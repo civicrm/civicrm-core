@@ -73,7 +73,7 @@
         <table id="options" class="row-highlight">
          <thead>
          <tr>
-            {if !empty($hasIcons)}
+            {if $hasIcons}
               <th></th>
             {/if}
             {if $showComponent}
@@ -113,29 +113,29 @@
           <tbody>
         {foreach from=$rows item=row}
           <tr id="option_value-{$row.id}" class="crm-admin-options crm-admin-options_{$row.id} crm-entity {cycle values="odd-row,even-row"}{if NOT $row.is_active} disabled{/if}">
-            {if !empty($hasIcons)}
+            {if $hasIcons}
               <td class="crm-admin-options-icon"><i class="crm-i {$row.icon}" aria-hidden="true"></i></td>
             {/if}
             {if $showComponent}
               <td class="crm-admin-options-component_name">{$row.component_name}</td>
             {/if}
-            <td class="crm-admin-options-label crm-editable" data-field="label" {if !empty($row.color)}style="background-color: {$row.color}; color: {$row.color|colorContrast};"{/if}>
-              {if !empty($row.label)}{$row.label}{/if}
+            <td class="crm-admin-options-label crm-editable" data-field="label" {if $row.color}style="background-color: {$row.color}; color: {$row.color|colorContrast};"{/if}>
+              {$row.label}
             </td>
             {if $gName eq "case_status"}
               <td class="crm-admin-options-grouping">{$row.grouping}</td>
             {/if}
-            <td class="crm-admin-options-value">{if isset($row.value)}{$row.value}{/if}</td>
+            <td class="crm-admin-options-value">{$row.value}</td>
             {if $gName eq "payment_instrument"}
               <td>{$row.financial_account}</td>
             {/if}
             {if $showCounted}
               <td class="center crm-admin-options-filter">{icon condition=$row.filter}{ts}Counted{/ts}{/icon}</td>
             {/if}
-            <td class="crm-admin-options-description crm-editable" data-field="description" data-type="textarea">{if isset($row.description)}{$row.description}{/if}</td>
-            <td class="nowrap crm-admin-options-order">{if isset($row.weight)}{$row.weight}{/if}</td>
+            <td class="crm-admin-options-description crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
+            <td class="nowrap crm-admin-options-order">{if $row.weight}{$row.weight}{/if}</td>
             {if $showIsDefault}
-              <td class="crm-admin-options-is_default" align="center">{if !empty($row.is_default)}{icon}{ts}Default{/ts}{/icon}{/if}&nbsp;</td>
+              <td class="crm-admin-options-is_default" align="center">{if $row.is_default}{icon}{ts}Default{/ts}{/icon}{/if}&nbsp;</td>
             {/if}
             <td class="crm-admin-options-is_reserved">{if $row.is_reserved eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td class="crm-admin-options-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>

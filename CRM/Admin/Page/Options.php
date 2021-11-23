@@ -217,11 +217,20 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
     CRM_Utils_Weight::addOrder($optionValue, 'CRM_Core_DAO_OptionValue',
       'id', $returnURL, $filter
     );
+    $this->assign('hasIcons', FALSE);
 
     // retrieve financial account name for the payment method page
-    if ($gName === "payment_instrument") {
-      foreach ($optionValue as $key => $option) {
+    foreach ($optionValue as $key => $option) {
+      if ($gName === 'payment_instrument') {
         $optionValue[$key]['financial_account'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($key, NULL, 'civicrm_option_value', 'financial_account_id.name');
+      }
+      foreach (['weight', 'description', 'value', 'color', 'label', 'is_default', 'icon'] as $expectedKey) {
+        if (!array_key_exists($expectedKey, $option)) {
+          $optionValue[$key][$expectedKey] = NULL;
+        }
+      }
+      if ($option['icon']) {
+        $this->assign('hasIcons', TRUE);
       }
     }
     $this->assign('rows', $optionValue);
