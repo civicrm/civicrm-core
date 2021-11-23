@@ -15,7 +15,7 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
    *
    * @dataProvider formList
    */
-  public function testOpeningForms(string $url) {
+  public function testOpeningForms(string $url): void {
     $this->createLoggedInUser();
 
     $_SERVER['REQUEST_URI'] = $url;
@@ -61,6 +61,9 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
       ],
       'New Email' => [
         'civicrm/activity/email/add?atype=3&action=add&reset=1&context=standalone',
+      ],
+      'Message Templates' => [
+        'civicrm/admin/messageTemplates?reset=1',
       ],
     ];
   }

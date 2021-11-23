@@ -410,9 +410,13 @@ class CRM_Core_Smarty extends Smarty {
 
         // The ones below this point are hopefully here short term.
         || strpos($string, '<a') === 0
+        // Message templates screen
+        || strpos($string, '<span><a href') === 0
         // Not sure how big a pattern this is - used in Pledge view tab
         // not sure if it needs escaping
         || strpos($string, ' action="/civicrm/') === 0
+        // eg. Tag edit page, civicrm/admin/financial/financialType/accounts?action=add&reset=1&aid=1
+        || strpos($string, ' action="" method="post"') === 0
         // This seems to be urls...
         || strpos($string, '/civicrm/') === 0
         // Validation error message - eg. <span class="crm-error">Tournament Fees is a required field.</span>
