@@ -14,7 +14,7 @@
     <td class="html-adjust description">{$element.help_pre}</td>
   </tr>
 {/if}
-{if isset($element.options_per_line) and $element.options_per_line != 0 }
+{if $element.options_per_line}
   <tr class="custom_field-row {$element.element_name}-row">
     <td
       class="label">{$formElement.label}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$element.label}{/if}</td>
