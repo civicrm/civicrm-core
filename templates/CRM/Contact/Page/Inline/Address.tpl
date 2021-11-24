@@ -38,7 +38,7 @@
           {if !empty($sharedAddresses.$locationIndex.shared_address_display.name)}
             <strong>{ts 1=$sharedAddresses.$locationIndex.shared_address_display.name}Address belongs to %1{/ts}</strong><br />
           {/if}
-          {$add.display|nl2br}
+          {$add.display|smarty:nodefaults|purify|nl2br}
         </div>
       </div>
 
