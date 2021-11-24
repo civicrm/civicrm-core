@@ -1,17 +1,15 @@
 <?xml version="1.0"?>
 <extension key="org.civicrm.afform_admin" type="module">
   <file>afform_admin</file>
-  <name>Afform: Form Builder</name>
-  <description>GUI for designing forms</description>
+  <name>Form Builder</name>
+  <description>Administer, edit and compose dynamic forms</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>Tim Otten</author>
     <email>totten@civicrm.org</email>
   </maintainer>
   <urls>
-    <url desc="Main Extension Page">http://FIXME</url>
-    <url desc="Documentation">http://FIXME</url>
-    <url desc="Support">http://FIXME</url>
+    <url desc="Chat">https://chat.civicrm.org/civicrm/channels/dev-afform</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2020-01-09</releaseDate>
@@ -20,7 +18,7 @@
   <compatibility>
     <ver>5.23</ver>
   </compatibility>
-  <comments>Administer, edit and compose CiviCRM Afforms.</comments>
+  <comments>Form Builder provides a UI to administer and edit forms. It is an optional admin tool and not required for the forms to function.</comments>
   <requires>
     <ext>org.civicrm.afform</ext>
     <ext>org.civicrm.search_kit</ext>

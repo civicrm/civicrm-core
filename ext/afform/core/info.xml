@@ -1,17 +1,15 @@
 <?xml version="1.0"?>
 <extension key="org.civicrm.afform" type="module">
   <file>afform</file>
-  <name>Afform: Core Runtime</name>
-  <description>Afform is the Affable Administrative AngularJS Form Framework</description>
+  <name>Form Core</name>
+  <description>Core functionality for rendering and processing dynamic forms</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>CiviCRM LLC</author>
     <email>info@civicrm.org</email>
   </maintainer>
   <urls>
-    <url desc="Main Extension Page">http://FIXME</url>
-    <url desc="Documentation">http://FIXME</url>
-    <url desc="Support">http://FIXME</url>
+    <url desc="Chat">https://chat.civicrm.org/civicrm/channels/dev-afform</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2020-01-09</releaseDate>
@@ -20,10 +18,7 @@
   <compatibility>
     <ver>5.23</ver>
   </compatibility>
-  <requires>
-    <ext version="~4.5">org.civicrm.api4</ext>
-  </requires>
-  <comments>Core functionality for CiviCRM Afforms</comments>
+  <comments>The Form Core extension is required to use any dynamic form. To administer and edit forms, also install the Form Builder extension.</comments>
   <civix>
     <namespace>CRM/Afform</namespace>
   </civix>
