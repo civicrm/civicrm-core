@@ -11914,7 +11914,8 @@ INSERT INTO `civicrm_state_province` (`id`, `name`, `abbreviation`, `country_id`
  (10391,'Torfaen','TOF',1226,1),
  (10392,'Wrexham','WRX',1226,1),
  (10393,'Sejong','50',1115,1),
- (10394,'Dinagat Islands','DIN',1170,1);
+ (10394,'Dinagat Islands','DIN',1170,1),
+ (10395,'Huila','HUI',1048,1);
 /*!40000 ALTER TABLE `civicrm_state_province` ENABLE KEYS */;
 UNLOCK TABLES;
 

@@ -4144,4 +4144,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1115, "50", "Sejong"),
 
 -- Add missing province for Philippines
-(NULL, 1170, "DIN", "Dinagat Islands");
+(NULL, 1170, "DIN", "Dinagat Islands"),
+
+-- Add missing state for Colombia
+(NULL, 1048, "HUI", "Huila");
