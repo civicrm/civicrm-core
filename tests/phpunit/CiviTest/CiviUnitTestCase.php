@@ -2404,6 +2404,21 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
+   * Get the rendered contents from a form.
+   *
+   * @param string $formName
+   *
+   * @return false|string
+   */
+  protected function getRenderedFormContents(string $formName) {
+    $form = $this->getFormObject($formName);
+    $form->buildForm();
+    ob_start();
+    $form->controller->_actions['display']->perform($form, 'display');
+    return ob_get_clean();
+  }
+
+  /**
    * Set up initial recurring payment allowing subsequent IPN payments.
    *
    * @param array $recurParams (Optional)
@@ -3199,6 +3214,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       case 'CRM_Event_Cart_Form_Checkout_Payment':
       case 'CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices':
         $form->controller = new CRM_Event_Cart_Controller_Checkout();
+        break;
+
+      case strpos($class, '_Form_') !== FALSE:
+        $form->controller = new CRM_Core_Controller_Simple($class, $pageName);
         break;
 
       default:
