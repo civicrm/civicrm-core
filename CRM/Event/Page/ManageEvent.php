@@ -53,7 +53,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
     if (!(self::$_actionLinks)) {
       // helper variable for nicer formatting
       $copyExtra = ts('Are you sure you want to make a copy of this Event?');
-      $deleteExtra = ts('Are you sure you want to delete this Event?');
 
       self::$_actionLinks = [
         CRM_Core_Action::DISABLE => [
@@ -70,7 +69,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'name' => ts('Delete'),
           'url' => CRM_Utils_System::currentPath(),
           'qs' => 'action=delete&id=%%id%%',
-          'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
           'title' => ts('Delete Event'),
         ],
         CRM_Core_Action::COPY => [
