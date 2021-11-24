@@ -14,13 +14,14 @@
         ctrl = this;
 
       this.$onInit = function() {
-        var rendered = false;
+        var rendered = false,
+          field = this.field || {};
         ctrl.dateRanges = CRM.crmSearchTasks.dateRanges;
-        ctrl.entity = ctrl.field.fk_entity || ctrl.field.entity;
+        ctrl.entity = field.fk_entity || field.entity;
 
         this.ngModel.$render = function() {
           ctrl.value = ctrl.ngModel.$viewValue;
-          if (!rendered && ctrl.field.input_type === 'Date') {
+          if (!rendered && field.input_type === 'Date') {
             setDateType();
           }
           rendered = true;
