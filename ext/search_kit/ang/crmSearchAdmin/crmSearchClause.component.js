@@ -62,17 +62,15 @@
       }
 
       this.getField = function(expr) {
-        if (!meta[expr]) {
-          meta[expr] = searchMeta.parseExpr(expr).args[0];
+        if (!(expr in meta)) {
+          meta[expr] = _.findWhere(searchMeta.parseExpr(expr).args, {type: 'field'});
         }
-        return meta[expr].field;
+        return meta[expr] && meta[expr].field;
       };
 
       this.getOptionKey = function(expr) {
-        if (!meta[expr]) {
-          meta[expr] = _.findWhere(searchMeta.parseExpr(expr).args, {type: 'field'});
-        }
-        return meta[expr].suffix ? meta[expr].suffix.slice(1) : 'id';
+        var field = ctrl.getField(expr) || {};
+        return field.suffix ? field.suffix.slice(1) : 'id';
       };
 
       this.addGroup = function(op) {
