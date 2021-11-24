@@ -9,10 +9,10 @@
       row: '<',
       col: '<',
       cancel: '&',
-      onSuccess: '&'
+      doSave: '&'
     },
     templateUrl: '~/crmSearchDisplay/crmSearchDisplayEditable.html',
-    controller: function($scope, $element, crmApi4, crmStatus) {
+    controller: function($scope, $element, crmApi4) {
       var ctrl = this,
         initialValue,
         col;
@@ -58,9 +58,7 @@
         var record = _.cloneDeep(col.edit.record);
         record[col.edit.value_key] = ctrl.value;
         $('input', $element).attr('disabled', true);
-        crmStatus({}, crmApi4(col.edit.entity, 'update', {
-          values: record
-        })).then(ctrl.onSuccess);
+        ctrl.doSave({apiCall: [col.edit.entity, 'update', {values: record}]});
       };
 
       function loadOptions() {

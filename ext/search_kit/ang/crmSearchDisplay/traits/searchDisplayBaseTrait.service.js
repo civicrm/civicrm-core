@@ -2,7 +2,7 @@
   "use strict";
 
   // Trait provides base methods and properties common to all search display types
-  angular.module('crmSearchDisplay').factory('searchDisplayBaseTrait', function(crmApi4) {
+  angular.module('crmSearchDisplay').factory('searchDisplayBaseTrait', function(crmApi4, crmStatus) {
 
     // Return a base trait shared by all search display controllers
     // Gets mixed in using angular.extend()
@@ -90,23 +90,29 @@
       },
 
       // Call SearchDisplay.run and update ctrl.results and ctrl.rowCount
-      runSearch: function(editedRow) {
+      runSearch: function(apiCalls, statusParams, editedRow) {
         var ctrl = this,
           requestId = ++this._runCount,
           apiParams = this.getApiParams();
-        this.loading = true;
+        if (!statusParams) {
+          this.loading = true;
+        }
         _.each(ctrl.onPreRun, function(callback) {
           callback.call(ctrl, apiParams);
         });
-        return crmApi4('SearchDisplay', 'run', apiParams).then(function(results) {
+        apiCalls = apiCalls || [];
+        apiCalls.push(['SearchDisplay', 'run', apiParams]);
+        var apiRequest = crmApi4(apiCalls);
+        apiRequest.then(function(apiResults) {
           if (requestId < ctrl._runCount) {
             return; // Another request started after this one
           }
-          ctrl.results = results;
+          ctrl.results = _.last(apiResults);
           ctrl.editing = ctrl.loading = false;
-          if (!ctrl.rowCount) {
-            if (!ctrl.limit || results.length < ctrl.limit) {
-              ctrl.rowCount = results.length;
+          // Update rowCount if running for the first time or during an update op
+          if (!ctrl.rowCount || editedRow) {
+            if (!ctrl.limit || ctrl.results.length < ctrl.limit) {
+              ctrl.rowCount = ctrl.results.length;
             } else if (ctrl.settings.pager) {
               var params = ctrl.getApiParams('row_count');
               crmApi4('SearchDisplay', 'run', params).then(function(result) {
@@ -115,7 +121,7 @@
             }
           }
           _.each(ctrl.onPostRun, function(callback) {
-            callback.call(ctrl, results, 'success', editedRow);
+            callback.call(ctrl, ctrl.results, 'success', editedRow);
           });
         }, function(error) {
           if (requestId < ctrl._runCount) {
@@ -127,6 +133,10 @@
             callback.call(ctrl, error, 'error', editedRow);
           });
         });
+        if (statusParams) {
+          crmStatus(statusParams, apiRequest);
+        }
+        return apiRequest;
       },
       formatFieldValue: function(colData) {
         return angular.isArray(colData.val) ? colData.val.join(', ') : colData.val;
