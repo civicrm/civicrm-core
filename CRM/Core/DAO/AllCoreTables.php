@@ -364,6 +364,11 @@ class CRM_Core_DAO_AllCoreTables {
    */
   public static function getEntityNameForTable(string $tableName) {
     self::init();
+    // CRM-19677: on multilingual setup, trim locale from $tableName to fetch class name
+    if (CRM_Core_I18n::isMultilingual()) {
+      global $dbLocale;
+      $tableName = str_replace($dbLocale, '', $tableName);
+    }
     $matches = CRM_Utils_Array::findAll(self::$entityTypes, ['table' => $tableName]);
     return $matches ? $matches[0]['name'] : NULL;
   }
