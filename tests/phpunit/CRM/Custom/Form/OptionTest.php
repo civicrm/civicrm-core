@@ -9,7 +9,7 @@ class CRM_Custom_Form_OptionTest extends CiviUnitTestCase {
   /**
    * Test the `name` field doesn't get changed when editing an existing option.
    */
-  public function testEditCustomFieldOptionValue() {
+  public function testEditCustomFieldOptionValue(): void {
     // Create a custom field for contacts with some option choices
     $customGroup = $this->customGroupCreate(['extends' => 'Contact', 'title' => 'contact stuff']);
     $customField = $this->customFieldOptionValueCreate($customGroup, 'myCustomField');
@@ -28,6 +28,7 @@ class CRM_Custom_Form_OptionTest extends CiviUnitTestCase {
     $form->set('id', $optionValue['id']);
     $form->set('fid', $customField['id']);
     $form->set('gid', $customGroup['id']);
+    $form->buildForm();
 
     ob_start();
     $form->controller->_actions['display']->perform($form, 'display');
