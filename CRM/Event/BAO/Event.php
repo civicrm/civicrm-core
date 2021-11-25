@@ -1171,7 +1171,7 @@ WHERE civicrm_event.is_active = 1
           'credit_card_number' => CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $participantParams)),
           'credit_card_exp_date' => CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $participantParams))),
           'selfcancelxfer_time' => abs($values['event']['selfcancelxfer_time']),
-          'selfservice_preposition' => $values['event']['selfcancelxfer_time'] < 0 ? 'after' : 'before',
+          'selfservice_preposition' => $values['event']['selfcancelxfer_time'] < 0 ? ts('after') : ts('before'),
           'currency' => $values['event']['currency'] ?? CRM_Core_Config::singleton()->defaultCurrency,
         ]);
 
