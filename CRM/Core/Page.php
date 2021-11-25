@@ -106,8 +106,6 @@ class CRM_Core_Page {
    * @var string[]
    */
   public $expectedSmartyVariables = [
-    'breadcrumb',
-    'pageTitle',
     'isForm',
     'hookContent',
     'hookContentPlacement',
@@ -121,6 +119,11 @@ class CRM_Core_Page {
     // required for Summary.tpl (contact summary) but seems
     // likely to be used more broadly to warrant inclusion here.
     'context',
+    // for CMSPrint.tpl
+    'urlIsPublic',
+    'breadcrumb',
+    'pageTitle',
+    'isDeleted',
   ];
 
   /**

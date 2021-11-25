@@ -265,6 +265,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // in CMSPrint.tpl
     'breadcrumb',
     'pageTitle',
+    'urlIsPublic',
+    'isDeleted',
     // in 'body.tpl
     'suppressForm',
     'beginHookFormElements',
