@@ -57,6 +57,11 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
       'valid' => FALSE,
       'active' => FALSE,
       'current' => FALSE,
+      'class' => FALSE,
+      'extra' => FALSE,
+      'template' => FALSE,
+      'count' => FALSE,
+      'icon' => FALSE,
     ];
 
     $tabs = [
