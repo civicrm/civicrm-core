@@ -1741,19 +1741,15 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
    * Mostly just check there's no errors opening the Widget tab on contribution
    * pages.
    */
-  public function testOpeningWidgetAdminPage() {
+  public function testOpeningWidgetAdminPage(): void {
     $page_id = $this->callAPISuccess('ContributionPage', 'create', [
       'title' => 'my page',
       'financial_type_id' => $this->_financialTypeId,
       'payment_processor' => $this->paymentProcessorID,
     ])['id'];
+    $_REQUEST = ['reset' => 1, 'action' => 'update', 'id' => $page_id];
 
-    $form = new CRM_Contribute_Form_ContributionPage_Widget();
-    $form->controller = new CRM_Core_Controller_Simple('CRM_Contribute_Form_ContributionPage_Widget', 'Widget');
-
-    $form->set('reset', '1');
-    $form->set('action', 'update');
-    $form->set('id', $page_id);
+    $form = $this->getFormObject('CRM_Contribute_Form_ContributionPage_Widget');
 
     ob_start();
     $form->controller->_actions['display']->perform($form, 'display');
