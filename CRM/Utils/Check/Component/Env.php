@@ -676,6 +676,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       else {
         $message = ts('All extensions are up-to-date:');
       }
+      natcasesort($okextensions);
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__ . 'Ok',
         $message . '<ul><li>' . implode('</li><li>', $okextensions) . '</li></ul>',
