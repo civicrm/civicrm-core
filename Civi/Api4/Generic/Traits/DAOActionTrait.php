@@ -32,6 +32,8 @@ trait DAOActionTrait {
    */
   protected $language;
 
+  private $_maxWeights = [];
+
   /**
    * @return \CRM_Core_DAO|string
    */
@@ -105,6 +107,7 @@ trait DAOActionTrait {
    */
   protected function writeObjects(&$items) {
     $baoName = $this->getBaoName();
+    $updateWeights = FALSE;
 
     // TODO: Opt-in more entities to use the new writeRecords BAO method.
     $functionNames = [
@@ -118,12 +121,27 @@ trait DAOActionTrait {
       $method = method_exists($baoName, 'create') ? 'create' : (method_exists($baoName, 'add') ? 'add' : 'writeRecords');
     }
 
+    // Adjust weights for sortable entities
+    if (in_array('SortableEntity', CoreUtil::getInfoItem($this->getEntityName(), 'type'))) {
+      $weightField = CoreUtil::getInfoItem($this->getEntityName(), 'order_by');
+      // Only take action if updating a single record, or if no weights are specified in any record
+      // This avoids messing up a bulk update with multiple recalculations
+      if (count($items) === 1 || !array_filter(array_column($items, $weightField))) {
+        $updateWeights = TRUE;
+      }
+    }
+
     $result = [];
 
     foreach ($items as &$item) {
       $entityId = $item['id'] ?? NULL;
       FormattingUtil::formatWriteParams($item, $this->entityFields());
       $this->formatCustomParams($item, $entityId);
+
+      // Adjust weights for sortable entities
+      if ($updateWeights) {
+        $this->updateWeight($item);
+      }
 
       // Skip individual processing if using writeRecords
       if ($method === 'writeRecords') {
@@ -285,6 +303,64 @@ trait DAOActionTrait {
       \Civi::cache('metadata')->set($cacheKey, $info);
     }
     return isset($info[$fieldName]) ? ['suffix' => $suffix] + $info[$fieldName] : NULL;
+  }
+
+  /**
+   * Update weights when inserting or updating a sortable entity
+   * @param array $record
+   * @see SortableEntity
+   */
+  protected function updateWeight(array &$record) {
+    /** @var \CRM_Core_DAO|string $daoName */
+    $daoName = CoreUtil::getInfoItem($this->getEntityName(), 'dao');
+    $weightField = CoreUtil::getInfoItem($this->getEntityName(), 'order_by');
+    $idField = CoreUtil::getIdFieldName($this->getEntityName());
+    // If updating an existing record without changing weight, do nothing
+    if (!isset($record[$weightField]) && !empty($record[$idField])) {
+      return;
+    }
+    $daoFields = $daoName::getSupportedFields();
+    $newWeight = $record[$weightField] ?? NULL;
+    $oldWeight = empty($record[$idField]) ? NULL : \CRM_Core_DAO::getFieldValue($daoName, $record[$idField], $weightField);
+
+    // FIXME: Need a more metadata-ish approach. For now here's a hardcoded list of the fields sortable entities use for grouping.
+    $guesses = ['option_group_id', 'price_set_id', 'price_field_id', 'premiums_id', 'uf_group_id', 'custom_group_id', 'domain_id'];
+    $filters = [];
+    foreach (array_intersect($guesses, array_keys($daoFields)) as $filter) {
+      $value = $record[$filter] ?? (empty($record[$idField]) ? NULL : \CRM_Core_DAO::getFieldValue($daoName, $record[$idField], $filter));
+      // Ignore the db-formatted string 'null' and empty strings as well as NULL values
+      if (!\CRM_Utils_System::isNull($value)) {
+        $filters[$filter] = $value;
+      }
+    }
+    // Supply default weight for new record
+    if (!isset($record[$weightField]) && empty($record[$idField])) {
+      $record[$weightField] = $this->getMaxWeight($daoName, $filters, $weightField);
+    }
+    else {
+      $record[$weightField] = \CRM_Utils_Weight::updateOtherWeights($daoName, $oldWeight, $newWeight, $filters, $weightField);
+    }
+  }
+
+  /**
+   * Looks up max weight for a set of sortable entities
+   *
+   * Keeps it in memory in case this operation is writing more than one record
+   *
+   * @param $daoName
+   * @param $filters
+   * @param $weightField
+   * @return int|mixed
+   */
+  private function getMaxWeight($daoName, $filters, $weightField) {
+    $key = $daoName . json_encode($filters);
+    if (!isset($this->_maxWeights[$key])) {
+      $this->_maxWeights[$key] = \CRM_Utils_Weight::getMax($daoName, $filters, $weightField) + 1;
+    }
+    else {
+      ++$this->_maxWeights[$key];
+    }
+    return $this->_maxWeights[$key];
   }
 
 }

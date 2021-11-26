@@ -15,10 +15,12 @@ namespace Civi\Api4;
  *
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields/
  * @searchable secondary
+ * @orderBy weight
  * @since 5.19
  * @package Civi\Api4
  */
 class CustomField extends Generic\DAOEntity {
   use Generic\Traits\ManagedEntity;
+  use Generic\Traits\SortableEntity;
 
 }

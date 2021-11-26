@@ -100,6 +100,16 @@ class CRM_Utils_String {
   }
 
   /**
+   * Inverse of above function, converts camelCase to snake_case
+   *
+   * @param string $str
+   * @return string
+   */
+  public static function convertStringToSnakeCase(string $str): string {
+    return strtolower(ltrim(preg_replace('/(?=[A-Z])/', '_$0', $str), '_'));
+  }
+
+  /**
    * Takes a variable name and munges it randomly into another variable name.
    *
    * @param string $name

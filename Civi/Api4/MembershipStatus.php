@@ -14,11 +14,13 @@ namespace Civi\Api4;
  * MembershipStatus entity.
  *
  * @searchable secondary
+ * @orderBy weight
  * @since 5.42
  * @package Civi\Api4
  */
 class MembershipStatus extends Generic\DAOEntity {
   use Generic\Traits\OptionList;
   use Generic\Traits\ManagedEntity;
+  use Generic\Traits\SortableEntity;
 
 }
