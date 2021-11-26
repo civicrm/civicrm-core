@@ -1,12 +1,12 @@
 <a class="btn btn-xs btn-default" title="{{:: ts('View search results table') }}" ng-href="{{:: $ctrl.searchDisplayPath + '#/display/' + row.data.name }}" target="_blank">
   {{:: ts('View') }}
 </a>
-<a class="btn btn-xs btn-primary" href="#/edit/{{:: row.data.id }}" ng-if="row.permissionToEdit">
+<a class="btn btn-xs btn-primary" href="#/edit/{{:: row.data.id }}" ng-style="{visibility: row.permissionToEdit ? 'visible' : 'hidden'}">
   {{:: ts('Edit') }}
 </a>
 <a class="btn btn-xs btn-secondary" href="#/create/{{:: row.data.api_entity + '?params=' + $ctrl.encode(row.data.api_params) }}">
   {{:: ts('Clone') }}
 </a>
-<a href class="btn btn-xs btn-{{ row.data['base_module:label'] ? 'warning' : 'danger' }}" ng-click="$ctrl.deleteOrRevert(row)">
+<a href ng-style="{visibility: row.data['base_module:label'] && !row.data['local_modified_date'] ? 'hidden' : 'visible'}" class="btn btn-xs btn-{{ row.data['base_module:label'] ? 'warning' : 'danger' }}" ng-click="$ctrl.deleteOrRevert(row)">
   {{ row.data['base_module:label'] ? ts('Revert') : ts('Delete') }}
 </a>
