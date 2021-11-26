@@ -4,7 +4,7 @@
     <label for="af_config_form_title">
       {{:: ts('Title') }} <span class="crm-marker">*</span>
     </label>
-    <p class="help-block">{{:: ts('Public title (usually displayed at the top of the form).') }}</p>
+    <p class="help-block" ng-if=":: editor.afform.type !== 'block'">{{:: ts('Public title (usually displayed at the top of the form).') }}</p>
     <input ng-model="editor.afform.title" class="form-control" id="af_config_form_title" required title="{{:: ts('Required') }}" />
   </div>
 
@@ -17,7 +17,8 @@
     <!-- Description is "semi-private": not generally public, but not audited for secrecy -->
   </div>
 
-  <div class="form-group">
+  <!-- Form permissions do not apply to blocks -->
+  <div class="form-group" ng-if=":: editor.afform.type !== 'block'">
     <label for="af_config_form_permission">
       {{:: ts('Permission') }}
     </label>
@@ -25,7 +26,8 @@
     <p class="help-block">{{:: ts('What permission is required to use this form?') }}</p>
   </div>
 
-  <fieldset>
+  <!-- Placement options do not apply to blocks -->
+  <fieldset ng-if=":: editor.afform.type !== 'block'">
     <legend>{{:: ts('Placement') }}</legend>
 
     <div class="form-group" ng-class="{'has-error': !!config_form.server_route.$error.pattern}">
@@ -84,8 +86,9 @@
       <p class="help-block">{{:: ts('Choose which contact from the search should match the contact being viewed.') }}</p>
     </div>
   </fieldset>
-  <fieldset>
 
+  <!--  Submit actions are only applicable to form types with a submit button (exclude blocks and search forms) -->
+  <fieldset ng-if=":: editor.afform.type === 'custom'">
     <legend>{{:: ts('Submit Actions') }}</legend>
 
     <div class="form-group" >
