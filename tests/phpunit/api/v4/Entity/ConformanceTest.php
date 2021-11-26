@@ -53,6 +53,8 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
    * Set up baseline for testing
    */
   public function setUp(): void {
+    // Enable all components
+    \CRM_Core_BAO_ConfigSetting::enableAllComponents();
     $this->setUpOptionCleanup();
     $this->loadDataSet('CaseType');
     $this->loadDataSet('ConformanceTest');
