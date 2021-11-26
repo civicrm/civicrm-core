@@ -34,7 +34,7 @@
       </div>
      </div>
     {/if}
-    {if isset($cgCount)}
+    {if $cgCount}
       <div id="custom_group_{$group_id}_{$cgCount}"></div>
     {else}
       <div id="custom_group_{$group_id}"></div>
