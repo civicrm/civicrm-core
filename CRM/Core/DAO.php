@@ -2523,8 +2523,7 @@ SELECT contact_id
   /**
    * Find all records which refer to this entity.
    *
-   * @return array
-   *   Array of objects referencing this
+   * @return CRM_Core_DAO[]
    */
   public function findReferences() {
     $links = self::getReferencesToTable(static::getTableName());

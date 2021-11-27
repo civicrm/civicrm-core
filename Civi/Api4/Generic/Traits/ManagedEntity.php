@@ -12,6 +12,7 @@
 namespace Civi\Api4\Generic\Traits;
 
 use Civi\Api4\Generic\BasicBatchAction;
+use Civi\Api4\Generic\ExportAction;
 
 /**
  * A managed entity includes extra fields and methods to revert from an overridden local to base state.
@@ -34,6 +35,15 @@ trait ManagedEntity {
         throw new \API_Exception('Cannot revert ' . $action->getEntityName() . ' with id ' . $item['id']);
       }
     }))->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Generic\ExportAction
+   */
+  public static function export($checkPermissions = TRUE) {
+    return (new ExportAction(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
 }
