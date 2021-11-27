@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contact;
+
 /**
  *
  * @package CRM
@@ -67,6 +69,15 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     //revert the permissionship text in template
     $relationship = new CRM_Contact_DAO_Relationship();
     $relationship->id = $viewRelationship[$this->getEntityId()]['id'];
+
+    $viewRelationship[$this->getEntityId()]['name'] = CRM_Contact_BAO_Relationship::formatContactName([
+      'name' => $viewRelationship[$this->getEntityId()]['name'],
+      'is_deceased' => Contact::get(FALSE)
+        ->addWhere('id', '=', $viewRelationship[$this->getEntityId()]['cid'])
+        ->addSelect('is_deceased')
+        ->execute()
+        ->first()['is_deceased'],
+    ]);
 
     if ($relationship->find(TRUE)) {
       if (($viewRelationship[$this->getEntityId()]['rtype'] == 'a_b') && ($this->getContactId() == $relationship->contact_id_a)) {

@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contact;
+
 /**
  * Class CRM_Contact_BAO_Relationship.
  */
@@ -1991,6 +1993,22 @@ AND cc.sort_name LIKE '%$name%'";
   }
 
   /**
+   * Format the contact name to show on the relationship
+   * Currently adds "deceased" like on contact summary if applicable.
+   *
+   * @param array $contact
+   *
+   * @return string
+   */
+  public static function formatContactName(array $contact): string {
+    $name = $contact['name'];
+    if (!empty($contact['is_deceased'])) {
+      $name .= ' <span class="crm-contact-deceased">(' . ts('deceased') . ')</span>';
+    }
+    return $name;
+  }
+
+  /**
    * Wrapper for contact relationship selector.
    *
    * @param array $params
@@ -2048,6 +2066,13 @@ AND cc.sort_name LIKE '%$name%'";
 
       $displayName = CRM_Contact_BAO_Contact::displayName($params['contact_id']);
 
+      $relationshipContactIDs = CRM_Utils_Array::collect('cid', $relationships);
+      $contactIsDeceased = Contact::get(FALSE)
+        ->addWhere('id', 'IN', $relationshipContactIDs)
+        ->addSelect('is_deceased')
+        ->execute()
+        ->indexBy('id');
+
       // format params
       foreach ($relationships as $relationshipId => $values) {
         $relationship = [];
@@ -2068,6 +2093,11 @@ AND cc.sort_name LIKE '%$name%'";
           FALSE,
           $values['cid']
         );
+
+        $values['name'] = self::formatContactName([
+          'name' => $values['name'],
+          'is_deceased' => $contactIsDeceased[$values['cid']]['is_deceased'],
+        ]);
         $relationship['sort_name'] = $icon . ' ' . CRM_Utils_System::href(
             $values['name'],
             'civicrm/contact/view',
