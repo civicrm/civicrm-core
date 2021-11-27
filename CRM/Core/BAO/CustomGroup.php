@@ -1788,7 +1788,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public static function formatGroupTree(&$groupTree, $groupCount = 1, &$form = NULL) {
+  public static function formatGroupTree($groupTree, $groupCount = 1, &$form = NULL) {
     $formattedGroupTree = [];
     $uploadNames = $formValues = [];
 
@@ -1822,8 +1822,12 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
       $formattedGroupTree[$key]['subtype'] = $value['subtype'] ?? NULL;
       $formattedGroupTree[$key]['max_multiple'] = $value['max_multiple'] ?? NULL;
 
+      // Properties that might have been filtered out but which
+      // should be present to avoid smarty e-notices.
+      $expectedProperties = ['options_per_line', 'help_pre', 'help_post'];
       // add field information
       foreach ($value['fields'] as $k => $properties) {
+        $properties = array_merge(array_fill_keys($expectedProperties, 'NULL'), $properties);
         $properties['element_name'] = "custom_{$k}_-{$groupCount}";
         if (isset($properties['customValue']) &&
           !CRM_Utils_System::isNull($properties['customValue']) &&
