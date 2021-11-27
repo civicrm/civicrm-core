@@ -277,6 +277,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     'infoTitle',
     'infoType',
     'infoOptions',
+    // required for attachmentjs.tpl
+    'context',
   ];
 
   /**
