@@ -615,7 +615,9 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
   public function preProcessCommon() {
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean');
-
+    // Ensure smarty variables are assigned here since this function is called from
+    // the report api and the main buildForm is not.
+    self::$_template->ensureVariablesAreAssigned($this->expectedSmartyVariables);
     $this->_dashBoardRowCount = CRM_Utils_Request::retrieve('rowCount', 'Integer');
 
     $this->_section = CRM_Utils_Request::retrieve('section', 'Integer');
