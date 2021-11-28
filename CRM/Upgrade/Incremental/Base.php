@@ -213,7 +213,10 @@ class CRM_Upgrade_Incremental_Base {
       foreach ($queries as $query) {
         CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
       }
+      $logging = new CRM_Logging_Schema();
+      $logging->fixSchemaDifferencesFor($table);
     }
+
     if ($locales && $triggerRebuild) {
       CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, $version, TRUE);
     }
