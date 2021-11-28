@@ -718,7 +718,8 @@ abstract class CRM_Utils_System_Base {
       // the system for a loop on lobo's macosx box
       // or in modules
       $cmsPath = $config->userSystem->cmsRootPath();
-      $userFrameworkResourceURL = $baseURL . str_replace("$cmsPath/", '',
+      $realCmsPath = realpath($cmsPath);
+      $userFrameworkResourceURL = $baseURL . str_replace(["$cmsPath/", "$realCmsPath/"], '',
           str_replace('\\', '/', $civicrm_root)
         );
 
