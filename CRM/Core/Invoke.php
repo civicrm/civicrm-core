@@ -220,6 +220,12 @@ class CRM_Core_Invoke {
     $template = CRM_Core_Smarty::singleton();
     $template->assign('activeComponent', 'CiviCRM');
     $template->assign('formTpl', 'default');
+    // Ensure template variables have 'something' assigned for e-notice
+    // prevention. These are ones that are included very often
+    // and not tied to a specific form.
+    // jsortable.tpl (datatables)
+    $template->assign('sourceUrl');
+    $template->assign('useAjax', 0);
 
     if ($item) {
 
