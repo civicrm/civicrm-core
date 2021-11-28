@@ -359,9 +359,12 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
       ->addChain('export', OptionGroup::export()->setId('$id'))
       ->execute()->first();
     $this->assertEquals('from_email_address', $result['export'][1]['params']['values']['option_group_id.name']);
-    $this->assertEquals('current_domain', $result['export'][1]['params']['values']['domain_id']);
     $this->assertNull($result['export'][1]['params']['values']['visibility_id']);
     $this->assertStringStartsWith('OptionGroup_from_email_address_OptionValue_', $result['export'][1]['name']);
+    // All references should be from the current domain
+    foreach (array_slice($result['export'], 1) as $reference) {
+      $this->assertEquals('current_domain', $reference['params']['values']['domain_id']);
+    }
   }
 
   public function testManagedNavigationWeights() {

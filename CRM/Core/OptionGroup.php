@@ -21,12 +21,22 @@ class CRM_Core_OptionGroup {
   /**
    * $_domainIDGroups array maintains the list of option groups for whom
    * domainID is to be considered.
+   *
+   * FIXME: Hardcoded list = bad. It would be better to make this a column in the civicrm_option_group table
    * @var array
    */
   public static $_domainIDGroups = [
     'from_email_address',
     'grant_type',
   ];
+
+  /**
+   * @param $groupName
+   * @return bool
+   */
+  public static function isDomainOptionGroup($groupName) {
+    return in_array($groupName, self::$_domainIDGroups, TRUE);
+  }
 
   /**
    * @param CRM_Core_DAO $dao
@@ -106,7 +116,7 @@ class CRM_Core_OptionGroup {
     $orderBy = 'weight'
   ) {
     $cache = CRM_Utils_Cache::singleton();
-    if (in_array($name, self::$_domainIDGroups)) {
+    if (self::isDomainOptionGroup($name)) {
       $cacheKey = self::createCacheKey($name, CRM_Core_I18n::getLocale(), $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName, $orderBy, CRM_Core_Config::domainID());
     }
     else {
@@ -144,7 +154,7 @@ WHERE  v.option_group_id = g.id
       }
       $query .= " AND ($componentClause) ";
     }
-    if (in_array($name, self::$_domainIDGroups)) {
+    if (self::isDomainOptionGroup($name)) {
       $query .= " AND v.domain_id = " . CRM_Core_Config::domainID();
     }
 
@@ -433,7 +443,7 @@ WHERE  v.option_group_id = g.id
   AND  g.is_active       = 1
   AND  v.is_default      = 1
 ";
-    if (in_array($groupName, self::$_domainIDGroups)) {
+    if (self::isDomainOptionGroup($groupName)) {
       $query .= " AND v.domain_id = " . CRM_Core_Config::domainID();
     }
 

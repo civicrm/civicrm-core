@@ -110,13 +110,21 @@ class ExportAction extends AbstractAction {
         $record[$fieldName] = NULL;
       }
     }
-    // Special handing of current_domain
+    // Should references be limited to the current domain?
+    $limitRefsByDomain = $entityType === 'OptionGroup' && \CRM_Core_OptionGroup::isDomainOptionGroup($record['name']) ? \CRM_Core_BAO_Domain::getDomain()->id : FALSE;
     foreach ($allFields as $fieldName => $field) {
       if (($field['fk_entity'] ?? NULL) === 'Domain') {
         $alias = $fieldName . '.name';
-        if (isset($record[$alias]) && $record[$alias] === \CRM_Core_BAO_Domain::getDomain()->name) {
-          unset($record[$alias]);
-          $record[$fieldName] = 'current_domain';
+        if (isset($record[$alias])) {
+          // If this entity is for a specific domain, limit references to that same domain
+          if ($fieldName === 'domain_id') {
+            $limitRefsByDomain = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $record[$alias], 'id', 'name');
+          }
+          // Swap current domain for special API keyword
+          if ($record[$alias] === \CRM_Core_BAO_Domain::getDomain()->name) {
+            unset($record[$alias]);
+            $record[$fieldName] = 'current_domain';
+          }
         }
       }
     }
@@ -140,6 +148,15 @@ class ExportAction extends AbstractAction {
     $references = [];
     foreach ($dao->findReferences() as $reference) {
       $refEntity = \CRM_Utils_Array::first($reference::fields())['entity'] ?? '';
+      // Limit references by domain
+      if (property_exists($reference, 'domain_id')) {
+        if (!isset($reference->domain_id)) {
+          $reference->find(TRUE);
+        }
+        if (isset($reference->domain_id) && $reference->domain_id != $limitRefsByDomain) {
+          continue;
+        }
+      }
       $references[$refEntity][] = $reference;
     }
     foreach ($references as $refEntity => $records) {

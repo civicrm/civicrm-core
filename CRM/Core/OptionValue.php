@@ -82,7 +82,7 @@ class CRM_Core_OptionValue {
     if ($optionGroupID) {
       $dao->option_group_id = $optionGroupID;
 
-      if (in_array($groupName, CRM_Core_OptionGroup::$_domainIDGroups)) {
+      if (CRM_Core_OptionGroup::isDomainOptionGroup($groupName)) {
         $dao->domain_id = CRM_Core_Config::domainID();
       }
 
@@ -438,7 +438,7 @@ FROM
       $params[2] = [$groupName, 'String'];
     }
 
-    if (in_array($groupName, CRM_Core_OptionGroup::$_domainIDGroups)) {
+    if (CRM_Core_OptionGroup::isDomainOptionGroup($groupName)) {
       $where .= " AND option_value.domain_id = " . CRM_Core_Config::domainID();
     }
 
