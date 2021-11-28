@@ -305,10 +305,15 @@ class CRM_Utils_Weight {
           // invalid field specified.  abort.
           throw new CRM_Core_Exception("Invalid field '$fieldName' for $daoName");
         }
-        $fieldNum++;
-        $whereConditions[] = "$fieldName = %$fieldNum";
-        $fieldType = $fields[$fieldName]['type'];
-        $params[$fieldNum] = [$value, CRM_Utils_Type::typeToString($fieldType)];
+        if (CRM_Utils_System::isNull($value)) {
+          $whereConditions[] = "$fieldName IS NULL";
+        }
+        else {
+          $fieldNum++;
+          $whereConditions[] = "$fieldName = %$fieldNum";
+          $fieldType = $fields[$fieldName]['type'];
+          $params[$fieldNum] = [$value, CRM_Utils_Type::typeToString($fieldType)];
+        }
       }
     }
     $where = implode(' AND ', $whereConditions);

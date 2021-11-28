@@ -115,6 +115,7 @@ trait DAOActionTrait {
       'CustomField' => 'writeRecords',
       'EntityTag' => 'add',
       'GroupContact' => 'add',
+      'Navigation' => 'writeRecords',
     ];
     $method = $functionNames[$this->getEntityName()] ?? NULL;
     if (!isset($method)) {
@@ -324,14 +325,10 @@ trait DAOActionTrait {
     $oldWeight = empty($record[$idField]) ? NULL : \CRM_Core_DAO::getFieldValue($daoName, $record[$idField], $weightField);
 
     // FIXME: Need a more metadata-ish approach. For now here's a hardcoded list of the fields sortable entities use for grouping.
-    $guesses = ['option_group_id', 'price_set_id', 'price_field_id', 'premiums_id', 'uf_group_id', 'custom_group_id', 'domain_id'];
+    $guesses = ['option_group_id', 'price_set_id', 'price_field_id', 'premiums_id', 'uf_group_id', 'custom_group_id', 'parent_id', 'domain_id'];
     $filters = [];
     foreach (array_intersect($guesses, array_keys($daoFields)) as $filter) {
-      $value = $record[$filter] ?? (empty($record[$idField]) ? NULL : \CRM_Core_DAO::getFieldValue($daoName, $record[$idField], $filter));
-      // Ignore the db-formatted string 'null' and empty strings as well as NULL values
-      if (!\CRM_Utils_System::isNull($value)) {
-        $filters[$filter] = $value;
-      }
+      $filters[$filter] = $record[$filter] ?? (empty($record[$idField]) ? NULL : \CRM_Core_DAO::getFieldValue($daoName, $record[$idField], $filter));
     }
     // Supply default weight for new record
     if (!isset($record[$weightField]) && empty($record[$idField])) {

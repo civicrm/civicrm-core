@@ -19,6 +19,7 @@
 namespace api\v4\Entity;
 
 use api\v4\UnitTestCase;
+use Civi\Api4\Navigation;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\OptionValue;
 use Civi\Api4\SavedSearch;
@@ -363,6 +364,173 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
     $this->assertStringStartsWith('OptionGroup_from_email_address_OptionValue_', $result['export'][1]['name']);
   }
 
+  public function testManagedNavigationWeights() {
+    $this->_managedEntities = [
+      [
+        'module' => 'unit.test.fake.ext',
+        'name' => 'Navigation_Test_Parent',
+        'entity' => 'Navigation',
+        'cleanup' => 'unused',
+        'update' => 'unmodified',
+        'params' => [
+          'version' => 4,
+          'values' => [
+            'label' => 'Test Parent',
+            'name' => 'Test_Parent',
+            'url' => NULL,
+            'icon' => 'crm-i test',
+            'permission' => 'access CiviCRM',
+            'permission_operator' => '',
+            'is_active' => TRUE,
+            'weight' => 50,
+            'parent_id' => NULL,
+            'has_separator' => NULL,
+            'domain_id' => 'current_domain',
+          ],
+        ],
+      ],
+      [
+        'module' => 'unit.test.fake.ext',
+        'name' => 'Navigation_Test_Child_1',
+        'entity' => 'Navigation',
+        'cleanup' => 'unused',
+        'update' => 'unmodified',
+        'params' => [
+          'version' => 4,
+          'values' => [
+            'label' => 'Test Child 1',
+            'name' => 'Test_Child_1',
+            'url' => 'civicrm/test1?reset=1',
+            'icon' => NULL,
+            'permission' => 'access CiviCRM',
+            'permission_operator' => '',
+            'parent_id.name' => 'Test_Parent',
+            'is_active' => TRUE,
+            'has_separator' => NULL,
+            'domain_id' => 'current_domain',
+          ],
+        ],
+      ],
+      [
+        'module' => 'unit.test.fake.ext',
+        'name' => 'Navigation_Test_Child_2',
+        'entity' => 'Navigation',
+        'cleanup' => 'unused',
+        'update' => 'unmodified',
+        'params' => [
+          'version' => 4,
+          'values' => [
+            'label' => 'Test Child 2',
+            'name' => 'Test_Child_2',
+            'url' => 'civicrm/test2?reset=1',
+            'icon' => NULL,
+            'permission' => 'access CiviCRM',
+            'permission_operator' => '',
+            'parent_id.name' => 'Test_Parent',
+            'is_active' => TRUE,
+            'has_separator' => NULL,
+            'domain_id' => 'current_domain',
+          ],
+        ],
+      ],
+      [
+        'module' => 'unit.test.fake.ext',
+        'name' => 'Navigation_Test_Child_3',
+        'entity' => 'Navigation',
+        'cleanup' => 'unused',
+        'update' => 'unmodified',
+        'params' => [
+          'version' => 4,
+          'values' => [
+            'label' => 'Test Child 3',
+            'name' => 'Test_Child_3',
+            'url' => 'civicrm/test3?reset=1',
+            'icon' => NULL,
+            'permission' => 'access CiviCRM',
+            'permission_operator' => '',
+            'parent_id.name' => 'Test_Parent',
+            'is_active' => TRUE,
+            'has_separator' => NULL,
+            'domain_id' => 'current_domain',
+          ],
+        ],
+      ],
+    ];
+
+    // Refresh managed entities with module active
+    $allModules = [
+      new \CRM_Core_Module('unit.test.fake.ext', TRUE),
+    ];
+    (new \CRM_Core_ManagedEntities($allModules))->reconcile();
+
+    $nav = Navigation::get(FALSE)
+      ->addWhere('name', '=', 'Test_Parent')
+      ->addChain('export', Navigation::export()->setId('$id'))
+      ->execute()->first();
+
+    $this->assertCount(4, $nav['export']);
+    $this->assertEquals(TRUE, $nav['is_active']);
+
+    $this->assertEquals(50, $nav['export'][0]['params']['values']['weight']);
+    $this->assertEquals('Navigation_Test_Parent_Navigation_Test_Child_1', $nav['export'][1]['name']);
+    $this->assertEquals('Navigation_Test_Parent_Navigation_Test_Child_2', $nav['export'][2]['name']);
+    $this->assertEquals('Navigation_Test_Parent_Navigation_Test_Child_3', $nav['export'][3]['name']);
+    // Weight should not be included in export of children, leaving it to be auto-managed
+    $this->assertArrayNotHasKey('weight', $nav['export'][1]['params']['values']);
+
+    // Children should have been assigned correct auto-weights
+    $children = Navigation::get(FALSE)
+      ->addWhere('parent_id.name', '=', 'Test_Parent')
+      ->addOrderBy('weight')
+      ->execute();
+    foreach ([1, 2, 3] as $index => $weight) {
+      $this->assertEquals($weight, $children[$index]['weight']);
+      $this->assertEquals(TRUE, $children[$index]['is_active']);
+    }
+
+    // Refresh managed entities with module disabled
+    $allModules = [
+      new \CRM_Core_Module('unit.test.fake.ext', FALSE),
+    ];
+    (new \CRM_Core_ManagedEntities($allModules))->reconcile();
+
+    // Children's weight should have been unaffected, but they should be disabled
+    $children = Navigation::get(FALSE)
+      ->addWhere('parent_id.name', '=', 'Test_Parent')
+      ->addOrderBy('weight')
+      ->execute();
+    foreach ([1, 2, 3] as $index => $weight) {
+      $this->assertEquals($weight, $children[$index]['weight']);
+      $this->assertEquals(FALSE, $children[$index]['is_active']);
+    }
+
+    $nav = Navigation::get(FALSE)
+      ->addWhere('name', '=', 'Test_Parent')
+      ->execute()->first();
+    $this->assertEquals(FALSE, $nav['is_active']);
+
+    // Refresh managed entities with module active
+    $allModules = [
+      new \CRM_Core_Module('unit.test.fake.ext', TRUE),
+    ];
+    (new \CRM_Core_ManagedEntities($allModules))->reconcile();
+
+    // Children's weight should have been unaffected, but they should be enabled
+    $children = Navigation::get(FALSE)
+      ->addWhere('parent_id.name', '=', 'Test_Parent')
+      ->addOrderBy('weight')
+      ->execute();
+    foreach ([1, 2, 3] as $index => $weight) {
+      $this->assertEquals($weight, $children[$index]['weight']);
+      $this->assertEquals(TRUE, $children[$index]['is_active']);
+    }
+    // Parent should also be re-enabled
+    $nav = Navigation::get(FALSE)
+      ->addWhere('name', '=', 'Test_Parent')
+      ->execute()->first();
+    $this->assertEquals(TRUE, $nav['is_active']);
+  }
+
   /**
    * @dataProvider sampleEntityTypes
    * @param string $entityName
@@ -389,6 +557,7 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
       'CustomField' => TRUE,
       'CustomGroup' => TRUE,
       'MembershipType' => TRUE,
+      'Navigation' => TRUE,
       'OptionGroup' => TRUE,
       'OptionValue' => TRUE,
       'SavedSearch' => TRUE,
