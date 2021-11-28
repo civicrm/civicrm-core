@@ -1057,7 +1057,27 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Get any smarty elements that may not be present in the form.
+   * Quick form elements which are conditionally added to the form.
+   *
+   * Elements in this array will be added to the form at the end if not present
+   * so that smarty does not e-notice on things like '{if $form.group}' when
+   * 'group' is not added to the form (e.g when no groups exist).
+   *
+   * @var array
+   */
+  protected $optionalQuickFormElements = [];
+
+  /**
+   * Add an optional element to the optional elements array.
+   *
+   * @param string $elementName
+   */
+  public function addOptionalQuickFormElement(string $elementName): void {
+    $this->optionalQuickFormElements[] = $elementName;
+  }
+
+  /**
+   * Get any quick-form elements that may not be present in the form.
    *
    * To make life simpler for smarty we ensure they are set to null
    * rather than unset. This is done at the last minute when $this
@@ -1066,7 +1086,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return array
    */
   public function getOptionalQuickFormElements(): array {
-    return [];
+    return $this->optionalQuickFormElements;
   }
 
   /**

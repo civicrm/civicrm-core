@@ -66,33 +66,32 @@ class CRM_Contact_Form_Edit_Email {
 
       //Bulkmail checkbox
       $form->assign('multipleBulk', $multipleBulk);
-      $js = ['id' => "Email_" . $blockId . "_IsBulkmail" , 'aria-label' => ts('Bulk Mailing for Email %1?', [1 => $blockId])];
+      $js = ['id' => 'Email_' . $blockId . '_IsBulkmail', 'aria-label' => ts('Bulk Mailing for Email %1?', [1 => $blockId])];
       if (!$blockEdit) {
         $js['onClick'] = 'singleSelect( this.id );';
       }
       $form->addElement('advcheckbox', "email[$blockId][is_bulkmail]", NULL, '', $js);
 
       //is_Primary radio
-      $js = ['id' => "Email_" . $blockId . "_IsPrimary", 'aria-label' => ts('Email %1 is primary?', [1 => $blockId])];
+      $js = ['id' => 'Email_' . $blockId . '_IsPrimary', 'aria-label' => ts('Email %1 is primary?', [1 => $blockId])];
       if (!$blockEdit) {
         $js['onClick'] = 'singleSelect( this.id );';
       }
 
       $form->addElement('radio', "email[$blockId][is_primary]", '', '', '1', $js);
-
-      if (CRM_Utils_System::getClassName($form) == 'CRM_Contact_Form_Contact') {
-        // Only display the signature fields if this contact has a CMS account
-        // because they can only send email if they have access to the CRM
-        if (!empty($form->_contactId)) {
-          $ufID = CRM_Core_BAO_UFMatch::getUFId($form->_contactId);
-          if ($ufID) {
-            $form->add('textarea', "email[$blockId][signature_text]", ts('Signature (Text)'),
-              ['rows' => 2, 'cols' => 40]
-            );
-            $form->add('wysiwyg', "email[$blockId][signature_html]", ts('Signature (HTML)'),
-              ['rows' => 2, 'cols' => 40]
-            );
-          }
+      // Only display the signature fields if this contact has a CMS account
+      // because they can only send email if they have access to the CRM
+      $isAddSignatureFields = $form instanceof \CRM_Contact_Form_Contact && !empty($form->_contactId);
+      $form->assign('isAddSignatureFields', $isAddSignatureFields);
+      if ($isAddSignatureFields) {
+        $ufID = CRM_Core_BAO_UFMatch::getUFId($form->_contactId);
+        if ($ufID) {
+          $form->add('textarea', "email[$blockId][signature_text]", ts('Signature (Text)'),
+            ['rows' => 2, 'cols' => 40]
+          );
+          $form->add('wysiwyg', "email[$blockId][signature_html]", ts('Signature (HTML)'),
+            ['rows' => 2, 'cols' => 40]
+          );
         }
       }
     }
