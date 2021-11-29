@@ -91,8 +91,8 @@
       </td>
   </tr>
 
-  {if !empty($activityTypeFile)}
-  {include file="CRM/$crmDir/Form/Activity/$activityTypeFile.tpl"}
+  {if $activityTypeFile}
+    {include file="CRM/$crmDir/Form/Activity/$activityTypeFile.tpl"}
   {/if}
 
   <tr class="crm-activity-form-block-subject">
