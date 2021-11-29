@@ -26,7 +26,6 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class ContactType extends Generic\DAOEntity {
-  use Generic\Traits\OptionList;
   use Generic\Traits\ManagedEntity;
 
 }

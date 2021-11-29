@@ -60,7 +60,6 @@ class Entity extends Generic\AbstractEntity {
             'BasicEntity' => 'BasicEntity',
             'ManagedEntity' => 'ManagedEntity',
             'EntityBridge' => 'EntityBridge',
-            'OptionList' => 'OptionList',
           ],
         ],
         [
