@@ -14,7 +14,7 @@ namespace Civi\Api4;
  * CustomGroup entity.
  *
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields/
- * @searchable none
+ * @searchable secondary
  * @since 5.19
  * @package Civi\Api4
  */
