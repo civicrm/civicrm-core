@@ -35,7 +35,7 @@
 {/if}
 
 {* @TODO: This is confusing - the variable `table` is already set and used above, and now we set it again to something that is technically different but has the same value, except on a blank form where it doesn't exist, but effectively then is the same value that it already has which is ''. So do we need this line even? *}
-{if (isset($form.table.value.0))}{assign var=table value=$form.table.value.0}{/if}
+{if $form.table.value && (array_key_exists(0, $form.table.value))}{assign var=table value=$form.table.value.0}{/if}
 {assign var=text  value=$form.text.value}
 {if !empty($summary.Contact) }
   <div class="section">
