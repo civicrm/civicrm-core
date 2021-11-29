@@ -82,7 +82,8 @@
     <title>Required Permission</title>
     <type>varchar</type>
     <length>255</length>
-    <comment>Permission for menu item</comment>
+    <comment>Permission(s) needed to access menu item</comment>
+    <serialize>COMMA</serialize>
     <add>3.0</add>
   </field>
   <field>
@@ -90,7 +91,10 @@
     <title>Permission Operator</title>
     <type>varchar</type>
     <length>3</length>
-    <comment>Permission Operator</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::andOr</callback>
+    </pseudoconstant>
+    <comment>Operator to use if item has more than one permission</comment>
     <add>3.0</add>
   </field>
   <field>

@@ -1101,4 +1101,14 @@ class CRM_Core_SelectValues {
     ];
   }
 
+  /**
+   * @return array
+   */
+  public static function andOr() {
+    return [
+      'AND' => ts('And'),
+      'OR' => ts('Or'),
+    ];
+  }
+
 }

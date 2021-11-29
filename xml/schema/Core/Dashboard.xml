@@ -82,6 +82,9 @@
     <type>varchar</type>
     <title>Dashlet Permission Operator</title>
     <length>3</length>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::andOr</callback>
+    </pseudoconstant>
     <comment>Permission Operator</comment>
     <add>3.1</add>
   </field>
