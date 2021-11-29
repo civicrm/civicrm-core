@@ -905,35 +905,26 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
    *
    * @param string $thousandSeparator
    *
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   * @throws \Civi\Payment\Exception\PaymentProcessorException
-   *
    * @dataProvider getThousandSeparators
    */
   public function testSubmitUpdate(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
-    $form = new CRM_Contribute_Form_Contribution();
-
-    $form->testSubmit([
+    $this->submitContributionForm([
       'total_amount' => $this->formatMoneyInput(6100.10),
       'financial_type_id' => 1,
       'contact_id' => $this->_individualId,
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
-      'price_set_id' => 0,
-    ], CRM_Core_Action::ADD);
+    ]);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId]);
-    $form->testSubmit([
+    $this->submitContributionForm([
       'total_amount' => $this->formatMoneyInput(5200.20),
       'net_amount' => $this->formatMoneyInput(5200.20),
       'financial_type_id' => 1,
       'contact_id' => $this->_individualId,
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
-      'price_set_id' => 0,
-      'id' => $contribution['id'],
-    ], CRM_Core_Action::UPDATE);
+    ], $contribution['id']);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId]);
     $this->assertEquals(5200.20, $contribution['total_amount'], 2);
 
@@ -953,32 +944,28 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
    *
    * @dataProvider getThousandSeparators
    */
-  public function testSubmitUpdateChangePaymentInstrument($thousandSeparator) {
+  public function testSubmitUpdateChangePaymentInstrument(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
-    $form = new CRM_Contribute_Form_Contribution();
-
-    $form->testSubmit([
+    $this->submitContributionForm([
       'total_amount' => 1200.55,
       'financial_type_id' => 1,
       'contact_id' => $this->_individualId,
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'check_number' => '123AX',
       'contribution_status_id' => 1,
-      'price_set_id' => 0,
-    ], CRM_Core_Action::ADD);
+    ]);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId]);
-    $form->testSubmit([
+    $this->submitContributionForm([
       'total_amount' => 1200.55,
       'net_amount' => 1200.55,
       'financial_type_id' => 1,
       'contact_id' => $this->_individualId,
-      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'card_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialTrxn', 'card_type_id', 'Visa'),
       'pan_truncation' => '1011',
       'contribution_status_id' => 1,
-      'price_set_id' => 0,
       'id' => $contribution['id'],
-    ], CRM_Core_Action::UPDATE);
+    ], $contribution['id']);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId]);
     $this->assertEquals(1200.55, $contribution['total_amount']);
 
@@ -998,7 +985,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $this->assertEquals(1200.55, $latestTrxn['total_amount']);
     $this->assertEquals('1011', $latestTrxn['pan_truncation']);
     $this->assertEquals(array_search('Credit Card', $this->paymentInstruments), $latestTrxn['payment_instrument_id']);
-    $lineItem = $this->callAPISuccessGetSingle('LineItem', []);
+    $this->callAPISuccessGetSingle('LineItem', []);
   }
 
   /**
@@ -1007,7 +994,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
    * @return array
    *   Credit card specific parameters.
    */
-  protected function getCreditCardParams() {
+  protected function getCreditCardParams(): array {
     return [
       'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => ['M' => 5, 'Y' => 2012],
