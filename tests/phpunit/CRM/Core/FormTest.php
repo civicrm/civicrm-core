@@ -39,7 +39,7 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
   }
 
   /**
-   * Dataprovider for testOpeningForms().
+   * Data provider for testOpeningForms().
    * TODO: Add more forms!
    *
    * @return array
@@ -64,6 +64,9 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
       ],
       'Message Templates' => [
         'civicrm/admin/messageTemplates?reset=1',
+      ],
+      'Scheduled Jobs' => [
+        'civicrm/admin/job?reset=1',
       ],
     ];
   }
