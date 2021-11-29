@@ -8,6 +8,7 @@
   </comment>
   <add>1.1</add>
   <log>true</log>
+  <title>Custom Field Group</title>
   <labelField>title</labelField>
   <field>
     <name>id</name>
