@@ -19,7 +19,6 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class OptionValue extends Generic\DAOEntity {
-  use Generic\Traits\OptionList;
   use Generic\Traits\ManagedEntity;
 
 }
