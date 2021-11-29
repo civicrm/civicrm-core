@@ -1012,7 +1012,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmitUpdateMembershipFromPartiallyPaid() {
+  public function testSubmitUpdateMembershipFromPartiallyPaid(): void {
     $memStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'validate');
 
     //Perform a pay later membership contribution.
@@ -1029,18 +1029,19 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'total_amount' => 5,
     ]);
 
-    // Complete the contribution from offline form.
-    $form = new CRM_Contribute_Form_Contribution();
     $submitParams = [
       'id' => $contribution['contribution_id'],
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
-      'price_set_id' => 0,
     ];
     $fields = ['total_amount', 'net_amount', 'financial_type_id', 'receive_date', 'contact_id', 'payment_instrument_id'];
     foreach ($fields as $val) {
       $submitParams[$val] = $prevContribution[$val];
     }
-    $form->testSubmit($submitParams, CRM_Core_Action::UPDATE);
+    $_REQUEST['action'] = 'update';
+    $_REQUEST['id'] = $contribution['contribution_id'];
+    // Complete the contribution from offline form.
+    $form = $this->getContributionForm($submitParams);
+    $form->postProcess();
 
     //Check if Membership is updated to New.
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
@@ -1378,7 +1379,6 @@ Expires: ',
    * Test membership status overrides when contribution is cancelled.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testContributionFormStatusUpdate(): void {
     // @todo figure out why financial validation fails with this test.
@@ -1393,13 +1393,10 @@ Expires: ',
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'),
     ];
-
-    //Update Contribution to Cancelled.
-    $form = new CRM_Contribute_Form_Contribution();
-    $form->_id = $params['id'] = $this->ids['Contribution'][0];
-    $form->_mode = NULL;
-    $form->_contactID = $this->_individualId;
-    $form->testSubmit($params, CRM_Core_Action::UPDATE);
+    $_REQUEST['action'] = 'update';
+    $_REQUEST['id'] = $this->ids['Contribution'][0];
+    $form = $this->getContributionForm($params);
+    $form->postProcess();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_contactID]);
 
     //Assert membership status overrides when the contribution cancelled.
@@ -1408,6 +1405,20 @@ Expires: ',
       'return' => 'id',
       'name' => 'Cancelled',
     ]));
+  }
+
+  /**
+   * Get the contribution form object.
+   *
+   * @param array $formValues
+   *
+   * @return \CRM_Contribute_Form_Contribution
+   */
+  protected function getContributionForm(array $formValues): CRM_Contribute_Form_Contribution {
+    /* @var CRM_Contribute_Form_Contribution $form */
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', $formValues);
+    $form->buildForm();
+    return $form;
   }
 
   /**
