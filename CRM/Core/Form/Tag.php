@@ -26,7 +26,7 @@ class CRM_Core_Form_Tag {
    *
    * @param CRM_Core_Form $form
    *   Form object.
-   * @param string $parentNames
+   * @param array $parentNames
    *   Parent name ( tag name).
    * @param string $entityTable
    *   Entitytable 'eg: civicrm_contact'.
@@ -43,7 +43,7 @@ class CRM_Core_Form_Tag {
     &$form, $parentNames, $entityTable, $entityId = NULL, $skipTagCreate = FALSE,
     $skipEntityAction = FALSE, $tagsetElementName = NULL) {
     $tagset = $form->_entityTagValues = [];
-    $form->assign("isTagset", FALSE);
+    $form->assign('isTagset', FALSE);
     $mode = NULL;
 
     foreach ($parentNames as &$parentNameItem) {
@@ -96,8 +96,8 @@ class CRM_Core_Form_Tag {
         $tagsetInfo[$mode] = [];
       }
       $tagsetInfo[$mode] = array_merge($tagsetInfo[$mode], $tagset);
-      $form->assign("tagsetInfo", $tagsetInfo);
-      $form->assign("isTagset", TRUE);
+      $form->assign('tagsetInfo', $tagsetInfo);
+      $form->assign('isTagset', TRUE);
     }
   }
 
