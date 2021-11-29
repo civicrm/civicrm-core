@@ -63,7 +63,7 @@
     </td>
   </tr>
 
-  {if !empty($form.separation)}
+  {if $form.separation}
     <tr class="crm-activity-form-block-separation crm-is-multi-activity-wrapper">
       <td class="label">{$form.separation.label}</td>
       <td>{$form.separation.html} {help id="separation"}</td>
@@ -156,7 +156,7 @@
     <td class="label">{$form.result.label}</td><td class="view-value">{$form.result.html}</td>
   </tr>
   {/if}
-  {if !empty($form.tag.html)}
+  {if $form.tag}
   <tr class="crm-activity-form-block-tag">
     <td class="label">{$form.tag.label}</td>
     <td class="view-value">

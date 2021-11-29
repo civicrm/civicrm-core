@@ -1072,6 +1072,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Add an optional element to the optional elements array.
    *
+   * These elements are assigned as empty (null) variables if
+   * there is no real field - allowing smarty to use them without
+   * notices.
+   *
    * @param string $elementName
    */
   public function addOptionalQuickFormElement(string $elementName): void {

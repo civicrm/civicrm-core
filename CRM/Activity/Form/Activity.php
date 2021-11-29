@@ -515,6 +515,19 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
+   * Get any smarty elements that may not be present in the form.
+   *
+   * To make life simpler for smarty we ensure they are set to null
+   * rather than unset. This is done at the last minute when $this
+   * is converted to an array to be assigned to the form.
+   *
+   * @return array
+   */
+  public function getOptionalQuickFormElements(): array {
+    return ['separation', 'tag'];
+  }
+
+  /**
    * Set default values for the form.
    *
    * For edit/view mode the default values are retrieved from the database.
