@@ -15,9 +15,11 @@ namespace Civi\Api4;
  *
  * @see \Civi\Api4\UFGroup
  * @searchable none
+ * @orderBy weight
  * @since 5.19
  * @package Civi\Api4
  */
 class UFField extends Generic\DAOEntity {
+  use Generic\Traits\SortableEntity;
 
 }

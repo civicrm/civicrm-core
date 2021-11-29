@@ -163,7 +163,13 @@ abstract class AbstractEntity {
       $info['description'] = $dao::getEntityDescription() ?? $info['description'] ?? NULL;
     }
     unset($info['package'], $info['method']);
-    return $info;
+
+    // Ensure all keys are snake_case
+    $keys = array_keys($info);
+    foreach ($keys as &$key) {
+      $key = \CRM_Utils_String::convertStringToSnakeCase($key);
+    }
+    return array_combine($keys, array_values($info));
   }
 
   /**

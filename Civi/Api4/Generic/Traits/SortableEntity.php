@@ -8,19 +8,14 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
-namespace Civi\Api4;
+
+namespace Civi\Api4\Generic\Traits;
 
 /**
- * CustomGroup entity.
+ * A sortable entity has a 'weight' column which will be auto-updated by the API.
  *
- * @see https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields/
- * @searchable secondary
- * @orderBy weight
- * @since 5.19
- * @package Civi\Api4
+ * NOTE: In order to use this trait, an entity must declare `@orderBy`
  */
-class CustomGroup extends Generic\DAOEntity {
-  use Generic\Traits\ManagedEntity;
-  use Generic\Traits\SortableEntity;
+trait SortableEntity {
 
 }

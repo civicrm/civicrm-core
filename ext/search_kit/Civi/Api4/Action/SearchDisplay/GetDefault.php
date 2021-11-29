@@ -69,9 +69,17 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
           'show_count' => TRUE,
           'expose_limit' => TRUE,
         ],
+        'sort' => [],
         'columns' => [],
       ],
     ];
+    // Supply default sort if no orderBy given in api params
+    if (!empty($this->savedSearch['api_entity']) && empty($this->savedSearch['api_params']['orderBy'])) {
+      $defaultSort = CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'order_by');
+      if ($defaultSort) {
+        $display['settings']['sort'][] = [$defaultSort, 'ASC'];
+      }
+    }
     foreach ($this->getSelectClause() as $key => $clause) {
       $display['settings']['columns'][] = $this->configureColumn($clause, $key);
     }

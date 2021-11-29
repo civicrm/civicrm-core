@@ -385,4 +385,47 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
     $this->assertEquals($optionGroupCount, OptionGroup::get(FALSE)->selectRowCount()->execute()->count());
   }
 
+  public function testUpdateWeights() {
+    $getValues = function($groupName) {
+      return CustomField::get(FALSE)
+        ->addWhere('custom_group_id.name', '=', $groupName)
+        ->addOrderBy('weight')
+        ->execute()->indexBy('name')->column('weight');
+    };
+
+    // Create 2 custom groups. Control group is to ensure updating one doesn't affect the other
+    foreach (['controlGroup', 'experimentalGroup'] as $groupName) {
+      $customGroups[$groupName] = CustomGroup::create(FALSE)
+        ->addValue('name', $groupName)
+        ->addValue('extends', 'Individual')
+        ->execute()->first();
+      $sampleData = [
+        ['label' => 'One'],
+        ['label' => 'Two'],
+        ['label' => 'Three'],
+        ['label' => 'Four'],
+      ];
+      CustomField::save(FALSE)
+        ->setRecords($sampleData)
+        ->addDefault('custom_group_id.name', $groupName)
+        ->addDefault('html_type', 'Text')
+        ->execute();
+      // Default weights should have been set during create
+      $this->assertEquals(['One' => 1, 'Two' => 2, 'Three' => 3, 'Four' => 4], $getValues($groupName));
+    }
+
+    // Ensure default weights were set for custom groups
+    $this->assertEquals($customGroups['controlGroup']['weight'] + 1, $customGroups['experimentalGroup']['weight']);
+
+    // Move third option to second position
+    CustomField::update(FALSE)
+      ->addWhere('custom_group_id.name', '=', 'experimentalGroup')
+      ->addWhere('name', '=', 'Three')
+      ->addValue('weight', 2)
+      ->execute();
+    // Experimental group should be updated, control group should not
+    $this->assertEquals(['One' => 1, 'Three' => 2, 'Two' => 3, 'Four' => 4], $getValues('experimentalGroup'));
+    $this->assertEquals(['One' => 1, 'Two' => 2, 'Three' => 3, 'Four' => 4], $getValues('controlGroup'));
+  }
+
 }

@@ -69,14 +69,15 @@ class ExportAction extends AbstractAction {
    * @param int $entityId
    * @param \Civi\Api4\Generic\Result $result
    * @param string $parentName
+   * @param array $excludeFields
    */
-  private function exportRecord(string $entityType, int $entityId, Result $result, $parentName = NULL) {
+  private function exportRecord(string $entityType, int $entityId, Result $result, $parentName = NULL, $excludeFields = []) {
     if (isset($this->exportedEntities[$entityType][$entityId])) {
       throw new \API_Exception("Circular reference detected: attempted to export $entityType id $entityId multiple times.");
     }
     $this->exportedEntities[$entityType][$entityId] = TRUE;
     $select = $pseudofields = [];
-    $allFields = $this->getFieldsForExport($entityType, TRUE);
+    $allFields = $this->getFieldsForExport($entityType, TRUE, $excludeFields);
     foreach ($allFields as $field) {
       // Use implicit join syntax but only if the fk entity has a `name` field
       if (!empty($field['fk_entity']) && array_key_exists('name', $this->getFieldsForExport($field['fk_entity']))) {
@@ -109,13 +110,21 @@ class ExportAction extends AbstractAction {
         $record[$fieldName] = NULL;
       }
     }
-    // Special handing of current_domain
+    // Should references be limited to the current domain?
+    $limitRefsByDomain = $entityType === 'OptionGroup' && \CRM_Core_OptionGroup::isDomainOptionGroup($record['name']) ? \CRM_Core_BAO_Domain::getDomain()->id : FALSE;
     foreach ($allFields as $fieldName => $field) {
       if (($field['fk_entity'] ?? NULL) === 'Domain') {
         $alias = $fieldName . '.name';
-        if (isset($record[$alias]) && $record[$alias] === \CRM_Core_BAO_Domain::getDomain()->name) {
-          unset($record[$alias]);
-          $record[$fieldName] = 'current_domain';
+        if (isset($record[$alias])) {
+          // If this entity is for a specific domain, limit references to that same domain
+          if ($fieldName === 'domain_id') {
+            $limitRefsByDomain = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $record[$alias], 'id', 'name');
+          }
+          // Swap current domain for special API keyword
+          if ($record[$alias] === \CRM_Core_BAO_Domain::getDomain()->name) {
+            unset($record[$alias]);
+            $record[$fieldName] = 'current_domain';
+          }
         }
       }
     }
@@ -135,12 +144,43 @@ class ExportAction extends AbstractAction {
     /** @var \CRM_Core_DAO $dao */
     $dao = new $daoName();
     $dao->id = $entityId;
+    // Collect references into arrays keyed by entity type
+    $references = [];
     foreach ($dao->findReferences() as $reference) {
-      $refEntity = $reference::fields()['id']['entity'] ?? '';
+      $refEntity = \CRM_Utils_Array::first($reference::fields())['entity'] ?? '';
+      // Limit references by domain
+      if (property_exists($reference, 'domain_id')) {
+        if (!isset($reference->domain_id)) {
+          $reference->find(TRUE);
+        }
+        if (isset($reference->domain_id) && $reference->domain_id != $limitRefsByDomain) {
+          continue;
+        }
+      }
+      $references[$refEntity][] = $reference;
+    }
+    foreach ($references as $refEntity => $records) {
       $refApiType = CoreUtil::getInfoItem($refEntity, 'type') ?? [];
       // Reference must be a ManagedEntity
-      if (in_array('ManagedEntity', $refApiType, TRUE)) {
-        $this->exportRecord($refEntity, $reference->id, $result, $name . '_');
+      if (!in_array('ManagedEntity', $refApiType, TRUE)) {
+        continue;
+      }
+      $exclude = [];
+      // For sortable entities, order by weight and exclude weight from the export (it will be auto-managed)
+      if (in_array('SortableEntity', $refApiType, TRUE)) {
+        $exclude[] = $weightCol = CoreUtil::getInfoItem($refEntity, 'order_by');
+        usort($records, function($a, $b) use ($weightCol) {
+          if (!isset($a->$weightCol)) {
+            $a->find(TRUE);
+          }
+          if (!isset($b->$weightCol)) {
+            $b->find(TRUE);
+          }
+          return $a->$weightCol < $b->$weightCol ? -1 : 1;
+        });
+      }
+      foreach ($records as $record) {
+        $this->exportRecord($refEntity, $record->id, $result, $name . '_', $exclude);
       }
     }
   }
@@ -170,16 +210,21 @@ class ExportAction extends AbstractAction {
   /**
    * @param $entityType
    * @param bool $loadOptions
+   * @param array $excludeFields
    * @return array
    */
-  private function getFieldsForExport($entityType, $loadOptions = FALSE): array {
+  private function getFieldsForExport($entityType, $loadOptions = FALSE, $excludeFields = []): array {
+    $conditions = [
+      ['type', 'IN', ['Field', 'Custom']],
+      ['readonly', '!=', TRUE],
+    ];
+    if ($excludeFields) {
+      $conditions[] = ['name', 'NOT IN', $excludeFields];
+    }
     try {
       return (array) civicrm_api4($entityType, 'getFields', [
         'action' => 'create',
-        'where' => [
-          ['type', 'IN', ['Field', 'Custom']],
-          ['readonly', '!=', TRUE],
-        ],
+        'where' => $conditions,
         'loadOptions' => $loadOptions,
         'checkPermissions' => $this->checkPermissions,
       ])->indexBy('name');

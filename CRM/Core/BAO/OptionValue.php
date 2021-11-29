@@ -169,7 +169,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     $optionValue = new CRM_Core_DAO_OptionValue();
     $optionValue->copyValues($params);
 
-    $isDomainOptionGroup = in_array($groupName, CRM_Core_OptionGroup::$_domainIDGroups);
+    $isDomainOptionGroup = CRM_Core_OptionGroup::isDomainOptionGroup($groupName);
     // When creating a new option for a group that requires a domain, set default domain
     if ($isDomainOptionGroup && empty($params['id']) && (empty($params['domain_id']) || CRM_Utils_System::isNull($params['domain_id']))) {
       $optionValue->domain_id = CRM_Core_Config::domainID();
@@ -215,7 +215,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
         // CRM-21737 languages option group does not use unique values but unique names.
         $dao->name = $params['name'];
       }
-      if (in_array($groupName, CRM_Core_OptionGroup::$_domainIDGroups)) {
+      if (CRM_Core_OptionGroup::isDomainOptionGroup($groupName)) {
         $dao->domain_id = $optionValue->domain_id;
       }
       $dao->option_group_id = $params['option_group_id'];

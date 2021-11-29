@@ -122,14 +122,11 @@ class CRM_Utils_Weight {
    * @return int
    */
   public static function updateOtherWeights($daoName, $oldWeight, $newWeight, $fieldValues = NULL, $weightField = 'weight') {
-    $oldWeight = (int ) $oldWeight;
-    $newWeight = (int ) $newWeight;
+    $oldWeight = (int) $oldWeight;
+    $newWeight = (int) $newWeight;
 
     // max weight is the highest current weight
-    $maxWeight = CRM_Utils_Weight::getMax($daoName, $fieldValues, $weightField);
-    if (!$maxWeight) {
-      $maxWeight = 1;
-    }
+    $maxWeight = self::getMax($daoName, $fieldValues, $weightField) ?: 1;
 
     if ($newWeight > $maxWeight) {
       // calculate new weight, CRM-4133
@@ -154,12 +151,18 @@ class CRM_Utils_Weight {
       return $newWeight;
     }
 
+    // Check for an existing record with this weight
+    $existing = self::query('SELECT', $daoName, $fieldValues, "id", "$weightField = $newWeight");
+    // Nothing to do if no existing record has this weight
+    if (empty($existing->N)) {
+      return $newWeight;
+    }
+
     // if oldWeight not present, indicates new weight is to be added. So create a gap for a new row to be inserted.
     if (!$oldWeight) {
       $additionalWhere = "$weightField >= $newWeight";
       $update = "$weightField = ($weightField + 1)";
       CRM_Utils_Weight::query('UPDATE', $daoName, $fieldValues, $update, $additionalWhere);
-      return $newWeight;
     }
     else {
       if ($newWeight > $oldWeight) {
@@ -171,8 +174,8 @@ class CRM_Utils_Weight {
         $update = "$weightField = ($weightField + 1)";
       }
       CRM_Utils_Weight::query('UPDATE', $daoName, $fieldValues, $update, $additionalWhere);
-      return $newWeight;
     }
+    return $newWeight;
   }
 
   /**
@@ -262,7 +265,7 @@ class CRM_Utils_Weight {
    *
    * @param string $queryType
    *   SELECT, UPDATE, DELETE.
-   * @param string $daoName
+   * @param CRM_Core_DAO|string $daoName
    *   Full name of the DAO.
    * @param array $fieldValues
    *   Field => value to be used in the WHERE.
@@ -286,12 +289,8 @@ class CRM_Utils_Weight {
     $orderBy = NULL,
     $groupBy = NULL
   ) {
-
-    require_once str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php";
-
-    $dao = new $daoName();
-    $table = $dao->getTablename();
-    $fields = &$dao->fields();
+    $table = $daoName::getTablename();
+    $fields = $daoName::getSupportedFields();
     $fieldlist = array_keys($fields);
 
     $whereConditions = [];
@@ -304,12 +303,17 @@ class CRM_Utils_Weight {
       foreach ($fieldValues as $fieldName => $value) {
         if (!in_array($fieldName, $fieldlist)) {
           // invalid field specified.  abort.
-          return FALSE;
+          throw new CRM_Core_Exception("Invalid field '$fieldName' for $daoName");
         }
-        $fieldNum++;
-        $whereConditions[] = "$fieldName = %$fieldNum";
-        $fieldType = $fields[$fieldName]['type'];
-        $params[$fieldNum] = [$value, CRM_Utils_Type::typeToString($fieldType)];
+        if (CRM_Utils_System::isNull($value)) {
+          $whereConditions[] = "$fieldName IS NULL";
+        }
+        else {
+          $fieldNum++;
+          $whereConditions[] = "$fieldName = %$fieldNum";
+          $fieldType = $fields[$fieldName]['type'];
+          $params[$fieldNum] = [$value, CRM_Utils_Type::typeToString($fieldType)];
+        }
       }
     }
     $where = implode(' AND ', $whereConditions);
@@ -340,7 +344,7 @@ class CRM_Utils_Weight {
         break;
 
       default:
-        return FALSE;
+        throw new CRM_Core_Exception("Invalid query operation for $daoName");
     }
 
     $resultDAO = CRM_Core_DAO::executeQuery($query, $params);
