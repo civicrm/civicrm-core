@@ -183,12 +183,19 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $params['id'] = $this->_id;
     }
+    // If date is left empty it will be set to empty string.
+    // Which will cause it to be set to NULL in the database and it should default to created_date.
+    if (empty($params['id'])) {
+      if (empty($params['note_date'])) {
+        unset($params['note_date']);
+      }
+    }
 
     // add attachments as needed
     CRM_Core_BAO_File::formatAttachment($params, $params, 'civicrm_note', $params['id']);
 
     $ids = [];
-    $note = CRM_Core_BAO_Note::add($params, $ids);
+    CRM_Core_BAO_Note::add($params, $ids);
 
     CRM_Core_Session::setStatus(ts('Your Note has been saved.'), ts('Saved'), 'success');
   }

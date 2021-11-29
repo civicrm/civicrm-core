@@ -11,3 +11,6 @@ UPDATE civicrm_state_province SET name = 'Cotabato' WHERE country_id = @PHILIPPI
 SELECT @country_id := id from civicrm_country where name = 'Colombia' AND iso_code = 'CO';
 INSERT IGNORE INTO `civicrm_state_province` (`id`, `country_id`, `abbreviation`, `name`) VALUES
 (NULL, @country_id, 'HUI', 'Huila');
+
+-- Fix empty civicrm_note.note_date
+UPDATE civicrm_note SET note_date = created_date WHERE note_date IS NULL;
