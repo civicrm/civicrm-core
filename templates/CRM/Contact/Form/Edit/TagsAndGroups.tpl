@@ -14,7 +14,7 @@
 {/if}
     <table class="form-layout-compressed{if $context EQ 'profile'} crm-profile-tagsandgroups{/if}">
       <tr>
-        {if empty($type) || $type eq 'tag'}
+        {if $form.tag}
           <td>
             <div class="crm-section tag-section">
               {if !empty($title)}{$form.tag.label}<br>{/if}
@@ -25,24 +25,22 @@
             {/if}
           </td>
         {/if}
-        {if empty($type) || $type eq 'group'}
+        {if $form.group}
           <td>
-            {if isset($groupElementType) && $groupElementType eq 'select'}
+            {if $groupElementType eq 'select'}
               <div class="crm-section group-section">
-              {if !empty($title)}{$form.group.label}<br>{/if}
+              {if $title}{$form.group.label}<br>{/if}
               {$form.group.html}
             </div>
             {else}
-              {if isset($form.group)} 
-                {foreach key=key item=item from=$tagGroup.group}
-                  <div class="group-wrapper">
-                    {$form.group.$key.html}
-                      {if $item.description}
-                      <div class="description">{$item.description}</div>
-                    {/if}
-                  </div>
-                {/foreach}
-              {/if}
+              {foreach key=key item=item from=$tagGroup.group}
+                <div class="group-wrapper">
+                  {$form.group.$key.html}
+                    {if $item.description}
+                    <div class="description">{$item.description}</div>
+                  {/if}
+                </div>
+              {/foreach}
             {/if}
           </td>
         {/if}
