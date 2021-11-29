@@ -1144,29 +1144,28 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
    *
    * @throws \Exception
    */
-  public function testReSubmitSaleTax($thousandSeparator): void {
+  public function testReSubmitSaleTax(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $this->enableTaxAndInvoicing();
     $this->addTaxAccountToFinancialType($this->_financialTypeId);
-    [$form, $contribution] = $this->doInitialSubmit();
+    $contribution = $this->doInitialSubmit();
     $this->assertEquals(11000, $contribution['total_amount']);
     $this->assertEquals(1000, $contribution['tax_amount']);
     $this->assertEquals(11000, $contribution['net_amount']);
 
     $mut = new CiviMailUtils($this, TRUE);
     // Testing here if when we edit something trivial like adding a check_number tax, net, total amount stay the same:
-    $form->testSubmit([
+    $this->submitContributionForm([
       'id' => $contribution['id'],
       'tax_amount' => $contribution['tax_amount'],
       'financial_type_id' => $contribution['financial_type_id'],
       'receive_date' => $contribution['receive_date'],
       'payment_instrument_id' => $contribution['payment_instrument_id'],
-      'price_set_id' => 0,
       'check_number' => 12345,
       'contribution_status_id' => 1,
       'is_email_receipt' => 1,
       'from_email_address' => 'demo@example.com',
-    ], CRM_Core_Action::UPDATE);
+    ], $contribution['id']);
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [
         'contribution_id' => 1,
@@ -1205,15 +1204,15 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
    *
    * @throws \Exception
    */
-  public function testReSubmitSaleTaxAlteredAmount($thousandSeparator) {
+  public function testReSubmitSaleTaxAlteredAmount(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $this->enableTaxAndInvoicing();
     $this->addTaxAccountToFinancialType($this->_financialTypeId);
-    [$form, $contribution] = $this->doInitialSubmit();
+    $contribution = $this->doInitialSubmit();
 
     $mut = new CiviMailUtils($this, TRUE);
     // Testing here if when we edit something trivial like adding a check_number tax, net, total amount stay the same:
-    $form->testSubmit([
+    $this->submitContributionForm([
       'id' => $contribution['id'],
       'total_amount' => $this->formatMoneyInput(20000),
       'tax_amount' => $this->formatMoneyInput(2000),
@@ -1225,7 +1224,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'contribution_status_id' => 1,
       'is_email_receipt' => 1,
       'from_email_address' => 'demo@example.com',
-    ], CRM_Core_Action::UPDATE);
+    ], $contribution['id']);
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [
         'contribution_id' => 1,
@@ -1267,17 +1266,14 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
    * @throws \Exception
    */
   protected function doInitialSubmit() {
-    $form = new CRM_Contribute_Form_Contribution();
-
-    $form->testSubmit([
+    $this->submitContributionForm([
       'total_amount' => $this->formatMoneyInput(10000),
       'financial_type_id' => $this->_financialTypeId,
       'receive_date' => '2015-04-21 00:00:00',
       'contact_id' => $this->_individualId,
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
-      'price_set_id' => 0,
-    ], CRM_Core_Action::ADD);
+    ]);
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [
         'contribution_id' => 1,
@@ -1294,7 +1290,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $this->assertEquals(11000, $contribution['total_amount']);
     $this->assertEquals(1000, $contribution['tax_amount']);
     $this->assertEquals(11000, $contribution['net_amount']);
-    return [$form, $contribution];
+    return $contribution;
   }
 
   /**
