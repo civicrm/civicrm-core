@@ -872,31 +872,28 @@ class Api4SelectQuery {
    * @throws \API_Exception
    */
   private function getBridgeRefs(string $bridgeEntity, string $joinEntity): array {
-    $bridgeFields = CoreUtil::getInfoItem($bridgeEntity, 'bridge') ?? [];
-    // Sanity check - bridge entity should declare exactly 2 FK fields
-    if (count($bridgeFields) !== 2) {
-      throw new \API_Exception("Illegal bridge entity specified: $bridgeEntity. Expected 2 bridge fields, found " . count($bridgeFields));
-    }
+    $bridges = CoreUtil::getInfoItem($bridgeEntity, 'bridge') ?? [];
     /* @var \CRM_Core_DAO $bridgeDAO */
     $bridgeDAO = CoreUtil::getInfoItem($bridgeEntity, 'dao');
+    $bridgeEntityFields = \Civi\API\Request::create($bridgeEntity, 'get', ['version' => 4, 'checkPermissions' => $this->getCheckPermissions()])->entityFields();
     $bridgeTable = $bridgeDAO::getTableName();
 
     // Get the 2 bridge reference columns as CRM_Core_Reference_* objects
-    $joinRef = $baseRef = NULL;
-    foreach ($bridgeDAO::getReferenceColumns() as $ref) {
-      if (array_key_exists($ref->getReferenceKey(), $bridgeFields)) {
-        if (!$joinRef && in_array($joinEntity, $ref->getTargetEntities())) {
-          $joinRef = $ref;
+    $referenceColumns = $bridgeDAO::getReferenceColumns();
+    foreach ($referenceColumns as $joinRef) {
+      $refKey = $joinRef->getReferenceKey();
+      if (array_key_exists($refKey, $bridges) && in_array($joinEntity, $joinRef->getTargetEntities())) {
+        if (!empty($bridgeEntityFields[$refKey]['fk_entity']) && $joinEntity !== $bridgeEntityFields[$refKey]['fk_entity']) {
+          continue;
         }
-        else {
-          $baseRef = $ref;
+        foreach ($bridgeDAO::getReferenceColumns() as $baseRef) {
+          if ($baseRef->getReferenceKey() === $bridges[$refKey]['to']) {
+            return [$bridgeTable, $baseRef, $joinRef];
+          }
         }
       }
     }
-    if (!$joinRef || !$baseRef) {
-      throw new \API_Exception("Unable to join $bridgeEntity to $joinEntity");
-    }
-    return [$bridgeTable, $baseRef, $joinRef];
+    throw new \API_Exception("Unable to join $bridgeEntity to $joinEntity");
   }
 
   /**

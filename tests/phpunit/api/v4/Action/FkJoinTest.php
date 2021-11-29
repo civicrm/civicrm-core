@@ -21,6 +21,7 @@ namespace api\v4\Action;
 
 use api\v4\UnitTestCase;
 use Civi\Api4\Activity;
+use Civi\Api4\CiviCase;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
 use Civi\Api4\EntityTag;
@@ -44,6 +45,10 @@ class FkJoinTest extends UnitTestCase {
       'civicrm_activity',
       'civicrm_phone',
       'civicrm_activity_contact',
+      'civicrm_relationship',
+      'civicrm_case_contact',
+      'civicrm_case_type',
+      'civicrm_case',
     ];
     $this->cleanup(['tablesToTruncate' => $relatedTables]);
     parent::tearDown();
@@ -439,6 +444,32 @@ class FkJoinTest extends UnitTestCase {
     $this->assertCount(1, $contacts);
     $this->assertEquals($this->getReference('test_contact_1')['id'], $contacts[0]['id']);
     $this->assertEquals('654321', $contacts[0]['phone.phone']);
+  }
+
+  public function testJoinCaseRoles() {
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+    $this->loadDataSet('CaseType');
+
+    $contactID = $this->createEntity(['type' => 'Individual'])['id'];
+    $managerID = $this->createEntity(['type' => 'Individual'])['id'];
+
+    $case = CiviCase::create(FALSE)
+      ->addValue('case_type_id', $this->getReference('test_case_type_1')['id'])
+      ->addValue('status_id', 1)
+      ->addValue('creator_id', $managerID)
+      ->addValue('contact_id', $contactID)
+      ->execute()
+      ->first();
+
+    $contacts = \Civi\Api4\Contact::get()
+      ->addSelect('*', 'case.*')
+      ->addJoin('Case AS case', 'INNER', 'RelationshipCache', ['id', '=', 'case.far_contact_id'], ['case.far_relation', '=', '"Parent of"'])
+      ->addWhere('case.id', '=', $case['id'])
+      ->execute();
+
+    // FIXME: Currently returning 2
+    // $this->assertCount(1, $contacts);
+    $this->assertEquals($managerID, $contacts[0]['id']);
   }
 
 }

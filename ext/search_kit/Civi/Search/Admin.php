@@ -180,21 +180,22 @@ class Admin {
     foreach ($allowedEntities as $entity) {
       // Multi-record custom field groups (to-date only the contact entity supports these)
       if (in_array('CustomValue', $entity['type'])) {
+        // TODO: Lookup target entity from custom group if someday other entities support multi-record custom data
         $targetEntity = $allowedEntities['Contact'];
         // Join from Custom group to Contact (n-1)
-        $alias = $entity['name'] . '_Contact_entity_id';
+        $alias = "{$entity['name']}_{$targetEntity['name']}_entity_id";
         $joins[$entity['name']][] = [
           'label' => $entity['title'] . ' ' . $targetEntity['title'],
           'description' => '',
-          'entity' => 'Contact',
+          'entity' => $targetEntity['name'],
           'conditions' => self::getJoinConditions('entity_id', $alias . '.id'),
           'defaults' => self::getJoinDefaults($alias, $targetEntity),
           'alias' => $alias,
           'multi' => FALSE,
         ];
         // Join from Contact to Custom group (n-n)
-        $alias = 'Contact_' . $entity['name'] . '_entity_id';
-        $joins['Contact'][] = [
+        $alias = "{$targetEntity['name']}_{$entity['name']}_entity_id";
+        $joins[$targetEntity['name']][] = [
           'label' => $entity['title_plural'],
           'description' => '',
           'entity' => $entity['name'],
@@ -209,43 +210,32 @@ class Admin {
         /* @var \CRM_Core_DAO $daoClass */
         $daoClass = $entity['dao'];
         $references = $daoClass::getReferenceColumns();
-        // Only the first bridge reference gets processed, so if it's dynamic we want to be sure it's first in the list
-        usort($references, function($first, $second) {
-          foreach ([-1 => $first, 1 => $second] as $weight => $reference) {
-            if (is_a($reference, 'CRM_Core_Reference_Dynamic')) {
-              return $weight;
-            }
-          }
-          return 0;
-        });
         $fields = array_column($entity['fields'], NULL, 'name');
         $bridge = in_array('EntityBridge', $entity['type']) ? $entity['name'] : NULL;
-        $bridgeFields = array_keys($entity['bridge'] ?? []);
-        foreach ($references as $reference) {
-          $keyField = $fields[$reference->getReferenceKey()] ?? NULL;
-          if (
-            // Sanity check - keyField must exist
-            !$keyField ||
-            // Exclude any joins that are better represented by pseudoconstants
-            is_a($reference, 'CRM_Core_Reference_OptionValue') || (!$bridge && !empty($keyField['options'])) ||
-            // Limit bridge joins to just the first
-            ($bridge && array_search($keyField['name'], $bridgeFields) !== 0) ||
-            // Sanity check - table should match
-            $daoClass::getTableName() !== $reference->getReferenceTable()
-          ) {
-            continue;
-          }
-          // Dynamic references use a column like "entity_table" (for normal joins this value will be null)
-          $dynamicCol = $reference->getTypeColumn();
 
-          // For dynamic references getTargetEntities will return multiple targets; for normal joins this loop will only run once
-          foreach ($reference->getTargetEntities() as $targetTable => $targetEntityName) {
-            if (!isset($allowedEntities[$targetEntityName]) || $targetEntityName === $entity['name']) {
+        // Non-bridge joins directly between 2 entities
+        if (!$bridge) {
+          foreach ($references as $reference) {
+            $keyField = $fields[$reference->getReferenceKey()] ?? NULL;
+            if (
+              // Sanity check - keyField must exist
+              !$keyField ||
+              // Exclude any joins that are better represented by pseudoconstants
+              is_a($reference, 'CRM_Core_Reference_OptionValue') || !empty($keyField['options']) ||
+              // Sanity check - table should match
+              $daoClass::getTableName() !== $reference->getReferenceTable()
+            ) {
               continue;
             }
-            $targetEntity = $allowedEntities[$targetEntityName];
-            // Non-bridge joins directly between 2 entities
-            if (!$bridge) {
+            // Dynamic references use a column like "entity_table" (for normal joins this value will be null)
+            $dynamicCol = $reference->getTypeColumn();
+
+            // For dynamic references getTargetEntities will return multiple targets; for normal joins this loop will only run once
+            foreach ($reference->getTargetEntities() as $targetTable => $targetEntityName) {
+              if (!isset($allowedEntities[$targetEntityName]) || $targetEntityName === $entity['name']) {
+                continue;
+              }
+              $targetEntity = $allowedEntities[$targetEntityName];
               // Add the straight 1-1 join
               $alias = $entity['name'] . '_' . $targetEntityName . '_' . $keyField['name'];
               $joins[$entity['name']][] = [
@@ -269,21 +259,27 @@ class Admin {
                 'multi' => TRUE,
               ];
             }
-            // Bridge joins (sanity check - bridge must specify exactly 2 FK fields)
-            elseif (count($entity['bridge']) === 2) {
-              // Get the other entity being linked through this bridge
-              $baseKey = array_search($reference->getReferenceKey(), $bridgeFields) ? $bridgeFields[0] : $bridgeFields[1];
+          }
+        }
+        // Bridge joins go through an intermediary table
+        elseif (!empty($entity['bridge'])) {
+          foreach ($entity['bridge'] as $targetKey => $bridgeInfo) {
+            $baseKey = $bridgeInfo['to'];
+            $reference = self::getReference($targetKey, $references);
+            $dynamicCol = $reference->getTypeColumn();
+            $keyField = $fields[$reference->getReferenceKey()] ?? NULL;
+            foreach ($reference->getTargetEntities() as $targetTable => $targetEntityName) {
+              $targetEntity = $allowedEntities[$targetEntityName] ?? NULL;
               $baseEntity = $allowedEntities[$fields[$baseKey]['fk_entity']] ?? NULL;
-              if (!$baseEntity) {
+              if (!$targetEntity || !$baseEntity) {
                 continue;
               }
               // Add joins for the two entities that connect through this bridge (n-n)
-              $symmetric = $baseEntity['name'] === $targetEntityName;
-              $targetsTitle = $symmetric ? $allowedEntities[$bridge]['title_plural'] : $targetEntity['title_plural'];
+              $targetsTitle = $bridgeInfo['label'] ?? $targetEntity['title_plural'];
               $alias = $baseEntity['name'] . "_{$bridge}_" . $targetEntityName;
               $joins[$baseEntity['name']][] = [
                 'label' => $baseEntity['title'] . ' ' . $targetsTitle,
-                'description' => $entity['bridge'][$baseKey]['description'] ?? E::ts('Multiple %1 per %2', [1 => $targetsTitle, 2 => $baseEntity['title']]),
+                'description' => $bridgeInfo['description'] ?? E::ts('Multiple %1 per %2', [1 => $targetsTitle, 2 => $baseEntity['title']]),
                 'entity' => $targetEntityName,
                 'conditions' => array_merge(
                   [$bridge],
@@ -294,10 +290,11 @@ class Admin {
                 'alias' => $alias,
                 'multi' => TRUE,
               ];
-              if (!$symmetric) {
+              // Back-fill the reverse join if declared
+              if ($dynamicCol && $keyField && !empty($entity['bridge'][$baseKey])) {
                 $alias = $targetEntityName . "_{$bridge}_" . $baseEntity['name'];
                 $joins[$targetEntityName][] = [
-                  'label' => $targetEntity['title'] . ' ' . $baseEntity['title_plural'],
+                  'label' => $targetEntity['title'] . ' ' . ($entity['bridge'][$baseKey]['label'] ?? $baseEntity['title_plural']),
                   'description' => $entity['bridge'][$reference->getReferenceKey()]['description'] ?? E::ts('Multiple %1 per %2', [1 => $baseEntity['title_plural'], 2 => $targetEntity['title']]),
                   'entity' => $baseEntity['name'],
                   'conditions' => array_merge(
@@ -316,6 +313,19 @@ class Admin {
       }
     }
     return $joins;
+  }
+
+  /**
+   * @param string $fieldName
+   * @param \CRM_Core_Reference_Basic[] $references
+   * @return \CRM_Core_Reference_Basic
+   */
+  private static function getReference(string $fieldName, array $references) {
+    foreach ($references as $reference) {
+      if ($reference->getReferenceKey() === $fieldName) {
+        return $reference;
+      }
+    }
   }
 
   /**
