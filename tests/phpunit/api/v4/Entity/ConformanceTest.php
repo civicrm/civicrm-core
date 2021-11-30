@@ -424,10 +424,15 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
     $this->assertEquals(0, $this->checkAccessCounts["{$entity}::delete"]);
     $isReadOnly = $this->isReadOnly($entityClass);
 
-    $deleteResult = $entityClass::delete()
+    $deleteAction = $entityClass::delete()
       ->setCheckPermissions(!$isReadOnly)
-      ->addWhere('id', '=', $id)
-      ->execute();
+      ->addWhere('id', '=', $id);
+
+    if (property_exists($deleteAction, 'useTrash')) {
+      $deleteAction->setUseTrash(FALSE);
+    }
+
+    $deleteResult = $deleteAction->execute();
 
     // should get back an array of deleted id
     $this->assertEquals([['id' => $id]], (array) $deleteResult);

@@ -180,6 +180,20 @@ class ReflectionUtils {
   }
 
   /**
+   * Check if a class method is deprecated
+   *
+   * @param string $className
+   * @param string $methodName
+   * @return bool
+   * @throws \ReflectionException
+   */
+  public static function isMethodDeprecated(string $className, string $methodName): bool {
+    $reflection = new \ReflectionClass($className);
+    $docBlock = $reflection->getMethod($methodName)->getDocComment();
+    return strpos($docBlock, "@deprecated") !== FALSE;
+  }
+
+  /**
    * Find any methods in this class which match the given prefix.
    *
    * @param string $class

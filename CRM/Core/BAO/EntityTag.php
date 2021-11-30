@@ -96,7 +96,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * Delete the tag for a contact.
    *
    * @param array $params
-   *
+   * @deprecated
    * WARNING: Nonstandard params searches by tag_id rather than id!
    */
   public static function del(&$params) {
