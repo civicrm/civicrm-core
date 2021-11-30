@@ -712,6 +712,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return array
    */
   protected function getOrderByFromSort() {
+    // Drag-sortable tables have a forced order
+    if (!empty($this->display['settings']['draggable'])) {
+      return [$this->display['settings']['draggable'] => 'ASC'];
+    }
+
     $defaultSort = $this->display['settings']['sort'] ?? [];
     $currentSort = $this->sort;
 
@@ -745,8 +750,12 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     }, $apiParams['select']);
     $additions = [];
     // Add primary key field if actions are enabled
-    if (!empty($this->display['settings']['actions'])) {
+    if (!empty($this->display['settings']['actions']) || !empty($this->display['settings']['draggable'])) {
       $additions = CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'primary_key');
+    }
+    // Add draggable column (typically "weight")
+    if (!empty($this->display['settings']['draggable'])) {
+      $additions[] = $this->display['settings']['draggable'];
     }
     // Add style conditions for the display
     foreach ($this->getCssRulesSelect($this->display['settings']['cssRules'] ?? []) as $addition) {

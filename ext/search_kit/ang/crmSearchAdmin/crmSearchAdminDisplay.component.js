@@ -34,8 +34,7 @@
     },
     controller: function($scope, $timeout, searchMeta) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        ctrl = this,
-        afforms;
+        ctrl = this;
 
       this.isSuperAdmin = CRM.checkPerm('all CiviCRM permissions and ACLs');
       this.aclBypassHelp = ts('Only users with "all CiviCRM permissions and ACLs" can disable permission checks.');
@@ -186,6 +185,10 @@
       // Checks if a column contains a sortable value
       // Must be a real sql expression (not a pseudo-field like `result_row_num`)
       this.canBeSortable = function(col) {
+        // Column-header sorting is incompatible with draggable sorting
+        if (ctrl.display.settings.draggable) {
+          return false;
+        }
         var expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr),
           arg = (info && info.args && _.findWhere(info.args, {type: 'field'})) || {};

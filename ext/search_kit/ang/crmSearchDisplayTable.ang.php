@@ -9,7 +9,7 @@ return [
     'ang/crmSearchDisplayTable',
   ],
   'basePages' => ['civicrm/search', 'civicrm/admin/search'],
-  'requires' => ['crmSearchDisplay', 'crmUi', 'crmSearchTasks', 'ui.bootstrap'],
+  'requires' => ['crmSearchDisplay', 'crmUi', 'crmSearchTasks', 'ui.bootstrap', 'ui.sortable'],
   'bundles' => ['bootstrap3'],
   'exports' => [
     'crm-search-display-table' => 'E',

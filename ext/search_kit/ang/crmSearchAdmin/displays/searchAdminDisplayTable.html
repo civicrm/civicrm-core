@@ -1,5 +1,13 @@
-<fieldset ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
+<fieldset ng-if="!$ctrl.display.settings.draggable" ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
 <fieldset>
+  <div ng-if="$ctrl.canBeDraggable" class="form-inline">
+    <div class="checkbox-inline form-control">
+      <label>
+        <input type="checkbox" ng-checked="!!$ctrl.display.settings.draggable" ng-click="$ctrl.toggleDraggable()">
+        <span>{{:: ts('Drag and drop sorting') }}</span>
+      </label>
+    </div>
+  </div>
   <div class="form-inline">
     <div class="checkbox-inline form-control">
       <label>
@@ -44,7 +52,7 @@
           <option value="text-right">{{:: ts('Right') }}</option>
         </select>
       </div>
-      <div class="form-inline" ng-if=":: $ctrl.parent.canBeSortable(col)">
+      <div class="form-inline" ng-if="$ctrl.parent.canBeSortable(col)">
         <label title="{{:: ts('Allow user to click on header to sort table by this column') }}">
           <input type="checkbox" ng-checked="col.sortable !== false" ng-click="col.sortable = col.sortable === false" >
           {{:: ts('Sortable Header') }}
