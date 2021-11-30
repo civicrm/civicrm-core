@@ -464,6 +464,7 @@ class CRM_Core_ManagedEntities {
     // CRM_Core_BAO_Managed::on_hook_civicrm_post()
     if ($doDelete && CRM_Core_BAO_Managed::isApi4ManagedType($dao->entity_type)) {
       civicrm_api4($dao->entity_type, 'delete', [
+        'checkPermissions' => FALSE,
         'where' => [['id', '=', $dao->entity_id]],
       ]);
     }
