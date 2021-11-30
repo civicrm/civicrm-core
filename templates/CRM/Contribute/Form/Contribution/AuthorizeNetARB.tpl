@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if isset($subscriptionType) && $subscriptionType eq 'cancel'}
+{if $subscriptionType eq 'cancel'}
 <?xml version="1.0" encoding="utf-8"?>
 <ARBCancelSubscriptionRequest xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd">
   <merchantAuthentication>
@@ -16,7 +16,7 @@
   </merchantAuthentication>
   <subscriptionId>{$subscriptionId}</subscriptionId>
 </ARBCancelSubscriptionRequest>
-{elseif isset($subscriptionType) && $subscriptionType eq 'updateBilling'}
+{elseif $subscriptionType eq 'updateBilling'}
 <?xml version="1.0" encoding="utf-8"?>
 <ARBUpdateSubscriptionRequest xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd">
   <merchantAuthentication>

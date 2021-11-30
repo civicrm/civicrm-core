@@ -304,7 +304,8 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $template->assign('billingState', $this->_getParam('state_province'));
     $template->assign('billingZip', $this->_getParam('postal_code', TRUE));
     $template->assign('billingCountry', $this->_getParam('country'));
-
+    // Required to be set for s
+    $template->ensureVariablesAreAssigned(['subscriptionType']);
     $arbXML = $template->fetch('CRM/Contribute/Form/Contribution/AuthorizeNetARB.tpl');
 
     // Submit to authorize.net
