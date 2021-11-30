@@ -52,7 +52,7 @@
         </div>
         <div class="crm-accordion-body">
           <div>{$article.description|smarty:nodefaults|purify}</div>
-          <p class="crm-news-feed-item-link"><a target="_blank" href="{$article.link|smarty:nodefaults|purify}" title="{$article.title|escape}"><i class="crm-i fa-external-link" aria-hidden="true"></i> {ts}read more{/ts}…</a></p>
+          <p class="crm-news-feed-item-link"><a target="_blank" href="{$article.link|smarty:nodefaults|purify}" title="{$article.title|smarty:nodefaults|escape}"><i class="crm-i fa-external-link" aria-hidden="true"></i> {ts}read more{/ts}…</a></p>
         </div>
       </div>
     {/foreach}
