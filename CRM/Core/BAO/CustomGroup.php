@@ -1827,7 +1827,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
       $expectedProperties = ['options_per_line', 'help_pre', 'help_post'];
       // add field information
       foreach ($value['fields'] as $k => $properties) {
-        $properties = array_merge(array_fill_keys($expectedProperties, 'NULL'), $properties);
+        $properties = array_merge(array_fill_keys($expectedProperties, NULL), $properties);
         $properties['element_name'] = "custom_{$k}_-{$groupCount}";
         if (isset($properties['customValue']) &&
           !CRM_Utils_System::isNull($properties['customValue']) &&
