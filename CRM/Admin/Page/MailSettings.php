@@ -105,7 +105,11 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
         $mailSetting->id
       );
     }
-
+    $expectedKeys = ['server', 'username', 'localpart', 'domain', 'return_path', 'protocol', 'source', 'port', 'is_ssl'];
+    foreach ($allMailSettings as $key => $allMailSetting) {
+      // make sure they are there to prevent smarty notices.
+      $allMailSettings[$key] = array_merge(array_fill_keys($expectedKeys, NULL), $allMailSetting);
+    }
     $this->assign('rows', $allMailSettings);
 
     $setupActions = CRM_Core_BAO_MailSettings::getSetupActions();
