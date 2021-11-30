@@ -75,7 +75,7 @@
 
     {foreach from=$rows item=row key=field}
 
-      {if !isset($row.main) && !isset($row.other)}
+      {if !$row.main && !$row.other}
         <tr style="background-color: #fff !important; border-bottom:1px solid #ccc !important;" class="no-data">
           <td>
             <strong>{$row.title|escape}</strong>
@@ -193,7 +193,7 @@
             </td>
 
             <td>
-              {if isset($row.main) || isset($row.other)}
+              {if $row.main || $row.other}
                 <span>
                   {if $row.main == $row.other}
                     <span class="action_label">({ts}match{/ts})</span><br />
