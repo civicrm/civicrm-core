@@ -9,10 +9,10 @@
 *}
 {strip}
   <div class="action-link">
-    {if !empty($templateUrl)}
+    {if $templateUrl}
       <a href="{$templateUrl}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {$newButton}</span></a>
     {/if}
-    {if !empty($reportUrl)}
+    {if $reportUrl}
       <a href="{$reportUrl}" class="button"><span>{ts}View All Reports{/ts}</span></a>
     {/if}
   </div>
@@ -22,7 +22,7 @@
       {foreach from=$list item=rows key=report}
         <div class="crm-accordion-wrapper crm-accordion_{$report}-accordion ">
           <div class="crm-accordion-header">
-            {if isset($title)}{$title}{elseif $report EQ 'Contribute'}{ts}Contribution Reports{/ts}{else}{ts 1=$report}%1 Reports{/ts}{/if}</a>
+            {if $title}{$title}{elseif $report EQ 'Contribute'}{ts}Contribution Reports{/ts}{else}{ts 1=$report}%1 Reports{/ts}{/if}</a>
           </div><!-- /.crm-accordion-header -->
           <div class="crm-accordion-body">
             <div id="{$report}" class="boxBlock">
@@ -37,7 +37,7 @@
                       <ul class="panel">
                         {foreach from=$row.actions item=action key=action_name}
                           <li><a href="{$action.url}" class="{$action_name} action-item crm-hover-button small-popup"
-                          {if !empty($action.confirm_message)}onclick="return window.confirm({$action.confirm_message|json_encode|htmlspecialchars})"{/if}
+                          {if $action.confirm_message}onclick="return window.confirm({$action.confirm_message|json_encode|htmlspecialchars})"{/if}
                           title="{$action.label|escape}">{$action.label}</a></li>
                         {/foreach}
                       </ul>
@@ -53,10 +53,10 @@
     </div>
 
     <div class="action-link">
-      {if !empty($templateUrl)}
+      {if $templateUrl}
         <a href="{$templateUrl}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {$newButton}</span></a>
       {/if}
-      {if !empty($reportUrl)}
+      {if $reportUrl}
         <a href="{$reportUrl}" class="button"><span>{ts}View All Reports{/ts}</span></a>
       {/if}
     </div>
@@ -65,7 +65,7 @@
     <div class="crm-content-block">
       <div class="messages status no-popup">
         {icon icon="fa-info-circle"}{/icon}
-        {if !empty($myReports)}
+        {if !$myReports}
           {ts}You do not have any private reports. To add a report to this section, edit the Report Settings for a report and set 'Add to My Reports' to Yes.{/ts} &nbsp;
         {else}
           {if $compName}
@@ -73,7 +73,7 @@
           {else}
             {ts}No reports have been created.{/ts} &nbsp;
           {/if}
-          {if !empty($templateUrl)}
+          {if $templateUrl}
             {ts 1=$templateUrl}You can create reports by selecting from the <a href="%1">list of report templates here.</a>{/ts}
           {else}
             {ts}Contact your site administrator for help creating reports.{/ts}
