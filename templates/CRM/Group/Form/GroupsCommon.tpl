@@ -8,9 +8,9 @@
  +--------------------------------------------------------------------+
 *}
 {*CRM-14190*}
-{if (isset($parent_groups) and $parent_groups|@count > 0) or !empty($form.parents.html)}
+{if $parent_groups|@count > 0 || !empty($form.parents.html)}
   <h3>{ts}Parent Groups{/ts} {help id="id-group-parent" file="CRM/Group/Page/Group.hlp"}</h3>
-  {if isset($parent_groups) and $parent_groups|@count > 0}
+  {if $parent_groups|@count > 0}
     <table class="form-layout-compressed">
       <tr>
         <td><label>{ts}Remove Parent?{/ts}</label></td>
