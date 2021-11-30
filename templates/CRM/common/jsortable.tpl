@@ -27,7 +27,7 @@
     }
 
     // for date sorting see http://wiki.civicrm.org/confluence/display/CRMDOC/Sorting+Date+Fields+in+dataTables+Widget
-    var useAjax = {$useAjax},
+    var useAjax = {/literal}{$useAjax}{literal},
       sourceUrl = '',
       useClass  = 'display',
       tcount = 1,
