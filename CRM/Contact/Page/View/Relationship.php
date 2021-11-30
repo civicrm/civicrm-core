@@ -197,6 +197,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
    * @throws \CRM_Core_Exception
    */
   public function run() {
+    $this->assign('entityInClassFormat', 'relationship');
     $this->preProcessQuickEntityPage();
 
     $this->setContext();

@@ -132,6 +132,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
       $contactRelationships = $selector = NULL;
       CRM_Utils_Hook::searchColumns('relationship.columns', $columnHeaders, $contactRelationships, $selector);
       $this->assign('columnHeaders', $columnHeaders);
+      $this->assign('entityInClassFormat', 'relationship');
       $dashboardElements[] = [
         'class' => 'crm-dashboard-permissionedOrgs',
         'templatePath' => 'CRM/Contact/Page/View/RelationshipSelector.tpl',
