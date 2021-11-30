@@ -50,6 +50,9 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
       'Add New Tag' => [
         'civicrm/tag/edit?action=add&parent_id=',
       ],
+      'Location Type' => [
+        'civicrm/admin/locationType?reset=1',
+      ],
       'Assign Account to Financial Type' => [
         'civicrm/admin/financial/financialType/accounts?action=add&reset=1&aid=1',
       ],
