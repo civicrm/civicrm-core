@@ -166,6 +166,12 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     }
 
     usort($dashboardElements, ['CRM_Utils_Sort', 'cmpFunc']);
+    foreach ($dashboardElements as $index => $dashboardElement) {
+      // Ensure property is set to avoid smarty notices
+      if (!array_key_exists('class', $dashboardElement)) {
+        $dashboardElements[$index]['class'] = NULL;
+      }
+    }
     $this->assign('dashboardElements', $dashboardElements);
 
     if (!empty($dashboardOptions['Groups'])) {
