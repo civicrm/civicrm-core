@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/shimmy/foobar</path>
+    <page_callback>CRM_Shimmy_Page_FooBar</page_callback>
+    <title>FooBar</title>
+    <access_arguments>*always allow*</access_arguments>
+  </item>
+</menu>
