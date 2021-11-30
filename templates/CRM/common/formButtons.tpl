@@ -24,7 +24,7 @@
       {capture assign=linkname}name="{$linkButton.ref}"{/capture}
     {else}{capture assign=linkname}name="{$linkButton.name}"{/capture}
     {/if}
-    <a class="button" {$linkname} href="{crmURL p=$linkButton.url q=$linkButton.qs}" {$accessKey} {$linkButton.extra}><span>{$icon}{$linkButton.title}</span></a>
+    <a class="button" {$linkname} href="{crmURL p=$linkButton.url q=$linkButton.qs}" {$accessKey} {$linkButton.extra}><span>{$icon|smarty:nodefaults}{$linkButton.title}</span></a>
   {/foreach}
 {/if}
 
