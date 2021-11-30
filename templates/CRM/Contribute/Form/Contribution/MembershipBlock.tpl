@@ -195,7 +195,7 @@
         </tr>
 
       {/foreach}
-      {if isset($form.auto_renew) }
+      {if $form.auto_renew}
         <tr id="allow_auto_renew">
           <td style="width: auto;">{$form.auto_renew.html}</td>
           <td style="width: auto;">
