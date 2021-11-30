@@ -17,7 +17,7 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
    */
   public function testOpeningForms(string $url): void {
     $this->createLoggedInUser();
-
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
     $_SERVER['REQUEST_URI'] = $url;
     $urlParts = explode('?', $url);
     $_GET['q'] = $urlParts[0];
