@@ -61,16 +61,21 @@
         }
       }
 
-      this.getField = function(expr) {
+      // Gets the first arg of type "field"
+      function getFirstArgFromExpr(expr) {
         if (!(expr in meta)) {
           meta[expr] = _.findWhere(searchMeta.parseExpr(expr).args, {type: 'field'});
         }
-        return meta[expr] && meta[expr].field;
+        return meta[expr] || {};
+      }
+
+      this.getField = function(expr) {
+        return getFirstArgFromExpr(expr).field;
       };
 
       this.getOptionKey = function(expr) {
-        var field = ctrl.getField(expr) || {};
-        return field.suffix ? field.suffix.slice(1) : 'id';
+        var arg = getFirstArgFromExpr(expr);
+        return arg.suffix ? arg.suffix.slice(1) : 'id';
       };
 
       this.addGroup = function(op) {
