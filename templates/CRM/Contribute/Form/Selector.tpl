@@ -22,7 +22,7 @@
       {/if}
       {foreach from=$columnHeaders item=header}
         <th scope="col">
-          {if isset($header.sort)}
+          {if $header.sort}
             {assign var='key' value=$header.sort}
             {$sort->_response.$key.link}
           {elseif (!empty($header.name))}
@@ -57,12 +57,12 @@
         </td>
       {foreach from=$columnHeaders item=column}
           {assign var='columnName' value=''}
-          {if isset($column.field_name)}
+          {if $column.field_name}
             {assign var='columnName' value=$column.field_name}
           {/if}
         {if !$columnName}{* if field_name has not been set skip, this helps with not changing anything not specifically edited *}
         {elseif $columnName === 'total_amount'}{* rendered above as soft credit columns = confusing *}
-        {elseif isset($column.type) && $column.type === 'actions'}{* rendered below as soft credit column handling = not fixed *}
+        {elseif $column.type === 'actions'}{* rendered below as soft credit column handling = not fixed *}
         {elseif $columnName == 'contribution_status'}
           <td class="crm-contribution-status">
             {$row.contribution_status}<br/>
@@ -71,13 +71,13 @@
             {/if}
           </td>
         {else}
-          {if isset($column.type) && $column.type == 'date'}
+          {if $column.type == 'date'}
             <td class="crm-contribution-{$columnName}">
               {$row.$columnName|crmDate}
             </td>
           {else}
-          <td class="crm-{$columnName} crm-{$columnName}_{if isset($row.columnName)}{$row.columnName}{/if}">
-            {if isset($row.$columnName)}{$row.$columnName}{/if}
+          <td class="crm-{$columnName} crm-{$columnName}_{if $row.columnName}{$row.columnName}{/if}">
+            {$row.$columnName}
           </td>
           {/if}
         {/if}

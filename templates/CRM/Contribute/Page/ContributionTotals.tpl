@@ -29,11 +29,11 @@
             <th class="right"> &nbsp; {ts}# Completed{/ts} &ndash; {$contributionSummary.total.count}</th>
             <th class="right contriTotalRight"> &nbsp; {ts}Avg{/ts} &ndash; {$contributionSummary.total.avg}</th>
           {/if}
-          {if isset($contributionSummary.cancel.amount)}
+          {if $contributionSummary.cancel.amount}
             <th class="disabled right contriTotalRight"> &nbsp; {ts}Cancelled/Refunded{/ts} &ndash; {$contributionSummary.cancel.amount}</th>
           {/if}
       </tr>
-      {if isset($contributionSummary.soft_credit.count)}
+      {if $contributionSummary.soft_credit.count}
         {include file="CRM/Contribute/Page/ContributionSoftTotals.tpl" softCreditTotals=$contributionSummary.soft_credit}
       {/if}
     {/if}
