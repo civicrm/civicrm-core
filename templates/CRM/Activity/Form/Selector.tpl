@@ -21,12 +21,12 @@
        {/if}
        {foreach from=$columnHeaders item=header}
           <th scope="col">
-          {if isset($header.sort)}
+          {if $header.sort}
             {assign var='key' value=$header.sort}
             {if !empty($sort)}
               {$sort->_response.$key.link}
             {/if}
-          {elseif isset($header.name)}
+          {elseif $header.name}
             {$header.name}
           {/if}
           </th>
@@ -54,7 +54,7 @@
       {/if}
     </td>
 
-  <td>{if isset($row.activity_subject)}{$row.activity_subject|purify}{/if}</td>
+  <td>{$row.activity_subject|purify}</td>
 
     <td>
     {if !$row.source_contact_id}
@@ -67,7 +67,7 @@
     <td>
     {if $row.mailingId}
       <a href="{$row.mailingId}" title="{ts}View Mailing Report{/ts}">{$row.recipients}</a>
-    {elseif isset($row.recipients)}
+    {elseif $row.recipients}
       {$row.recipients}
     {elseif !$row.target_contact_name}
       <em>n/a</em>
