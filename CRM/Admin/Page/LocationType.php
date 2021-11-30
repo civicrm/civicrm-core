@@ -107,4 +107,24 @@ class CRM_Admin_Page_LocationType extends CRM_Core_Page_Basic {
     return 'civicrm/admin/locationType';
   }
 
+  /**
+   * @param $sort
+   * @param $action
+   * @param array $links
+   *
+   * @return array
+   */
+  protected function getRows($sort, $action, array $links): array {
+    $rows = parent::getRows($sort, $action, $links);
+    foreach ($rows as &$row) {
+      // prevent smarty notices.
+      foreach (['is_default', 'class', 'vcard_name'] as $expectedField) {
+        if (!isset($row['is_default'])) {
+          $row[$expectedField] = NULL;
+        }
+      }
+    }
+    return $rows;
+  }
+
 }

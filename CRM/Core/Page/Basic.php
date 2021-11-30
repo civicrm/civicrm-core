@@ -203,67 +203,8 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     if ($action & CRM_Core_Action::ENABLE) {
       $action -= CRM_Core_Action::ENABLE;
     }
-    $baoString = $this->getBAOName();
-    $object = new $baoString();
 
-    $values = [];
-
-    // lets make sure we get the stuff sorted by name if it exists
-    $fields = &$object->fields();
-    $key = '';
-    if (!empty($fields['title'])) {
-      $key = 'title';
-    }
-    elseif (!empty($fields['label'])) {
-      $key = 'label';
-    }
-    elseif (!empty($fields['name'])) {
-      $key = 'name';
-    }
-
-    if (trim($sort)) {
-      $object->orderBy($sort);
-    }
-    elseif ($key) {
-      $object->orderBy($key . ' asc');
-    }
-
-    $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, FALSE);
-    // find all objects
-    $object->find();
-    while ($object->fetch()) {
-      if (!isset($object->mapping_type_id) ||
-        // "1 for Search Builder"
-        $object->mapping_type_id != 1
-      ) {
-        $permission = CRM_Core_Permission::EDIT;
-        if ($key) {
-          $permission = $this->checkPermission($object->id, $object->$key);
-        }
-        if ($permission) {
-          $values[$object->id] = [];
-          CRM_Core_DAO::storeValues($object, $values[$object->id]);
-
-          if (is_a($object, 'CRM_Contact_DAO_RelationshipType')) {
-            if (isset($values[$object->id]['contact_type_a'])) {
-              $values[$object->id]['contact_type_a_display'] = $contactTypes[$values[$object->id]['contact_type_a']];
-            }
-            if (isset($values[$object->id]['contact_type_b'])) {
-              $values[$object->id]['contact_type_b_display'] = $contactTypes[$values[$object->id]['contact_type_b']];
-            }
-          }
-
-          // populate action links
-          $this->action($object, $action, $values[$object->id], $links, $permission);
-
-          if (isset($object->mapping_type_id)) {
-            $mappintTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Mapping', 'mapping_type_id');
-            $values[$object->id]['mapping_type'] = $mappintTypes[$object->mapping_type_id];
-          }
-        }
-      }
-    }
-    $this->assign('rows', $values);
+    $this->assign('rows', $this->getRows($sort, $action, $links));
   }
 
   /**
@@ -393,6 +334,77 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     $controller->setEmbedded(TRUE);
     $controller->process();
     $controller->run();
+  }
+
+  /**
+   * @param $sort
+   * @param $action
+   * @param array $links
+   *
+   * @return array
+   */
+  protected function getRows($sort, $action, array $links): array {
+    $baoString = $this->getBAOName();
+    $object = new $baoString();
+
+    $values = [];
+
+    // lets make sure we get the stuff sorted by name if it exists
+    $fields = &$object->fields();
+    $key = '';
+    if (!empty($fields['title'])) {
+      $key = 'title';
+    }
+    elseif (!empty($fields['label'])) {
+      $key = 'label';
+    }
+    elseif (!empty($fields['name'])) {
+      $key = 'name';
+    }
+
+    if (trim($sort)) {
+      $object->orderBy($sort);
+    }
+    elseif ($key) {
+      $object->orderBy($key . ' asc');
+    }
+
+    $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, FALSE);
+    // find all objects
+    $object->find();
+    while ($object->fetch()) {
+      if (!isset($object->mapping_type_id) ||
+        // "1 for Search Builder"
+        $object->mapping_type_id != 1
+      ) {
+        $permission = CRM_Core_Permission::EDIT;
+        if ($key) {
+          $permission = $this->checkPermission($object->id, $object->$key);
+        }
+        if ($permission) {
+          $values[$object->id] = [];
+          CRM_Core_DAO::storeValues($object, $values[$object->id]);
+
+          if (is_a($object, 'CRM_Contact_DAO_RelationshipType')) {
+            if (isset($values[$object->id]['contact_type_a'])) {
+              $values[$object->id]['contact_type_a_display'] = $contactTypes[$values[$object->id]['contact_type_a']];
+            }
+            if (isset($values[$object->id]['contact_type_b'])) {
+              $values[$object->id]['contact_type_b_display'] = $contactTypes[$values[$object->id]['contact_type_b']];
+            }
+          }
+
+          // populate action links
+          $this->action($object, $action, $values[$object->id], $links, $permission);
+
+          if (isset($object->mapping_type_id)) {
+            $mappintTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Mapping', 'mapping_type_id');
+            $values[$object->id]['mapping_type'] = $mappintTypes[$object->mapping_type_id];
+          }
+        }
+      }
+    }
+    return $values;
   }
 
 }
