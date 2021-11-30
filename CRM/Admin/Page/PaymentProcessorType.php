@@ -105,4 +105,13 @@ class CRM_Admin_Page_PaymentProcessorType extends CRM_Core_Page_Basic {
     return 'civicrm/admin/paymentProcessorType';
   }
 
+  /**
+   * Get any properties that should always be present in each row (null if no value).
+   *
+   * @return array
+   */
+  protected function getExpectedRowProperties(): array {
+    return ['class', 'description'];
+  }
+
 }
