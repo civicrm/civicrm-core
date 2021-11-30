@@ -188,7 +188,7 @@
                           <td class="{$lClass} crm-event-label">{$feeBlock.label.$idx}</td>
                           {if $isPriceSet & $feeBlock.isDisplayAmount.$idx}
             <td class="fee_amount-value right">
-                              {if isset($feeBlock.tax_amount.$idx)}
+                              {if $feeBlock.tax_amount && $feeBlock.tax_amount.$idx}
           {$feeBlock.value.$idx}
                               {else}
                 {$feeBlock.value.$idx|crmMoney}
