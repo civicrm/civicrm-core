@@ -294,11 +294,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     $this->addFormRule(['CRM_Member_Form_MembershipType', 'formRule']);
 
     $this->assign('membershipTypeId', $this->_id);
-
-    if (Civi::settings()->get('deferred_revenue_enabled')) {
-      $deferredFinancialType = CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType();
-      $this->assign('deferredFinancialType', array_keys($deferredFinancialType));
-    }
+    $this->assign('deferredFinancialType', Civi::settings()->get('deferred_revenue_enabled') ? array_keys(CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType()) : NULL);
   }
 
   /**
