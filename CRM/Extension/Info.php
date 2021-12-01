@@ -46,6 +46,13 @@ class CRM_Extension_Info {
 
   /**
    * @var array
+   *   List of expected mixins.
+   *   Ex: ['civix@2.0.0']
+   */
+  public $mixins = [];
+
+  /**
+   * @var array
    *   List of strings (tag-names).
    */
   public $tags = [];
@@ -195,6 +202,12 @@ class CRM_Extension_Info {
         $this->tags = [];
         foreach ($val->tag as $tag) {
           $this->tags[] = (string) $tag;
+        }
+      }
+      elseif ($attr === 'mixins') {
+        $this->mixins = [];
+        foreach ($val->mixin as $mixin) {
+          $this->mixins[] = (string) $mixin;
         }
       }
       elseif ($attr === 'requires') {

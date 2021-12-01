@@ -119,15 +119,6 @@ function afform_html_civicrm_angularModules(&$angularModules) {
 }
 
 /**
- * Implements hook_civicrm_alterSettingsFolders().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_alterSettingsFolders
- */
-function afform_html_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  _afform_html_civix_civicrm_alterSettingsFolders($metaDataFolders);
-}
-
-/**
  * Implements hook_civicrm_entityTypes().
  *
  * Declare entity types provided by this module.

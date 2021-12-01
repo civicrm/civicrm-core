@@ -24,6 +24,9 @@
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
+  <mixins>
+    <mixin>setting-php@1.0.0</mixin>
+  </mixins>
   <civix>
     <namespace>CRM/Event/Cart</namespace>
   </civix>
