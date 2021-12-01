@@ -5136,7 +5136,7 @@ civicrm_relationship.start_date > {$today}
 
     $this->appendFinancialTypeWhereAndFromToQueryStrings($where, $from);
 
-    $summary = ['total' => []];
+    $summary = ['total' => [], 'soft_credit' => ['count' => 0, 'avg' => 0, 'amount' => 0]];
     $this->addBasicStatsToSummary($summary, $where, $from);
 
     if (CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled()) {
@@ -6701,7 +6701,7 @@ AND   displayRelType.is_active = 1
     GROUP BY currency";
 
     $dao = CRM_Core_DAO::executeQuery($query);
-
+    $summary['cancel'] = ['count' => 0, 'amount' => 0, 'avg' => 0];
     if ($dao->N <= 1) {
       if ($dao->fetch()) {
         $summary['cancel']['count'] = $dao->cancel_count;

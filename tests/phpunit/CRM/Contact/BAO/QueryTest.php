@@ -1103,7 +1103,7 @@ civicrm_relationship.is_active = 1 AND
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetSummaryQueryWithFinancialACLDisabled() {
+  public function testGetSummaryQueryWithFinancialACLDisabled(): void {
     $this->createContributionsForSummaryQueryTests();
 
     // Test the function directly
@@ -1128,6 +1128,11 @@ civicrm_relationship.is_active = 1 AND
         'amount' => '$ 100.00',
         'avg' => '$ 50.00',
       ],
+      'soft_credit' => [
+        'count' => 0,
+        'avg' => 0,
+        'amount' => 0,
+      ],
     ], $summary);
   }
 
@@ -1136,7 +1141,7 @@ civicrm_relationship.is_active = 1 AND
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetSummaryQueryWithFinancialACLEnabled() {
+  public function testGetSummaryQueryWithFinancialACLEnabled(): void {
     $where = $from = NULL;
     $this->createContributionsForSummaryQueryTests();
     $this->enableFinancialACLs();
@@ -1165,6 +1170,11 @@ civicrm_relationship.is_active = 1 AND
         'count' => 1,
         'amount' => '$ 50.00',
         'avg' => '$ 50.00',
+      ],
+      'soft_credit' => [
+        'count' => 0,
+        'avg' => 0,
+        'amount' => 0,
       ],
     ], $summary);
     $this->disableFinancialACLs();
