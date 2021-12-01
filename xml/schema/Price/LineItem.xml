@@ -148,7 +148,7 @@
     <fieldName>contribution_id</fieldName>
     <fieldName>price_field_value_id</fieldName>
     <fieldName>price_field_id</fieldName>
-    <unique>true</unique>
+    <unique>false</unique>
     <add>3.3</add>
     <change>4.5</change>
     <!-- Add contribution_id to unique index in 4.5  -->

@@ -11,3 +11,6 @@ UPDATE civicrm_state_province SET name = 'Cotabato' WHERE country_id = @PHILIPPI
 SELECT @country_id := id from civicrm_country where name = 'Colombia' AND iso_code = 'CO';
 INSERT IGNORE INTO `civicrm_state_province` (`id`, `country_id`, `abbreviation`, `name`) VALUES
 (NULL, @country_id, 'HUI', 'Huila');
+
+-- Change civicrm_line_item index to be non-unique
+ALTER TABLE `civicrm_line_item` DROP INDEX `UI_line_item_value`, ADD INDEX `UI_line_item_value` (`entity_table`, `entity_id`, `contribution_id`, `price_field_value_id`, `price_field_id`) USING BTREE;
