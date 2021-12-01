@@ -59,6 +59,8 @@ class CRM_Upgrade_Incremental_php_FiveFortyFive extends CRM_Upgrade_Incremental_
     $this->addTask('Add entity_modified_date column to civicrm_managed', 'addColumn',
       'civicrm_managed', 'entity_modified_date', "timestamp NULL DEFAULT NULL COMMENT 'When the managed entity was changed from its original settings.'"
     );
+    $this->addTask('Update currency symbols for Ghana', 'updateCurrencyName', 'GHC', 'GHS');
+    $this->addTask('Update currency symbols for Belarus', 'updateCurrencyName', 'BYR', 'BYN');
   }
 
 }
