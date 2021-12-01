@@ -113,15 +113,6 @@ function flexmailer_civicrm_angularModules(&$angularModules) {
 }
 
 /**
- * Implements hook_civicrm_alterSettingsFolders().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_alterSettingsFolders
- */
-function flexmailer_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  _flexmailer_civix_civicrm_alterSettingsFolders($metaDataFolders);
-}
-
-/**
  * Implements hook_civicrm_navigationMenu().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu

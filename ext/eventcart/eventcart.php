@@ -113,15 +113,6 @@ function eventcart_civicrm_angularModules(&$angularModules) {
 }
 
 /**
- * Implements hook_civicrm_alterSettingsFolders().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_alterSettingsFolders
- */
-function eventcart_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  _eventcart_civix_civicrm_alterSettingsFolders($metaDataFolders);
-}
-
-/**
  * Implements hook_civicrm_entityTypes().
  *
  * Declare entity types provided by this module.

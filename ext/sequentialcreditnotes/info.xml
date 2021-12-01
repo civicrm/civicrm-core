@@ -23,6 +23,9 @@
   <compatibility>
     <ver>5.24</ver>
   </compatibility>
+  <mixins>
+    <mixin>setting-php@1.0.0</mixin>
+  </mixins>
   <civix>
     <namespace>CRM/Sequentialcreditnotes</namespace>
   </civix>

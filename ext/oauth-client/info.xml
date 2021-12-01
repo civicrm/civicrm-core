@@ -29,6 +29,9 @@
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <upgrader>CRM_OAuth_Upgrader</upgrader>
+  <mixins>
+    <mixin>setting-php@1.0.0</mixin>
+  </mixins>
   <civix>
     <namespace>CRM/OAuth</namespace>
   </civix>

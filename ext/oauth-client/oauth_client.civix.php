@@ -430,18 +430,6 @@ function _oauth_client_civix_fixNavigationMenuItems(&$nodes, &$maxNavID, $parent
 }
 
 /**
- * (Delegated) Implements hook_civicrm_alterSettingsFolders().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_alterSettingsFolders
- */
-function _oauth_client_civix_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  $settingsDir = __DIR__ . DIRECTORY_SEPARATOR . 'settings';
-  if (!in_array($settingsDir, $metaDataFolders) && is_dir($settingsDir)) {
-    $metaDataFolders[] = $settingsDir;
-  }
-}
-
-/**
  * (Delegated) Implements hook_civicrm_entityTypes().
  *
  * Find any *.entityType.php files, merge their content, and return.
