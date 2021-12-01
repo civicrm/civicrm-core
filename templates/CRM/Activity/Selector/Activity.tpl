@@ -97,9 +97,7 @@
 {else}
 
   <div class="messages status no-popup">
-    {if isset($caseview) and $caseview}
-      {ts}There are no Activities attached to this case record.{/ts}{if $permission EQ 'edit'} {ts}You can go to the Activities tab to create or attach activity records.{/ts}{/if}
-    {elseif $context eq 'home'}
+    {if $context eq 'home'}
       {ts}There are no Activities to display.{/ts}
     {else}
       {ts}There are no Activities to display.{/ts}{if $permission EQ 'edit'} {ts}You can use the links above to schedule or record an activity.{/ts}{/if}
