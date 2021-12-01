@@ -92,6 +92,8 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    * Set up variables to build the form.
    */
   public function preProcess() {
+    $this->addOptionalQuickFormElement('parents');
+    $this->addExpectedSmartyVariable('parent_groups');
     $this->_id = $this->get('id');
     if ($this->_id) {
       $breadCrumb = array(
