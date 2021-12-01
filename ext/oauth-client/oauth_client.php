@@ -66,19 +66,6 @@ function oauth_client_civicrm_permission(&$permissions) {
 }
 
 /**
- * Implements hook_civicrm_caseTypes().
- *
- * Generate a list of case-types.
- *
- * Note: This hook only runs in CiviCRM 4.4+.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_caseTypes
- */
-function oauth_client_civicrm_caseTypes(&$caseTypes) {
-  _oauth_client_civix_civicrm_caseTypes($caseTypes);
-}
-
-/**
  * Implements hook_civicrm_entityTypes().
  *
  * Declare entity types provided by this module.

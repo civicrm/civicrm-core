@@ -258,34 +258,6 @@ function _ckeditor4_civix_civicrm_managed(&$entities) {
 }
 
 /**
- * (Delegated) Implements hook_civicrm_caseTypes().
- *
- * Find any and return any files matching "xml/case/*.xml"
- *
- * Note: This hook only runs in CiviCRM 4.4+.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_caseTypes
- */
-function _ckeditor4_civix_civicrm_caseTypes(&$caseTypes) {
-  if (!is_dir(__DIR__ . '/xml/case')) {
-    return;
-  }
-
-  foreach (_ckeditor4_civix_glob(__DIR__ . '/xml/case/*.xml') as $file) {
-    $name = preg_replace('/\.xml$/', '', basename($file));
-    if ($name != CRM_Case_XMLProcessor::mungeCaseType($name)) {
-      $errorMessage = sprintf("Case-type file name is malformed (%s vs %s)", $name, CRM_Case_XMLProcessor::mungeCaseType($name));
-      throw new CRM_Core_Exception($errorMessage);
-    }
-    $caseTypes[$name] = [
-      'module' => E::LONG_NAME,
-      'name' => $name,
-      'file' => $file,
-    ];
-  }
-}
-
-/**
  * Glob wrapper which is guaranteed to return an array.
  *
  * The documentation for glob() says, "On some systems it is impossible to

@@ -90,19 +90,6 @@ function ckeditor4_civicrm_managed(&$entities) {
 }
 
 /**
- * Implements hook_civicrm_caseTypes().
- *
- * Generate a list of case-types.
- *
- * Note: This hook only runs in CiviCRM 4.4+.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_caseTypes
- */
-function ckeditor4_civicrm_caseTypes(&$caseTypes) {
-  _ckeditor4_civix_civicrm_caseTypes($caseTypes);
-}
-
-/**
  * Implements hook_civicrm_entityTypes().
  *
  * Declare entity types provided by this module.
