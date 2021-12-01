@@ -185,13 +185,6 @@ function authx_civicrm_entityTypes(&$entityTypes) {
 }
 
 /**
- * Implements hook_civicrm_thems().
- */
-function authx_civicrm_themes(&$themes) {
-  _authx_civix_civicrm_themes($themes);
-}
-
-/**
  * Implements hook_civicrm_permission().
  *
  * @see CRM_Utils_Hook::permission()

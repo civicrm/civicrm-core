@@ -27,7 +27,6 @@ function greenwich_civicrm_config(&$config) {
  * Implements hook_civicrm_themes().
  */
 function greenwich_civicrm_themes(&$themes) {
-  // _greenwich_civix_civicrm_themes($themes);
   $themes['greenwich'] = [
     'ext' => 'civicrm',
     'title' => 'Greenwich',

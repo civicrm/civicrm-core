@@ -113,13 +113,6 @@ function message_admin_civicrm_entityTypes(&$entityTypes) {
   _message_admin_civix_civicrm_entityTypes($entityTypes);
 }
 
-/**
- * Implements hook_civicrm_themes().
- */
-function message_admin_civicrm_themes(&$themes) {
-  _message_admin_civix_civicrm_themes($themes);
-}
-
 // --- Functions below this ship commented out. Uncomment as required. ---
 
 /**

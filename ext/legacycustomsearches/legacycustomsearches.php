@@ -113,13 +113,6 @@ function legacycustomsearches_civicrm_entityTypes(&$entityTypes) {
   _legacycustomsearches_civix_civicrm_entityTypes($entityTypes);
 }
 
-/**
- * Implements hook_civicrm_themes().
- */
-function legacycustomsearches_civicrm_themes(&$themes) {
-  _legacycustomsearches_civix_civicrm_themes($themes);
-}
-
 // --- Functions below this ship commented out. Uncomment as required. ---
 
 /**

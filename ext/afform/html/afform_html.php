@@ -128,10 +128,3 @@ function afform_html_civicrm_angularModules(&$angularModules) {
 function afform_html_civicrm_entityTypes(&$entityTypes) {
   _afform_html_civix_civicrm_entityTypes($entityTypes);
 }
-
-/**
- * Implements hook_civicrm_themes().
- */
-function afform_html_civicrm_themes(&$themes) {
-  _afform_html_civix_civicrm_themes($themes);
-}

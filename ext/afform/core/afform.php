@@ -333,13 +333,6 @@ function afform_civicrm_entityTypes(&$entityTypes) {
 }
 
 /**
- * Implements hook_civicrm_themes().
- */
-function afform_civicrm_themes(&$themes) {
-  _afform_civix_civicrm_themes($themes);
-}
-
-/**
  * Implements hook_civicrm_buildAsset().
  */
 function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {

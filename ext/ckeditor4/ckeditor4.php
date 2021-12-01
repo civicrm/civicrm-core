@@ -113,13 +113,6 @@ function ckeditor4_civicrm_entityTypes(&$entityTypes) {
   _ckeditor4_civix_civicrm_entityTypes($entityTypes);
 }
 
-/**
- * Implements hook_civicrm_themes().
- */
-function ckeditor4_civicrm_themes(&$themes) {
-  _ckeditor4_civix_civicrm_themes($themes);
-}
-
 function ckeditor4_civicrm_buildForm($formName, $form) {
   if ($formName === 'CRM_Admin_Form_Preferences_Display') {
     $form->addElement(

@@ -123,13 +123,6 @@ function financialacls_civicrm_entityTypes(&$entityTypes) {
 }
 
 /**
- * Implements hook_civicrm_thems().
- */
-function financialacls_civicrm_themes(&$themes) {
-  _financialacls_civix_civicrm_themes($themes);
-}
-
-/**
  * Intervene to prevent deletion, where permissions block it.
  *
  * @param string $op

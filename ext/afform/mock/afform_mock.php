@@ -124,10 +124,3 @@ function afform_mock_civicrm_angularModules(&$angularModules) {
 function afform_mock_civicrm_entityTypes(&$entityTypes) {
   _afform_mock_civix_civicrm_entityTypes($entityTypes);
 }
-
-/**
- * Implements hook_civicrm_themes().
- */
-function afform_mock_civicrm_themes(&$themes) {
-  _afform_mock_civix_civicrm_themes($themes);
-}

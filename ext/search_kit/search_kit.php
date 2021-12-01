@@ -101,13 +101,6 @@ function search_kit_civicrm_entityTypes(&$entityTypes) {
 }
 
 /**
- * Implements hook_civicrm_themes().
- */
-function search_kit_civicrm_themes(&$themes) {
-  _search_kit_civix_civicrm_themes($themes);
-}
-
-/**
  * Implements hook_civicrm_pre().
  */
 function search_kit_civicrm_pre($op, $entity, $id, &$params) {

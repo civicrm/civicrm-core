@@ -113,13 +113,6 @@ function payflowpro_civicrm_entityTypes(&$entityTypes) {
   _payflowpro_civix_civicrm_entityTypes($entityTypes);
 }
 
-/**
- * Implements hook_civicrm_themes().
- */
-function payflowpro_civicrm_themes(&$themes) {
-  _payflowpro_civix_civicrm_themes($themes);
-}
-
 // --- Functions below this ship commented out. Uncomment as required. ---
 
 /**
