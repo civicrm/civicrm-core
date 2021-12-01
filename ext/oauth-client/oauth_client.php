@@ -15,15 +15,6 @@ function oauth_client_civicrm_config(&$config) {
 }
 
 /**
- * Implements hook_civicrm_xmlMenu().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_xmlMenu
- */
-function oauth_client_civicrm_xmlMenu(&$files) {
-  _oauth_client_civix_civicrm_xmlMenu($files);
-}
-
-/**
  * Implements hook_civicrm_managed().
  *
  * Generate a list of entities to create/deactivate/delete when this module

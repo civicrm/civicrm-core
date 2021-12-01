@@ -24,6 +24,9 @@
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
+  <mixins>
+    <mixin>menu-xml@1.0.0</mixin>
+  </mixins>
   <civix>
     <namespace>CRM/Ckeditor4</namespace>
   </civix>

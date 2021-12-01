@@ -28,6 +28,9 @@
     <psr0 prefix="CRM_" path=""/>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
+  <mixins>
+    <mixin>menu-xml@1.0.0</mixin>
+  </mixins>
   <civix>
     <namespace>CRM/Legacycustomsearches</namespace>
   </civix>
