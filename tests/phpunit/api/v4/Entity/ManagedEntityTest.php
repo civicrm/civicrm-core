@@ -19,6 +19,7 @@
 namespace api\v4\Entity;
 
 use api\v4\UnitTestCase;
+use Civi\Api4\Domain;
 use Civi\Api4\Navigation;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\OptionValue;
@@ -460,6 +461,18 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
       ],
     ];
 
+    // Throw a monkey wrench by placing duplicates in another domain
+    $d2 = Domain::create(FALSE)
+      ->addValue('name', 'Decoy domain')
+      ->addValue('version', \CRM_Utils_System::version())
+      ->execute()->single();
+    foreach ($this->_managedEntities as $item) {
+      $decoys[] = civicrm_api4('Navigation', 'create', [
+        'checkPermissions' => FALSE,
+        'values' => ['domain_id' => $d2['id']] + $item['params']['values'],
+      ])->first();
+    }
+
     // Refresh managed entities with module active
     $allModules = [
       new \CRM_Core_Module('unit.test.fake.ext', TRUE),
@@ -490,6 +503,15 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
       $this->assertEquals($weight, $children[$index]['weight']);
       $this->assertEquals(TRUE, $children[$index]['is_active']);
     }
+
+    // Try exporting the decoy records
+    $decoyExport = Navigation::export(FALSE)
+      ->setId($decoys[0]['id'])
+      ->execute();
+    $this->assertCount(4, $decoyExport);
+    $this->assertEquals('Decoy domain', $decoyExport[0]['params']['values']['domain_id.name']);
+    $this->assertEquals('Decoy domain', $decoyExport[1]['params']['values']['domain_id.name']);
+    $this->assertArrayNotHasKey('weight', $decoyExport[1]['params']['values']);
 
     // Refresh managed entities with module disabled
     $allModules = [

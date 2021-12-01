@@ -198,8 +198,12 @@ trait DAOActionTrait {
    * @param array $record
    */
   private function resolveFKValues(array &$record): void {
+    // Resolve domain id first
+    uksort($record, function($a, $b) {
+      return substr($a, 0, 9) == 'domain_id' ? -1 : 1;
+    });
     foreach ($record as $key => $value) {
-      if (substr_count($key, '.') !== 1) {
+      if (!$value || substr_count($key, '.') !== 1) {
         continue;
       }
       [$fieldName, $fkField] = explode('.', $key);
@@ -208,7 +212,27 @@ trait DAOActionTrait {
         continue;
       }
       $fkDao = CoreUtil::getBAOFromApiName($field['fk_entity']);
-      $record[$fieldName] = \CRM_Core_DAO::getFieldValue($fkDao, $value, 'id', $fkField);
+      // Constrain search to the domain of the current entity
+      $domainConstraint = NULL;
+      if (isset($fkDao::getSupportedFields()['domain_id'])) {
+        if (!empty($record['domain_id'])) {
+          $domainConstraint = $record['domain_id'] === 'current_domain' ? \CRM_Core_Config::domainID() : $record['domain_id'];
+        }
+        elseif (!empty($record['id']) && isset($this->entityFields()['domain_id'])) {
+          $domainConstraint = \CRM_Core_DAO::getFieldValue($this->getBaoName(), $record['id'], 'domain_id');
+        }
+      }
+      if ($domainConstraint) {
+        $fkSearch = new $fkDao();
+        $fkSearch->domain_id = $domainConstraint;
+        $fkSearch->$fkField = $value;
+        $fkSearch->find(TRUE);
+        $record[$fieldName] = $fkSearch->id;
+      }
+      // Simple lookup without all the fuss about domains
+      else {
+        $record[$fieldName] = \CRM_Core_DAO::getFieldValue($fkDao, $value, 'id', $fkField);
+      }
       unset($record[$key]);
     }
   }
