@@ -9,7 +9,7 @@
 *}
 {*this template is used for activity accordion*}
 {assign var=caseid value=$caseID}
-{if isset($isForm) and $isForm}
+{if $isForm}
   <div class="crm-accordion-wrapper crm-case_activities-accordion  crm-case-activities-block">
     <div class="crm-accordion-header">
       {ts}Activities{/ts}
@@ -104,7 +104,7 @@
     {/foreach}
   </style>
 
-{if isset($isForm) and $isForm}
+{if $isForm}
     </div><!-- /.crm-accordion-body -->
   </div><!-- /.crm-accordion-wrapper -->
 {/if}
