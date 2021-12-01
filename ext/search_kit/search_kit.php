@@ -70,7 +70,6 @@ function search_kit_civicrm_managed(&$entities) {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_angularModules
  */
 function search_kit_civicrm_angularModules(&$angularModules) {
-  _search_kit_civix_civicrm_angularModules($angularModules);
   // Fetch all search tasks provided by extensions and add their Angular modules as crmSearchTasks dependencies
   $tasks = [];
   $null = NULL;

@@ -79,20 +79,6 @@ function oauth_client_civicrm_caseTypes(&$caseTypes) {
 }
 
 /**
- * Implements hook_civicrm_angularModules().
- *
- * Generate a list of Angular modules.
- *
- * Note: This hook only runs in CiviCRM 4.5+. It may
- * use features only available in v4.6+.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_angularModules
- */
-function oauth_client_civicrm_angularModules(&$angularModules) {
-  _oauth_client_civix_civicrm_angularModules($angularModules);
-}
-
-/**
  * Implements hook_civicrm_entityTypes().
  *
  * Declare entity types provided by this module.
