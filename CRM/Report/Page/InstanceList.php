@@ -46,6 +46,15 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
   protected $_grouping = NULL;
 
   /**
+   * Possibly always null.... maybe $_title is used...
+   *
+   * The relationship between this & $_title is ambigous & seemingly not worked through.
+   *
+   * @var string
+   */
+  protected $title;
+
+  /**
    * ID of parent report template if list is filtered by template.
    *
    * @var int
@@ -190,19 +199,16 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
     $this->grouping = CRM_Utils_Request::retrieve('grp', 'String', $this);
 
     $rows = $this->info();
-
+    $this->assign('title', $this->title);
     $this->assign('list', $rows);
     if ($this->ovID or $this->compID) {
       // link to view all reports
       $reportUrl = CRM_Utils_System::url('civicrm/report/list', "reset=1");
-      $this->assign('reportUrl', $reportUrl);
-      if ($this->ovID) {
-        $this->assign('title', $this->title);
-      }
-      else {
+      if (!$this->ovID) {
         CRM_Utils_System::setTitle(ts('%1 Reports', [1 => $this->_compName]));
       }
     }
+    $this->assign('reportUrl', $reportUrl ?? FALSE);
     // assign link to template list for users with appropriate permissions
     if (CRM_Core_Permission::check('administer Reports')) {
       if ($this->compID) {
@@ -214,10 +220,10 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
         $templateUrl = CRM_Utils_System::url('civicrm/report/template/list', "reset=1");
       }
       $this->assign('newButton', $newButton);
-      $this->assign('templateUrl', $templateUrl);
       $this->assign('compName', $this->_compName);
-      $this->assign('myReports', $this->myReports);
     }
+    $this->assign('myReports', $this->myReports);
+    $this->assign('templateUrl', $templateUrl ?? NULL);
     return parent::run();
   }
 
@@ -235,14 +241,17 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
       'copy' => [
         'url' => CRM_Utils_System::url($urlCommon, 'reset=1&output=copy'),
         'label' => ts('Save a Copy'),
+        'confirm_message' => NULL,
       ],
       'pdf' => [
         'url' => CRM_Utils_System::url($urlCommon, 'reset=1&force=1&output=pdf'),
         'label' => ts('View as pdf'),
+        'confirm_message' => NULL,
       ],
       'print' => [
         'url' => CRM_Utils_System::url($urlCommon, 'reset=1&force=1&output=print'),
         'label' => ts('Print report'),
+        'confirm_message' => NULL,
       ],
     ];
     // Hackery, Hackera, Hacker ahahahahahaha a super nasty hack.
@@ -257,6 +266,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
       $actions['csv'] = [
         'url' => CRM_Utils_System::url($urlCommon, 'reset=1&force=1&output=csv'),
         'label' => ts('Export to csv'),
+        'confirm_message' => NULL,
       ];
     }
     if (CRM_Core_Permission::check('administer Reports')) {
