@@ -432,7 +432,16 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
       $deleteAction->setUseTrash(FALSE);
     }
 
+    $log = [];
+    $listen = function($e) use (&$log) {
+      $log[] = $e->entity . '.' . $e->action;
+    };
+    \Civi::dispatcher()->addListener('hook_civicrm_post', $listen);
     $deleteResult = $deleteAction->execute();
+    \Civi::dispatcher()->removeListener('hook_civicrm_post', $listen);
+
+    // We should have emitted an event.
+    $this->assertTrue(in_array("$entity.delete", $log), "$entity should emit hook_civicrm_post() for deletions");
 
     // should get back an array of deleted id
     $this->assertEquals([['id' => $id]], (array) $deleteResult);
