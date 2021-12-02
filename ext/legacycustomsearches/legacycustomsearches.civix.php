@@ -205,24 +205,6 @@ function _legacycustomsearches_civix_upgrader() {
 }
 
 /**
- * Glob wrapper which is guaranteed to return an array.
- *
- * The documentation for glob() says, "On some systems it is impossible to
- * distinguish between empty match and an error." Anecdotally, the return
- * result for an empty match is sometimes array() and sometimes FALSE.
- * This wrapper provides consistency.
- *
- * @link http://php.net/glob
- * @param string $pattern
- *
- * @return array
- */
-function _legacycustomsearches_civix_glob($pattern) {
-  $result = glob($pattern);
-  return is_array($result) ? $result : [];
-}
-
-/**
  * Inserts a navigation menu item at a given place in the hierarchy.
  *
  * @param array $menu - menu hierarchy
