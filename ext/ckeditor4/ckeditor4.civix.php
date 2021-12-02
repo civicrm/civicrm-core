@@ -205,22 +205,6 @@ function _ckeditor4_civix_upgrader() {
 }
 
 /**
- * Search directory tree for files which match a glob pattern.
- *
- * Note: Dot-directories (like "..", ".git", or ".svn") will be ignored.
- * Note: Delegate to CRM_Utils_File::findFiles(), this function kept only
- * for backward compatibility of extension code that uses it.
- *
- * @param string $dir base dir
- * @param string $pattern , glob pattern, eg "*.txt"
- *
- * @return array
- */
-function _ckeditor4_civix_find_files($dir, $pattern) {
-  return CRM_Utils_File::findFiles($dir, $pattern);
-}
-
-/**
  * Glob wrapper which is guaranteed to return an array.
  *
  * The documentation for glob() says, "On some systems it is impossible to
