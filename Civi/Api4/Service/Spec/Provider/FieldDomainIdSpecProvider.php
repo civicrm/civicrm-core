@@ -21,7 +21,8 @@ class FieldDomainIdSpecProvider implements Generic\SpecProviderInterface {
    */
   public function modifySpec(RequestSpec $spec) {
     $domainIdField = $spec->getFieldByName('domain_id');
-    if ($domainIdField && $domainIdField->isRequired()) {
+    // TODO: The WordReplacement entity should have domain_id required so this OR condition can be removed
+    if ($domainIdField && ($domainIdField->isRequired() || $domainIdField->getEntity() === 'WordReplacement')) {
       $domainIdField->setRequired(FALSE)->setDefaultValue('current_domain');;
     }
   }
