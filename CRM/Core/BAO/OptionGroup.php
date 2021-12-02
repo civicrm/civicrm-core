@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
+class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup implements \Civi\Test\HookInterface {
 
   /**
    * Class constructor.
@@ -92,18 +92,25 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
   /**
    * Delete Option Group.
    *
+   * @deprecated
    * @param int $optionGroupId
-   *   Id of the Option Group to be deleted.
    */
   public static function del($optionGroupId) {
-    // need to delete all option value field before deleting group
-    $optionValue = new CRM_Core_DAO_OptionValue();
-    $optionValue->option_group_id = $optionGroupId;
-    $optionValue->delete();
+    static::deleteRecord(['id' => $optionGroupId]);
+  }
 
-    $optionGroup = new CRM_Core_DAO_OptionGroup();
-    $optionGroup->id = $optionGroupId;
-    $optionGroup->delete();
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete') {
+      // need to delete all option value field before deleting group
+      \Civi\Api4\OptionValue::delete(FALSE)
+        ->addWhere('option_group_id', '=', $event->id)
+        ->execute();
+    }
   }
 
   /**
