@@ -14,7 +14,8 @@ function absdirname() {
 }
 
 SCRIPT_DIR=$(absdirname "$0")
-EXT_DIR=$(cv path -c extensionsDir)/example-mixin
+EXT_DIR=$(cv path -c extensionsDir)
+EX_EXT_DIR="$EXT_DIR/example-mixin"
 JUNIT_DIR="$1"
 
 ## TODO: Once the managed-entity regression is examined/fixed, remove the MY_MIXINS list. Then it will test all mixins.
@@ -34,7 +35,7 @@ function mixer_test() {
   cv flush
 
   ## usage: mixer test [-f] [--bare] [--isolate] <temp-ext-path> [<mixin-names>...] -- [<phpunit-options>...]
-  "$SCRIPT_DIR/mixer" test -f "$EXT_DIR" "$@" -- --group e2e --log-junit "$JUNIT_DIR/$XML_FILE"
+  "$SCRIPT_DIR/mixer" test -f "$EX_EXT_DIR" "$@" -- --group e2e --log-junit "$JUNIT_DIR/$XML_FILE"
 }
 
 ###############################################################################
