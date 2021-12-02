@@ -264,8 +264,6 @@ function afform_civicrm_contactSummaryBlocks(&$blocks) {
  * Generate a list of Afform Angular modules.
  */
 function afform_civicrm_angularModules(&$angularModules) {
-  _afform_civix_civicrm_angularModules($angularModules);
-
   $afforms = \Civi\Api4\Afform::get(FALSE)
     ->setSelect(['name', 'requires', 'module_name', 'directive_name'])
     ->execute();

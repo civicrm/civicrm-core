@@ -245,31 +245,6 @@ function _afform_html_civix_civicrm_managed(&$entities) {
 }
 
 /**
- * (Delegated) Implements hook_civicrm_angularModules().
- *
- * Find any and return any files matching "ang/*.ang.php"
- *
- * Note: This hook only runs in CiviCRM 4.5+.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_angularModules
- */
-function _afform_html_civix_civicrm_angularModules(&$angularModules) {
-  if (!is_dir(__DIR__ . '/ang')) {
-    return;
-  }
-
-  $files = _afform_html_civix_glob(__DIR__ . '/ang/*.ang.php');
-  foreach ($files as $file) {
-    $name = preg_replace(':\.ang\.php$:', '', basename($file));
-    $module = include $file;
-    if (empty($module['ext'])) {
-      $module['ext'] = E::LONG_NAME;
-    }
-    $angularModules[$name] = $module;
-  }
-}
-
-/**
  * Glob wrapper which is guaranteed to return an array.
  *
  * The documentation for glob() says, "On some systems it is impossible to

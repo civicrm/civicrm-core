@@ -22,6 +22,9 @@
     <ext>org.civicrm.afform</ext>
   </requires>
   <comments>This extension is experimental and has limited functionality.</comments>
+  <mixins>
+    <mixin>ang-php@1.0.0</mixin>
+  </mixins>
   <civix>
     <namespace>CRM/AfformHtml</namespace>
   </civix>

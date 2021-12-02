@@ -25,4 +25,7 @@
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
+  <mixins>
+    <mixin>ang-php@1.0.0</mixin>
+  </mixins>
 </extension>
