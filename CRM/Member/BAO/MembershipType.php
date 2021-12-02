@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
+class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implements \Civi\Test\HookInterface {
 
   /**
    * Static holder for the default Membership Type.
@@ -203,6 +203,30 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     }
 
     return $result;
+  }
+
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function on_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete' && $event->entity === 'RelationshipType') {
+      // When deleting relationship type, remove from membership types
+      $mems = civicrm_api3('MembershipType', 'get', [
+        'relationship_type_id' => ['LIKE' => "%{$event->id}%"],
+        'return' => ['id', 'relationship_type_id', 'relationship_direction'],
+      ]);
+      foreach ($mems['values'] as $membershipType) {
+        $pos = array_search($event->id, $membershipType['relationship_type_id']);
+        // Api call may have returned false positives but currently the relationship_type_id uses
+        // nonstandard serialization which makes anything more accurate impossible.
+        if ($pos !== FALSE) {
+          unset($membershipType['relationship_type_id'][$pos], $membershipType['relationship_direction'][$pos]);
+          civicrm_api3('MembershipType', 'create', $membershipType);
+        }
+      }
+    }
   }
 
   /**
