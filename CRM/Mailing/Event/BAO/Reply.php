@@ -223,9 +223,12 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
 
     $to = empty($replyto) ? $eq->email : $replyto;
 
-    $component = new CRM_Mailing_BAO_MailingComponent();
-    $component->id = $mailing->reply_id;
-    $component->find(TRUE);
+    $params['id'] = $mailing->reply_id;
+    $defaults = [];
+    $component = CRM_Mailing_BAO_MailingComponent::retrieve($params, $defaults);
+    if (!$component) {
+      return;
+    }
 
     $domain = CRM_Core_BAO_Domain::getDomain();
     list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();

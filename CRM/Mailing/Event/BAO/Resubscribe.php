@@ -32,16 +32,19 @@ class CRM_Mailing_Event_BAO_Resubscribe {
    * @param string $hash
    *   The hash.
    *
-   * @return array|null
-   *   $groups    Array of all groups to which the contact was added, or null if the queue event could not be found.
+   * @return array
+   *   $groups    Array of all groups to which the contact was added
    */
   public static function &resub_to_mailing($job_id, $queue_id, $hash) {
+    // Make a list of groups and a list of prior mailings that received
+    // this mailing.
+    $groups = [];
+    $mailings = [];
     // First make sure there's a matching queue event.
 
     $q = CRM_Mailing_Event_BAO_Queue::verify($job_id, $queue_id, $hash);
-    $success = NULL;
     if (!$q) {
-      return $success;
+      return $groups;
     }
 
     // check if this queue_id was actually unsubscribed
@@ -49,7 +52,7 @@ class CRM_Mailing_Event_BAO_Resubscribe {
     $ue->event_queue_id = $queue_id;
     $ue->org_unsubscribe = 0;
     if (!$ue->find(TRUE)) {
-      return $success;
+      return $groups;
     }
 
     $contact_id = $q->contact_id;
@@ -82,11 +85,6 @@ class CRM_Mailing_Event_BAO_Resubscribe {
                 AND     $mg.group_type IN ( 'Include', 'Base' )
                 AND     $group.is_hidden = 0"
     );
-
-    // Make a list of groups and a list of prior mailings that received
-    // this mailing.
-    $groups = [];
-    $mailings = [];
 
     while ($do->fetch()) {
       if ($do->entity_table == $group) {
@@ -199,10 +197,12 @@ class CRM_Mailing_Event_BAO_Resubscribe {
                         WHERE $jobTable.id = $job");
     $dao->fetch();
 
-    $component = new CRM_Mailing_BAO_MailingComponent();
-    $component->id = $dao->resubscribe_id;
-    $component->find(TRUE);
-
+    $params['id'] = $dao->resubscribe_id;
+    $defaults = [];
+    $component = CRM_Mailing_BAO_MailingComponent::retrieve($params, $defaults);
+    if (!$component) {
+      return;
+    }
     $html = $component->body_html;
     if ($component->body_text) {
       $text = $component->body_text;

@@ -26,7 +26,8 @@ class CRM_Mailing_BAO_MailingComponent extends CRM_Mailing_DAO_MailingComponent 
    *
    * @return CRM_Core_BAO_LocationType.
    */
-  public static function retrieve(&$params, &$defaults) {
+  public static function retrieve(array &$params, array &$defaults) {
+    $params = array_merge(['is_active' => 1, 'is_default' => 1], $params);
     $component = new CRM_Mailing_DAO_MailingComponent();
     $component->copyValues($params);
     if ($component->find(TRUE)) {

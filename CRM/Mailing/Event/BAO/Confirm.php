@@ -95,47 +95,44 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $group->id = $se->group_id;
     $group->find(TRUE);
 
-    $component = new CRM_Mailing_BAO_MailingComponent();
-    $component->is_default = 1;
-    $component->is_active = 1;
-    $component->component_type = 'Welcome';
+    $params['component_type'] = 'Welcome';
+    $defaults = [];
+    $component = CRM_Mailing_BAO_MailingComponent::retrieve($params, $defaults);
+    if ($component) {
+      $html = $component->body_html;
 
-    $component->find(TRUE);
+      if ($component->body_text) {
+        $text = $component->body_text;
+      }
+      else {
+        $text = CRM_Utils_String::htmlToText($component->body_html);
+      }
 
-    $html = $component->body_html;
+      $bao = new CRM_Mailing_BAO_Mailing();
+      $bao->body_text = $text;
+      $bao->body_html = $html;
+      $tokens = $bao->getTokens();
 
-    if ($component->body_text) {
-      $text = $component->body_text;
+      $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html']);
+      $html = CRM_Utils_Token::replaceWelcomeTokens($html, $group->title, TRUE);
+
+      $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
+      $text = CRM_Utils_Token::replaceWelcomeTokens($text, $group->title, FALSE);
+
+      $mailParams = [
+        'groupName' => 'Mailing Event ' . $component->component_type,
+        'subject' => $component->subject,
+        'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
+        'toEmail' => $email,
+        'toName' => $display_name,
+        'replyTo' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+        'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+        'html' => $html,
+        'text' => $text,
+      ];
+      // send - ignore errors because the desired status change has already been successful
+      $unused_result = CRM_Utils_Mail::send($mailParams);
     }
-    else {
-      $text = CRM_Utils_String::htmlToText($component->body_html);
-    }
-
-    $bao = new CRM_Mailing_BAO_Mailing();
-    $bao->body_text = $text;
-    $bao->body_html = $html;
-    $tokens = $bao->getTokens();
-
-    $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html']);
-    $html = CRM_Utils_Token::replaceWelcomeTokens($html, $group->title, TRUE);
-
-    $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
-    $text = CRM_Utils_Token::replaceWelcomeTokens($text, $group->title, FALSE);
-
-    $mailParams = [
-      'groupName' => 'Mailing Event ' . $component->component_type,
-      'subject' => $component->subject,
-      'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
-      'toEmail' => $email,
-      'toName' => $display_name,
-      'replyTo' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
-      'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
-      'html' => $html,
-      'text' => $text,
-    ];
-    // send - ignore errors because the desired status change has already been successful
-    $unused_result = CRM_Utils_Mail::send($mailParams);
-
     return $group->title;
   }
 

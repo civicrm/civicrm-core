@@ -198,12 +198,12 @@ SELECT     civicrm_email.id as email_id
     $group->id = $this->group_id;
     $group->find(TRUE);
 
-    $component = new CRM_Mailing_BAO_MailingComponent();
-    $component->is_default = 1;
-    $component->is_active = 1;
-    $component->component_type = 'Subscribe';
-
-    $component->find(TRUE);
+    $params['component_type'] = 'Subscribe';
+    $defaults = [];
+    $component = CRM_Mailing_BAO_MailingComponent::retrieve($params, $defaults);
+    if (!$component) {
+      return;
+    }
 
     $params = [
       'subject' => $component->subject,

@@ -310,7 +310,6 @@ WHERE  email = %2
    *   The job ID.
    */
   public static function send_unsub_response($queue_id, $groups, $is_domain, $job) {
-    $config = CRM_Core_Config::singleton();
     $domain = CRM_Core_BAO_Domain::getDomain();
     $jobObject = new CRM_Mailing_BAO_MailingJob();
     $jobTable = $jobObject->getTableName();
@@ -333,15 +332,12 @@ WHERE  email = %2
                         WHERE $jobTable.id = $job");
     $dao->fetch();
 
-    $component = new CRM_Mailing_BAO_MailingComponent();
-
-    if ($is_domain) {
-      $component->id = $dao->optout_id;
+    $params['id'] = $is_domain ? $dao->optout_id : $dao->unsubscribe_id;
+    $defaults = [];
+    $component = CRM_Mailing_BAO_MailingComponent::retrieve($params, $defaults);
+    if (!$component) {
+      return;
     }
-    else {
-      $component->id = $dao->unsubscribe_id;
-    }
-    $component->find(TRUE);
 
     $html = $component->body_html;
     if ($component->body_text) {
