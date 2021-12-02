@@ -221,30 +221,6 @@ function _ckeditor4_civix_find_files($dir, $pattern) {
 }
 
 /**
- * (Delegated) Implements hook_civicrm_managed().
- *
- * Find any *.mgd.php files, merge their content, and return.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_managed
- */
-function _ckeditor4_civix_civicrm_managed(&$entities) {
-  $mgdFiles = _ckeditor4_civix_find_files(__DIR__, '*.mgd.php');
-  sort($mgdFiles);
-  foreach ($mgdFiles as $file) {
-    $es = include $file;
-    foreach ($es as $e) {
-      if (empty($e['module'])) {
-        $e['module'] = E::LONG_NAME;
-      }
-      if (empty($e['params']['version'])) {
-        $e['params']['version'] = '3';
-      }
-      $entities[] = $e;
-    }
-  }
-}
-
-/**
  * Glob wrapper which is guaranteed to return an array.
  *
  * The documentation for glob() says, "On some systems it is impossible to

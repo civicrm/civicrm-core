@@ -15,18 +15,6 @@ function oauth_client_civicrm_config(&$config) {
 }
 
 /**
- * Implements hook_civicrm_managed().
- *
- * Generate a list of entities to create/deactivate/delete when this module
- * is installed, disabled, uninstalled.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_managed
- */
-function oauth_client_civicrm_managed(&$entities) {
-  _oauth_client_civix_civicrm_managed($entities);
-}
-
-/**
  * Implements hook_civicrm_permission().
  *
  * @see CRM_Utils_Hook::permission()
