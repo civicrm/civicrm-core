@@ -244,24 +244,8 @@ class CRM_Extension_System {
   }
 
   public function applyMixins($force = FALSE) {
-    $cache = $this->getCache();
-
-    $cachedScan = $force ? NULL : $cache->get('mixinScan');
-    $cachedBootData = $force ? NULL : $cache->get('mixinBoot');
-
-    [$funcFiles, $mixInfos] = $cachedScan ?: (new CRM_Extension_MixinScanner($this->mapper, $this->manager, TRUE))->build();
-    $bootData = $cachedBootData ?: new CRM_Extension_BootCache();
-
     $mixinLoader = new CRM_Extension_MixinLoader();
-    $mixinLoader->run($bootData, $funcFiles, $mixInfos);
-
-    if ($cachedScan === NULL) {
-      $cache->set('mixinScan', [$funcFiles, $mixInfos], 24 * 60 * 60);
-    }
-    if ($cachedBootData === NULL) {
-      $bootData->lock();
-      $cache->set('mixinBoot', $bootData, 24 * 60 * 60);
-    }
+    $mixinLoader->run($force);
   }
 
   /**

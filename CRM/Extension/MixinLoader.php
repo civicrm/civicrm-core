@@ -10,16 +10,37 @@
  */
 
 /**
- * The MixinLoader tracks a list of extensions and mixins.
+ * The MixinLoader gets a list of extensions and mixins - then loads them.
  */
 class CRM_Extension_MixinLoader {
+
+  public function run($force = FALSE) {
+    $system = CRM_Extension_System::singleton();
+    $cache = $system->getCache();
+
+    $cachedScan = $force ? NULL : $cache->get('mixinScan');
+    $cachedBootData = $force ? NULL : $cache->get('mixinBoot');
+
+    [$funcFiles, $mixInfos] = $cachedScan ?: (new CRM_Extension_MixinScanner($system->getMapper(), $system->getManager(), TRUE))->build();
+    $bootData = $cachedBootData ?: new CRM_Extension_BootCache();
+
+    $this->loadMixins($bootData, $funcFiles, $mixInfos);
+
+    if ($cachedScan === NULL) {
+      $cache->set('mixinScan', [$funcFiles, $mixInfos], 24 * 60 * 60);
+    }
+    if ($cachedBootData === NULL) {
+      $bootData->lock();
+      $cache->set('mixinBoot', $bootData, 24 * 60 * 60);
+    }
+  }
 
   /**
    * Load all extensions and call their respective function-files.
    *
    * @throws \CRM_Core_Exception
    */
-  public function run(CRM_Extension_BootCache $bootCache, array $liveFuncFiles, array $mixInfos): void {
+  protected function loadMixins(CRM_Extension_BootCache $bootCache, array $liveFuncFiles, array $mixInfos): void {
     // == WIP ==
     //
     //Do mixins run strictly once (during boot)? Or could they run twice? Or incrementally? Some edge-cases:
