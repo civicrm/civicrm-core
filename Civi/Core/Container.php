@@ -608,7 +608,7 @@ class Container {
       \CRM_Utils_Hook::singleton(TRUE);
       \CRM_Extension_System::singleton(TRUE);
       \CRM_Extension_System::singleton()->getClassLoader()->register();
-      \CRM_Extension_System::singleton()->applyMixins();
+      \CRM_Extension_System::singleton()->getMixinLoader()->run();
       $bootServices['dispatcher.boot']->setDispatchPolicy($mainDispatchPolicy);
 
       $runtime->includeCustomPath();
