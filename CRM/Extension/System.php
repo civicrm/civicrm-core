@@ -243,6 +243,26 @@ class CRM_Extension_System {
     return $this->downloader;
   }
 
+  public function applyMixins($force = FALSE) {
+    $cache = $this->getCache();
+
+    $cachedMixinLoader = $force ? NULL : $cache->get('mixinLoader');
+    $cachedBootData = $force ? NULL : $cache->get('mixinBoot');
+
+    $mixinLoader = $cachedMixinLoader ?: (new CRM_Extension_MixinScanner($this->mapper, $this->manager, TRUE))->createLoader();
+    $bootData = $cachedBootData ?: new CRM_Extension_BootCache();
+
+    $mixinLoader->run($bootData);
+
+    if ($cachedMixinLoader === NULL) {
+      $cache->set('mixinLoader', $mixinLoader, 24 * 60 * 60);
+    }
+    if ($cachedBootData === NULL) {
+      $bootData->lock();
+      $cache->set('mixinBoot', $bootData, 24 * 60 * 60);
+    }
+  }
+
   /**
    * @return CRM_Utils_Cache_Interface
    */
