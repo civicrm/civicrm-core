@@ -24,7 +24,7 @@ require_once 'Mail/mime.php';
 /**
  * Class CRM_Core_BAO_MessageTemplate.
  */
-class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
+class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implements \Civi\Test\HookInterface {
 
   /**
    * Fetch object based on array of properties.
@@ -165,7 +165,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * Delete the Message Templates.
    *
    * @param int $messageTemplatesID
-   *
+   * @deprecated
    * @throws \CRM_Core_Exception
    */
   public static function del($messageTemplatesID) {
@@ -174,18 +174,25 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       throw new CRM_Core_Exception(ts('Invalid Message template'));
     }
 
-    // Set mailing msg template col to NULL
-    $query = "UPDATE civicrm_mailing
-                  SET msg_template_id = NULL
-                  WHERE msg_template_id = %1";
-
-    $params = [1 => [$messageTemplatesID, 'Integer']];
-    CRM_Core_DAO::executeQuery($query, $params);
-
-    $messageTemplates = new CRM_Core_DAO_MessageTemplate();
-    $messageTemplates->id = $messageTemplatesID;
-    $messageTemplates->delete();
+    static::deleteRecord(['id' => $messageTemplatesID]);
+    // Yikes - bad idea setting status messages in BAO CRUD functions. Don't do this.
     CRM_Core_Session::setStatus(ts('Selected message template has been deleted.'), ts('Deleted'), 'success');
+  }
+
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete') {
+      // Set mailing msg template col to NULL
+      $query = "UPDATE civicrm_mailing
+                    SET msg_template_id = NULL
+                    WHERE msg_template_id = %1";
+      $params = [1 => [$event->id, 'Integer']];
+      CRM_Core_DAO::executeQuery($query, $params);
+    }
   }
 
   /**
