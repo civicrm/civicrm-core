@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
+class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Civi\Test\HookInterface {
 
   /**
    * Static holder for the default LT.
@@ -126,28 +126,27 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    * Delete location Types.
    *
    * @param int $locationTypeId
-   *   ID of the location type to be deleted.
-   *
+   * @deprecated
    */
   public static function del($locationTypeId) {
-    $entity = ['address', 'phone', 'email', 'im'];
-    //check dependencies
-    foreach ($entity as $key) {
-      if ($key == 'im') {
-        $name = strtoupper($key);
-      }
-      else {
-        $name = ucfirst($key);
-      }
-      $baoString = 'CRM_Core_BAO_' . $name;
-      $object = new $baoString();
-      $object->location_type_id = $locationTypeId;
-      $object->delete();
-    }
+    static::deleteRecord(['id' => $locationTypeId]);
+  }
 
-    $locationType = new CRM_Core_DAO_LocationType();
-    $locationType->id = $locationTypeId;
-    $locationType->delete();
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    // When deleting a location type, delete related records
+    if ($event->action === 'delete') {
+      foreach (['Address', 'IM', 'Email', 'Phone'] as $entity) {
+        civicrm_api4($entity, 'delete', [
+          'checkPermissions' => FALSE,
+          'where' => [['location_type_id', '=', $event->id]],
+        ]);
+      }
+    }
   }
 
 }
