@@ -31,6 +31,8 @@ use Civi\Api4\Event\ValidateValuesEvent;
 use Civi\Api4\Service\Spec\CustomFieldSpec;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Core\Event\PostEvent;
+use Civi\Core\Event\PreEvent;
 use Civi\Test\HookInterface;
 
 /**
@@ -432,16 +434,14 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
       $deleteAction->setUseTrash(FALSE);
     }
 
-    $log = [];
-    $listen = function($e) use (&$log) {
-      $log[] = $e->entity . '.' . $e->action;
-    };
-    \Civi::dispatcher()->addListener('hook_civicrm_post', $listen);
-    $deleteResult = $deleteAction->execute();
-    \Civi::dispatcher()->removeListener('hook_civicrm_post', $listen);
+    $log = $this->withPrePostLogging(function() use (&$deleteAction, &$deleteResult) {
+      $deleteResult = $deleteAction->execute();
+    });
 
     // We should have emitted an event.
-    $this->assertTrue(in_array("$entity.delete", $log), "$entity should emit hook_civicrm_post() for deletions");
+    $hookEntity = ($entity === 'Contact') ? 'Individual' : $entity; /* ooph */
+    $this->assertContains("pre.{$hookEntity}.delete", $log, "$entity should emit hook_civicrm_pre() for deletions");
+    $this->assertContains("post.{$hookEntity}.delete", $log, "$entity should emit hook_civicrm_post() for deletions");
 
     // should get back an array of deleted id
     $this->assertEquals([['id' => $id]], (array) $deleteResult);
@@ -516,6 +516,40 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
    */
   protected function isReadOnly($entityClass) {
     return in_array('ReadOnly', $entityClass::getInfo()['type'], TRUE);
+  }
+
+  /**
+   * Temporarily enable logging for `hook_civicrm_pre` and `hook_civicrm_post`.
+   *
+   * @param callable $callable
+   *   Run this function. Create a log while running this function.
+   * @return array
+   *   Log; list of times the hooks were called.
+   *   Ex: ['pre.Event.delete', 'post.Event.delete']
+   */
+  protected function withPrePostLogging($callable): array {
+    $log = [];
+
+    $listen = function ($e) use (&$log) {
+      if ($e instanceof PreEvent) {
+        $log[] = "pre.{$e->entity}.{$e->action}";
+      }
+      elseif ($e instanceof PostEvent) {
+        $log[] = "post.{$e->entity}.{$e->action}";
+      }
+    };
+
+    try {
+      \Civi::dispatcher()->addListener('hook_civicrm_pre', $listen);
+      \Civi::dispatcher()->addListener('hook_civicrm_post', $listen);
+      $callable();
+    }
+    finally {
+      \Civi::dispatcher()->removeListener('hook_civicrm_pre', $listen);
+      \Civi::dispatcher()->removeListener('hook_civicrm_post', $listen);
+    }
+
+    return $log;
   }
 
 }
