@@ -421,6 +421,7 @@
           cj('#memberStatus').hide();
           cj('#memberStatus_show').show();
           cj('#status-override-end-date').hide();
+          cj('#status_id option[selected]').removeAttr('selected');
           break;
         case '1':
           cj('#memberStatus').show();
@@ -436,6 +437,7 @@
           cj('#memberStatus').hide( );
           cj('#memberStatus_show').show( );
           cj('#status-override-end-date').hide();
+          cj('#status_id option[selected]').removeAttr('selected');
           break;
       }
     }
