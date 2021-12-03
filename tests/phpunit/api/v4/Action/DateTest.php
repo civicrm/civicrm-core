@@ -71,7 +71,7 @@ class DateTest extends UnitTestCase {
 
     // Avoid problems with `strtotime(<date arithmetic expression>)` giving
     // impossible dates like April 31 which roll over and then don't match.
-    $thisMonth = date('m');
+    $thisMonth = (int) date('m');
     $lastMonth = ($thisMonth === 1 ? 12 : $thisMonth - 1);
     $nextMonth = ($thisMonth === 12 ? 1 : $thisMonth + 1);
     $lastMonthsYear = ($thisMonth === 1 ? date('Y') - 1 : date('Y'));
