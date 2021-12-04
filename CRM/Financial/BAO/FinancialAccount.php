@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAccount {
+class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAccount implements \Civi\Test\HookInterface {
 
   /**
    * Class constructor.
@@ -121,38 +121,43 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
   /**
    * Delete financial Types.
    *
+   * @deprecated
    * @param int $financialAccountId
    */
   public static function del($financialAccountId) {
-    // checking if financial type is present
-    $check = FALSE;
-
-    //check dependencies
-    $dependency = [
-      ['Core', 'FinancialTrxn', 'to_financial_account_id'],
-      ['Financial', 'FinancialTypeAccount', 'financial_account_id'],
-      ['Financial', 'FinancialItem', 'financial_account_id'],
-    ];
-    foreach ($dependency as $name) {
-      require_once str_replace('_', DIRECTORY_SEPARATOR, "CRM_" . $name[0] . "_BAO_" . $name[1]) . ".php";
-      $className = "CRM_{$name[0]}_BAO_{$name[1]}";
-      $bao = new $className();
-      $bao->{$name[2]} = $financialAccountId;
-      if ($bao->find(TRUE)) {
-        $check = TRUE;
-      }
+    try {
+      static::deleteRecord(['id' => $financialAccountId]);
+      return TRUE;
     }
-
-    if ($check) {
-      CRM_Core_Session::setStatus(ts('This financial account cannot be deleted since it is being used as a header account. Please remove it from being a header account before trying to delete it again.'));
+    catch (CRM_Core_Exception $e) {
+      // FIXME: Setting status messages within a BAO CRUD function is bad bad bad. But this fn is deprecated so who cares.
+      CRM_Core_Session::setStatus($e->getMessage(), ts('Delete Error'), 'error');
       return FALSE;
     }
+  }
 
-    // delete from financial Type table
-    $financialAccount = new CRM_Financial_DAO_FinancialAccount();
-    $financialAccount->id = $financialAccountId;
-    $financialAccount->delete();
-    return TRUE;
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete') {
+      // Check dependencies before deleting
+      $dependency = [
+        ['Core', 'FinancialTrxn', 'to_financial_account_id'],
+        ['Financial', 'FinancialTypeAccount', 'financial_account_id'],
+        ['Financial', 'FinancialItem', 'financial_account_id'],
+      ];
+      foreach ($dependency as $name) {
+        $className = "CRM_{$name[0]}_BAO_{$name[1]}";
+        $bao = new $className();
+        $bao->{$name[2]} = $event->id;
+        if ($bao->find(TRUE)) {
+          throw new CRM_Core_Exception(ts('This financial account cannot be deleted since it is being used as a header account. Please remove it from being a header account before trying to delete it again.'));
+        }
+      }
+    }
   }
 
   /**
