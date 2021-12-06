@@ -74,7 +74,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
   /**
    * Test the content of the dashboard.
    */
-  public function testDashboardContentContributionsWithInvoicingEnabled() {
+  public function testDashboardContentContributionsWithInvoicingEnabled(): void {
     $this->contributions[] = $this->contributionCreate([
       'contact_id' => $this->contactID,
       'receive_date' => '2018-11-21',
@@ -193,7 +193,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
   /**
    * Run the user dashboard.
    */
-  protected function runUserDashboard() {
+  protected function runUserDashboard(): void {
     $_REQUEST = ['reset' => 1, 'id' => $this->contactID];
     $dashboard = new CRM_Contact_Page_View_UserDashBoard();
     $dashboard->_contactId = $this->contactID;
