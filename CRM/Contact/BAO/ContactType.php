@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
+class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements \Civi\Test\HookInterface {
 
   /**
    * Fetch object based on array of properties.
@@ -460,52 +460,69 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
    *
    * @param int $contactTypeId
    *   ID of the Contact Subtype to be deleted.
-   *
+   * @deprecated
    * @return bool
    */
   public static function del($contactTypeId) {
-
     if (!$contactTypeId) {
       return FALSE;
     }
-
-    $params = ['id' => $contactTypeId];
-    self::retrieve($params, $typeInfo);
-    $name = $typeInfo['name'];
-    // check if any custom group
-    $custom = new CRM_Core_DAO_CustomGroup();
-    $custom->whereAdd("extends_entity_column_value LIKE '%" .
-      CRM_Core_DAO::VALUE_SEPARATOR .
-      $name .
-      CRM_Core_DAO::VALUE_SEPARATOR . "%'"
-    );
-    if ($custom->find()) {
+    try {
+      static::deleteRecord(['id' => $contactTypeId]);
+      return TRUE;
+    }
+    catch (CRM_Core_Exception $e) {
       return FALSE;
     }
+  }
 
-    // remove subtype for existing contacts
-    $sql = "
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    // Before deleting a contactType, check references by custom groups
+    if ($event->action === 'delete') {
+      $name = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_ContactType', $event->id);
+      $sep = CRM_Core_DAO::VALUE_SEPARATOR;
+      $custom = new CRM_Core_DAO_CustomGroup();
+      $custom->whereAdd("extends_entity_column_value LIKE '%{$sep}{$name}{$sep}%'");
+      if ($custom->find()) {
+        throw new CRM_Core_Exception(ts("You can not delete this contact type -- it is used by %1 custom field group(s). The custom fields must be deleted first.", [1 => $custom->N]));
+      }
+    }
+  }
+
+  /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    if ($event->action === 'delete') {
+      $sep = CRM_Core_DAO::VALUE_SEPARATOR;
+      $subType = "$sep{$event->object->name}$sep";
+      // For contacts with just the one sub-type, set to null
+      $sql = "
 UPDATE civicrm_contact SET contact_sub_type = NULL
-WHERE contact_sub_type = '$name'";
-    CRM_Core_DAO::executeQuery($sql);
+WHERE contact_sub_type = '$subType'";
+      CRM_Core_DAO::executeQuery($sql);
+      // For contacts with multipe sub-types, remove this one
+      $sql = "
+UPDATE civicrm_contact SET contact_sub_type = REPLACE(contact_sub_type, '$subType', '$sep')
+WHERE contact_sub_type LIKE '%{$subType}%'";
+      CRM_Core_DAO::executeQuery($sql);
 
-    // remove subtype from contact type table
-    $contactType = new CRM_Contact_DAO_ContactType();
-    $contactType->id = $contactTypeId;
-    $contactType->delete();
+      // remove navigation entry which was auto-created when this sub-type was added
+      \Civi\Api4\Navigation::delete(FALSE)
+        ->addWhere('name', '=', "New {$event->object->name}")
+        ->addWhere('url', 'LIKE', 'civicrm/contact/add%')
+        // Overide the default which limits to a single domain
+        ->addWhere('domain_id', '>', 0)
+        ->execute();
 
-    // remove navigation entry if any
-    if ($name) {
-      $sql = '
-DELETE
-FROM civicrm_navigation
-WHERE name = %1';
-      $params = [1 => ["New $name", 'String']];
-      CRM_Core_DAO::executeQuery($sql, $params);
-      CRM_Core_BAO_Navigation::resetNavigation();
       Civi::cache('contactTypes')->clear();
     }
-    return TRUE;
   }
 
   /**

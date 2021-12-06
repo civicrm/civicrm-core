@@ -21,12 +21,54 @@ namespace api\v4\Entity;
 
 use Civi\Api4\Contact;
 use api\v4\UnitTestCase;
+use Civi\Api4\ContactType;
 use Civi\Api4\Email;
+use Civi\Api4\Navigation;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class ContactTypeTest extends UnitTestCase {
+class ContactTypeTest extends UnitTestCase implements TransactionalInterface {
+
+  public function testMenuItemWillBeCreatedAndDeleted() {
+    ContactType::create(FALSE)
+      ->addValue('name', 'Tester')
+      ->addValue('label', 'Tester')
+      ->addValue('parent_id.name', 'Individual')
+      ->execute();
+    // Menu item should have been auto-created
+    $this->assertCount(1, Navigation::get(FALSE)->addWhere('name', '=', 'New Tester')->execute());
+
+    ContactType::delete(FALSE)
+      ->addWhere('name', '=', 'Tester')
+      ->execute();
+    // Menu item should be gone
+    $this->assertCount(0, Navigation::get(FALSE)->addWhere('name', '=', 'New Tester')->execute());
+  }
+
+  public function testSubTypeWillBeRemovedFromExistingContacts() {
+    foreach (['TesterA', 'TesterB'] as $name) {
+      ContactType::create(FALSE)
+        ->addValue('name', $name)
+        ->addValue('label', $name)
+        ->addValue('parent_id.name', 'Individual')
+        ->execute();
+    }
+    $c1 = Contact::create(FALSE)
+      ->addValue('contact_sub_type', ['TesterA'])
+      ->execute()->first()['id'];
+    $c2 = Contact::create(FALSE)
+      ->addValue('contact_sub_type', ['TesterA', 'TesterB'])
+      ->execute()->first()['id'];
+
+    ContactType::delete(FALSE)
+      ->addWhere('name', '=', 'TesterA')
+      ->execute();
+
+    $this->assertNull(Contact::get(FALSE)->addWhere('id', '=', $c1)->execute()->first()['contact_sub_type']);
+    $this->assertEquals(['TesterB'], Contact::get(FALSE)->addWhere('id', '=', $c2)->execute()->first()['contact_sub_type']);
+  }
 
   public function testGetReturnsFieldsAppropriateToEachContactType() {
     $indiv = Contact::create()

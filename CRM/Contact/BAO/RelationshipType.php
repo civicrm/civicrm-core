@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType {
+class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType implements \Civi\Test\HookInterface {
 
   /**
    * Class constructor.
@@ -99,6 +99,7 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
    *
    * @param int $relationshipTypeId
    *
+   * @deprecated
    * @throws CRM_Core_Exception
    * @return mixed
    */
@@ -109,40 +110,21 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
     if (!CRM_Utils_Rule::positiveInteger($relationshipTypeId)) {
       throw new CRM_Core_Exception(ts('Invalid relationship type'));
     }
+    return static::deleteRecord(['id' => $relationshipTypeId]);
+  }
 
-    //check dependencies
-
-    // delete all relationships
-    $relationship = new CRM_Contact_DAO_Relationship();
-    $relationship->relationship_type_id = $relationshipTypeId;
-    $relationship->delete();
-
-    // remove this relationship type from membership types
-    $mems = civicrm_api3('MembershipType', 'get', [
-      'relationship_type_id' => ['LIKE' => "%{$relationshipTypeId}%"],
-      'return' => ['id', 'relationship_type_id', 'relationship_direction'],
-    ]);
-    foreach ($mems['values'] as $membershipTypeId => $membershipType) {
-      $pos = array_search($relationshipTypeId, $membershipType['relationship_type_id']);
-      // Api call may have returned false positives but currently the relationship_type_id uses
-      // nonstandard serialization which makes anything more accurate impossible.
-      if ($pos !== FALSE) {
-        unset($membershipType['relationship_type_id'][$pos], $membershipType['relationship_direction'][$pos]);
-        civicrm_api3('MembershipType', 'create', $membershipType);
-      }
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete') {
+      // need to delete all option value field before deleting group
+      \Civi\Api4\Relationship::delete(FALSE)
+        ->addWhere('relationship_type_id', '=', $event->id)
+        ->execute();
     }
-
-    //fixed for CRM-3323
-    $mappingField = new CRM_Core_DAO_MappingField();
-    $mappingField->relationship_type_id = $relationshipTypeId;
-    $mappingField->find();
-    while ($mappingField->fetch()) {
-      $mappingField->delete();
-    }
-
-    $relationshipType = new CRM_Contact_DAO_RelationshipType();
-    $relationshipType->id = $relationshipTypeId;
-    return $relationshipType->delete();
   }
 
 }

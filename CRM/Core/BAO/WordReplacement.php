@@ -18,7 +18,7 @@
 /**
  * Class CRM_Core_BAO_WordReplacement.
  */
-class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
+class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement implements \Civi\Test\HookInterface {
 
   /**
    * Class constructor.
@@ -105,21 +105,37 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   }
 
   /**
-   * Delete website.
+   * Deprecated delete function
    *
+   * @deprecated
    * @param int $id
-   *   WordReplacement id.
-   *
-   * @return object
+   * @return CRM_Core_DAO_WordReplacement
    */
   public static function del($id) {
-    $dao = new CRM_Core_DAO_WordReplacement();
-    $dao->id = $id;
-    $dao->delete();
-    if (!isset($params['options']) || CRM_Utils_Array::value('wp-rebuild', $params['options'], TRUE)) {
+    return static::deleteRecord(['id' => $id]);
+  }
+
+  /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    if ($event->action === 'delete') {
       self::rebuild();
     }
-    return $dao;
+  }
+
+  /**
+   * Efficient function to write multiple records then rebuild at the end
+   *
+   * @param array[] $records
+   * @return CRM_Core_DAO_WordReplacement[]
+   * @throws CRM_Core_Exception
+   */
+  public static function writeRecords(array $records): array {
+    $records = parent::writeRecords($records);
+    self::rebuild();
+    return $records;
   }
 
   /**

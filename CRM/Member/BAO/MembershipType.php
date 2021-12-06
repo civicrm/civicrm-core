@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
+class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implements \Civi\Test\HookInterface {
 
   /**
    * Static holder for the default Membership Type.
@@ -146,63 +146,85 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *
    * @param int $membershipTypeId
    *
+   * @deprecated
    * @throws CRM_Core_Exception
-   * @return bool|mixed
+   * @return bool
    */
   public static function del($membershipTypeId) {
-    // Check dependencies.
-    $check = FALSE;
-    $status = [];
-    $dependency = [
-      'Membership' => 'membership_type_id',
-      'MembershipBlock' => 'membership_type_default',
-    ];
+    try {
+      static::deleteRecord(['id' => $membershipTypeId]);
+      return TRUE;
+    }
+    catch (CRM_Core_Exception $e) {
+      return FALSE;
+    }
+  }
 
-    foreach ($dependency as $name => $field) {
-      $baoString = 'CRM_Member_BAO_' . $name;
-      $dao = new $baoString();
-      $dao->$field = $membershipTypeId;
-      /** @noinspection PhpUndefinedMethodInspection */
-      if ($dao->find(TRUE)) {
-        $check = TRUE;
-        $status[] = $name;
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function on_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete' && $event->entity === 'RelationshipType') {
+      // When deleting relationship type, remove from membership types
+      $mems = civicrm_api3('MembershipType', 'get', [
+        'relationship_type_id' => ['LIKE' => "%{$event->id}%"],
+        'return' => ['id', 'relationship_type_id', 'relationship_direction'],
+      ]);
+      foreach ($mems['values'] as $membershipType) {
+        $pos = array_search($event->id, $membershipType['relationship_type_id']);
+        // Api call may have returned false positives but currently the relationship_type_id uses
+        // nonstandard serialization which makes anything more accurate impossible.
+        if ($pos !== FALSE) {
+          unset($membershipType['relationship_type_id'][$pos], $membershipType['relationship_direction'][$pos]);
+          civicrm_api3('MembershipType', 'create', $membershipType);
+        }
       }
     }
-    if ($check) {
-      $cnt = 1;
-      $message = ts('This membership type cannot be deleted due to following reason(s):');
-      if (in_array('Membership', $status)) {
-        $findMembersURL = CRM_Utils_System::url('civicrm/member/search', 'reset=1');
-        $deleteURL = CRM_Utils_System::url('civicrm/contact/search/advanced', 'reset=1');
-        $message .= '<br/>' . ts('%3. There are some contacts who have this membership type assigned to them. Search for contacts with this membership type from <a href=\'%1\'>Find Members</a>. If you are still getting this message after deleting these memberships, there may be contacts in the Trash (deleted) with this membership type. Try using <a href="%2">Advanced Search</a> and checking "Search in Trash".', [
-          1 => $findMembersURL,
-          2 => $deleteURL,
-          3 => $cnt,
-        ]);
-        $cnt++;
+    if ($event->action === 'delete' && $event->entity === 'MembershipType') {
+      // Check dependencies.
+      $check = FALSE;
+      $status = [];
+      $dependency = [
+        'Membership' => 'membership_type_id',
+        'MembershipBlock' => 'membership_type_default',
+      ];
+
+      foreach ($dependency as $name => $field) {
+        $baoString = 'CRM_Member_BAO_' . $name;
+        $dao = new $baoString();
+        $dao->$field = $event->id;
+        if ($dao->find(TRUE)) {
+          $check = TRUE;
+          $status[] = $name;
+        }
       }
+      if ($check) {
+        $cnt = 1;
+        $message = ts('This membership type cannot be deleted due to following reason(s):');
+        if (in_array('Membership', $status)) {
+          $findMembersURL = CRM_Utils_System::url('civicrm/member/search', 'reset=1');
+          $deleteURL = CRM_Utils_System::url('civicrm/contact/search/advanced', 'reset=1');
+          $message .= '<br/>' . ts('%3. There are some contacts who have this membership type assigned to them. Search for contacts with this membership type from <a href=\'%1\'>Find Members</a>. If you are still getting this message after deleting these memberships, there may be contacts in the Trash (deleted) with this membership type. Try using <a href="%2">Advanced Search</a> and checking "Search in Trash".', [
+            1 => $findMembersURL,
+            2 => $deleteURL,
+            3 => $cnt,
+          ]);
+          $cnt++;
+        }
 
-      if (in_array('MembershipBlock', $status)) {
-        $deleteURL = CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1');
-        $message .= ts('%2. This Membership Type is used in an <a href=\'%1\'>Online Contribution page</a>. Uncheck this membership type in the Memberships tab.', [
-          1 => $deleteURL,
-          2 => $cnt,
-        ]);
-        throw new CRM_Core_Exception($message);
+        if (in_array('MembershipBlock', $status)) {
+          $deleteURL = CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1');
+          $message .= ts('%2. This Membership Type is used in an <a href=\'%1\'>Online Contribution page</a>. Uncheck this membership type in the Memberships tab.', [
+            1 => $deleteURL,
+            2 => $cnt,
+          ]);
+          throw new CRM_Core_Exception($message);
+        }
       }
+      CRM_Utils_Weight::delWeight('CRM_Member_DAO_MembershipType', $event->id);
     }
-    CRM_Utils_Weight::delWeight('CRM_Member_DAO_MembershipType', $membershipTypeId);
-    //delete from membership Type table
-    $membershipType = new CRM_Member_DAO_MembershipType();
-    $membershipType->id = $membershipTypeId;
-
-    //fix for membership type delete api
-    $result = FALSE;
-    if ($membershipType->find(TRUE)) {
-      return $membershipType->delete();
-    }
-
-    return $result;
   }
 
   /**

@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
+class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType implements \Civi\Test\HookInterface {
 
   /**
    * Static cache holder of available financial types for this session
@@ -117,46 +117,60 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * Delete financial Types.
    *
    * @param int $financialTypeId
-   *
+   * @deprecated
    * @return array|bool
    */
   public static function del($financialTypeId) {
-    $financialType = new CRM_Financial_DAO_FinancialType();
-    $financialType->id = $financialTypeId;
-    $financialType->find(TRUE);
-    // tables to ignore checks for financial_type_id
-    $ignoreTables = ['CRM_Financial_DAO_EntityFinancialAccount'];
+    try {
+      static::deleteRecord(['id' => $financialTypeId]);
+      return TRUE;
+    }
+    catch (CRM_Core_Exception $e) {
+      return [
+        'is_error' => 1,
+        'error_message' => $e->getMessage(),
+      ];
+    }
+  }
 
-    // TODO: if (!$financialType->find(true)) {
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete') {
+      $financialType = new CRM_Financial_DAO_FinancialType();
+      $financialType->id = $event->id;
 
-    // ensure that we have no objects that have an FK to this financial type id TODO: that cannot be null
-    $occurrences = $financialType->findReferences();
-    if ($occurrences) {
+      // tables to ignore checks for financial_type_id
+      $ignoreTables = ['CRM_Financial_DAO_EntityFinancialAccount'];
+
+      // ensure that we have no objects that have an FK to this financial type id TODO: that cannot be null
       $tables = [];
-      foreach ($occurrences as $occurrence) {
+      foreach ($financialType->findReferences() as $occurrence) {
         $className = get_class($occurrence);
         if (!in_array($className, $tables) && !in_array($className, $ignoreTables)) {
           $tables[] = $className;
         }
       }
       if (!empty($tables)) {
-        $message = ts('The following tables have an entry for this financial type: %1', [1 => implode(', ', $tables)]);
-
-        $errors = [];
-        $errors['is_error'] = 1;
-        $errors['error_message'] = $message;
-        return $errors;
+        throw new CRM_Core_Exception(ts('The following tables have an entry for this financial type: %1', [1 => implode(', ', $tables)]));
       }
     }
+  }
 
-    // delete from financial Type table
-    $financialType->delete();
-
-    $entityFinancialType = new CRM_Financial_DAO_EntityFinancialAccount();
-    $entityFinancialType->entity_id = $financialTypeId;
-    $entityFinancialType->entity_table = 'civicrm_financial_type';
-    $entityFinancialType->delete();
-    return TRUE;
+  /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    if ($event->action === 'delete') {
+      \Civi\Api4\EntityFinancialAccount::delete(FALSE)
+        ->addWhere('entity_id', '=', $event->id)
+        ->addWhere('entity_table', '=', 'civicrm_financial_type')
+        ->execute();
+    }
   }
 
   /**

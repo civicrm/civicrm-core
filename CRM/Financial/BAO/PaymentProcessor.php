@@ -18,7 +18,7 @@
 /**
  * This class contains payment processor related functions.
  */
-class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProcessor {
+class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProcessor implements \Civi\Test\HookInterface {
   /**
    * Static holder for the default payment processor
    * @var object
@@ -184,27 +184,29 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * Delete payment processor.
    *
    * @param int $paymentProcessorID
-   *
-   * @return null
+   * @deprecated
    */
   public static function del($paymentProcessorID) {
     if (!$paymentProcessorID) {
       throw new CRM_Core_Exception(ts('Invalid value passed to delete function.'));
     }
+    static::deleteRecord(['id' => $paymentProcessorID]);
+  }
 
-    $dao = new CRM_Financial_DAO_PaymentProcessor();
-    $dao->id = $paymentProcessorID;
-    if (!$dao->find(TRUE)) {
-      return NULL;
+  /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    if ($event->action === 'delete') {
+      // When a paymentProcessor is deleted, delete the associated test processor
+      $testDAO = new CRM_Financial_DAO_PaymentProcessor();
+      $testDAO->name = $event->object->name;
+      $testDAO->is_test = 1;
+      $testDAO->delete();
+
+      Civi\Payment\System::singleton()->flushProcessors();
     }
-
-    $testDAO = new CRM_Financial_DAO_PaymentProcessor();
-    $testDAO->name = $dao->name;
-    $testDAO->is_test = 1;
-    $testDAO->delete();
-
-    $dao->delete();
-    Civi\Payment\System::singleton()->flushProcessors();
   }
 
   /**

@@ -116,6 +116,7 @@ trait DAOActionTrait {
       'EntityTag' => 'add',
       'GroupContact' => 'add',
       'Navigation' => 'writeRecords',
+      'WordReplacement' => 'writeRecords',
     ];
     $method = $functionNames[$this->getEntityName()] ?? NULL;
     if (!isset($method)) {
