@@ -20,6 +20,7 @@ namespace api\v4\Entity;
 
 use api\v4\UnitTestCase;
 use Civi\Api4\Domain;
+use Civi\Api4\Group;
 use Civi\Api4\Navigation;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\OptionValue;
@@ -560,6 +561,31 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
     $this->assertEquals(TRUE, $nav['is_active']);
   }
 
+  public function testExportAndCreateGroup() {
+    $original = Group::create(FALSE)
+      ->addValue('title', 'My Managed Group')
+      ->execute()->single();
+
+    $export = Group::export(FALSE)
+      ->setId($original['id'])
+      ->execute()->single();
+
+    Group::delete(FALSE)->addWhere('id', '=', $original['id'])->execute();
+
+    $this->_managedEntities = [
+      ['module' => 'civicrm'] + $export,
+    ];
+    \CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+
+    $created = Group::get(FALSE)
+      ->addWhere('name', '=', $original['name'])
+      ->execute()->single();
+
+    $this->assertEquals('My Managed Group', $created['title']);
+    $this->assertEquals($original['name'], $created['name']);
+    $this->assertGreaterThan($original['id'], $created['id']);
+  }
+
   /**
    * @dataProvider sampleEntityTypes
    * @param string $entityName
@@ -585,6 +611,7 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
       'ContactType' => TRUE,
       'CustomField' => TRUE,
       'CustomGroup' => TRUE,
+      'Group' => TRUE,
       'MembershipType' => TRUE,
       'Navigation' => TRUE,
       'OptionGroup' => TRUE,

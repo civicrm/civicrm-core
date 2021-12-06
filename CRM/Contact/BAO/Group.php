@@ -336,13 +336,13 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *   The new group BAO (if created)
    */
   public static function create(&$params) {
+    $params += [
+      'group_type' => NULL,
+      'parents' => NULL,
+    ];
 
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::pre('edit', 'Group', $params['id'], $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'Group', NULL, $params);
-    }
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'Group', $params['id'] ?? NULL, $params);
 
     // If title isn't specified, retrieve it because we use it later, e.g.
     // for RecentItems. But note we use array_key_exists not isset or empty
@@ -369,7 +369,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           'is_active' => 1,
         ]);
         if (count($parentIds) >= 1 && $activeParentsCount <= 1) {
-          $setDisable = self::setIsActive($childValue, CRM_Utils_Array::value('is_active', $params, 1));
+          self::setIsActive($childValue, (int) ($params['is_active'] ?? 1));
         }
       }
     }
@@ -379,16 +379,13 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
     }
 
-    if (!empty($params['parents'])) {
+    if (!CRM_Utils_System::isNull($params['parents'])) {
       $params['parents'] = CRM_Utils_Array::convertCheckboxFormatToArray((array) $params['parents']);
     }
 
     // convert params if array type
-    if (isset($params['group_type'])) {
+    if (!CRM_Utils_System::isNull($params['group_type'])) {
       $params['group_type'] = CRM_Utils_Array::convertCheckboxFormatToArray((array) $params['group_type']);
-    }
-    else {
-      $params['group_type'] = NULL;
     }
 
     $session = CRM_Core_Session::singleton();
@@ -404,7 +401,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     // CRM-19068.
     // Validate parents parameter when creating group.
-    if (!empty($params['parents'])) {
+    if (!CRM_Utils_System::isNull($params['parents'])) {
       $parents = is_array($params['parents']) ? array_keys($params['parents']) : (array) $params['parents'];
       foreach ($parents as $parent) {
         CRM_Utils_Type::validate($parent, 'Integer');
@@ -413,9 +410,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $group = new CRM_Contact_BAO_Group();
     $group->copyValues($params);
 
-    if (empty($params['id']) &&
-      !$nameParam
-    ) {
+    if (empty($params['id']) && !$nameParam) {
       $group->name .= "_tmp";
     }
     $group->save();
@@ -424,9 +419,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       return NULL;
     }
 
-    if (empty($params['id']) &&
-      !$nameParam
-    ) {
+    // Enforce unique name by appending id
+    if (empty($params['id']) && !$nameParam) {
       $group->name = substr($group->name, 0, -4) . "_{$group->id}";
     }
 
@@ -450,7 +444,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         $params['parents'] = [$domainGroupID];
       }
 
-      if (!empty($params['parents'])) {
+      if (!CRM_Utils_System::isNull($params['parents'])) {
         foreach ($params['parents'] as $parentId) {
           if ($parentId && !CRM_Contact_BAO_GroupNesting::isParentChild($parentId, $group->id)) {
             CRM_Contact_BAO_GroupNesting::add($parentId, $group->id);
@@ -481,12 +475,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     self::flushCaches();
     CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($group->id);
 
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'Group', $group->id, $group);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'Group', $group->id, $group);
-    }
+    CRM_Utils_Hook::post($hook, 'Group', $group->id, $group);
 
     $recentOther = [];
     if (CRM_Core_Permission::check('edit groups')) {

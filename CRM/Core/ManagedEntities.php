@@ -315,7 +315,7 @@ class CRM_Core_ManagedEntities {
       $todo['params']['checkPermissions'] = FALSE;
     }
 
-    $result = civicrm_api($todo['entity_type'], 'create', $todo['params']);
+    $result = civicrm_api($todo['entity_type'], 'create', ['debug' => TRUE] + $todo['params']);
     if (!empty($result['is_error'])) {
       $this->onApiError($todo['entity_type'], 'create', $todo['params'], $result);
     }
