@@ -54,7 +54,7 @@ trait AfformFormatTrait {
    * @throws \API_Exception
    */
   protected function convertInputToHtml($mixed) {
-    if ($this->layoutFormat === 'html') {
+    if (is_string($mixed)) {
       return $mixed;
     }
     $converter = new \CRM_Afform_ArrayHtml($this->layoutFormat !== 'shallow', $this->formatWhitespace);
