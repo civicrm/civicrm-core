@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-export XDEBUG_PORT= XDEBUG_MODE=off
+# Not really readed, and currently segfaulting on CI: # export XDEBUG_PORT= XDEBUG_MODE=off
 
 ###############################################################################
 ## Bootstrap
