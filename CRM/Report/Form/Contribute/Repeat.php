@@ -882,8 +882,8 @@ GROUP BY    currency
     $from2 = CRM_Utils_Date::customFormat($from2, NULL, array('d'));
     $to2 = CRM_Utils_Date::customFormat($to2, NULL, array('d'));
 
-    $this->_columnHeaders['contribution1_total_amount_sum']['title'] = "$from1 -<br/> $to1";
-    $this->_columnHeaders['contribution2_total_amount_sum']['title'] = "$from2 -<br/> $to2";
+    $this->_columnHeaders['contribution1_total_amount_sum']['title'] = "$from1 - $to1";
+    $this->_columnHeaders['contribution2_total_amount_sum']['title'] = "$from2 - $to2";
     unset($this->_columnHeaders['contribution1_total_amount_count'],
       $this->_columnHeaders['contribution2_total_amount_count']
     );
