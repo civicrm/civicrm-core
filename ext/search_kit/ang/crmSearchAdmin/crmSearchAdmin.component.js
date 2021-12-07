@@ -424,7 +424,7 @@
       // Is a column eligible to use an aggregate function?
       this.canAggregate = function(col) {
         // If the query does not use grouping, never
-        if (!ctrl.savedSearch.api_params.groupBy.length) {
+        if (!ctrl.savedSearch.api_params.groupBy || !ctrl.savedSearch.api_params.groupBy.length) {
           return false;
         }
         var arg = _.findWhere(searchMeta.parseExpr(col).args, {type: 'field'}) || {};
