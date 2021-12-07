@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if !isset($isAdmin)}
-  {assign var="isAdmin" value="0"}
-{/if}
 {* This template is used for adding/scheduling reminders.  *}
 <div class="crm-block crm-form-block crm-scheduleReminder-form-block">
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
