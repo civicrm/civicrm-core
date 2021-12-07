@@ -538,6 +538,7 @@ class CRM_Extension_Mapper {
     }
     // FIXME: How can code so code wrong be so right?
     CRM_Extension_System::singleton()->getClassLoader()->refresh();
+    CRM_Extension_System::singleton()->getMixinLoader()->run(TRUE);
   }
 
   /**

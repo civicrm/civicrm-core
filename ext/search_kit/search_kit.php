@@ -39,27 +39,6 @@ function search_kit_civicrm_alterApiRoutePermissions(&$permissions, $entity, $ac
 }
 
 /**
- * Implements hook_civicrm_xmlMenu().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_xmlMenu
- */
-function search_kit_civicrm_xmlMenu(&$files) {
-  _search_kit_civix_civicrm_xmlMenu($files);
-}
-
-/**
- * Implements hook_civicrm_managed().
- *
- * Generate a list of entities to create/deactivate/delete when this module
- * is installed, disabled, uninstalled.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_managed
- */
-function search_kit_civicrm_managed(&$entities) {
-  _search_kit_civix_civicrm_managed($entities);
-}
-
-/**
  * Implements hook_civicrm_angularModules().
  *
  * Generate a list of Angular modules.
@@ -70,7 +49,6 @@ function search_kit_civicrm_managed(&$entities) {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_angularModules
  */
 function search_kit_civicrm_angularModules(&$angularModules) {
-  _search_kit_civix_civicrm_angularModules($angularModules);
   // Fetch all search tasks provided by extensions and add their Angular modules as crmSearchTasks dependencies
   $tasks = [];
   $null = NULL;
@@ -99,13 +77,6 @@ function search_kit_civicrm_angularModules(&$angularModules) {
  */
 function search_kit_civicrm_entityTypes(&$entityTypes) {
   _search_kit_civix_civicrm_entityTypes($entityTypes);
-}
-
-/**
- * Implements hook_civicrm_themes().
- */
-function search_kit_civicrm_themes(&$themes) {
-  _search_kit_civix_civicrm_themes($themes);
 }
 
 /**

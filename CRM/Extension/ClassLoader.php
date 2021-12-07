@@ -63,33 +63,23 @@ class CRM_Extension_ClassLoader {
    */
   public function register() {
     // In pre-installation environments, don't bother with caching.
-    $cacheFile = (defined('CIVICRM_DSN') && !defined('CIVICRM_TEST') && !\CRM_Utils_System::isInUpgradeMode())
-      ? $this->getCacheFile() : NULL;
+    if (!defined('CIVICRM_DSN') || defined('CIVICRM_TEST') || \CRM_Utils_System::isInUpgradeMode()) {
+      $this->loader = $this->buildClassLoader();
+      return $this->loader->register();
+    }
 
-    if (file_exists($cacheFile)) {
-      [$classLoader, $mixinLoader, $bootCache] = require $cacheFile;
-      $cacheUpdate = NULL;
+    $file = $this->getCacheFile();
+    if (file_exists($file)) {
+      $this->loader = require $file;
     }
     else {
-      $classLoader = $this->buildClassLoader();
-      $mixinLoader = (new CRM_Extension_MixinScanner($this->mapper, $this->manager, $cacheFile !== NULL))->createLoader();
-      $bootCache = new CRM_Extension_BootCache();
-      // We don't own Composer\Autoload\ClassLoader, so we clone to prevent register() from potentially leaking data.
-      // We do own MixinLoader, and we want its state - like $bootCache - to be written.
-      $cacheUpdate = $cacheFile ? [clone $classLoader, clone $mixinLoader, $bootCache] : NULL;
+      $this->loader = $this->buildClassLoader();
+      $ser = serialize($this->loader);
+      file_put_contents($file,
+        sprintf("<?php\nreturn unserialize(%s);", var_export($ser, 1))
+      );
     }
-
-    $classLoader->register();
-    $mixinLoader->run($bootCache);
-
-    if ($cacheUpdate !== NULL) {
-      // Save cache after $mixinLoader has a chance to fill $bootCache.
-      $export = var_export(serialize($cacheUpdate), 1);
-      file_put_contents($cacheFile, sprintf("<?php\nreturn unserialize(%s);", $export));
-    }
-
-    $this->loader = $classLoader;
-    return $classLoader;
+    return $this->loader->register();
   }
 
   /**
@@ -172,8 +162,7 @@ class CRM_Extension_ClassLoader {
    * @return string
    */
   protected function getCacheFile() {
-    $formatRev = '_2';
-    $envId = \CRM_Core_Config_Runtime::getId() . $formatRev;
+    $envId = \CRM_Core_Config_Runtime::getId();
     $file = \Civi::paths()->getPath("[civicrm.compile]/CachedExtLoader.{$envId}.php");
     return $file;
   }

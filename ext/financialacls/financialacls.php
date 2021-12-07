@@ -24,15 +24,6 @@ function financialacls_civicrm_container($container) {
 }
 
 /**
- * Implements hook_civicrm_xmlMenu().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_xmlMenu
- */
-function financialacls_civicrm_xmlMenu(&$files) {
-  _financialacls_civix_civicrm_xmlMenu($files);
-}
-
-/**
  * Implements hook_civicrm_install().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_install
@@ -87,45 +78,6 @@ function financialacls_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
 }
 
 /**
- * Implements hook_civicrm_managed().
- *
- * Generate a list of entities to create/deactivate/delete when this module
- * is installed, disabled, uninstalled.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_managed
- */
-function financialacls_civicrm_managed(&$entities) {
-  _financialacls_civix_civicrm_managed($entities);
-}
-
-/**
- * Implements hook_civicrm_caseTypes().
- *
- * Generate a list of case-types.
- *
- * Note: This hook only runs in CiviCRM 4.4+.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_caseTypes
- */
-function financialacls_civicrm_caseTypes(&$caseTypes) {
-  _financialacls_civix_civicrm_caseTypes($caseTypes);
-}
-
-/**
- * Implements hook_civicrm_angularModules().
- *
- * Generate a list of Angular modules.
- *
- * Note: This hook only runs in CiviCRM 4.5+. It may
- * use features only available in v4.6+.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_angularModules
- */
-function financialacls_civicrm_angularModules(&$angularModules) {
-  _financialacls_civix_civicrm_angularModules($angularModules);
-}
-
-/**
  * Implements hook_civicrm_entityTypes().
  *
  * Declare entity types provided by this module.
@@ -134,13 +86,6 @@ function financialacls_civicrm_angularModules(&$angularModules) {
  */
 function financialacls_civicrm_entityTypes(&$entityTypes) {
   _financialacls_civix_civicrm_entityTypes($entityTypes);
-}
-
-/**
- * Implements hook_civicrm_thems().
- */
-function financialacls_civicrm_themes(&$themes) {
-  _financialacls_civix_civicrm_themes($themes);
 }
 
 /**

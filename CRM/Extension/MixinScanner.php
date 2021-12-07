@@ -32,6 +32,25 @@ class CRM_Extension_MixinScanner {
   protected $relativeBases;
 
   /**
+   * @var array
+   *   Ex: ['civix' => ['1.0.0' => 'path/to/civix@1.0.0.mixin.php']]
+   */
+  protected $allFuncFiles = [];
+
+  /**
+   * @var array|null
+   *   If we have not scanned for live funcs, then NULL.
+   *   Otherwise, every live version-requirement is mapped to the corresponding file.
+   *   Ex: ['civix@1' => 'path/to/civix@1.0.0.mixin.php']
+   */
+  protected $liveFuncFiles = NULL;
+
+  /**
+   * @var \CRM_Extension_MixInfo[]
+   */
+  protected $mixInfos = [];
+
+  /**
    * CRM_Extension_ClassLoader constructor.
    * @param \CRM_Extension_Mapper|NULL $mapper
    * @param \CRM_Extension_Manager|NULL $manager
@@ -57,27 +76,132 @@ class CRM_Extension_MixinScanner {
   }
 
   /**
-   * @return \CRM_Extension_MixinLoader
+   * @return array{0: funcFiles, 1: mixInfos}
    */
-  public function createLoader() {
-    $l = new CRM_Extension_MixinLoader();
+  public function build() {
+    $this->scan();
+    return $this->compile();
+  }
 
+  /**
+   * Search through known extensions
+   */
+  protected function scan() {
     foreach ($this->getInstalledKeys() as $key) {
       try {
         $path = $this->mapper->keyToBasePath($key);
-        $l->addMixInfo($this->createMixInfo($path . DIRECTORY_SEPARATOR . CRM_Extension_Info::FILENAME));
-        $l->addFunctionFiles($this->findFunctionFiles("$path/mixin/*@*.mixin.php"));
-        $l->addFunctionFiles($this->findFunctionFiles("$path/mixin/*@*/mixin.php"), TRUE);
+        $this->addMixInfo($this->createMixInfo($path . DIRECTORY_SEPARATOR . CRM_Extension_Info::FILENAME));
+        $this->addFunctionFiles($this->findFunctionFiles("$path/mixin/*@*.mixin.php"));
+        $this->addFunctionFiles($this->findFunctionFiles("$path/mixin/*@*/mixin.php"), TRUE);
       }
       catch (CRM_Extension_Exception_ParseException $e) {
         error_log(sprintf('MixinScanner: Failed to read extension (%s)', $key));
       }
     }
 
-    $l->addFunctionFiles($this->findFunctionFiles(Civi::paths()->getPath('[civicrm.root]/mixin/*@*.mixin.php')));
-    $l->addFunctionFiles($this->findFunctionFiles(Civi::paths()->getPath('[civicrm.root]/mixin/*@*/mixin.php')), TRUE);
+    $this->addFunctionFiles($this->findFunctionFiles(Civi::paths()->getPath('[civicrm.root]/mixin/*@*.mixin.php')));
+    $this->addFunctionFiles($this->findFunctionFiles(Civi::paths()->getPath('[civicrm.root]/mixin/*@*/mixin.php')), TRUE);
+  }
 
-    return $l->compile();
+  /**
+   * Optimize the metadata, removing information that is not needed at runtime.
+   *
+   * Steps:
+   *
+   * - Remove any unnecessary $mixInfos (ie they have no mixins).
+   * - Given the available versions and expectations, pick the best $liveFuncFiles.
+   * - Drop $allFuncFiles.
+   */
+  protected function compile() {
+    $this->liveFuncFiles = [];
+    $allFuncs = $this->allFuncFiles ?? [];
+
+    $sortByVer = function ($a, $b) {
+      return version_compare($a, $b /* ignore third arg */);
+    };
+    foreach (array_keys($allFuncs) as $name) {
+      uksort($allFuncs[$name], $sortByVer);
+    }
+
+    $this->mixInfos = array_filter($this->mixInfos, function(CRM_Extension_MixInfo $mixInfo) {
+      return !empty($mixInfo->mixins);
+    });
+
+    foreach ($this->mixInfos as $ext) {
+      /** @var \CRM_Extension_MixInfo $ext */
+      foreach ($ext->mixins as $verExpr) {
+        list ($name, $expectVer) = explode('@', $verExpr);
+        $matchFile = NULL;
+        // NOTE: allFuncs[$name] is sorted by increasing version number. Choose highest satisfactory match.
+        foreach ($allFuncs[$name] ?? [] as $availVer => $availFile) {
+          if (static::satisfies($expectVer, $availVer)) {
+            $matchFile = $availFile;
+          }
+        }
+        if ($matchFile) {
+          $this->liveFuncFiles[$verExpr] = $matchFile;
+        }
+        else {
+          error_log(sprintf('MixinLoader: Failed to locate match for "%s"', $verExpr));
+        }
+      }
+    }
+
+    $this->allFuncFiles = NULL;
+
+    return [$this->liveFuncFiles, $this->mixInfos];
+  }
+
+  /**
+   * @param CRM_Extension_MixInfo $mix
+   * @return static
+   * @throws \CRM_Extension_Exception_ParseException
+   */
+  public function addMixInfo(CRM_Extension_MixInfo $mix) {
+    $this->mixInfos[$mix->longName] = $mix;
+    return $this;
+  }
+
+  /**
+   * @param array|string $files
+   *   Ex: 'path/to/some/file@1.0.0.mixin.php'
+   * @param bool $deepRead
+   *   If TRUE, then the file will be read to find metadata.
+   * @return $this
+   */
+  public function addFunctionFiles($files, $deepRead = FALSE) {
+    $files = (array) $files;
+    foreach ($files as $file) {
+      if (preg_match(';^([^@]+)@([^@]+)\.mixin\.php$;', basename($file), $m)) {
+        $this->allFuncFiles[$m[1]][$m[2]] = $file;
+        continue;
+      }
+
+      if ($deepRead) {
+        $header = $this->loadFunctionFileHeader($file);
+        if (isset($header['mixinName'], $header['mixinVersion'])) {
+          $this->allFuncFiles[$header['mixinName']][$header['mixinVersion']] = $file;
+          continue;
+        }
+        else {
+          error_log(sprintf('MixinLoader: Invalid mixin header for "%s". @mixinName and @mixinVersion required.', $file));
+          continue;
+        }
+      }
+
+      error_log(sprintf('MixinLoader: File \"%s\" cannot be parsed.', $file));
+    }
+    return $this;
+  }
+
+  private function loadFunctionFileHeader($file) {
+    $php = file_get_contents($file, TRUE);
+    foreach (token_get_all($php) as $token) {
+      if (is_array($token) && in_array($token[0], [T_DOC_COMMENT, T_COMMENT, T_FUNC_C, T_METHOD_C, T_TRAIT_C, T_CLASS_C])) {
+        return \Civi\Api4\Utils\ReflectionUtils::parseDocBlock($token[1]);
+      }
+    }
+    return [];
   }
 
   /**
@@ -143,6 +267,17 @@ class CRM_Extension_MixinScanner {
       }
     }
     return $file;
+  }
+
+  /**
+   * @param string $expectVer
+   * @param string $actualVer
+   * @return bool
+   */
+  private static function satisfies($expectVer, $actualVer) {
+    [$expectMajor] = explode('.', $expectVer);
+    [$actualMajor] = explode('.', $actualVer);
+    return ($expectMajor == $actualMajor) && version_compare($actualVer, $expectVer, '>=');
   }
 
 }

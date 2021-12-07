@@ -64,15 +64,6 @@ function afform_civicrm_config(&$config) {
 }
 
 /**
- * Implements hook_civicrm_xmlMenu().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_xmlMenu
- */
-function afform_civicrm_xmlMenu(&$files) {
-  _afform_civix_civicrm_xmlMenu($files);
-}
-
-/**
  * Implements hook_civicrm_install().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_install
@@ -135,8 +126,6 @@ function afform_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_managed
  */
 function afform_civicrm_managed(&$entities) {
-  _afform_civix_civicrm_managed($entities);
-
   /** @var \CRM_Afform_AfformScanner $scanner */
   if (\Civi::container()->has('afform_scanner')) {
     $scanner = \Civi::service('afform_scanner');
@@ -273,8 +262,6 @@ function afform_civicrm_contactSummaryBlocks(&$blocks) {
  * Generate a list of Afform Angular modules.
  */
 function afform_civicrm_angularModules(&$angularModules) {
-  _afform_civix_civicrm_angularModules($angularModules);
-
   $afforms = \Civi\Api4\Afform::get(FALSE)
     ->setSelect(['name', 'requires', 'module_name', 'directive_name'])
     ->execute();
@@ -330,13 +317,6 @@ function _afform_get_partials($moduleName, $module) {
  */
 function afform_civicrm_entityTypes(&$entityTypes) {
   _afform_civix_civicrm_entityTypes($entityTypes);
-}
-
-/**
- * Implements hook_civicrm_themes().
- */
-function afform_civicrm_themes(&$themes) {
-  _afform_civix_civicrm_themes($themes);
 }
 
 /**

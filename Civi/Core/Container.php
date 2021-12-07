@@ -607,7 +607,8 @@ class Container {
       \CRM_Core_DAO::init($runtime->dsn);
       \CRM_Utils_Hook::singleton(TRUE);
       \CRM_Extension_System::singleton(TRUE);
-      \CRM_Extension_System::singleton(TRUE)->getClassLoader()->register();
+      \CRM_Extension_System::singleton()->getClassLoader()->register();
+      \CRM_Extension_System::singleton()->getMixinLoader()->run();
       $bootServices['dispatcher.boot']->setDispatchPolicy($mainDispatchPolicy);
 
       $runtime->includeCustomPath();
