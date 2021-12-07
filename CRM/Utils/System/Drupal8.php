@@ -883,4 +883,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     }
   }
 
+  public function getVersion() {
+    if (class_exists('\Drupal')) {
+      return \Drupal::VERSION;
+    }
+    return 'Unknown';
+  }
+
 }
