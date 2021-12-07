@@ -34,6 +34,9 @@ function mixer_test() {
   civibuild restore
   cv flush
 
+  ## Facilitate testing of mixin/case-xml@1.
+  cv ev 'CRM_Core_BAO_ConfigSetting::enableComponent("CiviCase");'
+
   ## usage: mixer test [-f] [--bare] [--isolate] <temp-ext-path> [<mixin-names>...] -- [<phpunit-options>...]
   "$SCRIPT_DIR/mixer" test -f "$EX_EXT_DIR" "$@" -- --group e2e --log-junit "$JUNIT_DIR/$XML_FILE"
 }

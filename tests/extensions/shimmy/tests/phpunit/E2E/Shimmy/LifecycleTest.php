@@ -15,6 +15,10 @@ class E2E_Shimmy_LifecycleTest extends \PHPUnit\Framework\TestCase implements \C
    */
   protected $mixinTests;
 
+  public static function setUpBeforeClass(): void {
+    civicrm_api3('Extension', 'refresh', ['local' => TRUE, 'remote' => FALSE]);
+  }
+
   protected function setUp(): void {
     $this->assertNotEquals('UnitTests', getenv('CIVICRM_UF'), 'This is an end-to-end test involving CLI and HTTP. CIVICRM_UF should not be set to UnitTests.');
 
