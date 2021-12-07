@@ -252,3 +252,7 @@
   min-width: 200px;
   text-align: left;
 }
+
+crm-search-admin-export {
+  display: block;
+}

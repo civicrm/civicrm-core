@@ -8,7 +8,7 @@
       tabCount: '='
     },
     templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
-    controller: function($scope, $q, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait) {
+    controller: function($scope, $q, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait, dialogService) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in traits to this controller
         ctrl = angular.extend(this, searchDisplayBaseTrait, searchDisplaySortableTrait),
@@ -158,6 +158,15 @@
           {start: ts('Reverting...'), success: ts('Search Reverted')},
           row
         );
+      };
+
+      this.export = function(row) {
+        var options = CRM.utils.adjustDialogDefaults({
+          autoOpen: false,
+          height: 600,
+          title: ts('Export %1', {1: row.data.label})
+        });
+        dialogService.open('crmSearchAdminExport', '~/crmSearchAdmin/searchListing/export.html', row, options);
       };
 
       function buildDisplaySettings() {

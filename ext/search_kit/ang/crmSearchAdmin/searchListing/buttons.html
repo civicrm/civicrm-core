@@ -19,6 +19,12 @@
         {{:: ts('Clone...') }}
       </a>
     </li>
+    <li title="{{:: ts('Export this saved search to a file') }}">
+      <a href ng-click="$ctrl.export(row)">
+        <i class="crm-i fa-download"></i>
+        {{:: ts('Export...') }}
+      </a>
+    </li>
     <li ng-if="!row.data['base_module:label']" title="{{:: ts('Delete search along with any displays and forms') }}">
       <a href ng-click="$ctrl.deleteOrRevert(row)">
         <i class="crm-i fa-trash"></i>
