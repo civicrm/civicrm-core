@@ -67,14 +67,14 @@
     require: {
       crmDialog: '?^^crmDialog'
     },
-    controller: function($scope, $element, dialogService, $timeout) {
-      var ts = $scope.ts = CRM.ts('crmDialog'), $ctrl = this;
+    controller: function($scope) {
+      var $ctrl = this;
       $ctrl.$onInit = function() {
         $ctrl.crmDialog.buttons.push(this);
       };
       $ctrl.id = 'crmDialogButton_' + (idNum++);
 
-      $scope.$watch('$ctrl.disabled', function(){
+      $scope.$watch('$ctrl.disabled', function() {
         $ctrl.crmDialog.toggleButtons();
       });
     }
