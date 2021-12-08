@@ -404,7 +404,23 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
         }
       }
     }
+    foreach ($this->getExpectedRowProperties() as $key) {
+      foreach ($values as $index => $value) {
+        if (!array_key_exists($key, $value)) {
+          $values[$index][$key] = NULL;
+        }
+      }
+    }
     return $values;
+  }
+
+  /**
+   * Get any properties that should always be present in each row (null if no value).
+   *
+   * @return array
+   */
+  protected function getExpectedRowProperties(): array {
+    return [];
   }
 
 }
