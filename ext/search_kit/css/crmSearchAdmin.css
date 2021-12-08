@@ -3,6 +3,15 @@
   min-width: 500px;
 }
 
+#bootstrap-theme .crm-search-nav-tabs {
+  position: relative;
+}
+#bootstrap-theme .crm-search-nav-tabs > a.btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
 #bootstrap-theme.crm-search .nav-stacked {
   margin-left: 0;
   margin-right: 20px;

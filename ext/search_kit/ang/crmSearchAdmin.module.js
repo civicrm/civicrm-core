@@ -13,7 +13,7 @@
       $routeProvider.when('/list', {
         controller: 'searchList',
         reloadOnSearch: false,
-        templateUrl: '~/crmSearchAdmin/searchListing/crmSearchAdminSearchListing.html',
+        templateUrl: '~/crmSearchAdmin/searchListing/searchList.html',
       });
       $routeProvider.when('/create/:entity', {
         controller: 'searchCreate',
