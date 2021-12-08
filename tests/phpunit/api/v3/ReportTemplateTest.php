@@ -1651,6 +1651,46 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Basic test of the repeat contributions report.
+   */
+  public function testRepeatContributions() {
+    // our sorting options are limited in this report - default is last name so let's ensure order
+    $contact1 = $this->individualCreate(['last_name' => 'aaaaa']);
+    $contact2 = $this->individualCreate(['last_name' => 'zzzzz']);
+    $this->contributionCreate(['contact_id' => $contact1, 'receive_date' => (date('Y') - 1) . '-07-01', 'financial_type_id' => 1, 'total_amount' => '10']);
+    $this->contributionCreate(['contact_id' => $contact1, 'receive_date' => (date('Y') - 1) . '-08-01', 'financial_type_id' => 1, 'total_amount' => '20']);
+    $this->contributionCreate(['contact_id' => $contact1, 'receive_date' => date('Y') . '-01-01', 'financial_type_id' => 1, 'total_amount' => '40']);
+    $this->contributionCreate(['contact_id' => $contact2, 'receive_date' => (date('Y') - 1) . '-09-01', 'financial_type_id' => 1, 'total_amount' => '80']);
+    $rows = $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => 'contribute/repeat',
+      'receive_date1' => 'previous.year',
+      'receive_date2' => 'this.year',
+      'fields' => [
+        'sort_name' => 1,
+      ],
+    ]);
+
+    $this->assertCount(2, $rows['values']);
+
+    // Should have for both this year and last, and last year was multiple.
+    $this->assertEquals($contact1, $rows['values'][0]['contact_civireport_id'], "doesn't seem to be the right contact 1");
+    $this->assertSame('30.00', $rows['values'][0]['contribution1_total_amount_sum']);
+    $this->assertSame('2', $rows['values'][0]['contribution1_total_amount_count']);
+    $this->assertSame('40.00', $rows['values'][0]['contribution2_total_amount_sum']);
+    $this->assertSame('1', $rows['values'][0]['contribution2_total_amount_count']);
+
+    // Should only have for last year.
+    $this->assertEquals($contact2, $rows['values'][1]['contact_civireport_id'], "doesn't seem to be the right contact 2");
+    $this->assertSame('80.00', $rows['values'][1]['contribution1_total_amount_sum']);
+    $this->assertSame('1', $rows['values'][1]['contribution1_total_amount_count']);
+    $this->assertNull($rows['values'][1]['contribution2_total_amount_sum']);
+    $this->assertNull($rows['values'][1]['contribution2_total_amount_count']);
+
+    $this->callAPISuccess('Contact', 'delete', ['id' => $contact1]);
+    $this->callAPISuccess('Contact', 'delete', ['id' => $contact2]);
+  }
+
+  /**
    * Convoluted test of the convoluted logging detail report.
    *
    * In principle it's just make an update and get the report and see if it
