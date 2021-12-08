@@ -262,6 +262,7 @@
   text-align: left;
 }
 
-crm-search-admin-export {
+crm-search-admin-export,
+crm-search-admin-import {
   display: block;
 }
