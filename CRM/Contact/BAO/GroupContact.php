@@ -33,7 +33,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Contact_BAO_Group
+   * @return CRM_Contact_BAO_GroupContact
    */
   public static function add($params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
@@ -477,7 +477,7 @@ SELECT    *
    *   Id of a particular group.
    *
    *
-   * @return groupID
+   * @return int groupID
    */
   public static function getGroupId($groupContactID) {
     $dao = new CRM_Contact_DAO_GroupContact();
@@ -489,19 +489,25 @@ SELECT    *
   /**
    * Creates / removes contacts from the groups
    *
-   * FIXME: Nonstandard create function; only called from CRM_Contact_BAO_Contact::createProfileContact
-   *
    * @param array $params
    *   Name/value pairs.
    * @param int $contactId
    *   Contact id.
-   *
    * @param bool $ignorePermission
    *   if ignorePermission is true we are coming in via profile mean $method = 'Web'
-   *
    * @param string $method
+   *
+   * @return CRM_Contact_BAO_GroupContact|void
    */
   public static function create($params, $contactId, $ignorePermission = FALSE, $method = 'Admin') {
+    if (empty($contactId)) {
+      return self::add($params);
+    }
+
+    // @fixme create was only called from CRM_Contact_BAO_Contact::createProfileContact
+    //   Now it's not called from anywhere so we can remove the below code after some time
+    CRM_Core_Error::deprecatedFunctionWarning('Use the GroupContact API');
+
     $contactIds = [$contactId];
     $contactGroup = [];
 

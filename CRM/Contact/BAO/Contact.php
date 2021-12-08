@@ -2041,6 +2041,8 @@ ORDER BY civicrm_email.is_primary DESC";
     }
 
     // Process group and tag
+    // @todo Contact::create also calls addContactsToGroup/removeContactsToGroup
+    //   Remove from here and use the existing functionality in Contact::create
     if (isset($params['group'])) {
       $method = 'Admin';
       // this for sure means we are coming in via profile since i added it to fix
@@ -2048,7 +2050,35 @@ ORDER BY civicrm_email.is_primary DESC";
       if ($visibility) {
         $method = 'Web';
       }
-      CRM_Contact_BAO_GroupContact::create($params['group'], $contactID, $visibility, $method);
+      $groupParams = $params['group'] ?? [];
+      $contactIds = [$contactID];
+      $contactGroup = [];
+
+      if ($contactID) {
+        $contactGroupList = CRM_Contact_BAO_GroupContact::getContactGroup($contactID, 'Added',
+          NULL, FALSE, $visibility
+        );
+        if (is_array($contactGroupList)) {
+          foreach ($contactGroupList as $key) {
+            $groupId = $key['group_id'];
+            $contactGroup[$groupId] = $groupId;
+          }
+        }
+      }
+      // get the list of all the groups
+      $allGroup = CRM_Contact_BAO_GroupContact::getGroupList(0, $visibility);
+
+      // check which values has to be add/remove contact from group
+      foreach ($allGroup as $key => $varValue) {
+        if (!empty($groupParams[$key]) && !array_key_exists($key, $contactGroup)) {
+          // add contact to group
+          CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIds, $key, $method);
+        }
+        elseif (empty($groupParams[$key]) && array_key_exists($key, $contactGroup)) {
+          // remove contact from group
+          CRM_Contact_BAO_GroupContact::removeContactsFromGroup($contactIds, $key, $method);
+        }
+      }
     }
 
     if (!empty($fields['tag']) && array_key_exists('tag', $params)) {
@@ -2057,7 +2087,8 @@ ORDER BY civicrm_email.is_primary DESC";
       CRM_Core_BAO_EntityTag::create($tags, 'civicrm_contact', $contactID);
     }
 
-    //to add profile in default group
+    // to add profile in default group
+    // @todo merge this with code above which also calls addContactsToGroup
     if (is_array($addToGroupID)) {
       $contactIds = [$contactID];
       foreach ($addToGroupID as $groupId) {
