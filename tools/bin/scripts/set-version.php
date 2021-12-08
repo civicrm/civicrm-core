@@ -40,12 +40,14 @@ if (!isVersionValid($newVersion)) {
 echo "Changing version from $oldVersion to $newVersion...\n";
 
 $verName = makeVerName($newVersion);
-$phpFile = initFile("CRM/Upgrade/Incremental/php/{$verName}.php", function () use ($verName) {
+$phpFile = initFile("CRM/Upgrade/Incremental/php/{$verName}.php", function () use ($verName, $newVersion) {
   ob_start();
   global $camelNumber;
+  global $versionNumber;
   $camelNumber = $verName;
+  $versionNumber = $newVersion;
   require 'CRM/Upgrade/Incremental/php/Template.php';
-  unset($camelNumber);
+  unset($camelNumber, $versionNumber);
   return ob_get_clean();
 });
 
