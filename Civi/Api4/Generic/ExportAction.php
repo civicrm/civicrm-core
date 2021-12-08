@@ -85,7 +85,7 @@ class ExportAction extends AbstractAction {
         $pseudofields[$field['name'] . '.name'] = $field['name'];
       }
       // Use pseudoconstant syntax if appropriate
-      elseif ($this->shouldUsePseudoconstant($field)) {
+      elseif ($this->shouldUsePseudoconstant($entityType, $field)) {
         $select[] = $field['name'] . ':name';
         $pseudofields[$field['name'] . ':name'] = $field['name'];
       }
@@ -141,68 +141,72 @@ class ExportAction extends AbstractAction {
     ];
     // Export entities that reference this one
     $daoName = CoreUtil::getInfoItem($entityType, 'dao');
-    /** @var \CRM_Core_DAO $dao */
-    $dao = new $daoName();
-    $dao->id = $entityId;
-    // Collect references into arrays keyed by entity type
-    $references = [];
-    foreach ($dao->findReferences() as $reference) {
-      $refEntity = \CRM_Utils_Array::first($reference::fields())['entity'] ?? '';
-      // Limit references by domain
-      if (property_exists($reference, 'domain_id')) {
-        if (!isset($reference->domain_id)) {
-          $reference->find(TRUE);
+    if ($daoName) {
+      /** @var \CRM_Core_DAO $dao */
+      $dao = new $daoName();
+      $dao->id = $entityId;
+      // Collect references into arrays keyed by entity type
+      $references = [];
+      foreach ($dao->findReferences() as $reference) {
+        $refEntity = \CRM_Utils_Array::first($reference::fields())['entity'] ?? '';
+        // Limit references by domain
+        if (property_exists($reference, 'domain_id')) {
+          if (!isset($reference->domain_id)) {
+            $reference->find(TRUE);
+          }
+          if (isset($reference->domain_id) && $reference->domain_id != $limitRefsByDomain) {
+            continue;
+          }
         }
-        if (isset($reference->domain_id) && $reference->domain_id != $limitRefsByDomain) {
+        $references[$refEntity][] = $reference;
+      }
+      foreach ($references as $refEntity => $records) {
+        $refApiType = CoreUtil::getInfoItem($refEntity, 'type') ?? [];
+        // Reference must be a ManagedEntity
+        if (!in_array('ManagedEntity', $refApiType, TRUE)) {
           continue;
         }
-      }
-      $references[$refEntity][] = $reference;
-    }
-    foreach ($references as $refEntity => $records) {
-      $refApiType = CoreUtil::getInfoItem($refEntity, 'type') ?? [];
-      // Reference must be a ManagedEntity
-      if (!in_array('ManagedEntity', $refApiType, TRUE)) {
-        continue;
-      }
-      $exclude = [];
-      // For sortable entities, order by weight and exclude weight from the export (it will be auto-managed)
-      if (in_array('SortableEntity', $refApiType, TRUE)) {
-        $exclude[] = $weightCol = CoreUtil::getInfoItem($refEntity, 'order_by');
-        usort($records, function($a, $b) use ($weightCol) {
-          if (!isset($a->$weightCol)) {
-            $a->find(TRUE);
-          }
-          if (!isset($b->$weightCol)) {
-            $b->find(TRUE);
-          }
-          return $a->$weightCol < $b->$weightCol ? -1 : 1;
-        });
-      }
-      foreach ($records as $record) {
-        $this->exportRecord($refEntity, $record->id, $result, $name . '_', $exclude);
+        $exclude = [];
+        // For sortable entities, order by weight and exclude weight from the export (it will be auto-managed)
+        if (in_array('SortableEntity', $refApiType, TRUE)) {
+          $exclude[] = $weightCol = CoreUtil::getInfoItem($refEntity, 'order_by');
+          usort($records, function ($a, $b) use ($weightCol) {
+            if (!isset($a->$weightCol)) {
+              $a->find(TRUE);
+            }
+            if (!isset($b->$weightCol)) {
+              $b->find(TRUE);
+            }
+            return $a->$weightCol < $b->$weightCol ? -1 : 1;
+          });
+        }
+        foreach ($records as $record) {
+          $this->exportRecord($refEntity, $record->id, $result, $name . '_', $exclude);
+        }
       }
     }
   }
 
   /**
    * If a field has a pseudoconstant list, determine whether it would be better
-   * to use pseudoconstant (field:name) syntax.
+   * to use pseudoconstant (field:name) syntax vs plain value.
    *
-   * Generally speaking, options with numeric keys are the ones we need to worry about
-   * because auto-increment keys can vary when migrating an entity to a different database.
-   *
-   * But options with string keys tend to be stable,
-   * and it's better not to use the pseudoconstant syntax with these fields because
-   * the option list may not be populated at the time of managed entity reconciliation.
-   *
+   * @param string $entityType
    * @param array $field
    * @return bool
    */
-  private function shouldUsePseudoconstant(array $field) {
+  private function shouldUsePseudoconstant(string $entityType, array $field) {
     if (empty($field['options'])) {
       return FALSE;
     }
+    $daoName = CoreUtil::getInfoItem($entityType, 'dao');
+    // Options generated by a callback function tend to be stable,
+    // and the :name property may not be reliable. Use plain value.
+    if ($daoName && !empty($daoName::getSupportedFields()[$field['name']]['pseudoconstant']['callback'])) {
+      return FALSE;
+    }
+    // Options with numeric keys probably refer to auto-increment keys
+    // which vary across different databases. Use :name syntax.
     $numericKeys = array_filter(array_keys($field['options']), 'is_numeric');
     return count($numericKeys) === count($field['options']);
   }

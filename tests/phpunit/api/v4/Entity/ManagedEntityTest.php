@@ -410,7 +410,7 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
             'permission_operator' => '',
             'parent_id.name' => 'Test_Parent',
             'is_active' => TRUE,
-            'has_separator' => NULL,
+            'has_separator' => 1,
             'domain_id' => 'current_domain',
           ],
         ],
@@ -432,7 +432,7 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
             'permission_operator' => '',
             'parent_id.name' => 'Test_Parent',
             'is_active' => TRUE,
-            'has_separator' => NULL,
+            'has_separator' => 2,
             'domain_id' => 'current_domain',
           ],
         ],
@@ -491,6 +491,10 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
     $this->assertEquals('Navigation_Test_Parent_Navigation_Test_Child_1', $nav['export'][1]['name']);
     $this->assertEquals('Navigation_Test_Parent_Navigation_Test_Child_2', $nav['export'][2]['name']);
     $this->assertEquals('Navigation_Test_Parent_Navigation_Test_Child_3', $nav['export'][3]['name']);
+    // The has_separator should be using numeric key not pseudoconstant
+    $this->assertNull($nav['export'][0]['params']['values']['has_separator']);
+    $this->assertEquals(1, $nav['export'][1]['params']['values']['has_separator']);
+    $this->assertEquals(2, $nav['export'][2]['params']['values']['has_separator']);
     // Weight should not be included in export of children, leaving it to be auto-managed
     $this->assertArrayNotHasKey('weight', $nav['export'][1]['params']['values']);
 
