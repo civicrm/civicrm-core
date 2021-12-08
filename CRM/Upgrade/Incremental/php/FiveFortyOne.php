@@ -10,26 +10,9 @@
  */
 
 /**
- * Upgrade logic for FiveFortyOne */
+ * Upgrade logic for FiveFortyOne
+ */
 class CRM_Upgrade_Incremental_php_FiveFortyOne extends CRM_Upgrade_Incremental_Base {
-
-  /**
-   * Compute any messages which should be displayed beforeupgrade.
-   *
-   * Note: This function is called iteratively for each incremental upgrade step.
-   * There must be a concrete step (eg 'X.Y.Z.mysql.tpl' or 'upgrade_X_Y_Z()').
-   *
-   * @param string $preUpgradeMessage
-   * @param string $rev
-   *   a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'.
-   * @param null $currentVer
-   */
-  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
-    // Example: Generate a pre-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the Manage Tags screen.', array(1 => ts('manage tags'))) . '</p>';
-    // }
-  }
 
   /**
    * Compute any messages which should be displayed after upgrade.
@@ -47,12 +30,6 @@ class CRM_Upgrade_Incremental_php_FiveFortyOne extends CRM_Upgrade_Incremental_B
       $postUpgradeMessage .= '<br /><br />' . ts('A token has been updated in the %1 template. Check the system checks page to see if any action is required.', [1 => 'invoice']);
     }
   }
-
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
-   */
 
   /**
    * Upgrade function.

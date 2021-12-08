@@ -10,7 +10,8 @@
  */
 
 /**
- * Upgrade logic for FiveThirtySeven */
+ * Upgrade logic for FiveThirtySeven
+ */
 class CRM_Upgrade_Incremental_php_FiveThirtySeven extends CRM_Upgrade_Incremental_Base {
 
   /**
@@ -36,30 +37,6 @@ class CRM_Upgrade_Incremental_php_FiveThirtySeven extends CRM_Upgrade_Incrementa
   }
 
   /**
-   * Compute any messages which should be displayed after upgrade.
-   *
-   * Note: This function is called iteratively for each incremental upgrade step.
-   * There must be a concrete step (eg 'X.Y.Z.mysql.tpl' or 'upgrade_X_Y_Z()').
-   *
-   * @param string $postUpgradeMessage
-   *   alterable.
-   * @param string $rev
-   *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
-   */
-  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
-    // Example: Generate a post-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
-    // }
-  }
-
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
-   */
-
-  /**
    * Upgrade function.
    *
    * @param string $rev
@@ -75,19 +52,6 @@ class CRM_Upgrade_Incremental_php_FiveThirtySeven extends CRM_Upgrade_Incrementa
     $this->addTask('core-issue#2487 Add / alter defaults for civicrm_contribution_recur', 'updateDBDefaultsForContributionRecur');
     $this->addTask('Install reCAPTCHA extension', 'installReCaptchaExtension');
   }
-
-  //  /**
-  //   * Upgrade function.
-  //   *
-  //   * @param string $rev
-  //   */
-  //  public function upgrade_5_0_x($rev) {
-  //    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-  //    $this->addTask('Do the foo change', 'taskFoo', ...);
-  //    // Additional tasks here...
-  //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
-  //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
-  //  }
 
   /**
    * @param \CRM_Queue_TaskContext $ctx

@@ -496,12 +496,6 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       "date DEFAULT NULL COMMENT 'The end date of membership status override if (Override until selected date) override type is selected.'");
   }
 
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
-   */
-
   //  /**
   //   * Upgrade function.
   //   *
