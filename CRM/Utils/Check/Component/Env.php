@@ -708,23 +708,26 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       ])['values'][0]['description'] ?? NULL;
       if (!empty($lastExecutionMessage) && strpos($lastExecutionMessage, 'Failure') !== FALSE) {
         $viewLogURL = CRM_Utils_System::url('civicrm/admin/joblog', "jid={$job['id']}&reset=1");
-        $html .= "<tr><td>{$job['name']} </td><td>{$lastExecutionMessage}</td><td>{$job['last_run']}</td><td> <a href='{$viewLogURL}'>View Job Log</a></td></tr>";
+        $html .= '<tr>
+          <td>' . $job['name'] . ' </td>
+          <td>' . $lastExecutionMessage . '</td>
+          <td>' . $job['last_run'] . '</td>
+          <td><a href="' . $viewLogURL . '">' . ts('View Job Log') . '</a></td>
+        </tr>';
       }
     }
     if (empty($html)) {
       return [];
     }
 
-    $message = "<p>The following scheduled jobs failed on the last run:</p>
-      <p><table><thead><tr><th>Job</th><th>Message</th><th>Date</th><th></th>
-      </tr></thead><tbody>
-      $html
-      </tbody></table></p>
-     ";
+    $message = '<p>' . ts('The following scheduled jobs failed on the last run:') . '</p>
+      <p><table><thead><tr><th>' . ts('Job') . '</th><th>' . ts('Message') . '</th><th>' . ts('Last Run') . '</th><th></th>
+      </tr></thead><tbody>' . $html . '
+      </tbody></table></p>';
 
     $msg = new CRM_Utils_Check_Message(
       __FUNCTION__,
-      ts($message),
+      $message,
       ts('Scheduled Job Failures'),
       \Psr\Log\LogLevel::WARNING,
       'fa-server'
