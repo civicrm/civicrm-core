@@ -136,8 +136,8 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $actual = $smarty->fetch('string:{crmRegion name=testAddScriptFile}{/crmRegion}');
     // stable ordering: alphabetical by (snippet.weight,snippet.name)
     $expected = ""
-      . "<script type=\"text/javascript\" src=\"http://core-app/foo%20bar.js?r=resTest\">\n</script>\n"
-      . "<script type=\"text/javascript\" src=\"http://ext-dir/com.example.ext/foo%20bar.js?r=resTest\">\n</script>\n";
+      . "<script type=\"text/javascript\" src=\"http://core-app/foo%20bar.js?r=resTesten_US\">\n</script>\n"
+      . "<script type=\"text/javascript\" src=\"http://ext-dir/com.example.ext/foo%20bar.js?r=resTesten_US\">\n</script>\n";
     $this->assertEquals($expected, $actual);
   }
 
@@ -288,7 +288,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $actual = $smarty->fetch('string:{crmRegion name=testCrmJS}{/crmRegion}');
     // stable ordering: alphabetical by (snippet.weight,snippet.name)
     $expected = ""
-      . "<script type=\"text/javascript\" src=\"http://ext-dir/com.example.ext/foo%20bar.js?r=resTest\">\n</script>\n"
+      . "<script type=\"text/javascript\" src=\"http://ext-dir/com.example.ext/foo%20bar.js?r=resTesten_US\">\n</script>\n"
       . "<script type=\"text/javascript\" src=\"/whiz/foo%20bar.js\">\n</script>\n";
     $this->assertEquals($expected, $actual);
   }
@@ -304,8 +304,8 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $actual = $smarty->fetch('string:{crmRegion name=testAddStyleFile}{/crmRegion}');
     // stable ordering: alphabetical by (snippet.weight,snippet.name)
     $expected = ""
-      . "<link href=\"http://core-app/foo%20bar.css?r=resTest\" rel=\"stylesheet\" type=\"text/css\"/>\n"
-      . "<link href=\"http://ext-dir/com.example.ext/foo%20bar.css?r=resTest\" rel=\"stylesheet\" type=\"text/css\"/>\n";
+      . "<link href=\"http://core-app/foo%20bar.css?r=resTesten_US\" rel=\"stylesheet\" type=\"text/css\"/>\n"
+      . "<link href=\"http://ext-dir/com.example.ext/foo%20bar.css?r=resTesten_US\" rel=\"stylesheet\" type=\"text/css\"/>\n";
     $this->assertEquals($expected, $actual);
   }
 
@@ -350,7 +350,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $actual = $smarty->fetch('string:{crmRegion name=testCrmCSS}{/crmRegion}');
     // stable ordering: alphabetical by (snippet.weight,snippet.name)
     $expected = ""
-      . "<link href=\"http://ext-dir/com.example.ext/foo%20bar.css?r=resTest\" rel=\"stylesheet\" type=\"text/css\"/>\n"
+      . "<link href=\"http://ext-dir/com.example.ext/foo%20bar.css?r=resTesten_US\" rel=\"stylesheet\" type=\"text/css\"/>\n"
       . "<link href=\"/whiz/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n";
     $this->assertEquals($expected, $actual);
   }
@@ -381,7 +381,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals('http://ext-dir/com.example.ext/foo%20bar.png', $actual);
 
     $actual = $smarty->fetch('string:{crmResURL ext=com.example.ext file=foo%20bar.png addCacheCode=1}');
-    $this->assertEquals('http://ext-dir/com.example.ext/foo%20bar.png?r=resTest', $actual);
+    $this->assertEquals('http://ext-dir/com.example.ext/foo%20bar.png?r=resTesten_US', $actual);
 
     $actual = $smarty->fetch('string:{crmResURL ext=com.example.ext}');
     $this->assertEquals('http://ext-dir/com.example.ext/', $actual);
@@ -459,18 +459,21 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    * @return array
    */
   public function urlForCacheCodeProvider() {
+    $cacheBusterString = Civi::resources()
+      ->setCacheCode($this->cacheBusterString)
+      ->getCacheCode();
     return [
       [
         'http://www.civicrm.org',
-        'http://www.civicrm.org?r=' . $this->cacheBusterString,
+        'http://www.civicrm.org?r=' . $cacheBusterString,
       ],
       [
         'www.civicrm.org/custom.css?foo=bar',
-        'www.civicrm.org/custom.css?foo=bar&r=' . $this->cacheBusterString,
+        'www.civicrm.org/custom.css?foo=bar&r=' . $cacheBusterString,
       ],
       [
         'civicrm.org/custom.css?car=blue&foo=bar',
-        'civicrm.org/custom.css?car=blue&foo=bar&r=' . $this->cacheBusterString,
+        'civicrm.org/custom.css?car=blue&foo=bar&r=' . $cacheBusterString,
       ],
     ];
   }
