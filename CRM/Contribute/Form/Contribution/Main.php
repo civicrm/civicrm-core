@@ -549,6 +549,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   private function buildMembershipBlock($cid, $selectedMembershipTypeID = NULL, $isTest = NULL) {
     $separateMembershipPayment = FALSE;
+    $this->addOptionalQuickFormElement('auto_renew');
     if ($this->_membershipBlock) {
       $this->_currentMemberships = [];
 

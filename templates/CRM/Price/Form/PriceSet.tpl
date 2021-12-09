@@ -101,7 +101,7 @@
                     <div class='crm-section auto-renew'>
                       <div class='label'></div>
                       <div class='content' id="auto_renew_section">
-                        {if isset($form.auto_renew) }
+                        {if $form.auto_renew}
                           {$form.auto_renew.html}&nbsp;{$form.auto_renew.label}
                         {/if}
                       </div>
