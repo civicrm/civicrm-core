@@ -196,7 +196,17 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         unset($rowsElementsAndInfo['rows']['move_contact_type']);
       }
 
-      $this->assign('rows', $rowsElementsAndInfo['rows']);
+      $assignedRows = $rowsElementsAndInfo['rows'];
+      foreach ($assignedRows as $index => $assignedRow) {
+        // prevent smarty notices.
+        if (!array_key_exists('main', $assignedRow)) {
+          $assignedRows[$index]['main'] = NULL;
+        }
+        if (!array_key_exists('other', $assignedRow)) {
+          $assignedRows[$index]['other'] = NULL;
+        }
+      }
+      $this->assign('rows', $assignedRows);
 
       // add elements
       foreach ($rowsElementsAndInfo['elements'] as $element) {
