@@ -56,10 +56,10 @@
         CRM.utils.copyAttributes($dataField, $dateField, ['style', 'class', 'disabled', 'aria-label']);
         placeholder = settings.placeholder || $dataField.attr('placeholder');
         $dateField.addClass('crm-form-' + type);
-        if (!settings.minDate && !_.isUndefined(settings.start_date_years)) {
+        if (!settings.minDate && isInt(settings.start_date_years)) {
           settings.minDate = '' + (new Date().getFullYear() - settings.start_date_years) + '-01-01';
         }
-        if (!settings.maxDate && !_.isUndefined(settings.end_date_years)) {
+        if (!settings.maxDate && isInt(settings.end_date_years)) {
           settings.maxDate = '' + (new Date().getFullYear() + settings.end_date_years) + '-12-31';
         }
         if (hasDatepicker) {
@@ -105,10 +105,7 @@
        */
       function dateHasDay() {
         var lowerFormat = settings.dateFormat.toLowerCase();
-        if (lowerFormat.indexOf('d') < 0) {
-          return false;
-        }
-        return true;
+        return lowerFormat.indexOf('d') >= 0;
       }
       function updateInputFields(e, context) {
         var val = $dataField.val(),
@@ -159,4 +156,13 @@
       updateInputFields();
     });
   };
+
+  function isInt(value) {
+    if (isNaN(value)) {
+      return false;
+    }
+    var x = parseFloat(value);
+    return (x | 0) === x;
+  }
+
 })(jQuery, CRM, CRM._);
