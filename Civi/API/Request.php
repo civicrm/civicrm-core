@@ -48,12 +48,17 @@ class Request {
         // Load the API kernel service for registering API providers, as
         // otherwise subscribers to the civi.api4.createRequest event registered
         // through the EventSubscriberInterface will not be registered.
-        $kernel = \Civi::service('civi_api_kernel');
+        \Civi::service('civi_api_kernel');
         $e = new CreateApi4RequestEvent($entity);
         \Civi::dispatcher()->dispatch('civi.api4.createRequest', $e);
         $callable = [$e->className, $action];
         if (!$e->className || !is_callable($callable)) {
           throw new \Civi\API\Exception\NotImplementedException("API ($entity, $action) does not exist (join the API team and implement it!)");
+        }
+        // Check enabled components
+        $daoName = \CRM_Core_DAO_AllCoreTables::getFullName($entity);
+        if ($daoName && defined("{$daoName}::COMPONENT") && !array_key_exists($daoName::COMPONENT, \CRM_Core_Component::getEnabledComponents())) {
+          throw new \Civi\API\Exception\NotImplementedException("$entity API is not available because " . $daoName::COMPONENT . " component is disabled");
         }
         $apiRequest = call_user_func_array($callable, $e->args);
         foreach ($params as $name => $param) {
