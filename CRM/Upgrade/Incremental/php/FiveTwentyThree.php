@@ -10,7 +10,8 @@
  */
 
 /**
- * Upgrade logic for FiveTwentyThree */
+ * Upgrade logic for FiveTwentyThree
+ */
 class CRM_Upgrade_Incremental_php_FiveTwentyThree extends CRM_Upgrade_Incremental_Base {
 
   /**
@@ -38,40 +39,6 @@ class CRM_Upgrade_Incremental_php_FiveTwentyThree extends CRM_Upgrade_Incrementa
       }
     }
   }
-
-  /**
-   * Compute any messages which should be displayed after upgrade.
-   *
-   * @param string $postUpgradeMessage
-   *   alterable.
-   * @param string $rev
-   *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
-   */
-  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
-    // Example: Generate a post-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
-    // }
-  }
-
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
-   */
-
-  //  /**
-  //   * Upgrade function.
-  //   *
-  //   * @param string $rev
-  //   */
-  //  public function upgrade_5_0_x($rev) {
-  //    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-  //    $this->addTask('Do the foo change', 'taskFoo', ...);
-  //    // Additional tasks here...
-  //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
-  //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
-  //  }
 
   /**
    * Upgrade function.

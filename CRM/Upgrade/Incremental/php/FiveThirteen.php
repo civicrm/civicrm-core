@@ -10,26 +10,9 @@
  */
 
 /**
- * Upgrade logic for FiveThirteen */
+ * Upgrade logic for FiveThirteen
+ */
 class CRM_Upgrade_Incremental_php_FiveThirteen extends CRM_Upgrade_Incremental_Base {
-
-  /**
-   * Compute any messages which should be displayed beforeupgrade.
-   *
-   * Note: This function is called iteratively for each upcoming
-   * revision to the database.
-   *
-   * @param string $preUpgradeMessage
-   * @param string $rev
-   *   a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'.
-   * @param null $currentVer
-   */
-  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
-    // Example: Generate a pre-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the Manage Tags screen.', array(1 => ts('manage tags'))) . '</p>';
-    // }
-  }
 
   /**
    * Compute any messages which should be displayed after upgrade.
@@ -46,12 +29,6 @@ class CRM_Upgrade_Incremental_php_FiveThirteen extends CRM_Upgrade_Incremental_B
       $postUpgradeMessage .= '<br /><br />' . ts("If you have created a report based on the Mailing Summary Report template and it outputs or filters on campaigns, You will need to go back to that report and re-save the report after selecting and or setting the campaign filters up again");
     }
   }
-
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
-   */
 
   /**
    * Upgrade function.
