@@ -28,6 +28,12 @@ class Authenticator {
   protected $authxUf;
 
   /**
+   * @var string
+   *   Ex: 'send' or 'exception
+   */
+  protected $rejectMode = 'send';
+
+  /**
    * Authenticator constructor.
    */
   public function __construct() {
@@ -223,11 +229,26 @@ class Authenticator {
   }
 
   /**
+   * Specify the rejection mode.
+   *
+   * @param string $mode
+   * @return $this
+   */
+  public function setRejectMode(string $mode) {
+    $this->rejectMode = $mode;
+    return $this;
+  }
+
+  /**
    * Reject a bad authentication attempt.
    *
    * @param string $message
    */
   protected function reject($message = 'Authentication failed') {
+    if ($this->rejectMode === 'exception') {
+      throw new AuthxException($message);
+    }
+
     \CRM_Core_Session::useFakeSession();
     $r = new Response(401, ['Content-Type' => 'text/plain'], "HTTP 401 $message");
     \CRM_Utils_System::sendResponse($r);
