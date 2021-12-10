@@ -145,6 +145,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
               }
               else {
                 $values['feeBlock']['value'][$fieldCnt] = $optionVal['amount'];
+                $values['feeBlock']['tax_amount'][$fieldCnt] = 0;
               }
               $values['feeBlock']['label'][$fieldCnt] = $optionVal['label'];
               $values['feeBlock']['lClass'][$fieldCnt] = $labelClass;
