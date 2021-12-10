@@ -39,6 +39,36 @@ Civi::dispatcher()->addListener('civi.invoke.auth', function($e) {
 });
 
 /**
+ * Perform a system login.
+ *
+ * This is useful for backend scripts that need to switch to a specific user.
+ *
+ * As needed, this will update the Civi session and CMS data.
+ *
+ * @param array{contactId: int, userId: int, user: string} $principal
+ *   One of:
+ *   - int $contactId
+ *   - int $userId
+ *   - string $user
+ * @param bool $useSession
+ *   If TRUE, the user will be attached to the existing session.
+ *   If FALSE, the user will not be attached to a session. A fake session may be configured to track the momentary login.
+ * @return array{contactId: int, userId: ?int, flow: string, credType: string, useSession: bool}
+ *   An array describing the authenticated session.
+ * @throws \Civi\Authx\AuthxException
+ */
+function authx_login(array $principal, bool $useSession): array {
+  $auth = new \Civi\Authx\Authenticator();
+  $auth->setRejectMode('exception');
+  if ($auth->setPrincipal($principal, $useSession)) {
+    return \CRM_Core_Session::singleton()->get("authx");
+  }
+  else {
+    throw new \Civi\Authx\AuthxException("Failed to set principal");
+  }
+}
+
+/**
  * @return \Civi\Authx\AuthxInterface
  */
 function _authx_uf() {

@@ -78,6 +78,34 @@ class Authenticator {
   }
 
   /**
+   * Perform a system login.
+   *
+   * This similar to auth(), except that there are no secret credentials, and there is no policy check.
+   *
+   * @param array $principal
+   *   One of:
+   *   - int $contactId
+   *   - int $userId
+   * @param bool $useSession
+   * @return bool
+   *   Returns TRUE on success.
+   * @throws \Exception
+   */
+  public function setPrincipal(array $principal, bool $useSession): bool {
+    $principal['credType'] = 'none';
+
+    $tgt = AuthenticatorTarget::create([
+      'flow' => 'system',
+      'cred' => NULL,
+      'useSession' => $useSession,
+    ]);
+    $tgt->setPrincipal($principal);
+
+    $this->login($tgt);
+    return TRUE;
+  }
+
+  /**
    * Assess the credential ($tgt->cred) and determine the matching principal.
    *
    * @param \Civi\Authx\AuthenticatorTarget $tgt
@@ -136,6 +164,11 @@ class Authenticator {
   protected function checkPolicy(AuthenticatorTarget $tgt) {
     if (!$tgt->hasPrincipal()) {
       $this->reject('Invalid credential');
+    }
+
+    if ($tgt->flow === 'system') {
+      // We should never get here... let's just make sure...
+      $this->reject('System authentication does not use this call-path.');
     }
 
     $allowCreds = \Civi::settings()->get('authx_' . $tgt->flow . '_cred');
@@ -337,12 +370,16 @@ class AuthenticatorTarget {
    * Specify the authenticated principal for this request.
    *
    * @param array $args
-   *   Mix of: 'userId', 'contactId', 'credType'
+   *   Mix of: 'user', 'userId', 'contactId', 'credType'
    *   It is valid to give 'userId' or 'contactId' - the missing one will be
    *   filled in via UFMatch (if available).
    * @return $this
    */
   public function setPrincipal($args) {
+    if (!empty($args['user'])) {
+      $args['userId'] = $args['userId'] ?? \CRM_Core_Config::singleton()->userSystem->getUfId($args['user']);
+      unset($args['user']);
+    }
     if (empty($args['userId']) && empty($args['contactId'])) {
       throw new \InvalidArgumentException("Must specify principal by userId and/or contactId");
     }

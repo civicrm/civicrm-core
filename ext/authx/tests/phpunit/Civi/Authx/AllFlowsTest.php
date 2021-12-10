@@ -464,6 +464,38 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
   }
 
   /**
+   * The internal API `authx_login()` should be used by background services to set the active user.
+   *
+   * To test this, we call `cv ev 'authx_login(...);'` and check the resulting identity.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testCliServiceLogin() {
+    $withCv = function($phpStmt) {
+      $cmd = strtr('cv ev @PHP', ['@PHP' => escapeshellarg($phpStmt)]);
+      exec($cmd, $output, $val);
+      $this->assertEquals(0, $val, "Command returned error ($cmd) ($val)");
+      return json_decode(implode("", $output), TRUE);
+    };
+
+    $principals = [
+      'contactId' => $this->getDemoCID(),
+      'userId' => $this->getDemoUID(),
+      'user' => $GLOBALS['_CV']['DEMO_USER'],
+    ];
+    foreach ($principals as $principalField => $principalValue) {
+      $msg = "Logged in with $principalField=$principalValue. We should see this user as authenticated.";
+
+      $report = $withCv(sprintf('return authx_login([%s => %s], FALSE);', var_export($principalField, 1), var_export($principalValue, 1)));
+      $this->assertEquals($this->getDemoCID(), $report['contactId'], $msg);
+      $this->assertEquals($this->getDemoUID(), $report['userId'], $msg);
+      $this->assertEquals('system', $report['flow'], $msg);
+      $this->assertEquals('none', $report['credType'], $msg);
+      $this->assertEquals(FALSE, $report['useSession'], $msg);
+    }
+  }
+
+  /**
    * Filter a request, applying the given authentication options
    *
    * @param \Psr\Http\Message\RequestInterface $request
