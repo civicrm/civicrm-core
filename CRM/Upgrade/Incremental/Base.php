@@ -69,17 +69,6 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
-   * Verify DB state.
-   *
-   * @param $errors
-   *
-   * @return bool
-   */
-  public function verifyPreDBstate(&$errors) {
-    return TRUE;
-  }
-
-  /**
    * Compute any messages which should be displayed before upgrade.
    *
    * Note: This function is called iteratively for each upcoming

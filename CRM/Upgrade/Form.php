@@ -733,22 +733,6 @@ SET    version = '$version'
 
     $versionObject = $upgrade->incrementalPhpObject($rev);
 
-    // pre-db check for major release.
-    if ($upgrade->checkVersionRelease($rev, 'alpha1')) {
-      if (!(is_callable([$versionObject, 'verifyPreDBstate']))) {
-        throw new CRM_Core_Exception("verifyPreDBstate method was not found for $rev");
-      }
-
-      $error = NULL;
-      if (!($versionObject->verifyPreDBstate($error))) {
-        if (!isset($error)) {
-          $error = "post-condition failed for current upgrade for $rev";
-        }
-        throw new CRM_Core_Exception($error);
-      }
-
-    }
-
     $upgrade->setSchemaStructureTables($rev);
 
     if (is_callable([$versionObject, $phpFunctionName])) {
