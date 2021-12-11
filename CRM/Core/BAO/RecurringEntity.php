@@ -588,15 +588,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
    *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just updated.
    */
   public static function triggerUpdate($event) {
-    // if DB version is earlier than 4.6 skip any processing
-    static $currentVer = NULL;
-    if (!$currentVer) {
-      $currentVer = CRM_Core_BAO_Domain::version();
-    }
-    if (version_compare($currentVer, '4.6.alpha1') < 0) {
-      return;
-    }
-
     static $processedEntities = [];
     $obj =& $event->object;
     if (empty($obj->id) || empty($obj->__table)) {
@@ -658,15 +649,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
   public static function triggerInsert($event) {
     $obj =& $event->object;
     if (!array_key_exists($obj->__table, self::$_linkedEntitiesInfo)) {
-      return;
-    }
-
-    // if DB version is earlier than 4.6 skip any processing
-    static $currentVer = NULL;
-    if (!$currentVer) {
-      $currentVer = CRM_Core_BAO_Domain::version();
-    }
-    if (version_compare($currentVer, '4.6.alpha1') < 0) {
       return;
     }
 
@@ -764,15 +746,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
    */
   public static function triggerDelete($event) {
     $obj =& $event->object;
-
-    // if DB version is earlier than 4.6 skip any processing
-    static $currentVer = NULL;
-    if (!$currentVer) {
-      $currentVer = CRM_Core_BAO_Domain::version();
-    }
-    if (version_compare($currentVer, '4.6.alpha1') < 0) {
-      return;
-    }
 
     static $processedEntities = [];
     if (empty($obj->id) || empty($obj->__table) || !$event->result) {
