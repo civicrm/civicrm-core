@@ -16,7 +16,7 @@
  */
 class E2E_Extern_AuthxRestTest extends E2E_Extern_BaseRestTest {
 
-  public static function setUpBeforeClass() {
+  public static function setUpBeforeClass(): void {
     parent::setUpBeforeClass();
     \Civi\Test::e2e()
       ->install(['authx'])
