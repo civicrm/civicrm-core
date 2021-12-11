@@ -148,14 +148,17 @@ function afform_civicrm_managed(&$entities) {
       // ideal cleanup policy might be to (a) deactivate if used and (b) remove if unused
       'cleanup' => 'always',
       'params' => [
-        'version' => 3,
-        // Q: Should we loop through all domains?
-        'domain_id' => CRM_Core_BAO_Domain::getDomain()->id,
-        'is_active' => TRUE,
-        'name' => $afform['name'],
-        'label' => $afform['title'] ?? E::ts('(Untitled)'),
-        'directive' => _afform_angular_module_name($afform['name'], 'dash'),
-        'permission' => "@afform:" . $afform['name'],
+        'version' => 4,
+        'values' => [
+          // Q: Should we loop through all domains?
+          'domain_id' => 'current_domain',
+          'is_active' => TRUE,
+          'name' => $afform['name'],
+          'label' => $afform['title'] ?? E::ts('(Untitled)'),
+          'directive' => _afform_angular_module_name($afform['name'], 'dash'),
+          'permission' => "@afform:" . $afform['name'],
+          'url' => NULL,
+        ],
       ],
     ];
   }
