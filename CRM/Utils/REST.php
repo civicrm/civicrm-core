@@ -399,9 +399,7 @@ class CRM_Utils_REST {
     unset($param['q']);
     $smarty->assign_by_ref("request", $param);
 
-    if (!array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
-      $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest"
-    ) {
+    if (!self::isWebServiceRequest()) {
 
       $smarty->assign('tplFile', $tpl);
       $config = CRM_Core_Config::singleton();
@@ -434,10 +432,7 @@ class CRM_Utils_REST {
 
     require_once 'api/v3/utils.php';
     $config = CRM_Core_Config::singleton();
-    if (!$config->debug && (!array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
-        $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest"
-      )
-    ) {
+    if (!$config->debug && !self::isWebServiceRequest()) {
       $error = civicrm_api3_create_error("SECURITY ALERT: Ajax requests can only be issued by javascript clients, eg. CRM.api3().",
         [
           'IP' => $_SERVER['REMOTE_ADDR'],
@@ -499,11 +494,7 @@ class CRM_Utils_REST {
     // restrict calls to this etc
     // the request has to be sent by an ajax call. First line of protection against csrf
     $config = CRM_Core_Config::singleton();
-    if (!$config->debug &&
-      (!array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
-        $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest"
-      )
-    ) {
+    if (!$config->debug && !self::isWebServiceRequest()) {
       require_once 'api/v3/utils.php';
       $error = civicrm_api3_create_error("SECURITY ALERT: Ajax requests can only be issued by javascript clients, eg. CRM.api3().",
         [
@@ -634,6 +625,17 @@ class CRM_Utils_REST {
       CRM_Utils_System::loadBootStrap([], FALSE, FALSE);
       return self::error('ERROR: No CMS user associated with given api-key');
     }
+  }
+
+  /**
+   * Does this request appear to be a web-service request?
+   *
+   * @return bool
+   *   TRUE if the current request appears to be web-service request (ie AJAX).
+   *   FALSE if the current request appears to be a standalone browser page-view.
+   */
+  protected static function isWebServiceRequest(): bool {
+    return array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
   }
 
 }
