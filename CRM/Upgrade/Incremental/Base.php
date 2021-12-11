@@ -71,13 +71,24 @@ class CRM_Upgrade_Incremental_Base {
   /**
    * Compute any messages which should be displayed before upgrade.
    *
-   * Note: This function is called iteratively for each upcoming
-   * revision to the database.
+   * Downstream classes should implement this method to generate their messages.
    *
-   * @param $preUpgradeMessage
+   * This method will be invoked multiple times. Implementations MUST consult the `$rev`
+   * before deciding what messages to add. See the examples linked below.
+   *
+   * @see \CRM_Upgrade_Incremental_php_FourSeven::setPreUpgradeMessage()
+   * @see \CRM_Upgrade_Incremental_php_FiveTwenty::setPreUpgradeMessage()
+   *
+   * @param string $preUpgradeMessage
+   *   Accumulated list of messages. Alterable.
    * @param string $rev
-   *   a version number, e.g. '4.8.alpha1', '4.8.beta3', '4.8.0'.
+   *   The incremental version number. (Called repeatedly, once for each increment.)
+   *
+   *   Ex: Suppose the system upgrades from 5.7.3 to 5.10.0. The method FiveEight::setPreUpgradeMessage()
+   *   will be called for each increment of '5.8.*' ('5.8.alpha1' => '5.8.beta1' =>  '5.8.0').
    * @param null $currentVer
+   *   This is the penultimate version targeted by the upgrader.
+   *   Equivalent to CRM_Utils_System::version().
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
   }
@@ -85,10 +96,21 @@ class CRM_Upgrade_Incremental_Base {
   /**
    * Compute any messages which should be displayed after upgrade.
    *
+   * Downstream classes should implement this method to generate their messages.
+   *
+   * This method will be invoked multiple times. Implementations MUST consult the `$rev`
+   * before deciding what messages to add. See the examples linked below.
+   *
+   * @see \CRM_Upgrade_Incremental_php_FourSeven::setPostUpgradeMessage()
+   * @see \CRM_Upgrade_Incremental_php_FiveTwentyOne::setPostUpgradeMessage()
+   *
    * @param string $postUpgradeMessage
-   *   alterable.
+   *   Accumulated list of messages. Alterable.
    * @param string $rev
-   *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
+   *   The incremental version number. (Called repeatedly, once for each increment.)
+   *
+   *   Ex: Suppose the system upgrades from 5.7.3 to 5.10.0. The method FiveEight::setPreUpgradeMessage()
+   *   will be called for each increment of '5.8.*' ('5.8.alpha1' => '5.8.beta1' =>  '5.8.0').
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
   }
