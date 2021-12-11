@@ -285,9 +285,10 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
     if ($dao->fetch()) {
       $displayName = $dao->display_name;
       $email = $dao->email;
+      $contact_id = $dao->contact_id;
     }
 
-    return [$displayName, $email];
+    return [$displayName, $email, $contact_id];
   }
 
   /**
