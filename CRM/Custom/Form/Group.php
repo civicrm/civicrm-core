@@ -343,7 +343,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $defaults['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_CustomGroup');
 
       $defaults['is_multiple'] = $defaults['min_multiple'] = 0;
-      $defaults['is_active'] = $defaults['is_public'] = $defaults['collapse_display'] = 1;
+      $defaults['is_active'] = $defaults['is_public'] = $defaults['collapse_adv_display'] = 1;
       $defaults['style'] = 'Inline';
     }
     elseif (empty($defaults['max_multiple']) && !$this->_isGroupEmpty) {
