@@ -37,6 +37,13 @@
         initFunction();
       };
 
+      // Watch if field is switched
+      $scope.$watch('$ctrl.expr', function(newExpr, oldExpr) {
+        if (oldExpr && newExpr && newExpr.indexOf('(') < 0) {
+          ctrl.$onInit();
+        }
+      });
+
       this.addArg = function(exprType) {
         var param = ctrl.getParam(ctrl.args.length);
         ctrl.args.push({

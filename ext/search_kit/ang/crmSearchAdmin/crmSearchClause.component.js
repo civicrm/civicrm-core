@@ -74,6 +74,13 @@
         return getFirstArgFromExpr(expr).field;
       };
 
+      this.getFieldOrFunction = function(expr) {
+        if (ctrl.hasFunction(expr)) {
+          return searchMeta.parseExpr(expr).fn;
+        }
+        return ctrl.getField(expr);
+      };
+
       this.getOptionKey = function(expr) {
         var arg = getFirstArgFromExpr(expr);
         return arg.suffix ? arg.suffix.slice(1) : 'id';

@@ -310,7 +310,7 @@
           values = _.merge({
             type: 'field',
             key: info.alias,
-            dataType: (info.fn && info.fn.dataType) || field.data_type
+            dataType: (info.fn && info.fn.data_type) || field.data_type
           }, defaults);
         if (defaults.label === true) {
           values.label = getDefaultLabel(fieldExpr);

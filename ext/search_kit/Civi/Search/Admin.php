@@ -395,7 +395,7 @@ class Admin {
       'title' => ts('Arithmetic'),
       'description' => ts('Add, subtract, multiply, divide'),
       'category' => SqlFunction::CATEGORY_MATH,
-      'dataType' => 'Number',
+      'data_type' => 'Number',
       'params' => [
         [
           'label' => ts('Value'),
@@ -412,8 +412,11 @@ class Admin {
         ],
       ],
     ];
-    // Filter out empty param properties (simplifies the javascript which treats empty arrays/objects as != null)
     foreach ($functions as &$function) {
+      // Normalize this property name to match fields data_type
+      $function['data_type'] = $function['dataType'] ?? NULL;
+      unset($function['dataType']);
+      // Filter out empty param properties (simplifies the javascript which treats empty arrays/objects as != null)
       foreach ($function['params'] as $i => $param) {
         $function['params'][$i] = array_filter($param);
       }
