@@ -7,6 +7,7 @@
       clauses: '<',
       format: '@',
       op: '@',
+      allowFunctions: '<',
       skip: '<',
       label: '@',
       hideLabel: '@',
@@ -76,6 +77,10 @@
       this.getOptionKey = function(expr) {
         var arg = getFirstArgFromExpr(expr);
         return arg.suffix ? arg.suffix.slice(1) : 'id';
+      };
+
+      this.hasFunction = function(expr) {
+        return expr.indexOf('(') > -1;
       };
 
       this.addGroup = function(op) {

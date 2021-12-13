@@ -3,6 +3,7 @@
 
   angular.module('crmSearchAdmin').component('crmSearchFunction', {
     bindings: {
+      mode: '@',
       expr: '='
     },
     require: {
@@ -160,7 +161,10 @@
           // Replace fake function "e"
           ctrl.expr = (ctrl.fnName === 'e' ? '' : ctrl.fnName) + '(';
           ctrl.expr += args.join('');
-          ctrl.expr += ') AS ' + makeAlias();
+          ctrl.expr += ')';
+          if (ctrl.mode === 'select') {
+            ctrl.expr += ' AS ' + makeAlias();
+          }
         } else {
           ctrl.expr = ctrl.args[0].value;
         }
