@@ -1,5 +1,5 @@
 <div class="form-inline">
-  <input class="form-control" style="width: 15em;" ng-model="$ctrl.fnName" crm-ui-select="{data: $ctrl.getFunctions, placeholder: ts('Function')}" ng-change="$ctrl.selectFunction()">
+  <input class="form-control fa-crm-formula" style="min-width: 20px" ng-model="$ctrl.fnName" crm-ui-select="{data: $ctrl.getFunctions, placeholder: ' ', width: 'off', dropdownCss: {width: '275px'}}" ng-change="$ctrl.selectFunction()">
   <label>{{ $ctrl.fieldArg.field.label }}</label>
   <label ng-repeat="(val, label) in $ctrl.fn.params[0].flag_before">
     <input type="checkbox" ng-checked="$ctrl.fieldArg.flag_before === val" ng-click="$ctrl.fieldArg.flag_before = ($ctrl.fieldArg.flag_before === val ? null : val); $ctrl.writeExpr();" >
