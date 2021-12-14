@@ -20,7 +20,6 @@ class Civi {
 
   /**
    * A central location for static variable storage.
-   * @var array
    * ```
    * `Civi::$statics[__CLASS__]['foo'] = 'bar';
    * ```
