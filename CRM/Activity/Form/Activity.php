@@ -180,7 +180,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       'source_contact_id' => [
         'type' => 'entityRef',
         'label' => ts('Added by'),
-        'required' => FALSE,
+        'required' => TRUE,
       ],
       'target_contact_id' => [
         'type' => 'entityRef',
