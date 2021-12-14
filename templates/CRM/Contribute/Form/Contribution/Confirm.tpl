@@ -123,11 +123,11 @@
                 {if $frequency_unit eq 'day'}
                   <p><strong>{ts}I want to contribute this amount every day.{/ts}</strong></p>
                 {elseif $frequency_unit eq 'week'}
-                  <p><strong>{ts}I want to contribute this amount processed every week.{/ts}</strong></p>
+                  <p><strong>{ts}I want to contribute this amount every week.{/ts}</strong></p>
                 {elseif $frequency_unit eq 'month'}
-                  <p><strong>{ts}I want to contribute this amount processed every month.{/ts}</strong></p>
+                  <p><strong>{ts}I want to contribute this amount every month.{/ts}</strong></p>
                 {elseif $frequency_unit eq 'year'}
-                  <p><strong>{ts}I want to contribute this amount processed every year.{/ts}</strong></p>
+                  <p><strong>{ts}I want to contribute this amount every year.{/ts}</strong></p>
                 {/if}
               {/if}
             {/if}
