@@ -139,6 +139,11 @@ class CRM_Core_Smarty extends Smarty {
 
     $this->register_function('crmURL', ['CRM_Utils_System', 'crmURL']);
     if (CRM_Utils_Constant::value('CIVICRM_SMARTY_DEFAULT_ESCAPE')) {
+      // When default escape is enabled if the core escape is called before
+      // any custom escaping is done the modifier_escape function is not
+      // found, so require_once straight away. Note this was hit on the basic
+      // contribution dashboard from RecentlyViewed.tpl
+      require_once 'Smarty/plugins/modifier.escape.php';
       if (!isset($this->_plugins['modifier']['escape'])) {
         $this->register_modifier('escape', ['CRM_Core_Smarty', 'escape']);
       }
@@ -429,7 +434,7 @@ class CRM_Core_Smarty extends Smarty {
         return $string;
       }
     }
-    require_once 'Smarty/plugins/modifier.escape.php';
+
     $value = smarty_modifier_escape($string, $esc_type, $char_set);
     if ($value !== $string) {
       Civi::log()->debug('smarty escaping original {original}, escaped {escaped} type {type} charset {charset}', [
