@@ -35,7 +35,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     parent::tearDown();
   }
 
-  public function testInvalid() {
+  public function testInvalid_BadMethod() {
     $responseLines = $this->runLines([
       '{"jsonrpc":"2.0","method":"wiggum"}',
     ]);
@@ -45,19 +45,29 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $this->assertEquals(-32601, $decode['error']['code']);
   }
 
+  public function testInvalid_MalformedParams() {
+    $responseLines = $this->runLines([
+      '{"jsonrpc":"2.0","id":"a","method":"echo","params":123}',
+    ]);
+    $decode = json_decode($responseLines[1], 1);
+    $this->assertEquals('2.0', $decode['jsonrpc']);
+    $this->assertEquals('Invalid params', $decode['error']['message']);
+    $this->assertEquals(-32602, $decode['error']['code']);
+  }
+
   public function testEcho() {
     $this->assertRequestResponse([
-      '{"jsonrpc":"2.0","id":"a","method":"echo","params":123}' => '{"jsonrpc":"2.0","result":123,"id":"a"}',
-      '{"jsonrpc":"2.0","id":"a","method":"echo","params":true}' => '{"jsonrpc":"2.0","result":true,"id":"a"}',
+      '{"jsonrpc":"2.0","id":null,"method":"echo"}' => '{"jsonrpc":"2.0","result":[],"id":null}',
+      '{"jsonrpc":"2.0","id":"a","method":"echo","params":{"color":"blue"}}' => '{"jsonrpc":"2.0","result":{"color":"blue"},"id":"a"}',
       '{"jsonrpc":"2.0","id":"a","method":"echo","params":[1,4,9]}' => '{"jsonrpc":"2.0","result":[1,4,9],"id":"a"}',
-      '{"jsonrpc":"2.0","id":null,"method":"echo","params":123}' => '{"jsonrpc":"2.0","result":123,"id":null}',
+      '{"jsonrpc":"2.0","id":null,"method":"echo","params":[123]}' => '{"jsonrpc":"2.0","result":[123],"id":null}',
     ]);
   }
 
   public function testBatch() {
     $batchLine = '[' .
       '{"jsonrpc":"2.0","id":"a","method":"wiggum"},' .
-      '{"jsonrpc":"2.0","id":"b","method": "echo","params":123}' .
+      '{"jsonrpc":"2.0","id":"b","method": "echo","params":[123]}' .
       ']';
     $responseLines = $this->runLines([$batchLine]);
     $decode = json_decode($responseLines[1], 1);
@@ -69,7 +79,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
 
     $this->assertEquals('2.0', $decode[1]['jsonrpc']);
     $this->assertEquals('b', $decode[1]['id']);
-    $this->assertEquals(123, $decode[1]['result']);
+    $this->assertEquals([123], $decode[1]['result']);
   }
 
   public function testInvalidControl() {
@@ -83,7 +93,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $this->assertRequestResponse([
       '{"jsonrpc":"2.0","id":"c","method":"options"}' => '{"jsonrpc":"2.0","result":{"apiError":"array","bufferSize":524288,"responsePrefix":null},"id":"c"}',
       '{"jsonrpc":"2.0","id":"c","method":"options","params":{"responsePrefix":"ZZ"}}' => 'ZZ{"jsonrpc":"2.0","result":{"responsePrefix":"ZZ"},"id":"c"}',
-      '{"jsonrpc":"2.0","id":"c","method": "echo","params":123}' => 'ZZ{"jsonrpc":"2.0","result":123,"id":"c"}',
+      '{"jsonrpc":"2.0","id":"c","method": "echo","params":[123]}' => 'ZZ{"jsonrpc":"2.0","result":[123],"id":"c"}',
     ]);
   }
 

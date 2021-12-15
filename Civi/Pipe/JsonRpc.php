@@ -66,6 +66,9 @@ class JsonRpc {
       if (($request['jsonrpc'] ?? '') !== '2.0' || !is_string($request['method'])) {
         throw new \InvalidArgumentException('Invalid Request', -32600);
       }
+      if (isset($request['params']) && !is_array($request['params'])) {
+        throw new \InvalidArgumentException('Invalid params', -32602);
+      }
 
       $result = $dispatcher($request['method'], $request['params'] ?? []);
       return static::createResponseSuccess($request, $result);
