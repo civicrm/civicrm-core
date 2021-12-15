@@ -28,7 +28,7 @@ class PublicMethods {
   /**
    * Send a request to APIv3.
    *
-   * @param $session
+   * @param \Civi\Pipe\PipeSession $session
    * @param array $request
    *   Tuple: [$entity, $action, $params]
    * @return array|\Civi\Api4\Generic\Result|int
@@ -50,7 +50,7 @@ class PublicMethods {
   /**
    * Send a request to APIv4.
    *
-   * @param $session
+   * @param \Civi\Pipe\PipeSession $session
    * @param array $request
    *   Tuple: [$entity, $action, $params]
    * @return array|\Civi\Api4\Generic\Result|int
@@ -72,7 +72,7 @@ class PublicMethods {
   /**
    * Simple test; send/receive a fragment of data.
    *
-   * @param $session
+   * @param \Civi\Pipe\PipeSession $session
    * @param mixed $request
    * @return mixed
    */
@@ -83,7 +83,7 @@ class PublicMethods {
   /**
    * Set active user.
    *
-   * @param $session
+   * @param \Civi\Pipe\PipeSession $session
    * @param array{contactId: int, userId: int, user: string} $request
    * @return array|\Civi\Api4\Generic\Result|int
    */
@@ -98,7 +98,7 @@ class PublicMethods {
   /**
    * Set ephemeral session options.
    *
-   * @param $session
+   * @param \Civi\Pipe\PipeSession $session
    * @param array{bufferSize: int, responsePrefix: int} $request
    *   Any updates to perform. May be empty/omitted.
    * @return array{bufferSize: int, responsePrefix: int}

@@ -11,7 +11,7 @@
 
 namespace Civi\Pipe;
 
-class JsonRpcSession {
+class PipeSession {
 
   use LineSessionTrait;
 

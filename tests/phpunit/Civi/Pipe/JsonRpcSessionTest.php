@@ -25,7 +25,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     parent::setUp();
     $this->input = fopen('php://memory', 'w');
     $this->output = fopen('php://memory', 'w');
-    $this->server = new JsonRpcSession($this->input, $this->output);
+    $this->server = new PipeSession($this->input, $this->output);
   }
 
   protected function tearDown(): void {
