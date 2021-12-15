@@ -44,7 +44,7 @@ class PublicMethods {
    *   Tuple: [$entity, $action, $params]
    * @return array|\Civi\Api4\Generic\Result|int
    */
-  public function api3($session, $request) {
+  public function api3(PipeSession $session, array $request) {
     $request[2] = array_merge($request[2] ?? [], ['version' => 3]);
     $request[2]['check_permissions'] = !$session->isTrusted() || $this->isCheckPermissions($request[2], 'check_permissions');
     // ^^ Untrusted sessions MUST check perms. All sessions DEFAULT to checking perms. Trusted sessions MAY disable perms.
@@ -68,7 +68,7 @@ class PublicMethods {
    *   Tuple: [$entity, $action, $params]
    * @return array|\Civi\Api4\Generic\Result|int
    */
-  public function api4($session, $request) {
+  public function api4(PipeSession $session, array $request) {
     $request[2] = array_merge($request[2] ?? [], ['version' => 4]);
     $request[2]['checkPermissions'] = !$session->isTrusted() || $this->isCheckPermissions($request[2], 'checkPermissions');
     // ^^ Untrusted sessions MUST check perms. All sessions DEFAULT to checking perms. Trusted sessions MAY disable perms.
@@ -88,10 +88,10 @@ class PublicMethods {
    * Simple test; send/receive a fragment of data.
    *
    * @param \Civi\Pipe\PipeSession $session
-   * @param mixed $request
-   * @return mixed
+   * @param array $request
+   * @return array
    */
-  public function echo($session, $request) {
+  public function echo(PipeSession $session, array $request) {
     return $request;
   }
 
@@ -102,7 +102,7 @@ class PublicMethods {
    * @param array{contactId: int, userId: int, user: string} $request
    * @return array|\Civi\Api4\Generic\Result|int
    */
-  public function login($session, $request) {
+  public function login(PipeSession $session, array $request) {
     if (!function_exists('authx_login')) {
       throw new \CRM_Core_Exception("Cannot authenticate. Authx is not configured.");
     }
@@ -139,7 +139,7 @@ class PublicMethods {
    *   List of updated options.
    *   If the list of updates was empty, then return all options.
    */
-  public function options($session, $request) {
+  public function options(PipeSession $session, array $request) {
     $storageMap = [
       'apiCheckPermissions' => $this,
       'apiError' => $this,

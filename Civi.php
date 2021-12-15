@@ -124,9 +124,14 @@ class Civi {
    *    - 'l': Report on login support in connection header.
    *    - 't': Trusted session. Logins do not require credentials. API calls may execute with or without permission-checks.
    *    - 'u': Untrusted session. Logins require credentials. API calls may only execute with permission-checks.
-   *   Note: The `Civi::pipe()` entry-point is designed to be amenable to shell orchestration (SSH/cv/drush/wp-cli/etc).
+   *
+   *   The `Civi::pipe()` entry-point is designed to be amenable to shell orchestration (SSH/cv/drush/wp-cli/etc).
    *   The negotiation flags are therefore condensed to individual characters.
-   *   Note: Future flags may be added to the default list. But be careful about removing flags from the default list.
+   *
+   *   It is possible to preserve compatibility while adding new default-flags. However, removing default-flags
+   *   is more likely to be a breaking-change.
+   *
+   *   When adding a new flag, consider whether mutable `option()`s may be more appropriate.
    * @see \Civi\Pipe\PipeSession
    */
   public static function pipe(string $negotiationFlags = 'vtl'): void {

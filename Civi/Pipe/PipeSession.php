@@ -18,9 +18,10 @@ class PipeSession {
   protected const METHOD_REGEX = ';^[a-z][a-zA-Z0-9_]*$;';
 
   /**
-   * Open-ended object. Any public method will be available during this session.
+   * Open-ended object. Any public method from this object will be available during this session.
    *
    * @var object
+   * @see \Civi\Pipe\PublicMethods
    */
   protected $methods;
 
@@ -75,7 +76,7 @@ class PipeSession {
    * @inheritDoc
    */
   protected function onRequest(string $requestLine): ?string {
-    return JsonRpc::run($requestLine, function($method, $params) {
+    return JsonRpc::run($requestLine, function(string $method, array $params) {
       $method = str_replace('.', '_', $method);
       if (!preg_match(self::METHOD_REGEX, $method)) {
         throw new \InvalidArgumentException('Method not found', -32601);
