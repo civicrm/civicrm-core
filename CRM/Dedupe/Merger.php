@@ -683,7 +683,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected static function createContact($contactID, $params) {
+  protected static function updateContact(int $contactID, $params): void {
     // This parameter causes blank fields to be be emptied out.
     // We can probably remove.
     $params['updateBlankLocInfo'] = TRUE;
@@ -1936,7 +1936,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       if (!isset($submitted['suffix_id']) && !empty($migrationInfo['main_details']['suffix_id'])) {
         $submitted['suffix_id'] = $migrationInfo['main_details']['suffix_id'];
       }
-      self::createContact($mainId, $submitted);
+      self::updateContact($mainId, $submitted);
     }
     $transaction->commit();
     CRM_Utils_Hook::post('merge', 'Contact', $mainId);
