@@ -687,7 +687,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // This parameter causes blank fields to be be emptied out.
     // We can probably remove.
     $params['updateBlankLocInfo'] = TRUE;
-    [$data] = self::formatProfileContactParams($params, [], $contactID);
+    $data = self::formatProfileContactParams($params, [], $contactID);
     CRM_Contact_BAO_Contact::create($data);
   }
 
@@ -704,7 +704,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param int $contactID
    * @param int $ufGroupId
    * @param null $ctype
-   * @param bool $skipCustom
    *
    * @return array
    */
@@ -713,8 +712,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $fields,
     $contactID = NULL,
     $ufGroupId = NULL,
-    $ctype = NULL,
-    $skipCustom = FALSE
+    $ctype = NULL
   ) {
 
     $data = $contactDetails = [];
@@ -952,7 +950,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           //save email/postal greeting and addressee values if any, CRM-4575
           $data[$key . '_id'] = $value;
         }
-        elseif (!$skipCustom && ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
+        elseif (($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
           // for autocomplete transfer hidden value instead of label
           if ($params[$key] && isset($params[$key . '_id'])) {
             $value = $params[$key . '_id'];
@@ -1064,7 +1062,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
     }
 
-    return [$data, $contactDetails];
+    return $data;
   }
 
   /**
