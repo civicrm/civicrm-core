@@ -17,6 +17,15 @@ namespace Civi\Pipe;
 class PublicMethods {
 
   /**
+   * How should API errors be reported?
+   *
+   * @var string
+   *   - 'array': Traditional array format from civicrm_api(). Maximizes consistency of error data.
+   *   - 'exception': Converted to an exception. Somewhat lossy. Improves out-of-box DX on stricter JSON-RPC clients.
+   */
+  protected $apiError = 'array';
+
+  /**
    * Send a request to APIv3.
    *
    * @param $session
@@ -26,7 +35,16 @@ class PublicMethods {
    */
   public function api3($session, $request) {
     $request[2] = array_merge(['version' => 3, 'check_permissions' => TRUE], $request[2] ?? []);
-    return civicrm_api(...$request);
+    switch ($this->apiError) {
+      case 'array':
+        return civicrm_api(...$request);
+
+      case 'exception':
+        return civicrm_api3(...$request);
+
+      default:
+        throw new \CRM_Core_Exception("Invalid API error-handling mode: $this->apiError");
+    }
   }
 
   /**
@@ -39,7 +57,16 @@ class PublicMethods {
    */
   public function api4($session, $request) {
     $request[2] = array_merge(['version' => 4, 'checkPermissions' => TRUE], $request[2] ?? []);
-    return civicrm_api(...$request);
+    switch ($this->apiError) {
+      case 'array':
+        return civicrm_api(...$request);
+
+      case 'exception':
+        return civicrm_api4(...$request);
+
+      default:
+        throw new \CRM_Core_Exception("Invalid API error-handling mode: $this->apiError");
+    }
   }
 
   /**
@@ -79,24 +106,42 @@ class PublicMethods {
    *   If the list of updates was empty, then return all options.
    */
   public function options($session, $request) {
-    $map = [
-      'responsePrefix' => $session,
+    $storageMap = [
+      'apiError' => $this,
       'maxLine' => $session,
+      'responsePrefix' => $session,
     ];
+
+    $get = function($storage, $name) {
+      if (method_exists($storage, 'get' . ucfirst($name))) {
+        return $storage->{'get' . ucfirst($name)}();
+      }
+      else {
+        return $storage->{$name};
+      }
+    };
+
+    $set = function($storage, $name, $value) use ($get) {
+      if (method_exists($storage, 'set' . ucfirst($name))) {
+        $storage->{'set' . ucfirst($name)}($value);
+      }
+      else {
+        $storage->{$name} = $value;
+      }
+      return $get($storage, $name);
+    };
 
     $result = [];
     if (!empty($request)) {
-      foreach ($request as $option => $value) {
-        if (isset($map[$option])) {
-          $storage = $map[$option];
-          $storage->{'set' . ucfirst($option)}($value);
-          $result[$option] = $storage->{'get' . ucfirst($option)}();
+      foreach ($request as $name => $value) {
+        if (isset($storageMap[$name])) {
+          $result[$name] = $set($storageMap[$name], $name, $value);
         }
       }
     }
     else {
-      foreach ($map as $option => $storage) {
-        $result[$option] = $storage->{'get' . ucfirst($option)}();
+      foreach ($storageMap as $name => $storage) {
+        $result[$name] = $get($storage, $name);
       }
     }
     return $result;
