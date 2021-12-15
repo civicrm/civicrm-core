@@ -2,6 +2,8 @@
 
 namespace Civi\Authx;
 
+use Civi\Pipe\BasicPipeClient;
+use Civi\Pipe\JsonRpcMethodException;
 use Civi\Test\HttpTestTrait;
 use CRM_Authx_ExtensionUtil as E;
 use Civi\Test\EndToEndInterface;
@@ -510,6 +512,40 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       $this->assertRegExp($expectExceptionMessage, $report[1], "Invalid principal ($principalField=>$principalValue) should generate exception.");
       $this->assertEquals($expectExceptionClass, $report[0], "Invalid principal ($principalField=>$principalValue) should generate exception.");
     }
+  }
+
+  public function testCliPipeTrustedLogin() {
+    $rpc = new BasicPipeClient('cv ev \'Civi::pipe("tl");\'');
+    $this->assertEquals('trusted', $rpc->getWelcome()['t']);
+    $this->assertEquals(['login'], $rpc->getWelcome()['l']);
+
+    $login = $rpc->call('login', ['userId' => $this->getDemoUID()]);
+    $this->assertEquals($this->getDemoCID(), $login['contactId']);
+    $this->assertEquals($this->getDemoUID(), $login['userId']);
+
+    $me = $rpc->call('api3', ['Contact', 'get', ['id' => 'user_contact_id', 'sequential' => TRUE]]);
+    $this->assertEquals($this->getDemoCID(), $me['values'][0]['contact_id']);
+  }
+
+  public function testCliPipeUntrustedLogin() {
+    $rpc = new BasicPipeClient('cv ev \'Civi::pipe("ul");\'');
+    $this->assertEquals('untrusted', $rpc->getWelcome()['u']);
+    $this->assertEquals(['login'], $rpc->getWelcome()['l']);
+
+    try {
+      $rpc->call('login', ['userId' => $this->getDemoUID()]);
+      $this->fail('Untrusted sessions should require authentication credentials');
+    }
+    catch (JsonRpcMethodException $e) {
+      $this->assertRegExp(';not trusted;', $e->getMessage());
+    }
+
+    $login = $rpc->call('login', ['cred' => $this->credJwt($this->getDemoCID())]);
+    $this->assertEquals($this->getDemoCID(), $login['contactId']);
+    $this->assertEquals($this->getDemoUID(), $login['userId']);
+
+    $me = $rpc->call('api3', ['Contact', 'get', ['id' => 'user_contact_id', 'sequential' => TRUE]]);
+    $this->assertEquals($this->getDemoCID(), $me['values'][0]['contact_id']);
   }
 
   /**
