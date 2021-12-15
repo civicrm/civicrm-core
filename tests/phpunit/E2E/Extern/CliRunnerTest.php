@@ -124,27 +124,15 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
    */
   public function testPipe($name, $runner) {
     $cmd = strtr($runner, ['@PHP' => escapeshellarg('Civi::pipe("t");')]);
-    $desc = [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'a']];
-    $process = proc_open($cmd, $desc, $pipes);
+    $rpc = new \Civi\Pipe\BasicPipeClient($cmd);
 
-    $write = function(string $method, array $data = []) use (&$pipes) {
-      fwrite($pipes[0], json_encode(['jsonrpc' => '2.0', 'method' => $method, 'params' => $data, 'id' => NULL]) . "\n");
-    };
-    $read = function() use (&$pipes) {
-      $line = stream_get_line($pipes[1], 4096, "\n");
-      $decode = json_decode($line, TRUE);
-      return $decode;
-    };
+    $this->assertEquals('trusted', $rpc->getWelcome()['t'], "Expect standard Civi::pipe header when starting via $name");
 
-    $this->assertEquals(['Civi::pipe' => ['t' => 'trusted']], $read(), "Expect standard Civi::pipe header when starting via $name");
+    $r = $rpc->call('echo', ['a' => 123]);
+    $this->assertEquals(['a' => 123], $r);
 
-    $write('echo', ['a' => 123]);
-    $this->assertEquals(['a' => 123], $read()['result']);
-
-    $write('echo', [4, 5, 6]);
-    $this->assertEquals([4, 5, 6], $read()['result']);
-
-    proc_close($process);
+    $r = $rpc->call('echo', [4, 5, 6]);
+    $this->assertEquals([4, 5, 6], $r);
   }
 
   /**
