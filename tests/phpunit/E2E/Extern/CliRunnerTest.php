@@ -111,6 +111,43 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
   }
 
   /**
+   * Use a CLI runner to start a bidirectional command pipe.
+   *
+   * This ensures that there are no funny headers or constraints of bidirectional data-flow.
+   *
+   * @param string $name
+   *   The name of the command we're testing with.
+   *   Ex: 'cv'
+   * @param string $runner
+   *   Ex: 'cv ev @PHP'
+   * @dataProvider getRunners
+   */
+  public function testPipe($name, $runner) {
+    $cmd = strtr($runner, ['@PHP' => escapeshellarg('Civi::pipe("jsonrpc20");')]);
+    $desc = [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'a']];
+    $process = proc_open($cmd, $desc, $pipes);
+
+    $write = function(string $method, array $data = []) use (&$pipes) {
+      fwrite($pipes[0], json_encode(['jsonrpc' => '2.0', 'method' => $method, 'params' => $data, 'id' => NULL]) . "\n");
+    };
+    $read = function() use (&$pipes) {
+      $line = stream_get_line($pipes[1], 4096, "\n");
+      $decode = json_decode($line, TRUE);
+      return $decode;
+    };
+
+    $this->assertEquals(['Civi::pipe' => ['jsonrpc20']], $read(), "Expect standard Civi::pipe header when starting via $name");
+
+    $write('echo', ['a' => 123]);
+    $this->assertEquals(['a' => 123], $read()['result']);
+
+    $write('echo', [4, 5, 6]);
+    $this->assertEquals([4, 5, 6], $read()['result']);
+
+    proc_close($process);
+  }
+
+  /**
    * @param string $runner
    *   Ex: 'cv ev @PHP'
    * @param string $phpExpr

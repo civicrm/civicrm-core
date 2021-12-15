@@ -115,6 +115,15 @@ class Civi {
   }
 
   /**
+   * Initiate a bidirectional pipe for exchanging a series of multiple API requests.
+   *
+   * @see \Civi\Pipe\BasicJsonSession
+   */
+  public static function pipe(string $protocol = 'jsonrpc20'): void {
+    Civi::service('pipe.' . $protocol)->setIO(STDIN, STDOUT)->run();
+  }
+
+  /**
    * Fetch a service from the container.
    *
    * @param string $id
