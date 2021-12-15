@@ -31,7 +31,9 @@ class DAOGetAction extends AbstractGetAction {
   /**
    * Fields to return. Defaults to all standard (non-custom, non-extra) fields `['*']`.
    *
-   * The keyword `"custom.*"` selects all custom fields. So to select all standard + custom fields, select `['*', 'custom.*']`.
+   * The keyword `"custom.*"` selects all custom fields (except those belonging to multi-record custom field sets). So to select all standard + custom fields, select `['*', 'custom.*']`.
+   *
+   * Multi-record custom field sets are represented as their own entity, so join to that entity to get those custom fields.
    *
    * Use the dot notation to perform joins in the select clause, e.g. selecting `['*', 'contact.*']` from `Email::get()`
    * will select all fields for the email + all fields for the related contact.
