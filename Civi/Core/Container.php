@@ -262,11 +262,6 @@ class Container {
     }
     $container->setAlias('cache.short', 'cache.default')->setPublic(TRUE);
 
-    $container->setDefinition('pipe.json', new Definition(
-      'Civi\Pipe\BasicJsonSession',
-      []
-    ))->setPublic(TRUE);
-
     $container->setDefinition('pipe.jsonrpc20', new Definition(
       'Civi\Pipe\JsonRpcSession',
       []
