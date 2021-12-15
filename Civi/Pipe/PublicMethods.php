@@ -99,16 +99,16 @@ class PublicMethods {
    * Set ephemeral session options.
    *
    * @param $session
-   * @param array{maxLines: int, responsePrefix: int} $request
+   * @param array{bufferSize: int, responsePrefix: int} $request
    *   Any updates to perform. May be empty/omitted.
-   * @return array{maxLines: int, responsePrefix: int}
+   * @return array{bufferSize: int, responsePrefix: int}
    *   List of updated options.
    *   If the list of updates was empty, then return all options.
    */
   public function options($session, $request) {
     $storageMap = [
       'apiError' => $this,
-      'maxLine' => $session,
+      'bufferSize' => $session,
       'responsePrefix' => $session,
     ];
 

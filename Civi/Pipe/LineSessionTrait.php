@@ -87,7 +87,7 @@ trait LineSessionTrait {
    *
    * @var int
    */
-  protected $maxLine = 524288;
+  protected $bufferSize = 524288;
 
   /**
    * A value to display immediately before the response lines.
@@ -114,7 +114,7 @@ trait LineSessionTrait {
   public function run() {
     $this->write($this->onConnect());
 
-    while (FALSE !== ($line = stream_get_line($this->input, $this->maxLine, $this->delimiter))) {
+    while (FALSE !== ($line = stream_get_line($this->input, $this->bufferSize, $this->delimiter))) {
       $line = rtrim($line, $this->delimiter);
       if (empty($line)) {
         continue;
@@ -133,16 +133,16 @@ trait LineSessionTrait {
   /**
    * @return int
    */
-  public function getMaxLine(): int {
-    return $this->maxLine;
+  public function getBufferSize(): int {
+    return $this->bufferSize;
   }
 
   /**
-   * @param int $maxLine
+   * @param int $bufferSize
    * @return $this
    */
-  public function setMaxLine(int $maxLine) {
-    $this->maxLine = $maxLine;
+  public function setBufferSize(int $bufferSize) {
+    $this->bufferSize = $bufferSize;
     return $this;
   }
 
