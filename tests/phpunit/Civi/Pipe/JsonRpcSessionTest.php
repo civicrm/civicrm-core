@@ -26,6 +26,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $this->input = fopen('php://memory', 'w');
     $this->output = fopen('php://memory', 'w');
     $this->server = new PipeSession($this->input, $this->output);
+    $this->server->setTrusted(TRUE);
   }
 
   protected function tearDown(): void {
@@ -91,7 +92,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
 
   public function testControl() {
     $this->assertRequestResponse([
-      '{"jsonrpc":"2.0","id":"c","method":"options"}' => '{"jsonrpc":"2.0","result":{"apiError":"array","bufferSize":524288,"responsePrefix":null},"id":"c"}',
+      '{"jsonrpc":"2.0","id":"c","method":"options"}' => '{"jsonrpc":"2.0","result":{"apiCheckPermissions":true,"apiError":"array","bufferSize":524288,"responsePrefix":null},"id":"c"}',
       '{"jsonrpc":"2.0","id":"c","method":"options","params":{"responsePrefix":"ZZ"}}' => 'ZZ{"jsonrpc":"2.0","result":{"responsePrefix":"ZZ"},"id":"c"}',
       '{"jsonrpc":"2.0","id":"c","method": "echo","params":[123]}' => 'ZZ{"jsonrpc":"2.0","result":[123],"id":"c"}',
     ]);

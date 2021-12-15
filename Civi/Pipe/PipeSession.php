@@ -25,6 +25,11 @@ class PipeSession {
   protected $methods;
 
   /**
+   * @var bool|null
+   */
+  protected $trusted;
+
+  /**
    * @inheritDoc
    */
   protected function onConnect(): ?string {
@@ -57,6 +62,26 @@ class PipeSession {
   protected function onException(string $requestLine, \Throwable $t): ?string {
     $error = JsonRpc::createResponseError([], $t);
     return \json_encode($error);
+  }
+
+  /**
+   * @param bool $trusted
+   * @return PipeSession
+   */
+  public function setTrusted(bool $trusted): PipeSession {
+    if ($this->trusted !== NULL && $this->trusted !== $trusted) {
+      throw new \CRM_Core_Exception('Cannot modify PipeSession::$trusted after initialization');
+    }
+    $this->trusted = $trusted;
+    return $this;
+  }
+
+  /**
+   * @return bool
+   */
+  public function isTrusted(): bool {
+    // If this gets called when the value is NULL, then you are doing it wrong.
+    return $this->trusted;
   }
 
 }

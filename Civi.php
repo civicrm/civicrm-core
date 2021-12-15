@@ -120,7 +120,10 @@ class Civi {
    * @see \Civi\Pipe\BasicJsonSession
    */
   public static function pipe(string $protocol = 'jsonrpc20'): void {
-    Civi::service('pipe.' . $protocol)->setIO(STDIN, STDOUT)->run();
+    Civi::service('pipe.' . $protocol)
+      ->setIO(STDIN, STDOUT)
+      ->setTrusted(TRUE)
+      ->run();
   }
 
   /**

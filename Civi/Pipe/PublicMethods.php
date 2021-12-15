@@ -11,6 +11,8 @@
 
 namespace Civi\Pipe;
 
+use Civi\Authx\AuthxException;
+
 /**
  * Collection of methods to expose to the pipe session. Any public method will be accessible.
  */
@@ -26,6 +28,15 @@ class PublicMethods {
   protected $apiError = 'array';
 
   /**
+   * Should API calls use permission checks?
+   *
+   * Note: This property is only consulted on trusted connections. It is ignored on untrusted connections.
+   *
+   * @var bool
+   */
+  protected $apiCheckPermissions = TRUE;
+
+  /**
    * Send a request to APIv3.
    *
    * @param \Civi\Pipe\PipeSession $session
@@ -34,7 +45,9 @@ class PublicMethods {
    * @return array|\Civi\Api4\Generic\Result|int
    */
   public function api3($session, $request) {
-    $request[2] = array_merge(['version' => 3, 'check_permissions' => TRUE], $request[2] ?? []);
+    $request[2] = array_merge($request[2] ?? [], ['version' => 3]);
+    $request[2]['check_permissions'] = !$session->isTrusted() || $this->isCheckPermissions($request[2], 'check_permissions');
+    // ^^ Untrusted sessions MUST check perms. All sessions DEFAULT to checking perms. Trusted sessions MAY disable perms.
     switch ($this->apiError) {
       case 'array':
         return civicrm_api(...$request);
@@ -56,7 +69,9 @@ class PublicMethods {
    * @return array|\Civi\Api4\Generic\Result|int
    */
   public function api4($session, $request) {
-    $request[2] = array_merge(['version' => 4, 'checkPermissions' => TRUE], $request[2] ?? []);
+    $request[2] = array_merge($request[2] ?? [], ['version' => 4]);
+    $request[2]['checkPermissions'] = !$session->isTrusted() || $this->isCheckPermissions($request[2], 'checkPermissions');
+    // ^^ Untrusted sessions MUST check perms. All sessions DEFAULT to checking perms. Trusted sessions MAY disable perms.
     switch ($this->apiError) {
       case 'array':
         return civicrm_api(...$request);
@@ -91,8 +106,27 @@ class PublicMethods {
     if (!function_exists('authx_login')) {
       throw new \CRM_Core_Exception("Cannot authenticate. Authx is not configured.");
     }
-    $auth = authx_login($request, FALSE /* Pipe sessions do not need cookies or DB */);
-    return \CRM_Utils_Array::subset($auth, ['contactId', 'userId']);
+
+    $redact = function(?array $authx) {
+      return $authx ? \CRM_Utils_Array::subset($authx, ['contactId', 'userId']) : FALSE;
+    };
+
+    $principal = \CRM_Utils_Array::subset($request, ['contactId', 'userId', 'user']);
+    if ($principal && $session->isTrusted()) {
+      return $redact(authx_login($request, FALSE /* Pipe sessions do not need cookies or DB */));
+    }
+    elseif ($principal && !$session->isTrusted()) {
+      throw new AuthxException("Session is not trusted.");
+    }
+    elseif (isset($request['cred'])) {
+      $authn = new \Civi\Authx\Authenticator();
+      $authn->setRejectMode('exception');
+      if ($authn->auth(NULL, ['flow' => 'xheader', 'cred' => $request['cred']])) {
+        return $redact(\CRM_Core_Session::singleton()->get("authx"));
+      }
+    }
+
+    throw new AuthxException("Cannot authenticate. Must specify principal/credentials.");
   }
 
   /**
@@ -107,10 +141,15 @@ class PublicMethods {
    */
   public function options($session, $request) {
     $storageMap = [
+      'apiCheckPermissions' => $this,
       'apiError' => $this,
       'bufferSize' => $session,
       'responsePrefix' => $session,
     ];
+
+    if (!$session->isTrusted() && array_key_exists('apiCheckPermissions', $request)) {
+      unset($request['apiCheckPermissions']);
+    }
 
     $get = function($storage, $name) {
       if (method_exists($storage, 'get' . ucfirst($name))) {
@@ -145,6 +184,10 @@ class PublicMethods {
       }
     }
     return $result;
+  }
+
+  private function isCheckPermissions(array $params, string $field) {
+    return isset($params[$field]) ? $params[$field] : $this->apiCheckPermissions;
   }
 
 }
