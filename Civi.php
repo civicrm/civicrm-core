@@ -117,13 +117,22 @@ class Civi {
   /**
    * Initiate a bidirectional pipe for exchanging a series of multiple API requests.
    *
-   * @see \Civi\Pipe\BasicJsonSession
+   * @param string $negotiationFlags
+   *   List of pipe initialization flags. Some combination of the following:
+   *    - 'v': Report version in connection header.
+   *    - 'j': Report JSON-RPC flavors in connection header.
+   *    - 'l': Report on login support in connection header.
+   *    - 't': Trusted session. Logins do not require credentials. API calls may execute with or without permission-checks.
+   *    - 'u': Untrusted session. Logins require credentials. API calls may only execute with permission-checks.
+   *   Note: The `Civi::pipe()` entry-point is designed to be amenable to shell orchestration (SSH/cv/drush/wp-cli/etc).
+   *   The negotiation flags are therefore condensed to individual characters.
+   *   Note: Future flags may be added to the default list. But be careful about removing flags from the default list.
+   * @see \Civi\Pipe\PipeSession
    */
-  public static function pipe(string $protocol = 'jsonrpc20'): void {
-    Civi::service('pipe.' . $protocol)
+  public static function pipe(string $negotiationFlags = 'vtl'): void {
+    Civi::service('civi.pipe')
       ->setIO(STDIN, STDOUT)
-      ->setTrusted(TRUE)
-      ->run();
+      ->run($negotiationFlags);
   }
 
   /**

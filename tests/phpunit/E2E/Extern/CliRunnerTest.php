@@ -123,7 +123,7 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
    * @dataProvider getRunners
    */
   public function testPipe($name, $runner) {
-    $cmd = strtr($runner, ['@PHP' => escapeshellarg('Civi::pipe("jsonrpc20");')]);
+    $cmd = strtr($runner, ['@PHP' => escapeshellarg('Civi::pipe("t");')]);
     $desc = [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'a']];
     $process = proc_open($cmd, $desc, $pipes);
 
@@ -136,7 +136,7 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
       return $decode;
     };
 
-    $this->assertEquals(['Civi::pipe' => ['jsonrpc20']], $read(), "Expect standard Civi::pipe header when starting via $name");
+    $this->assertEquals(['Civi::pipe' => ['t' => 'trusted']], $read(), "Expect standard Civi::pipe header when starting via $name");
 
     $write('echo', ['a' => 123]);
     $this->assertEquals(['a' => 123], $read()['result']);

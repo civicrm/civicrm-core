@@ -32,10 +32,43 @@ class PipeSession {
   /**
    * @inheritDoc
    */
-  protected function onConnect(): ?string {
+  protected function onConnect(string $negotiationFlags): ?string {
     \CRM_Core_Session::useFakeSession();
     $this->methods = new PublicMethods();
-    return json_encode(["Civi::pipe" => ['jsonrpc20']]);
+
+    // Convention: Every negotiation-flag should produce exactly one output in the header line.
+    foreach (str_split($negotiationFlags) as $flag) {
+      switch ($flag) {
+        case 'v':
+          $flags[$flag] = \CRM_Utils_System::version();
+          break;
+
+        case 'j':
+          $flags[$flag] = ['jsonrpc-2.0'];
+          break;
+
+        case 'l':
+          $flags[$flag] = function_exists('authx_login') ? ['login'] : ['nologin'];
+          break;
+
+        case 't':
+          $this->setTrusted(TRUE);
+          $flags[$flag] = 'trusted';
+          break;
+
+        case 'u':
+          $this->setTrusted(FALSE);
+          $flags[$flag] = 'untrusted';
+          break;
+
+        default:
+          // What flags might exist in the future? We don't know! Communicate that we don't know.
+          $flags[$flag] = NULL;
+          break;
+      }
+    }
+
+    return json_encode(["Civi::pipe" => $flags]);
   }
 
   /**

@@ -32,10 +32,13 @@ trait LineSessionTrait {
   /**
    * The onConnect() method is called when a new session is opened.
    *
+   * @param string $negotiationFlags
+   *   List of pipe initialization flags. See Civi::pipe() for description of flags.
    * @return string|null
    *   Header/welcome line, or NULL if none.
+   * @see Civi::pipe
    */
-  protected function onConnect(): ?string {
+  protected function onConnect(string $negotiationFlags): ?string {
     return NULL;
   }
 
@@ -110,9 +113,12 @@ trait LineSessionTrait {
 
   /**
    * Run the main loop. Poll for commands on $input and write responses to $output.
+   *
+   * @param string $negotiationFlags
+   *   List of pipe initialization flags. See Civi::pipe() for description of flags.
    */
-  public function run() {
-    $this->write($this->onConnect());
+  public function run(string $negotiationFlags = '') {
+    $this->write($this->onConnect($negotiationFlags));
 
     while (FALSE !== ($line = stream_get_line($this->input, $this->bufferSize, $this->delimiter))) {
       $line = rtrim($line, $this->delimiter);

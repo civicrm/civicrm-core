@@ -16,7 +16,7 @@ namespace Civi\Pipe;
  */
 class JsonRpcSessionTest extends \CiviUnitTestCase {
 
-  protected $standardHeader = '{"Civi::pipe":["jsonrpc20"]}';
+  protected $standardHeader = '{"Civi::pipe":{"t":"trusted"}}';
   protected $input;
   protected $output;
   protected $server;
@@ -26,7 +26,6 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $this->input = fopen('php://memory', 'w');
     $this->output = fopen('php://memory', 'w');
     $this->server = new PipeSession($this->input, $this->output);
-    $this->server->setTrusted(TRUE);
   }
 
   protected function tearDown(): void {
@@ -209,7 +208,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     }
     fseek($this->input, 0);
 
-    $this->server->run();
+    $this->server->run("t");
 
     fseek($this->output, 0);
     return explode("\n", stream_get_contents($this->output));
