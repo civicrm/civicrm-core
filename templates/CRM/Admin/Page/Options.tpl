@@ -133,7 +133,7 @@
               <td class="center crm-admin-options-filter">{icon condition=$row.filter}{ts}Counted{/ts}{/icon}</td>
             {/if}
             <td class="crm-admin-options-description crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
-            <td class="nowrap crm-admin-options-order">{if $row.weight}{$row.weight}{/if}</td>
+            <td class="nowrap crm-admin-options-order">{if $row.weight}{$row.weight|smarty:nodefaults}{/if}</td>
             {if $showIsDefault}
               <td class="crm-admin-options-is_default" align="center">{if $row.is_default}{icon}{ts}Default{/ts}{/icon}{/if}&nbsp;</td>
             {/if}
