@@ -710,7 +710,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   private static function formatProfileContactParams(
     &$params,
     $fields,
-    $contactID = NULL,
+    int $contactID,
     $ufGroupId = NULL,
     $ctype = NULL
   ) {
@@ -718,33 +718,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $data = $contactDetails = [];
 
     // get the contact details (hier)
-    if ($contactID) {
-      $details = CRM_Contact_BAO_Contact::getHierContactDetails($contactID, $fields);
+    $details = CRM_Contact_BAO_Contact::getHierContactDetails($contactID, $fields);
 
-      $contactDetails = $details[$contactID];
-      $data['contact_type'] = $contactDetails['contact_type'] ?? NULL;
-      $data['contact_sub_type'] = $contactDetails['contact_sub_type'] ?? NULL;
-    }
-    else {
-      //we should get contact type only if contact
-      if ($ufGroupId) {
-        $data['contact_type'] = CRM_Core_BAO_UFField::getProfileType($ufGroupId, TRUE, FALSE, TRUE);
-
-        //special case to handle profile with only contact fields
-        if ($data['contact_type'] == 'Contact') {
-          $data['contact_type'] = 'Individual';
-        }
-        elseif (CRM_Contact_BAO_ContactType::isaSubType($data['contact_type'])) {
-          $data['contact_type'] = CRM_Contact_BAO_ContactType::getBasicType($data['contact_type']);
-        }
-      }
-      elseif ($ctype) {
-        $data['contact_type'] = $ctype;
-      }
-      else {
-        $data['contact_type'] = 'Individual';
-      }
-    }
+    $contactDetails = $details[$contactID];
+    $data['contact_type'] = $contactDetails['contact_type'] ?? NULL;
+    $data['contact_sub_type'] = $contactDetails['contact_sub_type'] ?? NULL;
 
     //fix contact sub type CRM-5125
     if (array_key_exists('contact_sub_type', $params) &&
@@ -781,15 +759,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $locationType = [];
     $count = 1;
 
-    if ($contactID) {
-      //add contact id
-      $data['contact_id'] = $contactID;
-      $primaryLocationType = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID);
-    }
-    else {
-      $defaultLocation = CRM_Core_BAO_LocationType::getDefault();
-      $defaultLocationId = $defaultLocation->id;
-    }
+    //add contact id
+    $data['contact_id'] = $contactID;
+    $primaryLocationType = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID);
 
     $billingLocationTypeId = CRM_Core_BAO_LocationType::getBilling();
 
@@ -812,18 +784,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       [$fieldName, $locTypeId, $typeId] = CRM_Utils_System::explode('-', $key, 3);
 
       if ($locTypeId == 'Primary') {
-        if ($contactID) {
-          if (in_array($fieldName, $blocks)) {
-            $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, $fieldName);
-          }
-          else {
-            $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, 'address');
-          }
-          $primaryLocationType = $locTypeId;
+        if (in_array($fieldName, $blocks)) {
+          $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, $fieldName);
         }
         else {
-          $locTypeId = $defaultLocationId;
+          $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, 'address');
         }
+        $primaryLocationType = $locTypeId;
       }
 
       if (is_numeric($locTypeId) &&
@@ -1055,9 +1022,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           if (empty($params[$key])) {
             $data[$key] = 0;
           }
-        }
-        elseif (!$contactID) {
-          $data[$key] = 0;
         }
       }
     }
