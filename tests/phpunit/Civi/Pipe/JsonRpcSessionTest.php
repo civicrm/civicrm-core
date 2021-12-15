@@ -23,14 +23,15 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
 
   protected function setUp(): void {
     parent::setUp();
-    $this->input = fopen('php://memory', 'w');
-    $this->output = fopen('php://memory', 'w');
-    $this->server = new PipeSession($this->input, $this->output);
   }
 
   protected function tearDown(): void {
-    fclose($this->input);
-    fclose($this->output);
+    if ($this->input) {
+      fclose($this->input);
+    }
+    if ($this->output) {
+      fclose($this->output);
+    }
     $this->input = $this->output = $this->server = NULL;
     parent::tearDown();
   }
@@ -149,6 +150,54 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $this->assertEquals('Number', $fields['id']['input_type']);
   }
 
+  public function testApi4Authz() {
+    // We try 'Route.get' action with different access levels.
+    $useException = '{"jsonrpc":"2.0","id":"o","method":"options","params":{"apiError":"exception"}}';
+    $checkPermTrue = '{"jsonrpc":"2.0","id":"m","method":"api4","params":["Route","get",{"checkPermissions":true}]}';
+    $checkPermFalse = '{"jsonrpc":"2.0","id":"m","method":"api4","params":["Route","get",{"checkPermissions":false}]}';
+    $checkPermDefault = '{"jsonrpc":"2.0","id":"m","method":"api4","params":["Route","get",{}]}';
+    $allPerm = ['access CiviCRM', 'administer CiviCRM'];
+    $noPerm = [];
+    $trusted = 't';
+    $untrusted = 'u';
+
+    $apiOk = function($line, $caseId) {
+      $decode = json_decode($line, TRUE);
+      $this->assertTrue(!isset($decode['error']), "($caseId) Should have no error. Got error: $line");
+      $this->assertTrue(is_array($decode['result'] ?? NULL), "($caseId) Should have values. Got: $line");
+    };
+    $apiFail = function($line, $caseId) {
+      $decode = json_decode($line, TRUE);
+      $this->assertRegExp(';Authorization failed;', $decode['error']['message'], "($caseId) Should have authorization error. Got: $line");
+    };
+
+    $cases = []; /* [ ActivePerms?, Trusted?, CheckPerms?, ExpectResult */
+
+    // For user with no perms, almost everything fails -- unless we explicitly optout on a trusted connection.
+    $cases['nut'] = [$noPerm, $untrusted, $checkPermTrue, $apiFail];
+    $cases['nud'] = [$noPerm, $untrusted, $checkPermDefault, $apiFail];
+    $cases['nuf'] = [$noPerm, $untrusted, $checkPermFalse, $apiFail]; /* not allowed to optout */
+    $cases['ntt'] = [$noPerm, $trusted, $checkPermTrue, $apiFail];
+    $cases['ntd'] = [$noPerm, $trusted, $checkPermDefault, $apiFail];
+    $cases['ntf'] = [$noPerm, $trusted, $checkPermFalse, $apiOk]; /* allowed to optout */
+
+    // For user with all perms, you have success regardless of the permutation of trusted/checkPerms.
+    $cases['aut'] = [$allPerm, $untrusted, $checkPermTrue, $apiOk];
+    $cases['aud'] = [$allPerm, $untrusted, $checkPermDefault, $apiOk];
+    $cases['auf'] = [$allPerm, $untrusted, $checkPermFalse, $apiOk];
+    $cases['att'] = [$allPerm, $trusted, $checkPermTrue, $apiOk];
+    $cases['atd'] = [$allPerm, $trusted, $checkPermDefault, $apiOk];
+    $cases['atf'] = [$allPerm, $trusted, $checkPermFalse, $apiOk];
+
+    foreach ($cases as $caseId => $case) {
+      [$inActivePerms, $inTrusted, $inApiCall, $expect] = $case;
+      $this->setPermissions($inActivePerms);
+      $responses = $this->runLines([$useException, $inApiCall], $inTrusted);
+      $this->assertRegExp($inTrusted === 'u' ? ';"untrusted";' : ';"trusted";', $responses[0], "($caseId) Header should indicate trust level");
+      $expect($responses[2], $caseId);
+    }
+  }
+
   public function testApi4ErrorModes() {
     $responses = $this->runLines([
       // First call: Use default/traditional API error mode
@@ -199,23 +248,25 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
   /**
    * @param string[] $lines
    *   List of statements to send. (Does not include the line-delimiter.)
+   * @param string $negotiationFlags
+   *   Flags to set when opening connection - eg (t)rusted, (u)ntrusted
    * @return string[]
    *   List of responses. (Does not include the line-delimiter.)
    */
-  protected function runLines(array $lines): array {
+  protected function runLines(array $lines, string $negotiationFlags = 't'): array {
+    $this->input = fopen('php://memory', 'w');
+    $this->output = fopen('php://memory', 'w');
+    $this->server = new PipeSession($this->input, $this->output);
+
     foreach ($lines as $line) {
       fwrite($this->input, $line . "\n");
     }
     fseek($this->input, 0);
 
-    $this->server->run("t");
+    $this->server->run($negotiationFlags);
 
     fseek($this->output, 0);
     return explode("\n", stream_get_contents($this->output));
-  }
-
-  protected function getOutputLine() {
-    return stream_get_line($this->output, 10000, "\n");
   }
 
 }
