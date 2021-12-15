@@ -2019,8 +2019,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param $entity
    * @param int $delete
    * @param string $errorText
-   *
-   * @throws CRM_Core_Exception
    */
   public function getAndCheck(array $params, int $id, $entity, int $delete = 1, string $errorText = ''): void {
 
@@ -2806,7 +2804,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'return' => ['total_amount', 'fee_amount', 'net_amount'],
     ]);
     $this->assertEquals($contribution['total_amount'] - $contribution['fee_amount'], $contribution['net_amount']);
-    if ($context == 'pending') {
+    if ($context === 'pending') {
       $trxn = CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams);
       $this->assertNull($trxn, 'No Trxn to be created until IPN callback');
       return;
@@ -2815,14 +2813,14 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $trxnParams = [
       'id' => $trxn['financial_trxn_id'],
     ];
-    if ($context != 'online' && $context != 'payLater') {
+    if ($context !== 'online' && $context !== 'payLater') {
       $compareParams = [
         'to_financial_account_id' => 6,
         'total_amount' => (float) CRM_Utils_Array::value('total_amount', $params, 100.00),
         'status_id' => 1,
       ];
     }
-    if ($context == 'feeAmount') {
+    if ($context === 'feeAmount') {
       $compareParams['fee_amount'] = 50;
     }
     elseif ($context === 'online') {
@@ -2854,7 +2852,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'status_id' => 1,
       'financial_account_id' => CRM_Utils_Array::value('financial_account_id', $params, 1),
     ];
-    if ($context == 'payLater') {
+    if ($context === 'payLater') {
       $compareParams = [
         'amount' => (float) CRM_Utils_Array::value('total_amount', $params, 100.00),
         'status_id' => 3,
@@ -3515,7 +3513,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function validateAllPayments() {
+  protected function validateAllPayments(): void {
     $payments = $this->callAPISuccess('Payment', 'get', [
       'return' => ['total_amount', 'tax_amount'],
       'options' => ['limit' => 0],
@@ -3566,10 +3564,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
   /**
    * @return array|int
-   * @throws \CRM_Core_Exception
    */
   protected function createRuleGroup() {
-    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
+    return $this->callAPISuccess('RuleGroup', 'create', [
       'contact_type' => 'Individual',
       'threshold' => 8,
       'used' => 'General',
@@ -3577,7 +3574,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'title' => 'TestRule',
       'is_reserved' => 0,
     ]);
-    return $ruleGroup;
   }
 
   /**
@@ -3587,7 +3583,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function basicCreateTest(int $version) {
+  protected function basicCreateTest(int $version): void {
     $this->_apiversion = $version;
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
@@ -3602,7 +3598,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function basicDeleteTest($version) {
+  protected function basicDeleteTest(int $version): void {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $deleteParams = ['id' => $result['id']];
@@ -3648,7 +3644,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * This query takes about 2 minutes on a DB with 10s of millions of contacts.
    */
-  public function assertLocationValidity() {
+  public function assertLocationValidity(): void {
     $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM
 
 (SELECT a1.contact_id

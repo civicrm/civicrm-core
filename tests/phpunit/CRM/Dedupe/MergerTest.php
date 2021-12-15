@@ -1458,8 +1458,6 @@ WHERE
 
   /**
    * Test that declaring a custom join for search kit does not break merge.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testMergeWithDeclaredSearchJoin(): void {
     $this->hookClass->setHook('civicrm_entityTypes', [
