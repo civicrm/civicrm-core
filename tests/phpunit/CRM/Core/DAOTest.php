@@ -407,6 +407,9 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     ];
     $daoInfo = new ReflectionClass('CRM_Core_DAO');
     foreach ($daoInfo->getConstants() as $constant => $val) {
+      if ($constant === 'SERIALIZE_NONE') {
+        continue;
+      }
       if ($constant === 'SERIALIZE_JSON' || $constant === 'SERIALIZE_PHP') {
         $constants[] = [$val, array_merge($simpleData, $complexData)];
       }
