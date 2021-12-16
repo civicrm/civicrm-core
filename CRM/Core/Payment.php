@@ -1186,8 +1186,9 @@ abstract class CRM_Core_Payment {
 
     if ($this->_component == 'event') {
       return CRM_Utils_System::url($this->getBaseReturnUrl(), [
-        'reset' => 1,
-        'cc' => 'fail',
+        '_qf_Register_display' => 1,
+        'qfKey' => $qfKey,
+        'cancel' => 1,
         'participantId' => $participantID,
       ],
         TRUE, NULL, FALSE

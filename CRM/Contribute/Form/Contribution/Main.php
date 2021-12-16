@@ -114,6 +114,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if (!empty($this->_values['footer_text'])) {
       $this->assign('footer_text', $this->_values['footer_text']);
     }
+
+    if (!empty($this->_paymentProcessor) &&  $this->_paymentProcessor['object']->supports('preApproval')) {
+      $isCancel = CRM_Utils_Request::retrieve('cancel', 'Boolean');
+      if ($isCancel && $this->get('pre_approval_parameters')) {
+        $this->set('pre_approval_parameters', []);
+      }
+    }
   }
 
   /**

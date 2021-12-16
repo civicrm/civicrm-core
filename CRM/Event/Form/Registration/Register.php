@@ -198,6 +198,13 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if ($this->_allowConfirmation) {
       CRM_Event_Form_EventFees::preProcess($this);
     }
+
+    if (!empty($this->_paymentProcessor) &&  $this->_paymentProcessor['object']->supports('preApproval')) {
+      $isCancel = CRM_Utils_Request::retrieve('cancel', 'Boolean');
+      if ($isCancel && $this->get('pre_approval_parameters')) {
+        $this->set('pre_approval_parameters', []);
+      }
+    }
   }
 
   /**
