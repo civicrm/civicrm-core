@@ -336,7 +336,9 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
    * @return string
    */
   public function getCacheCode() {
-    return $this->cacheCode;
+    // Ex: AngularJS json partials are language-specific because they ship with the strings
+    // for the current language.
+    return $this->cacheCode . CRM_Core_I18n::getLocale();
   }
 
   /**
@@ -563,7 +565,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     $hasQuery = strpos($url, '?') !== FALSE;
     $operator = $hasQuery ? '&' : '?';
 
-    return $url . $operator . 'r=' . $this->cacheCode;
+    return $url . $operator . 'r=' . $this->getCacheCode();
   }
 
   /**
