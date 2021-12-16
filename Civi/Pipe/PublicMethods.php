@@ -25,7 +25,7 @@ class PublicMethods {
    *   - 'array': Traditional array format from civicrm_api(). Maximizes consistency of error data.
    *   - 'exception': Converted to an exception. Somewhat lossy. Improves out-of-box DX on stricter JSON-RPC clients.
    */
-  protected $apiError = 'array';
+  protected $apiError = 'exception';
 
   /**
    * Should API calls use permission checks?

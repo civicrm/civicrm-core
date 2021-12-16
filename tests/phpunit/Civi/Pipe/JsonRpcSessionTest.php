@@ -92,7 +92,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
 
   public function testControl() {
     $this->assertRequestResponse([
-      '{"jsonrpc":"2.0","id":"c","method":"options"}' => '{"jsonrpc":"2.0","result":{"apiCheckPermissions":true,"apiError":"array","bufferSize":524288,"responsePrefix":null},"id":"c"}',
+      '{"jsonrpc":"2.0","id":"c","method":"options"}' => '{"jsonrpc":"2.0","result":{"apiCheckPermissions":true,"apiError":"exception","bufferSize":524288,"responsePrefix":null},"id":"c"}',
       '{"jsonrpc":"2.0","id":"c","method":"options","params":{"responsePrefix":"ZZ"}}' => 'ZZ{"jsonrpc":"2.0","result":{"responsePrefix":"ZZ"},"id":"c"}',
       '{"jsonrpc":"2.0","id":"c","method": "echo","params":[123]}' => 'ZZ{"jsonrpc":"2.0","result":[123],"id":"c"}',
     ]);
@@ -111,10 +111,10 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
 
   public function testApi3ErrorModes() {
     $responses = $this->runLines([
-      // First call: Use default/traditional API error mode
+      // First call: By default, use JSON-RPC errors.
       '{"jsonrpc":"2.0","id":"bad1","method":"api3","params":["System","zznnzznnzz"]}',
-      // Second call: Bind API errors to JSON-RPC errors.
-      '{"jsonrpc":"2.0","id":"o","method":"options","params":{"apiError":"exception"}}',
+      // Second call: Use traditional API error-arrays
+      '{"jsonrpc":"2.0","id":"o","method":"options","params":{"apiError":"array"}}',
       '{"jsonrpc":"2.0","id":"bad2","method":"api3","params":["System","zznnzznnzz"]}',
     ]);
 
@@ -123,18 +123,18 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $decode = json_decode($responses[1], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
     $this->assertEquals('bad1', $decode['id']);
-    $this->assertEquals(1, $decode['result']['is_error']);
-    $this->assertRegexp(';API.*System.*zznnzznnzz.*not exist;', $decode['result']['error_message']);
+    $this->assertRegexp(';API.*System.*zznnzznnzz.*not exist;', $decode['error']['message']);
 
     $decode = json_decode($responses[2], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
     $this->assertEquals('o', $decode['id']);
-    $this->assertEquals('exception', $decode['result']['apiError']);
+    $this->assertEquals('array', $decode['result']['apiError']);
 
     $decode = json_decode($responses[3], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
     $this->assertEquals('bad2', $decode['id']);
-    $this->assertRegexp(';API.*System.*zznnzznnzz.*not exist;', $decode['error']['message']);
+    $this->assertEquals(1, $decode['result']['is_error']);
+    $this->assertRegexp(';API.*System.*zznnzznnzz.*not exist;', $decode['result']['error_message']);
   }
 
   public function testApi4() {
@@ -200,10 +200,10 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
 
   public function testApi4ErrorModes() {
     $responses = $this->runLines([
-      // First call: Use default/traditional API error mode
+      // First call: By default, use JSON-RPC errors.
       '{"jsonrpc":"2.0","id":"bad1","method":"api4","params":["System","zznnzznnzz"]}',
-      // Second call: Bind API errors to JSON-RPC errors.
-      '{"jsonrpc":"2.0","id":"o","method":"options","params":{"apiError":"exception"}}',
+      // Second call: Use traditional API error-arrays
+      '{"jsonrpc":"2.0","id":"o","method":"options","params":{"apiError":"array"}}',
       '{"jsonrpc":"2.0","id":"bad2","method":"api4","params":["System","zznnzznnzz"]}',
     ]);
 
@@ -212,18 +212,18 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $decode = json_decode($responses[1], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
     $this->assertEquals('bad1', $decode['id']);
-    $this->assertEquals(1, $decode['result']['is_error']);
-    $this->assertRegexp(';Api.*System.*zznnzznnzz.*not exist;', $decode['result']['error_message']);
+    $this->assertRegexp(';Api.*System.*zznnzznnzz.*not exist;', $decode['error']['message']);
 
     $decode = json_decode($responses[2], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
     $this->assertEquals('o', $decode['id']);
-    $this->assertEquals('exception', $decode['result']['apiError']);
+    $this->assertEquals('array', $decode['result']['apiError']);
 
     $decode = json_decode($responses[3], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
     $this->assertEquals('bad2', $decode['id']);
-    $this->assertRegexp(';Api.*System.*zznnzznnzz.*not exist;', $decode['error']['message']);
+    $this->assertEquals(1, $decode['result']['is_error']);
+    $this->assertRegexp(';Api.*System.*zznnzznnzz.*not exist;', $decode['result']['error_message']);
   }
 
   /**
