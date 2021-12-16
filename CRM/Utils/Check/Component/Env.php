@@ -690,6 +690,54 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
+   * @return CRM_Utils_Check_Message[]
+   */
+  public function checkScheduledJobLogErrors() {
+    $jobs = civicrm_api3('Job', 'get', [
+      'sequential' => 1,
+      'return' => ["id", "name", "last_run"],
+      'is_active' => 1,
+      'options' => ['limit' => 0],
+    ]);
+    $html = '';
+    foreach ($jobs['values'] as $job) {
+      $lastExecutionMessage = civicrm_api3('JobLog', 'get', [
+        'sequential' => 1,
+        'return' => ["description"],
+        'job_id' => $job['id'],
+        'options' => ['sort' => "id desc", 'limit' => 1],
+      ])['values'][0]['description'] ?? NULL;
+      if (!empty($lastExecutionMessage) && strpos($lastExecutionMessage, 'Failure') !== FALSE) {
+        $viewLogURL = CRM_Utils_System::url('civicrm/admin/joblog', "jid={$job['id']}&reset=1");
+        $html .= '<tr>
+          <td>' . $job['name'] . ' </td>
+          <td>' . $lastExecutionMessage . '</td>
+          <td>' . $job['last_run'] . '</td>
+          <td><a href="' . $viewLogURL . '">' . ts('View Job Log') . '</a></td>
+        </tr>';
+      }
+    }
+    if (empty($html)) {
+      return [];
+    }
+
+    $message = '<p>' . ts('The following scheduled jobs failed on the last run:') . '</p>
+      <p><table><thead><tr><th>' . ts('Job') . '</th><th>' . ts('Message') . '</th><th>' . ts('Last Run') . '</th><th></th>
+      </tr></thead><tbody>' . $html . '
+      </tbody></table></p>';
+
+    $msg = new CRM_Utils_Check_Message(
+      __FUNCTION__,
+      $message,
+      ts('Scheduled Job Failures'),
+      \Psr\Log\LogLevel::WARNING,
+      'fa-server'
+    );
+    $messages[] = $msg;
+    return $messages;
+  }
+
+  /**
    * Checks if there are pending extension upgrades.
    *
    * @return CRM_Utils_Check_Message[]
