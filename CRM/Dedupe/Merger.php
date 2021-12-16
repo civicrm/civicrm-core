@@ -687,7 +687,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // This parameter causes blank fields to be be emptied out.
     // We can probably remove.
     $params['updateBlankLocInfo'] = TRUE;
-    $data = self::formatProfileContactParams($params, [], $contactID);
+    $data = self::formatProfileContactParams($params, $contactID);
     CRM_Contact_BAO_Contact::create($data);
   }
 
@@ -700,25 +700,19 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * eliminate a toxic function.
    *
    * @param array $params
-   * @param $fields
    * @param int $contactID
-   * @param int $ufGroupId
-   * @param null $ctype
    *
    * @return array
    */
   private static function formatProfileContactParams(
-    &$params,
-    $fields,
-    int $contactID,
-    $ufGroupId = NULL,
-    $ctype = NULL
+    $params,
+    int $contactID
   ) {
 
     $data = $contactDetails = [];
 
     // get the contact details (hier)
-    $details = CRM_Contact_BAO_Contact::getHierContactDetails($contactID, $fields);
+    $details = CRM_Contact_BAO_Contact::getHierContactDetails($contactID, []);
 
     $contactDetails = $details[$contactID];
     $data['contact_type'] = $contactDetails['contact_type'] ?? NULL;
@@ -747,13 +741,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $data['contact_sub_type'] = CRM_Core_DAO::VALUE_SEPARATOR . $data['contact_sub_type'] . CRM_Utils_Array::implodePadded($params['contact_sub_type_hidden']);
         }
       }
-    }
-
-    if ($ctype == 'Organization') {
-      $data['organization_name'] = $contactDetails['organization_name'] ?? NULL;
-    }
-    elseif ($ctype == 'Household') {
-      $data['household_name'] = $contactDetails['household_name'] ?? NULL;
     }
 
     $locationType = [];
@@ -1010,20 +997,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     if (!isset($data['contact_type'])) {
       $data['contact_type'] = 'Individual';
-    }
-
-    //set the values for checkboxes (do_not_email, do_not_mail, do_not_trade, do_not_phone)
-    $privacy = CRM_Core_SelectValues::privacy();
-    foreach ($privacy as $key => $value) {
-      if (array_key_exists($key, $fields)) {
-        // do not reset values for existing contacts, if fields are added to a profile
-        if (array_key_exists($key, $params)) {
-          $data[$key] = $params[$key];
-          if (empty($params[$key])) {
-            $data[$key] = 0;
-          }
-        }
-      }
     }
 
     return $data;
