@@ -177,6 +177,250 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test isDir
+   *
+   * I stole some of these from php's own unit tests at
+   *   https://github.com/php/php-src/blob/5b01c4863fe9e4bc2702b2bbf66d292d23001a18/ext/standard/tests/file/is_dir_basic.phpt
+   * and related files.
+   *
+   * @dataProvider isDirProvider
+   *
+   * @param string|null $input
+   * @param bool $expected
+   */
+  public function testIsDir(?string $input, bool $expected) {
+    clearstatcache();
+    $this->assertSame($expected, CRM_Utils_File::isDir($input));
+  }
+
+  /**
+   * Test isDir with invalid args.
+   *
+   * @dataProvider isDirInvalidArgsProvider
+   *
+   * @param mixed $input
+   * @param bool $expected
+   */
+  public function testIsDirInvalidArgs($input, bool $expected) {
+    $this->assertSame($expected, CRM_Utils_File::isDir($input));
+  }
+
+  /**
+   * Just trying to include some of the same tests as php itself and
+   * this doesn't fit in well to a dataprovider so is separate.
+   */
+  public function testIsDirMkdir() {
+    $a_dir = sys_get_temp_dir() . '/testIsDir';
+    mkdir($a_dir);
+    $this->assertTrue(CRM_Utils_File::isDir($a_dir));
+    mkdir($a_dir . '/aSubDir');
+    $this->assertTrue(CRM_Utils_File::isDir($a_dir . '/aSubDir'));
+    clearstatcache();
+    $this->assertTrue(CRM_Utils_File::isDir($a_dir));
+    rmdir($a_dir . '/aSubDir');
+    rmdir($a_dir);
+  }
+
+  /**
+   * testIsDirSlashVariations
+   */
+  public function testIsDirSlashVariations() {
+    $a_dir = sys_get_temp_dir() . '/testIsDir';
+    mkdir($a_dir);
+
+    $old_cwd = getcwd();
+    $this->assertTrue(chdir(sys_get_temp_dir()));
+
+    $this->assertTrue(CRM_Utils_File::isDir("./testIsDir"));
+    clearstatcache();
+    $this->assertTrue(CRM_Utils_File::isDir("testIsDir/"));
+    clearstatcache();
+    $this->assertTrue(CRM_Utils_File::isDir("./testIsDir/"));
+    clearstatcache();
+    $this->assertTrue(CRM_Utils_File::isDir("testIsDir//"));
+    clearstatcache();
+    $this->assertTrue(CRM_Utils_File::isDir("./testIsDir//"));
+    clearstatcache();
+    $this->assertTrue(CRM_Utils_File::isDir(".//testIsDir//"));
+    clearstatcache();
+    $this->assertFalse(CRM_Utils_File::isDir('testIsDir*'));
+
+    // Note that in php8 is_dir changed in php itself to return false with no warning for these. It used to give `is_dir() expects parameter 1 to be a valid path, string given`. See https://github.com/php/php-src/commit/7bc7a80445f2bb349891d3cccfef2d589c48607e
+    clearstatcache();
+    $this->assertFalse(CRM_Utils_File::isDir('./testIsDir/' . chr(0)));
+    clearstatcache();
+    $this->assertFalse(CRM_Utils_File::isDir("testIsDir\0"));
+
+    $this->assertTrue(chdir($old_cwd));
+    rmdir($a_dir);
+  }
+
+  /**
+   * Test hard and soft links with isDir
+   * Note hard links to directories aren't allowed so can only test with file.
+   */
+  public function testIsDirLinks() {
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $this->markTestSkipped('Windows has links but not the same.');
+    }
+
+    $a_dir = sys_get_temp_dir() . '/testIsDir';
+    mkdir($a_dir);
+    symlink($a_dir, $a_dir . '_symlink');
+    $this->assertTrue(CRM_Utils_File::isDir($a_dir . '_symlink'));
+
+    $a_file = $a_dir . '/testFile';
+    touch($a_file);
+    $this->assertFalse(CRM_Utils_File::isDir($a_file));
+
+    clearstatcache();
+    symlink($a_file, $a_file . '_symlink');
+    $this->assertFalse(CRM_Utils_File::isDir($a_file . '_symlink'));
+
+    clearstatcache();
+    link($a_file, $a_file . '_hardlink');
+    $this->assertFalse(CRM_Utils_File::isDir($a_file . '_hardlink'));
+
+    unlink($a_file . '_symlink');
+    unlink($a_file . '_hardlink');
+    unlink($a_file);
+    unlink($a_dir . '_symlink');
+    rmdir($a_dir);
+  }
+
+  /**
+   * Test isDir with open_basedir
+   *
+   * @link https://github.com/php/php-src/blob/5b01c4863fe9e4bc2702b2bbf66d292d23001a18/tests/security/open_basedir_is_dir.phpt
+   *
+   * @dataProvider isDirBasedirProvider
+   *
+   * @param string|null $input
+   * @param bool $expected
+   */
+  public function testIsDirWithOpenBasedir(?string $input, bool $expected) {
+    $originalOpenBasedir = ini_get('open_basedir');
+
+    // This might not always be under cms root, but let's see how it goes.
+    $a_dir = \Civi::paths()->getPath('[civicrm.compile]/');
+    if (file_exists("{$a_dir}/isDirTest/ok/ok.txt")) {
+      unlink("{$a_dir}/isDirTest/ok/ok.txt");
+    }
+    if (is_dir("{$a_dir}/isDirTest/ok")) {
+      rmdir("{$a_dir}/isDirTest/ok");
+    }
+    if (is_dir("{$a_dir}/isDirTest")) {
+      rmdir("{$a_dir}/isDirTest");
+    }
+
+    // We want the cms root path, but in headless tests even though there is
+    // a real cms strictly speaking the cms is "UNITTESTS", which might return
+    // something made up (currently NULL).
+    // \Civi::paths()->getPath('[cms.root]/')
+    // For now let's try this, assuming a drupal 7 structure where we know
+    // where this file is:
+    $cms_root = realpath(__DIR__ . '/../../../../../../../..');
+    // We also need temp dir because phpunit creates files in there as it does stuff before we can reset basedir.
+    ini_set('open_basedir', $cms_root . PATH_SEPARATOR . sys_get_temp_dir());
+
+    $this->assertTrue(mkdir("{$a_dir}/isDirTest"));
+    $this->assertTrue(mkdir("{$a_dir}/isDirTest/ok"));
+    file_put_contents("{$a_dir}/isDirTest/ok/ok.txt", 'Hello World!');
+    // hmm the "bad" isn't going to work the same way php's own tests work. We
+    // need to find a directory outside both cms_root and the sys temp dir.
+    // Let's just use some known unix files that always exist instead.
+    // mkdir("{$a_dir}/isDirTest/bad");
+
+    $old_cwd = getcwd();
+    $this->assertTrue(chdir("{$a_dir}/isDirTest/ok"));
+
+    clearstatcache();
+    if ($expected) {
+      $this->assertTrue(CRM_Utils_File::isDir($input));
+    }
+    else {
+      // Note that except for 'ok.txt', the real is_dir() would give an
+      // error for these. For 'ok.txt' it would return false, but no error.
+      // So this is what we are changing about the real function.
+      $this->assertFalse(CRM_Utils_File::isDir($input));
+    }
+
+    ini_set('open_basedir', $originalOpenBasedir);
+    $this->assertTrue(chdir($old_cwd));
+    unlink("{$a_dir}/isDirTest/ok/ok.txt");
+    rmdir("{$a_dir}/isDirTest/ok");
+    rmdir("{$a_dir}/isDirTest");
+  }
+
+  /**
+   * dataprovider for testIsDir
+   *
+   * @return array
+   */
+  public function isDirProvider(): array {
+    return [
+      // explicit indices to make it easier to see which one failed
+      0 => [
+        // input value
+        NULL,
+        // expected value
+        FALSE,
+      ],
+      1 => ['.', TRUE],
+      2 => ['..', TRUE],
+      3 => [__FILE__, FALSE],
+      4 => [__DIR__, TRUE],
+      5 => ['dontexist', FALSE],
+      6 => ['/no/such/dir', FALSE],
+      7 => [' ', FALSE],
+    ];
+  }
+
+  /**
+   * dataprovider for testIsDirInvalidArgs
+   *
+   * @return array
+   */
+  public function isDirInvalidArgsProvider(): array {
+    return [
+      // explicit indices to make it easier to see which one failed
+      0 => [-2.34555, FALSE],
+      1 => [TRUE, FALSE],
+      2 => [FALSE, FALSE],
+      3 => [0, FALSE],
+      4 => [1234, FALSE],
+    ];
+  }
+
+  /**
+   * dataprovider for testIsDirWithOpenBasedir
+   *
+   * @return array
+   */
+  public function isDirBasedirProvider(): array {
+    return [
+      // explicit indices to make it easier to see which one failed
+      0 => [
+        // input value
+        strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 'C:/windows' : '/etc',
+        // expected value
+        FALSE,
+      ],
+      1 => [strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 'C:/windows/win.ini' : '/etc/group', FALSE],
+      // This assumes a known location for template compile dir relative to
+      // open_basedir, and that we're 2 dirs below compile dir.
+      2 => ['../../../../../../../..', FALSE],
+      3 => ['../../../../../../../../', FALSE],
+      4 => ['/', FALSE],
+      5 => [strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 'C:/windows/../windows/win.ini' : '/etc/../etc/group', FALSE],
+      6 => ['./../.', TRUE],
+      7 => ['../ok', TRUE],
+      8 => ['ok.txt', FALSE],
+      9 => ['../ok/ok.txt', FALSE],
+    ];
+  }
+
+  /**
    * dataprovider for testMakeFilenameWithUnicode
    * @return array
    */
