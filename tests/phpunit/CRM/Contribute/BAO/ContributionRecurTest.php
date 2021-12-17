@@ -294,8 +294,6 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $templateContribution = $templateContribution->first();
     $this->assertNotNull($templateContribution['template.field']);
     $this->assertEquals('Second and most recent Contribution', $templateContribution['template.field']);
-    $this->callAPISuccess('CustomField', 'delete', ['id' => $custom_field['id']]);
-    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $custom_group['id']]);
   }
 
   /**

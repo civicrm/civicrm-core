@@ -393,6 +393,23 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->customGroupDelete($ids['custom_group_id']);
   }
 
+  public function testUpdateSharedAddressWithCustomFields() {
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+
+    $params = $this->_params;
+    $params['custom_' . $ids['custom_field_id']] = "custom string";
+
+    $firstAddress = $this->callAPISuccess($this->_entity, 'create', $params);
+
+    $contactIdB = $this->individualCreate();
+
+    $secondAddressParams = array_merge(['contact_id' => $contactIdB, 'master_id' => $firstAddress['id']], $firstAddress);
+    unset($secondAddressParams['id']);
+    $secondAddress = $this->callAPISuccess('Address', 'create', $secondAddressParams);
+    // Ensure an update to the second address doesn't cause a "db error: already exists" when resaving the custom fields.
+    $this->callAPISuccess('Address', 'create', ['id' => $secondAddress['id'], 'contact_id' => $contactIdB, 'master_id' => $firstAddress['id']]);
+  }
+
   /**
    * @param int $version
    * @dataProvider versionThreeAndFour
