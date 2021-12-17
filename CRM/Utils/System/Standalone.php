@@ -150,7 +150,8 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     $htmlize = TRUE
   ) {
     // @todo Implement absolute etc
-    $url = "/{$path}?{$query}";
+    $fragment = $fragment ? ('#' . $fragment) : '';
+    $url = "/{$path}?{$query}$fragment";
     return $url;
   }
 
@@ -214,10 +215,25 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   *
+   * @inheritDoc
    */
   public function logout() {
     // @todo
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+    if ($maintenance) {
+      $smarty = CRM_Core_Smarty::singleton();
+      echo implode('', $smarty->_tpl_vars['pageHTMLHead']);
+    }
+
+    // @todo Add variables from the body tag? (for Shoreditch)
+
+    print $content;
+    return NULL;
   }
 
   /**
