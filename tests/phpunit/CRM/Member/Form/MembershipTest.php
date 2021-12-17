@@ -1430,7 +1430,7 @@ Expires: ',
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testLineItemAmountOnSalesTax() {
+  public function testLineItemAmountOnSalesTax(): void {
     $this->enableTaxAndInvoicing();
     $this->addTaxAccountToFinancialType(2);
     $form = $this->getForm();
@@ -1472,17 +1472,17 @@ Expires: ',
     $this->assertEquals(50.00, $lineItem['line_total']);
     $this->assertEquals(5.00, $lineItem['tax_amount']);
 
+    $_REQUEST['id'] = $lineItem['contribution_id'];
+    $_REQUEST['context'] = 'membership';
     // Simply save the 'Edit Contribution' form
-    $form = new CRM_Contribute_Form_Contribution();
-    $form->_context = 'membership';
-    $form->_values = $this->callAPISuccessGetSingle('Contribution', ['id' => $lineItem['contribution_id'], 'return' => ['total_amount', 'net_amount', 'fee_amount', 'tax_amount']]);
-    $form->testSubmit([
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
       'contact_id' => $this->_individualId,
-      'id' => $lineItem['contribution_id'],
       'financial_type_id' => 2,
+      'total_amount' => 55,
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
-    ],
-    CRM_Core_Action::UPDATE);
+    ]);
+    $form->buildForm();
+    $form->postProcess();
 
     // ensure that the LineItem data remain the same
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['entity_id' => $membership['id'], 'entity_table' => 'civicrm_membership']);
