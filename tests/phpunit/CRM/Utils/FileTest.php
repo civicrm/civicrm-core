@@ -211,6 +211,9 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    */
   public function testIsDirMkdir() {
     $a_dir = sys_get_temp_dir() . '/testIsDir';
+    // I think temp is global to the test node, so if any test failed on this
+    // in the past it doesn't get cleaned up and so already exists.
+    system('rm -rf ' . escapeshellarg($a_dir));
     mkdir($a_dir);
     $this->assertTrue(CRM_Utils_File::isDir($a_dir));
     mkdir($a_dir . '/aSubDir');
@@ -226,6 +229,9 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    */
   public function testIsDirSlashVariations() {
     $a_dir = sys_get_temp_dir() . '/testIsDir';
+    // I think temp is global to the test node, so if any test failed on this
+    // in the past it doesn't get cleaned up and so already exists.
+    system('rm -rf ' . escapeshellarg($a_dir));
     mkdir($a_dir);
 
     $old_cwd = getcwd();
@@ -265,6 +271,9 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     }
 
     $a_dir = sys_get_temp_dir() . '/testIsDir';
+    // I think temp is global to the test node, so if any test failed on this
+    // in the past it doesn't get cleaned up and so already exists.
+    system('rm -rf ' . escapeshellarg($a_dir));
     mkdir($a_dir);
     symlink($a_dir, $a_dir . '_symlink');
     $this->assertTrue(CRM_Utils_File::isDir($a_dir . '_symlink'));
