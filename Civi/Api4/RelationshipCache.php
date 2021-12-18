@@ -49,6 +49,7 @@ class RelationshipCache extends Generic\AbstractEntity {
     $info['bridge'] = [
       'near_contact_id' => [
         'to' => 'far_contact_id',
+        'label' => ts('Related Contacts'),
         'description' => ts('One or more related contacts'),
       ],
     ];
