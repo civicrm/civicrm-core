@@ -33,7 +33,7 @@
     $scope.availableParams = {};
     params = $scope.params = {};
     $scope.index = '';
-    $scope.selectedTab = {result: 'result', code: 'php'};
+    $scope.selectedTab = {result: 'result'};
     $scope.perm = {
       accessDebugOutput: CRM.checkPerm('access debug output'),
       editGroups: CRM.checkPerm('edit groups')
@@ -75,7 +75,6 @@
         {name: 'pipe', label: ts('CV (pipe)'), code: ''}
       ]
     };
-    this.resultFormat = 'json';
     this.resultFormats = [
       {
         name: 'json',
@@ -91,10 +90,21 @@
       formatForSelect2(schema, entities, 'name', ['description', 'icon']);
     }
 
+    // Prefix other url args with an underscore to avoid conflicts with param names
     $scope.$bindToRoute({
       expr: 'index',
-      param: 'index',
+      param: '_index',
       default: ''
+    });
+    $scope.$bindToRoute({
+      expr: 'selectedTab.code',
+      param: '_lang',
+      default: 'php'
+    });
+    $scope.$bindToRoute({
+      expr: '$ctrl.resultFormat',
+      param: '_format',
+      default: 'json'
     });
 
     function ucfirst(str) {
@@ -879,6 +889,9 @@
     };
 
     ctrl.formatResult = function() {
+      if (!response) {
+        return;
+      }
       $scope.result = [formatMeta(response.meta)];
       switch (ctrl.resultFormat) {
         case 'json':
