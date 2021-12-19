@@ -1756,7 +1756,12 @@ class CRM_Utils_System {
     $inc_dirs = explode(PATH_SEPARATOR, get_include_path());
     foreach ($inc_dirs as $inc_dir) {
       $target_dir = $inc_dir . DIRECTORY_SEPARATOR . $relpath;
-      if (is_dir($target_dir)) {
+      // While it seems pointless to have a folder that's outside open_basedir
+      // listed in include_path and that seems more like a configuration issue,
+      // not everyone has control over the hosting provider's include_path and
+      // this does happen out in the wild, so use our wrapper to avoid flooding
+      // logs.
+      if (CRM_Utils_File::isDir($target_dir)) {
         $cur_list = scandir($target_dir);
         foreach ($cur_list as $fname) {
           if ($fname != '.' && $fname != '..') {
