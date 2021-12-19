@@ -1117,7 +1117,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     ];
     $contributionParams['payment_instrument_id'] = $this->_paymentProcessor['payment_instrument_id'];
 
-    $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($this,
+    $contribution = $this->processFormContribution(
       $this->_params,
       NULL,
       $contributionParams,
@@ -1193,6 +1193,187 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
+    return $contribution;
+  }
+
+  /**
+   * Process the contribution.
+   *
+   * @todo - this form is a copy of the previously shared code on the front
+   * end form - not all aspects of the code will be relevant to this form.
+   *
+   * @param array $params
+   * @param array $result
+   * @param array $contributionParams
+   *   Parameters to be passed to contribution create action.
+   *   This differs from params in that we are currently adding params to it and 1) ensuring they are being
+   *   passed consistently & 2) documenting them here.
+   *   - contact_id
+   *   - line_item
+   *   - is_test
+   *   - campaign_id
+   *   - contribution_page_id
+   *   - source
+   *   - payment_type_id
+   *   - thankyou_date (not all forms will set this)
+   *
+   * @param CRM_Financial_DAO_FinancialType $financialType
+   * @param bool $online
+   *   Is the form a front end form? If so set a bunch of unpredictable things that should be passed in from the form.
+   *
+   * @param int $billingLocationID
+   *   ID of billing location type.
+   * @param bool $isRecur
+   *   Is this recurring?
+   *
+   * @return \CRM_Contribute_DAO_Contribution
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function processFormContribution(
+    $params,
+    $result,
+    $contributionParams,
+    $financialType,
+    $online,
+    $billingLocationID,
+    $isRecur
+  ) {
+    $form = $this;
+    $transaction = new CRM_Core_Transaction();
+    $contactID = $contributionParams['contact_id'];
+
+    $isEmailReceipt = !empty($form->_values['is_email_receipt']);
+    $isSeparateMembershipPayment = !empty($params['separate_membership_payment']);
+    $pledgeID = !empty($params['pledge_id']) ? $params['pledge_id'] : $form->_values['pledge_id'] ?? NULL;
+    if (!$isSeparateMembershipPayment && !empty($form->_values['pledge_block_id']) &&
+      (!empty($params['is_pledge']) || $pledgeID)) {
+      $isPledge = TRUE;
+    }
+    else {
+      $isPledge = FALSE;
+    }
+
+    // add these values for the recurringContrib function ,CRM-10188
+    $params['financial_type_id'] = $financialType->id;
+
+    $contributionParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params, $billingLocationID);
+
+    //@todo - this is being set from the form to resolve CRM-10188 - an
+    // eNotice caused by it not being set @ the front end
+    // however, we then get it being over-written with null for backend contributions
+    // a better fix would be to set the values in the respective forms rather than require
+    // a function being shared by two forms to deal with their respective values
+    // moving it to the BAO & not taking the $form as a param would make sense here.
+    if (!isset($params['is_email_receipt']) && $isEmailReceipt) {
+      $params['is_email_receipt'] = $isEmailReceipt;
+    }
+    $params['is_recur'] = $isRecur;
+    $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'] ?? NULL;
+    $recurringContributionID = CRM_Contribute_Form_Contribution_Confirm::processRecurringContribution($form, $params, $contactID, $financialType);
+
+    $now = date('YmdHis');
+    $receiptDate = $params['receipt_date'] ?? NULL;
+    if ($isEmailReceipt) {
+      $receiptDate = $now;
+    }
+
+    if (isset($params['amount'])) {
+      $contributionParams = array_merge(CRM_Contribute_Form_Contribution_Confirm::getContributionParams(
+        $params, $financialType->id,
+        $result, $receiptDate,
+        $recurringContributionID), $contributionParams
+      );
+      $contributionParams['non_deductible_amount'] = CRM_Contribute_Form_Contribution_Confirm::getNonDeductibleAmount($params, $financialType, $online, $form);
+      $contributionParams['skipCleanMoney'] = TRUE;
+      // @todo this is the wrong place for this - it should be done as close to form submission
+      // as possible
+      $contributionParams['total_amount'] = $params['amount'];
+
+      $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
+
+      if (Civi::settings()->get('invoicing')) {
+        $dataArray = [];
+        // @todo - interrogate the line items passed in on the params array.
+        // No reason to assume line items will be set on the form.
+        foreach ($form->_lineItem as $lineItemKey => $lineItemValue) {
+          foreach ($lineItemValue as $key => $value) {
+            if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
+              if (isset($dataArray[$value['tax_rate']])) {
+                $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + $value['tax_amount'];
+              }
+              else {
+                $dataArray[$value['tax_rate']] = $value['tax_amount'];
+              }
+            }
+          }
+        }
+        $smarty = CRM_Core_Smarty::singleton();
+        $smarty->assign('dataArray', $dataArray);
+        $smarty->assign('totalTaxAmount', $params['tax_amount'] ?? NULL);
+      }
+
+      // lets store it in the form variable so postProcess hook can get to this and use it
+      $form->_contributionID = $contribution->id;
+    }
+
+    // process soft credit / pcp params first
+    CRM_Contribute_BAO_ContributionSoft::formatSoftCreditParams($params, $form);
+
+    //CRM-13981, processing honor contact into soft-credit contribution
+    CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
+
+    if ($isPledge) {
+      $form = CRM_Contribute_Form_Contribution_Confirm::handlePledge($form, $params, $contributionParams, $pledgeID, $contribution, $isEmailReceipt);
+    }
+
+    if ($online && $contribution) {
+      CRM_Core_BAO_CustomValueTable::postProcess($params,
+        'civicrm_contribution',
+        $contribution->id,
+        'Contribution'
+      );
+    }
+    elseif ($contribution) {
+      //handle custom data.
+      $params['contribution_id'] = $contribution->id;
+      if (!empty($params['custom']) &&
+        is_array($params['custom'])
+      ) {
+        CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_contribution', $contribution->id);
+      }
+    }
+    // Save note
+    if ($contribution && !empty($params['contribution_note'])) {
+      $noteParams = [
+        'entity_table' => 'civicrm_contribution',
+        'note' => $params['contribution_note'],
+        'entity_id' => $contribution->id,
+        'contact_id' => $contribution->contact_id,
+      ];
+
+      CRM_Core_BAO_Note::add($noteParams, []);
+    }
+
+    //create contribution activity w/ individual and target
+    //activity w/ organisation contact id when onbelf, CRM-4027
+    $actParams = [];
+    $targetContactID = NULL;
+    if (!empty($params['onbehalf_contact_id'])) {
+      $actParams = [
+        'source_contact_id' => $params['onbehalf_contact_id'],
+        'on_behalf' => TRUE,
+      ];
+      $targetContactID = $contribution->contact_id;
+    }
+
+    // create an activity record
+    if ($contribution) {
+      CRM_Activity_BAO_Activity::addActivity($contribution, 'Contribution', $targetContactID, $actParams);
+    }
+
+    $transaction->commit();
     return $contribution;
   }
 

@@ -1013,6 +1013,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   /**
    * Process the contribution.
    *
+   * @todo - this code was previously shared with the backoffice form - some parts of this
+   * function may relate to that form, not this one.
+   *
    * @param CRM_Core_Form $form
    * @param array $params
    * @param array $result
@@ -1043,7 +1046,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function processFormContribution(
+  protected static function processFormContribution(
     &$form,
     $params,
     $result,
