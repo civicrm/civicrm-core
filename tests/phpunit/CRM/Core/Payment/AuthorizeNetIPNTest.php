@@ -10,16 +10,6 @@ use Civi\Api4\Contribution;
 class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   use CRMTraits_Financial_OrderTrait;
 
-  /**
-   * Should financials be checked after the test but before tear down.
-   *
-   * Ideally all tests (or at least all that call any financial api calls ) should do this but there
-   * are some test data issues and some real bugs currently blocking.
-   *
-   * @var bool
-   */
-  protected $isValidateFinancialsOnPostAssert = TRUE;
-
   protected $_contributionID;
   protected $_invoiceID = 'c2r9c15f7be20b4f3fef1f77e4c37424';
   protected $_financialTypeID = 1;
@@ -29,8 +19,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   protected $_paymentProcessorID;
 
   /**
-   *
-   * @throws \CRM_Core_Exception
+   * Setup for test.
    */
   public function setUp(): void {
     parent::setUp();
@@ -70,7 +59,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'id' => $this->_contributionPageID,
       'is_email_receipt' => FALSE,
     ];
-    $this->callAPISuccess('contributionPage', 'update', $api_params);
+    $this->callAPISuccess('ContributionPage', 'update', $api_params);
 
     // Create initial recurring payment and initial contribution.
     // Note - we can't use setupRecurringPaymentProcessorTransaction(), which
@@ -80,49 +69,50 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     // closely mimic what happens with a live transaction to test that
     // is_email_receipt is not set to 1 if the originating contribution page
     // has is_email_receipt set to 0.
-    $form = new CRM_Contribute_Form_Contribution();
-    $form->_mode = 'Live';
+    $_REQUEST['mode'] = 'live';
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
+      'total_amount' => 200,
+      'financial_type_id' => 1,
+      'receive_date' => date('m/d/Y'),
+      'receive_date_time' => date('H:i:s'),
+      'contact_id' => $this->_contactID,
+      'contribution_status_id' => 1,
+      'credit_card_number' => 4444333322221111,
+      'cvv2' => 123,
+      'credit_card_exp_date' => [
+        'M' => 9,
+        'Y' => 2025,
+      ],
+      'credit_card_type' => 'Visa',
+      'billing_first_name' => 'Junko',
+      'billing_middle_name' => '',
+      'billing_last_name' => 'Adams',
+      'billing_street_address-5' => time() . ' Lincoln St S',
+      'billing_city-5' => 'Maryknoll',
+      'billing_state_province_id-5' => 1031,
+      'billing_postal_code-5' => 10545,
+      'billing_country_id-5' => 1228,
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
+      'installments' => 2,
+      'hidden_AdditionalDetail' => 1,
+      'hidden_Premium' => 1,
+      'payment_processor_id' => $this->_paymentProcessorID,
+      'currency' => 'USD',
+      'source' => 'bob sled race',
+      'contribution_page_id' => $this->_contributionPageID,
+      'is_recur' => TRUE,
+    ]);
+    $form->buildForm();
     try {
-      $contribution = $form->testSubmit([
-        'total_amount' => 200,
-        'financial_type_id' => 1,
-        'receive_date' => date('m/d/Y'),
-        'receive_date_time' => date('H:i:s'),
-        'contact_id' => $this->_contactID,
-        'contribution_status_id' => 1,
-        'credit_card_number' => 4444333322221111,
-        'cvv2' => 123,
-        'credit_card_exp_date' => [
-          'M' => 9,
-          'Y' => 2025,
-        ],
-        'credit_card_type' => 'Visa',
-        'billing_first_name' => 'Junko',
-        'billing_middle_name' => '',
-        'billing_last_name' => 'Adams',
-        'billing_street_address-5' => time() . ' Lincoln St S',
-        'billing_city-5' => 'Maryknoll',
-        'billing_state_province_id-5' => 1031,
-        'billing_postal_code-5' => 10545,
-        'billing_country_id-5' => 1228,
-        'frequency_interval' => 1,
-        'frequency_unit' => 'month',
-        'installments' => 2,
-        'hidden_AdditionalDetail' => 1,
-        'hidden_Premium' => 1,
-        'payment_processor_id' => $this->_paymentProcessorID,
-        'currency' => 'USD',
-        'source' => 'bob sled race',
-        'contribution_page_id' => $this->_contributionPageID,
-        'is_recur' => TRUE,
-      ], CRM_Core_Action::ADD);
+      $form->postProcess();
     }
     catch (PaymentProcessorException $e) {
       $this->markTestSkipped('Error from A.net - cannot proceed');
     }
-
-    $this->ids['Contribution'][0] = $contribution->id;
-    $this->_contributionRecurID = $contribution->contribution_recur_id;
+    $contribution = Contribution::get()->setLimit(1)->addWhere('contribution_page_id', '=', $this->_contributionPageID)->execute()->first();
+    $this->ids['Contribution'][0] = $contribution['id'];
+    $this->_contributionRecurID = $contribution['contribution_recur_id'];
 
     $contributionRecur  = $this->callAPISuccessGetSingle('ContributionRecur', ['id' => $this->_contributionRecurID]);
     $processor_id = $contributionRecur['processor_id'];
@@ -159,7 +149,9 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testIPNPaymentRecurSuccess(): void {
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
@@ -170,7 +162,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->assertEquals(1, $contribution['contribution_status_id']);
     $this->assertEquals('6511143069', $contribution['trxn_id']);
     // source gets set by processor
-    $this->assertTrue(substr($contribution['contribution_source'], 0, 20) == "Online Contribution:");
+    $this->assertSame(strpos($contribution['contribution_source'], 'Online Contribution:'), 0);
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurSubsequentTransaction());
@@ -189,8 +181,12 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
 
   /**
    * Test payment processor is correctly assigned for the IPN payment.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testIPNPaymentRecurSuccessMultiAuthNetProcessor() {
+  public function testIPNPaymentRecurSuccessMultiAuthNetProcessor(): void {
     //Create and set up recur payment using second instance of AuthNet Processor.
     $this->_paymentProcessorID2 = $this->paymentProcessorAuthorizeNetCreate(['name' => 'Authorize2', 'is_test' => 0]);
     $this->setupRecurringPaymentProcessorTransaction(['payment_processor_id' => $this->_paymentProcessorID2]);
@@ -214,7 +210,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testIPNPaymentRecurSuccessSuppliedReceiveDate() {
+  public function testIPNPaymentRecurSuccessSuppliedReceiveDate(): void {
     $this->setupRecurringPaymentProcessorTransaction();
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
     $IPN->main();
@@ -240,6 +236,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
    * Test IPN response updates contribution_recur & contribution for first &
    * second contribution
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
@@ -278,9 +275,11 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   /**
    * Test IPN response mails don't leak.
    *
-   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testIPNPaymentMembershipRecurSuccessNoLeakage() {
+  public function testIPNPaymentMembershipRecurSuccessNoLeakage(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $this->setupMembershipRecurringPaymentProcessorTransaction(['is_email_receipt' => TRUE]);
     $this->addProfile('supporter_profile', $this->_contributionPageID);
@@ -312,7 +311,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     ]);
     $mut->clearMessages();
     $this->_contactID = $this->individualCreate(['first_name' => 'Antonia', 'prefix_id' => 'Mrs.', 'email' => 'antonia_anderson@civicrm.org']);
-    $this->_invoiceID = uniqid();
+    $this->_invoiceID = 9955;
 
     // Note, the second contribution is not in honor of anyone and the
     // receipt should not mention honor at all.
@@ -340,7 +339,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'Honor',
       'In Memory of',
     ];
-    $mails = $mut->getAllMessages('raw');
+    $mails = $mut->getAllMessages();
     foreach ($mails as $mail) {
       $mut->checkMailForStrings([], $shouldNotBeInMailing, '', $mail);
     }
@@ -350,8 +349,12 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
 
   /**
    * Test IPN response mails don't leak.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testIPNPaymentMembershipRecurSuccessNoLeakageOnlineThenOffline() {
+  public function testIPNPaymentMembershipRecurSuccessNoLeakageOnlineThenOffline(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $this->setupMembershipRecurringPaymentProcessorTransaction(['is_email_receipt' => TRUE]);
     $this->addProfile('supporter_profile', $this->_contributionPageID);
@@ -372,7 +375,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     ]);
 
     $this->_contactID = $this->individualCreate(['first_name' => 'Antonia', 'prefix_id' => 'Mrs.', 'email' => 'antonia_anderson@civicrm.org']);
-    $this->_invoiceID = uniqid();
+    $this->_invoiceID = 8977;
     $this->_contributionPageID = NULL;
 
     $this->setupMembershipRecurringPaymentProcessorTransaction(['is_email_receipt' => TRUE]);
@@ -412,34 +415,34 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
    * @return array
    *   Parameters like AuthorizeNet silent post paramters.
    */
-  public function getRecurTransaction($params = []) {
+  public function getRecurTransaction(array $params = []): array {
     return array_merge([
       'x_amount' => '200.00',
-      "x_country" => 'US',
-      'x_phone' => "",
-      "x_fax" => "",
-      "x_email" => "me@gmail.com",
-      "x_description" => "lots of money",
-      "x_type" => "auth_capture",
-      "x_ship_to_first_name" => "",
-      "x_ship_to_last_name" => "",
-      "x_ship_to_company" => "",
-      "x_ship_to_address" => "",
-      "x_ship_to_city" => "",
-      "x_ship_to_state" => "",
-      "x_ship_to_zip" => "",
-      "x_ship_to_country" => "",
-      "x_tax" => "0.00",
-      "x_duty" => "0.00",
-      "x_freight" => "0.00",
-      "x_tax_exempt" => "FALSE",
-      "x_po_num" => "",
-      "x_MD5_Hash" => "1B7C0C5B4DEDD9CAD0636E35E22FC594",
-      "x_cvv2_resp_code" => "",
-      "x_cavv_response" => "",
-      "x_test_request" => "false",
-      "x_subscription_id" => $this->_contactID,
-      "x_subscription_paynum" => "1",
+      'x_country' => 'US',
+      'x_phone' => '',
+      'x_fax' => '',
+      'x_email' => 'me@gmail.com',
+      'x_description' => 'lots of money',
+      'x_type' => 'auth_capture',
+      'x_ship_to_first_name' => '',
+      'x_ship_to_last_name' => '',
+      'x_ship_to_company' => '',
+      'x_ship_to_address' => '',
+      'x_ship_to_city' => '',
+      'x_ship_to_state' => '',
+      'x_ship_to_zip' => '',
+      'x_ship_to_country' => '',
+      'x_tax' => '0.00',
+      'x_duty' => '0.00',
+      'x_freight' => '0.00',
+      'x_tax_exempt' => 'FALSE',
+      'x_po_num' => '',
+      'x_MD5_Hash' => '1B7C0C5B4DEDD9CAD0636E35E22FC594',
+      'x_cvv2_resp_code' => '',
+      'x_cavv_response' => '',
+      'x_test_request' => 'false',
+      'x_subscription_id' => $this->_contactID,
+      'x_subscription_paynum' => '1',
       'x_first_name' => 'Robert',
       'x_zip' => '90210',
       'x_state' => 'WA',
@@ -462,9 +465,11 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   }
 
   /**
+   * @param array $params
+   *
    * @return array
    */
-  public function getRecurSubsequentTransaction($params = []) {
+  public function getRecurSubsequentTransaction($params = []): array {
     return array_merge($this->getRecurTransaction(), [
       'x_trans_id' => 'second_one',
       'x_MD5_Hash' => 'EA7A3CD65A85757827F51212CA1486A8',
