@@ -1199,7 +1199,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @return int|null
    */
-  public static function processRecurringContribution(&$form, &$params, $contactID, $contributionType) {
+  public static function processRecurringContribution($form, $params, $contactID, $contributionType) {
 
     if (empty($params['is_recur'])) {
       return NULL;
