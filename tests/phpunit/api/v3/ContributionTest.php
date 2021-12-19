@@ -3457,8 +3457,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testPendingToCompleteContribution(): void {
     $this->createPriceSetWithPage('membership');
-    $this->setUpPendingContribution($this->_ids['price_field_value'][0]);
-    $this->callAPISuccess('membership', 'getsingle', ['id' => $this->_ids['membership']]);
+    $this->setUpPendingContribution($this->_ids['price_field_value'][0], '', [], [], [
+      'start_date' => 'yesterday',
+      'join_date' => 'yesterday',
+    ]);
+    $this->callAPISuccess('Membership', 'getsingle', ['id' => $this->_ids['membership']]);
     // Case 1: Assert that Membership Signup Activity is created on Pending to Completed Contribution via backoffice
     $activity = $this->callAPISuccess('Activity', 'get', [
       'activity_type_id' => 'Membership Signup',
@@ -3466,7 +3469,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'status_id' => 'Scheduled',
     ]);
     $this->assertEquals(1, $activity['count']);
-    $_REQUEST['id'] = $this->getContributionID();
+    $_REQUEST['id'] = $this->getContributionID('');
     $_REQUEST['action'] = 'update';
     // change pending contribution to completed
     /* @var CRM_Contribute_Form_Contribution $form */
@@ -3507,7 +3510,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     // 2.b Contribution activity created to record successful payment
     $activity = $this->callAPISuccess('Activity', 'get', [
       'activity_type_id' => 'Contribution',
-      'source_record_id' => $this->getContributionID(),
+      'source_record_id' => $this->getContributionID(''),
       'status_id' => 'Completed',
     ]);
     $this->assertEquals(1, $activity['count']);
