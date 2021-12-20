@@ -228,14 +228,7 @@ LIMIT 1
     ];
     // on create fetch statuses on basis of component
     if (!$name) {
-      $statusNamesToUnset = array_merge($statusNamesToUnset, [
-        'Refunded',
-        'Chargeback',
-        'Pending refund',
-        'In Progress',
-        'Overdue',
-        'Partially paid',
-      ]);
+      return self::getPendingCompleteFailedAndCancelledStatuses();
     }
     else {
       switch ($name) {
