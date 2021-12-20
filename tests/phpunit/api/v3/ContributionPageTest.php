@@ -1081,6 +1081,9 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->setUpMembershipContributionPage(TRUE);
     $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
     $dummyPP->setDoDirectPaymentResult(['payment_status_id' => 1, 'trxn_id' => 'create_first_success']);
+    // Set Hook to check contributionRecurID is set
+    $this->hookClass->setHook('civicrm_alterPaymentProcessorParams', [$this, 'hookCheckRecurID']);
+
     $submitParams = array_merge($this->getSubmitParamsContributionPlusMembership(TRUE), [
       'is_recur' => 1,
       'auto_renew' => 1,
@@ -1089,16 +1092,29 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     ]);
 
     $this->callAPIAndDocument('ContributionPage', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page');
-    $contribution = $this->callAPISuccess('contribution', 'get', [
+    $contributions = $this->callAPISuccess('contribution', 'get', [
       'contribution_page_id' => $this->_ids['contribution_page'],
       'contribution_status_id' => 1,
-    ]);
+    ])['values'];
 
-    $this->assertEquals(2, $contribution['count']);
+    $this->assertCount(2, $contributions);
+
+    // Check the recurring contribution is linked to the membership payment.
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', []);
     $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id']]);
-    $this->assertNotEmpty($contribution['values'][$membershipPayment['contribution_id']]['contribution_recur_id']);
+    $this->assertNotEmpty($contributions[$membershipPayment['contribution_id']]['contribution_recur_id']);
     $this->callAPISuccess('ContributionRecur', 'getsingle');
+  }
+
+  /**
+   * Implements hook_civicrm_alterPaymentProcessorParams().
+   *
+   * @throws CRM_Core_Exception
+   * @noinspection PhpUnusedParameterInspection
+   */
+  public function hookCheckRecurID($paymentObj, $rawParams, $cookedParams): void {
+    // @todo - fix https://lab.civicrm.org/dev/core/-/issues/567 by testing for correct passing of
+    // contributionRecurID.
   }
 
   /**
