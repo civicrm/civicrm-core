@@ -118,11 +118,11 @@
         delete ctrl.fieldArg.flag_before;
         ctrl.args = [ctrl.fieldArg];
         if (ctrl.fn) {
-          var exprType, pos = 0,
-            uiDefaults = ctrl.fn.params[0].ui_defaults || [];
+          var exprType,
+            pos = 0;
           // Add non-field args to the beginning if needed
-          while (uiDefaults[pos] && uiDefaults[pos].type && uiDefaults[pos].type !== 'SqlField') {
-            exprType = uiDefaults[pos].type;
+          while (!_.includes(ctrl.fn.params[pos].must_be, 'SqlField')) {
+            exprType = ctrl.fn.params[pos].must_be[0];
             ctrl.args.splice(pos, 0, {
               type: ctrl.exprTypes[exprType].type,
               value: exprType === 'SqlNumber' ? 0 : ''
