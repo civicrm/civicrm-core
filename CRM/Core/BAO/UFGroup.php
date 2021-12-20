@@ -2093,7 +2093,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       );
     }
     elseif ($fieldName === 'contribution_status_id') {
-      $contributionStatuses = CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses();
+      $contributionStatuses = CRM_Contribute_BAO_Contribution_Utils::getPendingCompleteFailedAndCancelledStatuses();
 
       $form->add('select', $name, $title,
         $contributionStatuses, $required, ['placeholder' => TRUE]
