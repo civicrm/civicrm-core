@@ -448,12 +448,12 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
       }
       //load the data in tabs.
       $this->{'browse' . ucfirst($subPageType)}();
-      $this->assign('subPageType', ucfirst($subPageType));
     }
     // Initialize tabs
     else {
       $this->buildTabs();
     }
+    $this->assign('subPageType', ucfirst($subPageType));
   }
 
   /**
@@ -477,6 +477,11 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         'valid' => TRUE,
         'active' => TRUE,
         'link' => CRM_Utils_System::url('civicrm/campaign', "reset=1&type=$name"),
+        'extra' => NULL,
+        'template' => NULL,
+        'count' => NULL,
+        'icon' => NULL,
+        'class' => NULL,
       ];
     }
     $allTabs['campaign']['class'] = 'livePage';
