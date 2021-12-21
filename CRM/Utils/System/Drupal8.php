@@ -356,7 +356,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @return int|null
    */
   public function getUfId($username) {
-    if ($id = user_load_by_name($username)->id()) {
+    $user = user_load_by_name($username);
+    if ($user && $id = $user->id()) {
       return $id;
     }
   }
