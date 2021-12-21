@@ -78,7 +78,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
     if ($address->id) {
       // first get custom field from master address if any
       if (isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id'])) {
-        $address->copyCustomFields($params['master_id'], $address->id);
+        $address->copyCustomFields($params['master_id'], $address->id, $hook);
       }
 
       if (isset($params['custom'])) {

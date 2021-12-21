@@ -376,6 +376,13 @@ class CRM_Core_BAO_CustomValueTable {
         if (!empty($customValue['id'])) {
           $cvParam['id'] = $customValue['id'];
         }
+        elseif (empty($cvParam['is_multiple']) && !empty($entityID)) {
+          // dev/core#3000 Ensure that if we are not dealing with multiple record custom data and for some reason have got here without getting the id of the record in the custom table for this entityId let us give it one last shot
+          $rowId = CRM_Core_DAO::singleValueQuery("SELECT id FROM {$cvParam['table_name']} WHERE entity_id = %1", [1 => [$entityID, 'Integer']]);
+          if (!empty($rowId)) {
+            $cvParam['id'] = $rowId;
+          }
+        }
         if (!array_key_exists($customValue['table_name'], $cvParams)) {
           $cvParams[$customValue['table_name']] = [];
         }
