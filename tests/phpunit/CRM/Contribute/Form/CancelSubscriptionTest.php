@@ -49,7 +49,7 @@ class CRM_Contribute_Form_CancelSubscriptionTest extends CRM_Contribute_Form_Rec
       "Subject: Recurring Contribution Cancellation Notification - Mr. Anthony\n Anderson II",
       'Return-Path: bob@example.org',
       'Dear Anthony,',
-      'Your recurring contribution of $ 10.00, every 1 month has been cancelled as requested',
+      'Your recurring contribution of $10.00, every 1 month has been cancelled as requested',
     ];
   }
 
