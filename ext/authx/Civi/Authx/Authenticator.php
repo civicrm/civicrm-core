@@ -101,6 +101,7 @@ class Authenticator {
     ]);
     $tgt->setPrincipal($principal);
 
+    $this->checkPolicy($tgt);
     $this->login($tgt);
     return TRUE;
   }
@@ -166,9 +167,16 @@ class Authenticator {
       $this->reject('Invalid credential');
     }
 
+    if ($tgt->contactId) {
+      $findContact = \Civi\Api4\Contact::get(0)->addWhere('id', '=', $tgt->contactId);
+      if ($findContact->execute()->count() === 0) {
+        $this->reject(sprintf('Contact ID %d is invalid', $tgt->contactId));
+      }
+    }
+
     if ($tgt->flow === 'system') {
-      // We should never get here... let's just make sure...
-      $this->reject('System authentication does not use this call-path.');
+      // Most policies don't apply to system-login.
+      return;
     }
 
     $allowCreds = \Civi::settings()->get('authx_' . $tgt->flow . '_cred');
@@ -235,7 +243,7 @@ class Authenticator {
 
     if (empty($tgt->contactId)) {
       // It shouldn't be possible to get here due policy checks. But just in case.
-      throw new \LogicException("Cannot login. Failed to determine contact ID.");
+      $this->reject("Cannot login. Failed to determine contact ID.");
     }
 
     if (!($tgt->useSession)) {
@@ -378,16 +386,21 @@ class AuthenticatorTarget {
   public function setPrincipal($args) {
     if (!empty($args['user'])) {
       $args['userId'] = $args['userId'] ?? \CRM_Core_Config::singleton()->userSystem->getUfId($args['user']);
-      unset($args['user']);
+      if ($args['userId']) {
+        unset($args['user']);
+      }
+      else {
+        throw new AuthxException("Must specify principal with valid user, userId, or contactId");
+      }
     }
     if (empty($args['userId']) && empty($args['contactId'])) {
-      throw new \InvalidArgumentException("Must specify principal by userId and/or contactId");
+      throw new AuthxException("Must specify principal with valid user, userId, or contactId");
     }
     if (empty($args['credType'])) {
-      throw new \InvalidArgumentException("Must specify the type of credential used to identify the principal");
+      throw new AuthxException("Must specify the type of credential used to identify the principal");
     }
     if ($this->hasPrincipal()) {
-      throw new \LogicException("Principal has already been specified");
+      throw new AuthxException("Principal has already been specified");
     }
 
     if (empty($args['contactId']) && !empty($args['userId'])) {

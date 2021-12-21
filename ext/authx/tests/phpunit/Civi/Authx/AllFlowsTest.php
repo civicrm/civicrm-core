@@ -474,8 +474,9 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $withCv = function($phpStmt) {
       $cmd = strtr('cv ev @PHP', ['@PHP' => escapeshellarg($phpStmt)]);
       exec($cmd, $output, $val);
-      $this->assertEquals(0, $val, "Command returned error ($cmd) ($val)");
-      return json_decode(implode("", $output), TRUE);
+      $fullOutput = implode("\n", $output);
+      $this->assertEquals(0, $val, "Command returned error ($cmd) ($val): " . $fullOutput);
+      return json_decode($fullOutput, TRUE);
     };
 
     $principals = [
@@ -492,6 +493,19 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       $this->assertEquals('system', $report['flow'], $msg);
       $this->assertEquals('none', $report['credType'], $msg);
       $this->assertEquals(FALSE, $report['useSession'], $msg);
+    }
+
+    $invalidPrincipals = [
+      ['contactId', 999999, AuthxException::CLASS, ';Contact ID 999999 is invalid;'],
+      ['userId', 999999, AuthxException::CLASS, ';Cannot login. Failed to determine contact ID.;'],
+      ['user', 'randuser' . mt_rand(0, 32767), AuthxException::CLASS, ';Must specify principal with valid user, userId, or contactId;'],
+    ];
+    foreach ($invalidPrincipals as $invalidPrincipal) {
+      [$principalField, $principalValue, $expectExceptionClass, $expectExceptionMessage] = $invalidPrincipal;
+      $report = $withCv(sprintf('try { return authx_login(%s, FALSE); } catch (Exception $e) { return [get_class($e), $e->getMessage()]; }', var_export([$principalField => $principalValue], 1)));
+      $this->assertTrue(isset($report[0], $report[1]), "authx_login() should fail with invalid credentials ($principalField=>$principalValue). Received array: " . json_encode($report));
+      $this->assertRegExp($expectExceptionMessage, $report[1], "Invalid principal ($principalField=>$principalValue) should generate exception.");
+      $this->assertEquals($expectExceptionClass, $report[0], "Invalid principal ($principalField=>$principalValue) should generate exception.");
     }
   }
 
