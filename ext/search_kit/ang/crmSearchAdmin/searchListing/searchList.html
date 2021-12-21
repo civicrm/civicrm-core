@@ -2,14 +2,20 @@
   <h1 crm-page-title>{{:: ts('Saved Searches') }}</h1>
 
   <!-- Tabs based on the has_base filter -->
-  <ul class="nav nav-tabs">
-    <li ng-repeat="tab in $ctrl.tabs" role="presentation" ng-class="{active: $ctrl.tab === tab.name}">
-      <a href ng-click="$ctrl.tab = tab.name"><i class="crm-i {{:: tab.icon }}"></i>
-        {{:: tab.title }}
-        <span class="badge">{{ tab.rowCount }}</span>
-      </a>
-    </li>
-  </ul>
+  <div class="crm-search-nav-tabs">
+    <ul class="nav nav-tabs">
+      <li ng-repeat="tab in $ctrl.tabs" role="presentation" ng-class="{active: $ctrl.tab === tab.name}">
+        <a href ng-click="$ctrl.tab = tab.name"><i class="crm-i {{:: tab.icon }}"></i>
+          {{:: tab.title }}
+          <span class="badge">{{ tab.rowCount }}</span>
+        </a>
+      </li>
+    </ul>
+    <a class="btn btn-primary" href="#/create/Contact/">
+      <i class="crm-i fa-plus"></i>
+      {{:: ts('New Search') }}
+    </a>
+  </div>
 
   <div ng-repeat="tab in $ctrl.tabs" ng-show="$ctrl.tab === tab.name">
     <div class="form-inline">
@@ -22,9 +28,9 @@
       <span ng-if="$ctrl.getTags().results.length">
         <input class="form-control" ng-model="tab.filters.tags" ng-list crm-ui-select="{multiple: true, data: $ctrl.getTags, placeholder: ts('Filter by tags...')}">
       </span>
-      <a class="btn btn-primary pull-right" ng-if="tab.name === 'custom'" href="#/create/Contact/">
-        <i class="crm-i fa-plus"></i>
-        {{:: ts('New Search') }}
+      <a class="btn btn-secondary btn-sm pull-right" ng-if="tab.name === 'custom'" href ng-click="$ctrl.openImportDialog()">
+        <i class="crm-i fa-upload"></i>
+        {{:: ts('Import') }}
       </a>
     </div>
     <crm-search-admin-search-listing filters="tab.filters" tab-count="tab.rowCount"></crm-search-admin-search-listing>
