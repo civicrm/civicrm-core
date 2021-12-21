@@ -11,7 +11,7 @@
 <div id="alpha-filter">
     <ul>
     {foreach from=$aToZ item=letter}
-        <li {if !empty($letter.class)}class="{$letter.class}"{/if}>{$letter.item}</li>
+        <li {if $letter.class}class="{$letter.class}"{/if}>{$letter.item}</li>
     {/foreach}
     </ul>
 </div>
