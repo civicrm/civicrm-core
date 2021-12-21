@@ -487,8 +487,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->buildCustom($this->_values['honoree_profile_id'], 'honoreeProfileFields', TRUE, 'honor', $fieldTypes);
     }
     $this->assign('receiptFromEmail', $this->_values['receipt_from_email'] ?? NULL);
-    $amount_block_is_active = $this->get('amount_block_is_active');
-    $this->assign('amount_block_is_active', $amount_block_is_active);
+    $this->assign('amount_block_is_active', $this->isFormSupportsNonMembershipContributions());
 
     // Make a copy of line items array to use for display only
     $tplLineItems = $this->_lineItem;
@@ -1438,9 +1437,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       //enabled and contribution amount is not selected. fix for CRM-3010
       $isPaidMembership = TRUE;
     }
-    $isProcessSeparateMembershipTransaction = $this->isSeparateMembershipTransaction($this->_id, $this->_values['amount_block_is_active']);
+    $isProcessSeparateMembershipTransaction = $this->isSeparateMembershipTransaction($this->_id);
 
-    if ($this->_values['amount_block_is_active']) {
+    if ($this->isFormSupportsNonMembershipContributions()) {
       $financialTypeID = $this->_values['financial_type_id'];
     }
     else {
@@ -1876,13 +1875,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * transaction AND a membership transaction AND the payment processor supports double financial transactions (ie. NOT doTransferCheckout style)
    *
    * @param int $formID
-   * @param bool $amountBlockActiveOnForm
    *
    * @return bool
    */
-  public function isSeparateMembershipTransaction($formID, $amountBlockActiveOnForm) {
+  protected function isSeparateMembershipTransaction($formID): bool {
     $memBlockDetails = CRM_Member_BAO_Membership::getMembershipBlock($formID);
-    if (!empty($memBlockDetails['is_separate_payment']) && $amountBlockActiveOnForm) {
+    if (!empty($memBlockDetails['is_separate_payment']) && $this->isFormSupportsNonMembershipContributions()) {
       return TRUE;
     }
     return FALSE;
@@ -2495,7 +2493,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (!empty($membershipParams['selectMembership'])) {
       // CRM-12233
       $membershipLineItems = $formLineItems;
-      if ($this->_separateMembershipPayment && $this->_values['amount_block_is_active']) {
+      if ($this->_separateMembershipPayment && $this->isFormSupportsNonMembershipContributions()) {
         $membershipLineItems = [];
         foreach ($this->_values['fee'] as $key => $feeValues) {
           if ($feeValues['name'] == 'membership_amount') {

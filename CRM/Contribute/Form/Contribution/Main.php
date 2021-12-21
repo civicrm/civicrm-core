@@ -946,7 +946,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
       // CRM-12233
       if ($membershipIsActive && empty($self->_membershipBlock['is_required'])
-        && $self->_values['amount_block_is_active']
+        && $self->isFormSupportsNonMembershipContributions()
       ) {
         $membershipFieldId = $contributionFieldId = $errorKey = $otherFieldId = NULL;
         foreach ($self->_values['fee'] as $fieldKey => $fieldValue) {
