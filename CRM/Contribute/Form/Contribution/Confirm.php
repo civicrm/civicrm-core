@@ -2331,27 +2331,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // store the fact that this is a membership and membership type is selected
     if ($this->isMembershipSelected($membershipParams)) {
-      if (!$this->_useForMember) {
-        $this->assign('membership_assign', TRUE);
-        $this->set('membershipTypeID', $this->_params['selectMembership']);
-      }
-
-      if ($this->_action & CRM_Core_Action::PREVIEW) {
-        $membershipParams['is_test'] = 1;
-      }
-      if ($this->_params['is_pay_later']) {
-        $membershipParams['is_pay_later'] = 1;
-      }
-
-      if (isset($this->_params['onbehalf_contact_id'])) {
-        $membershipParams['onbehalf_contact_id'] = $this->_params['onbehalf_contact_id'];
-      }
-      //inherit campaign from contribution page.
-      if (!array_key_exists('campaign_id', $membershipParams)) {
-        $membershipParams['campaign_id'] = $this->_values['campaign_id'] ?? NULL;
-      }
-
-      $this->_params = CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $membershipParams, TRUE);
       $this->doMembershipProcessing($contactID, $membershipParams, $premiumParams, $this->_lineItem);
     }
     else {
@@ -2453,6 +2432,28 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $formLineItems
    */
   protected function doMembershipProcessing($contactID, $membershipParams, $premiumParams, $formLineItems) {
+    if (!$this->_useForMember) {
+      $this->assign('membership_assign', TRUE);
+      $this->set('membershipTypeID', $this->_params['selectMembership']);
+    }
+
+    if ($this->_action & CRM_Core_Action::PREVIEW) {
+      $membershipParams['is_test'] = 1;
+    }
+    if ($this->_params['is_pay_later']) {
+      $membershipParams['is_pay_later'] = 1;
+    }
+
+    if (isset($this->_params['onbehalf_contact_id'])) {
+      $membershipParams['onbehalf_contact_id'] = $this->_params['onbehalf_contact_id'];
+    }
+    //inherit campaign from contribution page.
+    if (!array_key_exists('campaign_id', $membershipParams)) {
+      $membershipParams['campaign_id'] = $this->_values['campaign_id'] ?? NULL;
+    }
+
+    $this->_params = CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $membershipParams, TRUE);
+
     // This could be set by a hook.
     if (!empty($this->_params['installments'])) {
       $membershipParams['installments'] = $this->_params['installments'];
