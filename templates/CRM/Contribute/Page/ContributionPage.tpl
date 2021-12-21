@@ -55,25 +55,25 @@
 
        {if $row.configureActionLinks}
          <div class="crm-contribution-page-configure-actions">
-                  {$row.configureActionLinks|replace:'xx':$row.id}
+           {$row.configureActionLinks|smarty:nodefaults|replace:'xx':$row.id}
          </div>
-             {/if}
+       {/if}
 
-            {if $row.contributionLinks}
-        <div class="crm-contribution-online-contribution-actions">
-                  {$row.contributionLinks|replace:'xx':$row.id}
-        </div>
+        {if $row.contributionLinks}
+          <div class="crm-contribution-online-contribution-actions">
+            {$row.contributionLinks|smarty:nodefaults|replace:'xx':$row.id}
+          </div>
         {/if}
 
         {if $row.onlineContributionLinks}
-        <div class="crm-contribution-search-contribution-actions">
-                  {$row.onlineContributionLinks|replace:'xx':$row.id}
-        </div>
+          <div class="crm-contribution-search-contribution-actions">
+            {$row.onlineContributionLinks|smarty:nodefaults|replace:'xx':$row.id}
+          </div>
         {/if}
 
         <div class="crm-contribution-page-more">
-                    {$row.action|replace:'xx':$row.id}
-            </div>
+          {$row.action|smarty:nodefaults|replace:'xx':$row.id}
+        </div>
 
       </td>
 
