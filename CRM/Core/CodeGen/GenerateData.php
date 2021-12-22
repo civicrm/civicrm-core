@@ -1728,22 +1728,37 @@ VALUES
 
   private function addContribution() {
     $query = "
-INSERT INTO civicrm_contribution
-    (contact_id, financial_type_id, payment_instrument_id, receive_date, non_deductible_amount, total_amount, trxn_id, check_number, currency, cancel_date, cancel_reason, receipt_date, thankyou_date, source )
+INSERT INTO civicrm_contribution_recur
+  (contact_id, amount, currency, frequency_unit, frequency_interval, installments, start_date, cancel_date, cancel_reason, processor_id, trxn_id, contribution_status_id, next_sched_contribution_date, payment_processor_id)
 VALUES
-    (2, 1, 4, '2010-04-11 00:00:00', 0.00, 125.00, NULL, '1041', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1' ),
-    (4, 1, 1, '2010-03-21 00:00:00', 0.00, 50.00, 'P20901X1', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Save the Penguins' ),
-    (6, 1, 4, '2010-04-29 00:00:00', 0.00, 25.00, NULL, '2095', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1' ),
-    (8, 1, 4, '2010-04-11 00:00:00', 0.00, 50.00, NULL, '10552', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1' ),
-    (16, 1, 4, '2010-04-15 00:00:00', 0.00, 500.00, NULL, '509', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1' ),
-    (19, 1, 4, '2010-04-11 00:00:00', 0.00, 175.00, NULL, '102', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1' ),
-    (82, 1, 1, '2010-03-27 00:00:00', 0.00, 50.00, 'P20193L2', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Save the Penguins' ),
-    (92, 1, 1, '2010-03-08 00:00:00', 0.00, 10.00, 'P40232Y3', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Help CiviCRM' ),
-    (34, 1, 1, '2010-04-22 00:00:00', 0.00, 250.00, 'P20193L6', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Help CiviCRM' ),
-    (71, 1, 1, '2009-07-01 11:53:50', 0.00, 500.00, 'PL71', NULL, 'USD', NULL, NULL, NULL, NULL, NULL ),
-    (43, 1, 1, '2009-07-01 12:55:41', 0.00, 200.00, 'PL43II', NULL, 'USD', NULL, NULL, NULL, NULL, NULL ),
-    (32, 1, 1, '2009-10-01 11:53:50', 0.00, 200.00, 'PL32I', NULL, 'USD', NULL, NULL, NULL, NULL, NULL ),
-    (32, 1, 1, '2009-12-01 12:55:41', 0.00, 200.00, 'PL32II', NULL, 'USD', NULL, NULL, NULL, NULL, NULL );
+  (56, 25.00, 'USD', 'month', 1, 12, '2010-04-29 00:00:00', NULL, NULL, 889, 56888, 1, '2010-09-29 00:00:00', 1),
+  (99, 10.00, 'USD', 'month', 1, 6, '2010-03-08 00:00:00', '2010-04-08 10:00:00', 'no longer interested', 6789, 9988, 3, NULL, 1)
+";
+    $this->_query($query);
+
+    $query = "
+INSERT INTO civicrm_contribution
+    (contact_id, financial_type_id, payment_instrument_id, receive_date, non_deductible_amount, total_amount, trxn_id, check_number, currency, cancel_date, cancel_reason, receipt_date, thankyou_date, source, contribution_recur_id)
+VALUES
+    (2, 1, 4, '2010-04-11 00:00:00', 0.00, 125.00, NULL, '1041', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL),
+    (4, 1, 1, '2010-03-21 00:00:00', 0.00, 50.00, 'P20901X1', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Save the Penguins', NULL),
+    (6, 1, 4, '2010-04-29 00:00:00', 0.00, 25.00, NULL, '2095', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL),
+    (8, 1, 4, '2010-04-11 00:00:00', 0.00, 50.00, NULL, '10552', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL),
+    (16, 1, 4, '2010-04-15 00:00:00', 0.00, 500.00, NULL, '509', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL),
+    (19, 1, 4, '2010-04-11 00:00:00', 0.00, 175.00, NULL, '102', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL),
+    (56, 3, 1, '2010-04-29 00:00:00', 0.00, 25.00, NULL, 'RR123', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', 1),
+    (56, 3, 1, '2010-05-29 00:00:00', 0.00, 25.00, NULL, 'RR124', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', 1),
+    (56, 3, 1, '2010-06-29 00:00:00', 0.00, 25.00, NULL, 'RR125', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', 1),
+    (56, 3, 1, '2010-07-29 00:00:00', 0.00, 25.00, NULL, 'RR126', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', 1),
+    (56, 3, 1, '2010-08-29 00:00:00', 0.00, 25.00, NULL, 'RR127', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', 1),
+    (82, 1, 1, '2010-03-27 00:00:00', 0.00, 50.00, 'P20193L2', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Save the Penguins', NULL),
+    (92, 1, 1, '2010-03-08 00:00:00', 0.00, 10.00, 'P40232Y3', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Help CiviCRM', NULL),
+    (34, 1, 1, '2010-04-22 00:00:00', 0.00, 250.00, 'P20193L6', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Help CiviCRM', NULL),
+    (71, 1, 1, '2009-07-01 11:53:50', 0.00, 500.00, 'PL71', NULL, 'USD', NULL, NULL, NULL, NULL, NULL, NULL),
+    (43, 1, 1, '2009-07-01 12:55:41', 0.00, 200.00, 'PL43II', NULL, 'USD', NULL, NULL, NULL, NULL, NULL, NULL),
+    (32, 1, 1, '2009-10-01 11:53:50', 0.00, 200.00, 'PL32I', NULL, 'USD', NULL, NULL, NULL, NULL, NULL, NULL),
+    (32, 1, 1, '2009-12-01 12:55:41', 0.00, 200.00, 'PL32II', NULL, 'USD', NULL, NULL, NULL, NULL, NULL, NULL),
+    (99, 1, 1, '2010-03-08 00:00:00', 0.00, 10.00, 'REC-123', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Help CiviCRM', 2);
 ";
     $this->_query($query);
 
