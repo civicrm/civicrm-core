@@ -63,7 +63,7 @@
             </tr>
             <tr class="crm-localization-form-block-currencyLimit">
                 <td class="label">{$form.currencyLimit.label}</td>
-                <td>{$form.currencyLimit.html}</td>
+                <td>{$form.currencyLimit.html|smarty:nodefaults}</td>
             </tr>
             <tr class="crm-localization-form-block-moneyformat">
                 <td class="label">{$form.moneyformat.label} {help id='moneyformat' title=$form.moneyformat.label}</td>
@@ -87,7 +87,7 @@
             {include file='CRM/Admin/Form/Setting/SettingField.tpl' setting_name='defaultContactCountry' fieldSpec=$settings_fields.defaultContactCountry}
             <tr class="crm-localization-form-block-pinnedContactCountries">
                 <td class="label">{$form.pinnedContactCountries.label} {help id='pinnedContactCountries' title=$form.pinnedContactCountries.label}</td>
-                <td>{$form.pinnedContactCountries.html}</td>
+                <td>{$form.pinnedContactCountries.html|smarty:nodefaults}</td>
             </tr>
            <tr class="crm-localization-form-block-defaultContactStateProvince">
                 <td class="label">{$form.defaultContactStateProvince.label} {help id='defaultContactCountry' title=$form.defaultContactStateProvince.label}</td>
@@ -95,11 +95,11 @@
             </tr>
             <tr class="crm-localization-form-block-countryLimit">
                 <td class="label">{$form.countryLimit.label} {help id='countryLimit' title=$form.countryLimit.label}</td>
-                <td>{$form.countryLimit.html}</td>
+                <td>{$form.countryLimit.html|smarty:nodefaults}</td>
             </tr>
             <tr class="crm-localization-form-block-provinceLimit">
                 <td class="label">{$form.provinceLimit.label} {help id='provinceLimit' title=$form.provinceLimit.label}</td>
-                <td>{$form.provinceLimit.html}</td>
+                <td>{$form.provinceLimit.html|smarty:nodefaults}</td>
             </tr>
         </table>
     <h3>{ts}Multiple Languages Support{/ts}</h3>
