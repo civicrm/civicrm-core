@@ -765,7 +765,12 @@ VALUES
    (@option_group_id_nuf, '{ts escape="sql"}Participants{/ts}',  'civicrm_participant',  'Participant',  NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_nuf, '{ts escape="sql"}Contributions{/ts}', 'civicrm_contribution', 'Contribution', NULL, 0, NULL, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
 
+-- Available currencies.
    (@option_group_id_currency, 'USD ($)',      'USD',     'USD',       NULL, 0, 1, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
+   (@option_group_id_currency, 'CAD ($)',      'CAD',     'CAD',       NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
+   (@option_group_id_currency, 'EUR (€)',      'EUR',     'EUR',       NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
+   (@option_group_id_currency, 'GBP (£)',      'GBP',     'GBP',       NULL, 0, 0, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
+   (@option_group_id_currency, 'JPY (¥)',      'JPY',     'JPY',       NULL, 0, 0, 5, NULL, 0, 0, 1, NULL, NULL, NULL),
 
 -- event name badges
   (@option_group_id_eventBadge,  '{ts escape="sql"}Name Only{/ts}'     , 1, 'CRM_Event_Badge_Simple'  ,  NULL, 0, 0, 1, '{ts escape="sql"}Simple Event Name Badge{/ts}', 0, 1, 1, NULL, NULL, NULL),
