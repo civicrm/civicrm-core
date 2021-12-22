@@ -43,6 +43,9 @@ function _civicrm_api3_mailing_contact_getresults($params, $count) {
   }
   $options  = _civicrm_api3_get_options_from_params($params, TRUE, 'contribution', 'get');
   $fnName = '_civicrm_api3_mailing_contact_get_' . strtolower($params['type']);
+  if (!function_exists($fnName)) {
+    throw new API_Exception('Invalid mailing type: ' . $params['type']);
+  }
   return $fnName(
       $params['contact_id'],
       $options['offset'],
