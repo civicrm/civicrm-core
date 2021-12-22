@@ -20,7 +20,7 @@
       ];
 
       this.$onInit = function() {
-        this.apiExplorerLink = CRM.url('civicrm/api4#/explorer/SavedSearch/export?id=' + ctrl.savedSearchId);
+        this.apiExplorerLink = CRM.url('civicrm/api4#/explorer/SavedSearch/export?_format=php&id=' + ctrl.savedSearchId);
 
         var findDisplays = _.transform(ctrl.displayNames, function(findDisplays, displayName) {
           findDisplays.push(['search_displays', 'CONTAINS', ctrl.savedSearchName + '.' + displayName]);
