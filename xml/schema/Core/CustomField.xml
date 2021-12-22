@@ -8,6 +8,13 @@
   <add>1.1</add>
   <log>true</log>
   <labelField>label</labelField>
+  <paths>
+    <add>civicrm/admin/custom/group/field/add?reset=1&amp;action=add&amp;gid=[custom_group_id]</add>
+    <update>civicrm/admin/custom/group/field/update?action=update&amp;reset=1&amp;id=[id]&amp;gid=[custom_group_id]</update>
+    <preview>civicrm/admin/custom/group/field?action=preview&amp;reset=1&amp;id=[id]&amp;gid=[custom_group_id]</preview>
+    <delete>civicrm/admin/custom/group/field?action=delete&amp;reset=1&amp;id=[id]&amp;gid=[custom_group_id]</delete>
+    <move>civicrm/admin/custom/group/field/move?reset=1&amp;fid=[id]</move>
+  </paths>
   <field>
     <name>id</name>
     <type>int unsigned</type>

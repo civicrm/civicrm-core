@@ -10,6 +10,12 @@
   <log>true</log>
   <title>Custom Field Group</title>
   <labelField>title</labelField>
+  <paths>
+    <add>civicrm/admin/custom/group?action=add&amp;reset=1</add>
+    <update>civicrm/admin/custom/group?action=update&amp;reset=1&amp;id=[id]</update>
+    <preview>civicrm/admin/custom/group?action=preview&amp;reset=1&amp;id=[id]</preview>
+    <delete>civicrm/admin/custom/group?action=delete&amp;reset=1&amp;id=[id]</delete>
+  </paths>
   <field>
     <name>id</name>
     <type>int unsigned</type>
