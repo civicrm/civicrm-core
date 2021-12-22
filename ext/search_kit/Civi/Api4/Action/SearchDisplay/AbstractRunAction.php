@@ -471,8 +471,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   private function getEditableInfo($key) {
     [$key] = explode(':', $key);
     $field = $this->getField($key);
-    // If field is an implicit join, use the original fk field
-    if (!empty($field['implicit_join'])) {
+    // If field is an implicit join to another entity (not a custom group), use the original fk field
+    if (!empty($field['implicit_join']) && empty($field['custom_field_id'])) {
       return $this->getEditableInfo(substr($key, 0, -1 - strlen($field['name'])));
     }
     if ($field) {
