@@ -99,11 +99,13 @@
     $scope.$bindToRoute({
       expr: 'selectedTab.code',
       param: '_lang',
+      format: 'raw',
       default: 'php'
     });
     $scope.$bindToRoute({
       expr: '$ctrl.resultFormat',
       param: '_format',
+      format: 'raw',
       default: 'json'
     });
 
