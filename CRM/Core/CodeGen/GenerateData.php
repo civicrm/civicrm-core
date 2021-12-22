@@ -1727,6 +1727,9 @@ VALUES
   }
 
   private function addContribution() {
+    // The process is a bit weird & the payment processor gets added later...
+    // so we need to disable foreign key checks here.
+    $this->_query('SET foreign_key_checks = 0');
     $query = "
 INSERT INTO civicrm_contribution_recur
   (contact_id, amount, currency, frequency_unit, frequency_interval, installments, start_date, cancel_date, cancel_reason, processor_id, trxn_id, contribution_status_id, next_sched_contribution_date, payment_processor_id)
@@ -1735,6 +1738,7 @@ VALUES
   (99, 10.00, 'USD', 'month', 1, 6, '2010-03-08 00:00:00', '2010-04-08 10:00:00', 'no longer interested', 6789, 9988, 3, NULL, 1)
 ";
     $this->_query($query);
+    $this->_query('SET foreign_key_checks = 1');
 
     $query = "
 INSERT INTO civicrm_contribution
