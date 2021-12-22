@@ -122,6 +122,9 @@
 - github      : arborrow
   name        : Anthony Borrow
 
+- github      : arnaudbroes
+  name        : Arnaud Broes
+
 - github      : AronNovakInovae
   name        : Aron Novak
   organization: Gizra
@@ -543,7 +546,12 @@
   name        : Guy Iaccarino
   organization: Greenleaf Advancement
 
+- github      : Guydn
+
 - github      : GValFr35
+
+- github      : homotechsual
+  name        : Mikey O'Toole
 
 - github      : hosseinamin
   name        : Hossein Amin
@@ -684,6 +692,8 @@
 
 - github      : joannechester
   name        : Joanne Chester
+
+- github      : joapta
 
 - github      : joels341
   name        : Joel Stevens
@@ -1042,6 +1052,8 @@
   name        : Nathan Brettell
 
 - name        : Neil Zampella
+
+- github      : netzih
 
 - github      : nganivet
   name        : Nicolas Ganivet
@@ -1498,6 +1510,10 @@
 
 - name        : William Gordon
   organization: British Humanist Association
+
+- github      : webmaster-cses-org-uk
+  name        : Adam Wood
+  organization: CSES (Chelmsford Science and Engineering Society)
 
 - github      : websiteexpress
   name        : James Forbes Keir
