@@ -38,7 +38,7 @@
 
   <table class="form-layout-compressed">
   <tr>
-    <td class="font-size12pt" style="width: 30%;">
+    <td style="width: 30%;">
         {if !empty($savedSearch.name)}{$savedSearch.name} ({ts}smart group{/ts}) - {/if}
         {ts count=$pager->_totalItems plural='%count Contacts'}%count Contact{/ts}
     </td>
@@ -51,7 +51,7 @@
     </td>
   </tr>
   <tr>
-    <td class="font-size11pt"> {ts}Select Records{/ts}:</td>
+    <td> {ts}Select Records{/ts}:</td>
     <td class="nowrap">
       {assign var="checked" value=$selectedContactIds|@count}
       {$form.radio_ts.ts_all.html} <label for="{$ts_all_id}">{ts count=$pager->_totalItems plural='All %count records'}The found record{/ts}</label>

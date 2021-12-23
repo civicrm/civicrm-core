@@ -38,7 +38,7 @@
   </div>
   <table class="form-layout-compressed">
     <tr>
-      <td class="font-size12pt label"><strong>{if $component eq 'event'}{ts}Participant{/ts}{else}{ts}Contact{/ts}{/if}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
+      <td class="label"><strong>{if $component eq 'event'}{ts}Participant{/ts}{else}{ts}Contact{/ts}{/if}</strong></td><td><strong>{$displayName}</strong></td>
     </tr>
     {if $eventName}
       <tr>

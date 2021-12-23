@@ -19,7 +19,7 @@
         <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
         <table class="form-layout-compressed">
           <tr>
-            <td class="font-size12pt" colspan="2">
+            <td colspan="2">
               {$form.sort_name.label}<br>
               {$form.sort_name.html|crmAddClass:'twenty'}
             </td>

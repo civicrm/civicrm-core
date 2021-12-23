@@ -36,8 +36,8 @@
     {/if}
 {if !empty($clientName)}
     <tr class="crm-case-form-block-clientName">
-      <td class="label font-size12pt">{ts}Client{/ts}</td>
-      <td class="font-size12pt bold view-value">{$clientName}</td>
+      <td class="label">{ts}Client{/ts}</td>
+      <td class="bold view-value">{$clientName}</td>
     </tr>
 {elseif empty($clientName) and $action eq 1}
     {if $context eq 'standalone'}
