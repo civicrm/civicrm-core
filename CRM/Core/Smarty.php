@@ -395,7 +395,7 @@ class CRM_Core_Smarty extends Smarty {
    *
    * @return string
    */
-  public static function escape($string, $esc_type = 'html', $char_set = 'ISO-8859-1') {
+  public static function escape($string, $esc_type = 'html', $char_set = 'UTF-8') {
     // CiviCRM variables are often arrays - just handle them.
     // The early return on booleans & numbers is mostly to prevent them being
     // logged as 'changed' when they are cast to a string.
