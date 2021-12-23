@@ -11,7 +11,7 @@
   {ts}Custom Fields{/ts}
 {/htxt}
 {htxt id="id-group_intro"}
-    {ts}Use this form to set the title, the type of record the fields will be used for, and set-level help. You will then be able to add any number of fields to the set.{/ts} {docURL page="user/organising-your-data/custom-fields"}
+    {ts}Use this form to set the title, the type of record the fields will be used for, and set-level help. You will then be able to add any number of fields to the set.{/ts} {docURL page="user/organising-your-data/creating-custom-fields"}
 {/htxt}
 
 {htxt id="id-title-title"}

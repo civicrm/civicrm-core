@@ -24,8 +24,10 @@
   <li>{ts}If you need to create new custom fields, you can also do that within the profile editor. Then add the new custom field(s) to this profile by dragging them into the form builder.{/ts}</li>
   <li>{ts}Save your profile to return to this screen. You can preview it from here by clicking the Preview button.{/ts}</li>
 </ol>
-{capture assign=docLinkCustom}{docURL page="user/organising-your-data/custom-fields" text="custom fields"}{/capture}
-{capture assign=docLinkProfile}{docURL page="user/organising-your-data/profiles" text="profiles"}{/capture}
+{capture assign=docUrlTextCustom}{ts}custom fields{/ts}{/capture}
+{capture assign=docLinkCustom}{docURL page="user/organising-your-data/creating-custom-fields" text=$docUrlTextCustom}{/capture}
+{capture assign=docUrlTextProfile}{ts}profiles{/ts}{/capture}
+{capture assign=docLinkProfile}{docURL page="user/organising-your-data/profiles" text=$docUrlTextProfile}{/capture}
 <p>
   {ts 1=$docLinkCustom 2=$docLinkProfile}Refer to the online documentation for more details on creating %1 and %2.{/ts}
 </p>

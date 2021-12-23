@@ -171,7 +171,9 @@
             <div class="content">{$form.address.$index.geo_code_1.html}, {$form.address.$index.geo_code_2.html}
                 <br class="spacer"/>
                 <span class="description">
-                    {ts}Latitude and longitude may be automatically populated by enabling a Mapping Provider.{/ts} {docURL page="user/initial-set-up/installation-and-basic-set-up" text="(Refer to the Mapping and Geocoding section in the Installation and Basic Setup Chapter)"}</span>
+                  {capture assign=docUrlText}{ts}(Refer to the Mapping and Geocoding section in the Installation and Basic Setup Chapter){/ts}{/capture}
+                  {ts}Latitude and longitude may be automatically populated by enabling a Mapping Provider.{/ts} {docURL page="user/initial-set-up/installation-and-basic-set-up/#mapping-and-geocoding" text=$docUrlText}
+                </span>
             </div>
             <div class="clear"></div>
         </div>

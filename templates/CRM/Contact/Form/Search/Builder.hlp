@@ -11,7 +11,8 @@
 {ts}Search Builder{/ts}
 {/htxt}
 {htxt id="builder-intro"}
-{capture assign=docLink}{docURL page="user/the-user-interface/searching" text="Search documentation in the User Guide"}{/capture}
+{capture assign=docUrlText}{ts}Search documentation in the User Guide{/ts}{/capture}
+{capture assign=docLink}{docURL page="user/the-user-interface/searching" text=$docUrlText}{/capture}
 <p>{ts}Create your search by selecting the criteria (record type and field), the comparison operator, and entering the value you want to search for. You can define one or many criteria as a set: <em>Include contacts where... State IS Washington AND City IS Seattle AND Birth Date is later than (>) Jan 1, 1985</em>{/ts}</p>
 <p>{ts}You can also create additional sets of criteria: <em>Also include contacts where... State IS California AND City IS Los Angeles AND Birth Date is later than (>) Jan 1, 1985</em>{/ts}</p>
 <p>{ts 1=$docLink}For more information see %1.{/ts}</p>
