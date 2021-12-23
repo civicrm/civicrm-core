@@ -1498,7 +1498,7 @@ function _civicrm_api3_validate($entity, $action, $params) {
   foreach ($finalfields as $fieldInfo) {
     $fieldName = $fieldInfo['name'];
     try {
-      _civicrm_api3_validate_switch_cases($fieldName, $fieldInfo, $entity, $params);
+      _civicrm_api3_validate_switch_cases($fieldName, $fieldInfo, $entity, $params, $action);
     }
     catch (Exception $e) {
       $errors[$fieldName] = [
@@ -1517,11 +1517,12 @@ function _civicrm_api3_validate($entity, $action, $params) {
  * @param array $fieldInfo
  * @param string $entity
  * @param array $params
+ * @param string $action
  *
  * @throws API_Exception
  * @throws Exception
  */
-function _civicrm_api3_validate_switch_cases($fieldName, $fieldInfo, $entity, $params) {
+function _civicrm_api3_validate_switch_cases($fieldName, $fieldInfo, $entity, $params, $action) {
   switch (CRM_Utils_Array::value('type', $fieldInfo)) {
     case CRM_Utils_Type::T_INT:
       _civicrm_api3_validate_integer($params, $fieldName, $fieldInfo, $entity);
@@ -1536,7 +1537,7 @@ function _civicrm_api3_validate_switch_cases($fieldName, $fieldInfo, $entity, $p
 
     case CRM_Utils_Type::T_TEXT:
     case CRM_Utils_Type::T_STRING:
-      _civicrm_api3_validate_string($params, $fieldName, $fieldInfo, $entity);
+      _civicrm_api3_validate_string($params, $fieldName, $fieldInfo, $entity, $action);
       break;
 
     case CRM_Utils_Type::T_MONEY:
@@ -1605,7 +1606,7 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields) {
 
       case CRM_Utils_Type::T_TEXT:
       case CRM_Utils_Type::T_STRING:
-        _civicrm_api3_validate_string($params, $fieldName, $fieldInfo, $entity);
+        _civicrm_api3_validate_string($params, $fieldName, $fieldInfo, $entity, $action);
         break;
 
       case CRM_Utils_Type::T_MONEY:
@@ -2225,11 +2226,13 @@ function _civicrm_api3_validate_html(&$params, &$fieldName, $fieldInfo) {
  * @param array $fieldInfo
  *   Array of fields from getfields function.
  * @param string $entity
+ * @param string $action
  *
  * @throws API_Exception
  * @throws Exception
  */
-function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $entity) {
+function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $entity, $action) {
+  $isGet = substr($action, 0, 3) === 'get';
   list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName, 'String');
   if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE || CRM_Utils_System::isNull($fieldValue)) {
     return;
@@ -2250,7 +2253,15 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
     }
   }
   if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options'])) {
-    _civicrm_api3_api_match_pseudoconstant($fieldValue, $entity, $fieldName, $fieldInfo, $op);
+    try {
+      _civicrm_api3_api_match_pseudoconstant($fieldValue, $entity, $fieldName, $fieldInfo, $op);
+    }
+    catch (API_Exception $e) {
+      // For get operations, allow any string
+      if (!$isGet) {
+        throw $e;
+      }
+    }
   }
   // Check our field length
   elseif (is_string($fieldValue) && !empty($fieldInfo['maxlength']) && strlen(utf8_decode($fieldValue)) > $fieldInfo['maxlength']) {
