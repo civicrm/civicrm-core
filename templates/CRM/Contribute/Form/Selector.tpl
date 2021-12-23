@@ -48,7 +48,7 @@
              <a class="nowrap bold crm-expand-row" title="{ts}view payments{/ts}" href="{crmURL p='civicrm/payment' q="view=transaction&component=contribution&action=browse&cid=`$row.contact_id`&id=`$row.contribution_id`&selector=1"}">
                &nbsp; {$row.total_amount|crmMoney:$row.currency}
             </a>
-          {if !empty($row.amount_level) }<br/>({$row.amount_level}){/if}
+          {if $row.amount_level}<br/>({$row.amount_level}){/if}
           {if $row.contribution_recur_id && $row.is_template}
             <br/>{ts}(Recurring Template){/ts}
           {elseif $row.contribution_recur_id }

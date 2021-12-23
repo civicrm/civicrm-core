@@ -356,7 +356,8 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       );
 
       $checkLineItem = FALSE;
-      $row = [];
+      // Set defaults to empty to prevent e-notices.
+      $row = ['amount_level' => ''];
       // Now check for lineItems
       if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
         $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($result->id);
