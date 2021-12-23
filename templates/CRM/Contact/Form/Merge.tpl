@@ -59,7 +59,7 @@
       <th>{$otherContactTypeIcon} <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$other_cid"}">{$other_name|escape}</a> ({ts}duplicate{/ts})</th>
       <th>{ts}Mark All{/ts}<br />=={$form.toggleSelect.html} ==&gt;</th>
       <th>{$mainContactTypeIcon}<a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$main_cid"}">{$main_name|escape}</a></th>
-      <th width="300">Add/overwrite?</th>
+      <th width="300">{ts}Add/overwrite?{/ts}</th>
     </tr>
 
 
@@ -155,7 +155,7 @@
               <span id="main_{$blockName}_{$blockId}_overwrite" class="location_block_controls">
 
                 <span class="location_primary">
-                  {if $row.main && $row.main_is_primary == "1"}Primary{/if}
+                  {if $row.main && $row.main_is_primary == "1"}{ts}Primary{/ts}{/if}
                 </span>
 
                 <span class="location_block_controls_options">
@@ -283,7 +283,7 @@
 
     // Update primary label
     if (mainBlock != false && mainBlock['is_primary'] == '1') {
-      this_controls.find(".location_primary").text('Primary');
+      this_controls.find(".location_primary").text('{/literal}{ts escape='js'}Primary{/ts}{literal}');
     }
     else {
       this_controls.find(".location_primary").text('');

@@ -610,7 +610,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
     CRM_Core_Session::setStatus(ts("%1 status has been updated to %2.", [
       1 => $pcpTitle,
       2 => $pcpStatus,
-    ]), 'Status Updated', 'success');
+    ]), ts('Status Updated'), 'success');
 
     // send status change mail
     $result = self::sendStatusUpdate($id, $is_active, FALSE, $pcpPageType);

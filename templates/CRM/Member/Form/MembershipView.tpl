@@ -55,7 +55,7 @@
           <tr>
             <td class="label">{ts}Recurring Contribution{/ts}</td>
             <td>
-              <a class="crm-hover-button action-item" href='{crmURL p="civicrm/contact/view/contributionrecur" q="reset=1&id=`$contribution_recur_id`&cid=`$contactId`&context=contribution"}'>View Recurring Contribution</a>
+              <a class="crm-hover-button action-item" href='{crmURL p="civicrm/contact/view/contributionrecur" q="reset=1&id=`$contribution_recur_id`&cid=`$contactId`&context=contribution"}'>{ts}View Recurring Contribution{/ts}</a>
             </td>
           </tr>
      {/if}

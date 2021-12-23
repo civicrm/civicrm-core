@@ -21,7 +21,7 @@
         </td>
         <td class="crm-contact-form-block-search">
           <label>&nbsp;</label><br />
-          <button type="submit" class="button crm-button filtercontacts"><span><i class="crm-i fa-search" aria-hidden="true"></i> Find Contacts</span></button>
+          <button type="submit" class="button crm-button filtercontacts"><span><i class="crm-i fa-search" aria-hidden="true"></i> {ts}Find Contacts{/ts}</span></button>
         </td>
       </tr>
     </table>
