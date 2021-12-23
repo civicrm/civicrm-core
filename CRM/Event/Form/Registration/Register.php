@@ -288,13 +288,22 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         }
         $optionFullIds = CRM_Utils_Array::value('option_full_ids', $val, []);
         foreach ($val['options'] as $keys => $values) {
-          if ($values['is_default'] && empty($values['is_full'])) {
-
-            if ($val['html_type'] == 'CheckBox') {
-              $this->_defaults["price_{$key}"][$keys] = 1;
-            }
-            else {
-              $this->_defaults["price_{$key}"] = $keys;
+          $priceFieldName = 'price_' . $values['price_field_id'];
+          $priceFieldValue = CRM_Price_BAO_PriceSet::getPriceFieldValueFromURL($this, $priceFieldName);
+          if (!empty($priceFieldValue)) {
+            CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $priceFieldValue, $val['html_type'], $this->_defaults);
+            // break here to prevent overwriting of default due to 'is_default'
+            // option configuration. The value sent via URL get's higher priority.
+            break;
+          }
+          else {
+            if ($values['is_default'] && empty($values['is_full'])) {
+              if ($val['html_type'] == 'CheckBox') {
+                $this->_defaults["price_{$key}"][$keys] = 1;
+              }
+              else {
+                $this->_defaults["price_{$key}"] = $keys;
+              }
             }
           }
         }
