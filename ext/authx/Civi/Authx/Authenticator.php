@@ -218,7 +218,8 @@ class Authenticator {
 
     if (\CRM_Core_Session::getLoggedInContactID() || $this->authxUf->getCurrentUserId()) {
       if ($isSameValue(\CRM_Core_Session::getLoggedInContactID(), $tgt->contactId)  && $isSameValue($this->authxUf->getCurrentUserId(), $tgt->userId)) {
-        // Already logged in. Nothing to do.
+        // Already logged in. Post-condition met - but by unusual means.
+        \CRM_Core_Session::singleton()->set('authx', $tgt->createAlreadyLoggedIn());
         return;
       }
       else {
@@ -416,7 +417,7 @@ class AuthenticatorTarget {
    * The redacted version may be retained in the (real or fake) session and consulted by more
    * fine-grained access-controls.
    *
-   * @return array
+   * @return array{flow: string, credType: string, jwt: ?array, useSession: bool, userId: ?int, contactId: ?int}
    */
   public function createRedacted(): array {
     return [
@@ -426,6 +427,37 @@ class AuthenticatorTarget {
       'credType' => $this->credType,
       'jwt' => $this->jwt,
       'useSession' => $this->useSession,
+      'userId' => $this->userId,
+      'contactId' => $this->contactId,
+    ];
+  }
+
+  /**
+   * Describe the (OK-ish) authentication outcome wherein the same user was
+   * already authenticated.
+   *
+   * Ex: cv ev --user=demo "return authx_login(['principal' => ['user' => 'demo']], false);"
+   *
+   * In this example, `cv ev --user=demo` does an initial login, and then `authx_login()` tries
+   * to login a second time. This is sort of an error for `authx_login()` (_since it doesn't
+   * really do auth_); but it's sort of OK (because the post-conditions are met). It's sort of
+   * a code-smell (because flows with multiple login-calls are ill-advised - and may raise
+   * exceptions with different data).
+   *
+   * @return array{flow: string, credType: string, jwt: ?array, useSession: bool, userId: ?int, contactId: ?int}
+   */
+  public function createAlreadyLoggedIn(): array {
+    \Civi::log()->warning('Principal was already authenticated. Ignoring request to re-authenticate.', [
+      'userId' => $this->userId,
+      'contactId' => $this->contactId,
+      'requestedFlow' => $this->flow,
+      'requestedCredType' => $this->credType,
+    ]);
+    return [
+      'flow' => 'already-logged-in',
+      'credType' => 'already-logged-in',
+      'jwt' => NULL,
+      'useSession' => !\CRM_Utils_Constant::value('_CIVICRM_FAKE_SESSION'),
       'userId' => $this->userId,
       'contactId' => $this->contactId,
     ];
