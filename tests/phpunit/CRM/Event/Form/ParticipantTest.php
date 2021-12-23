@@ -537,13 +537,15 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * Test submitting a partially paid event registration.
    *
    * In this case the participant status is selected as 'partially paid' and
-   * a contribution is created for the full amount with a payment equal to the entered amount.
+   * a contribution is created for the full amount with a payment equal to the
+   * entered amount.
    *
    * @dataProvider getBooleanDataProvider
    *
    * @param bool $isQuickConfig
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitPartialPayment($isQuickConfig) {
     $mut = new CiviMailUtils($this, TRUE);
@@ -728,8 +730,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'Annual CiviCRM meet',
       'Registered Email',
       $isQuickConfig ? $this->formatMoneyInput(1550.55) . ' big - 1' : 'Price Field - big',
-      $isAmountPaidOnForm ? 'Total Paid: $ 20.00' : ' ',
-      'Balance: $ 1,530.55',
+      $isAmountPaidOnForm ? 'Total Paid: $20.00' : ' ',
+      'Balance: $1,530.55',
       'Financial Type: Event Fee',
       'Paid By: Check',
       'Check Number: 879',

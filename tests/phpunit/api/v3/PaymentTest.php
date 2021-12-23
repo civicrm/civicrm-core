@@ -219,7 +219,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]);
     $this->assertNotEmpty($contribution['receipt_date']);
     $mut->checkMailLog([
-      'Price Field - Price Field 1        1   $ 100.00    $ 100.00',
+      'Price Field - Price Field 1        1    $100.00     $100.00',
       'event place',
       'streety street',
     ]);
@@ -293,10 +293,10 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'From: "FIXME" <info@EXAMPLE.ORG>',
       'Dear Anthony,',
-      'Total Fee: $ 300.00',
-      'This Payment Amount: $ 50.00',
+      'Total Fee: $300.00',
+      'This Payment Amount: $50.00',
       //150 was paid in the 1st payment.
-      'Balance Owed: $ 100.00',
+      'Balance Owed: $100.00',
       'Event Information and Location',
       'Paid By: Check',
       'Check Number: 345',
@@ -331,9 +331,9 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'From: "FIXME" <info@EXAMPLE.ORG>',
       'Dear Anthony,',
       'Below you will find a receipt for this payment.',
-      'Total Fee: $ 300.00',
-      'This Payment Amount: $ 150.00',
-      'Balance Owed: $ 0.00',
+      'Total Fee: $300.00',
+      'This Payment Amount: $150.00',
+      'Balance Owed: $0.00',
       'Thank you for completing this payment.',
     ]);
   }
@@ -382,12 +382,12 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'Dear Anthony,',
       'A refund has been issued based on changes in your registration selections.',
-      'Total Fee: $ 300' . $decimalSeparator . '00',
-      'Refund Amount: $ -30' . $decimalSeparator . '00',
+      'Total Fee: $300' . $decimalSeparator . '00',
+      'Refund Amount: -$30' . $decimalSeparator . '00',
       'Event Information and Location',
       'Paid By: Check',
       'Transaction Date: November 13th, 2018 12:01 PM',
-      'Total Paid: $ 170' . $decimalSeparator . '00',
+      'Total Paid: $170' . $decimalSeparator . '00',
     ]);
   }
 

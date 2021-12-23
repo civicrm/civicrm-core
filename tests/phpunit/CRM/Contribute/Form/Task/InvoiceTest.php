@@ -77,7 +77,7 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $this->assertStringContainsString('PAYMENT ADVICE', $invoiceHTML[$contribution['id']]);
 
     $this->assertStringContainsString('AMOUNT DUE:</font></b></td>
-                <td style="text-align:right;"><b><font size="1">$ 92.00</font></b></td>', $invoiceHTML[$contribution3['id']]);
+                <td style="text-align:right;"><b><font size="1">$92.00</font></b></td>', $invoiceHTML[$contribution3['id']]);
   }
 
   /**
@@ -86,7 +86,7 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testInvoiceForLineItems() {
+  public function testInvoiceForLineItems(): void {
 
     $this->enableTaxAndInvoicing();
 
@@ -154,12 +154,12 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $lineItems = $this->callAPISuccess('LineItem', 'get', ['contribution_id' => $order['id']]);
 
     foreach ($lineItems['values'] as $lineItem) {
-      $this->assertStringContainsString("<font size=\"1\">$ {$lineItem['line_total']}</font>", $invoiceHTML);
+      $this->assertStringContainsString("<font size=\"1\">$" . $lineItem['line_total'] . '</font>', $invoiceHTML);
     }
 
     $totalAmount = $this->formatMoneyInput($order['values'][$order['id']]['total_amount']);
     $this->assertStringContainsString("TOTAL USD</font></b></td>
-                <td style=\"text-align:right;\"><font size=\"1\">$ $totalAmount</font>", $invoiceHTML);
+                <td style=\"text-align:right;\"><font size=\"1\">$" . $totalAmount . '</font>', $invoiceHTML);
 
   }
 
@@ -167,10 +167,8 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
    * Test invoices if payment is made with different currency.
    *
    * https://lab.civicrm.org/dev/core/issues/2269
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testThatInvoiceShowTheActuallContributionCurrencyInsteadOfTheDefaultOne() {
+  public function testThatInvoiceShowsTheActualContributionCurrencyInsteadOfTheDefaultOne(): void {
     $this->setDefaultCurrency('USD');
 
     $this->_individualId = $this->individualCreate();
@@ -187,8 +185,8 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $this->assertStringNotContainsString('$', $invoiceHTML);
     $this->assertStringNotContainsString('Amount USD', $invoiceHTML);
     $this->assertStringNotContainsString('TOTAL USD', $invoiceHTML);
-    $this->assertStringContainsString('£ 0.00', $invoiceHTML);
-    $this->assertStringContainsString('£ 100.00', $invoiceHTML);
+    $this->assertStringContainsString('£0.00', $invoiceHTML);
+    $this->assertStringContainsString('£100.00', $invoiceHTML);
     $this->assertStringContainsString('Amount GBP', $invoiceHTML);
     $this->assertStringContainsString('TOTAL GBP', $invoiceHTML);
 

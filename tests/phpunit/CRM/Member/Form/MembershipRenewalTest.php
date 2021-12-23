@@ -464,7 +464,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', ['contact_id' => $this->_individualId]);
     $this->assertEquals(1, $contributionRecur['is_email_receipt']);
     $this->mut->checkMailLog([
-      '$ ' . $this->formatMoneyInput(7800.90),
+      '$' . $this->formatMoneyInput(7800.90),
       'Country-multi : Angola, Anguilla',
     ]);
     $this->mut->stop();

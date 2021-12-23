@@ -146,9 +146,9 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'From: site@something.com',
       'Dear Anthony,',
       'Payment Details',
-      'Total Fee: $ 100.00',
-      'This Payment Amount: $ 70.00',
-      'Balance Owed: $ 0.00 ',
+      'Total Fee: $100.00',
+      'This Payment Amount: $70.00',
+      'Balance Owed: $0.00 ',
       'Billing Name and Address',
       'Vancouver, AE 1321312',
       'Visa',
@@ -180,7 +180,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testMultiplePaymentForPartiallyPaidContribution() {
+  public function testMultiplePaymentForPartiallyPaidContribution(): void {
     $this->createPartiallyPaidOrder();
 
     // pay additional amount
@@ -236,9 +236,9 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'Dear Anthony,',
       'Below you will find a receipt for this payment.',
-      'Total Fee: $ 100.00',
-      'This Payment Amount: $ 50.00',
-      'Balance Owed: $ 20.00 ',
+      'Total Fee: $100.00',
+      'This Payment Amount: $50.00',
+      'Balance Owed: $20.00 ',
       'Paid By: Check',
       'Check Number: check-12345',
     ],
@@ -266,9 +266,9 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
 
     $mut->checkMailLog([
       'Below you will find a receipt for this payment.',
-      'Total Fee: $ 100.00',
-      'This Payment Amount: $ 100.00',
-      'Balance Owed: $ 0.00 ',
+      'Total Fee: $100.00',
+      'This Payment Amount: $100.00',
+      'Balance Owed: $0.00 ',
       'Paid By: Credit Card',
       '***********1111',
       'Billing Name and Address',

@@ -3652,7 +3652,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'receipt_from_email' => 'api@civicrm.org',
     ]);
     $mut->checkMailLog([
-      '$ 100.00',
+      '$100.00',
       'Contribution Information',
     ], [
       'Event',

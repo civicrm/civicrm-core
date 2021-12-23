@@ -449,7 +449,7 @@ emo
    -->
   <tr>
     <td>25 December 2016</td>
-    <td>$ 100.00</td>
+    <td>$100.00</td>
     <td>Donation</td>
     <td></td>
   </tr>
@@ -457,7 +457,7 @@ emo
   -->
   <tr>
     <td><strong>Total</strong></td>
-    <td><strong>$ 100.00</strong></td>
+    <td><strong>$100.00</strong></td>
     <td></td>
     <td></td>
   </tr>
@@ -475,7 +475,7 @@ emo
    -->
   <tr>
     <td>25 December 2016</td>
-    <td>$ 10.00</td>
+    <td>$10.00</td>
     <td>Donation</td>
     <td></td>
   </tr>
@@ -483,7 +483,7 @@ emo
      -->
   <tr>
     <td>25 December 2016</td>
-    <td>$ 1.00</td>
+    <td>$1.00</td>
     <td>Donation</td>
     <td></td>
   </tr>
@@ -491,7 +491,7 @@ emo
   -->
   <tr>
     <td><strong>Total</strong></td>
-    <td><strong>$ 11.00</strong></td>
+    <td><strong>$11.00</strong></td>
     <td></td>
     <td></td>
   </tr>

@@ -698,7 +698,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 ---------------------------------------------------------
 Item                             Qty       Each       Total
 ----------------------------------------------------------
-Price Field - Price Field 1        1   $ 100.00      $ 100.00
+Price Field - Price Field 1        1    $100.00       $100.00
 ',
     ]);
     $mut->stop();
@@ -1154,8 +1154,8 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $this->assertEquals(11000, $contribution['net_amount']);
 
     $strings = [
-      'Total Tax Amount : $ ' . $this->formatMoneyInput(1000.00),
-      'Total Amount : $ ' . $this->formatMoneyInput(11000.00),
+      'Total Tax Amount : $' . $this->formatMoneyInput(1000.00),
+      'Total Amount : $' . $this->formatMoneyInput(11000.00),
       'Date Received: April 21st, 2015',
       'Paid By: Check',
       'Check Number: 12345',
@@ -1213,8 +1213,8 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $this->assertEquals(22000, $contribution['net_amount']);
 
     $strings = [
-      'Total Tax Amount : $ ' . $this->formatMoneyInput(2000),
-      'Total Amount : $ ' . $this->formatMoneyInput(22000.00),
+      'Total Tax Amount : $' . $this->formatMoneyInput(2000),
+      'Total Amount : $' . $this->formatMoneyInput(22000.00),
       'Date Received: April 21st, 2015',
       'Paid By: Check',
       'Check Number: 12345',
