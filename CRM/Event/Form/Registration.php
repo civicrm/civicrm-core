@@ -495,6 +495,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     $contactID = CRM_Core_Session::getLoggedInContactID();
+    $fields = [];
 
     // we don't allow conflicting fields to be
     // configured via profile
