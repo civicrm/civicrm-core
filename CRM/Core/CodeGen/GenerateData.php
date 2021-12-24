@@ -561,7 +561,7 @@ class CRM_Core_CodeGen_GenerateData {
 
     foreach ($this->Individual as $cid) {
       $contact->is_deceased = $contact->gender_id = $contact->birth_date = $contact->deceased_date = $email = NULL;
-      list($gender_id, $gender) = $this->randomKeyValue($this->gender);
+      [$gender_id, $gender] = $this->randomKeyValue($this->gender);
       $birth_date = $this->randomInt($now - 90 * $year, $now - 10 * $year);
 
       $contact->last_name = $this->randomItem('last_name');
@@ -623,11 +623,11 @@ class CRM_Core_CodeGen_GenerateData {
       // Prefix and suffix by gender and age
       $contact->prefix_id = $contact->suffix_id = $prefix = $suffix = NULL;
       if ($this->probability(.5) && $age > 20) {
-        list($contact->prefix_id, $prefix) = $this->randomKeyValue($this->prefix[$gender_id]);
+        [$contact->prefix_id, $prefix] = $this->randomKeyValue($this->prefix[$gender_id]);
         $prefix .= ' ';
       }
       if ($gender == 'male' && $this->probability(.50)) {
-        list($contact->suffix_id, $suffix) = $this->randomKeyValue($this->suffix);
+        [$contact->suffix_id, $suffix] = $this->randomKeyValue($this->suffix);
         $suffix = ' ' . $suffix;
       }
       if ($this->probability(.7)) {
@@ -901,14 +901,7 @@ class CRM_Core_CodeGen_GenerateData {
       }
 
       // Hack to add lat/long (limited to USA based addresses)
-      list(
-        $params['country_id'],
-        $params['state_province_id'],
-        $params['city'],
-        $params['postal_code'],
-        $params['geo_code_1'],
-        $params['geo_code_2'],
-        ) = $this->getZipCodeInfo();
+      $params = array_merge($params, $this->getZipCodeInfo());
 
       $this->_addDAO('Address', $params);
       $params['state'] = $this->states[$params['state_province_id']];
@@ -1272,7 +1265,14 @@ class CRM_Core_CodeGen_GenerateData {
     }
 
     $zip = str_pad($zipCode->zip, 5, '0', STR_PAD_LEFT);
-    return array(1228, $stateID, $zipCode->city, $zip, $zipCode->latitude, $zipCode->longitude);
+    return [
+      'country_id' => 1228,
+      'state_province_id' => $stateID,
+      'city' => $zipCode->city,
+      'postal_code' => $zip,
+      'geo_code_1' => $zipCode->latitude,
+      'geo_code_2' => $zipCode->longitude,
+    ];
   }
 
   /**
@@ -1727,81 +1727,266 @@ VALUES
   }
 
   private function addContribution() {
+    $defaults = [
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 4,
+      'receive_date' => 'now',
+      'non_deductible_amount' => 0,
+      'total_amount' => 25,
+      'trxn_id' => '',
+      'check_number' => '',
+      'currency' => 'USD',
+      'cancel_date' => NULL,
+      'cancel_reason' => NULL,
+      'receipt_date' => NULL,
+      'thankyou_date' => NULL,
+      'source' => 'April Mailer 1',
+      'contribution_recur_id' => NULL,
+    ];
+    $contributions = [
+      1 => [
+        'contact_id' => 2,
+        'receive_date' => '10 years ago',
+        'total_amount' => 125,
+        'check_number' => '1041',
+      ],
+      2 => [
+        'contact_id' => 4,
+        'payment_instrument_id' => 1,
+        'receive_date' => '2 years 3 months ago',
+        'total_amount' => 50,
+        'trxn_id' => 'P20901X1',
+        'source' => 'Online: Save the Penguins',
+      ],
+      3 => [
+        'contact_id' => 6,
+        'receive_date' => '6 years 25 days 780 minutes ago',
+        'total_amount' => 25,
+        'trxn_id' => 'GBP12',
+        'check_number' => '2095',
+        'currency' => 'GBP',
+      ],
+      4 => [
+        'contact_id' => 8,
+        'receive_date' => '2 years 3 months ago',
+        'total_amount' => 50,
+        'check_number' => '10552',
+        'source' => 'Online: Save the Penguins',
+      ],
+      5 => [
+        'contact_id' => 4,
+        'payment_instrument_id' => 1,
+        'receive_date' => '2 years 3 months ago',
+        'total_amount' => 50,
+        'trxn_id' => 'Q90901X1',
+        'source' => 'Online: Save the Penguins',
+      ],
+      6 => [
+        'contact_id' => 16,
+        'receive_date' => '85 days 42 minutes ago',
+        'total_amount' => 500,
+        'check_number' => '509',
+      ],
+      7 => [
+        'contact_id' => 19,
+        'payment_instrument_id' => 1,
+        'receive_date' => '2 days ago',
+        'total_amount' => 1750,
+        'check_number' => '102',
+        'source' => 'Online: Save the Penguins',
+      ],
+      8 => [
+        'contact_id' => 82,
+        'payment_instrument_id' => 1,
+        'receive_date' => '340789 minutes ago',
+        'total_amount' => 50,
+        'trxn_id' => 'P20193L2',
+        'source' => 'Online: Save the Penguins',
+      ],
+      9 => [
+        'contact_id' => 92,
+        'payment_instrument_id' => 1,
+        'receive_date' => '11 months ago',
+        'total_amount' => 10,
+        'trxn_id' => 'P40232Y3',
+        'source' => 'Online: Help CiviCRM',
+      ],
+      10 => [
+        'contact_id' => 34,
+        'payment_instrument_id' => 1,
+        'receive_date' => '52 months 33000 minutes ago',
+        'total_amount' => 250,
+        'trxn_id' => 'P20193L6',
+        'source' => 'Online: Help CiviCRM',
+      ],
+      11 => [
+        'contact_id' => 71,
+        'payment_instrument_id' => 1,
+        'receive_date' => '28 hours ago',
+        'total_amount' => 500,
+        'trxn_id' => 'PL71',
+        'source' => '',
+        'currency' => 'JPY',
+      ],
+
+      12 => [
+        'contact_id' => 43,
+        'payment_instrument_id' => 1,
+        'receive_date' => '15 months 38000 seconds ago',
+        'total_amount' => 50,
+        'trxn_id' => 'P291X1',
+        'source' => 'Online: Save the Penguins',
+      ],
+      13 => [
+        'contact_id' => 32,
+        'payment_instrument_id' => 1,
+        'receive_date' => 'midnight 3 months ago',
+        'total_amount' => 50,
+        'trxn_id' => 'PL32I',
+        'source' => '',
+      ],
+      14 => [
+        'contact_id' => 32,
+        'payment_instrument_id' => 1,
+        'receive_date' => 'midnight 2 months ago',
+        'total_amount' => 50,
+        'trxn_id' => 'PL32II',
+        'source' => '',
+      ],
+    ];
+    $recurrings = [
+      [
+        'contact_id' => 59,
+        'amount' => 25,
+        'currency' => 'USD',
+        'frequency_interval' => 1,
+        'frequency_unit' => 'month',
+        'installments' => 12,
+        'start_date' => '15 months ago',
+        'processor_id' => 'CLC45',
+        'trxn_id' => '56799',
+        'contribution_status_id' => 1,
+        'payment_processor_id' => 1,
+      ],
+      [
+        'contact_id' => 99,
+        'amount' => 10,
+        'currency' => 'CAD',
+        'frequency_interval' => 1,
+        'frequency_unit' => 'month',
+        'installments' => 6,
+        'start_date' => '8 months ago',
+        'cancel_date' => '1 month ago',
+        'cancel_reason' => 'No longer interested',
+        'processor_id' => 'CLR35',
+        'trxn_id' => '22799',
+        'contribution_status_id' => 3,
+        'payment_processor_id' => 1,
+      ],
+      [
+        'contact_id' => 103,
+        'amount' => 5,
+        'currency' => 'EUR',
+        'frequency_interval' => 3,
+        'frequency_unit' => 'month',
+        'installments' => 3,
+        'start_date' => '1 month ago',
+        'processor_id' => 'EGR12',
+        'trxn_id' => '44889',
+        'contribution_status_id' => 5,
+        'next_sched_contribution_date' => '+ 2 months',
+        'payment_processor_id' => 1,
+      ],
+    ];
     // The process is a bit weird & the payment processor gets added later...
     // so we need to disable foreign key checks here.
     $this->_query('SET foreign_key_checks = 0');
-    $query = "
-INSERT INTO civicrm_contribution_recur
-  (contact_id, amount, currency, frequency_unit, frequency_interval, installments, start_date, cancel_date, cancel_reason, processor_id, trxn_id, contribution_status_id, next_sched_contribution_date, payment_processor_id)
-VALUES
-  (56, 25.00, 'USD', 'month', 1, 12, '2010-04-29 00:00:00', NULL, NULL, 889, 56888, 1, '2010-09-29 00:00:00', 1),
-  (99, 10.00, 'USD', 'month', 1, 6, '2010-03-08 00:00:00', '2010-04-08 10:00:00', 'no longer interested', 6789, 9988, 3, NULL, 1)
-";
-    $this->_query($query);
+    $contributionRecurID = 1;
+    foreach ($recurrings as $recur) {
+      $startDate = date('Y-m-d H:i:s', strtotime($recur['start_date']));
+      $cancelDate = empty($recur['cancel_date']) ? 'NULL' : "'" . date('Y-m-d H:i:s', strtotime($recur['cancel_date'])) . "'";
+      $nextScheduledDate = empty($recur['next_sched_contribution_date']) ? 'NULL' : "'" . date('Y-m-d H:i:s', strtotime($recur['next_sched_contribution_date'])) . "'";
+      $this->_query("
+        INSERT INTO civicrm_contribution_recur (
+          contact_id, amount, currency, frequency_unit,
+          frequency_interval, installments,
+          start_date, cancel_date, cancel_reason, processor_id,
+          trxn_id, contribution_status_id, next_sched_contribution_date, payment_processor_id)
+        VALUES (
+          %1, %2, %3, %4, %5, %6,
+          %7, {$cancelDate}, %8, %9,
+          %10, %11, {$nextScheduledDate}, 1
+        )", [
+          1 => [$recur['contact_id'] ?? NULL, 'Integer'],
+          2 => [$recur['amount'], 'Money'],
+          3 => [$recur['currency'], 'String'],
+          4 => [$recur['frequency_unit'], 'String'],
+          5 => [$recur['frequency_interval'], 'Integer'],
+          6 => [$recur['installments'], 'Integer'],
+          7 => [date('Y-m-d H:i:s', strtotime($recur['start_date'])), 'String'],
+          8 => [$recur['cancel_reason'] ?? '', 'String'],
+          9 => [$recur['processor_id'] ?? '', 'String'],
+          10 => [$recur['trxn_id'], 'String'],
+          11 => [$recur['contribution_status_id'], 'Integer'],
+        ]
+      );
+      $contributionNumber = 1;
+      $receive_date = $startDate;
+      while ($contributionNumber < $recur['installments'] && strtotime($receive_date) < time()) {
+        if (!empty($recur['cancel_date']) && strtotime($receive_date) > strtotime($recur['cancel_date'])) {
+          continue;
+        }
+        $contributions[] = [
+          'contact_id' => $recur['contact_id'],
+          'payment_instrument_id' => 1,
+          'receive_date' => $receive_date,
+          'total_amount' => $recur['amount'],
+          'currency' => $recur['currency'],
+          'trxn_id' => 'PL32I' . $recur['contact_id'] . $contributionNumber,
+          'source' => 'Recurring contribution',
+          'contribution_recur_id' => $contributionRecurID,
+        ];
+        $receive_date = date('Y-m-d H:i:s', strtotime("+ {$recur['frequency_interval']} {$recur['frequency_unit']}", strtotime($receive_date)));
+        $contributionNumber++;
+      }
+      $contributionRecurID++;
+    }
     $this->_query('SET foreign_key_checks = 1');
+    $contributionID = 1;
+    $currentActivityID = CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_activity') + 1;
+    foreach ($contributions as $contribution) {
+      $contribution = array_merge($defaults, $contribution);
+      $contribution['receive_date'] = date('Y-m-d H:i:s', strtotime($contribution['receive_date']));
+      $contributionObject = new CRM_Contribute_BAO_Contribution();
+      $contributionObject->copyValues($contribution);
+      $contributionObject->save();
 
-    $query = "
-INSERT INTO civicrm_contribution
-    (contact_id, financial_type_id, payment_instrument_id, receive_date, non_deductible_amount, total_amount, trxn_id, check_number, currency, cancel_date, cancel_reason, receipt_date, thankyou_date, source, contribution_recur_id)
-VALUES
-    (2, 1, 4, '2010-04-11 00:00:00', 0.00, 125.00, NULL, '1041', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL),
-    (4, 1, 1, '2010-03-21 00:00:00', 0.00, 50.00, 'P20901X1', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Save the Penguins', NULL),
-    (6, 1, 4, '2010-04-29 00:00:00', 0.00, 25.00, NULL, '2095', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL),
-    (8, 1, 4, '2010-04-11 00:00:00', 0.00, 50.00, NULL, '10552', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL),
-    (16, 1, 4, '2010-04-15 00:00:00', 0.00, 500.00, NULL, '509', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL),
-    (19, 1, 4, '2010-04-11 00:00:00', 0.00, 175.00, NULL, '102', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL),
-    (56, 3, 1, '2010-04-29 00:00:00', 0.00, 25.00, NULL, 'RR123', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', 1),
-    (56, 3, 1, '2010-05-29 00:00:00', 0.00, 25.00, NULL, 'RR124', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', 1),
-    (56, 3, 1, '2010-06-29 00:00:00', 0.00, 25.00, NULL, 'RR125', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', 1),
-    (56, 3, 1, '2010-07-29 00:00:00', 0.00, 25.00, NULL, 'RR126', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', 1),
-    (56, 3, 1, '2010-08-29 00:00:00', 0.00, 25.00, NULL, 'RR127', 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', 1),
-    (82, 1, 1, '2010-03-27 00:00:00', 0.00, 50.00, 'P20193L2', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Save the Penguins', NULL),
-    (92, 1, 1, '2010-03-08 00:00:00', 0.00, 10.00, 'P40232Y3', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Help CiviCRM', NULL),
-    (34, 1, 1, '2010-04-22 00:00:00', 0.00, 250.00, 'P20193L6', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Help CiviCRM', NULL),
-    (71, 1, 1, '2009-07-01 11:53:50', 0.00, 500.00, 'PL71', NULL, 'USD', NULL, NULL, NULL, NULL, NULL, NULL),
-    (43, 1, 1, '2009-07-01 12:55:41', 0.00, 200.00, 'PL43II', NULL, 'USD', NULL, NULL, NULL, NULL, NULL, NULL),
-    (32, 1, 1, '2009-10-01 11:53:50', 0.00, 200.00, 'PL32I', NULL, 'USD', NULL, NULL, NULL, NULL, NULL, NULL),
-    (32, 1, 1, '2009-12-01 12:55:41', 0.00, 200.00, 'PL32II', NULL, 'USD', NULL, NULL, NULL, NULL, NULL, NULL),
-    (99, 1, 1, '2010-03-08 00:00:00', 0.00, 10.00, 'REC-123', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Help CiviCRM', 2);
-";
-    $this->_query($query);
-
-    $currentActivityID = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) FROM civicrm_activity");
-    $query = "
+      $symbols = [
+        'USD' => '$',
+        'CAD' => '$',
+        'EUR' => '€',
+        'GBP' => '£',
+        'JPY' => '¥',
+      ];
+      $subject = $symbols[$contribution['currency']] . ' ' . $contribution['total_amount'] . ' ' . $contribution['source'];
+      $this->_query('
 INSERT INTO civicrm_activity
     (source_record_id, activity_type_id, subject, activity_date_time, duration, location, phone_id, phone_number, details, priority_id,parent_id, is_test, status_id)
-VALUES
-    (1, 6, '$ 125.00-Apr 2007 Mailer 1', '2010-04-11 00:00:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2 ),
-    (2, 6, '$ 50.00-Online: Save the Penguins', '2010-03-21 00:00:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2 ),
-    (3, 6, '$ 25.00-Apr 2007 Mailer 1', '2010-04-29 00:00:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2 ),
-    (4, 6, '$ 50.00-Apr 2007 Mailer 1', '2010-04-11 00:00:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2 ),
-    (5, 6, '$ 500.00-Apr 2007 Mailer 1', '2010-04-15 00:00:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2 ),
-    (6, 6, '$ 175.00-Apr 2007 Mailer 1', '2010-04-11 00:00:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2 ),
-    (7, 6, '$ 50.00-Online: Save the Penguins', '2010-03-27 00:00:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2 ),
-    (8, 6, '$ 10.00-Online: Save the Penguins', '2010-03-08 00:00:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2 ),
-    (9, 6, '$ 250.00-Online: Save the Penguins', '2010-04-22 00:00:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2 ),
-    (10, 6, NULL, '2009-07-01 11:53:50', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2 ),
-    (11, 6, NULL, '2009-07-01 12:55:41', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2 ),
-    (12, 6, NULL, '2009-10-01 11:53:50', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2 ),
-    (13, 6, NULL, '2009-12-01 12:55:41', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2 );
-    ";
-    $this->_query($query);
-
-    $activityContact = "
-INSERT INTO civicrm_activity_contact
+VALUES (
+     %1, 6, %2, %3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2
+  )',
+        [
+          1 => [$contributionID, 'Integer'],
+          2 => [$subject, 'String'],
+          3 => [$receive_date, 'String'],
+        ]
+      );
+      $this->_query("INSERT INTO civicrm_activity_contact
   (contact_id, activity_id, record_type_id)
-VALUES
-";
-
-    $arbitraryNumbers = array(2, 4, 6, 8, 16, 19, 82, 92, 34, 71, 43, 32, 32);
-    for ($i = 0; $i < count($arbitraryNumbers); $i++) {
+VALUES ({$contribution['contact_id']}, $currentActivityID, 2)");
+      $contributionID++;
       $currentActivityID++;
-      $activityContact .= "({$arbitraryNumbers[$i]}, $currentActivityID, 2)";
-      if ($i != count($arbitraryNumbers) - 1) {
-        $activityContact .= ", ";
-      }
     }
-    $this->_query($activityContact);
   }
 
   private function addSoftContribution() {
