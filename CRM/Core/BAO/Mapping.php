@@ -649,6 +649,11 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Test\Ho
             $relationships
           );
         }
+        if (!empty($fields[$contactType]['state_province']) && empty($fields[$contactType]['state_province_name'])) {
+          $fields[$contactType]['state_province_name'] = $fields[$contactType]['state_province'];
+          $fields[$contactType]['state_province_name']['title'] = ts('State/Province Name');
+          $fields[$contactType]['state_province']['title'] = ts('State/Province Abbreviation');
+        }
       }
     }
 
