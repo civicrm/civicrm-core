@@ -187,6 +187,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
           ->addSelect('*', 'type:name', 'type:icon', 'saved_search_id.name', 'saved_search_id.api_entity', 'saved_search_id.api_params')
           ->execute()->first();
         $display['calc_fields'] = $this->getCalcFields($display['saved_search_id.api_entity'], $display['saved_search_id.api_params']);
+        $display['filters'] = empty($displayTag['filters']) ? NULL : (\CRM_Utils_JS::getRawProps($displayTag['filters']) ?: NULL);
         $info['search_displays'][] = $display;
         if ($newForm) {
           $info['definition']['layout'][0]['#children'][] = $displayTag + ['#tag' => $display['type:name']];
