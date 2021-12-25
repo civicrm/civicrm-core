@@ -36,6 +36,12 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
         'name' => 'test-queue',
       ],
     ];
+    $queueSpecs[] = [
+      [
+        'type' => 'SqlParallel',
+        'name' => 'test-queue-sqlparallel',
+      ],
+    ];
     return $queueSpecs;
   }
 
