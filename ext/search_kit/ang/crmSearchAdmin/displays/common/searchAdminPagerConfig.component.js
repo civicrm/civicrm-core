@@ -42,6 +42,14 @@
         }
       };
 
+      // When user deletes limit, set it to 0 and disable pager
+      this.onChangeLimit = function() {
+        if (!ctrl.display.settings.limit) {
+          ctrl.display.settings.limit = 0;
+          ctrl.display.settings.pager = false;
+        }
+      };
+
     }
   });
 
