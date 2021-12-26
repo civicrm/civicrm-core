@@ -418,6 +418,7 @@
     <default>CURRENT_TIMESTAMP</default>
     <html>
       <label>Created Date</label>
+      <type>Select Date</type>
     </html>
     <add>4.7</add>
   </field>
@@ -431,6 +432,7 @@
     <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
     <html>
       <label>Modified Date</label>
+      <type>Select Date</type>
     </html>
     <readonly>true</readonly>
     <add>4.7</add>
