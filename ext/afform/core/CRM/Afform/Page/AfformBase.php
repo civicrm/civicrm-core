@@ -40,7 +40,6 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
 
     if (!empty($afform['title'])) {
       $title = strip_tags($afform['title']);
-      CRM_Utils_System::setTitle($title);
       if (!$isFrontEndPage) {
         CRM_Utils_System::appendBreadCrumb([
           [

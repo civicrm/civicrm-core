@@ -62,6 +62,12 @@
 
         if (this.afFieldset) {
           $scope.$watch(this.afFieldset.getFieldData, onChangeFilters, true);
+          // Add filter title to Afform
+          this.onPostRun.push(function(results) {
+            if (results.labels && results.labels.length && $scope.$parent.addTitle) {
+              $scope.$parent.addTitle(results.labels.join(' '));
+            }
+          });
         }
         if (this.settings.pager && this.settings.pager.expose_limit) {
           $scope.$watch('$ctrl.limit', onChangePageSize);

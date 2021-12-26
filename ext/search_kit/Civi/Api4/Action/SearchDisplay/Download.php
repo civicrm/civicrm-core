@@ -46,10 +46,10 @@ class Download extends AbstractRunAction {
   ];
 
   /**
-   * @param \Civi\Api4\Generic\Result $result
+   * @param \Civi\Api4\Result\SearchDisplayRunResult $result
    * @throws \API_Exception
    */
-  protected function processResult(\Civi\Api4\Generic\Result $result) {
+  protected function processResult(\Civi\Api4\Result\SearchDisplayRunResult $result) {
     $entityName = $this->savedSearch['api_entity'];
     $apiParams =& $this->_apiParams;
     $settings = $this->display['settings'];
