@@ -84,6 +84,18 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->first();
 
     $this->assertEquals('Blue', $contact['MyIndividualFields.FavColor']);
+
+    // Try setting to null
+    Contact::update()
+      ->addWhere('id', '=', $contactId)
+      ->addValue('MyIndividualFields.FavColor', NULL)
+      ->execute();
+    $contact = Contact::get(FALSE)
+      ->addSelect('MyIndividualFields.FavColor')
+      ->addWhere('id', '=', $contactId)
+      ->execute()
+      ->first();
+    $this->assertEquals(NULL, $contact['MyIndividualFields.FavColor']);
   }
 
   public function testWithTwoFields() {
