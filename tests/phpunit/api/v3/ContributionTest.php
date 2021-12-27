@@ -2082,7 +2082,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test completing a transaction via the API with a non-USD transaction.
    */
-  public function testCompleteTransactionEuro() {
+  public function testCompleteTransactionEuro(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $this->swapMessageTemplateForTestTemplate();
     $this->createLoggedInUser();

@@ -37,9 +37,9 @@
 
 {foreach from=$dataArray item=value key=priceset}
 {if $priceset ||  $priceset == 0 || $value != ''}
-{if isset($taxTerm)}{$taxTerm}{/if} {$priceset|string_format:"%.2f"}% : {$value|crmMoney:$currency}
+{$taxTerm} {$priceset|string_format:"%.2f"}% : {$value|crmMoney:$currency}
 {else}
-{ts}No{/ts} {if isset($taxTerm)}{$taxTerm}{/if} : {$value|crmMoney:$currency}
+{ts}No{/ts} {$taxTerm} : {$value|crmMoney:$currency}
 {/if}
 {/foreach}
 {/if}
