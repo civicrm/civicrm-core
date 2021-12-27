@@ -80,12 +80,20 @@ class CRM_Queue_Service {
    *   - reset: bool, optional; if a queue is found, then it should be
    *     flushed; default to TRUE
    *   - (additional keys depending on the queue provider).
+   *   - is_persistent: bool, optional; if true, then this queue is stored and discoverable
+   *   - is_autorun: bool, optional; if true, then this queue will be auto-scanned
+   *     by background task-runners
    *
    * @return CRM_Queue_Queue
    */
   public function create($queueSpec) {
     if (is_object($this->queues[$queueSpec['name']] ?? NULL) && empty($queueSpec['reset'])) {
       return $this->queues[$queueSpec['name']];
+    }
+    $queueSpec = array_merge($this->getDefaultSpec($queueSpec['name']), $queueSpec);
+
+    if (!empty($queueSpec['is_persistent'])) {
+      $this->registerPersistentQueue($queueSpec);
     }
 
     $queue = $this->instantiateQueueObject($queueSpec);
@@ -102,6 +110,62 @@ class CRM_Queue_Service {
     }
     $this->queues[$queueSpec['name']] = $queue;
     return $queue;
+  }
+
+  /**
+   * Determine default settings based on the name of queue.
+   *
+   * Flags:
+   *   - `?bg` ("Background") implies persistent, auto-running queue with parallel tasks
+   *   - `?fg` ("Foreground") implies ephemeral queue with linear tasks
+   *
+   * @param string $name
+   *   Ex: 'foo?bg'
+   * @return array
+   *   Ex: ['type' => 'SqlParallel', 'is_persistent' => TRUE, 'is_autorun' => TRUE]
+   */
+  protected function getDefaultSpec(string $name): array {
+    $defaults = ['is_persistent' => FALSE, 'is_autorun' => FALSE];
+    if (FALSE !== ($questionPos = strpos($name, '?'))) {
+      $flags = explode(',', substr($name, 1 + $questionPos));
+
+      $flagDefs = [
+        'bg' => ['is_persistent' => TRUE, 'is_autorun' => TRUE, 'type' => 'SqlParallel'],
+        'fg' => ['is_persistent' => FALSE, 'is_autorun' => FALSE, 'type' => 'Sql'],
+        // More fine-grained flags might be more expressive. But are they really needed? Maybe...?
+        // 'parallel' => ['type' => 'SqlParallel'],
+        // 'linear' => ['type' => 'Sql'],
+        // 'persist' => ['is_persistent' => TRUE],
+        // 'autorun' => ['is_persistent' => TRUE, 'is_autorun' => TRUE],
+      ];
+
+      foreach (array_intersect($flags, array_keys($flagDefs)) as $flag) {
+        $defaults = array_merge($defaults, $flagDefs[$flag]);
+      }
+    }
+    return $defaults;
+  }
+
+  protected function registerPersistentQueue(array $queueSpec): void {
+    $values = CRM_Utils_Array::subset($queueSpec, ['name', 'type', 'is_autorun']);
+
+    // Passing this to APIv4 might have advantages; at time of writing, APIv4 seems to confuse MailingEventQueue and Queue.
+    // if (Civi\Api4\Queue::get(FALSE)->addWhere('name', '=', $queueSpec['name'])->execute()->count()) {
+    //   return;
+    // }
+    // Civi\Api4\Queue::create(FALSE)
+    //   ->setValues($values)
+    //   ->execute();
+
+    $dao = new CRM_Queue_DAO_Queue();
+    $dao->name = $queueSpec['name'];
+    if ($dao->find()) {
+      return;
+    }
+
+    $dao = new CRM_Queue_DAO_Queue();
+    $dao->copyValues($values);
+    $dao->insert();
   }
 
   /**

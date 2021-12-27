@@ -106,6 +106,40 @@ class Civi {
   }
 
   /**
+   * Find or create a queue.
+   *
+   * This interface is somewhat opinionated about how to construct the
+   * queue object. If you need more fine-grained control, then directly
+   * use `CRM_Queue_Service::singleton()` or instantiate the queue directly.
+   *
+   * @param string $name
+   *   Name of the queue. The name should include a flag (`?bg` or `?fg`) that indicates
+   *   a general stereotype for usage.
+   *
+   *   Flags:
+   *   - `?bg` ("Background"): Queue tasks execute automatically in the background.
+   *   - `?fg` ("Foreground"): Queue tasks execute in the foreground. You must take extra
+   *     steps to ensure that the foreground page runs the queue.
+   *
+   *   Currently, the flags indicate the following queue configuration:
+   *   - `?bg`: `type=>SqlParallel`, 'is_persistent=>TRUE`, `is_autorun=>TRUE`
+   *   - `?fg`: `type=>Sql`, 'is_persistent=>FALSE`, `is_autorun=>FALSE`
+   *
+   *   At time of writing, there is no hook or mechanism to override or supplement these
+   *   flags. However, it could be appropriate to add a mechanism.
+   *
+   *   Ex: 'foobar?fg' or 'bazqux?bg'
+   * @return \CRM_Queue_Queue
+   * @see \CRM_Queue_Service
+   */
+  public static function queue(string $name): CRM_Queue_Queue {
+    return CRM_Queue_Service::singleton()->create([
+      'name' => $name,
+      'reset' => FALSE,
+    ]);
+  }
+
+  /**
    * Obtain the formatting object.
    *
    * @return \Civi\Core\Format
