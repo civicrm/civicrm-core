@@ -29,6 +29,7 @@
           options: col.edit.options,
           fk_entity: col.edit.fk_entity,
           serialize: col.edit.serialize,
+          required: col.edit.required,
         };
 
         $(document).on('keydown.crmSearchDisplayEditable', function(e) {

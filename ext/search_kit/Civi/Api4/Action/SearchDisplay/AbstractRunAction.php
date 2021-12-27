@@ -467,7 +467,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
 
   /**
    * @param $key
-   * @return array{entity: string, input_type: string, data_type: string, options: bool, serialize: bool, fk_entity: string, value_key: string, value_path: string, id_key: string, id_path: string}|null
+   * @return array{entity: string, input_type: string, data_type: string, options: bool, serialize: bool, required: bool, fk_entity: string, value_key: string, value_path: string, id_key: string, id_path: string}|null
    */
   private function getEditableInfo($key) {
     [$key] = explode(':', $key);
@@ -491,6 +491,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         'options' => !empty($field['options']),
         'serialize' => !empty($field['serialize']),
         'fk_entity' => $field['fk_entity'],
+        'required' => $field['required'],
         'value_key' => $field['name'],
         'value_path' => $key,
         'id_key' => $idKey,
