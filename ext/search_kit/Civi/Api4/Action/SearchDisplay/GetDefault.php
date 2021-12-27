@@ -154,7 +154,7 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
       if (!empty($field['explicit_join'])) {
         $label = $this->getJoinLabel($field['explicit_join']) . ': ';
       }
-      if (!empty($field['implicit_join'])) {
+      if (!empty($field['implicit_join']) && empty($field['custom_field_id'])) {
         $field = $this->getField(substr($expr->getAlias(), 0, -1 - strlen($field['name'])));
       }
       return $label . $field['label'];
