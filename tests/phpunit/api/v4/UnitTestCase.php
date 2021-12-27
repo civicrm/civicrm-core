@@ -264,6 +264,9 @@ class UnitTestCase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
         'subject' => 'unit testing',
         'source_contact_id' => 'dummy.Individual',
       ],
+      'Group' => [
+        'title' => 'unit testing',
+      ],
     ];
     if ($type == 'Contact') {
       $type = 'Individual';
