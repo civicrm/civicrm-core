@@ -193,6 +193,9 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting {
    *   List of groupIds that represent the requested group and its descendents
    */
   public static function getDescendentGroupIds($groupIds, $includeSelf = TRUE) {
+    if (!$groupIds) {
+      return [];
+    }
     if (!is_array($groupIds)) {
       $groupIds = [$groupIds];
     }
