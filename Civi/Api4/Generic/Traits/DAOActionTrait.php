@@ -257,43 +257,44 @@ trait DAOActionTrait {
         continue;
       }
 
-      // todo are we sure we don't want to allow setting to NULL? need to test
-      if (NULL !== $value) {
-
-        if ($field['suffix']) {
-          $options = FormattingUtil::getPseudoconstantList($field, $name, $params, $this->getActionName());
-          $value = FormattingUtil::replacePseudoconstant($options, $value, TRUE);
-        }
-
-        if ($field['html_type'] === 'CheckBox') {
-          // this function should be part of a class
-          formatCheckBoxField($value, 'custom_' . $field['id'], $this->getEntityName());
-        }
-
-        // Match contact id to strings like "user_contact_id"
-        // FIXME handle arrays for multi-value contact reference fields, etc.
-        if ($field['data_type'] === 'ContactReference' && is_string($value) && !is_numeric($value)) {
-          // FIXME decouple from v3 API
-          require_once 'api/v3/utils.php';
-          $value = \_civicrm_api3_resolve_contactID($value);
-          if ('unknown-user' === $value) {
-            throw new \API_Exception("\"{$field['name']}\" \"{$value}\" cannot be resolved to a contact ID", 2002, ['error_field' => $field['name'], "type" => "integer"]);
-          }
-        }
-
-        \CRM_Core_BAO_CustomField::formatCustomField(
-          $field['id'],
-          $customParams,
-          $value,
-          $field['custom_group_id.extends'],
-          // todo check when this is needed
-          NULL,
-          $entityId,
-          FALSE,
-          $this->getCheckPermissions(),
-          TRUE
-        );
+      // Null and empty string are interchangeable as far as the custom bao understands
+      if (NULL === $value) {
+        $value = '';
       }
+
+      if ($field['suffix']) {
+        $options = FormattingUtil::getPseudoconstantList($field, $name, $params, $this->getActionName());
+        $value = FormattingUtil::replacePseudoconstant($options, $value, TRUE);
+      }
+
+      if ($field['html_type'] === 'CheckBox') {
+        // this function should be part of a class
+        formatCheckBoxField($value, 'custom_' . $field['id'], $this->getEntityName());
+      }
+
+      // Match contact id to strings like "user_contact_id"
+      // FIXME handle arrays for multi-value contact reference fields, etc.
+      if ($field['data_type'] === 'ContactReference' && is_string($value) && !is_numeric($value)) {
+        // FIXME decouple from v3 API
+        require_once 'api/v3/utils.php';
+        $value = \_civicrm_api3_resolve_contactID($value);
+        if ('unknown-user' === $value) {
+          throw new \API_Exception("\"{$field['name']}\" \"{$value}\" cannot be resolved to a contact ID", 2002, ['error_field' => $field['name'], "type" => "integer"]);
+        }
+      }
+
+      \CRM_Core_BAO_CustomField::formatCustomField(
+        $field['id'],
+        $customParams,
+        $value,
+        $field['custom_group_id.extends'],
+        // todo check when this is needed
+        NULL,
+        $entityId,
+        FALSE,
+        $this->getCheckPermissions(),
+        TRUE
+      );
     }
 
     $params['custom'] = $customParams ?: NULL;
