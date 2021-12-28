@@ -159,7 +159,13 @@
     {literal}
 
     cj("#additional_participants").change(function () {
-      skipPaymentMethod();
+      if (typeof skipPaymentMethod == 'function') {
+        // For free event there is no involvement of payment processor, hence
+        // this function is not available. if above condition not present
+        // then you will receive JS Error in case you change multiple
+        // registrant option.
+        skipPaymentMethod();
+      }
     });
 
   {/literal}
@@ -225,7 +231,13 @@
         cj("#bypass_payment").val(0);
       }
       //reset value since user don't want or not eligible for waitlist
-      skipPaymentMethod();
+      if (typeof skipPaymentMethod == 'function') {
+        // For free event there is no involvement of payment processor, hence
+        // this function is not available. if above condition not present
+        // then you will receive JS Error in case register multiple participants
+        // enabled and require approval.
+        skipPaymentMethod();
+      }
     }
   }
 
