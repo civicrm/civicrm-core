@@ -15,7 +15,7 @@ class CRM_Core_Reference_Basic implements CRM_Core_Reference_Interface {
   /**
    * @param $refTable
    * @param $refKey
-   * @param null $targetTable
+   * @param string $targetTable
    * @param string $targetKey
    * @param null $refTypeColumn
    */

@@ -119,7 +119,7 @@ class CRM_Extension_Browser {
   /**
    * Get a list of all available extensions.
    *
-   * @return array
+   * @return CRM_Extension_Info[]
    *   ($key => CRM_Extension_Info)
    */
   public function getExtensions() {
@@ -159,7 +159,7 @@ class CRM_Extension_Browser {
   }
 
   /**
-   * @return array
+   * @return CRM_Extension_Info[]
    * @throws CRM_Extension_Exception_ParseException
    */
   private function _discoverRemote() {

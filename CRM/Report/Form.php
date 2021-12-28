@@ -297,10 +297,12 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @var int
    */
   protected $_offsetValue = NULL;
+
   /**
-   * @var null
+   * @var array
    */
-  protected $_sections = NULL;
+  protected $_sections = [];
+
   protected $_autoIncludeIndexedFieldsAsOrderBys = 0;
 
   /**
@@ -3917,7 +3919,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * Buld contact acl clause
+   * Build contact acl clause
    * @deprecated in favor of buildPermissionClause
    *
    * Note that if the buildPermissionClause function is called (which most reports do from
@@ -3930,7 +3932,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * Build the permision clause for all entities in this report
+   * Build the permission clause for all entities in this report
    */
   public function buildPermissionClause() {
     $ret = [];
