@@ -491,7 +491,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         'options' => !empty($field['options']),
         'serialize' => !empty($field['serialize']),
         'fk_entity' => $field['fk_entity'],
-        'required' => $field['required'],
+        'required' => $field['required'] || $field['default_value'],
         'value_key' => $field['name'],
         'value_path' => $key,
         'id_key' => $idKey,

@@ -27,7 +27,7 @@ class ActivitySpecProvider implements Generic\SpecProviderInterface {
     $field->setTitle(ts('Source Contact'));
     $field->setLabel(ts('Added by'));
     $field->setDescription(ts('Contact who created this activity.'));
-    $field->setRequired($action === 'create');
+    $field->setRequired(TRUE);
     $field->setFkEntity('Contact');
     $field->setInputType('EntityRef');
     $spec->addFieldSpec($field);

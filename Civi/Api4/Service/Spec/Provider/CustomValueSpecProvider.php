@@ -34,7 +34,7 @@ class CustomValueSpecProvider implements Generic\SpecProviderInterface {
     $entityField->setType('Field');
     $entityField->setColumnName('entity_id');
     $entityField->setTitle(ts('Entity ID'));
-    $entityField->setRequired($action === 'create');
+    $entityField->setRequired(TRUE);
     $entityField->setFkEntity('Contact');
     $entityField->setReadonly(TRUE);
     $spec->addFieldSpec($entityField);
