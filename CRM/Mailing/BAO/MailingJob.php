@@ -979,7 +979,7 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
           $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Bulk Email');
         }
         if (!$activityTypeID) {
-          throw new CRM_Core_Execption(ts('No relevant activity type found when recording Mailing Event delivered Activity'));
+          throw new CRM_Core_Exception(ts('No relevant activity type found when recording Mailing Event delivered Activity'));
         }
       }
 
