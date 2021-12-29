@@ -1329,7 +1329,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       return $contactTypes;
     }
     else {
-      throw new CRM_Core_Exception();
+      throw new CRM_Core_Exception('Cannot proceed without a valid contact');
     }
   }
 
