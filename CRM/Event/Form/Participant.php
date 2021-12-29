@@ -2181,7 +2181,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   }
 
   /**
-   * Store the parameters to create a payment, if approprite, on the form.
+   * Store the parameters to create a payment, if appropriate, on the form.
    *
    * @param array $params
    *   Params as submitted.

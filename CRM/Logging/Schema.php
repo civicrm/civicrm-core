@@ -512,7 +512,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    * Get column query.
    *
    * @param string $col
-   * @param bool $createQuery
+   * @param array $createQuery
    *
    * @return array|mixed|string
    */

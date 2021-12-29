@@ -492,7 +492,7 @@ WHERE li.contribution_id = %1";
    * @param array $params
    *   Form values.
    *
-   * @param string $entityId
+   * @param string[]|null $entityId
    *   Entity id.
    *
    * @param string $entityTable

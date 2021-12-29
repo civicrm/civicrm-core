@@ -1814,7 +1814,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
       $formattedGroupTree[$key]['collapse_adv_display'] = $value['collapse_adv_display'] ?? NULL;
       $formattedGroupTree[$key]['style'] = $value['style'] ?? NULL;
 
-      // this params needed of bulding multiple values
+      // this params needed of building multiple values
       $formattedGroupTree[$key]['is_multiple'] = $value['is_multiple'] ?? NULL;
       $formattedGroupTree[$key]['extends'] = $value['extends'] ?? NULL;
       $formattedGroupTree[$key]['extends_entity_column_id'] = $value['extends_entity_column_id'] ?? NULL;

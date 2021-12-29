@@ -16,7 +16,7 @@
  */
 
 /**
- * Event Info Page - Summmary about the event
+ * Event Info Page - Summary about the event
  */
 class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 

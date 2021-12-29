@@ -546,7 +546,7 @@ class CRM_Extension_Mapper {
    * @todo We should improve this to return more appropriate text. eg. when an extension is not installed
    *   it should not say "version xx is installed".
    *
-   * @param array $remoteExtensionInfo
+   * @param CRM_Extension_Info $remoteExtensionInfo
    * @param array $localExtensionInfo
    *
    * @return string

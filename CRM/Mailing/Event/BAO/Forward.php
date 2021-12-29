@@ -30,8 +30,8 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
    * @param $queue_id
    * @param $hash
    * @param $forward_email
-   * @param null $fromEmail
-   * @param null $comment
+   * @param string|null $fromEmail
+   * @param array|null $comment
    *
    * @return bool
    */

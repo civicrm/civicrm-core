@@ -638,7 +638,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   /**
    * Send a receipt.
    *
-   * @param array $membership
+   * @param CRM_Member_BAO_Membership $membership
    *
    * @throws \CRM_Core_Exception
    */
