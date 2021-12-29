@@ -769,6 +769,7 @@ December 21st, 2007
       '{domain.id}' => ts('Domain ID'),
       '{domain.description}' => ts('Domain Description'),
       '{domain.now}' => 'Current time/date',
+      '{domain.tax_term}' => 'Sales tax term (e.g VAT)',
     ];
   }
 

@@ -62,9 +62,7 @@
   {if !empty($priceset)}
   priceset:::{$priceset}
   {/if}
-  {if !empty($taxTerm)}
   taxTerm:::{$taxTerm}
-  {/if}
   {if !empty($pcpBlock)}
   pcpBlock:::{$pcpBlock}
   pcp_display_in_roll:::{$pcp_display_in_roll}
@@ -82,10 +80,8 @@
   {if !empty($isBillingAddressRequiredForPayLater)}
   isBillingAddressRequiredForPayLater:::{$isBillingAddressRequiredForPayLater}
   {/if}
-  {if !empty($billingName)}
   billingName:::{$billingName}
   address:::{$address}
-  {/if}
   {if !empty($credit_card_type)}
   credit_card_type:::{$credit_card_type}
   credit_card_number:::{$credit_card_number}

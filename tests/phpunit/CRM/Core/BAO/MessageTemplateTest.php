@@ -15,15 +15,14 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
 
   /**
    * Post test cleanup.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function tearDown():void {
     $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_im', 'civicrm_website', 'civicrm_openid', 'civicrm_email'], TRUE);
     parent::tearDown();
+    Civi::cache('metadata')->clear();
   }
 
-  public function testRenderTemplate() {
+  public function testRenderTemplate(): void {
     $contactId = $this->individualCreate([
       'first_name' => 'Abba',
       'last_name' => 'Baab',
@@ -107,7 +106,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $this->assertStringContainsString('<p>Hello testSendTemplate_RenderMode_OpenTemplate Abba Baab!</p>', $messageHtml);
   }
 
-  public function testSendTemplate_RenderMode_DefaultTpl() {
+  public function testSendTemplate_RenderMode_DefaultTpl(): void {
     CRM_Core_Transaction::create(TRUE)->run(function(CRM_Core_Transaction $tx) {
       $tx->rollback();
 
@@ -144,7 +143,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     });
   }
 
-  public function testSendTemplate_RenderMode_TokenContext() {
+  public function testSendTemplateRenderModeTokenContext(): void {
     CRM_Core_Transaction::create(TRUE)->run(function(CRM_Core_Transaction $tx) {
       $tx->rollback();
 
