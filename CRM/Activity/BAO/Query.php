@@ -461,7 +461,6 @@ class CRM_Activity_BAO_Query {
     if (!empty($ssID) && !empty($form->_formValues['activity_status_id'])) {
       $status = $form->_formValues['activity_status_id'];
     }
-    $form->setDefaults(['activity_status_id' => $status]);
 
     $form->addElement('text', 'activity_text', ts('Activity Text'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
 
