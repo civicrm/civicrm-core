@@ -27,11 +27,14 @@ class CRM_Contact_BAO_Contact_Utils {
    *   Contact id.
    * @param bool $addProfileOverlay
    *   If profile overlay class should be added.
+   * @param string $contactUrl
+   *   URL to the contact page. Defaults to civicrm/contact/view
    *
    * @return string
    * @throws \CRM_Core_Exception
    */
-  public static function getImage($contactType, $urlOnly = FALSE, $contactId = NULL, $addProfileOverlay = TRUE) {
+  public static function getImage($contactType, $urlOnly = FALSE, $contactId = NULL, $addProfileOverlay = TRUE, $contactUrl = NULL) {
+
     static $imageInfo = [];
 
     $contactType = CRM_Utils_Array::explodePadded($contactType);
@@ -79,11 +82,14 @@ class CRM_Contact_BAO_Contact_Utils {
         $summaryOverlayProfileId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', 'summary_overlay', 'id', 'name');
       }
 
+      $contactURL = $contactUrl ?: CRM_Utils_System::url('civicrm/contact/view',
+        "reset=1&cid={$contactId}"
+      );
       $profileURL = CRM_Utils_System::url('civicrm/profile/view',
         "reset=1&gid={$summaryOverlayProfileId}&id={$contactId}&snippet=4&is_show_email_task=1"
       );
 
-      $imageInfo[$contactType]['summary-link'] = '<a href="' . $profileURL . '" class="crm-summary-link">' . $imageInfo[$contactType]['image'] . '</a>';
+      $imageInfo[$contactType]['summary-link'] = '<a href="' . $contactURL . '" data-tooltip-url="' . $profileURL . '" class="crm-summary-link">' . $imageInfo[$contactType]['image'] . '</a>';
     }
     else {
       $imageInfo[$contactType]['summary-link'] = $imageInfo[$contactType]['image'];

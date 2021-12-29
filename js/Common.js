@@ -1148,10 +1148,11 @@ if (!CRM.vars) CRM.vars = {};
           $(this).addClass('crm-tooltip-down');
         }
         if (!$(this).children('.crm-tooltip-wrapper').length) {
+          var tooltipContents = $(this)[0].hasAttribute('data-tooltip-url') ? $(this).attr('data-tooltip-url') : this.href;
           $(this).append('<div class="crm-tooltip-wrapper"><div class="crm-tooltip"></div></div>');
           $(this).children().children('.crm-tooltip')
             .html('<div class="crm-loading-element"></div>')
-            .load(this.href);
+            .load(tooltipContents);
         }
       })
       .on('mouseleave', 'a.crm-summary-link', function () {
