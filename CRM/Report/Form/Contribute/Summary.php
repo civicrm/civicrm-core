@@ -1014,7 +1014,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         $mode[] = CRM_Utils_Money::format($modeDAO->amount, $modeDAO->currency);
       }
       else {
-        $mode[] = 'N/A';
+        $mode[] = ts('N/A');
       }
     }
     return $mode;

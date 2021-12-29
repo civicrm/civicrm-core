@@ -210,7 +210,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $defaults = [];
 
     $paneNames = [
-      'Payment Reminders' => 'PaymentReminders',
+      ts('Payment Reminders') => 'PaymentReminders',
     ];
     foreach ($paneNames as $name => $type) {
       $urlParams = "snippet=4&formType={$type}";
