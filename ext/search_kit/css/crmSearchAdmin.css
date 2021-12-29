@@ -155,6 +155,7 @@
   position: relative;
   top: -5px;
   right: -9px;
+  vertical-align: top;
 }
 
 #bootstrap-theme.crm-search .api4-add-where-group-menu {
