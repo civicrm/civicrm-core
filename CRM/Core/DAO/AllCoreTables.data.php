@@ -603,7 +603,7 @@ return [
     'table' => 'civicrm_mailing_spool',
   ],
   'CRM_Mailing_Event_DAO_Queue' => [
-    'name' => 'Queue',
+    'name' => 'MailingEventQueue',
     'class' => 'CRM_Mailing_Event_DAO_Queue',
     'table' => 'civicrm_mailing_event_queue',
   ],
