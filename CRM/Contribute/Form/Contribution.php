@@ -668,7 +668,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_id) {
       $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
     }
-    $status = CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses('contribution', $this->getPreviousContributionStatus());
+    $status = CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses($this->getPreviousContributionStatus());
 
     // define the status IDs that show the cancellation info, see CRM-17589
     $cancelInfo_show_ids = [];

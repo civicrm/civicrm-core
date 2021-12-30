@@ -207,14 +207,13 @@ LIMIT 1
   /**
    * Get contribution statuses by entity e.g. contribution, membership or 'participant'
    *
-   * @param string $usedFor
    * @param string $name
    *   Contribution ID
    *
    * @return array
    *   Array of contribution statuses in array('status id' => 'label') format
    */
-  public static function getContributionStatuses($usedFor = 'contribution', $name = NULL) {
+  public static function getContributionStatuses($name = NULL) {
     $statusNames = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
 
     $statusNamesToUnset = [
