@@ -360,6 +360,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     $resolvedContacts = civicrm_api3('Contact', 'get', [
       'return' => array_keys($returnProperties),
       'id' => ['IN' => array_keys($contacts)],
+      'options' => ['limit' => 0],
     ])['values'];
     foreach ($contacts as $contactID => $contact) {
       $contacts[$contactID] = array_merge($resolvedContacts[$contactID], $contact);
