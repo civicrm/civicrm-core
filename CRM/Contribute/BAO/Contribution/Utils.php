@@ -228,21 +228,7 @@ LIMIT 1
     ];
     // on create fetch statuses on basis of component
     if (!$name) {
-      $statusNamesToUnset = array_merge($statusNamesToUnset, [
-        'Refunded',
-        'Chargeback',
-        'Pending refund',
-        'In Progress',
-        'Overdue',
-        'Partially paid',
-      ]);
-
-      if ($usedFor && $usedFor !== 'contribution') {
-        $statusNamesToUnset = array_merge($statusNamesToUnset, [
-          'Cancelled',
-          'Failed',
-        ]);
-      }
+      return self::getPendingCompleteFailedAndCancelledStatuses();
     }
     else {
       switch ($name) {
@@ -299,6 +285,34 @@ LIMIT 1
     }
 
     return $statuses;
+  }
+
+  /**
+   * Get the options for pending and completed as an array with labels as values.
+   *
+   * @return array
+   */
+  public static function getPendingAndCompleteStatuses(): array {
+    $statusIDS = [
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+    ];
+    return array_intersect_key(CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id'), array_flip($statusIDS));
+  }
+
+  /**
+   * Get the options for pending and completed as an array with labels as values.
+   *
+   * @return array
+   */
+  public static function getPendingCompleteFailedAndCancelledStatuses(): array {
+    $statusIDS = [
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Failed'),
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'),
+    ];
+    return array_intersect_key(CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id'), array_flip($statusIDS));
   }
 
   /**
