@@ -132,6 +132,21 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
     ];
   }
 
+  public function testTokenDataEscape() {
+    $cutesyContactId = $this->individualCreate([
+      'first_name' => 'Ivan\'s "The Ter<r>ib`le"',
+    ]);
+    $rendered = CRM_Core_TokenSmarty::render(
+      [
+        'msg_html' => 'First name is <b>{contact.first_name}</b>.',
+        'msg_text' => 'First name is __{contact.first_name}__.',
+      ],
+      ['contactId' => $cutesyContactId]
+    );
+    $this->assertEquals('First name is <b>Ivan&#039;s &quot;The Ter&lt;r&gt;ib`le&quot;</b>.', $rendered['msg_html']);
+    $this->assertEquals('First name is __Ivan\'s "The Ter<r>ib`le"__.', $rendered['msg_text']);
+  }
+
   /**
    * Someone malicious gives cutesy expressions (via token-content) that tries to provoke extra evaluation.
    */
