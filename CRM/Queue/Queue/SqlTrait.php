@@ -90,8 +90,12 @@ trait CRM_Queue_Queue_SqlTrait {
    *   The item returned by claimItem.
    */
   public function deleteItem($dao) {
-    $dao->delete();
-    $dao->free();
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_queue_item WHERE id = %1', [
+      1 => [$dao->id, 'Positive'],
+    ]);
+    if ($dao instanceof CRM_Core_DAO) {
+      $dao->free();
+    }
   }
 
   /**
