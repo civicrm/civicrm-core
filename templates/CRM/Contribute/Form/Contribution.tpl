@@ -493,7 +493,7 @@
       var choose = "{/literal}{ts escape='js'}Choose price set{/ts}{literal}";
       cj("#price_set_id option[value='']").html(choose);
 
-      cj('label[for="total_amount"]').text('{/literal}{ts}Total Amount{/ts}{literal}');
+      cj('label[for="total_amount"]').text('{/literal}{ts escape='js'}Total Amount{/ts}{literal}');
       cj(".crm-contribution-form-block-financial_type_id").show();
       cj("#financial_type_id option[value='']").attr('selected', true);
 
@@ -527,7 +527,7 @@
     var manual = "{/literal}{ts escape='js'}Manual contribution amount{/ts}{literal}";
     cj("#price_set_id option[value='']").html(manual);
 
-    cj('label[for="total_amount"]').text('{/literal}{ts}Price Sets{/ts}{literal}');
+    cj('label[for="total_amount"]').text('{/literal}{ts escape='js'}Price Sets{/ts}{literal}');
     if (financialtypeIds) {
       cj("#financial_type_id option[value="+financialtypeIds[priceSetId]+"]").prop('selected', true);
     }
