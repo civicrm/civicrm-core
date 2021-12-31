@@ -34,7 +34,7 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
    * CRM-17815 - Test due date and payment advice block in generated
    * invoice pdf for pending and completed contributions
    */
-  public function testInvoiceForDueDate() {
+  public function testInvoiceForDueDate(): void {
     $contactIds = [];
     $params = [
       'output' => 'pdf_invoice',
@@ -86,7 +86,7 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testInvoiceForLineItems() {
+  public function testInvoiceForLineItems(): void {
 
     $this->enableTaxAndInvoicing();
 
@@ -217,6 +217,8 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $expected = [
       'externalIdentifier (token):::2345',
       'displayName (token):::Mr. Anthony Anderson II',
+      'currency (token):::GBP',
+      'currency (smarty):::GBP',
     ];
     foreach ($expected as $string) {
       $this->assertStringContainsString($string, $invoiceHTML);
