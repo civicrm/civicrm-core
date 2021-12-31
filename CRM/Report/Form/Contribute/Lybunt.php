@@ -16,12 +16,6 @@
  */
 class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
-  protected $_charts = [
-    '' => 'Tabular',
-    'barChart' => 'Bar Chart',
-    'pieChart' => 'Pie Chart',
-  ];
-
   /**
    * This is the report that links will lead to.
    *
@@ -248,6 +242,13 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
     // If we have a campaign, build out the relevant elements
     $this->addCampaignFields('civicrm_contribution');
+
+    // Add charts support
+    $this->_charts = [
+      '' => ts('Tabular'),
+      'barChart' => ts('Bar Chart'),
+      'pieChart' => ts('Pie Chart'),
+    ];
 
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
@@ -630,7 +631,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $current_year = $this->_params['yid_value'];
     $previous_year = $current_year - 1;
     $interval[$previous_year] = $previous_year;
-    $interval['life_time'] = 'Life Time';
+    $interval['life_time'] = ts('Life Time');
 
     foreach ($rows as $key => $row) {
       // The final row contains the totals so we don't need to include it here.
