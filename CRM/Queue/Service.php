@@ -125,23 +125,26 @@ class CRM_Queue_Service {
    *   Ex: ['type' => 'SqlParallel', 'is_persistent' => TRUE, 'is_autorun' => TRUE]
    */
   protected function getDefaultSpec(string $name): array {
-    $defaults = ['is_persistent' => FALSE, 'is_autorun' => FALSE];
+    $defaults = ['is_autorun' => FALSE];
     if (FALSE !== ($questionPos = strpos($name, '?'))) {
       $flags = explode(',', substr($name, 1 + $questionPos));
 
       $flagDefs = [
         'bg' => ['is_persistent' => TRUE, 'is_autorun' => TRUE, 'type' => 'SqlParallel'],
         'fg' => ['is_persistent' => FALSE, 'is_autorun' => FALSE, 'type' => 'Sql'],
-        // More fine-grained flags might be more expressive. But are they really needed? Maybe...?
-        // 'parallel' => ['type' => 'SqlParallel'],
-        // 'linear' => ['type' => 'Sql'],
-        // 'persist' => ['is_persistent' => TRUE],
-        // 'autorun' => ['is_persistent' => TRUE, 'is_autorun' => TRUE],
+        'parallel' => ['type' => 'SqlParallel'],
+        'linear' => ['type' => 'Sql'],
+        'persist' => ['is_persistent' => TRUE],
+        'autorun' => ['is_autorun' => TRUE],
       ];
 
       foreach (array_intersect($flags, array_keys($flagDefs)) as $flag) {
         $defaults = array_merge($defaults, $flagDefs[$flag]);
       }
+    }
+
+    if (!isset($defaults['is_persistent'])) {
+      $defaults['is_persistent'] = $defaults['is_autorun'];
     }
     return $defaults;
   }
