@@ -116,12 +116,13 @@ class CRM_Queue_Queue_SqlParallel extends CRM_Queue_Queue {
     $sql = "SELECT id, queue_name, submit_time, release_time, data
         FROM civicrm_queue_item
         WHERE queue_name = %1
-              AND release_time IS NULL
+              AND (release_time IS NULL OR release_time < %2)
         ORDER BY weight ASC, id ASC
         LIMIT 1
       ";
     $params = [
       1 => [$this->getName(), 'String'],
+      2 => [CRM_Utils_Time::getTime(), 'Timestamp'],
     ];
     $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, 'CRM_Queue_DAO_QueueItem');
     if (is_a($dao, 'DB_Error')) {
