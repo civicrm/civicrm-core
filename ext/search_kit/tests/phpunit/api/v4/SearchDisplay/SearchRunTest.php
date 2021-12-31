@@ -208,9 +208,9 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertNotEmpty($result->first()['data']['sort_name']);
 
     // These items are not part of the search, but will be added via links
-    $this->assertArrayNotHasKey('contact_type', $result->first());
-    $this->assertArrayNotHasKey('source', $result->first());
-    $this->assertArrayNotHasKey('last_name', $result->first());
+    $this->assertArrayNotHasKey('contact_type', $result->first()['data']);
+    $this->assertArrayNotHasKey('source', $result->first()['data']);
+    $this->assertArrayNotHasKey('last_name', $result->first()['data']);
 
     // Add links
     $params['display']['settings']['columns'][] = [
@@ -225,6 +225,87 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertEquals('Individual', $result->first()['data']['contact_type']);
     $this->assertEquals('Unit test', $result->first()['data']['source']);
     $this->assertEquals($lastName, $result->first()['data']['last_name']);
+  }
+
+  /**
+   * Test smarty rewrite syntax.
+   */
+  public function testRunWithSmartyRewrite() {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'One', 'last_name' => $lastName, 'nick_name' => 'Uno'],
+      ['first_name' => 'Two', 'last_name' => $lastName],
+    ];
+    $contacts = Contact::save(FALSE)->setRecords($sampleData)->execute();
+    Email::create(FALSE)
+      ->addValue('contact_id', $contacts[0]['id'])
+      ->addValue('email', 'testmail@unit.test')
+      ->execute();
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id', 'first_name', 'last_name', 'nick_name', 'Contact_Email_contact_id_01.email', 'Contact_Email_contact_id_01.location_type_id:label'],
+          'where' => [['last_name', '=', $lastName]],
+          'join' => [
+            [
+              "Email AS Contact_Email_contact_id_01",
+              "LEFT",
+              ["id", "=", "Contact_Email_contact_id_01.contact_id"],
+              ["Contact_Email_contact_id_01.is_primary", "=", TRUE],
+            ],
+          ],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'limit' => 20,
+          'pager' => TRUE,
+          'columns' => [
+            [
+              'key' => 'id',
+              'label' => 'Contact ID',
+              'type' => 'field',
+            ],
+            [
+              'key' => 'first_name',
+              'label' => 'Name',
+              'type' => 'field',
+              'rewrite' => '{if "[nick_name]"}[nick_name]{else}[first_name]{/if} [last_name]',
+            ],
+            [
+              'key' => 'Contact_Email_contact_id_01.email',
+              'label' => 'Email',
+              'type' => 'field',
+              'rewrite' => '{if "[Contact_Email_contact_id_01.email]"}[Contact_Email_contact_id_01.email] ([Contact_Email_contact_id_01.location_type_id:label]){/if}',
+            ],
+          ],
+          'sort' => [
+            ['id', 'ASC'],
+          ],
+        ],
+      ],
+    ];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertEquals("Uno $lastName", $result[0]['columns'][1]['val']);
+    $this->assertEquals("Two $lastName", $result[1]['columns'][1]['val']);
+    $this->assertEquals("testmail@unit.test (Home)", $result[0]['columns'][2]['val']);
+    $this->assertEquals("", $result[1]['columns'][2]['val']);
+
+    // Try running it with illegal tags like {crmApi}
+    $params['display']['columns'][1]['rewrite'] = '{crmApi entity="Email" action="get" va="notAllowed"}';
+    try {
+      civicrm_api4('SearchDisplay', 'run', $params);
+      $this->fail();
+    }
+    catch (\Exception $e) {
+    }
   }
 
   /**
