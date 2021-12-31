@@ -207,6 +207,14 @@ LIMIT 1
   /**
    * Get contribution statuses by entity e.g. contribution, membership or 'participant'
    *
+   * @deprecated
+   *
+   * This is called from a couple of places outside of core so it has been made
+   * unused and deprecated rather than having the now-obsolete parameter change.
+   * It should work much the same for the places that call it with a notice. It is
+   * not an api function & not supported for use outside core. Extensions should write
+   * their own functions.
+   *
    * @param string $usedFor
    * @param string $name
    *   Contribution ID
@@ -216,7 +224,10 @@ LIMIT 1
    */
   public static function getContributionStatuses($usedFor = 'contribution', $name = NULL) {
     $statusNames = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
-
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    if ($usedFor !== 'contribution') {
+      return self::getPendingAndCompleteStatuses();
+    }
     $statusNamesToUnset = [
       // For records which represent a data template for a recurring
       // contribution that may not yet have a payment. This status should not

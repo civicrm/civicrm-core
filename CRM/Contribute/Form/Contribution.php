@@ -668,7 +668,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_id) {
       $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
     }
-    $status = CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses('contribution', $this->getPreviousContributionStatus());
+    $status = $this->getAvailableContributionStatuses();
 
     // define the status IDs that show the cancellation info, see CRM-17589
     $cancelInfo_show_ids = [];
@@ -2039,6 +2039,86 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         ->first()['contribution_status_id:name'];
     }
     return $this->previousContributionStatus;
+  }
+
+  /**
+   * Get the contribution statuses available on the form.
+   *
+   * @todo - this needs work - some returned options are invalid or do
+   * not create good financial entities. Probably the only reason we don't just
+   * return CRM_Contribute_BAO_Contribution_Utils::getPendingCompleteFailedAndCancelledStatuses();
+   * is that it might exclude the current status of the contribution.
+   *
+   * @return array
+   * @throws \API_Exception
+   */
+  protected function getAvailableContributionStatuses(): array {
+    if (!$this->getPreviousContributionStatus()) {
+      return CRM_Contribute_BAO_Contribution_Utils::getPendingCompleteFailedAndCancelledStatuses();
+    }
+    $statusNames = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
+    $statusNamesToUnset = [
+      // For records which represent a data template for a recurring
+      // contribution that may not yet have a payment. This status should not
+      // be available from forms. 'Template' contributions should only be created
+      // in conjunction with a ContributionRecur record, and should have their
+      // is_template field set to 1. This status excludes them from reports
+      // that are still ignorant of the is_template field.
+      'Template',
+    ];
+    switch ($this->getPreviousContributionStatus()) {
+      case 'Completed':
+        // [CRM-17498] Removing unsupported status change options.
+        $statusNamesToUnset = array_merge($statusNamesToUnset, [
+          'Pending',
+          'Failed',
+          'Partially paid',
+          'Pending refund',
+        ]);
+        break;
+
+      case 'Cancelled':
+      case 'Chargeback':
+      case 'Refunded':
+        $statusNamesToUnset = array_merge($statusNamesToUnset, [
+          'Pending',
+          'Failed',
+        ]);
+        break;
+
+      case 'Pending':
+      case 'In Progress':
+        $statusNamesToUnset = array_merge($statusNamesToUnset, [
+          'Refunded',
+          'Chargeback',
+        ]);
+        break;
+
+      case 'Failed':
+        $statusNamesToUnset = array_merge($statusNamesToUnset, [
+          'Pending',
+          'Refunded',
+          'Chargeback',
+          'Completed',
+          'In Progress',
+          'Cancelled',
+        ]);
+        break;
+    }
+
+    foreach ($statusNamesToUnset as $name) {
+      unset($statusNames[CRM_Utils_Array::key($name, $statusNames)]);
+    }
+
+    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
+
+    foreach ($statuses as $statusID => $label) {
+      if (!array_key_exists($statusID, $statusNames)) {
+        unset($statuses[$statusID]);
+      }
+    }
+
+    return $statuses;
   }
 
 }
