@@ -262,4 +262,32 @@ class SqlFunctionTest extends UnitTestCase {
     $this->assertLessThan(1, $result[0]['rand']);
   }
 
+  public function testYearInWhereClause() {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => '2009-11-11'],
+      ['first_name' => 'def', 'last_name' => $lastName, 'birth_date' => '2009-01-01'],
+      ['first_name' => 'def', 'last_name' => $lastName, 'birth_date' => '2010-01-01'],
+    ];
+    Contact::save(FALSE)
+      ->setRecords($sampleData)
+      ->execute();
+
+    // Should work with isExpression=FALSE
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('YEAR(birth_date)', '=', 2009)
+      ->selectRowCount()
+      ->execute();
+    $this->assertCount(2, $result);
+
+    // Should work with isExpression=TRUE
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('YEAR(birth_date)', '=', 2009, TRUE)
+      ->selectRowCount()
+      ->execute();
+    $this->assertCount(2, $result);
+  }
+
 }

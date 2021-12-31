@@ -3,6 +3,7 @@
 
   angular.module('crmSearchAdmin').component('crmSearchFunction', {
     bindings: {
+      mode: '@',
       expr: '='
     },
     require: {
@@ -35,6 +36,13 @@
         ctrl.fnName = !info.fn ? '' : info.fn.name;
         initFunction();
       };
+
+      // Watch if field is switched
+      $scope.$watch('$ctrl.expr', function(newExpr, oldExpr) {
+        if (oldExpr && newExpr && newExpr.indexOf('(') < 0) {
+          ctrl.$onInit();
+        }
+      });
 
       this.addArg = function(exprType) {
         var param = ctrl.getParam(ctrl.args.length);
@@ -160,7 +168,10 @@
           // Replace fake function "e"
           ctrl.expr = (ctrl.fnName === 'e' ? '' : ctrl.fnName) + '(';
           ctrl.expr += args.join('');
-          ctrl.expr += ') AS ' + makeAlias();
+          ctrl.expr += ')';
+          if (ctrl.mode === 'select') {
+            ctrl.expr += ' AS ' + makeAlias();
+          }
         } else {
           ctrl.expr = ctrl.args[0].value;
         }

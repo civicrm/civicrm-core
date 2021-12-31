@@ -452,9 +452,13 @@ class Api4SelectQuery {
 
     // For WHERE clause, expr must be the name of a field.
     if ($type === 'WHERE' && !$isExpression) {
-      $field = $this->getField($expr, TRUE);
-      FormattingUtil::formatInputValue($value, $expr, $field, $operator);
-      $fieldAlias = $this->getExpression($expr)->render($this->apiFieldSpec);
+      $expr = $this->getExpression($expr, ['SqlField', 'SqlFunction']);
+      if ($expr->getType() === 'SqlField') {
+        $fieldName = count($expr->getFields()) === 1 ? $expr->getFields()[0] : NULL;
+        $field = $this->getField($fieldName, TRUE);
+        FormattingUtil::formatInputValue($value, $fieldName, $field, $operator);
+      }
+      $fieldAlias = $expr->render($this->apiFieldSpec);
     }
     // For HAVING, expr must be an item in the SELECT clause
     elseif ($type === 'HAVING') {
@@ -500,7 +504,7 @@ class Api4SelectQuery {
       $fieldAlias = $expr->render($this->apiFieldSpec);
       if (is_string($value)) {
         $valExpr = $this->getExpression($value);
-        if ($fieldName && $valExpr->getType() === 'SqlString') {
+        if ($expr->getType() === 'SqlField' && $valExpr->getType() === 'SqlString') {
           $value = $valExpr->getExpr();
           FormattingUtil::formatInputValue($value, $fieldName, $this->apiFieldSpec[$fieldName], $operator);
           return $this->createSQLClause($fieldAlias, $operator, $value, $this->apiFieldSpec[$fieldName], $depth);
@@ -510,7 +514,7 @@ class Api4SelectQuery {
           return sprintf('%s %s %s', $fieldAlias, $operator, $value);
         }
       }
-      elseif ($fieldName) {
+      elseif ($expr->getType() === 'SqlField') {
         $field = $this->getField($fieldName);
         FormattingUtil::formatInputValue($value, $fieldName, $field, $operator);
       }
@@ -592,11 +596,12 @@ class Api4SelectQuery {
 
   /**
    * @param string $expr
+   * @param array $allowedTypes
    * @return SqlExpression
    * @throws \API_Exception
    */
-  protected function getExpression(string $expr) {
-    $sqlExpr = SqlExpression::convert($expr);
+  protected function getExpression(string $expr, $allowedTypes = NULL) {
+    $sqlExpr = SqlExpression::convert($expr, FALSE, $allowedTypes);
     foreach ($sqlExpr->getFields() as $fieldName) {
       $this->getField($fieldName, TRUE);
     }
