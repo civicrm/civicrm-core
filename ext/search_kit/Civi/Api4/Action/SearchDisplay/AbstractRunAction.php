@@ -187,8 +187,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * @param $column
-   * @param $data
+   * @param array $column
+   * @param array $data
    * @return array{val: mixed, links: array, edit: array, label: string, title: string, image: array, cssClass: string}
    */
   private function formatColumn($column, $data) {
@@ -201,7 +201,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $out['val'] = $this->replaceTokens($column['empty_value'], $data, 'view');
         }
         elseif ($column['rewrite']) {
-          $out['val'] = $this->replaceTokens($column['rewrite'], $data, 'view');
+          $out['val'] = $this->rewrite($column, $data);
         }
         else {
           $out['val'] = $this->formatViewValue($column['key'], $rawValue);
@@ -257,6 +257,34 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $out['cssClass'] = implode(' ', $cssClass);
     }
     return $out;
+  }
+
+  /**
+   * @param array $column
+   * @param array $data
+   * @return string
+   */
+  private function rewrite(array $column, array $data) {
+    $output = $this->replaceTokens($column['rewrite'], $data, 'view');
+    // Cheap strpos to skip Smarty processing if not needed
+    if (strpos($output, '{') !== FALSE) {
+      $vars = [];
+      // Convert dots to nested arrays which are more Smarty-friendly
+      foreach ($data as $key => $value) {
+        $parent = &$vars;
+        $keys = array_map('CRM_Utils_String::munge', explode('.', $key));
+        while (count($keys) > 1) {
+          $level = array_shift($keys);
+          $parent[$level] = $parent[$level] ?? [];
+          $parent = &$parent[$level];
+        }
+        $level = array_shift($keys);
+        $parent[$level] = $value;
+      }
+      $smarty = \CRM_Core_Smarty::singleton();
+      $output = $smarty->fetchWith("string:$output", $vars);
+    }
+    return $output;
   }
 
   /**
@@ -529,7 +557,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return string
    */
   private function replaceTokens($tokenExpr, $data, $format, $index = 0) {
-    if ($tokenExpr) {
+    if (strpos($tokenExpr, '[') !== FALSE) {
       foreach ($this->getTokens($tokenExpr) as $token) {
         $val = $data[$token] ?? NULL;
         if (isset($val) && $format === 'view') {
