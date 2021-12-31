@@ -2,8 +2,8 @@
 
 /**
  * @method array getContribution()
- * @method array getContributionID()
- * @method $this setContributionID(array $contact)
+ * @method ?int getContributionID()
+ * @method $this setContributionID(?int $contributionId)
  */
 trait CRM_Contribute_WorkflowMessage_ContributionTrait {
   /**
