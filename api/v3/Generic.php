@@ -434,6 +434,11 @@ function civicrm_api3_generic_getoptions($apiRequest) {
   }
   else {
     $baoName = _civicrm_api3_get_BAO($apiRequest['entity']);
+    if (!isset($apiRequest['params']['check_permissions'])) {
+      // Ensure this is set so buildOptions for ContributionPage.buildOptions
+      // can distinguish between 'who knows' and 'NO'.
+      $apiRequest['params']['check_permissions'] = FALSE;
+    }
     $options = $baoName::buildOptions($fieldName, $context, $apiRequest['params']);
   }
   if ($options === FALSE) {

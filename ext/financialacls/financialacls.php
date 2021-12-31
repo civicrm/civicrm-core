@@ -2,6 +2,7 @@
 
 require_once 'financialacls.civix.php';
 // phpcs:disable
+use Civi\Api4\EntityFinancialAccount;
 use CRM_Financialacls_ExtensionUtil as E;
 // phpcs:enable
 
@@ -138,18 +139,64 @@ function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
     case 'LineItem':
     case 'MembershipType':
     case 'ContributionRecur':
-      $types = [];
-      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
-      if ($types) {
-        $clauses['financial_type_id'] = 'IN (' . implode(',', array_keys($types)) . ')';
-      }
-      else {
-        $clauses['financial_type_id'] = '= 0';
-      }
+      $clauses['financial_type_id'] = _financialacls_civicrm_get_type_clause();
+      break;
+
+    case 'FinancialType':
+      $clauses['id'] = _financialacls_civicrm_get_type_clause();
+      break;
+
+    case 'FinancialAccount':
+      $clauses['id'] = _financialacls_civicrm_get_accounts_clause();
       break;
 
   }
 
+}
+
+/**
+ * Get the clause to limit available types.
+ *
+ * @return string
+ */
+function _financialacls_civicrm_get_accounts_clause(): string {
+  if (!isset(Civi::$statics['financial_acls'][__FUNCTION__][CRM_Core_Session::getLoggedInContactID()])) {
+    try {
+      $clause = '= 0';
+      Civi::$statics['financial_acls'][__FUNCTION__][CRM_Core_Session::getLoggedInContactID()] = &$clause;
+      $accounts = (array) EntityFinancialAccount::get()
+        ->addWhere('account_relationship:name', '=', 'Income Account is')
+        ->addWhere('entity_table', '=', 'civicrm_financial_type')
+        ->addSelect('entity_id', 'financial_account_id')
+        ->addJoin('FinancialType AS financial_type', 'LEFT', [
+          'entity_id',
+          '=',
+          'financial_type.id',
+        ])
+        ->execute()->indexBy('financial_account_id');
+      if (!empty($accounts)) {
+        $clause = 'IN (' . implode(',', array_keys($accounts)) . ')';
+      }
+    }
+    catch (\API_Exception $e) {
+      // We've already set it to 0 so we can quietly handle this.
+    }
+  }
+  return Civi::$statics['financial_acls'][__FUNCTION__][CRM_Core_Session::getLoggedInContactID()];
+}
+
+/**
+ * Get the clause to limit available types.
+ *
+ * @return string
+ */
+function _financialacls_civicrm_get_type_clause(): string {
+  $types = [];
+  CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
+  if ($types) {
+    return 'IN (' . implode(',', array_keys($types)) . ')';
+  }
+  return '= 0';
 }
 
 /**
