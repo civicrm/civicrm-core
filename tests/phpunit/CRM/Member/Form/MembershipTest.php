@@ -533,7 +533,13 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $form->_contactID = $this->_individualId;
     $form->testSubmit($params);
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
-    $this->assertEquals(date('Y') + 1 . '-12-31', $membership['end_date']);
+    $membershipEndYear = date('Y') + 1;
+    if (date('m-d') == '12-31') {
+      // If you join on Dec 31, then the first term would end right away, so
+      // add a year.
+      $membershipEndYear++;
+    }
+    $this->assertEquals($membershipEndYear . '-12-31', $membership['end_date']);
     $this->callAPISuccessGetCount('ContributionRecur', ['contact_id' => $this->_individualId], 0);
     $contribution = $this->callAPISuccess('Contribution', 'get', [
       'contact_id' => $this->_individualId,
@@ -573,7 +579,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->mut->stop();
     $this->assertEquals([
       [
-        'text' => 'AnnualFixed membership for Mr. Anthony Anderson II has been added. The new membership End Date is December 31st, ' . (date('Y') + 1) . '. A membership confirmation and receipt has been sent to anthony_anderson@civicrm.org.',
+        'text' => 'AnnualFixed membership for Mr. Anthony Anderson II has been added. The new membership End Date is December 31st, ' . $membershipEndYear . '. A membership confirmation and receipt has been sent to anthony_anderson@civicrm.org.',
         'title' => 'Complete',
         'type' => 'success',
         'options' => NULL,
