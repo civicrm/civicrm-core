@@ -553,8 +553,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
     $module_data = \Drupal::service('extension.list.module')->reset()->getList();
     foreach ($module_data as $module_name => $extension) {
-      if (!isset($extension->info['hidden']) && $extension->origin != 'core') {
-        $modules[] = new CRM_Core_Module('drupal.' . $module_name, ($extension->status == 1));
+      if (!isset($extension->info['hidden']) && $extension->origin != 'core' && $extension->status == 1) {
+        $modules[] = new CRM_Core_Module('drupal.' . $module_name, TRUE);
       }
     }
     return $modules;
