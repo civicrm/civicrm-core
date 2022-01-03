@@ -54,20 +54,20 @@
   {include file="CRM/Contact/Form/Edit/Address.tpl" blockId=1}
   <table class="form-layout-compressed">
     <tr>
-      <td><label>{ts}Email 1:{/ts}</label></td>
+      <td>{$form.email.1.email.label}</td>
       <td>{$form.email.1.email.html|crmAddClass:email}</td>
     </tr>
     <tr>
-      <td><label>{ts}Email 2:{/ts}</label></td>
+      <td>{$form.email.2.email.label}</td>
       <td>{$form.email.2.email.html|crmAddClass:email}</td>
     </tr>
     <tr>
-      <td><label>{ts}Phone 1:{/ts}</label></td>
-      <td>{$form.phone.1.phone.html|crmAddClass:phone} {ts context="phone_ext"}ext.{/ts}&nbsp;{$form.phone.1.phone_ext.html|crmAddClass:four}&nbsp;{$form.phone.1.phone_type_id.html}</td>
+      <td>{$form.phone.1.phone.label}</td>
+      <td>{$form.phone.1.phone.html|crmAddClass:phone} {$form.phone.1.phone_ext.label}&nbsp;{$form.phone.1.phone_ext.html|crmAddClass:four}&nbsp;{$form.phone.1.phone_type_id.html}</td>
     </tr>
     <tr>
-      <td><label>{ts}Phone 2:{/ts}</label></td>
-      <td>{$form.phone.2.phone.html|crmAddClass:phone} {ts context="phone_ext"}ext.{/ts}&nbsp;{$form.phone.2.phone_ext.html|crmAddClass:four}&nbsp;{$form.phone.2.phone_type_id.html}</td>
+      <td>{$form.phone.2.phone.label}</td>
+      <td>{$form.phone.2.phone.html|crmAddClass:phone} {$form.phone.2.phone_ext.label}&nbsp;{$form.phone.2.phone_ext.html|crmAddClass:four}&nbsp;{$form.phone.2.phone_type_id.html}</td>
     </tr>
   </table>
 
