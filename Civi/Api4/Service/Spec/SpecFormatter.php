@@ -37,6 +37,7 @@ class SpecFormatter {
         $field->setTableName($data['custom_group_id.table_name']);
       }
       $field->setColumnName($data['column_name']);
+      $field->setNullable(empty($data['is_required']));
       $field->setCustomFieldId($data['id'] ?? NULL);
       $field->setCustomGroupName($data['custom_group_id.name']);
       $field->setTitle($data['label']);
@@ -58,7 +59,8 @@ class SpecFormatter {
       $field = new FieldSpec($name, $entity, $dataTypeName);
       $field->setType('Field');
       $field->setColumnName($name);
-      $field->setRequired(!empty($data['required']));
+      $field->setNullable(empty($data['required']));
+      $field->setRequired(!empty($data['required']) && empty($data['default']));
       $field->setTitle($data['title'] ?? NULL);
       $field->setLabel($data['html']['label'] ?? NULL);
       if (!empty($data['pseudoconstant'])) {

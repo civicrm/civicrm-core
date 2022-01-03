@@ -29,6 +29,7 @@
           options: col.edit.options,
           fk_entity: col.edit.fk_entity,
           serialize: col.edit.serialize,
+          nullable: col.edit.nullable
         };
 
         $(document).on('keydown.crmSearchDisplayEditable', function(e) {
@@ -36,8 +37,6 @@
             $scope.$apply(function() {
               ctrl.cancel();
             });
-          } else if (e.key === 'Enter') {
-            $scope.$apply(ctrl.save);
           }
         });
 
@@ -71,7 +70,7 @@
           action: 'update',
           select: ['options'],
           loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
-          where: [['name', '=', ctrl.field.name]],
+          where: [['name', '=', ctrl.field.name]]
         }, 0).then(function(field) {
           ctrl.field.options = optionsCache[cacheKey] = field.options;
         });
