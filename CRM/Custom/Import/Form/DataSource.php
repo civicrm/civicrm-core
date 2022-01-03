@@ -35,9 +35,10 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
       'multipleCustomData' => $this->_id,
     ];
 
-    if ($loadeMapping = $this->get('loadedMapping')) {
-      $this->assign('loadedMapping', $loadeMapping);
-      $defaults['savedMapping'] = $loadeMapping;
+    $loadedMapping = $this->get('loadedMapping');
+    $this->assign('loadedMapping', $loadedMapping);
+    if ($loadedMapping) {
+      $defaults['savedMapping'] = $loadedMapping;
     }
 
     return $defaults;

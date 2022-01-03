@@ -147,23 +147,16 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   public function import($onDuplicate, &$values) {
     $response = $this->summary($values);
     if ($response != CRM_Import_Parser::VALID) {
-      $importRecordParams = [
-        $statusFieldName => 'INVALID',
-        "${statusFieldName}Msg" => "Invalid (Error Code: $response)",
-      ];
       return $response;
     }
 
     $this->_updateWithId = FALSE;
     $this->_parseStreetAddress = CRM_Utils_Array::value('street_address_parsing', CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'address_options'), FALSE);
 
-    $params = $this->getActiveFieldParams();
     $contactType = $this->_contactType ? $this->_contactType : 'Organization';
     $formatted = [
       'contact_type' => $contactType,
     ];
-    $session = CRM_Core_Session::singleton();
-    $dateType = $session->get('dateTypes');
 
     if (isset($this->_params['external_identifier']) && !isset($this->_params['contact_id'])) {
       $checkCid = new CRM_Contact_DAO_Contact();
@@ -174,9 +167,8 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
     else {
       $formatted['id'] = $this->_params['contact_id'];
     }
-    $setDateFields = array_intersect_key($this->_params, array_flip($this->_dateFields));
 
-    $this->formatCommonData($this->_params, $formatted, $formatted);
+    $this->formatCommonData($this->_params, $formatted);
     foreach ($formatted['custom'] as $key => $val) {
       $this->_params['custom_' . $key] = $val[-1]['value'];
     }
@@ -194,19 +186,96 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   }
 
   /**
-   * Format Date params.
+   * Adapted from CRM_Contact_Import_Parser::formatCommonData
    *
-   * Although the api will accept any strtotime valid string CiviCRM accepts at least one date format
-   * not supported by strtotime so we should run this through a conversion
+   * TODO: Is this function even necessary? All values get passed to the api anyway.
+   *
+   * @param array $params
+   *   Contain record values.
+   * @param array $formatted
+   *   Array of formatted data.
    */
-  public function formatDateParams() {
-    $session = CRM_Core_Session::singleton();
-    $dateType = $session->get('dateTypes');
-    $setDateFields = array_intersect_key($this->_params, array_flip($this->_dateFields));
+  public function formatCommonData($params, &$formatted) {
 
-    foreach ($setDateFields as $key => $value) {
-      CRM_Utils_Date::convertToDefaultDate($this->_params, $dateType, $key);
-      $this->_params[$key] = CRM_Utils_Date::processDate($this->_params[$key]);
+    $customFields = CRM_Core_BAO_CustomField::getFields(NULL);
+
+    //format date first
+    $session = CRM_Core_Session::singleton();
+    $dateType = $session->get("dateTypes");
+    foreach ($params as $key => $val) {
+      $customFieldID = CRM_Core_BAO_CustomField::getKeyID($key);
+      if ($customFieldID) {
+        //we should not update Date to null, CRM-4062
+        if ($val && ($customFields[$customFieldID]['data_type'] == 'Date')) {
+          //CRM-21267
+          CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
+        }
+        elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
+          if (empty($val) && !is_numeric($val)) {
+            //retain earlier value when Import mode is `Fill`
+            unset($params[$key]);
+          }
+          else {
+            $params[$key] = CRM_Utils_String::strtoboolstr($val);
+          }
+        }
+      }
+    }
+
+    //now format custom data.
+    foreach ($params as $key => $field) {
+
+      if ($key == 'id' && isset($field)) {
+        $formatted[$key] = $field;
+      }
+
+      //Handling Custom Data
+      if (($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) &&
+        array_key_exists($customFieldID, $customFields)
+      ) {
+
+        $extends = $customFields[$customFieldID]['extends'] ?? NULL;
+        $htmlType = $customFields[$customFieldID]['html_type'] ?? NULL;
+        $dataType = $customFields[$customFieldID]['data_type'] ?? NULL;
+        $serialized = CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID]);
+
+        if (!$serialized && in_array($htmlType, ['Select', 'Radio', 'Autocomplete-Select']) && in_array($dataType, ['String', 'Int'])) {
+          $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
+          foreach ($customOption as $customValue) {
+            $val = $customValue['value'] ?? NULL;
+            $label = strtolower($customValue['label'] ?? '');
+            $value = strtolower(trim($formatted[$key]));
+            if (($value == $label) || ($value == strtolower($val))) {
+              $params[$key] = $formatted[$key] = $val;
+            }
+          }
+        }
+        elseif ($serialized && !empty($formatted[$key]) && !empty($params[$key])) {
+          $mulValues = explode(',', $formatted[$key]);
+          $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
+          $formatted[$key] = [];
+          $params[$key] = [];
+          foreach ($mulValues as $v1) {
+            foreach ($customOption as $v2) {
+              if ((strtolower($v2['label']) == strtolower(trim($v1))) ||
+                (strtolower($v2['value']) == strtolower(trim($v1)))
+              ) {
+                if ($htmlType == 'CheckBox') {
+                  $params[$key][$v2['value']] = $formatted[$key][$v2['value']] = 1;
+                }
+                else {
+                  $params[$key][] = $formatted[$key][] = $v2['value'];
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (!empty($key) && ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) && array_key_exists($customFieldID, $customFields)) {
+      // @todo calling api functions directly is not supported
+      _civicrm_api3_custom_format_params($params, $formatted, $extends);
     }
   }
 
