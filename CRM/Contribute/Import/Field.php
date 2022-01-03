@@ -35,7 +35,7 @@ class CRM_Contribute_Import_Field {
 
   /**
    * Type of field
-   * @var enum
+   * @var int
    */
   public $_type;
 
@@ -66,7 +66,7 @@ class CRM_Contribute_Import_Field {
 
   /**
    * Value of this field
-   * @var object
+   * @var string|null
    */
   public $_value;
 
@@ -78,7 +78,7 @@ class CRM_Contribute_Import_Field {
 
   /**
    * @param string $name
-   * @param $title
+   * @param string $title
    * @param int $type
    * @param string $headerPattern
    * @param string $dataPattern
@@ -104,7 +104,7 @@ class CRM_Contribute_Import_Field {
    * The value is in string format. Convert the value to the type of this field
    * and set the field value with the appropriate type
    *
-   * @param $value
+   * @param string $value
    */
   public function setValue($value) {
     $this->_value = $value;

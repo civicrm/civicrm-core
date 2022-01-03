@@ -33,7 +33,7 @@ class CRM_Event_Import_Field {
 
   /**
    * Type of field
-   * @var enum
+   * @var int
    */
   public $_type;
 
@@ -51,13 +51,13 @@ class CRM_Event_Import_Field {
 
   /**
    * Value of this field
-   * @var object
+   * @var string|null
    */
   public $_value;
 
   /**
    * @param string $name
-   * @param $title
+   * @param string $title
    * @param int $type
    * @param string $headerPattern
    * @param string $dataPattern
@@ -95,8 +95,8 @@ class CRM_Event_Import_Field {
 
     switch ($this->_name) {
       case 'contact_id':
-        // note: we validate extistence of the contact in API, upon
-        // insert (it would be too costlty to do a db call here)
+        // note: we validate existence of the contact in API, upon
+        // insert (it would be too costly to do a db call here)
         return CRM_Utils_Rule::integer($this->_value);
 
       case 'register_date':
