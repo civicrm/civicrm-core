@@ -16,12 +16,6 @@
  */
 class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 
-  protected $_charts = [
-    '' => 'Tabular',
-    'barChart' => 'Bar Chart',
-    'pieChart' => 'Pie Chart',
-  ];
-
   protected $_customGroupExtends = [
     'Contact',
     'Individual',
@@ -243,6 +237,13 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 
     // If we have a campaign, build out the relevant elements
     $this->addCampaignFields('civicrm_contribution');
+
+    // Add charts support
+    $this->_charts = [
+      '' => ts('Tabular'),
+      'barChart' => ts('Bar Chart'),
+      'pieChart' => ts('Pie Chart'),
+    ];
 
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;

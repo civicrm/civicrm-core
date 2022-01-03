@@ -29,12 +29,6 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     'Organization',
   ];
 
-  protected $_charts = [
-    '' => 'Tabular',
-    'barChart' => 'Bar Chart',
-    'pieChart' => 'Pie Chart',
-  ];
-
   /**
    * This report has not been optimised for group filtering.
    *
@@ -240,6 +234,13 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
       'dao' => 'CRM_Core_DAO_Phone',
       'fields' => ['phone' => NULL],
       'grouping' => 'contact-fields',
+    ];
+
+    // Add charts support
+    $this->_charts = [
+      '' => ts('Tabular'),
+      'barChart' => ts('Bar Chart'),
+      'pieChart' => ts('Pie Chart'),
     ];
 
     $this->_groupFilter = TRUE;

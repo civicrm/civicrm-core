@@ -18,12 +18,6 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
-  protected $_charts = [
-    '' => 'Tabular',
-    'barChart' => 'Bar Chart',
-    'pieChart' => 'Pie Chart',
-  ];
-
   /**
    * Constructor function.
    */
@@ -117,6 +111,14 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
         ],
       ],
     ];
+
+    // Add charts support
+    $this->_charts = [
+      '' => ts('Tabular'),
+      'barChart' => ts('Bar Chart'),
+      'pieChart' => ts('Pie Chart'),
+    ];
+
     parent::__construct();
   }
 

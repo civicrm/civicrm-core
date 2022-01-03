@@ -37,12 +37,6 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
 
   public $_drilldownReport = ['contribute/detail' => 'Link to Detail Report'];
 
-  protected $_charts = [
-    '' => 'Tabular',
-    'barChart' => 'Bar Chart',
-    'pieChart' => 'Pie Chart',
-  ];
-
   /**
    */
   public function __construct() {
@@ -186,6 +180,13 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
         ],
         'grouping' => 'phone-fields',
       ],
+    ];
+
+    // Add charts support
+    $this->_charts = [
+      '' => ts('Tabular'),
+      'barChart' => ts('Bar Chart'),
+      'pieChart' => ts('Pie Chart'),
     ];
 
     $this->_groupFilter = TRUE;

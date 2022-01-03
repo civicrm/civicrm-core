@@ -540,6 +540,12 @@ class CRM_Report_Form extends CRM_Core_Form {
   public $optimisedForOnlyFullGroupBy = TRUE;
 
   /**
+   * Determines which chart types are supported for this report
+   * @var string[]
+   */
+  protected $_charts = [];
+
+  /**
    * Get the number of rows to show
    * @return int
    */
