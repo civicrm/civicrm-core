@@ -52,6 +52,7 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     parent::buildQuickForm();
 
     $multipleCustomData = CRM_Core_BAO_CustomGroup::getMultipleFieldGroup();
+    $this->assign('fieldGroups', $multipleCustomData);
     $this->add('select', 'multipleCustomData', ts('Multi-value Custom Data'), ['' => ts('- select -')] + $multipleCustomData, TRUE);
 
     $this->addContactTypeSelector();
