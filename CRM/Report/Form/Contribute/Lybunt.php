@@ -150,6 +150,13 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
             'title' => ts('Email on hold'),
           ],
         ],
+        'filters' => [
+          'on_hold' => [
+            'title' => ts('On Hold'),
+            'type' => CRM_Utils_Type::T_BOOLEAN,
+            'options' => ['' => ts('Any')] + CRM_Core_SelectValues::boolean(),
+          ],
+        ],
       ],
       'civicrm_phone' => [
         'dao' => 'CRM_Core_DAO_Phone',
