@@ -192,7 +192,7 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
     $customGroupStyle = CRM_Core_SelectValues::customGroupStyle();
     while ($dao->fetch()) {
       $id = $dao->id;
-      $customGroup[$id] = [];
+      $customGroup[$id] = ['class' => ''];
       CRM_Core_DAO::storeValues($dao, $customGroup[$id]);
       // form all action links
       $action = array_sum(array_keys(self::actionLinks()));
