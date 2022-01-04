@@ -476,7 +476,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertCount(2, $contributions);
     $this->callAPISuccess('membership_payment', 'getsingle', ['contribution_id' => ['IN' => array_keys($contributions)]]);
     $mut->checkMailLog([
-      'Membership Amount -...             $ 2.00',
+      'Membership Amount -...              $2.00',
     ]);
     $mut->stop();
     $mut->clearMessages();
@@ -555,8 +555,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     // line and no total line.
     $mut->checkAllMailLog(
       [
-        'Amount: $ 2.00',
-        'Amount: $ 88.00',
+        'Amount: $2.00',
+        'Amount: $88.00',
         'Membership Fee',
       ],
       [
@@ -591,7 +591,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($membership['contact_id'], $contributions[$membershipPayment['contribution_id']]['contact_id']);
     $mut->checkMailLog([
       'Gruff',
-      'General Membership: $ 0.00',
+      'General Membership: $0.00',
       'Membership Fee',
     ]);
     $mut->stop();
@@ -662,7 +662,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     }
     // The total string is currently absent & it seems worse with - although at some point
     // it may have been intended
-    $mut->checkAllMailLog(['$ 2.00', 'Contribution Amount', '$ 88.00'], ['Total:']);
+    $mut->checkAllMailLog(['$2.00', 'Contribution Amount', '$88.00'], ['Total:']);
     $mut->stop();
     $mut->clearMessages();
   }

@@ -80,9 +80,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *
    * Connect to the database, truncate the tables that will be used
    * and redirect stdin to a temporary file.
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setUp(): void {
     $this->_apiversion = 3;
@@ -573,7 +570,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       ]),
     ], 'online');
     $this->mut->checkMailLog([
-      CRM_Utils_Money::format('1234.56'),
+      Civi::format()->money('1234.56'),
       'Receipt text',
     ]);
     $this->mut->stop();
@@ -1275,11 +1272,13 @@ Expires: ',
    *
    * @return \CRM_Member_Form_Membership
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  protected function getForm($formValues = []) {
+  protected function getForm($formValues = []): CRM_Member_Form_Membership {
     if (isset($_REQUEST['cid'])) {
       unset($_REQUEST['cid']);
     }
+    /* @var CRM_Member_Form_Membership $form*/
     $form = $this->getFormObject('CRM_Member_Form_Membership', $formValues);
     $form->preProcess();
     return $form;
