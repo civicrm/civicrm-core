@@ -1037,7 +1037,10 @@ class PropertyBag implements \ArrayAccess {
    */
   public function setRecurInstallments($recurInstallments, $label = 'default') {
     // Counts zero as positive which is ok - means no installments
-    if (!\CRM_Utils_Type::validate($recurInstallments, 'Positive')) {
+    try {
+      \CRM_Utils_Type::validate($recurInstallments, 'Positive');
+    }
+    catch (\CRM_Core_Exception $e) {
       throw new InvalidArgumentException('recurInstallments must be 0 or a positive integer');
     }
 
