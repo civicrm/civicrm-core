@@ -42,7 +42,11 @@ class CRM_Contact_Form_Edit_Email {
     $form->applyFilter('__ALL__', 'trim');
 
     //Email box
-    $form->addField("email[$blockId][email]", ['entity' => 'email', 'aria-label' => ts('Email %1', [1 => $blockId])]);
+    $form->addField("email[$blockId][email]", [
+      'entity' => 'email',
+      'aria-label' => ts('Email %1', [1 => $blockId]),
+      'label' => ts('Email %1', [1 => $blockId]),
+    ]);
     $form->addRule("email[$blockId][email]", ts('Email is not valid.'), 'email');
     if (isset($form->_contactType) || $blockEdit) {
       //Block type

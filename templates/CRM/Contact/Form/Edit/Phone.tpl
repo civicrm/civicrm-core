@@ -24,7 +24,7 @@
   </tr>
 {/if}
 <tr id="Phone_Block_{$blockId}">
-  <td>{$form.phone.$blockId.phone.html} {ts context="phone_ext"}ext.{/ts}&nbsp;{$form.phone.$blockId.phone_ext.html|crmAddClass:four}&nbsp;</td>
+  <td>{$form.phone.$blockId.phone.html} {$form.phone.$blockId.phone_ext.label}&nbsp;{$form.phone.$blockId.phone_ext.html|crmAddClass:four}&nbsp;</td>
   {if $className eq 'CRM_Contact_Form_Contact'}
   <td>{$form.phone.$blockId.location_type_id.html}</td>
   {/if}
