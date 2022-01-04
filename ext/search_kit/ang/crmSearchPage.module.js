@@ -10,7 +10,7 @@
         controller: 'crmSearchPageDisplay',
         // Dynamic template generates the directive for each display type
         template: '<h1 crm-page-title>{{:: $ctrl.display.label }}</h1>\n' +
-          '<div ng-include="\'~/crmSearchPage/displayType/\' + $ctrl.display.type + \'.html\'" id="bootstrap-theme"></div>',
+          '<form ng-include="\'~/crmSearchPage/displayType/\' + $ctrl.display.type + \'.html\'" id="bootstrap-theme"></form>',
         resolve: {
           // Load saved search display
           info: function($route, crmApi4) {
