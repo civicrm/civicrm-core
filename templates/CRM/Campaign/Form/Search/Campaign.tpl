@@ -148,9 +148,9 @@
 
     //build the search qill.
     //get the search criteria.
-    var searchParams = {/literal}{$searchParams}{literal};
-    var campaignTypes = {/literal}{$campaignTypes}{literal};
-    var campaignStatus = {/literal}{$campaignStatus}{literal};
+    var searchParams = {/literal}{$searchParams|smarty:nodefaults}{literal};
+    var campaignTypes = {/literal}{$campaignTypes|smarty:nodefaults}{literal};
+    var campaignStatus = {/literal}{$campaignStatus|smarty:nodefaults}{literal};
     var noRecordFoundMsg = '{/literal}{ts escape='js'}No matches found for:{/ts}{literal}';
     noRecordFoundMsg += '<div class="qill">';
 
@@ -226,7 +226,7 @@
         var searchCriteria = [];
 
         //get the search criteria.
-        var searchParams = {/literal}{$searchParams}{literal};
+        var searchParams = {/literal}{$searchParams|smarty:nodefaults}{literal};
         for (param in searchParams) {
           fldName = param;
           if (param == 'campaign_title') {
