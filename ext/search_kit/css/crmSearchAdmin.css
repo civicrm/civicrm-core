@@ -267,3 +267,15 @@ crm-search-admin-export,
 crm-search-admin-import {
   display: block;
 }
+
+#bootstrap-theme .crm-search-admin-relative {
+  position: relative;
+  display: block;
+}
+
+#bootstrap-theme .crm-search-admin-right {
+  position: absolute;
+  top: 1px;
+  right: 0;
+  background-color: white;
+}

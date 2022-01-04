@@ -46,6 +46,31 @@
     </fieldset>
   </div>
 </div>
+<div class="form-group crm-search-admin-right">
+  <div class="btn-group" ng-if="$ctrl.savedSearch.id">
+    <a ng-href="{{ $ctrl.searchDisplayPath + '#/display/' + $ctrl.savedSearch.name }}" target="_blank" class="btn btn-primary-outline" title="{{:: ts('View search results table') }}">
+      <i class="crm-i fa-external-link"></i>
+      {{:: ts('View Results') }}
+    </a>
+    <button type="button" ng-click="$ctrl.openDisplayMenu = true;" class="btn btn-primary-outline dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right" ng-if=":: $ctrl.openDisplayMenu">
+      <li title="{{:: ts('View search results table') }}">
+        <a ng-href="{{ $ctrl.searchDisplayPath + '#/display/' + $ctrl.savedSearch.name }}" target="_blank">
+          <i class="crm-i fa-table"></i>
+          {{:: ts('Search results table') }}
+        </a>
+      </li>
+      <li ng-repeat="display in $ctrl.savedSearch.displays" ng-if="display.id" ng-class="{disabled: display.acl_bypass}" title="{{:: display.acl_bypass ? ts('Display has permissions disabled') : ts('View display') }}">
+        <a ng-href="{{ display.acl_bypass ? '' : $ctrl.searchDisplayPath + '#/display/' + $ctrl.savedSearch.name + '/' + display.name }}" target="_blank">
+          <i class="crm-i {{ display.acl_bypass ? 'fa-unlock' : $ctrl.displayTypes[display.type].icon }}"></i>
+          {{ display.label }}
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
 <fieldset id="crm-search-build-functions">
   <legend ng-click="controls.showFunctions = !controls.showFunctions">
     <i class="crm-i fa-caret-{{ !controls.showFunctions ? 'right' : 'down' }}"></i>

@@ -54,30 +54,6 @@
             </ul>
           </div>
 
-          <div class="btn-group" ng-if="$ctrl.savedSearch.id">
-            <a ng-href="{{ $ctrl.searchDisplayPath + '#/display/' + $ctrl.savedSearch.name }}" target="_blank" class="btn btn-primary-outline" title="{{:: ts('View search results table') }}">
-              <i class="crm-i fa-external-link"></i>
-              {{:: ts('View') }}
-            </a>
-            <button type="button" ng-click="$ctrl.openDisplayMenu = true;" class="btn btn-primary-outline dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-right" ng-if=":: $ctrl.openDisplayMenu">
-              <li title="{{:: ts('View search results table') }}">
-                <a ng-href="{{ $ctrl.searchDisplayPath + '#/display/' + $ctrl.savedSearch.name }}" target="_blank">
-                  <i class="crm-i fa-table"></i>
-                  {{:: ts('Search results table') }}
-                </a>
-              </li>
-              <li ng-repeat="display in $ctrl.savedSearch.displays" ng-if="display.id" ng-class="{disabled: display.acl_bypass}" title="{{:: display.acl_bypass ? ts('Display has permissions disabled') : ts('View display') }}">
-                <a ng-href="{{ display.acl_bypass ? '' : $ctrl.searchDisplayPath + '#/display/' + $ctrl.savedSearch.name + '/' + display.name }}" target="_blank">
-                  <i class="crm-i {{ display.acl_bypass ? 'fa-unlock' : $ctrl.displayTypes[display.type].icon }}"></i>
-                  {{ display.label }}
-                </a>
-              </li>
-            </ul>
-          </div>
-
           <div class="btn-group">
             <button type="button" class="btn" ng-class="{'btn-primary': status === 'unsaved', 'btn-warning': status === 'saving', 'btn-success': status === 'saved'}" ng-disabled="status !== 'unsaved'" ng-click="$ctrl.save()">
               <i class="crm-i" ng-class="{'fa-check': status !== 'saving', 'fa-spin fa-spinner': status === 'saving'}"></i>
@@ -95,7 +71,7 @@
       <ul class="nav nav-pills nav-stacked" ng-include="'~/crmSearchAdmin/tabs.html'"></ul>
       <div class="crm-flex-4" ng-switch="controls.tab">
         <div ng-switch-when="compose">
-          <div ng-include="'~/crmSearchAdmin/compose.html'"></div>
+          <div ng-include="'~/crmSearchAdmin/compose.html'" class="crm-search-admin-relative"></div>
           <crm-search-admin-results-table search="$ctrl.savedSearch"></crm-search-admin-results-table>
         </div>
         <div ng-switch-when="group">
@@ -103,7 +79,7 @@
         </div>
         <div ng-switch-default>
           <div ng-repeat="display in $ctrl.savedSearch.displays" ng-if="controls.tab === ('display_' + $index)">
-            <crm-search-admin-display display="display" saved-search="$ctrl.savedSearch"></crm-search-admin-display>
+            <crm-search-admin-display class="crm-search-admin-relative" display="display" saved-search="$ctrl.savedSearch"></crm-search-admin-display>
           </div>
         </div>
       </div>
