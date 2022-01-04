@@ -195,13 +195,13 @@
         return arg.field && arg.field.type !== 'Pseudo';
       };
 
-      // Aggregate functions (COUNT, AVG, MAX) cannot display as links, except for GROUP_CONCAT
+      // Aggregate functions (COUNT, AVG, MAX) cannot autogenerate links, except for GROUP_CONCAT
       // which gets special treatment in APIv4 to convert it to an array.
-      this.canBeLink = function(col) {
-        var expr = ctrl.getExprFromSelect(col.key),
+      function canUseLinks(colKey) {
+        var expr = ctrl.getExprFromSelect(colKey),
           info = searchMeta.parseExpr(expr);
         return !info.fn || info.fn.category !== 'aggregate' || info.fn.name === 'GROUP_CONCAT';
-      };
+      }
 
       var linkProps = ['path', 'entity', 'action', 'join', 'target'];
 
@@ -237,10 +237,13 @@
 
       this.getLinks = function(columnKey) {
         if (!ctrl.links) {
-          ctrl.links = {'*': ctrl.crmSearchAdmin.buildLinks()};
+          ctrl.links = {'*': ctrl.crmSearchAdmin.buildLinks(), '0': []};
         }
         if (!columnKey) {
           return ctrl.links['*'];
+        }
+        if (!canUseLinks(columnKey)) {
+          return ctrl.links['0'];
         }
         var expr = ctrl.getExprFromSelect(columnKey),
           info = searchMeta.parseExpr(expr),
