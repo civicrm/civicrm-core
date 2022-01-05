@@ -50,7 +50,7 @@ class CRM_Core_CodeGen_GenerateData {
     $config = CRM_Core_Config::singleton();
 
     // Relationship types indexed by name_a_b from the table civicrm_relationship_type
-    $this->relTypes = CRM_Utils_Array::index(array('name_a_b'), CRM_Core_PseudoConstant::relationshipType('name'));
+    $this->relTypes = CRM_Utils_Array::index(['name_a_b'], CRM_Core_PseudoConstant::relationshipType('name'));
   }
 
   /**
@@ -96,6 +96,7 @@ class CRM_Core_CodeGen_GenerateData {
   /**
    * Public wrapper for calling private "add" functions
    * Provides user feedback
+   *
    * @param $itemName
    */
   public function generate($itemName) {
@@ -157,90 +158,116 @@ class CRM_Core_CodeGen_GenerateData {
 
   /**
    * enum's from database
+   *
    * @var array
    */
-  private $preferredCommunicationMethod = array('1', '2', '3', '4', '5');
-  private $contactType = array('Individual', 'Household', 'Organization');
-  private $phoneType = array('1', '2', '3', '4');
+  private $preferredCommunicationMethod = ['1', '2', '3', '4', '5'];
+
+  private $contactType = ['Individual', 'Household', 'Organization'];
+
+  private $phoneType = ['1', '2', '3', '4'];
 
   /**
    * customizable enums (foreign keys)
+   *
    * @var array
    */
-  private $prefix = array(
+  private $prefix = [
     // Female
-    1 => array(
+    1 => [
       1 => 'Mrs.',
       2 => 'Ms.',
       4 => 'Dr.',
-    ),
+    ],
     // Male
-    2 => array(
+    2 => [
       3 => 'Mr.',
       4 => 'Dr.',
-    ),
-  );
+    ],
+  ];
+
   /**
    * @var array
    */
-  private $suffix = array(1 => 'Jr.', 2 => 'Sr.', 3 => 'II', 4 => 'III');
-  private $gender = array(1 => 'female', 2 => 'male');
+  private $suffix = [1 => 'Jr.', 2 => 'Sr.', 3 => 'II', 4 => 'III'];
+
+  private $gender = [1 => 'female', 2 => 'male'];
 
   /**
    * store domain id's
+   *
    * @var array
    */
-  private $domain = array();
+  private $domain = [];
 
   /**
    * store contact id's
+   *
    * @var array
    */
-  private $contact = array();
-  private $Individual = array();
-  private $Household = array();
-  private $Organization = array();
+  private $contact = [];
+
+  private $Individual = [];
+
+  private $Household = [];
+
+  private $Organization = [];
 
   // store which contacts have a location entity
+
   /**
    * for automatic management of is_primary field
+   *
    * @var array
    */
-  private $location = array(
-    'Email' => array(),
-    'Phone' => array(),
-    'Address' => array(),
-  );
+  private $location = [
+    'Email' => [],
+    'Phone' => [],
+    'Address' => [],
+  ];
 
   /**
    * stores the strict individual id and household id to individual id mapping
+   *
    * @var array
    */
-  private $strictIndividual = array();
-  private $householdIndividual = array();
-  private $householdName = array();
+  private $strictIndividual = [];
+
+  private $householdIndividual = [];
+
+  private $householdName = [];
 
   /**
    * sample data in xml format
+   *
    * @var array
    */
-  private $sampleData = array();
+  private $sampleData = [];
 
   /**
    * private vars
+   *
    * @var array
    */
   private $startCid;
-  private $numIndividual = 0;
-  private $numHousehold = 0;
-  private $numOrganization = 0;
-  private $numStrictIndividual = 0;
-  private $stateMap = array();
-  private $states = array();
 
-  private $groupMembershipStatus = array('Added', 'Removed', 'Pending');
-  private $subscriptionHistoryMethod = array('Admin', 'Email');
-  private $deceasedContactIds = array();
+  private $numIndividual = 0;
+
+  private $numHousehold = 0;
+
+  private $numOrganization = 0;
+
+  private $numStrictIndividual = 0;
+
+  private $stateMap = [];
+
+  private $states = [];
+
+  private $groupMembershipStatus = ['Added', 'Removed', 'Pending'];
+
+  private $subscriptionHistoryMethod = ['Admin', 'Email'];
+
+  private $deceasedContactIds = [];
 
   /*********************************
    * private methods
@@ -257,6 +284,7 @@ class CRM_Core_CodeGen_GenerateData {
    *
    * @param int $min
    * @param int $max
+   *
    * @return int
    */
   private function randomInt($min, $max) {
@@ -298,7 +326,8 @@ class CRM_Core_CodeGen_GenerateData {
   /**
    * Get a random item from the sample data or any other array
    *
-   * @param $items (array or string) - if string, used as key for sample data, if array, used as data source
+   * @param $items (array or string) - if string, used as key for sample data,
+   *   if array, used as data source
    *
    * @return mixed (element from array)
    *
@@ -332,7 +361,7 @@ class CRM_Core_CodeGen_GenerateData {
    */
   private function randomKeyValue($items) {
     $key = $this->randomIndex($items);
-    return array($key, $items[$key]);
+    return [$key, $items[$key]];
   }
 
   private function shuffle($array) {
@@ -372,8 +401,9 @@ class CRM_Core_CodeGen_GenerateData {
    *   if none are specified - date is between today - 1year
    *   and today
    *
-   * @param  int $startDate Start Date in Unix timestamp
-   * @param  int $endDate End Date in Unix timestamp
+   * @param int $startDate Start Date in Unix timestamp
+   * @param int $endDate End Date in Unix timestamp
+   *
    * @access private
    *
    * @return string randomly generated date in the format "Ymd"
@@ -406,9 +436,12 @@ class CRM_Core_CodeGen_GenerateData {
   }
 
   /**
-   * Automatically manage the is_primary field by tracking which contacts have each item
+   * Automatically manage the is_primary field by tracking which contacts have
+   * each item
+   *
    * @param $cid
    * @param $type
+   *
    * @return int
    */
   private function isPrimary($cid, $type) {
@@ -422,11 +455,13 @@ class CRM_Core_CodeGen_GenerateData {
   /**
    * Execute a query unless we are doing a dry run
    * Note: this wrapper should not be used for SELECT queries
+   *
    * @param $query
    * @param array $params
+   *
    * @return \CRM_Core_DAO
    */
-  private function _query($query, $params = array()) {
+  private function _query($query, $params = []) {
     if (self::ADD_TO_DB) {
       return CRM_Core_DAO::executeQuery($query, $params);
     }
@@ -434,6 +469,7 @@ class CRM_Core_CodeGen_GenerateData {
 
   /**
    * Call dao insert method unless we are doing a dry run
+   *
    * @param $dao
    */
   private function _insert(&$dao) {
@@ -444,6 +480,7 @@ class CRM_Core_CodeGen_GenerateData {
 
   /**
    * Call dao update method unless we are doing a dry run
+   *
    * @param $dao
    */
   private function _update(&$dao) {
@@ -454,6 +491,7 @@ class CRM_Core_CodeGen_GenerateData {
 
   /**
    * Add core DAO object
+   *
    * @param $type
    * @param $params
    */
@@ -471,11 +509,13 @@ class CRM_Core_CodeGen_GenerateData {
 
   /**
    * Fetch contact type based on stored mapping
+   *
    * @param $id
+   *
    * @return string $type
    */
   private function getContactType($id) {
-    foreach (array('Individual', 'Household', 'Organization') as $type) {
+    foreach (['Individual', 'Household', 'Organization'] as $type) {
       if (in_array($id, $this->$type)) {
         return $type;
       }
@@ -626,7 +666,7 @@ class CRM_Core_CodeGen_GenerateData {
         [$contact->prefix_id, $prefix] = $this->randomKeyValue($this->prefix[$gender_id]);
         $prefix .= ' ';
       }
-      if ($gender == 'male' && $this->probability(.50)) {
+      if ($gender === 'male' && $this->probability(.50)) {
         [$contact->suffix_id, $suffix] = $this->randomKeyValue($this->suffix);
         $suffix = ' ' . $suffix;
       }
@@ -694,9 +734,9 @@ class CRM_Core_CodeGen_GenerateData {
    *
    * contact_uuid - household_individual
    * contact_rid - latest one
-   * household_name 'household $contact_uuid primary contact $primary_contact_uuid'
-   * nick_name 'nick $contact_uuid'
-   * primary_contact_uuid = $household_individual[$contact_uuid][0];
+   * household_name 'household $contact_uuid primary contact
+   * $primary_contact_uuid' nick_name 'nick $contact_uuid' primary_contact_uuid
+   * = $household_individual[$contact_uuid][0];
    *
    */
   private function addHousehold() {
@@ -750,7 +790,7 @@ class CRM_Core_CodeGen_GenerateData {
 
       // Some orgs are named after their location
       if ($this->probability(.7)) {
-        $place = $this->randomItem(array('city', 'street_name', 'state'));
+        $place = $this->randomItem(['city', 'street_name', 'state']);
         $namePre = $address[$place];
       }
       $org->organization_name = "$namePre $nameMid $namePost";
@@ -805,8 +845,8 @@ class CRM_Core_CodeGen_GenerateData {
 
       // add child_of relationship for each child
       $relationship->relationship_type_id = $this->relTypes['Child of']['id'];
-      foreach (array(0, 1) as $parent) {
-        foreach (array(2, 3) as $child) {
+      foreach ([0, 1] as $parent) {
+        foreach ([2, 3] as $child) {
           $relationship->contact_id_a = $household_member[$child];
           $relationship->contact_id_b = $household_member[$parent];
           $this->_insert($relationship);
@@ -883,7 +923,7 @@ class CRM_Core_CodeGen_GenerateData {
 
     // Generate new address
     else {
-      $params = array(
+      $params = [
         'contact_id' => $cid,
         'location_type_id' => $this->getContactType($cid) == 'Organization' ? self::MAIN : self::HOME,
         'street_number' => $this->randomInt(1, 1000),
@@ -892,7 +932,7 @@ class CRM_Core_CodeGen_GenerateData {
         'street_type' => $this->randomItem('street_type'),
         'street_number_postdirectional' => $this->randomItem('address_direction'),
         'county_id' => 1,
-      );
+      ];
 
       $params['street_address'] = $params['street_number'] . $params['street_number_suffix'] . " " . $params['street_name'] . " " . $params['street_type'] . " " . $params['street_number_postdirectional'];
 
@@ -920,13 +960,13 @@ class CRM_Core_CodeGen_GenerateData {
     $area = $this->probability(.5) ? '' : $this->randomInt(201, 899);
     $pre = $this->randomInt(201, 899);
     $post = $this->randomInt(1000, 9999);
-    $params = array(
+    $params = [
       'location_type_id' => $this->getContactType($cid) == 'Organization' ? self::MAIN : self::HOME,
       'contact_id' => $cid,
       'phone' => ($area ? "($area) " : '') . "$pre-$post",
       'phone_numeric' => $area . $pre . $post,
       'phone_type_id' => $this->randomInt(1, 2),
-    );
+    ];
     $this->_addDAO('Phone', $params);
     return $params;
   }
@@ -941,11 +981,11 @@ class CRM_Core_CodeGen_GenerateData {
    * @return array
    */
   private function _addEmail($cid, $email, $locationType) {
-    $params = array(
+    $params = [
       'location_type_id' => $locationType,
       'contact_id' => $cid,
       'email' => $email,
-    );
+    ];
     $this->_addDAO('Email', $params);
     return $params;
   }
@@ -981,12 +1021,12 @@ class CRM_Core_CodeGen_GenerateData {
           break;
       }
     }
-    $params = array(
+    $params = [
       'website_type_id' => 1,
       'location_type_id' => self::MAIN,
       'contact_id' => $cid,
       'url' => "http://$domain.org",
-    );
+    ];
     $this->_addDAO('Website', $params);
     return $params;
   }
@@ -1176,11 +1216,11 @@ class CRM_Core_CodeGen_GenerateData {
    * This method populates the civicrm_note table
    */
   private function addNote() {
-    $params = array(
+    $params = [
       'entity_table' => 'civicrm_contact',
       'contact_id' => 1,
       'privacy' => 0,
-    );
+    ];
     for ($i = 0; $i < self::NUM_CONTACT; $i += 10) {
       $params['entity_id'] = $this->randomItem($this->contact);
       $params['note'] = $this->randomItem('note');
@@ -1240,10 +1280,10 @@ class CRM_Core_CodeGen_GenerateData {
   public function getZipCodeInfo() {
 
     if (!$this->stateMap) {
-      $query = 'SELECT id, name, abbreviation from civicrm_state_province where country_id = 1228';
+      $query = 'SELECT id, name, abbreviation FROM civicrm_state_province WHERE country_id = 1228';
       $dao = new CRM_Core_DAO();
       $dao->query($query);
-      $this->stateMap = array();
+      $this->stateMap = [];
       while ($dao->fetch()) {
         $this->stateMap[$dao->abbreviation] = $dao->id;
         $this->states[$dao->id] = $dao->name;
@@ -1302,10 +1342,10 @@ class CRM_Core_CodeGen_GenerateData {
       $xml = simplexml_load_string($matches[1]);
       $attributes = $xml->center->attributes();
       if (!empty($attributes)) {
-        return array((float ) $attributes['lat'], (float ) $attributes['lng']);
+        return [(float ) $attributes['lat'], (float ) $attributes['lng']];
       }
     }
-    return array(NULL, NULL);
+    return [NULL, NULL];
   }
 
   private function addMembershipType() {
@@ -1326,7 +1366,7 @@ class CRM_Core_CodeGen_GenerateData {
 
   private function addMembership() {
     $contact = new CRM_Contact_DAO_Contact();
-    $contact->query("SELECT id FROM civicrm_contact where contact_type = 'Individual'");
+    $contact->query("SELECT id FROM civicrm_contact WHERE contact_type = 'Individual'");
     $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     while ($contact->fetch()) {
       $contacts[] = $contact->id;
@@ -1335,10 +1375,10 @@ class CRM_Core_CodeGen_GenerateData {
 
     $randomContacts = array_slice($contacts, 20, 30);
 
-    $sources = array('Payment', 'Donation', 'Check');
-    $membershipTypes = array(1, 2);
-    $membershipTypeNames = array('General', 'Student');
-    $statuses = array(3, 4);
+    $sources = ['Payment', 'Donation', 'Check'];
+    $membershipTypes = [1, 2];
+    $membershipTypeNames = ['General', 'Student'];
+    $statuses = [3, 4];
 
     $membership = "
 INSERT INTO civicrm_membership
@@ -1431,7 +1471,7 @@ VALUES
    * @return string
    */
   public static function repairDate($date) {
-    $dropArray = array('-' => '', ':' => '', ' ' => '');
+    $dropArray = ['-' => '', ':' => '', ' ' => ''];
     return strtr($date, $dropArray);
   }
 
@@ -1468,11 +1508,11 @@ VALUES
       ";
     $this->_query($event);
 
-    $sql = "SELECT id from civicrm_address where street_address = '14S El Camino Way E'";
+    $sql = "SELECT id FROM civicrm_address WHERE street_address = '14S El Camino Way E'";
     $eventAdd1 = CRM_Core_DAO::singleValueQuery($sql);
-    $sql = "SELECT id from civicrm_address where street_address = '11B Woodbridge Path SW'";
+    $sql = "SELECT id FROM civicrm_address WHERE street_address = '11B Woodbridge Path SW'";
     $eventAdd2 = CRM_Core_DAO::singleValueQuery($sql);
-    $sql = "SELECT id from civicrm_address where street_address = '581O Lincoln Dr SW'";
+    $sql = "SELECT id FROM civicrm_address WHERE street_address = '581O Lincoln Dr SW'";
     $eventAdd3 = CRM_Core_DAO::singleValueQuery($sql);
 
     $event = "INSERT INTO civicrm_email (contact_id, location_type_id, email, is_primary, is_billing, on_hold, hold_date, reset_date)
@@ -1483,11 +1523,11 @@ VALUES
        ";
     $this->_query($event);
 
-    $sql = "SELECT id from civicrm_email where email = 'development@example.org'";
+    $sql = "SELECT id FROM civicrm_email WHERE email = 'development@example.org'";
     $eventEmail1 = CRM_Core_DAO::singleValueQuery($sql);
-    $sql = "SELECT id from civicrm_email where email = 'tournaments@example.org'";
+    $sql = "SELECT id FROM civicrm_email WHERE email = 'tournaments@example.org'";
     $eventEmail2 = CRM_Core_DAO::singleValueQuery($sql);
-    $sql = "SELECT id from civicrm_email where email = 'celebration@example.org'";
+    $sql = "SELECT id FROM civicrm_email WHERE email = 'celebration@example.org'";
     $eventEmail3 = CRM_Core_DAO::singleValueQuery($sql);
 
     $event = "INSERT INTO civicrm_phone (contact_id, location_type_id, is_primary, is_billing, mobile_provider_id, phone, phone_numeric, phone_type_id)
@@ -1498,11 +1538,11 @@ VALUES
        ";
     $this->_query($event);
 
-    $sql = "SELECT id from civicrm_phone where phone = '204 222-1000'";
+    $sql = "SELECT id FROM civicrm_phone WHERE phone = '204 222-1000'";
     $eventPhone1 = CRM_Core_DAO::singleValueQuery($sql);
-    $sql = "SELECT id from civicrm_phone where phone = '204 223-1000'";
+    $sql = "SELECT id FROM civicrm_phone WHERE phone = '204 223-1000'";
     $eventPhone2 = CRM_Core_DAO::singleValueQuery($sql);
-    $sql = "SELECT id from civicrm_phone where phone = '303 323-1000'";
+    $sql = "SELECT id FROM civicrm_phone WHERE phone = '303 323-1000'";
     $eventPhone3 = CRM_Core_DAO::singleValueQuery($sql);
 
     $event = "INSERT INTO civicrm_loc_block ( address_id, email_id, phone_id, address_2_id, email_2_id, phone_2_id)
@@ -1534,14 +1574,14 @@ VALUES
     $eventTemplates = "INSERT INTO civicrm_event
         ( is_template, template_title, event_type_id, default_role_id, participant_listing_id, is_public, is_monetary, is_online_registration, is_multiple_registrations, allow_same_participant_emails, is_email_confirm, financial_type_id, fee_label, confirm_title, thankyou_title, confirm_from_name, confirm_from_email, is_active, currency )
         VALUES
-        ( 1, 'Free Meeting without Online Registration', 4, 1, 1, 1, 0, 0, null, null, null, null,             null, null, null, null, null, 1, 'USD'  ),
-        ( 1, 'Free Meeting with Online Registration',    4, 1, 1, 1, 0, 1,    1,    1,    0, null,             null, 'Confirm Your Registration Information', 'Thanks for Registering!', null, null, 1, 'USD'  ),
+        ( 1, 'Free Meeting without Online Registration', 4, 1, 1, 1, 0, 0, NULL, NULL, NULL, NULL,             NULL, NULL, NULL, NULL, NULL, 1, 'USD'  ),
+        ( 1, 'Free Meeting with Online Registration',    4, 1, 1, 1, 0, 1,    1,    1,    0, NULL,             NULL, 'Confirm Your Registration Information', 'Thanks for Registering!', NULL, NULL, 1, 'USD'  ),
         ( 1, 'Paid Conference with Online Registration', 1, 1, 1, 1, 1, 1,    1,    1,    1,     4, 'Conference Fee', 'Confirm Your Registration Information', 'Thanks for Registering!', 'Event Template Dept.', 'event_templates@example.org', 1, 'USD' )";
 
     $this->_query($eventTemplates);
 
-    $ufJoinValues = $tellFriendValues = array();
-    $profileID = CRM_Core_DAO::singleValueQuery("Select id from civicrm_uf_group where name ='event_registration'");
+    $ufJoinValues = $tellFriendValues = [];
+    $profileID = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_uf_group WHERE name ='event_registration'");
 
     // grab id's for all events and event templates
     $query = "
@@ -1991,10 +2031,10 @@ VALUES ({$contribution['contact_id']}, $currentActivityID, 2)");
 
   private function addSoftContribution() {
 
-    $sql = "SELECT id from civicrm_contribution where contact_id = 92";
+    $sql = "SELECT id FROM civicrm_contribution WHERE contact_id = 92";
     $contriId1 = CRM_Core_DAO::singleValueQuery($sql);
 
-    $sql = "SELECT id from civicrm_contribution where contact_id = 34";
+    $sql = "SELECT id FROM civicrm_contribution WHERE contact_id = 34";
     $contriId2 = CRM_Core_DAO::singleValueQuery($sql);
 
     $sql = "SELECT cov.value FROM civicrm_option_value cov LEFT JOIN civicrm_option_group cog ON cog.id = cov.option_group_id WHERE cov.name = 'pcp' AND cog.name = 'soft_credit_type'";
@@ -2027,32 +2067,32 @@ VALUES
     $pledgePayment = "INSERT INTO civicrm_pledge_payment
         ( pledge_id, contribution_id, scheduled_amount, actual_amount, currency, scheduled_date, reminder_date, reminder_count, status_id)
        VALUES
-         (1, 10, 500.00, 500.00, 'USD','2009-07-01 00:00:00', null, 0, 1 ),
-         (2, 11,   200.00, 200.00, 'USD','2009-07-01 00:00:00', null, 0,  1 ),
-         (2, null, 200.00, null, 'USD', '2009-10-01 00:00:00', null, 0,  2 ),
-         (2, null, 200.00, null, 'USD', '2009-01-01 00:00:00', null, 0,  2 ),
-         (2, null, 200.00, null, 'USD', '2009-04-01 00:00:00', null, 0,  2 ),
+         (1, 10, 500.00, 500.00, 'USD','2009-07-01 00:00:00', NULL, 0, 1 ),
+         (2, 11,   200.00, 200.00, 'USD','2009-07-01 00:00:00', NULL, 0,  1 ),
+         (2, NULL, 200.00, NULL, 'USD', '2009-10-01 00:00:00', NULL, 0,  2 ),
+         (2, NULL, 200.00, NULL, 'USD', '2009-01-01 00:00:00', NULL, 0,  2 ),
+         (2, NULL, 200.00, NULL, 'USD', '2009-04-01 00:00:00', NULL, 0,  2 ),
 
-         (3, 12,   200.00, 200.00, 'USD', '2009-10-01 00:00:00', null, 0, 1 ),
+         (3, 12,   200.00, 200.00, 'USD', '2009-10-01 00:00:00', NULL, 0, 1 ),
          (3, 13,   200.00, 200.00, 'USD', '2009-11-01 00:0:00', '2009-10-28 00:00:00', 1, 1),
-         (3, null, 200.00, null, 'USD', '2009-12-01 00:00:00', null, 0, 2 );
+         (3, NULL, 200.00, NULL, 'USD', '2009-12-01 00:00:00', NULL, 0, 2 );
         ";
     $this->_query($pledgePayment);
   }
 
   private function addContributionLineItem() {
     $query = " INSERT INTO civicrm_line_item (`entity_table`, `entity_id`, contribution_id, `price_field_id`, `label`, `qty`, `unit_price`, `line_total`, `participant_count`, `price_field_value_id`, `financial_type_id`)
-SELECT 'civicrm_contribution', cc.id, cc.id contribution_id, cpf.id as price_field, cpfv.label, 1, cc.total_amount, cc.total_amount line_total, 0, cpfv.id as price_field_value, cpfv.financial_type_id
+SELECT 'civicrm_contribution', cc.id, cc.id contribution_id, cpf.id AS price_field, cpfv.label, 1, cc.total_amount, cc.total_amount line_total, 0, cpfv.id AS price_field_value, cpfv.financial_type_id
 FROM civicrm_contribution cc
 LEFT JOIN civicrm_price_set cps ON cps.name = 'default_contribution_amount'
 LEFT JOIN civicrm_price_field cpf ON cpf.price_set_id = cps.id
 LEFT JOIN civicrm_price_field_value cpfv ON cpfv.price_field_id = cpf.id
-order by cc.id; ";
+ORDER BY cc.id; ";
     $this->_query($query);
   }
 
   private function addAccountingEntries() {
-    $components = array('contribution', 'membership', 'participant');
+    $components = ['contribution', 'membership', 'participant'];
     $select = 'SELECT contribution.id contribution_id, cli.id as line_item_id, contribution.contact_id, contribution.receive_date, contribution.total_amount, contribution.currency, cli.label,
       cli.financial_type_id,  cefa.financial_account_id, contribution.payment_instrument_id, contribution.check_number, contribution.trxn_id';
     $where = 'WHERE cefa.account_relationship = 1';
@@ -2081,7 +2121,7 @@ order by cc.id; ";
   private function addFinancialItem($result, $financialAccountId) {
     $defaultFinancialAccount = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1 AND financial_account_type_id = 1");
     while ($result->fetch()) {
-      $trxnParams = array(
+      $trxnParams = [
         'trxn_date' => CRM_Utils_Date::processDate($result->receive_date),
         'total_amount' => $result->total_amount,
         'currency' => $result->currency,
@@ -2092,9 +2132,9 @@ order by cc.id; ";
         'payment_instrument_id' => $result->payment_instrument_id,
         'check_number' => $result->check_number,
         'is_payment' => 1,
-      );
+      ];
       $trxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
-      $financialItem = array(
+      $financialItem = [
         'transaction_date' => CRM_Utils_Date::processDate($result->receive_date),
         'amount' => $result->total_amount,
         'currency' => $result->currency,
@@ -2104,7 +2144,7 @@ order by cc.id; ";
         'entity_table' => 'civicrm_line_item',
         'description' => $result->label,
         'financial_account_id' => $result->financial_account_id,
-      );
+      ];
       $trxnId['id'] = $trxn->id;
       CRM_Financial_BAO_FinancialItem::create($financialItem, NULL, $trxnId);
     }
@@ -2113,14 +2153,14 @@ order by cc.id; ";
   private function addLineItemParticipants() {
     $participant = new CRM_Event_DAO_Participant();
     $participant->query("INSERT INTO civicrm_line_item (`entity_table`, `entity_id`, contribution_id, `price_field_id`, `label`, `qty`, `unit_price`, `line_total`, `participant_count`, `price_field_value_id`, `financial_type_id`)
-SELECT 'civicrm_participant', cp.id, cpp.contribution_id, cpfv.price_field_id, cpfv.label, 1, cpfv.amount, cpfv.amount as line_total, 0, cpfv.id, cpfv.financial_type_id FROM civicrm_participant cp LEFT JOIN civicrm_participant_payment cpp ON cpp.participant_id = cp.id
+SELECT 'civicrm_participant', cp.id, cpp.contribution_id, cpfv.price_field_id, cpfv.label, 1, cpfv.amount, cpfv.amount AS line_total, 0, cpfv.id, cpfv.financial_type_id FROM civicrm_participant cp LEFT JOIN civicrm_participant_payment cpp ON cpp.participant_id = cp.id
 LEFT JOIN civicrm_price_set_entity cpe ON cpe.entity_id = cp.event_id LEFT JOIN civicrm_price_field cpf ON cpf.price_set_id = cpe.price_set_id LEFT JOIN civicrm_price_field_value cpfv ON cpfv.price_field_id = cpf.id WHERE cpfv.label = cp.fee_level");
   }
 
   private function addMembershipPayment() {
-    $maxContribution = CRM_Core_DAO::singleValueQuery("select max(id) from civicrm_contribution");
-    $financialTypeID = CRM_Core_DAO::singleValueQuery("select id from civicrm_financial_type where name = 'Member Dues'");
-    $paymentInstrumentID = CRM_Core_DAO::singleValueQuery("select value from civicrm_option_value where name = 'Credit Card' AND option_group_id = (SELECT id from civicrm_option_group where name = 'payment_instrument')");
+    $maxContribution = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) FROM civicrm_contribution");
+    $financialTypeID = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_type WHERE name = 'Member Dues'");
+    $paymentInstrumentID = CRM_Core_DAO::singleValueQuery("SELECT value FROM civicrm_option_value WHERE name = 'Credit Card' AND option_group_id = (SELECT id FROM civicrm_option_group WHERE name = 'payment_instrument')");
     $sql = "INSERT INTO civicrm_contribution (contact_id,financial_type_id,payment_instrument_id, receive_date, total_amount, currency, source, contribution_status_id, trxn_id)
 SELECT  cm.contact_id, $financialTypeID, $paymentInstrumentID, now(), cmt.minimum_fee, 'USD', CONCAT(cmt.name, ' Membership: Offline signup'), 1, SUBSTRING(MD5(RAND()) FROM 1 FOR 16) FROM `civicrm_membership` cm
 LEFT JOIN civicrm_membership_type cmt ON cmt.id = cm.membership_type_id;";
@@ -2135,7 +2175,7 @@ WHERE cc.id > $maxContribution;";
     $this->_query($sql);
 
     $sql = "INSERT INTO civicrm_line_item (entity_table, entity_id, contribution_id, price_field_value_id, price_field_id, label, qty, unit_price, line_total, financial_type_id)
-SELECT 'civicrm_membership', cm.id, cmp.contribution_id, cpfv.id, cpfv.price_field_id, cpfv.label, 1, cpfv.amount, cpfv.amount as unit_price, cpfv.financial_type_id FROM `civicrm_membership` cm
+SELECT 'civicrm_membership', cm.id, cmp.contribution_id, cpfv.id, cpfv.price_field_id, cpfv.label, 1, cpfv.amount, cpfv.amount AS unit_price, cpfv.financial_type_id FROM `civicrm_membership` cm
 LEFT JOIN civicrm_membership_payment cmp ON cmp.membership_id = cm.id
 LEFT JOIN civicrm_price_field_value cpfv ON cpfv.membership_type_id = cm.membership_type_id
 LEFT JOIN civicrm_price_field cpf ON cpf.id = cpfv.price_field_id
@@ -2158,9 +2198,9 @@ AND    a.details = 'Membership Payment'
   }
 
   private function addParticipantPayment() {
-    $maxContribution = CRM_Core_DAO::singleValueQuery("select max(id) from civicrm_contribution");
-    $financialTypeID = CRM_Core_DAO::singleValueQuery("select id from civicrm_financial_type where name = 'Event Fee'");
-    $paymentInstrumentID = CRM_Core_DAO::singleValueQuery("select value from civicrm_option_value where name = 'Credit Card' AND option_group_id = (SELECT id from civicrm_option_group where name = 'payment_instrument')");
+    $maxContribution = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) FROM civicrm_contribution");
+    $financialTypeID = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_type WHERE name = 'Event Fee'");
+    $paymentInstrumentID = CRM_Core_DAO::singleValueQuery("SELECT value FROM civicrm_option_value WHERE name = 'Credit Card' AND option_group_id = (SELECT id FROM civicrm_option_group WHERE name = 'payment_instrument')");
     $sql = "INSERT INTO civicrm_contribution (contact_id, financial_type_id, payment_instrument_id, receive_date, total_amount, currency, receipt_date, source, contribution_status_id, trxn_id)
 SELECT  `contact_id`, $financialTypeID, $paymentInstrumentID, now(), `fee_amount`, 'USD', now(), CONCAT(ce.title, ' : Offline registration'), 1,  SUBSTRING(MD5(RAND()) FROM 1 FOR 16) FROM `civicrm_participant` cp
 LEFT JOIN civicrm_event ce ON ce.id = cp.event_id
@@ -2192,7 +2232,7 @@ AND    a.details = 'Participant Payment'
   /**
    * @return string
    */
-  protected static function getCivicrmDir():string {
+  protected static function getCivicrmDir(): string {
     return dirname(dirname(dirname(__DIR__)));
   }
 
