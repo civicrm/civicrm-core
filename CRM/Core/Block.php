@@ -464,10 +464,6 @@ class CRM_Core_Block {
       );
     }
 
-    if (empty($dashboardLinks)) {
-      return NULL;
-    }
-
     $values = [];
     foreach ($dashboardLinks as $dash) {
       $value = [];
