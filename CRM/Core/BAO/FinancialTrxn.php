@@ -36,22 +36,21 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @return CRM_Financial_DAO_FinancialTrxn
    */
   public static function create($params) {
-    $trxn = new CRM_Financial_DAO_FinancialTrxn();
-    $trxn->copyValues($params);
-
     if (isset($params['fee_amount']) && is_numeric($params['fee_amount'])) {
       if (!isset($params['total_amount'])) {
+        $trxn = new CRM_Financial_DAO_FinancialTrxn();
+        $trxn->copyValues($params);
         $trxn->fetch();
         $params['total_amount'] = $trxn->total_amount;
       }
-      $trxn->net_amount = $params['total_amount'] - $params['fee_amount'];
+      $params['net_amount'] = $params['total_amount'] - $params['fee_amount'];
     }
 
-    if (empty($params['id']) && !CRM_Utils_Rule::currencyCode($trxn->currency)) {
-      $trxn->currency = CRM_Core_Config::singleton()->defaultCurrency;
+    if (empty($params['id']) && !CRM_Utils_Rule::currencyCode($params['currency'])) {
+      $params['currency'] = CRM_Core_Config::singleton()->defaultCurrency;
     }
 
-    $trxn->save();
+    $trxn = self::writeRecord($params);
 
     if (!empty($params['id'])) {
       // For an update entity financial transaction record will already exist. Return early.
