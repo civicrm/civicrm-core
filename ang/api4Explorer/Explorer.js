@@ -789,6 +789,7 @@
     // Format oop params
     function formatOOP(entity, action, params, indent) {
       var info = getEntity(entity),
+        arrayParams = ['groupBy', 'records'],
         newLine = "\n" + _.repeat(' ', indent),
         code = '\\' + info.class + '::' + action + '(',
         perm = params.checkPermissions === false ? 'FALSE' : '';
@@ -803,6 +804,10 @@
           _.each(param, function(item, index) {
             val = phpFormat(index) + ', ' + phpFormat(item, 2 + indent);
             code += newLine + "->add" + ucfirst(key).replace(/s$/, '') + '(' + val + ')';
+          });
+        } else if (_.includes(arrayParams, key)) {
+          _.each(param, function(item) {
+            code += newLine + "->add" + ucfirst(key).replace(/s$/, '') + '(' + phpFormat(item, 2 + indent) + ')';
           });
         } else if (key === 'where') {
           _.each(param, function (clause) {
