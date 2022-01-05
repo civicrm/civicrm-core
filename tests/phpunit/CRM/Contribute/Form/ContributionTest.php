@@ -372,7 +372,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * Test the submit function on the contribution page.
    */
   public function testSubmitCreditCardFee(): void {
-    $form = new CRM_Contribute_Form_Contribution();
     $this->paymentProcessor->setDoDirectPaymentResult(['payment_status_id' => 1, 'is_error' => 0, 'trxn_id' => 'tx', 'fee_amount' => .08]);
     $this->submitContributionForm([
       'total_amount' => 50,
@@ -571,9 +570,8 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   /**
    * Test the submit function does not create a billing address if no details provided.
    */
-  public function testSubmitCreditCardWithNoBillingAddress() {
-    $form = new CRM_Contribute_Form_Contribution();
-    $form->testSubmit([
+  public function testSubmitCreditCardWithNoBillingAddress(): void {
+    $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
       'contact_id' => $this->_individualId,
@@ -581,7 +579,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],
       'credit_card_number' => '411111111111111',
-    ], CRM_Core_Action::ADD, 'live');
+    ], NULL, 'live');
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['return' => 'address_id']);
     $this->assertEmpty($contribution['address_id']);
     $this->callAPISuccessGetCount('Address', [

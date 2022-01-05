@@ -1519,7 +1519,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // reassign submitted form values if the any information is formatted via beginPostProcess
     $submittedValues = $this->_params;
 
-    if (!empty($submittedValues['price_set_id']) && $action & CRM_Core_Action::UPDATE) {
+    if ($this->getPriceSetID() && $action & CRM_Core_Action::UPDATE) {
       $line = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'contribution');
       $lineID = key($line);
       $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', CRM_Utils_Array::value('price_field_id', $line[$lineID]), 'price_set_id');
@@ -1534,7 +1534,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // Process price set and get total amount and line items.
     $lineItem = [];
     $priceSetId = $submittedValues['price_set_id'] ?? NULL;
-    if (empty($priceSetId) && !$this->_id) {
+    if (!$this->getPriceSetID() && !$this->_id) {
       $this->_priceSetId = $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_contribution_amount', 'id', 'name');
       $this->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
       $fieldID = key($this->_priceSet['fields']);
@@ -2119,6 +2119,18 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     return $statuses;
+  }
+
+  /**
+   * Get the price set ID.
+   *
+   * Note that the function currently returns NULL if not submitted
+   * but will over time be fixed to always return an ID.
+   *
+   * @return int|null
+   */
+  protected function getPriceSetID() {
+    return $this->getSubmittedValue('price_set_id');
   }
 
 }
