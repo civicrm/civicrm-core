@@ -325,6 +325,10 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         }
         list($values['customPost_grouptitle'], $values['customPost']) = self::getProfileNameAndFields($postID, $userID, $params['custom_post_id']);
       }
+      // Assign honoree values for the receipt. But first, stop any leaks from
+      // previously assigned values.
+      $template->assign('honoreeProfile', []);
+      $template->assign('honorName', NULL);
       if (isset($values['honor'])) {
         $honorValues = $values['honor'];
         $template->_values = ['honoree_profile_id' => $values['honoree_profile_id']];
