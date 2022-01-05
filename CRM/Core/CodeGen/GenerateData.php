@@ -1,5 +1,12 @@
 <?php
 
+use Civi\Api4\ACL;
+use Civi\Api4\ACLEntityRole;
+use Civi\Api4\Contact;
+use Civi\Api4\Email;
+use Civi\Api4\Group;
+use Civi\Api4\OptionValue;
+
 class CRM_Core_CodeGen_GenerateData {
 
   /**
@@ -66,6 +73,7 @@ class CRM_Core_CodeGen_GenerateData {
     $this->generate('Relationship');
     $this->generate('EntityTag');
     $this->generate('Group');
+    $this->generate('ACL');
     $this->generate('Note');
     $this->generate('Activity');
     $this->generate('Event');
@@ -1124,6 +1132,8 @@ class CRM_Core_CodeGen_GenerateData {
 
   /**
    * This method populates the civicrm_group_contact table
+   *
+   * @throws \API_Exception
    */
   private function addGroup() {
     // add the 3 groups first
@@ -1153,7 +1163,7 @@ class CRM_Core_CodeGen_GenerateData {
       // method
       $subscriptionHistory->method = $this->randomItem($this->subscriptionHistoryMethod);
       $subscriptionHistory->date = $this->randomDate();
-      if ($groupContact->status != 'Pending') {
+      if ($groupContact->status !== 'Pending') {
         $this->_insert($groupContact);
       }
       $this->_insert($subscriptionHistory);
@@ -1176,18 +1186,33 @@ class CRM_Core_CodeGen_GenerateData {
       $subscriptionHistory->method = $this->randomItem($this->subscriptionHistoryMethod);
       $subscriptionHistory->date = $this->randomDate();
 
-      if ($groupContact->status != 'Pending') {
+      if ($groupContact->status !== 'Pending') {
         $this->_insert($groupContact);
       }
       $this->_insert($subscriptionHistory);
     }
 
-    // 8 advisory board group
-    for ($i = 0; $i < 8; $i++) {
+    // 8 advisory board group + 1 with a login
+    for ($i = 0; $i < 9; $i++) {
       $groupContact = new CRM_Contact_DAO_GroupContact();
       // advisory board group
       $groupContact->group_id = 4;
-      $groupContact->contact_id = $this->Individual[$i * 7];
+      if ($i !== 8) {
+        $groupContact->contact_id = $this->Individual[$i * 7];
+      }
+      else {
+        $advisorID = Contact::create(FALSE)->setValues([
+          'first_name' => 'Jenny',
+          'last_name' => 'Lee',
+          'contact_type' => 'Individual',
+          'job_title' => 'Volunteer coordinator',
+        ])->addChain('email', Email::create(FALSE)->setValues([
+          'contact_id' => '$id',
+          'email' => 'jenny@example.com',
+        ]))
+          ->execute()->first()['id'];
+        $groupContact->contact_id = $advisorID;
+      }
       // membership status
       $groupContact->status = 'Added';
 
@@ -1199,7 +1224,7 @@ class CRM_Core_CodeGen_GenerateData {
       $subscriptionHistory->method = $this->randomItem($this->subscriptionHistoryMethod);
       $subscriptionHistory->date = $this->randomDate();
 
-      if ($groupContact->status != 'Pending') {
+      if ($groupContact->status !== 'Pending') {
         $this->_insert($groupContact);
       }
       $this->_insert($subscriptionHistory);
@@ -1210,6 +1235,43 @@ class CRM_Core_CodeGen_GenerateData {
     //reset the cache.
     Civi::cache('fields')->flush();
     CRM_Core_BAO_Cache::resetCaches();
+  }
+
+  /**
+   * This method sets up a basic ACL.
+   *
+   * It allows the members of the advisory group to edit the Summer volunteers group.
+   *
+   * @throws \API_Exception
+   */
+  private function addACL(): void {
+    $optionValueID = OptionValue::create(FALSE)->setValues([
+      'option_group_id:name' => 'acl_role',
+      'value' => 3,
+      'name' => 'Advisory Board',
+      'label' => 'Advisory Board',
+    ])
+      ->execute()->first()['id'];
+    $advisoryGroupID = Group::get(FALSE)
+      ->addWhere('name', '=', 'Advisory Board')
+      ->execute()->first()['id'];
+    $roleID = ACLEntityRole::create(FALSE)->setValues([
+      'entity_table' => 'civicrm_group',
+      'acl_role_id' => $optionValueID,
+      'entity_id' => $advisoryGroupID,
+    ])->execute()->first()['id'];
+    $volunteerID = Group::get(FALSE)
+      ->addWhere('name', '=', 'Summer Program Volunteers')
+      ->execute()->first()['id'];
+
+    ACL::create(FALSE)->setValues([
+      'name' => 'Advisory board access to volunteers',
+      'entity_table' => 'civicrm_acl_role',
+      'operation' => 'Edit',
+      'object_table' => 'civicrm_saved_search',
+      'entity_id' => $roleID,
+      'object_id' => $volunteerID,
+    ])->execute();
   }
 
   /**
