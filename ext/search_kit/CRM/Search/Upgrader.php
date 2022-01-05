@@ -51,6 +51,14 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
    * @return bool
    */
   public function upgrade_1001(): bool {
+    // If you upgrade direct from 5.35 to 5.40+ then upgrade_1001 which is
+    // from 5.36 triggers api4 to use the field that gets added in 5.40.
+    // So rather than rewrite all these upgrades in straight SQL, let's just
+    // add the field now, and then upgrade_1005 will be a no-op if upgrading
+    // from 5.36 or earlier.
+    $this->ctx->log->info('Applying update 1005 before 1001 to avoid chicken and egg problem.');
+    $this->addColumn('civicrm_search_display', 'acl_bypass', "tinyint DEFAULT 0 COMMENT 'Skip permission checks and ACLs when running this display.'");
+
     $this->ctx->log->info('Applying update 1001 - normalize search display columns.');
     $savedSearches = \Civi\Api4\SavedSearch::get(FALSE)
       ->addWhere('api_params', 'IS NOT NULL')
