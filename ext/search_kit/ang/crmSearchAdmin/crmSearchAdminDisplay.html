@@ -15,5 +15,10 @@
       {{:: ts('Anyone who can view this display will be able to see all results, regardless of their permission level.') }}
     </div>
   </div>
-
 </fieldset>
+<div class="form-group crm-search-admin-right" ng-if="$ctrl.display.id">
+  <a ng-href="{{ $ctrl.crmSearchAdmin.searchDisplayPath + '#/display/' + $ctrl.savedSearch.name + '/' + $ctrl.display.name }}" target="_blank" class="btn btn-primary-outline" title="{{:: ts('View search display on its own page') }}">
+    <i class="crm-i fa-external-link"></i>
+    {{:: ts('View Display') }}
+  </a>
+</div>
