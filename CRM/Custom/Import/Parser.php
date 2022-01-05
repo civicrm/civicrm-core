@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
+abstract class CRM_Custom_Import_Parser extends CRM_Import_Parser {
 
   protected $_fileName;
 
@@ -58,7 +58,7 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
    */
   public function run(
     $fileName,
-    $separator = ',',
+    $separator,
     &$mapper,
     $skipColumnHeader = FALSE,
     $mode = self::MODE_PREVIEW,
@@ -167,7 +167,7 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
       if ($returnCode & self::WARNING) {
         $this->_warningCount++;
         if ($this->_warningCount < $this->_maxWarningCount) {
-          $this->_warningCount[] = $line;
+          $this->_warnings[] = $this->_lineCount;
         }
       }
 
@@ -238,7 +238,7 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
           ts('Reason'),
         ], $customHeaders);
         $this->_errorFileName = self::errorFileName(self::ERROR);
-        self::exportCSV($this->_errorFileName, $headers, $this->_errors);
+        CRM_Contact_Import_Parser::exportCSV($this->_errorFileName, $headers, $this->_errors);
       }
       if ($this->_conflictCount) {
         $headers = array_merge([
@@ -246,7 +246,7 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
           ts('Reason'),
         ], $customHeaders);
         $this->_conflictFileName = self::errorFileName(self::CONFLICT);
-        self::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
+        CRM_Contact_Import_Parser::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
       }
       if ($this->_duplicateCount) {
         $headers = array_merge([
@@ -255,7 +255,7 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
         ], $customHeaders);
 
         $this->_duplicateFileName = self::errorFileName(self::DUPLICATE);
-        self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
+        CRM_Contact_Import_Parser::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
       }
     }
     return $this->fini();
@@ -353,6 +353,25 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
       if ($this->_duplicateCount) {
         $store->set('duplicatesFileName', $this->_duplicateFileName);
       }
+    }
+  }
+
+  /**
+   * @param string $name
+   * @param $title
+   * @param int $type
+   * @param string $headerPattern
+   * @param string $dataPattern
+   * @param bool $hasLocationType
+   */
+  public function addField(
+    $name, $title, $type = CRM_Utils_Type::T_INT,
+    $headerPattern = '//', $dataPattern = '//',
+    $hasLocationType = FALSE
+  ) {
+    $this->_fields[$name] = new CRM_Custom_Import_Field($name, $title, $type, $headerPattern, $dataPattern, $hasLocationType);
+    if (empty($name)) {
+      $this->_fields['doNotImport'] = new CRM_Custom_Import_Field($name, $title, $type, $headerPattern, $dataPattern, $hasLocationType);
     }
   }
 

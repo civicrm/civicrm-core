@@ -91,10 +91,11 @@ VALUES
     ( @domainID, 'civicrm/activity?reset=1&action=add&context=standalone',  '{ts escape="sql" skip="true"}New Activity{/ts}',           'New Activity',         NULL,               '',             @contactlastID, '1', NULL,  5 ),
     ( @domainID, 'civicrm/activity/email/add?atype=3&action=add&reset=1&context=standalone', '{ts escape="sql" skip="true"}New Email{/ts}',   'New Email',      NULL,               '',             @contactlastID, '1', '1',   6 ),
     ( @domainID, 'civicrm/import/contact?reset=1',                          '{ts escape="sql" skip="true"}Import Contacts{/ts}',        'Import Contacts',      'import contacts',  '',             @contactlastID, '1', NULL,  7 ),
-    ( @domainID, 'civicrm/import/activity?reset=1',                         '{ts escape="sql" skip="true"}Import Activities{/ts}',      'Import Activities',    'import contacts',  '',             @contactlastID, '1', '1',   8 ),
-    ( @domainID, 'civicrm/group/add?reset=1',                               '{ts escape="sql" skip="true"}New Group{/ts}',              'New Group',            'edit groups',      '',             @contactlastID, '1', NULL,  9 ),
-    ( @domainID, 'civicrm/group?reset=1',                                   '{ts escape="sql" skip="true"}Manage Groups{/ts}',          'Manage Groups',        'access CiviCRM',   '',             @contactlastID, '1', '1',   10 ),
-    ( @domainID, 'civicrm/tag?reset=1',                               '{ts escape="sql" skip="true"}Manage Tags{/ts}', 'Manage Tags (Categories)', 'manage tags', '',     @contactlastID, '1','1', 12 ),
+    ( @domainID, 'civicrm/import/activity?reset=1',                         '{ts escape="sql" skip="true"}Import Activities{/ts}',      'Import Activities',    'import contacts',  '',             @contactlastID, '1', NULL,   8 ),
+    ( @domainID, 'civicrm/import/custom?reset=1',                         '{ts escape="sql" skip="true"}Import Custom Data{/ts}',  'Import MultiValued Custom', 'import contacts',  '',             @contactlastID, '1', '1',   9 ),
+    ( @domainID, 'civicrm/group/add?reset=1',                               '{ts escape="sql" skip="true"}New Group{/ts}',              'New Group',            'edit groups',      '',             @contactlastID, '1', NULL,  10 ),
+    ( @domainID, 'civicrm/group?reset=1',                                   '{ts escape="sql" skip="true"}Manage Groups{/ts}',          'Manage Groups',        'access CiviCRM',   '',             @contactlastID, '1', '1',   11 ),
+    ( @domainID, 'civicrm/tag?reset=1',                               '{ts escape="sql" skip="true"}Manage Tags{/ts}', 'Manage Tags (Categories)',              'manage tags',      '',             @contactlastID, '1', '1',   12 ),
     ( @domainID, 'civicrm/contact/deduperules?reset=1',  '{ts escape="sql" skip="true"}Find and Merge Duplicate Contacts{/ts}', 'Find and Merge Duplicate Contacts', 'administer dedupe rules,merge duplicate contacts', 'OR', @contactlastID, '1', NULL, 13 );
 
 INSERT INTO civicrm_navigation

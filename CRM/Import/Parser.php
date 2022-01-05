@@ -442,7 +442,7 @@ abstract class CRM_Import_Parser {
   /**
    * Determines the file extension based on error code.
    *
-   * @var $type error code constant
+   * @var int $type error code constant
    * @return string
    */
   public static function errorFileName($type) {
