@@ -16,24 +16,30 @@
 
 {php}
   $currentStep = $this->get_template_vars('step');
-  $wizard = array(
-    'style' => array(),
+  $wizard = [
+    'style' => ['barClass' => '', 'showTitle' => FALSE],
     'currentStepNumber' => $currentStep,
-    'steps' => array(
-      array(
+    'steps' => [
+      [
         'title' => ts('Manage Roles'),
         'link' => CRM_Utils_System::url('civicrm/admin/options/acl_role', 'reset=1'),
-      ),
-      array(
+        'collapsed' => FALSE,
+        'name' => '',
+      ],
+      [
         'title' => ts('Assign Users'),
         'link' => CRM_Utils_System::url('civicrm/acl/entityrole', 'reset=1'),
-      ),
-      array(
+        'collapsed' => FALSE,
+        'name' => '',
+      ],
+      [
         'title' => ts('Manage ACLs'),
         'link' => CRM_Utils_System::url('civicrm/acl', 'reset=1'),
-      ),
-    ),
-  );
+        'collapsed' => FALSE,
+        'name' => '',
+      ],
+    ],
+  ];
   foreach ($wizard['steps'] as $num => &$step) {
     $step['step'] = $step['valid'] = $step['stepNumber'] = $num + 1;
     if ($step['stepNumber'] == $currentStep) {

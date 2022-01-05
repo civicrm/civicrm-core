@@ -10,7 +10,7 @@
 {if count( $wizard.steps ) > 1}
 {* wizard.style variable is passed by some Wizards to allow alternate styling for progress "bar". *}
 <div id="wizard-steps">
-   <ul class="wizard-bar{if !empty($wizard.style.barClass)}-{$wizard.style.barClass}{/if}">
+   <ul class="wizard-bar{if $wizard.style.barClass}-{$wizard.style.barClass}{/if}">
     {section name=step loop=$wizard.steps}
         {if count ( $wizard.steps ) > 5 }
             {* truncate step titles so header isn't too wide *}
@@ -19,7 +19,7 @@
             {assign var="title" value=$wizard.steps[step].title}
         {/if}
         {* Show each wizard link unless collapsed value is true. Also excluding quest app submit steps. Should create separate WizardHeader for Quest at some point.*}
-        {if empty($wizard.steps[step].collapsed) && !empty($wizard.steps[step].name) && $wizard.steps[step].name NEQ 'Submit' && $wizard.steps[step].name NEQ 'PartnerSubmit'}
+        {if !$wizard.steps[step].collapsed && $wizard.steps[step].name && $wizard.steps[step].name NEQ 'Submit' && $wizard.steps[step].name NEQ 'PartnerSubmit'}
             {assign var=i value=$smarty.section.step.iteration}
             {if $wizard.currentStepNumber > $wizard.steps[step].stepNumber}
                 {if $wizard.steps[step].step}
