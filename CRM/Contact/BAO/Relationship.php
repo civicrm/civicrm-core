@@ -193,7 +193,9 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         }
 
         //CRM-16978:check duplicate relationship as per case id.
+        // https://issues.civicrm.org/jira/browse/CRM-16978
         if ($caseId = CRM_Utils_Array::value('case_id', $params)) {
+          CRM_Core_Error::deprecatedWarning('this code is believed to be unreachable');
           $contactFields['case_id'] = $caseId;
         }
         if (
