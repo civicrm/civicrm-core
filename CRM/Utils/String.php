@@ -1038,7 +1038,9 @@ class CRM_Utils_String {
     $cachingValue = $smarty->caching;
     $smarty->caching = 0;
     $smarty->assign('smartySingleUseString', $templateString);
-    $templateString = $smarty->fetch('string:{eval var=$smartySingleUseString}');
+    // Do not escape the smartySingleUseString as that is our smarty template
+    // and is likely to contain html.
+    $templateString = (string) $smarty->fetch('string:{eval var=$smartySingleUseString|smarty:nodefaults}');
     $smarty->caching = $cachingValue;
     $smarty->assign('smartySingleUseString', NULL);
     return $templateString;

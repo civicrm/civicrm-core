@@ -75,7 +75,7 @@
                 <th style="text-align:left;font-weight:bold;width:100%"><font size="1">{ts}Description{/ts}</font></th>
                 <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{ts}Quantity{/ts}</font></th>
                 <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{ts}Unit Price{/ts}</font></th>
-                <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{if isset($taxTerm)}{$taxTerm}{/if}</font></th>
+                <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{$taxTerm}</font></th>
                 <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{ts 1=$currency}Amount %1{/ts}</font></th>
               </tr>
               {foreach from=$lineItem item=value key=priceset name=taxpricevalue}
@@ -99,7 +99,7 @@
                   {if $value.tax_amount != ''}
                     <td style="text-align:right;"><font size="1">{if isset($value.tax_rate)}{$value.tax_rate}%{/if}</font></td>
                   {else}
-                    <td style="text-align:right;"><font size="1">{if isset($taxTerm)}{ts 1=$taxTerm}-{/ts}{/if}</font></td>
+                    <td style="text-align:right;"><font size="1">{if $taxTerm}{ts 1=$taxTerm}-{/ts}{/if}</font></td>
                   {/if}
                   <td style="text-align:right;"><font size="1">{$value.subTotal|crmMoney:$currency}</font></td>
                 </tr>
@@ -114,10 +114,10 @@
                 <tr>
                   <td colspan="3"></td>
                     {if $priceset}
-                      <td style="text-align:right;white-space: nowrap"><font size="1">{if isset($taxTerm)}{ts 1=$taxTerm 2=$priceset}TOTAL %1 %2%{/ts}{/if}</font></td>
+                      <td style="text-align:right;white-space: nowrap"><font size="1">{if $taxTerm}{ts 1=$taxTerm 2=$priceset}TOTAL %1 %2%{/ts}{/if}</font></td>
                       <td style="text-align:right"><font size="1" align="right">{$value|crmMoney:$currency}</font> </td>
                     {elseif $priceset == 0}
-                      <td style="text-align:right;white-space: nowrap"><font size="1">{if isset($taxTerm)}{ts 1=$taxTerm}TOTAL %1{/ts}{/if}</font></td>
+                      <td style="text-align:right;white-space: nowrap"><font size="1">{if $taxTerm}{ts 1=$taxTerm}TOTAL %1{/ts}{/if}</font></td>
                       <td style="text-align:right"><font size="1" align="right">{$value|crmMoney:$currency}</font> </td>
                     {/if}
                 </tr>
@@ -302,7 +302,7 @@
                 <th style="padding-right:28px;text-align:left;font-weight:bold;width:200px;"><font size="1">{ts}Description{/ts}</font></th>
                 <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{ts}Quantity{/ts}</font></th>
                 <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{ts}Unit Price{/ts}</font></th>
-                <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{if isset($taxTerm)}{$taxTerm}{/if}</font></th>
+                <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{$taxTerm}</font></th>
                 <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{ts 1=$currency}Amount %1{/ts}</font></th>
               </tr>
               {foreach from=$lineItem item=value key=priceset name=pricevalue}
@@ -329,7 +329,7 @@
                   {if $value.tax_amount != ''}
                     <td style="padding-left:28px;text-align:right;"><font size="1">{if isset($value.tax_rate)}{$value.tax_rate}%{/if}</font></td>
                   {else}
-                    <td style="padding-left:28px;text-align:right"><font size="1">{if isset($taxTerm)}{ts 1=$taxTerm}No %1{/ts}{/if}</font></td>
+                    <td style="padding-left:28px;text-align:right"><font size="1">{if $taxTerm}{ts 1=$taxTerm}No %1{/ts}{/if}</font></td>
                   {/if}
                   <td style="padding-left:28px;text-align:right;"><font size="1">{$value.subTotal|crmMoney:$currency}</font></td>
                 </tr>
@@ -345,10 +345,10 @@
                 <tr>
                   <td colspan="3"></td>
                   {if $priceset}
-                    <td style="padding-left:28px;text-align:right;"><font size="1">{if isset($taxTerm)}{ts 1=$taxTerm 2=$priceset}TOTAL %1 %2%{/ts}{/if}</font></td>
+                    <td style="padding-left:28px;text-align:right;"><font size="1">{if $taxTerm}{ts 1=$taxTerm 2=$priceset}TOTAL %1 %2%{/ts}{/if}</font></td>
                     <td style="padding-left:28px;text-align:right;"><font size="1" align="right">{$value|crmMoney:$currency}</font> </td>
                   {elseif $priceset == 0}
-                    <td style="padding-left:28px;text-align:right;"><font size="1">{if isset($taxTerm)}{ts 1=$taxTerm}TOTAL NO %1{/ts}{/if}</font></td>
+                    <td style="padding-left:28px;text-align:right;"><font size="1">{if $taxTerm}{ts 1=$taxTerm}TOTAL NO %1{/ts}{/if}</font></td>
                     <td style="padding-left:28px;text-align:right;"><font size="1" align="right">{$value|crmMoney:$currency}</font> </td>
                   {/if}
                 </tr>

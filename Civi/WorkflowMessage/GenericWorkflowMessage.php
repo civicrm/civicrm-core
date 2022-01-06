@@ -100,4 +100,15 @@ class GenericWorkflowMessage implements WorkflowMessageInterface {
     }
   }
 
+  /**
+   * Define tokens to be exported as smarty values.
+   *
+   * @param array $export
+   */
+  protected function exportExtraTokenContext(array &$export): void {
+    // Tax term is exposed at the generic level as so many templates use it
+    // (e.g. Membership, participant, pledge as well as contributions).
+    $export['smartyTokenAlias']['taxTerm'] = 'domain.tax_term';
+  }
+
 }

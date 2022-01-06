@@ -2052,8 +2052,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Note that we are creating a logged in user because email goes out from
    * that person
    */
-  public function testCompleteTransaction() {
+  public function testCompleteTransaction(): void {
     $mut = new CiviMailUtils($this, TRUE);
+    Civi::settings()->set('tax_term', 'GST');
     $this->swapMessageTemplateForTestTemplate();
     $this->createLoggedInUser();
     $params = array_merge($this->_params, ['contribution_status_id' => 2]);
@@ -2074,6 +2075,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       "receipt_date:::\n",
       'title:::Contribution',
       'contributionStatus:::Completed',
+      'taxTerm:::GST',
     ]);
     $mut->stop();
     $this->revertTemplateToReservedTemplate();
@@ -2082,7 +2084,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test completing a transaction via the API with a non-USD transaction.
    */
-  public function testCompleteTransactionEuro() {
+  public function testCompleteTransactionEuro(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $this->swapMessageTemplateForTestTemplate();
     $this->createLoggedInUser();
