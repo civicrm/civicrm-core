@@ -141,6 +141,11 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
+   * Only called from import now... plus one place outside of core & tests.
+   *
+   * @todo - deprecate more aggressively - will involve copying to the import
+   * class, adding a deprecation notice here & removing from tests.
+   *
    * Takes an associative array and creates a relationship object.
    *
    * @deprecated For single creates use the api instead (it's tested).
