@@ -42,12 +42,11 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * Add/update navigation record.
+   * Deprecated in favor of APIv4
    *
+   * @deprecated
    * @param array $params Submitted values
-   *
    * @return CRM_Core_DAO_Navigation
-   *   navigation object
    */
   public static function add(&$params) {
     $navigation = new CRM_Core_DAO_Navigation();
