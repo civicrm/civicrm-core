@@ -178,15 +178,15 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     if (!$relationshipId) {
       // creating a new relationship
       $relationshipIds = [];
-      foreach ($params['contact_check'] as $key => $value) {
+      foreach (array_keys($params['contact_check']) as $relatedContactID) {
         // check if the relationship is valid between contacts.
         // step 1: check if the relationship is valid if not valid skip and keep the count
         // step 2: check the if two contacts already have a relationship if yes skip and keep the count
         // step 3: if valid relationship then add the relation and keep the count
 
         // step 1
-        $contactFields = self::setContactABFromIDs($params, $ids, $key);
-        $errors = self::checkValidRelationship($contactFields, $ids, $key);
+        $contactFields = self::setContactABFromIDs($params, $ids, $relatedContactID);
+        $errors = self::checkValidRelationship($contactFields, $ids, $relatedContactID);
         if ($errors) {
           $invalid++;
           continue;
@@ -203,7 +203,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           $contactFields,
           CRM_Utils_Array::value('contact', $ids),
           // step 2
-          $key
+          $relatedContactID
         )
         ) {
           $duplicate++;
