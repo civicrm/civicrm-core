@@ -337,7 +337,7 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
   $moduleName = _afform_angular_module_name($params['name'], 'camel');
   $formMetaData = (array) civicrm_api4('Afform', 'get', [
     'checkPermissions' => FALSE,
-    'select' => ['redirect', 'name'],
+    'select' => ['redirect', 'name', 'title'],
     'where' => [['name', '=', $params['name']]],
   ], 0);
   $smarty = CRM_Core_Smarty::singleton();
@@ -366,7 +366,6 @@ function afform_civicrm_alterMenu(&$items) {
       $items[$meta['server_route']] = [
         'page_callback' => 'CRM_Afform_Page_AfformBase',
         'page_arguments' => 'afform=' . urlencode($name),
-        'title' => $meta['title'] ?? '',
         'access_arguments' => [["@afform:$name"], 'and'],
         'is_public' => $meta['is_public'],
       ];

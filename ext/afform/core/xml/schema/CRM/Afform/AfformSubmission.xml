@@ -27,6 +27,9 @@
     <name>contact_id</name>
     <type>int unsigned</type>
     <title>User Contact ID</title>
+    <html>
+      <type>EntityRef</type>
+    </html>
     <add>5.41</add>
   </field>
   <foreignKey>
@@ -41,8 +44,14 @@
     <type>varchar</type>
     <length>255</length>
     <title>Afform Name</title>
+    <html>
+      <type>Select</type>
+    </html>
     <comment>Name of submitted afform</comment>
     <add>5.41</add>
+    <pseudoconstant>
+      <callback>CRM_Afform_BAO_AfformSubmission::getAllAfformsByName</callback>
+    </pseudoconstant>
   </field>
 
   <field>
@@ -57,6 +66,9 @@
   <field>
     <name>submission_date</name>
     <type>timestamp</type>
+    <html>
+      <type>Select Date</type>
+    </html>
     <title>Submission Date/Time</title>
     <default>CURRENT_TIMESTAMP</default>
     <readonly>true</readonly>

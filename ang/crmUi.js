@@ -1083,15 +1083,20 @@
           function update() {
             $timeout(function() {
               var newPageTitle = _.trim($el.html()),
-                newDocumentTitle = scope.crmDocumentTitle || $el.text();
+                newDocumentTitle = scope.crmDocumentTitle || $el.text(),
+                h1Count = 0;
               document.title = $('title').text().replace(documentTitle, newDocumentTitle);
               // If the CMS has already added title markup to the page, use it
               $('h1').not('.crm-container h1').each(function() {
-                if (_.trim($(this).html()) === pageTitle) {
+                if ($(this).hasClass('crm-page-title') || _.trim($(this).html()) === pageTitle) {
                   $(this).addClass('crm-page-title').html(newPageTitle);
                   $el.hide();
+                  ++h1Count;
                 }
               });
+              if (!h1Count) {
+                $el.show();
+              }
               pageTitle = newPageTitle;
               documentTitle = newDocumentTitle;
             });

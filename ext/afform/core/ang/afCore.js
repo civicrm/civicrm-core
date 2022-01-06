@@ -21,6 +21,14 @@
           $scope.$watch(function() {return $location.search();}, function(params) {
             $scope.routeParams = params;
           });
+
+          $scope.$parent.afformTitle = meta.title;
+
+          // Prepends a string to the afform title
+          // Provides contextual titles to search Afforms in standalone mode
+          $scope.addTitle = function(addition) {
+            $scope.$parent.afformTitle = addition + ' ' + meta.title;
+          };
         }
       };
       return d;
