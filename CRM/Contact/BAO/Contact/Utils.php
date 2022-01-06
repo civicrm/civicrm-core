@@ -288,7 +288,7 @@ WHERE  id IN ( $idString )
         'relationship_type_id' => $relTypeId . '_a_b',
         'contact_check' => [$organization => TRUE],
       ];
-      [$valid, $invalid, $duplicate, $saved, $relationshipIds]
+      [$duplicate, $relationshipIds]
         = self::legacyCreateMultiple($relationshipParams, $contactID);
 
       // In case we change employer, clean previous employer related records.
@@ -328,8 +328,7 @@ WHERE  id IN ( $idString )
    * @throws \CiviCRM_API3_Exception
    */
   private static function legacyCreateMultiple(&$params, int $contactID) {
-    $valid = $invalid = $duplicate = $saved = 0;
-    $relationships = $relationshipIds = [];
+    $invalid = $duplicate = 0;
     $ids = ['contact' => $contactID];
 
     $relationshipIds = [];
@@ -366,8 +365,6 @@ WHERE  id IN ( $idString )
       $singleInstanceParams = array_merge($params, $contactFields);
       $relationship = CRM_Contact_BAO_Relationship::add($singleInstanceParams);
       $relationshipIds[] = $relationship->id;
-      $relationships[$relationship->id] = $relationship;
-      $valid++;
     }
 
     // do not add to recent items for import, CRM-4399
@@ -375,7 +372,7 @@ WHERE  id IN ( $idString )
       CRM_Contact_BAO_Relationship::addRecent($params, $relationship);
     }
 
-    return [$valid, $invalid, $duplicate, $saved, $relationshipIds, $relationships];
+    return [$duplicate, $relationshipIds];
   }
 
   /**
