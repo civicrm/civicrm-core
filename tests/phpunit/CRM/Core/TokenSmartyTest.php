@@ -132,7 +132,10 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
     ];
   }
 
-  public function testTokenDataEscape() {
+  /**
+   * Test appropriate escaping is applied to tokens with appostrophes.
+   */
+  public function testTokenDataEscape(): void {
     $cutesyContactId = $this->individualCreate([
       'first_name' => 'Ivan\'s "The Ter<r>ib`le"',
     ]);
