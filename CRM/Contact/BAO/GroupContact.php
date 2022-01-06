@@ -9,59 +9,46 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Event\PostEvent;
+
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
+class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implements \Civi\Test\HookInterface {
 
   /**
-   * Takes an associative array and creates a groupContact object.
-   *
-   * the function extract all the params it needs to initialize the create a
-   * group object. the params array could contain additional unused name/value
-   * pairs
+   * Deprecated add function
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Contact_BAO_GroupContact
+   * @return CRM_Contact_DAO_GroupContact
+   * @throws \CRM_Core_Exception
+   *
+   * @deprecated
    */
-  public static function add($params) {
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'GroupContact', CRM_Utils_Array::value('id', $params), $params);
-
-    if (!self::dataExists($params)) {
-      return NULL;
-    }
-
-    $groupContact = new CRM_Contact_BAO_GroupContact();
-    $groupContact->copyValues($params);
-    $groupContact->save();
-
-    // Lookup existing info for the sake of subscription history
-    if (!empty($params['id'])) {
-      $groupContact->find(TRUE);
-      $params = $groupContact->toArray();
-    }
-    CRM_Contact_BAO_SubscriptionHistory::create($params);
-
-    CRM_Utils_Hook::post($hook, 'GroupContact', $groupContact->id, $groupContact);
-
-    return $groupContact;
+  public static function add(array $params): CRM_Contact_DAO_GroupContact {
+    return self::writeRecord($params);
   }
 
   /**
-   * Check if there is data to create the object.
+   * Callback for hook_civicrm_post().
    *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   * @param \Civi\Core\Event\PostEvent $event
    *
-   * @return bool
+   * @noinspection PhpUnused
+   * @noinspection UnknownInspectionInspection
    */
-  public static function dataExists(&$params) {
-    return (!empty($params['id']) || (!empty($params['group_id']) && !empty($params['contact_id'])));
+  public static function self_hook_civicrm_post(PostEvent $event): void {
+    if (is_object($event->object) && in_array($event->action, ['create', 'edit'], TRUE)) {
+      // Lookup existing info for the sake of subscription history
+      if ($event->action === 'edit') {
+        $event->object->find(TRUE);
+      }
+      $params = $event->object->toArray();
+      CRM_Contact_BAO_SubscriptionHistory::create($params);
+    }
   }
 
   /**
@@ -486,7 +473,7 @@ SELECT    *
    *
    * @param array $params
    *
-   * @return CRM_Contact_BAO_GroupContact
+   * @return CRM_Contact_DAO_GroupContact
    */
   public static function create(array $params) {
     // @fixme create was only called from CRM_Contact_BAO_Contact::createProfileContact
