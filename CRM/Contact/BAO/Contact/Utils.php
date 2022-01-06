@@ -275,7 +275,6 @@ WHERE  id IN ( $idString )
     }
 
     if ($organization && is_numeric($organization)) {
-      $cid = ['contact' => $contactID];
 
       // get the relationship type id of "Employee of"
       $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b');
@@ -289,8 +288,8 @@ WHERE  id IN ( $idString )
         'relationship_type_id' => $relTypeId . '_a_b',
         'contact_check' => [$organization => TRUE],
       ];
-      list($valid, $invalid, $duplicate, $saved, $relationshipIds)
-        = self::legacyCreateMultiple($relationshipParams, $cid);
+      [$valid, $invalid, $duplicate, $saved, $relationshipIds]
+        = self::legacyCreateMultiple($relationshipParams, $contactID);
 
       // In case we change employer, clean previous employer related records.
       if (!$previousEmployerID && !$newContact) {
@@ -322,18 +321,17 @@ WHERE  id IN ( $idString )
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   * @param array $ids
-   *   The array that holds all the db ids.
-   *   per http://wiki.civicrm.org/confluence/display/CRM/Database+layer
-   *  "we are moving away from the $ids param "
+   * @param int $contactID
    *
    * @return array
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  private static function legacyCreateMultiple(&$params, $ids = []) {
+  private static function legacyCreateMultiple(&$params, int $contactID) {
     $valid = $invalid = $duplicate = $saved = 0;
     $relationships = $relationshipIds = [];
-    $relationshipId = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
+    $ids = ['contact' => $contactID];
+    $relationshipId = CRM_Utils_Array::value('id', $params);
 
     //CRM-9015 - the hooks are called here & in add (since add doesn't call create)
     // but in future should be tidied per ticket
