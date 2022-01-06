@@ -331,17 +331,11 @@ WHERE  id IN ( $idString )
     $valid = $invalid = $duplicate = $saved = 0;
     $relationships = $relationshipIds = [];
     $ids = ['contact' => $contactID];
-    $relationshipId = CRM_Utils_Array::value('id', $params);
+    $relationshipId = NULL;
 
     //CRM-9015 - the hooks are called here & in add (since add doesn't call create)
     // but in future should be tidied per ticket
-    if (empty($relationshipId)) {
-      $hook = 'create';
-    }
-    else {
-      $hook = 'edit';
-    }
-
+    $hook = 'create';
     // @todo pre hook is called from add - remove it from here
     CRM_Utils_Hook::pre($hook, 'Relationship', $relationshipId, $params);
 
@@ -389,43 +383,6 @@ WHERE  id IN ( $idString )
         $valid++;
       }
       // editing the relationship
-    }
-    else {
-      // check for duplicate relationship
-      // @todo this code doesn't cope well with updates - causes e-Notices.
-      // API has a lot of code to work around
-      // this but should review this code & remove the extra handling from the api
-      // it seems doubtful any of this is relevant if the contact fields & relationship
-      // type fields are not set
-      if (
-        CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
-          $params,
-          CRM_Utils_Array::value('contact', $ids),
-          $ids['contactTarget'],
-          $relationshipId
-        )
-      ) {
-        $duplicate++;
-        return [$valid, $invalid, $duplicate, $saved, NULL];
-      }
-
-      $validContacts = TRUE;
-      //validate contacts in update mode also.
-      $contactFields = CRM_Contact_BAO_Relationship::setContactABFromIDs($params, $ids, $ids['contactTarget']);
-      if (!empty($ids['contact']) && !empty($ids['contactTarget'])) {
-        if (CRM_Contact_BAO_Relationship::checkValidRelationship($contactFields, $ids, $ids['contactTarget'])) {
-          $validContacts = FALSE;
-          $invalid++;
-        }
-      }
-      if ($validContacts) {
-        // editing an existing relationship
-        $singleInstanceParams = array_merge($params, $contactFields);
-        $relationship = CRM_Contact_BAO_Relationship::add($singleInstanceParams, $ids, $ids['contactTarget']);
-        $relationshipIds[] = $relationship->id;
-        $relationships[$relationship->id] = $relationship;
-        $saved++;
-      }
     }
 
     // do not add to recent items for import, CRM-4399
