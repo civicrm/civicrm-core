@@ -331,58 +331,54 @@ WHERE  id IN ( $idString )
     $valid = $invalid = $duplicate = $saved = 0;
     $relationships = $relationshipIds = [];
     $ids = ['contact' => $contactID];
-    $relationshipId = NULL;
 
     //CRM-9015 - the hooks are called here & in add (since add doesn't call create)
     // but in future should be tidied per ticket
     $hook = 'create';
     // @todo pre hook is called from add - remove it from here
-    CRM_Utils_Hook::pre($hook, 'Relationship', $relationshipId, $params);
+    CRM_Utils_Hook::pre($hook, 'Relationship', NULL, $params);
 
-    if (!$relationshipId) {
-      // creating a new relationship
-      $dataExists = CRM_Contact_BAO_Relationship::dataExists($params);
-      if (!$dataExists) {
-        return [FALSE, TRUE, FALSE, FALSE, NULL];
+    // creating a new relationship
+    $dataExists = CRM_Contact_BAO_Relationship::dataExists($params);
+    if (!$dataExists) {
+      return [FALSE, TRUE, FALSE, FALSE, NULL];
+    }
+    $relationshipIds = [];
+    foreach ($params['contact_check'] as $key => $value) {
+      // check if the relationship is valid between contacts.
+      // step 1: check if the relationship is valid if not valid skip and keep the count
+      // step 2: check the if two contacts already have a relationship if yes skip and keep the count
+      // step 3: if valid relationship then add the relation and keep the count
+
+      // step 1
+      $contactFields = CRM_Contact_BAO_Relationship::setContactABFromIDs($params, $ids, $key);
+      $errors = CRM_Contact_BAO_Relationship::checkValidRelationship($contactFields, $ids, $key);
+      if ($errors) {
+        $invalid++;
+        continue;
       }
-      $relationshipIds = [];
-      foreach ($params['contact_check'] as $key => $value) {
-        // check if the relationship is valid between contacts.
-        // step 1: check if the relationship is valid if not valid skip and keep the count
-        // step 2: check the if two contacts already have a relationship if yes skip and keep the count
-        // step 3: if valid relationship then add the relation and keep the count
 
-        // step 1
-        $contactFields = CRM_Contact_BAO_Relationship::setContactABFromIDs($params, $ids, $key);
-        $errors = CRM_Contact_BAO_Relationship::checkValidRelationship($contactFields, $ids, $key);
-        if ($errors) {
-          $invalid++;
-          continue;
-        }
-
-        //CRM-16978:check duplicate relationship as per case id.
-        if ($caseId = CRM_Utils_Array::value('case_id', $params)) {
-          $contactFields['case_id'] = $caseId;
-        }
-        if (
-          CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
-            $contactFields,
-            CRM_Utils_Array::value('contact', $ids),
-            // step 2
-            $key
-          )
-        ) {
-          $duplicate++;
-          continue;
-        }
-
-        $singleInstanceParams = array_merge($params, $contactFields);
-        $relationship = CRM_Contact_BAO_Relationship::add($singleInstanceParams);
-        $relationshipIds[] = $relationship->id;
-        $relationships[$relationship->id] = $relationship;
-        $valid++;
+      //CRM-16978:check duplicate relationship as per case id.
+      if ($caseId = CRM_Utils_Array::value('case_id', $params)) {
+        $contactFields['case_id'] = $caseId;
       }
-      // editing the relationship
+      if (
+        CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
+          $contactFields,
+          CRM_Utils_Array::value('contact', $ids),
+          // step 2
+          $key
+        )
+      ) {
+        $duplicate++;
+        continue;
+      }
+
+      $singleInstanceParams = array_merge($params, $contactFields);
+      $relationship = CRM_Contact_BAO_Relationship::add($singleInstanceParams);
+      $relationshipIds[] = $relationship->id;
+      $relationships[$relationship->id] = $relationship;
+      $valid++;
     }
 
     // do not add to recent items for import, CRM-4399
