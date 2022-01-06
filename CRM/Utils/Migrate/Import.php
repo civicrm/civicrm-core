@@ -221,7 +221,7 @@ WHERE      v.option_group_id = %1
                 $valueIDs[] = $relTypeId;
               }
             }
-            elseif (in_array($customGroup->extends, ['Individual', 'Organization', 'Household'])) {
+            elseif (in_array($customGroup->extends, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE)) {
               $valueIDs = $optionValues;
             }
             elseif (in_array($customGroup->extends, ['Contribution', 'ContributionRecur'])) {

@@ -1003,7 +1003,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     }
 
     // get array of subtypes - CRM-18708
-    if (in_array($csType, ['Individual', 'Organization', 'Household'])) {
+    if (in_array($csType, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE)) {
       $csType = self::getSubtypes($params['contact_type']);
     }
 
@@ -2115,9 +2115,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       $requiredCheck = FALSE;
     }
     if ($requiredCheck) {
-      if (isset($params['id'])) {
-        $required = ['Individual', 'Household', 'Organization'];
-      }
       $required = [
         'Individual' => [
           ['first_name', 'last_name'],

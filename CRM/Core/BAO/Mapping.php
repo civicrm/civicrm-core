@@ -1014,11 +1014,11 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Test\Ho
       return $fields;
     }
 
-    $types = ['Individual', 'Organization', 'Household'];
+    $types = CRM_Contact_BAO_ContactType::basicTypes(TRUE);
     foreach ($params['mapper'] as $key => $value) {
       $contactType = NULL;
       foreach ($value as $k => $v) {
-        if (in_array($v[0], $types)) {
+        if (in_array($v[0], $types, TRUE)) {
           if ($contactType && $contactType != $v[0]) {
             throw new CRM_Core_Exception(ts("Cannot have two clauses with different types: %1, %2",
               [1 => $contactType, 2 => $v[0]]

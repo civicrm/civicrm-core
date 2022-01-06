@@ -408,7 +408,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $value = NULL;
           foreach ($customDataType as $dataType) {
             if (array_key_exists($dataType, CRM_Core_SelectValues::customGroupExtends())) {
-              if (in_array($dataType, ['Individual', 'Household', 'Organization'])) {
+              if (in_array($dataType, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE)) {
                 $val = "'" . CRM_Utils_Type::escape($dataType, 'String') . "', 'Contact' ";
               }
               else {
@@ -2672,7 +2672,7 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
    */
   public function getEntity() {
     $entity = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->custom_group_id, 'extends');
-    return in_array($entity, ['Individual', 'Household', 'Organization']) ? 'Contact' : $entity;
+    return in_array($entity, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE) ? 'Contact' : $entity;
   }
 
   /**

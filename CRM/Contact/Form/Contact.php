@@ -161,9 +161,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $this->_contactType = CRM_Utils_Request::retrieve('ct', 'String',
         $this, TRUE, NULL, 'REQUEST'
       );
-      if (!in_array($this->_contactType,
-        ['Individual', 'Household', 'Organization']
-      )
+      if (!in_array($this->_contactType, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE)
       ) {
         CRM_Core_Error::statusBounce(ts('Could not get a contact id and/or contact type'));
       }

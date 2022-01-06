@@ -5426,7 +5426,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    */
   protected function getContactColumns($options = []) {
     $defaultOptions = [
-      'custom_fields' => ['Individual', 'Contact', 'Organization'],
+      'custom_fields' => CRM_Contact_BAO_ContactType::basicTypes(),
       'fields_defaults' => ['display_name', 'id'],
       'order_bys_defaults' => ['sort_name ASC'],
       'contact_type' => NULL,
