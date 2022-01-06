@@ -275,7 +275,6 @@ WHERE  id IN ( $idString )
     }
 
     if ($organization && is_numeric($organization)) {
-      $cid = ['contact' => $contactID];
 
       // get the relationship type id of "Employee of"
       $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b');
@@ -289,8 +288,8 @@ WHERE  id IN ( $idString )
         'relationship_type_id' => $relTypeId . '_a_b',
         'contact_check' => [$organization => TRUE],
       ];
-      list($valid, $invalid, $duplicate, $saved, $relationshipIds)
-        = CRM_Contact_BAO_Relationship::legacyCreateMultiple($relationshipParams, $cid);
+      [$valid, $invalid, $duplicate, $saved, $relationshipIds]
+        = self::legacyCreateMultiple($relationshipParams, $contactID);
 
       // In case we change employer, clean previous employer related records.
       if (!$previousEmployerID && !$newContact) {
@@ -309,6 +308,132 @@ WHERE  id IN ( $idString )
       // Handle related memberships. CRM-3792
       self::currentEmployerRelatedMembership($contactID, $organization, $relationshipParams, $duplicate, $previousEmployerID);
     }
+  }
+
+  /**
+   * Previously shared function in need of cleanup.
+   *
+   * Takes an associative array and creates a relationship object.
+   *
+   * @deprecated For single creates use the api instead (it's tested).
+   * For multiple a new variant of this function needs to be written and migrated to as this is a bit
+   * nasty
+   *
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param int $contactID
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  private static function legacyCreateMultiple(&$params, int $contactID) {
+    $valid = $invalid = $duplicate = $saved = 0;
+    $relationships = $relationshipIds = [];
+    $ids = ['contact' => $contactID];
+    $relationshipId = CRM_Utils_Array::value('id', $params);
+
+    //CRM-9015 - the hooks are called here & in add (since add doesn't call create)
+    // but in future should be tidied per ticket
+    if (empty($relationshipId)) {
+      $hook = 'create';
+    }
+    else {
+      $hook = 'edit';
+    }
+
+    // @todo pre hook is called from add - remove it from here
+    CRM_Utils_Hook::pre($hook, 'Relationship', $relationshipId, $params);
+
+    if (!$relationshipId) {
+      // creating a new relationship
+      $dataExists = CRM_Contact_BAO_Relationship::dataExists($params);
+      if (!$dataExists) {
+        return [FALSE, TRUE, FALSE, FALSE, NULL];
+      }
+      $relationshipIds = [];
+      foreach ($params['contact_check'] as $key => $value) {
+        // check if the relationship is valid between contacts.
+        // step 1: check if the relationship is valid if not valid skip and keep the count
+        // step 2: check the if two contacts already have a relationship if yes skip and keep the count
+        // step 3: if valid relationship then add the relation and keep the count
+
+        // step 1
+        $contactFields = CRM_Contact_BAO_Relationship::setContactABFromIDs($params, $ids, $key);
+        $errors = CRM_Contact_BAO_Relationship::checkValidRelationship($contactFields, $ids, $key);
+        if ($errors) {
+          $invalid++;
+          continue;
+        }
+
+        //CRM-16978:check duplicate relationship as per case id.
+        if ($caseId = CRM_Utils_Array::value('case_id', $params)) {
+          $contactFields['case_id'] = $caseId;
+        }
+        if (
+          CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
+            $contactFields,
+            CRM_Utils_Array::value('contact', $ids),
+            // step 2
+            $key
+          )
+        ) {
+          $duplicate++;
+          continue;
+        }
+
+        $singleInstanceParams = array_merge($params, $contactFields);
+        $relationship = CRM_Contact_BAO_Relationship::add($singleInstanceParams);
+        $relationshipIds[] = $relationship->id;
+        $relationships[$relationship->id] = $relationship;
+        $valid++;
+      }
+      // editing the relationship
+    }
+    else {
+      // check for duplicate relationship
+      // @todo this code doesn't cope well with updates - causes e-Notices.
+      // API has a lot of code to work around
+      // this but should review this code & remove the extra handling from the api
+      // it seems doubtful any of this is relevant if the contact fields & relationship
+      // type fields are not set
+      if (
+        CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
+          $params,
+          CRM_Utils_Array::value('contact', $ids),
+          $ids['contactTarget'],
+          $relationshipId
+        )
+      ) {
+        $duplicate++;
+        return [$valid, $invalid, $duplicate, $saved, NULL];
+      }
+
+      $validContacts = TRUE;
+      //validate contacts in update mode also.
+      $contactFields = CRM_Contact_BAO_Relationship::setContactABFromIDs($params, $ids, $ids['contactTarget']);
+      if (!empty($ids['contact']) && !empty($ids['contactTarget'])) {
+        if (CRM_Contact_BAO_Relationship::checkValidRelationship($contactFields, $ids, $ids['contactTarget'])) {
+          $validContacts = FALSE;
+          $invalid++;
+        }
+      }
+      if ($validContacts) {
+        // editing an existing relationship
+        $singleInstanceParams = array_merge($params, $contactFields);
+        $relationship = CRM_Contact_BAO_Relationship::add($singleInstanceParams, $ids, $ids['contactTarget']);
+        $relationshipIds[] = $relationship->id;
+        $relationships[$relationship->id] = $relationship;
+        $saved++;
+      }
+    }
+
+    // do not add to recent items for import, CRM-4399
+    if (!(!empty($params['skipRecentView']) || $invalid || $duplicate)) {
+      CRM_Contact_BAO_Relationship::addRecent($params, $relationship);
+    }
+
+    return [$valid, $invalid, $duplicate, $saved, $relationshipIds, $relationships];
   }
 
   /**
