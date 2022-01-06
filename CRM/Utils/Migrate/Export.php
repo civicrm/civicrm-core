@@ -483,7 +483,7 @@ class CRM_Utils_Migrate_Export {
             }
             $types = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($object->$name, 1, -1));
             $values = [];
-            if (in_array($object->extends, ['Individual', 'Organization', 'Household'])) {
+            if (in_array($object->extends, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE)) {
               $key = 'contact_type';
               $values = $types;
             }

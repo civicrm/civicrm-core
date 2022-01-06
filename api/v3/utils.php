@@ -1096,7 +1096,7 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
   $values['custom'] = [];
   $checkCheckBoxField = FALSE;
   $entity = $extends;
-  if (in_array($extends, ['Household', 'Individual', 'Organization'])) {
+  if (in_array($extends, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE)) {
     $entity = 'Contact';
   }
 

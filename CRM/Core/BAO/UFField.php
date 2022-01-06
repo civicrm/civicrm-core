@@ -414,7 +414,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
       }
     }
 
-    $contactTypes = ['Individual', 'Household', 'Organization'];
+    $contactTypes = CRM_Contact_BAO_ContactType::basicTypes(TRUE);
     $subTypes = CRM_Contact_BAO_ContactType::subTypes();
 
     $profileTypeComponent = array_intersect($components, $profileTypes);

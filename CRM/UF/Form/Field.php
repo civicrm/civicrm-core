@@ -968,8 +968,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         }
         elseif (
           CRM_Utils_Array::value(1, $fields['field_name']) == 'contact_sub_type' &&
-          !in_array($profileType, ['Individual', 'Household', 'Organization']) &&
-          !in_array($profileType, CRM_Contact_BAO_ContactType::subTypes())
+          !in_array($profileType, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE) &&
+          !in_array($profileType, CRM_Contact_BAO_ContactType::subTypes(), TRUE)
         ) {
           $errors['field_name'] = ts('Cannot add or update profile field Contact Subtype as profile type is not one of Individual, Household or Organization.');
         }

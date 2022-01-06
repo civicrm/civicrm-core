@@ -144,7 +144,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
         $scanBlocks($info['definition']['layout']);
       }
 
-      if (array_intersect($entities, ['Individual', 'Household', 'Organization'])) {
+      if (array_intersect($entities, \CRM_Contact_BAO_ContactType::basicTypes(TRUE))) {
         $entities[] = 'Contact';
       }
 
@@ -204,7 +204,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
 
     // Optimization - since contact fields are a combination of these three,
     // we'll combine them client-side rather than sending them via ajax.
-    elseif (array_intersect($entities, ['Individual', 'Household', 'Organization'])) {
+    elseif (array_intersect($entities, \CRM_Contact_BAO_ContactType::basicTypes(TRUE))) {
       $entities = array_diff($entities, ['Contact']);
     }
 

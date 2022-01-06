@@ -114,7 +114,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     if ($this->_onDuplicate != CRM_Import_Parser::DUPLICATE_NOCHECK) {
       //Mark Dedupe Rule Fields as required, since it's used in matching contact
-      foreach (['Individual', 'Household', 'Organization'] as $cType) {
+      foreach (CRM_Contact_BAO_ContactType::basicTypes() as $cType) {
         $ruleParams = [
           'contact_type' => $cType,
           'used' => 'Unsupervised',
