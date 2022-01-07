@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contact;
+
 /**
  *
  * @package CRM
@@ -245,9 +247,10 @@ WHERE  id IN ( $idString )
    *   Contact id of the individual.
    * @param $organization
    *   (id or name).
-   * @param int $previousEmployerID
+   * @param null $previousEmployerID
    * @param bool $newContact
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
@@ -260,23 +263,11 @@ WHERE  id IN ( $idString )
     }
     if (!is_numeric($organization)) {
       $dupeIDs = CRM_Contact_BAO_Contact::getDuplicateContacts(['organization_name' => $organization], 'Organization', 'Unsupervised', [], FALSE);
-
-      if (is_array($dupeIDs) && !empty($dupeIDs)) {
-        // we should create relationship only w/ first org CRM-4193
-        foreach ($dupeIDs as $orgId) {
-          $organization = $orgId;
-          break;
-        }
-      }
-      else {
-        //create new organization
-        $newOrg = [
+      $organization = reset($dupeIDs) ?: Contact::create(FALSE)
+        ->setValues([
           'contact_type' => 'Organization',
           'organization_name' => $organization,
-        ];
-        $org = CRM_Contact_BAO_Contact::create($newOrg);
-        $organization = $org->id;
-      }
+        ])->execute()->first()['id'];
     }
 
     if (is_numeric($organization)) {
