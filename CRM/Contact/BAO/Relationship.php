@@ -174,11 +174,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     $ids = ['contact' => $ids['contact']];
     // Likewise neither place ever passed in relationshipID
     $relationshipId = NULL;
-    $hook = 'create';
-    // CRM-9015 - the hooks are called here & in add (since add doesn't call create)
-    // but in future should be tidied per ticket
-    // @todo pre hook is called from add - remove it from here
-    CRM_Utils_Hook::pre($hook, 'Relationship', $relationshipId, $params);
 
     if (!$relationshipId) {
       // creating a new relationship
