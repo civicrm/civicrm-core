@@ -332,11 +332,6 @@ WHERE  id IN ( $idString )
     $relationships = $relationshipIds = [];
     $ids = ['contact' => $contactID];
 
-    // creating a new relationship
-    $dataExists = CRM_Contact_BAO_Relationship::dataExists($params);
-    if (!$dataExists) {
-      return [FALSE, TRUE, FALSE, FALSE, NULL];
-    }
     $relationshipIds = [];
     foreach ($params['contact_check'] as $key => $value) {
       // check if the relationship is valid between contacts.
