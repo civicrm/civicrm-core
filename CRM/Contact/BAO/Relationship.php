@@ -252,7 +252,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       if ($validContacts) {
         // editing an existing relationship
         $singleInstanceParams = array_merge($params, $contactFields);
-        $relationship = self::add($singleInstanceParams, $ids, $ids['contactTarget']);
+        $relationship = self::add($singleInstanceParams, $ids);
         $relationshipIds[] = $relationship->id;
         $relationships[$relationship->id] = $relationship;
         $saved++;
@@ -274,14 +274,12 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *   Array of name/value pairs.
    * @param array $ids
    *   The array that holds all the db ids.
-   * @param int $contactId
-   *   This is contact id for adding relationship.
    *
    * @return CRM_Contact_BAO_Relationship
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public static function add($params, $ids = [], $contactId = NULL) {
+  public static function add($params, $ids = []) {
     $params['id'] = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
 
     $hook = 'create';
