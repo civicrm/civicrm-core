@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contact;
+
 /**
  *
  * @package CRM
@@ -245,36 +247,30 @@ WHERE  id IN ( $idString )
    *   Contact id of the individual.
    * @param $organization
    *   (id or name).
-   * @param int $previousEmployerID
+   * @param null $previousEmployerID
    * @param bool $newContact
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
   public static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL, $newContact = FALSE) {
-    //if organization name is passed. CRM-15368,CRM-15547
-    if (!CRM_Utils_System::isNull($organization) && !is_numeric($organization)) {
+    if (!$organization) {
+      // This function is not called in core with no organization & should not be
+      // Refs CRM-15368,CRM-15547
+      CRM_Core_Error::deprecatedWarning('calling this function with no organization is deprected');
+      return;
+    }
+    if (!is_numeric($organization)) {
       $dupeIDs = CRM_Contact_BAO_Contact::getDuplicateContacts(['organization_name' => $organization], 'Organization', 'Unsupervised', [], FALSE);
-
-      if (is_array($dupeIDs) && !empty($dupeIDs)) {
-        // we should create relationship only w/ first org CRM-4193
-        foreach ($dupeIDs as $orgId) {
-          $organization = $orgId;
-          break;
-        }
-      }
-      else {
-        //create new organization
-        $newOrg = [
+      $organization = reset($dupeIDs) ?: Contact::create(FALSE)
+        ->setValues([
           'contact_type' => 'Organization',
           'organization_name' => $organization,
-        ];
-        $org = CRM_Contact_BAO_Contact::create($newOrg);
-        $organization = $org->id;
-      }
+        ])->execute()->first()['id'];
     }
 
-    if ($organization && is_numeric($organization)) {
+    if (is_numeric($organization)) {
 
       // get the relationship type id of "Employee of"
       $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b');
