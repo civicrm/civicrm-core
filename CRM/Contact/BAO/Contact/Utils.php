@@ -410,7 +410,7 @@ WHERE  id IN ( $idString )
    * @throws CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
-  public static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate = FALSE, $previousEmpID = NULL) {
+  private static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate = FALSE, $previousEmpID = NULL) {
     $ids = [];
     $action = CRM_Core_Action::ADD;
 
