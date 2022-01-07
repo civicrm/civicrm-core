@@ -1145,7 +1145,8 @@ HTACCESS;
     finally {
       restore_error_handler();
     }
-    return $is_dir;
+    // In php8 the return value from is_dir() is always bool but in php7 it can be null, so normalize.
+    return (bool) $is_dir;
   }
 
 }
