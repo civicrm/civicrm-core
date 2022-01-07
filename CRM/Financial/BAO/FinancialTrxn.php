@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
+class CRM_Financial_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
 
   /**
    * Takes an associative array and creates a financial transaction object.
@@ -343,7 +343,7 @@ WHERE ceft.entity_id = %1";
         'entity_table' => 'civicrm_contribution',
         'entity_id' => $params['contributionId'],
       ];
-      CRM_Core_BAO_FinancialTrxn::create($financialtrxn);
+      CRM_Financial_BAO_FinancialTrxn::create($financialtrxn);
     }
 
     if (!empty($params['oldPremium'])) {
@@ -359,7 +359,7 @@ WHERE ceft.entity_id = %1";
         'contributionId' => $params['oldPremium']['contribution_id'],
         'isDeleted' => TRUE,
       ];
-      CRM_Core_BAO_FinancialTrxn::createPremiumTrxn($params);
+      CRM_Financial_BAO_FinancialTrxn::createPremiumTrxn($params);
     }
   }
 
@@ -398,7 +398,7 @@ WHERE ceft.entity_id = %1";
     $params['trxnParams']['is_payment'] = FALSE;
     $trxn = self::create($params['trxnParams']);
     if (empty($params['entity_id'])) {
-      $financialTrxnID = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['trxnParams']['contribution_id'], 'DESC');
+      $financialTrxnID = CRM_Financial_BAO_FinancialTrxn::getFinancialTrxnId($params['trxnParams']['contribution_id'], 'DESC');
       $params['entity_id'] = $financialTrxnID['financialTrxnId'];
     }
     $fItemParams
@@ -618,7 +618,7 @@ WHERE ceft.entity_id = %1";
         foreach ($deferredRevenue['revenue'] as $revenue) {
           $trxnParams['total_amount'] = $trxnParams['net_amount'] = $revenue['amount'];
           $trxnParams['trxn_date'] = CRM_Utils_Date::isoToMysql($revenue['revenue_date']);
-          $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
+          $financialTxn = CRM_Financial_BAO_FinancialTrxn::create($trxnParams);
           $entityParams = [
             'entity_id' => $deferredRevenue['financial_item_id'],
             'entity_table' => 'civicrm_financial_item',
@@ -707,7 +707,7 @@ WHERE ceft.entity_id = %1";
     $lastFinancialTrxn['fee_amount'] = -$inputParams['trxnParams']['fee_amount'];
     $lastFinancialTrxn['contribution_id'] = $prevContribution->id;
     foreach ([$lastFinancialTrxn, $inputParams['trxnParams']] as $financialTrxnParams) {
-      $trxn = CRM_Core_BAO_FinancialTrxn::create($financialTrxnParams);
+      $trxn = CRM_Financial_BAO_FinancialTrxn::create($financialTrxnParams);
       $trxnParams = [
         'total_amount' => $trxn->total_amount,
         'contribution_id' => $currentContribution->id,

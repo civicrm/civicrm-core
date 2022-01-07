@@ -215,7 +215,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
     }
 
-    $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
+    $trxn = CRM_Financial_BAO_FinancialTrxn::create($params['trxnParams']);
     // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
     $params['entity_id'] = $trxn->id;
 
@@ -312,7 +312,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $params['trxnParams']['currency'] = CRM_Utils_Array::value('currency', $params, $params['prevContribution']->currency);
 
       $transactionIDs[] = CRM_Contribute_BAO_FinancialProcessor::recordAlwaysAccountsReceivable($params['trxnParams'], $params);
-      $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
+      $trxn = CRM_Financial_BAO_FinancialTrxn::create($params['trxnParams']);
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       $params['entity_id'] = $transactionIDs[] = $trxn->id;
 
@@ -393,7 +393,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $params['to_financial_account_id'] = $arAccountId;
     $params['status_id'] = array_search('Pending', $contributionStatuses);
     $params['is_payment'] = FALSE;
-    $trxn = CRM_Core_BAO_FinancialTrxn::create($params);
+    $trxn = CRM_Financial_BAO_FinancialTrxn::create($params);
     $trxnParams['from_financial_account_id'] = $params['to_financial_account_id'];
     return $trxn->id;
   }

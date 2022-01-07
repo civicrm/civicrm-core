@@ -226,7 +226,7 @@ class CRM_Contribute_Form_AdditionalInfo {
         $premiumParams['oldPremium']['product_id'] = $ContributionProduct->product_id;
         $premiumParams['oldPremium']['contribution_id'] = $ContributionProduct->contribution_id;
       }
-      CRM_Core_BAO_FinancialTrxn::createPremiumTrxn($premiumParams);
+      CRM_Financial_BAO_FinancialTrxn::createPremiumTrxn($premiumParams);
     }
   }
 

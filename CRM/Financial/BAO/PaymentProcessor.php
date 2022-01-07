@@ -121,7 +121,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     $params = [];
     if ($fieldName === 'financial_account_id') {
       // Pseudo-field - let's help out.
-      return CRM_Core_BAO_FinancialTrxn::buildOptions('to_financial_account_id', $context, $props);
+      return CRM_Financial_BAO_FinancialTrxn::buildOptions('to_financial_account_id', $context, $props);
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }

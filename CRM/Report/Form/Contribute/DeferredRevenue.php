@@ -493,7 +493,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
 
         // convert transaction status id to status name
         if ($status = CRM_Utils_Array::value('civicrm_financial_trxn_status_id', $row)) {
-          $row['civicrm_financial_trxn_status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'status_id', $status);
+          $row['civicrm_financial_trxn_status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Financial_BAO_FinancialTrxn', 'status_id', $status);
           $entryFound = TRUE;
         }
 

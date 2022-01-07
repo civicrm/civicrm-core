@@ -285,7 +285,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
     //Check if this is an online transaction (financial_trxn.payment_processor_id NOT NULL)
     $this->_online = FALSE;
-    $fids = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($id);
+    $fids = CRM_Financial_BAO_FinancialTrxn::getFinancialTrxnId($id);
     if (!empty($fids['financialTrxnId'])) {
       $this->_online = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $fids['financialTrxnId'], 'payment_processor_id');
     }
@@ -581,7 +581,7 @@ WHERE  contribution_id = {$id}
       $params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($params);
     }
     if (!empty($params['credit_card_type'])) {
-      $params['card_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $params['credit_card_type']);
+      $params['card_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialTrxn', 'card_type_id', $params['credit_card_type']);
     }
     if (!empty($params['credit_card_number']) && empty($params['pan_truncation'])) {
       $params['pan_truncation'] = substr($params['credit_card_number'], -4);

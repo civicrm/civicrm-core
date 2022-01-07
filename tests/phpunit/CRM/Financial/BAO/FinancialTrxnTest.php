@@ -10,10 +10,10 @@
  */
 
 /**
- * Class CRM_Core_BAO_FinancialTrxnTest
+ * Class CRM_Financial_BAO_FinancialTrxnTest
  * @group headless
  */
-class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
+class CRM_Financial_BAO_FinancialTrxnTest extends CiviUnitTestCase {
 
   /**
    * Check method create().
@@ -38,9 +38,9 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
       'payment_processor' => 'Dummy',
       'trxn_id' => 'test_01014000',
     ];
-    $FinancialTrxn = CRM_Core_BAO_FinancialTrxn::create($params);
+    $FinancialTrxn = CRM_Financial_BAO_FinancialTrxn::create($params);
 
-    $result = $this->assertDBNotNull('CRM_Core_BAO_FinancialTrxn', $FinancialTrxn->id,
+    $result = $this->assertDBNotNull('CRM_Financial_BAO_FinancialTrxn', $FinancialTrxn->id,
       'total_amount', 'id',
       'Database check on updated financial trxn record.'
     );
@@ -78,7 +78,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'create', $params);
     $contribution = $contribution['values'][$contribution['id']];
 
-    $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id']);
+    $totalPaymentAmount = CRM_Financial_BAO_FinancialTrxn::getTotalPayments($contribution['id']);
     $this->assertEquals(0, $totalPaymentAmount, 'Amount not matching.');
 
     $params['id'] = $contribution['id'];
@@ -86,7 +86,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccess('Contribution', 'create', $params);
 
-    $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id']);
+    $totalPaymentAmount = CRM_Financial_BAO_FinancialTrxn::getTotalPayments($contribution['id']);
     $this->assertEquals('200.00', $totalPaymentAmount, 'Amount not matching.');
   }
 
@@ -102,7 +102,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
       'total_amount' => 100.00,
     ];
     $this->callAPISuccess('Payment', 'create', $params);
-    $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($orderID);
+    $totalPaymentAmount = CRM_Financial_BAO_FinancialTrxn::getTotalPayments($orderID);
     $this->assertEquals('250.00', $totalPaymentAmount, 'Amount does not match.');
   }
 
@@ -132,7 +132,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
 
     $contributionObj = $this->getContributionObject($contribution['id']);
     $contributionObj->revenue_recognition_date = date('Ymd', strtotime('+1 month'));
-    CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $contributionObj);
+    CRM_Financial_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $contributionObj);
     $trxn = $this->callAPISuccess('FinancialTrxn', 'get', ['total_amount' => 622, 'id' => ['NOT IN' => [$trxn['id']]]]);
 
     $this->assertEquals(date('Ymd', strtotime($trxn['values'][$trxn['id']]['trxn_date'])), date('Ymd', strtotime('+1 month')));
@@ -152,7 +152,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
     ];
     $contribution = $this->callAPISuccess('Contribution', 'create', $params);
-    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
+    $lastFinancialTrxnId = CRM_Financial_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
       [
@@ -193,7 +193,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
     ];
     $contribution = $this->callAPISuccess('Contribution', 'create', $params);
-    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
+    $lastFinancialTrxnId = CRM_Financial_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
       [
@@ -203,7 +203,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     );
     $this->assertEquals(CRM_Utils_Array::value('card_type_id', $financialTrxn), NULL);
     $this->assertEquals(CRM_Utils_Array::value('pan_truncation', $financialTrxn), NULL);
-    CRM_Core_BAO_FinancialTrxn::updateCreditCardDetails($contribution['id'], 4567, 2);
+    CRM_Financial_BAO_FinancialTrxn::updateCreditCardDetails($contribution['id'], 4567, 2);
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
       [

@@ -427,7 +427,7 @@ WHERE li.contribution_id = %1";
       }
     }
     if (!$update && $contributionDetails) {
-      CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $contributionDetails);
+      CRM_Financial_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $contributionDetails);
     }
   }
 
@@ -714,7 +714,7 @@ WHERE li.contribution_id = %1";
             'entity_id' => $newFinancialItem->id,
             'entity_table' => 'civicrm_financial_item',
           ]);
-          $reverseTrxn = CRM_Core_BAO_FinancialTrxn::create($updateFinancialItemInfoValues);
+          $reverseTrxn = CRM_Financial_BAO_FinancialTrxn::create($updateFinancialItemInfoValues);
           // record reverse entity financial trxn linked to membership's related contribution
           civicrm_api3('EntityFinancialTrxn', 'create', [
             'entity_table' => "civicrm_contribution",
@@ -1149,10 +1149,10 @@ WHERE li.contribution_id = %1";
    * @param int $taxAmount
    * @param bool $updateAmountLevel
    *
-   * @return bool|\CRM_Core_BAO_FinancialTrxn
+   * @return bool|\CRM_Financial_BAO_FinancialTrxn
    */
   protected function _recordAdjustedAmt($updatedAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL) {
-    $paidAmount = (float) CRM_Core_BAO_FinancialTrxn::getTotalPayments($contributionId);
+    $paidAmount = (float) CRM_Financial_BAO_FinancialTrxn::getTotalPayments($contributionId);
     $balanceAmt = $updatedAmount - $paidAmount;
 
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -1199,7 +1199,7 @@ WHERE li.contribution_id = %1";
         'trxn_date' => date('YmdHis'),
         'currency' => $updatedContribution->currency,
       ];
-      $adjustedTrxn = CRM_Core_BAO_FinancialTrxn::create($adjustedTrxnValues);
+      $adjustedTrxn = CRM_Financial_BAO_FinancialTrxn::create($adjustedTrxnValues);
     }
     // CRM-17151: Update the contribution status to completed if balance is zero,
     //  because due to sucessive fee change will leave the related contribution status incorrect

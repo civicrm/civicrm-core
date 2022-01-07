@@ -2197,7 +2197,7 @@ ORDER BY cc.id; ";
         'check_number' => $result->check_number,
         'is_payment' => 1,
       ];
-      $trxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
+      $trxn = CRM_Financial_BAO_FinancialTrxn::create($trxnParams);
       $financialItem = [
         'transaction_date' => CRM_Utils_Date::processDate($result->receive_date),
         'amount' => $result->total_amount,

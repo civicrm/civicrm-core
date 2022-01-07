@@ -588,7 +588,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * @return int|null
    */
   protected function getCardTypeID(): ?int {
-    return CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $this->getSubmittedValue('credit_card_type'));
+    return CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialTrxn', 'card_type_id', $this->getSubmittedValue('credit_card_type'));
   }
 
 }

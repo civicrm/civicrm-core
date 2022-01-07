@@ -802,9 +802,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
         elseif ($paymentField === 'credit_card_type') {
           $this->assign('credit_card_type', CRM_Core_PseudoConstant::getLabel(
-            'CRM_Core_BAO_FinancialTrxn',
+            'CRM_Financial_BAO_FinancialTrxn',
             'card_type_id',
-            CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $this->_params['credit_card_type'])
+            CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialTrxn', 'card_type_id', $this->_params['credit_card_type'])
           ));
         }
         else {

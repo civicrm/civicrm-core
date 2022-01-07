@@ -370,7 +370,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'from_financial_account_id' => 7,
       'to_financial_account_id' => 6,
       'total_amount' => -30,
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'status_id', 'Refunded'),
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialTrxn', 'status_id', 'Refunded'),
       'is_payment' => 1,
     ];
     foreach ($expected as $key => $value) {
@@ -1189,14 +1189,14 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPISuccess('Payment', 'create', ['payment_processor_id' => $processor->getID(), 'total_amount' => 6, 'contribution_id' => $order['id']]);
     $this->callAPISuccess('Payment', 'create', ['payment_processor_id' => $processor2->getID(), 'total_amount' => 15, 'contribution_id' => $order['id']]);
     $payments = $this->callAPISuccess('Payment', 'get', ['sequential' => 1, 'contribution_id' => $order['id']])['values'];
-    $this->assertEquals('Deposit Bank Account', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'to_financial_account_id', $payments[0]['to_financial_account_id']));
-    $this->assertEquals('Payment Processor Account', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'to_financial_account_id', $payments[1]['to_financial_account_id']));
-    $this->assertEquals('Accounts Receivable', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'from_financial_account_id', $payments[0]['from_financial_account_id']));
-    $this->assertEquals('Accounts Receivable', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'from_financial_account_id', $payments[1]['from_financial_account_id']));
-    $this->assertEquals('Cash', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $payments[0]['payment_instrument_id']));
-    $this->assertEquals('EFT', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $payments[1]['payment_instrument_id']));
+    $this->assertEquals('Deposit Bank Account', CRM_Core_PseudoConstant::getName('CRM_Financial_BAO_FinancialTrxn', 'to_financial_account_id', $payments[0]['to_financial_account_id']));
+    $this->assertEquals('Payment Processor Account', CRM_Core_PseudoConstant::getName('CRM_Financial_BAO_FinancialTrxn', 'to_financial_account_id', $payments[1]['to_financial_account_id']));
+    $this->assertEquals('Accounts Receivable', CRM_Core_PseudoConstant::getName('CRM_Financial_BAO_FinancialTrxn', 'from_financial_account_id', $payments[0]['from_financial_account_id']));
+    $this->assertEquals('Accounts Receivable', CRM_Core_PseudoConstant::getName('CRM_Financial_BAO_FinancialTrxn', 'from_financial_account_id', $payments[1]['from_financial_account_id']));
+    $this->assertEquals('Cash', CRM_Core_PseudoConstant::getName('CRM_Financial_BAO_FinancialTrxn', 'payment_instrument_id', $payments[0]['payment_instrument_id']));
+    $this->assertEquals('EFT', CRM_Core_PseudoConstant::getName('CRM_Financial_BAO_FinancialTrxn', 'payment_instrument_id', $payments[1]['payment_instrument_id']));
     // $order = $this->callAPISuccessGetSingle('Order', ['id' => $processor->getID()]);
-    // $this->assertEquals('Cash', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $order['payment_instrument_id']));
+    // $this->assertEquals('Cash', CRM_Core_PseudoConstant::getName('CRM_Financial_BAO_FinancialTrxn', 'payment_instrument_id', $order['payment_instrument_id']));
   }
 
   /**

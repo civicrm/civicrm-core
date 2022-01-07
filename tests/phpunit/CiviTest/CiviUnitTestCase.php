@@ -2875,7 +2875,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         'total_amount' => 50,
         'status_id' => 1,
       ];
-      $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['id'], 'DESC');
+      $trxnId = CRM_Financial_BAO_FinancialTrxn::getFinancialTrxnId($params['id'], 'DESC');
       $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams, $compareParams);
       $fitemParams = [
         'entity_id' => $trxnId['financialTrxnId'],

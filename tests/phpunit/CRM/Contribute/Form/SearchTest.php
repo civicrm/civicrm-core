@@ -175,7 +175,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'card_type_id' => 1,
       'total_amount' => 100,
     ];
-    CRM_Core_BAO_FinancialTrxn::create($params);
+    CRM_Financial_BAO_FinancialTrxn::create($params);
     $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => 1,
       'total_amount' => 150,
@@ -200,7 +200,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'card_type_id' => 2,
       'total_amount' => 200,
     ];
-    CRM_Core_BAO_FinancialTrxn::create($params);
+    CRM_Financial_BAO_FinancialTrxn::create($params);
 
     $useCases = [
       // Case 1: Search for ONLY those contributions which have card type
@@ -278,7 +278,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'total_amount' => 100,
       'pan_truncation' => 1234,
     ];
-    CRM_Core_BAO_FinancialTrxn::create($params);
+    CRM_Financial_BAO_FinancialTrxn::create($params);
     $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => 1,
       'total_amount' => 150,
@@ -304,7 +304,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'total_amount' => 200,
       'pan_truncation' => 5678,
     ];
-    CRM_Core_BAO_FinancialTrxn::create($params);
+    CRM_Financial_BAO_FinancialTrxn::create($params);
 
     $useCases = [
       // Case 1: Search for ONLY those contributions which have card number
@@ -531,7 +531,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'card_type_id' => 1,
       'total_amount' => 11,
     ];
-    CRM_Core_BAO_FinancialTrxn::create($params);
+    CRM_Financial_BAO_FinancialTrxn::create($params);
     // Create a normal contribution
     $Contribution1 = $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => 'Donation',
@@ -551,7 +551,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'card_type_id' => 1,
       'total_amount' => 11,
     ];
-    CRM_Core_BAO_FinancialTrxn::create($params);
+    CRM_Financial_BAO_FinancialTrxn::create($params);
     // "Completed" recurring contribution for contactID2
     $ContributionRecur2 = $this->callAPISuccess('ContributionRecur', 'create', [
       'sequential' => 1,
@@ -585,7 +585,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'card_type_id' => 1,
       'total_amount' => 22,
     ];
-    CRM_Core_BAO_FinancialTrxn::create($params);
+    CRM_Financial_BAO_FinancialTrxn::create($params);
   }
 
   /**

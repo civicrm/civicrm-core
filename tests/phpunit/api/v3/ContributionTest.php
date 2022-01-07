@@ -4627,7 +4627,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'pan_truncation' => 4567,
     ];
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
-    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
+    $lastFinancialTrxnId = CRM_Financial_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
       [

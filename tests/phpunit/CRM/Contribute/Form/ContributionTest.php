@@ -1289,7 +1289,7 @@ Price Field - Price Field 1        1    $100.00       $100.00
         'return' => ['id'],
       ]
     );
-    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
+    $lastFinancialTrxnId = CRM_Financial_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
       [
@@ -1351,7 +1351,7 @@ Price Field - Price Field 1        1    $100.00       $100.00
    * function to test card_type and pan truncation.
    */
   public function testCardTypeAndPanTruncationLiveMode(): void {
-    $visaID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', 'Visa');
+    $visaID = CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialTrxn', 'card_type_id', 'Visa');
     $this->submitContributionForm(
       [
         'total_amount' => 50,
@@ -1387,7 +1387,7 @@ Price Field - Price Field 1        1    $100.00       $100.00
       ], NULL, 'live'
     );
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId]);
-    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
+    $lastFinancialTrxnId = CRM_Financial_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
       [

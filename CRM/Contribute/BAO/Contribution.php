@@ -1022,10 +1022,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     $statuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
 
     while ($resultDAO->fetch()) {
-      $paidByLabel = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $resultDAO->payment_instrument_id);
-      $paidByName = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $resultDAO->payment_instrument_id);
+      $paidByLabel = CRM_Core_PseudoConstant::getLabel('CRM_Financial_BAO_FinancialTrxn', 'payment_instrument_id', $resultDAO->payment_instrument_id);
+      $paidByName = CRM_Core_PseudoConstant::getName('CRM_Financial_BAO_FinancialTrxn', 'payment_instrument_id', $resultDAO->payment_instrument_id);
       if ($resultDAO->card_type_id) {
-        $creditCardType = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $resultDAO->card_type_id);
+        $creditCardType = CRM_Core_PseudoConstant::getLabel('CRM_Financial_BAO_FinancialTrxn', 'card_type_id', $resultDAO->card_type_id);
         $pantruncation = '';
         if ($resultDAO->pan_truncation) {
           $pantruncation = ": {$resultDAO->pan_truncation}";
@@ -1263,7 +1263,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
     $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $id, 'participant_id', 'contribution_id');
 
     // delete any related entity_financial_trxn, financial_trxn and financial_item records.
-    CRM_Core_BAO_FinancialTrxn::deleteFinancialTrxn($id);
+    CRM_Financial_BAO_FinancialTrxn::deleteFinancialTrxn($id);
 
     if ($participantId) {
       CRM_Price_BAO_LineItem::deleteLineItems($participantId, 'civicrm_participant');
@@ -3076,7 +3076,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *   Contribution object, line item array and params for trxn.
    *
    *
-   * @return null|\CRM_Core_BAO_FinancialTrxn
+   * @return null|\CRM_Financial_BAO_FinancialTrxn
    */
   public static function recordFinancialAccounts(&$params) {
     $skipRecords = $return = FALSE;
@@ -3238,7 +3238,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
                 $params['prevContribution']->financial_type_id, $accountRelationship);
             }
             else {
-              $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['prevContribution']->id, 'DESC');
+              $lastFinancialTrxnId = CRM_Financial_BAO_FinancialTrxn::getFinancialTrxnId($params['prevContribution']->id, 'DESC');
               if (!empty($lastFinancialTrxnId['financialTrxnId'])) {
                 $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
               }
@@ -3250,7 +3250,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
                 $line['financial_type_id'] = $params['financial_type_id'];
               }
             }
-            CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, 'changeFinancialType');
+            CRM_Financial_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, 'changeFinancialType');
             /* $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id']; */
             $params['financial_account_id'] = $newFinancialAccount;
             $params['total_amount'] = $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $trxnParams['total_amount'];
@@ -3259,7 +3259,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
               $params['trxnParams']['fee_amount'] = $params['fee_amount'];
             }
             CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccounts($params);
-            CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE);
+            CRM_Financial_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE);
             $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
             $updated = TRUE;
             $params['deferred_financial_account_id'] = $newFinancialAccount;
@@ -3281,7 +3281,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $callUpdateFinancialAccounts = CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccountsOnContributionStatusChange($params);
           if ($callUpdateFinancialAccounts) {
             CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccounts($params, 'changedStatus');
-            CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, 'changedStatus');
+            CRM_Financial_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, 'changedStatus');
           }
           $updated = TRUE;
         }
@@ -3296,7 +3296,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $params['trxnParams']['check_number'] = $params['check_number'] ?? NULL;
 
         if (CRM_Contribute_BAO_FinancialProcessor::isPaymentInstrumentChange($params, $pendingStatus)) {
-          $updated = CRM_Core_BAO_FinancialTrxn::updateFinancialAccountsOnPaymentInstrumentChange($params);
+          $updated = CRM_Financial_BAO_FinancialTrxn::updateFinancialAccountsOnPaymentInstrumentChange($params);
         }
 
         //if Change contribution amount
@@ -3310,7 +3310,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           //Update Financial Records
           $params['trxnParams']['from_financial_account_id'] = NULL;
           CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccounts($params, 'changedAmount');
-          CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, 'changedAmount');
+          CRM_Financial_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, 'changedAmount');
           $updated = TRUE;
         }
 
@@ -3322,7 +3322,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           // the data fix scenario.
           // CRM-17751.
           if (isset($params['refund_trxn_id'])) {
-            $refundIDs = CRM_Core_BAO_FinancialTrxn::getRefundTransactionIDs($params['id']);
+            $refundIDs = CRM_Financial_BAO_FinancialTrxn::getRefundTransactionIDs($params['id']);
             if (!empty($refundIDs['financialTrxnId']) && $refundIDs['trxn_id'] != $params['refund_trxn_id']) {
               civicrm_api3('FinancialTrxn', 'create', [
                 'id' => $refundIDs['financialTrxnId'],
@@ -3332,7 +3332,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           }
           $cardType = $params['card_type_id'] ?? NULL;
           $panTruncation = $params['pan_truncation'] ?? NULL;
-          CRM_Core_BAO_FinancialTrxn::updateCreditCardDetails($params['contribution']->id, $panTruncation, $cardType);
+          CRM_Financial_BAO_FinancialTrxn::updateCreditCardDetails($params['contribution']->id, $panTruncation, $cardType);
         }
       }
 
@@ -3342,7 +3342,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         CRM_Contribute_BAO_FinancialProcessor::recordAlwaysAccountsReceivable($trxnParams, $params);
         $trxnParams['pan_truncation'] = $params['pan_truncation'] ?? NULL;
         $trxnParams['card_type_id'] = $params['card_type_id'] ?? NULL;
-        $return = $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
+        $return = $financialTxn = CRM_Financial_BAO_FinancialTrxn::create($trxnParams);
         $params['entity_id'] = $financialTxn->id;
       }
     }
@@ -3364,7 +3364,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     // when a fee is charged
     if (!empty($params['fee_amount']) && (empty($params['prevContribution']) || $params['contribution']->fee_amount != $params['prevContribution']->fee_amount) && $skipRecords) {
-      CRM_Core_BAO_FinancialTrxn::recordFees($params);
+      CRM_Financial_BAO_FinancialTrxn::recordFees($params);
     }
 
     if (!empty($params['prevContribution']) && $entityTable == 'civicrm_participant'
@@ -3597,10 +3597,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     // The balance used to be calculated this way - we really want to remove this 'oldCalculation'
     // but need to unpick the whole trxn_id it's returning first.
-    $oldCalculation = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
+    $oldCalculation = CRM_Financial_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
     $baseTrxnId = !empty($oldCalculation['trxn_id']) ? $oldCalculation['trxn_id'] : NULL;
     if (!$baseTrxnId) {
-      $baseTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionId);
+      $baseTrxnId = CRM_Financial_BAO_FinancialTrxn::getFinancialTrxnId($contributionId);
       $baseTrxnId = $baseTrxnId['financialTrxnId'];
     }
     $total = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
@@ -3651,7 +3651,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     return (float) CRM_Utils_Money::subtractCurrencies(
       $contributionTotal,
-      CRM_Core_BAO_FinancialTrxn::getTotalPayments($contributionId, TRUE),
+      CRM_Financial_BAO_FinancialTrxn::getTotalPayments($contributionId, TRUE),
       CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'currency')
     );
   }

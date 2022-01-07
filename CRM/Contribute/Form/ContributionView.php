@@ -70,7 +70,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     }
 
     // get received into i.e to_financial_account_id from last trxn
-    $financialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($values['contribution_id'], 'DESC');
+    $financialTrxnId = CRM_Financial_BAO_FinancialTrxn::getFinancialTrxnId($values['contribution_id'], 'DESC');
     $values['to_financial_account'] = '';
     if (!empty($financialTrxnId['financialTrxnId'])) {
       $values['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $financialTrxnId['financialTrxnId'], 'to_financial_account_id');
@@ -151,7 +151,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       $values['campaign'] = $campaigns[$campaignId];
     }
     if ($values['contribution_status'] == 'Refunded') {
-      $this->assign('refund_trxn_id', CRM_Core_BAO_FinancialTrxn::getRefundTransactionTrxnID($id));
+      $this->assign('refund_trxn_id', CRM_Financial_BAO_FinancialTrxn::getRefundTransactionTrxnID($id));
     }
 
     // assign values to the template

@@ -274,7 +274,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $dueDatePeriodSetting = Civi::settings()->get('invoice_due_date_period');
       $dueDate = date('F j, Y', strtotime($contributionReceiveDate . "+" . $dueDateSetting . "" . $dueDatePeriodSetting));
 
-      $amountPaid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribID, TRUE);
+      $amountPaid = CRM_Financial_BAO_FinancialTrxn::getTotalPayments($contribID, TRUE);
       $amountDue = ($input['amount'] - $amountPaid);
 
       // retrieving the subtotal and sum of same tax_rate

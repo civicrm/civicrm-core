@@ -74,7 +74,7 @@ class CRM_Financial_BAO_Payment {
     $paymentTrxnParams['from_financial_account_id'] = $accountsReceivableAccount;
 
     if ($params['total_amount'] > 0) {
-      $paymentTrxnParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'status_id', 'Completed');
+      $paymentTrxnParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialTrxn', 'status_id', 'Completed');
     }
     elseif ($params['total_amount'] < 0) {
       $paymentTrxnParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
@@ -91,11 +91,11 @@ class CRM_Financial_BAO_Payment {
         'is_payment' => 0,
         'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
       ]);
-      CRM_Core_BAO_FinancialTrxn::create($ftParams);
+      CRM_Financial_BAO_FinancialTrxn::create($ftParams);
       $contributionStatus = 'Pending';
       self::updateContributionStatus($contribution['id'], $contributionStatus);
     }
-    $trxn = CRM_Core_BAO_FinancialTrxn::create($paymentTrxnParams);
+    $trxn = CRM_Financial_BAO_FinancialTrxn::create($paymentTrxnParams);
 
     if ($params['total_amount'] < 0 && !empty($params['cancelled_payment_id'])) {
       self::reverseAllocationsFromPreviousPayment($params, $trxn->id);
@@ -194,9 +194,9 @@ class CRM_Financial_BAO_Payment {
           'payment_processor_id' => $paymentTrxnParams['payment_processor_id'] ?? NULL,
         ]);
         // Get the trxn
-        $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
+        $trxnId = CRM_Financial_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
         $ftParams = ['id' => $trxnId['financialTrxnId']];
-        $trxn = CRM_Core_BAO_FinancialTrxn::retrieve($ftParams);
+        $trxn = CRM_Financial_BAO_FinancialTrxn::retrieve($ftParams);
       }
     }
     elseif ($contributionStatus === 'Pending' && $params['total_amount'] > 0) {
@@ -209,7 +209,7 @@ class CRM_Financial_BAO_Payment {
         civicrm_api3('Participant', 'create', ['id' => $participantPayment['participant_id'], 'status_id' => 'Partially paid']);
       }
     }
-    elseif ($contributionStatus === 'Completed' && ((float) CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id'], TRUE) === 0.0)) {
+    elseif ($contributionStatus === 'Completed' && ((float) CRM_Financial_BAO_FinancialTrxn::getTotalPayments($contribution['id'], TRUE) === 0.0)) {
       // If the contribution has previously been completed (fully paid) and now has total payments adding up to 0
       //  change status to refunded.
       self::updateContributionStatus($contribution['id'], 'Refunded');
@@ -404,7 +404,7 @@ class CRM_Financial_BAO_Payment {
       'paymentAmount' => $entities['payment']['total_amount'],
       'checkNumber' => $entities['payment']['check_number'] ?? NULL,
       'receive_date' => $entities['payment']['trxn_date'],
-      'paidBy' => CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $entities['payment']['payment_instrument_id']),
+      'paidBy' => CRM_Core_PseudoConstant::getLabel('CRM_Financial_BAO_FinancialTrxn', 'payment_instrument_id', $entities['payment']['payment_instrument_id']),
       'isShowLocation' => (!empty($entities['event']) ? $entities['event']['is_show_location'] : FALSE),
       'location' => $entities['location'] ?? NULL,
       'event' => $entities['event'] ?? NULL,
@@ -539,7 +539,7 @@ class CRM_Financial_BAO_Payment {
       $ratio = $params['total_amount'] / $outstandingBalance;
     }
     elseif ($params['total_amount'] < 0) {
-      $ratio = $params['total_amount'] / (float) CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id'], TRUE);
+      $ratio = $params['total_amount'] / (float) CRM_Financial_BAO_FinancialTrxn::getTotalPayments($params['contribution_id'], TRUE);
     }
     else {
       // Help we are making a payment but no money is owed. We won't allocate the overpayment to any line item.

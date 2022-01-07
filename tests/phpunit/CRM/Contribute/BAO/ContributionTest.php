@@ -566,7 +566,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'is_payment' => 1,
     ];
     $defaults = [];
-    $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
+    $financialTrxn = CRM_Financial_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
     $this->assertEquals(1, $financialTrxn->N, 'Mismatch count for is payment flag.');
     //update contribution amount
     $params['id'] = $contribution['id'];
@@ -580,10 +580,10 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'is_payment' => 1,
     ];
     $defaults = [];
-    $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
+    $financialTrxn = CRM_Financial_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
     $this->assertEquals(2, $financialTrxn->N, 'Mismatch count for is payment flag.');
     $trxnArray['is_payment'] = 0;
-    $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
+    $financialTrxn = CRM_Financial_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
     $this->assertEquals(1, $financialTrxn->N, 'Mismatch count for is payment flag.');
   }
 
@@ -623,10 +623,10 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'is_payment' => 0,
     ];
     $defaults = [];
-    $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
+    $financialTrxn = CRM_Financial_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
     $this->assertEquals(2, $financialTrxn->N, 'Mismatch count for is payment flag.');
     $trxnArray['is_payment'] = 1;
-    $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
+    $financialTrxn = CRM_Financial_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
     $this->assertEquals(NULL, $financialTrxn, 'Mismatch count for is payment flag.');
     //update contribution amount
     $params['id'] = $contribution['id'];
@@ -641,10 +641,10 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'is_payment' => 1,
     ];
     $defaults = [];
-    $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
+    $financialTrxn = CRM_Financial_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
     $this->assertEquals(1, $financialTrxn->N, 'Mismatch count for is payment flag.');
     $trxnArray['is_payment'] = 0;
-    $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
+    $financialTrxn = CRM_Financial_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
     $this->assertEquals(2, $financialTrxn->N, 'Mismatch count for is payment flag.');
   }
 
@@ -953,7 +953,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     ];
 
     $contribution = $this->callAPISuccess('Order', 'create', $params);
-    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
+    $lastFinancialTrxnId = CRM_Financial_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
       [
@@ -1113,7 +1113,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'payment_instrument_id' => 3,
     ];
     $this->callAPISuccess('Contribution', 'create', $params);
-    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
+    $lastFinancialTrxnId = CRM_Financial_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $eftParams = [
       'entity_table' => 'civicrm_financial_item',
       'financial_trxn_id' => $lastFinancialTrxnId['financialTrxnId'],

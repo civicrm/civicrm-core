@@ -997,7 +997,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           'financial_type_id' => $params['financial_type_id'],
           'contributionId' => $contribution->id,
         ];
-        CRM_Core_BAO_FinancialTrxn::createPremiumTrxn($trxnParams);
+        CRM_Financial_BAO_FinancialTrxn::createPremiumTrxn($trxnParams);
       }
     }
     elseif ($selectProduct === 'no_thanks') {

@@ -187,7 +187,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     // check payment info again and see if the payment is completed
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contributionID]);
     $this->assertEquals($feeAmt, $contribution['total_amount'], 'Total amount recorded is not proper');
-    $this->assertEquals($feeAmt, CRM_Core_BAO_FinancialTrxn::getTotalPayments($contributionID), 'Amount paid is not correct');
+    $this->assertEquals($feeAmt, CRM_Financial_BAO_FinancialTrxn::getTotalPayments($contributionID), 'Amount paid is not correct');
     $this->assertEquals(CRM_Contribute_BAO_Contribution::getContributionBalance($contributionID), 0, 'Balance amount is not proper');
     $this->assertEquals('Completed', $contribution['contribution_status'], 'Contribution status is not correct');
 
@@ -204,7 +204,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $amtPaid = (float) 60;
     $balance = (float) 40;
     $result = $this->addParticipantWithPayment($feeAmt, $amtPaid);
-    $amountPaid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($result['contribution']['id']);
+    $amountPaid = CRM_Financial_BAO_FinancialTrxn::getTotalPayments($result['contribution']['id']);
     $contributionBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($result['contribution']['id']);
 
     $this->assertEquals($feeAmt, $this->callAPISuccess('Contribution', 'getvalue', ['return' => 'total_amount', 'id' => $result['contribution']['id']]), 'Total amount recorded is not correct');

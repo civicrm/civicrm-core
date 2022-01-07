@@ -1718,7 +1718,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
         $transactionParams['trxnParams']['trxn_id'] = NULL;
         $transactionParams['trxnParams']['net_amount'] = NULL;
         $transactionParams['trxnParams']['fee_amount'] = NULL;
-        CRM_Core_BAO_FinancialTrxn::create($transactionParams);
+        CRM_Financial_BAO_FinancialTrxn::create($transactionParams);
       }
     }
   }
