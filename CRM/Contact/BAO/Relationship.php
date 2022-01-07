@@ -165,26 +165,23 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   public static function legacyCreateMultiple(&$params, $ids = []) {
     $valid = $invalid = $duplicate = $saved = 0;
     $relationships = $relationshipIds = [];
-    $relationshipId = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
-
-    //CRM-9015 - the hooks are called here & in add (since add doesn't call create)
+    // clarify that the only key ever pass in the ids array is 'contact'
+    // There is legacy handling for other keys but a universe search on
+    // calls to this function (not supported to be called from outside core)
+    // only returns 2 calls - one in CRM_Contact_Import_Parser_Contact
+    // and the other in jma grant applications (CRM_Grant_Form_Grant_Confirm)
+    // both only pass in contact as a key here.
+    $ids = ['contact' => $ids['contact']];
+    // Likewise neither place ever passed in relationshipID
+    $relationshipId = NULL;
+    $hook = 'create';
+    // CRM-9015 - the hooks are called here & in add (since add doesn't call create)
     // but in future should be tidied per ticket
-    if (empty($relationshipId)) {
-      $hook = 'create';
-    }
-    else {
-      $hook = 'edit';
-    }
-
     // @todo pre hook is called from add - remove it from here
     CRM_Utils_Hook::pre($hook, 'Relationship', $relationshipId, $params);
 
     if (!$relationshipId) {
       // creating a new relationship
-      $dataExists = self::dataExists($params);
-      if (!$dataExists) {
-        return [FALSE, TRUE, FALSE, FALSE, NULL];
-      }
       $relationshipIds = [];
       foreach ($params['contact_check'] as $key => $value) {
         // check if the relationship is valid between contacts.
