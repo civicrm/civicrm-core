@@ -22,7 +22,7 @@ echo "<?php\n";
  * If only a .tpl file exists for a version, it will be run automatically.
  * If the function exists, it must explicitly add the 'runSql' task if there is a corresponding .mysql.tpl.
  *
- * This class may also implement `setPreUpgradeMessage()` and `setPreUpgradeMessage()` functions.
+ * This class may also implement `setPreUpgradeMessage()` and `setPostUpgradeMessage()` functions.
  */
 class CRM_Upgrade_Incremental_php_<?php echo $camelNumber; ?> extends CRM_Upgrade_Incremental_Base {
 
