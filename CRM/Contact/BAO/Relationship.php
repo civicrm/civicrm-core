@@ -216,43 +216,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       }
       // editing the relationship
     }
-    else {
-      // check for duplicate relationship
-      // @todo this code doesn't cope well with updates - causes e-Notices.
-      // API has a lot of code to work around
-      // this but should review this code & remove the extra handling from the api
-      // it seems doubtful any of this is relevant if the contact fields & relationship
-      // type fields are not set
-      if (
-      self::checkDuplicateRelationship(
-        $params,
-        CRM_Utils_Array::value('contact', $ids),
-        $ids['contactTarget'],
-        $relationshipId
-      )
-      ) {
-        $duplicate++;
-        return [$valid, $invalid, $duplicate, $saved, NULL];
-      }
-
-      $validContacts = TRUE;
-      //validate contacts in update mode also.
-      $contactFields = self::setContactABFromIDs($params, $ids, $ids['contactTarget']);
-      if (!empty($ids['contact']) && !empty($ids['contactTarget'])) {
-        if (self::checkValidRelationship($contactFields, $ids, $ids['contactTarget'])) {
-          $validContacts = FALSE;
-          $invalid++;
-        }
-      }
-      if ($validContacts) {
-        // editing an existing relationship
-        $singleInstanceParams = array_merge($params, $contactFields);
-        $relationship = self::add($singleInstanceParams, $ids);
-        $relationshipIds[] = $relationship->id;
-        $relationships[$relationship->id] = $relationship;
-        $saved++;
-      }
-    }
 
     // do not add to recent items for import, CRM-4399
     if (!(!empty($params['skipRecentView']) || $invalid || $duplicate)) {
