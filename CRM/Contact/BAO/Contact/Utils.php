@@ -252,8 +252,13 @@ WHERE  id IN ( $idString )
    * @throws \CiviCRM_API3_Exception
    */
   public static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL, $newContact = FALSE) {
-    //if organization name is passed. CRM-15368,CRM-15547
-    if (!CRM_Utils_System::isNull($organization) && !is_numeric($organization)) {
+    if (!$organization) {
+      // This function is not called in core with no organization & should not be
+      // Refs CRM-15368,CRM-15547
+      CRM_Core_Error::deprecatedWarning('calling this function with no organization is deprected');
+      return;
+    }
+    if (!is_numeric($organization)) {
       $dupeIDs = CRM_Contact_BAO_Contact::getDuplicateContacts(['organization_name' => $organization], 'Organization', 'Unsupervised', [], FALSE);
 
       if (is_array($dupeIDs) && !empty($dupeIDs)) {
@@ -274,7 +279,7 @@ WHERE  id IN ( $idString )
       }
     }
 
-    if ($organization && is_numeric($organization)) {
+    if (is_numeric($organization)) {
 
       // get the relationship type id of "Employee of"
       $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b');
