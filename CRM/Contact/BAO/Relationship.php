@@ -222,7 +222,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       self::addRecent($params, $relationship);
     }
 
-    return [$valid, $invalid, $duplicate, $saved, $relationshipIds, $relationships];
+    return [$valid, $duplicate];
   }
 
   /**
