@@ -36,27 +36,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @return CRM_Contact_BAO_GroupContact
    */
   public static function add($params) {
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'GroupContact', CRM_Utils_Array::value('id', $params), $params);
-
-    if (!self::dataExists($params)) {
-      return NULL;
-    }
-
-    $groupContact = new CRM_Contact_BAO_GroupContact();
-    $groupContact->copyValues($params);
-    $groupContact->save();
-
-    // Lookup existing info for the sake of subscription history
-    if (!empty($params['id'])) {
-      $groupContact->find(TRUE);
-      $params = $groupContact->toArray();
-    }
-    CRM_Contact_BAO_SubscriptionHistory::create($params);
-
-    CRM_Utils_Hook::post($hook, 'GroupContact', $groupContact->id, $groupContact);
-
-    return $groupContact;
+    return self::writeRecord($params);
   }
 
   /**
