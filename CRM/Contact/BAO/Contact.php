@@ -3572,8 +3572,9 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    *   The context if relevant, eg. ['event_id' => X]
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
-  public static function getDuplicateContacts($input, $contactType, $rule = 'Unsupervised', $excludedContactIDs = [], $checkPermissions = TRUE, $ruleGroupID = NULL, $contextParams = []) {
+  public static function getDuplicateContacts(array $input, string $contactType, string $rule = 'Unsupervised', $excludedContactIDs = [], $checkPermissions = TRUE, $ruleGroupID = NULL, $contextParams = []): array {
     $dedupeParams = CRM_Dedupe_Finder::formatParams($input, $contactType);
     $dedupeParams['check_permission'] = $checkPermissions;
     $dedupeParams['contact_type'] = $contactType;
@@ -3586,7 +3587,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
     if (!$dedupeResults['handled']) {
       $dedupeResults['ids'] = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $contactType, $rule, $excludedContactIDs, $ruleGroupID);
     }
-    return $dedupeResults['ids'];
+    return $dedupeResults['ids'] ?? [];
   }
 
   /**
