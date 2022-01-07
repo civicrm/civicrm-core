@@ -56,10 +56,7 @@
           {/if}
         </td>
       {foreach from=$columnHeaders item=column}
-          {assign var='columnName' value=''}
-          {if $column.field_name}
-            {assign var='columnName' value=$column.field_name}
-          {/if}
+        {assign var='columnName' value=$column.field_name}
         {if !$columnName}{* if field_name has not been set skip, this helps with not changing anything not specifically edited *}
         {elseif $columnName === 'total_amount'}{* rendered above as soft credit columns = confusing *}
         {elseif $column.type === 'actions'}{* rendered below as soft credit column handling = not fixed *}
@@ -76,7 +73,7 @@
               {$row.$columnName|crmDate}
             </td>
           {else}
-          <td class="crm-{$columnName} crm-{$columnName}_{if $row.columnName}{$row.columnName}{/if}">
+          <td class="crm-{$columnName} crm-{$columnName}_">
             {$row.$columnName}
           </td>
           {/if}
