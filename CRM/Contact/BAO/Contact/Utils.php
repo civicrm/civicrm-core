@@ -332,12 +332,6 @@ WHERE  id IN ( $idString )
     $relationships = $relationshipIds = [];
     $ids = ['contact' => $contactID];
 
-    //CRM-9015 - the hooks are called here & in add (since add doesn't call create)
-    // but in future should be tidied per ticket
-    $hook = 'create';
-    // @todo pre hook is called from add - remove it from here
-    CRM_Utils_Hook::pre($hook, 'Relationship', NULL, $params);
-
     // creating a new relationship
     $dataExists = CRM_Contact_BAO_Relationship::dataExists($params);
     if (!$dataExists) {
