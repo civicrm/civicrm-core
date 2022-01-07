@@ -74,9 +74,6 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey implements Civi\Te
 
     $dao = self::writeRecord($params);
 
-    if (!empty($params['custom']) && is_array($params['custom'])) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_survey', $dao->id);
-    }
     return $dao;
   }
 

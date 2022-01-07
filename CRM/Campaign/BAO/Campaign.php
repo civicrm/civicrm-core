@@ -65,11 +65,6 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
       }
     }
 
-    //store custom data
-    if (!empty($params['custom']) && is_array($params['custom'])) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_campaign', $campaign->id);
-    }
-
     return $campaign;
   }
 
