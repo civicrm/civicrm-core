@@ -912,7 +912,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * This function checks for duplicate relationship.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   An assoc array of name/value pairs.
    * @param int $id
    *   This the id of the contact whom we are adding relationship.
    * @param int $contactId
@@ -923,7 +923,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @return bool
    *   true if record exists else false
    */
-  public static function checkDuplicateRelationship(&$params, $id, $contactId = 0, $relationshipId = 0) {
+  public static function checkDuplicateRelationship($params, $id, $contactId = 0, $relationshipId = 0) {
     $relationshipTypeId = $params['relationship_type_id'] ?? NULL;
     list($type) = explode('_', $relationshipTypeId);
 
@@ -967,18 +967,18 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
     }
 
     $queryString .=
-      " AND ( ( contact_id_a = " . CRM_Utils_Type::escape($id, 'Integer') .
-      " AND contact_id_b = " . CRM_Utils_Type::escape($contactId, 'Integer') .
-      " ) OR ( contact_id_a = " . CRM_Utils_Type::escape($contactId, 'Integer') .
-      " AND contact_id_b = " . CRM_Utils_Type::escape($id, 'Integer') . " ) ) ";
+      ' AND ( ( contact_id_a = ' . CRM_Utils_Type::escape($id, 'Integer') .
+      ' AND contact_id_b = ' . CRM_Utils_Type::escape($contactId, 'Integer') .
+      ' ) OR ( contact_id_a = ' . CRM_Utils_Type::escape($contactId, 'Integer') .
+      ' AND contact_id_b = ' . CRM_Utils_Type::escape($id, 'Integer') . " ) ) ";
 
     //if caseId is provided, include it duplicate checking.
     if ($caseId = CRM_Utils_Array::value('case_id', $params)) {
-      $queryString .= " AND case_id = " . CRM_Utils_Type::escape($caseId, 'Integer');
+      $queryString .= ' AND case_id = ' . CRM_Utils_Type::escape($caseId, 'Integer');
     }
 
     if ($relationshipId) {
-      $queryString .= " AND id !=" . CRM_Utils_Type::escape($relationshipId, 'Integer');
+      $queryString .= ' AND id !=' . CRM_Utils_Type::escape($relationshipId, 'Integer');
     }
 
     $relationship = CRM_Core_DAO::executeQuery($queryString);
