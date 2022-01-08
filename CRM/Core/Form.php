@@ -374,7 +374,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'date',
       'currentDate',
       'asciiFile',
-      'htmlFile',
       'utf8File',
       'objectExists',
       'optionExists',
