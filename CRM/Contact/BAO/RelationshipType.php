@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\RelationshipType;
+
 /**
  *
  * @package CRM
@@ -118,6 +120,34 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
         ->addWhere('relationship_type_id', '=', $event->id)
         ->execute();
     }
+  }
+
+
+  /**
+   * Get the id of the employee relationship, checking it is valid.
+   *
+   * @return int|string
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function getEmployeeRelationshipTypeID(): int {
+    try {
+      if (!Civi::cache('metadata')->has(__CLASS__ . __FUNCTION__)) {
+        $relationship = RelationshipType::get(FALSE)
+          ->addWhere('name_a_b', '=', 'Employee of')
+          ->addWhere('contact_type_a', '=', 'Individual')
+          ->addWhere('contact_type_b', '=', 'Organization')
+          ->addSelect('id')->execute()->first();
+        if (empty($relationship)) {
+          throw new API_Exception('no valid relationship');
+        }
+        Civi::cache('metadata')->set(__CLASS__ . __FUNCTION__, $relationship['id']);
+      }
+    }
+    catch (API_Exception $e) {
+      throw new CRM_Core_Exception(ts("You seem to have deleted the relationship type 'Employee of'"));
+    }
+    return Civi::cache('metadata')->get(__CLASS__ . __FUNCTION__);
   }
 
 }
