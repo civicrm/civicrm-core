@@ -756,24 +756,6 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * See how file rules are written in HTML/QuickForm/file.php
-   * Checks to make sure the uploaded file is html
-   *
-   * @param array $elementValue
-   *
-   * @return bool
-   *   True if file has been uploaded, false otherwise
-   */
-  public static function htmlFile($elementValue) {
-    if ((isset($elementValue['error']) && $elementValue['error'] == 0) ||
-      (!empty($elementValue['tmp_name']) && $elementValue['tmp_name'] != 'none')
-    ) {
-      return CRM_Utils_File::isHtmlFile($elementValue['tmp_name']);
-    }
-    return FALSE;
-  }
-
-  /**
    * Check if there is a record with the same name in the db.
    *
    * @param string $value
