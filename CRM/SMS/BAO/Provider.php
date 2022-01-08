@@ -17,13 +17,6 @@
 class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * @return null|string
    */
   public static function activeProviderCount() {

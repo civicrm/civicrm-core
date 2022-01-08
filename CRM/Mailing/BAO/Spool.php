@@ -17,13 +17,6 @@
 class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Store Mails into Spool table.
    *
    * @param string|array $recipient

@@ -23,13 +23,6 @@ require_once 'Mail/mime.php';
 class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Confirm a pending subscription.
    *
    * @param int $contact_id

@@ -82,13 +82,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Te
   public static $_exportableFields = NULL;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Takes an associative array and creates a contact object.
    *
    * The function extracts all the params it needs to initialize the create a

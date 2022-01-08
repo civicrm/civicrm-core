@@ -17,13 +17,6 @@
 class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Create a new forward event, create a new contact if necessary
    *
    * @param $job_id

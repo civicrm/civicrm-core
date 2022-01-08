@@ -17,13 +17,6 @@
 class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType implements \Civi\Test\HookInterface {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Fetch object based on array of properties.
    *
    * @param array $params

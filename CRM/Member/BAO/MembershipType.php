@@ -25,13 +25,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
   public static $_membershipTypeInfo = [];
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Fetch object based on array of properties.
    *
    * @param array $params

@@ -24,13 +24,6 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Ci
   public static $_billingLocationType = NULL;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Fetch object based on array of properties.
    *
    * @param array $params

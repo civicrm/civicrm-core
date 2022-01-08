@@ -21,13 +21,6 @@
 class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Takes an associative array and creates a custom group object.
    *
    * This function is invoked from within the web form layer and also from the api layer

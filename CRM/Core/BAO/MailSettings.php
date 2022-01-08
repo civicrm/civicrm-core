@@ -17,13 +17,6 @@
 class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Get a list of setup-actions.
    *
    * @return array

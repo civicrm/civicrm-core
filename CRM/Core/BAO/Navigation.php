@@ -20,13 +20,6 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   const CACHE_KEY_STRLEN = 8;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Update the is_active flag in the db.
    *
    * @param int $id

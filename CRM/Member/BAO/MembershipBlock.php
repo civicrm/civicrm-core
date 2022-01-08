@@ -17,13 +17,6 @@
 class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Create or update a MembershipBlock.
    *
    * @param array $params

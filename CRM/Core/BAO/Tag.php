@@ -22,13 +22,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   protected $tree;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Fetch object based on array of properties.
    *
    * @param array $params

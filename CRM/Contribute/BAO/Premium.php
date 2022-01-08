@@ -24,13 +24,6 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   private static $productInfo;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Fetch object based on array of properties.
    *
    * @param array $params

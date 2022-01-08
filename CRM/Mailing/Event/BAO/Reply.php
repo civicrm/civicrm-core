@@ -23,13 +23,6 @@ require_once 'Mail/mime.php';
 class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Register a reply event.
    *
    * @param int $job_id

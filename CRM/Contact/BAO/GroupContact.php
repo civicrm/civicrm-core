@@ -17,13 +17,6 @@
 class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Takes an associative array and creates a groupContact object.
    *
    * the function extract all the params it needs to initialize the create a

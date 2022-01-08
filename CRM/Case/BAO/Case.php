@@ -29,13 +29,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   public static $_exportableFields = NULL;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Is CiviCase enabled?
    *
    * @return bool

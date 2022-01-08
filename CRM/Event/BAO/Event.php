@@ -17,13 +17,6 @@
 class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Fetch object based on array of properties.
    *
    * @param array $params

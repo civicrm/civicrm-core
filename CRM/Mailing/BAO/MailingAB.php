@@ -21,13 +21,6 @@
 class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
 
   /**
-   * class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Construct a new mailingab object.
    *
    * @params array $params

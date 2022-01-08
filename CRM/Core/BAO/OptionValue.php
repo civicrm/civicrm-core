@@ -17,13 +17,6 @@
 class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Create option value.
    *
    * Note that the create function calls 'add' but has more business logic.

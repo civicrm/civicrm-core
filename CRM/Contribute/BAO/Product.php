@@ -23,13 +23,6 @@ class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product {
   public static $_defaultContributionType = NULL;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Fetch object based on array of properties.
    *
    * @param array $params

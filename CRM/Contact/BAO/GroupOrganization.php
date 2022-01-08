@@ -17,13 +17,6 @@
 class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganization {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Takes an associative array and creates a groupOrganization object.
    *
    * @param array $params
