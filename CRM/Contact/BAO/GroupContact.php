@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\SubscriptionHistory;
 use Civi\Core\Event\PostEvent;
 
 /**
@@ -46,8 +47,24 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
       if ($event->action === 'edit') {
         $event->object->find(TRUE);
       }
-      $params = $event->object->toArray();
-      CRM_Contact_BAO_SubscriptionHistory::create($params);
+
+      try {
+        if (empty($event->object->group_id) || empty($event->object->contact_id) || empty($event->object->status)) {
+          $event->object->find(TRUE);
+        }
+        SubscriptionHistory::save(FALSE)->setRecords([
+          [
+            'group_id' => $event->object->group_id,
+            'contact_id' => $event->object->contact_id,
+            'status' => $event->object->status,
+          ],
+        ])->execute();
+      }
+      catch (API_Exception $e) {
+        // A failure to create the history might be a deadlock or similar
+        // This record is not important enough to trigger a larger fail.
+        Civi::log()->warning('Failed to add civicrm_subscription_history record with error :error', ['error' => $e->getMessage()]);
+      }
     }
   }
 

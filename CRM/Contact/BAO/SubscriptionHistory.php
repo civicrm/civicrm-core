@@ -29,7 +29,7 @@ class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHi
    * @return object
    *   $history  The new history object
    */
-  public static function &create(&$params) {
+  public static function create($params) {
     $history = new CRM_Contact_BAO_SubscriptionHistory();
     $history->date = date('Ymd');
     $history->copyValues($params);
