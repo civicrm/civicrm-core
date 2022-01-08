@@ -1124,9 +1124,10 @@ HTACCESS;
    * It should either return FALSE, or the value returned from is_dir().
    *
    * @param string|null $dir
-   * @return bool
+   * @return bool|null
+   *   In php8 the return value from is_dir() is always bool but in php7 it can be null.
    */
-  public static function isDir(?string $dir): bool {
+  public static function isDir(?string $dir) {
     set_error_handler(function($errno, $errstr) {
       // If this is open_basedir-related, convert it to an exception so we
       // can catch it.
