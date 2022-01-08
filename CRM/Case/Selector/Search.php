@@ -106,7 +106,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   /**
    * The query object
    *
-   * @var string
+   * @var CRM_Contact_BAO_Query
    */
   protected $_query;
 
@@ -451,7 +451,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   }
 
   /**
-   * @return string
+   * @return CRM_Contact_BAO_Query
    */
   public function &getQuery() {
     return $this->_query;

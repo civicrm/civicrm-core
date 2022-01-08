@@ -118,7 +118,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
   /**
    * The query object
    *
-   * @var string
+   * @var CRM_Contact_BAO_Query
    */
   protected $_query;
 
@@ -140,7 +140,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
    * @param string $context
    * @param null $compContext
    *
-   * @return \CRM_Contribute_Selector_Search
+   * @return CRM_Contribute_Selector_Search
    */
   public function __construct(
     &$queryParams,
@@ -622,7 +622,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
   }
 
   /**
-   * @return \CRM_Contact_BAO_Query
+   * @return CRM_Contact_BAO_Query
    */
   public function &getQuery() {
     return $this->_query;
