@@ -23,7 +23,7 @@ class Format {
   /**
    * Get formatted money
    *
-   * @param string $amount
+   * @param string|int|float $amount
    * @param string|null $currency
    *   Currency, defaults to site currency if not provided.
    * @param string|null $locale
@@ -33,7 +33,15 @@ class Format {
    * @noinspection PhpDocMissingThrowsInspection
    * @noinspection PhpUnhandledExceptionInspection
    */
-  public function money(string $amount, ?string $currency = NULL, ?string $locale = NULL): string {
+  public function money($amount, ?string $currency = NULL, ?string $locale = NULL): string {
+    // Empty value => empty string
+    if (is_null($amount) || $amount === '' || $amount === FALSE) {
+      return '';
+    }
+    // Verify the amount is a number or numeric string/object
+    elseif ($amount === TRUE || !is_numeric((string) $amount)) {
+      throw new \CRM_Core_Exception('Invalid value for type money');
+    }
     if (!$currency) {
       $currency = Civi::settings()->get('defaultCurrency');
     }
