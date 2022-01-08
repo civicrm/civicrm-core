@@ -29,13 +29,6 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
   public static $_defaultPriceSet = NULL;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Takes an associative array and creates a price set object.
    *
    * @param array $params

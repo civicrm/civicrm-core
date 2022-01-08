@@ -77,13 +77,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   public $trxn_result_code;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Takes an associative array and creates a contribution object.
    *
    * the function extract all the params it needs to initialize the create a

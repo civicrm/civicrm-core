@@ -24,13 +24,6 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
   public static $_pcpLinks = NULL;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Add or update either a Personal Campaign Page OR a PCP Block.
    *
    * @param array $params

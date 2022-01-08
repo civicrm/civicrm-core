@@ -21,13 +21,6 @@
 class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement implements \Civi\Test\HookInterface {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Function that must have never worked & should be removed.
    *
    * Retrieve DB object based on input parameters.

@@ -17,13 +17,6 @@
 class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Create a new bounce event, update the email address if necessary
    *
    * @param $params

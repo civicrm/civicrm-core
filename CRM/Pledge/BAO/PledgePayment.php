@@ -17,13 +17,6 @@
 class CRM_Pledge_BAO_PledgePayment extends CRM_Pledge_DAO_PledgePayment {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Get pledge payment details.
    *
    * @param int $pledgeId

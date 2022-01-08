@@ -17,13 +17,6 @@
 class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Given a url, mailing id and queue event id, find or construct a
    * trackable url and redirect url.
    *

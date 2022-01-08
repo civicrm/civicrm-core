@@ -32,13 +32,6 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
   public static $_statusACLFt = [];
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Fetch object based on array of properties.
    *
    * @param array $params

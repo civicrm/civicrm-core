@@ -24,13 +24,6 @@ require_once 'Mail/mime.php';
 class CRM_Mailing_Event_BAO_Subscribe extends CRM_Mailing_Event_DAO_Subscribe {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Register a subscription event.  Create a new contact if one does not
    * already exist.
    *

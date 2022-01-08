@@ -23,13 +23,6 @@
 class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Add the payment-processor type in the db
    *
    * @param array $params

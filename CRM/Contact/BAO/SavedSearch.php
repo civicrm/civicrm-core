@@ -21,13 +21,6 @@
 class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Query the db for all saved searches.
    *
    * @return array

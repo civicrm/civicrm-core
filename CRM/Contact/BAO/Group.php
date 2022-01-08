@@ -19,13 +19,6 @@ use Civi\Api4\Group;
 class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Retrieve DB object based on input parameters.
    *
    * It also stores all the retrieved values in the default array.

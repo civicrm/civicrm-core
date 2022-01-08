@@ -31,13 +31,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
   public static $_signupActType = NULL;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Takes an associative array and creates a membership object.
    *
    * the function extracts all the params it needs to initialize the created

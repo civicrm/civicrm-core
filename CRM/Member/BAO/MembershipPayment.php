@@ -17,13 +17,6 @@
 class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Add the membership Payments.
    *
    * @param array $params
