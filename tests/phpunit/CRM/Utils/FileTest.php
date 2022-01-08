@@ -253,9 +253,16 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
 
     // Note that in php8 is_dir changed in php itself to return false with no warning for these. It used to give `is_dir() expects parameter 1 to be a valid path, string given`. See https://github.com/php/php-src/commit/7bc7a80445f2bb349891d3cccfef2d589c48607e
     clearstatcache();
-    $this->assertFalse(CRM_Utils_File::isDir('./testIsDir/' . chr(0)));
-    clearstatcache();
-    $this->assertFalse(CRM_Utils_File::isDir("testIsDir\0"));
+    if (version_compare(PHP_VERSION, '8.0.0', '<')) {
+      $this->assertNull(CRM_Utils_File::isDir('./testIsDir/' . chr(0)));
+      clearstatcache();
+      $this->assertNull(CRM_Utils_File::isDir("testIsDir\0"));
+    }
+    else {
+      $this->assertFalse(CRM_Utils_File::isDir('./testIsDir/' . chr(0)));
+      clearstatcache();
+      $this->assertFalse(CRM_Utils_File::isDir("testIsDir\0"));
+    }
 
     $this->assertTrue(chdir($old_cwd));
     rmdir($a_dir);
