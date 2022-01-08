@@ -342,10 +342,6 @@ WHERE  id IN ( $idString )
         continue;
       }
 
-      //CRM-16978:check duplicate relationship as per case id.
-      if ($caseId = CRM_Utils_Array::value('case_id', $params)) {
-        $contactFields['case_id'] = $caseId;
-      }
       if (
         CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
           $contactFields,
