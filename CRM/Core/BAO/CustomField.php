@@ -75,13 +75,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * Takes an associative array and creates a custom field object.
+   * Deprecated in favor of writeRecords & APIv4
    *
-   * This function is invoked from within the web form layer and also from the api layer
-   *
+   * @deprecated
    * @param array $params
-   *   (reference) an assoc array of name/value pairs.
-   *
    * @return CRM_Core_DAO_CustomField
    */
   public static function create($params) {

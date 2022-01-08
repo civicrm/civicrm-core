@@ -95,7 +95,7 @@ trait DAOActionTrait {
   }
 
   /**
-   * Write bao objects as part of a create/update action.
+   * Write bao objects as part of a create/update/save action.
    *
    * @param array $items
    *   The records to write to the DB.

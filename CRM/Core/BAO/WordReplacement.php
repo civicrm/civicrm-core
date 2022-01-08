@@ -66,14 +66,15 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement implemen
   }
 
   /**
-   * Save the values of a WordReplacement.
+   * Deprecated update function.
    *
+   * @deprecated
    * @param array $params
    * @param int $id
-   *
    * @return array
    */
   public static function edit(&$params, &$id) {
+    CRM_Core_Error::deprecatedWarning('APIv4');
     $wordReplacement = new CRM_Core_DAO_WordReplacement();
     $wordReplacement->id = $id;
     $wordReplacement->copyValues($params);
@@ -85,10 +86,10 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement implemen
   }
 
   /**
-   * Create a new WordReplacement.
+   * Deprecated create function.
    *
+   * @deprecated
    * @param array $params
-   *
    * @return array
    */
   public static function create($params) {
