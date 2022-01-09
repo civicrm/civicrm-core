@@ -328,15 +328,15 @@ WHERE  id IN ( $idString )
     $ids = ['contact' => $contactID];
 
     $relationshipIds = [];
-    foreach ($params['contact_check'] as $key => $value) {
+    foreach (array_keys($params['contact_check']) as $organizationID) {
       // check if the relationship is valid between contacts.
       // step 1: check if the relationship is valid if not valid skip and keep the count
       // step 2: check the if two contacts already have a relationship if yes skip and keep the count
       // step 3: if valid relationship then add the relation and keep the count
 
       // step 1
-      $contactFields = CRM_Contact_BAO_Relationship::setContactABFromIDs($params, $ids, $key);
-      $errors = CRM_Contact_BAO_Relationship::checkValidRelationship($contactFields, $ids, $key);
+      $contactFields = CRM_Contact_BAO_Relationship::setContactABFromIDs($params, $ids, $organizationID);
+      $errors = CRM_Contact_BAO_Relationship::checkValidRelationship($contactFields, $ids, $organizationID);
       if ($errors) {
         $invalid++;
         continue;
@@ -347,7 +347,7 @@ WHERE  id IN ( $idString )
           $contactFields,
           CRM_Utils_Array::value('contact', $ids),
           // step 2
-          $key
+          $organizationID
         )
       ) {
         $duplicate++;
