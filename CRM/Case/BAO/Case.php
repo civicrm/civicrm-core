@@ -48,7 +48,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Case_BAO_Case
+   * @return CRM_Case_DAO_Case
    */
   public static function add(&$params) {
     $caseDAO = new CRM_Case_DAO_Case();
@@ -65,7 +65,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return CRM_Case_BAO_Case
+   * @return CRM_Case_DAO_Case
    */
   public static function &create(&$params) {
     // CRM-20958 - These fields are managed by MySQL triggers. Watch out for clients resaving stale timestamps.
