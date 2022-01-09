@@ -1302,29 +1302,20 @@ function _civicrm_api3_basic_get($bao_name, $params, $returnAsSuccess = TRUE, $e
 function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
   _civicrm_api3_check_edit_permissions($bao_name, $params);
   _civicrm_api3_format_params_for_create($params, $entity);
-  $args = array(&$params);
-  if ($entity) {
-    $ids = [$entity => CRM_Utils_Array::value('id', $params)];
-    $args[] = &$ids;
-  }
 
   if (method_exists($bao_name, 'create')) {
     $fct = 'create';
-    $fct_name = $bao_name . '::' . $fct;
-    $bao = call_user_func_array([$bao_name, $fct], $args);
   }
   elseif (method_exists($bao_name, 'add')) {
     $fct = 'add';
-    $fct_name = $bao_name . '::' . $fct;
-    $bao = call_user_func_array([$bao_name, $fct], $args);
   }
-  else {
-    $fct_name = '_civicrm_api3_basic_create_fallback';
-    $bao = _civicrm_api3_basic_create_fallback($bao_name, $params);
+  if (!isset($fct) || \Civi\Api4\Utils\ReflectionUtils::isMethodDeprecated($bao_name, $fct)) {
+    $fct = 'writeRecord';
   }
+  $bao = $bao_name::$fct($params);
 
   if (is_null($bao)) {
-    return civicrm_api3_create_error('Entity not created (' . $fct_name . ')');
+    return civicrm_api3_create_error("Entity not created ($bao_name::$fct)");
   }
   elseif (is_a($bao, 'CRM_Core_Error')) {
     //some weird circular thing means the error takes itself as an argument
@@ -1338,8 +1329,9 @@ function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
   }
   else {
     // If we have custom fields the BAO may have taken care of it or we may have to.
-    // $extendsMap provides a pretty good hard-coded list of BAOs that take care of the custom data.
-    if (isset($params['custom']) && empty(CRM_Core_BAO_CustomQuery::$extendsMap[$entity])) {
+    // DAO::writeRecord always handles custom data.
+    // Otherwise guess based on the $extendsMap hard-coded list of BAOs that take care of custom data.
+    if (isset($params['custom']) && $fct !== 'writeRecord' && empty(CRM_Core_BAO_CustomQuery::$extendsMap[$entity])) {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($entity)), $bao->id);
     }
     $values = [];
