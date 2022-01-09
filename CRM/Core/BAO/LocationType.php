@@ -17,10 +17,13 @@
 class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Civi\Test\HookInterface {
 
   /**
-   * Static holder for the default LT.
-   * @var int
+   * @var CRM_Core_DAO_LocationType|null
    */
   public static $_defaultLocationType = NULL;
+
+  /**
+   * @var int|null
+   */
   public static $_billingLocationType = NULL;
 
   /**
@@ -31,7 +34,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Ci
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_BAO_LocaationType|null
+   * @return CRM_Core_DAO_LocationType|null
    *   object on success, null otherwise
    */
   public static function retrieve(&$params, &$defaults) {

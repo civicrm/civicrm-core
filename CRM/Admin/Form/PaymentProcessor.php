@@ -28,7 +28,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   protected $_testID;
 
   /**
-   * @var \CRM_Core_DAO_PaymentProcessor
+   * @var \CRM_Financial_DAO_PaymentProcessorType
    * Payment Processor DAO Object
    */
   protected $_paymentProcessorDAO;
