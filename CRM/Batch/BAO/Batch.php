@@ -329,16 +329,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
         $values['id']
       );
       // CRM-21205
-      $values['currency'] = CRM_Core_DAO::singleValueQuery("
-        SELECT GROUP_CONCAT(DISTINCT ft.currency)
-        FROM  civicrm_batch batch
-        JOIN civicrm_entity_batch eb
-          ON batch.id = eb.batch_id
-        JOIN civicrm_financial_trxn ft
-          ON eb.entity_id = ft.id
-        WHERE batch.id = %1
-        GROUP BY batch.id
-      ", [1 => [$values['id'], 'Positive']]);
+      $values['currency'] = CRM_Batch_BAO_EntityBatch::getBatchCurrency($values['id']);
       $results[$values['id']] = $values;
     }
 
