@@ -893,7 +893,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
                 'contact' => $primaryContactId,
               ];
 
-              [$valid, $invalid, $duplicate, $saved, $relationshipIds] = CRM_Contact_BAO_Relationship::legacyCreateMultiple($relationParams, $relationIds);
+              [$valid, $duplicate] = CRM_Contact_BAO_Relationship::legacyCreateMultiple($relationParams, $relationIds);
 
               if ($valid || $duplicate) {
                 $relationIds['contactTarget'] = $relContactId;
