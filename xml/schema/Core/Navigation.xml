@@ -125,6 +125,8 @@
     <title>Is Active</title>
     <type>boolean</type>
     <comment>Is this navigation item active?</comment>
+    <default>1</default>
+    <required>true</required>
     <add>3.0</add>
   </field>
   <field>
@@ -143,6 +145,8 @@
     <title>Order</title>
     <type>int</type>
     <comment>Ordering of the navigation items in various blocks.</comment>
+    <default>0</default>
+    <required>true</required>
     <add>3.0</add>
   </field>
 </table>
