@@ -2704,10 +2704,16 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         return CRM_Core_BAO_Note::getContactNoteCount($contactId);
 
       case 'contribution':
-        return CRM_Contribute_BAO_Contribution::contributionCount($contactId);
+        if (array_key_exists('CiviContribute', CRM_Core_Component::getEnabledComponents())) {
+          return CRM_Contribute_BAO_Contribution::contributionCount($contactId);
+        }
+        return FALSE;
 
       case 'membership':
-        return CRM_Member_BAO_Membership::getContactMembershipCount((int) $contactId, TRUE);
+        if (array_key_exists('CiviMember', CRM_Core_Component::getEnabledComponents())) {
+          return CRM_Member_BAO_Membership::getContactMembershipCount((int) $contactId, TRUE);
+        }
+        return FALSE;
 
       case 'participant':
         return CRM_Event_BAO_Participant::getContactParticipantCount($contactId);
