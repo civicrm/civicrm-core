@@ -55,7 +55,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       throw new CRM_Core_Exception('Duplicate Relationship');
     }
     $params = $extendedParams;
-    if (self::checkValidRelationship($params, $params, 0)) {
+    if (!CRM_Contact_BAO_Relationship::checkRelationshipType($params['contact_id_a'], $params['contact_id_b'],
+      $params['relationship_type_id'])) {
       throw new CRM_Core_Exception('Invalid Relationship');
     }
     $relationship = self::add($params);
@@ -182,8 +183,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
     // step 1
     $contactFields = self::setContactABFromIDs($params, $ids, $relatedContactID);
-    $errors = self::checkValidRelationship($contactFields, $ids, $relatedContactID);
-    if ($errors) {
+    if (!CRM_Contact_BAO_Relationship::checkRelationshipType($contactFields['contact_id_a'], $contactFields['contact_id_b'],
+      $contactFields['relationship_type_id'])) {
       return [0, 0];
     }
 
@@ -208,7 +209,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     $relationship = self::add($singleInstanceParams);
 
     // do not add to recent items for import, CRM-4399
-    if (!(!empty($params['skipRecentView']))) {
+    if (empty($params['skipRecentView'])) {
       self::addRecent($params, $relationship);
     }
 
@@ -840,10 +841,13 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param int $contactId
    *   This is contact id for adding relationship.
    *
+   * @deprecated
+   *
    * @return string
    */
   public static function checkValidRelationship($params, $ids, $contactId) {
     $errors = '';
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     // function to check if the relationship selected is correct
     // i.e. employer relationship can exit between Individual and Organization (not between Individual and Individual)
     if (!CRM_Contact_BAO_Relationship::checkRelationshipType($params['contact_id_a'], $params['contact_id_b'],

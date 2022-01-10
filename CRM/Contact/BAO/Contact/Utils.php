@@ -339,8 +339,8 @@ WHERE  id IN ( $idString )
 
     // step 1
     $contactFields = CRM_Contact_BAO_Relationship::setContactABFromIDs($params, $ids, $organizationID);
-    $errors = CRM_Contact_BAO_Relationship::checkValidRelationship($contactFields, $ids, $organizationID);
-    if ($errors) {
+    if (!CRM_Contact_BAO_Relationship::checkRelationshipType($contactFields['contact_id_a'], $contactFields['contact_id_b'],
+      $contactFields['relationship_type_id'])) {
       return [0, []];
     }
 

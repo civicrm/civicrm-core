@@ -147,14 +147,15 @@ DELETE FROM civicrm_contact_type
   }
 
   /**
-   * Methods create relationshipe within same contact type with valid data.
-   * success expected
+   * Methods create relationships within same contact type with valid data.
+   *
+   * Success expected
    */
-  public function testRelationshipCreateWithinSameType() {
+  public function testRelationshipCreateWithinSameType(): void {
     //check for Individual to Parent
     $relTypeParams = [
-      'name_a_b' => 'indivToparent',
-      'name_b_a' => 'parentToindiv',
+      'name_a_b' => 'individualToParent',
+      'name_b_a' => 'parentToIndividual',
       'contact_type_a' => 'Individual',
       'contact_type_b' => 'Individual',
       'contact_sub_type_b' => $this->parent,
@@ -166,7 +167,7 @@ DELETE FROM civicrm_contact_type
       'contact_check' => [$this->indivi_parent => $this->indivi_parent],
     ];
     $ids = ['contact' => $this->individual];
-    list($valid) = CRM_Contact_BAO_Relationship::legacyCreateMultiple($params, $ids);
+    [$valid] = CRM_Contact_BAO_Relationship::legacyCreateMultiple($params, $ids);
 
     $this->assertEquals($valid, 1);
   }
