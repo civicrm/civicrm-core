@@ -884,7 +884,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $includeComponent = !$excludeComponentHandledActivities || !empty($compObj->info['showActivitiesInCore']);
       if ($includeComponent) {
         if ($compObj->info['name'] == 'CiviCampaign') {
-          $componentPermission = "administer {$compObj->name}";
+          $componentPermission = "manage campaign";
         }
         else {
           $componentPermission = "access {$compObj->name}";
