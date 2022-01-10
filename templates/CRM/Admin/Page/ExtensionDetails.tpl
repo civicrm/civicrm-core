@@ -62,9 +62,4 @@
     <tr>
       <td class="label">{ts}Local path{/ts}</td><td>{if !empty($extension.path)}{$extension.path|escape}{/if}</td>
     </tr>
-    {if !empty($extension.downloadUrl)}
-    <tr>
-      <td class="label">{ts}Download location{/ts}</td><td>{$extension.downloadUrl|escape}</td>
-    </tr>
-    {/if}
 </table>
