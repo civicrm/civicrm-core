@@ -506,7 +506,7 @@ contribution_recur.payment_instrument_id:name :Check
     ]);
     $tokens = $tokenProcessor->listTokens();
     // Add in custom tokens as token processor supports these.
-    $expectedTokens = array_merge($expectedTokens, $this->getTokensAdvertisedByTokenProcessorButNotLegacy());
+    $expectedTokens = array_merge($expectedTokens, $this->getTokensAdvertisedByTokenProcessorButNotLegacy(), $this->getContributionRecurTokens());
     $this->assertEquals(array_merge($expectedTokens, $this->getDomainTokens()), $tokens);
     $tokenProcessor->addMessage('html', $tokenString, 'text/plain');
     $tokenProcessor->addRow(['membershipId' => $this->getMembershipID()]);

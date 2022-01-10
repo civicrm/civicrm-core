@@ -311,11 +311,88 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     return $tokenProcessor->evaluate()->getRow(0);
   }
 
+  /**
+   * Check that we can render contribution and contribution_recur tokens when passing a contribution ID.
+   * This checks ImpliedContextSubscriber
+   *
+   * @return void
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testRenderContributionRecurTokenFromContribution(): void {
+    $cid = $this->individualCreate();
+    $crid = \Civi\Api4\ContributionRecur::create(FALSE)
+      ->addValue('contact_id', $cid)
+      ->addValue('amount', 5)
+      ->execute()
+      ->first()['id'];
+    $coid = $this->contributionCreate(['contact_id' => $cid, 'contribution_recur_id' => $crid]);
+
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'schema' => ['contactId', 'contributionId'],
+      'smarty' => FALSE,
+    ]);
+    $tokenProcessor->addMessage('text', '!!{contribution.id}{contribution_recur.id}!!', 'text/plain');
+    $tokenProcessor->addRow()->context(['contactId' => $cid, 'contributionId' => $coid]);
+
+    $expectText = [
+      "!!{$coid}{$crid}!!",
+    ];
+
+    $rowCount = 0;
+    foreach ($tokenProcessor->evaluate()->getRows() as $key => $row) {
+      /** @var TokenRow */
+      $this->assertTrue($row instanceof TokenRow);
+      $this->assertEquals($expectText[$key], $row->render('text'));
+      $rowCount++;
+    }
+    $this->assertEquals(1, $rowCount);
+  }
+
+  /**
+   * Check that we can render membership and contribution_recur tokens when passing a membership ID.
+   * This checks ImpliedContextSubscriber
+   *
+   * @return void
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testRenderContributionRecurTokenFromMembership(): void {
+    $cid = $this->individualCreate();
+    $crid = \Civi\Api4\ContributionRecur::create(FALSE)
+      ->addValue('contact_id', $cid)
+      ->addValue('amount', 5)
+      ->execute()
+      ->first()['id'];
+    $mid = $this->contactMembershipCreate(['contribution_recur_id' => $crid, 'contact_id' => $cid]);
+
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'schema' => ['contactId', 'membershipId'],
+      'smarty' => FALSE,
+    ]);
+    $tokenProcessor->addMessage('text', '!!{membership.id}{contribution_recur.id}!!', 'text/plain');
+    $tokenProcessor->addRow()->context(['contactId' => $cid, 'membershipId' => $mid]);
+
+    $expectText = [
+      "!!{$mid}{$crid}!!",
+    ];
+
+    $rowCount = 0;
+    foreach ($tokenProcessor->evaluate()->getRows() as $key => $row) {
+      /** @var TokenRow */
+      $this->assertTrue($row instanceof TokenRow);
+      $this->assertEquals($expectText[$key], $row->render('text'));
+      $rowCount++;
+    }
+    $this->assertEquals(1, $rowCount);
+  }
+
   public function testGetMessageTokens(): void {
     $tokenProcessor = $this->getTokenProcessor();
     $tokenProcessor->addMessage('greeting_html', 'Good morning, <p>{contact.display_name}</p>. {custom.foobar}!', 'text/html');
     $tokenProcessor->addMessage('greeting_text', 'Good morning, {contact.display_name}. {custom.whiz_bang}, {contact.first_name}!', 'text/plain');
-
     $expected = [
       'contact' => ['display_name', 'first_name'],
       'custom' => ['foobar', 'whiz_bang'],

@@ -109,6 +109,18 @@ class ImpliedContextSubscriber implements EventSubscriberInterface {
       'fk' => 'civicrm_participant.event_id',
       'destEntityId' => 'eventId',
     ];
+    yield [
+      'srcEntityId' => 'membershipId',
+      'srcEntityRec' => 'membership',
+      'fk' => 'civicrm_membership.contribution_recur_id',
+      'destEntityId' => 'contribution_recurId',
+    ];
+    yield [
+      'srcEntityId' => 'contributionId',
+      'srcEntityRec' => 'contribution',
+      'fk' => 'civicrm_contribution.contribution_recur_id',
+      'destEntityId' => 'contribution_recurId',
+    ];
   }
 
 }
