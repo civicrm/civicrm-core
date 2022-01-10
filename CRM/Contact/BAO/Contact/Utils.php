@@ -279,13 +279,8 @@ WHERE  id IN ( $idString )
       }
 
       // create employee of relationship
-      $relationshipParams = [
-        'is_active' => TRUE,
-        'relationship_type_id' => $relTypeId . '_a_b',
-        'contact_check' => [$organization => TRUE],
-      ];
       [$duplicate, $relationshipIds]
-        = self::legacyCreateMultiple($relationshipParams, $contactID);
+        = self::legacyCreateMultiple($relTypeId, $organization, $contactID);
 
       // In case we change employer, clean previous employer related records.
       if (!$previousEmployerID && !$newContact) {
@@ -300,7 +295,12 @@ WHERE  id IN ( $idString )
       // set current employer
       self::setCurrentEmployer([$contactID => $organization]);
 
-      $relationshipParams['relationship_ids'] = $relationshipIds;
+      $relationshipParams = [
+        'relationship_ids' => $relationshipIds,
+        'is_active' => 1,
+        'contact_check' => [$organization => TRUE],
+        'relationship_type_id' => $relTypeId . '_a_b',
+      ];
       // Handle related memberships. CRM-3792
       self::currentEmployerRelatedMembership($contactID, $organization, $relationshipParams, $duplicate, $previousEmployerID);
     }
@@ -315,16 +315,20 @@ WHERE  id IN ( $idString )
    * For multiple a new variant of this function needs to be written and migrated to as this is a bit
    * nasty
    *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   * @param int $relationshipTypeID
+   * @param int $organization
    * @param int $contactID
    *
    * @return array
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  private static function legacyCreateMultiple(&$params, int $contactID) {
-    $invalid = $duplicate = 0;
+  private static function legacyCreateMultiple(int $relationshipTypeID, int $organization, int $contactID): array {
+    $params = [
+      'is_active' => TRUE,
+      'relationship_type_id' => $relationshipTypeID . '_a_b',
+      'contact_check' => [$organization => TRUE],
+    ];
     $ids = ['contact' => $contactID];
 
     $relationshipIds = [];
@@ -338,8 +342,7 @@ WHERE  id IN ( $idString )
       $contactFields = CRM_Contact_BAO_Relationship::setContactABFromIDs($params, $ids, $organizationID);
       $errors = CRM_Contact_BAO_Relationship::checkValidRelationship($contactFields, $ids, $organizationID);
       if ($errors) {
-        $invalid++;
-        continue;
+        return [0, []];
       }
 
       if (
@@ -350,8 +353,7 @@ WHERE  id IN ( $idString )
           $organizationID
         )
       ) {
-        $duplicate++;
-        continue;
+        return [1, []];
       }
 
       $singleInstanceParams = array_merge($params, $contactFields);
@@ -359,12 +361,9 @@ WHERE  id IN ( $idString )
       $relationshipIds[] = $relationship->id;
     }
 
-    // do not add to recent items for import, CRM-4399
-    if (!(!empty($params['skipRecentView']) || $invalid || $duplicate)) {
-      CRM_Contact_BAO_Relationship::addRecent($params, $relationship);
-    }
+    CRM_Contact_BAO_Relationship::addRecent($params, $relationship);
 
-    return [$duplicate, $relationshipIds];
+    return [0, $relationshipIds];
   }
 
   /**
