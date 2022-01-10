@@ -162,9 +162,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public static function legacyCreateMultiple(&$params, $ids = []) {
-    $valid = $invalid = $duplicate = $saved = 0;
-    $relationships = $relationshipIds = [];
+  public static function legacyCreateMultiple($params, $ids = []) {
     // clarify that the only key ever pass in the ids array is 'contact'
     // There is legacy handling for other keys but a universe search on
     // calls to this function (not supported to be called from outside core)
@@ -174,11 +172,14 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     $ids = ['contact' => $ids['contact']];
     // Likewise neither place ever passed in relationshipID
     $relationshipId = NULL;
+    // There is only ever one value passed in from the 2 places above that call
+    // this - by clarifying here like this we can cleanup within this
+    // function without having to do more universe searches.
+    $relatedContactIDs = [key($params['contact_check'])];
 
     if (!$relationshipId) {
       // creating a new relationship
-      $relationshipIds = [];
-      foreach (array_keys($params['contact_check']) as $relatedContactID) {
+      foreach ($relatedContactIDs as $relatedContactID) {
         // check if the relationship is valid between contacts.
         // step 1: check if the relationship is valid if not valid skip and keep the count
         // step 2: check the if two contacts already have a relationship if yes skip and keep the count
@@ -188,8 +189,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         $contactFields = self::setContactABFromIDs($params, $ids, $relatedContactID);
         $errors = self::checkValidRelationship($contactFields, $ids, $relatedContactID);
         if ($errors) {
-          $invalid++;
-          continue;
+          return [0, 0];
         }
 
         //CRM-16978:check duplicate relationship as per case id.
@@ -206,25 +206,21 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           $relatedContactID
         )
         ) {
-          $duplicate++;
-          continue;
+          return [0, 1];
         }
 
         $singleInstanceParams = array_merge($params, $contactFields);
         $relationship = self::add($singleInstanceParams);
-        $relationshipIds[] = $relationship->id;
-        $relationships[$relationship->id] = $relationship;
-        $valid++;
       }
       // editing the relationship
     }
 
     // do not add to recent items for import, CRM-4399
-    if (!(!empty($params['skipRecentView']) || $invalid || $duplicate)) {
+    if (!(!empty($params['skipRecentView']))) {
       self::addRecent($params, $relationship);
     }
 
-    return [$valid, $duplicate];
+    return [1, 0];
   }
 
   /**
