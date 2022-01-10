@@ -436,7 +436,7 @@ class CRM_Utils_Mail {
 
   /**
    * @param string $name
-   * @param $email
+   * @param string $email
    * @param bool $useQuote
    *
    * @return null|string
