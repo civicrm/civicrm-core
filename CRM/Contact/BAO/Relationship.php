@@ -170,50 +170,42 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     // and the other in jma grant applications (CRM_Grant_Form_Grant_Confirm)
     // both only pass in contact as a key here.
     $ids = ['contact' => $ids['contact']];
-    // Likewise neither place ever passed in relationshipID
-    $relationshipId = NULL;
     // There is only ever one value passed in from the 2 places above that call
     // this - by clarifying here like this we can cleanup within this
     // function without having to do more universe searches.
-    $relatedContactIDs = [key($params['contact_check'])];
+    $relatedContactID = key($params['contact_check']);
 
-    if (!$relationshipId) {
-      // creating a new relationship
-      foreach ($relatedContactIDs as $relatedContactID) {
-        // check if the relationship is valid between contacts.
-        // step 1: check if the relationship is valid if not valid skip and keep the count
-        // step 2: check the if two contacts already have a relationship if yes skip and keep the count
-        // step 3: if valid relationship then add the relation and keep the count
+    // check if the relationship is valid between contacts.
+    // step 1: check if the relationship is valid if not valid skip and keep the count
+    // step 2: check the if two contacts already have a relationship if yes skip and keep the count
+    // step 3: if valid relationship then add the relation and keep the count
 
-        // step 1
-        $contactFields = self::setContactABFromIDs($params, $ids, $relatedContactID);
-        $errors = self::checkValidRelationship($contactFields, $ids, $relatedContactID);
-        if ($errors) {
-          return [0, 0];
-        }
-
-        //CRM-16978:check duplicate relationship as per case id.
-        // https://issues.civicrm.org/jira/browse/CRM-16978
-        if ($caseId = CRM_Utils_Array::value('case_id', $params)) {
-          CRM_Core_Error::deprecatedWarning('this code is believed to be unreachable');
-          $contactFields['case_id'] = $caseId;
-        }
-        if (
-        self::checkDuplicateRelationship(
-          $contactFields,
-          CRM_Utils_Array::value('contact', $ids),
-          // step 2
-          $relatedContactID
-        )
-        ) {
-          return [0, 1];
-        }
-
-        $singleInstanceParams = array_merge($params, $contactFields);
-        $relationship = self::add($singleInstanceParams);
-      }
-      // editing the relationship
+    // step 1
+    $contactFields = self::setContactABFromIDs($params, $ids, $relatedContactID);
+    $errors = self::checkValidRelationship($contactFields, $ids, $relatedContactID);
+    if ($errors) {
+      return [0, 0];
     }
+
+    //CRM-16978:check duplicate relationship as per case id.
+    // https://issues.civicrm.org/jira/browse/CRM-16978
+    if ($caseId = CRM_Utils_Array::value('case_id', $params)) {
+      CRM_Core_Error::deprecatedWarning('this code is believed to be unreachable');
+      $contactFields['case_id'] = $caseId;
+    }
+    if (
+    self::checkDuplicateRelationship(
+      $contactFields,
+      CRM_Utils_Array::value('contact', $ids),
+      // step 2
+      $relatedContactID
+    )
+    ) {
+      return [0, 1];
+    }
+
+    $singleInstanceParams = array_merge($params, $contactFields);
+    $relationship = self::add($singleInstanceParams);
 
     // do not add to recent items for import, CRM-4399
     if (!(!empty($params['skipRecentView']))) {
