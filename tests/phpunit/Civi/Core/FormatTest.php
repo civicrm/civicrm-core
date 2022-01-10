@@ -208,6 +208,78 @@ class FormatTest extends CiviUnitTestCase {
         'money_number_long' => '1 234,500',
       ],
     ];
+    $cases['en_US_USD_blank'] = [
+      [
+        'amount' => '',
+        'locale' => 'en_US',
+        'currency' => 'USD',
+        'money' => '',
+        'money_number' => '',
+        'money_number_long' => '',
+        'number' => '',
+        'money_long' => '',
+      ],
+    ];
+    $cases['en_US_USD_null'] = [
+      [
+        'amount' => NULL,
+        'locale' => 'en_US',
+        'currency' => 'USD',
+        'money' => '',
+        'money_number' => '',
+        'money_number_long' => '',
+        'number' => '',
+        'money_long' => '',
+      ],
+    ];
+    $cases['en_US_USD_0_int'] = [
+      [
+        'amount' => 0,
+        'locale' => 'en_US',
+        'currency' => 'USD',
+        'money' => '$0.00',
+        'money_number' => '0.00',
+        'money_number_long' => '0.00',
+        'number' => '0',
+        'money_long' => '$0.00',
+      ],
+    ];
+    $cases['en_US_USD_0_float'] = [
+      [
+        'amount' => 0.0,
+        'locale' => 'en_US',
+        'currency' => 'USD',
+        'money' => '$0.00',
+        'money_number' => '0.00',
+        'money_number_long' => '0.00',
+        'number' => '0',
+        'money_long' => '$0.00',
+      ],
+    ];
+    $cases['en_US_USD_0_string'] = [
+      [
+        'amount' => '0',
+        'locale' => 'en_US',
+        'currency' => 'USD',
+        'money' => '$0.00',
+        'money_number' => '0.00',
+        'money_number_long' => '0.00',
+        'number' => '0',
+        'money_long' => '$0.00',
+      ],
+    ];
+    $cases['en_US_USD_0_string2'] = [
+      [
+        'amount' => '0.00',
+        'locale' => 'en_US',
+        'currency' => 'USD',
+        'money' => '$0.00',
+        'money_number' => '0.00',
+        'money_number_long' => '0.00',
+        'number' => '0',
+        'money_long' => '$0.00',
+      ],
+    ];
     return $cases;
   }
 
@@ -222,7 +294,6 @@ class FormatTest extends CiviUnitTestCase {
     $this->assertEquals($testData['number'], Civi::format()->number($testData['amount'], $testData['locale']));
     $this->assertEquals($testData['money_long'], Civi::format()->moneyLong($testData['amount'], $testData['currency'], $testData['locale']));
     $this->assertEquals($testData['money_number_long'], Civi::format()->moneyNumberLong($testData['amount'], $testData['currency'], $testData['locale']));
-
   }
 
 }
