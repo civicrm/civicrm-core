@@ -26,7 +26,7 @@
   </tbody>
 </table>
 
-<div class="crm-submit-buttons">{if in_array($batchStatus, array('Open', 'Reopened'))}{$form.close_batch.html}{/if} {$form.export_batch.html}</div>
+<div class="crm-submit-buttons">{if array_key_exists('close_batch', $form)}{$form.close_batch.html}{/if} {if array_key_exists('close_batch', $form)}{$form.export_batch.html}{/if}</div>
 
 {if in_array($batchStatus, array('Open', 'Reopened'))} {* Add / remove transactions only allowed for Open/Reopened batches *}
   <br /><div class="form-layout-compressed">{$form.trans_remove.html}&nbsp;{$form.rSubmit.html}</div><br/>
@@ -75,17 +75,17 @@ CRM.$(function($) {
 });
 function assignRemove(recordID, op) {
   var recordBAO = 'CRM_Batch_BAO_Batch';
-  if (op == 'assign' || op == 'remove') {
-    recordBAO = 'CRM_Batch_BAO_EntityBatch';   
+  if (op === 'assign' || op === 'remove') {
+    recordBAO = 'CRM_Batch_BAO_EntityBatch';
   }
   var entityID = {/literal}"{$entityID}"{literal};
-  if (op == 'close' || op == 'export') {
+  if (op === 'close' || op === 'export') {
     var mismatch = checkMismatch();
   }
   else {
     CRM.$('#mark_x_' + recordID).closest('tr').block({message: {/literal}'{ts escape="js"}Updating{/ts}'{literal}});
   }
-  if (op == 'close' || (op == 'export' && mismatch.length)) {
+  if (op === 'close' || (op === 'export' && mismatch.length)) {
     CRM.$("#enableDisableStatusMsg").dialog({
       title: {/literal}'{ts escape="js"}Close Batch{/ts}'{literal},
       modal: true,
