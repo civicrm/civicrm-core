@@ -300,7 +300,6 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
     if (isset($fv['merge_same_address'])) {
       CRM_Core_BAO_Address::mergeSameAddress($rows);
-      $individualFormat = TRUE;
     }
 
     // format the addresses according to CIVICRM_ADDRESS_FORMAT (CRM-1327)
@@ -316,18 +315,6 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       }
       $row['id'] = $id;
       $formatted = CRM_Utils_Address::format($row, 'mailing_format', FALSE, TRUE, $tokenFields);
-
-      // CRM-2211: UFPDF doesn't have bidi support; use the PECL fribidi package to fix it.
-      // On Ubuntu (possibly Debian?) be aware of http://pecl.php.net/bugs/bug.php?id=12366
-      // Due to FriBidi peculiarities, this can't be called on
-      // a multi-line string, hence the explode+implode approach.
-      if (function_exists('fribidi_log2vis')) {
-        $lines = explode("\n", $formatted);
-        foreach ($lines as $i => $line) {
-          $lines[$i] = fribidi_log2vis($line, FRIBIDI_AUTO, FRIBIDI_CHARSET_UTF8);
-        }
-        $formatted = implode("\n", $lines);
-      }
       $rows[$id] = [$formatted];
     }
 
@@ -336,7 +323,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     }
 
     //call function to create labels
-    self::createLabel($rows, $fv['label_name']);
+    $this->createLabel($rows, $fv['label_name']);
     CRM_Utils_System::civiExit();
   }
 
