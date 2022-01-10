@@ -2245,6 +2245,9 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         // array_filter with strlen filters out NULL, '' and FALSE but not 0.
       ], 'strlen')
     );
+    if (!empty($input['amount'])) {
+      $templateContribution['total_amount'] = $input['amount'];
+    }
     $contributionParams['line_item'] = $templateContribution['line_item'];
     $contributionParams['status_id'] = 'Pending';
 
