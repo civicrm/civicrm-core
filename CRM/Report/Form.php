@@ -1115,7 +1115,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @param string $group
    * @param string $grpFieldName
    *
-   * @return bool
+   * @return object|bool
    */
   public function getElementFromGroup($group, $grpFieldName) {
     $eleObj = $this->getElement($group);
@@ -2224,7 +2224,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * Get SQL where clause for contact subtypes
-   * @param string $field
+   * @param array $field Field specifications
    * @param mixed $value
    * @param string $op SQL Operator
    *

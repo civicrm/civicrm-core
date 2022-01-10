@@ -4948,7 +4948,7 @@ civicrm_relationship.start_date > {$today}
    *
    * @param bool $skipOrderAndLimit
    *
-   * @return CRM_Core_DAO
+   * @return string|null|CRM_Core_DAO
    */
   public function searchQuery(
     $offset = 0, $rowCount = 0, $sort = NULL,

@@ -88,7 +88,7 @@ abstract class CRM_SMS_Provider {
    *
    * Child class could override this function to have better control over the message being sent.
    *
-   * @param string $message
+   * @param Mail_mime $message
    * @param int $contactID
    * @param array $contactDetails
    *

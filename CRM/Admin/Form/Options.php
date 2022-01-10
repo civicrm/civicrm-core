@@ -342,7 +342,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param array $self
+   * @param self $self
    *   Current form object.
    *
    * @return array

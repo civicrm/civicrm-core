@@ -151,7 +151,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param array $self
+   * @param self $self
    *   This object.
    *
    * @return bool|array

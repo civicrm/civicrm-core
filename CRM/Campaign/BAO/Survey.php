@@ -549,8 +549,8 @@ INNER JOIN  civicrm_activity_contact activityAssignment
    * @param array $voterIds
    * @param bool $onlyCount
    *
-   * @return array
-   *   An array of survey activity.
+   * @return array|int
+   *   An array of survey activity, or an int if $onlyCount is set to TRUE
    */
   public static function getSurveyActivities(
     $surveyId,

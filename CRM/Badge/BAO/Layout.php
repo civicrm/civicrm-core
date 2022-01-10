@@ -145,7 +145,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   /**
    * Decode encoded data and return as an array.
    *
-   * @param json $jsonData
+   * @param string $jsonData
    *   Json object.
    *
    * @return array

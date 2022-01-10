@@ -48,7 +48,7 @@ class CRM_Utils_REST {
    * @param string $var
    *   The string to be echoed.
    *
-   * @return string
+   * @return array
    */
   public static function ping($var = NULL) {
     $session = CRM_Core_Session::singleton();

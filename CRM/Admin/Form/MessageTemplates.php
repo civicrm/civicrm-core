@@ -244,7 +244,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param array $self
+   * @param self $self
    *
    * @return array
    *   array of errors

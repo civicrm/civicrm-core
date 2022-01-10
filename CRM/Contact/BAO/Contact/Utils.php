@@ -139,8 +139,8 @@ WHERE  id IN ( $idString )
    * @param string $entityType
    * @param null $hashSize
    *
-   * @return array
-   *   ( $cs, $ts, $live )
+   * @return string
+   *   (Underscore separated: $cs, $ts, $live )
    * @throws \CRM_Core_Exception
    */
   public static function generateChecksum($entityId, $ts = NULL, $live = NULL, $hash = NULL, $entityType = 'contact', $hashSize = NULL) {
@@ -402,7 +402,7 @@ WHERE  id IN ( $idString )
       }
     }
 
-    //need to handle related meberships. CRM-3792
+    //need to handle related memberships. CRM-3792
     if ($previousEmpID != $employerID) {
       CRM_Contact_BAO_Relationship::relatedMemberships($contactID, $relationshipParams, $ids, $action);
     }
@@ -455,7 +455,7 @@ WHERE id={$contactId}; ";
 
     $dao = CRM_Core_DAO::executeQuery($query);
 
-    // need to handle related meberships. CRM-3792
+    // need to handle related memberships. CRM-3792
     if ($employerId) {
       //1. disable corresponding relationship.
       //2. delete related membership.

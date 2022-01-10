@@ -274,7 +274,7 @@ class CRM_Contact_Form_Task_SMSCommon {
    * @param array $fields
    *   The input form values.
    * @param array $dontCare
-   * @param array $self
+   * @param self $self
    *   Additional values form 'this'.
    *
    * @return bool|array
