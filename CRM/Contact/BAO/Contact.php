@@ -233,7 +233,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Te
    * @param bool $skipDelete
    *   Unclear parameter, passed to website create
    *
-   * @return CRM_Contact_BAO_Contact|CRM_Core_Error
+   * @return CRM_Contact_BAO_Contact|CRM_Core_Error|NULL
    *   Created or updated contribution object. We are deprecating returning an error in
    *   favour of exceptions
    *
@@ -550,7 +550,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Te
    * @param bool $includeTypeInReturnParameters
    *   Should type be part of the returned array?
    *
-   * @return array
+   * @return array|null
    *   the displayName and contactImage for this contact
    */
   public static function getDisplayAndImage($id, $includeTypeInReturnParameters = FALSE) {
@@ -1840,16 +1840,16 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    *
    * $params int     $contactId contact_id
    * $params boolean $isPrimaryExist if true, return primary contact location type otherwise null
-   * $params boolean $skipDefaultPriamry if true, return primary contact location type otherwise null
+   * $params boolean $skipDefaultPrimary if true, return primary contact location type otherwise null
    *
    * @param int $contactId
-   * @param bool $skipDefaultPriamry
+   * @param bool $skipDefaultPrimary
    * @param null $block
    *
-   * @return int
+   * @return int|NULL
    *   $locationType location_type_id
    */
-  public static function getPrimaryLocationType($contactId, $skipDefaultPriamry = FALSE, $block = NULL) {
+  public static function getPrimaryLocationType($contactId, $skipDefaultPrimary = FALSE, $block = NULL) {
     if ($block) {
       $entityBlock = ['contact_id' => $contactId];
       $blocks = CRM_Core_BAO_Location::getValues($entityBlock);
@@ -1891,7 +1891,7 @@ WHERE  civicrm_contact.id = %1 ";
     if (isset($locationType)) {
       return $locationType;
     }
-    elseif ($skipDefaultPriamry) {
+    elseif ($skipDefaultPrimary) {
       // if there is no primary contact location then return null
       return NULL;
     }
@@ -2765,7 +2765,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
             $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $custom['1'], 'table_name');
           }
           $queryString = "SELECT count(id) FROM {$tableName} WHERE entity_id = {$contactId}";
-          return CRM_Core_DAO::singleValueQuery($queryString);
+          return (int) CRM_Core_DAO::singleValueQuery($queryString);
         }
     }
   }
@@ -3633,7 +3633,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    * @param array $appendProfiles
    *   Name of profile(s) to append to each link.
    *
-   * @return array
+   * @return array|false
    */
   public static function getEntityRefCreateLinks($appendProfiles = []) {
     // You'd think that "create contacts" would be the permission to check,

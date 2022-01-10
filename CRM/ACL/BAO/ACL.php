@@ -83,7 +83,7 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL implements \Civi\Test\HookInterfac
   /**
    * Get all ACLs owned by a given contact, including domain and group-level.
    *
-   * @param int|null $contact_id
+   * @param int $contact_id
    *   The contact ID.
    *
    * @return array
@@ -185,7 +185,7 @@ SELECT acl.*
   }
 
   /**
-   * @param $str
+   * @param string $str
    * @param int $contactID
    *
    * @return bool
@@ -219,9 +219,9 @@ SELECT count( a.id )
   }
 
   /**
-   * @param $type
-   * @param $tables
-   * @param $whereTables
+   * @param int $type
+   * @param array $tables
+   * @param array $whereTables
    * @param int $contactID
    *
    * @return null|string
@@ -314,8 +314,8 @@ SELECT g.*
    * @param int $type
    * @param int $contactID
    * @param string $tableName
-   * @param null $allGroups
-   * @param null $includedGroups
+   * @param array|null $allGroups
+   * @param array|null $includedGroups
    *
    * @return array
    */
@@ -385,7 +385,7 @@ SELECT g.*
 
   /**
    * @param int $type
-   * @param $operation
+   * @param string $operation
    *
    * @return bool
    */
@@ -456,7 +456,7 @@ SELECT g.*
    * @param int $contactID
    * @param string $tableName
    * @param int $type
-   * @param $allGroups
+   * @param array $allGroups
    *
    * @return array
    */

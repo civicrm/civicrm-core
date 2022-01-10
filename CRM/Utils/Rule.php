@@ -261,10 +261,10 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
+   * @param string $value
    * @param null $default
    *
-   * @return null
+   * @return string|null
    */
   public static function date($value, $default = NULL) {
     if (is_string($value) &&
@@ -276,10 +276,10 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
+   * @param string $value
    * @param null $default
    *
-   * @return null|string
+   * @return string|null
    */
   public static function dateTime($value, $default = NULL) {
     $result = $default;

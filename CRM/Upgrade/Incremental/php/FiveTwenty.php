@@ -118,8 +118,8 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
   /**
    * Process a single case type
    *
-   * @param $caseTypeId int
-   * @param $definition string
+   * @param int $caseTypeId
+   * @param string $definition
    *   xml string
    */
   public static function processCaseTypeAutoassignee($caseTypeId, $definition) {
@@ -213,9 +213,9 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
   /**
    * Process a single case type for _changeCaseTypeLabelToName()
    *
-   * @param $isDryRun bool
+   * @param bool $isDryRun
    *   If TRUE then don't actually change anything just report warnings.
-   * @param $caseTypeId int
+   * @param int $caseTypeId
    */
   private static function _processCaseTypeLabelName($isDryRun, $caseTypeId) {
     $messages = [];

@@ -913,7 +913,7 @@ class CRM_Utils_Date {
    * @param date $targetDate
    *   Target Date. (show age on specific date)
    *
-   * @return int
+   * @return array
    *   array $results contains years or months
    */
   public static function calculateAge($birthDate, $targetDate = NULL) {

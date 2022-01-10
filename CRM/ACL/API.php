@@ -33,7 +33,7 @@ class CRM_ACL_API {
    *
    * @param string $str
    *   The permission to check.
-   * @param int $contactID
+   * @param int|null $contactID
    *   The contactID for whom the check is made.
    *
    * @return bool
@@ -64,7 +64,7 @@ class CRM_ACL_API {
    *   (reference ) add the tables that are needed for the select clause.
    * @param array $whereTables
    *   (reference ) add the tables that are needed for the where clause.
-   * @param int $contactID
+   * @param int|null $contactID
    *   The contactID for whom the check is made.
    * @param bool $onlyDeleted
    *   Whether to include only deleted contacts.
@@ -135,12 +135,12 @@ class CRM_ACL_API {
    *
    * @param int $type
    *   The type of permission needed.
-   * @param int $contactID
+   * @param int|null $contactID
    *   The contactID for whom the check is made.
    *
    * @param string $tableName
-   * @param null $allGroups
-   * @param null $includedGroups
+   * @param array|null $allGroups
+   * @param array|null $includedGroups
    *
    * @return array
    *   the ids of the groups for which the user has permissions
@@ -165,11 +165,11 @@ class CRM_ACL_API {
    * @param int $type
    *   The type of permission needed.
    * @param int $groupID
-   * @param int $contactID
+   * @param int|null $contactID
    *   The contactID for whom the check is made.
    * @param string $tableName
-   * @param null $allGroups
-   * @param null $includedGroups
+   * @param array|null $allGroups
+   * @param array|null $includedGroups
    *
    * @return bool
    */
