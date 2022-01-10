@@ -18,7 +18,7 @@
 /**
  * Format the given monetary amount (and currency) for display
  *
- * @param float $amount
+ * @param string|int|float $amount
  *   The monetary amount up for display.
  * @param string|null $currency
  *   The (optional) currency.
