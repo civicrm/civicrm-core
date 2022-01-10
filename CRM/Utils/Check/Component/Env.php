@@ -600,7 +600,11 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       return $messages;
     }
 
-    $keys = array_keys($manager->getStatuses());
+    $stauses = $manager->getStatuses();
+    $keys = array_keys($stauses);
+    $enabled = array_keys(array_filter($stauses, function($status) {
+      return $status === CRM_Extension_Manager::STATUS_INSTALLED;
+    }));
     sort($keys);
     $updates = $errors = $okextensions = [];
 
@@ -619,7 +623,10 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
           break;
 
         case CRM_Extension_Manager::STATUS_INSTALLED:
-          if (!empty($remotes[$key]) && version_compare($row['version'], $remotes[$key]->version, '<')) {
+          if (!empty($row['requires']) && array_diff($row['requires'], $enabled)) {
+            $errors[] = ts('%1 extension depends on %2, which is not enabled.', [1 => $row['label'] ?? $key, 2 => implode(', ', array_diff($row['requires'], $enabled))]);
+          }
+          elseif (!empty($remotes[$key]) && version_compare($row['version'], $remotes[$key]->version, '<')) {
             $updates[] = $row['label'] . ': ' . $mapper->getUpgradeLink($remotes[$key], $row);
           }
           else {
