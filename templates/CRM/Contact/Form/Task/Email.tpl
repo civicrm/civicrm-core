@@ -68,7 +68,7 @@
   {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignTrClass="crm-contactEmail-form-block-campaign_id"}
 </table>
 
-{include file="CRM/Contact/Form/Task/EmailCommon.tpl"}
+{include file="CRM/Contact/Form/Task/EmailCommon.tpl" noAttach=0}
 {include file="CRM/Activity/Form/FollowUp.tpl" type='email-'}
 
 <div class="spacer"> </div>
