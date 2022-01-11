@@ -33,13 +33,6 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->useTransaction(TRUE);
   }
 
-  public function testAddFormattedParam() {
-    $values = ['contact_type' => 'Individual'];
-    $params = ['something' => 1];
-    $result = _civicrm_api3_deprecated_add_formatted_param($values, $params);
-    $this->assertTrue($result);
-  }
-
   public function testCheckPermissionReturn() {
     $check = ['check_permissions' => TRUE];
     $config = CRM_Core_Config::singleton();
