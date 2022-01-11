@@ -429,7 +429,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return string
    */
   private function getUrl(string $path, $query = NULL) {
-    if ($path[0] === '/' || strpos($path, 'http://') || strpos($path, 'https://')) {
+    if ($path[0] === '/' || strpos($path, 'http://') !== FALSE || strpos($path, 'https://') !== FALSE) {
       return $path;
     }
     // Use absolute urls when downloading spreadsheet
