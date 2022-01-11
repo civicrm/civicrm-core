@@ -338,7 +338,11 @@ WHERE  id IN ( $idString )
     // step 3: if valid relationship then add the relation and keep the count
 
     // step 1
-    $contactFields = CRM_Contact_BAO_Relationship::setContactABFromIDs($params, $ids, $organizationID);
+    $contactFields = [
+      'contact_id_a' => $contactID,
+      'contact_id_b' => $organizationID,
+      'relationship_type_id' => $relationshipTypeID,
+    ];
     if (!CRM_Contact_BAO_Relationship::checkRelationshipType($contactFields['contact_id_a'], $contactFields['contact_id_b'],
       $contactFields['relationship_type_id'])) {
       return [0, []];
@@ -347,7 +351,7 @@ WHERE  id IN ( $idString )
     if (
       CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
         $contactFields,
-        CRM_Utils_Array::value('contact', $ids),
+        $contactID,
         // step 2
         $organizationID
       )
