@@ -199,48 +199,6 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test IPN that we can force membership when the membership payment has been deleted.
-   *
-   * https://lab.civicrm.org/dev/membership/issues/13
-   *
-   * In this scenario the membership payment record was deleted (or not created) for the first contribution but we
-   * 'recover' by using the input  membership id.
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function testIPNPaymentInputMembershipRecurSuccess(): void {
-    $durationUnit = 'year';
-    $this->setupMembershipRecurringPaymentProcessorTransaction(['duration_unit' => $durationUnit, 'frequency_unit' => $durationUnit]);
-    $membershipPayment = $this->callAPISuccessGetSingle('membership_payment', []);
-    $paypalIPN = new CRM_Core_Payment_PayPalIPN(array_merge($this->getPaypalRecurTransaction(), ['membershipID' => $membershipPayment['membership_id']]));
-    $paypalIPN->main();
-    $membershipEndDate = $this->callAPISuccessGetValue('membership', ['return' => 'end_date']);
-    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_membership_payment WHERE id = ' . $membershipPayment['id']);
-    CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item SET entity_table = 'civicrm_contribution' WHERE entity_table = 'civicrm_membership'");
-
-    $paypalIPN = new CRM_Core_Payment_PaypalIPN(array_merge($this->getPaypalRecurSubsequentTransaction(), ['membershipID' => $membershipPayment['membership_id']]));
-    $paypalIPN->main();
-    $renewedMembershipEndDate = $this->membershipRenewalDate($durationUnit, $membershipEndDate);
-    $this->assertEquals($renewedMembershipEndDate, $this->callAPISuccessGetValue('membership', ['return' => 'end_date']));
-    $contribution = $this->callAPISuccess('contribution', 'get', [
-      'contribution_recur_id' => $this->_contributionRecurID,
-      'sequential' => 1,
-    ]);
-    $this->assertEquals(2, $contribution['count']);
-    $this->assertEquals('secondone', $contribution['values'][1]['trxn_id']);
-    $this->callAPISuccessGetCount('line_item', [
-      'entity_id' => $this->ids['membership'],
-      'entity_table' => 'civicrm_membership',
-    ], 1);
-    $this->callAPISuccessGetSingle('line_item', [
-      'contribution_id' => $contribution['values'][1]['id'],
-      'entity_table' => 'civicrm_membership',
-    ]);
-    $this->callAPISuccessGetSingle('membership_payment', ['contribution_id' => $contribution['values'][1]['id']]);
-  }
-
-  /**
    * Get IPN style details for an incoming recurring transaction.
    */
   public function getPaypalRecurTransaction() {
