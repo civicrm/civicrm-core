@@ -97,7 +97,7 @@
                   <td style="text-align:right;"><font size="1">{$value.qty}</font></td>
                   <td style="text-align:right;"><font size="1">{$value.unit_price|crmMoney:$currency}</font></td>
                   {if $value.tax_amount != ''}
-                    <td style="text-align:right;"><font size="1">{if isset($value.tax_rate)}{$value.tax_rate}%{/if}</font></td>
+                    <td style="text-align:right;"><font size="1">{if $value.tax_rate}{$value.tax_rate}%{/if}</font></td>
                   {else}
                     <td style="text-align:right;"><font size="1">{if $taxTerm}{ts 1=$taxTerm}-{/ts}{/if}</font></td>
                   {/if}
@@ -327,7 +327,7 @@
                   <td style="padding-left:28px;text-align:right;"><font size="1">{$value.qty}</font></td>
                   <td style="padding-left:28px;text-align:right;"><font size="1">{$value.unit_price|crmMoney:$currency}</font></td>
                   {if $value.tax_amount != ''}
-                    <td style="padding-left:28px;text-align:right;"><font size="1">{if isset($value.tax_rate)}{$value.tax_rate}%{/if}</font></td>
+                    <td style="padding-left:28px;text-align:right;"><font size="1">{if $value.tax_rate}{$value.tax_rate}%{/if}</font></td>
                   {else}
                     <td style="padding-left:28px;text-align:right"><font size="1">{if $taxTerm}{ts 1=$taxTerm}No %1{/ts}{/if}</font></td>
                   {/if}

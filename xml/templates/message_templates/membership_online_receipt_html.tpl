@@ -178,7 +178,7 @@
               <td>
                {$line.unit_price*$line.qty|crmMoney}
               </td>
-              {if isset($line.tax_rate) and ($line.tax_rate != "" || $line.tax_amount != "")}
+              {if ($line.tax_rate || $line.tax_amount != "")}
                <td>
                 {$line.tax_rate|string_format:"%.2f"}%
                </td>
