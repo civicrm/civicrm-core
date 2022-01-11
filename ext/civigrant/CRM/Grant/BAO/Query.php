@@ -9,17 +9,19 @@
  +--------------------------------------------------------------------+
  */
 
+use CRM_Grant_ExtensionUtil as E;
+
 /**
  * Class CRM_Grant_BAO_Query
  */
-class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
+class CRM_Grant_BAO_Query extends CRM_Contact_BAO_Query_Interface {
 
   /**
    * Get grant fields.
    *
    * @return array
    */
-  public static function &getFields() {
+  public function &getFields() {
     return CRM_Grant_BAO_Grant::exportableFields();
   }
 
@@ -27,8 +29,6 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
    * Build select for CiviGrant.
    *
    * @param $query
-   *
-   * @return void
    */
   public static function select(&$query) {
     if (!empty($query->_returnProperties['grant_status_id'])) {
@@ -84,8 +84,6 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
    * where clause
    *
    * @param $query
-   *
-   * @return void
    */
   public static function where(&$query) {
     foreach ($query->_params as $id => $values) {
@@ -104,7 +102,7 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
    * @param \CRM_Contact_BAO_Query $query
    */
   public static function whereClauseSingle(&$values, &$query) {
-    list($name, $op, $value, $grouping, $wildcard) = $values;
+    [$name, $op, $value, $grouping, $wildcard] = $values;
     switch ($name) {
       case 'grant_money_transfer_date_low':
       case 'grant_money_transfer_date_high':
@@ -116,7 +114,7 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
 
       case 'grant_money_transfer_date_notset':
         $query->_where[$grouping][] = "civicrm_grant.money_transfer_date IS NULL";
-        $query->_qill[$grouping][] = ts("Grant Money Transfer Date is NULL");
+        $query->_qill[$grouping][] = E::ts("Grant Money Transfer Date is NULL");
         $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
         return;
 
@@ -130,7 +128,7 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
 
       case 'grant_application_received_date_notset':
         $query->_where[$grouping][] = "civicrm_grant.application_received_date IS NULL";
-        $query->_qill[$grouping][] = ts("Grant Application Received Date is NULL");
+        $query->_qill[$grouping][] = E::ts("Grant Application Received Date is NULL");
         $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
         return;
 
@@ -138,13 +136,13 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
       case 'grant_due_date_high':
         $query->dateQueryBuilder($values, 'civicrm_grant',
           'grant_due_date',
-          'grant_due_date', ts('Grant Due Date')
+          'grant_due_date', E::ts('Grant Due Date')
         );
         return;
 
       case 'grant_due_date_notset':
         $query->_where[$grouping][] = "civicrm_grant.grant_due_date IS NULL";
-        $query->_qill[$grouping][] = ts("Grant Due Date is NULL");
+        $query->_qill[$grouping][] = E::ts("Grant Due Date is NULL");
         $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
         return;
 
@@ -152,13 +150,13 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
       case 'grant_decision_date_high':
         $query->dateQueryBuilder($values, 'civicrm_grant',
           'grant_decision_date',
-          'decision_date', ts('Grant Decision Date')
+          'decision_date', E::ts('Grant Decision Date')
         );
         return;
 
       case 'grant_decision_date_notset':
         $query->_where[$grouping][] = "civicrm_grant.decision_date IS NULL";
-        $query->_qill[$grouping][] = ts("Grant Decision Date is NULL");
+        $query->_qill[$grouping][] = E::ts("Grant Decision Date is NULL");
         $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
         return;
 
@@ -169,17 +167,17 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
 
         if (strstr($name, 'type')) {
           $name = 'grant_type_id';
-          $label = ts('Grant Type(s)');
+          $label = E::ts('Grant Type(s)');
         }
         else {
           $name = 'status_id';
-          $label = ts('Grant Status(s)');
+          $label = E::ts('Grant Status(s)');
         }
 
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_grant.$name", $op, $value, "Integer");
 
         list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Grant_DAO_Grant', $name, $value, $op);
-        $query->_qill[$grouping][] = ts("%1 %2 %3", [1 => $label, 2 => $qillop, 3 => $qillVal]);
+        $query->_qill[$grouping][] = E::ts("%1 %2 %3", [1 => $label, 2 => $qillop, 3 => $qillVal]);
         $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
 
         return;
@@ -187,15 +185,15 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
       case 'grant_report_received':
 
         if ($value == 1) {
-          $yesNo = ts('Yes');
+          $yesNo = E::ts('Yes');
           $query->_where[$grouping][] = "civicrm_grant.grant_report_received $op $value";
         }
         elseif ($value == 0) {
-          $yesNo = ts('No');
+          $yesNo = E::ts('No');
           $query->_where[$grouping][] = "civicrm_grant.grant_report_received IS NULL";
         }
 
-        $query->_qill[$grouping][] = ts('Grant Report Received = %1', [1 => $yesNo]);
+        $query->_qill[$grouping][] = E::ts('Grant Report Received = %1', [1 => $yesNo]);
         $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
 
         return;
@@ -305,37 +303,80 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
    *
    *
    * @param \CRM_Grant_Form_Search $form
+   * @param $type
    *
    * @return void
    */
-  public static function buildSearchForm(&$form) {
+  public function buildAdvancedSearchPaneForm(&$form, $type) {
+    if ($type !== 'CiviGrant') {
+      return;
+    }
 
     $grantType = CRM_Core_OptionGroup::values('grant_type');
     $form->addSearchFieldMetadata(['Grant' => self::getSearchFieldMetadata()]);
     $form->addFormFieldsFromMetadata();
     $form->assign('grantSearchFields', self::getTemplateHandlableSearchFields());
-    $form->add('select', 'grant_type_id', ts('Grant Type'), $grantType, FALSE,
+    $form->add('select', 'grant_type_id', E::ts('Grant Type'), $grantType, FALSE,
       ['id' => 'grant_type_id', 'multiple' => 'multiple', 'class' => 'crm-select2']
     );
 
     $grantStatus = CRM_Core_OptionGroup::values('grant_status');
-    $form->add('select', 'grant_status_id', ts('Grant Status'), $grantStatus, FALSE,
+    $form->add('select', 'grant_status_id', E::ts('Grant Status'), $grantStatus, FALSE,
       ['id' => 'grant_status_id', 'multiple' => 'multiple', 'class' => 'crm-select2']
     );
-    $form->addElement('checkbox', 'grant_application_received_date_notset', ts('Date is not set'), NULL);
-    $form->addElement('checkbox', 'grant_money_transfer_date_notset', ts('Date is not set'), NULL);
-    $form->addElement('checkbox', 'grant_due_date_notset', ts('Date is not set'), NULL);
-    $form->addElement('checkbox', 'grant_decision_date_notset', ts('Date is not set'), NULL);
+    $form->addElement('checkbox', 'grant_application_received_date_notset', E::ts('Date is not set'), NULL);
+    $form->addElement('checkbox', 'grant_money_transfer_date_notset', E::ts('Date is not set'), NULL);
+    $form->addElement('checkbox', 'grant_due_date_notset', E::ts('Date is not set'), NULL);
+    $form->addElement('checkbox', 'grant_decision_date_notset', E::ts('Date is not set'), NULL);
 
-    $form->add('text', 'grant_amount_low', ts('Minimum Amount'), ['size' => 8, 'maxlength' => 8]);
-    $form->addRule('grant_amount_low', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('9.99')]), 'money');
+    $form->add('text', 'grant_amount_low', E::ts('Minimum Amount'), ['size' => 8, 'maxlength' => 8]);
+    $form->addRule('grant_amount_low', E::ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('9.99')]), 'money');
 
-    $form->add('text', 'grant_amount_high', ts('Maximum Amount'), ['size' => 8, 'maxlength' => 8]);
-    $form->addRule('grant_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
+    $form->add('text', 'grant_amount_high', E::ts('Maximum Amount'), ['size' => 8, 'maxlength' => 8]);
+    $form->addRule('grant_amount_high', E::ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
 
-    self::addCustomFormFields($form, ['Grant']);
+    CRM_Core_BAO_Query::addCustomFormFields($form, ['Grant']);
 
     $form->assign('validGrant', TRUE);
+  }
+
+  /**
+   * @param string[] $panes
+   */
+  public function registerAdvancedSearchPane(&$panes) {
+    $panes[E::ts('Grants')] = 'CiviGrant';
+  }
+
+  /**
+   * @param string[] $panes
+   */
+  public function getPanesMapper(&$panes) {
+    $panes[E::ts('Grants')] = 'civicrm_grant';
+  }
+
+  /**
+   * @param $tables
+   */
+  public function setTableDependency(&$tables) {
+    // $tables['civicrm_grant'] = 1;
+  }
+
+  /**
+   * @param $paneTemplatePathArray
+   * @param $type
+   */
+  public function setAdvancedSearchPaneTemplatePath(&$paneTemplatePathArray, $type) {
+    $paneTemplatePathArray['CiviGrant'] = 'CRM/Grant/Form/Search/AdvancedSearchPane.tpl';
+  }
+
+  /**
+   * Describe options for available for use in the search-builder.
+   *
+   * @param array $apiEntities
+   * @param array $fieldOptions
+   */
+  public function alterSearchBuilderOptions(&$apiEntities, &$fieldOptions) {
+    $apiEntities[] = 'grant';
   }
 
 }

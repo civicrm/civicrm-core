@@ -449,7 +449,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       'member',
       'contribution',
       'case',
-      'grant',
     ];
     CRM_Contact_BAO_Query_Hook::singleton()->alterSearchBuilderOptions($entities, $options);
     $fkEntities = [];

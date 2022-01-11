@@ -8,7 +8,6 @@
   <add>1.8</add>
   <log>true</log>
   <icon>fa-money</icon>
-  <component>CiviGrant</component>
   <paths>
     <add>civicrm/grant/add?reset=1&amp;action=add&amp;context=standalone</add>
     <view>civicrm/contact/view/grant?reset=1&amp;action=view&amp;id=[id]&amp;cid=[contact_id]</view>

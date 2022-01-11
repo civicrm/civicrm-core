@@ -23,7 +23,6 @@
 <xi:include href="Event/Cart/files.xml"        parse="xml" />
 <xi:include href="Dedupe/files.xml"            parse="xml" />
 <xi:include href="Case/files.xml"              parse="xml" />
-<xi:include href="Grant/files.xml"             parse="xml" />
 <xi:include href="Friend/files.xml"            parse="xml" />
 <xi:include href="Pledge/files.xml"            parse="xml" />
 <xi:include href="Queue/files.xml"            parse="xml" />

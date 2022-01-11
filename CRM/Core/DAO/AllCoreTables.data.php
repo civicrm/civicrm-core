@@ -232,11 +232,6 @@ return [
     'class' => 'CRM_Case_DAO_CaseType',
     'table' => 'civicrm_case_type',
   ],
-  'CRM_Grant_DAO_Grant' => [
-    'name' => 'Grant',
-    'class' => 'CRM_Grant_DAO_Grant',
-    'table' => 'civicrm_grant',
-  ],
   'CRM_Friend_DAO_Friend' => [
     'name' => 'Friend',
     'class' => 'CRM_Friend_DAO_Friend',

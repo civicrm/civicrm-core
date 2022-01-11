@@ -178,6 +178,7 @@ class CRM_Utils_VersionCheck {
    * Add info to the 'entities' array
    */
   private function getEntityStats() {
+    // FIXME hardcoded list = bad
     $tables = [
       'CRM_Activity_DAO_Activity' => 'is_test = 0',
       'CRM_Case_DAO_Case' => 'is_deleted = 0',
@@ -203,15 +204,18 @@ class CRM_Utils_VersionCheck {
       'CRM_Mailing_Event_DAO_Delivered' => NULL,
     ];
     foreach ($tables as $daoName => $where) {
-      $dao = new $daoName();
-      if ($where) {
-        $dao->whereAdd($where);
+      if (class_exists($daoName)) {
+        /* @var \CRM_Core_DAO $dao */
+        $dao = new $daoName();
+        if ($where) {
+          $dao->whereAdd($where);
+        }
+        $short_name = substr($daoName, strrpos($daoName, '_') + 1);
+        $this->stats['entities'][] = [
+          'name' => $short_name,
+          'size' => $dao->count(),
+        ];
       }
-      $short_name = substr($daoName, strrpos($daoName, '_') + 1);
-      $this->stats['entities'][] = [
-        'name' => $short_name,
-        'size' => $dao->count(),
-      ];
     }
   }
 
