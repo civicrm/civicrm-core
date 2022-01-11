@@ -123,6 +123,10 @@ trait CRM_Contact_Form_Task_EmailTrait {
       // Currently only the contact email form is callable outside search context.
       parent::preProcess();
     }
+    else {
+      // E-notice prevention in Task.tpl
+      $this->assign('isSelectedContacts', FALSE);
+    }
     $this->setContactIDs();
     $this->assign('single', $this->_single);
     $this->assign('isAdmin', CRM_Core_Permission::check('administer CiviCRM'));

@@ -5,7 +5,7 @@
  */
 class CRM_Case_Form_EmailTest extends CiviCaseTestCase {
 
-  public function testOpeningEmailForm() {
+  public function testOpeningEmailForm(): void {
     $clientId = $this->individualCreate();
     $caseObj = $this->createCase($clientId, $this->_loggedInUser);
 
@@ -24,8 +24,7 @@ class CRM_Case_Form_EmailTest extends CiviCaseTestCase {
     $item = CRM_Core_Invoke::getItem([$_GET['q']]);
     ob_start();
     CRM_Core_Invoke::runItem($item);
-    $contents = ob_get_contents();
-    ob_end_clean();
+    $contents = ob_get_clean();
 
     foreach ($parsed as $param => $dontcare) {
       unset($_REQUEST[$param]);
@@ -41,7 +40,7 @@ class CRM_Case_Form_EmailTest extends CiviCaseTestCase {
     $this->assertStringContainsString('CRM_Case_Form_Task_Email', $contents);
   }
 
-  public function testCaseTokenForRecipientAddedAfterOpeningForm() {
+  public function testCaseTokenForRecipientAddedAfterOpeningForm(): void {
     $clientId = $this->individualCreate();
     $caseObj = $this->createCase($clientId, $this->_loggedInUser);
 
