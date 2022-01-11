@@ -316,50 +316,48 @@ WHERE  id IN ( $idString )
    * nasty
    *
    * @param int $relationshipTypeID
-   * @param int $organization
+   * @param int $organizationID
    * @param int $contactID
    *
    * @return array
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  private static function legacyCreateMultiple(int $relationshipTypeID, int $organization, int $contactID): array {
+  private static function legacyCreateMultiple(int $relationshipTypeID, int $organizationID, int $contactID): array {
     $params = [
       'is_active' => TRUE,
       'relationship_type_id' => $relationshipTypeID . '_a_b',
-      'contact_check' => [$organization => TRUE],
+      'contact_check' => [$organizationID => TRUE],
     ];
     $ids = ['contact' => $contactID];
 
     $relationshipIds = [];
-    foreach (array_keys($params['contact_check']) as $organizationID) {
-      // check if the relationship is valid between contacts.
-      // step 1: check if the relationship is valid if not valid skip and keep the count
-      // step 2: check the if two contacts already have a relationship if yes skip and keep the count
-      // step 3: if valid relationship then add the relation and keep the count
+    // check if the relationship is valid between contacts.
+    // step 1: check if the relationship is valid if not valid skip and keep the count
+    // step 2: check the if two contacts already have a relationship if yes skip and keep the count
+    // step 3: if valid relationship then add the relation and keep the count
 
-      // step 1
-      $contactFields = CRM_Contact_BAO_Relationship::setContactABFromIDs($params, $ids, $organizationID);
-      $errors = CRM_Contact_BAO_Relationship::checkValidRelationship($contactFields, $ids, $organizationID);
-      if ($errors) {
-        return [0, []];
-      }
-
-      if (
-        CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
-          $contactFields,
-          CRM_Utils_Array::value('contact', $ids),
-          // step 2
-          $organizationID
-        )
-      ) {
-        return [1, []];
-      }
-
-      $singleInstanceParams = array_merge($params, $contactFields);
-      $relationship = CRM_Contact_BAO_Relationship::add($singleInstanceParams);
-      $relationshipIds[] = $relationship->id;
+    // step 1
+    $contactFields = CRM_Contact_BAO_Relationship::setContactABFromIDs($params, $ids, $organizationID);
+    $errors = CRM_Contact_BAO_Relationship::checkValidRelationship($contactFields, $ids, $organizationID);
+    if ($errors) {
+      return [0, []];
     }
+
+    if (
+      CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
+        $contactFields,
+        CRM_Utils_Array::value('contact', $ids),
+        // step 2
+        $organizationID
+      )
+    ) {
+      return [1, []];
+    }
+
+    $singleInstanceParams = array_merge($params, $contactFields);
+    $relationship = CRM_Contact_BAO_Relationship::add($singleInstanceParams);
+    $relationshipIds[] = $relationship->id;
 
     CRM_Contact_BAO_Relationship::addRecent($params, $relationship);
 
