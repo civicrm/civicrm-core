@@ -58,6 +58,13 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       ],
     ];
 
+    // In case there extension which have recurring payment and then
+    // extension is disabled and in that case payment object may be null
+    // To avoid the fatal error, return with VIEW link.
+    if (!is_object($paymentProcessorObj)) {
+      return $links;
+    }
+
     $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($recurID);
     if (
       (CRM_Core_Permission::check('edit contributions') || $context !== 'contribution') &&
@@ -121,6 +128,12 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   public static function selfServiceRecurLinks(int $recurID): array {
     $links = [];
     $paymentProcessorObj = Civi\Payment\System::singleton()->getById(CRM_Contribute_BAO_ContributionRecur::getPaymentProcessorID($recurID));
+    // In case there extension which have recurring payment and then
+    // extension is disabled and in that case payment object may be null
+    // To avoid the fatal error, return with VIEW link.
+    if (!is_object($paymentProcessorObj)) {
+      return $links;
+    }
     if ($paymentProcessorObj->supports('cancelRecurring')
       && $paymentProcessorObj->subscriptionURL($recurID, 'recur', 'cancel')
     ) {
