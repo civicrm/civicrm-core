@@ -378,6 +378,10 @@ input.crm-form-entityref {
   text-indent: 0;
   width: auto;
 }
+/* Fix for https://lab.civicrm.org/dev/report/-/issues/94 */
+.crm-container fieldset:not(.fieldgroup) > legend {
+  position: unset;
+}
 
 .crm-container fieldset.form-layout {
   margin: .25em 0 .5em 0;
