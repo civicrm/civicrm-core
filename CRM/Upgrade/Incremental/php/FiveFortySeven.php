@@ -30,11 +30,36 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
   public function upgrade_5_47_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Migrate CiviGrant component to an extension', 'migrateCiviGrant');
+    $this->addTask('Add created_date to civicrm_relationship', 'addColumn', 'civicrm_relationship', 'created_date',
+      "timestamp NOT NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'Relationship created date'"
+    );
+    $this->addTask('Add modified_date column to civicrm_relationship', 'addColumn',
+      'civicrm_relationship', 'modified_date',
+      "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Relationship last modified.'"
+    );
+    $this->addTask('Set initial value for relationship created_date and modified_date to start_date', 'updateRelationshipDates');
   }
 
   /**
    * @param \CRM_Queue_TaskContext $ctx
+   *
    * @return bool
+   */
+  public static function updateRelationshipDates(CRM_Queue_TaskContext $ctx): bool {
+    CRM_Core_DAO::executeQuery('
+      UPDATE civicrm_relationship SET created_date = start_date, modified_date = start_date
+      WHERE start_date IS NOT NULL AND start_date > "1970-01-01"
+    ');
+    return TRUE;
+  }
+
+  /**
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
    */
   public static function migrateCiviGrant(CRM_Queue_TaskContext $ctx): bool {
     $civiGrantEnabled = in_array('CiviGrant', Civi::settings()->get('enable_components'), TRUE);
