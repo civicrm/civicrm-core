@@ -2524,6 +2524,47 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test repeat contribution accepts recur_id instead of
+   * original_contribution_id.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRepeatTransactionPreviousContributionRefunded(): void {
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', [
+      'contact_id' => $this->_individualId,
+      'installments' => '12',
+      'frequency_interval' => '1',
+      'amount' => '100',
+      'contribution_status_id' => 1,
+      'start_date' => '2012-01-01 00:00:00',
+      'currency' => 'USD',
+      'frequency_unit' => 'month',
+      'payment_processor_id' => $this->paymentProcessorID,
+    ]);
+    $this->callAPISuccess('contribution', 'create', array_merge(
+        $this->_params,
+        [
+          'contribution_recur_id' => $contributionRecur['id'],
+          'contribution_status_id' => 'Refunded',
+        ]
+      )
+    );
+
+    $this->callAPISuccess('contribution', 'repeattransaction', [
+      'contribution_recur_id' => $contributionRecur['id'],
+      'trxn_id' => 1234,
+    ]);
+    $contributions = $this->callAPISuccess('contribution', 'get', [
+      'contribution_recur_id' => $contributionRecur['id'],
+      'sequential' => 1,
+    ]);
+    // We should have contribution 0 in "Refunded" status and contribution 1 in "Pending" status
+    $this->assertEquals(2, $contributions['count']);
+    $this->assertEquals(7, $contributions['values'][0]['contribution_status_id']);
+    $this->assertEquals(2, $contributions['values'][1]['contribution_status_id']);
+  }
+
+  /**
    * CRM-19945 Tests that Contribute.repeattransaction renews a membership when contribution status=Completed
    *
    * @throws \CRM_Core_Exception
