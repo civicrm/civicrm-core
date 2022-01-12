@@ -30,6 +30,7 @@ class api_v3_GrantTest extends \PHPUnit\Framework\TestCase implements \Civi\Test
 
   public function setUpHeadless() {
     return \Civi\Test::headless()
+      ->install(['org.civicrm.afform', 'org.civicrm.search_kit'])
       ->installMe(__DIR__)
       ->apply();
   }
