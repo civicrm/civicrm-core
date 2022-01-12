@@ -1178,6 +1178,7 @@ class CRM_Utils_Token {
     $className = NULL,
     $jobID = NULL
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('If you hit this in mailing code you should use flexmailer - otherwise use the token processor');
     $params = [];
     foreach ($contactIDs as $contactID) {
       $params[] = [

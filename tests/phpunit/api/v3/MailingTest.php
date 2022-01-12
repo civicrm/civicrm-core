@@ -297,37 +297,6 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
   }
 
-  /**
-   *
-   */
-  public function testMailerPreviewExtraScheme() {
-    try {
-      \Civi::settings()->set('flexmailer_traditional', 'bao');
-
-      $contactID = $this->individualCreate();
-      $displayName = $this->callAPISuccess('contact', 'get', ['id' => $contactID]);
-      $displayName = $displayName['values'][$contactID]['display_name'];
-      $this->assertNotEmpty($displayName);
-
-      $params = $this->_params;
-      $params['body_html'] = '<a href="http://{action.forward}">Forward this email written in ckeditor</a>';
-      $params['api.Mailing.preview'] = [
-        'id' => '$value.id',
-        'contact_id' => $contactID,
-      ];
-      $params['options']['force_rollback'] = 1;
-
-      $result = $this->callAPISuccess('mailing', 'create', $params);
-      $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
-      $this->assertRegexp('!>Forward this email written in ckeditor</a>!', $previewResult['values']['body_html']);
-      $this->assertRegexp('!<a href="([^"]+)civicrm/mailing/forward&amp;amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
-      $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
-
-    } finally {
-      \Civi::settings()->revert('flexmailer_traditional');
-    }
-  }
-
   public function testMailerPreviewUnknownContact(): void {
     $params = $this->_params;
     $params['api.Mailing.preview'] = [
