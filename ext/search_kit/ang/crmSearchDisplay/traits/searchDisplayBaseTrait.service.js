@@ -39,7 +39,8 @@
           });
         }
 
-        $element.on('crmPopupFormSuccess', this.getResults);
+        // Popup forms in this display or surrounding Afform trigger a refresh
+        $element.closest('form').on('crmPopupFormSuccess', this.getResults);
 
         function onChangeFilters() {
           ctrl.page = 1;
