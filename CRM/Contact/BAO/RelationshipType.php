@@ -9,7 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Relationship;
 use Civi\Api4\RelationshipType;
+use Civi\Core\Event\PreEvent;
 
 /**
  *
@@ -110,18 +112,20 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
 
   /**
    * Callback for hook_civicrm_pre().
+   *
    * @param \Civi\Core\Event\PreEvent $event
-   * @throws CRM_Core_Exception
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+  public static function self_hook_civicrm_pre(PreEvent $event): void {
     if ($event->action === 'delete') {
       // need to delete all option value field before deleting group
-      \Civi\Api4\Relationship::delete(FALSE)
+      Relationship::delete(FALSE)
         ->addWhere('relationship_type_id', '=', $event->id)
         ->execute();
     }
   }
-
 
   /**
    * Get the id of the employee relationship, checking it is valid.

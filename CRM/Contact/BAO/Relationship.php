@@ -603,12 +603,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         $sharedContact->id = $relationship->contact_id_a;
         $sharedContact->find(TRUE);
 
-        // CRM-15881 UPDATES
-        // changed FROM "...relationship->relationship_type_id == 4..." TO "...relationship->relationship_type_id == 5..."
-        // As the system should be looking for type "employer of" (id 5) and not "sibling of" (id 4)
-        // As suggested by @davecivicrm, the employee relationship type id is fetched using the CRM_Core_DAO::getFieldValue() class and method, since these ids differ from system to system.
-        $employerRelTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b');
-
+        $employerRelTypeId = CRM_Contact_BAO_RelationshipType::getEmployeeRelationshipTypeID();
         if ($relationship->relationship_type_id == $employerRelTypeId && $relationship->contact_id_b == $sharedContact->employer_id) {
           CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($relationship->contact_id_a);
         }

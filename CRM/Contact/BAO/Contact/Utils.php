@@ -270,12 +270,13 @@ WHERE  id IN ( $idString )
         ])->execute()->first()['id'];
     }
 
-    // get the relationship type id of "Employee of"
-    $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b');
-    if (!$relTypeId) {
-      throw new CRM_Core_Exception(ts("You seem to have deleted the relationship type 'Employee of'"));
+    $relTypeId = CRM_Contact_BAO_RelationshipType::getEmployeeRelationshipTypeID();
+    if (!CRM_Contact_BAO_Contact::getContactType($contactID) || !CRM_Contact_BAO_Contact::getContactType($organization)) {
+      // There doesn't seem to be any reason to think this would ever be true but there
+      // was a previous more complicated check.
+      CRM_Core_Error::deprecatedWarning('attempting to create an employer with invalid contact types is deprecated');
+      return;
     }
-
     // create employee of relationship
     [$duplicate, $relationshipIds]
       = self::legacyCreateMultiple($relTypeId, $organization, $contactID);
@@ -340,10 +341,6 @@ WHERE  id IN ( $idString )
       'contact_id_b' => $organizationID,
       'relationship_type_id' => $relationshipTypeID,
     ];
-    if (!CRM_Contact_BAO_Relationship::checkRelationshipType($contactFields['contact_id_a'], $contactFields['contact_id_b'],
-      $contactFields['relationship_type_id'])) {
-      return [0, []];
-    }
 
     if (
       CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
@@ -460,10 +457,7 @@ WHERE id={$contactId}; ";
       //2. delete related membership.
 
       //get the relationship type id of "Employee of"
-      $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b');
-      if (!$relTypeId) {
-        throw new CRM_Core_Exception(ts("You seem to have deleted the relationship type 'Employee of'"));
-      }
+      $relTypeId = CRM_Contact_BAO_RelationshipType::getEmployeeRelationshipTypeID();
       $relMembershipParams['relationship_type_id'] = $relTypeId . '_a_b';
       $relMembershipParams['contact_check'][$employerId] = 1;
 
