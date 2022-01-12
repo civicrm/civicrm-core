@@ -195,7 +195,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @param array $formatted
    *   Array of formatted data.
    */
-  public function formatCommonData($params, &$formatted) {
+  private function formatCommonData($params, &$formatted) {
 
     $customFields = CRM_Core_BAO_CustomField::getFields(NULL);
 
