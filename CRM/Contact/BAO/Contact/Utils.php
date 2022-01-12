@@ -270,40 +270,37 @@ WHERE  id IN ( $idString )
         ])->execute()->first()['id'];
     }
 
-    if (is_numeric($organization)) {
-
-      // get the relationship type id of "Employee of"
-      $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b');
-      if (!$relTypeId) {
-        throw new CRM_Core_Exception(ts("You seem to have deleted the relationship type 'Employee of'"));
-      }
-
-      // create employee of relationship
-      [$duplicate, $relationshipIds]
-        = self::legacyCreateMultiple($relTypeId, $organization, $contactID);
-
-      // In case we change employer, clean previous employer related records.
-      if (!$previousEmployerID && !$newContact) {
-        $previousEmployerID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id');
-      }
-      if ($previousEmployerID &&
-        $previousEmployerID != $organization
-      ) {
-        self::clearCurrentEmployer($contactID, $previousEmployerID);
-      }
-
-      // set current employer
-      self::setCurrentEmployer([$contactID => $organization]);
-
-      $relationshipParams = [
-        'relationship_ids' => $relationshipIds,
-        'is_active' => 1,
-        'contact_check' => [$organization => TRUE],
-        'relationship_type_id' => $relTypeId . '_a_b',
-      ];
-      // Handle related memberships. CRM-3792
-      self::currentEmployerRelatedMembership($contactID, $organization, $relationshipParams, $duplicate, $previousEmployerID);
+    // get the relationship type id of "Employee of"
+    $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b');
+    if (!$relTypeId) {
+      throw new CRM_Core_Exception(ts("You seem to have deleted the relationship type 'Employee of'"));
     }
+
+    // create employee of relationship
+    [$duplicate, $relationshipIds]
+      = self::legacyCreateMultiple($relTypeId, $organization, $contactID);
+
+    // In case we change employer, clean previous employer related records.
+    if (!$previousEmployerID && !$newContact) {
+      $previousEmployerID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id');
+    }
+    if ($previousEmployerID &&
+      $previousEmployerID != $organization
+    ) {
+      self::clearCurrentEmployer($contactID, $previousEmployerID);
+    }
+
+    // set current employer
+    self::setCurrentEmployer([$contactID => $organization]);
+
+    $relationshipParams = [
+      'relationship_ids' => $relationshipIds,
+      'is_active' => 1,
+      'contact_check' => [$organization => TRUE],
+      'relationship_type_id' => $relTypeId . '_a_b',
+    ];
+    // Handle related memberships. CRM-3792
+    self::currentEmployerRelatedMembership($contactID, $organization, $relationshipParams, $duplicate, $previousEmployerID);
   }
 
   /**
