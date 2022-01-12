@@ -18,6 +18,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Contact;
+
 /**
  * Class api_v3_JobTest
  *
@@ -180,15 +182,24 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Test greeting update job.
    *
-   * Note that this test is about testing the metadata / calling of the function & doesn't test the success of the called function
+   * Note that this test is about testing the metadata / calling of the
+   * function & doesn't test the success of the called function
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function testCallUpdateGreetingSuccess(): void {
+    $contactID = $this->individualCreate();
+    // Clear out the postal greeting
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET postal_greeting_display = NULL WHERE id = ' . $contactID);
     $this->callAPISuccess($this->_entity, 'update_greeting', [
       'gt' => 'postal_greeting',
       'ct' => 'Individual',
     ]);
+    $this->assertEquals('Dear Anthony', Contact::get()
+      ->addWhere('id', '=', $contactID)
+      ->addSelect('postal_greeting_display')
+      ->execute()->first()['postal_greeting_display']
+    );
   }
 
   /**
