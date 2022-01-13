@@ -69,26 +69,6 @@ function civigrant_civicrm_permission(&$permissions) {
 }
 
 /**
- * Implements hook_civicrm_tabSet().
- *
- * Add grants tab to contact summary screen.
- */
-function civigrant_civicrm_tabSet($tabSetName, &$tabs, $context) {
-  if ($tabSetName === 'civicrm/contact/view' && !empty($context['contact_id'])) {
-    $cid = $context['contact_id'];
-    $tabs[] = [
-      'id' => 'grant',
-      'url' => CRM_Utils_System::url("civicrm/contact/view/grant", ['reset' => 1, 'cid' => $cid]),
-      'title' => E::ts('Grants'),
-      'weight' => 60,
-      'count' => CRM_Grant_BAO_Grant::getContactGrantCount($cid),
-      'class' => 'livePage',
-      'icon' => 'crm-i fa-money',
-    ];
-  }
-}
-
-/**
  * Implements hook_civicrm_queryObjects().
  *
  * Adds query object for legacy screens like advanced search, search builder, etc.
