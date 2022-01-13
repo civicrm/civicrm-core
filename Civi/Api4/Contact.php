@@ -28,6 +28,24 @@ class Contact extends Generic\DAOEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return Action\Contact\Update
+   */
+  public static function update($checkPermissions = TRUE) {
+    return (new Action\Contact\Update(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Contact\Save
+   */
+  public static function save($checkPermissions = TRUE) {
+    return (new Action\Contact\Save(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return Action\Contact\Delete
    */
   public static function delete($checkPermissions = TRUE) {

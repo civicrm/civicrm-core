@@ -16,6 +16,7 @@ use Civi\Api4\CustomField;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Api4\Utils\ReflectionUtils;
 
 /**
  * @method string getLanguage()
@@ -105,24 +106,8 @@ trait DAOActionTrait {
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  protected function writeObjects(&$items) {
-    $baoName = $this->getBaoName();
+  protected function writeObjects($items) {
     $updateWeights = FALSE;
-
-    // TODO: Opt-in more entities to use the new writeRecords BAO method.
-    $functionNames = [
-      'Address' => 'add',
-      'CustomField' => 'writeRecords',
-      'EntityTag' => 'add',
-      'GroupContact' => 'add',
-      'Navigation' => 'writeRecords',
-      'WordReplacement' => 'writeRecords',
-    ];
-    $method = $functionNames[$this->getEntityName()] ?? NULL;
-    if (!isset($method)) {
-      $method = method_exists($baoName, 'create') ? 'create' : (method_exists($baoName, 'add') ? 'add' : 'writeRecords');
-    }
-
     // Adjust weights for sortable entities
     if (in_array('SortableEntity', CoreUtil::getInfoItem($this->getEntityName(), 'type'))) {
       $weightField = CoreUtil::getInfoItem($this->getEntityName(), 'order_by');
@@ -145,44 +130,48 @@ trait DAOActionTrait {
         $this->updateWeight($item);
       }
 
-      // Skip individual processing if using writeRecords
-      if ($method === 'writeRecords') {
-        continue;
-      }
       $item['check_permissions'] = $this->getCheckPermissions();
+    }
 
-      // For some reason the contact bao requires this
-      if ($entityId && $this->getEntityName() === 'Contact') {
-        $item['contact_id'] = $entityId;
-      }
+    // Ensure array keys start at 0
+    $items = array_values($items);
 
-      if ($this->getEntityName() === 'Address') {
-        $createResult = $baoName::$method($item, $this->fixAddress);
-      }
-      else {
-        $createResult = $baoName::$method($item);
-      }
-
-      if (!$createResult) {
+    foreach ($this->write($items) as $index => $dao) {
+      if (!$dao) {
         $errMessage = sprintf('%s write operation failed', $this->getEntityName());
         throw new \API_Exception($errMessage);
       }
-
-      $result[] = $this->baoToArray($createResult, $item);
-    }
-
-    // Use bulk `writeRecords` method if the BAO doesn't have a create or add method
-    // TODO: reverse this from opt-in to opt-out and default to using `writeRecords` for all BAOs
-    if ($method === 'writeRecords') {
-      $items = array_values($items);
-      foreach ($baoName::writeRecords($items) as $i => $createResult) {
-        $result[] = $this->baoToArray($createResult, $items[$i]);
-      }
+      $result[] = $this->baoToArray($dao, $items[$index]);
     }
 
     \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
     FormattingUtil::formatOutputValues($result, $this->entityFields());
     return $result;
+  }
+
+  /**
+   * Overrideable function to save items using the appropriate BAO function
+   *
+   * @param array[] $items
+   *   Items already formatted by self::writeObjects
+   * @return \CRM_Core_DAO[]
+   *   Array of saved DAO records
+   */
+  protected function write(array $items) {
+    $saved = [];
+    $baoName = $this->getBaoName();
+
+    $method = method_exists($baoName, 'create') ? 'create' : (method_exists($baoName, 'add') ? 'add' : NULL);
+    // Use BAO create or add method if not deprecated
+    if ($method && !ReflectionUtils::isMethodDeprecated($baoName, $method)) {
+      foreach ($items as $item) {
+        $saved[] = $baoName::$method($item);
+      }
+    }
+    else {
+      $saved = $baoName::writeRecords($items);
+    }
+    return $saved;
   }
 
   /**
