@@ -170,7 +170,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     // only returns 2 calls - one in CRM_Contact_Import_Parser_Contact
     // and the other in jma grant applications (CRM_Grant_Form_Grant_Confirm)
     // both only pass in contact as a key here.
-    $ids = ['contact' => $ids['contact']];
+    $contactID = $ids['contact'];
+    unset($ids);
     // There is only ever one value passed in from the 2 places above that call
     // this - by clarifying here like this we can cleanup within this
     // function without having to do more universe searches.
@@ -182,7 +183,9 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     // step 3: if valid relationship then add the relation and keep the count
 
     // step 1
-    $contactFields = self::setContactABFromIDs($params, $ids, $relatedContactID);
+    [$contactFields['relationship_type_id'], $firstLetter, $secondLetter] = explode('_', $params['relationship_type_id']);
+    $contactFields['contact_id_' . $firstLetter] = $contactID;
+    $contactFields['contact_id_' . $secondLetter] = $relatedContactID;
     if (!CRM_Contact_BAO_Relationship::checkRelationshipType($contactFields['contact_id_a'], $contactFields['contact_id_b'],
       $contactFields['relationship_type_id'])) {
       return [0, 0];
@@ -197,7 +200,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     if (
     self::checkDuplicateRelationship(
       $contactFields,
-      CRM_Utils_Array::value('contact', $ids),
+      $contactID,
       // step 2
       $relatedContactID
     )
@@ -401,46 +404,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       }
     }
     return $params;
-  }
-
-  /**
-   * Resolve passed in contact IDs to contact_id_a & contact_id_b.
-   *
-   * @param array $params
-   * @param array $ids
-   * @param null $contactID
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public static function setContactABFromIDs($params, $ids = [], $contactID = NULL) {
-    $returnFields = [];
-
-    // $ids['contact'] is deprecated but comes from legacyCreateMultiple function.
-    if (empty($ids['contact'])) {
-      if (!empty($params['id'])) {
-        return self::loadExistingRelationshipDetails($params);
-      }
-      throw new CRM_Core_Exception('Cannot create relationship, insufficient contact IDs provided');
-    }
-    if (isset($params['relationship_type_id']) && !is_numeric($params['relationship_type_id'])) {
-      $relationshipTypes = $params['relationship_type_id'] ?? NULL;
-      list($relationshipTypeID, $first) = explode('_', $relationshipTypes);
-      $returnFields['relationship_type_id'] = $relationshipTypeID;
-
-      foreach (['a', 'b'] as $contactLetter) {
-        if (empty($params['contact_' . $contactLetter])) {
-          if ($first == $contactLetter) {
-            $returnFields['contact_id_' . $contactLetter] = $ids['contact'] ?? NULL;
-          }
-          else {
-            $returnFields['contact_id_' . $contactLetter] = $contactID;
-          }
-        }
-      }
-    }
-
-    return $returnFields;
   }
 
   /**
