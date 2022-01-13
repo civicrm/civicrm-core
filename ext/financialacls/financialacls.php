@@ -398,6 +398,18 @@ function financialacls_toggle() {
 //}
 
 /**
+ * Require financial acl permissions for financial screens.
+ *
+ * @param array $menu
+ */
+function financialacls_civicrm_alterMenu(array &$menu): void {
+  if (!financialacls_is_acl_limiting_enabled()) {
+    return;
+  }
+  $menu['civicrm/admin/financial/financialType']['access_arguments'] = [['administer CiviCRM Financial Types']];
+}
+
+/**
  * Implements hook_civicrm_navigationMenu().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_navigationMenu
