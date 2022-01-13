@@ -222,7 +222,7 @@ class CRM_Core_CodeGen_Specification {
       'labelName' => substr($name, 8),
       'className' => $this->classNames[$name],
       'bao' => ($useBao ? str_replace('DAO', 'BAO', $this->classNames[$name]) : $this->classNames[$name]),
-      'entity' => $klass,
+      'entity' => $tableXML->entity ?? $klass,
       'attributes_simple' => trim($database['tableAttributes_simple']),
       'attributes_modern' => trim($database['tableAttributes_modern']),
       'comment' => $this->value('comment', $tableXML),
