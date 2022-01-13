@@ -355,11 +355,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
       return '';
     }
     if ($component === 'contribution') {
-      $types = array_keys(self::getAllEnabledAvailableFinancialTypes());
-      if (empty($types)) {
-        $types = [0];
-      }
-      $clauses[] = ' civicrm_contribution.financial_type_id IN (' . implode(',', $types) . ')';
+      $clauses = CRM_Contribute_BAO_Contribution::getSelectWhereClause();
     }
     if ($component === 'membership') {
       self::getAvailableMembershipTypes($types, CRM_Core_Action::VIEW);

@@ -81,7 +81,7 @@ class FinancialTypeTest extends BaseTestClass {
       'view contributions of type Member Dues',
     ]);
     $whereClause = \CRM_Financial_BAO_FinancialType::buildPermissionedClause('contribution');
-    $this->assertEquals(' civicrm_contribution.financial_type_id IN (1,2)', $whereClause);
+    $this->assertEquals('(`civicrm_contribution`.`financial_type_id` IS NULL OR (`civicrm_contribution`.`financial_type_id` IN (1,2)))', $whereClause);
     $this->setPermissions([
       'view contributions of type Donation',
       'view contributions of type Member Dues',
@@ -89,7 +89,7 @@ class FinancialTypeTest extends BaseTestClass {
     ]);
 
     $whereClause = \CRM_Financial_BAO_FinancialType::buildPermissionedClause('contribution');
-    $this->assertEquals(' civicrm_contribution.financial_type_id IN (1,4,2)', $whereClause);
+    $this->assertEquals('(`civicrm_contribution`.`financial_type_id` IS NULL OR (`civicrm_contribution`.`financial_type_id` IN (1,4,2)))', $whereClause);
   }
 
 }
