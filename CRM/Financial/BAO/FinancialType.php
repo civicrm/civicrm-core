@@ -356,33 +356,22 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
     if (!self::isACLFinancialTypeStatus()) {
       return FALSE;
     }
-    if (is_array($whereClauses)) {
+    if ($component == 'contribution') {
       $types = self::getAllEnabledAvailableFinancialTypes();
-      if (empty($types)) {
-        $whereClauses[] = ' ' . $alias . '.financial_type_id IN (0)';
-      }
-      else {
-        $whereClauses[] = ' ' . $alias . '.financial_type_id IN (' . implode(',', array_keys($types)) . ')';
-      }
+      $column = "financial_type_id";
     }
-    else {
-      if ($component == 'contribution') {
-        $types = self::getAllEnabledAvailableFinancialTypes();
-        $column = "financial_type_id";
-      }
-      if ($component == 'membership') {
-        self::getAvailableMembershipTypes($types, CRM_Core_Action::VIEW);
-        $column = "membership_type_id";
-      }
-      if (!empty($whereClauses)) {
-        $whereClauses .= ' AND ';
-      }
-      if (empty($types)) {
-        $whereClauses .= " civicrm_{$component}.{$column} IN (0)";
-        return;
-      }
-      $whereClauses .= " civicrm_{$component}.{$column} IN (" . implode(',', array_keys($types)) . ")";
+    if ($component == 'membership') {
+      self::getAvailableMembershipTypes($types, CRM_Core_Action::VIEW);
+      $column = "membership_type_id";
     }
+    if (!empty($whereClauses)) {
+      $whereClauses .= ' AND ';
+    }
+    if (empty($types)) {
+      $whereClauses .= " civicrm_{$component}.{$column} IN (0)";
+      return;
+    }
+    $whereClauses .= " civicrm_{$component}.{$column} IN (" . implode(',', array_keys($types)) . ")";
   }
 
   /**
