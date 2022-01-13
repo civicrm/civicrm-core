@@ -3,6 +3,32 @@
 
   angular.module('crmDialog', CRM.angRequires('crmDialog'));
 
+  // Convenience binding to automatically launch a dialog when clicking an element
+  // Ex: <button type="button" crm-dialog-popup="myDialogName" popup-tpl="~/myExt/MyDialogTpl.html" popup-data="{foo: bar}"
+  angular.module('crmDialog').directive('crmDialogPopup', function(dialogService) {
+    return {
+      restrict: 'A',
+      bindToController: {
+        popupTpl: '@',
+        popupName: '@crmDialogPopup',
+        popupData: '<'
+      },
+      controller: function($scope, $element) {
+        var ctrl = this;
+        $element.on('click', function() {
+          var options = CRM.utils.adjustDialogDefaults({
+            autoOpen: false,
+            title: _.trim($element.attr('title') || $element.text())
+          });
+          dialogService.open(ctrl.popupName, ctrl.popupTpl, ctrl.popupData || {}, options)
+            .then(function(success) {
+              $element.trigger('crmPopupFormSuccess');
+            });
+        });
+      }
+    };
+  });
+
   // Ex: <div crm-dialog="myDialogName"> ... <button ng-click="$dialog.cancel()">Cancel</button> ... </div>
   // Ex: <div crm-dialog="myDialogName"> ... <button ng-click="$dialog.close(outputData)">Close</button> ... </div>
   // Ex: <div crm-dialog="myDialogName"> ... <crm-dialog-button text="'Close'" on-click="$dialog.close()" /> ... </div>
