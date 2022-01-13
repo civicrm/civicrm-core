@@ -99,7 +99,7 @@ class PublicMethods {
    * Set active user.
    *
    * @param \Civi\Pipe\PipeSession $session
-   * @param array{contactId: int, userId: int, user: string} $request
+   * @param array{contactId: int, userId: int, user: string, cred: string} $request
    * @return array|\Civi\Api4\Generic\Result|int
    */
   public function login(PipeSession $session, array $request) {
@@ -113,7 +113,7 @@ class PublicMethods {
 
     $principal = \CRM_Utils_Array::subset($request, ['contactId', 'userId', 'user']);
     if ($principal && $session->isTrusted()) {
-      return $redact(authx_login($request, FALSE /* Pipe sessions do not need cookies or DB */));
+      return $redact(authx_login(['flow' => 'script', 'principal' => $principal]));
     }
     elseif ($principal && !$session->isTrusted()) {
       throw new AuthxException("Session is not trusted.");
@@ -121,7 +121,7 @@ class PublicMethods {
     elseif (isset($request['cred'])) {
       $authn = new \Civi\Authx\Authenticator();
       $authn->setRejectMode('exception');
-      if ($authn->auth(NULL, ['flow' => 'xheader', 'cred' => $request['cred']])) {
+      if ($authn->auth(NULL, ['flow' => 'pipe', 'cred' => $request['cred']])) {
         return $redact(\CRM_Core_Session::singleton()->get("authx"));
       }
     }
