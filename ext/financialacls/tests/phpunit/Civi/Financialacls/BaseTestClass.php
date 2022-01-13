@@ -58,6 +58,7 @@ class BaseTestClass extends \PHPUnit\Framework\TestCase implements HeadlessInter
       'access CiviMember',
       'edit contributions',
       'delete in CiviContribute',
+      'view all contacts',
       'view contributions of type Donation',
       'delete contributions of type Donation',
       'add contributions of type Donation',

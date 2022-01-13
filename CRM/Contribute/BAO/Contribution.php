@@ -4371,30 +4371,29 @@ LIMIT 1;";
     }
     $startDate = "$year$monthDay";
     $endDate = "$nextYear$monthDay";
-
-    $whereClauses = [
-      'contact_id' => 'IN (' . $contactIDs . ')',
-      'is_test' => ' = 0',
-      'receive_date' => ['>=' . $startDate, '<  ' . $endDate],
-    ];
     $havingClause = 'contribution_status_id = ' . (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-    CRM_Financial_BAO_FinancialType::addACLClausesToWhereClauses($whereClauses);
+
+    $contributionBAO = new CRM_Contribute_BAO_Contribution();
+    $whereClauses = $contributionBAO->addSelectWhereClause();
 
     $clauses = [];
     foreach ($whereClauses as $key => $clause) {
-      $clauses[] = 'b.' . $key . " " . implode(' AND b.' . $key, (array) $clause);
+      $clauses[] = 'b.' . $key . ' ' . implode(' AND b.' . $key, (array) $clause);
     }
+    $clauses[] = 'b.contact_id IN (' . $contactIDs . ')';
+    $clauses[] = 'b.is_test = 0';
+    $clauses[] = 'b.receive_date >=' . $startDate . ' AND b.receive_date < ' . $endDate;
     $whereClauseString = implode(' AND ', $clauses);
 
     // See https://github.com/civicrm/civicrm-core/pull/13512 for discussion of how
     // this group by + having on contribution_status_id improves performance
-    $query = "
+    $query = '
       SELECT COUNT(*) as count,
              SUM(total_amount) as amount,
              AVG(total_amount) as average,
              currency
       FROM civicrm_contribution b
-      WHERE " . $whereClauseString . "
+      WHERE ' . $whereClauseString . "
       GROUP BY currency, contribution_status_id
       HAVING $havingClause
       ";

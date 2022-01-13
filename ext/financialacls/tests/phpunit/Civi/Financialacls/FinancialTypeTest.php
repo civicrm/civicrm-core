@@ -71,40 +71,4 @@ class FinancialTypeTest extends BaseTestClass {
     $this->assertEquals([1 => 'Donation'], $type);
   }
 
-  /**
-   * Check method test buildPermissionedClause()
-   *
-   * @throws \API_Exception
-   */
-  public function testBuildPermissionedClause(): void {
-    Civi::settings()->set('acl_financial_type', 1);
-    $membershipTypeID = Civi\Api4\MembershipType::create()->setValues([
-      'financial_type_id:name' => 'Event Fee',
-      'name' => 'event access',
-      'member_of_contact_id' => \CRM_Core_Config::domainID(),
-      'duration_unit' => 'year',
-      'period_type' => 'fixed',
-    ])->execute()->first()['id'];
-    $this->setPermissions([
-      'view contributions of type Donation',
-      'view contributions of type Member Dues',
-    ]);
-    $whereClause = \CRM_Financial_BAO_FinancialType::buildPermissionedClause('contribution');
-    $this->assertEquals('(`civicrm_contribution`.`financial_type_id` IS NULL OR (`civicrm_contribution`.`financial_type_id` IN (1,2)))', $whereClause);
-    $whereClause = \CRM_Financial_BAO_FinancialType::buildPermissionedClause('membership');
-    $this->assertEquals(' civicrm_membership.membership_type_id IN (0)', $whereClause);
-
-    $this->setPermissions([
-      'view contributions of type Donation',
-      'view contributions of type Member Dues',
-      'view contributions of type Event Fee',
-    ]);
-
-    $whereClause = \CRM_Financial_BAO_FinancialType::buildPermissionedClause('contribution');
-    $this->assertEquals('(`civicrm_contribution`.`financial_type_id` IS NULL OR (`civicrm_contribution`.`financial_type_id` IN (1,4,2)))', $whereClause);
-    $whereClause = \CRM_Financial_BAO_FinancialType::buildPermissionedClause('membership');
-    $this->assertEquals(' civicrm_membership.membership_type_id IN (' . $membershipTypeID . ')', $whereClause);
-
-  }
-
 }

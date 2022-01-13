@@ -346,27 +346,21 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    * @param string $component
    *   the type of component
    *
+   * @deprecated
+   *
    * @return string $clauses
    */
   public static function buildPermissionedClause(string $component): string {
-    $clauses = [];
-    // @todo the relevant addSelectWhere clause should be called.
-    if (!self::isACLFinancialTypeStatus()) {
-      return '';
-    }
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    // There are no non-test usages of this function (including in a universe
+    // search).
     if ($component === 'contribution') {
       $clauses = CRM_Contribute_BAO_Contribution::getSelectWhereClause();
     }
     if ($component === 'membership') {
-      self::getAvailableMembershipTypes($types, CRM_Core_Action::VIEW);
-      $types = array_keys($types);
-      if (empty($types)) {
-        $types = [0];
-      }
-      $clauses[] = ' civicrm_membership.membership_type_id IN (' . implode(',', $types) . ')';
-
+      $clauses = CRM_Member_BAO_Membership::getSelectWhereClause();
     }
-    return implode(' AND ', $clauses);
+    return 'AND ' . implode(' AND ', $clauses);
   }
 
   /**
