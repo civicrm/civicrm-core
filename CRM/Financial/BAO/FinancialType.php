@@ -299,7 +299,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    */
   public static function getAvailableMembershipTypes(&$membershipTypes = NULL, $action = CRM_Core_Action::VIEW) {
     if (empty($membershipTypes)) {
-      $membershipTypes = CRM_Member_PseudoConstant::membershipType();
+      $membershipTypes = CRM_Member_BAO_Membership::buildOptions('membership_type_id');
     }
     if (!self::isACLFinancialTypeStatus()) {
       return $membershipTypes;
