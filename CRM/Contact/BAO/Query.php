@@ -2038,7 +2038,7 @@ class CRM_Contact_BAO_Query {
    * @return string
    * @throws \CRM_Core_Exception
    */
-  public function whereClause($isForcePrimaryEmailOnly = NULL) {
+  public function whereClause($isForcePrimaryEmailOnly = NULL): string {
     $this->_where[0] = [];
     $this->_qill[0] = [];
 
