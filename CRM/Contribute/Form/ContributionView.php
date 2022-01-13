@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+
 /**
  *
  * @package CRM
@@ -24,16 +26,23 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
    * Set variables up before form is built.
    */
   public function preProcess() {
-    $id = $this->get('id');
-    if (empty($id)) {
-      throw new CRM_Core_Exception('Contribution ID is required');
-    }
-    $params = ['id' => $id];
+    $id = $this->getID();
+
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->assign('context', $context);
 
-    $values = CRM_Contribute_BAO_Contribution::getValuesWithMappings($params);
+    // Note than this get could be restricted by ACLs in an extension
+    $contribution = Contribution::get(TRUE)->addWhere('id', '=', $id)->addSelect('*')->execute()->first();
+    if (empty($contribution)) {
+      CRM_Core_Error::statusBounce(ts('Access to contribution not permitted'));
+    }
+    // We just cast here because it was traditionally an array called values - would be better
+    // just to use 'contribution'.
+    $values = (array) $contribution;
+    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $values['contribution_status_id']);
 
+    // @todo - it might have been better to create a new form that extends this
+    // for template contributions rather than overloading this form.
     $force_create_template = CRM_Utils_Request::retrieve('force_create_template', 'Boolean', $this, FALSE, FALSE);
     if ($force_create_template && !empty($values['contribution_recur_id']) && empty($values['is_template'])) {
       // Create a template contribution.
@@ -70,7 +79,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     }
 
     // get received into i.e to_financial_account_id from last trxn
-    $financialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($values['contribution_id'], 'DESC');
+    $financialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($this->getID(), 'DESC');
     $values['to_financial_account'] = '';
     if (!empty($financialTrxnId['financialTrxnId'])) {
       $values['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $financialTrxnId['financialTrxnId'], 'to_financial_account_id');
@@ -129,7 +138,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     }
 
     //assign soft credit record if exists.
-    $SCRecords = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($values['contribution_id'], TRUE);
+    $SCRecords = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->getID(), TRUE);
     if (!empty($SCRecords['soft_credit'])) {
       $this->assign('softContributions', $SCRecords['soft_credit']);
       unset($SCRecords['soft_credit']);
@@ -150,7 +159,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
       $values['campaign'] = $campaigns[$campaignId];
     }
-    if ($values['contribution_status'] == 'Refunded') {
+    if ($contributionStatus === 'Refunded') {
       $this->assign('refund_trxn_id', CRM_Core_BAO_FinancialTrxn::getRefundTransactionTrxnID($id));
     }
 
@@ -258,6 +267,19 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $this->assign('payments', $paymentInfo['transaction']);
     $this->assign('paymentLinks', $paymentInfo['payment_links']);
     return $title;
+  }
+
+  /**
+   * Get the contribution ID.
+   *
+   * @return int
+   */
+  private function getID(): int {
+    $id = $this->get('id');
+    if (empty($id)) {
+      CRM_Core_Error::statusBounce('Contribution ID is required');
+    }
+    return $id;
   }
 
 }

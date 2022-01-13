@@ -316,7 +316,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * Get the values and resolve the most common mappings.
+   * Deprecated contact.get call.
    *
    * Since contribution status is resolved in almost every function that calls getValues it makes
    * sense to have an extra function to resolve it rather than repeat the code.
@@ -330,6 +330,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @return array
    *   Array of the found contribution.
    * @throws CRM_Core_Exception
+   *
+   * @deprecated
    */
   public static function getValuesWithMappings($params) {
     $values = $ids = [];
