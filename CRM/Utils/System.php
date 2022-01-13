@@ -22,21 +22,22 @@
  *
  * FIXME: This is a massive and random collection that could be split into smaller services
  *
+ * @method static void getCMSPermissionsUrlParams() Immediately stop script execution and display a 401 "Access Denied" page.
  * @method static mixed permissionDenied() Show access denied screen.
  * @method static mixed logout() Log out the current user.
  * @method static mixed updateCategories() Clear CMS caches related to the user registration/profile forms.
- * @method static appendBreadCrumb(array $breadCrumbs) Append an additional breadcrumb tag to the existing breadcrumbs.
- * @method static resetBreadCrumb() Reset an additional breadcrumb tag to the existing breadcrumb.
- * @method static addHTMLHead(string $bc) Append a string to the head of the HTML file.
+ * @method static void appendBreadCrumb(array $breadCrumbs) Append an additional breadcrumb tag to the existing breadcrumbs.
+ * @method static void resetBreadCrumb() Reset an additional breadcrumb tag to the existing breadcrumb.
+ * @method static void addHTMLHead(string $head) Append a string to the head of the HTML file.
  * @method static string postURL(int $action) Determine the post URL for a form.
  * @method static string|null getUFLocale() Get the locale of the CMS.
  * @method static bool setUFLocale(string $civicrm_language) Set the locale of the CMS.
  * @method static bool isUserLoggedIn() Check if user is logged in.
  * @method static int getLoggedInUfID() Get current logged in user id.
- * @method static setHttpHeader(string $name, string $value) Set http header.
+ * @method static void setHttpHeader(string $name, string $value) Set http header.
  * @method static array synchronizeUsers() Create CRM contacts for all existing CMS users.
- * @method static appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_coreResourceList.
- * @method static alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_getAssetUrl.
+ * @method static void appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_coreResourceList.
+ * @method static void alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_getAssetUrl.
  */
 class CRM_Utils_System {
 
@@ -949,7 +950,7 @@ class CRM_Utils_System {
    *   (optional) Whether to log the memory usage information.
    */
   public static function xMemory($title = NULL, $log = FALSE) {
-    $mem = (float ) xdebug_memory_usage() / (float ) (1024);
+    $mem = (float) xdebug_memory_usage() / (float) (1024);
     $mem = number_format($mem, 5) . ", " . time();
     if ($log) {
       echo "<p>$title: $mem<p>";
