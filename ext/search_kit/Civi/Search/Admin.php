@@ -221,7 +221,7 @@ class Admin {
               // Sanity check - keyField must exist
               !$keyField ||
               // Exclude any joins that are better represented by pseudoconstants
-              is_a($reference, 'CRM_Core_Reference_OptionValue') || !empty($keyField['options']) ||
+              is_a($reference, 'CRM_Core_Reference_OptionValue') ||
               // Sanity check - table should match
               $daoClass::getTableName() !== $reference->getReferenceTable()
             ) {
