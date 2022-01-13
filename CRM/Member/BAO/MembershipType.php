@@ -84,14 +84,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
 
     $membershipTypeId = $params['id'] ?? NULL;
 
-    if (!$membershipTypeId) {
-      if (!isset($params['is_active'])) {
-        // do we need this?
-        $params['is_active'] = FALSE;
-      }
-      if (!isset($params['domain_id'])) {
-        $params['domain_id'] = CRM_Core_Config::domainID();
-      }
+    if (!$membershipTypeId && !isset($params['domain_id'])) {
+      $params['domain_id'] = CRM_Core_Config::domainID();
     }
 
     // $previousID is the old organization id for membership type i.e 'member_of_contact_id'. This is used when an organization is changed.
