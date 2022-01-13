@@ -2361,12 +2361,12 @@ abstract class CRM_Utils_Hook {
    * Issue CRM-14276
    * Add a hook for altering the display name
    *
-   * hook_civicrm_contact_get_displayname(&$display_name, $objContact)
+   * hook_civicrm_contact_get_displayname(&$display_name, $contactId, $dao)
    *
    * @param string $displayName
    * @param int $contactId
-   * @param object $dao
-   *   The contact object.
+   * @param CRM_Core_DAO $dao
+   *   A DAO object containing contact fields + primary email field as "email".
    *
    * @return mixed
    */
