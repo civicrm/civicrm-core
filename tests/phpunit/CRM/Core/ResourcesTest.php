@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Test\Invasive;
+
 /**
  * Tests for linking to resource files
  * @group headless
@@ -508,7 +510,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    */
   public function testEntityRefFiltersHook() {
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_entityRefFilters', [$this, 'entityRefFilters']);
-    $data = CRM_Core_Resources::getEntityRefMetadata();
+    $data = Invasive::call(['CRM_Core_Resources', 'getEntityRefMetadata']);
     $this->assertEquals(count($data['links']['Contact']), 4);
     $this->assertEquals(!empty($data['links']['Contact']['new_staff']), TRUE);
   }
