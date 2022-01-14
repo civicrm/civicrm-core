@@ -501,22 +501,12 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
       'filters' => [],
       'links' => [],
     ];
-    $config = CRM_Core_Config::singleton();
-
-    $disabledComponents = [];
-    $dao = CRM_Core_DAO::executeQuery("SELECT name, namespace FROM civicrm_component");
-    while ($dao->fetch()) {
-      if (!in_array($dao->name, $config->enableComponents)) {
-        $disabledComponents[$dao->name] = $dao->namespace;
-      }
-    }
+    $enabledComponents = Civi::settings()->get('enable_components');
 
     foreach (CRM_Core_DAO_AllCoreTables::daoToClass() as $entity => $daoName) {
       // Skip DAOs of disabled components
-      foreach ($disabledComponents as $nameSpace) {
-        if (strpos($daoName, $nameSpace) === 0) {
-          continue 2;
-        }
+      if (defined("$daoName::COMPONENT") && !in_array($daoName::COMPONENT, $enabledComponents, TRUE)) {
+        continue;
       }
       $baoName = str_replace('_DAO_', '_BAO_', $daoName);
       if (class_exists($baoName)) {
