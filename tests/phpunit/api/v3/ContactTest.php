@@ -909,8 +909,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test creating a current employer through API.
    *
    * Check it will re-activate a de-activated employer
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testContactCreateDuplicateCurrentEmployerEnables(): void {
     // Set up  - create employer relationship.
