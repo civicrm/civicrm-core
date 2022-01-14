@@ -72,22 +72,6 @@
       if (!this.tab) {
         this.tab = this.tabs[0].name;
       }
-
-      this.openImportDialog = function() {
-        var options = CRM.utils.adjustDialogDefaults({
-          autoOpen: false,
-          title: ts('Import Saved Search')
-        });
-        dialogService.open('crmSearchAdminImport', '~/crmSearchAdmin/searchListing/import.html', {}, options)
-          .then(function() {
-            // Refresh the custom tab by resetting the filters
-            ctrl.tabs[0].filters = {};
-            // Timeout ensures the change gets noticed by the display's $watch
-            $timeout(function() {
-              ctrl.tabs[0].filters = {has_base: false};
-            }, 300);
-          }, _.noop);
-      };
     })
 
     // Controller for creating a new search
