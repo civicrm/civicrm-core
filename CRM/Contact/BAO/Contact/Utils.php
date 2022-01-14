@@ -245,7 +245,7 @@ WHERE  id IN ( $idString )
    *
    * @param int $contactID
    *   Contact id of the individual.
-   * @param $organization
+   * @param $employerID
    *   (id or name).
    * @param null $previousEmployerID
    * @param bool $newContact
@@ -254,24 +254,24 @@ WHERE  id IN ( $idString )
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL, $newContact = FALSE) {
-    if (!$organization) {
+  public static function createCurrentEmployerRelationship($contactID, $employerID, $previousEmployerID = NULL, $newContact = FALSE) {
+    if (!$employerID) {
       // This function is not called in core with no organization & should not be
       // Refs CRM-15368,CRM-15547
       CRM_Core_Error::deprecatedWarning('calling this function with no organization is deprected');
       return;
     }
-    if (!is_numeric($organization)) {
-      $dupeIDs = CRM_Contact_BAO_Contact::getDuplicateContacts(['organization_name' => $organization], 'Organization', 'Unsupervised', [], FALSE);
-      $organization = reset($dupeIDs) ?: Contact::create(FALSE)
+    if (!is_numeric($employerID)) {
+      $dupeIDs = CRM_Contact_BAO_Contact::getDuplicateContacts(['organization_name' => $employerID], 'Organization', 'Unsupervised', [], FALSE);
+      $employerID = reset($dupeIDs) ?: Contact::create(FALSE)
         ->setValues([
           'contact_type' => 'Organization',
-          'organization_name' => $organization,
+          'organization_name' => $employerID,
         ])->execute()->first()['id'];
     }
 
-    $relTypeId = CRM_Contact_BAO_RelationshipType::getEmployeeRelationshipTypeID();
-    if (!CRM_Contact_BAO_Contact::getContactType($contactID) || !CRM_Contact_BAO_Contact::getContactType($organization)) {
+    $relationshipTypeID = CRM_Contact_BAO_RelationshipType::getEmployeeRelationshipTypeID();
+    if (!CRM_Contact_BAO_Contact::getContactType($contactID) || !CRM_Contact_BAO_Contact::getContactType($employerID)) {
       // There doesn't seem to be any reason to think this would ever be true but there
       // was a previous more complicated check.
       CRM_Core_Error::deprecatedWarning('attempting to create an employer with invalid contact types is deprecated');
@@ -279,29 +279,29 @@ WHERE  id IN ( $idString )
     }
     // create employee of relationship
     [$duplicate, $relationshipIds]
-      = self::legacyCreateMultiple($relTypeId, $organization, $contactID);
+      = self::legacyCreateMultiple($relationshipTypeID, $employerID, $contactID);
 
     // In case we change employer, clean previous employer related records.
     if (!$previousEmployerID && !$newContact) {
       $previousEmployerID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id');
     }
     if ($previousEmployerID &&
-      $previousEmployerID != $organization
+      $previousEmployerID != $employerID
     ) {
       self::clearCurrentEmployer($contactID, $previousEmployerID);
     }
 
     // set current employer
-    self::setCurrentEmployer([$contactID => $organization]);
+    self::setCurrentEmployer([$contactID => $employerID]);
 
     $relationshipParams = [
       'relationship_ids' => $relationshipIds,
       'is_active' => 1,
-      'contact_check' => [$organization => TRUE],
-      'relationship_type_id' => $relTypeId . '_a_b',
+      'contact_check' => [$employerID => TRUE],
+      'relationship_type_id' => $relationshipTypeID . '_a_b',
     ];
     // Handle related memberships. CRM-3792
-    self::currentEmployerRelatedMembership($contactID, $organization, $relationshipParams, $duplicate, $previousEmployerID);
+    self::currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate, $previousEmployerID);
   }
 
   /**
@@ -374,12 +374,12 @@ WHERE  id IN ( $idString )
    * @param bool $duplicate
    *   Are we triggered existing relationship.
    *
-   * @param int $previousEmpID
+   * @param int $previousEmployerID
    *
    * @throws CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
-  private static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate = FALSE, $previousEmpID = NULL) {
+  private static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate = FALSE, $previousEmployerID = NULL) {
     $ids = [];
     $action = CRM_Core_Action::ADD;
 
@@ -399,7 +399,7 @@ WHERE  id IN ( $idString )
     }
 
     //need to handle related memberships. CRM-3792
-    if ($previousEmpID != $employerID) {
+    if ($previousEmployerID != $employerID) {
       CRM_Contact_BAO_Relationship::relatedMemberships($contactID, $relationshipParams, $ids, $action);
     }
   }
