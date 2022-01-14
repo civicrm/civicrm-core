@@ -69,7 +69,7 @@ class PipeSession {
       }
     }
 
-    return json_encode(["Civi::pipe" => $flags]);
+    return json_encode(['Civi::pipe' => $flags]);
   }
 
   /**

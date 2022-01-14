@@ -104,7 +104,7 @@ class PublicMethods {
    */
   public function login(PipeSession $session, array $request) {
     if (!function_exists('authx_login')) {
-      throw new \CRM_Core_Exception("Cannot authenticate. Authx is not configured.");
+      throw new \CRM_Core_Exception('Cannot authenticate. Authx is not configured.');
     }
 
     $redact = function(?array $authx) {
@@ -116,17 +116,17 @@ class PublicMethods {
       return $redact(authx_login(['flow' => 'script', 'principal' => $principal]));
     }
     elseif ($principal && !$session->isTrusted()) {
-      throw new AuthxException("Session is not trusted.");
+      throw new AuthxException('Session is not trusted.');
     }
     elseif (isset($request['cred'])) {
       $authn = new \Civi\Authx\Authenticator();
       $authn->setRejectMode('exception');
       if ($authn->auth(NULL, ['flow' => 'pipe', 'cred' => $request['cred']])) {
-        return $redact(\CRM_Core_Session::singleton()->get("authx"));
+        return $redact(\CRM_Core_Session::singleton()->get('authx'));
       }
     }
 
-    throw new AuthxException("Cannot authenticate. Must specify principal/credentials.");
+    throw new AuthxException('Cannot authenticate. Must specify principal/credentials.');
   }
 
   /**

@@ -17,7 +17,7 @@ class JsonRpcMethodException extends \CRM_Core_Exception {
   public $raw;
 
   public function __construct(array $jsonRpcError) {
-    parent::__construct($jsonRpcError['error']['message'] ?? "Unknown JSON-RPC error",
+    parent::__construct($jsonRpcError['error']['message'] ?? 'Unknown JSON-RPC error',
       $jsonRpcError['error']['code'] ?? 0,
       $jsonRpcError['error']['data'] ?? []
     );
