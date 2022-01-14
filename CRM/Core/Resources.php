@@ -496,7 +496,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
    *
    * @return array
    */
-  public static function getEntityRefMetadata() {
+  protected static function getEntityRefMetadata() {
     $data = [
       'filters' => [],
       'links' => [],
