@@ -262,6 +262,11 @@ class Container {
     }
     $container->setAlias('cache.short', 'cache.default')->setPublic(TRUE);
 
+    $container->setDefinition('civi.pipe', new Definition(
+      'Civi\Pipe\PipeSession',
+      []
+    ))->setPublic(TRUE)->setShared(FALSE);
+
     $container->setDefinition('resources', new Definition(
       'CRM_Core_Resources',
       [new Reference('service_container')]

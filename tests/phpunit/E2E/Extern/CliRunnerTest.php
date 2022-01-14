@@ -111,6 +111,31 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
   }
 
   /**
+   * Use a CLI runner to start a bidirectional command pipe.
+   *
+   * This ensures that there are no funny headers or constraints of bidirectional data-flow.
+   *
+   * @param string $name
+   *   The name of the command we're testing with.
+   *   Ex: 'cv'
+   * @param string $runner
+   *   Ex: 'cv ev @PHP'
+   * @dataProvider getRunners
+   */
+  public function testPipe($name, $runner) {
+    $cmd = strtr($runner, ['@PHP' => escapeshellarg('Civi::pipe("t");')]);
+    $rpc = new \Civi\Pipe\BasicPipeClient($cmd);
+
+    $this->assertEquals('trusted', $rpc->getWelcome()['t'], "Expect standard Civi::pipe header when starting via $name");
+
+    $r = $rpc->call('echo', ['a' => 123]);
+    $this->assertEquals(['a' => 123], $r);
+
+    $r = $rpc->call('echo', [4, 5, 6]);
+    $this->assertEquals([4, 5, 6], $r);
+  }
+
+  /**
    * @param string $runner
    *   Ex: 'cv ev @PHP'
    * @param string $phpExpr
