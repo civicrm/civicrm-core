@@ -52,7 +52,7 @@ class JsonRpc {
       $response = static::handleMethodCall($parsed, $dispatcher);
     }
     else {
-      // [sic] "Invalid Request" title-case is anomalous but dictated by standard.
+      // [sic] 'Invalid Request' title-case is anomalous but dictated by standard.
       throw new \InvalidArgumentException('Invalid Request', -32600);
     }
 
@@ -65,7 +65,7 @@ class JsonRpc {
         throw new \InvalidArgumentException('Parse error', -32700);
       }
       if (($request['jsonrpc'] ?? '') !== '2.0' || !is_string($request['method'])) {
-        // [sic] "Invalid Request" title-case is anomalous but dictated by standard.
+        // [sic] 'Invalid Request' title-case is anomalous but dictated by standard.
         throw new \InvalidArgumentException('Invalid Request', -32600);
       }
       if (isset($request['params']) && !is_array($request['params'])) {

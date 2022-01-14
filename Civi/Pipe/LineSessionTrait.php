@@ -18,10 +18,10 @@ namespace Civi\Pipe;
  * $session = new class {
  *   use LineSessionTrait;
  *   protected function onRequest(string $requestLine): ?string {
- *     return "Thanks";
+ *     return 'Thanks';
  *   }
  *   protected function onException(string $requestLine, \Throwable $t): ?string {
- *     return "Oops";
+ *     return 'Oops';
  *   }
  * }
  * $session->setIO(STDIN, STDOUT)->run();

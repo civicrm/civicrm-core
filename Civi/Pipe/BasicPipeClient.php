@@ -81,7 +81,7 @@ class BasicPipeClient {
    */
   public function connect(string $command): array {
     if ($this->process) {
-      throw new \RuntimeException("Client error: Already connected");
+      throw new \RuntimeException('Client error: Already connected');
     }
 
     $desc = [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'a']];
@@ -92,7 +92,7 @@ class BasicPipeClient {
     $line = stream_get_line($this->pipes[1], $this->bufferSize, "\n");
     $this->welcome = json_decode($line, TRUE);
     if ($this->welcome === NULL || !isset($this->welcome['Civi::pipe'])) {
-      throw new \RuntimeException("Protocol error: Received malformed welcome");
+      throw new \RuntimeException('Protocol error: Received malformed welcome');
     }
     return $this->welcome['Civi::pipe'];
   }
@@ -114,7 +114,7 @@ class BasicPipeClient {
    */
   public function call(string $method, array $params, $id = NULL): array {
     if (!$this->process) {
-      throw new \RuntimeException("Client error: Connection was not been opened yet.");
+      throw new \RuntimeException('Client error: Connection was not been opened yet.');
     }
 
     $requestLine = json_encode(['jsonrpc' => '2.0', 'method' => $method, 'params' => $params, 'id' => $id]);
@@ -122,10 +122,10 @@ class BasicPipeClient {
     $responseLine = stream_get_line($this->pipes[1], $this->bufferSize, "\n");
     $decode = json_decode($responseLine, TRUE);
     if (!isset($decode['jsonrpc']) || $decode['jsonrpc'] !== '2.0') {
-      throw new \RuntimeException("Protocol error: Response lacks JSON-RPC header.");
+      throw new \RuntimeException('Protocol error: Response lacks JSON-RPC header.');
     }
     if (!array_key_exists('id', $decode) || $decode['id'] !== $id) {
-      throw new \RuntimeException("Protocol error: Received response for wrong request.");
+      throw new \RuntimeException('Protocol error: Received response for wrong request.');
     }
 
     if (array_key_exists('error', $decode) && !array_key_exists('result', $decode)) {
