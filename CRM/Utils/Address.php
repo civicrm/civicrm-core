@@ -34,7 +34,7 @@ class CRM_Utils_Address {
    *   If true indicates, the address to be built in hcard-microformat standard.
    * @param bool $mailing
    *   If true indicates, the call has been made from mailing label.
-   * @param null $tokenFields
+   * @param string[] $tokenFields
    *
    * @return string
    *   formatted address string
@@ -265,7 +265,7 @@ class CRM_Utils_Address {
   }
 
   /**
-   * @param $format
+   * @param string $format
    *
    * @return array
    */

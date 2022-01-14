@@ -51,13 +51,13 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
 
   /**
    * The header associated with this mailing.
-   * @var string
+   * @var CRM_Mailing_BAO_MailingComponent
    */
   private $header = NULL;
 
   /**
    * The footer associated with this mailing.
-   * @var string
+   * @var CRM_Mailing_BAO_MailingComponent
    */
   private $footer = NULL;
 

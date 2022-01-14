@@ -37,8 +37,8 @@ class CRM_Mailing_Event_BAO_Subscribe extends CRM_Mailing_Event_DAO_Subscribe {
    *   during event registration.
    * @param string $context
    *
-   * @return int|null
-   *   $se_id      The id of the subscription event, null on failure
+   * @return CRM_Mailing_Event_BAO_Subscribe|null
+   *   $se_id      The subscription event object, null on failure
    */
   public static function &subscribe($group_id, $email, $contactId = NULL, $context = NULL) {
     // CRM-1797 - allow subscription only to public groups

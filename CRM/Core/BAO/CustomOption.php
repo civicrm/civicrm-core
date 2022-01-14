@@ -167,7 +167,7 @@ class CRM_Core_BAO_CustomOption {
   /**
    * Delete Option.
    *
-   * @param $optionId integer
+   * @param int $optionId
    *   option id
    *
    */

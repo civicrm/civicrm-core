@@ -694,7 +694,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
    * care about output params appended.
    *
    * @param string $url
-   * @param array $url_params
+   * @param string $url_params
    *
    * @param int|null $parent_id
    *   Optionally restrict to one parent.

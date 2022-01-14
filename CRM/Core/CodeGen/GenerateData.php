@@ -334,7 +334,7 @@ class CRM_Core_CodeGen_GenerateData {
   /**
    * Get a random item from the sample data or any other array
    *
-   * @param $items (array or string) - if string, used as key for sample data,
+   * @param array|string $items if string, used as key for sample data,
    *   if array, used as data source
    *
    * @return mixed (element from array)
@@ -908,8 +908,10 @@ class CRM_Core_CodeGen_GenerateData {
   /**
    * Create an address for a contact
    *
-   * @param $cid int: contact id
-   * @param $masterContactId int: set if this is a shared address
+   * @param int $cid
+   *   contact id
+   * @param int $masterContactId
+   *   set if this is a shared address
    *
    * @return array
    */
@@ -960,7 +962,7 @@ class CRM_Core_CodeGen_GenerateData {
   /**
    * Add a phone number for a contact
    *
-   * @param $cid int: contact id
+   * @param int $cid contact id
    *
    * @return array
    */
@@ -982,7 +984,7 @@ class CRM_Core_CodeGen_GenerateData {
   /**
    * Add an email for a contact
    *
-   * @param $cid int: contact id
+   * @param int $cid contact id
    * @param $email
    * @param $locationType
    *
@@ -1002,8 +1004,8 @@ class CRM_Core_CodeGen_GenerateData {
    * Add a website based on organization name
    * Using common naming patterns
    *
-   * @param $cid int: contact id
-   * @param $name str: contact name
+   * @param int $cid contact id
+   * @param string $name contact name
    *
    * @return array
    */
@@ -1043,8 +1045,8 @@ class CRM_Core_CodeGen_GenerateData {
    * Create an email address based on a person's name
    * Using common naming patterns
    *
-   * @param $contact obj: individual contact record
-   * @param $domain str: supply a domain (i.e. for a work address)
+   * @param CRM_Contact_DAO_Contact $contact individual contact record
+   * @param string $domain supply a domain (i.e. for a work address)
    *
    * @return string
    */

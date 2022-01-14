@@ -218,7 +218,7 @@ class CRM_Utils_JS {
    *   'bar' => 'function() {return "bar";}',
    * ]
    *
-   * @param $js
+   * @param string $js
    * @return array
    * @throws Exception
    */

@@ -76,7 +76,7 @@ class CRM_Utils_Recent {
    *   The link for the above title.
    * @param string $id
    *   Object id.
-   * @param $type
+   * @param string $type
    * @param int $contactId
    * @param string $contactName
    * @param array $others

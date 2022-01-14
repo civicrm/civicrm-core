@@ -1361,14 +1361,13 @@ class CRM_Utils_System {
    *   Title of documentation wiki page.
    * @param bool $URLonly
    *   (optional) Whether to return URL only or full HTML link (default).
-   * @param string $text
+   * @param string|null $text
    *   (optional) Text of HTML link (no effect if $URLonly = false).
-   * @param string $title
+   * @param string|null $title
    *   (optional) Tooltip text for HTML link (no effect if $URLonly = false)
-   * @param string $style
+   * @param string|null $style
    *   (optional) Style attribute value for HTML link (no effect if $URLonly = false)
-   *
-   * @param null $resource
+   * @param string|null $resource
    *
    * @return string
    *   URL or link to documentation page, based on provided parameters.

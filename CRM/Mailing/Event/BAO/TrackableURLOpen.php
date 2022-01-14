@@ -201,7 +201,7 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
   /**
    * Get tracked url count for each mailing for a given set of mailing IDs.
    *
-   * @param int $mailingIDs
+   * @param int[] $mailingIDs
    *   IDs of the mailing (comma separated).
    * @param int $contactID
    *   ID of the contact.

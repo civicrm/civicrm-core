@@ -227,7 +227,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
    * to use a trait based approach. For now this is renamed to
    * permit the use of a non-static function with this name
    *
-   * @param $form CRM_Core_Form
+   * @param CRM_Core_Form_Task $form
    *
    * @return array $contactIds
    */

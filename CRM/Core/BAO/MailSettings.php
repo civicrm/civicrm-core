@@ -134,7 +134,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    *   Reference array contains the values submitted by the form.
    *
    *
-   * @return object
+   * @return CRM_Core_DAO_MailSettings
    */
   public static function add(&$params) {
     $result = NULL;
@@ -167,7 +167,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Core_BAO_MailSettings
+   * @return CRM_Core_DAO_MailSettings|CRM_Core_Error
    */
   public static function create(&$params) {
     $transaction = new CRM_Core_Transaction();

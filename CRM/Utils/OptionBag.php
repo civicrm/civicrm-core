@@ -61,7 +61,7 @@ class CRM_Utils_OptionBag implements ArrayAccess, IteratorAggregate, Countable {
   }
 
   /**
-   * @param $key
+   * @param mixed $key
    *
    * @return bool
    */

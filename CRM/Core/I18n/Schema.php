@@ -451,8 +451,8 @@ class CRM_Core_I18n_Schema {
    *   schema structure class to use.
    * @param bool $isUpgradeMode
    *   Are we in upgrade mode therefore only build based off table not class
-   * @return array
-   *   array of CREATE INDEX queries
+   * @return string
+   *   The generated CREATE VIEW query
    */
   private static function createViewQuery($locale, $table, &$dao, $class = 'CRM_Core_I18n_SchemaStructure', $isUpgradeMode = FALSE) {
     $columns =& $class::columns();

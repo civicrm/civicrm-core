@@ -781,7 +781,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * Filter the activity types to only return the ones we actually asked for
    * Uses params['activity_type_id'] and params['activity_type_exclude_id']
    *
-   * @param $params
+   * @param array $params
    * @return array|null (Use in Activity.get API activity_type_id)
    */
   public static function filterActivityTypes($params) {
@@ -2288,7 +2288,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @return array
    */
   protected static function getActivityParamsForDashboardFunctions($params) {

@@ -246,7 +246,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Add a css file.
    *
-   * @param $url : string, absolute path to file
+   * @param string $url
+   *   absolute path to file
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *

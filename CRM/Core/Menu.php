@@ -528,7 +528,7 @@ class CRM_Core_Menu {
   }
 
   /**
-   * @param $path string
+   * @param string $path
    *   Path of menu item to retrieve.
    *
    * @return array

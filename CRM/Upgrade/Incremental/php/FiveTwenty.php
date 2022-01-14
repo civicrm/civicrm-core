@@ -160,7 +160,7 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
    * we're using this we don't care too much about the edge case where name
    * might not also be bidirectional.
    *
-   * @param $relationshipTypeId int
+   * @param int $relationshipTypeId
    *
    * @return bool
    */
@@ -190,7 +190,7 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
    * ONLY for ones using database storage - don't want to "fork" case types
    * that aren't currently forked.
    *
-   * @param $isDryRun bool
+   * @param bool $isDryRun
    *   If TRUE then don't actually change anything just report warnings.
    *
    * @return array List of warning messages.
@@ -326,9 +326,9 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
    * If it's unidirectional, we can't convert it if there's an edge case
    * where there's another type that has the same label.
    *
-   * @param $relationshipType array
-   * @param $caseTypeName string
-   * @param $xmlRoleName string
+   * @param array $relationshipType
+   * @param string $caseTypeName
+   * @param string $xmlRoleName
    *
    * @return string|NULL
    */
