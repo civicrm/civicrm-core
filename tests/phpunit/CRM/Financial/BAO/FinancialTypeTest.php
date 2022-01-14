@@ -302,26 +302,4 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     $this->assertEquals($perm, TRUE, 'Verify that lineitems now have permission.');
   }
 
-  /**
-   * Check method testisACLFinancialTypeStatus()
-   */
-  public function testBuildPermissionedClause() {
-    $this->setACL();
-    $this->setPermissions([
-      'view contributions of type Donation',
-      'view contributions of type Member Dues',
-    ]);
-    CRM_Financial_BAO_FinancialType::buildPermissionedClause($whereClause, 'contribution');
-    $this->assertEquals($whereClause, ' civicrm_contribution.financial_type_id IN (1,2)');
-    $this->setPermissions([
-      'view contributions of type Donation',
-      'view contributions of type Member Dues',
-      'view contributions of type Event Fee',
-    ]);
-    $whereClause = NULL;
-
-    CRM_Financial_BAO_FinancialType::buildPermissionedClause($whereClause, 'contribution');
-    $this->assertEquals($whereClause, ' civicrm_contribution.financial_type_id IN (1,4,2)');
-  }
-
 }

@@ -581,7 +581,11 @@ class CRM_Contact_BAO_Query {
     }
     if (isset($component) && !$this->_skipPermission) {
       // Unit test coverage in api_v3_FinancialTypeACLTest::testGetACLContribution.
-      CRM_Financial_BAO_FinancialType::buildPermissionedClause($this->_whereClause, $component);
+      $clauses = CRM_Financial_BAO_FinancialType::buildPermissionedClause($component);
+      if (!empty($this->_whereClause) && !empty($clauses)) {
+        $this->_whereClause .= ' AND ';
+      }
+      $this->_whereClause .= $clauses;
     }
 
     $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode, $apiEntity);

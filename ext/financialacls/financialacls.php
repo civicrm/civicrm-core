@@ -139,6 +139,7 @@ function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
     case 'LineItem':
     case 'MembershipType':
     case 'ContributionRecur':
+    case 'Contribution':
       $clauses['financial_type_id'] = _financialacls_civicrm_get_type_clause();
       break;
 

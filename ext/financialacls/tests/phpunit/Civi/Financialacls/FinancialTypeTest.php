@@ -16,8 +16,6 @@ class FinancialTypeTest extends BaseTestClass {
   /**
    * Test that a message is put in session when changing the name of a
    * financial type.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testChangeFinancialTypeName(): void {
     Civi::settings()->set('acl_financial_type', TRUE);
@@ -71,6 +69,27 @@ class FinancialTypeTest extends BaseTestClass {
     $this->setupLoggedInUserWithLimitedFinancialTypeAccess();
     $type = \CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
     $this->assertEquals([1 => 'Donation'], $type);
+  }
+
+  /**
+   * Check method test buildPermissionedClause()
+   */
+  public function testBuildPermissionedClause(): void {
+    Civi::settings()->set('acl_financial_type', 1);
+    $this->setPermissions([
+      'view contributions of type Donation',
+      'view contributions of type Member Dues',
+    ]);
+    $whereClause = \CRM_Financial_BAO_FinancialType::buildPermissionedClause('contribution');
+    $this->assertEquals('(`civicrm_contribution`.`financial_type_id` IS NULL OR (`civicrm_contribution`.`financial_type_id` IN (1,2)))', $whereClause);
+    $this->setPermissions([
+      'view contributions of type Donation',
+      'view contributions of type Member Dues',
+      'view contributions of type Event Fee',
+    ]);
+
+    $whereClause = \CRM_Financial_BAO_FinancialType::buildPermissionedClause('contribution');
+    $this->assertEquals('(`civicrm_contribution`.`financial_type_id` IS NULL OR (`civicrm_contribution`.`financial_type_id` IN (1,4,2)))', $whereClause);
   }
 
 }
