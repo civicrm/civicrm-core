@@ -294,14 +294,33 @@ WHERE  id IN ( $idString )
     // set current employer
     self::setCurrentEmployer([$contactID => $employerID]);
 
-    $relationshipParams = [
-      'relationship_ids' => $relationshipIds,
-      'is_active' => 1,
-      'contact_check' => [$employerID => TRUE],
-      'relationship_type_id' => $relationshipTypeID . '_a_b',
-    ];
-    // Handle related memberships. CRM-3792
-    self::currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate, $previousEmployerID);
+    $ids = [];
+    $action = CRM_Core_Action::ADD;
+
+    //we do not know that triggered relationship record is active.
+    if ($duplicate) {
+      $relationship = new CRM_Contact_DAO_Relationship();
+      $relationship->contact_id_a = $contactID;
+      $relationship->contact_id_b = $employerID;
+      $relationship->relationship_type_id = $relationshipTypeID;
+      if ($relationship->find(TRUE)) {
+        $action = CRM_Core_Action::UPDATE;
+        $ids['contact'] = $contactID;
+        $ids['contactTarget'] = $employerID;
+        $ids['relationship'] = $relationship->id;
+        CRM_Contact_BAO_Relationship::setIsActive($relationship->id, TRUE);
+      }
+    }
+
+    //need to handle related memberships. CRM-3792
+    if ($previousEmployerID != $employerID) {
+      CRM_Contact_BAO_Relationship::relatedMemberships($contactID, [
+        'relationship_ids' => $relationshipIds,
+        'is_active' => 1,
+        'contact_check' => [$employerID => TRUE],
+        'relationship_type_id' => $relationshipTypeID . '_a_b',
+      ], $ids, $action);
+    }
   }
 
   /**
@@ -380,28 +399,7 @@ WHERE  id IN ( $idString )
    * @throws \CRM_Core_Exception
    */
   private static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate = FALSE, $previousEmployerID = NULL) {
-    $ids = [];
-    $action = CRM_Core_Action::ADD;
 
-    //we do not know that triggered relationship record is active.
-    if ($duplicate) {
-      $relationship = new CRM_Contact_DAO_Relationship();
-      $relationship->contact_id_a = $contactID;
-      $relationship->contact_id_b = $employerID;
-      $relationship->relationship_type_id = $relationshipParams['relationship_type_id'];
-      if ($relationship->find(TRUE)) {
-        $action = CRM_Core_Action::UPDATE;
-        $ids['contact'] = $contactID;
-        $ids['contactTarget'] = $employerID;
-        $ids['relationship'] = $relationship->id;
-        CRM_Contact_BAO_Relationship::setIsActive($relationship->id, TRUE);
-      }
-    }
-
-    //need to handle related memberships. CRM-3792
-    if ($previousEmployerID != $employerID) {
-      CRM_Contact_BAO_Relationship::relatedMemberships($contactID, $relationshipParams, $ids, $action);
-    }
   }
 
   /**
