@@ -287,7 +287,7 @@ FROM   civicrm_prevnext_cache pn
   }
 
   /**
-   * @param $string
+   * @param mixed $string
    *
    * @return bool
    */

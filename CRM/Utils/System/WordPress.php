@@ -783,7 +783,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @param $dir
+   * @param string $dir
    *
    * @return bool
    */
@@ -963,7 +963,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
   /**
    * @param array $params
-   * @param $errors
+   * @param array $errors
    * @param string $emailName
    */
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
@@ -1401,8 +1401,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * is only as of PHP 7.3.0 that the setcookie() method supports the "SameSite"
    * attribute in its options and will accept "None" as a valid value.
    *
-   * @param $name The name of the cookie.
-   * @param $value The value of the cookie.
+   * @param string $name The name of the cookie.
+   * @param string $value The value of the cookie.
    * @param array $options The header options for the cookie.
    */
   private function setAuthCookie($name, $value, $options) {

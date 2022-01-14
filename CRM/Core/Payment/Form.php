@@ -188,7 +188,7 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * @param array $paymentProcessor
+   * @param CRM_Core_Payment $paymentProcessor
    *
    * @return string
    */

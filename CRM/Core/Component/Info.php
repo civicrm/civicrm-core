@@ -332,7 +332,7 @@ abstract class CRM_Core_Component_Info {
   /**
    * Helper for instantiating component's elements.
    *
-   * @param $cl
+   * @param string $cl
    *
    * @return mixed
    *   component's element as class instance

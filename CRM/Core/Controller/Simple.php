@@ -23,7 +23,7 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
   /**
    * Constructor.
    *
-   * @param null $path
+   * @param string $path
    *   The class Path of the form being implemented
    * @param bool $title
    * @param string $mode

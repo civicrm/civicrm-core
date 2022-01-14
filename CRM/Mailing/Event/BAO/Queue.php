@@ -40,7 +40,7 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    *
    * @param array $params
    *
-   * @return int
+   * @return string
    *   The hash
    */
   public static function hash($params) {

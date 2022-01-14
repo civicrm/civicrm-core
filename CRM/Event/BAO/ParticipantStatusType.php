@@ -19,7 +19,7 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   /**
    * @param array $params
    *
-   * @return this|null
+   * @return self|null
    */
   public static function add(&$params) {
     if (empty($params)) {
@@ -33,7 +33,7 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   /**
    * @param array $params
    *
-   * @return this|null
+   * @return self|null
    */
   public static function &create(&$params) {
     $transaction = new CRM_Core_Transaction();

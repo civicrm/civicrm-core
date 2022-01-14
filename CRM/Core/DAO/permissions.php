@@ -12,9 +12,9 @@
 /**
  * Decide what permissions to check for an api call
  *
- * @param $entity : (str) api entity
- * @param $action : (str) api action
- * @param $params : (array) api params
+ * @param string $entity api entity
+ * @param string $action api action
+ * @param array $params api params
  *
  * @return array
  *   Array of permissions to check for this entity-action combo

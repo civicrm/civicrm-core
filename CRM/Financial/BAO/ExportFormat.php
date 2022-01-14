@@ -73,7 +73,7 @@ abstract class CRM_Financial_BAO_ExportFormat {
   /**
    * Abstract function that generates exports, and downloads them as zip file.
    *
-   * @param $exportDaos array with DAO's for queries to be exported.
+   * @param array $exportDaos with DAO's for queries to be exported.
    */
   abstract public function makeExport($exportDaos);
 

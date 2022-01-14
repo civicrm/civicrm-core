@@ -205,7 +205,7 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
   /**
    * Set NULL to phone, mapping, uffield
    *
-   * @param $optionId
+   * @param int $optionId
    *   Value of option to be deleted.
    */
   public static function setOptionToNull($optionId) {

@@ -94,7 +94,7 @@ class CRM_Activity_Form_Task_PDF extends CRM_Activity_Form_Task {
   /**
    * Render html from rows
    *
-   * @param $rows
+   * @param array $rows
    * @param string $msgPart
    *   The name registered with the TokenProcessor
    * @param array $formValues

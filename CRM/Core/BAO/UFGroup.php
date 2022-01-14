@@ -1604,7 +1604,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return CRM_Core_BAO_UFJoin
+   * @return CRM_Core_DAO_UFJoin
    */
   public static function addUFJoin(&$params) {
     $ufJoin = new CRM_Core_DAO_UFJoin();

@@ -855,7 +855,7 @@ class CRM_Utils_Token {
    *
    * @deprecated
    *
-   * @param $str ref to the string that will be scanned and modified
+   * @param string $str ref to the string that will be scanned and modified
    */
   public static function unescapeTokens(&$str) {
     $str = preg_replace('/\\\\|\{(\{\w+\.\w+\})\}/', '\\1', $str);

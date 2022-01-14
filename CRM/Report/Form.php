@@ -555,7 +555,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * set the number of rows to show
-   * @param $rowCount int
+   * @param int $rowCount
    */
   public function setRowCount($rowCount): void {
     $this->_rowCount = $rowCount;

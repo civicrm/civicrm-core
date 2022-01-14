@@ -231,7 +231,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
   }
 
   /**
-   * @param $page
+   * @param CRM_Core_Page $page
    * @param int $contactID
    */
   public static function checkUserPermission($page, $contactID = NULL) {
@@ -242,7 +242,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
       $contactID = $page->_contactId;
     }
 
-    // automatically grant permissin for users on their own record. makes
+    // automatically grant permission for users on their own record. makes
     // things easier in dashboard
     $session = CRM_Core_Session::singleton();
 

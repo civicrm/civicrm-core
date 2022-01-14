@@ -531,9 +531,9 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
    * in the data provider.
    * Maybe it doesn't really make sense to use a data provider here, but kinda.
    *
-   * @param &$expected array Contains the placeholders to update.
-   * @param $client_id int
-   * @param $case_id int
+   * @param array &$expected Contains the placeholders to update.
+   * @param int $client_id
+   * @param int $case_id
    */
   private function updateExpectedBecauseDataProviderEvaluatesBeforeEverything(&$expected, $client_id, $case_id) {
     $display_name = $this->callAPISuccess('Contact', 'getsingle', [

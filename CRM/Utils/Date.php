@@ -267,7 +267,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   * @param $string
+   * @param string $string
    *
    * @return int
    */

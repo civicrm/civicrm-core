@@ -127,9 +127,9 @@ class CRM_Utils_PDF_Document {
   }
 
   /**
-   * @param $value
-   * @param $metric
-   * @return int
+   * @param int $value
+   * @param string $metric
+   * @return float
    */
   public static function toTwip($value, $metric) {
     $point = CRM_Utils_PDF_Utils::convertMetric($value, $metric, 'pt');

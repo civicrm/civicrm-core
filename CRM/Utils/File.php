@@ -377,7 +377,7 @@ class CRM_Utils_File {
   }
 
   /**
-   * @param $ext
+   * @param string $ext
    *
    * @return bool
    */

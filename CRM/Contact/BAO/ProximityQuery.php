@@ -35,11 +35,23 @@ class CRM_Contact_BAO_ProximityQuery {
    */
 
   /**
-   * @var string
+   * @var float
    */
   static protected $_earthFlattening;
+
+  /**
+   * @var float
+   */
   static protected $_earthRadiusSemiMinor;
+
+  /**
+   * @var float
+   */
   static protected $_earthRadiusSemiMajor;
+
+  /**
+   * @var float
+   */
   static protected $_earthEccentricitySQ;
 
   public static function initialize() {
@@ -353,9 +365,8 @@ ACOS(
 
   /**
    * @param array $input
-   * retun void
    *
-   * @return null
+   * @return void
    */
   public static function fixInputParams(&$input) {
     foreach ($input as $param) {
@@ -378,7 +389,6 @@ ACOS(
             }
           }
         }
-        return NULL;
       }
     }
   }

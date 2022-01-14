@@ -274,7 +274,7 @@ WHERE cft.id = %1
   /**
    * Get Financial Account type relations.
    *
-   * @param $flip bool
+   * @param bool $flip
    *
    * @return array
    *

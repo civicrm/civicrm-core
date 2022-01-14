@@ -452,7 +452,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * so we can interrupt a potential POST/redirect
    *
    * @param string $name name of debug section
-   * @param $variable mixed reference to variables that we need a trace of
+   * @param mixed $variable reference to variables that we need a trace of
    * @param bool $log should we log or return the output
    * @param bool $html whether to generate a HTML-escaped output
    * @param bool $checkPermission should we check permissions before displaying output
