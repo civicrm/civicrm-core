@@ -483,8 +483,8 @@ if (!CRM.vars) CRM.vars = {};
           $('.crm-select2-row-description', '#select2-drop').each(function() {
             $(this).closest('.select2-result-label').attr('title', $(this).text());
           });
-          // Collapsible optgroups should be expanded when searching
-          if ($('#select2-drop.collapsible-optgroups-enabled .select2-search input.select2-input').val()) {
+          // Collapsible optgroups should be expanded when searching (searching happens within select2-drop for single selects, but within the element for multiselects; this handles both)
+          if ($('#select2-drop.collapsible-optgroups-enabled .select2-search input.select2-input, .select2-dropdown-open.collapsible-optgroups .select2-search-field input.select2-input').val()) {
             $('#select2-drop.collapsible-optgroups-enabled li.select2-result-with-children')
               .addClass('optgroup-expanded');
           }
