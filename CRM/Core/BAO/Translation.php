@@ -68,7 +68,7 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements \Civi
    * Given a constant list of of id/name/label options, convert to the
    * format required by pseudoconstant.
    *
-   * @param string|NULL $context
+   * @param string|null $context
    * @param array $options
    *   List of options, each as a record of id+name+label.
    *   Ex: [['id' => 123, 'name' => 'foo_bar', 'label' => 'Foo Bar']]

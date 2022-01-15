@@ -2556,19 +2556,22 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
 
   /**
    * Get the right links depending on the activity type and other factors.
+   *
    * @param array $values
    * @param int $activityId
-   * @param ?int $contactId
+   * @param int|null $contactId
    * @param bool $isViewOnly Is this a special type that shouldn't be edited
-   * @param ?string $context
-   * @param ?int $mask
-   * @param bool $dontBreakCaseActivities Originally this function was
+   * @param string|null $context
+   * @param int|null $mask
+   * @param bool $dontBreakCaseActivities
+   *   Originally this function was
    *   part of another function that was only used on the contact's activity
    *   tab and this parameter would only be false when you're not displaying
    *   case activities anyway and so was effectively never used. And I'm not
    *   sure why for the purposes of links you would ever want a case activity
    *   to link to the regular form, so I think this can be removed, but am
    *   leaving it as-is for now.
+   *
    * @return string HTML string
    */
   public static function getActionLinks(

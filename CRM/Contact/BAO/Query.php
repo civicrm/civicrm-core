@@ -2543,7 +2543,7 @@ class CRM_Contact_BAO_Query {
    *   Search on primary location. See note below.
    * @param int $mode
    *   Determines search mode based on bitwise MODE_* constants.
-   * @param string|NULL $apiEntity
+   * @param string|null $apiEntity
    *   Determines search mode based on entity by string.
    *
    * The $primaryLocation flag only seems to be used when

@@ -100,7 +100,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Checks that the current DB schema is at least $min version
    *
-   * @param string|number $min
+   * @param string|int $min
    * @return bool
    */
   public static function isDBVersionAtLeast($min) {

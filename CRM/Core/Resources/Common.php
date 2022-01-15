@@ -26,7 +26,7 @@ class CRM_Core_Resources_Common {
    *
    * @param string $name
    *   Symbolic name of the bundle.
-   * @param callable|NULL $init
+   * @param callable|null $init
    *   Optional initialization function. Populate default resources.
    *   Signature: `function($bundle): void`
    *   Example: `function myinit($b) { $b->addScriptFile(...)->addStyleFile(...); }`

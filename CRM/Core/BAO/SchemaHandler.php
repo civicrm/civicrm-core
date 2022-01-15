@@ -157,7 +157,7 @@ class CRM_Core_BAO_SchemaHandler {
    * @param array $params
    * @param string $separator
    * @param string $prefix
-   * @param string|NULL $existingIndex
+   * @param string|null $existingIndex
    *
    * @return NULL|string
    */
@@ -609,7 +609,7 @@ MODIFY      {$columnName} varchar( $length )
    * @param bool $dropFalseIndices
    *  If set - this function deletes false indices present in the DB which mismatches the expected
    *  values of xml file so that civi re-creates them with correct values using createMissingIndices() function.
-   * @param array|FALSE $tables
+   * @param array|false $tables
    *   An optional array of tables - if provided the results will be restricted to these tables.
    *
    * @return array
