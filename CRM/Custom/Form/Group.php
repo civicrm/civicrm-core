@@ -317,15 +317,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $buttons[0]['class'] = 'crm-warnDataLoss';
     }
     $this->addButtons($buttons);
-
-    // TODO: Is this condition ever true? Can this code be removed?
-    if ($this->_action & CRM_Core_Action::VIEW) {
-      $this->freeze();
-      $this->addElement('xbutton', 'done', ts('Done'), [
-        'type' => 'button',
-        'onclick' => "location.href='civicrm/admin/custom/group?reset=1&action=browse'",
-      ]);
-    }
   }
 
   /**
