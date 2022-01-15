@@ -426,8 +426,25 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       $this->assertEquals(['One' => 1, 'Two' => 2, 'Three' => 3, 'Four' => 4], $getValues($groupName));
     }
 
+    // Testing custom group weights
+
+    $originalControlGroupWeight = $customGroups['controlGroup']['weight'];
+    $originalExperimentalGroupWeight = $customGroups['experimentalGroup']['weight'];
+
     // Ensure default weights were set for custom groups
-    $this->assertEquals($customGroups['controlGroup']['weight'] + 1, $customGroups['experimentalGroup']['weight']);
+    $this->assertEquals($originalControlGroupWeight + 1, $originalExperimentalGroupWeight);
+    // Updating custom group weight
+    $newExperimentalGroupWeight = CustomGroup::update(FALSE)
+      ->addValue('id', $customGroups['experimentalGroup']['id'])
+      ->addValue('weight', $originalControlGroupWeight)
+      ->execute()->first()['weight'];
+    // The other group's weight should have auto-adjusted
+    $newControlGroupWeight = CustomGroup::get(FALSE)
+      ->addWhere('id', '=', $customGroups['controlGroup']['id'])
+      ->execute()->first()['weight'];
+    $this->assertEquals($newExperimentalGroupWeight + 1, $newControlGroupWeight);
+
+    // Testing custom field weights
 
     // Move third option to second position
     CustomField::update(FALSE)
