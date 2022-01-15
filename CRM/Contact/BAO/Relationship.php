@@ -164,6 +164,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @throws \CRM_Core_Exception
    */
   public static function legacyCreateMultiple($params, $ids = []) {
+    CRM_Core_Error::deprecatedFunctionWarning('api v4');
     // clarify that the only key ever pass in the ids array is 'contact'
     // There is legacy handling for other keys but a universe search on
     // calls to this function (not supported to be called from outside core)
