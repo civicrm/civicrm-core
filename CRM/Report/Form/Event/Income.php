@@ -206,7 +206,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
   }
 
   /**
-   * @param $eventIDs
+   * @param array $eventIDs
    *
    * @return array
    */
@@ -298,6 +298,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
       $numRows = $this->_limit;
 
       if (CRM_Utils_Array::value('id_op', $this->_params, 'in') == 'in' || $noSelection) {
+        $rowCount = $this->getRowCount();
         while ($count < $rowCount) {
           if (!isset($this->_params['id_value'][$numRows])) {
             break;
