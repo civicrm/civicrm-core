@@ -219,14 +219,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     }
 
     $session->replaceUserContext($this->_cancelURL);
-    // views are implemented as frozen form
-    if ($this->_action & CRM_Core_Action::VIEW) {
-      $this->freeze();
-      $this->addElement('xbutton', 'done', ts('Done'), [
-        'type' => 'button',
-        'onclick' => "location.href='civicrm/admin/custom/group?reset=1&action=browse'",
-      ]);
-    }
 
     // don't show option for contribution amounts section if membership price set
     // this flag is sent to template
