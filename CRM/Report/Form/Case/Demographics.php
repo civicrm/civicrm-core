@@ -263,7 +263,7 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */

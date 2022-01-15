@@ -149,7 +149,7 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */

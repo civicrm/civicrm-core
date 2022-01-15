@@ -247,7 +247,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */

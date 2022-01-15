@@ -329,7 +329,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param $self
+   * @param self $self
    *
    * @return bool|array
    *   true if no errors, else array of errors

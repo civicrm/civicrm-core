@@ -187,7 +187,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
    *   Posted values of the form.
    *
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    *   list of errors to be posted back to the form
