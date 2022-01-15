@@ -664,7 +664,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */

@@ -408,7 +408,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    * @throws \CRM_Core_Exception

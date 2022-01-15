@@ -785,7 +785,7 @@ HERESQL;
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */

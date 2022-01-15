@@ -497,7 +497,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */
