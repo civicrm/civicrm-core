@@ -515,7 +515,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */

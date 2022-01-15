@@ -128,7 +128,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    *   Posted values of the form.
    *
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    *   list of errors to be posted back to the form

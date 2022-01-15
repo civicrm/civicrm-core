@@ -292,7 +292,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */

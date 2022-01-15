@@ -315,7 +315,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    *   Posted values of the form.
    *
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    *   list of errors to be posted back to the form

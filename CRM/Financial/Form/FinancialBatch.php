@@ -141,7 +141,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    *
    * @param array $values
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    *   list of errors to be posted back to the form

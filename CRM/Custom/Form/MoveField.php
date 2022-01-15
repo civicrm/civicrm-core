@@ -125,7 +125,7 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array|bool
    */

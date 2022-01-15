@@ -67,7 +67,7 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
    *   The input form values.
    *
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return bool|array
    *   true if no errors, else array of errors

@@ -786,7 +786,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @param array $values
    *   Posted values of the form.
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    *   list of errors to be posted back to the form

@@ -408,7 +408,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * @param array $params
    *   (ref.) an assoc array of name/value pairs.
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return bool|array
    *   mixed true or array of errors

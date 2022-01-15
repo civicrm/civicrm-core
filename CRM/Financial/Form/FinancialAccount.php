@@ -115,7 +115,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    * @param array $values
    *   posted values of the form
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    *   list of errors to be posted back to the form

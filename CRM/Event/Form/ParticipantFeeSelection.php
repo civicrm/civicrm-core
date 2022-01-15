@@ -212,7 +212,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */

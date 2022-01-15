@@ -728,7 +728,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    *   Posted values of the form.
    *
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    *   list of errors to be posted back to the form

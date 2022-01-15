@@ -495,7 +495,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    *   Posted values of the form.
    *
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    *   if errors then list of errors to be posted back to the form,
