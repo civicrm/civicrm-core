@@ -146,7 +146,7 @@ class CRM_Utils_Check {
   /**
    * Throw an exception if any of the checks fail.
    *
-   * @param array|NULL $messages
+   * @param array|null $messages
    *   [CRM_Utils_Check_Message]
    * @param string $threshold
    *

@@ -302,7 +302,7 @@ class CRM_Queue_Runner {
    *
    * @param bool $isOK
    *   TRUE if the task completed successfully.
-   * @param Exception|NULL $exception
+   * @param Exception|null $exception
    *   If applicable, an unhandled exception that arose during execution.
    *
    * @return array

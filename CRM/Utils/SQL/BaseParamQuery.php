@@ -139,7 +139,7 @@ class CRM_Utils_SQL_BaseParamQuery implements ArrayAccess {
   }
 
   /**
-   * @param string|NULL $value
+   * @param string|null $value
    * @return string
    *   SQL expression, e.g. "it\'s great" (with-quotes) or NULL (without-quotes)
    */

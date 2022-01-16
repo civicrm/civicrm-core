@@ -316,7 +316,7 @@ class CRM_Financial_BAO_Order {
    *
    * @internal use in tested core code only.
    *
-   * @param \CRM_Core_Form|NULL $form
+   * @param \CRM_Core_Form|null $form
    */
   public function setForm(?CRM_Core_Form $form): void {
     $this->form = $form;

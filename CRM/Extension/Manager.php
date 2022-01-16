@@ -130,7 +130,7 @@ class CRM_Extension_Manager {
    * Class constructor.
    *
    * @param CRM_Extension_Container_Interface $fullContainer
-   * @param CRM_Extension_Container_Basic|FALSE $defaultContainer
+   * @param CRM_Extension_Container_Basic|false $defaultContainer
    * @param CRM_Extension_Mapper $mapper
    * @param array $typeManagers
    */

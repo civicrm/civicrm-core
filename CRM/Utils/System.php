@@ -1247,7 +1247,7 @@ class CRM_Utils_System {
   /**
    * Redirect to SSL.
    *
-   * @param bool|FALSE $abort
+   * @param bool|false $abort
    *
    * @throws \CRM_Core_Exception
    */
@@ -1824,7 +1824,7 @@ class CRM_Utils_System {
   /**
    * Evaluate any tokens in a URL.
    *
-   * @param string|FALSE $url
+   * @param string|false $url
    *
    * @return string|FALSE
    */

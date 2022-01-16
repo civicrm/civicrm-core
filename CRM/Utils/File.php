@@ -293,7 +293,7 @@ class CRM_Utils_File {
   }
 
   /**
-   * @param string|NULL $dsn
+   * @param string|null $dsn
    *   Use NULL to load the default/active connection from CRM_Core_DAO.
    *   Otherwise, give a full DSN string.
    * @param string $fileName
@@ -312,7 +312,7 @@ class CRM_Utils_File {
 
   /**
    *
-   * @param string|NULL $dsn
+   * @param string|null $dsn
    * @param string $queryString
    * @param string $prefix
    * @param bool $dieOnErrors
