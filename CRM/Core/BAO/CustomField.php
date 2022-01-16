@@ -2708,12 +2708,16 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
   }
 
   /**
+   * Prepare params for the create operation.
+   *
    * @param CRM_Core_DAO_CustomField $field
-   * @param 'add|modify|delete' $operation
+   * @param string $operation
+   *   add|modify|delete
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
-  protected static function prepareCreateParams($field, $operation) {
+  protected static function prepareCreateParams($field, $operation): array {
     $tableName = CRM_Core_DAO::getFieldValue(
       'CRM_Core_DAO_CustomGroup',
       $field->custom_group_id,

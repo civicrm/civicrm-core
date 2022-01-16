@@ -1665,7 +1665,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param bool $skipPermission
    * @param int $op
    *   Which operation (view, edit, create, etc) to check permission for.
-   * @param array|NULL $returnFields list of UFGroup fields to return; NULL for default
+   * @param array|null $returnFields
    *
    * @return array
    *   array of ufgroups for a module

@@ -92,7 +92,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
   /**
    * Process the form after the input has been submitted and validated.
    *
-   * @param array|NULL $params
+   * @param array|null $params
    */
   public function postProcess($params = NULL) {
     $fv = $params ?: $this->controller->exportValues($this->_name);

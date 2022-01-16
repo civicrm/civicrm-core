@@ -570,7 +570,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
   }
 
   /**
-   * @param string|NULL $region
+   * @param string|null $region
    *   Optional request for a specific region. If NULL/omitted, use global default.
    * @return \CRM_Core_Region
    */
