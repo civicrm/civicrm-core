@@ -515,9 +515,8 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     // suppress any subtypes if present
     CRM_Contact_BAO_ContactType::suppressSubTypes($profileTypes);
 
-    $contactTypes = ['Contact', 'Individual', 'Household', 'Organization'];
+    $contactTypes = array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes(TRUE));
     $components = ['Contribution', 'Participant', 'Membership', 'Activity'];
-    $fields = [];
 
     // check for mix profile condition
     if (count($profileTypes) > 1) {
@@ -583,7 +582,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    */
   public static function calculateProfileType($ufGroupType, $returnMixType = TRUE, $onlyPure = FALSE, $skipComponentType = FALSE) {
     // profile types
-    $contactTypes = ['Contact', 'Individual', 'Household', 'Organization'];
+    $contactTypes = array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes(TRUE));
     $subTypes = CRM_Contact_BAO_ContactType::subTypes();
     $components = ['Contribution', 'Participant', 'Membership', 'Activity'];
 

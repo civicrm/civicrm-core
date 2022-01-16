@@ -1128,7 +1128,7 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
  * @param $entity
  */
 function _civicrm_api3_format_params_for_create(&$params, $entity) {
-  $nonGenericEntities = ['Contact', 'Individual', 'Household', 'Organization'];
+  $nonGenericEntities = array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes(TRUE));
 
   $customFieldEntities = array_diff_key(CRM_Core_SelectValues::customGroupExtends(), array_fill_keys($nonGenericEntities, 1));
   if (!array_key_exists($entity, $customFieldEntities)) {

@@ -327,7 +327,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $checkPermission = CRM_Core_Permission::EDIT;
     }
     if (empty($customDataType)) {
-      $customDataType = ['Contact', 'Individual', 'Organization', 'Household'];
+      $customDataType = array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes());
     }
     if ($customDataType === 'ANY') {
       // NULL should have been respected but the line above broke that.
