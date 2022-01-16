@@ -556,7 +556,7 @@ WHERE      a.id = %1
 
   /**
    * @param int $activityTypeID
-   * @param null $dateFormat
+   * @param string|null $dateFormat
    * @param bool $onlyActive
    *
    * @return mixed

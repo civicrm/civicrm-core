@@ -1515,16 +1515,16 @@ HERESQL;
   }
 
   /**
-   * @param $groupInfo
+   * @param array $groupInfo
    * @param null $sort
-   * @param null $showLinks
+   * @param bool $showLinks
    * @param bool $returnOnlyCount
    * @param int $offset
    * @param int $rowCount
    *
    * @return array
    */
-  public static function getGlobalContacts(&$groupInfo, $sort = NULL, $showLinks = NULL, $returnOnlyCount = FALSE, $offset = 0, $rowCount = 25) {
+  public static function getGlobalContacts(&$groupInfo, $sort = NULL, $showLinks = FALSE, $returnOnlyCount = FALSE, $offset = 0, $rowCount = 25) {
     $globalContacts = [];
 
     $settingsProcessor = new CRM_Case_XMLProcessor_Settings();

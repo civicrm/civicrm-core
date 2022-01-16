@@ -56,7 +56,7 @@ function civicrm_api3_participant_create($params) {
  * @todo this should be done in the BAO not the api
  *
  * @param array $params
- * @param $participant
+ * @param CRM_Event_BAO_Participant $participant
  *
  * @throws \CiviCRM_API3_Exception
  */

@@ -1701,7 +1701,7 @@ contact_id_a IN ( %1 ) OR contact_id_b IN ( %1 ) AND id IN (" . implode(',', $re
   /**
    * Get Current Employer for Contact.
    *
-   * @param $contactIds
+   * @param array $contactIds
    *   Contact Ids.
    *
    * @return array
@@ -2186,7 +2186,7 @@ AND cc.sort_name LIKE '%$name%'";
   /**
    * Is the inherited relationship invalidated by this relationship change.
    *
-   * @param $membershipValues
+   * @param array $membershipValues
    * @param array $values
    * @param int $cid
    *

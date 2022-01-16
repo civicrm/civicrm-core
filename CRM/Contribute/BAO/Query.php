@@ -1088,7 +1088,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    *
    * Extracted into separate function to improve readability of main select function.
    *
-   * @param $query
+   * @param CRM_Contact_BAO_Query $query
    */
   private static function addSoftCreditFields(&$query) {
     $includeSoftCredits = self::isSoftCreditOptionEnabled($query->_params);

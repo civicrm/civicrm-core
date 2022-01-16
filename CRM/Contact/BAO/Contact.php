@@ -1767,7 +1767,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    *
    * This is for the query to use, create the right sql.
    *
-   * @param $fields
+   * @param array $fields
    * @param int $contactId
    *   Contact id.
    *
@@ -1844,7 +1844,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    *
    * @param int $contactId
    * @param bool $skipDefaultPrimary
-   * @param null $block
+   * @param string|null $block
    *
    * @return int|NULL
    *   $locationType location_type_id
@@ -2106,10 +2106,10 @@ ORDER BY civicrm_email.is_primary DESC";
    * Format profile contact parameters.
    *
    * @param array $params
-   * @param $fields
-   * @param int $contactID
-   * @param int $ufGroupId
-   * @param null $ctype
+   * @param array $fields
+   * @param int|null $contactID
+   * @param int|null $ufGroupId
+   * @param string|null $ctype
    * @param bool $skipCustom
    *
    * @return array
@@ -2696,7 +2696,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
    * @param string $tableName
    *   Optional tableName if component is custom group.
    *
-   * @return int
+   * @return int|false
    *   total number in database
    */
   public static function getCountComponent($component, $contactId, $tableName = NULL) {
@@ -3367,8 +3367,8 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
   /**
    * Get a list of triggers for the contact table.
    *
-   * @param $info
-   * @param null $tableName
+   * @param array $info
+   * @param string|null $tableName
    *
    * @see http://issues.civicrm.org/jira/browse/CRM-10554
    *

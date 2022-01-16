@@ -53,7 +53,7 @@ class CRM_Core_I18n_PseudoConstant {
   }
 
   /**
-   * @param $long
+   * @param string $long
    *
    * @return string
    */

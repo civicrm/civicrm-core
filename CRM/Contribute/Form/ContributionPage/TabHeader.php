@@ -45,7 +45,7 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
   /**
    * @param CRM_Core_Form $form
    *
-   * @return array
+   * @return array|null
    */
   public static function process(&$form) {
     if ($form->getVar('_id') <= 0) {

@@ -253,7 +253,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *   What action are we doing.
    * @param int $visibility
    *   Visibility of fields we are interested in.
-   * @param $searchable
+   * @param bool $searchable
    * @param bool $showAll
    * @param string $restrict
    *   Should we restrict based on a specified profile type.
@@ -261,10 +261,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param null $ctype
    * @param int $permissionType
    * @param string $orderBy
-   * @param null $orderProfiles
-   *
+   * @param bool $orderProfiles
    * @param bool $eventProfile
-   *
    * @return array
    *   The fields that belong to this ufgroup(s)
    *
@@ -275,14 +273,14 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     $register = FALSE,
     $action = NULL,
     $visibility = NULL,
-    $searchable = NULL,
+    $searchable = FALSE,
     $showAll = FALSE,
     $restrict = NULL,
     $skipPermission = FALSE,
     $ctype = NULL,
     $permissionType = CRM_Core_Permission::CREATE,
     $orderBy = 'field_name',
-    $orderProfiles = NULL,
+    $orderProfiles = FALSE,
     $eventProfile = FALSE
   ) {
     if (!is_array($id)) {
@@ -3081,7 +3079,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * setDefault componet specific profile fields.
+   * setDefault component specific profile fields.
    *
    * @param array $fields
    *   Profile fields.

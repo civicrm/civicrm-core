@@ -85,15 +85,15 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
   }
 
   /**
-   * @param $data
+   * @param string $data
    * @param int $fileTypeID
-   * @param $entityTable
+   * @param string $entityTable
    * @param int $entityID
-   * @param $entitySubtype
+   * @param string|false $entitySubtype
    * @param bool $overwrite
    * @param null|array $fileParams
    * @param string $uploadName
-   * @param null $mimeType
+   * @param string $mimeType
    *
    * @throws Exception
    */
@@ -102,7 +102,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
     $fileTypeID,
     $entityTable,
     $entityID,
-    $entitySubtype,
+    $entitySubtype = FALSE,
     $overwrite = TRUE,
     $fileParams = NULL,
     $uploadName = 'uploadFile',

@@ -188,7 +188,7 @@ class CRM_Core_DAO_AllCoreTables {
    *
    * @param string $baoName
    *
-   * @return string|CRM_Core_DAO
+   * @return string
    */
   public static function getCanonicalClassName($baoName) {
     return str_replace('_BAO_', '_DAO_', $baoName);

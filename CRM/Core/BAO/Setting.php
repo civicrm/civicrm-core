@@ -47,7 +47,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   /**
    * Retrieve the value of a setting from the DB table.
    *
-   * @param string $group
+   * @param string|null $group
    *   The group name of the item (deprecated).
    * @param string $name
    *   (required) The name under which this item is stored.
@@ -169,7 +169,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @param array $params
    *   (required) An api formatted array of keys and values.
-   * @param null $domains
+   * @param array|null $domains
    *
    * @throws API_Exception
    * @domains array an array of domains to get settings for. Default is the current domain

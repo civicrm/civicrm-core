@@ -46,8 +46,8 @@ class CRM_Contact_Import_ImportJob {
   protected $_parser;
 
   /**
-   * @param null $tableName
-   * @param null $createSql
+   * @param string|null $tableName
+   * @param string|null $createSql
    * @param bool $createTable
    *
    * @throws \CRM_Core_Exception

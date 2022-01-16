@@ -532,7 +532,7 @@ class CRM_Core_I18n {
   /**
    * Binds a gettext domain, wrapper over bindtextdomain().
    *
-   * @param $key
+   * @param string $key
    *   Key of the extension (can be 'civicrm', or 'org.example.foo').
    *
    * @return Bool
@@ -610,7 +610,7 @@ class CRM_Core_I18n {
   /**
    * Is the language written "right-to-left"?
    *
-   * @param $language
+   * @param string $language
    *   Language (for example 'en_US', or 'fr_CA').
    *
    * @return bool
@@ -637,7 +637,7 @@ class CRM_Core_I18n {
   /**
    * Change the processing language without changing the current user language
    *
-   * @param $locale
+   * @param string $locale
    *   Locale (for example 'en_US', or 'fr_CA').
    *   True if the domain was changed for an extension.
    */

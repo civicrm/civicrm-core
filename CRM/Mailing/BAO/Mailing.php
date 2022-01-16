@@ -2684,7 +2684,8 @@ WHERE  civicrm_mailing_job.id = %1
   }
 
   /**
-   * @param null $mode
+   * @param string|null $mode
+   *   Either 'sms' or null
    *
    * @return bool
    * @throws Exception

@@ -262,7 +262,7 @@ class CRM_Utils_Rule {
 
   /**
    * @param string $value
-   * @param null $default
+   * @param string|null $default
    *
    * @return string|null
    */
@@ -277,7 +277,7 @@ class CRM_Utils_Rule {
 
   /**
    * @param string $value
-   * @param null $default
+   * @param string|null $default
    *
    * @return string|null
    */
@@ -860,8 +860,8 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
-   * @param null $actualElementValue
+   * @param mixed $value
+   * @param mixed $actualElementValue
    *
    * @return bool
    */

@@ -40,8 +40,8 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
   protected $_revertedId;
 
   /**
-   * @param null $title
-   * @param null $mode
+   * @param string $title
+   * @param int $mode
    */
   public function __construct($title = NULL, $mode = NULL) {
     parent::__construct($title, $mode);

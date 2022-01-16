@@ -26,7 +26,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param string $column
    * @param bool $onlyActive
-   * @param null $condition
+   * @param string|null $condition
    * @param bool $fresh
    *
    * @return array

@@ -149,7 +149,7 @@ class CRM_Utils_Check_Message {
    *
    * @param string $title
    *   Text displayed on the status message as a link or button.
-   * @param string $confirmation
+   * @param string|false $confirmation
    *   Optional confirmation message before performing action
    * @param string $type
    *   Currently supports: api3 or href

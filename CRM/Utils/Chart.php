@@ -145,9 +145,9 @@ class CRM_Utils_Chart {
   }
 
   /**
-   * @param $rows
-   * @param $chart
-   * @param $interval
+   * @param array $rows
+   * @param string $chart
+   * @param string $interval
    *
    * @return array
    */
@@ -229,10 +229,10 @@ class CRM_Utils_Chart {
   }
 
   /**
-   * @param $rows
-   * @param $chart
-   * @param $interval
-   * @param $chartInfo
+   * @param array $rows
+   * @param string $chart
+   * @param array $interval
+   * @param array $chartInfo
    *
    * @return array
    */
@@ -270,7 +270,7 @@ class CRM_Utils_Chart {
 
   /**
    * @param array $params
-   * @param $chart
+   * @param string $chart
    *
    * @return array
    */

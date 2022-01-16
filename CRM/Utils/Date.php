@@ -778,7 +778,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   * @param null $timeStamp
+   * @param int|false|null $timeStamp
    *
    * @return bool|string
    */
