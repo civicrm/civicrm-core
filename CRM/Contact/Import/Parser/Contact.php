@@ -877,7 +877,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
               //if more than one duplicate contact
               //found, create relationship with first contact
               // now create the relationship record
-              $relationParams = [];
               $relationParams = [
                 'relationship_type_id' => $key,
                 'contact_check' => [
@@ -893,7 +892,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
                 'contact' => $primaryContactId,
               ];
 
-              [$valid, $duplicate] = CRM_Contact_BAO_Relationship::legacyCreateMultiple($relationParams, $relationIds);
+              [$valid, $duplicate] = self::legacyCreateMultiple($relationParams, $relationIds);
 
               if ($valid || $duplicate) {
                 $relationIds['contactTarget'] = $relContactId;
@@ -955,6 +954,72 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     }
     // sleep(3);
     return $this->processMessage($values, $statusFieldName, CRM_Import_Parser::VALID);
+  }
+
+  /**
+   * Only called from import now... plus one place outside of core & tests.
+   *
+   * @todo - deprecate more aggressively - will involve copying to the import
+   * class, adding a deprecation notice here & removing from tests.
+   *
+   * Takes an associative array and creates a relationship object.
+   *
+   * @deprecated For single creates use the api instead (it's tested).
+   * For multiple a new variant of this function needs to be written and migrated to as this is a bit
+   * nasty
+   *
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $ids
+   *   The array that holds all the db ids.
+   *   per http://wiki.civicrm.org/confluence/display/CRM/Database+layer
+   *  "we are moving away from the $ids param "
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private static function legacyCreateMultiple($params, $ids = []) {
+    // clarify that the only key ever pass in the ids array is 'contact'
+    // There is legacy handling for other keys but a universe search on
+    // calls to this function (not supported to be called from outside core)
+    // only returns 2 calls - one in CRM_Contact_Import_Parser_Contact
+    // and the other in jma grant applications (CRM_Grant_Form_Grant_Confirm)
+    // both only pass in contact as a key here.
+    $contactID = $ids['contact'];
+    unset($ids);
+    // There is only ever one value passed in from the 2 places above that call
+    // this - by clarifying here like this we can cleanup within this
+    // function without having to do more universe searches.
+    $relatedContactID = key($params['contact_check']);
+
+    // check if the relationship is valid between contacts.
+    // step 1: check if the relationship is valid if not valid skip and keep the count
+    // step 2: check the if two contacts already have a relationship if yes skip and keep the count
+    // step 3: if valid relationship then add the relation and keep the count
+
+    // step 1
+    [$contactFields['relationship_type_id'], $firstLetter, $secondLetter] = explode('_', $params['relationship_type_id']);
+    $contactFields['contact_id_' . $firstLetter] = $contactID;
+    $contactFields['contact_id_' . $secondLetter] = $relatedContactID;
+    if (!CRM_Contact_BAO_Relationship::checkRelationshipType($contactFields['contact_id_a'], $contactFields['contact_id_b'],
+      $contactFields['relationship_type_id'])) {
+      return [0, 0];
+    }
+
+    if (
+      CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
+        $contactFields,
+        $contactID,
+        // step 2
+        $relatedContactID
+      )
+    ) {
+      return [0, 1];
+    }
+
+    $singleInstanceParams = array_merge($params, $contactFields);
+    CRM_Contact_BAO_Relationship::add($singleInstanceParams);
+    return [1, 0];
   }
 
   /**
