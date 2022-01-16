@@ -52,8 +52,8 @@ class CRM_Extension_MixinScanner {
 
   /**
    * CRM_Extension_ClassLoader constructor.
-   * @param \CRM_Extension_Mapper|NULL $mapper
-   * @param \CRM_Extension_Manager|NULL $manager
+   * @param \CRM_Extension_Mapper|null $mapper
+   * @param \CRM_Extension_Manager|null $manager
    * @param bool $relativize
    *   Whether to store paths in relative form.
    *   Enabling this may slow-down scanning a bit, and it has no benefit when for on-demand loaders.

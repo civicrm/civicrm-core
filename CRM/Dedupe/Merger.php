@@ -1093,7 +1093,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @param bool $checkPermissions
    *   Respect logged in user permissions.
-   * @param bool|NULL $reloadCacheIfEmpty
+   * @param bool|null $reloadCacheIfEmpty
    *  If not set explicitly this is calculated but it is preferred that it be set
    *  per comments on isSelected above.
    *
@@ -2625,7 +2625,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * Build up the location block for the contact in dedupe-screen display format.
    *
-   * @param integer $cid
+   * @param int $cid
    * @param array $blockInfo
    * @param string $blockName
    *

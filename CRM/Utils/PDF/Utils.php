@@ -202,7 +202,7 @@ class CRM_Utils_PDF_Utils {
   }
 
   /**
-   * @param (float|int)[] $paper_size
+   * @param float|int[] $paper_size
    * @param string $orientation
    * @param array $margins
    * @param string $html

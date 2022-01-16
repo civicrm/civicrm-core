@@ -951,7 +951,7 @@ class CRM_Utils_String {
    * safe, standard data interchange formats such as JSON rather than PHP's
    * serialization format when dealing with user input.
    *
-   * @param string|NULL $string
+   * @param string|null $string
    *
    * @return mixed
    */

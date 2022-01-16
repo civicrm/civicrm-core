@@ -92,7 +92,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
 
   /**
    * Retrieve array of allowed credit cards for this payment processor.
-   * @param integer|null $paymentProcessorID id of processor.
+   * @param int|null $paymentProcessorID
    * @return array
    */
   public static function getCreditCards($paymentProcessorID = NULL) {
@@ -270,12 +270,12 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * Get all payment processors as an array of objects.
    *
-   * @param string|NULL $mode
+   * @param string|null $mode
    * only return this mode - test|live or NULL for all
    * @param bool $reset
    * @param bool $isCurrentDomainOnly
    *   Do we only want to load payment processors associated with the current domain.
-   * @param bool|NULL $isActive
+   * @param bool|null $isActive
    *   Do we only want active processors, only inactive (FALSE) or all processors (NULL)
    *
    * @throws CiviCRM_API3_Exception
