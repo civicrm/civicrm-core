@@ -105,7 +105,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
   /**
    * Retrieve all subtypes Information.
    *
-   * @param array $contactType
+   * @param string|null $contactType
    * @param bool $all
    *
    * @return array
@@ -130,8 +130,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
    *
    *   retrieve all subtypes
    *
-   * @param array $contactType
-   *   ..
+   * @param string|null $contactType
    * @param bool $all
    * @param string $columnName
    * @param bool $ignoreCache
@@ -143,7 +142,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
    */
   public static function subTypes($contactType = NULL, $all = FALSE, $columnName = 'name', $ignoreCache = FALSE) {
     if ($columnName === 'name') {
-      return array_keys(self::subTypeInfo($contactType, $all, $ignoreCache));
+      return array_keys(self::subTypeInfo($contactType, $all));
     }
     else {
       return array_values(self::subTypePairs($contactType, FALSE, NULL, $ignoreCache));
@@ -156,14 +155,14 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
    *
    * @param array $contactType
    * @param bool $all
-   * @param string $labelPrefix
+   * @param string|null $labelPrefix
    * @param bool $ignoreCache
    *
    * @return array
    *   list of subtypes with name as 'subtype-name' and 'label' as value
    */
   public static function subTypePairs($contactType = NULL, $all = FALSE, $labelPrefix = '- ', $ignoreCache = FALSE) {
-    $subtypes = self::subTypeInfo($contactType, $all, $ignoreCache);
+    $subtypes = self::subTypeInfo($contactType, $all);
 
     $pairs = [];
     foreach ($subtypes as $name => $info) {
