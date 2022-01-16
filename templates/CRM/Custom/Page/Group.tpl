@@ -8,13 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 {* The name "custom data group" is replaced by "custom data set"  *}
-{if $action eq 1 or $action eq 2 or $action eq 4}
-    {include file="CRM/Custom/Form/Group.tpl"}
-{elseif $action eq 1024}
-    {include file="CRM/Custom/Form/Preview.tpl"}
-{elseif $action eq 8}
-    {include file="CRM/Custom/Form/DeleteGroup.tpl"}
-{else}
     <div class="help">
     {ts}Custom data is stored in custom fields. Custom fields are organized into logically related custom data sets (e.g. Volunteer Info). Use custom fields to collect and store custom data which are not included in the standard CiviCRM forms. You can create one or many sets of custom fields.{/ts} {docURL page="user/organising-your-data/creating-custom-fields"}
     </div>
@@ -54,22 +47,17 @@
         </tbody>
       </table>
 
-        {if NOT ($action eq 1 or $action eq 2) }
         <div class="action-link">
-        {crmButton p='civicrm/admin/custom/group' q="action=add&reset=1" id="newCustomDataGroup"  icon="plus-circle"}{ts}Add Set of Custom Fields{/ts}{/crmButton}
+        {crmButton p='civicrm/admin/custom/group/edit' q="action=add&reset=1" id="newCustomDataGroup"  icon="plus-circle"}{ts}Add Set of Custom Fields{/ts}{/crmButton}
         </div>
-        {/if}
 
         {/strip}
     </div>
     </div>
     {else}
-       {if $action ne 1} {* When we are adding an item, we should not display this message *}
        <div class="messages status no-popup">
        <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/> &nbsp;
-         {capture assign=crmURL}{crmURL p='civicrm/admin/custom/group' q='action=add&reset=1'}{/capture}
+         {capture assign=crmURL}{crmURL p='civicrm/admin/custom/group/edit' q='action=add&reset=1'}{/capture}
          {ts 1=$crmURL}No custom data groups have been created yet. You can <a id="newCustomDataGroup" href='%1'>add one</a>.{/ts}
        </div>
-       {/if}
     {/if}
-{/if}

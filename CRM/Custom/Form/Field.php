@@ -78,8 +78,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    * @return void
    */
   public function preProcess() {
-    //custom field id
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->setAction($this->_id ? CRM_Core_Action::UPDATE : CRM_Core_Action::ADD);
 
     $this->assign('dataToHTML', self::$_dataToHTML);
 
@@ -97,13 +97,13 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this);
     }
 
-    if ($isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved', 'id')) {
+    if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved')) {
       CRM_Core_Error::statusBounce("You cannot add or edit fields in a reserved custom field-set.");
     }
 
     if ($this->_gid) {
       $url = CRM_Utils_System::url('civicrm/admin/custom/group/field',
-        "reset=1&action=browse&gid={$this->_gid}"
+        "reset=1&gid={$this->_gid}"
       );
 
       $session = CRM_Core_Session::singleton();
@@ -192,8 +192,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     if ($this->_gid) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'title');
       $this->setTitle($this->_title . ' - ' . ($this->_id ? ts('Edit Field') : ts('New Field')));
-      $this->assign('gid', $this->_gid);
     }
+    $this->assign('gid', $this->_gid);
 
     // lets trim all the whitespace
     $this->applyFilter('__ALL__', 'trim');
@@ -476,7 +476,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     // if view mode pls freeze it with the done button.
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
-      $url = CRM_Utils_System::url('civicrm/admin/custom/group/field', 'reset=1&action=browse&gid=' . $this->_gid);
+      $url = CRM_Utils_System::url('civicrm/admin/custom/group/field', 'reset=1&gid=' . $this->_gid);
       $this->addElement('xbutton',
         'done',
         ts('Done'),
@@ -892,12 +892,12 @@ AND    option_group_id = %2";
     if ($buttonName == $this->getButtonName('next', 'new')) {
       $msg .= '<p>' . ts("Ready to add another.") . '</p>';
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field/add',
-        'reset=1&action=add&gid=' . $this->_gid
+        'reset=1&gid=' . $this->_gid
       ));
     }
     else {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field',
-        'reset=1&action=browse&gid=' . $this->_gid
+        'reset=1&gid=' . $this->_gid
       ));
     }
     $session->setStatus($msg, ts('Saved'), 'success');

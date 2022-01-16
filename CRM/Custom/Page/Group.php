@@ -51,13 +51,13 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
         ],
         CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview'),
-          'url' => 'civicrm/admin/custom/group',
-          'qs' => 'action=preview&reset=1&id=%%id%%',
+          'url' => 'civicrm/admin/custom/group/preview',
+          'qs' => 'reset=1&gid=%%id%%',
           'title' => ts('Preview Custom Data Set'),
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Settings'),
-          'url' => 'civicrm/admin/custom/group',
+          'url' => 'civicrm/admin/custom/group/edit',
           'qs' => 'action=update&reset=1&id=%%id%%',
           'title' => ts('Edit Custom Set'),
         ],
@@ -73,8 +73,8 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/custom/group',
-          'qs' => 'action=delete&reset=1&id=%%id%%',
+          'url' => 'civicrm/admin/custom/group/delete',
+          'qs' => 'reset=1&id=%%id%%',
           'title' => ts('Delete Custom Set'),
         ],
       ];
@@ -83,104 +83,17 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * Run the page.
-   *
-   * This method is called after the page is created. It checks for the
-   * type of action and executes that action.
-   * Finally it calls the parent's run method.
-   *
    * @return void
    */
   public function run() {
-    // get the requested action
-    $action = CRM_Utils_Request::retrieve('action', 'String',
-      // default to 'browse'
-      $this, FALSE, 'browse'
-    );
-
-    if ($action & CRM_Core_Action::DELETE) {
-      $session = CRM_Core_Session::singleton();
-      $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/', 'action=browse'));
-      $controller = new CRM_Core_Controller_Simple('CRM_Custom_Form_DeleteGroup', "Delete Cutom Set", NULL);
-      $id = CRM_Utils_Request::retrieve('id', 'Positive',
-        $this, FALSE, 0
-      );
-      $controller->set('id', $id);
-      $controller->setEmbedded(TRUE);
-      $controller->process();
-      $controller->run();
-    }
-    // assign vars to templates
-    $this->assign('action', $action);
-    $id = CRM_Utils_Request::retrieve('id', 'Positive',
-      $this, FALSE, 0
-    );
-
-    // what action to take ?
-    if ($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD)) {
-      $this->edit($id, $action);
-    }
-    elseif ($action & CRM_Core_Action::PREVIEW) {
-      $this->preview($id);
-    }
-    else {
-      // finally browse the custom groups
-      $this->browse();
-    }
-    // parent run
+    $this->browse();
     return parent::run();
   }
 
   /**
-   * Edit custom group.
-   *
-   * @param int $id
-   *   Custom group id.
-   * @param string $action
-   *   The action to be invoked.
-   *
-   * @return void
-   */
-  public function edit($id, $action) {
-    // create a simple controller for editing custom data
-    $controller = new CRM_Core_Controller_Simple('CRM_Custom_Form_Group', ts('Custom Set'), $action);
-
-    // set the userContext stack
-    $session = CRM_Core_Session::singleton();
-    $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/', 'action=browse'));
-    $controller->set('id', $id);
-    $controller->setEmbedded(TRUE);
-    $controller->process();
-    $controller->run();
-  }
-
-  /**
-   * Preview custom group.
-   *
-   * @param int $id
-   *   Custom group id.
-   *
-   * @return void
-   */
-  public function preview($id) {
-    $controller = new CRM_Core_Controller_Simple('CRM_Custom_Form_Preview', ts('Preview Custom Data'), NULL);
-    $session = CRM_Core_Session::singleton();
-    $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/custom/group', 'action=browse'));
-    $controller->set('groupId', $id);
-    $controller->setEmbedded(TRUE);
-    $controller->process();
-    $controller->run();
-  }
-
-  /**
    * Browse all custom data groups.
-   *
-   * @param string $action
-   *   The action to be invoked.
-   *
-   * @return void
    */
-  public function browse($action = NULL) {
+  public function browse() {
     // get all custom groups sorted by weight
     $customGroup = [];
     $dao = new CRM_Core_DAO_CustomGroup();
@@ -300,7 +213,7 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
       }
     }
 
-    $returnURL = CRM_Utils_System::url('civicrm/admin/custom/group', "reset=1&action=browse");
+    $returnURL = CRM_Utils_System::url('civicrm/admin/custom/group');
     CRM_Utils_Weight::addOrder($customGroup, 'CRM_Core_DAO_CustomGroup',
       'id', $returnURL
     );
