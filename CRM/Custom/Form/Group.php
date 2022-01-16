@@ -172,7 +172,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $this->add('text', 'title', ts('Set Name'), $attributes['title'], TRUE);
 
     //Fix for code alignment, CRM-3058
-    $contactTypes = ['Contact', 'Individual', 'Household', 'Organization'];
+    $contactTypes = array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes());
     $this->assign('contactTypes', json_encode($contactTypes));
 
     $sel1 = ["" => ts("- select -")] + CRM_Core_SelectValues::customGroupExtends();

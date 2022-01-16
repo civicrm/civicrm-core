@@ -301,7 +301,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       'household_name',
     ];
 
-    $contactTypes = ['Contact', 'Individual', 'Household', 'Organization'];
+    $contactTypes = array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes(TRUE));
     $contactReturnProperties = [];
 
     for ($rowNumber = 1; $rowNumber <= $this->_batchInfo['item_count']; $rowNumber++) {
