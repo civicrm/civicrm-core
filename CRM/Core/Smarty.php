@@ -129,7 +129,7 @@ class CRM_Core_Smarty extends Smarty {
     }
 
     $this->register_function('crmURL', ['CRM_Utils_System', 'crmURL']);
-    if (CRM_Utils_Constant::value('CIVICRM_SMARTY_DEFAULT_ESCAPE')) {
+    if (CRM_Utils_Constant::value('CIVICRM_SMARTY_DEFAULT_ESCAPE') || self::isTestEnvironment()) {
       // When default escape is enabled if the core escape is called before
       // any custom escaping is done the modifier_escape function is not
       // found, so require_once straight away. Note this was hit on the basic
@@ -144,9 +144,20 @@ class CRM_Core_Smarty extends Smarty {
 
     $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
 
-    if ($config->debug) {
+    if ($config->debug || self::isTestEnvironment()) {
       $this->error_reporting = E_ALL;
     }
+  }
+
+  /**
+   * Is this a test environment.
+   *
+   * Currently we just check the class name but it is possible to run tests in CMS frameworks.
+   *
+   * @return bool
+   */
+  private static function isTestEnvironment(): bool {
+    return CRM_Core_Config::singleton()->userFramework === 'UnitTests';
   }
 
   /**
