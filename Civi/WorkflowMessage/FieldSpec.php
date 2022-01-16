@@ -69,7 +69,7 @@ class FieldSpec {
   /**
    * Enable export/import in alternative scopes.
    *
-   * @param string|array|NULL $scope
+   * @param string|array|null $scope
    *   Ex: 'tplParams'
    *   Ex: 'tplParams as foo_bar'
    *   Ex: 'tplParams as contact_id, TokenProcessor as contactId'

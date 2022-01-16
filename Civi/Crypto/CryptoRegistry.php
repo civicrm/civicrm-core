@@ -193,7 +193,7 @@ class CryptoRegistry {
   /**
    * @param CipherSuiteInterface $cipherSuite
    *   The encryption/decryption callback/handler
-   * @param string[]|NULL $names
+   * @param string[]|null $names
    *   Symbolic names. Ex: 'aes-cbc'
    *   If NULL, probe $cipherSuite->getNames()
    */

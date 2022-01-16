@@ -165,7 +165,7 @@ class TokenProcessor {
   /**
    * Add a row of data.
    *
-   * @param array|NULL $context
+   * @param array|null $context
    *   Optionally, initialize the context for this row.
    *   Ex: ['contact_id' => 123].
    * @return TokenRow
@@ -283,7 +283,7 @@ class TokenProcessor {
    *
    * @param string $field
    *   Ex: 'contactId'.
-   * @param string|NULL $subfield
+   * @param string|null $subfield
    * @return array
    *   Ex: [12, 34, 56].
    */
