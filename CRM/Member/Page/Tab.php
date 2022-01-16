@@ -28,6 +28,16 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   public $_contactId = NULL;
 
   /**
+   * @var bool
+   */
+  private $_isPaymentProcessor = FALSE;
+
+  /**
+   * @var bool
+   */
+  private $_accessContribution = FALSE;
+
+  /**
    * called when action is browse.
    */
   public function browse() {
@@ -118,8 +128,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         $isCancelSupported = CRM_Member_BAO_Membership::isCancelSubscriptionSupported(
           $membership[$dao->id]['membership_id']);
         $links = self::links('all',
-            NULL,
-            NULL,
+            FALSE,
+            FALSE,
             $isCancelSupported,
             $isUpdateBilling
         );
@@ -240,7 +250,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   /**
    * called when action is view.
    *
-   * @return null
+   * @return mixed
    */
   public function view() {
     $controller = new CRM_Core_Controller_Simple(
@@ -258,7 +268,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   /**
    * called when action is update or new.
    *
-   * @return null
+   * @return mixed
    */
   public function edit() {
     // We're trying to edit existing memberships or create a new one so we'll first check that a membership
@@ -486,8 +496,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * Get action links.
    *
    * @param string $status
-   * @param null $isPaymentProcessor
-   * @param null $accessContribution
+   * @param bool $isPaymentProcessor
+   * @param bool $accessContribution
    * @param bool $isCancelSupported
    * @param bool $isUpdateBilling
    *
@@ -496,8 +506,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    */
   public static function &links(
     $status = 'all',
-    $isPaymentProcessor = NULL,
-    $accessContribution = NULL,
+    $isPaymentProcessor = FALSE,
+    $accessContribution = FALSE,
     $isCancelSupported = FALSE,
     $isUpdateBilling = FALSE
   ) {
