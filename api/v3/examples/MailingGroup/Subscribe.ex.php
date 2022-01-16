@@ -1,7 +1,11 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example of using mailing_group subscribe API.
- *
  *
  * @return array
  *   API result array
@@ -15,7 +19,7 @@ function mailing_group_subscribe_example() {
     'time_stamp' => '20101212121212',
   ];
 
-  try{
+  try {
     $result = civicrm_api3('mailing_group', 'subscribe', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -63,7 +67,7 @@ function mailing_group_subscribe_expectedresult() {
 * The test that created it is called
 * testMailerGroupSubscribeGivenContactId
 * and can be found in
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MailingGroupTest.php
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MailingGroupTest.php.
 *
 * You can see the outcome of the API tests at
 * https://test.civicrm.org/job/CiviCRM-master-git/
