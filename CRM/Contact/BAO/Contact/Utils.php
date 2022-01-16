@@ -1024,17 +1024,12 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
     }
 
     if (empty($filterContactFldIds)) {
-      $greetingDetails = [];
-      $filterContactFldIds[] = 0;
-    }
-    else {
-      // we do token replacement in the replaceGreetingTokens hook
-      [$greetingDetails] = CRM_Utils_Token::getTokenDetails(array_keys($filterContactFldIds), $greetingsReturnProperties, FALSE, FALSE);
+      return;
     }
     // perform token replacement and build update SQL
     $contactIds = [];
     $cacheFieldQuery = "UPDATE civicrm_contact SET {$greeting}_display = CASE id ";
-    foreach ($greetingDetails as $contactID => $contactDetails) {
+    foreach (array_keys($filterContactFldIds) as $contactID) {
       if (!$processAll &&
         !array_key_exists($contactID, $filterContactFldIds)
       ) {
@@ -1055,7 +1050,7 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
         }
       }
 
-      self::processGreetingTemplate($greetingString, $contactDetails, $contactID, 'CRM_UpdateGreeting');
+      self::processGreetingTemplate($greetingString, [], $contactID, 'CRM_UpdateGreeting');
       $greetingString = CRM_Core_DAO::escapeString($greetingString);
       $cacheFieldQuery .= " WHEN {$contactID} THEN '{$greetingString}' ";
 
