@@ -78,7 +78,7 @@ class Format {
    *
    * @param string|float|int $amount
    * @param string $currency
-   * @param $locale
+   * @param string|null $locale
    *
    * @return string
    *

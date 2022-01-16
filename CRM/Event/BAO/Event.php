@@ -24,7 +24,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Event_DAO_Event
+   * @return CRM_Event_DAO_Event|null
    */
   public static function retrieve(&$params, &$defaults) {
     $event = new CRM_Event_DAO_Event();

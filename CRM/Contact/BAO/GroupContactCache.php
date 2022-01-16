@@ -309,7 +309,7 @@ WHERE  id IN ( $groupIDs )
    * Remove one or more contacts from the smart group cache.
    *
    * @param int|array $cid
-   * @param null $groupId
+   * @param int|null $groupId
    *
    * @return bool
    *   TRUE if successful.

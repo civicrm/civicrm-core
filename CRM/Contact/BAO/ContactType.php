@@ -212,8 +212,8 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
    * Retrieve basic type pairs with name as 'built-in name' and 'label' as value.
    *
    * @param bool $all
-   * @param null $typeName
-   * @param null $delimiter
+   * @param array|string|null $typeName
+   * @param string|null $delimiter
    *
    * @return array|string
    *   Array of basictypes with name as 'built-in name' and 'label' as value

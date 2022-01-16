@@ -222,7 +222,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * attempt to standardize on the number of variations that we
    * use of the below form elements
    *
-   * @var const string
+   * @var string
    */
   const ATTR_SPACING = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 
@@ -291,7 +291,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @param object $state
    *   State associated with this form.
-   * @param \const|\enum|int $action The mode the form is operating in (None/Create/View/Update/Delete)
+   * @param int $action The mode the form is operating in (None/Create/View/Update/Delete)
    * @param string $method
    *   The type of http method used (GET/POST).
    * @param string $name
@@ -1296,10 +1296,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * @param string $name
-   * @param $title
-   * @param $values
+   * @param string $title
+   * @param array $values
    * @param array $attributes
-   * @param null $separator
+   * @param string $separator
    * @param bool $required
    * @param array $optionAttributes - Option specific attributes
    *
@@ -1343,10 +1343,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @param int $id
-   * @param $title
+   * @param string $id
+   * @param string $title
    * @param bool $allowClear
-   * @param null $required
+   * @param bool $required
    * @param array $attributes
    */
   public function addYesNo($id, $title, $allowClear = FALSE, $required = NULL, $attributes = []) {
@@ -1366,8 +1366,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * @param int $id
-   * @param $title
-   * @param $values
+   * @param string $title
+   * @param array $values
    * @param null $other
    * @param null $attributes
    * @param null $required
@@ -1938,7 +1938,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @param $elementName
+   * @param string[]|string $elementName
    */
   public function addUploadElement($elementName) {
     $uploadNames = $this->get('uploadNames');
@@ -1966,17 +1966,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @param $name
+   * @param string $name
    *
-   * @return null
+   * @return mixed
    */
   public function getVar($name) {
     return $this->$name ?? NULL;
   }
 
   /**
-   * @param $name
-   * @param $value
+   * @param string $name
+   * @param mixed $value
    */
   public function setVar($name, $value) {
     $this->$name = $value;
@@ -2084,7 +2084,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $name
    * @param string $label
    * @param bool $required
-   * @param null $attributes
+   * @param array $attributes
    */
   public function addDateTime($name, $label, $required = FALSE, $attributes = NULL) {
     $addTime = ['addTime' => TRUE];
@@ -2104,10 +2104,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $name
    * @param string $label
    * @param bool $required
-   * @param null $attributes
+   * @param array $attributes
    * @param bool $addCurrency
    * @param string $currencyName
-   * @param null $defaultCurrency
+   * @param string $defaultCurrency
    * @param bool $freezeCurrency
    *
    * @return \HTML_QuickForm_Element
@@ -2136,7 +2136,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Add currency element to the form.
    *
    * @param string $name
-   * @param null $label
+   * @param string $label
    * @param bool $required
    * @param string $defaultCurrency
    * @param bool $freezeCurrency
@@ -2405,6 +2405,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * @return bool
    */
   public function canUseAjaxContactLookups() {
     if (0 < (civicrm_api3('contact', 'getcount', ['check_permissions' => 1])) &&
@@ -2412,6 +2413,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     ) {
       return TRUE;
     }
+    return FALSE;
   }
 
   /**

@@ -199,7 +199,7 @@ function civicrm_api3_attachment_get($params) {
 /**
  * Adjust metadata for Attachment delete action.
  *
- * @param $spec
+ * @param array $spec
  */
 function _civicrm_api3_attachment_delete_spec(&$spec) {
   unset($spec['id']['api.required']);

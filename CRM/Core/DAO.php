@@ -693,7 +693,8 @@ class CRM_Core_DAO extends DB_DataObject {
    *             we will build the condition only using the whereAdd's.  Default is to
    *             build the condition only using the object parameters.
    *
-   *     * @return mixed Int (No. of rows affected) on success, false on failure, 0 on no data affected
+   * @return int|false
+   *   Int (No. of rows affected) on success, false on failure, 0 on no data affected
    */
   public function delete($useWhere = FALSE) {
     $preEvent = new \Civi\Core\DAO\Event\PreDelete($this);

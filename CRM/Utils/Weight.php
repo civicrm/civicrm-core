@@ -271,11 +271,12 @@ class CRM_Utils_Weight {
    *   Field => value to be used in the WHERE.
    * @param string $queryData
    *   Data to be used, dependent on the query type.
-   * @param null $additionalWhere
-   * @param string $orderBy
+   * @param string|null $additionalWhere
+   *   Optional WHERE field.
+   * @param string|null $orderBy
    *   Optional ORDER BY field.
-   *
-   * @param null $groupBy
+   * @param string|null $groupBy
+   *   Optional GROU{} BY field.
    *
    * @return CRM_Core_DAO
    *   objet that holds the results of the query
@@ -352,11 +353,11 @@ class CRM_Utils_Weight {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    * @param string $daoName
    * @param string $idName
-   * @param $returnURL
-   * @param null $filter
+   * @param string $returnURL
+   * @param string|null $filter
    */
   public static function addOrder(&$rows, $daoName, $idName, $returnURL, $filter = NULL) {
     if (empty($rows)) {
@@ -497,7 +498,7 @@ class CRM_Utils_Weight {
   }
 
   /**
-   * @param $url
+   * @param string $url
    */
   public static function fixOrderOutput($url) {
     if (empty($_GET['snippet']) || $_GET['snippet'] !== 'json') {

@@ -61,7 +61,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    * Initiate all pending/ready jobs.
    *
    * @param array $testParams
-   * @param string $mode
+   * @param string|null $mode
+   *   Either 'sms' or null
    *
    * @return bool|null
    */
@@ -208,7 +209,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   /**
    * Post process to determine if the parent job
    * as well as the mailing is complete after the run.
-   * @param null $mode
+   * @param string|null $mode
+   *   Either 'sms' or null
    */
   public static function runJobs_post($mode = NULL) {
 
@@ -282,7 +284,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   /**
    * before we run jobs, we need to split the jobs
    * @param int $offset
-   * @param null $mode
+   * @param string|null $mode
+   *   Either 'sms' or null
    */
   public static function runJobs_pre($offset = 200, $mode = NULL) {
     $job = new CRM_Mailing_BAO_MailingJob();

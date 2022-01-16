@@ -269,7 +269,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   }
 
   /**
-   * @param $fields
+   * @param array $fields
    *
    * @return array|bool
    */
@@ -297,7 +297,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   /**
    * @param array $fields
    * @param array $errors
-   * @param null $section
+   * @param string|null $section
    *
    * @return bool
    */

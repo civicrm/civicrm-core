@@ -504,7 +504,7 @@ SELECT second_degree_relationship.contact_id_{$second_direction['to']} AS contac
 
   /**
    * @param bool $checkSumValidationResult
-   * @param null $form
+   * @param CRM_Core_Form|null $form
    */
   public static function initChecksumAuthSrc($checkSumValidationResult = FALSE, $form = NULL) {
     $session = CRM_Core_Session::singleton();

@@ -255,7 +255,7 @@ class CRM_Core_Permission {
 
   /**
    * @param int $type
-   * @param null $prefix
+   * @param string|null $prefix
    * @param bool $reset
    *
    * @return string

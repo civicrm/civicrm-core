@@ -690,10 +690,10 @@ class CRM_Utils_String {
    * "admin foo" => array(NULL,"admin foo")
    * "cms:admin foo" => array("cms", "admin foo")
    *
-   * @param $delim
+   * @param string $delim
    * @param string $string
    *   E.g. "view all contacts". Syntax: "[prefix:]name".
-   * @param null $defaultPrefix
+   * @param string|null $defaultPrefix
    *
    * @return array
    *   (0 => string|NULL $prefix, 1 => string $value)

@@ -311,7 +311,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * Get all the Personal campaign pages.
    *
    *
-   * @param null $pageType
+   * @param string|null $pageType
    * @param int $id
    *
    * @return array

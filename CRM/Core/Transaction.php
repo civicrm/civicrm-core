@@ -223,12 +223,12 @@ class CRM_Core_Transaction {
    *
    * @param int $phase
    *   A constant; one of: self::PHASE_{PRE,POST}_{COMMIT,ROLLBACK}.
-   * @param string $callback
+   * @param callable $callback
    *   A PHP callback.
    * @param mixed $params
    *   Optional values to pass to callback.
    *          See php manual call_user_func_array for details.
-   * @param int $id
+   * @param string|int|null $id
    */
   public static function addCallback($phase, $callback, $params = NULL, $id = NULL) {
     $frame = \Civi\Core\Transaction\Manager::singleton()->getBaseFrame();

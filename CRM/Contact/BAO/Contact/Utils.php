@@ -135,9 +135,8 @@ WHERE  id IN ( $idString )
    *   Life of this checksum in hours/ 'inf' for infinite.
    * @param string $hash
    *   Contact hash, if sent, prevents a query in inner loop.
-   *
    * @param string $entityType
-   * @param null $hashSize
+   * @param int|null $hashSize
    *
    * @return string
    *   (Underscore separated: $cs, $ts, $live )
@@ -245,9 +244,9 @@ WHERE  id IN ( $idString )
    *
    * @param int $contactID
    *   Contact id of the individual.
-   * @param $employerID
+   * @param int|string $employerID
    *   (id or name).
-   * @param null $previousEmployerID
+   * @param int|null $previousEmployerID
    * @param bool $newContact
    *
    * @throws \API_Exception
@@ -258,7 +257,7 @@ WHERE  id IN ( $idString )
     if (!$employerID) {
       // This function is not called in core with no organization & should not be
       // Refs CRM-15368,CRM-15547
-      CRM_Core_Error::deprecatedWarning('calling this function with no organization is deprected');
+      CRM_Core_Error::deprecatedWarning('calling this function with no organization is deprecated');
       return;
     }
     if (!is_numeric($employerID)) {

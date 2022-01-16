@@ -1143,7 +1143,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    *
    * @param array $fields
    *   Fields array which are submitted.
-   * @param $errors
+   * @param array $errors
    * @param int $contactID
    *   Contact id.
    * @param string $contactType

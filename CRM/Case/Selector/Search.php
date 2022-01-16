@@ -167,7 +167,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    * - Edit
    *
    * @param bool $isDeleted
-   * @param null $key
+   * @param string|null $key
    *
    * @return array
    */

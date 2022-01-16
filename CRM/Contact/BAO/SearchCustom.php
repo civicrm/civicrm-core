@@ -114,7 +114,7 @@ class CRM_Contact_BAO_SearchCustom {
   }
 
   /**
-   * @param $args
+   * @param string $args
    *
    * @return array
    */

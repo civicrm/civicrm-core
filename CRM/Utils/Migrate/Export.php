@@ -383,7 +383,7 @@ class CRM_Utils_Migrate_Export {
   /**
    * @param string $groupName
    * @param string $daoName
-   * @param null $sql
+   * @param string $sql
    */
   public function fetch($groupName, $daoName, $sql = NULL) {
     $idNameFields = $this->_xml[$groupName]['idNameFields'] ?? NULL;
@@ -443,7 +443,7 @@ class CRM_Utils_Migrate_Export {
    * @param string $objectName
    *   Business-entity/xml-tag name.
    * @param CRM_Core_DAO $object
-   * @param $mappedFields
+   * @param array $mappedFields
    *
    * @return array
    */

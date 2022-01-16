@@ -426,7 +426,7 @@ class CRM_Core_Block {
   }
 
   /**
-   * @param $short
+   * @param array $short
    *
    * @return array
    */

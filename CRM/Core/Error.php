@@ -242,9 +242,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * this function is used to return error details
+   * This function is used to return error details
    *
-   * @param $pearError
+   * @param PEAR_Error $pearError
    *
    * @return array $error
    */
@@ -902,9 +902,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @param string $status
    *   The status message to set.
-   *
-   * @param null $redirect
-   * @param string $title
+   * @param string|null $redirect
+   * @param string|null $title
    */
   public static function statusBounce($status, $redirect = NULL, $title = NULL) {
     $session = CRM_Core_Session::singleton();
@@ -934,7 +933,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * PEAR error-handler which converts errors to exceptions
    *
-   * @param $pearError
+   * @param PEAR_Error $pearError
    * @throws PEAR_Exception
    */
   public static function exceptionHandler($pearError) {
