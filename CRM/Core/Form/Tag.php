@@ -96,9 +96,9 @@ class CRM_Core_Form_Tag {
         $tagsetInfo[$mode] = [];
       }
       $tagsetInfo[$mode] = array_merge($tagsetInfo[$mode], $tagset);
-      $form->assign('tagsetInfo', $tagsetInfo);
       $form->assign('isTagset', TRUE);
     }
+    $form->assign('tagsetInfo', $tagsetInfo ?? NULL);
   }
 
   /**
