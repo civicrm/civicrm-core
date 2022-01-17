@@ -20,10 +20,13 @@ function mustache_civicrm_container($container) {
 }
 
 function _mustache_check_sendable(\Civi\FlexMailer\Event\CheckSendableEvent $e) {
-  if ($e->getMailing()->template_type !== 'mustache') return;
+  if ($e->getMailing()->template_type !== 'mustache') {
+    return;
+  }
 
   if (strpos('{{unsubscribeUrl}}', $e->getMailing()->body_html) === FALSE) {
     $e->setError('body_html:unsubscribeUrl', E::ts('Please include the token {{unsubscribeUrl}}'));
   }
 }
+
 ```
