@@ -86,6 +86,7 @@ class CRM_Core_Form_Tag {
       }
     }
 
+    $form->addExpectedSmartyVariable('tagsetInfo');
     if (!empty($tagset)) {
       // assign current tagsets which is used in postProcess
       $form->_tagsetInfo = $tagset;

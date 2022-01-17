@@ -526,7 +526,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * @return array
    */
   public function getOptionalQuickFormElements(): array {
-    return ['separation', 'tag'];
+    return array_merge(['separation', 'tag'], $this->optionalQuickFormElements);
   }
 
   /**
