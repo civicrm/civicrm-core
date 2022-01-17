@@ -60,7 +60,7 @@
             {foreach from=$activity.fields item=field}
               <tr>
                 <td {$labelStyle}>
-                  {$field.label}{if !empty($field.category)}({$field.category}){/if}
+                  {$field.label}
                 </td>
                 <td {$valueStyle}>
                   {if $field.type eq 'Date'}
