@@ -71,7 +71,7 @@ function event_getsingle_expectedresult() {
     'allow_selfcancelxfer' => 0,
     'selfcancelxfer_time' => 0,
     'is_template' => 0,
-    'created_date' => '2019-08-20 19:17:20',
+    'created_date' => '2022-01-17 12:29:42',
     'is_share' => '1',
     'is_confirm_enabled' => '1',
     'is_billing_required' => 0,

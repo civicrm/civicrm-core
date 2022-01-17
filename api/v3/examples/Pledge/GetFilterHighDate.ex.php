@@ -7,14 +7,14 @@
 /**
  * Test Generated example demonstrating the Pledge.get API.
  *
- * Demonstrates high date filter.
+ * demonstrates high date filter.
  *
  * @return array
  *   API result array
  */
 function pledge_get_example() {
   $params = [
-    'pledge_start_date_high' => '20190818192828',
+    'pledge_start_date_high' => '20220115131204',
   ];
 
   try {
@@ -58,11 +58,11 @@ function pledge_get_expectedresult() {
         'display_name' => 'Mr. Anthony Anderson II',
         'pledge_id' => '2',
         'pledge_amount' => '100.00',
-        'pledge_create_date' => '2019-08-20 00:00:00',
-        'pledge_start_date' => '2018-03-02 00:00:00',
+        'pledge_create_date' => '2022-01-17 00:00:00',
+        'pledge_start_date' => '2021-03-05 00:00:00',
         'pledge_status' => 'Overdue',
         'pledge_total_paid' => '',
-        'pledge_next_pay_date' => '2018-03-02 00:00:00',
+        'pledge_next_pay_date' => '2021-03-05 00:00:00',
         'pledge_next_pay_amount' => '20.00',
         'pledge_outstanding_amount' => '20.00',
         'pledge_financial_type' => 'Donation',

@@ -13,7 +13,7 @@
 function membership_create_example() {
   $params = [
     'contact_id' => 3,
-    'membership_type_id' => 1,
+    'membership_type_id' => 'General',
     'join_date' => '2009-01-21',
     'start_date' => '2009-01-21',
     'end_date' => '2009-12-21',

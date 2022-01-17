@@ -12,7 +12,7 @@
  */
 function payment_delete_example() {
   $params = [
-    'id' => 2,
+    'id' => '1',
     'check_permissions' => TRUE,
   ];
 

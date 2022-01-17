@@ -12,7 +12,8 @@
  */
 function membership_get_example() {
   $params = [
-    'membership_type_id' => 1,
+    'membership_type_id' => 'General',
+    'return' => 'custom_1',
   ];
 
   try {
@@ -50,20 +51,7 @@ function membership_get_expectedresult() {
     'values' => [
       '1' => [
         'id' => '1',
-        'contact_id' => '3',
-        'membership_type_id' => '1',
-        'join_date' => '2009-01-21',
-        'start_date' => '2013-07-29 00:00:00',
-        'end_date' => '2013-08-04 00:00:00',
-        'source' => 'Payment',
-        'status_id' => '20',
-        'is_override' => '1',
-        'is_test' => 0,
-        'is_pay_later' => 0,
         'custom_1' => 'custom string',
-        'membership_name' => 'General',
-        'relationship_name' => 'Child of',
-        'custom_1_1' => 'custom string',
       ],
     ],
   ];

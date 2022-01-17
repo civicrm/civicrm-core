@@ -12,13 +12,13 @@
  */
 function message_template_get_example() {
   $params = [
-    'msg_title' => 'msg_title_472',
-    'msg_subject' => 'msg_subject_472',
-    'msg_text' => 'msg_text_472',
-    'msg_html' => 'msg_html_472',
-    'workflow_name' => 'contribution_online_invoice',
+    'msg_title' => 'msg_title_357',
+    'msg_subject' => 'msg_subject_357',
+    'msg_text' => 'msg_text_357',
+    'msg_html' => 'msg_html_357',
+    'workflow_id' => 357,
     'is_default' => '1',
-    'is_reserved' => 1,
+    'is_reserved' => 0,
   ];
 
   try {
@@ -56,16 +56,17 @@ function message_template_get_expectedresult() {
     'values' => [
       '70' => [
         'id' => '70',
-        'msg_title' => 'msg_title_472',
-        'msg_subject' => 'msg_subject_472',
-        'msg_text' => 'msg_text_472',
-        'msg_html' => 'msg_html_472',
+        'msg_title' => 'msg_title_357',
+        'msg_subject' => 'msg_subject_357',
+        'msg_text' => 'msg_text_357',
+        'msg_html' => 'msg_html_357',
         'is_active' => '1',
-        'workflow_id' => '472',
+        'workflow_id' => '357',
+        'workflow_name' => 'workflow_name_357',
         'is_default' => '1',
-        'is_reserved' => '1',
+        'is_reserved' => 0,
         'is_sms' => 0,
-        'pdf_format_id' => '472',
+        'pdf_format_id' => '357',
       ],
     ],
   ];

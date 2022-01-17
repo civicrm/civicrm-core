@@ -14,7 +14,7 @@ function membership_type_create_example() {
   $params = [
     'name' => '40+ Membership',
     'description' => 'people above 40 are given health instructions',
-    'member_of_contact_id' => 7,
+    'member_of_contact_id' => 11,
     'financial_type_id' => 1,
     'domain_id' => '1',
     'minimum_fee' => '200',
@@ -55,14 +55,14 @@ function membership_type_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 2,
+    'id' => 3,
     'values' => [
-      '2' => [
-        'id' => '2',
+      '3' => [
+        'id' => '3',
         'domain_id' => '1',
         'name' => '40+ Membership',
         'description' => 'people above 40 are given health instructions',
-        'member_of_contact_id' => '7',
+        'member_of_contact_id' => '11',
         'financial_type_id' => '1',
         'minimum_fee' => '200',
         'duration_unit' => 'month',

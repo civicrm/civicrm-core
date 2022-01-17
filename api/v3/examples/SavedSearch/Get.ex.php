@@ -54,6 +54,9 @@ function saved_search_get_expectedresult() {
           'relation_type_id' => '6_a_b',
           'relation_target_name' => 'Default Organization',
         ],
+        'expires_date' => '2021-08-08 00:00:00',
+        'created_date' => '2013-07-28 08:49:19',
+        'modified_date' => '2012-11-14 16:02:35',
       ],
     ],
   ];

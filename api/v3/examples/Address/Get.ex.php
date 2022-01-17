@@ -12,8 +12,13 @@
  */
 function address_get_example() {
   $params = [
-    'contact_id' => 4,
+    'contact_id' => 3,
     'street_name' => 'Ambachtstraat',
+    'return' => [
+      '0' => 'location_type_id',
+      '1' => 'is_primary',
+      '2' => 'street_address',
+    ],
   ];
 
   try {
@@ -47,21 +52,13 @@ function address_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 1,
+    'id' => 2,
     'values' => [
-      '1' => [
-        'id' => '1',
-        'contact_id' => '4',
+      '2' => [
+        'id' => '2',
         'location_type_id' => '27',
         'is_primary' => '1',
-        'is_billing' => 0,
         'street_address' => 'Ambachtstraat 23',
-        'street_number' => '23',
-        'street_name' => 'Ambachtstraat',
-        'city' => 'Brummen',
-        'postal_code' => '6971 BN',
-        'country_id' => '1152',
-        'manual_geo_code' => 0,
       ],
     ],
   ];

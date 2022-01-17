@@ -12,7 +12,7 @@
  */
 function group_organization_delete_example() {
   $params = [
-    'id' => 5,
+    'id' => 10,
   ];
 
   try {

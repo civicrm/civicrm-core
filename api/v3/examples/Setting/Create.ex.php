@@ -12,7 +12,7 @@
  */
 function setting_create_example() {
   $params = [
-    'domain_id' => 2,
+    'domain_id' => 21,
     'uniq_email_per_site' => 1,
   ];
 
@@ -47,9 +47,9 @@ function setting_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 2,
+    'id' => 21,
     'values' => [
-      '2' => [
+      '21' => [
         'uniq_email_per_site' => '1',
       ],
     ],

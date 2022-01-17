@@ -12,9 +12,9 @@
  */
 function relationship_create_example() {
   $params = [
-    'contact_id_a' => 31,
-    'contact_id_b' => 33,
-    'relationship_type_id' => 18,
+    'contact_id_a' => 3,
+    'contact_id_b' => 5,
+    'relationship_type_id' => 26,
     'start_date' => '2010-10-30',
     'end_date' => '2010-12-30',
     'is_active' => 1,
@@ -56,9 +56,9 @@ function relationship_create_expectedresult() {
     'values' => [
       '1' => [
         'id' => '1',
-        'contact_id_a' => '31',
-        'contact_id_b' => '33',
-        'relationship_type_id' => '18',
+        'contact_id_a' => '3',
+        'contact_id_b' => '5',
+        'relationship_type_id' => '26',
         'start_date' => '2013-07-29 00:00:00',
         'end_date' => '2013-08-04 00:00:00',
         'is_active' => '1',
@@ -80,17 +80,17 @@ function relationship_create_expectedresult() {
  * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/RelationshipTest.php
  *
  * You can see the outcome of the API tests at
- * https://test.civicrm.org/job/CiviCRM-master-git/
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
  *
  * To Learn about the API read
- * http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+ * https://docs.civicrm.org/dev/en/latest/api/
  *
- * Browse the api on your own site with the api explorer
- * http://MYSITE.ORG/path/to/civicrm/api
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
  *
  * Read more about testing here
- * http://wiki.civicrm.org/confluence/display/CRM/Testing
+ * https://docs.civicrm.org/dev/en/latest/testing/
  *
  * API Standards documentation:
- * http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
  */

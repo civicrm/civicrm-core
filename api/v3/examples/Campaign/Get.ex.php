@@ -48,10 +48,10 @@ function campaign_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 2,
+    'id' => 3,
     'values' => [
-      '2' => [
-        'id' => '2',
+      '3' => [
+        'id' => '3',
         'name' => 'campaign_title',
         'title' => 'campaign title',
         'description' => 'Call people, ask for money',

@@ -14,6 +14,7 @@ function open_i_d_create_example() {
   $params = [
     'contact_id' => 5,
     'openid' => 'My OpenID handle',
+    'sequential' => 1,
   ];
 
   try {
@@ -47,15 +48,15 @@ function open_i_d_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 2,
+    'id' => 3,
     'values' => [
-      '2' => [
-        'id' => '2',
+      '0' => [
+        'id' => '3',
         'contact_id' => '5',
         'location_type_id' => '1',
         'openid' => 'My OpenID handle',
         'allowed_to_login' => '',
-        'is_primary' => '',
+        'is_primary' => '1',
       ],
     ],
   ];

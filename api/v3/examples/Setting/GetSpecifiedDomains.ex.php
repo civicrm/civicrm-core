@@ -16,7 +16,7 @@ function setting_get_example() {
   $params = [
     'domain_id' => [
       '0' => 1,
-      '1' => 2,
+      '1' => 37,
     ],
     'return' => [
       '0' => 'uniq_email_per_site',
@@ -58,7 +58,7 @@ function setting_get_expectedresult() {
       '1' => [
         'uniq_email_per_site' => 0,
       ],
-      '2' => [
+      '37' => [
         'uniq_email_per_site' => '1',
       ],
     ],

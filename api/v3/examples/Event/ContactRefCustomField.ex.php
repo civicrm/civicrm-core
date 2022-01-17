@@ -15,7 +15,7 @@
 function event_get_example() {
   $params = [
     'return.custom_2' => 1,
-    'custom_2' => 4,
+    'custom_2' => 3,
   ];
 
   try {
@@ -81,7 +81,7 @@ function event_get_expectedresult() {
         'is_confirm_enabled' => '1',
         'is_billing_required' => 0,
         'custom_1' => 'defaultValue',
-        'custom_2_id' => '4',
+        'custom_2_id' => '3',
         'custom_2' => 'Contact, Test',
       ],
     ],

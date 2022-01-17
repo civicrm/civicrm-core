@@ -12,7 +12,7 @@
  */
 function country_delete_example() {
   $params = [
-    'id' => 1255,
+    'id' => 1257,
   ];
 
   try {

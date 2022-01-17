@@ -19,7 +19,7 @@ function membership_create_example() {
     'end_date' => '2006-12-21',
     'source' => 'Payment',
     'is_override' => 1,
-    'status_id' => 31,
+    'status_id' => 33,
   ];
 
   try {
@@ -63,7 +63,7 @@ function membership_create_expectedresult() {
         'start_date' => '2013-07-29 00:00:00',
         'end_date' => '2013-08-04 00:00:00',
         'source' => 'Payment',
-        'status_id' => '31',
+        'status_id' => '33',
         'is_override' => '1',
         'status_override_end_date' => '',
         'owner_membership_id' => '',

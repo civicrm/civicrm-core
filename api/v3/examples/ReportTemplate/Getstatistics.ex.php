@@ -47,15 +47,17 @@ function report_template_getstatistics_expectedresult() {
   $expectedResult = [
     'is_error' => 0,
     'version' => 3,
-    'count' => 1,
-    'id' => 'counts',
+    'count' => 3,
     'values' => [
       'counts' => [
         'rowCount' => [
           'title' => 'Row(s) Listed',
           'value' => 0,
+          'type' => 1,
         ],
       ],
+      'groups' => [],
+      'filters' => [],
     ],
   ];
 

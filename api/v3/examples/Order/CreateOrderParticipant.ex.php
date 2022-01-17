@@ -14,7 +14,7 @@
  */
 function order_create_example() {
   $params = [
-    'contact_id' => 11,
+    'contact_id' => 41,
     'receive_date' => '2010-01-20',
     'financial_type_id' => 1,
     'contribution_status_id' => 'Pending',
@@ -45,7 +45,7 @@ function order_create_example() {
           ],
         ],
         'params' => [
-          'contact_id' => 11,
+          'contact_id' => 41,
           'event_id' => 1,
           'role_id' => 1,
           'register_date' => '2007-07-21 00:00:00',
@@ -90,7 +90,7 @@ function order_create_expectedresult() {
     'values' => [
       '1' => [
         'id' => '1',
-        'contact_id' => '11',
+        'contact_id' => '41',
         'financial_type_id' => '1',
         'contribution_page_id' => '',
         'payment_instrument_id' => '4',
@@ -117,10 +117,38 @@ function order_create_expectedresult() {
         'check_number' => '',
         'campaign_id' => '',
         'creditnote_id' => '',
-        'tax_amount' => '',
+        'tax_amount' => 0,
         'revenue_recognition_date' => '',
         'is_template' => '',
         'contribution_type_id' => '1',
+        'line_item' => [
+          '0' => [
+            'price_field_id' => '2',
+            'price_field_value_id' => '2',
+            'label' => 'Price Field 1',
+            'field_title' => 'Price Field 1',
+            'qty' => '1',
+            'unit_price' => '100.000000000',
+            'line_total' => '100.000000000',
+            'financial_type_id' => '4',
+            'entity_table' => 'civicrm_participant',
+            'tax_amount' => 0,
+            'entity_id' => '1',
+          ],
+          '1' => [
+            'price_field_id' => '2',
+            'price_field_value_id' => '3',
+            'label' => 'Price Field 2',
+            'field_title' => 'Price Field 2',
+            'qty' => '1',
+            'unit_price' => '200.000000000',
+            'line_total' => '200.000000000',
+            'financial_type_id' => '4',
+            'entity_table' => 'civicrm_participant',
+            'tax_amount' => 0,
+            'entity_id' => '1',
+          ],
+        ],
       ],
     ],
   ];

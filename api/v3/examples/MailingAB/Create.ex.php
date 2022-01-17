@@ -65,7 +65,7 @@ function mailing_a_b_create_expectedresult() {
         'testing_criteria' => 'subject',
         'winner_criteria' => 'open',
         'specific_url' => '',
-        'declare_winning_time' => '20190822192332',
+        'declare_winning_time' => '20220119125416',
         'group_percentage' => '10',
         'created_id' => '3',
         'created_date' => '2013-07-28 08:49:19',

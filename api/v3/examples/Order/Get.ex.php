@@ -107,6 +107,7 @@ function order_get_expectedresult() {
             'price_field_value_id' => '1',
             'financial_type_id' => '1',
             'non_deductible_amount' => '0.00',
+            'tax_amount' => '0.00',
             'contribution_type_id' => '1',
           ],
         ],

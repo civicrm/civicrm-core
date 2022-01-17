@@ -55,7 +55,7 @@ function job_clone_expectedresult() {
         'name' => 'API_Test_Job - Copy',
         'description' => 'A long description written by hand in cursive',
         'api_entity' => 'ApiTestEntity',
-        'api_action' => 'apitestaction',
+        'api_action' => 'api_test_action',
         'parameters' => 'Semi-formal explanation of runtime job parameters',
         'is_active' => '1',
       ],

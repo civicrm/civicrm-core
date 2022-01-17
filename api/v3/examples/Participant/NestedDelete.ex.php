@@ -14,7 +14,7 @@
  */
 function participant_get_example() {
   $params = [
-    'contact_id' => 4,
+    'contact_id' => 6,
     'api.participant.delete' => 1,
   ];
 
@@ -51,12 +51,12 @@ function participant_get_expectedresult() {
     'count' => 2,
     'values' => [
       '2' => [
-        'contact_id' => '4',
+        'contact_id' => '6',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
         'sort_name' => 'Anderson, Anthony',
         'display_name' => 'Mr. Anthony Anderson II',
-        'event_id' => '42',
+        'event_id' => '40',
         'event_title' => 'Annual CiviCRM meet',
         'event_start_date' => '2013-07-29 00:00:00',
         'event_end_date' => '2013-08-04 00:00:00',
@@ -87,12 +87,12 @@ function participant_get_expectedresult() {
         ],
       ],
       '3' => [
-        'contact_id' => '4',
+        'contact_id' => '6',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
         'sort_name' => 'Anderson, Anthony',
         'display_name' => 'Mr. Anthony Anderson II',
-        'event_id' => '42',
+        'event_id' => '40',
         'event_title' => 'Annual CiviCRM meet',
         'event_start_date' => '2013-07-29 00:00:00',
         'event_end_date' => '2013-08-04 00:00:00',

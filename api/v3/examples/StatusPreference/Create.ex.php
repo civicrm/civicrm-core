@@ -50,16 +50,17 @@ function status_preference_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 4,
+    'id' => 7,
     'values' => [
-      '4' => [
-        'id' => '4',
+      '7' => [
+        'id' => '7',
         'domain_id' => '1',
         'name' => 'test_check',
         'hush_until' => '20151212000000',
         'ignore_severity' => '5',
         'prefs' => '',
         'check_info' => '',
+        'is_active' => '',
       ],
     ],
   ];

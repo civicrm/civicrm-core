@@ -12,7 +12,7 @@
  */
 function activity_contact_delete_example() {
   $params = [
-    'id' => 11,
+    'id' => 14,
   ];
 
   try {

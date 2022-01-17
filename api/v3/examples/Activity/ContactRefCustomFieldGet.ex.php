@@ -66,10 +66,14 @@ function activity_get_expectedresult() {
         'is_current_revision' => '1',
         'is_deleted' => 0,
         'is_star' => 0,
+        'created_date' => '2013-07-28 08:49:19',
+        'modified_date' => '2012-11-14 16:02:35',
         'custom_1' => 'defaultValue',
         'custom_2_id' => '1',
         'custom_2' => 'Anderson, Anthony',
         'source_contact_id' => '1',
+        'source_contact_name' => 'Mr. Anthony Anderson II',
+        'source_contact_sort_name' => 'Anderson, Anthony',
         'custom_1_1' => 'defaultValue',
         'custom_2_1' => 'Anderson, Anthony',
         'custom_2_1_id' => '1',
@@ -87,17 +91,17 @@ function activity_get_expectedresult() {
  * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ActivityTest.php
  *
  * You can see the outcome of the API tests at
- * https://test.civicrm.org/job/CiviCRM-master-git/
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
  *
  * To Learn about the API read
- * http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+ * https://docs.civicrm.org/dev/en/latest/api/
  *
- * Browse the api on your own site with the api explorer
- * http://MYSITE.ORG/path/to/civicrm/api
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
  *
  * Read more about testing here
- * http://wiki.civicrm.org/confluence/display/CRM/Testing
+ * https://docs.civicrm.org/dev/en/latest/testing/
  *
  * API Standards documentation:
- * http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
  */

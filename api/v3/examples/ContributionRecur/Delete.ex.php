@@ -12,7 +12,7 @@
  */
 function contribution_recur_delete_example() {
   $params = [
-    'id' => 4,
+    'id' => 7,
   ];
 
   try {
@@ -54,9 +54,9 @@ function contribution_recur_delete_expectedresult() {
 
 /*
  * This example has been generated from the API test suite.
- * The test that created it is called "testDeleteContributionRecur"
+ * The test that created it is called "basicDeleteTest"
  * and can be found at:
- * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContributionRecurTest.php
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/CiviUnitTestCase.php
  *
  * You can see the outcome of the API tests at
  * https://test.civicrm.org/job/CiviCRM-Core-Matrix/

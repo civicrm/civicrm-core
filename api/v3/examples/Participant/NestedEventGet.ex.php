@@ -52,7 +52,7 @@ function participant_get_expectedresult() {
     'id' => 1,
     'values' => [
       '1' => [
-        'contact_id' => '2',
+        'contact_id' => '4',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
         'sort_name' => 'Anderson, Anthony',
@@ -91,8 +91,8 @@ function participant_get_expectedresult() {
               'title' => 'Annual CiviCRM meet',
               'event_title' => 'Annual CiviCRM meet',
               'summary' => 'If you have any CiviCRM related issues or want to track where CiviCRM is heading, Sign up now',
-              'description' => 'This event is intended to give brief idea about progess of CiviCRM and giving solutions to common user issues',
-              'event_description' => 'This event is intended to give brief idea about progess of CiviCRM and giving solutions to common user issues',
+              'description' => 'This event is intended to give brief idea about progress of CiviCRM and giving solutions to common user issues',
+              'event_description' => 'This event is intended to give brief idea about progress of CiviCRM and giving solutions to common user issues',
               'event_type_id' => '1',
               'is_public' => '1',
               'start_date' => '2013-07-29 00:00:00',

@@ -86,6 +86,7 @@ function custom_field_create_expectedresult() {
         'note_rows' => '',
         'column_name' => 'name1_1',
         'option_group_id' => '',
+        'serialize' => 0,
         'filter' => '',
         'in_selector' => 0,
       ],

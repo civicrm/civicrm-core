@@ -33,10 +33,10 @@ function contact_create_example() {
       'skipCleanMoney' => 1,
     ],
     'api.website.create' => [
-      'url' => 'http://civicrm.org',
+      'url' => 'https://civicrm.org',
     ],
     'api.website.create.2' => [
-      'url' => 'http://chained.org',
+      'url' => 'https://chained.org',
     ],
   ];
 
@@ -158,8 +158,9 @@ function contact_create_expectedresult() {
               'check_number' => '',
               'campaign_id' => '',
               'creditnote_id' => '',
-              'tax_amount' => '',
+              'tax_amount' => 0,
               'revenue_recognition_date' => '',
+              'is_template' => '',
               'contribution_type_id' => '1',
             ],
           ],
@@ -173,7 +174,7 @@ function contact_create_expectedresult() {
             '0' => [
               'id' => '1',
               'contact_id' => '3',
-              'url' => 'http://civicrm.org',
+              'url' => 'https://civicrm.org',
               'website_type_id' => '',
             ],
           ],
@@ -187,7 +188,7 @@ function contact_create_expectedresult() {
             '0' => [
               'id' => '2',
               'contact_id' => '3',
-              'url' => 'http://chained.org',
+              'url' => 'https://chained.org',
               'website_type_id' => '',
             ],
           ],

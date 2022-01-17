@@ -50,10 +50,10 @@ function price_set_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 20,
+    'id' => 6,
     'values' => [
-      '20' => [
-        'id' => '20',
+      '6' => [
+        'id' => '6',
         'domain_id' => '',
         'name' => 'event price',
         'title' => 'event price',

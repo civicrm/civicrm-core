@@ -12,7 +12,7 @@
  */
 function group_organization_get_example() {
   $params = [
-    'organization_id' => 1,
+    'organization_id' => 2,
   ];
 
   try {

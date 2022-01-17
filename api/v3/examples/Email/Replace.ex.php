@@ -74,8 +74,8 @@ function email_replace_expectedresult() {
     'version' => 3,
     'count' => 5,
     'values' => [
-      '13' => [
-        'id' => '13',
+      '23' => [
+        'id' => '23',
         'contact_id' => '17',
         'location_type_id' => '34',
         'email' => '1-1@example.com',
@@ -88,8 +88,8 @@ function email_replace_expectedresult() {
         'signature_text' => '',
         'signature_html' => '',
       ],
-      '14' => [
-        'id' => '14',
+      '24' => [
+        'id' => '24',
         'contact_id' => '17',
         'location_type_id' => '34',
         'email' => '1-2@example.com',
@@ -102,8 +102,8 @@ function email_replace_expectedresult() {
         'signature_text' => '',
         'signature_html' => '',
       ],
-      '15' => [
-        'id' => '15',
+      '25' => [
+        'id' => '25',
         'contact_id' => '17',
         'location_type_id' => '34',
         'email' => '1-3@example.com',
@@ -116,8 +116,8 @@ function email_replace_expectedresult() {
         'signature_text' => '',
         'signature_html' => '',
       ],
-      '16' => [
-        'id' => '16',
+      '26' => [
+        'id' => '26',
         'contact_id' => '17',
         'location_type_id' => '35',
         'email' => '2-1@example.com',
@@ -130,8 +130,8 @@ function email_replace_expectedresult() {
         'signature_text' => '',
         'signature_html' => '',
       ],
-      '17' => [
-        'id' => '17',
+      '27' => [
+        'id' => '27',
         'contact_id' => '17',
         'location_type_id' => '35',
         'email' => '2-2@example.com',

@@ -50,7 +50,7 @@ function domain_get_expectedresult() {
       '0' => [
         'id' => '1',
         'name' => 'Default Domain Name',
-        'version' => '4.6.alpha1',
+        'version' => '5.47.alpha1',
         'contact_id' => '3',
         'locale_custom_strings' => 'a:1:{s:5:\"en_US\";a:0:{}}',
         'domain_email' => 'my@email.com',
@@ -72,14 +72,14 @@ function domain_get_expectedresult() {
         ],
         'from_name' => 'FIXME',
         'from_email' => 'info@EXAMPLE.ORG',
-        'domain_version' => '4.6.alpha1',
+        'domain_version' => '5.47.alpha1',
       ],
       '1' => [
         'id' => '2',
         'name' => 'Second Domain',
-        'version' => '4.6.alpha1',
+        'version' => '5.47.alpha1',
         'contact_id' => '2',
-        'domain_email' => '\"Domain Email\" <domainemail2@example.org>',
+        'domain_email' => 'domainemail2@example.org',
         'domain_phone' => [
           'phone_type' => 'Phone',
           'phone' => '204 555-1001',
@@ -98,7 +98,7 @@ function domain_get_expectedresult() {
         ],
         'from_name' => 'FIXME',
         'from_email' => 'info@EXAMPLE.ORG',
-        'domain_version' => '4.6.alpha1',
+        'domain_version' => '5.47.alpha1',
       ],
     ],
   ];

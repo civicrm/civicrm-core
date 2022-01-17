@@ -48,10 +48,10 @@ function email_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 26,
+    'id' => 49,
     'values' => [
-      '26' => [
-        'id' => '26',
+      '49' => [
+        'id' => '49',
         'contact_id' => '23',
         'location_type_id' => '1',
         'email' => 'api@a-team.com',
@@ -59,7 +59,7 @@ function email_create_expectedresult() {
         'is_billing' => '',
         'on_hold' => '2',
         'is_bulkmail' => '',
-        'hold_date' => '20190820191652',
+        'hold_date' => '20220117122830',
         'reset_date' => '',
         'signature_text' => '',
         'signature_html' => '',

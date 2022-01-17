@@ -56,7 +56,7 @@ function price_set_get_expectedresult() {
         'extends' => '2',
         'is_quick_config' => '1',
         'is_reserved' => '1',
-        'min_amount' => 0,
+        'min_amount' => '0.00',
         'entity' => [],
       ],
     ],

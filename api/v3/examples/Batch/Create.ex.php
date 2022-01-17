@@ -17,7 +17,7 @@ function batch_create_example() {
     'description' => 'This is description for New Batch 04',
     'total' => '400.44',
     'item_count' => 4,
-    'id' => 3,
+    'id' => 5,
   ];
 
   try {
@@ -51,10 +51,10 @@ function batch_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 3,
+    'id' => 5,
     'values' => [
-      '3' => [
-        'id' => '3',
+      '5' => [
+        'id' => '5',
         'name' => 'New_Batch_04',
         'title' => 'New Batch 04',
         'description' => 'This is description for New Batch 04',

@@ -13,9 +13,9 @@
 function payment_token_get_example() {
   $params = [
     'token' => 'fancy-token-xxxx',
-    'contact_id' => 4,
-    'created_id' => 4,
-    'payment_processor_id' => 2,
+    'contact_id' => 6,
+    'created_id' => 6,
+    'payment_processor_id' => 4,
   ];
 
   try {
@@ -49,15 +49,15 @@ function payment_token_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 2,
+    'id' => 4,
     'values' => [
-      '2' => [
-        'id' => '2',
-        'contact_id' => '4',
-        'payment_processor_id' => '2',
+      '4' => [
+        'id' => '4',
+        'contact_id' => '6',
+        'payment_processor_id' => '4',
         'token' => 'fancy-token-xxxx',
         'created_date' => '2013-07-28 08:49:19',
-        'created_id' => '4',
+        'created_id' => '6',
       ],
     ],
   ];

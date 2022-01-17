@@ -12,7 +12,7 @@
  */
 function status_preference_get_example() {
   $params = [
-    'id' => 3,
+    'id' => 5,
   ];
 
   try {
@@ -46,14 +46,15 @@ function status_preference_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 3,
+    'id' => 5,
     'values' => [
-      '3' => [
-        'id' => '3',
+      '5' => [
+        'id' => '5',
         'domain_id' => '1',
         'name' => 'test_check',
         'hush_until' => '2015-12-12',
         'ignore_severity' => '4',
+        'is_active' => '1',
       ],
     ],
   ];

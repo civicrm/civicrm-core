@@ -107,7 +107,7 @@ function contact_get_expectedresult() {
         'phone_id' => '',
         'phone_type_id' => '',
         'phone' => '',
-        'email_id' => '1',
+        'email_id' => '3',
         'email' => 'man3@yahoo.com',
         'on_hold' => 0,
         'im_id' => '',
@@ -124,7 +124,7 @@ function contact_get_expectedresult() {
         'state_province' => '',
         'country' => '',
         'id' => '3',
-        'api.website.getValue' => 'http://civicrm.org',
+        'api.website.getValue' => 'https://civicrm.org',
         'api.Contribution.getCount' => 2,
         'api.CustomValue.get' => [
           'is_error' => 0,

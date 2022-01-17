@@ -12,7 +12,7 @@
  */
 function email_delete_example() {
   $params = [
-    'id' => 12,
+    'id' => 21,
   ];
 
   try {

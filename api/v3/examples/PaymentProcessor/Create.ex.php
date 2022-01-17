@@ -74,7 +74,7 @@ function payment_processor_create_expectedresult() {
         'billing_mode' => '1',
         'is_recur' => 0,
         'payment_type' => '1',
-        'payment_instrument_id' => '1',
+        'payment_instrument_id' => '2',
         'accepted_credit_cards' => '',
       ],
     ],

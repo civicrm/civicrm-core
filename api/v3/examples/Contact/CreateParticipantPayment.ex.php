@@ -8,7 +8,7 @@
  * Test Generated example demonstrating the Contact.create API.
  *
  * Single function to create contact with partipation & contribution.
- * Note that in the case of 'contribution' the 'create' is implied (api.contribution.create)
+ * Note that in the case of 'contribution' the 'create' is implied (api.contribution.create).
  *
  * @return array
  *   API result array
@@ -18,7 +18,7 @@ function contact_create_example() {
     'contact_type' => 'Individual',
     'display_name' => 'dlobo',
     'api.participant' => [
-      'event_id' => 43,
+      'event_id' => 41,
       'status_id' => 1,
       'role_id' => 1,
       'format.only_id' => 1,
@@ -65,10 +65,10 @@ function contact_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 5,
+    'id' => 7,
     'values' => [
-      '5' => [
-        'id' => '5',
+      '7' => [
+        'id' => '7',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
         'do_not_email' => 0,

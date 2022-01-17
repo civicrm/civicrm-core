@@ -52,7 +52,7 @@ function membership_type_get_expectedresult() {
         'id' => '1',
         'domain_id' => '1',
         'name' => 'General',
-        'member_of_contact_id' => '4',
+        'member_of_contact_id' => '5',
         'financial_type_id' => '2',
         'minimum_fee' => '0.000000000',
         'duration_unit' => 'year',

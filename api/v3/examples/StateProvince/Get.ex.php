@@ -46,13 +46,14 @@ function state_province_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 14035,
+    'id' => 14068,
     'values' => [
-      '14035' => [
-        'id' => '14035',
+      '14068' => [
+        'id' => '14068',
         'name' => 'Wessex',
         'abbreviation' => 'WEX',
         'country_id' => '1226',
+        'is_active' => '1',
       ],
     ],
   ];

@@ -67,7 +67,7 @@ function option_group_create_expectedresult() {
         'is_reserved' => '1',
         'is_active' => '1',
         'is_locked' => '',
-        'api.OptionValue.create' => 869,
+        'api.OptionValue.create' => 859,
       ],
     ],
   ];

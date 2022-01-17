@@ -13,7 +13,7 @@
 function logging_revert_example() {
   $params = [
     'log_conn_id' => 'woot',
-    'log_date' => '2019-08-20 19:22:48',
+    'log_date' => '2022-01-17 12:52:20',
   ];
 
   try {
@@ -55,7 +55,7 @@ function logging_revert_expectedresult() {
 
 /*
  * This example has been generated from the API test suite.
- * The test that created it is called "/home/seamus/buildkit/build/47-test/sites/all/modules/civicrm/tests/phpunit/api/v3/LoggingTest.php"
+ * The test that created it is called "/home/seamus/buildkit/build/47-test/web/sites/all/modules/civicrm/tests/phpunit/api/v3/LoggingTest.php"
  * and can be found at:
  * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/Revert
  *

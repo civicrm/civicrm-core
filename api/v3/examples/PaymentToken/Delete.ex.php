@@ -12,7 +12,7 @@
  */
 function payment_token_delete_example() {
   $params = [
-    'id' => 3,
+    'id' => 6,
   ];
 
   try {

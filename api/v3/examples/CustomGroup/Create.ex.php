@@ -80,6 +80,7 @@ function custom_group_create_expectedresult() {
         'created_date' => '',
         'is_reserved' => '',
         'is_public' => '',
+        'icon' => '',
       ],
     ],
   ];

@@ -14,7 +14,7 @@ function phone_create_example() {
   $params = [
     'contact_id' => 5,
     'phone' => '(123) 456-7890',
-    'is_primary' => 1,
+    'is_primary' => TRUE,
     'phone_type_id' => 1,
   ];
 
@@ -49,10 +49,10 @@ function phone_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 3,
+    'id' => 4,
     'values' => [
-      '3' => [
-        'id' => '3',
+      '4' => [
+        'id' => '4',
         'contact_id' => '5',
         'location_type_id' => '1',
         'is_primary' => '1',

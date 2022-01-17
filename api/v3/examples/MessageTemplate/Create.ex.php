@@ -12,13 +12,13 @@
  */
 function message_template_create_example() {
   $params = [
-    'msg_title' => 'msg_title_471',
-    'msg_subject' => 'msg_subject_471',
-    'msg_text' => 'msg_text_471',
-    'msg_html' => 'msg_html_471',
-    'workflow_id' => 471,
+    'msg_title' => 'msg_title_356',
+    'msg_subject' => 'msg_subject_356',
+    'msg_text' => 'msg_text_356',
+    'msg_html' => 'msg_html_356',
+    'workflow_id' => 356,
     'is_default' => '1',
-    'is_reserved' => 1,
+    'is_reserved' => 0,
   ];
 
   try {
@@ -56,14 +56,15 @@ function message_template_create_expectedresult() {
     'values' => [
       '69' => [
         'id' => '69',
-        'msg_title' => 'msg_title_471',
-        'msg_subject' => 'msg_subject_471',
-        'msg_text' => 'msg_text_471',
-        'msg_html' => 'msg_html_471',
+        'msg_title' => 'msg_title_356',
+        'msg_subject' => 'msg_subject_356',
+        'msg_text' => 'msg_text_356',
+        'msg_html' => 'msg_html_356',
         'is_active' => '1',
-        'workflow_id' => '471',
+        'workflow_id' => '356',
+        'workflow_name' => '',
         'is_default' => '1',
-        'is_reserved' => '1',
+        'is_reserved' => 0,
         'is_sms' => '',
         'pdf_format_id' => '',
       ],

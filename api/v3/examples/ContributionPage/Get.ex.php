@@ -61,6 +61,7 @@ function contribution_page_get_expectedresult() {
         'is_recur_installments' => 0,
         'adjust_recur_start_date' => 0,
         'is_pay_later' => '1',
+        'pay_later_text' => 'Send check',
         'is_partial_payment' => 0,
         'is_allow_other_amount' => 0,
         'goal_amount' => '34567.00',

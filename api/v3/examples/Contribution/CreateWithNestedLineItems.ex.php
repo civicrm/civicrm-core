@@ -14,7 +14,7 @@
  */
 function contribution_create_example() {
   $params = [
-    'contact_id' => 13,
+    'contact_id' => 3,
     'receive_date' => '20120511',
     'total_amount' => '100',
     'financial_type_id' => 1,
@@ -25,7 +25,7 @@ function contribution_create_example() {
     'trxn_id' => 12345,
     'invoice_id' => 67890,
     'source' => 'SSF',
-    'contribution_status_id' => 1,
+    'contribution_status_id' => 'Pending',
     'skipLineItem' => 1,
     'api.line_item.create' => [
       '0' => [
@@ -78,7 +78,7 @@ function contribution_create_expectedresult() {
     'values' => [
       '1' => [
         'id' => '1',
-        'contact_id' => '13',
+        'contact_id' => '3',
         'financial_type_id' => '1',
         'contribution_page_id' => '',
         'payment_instrument_id' => '1',
@@ -100,7 +100,7 @@ function contribution_create_expectedresult() {
         'contribution_recur_id' => '',
         'is_test' => '',
         'is_pay_later' => '',
-        'contribution_status_id' => '1',
+        'contribution_status_id' => '2',
         'address_id' => '',
         'check_number' => '',
         'campaign_id' => '',
@@ -131,6 +131,7 @@ function contribution_create_expectedresult() {
                 'financial_type_id' => '',
                 'non_deductible_amount' => '',
                 'tax_amount' => '',
+                'membership_num_terms' => '',
               ],
             ],
           ],
@@ -155,6 +156,7 @@ function contribution_create_expectedresult() {
                 'financial_type_id' => '',
                 'non_deductible_amount' => '',
                 'tax_amount' => '',
+                'membership_num_terms' => '',
               ],
             ],
           ],

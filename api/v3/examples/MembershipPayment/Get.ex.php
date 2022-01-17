@@ -12,7 +12,7 @@
  */
 function membership_payment_get_example() {
   $params = [
-    'contribution_id' => 4,
+    'contribution_id' => 3,
     'membership_id' => 2,
   ];
 
@@ -52,7 +52,7 @@ function membership_payment_get_expectedresult() {
       '2' => [
         'id' => '2',
         'membership_id' => '2',
-        'contribution_id' => '4',
+        'contribution_id' => '3',
       ],
     ],
   ];

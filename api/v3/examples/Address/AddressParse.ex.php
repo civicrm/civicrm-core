@@ -17,7 +17,7 @@ function address_create_example() {
     'street_parsing' => 1,
     'street_address' => '54A Excelsior Ave. Apt 1C',
     'location_type_id' => 8,
-    'contact_id' => 4,
+    'contact_id' => 3,
   ];
 
   try {
@@ -51,11 +51,11 @@ function address_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 1,
+    'id' => 2,
     'values' => [
-      '1' => [
-        'id' => '1',
-        'contact_id' => '4',
+      '2' => [
+        'id' => '2',
+        'contact_id' => '3',
         'location_type_id' => '8',
         'is_primary' => '1',
         'is_billing' => 0,
