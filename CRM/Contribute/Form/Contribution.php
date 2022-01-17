@@ -516,11 +516,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('payNow', FALSE);
     $buildRecurBlock = FALSE;
 
-    // display tax amount on edit contribution page
-    if ($invoicing && $this->_action & CRM_Core_Action::UPDATE && isset($this->_values['tax_amount'])) {
-      $this->assign('totalTaxAmount', $this->_values['tax_amount']);
-    }
-
     if (empty($this->_lineItems) &&
       ($this->_priceSetId || !empty($_POST['price_set_id']))
     ) {
