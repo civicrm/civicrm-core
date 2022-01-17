@@ -470,8 +470,18 @@ class TokenProcessor {
       }
     }
 
-    if ($value instanceof Money && $filter === NULL) {
-      $filter = ['crmMoney'];
+    if ($value instanceof Money) {
+      switch ($filter[0] ?? NULL) {
+        case NULL:
+        case 'crmMoney':
+          return \Civi::format()->money($value->getAmount(), $value->getCurrency());
+
+        case 'raw':
+          return $value->getAmount();
+
+        default:
+          throw new \CRM_Core_Exception("Invalid token filter: $filter");
+      }
     }
 
     switch ($filter[0] ?? NULL) {
@@ -483,11 +493,6 @@ class TokenProcessor {
 
       case 'lower':
         return mb_strtolower($value);
-
-      case 'crmMoney':
-        if ($value instanceof Money) {
-          return \Civi::format()->money($value->getAmount(), $value->getCurrency());
-        }
 
       case 'crmDate':
         if ($value instanceof \DateTime) {

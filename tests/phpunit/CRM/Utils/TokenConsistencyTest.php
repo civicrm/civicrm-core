@@ -213,6 +213,26 @@ case.custom_1 :' . '
   }
 
   /**
+   * Test that contribution recur tokens are consistently rendered.
+   */
+  public function testContributionRecurTokenRaw(): void {
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+      'schema' => ['contribution_recurId'],
+    ]);
+    $tokenProcessor->addMessage('not_specified', '{contribution_recur.amount}', 'text/plain');
+    $tokenProcessor->addMessage('money', '{contribution_recur.amount|crmMoney}', 'text/plain');
+    $tokenProcessor->addMessage('raw', '{contribution_recur.amount|raw}', 'text/plain');
+    $tokenProcessor->addMessage('moneyNumber', '{contribution_recur.amount|crmMoneyNumber}', 'text/plain');
+    $tokenProcessor->addRow(['contribution_recurId' => $this->getContributionRecurID()]);
+    $tokenProcessor->evaluate();
+    $this->assertEquals('€5,990.99', $tokenProcessor->getRow(0)->render('not_specified'));
+    $this->assertEquals('€5,990.99', $tokenProcessor->getRow(0)->render('money'));
+    $this->assertEquals('5990.99', $tokenProcessor->getRow(0)->render('raw'));
+  }
+
+  /**
    * Test money format tokens can respect passed in locale.
    */
   public function testMoneyFormat(): void {
