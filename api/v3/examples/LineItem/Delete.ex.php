@@ -12,7 +12,7 @@
  */
 function line_item_delete_example() {
   $params = [
-    'id' => 4,
+    'id' => 17,
   ];
 
   try {

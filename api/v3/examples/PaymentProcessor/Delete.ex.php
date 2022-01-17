@@ -12,7 +12,7 @@
  */
 function payment_processor_delete_example() {
   $params = [
-    'id' => 3,
+    'id' => 5,
   ];
 
   try {

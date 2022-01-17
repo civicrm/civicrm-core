@@ -48,10 +48,10 @@ function country_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 1254,
+    'id' => 1255,
     'values' => [
-      '1254' => [
-        'id' => '1254',
+      '1255' => [
+        'id' => '1255',
         'name' => 'Made Up Land',
         'iso_code' => 'ZZ',
         'country_code' => '',
@@ -60,6 +60,7 @@ function country_create_expectedresult() {
         'ndd_prefix' => '',
         'region_id' => '1',
         'is_province_abbreviated' => '',
+        'is_active' => '',
       ],
     ],
   ];

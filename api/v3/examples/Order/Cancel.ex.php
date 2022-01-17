@@ -50,7 +50,7 @@ function order_cancel_expectedresult() {
     'values' => [
       '1' => [
         'id' => '1',
-        'contact_id' => '16',
+        'contact_id' => '55',
         'financial_type_id' => '1',
         'contribution_page_id' => '',
         'payment_instrument_id' => '4',
@@ -76,8 +76,8 @@ function order_cancel_expectedresult() {
         'address_id' => '',
         'check_number' => '',
         'campaign_id' => '',
-        'creditnote_id' => '1',
-        'tax_amount' => '',
+        'creditnote_id' => 'CN_1',
+        'tax_amount' => '0.00',
         'revenue_recognition_date' => '',
         'is_template' => 0,
         'contribution_type_id' => '1',

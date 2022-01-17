@@ -13,7 +13,7 @@
 function profile_get_example() {
   $params = [
     'profile_id' => [
-      '0' => 15,
+      '0' => 16,
       '1' => 1,
       '2' => 'Billing',
     ],
@@ -52,7 +52,7 @@ function profile_get_expectedresult() {
     'version' => 3,
     'count' => 3,
     'values' => [
-      '15' => [
+      '16' => [
         'postal_code-1' => '90210',
         'state_province-1' => '1021',
         'country-1' => '1228',

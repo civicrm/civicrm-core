@@ -100,7 +100,7 @@ function contact_get_expectedresult() {
         'phone_id' => '',
         'phone_type_id' => '',
         'phone' => '',
-        'email_id' => '1',
+        'email_id' => '3',
         'email' => 'man2@yahoo.com',
         'on_hold' => 0,
         'im_id' => '',

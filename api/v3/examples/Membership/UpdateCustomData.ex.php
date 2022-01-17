@@ -13,13 +13,13 @@
 function membership_create_example() {
   $params = [
     'contact_id' => 3,
-    'membership_type_id' => 1,
+    'membership_type_id' => 'General',
     'join_date' => '2009-01-21',
     'start_date' => '2009-01-21',
     'end_date' => '2009-12-21',
     'source' => 'Payment',
     'is_override' => 1,
-    'status_id' => 42,
+    'status_id' => 43,
     'custom_1' => 'custom string',
   ];
 
@@ -64,7 +64,7 @@ function membership_create_expectedresult() {
         'start_date' => '2013-07-29 00:00:00',
         'end_date' => '2013-08-04 00:00:00',
         'source' => 'Payment',
-        'status_id' => '42',
+        'status_id' => '43',
         'is_override' => '1',
         'status_override_end_date' => '',
         'owner_membership_id' => '',

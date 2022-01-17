@@ -12,7 +12,7 @@
  */
 function phone_delete_example() {
   $params = [
-    'id' => 4,
+    'id' => 6,
   ];
 
   try {

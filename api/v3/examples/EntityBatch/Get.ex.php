@@ -12,7 +12,7 @@
  */
 function entity_batch_get_example() {
   $params = [
-    'entity_id' => 2,
+    'entity_id' => '3',
     'batch_id' => 2,
     'entity_table' => 'civicrm_financial_trxn',
   ];
@@ -53,7 +53,7 @@ function entity_batch_get_expectedresult() {
       '2' => [
         'id' => '2',
         'entity_table' => 'civicrm_financial_trxn',
-        'entity_id' => '2',
+        'entity_id' => '3',
         'batch_id' => '2',
       ],
     ],

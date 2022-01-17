@@ -12,7 +12,7 @@
  */
 function note_delete_example() {
   $params = [
-    'id' => 32,
+    'id' => 35,
   ];
 
   try {

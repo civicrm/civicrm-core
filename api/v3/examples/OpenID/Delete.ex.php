@@ -12,7 +12,7 @@
  */
 function open_i_d_delete_example() {
   $params = [
-    'id' => 4,
+    'id' => 7,
   ];
 
   try {

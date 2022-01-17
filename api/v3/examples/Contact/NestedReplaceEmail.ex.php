@@ -154,7 +154,7 @@ function contact_get_expectedresult() {
           'count' => 5,
           'values' => [
             '0' => [
-              'id' => '19',
+              'id' => '35',
               'contact_id' => '19',
               'location_type_id' => '38',
               'email' => '1-1@example.com',
@@ -168,7 +168,7 @@ function contact_get_expectedresult() {
               'signature_html' => '',
             ],
             '1' => [
-              'id' => '20',
+              'id' => '36',
               'contact_id' => '19',
               'location_type_id' => '38',
               'email' => '1-2@example.com',
@@ -182,7 +182,7 @@ function contact_get_expectedresult() {
               'signature_html' => '',
             ],
             '2' => [
-              'id' => '21',
+              'id' => '37',
               'contact_id' => '19',
               'location_type_id' => '38',
               'email' => '1-3@example.com',
@@ -196,7 +196,7 @@ function contact_get_expectedresult() {
               'signature_html' => '',
             ],
             '3' => [
-              'id' => '22',
+              'id' => '38',
               'contact_id' => '19',
               'location_type_id' => '39',
               'email' => '2-1@example.com',
@@ -210,7 +210,7 @@ function contact_get_expectedresult() {
               'signature_html' => '',
             ],
             '4' => [
-              'id' => '23',
+              'id' => '39',
               'contact_id' => '19',
               'location_type_id' => '39',
               'email' => '2-2@example.com',

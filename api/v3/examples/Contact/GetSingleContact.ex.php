@@ -98,7 +98,7 @@ function contact_getsingle_expectedresult() {
     'phone_id' => '',
     'phone_type_id' => '',
     'phone' => '',
-    'email_id' => '1',
+    'email_id' => '3',
     'email' => 'anthony_anderson@civicrm.org',
     'on_hold' => 0,
     'im_id' => '',

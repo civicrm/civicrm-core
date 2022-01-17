@@ -12,7 +12,7 @@
  */
 function batch_delete_example() {
   $params = [
-    'id' => 5,
+    'id' => 8,
   ];
 
   try {

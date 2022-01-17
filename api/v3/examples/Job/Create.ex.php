@@ -17,7 +17,7 @@ function job_create_example() {
     'description' => 'A long description written by hand in cursive',
     'run_frequency' => 'Daily',
     'api_entity' => 'ApiTestEntity',
-    'api_action' => 'apitestaction',
+    'api_action' => 'api_test_action',
     'parameters' => 'Semi-formal explanation of runtime job parameters',
     'is_active' => 1,
   ];
@@ -64,7 +64,7 @@ function job_create_expectedresult() {
         'name' => 'API_Test_Job',
         'description' => 'A long description written by hand in cursive',
         'api_entity' => 'ApiTestEntity',
-        'api_action' => 'apitestaction',
+        'api_action' => 'api_test_action',
         'parameters' => 'Semi-formal explanation of runtime job parameters',
         'is_active' => '1',
       ],

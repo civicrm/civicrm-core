@@ -49,7 +49,7 @@ function participant_get_expectedresult() {
     'id' => 1,
     'values' => [
       '1' => [
-        'contact_id' => '2',
+        'contact_id' => '4',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
         'sort_name' => 'Anderson, Anthony',

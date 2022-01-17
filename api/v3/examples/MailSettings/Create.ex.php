@@ -53,10 +53,10 @@ function mail_settings_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 5,
+    'id' => 8,
     'values' => [
-      '5' => [
-        'id' => '5',
+      '8' => [
+        'id' => '8',
         'domain_id' => '1',
         'name' => 'my mail setting',
         'is_default' => '1',
@@ -71,6 +71,8 @@ function mail_settings_create_expectedresult() {
         'is_ssl' => '',
         'source' => '',
         'activity_status' => '',
+        'is_non_case_email_skipped' => '',
+        'is_contact_creation_disabled_if_no_match' => '',
       ],
     ],
   ];

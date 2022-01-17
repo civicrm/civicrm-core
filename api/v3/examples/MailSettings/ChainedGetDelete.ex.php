@@ -49,10 +49,10 @@ function mail_settings_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 6,
+    'id' => 10,
     'values' => [
-      '6' => [
-        'id' => '6',
+      '10' => [
+        'id' => '10',
         'domain_id' => '1',
         'name' => 'delete this setting',
         'is_default' => '1',
@@ -62,6 +62,8 @@ function mail_settings_get_expectedresult() {
         'username' => 'sue',
         'password' => 'pass',
         'is_ssl' => 0,
+        'is_non_case_email_skipped' => 0,
+        'is_contact_creation_disabled_if_no_match' => 0,
         'api.MailSettings.delete' => [
           'is_error' => 0,
           'version' => 3,

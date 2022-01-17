@@ -12,7 +12,7 @@
  */
 function payment_cancel_example() {
   $params = [
-    'id' => 2,
+    'id' => 1,
     'check_permissions' => TRUE,
   ];
 
@@ -47,15 +47,15 @@ function payment_cancel_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 3,
+    'id' => 2,
     'values' => [
-      '3' => [
-        'id' => '3',
+      '2' => [
+        'id' => '2',
         'from_financial_account_id' => '7',
         'to_financial_account_id' => '6',
-        'trxn_date' => '20190820192757',
+        'trxn_date' => '20220117131002',
         'total_amount' => '-150',
-        'fee_amount' => '0.00',
+        'fee_amount' => 0,
         'net_amount' => '-150',
         'currency' => 'USD',
         'is_payment' => '1',

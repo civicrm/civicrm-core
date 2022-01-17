@@ -12,7 +12,7 @@
  */
 function status_preference_delete_example() {
   $params = [
-    'id' => 2,
+    'id' => 3,
   ];
 
   try {

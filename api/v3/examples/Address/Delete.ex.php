@@ -12,7 +12,7 @@
  */
 function address_delete_example() {
   $params = [
-    'id' => 1,
+    'id' => 2,
   ];
 
   try {

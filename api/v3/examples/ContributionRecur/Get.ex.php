@@ -46,11 +46,11 @@ function contribution_recur_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 2,
+    'id' => 3,
     'values' => [
-      '2' => [
-        'id' => '2',
-        'contact_id' => '4',
+      '3' => [
+        'id' => '3',
+        'contact_id' => '5',
         'amount' => '500.00',
         'currency' => 'USD',
         'frequency_unit' => 'day',

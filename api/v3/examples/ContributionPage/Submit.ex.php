@@ -7,7 +7,7 @@
 /**
  * Test Generated example demonstrating the ContributionPage.submit API.
  *
- * Submit contribution page.
+ * submit contribution page.
  *
  * @return array
  *   API result array
@@ -18,6 +18,7 @@ function contribution_page_submit_example() {
     'pledge_amount' => [
       '2' => 1,
     ],
+    'price_2' => 3,
     'billing_first_name' => 'Billy',
     'billing_middle_name' => 'Goat',
     'billing_last_name' => 'Gruff',
@@ -33,7 +34,6 @@ function contribution_page_submit_example() {
     'pledge_id' => '1',
     'cid' => '4',
     'contact_id' => '4',
-    'amount' => '100',
     'is_pledge' => TRUE,
     'pledge_block_id' => 1,
   ];

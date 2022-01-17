@@ -48,15 +48,18 @@ function setting_get_expectedresult() {
   $expectedResult = [
     'is_error' => 0,
     'version' => 3,
-    'count' => 3,
+    'count' => 4,
     'values' => [
+      '37' => [
+        'uniq_email_per_site' => '1',
+      ],
+      '38' => [
+        'uniq_email_per_site' => '1',
+      ],
       '1' => [
         'uniq_email_per_site' => '1',
       ],
       '2' => [
-        'uniq_email_per_site' => '1',
-      ],
-      '3' => [
         'uniq_email_per_site' => '1',
       ],
     ],

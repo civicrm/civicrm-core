@@ -46,10 +46,10 @@ function entity_tag_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 5,
+    'id' => 6,
     'values' => [
-      '5' => [
-        'id' => '5',
+      '6' => [
+        'id' => '6',
         'entity_table' => 'civicrm_contact',
         'entity_id' => '18',
         'tag_id' => '11',

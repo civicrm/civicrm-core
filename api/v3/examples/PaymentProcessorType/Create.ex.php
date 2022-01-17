@@ -51,10 +51,10 @@ function payment_processor_type_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 13,
+    'id' => 10,
     'values' => [
       '0' => [
-        'id' => '13',
+        'id' => '10',
         'name' => 'API_Test_PP',
         'title' => 'API Test Payment Processor',
         'description' => '',

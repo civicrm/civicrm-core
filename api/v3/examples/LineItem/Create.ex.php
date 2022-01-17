@@ -15,11 +15,10 @@ function line_item_create_example() {
     'price_field_value_id' => 1,
     'price_field_id' => 1,
     'entity_table' => 'civicrm_contribution',
-    'entity_id' => 1,
+    'entity_id' => 3,
     'qty' => 1,
     'unit_price' => 50,
     'line_total' => 50,
-    'debug' => 1,
   ];
 
   try {
@@ -53,12 +52,12 @@ function line_item_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 2,
+    'id' => 6,
     'values' => [
-      '2' => [
-        'id' => '2',
+      '6' => [
+        'id' => '6',
         'entity_table' => 'civicrm_contribution',
-        'entity_id' => '1',
+        'entity_id' => '3',
         'contribution_id' => '',
         'price_field_id' => '1',
         'label' => 'line item',
@@ -70,6 +69,7 @@ function line_item_create_expectedresult() {
         'financial_type_id' => '',
         'non_deductible_amount' => '',
         'tax_amount' => '',
+        'membership_num_terms' => '',
       ],
     ],
   ];

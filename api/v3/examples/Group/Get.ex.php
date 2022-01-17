@@ -55,9 +55,6 @@ function group_get_expectedresult() {
         'description' => 'New Test Group Created',
         'is_active' => '1',
         'visibility' => 'Public Pages',
-        'where_clause' => ' (  ( ( `civicrm_group_contact-5d5bbacea0631`.group_id IN (\"1\") ) )  ) ',
-        'select_tables' => 'a:8:{s:15:\"civicrm_contact\";i:1;s:15:\"civicrm_address\";i:1;s:15:\"civicrm_country\";i:1;s:13:\"civicrm_email\";i:1;s:13:\"civicrm_phone\";i:1;s:10:\"civicrm_im\";i:1;s:19:\"civicrm_worldregion\";i:1;s:37:\"`civicrm_group_contact-5d5bbacea0631`\";s:201:\" LEFT JOIN civicrm_group_contact `civicrm_group_contact-5d5bbacea0631` ON (contact_a.id = `civicrm_group_contact-5d5bbacea0631`.contact_id AND `civicrm_group_contact-5d5bbacea0631`.status IN (\'Added\'))\";}',
-        'where_tables' => 'a:2:{s:15:\"civicrm_contact\";i:1;s:37:\"`civicrm_group_contact-5d5bbacea0631`\";s:201:\" LEFT JOIN civicrm_group_contact `civicrm_group_contact-5d5bbacea0631` ON (contact_a.id = `civicrm_group_contact-5d5bbacea0631`.contact_id AND `civicrm_group_contact-5d5bbacea0631`.status IN (\'Added\'))\";}',
         'group_type' => [
           '0' => '1',
           '1' => '2',

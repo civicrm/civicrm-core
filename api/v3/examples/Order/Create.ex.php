@@ -12,7 +12,7 @@
  */
 function order_create_example() {
   $params = [
-    'contact_id' => 3,
+    'contact_id' => 10,
     'receive_date' => '2010-01-20',
     'financial_type_id' => 'Event Fee',
     'contribution_status_id' => 'Pending',
@@ -33,7 +33,7 @@ function order_create_example() {
           ],
         ],
         'params' => [
-          'contact_id' => 3,
+          'contact_id' => 10,
           'membership_type_id' => 2,
           'join_date' => '2006-01-21',
           'start_date' => '2006-01-21',
@@ -80,7 +80,7 @@ function order_create_expectedresult() {
     'values' => [
       '1' => [
         'id' => '1',
-        'contact_id' => '3',
+        'contact_id' => '10',
         'financial_type_id' => '4',
         'contribution_page_id' => '',
         'payment_instrument_id' => '4',
@@ -107,10 +107,26 @@ function order_create_expectedresult() {
         'check_number' => '',
         'campaign_id' => '',
         'creditnote_id' => '',
-        'tax_amount' => '',
+        'tax_amount' => 0,
         'revenue_recognition_date' => '',
         'is_template' => '',
         'contribution_type_id' => '4',
+        'line_item' => [
+          '0' => [
+            'price_field_id' => '4',
+            'price_field_value_id' => '5',
+            'label' => 'Price Field 2',
+            'field_title' => 'Price Field 2',
+            'qty' => '1',
+            'unit_price' => '200.000000000',
+            'line_total' => '200.000000000',
+            'financial_type_id' => '4',
+            'entity_table' => 'civicrm_membership',
+            'membership_type_id' => '1',
+            'tax_amount' => 0,
+            'entity_id' => '1',
+          ],
+        ],
       ],
     ],
   ];

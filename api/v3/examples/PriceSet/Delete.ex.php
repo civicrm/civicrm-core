@@ -12,7 +12,7 @@
  */
 function price_set_delete_example() {
   $params = [
-    'id' => 21,
+    'id' => 7,
   ];
 
   try {

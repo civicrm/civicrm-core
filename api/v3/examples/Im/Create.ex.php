@@ -48,15 +48,15 @@ function im_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 2,
+    'id' => 3,
     'values' => [
-      '2' => [
-        'id' => '2',
+      '3' => [
+        'id' => '3',
         'contact_id' => '5',
         'location_type_id' => '1',
         'name' => 'My Yahoo IM Handle',
         'provider_id' => '1',
-        'is_primary' => '',
+        'is_primary' => '1',
         'is_billing' => '',
       ],
     ],

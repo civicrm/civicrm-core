@@ -46,13 +46,13 @@ function line_item_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 3,
+    'id' => 15,
     'values' => [
-      '3' => [
-        'id' => '3',
+      '15' => [
+        'id' => '15',
         'entity_table' => 'civicrm_contribution',
-        'entity_id' => '2',
-        'contribution_id' => '2',
+        'entity_id' => '7',
+        'contribution_id' => '7',
         'price_field_id' => '1',
         'label' => 'Contribution Amount',
         'qty' => '1.00',
@@ -61,6 +61,7 @@ function line_item_get_expectedresult() {
         'price_field_value_id' => '1',
         'financial_type_id' => '1',
         'non_deductible_amount' => '0.00',
+        'tax_amount' => '0.00',
         'contribution_type_id' => '1',
       ],
     ],

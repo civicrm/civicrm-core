@@ -52,6 +52,7 @@ function batch_get_expectedresult() {
         'id' => '1',
         'name' => 'Batch_433397',
         'title' => 'Batch_433397',
+        'created_date' => '2013-07-28 08:49:19',
         'modified_date' => '2012-11-14 16:02:35',
         'status_id' => '1',
       ],

@@ -19,6 +19,7 @@ function address_get_example() {
       'limit' => 2,
     ],
     'sequential' => 1,
+    'return' => 'street_address',
   ];
 
   try {
@@ -54,32 +55,12 @@ function address_get_expectedresult() {
     'count' => 2,
     'values' => [
       '0' => [
-        'id' => '2',
-        'contact_id' => '4',
-        'location_type_id' => '31',
-        'is_primary' => '1',
-        'is_billing' => 0,
+        'id' => '3',
         'street_address' => 'yzy',
-        'street_number' => '23',
-        'street_name' => 'Ambachtstraat',
-        'city' => 'Brummen',
-        'postal_code' => '6971 BN',
-        'country_id' => '1152',
-        'manual_geo_code' => 0,
       ],
       '1' => [
-        'id' => '1',
-        'contact_id' => '4',
-        'location_type_id' => '31',
-        'is_primary' => 0,
-        'is_billing' => 0,
+        'id' => '2',
         'street_address' => 'Ambachtstraat 23',
-        'street_number' => '23',
-        'street_name' => 'Ambachtstraat',
-        'city' => 'Brummen',
-        'postal_code' => '6971 BN',
-        'country_id' => '1152',
-        'manual_geo_code' => 0,
       ],
     ],
   ];

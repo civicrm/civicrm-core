@@ -7,7 +7,7 @@
 /**
  * Test Generated example demonstrating the PaymentToken.create API.
  *
- * Create a payment token - Note use of relative dates here:
+ * Create a payment token - Note use of relative dates here:.
  * @link http://www.php.net/manual/en/datetime.formats.relative.php.
  *
  * @return array
@@ -16,9 +16,9 @@
 function payment_token_create_example() {
   $params = [
     'token' => 'fancy-token-xxxx',
-    'contact_id' => 3,
-    'created_id' => 3,
-    'payment_processor_id' => 1,
+    'contact_id' => 4,
+    'created_id' => 4,
+    'payment_processor_id' => 2,
   ];
 
   try {
@@ -52,15 +52,15 @@ function payment_token_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 1,
+    'id' => 2,
     'values' => [
-      '1' => [
-        'id' => '1',
-        'contact_id' => '3',
-        'payment_processor_id' => '1',
+      '2' => [
+        'id' => '2',
+        'contact_id' => '4',
+        'payment_processor_id' => '2',
         'token' => 'fancy-token-xxxx',
         'created_date' => '2013-07-28 08:49:19',
-        'created_id' => '3',
+        'created_id' => '4',
         'expiry_date' => '',
         'email' => '',
         'billing_first_name' => '',

@@ -66,6 +66,13 @@ function website_get_expectedresult() {
           'entity' => 'Website',
           'bao' => 'CRM_Core_BAO_Website',
           'localizable' => 0,
+          'html' => [
+            'type' => 'Number',
+            'size' => '6',
+            'maxlength' => '14',
+          ],
+          'readonly' => '1',
+          'add' => '3.2',
           'is_core_field' => '1',
           'api.aliases' => [
             '0' => 'website_id',
@@ -74,7 +81,7 @@ function website_get_expectedresult() {
         'contact_id' => [
           'name' => 'contact_id',
           'type' => '1',
-          'title' => 'Contact',
+          'title' => 'Contact ID',
           'description' => 'FK to Contact ID',
           'where' => 'civicrm_website.contact_id',
           'table_name' => 'civicrm_website',
@@ -82,6 +89,12 @@ function website_get_expectedresult() {
           'bao' => 'CRM_Core_BAO_Website',
           'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
+          'html' => [
+            'label' => 'Contact',
+            'size' => '6',
+            'maxlength' => '14',
+          ],
+          'add' => '3.2',
           'is_core_field' => '1',
           'FKApiName' => 'Contact',
         ],
@@ -106,6 +119,7 @@ function website_get_expectedresult() {
             'maxlength' => '128',
             'size' => '30',
           ],
+          'add' => '3.2',
           'is_core_field' => '1',
         ],
         'website_type_id' => [
@@ -127,6 +141,7 @@ function website_get_expectedresult() {
             'optionGroupName' => 'website_type',
             'optionEditPath' => 'civicrm/admin/options/website_type',
           ],
+          'add' => '3.2',
           'is_core_field' => '1',
         ],
       ],

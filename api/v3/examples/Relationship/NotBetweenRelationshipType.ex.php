@@ -16,8 +16,8 @@ function relationship_get_example() {
   $params = [
     'relationship_type_id' => [
       'NOT BETWEEN' => [
-        '0' => 36,
-        '1' => 38,
+        '0' => 56,
+        '1' => 58,
       ],
     ],
   ];
@@ -57,9 +57,9 @@ function relationship_get_expectedresult() {
     'values' => [
       '1' => [
         'id' => '1',
-        'contact_id_a' => '99',
-        'contact_id_b' => '101',
-        'relationship_type_id' => '35',
+        'contact_id_a' => '3',
+        'contact_id_b' => '5',
+        'relationship_type_id' => '55',
         'start_date' => '2013-07-29 00:00:00',
         'is_active' => '1',
         'is_permission_a_b' => 0,
@@ -78,17 +78,17 @@ function relationship_get_expectedresult() {
  * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/RelationshipTest.php
  *
  * You can see the outcome of the API tests at
- * https://test.civicrm.org/job/CiviCRM-master-git/
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
  *
  * To Learn about the API read
- * http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+ * https://docs.civicrm.org/dev/en/latest/api/
  *
- * Browse the api on your own site with the api explorer
- * http://MYSITE.ORG/path/to/civicrm/api
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
  *
  * Read more about testing here
- * http://wiki.civicrm.org/confluence/display/CRM/Testing
+ * https://docs.civicrm.org/dev/en/latest/testing/
  *
  * API Standards documentation:
- * http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
  */

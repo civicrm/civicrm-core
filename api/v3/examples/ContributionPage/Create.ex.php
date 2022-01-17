@@ -17,6 +17,7 @@ function contribution_page_create_example() {
     'currency' => 'NZD',
     'goal_amount' => 34567,
     'is_pay_later' => 1,
+    'pay_later_text' => 'Send check',
     'is_monetary' => TRUE,
     'is_email_receipt' => TRUE,
     'receipt_from_email' => 'yourconscience@donate.com',
@@ -71,7 +72,7 @@ function contribution_page_create_expectedresult() {
         'is_recur_installments' => '',
         'adjust_recur_start_date' => '',
         'is_pay_later' => '1',
-        'pay_later_text' => '',
+        'pay_later_text' => 'Send check',
         'pay_later_receipt' => '',
         'is_partial_payment' => '',
         'initial_amount_label' => '',
@@ -102,6 +103,7 @@ function contribution_page_create_expectedresult() {
         'campaign_id' => '',
         'is_share' => '',
         'is_billing_required' => '',
+        'frontend_title' => '',
         'contribution_type_id' => '1',
       ],
     ],
@@ -112,9 +114,9 @@ function contribution_page_create_expectedresult() {
 
 /*
  * This example has been generated from the API test suite.
- * The test that created it is called "testCreateContributionPage"
+ * The test that created it is called "basicCreateTest"
  * and can be found at:
- * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContributionPageTest.php
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/CiviUnitTestCase.php
  *
  * You can see the outcome of the API tests at
  * https://test.civicrm.org/job/CiviCRM-Core-Matrix/

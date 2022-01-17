@@ -47,10 +47,10 @@ function phone_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 5,
+    'id' => 8,
     'values' => [
-      '5' => [
-        'id' => '5',
+      '8' => [
+        'id' => '8',
         'contact_id' => '12',
         'location_type_id' => '15',
         'is_primary' => '1',

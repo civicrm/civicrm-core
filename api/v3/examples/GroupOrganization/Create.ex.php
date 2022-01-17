@@ -12,8 +12,8 @@
  */
 function group_organization_create_example() {
   $params = [
-    'organization_id' => 8,
-    'group_id' => 6,
+    'organization_id' => 12,
+    'group_id' => 10,
   ];
 
   try {
@@ -47,12 +47,12 @@ function group_organization_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 3,
+    'id' => 6,
     'values' => [
-      '3' => [
-        'id' => '3',
-        'group_id' => '6',
-        'organization_id' => '8',
+      '6' => [
+        'id' => '6',
+        'group_id' => '10',
+        'organization_id' => '12',
       ],
     ],
   ];

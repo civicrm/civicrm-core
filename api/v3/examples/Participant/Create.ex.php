@@ -12,7 +12,7 @@
  */
 function participant_create_example() {
   $params = [
-    'contact_id' => 2,
+    'contact_id' => 4,
     'event_id' => 3,
     'status_id' => 1,
     'role_id' => 1,
@@ -56,7 +56,7 @@ function participant_create_expectedresult() {
     'values' => [
       '4' => [
         'id' => '4',
-        'contact_id' => '2',
+        'contact_id' => '4',
         'event_id' => '3',
         'status_id' => '1',
         'role_id' => '1',

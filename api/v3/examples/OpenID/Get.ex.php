@@ -15,6 +15,7 @@ function open_i_d_get_example() {
     'contact_id' => 7,
     'openid' => 'My OpenID handle',
     'location_type_id' => 1,
+    'sequential' => 1,
   ];
 
   try {
@@ -48,15 +49,15 @@ function open_i_d_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 3,
+    'id' => 5,
     'values' => [
-      '3' => [
-        'id' => '3',
+      '0' => [
+        'id' => '5',
         'contact_id' => '7',
         'location_type_id' => '1',
         'openid' => 'My OpenID handle',
         'allowed_to_login' => 0,
-        'is_primary' => 0,
+        'is_primary' => '1',
       ],
     ],
   ];

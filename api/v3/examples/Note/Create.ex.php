@@ -16,6 +16,8 @@ function note_create_example() {
     'entity_id' => 15,
     'note' => 'Hello!!! m testing Note',
     'contact_id' => 15,
+    'created_date' => '2012-01-17 13:04:50',
+    'note_date' => '2012-01-17 13:04:50',
     'modified_date' => '2011-01-31',
     'subject' => 'Test Note',
   ];
@@ -59,6 +61,8 @@ function note_create_expectedresult() {
         'entity_id' => '15',
         'note' => 'Hello!!! m testing Note',
         'contact_id' => '15',
+        'note_date' => '20120117130450',
+        'created_date' => '2013-07-28 08:49:19',
         'modified_date' => '2012-11-14 16:02:35',
         'subject' => 'Test Note',
         'privacy' => 0,

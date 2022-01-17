@@ -16,7 +16,7 @@ function payment_create_example() {
   $params = [
     'contribution_id' => 1,
     'total_amount' => 100,
-    'id' => 3,
+    'id' => 2,
     'check_permissions' => TRUE,
   ];
 
@@ -51,15 +51,15 @@ function payment_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 5,
+    'id' => 4,
     'values' => [
-      '5' => [
-        'id' => '5',
+      '4' => [
+        'id' => '4',
         'from_financial_account_id' => '7',
         'to_financial_account_id' => '6',
-        'trxn_date' => '20190820192758',
+        'trxn_date' => '',
         'total_amount' => '100',
-        'fee_amount' => '',
+        'fee_amount' => 0,
         'net_amount' => '100',
         'currency' => 'USD',
         'is_payment' => '1',

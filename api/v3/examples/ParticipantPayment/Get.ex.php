@@ -12,7 +12,7 @@
  */
 function participant_payment_get_example() {
   $params = [
-    'participant_id' => 68,
+    'participant_id' => 32,
     'contribution_id' => 7,
   ];
 
@@ -51,7 +51,7 @@ function participant_payment_get_expectedresult() {
     'values' => [
       '7' => [
         'id' => '7',
-        'participant_id' => '68',
+        'participant_id' => '32',
         'contribution_id' => '7',
       ],
     ],
