@@ -597,7 +597,6 @@
           // replace all thousandMarker and change the separator to a dot
           totalAmount = totalAmount.replace(thousandMarker,'').replace(separator,'.');
 
-          var totalTaxAmount = '{/literal}{$totalTaxAmount}{literal}';
           var taxAmount = (taxRate/100)*totalAmount;
           taxAmount = isNaN (taxAmount) ? 0:taxAmount;
           var totalTaxAmount = taxAmount + Number(totalAmount);
