@@ -422,6 +422,8 @@ AND       CEF.entity_id    = %2";
    * @param int $entityID
    * @param null $numAttachments
    * @param bool $ajaxDelete
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function buildAttachment(&$form, $entityTable, $entityID = NULL, $numAttachments = NULL, $ajaxDelete = FALSE) {
 
@@ -481,8 +483,9 @@ AND       CEF.entity_id    = %2";
         'placeholder' => ts('Description'),
       ]);
 
+      $tagField = "tag_$i";
       if (!empty($tags)) {
-        $form->add('select', "tag_$i", ts('Tags'), $tags, FALSE,
+        $form->add('select', $tagField, ts('Tags'), $tags, FALSE,
           [
             'id' => "tags_$i",
             'multiple' => 'multiple',
@@ -490,6 +493,9 @@ AND       CEF.entity_id    = %2";
             'placeholder' => ts('- none -'),
           ]
         );
+      }
+      else {
+        $form->addOptionalQuickFormElement($tagField);
       }
       CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_file', NULL, FALSE, TRUE, "file_taglist_$i");
     }
