@@ -32,13 +32,11 @@
     {else}
       {capture assign=attachTitle}{ts}Attachment(s){/ts}{/capture}
     {/if}
-    {if empty($noexpand)}
     <div class="crm-accordion-wrapper {if (empty($context) || $context NEQ 'pcpCampaign') AND empty($currentAttachmentInfo)}collapsed{/if}">
-       <div class="crm-accordion-header">
-          {$attachTitle}
-      </div><!-- /.crm-accordion-header -->
-     <div class="crm-accordion-body">
-     {/if}
+     <div class="crm-accordion-header">
+      {$attachTitle}
+     </div><!-- /.crm-accordion-header -->
+    <div class="crm-accordion-body">
     <div id="attachments">
       <table class="form-layout-compressed">
       {if !empty($form.attachFile_1)}
