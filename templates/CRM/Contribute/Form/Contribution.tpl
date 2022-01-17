@@ -217,7 +217,7 @@
         {if empty($is_template)}
         <tr id="fromEmail" class="crm-contribution-form-block-receipt_date" style="display:none;">
           <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
+          <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
         </tr>
         {/if}
         {if empty($is_template)}
