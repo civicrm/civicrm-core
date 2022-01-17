@@ -265,10 +265,11 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
     $createResult = $entityClass::create()
       ->setValues($requiredParams)
       ->setCheckPermissions(!$isReadOnly)
+      ->setDebug(TRUE)
       ->execute()
       ->first();
 
-    $this->assertArrayHasKey('id', $createResult, "create missing ID");
+    $this->assertArrayHasKey('id', $createResult, 'create missing ID');
     $id = $createResult['id'];
     $this->assertGreaterThanOrEqual(1, $id, "$entity ID not positive");
     if (!$isReadOnly) {
