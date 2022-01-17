@@ -144,22 +144,19 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Build Premium B im Contribution Pages.
+   * Build Premium Preview block for Contribution Pages.
    *
    * @param CRM_Core_Form $form
-   * @param int $productID
-   * @param int $premiumProductID
+   * @param int|null $productID
+   *
+   * @return void
    */
-  public function buildPremiumPreviewBlock($form, $productID, $premiumProductID = NULL) {
-    if ($premiumProductID) {
-      $dao = new CRM_Contribute_DAO_PremiumsProduct();
-      $dao->id = $premiumProductID;
-      $dao->find(TRUE);
-      $productID = $dao->product_id;
-    }
+  public static function buildPremiumPreviewBlock($form, $productID) {
     $productDAO = new CRM_Contribute_DAO_Product();
     $productDAO->id = $productID;
     $productDAO->is_active = 1;
+    $products = [];
+
     if ($productDAO->find(TRUE)) {
       CRM_Core_DAO::storeValues($productDAO, $products[$productDAO->id]);
     }
