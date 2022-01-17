@@ -281,6 +281,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     'context',
     // FormButtons.tpl (adds buttons to forms).
     'linkButtons',
+    // Required for contactFooter.tpl.
+    // See CRM_Activity_Form_ActivityTest:testInboundEmailDisplaysWithLineBreaks.
+    'external_identifier',
+    'lastModified',
+    'created_date',
+    'changeLog',
+    // Required for footer.tpl,
+    // See CRM_Activity_Form_ActivityTest:testInboundEmailDisplaysWithLineBreaks.
+    'footer_status_severity',
   ];
 
   /**
