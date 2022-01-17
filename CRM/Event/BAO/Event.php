@@ -18,23 +18,20 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   const tz_fields = ['event_start_date', 'event_end_date', 'start_date', 'end_date', 'registration_start_date', 'registration_end_date'];
 
   /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Event_DAO_Event|null
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $event = new CRM_Event_DAO_Event();
-    $event->copyValues($params);
-    if ($event->find(TRUE)) {
-      CRM_Core_DAO::storeValues($event, $defaults);
-      return $event;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**

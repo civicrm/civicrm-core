@@ -71,22 +71,20 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   }
 
   /**
-   * @param array $params
-   * @param array $defaults
+   * Retrieve DB object and copy to defaults array.
    *
-   * @return CRM_Event_DAO_ParticipantStatusType|null
+   * @param array $params
+   *   Array of criteria values.
+   * @param array $defaults
+   *   Array to be populated with found values.
+   *
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $result = NULL;
-
-    $dao = new CRM_Event_DAO_ParticipantStatusType();
-    $dao->copyValues($params);
-    if ($dao->find(TRUE)) {
-      CRM_Core_DAO::storeValues($dao, $defaults);
-      $result = $dao;
-    }
-
-    return $result;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**

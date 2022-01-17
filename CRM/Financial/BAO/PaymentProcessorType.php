@@ -23,24 +23,20 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   public static $_defaultPaymentProcessorType = NULL;
 
   /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Core_BAO_LocationType|null
-   *   object on success, null otherwise
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $paymentProcessorType = new CRM_Financial_DAO_PaymentProcessorType();
-    $paymentProcessorType->copyValues($params);
-    if ($paymentProcessorType->find(TRUE)) {
-      CRM_Core_DAO::storeValues($paymentProcessorType, $defaults);
-      return $paymentProcessorType;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**

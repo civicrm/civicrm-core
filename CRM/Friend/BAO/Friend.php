@@ -45,23 +45,20 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   }
 
   /**
-   * Given the list of params in the params array, fetch the object
-   * and store the values in the values array
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   Input parameters to find object.
-   * @param array $values
-   *   Output values of the object.
+   *   Array of criteria values.
+   * @param array $defaults
+   *   Array to be populated with found values.
    *
-   * @return array
-   *   values
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$values) {
-    $friend = new CRM_Friend_DAO_Friend();
-    $friend->copyValues($params);
-    $friend->find(TRUE);
-    CRM_Core_DAO::storeValues($friend, $values);
-    return $values;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**

@@ -17,23 +17,20 @@
 class CRM_Mailing_BAO_MailingComponent extends CRM_Mailing_DAO_MailingComponent {
 
   /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Core_BAO_LocationType.
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $component = new CRM_Mailing_DAO_MailingComponent();
-    $component->copyValues($params);
-    if ($component->find(TRUE)) {
-      CRM_Core_DAO::storeValues($component, $defaults);
-      return $component;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
