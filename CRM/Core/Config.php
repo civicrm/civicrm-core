@@ -67,14 +67,6 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
   private static $_singleton = NULL;
 
   /**
-   * The constructor. Sets domain id if defined, otherwise assumes
-   * single instance installation.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Singleton function used to manage this object.
    *
    * @param bool $loadFromDB

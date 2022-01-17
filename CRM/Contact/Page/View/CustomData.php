@@ -28,15 +28,6 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
   public $_groupId;
 
   /**
-   * Class constructor.
-   *
-   * @return CRM_Contact_Page_View_CustomData
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Add a few specific things to view contact.
    */
   public function preProcess() {

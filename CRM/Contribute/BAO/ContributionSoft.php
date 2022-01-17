@@ -19,13 +19,6 @@ use Civi\Api4\Contribution;
 class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_ContributionSoft {
 
   /**
-   * Construct method.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Add contribution soft credit record.
    *
    * @param array $params
