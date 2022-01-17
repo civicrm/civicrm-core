@@ -28,6 +28,7 @@ function example_civicrm_container($container) {
 function _example_run(\Civi\FlexMailer\Event\RunEvent $event) {
   printf("Starting work on job #%d for mailing #%d\n", $event->getJob()->id, $event->getMailing()->id);
 }
+
 ```
 
 !!! note "Stopping the `RunEvent` will stop FlexMailer."
