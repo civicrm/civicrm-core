@@ -241,7 +241,7 @@ class AssetBuilder {
   /**
    * Determine the local path of a cache file.
    *
-   * @param string|NULL $fileName
+   * @param string|null $fileName
    *   Ex: 'angular.abcd1234abcd1234.json'.
    * @return string
    *   URL.
@@ -257,7 +257,7 @@ class AssetBuilder {
   /**
    * Determine the URL of a cache file.
    *
-   * @param string|NULL $fileName
+   * @param string|null $fileName
    *   Ex: 'angular.abcd1234abcd1234.json'.
    * @return string
    *   URL.

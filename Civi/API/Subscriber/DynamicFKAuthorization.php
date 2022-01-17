@@ -119,7 +119,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    *   See docblock in DynamicFKAuthorization::$lookupDelegateSql.
    * @param string $lookupCustomFieldSql
    *   See docblock in DynamicFKAuthorization::$lookupCustomFieldSql.
-   * @param array|NULL $allowedDelegates
+   * @param array|null $allowedDelegates
    *   e.g. "civicrm_mailing","civicrm_activity"; NULL to allow any.
    */
   public function __construct($kernel, $entityName, $actions, $lookupDelegateSql, $lookupCustomFieldSql, $allowedDelegates = NULL) {

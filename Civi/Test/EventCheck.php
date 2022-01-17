@@ -27,7 +27,7 @@ class EventCheck extends Assert {
   /**
    * Determine whether this check should be used during the current test.
    *
-   * @param \PHPUnit\Framework\Test|NULL $test
+   * @param \PHPUnit\Framework\Test|null $test
    *
    * @return bool|string
    *   FALSE: The check will be completely skipped.
@@ -46,7 +46,7 @@ class EventCheck extends Assert {
   }
 
   /**
-   * @param \PHPUnit\Framework\Test|NULL $test
+   * @param \PHPUnit\Framework\Test|null $test
    */
   public function setTest($test): void {
     $this->test = $test;
@@ -61,7 +61,7 @@ class EventCheck extends Assert {
    *   Ex: [`array`, `NULL`, `CRM_Core_DAO`]
    * @param mixed $value
    *   The variable to check
-   * @param string|NULL $msg
+   * @param string|null $msg
    * @see \CRM_Utils_Type::validatePhpType
    */
   public function assertType($types, $value, ?string $msg = NULL) {

@@ -232,7 +232,7 @@ class Paths {
    *   The result data may not meet the preference -- if the setting
    *   refers to an external domain, then the result will be
    *   absolute (regardless of preference).
-   * @param bool|NULL $ssl
+   * @param bool|null $ssl
    *   NULL to autodetect. TRUE to force to SSL.
    * @return FALSE|string
    *   The URL for $value (string), or FALSE if the $value is not specified.

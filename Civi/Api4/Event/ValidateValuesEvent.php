@@ -124,7 +124,7 @@ class ValidateValuesEvent extends GenericHookEvent {
    *   If the error is multi-field (e.g. mismatched password-confirmation), then use an array.
    *   If the error is independent of any field, then use [].
    * @param string $name
-   * @param string|NULL $message
+   * @param string|null $message
    * @return $this
    */
   public function addError($recordKey, $field, string $name, string $message = NULL): self {

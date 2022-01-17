@@ -50,7 +50,7 @@ class Test {
   /**
    * Get the data source used for testing.
    *
-   * @param string|NULL $part
+   * @param string|null $part
    *   One of NULL, 'hostspec', 'port', 'username', 'password', 'database'.
    * @return string|array|NULL
    *   If $part is omitted, return full DSN array.
