@@ -29,12 +29,6 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   public $_friendId;
 
   /**
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Takes an associative array and creates a friend object.
    *
    * the function extract all the params it needs to initialize the create a

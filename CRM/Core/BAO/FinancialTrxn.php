@@ -15,17 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
-  /**
-   * Class constructor.
-   *
-   * @return \CRM_Financial_DAO_FinancialTrxn
-   */
-
-  /**
-   */
-  public function __construct() {
-    parent::__construct();
-  }
 
   /**
    * Takes an associative array and creates a financial transaction object.
