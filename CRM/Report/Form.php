@@ -1841,7 +1841,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * Note: $fieldName param allows inheriting class to build operationPairs specific to a field.
    *
-   * @param string $type
+   * @param int|string $type
    * @param string $fieldName
    *
    * @return array
@@ -3742,7 +3742,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    *
    * @deprecated
    *
-   * @param string $field
+   * @param array $field
    * @param mixed $value
    * @param string $op
    *
@@ -3797,7 +3797,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   /**
    * Build where clause for groups.
    *
-   * @param string $field
+   * @param array $field
    * @param mixed $value
    * @param string $op
    *
@@ -3847,7 +3847,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   /**
    * Build where clause for tags.
    *
-   * @param string $field
+   * @param array $field
    * @param mixed $value
    * @param string $op
    *
@@ -4587,8 +4587,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * @param array $row
    * @param array $rows
    * @param int $rowNum
-   * @param string $baseUrl
-   * @param string $linkText
+   * @param string|null $baseUrl
+   * @param string|null $linkText
    * @param string $separator
    *
    * @return bool
@@ -4637,8 +4637,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * @param array $row
    * @param array $rows
    * @param int $rowNum
-   * @param string $baseUrl
-   * @param string $linkText
+   * @param string|null $baseUrl
+   * @param string|null $linkText
    *
    * @return bool
    */

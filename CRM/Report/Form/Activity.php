@@ -619,7 +619,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   /**
    * Build ACL clause.
    *
-   * @param string $tableAlias
+   * @param array $tableAlias
    *
    * @throws \CRM_Core_Exception
    */
