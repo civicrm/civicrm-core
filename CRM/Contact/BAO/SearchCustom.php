@@ -132,19 +132,4 @@ class CRM_Contact_BAO_SearchCustom {
     return $formValues;
   }
 
-  /**
-   * @param int $csID
-   * @param int $ssID
-   *
-   * @return array
-   */
-  public static function fromWhereEmail($csID, $ssID) {
-    $customClass = self::customClass($csID, $ssID);
-
-    $from = $customClass->from();
-    $where = $customClass->where();
-
-    return [$from, $where];
-  }
-
 }
