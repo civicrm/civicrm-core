@@ -33,7 +33,7 @@ class CRM_Utils_SameSite {
   /**
    * Determine if the current User Agent can handle the `SameSite=None` parameter.
    *
-   * @param str $userAgent The User Agent.
+   * @param string $userAgent
    * @return bool True if the User Agent is compatible, FALSE otherwise.
    */
   public static function shouldSendSameSiteNone($userAgent) {
@@ -43,7 +43,7 @@ class CRM_Utils_SameSite {
   /**
    * Detect classes of browsers known to be incompatible.
    *
-   * @param str $userAgent The User Agent.
+   * @param string $userAgent The User Agent.
    * @return bool True if the User Agent is determined to be incompatible, FALSE otherwise.
    */
   private static function isSameSiteNoneIncompatible($userAgent) {
@@ -58,7 +58,7 @@ class CRM_Utils_SameSite {
    * These versions will erroneously treat cookies marked with `SameSite=None`
    * as if they were marked `SameSite=Strict`.
    *
-   * @param str $userAgent The User Agent.
+   * @param string $userAgent The User Agent.
    * @return bool
    */
   private static function hasWebKitSameSiteBug($userAgent) {
@@ -74,7 +74,7 @@ class CRM_Utils_SameSite {
    * but with the addition of the new "None" value to the specification, this
    * behavior has been updated in newer versions of UC Browser.
    *
-   * @param str $userAgent The User Agent.
+   * @param string $userAgent The User Agent.
    * @return bool
    */
   private static function dropsUnrecognizedSameSiteCookies($userAgent) {
@@ -91,7 +91,7 @@ class CRM_Utils_SameSite {
    * Detect iOS version.
    *
    * @param int $major The major version to test.
-   * @param str $userAgent The User Agent.
+   * @param string $userAgent The User Agent.
    * @return bool
    */
   private static function isIosVersion($major, $userAgent) {
@@ -112,7 +112,7 @@ class CRM_Utils_SameSite {
    *
    * @param int $major The major version to test.
    * @param int $minor The minor version to test.
-   * @param str $userAgent The User Agent.
+   * @param string $userAgent The User Agent.
    * @return bool
    */
   private static function isMacosxVersion($major, $minor, $userAgent) {
@@ -131,7 +131,7 @@ class CRM_Utils_SameSite {
   /**
    * Detect MacOS Safari.
    *
-   * @param str $userAgent The User Agent.
+   * @param string $userAgent The User Agent.
    * @return bool
    */
   private static function isSafari($userAgent) {
@@ -142,7 +142,7 @@ class CRM_Utils_SameSite {
   /**
    * Detect MacOS embedded browser.
    *
-   * @param str $userAgent The User Agent.
+   * @param string $userAgent The User Agent.
    * @return FALSE|int
    */
   private static function isMacEmbeddedBrowser($userAgent) {
@@ -153,7 +153,7 @@ class CRM_Utils_SameSite {
   /**
    * Detect if browser is Chromium based.
    *
-   * @param str $userAgent The User Agent.
+   * @param string $userAgent The User Agent.
    * @return FALSE|int
    */
   private static function isChromiumBased($userAgent) {
@@ -165,8 +165,8 @@ class CRM_Utils_SameSite {
    * Detect if Chromium version meets requirements.
    *
    * @param int $major The major version to test.
-   * @param str $userAgent The User Agent.
-   * @param str $operator
+   * @param string $userAgent The User Agent.
+   * @param string $operator
    * @return bool|int
    */
   private static function isChromiumVersionAtLeast($major, $userAgent, $operator) {
@@ -184,7 +184,7 @@ class CRM_Utils_SameSite {
   /**
    * Detect UCBrowser.
    *
-   * @param str $userAgent The User Agent.
+   * @param string $userAgent The User Agent.
    * @return FALSE|int
    */
   private static function isUcBrowser($userAgent) {
@@ -198,7 +198,7 @@ class CRM_Utils_SameSite {
    * @param int $major The major version to test.
    * @param int $minor The minor version to test.
    * @param int $build The build version to test.
-   * @param str $userAgent The User Agent.
+   * @param string $userAgent The User Agent.
    * @return bool|int
    */
   private static function isUcBrowserVersionAtLeast($major, $minor, $build, $userAgent) {
