@@ -60,23 +60,20 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Grant_DAO_Grant
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $grant = new CRM_Grant_DAO_Grant();
-    $grant->copyValues($params);
-    if ($grant->find(TRUE)) {
-      CRM_Core_DAO::storeValues($grant, $defaults);
-      return $grant;
-    }
-    return NULL;
+  public static function retrieve(array $params, array &$defaults = []) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**

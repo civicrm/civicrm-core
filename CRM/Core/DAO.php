@@ -1502,8 +1502,7 @@ LIKE %1
    * @param array $returnProperities
    *   An assoc array of fields that need to be returned, eg array( 'first_name', 'last_name').
    *
-   * @return object
-   *   an object of type referenced by daoName
+   * @return static|null
    */
   public static function commonRetrieve($daoName, &$params, &$defaults, $returnProperities = NULL) {
     $object = new $daoName();
