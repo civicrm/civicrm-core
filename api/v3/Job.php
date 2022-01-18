@@ -98,7 +98,7 @@ function civicrm_api3_job_get($params) {
  * @param array $params
  */
 function civicrm_api3_job_delete($params) {
-  _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
