@@ -652,11 +652,10 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
     $params_2 = array_merge($params_1, $custom_params_2);
 
-    $this->callAPISuccess('relationship', 'create', $params_1);
-    $result_2 = $this->callAPISuccess('relationship', 'create', $params_2);
+    $this->callAPISuccess('Relationship', 'create', $params_1);
+    $result_2 = $this->callAPISuccess('Relationship', 'create', $params_2);
 
     $this->assertNotNull($result_2['id']);
-    $this->assertEquals(0, $result_2['is_error']);
   }
 
   /**
