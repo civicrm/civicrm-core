@@ -27,7 +27,7 @@ class CRM_Core_Component {
   /**
    * @var array
    */
-  public static $_contactSubTypes = NULL;
+  public static $_contactSubTypes;
 
   /**
    * @param bool $force
@@ -349,9 +349,14 @@ class CRM_Core_Component {
   }
 
   /**
+   * Unused function.
+   *
    * @return array|null
+   *
+   * @deprecated
    */
-  public static function &contactSubTypes() {
+  public static function contactSubTypes() {
+    CRM_Core_Error::deprecatedWarning('unused');
     if (self::$_contactSubTypes == NULL) {
       self::$_contactSubTypes = [];
     }
@@ -359,19 +364,24 @@ class CRM_Core_Component {
   }
 
   /**
-   * @param $subType
-   * @param $op
+   * Unused function.
    *
-   * @return null
+   * @param string $subType
+   * @param string $op
+   *
+   * @return null|string
+   *
+   * @deprecated
    */
-  public static function &contactSubTypeProperties($subType, $op) {
+  public static function contactSubTypeProperties($subType, $op): ?string {
+    CRM_Core_Error::deprecatedWarning('unused');
     $properties = self::contactSubTypes();
     if (array_key_exists($subType, $properties) &&
       array_key_exists($op, $properties[$subType])
     ) {
       return $properties[$subType][$op];
     }
-    return CRM_Core_DAO::$_nullObject;
+    return NULL;
   }
 
   /**
@@ -405,7 +415,7 @@ class CRM_Core_Component {
     if (is_dir($crmFolderDir) && $dir = opendir($crmFolderDir)) {
       while ($subDir = readdir($dir)) {
         // skip the extensions diretory since it has an Info.php file also
-        if ($subDir == 'Extension') {
+        if ($subDir === 'Extension') {
           continue;
         }
 

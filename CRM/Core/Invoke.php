@@ -331,13 +331,17 @@ class CRM_Core_Invoke {
   /**
    * This function contains the default action.
    *
+   * Unused function.
+   *
    * @param $action
    *
    * @param $contact_type
    * @param $contact_sub_type
    *
+   * @Deprecated
    */
   public static function form($action, $contact_type, $contact_sub_type) {
+    CRM_Core_Error::deprecatedWarning('unused');
     CRM_Utils_System::setUserContext(['civicrm/contact/search/basic', 'civicrm/contact/view']);
     $wrapper = new CRM_Utils_Wrapper();
 
