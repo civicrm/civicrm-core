@@ -23,7 +23,7 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
    * Test that getCaseReport has the right output.
    *
    * @param $activitySetName string Also acts as data provider test identifier.
-   * @param $expected array
+   * @param array $expected
    *
    * @dataProvider caseReportDataProvider
    */

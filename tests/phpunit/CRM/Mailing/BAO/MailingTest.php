@@ -29,7 +29,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    * match the expected list
    *
    * @param $mailingID
-   * @param $expectedRecipients array
+   * @param array $expectedRecipients
    *   Array of contact ID that should be in the recipient list.
    */
   private function assertRecipientsCorrect($mailingID, $expectedRecipients) {
