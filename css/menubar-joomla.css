@@ -1,5 +1,5 @@
 @media (min-width: $breakMin) {
-	
+
   body.crm-menubar-over-cms-menu.crm-menubar-visible {
     padding-top: $menubarHeight;
   }
@@ -45,15 +45,15 @@ body.admin.com_civicrm.layout-default #crm-qsearch label {
     top: calc($menubarHeight + 26px);
     z-index: 10000;
     position: absolute;
-	  border-top: 1px solid #aaa;
+    border-top: 1px solid #aaa;
   }
 
   body.crm-menubar-below-cms-menu.layout-default #header {
-	  margin-bottom: calc($menubarHeight + 1px);
+    margin-bottom: calc($menubarHeight + 1px);
   }
 
   body.crm-menubar-below-cms-menu.crm-menubar-wrapped.layout-default #header {
-	  margin-bottom: 81px;
+    margin-bottom: 81px;
   }
 }
 

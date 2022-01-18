@@ -137,7 +137,7 @@
   height: 22px;
   width: 100%;
   transition: opacity .2s;
-  position:relative;
+  position: relative;
   font-family: "Courier New", Courier, monospace;
   font-size: 12px;
 }
@@ -550,11 +550,11 @@ body.af-gui-dragging {
   list-style: none;
   padding-left: 15px;
   position: relative;
-  background-color:#e7ecf1;
+  background-color: #e7ecf1;
   cursor: move;
 }
 #afGuiEditor af-gui-edit-options.af-gui-content-editing-area ul[ui-sortable] li:nth-child(even) {
-  background-color:#f2f2f2;
+  background-color: #f2f2f2;
 }
 #afGuiEditor af-gui-edit-options.af-gui-content-editing-area ul[ui-sortable] li > div {
   width: calc(100% - 30px);

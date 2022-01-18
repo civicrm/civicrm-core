@@ -18,7 +18,7 @@ div#crm-contact-thumbnail {
 }
 
 .crm-container div.contact_panel td {
-  border-bottom: 1px solid #FFF;
+  border-bottom: 1px solid #fff;
 }
 
 #crm-container div.crm-inline-edit {
@@ -34,7 +34,7 @@ div#crm-contact-thumbnail {
 
 #crm-container div.crm-inline-edit.form {
   cursor: default;
-  border: 2px dashed #6665BF;
+  border: 2px dashed #6665bf;
   box-shadow: rgba(255, 255, 255, 0.3) 0 0 0 99999px;
   background-color: white;
   float: left;
@@ -61,12 +61,12 @@ div#crm-contact-thumbnail {
 
 #crm-container .crm-address-block+.crm-address-block .add-new .crm-edit-help {
   display: block;
-  background-color: #EBEBEB;
+  background-color: #ebebeb;
 }
 
 #crm-container .crm-edit-ready .crm-summary-block .crm-inline-edit:hover .crm-edit-help {
   display: block;
-  background-color: #DFE1FF;
+  background-color: #dfe1ff;
 }
 
 #crm-container div.crm-inline-edit.form .crm-edit-help {
@@ -150,7 +150,7 @@ div#crm-contact-thumbnail {
 #crm-container div.contact_panel td {
   padding: 4px;
   vertical-align: top;
-  border-bottom: 1px solid #E2E2E2;
+  border-bottom: 1px solid #e2e2e2;
 }
 
 #crm-container div.contact_panel td.label {
@@ -176,7 +176,7 @@ div#crm-contact-thumbnail {
   width: 100%;
 }
 .crm-container div.contact_panel td.grouplabel {
-  border-bottom: 2px solid #D7D7D0 !important;
+  border-bottom: 2px solid #d7d7d0 !important;
 }
 
 #crm-container div.contact_panel .crm-address-block {
@@ -195,14 +195,14 @@ div#crm-contact-thumbnail {
 }
 
 #crm-container div.crm-summary-row {
-  background-color: #F4F4ED;
+  background-color: #f4f4ed;
   border-top: 1px solid #ffffff;
   margin-bottom: 1px;
   min-height: 17px;
 }
 
 #crm-container div.crm-summary-row div.crm-label {
-  background-color: #FAFAFA;
+  background-color: #fafafa;
   color: #777760;
   text-align: left;
   width: 122px;
@@ -216,7 +216,7 @@ div#crm-contact-thumbnail {
 }
 
 .crm-container #customFields div.contact_panel td {
-  border-bottom: 1px solid #FFFFFF;
+  border-bottom: 1px solid #ffffff;
   padding: 4px;
   vertical-align: top;
 }
@@ -372,7 +372,7 @@ div#crm-contact-thumbnail {
 }
 
 #tagGroup table .label {
-  color: #FFF;
+  color: #fff;
 }
 #tagGroup table {
   color: #000;
