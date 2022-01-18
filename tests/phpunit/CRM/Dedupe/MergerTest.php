@@ -7,6 +7,8 @@
  */
 class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
+  use CRMTraits_Custom_CustomDataTrait;
+
   protected $_groupId;
 
   protected $_contactIds = [];
@@ -1471,6 +1473,33 @@ WHERE
   }
 
   /**
+   * Test that a custom field attached to the relationship does not block merge.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMergeWithRelationshipWithCustomFields(): void {
+    $contact1 = $this->individualCreate();
+    $this->createCustomGroupWithFieldsOfAllTypes(['extends' => 'Relationship']);
+    $contact2 = $this->createContactWithEmployerRelationship([
+      $this->getCustomFieldName('text') => 'blah',
+      $this->getCustomFieldName('boolean') => TRUE,
+    ]);
+    $this->callAPISuccess('Contact', 'merge', ['to_keep_id' => $contact1, 'to_remove_id' => $contact2]);
+    $this->callAPISuccessGetSingle('Relationship', [
+      'contact_id_a' => $contact1,
+    ]);
+
+    $contact2 = $this->createContactWithEmployerRelationship([
+      $this->getCustomFieldName('boolean') => TRUE,
+      $this->getCustomFieldName('text') => '',
+    ]);
+    $this->callAPISuccess('Contact', 'merge', ['to_keep_id' => $contact2, 'to_remove_id' => $contact1]);
+    $this->callAPISuccessGetSingle('Relationship', [
+      'contact_id_a' => $contact2,
+    ]);
+  }
+
+  /**
    * Implements hook_civicrm_entityTypes().
    *
    * Declare a callback to hookLinkCallBack function.
@@ -1494,6 +1523,26 @@ WHERE
    */
   public function hookLinkCallBack(string $className, array &$links): void {
     $links[] = new CRM_Core_Reference_Basic('civicrm_im', 'name', 'civicrm_contact', 'first_name');
+  }
+
+  /**
+   * Create an individual with a relationship of type employee.
+   *
+   * @param array $params
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  protected function createContactWithEmployerRelationship(array $params): int {
+    $contact2 = $this->individualCreate();
+    // Test the merge can also happen if the other contact has an empty text field.
+    $this->callAPISuccess('Relationship', 'create', array_merge([
+      'contact_id_a' => $contact2,
+      'contact_id_b' => CRM_Core_BAO_Domain::getDomain()->contact_id,
+      'relationship_type_id' => 'Employee of',
+      'is_current_employer' => TRUE,
+    ], $params));
+    return $contact2;
   }
 
 }
