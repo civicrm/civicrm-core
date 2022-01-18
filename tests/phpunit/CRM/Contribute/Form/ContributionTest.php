@@ -1216,6 +1216,7 @@ Price Field - Price Field 1        1    $100.00       $100.00
       'Date Received: April 21st, 2015',
       'Paid By: Check',
       'Check Number: 12345',
+      'Financial Type: Donation',
     ];
 
     $mut->checkMailLog($strings);
