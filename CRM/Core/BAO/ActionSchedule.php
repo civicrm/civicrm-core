@@ -295,6 +295,9 @@ FROM civicrm_action_schedule cas
         if ($actionSchedule->mode === 'Email' || $actionSchedule->mode === 'User_Preference') {
           CRM_Utils_Array::extend($errors, self::sendReminderEmail($tokenRow, $actionSchedule, $dao->contactID));
         }
+
+        CRM_Utils_Hook::sendReminder($tokenRow, $actionSchedule, $dao->contactID, $errors);
+
         // insert activity log record if needed
         if ($actionSchedule->record_activity && empty($errors)) {
           $caseID = empty($dao->case_id) ? NULL : $dao->case_id;
