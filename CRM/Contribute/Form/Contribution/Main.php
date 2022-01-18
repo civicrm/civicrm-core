@@ -372,7 +372,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     //don't build membership block when pledge_id is passed
     if (empty($this->_values['pledge_id']) && empty($this->_ccid)) {
       $this->_separateMembershipPayment = FALSE;
-      if (in_array('CiviMember', $config->enableComponents)) {
+      if (CRM_Core_Component::isEnabled('CiviMember')) {
         $isTest = 0;
         if ($this->_action & CRM_Core_Action::PREVIEW) {
           $isTest = 1;
