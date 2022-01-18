@@ -8,15 +8,15 @@
 
 /* Use this class to hide text that should only be there for screen readers */
 .sr-only {
-   border: 0;
-   clip: rect(1px, 1px, 1px, 1px);
-   clip-path: inset(50%);
-   height: 1px;
-   width: 1px;
-   margin: -1px;
-   overflow: hidden;
-   padding: 0;
-   position: absolute;
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
 }
 
 .crm-container .crm-flex-box {
@@ -62,11 +62,12 @@ div.crm-container label {
   display: inline;
 }
 
-div.crm-container fieldset label{
+div.crm-container fieldset label {
   float: none;
 }
 
-input.crm-form-radio + label, input.crm-form-checkbox + label{
+input.crm-form-radio + label,
+input.crm-form-checkbox + label {
   margin-left: 7px;
 }
 
@@ -112,11 +113,11 @@ input.crm-form-radio + label, input.crm-form-checkbox + label{
 .crm-container table.display thead th,
 .crm-container table thead.sticky th,
 .crm-container table.caseSelector tr.columnheader th {
-  background-color: #FFFFFF;
-  border-color: #FFFFFF #FFFFFF #CFCEC3;
+  background-color: #ffffff;
+  border-color: #ffffff #ffffff #cfcec3;
   border-style: solid;
   border-width: 1px 1px 2px;
-  color: #A7A7A7;
+  color: #a7a7a7;
   font-size: 13px;
   font-weight: bold;
   padding: 4px;
@@ -125,13 +126,13 @@ input.crm-form-radio + label, input.crm-form-checkbox + label{
 }
 /* Styles for Sticky Header */
 .crm-container table thead.sticky {
-  background-color: #FFF;
+  background-color: #fff;
 }
 
 .crm-container thead div.sticky-header {
   height: 15px;
-  border-bottom: 2px solid #CFCEC3;
-  background-color: #FFF;
+  border-bottom: 2px solid #cfcec3;
+  background-color: #fff;
   z-index: 10;
 }
 
@@ -143,12 +144,12 @@ input.crm-form-radio + label, input.crm-form-checkbox + label{
 .crm-container table.caseSelector tr.columnheader th a.sort-ascending,
 .crm-container table.caseSelector tr.columnheader th a.sort-descending {
   color: #3e3e3e;
-  background-color: #FFF;
+  background-color: #fff;
 }
 
 /* Set background back to normal gray for form labels which use <th>. Temporary fix until we standardize form layout markup. */
 .crm-container table.form-layout-compressed tbody th.label {
-  background-color: #F7F7F7;
+  background-color: #f7f7f7;
 }
 
 .crm-container tbody {
@@ -164,7 +165,7 @@ input.crm-form-radio + label, input.crm-form-checkbox + label{
   margin: 0;
   padding: 3px 0 3px 0;
   clear: none;
-  background-color: #F1F8EB;
+  background-color: #f1f8eb;
 }
 
 /*
@@ -240,7 +241,7 @@ input.crm-form-entityref {
 
 /* Base crm-container styles */
 .crm-container hr {
-  background-color: #B0B0B0;
+  background-color: #b0b0b0;
 }
 
 .crm-container .crm-form-block {
@@ -248,7 +249,7 @@ input.crm-form-entityref {
   margin-bottom: 4px;
   font-size: 13px;
   background-color: #efefe5;
-  color: #3E3E3E;
+  color: #3e3e3e;
 }
 
 .crm-container .no-border {
@@ -303,7 +304,7 @@ input.crm-form-entityref {
 }
 
 .crm-container input.crm-form-text.ng-invalid.ng-dirty {
-    border: 1px solid #FF0000;
+  border: 1px solid #ff0000;
 }
 .crm-container input.crm-form-text,
 .crm-container .crm-icon-picker-button,
@@ -358,7 +359,7 @@ input.crm-form-entityref {
   padding: 4px 0;
   margin: 10px 0;
   border: none;
-  border-top: 1px solid #CFCEC3;
+  border-top: 1px solid #cfcec3;
 }
 
 .crm-container fieldset.no-border {
@@ -373,7 +374,7 @@ input.crm-form-entityref {
   background: none;
   border: medium none;
   background-color: transparent;
-  color: #3E3E3E;
+  color: #3e3e3e;
   position: relative;
   text-indent: 0;
   width: auto;
@@ -422,7 +423,7 @@ input.crm-form-entityref {
   }
 }
 
-.crm-container .crm-section .label label{
+.crm-container .crm-section .label label {
   white-space: normal;
 }
 
@@ -633,14 +634,14 @@ input.crm-form-entityref {
 }
 
 .crm-container .messages table td {
-  background-color: #F7F7F7;
-  border-bottom: 1px solid #DDDDDD;
+  background-color: #f7f7f7;
+  border-bottom: 1px solid #dddddd;
 }
 
 .crm-container .status {
-  background-color: #FFFFCC;
+  background-color: #ffffcc;
   background-image: none;
-  border: 1px solid #FFFF66;
+  border: 1px solid #ffff66;
   margin: 0.5em 0;
   padding: 0.25em 0.5em;
   color: #3e3e3e;
@@ -673,26 +674,26 @@ input.crm-form-entityref {
   color: #000080;
 }
 
-.crm-container .crm-marker{
-  color: #8A1F11;
+.crm-container .crm-marker {
+  color: #8a1f11;
   font-weight: bold;
   margin-right: 5px;
 }
 
 .crm-container .crm-error,
 .crm-container .crm-inline-error {
-  background: #FBE3E4 none repeat scroll 0 0;
+  background: #fbe3e4 none repeat scroll 0 0;
   border: none;
-  color: #8A1F11;
+  color: #8a1f11;
 }
 .crm-container .crm-error {
   padding: 4px;
 }
 
 .crm-container .status.crm-ok {
-  border-color: #B0D730;
-  background-color: #F1F8EB;
-  color: #3E3E3E;
+  border-color: #b0d730;
+  background-color: #f1f8eb;
+  color: #3e3e3e;
 }
 
 .crm-container .crm-footer {
@@ -744,7 +745,7 @@ input.crm-form-entityref {
   padding: 0.5em;
   background-color: #999999;
   font-weight: bold;
-  color: #FAFAFA;
+  color: #fafafa;
   border-radius: 2px;
 }
 
@@ -756,10 +757,10 @@ input.crm-form-entityref {
 /* Data display layouts */
 .crm-container h3 {
   /* h3 used as table header for civicrm */
-  background-color: #CDE8FE;
+  background-color: #cde8fe;
   font-size: 15px;
   font-weight: bold;
-  color: #121A2D;
+  color: #121a2d;
   padding: 4px 6px;
   margin: 0 0 0.3em;
 }
@@ -842,9 +843,9 @@ input.crm-form-entityref {
 /* Page and form-level 'help' */
 .crm-container .help,
 .crm-container #help {
-  background-color: #F1F8EB;
-  border: 1px solid #B0D730;
-  color: #3E3E3E;
+  background-color: #f1f8eb;
+  border: 1px solid #b0d730;
+  color: #3e3e3e;
   font-size: 13px;
   margin: 0 0 8px;
   padding: 4px;
@@ -903,9 +904,9 @@ input.crm-form-entityref {
 }
 
 #crm-container tr.columnheader {
-  background-color: #E6E6E6;
+  background-color: #e6e6e6;
   color: #000000;
-  border: 1px solid #DDD;
+  border: 1px solid #ddd;
 }
 
 #crm-container tr.columnheader a {
@@ -916,7 +917,7 @@ input.crm-form-entityref {
 
 #crm-container tr.columnheader-dark th {
   background-color: #999999;
-  color: #FAFAFA;
+  color: #fafafa;
   border: 1px solid #696969;
 }
 
@@ -956,7 +957,7 @@ input.crm-form-entityref {
 
 #crm-container .report td {
   border: 1px solid #999999;
-  background-color: #F6F6F6;
+  background-color: #f6f6f6;
 }
 
 /* double line right border for last cell in a horizontal grouping */
@@ -966,9 +967,9 @@ input.crm-form-entityref {
 
 #crm-container .report td.separator {
   padding-top: 1em;
-  background-color: #FFFFFF;
-  border-left-color: #FFFFFF;
-  border-right-color: #FFFFFF;
+  background-color: #ffffff;
+  border-left-color: #ffffff;
+  border-right-color: #ffffff;
 }
 
 #crm-container .chart td {
@@ -1023,7 +1024,7 @@ input.crm-form-entityref {
 
 .crm-container .crm-pager {
   border: none;
-  background-color: #F5F6F1;
+  background-color: #f5f6f1;
   position: relative;
   height: 35px;
   padding-top: 5px;
@@ -1060,7 +1061,7 @@ input.crm-form-entityref {
 #crm-container form .section-hidden-border {
   background-color: #5c5c59;
   border: medium none;
-  color: #FFFFFF;
+  color: #ffffff;
   margin-left: 5px;
   font-size: 13px;
   font-family: Verdana;
@@ -1093,7 +1094,7 @@ input.crm-form-entityref {
 
 #crm-container ul.wizard-bar li {
   display: inline;
-  background-color: #FAFAFA;
+  background-color: #fafafa;
   border: 1px solid #999999;
   height: auto;
   margin: -2px;
@@ -1104,14 +1105,14 @@ input.crm-form-entityref {
 }
 
 #crm-container ul.wizard-bar li.current-step {
-  background-color: #4A89DC;
-  border-color: #4A89DC;
+  background-color: #4a89dc;
+  border-color: #4a89dc;
   color: #ffffff;
   font-weight: bold;
 }
 
 #crm-container ul.wizard-bar li.past-step {
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
   color: #666;
 }
 
@@ -1133,7 +1134,7 @@ input.crm-form-entityref {
 #crm-recently-viewed li.crm-recently-viewed {
   margin: 1px;
   padding: 1px 1px 4px 3px;
-  border: 1px solid #D7D7D0;
+  border: 1px solid #d7d7d0;
   background-color: #fff;
   white-space: nowrap;
   list-style-type: none;
@@ -1143,14 +1144,14 @@ input.crm-form-entityref {
 
 #crm-recently-viewed ul li.crm-recently-viewed:hover,
 #crm-recently-viewed .crm-recentview-wrapper {
-  background-color: #FFFFCC;
-  border: 1px solid #FFFF66;
+  background-color: #ffffcc;
+  border: 1px solid #ffff66;
   border-radius: 4px;
 }
 
 #crm-recently-viewed a {
   font-weight: normal;
-  color: #4A88DF;
+  color: #4a88df;
   text-decoration: none;
   font-size: .95em;
 }
@@ -1266,7 +1267,7 @@ input.crm-form-entityref {
 }
 
 #crm-container table.campaign table {
-  background: #F7F7F7;
+  background: #f7f7f7;
 }
 
 #crm-container div.remaining {
@@ -1332,7 +1333,7 @@ input.crm-form-entityref {
 }
 
 #crm-container .pcp-widgets {
-  border: 1px solid #CCCCCC;
+  border: 1px solid #cccccc;
   float: right;
   margin: 0 0 1em 1em;
   padding: 0.5em;
@@ -1396,10 +1397,10 @@ input.crm-form-entityref {
 
 #crm-container table.nestedActivitySelector tr.columnheader th {
   color: #000000;
-  background-color: #CFCEC3;
-  border-top-color: #FFF;
-  border-left-color: #FFFFFF;
-  border-right-color: #FFFFFF;
+  background-color: #cfcec3;
+  border-top-color: #fff;
+  border-left-color: #ffffff;
+  border-right-color: #ffffff;
   border-bottom-color: #999999;
 }
 
@@ -1413,17 +1414,16 @@ input.crm-form-entityref {
 }
 
 #crm-container table#activities-selector.nestedActivitySelector tr.status-overdue {
-
 }
 
 #crm-container table.nestedActivitySelector tr.priority-urgent,
 #crm-container table.nestedActivitySelector tr a.priority-urgent {
-  background-color: #FFDDDD;
+  background-color: #ffdddd;
 }
 
 #crm-container table.nestedActivitySelector tr.priority-low,
 #crm-container table.nestedActivitySelector tr a.priority-low {
-  background-color: #DDFFDD;
+  background-color: #ddffdd;
 }
 
 #crm-container table.nestedActivitySelector tr.status-scheduled,
@@ -1438,7 +1438,7 @@ input.crm-form-entityref {
 
 #crm-container table.nestedActivitySelector tr.status-overdue,
 #crm-container table.nestedActivitySelector tr a.status-overdue {
-  color: #FF0000;
+  color: #ff0000;
 }
 
 #crm-container table.nestedActivitySelector tr a.crm-activity-status {
@@ -1489,7 +1489,7 @@ input.crm-form-entityref {
 
 .crm-container .action-item-wrap {
   padding: 0 5px;
-  border-left: 1px solid #CCC;
+  border-left: 1px solid #ccc;
   white-space: normal;
 }
 
@@ -1531,9 +1531,9 @@ input.crm-form-entityref {
   background-image: -moz-linear-gradient(center bottom, #eee 0%, #ccc 100%);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#cccccc', endColorstr = '#eeeeee', GradientType = 0);
   background-image: linear-gradient(top, #eee 0%, #ccc 100%);
-  border: 1px solid #AAAAAA;
+  border: 1px solid #aaaaaa;
   opacity: 1;
-  color: #2786C2;
+  color: #2786c2;
 }
 .crm-container .crm-hover-button .icon {
   cursor: pointer;
@@ -1551,7 +1551,7 @@ input.crm-form-entityref {
 
 /* theming for panel and context menus */
 .crm-container td ul.panel li {
-  background-color: #2F2F2E;
+  background-color: #2f2f2e;
 }
 
 .crm-container .btn-slide .panel li a:hover,
@@ -1559,7 +1559,7 @@ input.crm-form-entityref {
 .crm-container .crm-event-links-list-inner li a:hover,
 .crm-container .crm-contribpage-links-list-inner li a:hover {
   color: #3e3e3e;
-  background-color: #F5F6F1;
+  background-color: #f5f6f1;
   text-decoration: none;
 }
 
@@ -1617,7 +1617,7 @@ input.crm-form-entityref {
   padding: 4px;
   display: block;
   cursor: pointer;
-  color: #DFDFDF;
+  color: #dfdfdf;
 }
 
 /*class for CMS user name check used in profile*/
@@ -1694,7 +1694,7 @@ input.crm-form-entityref {
 .crm-container div.crm-clear {
   clear: both;
   margin-bottom: 1px;
-  background-color: #FAFAFA;
+  background-color: #fafafa;
   font-size: 11px;
 }
 
@@ -1738,7 +1738,7 @@ input.crm-form-entityref {
 
 .crm-container a.crm-event-feed-link {
   margin: 0 1ex;
-  color: #52534D;
+  color: #52534d;
   display: inline-block;
   font-size: 10px;
   padding: 2px 2px 0;
@@ -1766,8 +1766,8 @@ input.crm-form-entityref {
 }
 
 #crm-container .report-contents {
-  background-color: #F5F5F5;
-  border: 1px solid #CDCDC3;
+  background-color: #f5f5f5;
+  border: 1px solid #cdcdc3;
   padding: 4px;
   width: 20%;
   white-space: normal;
@@ -1775,7 +1775,7 @@ input.crm-form-entityref {
 }
 
 #crm-container .report-contents-right {
-  border: 1px solid #CDCDC3;
+  border: 1px solid #cdcdc3;
   padding: 4px;
   font-size: 0.95em;
   text-align: right;
@@ -1783,7 +1783,7 @@ input.crm-form-entityref {
 
 #crm-container table.report-layout td {
   padding: 4px;
-  border-bottom: 1px solid #CDCDC3;
+  border-bottom: 1px solid #cdcdc3;
   vertical-align: top;
 }
 
@@ -1797,8 +1797,7 @@ input.crm-form-entityref {
 }
 
 #crm-container table.report-layout th.report-contents {
-  background-color: #F5F5F5;
-
+  background-color: #f5f5f5;
 }
 
 #crm-container table.report-layout th.statistics {
@@ -1823,7 +1822,7 @@ input.crm-form-entityref {
   vertical-align: top;
   font-weight: bold;
   margin-right: 10px;
-  background-color: #EEEEEE;
+  background-color: #eeeeee;
   width: 20%;
 }
 
@@ -1896,7 +1895,7 @@ input.crm-form-entityref {
 .crm-container .crm-button {
   text-shadow: 0 1px 0 black;
   background: #696969;
-  color: #FFF;
+  color: #fff;
   font-size: 13px;
   font-weight: normal;
   margin: 0 6px 0 0;
@@ -2078,11 +2077,11 @@ a.crm-i:hover {
 .crm-container .crm-hover-button:hover .crm-i.fa-trash,
 .crm-container span:hover > .crm-i.fa-trash,
 .crm-i.crm-i-red {
-  color: #8A1F11;
+  color: #8a1f11;
 }
 
 .crm-i.crm-i-blue {
-  color: #6177D5;
+  color: #6177d5;
 }
 
 .crm-i.crm-i-green {
@@ -2094,8 +2093,8 @@ a.crm-i:hover {
 }
 
 .crm-submit-buttons .helpicon {
-    float: left;
-    padding-right: 6px;
+  float: left;
+  padding-right: 6px;
 }
 
 .crm-container  a.helpicon:hover,
@@ -2197,21 +2196,21 @@ div.crm-master-accordion-header a.helpicon {
 /* Specific types of headers */
 
 #crm-container .widget-content .crm-accordion-header {
-  background-color: #EFEFE5;
+  background-color: #efefe5;
   color: #080808;
 }
 
 .crm-container a.crm-expand-row:before,
 .crm-container a.crm-expand-row:link::before,
 .crm-container a.crm-expand-row:visited::before {
-  color: #3E3E3E;
+  color: #3e3e3e;
 }
 
 .crm-container .crm-accordion-header {
-  color: #F5F6F1;
+  color: #f5f6f1;
   font-weight: normal;
   padding: 4px 8px;
-  background-color: #5D677B;
+  background-color: #5d677b;
   border-radius: 4px 4px 0 0;
 }
 
@@ -2221,11 +2220,11 @@ div.crm-master-accordion-header a.helpicon {
 
 .crm-container .crm-accordion-header.active {
   font-weight: bold;
-  background-color: #3E3E3E;
+  background-color: #3e3e3e;
 }
 
 .crm-container .crm-accordion-header:hover {
-  background-color: #2F2F2E;
+  background-color: #2f2f2e;
 }
 
 #crm-container .widget-content .crm-accordion-header:hover {
@@ -2234,7 +2233,7 @@ div.crm-master-accordion-header a.helpicon {
 
 .crm-container .crm-accordion-wrapper .crm-master-accordion-header {
   background-color: transparent;
-  color: #3E3E3E;
+  color: #3e3e3e;
 }
 
 .crm-container .crm-accordion-wrapper .crm-master-accordion-header {
@@ -2243,7 +2242,7 @@ div.crm-master-accordion-header a.helpicon {
 
 .crm-container .crm-master-accordion-header.crm-accordion-header:hover,
 .crm-container .crm-collapsible .collapsible-title:hover {
-  color: #121A2D;
+  color: #121a2d;
 }
 
 .crm-container .collapsed .crm-accordion-body,
@@ -2289,7 +2288,7 @@ div.crm-master-accordion-header a.helpicon {
 
 .crm-container .crm-accordion-body {
   border-radius: 0 0 4px 4px;
-  border: 1px solid #70716B;
+  border: 1px solid #70716b;
   border-top: 0;
   padding: 4px 0;
 }
@@ -2322,7 +2321,7 @@ div.crm-master-accordion-header a.helpicon {
 }
 
 .crm-status-box-outer.status-start {
-  background: #F8FF03 url("../i/animated-overlay.gif");
+  background: #f8ff03 url("../i/animated-overlay.gif");
 }
 
 .crm-status-box-outer .crm-status-box-inner {
@@ -2377,7 +2376,7 @@ div.crm-master-accordion-header a.helpicon {
 .crm-container .crm-tooltip {
   padding: 4px;
   background-color: #2f2f2e;
-  color: #FFF;
+  color: #fff;
   margin-left: 11px;
   min-width: 20px;
   min-height: 20px;
@@ -2386,7 +2385,7 @@ div.crm-master-accordion-header a.helpicon {
 #crm-container .crm-tooltip table tr td {
   background-color: #2f2f2e;
   border: none;
-  color: #FFF;
+  color: #fff;
   word-wrap: break-word;
 }
 .crm-container .crm-tooltip .crm-summary-group {
@@ -2406,7 +2405,7 @@ div.crm-master-accordion-header a.helpicon {
 .crm-container .crm-summary-group h2 {
   padding: 2px 4px 0 4px;
   font-size: 14px;
-  color: #FFF;
+  color: #fff;
   margin-bottom: 0;
 }
 
@@ -2415,7 +2414,7 @@ div.crm-master-accordion-header a.helpicon {
   text-align: left;
   width: 40%;
   font-size: 11px;
-  color: #A7A7A7;
+  color: #a7a7a7;
   background-color: transparent;
 }
 
@@ -2710,7 +2709,7 @@ div.crm-container form {
 .crm-container tr.even,
 .crm-container tr.odd,
 .crm-container tbody th {
-  border-color: #FFF #FFF #efefef #FFF;
+  border-color: #fff #fff #efefef #fff;
 }
 
 .crm-container tr.even-row td,
@@ -2724,12 +2723,12 @@ div.crm-container form {
 .crm-container .odd-row,
 .crm-container .odd,
 tbody.scrollContent {
-  background-color: #FAFAFA;
+  background-color: #fafafa;
 }
 .crm-container .even-row,
 .crm-container .even,
 tbody.scrollContent tr.alternateRow {
-  background-color: #EFEFEF;
+  background-color: #efefef;
 }
 
 .crm-container td.checkbox {
@@ -2743,7 +2742,7 @@ tbody.scrollContent tr.alternateRow {
 .crm-container a.sorting,
 .crm-container a.sorting_desc,
 .crm-container a.sorting_asc {
-  color: #A7A7A7;
+  color: #a7a7a7;
   background: url("../bower_components/datatables/media/images/sort_both.png") no-repeat left center;
   padding-left: 20px;
 }
@@ -2755,7 +2754,7 @@ tbody.scrollContent tr.alternateRow {
 .crm-container tr a.sorting,
 .crm-container tr a.sorting_asc,
 .crm-container tr a.sorting_desc {
-  color: #52534D;
+  color: #52534d;
 }
 
 .crm-container table thead a.sorting_asc {
@@ -2783,7 +2782,7 @@ tbody.scrollContent tr.alternateRow {
 }
 
 .crm-container table.crm-info-panel td {
-  border-bottom: 1px solid #FFF;
+  border-bottom: 1px solid #fff;
 }
 
 .crm-container table.crm-info-panel .label {
@@ -2806,7 +2805,7 @@ tbody.scrollContent tr.alternateRow {
 }
 
 .crm-container table.selector td {
-  border-right: 1px dotted #DDDDDD;
+  border-right: 1px dotted #dddddd;
 }
 
 .crm-container div.contact_panel td,
@@ -2861,8 +2860,8 @@ tbody.scrollContent tr.alternateRow {
 /* search results */
 .crm-container .crm-search-tasks,
 .crm-container .crm-tasks {
-  background-color: #F0F0E8;
-  color: #52534D;
+  background-color: #f0f0e8;
+  color: #52534d;
 }
 
 #crm-container .crm-tasks table {
@@ -2885,7 +2884,7 @@ tbody.scrollContent tr.alternateRow {
 .crm-container .status-past,
 .crm-contact-deceased,
 .crm-container .status-warning {
-  color: #E43D2B !important;
+  color: #e43d2b !important;
 }
 
 /* rounded corners */
@@ -2924,7 +2923,8 @@ tbody.scrollContent tr.alternateRow {
   padding: 4px;
 }
 
-.crm-create-new-list-inner, .crm-create-new-list-inner ul {
+.crm-create-new-list-inner,
+.crm-create-new-list-inner ul {
   width: 160px!important;
 }
 
@@ -2935,12 +2935,12 @@ tbody.scrollContent tr.alternateRow {
 .crm-container .ac_results li,
 .crm-container .ac_results li a,
 .crm-container .ac_results li a:visited {
-  color: #DFDFDF;
+  color: #dfdfdf;
   text-decoration: none;
 }
 
 .ac_results li strong {
-  color: #FFF;
+  color: #fff;
   font-weight: normal;
 }
 
@@ -2957,7 +2957,7 @@ tbody.scrollContent tr.alternateRow {
 .ac_results li:hover,
 .ac_results li:hover a,
 .ac_results li a:hover {
-  background-color: #F5F6F1;
+  background-color: #f5f6f1;
   color: #666;
 }
 .crm-container .ac_results li:hover strong {
@@ -3107,7 +3107,7 @@ tbody.scrollContent tr.alternateRow {
   padding: 0;
 }
 .crm-container .crm-action-menu .select2-default span.select2-chosen {
-  color: #2786C2;
+  color: #2786c2;
 }
 .crm-container .select2-container[class*=" fa-"]:before {
   display: none;
@@ -3155,7 +3155,7 @@ span.crm-select-item-color {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
 }
 .crm-container.ui-dialog.ui-resizable:before {
-  display:block;
+  display: block;
   content: " ";
   width: 16px;
   height: 16px;
@@ -3165,8 +3165,8 @@ span.crm-select-item-color {
   right: 0;
 }
 .crm-container .ui-dialog-titlebar.ui-widget-header {
-  background: #5D677B;
-  color: #F5F6F1;
+  background: #5d677b;
+  color: #f5f6f1;
 }
 .crm-container .ui-dialog-title {
   background: url("../i/item_sprites.png") no-repeat scroll -79px -47px;
@@ -3193,16 +3193,16 @@ span.crm-select-item-color {
 
 /* table row highlightng */
 .crm-container .crm-row-ok {
-  background-color: #EFFFE7;
+  background-color: #efffe7;
   border-bottom: 1px solid #ccc;
 }
 .crm-container .crm-row-error {
-  background-color: #FFECEC;
+  background-color: #ffecec;
   border-bottom: 1px solid #ccc;
 }
 .crm-container table.row-highlight tr:hover,
 .crm-container .crm-row-selected {
-  background-color: #FFFFCC;
+  background-color: #ffffcc;
 }
 .crm-container table.row-highlight tr.even-row:hover,
 .crm-container table.row-highlight tr.even:hover,
@@ -3248,10 +3248,10 @@ span.crm-select-item-color {
   word-break: break-all;
 }
 .crm-container ul.crm-checkbox-list li:nth-child(even) label {
-  background-color: #FAFAFA;
+  background-color: #fafafa;
 }
 .crm-container ul.crm-checkbox-list li input:checked + label {
-  background-color: #FFFFCC;
+  background-color: #ffffcc;
 }
 .crm-container ul.crm-checkbox-list li:nth-child(even) input:checked + label {
   background-color: #fffdb2
@@ -3302,7 +3302,7 @@ span.crm-select-item-color {
 }
 
 .crm-container table.batch-totals {
-  border: 1px solid #7A7A60 !important;
+  border: 1px solid #7a7a60 !important;
   margin-top: 10px !important;
 }
 
@@ -3310,13 +3310,13 @@ span.crm-select-item-color {
 .crm-container .crm-grid-table {
   display: table;
   border-collapse: collapse;
-  border: 1px solid #7A7A60;
-  background-color: #FFFFFF;
+  border: 1px solid #7a7a60;
+  background-color: #ffffff;
   margin: 10px 3px 10px !important;
 }
 
 .crm-container .crm-batch-entry-table {
-  border-right: 2px solid #7A7A60 !important;
+  border-right: 2px solid #7a7a60 !important;
 }
 
 .crm-container .crm-grid-row,
@@ -3330,7 +3330,7 @@ span.crm-select-item-color {
 
 .crm-container .crm-grid-cell {
   display: table-cell;
-  border-right: 1px solid #EFEFEF;
+  border-right: 1px solid #efefef;
   padding: 2px;
   vertical-align: top;
 }
@@ -3410,7 +3410,7 @@ span.crm-select-item-color {
 }
 
 .crm-container .crm-editable-saving {
-  background: #FFFFCC!important;
+  background: #ffffcc!important;
   opacity: 0.8;
 }
 
@@ -3524,15 +3524,15 @@ span.crm-select-item-color {
 }
 .crm-container div.ui-notify-message-style a,
 .crm-container div.ui-notify-message-style a:link {
-  color: #CCD0FF;
+  color: #ccd0ff;
   text-decoration: underline;
 }
 .crm-container div.ui-notify-message-style a:hover,
 .crm-container div.ui-notify-message-style a:focus {
-  color: #B2B8FF;
+  color: #b2b8ff;
 }
 .crm-container div.ui-notify-message-style .ui-button .ui-button-text {
-  color: #2F2F2F;
+  color: #2f2f2f;
   text-decoration: none;
 }
 #crm-notification-container .ui-notify-message .ui-notify-close {
@@ -3546,7 +3546,7 @@ span.crm-select-item-color {
   font-weight: bold;
   text-shadow: 0 1px 1px #fff;
   padding: 2px;
-  color: #FDFDFD;
+  color: #fdfdfd;
 }
 #crm-notification-container .ui-notify-message .ui-notify-cross:hover,
 #crm-notification-container .ui-notify-message .ui-notify-cross:focus {
@@ -3827,7 +3827,7 @@ span.crm-status-icon {
   margin-right: 10px;
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
   border-radius: 3px;
-  border: 1px solid #FFFFFF;
+  border: 1px solid #ffffff;
 }
 
 .crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-visa {
@@ -3877,15 +3877,15 @@ span.crm-status-icon {
 .crm-container input.ng-invalid.ng-dirty,
 .crm-container select.ng-invalid.ng-dirty,
 .crm-container textarea.ng-invalid.ng-dirty {
-    border: 1px solid red;
+  border: 1px solid red;
 }
 .crm-container input.ng-valid,
 .crm-container input.ng-pristine,
 .crm-container textarea.ng-valid,
 .crm-container textarea.ng-pristine,
 .crm-container select.ng-valid,
-.crm-container select.ng-pristine{
-    border: 1px solid #666;
+.crm-container select.ng-pristine {
+  border: 1px solid #666;
 }
 
 /* block-ui */
@@ -3894,7 +3894,7 @@ span.crm-status-icon {
 }
 
 .crm-container table.mergecontact thead th {
-  width:30%;
+  width: 30%;
 }
 .crm-container .crm-ui-datetime.ng-dirty input.incomplete {
   border: 1px solid red;

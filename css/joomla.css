@@ -27,7 +27,8 @@ img {
   border: 0;
 }
 /* Added in CiviCRM 2.0 to alleviate tiny font issues. */
-#crm-container tr, #crm-container tr td {
+#crm-container tr,
+#crm-container tr td {
   font-size: 1em;
 }
 
@@ -45,7 +46,8 @@ th {
 th.active img {
   display: inline;
 }
-tr.dark, tr.light {
+tr.dark,
+tr.light {
   background-color: #eee;
   border-bottom: 1px solid #ccc;
   padding: 0.1em 0.6em;
@@ -108,10 +110,13 @@ br.clear {
   list-style: disc;
 }
 /* Override .9em field help size from civicrm.css - CiviCRM 2.0 */
-#crm-container div.description, #crm-container span.description, #crm-container dd.description {
+#crm-container div.description,
+#crm-container span.description,
+#crm-container dd.description {
   font-size: 1em;
 }
-#crm-container div.description, #crm-container span.description {
+#crm-container div.description,
+#crm-container span.description {
   margin: 2px 0 15px 0;
   display: block;
 }
@@ -124,7 +129,8 @@ br.clear {
 .crm-form-submit {
   margin: 0.5em 0;
 }
-.marker, .form-required {
+.marker,
+.form-required {
   color: #f00;
 }
 .more-link {
@@ -152,7 +158,8 @@ br.clear {
 /*
 ** Page layout blocks / IDs
 */
-#header, #content {
+#header,
+#content {
   width: 100%;
 }
 #logo {
@@ -186,7 +193,8 @@ br.clear {
   font-weight: bold;
   color: #9cf;
 }
-#search .form-text, #search .crm-form-submit {
+#search .form-text,
+#search .crm-form-submit {
   border: 1px solid #369;
   font-size: 1.1em;
 }
@@ -220,7 +228,8 @@ br.clear {
   border-color: red;
   color: red;
 }
-#sidebar-left, #sidebar-right {
+#sidebar-left,
+#sidebar-right {
   background-color: #ddd;
   width: 16em;
   /* padding in px not ex because IE messes up 100% width tables otherwise */
@@ -229,7 +238,7 @@ br.clear {
 }
 
 #content-right {
-  background-color: #FFFFFF;
+  background-color: #ffffff;
 }
 
 #footer {
@@ -243,13 +252,15 @@ br.clear {
 ** additional rules /with only the differing properties!/ to .parent .class.
 ** See .comment .title for an example.
 */
-.title, .title a {
+.title,
+.title a {
   font-weight: normal;
   font-size: 1.6em;
   color: #666;
   margin: 0 auto 0 auto;  /* decrease default margins for h<x>.title */
 }
-.block-civicrm #recently-viewed .crm-icon, .crm-icon {
+.block-civicrm #recently-viewed .crm-icon,
+.crm-icon {
   margin-top: 0 !important;
 }
 .submitted {
@@ -262,7 +273,8 @@ br.clear {
 .links a {
   font-weight: bold;
 }
-.block, .box {
+.block,
+.box {
   padding: 0 0 1.5em 0;
 }
 .block {
@@ -278,14 +290,15 @@ br.clear {
   font-size: 1.1em;
 }
 
-#module-status, .version {
-  font-size:11px;
+#module-status,
+.version {
+  font-size: 11px;
 }
 #module-status a {
   font-weight: normal;
 }
 .main {
-  text-align:left;
+  text-align: left;
 }
 
 /* Joomla Admin Menu alterations */
@@ -299,7 +312,8 @@ div#toolbar-box div.m {
   margin-top: 8px;
 }
 
-div#toolbar-box, div#toolbar-box div.m{
+div#toolbar-box,
+div#toolbar-box div.m {
   height: auto;
 }
 
@@ -312,8 +326,8 @@ div#toolbar-box, div#toolbar-box div.m{
   padding: 0.2em 3px 1px;
 }
 #mainTabContainer li.crm-tab-button {
-  margin:0 3px 3px 0;
-  border: 1px solid #F5F6F1 !important;
+  margin: 0 3px 3px 0;
+  border: 1px solid #f5f6f1 !important;
 }
 #mainTabContainer li.crm-tab-button.ui-tabs-selected {
   padding-bottom: 0;
@@ -379,20 +393,20 @@ div#toolbar-box, div#toolbar-box div.m{
 /* Remove Joomla subhead toolbar & whitespace border */
 
 body.admin.com_civicrm .subhead-collapse {
-	display:none;
+  display: none;
 }
 body.admin.com_civicrm .container-fluid.container-main {
-	padding: 0;
-	border-top: 1px solid #787878;
+  padding: 0;
+  border-top: 1px solid #787878;
 }
 body.admin.com_civicrm.task-civicrmupgrade .container-fluid.container-main {
-	padding: 10px 25px 25px;
+  padding: 10px 25px 25px;
 }
 body.admin.com_civicrm #crm-nav-menu-container {
-	padding-bottom: 0 !important;
+  padding-bottom: 0 !important;
 }
 body.admin.com_civicrm #content-right {
-	padding: 12px;
+  padding: 12px;
 }
 
 /* Make footer admin bar hide behind popup windows (CRM-15723) */
@@ -403,36 +417,35 @@ body.ui-dialog-open #status {
 /* Joomla 4 */
 
 body.admin.com_civicrm.layout-default #content {
-	padding: 0;
+  padding: 0;
 }
 
 body.admin.com_civicrm.layout-default #subhead-container {
-	display: none;
+  display: none;
 }
 
 body.admin.com_civicrm.layout-default .crm-container .crm-dashlet {
-	max-width: 50vw; /* fixes over-wide news dashlet */ 
+  max-width: 50vw; /* fixes over-wide news dashlet */
 }
 
 body.admin.com_civicrm.layout-default .crm-container .content {
-	padding: inherit; /* overrides J4 duplicated padding */
+  padding: inherit; /* overrides J4 duplicated padding */
 }
 
 /* J4 Modals */
 
 body.admin.com_civicrm.layout-default .crm-container.ui-dialog.ui-resizable {
-	z-index: 1021;
+  z-index: 1021;
 }
 
 body.admin.com_civicrm.layout-default .ui-widget-overlay {
-	z-index: 1;
+  z-index: 1;
 }
 
 body.admin.com_civicrm.layout-default .crm-container .modal-dialog {
-	max-width: inherit;
-	padding: 0;
-	margin: 0;
-	overflow: scroll;
-	pointer-events: all;
+  max-width: inherit;
+  padding: 0;
+  margin: 0;
+  overflow: scroll;
+  pointer-events: all;
 }
-
