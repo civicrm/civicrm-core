@@ -2589,11 +2589,8 @@ abstract class CRM_Utils_Hook {
    * inserted in civicrm_financial_trxn table
    *
    * @param array $deferredRevenues
-   *
-   * @param array $contributionDetails
-   *
+   * @param CRM_Contribute_BAO_Contribution $contributionDetails
    * @param bool $update
-   *
    * @param string $context
    *
    * @return mixed
