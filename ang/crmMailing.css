@@ -1,7 +1,8 @@
 .crmMailing input[name=subject] {
   width: 30em;
 }
-.crmMailing select, .crmMailing input[type=text] {
+.crmMailing select,
+.crmMailing input[type=text] {
   width: 36em;
 }
 .crmMailing textarea {
@@ -33,11 +34,14 @@ span.crmMailing-mandatory {
   color: #866304;
 }
 
-.crmMailing input[name=preview_test_email], .crmMailing-preview select[name=preview_test_group] {
+.crmMailing input[name=preview_test_email],
+.crmMailing-preview select[name=preview_test_group] {
   width: 80%;
 }
 
-.crmMailing .preview-popup, .crmMailing .preview-contact, .crmMailing .preview-group {
+.crmMailing .preview-popup,
+.crmMailing .preview-contact,
+.crmMailing .preview-group {
   width: 30%;
   height: 4.5em;
   margin: 0.5em;
@@ -45,10 +49,12 @@ span.crmMailing-mandatory {
   vertical-align: middle;
   float: left;
 }
-.crmMailing .preview-popup, .crmMailing .preview-contact {
+.crmMailing .preview-popup,
+.crmMailing .preview-contact {
   border-right: 1px solid black;
 }
-.crmMailing .preview-group, .crmMailing .preview-contact {
+.crmMailing .preview-group,
+.crmMailing .preview-contact {
 }
 
 .crmMailing .crmMailing-schedule-outer {
@@ -67,7 +73,7 @@ input[name=preview_test_email]:-moz-placeholder {
 input[name=preview_test_email]::-moz-placeholder {
   text-align: center;
 }
-input[name=preview_test_email]::-webkit-input-placeholder  {
+input[name=preview_test_email]::-webkit-input-placeholder {
   text-align: center;
 }
 input[name=preview_test_email]:-ms-input-placeholder {
