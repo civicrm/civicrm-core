@@ -205,7 +205,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     $contribution->trxn_result_code = $params['trxn_result_code'] ?? NULL;
     $contribution->payment_processor = $params['payment_processor'] ?? NULL;
 
-    //add Account details
+    // Loading contribution used to be required for recordFinancialAccounts.
     $params['contribution'] = $contribution;
     if (empty($params['is_post_payment_create'])) {
       // If this is being called from the Payment.create api/ BAO then that Entity
@@ -215,7 +215,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       // Note that leveraging this parameter for any other code flow is not supported and
       // is likely to break in future and / or cause serious problems in your data.
       // https://github.com/civicrm/civicrm-core/pull/14673
-      self::recordFinancialAccounts($params);
+      self::recordFinancialAccounts($params, $contribution);
     }
 
     if (self::isUpdateToRecurringContribution($params)) {
@@ -3073,11 +3073,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *
    * @param array $params
    *   Contribution object, line item array and params for trxn.
-   *
+   * @param \CRM_Contribute_DAO_Contribution $contribution
    *
    * @return null|\CRM_Core_BAO_FinancialTrxn
    */
-  public static function recordFinancialAccounts(&$params) {
+  public static function recordFinancialAccounts(&$params, CRM_Contribute_DAO_Contribution $contribution) {
     $skipRecords = $return = FALSE;
     $isUpdate = !empty($params['prevContribution']);
 
@@ -3097,7 +3097,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $entityTable = 'civicrm_membership';
     }
     else {
-      $entityId = $params['contribution']->id;
+      $entityId = $contribution->id;
       $entityTable = 'civicrm_contribution';
     }
 
@@ -3154,16 +3154,24 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if (!isset($totalAmount) && !empty($params['prevContribution'])) {
         $totalAmount = $params['total_amount'] = $params['prevContribution']->total_amount;
       }
+      if (empty($contribution->currency)) {
+        $contribution->find(TRUE);
+      }
       //build financial transaction params
       $trxnParams = [
-        'contribution_id' => $params['contribution']->id,
+        'contribution_id' => $contribution->id,
         'to_financial_account_id' => $params['to_financial_account_id'],
-        'trxn_date' => !empty($params['contribution']->receive_date) ? $params['contribution']->receive_date : date('YmdHis'),
+        // If receive_date is not deliberately passed in we assume 'now'.
+        // test testCompleteTransactionWithReceiptDateSet ensures we don't
+        // default to loading the stored contribution receive_date.
+        // Note that as we deprecate completetransaction in favour
+        // of Payment.create handling of trxn_date will tighten up.
+        'trxn_date' => $params['receive_date'] ?? date('YmdHis'),
         'total_amount' => $totalAmount,
         'fee_amount' => $params['fee_amount'] ?? NULL,
         'net_amount' => CRM_Utils_Array::value('net_amount', $params, $totalAmount),
-        'currency' => $params['contribution']->currency,
-        'trxn_id' => $params['contribution']->trxn_id,
+        'currency' => $contribution->currency,
+        'trxn_id' => $contribution->trxn_id,
         // @todo - this is getting the status id from the contribution - that is BAD - ie the contribution could be partially
         // paid but each payment is completed. The work around is to pass in the status_id in the trxn_params but
         // this should really default to completed (after discussion).

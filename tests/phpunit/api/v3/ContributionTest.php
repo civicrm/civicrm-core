@@ -1390,7 +1390,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Function tests that financial records are updated when Payment Instrument is changed.
    */
-  public function testCreateUpdateContributionPaymentInstrument() {
+  public function testCreateUpdateContributionPaymentInstrument(): void {
     $instrumentId = $this->_addPaymentInstrument();
     $contribParams = [
       'contact_id' => $this->_individualId,
@@ -1406,12 +1406,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $contribution['id'],
       'payment_instrument_id' => $instrumentId,
     ]);
-    $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $newParams);
     $this->assertAPISuccess($contribution);
     $this->checkFinancialTrxnPaymentInstrumentChange($contribution['id'], 4, $instrumentId);
 
     // cleanup - delete created payment instrument
-    $this->_deletedAddedPaymentInstrument();
+    $this->deletedAddedPaymentInstrument();
   }
 
   /**
@@ -1438,7 +1438,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->checkFinancialTrxnPaymentInstrumentChange($contribution['id'], 4, $instrumentId, -100);
 
     // cleanup - delete created payment instrument
-    $this->_deletedAddedPaymentInstrument();
+    $this->deletedAddedPaymentInstrument();
   }
 
   /**
@@ -3064,7 +3064,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * CRM-14151 - Test completing a transaction via the API.
    */
-  public function testCompleteTransactionWithReceiptDateSet() {
+  public function testCompleteTransactionWithReceiptDateSet(): void {
     $this->swapMessageTemplateForTestTemplate();
     $mut = new CiviMailUtils($this, TRUE);
     $this->createLoggedInUser();
@@ -4196,7 +4196,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     return $optionValue['values'][$optionValue['id']]['value'];
   }
 
-  public function _deletedAddedPaymentInstrument() {
+  public function deletedAddedPaymentInstrument() {
     $result = $this->callAPISuccess('OptionValue', 'get', [
       'option_group_id' => 'payment_instrument',
       'name' => 'Test Card',

@@ -24,7 +24,18 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    *
    * @return CRM_Financial_DAO_FinancialTrxn
    */
-  public static function create($params) {
+  public static function create(array $params): CRM_Financial_DAO_FinancialTrxn {
+    if (empty($params['id'])) {
+      $params = array_merge([
+        'currency' => CRM_Core_Config::singleton()->defaultCurrency,
+        'status_id' => CRM_Core_Pseudoconstant::getKey(__CLASS__, 'status_id', 'Paid'),
+      ], $params);
+      if (!CRM_Utils_Rule::currencyCode($params['currency'])) {
+        CRM_Core_Error::deprecatedWarning('invalid currency data for financial transactions is deprecated');
+        $params['currency'] = CRM_Core_Config::singleton()->defaultCurrency;
+      }
+    }
+
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
     $trxn->copyValues($params);
 
@@ -34,10 +45,6 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
         $params['total_amount'] = $trxn->total_amount;
       }
       $trxn->net_amount = $params['total_amount'] - $params['fee_amount'];
-    }
-
-    if (empty($params['id']) && !CRM_Utils_Rule::currencyCode($trxn->currency)) {
-      $trxn->currency = CRM_Core_Config::singleton()->defaultCurrency;
     }
 
     $trxn->save();
