@@ -20,7 +20,7 @@
       </a>
     </li>
     <li title="{{:: ts('Export this saved search to a file') }}">
-      <a href ng-click="$ctrl.export(row)">
+      <a href crm-dialog-popup="crmSearchAdminExport" popup-data="row" popup-tpl="~/crmSearchAdmin/searchListing/export.html" title="{{:: ts('Export %1', {1: row.data.label}) }}">
         <i class="crm-i fa-download"></i>
         {{:: ts('Export...') }}
       </a>

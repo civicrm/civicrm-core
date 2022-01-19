@@ -1,4 +1,4 @@
-<div id="bootstrap-theme" class="crm-search">
+<form id="bootstrap-theme" class="crm-search">
   <h1 crm-page-title>{{:: ts('Saved Searches') }}</h1>
 
   <!-- Tabs based on the has_base filter -->
@@ -28,11 +28,11 @@
       <span ng-if="$ctrl.getTags().results.length">
         <input class="form-control" ng-model="tab.filters.tags" ng-list crm-ui-select="{multiple: true, data: $ctrl.getTags, placeholder: ts('Filter by tags...')}">
       </span>
-      <a class="btn btn-secondary btn-sm pull-right" ng-if="tab.name === 'custom'" href ng-click="$ctrl.openImportDialog()">
+      <a class="btn btn-secondary btn-sm pull-right" ng-if="tab.name === 'custom'" href crm-dialog-popup="crmSearchAdminImport" popup-tpl="~/crmSearchAdmin/searchListing/import.html">
         <i class="crm-i fa-upload"></i>
         {{:: ts('Import') }}
       </a>
     </div>
     <crm-search-admin-search-listing filters="tab.filters" tab-count="tab.rowCount"></crm-search-admin-search-listing>
   </div>
-</div>
+</form>
