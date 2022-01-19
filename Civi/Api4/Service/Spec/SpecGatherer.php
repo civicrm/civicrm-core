@@ -55,7 +55,7 @@ class SpecGatherer {
     }
 
     // Default value only makes sense for create actions
-    if ($action != 'create') {
+    if ($action !== 'create') {
       foreach ($specification->getFields() as $field) {
         $field->setDefaultValue(NULL);
       }

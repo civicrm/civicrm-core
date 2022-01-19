@@ -16,9 +16,9 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-
 namespace api\v4\Entity;
 
+use api\v4\Service\TestCreationParameterProvider;
 use api\v4\Traits\CheckAccessTrait;
 use api\v4\Traits\OptionCleanupTrait;
 use api\v4\Traits\TableDropperTrait;
@@ -30,6 +30,7 @@ use api\v4\UnitTestCase;
 use Civi\Api4\Event\ValidateValuesEvent;
 use Civi\Api4\Service\Spec\CustomFieldSpec;
 use Civi\Api4\Service\Spec\FieldSpec;
+use Civi\Api4\Service\Spec\SpecGatherer;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\PostEvent;
 use Civi\Core\Event\PreEvent;
@@ -53,6 +54,8 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
 
   /**
    * Set up baseline for testing
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setUp(): void {
     // Enable all components
@@ -60,7 +63,8 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
     $this->setUpOptionCleanup();
     $this->loadDataSet('CaseType');
     $this->loadDataSet('ConformanceTest');
-    $this->creationParamProvider = \Civi::container()->get('test.param_provider');
+    $gatherer = new SpecGatherer();
+    $this->creationParamProvider = new TestCreationParameterProvider($gatherer);
     parent::setUp();
     $this->resetCheckAccess();
   }
@@ -94,9 +98,9 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
    * @return array
    *
    * @throws \API_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \CRM_Core_Exception
    */
-  public function getEntitiesHitech() {
+  public function getEntitiesHitech(): array {
     // Ensure all components are enabled so their entities show up
     foreach (array_keys(\CRM_Core_Component::getComponents()) as $component) {
       \CRM_Core_BAO_ConfigSetting::enableComponent($component);
@@ -113,7 +117,7 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
    *
    * @return array
    */
-  public function getEntitiesLotech() {
+  public function getEntitiesLotech(): array {
     $manual['add'] = [];
     $manual['remove'] = ['CustomValue'];
     $manual['transform'] = ['CiviCase' => 'Case'];
@@ -137,7 +141,7 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
    * Ensure that "getEntitiesLotech()" (which is the 'dataProvider') is up to date
    * with "getEntitiesHitech()" (which is a live feed available entities).
    */
-  public function testEntitiesProvider() {
+  public function testEntitiesProvider(): void {
     $this->assertEquals($this->getEntitiesHitech(), $this->getEntitiesLotech(), "The lo-tech list of entities does not match the hi-tech list. You probably need to update getEntitiesLotech().");
   }
 
@@ -286,10 +290,8 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
   /**
    * @param string $entity
    * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
-   *
-   * @return mixed
    */
-  protected function checkCreationDenied($entity, $entityClass) {
+  protected function checkCreationDenied(string $entity, $entityClass): void {
     $this->setCheckAccessGrants(["{$entity}::create" => FALSE]);
     $this->assertEquals(0, $this->checkAccessCounts["{$entity}::create"]);
 
@@ -316,7 +318,7 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
    * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
    * @param int $id
    */
-  protected function checkUpdateFailsFromCreate($entityClass, $id): void {
+  protected function checkUpdateFailsFromCreate($entityClass, int $id): void {
     $exceptionThrown = '';
     try {
       $entityClass::create(FALSE)
@@ -334,7 +336,7 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
    * @param int $id
    * @param string $entity
    */
-  protected function checkGet($entityClass, $id, $entity) {
+  protected function checkGet($entityClass, int $id, string $entity): void {
     $getResult = $entityClass::get(FALSE)
       ->addWhere('id', '=', $id)
       ->execute();
