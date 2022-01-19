@@ -178,6 +178,24 @@
     </html>
     <add>2.2</add>
   </field>
+  <field>
+    <name>created_date</name>
+    <type>timestamp</type>
+    <comment>Relationship created date.</comment>
+    <required>true</required>
+    <default>CURRENT_TIMESTAMP</default>
+    <add>5.47</add>
+  </field>
+  <field>
+    <name>modified_date</name>
+    <title>Relationship Modified Date</title>
+    <type>timestamp</type>
+    <required>true</required>
+    <comment>Relationship last modified.</comment>
+    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <add>5.47</add>
+    <readonly>true</readonly>
+  </field>
   <foreignKey>
     <name>case_id</name>
     <table>civicrm_case</table>
