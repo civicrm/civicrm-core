@@ -423,4 +423,17 @@ class CRM_Core_Component {
     return $components;
   }
 
+  /**
+   * Is the specified component enabled.
+   *
+   * @param string $component
+   *   Component name - ie CiviMember, CiviContribute, CiviEvent...
+   *
+   * @return bool
+   *   Is the component enabled.
+   */
+  public static function isEnabled(string $component): bool {
+    return in_array($component, CRM_Core_Config::singleton()->enableComponents, TRUE);
+  }
+
 }

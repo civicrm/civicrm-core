@@ -100,7 +100,7 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
    */
   protected function getBespokeTokens(): array {
     $tokens = [];
-    if (array_key_exists('CiviCase', CRM_Core_Component::getEnabledComponents())) {
+    if (CRM_Core_Component::isEnabled('CiviCase')) {
       $tokens['case_id'] = ts('Activity Case ID');
       return [
         'case_id' => [

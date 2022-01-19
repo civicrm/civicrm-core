@@ -142,7 +142,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 
     // Preload libraries required by the "Profiles" tab
     $schemas = ['IndividualModel', 'OrganizationModel', 'ContributionModel'];
-    if (in_array('CiviMember', CRM_Core_Config::singleton()->enableComponents)) {
+    if (CRM_Core_Component::isEnabled('CiviMember')) {
       $schemas[] = 'MembershipModel';
     }
     CRM_UF_Page_ProfileEditor::registerProfileScripts();
