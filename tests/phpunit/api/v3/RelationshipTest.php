@@ -1335,11 +1335,6 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     ]);
     $this->callAPISuccessGetCount('membership', ['contact_id' => $this->_cId_a_2], 0);
 
-    // @todo - this is actually mimicing an accidental test set up from earlier.
-    // there is a legit bug whereby apiv4 contact.delete is
-    // somehow bypassing Membership cleanup.
-    // https://lab.civicrm.org/dev/core/-/issues/2757
-    $this->_apiversion = 3;
     // Deleting the organization should cause the related membership to be deleted.
     $this->callAPISuccess('Contact', 'delete', ['id' => $mainContactID]);
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $this->_cId_a], 0);
@@ -1350,7 +1345,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testRelationshipCreateWithEmployerData() {
+  public function testRelationshipCreateWithEmployerData(): void {
     // CASE A: Create a current employee relationship without setting end date, ensure that employer field is set
     $params = [
       'relationship_type_id' => '5_a_b',
