@@ -1267,7 +1267,6 @@ WHERE li.contribution_id = %1";
    */
   public static function entityTables(): array {
     return [
-      'civicrm_contribution' => ts('Contribution'),
       'civicrm_participant' => ts('Participant'),
       'civicrm_membership' => ts('Membership'),
     ];
