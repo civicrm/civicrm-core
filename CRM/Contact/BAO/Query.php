@@ -4873,16 +4873,15 @@ civicrm_relationship.start_date > {$today}
   }
 
   /**
-   * Include Select columns in groupBy clause.
+   * Include select columns in groupBy clause.
    *
    * @param array $selectClauses
-   * @param array $groupBy - Columns already included in GROUP By clause.
+   * @param array|string|null $groupBy - Columns already included in GROUP By clause.
    *
    * @return string
    */
   public static function getGroupByFromSelectColumns($selectClauses, $groupBy = NULL) {
     $groupBy = (array) $groupBy;
-    $mysqlVersion = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
     $sqlMode = CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode');
 
     //return if ONLY_FULL_GROUP_BY is not enabled.
