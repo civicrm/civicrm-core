@@ -57,7 +57,7 @@ class Request {
         }
         // Check enabled components
         $daoName = \CRM_Core_DAO_AllCoreTables::getFullName($entity);
-        if ($daoName && defined("{$daoName}::COMPONENT") && !array_key_exists($daoName::COMPONENT, \CRM_Core_Component::getEnabledComponents())) {
+        if ($daoName && defined("{$daoName}::COMPONENT") && !\CRM_Core_Component::isEnabled($daoName::COMPONENT)) {
           throw new \Civi\API\Exception\NotImplementedException("$entity API is not available because " . $daoName::COMPONENT . " component is disabled");
         }
         $apiRequest = call_user_func_array($callable, $e->args);
