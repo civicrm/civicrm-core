@@ -298,7 +298,7 @@ AND    $operationClause
   }
 
   /**
-   * @param string $contactAlias
+   * @param string[]|string $contactAlias
    *
    * @return array
    */
