@@ -64,7 +64,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
     $info = $className::getInfo();
     $daoName = $info['dao'] ?? NULL;
     // Only include DAO entities from enabled components
-    if (!$daoName || !defined("{$daoName}::COMPONENT") || array_key_exists($daoName::COMPONENT, \CRM_Core_Component::getEnabledComponents())) {
+    if (!$daoName || !defined("{$daoName}::COMPONENT") || \CRM_Core_Component::isEnabled($daoName::COMPONENT)) {
       $entities[$info['name']] = $info;
     }
   }

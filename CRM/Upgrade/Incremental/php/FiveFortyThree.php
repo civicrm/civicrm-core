@@ -26,7 +26,7 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
    * @param null $currentVer
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL): void {
-    if ($rev === '5.43.alpha1' && !empty(CRM_Core_Component::getEnabledComponents()['CiviCase'])) {
+    if ($rev === '5.43.alpha1' && CRM_Core_Component::isEnabled('CiviCase')) {
       $preUpgradeMessage .= '<p>' . ts('Minor changes have been made to how the tokens to render case.is_deleted, case.created_date and case.modified_date. See https://docs.civicrm.org/sysadmin/en/latest/upgrade/version-specific/ for more') . '</p>';
     }
   }

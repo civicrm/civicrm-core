@@ -2728,13 +2728,13 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         return CRM_Core_BAO_Note::getContactNoteCount($contactId);
 
       case 'contribution':
-        if (array_key_exists('CiviContribute', CRM_Core_Component::getEnabledComponents())) {
+        if (CRM_Core_Component::isEnabled('CiviContribute')) {
           return CRM_Contribute_BAO_Contribution::contributionCount($contactId);
         }
         return FALSE;
 
       case 'membership':
-        if (array_key_exists('CiviMember', CRM_Core_Component::getEnabledComponents())) {
+        if (CRM_Core_Component::isEnabled('CiviMember')) {
           return CRM_Member_BAO_Membership::getContactMembershipCount((int) $contactId, TRUE);
         }
         return FALSE;

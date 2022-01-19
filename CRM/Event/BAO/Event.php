@@ -2357,7 +2357,7 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
         // @todo - the component is enabled check should be done within getIncomeFinancialType
         // It looks to me like test cover was NOT added to cover the change
         // that added this so we need to assume there is no test cover
-        if (array_key_exists('CiviContribute', CRM_Core_Component::getEnabledComponents())) {
+        if (CRM_Core_Component::isEnabled('CiviContribute')) {
           return CRM_Financial_BAO_FinancialType::getIncomeFinancialType($props['check_permissions'] ?? TRUE);
         }
         return [];
