@@ -25,11 +25,6 @@ class CRM_Core_Component {
   const COMPONENT_INFO_CLASS = 'Info';
 
   /**
-   * @var array
-   */
-  public static $_contactSubTypes;
-
-  /**
    * @param bool $force
    *
    * @return CRM_Core_Component_Info[]
@@ -357,10 +352,7 @@ class CRM_Core_Component {
    */
   public static function contactSubTypes() {
     CRM_Core_Error::deprecatedWarning('unused');
-    if (self::$_contactSubTypes == NULL) {
-      self::$_contactSubTypes = [];
-    }
-    return self::$_contactSubTypes;
+    return [];
   }
 
   /**

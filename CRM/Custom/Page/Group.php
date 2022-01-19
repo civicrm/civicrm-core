@@ -254,14 +254,7 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
     }
 
     $subTypes['Relationship'] = $allRelationshipType;
-
-    $cSubTypes = CRM_Core_Component::contactSubTypes();
-    $contactSubTypes = [];
-    foreach ($cSubTypes as $key => $value) {
-      $contactSubTypes[$key] = $key;
-    }
-
-    $subTypes['Contact'] = $contactSubTypes;
+    $subTypes['Contact'] = [];
 
     CRM_Core_BAO_CustomGroup::getExtendedObjectTypes($subTypes);
 
