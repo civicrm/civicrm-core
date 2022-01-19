@@ -2177,7 +2177,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
     }
     elseif ($fieldName == 'activity_details') {
-      $form->add('wysiwyg', $fieldName, $title, ['rows' => 4, 'cols' => 60], $required);
+      $form->add('wysiwyg', $name, $title, ['rows' => 4, 'cols' => 60], $required);
     }
     elseif ($fieldName == 'activity_duration') {
       $form->add('text', $name, $title, $attributes, $required);
