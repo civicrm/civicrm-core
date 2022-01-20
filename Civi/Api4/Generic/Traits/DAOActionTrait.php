@@ -60,8 +60,8 @@ trait DAOActionTrait {
     else {
       $inputFields = array_keys($input);
       // Convert 'null' input to true null
-      foreach ($input as $key => $val) {
-        if ($val === 'null') {
+      foreach ($inputFields as $key) {
+        if (($bao->$key ?? NULL) === 'null') {
           $bao->$key = NULL;
         }
       }
