@@ -165,6 +165,17 @@ abstract class CRM_Queue_Queue {
   abstract public function deleteItem($item);
 
   /**
+   * Get the full data for an item.
+   *
+   * This is a passive peek - it does not claim/steal/release anything.
+   *
+   * @param int|string $id
+   *   The unique ID of the task within the queue.
+   * @return CRM_Queue_DAO_QueueItem|object|null $dao
+   */
+  abstract public function fetchItem($id);
+
+  /**
    * Return an item that could not be processed.
    *
    * @param object $item
