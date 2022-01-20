@@ -918,10 +918,14 @@ class CRM_Core_DAO extends DB_DataObject {
     $entityName = CRM_Core_DAO_AllCoreTables::getBriefName($className);
 
     \CRM_Utils_Hook::pre($op, $entityName, $record['id'] ?? NULL, $record);
-    $instance = new $className();
+    $fields = static::getSupportedFields();
+    $instance = new static();
     // Ensure fields exist before attempting to write to them
-    $values = array_intersect_key($record, self::getSupportedFields());
+    $values = array_intersect_key($record, $fields);
     $instance->copyValues($values);
+    if (empty($values['id']) && array_key_exists('name', $fields) && empty($values['name']) && !empty($values['label'])) {
+      $instance->makeNameFromLabel();
+    }
     $instance->save();
 
     if (!empty($record['custom']) && is_array($record['custom'])) {
@@ -3277,6 +3281,46 @@ SELECT contact_id
    */
   public static function getEntityPaths() {
     return static::$_paths ?? [];
+  }
+
+  /**
+   * When creating a record without a supplied name,
+   * create a unique, clean name derived from the label.
+   *
+   * Note: this function does nothing unless a unique index exists for "name" column.
+   */
+  private function makeNameFromLabel() {
+    $indexNameWith = NULL;
+    // Look for a unique index which includes the "name" field
+    if (method_exists($this, 'indices')) {
+      foreach ($this->indices(FALSE) as $index) {
+        if (!empty($index['unique']) && in_array('name', $index['field'], TRUE)) {
+          $indexNameWith = $index['field'];
+        }
+      }
+    }
+    if (!$indexNameWith) {
+      // No unique index on "name", do nothing
+      return;
+    }
+    $name = CRM_Utils_String::munge($this->label, '_', 252);
+
+    // Find existing records with the same name
+    $sql = new CRM_Utils_SQL_Select($this::getTableName());
+    $sql->select(['id', 'name']);
+    $sql->where('name LIKE @name', ['@name' => $name . '%']);
+    // Include all fields that are part of the index
+    foreach (array_diff($indexNameWith, ['name']) as $field) {
+      $sql->where("`$field` = @val", ['@val' => $this->$field]);
+    }
+    $query = $sql->toSQL();
+    $existing = self::executeQuery($query)->fetchMap('id', 'name');
+    $dupes = 0;
+    $suffix = '';
+    while (in_array($name . $suffix, $existing)) {
+      $suffix = '_' . (++$dupes);
+    }
+    $this->name = $name . $suffix;
   }
 
 }

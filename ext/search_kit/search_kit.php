@@ -83,15 +83,6 @@ function search_kit_civicrm_entityTypes(&$entityTypes) {
  * Implements hook_civicrm_pre().
  */
 function search_kit_civicrm_pre($op, $entity, $id, &$params) {
-  // Supply default name/label when creating new SearchDisplay
-  if ($entity === 'SearchDisplay' && $op === 'create') {
-    if (empty($params['label'])) {
-      $params['label'] = $params['name'];
-    }
-    elseif (empty($params['name'])) {
-      $params['name'] = \CRM_Utils_String::munge($params['label']);
-    }
-  }
   // When deleting a saved search, also delete the displays
   // This would happen anyway in sql because of the ON DELETE CASCADE foreign key,
   // But this ensures that pre and post hooks are called
