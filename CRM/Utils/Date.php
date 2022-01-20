@@ -541,6 +541,7 @@ class CRM_Utils_Date {
   public static function convertToDefaultDate(&$params, $dateType, $dateParam) {
     $now = getdate();
     $cen = substr($now['year'], 0, 2);
+    $dec = substr($now['year'], 2, 2);
     $prevCen = $cen - 1;
 
     $value = NULL;
@@ -693,11 +694,9 @@ class CRM_Utils_Date {
     $month = ($month < 10) ? "0" . "$month" : $month;
     $day = ($day < 10) ? "0" . "$day" : $day;
 
-    $year = (int ) $year;
-    // simple heuristic to determine what century to use
-    // 00 - 20 is always 2000 - 2020
-    // 21 - 99 is always 1921 - 1999
-    if ($year < 21) {
+    // simple heuristic to determine what century to use if ommitted
+    // the next 10 years is assumed to be the current century, after that assume the past century
+    if ($year < ($dec + 10)) {
       $year = (strlen($year) == 1) ? $cen . '0' . $year : $cen . $year;
     }
     elseif ($year < 100) {
