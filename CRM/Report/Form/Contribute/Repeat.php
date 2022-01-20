@@ -602,7 +602,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
 
     foreach ($checkDate as $date_range => $range_data) {
       foreach ($range_data as $key => $value) {
-        if (CRM_Utils_Date::isDate($value)) {
+        if (!CRM_Utils_System::isNull($value)) {
           $errorCount[$date_range][$key]['valid'] = 'true';
           $errorCount[$date_range][$key]['is_empty'] = 'false';
         }
