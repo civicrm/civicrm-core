@@ -232,6 +232,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   public function testCreateTemplateContributionFromFirstContributionTest(): void {
     $custom_group = $this->customGroupCreate(['extends' => 'Contribution', 'name' => 'template']);
     $custom_field = $this->customFieldCreate(['custom_group_id' => $custom_group['id'], 'name' => 'field']);
+    $custom_field2 = $this->customFieldCreate(['custom_group_id' => $custom_group['id'], 'name' => 'field2', 'label' => 'Field 2']);
 
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
     // Create a first test contrib
@@ -246,6 +247,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
       'receive_date' => $date->format('YmdHis'),
       'custom_' . $custom_field['id'] => 'First Contribution',
+      'custom_' . $custom_field2['id'] => 'First Contribution custom field 2',
     ]);
     $date->modify('+2 days');
     $secondContrib = $this->callAPISuccess('Contribution', 'create', [
@@ -258,6 +260,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
       'receive_date' => $date->format('YmdHis'),
       'custom_' . $custom_field['id'] => 'Second and most recent Contribution',
+      'custom_' . $custom_field2['id'] => 'Second and most recent Contribution field 2',
     ]);
 
     $date->modify('-1 week');
@@ -271,7 +274,12 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
       'receive_date' => $date->format('YmdHis'),
       'custom_' . $custom_field['id'] => 'Third Contribution',
+      'custom_' . $custom_field2['id'] => 'Third Contribution field 2',
     ]);
+
+    // Register "contribution create" hook
+    $this->hookClass->setHook('civicrm_post', array($this, 'implementHookPost'));
+    \Civi::$statics['testCreateTemplateContributionFromFirstContributionTest']['custom_field_id'] = $custom_field['id'];
 
     // Make sure a template contribution exists.
     $templateContributionId = CRM_Contribute_BAO_ContributionRecur::ensureTemplateContributionExists($contributionRecur['id']);
@@ -294,8 +302,23 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $templateContribution = $templateContribution->first();
     $this->assertNotNull($templateContribution['template.field']);
     $this->assertEquals('Second and most recent Contribution', $templateContribution['template.field']);
+    $this->assertEquals('Template contribution custom data inserted by hook', $templateContribution['template.field2']);
     $this->callAPISuccess('CustomField', 'delete', ['id' => $custom_field['id']]);
     $this->callAPISuccess('CustomGroup', 'delete', ['id' => $custom_group['id']]);
+  }
+
+  public function implementHookPost($op, $objectName, $objectId, &$objectRef) {
+    if ($objectName !== 'Contribution') {
+      return;
+    }
+    if ($op !== 'create') {
+      return;
+    }
+
+    // Simulate an extension updating the custom data on the new contribution
+    $contributionParams['entity_id'] = $objectId;
+    $contributionParams['custom_2'] = 'Template contribution custom data inserted by hook';
+    civicrm_api3('CustomValue', 'create', $contributionParams);
   }
 
   /**
