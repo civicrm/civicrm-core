@@ -46,6 +46,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     }
     $this->assign('is_template', $values['is_template']);
 
+    $noACL = FALSE;
     if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && $this->_action & CRM_Core_Action::VIEW) {
       $financialTypeID = CRM_Contribute_PseudoConstant::financialType($values['financial_type_id']);
       CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($id, 'view');
@@ -60,7 +61,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       }
     }
     elseif ($this->_action & CRM_Core_Action::VIEW) {
-      $this->assign('noACL', TRUE);
+      $noACL = TRUE;
     }
     CRM_Contribute_BAO_Contribution::resolveDefaults($values);
 
@@ -221,6 +222,77 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       $this->assign('component', 'contribution');
     }
     $this->assignPaymentInfoBlock($id);
+
+    $searchKey = NULL;
+    if ($this->controller->_key) {
+      $searchKey = $this->controller->_key;
+    }
+    if ((
+        CRM_Core_Permission::check('edit_contributions')
+        && CRM_Core_Permission::check('edit contributions of type ' . $financialTypeID)
+        && !empty($canEdit)
+      ) || (CRM_Core_Permission::check('edit contributions') && $noACL)) {
+      $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=update&context={$context}";
+      if (($context === 'fulltext' || $context === 'search') && $searchKey) {
+        $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=update&context={$context}&key={$searchKey}";
+      }
+      $linkButtons[] = [
+        'title' => ts('Edit'),
+        'url' => 'civicrm/contact/view/contribution',
+        'qs' => $urlParams,
+        'icon' => 'fa-pencil',
+        'accesskey' => 'e',
+      ];
+      if (!empty($paymentButtonName)) {
+        $linkButtons[] = [
+          'title' => $paymentButtonName,
+          'url' => 'civicrm/payment',
+          'qs' => "action=add&reset=1&component=contribution&id={$id}&cid={$values['contact_id']}",
+          'icon' => 'fa-plus-circle',
+        ];
+      }
+    }
+
+    if ((
+        CRM_Core_Permission::check('delete in CiviContribute')
+        && CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($financialTypeID))
+        && !empty($canDelete)
+      ) || (CRM_Core_Permission::check('delete in CiviContribute') && $noACL)) {
+      $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=delete&context={$context}";
+      if (($context === 'fulltext' || $context === 'search') && $searchKey) {
+        $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=delete&context={$context}&key={$searchKey}";
+      }
+      $linkButtons[] = [
+        'title' => ts('Delete'),
+        'url' => 'civicrm/contact/view/contribution',
+        'qs' => $urlParams,
+        'icon' => 'fa-trash',
+      ];
+    }
+
+    $pdfUrlParams = "reset=1&id={$id}&cid={$values['contact_id']}";
+    $emailUrlParams = "reset=1&id={$id}&cid={$values['contact_id']}&select=email";
+    if ($invoicing && empty($is_template)) {
+      if (($values['contribution_status'] != 'Refunded') && ($values['contribution_status'] != 'Cancelled')) {
+        $invoiceButtonText = ts('Download Invoice');
+      }
+      else {
+        $invoiceButtonText = ts('Download Invoice and Credit Note');
+      }
+      $linkButtons[] = [
+        'title' => $invoiceButtonText,
+        'url' => 'civicrm/contribute/invoice',
+        'qs' => $pdfUrlParams,
+        'icon' => 'fa-download',
+      ];
+      $linkButtons[] = [
+        'title' => ts('Email Invoice'),
+        'url' => 'civicrm/contribute/invoice/email',
+        'qs' => $emailUrlParams,
+        'icon' => 'fa-paper-plane',
+      ];
+    }
+    $this->assign('linkButtons', $linkButtons ?? []);
   }
 
   /**
