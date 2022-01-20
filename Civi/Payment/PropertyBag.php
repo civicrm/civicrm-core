@@ -315,7 +315,7 @@ class PropertyBag implements \ArrayAccess {
    *
    * @return PropertyBag $this object so you can chain set setters.
    */
-  protected function set($prop, $label = 'default', $value) {
+  protected function set($prop, $label, $value) {
     $this->props[$label][$prop] = $value;
     return $this;
   }
