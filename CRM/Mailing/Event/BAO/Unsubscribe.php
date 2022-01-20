@@ -293,9 +293,9 @@ WHERE  email = %2
    * Send a response email informing the contact of the groups from which he.
    * has been unsubscribed.
    *
-   * @param string $queue_id
+   * @param int $queue_id
    *   The queue event ID.
-   * @param array $groups
+   * @param array|null $groups
    *   List of group IDs.
    * @param bool $is_domain
    *   Is this domain-level?.
