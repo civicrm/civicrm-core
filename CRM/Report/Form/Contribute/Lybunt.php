@@ -147,8 +147,9 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
         'filters' => [
           'on_hold' => [
             'title' => ts('On Hold'),
-            'type' => CRM_Utils_Type::T_BOOLEAN,
-            'options' => ['' => ts('Any')] + CRM_Core_SelectValues::boolean(),
+            'type' => CRM_Utils_Type::T_INT,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => ['' => ts('Any')] + CRM_Core_PseudoConstant::emailOnHoldOptions(),
           ],
         ],
       ],
