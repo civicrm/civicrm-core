@@ -99,6 +99,26 @@ trait CRM_Queue_Queue_SqlTrait {
   }
 
   /**
+   * Get the full data for an item.
+   *
+   * This is a passive peek - it does not claim/steal/release anything.
+   *
+   * @param int|string $id
+   *   The unique ID of the task within the queue.
+   * @return CRM_Queue_DAO_QueueItem|object|null $dao
+   */
+  public function fetchItem($id) {
+    $dao = new CRM_Queue_DAO_QueueItem();
+    $dao->id = $id;
+    $dao->queue_name = $this->getName();
+    if (!$dao->find(TRUE)) {
+      return NULL;
+    }
+    $dao->data = unserialize($dao->data);
+    return $dao;
+  }
+
+  /**
    * Return an item that could not be processed.
    *
    * @param CRM_Core_DAO $dao
