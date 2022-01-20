@@ -38,17 +38,25 @@ class TestCreationParameterProvider {
   }
 
   /**
-   * @param $entity
+   * Get the required fields for the api entity + action.
+   *
+   * @param string $entity
    *
    * @return array
+   * @throws \API_Exception
    */
-  public function getRequired($entity) {
-    $createSpec = $this->gatherer->getSpec($entity, 'create', FALSE);
-    $requiredFields = array_merge($createSpec->getRequiredFields(), $createSpec->getConditionalRequiredFields());
+  public function getRequired(string $entity) {
+    $requiredFields = civicrm_api4($entity, 'getfields', [
+      'action' => 'create',
+      'loadOptions' => TRUE,
+      'where' => [
+        ['OR', [['required', '=', TRUE], ['required_if', 'IS NOT EMPTY']]],
+      ],
+    ], 'name');
 
     $requiredParams = [];
-    foreach ($requiredFields as $requiredField) {
-      $requiredParams[$requiredField->getName()] = $this->getRequiredValue($requiredField);
+    foreach ($requiredFields as $fieldName => $requiredField) {
+      $requiredParams[$fieldName] = $this->getRequiredValue($requiredField);
     }
 
     // This is a ruthless hack to avoid peculiar constraints - but
@@ -77,43 +85,43 @@ class TestCreationParameterProvider {
    * Attempt to get a value using field option, defaults, FKEntity, or a random
    * value based on the data type.
    *
-   * @param \Civi\Api4\Service\Spec\FieldSpec $field
+   * @param array $field
    *
    * @return mixed
    * @throws \Exception
    */
-  private function getRequiredValue(FieldSpec $field) {
+  private function getRequiredValue(array $field) {
 
-    if ($field->getOptions()) {
-      return $this->getOption($field);
+    if (!empty($field['options'])) {
+      return key($field['options']);
     }
-    elseif ($field->getFkEntity()) {
-      return $this->getFkID($field, $field->getFkEntity());
+    if (!empty($field['fk_entity'])) {
+      return $this->getFkID($field['fk_entity']);
     }
-    elseif ($field->getDefaultValue()) {
-      return $field->getDefaultValue();
+    if (isset($field['default_value'])) {
+      return $field['default_value'];
     }
-    elseif ($field->getName() === 'contact_id') {
-      return $this->getFkID($field, 'Contact');
+    if ($field['name'] === 'contact_id') {
+      return $this->getFkID('Contact');
     }
-    elseif ($field->getName() === 'entity_id') {
+    if ($field['name'] === 'entity_id') {
       // What could possibly go wrong with this?
-      switch ($field->getTableName()) {
+      switch ($field['table_name']) {
         case 'civicrm_financial_item':
-          return $this->getFkID($field, FinancialItemCreationSpecProvider::DEFAULT_ENTITY);
+          return $this->getFkID(FinancialItemCreationSpecProvider::DEFAULT_ENTITY);
 
         default:
-          return $this->getFkID($field, 'Contact');
+          return $this->getFkID('Contact');
       }
     }
 
-    $randomValue = $this->getRandomValue($field->getDataType());
+    $randomValue = $this->getRandomValue($field['data_type']);
 
     if ($randomValue) {
       return $randomValue;
     }
 
-    throw new \Exception('Could not provide default value');
+    throw new \API_Exception('Could not provide default value');
   }
 
   /**
@@ -127,13 +135,15 @@ class TestCreationParameterProvider {
   }
 
   /**
-   * @param \Civi\Api4\Service\Spec\FieldSpec $field
+   * Get an ID for the appropriate entity.
+   *
    * @param string $fkEntity
    *
    * @return mixed
-   * @throws \Exception
+   *
+   * @throws \API_Exception
    */
-  private function getFkID(FieldSpec $field, $fkEntity) {
+  private function getFkID(string $fkEntity) {
     $params = ['checkPermissions' => FALSE];
     // Be predictable about what type of contact we select
     if ($fkEntity === 'Contact') {
@@ -142,7 +152,7 @@ class TestCreationParameterProvider {
     $entityList = civicrm_api4($fkEntity, 'get', $params);
     if ($entityList->count() < 1) {
       $msg = sprintf('At least one %s is required in test', $fkEntity);
-      throw new \Exception($msg);
+      throw new \API_Exception($msg);
     }
 
     return $entityList->last()['id'];
@@ -159,7 +169,7 @@ class TestCreationParameterProvider {
         return TRUE;
 
       case 'Integer':
-        return rand(1, 2000);
+        return random_int(1, 2000);
 
       case 'String':
         return \CRM_Utils_String::createRandom(10, implode('', range('a', 'z')));
