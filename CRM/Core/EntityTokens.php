@@ -496,6 +496,8 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @param int $id
    *
    * @return string
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function getCustomFieldName(int $id): string {
     foreach ($this->getTokenMetadata() as $key => $field) {
@@ -503,6 +505,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
         return $key;
       }
     }
+    throw new CRM_Core_Exception(
+      "A custom field with the ID {$id} does not exist"
+    );
   }
 
   /**
@@ -515,9 +520,14 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    */
   protected function getCustomFieldValue($entityID, string $field) {
     $id = str_replace('custom_', '', $field);
-    $value = $this->prefetch[$entityID][$this->getCustomFieldName($id)] ?? '';
-    if ($value !== NULL) {
-      return CRM_Core_BAO_CustomField::displayValue($value, $id);
+    try {
+      $value = $this->prefetch[$entityID][$this->getCustomFieldName($id)] ?? '';
+      if ($value !== NULL) {
+        return CRM_Core_BAO_CustomField::displayValue($value, $id);
+      }
+    }
+    catch (CRM_Core_Exception $exception) {
+      return NULL;
     }
   }
 
