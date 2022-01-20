@@ -32,7 +32,7 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
    *   Classname of BAO.
    */
   public function getBAOName() {
-    return 'CRM_ACL_BAO_EntityRole';
+    return 'CRM_ACL_BAO_ACLEntityRole';
   }
 
   /**
