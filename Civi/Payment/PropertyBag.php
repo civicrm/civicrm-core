@@ -26,13 +26,23 @@ class PropertyBag implements \ArrayAccess {
 
   protected static $propMap = [
     'amount'                      => TRUE,
+    'total_amount'                => 'amount',
     'billingStreetAddress'        => TRUE,
+    'billing_street_address'      => 'billingStreetAddress',
+    'street_address'              => 'billingStreetAddress',
     'billingSupplementalAddress1' => TRUE,
     'billingSupplementalAddress2' => TRUE,
     'billingSupplementalAddress3' => TRUE,
     'billingCity'                 => TRUE,
+    'billing_city'                => 'billingCity',
+    'city'                        => 'billingCity',
     'billingPostalCode'           => TRUE,
+    'billing_postal_code'         => 'billingPostalCode',
+    'postal_code'                 => 'billingPostalCode',
     'billingCounty'               => TRUE,
+    'billingStateProvince'        => TRUE,
+    'billing_state_province'      => 'billingStateProvince',
+    'state_province'              => 'billingStateProvince',
     'billingCountry'              => TRUE,
     'contactID'                   => TRUE,
     'contact_id'                  => 'contactID',
@@ -258,13 +268,18 @@ class PropertyBag implements \ArrayAccess {
     if ($newName === NULL && substr($prop, -2) === '-' . \CRM_Core_BAO_LocationType::getBilling()
       && isset(static::$propMap[substr($prop, 0, -2)])
     ) {
-      $newName = substr($prop, 0, -2);
+      $billingAddressProp = substr($prop, 0, -2);
+      $newName = static::$propMap[$billingAddressProp] ?? NULL;
+      if ($newName === TRUE) {
+        // Good, modern name.
+        return $billingAddressProp;
+      }
     }
 
     if ($newName === NULL) {
       if ($silent) {
         // Only for use by offsetExists
-        return;
+        return NULL;
       }
       throw new \InvalidArgumentException("Unknown property '$prop'.");
     }
@@ -300,7 +315,7 @@ class PropertyBag implements \ArrayAccess {
    *
    * @return PropertyBag $this object so you can chain set setters.
    */
-  protected function set($prop, $label, $value) {
+  protected function set($prop, $label = 'default', $value) {
     $this->props[$label][$prop] = $value;
     return $this;
   }
@@ -589,6 +604,27 @@ class PropertyBag implements \ArrayAccess {
    */
   public function setBillingCounty($input, $label = 'default') {
     return $this->set('billingCounty', $label, (string) $input);
+  }
+
+  /**
+   * BillingStateProvince getter.
+   *
+   * @return string
+   */
+  public function getBillingStateProvince($label = 'default') {
+    return $this->get('billingStateProvince', $label);
+  }
+
+  /**
+   * BillingStateProvince setter.
+   *
+   * Nb. we can't validate this unless we have the country ID too, so we don't.
+   *
+   * @param string $input
+   * @param string $label e.g. 'default'
+   */
+  public function setBillingStateProvince($input, $label = 'default') {
+    return $this->set('billingStateProvince', $label, (string) $input);
   }
 
   /**
