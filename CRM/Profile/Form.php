@@ -1353,9 +1353,12 @@ class CRM_Profile_Form extends CRM_Core_Form {
   }
 
   /**
-   * @param null $suffix
+   * Check template file exists.
    *
-   * @return null|string
+   * @param string|null $suffix
+   *
+   * @return string|null
+   *   Template file path, else null
    */
   public function checkTemplateFileExists($suffix = NULL) {
     if ($this->_gid) {
