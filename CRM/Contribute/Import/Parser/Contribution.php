@@ -968,6 +968,11 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
             $realField = $fields[$key]['is_pseudofield_for'] ?? $key;
             $realFieldSpec = $fields[$realField];
             $values[$key] = $this->parsePseudoConstantField($value, $realFieldSpec);
+
+            // since we are inconsistent with field or field_id
+            if (!empty($values[$key]) && $key != $realFieldSpec['name']) {
+              $values[$realFieldSpec['name']] = $values[$key];
+            }
           }
           break;
       }
