@@ -713,18 +713,6 @@ class CRM_Utils_Date {
   }
 
   /**
-   * @param $date
-   *
-   * @return bool
-   */
-  public static function isDate(&$date) {
-    if (CRM_Utils_System::isNull($date)) {
-      return FALSE;
-    }
-    return TRUE;
-  }
-
-  /**
    * Translate a TTL to a concrete expiration time.
    *
    * @param null|int|DateInterval $ttl
