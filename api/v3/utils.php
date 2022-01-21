@@ -445,15 +445,15 @@ function _civicrm_api3_filter_fields_for_bao($entity, &$params, &$values) {
 }
 
 /**
- * Store values.
+ * Copy values (other than id) from params to values if they exist in fields.
  *
  * @param array $fields
  * @param array $params
  * @param array $values
  *
- * @return Bool
+ * @return bool
  */
-function _civicrm_api3_store_values(&$fields, &$params, &$values) {
+function _civicrm_api3_store_values(array $fields, array $params, &$values): bool {
   $valueFound = FALSE;
 
   $keys = array_intersect_key($params, $fields);
