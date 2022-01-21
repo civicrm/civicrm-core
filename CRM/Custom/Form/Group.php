@@ -187,26 +187,13 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       }
     }
 
-    $cSubTypes = CRM_Core_Component::contactSubTypes();
+    if (!isset($this->_id)) {
+      $formName = 'document.forms.' . $this->_name;
 
-    if (!empty($cSubTypes)) {
-      $contactSubTypes = [];
-      foreach ($cSubTypes as $key => $value) {
-        $contactSubTypes[$key] = $key;
-      }
-      $sel2['Contact'] = [
-        "" => ("- Any -"),
-      ] + $contactSubTypes;
-    }
-    else {
-      if (!isset($this->_id)) {
-        $formName = 'document.forms.' . $this->_name;
-
-        $js = "<script type='text/javascript'>\n";
-        $js .= "{$formName}['extends_1'].style.display = 'none';\n";
-        $js .= "</script>";
-        $this->assign('initHideBlocks', $js);
-      }
+      $js = "<script type='text/javascript'>\n";
+      $js .= "{$formName}['extends_1'].style.display = 'none';\n";
+      $js .= "</script>";
+      $this->assign('initHideBlocks', $js);
     }
 
     $sel = &$this->add('hierselect',
