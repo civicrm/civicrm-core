@@ -30,11 +30,12 @@ class Admin {
   public static function getAdminSettings():array {
     $schema = self::getSchema();
     $extensions = \CRM_Extension_System::singleton()->getMapper();
-    return [
+    $data = [
       'schema' => self::addImplicitFKFields($schema),
       'joins' => self::getJoins($schema),
       'pseudoFields' => AbstractRunAction::getPseudoFields(),
       'operators' => \CRM_Utils_Array::makeNonAssociative(self::getOperators()),
+      'permissions' => [],
       'functions' => self::getSqlFunctions(),
       'displayTypes' => Display::getDisplayTypes(['id', 'name', 'label', 'description', 'icon']),
       'styles' => \CRM_Utils_Array::makeNonAssociative(self::getStyles()),
@@ -49,6 +50,19 @@ class Admin {
         ->addWhere('used_for', 'CONTAINS', 'civicrm_saved_search')
         ->execute(),
     ];
+    $perms = \Civi\Api4\Permission::get()
+      ->addWhere('group', 'IN', ['civicrm', 'cms'])
+      ->addWhere('is_active', '=', 1)
+      ->setOrderBy(['title' => 'ASC'])
+      ->execute();
+    foreach ($perms as $perm) {
+      $data['permissions'][] = [
+        'id' => $perm['name'],
+        'text' => $perm['title'],
+        'description' => $perm['description'] ?? NULL,
+      ];
+    }
+    return $data;
   }
 
   /**

@@ -6,6 +6,7 @@
       <th>{{:: ts('Open') }}</th>
       <th>{{:: ts('Text') }}</th>
       <th>{{:: ts('Link') }}</th>
+      <th>{{:: ts('Show if') }}</th>
       <th>{{:: ts('Style') }}</th>
       <th class="crm-search-admin-icon-col"></th>
     </tr>
@@ -33,6 +34,17 @@
       </td>
       <td class="form-inline">
         <crm-search-admin-link-select api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" link="item" links="$ctrl.links" on-change="$ctrl.onChangeLink(item, newLink)"></crm-search-admin-link-select>
+      </td>
+      <td class="form-inline">
+        <input ng-model="item.condition[0]" crm-ui-select="{placeholder: item.action ? ts('Allowed') : ts('Always'), data: $ctrl.fields}" ng-change="$ctrl.onChangeCondition(item)">
+        <select ng-if="item.condition[0]" class="form-control api4-operator" ng-model="item.condition[1]" ng-options="o.key as o.value for o in $ctrl.getOperators(item.condition)">
+        </select>
+        <div class="form-group" ng-if="item.condition[0] === 'check user permission'">
+          <input class="form-control" crm-ui-select="{data: $ctrl.permissions}" ng-model="item.condition[2]">
+        </div>
+        <div class="form-group" ng-if="item.condition[0] && item.condition[0] !== 'check user permission' && item.condition[1].indexOf('IS ') !== 0">
+          <crm-search-input ng-model="item.condition[2]" field="$ctrl.getField(item.condition[0])" option-key="'name'" op="item.condition[1]" class="form-group"></crm-search-input>
+        </div>
       </td>
       <td>
         <div class="btn-group">

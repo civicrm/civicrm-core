@@ -373,6 +373,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $out['text'] = $this->replaceTokens($column['text'], $data, 'view');
     }
     foreach ($column['links'] as $item) {
+      if (!$this->checkLinkCondition($item, $data)) {
+        continue;
+      }
       $path = $this->replaceTokens($this->getLinkPath($item, $data), $data, 'url');
       if ($path) {
         $link = [
@@ -388,6 +391,30 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
     }
     return $out;
+  }
+
+  /**
+   * Check if a link should be shown based on its conditions.
+   *
+   * Given a link, check if it is set to be displayed conditionally.
+   * If so, evaluate the condition, else return TRUE.
+   *
+   * @param array $item
+   * @param array $data
+   * @return bool
+   */
+  private function checkLinkCondition(array $item, array $data): bool {
+    if (empty($item['condition'][0]) || empty($item['condition'][1])) {
+      return TRUE;
+    }
+    $op = $item['condition'][1];
+    if ($item['condition'][0] === 'check user permission') {
+      if (!empty($item['condition'][2]) && !\CRM_Core_Permission::check($item['condition'][2])) {
+        return $op !== '=';
+      }
+      return TRUE;
+    }
+    return ArrayQueryActionTrait::filterCompare($data, $item['condition']);
   }
 
   /**
