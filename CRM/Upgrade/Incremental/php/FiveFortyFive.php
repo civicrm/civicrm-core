@@ -28,4 +28,24 @@ class CRM_Upgrade_Incremental_php_FiveFortyFive extends CRM_Upgrade_Incremental_
     $this->addTask('Update currency symbols for Belarus', 'updateCurrencyName', 'BYR', 'BYN');
   }
 
+  public function upgrade_5_45_2($rev): void {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Install search kit if afform-admin is installed', 'installDependentExtension');
+  }
+
+  /**
+   * @param CRM_Queue_TaskContext $ctx
+   */
+  public function installDependentExtension(CRM_Queue_TaskContext $ctx) {
+    $is_form_builder_active = (bool) CRM_Core_DAO::singleValueQuery("SELECT is_active FROM civicrm_extension WHERE full_name = 'org.civicrm.afform_admin'");
+    if ($is_form_builder_active) {
+      $is_search_kit_active = (bool) CRM_Core_DAO::singleValueQuery("SELECT is_active FROM civicrm_extension WHERE full_name = 'org.civicrm.search_kit'");
+      if (!$is_search_kit_active) {
+        // Would like to avoid api but otherwise we need to create tables etc ourselves.
+        civicrm_api3('Extension', 'install', ['keys' => 'org.civicrm.search_kit']);
+      }
+    }
+    return TRUE;
+  }
+
 }
