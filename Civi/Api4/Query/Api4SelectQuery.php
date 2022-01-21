@@ -680,10 +680,16 @@ class Api4SelectQuery {
       return TRUE;
     }
     if (!isset($this->entityAccess[$entity])) {
-      $this->entityAccess[$entity] = (bool) civicrm_api4($entity, 'getActions', [
-        'where' => [['name', '=', 'get']],
-        'select' => ['name'],
-      ])->first();
+      try {
+        $this->entityAccess[$entity] = (bool) civicrm_api4($entity, 'getActions', [
+          'where' => [['name', '=', 'get']],
+          'select' => ['name'],
+        ])->first();
+      }
+      // Anonymous users might not even be allowed to use 'getActions'
+      catch (UnauthorizedException $e) {
+        $this->entityAccess[$entity] = FALSE;
+      }
     }
     return $this->entityAccess[$entity];
   }
