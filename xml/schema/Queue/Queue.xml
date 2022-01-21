@@ -53,6 +53,9 @@
       <type>Text</type>
     </html>
     <add>5.47</add>
+    <pseudoconstant>
+      <callback>CRM_Queue_BAO_Queue::getTypes</callback>
+    </pseudoconstant>
   </field>
   <field>
     <name>is_autorun</name>
