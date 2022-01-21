@@ -1011,9 +1011,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * Check template file exists.
    *
-   * @param string $suffix
+   * @param string|null $suffix
    *
-   * @return null|string
+   * @return string|null
+   *   Template file path, else null
    */
   public function checkTemplateFileExists($suffix = NULL) {
     if ($this->_id) {
