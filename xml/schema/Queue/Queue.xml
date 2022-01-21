@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <!--
+    NOTE: To facilitate upgrades, manually copy the CREATE TABLE statement
+    from sql/civicrm.mysql to sql/civicrm_queue_item.mysql
+  -->
+  <base>CRM/Queue</base>
+  <class>Queue</class>
+  <name>civicrm_queue</name>
+  <comment>Stores a list of persistent queues</comment>
+  <add>5.47</add>
+  <field>
+    <name>id</name>
+    <title>System Queue ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
+    <add>5.47</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <title>Name</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Name of the queue</comment>
+    <required>true</required>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>5.47</add>
+  </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>5.47</add>
+  </index>
+  <field>
+    <name>type</name>
+    <title>Type</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Type of the queue</comment>
+    <required>true</required>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>5.47</add>
+    <pseudoconstant>
+      <callback>CRM_Queue_BAO_Queue::getTypes</callback>
+    </pseudoconstant>
+  </field>
+  <field>
+    <name>is_autorun</name>
+    <title>Enable Autorun</title>
+    <type>boolean</type>
+    <comment>Should the standard background attempt to autorun tasks in this queue?</comment>
+    <html>
+      <type>CheckBox</type>
+      <label>Auto Run</label>
+    </html>
+  </field>
+
+</table>

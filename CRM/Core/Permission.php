@@ -752,6 +752,14 @@ class CRM_Core_Permission {
       'administer reserved tags' => [
         $prefix . ts('administer reserved tags'),
       ],
+      'administer queues' => [
+        $prefix . ts('administer queues'),
+        ts('Initialize, browse, and cancel background processing queues'),
+        // At time of writing, we have specifically omitted the ability to edit fine-grained
+        // data about specific queue-tasks. Tasks are usually defined as PHP callables...
+        // and one should hesitate before allowing open-ended edits of PHP callables.
+        // However, it seems fine for web-admins to browse and cancel these things.
+      ],
       'administer dedupe rules' => [
         $prefix . ts('administer dedupe rules'),
         ts('Create and edit rules, change the supervised and unsupervised rules'),

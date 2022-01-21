@@ -242,6 +242,11 @@ return [
     'class' => 'CRM_Pledge_DAO_PledgeBlock',
     'table' => 'civicrm_pledge_block',
   ],
+  'CRM_Queue_DAO_Queue' => [
+    'name' => 'Queue',
+    'class' => 'CRM_Queue_DAO_Queue',
+    'table' => 'civicrm_queue',
+  ],
   'CRM_Queue_DAO_QueueItem' => [
     'name' => 'QueueItem',
     'class' => 'CRM_Queue_DAO_QueueItem',

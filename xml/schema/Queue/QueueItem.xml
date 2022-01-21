@@ -12,7 +12,7 @@
   <add>4.2</add>
   <field>
     <name>id</name>
-    <title>Queue ID</title>
+    <title>Queue Item ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <html>
@@ -29,6 +29,7 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Name of the queue which includes this item</comment>
+    <!-- This SHOULD match `civicrm_queue.name`; however, historically, it has been required to create records in `civicrm_queue`. -->
     <required>true</required>
     <html>
       <type>Text</type>
