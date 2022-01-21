@@ -94,19 +94,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       throw new UnauthorizedException('Access denied');
     }
     $this->loadSavedSearch();
-    if (is_string($this->display)) {
-      $this->display = SearchDisplay::get(FALSE)
-        ->setSelect(['*', 'type:name'])
-        ->addWhere('name', '=', $this->display)
-        ->addWhere('saved_search_id', '=', $this->savedSearch['id'])
-        ->execute()->single();
-    }
-    elseif (is_null($this->display)) {
-      $this->display = SearchDisplay::getDefault(FALSE)
-        ->addSelect('*', 'type:name')
-        ->setSavedSearch($this->savedSearch)
-        ->execute()->first();
-    }
+    $this->loadSearchDisplay();
+
     // Displays with acl_bypass must be embedded on an afform which the user has access to
     if (
       $this->checkPermissions && !empty($this->display['acl_bypass']) &&
@@ -1026,6 +1015,27 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $this->filterLabels[] = $record[$labelField];
         }
       }
+    }
+  }
+
+  /**
+   * Loads display if not already an array
+   */
+  private function loadSearchDisplay(): void {
+    // Display name given
+    if (is_string($this->display)) {
+      $this->display = SearchDisplay::get(FALSE)
+        ->setSelect(['*', 'type:name'])
+        ->addWhere('name', '=', $this->display)
+        ->addWhere('saved_search_id', '=', $this->savedSearch['id'])
+        ->execute()->single();
+    }
+    // Null given - use default display
+    elseif (is_null($this->display)) {
+      $this->display = SearchDisplay::getDefault(FALSE)
+        ->addSelect('*', 'type:name')
+        ->setSavedSearch($this->savedSearch)
+        ->execute()->first();
     }
   }
 
