@@ -115,7 +115,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       throw new UnauthorizedException('Access denied');
     }
 
-    $this->_apiParams['checkPermissions'] = empty($this->display['acl_bypass']);
+    $this->_apiParams['checkPermissions'] = $this->savedSearch['api_params']['checkPermissions'] = empty($this->display['acl_bypass']);
     $this->display['settings']['columns'] = $this->display['settings']['columns'] ?? [];
 
     $this->processResult($result);
