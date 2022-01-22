@@ -22,9 +22,9 @@
   </div>
   <label>{{:: ts('If') }}</label>
   <input class="form-control collapsible-optgroups" ng-model="clause[1]" crm-ui-select="::{data: $ctrl.fields, allowClear: true, placeholder: ts('Always')}" ng-change="$ctrl.onSelectField(clause)" />
-  <!-- TODO: Support operators other than '=' as clause[2] -->
-  <label ng-if="clause[1]">{{:: ts('Is') }}</label>
-  <crm-search-input ng-if="clause[1]" ng-model="clause[3]" field="$ctrl.getField(clause[1])" option-key="'name'" op="clause[1]" format="$ctrl.format" class="form-group"></crm-search-input>
+  <select class="form-control api4-operator" ng-if="clause[1]" ng-model="clause[2]" ng-options="o.key as o.value for o in $ctrl.operators">
+  </select>
+  <crm-search-input ng-if="clause[1] && clause[2].indexOf('IS ') !== 0" ng-model="clause[3]" field="$ctrl.getField(clause[1])" option-key="'name'" op="clause[2]" format="$ctrl.format" class="form-group"></crm-search-input>
   <button type="button" class="btn-xs btn-danger-outline" ng-click="$ctrl.item.cssRules.splice($index);" title="{{:: ts('Remove style') }}">
     <i class="crm-i fa-ban"></i>
   </button>

@@ -168,7 +168,7 @@
         }
         // Might be a pseudoField
         if (!field) {
-          field = _.cloneDeep(_.find(CRM.crmSearchAdmin.pseudoFields, {name: name}));
+          field = _.find(CRM.crmSearchAdmin.pseudoFields, {name: name});
         }
         if (field) {
           field.baseEntity = entityName;

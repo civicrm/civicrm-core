@@ -28,7 +28,10 @@
       this.styles.strikethrough = ts('Strikethrough');
 
       this.fields = function() {
-        return {results: ctrl.crmSearchAdmin.getAllFields(':name', ['Field', 'Custom', 'Extra'])};
+        var allFields = ctrl.crmSearchAdmin.getAllFields(':name', ['Field', 'Custom', 'Extra', 'Pseudo']);
+        return {
+          results: ctrl.crmSearchAdmin.getSelectFields().concat(allFields)
+        };
       };
 
       this.$onInit = function() {
@@ -61,8 +64,7 @@
         return !this.item.cssRules || !this.item.cssRules.length || _.last(this.item.cssRules)[1];
       };
 
-
-
+      this.operators = CRM.crmSearchAdmin.operators;
     }
   });
 

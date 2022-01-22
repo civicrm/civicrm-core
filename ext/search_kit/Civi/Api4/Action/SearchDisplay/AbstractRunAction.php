@@ -295,10 +295,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    */
   protected function getCssRuleCondition($clause) {
     $fieldKey = $clause[1] ?? NULL;
-    // For fields used in group by, add aggregation and change operator from = to CONTAINS
-    // FIXME: This assumes the operator is always set to '=', which so far is all the admin UI supports.
-    // That's only a safe assumption as long as the admin UI doesn't have an operator selector.
-    // @see ang/crmSearchAdmin/displays/common/searchAdminCssRules.html
+    // For fields used in group by, add aggregation and change operator to CONTAINS
+    // NOTE: This doesn't support any other operators for aggregated fields.
     if ($fieldKey && $this->canAggregate($fieldKey)) {
       $clause[2] = 'CONTAINS';
       $fieldKey = 'GROUP_CONCAT_' . str_replace(['.', ':'], '_', $clause[1]);
