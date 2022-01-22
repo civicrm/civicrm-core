@@ -9,13 +9,16 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\WorkflowMessage\GenericWorkflowMessage;
+
 /**
  * Receipt sent when confirming a back office contribution.
  *
  * @support template-only
+ *
  * @see CRM_Contribute_Form_AdditionalInfo::emailReceipt
  */
-class CRM_Contribute_WorkflowMessage_ContributionOfflineReceipt extends \Civi\WorkflowMessage\GenericWorkflowMessage {
+class CRM_Contribute_WorkflowMessage_ContributionOfflineReceipt extends GenericWorkflowMessage {
   use CRM_Contribute_WorkflowMessage_ContributionTrait;
   public const WORKFLOW = 'contribution_offline_receipt';
 

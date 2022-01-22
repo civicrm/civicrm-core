@@ -45,12 +45,12 @@
       </td>
      </tr>
      <tr>
-      {if !empty($formValues.contributionType_name)}
+      {if '{contribution.financial_type_id}'}
         <td {$labelStyle}>
          {ts}Financial Type{/ts}
         </td>
         <td {$valueStyle}>
-         {$formValues.contributionType_name}
+         {contribution.financial_type_id:label}
         </td>
       {/if}
      </tr>
@@ -131,13 +131,13 @@
       {/foreach}
      {/if}
 
-     {if isset($totalTaxAmount) && $totalTaxAmount !== 'null'}
+     {if $isShowTax}
       <tr>
         <td {$labelStyle}>
           {ts}Total Tax Amount{/ts}
         </td>
         <td {$valueStyle}>
-          {$totalTaxAmount|crmMoney:$currency}
+          {contribution.tax_amount}
         </td>
       </tr>
      {/if}
@@ -147,60 +147,60 @@
        {ts}Total Amount{/ts}
       </td>
       <td {$valueStyle}>
-       {$formValues.total_amount|crmMoney:$currency}
+        {contribution.total_amount}
       </td>
      </tr>
 
-     {if !empty($receive_date)}
-      <tr>
+     {if '{contribution.receive_date}'}
+       <tr>
        <td {$labelStyle}>
         {ts}Date Received{/ts}
        </td>
        <td {$valueStyle}>
-        {$receive_date|truncate:10:''|crmDate}
+         {contribution.receive_date}
        </td>
       </tr>
      {/if}
 
-      {if !empty($receipt_date)}
+      {if '{contribution.receipt_date}'}
       <tr>
        <td {$labelStyle}>
         {ts}Receipt Date{/ts}
        </td>
        <td {$valueStyle}>
-        {$receipt_date|truncate:10:''|crmDate}
+         {contribution.receipt_date}
        </td>
       </tr>
      {/if}
 
-     {if !empty($formValues.paidBy) and empty($formValues.hidden_CreditCard)}
+     {if '{contribution.payment_instrument_id}' and empty($formValues.hidden_CreditCard)}
       <tr>
        <td {$labelStyle}>
         {ts}Paid By{/ts}
        </td>
        <td {$valueStyle}>
-        {$formValues.paidBy}
+         {contribution.payment_instrument_id:label}
        </td>
       </tr>
-      {if !empty($formValues.check_number)}
+      {if '{contribution.check_number}'}
        <tr>
         <td {$labelStyle}>
          {ts}Check Number{/ts}
         </td>
         <td {$valueStyle}>
-         {$formValues.check_number}
+          {contribution.check_number}
         </td>
        </tr>
       {/if}
      {/if}
 
-     {if !empty($formValues.trxn_id)}
+     {if '{contribution.trxn_id}'}
       <tr>
        <td {$labelStyle}>
         {ts}Transaction ID{/ts}
        </td>
        <td {$valueStyle}>
-        {$formValues.trxn_id}
+         {contribution.trxn_id}
        </td>
       </tr>
      {/if}

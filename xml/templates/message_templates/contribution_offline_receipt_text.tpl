@@ -9,8 +9,8 @@
 
 ===========================================================
 {ts}Contributor{/ts}: {contact.display_name}
-{if !empty($formValues.contributionType_name)}
-{ts}Financial Type{/ts}: {$formValues.contributionType_name}
+{if '{contribution.financial_type_id}'}
+{ts}Financial Type{/ts}: {contribution.financial_type_id:label}
 {/if}
 {if $lineItem}
 {foreach from=$lineItem item=value key=priceset}
@@ -44,24 +44,24 @@
 {/foreach}
 {/if}
 
-{if isset($totalTaxAmount) && $totalTaxAmount !== 'null'}
-{ts}Total Tax Amount{/ts} : {$totalTaxAmount|crmMoney:$currency}
+{if $isShowTax}
+{ts}Total Tax Amount{/ts} : {contribution.tax_amount}
 {/if}
-{ts}Total Amount{/ts} : {$formValues.total_amount|crmMoney:$currency}
-{if !empty($receive_date)}
-{ts}Date Received{/ts}: {$receive_date|truncate:10:''|crmDate}
+{ts}Total Amount{/ts} : {contribution.total_amount}
+{if '{contribution.receive_date}'}
+{ts}Date Received{/ts}: {contribution.receive_date}
 {/if}
-{if !empty($receipt_date)}
-{ts}Receipt Date{/ts}: {$receipt_date|truncate:10:''|crmDate}
+{if '{contribution.receipt_date}'}
+{ts}Receipt Date{/ts}: {contribution.receipt_date}
 {/if}
-{if !empty($formValues.paidBy) and empty($formValues.hidden_CreditCard)}
-{ts}Paid By{/ts}: {$formValues.paidBy}
-{if !empty($formValues.check_number)}
-{ts}Check Number{/ts}: {$formValues.check_number}
+{if '{contribution.payment_instrument_id}' and empty($formValues.hidden_CreditCard)}
+{ts}Paid By{/ts}: {contribution.payment_instrument_id:label}
+{if '{contribution.check_number}'}
+{ts}Check Number{/ts}: {contribution.check_number}
 {/if}
 {/if}
-{if !empty($formValues.trxn_id)}
-{ts}Transaction ID{/ts}: {$formValues.trxn_id}
+{if '{contribution.trxn_id}'}
+{ts}Transaction ID{/ts}: {contribution.trxn_id}
 {/if}
 
 {if !empty($ccContribution)}

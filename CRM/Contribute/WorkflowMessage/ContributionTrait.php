@@ -22,6 +22,13 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
   public $contributionId;
 
   /**
+   * Is the site configured such that tax should be displayed.
+   *
+   * @var bool
+   */
+  public $isShowTax;
+
+  /**
    * Set contribution object.
    *
    * @param array $contribution
@@ -34,6 +41,19 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
       $this->contributionId = $contribution['id'];
     }
     return $this;
+  }
+
+  /**
+   * Extra variables to be exported to smarty based on being calculated.
+   *
+   * We export isShowTax to denote whether invoicing is enabled but
+   * hopefully at some point we will separate the assumption that invoicing
+   * and tax are a package.
+   *
+   * @param array $export
+   */
+  protected function exportExtraTplParams(array &$export): void {
+    $export['isShowTax'] = (bool) Civi::settings()->get('invoicing');
   }
 
 }
