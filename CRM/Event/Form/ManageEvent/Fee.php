@@ -306,7 +306,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
     // form fields of Discount sets
     $defaultOption = [];
-    $_showHide = new CRM_Core_ShowHideBlocks('', '');
+    $_showHide = new CRM_Core_ShowHideBlocks();
 
     for ($i = 1; $i <= self::NUM_DISCOUNT; $i++) {
       //the show hide blocks

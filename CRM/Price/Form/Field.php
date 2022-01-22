@@ -257,7 +257,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     }
 
     // form fields of Custom Option rows
-    $_showHide = new CRM_Core_ShowHideBlocks('', '');
+    $_showHide = new CRM_Core_ShowHideBlocks();
 
     for ($i = 1; $i <= self::NUM_OPTION; $i++) {
 
@@ -440,7 +440,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
         $countemptyrows = 0;
         $publicOptionCount = $_flagOption = $_rowError = 0;
 
-        $_showHide = new CRM_Core_ShowHideBlocks('', '');
+        $_showHide = new CRM_Core_ShowHideBlocks();
         $visibilityOptions = CRM_Price_BAO_PriceFieldValue::buildOptions('visibility_id', 'validate');
 
         for ($index = 1; $index <= self::NUM_OPTION; $index++) {
