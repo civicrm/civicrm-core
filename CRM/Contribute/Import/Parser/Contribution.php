@@ -607,14 +607,12 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * convert it into the same format that we use in QF and BAO object
    *
    * @param array $params
-   *   Associative array of property name/value.
-   *                             pairs to insert in new contact.
+   *   Associative array of property name/value
+   *   pairs to insert in new contact.
    * @param array $values
    *   The reformatted properties that we can use internally.
-   *                            '
-   *
    * @param bool $create
-   * @param null $onDuplicate
+   * @param int $onDuplicate
    *
    * @return array|CRM_Error
    */

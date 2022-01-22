@@ -61,7 +61,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * Build a nested array from hierarchical tags.
    *
    * Supports infinite levels of nesting.
-   * @param null $usedFor
+   *
+   * @param string|null $usedFor
    * @param bool $excludeHidden
    */
   public function buildTree($usedFor = NULL, $excludeHidden = FALSE) {

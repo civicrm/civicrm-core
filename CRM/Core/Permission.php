@@ -335,7 +335,7 @@ class CRM_Core_Permission {
 
   /**
    * @param int $type
-   * @param null $prefix
+   * @param string $prefix
    * @param bool $returnUFGroupIds
    *
    * @return array|string

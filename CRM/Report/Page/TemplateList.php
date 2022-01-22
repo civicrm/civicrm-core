@@ -22,7 +22,7 @@ class CRM_Report_Page_TemplateList extends CRM_Core_Page {
 
   /**
    * @param int $compID
-   * @param null $grouping
+   * @param string|null $grouping
    *
    * @return array
    */

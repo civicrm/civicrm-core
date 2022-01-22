@@ -397,7 +397,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
    * @todo get rid of $recordType param. It's only because 3 separate contact tables
    * are mis-declared as one that we need it.
    *
-   * @param null $recordType deprecated
+   * @param string $recordType deprecated
    *   Parameter to hack around the bad decision made in construct to misrepresent
    *   different tables as the same table.
    */

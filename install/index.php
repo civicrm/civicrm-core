@@ -839,7 +839,7 @@ class InstallRequirements {
   }
 
   /**
-   * @param null $section
+   * @param string|null $section
    */
   public function showTable($section = NULL) {
     if ($section) {
