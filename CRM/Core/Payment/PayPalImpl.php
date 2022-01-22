@@ -695,7 +695,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * Get url for users to manage this recurring contribution for this processor.
    *
    * @param int $entityID
-   * @param null $entity
+   * @param string|null $entity
    * @param string $action
    *
    * @return string|null

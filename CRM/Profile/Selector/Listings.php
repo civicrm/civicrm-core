@@ -181,7 +181,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * @param bool $map
    * @param bool $editLink
    * @param bool $ufLink
-   * @param null $gids
+   * @param int[]|null $gids
    *
    * @return array
    */

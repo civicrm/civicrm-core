@@ -48,7 +48,8 @@ class CRM_Utils_HttpClient {
   }
 
   /**
-   * @param null $connectionTimeout
+   * @param int|null $connectionTimeout
+   *   seconds; or NULL to use system default
    */
   public function __construct($connectionTimeout = NULL) {
     $this->connectionTimeout = $connectionTimeout;

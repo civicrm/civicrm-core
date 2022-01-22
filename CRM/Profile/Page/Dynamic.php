@@ -104,7 +104,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    *
    * @param $restrict
    * @param bool $skipPermission
-   * @param null $profileIds
+   * @param int[]|null $profileIds
    *
    * @param bool $isShowEmailTaskLink
    *

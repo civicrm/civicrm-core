@@ -157,7 +157,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   }
 
   /**
-   * @param null $event_cart
+   * @param CRM_Event_Cart_BAO_Cart|null $event_cart
    */
   public function load_associations($event_cart = NULL) {
     if ($this->assocations_loaded) {

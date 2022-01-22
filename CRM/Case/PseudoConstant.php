@@ -47,8 +47,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the redaction rules.
    *
-   *
-   * @param null $filter
+   * @param int $filter
    *
    * @return array
    *   array reference of all redaction rules

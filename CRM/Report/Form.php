@@ -5221,7 +5221,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *
    * @param string $baseTable
    * @param string $field
-   * @param null $tableAlias
+   * @param string|null $tableAlias
    */
   public function setFromBase($baseTable, $field = 'id', $tableAlias = NULL) {
     if (!$tableAlias) {

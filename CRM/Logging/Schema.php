@@ -924,7 +924,7 @@ COLS;
    * Get trigger info.
    *
    * @param array $info
-   * @param null $tableName
+   * @param string|null $tableName
    * @param bool $force
    */
   public function triggerInfo(&$info, $tableName = NULL, $force = FALSE) {

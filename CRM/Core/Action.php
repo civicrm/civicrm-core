@@ -166,7 +166,7 @@ class CRM_Core_Action {
    *
    * @param array $links
    *   The set of link items.
-   * @param int $mask
+   * @param int|null $mask
    *   The mask to be used. a null mask means all items.
    * @param array $values
    *   The array of values for parameter substitution in the link items.
@@ -311,8 +311,8 @@ class CRM_Core_Action {
    *   The mask to be used. a null mask means all items.
    * @param array $values
    *   The array of values for parameter substitution in the link items.
-   * @param null $op
-   * @param null $objectName
+   * @param string|null $op
+   * @param string|null $objectName
    * @param int $objectId
    *
    * @return array|null

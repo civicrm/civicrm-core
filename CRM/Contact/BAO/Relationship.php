@@ -1862,7 +1862,7 @@ AND cc.sort_name LIKE '%$name%'";
    *
    * @param array $params
    *   Api input array.
-   * @param null $direction
+   * @param string $direction
    *
    * @return array|void
    * @throws \CiviCRM_API3_Exception
