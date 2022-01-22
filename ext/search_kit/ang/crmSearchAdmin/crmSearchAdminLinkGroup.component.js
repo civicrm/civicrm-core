@@ -17,17 +17,10 @@
         ctrl = this,
         linkProps = ['path', 'entity', 'action', 'join', 'target', 'icon', 'text', 'style', 'condition'];
 
-      var permissionOperators = [
+      ctrl.permissionOperators = [
         {key: '=', value: ts('Has')},
         {key: '!=', value: ts('Lacks')}
       ];
-
-      this.getOperators = function(clause) {
-        if (clause[0] === 'check user permission') {
-          return permissionOperators;
-        }
-        return CRM.crmSearchAdmin.operators;
-      };
 
       this.styles = CRM.crmSearchAdmin.styles;
 

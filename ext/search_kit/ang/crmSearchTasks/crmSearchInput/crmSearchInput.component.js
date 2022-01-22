@@ -14,16 +14,6 @@
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
-      this.isMulti = function() {
-        // If there's a search operator, return `true` if the operator takes multiple values, else `false`
-        if (ctrl.op) {
-          return ctrl.op === 'IN' || ctrl.op === 'NOT IN';
-        }
-        // If no search operator this is an input for e.g. the bulk update action
-        // Return `true` if the field is multi-valued, else `null`
-        return ctrl.field && (ctrl.field.serialize || ctrl.field.data_type === 'Array') ? true : null;
-      };
-
       this.$onInit = function() {
 
         $scope.$watch('$ctrl.value', function() {

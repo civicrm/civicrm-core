@@ -1,0 +1,2 @@
+<select class="form-control api4-operator" ng-model="$ctrl.clause[$ctrl.offset]" ng-options="o.key as o.value for o in $ctrl.getOperators()" ng-change="$ctrl.changeClauseOperator()" ></select>
+<crm-search-input ng-if="$ctrl.operatorTakesInput()" ng-model="$ctrl.clause[$ctrl.offset + 1]" field="$ctrl.field" option-key="$ctrl.optionKey" op="$ctrl.clause[$ctrl.offset]" format="$ctrl.format" class="form-group"></crm-search-input>
