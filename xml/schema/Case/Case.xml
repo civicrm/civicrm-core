@@ -153,6 +153,7 @@
     <html>
       <label>Created Date</label>
     </html>
+    <readonly>true</readonly>
     <add>4.7</add>
   </field>
   <field>
