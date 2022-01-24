@@ -4267,7 +4267,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    */
   public function preProcessOrderBy(&$formValues) {
     // Object to show/hide form elements
-    $_showHide = new CRM_Core_ShowHideBlocks('', '');
+    $_showHide = new CRM_Core_ShowHideBlocks();
 
     $_showHide->addShow('optionField_1');
 

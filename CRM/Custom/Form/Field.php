@@ -300,7 +300,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
 
     // form fields of Custom Option rows
     $defaultOption = [];
-    $_showHide = new CRM_Core_ShowHideBlocks('', '');
+    $_showHide = new CRM_Core_ShowHideBlocks();
     for ($i = 1; $i <= self::NUM_OPTION; $i++) {
 
       //the show hide blocks
@@ -626,7 +626,7 @@ SELECT count(*)
      *  Incomplete row checking is also required.
      */
     $_flagOption = $_rowError = 0;
-    $_showHide = new CRM_Core_ShowHideBlocks('', '');
+    $_showHide = new CRM_Core_ShowHideBlocks();
     $htmlType = $fields['html_type'];
 
     if (isset($fields['option_type']) && $fields['option_type'] == 1) {

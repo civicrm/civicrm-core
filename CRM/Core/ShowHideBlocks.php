@@ -33,9 +33,9 @@ class CRM_Core_ShowHideBlocks {
   /**
    * Class constructor.
    *
-   * @param array $show
+   * @param array|null $show
    *   Initial value of show array.
-   * @param array $hide
+   * @param array|null $hide
    *   Initial value of hide array.
    *
    * @return \CRM_Core_ShowHideBlocks the newly created object
