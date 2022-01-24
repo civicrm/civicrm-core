@@ -159,6 +159,7 @@ class CRM_Utils_Mail {
    *   fullPath : complete pathname to the file
    *   mime_type: mime type of the attachment
    *   cleanName: the user friendly name of the attachmment
+   * contactId : contact id to send the email to (optional)
    *
    * @param array $params
    *   (by reference).

@@ -465,7 +465,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
       }
 
       $defaults = [
-        'contact_id' => $contact['id'],
+        'contactId' => $contact['id'],
         'toName' => $contact['display_name'],
         'toEmail' => $contact['email'],
         'text' => '',

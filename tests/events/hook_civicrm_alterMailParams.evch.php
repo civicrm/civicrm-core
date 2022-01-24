@@ -27,6 +27,7 @@ return new class() extends EventCheck implements HookInterface {
     'autoSubmitted' => ['type' => 'bool', 'for' => 'messageTemplate'],
     'Message-ID' => ['type' => 'string', 'for' => ['messageTemplate', 'singleEmail']],
     'messageId' => ['type' => 'string', 'for' => ['messageTemplate', 'singleEmail']],
+    'contactId' => ['type' => 'int|NULL', 'for' => ['messageTemplate' /* deprecated in favor of tokenContext[contactId] */, 'singleEmail']],
 
     // ## Envelope: CiviMail/Flexmailer
 
@@ -49,7 +50,6 @@ return new class() extends EventCheck implements HookInterface {
 
     'tokenContext' => ['type' => 'array', 'for' => 'messageTemplate'],
     'tplParams' => ['type' => 'array', 'for' => 'messageTemplate'],
-    'contactId' => ['type' => 'int|NULL', 'for' => 'messageTemplate' /* deprecated in favor of tokenContext[contactId] */],
     'workflow' => [
       'regex' => '/^([a-zA-Z_]+)$/',
       'type' => 'string',
