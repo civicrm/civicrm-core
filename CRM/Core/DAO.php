@@ -1528,12 +1528,15 @@ LIKE %1
   /**
    * Delete the object records that are associated with this contact.
    *
+   * @deprecated
+   *
    * @param string $daoName
    *   Name of the dao object.
    * @param int $contactId
    *   Id of the contact to delete.
    */
   public static function deleteEntityContact($daoName, $contactId) {
+    CRM_Core_Error::deprecatedFunctionWarning('APIv4');
     $object = new $daoName();
 
     $object->entity_table = 'civicrm_contact';
