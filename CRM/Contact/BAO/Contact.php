@@ -503,6 +503,10 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Te
     $missingGreetingParams = [];
 
     foreach ($allGreetingParams as $greetingIndex => $greetingParam) {
+      // An empty string means NULL
+      if (($params[$greetingParam] ?? NULL) === '') {
+        $params[$greetingParam] = 'null';
+      }
       if (empty($params[$greetingParam])) {
         $missingGreetingParams[$greetingIndex] = $greetingParam;
       }
