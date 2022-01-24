@@ -4,7 +4,7 @@
   angular.module('crmSearchTasks').component('crmSearchInputVal', {
     bindings: {
       field: '<',
-      'multi': '<',
+      'op': '<',
       'optionKey': '<'
     },
     require: {ngModel: 'ngModel'},
@@ -44,6 +44,16 @@
             ctrl.dateType = 'fixed';
           }
         }
+      };
+
+      this.isMulti = function() {
+        // If there's a search operator, return `true` if the operator takes multiple values, else `false`
+        if (ctrl.op) {
+          return ctrl.op === 'IN' || ctrl.op === 'NOT IN';
+        }
+        // If no search operator this is an input for e.g. the bulk update action
+        // Return `true` if the field is multi-valued, else `null`
+        return ctrl.field && (ctrl.field.serialize || ctrl.field.data_type === 'Array') ? true : null;
       };
 
       this.changeDateType = function() {
@@ -88,6 +98,10 @@
       this.getTemplate = function() {
         var field = ctrl.field || {};
 
+        if (_.includes(['LIKE', 'NOT LIKE', 'REGEXP', 'NOT REGEXP'], ctrl.op)) {
+          return '~/crmSearchTasks/crmSearchInput/text.html';
+        }
+
         if (field.input_type === 'Date') {
           return '~/crmSearchTasks/crmSearchInput/date.html';
         }
@@ -100,7 +114,7 @@
           return '~/crmSearchTasks/crmSearchInput/select.html';
         }
 
-        if (field.fk_entity || field.name === 'id') {
+        if ((field.fk_entity || field.name === 'id') && !_.includes(['>', '<', '>=', '<='], ctrl.op)) {
           return '~/crmSearchTasks/crmSearchInput/entityRef.html';
         }
 

@@ -64,7 +64,6 @@
         return !this.item.cssRules || !this.item.cssRules.length || _.last(this.item.cssRules)[1];
       };
 
-      this.operators = CRM.crmSearchAdmin.operators;
     }
   });
 
