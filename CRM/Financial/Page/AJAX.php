@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Batch;
+
 /**
  * This class contains all the function that are called using AJAX
  */
@@ -500,39 +502,51 @@ class CRM_Financial_Page_AJAX {
     CRM_Utils_JSON::output($status);
   }
 
-  public static function getBatchSummary() {
-    $batchID = CRM_Utils_Type::escape($_REQUEST['batchID'], 'String');
-    $params = ['id' => $batchID];
-
-    $batchSummary = self::makeBatchSummary($batchID, $params);
-
-    CRM_Utils_JSON::output($batchSummary);
+  /**
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public static function getBatchSummary(): void {
+    CRM_Utils_JSON::output(self::makeBatchSummary(CRM_Utils_Type::escape($_REQUEST['batchID'], 'Integer')));
   }
 
   /**
-   * Makes an array of the batch's summary and returns array to parent getBatchSummary() function.
+   * Get a summary of the batch..
    *
    * @param $batchID
-   * @param $params
    *
    * @return array
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function makeBatchSummary($batchID, $params) {
-    $batchInfo = CRM_Batch_BAO_Batch::retrieve($params, $value);
+  public static function makeBatchSummary(int $batchID): array {
+    // We use permissions false because the old function did that & we
+    // have not tested to ensure permissions are correct - but ideally
+    // we would setCheckPermissions = TRUE.
+    $batchInfo = Batch::get(FALSE)
+      ->addWhere('id', '=', $batchID)
+      ->addSelect(
+        'description',
+        'item_count',
+        'total',
+        'created_date',
+        'created_id.display_name',
+        'status_id:label',
+        'payment_instrument_id:label'
+      )
+      ->execute()->first();
     $batchTotals = CRM_Batch_BAO_Batch::batchTotals([$batchID]);
-    $batchSummary = [
-      'created_by' => CRM_Contact_BAO_Contact::displayName($batchInfo->created_id),
-      'status' => CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'status_id', $batchInfo->status_id),
-      'description' => $batchInfo->description,
-      'payment_instrument' => CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'payment_instrument_id', $batchInfo->payment_instrument_id),
-      'item_count' => $batchInfo->item_count,
+    return [
+      'created_by' => $batchInfo['created_id.display_name'],
+      'status' => $batchInfo['status_id:label'],
+      'description' => $batchInfo['description'],
+      'payment_instrument' => $batchInfo['payment_instrument_id:label'],
+      'item_count' => $batchInfo['item_count'],
       'assigned_item_count' => $batchTotals[$batchID]['item_count'],
-      'total' => CRM_Utils_Money::format($batchInfo->total),
-      'assigned_total' => CRM_Utils_Money::format($batchTotals[$batchID]['total']),
-      'opened_date' => CRM_Utils_Date::customFormat($batchInfo->created_date),
+      'total' => Civi::format()->money($batchInfo['total']),
+      'assigned_total' => Civi::format()->money($batchTotals[$batchID]['total']),
+      'opened_date' => CRM_Utils_Date::customFormat($batchInfo['created_date']),
     ];
-
-    return $batchSummary;
   }
 
 }

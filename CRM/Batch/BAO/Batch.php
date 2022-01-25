@@ -50,24 +50,21 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Retrieve the information about the batch.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array of criteria values.
+   * @param array|null $defaults
+   *   Array to be populated with found values.
    *
-   * @return CRM_Batch_BAO_Batch|null
-   *   CRM_Batch_BAO_Batch object on success, null otherwise
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $batch = new CRM_Batch_DAO_Batch();
-    $batch->copyValues($params);
-    if ($batch->find(TRUE)) {
-      CRM_Core_DAO::storeValues($batch, $defaults);
-      return $batch;
-    }
-    return NULL;
+  public static function retrieve(array $params, ?array &$defaults = NULL) {
+    $defaults = $defaults ?? [];
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
