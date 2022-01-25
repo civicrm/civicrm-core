@@ -20,7 +20,7 @@
         </div>
         <table class="form-layout">
             <tr>
-               <td class="font-size12pt" colspan="3">
+               <td colspan="3">
                     {$form.sort_name.label}&nbsp;&nbsp;{$form.sort_name.html}&nbsp;&nbsp;&nbsp;{$form.buttons.html}<br />
                </td>
             </tr>

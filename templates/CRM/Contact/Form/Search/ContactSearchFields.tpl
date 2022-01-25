@@ -1,5 +1,5 @@
 <tr>
-  <td class="font-size12pt">
+  <td>
     {$form.sort_name.label}
     <br>
     {$form.sort_name.html|crmAddClass:'twenty'}

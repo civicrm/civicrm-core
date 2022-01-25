@@ -92,7 +92,7 @@ CRM.$(function($) {
   {/if}
   <table class="form-layout">
     <tr>
-      <td class="font-size12pt label"><strong>{ts}Participant{/ts}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
+      <td class="label"><strong>{ts}Participant{/ts}</strong></td><td><strong>{$displayName}</strong></td>
     </tr>
     <tr>
       <td class='label'>{ts}Event{/ts}</td><td>{$eventName}</td>
