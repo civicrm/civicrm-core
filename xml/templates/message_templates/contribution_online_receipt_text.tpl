@@ -14,7 +14,7 @@
 {ts}Contribution Information{/ts}
 
 ===========================================================
-{if $lineItem and $priceSetID and empty($is_quick_config)}
+{if $isShowLineItems}
 {foreach from=$lineItem item=value key=priceset}
 ---------------------------------------------------------
 {capture assign=ts_item}{ts}Item{/ts}{/capture}
@@ -45,13 +45,13 @@
 {/foreach}
 {/if}
 
-{if isset($totalTaxAmount)}
-{ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}
+{if $isShowTax}
+{ts}Total Tax Amount{/ts}: {contribution.tax_amount|crmMoney}
 {/if}
 
 {ts}Total Amount{/ts}: {$amount|crmMoney:$currency}
 {else}
-{ts}Amount{/ts}: {$amount|crmMoney:$currency} {if isset($amount_level) } - {$amount_level} {/if}
+{ts}Amount{/ts}: {$amount|crmMoney:$currency} {if '{contribution.amount_level}'} - {contribution.amount_level}{/if}
 {/if}
 {/if}
 {if !empty($receive_date)}

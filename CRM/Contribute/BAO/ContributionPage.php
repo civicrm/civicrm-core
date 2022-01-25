@@ -415,10 +415,10 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
 
       // use either the contribution or membership receipt, based on whether it’s a membership-related contrib or not
       $sendTemplateParams = [
-        'groupName' => !empty($values['isMembership']) ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
-        'valueName' => !empty($values['isMembership']) ? 'membership_online_receipt' : 'contribution_online_receipt',
+        'workflow' => !empty($values['isMembership']) ? 'membership_online_receipt' : 'contribution_online_receipt',
         'contactId' => $contactID,
         'tplParams' => $tplParams,
+        'tokenContext' => $tplParams['contributionID'] ? ['contributionId' => (int) $tplParams['contributionID'], 'contactId' => $contactID] : ['contactId' => $contactID],
         'isTest' => $isTest,
         'PDFFilename' => 'receipt.pdf',
       ];

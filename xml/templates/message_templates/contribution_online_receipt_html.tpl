@@ -43,7 +43,7 @@
        </th>
       </tr>
 
-      {if !empty($lineItem) and !empty($priceSetID) and empty($is_quick_config)}
+      {if $isShowLineItems}
 
        {foreach from=$lineItem item=value key=priceset}
         <tr>
@@ -119,7 +119,7 @@
         {/foreach}
 
        {/if}
-       {if isset($totalTaxAmount)}
+       {if $isShowTax}
         <tr>
          <td {$labelStyle}>
           {ts}Total Tax{/ts}
@@ -146,7 +146,7 @@
              {ts}Total Tax Amount{/ts}
            </td>
            <td {$valueStyle}>
-             {$totalTaxAmount|crmMoney:$currency}
+             {contribution.tax_amount|crmMoney}
            </td>
          </tr>
        {/if}
@@ -155,7 +155,7 @@
          {ts}Amount{/ts}
         </td>
         <td {$valueStyle}>
-         {$amount|crmMoney:$currency} {if isset($amount_level)} - {$amount_level}{/if}
+         {$amount|crmMoney:$currency} {if '{contribution.amount_level}'} - {contribution.amount_level}{/if}
         </td>
        </tr>
 

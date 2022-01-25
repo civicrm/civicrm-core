@@ -626,6 +626,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   /**
    * Test submit with a membership block in place.
    *
+   * This test uses a quick config price set - which means line items
+   * do not show on the receipts. Separate payments are only supported
+   * with quick config.
+   *
    * We are expecting a separate payment for the membership vs the contribution.
    *
    * @throws \API_Exception
@@ -662,7 +666,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     }
     // The total string is currently absent & it seems worse with - although at some point
     // it may have been intended
-    $mut->checkAllMailLog(['$2.00', 'Contribution Amount', '$88.00'], ['Total:']);
+    $mut->checkAllMailLog(['$2.00', 'Contribution Information', '$88.00'], ['Total:']);
     $mut->stop();
     $mut->clearMessages();
   }
