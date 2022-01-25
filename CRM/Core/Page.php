@@ -124,6 +124,9 @@ class CRM_Core_Page {
     'breadcrumb',
     'pageTitle',
     'isDeleted',
+    // Required for footer.tpl,
+    // See ExampleHookTest:testPageOutput.
+    'footer_status_severity',
   ];
 
   /**
