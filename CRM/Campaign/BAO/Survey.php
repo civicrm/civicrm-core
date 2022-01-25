@@ -21,27 +21,20 @@
 class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey implements Civi\Test\HookInterface {
 
   /**
-   * Retrieve DB object based on input parameters.
-   *
-   * It also stores all the retrieved values in the default array.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Campaign_DAO_Survey|null
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $dao = new CRM_Campaign_DAO_Survey();
-
-    $dao->copyValues($params);
-
-    if ($dao->find(TRUE)) {
-      CRM_Core_DAO::storeValues($dao, $defaults);
-      return $dao;
-    }
-    return NULL;
+  public static function retrieve(array $params, array &$defaults = []) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
