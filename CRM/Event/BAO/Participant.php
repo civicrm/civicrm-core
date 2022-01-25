@@ -1391,6 +1391,9 @@ UPDATE  civicrm_participant
     ) {
       return $mailSent;
     }
+
+    CRM_Event_BAO_Event::setOutputTimeZone($eventDetails);
+
     $toEmail = $contactDetails['email'] ?? NULL;
     if ($toEmail) {
 

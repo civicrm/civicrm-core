@@ -38,6 +38,10 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
       "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Relationship last modified.'"
     );
     $this->addTask('Set initial value for relationship created_date and modified_date to start_date', 'updateRelationshipDates');
+    $this->addTask('core-issue#2122 - Add timezone column to Events', 'addColumn',
+      'civicrm_event', 'event_tz', "text NULL DEFAULT NULL COMMENT 'Event\'s native time zone'"
+    );
+    $this->addTask('core-issue#2122 - Set the timezone to the default for existing Events', 'setEventTZDefault');
   }
 
   /**
@@ -295,6 +299,19 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
         }
       }
     }
+    return TRUE;
+  }
+
+  /**
+   * Set the timezone to the default for existing Events.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @return bool
+   */
+  public static function setEventTZDefault(CRM_Queue_TaskContext $ctx) {
+    // Set default for CiviCRM Events to user system timezone (most reasonable default);
+    $defaultTZ = CRM_Core_Config::singleton()->userSystem->getTimeZoneString();
+    CRM_Core_DAO::executeQuery('UPDATE `civicrm_event` SET `event_tz` = %1 WHERE `event_tz` IS NULL;', [1 => [$defaultTZ, 'String']]);
     return TRUE;
   }
 

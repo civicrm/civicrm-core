@@ -30,13 +30,15 @@
         <td><a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.event_id`"}" title="{ts}read more{/ts}"><strong>{$event.title}</strong></a></td>
         <td>{if $event.summary}{$event.summary|purify} (<a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.event_id`"}" title="{ts}details...{/ts}">{ts}read more{/ts}...</a>){else}&nbsp;{/if}</td>
         <td class="nowrap" data-order="{$event.start_date|crmDate:'%Y-%m-%d'}">
-          {if $event.start_date}{$event.start_date|crmDate}{if $event.end_date}<br /><em>{ts}through{/ts}</em><br />{strip}
+          {if $event.start_date}<time datetime="{$event.start_date_utc|date_format:"%Y-%m-%dT%H:%M:%S"}Z">{$event.start_date|crmDate}{if !$event.end_date}<span class="timezone"> {$event.tz}</span>{/if}</time>{if $event.end_date}<br /><em>{ts}through{/ts}</em><br /><time datetime="{$event.end_date_utc|date_format:"%Y-%m-%dT%H:%M:%S"}Z">{strip}
             {* Only show end time if end date = start date *}
             {if $event.end_date|date_format:"%Y%m%d" == $event.start_date|date_format:"%Y%m%d"}
-              {$event.end_date|crmDate:0:1}
+                {$event.end_date|crmDate:0:1}
             {else}
-              {$event.end_date|crmDate}
-            {/if}{/strip}{/if}
+                {$event.end_date|crmDate}
+            {/if}
+          {/strip}<span class="timezone"> {$event.tz}</span></time>
+{/if}
           {else}{ts}(not available){/ts}{/if}
         </td>
         <td>{if $event.is_show_location EQ 1 AND $event.location}{$event.location}{else}{ts}(not available){/ts}{/if}</td>

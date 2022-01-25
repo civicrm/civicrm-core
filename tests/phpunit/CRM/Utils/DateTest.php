@@ -324,4 +324,26 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test timezone conversion function
+   */
+  public function testConvertTimeZone() {
+    $tests = [
+      [['1970-01-01 00:00:00', 'Atlantic/Azores', 'UTC'], '1969-12-31 23:00:00'],
+      [['1970-01-01 00:00:00', 'Europe/Berlin'], '1970-01-01 01:00:00'],
+      [['2022-06-22 12:00:00', 'Atlantic/Azores'], '2022-06-22 12:00:00'],
+      [['2022-06-22 12:00:00', 'Europe/Berlin', 'UTC'], '2022-06-22 14:00:00'],
+      [['2022-06-22 12:00:00', 'Europe/Berlin', 'Australia/Sydney'], '2022-06-22 04:00:00'],
+    ];
+
+    foreach ($tests as $i => [$params, $result]) {
+      $this->assertEquals($result, CRM_Utils_Date::convertTimeZone(...$params), "convertTimeZone $i");
+    }
+
+    //0000-00-00 00:00:00 is not an actual time, so we should expect an exception.
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessageMatches('{^Failed to parse date}');
+    CRM_Utils_Date::convertTimeZone('0000-00-00 00:00:00', 'Europe/Berlin');
+  }
+
 }
