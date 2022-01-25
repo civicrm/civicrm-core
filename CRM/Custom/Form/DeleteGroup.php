@@ -41,7 +41,7 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
    * @access protected
    */
   public function preProcess() {
-    $this->_id = $this->get('id');
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
 
     $defaults = [];
     $params = ['id' => $this->_id];

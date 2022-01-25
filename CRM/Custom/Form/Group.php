@@ -51,25 +51,16 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     Civi::resources()->addScriptFile('civicrm', 'js/jquery/jquery.crmIconPicker.js');
 
     // current set id
-    $this->_id = $this->get('id');
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->setAction($this->_id ? CRM_Core_Action::UPDATE : CRM_Core_Action::ADD);
 
-    if ($this->_id && $isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_id, 'is_reserved', 'id')) {
+    if ($this->_id && CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_id, 'is_reserved', 'id')) {
       CRM_Core_Error::statusBounce("You cannot edit the settings of a reserved custom field-set.");
     }
-    // setting title for html page
-    if ($this->_action == CRM_Core_Action::UPDATE) {
+
+    if ($this->_id) {
       $title = CRM_Core_BAO_CustomGroup::getTitle($this->_id);
       $this->setTitle(ts('Edit %1', [1 => $title]));
-    }
-    elseif ($this->_action == CRM_Core_Action::VIEW) {
-      $title = CRM_Core_BAO_CustomGroup::getTitle($this->_id);
-      $this->setTitle(ts('Preview %1', [1 => $title]));
-    }
-    else {
-      $this->setTitle(ts('New Custom Field Set'));
-    }
-
-    if (isset($this->_id)) {
       $params = ['id' => $this->_id];
       CRM_Core_BAO_CustomGroup::retrieve($params, $this->_defaults);
 
@@ -77,6 +68,9 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       if (!empty($subExtends)) {
         $this->_subtypes = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($subExtends, 1, -1));
       }
+    }
+    else {
+      $this->setTitle(ts('New Custom Field Set'));
     }
   }
 
@@ -405,7 +399,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     else {
       // Jump directly to adding a field if popups are disabled
       $action = CRM_Core_Resources::singleton()->ajaxPopupsEnabled ? '' : '/add';
-      $url = CRM_Utils_System::url("civicrm/admin/custom/group/field$action", 'reset=1&new=1&gid=' . $group['id'] . '&action=' . ($action ? 'add' : 'browse'));
+      $url = CRM_Utils_System::url("civicrm/admin/custom/group/field$action", 'reset=1&new=1&gid=' . $group['id']);
       CRM_Core_Session::setStatus(ts("Your custom field set '%1' has been added. You can add custom fields now.",
         [1 => $group['title']]
       ), ts('Saved'), 'success');

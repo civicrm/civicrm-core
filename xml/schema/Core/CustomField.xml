@@ -11,8 +11,8 @@
   <paths>
     <add>civicrm/admin/custom/group/field/add?reset=1&amp;action=add&amp;gid=[custom_group_id]</add>
     <update>civicrm/admin/custom/group/field/update?action=update&amp;reset=1&amp;id=[id]&amp;gid=[custom_group_id]</update>
-    <preview>civicrm/admin/custom/group/field?action=preview&amp;reset=1&amp;id=[id]&amp;gid=[custom_group_id]</preview>
-    <delete>civicrm/admin/custom/group/field?action=delete&amp;reset=1&amp;id=[id]&amp;gid=[custom_group_id]</delete>
+    <preview>civicrm/admin/custom/group/preview&amp;reset=1&amp;fid=[id]</preview>
+    <delete>civicrm/admin/custom/group/field/delete?reset=1&amp;id=[id]</delete>
     <move>civicrm/admin/custom/group/field/move?reset=1&amp;fid=[id]</move>
   </paths>
   <field>

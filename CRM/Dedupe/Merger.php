@@ -102,7 +102,7 @@ class CRM_Dedupe_Merger {
         'rel_table_custom_groups' => [
           'title' => ts('Custom Groups'),
           'tables' => ['civicrm_custom_group'],
-          'url' => CRM_Utils_System::url('civicrm/admin/custom/group', 'reset=1'),
+          'url' => CRM_Utils_System::url('civicrm/admin/custom/group'),
         ],
         'rel_table_uf_groups' => [
           'title' => ts('Profiles'),

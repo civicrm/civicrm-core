@@ -25,12 +25,12 @@
   {ts}Display Style{/ts}
 {/htxt}
 {htxt id="id-display_style"}
-    {ts}Select 'Inline' to include this set of fields in the main contact Add/Edit form and Contact Summary screens. Select 'Tab' or 'Tab with Table' to create a separate navigation tab for display and editing these values (generally for less frequently accessed and/or larger sets of fields). 'Tab with Table' is recommended for customs data sets which allow multiple records.{/ts} 
+    {ts}Select 'Inline' to include this set of fields in the main contact Add/Edit form and Contact Summary screens. Select 'Tab' or 'Tab with Table' to create a separate navigation tab for display and editing these values (generally for less frequently accessed and/or larger sets of fields). 'Tab with Table' is recommended for customs data sets which allow multiple records.{/ts}
     <p class="font-italic">{ts}NOTE: This setting applies only to custom sets used for Contact records (e.g. Individuals, Households, Organizations, or ALL contact types).{/ts}</p>
 {/htxt}
 
 {htxt id="id-extends-title"}
-  {ts}Entity Type{/ts}
+  {ts}Used For{/ts}
 {/htxt}
 {htxt id="id-extends"}
     {ts}Select the type of record that this set of custom fields is applicable for. You can configure custom data for a specific type of contact (e.g. Individuals but NOT Organizations), ANY type of contact, or other record types such as activities, contributions, memberships and event participants.{/ts}
@@ -64,7 +64,7 @@
 {/htxt}
 
 {htxt id="id-weight-title"}
-  {ts}Weight{/ts}
+  {ts}Order{/ts}
 {/htxt}
 {htxt id="id-weight"}
     {ts}Weight controls the order in which custom field sets are presented when there are more than one. Enter a positive or negative integer - lower numbers are displayed ahead of higher numbers.{/ts}
