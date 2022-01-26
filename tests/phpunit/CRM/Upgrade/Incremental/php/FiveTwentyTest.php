@@ -919,8 +919,8 @@ ENDXMLDIFFNAMEEXPECTED;
   /**
    * Helper to add a case type to the database.
    *
-   * @param $name string
-   * @param $xml string
+   * @param string $name
+   * @param string $xml
    *
    * @return int
    */

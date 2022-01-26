@@ -25,9 +25,12 @@ if (!isVersionValid($oldVersion)) {
   fatal("failed to read old version from \"xml/version.xml\"\n");
 }
 
-/** @var string $newVersion */
-/** @var bool $doCommit */
-/** @var bool $doSql */
+/**
+ * @var string $newVersion */
+/**
+ * @var bool $doCommit */
+/**
+ * @var bool $doSql */
 extract(parseArgs($argv));
 
 if (!isVersionValid($newVersion)) {
@@ -80,7 +83,7 @@ $infoXmls = findCoreInfoXml();
 foreach ($infoXmls as $infoXml) {
   updateXmlFile($infoXml, function (DOMDocument $dom) use ($newVersion) {
     foreach ($dom->getElementsByTagName('version') as $tag) {
-      /** @var \DOMNode $tag */
+      /* @var \DOMNode $tag */
       $tag->textContent = $newVersion;
     }
   });
@@ -188,10 +191,10 @@ function fatal($error) {
 }
 
 /**
-* @param array $argv
+ * @param array $argv
  *  Ex: ['myscript.php', '--no-commit', '5.6.7']
  * @return array
- *  Ex: ['scriptFile' => 'myscript.php', 'doCommit' => FALSE, 'newVersion' => '5.6.7']
+ *   Ex: ['scriptFile' => 'myscript.php', 'doCommit' => FALSE, 'newVersion' => '5.6.7']
  */
 function parseArgs($argv) {
   $parsed = [];
