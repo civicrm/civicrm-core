@@ -3141,6 +3141,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * If passed in it will override the default from contribution page.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testCompleteTransactionWithEmailReceiptInputTrue(): void {
@@ -3150,15 +3151,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     // Create a Contribution Page with is_email_receipt = FALSE
     $contributionPageID = $this->createQuickConfigContributionPage($contributionPageParams);
     $this->_params['contribution_page_id'] = $contributionPageID;
-    $params = array_merge($this->_params, ['contribution_status_id' => 2, 'receipt_date' => 'now']);
-    $contribution = $this->callAPISuccess('contribution', 'create', $params);
-    // Complete the transaction overriding is_email_receipt to = TRUE
-    $this->callAPISuccess('contribution', 'completetransaction', [
+    $params = array_merge($this->_params, ['contribution_status_id' => 2, 'receipt_date' => 'now', 'amount_level' => 'amount entered']);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params);
+    // Complete the transaction overriding is_email_receipt to = TRUE.
+    $this->callAPISuccess('Contribution', 'completetransaction', [
       'id' => $contribution['id'],
       'is_email_receipt' => 1,
     ]);
     $mut->checkMailLog([
       'Contribution Information',
+      'amount entered',
     ]);
     $mut->stop();
   }

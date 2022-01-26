@@ -29,6 +29,53 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
   public $isShowTax;
 
   /**
+   * @var CRM_Financial_BAO_Order
+   */
+  private $order;
+
+  /**
+   * Get order, if available.
+   *
+   * The order is used within the class to calculate line items etc.
+   *
+   * @return \CRM_Financial_BAO_Order|null
+   */
+  private function getOrder(): ?CRM_Financial_BAO_Order {
+    if ($this->contributionId) {
+      $this->order = new CRM_Financial_BAO_Order();
+      $this->order->setTemplateContributionID($this->contributionId);
+    }
+    return $this->order;
+  }
+
+  /**
+   * Should line items be displayed for the contribution.
+   *
+   * This determination is based on whether the price set is quick config.
+   *
+   * @var bool
+   *
+   * @scope tplParams
+   */
+  public $isShowLineItems;
+
+  /**
+   * Get bool for whether a line item breakdown be displayed.
+   *
+   * @return bool
+   */
+  public function getIsShowLineItems(): bool {
+    $order = $this->getOrder();
+    if (!$order) {
+      // This would only be the case transitionally.
+      // Since this is a trait it is used by templates which don't (yet)
+      // always have the contribution ID available as well as migrated ones.
+      return FALSE;
+    }
+    return $this->order->getPriceSetMetadata()['is_quick_config'];
+  }
+
+  /**
    * Set contribution object.
    *
    * @param array $contribution
