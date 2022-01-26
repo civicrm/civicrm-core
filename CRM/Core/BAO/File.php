@@ -496,8 +496,9 @@ AND       CEF.entity_id    = %2";
   }
 
   /**
-   * Return a clean url string and the number of attachment for a
-   * given entityTable, entityID
+   * Return a HTML string, separated by $separator,
+   * where each item is an anchor link to the file,
+   * with the filename as the link text.
    *
    * @param string $entityTable
    *   The entityTable to which the file is attached.
@@ -506,8 +507,8 @@ AND       CEF.entity_id    = %2";
    * @param string $separator
    *   The string separator where to implode the urls.
    *
-   * @return array
-   *   An array with 2 elements. The string and the number of attachments
+   * @return string|null
+   *   HTML list of attachment links, or null if no attachments
    */
   public static function attachmentInfo($entityTable, $entityID, $separator = '<br />') {
     if (!$entityID) {
