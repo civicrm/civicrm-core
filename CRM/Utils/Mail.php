@@ -184,13 +184,19 @@ class CRM_Utils_Mail {
       return FALSE;
     }
 
-    $textMessage = $params['text'] ?? NULL;
-    $htmlMessage = $params['html'] ?? NULL;
-    $attachments = $params['attachments'] ?? NULL;
-
-    // CRM-6224
-    if (trim(CRM_Utils_String::htmlToText($htmlMessage)) == '') {
+    $htmlMessage = $params['html'] ?? FALSE;
+    if (trim(CRM_Utils_String::htmlToText((string) $htmlMessage)) === '') {
       $htmlMessage = FALSE;
+    }
+    $attachments = $params['attachments'] ?? NULL;
+    if (!empty($params['text'])) {
+      $textMessage = $params['text'];
+    }
+    else {
+      $textMessage = CRM_Utils_String::htmlToText($htmlMessage);
+      // Render the &amp; entities in text mode, so that the links work.
+      // This is copied from the Action Schedule send code.
+      $textMessage = str_replace('&amp;', '&', $textMessage);
     }
 
     $headers = [];

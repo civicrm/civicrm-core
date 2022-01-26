@@ -2356,8 +2356,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->assertEquals('reportperson@example.com', $message->to[0]->email);
 
     $parts = $message->fetchParts(NULL, TRUE);
-    $this->assertCount(1, $parts);
-    $this->assertStringContainsString('test report', $parts[0]->text);
+    $this->assertCount(2, $parts);
+    $this->assertStringContainsString('test report', $parts[1]->text);
 
     $mut->clearMessages();
     $mut->stop();
@@ -2370,7 +2370,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * format it's a little difficult to parse out, so we're just testing that
    * the email was sent and it more or less looks like an email we'd expect.
    *
-   * @throws \CRM_Core_Exception
    * @throws \CRM_Core_Exception
    */
   public function testMailReportForPdf(): void {
@@ -2392,12 +2391,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->assertEquals('reportperson@example.com', $message->to[0]->email);
 
     $parts = $message->fetchParts(NULL, TRUE);
-    $this->assertCount(2, $parts);
-    $this->assertStringContainsString('<title>CiviCRM Report</title>', $parts[0]->text);
-    $this->assertEquals(ezcMailFilePart::CONTENT_TYPE_APPLICATION, $parts[1]->contentType);
-    $this->assertEquals('pdf', $parts[1]->mimeType);
-    $this->assertEquals(ezcMailFilePart::DISPLAY_ATTACHMENT, $parts[1]->dispositionType);
-    $this->assertGreaterThan(0, filesize($parts[1]->fileName));
+    $this->assertCount(3, $parts);
+    $this->assertStringContainsString('<title>CiviCRM Report</title>', $parts[1]->text);
+    $this->assertEquals(ezcMailFilePart::CONTENT_TYPE_APPLICATION, $parts[2]->contentType);
+    $this->assertEquals('pdf', $parts[2]->mimeType);
+    $this->assertEquals(ezcMailFilePart::DISPLAY_ATTACHMENT, $parts[2]->dispositionType);
+    $this->assertGreaterThan(0, filesize($parts[2]->fileName));
 
     $mut->clearMessages();
     $mut->stop();
@@ -2411,7 +2410,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * but since it's csv we can easily check the output.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMailReportForCsv(): void {
     // Create many contacts, in particular so that the report would be more
@@ -2438,9 +2436,9 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->assertEquals('reportperson@example.com', $message->to[0]->email);
 
     $parts = $message->fetchParts(NULL, TRUE);
-    $this->assertCount(2, $parts);
-    $this->assertStringContainsString('<title>CiviCRM Report</title>', $parts[0]->text);
-    $this->assertEquals('csv', $parts[1]->subType);
+    $this->assertCount(3, $parts);
+    $this->assertStringContainsString('<title>CiviCRM Report</title>', $parts[1]->text);
+    $this->assertEquals('csv', $parts[2]->subType);
 
     // Pull all the contacts to get our expected output.
     $contacts = $this->callAPISuccess('Contact', 'get', [
@@ -2465,7 +2463,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
     $this->assertEquals(
       CRM_Report_Utils_Report::makeCsv($fakeForm, $rows),
-      $parts[1]->text
+      $parts[2]->text
     );
 
     $mut->clearMessages();
@@ -2474,8 +2472,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Helper to create a report instance of the contact summary report.
-   *
-   * @throws \CRM_Core_Exception
    */
   private function createReportInstance() {
     return $this->callAPISuccess('ReportInstance', 'create', [
