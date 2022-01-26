@@ -59,7 +59,9 @@ class CRM_Core_Page {
    * Are we in print mode? if so we need to modify the display
    * functionality to do a minimal display :)
    *
-   * @var bool
+   * @var int|string
+   *   Should match a CRM_Core_Smarty::PRINT_* constant,
+   *   or equal 0 if not in print mode
    */
   protected $_print = FALSE;
 
@@ -218,10 +220,10 @@ class CRM_Core_Page {
       //its time to call the hook.
       CRM_Utils_Hook::alterContent($content, 'page', $pageTemplateFile, $this);
 
-      if ($this->_print == CRM_Core_Smarty::PRINT_PDF) {
+      if ($this->_print === CRM_Core_Smarty::PRINT_PDF) {
         CRM_Utils_PDF_Utils::html2pdf($content, "{$this->_name}.pdf", FALSE);
       }
-      elseif ($this->_print == CRM_Core_Smarty::PRINT_JSON) {
+      elseif ($this->_print === CRM_Core_Smarty::PRINT_JSON) {
         $this->ajaxResponse['content'] = $content;
         CRM_Core_Page_AJAX::returnJsonResponse($this->ajaxResponse);
       }
@@ -389,7 +391,11 @@ class CRM_Core_Page {
   /**
    * Setter for print.
    *
-   * @param bool $print
+   * @param int|string $print
+   *   Should match a CRM_Core_Smarty::PRINT_* constant,
+   *   or equal 0 if not in print mode
+   *
+   * @return void
    */
   public function setPrint($print) {
     $this->_print = $print;
@@ -398,8 +404,9 @@ class CRM_Core_Page {
   /**
    * Getter for print.
    *
-   * @return bool
-   *   return the print value
+   * @return int|string
+   *   Value matching a CRM_Core_Smarty::PRINT_* constant,
+   *   or 0 if not in print mode
    */
   public function getPrint() {
     return $this->_print;
