@@ -22,7 +22,7 @@ namespace Civi\Api4;
  */
 class EntityFinancialTrxn extends Generic\DAOEntity {
   use Generic\Traits\EntityBridge;
-  use Generic\Traits\ReadOnly;
+  use Generic\Traits\ReadOnlyEntity;
 
   /**
    * @return array
