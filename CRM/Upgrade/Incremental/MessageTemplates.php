@@ -315,7 +315,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
         ],
       ],
       [
-        'version' => '5.45.alpha1',
+        'version' => '5.47.alpha1',
         'upgrade_descriptor' => ts('Add time zone to Event dates'),
         'templates' => [
           ['name' => 'event_online_receipt', 'type' => 'html'],
