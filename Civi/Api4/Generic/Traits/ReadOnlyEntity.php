@@ -14,7 +14,7 @@ namespace Civi\Api4\Generic\Traits;
 /**
  * Trait for Entities not intended to be publicly writable.
  */
-trait ReadOnly {
+trait ReadOnlyEntity {
 
   /**
    * Not intended to be used outside CiviCRM core code.

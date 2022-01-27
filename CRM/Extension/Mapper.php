@@ -441,7 +441,7 @@ class CRM_Extension_Mapper {
   }
 
   /**
-   * @return array
+   * @return CRM_Extension_Info[]
    *   Ex: $result['org.civicrm.foobar'] = new CRM_Extension_Info(...).
    * @throws \CRM_Extension_Exception
    * @throws \Exception

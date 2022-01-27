@@ -517,7 +517,7 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
    * @return bool
    */
   protected function isReadOnly($entityClass) {
-    return in_array('ReadOnly', $entityClass::getInfo()['type'], TRUE);
+    return in_array('ReadOnlyEntity', $entityClass::getInfo()['type'], TRUE);
   }
 
   /**
