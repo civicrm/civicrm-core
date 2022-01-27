@@ -41,11 +41,31 @@ abstract class WorkflowMessageExample implements ExampleDataInterface {
   protected $wfName;
 
   /**
+   * Set the workflow name.
+   *
+   * The workflow name is the value in civicrm_message_template.workflow.
+   *
+   * @param string $workflowName
+   */
+  public function setWorkflowName(string $workflowName): void {
+    $this->wfName = $workflowName;
+  }
+
+  /**
    * Name for this example specifically.
    *
    * @var string
    */
   protected $exName;
+
+  /**
+   * Get the example name.
+   *
+   * @return string
+   */
+  public function getExampleName(): string {
+    return $this->exName;
+  }
 
   /**
    * WorkflowMessageExample constructor.
