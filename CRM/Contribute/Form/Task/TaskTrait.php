@@ -143,7 +143,7 @@ trait CRM_Contribute_Form_Task_TaskTrait {
   /**
    * Is only one entity being processed?
    *
-   * @return false
+   * @return bool
    */
   public function isSingle() {
     return count($this->getIDs()) === 1;
