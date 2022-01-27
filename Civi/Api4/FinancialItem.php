@@ -22,6 +22,6 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class FinancialItem extends Generic\DAOEntity {
-  use Generic\Traits\ReadOnly;
+  use Generic\Traits\ReadOnlyEntity;
 
 }
