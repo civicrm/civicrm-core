@@ -608,6 +608,21 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     sort($keys);
     $updates = $errors = $okextensions = [];
 
+    $extPrettyLabel = function($key) use ($mapper) {
+      // We definitely know a $key, but we may not have a $label.
+      // Which is too bad - because it would be nicer if $label could be the reliable start of the string.
+      $keyFmt = '<code>' . htmlentities($key) . '</code>';
+      try {
+        $info = $mapper->keyToInfo($key);
+        if ($info->label) {
+          return sprintf('"<em>%s</em>" (%s)', htmlentities($info->label), $keyFmt);
+        }
+      }
+      catch (CRM_Extension_Exception $ex) {
+        return "($keyFmt)";
+      }
+    };
+
     foreach ($keys as $key) {
       try {
         $obj = $mapper->keyToInfo($key);
@@ -619,12 +634,18 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       $row = CRM_Admin_Page_Extensions::createExtendedInfo($obj);
       switch ($row['status']) {
         case CRM_Extension_Manager::STATUS_INSTALLED_MISSING:
-          $errors[] = ts('%1 extension (%2) is installed but missing files.', [1 => $row['label'] ?? NULL, 2 => $key]);
+          $errors[] = ts('%1 is installed but missing files.', [1 => $extPrettyLabel($key)]);
           break;
 
         case CRM_Extension_Manager::STATUS_INSTALLED:
-          if (!empty($row['requires']) && array_diff($row['requires'], $enabled)) {
-            $errors[] = ts('%1 extension depends on %2, which is not enabled.', [1 => $row['label'] ?? $key, 2 => implode(', ', array_diff($row['requires'], $enabled))]);
+          $missingRequirements = array_diff($row['requires'], $enabled);
+          if (!empty($row['requires']) && $missingRequirements) {
+            $errors[] = ts('%1 has a missing dependency on %2', [
+              1 => $extPrettyLabel($key),
+              2 => implode(', ', array_map($extPrettyLabel, $missingRequirements)),
+              'plural' => '%1 has missing dependencies: %2',
+              'count' => count($missingRequirements),
+            ]);
           }
           elseif (!empty($remotes[$key]) && version_compare($row['version'], $remotes[$key]->version, '<')) {
             $updates[] = $row['label'] . ': ' . $mapper->getUpgradeLink($remotes[$key], $row);
@@ -659,8 +680,15 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     if ($errors) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__ . 'Error',
-        '<ul><li>' . implode('</li><li>', $errors) . '</li></ul>',
-        ts('Extension Error'),
+          ts('There is one extension error:', [
+            'count' => count($errors),
+            'plural' => 'There are %count extension errors:',
+          ])
+          . '<ul><li>' . implode('</li><li>', $errors) . '</li></ul>'
+          . ts('To resolve any errors, go to <a %1>Manage Extensions</a>.', [
+            1 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1') . '"',
+          ]),
+        ts('Extension Error', ['count' => count($errors), 'plural' => 'Extension Errors']),
         \Psr\Log\LogLevel::ERROR,
         'fa-plug'
       );
