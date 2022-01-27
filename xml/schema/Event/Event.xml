@@ -909,7 +909,7 @@
     <title>Event Time Zone</title>
     <import>true</import>
     <comment>Event's native time zone</comment>
-    <add>5.43</add>
+    <add>5.47</add>
     <default>NULL</default>
     <html>
       <type>Select</type>
