@@ -156,7 +156,7 @@ class PseudoconstantTest extends BaseCustomValueTest {
     ];
 
     CustomGroup::create(FALSE)
-      ->addValue('name', 'myPseudoconstantTest')
+      ->addValue('title', 'myPseudoconstantTest')
       ->addValue('extends', 'Individual')
       ->addChain('field1', CustomField::create()
         ->addValue('custom_group_id', '$id')

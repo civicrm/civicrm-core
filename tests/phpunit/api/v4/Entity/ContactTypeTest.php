@@ -143,4 +143,18 @@ class ContactTypeTest extends UnitTestCase implements TransactionalInterface {
 
   }
 
+  public function testSaveContactWithImpliedType(): void {
+    // Ensure pseudoconstant suffix works
+    $result = Contact::create(FALSE)
+      ->addValue('contact_type:name', 'Household')
+      ->execute()->first();
+    $this->assertEquals('Household', $result['contact_type']);
+
+    // Contact type should be inferred by the type of name given
+    $result = Contact::save(FALSE)
+      ->addRecord(['organization_name' => 'Foo'])
+      ->execute()->first();
+    $this->assertEquals('Organization', $result['contact_type']);
+  }
+
 }

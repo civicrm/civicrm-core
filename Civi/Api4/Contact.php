@@ -28,6 +28,15 @@ class Contact extends Generic\DAOEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return Action\Contact\Create
+   */
+  public static function create($checkPermissions = TRUE) {
+    return (new Action\Contact\Create(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return Action\Contact\Update
    */
   public static function update($checkPermissions = TRUE) {

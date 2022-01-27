@@ -33,7 +33,7 @@ class CreateCustomValueTest extends BaseCustomValueTest {
     $optionValues = ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'];
 
     $customGroup = CustomGroup::create(FALSE)
-      ->addValue('name', 'MyContactFields')
+      ->addValue('title', 'MyContactFields')
       ->addValue('extends', 'Contact')
       ->execute()
       ->first();

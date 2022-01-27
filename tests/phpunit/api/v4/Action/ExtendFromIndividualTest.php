@@ -31,7 +31,7 @@ class ExtendFromIndividualTest extends BaseCustomValueTest {
   public function testGetWithNonStandardExtends() {
 
     $customGroup = CustomGroup::create(FALSE)
-      ->addValue('name', 'MyContactFields')
+      ->addValue('title', 'MyContactFields')
       // not Contact
       ->addValue('extends', 'Individual')
       ->execute()

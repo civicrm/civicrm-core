@@ -10,19 +10,12 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\Api4\Event\Subscriber;
+namespace Civi\Api4\Action\CustomField;
 
-use Civi\Api4\Generic\AbstractAction;
-
-class ContributionPreSaveSubscriber extends Generic\PreSaveSubscriber {
-
-  public function modify(&$record, AbstractAction $request) {
-    // Required by Contribution BAO
-    $record['skipCleanMoney'] = TRUE;
-  }
-
-  public function applies(AbstractAction $request) {
-    return $request->getEntityName() === 'Contribution';
-  }
+/**
+ * @inheritDoc
+ */
+class Update extends \Civi\Api4\Generic\DAOUpdateAction {
+  use CustomFieldSaveTrait;
 
 }

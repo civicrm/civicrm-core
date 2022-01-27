@@ -20,14 +20,8 @@ class ContactCreationSpecProvider implements Generic\SpecProviderInterface {
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    */
   public function modifySpec(RequestSpec $spec) {
-    $contactTypeField = $spec->getFieldByName('contact_type');
-    if ($contactTypeField) {
-      $contactTypeField->setDefaultValue('Individual');
-    }
-
     $spec->getFieldByName('is_opt_out')->setRequired(FALSE);
     $spec->getFieldByName('is_deleted')->setRequired(FALSE);
-
   }
 
   /**

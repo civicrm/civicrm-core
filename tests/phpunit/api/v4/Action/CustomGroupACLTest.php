@@ -44,7 +44,7 @@ class CustomGroupACLTest extends BaseCustomValueTest {
 
     foreach ($groups as $name => $access) {
       $singleGroup = CustomGroup::create(FALSE)
-        ->addValue('name', 'My' . ucfirst($name) . 'Single')
+        ->addValue('title', 'My' . ucfirst($name) . 'Single')
         ->addValue('extends', 'Individual')
         ->addChain('field', CustomField::create()
           ->addValue('label', 'MyField')
@@ -53,7 +53,7 @@ class CustomGroupACLTest extends BaseCustomValueTest {
         ->execute()->single();
       $v3['single'][$name] = 'custom_' . $singleGroup['field']['id'];
       $multiGroup = CustomGroup::create(FALSE)
-        ->addValue('name', 'My' . ucfirst($name) . 'Multi')
+        ->addValue('title', 'My' . ucfirst($name) . 'Multi')
         ->addValue('extends', 'Individual')
         ->addValue('is_multiple', TRUE)
         ->addChain('field', CustomField::create()
