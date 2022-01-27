@@ -464,8 +464,8 @@ WHERE  civicrm_pledge.id = %2
    *
    * @param array $params
    *
-   * @return array
-   *   Next scheduled date as an array
+   * @return string
+   *   Next scheduled date in the format YmdHis
    */
   public static function calculateBaseScheduleDate(&$params) {
     $date = [];
