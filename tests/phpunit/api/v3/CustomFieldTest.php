@@ -203,7 +203,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $optionGroup = $this->callAPISuccess('option_group', 'getsingle', [
       'id' => $optionGroupID,
     ]);
-    $this->assertEquals('Country', $optionGroup['title']);
+    $this->assertEquals('select_test_group :: Country', $optionGroup['title']);
     $optionValueCount = $this->callAPISuccess('option_value', 'getcount', [
       'option_group_id' => $optionGroupID,
     ]);

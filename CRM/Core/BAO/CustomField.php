@@ -2028,14 +2028,13 @@ WHERE  id IN ( %1, %2 )
         )
       ) {
         // first create an option group for this custom group
-        $optionGroup = new CRM_Core_DAO_OptionGroup();
-        $optionGroup->name = "{$params['column_name']}_" . date('YmdHis');
-        $optionGroup->title = $params['label'];
-        $optionGroup->is_active = 1;
-        // Don't set reserved as it's not a built-in option group and may be useful for other custom fields.
-        $optionGroup->is_reserved = 0;
-        $optionGroup->data_type = $dataType;
-        $optionGroup->save();
+        $customGroupTitle = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $params['custom_group_id'], 'title');
+        $optionGroup = CRM_Core_DAO_OptionGroup::writeRecord([
+          'title' => "$customGroupTitle :: {$params['label']}",
+          // Don't set reserved as it's not a built-in option group and may be useful for other custom fields.
+          'is_reserved' => 0,
+          'data_type' => $dataType,
+        ]);
         $params['option_group_id'] = $optionGroup->id;
         if (!empty($params['option_value']) && is_array($params['option_value'])) {
           foreach ($params['option_value'] as $k => $v) {

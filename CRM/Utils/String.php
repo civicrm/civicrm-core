@@ -43,12 +43,14 @@ class CRM_Utils_String {
   public static function titleToVar($title, $maxLength = 31) {
     $variable = self::munge($title, '_', $maxLength);
 
+    // FIXME: nothing below this line makes sense. The above call to self::munge will always
+    // return a safe string of the correct length, so why are we now checking if it's a safe
+    // string of the correct length?
     if (CRM_Utils_Rule::title($variable, $maxLength)) {
       return $variable;
     }
 
-    // if longer than the maxLength lets just return a substr of the
-    // md5 to prevent errors downstream
+    // FIXME: When would this ever be reachable?
     return substr(md5($title), 0, $maxLength);
   }
 
