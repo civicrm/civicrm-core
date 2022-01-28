@@ -338,6 +338,10 @@ class FormattingUtil {
         case 'Money':
         case 'Float':
           return (float) $value;
+
+        case 'Date':
+          // Strip time from date-only fields
+          return substr($value, 0, 10);
       }
     }
     return $value;
