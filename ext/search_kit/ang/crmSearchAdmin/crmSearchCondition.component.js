@@ -7,10 +7,10 @@
       clause: '<',
       format: '<',
       optionKey: '<',
-      offset: '@'
+      offset: '<'
     },
     templateUrl: '~/crmSearchAdmin/crmSearchCondition.html',
-    controller: function ($scope, $element, searchMeta) {
+    controller: function ($scope) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
       this.operators = {};
@@ -29,6 +29,30 @@
           ctrl.changeClauseOperator();
         }
       }
+
+      function getValue() {
+        return ctrl.clause[1 + ctrl.offset];
+      }
+
+      function setValue(val) {
+        ctrl.clause[1 + ctrl.offset] = val;
+      }
+
+      // Getter/setter for use with ng-model
+      this.getSetOperator = function(op) {
+        if (arguments.length) {
+          setOperator(op);
+        }
+        return getOperator();
+      };
+
+      // Getter/setter for use with ng-model
+      this.getSetValue = function(val) {
+        if (arguments.length) {
+          setValue(val);
+        }
+        return getValue();
+      };
 
       // Return a list of operators allowed for the current field
       this.getOperators = function() {
@@ -74,13 +98,13 @@
           }
           // Change multi/single value to/from an array
           var shouldBeArray = _.includes(['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'], getOperator());
-          if (!_.isArray(ctrl.clause[ctrl.offset + 1]) && shouldBeArray) {
-            ctrl.clause[ctrl.offset + 1] = [];
-          } else if (_.isArray(ctrl.clause[ctrl.offset + 1]) && !shouldBeArray) {
-            ctrl.clause[ctrl.offset + 1] = '';
+          if (!_.isArray(getValue()) && shouldBeArray) {
+            setValue([]);
+          } else if (_.isArray(getValue()) && !shouldBeArray) {
+            setValue('');
           }
           if (_.includes(['BETWEEN', 'NOT BETWEEN'], getOperator())) {
-            ctrl.clause[ctrl.offset + 1].length = 2;
+            getValue().length = 2;
           }
         }
       };
