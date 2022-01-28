@@ -3512,7 +3512,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
       'contact_type' => $contact->contact_type,
       'greeting_type' => $greetingType,
     ];
-    return CRM_Core_PseudoConstant::greeting($filter)[$contact->{$idField}];
+    return CRM_Core_PseudoConstant::greeting($filter)[$contact->{$idField}] ?? '';
   }
 
   /**
