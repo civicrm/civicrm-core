@@ -457,4 +457,45 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
     $this->assertEquals(['One' => 1, 'Two' => 2, 'Three' => 3, 'Four' => 4], $getValues('controlGroup'));
   }
 
+  /**
+   * Ensure custom date fields only return the date part
+   */
+  public function testCustomDateFields(): void {
+    $cgName = uniqid('My');
+
+    CustomGroup::create(FALSE)
+      ->addValue('title', $cgName)
+      ->addValue('extends', 'Contact')
+      ->addChain('field1', CustomField::create()
+        ->addValue('label', 'DateOnly')
+        ->addValue('custom_group_id', '$id')
+        ->addValue('html_type', 'Select Date')
+        ->addValue('data_type', 'Date')
+        ->addValue('date_format', 'mm/dd/yy'))
+      ->addChain('field2', CustomField::create()
+        ->addValue('label', 'DateTime')
+        ->addValue('custom_group_id', '$id')
+        ->addValue('html_type', 'Select Date')
+        ->addValue('data_type', 'Date')
+        ->addValue('date_format', 'mm/dd/yy')
+        ->addValue('time_format', '1'))
+      ->execute();
+
+    $cid = Contact::create(FALSE)
+      ->addValue('first_name', 'Parent')
+      ->addValue('last_name', 'Tester')
+      ->addValue("$cgName.DateOnly", '2025-05-10')
+      ->addValue("$cgName.DateTime", '2025-06-11 12:15:30')
+      ->execute()
+      ->first()['id'];
+    $contact = Contact::get(FALSE)
+      ->addSelect('custom.*')
+      ->addWhere('id', '=', $cid)
+      ->execute()->first();
+    // Date field should only return date part
+    $this->assertEquals('2025-05-10', $contact["$cgName.DateOnly"]);
+    // Date time field should return all
+    $this->assertEquals('2025-06-11 12:15:30', $contact["$cgName.DateTime"]);
+  }
+
 }
