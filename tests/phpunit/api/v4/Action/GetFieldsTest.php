@@ -20,6 +20,7 @@
 namespace api\v4\Action;
 
 use api\v4\UnitTestCase;
+use Civi\Api4\Activity;
 use Civi\Api4\Campaign;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
@@ -91,6 +92,17 @@ class GetFieldsTest extends UnitTestCase {
       ->execute()->indexBy('name');
     $this->assertFalse($fields['campaign_id']['options']);
     $this->assertEquals(['name', 'label'], $fields['campaign_id']['suffixes']);
+  }
+
+  public function testRequiredAndNullable() {
+    $actFields = Activity::getFields(FALSE)
+      ->setAction('create')
+      ->execute()->indexBy('name');
+
+    $this->assertTrue($actFields['activity_type_id']['required']);
+    $this->assertFalse($actFields['activity_type_id']['nullable']);
+    $this->assertFalse($actFields['subject']['required']);
+    $this->assertTrue($actFields['subject']['nullable']);
   }
 
 }

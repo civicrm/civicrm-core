@@ -65,6 +65,7 @@
         else if (action.uiDialog) {
           var options = CRM.utils.adjustDialogDefaults({
             autoOpen: false,
+            dialogClass: 'crm-search-task-dialog',
             title: action.title
           });
           dialogService.open('crmSearchTask', action.uiDialog.templateUrl, data, options)

@@ -130,11 +130,21 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
         ->addValue('label', 'FavFood')
         ->addValue('custom_group_id', '$id')
         ->addValue('html_type', 'Text')
+        ->addValue('is_required', TRUE)
         ->addValue('data_type', 'String'))
       ->execute();
 
     // Test that no new option groups have been created (these are text fields with no options)
     $this->assertEquals($optionGroupCount, OptionGroup::get(FALSE)->selectRowCount()->execute()->count());
+
+    // Check getFields output
+    $fields = Contact::getFields(FALSE)->execute()->indexBy('name');
+    $this->assertFalse($fields['MyContactFields2.FavColor']['required']);
+    $this->assertTRUE($fields['MyContactFields2.FavColor']['nullable']);
+    // Custom fields are never actually *required* in the api, even if is_required = true
+    $this->assertFalse($fields['MyContactFields2.FavFood']['required']);
+    // But the api will report is_required as not nullable
+    $this->assertFalse($fields['MyContactFields2.FavFood']['nullable']);
 
     $contactId1 = Contact::create(FALSE)
       ->addValue('first_name', 'Johann')

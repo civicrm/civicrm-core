@@ -97,9 +97,6 @@ class SpecGatherer {
       ) {
         continue;
       }
-      if ($action !== 'create' || isset($DAOField['default'])) {
-        $DAOField['required'] = FALSE;
-      }
       if ($DAOField['name'] == 'is_active' && empty($DAOField['default'])) {
         $DAOField['default'] = '1';
       }

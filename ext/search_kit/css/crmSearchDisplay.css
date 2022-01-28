@@ -10,6 +10,12 @@
   opacity: .5;
 }
 
+#bootstrap-theme.crm-search input.ng-invalid,
+#bootstrap-theme.crm-search-display input.ng-invalid,
+.crm-search-task-dialog #bootstrap-theme input.ng-invalid {
+  border-color: #8a1f11;
+}
+
 /* Loading placeholders */
 #bootstrap-theme .crm-search-loading-placeholder {
   height: 2em;

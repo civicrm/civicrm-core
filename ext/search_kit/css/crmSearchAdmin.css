@@ -33,9 +33,6 @@
   cursor: not-allowed;
 }
 
-#bootstrap-theme.crm-search input.ng-invalid {
-  border-color: #8a1f11;
-}
 #bootstrap-theme.crm-search input.ng-invalid::placeholder {
   color: #8a1f11;
 }
