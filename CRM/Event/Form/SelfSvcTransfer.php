@@ -342,7 +342,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
   /**
    * Based on input, create participant row for transferee and send email
    *
-   * @param $participant
+   * @param CRM_Event_BAO_Participant $participant
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception

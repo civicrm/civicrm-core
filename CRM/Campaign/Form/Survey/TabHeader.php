@@ -117,7 +117,7 @@ class CRM_Campaign_Form_Survey_TabHeader {
   }
 
   /**
-   * @param $tabs
+   * @param array $tabs
    *
    * @return int|string
    */
@@ -142,7 +142,7 @@ class CRM_Campaign_Form_Survey_TabHeader {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return int|string
    */

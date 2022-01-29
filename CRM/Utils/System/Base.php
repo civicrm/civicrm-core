@@ -357,7 +357,7 @@ abstract class CRM_Utils_System_Base {
   /**
    * Get the relative path to the sites base url.
    *
-   * @return bool
+   * @return string|false
    */
   public function getRelativeBaseURL() {
     $absoluteBaseURL = $this->getAbsoluteBaseURL();

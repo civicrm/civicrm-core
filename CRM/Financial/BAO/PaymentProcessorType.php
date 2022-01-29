@@ -184,7 +184,7 @@ WHERE pp.payment_processor_type_id = ppt.id AND ppt.id = %1";
   }
 
   /**
-   * @param $attr
+   * @param string $attr
    *
    * @return array
    */

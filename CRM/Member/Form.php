@@ -99,7 +99,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   /**
    * Add to the status message.
    *
-   * @param $message
+   * @param string $message
    */
   protected function addStatusMessage($message) {
     $this->statusMessage[] = $message;

@@ -539,7 +539,7 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * @param $declarations
+   * @param array $declarations
    *
    * @return string|bool
    *   string on error, or FALSE

@@ -252,7 +252,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * FIXME: This is not a legacy function and the above is not a safe assumption.
    * External urls are allowed by CRM_Core_Resources and this needs to return the correct value.
    *
-   * @param $url
+   * @param string $url
    *
    * @return bool
    */

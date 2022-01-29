@@ -1574,7 +1574,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Adds a select based on field metadata.
    * TODO: This could be even more generic and widget type (select in this case) could also be read from metadata
    * Perhaps a method like $form->bind($name) which would look up all metadata for named field
-   * @param $name
+   * @param string $name
    *   Field name to go on the form.
    * @param array $props
    *   Mix of html attributes and special properties, namely.

@@ -251,8 +251,8 @@ class CRM_Utils_Sort {
   /**
    * Universal callback function for sorting by weight, id, title or name
    *
-   * @param $a
-   * @param $b
+   * @param array $a
+   * @param array $b
    *
    * @return int
    *   (-1 or 1)

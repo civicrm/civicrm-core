@@ -1500,9 +1500,9 @@ LIKE %1
    * @param string $daoName
    *   Name of the dao object.
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   (reference) an assoc array of name/value pairs.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   (reference) an assoc array to hold the flattened values.
    * @param array $returnProperities
    *   An assoc array of fields that need to be returned, eg array( 'first_name', 'last_name').
    *

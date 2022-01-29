@@ -420,7 +420,7 @@ class CRM_Utils_String {
    * @param string $str
    *   The string to be translated.
    *
-   * @return bool
+   * @return string|false
    */
   public static function strtoboolstr($str) {
     if (!is_scalar($str)) {
