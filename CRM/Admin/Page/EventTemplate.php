@@ -85,16 +85,19 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
       CRM_Core_DAO::storeValues($eventTemplate, $allEventTemplates[$eventTemplate->id]);
 
       //get listing types.
+      $allEventTemplates[$eventTemplate->id]['participant_listing'] = ts('Disabled');
       if ($eventTemplate->participant_listing_id) {
         $allEventTemplates[$eventTemplate->id]['participant_listing'] = $participantListings[$eventTemplate->participant_listing_id];
       }
 
       //get participant role
+      $allEventTemplates[$eventTemplate->id]['participant_role'] = '';
       if ($eventTemplate->default_role_id) {
         $allEventTemplates[$eventTemplate->id]['participant_role'] = $participantRoles[$eventTemplate->default_role_id];
       }
 
       //get event type.
+      $allEventTemplates[$eventTemplate->id]['event_type'] = '';
       if (isset($eventTypes[$eventTemplate->event_type_id])) {
         $allEventTemplates[$eventTemplate->id]['event_type'] = $eventTypes[$eventTemplate->event_type_id];
       }
