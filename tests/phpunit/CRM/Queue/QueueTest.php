@@ -27,13 +27,13 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $queueSpecs[] = [
       [
         'type' => 'Sql',
-        'name' => 'test-queue',
+        'name' => 'test-queue-sql',
       ],
     ];
     $queueSpecs[] = [
       [
         'type' => 'Memory',
-        'name' => 'test-queue',
+        'name' => 'test-queue-mem',
       ],
     ];
     $queueSpecs[] = [
@@ -56,7 +56,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
   public function tearDown(): void {
     CRM_Utils_Time::resetTime();
 
-    $tablesToTruncate = ['civicrm_queue_item'];
+    $tablesToTruncate = ['civicrm_queue_item', 'civicrm_queue'];
     $this->quickCleanup($tablesToTruncate);
     parent::tearDown();
   }
@@ -68,7 +68,9 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    * @param $queueSpec
    */
   public function testBasicUsage($queueSpec) {
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_queue');
     $this->queue = $this->queueService->create($queueSpec);
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_queue');
     $this->assertTrue($this->queue instanceof CRM_Queue_Queue);
 
     $this->queue->createItem([
