@@ -1,6 +1,6 @@
-<div class="form-group" ng-if="!$ctrl.multi">
+<div class="form-group" ng-if="!$ctrl.isMulti()">
   <input class="form-control" ng-model="$ctrl.value" crm-entityref="{entity: $ctrl.entity, select:{allowClear: true, placeholder: ts('Select')}, static: $ctrl.entity === 'Contact' ? ['user_contact_id'] : []}">
 </div>
-<div class="form-group" ng-if="$ctrl.multi">
+<div class="form-group" ng-if="$ctrl.isMulti()">
   <input class="form-control" ng-model="$ctrl.value" crm-entityref="{entity: $ctrl.entity, select: {multiple: true}, static: $ctrl.entity === 'Contact' ? ['user_contact_id'] : []}" ng-list >
 </div>
