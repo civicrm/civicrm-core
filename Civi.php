@@ -106,6 +106,23 @@ class Civi {
   }
 
   /**
+   * Fetch a queue object.
+   *
+   * @param string $name
+   *   Name of the queue.
+   *   The queue must be persistent (stored in `civicrm_queue`).
+   * @return \CRM_Queue_Queue
+   * @see \CRM_Queue_Service
+   */
+  public static function queue(string $name): CRM_Queue_Queue {
+    return CRM_Queue_Service::singleton()->create([
+      'name' => $name,
+      'reset' => FALSE,
+      'is_persistent' => TRUE,
+    ]);
+  }
+
+  /**
    * Obtain the formatting object.
    *
    * @return \Civi\Core\Format
