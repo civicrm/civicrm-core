@@ -74,8 +74,7 @@ class CRM_Queue_Service {
    *
    * @param array $queueSpec
    *   Array with keys:
-   *   - type: string, required, e.g. "interactive", "immediate", "stomp",
-   *    "beanstalk"
+   *   - type: string, required, e.g. `Sql`, `SqlParallel`, `Memory`
    *   - name: string, required, e.g. "upgrade-tasks"
    *   - reset: bool, optional; if a queue is found, then it should be
    *     flushed; default to TRUE
@@ -109,8 +108,7 @@ class CRM_Queue_Service {
    *
    * @param array $queueSpec
    *   Array with keys:
-   *   - type: string, required, e.g. "interactive", "immediate", "stomp",
-   *     "beanstalk"
+   *   - type: string, required, e.g. `Sql`, `SqlParallel`, `Memory`
    *   - name: string, required, e.g. "upgrade-tasks"
    *   - (additional keys depending on the queue provider).
    *
@@ -130,8 +128,7 @@ class CRM_Queue_Service {
    * Convert a queue "type" name to a class name.
    *
    * @param string $type
-   *   E.g. "interactive", "immediate", "stomp", "beanstalk".
-   *
+   *   - type: string, required, e.g. `Sql`, `SqlParallel`, `Memory`
    * @return string
    *   Class-name
    */
