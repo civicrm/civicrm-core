@@ -29,14 +29,14 @@ class CRM_Utils_Sort {
    *
    * @var int
    */
-  const ASCENDING = 1, DESCENDING = 2, DONTCARE = 4,
+  const ASCENDING = 1, DESCENDING = 2, DONTCARE = 4;
 
-    /**
-     * The name for the sort GET/POST param
-     *
-     * @var string
-     */
-    SORT_ID = 'crmSID', SORT_DIRECTION = 'crmSortDirection', SORT_ORDER = 'crmSortOrder';
+  /**
+   * The name for the sort GET/POST param
+   *
+   * @var string
+   */
+  const SORT_ID = 'crmSID', SORT_DIRECTION = 'crmSortDirection', SORT_ORDER = 'crmSortOrder';
 
   /**
    * Name of the sort function. Used to isolate session variables

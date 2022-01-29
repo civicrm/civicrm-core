@@ -19,7 +19,7 @@ class CRM_Core_I18n {
   /**
    * Constants for communication preferences.
    *
-   * @var int
+   * @var string
    */
   const NONE = 'none', AUTO = 'auto';
 
