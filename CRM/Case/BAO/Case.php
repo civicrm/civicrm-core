@@ -217,7 +217,7 @@ WHERE civicrm_case.id = %1";
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @return bool
    */
   public static function del($id) {
@@ -1118,8 +1118,8 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
   /**
    * Helper function to generate a formatted contact link/name for display in the Case activities tab
    *
-   * @param $contactId
-   * @param $contactName
+   * @param int $contactId
+   * @param string $contactName
    *
    * @return string
    */

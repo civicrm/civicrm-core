@@ -110,7 +110,7 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
    * This is an early cut of what will ideally eventually be a hooklike call to the
    * CRM_Invoicing_Utils class with a potential end goal of moving this handling to an extension.
    *
-   * @param $tplLineItems
+   * @param array $tplLineItems
    */
   protected function alterLineItemsForTemplate(&$tplLineItems) {
     if (!CRM_Invoicing_Utils::isInvoicingEnabled()) {

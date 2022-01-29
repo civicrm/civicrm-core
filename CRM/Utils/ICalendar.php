@@ -61,7 +61,7 @@ class CRM_Utils_ICalendar {
   /**
    * Escape date elements for safe ICalendar use.
    *
-   * @param $date
+   * @param string $date
    *   Date to escape.
    *
    * @param bool $gdata

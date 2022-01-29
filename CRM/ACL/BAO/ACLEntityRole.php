@@ -43,7 +43,7 @@ class CRM_ACL_BAO_ACLEntityRole extends CRM_ACL_DAO_ACLEntityRole {
 
   /**
    * @param array $params
-   * @param $defaults
+   * @param array $defaults
    */
   public static function retrieve(&$params, &$defaults) {
     CRM_Core_DAO::commonRetrieve(__CLASS__, $params, $defaults);

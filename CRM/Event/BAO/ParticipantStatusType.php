@@ -72,7 +72,7 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
 
   /**
    * @param array $params
-   * @param $defaults
+   * @param array $defaults
    *
    * @return CRM_Event_DAO_ParticipantStatusType|null
    */

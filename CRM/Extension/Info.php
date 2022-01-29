@@ -98,7 +98,7 @@ class CRM_Extension_Info {
   /**
    * Load extension info an XML file.
    *
-   * @param $file
+   * @param string $file
    *
    * @throws CRM_Extension_Exception_ParseException
    * @return CRM_Extension_Info

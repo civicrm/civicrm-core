@@ -1518,7 +1518,7 @@ DESC limit 1");
   /**
    * Get status message for create action.
    *
-   * @return array|string
+   * @return string
    * @throws \CiviCRM_API3_Exception
    */
   protected function getStatusMessageForCreate(): string {
