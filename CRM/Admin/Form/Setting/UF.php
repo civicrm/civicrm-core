@@ -32,16 +32,21 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
     $this->_uf = $config->userFramework;
     $this->_settings['syncCMSEmail'] = CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME;
 
-    if ($this->_uf == 'WordPress') {
-      $this->_settings['wpBasePage'] = CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME;
-    }
+    $this->assign('wpBasePageEnabled', FALSE);
+    $this->assign('userFrameworkUsersTableNameEnabled', FALSE);
 
     $this->setTitle(
       ts('Settings - %1 Integration', [1 => $this->_uf])
     );
 
+    if ($this->_uf == 'WordPress') {
+      $this->_settings['wpBasePage'] = CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME;
+      $this->assign('wpBasePageEnabled', TRUE);
+    }
+
     if ($config->userSystem->is_drupal) {
       $this->_settings['userFrameworkUsersTableName'] = CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME;
+      $this->assign('userFrameworkUsersTableNameEnabled', TRUE);
     }
 
     // find out if drupal has its database prefixed
@@ -61,6 +66,8 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
         $drupal_prefix = $databases['default']['default']['prefix'];
       }
     }
+
+    $this->assign('tablePrefixes', FALSE);
 
     if ($config->userSystem->viewsExists() &&
       (
