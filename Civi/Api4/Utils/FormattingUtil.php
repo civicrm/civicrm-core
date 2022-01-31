@@ -56,7 +56,8 @@ class FormattingUtil {
       /*
        * Because of the wacky way that database values are saved we need to format
        * some of the values here. In this strange world the string 'null' is used to
-       * unset values. Hence if we encounter true null we change it to string 'null'.
+       * unset values. If we encounter true null at this layer we change it to an empty string
+       * and it will be converted to 'null' by CRM_Core_DAO::copyValues.
        *
        * If we encounter the string 'null' then we assume the user actually wants to
        * set the value to string null. However since the string null is reserved for
@@ -66,7 +67,7 @@ class FormattingUtil {
        * 'Null'.
        */
       elseif (array_key_exists($name, $params) && $params[$name] === NULL) {
-        $params[$name] = 'null';
+        $params[$name] = '';
       }
     }
 
