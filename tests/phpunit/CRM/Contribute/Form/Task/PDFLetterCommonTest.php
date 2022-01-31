@@ -39,6 +39,9 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     parent::setUp();
     $this->_individualId = $this->individualCreate(['first_name' => 'Anthony', 'last_name' => 'Collins']);
     $this->_docTypes = CRM_Core_SelectValues::documentApplicationType();
+    $hooks = \CRM_Utils_Hook::singleton();
+    $hooks->setHook('civicrm_alterMailParams',
+      array($this, 'hook_alterMailParams'));
   }
 
   /**
@@ -678,6 +681,13 @@ value=$contact_aggregate+$contribution.total_amount}
       'source' => 'Contribution Source',
     ], $contributionParams);
     return $this->callAPISuccess('Contribution', 'create', $contributionParams)['id'];
+  }
+
+  /**
+   * @see CRM_Utils_Hook::alterMailParams
+   */
+  public function hook_alterMailParams(&$params, $context = NULL) {
+    $this->assertTrue(isset($params['contactId']));
   }
 
 }

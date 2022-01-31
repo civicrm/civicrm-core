@@ -465,6 +465,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
       }
 
       $defaults = [
+        'contactId' => $contact['id'],
         'toName' => $contact['display_name'],
         'toEmail' => $contact['email'],
         'text' => '',
@@ -488,8 +489,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
         $defaults['html'] = ts('Please see attached');
         $defaults['attachments'] = [CRM_Utils_Mail::appendPDF('ThankYou.pdf', $html, $format)];
       }
-      $params = array_merge($defaults);
-      return CRM_Utils_Mail::send($params);
+      return CRM_Utils_Mail::send($defaults);
     }
     catch (CRM_Core_Exception $e) {
       return FALSE;
