@@ -22,6 +22,27 @@
 class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental_Base {
 
   /**
+   * Compute any messages which should be displayed before upgrade.
+   *
+   * Note: This function is called iteratively for each incremental upgrade step.
+   * There must be a concrete step (eg 'X.Y.Z.mysql.tpl' or 'upgrade_X_Y_Z()').
+   *
+   * @param string $preUpgradeMessage
+   * @param string $rev
+   *   a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'.
+   * @param null $currentVer
+   */
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL): void {
+    if ($rev === '5.47.alpha1') {
+      $count = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_contact WHERE preferred_mail_format != "Both"');
+      if ($count) {
+        $preUpgradeMessage .= '<p>' . ts('The contact field preferred mail format is being phased out. Modern email clients can handle receiving both formats so CiviCRM is moving towards always sending both and the field will be incrementally removed from the UI.')
+        . ' <a href="https://lab.civicrm.org/dev/core/-/issues/2866">' . ts('See the issue for more detail') . '</a></p>';
+      }
+    }
+  }
+
+  /**
    * Upgrade step; adds tasks including 'runSql'.
    *
    * @param string $rev
