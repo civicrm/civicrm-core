@@ -19,7 +19,7 @@
                     <li><a class="crm-event-participant" href="{crmURL p='civicrm/participant/add' q="reset=1&action=add&context=standalone&eid=`$id`"}">{ts}Register Participant{/ts}</a></li>
                        <li><a class="crm-event-info" href="{crmURL p='civicrm/event/info' q="reset=1&id=`$id`" fe='true'}" target="_blank">{ts}Event Info{/ts}</a></li>
                     {if $isOnlineRegistration}
-                        <li><a class="crm-event-test" href="{crmURL p='civicrm/event/register' q="reset=1&action=preview&id=`$id`"}">{ts}Online Registration (Test-drive){/ts}</a></li>
+                        <li><a class="crm-event-test" href="{crmURL p='civicrm/event/register' q="reset=1&action=preview&id=`$id`" fe='true'}">{ts}Online Registration (Test-drive){/ts}</a></li>
                                <li><a class="crm-event-live" href="{crmURL p='civicrm/event/register' q="reset=1&id=`$id`" fe='true'}" target="_blank">{ts}Online Registration (Live){/ts}</a></li>
                     {/if}
                 </ul>
