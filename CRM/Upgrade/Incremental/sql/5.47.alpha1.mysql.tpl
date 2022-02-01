@@ -26,3 +26,6 @@ ALTER TABLE `civicrm_event`
   MODIFY COLUMN `end_date` timestamp NULL DEFAULT NULL COMMENT 'Date and time that event ends. May be NULL if no defined end date/time',
   MODIFY COLUMN `registration_start_date` timestamp NULL DEFAULT NULL COMMENT 'Date and time that online registration starts.',
   MODIFY COLUMN `registration_end_date` timestamp NULL DEFAULT NULL COMMENT 'Date and time that online registration ends.';
+
+{* Ensure CustomGroup.name is unique *}
+UPDATE civicrm_custom_group g1, civicrm_custom_group g2 SET g1.name = CONCAT(g1.name, '_1') WHERE g1.name = g2.name AND g1.id > g2.id;

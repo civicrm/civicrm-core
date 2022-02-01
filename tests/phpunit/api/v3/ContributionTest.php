@@ -506,8 +506,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCreateGetFieldsWithCustom(): void {
-    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
-    $idsContact = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTest.php');
+    $ids = $this->entityCustomGroupWithSingleFieldCreate('ContributionCustomFields', __FILE__);
+    $idsContact = $this->entityCustomGroupWithSingleFieldCreate('ContactCustomFields', 'ContactTest.php');
     $result = $this->callAPISuccess('Contribution', 'getfields', []);
     $this->assertArrayHasKey('custom_' . $ids['custom_field_id'], $result['values']);
     $this->assertArrayNotHasKey('custom_' . $idsContact['custom_field_id'], $result['values']);

@@ -39,6 +39,13 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
         $preUpgradeMessage .= '<p>' . ts('The contact field preferred mail format is being phased out. Modern email clients can handle receiving both formats so CiviCRM is moving towards always sending both and the field will be incrementally removed from the UI.')
         . ' <a href="https://lab.civicrm.org/dev/core/-/issues/2866">' . ts('See the issue for more detail') . '</a></p>';
       }
+      // Check for custom groups with duplicate names
+      $dupes = CRM_Core_DAO::singleValueQuery('SELECT COUNT(g1.id) FROM civicrm_custom_group g1, civicrm_custom_group g2 WHERE g1.name = g2.name AND g1.id > g2.id');
+      if ($dupes) {
+        $preUpgradeMessage .= '<p>' .
+          ts('Your system has custom field groups with duplicate internal names. To ensure data integrity, the internal names will be automatically changed; user-facing titles will not be affected. Please review any custom code you may be using which relies on custom field group names.') .
+          '</p>';
+      }
     }
   }
 
@@ -63,6 +70,8 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
       'civicrm_event', 'event_tz', "text NULL DEFAULT NULL COMMENT 'Event\'s native time zone'"
     );
     $this->addTask('core-issue#2122 - Set the timezone to the default for existing Events', 'setEventTZDefault');
+    $this->addTask('Drop CustomGroup UI_name_extends index', 'dropIndex', 'civicrm_custom_group', 'UI_name_extends');
+    $this->addTask('Add CustomGroup UI_name index', 'addIndex', 'civicrm_custom_group', ['name'], 'UI');
   }
 
   /**
