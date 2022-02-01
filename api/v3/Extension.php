@@ -50,7 +50,7 @@ function civicrm_api3_extension_install($params) {
 
 /**
  * Spec function for getfields
- * @param $fields
+ * @param array $fields
  */
 function _civicrm_api3_extension_install_spec(&$fields) {
   $fields['keys'] = [
@@ -122,7 +122,7 @@ function civicrm_api3_extension_enable($params) {
 
 /**
  * Spec function for getfields
- * @param $fields
+ * @param array $fields
  */
 function _civicrm_api3_extension_enable_spec(&$fields) {
   _civicrm_api3_extension_install_spec($fields);
@@ -153,7 +153,7 @@ function civicrm_api3_extension_disable($params) {
 
 /**
  * Spec function for getfields
- * @param $fields
+ * @param array $fields
  */
 function _civicrm_api3_extension_disable_spec(&$fields) {
   _civicrm_api3_extension_install_spec($fields);
@@ -186,7 +186,7 @@ function civicrm_api3_extension_uninstall($params) {
 
 /**
  * Spec function for getfields
- * @param $fields
+ * @param array $fields
  */
 function _civicrm_api3_extension_uninstall_spec(&$fields) {
   _civicrm_api3_extension_install_spec($fields);
@@ -250,7 +250,7 @@ function civicrm_api3_extension_download($params) {
 
 /**
  * Spec function for getfields
- * @param $fields
+ * @param array $fields
  */
 function _civicrm_api3_extension_download_spec(&$fields) {
   $fields['key'] = [
@@ -305,7 +305,7 @@ function civicrm_api3_extension_refresh($params) {
 
 /**
  * Spec function for getfields
- * @param $fields
+ * @param array $fields
  */
 function _civicrm_api3_extension_refresh_spec(&$fields) {
   $fields['local'] = [

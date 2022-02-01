@@ -273,7 +273,7 @@ function civicrm_api3_create_success($values = 1, $params = [], $entity = NULL, 
 /**
  * Load the DAO of the entity.
  *
- * @param $entity
+ * @param string $entity
  *
  * @return bool
  */
@@ -405,7 +405,7 @@ function _civicrm_api3_get_BAO($name) {
 /**
  * Recursive function to explode value-separated strings into arrays.
  *
- * @param $values
+ * @param array $values
  */
 function _civicrm_api3_separate_values(&$values) {
   $sp = CRM_Core_DAO::VALUE_SEPARATOR;
@@ -498,7 +498,7 @@ function _civicrm_api3_field_names($fields) {
  * Ideally this would be merged with _civicrm_get_query_object but we need to resolve differences in what the
  * 2 variants call
  *
- * @param $entity
+ * @param string $entity
  * @param array $params
  *   As passed into api get or getcount function.
  * @param array $additional_options
@@ -898,7 +898,7 @@ function _civicrm_api3_get_options_from_params($params, $queryObject = FALSE, $e
  *   Params array as passed into civicrm_api.
  * @param object $dao
  *   DAO object.
- * @param $entity
+ * @param string $entity
  *
  * @throws \API_Exception
  * @throws \CRM_Core_Exception
@@ -1068,8 +1068,8 @@ function _civicrm_api3_object_to_array(&$dao, &$values, $uniqueFields = FALSE) {
 /**
  * Wrapper for _civicrm_object_to_array when api supports unique fields.
  *
- * @param $dao
- * @param $values
+ * @param CRM_Core_DAO $dao
+ * @param array $values
  *
  * @return array
  */
@@ -1125,7 +1125,7 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
  * Format parameters for create action.
  *
  * @param array $params
- * @param $entity
+ * @param string $entity
  */
 function _civicrm_api3_format_params_for_create(&$params, $entity) {
   $nonGenericEntities = array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes(TRUE));
@@ -1401,7 +1401,7 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
  *
  * @param array $returnArray
  *   Array to append custom data too - generally $result[4] where 4 is the entity id.
- * @param $checkPermission
+ * @param bool $checkPermission
  * @param string $entity
  *   E.g membership, event.
  * @param int $entity_id
@@ -1505,7 +1505,7 @@ function _civicrm_api3_validate($entity, $action, $params) {
 
 /**
  * Used by the Validate API.
- * @param $fieldName
+ * @param string $fieldName
  * @param array $fieldInfo
  * @param string $entity
  * @param array $params
@@ -1705,7 +1705,7 @@ function _civicrm_api3_validate_date(&$params, &$fieldName, &$fieldInfo) {
  *
  * @param string $dateValue
  * @param string $fieldName
- * @param $fieldType
+ * @param int $fieldType
  *
  * @throws Exception
  * @return mixed
@@ -1876,7 +1876,7 @@ function _civicrm_api3_generic_replace_base_params($params) {
 /**
  * Returns fields allowable by api.
  *
- * @param $entity
+ * @param string $entity
  *   String Entity to query.
  * @param bool $unique
  *   Index by unique fields?.
@@ -1952,7 +1952,7 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = []) {
  *
  * This is the same as the BAO function but fields are prefixed with 'custom_' to represent api params.
  *
- * @param $entity
+ * @param string $entity
  * @param array $params
  *
  * @return array
@@ -1996,8 +1996,8 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
  *
  * Function also swaps unique fields for non-unique fields & vice versa.
  *
- * @param $apiRequest
- * @param $fields
+ * @param array $apiRequest
+ * @param array $fields
  */
 function _civicrm_api3_swap_out_aliases(&$apiRequest, $fields) {
   foreach ($fields as $field => $values) {
@@ -2118,7 +2118,7 @@ function _civicrm_api3_validate_integer(&$params, $fieldName, &$fieldInfo, $enti
 
 /**
  * Helper function to determine country_id given the myriad of values for country_id or country that are supported
- * @param $params
+ * @param array $params
  *
  * @return int|null
  */
@@ -2394,9 +2394,9 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
 /**
  * Returns the canonical name of a field.
  *
- * @param $entity
+ * @param string $entity
  *   api entity name (string should already be standardized - no camelCase).
- * @param $fieldName
+ * @param string $fieldName
  *   any variation of a field's name (name, unique_name, api.alias).
  *
  * @param string $action
@@ -2489,7 +2489,7 @@ function _civicrm_api3_field_value_check(&$params, $fieldName, $type = NULL) {
  * _civicrm_api3_basic_get but does not use DAO/BAO. This is useful for
  * small/mid-size data loaded from external JSON or XML documents.
  *
- * @param $entity
+ * @param string $entity
  * @param array $params
  *   API parameters.
  * @param array $records

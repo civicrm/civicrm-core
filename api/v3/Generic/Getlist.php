@@ -246,9 +246,9 @@ function _civicrm_api3_generic_getlist_output($result, $request, $entity, $field
 /**
  * Common postprocess for getlist output
  *
- * @param $result
- * @param $request
- * @param $values
+ * @param array $result
+ * @param array $request
+ * @param array $values
  */
 function _civicrm_api3_generic_getlist_postprocess($result, $request, &$values) {
   $chains = [];

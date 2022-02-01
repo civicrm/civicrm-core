@@ -485,7 +485,7 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
  * @param int $profileID
  * @param int $optionsBehaviour
  *   0 = don't resolve, 1 = resolve non-aggressively, 2 = resolve aggressively - ie include country & state.
- * @param $is_flush
+ * @param bool $is_flush
  *
  * @return array|void
  */
@@ -623,7 +623,7 @@ function _civicrm_api3_order_by_weight($a, $b) {
  * Here we map the profile fields as stored in the uf_field table to their 'real entity'
  * we also return the profile fieldname
  *
- * @param $field
+ * @param array $field
  *
  * @return array
  */
@@ -716,7 +716,7 @@ function _civicrm_api3_profile_getProfileID($profileID) {
  *
  * e.g getfields response incl 'membership_type_id' - with api.aliases = 'membership_type'
  * returned array will include both as keys (with the same values)
- * @param $entity
+ * @param string $entity
  *
  * @return array
  */

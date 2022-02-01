@@ -250,7 +250,7 @@ function civicrm_api3_membership_get($params) {
  * @param array $params
  *   Parameters passed into get function.
  * @param int $membershipTypeId
- * @param $activeOnly
+ * @param bool $activeOnly
  *
  * @return array
  *   result for calling function
@@ -271,7 +271,7 @@ function _civicrm_api3_membership_get_customv2behaviour(&$params, $membershipTyp
  *
  * @param array $params
  *   Parameters passed into get function.
- * @param $membershipValues
+ * @param array $membershipValues
  * @param int $contactID
  *
  * @return array

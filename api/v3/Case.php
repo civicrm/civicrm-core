@@ -131,8 +131,8 @@ function civicrm_api3_case_create($params) {
  * When creating a new case, run the xmlProcessor to get all necessary params/configuration
  *  for the new case, as cases use an xml file to store their configuration.
  *
- * @param $params
- * @param $caseBAO
+ * @param array $params
+ * @param CRM_Case_DAO_Case $caseBAO
  *
  * @throws \Exception
  */
@@ -762,8 +762,8 @@ function civicrm_api3_case_getList($params) {
 
 /**
  * Needed due to the above override
- * @param $params
- * @param $apiRequest
+ * @param array $params
+ * @param array $apiRequest
  */
 function _civicrm_api3_case_getlist_spec(&$params, $apiRequest) {
   require_once 'api/v3/Generic/Getlist.php';
