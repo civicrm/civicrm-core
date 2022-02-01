@@ -607,7 +607,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     foreach ($sqls as $sql) {
       CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE);
     }
-    CRM_Dedupe_Merger::addMembershipToRealtedContacts($mainId);
+    CRM_Dedupe_Merger::addMembershipToRelatedContacts($mainId);
   }
 
   /**
@@ -1917,7 +1917,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function addMembershipToRealtedContacts($contactID) {
+  public static function addMembershipToRelatedContacts($contactID) {
     $dao = new CRM_Member_DAO_Membership();
     $dao->contact_id = $contactID;
     $dao->is_test = 0;
