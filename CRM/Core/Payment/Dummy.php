@@ -126,10 +126,6 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
       }
     }
 
-    // We shouldn't do this but it saves us changing the `testPayNowPayment` test to actually test the contribution
-    // like it should.
-    $result = array_merge($params, $result);
-
     return $result;
   }
 

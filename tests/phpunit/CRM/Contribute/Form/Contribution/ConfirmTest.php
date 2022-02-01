@@ -105,7 +105,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     );
 
     // Make sure that certain parameters are set on return from processConfirm
-    $this->assertEquals('Campaign Contribution', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'financial_type_id', $processConfirmResult['financial_type_id']));
+    $this->assertEquals('Campaign Contribution', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'financial_type_id', $processConfirmResult['contribution']->financial_type_id));
 
     // Based on the processed contribution, complete transaction which update the contribution status based on payment result.
     if (!empty($processConfirmResult['contribution'])) {
