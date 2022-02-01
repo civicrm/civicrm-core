@@ -255,6 +255,32 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     }
   }
 
+  public function testFacadeAutoCreate() {
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_queue');
+    $q1 = Civi::queue('testFacadeAutoCreate_q1', [
+      'type' => 'Sql',
+    ]);
+    $q2 = Civi::queue('testFacadeAutoCreate_q2', [
+      'type' => 'SqlParallel',
+    ]);
+    $q1Reload = Civi::queue('testFacadeAutoCreate_q1', [
+      /* q1 already exists, so it doesn't matter what type you give. */
+      'type' => 'ZoombaroombaFaketypeGoombapoompa',
+    ]);
+    $this->assertDBQuery(2, 'SELECT count(*) FROM civicrm_queue');
+    $this->assertInstanceOf('CRM_Queue_Queue_Sql', $q1);
+    $this->assertInstanceOf('CRM_Queue_Queue_SqlParallel', $q2);
+    $this->assertInstanceOf('CRM_Queue_Queue_Sql', $q1Reload);
+
+    try {
+      Civi::queue('testFacadeAutoCreate_q3' /* missing type */);
+      $this->fail('Queue lookup should fail. There is neither pre-existing registration nor new details.');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertRegExp(';Missing field "type";', $e->getMessage());
+    }
+  }
+
   /**
    * Test that queue content is reset when reset=>TRUE
    *
