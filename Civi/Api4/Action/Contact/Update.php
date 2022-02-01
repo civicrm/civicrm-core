@@ -16,19 +16,6 @@ namespace Civi\Api4\Action\Contact;
  * @inheritDoc
  */
 class Update extends \Civi\Api4\Generic\DAOUpdateAction {
-
-  /**
-   * @param array $items
-   * @return array
-   */
-  protected function write(array $items) {
-    $saved = [];
-    foreach ($items as $item) {
-      // For some reason the contact BAO requires this for updates
-      $item['contact_id'] = $item['id'];
-      $saved[] = \CRM_Contact_BAO_Contact::create($item);
-    }
-    return $saved;
-  }
+  use ContactSaveTrait;
 
 }

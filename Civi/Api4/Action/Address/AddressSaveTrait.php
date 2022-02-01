@@ -13,7 +13,8 @@
 namespace Civi\Api4\Action\Address;
 
 /**
- * @inheritDoc
+ * Code shared by Address create/update/save actions
+ *
  * @method bool getStreetParsing()
  * @method $this setStreetParsing(bool $streetParsing)
  * @method bool getSkipGeocode()

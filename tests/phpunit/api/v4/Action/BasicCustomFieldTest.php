@@ -36,7 +36,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
    */
   public function testWithSingleField(): void {
     $customGroup = CustomGroup::create(FALSE)
-      ->addValue('name', 'MyIndividualFields')
+      ->addValue('title', 'MyIndividualFields')
       ->addValue('extends', 'Individual')
       ->execute()
       ->first();
@@ -103,7 +103,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
 
     // First custom set
     CustomGroup::create(FALSE)
-      ->addValue('name', 'MyContactFields')
+      ->addValue('title', 'MyContactFields')
       ->addValue('extends', 'Contact')
       ->addChain('field1', CustomField::create()
         ->addValue('label', 'FavColor')
@@ -119,7 +119,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
 
     // Second custom set
     CustomGroup::create(FALSE)
-      ->addValue('name', 'MyContactFields2')
+      ->addValue('title', 'MyContactFields2')
       ->addValue('extends', 'Contact')
       ->addChain('field1', CustomField::create()
         ->addValue('label', 'FavColor')
@@ -257,7 +257,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
     $cgName = uniqid('RelFields');
 
     $customGroup = CustomGroup::create(FALSE)
-      ->addValue('name', $cgName)
+      ->addValue('title', $cgName)
       ->addValue('extends', 'Relationship')
       ->execute()
       ->first();
@@ -330,7 +330,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
     $cgName = uniqid('My');
 
     CustomGroup::create(FALSE)
-      ->addValue('name', $cgName)
+      ->addValue('title', $cgName)
       ->addValue('extends', 'Contact')
       ->addChain('field1', CustomField::create()
         ->addValue('label', 'FavColor')
@@ -381,7 +381,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
     $optionGroupCount = OptionGroup::get(FALSE)->selectRowCount()->execute()->count();
 
     $customGroup = CustomGroup::create(FALSE)
-      ->addValue('name', 'MyIndividualFields')
+      ->addValue('title', 'MyIndividualFields')
       ->addValue('extends', 'Individual')
       ->execute()
       ->first();
@@ -418,6 +418,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
     // Create 2 custom groups. Control group is to ensure updating one doesn't affect the other
     foreach (['controlGroup', 'experimentalGroup'] as $groupName) {
       $customGroups[$groupName] = CustomGroup::create(FALSE)
+        ->addValue('title', $groupName)
         ->addValue('name', $groupName)
         ->addValue('extends', 'Individual')
         ->execute()->first();
@@ -464,6 +465,16 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->execute();
     // Experimental group should be updated, control group should not
     $this->assertEquals(['One' => 1, 'Three' => 2, 'Two' => 3, 'Four' => 4], $getValues('experimentalGroup'));
+    $this->assertEquals(['One' => 1, 'Two' => 2, 'Three' => 3, 'Four' => 4], $getValues('controlGroup'));
+
+    // Move first option to last position
+    CustomField::update(FALSE)
+      ->addWhere('custom_group_id.name', '=', 'experimentalGroup')
+      ->addWhere('name', '=', 'One')
+      ->addValue('weight', 4)
+      ->execute();
+    // Experimental group should be updated, control group should not
+    $this->assertEquals(['Three' => 1, 'Two' => 2, 'Four' => 3, 'One' => 4], $getValues('experimentalGroup'));
     $this->assertEquals(['One' => 1, 'Two' => 2, 'Three' => 3, 'Four' => 4], $getValues('controlGroup'));
   }
 

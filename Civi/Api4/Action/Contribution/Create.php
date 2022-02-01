@@ -10,12 +10,12 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\Api4\Action\Contact;
+namespace Civi\Api4\Action\Contribution;
 
 /**
  * @inheritDoc
  */
-class Save extends \Civi\Api4\Generic\DAOSaveAction {
-  use ContactSaveTrait;
+class Create extends \Civi\Api4\Generic\DAOCreateAction {
+  use ContributionSaveTrait;
 
 }

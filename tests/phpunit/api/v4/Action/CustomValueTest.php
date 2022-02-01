@@ -43,7 +43,7 @@ class CustomValueTest extends BaseCustomValueTest {
     $textFieldName = uniqid('txt');
 
     $customGroup = CustomGroup::create(FALSE)
-      ->addValue('name', $group)
+      ->addValue('title', $group)
       ->addValue('extends', 'Contact')
       ->addValue('is_multiple', TRUE)
       ->execute()

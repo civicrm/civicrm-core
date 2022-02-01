@@ -15,7 +15,7 @@ namespace Civi\Api4\Action\Contact;
 /**
  * @inheritDoc
  */
-class Save extends \Civi\Api4\Generic\DAOSaveAction {
+class Create extends \Civi\Api4\Generic\DAOCreateAction {
   use ContactSaveTrait;
 
 }

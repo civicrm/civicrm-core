@@ -10,12 +10,22 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\Api4\Action\Contact;
+namespace Civi\Api4\Action\Contribution;
 
 /**
- * @inheritDoc
+ * Code shared by Contribution create/update/save actions
  */
-class Save extends \Civi\Api4\Generic\DAOSaveAction {
-  use ContactSaveTrait;
+trait ContributionSaveTrait {
+
+  /**
+   * @inheritDoc
+   */
+  protected function write(array $items) {
+    foreach ($items as &$item) {
+      // Required by Contribution BAO
+      $item['skipCleanMoney'] = TRUE;
+    }
+    return parent::write($items);
+  }
 
 }

@@ -33,7 +33,7 @@ class SearchRunWithCustomFieldTest extends \PHPUnit\Framework\TestCase implement
    */
   public function testRunWithImageField() {
     CustomGroup::create(FALSE)
-      ->addValue('name', 'TestSearchFields')
+      ->addValue('title', 'TestSearchFields')
       ->addValue('extends', 'Individual')
       ->execute()
       ->first();

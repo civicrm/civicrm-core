@@ -32,7 +32,7 @@ class UpdateCustomValueTest extends BaseCustomValueTest {
   public function testGetWithCustomData() {
 
     $customGroup = CustomGroup::create(FALSE)
-      ->addValue('name', 'MyContactFields')
+      ->addValue('title', 'MyContactFields')
       ->addValue('extends', 'Contact')
       ->execute()
       ->first();

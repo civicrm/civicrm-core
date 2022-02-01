@@ -34,7 +34,7 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
     $foodField = uniqid('fooda');
 
     $customGroupId = CustomGroup::create(FALSE)
-      ->addValue('name', $group)
+      ->addValue('title', $group)
       ->addValue('extends', 'Contact')
       ->execute()
       ->first()['id'];
@@ -58,7 +58,7 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
       ->execute();
 
     $customGroupId = CustomGroup::create(FALSE)
-      ->addValue('name', 'FinancialStuff')
+      ->addValue('title', 'FinancialStuff')
       ->addValue('extends', 'Contact')
       ->execute()
       ->first()['id'];
@@ -100,7 +100,7 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
     $foodField = uniqid('foodb');
 
     $customGroupId = CustomGroup::create(FALSE)
-      ->addValue('name', $group)
+      ->addValue('title', $group)
       ->addValue('extends', 'Contact')
       ->execute()
       ->first()['id'];
@@ -124,7 +124,7 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
       ->execute();
 
     $customGroupId = CustomGroup::create(FALSE)
-      ->addValue('name', 'FinancialStuff')
+      ->addValue('title', 'FinancialStuff')
       ->addValue('extends', 'Contact')
       ->execute()
       ->first()['id'];

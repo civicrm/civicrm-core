@@ -83,7 +83,7 @@ class ChainTest extends UnitTestCase {
   public function testWithContactRef() {
     CustomGroup::create()
       ->setCheckPermissions(FALSE)
-      ->addValue('name', 'TestActCus')
+      ->addValue('title', 'TestActCus')
       ->addValue('extends', 'Activity')
       ->addChain('field1', CustomField::create()
         ->addValue('label', 'FavPerson')

@@ -32,7 +32,7 @@ class CustomContactRefTest extends BaseCustomValueTest {
     $firstName = uniqid('fav');
 
     $customGroup = CustomGroup::create(FALSE)
-      ->addValue('name', 'MyContactRef')
+      ->addValue('title', 'MyContactRef')
       ->addValue('extends', 'Individual')
       ->execute()
       ->first();
@@ -127,7 +127,7 @@ class CustomContactRefTest extends BaseCustomValueTest {
     $currentUser = $this->createLoggedInUser();
 
     $customGroup = CustomGroup::create(FALSE)
-      ->addValue('name', 'MyContactRef')
+      ->addValue('title', 'MyContactRef')
       ->addValue('extends', 'Individual')
       ->execute()
       ->first();

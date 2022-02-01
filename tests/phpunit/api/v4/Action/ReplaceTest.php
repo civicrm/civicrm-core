@@ -105,7 +105,7 @@ class ReplaceTest extends UnitTestCase {
 
   public function testCustomValueReplace() {
     $customGroup = CustomGroup::create(FALSE)
-      ->addValue('name', 'replaceTest')
+      ->addValue('title', 'replaceTest')
       ->addValue('extends', 'Contact')
       ->addValue('is_multiple', TRUE)
       ->execute()
