@@ -290,7 +290,7 @@ function _civicrm_api3_contribution_get_support_nonunique_returns($params) {
 /**
  * Support for supported output variables.
  *
- * @param $contribution
+ * @param array $contribution
  */
 function _civicrm_api3_contribution_add_supported_fields(&$contribution) {
   // These are output fields that are supported in our test contract.
@@ -329,7 +329,7 @@ function civicrm_api3_contribution_getcount($params) {
  * As of v4.4 we support multiple soft credit, so now contribution returns array with 'soft_credit' as key
  * but we still return first soft credit as a part of contribution array
  *
- * @param $contribution
+ * @param array $contribution
  */
 function _civicrm_api3_format_soft_credit(&$contribution) {
   if (!empty($contribution['soft_credit'])) {

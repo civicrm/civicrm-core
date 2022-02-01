@@ -454,8 +454,8 @@ function civicrm_api3_generic_getoptions($apiRequest) {
 /**
  * Provide metadata for this generic action
  *
- * @param $params
- * @param $apiRequest
+ * @param array $params
+ * @param array $apiRequest
  */
 function _civicrm_api3_generic_getoptions_spec(&$params, $apiRequest) {
   $params += [
