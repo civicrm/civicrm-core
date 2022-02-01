@@ -956,6 +956,13 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           }
           break;
 
+        case 'contribution_campaign_id':
+          if (empty(CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Campaign', $params['contribution_campaign_id']))) {
+            return civicrm_api3_create_error('Invalid Campaign ID provided. Contribution row was skipped.');
+          }
+          $values['contribution_campaign_id'] = $params['contribution_campaign_id'];
+          break;
+
         default:
           // Hande name or label for fields with options.
           if (isset($fields[$key]) &&
