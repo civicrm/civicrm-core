@@ -184,13 +184,13 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     // fetch available contribution statuses
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
+    $result = [];
     // check for application errors
     // TODO:
     // AVS, CVV2, CAVV, and other verification results
     switch ($response_fields[0]) {
       case self::AUTH_REVIEW:
-        $params['payment_status_id'] = array_search('Pending', $contributionStatus);
-        $params['payment_status'] = 'Pending';
+        $result = $this->setStatusPaymentPending($result);
         break;
 
       case self::AUTH_ERROR:
@@ -203,13 +203,12 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
       default:
         // Success
-        $params['trxn_id'] = !empty($response_fields[6]) ? $response_fields[6] : $this->getTestTrxnID();
-        $params['payment_status_id'] = array_search('Completed', $statuses);
-        $params['payment_status'] = 'Completed';
+        $result['trxn_id'] = !empty($response_fields[6]) ? $response_fields[6] : $this->getTestTrxnID();
+        $result = $this->setStatusPaymentCompleted($result);
         break;
     }
 
-    return $params;
+    return $result;
   }
 
   /**
