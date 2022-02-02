@@ -66,6 +66,64 @@
       <type>CheckBox</type>
       <label>Auto Run</label>
     </html>
+    <drop>5.48</drop>
   </field>
-
+  <field>
+    <name>runner</name>
+    <title>Runner</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>false</required>
+    <comment>Name of the task runner</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>5.48</add>
+  </field>
+  <field>
+    <name>batch_limit</name>
+    <title>Batch Limit</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <default>1</default>
+    <comment>Maximum number of items in a batch. Tip: If you expand batch_limit, then also consider expanding lease_time.</comment>
+    <add>5.48</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>lease_time</name>
+    <title>Lease Time</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <default>3600</default>
+    <comment>When claiming an item (or batch of items) for work, how long should the item(s) be reserved. (Seconds)</comment>
+    <add>5.48</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>retry_limit</name>
+    <title>Retry Limit</title>
+    <comment>Number of permitted retries. Decreases with each retry. Zero (0) to disable. Null for system default.</comment>
+    <type>int</type>
+    <required>false</required>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>5.48</add>
+  </field>
+  <field>
+    <name>retry_interval</name>
+    <title>Retry Interval</title>
+    <comment>Number of seconds to wait before retrying a failed execution.</comment>
+    <type>int</type>
+    <required>false</required>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>5.48</add>
+  </field>
 </table>
