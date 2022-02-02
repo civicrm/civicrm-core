@@ -2702,6 +2702,27 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This is called if automatic execution of a queue-task fails.
+   *
+   * @param \CRM_Queue_Queue $queue
+   * @param \CRM_Queue_DAO_QueueItem|\stdClass $item
+   *   The enqeued item $item.
+   *   In principle, this is the $item format determined by the queue, which includes `id` and `data`.
+   *   In practice, it is typically an instance of `CRM_Queue_DAO_QueueItem`.
+   * @param string $outcome
+   *   The outcome of the task. One of 'ok', 'retry', 'fail'.
+   *   The outcome may be altered - eg to flip between 'retry' or 'fail'.
+   * @param \Throwable|null $exception
+   *   If the task failed, this is the cause of the failure.
+   */
+  public static function queueAutorunError(CRM_Queue_Queue $queue, $item, &$outcome, ?Throwable $exception) {
+    return self::singleton()->invoke(['job', 'params'], $queue, $item,
+      $outcome, $exception, self::$_nullObject, self::$_nullObject,
+      'civicrm_queueAutorunError'
+    );
+  }
+
+  /**
    * This hook is called before a scheduled job is executed
    *
    * @param CRM_Core_DAO_Job $job
