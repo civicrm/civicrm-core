@@ -16,7 +16,7 @@ namespace Civi\Api4\Generic\Traits;
  * @method $this setUseTrash(bool $useTrash) Pass FALSE to force delete and bypass trash
  * @method bool getUseTrash()
  */
-trait SoftDelete {
+trait SoftDeleteEntity {
 
   /**
    * Should $ENTITY be moved to the trash instead of permanently deleted?
