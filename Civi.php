@@ -124,7 +124,7 @@ class Civi {
    */
   public static function queue(string $name, array $params = []): CRM_Queue_Queue {
     $defaults = ['reset' => FALSE, 'is_persistent' => TRUE];
-    $params = array_merge($defaults, ['name' => $name], $params);
+    $params = array_merge($defaults, $params, ['name' => $name]);
     return CRM_Queue_Service::singleton()->create($params);
   }
 
