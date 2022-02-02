@@ -96,14 +96,13 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   public function doPayment(&$params, $component = 'contribute') {
     $propertyBag = \Civi\Payment\PropertyBag::cast($params);
     $this->_component = $component;
-    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
+    $result = $this->setStatusPaymentPending([]);
 
     // If we have a $0 amount, skip call to processor and set payment_status to Completed.
     // Conceivably a processor might override this - perhaps for setting up a token - but we don't
     // have an example of that at the moment.
     if ($propertyBag->getAmount() == 0) {
-      $result['payment_status_id'] = array_search('Completed', $statuses);
-      $result['payment_status'] = 'Completed';
+      $result = $this->setStatusPaymentCompleted($result);
       return $result;
     }
 
@@ -217,8 +216,8 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
         $trxn_id = (string) CRM_Core_DAO::singleValueQuery($query);
         $trxn_id = (int) str_replace('test', '', $trxn_id);
         ++$trxn_id;
-        $params['trxn_id'] = sprintf('test%08d', $trxn_id);
-        return $params;
+        $result['trxn_id'] = sprintf('test%08d', $trxn_id);
+        return $result;
       }
       throw new PaymentProcessorException('Error: [approval code related to test transaction but mode was ' . $this->_mode, 9099);
     }
@@ -231,14 +230,13 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
       // Success !
       if ($this->_mode !== 'test') {
         // 'trxn_id' is varchar(255) field. returned value is length 37
-        $params['trxn_id'] = $processorResponse['ssl_txn_id'];
+        $result['trxn_id'] = $processorResponse['ssl_txn_id'];
       }
 
       $params['trxn_result_code'] = $processorResponse['ssl_approval_code'] . "-Cvv2:" . $processorResponse['ssl_cvv2_response'] . "-avs:" . $processorResponse['ssl_avs_response'];
-      $params['payment_status_id'] = array_search('Completed', $statuses);
-      $params['payment_status'] = 'Completed';
+      $result = $this->setStatusPaymentCompleted($result);
 
-      return $params;
+      return $result;
     }
   }
 
