@@ -110,7 +110,9 @@ trait CRM_Queue_Queue_SqlTrait {
       1 => [$dao->id, 'Integer'],
     ];
     CRM_Core_DAO::executeQuery($sql, $params);
-    $dao->free();
+    if ($dao instanceof CRM_Core_DAO) {
+      $dao->free();
+    }
   }
 
 }
