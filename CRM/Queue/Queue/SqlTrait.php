@@ -80,6 +80,11 @@ trait CRM_Queue_Queue_SqlTrait {
     $dao->submit_time = CRM_Utils_Time::getTime('YmdHis');
     $dao->data = serialize($data);
     $dao->weight = CRM_Utils_Array::value('weight', $options, 0);
+    if (empty($options['retry_count']) xor empty($options['retry_interval'])) {
+      throw new \CRM_Core_Exception("Incomplete retry policy. Must specify retry_count and retry_interval together.");
+    }
+    $dao->retry_count = $options['retry_count'] ?? NULL;
+    $dao->retry_interval = $options['retry_interval'] ?? NULL;
     $dao->save();
   }
 
@@ -116,6 +121,26 @@ trait CRM_Queue_Queue_SqlTrait {
     }
     $dao->data = unserialize($dao->data);
     return $dao;
+  }
+
+  /**
+   * Mark an item for retry.
+   *
+   * @param CRM_Core_DAO|stdClass $dao
+   *   The item returned by claimItem.
+   */
+  public function retryItem($dao) {
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_queue_item
+      SET retry_count = retry_count - 1,
+          release_time = DATE_ADD(NOW(), INTERVAL retry_interval SECOND)
+      WHERE id = %1',
+      [
+        1 => [$dao->id, 'Positive'],
+      ]
+    );
+    if ($dao instanceof CRM_Core_DAO) {
+      $dao->free();
+    }
   }
 
   /**
