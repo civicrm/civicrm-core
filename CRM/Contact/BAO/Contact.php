@@ -2691,21 +2691,24 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
   }
 
   /**
-   * Given the component name and returns the count of participation of contact.
+   * Provides counts for the contact summary tabs.
    *
-   * @param string $component
-   *   Input component name.
+   * @param string $type
+   *   Type of record to count.
    * @param int $contactId
    *   Input contact id.
-   * @param string $tableName
-   *   Optional tableName if component is custom group.
+   * @param string|null $tableName
+   *   Deprecated - do not use
    *
    * @return int|false
    *   total number in database
    */
-  public static function getCountComponent($component, $contactId, $tableName = NULL) {
-    $object = NULL;
-    switch ($component) {
+  public static function getCountComponent(string $type, int $contactId, ?string $tableName = NULL) {
+    if ($tableName) {
+      // TODO: Fix LineItemEditor extension to not use this function, then enable warning
+      // CRM_Core_Error::deprecatedWarning('Deprecated argument $tableName passed to ' . __CLASS__ . '::' . __FUNCTION__);
+    }
+    switch ($type) {
       case 'tag':
         return CRM_Core_BAO_EntityTag::getContactTags($contactId, TRUE);
 
@@ -2719,7 +2722,6 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         return $result;
 
       case 'group':
-
         return CRM_Contact_BAO_GroupContact::getContactGroup($contactId, "Added", NULL, TRUE, FALSE, FALSE, TRUE, NULL, TRUE);
 
       case 'log':
@@ -2766,14 +2768,12 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         return CRM_Mailing_BAO_Mailing::getContactMailingsCount($params);
 
       default:
-        $custom = explode('_', $component);
-        if ($custom['0'] = 'custom') {
-          if (!$tableName) {
-            $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $custom['1'], 'table_name');
-          }
-          $queryString = "SELECT count(id) FROM {$tableName} WHERE entity_id = {$contactId}";
-          return (int) CRM_Core_DAO::singleValueQuery($queryString);
+        if (!$tableName) {
+          $custom = explode('_', $type);
+          $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $custom[1], 'table_name');
         }
+        $queryString = "SELECT count(id) FROM $tableName WHERE entity_id = $contactId";
+        return (int) CRM_Core_DAO::singleValueQuery($queryString);
     }
   }
 
@@ -2840,7 +2840,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         'CRM_Contact_BAO_Contact'
       );
       $emailGreetingString = CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($emailGreetingString));
-      $updateQueryString[] = " email_greeting_display = '{$emailGreetingString}'";
+      $updateQueryString[] = " email_greeting_display = '$emailGreetingString'";
     }
 
     if ($postalGreetingString) {
@@ -2850,7 +2850,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         'CRM_Contact_BAO_Contact'
       );
       $postalGreetingString = CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($postalGreetingString));
-      $updateQueryString[] = " postal_greeting_display = '{$postalGreetingString}'";
+      $updateQueryString[] = " postal_greeting_display = '$postalGreetingString'";
     }
 
     if ($addresseeString) {
@@ -2860,12 +2860,12 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         'CRM_Contact_BAO_Contact'
       );
       $addresseeString = CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($addresseeString));
-      $updateQueryString[] = " addressee_display = '{$addresseeString}'";
+      $updateQueryString[] = " addressee_display = '$addresseeString'";
     }
 
     if (!empty($updateQueryString)) {
       $updateQueryString = implode(',', $updateQueryString);
-      $queryString = "UPDATE civicrm_contact SET {$updateQueryString} WHERE id = {$contact->id}";
+      $queryString = "UPDATE civicrm_contact SET $updateQueryString WHERE id = {$contact->id}";
       CRM_Core_DAO::executeQuery($queryString);
     }
   }
@@ -3132,7 +3132,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         'class' => 'dashboard',
         // NOTE: As an alternative you can also build url on CMS specific way
         //  as CRM_Core_Config::singleton()->userSystem->getUserRecordUrl($contactId)
-        'href' => CRM_Utils_System::url('civicrm/user', "reset=1&id={$contactId}"),
+        'href' => CRM_Utils_System::url('civicrm/user', "reset=1&id=$contactId"),
         'icon' => 'crm-i fa-tachometer',
       ];
     }
@@ -3526,18 +3526,18 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    */
   private static function getTemplateForGreeting(string $greetingType, CRM_Contact_DAO_Contact $contact): string {
     $customFieldName = $greetingType . '_custom';
-    if (!CRM_Utils_System::isNull($contact->{$customFieldName})) {
-      return $contact->{$customFieldName};
+    if (!CRM_Utils_System::isNull($contact->$customFieldName)) {
+      return $contact->$customFieldName;
     }
     $idField = $greetingType . '_id';
-    if (!is_numeric($contact->{$idField})) {
+    if (!is_numeric($contact->$idField)) {
       return '';
     }
     $filter = [
       'contact_type' => $contact->contact_type,
       'greeting_type' => $greetingType,
     ];
-    return CRM_Core_PseudoConstant::greeting($filter)[$contact->{$idField}] ?? '';
+    return CRM_Core_PseudoConstant::greeting($filter)[$contact->$idField] ?? '';
   }
 
   /**
