@@ -66,6 +66,24 @@ trait CRM_Queue_Queue_SqlTrait {
   }
 
   /**
+   * Add a new item to the queue.
+   *
+   * @param mixed $data
+   *   Serializable PHP object or array.
+   * @param array $options
+   *   Queue-dependent options; for example, if this is a
+   *   priority-queue, then $options might specify the item's priority.
+   */
+  public function createItem($data, $options = []) {
+    $dao = new CRM_Queue_DAO_QueueItem();
+    $dao->queue_name = $this->getName();
+    $dao->submit_time = CRM_Utils_Time::getTime('YmdHis');
+    $dao->data = serialize($data);
+    $dao->weight = CRM_Utils_Array::value('weight', $options, 0);
+    $dao->save();
+  }
+
+  /**
    * Remove an item from the queue.
    *
    * @param CRM_Core_DAO|stdClass $dao
