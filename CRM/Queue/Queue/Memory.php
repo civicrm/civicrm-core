@@ -204,7 +204,13 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
    *   The item returned by claimItem.
    */
   public function releaseItem($item) {
-    unset($this->releaseTimes[$item->id]);
+    if (empty($this->queueSpec['retry_interval'])) {
+      unset($this->releaseTimes[$item->id]);
+    }
+    else {
+      $nowEpoch = CRM_Utils_Time::getTimeRaw();
+      $this->releaseTimes[$item->id] = $nowEpoch + $this->queueSpec['retry_interval'];
+    }
   }
 
 }

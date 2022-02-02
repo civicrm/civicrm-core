@@ -121,11 +121,17 @@ trait CRM_Queue_Queue_SqlTrait {
    *   The item returned by claimItem.
    */
   public function releaseItem($dao) {
-    $sql = "UPDATE civicrm_queue_item SET release_time = NULL WHERE id = %1";
-    $params = [
-      1 => [$dao->id, 'Integer'],
-    ];
-    CRM_Core_DAO::executeQuery($sql, $params);
+    if (empty($this->queueSpec['retry_interval'])) {
+      CRM_Core_DAO::executeQuery('UPDATE civicrm_queue_item SET release_time = NULL WHERE id = %1', [
+        1 => [$dao->id, 'Integer'],
+      ]);
+    }
+    else {
+      CRM_Core_DAO::executeQuery('UPDATE civicrm_queue_item SET release_time = DATE_ADD(NOW(), INTERVAL %2 SECOND) WHERE id = %1', [
+        1 => [$dao->id, 'Integer'],
+        2 => [$this->queueSpec['retry_interval'], 'Integer'],
+      ]);
+    }
     $dao->free();
   }
 
