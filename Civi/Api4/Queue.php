@@ -22,6 +22,8 @@ namespace Civi\Api4;
  */
 class Queue extends \Civi\Api4\Generic\DAOEntity {
 
+  use Generic\Traits\ManagedEntity;
+
   /**
    * @return array
    */
