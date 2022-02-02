@@ -25,25 +25,48 @@ class CRM_Queue_BAO_QueueItem extends CRM_Queue_DAO_QueueItem {
   /**
    * Ensure that the required SQL table exists.
    *
+   * The `civicrm_queue_item` table is a special requirement - without it, the upgrader cannot run.
+   * The upgrader will make a special request for `findCreateTable()` before computing upgrade-tasks.
+   *
    * @return bool
    *   TRUE if table now exists
    */
-  public static function findCreateTable() {
-    $checkTableSql = "show tables like 'civicrm_queue_item'";
-    $foundName = CRM_Core_DAO::singleValueQuery($checkTableSql);
-    if ($foundName == 'civicrm_queue_item') {
-      return TRUE;
+  public static function findCreateTable(): bool {
+    if (!CRM_Core_DAO::checkTableExists('civicrm_queue_item')) {
+      return static::createTable();
     }
+    else {
+      return static::updateTable();
+    }
+  }
 
+  /**
+   * Create the `civicrm_queue_item` table.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  protected static function createTable(): bool {
     // civicrm/sql/civicrm_queue_item.mysql
     $fileName = dirname(__FILE__) . '/../../../sql/civicrm_queue_item.mysql';
 
     $config = CRM_Core_Config::singleton();
     CRM_Utils_File::sourceSQLFile($config->dsn, $fileName);
 
-    // Make sure it succeeded
-    $foundName = CRM_Core_DAO::singleValueQuery($checkTableSql);
-    return ($foundName == 'civicrm_queue_item');
+    return CRM_Core_DAO::checkTableExists('civicrm_queue_item');
+  }
+
+  /**
+   * Ensure that the `civicrm_queue_item` table is up-to-date.
+   *
+   * @return bool
+   */
+  public static function updateTable(): bool {
+    CRM_Upgrade_Incremental_Base::addColumn(NULL, 'civicrm_queue_item', 'retry_interval',
+      "int NULL COMMENT 'Number of seconds to wait before retrying a failed execution. NULL to disable.'");
+    CRM_Upgrade_Incremental_Base::addColumn(NULL, 'civicrm_queue_item', 'retry_count',
+      "int NULL COMMENT 'Number of permitted retries. Decreases with each retry. NULL to disable.'");
+    return TRUE;
   }
 
 }

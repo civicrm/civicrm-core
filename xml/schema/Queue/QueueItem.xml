@@ -65,6 +65,28 @@
       <formatType>activityDateTime</formatType>
     </html>
   </field>
+  <field>
+    <name>retry_interval</name>
+    <title>Retry Interval</title>
+    <comment>Number of seconds to wait before retrying a failed execution. NULL to disable.</comment>
+    <type>int</type>
+    <required>false</required>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>5.47</add>
+  </field>
+  <field>
+    <name>retry_count</name>
+    <title>Retry Count</title>
+    <comment>Number of permitted retries. Decreases with each retry. NULL to disable.</comment>
+    <type>int</type>
+    <required>false</required>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>5.47</add>
+  </field>
 
   <field>
     <name>data</name>
