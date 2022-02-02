@@ -313,7 +313,17 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
     $formValues['main_details'] = $this->_mainDetails;
     $formValues['other_details'] = $this->_otherDetails;
+
+    // Check if any rel_tables checkboxes have been de-selected
+    $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($this->_cid, $this->_oid);
+    // If rel_tables is not set then initialise with 0 value, required for the check which calls removeContactBelongings in moveAllBelongings
+    foreach (array_keys($rowsElementsAndInfo['rel_tables']) as $relTableElement) {
+      if (!array_key_exists($relTableElement, $formValues)) {
+        $formValues[$relTableElement] = '0';
+      }
+    }
     $migrationData = ['migration_info' => $formValues];
+
     CRM_Utils_Hook::merge('form', $migrationData, $this->_cid, $this->_oid);
     CRM_Dedupe_Merger::moveAllBelongings($this->_cid, $this->_oid, $migrationData['migration_info']);
 
