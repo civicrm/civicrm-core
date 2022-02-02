@@ -96,7 +96,7 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
    * @throws \Civi\API\Exception\NotImplementedException
    */
   public static function migrateCiviGrant(CRM_Queue_TaskContext $ctx): bool {
-    $civiGrantEnabled = in_array('CiviGrant', Civi::settings()->get('enable_components'), TRUE);
+    $civiGrantEnabled = CRM_Core_Component::isEnabled('CiviGrant');
     if ($civiGrantEnabled) {
       CRM_Core_BAO_ConfigSetting::disableComponent('CiviGrant');
     }

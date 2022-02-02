@@ -266,7 +266,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
 
-    if (in_array('CiviPledge', CRM_Core_Config::singleton()->enableComponents) && !$this->_formType) {
+    if (CRM_Core_Component::isEnabled('CiviPledge') && !$this->_formType) {
       $this->preProcessPledge();
     }
 

@@ -520,8 +520,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->set('productID', $productID);
       $this->set('option', $option);
     }
-    $config = CRM_Core_Config::singleton();
-    if (in_array('CiviMember', $config->enableComponents) && empty($this->_ccid)) {
+    if (CRM_Core_Component::isEnabled('CiviMember') && empty($this->_ccid)) {
       if (isset($params['selectMembership']) &&
         $params['selectMembership'] !== 'no_thanks'
       ) {

@@ -53,7 +53,7 @@ class RelationshipCache extends Generic\AbstractEntity {
         'description' => ts('One or more related contacts'),
       ],
     ];
-    if (in_array('CiviCase', \Civi::settings()->get('enable_components'), TRUE)) {
+    if (\CRM_Core_Component::isEnabled('CiviCase')) {
       $info['bridge']['case_id'] = [
         'to' => 'far_contact_id',
         'label' => ts('Case Roles'),

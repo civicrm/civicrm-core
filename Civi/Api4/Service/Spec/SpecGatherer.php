@@ -92,9 +92,7 @@ class SpecGatherer {
       if (array_key_exists('contactType', $DAOField) && $spec->getValue('contact_type') && $DAOField['contactType'] != $spec->getValue('contact_type')) {
         continue;
       }
-      if (!empty($DAOField['component']) &&
-        !in_array($DAOField['component'], \Civi::settings()->get('enable_components'), TRUE)
-      ) {
+      if (!empty($DAOField['component']) && !\CRM_Core_Component::isEnabled($DAOField['component'])) {
         continue;
       }
       if ($DAOField['name'] == 'is_active' && empty($DAOField['default'])) {

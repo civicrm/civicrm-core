@@ -526,7 +526,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       'amount_level',
     ];
 
-    $config = CRM_Core_Config::singleton();
     if (isset($this->_values['is_recur']) && !empty($this->_paymentProcessor['is_recur'])) {
       $this->assign('is_recur_enabled', 1);
       $vars = array_merge($vars, [
@@ -537,9 +536,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       ]);
     }
 
-    if (in_array('CiviPledge', $config->enableComponents) &&
-      CRM_Utils_Array::value('is_pledge', $this->_params) == 1
+    if (CRM_Core_Component::isEnabled('CiviPledge') &&
+      !empty($this->_params['is_pledge'])
     ) {
+      // TODO: Assigned variable appears to be unused
       $this->assign('pledge_enabled', 1);
 
       $vars = array_merge($vars, [

@@ -23,9 +23,7 @@ class CRM_Upgrade_Incremental_php_FiveThirteen extends CRM_Upgrade_Incremental_B
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
-    $config = CRM_Core_Config::singleton();
-    $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
-    if ($rev == '5.13.alpha1' && $campaignEnabled) {
+    if ($rev == '5.13.alpha1' && CRM_Core_Component::isEnabled('CiviCampaign')) {
       $postUpgradeMessage .= '<br /><br />' . ts("If you have created a report based on the Mailing Summary Report template and it outputs or filters on campaigns, You will need to go back to that report and re-save the report after selecting and or setting the campaign filters up again");
     }
   }

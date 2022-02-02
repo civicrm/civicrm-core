@@ -220,8 +220,7 @@ abstract class CRM_Core_Component_Info {
    *   true if component is enabled, false if not
    */
   public function isEnabled() {
-    $config = CRM_Core_Config::singleton();
-    return in_array($this->info['name'], $config->enableComponents, TRUE);
+    return CRM_Core_Component::isEnabled($this->info['name']);
   }
 
   /**

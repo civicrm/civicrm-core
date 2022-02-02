@@ -2067,8 +2067,7 @@ AND cl.modified_id  = c.id
       'is_current_revision',
       'activity_is_deleted',
     ];
-    $config = CRM_Core_Config::singleton();
-    if (!in_array('CiviCampaign', $config->enableComponents)) {
+    if (!CRM_Core_Component::isEnabled('CiviCampaign')) {
       $skipFields[] = 'activity_engagement_level';
     }
 

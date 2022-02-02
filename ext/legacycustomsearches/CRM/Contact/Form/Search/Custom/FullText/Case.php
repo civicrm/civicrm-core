@@ -29,8 +29,7 @@ class CRM_Contact_Form_Search_Custom_FullText_Case extends CRM_Contact_Form_Sear
    * @return bool
    */
   public function isActive() {
-    $config = CRM_Core_Config::singleton();
-    return in_array('CiviCase', $config->enableComponents);
+    return CRM_Core_Component::isEnabled('CiviCase');
   }
 
   /**

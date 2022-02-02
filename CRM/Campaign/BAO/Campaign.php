@@ -294,7 +294,7 @@ Order By  camp.title";
    * @return bool
    */
   public static function isCampaignEnable(): bool {
-    return in_array('CiviCampaign', CRM_Core_Config::singleton()->enableComponents, TRUE);
+    return CRM_Core_Component::isEnabled('CiviCampaign');
   }
 
   /**

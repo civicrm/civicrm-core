@@ -269,8 +269,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
     // If CiviCase enabled AND "Add" mode OR "edit" mode for non-reserved activities, only allow user to pick Core or CiviCase component.
     // FIXME: Each component should define whether adding new activity types is allowed.
-    $config = CRM_Core_Config::singleton();
-    if ($this->_gName == 'activity_type' && in_array("CiviCase", $config->enableComponents) &&
+    if ($this->_gName == 'activity_type' && CRM_Core_Component::isEnabled("CiviCase") &&
       (($this->_action & CRM_Core_Action::ADD) || !$isReserved)
     ) {
       $caseID = CRM_Core_Component::getComponentID('CiviCase');

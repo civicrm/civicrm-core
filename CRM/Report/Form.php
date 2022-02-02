@@ -4399,9 +4399,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    */
   public function addCampaignFields($entityTable = 'civicrm_contribution', $groupBy = FALSE, $orderBy = FALSE, $filters = TRUE) {
     // Check if CiviCampaign is a) enabled and b) has active campaigns
-    $config = CRM_Core_Config::singleton();
-    $campaignEnabled = in_array('CiviCampaign', $config->enableComponents);
-    if ($campaignEnabled) {
+    if (CRM_Core_Component::isEnabled('CiviCampaign')) {
       $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, FALSE, FALSE, TRUE);
       // If we have a campaign, build out the relevant elements
       if (!empty($getCampaigns['campaigns'])) {
