@@ -26,9 +26,9 @@
  *   This is used by some CLI upgrades.
  *
  * This runner is not appropriate for all queues or workloads, so you might choose or create
- * a different runner. For example, `CRM_Queue_Autorunner` is geared toward background task lists.
+ * a different runner. For example, `CRM_Queue_TaskRunner` is geared toward background task lists.
  *
- * @see CRM_Queue_Autorunner
+ * @see CRM_Queue_TaskRunner
  */
 class CRM_Queue_Runner {
 
