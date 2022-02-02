@@ -59,12 +59,11 @@ class CRM_Queue_Task {
   /**
    * Perform the task.
    *
-   * @param array $taskCtx
-   *   Array with keys:
-   *   - log: object 'Log'
-   *
+   * @param \CRM_Queue_TaskContext $taskCtx
    * @throws Exception
-   * @return bool, TRUE if task completes successfully
+   * @return bool
+   *   TRUE if task completes successfully.
+   *   FALSE or exception if task fails.
    */
   public function run($taskCtx) {
     $args = $this->arguments;
