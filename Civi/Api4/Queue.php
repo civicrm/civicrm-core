@@ -25,6 +25,8 @@ use Civi\Api4\Action\Queue\RunItem;
  */
 class Queue extends \Civi\Api4\Generic\DAOEntity {
 
+  use Generic\Traits\ManagedEntity;
+
   /**
    * @return array
    */
