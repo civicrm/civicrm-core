@@ -198,11 +198,10 @@
     <add>2.1</add>
   </index>
   <index>
-    <name>UI_name_extends</name>
+    <name>UI_name</name>
     <fieldName>name</fieldName>
-    <fieldName>extends</fieldName>
     <unique>true</unique>
-    <add>2.1</add>
+    <add>5.47</add>
   </index>
   <field>
     <name>created_id</name>
