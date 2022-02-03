@@ -39,6 +39,11 @@
   "config": {
     "platform": {
       "php": "7.2"
+    },
+    "allow-plugins": {
+      "civicrm/composer-compile-plugin": true,
+      "civicrm/composer-downloads-plugin": true,
+      "cweagans/composer-patches": true
     }
   },
   "require": {
