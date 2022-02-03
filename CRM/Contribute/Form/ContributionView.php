@@ -24,6 +24,9 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function preProcess() {
     $id = $this->getID();
@@ -55,23 +58,6 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     }
     $this->assign('is_template', $values['is_template']);
 
-    $noACL = FALSE;
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && $this->_action & CRM_Core_Action::VIEW) {
-      $financialTypeID = CRM_Contribute_PseudoConstant::financialType($values['financial_type_id']);
-      CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($id, 'view');
-      if (CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($id, 'edit', FALSE)) {
-        $this->assign('canEdit', TRUE);
-      }
-      if (CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($id, 'delete', FALSE)) {
-        $this->assign('canDelete', TRUE);
-      }
-      if (!CRM_Core_Permission::check('view contributions of type ' . $financialTypeID)) {
-        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
-      }
-    }
-    elseif ($this->_action & CRM_Core_Action::VIEW) {
-      $noACL = TRUE;
-    }
     CRM_Contribute_BAO_Contribution::resolveDefaults($values);
 
     if (!empty($values['contribution_page_id'])) {
@@ -236,11 +222,8 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     if ($this->controller->_key) {
       $searchKey = $this->controller->_key;
     }
-    if ((
-        CRM_Core_Permission::check('edit_contributions')
-        && CRM_Core_Permission::check('edit contributions of type ' . $financialTypeID)
-        && !empty($canEdit)
-      ) || (CRM_Core_Permission::check('edit contributions') && $noACL)) {
+
+    if ($this->isHasAccess('update')) {
       $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=update&context={$context}";
       if (($context === 'fulltext' || $context === 'search') && $searchKey) {
         $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=update&context={$context}&key={$searchKey}";
@@ -262,11 +245,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       }
     }
 
-    if ((
-        CRM_Core_Permission::check('delete in CiviContribute')
-        && CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($financialTypeID))
-        && !empty($canDelete)
-      ) || (CRM_Core_Permission::check('delete in CiviContribute') && $noACL)) {
+    if ($this->isHasAccess('delete')) {
       $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=delete&context={$context}";
       if (($context === 'fulltext' || $context === 'search') && $searchKey) {
         $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=delete&context={$context}&key={$searchKey}";
@@ -339,6 +318,23 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $this->assign('payments', $paymentInfo['transaction']);
     $this->assign('paymentLinks', $paymentInfo['payment_links']);
     return $title;
+  }
+
+  /**
+   * @param string $action
+   *
+   * @return bool
+   */
+  private function isHasAccess(string $action): bool {
+    try {
+      return Contribution::checkAccess()
+        ->setAction($action)
+        ->addValue('id', $this->getID())
+        ->execute()->first()['access'];
+    }
+    catch (API_Exception $e) {
+      return FALSE;
+    }
   }
 
   /**
