@@ -50,11 +50,6 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'options' => ['limit' => 0],
       'sequential' => 1,
     ];
-    $groupNames = civicrm_api3('Group', 'get', $params + [
-      'is_active' => 1,
-      'check_permissions' => TRUE,
-      'return' => ['title', 'visibility', 'group_type', 'is_hidden'],
-    ]);
     $headerfooterList = civicrm_api3('MailingComponent', 'get', $params + [
       'is_active' => 1,
       'return' => [
@@ -97,8 +92,6 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'civiMails' => [],
       'campaignEnabled' => in_array('CiviCampaign', $config->enableComponents),
       'groupNames' => [],
-      // @todo this is not used in core. Remove once Mosaico no longer depends on it.
-      'testGroupNames' => $groupNames['values'],
       'headerfooterList' => $headerfooterList['values'],
       'mesTemplate' => $mesTemplate['values'],
       'emailAdd' => $emailAdd['values'],
