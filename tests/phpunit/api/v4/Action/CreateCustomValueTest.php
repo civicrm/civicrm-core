@@ -59,7 +59,7 @@ class CreateCustomValueTest extends BaseCustomValueTest {
       ->execute()
       ->first();
 
-    $this->assertEquals('Color', $optionGroup['title']);
+    $this->assertEquals('MyContactFields :: Color', $optionGroup['title']);
 
     $createdOptionValues = OptionValue::get(FALSE)
       ->addWhere('option_group_id', '=', $optionGroupId)

@@ -423,6 +423,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Profile',
       'Payment',
       'Order',
+      'OptionGroup',
       'MailingGroup',
       'Logging',
     ];

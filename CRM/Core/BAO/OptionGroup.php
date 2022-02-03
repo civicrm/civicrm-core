@@ -59,8 +59,8 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup implements \Civi
    * @param array $ids
    *   Reference array contains the id.
    *
-   *
-   * @return object
+   * @deprecated
+   * @return CRM_Core_DAO_OptionGroup
    */
   public static function add(&$params, $ids = []) {
     if (empty($params['id']) && !empty($ids['optionGroup'])) {

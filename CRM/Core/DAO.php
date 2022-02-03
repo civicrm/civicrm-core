@@ -923,8 +923,8 @@ class CRM_Core_DAO extends DB_DataObject {
     // Ensure fields exist before attempting to write to them
     $values = array_intersect_key($record, $fields);
     $instance->copyValues($values);
-    if (empty($values['id']) && array_key_exists('name', $fields) && empty($values['name']) && !empty($values['label'])) {
-      $instance->makeNameFromLabel();
+    if (empty($values['id']) && array_key_exists('name', $fields) && empty($values['name'])) {
+      $instance->makeNameFromLabel(!empty($fields['name']['required']));
     }
     $instance->save();
 
@@ -3290,8 +3290,10 @@ SELECT contact_id
    * create a unique, clean name derived from the label.
    *
    * Note: this function does nothing unless a unique index exists for "name" column.
+   *
+   * @var bool $isRequired
    */
-  private function makeNameFromLabel() {
+  private function makeNameFromLabel(bool $isRequired): void {
     $indexNameWith = NULL;
     // Look for a unique index which includes the "name" field
     if (method_exists($this, 'indices')) {
@@ -3305,7 +3307,14 @@ SELECT contact_id
       // No unique index on "name", do nothing
       return;
     }
-    $name = CRM_Utils_String::munge($this->label, '_', 252);
+    $label = $this->label ?? $this->title ?? NULL;
+    if (!$label && $label !== '0' && !$isRequired) {
+      // No label supplied and name not required, do nothing
+      return;
+    }
+    $maxLen = static::getSupportedFields()['name']['maxlength'] ?? 255;
+    // Strip unsafe characters and trim to max length (-3 characters leaves room for a unique suffix)
+    $name = CRM_Utils_String::munge($label, '_', $maxLen - 3);
 
     // Find existing records with the same name
     $sql = new CRM_Utils_SQL_Select($this::getTableName());
@@ -3319,8 +3328,9 @@ SELECT contact_id
     $existing = self::executeQuery($query)->fetchMap('id', 'name');
     $dupes = 0;
     $suffix = '';
+    // Add unique suffix if existing records have the same name
     while (in_array($name . $suffix, $existing)) {
-      $suffix = '_' . (++$dupes);
+      $suffix = '_' . ++$dupes;
     }
     $this->name = $name . $suffix;
   }

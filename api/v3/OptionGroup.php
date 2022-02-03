@@ -37,9 +37,12 @@ function civicrm_api3_option_group_get($params) {
  * @return array
  */
 function civicrm_api3_option_group_create($params) {
-  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'OptionGroup');
+  // Use deprecated BAO method in APIv3 for legacy support. APIv4 uses new writeRecords method.
+  $bao = CRM_Core_BAO_OptionGroup::add($params);
   civicrm_api('option_value', 'getfields', ['version' => 3, 'cache_clear' => 1]);
-  return $result;
+  $values = [];
+  _civicrm_api3_object_to_array($bao, $values[$bao->id]);
+  return civicrm_api3_create_success($values, $params, 'OptionGroup', 'create', $bao);
 }
 
 /**
