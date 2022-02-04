@@ -73,6 +73,10 @@
       this.onPostRun.push(function(result) {
         _.each(result, function(row) {
           row.permissionToEdit = CRM.checkPerm('all CiviCRM permissions and ACLs') || !_.includes(row.data.display_acl_bypass, true);
+          // If main entity doesn't exist, no can edit
+          if (!row.data['api_entity:label']) {
+            row.permissionToEdit = false;
+          }
           // Saves rendering cycles to not show an empty menu of search displays
           if (!row.data.display_name) {
             row.openDisplayMenu = false;
@@ -177,6 +181,10 @@
               }),
               searchMeta.fieldToColumn('api_entity:label', {
                 label: ts('For'),
+                empty_value: ts('Missing'),
+                cssRules: [
+                  ['font-italic', 'api_entity:label', 'IS EMPTY']
+                ]
               }),
               {
                 type: 'include',
