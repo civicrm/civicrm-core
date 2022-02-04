@@ -215,9 +215,11 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       if (($context === 'fulltext' || $context === 'search') && $searchKey) {
         $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=update&context={$context}&key={$searchKey}";
       }
-      foreach (CRM_Contribute_BAO_Contribution::getContributionPaymentLinks($this->getID(), $contributionStatus) as $paymentButton) {
-        $paymentButton['icon'] = 'fa-plus-circle';
-        $linkButtons[] = $paymentButton;
+      if (!$contribution['is_template']) {
+        foreach (CRM_Contribute_BAO_Contribution::getContributionPaymentLinks($this->getID(), $contributionStatus) as $paymentButton) {
+          $paymentButton['icon'] = 'fa-plus-circle';
+          $linkButtons[] = $paymentButton;
+        }
       }
       $linkButtons[] = [
         'title' => ts('Edit'),
@@ -244,7 +246,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $pdfUrlParams = "reset=1&id={$id}&cid={$values['contact_id']}";
     $emailUrlParams = "reset=1&id={$id}&cid={$values['contact_id']}&select=email";
     if (Civi::settings()->get('invoicing') && !$contribution['is_template']) {
-      if (($values['contribution_status'] != 'Refunded') && ($values['contribution_status'] != 'Cancelled')) {
+      if (($values['contribution_status'] !== 'Refunded') && ($values['contribution_status'] !== 'Cancelled')) {
         $invoiceButtonText = ts('Download Invoice');
       }
       else {
@@ -264,6 +266,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       ];
     }
     $this->assign('linkButtons', $linkButtons ?? []);
+    // These next 3 parameters are used to construct a url in PaymentInfo.tpl
     $this->assign('contactId', $values['contact_id']);
     $this->assign('componentId', $id);
     $this->assign('component', 'contribution');
