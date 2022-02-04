@@ -17,7 +17,7 @@ Other resources for identifying changes are:
 
 ## CiviCRM 5.46.0
 
-Released February 2, 2022
+Released February 3, 2022
 
 - **[Synopsis](release-notes/5.46.0.md#synopsis)**
 - **[Features](release-notes/5.46.0.md#features)**
@@ -25,6 +25,15 @@ Released February 2, 2022
 - **[Miscellany](release-notes/5.46.0.md#misc)**
 - **[Credits](release-notes/5.46.0.md#credits)**
 - **[Feedback](release-notes/5.46.0.md#feedback)**
+
+## CiviCRM 5.45.3
+
+Released February 3, 2022
+
+- **[Synopsis](release-notes/5.45.3.md#synopsis)**
+- **[Bugs resolved](release-notes/5.45.3.md#bugs)**
+- **[Credits](release-notes/5.45.3.md#credits)**
+- **[Feedback](release-notes/5.45.3.md#feedback)**
 
 ## CiviCRM 5.45.2
 
