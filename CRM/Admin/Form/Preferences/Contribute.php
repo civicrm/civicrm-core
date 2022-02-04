@@ -54,6 +54,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
         'html_type' => 'text',
         'title' => ts('Due Date'),
         'weight' => 3,
+        'description' => '',
       ],
       'due_date_period' => [
         'html_type' => 'select',
@@ -84,11 +85,13 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
         'html_type' => 'text',
         'title' => ts('Tax Term'),
         'weight' => 7,
+        'description' => '',
       ],
       'tax_display_settings' => [
         'html_type' => 'select',
         'title' => ts('Tax Display Settings'),
         'weight' => 8,
+        'description' => '',
         'option_values' => [
           'Do_not_show' => ts('Do not show breakdown, only show total - i.e %1', [
             1 => CRM_Utils_Money::format(120),
