@@ -4271,6 +4271,9 @@ LIMIT 1;";
   /**
    * Get payment links as they relate to a contribution.
    *
+   * If a payment can be made then include a payment link & if a refund is appropriate
+   * then a refund link.
+   *
    * @param int $id
    * @param string $contributionStatus
    *
@@ -4279,10 +4282,9 @@ LIMIT 1;";
    *     -url
    *     -title
    *
-   * If a payment can be made then include a payment link & if a refund is appropriate
-   * then a refund link.
+   * @internal - not supported for use outside of core.
    */
-  protected static function getContributionPaymentLinks(int $id, string $contributionStatus): array {
+  public static function getContributionPaymentLinks(int $id, string $contributionStatus): array {
     if ($contributionStatus === 'Failed' || !CRM_Core_Permission::check('edit contributions')) {
       // In general the balance is the best way to determine if a payment can be added or not,
       // but not for Failed contributions, where we don't accept additional payments at the moment.

@@ -178,17 +178,15 @@
       <td>{$thankyou_date|crmDate}</td>
     </tr>
   {/if}
+  <tr>
+    <td class='label'>{ts}Payment Summary{/ts}</td>
+    <td id='payment-info'></td>
+  </tr>
   {if empty($is_template)}
   <tr>
     <td class="label">{ts}Payment Details{/ts}</td>
     <td>{include file="CRM/Contribute/Form/PaymentInfoBlock.tpl"}</td>
   </tr>
-  {/if}
-  {if $addRecordPayment}
-    <tr>
-      <td class='label'>{ts}Payment Summary{/ts}</td>
-      <td id='payment-info'></td>
-    </tr>
   {/if}
 </table>
 
@@ -285,9 +283,7 @@
     </div>
   </fieldset>
 {/if}
-{if $addRecordPayment}
-  {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='payments'}
-{/if}
+{include file="CRM/Contribute/Page/PaymentInfo.tpl" show='payments'}
 
 <div class="crm-submit-buttons">
   {include file="CRM/common/formButtons.tpl" location="bottom"}

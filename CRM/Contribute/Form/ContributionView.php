@@ -202,20 +202,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     );
     $statusOptionValueNames = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $contributionStatus = $statusOptionValueNames[$values['contribution_status_id']];
-    if (in_array($contributionStatus, ['Partially paid', 'Pending refund'])
-        || ($contributionStatus == 'Pending' && $values['is_pay_later'])
-        ) {
-      if ($contributionStatus == 'Pending refund') {
-        $this->assign('paymentButtonName', ts('Record Refund'));
-      }
-      else {
-        $this->assign('paymentButtonName', ts('Record Payment'));
-      }
-      $this->assign('addRecordPayment', TRUE);
-      $this->assign('contactId', $values['contact_id']);
-      $this->assign('componentId', $id);
-      $this->assign('component', 'contribution');
-    }
+    $this->assign('addRecordPayment', in_array($contributionStatus, ['Partially paid', 'Pending refund', 'Pending']));
     $this->assignPaymentInfoBlock($id);
 
     $searchKey = NULL;
@@ -228,6 +215,10 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       if (($context === 'fulltext' || $context === 'search') && $searchKey) {
         $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=update&context={$context}&key={$searchKey}";
       }
+      foreach (CRM_Contribute_BAO_Contribution::getContributionPaymentLinks($this->getID(), $contributionStatus) as $paymentButton) {
+        $paymentButton['icon'] = 'fa-plus-circle';
+        $linkButtons[] = $paymentButton;
+      }
       $linkButtons[] = [
         'title' => ts('Edit'),
         'url' => 'civicrm/contact/view/contribution',
@@ -235,14 +226,6 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
         'icon' => 'fa-pencil',
         'accesskey' => 'e',
       ];
-      if (!empty($paymentButtonName)) {
-        $linkButtons[] = [
-          'title' => $paymentButtonName,
-          'url' => 'civicrm/payment',
-          'qs' => "action=add&reset=1&component=contribution&id={$id}&cid={$values['contact_id']}",
-          'icon' => 'fa-plus-circle',
-        ];
-      }
     }
 
     if ($this->isHasAccess('delete')) {
@@ -260,7 +243,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     $pdfUrlParams = "reset=1&id={$id}&cid={$values['contact_id']}";
     $emailUrlParams = "reset=1&id={$id}&cid={$values['contact_id']}&select=email";
-    if ($invoicing && empty($is_template)) {
+    if (Civi::settings()->get('invoicing') && !$contribution['is_template']) {
       if (($values['contribution_status'] != 'Refunded') && ($values['contribution_status'] != 'Cancelled')) {
         $invoiceButtonText = ts('Download Invoice');
       }
@@ -281,6 +264,10 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       ];
     }
     $this->assign('linkButtons', $linkButtons ?? []);
+    $this->assign('contactId', $values['contact_id']);
+    $this->assign('componentId', $id);
+    $this->assign('component', 'contribution');
+    $this->assignPaymentInfoBlock($id);
   }
 
   /**
