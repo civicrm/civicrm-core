@@ -43,19 +43,13 @@
             <tr class="crm-contribution-for_organization_help">
                 <td class="description" colspan="2">
                     {capture assign="profileURL"}{crmURL p='civicrm/admin/uf/group' q='reset=1'}{/capture}
-                    {if $invalidProfiles}
-                      {ts 1=$profileURL}You must <a href="%1">configure a valid organization profile</a> in order to allow individuals to contribute on behalf of an organization. Valid profiles include Contact and / or Organization fields, and may include Contribution and Membership fields.{/ts}
-                    {else}
-                      {ts 1=$profileURL}To change the organization data collected use the "On Behalf Of Organization" profile (<a href="%1">Administer > Customize Data and Screens > Profiles</a>).{/ts}
-                    {/if}
+                    {ts 1=$profileURL}To change the organization data collected use the "On Behalf Of Organization" profile (<a href="%1">Administer > Customize Data and Screens > Profiles</a>).{/ts}
                 </td>
             </tr>
-            {if !$invalidProfiles}
-              <tr class="crm-contribution-onbehalf_profile_id">
-                <td class="label">{$form.onbehalf_profile_id.label}</td>
-                <td>{$form.onbehalf_profile_id.html}</td>
-              </tr>
-            {/if}
+            <tr class="crm-contribution-onbehalf_profile_id">
+              <td class="label">{$form.onbehalf_profile_id.label}</td>
+              <td>{$form.onbehalf_profile_id.html}</td>
+            </tr>
             <tr id="for_org_text" class="crm-contribution-contributionpage-settings-form-block-for_organization">
                 <td class="label">{$form.for_organization.label}</td>
                 <td>{$form.for_organization.html}<br />
@@ -141,12 +135,12 @@
         <td>{$form.is_share.html} {$form.is_share.label} {help id="id-is_share"}</td>
       </tr>
         <tr class="crm-contribution-contributionpage-settings-form-block-is_active">
-        <td>&nbsp;</td>  
+        <td>&nbsp;</td>
         <td>{$form.is_active.html} {$form.is_active.label}</td>
       </tr>
   {if $contributionPageID}
         <tr class="crm-contribution-contributionpage-settings-form-block-info_link">
-        <td>&nbsp;</td>  
+        <td>&nbsp;</td>
         <td class="description">
           {if $config->userSystem->is_drupal || $config->userFramework EQ 'WordPress'}
               {ts}When your page is active, you can link people to the page by copying and pasting the following URL:{/ts}<br />
