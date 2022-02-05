@@ -14,11 +14,11 @@
       <table class="form-layout-compressed">
         <tr>
           <td>
-            <label>{$form.text.label}</label>
+            {$form.text.label}
             {$form.text.html}
           </td>
           <td>
-            <label>{ts}in...{/ts}</label>
+            {$form.table.label}
             {$form.table.html}
           </td>
           <td>{$form.buttons.html} {help id="id-fullText"}</td>
