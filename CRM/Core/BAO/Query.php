@@ -23,8 +23,6 @@ class CRM_Core_BAO_Query {
   public static function addCustomFormFields(&$form, $extends) {
     $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE, $extends);
     if ($groupDetails) {
-      $tplName = lcfirst($extends[0]) . 'GroupTree';
-      $form->assign($tplName, $groupDetails);
       foreach ($groupDetails as $group) {
         foreach ($group['fields'] as $field) {
           $fieldId = $field['id'];
@@ -38,6 +36,8 @@ class CRM_Core_BAO_Query {
         }
       }
     }
+    $tplName = lcfirst($extends[0]) . 'GroupTree';
+    $form->assign($tplName, $groupDetails);
   }
 
   /**
