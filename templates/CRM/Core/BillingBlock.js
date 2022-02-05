@@ -10,7 +10,7 @@
   function civicrm_billingblock_creditcard_helper() {
     $(function() {
       $.each(CRM.config.creditCardTypes, function(key, val) {
-        var html = '<a href="#" data-card_type=" + key + " title="' + val + '" class="crm-credit_card_type-icon-' + val.css_key + '"><span>' + val.label + '</span></a>';
+        var html = '<a href="#" data-card_type=" + key + " title="' + val.label + '" class="crm-credit_card_type-icon-' + val.css_key + '"><span>' + val.label + '</span></a>';
         $('.crm-credit_card_type-icons').append(html);
 
         $('.crm-credit_card_type-icon-' + val.css_key).click(function() {
