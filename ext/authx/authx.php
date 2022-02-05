@@ -37,8 +37,12 @@ Civi::dispatcher()->addListener('civi.invoke.auth', function($e) {
     }
   }
 
-  if (count($e->args) > 2 && $e->args[1] === 'ajax' && $e->args[2] === 'rest' && (!empty($_REQUEST['api_key']) || !empty($_REQUEST['key']))) {
-    return (new \Civi\Authx\LegacyRestAuthenticator())->auth($e, ['flow' => 'legacyrest', 'cred' => 'Bearer ' . $_REQUEST['api_key'] ?? '', 'siteKey' => $_REQUEST['key'] ?? NULL]);
+  // Accept legacy auth (?key=...&api_key=...) for 'civicrm/ajax/rest' and 'civicrm/ajax/api4/*'.
+  // The use of `?key=` could clash on some endpoints. Only accept on a small list of endpoints that are compatible with it.
+  if (count($e->args) > 2 && $e->args[1] === 'ajax' && in_array($e->args[2], ['rest', 'api4'])) {
+    if ((!empty($_REQUEST['api_key']) || !empty($_REQUEST['key']))) {
+      return (new \Civi\Authx\LegacyRestAuthenticator())->auth($e, ['flow' => 'legacyrest', 'cred' => 'Bearer ' . $_REQUEST['api_key'] ?? '', 'siteKey' => $_REQUEST['key'] ?? NULL]);
+    }
   }
 });
 
