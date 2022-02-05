@@ -35,7 +35,7 @@ $_authx_settings = function() {
     'html_type' => 'Select',
     'html_attributes' => [
       'multiple' => 1,
-      'class' => 'crm-select2',
+      'class' => 'huge crm-select2',
     ],
     'default' => ['site_key', 'perm'],
     'title' => ts('Authentication guard'),
@@ -54,15 +54,14 @@ $_authx_settings = function() {
       'html_type' => 'Select',
       'html_attributes' => [
         'multiple' => 1,
-        'class' => 'crm-select2',
+        'class' => 'huge crm-select2',
       ],
       'default' => ['jwt'],
       'title' => ts('Acceptable credentials (%1)', [1 => $flow]),
-      'help_text' => NULL,
       'pseudoconstant' => [
         'callback' => ['\Civi\Authx\Meta', 'getCredentialTypes'],
       ],
-      'settings_pages' => ['authx' => ['weight' => $weight]],
+      'settings_pages' => ['authx' => ['weight' => 1000 + $weight]],
     ];
     $s["authx_{$flow}_user"] = $basic + [
       'name' => "authx_{$flow}_user",
@@ -70,7 +69,7 @@ $_authx_settings = function() {
       'quick_form_type' => 'Select',
       'html_type' => 'Select',
       'html_attributes' => [
-        'class' => 'crm-select2',
+        'class' => 'huge crm-select2',
       ],
       'default' => 'optional',
       'title' => ts('User account requirements (%1)', [1 => $flow]),
@@ -78,7 +77,7 @@ $_authx_settings = function() {
       'pseudoconstant' => [
         'callback' => ['\Civi\Authx\Meta', 'getUserModes'],
       ],
-      'settings_pages' => ['authx' => ['weight' => $weight + 5]],
+      'settings_pages' => ['authx' => ['weight' => 2000 + $weight]],
     ];
   }
 
