@@ -9,7 +9,7 @@
 *}
 
 <tr>
-{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="receive_date" colspan="2"}
+{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="receive_date" to='' from='' colspan="2" class='' hideRelativeLabel=0}
 </tr>
 <tr>
   <td><label>{ts}Contribution Amounts{/ts}</label> <br />
@@ -159,7 +159,7 @@
   </td>
 </tr>
 <tr>
-  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="contribution_cancel_date" colspan="2"}
+  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="contribution_cancel_date" to='' from='' colspan="2" class='' hideRelativeLabel=0}
 </tr>
 <tr>
   <td>
