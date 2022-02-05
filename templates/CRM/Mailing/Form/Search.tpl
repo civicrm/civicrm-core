@@ -15,7 +15,7 @@
       </td>
     </tr>
     <tr>
-      {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="mailing" colspan='2'}
+      {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="mailing" to='' from='' colspan='2' class='' hideRelativeLabel=0}
     </tr>
     <tr>
       <td colspan="1">{$form.sort_name.label} {help id="id-create_sort_name"}<br />

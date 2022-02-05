@@ -17,9 +17,9 @@
   <td class="crm-event-form-block-event_type_id"> {$form.event_type_id.label}<br />{$form.event_type_id.html} </td>
 </tr>
 <tr>
-    {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="event" colspan="2"}</tr>
+    {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="event" to='' from='' colspan="2" class='' hideRelativeLabel=0}</tr>
 <tr>
-  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="participant_register_date" colspan="2"}
+  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="participant_register_date" to='' from='' colspan="2" class='' hideRelativeLabel=0}
 </tr>
 <tr>
   <td class="crm-event-form-block-participant_status"><label>{$form.participant_status_id.label}</label>
