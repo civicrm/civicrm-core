@@ -22,10 +22,7 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
    */
   public function run() {
     $config = CRM_Core_Config::singleton();
-    if (!$config->debug && (!array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
-        $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest"
-      )
-    ) {
+    if (!$config->debug && !CRM_Utils_REST::isWebServiceRequest()) {
       $response = [
         'error_code' => 401,
         'error_message' => "SECURITY ALERT: Ajax requests can only be issued by javascript clients, eg. CRM.api4().",

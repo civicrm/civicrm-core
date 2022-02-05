@@ -17,7 +17,7 @@ use CRM_Authx_ExtensionUtil as E;
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 $_authx_settings = function() {
-  $flows = ['param', 'header', 'xheader', 'login', 'auto', 'script', 'pipe'];
+  $flows = ['param', 'header', 'xheader', 'login', 'auto', 'script', 'pipe', 'legacyrest'];
   $basic = [
     'group_name' => 'CiviCRM Preferences',
     'group' => 'authx',
@@ -77,6 +77,9 @@ $_authx_settings = function() {
     ];
   }
 
+  // Override defaults for a few specific elements
+  $s['authx_legacyrest_cred']['default'] = ['jwt', 'api_key'];
+  $s['authx_legacyrest_user']['default'] = 'require';
   $s['authx_param_cred']['default'] = ['jwt', 'api_key'];
   $s['authx_header_cred']['default'] = ['jwt', 'api_key'];
   $s['authx_xheader_cred']['default'] = ['jwt', 'api_key'];

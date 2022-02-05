@@ -9,12 +9,17 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Test\HttpTestTrait;
+
 /**
  * Verify that the REST API bindings correctly parse and authenticate requests.
  *
  * @group e2e
  */
-class E2E_Extern_RestTest extends CiviEndToEndTestCase {
+abstract class E2E_Extern_BaseRestTest extends CiviEndToEndTestCase {
+
+  use HttpTestTrait;
+
   protected $url;
   protected static $api_key;
   protected $session_id;
@@ -46,10 +51,7 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
     $this->old_api_keys = [];
   }
 
-  protected function getRestUrl() {
-    return CRM_Core_Resources::singleton()
-      ->getUrl('civicrm', 'extern/rest.php');
-  }
+  abstract protected function getRestUrl();
 
   protected function tearDown(): void {
     if (!empty($this->old_api_keys)) {
@@ -211,9 +213,11 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
   public function testAPICalls($query, $is_error) {
     $this->updateAdminApiKey();
 
-    $client = CRM_Utils_HttpClient::singleton();
-    list($status, $data) = $client->post($this->getRestUrl(), $query);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
+    $http = $this->createGuzzle(['http_errors' => FALSE]);
+    $response = $http->post($this->getRestUrl(), ['form_params' => $query]);
+    $this->assertStatusCode(200, $response);
+    $data = (string) $response->getBody();
+
     $result = json_decode($data, TRUE);
     if ($result === NULL) {
       $msg = print_r(array(
@@ -231,7 +235,7 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
    * a real user. Submit in "?entity=X&action=X" notation
    */
   public function testNotCMSUser_entityAction() {
-    $client = CRM_Utils_HttpClient::singleton();
+    $http = $this->createGuzzle(['http_errors' => FALSE]);
 
     //Create contact with api_key
     $test_key = "testing1234";
@@ -251,9 +255,10 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
       "json" => "1",
       "api_key" => $test_key,
     );
-    list($status, $data) = $client->post($this->getRestUrl(), $params);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-    $result = json_decode($data, TRUE);
+
+    $response = $http->post($this->getRestUrl(), ['form_params' => $params]);
+    $this->assertStatusCode(200, $response);
+    $result = json_decode((string) $response->getBody(), TRUE);
     $this->assertNotNull($result);
     $this->assertAPIErrorCode($result, 1);
   }
@@ -264,7 +269,7 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
    */
   public function testGetCorrectUserBack() {
     $this->updateAdminApiKey();
-    $client = CRM_Utils_HttpClient::singleton();
+    $http = $this->createGuzzle(['http_errors' => FALSE]);
 
     //Create contact with api_key
     // The key associates with a real contact but not a real user
@@ -276,9 +281,9 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
       "api_key" => self::getApiKey(),
       "id" => "user_contact_id",
     );
-    list($status, $data) = $client->post($this->getRestUrl(), $params);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-    $result = json_decode($data, TRUE);
+    $response = $http->post($this->getRestUrl(), ['form_params' => $params]);
+    $this->assertStatusCode(200, $response);
+    $result = json_decode((string) $response->getBody(), TRUE);
     $this->assertNotNull($result);
     $this->assertEquals($result['id'], $this->adminContactId);
   }
@@ -288,7 +293,7 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
    * a real user. Submit in "?q=civicrm/$entity/$action" notation
    */
   public function testNotCMSUser_q() {
-    $client = CRM_Utils_HttpClient::singleton();
+    $http = $this->createGuzzle(['http_errors' => FALSE]);
 
     //Create contact with api_key
     $test_key = "testing1234";
@@ -307,9 +312,10 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
       "json" => "1",
       "api_key" => $test_key,
     );
-    list($status, $data) = $client->post($this->getRestUrl(), $params);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-    $result = json_decode($data, TRUE);
+    $response = $http->post($this->getRestUrl(), ['form_params' => $params]);
+
+    $this->assertStatusCode(200, $response);
+    $result = json_decode((string) $response->getBody(), TRUE);
     $this->assertNotNull($result);
     $this->assertAPIErrorCode($result, 1);
   }
