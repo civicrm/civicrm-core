@@ -202,7 +202,7 @@
       </div>
       <div class="display-block">
        <div class="label-left crm-section honoree_profile-section">
-          <strong>{$honorName}</strong></br>
+          <strong>{$honorName}</strong><br/>
           {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields prefix='honor'}
         </div>
       </div>

@@ -12,7 +12,7 @@
     <tr>
       {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="modified_date" to='' from='' class='' colspan='' hideRelativeLabel=0}
       <td>
-        <span class="modifiedBy"><label>{ts}Modified By{/ts}</label></span></br>
+        <span class="modifiedBy"><label>{ts}Modified By{/ts}</label></span><br/>
         {$form.changed_by.html}<br><span class="description">{ts}Note this field just filters on who made a change no matter when that change happened, It doesn't have any link to the modified date field.{/ts}</span>
       </td>
     </tr>
