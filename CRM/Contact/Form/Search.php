@@ -429,11 +429,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $ssID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $this->_groupID, 'saved_search_id');
         $this->assign('ssID', $ssID);
 
-        //get the saved search edit link
-        if ($ssID) {
-          $this->_ssID = $ssID;
-          $this->assign('editSmartGroupURL', CRM_Contact_BAO_SavedSearch::getEditSearchUrl($ssID));
-        }
+        $this->_ssID = $ssID;
+        $this->assign('editSmartGroupURL', $ssID ? CRM_Contact_BAO_SavedSearch::getEditSearchUrl($ssID) : FALSE);
 
         // Set dynamic page title for 'Show Members of Group'
         $this->setTitle(ts('Contacts in Group: %1', [1 => $this->_group[$this->_groupID]]));
