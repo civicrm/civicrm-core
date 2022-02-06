@@ -132,6 +132,11 @@ class Entity extends Generic\AbstractEntity {
           'data_type' => 'Array',
           'description' => 'When joining entities in the UI, which fields should be presented by default in the ON clause',
         ],
+        [
+          'name' => 'group_weights_by',
+          'data_type' => 'Array',
+          'description' => 'For sortable entities, what field groupings are used to order by weight',
+        ],
       ];
     }))->setCheckPermissions($checkPermissions);
   }

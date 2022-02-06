@@ -423,9 +423,9 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
         ->addValue('extends', 'Individual')
         ->execute()->first();
       $sampleData = [
-        ['label' => 'One'],
+        ['label' => 'One', 'html_type' => 'Select', 'option_values' => ['a' => 'A', 'b' => 'B']],
         ['label' => 'Two'],
-        ['label' => 'Three'],
+        ['label' => 'Three', 'html_type' => 'Select', 'option_values' => ['c' => 'C', 'd' => 'D']],
         ['label' => 'Four'],
       ];
       CustomField::save(FALSE)
