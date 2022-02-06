@@ -134,13 +134,13 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   /**
    * Check dashlet permission for current user.
    *
-   * @param array $permissions
-   * @param string $operator
+   * @param array|null $permissions
+   * @param string|null $operator
    *
    * @return bool
    *   true if user has permission to view dashlet
    */
-  public static function checkPermission($permissions, $operator) {
+  private static function checkPermission(?array $permissions, ?string $operator): bool {
     if ($permissions) {
       static $allComponents;
       if (!$allComponents) {
@@ -151,22 +151,9 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       foreach ($permissions as $key) {
         $showDashlet = TRUE;
 
-        $componentName = NULL;
-        if (strpos($key, 'access') === 0) {
-          $componentName = trim(substr($key, 6));
-          if (!in_array($componentName, $allComponents)) {
-            $componentName = NULL;
-          }
-        }
+        $componentName = CRM_Core_Permission::getComponentName($key);
 
-        // hack to handle case permissions
-        if (!$componentName
-          && in_array($key, ['access my cases and activities', 'access all cases and activities'])
-        ) {
-          $componentName = 'CiviCase';
-        }
-
-        //hack to determine if it's a component related permission
+        // If the permission depends on a component, ensure it is enabled
         if ($componentName) {
           if (!CRM_Core_Component::isEnabled($componentName) || !CRM_Core_Permission::check($key)) {
             $showDashlet = FALSE;
@@ -189,17 +176,10 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
         }
       }
 
-      if (!$showDashlet && !$hasPermission) {
-        return FALSE;
-      }
-      else {
-        return TRUE;
-      }
+      return $showDashlet || $hasPermission;
     }
-    else {
-      // if permission is not set consider everyone has permission to access it.
-      return TRUE;
-    }
+    // If permission is not set consider everyone has access.
+    return TRUE;
   }
 
   /**
