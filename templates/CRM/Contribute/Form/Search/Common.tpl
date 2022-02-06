@@ -25,7 +25,7 @@
     <label>{ts}Currency{/ts}</label> <br />
     {$form.contribution_currency_type.html|crmAddClass:twenty}
   </td>
-  {if !empty($form.contribution_batch_id.html)}
+  {if $form.contribution_batch_id.html}
     <td>
       {$form.contribution_batch_id.label}<br />
       {$form.contribution_batch_id.html}
@@ -58,7 +58,7 @@
 </tr>
 <tr>
   <td>
-    {if !empty($form.contribution_or_softcredits)}
+    {if $form.contribution_or_softcredits}
       {$form.contribution_or_softcredits.label} <br />
       {$form.contribution_or_softcredits.html}<br />
       <div class="float-left" id="contribution_soft_credit_type_wrapper">
@@ -138,7 +138,7 @@
     {$form.contribution_source.html|crmAddClass:twenty}
   </td>
   <td>
-    {if !empty($form.contribution_product_id)}
+    {if $form.contribution_product_id}
       {$form.contribution_product_id.label} <br />
       {$form.contribution_product_id.html|crmAddClass:twenty}
     {/if}
@@ -182,7 +182,7 @@ campaignTrClass='' campaignTdClass=''}
   </td>
 </tr>
 
-{if !empty($contributionGroupTree)}
+{if $contributionGroupTree}
 <tr>
   <td colspan="2">
   {include file="CRM/Custom/Form/Search.tpl" groupTree=$contributionGroupTree showHideLinks=false}</td>

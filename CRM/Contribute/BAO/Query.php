@@ -1008,6 +1008,9 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         ]
       );
     }
+    else {
+      $form->addOptionalQuickFormElement('contribution_product_id');
+    }
 
     self::addCustomFormFields($form, ['Contribution']);
 
@@ -1026,6 +1029,9 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         ] + $batches,
         FALSE, ['class' => 'crm-select2']
       );
+    }
+    else {
+      $form->addOptionalQuickFormElement('contribution_batch_id');
     }
 
     $form->assign('validCiviContribute', TRUE);
