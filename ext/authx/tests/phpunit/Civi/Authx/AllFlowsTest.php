@@ -181,13 +181,6 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       $this->markTestIncomplete("Cannot run test without CIVICRM_SITE_KEY");
     }
 
-    $addParam = function($request, $key, $value) {
-      $query = $request->getUri()->getQuery();
-      return $request->withUri(
-        $request->getUri()->withQuery($query . '&' . urlencode($key) . '=' . urlencode($value))
-      );
-    };
-
     [$credType, $flowType] = ['pass', 'header'];
     $http = $this->createGuzzle(['http_errors' => FALSE]);
     \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
