@@ -41,7 +41,6 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       }
     }
 
-    $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
 
@@ -95,7 +94,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $crmMailingSettings = [
       'templateTypes' => CRM_Mailing_BAO_Mailing::getTemplateTypes(),
       'civiMails' => [],
-      'campaignEnabled' => in_array('CiviCampaign', $config->enableComponents),
+      'campaignEnabled' => CRM_Core_Component::isEnabled('CiviCampaign'),
       'groupNames' => [],
       // @todo this is not used in core. Remove once Mosaico no longer depends on it.
       'testGroupNames' => $groupNames['values'],

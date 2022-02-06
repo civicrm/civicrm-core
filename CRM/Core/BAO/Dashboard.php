@@ -142,8 +142,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    */
   public static function checkPermission($permissions, $operator) {
     if ($permissions) {
-      $config = CRM_Core_Config::singleton();
-
       static $allComponents;
       if (!$allComponents) {
         $allComponents = CRM_Core_Component::getNames();
@@ -170,9 +168,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
 
         //hack to determine if it's a component related permission
         if ($componentName) {
-          if (!in_array($componentName, $config->enableComponents) ||
-            !CRM_Core_Permission::check($key)
-          ) {
+          if (!CRM_Core_Component::isEnabled($componentName) || !CRM_Core_Permission::check($key)) {
             $showDashlet = FALSE;
             if ($operator == 'AND') {
               return $showDashlet;

@@ -134,7 +134,6 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
 
     $dao = CRM_Core_DAO::executeQuery($sql, $queryParams);
 
-    $config = CRM_Core_Config::singleton();
     $rows = [];
     $url = 'civicrm/report/instance';
     $my_reports_grouping = 'My';
@@ -143,7 +142,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
         continue;
       }
 
-      $enabled = in_array("Civi{$dao->compName}", $config->enableComponents);
+      $enabled = CRM_Core_Component::isEnabled("Civi{$dao->compName}");
       if ($dao->compName == 'Contact' || $dao->compName == $dao->grouping) {
         $enabled = TRUE;
       }

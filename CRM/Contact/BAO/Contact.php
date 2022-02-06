@@ -3268,7 +3268,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
     $componentName = $menuOptions['component'] ?? NULL;
 
     // if component action - make sure component is enable.
-    if ($componentName && !in_array($componentName, CRM_Core_Config::singleton()->enableComponents)) {
+    if ($componentName && !CRM_Core_Component::isEnabled($componentName)) {
       return FALSE;
     }
 

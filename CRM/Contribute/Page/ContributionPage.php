@@ -299,15 +299,11 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
       return $controller->run();
     }
     elseif ($action & CRM_Core_Action::UPDATE) {
-      $config = CRM_Core_Config::singleton();
-
       // assign vars to templates
       $this->assign('id', $id);
       $this->assign('title', CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $id, 'title'));
       $this->assign('is_active', CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $id, 'is_active'));
-      if (in_array('CiviMember', $config->enableComponents)) {
-        $this->assign('CiviMember', TRUE);
-      }
+      $this->assign('CiviMember', CRM_Core_Component::isEnabled('CiviMember'));
     }
     elseif ($action & CRM_Core_Action::COPY) {
       // @todo Unused local variable can be safely removed.

@@ -39,8 +39,7 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
         ]);
       }
 
-      $config = CRM_Core_Config::singleton();
-      if (in_array('CiviCase', $config->enableComponents)) {
+      if (CRM_Core_Component::isEnabled('CiviCase')) {
         // Do dry-run to get warning messages.
         $messages = self::_changeCaseTypeLabelToName(TRUE);
         foreach ($messages as $message) {
@@ -62,8 +61,7 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
       "tinyint(4) DEFAULT '0' COMMENT 'Shows this is a template for recurring contributions.'", FALSE, '5.20.alpha1');
     $this->addTask('Add order_reference field to civicrm_financial_trxn', 'addColumn', 'civicrm_financial_trxn', 'order_reference',
       "varchar(255) COMMENT 'Payment Processor external order reference'", FALSE, '5.20.alpha1');
-    $config = CRM_Core_Config::singleton();
-    if (in_array('CiviCase', $config->enableComponents)) {
+    if (CRM_Core_Component::isEnabled('CiviCase')) {
       $this->addTask('Change direction of autoassignees in case type xml', 'changeCaseTypeAutoassignee');
       $this->addTask('Change labels back to names in case type xml', 'changeCaseTypeLabelToName');
     }

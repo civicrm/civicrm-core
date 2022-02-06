@@ -3455,8 +3455,7 @@ SELECT  group_id
    */
   public static function isProfileDoubleOptin() {
     // check for double optin
-    $config = CRM_Core_Config::singleton();
-    if (in_array('CiviMail', $config->enableComponents)) {
+    if (CRM_Core_Component::isEnabled('CiviMail')) {
       return Civi::settings()->get('profile_double_optin');
     }
     return FALSE;
@@ -3467,8 +3466,7 @@ SELECT  group_id
    */
   public static function isProfileAddToGroupDoubleOptin() {
     // check for add to group double optin
-    $config = CRM_Core_Config::singleton();
-    if (in_array('CiviMail', $config->enableComponents)) {
+    if (CRM_Core_Component::isEnabled('CiviMail')) {
       return Civi::settings()->get('profile_add_to_group_double_optin');
     }
     return FALSE;

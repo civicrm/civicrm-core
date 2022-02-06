@@ -251,9 +251,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       return $messages;
     }
 
-    $config = CRM_Core_Config::singleton();
-
-    if (in_array('CiviMail', $config->enableComponents) &&
+    if (CRM_Core_Component::isEnabled('CiviMail') &&
       CRM_Core_BAO_MailSettings::defaultDomain() == "EXAMPLE.ORG"
     ) {
       $message = new CRM_Utils_Check_Message(

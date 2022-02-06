@@ -368,9 +368,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
         $componentName = CRM_Core_Permission::getComponentName($key);
 
         if ($componentName) {
-          if (!in_array($componentName, CRM_Core_Config::singleton()->enableComponents) ||
-            !CRM_Core_Permission::check($key)
-          ) {
+          if (!CRM_Core_Component::isEnabled($componentName) || !CRM_Core_Permission::check($key)) {
             $showItem = FALSE;
             if ($operator == 'AND') {
               return FALSE;

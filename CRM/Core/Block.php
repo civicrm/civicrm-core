@@ -326,8 +326,6 @@ class CRM_Core_Block {
    * Create the list of options to create New objects for the application and format is as a block.
    */
   private static function setTemplateShortcutValues() {
-    $config = CRM_Core_Config::singleton();
-
     static $shortCuts = [];
 
     if (!($shortCuts)) {
@@ -349,14 +347,12 @@ class CRM_Core_Block {
 
       $components = CRM_Core_Component::getEnabledComponents();
 
-      if (!empty($config->enableComponents)) {
+      if ($components) {
         // check if we can process credit card contribs
         $newCredit = CRM_Core_Config::isEnabledBackOfficeCreditCardPayments();
 
-        foreach ($components as $componentName => $obj) {
-          if (in_array($componentName, $config->enableComponents)) {
-            $obj->creatNewShortcut($shortCuts, $newCredit);
-          }
+        foreach ($components as $obj) {
+          $obj->creatNewShortcut($shortCuts, $newCredit);
         }
       }
 

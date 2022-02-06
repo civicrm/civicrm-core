@@ -423,9 +423,7 @@ class CRM_Core_Permission {
    *   Access to specified $module is granted.
    */
   public static function access($module, $checkPermission = TRUE, $requireAllCasesPermOnCiviCase = FALSE) {
-    $config = CRM_Core_Config::singleton();
-
-    if (!in_array($module, $config->enableComponents)) {
+    if (!CRM_Core_Component::isEnabled($module)) {
       return FALSE;
     }
 

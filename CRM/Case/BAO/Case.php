@@ -34,8 +34,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @return bool
    */
   public static function enabled() {
-    $config = CRM_Core_Config::singleton();
-    return in_array('CiviCase', $config->enableComponents);
+    return CRM_Core_Component::isEnabled('CiviCase');
   }
 
   /**
