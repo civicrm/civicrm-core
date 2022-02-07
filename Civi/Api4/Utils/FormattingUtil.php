@@ -117,7 +117,7 @@ class FormattingUtil {
 
     switch ($fieldSpec['data_type'] ?? NULL) {
       case 'Timestamp':
-        $value = self::formatDateValue('Y-m-d H:i:s', $value, $operator, $index);
+        $value = self::formatDateValue('YmdHis', $value, $operator, $index);
         break;
 
       case 'Date':

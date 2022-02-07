@@ -21,6 +21,7 @@ namespace api\v4\Action;
 
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\CustomValue;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\OptionValue;
 
@@ -71,6 +72,52 @@ class CreateCustomValueTest extends BaseCustomValueTest {
     $createdOptionValues = array_combine($values, $labels);
 
     $this->assertEquals($optionValues, $createdOptionValues);
+  }
+
+  /**
+   * Test setting/getting a multivalue customfield with date+time
+   */
+  public function testCustomDataWithDateTime() {
+    CustomGroup::create(FALSE)
+      ->addValue('title', 'MyContactDateFields')
+      ->addValue('name', 'MyContactDateFields')
+      ->addValue('extends', 'Contact')
+      ->addValue('is_multiple', TRUE)
+      ->execute();
+
+    CustomField::create(FALSE)
+      ->addValue('custom_group_id:name', 'MyContactDateFields')
+      ->addValue('label', 'Date field')
+      ->addValue('name', 'date_field')
+      ->addValue('data_type', 'Date')
+      ->addValue('html_type', 'Select Date')
+      ->addValue('date_format', 'yy-mm-dd')
+      ->execute();
+
+    CustomField::create(FALSE)
+      ->addValue('custom_group_id:name', 'MyContactDateFields')
+      ->addValue('label', 'Date time field')
+      ->addValue('name', 'date_time_field')
+      ->addValue('data_type', 'Date')
+      ->addValue('html_type', 'Select Date')
+      ->addValue('date_format', 'yy-mm-dd')
+      ->addValue('time_format', 2)
+      ->execute();
+
+    $contactID = $this->createEntity(['type' => 'Individual'])['id'];
+
+    CustomValue::create('MyContactDateFields', FALSE)
+      ->addValue('date_field', '2022-02-02')
+      ->addValue('date_time_field', '2022-02-02 12:07:31')
+      ->addValue('entity_id', $contactID)
+      ->execute();
+    $result = CustomValue::get('MyContactDateFields', FALSE)
+      ->execute()
+      ->first();
+
+    $this->assertEquals('2022-02-02', $result['date_field']);
+    $this->assertEquals('2022-02-02 12:07:31', $result['date_time_field']);
+
   }
 
 }
