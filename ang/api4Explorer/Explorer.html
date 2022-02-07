@@ -203,6 +203,26 @@
         </ul>
       </div>
       <div class="panel-body">
+        <div class="alert alert-danger" ng-if="selectedTab.code === 'rest' && !$ctrl.authxEnabled">
+          <p>
+            {{:: ts('To enable REST authentication, the AuthX extension must be installed.') }}
+            <a target="_blank" ng-href="{{ crmUrl('civicrm/admin/extensions') }}">
+              <i class="crm-i fa-gear"> {{:: ts('Manage Extensions') }}</i>
+            </a>
+          </p>
+        </div>
+        <div class="alert alert-warning" ng-if="selectedTab.code === 'rest' && $ctrl.authxEnabled">
+          <p>
+            <a target="_blank" ng-href="{{ crmUrl('civicrm/admin/setting/authx', {reset: 1}) }}">
+              <i class="crm-i fa-gear"> {{:: ts('Configure REST Authentication') }}</i>
+            </a>
+          </p>
+          <p>
+            <a target="_blank" href="https://docs.civicrm.org/dev/en/latest/api/v4/rest/">
+              <i class="crm-i fa-external-link"> {{:: ts('REST Documentation') }}</i>
+            </a>
+          </p>
+        </div>
         <div ng-repeat="style in code[selectedTab.code]">
           <label>{{:: style.label }}</label>
           <div><pre class="prettyprint" ng-bind-html="style.code"></pre></div>
