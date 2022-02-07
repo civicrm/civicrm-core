@@ -6,6 +6,7 @@
 
 afform
 authx
+civigrant
 contributioncancelactions
 ckeditor4
 eventcart
