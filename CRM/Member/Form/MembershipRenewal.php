@@ -627,7 +627,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         'membership_id' => $membership->id,
         'contribution_recur_id' => $contributionRecurID,
       ]);
-      CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams);
+      $contribution = CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams);
+      $this->_params['contribution_id'] = $contribution->id;
     }
 
     if (!empty($this->_params['send_receipt'])) {
@@ -708,6 +709,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         'from' => $receiptFrom,
         'toName' => $this->_contributorDisplayName,
         'toEmail' => $this->_contributorEmail,
+        'PDFFilename' => ts('receipt') . '.pdf',
+        'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
+        'contributionId' => $this->_params['contribution_id'],
         'isTest' => $this->_mode === 'test',
       ]
     );
