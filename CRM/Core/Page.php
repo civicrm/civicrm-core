@@ -129,6 +129,9 @@ class CRM_Core_Page {
     // Required for footer.tpl,
     // See ExampleHookTest:testPageOutput.
     'footer_status_severity',
+    // in 'body.tpl
+    'suppressForm',
+    'beginHookFormElements',
   ];
 
   /**
