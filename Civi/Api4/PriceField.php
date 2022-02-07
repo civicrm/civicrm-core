@@ -15,6 +15,7 @@ namespace Civi\Api4;
  *
  * @searchable secondary
  * @orderBy weight
+ * @groupWeightsBy price_set_id
  * @since 5.27
  * @package Civi\Api4
  */

@@ -330,6 +330,7 @@ trait DAOActionTrait {
     /** @var \CRM_Core_DAO|string $daoName */
     $daoName = CoreUtil::getInfoItem($this->getEntityName(), 'dao');
     $weightField = CoreUtil::getInfoItem($this->getEntityName(), 'order_by');
+    $grouping = CoreUtil::getInfoItem($this->getEntityName(), 'group_weights_by');
     $idField = CoreUtil::getIdFieldName($this->getEntityName());
     // If updating an existing record without changing weight, do nothing
     if (!isset($record[$weightField]) && !empty($record[$idField])) {
@@ -339,10 +340,8 @@ trait DAOActionTrait {
     $newWeight = $record[$weightField] ?? NULL;
     $oldWeight = empty($record[$idField]) ? NULL : \CRM_Core_DAO::getFieldValue($daoName, $record[$idField], $weightField);
 
-    // FIXME: Need a more metadata-ish approach. For now here's a hardcoded list of the fields sortable entities use for grouping.
-    $guesses = ['option_group_id', 'price_set_id', 'price_field_id', 'premiums_id', 'uf_group_id', 'custom_group_id', 'parent_id', 'domain_id'];
     $filters = [];
-    foreach (array_intersect($guesses, array_keys($daoFields)) as $filter) {
+    foreach ($grouping ?? [] as $filter) {
       $filters[$filter] = $record[$filter] ?? (empty($record[$idField]) ? NULL : \CRM_Core_DAO::getFieldValue($daoName, $record[$idField], $filter));
     }
     // Supply default weight for new record
