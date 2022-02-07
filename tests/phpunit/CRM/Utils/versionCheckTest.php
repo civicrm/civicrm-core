@@ -211,7 +211,6 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
         'Event',
         'Participant',
         'Friend',
-        'Grant',
         'Mailing',
         'Membership',
         'MembershipBlock',
