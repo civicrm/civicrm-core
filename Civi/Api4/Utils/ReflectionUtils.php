@@ -88,7 +88,7 @@ class ReflectionUtils {
         elseif ($key == 'return') {
           $info['return'] = explode('|', $words[0]);
         }
-        elseif ($key == 'options' || $key == 'ui_join_filters') {
+        elseif ($key == 'options' || $key == 'ui_join_filters' || $key == 'groupWeightsBy') {
           $val = str_replace(', ', ',', implode(' ', $words));
           $info[$key] = explode(',', $val);
         }

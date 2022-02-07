@@ -16,6 +16,7 @@ namespace Civi\Api4;
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields/
  * @searchable secondary
  * @orderBy weight
+ * @groupWeightsBy custom_group_id
  * @since 5.19
  * @package Civi\Api4
  */
