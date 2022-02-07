@@ -49,9 +49,13 @@
         var data = [];
         _.each(ctrl.types, function(type) {
           if (type.enabled) {
-            _.each(type.values, function(values) {
-              data.push([type.entity, 'create', {values: values}]);
-            });
+            var params = {records: type.values};
+            // Afform always matches on 'name', no need to add it to the API 'save' params
+            if (type.entity !== 'Afform') {
+              // Group and SavedSearch match by 'name', SearchDisplay also matches by 'saved_search_id'.
+              params.match = type.entity === 'SearchDisplay' ? ['name', 'saved_search_id'] : ['name'];
+            }
+            data.push([type.entity, 'save', params]);
           }
         });
         ctrl.output = JSON.stringify(data, null, 2);

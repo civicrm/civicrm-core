@@ -40,35 +40,27 @@
         var $dialog = this;
         $dialog.buttons = [];
 
-        $dialog.close = function (result) {
+        $dialog.close = function(result) {
           dialogService.close($dialog.name, result);
         };
 
-        $dialog.cancel = function (result) {
+        $dialog.cancel = function() {
           dialogService.cancel($dialog.name);
         };
 
         $dialog.loadButtons = function() {
           var buttons = [];
           angular.forEach($dialog.buttons, function (crmDialogButton) {
-            var button = _.pick(crmDialogButton, ['id', 'icons', 'text']);
-            button.click = function () {
-              crmDialogButton.onClick();
+            var button = _.pick(crmDialogButton, ['icons', 'text', 'disabled']);
+            button.click = function() {
+              $scope.$apply(crmDialogButton.onClick);
             };
             buttons.push(button);
           });
           dialogService.setButtons($dialog.name, buttons);
-          $dialog.toggleButtons();
         };
 
-        $dialog.toggleButtons = function() {
-          angular.forEach($dialog.buttons, function (crmDialogButton) {
-            $('#' + crmDialogButton.id).prop('disabled', crmDialogButton.disabled);
-          });
-        };
-
-        $timeout(function(){
-          $dialog.loadButtons();
+        $timeout(function() {
           $('.ui-dialog:last input:not([disabled]):not([type="submit"]):first').focus();
         });
 
@@ -79,8 +71,6 @@
       }
     };
   });
-
-  var idNum = 1;
 
   // Ex: <crm-dialog-button text="ts('Do it')" icons="{primary: 'fa-foo'}" on-click="doIt()" />
   angular.module('crmDialog').component('crmDialogButton', {
@@ -97,12 +87,10 @@
       var $ctrl = this;
       $ctrl.$onInit = function() {
         $ctrl.crmDialog.buttons.push(this);
+        $scope.$watch('$ctrl.disabled', $ctrl.crmDialog.loadButtons);
+        $scope.$watch('$ctrl.text', $ctrl.crmDialog.loadButtons);
+        $scope.$watch('$ctrl.icons', $ctrl.crmDialog.loadButtons);
       };
-      $ctrl.id = 'crmDialogButton_' + (idNum++);
-
-      $scope.$watch('$ctrl.disabled', function() {
-        $ctrl.crmDialog.toggleButtons();
-      });
     }
   });
 
