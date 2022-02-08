@@ -3,6 +3,7 @@
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\MessageTemplate;
+use Civi\Api4\Translation;
 use Civi\Token\TokenProcessor;
 
 /**
@@ -22,6 +23,12 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     Civi::cache('metadata')->clear();
   }
 
+  /**
+   * Basic render function test.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
   public function testRenderTemplate(): void {
     $contactId = $this->individualCreate([
       'first_name' => 'Abba',
@@ -43,6 +50,41 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $this->assertEquals('Hello testRenderTemplate Abba Baab!', $rendered['subject']);
     $this->assertEquals('Hello testRenderTemplate Abba Baab!', $rendered['text']);
     $this->assertStringContainsString('<p>Hello testRenderTemplate Abba Baab!</p>', $rendered['html']);
+  }
+
+  /**
+   * Test that translated strings are rendered for templates where they exist.
+   *
+   * @throws \API_Exception|\CRM_Core_Exception
+   */
+  public function testRenderTranslatedTemplate(): void {
+    $this->individualCreate(['preferred_language' => 'fr_FR']);
+    $contributionID = $this->contributionCreate(['contact_id' => $this->ids['Contact']['individual_0']]);
+    $messageTemplateID = MessageTemplate::get()
+      ->addWhere('is_default', '=', 1)
+      ->addWhere('workflow_name', '=', 'contribution_online_receipt')
+      ->addSelect('id')
+      ->execute()->first()['id'];
+
+    Translation::save()->setRecords([
+      ['entity_field' => 'subject', 'string' => 'Bonjour'],
+      ['entity_field' => 'html_msg', 'string' => 'Voila!'],
+    ])->setDefaults([
+      'entity_table' => 'civicrm_msg_template',
+      'entity_id' => $messageTemplateID,
+      'status_id:name' => 'active',
+      'language' => 'fr_FR',
+    ])->execute();
+
+    $rendered = CRM_Core_BAO_MessageTemplate::renderTemplate([
+      'workflow' => 'contribution_online_receipt',
+      'tokenContext' => [
+        'contactId' => $this->ids['Contact']['individual_0'],
+        'contributionId' => $contributionID,
+      ],
+    ]);
+    $this->assertEquals('Bonjour', $rendered['subject']);
+    $this->assertEquals('Voila', $rendered['html']);
   }
 
   /**
