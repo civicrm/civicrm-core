@@ -6,6 +6,7 @@
 
 afform
 authx
+civicrm_admin_ui
 civigrant
 contributioncancelactions
 ckeditor4
