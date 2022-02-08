@@ -15,6 +15,9 @@ CRM._ = _;
 function ts(text, params) {
   "use strict";
   var d = (params && params.domain) ? ('strings::' + params.domain) : null;
+  if (params && params.plural && params.count > 1) {
+    text = params.plural;
+  }
   if (d && CRM[d] && CRM[d][text]) {
     text = CRM[d][text];
   }
