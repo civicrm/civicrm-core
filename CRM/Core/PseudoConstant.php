@@ -162,8 +162,7 @@ class CRM_Core_PseudoConstant {
    * @param string $fieldName
    * @param array $params
    * - name       string  name of the option group
-   * - flip       boolean results are return in id => label format if false
-   *                            if true, the results are reversed
+   * - flip       DEPRECATED
    * - grouping   boolean if true, return the value in 'grouping' column (currently unsupported for tables other than option_value)
    * - localize   boolean if true, localize the results before returning
    * - condition  string|array add condition(s) to the sql query - will be concatenated using 'AND'
@@ -228,6 +227,11 @@ class CRM_Core_PseudoConstant {
         $fieldOptions = call_user_func(Civi\Core\Resolver::singleton()->get($pseudoconstant['callback']), $context, $params);
         //CRM-18223: Allow additions to field options via hook.
         CRM_Utils_Hook::fieldOptions($entity, $fieldName, $fieldOptions, $params);
+        if ($context === 'validate') {
+          // This mode requires machine names and key/value pairs don't have a name, so
+          // use key for name. (labels are translatable so don't make suitable machine names)
+          return array_combine(array_keys($fieldOptions), array_keys($fieldOptions));
+        }
         return $fieldOptions;
       }
 
@@ -255,10 +259,10 @@ class CRM_Core_PseudoConstant {
           $params['grouping'],
           $params['localize'],
           $params['condition'] ? ' AND ' . implode(' AND ', (array) $params['condition']) : NULL,
-          $params['labelColumn'] ? $params['labelColumn'] : 'label',
+          $params['labelColumn'] ?: 'label',
           $params['onlyActive'],
           $params['fresh'],
-          $params['keyColumn'] ? $params['keyColumn'] : 'value',
+          $params['keyColumn'] ?: 'value',
           !empty($params['orderColumn']) ? $params['orderColumn'] : 'weight'
         );
         CRM_Utils_Hook::fieldOptions($entity, $fieldName, $options, $params);

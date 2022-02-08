@@ -212,7 +212,8 @@ class BasicActionsTest extends UnitTestCase implements HookInterface {
     // Simple options should be expanded to non-assoc array
     $this->assertCount(2, $getFields);
     $this->assertEquals('one', $getFields['group']['options'][0]['id']);
-    $this->assertEquals('First', $getFields['group']['options'][0]['name']);
+    // Name is interchangeable with id
+    $this->assertEquals('one', $getFields['group']['options'][0]['name']);
     $this->assertEquals('First', $getFields['group']['options'][0]['label']);
     $this->assertFalse(isset($getFields['group']['options'][0]['color']));
     // Complex options should give all requested properties
@@ -400,7 +401,7 @@ class BasicActionsTest extends UnitTestCase implements HookInterface {
   public function testPseudoconstantMatch() {
     $records = [
       ['group:label' => 'First', 'shape' => 'round', 'fruit:name' => 'banana'],
-      ['group:name' => 'Second', 'shape' => 'square', 'fruit:label' => 'Pear'],
+      ['group:name' => 'two', 'shape' => 'square', 'fruit:label' => 'Pear'],
     ];
     $this->replaceRecords($records);
 
@@ -412,7 +413,7 @@ class BasicActionsTest extends UnitTestCase implements HookInterface {
     $this->assertEquals('round', $results[0]['shape']);
     $this->assertEquals('one', $results[0]['group']);
     $this->assertEquals('First', $results[0]['group:label']);
-    $this->assertEquals('First', $results[0]['group:name']);
+    $this->assertEquals('one', $results[0]['group:name']);
     $this->assertEquals(3, $results[0]['fruit']);
     $this->assertEquals('Banana', $results[0]['fruit:label']);
     $this->assertEquals('banana', $results[0]['fruit:name']);

@@ -177,7 +177,7 @@ class BasicGetFieldsAction extends BasicGetAction {
       if (!is_array($option)) {
         $option = [
           'id' => $id,
-          'name' => $option,
+          'name' => $id,
           'label' => $option,
         ];
       }
