@@ -581,11 +581,16 @@ class CRM_Contact_BAO_Query {
     }
     if (isset($component) && !$this->_skipPermission) {
       // Unit test coverage in api_v3_FinancialTypeACLTest::testGetACLContribution.
-      $clauses = CRM_Financial_BAO_FinancialType::buildPermissionedClause($component);
-      if (!empty($this->_whereClause) && !empty($clauses)) {
-        $this->_whereClause .= ' AND ';
+      $clauses = [];
+      if ($component === 'contribution') {
+        $clauses = CRM_Contribute_BAO_Contribution::getSelectWhereClause();
       }
-      $this->_whereClause .= $clauses;
+      if ($component === 'membership') {
+        $clauses = CRM_Member_BAO_Membership::getSelectWhereClause();
+      }
+      if ($clauses) {
+        $this->_whereClause .= ' AND ' . implode(' AND ', $clauses);
+      }
     }
 
     $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode, $apiEntity);
@@ -2112,7 +2117,7 @@ class CRM_Contact_BAO_Query {
       }
     }
 
-    return implode(' AND ', $andClauses);
+    return $andClauses ? implode(' AND ', $andClauses) : ' 1 ';
   }
 
   /**

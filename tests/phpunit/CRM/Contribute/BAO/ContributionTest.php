@@ -32,6 +32,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
    * Clean up after tests.
    */
   public function tearDown(): void {
+    $this->disableFinancialACLs();
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }
@@ -308,18 +309,17 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   /**
    * Test that financial type data is not added to the annual query if acls not enabled.
    */
-  public function testAnnualQueryWithFinancialACLsEnabled() {
+  public function testAnnualQueryWithFinancialACLsEnabled(): void {
     $this->enableFinancialACLs();
     $this->createLoggedInUserWithFinancialACL();
     $permittedFinancialType = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation');
     $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([1, 2, 3]);
     $this->assertStringContainsString('SUM(total_amount) as amount,', $sql);
-    $this->assertStringContainsString('WHERE b.contact_id IN (1,2,3)', $sql);
+    $this->assertStringContainsString('b.contact_id IN (1,2,3)', $sql);
     $this->assertStringContainsString('b.financial_type_id IN (' . $permittedFinancialType . ')', $sql);
 
     // Run it to make sure it's not bad sql.
     CRM_Core_DAO::executeQuery($sql);
-    $this->disableFinancialACLs();
   }
 
   /**
@@ -343,10 +343,10 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   /**
    * Test that financial type data is not added to the annual query if acls not enabled.
    */
-  public function testAnnualQueryWithFinancialACLsDisabled() {
+  public function testAnnualQueryWithFinancialACLsDisabled(): void {
     $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([1, 2, 3]);
     $this->assertStringContainsString('SUM(total_amount) as amount,', $sql);
-    $this->assertStringContainsString('WHERE b.contact_id IN (1,2,3)', $sql);
+    $this->assertStringContainsString('b.contact_id IN (1,2,3)', $sql);
     $this->assertStringNotContainsString('b.financial_type_id', $sql);
     //$this->assertNotContains('line_item', $sql);
     // Run it to make sure it's not bad sql.
@@ -356,12 +356,12 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   /**
    * Test that financial type data is not added to the annual query if acls not enabled.
    */
-  public function testAnnualQueryWithFinancialHook() {
+  public function testAnnualQueryWithFinancialHook(): void {
     $this->hookClass->setHook('civicrm_selectWhereClause', [$this, 'aclIdNoZero']);
     $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([1, 2, 3]);
     $this->assertStringContainsString('SUM(total_amount) as amount,', $sql);
-    $this->assertStringContainsString('WHERE b.contact_id IN (1,2,3)', $sql);
-    $this->assertStringContainsString('b.id NOT IN (0)', $sql);
+    $this->assertStringContainsString('b.contact_id IN (1,2,3)', $sql);
+    $this->assertStringContainsString('WHERE b.id NOT IN (0)', $sql);
     $this->assertStringNotContainsString('b.financial_type_id', $sql);
     CRM_Core_DAO::executeQuery($sql);
   }

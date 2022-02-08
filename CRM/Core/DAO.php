@@ -3082,11 +3082,14 @@ SELECT contact_id
     $fields = $this->fields();
     foreach ($fields as $fieldName => $field) {
       // Clause for contact-related entities like Email, Relationship, etc.
-      if (strpos($fieldName, 'contact_id') === 0 && CRM_Utils_Array::value('FKClassName', $field) == 'CRM_Contact_DAO_Contact') {
-        $clauses[$fieldName] = CRM_Utils_SQL::mergeSubquery('Contact');
+      if (strpos($field['name'], 'contact_id') === 0 && CRM_Utils_Array::value('FKClassName', $field) == 'CRM_Contact_DAO_Contact') {
+        $contactClause = CRM_Utils_SQL::mergeSubquery('Contact');
+        if (!empty($contactClause)) {
+          $clauses[$field['name']] = $contactClause;
+        }
       }
       // Clause for an entity_table/entity_id combo
-      if ($fieldName === 'entity_id' && isset($fields['entity_table'])) {
+      if ($field['name'] === 'entity_id' && isset($fields['entity_table'])) {
         $relatedClauses = [];
         $relatedEntities = $this->buildOptions('entity_table', 'get');
         foreach ((array) $relatedEntities as $table => $ent) {
