@@ -87,6 +87,14 @@
         {/if}
     </td>
   </tr>
+  {if $associatedParticipants}
+    <tr>
+      <td class="label">{ts}Associated participants{/ts}</td>
+      <td>
+        {include file="CRM/Contribute/Form/ContributionViewAssociatedParticipants.tpl" associatedParticipants=$associatedParticipants}
+      </td>
+    </tr>
+  {/if}
   {if $invoicing && $tax_amount}
     <tr>
       <td class="label">{ts 1=$taxTerm}Total %1 Amount{/ts}</td>
