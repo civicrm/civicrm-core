@@ -225,13 +225,9 @@ class CRM_Core_PseudoConstant {
       // if callback is specified..
       if (!empty($pseudoconstant['callback'])) {
         $fieldOptions = call_user_func(Civi\Core\Resolver::singleton()->get($pseudoconstant['callback']), $context, $params);
+        $fieldOptions = self::formatArrayOptions($context, $fieldOptions);
         //CRM-18223: Allow additions to field options via hook.
         CRM_Utils_Hook::fieldOptions($entity, $fieldName, $fieldOptions, $params);
-        if ($context === 'validate') {
-          // This mode requires machine names and key/value pairs don't have a name, so
-          // use key for name. (labels are translatable so don't make suitable machine names)
-          return array_combine(array_keys($fieldOptions), array_keys($fieldOptions));
-        }
         return $fieldOptions;
       }
 
@@ -1588,6 +1584,38 @@ WHERE  id = %1
     }
 
     return $output;
+  }
+
+  /**
+   * Convert multidimensional option list to flat array, if necessary
+   *
+   * Detect if an array of options is simple key/value pairs or a multidimensional array.
+   * If the latter, convert to a flat array, as determined by $context.
+   *
+   * @param string|null $context
+   *   See https://docs.civicrm.org/dev/en/latest/framework/pseudoconstant/#context
+   * @param array $options
+   *   List of options, each as a record of id+name+label.
+   *   Ex: [['id' => 123, 'name' => 'foo_bar', 'label' => 'Foo Bar']]
+   */
+  private static function formatArrayOptions($context, array &$options) {
+    // Already flat; return keys/values according to context
+    if (!isset($options[0]) || !is_array($options[0])) {
+      // For validate context, machine names are expected in place of labels.
+      // A flat array has no names so use the ids for both key and value.
+      return $context === 'validate' ?
+        array_combine(array_keys($options), array_keys($options)) :
+        $options;
+    }
+    $result = [];
+    $key = ($context === 'match') ? 'name' : 'id';
+    $value = ($context === 'validate') ? 'name' : (($context === 'abbreviate') ? 'abbr' : 'label');
+    foreach ($options as $option) {
+      // Some fallbacks in case the array is missing a 'name' or 'label' or 'abbr'
+      $id = $option[$key] ?? $option['id'] ?? $option['name'];
+      $result[$id] = $option[$value] ?? $option['label'] ?? $option['name'];
+    }
+    return $result;
   }
 
 }
