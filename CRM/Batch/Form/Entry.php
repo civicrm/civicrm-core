@@ -425,7 +425,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     $batchTotal = 0;
     foreach ($params['field'] as $key => $value) {
-      $batchTotal += $value['total_amount'];
+      $batchTotal += ($value['total_amount'] ?: 0);
 
       //validate for soft credit fields
       if (!empty($params['soft_credit_contact_id'][$key]) && empty($params['soft_credit_amount'][$key])) {
