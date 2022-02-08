@@ -34,6 +34,7 @@
     params = $scope.params = {};
     $scope.index = '';
     $scope.selectedTab = {result: 'result'};
+    $scope.crmUrl = CRM.url;
     $scope.perm = {
       accessDebugOutput: CRM.checkPerm('access debug output'),
       editGroups: CRM.checkPerm('edit groups')
@@ -53,7 +54,7 @@
     $scope.status = 'default';
     $scope.loading = false;
     $scope.controls = {};
-    $scope.langs = ['php', 'js', 'ang', 'cli'];
+    $scope.langs = ['php', 'js', 'ang', 'cli', 'rest'];
     $scope.joinTypes = [{k: 'LEFT', v: 'LEFT JOIN'}, {k: 'INNER', v: 'INNER JOIN'}, {k: 'EXCLUDE', v: 'EXCLUDE'}];
     $scope.bridgeEntities = _.filter(schema, function(entity) {return _.includes(entity.type, 'EntityBridge');});
     $scope.code = {
@@ -73,6 +74,11 @@
         {name: 'short', label: ts('CV (short)'), code: ''},
         {name: 'long', label: ts('CV (long)'), code: ''},
         {name: 'pipe', label: ts('CV (pipe)'), code: ''}
+      ],
+      rest: [
+        {name: 'curl', label: ts('Curl'), code: ''},
+        {name: 'restphp', label: ts('PHP (std)'), code: ''},
+        {name: 'guzzle', label: ts('PHP + Guzzle'), code: ''}
       ]
     };
     this.resultFormats = [
@@ -85,6 +91,7 @@
         label: ts('View as PHP')
       },
     ];
+    this.authxEnabled = CRM.vars.api4.authxEnabled;
 
     if (!entities.length) {
       formatForSelect2(schema, entities, 'name', ['description', 'icon']);
@@ -669,6 +676,14 @@
       return str.trim();
     }
 
+    // Url-encode suitable for use in a bash script
+    function curlEscape(str) {
+      return encodeURIComponent(str).
+        replace(/['()*]/g, function(c) {
+          return "%" + c.charCodeAt(0).toString(16);
+        });
+    }
+
     function writeCode() {
       var code = {},
         entity = $scope.entity,
@@ -777,6 +792,61 @@
                   code.short += ' ' + key + '=' + (typeof param === 'string' ? cliFormat(param) : cliFormat(JSON.stringify(param)));
               }
             });
+            break;
+
+          case 'rest':
+            var restUrl = CRM.vars.api4.restUrl
+              .replace('CRMAPI4ENTITY', entity)
+              .replace('CRMAPI4ACTION', action);
+            var cleanUrl;
+            if (CRM.vars.api4.restUrl.endsWith('/CRMAPI4ENTITY/CRMAPI4ACTION')) {
+              cleanUrl = CRM.vars.api4.restUrl.replace('/CRMAPI4ENTITY/CRMAPI4ACTION', '/');
+            }
+            var restCred = 'Bearer MY_API_KEY';
+
+            // CURL
+            code.curl =
+              "CRM_URL='" + restUrl + "'\n" +
+              "CRM_AUTH='X-Civi-Auth: " + restCred + "'\n\n" +
+              'curl -X POST -H "$CRM_AUTH" "$CRM_URL" \\' + "\n" +
+              "-d 'params=" + curlEscape(JSON.stringify(params));
+            if (index || index === 0) {
+              code.curl += '&index=' + curlEscape(JSON.stringify(index));
+            }
+            code.curl += "'";
+
+            var queryParams = "['params' => json_encode($params)" +
+              ((typeof index === 'number') ? ", 'index' => " + JSON.stringify(index) : '') +
+              ((index && typeof index !== 'number') ? ", 'index' => json_encode(" + phpFormat(index) + ')' : '') +
+              "]";
+
+            // Guzzle
+            code.guzzle =
+              "$params = " + phpFormat(params, 2) + ";\n" +
+              "$client = new \\GuzzleHttp\\Client([\n" +
+              (cleanUrl ? "  'base_uri' => '" + cleanUrl + "',\n" : '') +
+              "  'headers' => ['X-Civi-Auth' => " + phpFormat(restCred) + "],\n" +
+              "]);\n" +
+              "$response = $client->get('" + (cleanUrl ? entity + '/' + action : restUrl) + "', [\n" +
+              "  'form_params' => " + queryParams + ",\n" +
+              "]);\n" +
+              '$' + results + " = json_decode((string) $response->getBody(), TRUE);";
+
+            // PHP StdLib
+            code.restphp =
+              "$url = '" + restUrl + "';\n" +
+              "$params = " + phpFormat(params, 2) + ";\n" +
+              "$request = stream_context_create([\n" +
+              "  'http' => [\n" +
+              "    'method' => 'POST',\n" +
+              "    'header' => [\n" +
+              "      'Content-Type: application/x-www-form-urlencoded',\n" +
+              "      " + phpFormat('X-Civi-Auth: ' + restCred) + ",\n" +
+              "    ],\n" +
+              "    'content' => http_build_query(" + queryParams + "),\n" +
+              "  ]\n" +
+              "]);\n" +
+              '$' + results + " = json_decode(file_get_contents($url, FALSE, $request), TRUE);\n";
         }
       }
       _.each($scope.code, function(vals) {
