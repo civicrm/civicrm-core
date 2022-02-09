@@ -22,7 +22,7 @@ class CRM_Utils_Check_Component_DedupeRules extends CRM_Utils_Check_Component {
    * @return string[]
    */
   private static function getContactTypesForRule($used) {
-    $dedupeRules = \Civi\Api4\DedupeRuleGroup::get()
+    $dedupeRules = \Civi\Api4\DedupeRuleGroup::get(FALSE)
       ->addSelect('contact_type')
       ->addGroupBy('contact_type')
       ->addWhere('used', '=', $used)
