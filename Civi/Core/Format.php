@@ -30,6 +30,8 @@ class Format {
    *
    * @return string
    *
+   * @throws \CRM_Core_Exception
+   *
    * @noinspection PhpDocMissingThrowsInspection
    * @noinspection PhpUnhandledExceptionInspection
    */
@@ -61,6 +63,7 @@ class Format {
    *   add any padding.
    *
    * @return string
+   * @throws \CRM_Core_Exception
    */
   public function number($amount, ?string $locale = NULL, array $attributes = [
     NumberFormatter::MIN_FRACTION_DIGITS => 0,
@@ -214,7 +217,7 @@ class Format {
     }
     // Verify the amount is a number or numeric string/object.
     // We cast to string because it can be a BigDecimal object.
-    elseif ($amount === TRUE || !is_numeric((string) $amount)) {
+    if ($amount === TRUE || !is_numeric((string) $amount)) {
       throw new \CRM_Core_Exception('Invalid value for type money');
     }
     return (string) $amount;
