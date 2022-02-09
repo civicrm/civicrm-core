@@ -93,11 +93,11 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $this->_customField = $this->customFieldCreate(['custom_group_id' => $this->ids['string']['custom_group_id']]);
     $this->_customFieldID = $this->_customField['id'];
 
-    $customFieldDataType = CRM_Core_BAO_CustomField::dataType();
+    $customFieldDataType = array_column(CRM_Core_BAO_CustomField::dataType(), 'id');
     $dataToHtmlTypes = CRM_Custom_Form_Field::$_dataToHTML;
     $optionSupportingHTMLTypes = CRM_Custom_Form_Field::$htmlTypesWithOptions;
 
-    foreach ($customFieldDataType as $dataType => $label) {
+    foreach ($customFieldDataType as $dataType) {
       switch ($dataType) {
         // skipping File data-type & state province due to caching issues
         // case 'Country':

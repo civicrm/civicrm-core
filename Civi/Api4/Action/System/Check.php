@@ -95,7 +95,7 @@ class Check extends \Civi\Api4\Generic\BasicGetAction {
         'title' => 'Severity ID',
         'description' => 'Integer representation of Psr\Log\LogLevel',
         'data_type' => 'Integer',
-        'options' => \CRM_Utils_Check::getSeverityList(),
+        'options' => \CRM_Utils_Check::getSeverityOptions(),
       ],
       [
         'name' => 'is_visible',

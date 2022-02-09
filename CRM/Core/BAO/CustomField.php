@@ -35,18 +35,66 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    */
   public static function dataType() {
     return [
-      'String' => ts('Alphanumeric'),
-      'Int' => ts('Integer'),
-      'Float' => ts('Number'),
-      'Money' => ts('Money'),
-      'Memo' => ts('Note'),
-      'Date' => ts('Date'),
-      'Boolean' => ts('Yes or No'),
-      'StateProvince' => ts('State/Province'),
-      'Country' => ts('Country'),
-      'File' => ts('File'),
-      'Link' => ts('Link'),
-      'ContactReference' => ts('Contact Reference'),
+      [
+        'id' => 'String',
+        'name' => 'Alphanumeric',
+        'label' => ts('Alphanumeric'),
+      ],
+      [
+        'id' => 'Int',
+        'name' => 'Integer',
+        'label' => ts('Integer'),
+      ],
+      [
+        'id' => 'Float',
+        'name' => 'Number',
+        'label' => ts('Number'),
+      ],
+      [
+        'id' => 'Money',
+        'name' => 'Money',
+        'label' => ts('Money'),
+      ],
+      [
+        'id' => 'Memo',
+        'name' => 'Note',
+        'label' => ts('Note'),
+      ],
+      [
+        'id' => 'Date',
+        'name' => 'Date',
+        'label' => ts('Date'),
+      ],
+      [
+        'id' => 'Boolean',
+        'name' => 'Yes or No',
+        'label' => ts('Yes or No'),
+      ],
+      [
+        'id' => 'StateProvince',
+        'name' => 'State/Province',
+        'label' => ts('State/Province'),
+      ],
+      [
+        'id' => 'Country',
+        'name' => 'Country',
+        'label' => ts('Country'),
+      ],
+      [
+        'id' => 'File',
+        'name' => 'File',
+        'label' => ts('File'),
+      ],
+      [
+        'id' => 'Link',
+        'name' => 'Link',
+        'label' => ts('Link'),
+      ],
+      [
+        'id' => 'ContactReference',
+        'name' => 'Contact Reference',
+        'label' => ts('Contact Reference'),
+      ],
     ];
   }
 
