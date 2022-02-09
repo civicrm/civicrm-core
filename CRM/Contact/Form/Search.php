@@ -148,6 +148,14 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
   protected $_openedPanes = [];
 
+  public function __construct($state = NULL, $action = CRM_Core_Action::NONE, $method = 'post', $name = NULL) {
+    parent::__construct($state, $action, $method, $name);
+    // Because this is a static variable, reset it in case it got changed elsewhere.
+    // Should only come up during unit tests.
+    // Note the only subclass that seems to set this does it in preprocess (custom searches)
+    self::$_selectorName = 'CRM_Contact_Selector';
+  }
+
   /**
    * Explicitly declare the entity api name.
    */
