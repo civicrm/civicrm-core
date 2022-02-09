@@ -167,6 +167,35 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   public $_compId;
 
   /**
+   * Contribution ID.
+   *
+   * @var int|null
+   */
+  protected $contributionID;
+
+  /**
+   * Get the contribution id that has been created or is being edited.
+   *
+   * @internal - not supported for outside core.
+   *
+   * @return int|null
+   */
+  protected function getContributionID(): ?int {
+    return $this->contributionID;
+  }
+
+  /**
+   * Set the contribution id that has been created or is being edited.
+   *
+   * @internal - not supported for outside core.
+   *
+   * @param int|null $contributionID
+   */
+  protected function setContributionID(?int $contributionID): void {
+    $this->contributionID = $contributionID;
+  }
+
+  /**
    * Store the line items if price set used.
    * @var array
    */

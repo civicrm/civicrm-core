@@ -940,12 +940,8 @@ DESC limit 1");
     }
 
     $form->assign('module', 'Membership');
-    $form->assign('contactID', $formValues['contact_id']);
-
-    $form->assign('membershipID', $this->getMembershipID());
 
     if (!empty($formValues['contribution_id'])) {
-      $form->assign('contributionID', $formValues['contribution_id']);
       $form->assign('currency', CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $formValues['contribution_id'], 'currency'));
     }
     else {
@@ -987,16 +983,19 @@ DESC limit 1");
 
     CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
-        'groupName' => 'msg_tpl_workflow_membership',
-        'valueName' => 'membership_offline_receipt',
-        'contactId' => $form->_receiptContactId,
+        'workflow' => 'membership_offline_receipt',
         'from' => $receiptFrom,
         'toName' => $form->_contributorDisplayName,
         'toEmail' => $form->_contributorEmail,
         'PDFFilename' => ts('receipt') . '.pdf',
         'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
-        'contributionId' => $formValues['contribution_id'],
         'isTest' => (bool) ($form->_action & CRM_Core_Action::PREVIEW),
+        'modelProps' => [
+          'receiptText' => $this->getSubmittedValue('receipt_text'),
+          'contributionId' => $formValues['contribution_id'],
+          'contactId' => $form->_receiptContactId,
+          'membershipId' => $this->getMembershipID(),
+        ],
       ]
     );
 
@@ -1364,9 +1363,9 @@ DESC limit 1");
     if ($this->getSubmittedValue('send_receipt') && $receiptSend) {
       $formValues['contact_id'] = $this->_contactID;
       $formValues['contribution_id'] = $contributionId;
-      // We really don't need a distinct receipt_text_signup vs receipt_text_renewal as they are
-      // handled in the receipt. But by setting one we avoid breaking templates for now
-      // although at some point we should switch in the templates.
+      // receipt_text_signup is no longer used in receipts from 5.47
+      // but may linger in some sites that have not updated their
+      // templates.
       $formValues['receipt_text_signup'] = $formValues['receipt_text'];
       // send email receipt
       $this->assignBillingName();

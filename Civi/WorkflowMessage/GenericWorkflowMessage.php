@@ -64,7 +64,7 @@ class GenericWorkflowMessage implements WorkflowMessageInterface {
    * The contact receiving this message.
    *
    * @var int|null
-   * @scope tokenContext
+   * @scope tokenContext, tplParams as contactID
    * @fkEntity Contact
    */
   protected $contactId;

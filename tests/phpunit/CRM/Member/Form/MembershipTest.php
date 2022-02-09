@@ -152,8 +152,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -216,7 +214,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $obj = new CRM_Member_Form_Membership();
     $rc = CRM_Member_Form_Membership::formRule($params, $files, $obj);
     $this->assertisArray($rc);
-    $this->assertTrue(array_key_exists('start_date', $rc));
+    $this->assertArrayHasKey('start_date', $rc);
   }
 
   /**
@@ -582,6 +580,38 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
         'options' => NULL,
       ],
     ], CRM_Core_Session::singleton()->getStatus());
+  }
+
+  /**
+   * Test the submit function of the membership form for unpaid membership.
+   *
+   * It turns out that no receipt is sent. This just locks in that pre-existing
+   * behaviour.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
+   */
+  public function testSubmitUnpaid(): void {
+    $this->mut = new CiviMailUtils($this, TRUE);
+    $this->createLoggedInUser();
+    MembershipType::update()->addWhere('id', '=', $this->ids['membership_type']['AnnualFixed'])
+      ->setValues(['minimum_fee' => 0])->execute();
+    $form = $this->getForm([
+      'contact_id' => $this->_individualId,
+      'join_date' => date('Y-m-d'),
+      'membership_type_id' => [$this->ids['contact']['organization'], $this->ids['membership_type']['AnnualFixed']],
+      'total_amount' => 0,
+      'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
+      'send_receipt' => TRUE,
+      'receipt_text' => 'Receipt text',
+      'financial_type_id' => '',
+    ]);
+    $form->postProcess();
+    $this->mut->checkMailLog([], [
+      'Membership',
+      'Receipt text',
+    ]);
   }
 
   /**
@@ -1274,7 +1304,7 @@ Expires: ',
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  protected function getForm($formValues = []): CRM_Member_Form_Membership {
+  protected function getForm(array $formValues = []): CRM_Member_Form_Membership {
     if (isset($_REQUEST['cid'])) {
       unset($_REQUEST['cid']);
     }
