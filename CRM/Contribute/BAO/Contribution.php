@@ -1235,6 +1235,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
    *
    * @return mixed|null
    *   $results no of deleted Contribution on success, false otherwise
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function deleteContribution($id) {
     CRM_Utils_Hook::pre('delete', 'Contribution', $id);
@@ -1261,18 +1263,11 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
     if (CRM_Price_BAO_PriceSet::getFor('civicrm_contribution', $id)) {
       CRM_Price_BAO_PriceSet::removeFrom('civicrm_contribution', $id);
     }
-    // cleanup line items.
-    $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $id, 'participant_id', 'contribution_id');
 
     // delete any related entity_financial_trxn, financial_trxn and financial_item records.
     CRM_Core_BAO_FinancialTrxn::deleteFinancialTrxn($id);
 
-    if ($participantId) {
-      CRM_Price_BAO_LineItem::deleteLineItems($participantId, 'civicrm_participant');
-    }
-    else {
-      CRM_Price_BAO_LineItem::deleteLineItems($id, 'civicrm_contribution');
-    }
+    LineItem::delete(FALSE)->addWhere('contribution_id', '=', $id)->execute();
 
     //delete note.
     $note = CRM_Core_BAO_Note::getNote($id, 'civicrm_contribution');
@@ -1290,6 +1285,27 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
 
     CRM_Utils_Hook::post('delete', 'Contribution', $dao->id, $dao);
 
+    return $results;
+  }
+
+  /**
+   * Bulk delete multiple records.
+   *
+   * @param array[] $records
+   *
+   * @return static[]
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public static function deleteRecords(array $records): array {
+    $results = [];
+    foreach ($records as $record) {
+      if (self::deleteContribution($record['id'])) {
+        $returnObject = new CRM_Contribute_BAO_Contribution();
+        $returnObject->id = $record['id'];
+        $results[] = $returnObject;
+      }
+    }
     return $results;
   }
 
