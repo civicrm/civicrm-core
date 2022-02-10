@@ -13,10 +13,10 @@
 
     {if !empty($annual.count)}
         <tr>
-            <th class="contriTotalLeft right">{ts}Current Year-to-Date{/ts} &ndash; {$annual.amount}</th>
-            <th class="right"> &nbsp; {ts}# Completed Contributions{/ts} &ndash; {$annual.count}</th>
-            <th class="right contriTotalRight"> &nbsp; {ts}Avg Amount{/ts} &ndash; {$annual.avg}</th>
-            {if $contributionSummary.cancel.amount}
+            <th class="contriTotalLeft right">{ts}Current Year-to-Date{/ts} &ndash; {$annual.amount|smarty:nodefaults}</th>
+            <th class="right"> &nbsp; {ts}# Completed Contributions{/ts} &ndash; {$annual.count|smarty:nodefaults}</th>
+            <th class="right contriTotalRight"> &nbsp; {ts}Avg Amount{/ts} &ndash; {$annual.avg|smarty:nodefaults}</th>
+            {if $contributionSummary.cancel.amount|smarty:nodefaults}
                 <td>&nbsp;</td>
             {/if}
         </tr>
@@ -25,16 +25,16 @@
     {if $contributionSummary }
       <tr>
           {if $contributionSummary.total.amount}
-            <th class="contriTotalLeft right">{ts}Total{/ts} &ndash; {$contributionSummary.total.amount}</th>
-            <th class="right"> &nbsp; {ts}# Completed{/ts} &ndash; {$contributionSummary.total.count}</th>
-            <th class="right contriTotalRight"> &nbsp; {ts}Avg{/ts} &ndash; {$contributionSummary.total.avg}</th>
+            <th class="contriTotalLeft right">{ts}Total{/ts} &ndash; {$contributionSummary.total.amount|smarty:nodefaults}</th>
+            <th class="right"> &nbsp; {ts}# Completed{/ts} &ndash; {$contributionSummary.total.count|smarty:nodefaults}</th>
+            <th class="right contriTotalRight"> &nbsp; {ts}Avg{/ts} &ndash; {$contributionSummary.total.avg|smarty:nodefaults}</th>
           {/if}
-          {if $contributionSummary.cancel.amount}
-            <th class="disabled right contriTotalRight"> &nbsp; {ts}Cancelled/Refunded{/ts} &ndash; {$contributionSummary.cancel.amount}</th>
+          {if $contributionSummary.cancel.amount|smarty:nodefaults}
+            <th class="disabled right contriTotalRight"> &nbsp; {ts}Cancelled/Refunded{/ts} &ndash; {$contributionSummary.cancel.amount|smarty:nodefaults}</th>
           {/if}
       </tr>
-      {if $contributionSummary.soft_credit.count}
-        {include file="CRM/Contribute/Page/ContributionSoftTotals.tpl" softCreditTotals=$contributionSummary.soft_credit}
+      {if $contributionSummary.soft_credit.count|smarty:nodefaults}
+        {include file="CRM/Contribute/Page/ContributionSoftTotals.tpl" softCreditTotals=$contributionSummary.soft_credit|smarty:nodefaults}
       {/if}
     {/if}
 
