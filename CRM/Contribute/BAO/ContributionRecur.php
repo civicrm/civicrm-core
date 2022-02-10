@@ -1037,8 +1037,8 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     $params = [];
     switch ($fieldName) {
       case 'payment_processor_id':
-        if (isset(\Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'])) {
-          return \Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'];
+        if (isset(\Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'][$context])) {
+          return \Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'][$context];
         }
         $baoName = 'CRM_Contribute_BAO_ContributionRecur';
         $params['condition']['test'] = "is_test = 0";
@@ -1057,7 +1057,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
         }
         $allProcessors = $liveProcessors + $testProcessors;
         ksort($allProcessors);
-        \Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'] = $allProcessors;
+        \Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'][$context] = $allProcessors;
         return $allProcessors;
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
