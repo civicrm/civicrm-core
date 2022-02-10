@@ -4271,9 +4271,6 @@ LIMIT 1;";
   /**
    * Get payment links as they relate to a contribution.
    *
-   * If a payment can be made then include a payment link & if a refund is appropriate
-   * then a refund link.
-   *
    * @param int $id
    * @param string $contributionStatus
    *
@@ -4281,6 +4278,9 @@ LIMIT 1;";
    *   $actionLinks Links array containing:
    *     -url
    *     -title
+   *
+   * If a payment can be made then include a payment link & if a refund is appropriate
+   * then a refund link.
    */
   protected static function getContributionPaymentLinks(int $id, string $contributionStatus): array {
     if ($contributionStatus === 'Failed' || !CRM_Core_Permission::check('edit contributions')) {
