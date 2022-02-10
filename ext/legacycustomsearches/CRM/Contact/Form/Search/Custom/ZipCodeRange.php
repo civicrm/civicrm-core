@@ -47,14 +47,12 @@ class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Searc
   public function buildForm(&$form) {
     $form->add('text',
       'postal_code_low',
-      ts('Postal Code Start'),
-      TRUE
+      ts('Postal Code Start')
     );
 
     $form->add('text',
       'postal_code_high',
-      ts('Postal Code End'),
-      TRUE
+      ts('Postal Code End')
     );
 
     /**
@@ -73,8 +71,7 @@ class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Searc
    * @return array
    */
   public function summary() {
-    $summary = [];
-    return $summary;
+    return [];
   }
 
   /**

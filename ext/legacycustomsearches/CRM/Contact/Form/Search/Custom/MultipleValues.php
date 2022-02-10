@@ -87,7 +87,7 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
 
     $this->setTitle(ts('Multiple Value Custom Group Search and Export'));
 
-    $form->add('text', 'sort_name', ts('Contact Name'), TRUE);
+    $form->add('text', 'sort_name', ts('Contact Name'));
 
     $contactTypes = ['' => ts('- any contact type -')] + CRM_Contact_BAO_ContactType::getSelectElements();
     $form->add('select', 'contact_type', ts('Find...'), $contactTypes, ['class' => 'crm-select2 huge']);
