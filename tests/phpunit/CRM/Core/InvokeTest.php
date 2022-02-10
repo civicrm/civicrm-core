@@ -51,4 +51,18 @@ class CRM_Core_InvokeTest extends CiviUnitTestCase {
     ob_end_clean();
   }
 
+  public function testOpeningSearchBuilder(): void {
+    $_SERVER['REQUEST_URI'] = 'civicrm/contact/search/builder?reset=1';
+    $_GET['q'] = 'civicrm/contact/search/builder';
+    $_GET['reset'] = 1;
+
+    $item = CRM_Core_Invoke::getItem([$_GET['q']]);
+    ob_start();
+    CRM_Core_Invoke::runItem($item);
+    $contents = ob_get_clean();
+
+    unset($_GET['reset']);
+    $this->assertRegExp('/form.+id="Builder" class="CRM_Contact_Form_Search_Builder/', $contents);
+  }
+
 }
