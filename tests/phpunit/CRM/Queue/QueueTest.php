@@ -72,6 +72,8 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->queue = $this->queueService->create($queueSpec);
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_queue');
     $this->assertTrue($this->queue instanceof CRM_Queue_Queue);
+    $this->assertEquals($queueSpec['name'], $this->queue->getSpec('name'));
+    $this->assertEquals($queueSpec['type'], $this->queue->getSpec('type'));
 
     $this->queue->createItem([
       'test-key' => 'a',
