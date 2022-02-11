@@ -891,6 +891,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $processorParams = [
       'domain_id' => 1,
       'name' => 'Dummy',
+      'title' => 'Dummy',
       'payment_processor_type_id' => 'Dummy',
       'financial_account_id' => 12,
       'is_test' => TRUE,

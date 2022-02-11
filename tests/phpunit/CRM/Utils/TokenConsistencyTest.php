@@ -458,7 +458,7 @@ contribution_recur.frequency_unit:name :year
 contribution_recur.contribution_status_id:label :Pending Label**
 contribution_recur.contribution_status_id:name :Pending
 contribution_recur.payment_processor_id:label :Dummy (test)
-contribution_recur.payment_processor_id:name :Dummy (test)
+contribution_recur.payment_processor_id:name :Dummy_test
 contribution_recur.financial_type_id:label :Member Dues
 contribution_recur.financial_type_id:name :Member Dues
 contribution_recur.payment_instrument_id:label :Check
