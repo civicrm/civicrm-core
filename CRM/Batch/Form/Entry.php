@@ -212,6 +212,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       ->addSetting(['setting' => ['monetaryDecimalPoint' => CRM_Core_Config::singleton()->monetaryDecimalPoint]]);
 
     $this->assign('defaultCurrencySymbol', CRM_Core_BAO_Country::defaultCurrencySymbol());
+    // This could be updated to TRUE in the formRule
+    $this->addExpectedSmartyVariable('batchAmountMismatch');
+    // It is unclear where this is otherwise assigned but the template expects it.
+    $this->addExpectedSmartyVariable('contactFields');
+    // The not-always-present refresh button.
+    $this->addOptionalQuickFormElement('_qf_Batch_refresh');
   }
 
   /**
@@ -462,8 +468,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     if (!empty($errors)) {
       return $errors;
     }
-
-    $self->assign('batchAmountMismatch', FALSE);
     return TRUE;
   }
 

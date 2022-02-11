@@ -61,7 +61,7 @@
       </tr>
       <tr id="membershipOrgType" class="crm-member-membershiprenew-form-block-renew_org_name hiddenElement">
         <td class="label">{$form.membership_type_id.label}</td>
-        <td>{$form.membership_type_id.html}
+        <td>{$form.membership_type_id.html|smarty:nodefaults}
           {if $member_is_test} {ts}(test){/ts}{/if}<br/>
           <span class="description">{ts}Select Membership Organization and then Membership Type.{/ts}</span>
         </td>
