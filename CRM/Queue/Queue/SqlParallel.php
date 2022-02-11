@@ -37,13 +37,14 @@ class CRM_Queue_Queue_SqlParallel extends CRM_Queue_Queue {
   /**
    * Get the next item.
    *
-   * @param int $lease_time
-   *   Seconds.
-   *
+   * @param int|null $lease_time
+   *   Hold a lease on the claimed item for $X seconds.
+   *   If NULL, inherit a queue default (`$queueSpec['lease_time']`) or system default (`DEFAULT_LEASE_TIME`).
    * @return object
    *   With key 'data' that matches the inputted data.
    */
-  public function claimItem($lease_time = 3600) {
+  public function claimItem($lease_time = NULL) {
+    $lease_time = $lease_time ?: $this->getSpec('lease_time') ?: static::DEFAULT_LEASE_TIME;
 
     $result = NULL;
     $dao = CRM_Core_DAO::executeQuery('LOCK TABLES civicrm_queue_item WRITE;');
@@ -90,13 +91,15 @@ class CRM_Queue_Queue_SqlParallel extends CRM_Queue_Queue {
   /**
    * Get the next item, even if there's an active lease
    *
-   * @param int $lease_time
-   *   Seconds.
-   *
+   * @param int|null $lease_time
+   *   Hold a lease on the claimed item for $X seconds.
+   *   If NULL, inherit a queue default (`$queueSpec['lease_time']`) or system default (`DEFAULT_LEASE_TIME`).
    * @return object
    *   With key 'data' that matches the inputted data.
    */
-  public function stealItem($lease_time = 3600) {
+  public function stealItem($lease_time = NULL) {
+    $lease_time = $lease_time ?: $this->getSpec('lease_time') ?: static::DEFAULT_LEASE_TIME;
+
     $sql = "
       SELECT id, queue_name, submit_time, release_time, run_count, data
       FROM civicrm_queue_item

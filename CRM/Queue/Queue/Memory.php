@@ -117,13 +117,15 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   /**
    * Get and remove the next item.
    *
-   * @param int $leaseTime
-   *   Seconds.
-   *
+   * @param int|null $leaseTime
+   *   Hold a lease on the claimed item for $X seconds.
+   *   If NULL, inherit a queue default (`$queueSpec['lease_time']`) or system default (`DEFAULT_LEASE_TIME`).
    * @return object
    *   Includes key 'data' that matches the inputted data.
    */
-  public function claimItem($leaseTime = 3600) {
+  public function claimItem($leaseTime = NULL) {
+    $leaseTime = $leaseTime ?: $this->getSpec('lease_time') ?: static::DEFAULT_LEASE_TIME;
+
     // foreach hits the items in order -- but we short-circuit after the first
     foreach ($this->items as $id => $data) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
@@ -149,13 +151,15 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   /**
    * Get the next item.
    *
-   * @param int $leaseTime
-   *   Seconds.
-   *
+   * @param int|null $leaseTime
+   *   Hold a lease on the claimed item for $X seconds.
+   *   If NULL, inherit a queue default (`$queueSpec['lease_time']`) or system default (`DEFAULT_LEASE_TIME`).
    * @return object
    *   With key 'data' that matches the inputted data.
    */
-  public function stealItem($leaseTime = 3600) {
+  public function stealItem($leaseTime = NULL) {
+    $leaseTime = $leaseTime ?: $this->getSpec('lease_time') ?: static::DEFAULT_LEASE_TIME;
+
     // foreach hits the items in order -- but we short-circuit after the first
     foreach ($this->items as $id => $data) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();

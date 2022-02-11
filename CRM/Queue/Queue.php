@@ -20,6 +20,8 @@
  */
 abstract class CRM_Queue_Queue {
 
+  const DEFAULT_LEASE_TIME = 3600;
+
   /**
    * @var string
    */
@@ -137,13 +139,13 @@ abstract class CRM_Queue_Queue {
   /**
    * Get the next item.
    *
-   * @param int $lease_time
-   *   Seconds.
-   *
+   * @param int|null $lease_time
+   *   Hold a lease on the claimed item for $X seconds.
+   *   If NULL, inherit a default.
    * @return object
    *   with key 'data' that matches the inputted data
    */
-  abstract public function claimItem($lease_time = 3600);
+  abstract public function claimItem($lease_time = NULL);
 
   /**
    * Get the next item, even if there's an active lease
@@ -154,7 +156,7 @@ abstract class CRM_Queue_Queue {
    * @return object
    *   with key 'data' that matches the inputted data
    */
-  abstract public function stealItem($lease_time = 3600);
+  abstract public function stealItem($lease_time = NULL);
 
   /**
    * Remove an item from the queue.
