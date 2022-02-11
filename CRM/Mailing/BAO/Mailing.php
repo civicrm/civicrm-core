@@ -1470,7 +1470,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function create(&$params) {
+  public static function create(array $params) {
 
     // CRM-#1843
     // If it is a mass sms, set url_tracking to false

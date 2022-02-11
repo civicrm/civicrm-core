@@ -167,7 +167,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
       $params['scheduled_date'] = CRM_Utils_Date::processDate($mailing->scheduled_date);
     }
 
-    CRM_Mailing_BAO_Mailing::create($params, $ids);
+    CRM_Mailing_BAO_Mailing::create($params);
 
     //when user perform mailing from search context
     //redirect it to search result CRM-3711
