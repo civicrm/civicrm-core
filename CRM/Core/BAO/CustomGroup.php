@@ -1918,6 +1918,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
               'field_data_type' => $properties['data_type'] ?? NULL,
               'field_value' => CRM_Core_BAO_CustomField::displayValue($values['data'], $properties['id'], $entityId),
               'options_per_line' => $properties['options_per_line'] ?? NULL,
+              'data' => $values['data'],
             ];
             // editable = whether this set contains any non-read-only fields
             if (!isset($details[$groupID][$values['id']]['editable'])) {
