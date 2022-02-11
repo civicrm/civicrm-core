@@ -2085,10 +2085,10 @@ function _civicrm_api3_validate_integer(&$params, $fieldName, &$fieldInfo, $enti
       }
     }
     if (
-    (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options']) || $fieldName === 'campaign_id')
-     // if it is already numeric AND it is an FK field we don't need to validate because
-     // sql will do that for us on insert (this also saves a big lookup)
-     && (!is_numeric($fieldValue) || empty($fieldInfo['FKClassName']))
+      (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options']) || $fieldName === 'campaign_id')
+      // if it is already numeric AND it is an FK field we don't need to validate because
+      // sql will do that for us on insert (this also saves a big lookup)
+      && (!is_numeric($fieldValue) || !in_array($fieldName, ['campaign_id', 'payment_processor_id']))
     ) {
       $additional_lookup_params = [];
       if (strtolower($entity) === 'address' && $fieldName == 'state_province_id') {
