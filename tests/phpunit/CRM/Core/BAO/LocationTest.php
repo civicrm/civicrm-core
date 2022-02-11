@@ -48,7 +48,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
-  public function testCreateWithMissingParams() {
+  public function testCreateWithMissingParams(): void {
     $contactId = $this->individualCreate();
     $params = [
       'contact_id' => $contactId,
@@ -70,7 +70,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
    * create various elements of location block
    * without civicrm_loc_block entry
    */
-  public function testCreateWithoutLocBlock() {
+  public function testCreateWithoutLocBlock(): void {
     $contactId = $this->individualCreate();
 
     //create various element of location block
@@ -114,7 +114,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
       ],
       'openid' => [
         '1' => [
-          'openid' => 'http://civicrm.org/',
+          'openid' => 'https://civicrm.org/',
           'location_type_id' => 1,
           'is_primary' => 1,
         ],
@@ -131,7 +131,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
 
     $params['contact_id'] = $contactId;
 
-    $locBlockId = CRM_Core_BAO_Location::create($params);
+    CRM_Core_BAO_Location::create($params);
 
     //Now check DB for contact
     $searchParams = [
@@ -156,7 +156,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     $compareParams = ['email' => 'john.smith@example.org'];
     $this->assertDBCompareValues('CRM_Core_DAO_Email', $searchParams, $compareParams);
 
-    $compareParams = ['openid' => 'http://civicrm.org/'];
+    $compareParams = ['openid' => 'https://civicrm.org/'];
     $this->assertDBCompareValues('CRM_Core_DAO_OpenID', $searchParams, $compareParams);
 
     $compareParams = [
@@ -188,8 +188,10 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
   /**
    * GetValues() method
    * get the values of various location elements
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testLocBlockgetValues() {
+  public function testLocBlockgetValues(): void {
     $contactId = $this->individualCreate();
 
     //create various element of location block
@@ -233,7 +235,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
       ],
       'openid' => [
         '1' => [
-          'openid' => 'http://civicrm.org/',
+          'openid' => 'https://civicrm.org/',
           'location_type_id' => 1,
           'is_primary' => 1,
         ],
@@ -256,36 +258,12 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     //get the values from DB
     $values = CRM_Core_BAO_Location::getValues($params);
 
-    //Now check values of address
-    $this->assertAttributesEquals(CRM_Utils_Array::value('1', $params['address']),
-      CRM_Utils_Array::value('1', $values['address'])
-    );
-
-    //Now check values of email
-    $this->assertAttributesEquals(CRM_Utils_Array::value('1', $params['email']),
-      CRM_Utils_Array::value('1', $values['email'])
-    );
-
-    //Now check values of phone
-    $this->assertAttributesEquals(CRM_Utils_Array::value('1', $params['phone']),
-      CRM_Utils_Array::value('1', $values['phone'])
-    );
-
-    //Now check values of mobile
-    $this->assertAttributesEquals(CRM_Utils_Array::value('2', $params['phone']),
-      CRM_Utils_Array::value('2', $values['phone'])
-    );
-
-    //Now check values of openid
-    $this->assertAttributesEquals(CRM_Utils_Array::value('1', $params['openid']),
-      CRM_Utils_Array::value('1', $values['openid'])
-    );
-
-    //Now check values of im
-    $this->assertAttributesEquals(CRM_Utils_Array::value('1', $params['im']),
-      CRM_Utils_Array::value('1', $values['im'])
-    );
-    $this->contactDelete($contactId);
+    $this->assertAttributesEquals($params['address'][1], $values['address'][1]);
+    $this->assertAttributesEquals($params['email'][1], $values['email'][1]);
+    $this->assertAttributesEquals($params['phone'][1], $values['phone'][1]);
+    $this->assertAttributesEquals($params['phone'][2], $values['phone'][2]);
+    $this->assertAttributesEquals($params['openid'][1], $values['openid'][1]);
+    $this->assertAttributesEquals($params['im'][1], $values['im'][1]);
   }
 
 }
