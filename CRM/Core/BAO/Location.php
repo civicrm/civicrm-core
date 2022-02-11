@@ -198,35 +198,28 @@ WHERE e.id = %1";
   }
 
   /**
-   * Get values.
+   * Get array of location block BAOs.
    *
    * @param array $entityBlock
    * @param bool $microformat
    *
-   * @return CRM_Core_BAO_Location[]|NULL
+   * @return CRM_Core_BAO_Location[]|null
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function getValues($entityBlock, $microformat = FALSE) {
+  public static function getValues($entityBlock, $microformat = FALSE): ?array {
     if (empty($entityBlock)) {
+      // Can't imagine this is reachable.
+      CRM_Core_Error::deprecatedWarning('calling function pointlessly is deprecated');
       return NULL;
     }
-    $blocks = [];
-    $name_map = [
-      'im' => 'IM',
-      'openid' => 'OpenID',
+    return [
+      'im' => CRM_Core_BAO_IM::getValues($entityBlock),
+      'email' => CRM_Core_BAO_Email::getValues($entityBlock),
+      'openid' => CRM_Core_BAO_OpenID::getValues($entityBlock),
+      'phone' => CRM_Core_BAO_Phone::getValues($entityBlock),
+      'address' => CRM_Core_BAO_Address::getValues($entityBlock, $microformat),
     ];
-    $blocks = [];
-    //get all the blocks for this contact
-    foreach (self::$blocks as $block) {
-      if (array_key_exists($block, $name_map)) {
-        $name = $name_map[$block];
-      }
-      else {
-        $name = ucfirst($block);
-      }
-      $baoString = 'CRM_Core_BAO_' . $name;
-      $blocks[$block] = $baoString::getValues($entityBlock, $microformat);
-    }
-    return $blocks;
   }
 
   /**
