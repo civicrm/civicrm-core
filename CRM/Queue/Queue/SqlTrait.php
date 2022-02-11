@@ -86,12 +86,23 @@ trait CRM_Queue_Queue_SqlTrait {
   /**
    * Remove an item from the queue.
    *
-   * @param CRM_Core_DAO|stdClass $dao
+   * @param CRM_Core_DAO|stdClass $item
    *   The item returned by claimItem.
    */
-  public function deleteItem($dao) {
-    $dao->delete();
-    $dao->free();
+  public function deleteItem($item) {
+    $this->deleteItems([$item]);
+  }
+
+  public function deleteItems($items): void {
+    if (empty($items)) {
+      return;
+    }
+    $sql = CRM_Utils_SQL::interpolate('DELETE FROM civicrm_queue_item WHERE id IN (#ids) AND queue_name = @name', [
+      'ids' => CRM_Utils_Array::collect('id', $items),
+      'name' => $this->getName(),
+    ]);
+    CRM_Core_DAO::executeQuery($sql);
+    $this->freeDAOs($items);
   }
 
   /**
@@ -104,35 +115,60 @@ trait CRM_Queue_Queue_SqlTrait {
    * @return CRM_Queue_DAO_QueueItem|object|null $dao
    */
   public function fetchItem($id) {
-    $dao = new CRM_Queue_DAO_QueueItem();
-    $dao->id = $id;
-    $dao->queue_name = $this->getName();
-    if (!$dao->find(TRUE)) {
-      return NULL;
+    $items = $this->fetchItems([$id]);
+    return $items[0] ?? NULL;
+  }
+
+  public function fetchItems(array $ids): array {
+    $dao = CRM_Utils_SQL_Select::from('civicrm_queue_item')
+      ->select(['id', 'data', 'run_count'])
+      ->where('id IN (#ids)', ['ids' => $ids])
+      ->where('queue_name = @name', ['name' => $this->getName()])
+      ->execute();
+    $result = [];
+    while ($dao->fetch()) {
+      $result[] = (object) [
+        'id' => $dao->id,
+        'data' => unserialize($dao->data),
+        'run_count' => $dao->run_count,
+        'queue_name' => $this->getName(),
+      ];
     }
-    $dao->data = unserialize($dao->data);
-    return $dao;
+    return $result;
   }
 
   /**
    * Return an item that could not be processed.
    *
-   * @param CRM_Core_DAO $dao
+   * @param CRM_Core_DAO $item
    *   The item returned by claimItem.
    */
-  public function releaseItem($dao) {
-    if (empty($this->queueSpec['retry_interval'])) {
-      CRM_Core_DAO::executeQuery('UPDATE civicrm_queue_item SET release_time = NULL WHERE id = %1', [
-        1 => [$dao->id, 'Integer'],
-      ]);
+  public function releaseItem($item) {
+    $this->releaseItems([$item]);
+  }
+
+  public function releaseItems($items): void {
+    if (empty($items)) {
+      return;
     }
-    else {
-      CRM_Core_DAO::executeQuery('UPDATE civicrm_queue_item SET release_time = DATE_ADD(NOW(), INTERVAL %2 SECOND) WHERE id = %1', [
-        1 => [$dao->id, 'Integer'],
-        2 => [$this->queueSpec['retry_interval'], 'Integer'],
-      ]);
+    $sql = empty($this->queueSpec['retry_interval'])
+      ? 'UPDATE civicrm_queue_item SET release_time = NULL WHERE id IN (#ids) AND queue_name = @name'
+      : 'UPDATE civicrm_queue_item SET release_time = DATE_ADD(NOW(), INTERVAL #retry SECOND) WHERE id IN (#ids) AND queue_name = @name';
+    CRM_Core_DAO::executeQuery(CRM_Utils_SQL::interpolate($sql, [
+      'ids' => CRM_Utils_Array::collect('id', $items),
+      'name' => $this->getName(),
+      'retry' => $this->queueSpec['retry_interval'] ?? NULL,
+    ]));
+    $this->freeDAOs($items);
+  }
+
+  protected function freeDAOs($mixed) {
+    $mixed = (array) $mixed;
+    foreach ($mixed as $item) {
+      if ($item instanceof CRM_Core_DAO) {
+        $item->free();
+      }
     }
-    $dao->free();
   }
 
 }

@@ -412,4 +412,54 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $queue2->releaseItem($item);
   }
 
+  /**
+   * Grab items from a queue in batches.
+   *
+   * @dataProvider getQueueSpecs
+   * @param $queueSpec
+   */
+  public function testBatchClaim($queueSpec) {
+    $this->queue = $this->queueService->create($queueSpec);
+    $this->assertTrue($this->queue instanceof CRM_Queue_Queue);
+    if (!($this->queue instanceof CRM_Queue_Queue_BatchQueueInterface)) {
+      $this->markTestSkipped("Queue class does not support batch interface: " . get_class($this->queue));
+    }
+
+    for ($i = 0; $i < 9; $i++) {
+      $this->queue->createItem('x' . $i);
+    }
+    $this->assertEquals(9, $this->queue->numberOfItems());
+
+    // We expect this driver to be fully compliant with batching.
+    $claimsA = $this->queue->claimItems(3);
+    $claimsB = $this->queue->claimItems(3);
+    $this->assertEquals(9, $this->queue->numberOfItems());
+
+    $this->assertEquals(['x0', 'x1', 'x2'], CRM_Utils_Array::collect('data', $claimsA));
+    $this->assertEquals(['x3', 'x4', 'x5'], CRM_Utils_Array::collect('data', $claimsB));
+
+    $this->queue->deleteItems([$claimsA[0], $claimsA[1]]); /* x0, x1 */
+    $this->queue->releaseItems([$claimsA[2]]); /* x2: will retry with next claimItems() */
+    $this->queue->deleteItems([$claimsB[0], $claimsB[1]]); /* x3, x4 */
+    /* claimsB[2]: x5: Oops, we're gonna take some time to finish this one. */
+    $this->assertEquals(5, $this->queue->numberOfItems());
+
+    $claimsC = $this->queue->claimItems(3);
+    $this->assertEquals(['x2', 'x6', 'x7'], CRM_Utils_Array::collect('data', $claimsC));
+    $this->queue->deleteItem($claimsC[0]); /* x2 */
+    $this->queue->releaseItem($claimsC[1]); /* x6: will retry with next claimItems() */
+    $this->queue->deleteItem($claimsC[2]); /* x7 */
+    $this->assertEquals(3, $this->queue->numberOfItems());
+
+    $claimsD = $this->queue->claimItems(3);
+    $this->assertEquals(['x6', 'x8'], CRM_Utils_Array::collect('data', $claimsD));
+    $this->queue->deleteItem($claimsD[0]); /* x6 */
+    $this->queue->deleteItem($claimsD[1]); /* x8 */
+    $this->assertEquals(1, $this->queue->numberOfItems());
+
+    // claimsB took a while to wrap-up. But it finally did!
+    $this->queue->deleteItem($claimsB[2]); /* x5 */
+    $this->assertEquals(0, $this->queue->numberOfItems());
+  }
+
 }
