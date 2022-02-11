@@ -26,6 +26,14 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
    */
   public $releaseTimes;
 
+  /**
+   * Number of times each queue item has been attempted.
+   *
+   * @var array
+   *   array(queueItemId => int $count),
+   */
+  protected $runCounts;
+
   public $nextQueueItemId = 1;
 
   /**
@@ -52,6 +60,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   public function createQueue() {
     $this->items = [];
     $this->releaseTimes = [];
+    $this->runCounts = [];
   }
 
   /**
@@ -68,6 +77,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   public function deleteQueue() {
     $this->items = NULL;
     $this->releaseTimes = NULL;
+    $this->runCounts = NULL;
   }
 
   /**
@@ -92,6 +102,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
     $id = $this->nextQueueItemId++;
     // force copy, no unintendedsharing effects from pointers
     $this->items[$id] = serialize($data);
+    $this->runCounts[$id] = 0;
   }
 
   /**
@@ -118,10 +129,12 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
       if (empty($this->releaseTimes[$id]) || $this->releaseTimes[$id] < $nowEpoch) {
         $this->releaseTimes[$id] = $nowEpoch + $leaseTime;
+        $this->runCounts[$id]++;
 
         $item = new stdClass();
         $item->id = $id;
         $item->data = unserialize($data);
+        $item->run_count = $this->runCounts[$id];
         return $item;
       }
       else {
@@ -147,10 +160,12 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
     foreach ($this->items as $id => $data) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
       $this->releaseTimes[$id] = $nowEpoch + $leaseTime;
+      $this->runCounts[$id]++;
 
       $item = new stdClass();
       $item->id = $id;
       $item->data = unserialize($data);
+      $item->run_count = $this->runCounts[$id];
       return $item;
     }
     // nothing in queue
@@ -166,6 +181,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   public function deleteItem($item) {
     unset($this->items[$item->id]);
     unset($this->releaseTimes[$item->id]);
+    unset($this->runCounts[$item->id]);
   }
 
   /**

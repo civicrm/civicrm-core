@@ -49,7 +49,7 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
     $dao = CRM_Core_DAO::executeQuery('LOCK TABLES civicrm_queue_item WRITE;');
     $sql = "
         SELECT first_in_queue.* FROM (
-          SELECT id, queue_name, submit_time, release_time, data
+          SELECT id, queue_name, submit_time, release_time, run_count, data
           FROM civicrm_queue_item
           WHERE queue_name = %1
           ORDER BY weight ASC, id ASC
@@ -69,9 +69,11 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
 
     if ($dao->fetch()) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = %1 WHERE id = %2", [
+      $dao->run_count++;
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = %1, run_count = %3 WHERE id = %2", [
         '1' => [date('YmdHis', $nowEpoch + $lease_time), 'String'],
         '2' => [$dao->id, 'Integer'],
+        '3' => [$dao->run_count, 'Integer'],
       ]);
       // (Comment by artfulrobot Sep 2019: Not sure what the below comment means, should be removed/clarified?)
       // work-around: inconsistent date-formatting causes unintentional breakage
@@ -98,7 +100,7 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
    */
   public function stealItem($lease_time = 3600) {
     $sql = "
-      SELECT id, queue_name, submit_time, release_time, data
+      SELECT id, queue_name, submit_time, release_time, run_count, data
       FROM civicrm_queue_item
       WHERE queue_name = %1
       ORDER BY weight ASC, id ASC
@@ -110,6 +112,7 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
     $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, 'CRM_Queue_DAO_QueueItem');
     if ($dao->fetch()) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
+      $dao->run_count++;
       CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = %1 WHERE id = %2", [
         '1' => [date('YmdHis', $nowEpoch + $lease_time), 'String'],
         '2' => [$dao->id, 'Integer'],
