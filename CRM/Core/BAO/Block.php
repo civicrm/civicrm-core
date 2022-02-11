@@ -54,7 +54,7 @@ class CRM_Core_BAO_Block {
       if (!$block->contact_id) {
         throw new CRM_Core_Exception('Invalid Contact ID parameter passed');
       }
-      $blocks = self::retrieveBlock($block, $blockName);
+      $blocks = self::retrieveBlock($block);
     }
     else {
       $blockIds = self::getBlockIds($blockName, NULL, $params);
@@ -67,7 +67,7 @@ class CRM_Core_BAO_Block {
       foreach ($blockIds as $blockId) {
         $block = new $BAOString();
         $block->id = $blockId['id'];
-        $getBlocks = self::retrieveBlock($block, $blockName);
+        $getBlocks = self::retrieveBlock($block);
         $blocks[$count++] = array_pop($getBlocks);
       }
     }
@@ -81,13 +81,11 @@ class CRM_Core_BAO_Block {
    *
    * @param Object $block
    *   Typically a Phone|Email|IM|OpenID object.
-   * @param string $blockName
-   *   Name of the above object.
    *
    * @return array
    *   Array of $block objects.
    */
-  public static function retrieveBlock(&$block, $blockName) {
+  public static function retrieveBlock($block) {
     // we first get the primary location due to the order by clause
     $block->orderBy('is_primary desc, id');
     $block->find();

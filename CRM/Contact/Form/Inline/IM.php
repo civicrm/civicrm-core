@@ -42,7 +42,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
     $im = new CRM_Core_BAO_IM();
     $im->contact_id = $this->_contactId;
 
-    $this->_ims = CRM_Core_BAO_Block::retrieveBlock($im, NULL);
+    $this->_ims = CRM_Core_BAO_Block::retrieveBlock($im);
   }
 
   /**
