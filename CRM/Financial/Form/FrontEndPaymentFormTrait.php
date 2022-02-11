@@ -185,7 +185,7 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
     $optAttributes = [];
     foreach ($paymentProcessors as $ppKey => $ppval) {
       if ($ppKey > 0) {
-        $optAttributes[$ppKey]['class'] = 'payment_processor_' . strtolower($this->_paymentProcessors[$ppKey]['payment_processor_type']);
+        $optAttributes[$ppKey]['class'] = 'payment_processor_' . strtolower(CRM_Utils_String::munge($this->_paymentProcessors[$ppKey]['payment_processor_type'], '_', 1000));
       }
       else {
         $optAttributes[$ppKey]['class'] = 'payment_processor_paylater';
