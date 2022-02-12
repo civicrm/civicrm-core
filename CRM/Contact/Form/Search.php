@@ -400,9 +400,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'name' => CRM_Contact_BAO_SavedSearch::getName($this->_ssID, 'title'),
         'search_custom_id' => $search_custom_id,
       ];
-      $this->assign_by_ref('savedSearch', $savedSearchValues);
-      $this->assign('ssID', $this->_ssID);
     }
+    $this->assign('savedSearch', $savedSearchValues ?? NULL);
+    $this->assign('ssID', $this->_ssID);
 
     if ($this->_context === 'smog') {
       // CRM-11788, we might want to do this for all of search where force=1
