@@ -890,13 +890,12 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
 
     unset($params['id']);
 
-    //get the block information for this contact
-    $entityBlock = ['contact_id' => $params['contact_id']];
-    $blocks = CRM_Core_BAO_Location::getValues($entityBlock, $microformat);
-    $defaults = array_merge($defaults, $blocks);
-    foreach ($blocks as $block => $value) {
-      $contact->$block = $value;
-    }
+    $contact->im = $defaults['im'] = CRM_Core_BAO_IM::getValues(['contact_id' => $params['contact_id']]);
+    $contact->email = $defaults['email'] = CRM_Core_BAO_Email::getValues(['contact_id' => $params['contact_id']]);
+    $contact->openid = $defaults['openid'] = CRM_Core_BAO_OpenID::getValues(['contact_id' => $params['contact_id']]);
+    $contact->phone = $defaults['phone'] = CRM_Core_BAO_Phone::getValues(['contact_id' => $params['contact_id']]);
+    $contact->address = $defaults['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $params['contact_id']], $microformat);
+    $contact->website = CRM_Core_BAO_Website::getValues($params, $defaults);
 
     if (!isset($params['noNotes'])) {
       $contact->notes = CRM_Core_BAO_Note::getValues($params, $defaults);
@@ -908,10 +907,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
 
     if (!isset($params['noGroups'])) {
       $contact->groupContact = CRM_Contact_BAO_GroupContact::getValues($params, $defaults);
-    }
-
-    if (!isset($params['noWebsite'])) {
-      $contact->website = CRM_Core_BAO_Website::getValues($params, $defaults);
     }
 
     return $contact;
@@ -2616,7 +2611,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
    * @return CRM_Contact_BAO_Contact|null
    *   The found object or null
    */
-  public static function getValues(&$params, &$values) {
+  public static function getValues($params, &$values) {
     $contact = new CRM_Contact_BAO_Contact();
 
     $contact->copyValues($params);

@@ -76,7 +76,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @return array
    *   (reference)   the values that could be potentially assigned to smarty
    */
-  public static function getValues(&$params, &$values) {
+  public static function getValues($params, &$values) {
     if (empty($params)) {
       return NULL;
     }

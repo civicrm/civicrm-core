@@ -984,7 +984,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
    * @return array
    *   (reference)   the values that could be potentially assigned to smarty
    */
-  public static function &getValues(&$params, &$values) {
+  public static function &getValues($params, &$values) {
     if (empty($params)) {
       return NULL;
     }
