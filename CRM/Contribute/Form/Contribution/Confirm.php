@@ -1231,9 +1231,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $recurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     $recurParams['payment_processor_id'] = $params['payment_processor_id'] ?? NULL;
     $recurParams['is_email_receipt'] = (bool) ($params['is_email_receipt'] ?? FALSE);
-    // we need to add a unique trxn_id to avoid a unique key error
-    // in paypal IPN we reset this when paypal sends us the real trxn id, CRM-2991
-    $recurParams['trxn_id'] = $params['trxn_id'] ?? $params['invoiceID'];
+    // We set trxn_id=invoiceID specifically for paypal IPN. It is reset this when paypal sends us the real trxn id, CRM-2991
+    $recurParams['processor_id'] = $recurParams['trxn_id'] = ($params['trxn_id'] ?? $params['invoiceID']);
     $recurParams['financial_type_id'] = $contributionType->id;
 
     $campaignId = $params['campaign_id'] ?? $form->_values['campaign_id'] ?? NULL;

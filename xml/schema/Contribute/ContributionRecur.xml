@@ -229,7 +229,7 @@
     <title>Transaction ID</title>
     <type>varchar</type>
     <length>255</length>
-    <comment>unique transaction id. may be processor id, bank id + trans id, or account number + check number... depending on payment_method</comment>
+    <comment>unique transaction id (deprecated - use processor_id)</comment>
     <add>1.6</add>
     <html>
       <type>Text</type>
