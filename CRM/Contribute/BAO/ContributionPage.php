@@ -420,7 +420,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'tplParams' => $tplParams,
         'tokenContext' => $tplParams['contributionID'] ? ['contributionId' => (int) $tplParams['contributionID'], 'contactId' => $contactID] : ['contactId' => $contactID],
         'isTest' => $isTest,
-        'PDFFilename' => 'receipt.pdf',
+        'PDFFilename' => !empty($values['is_pay_later']) ? 'invoice.pdf' : 'receipt.pdf',
       ];
 
       if ($returnMessageText) {
