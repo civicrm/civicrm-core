@@ -875,4 +875,42 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertNotEmpty($result[1]['columns'][1]['links'][0]['url']);
   }
 
+  /**
+   * Ensure SearchKit can cope with a non-DAO-based entity
+   */
+  public function testRunWithNonDaoEntity() {
+    $search = [
+      'api_entity' => 'Entity',
+      'api_params' => [
+        'version' => 4,
+        'select' => ['name'],
+        'where' => [['name', '=', 'Contact']],
+      ],
+    ];
+
+    $display = [
+      'type' => 'table',
+      'settings' => [
+        'actions' => TRUE,
+        'columns' => [
+          [
+            'type' => 'field',
+            'key' => 'name',
+            'label' => 'Name',
+            'sortable' => TRUE,
+          ],
+        ],
+      ],
+    ];
+
+    $result = SearchDisplay::Run(FALSE)
+      ->setSavedSearch($search)
+      ->setDisplay($display)
+      ->setReturn('page:1')
+      ->execute();
+
+    $this->assertCount(1, $result);
+    $this->assertEquals('Contact', $result[0]['columns'][0]['val']);
+  }
+
 }
