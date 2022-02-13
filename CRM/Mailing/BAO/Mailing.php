@@ -14,6 +14,9 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+
+use Civi\API\Exception\UnauthorizedException;
+
 require_once 'Mail/mime.php';
 
 /**
@@ -140,7 +143,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
       return;
     }
 
-    list($location_filter, $order_by) = self::getLocationFilterAndOrderBy($mailingObj->email_selection_method, $mailingObj->location_type_id);
+    [$location_filter, $order_by] = self::getLocationFilterAndOrderBy($mailingObj->email_selection_method, $mailingObj->location_type_id);
 
     // get all the saved searches AND hierarchical groups
     // and load them in the cache
@@ -297,7 +300,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         ->execute();
     }
 
-    list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause();
+    [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause();
 
     // clear all the mailing recipients before populating
     CRM_Core_DAO::executeQuery(' DELETE FROM civicrm_mailing_recipients WHERE  mailing_id = %1 ', [
@@ -425,6 +428,32 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     }
 
     return [$location_filter, $orderBy];
+  }
+
+  /**
+   * Process parameters to ensure workflow permissions are respected.
+   *
+   * 'schedule mailings' and 'approve mailings' can update certain fields,
+   * but can't create.
+   *
+   * @param array $params
+   *
+   * @return array
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected static function processWorkflowPermissions(array $params): array {
+    if (empty($params['id']) && !CRM_Core_Permission::check('access CiviMail') && !CRM_Core_Permission::check('create mailings')) {
+      throw new UnauthorizedException("Cannot create new mailing. Required permission: 'access CiviMail' or 'create mailings'");
+    }
+
+    $safeParams = [];
+    $fieldPerms = CRM_Mailing_BAO_Mailing::getWorkflowFieldPerms();
+    foreach (array_keys($params) as $field) {
+      if (CRM_Core_Permission::check($fieldPerms[$field])) {
+        $safeParams[$field] = $params[$field];
+      }
+    }
+    return $safeParams;
   }
 
   /**
@@ -558,7 +587,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         preg_match_all($patterns[$key], $email, $matches, PREG_PATTERN_ORDER);
         foreach ($matches[0] as $idx => $token) {
           $preg_token = '/' . preg_quote($token, '/') . '/im';
-          list($split_template[], $email) = preg_split($preg_token, $email, 2);
+          [$split_template[], $email] = preg_split($preg_token, $email, 2);
           array_push($tokens, $this->getDataFunc($token));
         }
         if ($email) {
@@ -874,7 +903,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $bao->from_name = $bao->from_email = $bao->subject = '';
 
     // use $bao's instance method to get verp and urls
-    list($verp, $urls, $_) = $bao->getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email);
+    [$verp, $urls, $_] = $bao->getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email);
     return [$verp, $urls];
   }
 
@@ -1007,7 +1036,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $this->_domain = CRM_Core_BAO_Domain::getDomain();
     }
 
-    list($verp, $urls, $headers) = $this->getVerpAndUrlsAndHeaders(
+    [$verp, $urls, $headers] = $this->getVerpAndUrlsAndHeaders(
       $job_id,
       $event_queue_id,
       $hash,
@@ -1035,7 +1064,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
     else {
       $params = [['contact_id', '=', $contactId, 0, 0]];
-      list($contact) = CRM_Contact_BAO_Query::apiQuery($params);
+      [$contact] = CRM_Contact_BAO_Query::apiQuery($params);
       // $contact is an array of [ contactID => contactDetails ]
 
       // also call the hook to get contact details
@@ -1391,6 +1420,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    *
    * @return CRM_Mailing_DAO_Mailing
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function add(&$params, $ids = []) {
     $id = $params['id'] ?? $ids['mailing_id'] ?? NULL;
@@ -1398,13 +1428,11 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     if (empty($params['id']) && !empty($ids)) {
       CRM_Core_Error::deprecatedWarning('Parameter $ids is no longer used by Mailing::add. Use the api or just pass $params');
     }
-
-    if ($id) {
-      CRM_Utils_Hook::pre('edit', 'Mailing', $id, $params);
+    if (!empty($params['check_permissions']) && CRM_Mailing_Info::workflowEnabled()) {
+      $params = self::processWorkflowPermissions($params);
     }
-    else {
-      CRM_Utils_Hook::pre('create', 'Mailing', NULL, $params);
-    }
+    $action = $id ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($action, 'Mailing', $id, $params);
 
     $mailing = new static();
     if ($id) {
@@ -1431,12 +1459,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $result->modified_date = $mailing->modified_date;
     }
 
-    if ($id) {
-      CRM_Utils_Hook::post('edit', 'Mailing', $mailing->id, $mailing);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'Mailing', $mailing->id, $mailing);
-    }
+    CRM_Utils_Hook::post($action, 'Mailing', $mailing->id, $mailing);
 
     return $result;
   }
