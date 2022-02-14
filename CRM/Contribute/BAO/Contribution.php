@@ -505,6 +505,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
 
     if (!empty($params['id']) && !empty($params['contribution_status_id'])
+      && CRM_Core_Component::isEnabled('CiviPledge')
     ) {
       self::disconnectPledgePaymentsIfCancelled((int) $params['id'], CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id']));
     }
