@@ -209,24 +209,26 @@ class FormattingUtil {
           self::applyFormatters($result, $fieldName, $field, $value);
           $dataType = NULL;
         }
-        // Evaluate pseudoconstant suffixes
-        $suffix = strrpos($fieldName, ':');
-        if ($suffix) {
-          $fieldOptions[$fieldName] = $fieldOptions[$fieldName] ?? self::getPseudoconstantList($field, $fieldName, $result, $action);
-          $dataType = NULL;
-        }
-        if ($fieldExpr->supportsExpansion) {
-          if (!empty($field['serialize']) && is_string($value)) {
-            $value = \CRM_Core_DAO::unSerializeField($value, $field['serialize']);
+        if ($value !== NULL) {
+          // Evaluate pseudoconstant suffixes
+          $suffix = strrpos($fieldName, ':');
+          if ($suffix) {
+            $fieldOptions[$fieldName] = $fieldOptions[$fieldName] ?? self::getPseudoconstantList($field, $fieldName, $result, $action);
+            $dataType = NULL;
           }
-          if (isset($fieldOptions[$fieldName])) {
-            $value = self::replacePseudoconstant($fieldOptions[$fieldName], $value);
+          if ($fieldExpr->supportsExpansion) {
+            if (!empty($field['serialize']) && is_string($value)) {
+              $value = \CRM_Core_DAO::unSerializeField($value, $field['serialize']);
+            }
+            if (isset($fieldOptions[$fieldName])) {
+              $value = self::replacePseudoconstant($fieldOptions[$fieldName], $value);
+            }
           }
-        }
-        // Keep track of contact types for self::contactFieldsToRemove
-        if ($value && isset($field['entity']) && $field['entity'] === 'Contact' && $field['name'] === 'contact_type') {
-          $prefix = strrpos($fieldName, '.');
-          $contactTypePaths[$prefix ? substr($fieldName, 0, $prefix + 1) : ''] = $value;
+          // Keep track of contact types for self::contactFieldsToRemove
+          if ($value && isset($field['entity']) && $field['entity'] === 'Contact' && $field['name'] === 'contact_type') {
+            $prefix = strrpos($fieldName, '.');
+            $contactTypePaths[$prefix ? substr($fieldName, 0, $prefix + 1) : ''] = $value;
+          }
         }
         $result[$key] = self::convertDataType($value, $dataType);
       }

@@ -50,7 +50,7 @@ class BasicGetAction extends AbstractGetAction {
     $this->setDefaultWhereClause();
     $this->expandSelectClauseWildcards();
     $values = $this->getRecords();
-    $this->formatRawValues($values);
+    $values = $this->formatRawValues($values);
     $this->queryArray($values, $result);
   }
 
@@ -101,25 +101,34 @@ class BasicGetAction extends AbstractGetAction {
    * @param $records
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @return array
    */
-  protected function formatRawValues(&$records) {
+  private function formatRawValues($records): array {
     // Pad $records and $fields with pseudofields
     $fields = $this->entityFields();
-    foreach ($records as &$values) {
-      foreach ($this->entityFields() as $field) {
-        $values += [$field['name'] => NULL];
+    $values = [];
+    foreach ($records as $idx => $row) {
+      $values[$idx] = [];
+      foreach ($fields as $name => $field) {
+        $values[$idx][$name] = $row[$name] ?? NULL;
         if (!empty($field['options'])) {
           foreach (FormattingUtil::$pseudoConstantSuffixes as $suffix) {
-            $pseudofield = $field['name'] . ':' . $suffix;
-            if (!isset($values[$pseudofield]) && isset($values[$field['name']]) && $this->_isFieldSelected($pseudofield)) {
-              $values[$pseudofield] = $values[$field['name']];
+            $pseudofield = $name . ':' . $suffix;
+            // In some (nonstandard) cases the getter may supply already matched pseudoconstant values
+            if (isset($row[$pseudofield])) {
+              $values[$idx][$pseudofield] = $row[$pseudofield];
+            }
+            // Standard case - replace
+            elseif (isset($row[$name]) && $this->_isFieldSelected($pseudofield)) {
+              $values[$idx][$pseudofield] = $row[$name];
             }
           }
         }
       }
     }
     // Swap raw values with pseudoconstants
-    FormattingUtil::formatOutputValues($records, $fields, $this->getActionName());
+    FormattingUtil::formatOutputValues($values, $fields, $this->getActionName());
+    return $values;
   }
 
 }

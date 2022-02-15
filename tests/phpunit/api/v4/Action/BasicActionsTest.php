@@ -162,10 +162,10 @@ class BasicActionsTest extends UnitTestCase implements HookInterface {
 
   public function testBatchFrobnicate() {
     $objects = [
-      ['group' => 'one', 'color' => 'red', 'number' => 10],
-      ['group' => 'one', 'color' => 'blue', 'number' => 20],
-      ['group' => 'one', 'color' => 'green', 'number' => 30],
-      ['group' => 'two', 'color' => 'blue', 'number' => 40],
+      ['group' => 'one', 'color' => 'red', 'size' => 10],
+      ['group' => 'one', 'color' => 'blue', 'size' => 20],
+      ['group' => 'one', 'color' => 'green', 'size' => 30],
+      ['group' => 'two', 'color' => 'blue', 'size' => 40],
     ];
     $this->replaceRecords($objects);
 
@@ -432,6 +432,29 @@ class BasicActionsTest extends UnitTestCase implements HookInterface {
     catch (\API_Exception $createError) {
     }
     $this->assertStringContainsString('Illegal expression', $createError->getMessage());
+  }
+
+  public function testGetReturnValues(): void {
+    $records = [
+      ['shape' => 'round', 'not_a_real_field' => 'not allowed!'],
+      ['shape' => 'square', 'not_a_real_field' => 'not allowed!'],
+    ];
+    $this->replaceRecords($records);
+
+    // Fields not declared in the MockBasicEntity::getFields should not be returned
+    $results = MockBasicEntity::get(FALSE)
+      ->execute();
+    $this->assertEquals('round', $results[0]['shape']);
+    $this->assertArrayNotHasKey('not_a_real_field', $results[0]);
+    $this->assertArrayNotHasKey('not_a_real_field', $results[1]);
+
+    // Still should not be returned, even if selected
+    $results = MockBasicEntity::get(FALSE)
+      ->addSelect('shape', 'not_a_real_field')
+      ->execute();
+    $this->assertEquals('round', $results[0]['shape']);
+    $this->assertArrayNotHasKey('not_a_real_field', $results[0]);
+    $this->assertArrayNotHasKey('not_a_real_field', $results[1]);
   }
 
 }

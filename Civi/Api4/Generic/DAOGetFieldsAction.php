@@ -110,8 +110,7 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
       'data_type' => 'Integer',
     ];
     $fields[] = [
-      'name' => 'custom_group_id',
-      'data_type' => 'Integer',
+      'name' => 'custom_group',
     ];
     $fields[] = [
       'name' => 'sql_filters',

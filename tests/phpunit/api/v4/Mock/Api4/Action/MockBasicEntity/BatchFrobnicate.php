@@ -27,12 +27,12 @@ class BatchFrobnicate extends \Civi\Api4\Generic\BasicBatchAction {
   protected function doTask($item) {
     return [
       'identifier' => $item['identifier'],
-      'frobnication' => $item['number'] * $item['number'],
+      'frobnication' => $item['size'] * $item['size'],
     ];
   }
 
   protected function getSelect() {
-    return ['identifier', 'number'];
+    return ['identifier', 'size'];
   }
 
 }
