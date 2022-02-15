@@ -254,7 +254,7 @@
                 appendHTML += '<td class="{/literal}{$editableClass}{literal} crmf-description">' + (val.description || '') + "</td>";
                 appendHTML += "<td>" + val.group_type + "</td>";
                 appendHTML += '<td class="{/literal}{$editableClass}{literal} crmf-visibility" data-type="select">' + val.visibility + "</td>";
-                if (showOrgInfo) {
+                if (showOrgInfo != "0") {
                   appendHTML += "<td>" + val.org_info + "</td>";
                 }
                 appendHTML += "<td>" + val.links + "</td>";
