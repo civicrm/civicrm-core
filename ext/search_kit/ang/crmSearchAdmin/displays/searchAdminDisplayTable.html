@@ -28,6 +28,10 @@
   </div>
   <search-admin-css-rules label="{{:: ts('Row Style') }}" item="$ctrl.display.settings"></search-admin-css-rules>
   <search-admin-pager-config display="$ctrl.display"></search-admin-pager-config>
+  <div class="form-inline crm-search-admin-flex-row" title="{{:: ts('Text to display if the table is empty.') }}">
+    <label for="crm-search-admin-display-no-results-text">{{:: ts('No Results Text') }}</label>
+    <input class="form-control crm-flex-1" id="crm-search-admin-display-no-results-text" ng-model="$ctrl.display.settings.noResultsText" placeholder="{{:: ts('None found.') }}">
+  </div>
 </fieldset>
 <fieldset class="crm-search-admin-edit-columns-wrapper">
   <legend>

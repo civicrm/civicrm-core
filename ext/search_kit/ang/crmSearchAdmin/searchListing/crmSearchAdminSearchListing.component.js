@@ -64,11 +64,24 @@
         this.initializeDisplay($scope, $element);
         // Keep tab counts up-to-date - put rowCount in current tab if there are no other filters
         $scope.$watch('$ctrl.rowCount', function(val) {
-          if (typeof val === 'number' && angular.equals(['has_base'], _.keys(ctrl.filters))) {
+          if (typeof val === 'number' && angular.equals(['has_base'], getActiveFilters())) {
             ctrl.tabCount = val;
           }
         });
+        // Customize the noResultsText
+        $scope.$watch('$ctrl.filters', function() {
+          ctrl.settings.noResultsText = (angular.equals(['has_base'], getActiveFilters())) ?
+            ts('Welcome to Search Kit. Click the New Search button above to start composing your first search.') :
+            ts('No Saved Searches match filter criteria.');
+        }, true);
       };
+
+      // Get the names of in-use filters
+      function getActiveFilters() {
+        return _.keys(_.pick(ctrl.filters, function(val) {
+          return val !== null && (val === true || val === false || val.length);
+        }));
+      }
 
       this.onPostRun.push(function(result) {
         _.each(result, function(row) {

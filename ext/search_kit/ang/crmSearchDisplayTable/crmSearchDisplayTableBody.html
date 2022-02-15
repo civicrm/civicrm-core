@@ -11,7 +11,7 @@
 <tr ng-if="$ctrl.rowCount === 0">
   <td colspan="{{ $ctrl.settings.columns.length + 2 }}">
     <p class="alert alert-info text-center">
-      {{:: ts('None Found') }}
+      {{ $ctrl.settings.noResultsText || ts('None Found') }}
     </p>
   </td>
 </tr>
