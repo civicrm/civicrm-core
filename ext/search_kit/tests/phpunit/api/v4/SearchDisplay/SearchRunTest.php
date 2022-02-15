@@ -753,13 +753,13 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
             'cssRules' => [
               [
                 'bg-danger',
-                'Contact_Email_contact_id_01.on_hold:name',
+                'Contact_Email_contact_id_01.on_hold:label',
                 '=',
                 'On Hold Bounce',
               ],
               [
                 'bg-warning',
-                'Contact_Email_contact_id_01.on_hold:name',
+                'Contact_Email_contact_id_01.on_hold:label',
                 '=',
                 'On Hold Opt Out',
               ],
