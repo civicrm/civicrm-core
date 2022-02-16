@@ -84,7 +84,6 @@ VALUES
     ( @domainID, 'civicrm/contact/search&reset=1',                          'Find Contacts',      'Find Contacts', NULL, '',                      @searchlastID, '1', NULL, 1 ),
     ( @domainID, 'civicrm/contact/search/advanced&reset=1',                 'Advanced Search',    'Advanced Search', NULL, '', @searchlastID, '1', NULL, 2 ),
     ( @domainID, 'civicrm/contact/search/custom&csid=15&reset=1',           'Full-text Search',   'Full-text Search', NULL, '',                   @searchlastID, '1', NULL, 3 ),
-    ( @domainID, 'civicrm/contact/search/builder&reset=1',                  'Search Builder',     'Search Builder', NULL, '',                     @searchlastID, '1', '1',  4 ),
     ( @domainID, 'civicrm/case/search&reset=1',                             'Find Cases',         'Find Cases', 'access my cases and activities,access all cases and activities', 'OR',            @searchlastID, '1', NULL, 5 ),
     ( @domainID, 'civicrm/contribute/search&reset=1',                       'Find Contributions', 'Find Contributions', 'access CiviContribute', '',  @searchlastID, '1', NULL, 6 ),
     ( @domainID, 'civicrm/mailing&reset=1',                                 'Find Mailings',      'Find Mailings', 'access CiviMail', '',         @searchlastID, '1', NULL, 7 ),
