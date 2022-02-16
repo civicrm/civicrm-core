@@ -46,36 +46,6 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check detection of contact's preferred mail.
-   *
-   * - ie if text then no html output is sent.
-   *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
-   */
-  public function testSendTemplateNoHtml(): void {
-    $contactId = $this->individualCreate([
-      'preferred_mail_format' => 'Text',
-      'first_name' => 'Mary',
-      'email' => 'mary_anderson@civicrm.org',
-    ]);
-    $mut = new CiviMailUtils($this, TRUE);
-    CRM_Core_BAO_MessageTemplate::sendTemplate(
-      [
-        'contactId' => $contactId,
-        'from' => 'admin@example.com',
-        'toEmail' => 'mary_anderson@civicrm.org',
-        'messageTemplate' => [
-          'msg_subject' => 'My subject',
-          'msg_text' => 'My text',
-          'msg_html' => 'My html',
-        ],
-      ]
-    );
-    $mut->checkMailLog(['My text', 'My subject'], ['My html']);
-  }
-
-  /**
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */

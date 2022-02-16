@@ -15,7 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Api4\Email;
 use Civi\Api4\MessageTemplate;
 use Civi\WorkflowMessage\WorkflowMessage;
 
@@ -397,20 +396,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
     // send the template, honouring the target user’s preferences (if any)
     $sent = FALSE;
     if (!empty($params['toEmail'])) {
-      // @todo - consider whether we really should be loading
-      // this based on 'the first email in the db that matches'.
-      // when we likely have the contact id. OTOH people probably barely
-      // use preferredMailFormat these days - the good fight against html
-      // emails was lost a decade ago...
-      $preferredMailFormatArray = Email::get(FALSE)->addWhere('email', '=', $params['toEmail'])->addSelect('contact_id.preferred_mail_format')->execute()->first();
-      $preferredMailFormat = $preferredMailFormatArray['contact_id.preferred_mail_format'] ?? 'Both';
-
-      if ($preferredMailFormat === 'HTML') {
-        $params['text'] = NULL;
-      }
-      if ($preferredMailFormat === 'Text') {
-        $params['html'] = NULL;
-      }
 
       $config = CRM_Core_Config::singleton();
       if ($isAttachPDF) {
