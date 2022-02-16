@@ -99,11 +99,15 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
   public function getEntityNames($version) {
     $entities = [];
     $include_dirs = array_unique(explode(PATH_SEPARATOR, get_include_path()));
-    #$include_dirs = array(dirname(__FILE__). '/../../');
     foreach ($include_dirs as $include_dir) {
       $api_dir = implode(DIRECTORY_SEPARATOR,
         [$include_dir, 'api', 'v' . $version]);
-      if (!is_dir($api_dir)) {
+      // While it seems pointless to have a folder that's outside open_basedir
+      // listed in include_path and that seems more like a configuration issue,
+      // not everyone has control over the hosting provider's include_path and
+      // this does happen out in the wild, so use our wrapper to avoid flooding
+      // logs.
+      if (!\CRM_Utils_File::isDir($api_dir)) {
         continue;
       }
       $iterator = new \DirectoryIterator($api_dir);
@@ -281,7 +285,8 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
       foreach ([$camelName, 'Generic'] as $name) {
         $action_dir = implode(DIRECTORY_SEPARATOR,
           [$include_dir, 'api', "v${version}", $name]);
-        if (!is_dir($action_dir)) {
+        // see note above in getEntityNames about open_basedir
+        if (!\CRM_Utils_File::isDir($action_dir)) {
           continue;
         }
 
