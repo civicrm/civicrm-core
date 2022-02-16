@@ -32,7 +32,7 @@ class GetFields extends \Civi\Api4\Generic\BasicGetFieldsAction {
     $filter = $names ? ['name' => $names] : [];
     $settings = \Civi\Core\SettingsMetadata::getMetadata($filter, $this->domainId, $this->loadOptions);
     $getReadonly = $this->_isFieldSelected('readonly');
-    foreach ($settings as $index => $setting) {
+    foreach ($settings as &$setting) {
       // Unserialize default value
       if (!empty($setting['serialize']) && !empty($setting['default']) && is_string($setting['default'])) {
         $setting['default'] = \CRM_Core_DAO::unSerializeField($setting['default'], $setting['serialize']);
@@ -43,13 +43,18 @@ class GetFields extends \Civi\Api4\Generic\BasicGetFieldsAction {
       if ($getReadonly) {
         $setting['readonly'] = \Civi::settings()->getMandatory($setting['name']) !== NULL;
       }
-      // Filter out deprecated properties
-      $settings[$index] = array_intersect_key($setting, array_column($this->fields(), NULL, 'name'));
     }
     return $settings;
   }
 
+  /**
+   * Returns overridden list of fields for 'get', 'revert' & 'set' actions.
+   * @return string[][]
+   */
   public function fields() {
+    if (!in_array($this->action, ['get', 'revert', 'set'], TRUE)) {
+      return parent::fields();
+    }
     return [
       [
         'name' => 'name',

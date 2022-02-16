@@ -123,6 +123,7 @@ class BasicGetFieldsAction extends BasicGetAction {
         }
       }
     }
+    $fieldProps = array_column($this->fields(), 'name', 'name');
     // Unless this is an internal getFields call, filter out @internal properties
     $internalProps = $isInternal ? [] : array_filter(array_column($this->fields(), '@internal', 'name'));
     foreach ($values as &$field) {
@@ -141,7 +142,7 @@ class BasicGetFieldsAction extends BasicGetAction {
       if (isset($defaults['options'])) {
         $field['options'] = $this->formatOptionList($field['options']);
       }
-      $field = array_diff_key($field, $internalProps);
+      $field = array_intersect_key(array_diff_key($field, $internalProps), $fieldProps);
     }
   }
 

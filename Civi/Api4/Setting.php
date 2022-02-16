@@ -58,4 +58,13 @@ class Setting extends Generic\AbstractEntity {
       ->setCheckPermissions($checkPermissions);
   }
 
+  /**
+   * @inheritDoc
+   */
+  public static function getInfo() {
+    $info = parent::getInfo();
+    $info['primary_key'] = ['name'];
+    return $info;
+  }
+
 }
