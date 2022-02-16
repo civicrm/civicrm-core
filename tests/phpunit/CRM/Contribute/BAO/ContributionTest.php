@@ -184,9 +184,14 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * DeleteContribution() method
+   * Test contributions are deleted with assets in v3 and v4 api.@\
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
-  public function testDeleteContribution() {
+  public function testDeleteContribution(int $version): void {
+    $this->_apiversion = $version;
     $contactId = $this->individualCreate();
 
     $params = [
@@ -203,19 +208,14 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'total_amount' => 200.00,
       'fee_amount' => 5,
       'net_amount' => 195,
-      'trxn_id' => '33ereerwww322323',
-      'invoice_id' => '33ed39c9e9ee6ef6031621ce0eafe6da70',
-      'thankyou_date' => '20080522',
       'sequential' => TRUE,
     ];
 
     $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
 
-    CRM_Contribute_BAO_Contribution::deleteContribution($contribution['id']);
-
-    $this->assertDBNull('CRM_Contribute_DAO_Contribution', $contribution['trxn_id'],
-      'id', 'trxn_id', 'Database check for deleted Contribution.'
-    );
+    $this->callAPISuccess('Contribution', 'delete', ['id' => $contribution['id']]);
+    $this->callAPISuccessGetCount('Contribution', [], 0);
+    $this->callAPISuccessGetCount('LineItem', [], 0);
   }
 
   /**
