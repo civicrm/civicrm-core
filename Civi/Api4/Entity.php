@@ -81,7 +81,7 @@ class Entity extends Generic\AbstractEntity {
         ],
         [
           'name' => 'primary_key',
-          'type' => 'Array',
+          'data_type' => 'Array',
           'description' => 'Name of unique identifier field(s) (e.g. [id])',
         ],
         [
