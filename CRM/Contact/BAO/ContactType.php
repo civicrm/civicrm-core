@@ -17,24 +17,20 @@
 class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements \Civi\Test\HookInterface {
 
   /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Contact_DAO_ContactType|null
-   *   object on success, null otherwise
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $contactType = new CRM_Contact_DAO_ContactType();
-    $contactType->copyValues($params);
-    if ($contactType->find(TRUE)) {
-      CRM_Core_DAO::storeValues($contactType, $defaults);
-      return $contactType;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**

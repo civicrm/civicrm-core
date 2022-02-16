@@ -158,11 +158,20 @@ SELECT acl.*
   }
 
   /**
+   * Retrieve DB object and copy to defaults array.
+   *
    * @param array $params
+   *   Array of criteria values.
    * @param array $defaults
+   *   Array to be populated with found values.
+   *
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    CRM_Core_DAO::commonRetrieve('CRM_ACL_DAO_ACL', $params, $defaults);
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**

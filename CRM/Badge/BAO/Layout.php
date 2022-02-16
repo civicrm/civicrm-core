@@ -17,26 +17,16 @@
 class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
 
   /**
-   * Retrieve DB object based on input parameters.
+   * Retrieve DB object and copy to defaults array.
    *
-   * It also stores all the retrieved values in the default array.
-   *
+   * @deprecated
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_DAO_PrintLabel|null
-   *   object on success, null otherwise
+   * @return CRM_Core_DAO_PrintLabel|NULL
    */
-  public static function retrieve(&$params, &$defaults) {
-    $printLabel = new CRM_Core_DAO_PrintLabel();
-    $printLabel->copyValues($params);
-    if ($printLabel->find(TRUE)) {
-      CRM_Core_DAO::storeValues($printLabel, $defaults);
-      return $printLabel;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve('CRM_Core_DAO_PrintLabel', $params, $defaults);
   }
 
   /**

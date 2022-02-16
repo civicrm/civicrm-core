@@ -97,25 +97,20 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
   }
 
   /**
-   * Retrieve DB object based on input parameters.
-   *
-   * It also stores all the retrieved values in the default array.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Price_BAO_LineItem
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params = [], &$defaults = []) {
-    $lineItem = new CRM_Price_BAO_LineItem();
-    $lineItem->copyValues($params);
-    if ($lineItem->find(TRUE)) {
-      CRM_Core_DAO::storeValues($lineItem, $defaults);
-      return $lineItem;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults = []) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**

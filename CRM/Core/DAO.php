@@ -1498,13 +1498,13 @@ LIKE %1
    * Fetch object based on array of properties.
    *
    * @param string $daoName
-   *   Name of the dao object.
+   *   Name of the dao class.
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    * @param array $defaults
    *   (reference) an assoc array to hold the flattened values.
    * @param array $returnProperities
-   *   An assoc array of fields that need to be returned, eg array( 'first_name', 'last_name').
+   *   An assoc array of fields that need to be returned, e.g. ['first_name', 'last_name'].
    *
    * @return static|null
    */

@@ -75,27 +75,21 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Core_BAO_Navigation|null
-   *   object on success, NULL otherwise
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $navigation = new CRM_Core_DAO_Navigation();
-    $navigation->copyValues($params);
-
-    $navigation->domain_id = CRM_Core_Config::domainID();
-
-    if ($navigation->find(TRUE)) {
-      CRM_Core_DAO::storeValues($navigation, $defaults);
-      return $navigation;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    $params['domain_id'] = CRM_Core_Config::domainID();
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
