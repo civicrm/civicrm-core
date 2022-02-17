@@ -57,8 +57,7 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
       $params['body_html'] = htmlspecialchars($headerStr) . "\n\n" . $body;
       $params['subject'] = $headers['Subject'];
       $params['name'] = $headers['Subject'];
-      $ids = [];
-      $mailing = CRM_Mailing_BAO_Mailing::create($params, $ids);
+      $mailing = CRM_Mailing_BAO_Mailing::create($params);
 
       if (empty($mailing) || is_a($mailing, 'CRM_Core_Error')) {
         return PEAR::raiseError('Unable to create spooled mailing.');
