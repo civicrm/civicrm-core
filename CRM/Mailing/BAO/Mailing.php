@@ -1478,7 +1478,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    *  - _skip_evil_bao_auto_recipients_: bool
    *  - _skip_evil_bao_auto_schedule_: bool
-   *  - _evil_bao_validator_: string|callable
    *
    * </twowrongsmakesaright>
    *
@@ -1611,17 +1610,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     // check and attach and files as needed
     CRM_Core_BAO_File::processAttachment($params, 'civicrm_mailing', $mailing->id);
-
-    // If we're going to autosend, then check validity before saving.
-    if (empty($params['is_completed']) && !empty($params['scheduled_date']) && $params['scheduled_date'] != 'null' && !empty($params['_evil_bao_validator_'])) {
-      $cb = Civi\Core\Resolver::singleton()
-        ->get($params['_evil_bao_validator_']);
-      $errors = call_user_func($cb, $mailing);
-      if (!empty($errors)) {
-        $fields = implode(',', array_keys($errors));
-        throw new CRM_Core_Exception("Mailing cannot be sent. There are missing or invalid fields ($fields).", 'cannot-send', $errors);
-      }
-    }
 
     $transaction->commit();
 
