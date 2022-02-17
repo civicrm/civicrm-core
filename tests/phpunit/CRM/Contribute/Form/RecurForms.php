@@ -15,6 +15,11 @@
 class CRM_Contribute_Form_RecurForms extends CiviUnitTestCase {
 
   /**
+   * @var int
+   */
+  protected $paymentProcessorId;
+
+  /**
    * Get contact id.
    *
    *  return int
@@ -31,17 +36,18 @@ class CRM_Contribute_Form_RecurForms extends CiviUnitTestCase {
    */
   public function addContribution(): void {
     $this->paymentProcessorId = $this->processorCreate();
-    $this->callAPISuccess('Order', 'create', [
+    $order = $this->callAPISuccess('Order', 'create', [
       'contact_id' => $this->getContactID(),
       'contribution_recur_id' => $this->getContributionRecurID(),
       'financial_type_id' => 'Donation',
       'total_amount' => 10,
       'contribution_page_id' => $this->getContributionPageID(),
-      'api.Payment.create' => [
-        'total_amount' => 10,
-        'payment_processor_id' => $this->paymentProcessorId,
-        'is_send_contribution_notification' => FALSE,
-      ],
+    ]);
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $order['id'],
+      'total_amount' => 10,
+      'payment_processor_id' => $this->paymentProcessorId,
+      'is_send_contribution_notification' => FALSE,
     ]);
   }
 
@@ -58,6 +64,7 @@ class CRM_Contribute_Form_RecurForms extends CiviUnitTestCase {
         'installments' => 12,
         'frequency_interval' => 1,
         'frequency_unit' => 'month',
+        'payment_processor_id' => $this->paymentProcessorId,
       ])['id'];
     }
     return $this->ids['ContributionRecur'][0];
