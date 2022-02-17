@@ -458,6 +458,13 @@ class Api4SelectQuery {
         $field = $this->getField($fieldName, TRUE);
         FormattingUtil::formatInputValue($value, $fieldName, $field, $operator);
       }
+      elseif ($expr->getType() === 'SqlFunction') {
+        $fauxField = [
+          'name' => NULL,
+          'data_type' => $expr::getDataType(),
+        ];
+        FormattingUtil::formatInputValue($value, NULL, $fauxField, $operator);
+      }
       $fieldAlias = $expr->render($this->apiFieldSpec);
     }
     // For HAVING, expr must be an item in the SELECT clause
