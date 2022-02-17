@@ -5247,4 +5247,62 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $api->execute()->first()[$fieldName]);
   }
 
+  /**
+   * Test fetching custom field value that needs to be escaped.
+   */
+  public function testGetEscapedCustomField() {
+    $testValues = [
+      'testvalue',
+      // This value will be escaped.
+      "test'value",
+    ];
+
+    // Create a custom contact fieldgroup + field.
+    $customGroupId = $this->customGroupCreate([
+      'title' => 'testGetEscapedCustomField',
+    ])['id'];
+    $customFieldId = $this->customFieldCreate([
+      'custom_group_id' => $customGroupId,
+      'label' => 'testGetEscapedCustomField',
+    ])['id'];
+    $customFieldParam = 'custom_' . $customFieldId;
+
+    // Create and fetch contacts using the test values.
+    foreach ($testValues as $value) {
+      // Create a new contact and insert the test value into the custom field.
+      $contactId = $this->callAPISuccess('Contact', 'create', [
+        'contact_type' => 'Individual',
+        'first_name' => 'Test',
+        'last_name' => 'Contact',
+        $customFieldParam => $value,
+      ])['id'];
+
+      // Verify the test value was inserted correctly.
+      $contactData = $this->callAPISuccess('Contact', 'getsingle', [
+        'id' => $contactId,
+        'return' => [$customFieldParam],
+      ]);
+      $this->assertEquals($value, $contactData[$customFieldParam]);
+
+      // All of these comparison operators should return a result.
+      $comparisonQueries = [
+        ['<=' => $value],
+        ['>=' => $value],
+        ['LIKE' => $value],
+        ['IN' => [$value]],
+        ['BETWEEN' => [$value, $value]],
+        // Equals.
+        $value,
+      ];
+
+      // Fetch the new contact using different comparison operators.
+      foreach ($comparisonQueries as $query) {
+        $this->callAPISuccess('Contact', 'getsingle', [
+          'id' => $contactId,
+          $customFieldParam => $query,
+        ]);
+      }
+    }
+  }
+
 }
