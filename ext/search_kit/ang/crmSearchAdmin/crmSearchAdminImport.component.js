@@ -18,7 +18,7 @@
           try {
             var apiCalls = JSON.parse(ctrl.values),
               allowedEntities = ['SavedSearch', 'SearchDisplay', 'Group'];
-            if (CRM.crmSearchAdmin.afformEnabled) {
+            if ('org.civicrm.afform' in CRM.crmSearchAdmin.modules) {
               allowedEntities.push('Afform');
             }
             // Get entity titles for use in status message

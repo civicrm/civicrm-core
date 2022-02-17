@@ -11,7 +11,7 @@
     controller: function ($scope, $element, crmApi4) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
-      this.afformEnabled = CRM.crmSearchAdmin.afformEnabled;
+      this.afformEnabled = 'org.civicrm.afform' in CRM.crmSearchAdmin.modules;
 
       this.types = [
         {entity: 'SavedSearch', title: ts('Saved Search')},
