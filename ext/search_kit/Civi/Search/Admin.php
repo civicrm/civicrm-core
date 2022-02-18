@@ -12,6 +12,7 @@
 namespace Civi\Search;
 
 use Civi\Api4\Action\SearchDisplay\AbstractRunAction;
+use Civi\Api4\Extension;
 use Civi\Api4\Query\SqlEquation;
 use Civi\Api4\Query\SqlFunction;
 use Civi\Api4\SearchDisplay;
@@ -31,7 +32,8 @@ class Admin {
    */
   public static function getAdminSettings():array {
     $schema = self::getSchema();
-    $extensions = \CRM_Extension_System::singleton()->getMapper();
+    $extensions = Extension::get(FALSE)->addWhere('status', '=', 'installed')
+      ->execute()->indexBy('key')->column('label');
     $data = [
       'schema' => self::addImplicitFKFields($schema),
       'joins' => self::getJoins($schema),
@@ -43,10 +45,7 @@ class Admin {
       'styles' => \CRM_Utils_Array::makeNonAssociative(self::getStyles()),
       'defaultPagerSize' => \Civi::settings()->get('default_pager_size'),
       'defaultDisplay' => SearchDisplay::getDefault(FALSE)->setSavedSearch(['id' => NULL])->execute()->first(),
-      'afformEnabled' => $extensions->isActiveModule('afform'),
-      'afformAdminEnabled' => $extensions->isActiveModule('afform_admin'),
-      // TODO: Add v4 API for Extensions
-      'modules' => array_column(civicrm_api3('Extension', 'get', ['status' => "installed"])['values'], 'label', 'key'),
+      'modules' => $extensions,
       'tags' => Tag::get()
         ->addSelect('id', 'name', 'color', 'is_selectable', 'description')
         ->addWhere('used_for', 'CONTAINS', 'civicrm_saved_search')

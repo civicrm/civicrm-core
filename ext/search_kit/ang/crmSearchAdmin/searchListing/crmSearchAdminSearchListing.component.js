@@ -16,8 +16,8 @@
 
       this.searchDisplayPath = CRM.url('civicrm/search');
       this.afformPath = CRM.url('civicrm/admin/afform');
-      this.afformEnabled = CRM.crmSearchAdmin.afformEnabled;
-      this.afformAdminEnabled = CRM.crmSearchAdmin.afformAdminEnabled;
+      this.afformEnabled = 'org.civicrm.afform' in CRM.crmSearchAdmin.modules;
+      this.afformAdminEnabled = 'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
 
       this.apiEntity = 'SavedSearch';
       this.search = {
