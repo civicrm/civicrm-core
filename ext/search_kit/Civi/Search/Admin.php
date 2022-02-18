@@ -454,6 +454,9 @@ class Admin {
       // Normalize this property name to match fields data_type
       $function['data_type'] = $function['dataType'] ?? NULL;
       unset($function['dataType']);
+      if ($function['data_type'] === 'Date') {
+        $function['input_type'] = 'Date';
+      }
       // Filter out empty param properties (simplifies the javascript which treats empty arrays/objects as != null)
       foreach ($function['params'] as $i => $param) {
         $function['params'][$i] = array_filter($param);

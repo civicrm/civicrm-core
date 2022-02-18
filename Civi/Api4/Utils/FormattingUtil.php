@@ -80,14 +80,14 @@ class FormattingUtil {
    * This is used by read AND write actions (Get, Create, Update, Replace)
    *
    * @param $value
-   * @param string $fieldName
+   * @param string|null $fieldName
    * @param array $fieldSpec
-   * @param string $operator (only for 'get' actions)
-   * @param int $index (for recursive loops)
+   * @param string|null $operator (only for 'get' actions)
+   * @param null $index (for recursive loops)
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public static function formatInputValue(&$value, $fieldName, $fieldSpec, &$operator = NULL, $index = NULL) {
+  public static function formatInputValue(&$value, ?string $fieldName, array $fieldSpec, &$operator = NULL, $index = NULL) {
     // Evaluate pseudoconstant suffix
     $suffix = strpos($fieldName, ':');
     if ($suffix) {
@@ -126,7 +126,7 @@ class FormattingUtil {
     }
 
     $hic = \CRM_Utils_API_HTMLInputCoder::singleton();
-    if (is_string($value) && !$hic->isSkippedField($fieldSpec['name'])) {
+    if (is_string($value) && $fieldName && !$hic->isSkippedField($fieldSpec['name'])) {
       $value = $hic->encodeValue($value);
     }
   }
@@ -142,7 +142,7 @@ class FormattingUtil {
    * @param $index
    * @return array|string
    */
-  private static function formatDateValue($format, $value, &$operator = NULL, $index = NULL) {
+  public static function formatDateValue($format, $value, &$operator = NULL, $index = NULL) {
     // Non-relative dates (or if no search operator)
     if (!$operator || !array_key_exists($value, \CRM_Core_OptionGroup::values('relative_date_filters'))) {
       return date($format, strtotime($value));

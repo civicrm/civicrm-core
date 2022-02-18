@@ -107,8 +107,9 @@ class DateTest extends UnitTestCase {
     $this->assertContains($act[5], $result);
     $this->assertContains($act[6], $result);
 
+    // Ensure it also works if the DATE() function is used
     $result = Activity::get(FALSE)->addSelect('id')
-      ->addWhere('activity_date_time', '>=', 'this.year')
+      ->addWhere('DATE(activity_date_time)', '>=', 'this.year')
       ->execute()->column('id');
     $this->assertNotContains($act[0], $result);
     $this->assertNotContains($act[1], $result);
