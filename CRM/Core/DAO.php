@@ -2129,7 +2129,6 @@ SELECT contact_id
    *   an object of type referenced by daoName
    */
   public static function commonRetrieveAll($daoName, $fieldIdName, $fieldId, &$details, $returnProperities = NULL) {
-    require_once str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php";
     $object = new $daoName();
     $object->$fieldIdName = $fieldId;
 

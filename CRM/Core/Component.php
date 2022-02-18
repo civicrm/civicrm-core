@@ -414,7 +414,6 @@ class CRM_Core_Component {
         $infoFile = $crmFolderDir . "/{$subDir}/" . self::COMPONENT_INFO_CLASS . '.php';
         if (file_exists($infoFile)) {
           $infoClass = 'CRM_' . $subDir . '_' . self::COMPONENT_INFO_CLASS;
-          require_once str_replace('_', DIRECTORY_SEPARATOR, $infoClass) . '.php';
           $infoObject = new $infoClass(NULL, NULL, NULL);
           $components[$infoObject->info['name']] = $infoObject;
           unset($infoObject);
