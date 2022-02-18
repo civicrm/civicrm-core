@@ -2750,6 +2750,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
         // Add this value to the table rows
         $rows["move_location_{$blockName}_{$count}"]['other'] = $displayValue;
+        $rows["move_location_{$blockName}_{$count}"]['location_entity'] = $blockName;
 
         // CRM-17556 Only display 'main' contact value if it's the same location + type
         // Look it up from main values...
@@ -2777,7 +2778,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
               // Set this value as the default against the 'other' contact value
               $rows["move_location_{$blockName}_{$count}"]['main'] = $mainValueCheck[$blockInfo['displayField']];
               $rows["move_location_{$blockName}_{$count}"]['main_is_primary'] = $mainValueCheck['is_primary'] ?? 0;
-              $rows["move_location_{$blockName}_{$count}"]['location_entity'] = $blockName;
               $mainContactBlockId = $mainValueCheck['id'];
               break;
             }
