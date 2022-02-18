@@ -27,9 +27,6 @@
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_mailing_create($params) {
-  if (isset($params['template_options']) && is_array($params['template_options'])) {
-    $params['template_options'] = ($params['template_options'] === []) ? '{}' : json_encode($params['template_options']);
-  }
   $safeParams = $params;
   $timestampCheck = TRUE;
   if (!empty($params['id']) && !empty($params['modified_date'])) {

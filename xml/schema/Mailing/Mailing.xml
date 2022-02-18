@@ -206,12 +206,15 @@
     <pseudoconstant>
       <callback>CRM_Mailing_BAO_Mailing::getTemplateTypeNames</callback>
     </pseudoconstant>
+    <add>4.7.16</add>
   </field>
   <field>
     <name>template_options</name>
     <title>Template Options (JSON)</title>
     <type>longtext</type>
     <comment>Advanced options used by the email templating system. (JSON encoded)</comment>
+    <serialize>JSON</serialize>
+    <add>4.7.16</add>
   </field>
   <field>
     <name>subject</name>
