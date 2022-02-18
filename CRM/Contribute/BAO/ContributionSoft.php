@@ -373,7 +373,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     $contactId = $params['cid'];
 
     $filter = NULL;
-    if ($params['context'] == 'membership' && !empty($params['entityID']) && $contactId) {
+    if ($params['context'] === 'membership' && !empty($params['entityID']) && $contactId) {
       $filter = " AND cc.id IN (SELECT contribution_id FROM civicrm_membership_payment WHERE membership_id = {$params['entityID']})";
     }
 
@@ -398,6 +398,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @param array $dTParams
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public static function getSoftContributionList($contact_id, $filter = NULL, $isTest = 0, &$dTParams = NULL) {
     $config = CRM_Core_Config::singleton();
@@ -468,7 +469,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     $dTParams['total'] = CRM_Core_DAO::singleValueQuery('SELECT FOUND_ROWS()');
     $result = [];
     while ($cs->fetch()) {
-      $result[$cs->id]['amount'] = CRM_Utils_Money::format($cs->amount, $cs->currency);
+      $result[$cs->id]['amount'] = Civi::format()->money($cs->amount, $cs->currency);
       $result[$cs->id]['currency'] = $cs->currency;
       $result[$cs->id]['contributor_id'] = $cs->contributor_id;
       $result[$cs->id]['contribution_id'] = $cs->contribution_id;

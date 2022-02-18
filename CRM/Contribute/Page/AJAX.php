@@ -37,11 +37,6 @@ class CRM_Contribute_Page_AJAX {
     $params += CRM_Core_Page_AJAX::validateParams($requiredParameters, $optionalParameters);
 
     $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionSelector($params);
-
-    if (!empty($_GET['is_unit_test'])) {
-      return $softCreditList;
-    }
-
     CRM_Utils_JSON::output($softCreditList);
   }
 
