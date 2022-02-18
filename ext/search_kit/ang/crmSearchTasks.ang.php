@@ -13,7 +13,7 @@ return [
     'css/crmSearchTasks.css',
   ],
   'basePages' => [],
-  'requires' => ['crmUi', 'crmUtil', 'dialogService', 'api4', 'checklist-model'],
+  'requires' => ['crmUi', 'crmUtil', 'dialogService', 'api4', 'checklist-model', 'crmDialog'],
   'settingsFactory' => ['\Civi\Search\Actions', 'getActionSettings'],
   'permissions' => ['edit groups', 'administer reserved groups'],
 ];
