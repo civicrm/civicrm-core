@@ -507,7 +507,9 @@ contribution_recur.payment_instrument_id:name :Check
     $tokens = $tokenProcessor->listTokens();
     // Add in custom tokens as token processor supports these.
     $expectedTokens = array_merge($expectedTokens, $this->getTokensAdvertisedByTokenProcessorButNotLegacy(), $this->getContributionRecurTokens());
-    $this->assertEquals(array_merge($expectedTokens, $this->getDomainTokens()), $tokens);
+    // $expectedTokens contains unadvertised tokens (ie. won't show for selection for the user).
+    // But listTokens() only gets us the "advertised" tokens so we need to "remove" all the unadvertised ones before checking they are equal.
+    $this->assertEquals(array_diff_key(array_merge($expectedTokens, $this->getDomainTokens()), $this->getUnadvertisedTokens()), $tokens);
     $tokenProcessor->addMessage('html', $tokenString, 'text/plain');
     $tokenProcessor->addRow(['membershipId' => $this->getMembershipID()]);
     $tokenProcessor->evaluate();
