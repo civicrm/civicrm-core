@@ -69,6 +69,28 @@ function civigrant_civicrm_permission(&$permissions) {
 }
 
 /**
+ * Implements hook_civicrm_alterAPIPermissions().
+ *
+ * Set CiviGrant permissions for APIv3.
+ */
+function civigrant_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissions) {
+  $permissions['grant'] = [
+    'get' => [
+      'access CiviGrant',
+    ],
+    'delete' => [
+      'delete in CiviGrant',
+    ],
+    'create' => [
+      'edit grants',
+    ],
+    'update' => [
+      'edit grants',
+    ],
+  ];
+}
+
+/**
  * Implements hook_civicrm_queryObjects().
  *
  * Adds query object for legacy screens like advanced search, search builder, etc.
