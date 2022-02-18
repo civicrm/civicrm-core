@@ -3646,7 +3646,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $info['transaction'] = self::getContributionTransactionInformation($contributionId, $contribution['financial_type_id']);
     }
 
-    $info['payment_links'] = self::getContributionPaymentLinks($id, $paymentBalance, $info['contribution_status']);
+    $info['payment_links'] = self::getContributionPaymentLinks($id, $info['contribution_status']);
     return $info;
   }
 
@@ -4287,15 +4287,16 @@ LIMIT 1;";
    * then a refund link.
    *
    * @param int $id
-   * @param float $balance
    * @param string $contributionStatus
    *
    * @return array
    *   $actionLinks Links array containing:
    *     -url
    *     -title
+   *
+   * @internal - not supported for use outside of core.
    */
-  protected static function getContributionPaymentLinks($id, $balance, $contributionStatus) {
+  public static function getContributionPaymentLinks(int $id, string $contributionStatus): array {
     if ($contributionStatus === 'Failed' || !CRM_Core_Permission::check('edit contributions')) {
       // In general the balance is the best way to determine if a payment can be added or not,
       // but not for Failed contributions, where we don't accept additional payments at the moment.
@@ -4326,15 +4327,17 @@ LIMIT 1;";
         'title' => ts('Submit Credit Card payment'),
       ];
     }
-    $actionLinks[] = [
-      'url' => CRM_Utils_System::url('civicrm/payment', [
-        'action' => 'add',
-        'reset' => 1,
-        'id' => $id,
-        'is_refund' => 1,
-      ]),
-      'title' => ts('Record Refund'),
-    ];
+    if ($contributionStatus !== 'Pending') {
+      $actionLinks[] = [
+        'url' => CRM_Utils_System::url('civicrm/payment', [
+          'action' => 'add',
+          'reset' => 1,
+          'id' => $id,
+          'is_refund' => 1,
+        ]),
+        'title' => ts('Record Refund'),
+      ];
+    }
     return $actionLinks;
   }
 

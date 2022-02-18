@@ -24,6 +24,9 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function preProcess() {
     $id = $this->getID();
@@ -55,22 +58,6 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     }
     $this->assign('is_template', $values['is_template']);
 
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && $this->_action & CRM_Core_Action::VIEW) {
-      $financialTypeID = CRM_Contribute_PseudoConstant::financialType($values['financial_type_id']);
-      CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($id, 'view');
-      if (CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($id, 'edit', FALSE)) {
-        $this->assign('canEdit', TRUE);
-      }
-      if (CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($id, 'delete', FALSE)) {
-        $this->assign('canDelete', TRUE);
-      }
-      if (!CRM_Core_Permission::check('view contributions of type ' . $financialTypeID)) {
-        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
-      }
-    }
-    elseif ($this->_action & CRM_Core_Action::VIEW) {
-      $this->assign('noACL', TRUE);
-    }
     CRM_Contribute_BAO_Contribution::resolveDefaults($values);
 
     if (!empty($values['contribution_page_id'])) {
@@ -215,20 +202,74 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     );
     $statusOptionValueNames = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $contributionStatus = $statusOptionValueNames[$values['contribution_status_id']];
-    if (in_array($contributionStatus, ['Partially paid', 'Pending refund'])
-        || ($contributionStatus == 'Pending' && $values['is_pay_later'])
-        ) {
-      if ($contributionStatus == 'Pending refund') {
-        $this->assign('paymentButtonName', ts('Record Refund'));
+    $this->assign('addRecordPayment', in_array($contributionStatus, ['Partially paid', 'Pending refund', 'Pending']));
+    $this->assignPaymentInfoBlock($id);
+
+    $searchKey = NULL;
+    if ($this->controller->_key) {
+      $searchKey = $this->controller->_key;
+    }
+
+    if ($this->isHasAccess('update')) {
+      $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=update&context={$context}";
+      if (($context === 'fulltext' || $context === 'search') && $searchKey) {
+        $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=update&context={$context}&key={$searchKey}";
+      }
+      if (!$contribution['is_template']) {
+        foreach (CRM_Contribute_BAO_Contribution::getContributionPaymentLinks($this->getID(), $contributionStatus) as $paymentButton) {
+          $paymentButton['icon'] = 'fa-plus-circle';
+          $linkButtons[] = $paymentButton;
+        }
+      }
+      $linkButtons[] = [
+        'title' => ts('Edit'),
+        'url' => 'civicrm/contact/view/contribution',
+        'qs' => $urlParams,
+        'icon' => 'fa-pencil',
+        'accesskey' => 'e',
+      ];
+    }
+
+    if ($this->isHasAccess('delete')) {
+      $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=delete&context={$context}";
+      if (($context === 'fulltext' || $context === 'search') && $searchKey) {
+        $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=delete&context={$context}&key={$searchKey}";
+      }
+      $linkButtons[] = [
+        'title' => ts('Delete'),
+        'url' => 'civicrm/contact/view/contribution',
+        'qs' => $urlParams,
+        'icon' => 'fa-trash',
+      ];
+    }
+
+    $pdfUrlParams = "reset=1&id={$id}&cid={$values['contact_id']}";
+    $emailUrlParams = "reset=1&id={$id}&cid={$values['contact_id']}&select=email";
+    if (Civi::settings()->get('invoicing') && !$contribution['is_template']) {
+      if (($values['contribution_status'] !== 'Refunded') && ($values['contribution_status'] !== 'Cancelled')) {
+        $invoiceButtonText = ts('Download Invoice');
       }
       else {
-        $this->assign('paymentButtonName', ts('Record Payment'));
+        $invoiceButtonText = ts('Download Invoice and Credit Note');
       }
-      $this->assign('addRecordPayment', TRUE);
-      $this->assign('contactId', $values['contact_id']);
-      $this->assign('componentId', $id);
-      $this->assign('component', 'contribution');
+      $linkButtons[] = [
+        'title' => $invoiceButtonText,
+        'url' => 'civicrm/contribute/invoice',
+        'qs' => $pdfUrlParams,
+        'icon' => 'fa-download',
+      ];
+      $linkButtons[] = [
+        'title' => ts('Email Invoice'),
+        'url' => 'civicrm/contribute/invoice/email',
+        'qs' => $emailUrlParams,
+        'icon' => 'fa-paper-plane',
+      ];
     }
+    $this->assign('linkButtons', $linkButtons ?? []);
+    // These next 3 parameters are used to construct a url in PaymentInfo.tpl
+    $this->assign('contactId', $values['contact_id']);
+    $this->assign('componentId', $id);
+    $this->assign('component', 'contribution');
     $this->assignPaymentInfoBlock($id);
   }
 
@@ -267,6 +308,23 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $this->assign('payments', $paymentInfo['transaction']);
     $this->assign('paymentLinks', $paymentInfo['payment_links']);
     return $title;
+  }
+
+  /**
+   * @param string $action
+   *
+   * @return bool
+   */
+  private function isHasAccess(string $action): bool {
+    try {
+      return Contribution::checkAccess()
+        ->setAction($action)
+        ->addValue('id', $this->getID())
+        ->execute()->first()['access'];
+    }
+    catch (API_Exception $e) {
+      return FALSE;
+    }
   }
 
   /**
