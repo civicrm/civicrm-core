@@ -14,6 +14,7 @@
  * work. For example, the createItem() interface supports
  * priority-queueing.
  * @group headless
+ * @group queue
  */
 class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
 
