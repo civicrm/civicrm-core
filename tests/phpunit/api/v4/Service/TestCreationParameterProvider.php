@@ -150,9 +150,12 @@ class TestCreationParameterProvider {
       $params['where'] = [['contact_type', '=', 'Individual']];
     }
     $entityList = civicrm_api4($fkEntity, 'get', $params);
+    // If no existing entities, create one
     if ($entityList->count() < 1) {
-      $msg = sprintf('At least one %s is required in test', $fkEntity);
-      throw new \API_Exception($msg);
+      $entityList = civicrm_api4($fkEntity, 'create', [
+        'checkPermissions' => FALSE,
+        'values' => $this->getRequired($fkEntity),
+      ]);
     }
 
     return $entityList->last()['id'];

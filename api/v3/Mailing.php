@@ -36,9 +36,22 @@ function civicrm_api3_mailing_create($params) {
   if (!$timestampCheck) {
     throw new API_Exception("Mailing has not been saved, Content maybe out of date, please refresh the page and try again");
   }
+  // If we're going to autosend, then check validity before saving.
+  if (empty($params['is_completed']) && !empty($params['scheduled_date'])
+    && $params['scheduled_date'] !== 'null'
+    // This might have been passed in as empty to prevent us validating, is set skip.
+    && !isset($params['_evil_bao_validator_'])) {
 
-  // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
-  $safeParams['_evil_bao_validator_'] = \CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_SENDABLE', 'CRM_Mailing_BAO_Mailing::checkSendable');
+    // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
+    $function = \CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_SENDABLE', 'CRM_Mailing_BAO_Mailing::checkSendable');
+    $validationFunction = Civi\Core\Resolver::singleton()->get($function);
+    $errors = call_user_func($validationFunction, $params);
+    if (!empty($errors)) {
+      $fields = implode(',', array_keys($errors));
+      throw new CiviCRM_API3_Exception("Mailing cannot be sent. There are missing or invalid fields ($fields).", 'cannot-send', $errors);
+    }
+  }
+
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $safeParams, 'Mailing');
   return _civicrm_api3_mailing_get_formatResult($result);
 }

@@ -77,15 +77,21 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_mailing_create.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
-  public function testMailerCreateSuccess(): void {
+  public function testMailerCreateSuccess(int $version): void {
+    $this->_apiversion = $version;
+    $this->enableCiviCampaign();
     $this->callAPISuccess('Campaign', 'create', ['name' => 'big campaign', 'title' => 'abc']);
     $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + ['scheduled_date' => 'now', 'campaign_id' => 'big campaign'], __FUNCTION__, __FILE__);
-    $jobs = $this->callAPISuccess('mailing_job', 'get', ['mailing_id' => $result['id']]);
+    $jobs = $this->callAPISuccess('MailingJob', 'get', ['mailing_id' => $result['id']]);
     $this->assertEquals(1, $jobs['count']);
     // return isn't working on this in getAndCheck so lets not check it for now
     unset($this->_params['created_id']);
-    $this->getAndCheck($this->_params, $result['id'], 'mailing');
+    $this->getAndCheck($this->_params, $result['id'], 'Mailing');
   }
 
   /**
@@ -103,9 +109,12 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   /**
    * Create a completed mailing (e.g when importing from a provider).
    *
-   * @throws \CRM_Core_Exception
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
-  public function testMailerCreateCompleted() {
+  public function testMailerCreateCompleted(int $version): void {
+    $this->_apiversion = $version;
     $this->_params['body_html'] = 'I am completed so it does not matter if there is an opt out link since I have already been sent by another system';
     $this->_params['is_completed'] = 1;
     $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + ['scheduled_date' => 'now'], __FUNCTION__, __FILE__);
@@ -120,7 +129,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   /**
    * Per CRM-20316 the mailing should still create without created_id (not mandatory).
    */
-  public function testMailerCreateSuccessNoCreatedID() {
+  public function testMailerCreateSuccessNoCreatedID(): void {
     unset($this->_params['created_id']);
     $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + ['scheduled_date' => 'now'], __FUNCTION__, __FILE__);
     $this->getAndCheck($this->_params, $result['id'], 'mailing');

@@ -457,6 +457,47 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
   }
 
   /**
+   * Do Submit actions.
+   *
+   * When submitting (as opposed to creating or updating) a mailing it should
+   * be scheduled.
+   *
+   * This function creates the initial job and the recipient list.
+   *
+   * @param array $params
+   * @param \CRM_Mailing_DAO_Mailing $mailing
+   *
+   * @return array
+   */
+  protected static function doSubmitActions(array $params, CRM_Mailing_DAO_Mailing $mailing): array {
+    // Create parent job if not yet created.
+    // Condition on the existence of a scheduled date.
+    if (!empty($params['scheduled_date']) && $params['scheduled_date'] != 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
+      $job = new CRM_Mailing_BAO_MailingJob();
+      $job->mailing_id = $mailing->id;
+      // If we are creating a new Completed mailing (e.g. import from another system) set the job to completed.
+      // Keeping former behaviour when an id is present is precautionary and may warrant reconsideration later.
+      $job->status = ((empty($params['is_completed']) || !empty($params['id'])) ? 'Scheduled' : 'Complete');
+      $job->is_test = 0;
+
+      if (!$job->find(TRUE)) {
+        // Don't schedule job until we populate the recipients.
+        $job->scheduled_date = NULL;
+        $job->save();
+      }
+      // Schedule the job now that it has recipients.
+      $job->scheduled_date = $params['scheduled_date'];
+      $job->save();
+    }
+
+    // Populate the recipients.
+    if (empty($params['_skip_evil_bao_auto_recipients_'])) {
+      self::getRecipients($mailing->id);
+    }
+    return $params;
+  }
+
+  /**
    * Returns the regex patterns that are used for preparing the text and html templates.
    *
    * @param bool $onlyHrefs
@@ -1478,7 +1519,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    *  - _skip_evil_bao_auto_recipients_: bool
    *  - _skip_evil_bao_auto_schedule_: bool
-   *  - _evil_bao_validator_: string|callable
    *
    * </twowrongsmakesaright>
    *
@@ -1612,42 +1652,14 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     // check and attach and files as needed
     CRM_Core_BAO_File::processAttachment($params, 'civicrm_mailing', $mailing->id);
 
-    // If we're going to autosend, then check validity before saving.
-    if (empty($params['is_completed']) && !empty($params['scheduled_date']) && $params['scheduled_date'] != 'null' && !empty($params['_evil_bao_validator_'])) {
-      $cb = Civi\Core\Resolver::singleton()
-        ->get($params['_evil_bao_validator_']);
-      $errors = call_user_func($cb, $mailing);
-      if (!empty($errors)) {
-        $fields = implode(',', array_keys($errors));
-        throw new CRM_Core_Exception("Mailing cannot be sent. There are missing or invalid fields ($fields).", 'cannot-send', $errors);
-      }
-    }
-
     $transaction->commit();
 
-    // Create parent job if not yet created.
-    // Condition on the existence of a scheduled date.
-    if (!empty($params['scheduled_date']) && $params['scheduled_date'] != 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
-      $job = new CRM_Mailing_BAO_MailingJob();
-      $job->mailing_id = $mailing->id;
-      // If we are creating a new Completed mailing (e.g. import from another system) set the job to completed.
-      // Keeping former behaviour when an id is present is precautionary and may warrant reconsideration later.
-      $job->status = ((empty($params['is_completed']) || !empty($params['id'])) ? 'Scheduled' : 'Complete');
-      $job->is_test = 0;
-
-      if (!$job->find(TRUE)) {
-        // Don't schedule job until we populate the recipients.
-        $job->scheduled_date = NULL;
-        $job->save();
-      }
-      // Schedule the job now that it has recipients.
-      $job->scheduled_date = $params['scheduled_date'];
-      $job->save();
-    }
-
-    // Populate the recipients.
-    if (empty($params['_skip_evil_bao_auto_recipients_'])) {
-      self::getRecipients($mailing->id);
+    // These actions are really 'submit' not create actions.
+    // In v4 of the api they are not available via CRUD. At some
+    // point we will create a 'submit' function which will do the crud+submit
+    // but for now only CRUD is available via v4 api.
+    if (($params['version'] ?? '') !== 4) {
+      $params = self::doSubmitActions($params, $mailing);
     }
 
     return $mailing;
