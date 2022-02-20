@@ -17,12 +17,16 @@ use CRM_Grant_ExtensionUtil as E;
 class CRM_Grant_BAO_Query extends CRM_Contact_BAO_Query_Interface {
 
   /**
-   * Get grant fields.
+   * Unused.
+   *
+   * This function is meant to return extra contact fields, but grants are not contacts.
    *
    * @return array
    */
   public function &getFields() {
-    return CRM_Grant_BAO_Grant::exportableFields();
+    $fields = [];
+    return $fields;
+    // return CRM_Grant_BAO_Grant::exportableFields();
   }
 
   /**
