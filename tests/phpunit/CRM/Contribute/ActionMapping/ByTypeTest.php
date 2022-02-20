@@ -377,6 +377,11 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     foreach (CRM_Core_SelectValues::contributionTokens() as $token => $label) {
       $legacyTokens[substr($token, 14, -1)] = $label;
       if (strpos($token, ':') === FALSE) {
+        // Legacy tokens did not support "implied tokens" so does not return contribution_recur.X
+        // But tokenProcessor will do if contribution is linked to contribution_recur.
+        if (substr($token, 1, 19) === 'contribution_recur.') {
+          continue;
+        }
         $realLegacyTokens[substr($token, 14, -1)] = $label;
       }
     }
