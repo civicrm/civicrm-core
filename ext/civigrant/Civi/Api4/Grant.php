@@ -23,4 +23,21 @@ namespace Civi\Api4;
  */
 class Grant extends Generic\DAOEntity {
 
+  public static function permissions() {
+    return [
+      'get' => [
+        'access CiviGrant',
+      ],
+      'delete' => [
+        'delete in CiviGrant',
+      ],
+      'create' => [
+        'edit grants',
+      ],
+      'update' => [
+        'edit grants',
+      ],
+    ];
+  }
+
 }
