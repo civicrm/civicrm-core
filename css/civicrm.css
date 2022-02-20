@@ -1405,9 +1405,6 @@ input.crm-form-entityref {
   border-right: 0;
 }
 
-#crm-container table#activities-selector.nestedActivitySelector tr.status-overdue {
-}
-
 #crm-container table.nestedActivitySelector tr.priority-urgent,
 #crm-container table.nestedActivitySelector tr a.priority-urgent {
   background-color: #ffdddd;
@@ -1521,7 +1518,7 @@ input.crm-form-entityref {
   background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eee), color-stop(1, #ccc));
   background-image: -webkit-linear-gradient(center bottom, #eee 0%, #ccc 100%);
   background-image: -moz-linear-gradient(center bottom, #eee 0%, #ccc 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#cccccc', endColorstr = '#eeeeee', GradientType = 0);
+  filter: "progid: DXImageTransform.Microsoft.gradient(startColorstr = '#cccccc', endColorstr = '#eeeeee', GradientType = 0)";
   background-image: linear-gradient(top, #eee 0%, #ccc 100%);
   border: 1px solid #aaaaaa;
   opacity: 1;
@@ -1992,7 +1989,7 @@ input.crm-form-entityref {
 
 .crm-container .ui-icon,
 .crm-container .icon {
-  background-image: url("../i/icons/jquery-ui-52534D.png")
+  background-image: url("../i/icons/jquery-ui-52534D.png");
 }
 
 .crm-container .icon {
@@ -3246,7 +3243,7 @@ span.crm-select-item-color {
   background-color: #ffffcc;
 }
 .crm-container ul.crm-checkbox-list li:nth-child(even) input:checked + label {
-  background-color: #fffdb2
+  background-color: #fffdb2;
 }
 
 .crm-container ul.crm-sortable-list li label {
