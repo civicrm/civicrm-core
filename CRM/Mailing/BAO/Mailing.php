@@ -3014,8 +3014,16 @@ ORDER BY civicrm_mailing.name";
    */
   public static function mailingGroupEntityTables() {
     return [
-      CRM_Contact_BAO_Group::getTableName() => 'Group',
-      CRM_Mailing_BAO_Mailing::getTableName() => 'Mailing',
+      [
+        'id' => CRM_Contact_BAO_Group::getTableName(),
+        'name' => 'Group',
+        'label' => ts('Group'),
+      ],
+      [
+        'id' => CRM_Mailing_BAO_Mailing::getTableName(),
+        'name' => 'Mailing',
+        'label' => ts('Mailing'),
+      ],
     ];
   }
 
