@@ -267,7 +267,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       //set defaults for pledgeBlock values.
       $pledgeBlockParams = [
         'entity_id' => $this->_id,
-        'entity_table' => ts('civicrm_contribution_page'),
+        'entity_table' => 'civicrm_contribution_page',
       ];
       $pledgeBlockDefaults = [];
       CRM_Pledge_BAO_PledgeBlock::retrieve($pledgeBlockParams, $pledgeBlockDefaults);
