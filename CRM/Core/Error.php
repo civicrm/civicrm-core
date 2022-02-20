@@ -204,9 +204,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     CRM_Core_Error::debug_var('Fatal Error Details', $error, TRUE, TRUE, '', PEAR_LOG_ERR);
     CRM_Core_Error::backtrace('backTrace', TRUE);
 
+    $exit = TRUE;
     if ($config->initialized) {
       $content = $template->fetch('CRM/common/fatal.tpl');
       echo CRM_Utils_System::theme($content);
+      $exit = CRM_Utils_System::exitAfterFatal();
     }
     else {
       echo "Sorry. A non-recoverable error has occurred. The error trace below might help to resolve the issue<p>";
@@ -217,7 +219,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       exit;
     }
     $runOnce = TRUE;
-    self::abend(CRM_Core_Error::FATAL_ERROR);
+    self::abend(CRM_Core_Error::FATAL_ERROR, $exit);
   }
 
   /**
@@ -442,9 +444,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
 
     echo CRM_Utils_System::theme($content);
+    $exit = CRM_Utils_System::exitAfterFatal();
 
     // fin
-    self::abend(CRM_Core_Error::FATAL_ERROR);
+    self::abend(CRM_Core_Error::FATAL_ERROR, $exit);
   }
 
   /**
@@ -999,12 +1002,15 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Terminate execution abnormally.
    *
    * @param string $code
+   * @param bool $exit
    */
-  protected static function abend($code) {
+  protected static function abend($code, $exit = TRUE) {
     // do a hard rollback of any pending transactions
     // if we've come here, its because of some unexpected PEAR errors
     CRM_Core_Transaction::forceRollbackIfEnabled();
-    CRM_Utils_System::civiExit($code);
+    if ($exit) {
+      CRM_Utils_System::civiExit($code);
+    }
   }
 
   /**

@@ -1099,4 +1099,13 @@ abstract class CRM_Utils_System_Base {
     return [];
   }
 
+  /**
+   * Should the current execution exit after a fatal error?
+   * This is the appropriate functionality in most cases.
+   * @return bool
+   */
+  public function exitAfterFatal() {
+    return TRUE;
+  }
+
 }
