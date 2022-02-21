@@ -1,4 +1,4 @@
-<div id="bootstrap-theme">
+<div id="bootstrap-theme" crm-dialog="crmSearchTask">
   <form ng-controller="crmSearchTaskTag as $ctrl">
     <div class="form-radios">
       <label ng-class="{disabled: !!$ctrl.run}">
@@ -42,16 +42,8 @@
       <h5>{{:: $ctrl.action === 'save' ? ts('Adding tags...') : ts('Removing tags...') }}</h5>
       <crm-search-batch-runner entity="'EntityTag'" action="{{ $ctrl.action }}" id-field="entity_id" params="$ctrl.run" ids="model.ids" success="$ctrl.onSuccess()" error="$ctrl.onError()" ></crm-search-batch-runner>
     </div>
-    <hr />
-    <div class="buttons text-right">
-      <button type="button" ng-click="$ctrl.cancel()" class="btn btn-danger" ng-hide="$ctrl.run">
-        <i class="crm-i fa-times"></i>
-        {{:: ts('Cancel') }}
-      </button>
-      <button ng-click="$ctrl.saveTags()" class="btn btn-primary" ng-disabled="$ctrl.run || !$ctrl.selection.length">
-        <i class="crm-i fa-{{ $ctrl.run ? 'spin fa-spinner' : 'check' }}"></i>
-        {{ $ctrl.action === 'save' ? ts('Add tags') : ts('Remove tags') }}
-      </button>
-    </div>
+
+    <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.run" ></crm-dialog-button>
+    <crm-dialog-button text="$ctrl.action === 'save' ? ts('Add tags') : ts('Remove tags')" icons="{primary: $ctrl.run ? 'fa-spin fa-spinner' : 'fa-check'}" on-click="$ctrl.saveTags()" disabled="$ctrl.run || !$ctrl.selection.length" ></crm-dialog-button>
   </form>
 </div>
