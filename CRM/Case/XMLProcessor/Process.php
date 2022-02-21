@@ -245,7 +245,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     $dao->copyValues($params);
     // only create a relationship if it does not exist
     if (!$dao->find(TRUE)) {
-      $dao->save();
+      CRM_Contact_BAO_Relationship::add($params);
     }
     return TRUE;
   }
