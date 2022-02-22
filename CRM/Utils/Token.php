@@ -1960,6 +1960,10 @@ class CRM_Utils_Token {
           '$last_name' => 'contact.last_name',
           '$displayName' => 'contact.display_name',
         ],
+        'membership_offline_receipt' => [
+          // receipt_text_renewal appears to be long gone.
+          'receipt_text_renewal' => 'receipt_text',
+        ],
         'pledge_acknowledgement' => [
           '$domain' => 'no longer available / relevant',
           '$contact' => 'no longer available / relevant',

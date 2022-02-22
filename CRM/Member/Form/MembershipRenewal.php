@@ -376,7 +376,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
 
-    $this->add('textarea', 'receipt_text_renewal', ts('Renewal Message'));
+    $this->add('textarea', 'receipt_text', ts('Renewal Message'));
 
     // Retrieve the name and email of the contact - this will be the TO for receipt email
     list($this->_contributorDisplayName,
@@ -627,7 +627,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         'membership_id' => $membership->id,
         'contribution_recur_id' => $contributionRecurID,
       ]);
-      CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams);
+      $this->setContributionID(CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams)->id);
     }
 
     if (!empty($this->_params['send_receipt'])) {
@@ -671,9 +671,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     CRM_Core_BAO_UFGroup::getValues($this->_contactID, $customFields, $customValues, FALSE, $members);
 
     $this->assign_by_ref('formValues', $this->_params);
-    if (!empty($this->_params['contribution_id'])) {
-      $this->assign('contributionID', $this->_params['contribution_id']);
-    }
 
     $this->assign('membership_name', CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
       $membership->membership_type_id
@@ -694,7 +691,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->assign('isAmountzero', 0);
       $this->assign('is_pay_later', 0);
       $this->assign('isPrimary', 1);
-      $this->assign('receipt_text_renewal', $this->_params['receipt_text']);
       if ($this->_mode === 'test') {
         $this->assign('action', '1024');
       }
@@ -702,13 +698,19 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     list($this->isMailSent) = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
-        'groupName' => 'msg_tpl_workflow_membership',
-        'valueName' => 'membership_offline_receipt',
-        'contactId' => $this->_receiptContactId,
+        'workflow' => 'membership_offline_receipt',
         'from' => $receiptFrom,
         'toName' => $this->_contributorDisplayName,
         'toEmail' => $this->_contributorEmail,
         'isTest' => $this->_mode === 'test',
+        'PDFFilename' => ts('receipt') . '.pdf',
+        'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
+        'modelProps' => [
+          'receiptText' => $this->getSubmittedValue('receipt_text'),
+          'contactId' => $this->_receiptContactId,
+          'contributionID' => $this->getContributionID(),
+          'membershipID' => $this->_membershipId,
+        ],
       ]
     );
   }

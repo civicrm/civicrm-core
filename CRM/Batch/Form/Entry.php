@@ -937,9 +937,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $form->assign('module', 'Membership');
     $form->assign('contactID', $formValues['contact_id']);
 
-    $form->assign('membershipID', CRM_Utils_Array::value('membership_id', $form->_params, CRM_Utils_Array::value('membership_id', $form->_defaultValues)));
-    $this->assign('contributionID', $this->getCurrentRowContributionID());
-
     if (!empty($formValues['contribution_status_id'])) {
       $form->assign('contributionStatusID', $formValues['contribution_status_id']);
       $form->assign('contributionStatus', CRM_Contribute_PseudoConstant::contributionStatus($formValues['contribution_status_id'], 'name'));
@@ -961,16 +958,18 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
-        'groupName' => 'msg_tpl_workflow_membership',
-        'valueName' => 'membership_offline_receipt',
-        'contactId' => $form->_receiptContactId,
+        'workflow' => 'membership_offline_receipt',
         'from' => $this->getFromEmailAddress(),
         'toName' => $form->_contributorDisplayName,
         'toEmail' => $form->_contributorEmail,
         'PDFFilename' => ts('receipt') . '.pdf',
         'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
-        'contributionId' => $this->getCurrentRowContributionID(),
         'isTest' => (bool) ($form->_action & CRM_Core_Action::PREVIEW),
+        'modelProps' => [
+          'contributionId' => $this->getCurrentRowContributionID(),
+          'contactId' => $form->_receiptContactId,
+          'membershipId' => $this->getCurrentRowMembershipID(),
+        ],
       ]
     );
 

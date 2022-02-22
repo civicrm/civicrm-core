@@ -1,9 +1,7 @@
 {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
 
-{if !empty($formValues.receipt_text_signup)}
-{$formValues.receipt_text_signup}
-{elseif !empty($formValues.receipt_text_renewal)}
-{$formValues.receipt_text_renewal}
+{if $receipt_text}
+{$receipt_text}
 {else}{ts}Thank you for this contribution.{/ts}{/if}
 
 {if empty($lineItem)}
@@ -61,7 +59,7 @@
 --------------------------------------------------------------------------------------------------
 {/if}
 
-{if isset($totalTaxAmount)}
+{if $totalTaxAmount}
 {ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}
 {/if}
 
