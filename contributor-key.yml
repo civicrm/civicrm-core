@@ -915,7 +915,7 @@
 
 - name        : Matt Allard
   organization: City of Winnipeg, Manitoba
-  
+
 - github      : MattTrim1
   name        : Matt Trim
   organization: Circle Interactive
@@ -1091,6 +1091,9 @@
 
 - github      : nowszy
   name        : Pawel Nowak
+
+-github       : pboling
+ name         : Peter Boling 
 
 - name        : Peter Bull
 
