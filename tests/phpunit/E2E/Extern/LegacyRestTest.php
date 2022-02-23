@@ -28,4 +28,8 @@ class E2E_Extern_LegacyRestTest extends E2E_Extern_BaseRestTest {
       ->getUrl('civicrm', 'extern/rest.php');
   }
 
+  protected function isOldQSupported(): bool {
+    return TRUE;
+  }
+
 }
