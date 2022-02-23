@@ -1248,28 +1248,6 @@ GROUP BY     mt.member_of_contact_id ";
   }
 
   /**
-   * Retrieve auto renew frequency and interval.
-   *
-   * @param int $priceSetId
-   *   Price set id.
-   *
-   * @return array
-   *   associate array of frequency interval and unit
-   */
-  public static function getRecurDetails($priceSetId) {
-    $query = 'SELECT mt.duration_interval, mt.duration_unit
-            FROM civicrm_price_field_value pfv
-            INNER JOIN civicrm_membership_type mt ON pfv.membership_type_id = mt.id
-            INNER JOIN civicrm_price_field pf ON pfv.price_field_id = pf.id
-            WHERE pf.price_set_id = %1 LIMIT 1';
-
-    $params = [1 => [$priceSetId, 'Integer']];
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-    $dao->fetch();
-    return [$dao->duration_interval, $dao->duration_unit];
-  }
-
-  /**
    * @return object
    */
   public static function eventPriceSetDomainID() {

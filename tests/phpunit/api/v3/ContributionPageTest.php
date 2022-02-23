@@ -1404,10 +1404,16 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $contributionPage = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $this->_ids['contribution_page'] = $contributionPage['id'];
 
-    $this->ids['MembershipType'] = $this->membershipTypeCreate([
+    $this->ids['MembershipTypeMonth'] = $this->membershipTypeCreate([
       // force auto-renew
       'auto_renew' => 2,
       'duration_unit' => 'month',
+    ]);
+
+    $this->ids['MembershipTypeYear'] = $this->membershipTypeCreate([
+      // force auto-renew
+      'auto_renew' => 2,
+      'duration_unit' => 'year',
     ]);
 
     $priceSet = $this->callAPISuccess('PriceSet', 'create', [
@@ -1431,18 +1437,29 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'label' => 'CRM-21177 - Monthly',
       'amount' => 20,
       'membership_num_terms' => 1,
-      'membership_type_id' => $this->ids['MembershipType'],
+      'membership_type_id' => $this->ids['MembershipTypeMonth'],
       'price_field_id' => $this->_ids['price_field'],
       'financial_type_id' => 'Member Dues',
     ]);
     $this->_ids['price_field_value_monthly'] = $priceFieldValueMonthly['id'];
 
+    $priceFieldValue12Months = $this->callAPISuccess('price_field_value', 'create', [
+      'name' => 'CRM-21177_12_Months',
+      'label' => 'CRM-21177 - 12 Months',
+      'amount' => 200,
+      'membership_num_terms' => 12,
+      'membership_type_id' => $this->ids['MembershipTypeMonth'],
+      'price_field_id' => $this->_ids['price_field'],
+      'financial_type_id' => 'Member Dues',
+    ]);
+    $this->_ids['price_field_value_12_months'] = $priceFieldValue12Months['id'];
+
     $priceFieldValueYearly = $this->callAPISuccess('price_field_value', 'create', [
       'name' => 'CRM-21177_Yearly',
       'label' => 'CRM-21177 - Yearly',
       'amount' => 200,
-      'membership_num_terms' => 12,
-      'membership_type_id' => $this->ids['MembershipType'],
+      'membership_num_terms' => 1,
+      'membership_type_id' => $this->ids['MembershipTypeYear'],
       'price_field_id' => $this->_ids['price_field'],
       'financial_type_id' => 'Member Dues',
     ]);
@@ -1456,7 +1473,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'is_required' => TRUE,
       'is_separate_payment' => FALSE,
       'is_active' => TRUE,
-      'membership_type_default' => $this->ids['MembershipType'],
+      'membership_type_default' => $this->ids['MembershipTypeMonth'],
     ]);
   }
 
@@ -1486,13 +1503,21 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $submitParams['price_' . $this->_ids['price_field']] = $this->_ids['price_field_value_yearly'];
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
 
+    $submitParams['price_' . $this->_ids['price_field']] = $this->_ids['price_field_value_12_months'];
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+
     $contribution = $this->callAPISuccess('Contribution', 'get', [
       'contribution_page_id' => $this->_ids['contribution_page'],
       'sequential' => 1,
       'api.ContributionRecur.getsingle' => [],
     ]);
     $this->assertEquals(1, $contribution['values'][0]['api.ContributionRecur.getsingle']['frequency_interval']);
-    //$this->assertEquals(12, $contribution['values'][1]['api.ContributionRecur.getsingle']['frequency_interval']);
+    $this->assertEquals(1, $contribution['values'][1]['api.ContributionRecur.getsingle']['frequency_interval']);
+    $this->assertEquals(12, $contribution['values'][2]['api.ContributionRecur.getsingle']['frequency_interval']);
+
+    $this->assertEquals('month', $contribution['values'][0]['api.ContributionRecur.getsingle']['frequency_unit']);
+    $this->assertEquals('year', $contribution['values'][1]['api.ContributionRecur.getsingle']['frequency_unit']);
+    $this->assertEquals('month', $contribution['values'][2]['api.ContributionRecur.getsingle']['frequency_unit']);
   }
 
   /**
