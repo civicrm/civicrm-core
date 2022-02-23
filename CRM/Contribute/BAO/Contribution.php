@@ -968,27 +968,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * It is possible to override the membership id that is updated from the payment processor.
-   *
-   * Historically Paypal does this & it still does if it determines data is messed up - see
-   * https://lab.civicrm.org/dev/membership/issues/13
-   *
-   * Read the comment block on repeattransaction for more information
-   * about how things should  work.
-   *
-   * @param int $contributionID
-   * @param array $input
-   *
-   * @throws \CiviCRM_API3_Exception
-   */
-  protected static function handleMembershipIDOverride($contributionID, $input) {
-    if (!empty($input['membership_id'])) {
-      Civi::log()->debug('The related membership id has been overridden - this may impact data - see  https://github.com/civicrm/civicrm-core/pull/15053');
-      civicrm_api3('MembershipPayment', 'create', ['contribution_id' => $contributionID, 'membership_id' => $input['membership_id']]);
-    }
-  }
-
-  /**
    * Get transaction information about the contribution.
    *
    * @param int $contributionId
@@ -2210,17 +2189,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    *  2) repeattransaction code is current munged into completeTransaction code for historical bad coding reasons
    *  3) Repeat transaction duplicates rather than calls Order.create
    *  4) Use of payment.create still limited - completetransaction is more common.
-   * 6) the determination of the membership to be linked is tricksy. The prioritised method is
-   *   to load the membership(s) referred to via line items in the template transactions. Any other
-   *   method is likely to lead to incorrect line items & related entities being created (as the line_item
-   *   link is a required part of 'correct data'). However there are 3 other methods to determine it
-   *   - membership_payment record
-   *   - civicrm_membership.contribution_recur_id
-   *   - input override.
-   *   Passing in an input override WILL ensure the membership is extended to prevent regressions
-   *   of historical processors since this has been handled 'forever' - specifically for paypal.
-   *   albeit by an even nastier mechanism than the current input override.
-   *   The count is out on how correct related entities wind up in this case.
    */
   protected static function repeatTransaction(array $input, array $contributionParams) {
     $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution(
@@ -2246,7 +2214,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     $createContribution = civicrm_api3('Contribution', 'create', $contributionParams);
     $temporaryObject = new CRM_Contribute_BAO_Contribution();
     $temporaryObject->copyCustomFields($templateContribution['id'], $createContribution['id']);
-    self::handleMembershipIDOverride($createContribution['id'], $input);
     // Add new soft credit against current $contribution.
     CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($contributionParams['contribution_recur_id'], $createContribution['id']);
     return $createContribution;

@@ -653,7 +653,6 @@ function civicrm_api3_contribution_repeattransaction($params) {
     'fee_amount',
     'financial_type_id',
     'contribution_status_id',
-    'membership_id',
     'payment_processor_id',
   ];
   $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
