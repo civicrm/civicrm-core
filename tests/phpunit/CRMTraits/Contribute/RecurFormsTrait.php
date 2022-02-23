@@ -10,9 +10,9 @@
  */
 
 /**
- * Class CRM_Contribute_Form_UpdateSubscriptionTest
+ * Trait CRMTraits_Contribute_RecurFormsTrait
  */
-class CRM_Contribute_Form_RecurForms extends CiviUnitTestCase {
+trait CRMTraits_Contribute_RecurFormsTrait {
 
   /**
    * @var int

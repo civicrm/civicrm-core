@@ -12,7 +12,9 @@
 /**
  * Class CRM_Contribute_Form_UpdateSubscriptionTest
  */
-class CRM_Contribute_Form_CancelSubscriptionTest extends CRM_Contribute_Form_RecurForms {
+class CRM_Contribute_Form_CancelSubscriptionTest extends CiviUnitTestCase {
+
+  use CRMTraits_Contribute_RecurFormsTrait;
 
   /**
    * Test the mail sent on update.
