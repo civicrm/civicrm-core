@@ -315,6 +315,9 @@ abstract class E2E_Extern_BaseRestTest extends CiviEndToEndTestCase {
    * a real user. Submit in "?q=civicrm/$entity/$action" notation
    */
   public function testNotCMSUser_q() {
+    if (!$this->isOldQSupported()) {
+      $this->markTestSkipped('rest.php?q=civicrm/ENTITY/ACTION is not supported here');
+    }
     $http = $this->createGuzzle(['http_errors' => FALSE]);
 
     //Create contact with api_key
