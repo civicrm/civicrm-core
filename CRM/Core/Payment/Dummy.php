@@ -25,6 +25,23 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   protected $_doDirectPaymentResult = [];
 
   /**
+   * This support variable is used to allow the capabilities supported by the Dummy processor to be set from unit tests
+   *   so that we don't need to create a lot of new processors to test combinations of features.
+   * Initially these capabilities are set to TRUE, however they can be altered by calling the setSupports function directly from outside the class.
+   * @var bool[]
+   */
+  protected $supports = [
+    'MultipleConcurrentPayments' => TRUE,
+    'EditRecurringContribution' => TRUE,
+    'CancelRecurringNotifyOptional' => TRUE,
+    'BackOffice' => TRUE,
+    'NoEmailProvided' => TRUE,
+    'CancelRecurring' => TRUE,
+    'FutureRecurStartDate' => TRUE,
+    'Refund' => TRUE,
+  ];
+
+  /**
    * Set result from do Direct Payment for test purposes.
    *
    * @param array $doDirectPaymentResult
@@ -51,6 +68,111 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   public function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
+  }
+
+  /**
+   * Does this payment processor support refund?
+   *
+   * @return bool
+   */
+  public function supportsRefund() {
+    return $this->supports['Refund'];
+  }
+
+  /**
+   * Should the first payment date be configurable when setting up back office recurring payments.
+   *
+   * We set this to false for historical consistency but in fact most new processors use tokens for recurring and can support this
+   *
+   * @return bool
+   */
+  public function supportsFutureRecurStartDate() {
+    return $this->supports['FutureRecurStartDate'];
+  }
+
+  /**
+   * Can more than one transaction be processed at once?
+   *
+   * In general processors that process payment by server to server communication support this while others do not.
+   *
+   * In future we are likely to hit an issue where this depends on whether a token already exists.
+   *
+   * @return bool
+   */
+  protected function supportsMultipleConcurrentPayments() {
+    return $this->supports['MultipleConcurrentPayments'];
+  }
+
+  /**
+   * Checks if back-office recurring edit is allowed
+   *
+   * @return bool
+   */
+  public function supportsEditRecurringContribution() {
+    return $this->supports['EditRecurringContribution'];
+  }
+
+  /**
+   * Are back office payments supported.
+   *
+   * e.g paypal standard won't permit you to enter a credit card associated
+   * with someone else's login.
+   * The intention is to support off-site (other than paypal) & direct debit but that is not all working yet so to
+   * reach a 'stable' point we disable.
+   *
+   * @return bool
+   */
+  protected function supportsBackOffice() {
+    return $this->supports['BackOffice'];
+  }
+
+  /**
+   * Does the processor work without an email address?
+   *
+   * The historic assumption is that all processors require an email address. This capability
+   * allows a processor to state it does not need to be provided with an email address.
+   * NB: when this was added (Feb 2020), the Manual processor class overrides this but
+   * the only use of the capability is in the webform_civicrm module.  It is not currently
+   * used in core but may be in future.
+   *
+   * @return bool
+   */
+  protected function supportsNoEmailProvided() {
+    return $this->supports['NoEmailProvided'];
+  }
+
+  /**
+   * Does this processor support cancelling recurring contributions through code.
+   *
+   * If the processor returns true it must be possible to take action from within CiviCRM
+   * that will result in no further payments being processed. In the case of token processors (e.g
+   * IATS, eWay) updating the contribution_recur table is probably sufficient.
+   *
+   * @return bool
+   */
+  protected function supportsCancelRecurring() {
+    return $this->supports['CancelRecurring'];
+  }
+
+  /**
+   * Does the processor support the user having a choice as to whether to cancel the recurring with the processor?
+   *
+   * If this returns TRUE then there will be an option to send a cancellation request in the cancellation form.
+   *
+   * This would normally be false for processors where CiviCRM maintains the schedule.
+   *
+   * @return bool
+   */
+  protected function supportsCancelRecurringNotifyOptional() {
+    return $this->supports['CancelRecurringNotifyOptional'];
+  }
+
+  /**
+   * Set the return value of support functions. By default it is TRUE
+   *
+   */
+  public function setSupports(array $support) {
+    $this->supports = array_merge($this->supports, $support);
   }
 
   /**
@@ -130,24 +252,6 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   }
 
   /**
-   * Does this payment processor support refund?
-   *
-   * @return bool
-   */
-  public function supportsRefund() {
-    return TRUE;
-  }
-
-  /**
-   * Supports altering future start dates.
-   *
-   * @return bool
-   */
-  public function supportsFutureRecurStartDate() {
-    return TRUE;
-  }
-
-  /**
    * Submit a refund payment
    *
    * @throws \Civi\Payment\Exception\PaymentProcessorException
@@ -194,19 +298,6 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    */
   public function getEditableRecurringScheduleFields() {
     return ['amount', 'next_sched_contribution_date'];
-  }
-
-  /**
-   * Does this processor support cancelling recurring contributions through code.
-   *
-   * If the processor returns true it must be possible to take action from within CiviCRM
-   * that will result in no further payments being processed. In the case of token processors (e.g
-   * IATS, eWay) updating the contribution_recur table is probably sufficient.
-   *
-   * @return bool
-   */
-  protected function supportsCancelRecurring() {
-    return TRUE;
   }
 
   /**

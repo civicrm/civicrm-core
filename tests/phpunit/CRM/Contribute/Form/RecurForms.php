@@ -19,6 +19,15 @@ class CRM_Contribute_Form_RecurForms extends CiviUnitTestCase {
    */
   protected $paymentProcessorId;
 
+  public function tearDown(): void {
+    if ($this->paymentProcessorId) {
+      \Civi\Api4\PaymentProcessor::delete(FALSE)
+        ->addWhere('id', '=', $this->paymentProcessorId)
+        ->execute();
+    }
+    parent::tearDown();
+  }
+
   /**
    * Get contact id.
    *
