@@ -222,10 +222,20 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
       ];
     }
 
-    \Civi\Api4\Relationship::save(FALSE)
-      ->setRecords($relationshipValues)
-      ->setMatch(['case_id', 'relationship_type_id', 'contact_id_a', 'contact_id_b'])
-      ->execute();
+    //\Civi\Api4\Relationship::save(FALSE)
+    //  ->setRecords($relationshipValues)
+    //  ->setMatch(['case_id', 'relationship_type_id', 'contact_id_a', 'contact_id_b'])
+    //  ->execute();
+    // FIXME: The above api code would be better, but doesn't work
+    // See discussion in https://github.com/civicrm/civicrm-core/pull/15030
+    foreach ($relationshipValues as $params) {
+      $dao = new CRM_Contact_DAO_Relationship();
+      $dao->copyValues($params);
+      // only create a relationship if it does not exist
+      if (!$dao->find(TRUE)) {
+        CRM_Contact_BAO_Relationship::add($params);
+      }
+    }
 
     return TRUE;
   }
