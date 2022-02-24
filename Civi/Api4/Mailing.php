@@ -17,7 +17,7 @@ namespace Civi\Api4;
  *
  * @searchable secondary
  * @see https://docs.civicrm.org/user/en/latest/email/what-is-civimail/
- * @since 5.47
+ * @since 5.48
  * @package Civi\Api4
  */
 class Mailing extends Generic\DAOEntity {
