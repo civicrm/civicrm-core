@@ -33,13 +33,8 @@ class E2E_Extern_AuthxRestTest extends E2E_Extern_BaseRestTest {
     return CRM_Utils_System::url('civicrm/ajax/rest', NULL, TRUE, NULL, FALSE, TRUE);
   }
 
-  public function apiTestCases() {
-    $r = parent::apiTestCases();
-    $r = array_filter($r, function($case) {
-      // The 'civicrm/ajax/rest' end-point does not support '?q' inputs.
-      return !isset($case[0]['q']);
-    });
-    return $r;
+  protected function isOldQSupported(): bool {
+    return FALSE;
   }
 
 }

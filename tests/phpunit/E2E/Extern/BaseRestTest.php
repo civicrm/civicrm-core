@@ -28,6 +28,21 @@ abstract class E2E_Extern_BaseRestTest extends CiviEndToEndTestCase {
   protected $adminContactId;
 
   /**
+   * Enable testing of `civicrm/{$entity}/{$action}` from APIv3 REST?
+   *
+   * The APIv3 REST end-point supported two notations:
+   *
+   * - `rest.php?entity=ENTITY&action=ACTION`
+   * - `rest.php?q=civicrm/ENTITY/ACTON`.
+   *
+   * The former better documentation, tooling, and compatibility. The latter is conflicted
+   * is some cases.
+   *
+   * @return bool
+   */
+  abstract protected function isOldQSupported(): bool;
+
+  /**
    * @param $apiResult
    * @param $cmpvar
    * @param string $prefix
@@ -202,6 +217,13 @@ abstract class E2E_Extern_BaseRestTest extends CiviEndToEndTestCase {
       0,
     );
 
+    if (!$this->isOldQSupported()) {
+      $cases = array_filter($cases, function($case) {
+        // The 'civicrm/ajax/rest' end-point does not support '?q' inputs.
+        return !isset($case[0]['q']);
+      });
+    }
+
     return $cases;
   }
 
@@ -293,6 +315,9 @@ abstract class E2E_Extern_BaseRestTest extends CiviEndToEndTestCase {
    * a real user. Submit in "?q=civicrm/$entity/$action" notation
    */
   public function testNotCMSUser_q() {
+    if (!$this->isOldQSupported()) {
+      $this->markTestSkipped('rest.php?q=civicrm/ENTITY/ACTION is not supported here');
+    }
     $http = $this->createGuzzle(['http_errors' => FALSE]);
 
     //Create contact with api_key
