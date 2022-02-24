@@ -83,20 +83,6 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
   private $_domain = NULL;
 
   /**
-   * @deprecated
-   *
-   * @param int $mailingID
-   *
-   * @return int
-   */
-  public static function getRecipientsCount($mailingID) {
-    //rebuild the recipients
-    self::getRecipients($mailingID);
-
-    return civicrm_api3('MailingRecipients', 'getcount', ['mailing_id' => $mailingID]);
-  }
-
-  /**
    * This function retrieve recipients of selected mailing groups.
    *
    * @param int $mailingID
@@ -2032,16 +2018,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $report['jobs'][] = $row;
     }
 
-    $newTableSize = CRM_Mailing_BAO_Recipients::mailingSize($mailing_id);
-
-    // we need to do this for backward compatibility, since old mailings did not
-    // use the mailing_recipients table
-    if ($newTableSize > 0) {
-      $report['event_totals']['queue'] = $newTableSize;
-    }
-    else {
-      $report['event_totals']['queue'] = self::getRecipientsCount($mailing_id);
-    }
+    $report['event_totals']['queue'] = CRM_Mailing_BAO_Recipients::mailingSize($mailing_id);
 
     if (!empty($report['event_totals']['queue'])) {
       $report['event_totals']['delivered_rate'] = (100.0 * $report['event_totals']['delivered']) / $report['event_totals']['queue'];
