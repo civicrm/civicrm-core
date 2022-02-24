@@ -14,7 +14,6 @@ namespace Civi\Api4\Utils;
 
 use Civi\API\Exception\NotImplementedException;
 use Civi\API\Request;
-use Civi\Api4\Entity;
 use Civi\Api4\Event\CreateApi4RequestEvent;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
@@ -53,20 +52,8 @@ class CoreUtil {
    * @return mixed
    */
   public static function getInfoItem(string $entityName, string $keyToReturn) {
-    // Because this function might be called thousands of times per request, read directly
-    // from the cache set by Apiv4 Entity.get to avoid the processing overhead of the API wrapper.
-    $cached = \Civi::cache('metadata')->get('api4.entities.info');
-    if ($cached) {
-      $info = $cached[$entityName] ?? NULL;
-    }
-    // If the cache is empty, calling Entity.get will populate it and we'll use it next time.
-    else {
-      $info = Entity::get(FALSE)
-        ->addWhere('name', '=', $entityName)
-        ->addSelect($keyToReturn)
-        ->execute()->first();
-    }
-    return $info ? $info[$keyToReturn] ?? NULL : NULL;
+    $provider = \Civi::service('action_object_provider');
+    return $provider->getEntities()[$entityName][$keyToReturn] ?? NULL;
   }
 
   /**

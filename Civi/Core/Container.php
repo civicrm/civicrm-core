@@ -406,6 +406,7 @@ class Container {
 
     $dispatcher->addListener('civi.api4.validate', $aliasMethodEvent('civi.api4.validate', 'getEntityName'), 100);
     $dispatcher->addListener('civi.api4.authorizeRecord', $aliasMethodEvent('civi.api4.authorizeRecord', 'getEntityName'), 100);
+    $dispatcher->addListener('civi.api4.entityTypes', ['\Civi\Api4\Provider\CustomEntityProvider', 'addCustomEntities'], 100);
 
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\InstallationCanary', 'check']);
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\DatabaseInitializer', 'initialize']);
