@@ -21,7 +21,7 @@ class CRM_Contact_Form_Location {
    *
    * @param CRM_Core_Form $form
    */
-  public static function preProcess(&$form) {
+  public static function preProcess($form) {
     $form->_addBlockName = CRM_Utils_Request::retrieve('block', 'String');
     $additionalblockCount = CRM_Utils_Request::retrieve('count', 'Positive');
 
