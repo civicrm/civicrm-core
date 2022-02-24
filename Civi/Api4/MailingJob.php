@@ -20,7 +20,7 @@ use Civi\Api4\Generic\Traits\ReadOnlyEntity;
  * @searchable none
  *
  * @see https://docs.civicrm.org/user/en/latest/email/what-is-civimail/
- * @since 5.47
+ * @since 5.48
  * @package Civi\Api4
  */
 class MailingJob extends Generic\DAOEntity {
