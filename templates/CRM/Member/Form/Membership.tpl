@@ -85,7 +85,7 @@
               {help id="override_membership_type"}
             </span>
           </td>
-          <td id="mem_type_id-editable"><span id='mem_type_id'>{$form.membership_type_id.html}</span>
+          <td id="mem_type_id-editable"><span id='mem_type_id'>{$form.membership_type_id.html|smarty:nodefaults}</span>
             {if $hasPriceSets}
               <span id='totalAmountORPriceSet'> {ts}OR{/ts}</span>
               <span id='selectPriceSet'>{$form.price_set_id.html}</span>

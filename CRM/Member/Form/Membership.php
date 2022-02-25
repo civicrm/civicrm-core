@@ -234,7 +234,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         CRM_Core_Error::statusBounce(ts("This Membership is linked to a contribution. You must have 'delete in CiviContribute' permission in order to delete this record."));
       }
     }
-
+    $mems_by_org = [];
     if ($this->_action & CRM_Core_Action::ADD) {
       if ($this->_contactID) {
         //check whether contact has a current membership so we can alert user that they may want to do a renewal instead
@@ -249,7 +249,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           foreach ($cMemTypes as $memTypeID) {
             $memberorgs[$memTypeID] = CRM_Member_BAO_MembershipType::getMembershipType($memTypeID)['member_of_contact_id'];
           }
-          $mems_by_org = [];
           foreach ($contactMemberships as $mem) {
             $mem['member_of_contact_id'] = $memberorgs[$mem['membership_type_id']] ?? NULL;
             if (!empty($mem['membership_end_date'])) {
@@ -272,7 +271,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             );
             $mems_by_org[$mem['member_of_contact_id']] = $mem;
           }
-          $this->assign('existingContactMemberships', $mems_by_org);
         }
       }
       else {
@@ -287,6 +285,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $resources->addSetting(['existingMems' => $passthru]);
       }
     }
+    $this->assign('existingContactMemberships', $mems_by_org);
 
     if (!$this->_memType) {
       $params = CRM_Utils_Request::exportValues();
@@ -377,10 +376,7 @@ DESC limit 1");
     if (empty($defaults['join_date'])) {
       $defaults['join_date'] = CRM_Utils_Time::date('Y-m-d');
     }
-
-    if (!empty($defaults['membership_end_date'])) {
-      $this->assign('endDate', $defaults['membership_end_date']);
-    }
+    $this->assign('endDate', $defaults['membership_end_date'] ?? NULL);
 
     return $defaults;
   }
