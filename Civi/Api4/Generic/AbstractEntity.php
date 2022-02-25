@@ -153,6 +153,7 @@ abstract class AbstractEntity {
       $info['icon'] = $dao::$_icon;
       $info['label_field'] = $dao::$_labelField;
       $info['dao'] = $dao;
+      $info['table_name'] = $dao::$_tableName;
     }
     foreach (ReflectionUtils::getTraits(static::class) as $trait) {
       $info['type'][] = self::stripNamespace($trait);
