@@ -33,6 +33,9 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @param CRM_Core_DAO_Domain $domain
    */
   public static function onPostSave($domain) {
+    // We want to clear out any cached tokens.
+    // Editing a domain is so rare we can risk being heavy handed.
+    Civi::cache('metadata')->clear();
     Civi::$statics[__CLASS__]['current'] = NULL;
   }
 
@@ -147,8 +150,9 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @param int $id
    *
    * @return CRM_Core_DAO_Domain
+   * @throws \CRM_Core_Exception
    */
-  public static function edit($params, $id) {
+  public static function edit($params, $id): CRM_Core_DAO_Domain {
     $params['id'] = $id;
     return self::writeRecord($params);
   }

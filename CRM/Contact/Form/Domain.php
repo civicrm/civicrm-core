@@ -81,9 +81,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String',
       $this, FALSE, 'view'
     );
-    //location blocks.
-    $location = new CRM_Contact_Form_Location();
-    $location->preProcess($this);
+    CRM_Contact_Form_Location::preProcess($this);
   }
 
   /**
