@@ -209,6 +209,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
         $dao->domain_id = $optionValue->domain_id;
       }
       $dao->option_group_id = $params['option_group_id'];
+      $dao->grouping = $params['grouping'] ?? NULL;
       if ($dao->find(TRUE)) {
         throw new CRM_Core_Exception('Value already exists in the database');
       }
