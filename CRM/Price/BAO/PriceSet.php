@@ -1499,7 +1499,8 @@ WHERE       ps.id = %1
         $financialType = \CRM_Price_BAO_PriceSet::getFinancialType($options['financial_type_id']);
         if ($financialType['is_deductible']) {
           $nonDeductibleAmount += $options['non_deductible_amount'] * $options['qty'];
-        } else {
+        }
+        else {
           $nonDeductibleAmount += $options['line_total'];
         }
       }
@@ -1754,7 +1755,6 @@ WHERE     ct.id = cp.financial_type_id AND
       }
     }
   }
-
 
   /**
    * Get the financial type info for the given id.
