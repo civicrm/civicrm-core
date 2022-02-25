@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\FinancialType;
+
 /**
  * Business object for managing price sets.
  *
@@ -1494,7 +1496,12 @@ WHERE       ps.id = %1
     $nonDeductibleAmount = 0;
     if (!empty($lineItem[$priceSetId])) {
       foreach ($lineItem[$priceSetId] as $options) {
-        $nonDeductibleAmount += $options['non_deductible_amount'] * $options['qty'];
+        $financialType = \CRM_Price_BAO_PriceSet::getFinancialType($options['financial_type_id']);
+        if ($financialType['is_deductible']) {
+          $nonDeductibleAmount += $options['non_deductible_amount'] * $options['qty'];
+        } else {
+          $nonDeductibleAmount += $options['line_total'];
+        }
       }
     }
 
@@ -1746,6 +1753,23 @@ WHERE     ct.id = cp.financial_type_id AND
         }
       }
     }
+  }
+
+
+  /**
+   * Get the financial type info for the given id.
+   *
+   * @param int $financialTypeID
+   *
+   * @return \Civi\Api4\Generic\Result
+   *
+   * @throws \API_Exception
+   */
+  protected static function getFinancialType(int $financial_type_id): array {
+    return FinancialType::get(FALSE)
+      ->addWhere('id', '=', ($financial_type_id))
+      ->execute()
+      ->first();
   }
 
 }
