@@ -809,7 +809,20 @@ if (!CRM.vars) CRM.vars = {};
       return '';
     }
     if (createLinks === true) {
-      createLinks = params.contact_type ? _.where(CRM.config.entityRef.links[entity], {type: params.contact_type}) : CRM.config.entityRef.links[entity];
+      if (!params.contact_type) {
+        createLinks = CRM.config.entityRef.links[entity];
+      }
+      else if (typeof params.contact_type === 'string') {
+        createLinks = _.where(CRM.config.entityRef.links[entity], {type: params.contact_type});
+      } else {
+        // lets assume it's an array with filters such as IN etc
+        createLinks = [];
+        _.each(params.contact_type, function(types) {
+          _.each(types, function(type) {
+            createLinks.push(_.findWhere(CRM.config.entityRef.links[entity], {type: type}));
+          });
+        });
+      }
     }
     _.each(createLinks, function(link) {
       markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">' +
