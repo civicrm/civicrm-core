@@ -1760,14 +1760,14 @@ WHERE     ct.id = cp.financial_type_id AND
    * Get the financial type info for the given id.
    *
    * @param int $financialTypeID
-   *
+   *   Financial type Id.
    * @return \Civi\Api4\Generic\Result
    *
    * @throws \API_Exception
    */
-  protected static function getFinancialType(int $financial_type_id): array {
+  protected static function getFinancialType(int $financialTypeId): array {
     return FinancialType::get(FALSE)
-      ->addWhere('id', '=', ($financial_type_id))
+      ->addWhere('id', '=', ($financialTypeId))
       ->execute()
       ->first();
   }
