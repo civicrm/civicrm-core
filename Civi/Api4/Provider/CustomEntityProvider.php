@@ -29,27 +29,28 @@ class CustomEntityProvider {
       ->toSQL();
     $group = \CRM_Core_DAO::executeQuery($select);
     while ($group->fetch()) {
-      $fieldName = 'Custom_' . $group->name;
+      $entityName = 'Custom_' . $group->name;
       $baseEntity = CoreUtil::getApiClass(CustomGroupJoinable::getEntityFromExtends($group->extends));
-      $e->entities[$fieldName] = [
-        'name' => $fieldName,
+      $e->entities[$entityName] = [
+        'name' => $entityName,
         'title' => $group->title,
         'title_plural' => $group->title,
         'table_name' => $group->table_name,
+        'class_args' => [$group->name],
         'description' => ts('Custom group for %1', [1 => $baseEntity::getInfo()['title_plural']]),
         'paths' => [
           'view' => "civicrm/contact/view/cd?reset=1&gid={$group->id}&recId=[id]&multiRecordDisplay=single",
         ],
       ] + $baseInfo;
       if (!empty($group->icon)) {
-        $e->entities[$fieldName]['icon'] = $group->icon;
+        $e->entities[$entityName]['icon'] = $group->icon;
       }
       if (!empty($group->help_pre)) {
-        $e->entities[$fieldName]['comment'] = self::plainTextify($group->help_pre);
+        $e->entities[$entityName]['comment'] = self::plainTextify($group->help_pre);
       }
       if (!empty($group->help_post)) {
-        $pre = empty($e->entities[$fieldName]['comment']) ? '' : $e->entities[$fieldName]['comment'] . "\n\n";
-        $e->entities[$fieldName]['comment'] = $pre . self::plainTextify($group->help_post);
+        $pre = empty($e->entities[$entityName]['comment']) ? '' : $e->entities[$entityName]['comment'] . "\n\n";
+        $e->entities[$entityName]['comment'] = $pre . self::plainTextify($group->help_post);
       }
     }
   }

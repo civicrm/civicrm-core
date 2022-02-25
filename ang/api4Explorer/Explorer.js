@@ -688,13 +688,14 @@
       var code = {},
         entity = $scope.entity,
         action = $scope.action,
+        args = getEntity(entity).class_args || [],
         params = getParams(),
         index = isInt($scope.index) ? +$scope.index : parseYaml($scope.index),
         result = 'result';
       if ($scope.entity && $scope.action) {
         delete params.debug;
         if (action.slice(0, 3) === 'get') {
-          result = entity.substr(0, 7) === 'Custom_' ? _.camelCase(entity.substr(7)) : entity;
+          result = args[0] ? _.camelCase(args[0]) : entity;
           result = lcfirst(action.replace(/s$/, '').slice(3) || result);
         }
         var results = lcfirst(_.isNumber(index) ? result : pluralize(result)),
@@ -862,12 +863,11 @@
         arrayParams = ['groupBy', 'records'],
         newLine = "\n" + _.repeat(' ', indent),
         code = '\\' + info.class + '::' + action + '(',
-        perm = params.checkPermissions === false ? 'FALSE' : '';
-      if (entity.substr(0, 7) !== 'Custom_') {
-        code += perm + ')';
-      } else {
-        code += "'" + entity.substr(7) + "'" + (perm ? ', ' : '') + perm + ")";
+        args = _.cloneDeep(info.class_args || []);
+      if (params.checkPermissions === false) {
+        args.push(false);
       }
+      code += _.map(args, phpFormat).join(', ') + ')';
       _.each(params, function(param, key) {
         var val = '';
         if (typeof objectParams[key] !== 'undefined' && key !== 'chain') {
