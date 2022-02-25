@@ -20,7 +20,7 @@ use Civi\Api4\Email;
 /**
  * This class contains functions for email handling.
  */
-class CRM_Core_BAO_Email extends CRM_Core_DAO_Email implements Civi\Test\HookInterface {
+class CRM_Core_BAO_Email extends CRM_Core_DAO_Email implements Civi\Core\HookInterface {
   use CRM_Contact_AccessTrait;
 
   /**

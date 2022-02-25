@@ -18,7 +18,7 @@
 /**
  * This class contains functions for managed entities.
  */
-class CRM_Core_BAO_Managed extends CRM_Core_DAO_Managed implements Civi\Test\HookInterface {
+class CRM_Core_BAO_Managed extends CRM_Core_DAO_Managed implements Civi\Core\HookInterface {
 
   /**
    * Callback for hook_civicrm_post().

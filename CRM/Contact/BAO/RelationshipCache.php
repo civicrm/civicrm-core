@@ -12,7 +12,7 @@
 /**
  * Class CRM_Contact_BAO_RelationshipCache.
  */
-class CRM_Contact_BAO_RelationshipCache extends CRM_Contact_DAO_RelationshipCache implements \Civi\Test\HookInterface {
+class CRM_Contact_BAO_RelationshipCache extends CRM_Contact_DAO_RelationshipCache implements \Civi\Core\HookInterface {
 
   /**
    * The "mappings" array defines the values to put into `civicrm_relationship_cache`

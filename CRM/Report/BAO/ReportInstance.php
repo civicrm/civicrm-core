@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implements Civi\Test\HookInterface {
+class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implements Civi\Core\HookInterface {
 
   /**
    * Takes an associative array and creates an instance object.

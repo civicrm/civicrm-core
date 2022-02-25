@@ -17,7 +17,7 @@ use Civi\Api4\EntityFinancialAccount;
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType implements \Civi\Test\HookInterface {
+class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType implements \Civi\Core\HookInterface {
 
   /**
    * Static cache holder of available financial types for this session

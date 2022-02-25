@@ -18,7 +18,7 @@ use Civi\Core\Event\PreEvent;
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType implements \Civi\Test\HookInterface {
+class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType implements \Civi\Core\HookInterface {
 
   /**
    * Retrieve DB object and copy to defaults array.

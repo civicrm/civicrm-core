@@ -23,7 +23,7 @@ require_once 'Mail/mime.php';
 /**
  * Class CRM_Core_BAO_MessageTemplate.
  */
-class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implements \Civi\Test\HookInterface {
+class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implements \Civi\Core\HookInterface {
 
   /**
    * Retrieve DB object and copy to defaults array.
