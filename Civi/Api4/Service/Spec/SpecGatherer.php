@@ -44,9 +44,9 @@ class SpecGatherer {
 
     // Real entities
     if (strpos($entity, 'Custom_') !== 0) {
-      $this->addDAOFields($entity, $action, $specification, $values);
+      $this->addDAOFields($entity, $action, $specification);
       if ($includeCustom) {
-        $this->addCustomFields($entity, $specification, $values);
+        $this->addCustomFields($entity, $specification);
       }
     }
     // Custom pseudo-entities
@@ -123,6 +123,7 @@ class SpecGatherer {
     else {
       $extends = $customInfo['extends'];
     }
+    // FIXME: filter by entity sub-type if passed in values
     $customFields = CustomField::get(FALSE)
       ->addWhere('custom_group_id.extends', 'IN', $extends)
       ->addWhere('custom_group_id.is_multiple', '=', '0')
