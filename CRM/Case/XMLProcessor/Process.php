@@ -194,10 +194,9 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    * @return bool
    * @throws CRM_Core_Exception
    */
-  public function createRelationships($relationshipTypeXML, &$params) {
-
+  public function createRelationships($relationshipTypeXML, $params) {
     // get the relationship
-    list($relationshipType, $relationshipTypeName) = $this->locateNameOrLabel($relationshipTypeXML);
+    [$relationshipType, $relationshipTypeName] = $this->locateNameOrLabel($relationshipTypeXML);
     if ($relationshipType === FALSE) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/set-up");
       throw new CRM_Core_Exception(ts('Relationship type %1, found in case configuration file, is not present in the database %2',
@@ -205,48 +204,39 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
       ));
     }
 
-    $client = $params['clientID'];
-    if (!is_array($client)) {
-      $client = [$client];
-    }
+    $clients = (array) $params['clientID'];
+    $relationshipValues = [];
 
-    foreach ($client as $key => $clientId) {
-      $relationshipParams = [
+    foreach ($clients as $clientId) {
+      // $relationshipType string ends in either `_a_b` or `_b_a`
+      $a = substr($relationshipType, -3, 1);
+      $b = substr($relationshipType, -1);
+      $relationshipValues[] = [
         'relationship_type_id' => substr($relationshipType, 0, -4),
         'is_active' => 1,
         'case_id' => $params['caseID'],
         'start_date' => date("Ymd"),
         'end_date' => $params['relationship_end_date'] ?? NULL,
+        "contact_id_$a" => $clientId,
+        "contact_id_$b" => $params['creatorID'],
       ];
+    }
 
-      if (substr($relationshipType, -4) == '_b_a') {
-        $relationshipParams['contact_id_b'] = $clientId;
-        $relationshipParams['contact_id_a'] = $params['creatorID'];
-      }
-      if (substr($relationshipType, -4) == '_a_b') {
-        $relationshipParams['contact_id_a'] = $clientId;
-        $relationshipParams['contact_id_b'] = $params['creatorID'];
-      }
-
-      if (!$this->createRelationship($relationshipParams)) {
-        throw new CRM_Core_Exception('Unable to create case relationship');
+    //\Civi\Api4\Relationship::save(FALSE)
+    //  ->setRecords($relationshipValues)
+    //  ->setMatch(['case_id', 'relationship_type_id', 'contact_id_a', 'contact_id_b'])
+    //  ->execute();
+    // FIXME: The above api code would be better, but doesn't work
+    // See discussion in https://github.com/civicrm/civicrm-core/pull/15030
+    foreach ($relationshipValues as $params) {
+      $dao = new CRM_Contact_DAO_Relationship();
+      $dao->copyValues($params);
+      // only create a relationship if it does not exist
+      if (!$dao->find(TRUE)) {
+        CRM_Contact_BAO_Relationship::add($params);
       }
     }
-    return TRUE;
-  }
 
-  /**
-   * @param array $params
-   *
-   * @return bool
-   */
-  public function createRelationship(&$params) {
-    $dao = new CRM_Contact_DAO_Relationship();
-    $dao->copyValues($params);
-    // only create a relationship if it does not exist
-    if (!$dao->find(TRUE)) {
-      $dao->save();
-    }
     return TRUE;
   }
 
