@@ -80,6 +80,10 @@ class Entity extends Generic\AbstractEntity {
           'description' => 'Class name for dao-based entities',
         ],
         [
+          'name' => 'table_name',
+          'description' => 'Name of sql table, if applicable',
+        ],
+        [
           'name' => 'primary_key',
           'data_type' => 'Array',
           'description' => 'Name of unique identifier field(s) (e.g. [id])',

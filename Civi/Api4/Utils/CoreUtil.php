@@ -73,11 +73,7 @@ class CoreUtil {
    * @return string
    */
   public static function getTableName($entityName) {
-    if (strpos($entityName, 'Custom_') === 0) {
-      $customGroup = substr($entityName, 7);
-      return \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroup, 'table_name', 'name');
-    }
-    return AllCoreTables::getTableForEntityName($entityName);
+    return self::getInfoItem($entityName, 'table_name');
   }
 
   /**
@@ -87,15 +83,13 @@ class CoreUtil {
    * @return string|NULL
    */
   public static function getApiNameFromTableName($tableName) {
-    $entityName = AllCoreTables::getBriefName(AllCoreTables::getClassForTable($tableName));
-    // Real entities
-    if ($entityName) {
-      // Verify class exists
-      return self::getApiClass($entityName) ? $entityName : NULL;
+    $provider = \Civi::service('action_object_provider');
+    foreach ($provider->getEntities() as $entityName => $info) {
+      if (($info['table_name'] ?? NULL) === $tableName) {
+        return $entityName;
+      }
     }
-    // Multi-value custom group pseudo-entities
-    $customGroup = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $tableName, 'name', 'table_name');
-    return self::isCustomEntity($customGroup) ? "Custom_$customGroup" : NULL;
+    return NULL;
   }
 
   /**

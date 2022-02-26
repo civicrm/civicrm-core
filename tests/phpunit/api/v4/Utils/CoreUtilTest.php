@@ -20,6 +20,7 @@
 namespace api\v4\Utils;
 
 use api\v4\UnitTestCase;
+use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\Utils\CoreUtil;
 
@@ -45,6 +46,11 @@ class CoreUtilTest extends UnitTestCase {
       ->addValue('title', uniqid())
       ->addValue('extends', 'Contact')
       ->addValue('is_multiple', TRUE)
+      ->addChain('fields', CustomField::save()
+        ->addDefault('html_type', 'Text')
+        ->addDefault('custom_group_id', '$id')
+        ->addRecord(['label' => 'MyField1'])
+      )
       ->execute()->first();
 
     $this->assertEquals('Custom_' . $multiGroup['name'], CoreUtil::getApiNameFromTableName($multiGroup['table_name']));

@@ -35,6 +35,7 @@ class CustomEntityProvider {
         'name' => $fieldName,
         'title' => $group->title,
         'title_plural' => $group->title,
+        'table_name' => $group->table_name,
         'description' => ts('Custom group for %1', [1 => $baseEntity::getInfo()['title_plural']]),
         'paths' => [
           'view' => "civicrm/contact/view/cd?reset=1&gid={$group->id}&recId=[id]&multiRecordDisplay=single",
