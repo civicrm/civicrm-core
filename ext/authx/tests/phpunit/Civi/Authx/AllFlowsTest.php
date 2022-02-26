@@ -128,7 +128,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     // Phase 1: Request fails if this credential type is not enabled
     \Civi::settings()->set("authx_{$flowType}_cred", []);
     $response = $http->send($request);
-    $this->assertFailedDueToProhibition($response);
+    $this->assertNotAuthenticated($flowType === 'header' ? 'anon' : 'prohibit', $response);
 
     // Phase 2: Request succeeds if this credential type is enabled
     \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
@@ -159,7 +159,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     // Phase 1: Request fails if this credential type is not enabled
     \Civi::settings()->set("authx_{$flowType}_cred", []);
     $response = $http->send($request);
-    $this->assertFailedDueToProhibition($response);
+    $this->assertNotAuthenticated($flowType === 'header' ? 'anon' : 'prohibit', $response);
 
     // Phase 2: Request succeeds if this credential type is enabled
     \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
@@ -791,6 +791,28 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
   public function credNone($cid) {
     return NULL;
+  }
+
+  /**
+   * Assert that a request was not authenticated.
+   *
+   * @param string $mode
+   *   Expect that the  'prohibited' or 'anon'
+   * @param \Psr\Http\Message\ResponseInterface $response
+   */
+  private function assertNotAuthenticated(string $mode, $response) {
+    switch ($mode) {
+      case 'anon':
+        $this->assertAnonymousContact($response);
+        break;
+
+      case 'prohibit':
+        $this->assertFailedDueToProhibition($response);
+        break;
+
+      default:
+        throw new \RuntimeException("Invalid option: mode=$mode");
+    }
   }
 
   /**
