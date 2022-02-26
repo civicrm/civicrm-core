@@ -67,7 +67,7 @@ class EventScanner {
 
     $listenerMap = [];
     // These 2 interfaces do the same thing; one is meant for unit tests and the other for runtime code
-    if (is_subclass_of($class, '\Civi\Test\HookInterface') || is_subclass_of($class, '\Civi\Core\HookInterface')) {
+    if (is_subclass_of($class, '\Civi\Core\HookInterface')) {
       $listenerMap = static::mergeListenerMap($listenerMap, static::findFunctionListeners($class, $self));
     }
     if (is_subclass_of($class, '\Symfony\Component\EventDispatcher\EventSubscriberInterface')) {
