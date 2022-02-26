@@ -561,7 +561,7 @@ class CRM_Core_I18n {
           // phpgettext
           $mo_file = $path . DIRECTORY_SEPARATOR . 'l10n' . DIRECTORY_SEPARATOR . $this->locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . $domain . '.mo';
           $streamer = new FileReader($mo_file);
-          $this->_extensioncache[$key] = new gettext_reader($streamer);
+          $this->_extensioncache[$key] = $streamer->length() ? new gettext_reader($streamer) : NULL;
         }
       }
       catch (CRM_Extension_Exception $e) {
