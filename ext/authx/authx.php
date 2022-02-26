@@ -13,7 +13,7 @@ Civi::dispatcher()->addListener('civi.invoke.auth', function($e) {
     return (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'xheader', 'cred' => $_SERVER['HTTP_X_CIVI_AUTH'], 'siteKey' => $siteKey]);
   }
 
-  if (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
+  if (!empty($_SERVER['HTTP_AUTHORIZATION']) && !empty(Civi::settings()->get('authx_header_cred'))) {
     return (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'header', 'cred' => $_SERVER['HTTP_AUTHORIZATION'], 'siteKey' => $siteKey]);
   }
 
