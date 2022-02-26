@@ -18,7 +18,7 @@
 /**
  * This class contains the functions for Case Type management.
  */
-class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Test\HookInterface {
+class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\HookInterface {
 
   /**
    * Static field for all the case information that we can potentially export.

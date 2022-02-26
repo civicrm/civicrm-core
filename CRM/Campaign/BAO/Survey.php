@@ -18,7 +18,7 @@
 /**
  * Class CRM_Campaign_BAO_Survey.
  */
-class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey implements Civi\Test\HookInterface {
+class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey implements Civi\Core\HookInterface {
 
   /**
    * Retrieve DB object and copy to defaults array.

@@ -18,7 +18,7 @@
 /**
  * Class CRM_Core_BAO_WordReplacement.
  */
-class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement implements \Civi\Test\HookInterface {
+class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement implements \Civi\Core\HookInterface {
 
   /**
    * Retrieve DB object and copy to defaults array.

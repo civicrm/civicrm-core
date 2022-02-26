@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Civi\Test\HookInterface {
+class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Civi\Core\HookInterface {
 
   /**
    * @var CRM_Core_DAO_LocationType|null
