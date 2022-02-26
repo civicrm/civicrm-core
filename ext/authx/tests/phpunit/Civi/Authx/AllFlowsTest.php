@@ -482,6 +482,8 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
   public function testJwtMiddleware() {
+    \Civi::settings()->revert("authx_param_cred");
+
     // HTTP GET with a specific user. Choose flow automatically.
     $response = $this->createGuzzle()->get('civicrm/authx/id', [
       'authx_user' => $GLOBALS['_CV']['DEMO_USER'],
