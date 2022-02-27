@@ -1274,4 +1274,23 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     );
   }
 
+  /**
+   * Basic case create test with an Org client
+   */
+  public function testOrgClient() {
+    $loggedInUserId = $this->createLoggedInUser();
+    $clientId = $this->organizationCreate();
+    $caseObj = $this->createCase($clientId, $loggedInUserId);
+    // Note explicitly saying check permissions, just as an extra little test.
+    $caseResult = \Civi\Api4\CiviCase::get(TRUE)
+      ->addWhere('id', '=', $caseObj->id)
+      ->execute()->first();
+    $this->assertEquals(1, $caseResult['case_type_id']);
+    $this->assertEquals('Case Subject', $caseResult['subject']);
+    $caseContact = \Civi\Api4\CaseContact::get(TRUE)
+      ->addWhere('case_id', '=', $caseObj->id)
+      ->execute()->first();
+    $this->assertEquals($clientId, $caseContact['contact_id']);
+  }
+
 }
