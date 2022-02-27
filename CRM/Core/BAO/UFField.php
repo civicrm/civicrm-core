@@ -709,7 +709,7 @@ SELECT  id
    *
    * @param int $profileID
    */
-  public function resetInSelectorANDSearchable($profileID) {
+  public static function resetInSelectorANDSearchable($profileID) {
     if (!$profileID) {
       return;
     }
