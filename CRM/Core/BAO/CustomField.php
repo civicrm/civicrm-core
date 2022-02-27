@@ -146,9 +146,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     CRM_Utils_Hook::post(($op === 'add' ? 'create' : 'edit'), 'CustomField', $customField->id, $customField);
 
     CRM_Utils_System::flushCache();
-    // Flush caches is not aggressive about clearing the specific cache we know we want to clear
-    // so do it manually. Ideally we wouldn't need to clear others...
-    Civi::cache('metadata')->clear();
 
     return $customField;
   }
@@ -223,7 +220,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     }
 
     CRM_Utils_System::flushCache();
-    Civi::cache('metadata')->clear();
 
     foreach ($customFields as $index => $customField) {
       CRM_Utils_Hook::post(empty($records[$index]['id']) ? 'create' : 'edit', 'CustomField', $customField->id, $customField);
