@@ -1243,7 +1243,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @return array
    *   as array of success/fails for each address block
    */
-  public function parseAddress(&$params) {
+  public static function parseAddress(&$params) {
     $parseSuccess = $parsedFields = [];
     if (!is_array($params['address']) ||
       CRM_Utils_System::isNull($params['address'])

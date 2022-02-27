@@ -280,7 +280,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    *
    * @return array
    */
-  public function mergeSameHousehold(&$rows) {
+  public static function mergeSameHousehold(&$rows) {
     // group selected contacts by type
     $individuals = [];
     $households = [];

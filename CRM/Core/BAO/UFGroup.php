@@ -2718,7 +2718,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return array
    */
-  public function checkFieldsEmptyValues($gid, $cid, $params, $skipCheck = FALSE) {
+  public static function checkFieldsEmptyValues($gid, $cid, $params, $skipCheck = FALSE) {
     if ($gid) {
       if (CRM_Core_BAO_UFGroup::filterUFGroups($gid, $cid) || $skipCheck) {
         $values = [];
