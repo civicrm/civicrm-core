@@ -246,7 +246,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
       if (!empty($compat[$info->key]['obsolete'])) {
         continue;
       }
-      $row = (array) $info;
+      $row = self::fillMissingInfoKeys((array) $info);
       $row['id'] = $info->key;
       $row['upgradelink'] = '';
       $action = CRM_Core_Action::UPDATE;
@@ -330,7 +330,31 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    * @return array
    */
   public static function createExtendedInfo(CRM_Extension_Info $obj) {
-    return CRM_Extension_System::createExtendedInfo($obj);
+    return self::fillMissingInfoKeys(CRM_Extension_System::createExtendedInfo($obj));
+  }
+
+  /**
+   * Extension templates expect certain keys to always be set, but these might be missing from the relevant info.xml files
+   * This ensures the expect keys are always set.
+   *
+   * @param array $info
+   * @return array
+   */
+  private static function fillMissingInfoKeys(array $info) {
+    $defaultKeys = [
+      'urls' => [],
+      'authors' => [],
+      'version' => '',
+      'description' => '',
+      'license' => '',
+      'releaseDate' => '',
+      'downloadUrl' => FALSE,
+      'compatibility' => FALSE,
+      'develStage' => FALSE,
+      'comments' => FALSE,
+    ];
+
+    return array_merge($defaultKeys, $info);
   }
 
 }
