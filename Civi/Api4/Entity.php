@@ -127,6 +127,11 @@ class Entity extends Generic\AbstractEntity {
           'description' => 'PHP class name',
         ],
         [
+          'name' => 'class_args',
+          'data_type' => 'Array',
+          'description' => 'Arguments needed by php action factory functions (used when multiple entities share a class, e.g. CustomValue).',
+        ],
+        [
           'name' => 'bridge',
           'data_type' => 'Array',
           'description' => 'Connecting fields for EntityBridge types',

@@ -23,6 +23,7 @@ use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomValue;
 use Civi\Api4\Contact;
+use Civi\Api4\Entity;
 
 /**
  * @group headless
@@ -78,6 +79,17 @@ class CustomValueTest extends BaseCustomValueTest {
       ->addValue('contact_type', 'Individual')
       ->execute()
       ->first()['id'];
+
+    // Ensure virtual api entity has been created
+    $entity = Entity::get(FALSE)
+      ->addWhere('name', '=', "Custom_$group")
+      ->execute()->single();
+    $this->assertEquals(['CustomValue'], $entity['type']);
+    $this->assertEquals(['id'], $entity['primary_key']);
+    $this->assertEquals($customGroup['table_name'], $entity['table_name']);
+    $this->assertEquals('Civi\Api4\CustomValue', $entity['class']);
+    $this->assertEquals([$group], $entity['class_args']);
+    $this->assertEquals('secondary', $entity['searchable']);
 
     // Retrieve and check the fields of CustomValue = Custom_$group
     $fields = CustomValue::getFields($group)->setLoadOptions(TRUE)->setCheckPermissions(FALSE)->execute();
