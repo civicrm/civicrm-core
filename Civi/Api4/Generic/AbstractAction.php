@@ -174,6 +174,9 @@ abstract class AbstractAction implements \ArrayAccess {
    * @return $this
    */
   public function setCheckPermissions(bool $checkPermissions) {
+    if (defined('CIVICRM_TEST')) {
+      $checkPermissions = TRUE;
+    }
     $this->checkPermissions = $checkPermissions;
     return $this;
   }
