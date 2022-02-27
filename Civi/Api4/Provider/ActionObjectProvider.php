@@ -164,6 +164,10 @@ class ActionObjectProvider implements EventSubscriberInterface, ProviderInterfac
     return $entities;
   }
 
+  public function flushEntities(): void {
+    \Civi::cache('metadata')->delete('api4.entities.info');
+  }
+
   /**
    * @param \Civi\Api4\Generic\AbstractEntity $className
    * @param array $entities

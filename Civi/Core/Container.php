@@ -407,6 +407,8 @@ class Container {
     $dispatcher->addListener('civi.api4.validate', $aliasMethodEvent('civi.api4.validate', 'getEntityName'), 100);
     $dispatcher->addListener('civi.api4.authorizeRecord', $aliasMethodEvent('civi.api4.authorizeRecord', 'getEntityName'), 100);
     $dispatcher->addListener('civi.api4.entityTypes', ['\Civi\Api4\Provider\CustomEntityProvider', 'addCustomEntities'], 100);
+    // CustomEntityProvider (^^^) copies CustomGroup data to ActionObjectProvider, which caches it. Updates should propagate.
+    $dispatcher->addListenerService('hook_civicrm_post::CustomGroup', ['action_object_provider', 'flushEntities']);
 
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\InstallationCanary', 'check']);
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\DatabaseInitializer', 'initialize']);
