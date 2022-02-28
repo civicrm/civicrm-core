@@ -17,12 +17,16 @@ use CRM_Grant_ExtensionUtil as E;
 class CRM_Grant_BAO_Query extends CRM_Contact_BAO_Query_Interface {
 
   /**
-   * Get grant fields.
+   * Unused.
+   *
+   * This function is meant to return extra contact fields, but grants are not contacts.
    *
    * @return array
    */
   public function &getFields() {
-    return CRM_Grant_BAO_Grant::exportableFields();
+    $fields = [];
+    return $fields;
+    // return CRM_Grant_BAO_Grant::exportableFields();
   }
 
   /**
@@ -63,6 +67,11 @@ class CRM_Grant_BAO_Query extends CRM_Contact_BAO_Query_Interface {
       $query->_select['grant_note'] = "civicrm_note.note as grant_note";
       $query->_element['grant_note'] = 1;
       $query->_tables['grant_note'] = 1;
+    }
+
+    if (!empty($query->_returnProperties['grant_id'])) {
+      $query->_select['grant_id'] = "civicrm_grant.id as grant_id";
+      $query->_element['grant_id'] = 1;
     }
 
     if ($query->_mode & CRM_Contact_BAO_Query::MODE_GRANT) {
