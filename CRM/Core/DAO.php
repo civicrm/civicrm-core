@@ -1384,7 +1384,7 @@ LIKE %1
    *
    * @param string $daoName
    *   Name of the DAO (Example: CRM_Contact_DAO_Contact to retrieve value from a contact).
-   * @param int $searchValue
+   * @param mixed $searchValue
    *   Value of the column you want to search by.
    * @param string $returnColumn
    *   Name of the column you want to GET the value of.
@@ -1398,7 +1398,7 @@ LIKE %1
    *
    * @throws \CRM_Core_Exception
    */
-  public static function getFieldValue($daoName, $searchValue, $returnColumn = 'name', $searchColumn = 'id', $force = FALSE) {
+  public static function getFieldValue(string $daoName, $searchValue, string $returnColumn = 'name', string $searchColumn = 'id', bool $force = FALSE) {
     if (
       empty($searchValue) ||
       trim(strtolower($searchValue)) == 'null'
