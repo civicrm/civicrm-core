@@ -13,7 +13,6 @@ namespace Civi\Api4\Provider;
 
 use Civi\Api4\CustomValue;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
-use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
 
 class CustomEntityProvider {
@@ -30,14 +29,17 @@ class CustomEntityProvider {
     $group = \CRM_Core_DAO::executeQuery($select);
     while ($group->fetch()) {
       $entityName = 'Custom_' . $group->name;
-      $baseEntity = CoreUtil::getApiClass(CustomGroupJoinable::getEntityFromExtends($group->extends));
+      $baseEntity = CustomGroupJoinable::getEntityFromExtends($group->extends);
+      // Lookup base entity info using DAO methods not CoreUtil to avoid early-bootstrap issues
+      $baseEntityDao = \CRM_Core_DAO_AllCoreTables::getFullName($baseEntity);
+      $baseEntityTitle = $baseEntityDao ? $baseEntityDao::getEntityTitle(TRUE) : $baseEntity;
       $e->entities[$entityName] = [
         'name' => $entityName,
         'title' => $group->title,
         'title_plural' => $group->title,
         'table_name' => $group->table_name,
         'class_args' => [$group->name],
-        'description' => ts('Custom group for %1', [1 => $baseEntity::getInfo()['title_plural']]),
+        'description' => ts('Custom group for %1', [1 => $baseEntityTitle]),
         'paths' => [
           'view' => "civicrm/contact/view/cd?reset=1&gid={$group->id}&recId=[id]&multiRecordDisplay=single",
         ],
