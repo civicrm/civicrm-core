@@ -1759,7 +1759,7 @@ WHERE     ct.id = cp.financial_type_id AND
   /**
    * Get the financial type info for the given id.
    *
-   * @param int $financialTypeID
+   * @param int $financialTypeId
    *   Financial type Id.
    * @return \Civi\Api4\Generic\Result
    *
