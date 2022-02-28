@@ -402,6 +402,56 @@ class CRM_Core_BAO_Block {
   }
 
   /**
+   * Handling for is_billing.
+   * This process is a variation of handlePrimary above
+   * Find other entries with is_billing = 1 and reset them to 0
+   *
+   * @param array $params
+   * @param $class
+   *
+   * @throws API_Exception
+   */
+  public static function handleBilling(&$params, $class) {
+    if (isset($params['id']) && CRM_Utils_System::isNull($params['is_billing'] ?? NULL)) {
+      // if id is set & is_billing isn't we can assume no change)
+      return;
+    }
+    $table = CRM_Core_DAO_AllCoreTables::getTableForClass($class);
+    if (!$table) {
+      throw new API_Exception("Failed to locate table for class [$class]");
+    }
+
+    // contact_id in params might be empty or the string 'null' so cast to integer
+    $contactId = (int) ($params['contact_id'] ?? 0);
+    // If id is set & we haven't been passed a contact_id, retrieve it
+    if (!empty($params['id']) && !isset($params['contact_id'])) {
+      $entity = new $class();
+      $entity->id = $params['id'];
+      $entity->find(TRUE);
+      $contactId = $entity->contact_id;
+    }
+    // If entity is not associated with contact, concept of is_billing not relevant
+    if (!$contactId) {
+      return;
+    }
+
+    // if params is_billing then set all others to not be billing & exit out
+    // if is_billing = 1
+    if (!empty($params['is_billing'])) {
+      $sql = "UPDATE $table SET is_billing = 0 WHERE contact_id = %1";
+      $sqlParams = [1 => [$contactId, 'Integer']];
+      // we don't want to create unnecessary entries in the log_ tables so exclude the one we are working on
+      if (!empty($params['id'])) {
+        $sql .= " AND id <> %2";
+        $sqlParams[2] = [$params['id'], 'Integer'];
+      }
+      CRM_Core_DAO::executeQuery($sql, $sqlParams);
+      return;
+    }
+
+  }
+
+  /**
    * Sort location array so primary element is first.
    *
    * @param array $locations
