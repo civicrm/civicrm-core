@@ -69,6 +69,11 @@ class CRM_Grant_BAO_Query extends CRM_Contact_BAO_Query_Interface {
       $query->_tables['grant_note'] = 1;
     }
 
+    if (!empty($query->_returnProperties['grant_id'])) {
+      $query->_select['grant_id'] = "civicrm_grant.id as grant_id";
+      $query->_element['grant_id'] = 1;
+    }
+
     if ($query->_mode & CRM_Contact_BAO_Query::MODE_GRANT) {
       $query->_select['grant_amount_requested'] = 'civicrm_grant.amount_requested as grant_amount_requested';
       $query->_select['grant_amount_granted'] = 'civicrm_grant.amount_granted as grant_amount_granted';
