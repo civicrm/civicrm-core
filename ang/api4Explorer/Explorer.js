@@ -688,13 +688,13 @@
       var code = {},
         entity = $scope.entity,
         action = $scope.action,
-        args = getEntity(entity).class_args || [],
         params = getParams(),
         index = isInt($scope.index) ? +$scope.index : parseYaml($scope.index),
         result = 'result';
       if ($scope.entity && $scope.action) {
         delete params.debug;
         if (action.slice(0, 3) === 'get') {
+          var args = getEntity(entity).class_args || [];
           result = args[0] ? _.camelCase(args[0]) : entity;
           result = lcfirst(action.replace(/s$/, '').slice(3) || result);
         }
