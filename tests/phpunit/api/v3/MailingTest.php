@@ -836,6 +836,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
     $result = $this->callAPISuccess('mailing', 'stats', ['mailing_id' => $mail['id']]);
     $expectedResult = [
       //since among 100 mails 20 has been bounced
+      'Recipients' => 100,
       'Delivered' => 80,
       'Bounces' => 20,
       'Opened' => 20,

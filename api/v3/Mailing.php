@@ -729,17 +729,23 @@ function civicrm_api3_mailing_stats($params) {
   if (empty($params['job_id'])) {
     $params['job_id'] = NULL;
   }
-  foreach (['Delivered', 'Bounces', 'Unsubscribers', 'Unique Clicks', 'Opened'] as $detail) {
+  foreach (['Recipients', 'Delivered', 'Bounces', 'Unsubscribers', 'Unique Clicks', 'Opened'] as $detail) {
     switch ($detail) {
+      case 'Recipients':
+        $stats[$params['mailing_id']] += [
+          $detail => CRM_Mailing_Event_BAO_Queue::getTotalCount($params['mailing_id'], $params['job_id']),
+        ];
+        break;
+
       case 'Delivered':
         $stats[$params['mailing_id']] += [
-          $detail => CRM_Mailing_Event_BAO_Delivered::getTotalCount($params['mailing_id'], $params['job_id'], (bool) $params['is_distinct'], $params['date']),
+          $detail => CRM_Mailing_Event_BAO_Delivered::getTotalCount($params['mailing_id'], $params['job_id'], $params['date']),
         ];
         break;
 
       case 'Bounces':
         $stats[$params['mailing_id']] += [
-          $detail => CRM_Mailing_Event_BAO_Bounce::getTotalCount($params['mailing_id'], $params['job_id'], (bool) $params['is_distinct'], $params['date']),
+          $detail => CRM_Mailing_Event_BAO_Bounce::getTotalCount($params['mailing_id'], $params['job_id'], $params['date']),
         ];
         break;
 
