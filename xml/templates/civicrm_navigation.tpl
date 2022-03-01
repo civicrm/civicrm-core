@@ -463,18 +463,6 @@ VALUES
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
-    ( @domainID, NULL, '{ts escape="sql" skip="true"}CiviGrant{/ts}', 'CiviGrant', 'access CiviGrant,administer CiviCRM', 'AND', @adminlastID, '1', NULL, 13 );
-
-SET @adminGrantlastID:=LAST_INSERT_ID();
-INSERT INTO civicrm_navigation
-    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
-VALUES
-    ( @domainID, 'civicrm/admin/options/grant_type?reset=1', '{ts escape="sql" skip="true"}Grant Types{/ts}', 'Grant Types', 'access CiviGrant,administer CiviCRM', 'AND', @adminGrantlastID, '1', NULL, 1 ),
-    ( @domainID, 'civicrm/admin/options/grant_status?reset=1', '{ts escape="sql" skip="true"}Grant Status{/ts}', 'Grant Status', 'access CiviGrant,administer CiviCRM', 'AND', @adminGrantlastID, '1', NULL, 2 );
-
-INSERT INTO civicrm_navigation
-    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
-VALUES
     ( @domainID, NULL, '{ts escape="sql" skip="true"}CiviMail{/ts}', 'CiviMail', 'access CiviMail,administer CiviCRM', 'AND', @adminlastID, '1', NULL, 14 );
 
 SET @adminMailinglastID:=LAST_INSERT_ID();
