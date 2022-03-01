@@ -99,6 +99,9 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
     $civiGrantEnabled = CRM_Core_Component::isEnabled('CiviGrant');
     if ($civiGrantEnabled) {
       CRM_Core_BAO_ConfigSetting::disableComponent('CiviGrant');
+      // Install CiviGrant extension dependencies
+      CRM_Extension_System::singleton()->getManager()
+        ->install(['org.civicrm.search_kit', 'org.civicrm.afform']);
     }
     $civiGrantId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Component', 'CiviGrant', 'id', 'name');
     if ($civiGrantId) {
