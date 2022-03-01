@@ -744,19 +744,19 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   public function membershipRenewalDate($durationUnit, $membershipEndDate) {
     // We only have an end_date if frequency units match, otherwise membership won't be autorenewed and dates won't be calculated.
     $renewedMembershipEndDate = new DateTime($membershipEndDate);
+    // We have to add 1 day first in case it's the end of the month, then subtract afterwards
+    // eg. 2018-02-28 should renew to 2018-03-31, if we just added 1 month we'd get 2018-03-28
+    $renewedMembershipEndDate->add(new DateInterval('P1D'));
     switch ($durationUnit) {
       case 'year':
         $renewedMembershipEndDate->add(new DateInterval('P1Y'));
         break;
 
       case 'month':
-        // We have to add 1 day first in case it's the end of the month, then subtract afterwards
-        // eg. 2018-02-28 should renew to 2018-03-31, if we just added 1 month we'd get 2018-03-28
-        $renewedMembershipEndDate->add(new DateInterval('P1D'));
         $renewedMembershipEndDate->add(new DateInterval('P1M'));
-        $renewedMembershipEndDate->sub(new DateInterval('P1D'));
         break;
     }
+    $renewedMembershipEndDate->sub(new DateInterval('P1D'));
     return $renewedMembershipEndDate->format('Y-m-d');
   }
 
