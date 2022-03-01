@@ -86,7 +86,7 @@
     <type>int unsigned</type>
     <required>true</required>
     <default>1</default>
-    <comment>Maximum number of items in a batch. Tip: If you expand batch_limit, then also consider expanding lease_time.</comment>
+    <comment>Maximum number of items in a batch.</comment>
     <add>5.48</add>
     <html>
       <type>Text</type>
