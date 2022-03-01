@@ -2,8 +2,7 @@
 
 <table>
   <!--
-    NOTE: To facilitate upgrades, manually copy the CREATE TABLE statement
-    from sql/civicrm.mysql to sql/civicrm_queue_item.mysql
+    NOTE: To facilitate upgrades, manually copy any ALTER TABLE statements to CRM_Queue_BAO_QueueItem.
   -->
   <base>CRM/Queue</base>
   <class>QueueItem</class>
