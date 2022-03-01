@@ -94,7 +94,7 @@ $_authx_settings = function() {
   $s['authx_legacyrest_cred']['default'] = ['jwt', 'api_key'];
   $s['authx_legacyrest_user']['default'] = 'require';
   $s['authx_param_cred']['default'] = ['jwt', 'api_key'];
-  $s['authx_header_cred']['default'] = ['jwt', 'api_key'];
+  $s['authx_header_cred']['default'] = []; /* @see \authx_civicrm_install() */
   $s['authx_xheader_cred']['default'] = ['jwt', 'api_key'];
   $s['authx_pipe_cred']['default'] = ['jwt', 'api_key'];
 
