@@ -41,7 +41,7 @@ class CRM_Upgrade_Incremental_php_FiveFortyEight extends CRM_Upgrade_Incremental
       "int unsigned NOT NULL DEFAULT 3600 COMMENT 'When claiming an item (or batch of items) for work, how long should the item(s) be reserved. (Seconds)'"
     );
     $this->addTask('Add "retry_limit" to "civicrm_queue"', 'addColumn', 'civicrm_queue', 'retry_limit',
-      "int NULL COMMENT 'Number of permitted retries. Decreases with each retry. Zero (0) to disable. Null for system default.'"
+      "int NOT NULL DEFAULT 0 COMMENT 'Number of permitted retries. Set to zero (0) to disable.'"
     );
     $this->addTask('Add "retry_interval" to "civicrm_queue"', 'addColumn', 'civicrm_queue', 'retry_interval',
       "int NULL COMMENT 'Number of seconds to wait before retrying a failed execution.'"

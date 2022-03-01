@@ -92,7 +92,7 @@ class CRM_Queue_Service {
    *     automatically via `hook_civicrm_queueRun_{$runner}`
    *   - batch_limit: int, Maximum number of items in a batch.
    *   - lease_time: int, When claiming an item (or batch of items) for work, how long should the item(s) be reserved. (Seconds)
-   *   - retry_limit: int, Number of permitted retries. Decreases with each retry. Zero (0) to disable. Null for system default.
+   *   - retry_limit: int, Number of permitted retries. Set to zero (0) to disable.
    *   - retry_interval: int, Number of seconds to wait before retrying a failed execution.
    * @return CRM_Queue_Queue
    */
