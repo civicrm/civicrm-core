@@ -361,11 +361,20 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     }
     else {
       // get the submitted form values.
+      // Issue 3085 Cleared checkboxes don't appear in $params, so we look for
+      // elements starting with 'is', which indicates a boolean value, i.e.
+      // a check box. If such a field does not appear in $params, we set it
+      // to zero.
       $params = $this->controller->exportValues($this->_name);
+      foreach ($this->_elementIndex as $key => $value) {
+        if (str_starts_with($key, 'is')) {
+          if (!array_key_exists($key, $params)) {
+            $params[$key] = 0;
+          }
+        }
 
-      if (!array_key_exists('is_active', $params)) {
-        $params['is_active'] = 0;
       }
+     
 
       if ($this->_action & (CRM_Core_Action::UPDATE)) {
         $params['id'] = $this->_id;
