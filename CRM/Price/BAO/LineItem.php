@@ -1268,4 +1268,19 @@ WHERE li.contribution_id = %1";
     ];
   }
 
+  /**
+   * Add contribution id select where.
+   *
+   * This overrides the parent to PREVENT additional entity_id based
+   * clauses being added. Additional filters joining on the participant
+   * and membership tables just seem too non-performant.
+   *
+   * @inheritDoc
+   */
+  public function addSelectWhereClause(): array {
+    $clauses['contribution_id'] = CRM_Utils_SQL::mergeSubquery('Contribution');
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
+  }
+
 }
