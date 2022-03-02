@@ -18,7 +18,15 @@
 /**
  * Business object for managing custom data groups.
  */
-class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
+class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi\Core\HookInterface {
+
+  /**
+   * @param \Civi\Core\Event\PostEvent $e
+   * @see CRM_Utils_Hook::post()
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
+    Civi::cache('metadata')->flush();
+  }
 
   /**
    * Takes an associative array and creates a custom group object.
