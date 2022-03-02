@@ -1517,12 +1517,23 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           $this->assign('amount', $eventAmount);
         }
 
+        // Assemble event info to send to the message template
+        $eventDetails = [];
+        $eventParams = ['id' => $params['event_id']];
+        CRM_Event_BAO_Event::retrieve($eventParams, $eventDetails);
+        CRM_Event_BAO_Event::setOutputTimeZone($eventDetails);
+
+        $tplParams = [
+          'event' => $eventDetails,
+        ];
+
         $sendTemplateParams = [
           'groupName' => 'msg_tpl_workflow_event',
           'valueName' => 'event_offline_receipt',
           'contactId' => $contactID,
           'isTest' => !empty($this->_defaultValues['is_test']),
           'PDFFilename' => ts('confirmation') . '.pdf',
+          'tplParams' => $tplParams,
         ];
 
         // try to send emails only if email id is present
