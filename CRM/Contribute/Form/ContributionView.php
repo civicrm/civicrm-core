@@ -44,6 +44,16 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $values = (array) $contribution;
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $values['contribution_status_id']);
 
+    if (!isset($this->get_template_vars()['hookDiscount'])) {
+      $this->assign('hookDiscount', ['message' => '']);
+    }
+    $this->addExpectedSmartyVariables([
+      'pricesetFieldsCount',
+      'pcp_id',
+      // currencySymbol maybe doesn't make sense but is probably old?
+      'currencySymbol',
+    ]);
+
     // @todo - it might have been better to create a new form that extends this
     // for template contributions rather than overloading this form.
     $force_create_template = CRM_Utils_Request::retrieve('force_create_template', 'Boolean', $this, FALSE, FALSE);
@@ -60,6 +70,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     CRM_Contribute_BAO_Contribution::resolveDefaults($values);
 
+    $values['contribution_page_title'] = '';
     if (!empty($values['contribution_page_id'])) {
       $contribPages = CRM_Contribute_PseudoConstant::contributionPage(NULL, TRUE);
       $values['contribution_page_title'] = CRM_Utils_Array::value(CRM_Utils_Array::value('contribution_page_id', $values), $contribPages);
@@ -68,6 +79,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     // get received into i.e to_financial_account_id from last trxn
     $financialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($this->getID(), 'DESC');
     $values['to_financial_account'] = '';
+    $values['payment_processor_name'] = '';
     if (!empty($financialTrxnId['financialTrxnId'])) {
       $values['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $financialTrxnId['financialTrxnId'], 'to_financial_account_id');
       if ($values['to_financial_account_id']) {
@@ -125,6 +137,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       $productID = $dao->product_id;
     }
 
+    $this->assign('premium', '');
     if ($premiumId) {
       $productDAO = new CRM_Contribute_DAO_Product();
       $productDAO->id = $productID;
@@ -149,12 +162,9 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     //assign soft credit record if exists.
     $SCRecords = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->getID(), TRUE);
-    if (!empty($SCRecords['soft_credit'])) {
-      $this->assign('softContributions', $SCRecords['soft_credit']);
-      unset($SCRecords['soft_credit']);
-    }
-
-    //assign pcp record if exists
+    $this->assign('softContributions', empty($SCRecords['soft_credit']) ? NULL : $SCRecords['soft_credit']);
+    // unset doesn't complain if array member missing
+    unset($SCRecords['soft_credit']);
     foreach ($SCRecords as $name => $value) {
       $this->assign($name, $value);
     }
@@ -165,6 +175,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $this->assign('displayLineItemFinancialType', TRUE);
 
     //do check for campaigns
+    $values['campaign'] = '';
     if ($campaignId = CRM_Utils_Array::value('campaign_id', $values)) {
       $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
       $values['campaign'] = $campaigns[$campaignId];
