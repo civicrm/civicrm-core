@@ -22,8 +22,14 @@ class CRM_Report_Form_Contact_LoggingDetailTest extends CiviReportTestCase {
 
   public function setUp(): void {
     parent::setUp();
+
+    // Setup logging. This may create a series of backfilled log records.
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     $this->quickCleanup($this->_tablesToTruncate);
+
+    // The test needs to create+read some log records. We want this to have a new/separate `log_conn_id`.
+    unset(\Civi::$statics['CRM_Utils_Request']['id']);
+    CRM_Core_DAO::init(CIVICRM_DSN);
   }
 
   public function tearDown(): void {
