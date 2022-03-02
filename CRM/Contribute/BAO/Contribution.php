@@ -4280,6 +4280,11 @@ LIMIT 1;";
         'is_refund' => 0,
       ]),
       'title' => ts('Record Payment'),
+      'accessKey' => '',
+      'ref' => '',
+      'name' => '',
+      'qs' => '',
+      'extra' => '',
     ];
 
     if (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
@@ -4292,6 +4297,11 @@ LIMIT 1;";
           'mode' => 'live',
         ]),
         'title' => ts('Submit Credit Card payment'),
+        'accessKey' => '',
+        'ref' => '',
+        'name' => '',
+        'qs' => '',
+        'extra' => '',
       ];
     }
     if ($contributionStatus !== 'Pending') {
@@ -4303,6 +4313,11 @@ LIMIT 1;";
           'is_refund' => 1,
         ]),
         'title' => ts('Record Refund'),
+        'accessKey' => '',
+        'ref' => '',
+        'name' => '',
+        'qs' => '',
+        'extra' => '',
       ];
     }
     return $actionLinks;

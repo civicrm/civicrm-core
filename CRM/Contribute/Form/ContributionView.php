@@ -249,7 +249,10 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
         'url' => 'civicrm/contact/view/contribution',
         'qs' => $urlParams,
         'icon' => 'fa-pencil',
-        'accesskey' => 'e',
+        'accessKey' => 'e',
+        'ref' => '',
+        'name' => '',
+        'extra' => '',
       ];
     }
 
@@ -263,6 +266,10 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
         'url' => 'civicrm/contact/view/contribution',
         'qs' => $urlParams,
         'icon' => 'fa-trash',
+        'accessKey' => '',
+        'ref' => '',
+        'name' => '',
+        'extra' => '',
       ];
     }
 
