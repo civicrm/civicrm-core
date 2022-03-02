@@ -1523,6 +1523,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           'contactId' => $contactID,
           'isTest' => !empty($this->_defaultValues['is_test']),
           'PDFFilename' => ts('confirmation') . '.pdf',
+          'tplParams' => ['event' => [
+            'id' => $params['event_id'],
+          ]],
         ];
 
         // try to send emails only if email id is present
