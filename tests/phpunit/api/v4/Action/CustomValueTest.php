@@ -263,4 +263,36 @@ class CustomValueTest extends BaseCustomValueTest {
     $this->assertEquals(0, count($result));
   }
 
+  /**
+   * Whenever a CustomGroup toggles the `is_multiple` flag, the entity-list should be updated.
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testEntityRefresh() {
+    $groupName = uniqid('groupc');
+
+    $this->assertNotContains("Custom_$groupName", Entity::get()->execute()->column('name'));
+
+    CustomGroup::create(FALSE)
+      ->addValue('title', $groupName)
+      ->addValue('extends', 'Contact')
+      ->addValue('is_multiple', FALSE)
+      ->execute();
+
+    $this->assertNotContains("Custom_$groupName", Entity::get()->execute()->column('name'));
+
+    CustomGroup::update(FALSE)
+      ->addWhere('name', '=', $groupName)
+      ->addValue('is_multiple', TRUE)
+      ->execute();
+    $this->assertContains("Custom_$groupName", Entity::get()->execute()->column('name'));
+
+    CustomGroup::update(FALSE)
+      ->addWhere('name', '=', $groupName)
+      ->addValue('is_multiple', FALSE)
+      ->execute();
+    $this->assertNotContains("Custom_$groupName", Entity::get()->execute()->column('name'));
+  }
+
 }
