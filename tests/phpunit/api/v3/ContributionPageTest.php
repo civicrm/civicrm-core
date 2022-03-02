@@ -943,7 +943,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     //renew it with processor setting completed - should extend membership
     $renewContribution = $this->submitSecondContribution((int) $contribution['contact_id'], $submitParams, (int) $contribution['id']);
     $renewedMembership = $this->validateContributionWithContributionAndMembershipLineItems($renewContribution['id'], $preExistingMembershipID);
-    $this->assertEquals(date('Y-m-d', strtotime('+ 1 ' . $this->params['recur_frequency_unit'], strtotime($membership['end_date']))), $renewedMembership['end_date']);
+    $expectedEndDate = $this->membershipRenewalDate('year', $membership['end_date']);
+    $this->assertEquals($expectedEndDate, $renewedMembership['end_date']);
     $recurringContribution = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $contribution['contribution_recur_id']]);
     $this->assertEquals($processor['payment_instrument_id'], $recurringContribution['payment_instrument_id']);
     $this->assertEquals(5, $recurringContribution['contribution_status_id']);
@@ -1014,7 +1015,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->validateTripleLines($renewContribution['id'], $preExistingMembershipID);
 
     $renewedMembership = $this->callAPISuccessGetSingle('membership', ['id' => $preExistingMembershipID + 1]);
-    $this->assertEquals(date('Y-m-d', strtotime('+ 1 ' . $this->params['recur_frequency_unit'], strtotime($membership['end_date']))), $renewedMembership['end_date']);
+    $expectEndDate = $this->membershipRenewalDate($this->params['recur_frequency_unit'], $membership['end_date']);
+    $this->assertEquals($expectEndDate, $renewedMembership['end_date']);
   }
 
   /**
