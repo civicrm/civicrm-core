@@ -58,6 +58,9 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
   public function upgrade_5_47_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Migrate CiviGrant component to an extension', 'migrateCiviGrant');
+    if (CRM_Core_Component::isEnabled('CiviGrant')) {
+      $this->addExtensionTask('Enable CiviGrant dependencies', ['org.civicrm.search_kit', 'org.civicrm.afform']);
+    }
     $this->addTask('Add created_date to civicrm_relationship', 'addColumn', 'civicrm_relationship', 'created_date',
       "timestamp NOT NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'Relationship created date'"
     );
