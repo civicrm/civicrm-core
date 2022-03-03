@@ -248,9 +248,15 @@ class CRM_Core_I18n {
    */
   public static function getLocaleOptions(): array {
     $values = CRM_Core_OptionValue::getValues(['name' => 'languages'], $optionValues, 'label', TRUE);
+    $return = [];
     foreach ($values as $value) {
       $return[$value['name']] = $value['label'];
     }
+    // Sorry not sorry.
+    // Hacking in for now since the is probably the most important use-case for
+    // money formatting in an English speaking non-US locale based on any reasonable
+    // metric.
+    $return['en_NZ'] = ts('English - New Zealand');
     return $return;
   }
 
