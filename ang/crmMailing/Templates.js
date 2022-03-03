@@ -88,7 +88,7 @@
                   },
                   results: function(data) {
 
-                    results = {
+                    var results = {
                       children: $.map(data.values, function(obj) {
                         return { id: obj.id, text: obj.label };
                       })
@@ -98,7 +98,7 @@
                       results.text = ts('Message Templates');
                     }
 
-                    more = data.more_results;
+                    var more = data.more_results;
 
                     if (more && !data.more_results) {
                       rcpAjaxState.page_n += rcpAjaxState.page_i;
