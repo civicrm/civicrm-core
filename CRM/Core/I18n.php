@@ -240,6 +240,21 @@ class CRM_Core_I18n {
   }
 
   /**
+   * Get the options available for format locale.
+   *
+   * Note the pseudoconstant can't be used as the key is the name not the value.
+   *
+   * @return array
+   */
+  public static function getLocaleOptions(): array {
+    $values = CRM_Core_OptionValue::getValues(['name' => 'languages'], $optionValues, 'label', TRUE);
+    foreach ($values as $value) {
+      $return[$value['name']] = $value['label'];
+    }
+    return $return;
+  }
+
+  /**
    * Return the available UI languages
    * @return array|string
    *   array(string languageCode => string languageName) if !$justCodes
