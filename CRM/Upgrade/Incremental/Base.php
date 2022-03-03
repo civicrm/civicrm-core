@@ -159,6 +159,48 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * Add a task to activate an extension. This task will run post-upgrade (after all
+   * changes to core DB are settled).
+   *
+   * @param string $title
+   * @param string[] $keys
+   *   List of extensions to enable.
+   */
+  protected function addExtensionTask(string $title, array $keys): void {
+    Civi::queue(CRM_Upgrade_Form::QUEUE_NAME)->createItem(
+      new CRM_Queue_Task([static::CLASS, 'enableExtension'], [$keys], $title),
+      ['weight' => 2000]
+    );
+  }
+
+  /**
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param string[] $keys
+   *   List of extensions to enable.
+   * @return bool
+   */
+  public static function enableExtension(CRM_Queue_TaskContext $ctx, array $keys): bool {
+    // The `enableExtension` has a very high value of `weight`, so this runs after all
+    // core DB schema updates have been resolved. We can use high-level services.
+
+    Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.finish'));
+    $restore = \CRM_Utils_AutoClean::with(function() {
+      Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.main'));
+    });
+
+    $manager = CRM_Extension_System::singleton()->getManager();
+    $manager->enable($manager->findInstallRequirements($keys));
+
+    // Hrm, `enable()` normally does these things... but not during upgrade...
+    // Note: A good test-scenario is to install 5.45; enable logging and CiviGrant; disable searchkit+afform; then upgrade to 5.47.
+    $schema = new CRM_Logging_Schema();
+    $schema->fixSchemaDifferences();
+    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, TRUE);
+
+    return TRUE;
+  }
+
+  /**
    * Remove a payment processor if not in use
    *
    * @param CRM_Queue_TaskContext $ctx
