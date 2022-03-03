@@ -499,6 +499,14 @@ SET    version = '$version'
   /**
    * Fill the queue with upgrade tasks.
    *
+   * The queue is a priority-queue (sorted by tuple weight+id). Here are some common weights:
+   *
+   * - `weight=0`: Add a typical upgrade step for revising core schema.
+   * - `weight=-1`: In the middle of the upgrade, add an extra step for immediate execution.
+   * - `weight=1000`: Add some general core upgrade-logic that runs after all schema have change.d
+   * - `weight=2000`: Add some post-upgrade logic. If a task absolutely requires full system services
+   *    (eg enabling a new extension), then place it here.
+   *
    * @param string $currentVer
    *   the original revision.
    * @param string $latestVer
@@ -526,14 +534,14 @@ SET    version = '$version'
       [$postUpgradeMessageFile],
       "Cleanup old files"
     );
-    $queue->createItem($task);
+    $queue->createItem($task, ['weight' => 0]);
 
     $task = new CRM_Queue_Task(
       ['CRM_Upgrade_Form', 'disableOldExtensions'],
       [$postUpgradeMessageFile],
       "Checking extensions"
     );
-    $queue->createItem($task);
+    $queue->createItem($task, ['weight' => 0]);
 
     $revisions = $upgrade->getRevisionSequence();
     $maxRevision = empty($revisions) ? NULL : end($revisions);
@@ -552,7 +560,7 @@ SET    version = '$version'
           [$rev],
           "Begin Upgrade to $rev"
         );
-        $queue->createItem($beginTask);
+        $queue->createItem($beginTask, ['weight' => 0]);
 
         $task = new CRM_Queue_Task(
         // callback
@@ -561,7 +569,7 @@ SET    version = '$version'
           [$rev, $currentVer, $latestVer, $postUpgradeMessageFile],
           "Upgrade DB to $rev"
         );
-        $queue->createItem($task);
+        $queue->createItem($task, ['weight' => 0]);
 
         $task = new CRM_Queue_Task(
         // callback
@@ -570,7 +578,7 @@ SET    version = '$version'
           [$rev, $currentVer, $latestVer, $postUpgradeMessageFile],
           "Finish Upgrade DB to $rev"
         );
-        $queue->createItem($task);
+        $queue->createItem($task, ['weight' => 0]);
       }
     }
 
@@ -581,8 +589,15 @@ SET    version = '$version'
         [$rev, $latestVer, $latestVer, $postUpgradeMessageFile],
         "Finish Upgrade DB to $latestVer"
       );
-      $queue->createItem($task);
+      $queue->createItem($task, ['weight' => 0]);
     }
+
+    $task = new CRM_Queue_Task(
+      ['CRM_Upgrade_Form', 'doCoreFinish'],
+      [$rev, $latestVer, $latestVer, $postUpgradeMessageFile],
+      "Finish core DB updates $latestVer"
+    );
+    $queue->createItem($task, ['weight' => 1000]);
 
     return $queue;
   }
@@ -780,7 +795,13 @@ SET    version = '$version'
     return TRUE;
   }
 
-  public static function doFinish() {
+  /**
+   * Finalize the core upgrade.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public static function doCoreFinish(): bool {
     Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.finish'));
     $restore = \CRM_Utils_AutoClean::with(function() {
       Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.main'));
@@ -805,6 +826,21 @@ SET    version = '$version'
     $logging->fixSchemaDifferences();
     // Force a rebuild of CiviCRM asset cache in case things have changed.
     \Civi::service('asset_builder')->clear(FALSE);
+
+    return TRUE;
+  }
+
+  /**
+   * After finishing the queue, the upgrade-runner calls `doFinish()`.
+   *
+   * This is called by all upgrade-runners (inside or outside of `civicrm-core.git`).
+   * Removing it would be a breaky-annoying process; it would foreclose future use;
+   * and it would produce no tangible benefits.
+   *
+   * @return bool
+   */
+  public static function doFinish(): bool {
+    return TRUE;
   }
 
   /**
