@@ -62,22 +62,23 @@
             if (context === 'userInput' && $(this).val() === '' && $(this).siblings('.crm-form-date').val().length) {
               schedule.mode = 'at';
               schedule.datetime = '?';
-            } else { 
+            } else {
               var d = new Date(),
-              month = '' + (d.getMonth() + 1),
-              day = '' + d.getDate(),
-              year = d.getFullYear(),
-              hours = '' + d.getHours(),
-              minutes = '' + d.getMinutes();
-              var submittedDate = $(this).val();
+                month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear(),
+                hours = '' + d.getHours(),
+                minutes = '' + d.getMinutes(),
+                submittedDate = $(this).val();
               if (month.length < 2) month = '0' + month;
               if (day.length < 2) day = '0' + day;
               if (hours.length < 2) hours = '0' + hours;
               if (minutes.length < 2) minutes = '0' + minutes;
-              date = [year, month, day].join('-');
-              time = [hours, minutes, "00"].join(':');
-              currentDate = date + ' ' + time;
-              var isInPast = (submittedDate.length && submittedDate.match(/^[0-9\-]+ [0-9\:]+$/) && isDateBefore(submittedDate, currentDate, 4*60*60*1000));
+              var
+                date = [year, month, day].join('-'),
+                time = [hours, minutes, "00"].join(':'),
+                currentDate = date + ' ' + time,
+                isInPast = (submittedDate.length && submittedDate.match(/^[0-9\-]+ [0-9\:]+$/) && isDateBefore(submittedDate, currentDate, 4*60*60*1000));
               ngModel.$setValidity('dateTimeInThePast', !isInPast);
               if (lastAlert && lastAlert.isOpen) {
                 lastAlert.close();
