@@ -116,14 +116,10 @@ class CRM_Core_ManagedEntities {
    * existing entities, and remove orphaned (stale) entities.
    *
    * @param bool $ignoreUpgradeMode
-   *
+   *   Unused.
    * @throws \CRM_Core_Exception
    */
   public function reconcile($ignoreUpgradeMode = FALSE) {
-    // Do not reconcile whilst we are in upgrade mode
-    if (CRM_Core_Config::singleton()->isUpgradeMode() && !$ignoreUpgradeMode) {
-      return;
-    }
     $this->loadDeclarations();
     if ($error = $this->validate($this->getDeclarations())) {
       throw new CRM_Core_Exception($error);
