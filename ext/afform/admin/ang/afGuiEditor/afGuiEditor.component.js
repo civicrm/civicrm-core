@@ -24,6 +24,7 @@
       this.afform = null;
       $scope.saving = false;
       $scope.selectedEntityName = null;
+      $scope.searchDisplayListFilter = {};
       this.meta = afGui.meta;
       var editor = this,
         sortableOptions = {};
@@ -73,9 +74,11 @@
             editor.layout['#children'].push(afGui.meta.elements.submit.element);
           }
         }
-
-        else if (editor.getFormType() === 'block') {
+        else {
           editor.layout['#children'] = editor.afform.layout;
+        }
+
+        if (editor.getFormType() === 'block') {
           editor.blockEntity = editor.afform.join_entity || editor.afform.entity_type;
           $scope.entities[editor.blockEntity] = backfillEntityDefaults({
             type: editor.blockEntity,
@@ -85,20 +88,7 @@
         }
 
         else if (editor.getFormType() === 'search') {
-          editor.layout['#children'] = afGui.findRecursive(editor.afform.layout, {'af-fieldset': ''})[0]['#children'];
-          var searchFieldsets = afGui.findRecursive(editor.afform.layout, {'af-fieldset': ''});
-          editor.searchDisplays = _.transform(searchFieldsets, function(searchDisplays, fieldset) {
-            var displayElement = afGui.findRecursive(fieldset['#children'], function(item) {
-              return item['search-name'] && item['#tag'] && item['#tag'].indexOf('crm-search-display-') === 0;
-            })[0];
-            if (displayElement) {
-              searchDisplays[displayElement['search-name'] + (displayElement['display-name'] ? '.' + displayElement['display-name'] : '')] = {
-                element: displayElement,
-                fieldset: fieldset,
-                settings: afGui.getSearchDisplay(displayElement['search-name'], displayElement['display-name'])
-              };
-            }
-          }, {});
+          editor.searchDisplays = getSearchDisplaysOnForm();
         }
 
         // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
@@ -245,6 +235,92 @@
         }
       };
 
+      // Collects all search displays currently on the form
+      function getSearchDisplaysOnForm() {
+        var searchFieldsets = afGui.findRecursive(editor.afform.layout, {'af-fieldset': ''});
+        return _.transform(searchFieldsets, function(searchDisplays, fieldset) {
+          var displayElement = afGui.findRecursive(fieldset['#children'], function(item) {
+            return item['search-name'] && item['#tag'] && item['#tag'].indexOf('crm-search-display-') === 0;
+          })[0];
+          if (displayElement) {
+            searchDisplays[displayElement['search-name'] + (displayElement['display-name'] ? '.' + displayElement['display-name'] : '')] = {
+              element: displayElement,
+              fieldset: fieldset,
+              settings: afGui.getSearchDisplay(displayElement['search-name'], displayElement['display-name'])
+            };
+          }
+        }, {});
+      }
+
+      // Load data for "Add search display" dropdown
+      this.getSearchDisplaySelector = function() {
+        // Reset search input in dropdown
+        $scope.searchDisplayListFilter.label = '';
+        // A value means it's alredy loaded. Null means it's loading.
+        if (!editor.searchOptions && editor.searchOptions !== null) {
+          editor.searchOptions = null;
+          afGui.getAllSearchDisplays().then(function(links) {
+            editor.searchOptions = links;
+          });
+        }
+      };
+
+      this.addSearchDisplay = function(display) {
+        var searchName = display.key.split('.')[0];
+        var displayName = display.key.split('.')[1] || '';
+        var fieldset = {
+          '#tag': 'div',
+          'af-fieldset': '',
+          '#children': [
+            {
+              '#tag': display.tag,
+              'search-name': searchName,
+              'display-name': displayName,
+            }
+          ]
+        };
+        var meta = {
+          fieldset: fieldset,
+          element: fieldset['#children'][0],
+          settings: afGui.getSearchDisplay(searchName, displayName),
+        };
+        editor.searchDisplays[display.key] = meta;
+
+        function addToCanvas() {
+          editor.layout['#children'].push(fieldset);
+          editor.selectEntity(display.key);
+        }
+        if (meta.settings) {
+          addToCanvas();
+        } else {
+          $timeout(editor.adjustTabWidths);
+          crmApi4('Afform', 'loadAdminData', {
+            definition: {type: 'search'},
+            entity: display.key
+          }, 0).then(function(data) {
+            afGui.addMeta(data);
+            meta.settings = afGui.getSearchDisplay(searchName, displayName);
+            addToCanvas();
+          });
+        }
+      };
+
+      // Triggered by afGuiContainer.removeElement
+      this.onRemoveElement = function() {
+        // Keep this.searchDisplays in-sync when deleteing stuff from the form
+        if (editor.getFormType() === 'search') {
+          var current = getSearchDisplaysOnForm();
+          _.each(_.keys(editor.searchDisplays), function(key) {
+            if (!(key in current)) {
+              delete editor.searchDisplays[key];
+              editor.selectEntity(null);
+            }
+          });
+        }
+      };
+
+      // This function used to be needed to build a menu of available contact_id fields
+      // but is no longer used for that and is overkill for what it does now.
       function getSearchFilterOptions(searchDisplay) {
         var
           entityCount = {},

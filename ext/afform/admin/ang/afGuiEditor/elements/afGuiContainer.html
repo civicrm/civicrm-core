@@ -1,6 +1,7 @@
 <div class="af-gui-bar" ng-if="$ctrl.node['#tag']" ng-click="selectEntity()" >
   <div ng-if="!$ctrl.loading" class="form-inline">
     <span ng-if="$ctrl.getNodeType($ctrl.node) == 'fieldset'">{{ $ctrl.editor.getEntity($ctrl.entityName).label }}</span>
+    <span ng-if="$ctrl.getNodeType($ctrl.node) == 'searchFieldset'">{{:: ts('Search Display') }}</span>
     <span ng-if="block">{{ $ctrl.join ? ts($ctrl.join) + ':' : ts('Block:') }}</span>
     <span ng-if="!block">{{ tags[$ctrl.node['#tag']] }}</span>
     <select ng-if="block" ng-model="block.directive" ng-change="selectBlockDirective()">
@@ -14,7 +15,7 @@
         <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-element-button" data-toggle="dropdown" title="{{:: ts('Configure') }}">
           <span><i class="crm-i fa-gear"></i></span>
         </button>
-        <ul class="dropdown-menu dropdown-menu-right" ng-if="menu.open" ng-include="'~/afGuiEditor/elements/afGuiContainer-menu.html'"></ul>
+        <ul class="dropdown-menu dropdown-menu-right" ng-if="menu.open" ng-include="'~/afGuiEditor/elements/' + ($ctrl.node['af-fieldset'] === '' ? 'afGuiSearchContainer' : 'afGuiContainer') + '-menu.html'"></ul>
       </div>
     </div>
   </div>
@@ -30,6 +31,7 @@
       <af-gui-text ng-switch-when="text" node="item" delete-this="$ctrl.removeElement(item)" class="af-gui-element af-gui-text" ></af-gui-text>
       <af-gui-markup ng-switch-when="markup" node="item" delete-this="$ctrl.removeElement(item)" class="af-gui-markup" ></af-gui-markup>
       <af-gui-button ng-switch-when="button" node="item" delete-this="$ctrl.removeElement(item)" class="af-gui-element af-gui-button" ></af-gui-button>
+      <af-gui-container ng-switch-when="searchFieldset" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container af-gui-fieldset af-gui-container-type-{{ item['#tag'] }}" ng-class="{'af-entity-selected': isSelectedSearchFieldset(item)}" data-entity="{{ getSearchKey(item) }}" ></af-gui-container>
       <af-gui-search-display ng-switch-when="searchDisplay" node="item" class="af-gui-element"></af-gui-search-display>
     </div>
   </div>

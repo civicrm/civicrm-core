@@ -16,7 +16,7 @@
         </a>
       </li>
       <li role="presentation" ng-repeat="(key, display) in editor.searchDisplays" class="fluid-width-tab" ng-class="{active: selectedEntityName === key}" title="{{ display.label }}">
-        <a href ng-click="editor.selectEntity(key)">
+        <a href ng-click="display.settings && editor.selectEntity(key)">
           <i ng-if="display.settings" class="crm-i {{:: display.settings['type:icon'] }}"></i>
           <i ng-if="!display.settings" class="crm-i fa-spin fa-spinner"></i>
           <span>{{ display.settings.label }}</span>
@@ -26,11 +26,29 @@
         <a href class="dropdown-toggle" data-toggle="dropdown">
           <i class="crm-i fa-plus"></i>
         </a>
-        <ul class="dropdown-menu dropdown-menu-right">
+        <ul class="dropdown-menu">
           <li ng-repeat="(entityName, entity) in editor.meta.entities" ng-if="entity.defaults">
             <a href ng-click="editor.addEntity(entityName, true)">
               <i class="crm-i {{:: entity.icon }}"></i>
               {{:: entity.label }}
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li role="presentation" class="dropdown" ng-if="editor.getFormType() === 'search'" title="{{:: ts('Add Search') }}">
+        <a href class="dropdown-toggle" data-toggle="dropdown" ng-click="editor.getSearchDisplaySelector();">
+          <i class="crm-i fa-plus"></i>
+        </a>
+        <ul class="dropdown-menu">
+          <li ng-class="{disabled: !editor.searchOptions || !editor.searchOptions.length}">
+            <input ng-if="editor.searchOptions && editor.searchOptions.length" type="search" class="form-control" placeholder="&#xf002" ng-model="searchDisplayListFilter.label">
+            <a href ng-if="!editor.searchOptions"><i class="crm-i fa-spinner fa-spin"></i></a>
+            <a href ng-if="editor.searchOptions && !editor.searchOptions.length">{{:: ts('None Found') }}</a>
+          </li>
+          <li ng-repeat="link in editor.searchOptions | filter:searchDisplayListFilter" class="{{:: link.class }}">
+            <a href ng-click="editor.addSearchDisplay(link)">
+              <i class="crm-i {{:: link.icon }}"></i>
+              {{:: link.label }}
             </a>
           </li>
         </ul>
