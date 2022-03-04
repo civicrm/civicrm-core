@@ -58,6 +58,9 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
   public function upgrade_5_47_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Migrate CiviGrant component to an extension', 'migrateCiviGrant');
+    if (CRM_Core_Component::isEnabled('CiviGrant')) {
+      $this->addExtensionTask('Enable CiviGrant extension', ['civigrant']);
+    }
     $this->addTask('Add created_date to civicrm_relationship', 'addColumn', 'civicrm_relationship', 'created_date',
       "timestamp NOT NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'Relationship created date'"
     );
@@ -72,6 +75,12 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
     $this->addTask('core-issue#2122 - Set the timezone to the default for existing Events', 'setEventTZDefault');
     $this->addTask('Drop CustomGroup UI_name_extends index', 'dropIndex', 'civicrm_custom_group', 'UI_name_extends');
     $this->addTask('Add CustomGroup UI_name index', 'addIndex', 'civicrm_custom_group', ['name'], 'UI');
+    if (CRM_Core_DAO::checkTableExists('civicrm_search_display')) {
+      $this->addTask('Add SearchDisplay.acl_bypass', 'addColumn',
+        'civicrm_search_display', 'acl_bypass',
+        "tinyint DEFAULT 0 COMMENT 'Skip permission checks and ACLs when running this display.'"
+      );
+    }
   }
 
   /**
@@ -107,6 +116,9 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
       }
       CRM_Core_DAO::executeQuery("DELETE FROM civicrm_component WHERE name = 'CiviGrant'", [], TRUE, NULL, FALSE, FALSE);
     }
+
+    // There are existing records which should be managed by `civigrant`. To assign ownership, we need
+    // placeholders in `civicrm_extension` and `civicrm_managed`.
     $ext = new CRM_Core_DAO_Extension();
     $ext->full_name = 'civigrant';
     if (!$ext->find(TRUE)) {
@@ -114,8 +126,9 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
       $ext->name = 'CiviGrant';
       $ext->label = ts('CiviGrant');
       $ext->file = 'civigrant';
-      $ext->is_active = (int) $civiGrantEnabled;
+      $ext->is_active = 0; /* Not active _yet_. If site uses CiviGrant, we will re-activate once the core-schema has been revised. */
       $ext->save();
+      CRM_Extension_System::singleton()->getManager()->refresh();
 
       $managedItems = [
         'OptionGroup_advanced_search_options_OptionValue_CiviGrant' => [
