@@ -417,7 +417,6 @@ return [
     'quick_form_type' => 'Select',
     'html_type' => 'Select',
     'html_attributes' => [
-      'multiple' => 0,
       'class' => 'crm-select2',
     ],
     'default' => NULL,
@@ -427,7 +426,7 @@ return [
     'is_contact' => 0,
     'help_text' => NULL,
     'pseudoconstant' => [
-      'callback' => 'CRM_Core_I18n::getLocaleOptions',
+      'callback' => 'CRM_Core_I18n::getFormatLocales',
     ],
     'description' => ts('Locale to use when formatting money (and in future dates). This replaces thousandsSeparator & decimalSeparator & moneyFormat settings.'),
   ],

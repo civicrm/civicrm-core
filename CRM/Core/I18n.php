@@ -246,9 +246,10 @@ class CRM_Core_I18n {
    *
    * @return array
    */
-  public static function getLocaleOptions(): array {
+  public static function getFormatLocales(): array {
     $values = CRM_Core_OptionValue::getValues(['name' => 'languages'], $optionValues, 'label', TRUE);
     $return = [];
+    $return[NULL] = ts('Inherit from language');
     foreach ($values as $value) {
       $return[$value['name']] = $value['label'];
     }
