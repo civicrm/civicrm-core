@@ -86,10 +86,19 @@
 
         else if (editor.getFormType() === 'search') {
           editor.layout['#children'] = afGui.findRecursive(editor.afform.layout, {'af-fieldset': ''})[0]['#children'];
-          editor.searchDisplay = afGui.findRecursive(editor.layout['#children'], function(item) {
-            return item['#tag'] && item['#tag'].indexOf('crm-search-display-') === 0;
-          })[0];
-          editor.searchFilters = getSearchFilterOptions();
+          var searchFieldsets = afGui.findRecursive(editor.afform.layout, {'af-fieldset': ''});
+          editor.searchDisplays = _.transform(searchFieldsets, function(searchDisplays, fieldset) {
+            var displayElement = afGui.findRecursive(fieldset['#children'], function(item) {
+              return item['search-name'] && item['#tag'] && item['#tag'].indexOf('crm-search-display-') === 0;
+            })[0];
+            if (displayElement) {
+              searchDisplays[displayElement['search-name'] + (displayElement['display-name'] ? '.' + displayElement['display-name'] : '')] = {
+                element: displayElement,
+                fieldset: fieldset,
+                settings: afGui.getSearchDisplay(displayElement['search-name'], displayElement['display-name'])
+              };
+            }
+          }, {});
         }
 
         // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
@@ -222,19 +231,22 @@
       this.toggleContactSummary = function() {
         if (editor.afform.contact_summary) {
           editor.afform.contact_summary = false;
-          if (editor.afform.type === 'search') {
-            delete editor.searchDisplay.filters;
-          }
+          _.each(editor.searchDisplays, function(searchDisplay) {
+            delete searchDisplay.element.filters;
+          });
         } else {
           editor.afform.contact_summary = 'block';
-          if (editor.afform.type === 'search') {
-            editor.searchDisplay.filters = editor.searchFilters[0].key;
-          }
+          _.each(editor.searchDisplays, function(searchDisplay) {
+            var filterOptions = getSearchFilterOptions(searchDisplay.settings);
+            if (filterOptions.length) {
+              searchDisplay.element.filters = filterOptions[0].key;
+            }
+          });
         }
       };
 
-      function getSearchFilterOptions() {
-        var searchDisplay = afGui.getSearchDisplay(editor.searchDisplay['search-name'], editor.searchDisplay['display-name']),
+      function getSearchFilterOptions(searchDisplay) {
+        var
           entityCount = {},
           options = [];
 

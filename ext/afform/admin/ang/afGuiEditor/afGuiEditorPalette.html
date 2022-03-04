@@ -15,10 +15,11 @@
           <i ng-if="entity.loading" class="crm-i fa-spin fa-spinner"></i>
         </a>
       </li>
-      <li role="presentation" ng-repeat="(key, searchDisplay) in editor.meta.searchDisplays" class="fluid-width-tab" ng-class="{active: selectedEntityName === key}" title="{{ searchDisplay.label }}">
+      <li role="presentation" ng-repeat="(key, display) in editor.searchDisplays" class="fluid-width-tab" ng-class="{active: selectedEntityName === key}" title="{{ display.label }}">
         <a href ng-click="editor.selectEntity(key)">
-          <i class="crm-i {{:: searchDisplay['type:icon'] }}"></i>
-          <span>{{ searchDisplay.label }}</span>
+          <i ng-if="display.settings" class="crm-i {{:: display.settings['type:icon'] }}"></i>
+          <i ng-if="!display.settings" class="crm-i fa-spin fa-spinner"></i>
+          <span>{{ display.settings.label }}</span>
         </a>
       </li>
       <li role="presentation" class="dropdown" ng-if="editor.allowEntityConfig" title="{{:: ts('Add Entity') }}">
@@ -40,7 +41,7 @@
   <div class="panel-body" ng-repeat="entity in entities" ng-if="selectedEntityName === entity.name">
     <af-gui-entity entity="entity"></af-gui-entity>
   </div>
-  <div class="panel-body" ng-repeat="(key, searchDisplay) in editor.meta.searchDisplays" ng-if="selectedEntityName === key">
-    <af-gui-search display="searchDisplay"></af-gui-search>
+  <div class="panel-body" ng-repeat="(key, display) in editor.searchDisplays" ng-if="selectedEntityName === key">
+    <af-gui-search display="display"></af-gui-search>
   </div>
 </div>
