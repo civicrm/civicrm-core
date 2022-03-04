@@ -44,10 +44,8 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $values = (array) $contribution;
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $values['contribution_status_id']);
 
-    if (!isset($this->get_template_vars()['hookDiscount'])) {
-      $this->assign('hookDiscount', ['message' => '']);
-    }
     $this->addExpectedSmartyVariables([
+      'hookDiscount',
       'pricesetFieldsCount',
       'pcp_id',
       // currencySymbol maybe doesn't make sense but is probably old?
