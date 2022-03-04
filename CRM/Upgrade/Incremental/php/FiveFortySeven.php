@@ -75,6 +75,12 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
     $this->addTask('core-issue#2122 - Set the timezone to the default for existing Events', 'setEventTZDefault');
     $this->addTask('Drop CustomGroup UI_name_extends index', 'dropIndex', 'civicrm_custom_group', 'UI_name_extends');
     $this->addTask('Add CustomGroup UI_name index', 'addIndex', 'civicrm_custom_group', ['name'], 'UI');
+    if (CRM_Core_DAO::checkTableExists('civicrm_search_display')) {
+      $this->addTask('Add SearchDisplay.acl_bypass', 'addColumn',
+        'civicrm_search_display', 'acl_bypass',
+        "tinyint DEFAULT 0 COMMENT 'Skip permission checks and ACLs when running this display.'"
+      );
+    }
   }
 
   /**
