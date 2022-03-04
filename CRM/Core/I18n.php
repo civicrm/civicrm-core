@@ -257,7 +257,7 @@ class CRM_Core_I18n {
     // Hacking in for now since the is probably the most important use-case for
     // money formatting in an English speaking non-US locale based on any reasonable
     // metric.
-    $return['en_NZ'] = ts('English - New Zealand');
+    $return['en_NZ'] = ts('English (New Zealand)');
     return $return;
   }
 
