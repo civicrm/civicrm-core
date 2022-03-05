@@ -409,6 +409,27 @@ return [
       'callback' => 'CRM_Core_I18n::languages',
     ],
   ],
+  'format_locale' => [
+    'group_name' => 'Localization Preferences',
+    'group' => 'localization',
+    'name' => 'format_locale',
+    'type' => 'String',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
+    'html_attributes' => [
+      'class' => 'crm-select2',
+    ],
+    'default' => NULL,
+    'add' => '5.47',
+    'title' => ts('Formatting locale'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'help_text' => NULL,
+    'pseudoconstant' => [
+      'callback' => 'CRM_Core_I18n::getFormatLocales',
+    ],
+    'description' => ts('Locale to use when formatting money (and in future dates). This replaces thousandsSeparator & decimalSeparator & moneyFormat settings.'),
+  ],
   'uiLanguages' => [
     'group_name' => 'Localization Preferences',
     'group' => 'localization',
