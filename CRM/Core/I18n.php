@@ -240,6 +240,28 @@ class CRM_Core_I18n {
   }
 
   /**
+   * Get the options available for format locale.
+   *
+   * Note the pseudoconstant can't be used as the key is the name not the value.
+   *
+   * @return array
+   */
+  public static function getFormatLocales(): array {
+    $values = CRM_Core_OptionValue::getValues(['name' => 'languages'], $optionValues, 'label', TRUE);
+    $return = [];
+    $return[NULL] = ts('Inherit from language');
+    foreach ($values as $value) {
+      $return[$value['name']] = $value['label'];
+    }
+    // Sorry not sorry.
+    // Hacking in for now since the is probably the most important use-case for
+    // money formatting in an English speaking non-US locale based on any reasonable
+    // metric.
+    $return['en_NZ'] = ts('English (New Zealand)');
+    return $return;
+  }
+
+  /**
    * Return the available UI languages
    * @return array|string
    *   array(string languageCode => string languageName) if !$justCodes

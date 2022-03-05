@@ -43,7 +43,7 @@ class Format {
       $currency = Civi::settings()->get('defaultCurrency');
     }
     if (!isset($locale)) {
-      $locale = CRM_Core_I18n::getLocale();
+      $locale = Civi::settings()->get('format_locale') ?? CRM_Core_I18n::getLocale();
     }
     $money = Money::of($amount, $currency, NULL, RoundingMode::HALF_UP);
     $formatter = $this->getMoneyFormatter($currency, $locale);
@@ -150,7 +150,7 @@ class Format {
    * we are looking at how to manage an 'opt in'
    */
   protected function isUseSeparatorSettings(): bool {
-    return !CRM_Utils_Constant::value('IGNORE_SEPARATOR_CONFIG');
+    return !Civi::settings()->get('format_locale') && !CRM_Utils_Constant::value('IGNORE_SEPARATOR_CONFIG');
   }
 
   /**
