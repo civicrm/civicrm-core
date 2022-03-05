@@ -50,6 +50,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $this->addExpectedSmartyVariables([
       'pricesetFieldsCount',
       'pcp_id',
+      'getTaxDetails',
       // currencySymbol maybe doesn't make sense but is probably old?
       'currencySymbol',
     ]);
@@ -153,6 +154,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $values['note'] = array_values($noteValue);
 
     // show billing address location details, if exists
+    $values['billing_address'] = '';
     if (!empty($values['address_id'])) {
       $addressParams = ['id' => $values['address_id']];
       $addressDetails = CRM_Core_BAO_Address::getValues($addressParams, FALSE, 'id');

@@ -1975,6 +1975,11 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
       }
     }
     else {
+      $form->addExpectedSmartyVariables([
+        'multiRecordDisplay',
+        'groupId',
+        'skipTitle',
+      ]);
       $form->assign_by_ref("{$prefix}viewCustomData", $details);
       return $details;
     }
