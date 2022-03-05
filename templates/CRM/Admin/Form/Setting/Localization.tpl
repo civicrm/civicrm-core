@@ -49,10 +49,15 @@
               <span class="description">{$settings_fields.contact_default_language.description}</span>
             </td>
           </tr>
-            <tr class="crm-localization-form-block-defaultCurrency">
-                <td class="label">{$form.defaultCurrency.label} {help id='defaultCurrency' title=$form.defaultCurrency.label}</td>
-                <td>{$form.defaultCurrency.html}</td>
-            </tr>
+          <tr class="crm-localization-form-block-defaultCurrency">
+            <td class="label">{$form.defaultCurrency.label} {help id='defaultCurrency' title=$form.defaultCurrency.label}</td>
+            <td>{$form.defaultCurrency.html}</td>
+          </tr>
+          <tr class="crm-localization-form-block-format_locale">
+            <td class="label">{$form.format_locale.label}</td>
+            <td>{$form.format_locale.html}<br />
+              <span class="description">{ts}Locale to use when formatting money (and in future dates). This replaces thousandsSeparator & decimalSeparator settings.{/ts}</span></td>
+          </tr>
             <tr class="crm-localization-form-block-monetaryThousandSeparator">
                 <td class="label">{$form.monetaryThousandSeparator.label}</td>
                 <td>{$form.monetaryThousandSeparator.html}</td>
