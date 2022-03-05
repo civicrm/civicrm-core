@@ -84,6 +84,16 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
   }
 
   /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_5_47_1($rev): void {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+  }
+
+  /**
    * @param \CRM_Queue_TaskContext $ctx
    *
    * @return bool
