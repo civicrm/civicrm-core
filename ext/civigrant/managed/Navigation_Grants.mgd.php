@@ -151,25 +151,4 @@ return [
       ],
     ],
   ],
-  [
-    'name' => 'Navigation_Grants_Navigation_Grant_Reports',
-    'entity' => 'Navigation',
-    'cleanup' => 'unused',
-    'update' => 'unmodified',
-    'params' => [
-      'version' => 4,
-      'values' => [
-        'label' => 'Grant Reports',
-        'name' => 'Grant Reports',
-        'url' => 'civicrm/report/list?compid=5&reset=1',
-        'icon' => NULL,
-        'permission' => 'access CiviGrant',
-        'permission_operator' => '',
-        'parent_id.name' => 'Grants',
-        'is_active' => TRUE,
-        'has_separator' => NULL,
-        'domain_id' => 'current_domain',
-      ],
-    ],
-  ],
 ];
