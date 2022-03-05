@@ -587,6 +587,57 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
   }
 
   /**
+   * Tests a scenario where a record may already exist and we want to make it a managed entity
+   */
+  public function testMatchExisting() {
+    $optionGroup = OptionGroup::create(FALSE)
+      ->addValue('title', 'My pre-existing group')
+      ->addValue('name', 'My_pre_existing_group')
+      ->execute()->first();
+
+    $managed = [
+      'module' => 'civicrm',
+      'name' => 'preExistingGroup',
+      'entity' => 'OptionGroup',
+      'cleanup' => 'always',
+      'update' => 'always',
+      'params' => [
+        'version' => 4,
+        'values' => [
+          'name' => $optionGroup['name'],
+          'title' => "Cool new title",
+          'description' => 'Cool new description',
+        ],
+      ],
+    ];
+    $this->_managedEntities = [$managed];
+
+    // Without "match" in the params, it will try and fail to add a duplicate managed record
+    try {
+      \CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+    }
+    catch (\Exception $e) {
+    }
+    $this->assertStringContainsString('already exists', $e->getMessage());
+
+    // Now reconcile using a match param
+    $managed['params']['match'] = ['name'];
+    $this->_managedEntities = [$managed];
+    \CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+
+    $managedGroup = OptionGroup::get(FALSE)
+      ->addWhere('name', '=', $optionGroup['name'])
+      ->addSelect('id', 'title', 'description', 'base_module')
+      ->execute()->single();
+
+    $this->assertEquals($optionGroup['id'], $managedGroup['id']);
+    $this->assertEquals('Cool new title', $managedGroup['title']);
+    $this->assertEquals('Cool new description', $managedGroup['description']);
+    // The existing record has been converted to a managed entity!
+    $this->assertEquals('civicrm', $managedGroup['base_module']);
+  }
+
+  /**
    * @dataProvider sampleEntityTypes
    * @param string $entityName
    * @param bool $expected

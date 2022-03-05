@@ -307,22 +307,30 @@ class CRM_Core_ManagedEntities {
    *   Entity specification (per hook_civicrm_managedEntities).
    */
   protected function insertNewEntity($todo) {
-    if ($todo['params']['version'] == 4) {
-      $todo['params']['checkPermissions'] = FALSE;
+    $params = $todo['params'];
+    // APIv4
+    if ($params['version'] == 4) {
+      $params['checkPermissions'] = FALSE;
+      // Use "save" instead of "create" action to accommodate a "match" param
+      $params['records'] = [$params['values']];
+      unset($params['values']);
+      $result = civicrm_api4($todo['entity_type'], 'save', $params);
+      $id = $result->first()['id'];
     }
-
-    $result = civicrm_api($todo['entity_type'], 'create', ['debug' => TRUE] + $todo['params']);
-    if (!empty($result['is_error'])) {
-      $this->onApiError($todo['entity_type'], 'create', $todo['params'], $result);
+    // APIv3
+    else {
+      $result = civicrm_api($todo['entity_type'], 'create', $params);
+      if (!empty($result['is_error'])) {
+        $this->onApiError($todo['entity_type'], 'create', $params, $result);
+      }
+      $id = $result['id'];
     }
 
     $dao = new CRM_Core_DAO_Managed();
     $dao->module = $todo['module'];
     $dao->name = $todo['name'];
     $dao->entity_type = $todo['entity_type'];
-    // A fatal error will result if there is no valid id but if
-    // this is v4 api we might need to access it via ->first().
-    $dao->entity_id = $result['id'] ?? $result->first()['id'];
+    $dao->entity_id = $id;
     $dao->cleanup = $todo['cleanup'] ?? NULL;
     $dao->save();
   }
@@ -378,6 +386,8 @@ class CRM_Core_ManagedEntities {
     elseif ($doUpdate && $todo['params']['version'] == 4) {
       $params = ['checkPermissions' => FALSE] + $todo['params'];
       $params['values']['id'] = $dao->entity_id;
+      // 'match' param doesn't apply to "update" action
+      unset($params['match']);
       civicrm_api4($dao->entity_type, 'update', $params);
     }
 
