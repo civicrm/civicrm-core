@@ -116,6 +116,16 @@
       default: 'json'
     });
 
+    // Copy text to the clipboard
+    this.copyCode = function(domId) {
+      var node = document.getElementById(domId);
+      var range = document.createRange();
+      range.selectNode(node);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+      document.execCommand('copy');
+    };
+
     function ucfirst(str) {
       return str[0].toUpperCase() + str.slice(1);
     }
@@ -976,7 +986,7 @@
           break;
 
         case 'php':
-          $scope.result.push(prettyPrintOne((_.isArray(response.values) ? '(' + response.values.length + ') ' : '') + _.escape(phpFormat(response.values, 2, 2)), 'php', 1));
+          $scope.result.push(prettyPrintOne('return ' + _.escape(phpFormat(response.values, 2, 2)) + ';', 'php', 1));
           break;
       }
     };
