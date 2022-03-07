@@ -8,35 +8,48 @@
     // Trait properties get mixed into display controller using angular.extend()
     return {
 
-      selectedRows: [],
-      allRowsSelected: false,
-
-      // Toggle the "select all" checkbox
-      selectAllRows: function() {
+      // Use ajax to select all rows on every page
+      selectAllPages: function() {
         var ctrl = this;
-        // Deselect all
-        if (ctrl.allRowsSelected) {
-          ctrl.allRowsSelected = false;
-          ctrl.selectedRows.length = 0;
-          return;
-        }
-        // Select all
-        ctrl.allRowsSelected = true;
-        if (ctrl.page === 1 && ctrl.results.length < ctrl.limit) {
-          ctrl.selectedRows = _.pluck(ctrl.results, 'key');
-          return;
-        }
-        // If more than one page of results, use ajax to fetch all ids
-        ctrl.loadingAllRows = true;
+        ctrl.loadingAllRows = ctrl.allRowsSelected = true;
         var params = ctrl.getApiParams('id');
         crmApi4('SearchDisplay', 'run', params).then(function(ids) {
           ctrl.loadingAllRows = false;
-          ctrl.selectedRows = _.toArray(ids);
+          ctrl.selectedRows = _.uniq(_.toArray(ids));
         });
       },
 
+      // Select all rows on the current page
+      selectPage: function() {
+        this.allRowsSelected = true;
+        this.selectedRows = _.uniq(_.pluck(this.results, 'key'));
+      },
+
+      // Clear selection
+      selectNone: function() {
+        this.allRowsSelected = false;
+        this.selectedRows = [];
+      },
+
+      // Toggle the "select all" checkbox
+      toggleAllRows: function() {
+        // Deselect all
+        if (this.selectedRows && this.selectedRows.length) {
+          this.selectNone();
+        }
+        // Select all
+        else if (this.page === 1 && this.rowCount === this.results.length) {
+          this.selectPage();
+        }
+        // If more than one page of results, use ajax to fetch all ids
+        else {
+          this.selectAllPages();
+        }
+      },
+
       // Toggle row selection
-      selectRow: function(row, event) {
+      toggleRow: function(row, event) {
+        this.selectedRows = this.selectedRows || [];
         var ctrl = this,
           index = ctrl.selectedRows.indexOf(row.key);
 
@@ -74,7 +87,7 @@
               selectRange(allRows, nearestBefore + 1, checkboxPosition -1);
             }
           }
-          ctrl.selectedRows.push(row.key);
+          ctrl.selectedRows = _.uniq(ctrl.selectedRows.concat([row.key]));
           ctrl.allRowsSelected = (ctrl.rowCount === ctrl.selectedRows.length);
         } else {
           ctrl.allRowsSelected = false;
@@ -87,8 +100,13 @@
         return this.allRowsSelected || _.includes(this.selectedRows, row.key);
       },
 
+      isPageSelected: function() {
+        return (this.allRowsSelected && this.rowCount === this.results.length) ||
+          (!this.allRowsSelected && this.selectedRows && this.selectedRows.length === this.results.length);
+      },
+
       refreshAfterTask: function() {
-        this.selectedRows.length = 0;
+        this.selectedRows = [];
         this.allRowsSelected = false;
         this.rowCount = undefined;
         this.runSearch();
@@ -97,13 +115,13 @@
       // Add onChangeFilters callback (gets merged with others via angular.extend)
       onChangeFilters: [function() {
         // Reset selection when filters are changed
-        this.selectedRows.length = 0;
+        this.selectedRows = [];
         this.allRowsSelected = false;
       }],
 
       // Add onPostRun callback (gets merged with others via angular.extend)
       onPostRun: [function(results, status, editedRow) {
-        if (editedRow && status === 'success') {
+        if (editedRow && status === 'success' && this.selectedRows) {
           // If edited row disappears (because edits cause it to not meet search criteria), deselect it
           var index = this.selectedRows.indexOf(editedRow.key);
           if (index > -1 && !_.findWhere(results, {key: editedRow.key})) {
