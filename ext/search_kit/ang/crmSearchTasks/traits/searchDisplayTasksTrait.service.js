@@ -36,14 +36,49 @@
       },
 
       // Toggle row selection
-      selectRow: function(row) {
-        var index = this.selectedRows.indexOf(row.key);
+      selectRow: function(row, event) {
+        var ctrl = this,
+          index = ctrl.selectedRows.indexOf(row.key);
+
+        // See if any boxes are checked above/below this one
+        function checkRange(allRows, checkboxPosition, dir) {
+          for (var row = checkboxPosition; row >= 0 && row <= allRows.length; row += dir) {
+            if (ctrl.selectedRows.indexOf(allRows[row]) > -1) {
+              return row;
+            }
+          }
+        }
+
+        // Check a bunch of boxes
+        function selectRange(allRows, start, end) {
+          for (var row = start; row <= end; ++row) {
+            ctrl.selectedRows.push(allRows[row]);
+          }
+        }
+
         if (index < 0) {
-          this.selectedRows.push(row.key);
-          this.allRowsSelected = (this.rowCount === this.selectedRows.length);
+          // Shift-click - select range between clicked checkbox and the nearest selected row
+          if (event.shiftKey && ctrl.selectedRows.length) {
+            var allRows = _.pluck(ctrl.results, 'key'),
+              checkboxPosition = allRows.indexOf(row.key);
+
+            var nearestBefore = checkRange(allRows, checkboxPosition, -1),
+              nearestAfter = checkRange(allRows, checkboxPosition, 1);
+
+            // Select range between clicked box and the previous/next checked box
+            // In the ambiguous situation where there are checked boxes both above AND below the clicked box,
+            // choose the direction of the box which was most recently clicked.
+            if (nearestAfter !== undefined && (nearestBefore === undefined || nearestAfter === allRows.indexOf(_.last(ctrl.selectedRows)))) {
+              selectRange(allRows, checkboxPosition + 1, nearestAfter - 1);
+            } else if (nearestBefore !== undefined && (nearestAfter === undefined || nearestBefore === allRows.indexOf(_.last(ctrl.selectedRows)))) {
+              selectRange(allRows, nearestBefore + 1, checkboxPosition -1);
+            }
+          }
+          ctrl.selectedRows.push(row.key);
+          ctrl.allRowsSelected = (ctrl.rowCount === ctrl.selectedRows.length);
         } else {
-          this.allRowsSelected = false;
-          this.selectedRows.splice(index, 1);
+          ctrl.allRowsSelected = false;
+          ctrl.selectedRows.splice(index, 1);
         }
       },
 
