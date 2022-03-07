@@ -123,7 +123,8 @@ function civicrm_api3_payment_processor_pay($params) {
     if (empty($code)) {
       $code = 'EXTERNAL_FAILURE';
     }
-    throw new API_Exception('Payment failed', $code, $errorData, $e);
+    $message = $e->getMessage() ?? 'Payment Failed';
+    throw new API_Exception($message, $code, $errorData, $e);
   }
   return civicrm_api3_create_success(array($result), $params);
 }
