@@ -12,7 +12,6 @@
 namespace Civi\Api4\Event\Subscriber;
 
 use Civi\API\Events;
-use Civi\Api4\Utils\CoreUtil;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -37,20 +36,18 @@ class CreateApi4RequestSubscriber implements EventSubscriberInterface {
    * @param \Civi\Api4\Event\CreateApi4RequestEvent $event
    */
   public function onApiRequestCreate(\Civi\Api4\Event\CreateApi4RequestEvent $event) {
-    // Multi-record custom data entities
-    if (strpos($event->entityName, 'Custom_') === 0) {
-      $groupName = substr($event->entityName, 7);
-      if (CoreUtil::isCustomEntity($groupName)) {
-        $event->className = 'Civi\Api4\CustomValue';
-        $event->args = [$groupName];
-      }
+    // Most entities match the name of the class
+    $className = 'Civi\Api4\\' . $event->entityName;
+    if (class_exists($className)) {
+      $event->className = $className;
+      return;
     }
-    else {
-      // Because "Case" is a reserved php keyword
-      $className = 'Civi\Api4\\' . ($event->entityName === 'Case' ? 'CiviCase' : $event->entityName);
-      if (class_exists($className)) {
-        $event->className = $className;
-      }
+    // Lookup non-standard entities requiring arguments or with a mismatched classname
+    $provider = \Civi::service('action_object_provider');
+    $info = $provider->getEntities()[$event->entityName] ?? NULL;
+    if ($info) {
+      $event->className = $info['class'];
+      $event->args = $info['class_args'] ?? [];
     }
   }
 
