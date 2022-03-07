@@ -2752,13 +2752,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           }
           $result = $payment->doPayment($paymentParams);
           $form->_params = array_merge($form->_params, $result);
-          $form->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $result));
-          if (!empty($result['trxn_id'])) {
-            $contribution->trxn_id = $result['trxn_id'];
-          }
-          if (!empty($result['payment_status_id'])) {
-            $contribution->payment_status_id = $result['payment_status_id'];
-          }
+          $form->assign('trxn_id', $result['trxn_id'] ?? '');
+          $contribution->trxn_id = $result['trxn_id'] ?? $contribution->trxn_id ?? '';
+          $contribution->payment_status_id = $result['payment_status_id'];
           $result['contribution'] = $contribution;
           if ($result['payment_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')
             && $payment->isSendReceiptForPending()) {
