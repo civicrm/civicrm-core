@@ -44,7 +44,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
    *
    * @return string
    */
-  public function getDefaultEntity() {
+  public function getDefaultEntity(): string {
     return 'Relationship';
   }
 
@@ -53,24 +53,27 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
    *
    * @return string|null
    */
-  public function getDefaultContext() {
+  public function getDefaultContext(): ?string {
     return 'search';
   }
 
   /**
    * View details of a relationship.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function view() {
     $viewRelationship = CRM_Contact_BAO_Relationship::getRelationship($this->getContactId(), NULL, NULL, NULL, $this->getEntityId());
     //To check whether selected contact is a contact_id_a in
     //relationship type 'a_b' in relationship table, if yes then
-    //revert the permissionship text in template
+    //reverse the text in the template
     $relationship = new CRM_Contact_DAO_Relationship();
     $relationship->id = $viewRelationship[$this->getEntityId()]['id'];
 
     if ($relationship->find(TRUE)) {
-      if (($viewRelationship[$this->getEntityId()]['rtype'] == 'a_b') && ($this->getContactId() == $relationship->contact_id_a)) {
-        $this->assign("is_contact_id_a", TRUE);
+      if (($viewRelationship[$this->getEntityId()]['rtype'] === 'a_b') && ($this->getContactId() == $relationship->contact_id_a)) {
+        $this->assign('is_contact_id_a', TRUE);
       }
     }
     $relType = $viewRelationship[$this->getEntityId()]['civicrm_relationship_type_id'];
@@ -79,7 +82,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     $employerId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->getContactId(), 'employer_id');
     $this->assign('isCurrentEmployer', FALSE);
 
-    $relTypes = CRM_Utils_Array::index(array('name_a_b'), CRM_Core_PseudoConstant::relationshipType('name'));
+    $relTypes = CRM_Utils_Array::index(['name_a_b'], CRM_Core_PseudoConstant::relationshipType('name'));
 
     if ($viewRelationship[$this->getEntityId()]['employer_id'] == $this->getContactId()) {
       $this->assign('isCurrentEmployer', TRUE);
@@ -110,14 +113,14 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     if (($session->get('userID') == $this->getContactId()) ||
       CRM_Contact_BAO_Contact_Permission::allow($this->getContactId(), CRM_Core_Permission::EDIT)
     ) {
-      $recentOther = array(
+      $recentOther = [
         'editUrl' => CRM_Utils_System::url('civicrm/contact/view/rel',
           "action=update&reset=1&id={$viewRelationship[$this->getEntityId()]['id']}&cid={$this->getContactId()}&rtype={$rType}&context=home"
         ),
         'deleteUrl' => CRM_Utils_System::url('civicrm/contact/view/rel',
           "action=delete&reset=1&id={$viewRelationship[$this->getEntityId()]['id']}&cid={$this->getContactId()}&rtype={$rType}&context=home"
         ),
-      );
+      ];
     }
 
     $displayName = CRM_Contact_BAO_Contact::displayName($this->getContactId());
@@ -220,7 +223,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
   }
 
   public function setContext() {
-    if ($this->getContext() == 'dashboard') {
+    if ($this->getContext() === 'dashboard') {
       $url = CRM_Utils_System::url('civicrm/user', "reset=1&id={$this->getContactId()}");
     }
     else {
@@ -247,44 +250,44 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
    */
   public static function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::VIEW => array(
+      self::$_links = [
+        CRM_Core_Action::VIEW => [
           'name' => ts('View'),
           'url' => 'civicrm/contact/view/rel',
           'qs' => 'action=view&reset=1&cid=%%cid%%&id=%%id%%&rtype=%%rtype%%&selectedChild=rel',
           'title' => ts('View Relationship'),
-        ),
-        CRM_Core_Action::UPDATE => array(
+        ],
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/contact/view/rel',
           'qs' => 'action=update&reset=1&cid=%%cid%%&id=%%id%%&rtype=%%rtype%%',
           'title' => ts('Edit Relationship'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Relationship'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Relationship'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/rel',
           'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%&rtype=%%rtype%%',
           'title' => ts('Delete Relationship'),
-        ),
+        ],
         // FIXME: Not sure what to put as the key.
         // We want to use it differently later anyway (see CRM_Contact_BAO_Relationship::getRelationship). NONE should make it hidden by default.
-        CRM_Core_Action::NONE => array(
+        CRM_Core_Action::NONE => [
           'name' => ts('Manage Case'),
           'url' => 'civicrm/contact/view/case',
           'qs' => 'action=view&reset=1&cid=%%clientid%%&id=%%caseid%%',
           'title' => ts('Manage Case'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
