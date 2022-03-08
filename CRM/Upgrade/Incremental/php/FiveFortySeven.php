@@ -317,13 +317,6 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
             'domain_id' => 'current_domain',
           ],
         ],
-        'Navigation_Grants_Navigation_Grant_Reports' => [
-          'entity' => 'Navigation',
-          'values' => [
-            'name' => 'Grant Reports',
-            'domain_id' => 'current_domain',
-          ],
-        ],
       ];
       // Create an entry in civicrm_managed for each existing record that will be managed by the extension
       foreach ($managedItems as $name => $item) {
