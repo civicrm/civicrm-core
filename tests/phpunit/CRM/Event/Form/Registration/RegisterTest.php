@@ -10,21 +10,21 @@
  */
 
 /**
- * Class CRM_Event_Form_RegistrationTest
+ * Class CRM_Event_Form_Registration_RegisterTest
  * @group headless
  */
-class CRM_Event_Form_Registration_RegistrationTest extends CiviUnitTestCase {
+class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
 
   /**
-   * CRM-19626 - Test minimum value configured for priceset.
+   * CRM-19626 - Test minimum value configured for price set.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testMinValueForPriceSet() {
-    $form = new CRM_Event_Form_Registration();
-    $form->controller = new CRM_Core_Controller();
-
+  public function testMinValueForPriceSet(): void {
     $minAmt = 100;
     $feeAmt = 1000;
     $event = $this->eventCreate();
+    $form = $this->getEventForm($this->ids['event'][0]);
     $priceSetId = $this->eventPriceSetCreate($feeAmt, $minAmt);
     $priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
     $form->_values['fee'] = $form->_feeBlock = $priceSet['fields'];
@@ -55,10 +55,12 @@ class CRM_Event_Form_Registration_RegistrationTest extends CiviUnitTestCase {
 
   /**
    * event#30
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testDoubleWaitlistRegistration() {
+  public function testDoubleWaitlistRegistration(): void {
     // By default, waitlist participant statuses are disabled (which IMO is poor UX).
-    $sql = "UPDATE civicrm_participant_status_type SET is_active = 1";
+    $sql = 'UPDATE civicrm_participant_status_type SET is_active = 1';
     CRM_Core_DAO::executeQuery($sql);
 
     // Create an event, fill its participant slots.
@@ -74,14 +76,12 @@ class CRM_Event_Form_Registration_RegistrationTest extends CiviUnitTestCase {
     // Add someone to the waitlist.
     $waitlistContact = $this->individualCreate();
 
-    $firstWaitlist = $this->participantCreate(['event_id' => $event['id'], 'contact_id' => $waitlistContact, 'status_id' => 'On waitlist']);
+    $this->participantCreate(['event_id' => $event['id'], 'contact_id' => $waitlistContact, 'status_id' => 'On waitlist']);
 
     // We should now have two participants.
     $this->callAPISuccessGetCount('Participant', ['event_id' => $event['id']], 2);
 
-    $form = new CRM_Event_Form_Registration_Register();
-    $form->controller = new CRM_Core_Controller();
-    $form->set('id', $event['id']);
+    $form = $this->getEventForm($event['id']);
     $form->set('cid', $waitlistContact);
     // We SHOULD get an error when double registering a waitlisted user.
     try {
@@ -90,7 +90,19 @@ class CRM_Event_Form_Registration_RegistrationTest extends CiviUnitTestCase {
     catch (CRM_Core_Exception_PrematureExitException $e) {
       return;
     }
-    $this->fail('Waitlisted users shouldn\'t be allowed to re-register.');
+    $this->fail('Wait listed users shouldn\'t be allowed to re-register.');
+  }
+
+  /**
+   * @param int $eventID
+   *
+   * @return CRM_Event_Form_Registration_Register
+   */
+  protected function getEventForm(int $eventID): CRM_Event_Form_Registration_Register {
+    /* @var \CRM_Event_Form_Registration_Register $form */
+    $form = $this->getFormObject('CRM_Event_Form_Registration_Register');
+    $_REQUEST['id'] = $eventID;
+    return $form;
   }
 
 }
