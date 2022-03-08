@@ -50,6 +50,9 @@
           </td>
         </tr>
         <tr><td class="label">{ts}Status{/ts}</td><td>{if $row.is_active}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
+        <tr><td class="label">{ts}Created Date{/ts}</td><td>{$row.created_date|crmDate}</td></tr>
+        <tr><td class="label">{ts}Modified Date{/ts}</td><td>{$row.modified_date|crmDate}</td></tr>
+
       {/foreach}
   </table>
     {include file="CRM/Custom/Page/CustomDataView.tpl"}

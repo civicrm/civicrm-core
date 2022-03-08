@@ -1065,6 +1065,8 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
                               civicrm_relationship_type.id as civicrm_relationship_type_id,
                               civicrm_relationship.start_date as start_date,
                               civicrm_relationship.end_date as end_date,
+                              civicrm_relationship.created_date as created_date,
+                              civicrm_relationship.modified_date as modified_date,
                               civicrm_relationship.description as description,
                               civicrm_relationship.is_active as is_active,
                               civicrm_relationship.is_permission_a_b as is_permission_a_b,
@@ -1230,9 +1232,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     // building the query string
     $queryString = $select1 . $from1 . $where1 . $select2 . $from2 . $where2;
 
-    $relationship = new CRM_Contact_DAO_Relationship();
-
-    $relationship->query($queryString . $order . $limit);
+    $relationship = CRM_Core_DAO::executeQuery($queryString . $order . $limit);
     $row = [];
     if ($count) {
       $relationshipCount = 0;
@@ -1309,6 +1309,8 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         $values[$rid]['state'] = $relationship->state;
         $values[$rid]['start_date'] = $relationship->start_date;
         $values[$rid]['end_date'] = $relationship->end_date;
+        $values[$rid]['created_date'] = $relationship->created_date;
+        $values[$rid]['modified_date'] = $relationship->modified_date;
         $values[$rid]['description'] = $relationship->description;
         $values[$rid]['is_active'] = $relationship->is_active;
         $values[$rid]['is_permission_a_b'] = $relationship->is_permission_a_b;
