@@ -16,10 +16,9 @@
  * @subpackage API_Grant
  * @group headless
  */
-class api_v3_GrantTest extends \PHPUnit\Framework\TestCase implements \Civi\Test\HeadlessInterface {
+class api_v3_GrantTest extends \PHPUnit\Framework\TestCase implements \Civi\Test\HeadlessInterface, \Civi\Test\TransactionalInterface {
   use \Civi\Test\Api3TestTrait;
   use \Civi\Test\ContactTestTrait;
-
 
   protected $_apiversion = 3;
   protected $params;
@@ -48,6 +47,14 @@ class api_v3_GrantTest extends \PHPUnit\Framework\TestCase implements \Civi\Test
       'currency' => 'USD',
       'grant_type_id' => 1,
     ];
+    // Create a sample grant type
+    \CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+      'option_group_id' => 'grant_type',
+      'label' => 'Emergency',
+      'name' => 'Emergency',
+      'value' => 1,
+      'is_active' => 1,
+    ]);
   }
 
   /**
