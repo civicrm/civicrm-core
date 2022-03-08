@@ -619,6 +619,7 @@ Emerald City, Maine 90210
 
 event.info_url :' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=1
 event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=1
+event.pay_later_receipt :
 event.custom_1 :my field
 ';
   }
@@ -904,6 +905,7 @@ December 21st, 2007
       '{event.location}' => 'Event Location',
       '{event.info_url}' => 'Event Info URL',
       '{event.registration_url}' => 'Event Registration URL',
+      '{event.pay_later_receipt}' => 'Pay Later Receipt Text',
       '{event.' . $this->getCustomFieldName('text') . '}' => 'Enter text here :: Group with field text',
     ];
   }
