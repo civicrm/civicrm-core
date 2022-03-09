@@ -21,7 +21,10 @@
  */
 
 /**
- * Class CRM_Mailing_MailingSystemTest
+ * Class CRM_Mailing_MailingSystemTest.
+ *
+ * This class tests the deprecated code that we are moving
+ * away from supporting.
  *
  * MailingSystemTest checks that overall composition and delivery of
  * CiviMail blasts works. It extends CRM_Mailing_BaseMailingSystemTest
@@ -38,6 +41,9 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
   private $counts;
 
+  /**
+   * Set up the deprecated bao support.
+   */
   public function setUp(): void {
     parent::setUp();
     // If we happen to execute with flexmailer active, use BAO mode.
@@ -47,16 +53,20 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_alterMailParams',
       [$this, 'hook_alterMailParams']);
+    error_reporting(E_ALL && !E_USER_DEPRECATED);
   }
 
   /**
    * @see CRM_Utils_Hook::alterMailParams
    */
-  public function hook_alterMailParams(&$params, $context = NULL) {
+  public function hook_alterMailParams(&$params, $context = NULL): void {
     $this->counts['hook_alterMailParams'] = 1;
     $this->assertEquals('civimail', $context);
   }
 
+  /**
+   * Post test cleanup.
+   */
   public function tearDown(): void {
     global $dbLocale;
     if ($dbLocale) {
@@ -64,6 +74,30 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
     }
     parent::tearDown();
     $this->assertNotEmpty($this->counts['hook_alterMailParams']);
+  }
+
+  /**
+   * Test legacy mailer preview functionality.
+   */
+  public function testMailerPreviewExtraScheme(): void {
+    $contactID = $this->individualCreate();
+    $displayName = $this->callAPISuccess('contact', 'get', ['id' => $contactID]);
+    $displayName = $displayName['values'][$contactID]['display_name'];
+    $this->assertNotEmpty($displayName);
+
+    $params = $this->_params;
+    $params['body_html'] = '<a href="http://{action.forward}">Forward this email written in ckeditor</a>';
+    $params['api.Mailing.preview'] = [
+      'id' => '$value.id',
+      'contact_id' => $contactID,
+    ];
+    $params['options']['force_rollback'] = 1;
+
+    $result = $this->callAPISuccess('mailing', 'create', $params);
+    $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
+    $this->assertRegexp('!>Forward this email written in ckeditor</a>!', $previewResult['values']['body_html']);
+    $this->assertRegexp('!<a href="([^"]+)civicrm/mailing/forward&amp;amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
+    $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
   }
 
   // ---- Boilerplate ----
