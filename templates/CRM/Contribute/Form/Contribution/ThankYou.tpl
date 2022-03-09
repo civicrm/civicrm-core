@@ -13,7 +13,7 @@
 
 {include file="CRM/common/TrackingFields.tpl"}
 
-<div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-thankyou-form-block">
+<div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-thankyou-form-block" data-page-id="{$contributionPageID}" data-page-template="thankyou">
   {if $thankyou_text}
     <div id="thankyou_text" class="crm-section thankyou_text-section">
       {$thankyou_text}
