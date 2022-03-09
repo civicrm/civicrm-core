@@ -199,7 +199,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     $this->addRule('weight', ts('is a numeric field'), 'numeric');
 
     // is this group active ?
-    $this->addElement('checkbox', 'is_active', ts('Is this CiviCRM Profile active?'));
+    $this->addElement('advcheckbox', 'is_active', ts('Is this CiviCRM Profile active?'));
 
     $paneNames = [
       ts('Advanced Settings') => 'buildAdvanceSetting',
@@ -362,11 +362,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     else {
       // get the submitted form values.
       $params = $this->controller->exportValues($this->_name);
-
-      if (!array_key_exists('is_active', $params)) {
-        $params['is_active'] = 0;
-      }
-
       if ($this->_action & (CRM_Core_Action::UPDATE)) {
         $params['id'] = $this->_id;
         // CRM-5284
