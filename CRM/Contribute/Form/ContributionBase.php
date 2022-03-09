@@ -365,7 +365,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
       // this avoids getting E_NOTICE errors in php
       $setNullFields = [
-        'amount_block_is_active',
         'is_allow_other_amount',
         'footer_text',
       ];
@@ -450,16 +449,15 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     // check if one of the (amount , membership)  blocks is active or not.
     $this->_membershipBlock = $this->get('membershipBlock');
 
-    if (!$this->_values['amount_block_is_active'] &&
+    if (!$this->isFormSupportsNonMembershipContributions() &&
       !$this->_membershipBlock['is_active'] &&
       !$this->_priceSetId
     ) {
       CRM_Core_Error::statusBounce(ts('The requested online contribution page is missing a required Contribution Amount section or Membership section or Price Set. Please check with the site administrator for assistance.'));
     }
-
-    if ($this->_values['amount_block_is_active']) {
-      $this->set('amount_block_is_active', $this->_values['amount_block_is_active']);
-    }
+    // This can probably go as nothing it 'getting it' anymore since the values data is loaded
+    // on every form, rather than being passed from form to form.
+    $this->set('amount_block_is_active', $this->isFormSupportsNonMembershipContributions());
 
     $this->_contributeMode = $this->get('contributeMode');
     $this->assign('contributeMode', $this->_contributeMode);
@@ -1240,6 +1238,24 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     if (count($autoRenew) > 1) {
       $params['autoRenew'] = $autoRenew;
     }
+  }
+
+  /**
+   * Is payment for (non membership) contributions enabled on this form.
+   *
+   * This would be true in a case of contributions only or where both
+   * memberships and non-membership contributions are enabled (whether they
+   * are using quick config price sets or explicit price sets).
+   *
+   * The value is a database value in the config for the contribution page. It
+   * is loaded into values in ContributionBase::preProcess (called by this).
+   *
+   * @internal function is public to support validate but is for core use only.
+   *
+   * @return bool
+   */
+  public function isFormSupportsNonMembershipContributions(): bool {
+    return (bool) ($this->_values['amount_block_is_active'] ?? FALSE);
   }
 
 }
