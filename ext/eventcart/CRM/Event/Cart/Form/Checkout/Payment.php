@@ -558,8 +558,8 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
 
     $trxnDetails = [
       'trxn_id' => $result['trxn_id'],
-      'trxn_date' => $result['now'],
-      'currency' => $result['currencyID'] ?? NULL,
+      'trxn_date' => $params['receive_date'] ?? date('YmdHis'),
+      'currency' => $params['currencyID'],
     ];
     return $trxnDetails;
   }
