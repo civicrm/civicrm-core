@@ -663,9 +663,10 @@ WHERE  contribution_id = {$id}
       }
       //here we are setting up the billing contact - if different from the member they are already created
       // but they will get billing details assigned
+      $addressParams['contact_id'] = $this->_contributorContactID;
       CRM_Contact_BAO_Contact::createProfileContact($addressParams, $fields,
         $this->_contributorContactID, NULL, NULL,
-        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type')
+        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contributorContactID, 'contact_type')
       );
     }
 

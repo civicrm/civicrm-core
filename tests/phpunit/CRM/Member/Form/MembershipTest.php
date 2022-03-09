@@ -1377,6 +1377,7 @@ Expires: ',
     // register for both of these memberships via backoffice membership form submission
     $params = [
       'cid' => $contactId,
+      'contact_id' => $contactId,
       'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
