@@ -213,34 +213,6 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
             'name' => 'grant_type',
           ],
         ],
-        'OptionGroup_grant_type_OptionValue_Emergency' => [
-          'entity' => 'OptionValue',
-          'values' => [
-            'option_group_id:name' => 'grant_type',
-            'name' => 'Emergency',
-          ],
-        ],
-        'OptionGroup_grant_type_OptionValue_Family Support' => [
-          'entity' => 'OptionValue',
-          'values' => [
-            'option_group_id:name' => 'grant_type',
-            'name' => 'Family Support',
-          ],
-        ],
-        'OptionGroup_grant_type_OptionValue_General Protection' => [
-          'entity' => 'OptionValue',
-          'values' => [
-            'option_group_id:name' => 'grant_type',
-            'name' => 'General Protection',
-          ],
-        ],
-        'OptionGroup_grant_type_OptionValue_Impunity' => [
-          'entity' => 'OptionValue',
-          'values' => [
-            'option_group_id:name' => 'grant_type',
-            'name' => 'Impunity',
-          ],
-        ],
         'OptionGroup_report_template_OptionValue_CRM_Report_Form_Grant_Detail' => [
           'entity' => 'OptionValue',
           'values' => [
@@ -304,13 +276,6 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
           'entity' => 'Navigation',
           'values' => [
             'name' => 'Grant Status',
-            'domain_id' => 'current_domain',
-          ],
-        ],
-        'Navigation_Grants_Navigation_Grant_Reports' => [
-          'entity' => 'Navigation',
-          'values' => [
-            'name' => 'Grant Reports',
             'domain_id' => 'current_domain',
           ],
         ],
