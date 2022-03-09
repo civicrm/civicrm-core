@@ -190,16 +190,16 @@
                         {* Skip price field label for quick_config price sets since it duplicates $event.fee_label *}
                       {else}
                       <tr>
-                          <td class="{$lClass} crm-event-label">{$feeBlock.label.$idx}</td>
-                          {if $isPriceSet & $feeBlock.isDisplayAmount.$idx}
-            <td class="fee_amount-value right">
-                              {if $feeBlock.tax_amount && $feeBlock.tax_amount.$idx}
-          {$feeBlock.value.$idx}
-                              {else}
-                {$feeBlock.value.$idx|crmMoney}
-                              {/if}
-            </td>
-                          {/if}
+                        <td class="{$lClass} crm-event-label">{$feeBlock.label.$idx}</td>
+                        {if $isPriceSet & $feeBlock.isDisplayAmount.$idx}
+                          <td class="fee_amount-value right">
+                            {if $feeBlock.tax_amount && $feeBlock.tax_amount.$idx}
+                              {$feeBlock.value.$idx}
+                            {else}
+                              {$feeBlock.value.$idx|crmMoney:$eventCurrency}
+                            {/if}
+                          </td>
+                        {/if}
                       </tr>
                       {/if}
                   {/foreach}

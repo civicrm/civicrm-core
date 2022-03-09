@@ -58,6 +58,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
     //retrieve event information
     $params = ['id' => $this->_id];
+    $values = ['event' => NULL];
     CRM_Event_BAO_Event::retrieve($params, $values['event']);
 
     if (!$values['event']['is_active']) {
@@ -84,9 +85,11 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
     $values['event']['event_tz'] = CRM_Core_SelectValues::timezone()[$values['event']['event_tz']];
 
+    $eventCurrency = CRM_Utils_Array::value('currency', $values['event'], $config->defaultCurrency);
+    $this->assign('eventCurrency', $eventCurrency);
+
     // show event fees.
     if ($this->_id && !empty($values['event']['is_monetary'])) {
-      CRM_Contribute_BAO_Contribution_Utils::overrideDefaultCurrency($values['event']);
 
       //CRM-10434
       $discountId = CRM_Core_BAO_Discount::findSet($this->_id, 'civicrm_event');
@@ -145,7 +148,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
               $values['feeBlock']['isDisplayAmount'][$fieldCnt] = $fieldValues['is_display_amounts'] ?? NULL;
               if (Civi::settings()->get('invoicing') && isset($optionVal['tax_amount'])) {
-                $values['feeBlock']['value'][$fieldCnt] = CRM_Price_BAO_PriceField::getTaxLabel($optionVal, 'amount', $displayOpt, $taxTerm);
+                $values['feeBlock']['value'][$fieldCnt] = CRM_Price_BAO_PriceField::getTaxLabel($optionVal, 'amount', $displayOpt, $taxTerm, $eventCurrency);
                 $values['feeBlock']['tax_amount'][$fieldCnt] = $optionVal['tax_amount'];
               }
               else {
