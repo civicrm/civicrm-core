@@ -340,6 +340,51 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
   }
 
+  public function testGetAllContactMembership() {
+    $lifetimeTypeId = $this->membershipTypeCreate([
+      'name' => 'Lifetime',
+      'duration_unit' => 'lifetime',
+    ]);
+
+    // Contact 1 tests the "lifetimeOnly" code path.
+    $contactId = $this->individualCreate();
+
+    $pendingStatusId = array_search('Pending', CRM_Member_PseudoConstant::membershipStatus());
+    $cancelledStatusId = array_search('Cancelled', CRM_Member_PseudoConstant::membershipStatus());
+    $currentStatusId = array_search('Current', CRM_Member_PseudoConstant::membershipStatus());
+    $params = [
+      'contact_id' => $contactId,
+      'membership_type_id' => $this->_membershipTypeID,
+      'source' => 'Payment',
+      'is_override' => 1,
+      'status_id' => $pendingStatusId,
+    ];
+
+    CRM_Member_BAO_Membership::create($params);
+    $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id', 'contact_id', 'Database check for created membership.');
+    $memberships = CRM_Member_BAO_Membership::getAllContactMembership($contactId, FALSE, TRUE);
+    $this->assertEmpty($memberships, 'Verify pending membership is NOT retrieved.');
+    $this->membershipDelete($membershipId);
+
+    $params['status_id'] = $cancelledStatusId;
+    CRM_Member_BAO_Membership::create($params);
+    $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id', 'contact_id', 'Database check for created membership.');
+    $memberships = CRM_Member_BAO_Membership::getAllContactMembership($contactId, FALSE, TRUE);
+    $this->assertEmpty($memberships, 'Verify cancelled membership is NOT retrieved.');
+    $this->membershipDelete($membershipId);
+
+    // Lifetime membership.
+    $params['status_id'] = $currentStatusId;
+    $params['membership_type_id'] = $lifetimeTypeId;
+    CRM_Member_BAO_Membership::create($params);
+    $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id', 'contact_id', 'Database check for created membership.');
+    $memberships = CRM_Member_BAO_Membership::getAllContactMembership($contactId, FALSE, TRUE);
+    $this->assertEquals($membershipId, $memberships[$lifetimeTypeId]['id'], 'Verify current (lifetime) membership IS retrieved.');
+    $this->membershipDelete($membershipId);
+
+    $this->contactDelete($contactId);
+  }
+
   /**
    * Get the contribution.
    * page id from the membership record

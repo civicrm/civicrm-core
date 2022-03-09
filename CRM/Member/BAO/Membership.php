@@ -2362,8 +2362,7 @@ WHERE {$whereClause}";
   }
 
   /**
-   * Returns the membership types for a particular contact
-   * who has lifetime membership without end date.
+   * Returns the membership types for a contact, optionally filtering to lifetime memberships only.
    *
    * @param int $contactID
    * @param bool $isTest
@@ -2371,33 +2370,26 @@ WHERE {$whereClause}";
    *
    * @return array
    */
-  public static function getAllContactMembership($contactID, $isTest = FALSE, $onlyLifeTime = FALSE) {
+  public static function getAllContactMembership($contactID, $isTest = FALSE, $onlyLifeTime = FALSE) : array {
     $contactMembershipType = [];
     if (!$contactID) {
       return $contactMembershipType;
     }
 
-    $dao = new CRM_Member_DAO_Membership();
-    $dao->contact_id = $contactID;
-    $pendingStatusId = array_search('Pending', CRM_Member_PseudoConstant::membershipStatus());
-    $dao->whereAdd("status_id != $pendingStatusId");
-
-    if ($isTest) {
-      $dao->is_test = $isTest;
-    }
-    else {
-      $dao->whereAdd('is_test IS NULL OR is_test = 0');
-    }
+    $membershipQuery = \Civi\Api4\Membership::get(FALSE)
+      ->addWhere('contact_id', '=', $contactID)
+      ->addWhere('status_id:name', '<>', 'Pending')
+      ->addWhere('is_test', '=', $isTest)
+      //CRM-4297
+      ->addOrderBy('end_date', 'DESC');
 
     if ($onlyLifeTime) {
-      $dao->whereAdd('end_date IS NULL');
+      // membership#14 - use duration_unit for calculating lifetime, not join/end date.
+      $membershipQuery->addWhere('membership_type_id.duration_unit', '=', 'lifetime');
     }
-
-    $dao->find();
-    while ($dao->fetch()) {
-      $membership = [];
-      CRM_Core_DAO::storeValues($dao, $membership);
-      $contactMembershipType[$dao->membership_type_id] = $membership;
+    $memberships = $membershipQuery->execute();
+    foreach ($memberships as $membership) {
+      $contactMembershipType[$membership['membership_type_id']] = $membership;
     }
     return $contactMembershipType;
   }
