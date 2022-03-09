@@ -104,7 +104,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
         $row['preferred_communication_method'] = implode(', ', $temp);
       }
       $row['id'] = $id;
-      $formatted = CRM_Utils_Address::format($row, 'mailing_format', FALSE, TRUE, $tokenFields);
+      $formatted = CRM_Utils_Address::formatMailingLabel($row, 'mailing_format', FALSE, TRUE, $tokenFields);
       $rows[$id] = [$formatted];
     }
     if ($isPerMembership) {
