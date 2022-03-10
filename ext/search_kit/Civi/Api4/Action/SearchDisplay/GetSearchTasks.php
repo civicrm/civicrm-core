@@ -120,6 +120,16 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
           ],
         ];
       }
+      if (\CRM_Core_Component::isEnabled('CiviMail') && (
+        \CRM_Core_Permission::access('CiviMail') || !$this->checkPermissions ||
+        (\CRM_Mailing_Info::workflowEnabled() && \CRM_Core_Permission::check('create mailings'))
+      )) {
+        $tasks[$entity['name']]['contact.mailing'] = [
+          'title' => E::ts('Email - schedule/send via CiviMail'),
+          'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskMailing.html'],
+          'icon' => 'fa-paper-plane',
+        ];
+      }
     }
 
     if ($entity['name'] === 'Contribution') {

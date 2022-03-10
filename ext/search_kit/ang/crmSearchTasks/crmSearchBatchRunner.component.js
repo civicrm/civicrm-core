@@ -27,6 +27,9 @@
         EST_BATCH_TIME = 5;
 
       this.$onInit = function() {
+        if (ctrl.action === 'create') {
+          ctrl.ids = [0];
+        }
         totalBatches = Math.ceil(ctrl.ids.length / BATCH_SIZE);
         runBatch();
       };
@@ -50,7 +53,7 @@
               records.push(record);
             });
           });
-        } else {
+        } else if (ctrl.action !== 'create') {
           // For other batch actions (update, delete), add supplied ids to the where clause
           params.where = params.where || [];
           params.where.push([ctrl.idField || 'id', 'IN', ctrl.ids.slice(ctrl.first, ctrl.last)]);
@@ -60,7 +63,9 @@
             stopIncrementer();
             ctrl.progress = Math.floor(100 * ++currentBatch / totalBatches);
             if (ctrl.last >= ctrl.ids.length) {
-              $timeout(ctrl.success, 500);
+              $timeout(function() {
+                ctrl.success({result: result});
+              }, 500);
             } else {
               runBatch();
             }
