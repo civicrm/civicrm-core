@@ -2362,9 +2362,24 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         // @todo move premium processing to complete transaction if it truly is an 'after' action.
         $this->postProcessPremium($premiumParams, $result['contribution']);
       }
-      if (!empty($result['contribution'])) {
+      if (!empty($result['contribution']) && (($result['payment_status_id'] ?? NULL) == 1)) {
         // It seems this line is hit when there is a zero dollar transaction & in tests, not sure when else.
-        $this->completeTransaction($result, $result['contribution']->id);
+        try {
+          $result = civicrm_api3('Payment', 'create', [
+            'contribution_id' => $result['contribution']->id,
+            'trxn_id' => $result['trxn_id'] ?? NULL,
+            'payment_processor_id' => $result['payment_processor_id'] ?? $this->_paymentProcessor['id'],
+            'total_amount' => $result['contribution']->total_amount,
+            'fee_amount' => $result['fee_amount'] ?? NULL,
+            'trxn_date' => $result['receive_date'] ?? NULL,
+            'card_type_id' => $result['card_type_id'] ?? NULL,
+            'pan_truncation' => $result['pan_truncation'] ?? NULL,
+          ]);
+        }
+        catch (CiviCRM_API3_Exception $e) {
+          \Civi::log()->error("ContributionID: {$result['contribution']->id}: CRM_Contribute_Form_Contribution_Confirm::PaymentCreate CiviCRM_API3_Exception: " . $e->getMessage());
+          throw new CRM_Core_Exception('Failed to update contribution in database');
+        }
       }
       return $result;
     }
