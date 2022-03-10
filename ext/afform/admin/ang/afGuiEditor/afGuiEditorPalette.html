@@ -22,11 +22,11 @@
           <span>{{ display.settings.label }}</span>
         </a>
       </li>
-      <li role="presentation" class="dropdown" ng-if="editor.allowEntityConfig" title="{{:: ts('Add Entity') }}">
+      <li role="presentation" class="dropdown" ng-if="editor.allowEntityConfig" title="{{:: ts('Add Entity') }}" af-gui-menu>
         <a href class="dropdown-toggle" data-toggle="dropdown">
           <i class="crm-i fa-plus"></i>
         </a>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu" ng-if="menu.open">
           <li ng-repeat="(entityName, entity) in editor.meta.entities" ng-if="entity.defaults">
             <a href ng-click="editor.addEntity(entityName, true)">
               <i class="crm-i {{:: entity.icon }}"></i>
@@ -35,11 +35,11 @@
           </li>
         </ul>
       </li>
-      <li role="presentation" class="dropdown" ng-if="editor.getFormType() === 'search'" title="{{:: ts('Add Search') }}">
+      <li role="presentation" class="dropdown" ng-if="editor.getFormType() === 'search'" title="{{:: ts('Add Search') }}" af-gui-menu>
         <a href class="dropdown-toggle" data-toggle="dropdown" ng-click="editor.getSearchDisplaySelector();">
           <i class="crm-i fa-plus"></i>
         </a>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu" ng-if="menu.open">
           <li ng-class="{disabled: !editor.searchOptions || !editor.searchOptions.length}">
             <input ng-if="editor.searchOptions && editor.searchOptions.length" type="search" class="form-control" placeholder="&#xf002" ng-model="searchDisplayListFilter.label">
             <a href ng-if="!editor.searchOptions"><i class="crm-i fa-spinner fa-spin"></i></a>
