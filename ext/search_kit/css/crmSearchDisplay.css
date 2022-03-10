@@ -16,6 +16,10 @@
   border-color: #8a1f11;
 }
 
+#bootstrap-theme #crm-search-results-page-size {
+  width: 60px;
+}
+
 /* Loading placeholders */
 #bootstrap-theme .crm-search-loading-placeholder {
   height: 2em;
