@@ -2259,7 +2259,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
     $sel2['Campaign'] = $campaignTypes;
     $sel2['Membership'] = $membershipType;
     $sel2['ParticipantRole'] = $participantRole;
-    $sel2['ParticipantEventName'] = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
+    $sel2['ParticipantEventName'] = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template != 1 )");
     $sel2['ParticipantEventType'] = $eventType;
     $sel2['Contribution'] = CRM_Contribute_PseudoConstant::financialType();
     $sel2['Relationship'] = CRM_Custom_Form_Group::getRelationshipTypes();
