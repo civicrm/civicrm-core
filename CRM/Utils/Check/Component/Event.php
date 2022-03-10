@@ -6,6 +6,13 @@
 class CRM_Utils_Check_Component_Event extends CRM_Utils_Check_Component {
 
   /**
+   * @inheritDoc
+   */
+  public function isEnabled() {
+    return CRM_Core_Component::isEnabled('CiviEvent');
+  }
+
+  /**
    * Check events have timezone set.
    *
    * @return CRM_Utils_Check_Message[]
