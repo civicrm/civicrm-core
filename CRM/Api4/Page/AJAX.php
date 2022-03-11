@@ -142,6 +142,12 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
     }
     unset($vals['rowCount']);
     $vals['count'] = $result->count();
+    $vals['countFetched'] = $result->countFetched();
+    if (in_array('row_count', $params['select'] ?? [])) {
+      // We can only return countMatched (whose value is independent of LIMIT clauses) if row_count was in the select.
+      $vals['countMatched'] = $result->count();
+    }
+
     return $vals;
   }
 
