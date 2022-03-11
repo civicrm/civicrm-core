@@ -235,46 +235,57 @@ London, 90210
   }
 
   /**
-   * Test rendering of smarty tokens.
+   * Test rendering of Smarty and tplParams tokens.
+   *
+   * Note: tplParams is a quirk of api3 MessageTemplate.send that enables
+   * replacement of {$namedPattern} by including an api3 parameter like
+   * 'template_params' => ['namedPattern' => 'replacement text']
+   *
+   * Smarty can do a whole lot more, e.g. conditional logic.
    *
    * @throws \CRM_Core_Exception
    */
   public function testRenderTemplateSmarty(): void {
+    // {$one+2} is a Smarty expression, where as {$tplParam1} is valid for either Smarty or a straight tplParams
+    $templateWithSmartyAndTplVars = '1 + 2 = {$one+2} {$tplParam1}';
     $messageContent = CRM_Core_BAO_MessageTemplate::renderTemplate([
       'valueName' => 'dummy',
       'messageTemplate' => [
-        'msg_html' => '{$tokenString}',
+        'msg_html' => $templateWithSmartyAndTplVars,
         // Check the space is stripped.
-        'msg_subject' => '{$tokenString} ',
-        'msg_text' => '{$tokenString}',
+        'msg_subject' => $templateWithSmartyAndTplVars . ' ',
+        'msg_text' => $templateWithSmartyAndTplVars,
       ],
-      'tplParams' => ['tokenString' => 'Something really witty'],
+      'tplParams' => ['tplParam1' => 'Something really witty', 'one' => 1],
     ]);
-    $this->assertEquals('Something really witty', $messageContent['text']);
-    $this->assertEquals('Something really witty', $messageContent['html']);
-    $this->assertEquals('Something really witty', $messageContent['subject']);
+    $this->assertEquals('1 + 2 = 3 Something really witty', $messageContent['text']);
+    $this->assertEquals('1 + 2 = 3 Something really witty', $messageContent['html']);
+    $this->assertEquals('1 + 2 = 3 Something really witty', $messageContent['subject']);
   }
 
   /**
-   * Test rendering of smarty tokens.
+   * Test rendering of tplParams tokens without smarty.
    *
    */
   public function testRenderTemplateIgnoreSmarty(): void {
+    $templateWithSmartyAndTplVars = '1 + 2 = {$one+2} {$tplParam1}';
     $messageContent = CRM_Core_BAO_MessageTemplate::renderTemplate([
       'valueName' => 'dummy',
       'messageTemplate' => [
-        'msg_html' => '{$tokenString}',
+        'msg_html' => $templateWithSmartyAndTplVars,
         // Check the space is stripped.
-        'msg_subject' => '{$tokenString} ',
-        'msg_text' => '{$tokenString}',
+        'msg_subject' => $templateWithSmartyAndTplVars . ' ',
+        'msg_text' => $templateWithSmartyAndTplVars,
       ],
       'disableSmarty' => TRUE,
-      'tplParams' => ['tokenString' => 'Something really witty'],
+      'tplParams' => ['tplParam1' => 'Something really witty', 'one' => 1],
     ]);
 
-    $this->assertEquals('{$tokenString}', $messageContent['text']);
-    $this->assertEquals('{$tokenString}', $messageContent['html']);
-    $this->assertEquals('{$tokenString}', $messageContent['subject']);
+    // Without Smarty, we expect our tplParam substitutions to have been done, but that the
+    // Smarty expression is left as was.
+    $this->assertEquals('1 + 2 = {$one+2} Something really witty', $messageContent['text']);
+    $this->assertEquals('1 + 2 = {$one+2} Something really witty', $messageContent['html']);
+    $this->assertEquals('1 + 2 = {$one+2} Something really witty', $messageContent['subject']);
   }
 
   /**

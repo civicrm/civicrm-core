@@ -356,13 +356,26 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
     $params = array_merge($modelDefaults, $viewDefaults, $envelopeDefaults, $params);
 
     CRM_Utils_Hook::alterMailParams($params, 'messageTemplate');
-    $mailContent = self::loadTemplate((string) $params['valueName'], $params['isTest'], $params['messageTemplateID'] ?? NULL, $params['groupName'] ?? '', $params['messageTemplate'], $params['subject'] ?? NULL);
+    $mailContent = self::loadTemplate((string) $params['valueName'], (bool) $params['isTest'], $params['messageTemplateID'] ?? NULL, $params['groupName'] ?? '', $params['messageTemplate'], $params['subject'] ?? NULL);
 
     $sync();
+    $disableSmarty = !empty($params['disableSmarty']);
     $rendered = CRM_Core_TokenSmarty::render(CRM_Utils_Array::subset($mailContent, ['text', 'html', 'subject']), $params['tokenContext'], $params['tplParams']);
     if (isset($rendered['subject'])) {
       $rendered['subject'] = trim(preg_replace('/[\r\n]+/', ' ', $rendered['subject']));
     }
+
+    if ($disableSmarty && !empty($params['tplParams'])) {
+      // Honor template_params/tplParams API without Smarty.
+      $replacements = [];
+      foreach ($params['tplParams'] as $k => $v) {
+        $replacements['{$' . $k . '}'] = $v;
+      }
+      foreach (['subject', 'html', 'text'] as $_) {
+        $rendered[$_] = strtr($rendered[$_], $replacements);
+      }
+    }
+
     $nullSet = ['subject' => NULL, 'text' => NULL, 'html' => NULL];
     $mailContent = array_merge($nullSet, $mailContent, $rendered);
     return [$mailContent, $params];
