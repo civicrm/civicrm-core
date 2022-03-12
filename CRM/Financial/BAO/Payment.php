@@ -279,10 +279,6 @@ class CRM_Financial_BAO_Payment {
 
     $entities = self::loadRelatedEntities($params['id']);
 
-    if (!empty($entities['event'])) {
-      CRM_Event_BAO_Event::setOutputTimeZone($entities['event']);
-    }
-
     $sendTemplateParams = [
       'groupName' => 'msg_tpl_workflow_contribution',
       'valueName' => 'payment_or_refund_notification',
