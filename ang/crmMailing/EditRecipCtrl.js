@@ -25,7 +25,7 @@
     $scope.getRecipientsEstimate = function() {
       var ts = $scope.ts;
       if ($scope.recipients === null) {
-        return ts('Estimating...');
+        return ts('Estimating') + ' <i class="fa fa-spinner fa-spin"></i>';
       }
       if ($scope.recipients === 0) {
         return ts('Estimate recipient count');
@@ -45,7 +45,7 @@
         return ts('(unknown)');
       }
       else {
-        return $scope.permitRecipientRebuild ? ts('(unknown)') : ts('Estimating...');
+        return $scope.permitRecipientRebuild ? ts('(unknown)') : ts('Estimating') + ' <i class="fa fa-spinner fa-spin"></i>';
       }
     };
 
