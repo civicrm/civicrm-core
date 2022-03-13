@@ -754,6 +754,7 @@ SET    version = '$version'
       $versionObject->$phpFunctionName($rev, $originalVer, $latestVer);
     }
     else {
+      $ctx->log->info("Upgrade DB to $rev: SQL");
       $upgrade->processSQL($rev);
     }
 
