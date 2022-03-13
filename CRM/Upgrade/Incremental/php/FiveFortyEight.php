@@ -49,6 +49,16 @@ class CRM_Upgrade_Incremental_php_FiveFortyEight extends CRM_Upgrade_Incremental
   }
 
   /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_5_48_beta1($rev): void {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+  }
+
+  /**
    * The `is_autorun` column was introduced in 5.47,  but we didn't finish adding the
    * additional changes to use, so there shouldn't be any real usage. But just to be
    * paranoid, we'll convert to 5.48's `runner`.
