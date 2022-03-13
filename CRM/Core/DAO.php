@@ -82,6 +82,10 @@ class CRM_Core_DAO extends DB_DataObject {
     QUERY_FORMAT_NO_QUOTES = 2,
 
     /**
+     * No serialization.
+     */
+    SERIALIZE_NONE = 0,
+    /**
      * Serialized string separated by and bookended with VALUE_SEPARATOR
      */
     SERIALIZE_SEPARATOR_BOOKEND = 1,
