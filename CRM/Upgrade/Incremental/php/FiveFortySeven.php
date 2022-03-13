@@ -116,6 +116,9 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
       }
       CRM_Core_DAO::executeQuery("DELETE FROM civicrm_component WHERE name = 'CiviGrant'", [], TRUE, NULL, FALSE, FALSE);
     }
+    // Reload the civi cache here as 'table_name' may not be in the cached entities
+    // array generated in an earlier version retrieved via $cache->get('api4.entities.info', []);
+    Civi::cache('metadata')->flush();
 
     // There are existing records which should be managed by `civigrant`. To assign ownership, we need
     // placeholders in `civicrm_extension` and `civicrm_managed`.
