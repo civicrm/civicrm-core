@@ -22,5 +22,6 @@ namespace Civi\Api4;
  */
 class UFField extends Generic\DAOEntity {
   use Generic\Traits\SortableEntity;
+  use Generic\Traits\ManagedEntity;
 
 }
