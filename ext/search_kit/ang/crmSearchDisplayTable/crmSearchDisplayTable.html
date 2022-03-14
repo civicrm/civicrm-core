@@ -6,9 +6,7 @@
   <table class="{{:: $ctrl.settings.classes.join(' ') }}">
     <thead>
       <tr>
-        <th class="crm-search-result-select" ng-if=":: $ctrl.settings.actions || $ctrl.settings.draggable">
-          <i ng-if=":: $ctrl.settings.draggable" class="crm-i fa-sort-amount-asc" title="{{:: ts('Drag columns to reposition') }}"></i>
-          <input type="checkbox" ng-if=":: $ctrl.settings.actions" ng-disabled="$ctrl.loading || !$ctrl.results.length" ng-checked="$ctrl.allRowsSelected" ng-click="$ctrl.selectAllRows()" >
+        <th ng-class="{'crm-search-result-select': $ctrl.settings.actions}" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTaskHeader.html'" ng-if=":: $ctrl.settings.actions || $ctrl.settings.draggable">
         </th>
         <th ng-repeat="col in $ctrl.settings.columns" ng-click="$ctrl.setSort(col, $event)" class="{{:: $ctrl.isSortable(col) ? 'crm-sortable-col' : ''}}" title="{{:: $ctrl.isSortable(col) ? ts('Click to sort results (shift-click to sort by multiple).') : '' }}">
           <i ng-if=":: $ctrl.isSortable(col)" class="crm-i {{ $ctrl.getSort(col) }}"></i>
