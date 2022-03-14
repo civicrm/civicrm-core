@@ -945,9 +945,12 @@ function civicrm_api3_contact_getquick($params) {
   else {
     $strSearch = "$name%";
   }
-  $includeEmailFrom = $includeNickName = '';
+  $includeEmailFrom = $includeNickName = $includeLegalName = '';
   if ($config->includeNickNameInName) {
     $includeNickName = " OR nick_name LIKE '$strSearch'";
+  }
+  if ($config->includeLegalNameInName) {
+    $includeLegalName = " OR legal_name LIKE '$strSearch'";
   }
   $where = ' AND ' . implode(' AND ', $whereClauses);
   if (isset($customOptionsWhere)) {
@@ -962,7 +965,7 @@ function civicrm_api3_contact_getquick($params) {
     }
   }
   else {
-    $whereClause = " WHERE ( sort_name LIKE '$strSearch' $includeNickName ) {$where} ";
+    $whereClause = " WHERE ( sort_name LIKE '$strSearch' $includeNickName $includeLegalName ) {$where} ";
     if ($config->includeEmailInName) {
       if (!in_array('email', $list)) {
         $includeEmailFrom = "LEFT JOIN civicrm_email eml ON ( cc.id = eml.contact_id AND eml.is_primary = 1 )";

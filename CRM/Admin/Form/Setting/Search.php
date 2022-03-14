@@ -26,6 +26,7 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
     'includeEmailInName' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'searchPrimaryDetailsOnly' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'includeNickNameInName' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'includeLegalNameInName' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'includeAlphabeticalPager' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'includeOrderByClause' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'defaultSearchProfileID' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,

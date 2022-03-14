@@ -137,6 +137,7 @@ class CRM_Core_Config_MagicMerge {
       'includeAlphabeticalPager' => ['setting'],
       'includeEmailInName' => ['setting'],
       'includeNickNameInName' => ['setting'],
+      'includeLegalNameInName' => ['setting'],
       'includeOrderByClause' => ['setting'],
       'includeWildCardInName' => ['setting'],
       'inheritLocale' => ['setting'],
