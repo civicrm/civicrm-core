@@ -3923,3 +3923,23 @@ span.crm-status-icon {
 .crm-search-display-grid-layout-5 {
   grid-template-columns: repeat(5, 1fr);
 }
+
+/* Dedupe rules */
+.crm-dedupe-rules-form-block-used div {
+  max-width: 800px;
+}
+.crm-dedupe-rules-form-block-used p:first-child {
+  margin-top: 0;
+}
+.dedupe-rules-dialog [type=radio] {
+  margin-top: 4px;
+}
+.dedupe-rules-dialog p:first-child {
+  margin-top: 0;
+}
+.dedupe-rules-dialog input[type=radio] {
+  float: left;
+}
+.dedupe-rules-dialog label > * {
+  margin-left: 30px;
+}
