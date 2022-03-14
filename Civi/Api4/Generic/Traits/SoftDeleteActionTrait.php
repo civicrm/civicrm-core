@@ -12,11 +12,11 @@
 namespace Civi\Api4\Generic\Traits;
 
 /**
- * This trait is used by entities with a "move to trash" option.
+ * This trait is used by delete actions with a "move to trash" option.
  * @method $this setUseTrash(bool $useTrash) Pass FALSE to force delete and bypass trash
  * @method bool getUseTrash()
  */
-trait SoftDeleteEntity {
+trait SoftDeleteActionTrait {
 
   /**
    * Should $ENTITY be moved to the trash instead of permanently deleted?
