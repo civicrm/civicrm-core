@@ -611,11 +611,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * This virtual function is used to set the default values of various form elements.
    *
-   * @return array|NULL
+   * @return array
    *   reference to the array of default values
    */
   public function setDefaultValues() {
-    return NULL;
+    return [];
   }
 
   /**
