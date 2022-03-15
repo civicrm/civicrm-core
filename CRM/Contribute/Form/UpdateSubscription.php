@@ -151,9 +151,17 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     if (count($lineItems) > 1) {
       $amtAttr += ['readonly' => TRUE];
     }
-    $this->addMoney('amount', ts('Recurring Contribution Amount'), TRUE, $amtAttr,
+    $amountField = $this->addMoney('amount', ts('Recurring Contribution Amount'), TRUE, $amtAttr,
       TRUE, 'currency', $this->_subscriptionDetails->currency, TRUE
     );
+
+    // The amount on the recurring contribution should not be updated directly. If we update the amount using a template contribution the recurring contribution
+    //   will be updated automatically.
+    $paymentProcessorObj = Civi\Payment\System::singleton()->getById(CRM_Contribute_BAO_ContributionRecur::getPaymentProcessorID($this->contributionRecurID));
+    $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($this->contributionRecurID);
+    if (!empty($templateContribution['id']) && $paymentProcessorObj->supportsEditRecurringContribution()) {
+      $amountField->freeze();
+    }
 
     $this->add('text', 'installments', ts('Number of Installments'), ['size' => 20], FALSE);
 
