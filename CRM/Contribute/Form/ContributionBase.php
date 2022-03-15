@@ -128,6 +128,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   public $_contactID;
 
+  /**
+   * Kept only for backwards compatibility. Alias for _contactID
+   * @var int
+   */
   protected $_userID;
 
   /**
@@ -230,22 +234,20 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @throws \Exception
    */
   public function preProcess() {
-
     // current contribution page id
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_ccid = CRM_Utils_Request::retrieve('ccid', 'Positive', $this);
+
     if (!$this->_id) {
       // seems like the session is corrupted and/or we lost the id trail
       // lets just bump this to a regular session error and redirect user to main page
       $this->controller->invalidKeyRedirect();
     }
+
     $this->_emailExists = $this->get('emailExists');
-
-    // this was used prior to the cleverer this_>getContactID - unsure now
-    $this->_userID = CRM_Core_Session::getLoggedInContactID();
-
-    $this->_contactID = $this->_membershipContactID = $this->getContactID();
+    $this->_userID = $this->_contactID = $this->_membershipContactID = $this->getContactID();
     $this->_mid = NULL;
+
     if ($this->_contactID) {
       $this->_mid = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
       if ($this->_mid) {
