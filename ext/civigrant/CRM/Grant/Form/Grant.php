@@ -92,7 +92,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
    */
   public function setDefaultValues() {
 
-    $defaults = parent::setDefaultValues();
+    $defaults = parent::setDefaultValues() ?? [];
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return $defaults;
