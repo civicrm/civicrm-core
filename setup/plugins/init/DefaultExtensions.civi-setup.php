@@ -2,10 +2,7 @@
 /**
  * @file
  *
- * This is an example plugin which manipulates the installation options.
- *
- * Note: The filename `Example.disabled.php` indicates that the example is
- * a disabled. A real plugin must end in `*.civi-setup.php`.
+ * Choose some extensions to auto-install.
  */
 
 if (!defined('CIVI_SETUP')) {
@@ -16,7 +13,6 @@ if (!defined('CIVI_SETUP')) {
   ->addListener('civi.setup.init', function (\Civi\Setup\Event\InitEvent $e) {
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'init'));
 
-    // Activate some extensions during installation.
     $e->getModel()->extensions[] = 'org.civicrm.search_kit';
 
   });
