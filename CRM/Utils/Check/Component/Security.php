@@ -293,6 +293,33 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
   }
 
   /**
+   * Check to see if anonymous user has edit contributions permission
+   * @return CRM_Utils_Check_Message[]
+   */
+  public function checkAnonEditContribution() {
+    $messages = [];
+    $permissions = [];
+    if (CRM_Core_Config::singleton()->userPermissionClass->check('edit contributions', 0)) {
+      $permissions[] = 'edit contributions';
+    }
+    if (CRM_Core_Config::singleton()->userPermissionClass->check('access CiviContribute', 0)) {
+      $permissions[] = 'access CiviContribute';
+    }
+    if (!empty($permissions)) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('Anonymous users have permissions (%1). This may cause leakage of information in regards to recurring contributions.', [
+          1 => implode(', ', $permissions),
+        ]),
+        ts('Security Warning'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-lock'
+      );
+    }
+    return $messages;
+  }
+
+  /**
    * Determine whether $url is a public, browsable listing for $dir
    *
    * @param string $dir
