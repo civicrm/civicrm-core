@@ -235,7 +235,7 @@
         "url": "https://github.com/civicrm/jquery/archive/1.12.4-civicrm-1.2.zip"
       },
       "jquery-ui": {
-        "url": "https://github.com/civicrm/jqueryui/archive/1.13.0-civicrm.zip"
+        "url": "https://github.com/civicrm/jqueryui/archive/1.13.1-civicrm.zip"
       },
       "jquery-validation": {
         "url": "https://github.com/jquery-validation/jquery-validation/archive/1.19.3.zip",
