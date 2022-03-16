@@ -18,7 +18,6 @@
           {$field.label}
           {if !empty($fieldSpec.help)}
             {assign var=help value=$fieldSpec.help}
-            {capture assign=helpFile}{if $fieldSpec.help}{$fieldSpec.help}{else}''{/if}{/capture}
             {help id=$help.id file=$help.file}
           {/if}
           <br />
