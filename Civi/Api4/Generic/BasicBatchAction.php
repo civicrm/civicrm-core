@@ -59,16 +59,36 @@ class BasicBatchAction extends AbstractBatchAction {
   }
 
   /**
-   * We pass the doTask function an array representing one item to update.
-   * We expect to get the same format back.
+   * Checks permissions and then delegates to processBatch.
+   *
+   * Note: Unconditional logic must go here in the run function, as delegated functions may be overridden.
    *
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
-    foreach ($this->getBatchRecords() as $item) {
+    $items = $this->getBatchRecords();
+    foreach ($items as $item) {
       if ($this->checkPermissions && !CoreUtil::checkAccessRecord($this, $item, \CRM_Core_Session::getLoggedInContactID() ?: 0)) {
         throw new UnauthorizedException("ACL check failed");
       }
+    }
+    $this->processBatch($result, $items);
+  }
+
+  /**
+   * Calls doTask once per item and stores the result.
+   *
+   * We pass the doTask function an array representing one item to process.
+   * We expect to get the same format back.
+   *
+   * Note: This function may be overridden by the end api.
+   *
+   * @param Result $result
+   * @param array $items
+   * @throws NotImplementedException
+   */
+  protected function processBatch(Result $result, array $items) {
+    foreach ($items as $item) {
       $result[] = $this->doTask($item);
     }
   }

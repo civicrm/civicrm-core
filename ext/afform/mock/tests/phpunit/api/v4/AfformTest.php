@@ -1,4 +1,5 @@
 <?php
+use Civi\Api4\Dashboard;
 
 /**
  * Afform.Get API Test Case
@@ -50,6 +51,18 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
       return isset($arr[$key]) ? $arr[$key] : NULL;
     };
 
+    $checkDashlet = function($afform) use ($formName) {
+      $dashlet = Dashboard::get(FALSE)
+        ->addWhere('name', '=', $formName)
+        ->execute();
+      if (!empty($afform['is_dashlet'])) {
+        $this->assertCount(1, $dashlet);
+      }
+      else {
+        $this->assertCount(0, $dashlet);
+      }
+    };
+
     Civi\Api4\Afform::revert()->addWhere('name', '=', $formName)->execute();
 
     $message = 'The initial Afform.get should return default data';
@@ -66,13 +79,14 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertEquals(TRUE, $get($result[0], 'has_base'), $message);
     $this->assertEquals(FALSE, $get($result[0], 'has_local'), $message);
     $this->assertEquals('org.civicrm.afform-mock', $get($result[0], 'base_module'), $message);
+    $checkDashlet($originalMetadata);
 
     $message = 'After updating with Afform.create, the revised data should be returned';
     $result = Civi\Api4\Afform::update()
       ->addWhere('name', '=', $formName)
       ->addValue('description', 'The temporary description')
       ->addValue('permission', 'access foo')
-      ->addValue('is_dashlet', TRUE)
+      ->addValue('is_dashlet', empty($originalMetadata['is_dashlet']))
       ->execute();
     $this->assertEquals($formName, $result[0]['name'], $message);
     $this->assertEquals('The temporary description', $result[0]['description'], $message);
@@ -84,13 +98,14 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertEquals($formName, $result[0]['name'], $message);
     $this->assertEquals($get($originalMetadata, 'title'), $get($result[0], 'title'), $message);
     $this->assertEquals('The temporary description', $get($result[0], 'description'), $message);
-    $this->assertEquals(TRUE, $get($result[0], 'is_dashlet'), $message);
+    $this->assertEquals(empty($originalMetadata['is_dashlet']), $get($result[0], 'is_dashlet'), $message);
     $this->assertEquals($get($originalMetadata, 'server_route'), $get($result[0], 'server_route'), $message);
     $this->assertEquals('access foo', $get($result[0], 'permission'), $message);
     $this->assertTrue(is_array($result[0]['layout']), $message);
     $this->assertEquals(TRUE, $get($result[0], 'has_base'), $message);
     $this->assertEquals(TRUE, $get($result[0], 'has_local'), $message);
     $this->assertEquals('org.civicrm.afform-mock', $get($result[0], 'base_module'), $message);
+    $checkDashlet($result[0]);
 
     Civi\Api4\Afform::revert()->addWhere('name', '=', $formName)->execute();
     $message = 'After reverting, the final Afform.get should return default data';
@@ -102,10 +117,13 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertEquals($get($originalMetadata, 'description'), $get($result[0], 'description'), $message);
     $this->assertEquals($get($originalMetadata, 'server_route'), $get($result[0], 'server_route'), $message);
     $this->assertEquals($get($originalMetadata, 'permission'), $get($result[0], 'permission'), $message);
+    $this->assertEquals($get($originalMetadata, 'is_dashlet'), $get($result[0], 'is_dashlet'), $message);
     $this->assertTrue(is_array($result[0]['layout']), $message);
     $this->assertEquals(TRUE, $get($result[0], 'has_base'), $message);
     $this->assertEquals(FALSE, $get($result[0], 'has_local'), $message);
     $this->assertEquals('org.civicrm.afform-mock', $get($result[0], 'base_module'), $message);
+
+    $checkDashlet($originalMetadata);
   }
 
   public function getFormatExamples() {

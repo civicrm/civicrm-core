@@ -65,19 +65,18 @@ trait AfformSaveTrait {
       return ($item[$field] ?? NULL) !== ($orig[$field] ?? NULL);
     };
 
-    if ($isChanged('is_dashlet')) {
-      // FIXME: more targetted reconciliation
-      \CRM_Core_ManagedEntities::singleton()->reconcile();
-    }
-    elseif (array_key_exists('is_dashlet', (array) $orig) && $orig['is_dashlet'] && $isChanged('title')) {
-      // FIXME: more targetted reconciliation
+    // If the dashlet setting changed, managed entities must be reconciled
+    if (
+      $isChanged('is_dashlet') ||
+      (!empty($meta['is_dashlet']) && $isChanged('title'))
+    ) {
+      // FIXME: more targeted reconciliation
       \CRM_Core_ManagedEntities::singleton()->reconcile();
     }
 
     // Right now, permission-checks are completely on-demand.
     if ($isChanged('server_route') /* || $isChanged('permission') */) {
       \CRM_Core_Menu::store();
-      \CRM_Core_BAO_Navigation::resetNavigation();
     }
 
     $item['module_name'] = _afform_angular_module_name($item['name'], 'camel');

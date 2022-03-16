@@ -667,6 +667,7 @@ class CRM_Core_ManagedEntities {
 
   protected function loadManagedEntityActions(): void {
     $managedEntities = Managed::get(FALSE)->addSelect('*')->execute();
+    $this->managedActions = [];
     foreach ($managedEntities as $managedEntity) {
       $key = "{$managedEntity['module']}_{$managedEntity['name']}_{$managedEntity['entity_type']}";
       // Set to 'delete' - it will be overwritten below if it is to be updated.
