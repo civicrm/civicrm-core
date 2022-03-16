@@ -125,6 +125,8 @@
     <name>is_current_member</name>
     <title>Current Membership?</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
     <comment>Does this status aggregate to current members (e.g. New, Renewed, Grace might all be TRUE... while Unrenewed, Lapsed, Inactive would be FALSE).</comment>
     <add>1.5</add>
   </field>
@@ -136,6 +138,8 @@
     <html>
       <type>CheckBox</type>
     </html>
+    <default>0</default>
+    <required>true</required>
     <add>1.5</add>
   </field>
   <field>
@@ -148,6 +152,8 @@
     <name>is_default</name>
     <title>Default Status?</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
     <html>
       <type>CheckBox</type>
     </html>
@@ -159,6 +165,7 @@
     <title>Is Active</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <html>
       <type>CheckBox</type>
     </html>
@@ -170,6 +177,7 @@
     <title>Is Reserved</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <html>
       <type>CheckBox</type>
     </html>

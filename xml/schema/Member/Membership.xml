@@ -182,6 +182,8 @@
     <html>
       <type>CheckBox</type>
     </html>
+    <default>0</default>
+    <required>true</required>
     <add>1.5</add>
   </field>
   <field>
@@ -237,6 +239,7 @@
     <uniqueName>member_is_test</uniqueName>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <import>true</import>
     <headerPattern>/(is.)?test(.member(ship)?)?/i</headerPattern>
     <html>
@@ -249,6 +252,7 @@
     <title>Is Pay Later</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <import>true</import>
     <headerPattern>/(is.)?(pay(.)?later)$/i</headerPattern>
     <add>2.1</add>

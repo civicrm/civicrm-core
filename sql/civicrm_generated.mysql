@@ -4249,8 +4249,8 @@ UNLOCK TABLES;
 
 LOCK TABLES `civicrm_mail_settings` WRITE;
 /*!40000 ALTER TABLE `civicrm_mail_settings` DISABLE KEYS */;
-INSERT INTO `civicrm_mail_settings` (`id`, `domain_id`, `name`, `is_default`, `domain`, `localpart`, `return_path`, `protocol`, `server`, `port`, `username`, `password`, `is_ssl`, `source`, `activity_status`, `is_non_case_email_skipped`, `is_contact_creation_disabled_if_no_match`) VALUES
- (1,1,'default',1,'EXAMPLE.ORG',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0);
+INSERT INTO `civicrm_mail_settings` (`id`, `domain_id`, `name`, `is_default`, `domain`, `localpart`, `return_path`, `protocol`, `server`, `port`, `username`, `password`, `source`, `activity_status`, `is_non_case_email_skipped`, `is_contact_creation_disabled_if_no_match`) VALUES
+ (1,1,'default',1,'EXAMPLE.ORG',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0);
 /*!40000 ALTER TABLE `civicrm_mail_settings` ENABLE KEYS */;
 UNLOCK TABLES;
 

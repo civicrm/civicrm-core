@@ -67,6 +67,7 @@
     <title>Primary address</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this the primary address.</comment>
     <add>2.0</add>
     <html>
@@ -83,6 +84,7 @@
     <title>Is Billing Address</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this the billing address.</comment>
     <add>2.0</add>
     <html>
@@ -418,6 +420,7 @@
     <title>Is Manually Geocoded</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this a manually entered geo code</comment>
     <add>4.3</add>
     <html>

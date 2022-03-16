@@ -283,6 +283,7 @@
     <title>Test</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <import>true</import>
     <html>
       <type>CheckBox</type>
@@ -447,6 +448,7 @@
     <type>boolean</type>
     <comment>if true, receipt is automatically emailed to contact on each successful payment</comment>
     <default>1</default>
+    <required>true</required>
     <add>4.1</add>
     <html>
       <type>CheckBox</type>

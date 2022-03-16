@@ -74,12 +74,15 @@
     <title>Mailing Component is Default?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this the default component for this component_type?</comment>
   </field>
   <field>
     <name>is_active</name>
     <title>Mailing Component Is Active?</title>
     <type>boolean</type>
+    <required>true</required>
+    <default>1</default>
     <comment>Is this property active?</comment>
   </field>
 </table>
