@@ -26,10 +26,62 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    foreach (['CIVI_CORE', 'CMS_ROOT', 'CMS_URL'] as $var) {
+    foreach (['CIVI_CORE', 'CMS_ROOT', 'CMS_URL', 'ADMIN_USER'] as $var) {
       if (empty($GLOBALS['_CV'][$var])) {
         $this->markTestSkipped("Test environment does provide the civibuild/cv variable ($var)");
       }
+    }
+  }
+
+  /**
+   * Perform permission-checks using "on-behalf-of" mechanics.
+   */
+  public function testPermissionLookup() {
+    $name = 'cv';
+    $this->assertNotEmpty($this->findCommand($name), 'The command "$name" does not appear in the PATH.');
+    $perms = ['administer CiviCRM', 'profile edit', 'sign CiviCRM Petition'];
+
+    $r = 'cv ev @USER @PHP';
+    $asAnon = ['@USER' => ''];
+    $asAdmin = ['@USER' => '--user=' . escapeshellarg($GLOBALS['_CV']['ADMIN_USER'])];
+    $asDemo = ['@USER' => '--user=' . escapeshellarg($GLOBALS['_CV']['DEMO_USER'])];
+
+    // == This variant would validate the main `check()` has "consistency"
+    // $checkFunc = 'CRM_Core_Permission::check';
+    // $anonId = 0;
+    // $adminId = CRM_Core_BAO_UFMatch::getContactId(\CRM_Core_Config::singleton()->userSystem->getUfId($GLOBALS['_CV']['ADMIN_USER']));
+    // $demoId = CRM_Core_BAO_UFMatch::getContactId(\CRM_Core_Config::singleton()->userSystem->getUfId($GLOBALS['_CV']['DEMO_USER']));
+
+    // == This variant would validate the internal `check()` adapter has "consistency"
+    $checkFunc = 'CRM_Core_Config::singleton()->userPermissionClass->check';
+    $anonId = 0;
+    $adminId = \CRM_Core_Config::singleton()->userSystem->getUfId($GLOBALS['_CV']['ADMIN_USER']);
+    $demoId = \CRM_Core_Config::singleton()->userSystem->getUfId($GLOBALS['_CV']['DEMO_USER']);
+
+    $this->assertNotEmpty($adminId, 'Failed to resolve admin ID');
+    $this->assertNotEmpty($demoId, 'Failed to resolve demo ID');
+
+    foreach ($perms as $perm) {
+      $anon['viewedByAdmin'] = $this->callRunnerJson($r, "$checkFunc(\"$perm\", $anonId)", $asAdmin);
+      $anon['viewedByDemo'] = $this->callRunnerJson($r, "$checkFunc(\"$perm\", $anonId)", $asDemo);
+      $anon['viewedByAnon'] = $this->callRunnerJson($r, "$checkFunc(\"$perm\", $anonId)", $asAnon);
+      // $anon['viewedBySelf'] = $this->callRunnerJson($r, "$checkFunc(\"$perm\")", $asAnon);
+
+      $demo['viewedByAdmin'] = $this->callRunnerJson($r, "$checkFunc(\"$perm\", $demoId)", $asAdmin);
+      $demo['viewedByDemo'] = $this->callRunnerJson($r, "$checkFunc(\"$perm\", $demoId)", $asDemo);
+      $demo['viewedByAnon'] = $this->callRunnerJson($r, "$checkFunc(\"$perm\", $demoId)", $asAnon);
+      // $demo['viewedBySelf'] = $this->callRunnerJson($r, "$checkFunc(\"$perm\")", $asAdmin);
+
+      $admin['viewedByAdmin'] = $this->callRunnerJson($r, "$checkFunc(\"$perm\", $adminId)", $asAdmin);
+      $admin['viewedByDemo'] = $this->callRunnerJson($r, "$checkFunc(\"$perm\", $adminId)", $asDemo);
+      $admin['viewedByAnon'] = $this->callRunnerJson($r, "$checkFunc(\"$perm\", $adminId)", $asAnon);
+      // $admin['viewedBySelf'] = $this->callRunnerJson($r, "$checkFunc(\"$perm\")", $asAdmin);
+
+      $report = print_r(['anon' => $anon, 'demo' => $demo, 'admin' => $admin], 1);
+
+      $this->assertEquals(1, count(array_unique($anon)), "For permission \"$perm\" of anon(cid=$anonId), permissions should be consistent: " . $report);
+      $this->assertEquals(1, count(array_unique($demo)), "For permission \"$perm\" of demo(cid=$demoId), permissions should be consistent: " . $report);
+      $this->assertEquals(1, count(array_unique($admin)), "For permission \"$perm\" of admin(cid=$adminId), permissions should be consistent: " . $report);
     }
   }
 
@@ -115,11 +167,13 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
    *   Ex: 'cv ev @PHP'
    * @param string $phpExpr
    *   PHP expression to evaluate and return. (Encoded+decoded as JSON)
+   * @param string $vars
+   *   Extra key-value pairs to include in command.
    * @return mixed
    *   The result of running $phpExpr through the given $runner.
    */
-  protected function callRunnerJson($runner, $phpExpr) {
-    $json = $this->callRunnerOk($runner, "echo json_encode($phpExpr);");
+  protected function callRunnerJson($runner, $phpExpr, $vars = []) {
+    $json = $this->callRunnerOk($runner, "echo json_encode($phpExpr);", $vars);
     return json_decode($json);
   }
 
@@ -128,11 +182,14 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
    *   Ex: 'cv ev @PHP'
    * @param string $phpStmt
    *   PHP code to execute
+   * @param string $vars
+   *   Extra key-value pairs to include in command.
    * @return string
    *   The console output of running $phpStmt through the given $runner.
    */
-  protected function callRunnerOk($runner, $phpStmt) {
-    $cmd = strtr($runner, ['@PHP' => escapeshellarg($phpStmt)]);
+  protected function callRunnerOk($runner, $phpStmt, $vars = []) {
+    $vars['@PHP'] = escapeshellarg($phpStmt);
+    $cmd = strtr($runner, $vars);
     exec($cmd, $output, $val);
     $this->assertEquals(0, $val, "Command returned error ($cmd) ($val)");
     return implode("", $output);
