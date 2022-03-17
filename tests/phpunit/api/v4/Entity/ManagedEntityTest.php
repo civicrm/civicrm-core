@@ -383,7 +383,7 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
   }
 
   public function testManagedNavigationWeights() {
-    $this->_managedEntities = [
+    $managedEntities = [
       [
         'module' => 'unit.test.fake.ext',
         'name' => 'Navigation_Test_Parent',
@@ -474,13 +474,14 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
         ],
       ],
     ];
+    $this->_managedEntities = $managedEntities;
 
     // Throw a monkey wrench by placing duplicates in another domain
     $d2 = Domain::create(FALSE)
       ->addValue('name', 'Decoy domain')
       ->addValue('version', \CRM_Utils_System::version())
       ->execute()->single();
-    foreach ($this->_managedEntities as $item) {
+    foreach ($managedEntities as $item) {
       $decoys[] = civicrm_api4('Navigation', 'create', [
         'checkPermissions' => FALSE,
         'values' => ['domain_id' => $d2['id']] + $item['params']['values'],
@@ -535,6 +536,8 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
     $allModules = [
       new \CRM_Core_Module('unit.test.fake.ext', FALSE),
     ];
+    // If module is disabled it will not run hook_civicrm_managed.
+    $this->_managedEntities = [];
     (new \CRM_Core_ManagedEntities($allModules))->reconcile();
 
     // Children's weight should have been unaffected, but they should be disabled
@@ -556,6 +559,7 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
     $allModules = [
       new \CRM_Core_Module('unit.test.fake.ext', TRUE),
     ];
+    $this->_managedEntities = $managedEntities;
     (new \CRM_Core_ManagedEntities($allModules))->reconcile();
 
     // Children's weight should have been unaffected, but they should be enabled
