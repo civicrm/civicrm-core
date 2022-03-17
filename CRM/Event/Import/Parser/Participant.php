@@ -295,7 +295,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
       else {
         $eventTitle = $params['event_title'];
         $params['participant_role_id'] = CRM_Core_DAO::singleValueQuery('SELECT default_role_id FROM civicrm_event WHERE title = %1', [
-          1 => [$eventTitle, 'String']
+          1 => [$eventTitle, 'String'],
         ]);
       }
     }
@@ -551,7 +551,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
             return civicrm_api3_create_error("Event ID is not valid: $value");
           }
           $svq = CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_event WHERE id = %1', [
-            1 => [$value, 'Integer']
+            1 => [$value, 'Integer'],
           ]);
           if (!$svq) {
             return civicrm_api3_create_error("Invalid Event ID: There is no event record with event_id = $value.");
