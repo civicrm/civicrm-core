@@ -31,6 +31,11 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
   public function preProcess() {
     $id = $this->getID();
 
+    // Check permission for action.
+    if (!CRM_Core_Permission::checkActionPermission('CiviContribute', $this->_action)) {
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
+    }
+    $params = ['id' => $id];
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->assign('context', $context);
 

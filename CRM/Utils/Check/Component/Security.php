@@ -293,6 +293,35 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
   }
 
   /**
+   * Check to see if anonymous user has excessive permissions.
+   * @return CRM_Utils_Check_Message[]
+   */
+  public function checkAnonPermissions() {
+    $messages = [];
+    $permissions = [];
+    // These specific permissions were referenced in a security submission.
+    // This functionality is generally useful -- may be good to expand to a longer list.
+    $checkPerms = ['access CiviContribute', 'edit contributions'];
+    foreach ($checkPerms as $checkPerm) {
+      if (CRM_Core_Config::singleton()->userPermissionClass->check($checkPerm, 0)) {
+        $permissions[] = $checkPerm;
+      }
+    }
+    if (!empty($permissions)) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('The system configuration grants anonymous users an <em>unusually broad</em> list of permissions. This could compromise security. Please reassess whether these permissions are required: %1', [
+          1 => '<ul><li><tt>' . implode('</tt></li><li><tt>', $permissions) . '</tt></li></ul>',
+        ]),
+        ts('Unusual Permissions for Anonymous Users'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-lock'
+      );
+    }
+    return $messages;
+  }
+
+  /**
    * Determine whether $url is a public, browsable listing for $dir
    *
    * @param string $dir
