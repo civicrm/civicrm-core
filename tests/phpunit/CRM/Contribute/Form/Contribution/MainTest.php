@@ -22,19 +22,19 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
    * The id of the contribution page.
    * @var int
    */
-  private int $contributionPageId;
+  private $contributionPageId;
 
   /**
    * The id of the contribution page's payment processor.
    * @var int
    */
-  private int $paymentProcessorId;
+  private $paymentProcessorId;
 
   /**
    * The price set of the contribution page.
    * @var int
    */
-  private int $priceSetId;
+  private $priceSetId;
 
   /**
    * Clean up DB.
