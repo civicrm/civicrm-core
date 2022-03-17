@@ -10,8 +10,11 @@
       entityName: '<',
       deleteThis: '&'
     },
-    require: {editor: '^^afGuiEditor'},
-    controller: function($scope, crmApi4, dialogService, afGui) {
+    require: {
+      editor: '^^afGuiEditor',
+      parentContainer: '?^^afGuiContainer'
+    },
+    controller: function($scope, $element, crmApi4, dialogService, afGui) {
       var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
 
@@ -92,6 +95,10 @@
       // Block settings
       var block = {};
       $scope.block = null;
+
+      this.isBlock = function() {
+        return 'layout' in block;
+      };
 
       $scope.getSetChildren = function(val) {
         var collection = block.layout || (ctrl.node && ctrl.node['#children']);
@@ -254,6 +261,16 @@
         }, true));
       }
 
+      this.canSaveAsBlock = function() {
+        return !ctrl.node['af-fieldset'] &&
+          // Exclude blocks
+          !ctrl.isBlock() &&
+          // Exclude the child of a block
+          (!ctrl.parentContainer || !ctrl.parentContainer.isBlock()) &&
+          // Excludes search display containers and their children
+          (ctrl.entityName || '') === ctrl.getDataEntity();
+      };
+
       $scope.saveBlock = function() {
         var options = CRM.utils.adjustDialogDefaults({
           width: '500px',
@@ -328,6 +345,10 @@
         return ctrl.entityName ? ctrl.entityName.split('-join-')[0] : null;
       };
 
+      this.getDataEntity = function() {
+        return $element.attr('data-entity') || '';
+      };
+
       this.getJoinEntity = function() {
         if (!ctrl.join) {
           return null;
@@ -342,16 +363,15 @@
 
       // Returns the entity type for fields within this conainer (join entity type if this is a join, else the primary entity type)
       this.getFieldEntityType = function(fieldName) {
+        var entityType;
         // If entityName is declared for this fieldset, return entity-type or join-type
         if (ctrl.entityName) {
           var joinType = ctrl.entityName.split('-join-');
-          return joinType[1] || (ctrl.editor && ctrl.editor.getEntity(joinType[0]).type);
-        }
-        // If entityName is not declared, this field belongs to a search
-        var entityType,
-          searchDisplay = ctrl.getSearchDisplay(ctrl.node),
-          prefix = _.includes(fieldName, '.') ? fieldName.split('.')[0] : null;
-        if (searchDisplay) {
+          entityType = joinType[1] || (ctrl.editor && ctrl.editor.getEntity(joinType[0]).type);
+        } else {
+          var searchKey = ctrl.getDataEntity(),
+            searchDisplay = afGui.getSearchDisplay.apply(null, searchKey.split('.')),
+            prefix = _.includes(fieldName, '.') ? fieldName.split('.')[0] : null;
           if (prefix) {
             _.each(searchDisplay['saved_search_id.api_params'].join, function(join) {
               var joinInfo = join[0].split(' AS ');
@@ -365,7 +385,8 @@
             entityType = searchDisplay['saved_search_id.api_entity'];
           }
         }
-        return entityType || _.map(afGui.meta.searchDisplays, 'saved_search_id.api_entity')[0];
+
+        return entityType;
       };
 
     }

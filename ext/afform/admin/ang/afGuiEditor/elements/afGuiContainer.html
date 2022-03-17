@@ -25,7 +25,7 @@
   <div ng-repeat="item in getSetChildren()" >
     <div ng-switch="$ctrl.getNodeType(item)">
       <af-gui-container ng-switch-when="fieldset" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container af-gui-fieldset af-gui-container-type-{{ item['#tag'] }}" ng-class="{'af-entity-selected': isSelectedFieldset(item['af-fieldset'])}" entity-name="item['af-fieldset']" data-entity="{{ item['af-fieldset'] }}" ></af-gui-container>
-      <af-gui-container ng-switch-when="container" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container af-gui-container-type-{{ item['#tag'] }}" entity-name="$ctrl.entityName" data-entity="{{ $ctrl.entityName }}" ></af-gui-container>
+      <af-gui-container ng-switch-when="container" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container af-gui-container-type-{{ item['#tag'] }}" entity-name="$ctrl.entityName" data-entity="{{ $ctrl.getDataEntity() }}" ></af-gui-container>
       <af-gui-container ng-switch-when="join" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container" join="item['af-join']" entity-name="$ctrl.entityName + '-join-' + item['af-join']" data-entity="{{ $ctrl.entityName + '-join-' + item['af-join'] }}" ></af-gui-container>
       <af-gui-field ng-switch-when="field" node="item" delete-this="$ctrl.removeElement(item)" ></af-gui-field>
       <af-gui-text ng-switch-when="text" node="item" delete-this="$ctrl.removeElement(item)" class="af-gui-element af-gui-text" ></af-gui-text>
