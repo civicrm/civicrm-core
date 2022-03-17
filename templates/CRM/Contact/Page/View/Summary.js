@@ -193,7 +193,7 @@
     function refreshTitle() {
       var contactName = $('.crm-summary-display_name').text();
       contactName = $.trim(contactName);
-      document.title = $('title').html().replace(oldName, contactName);
+      document.title = document.title.replace(oldName, contactName);
       oldName = contactName;
     }
     $('#contactname-block').on('load', refreshTitle);
