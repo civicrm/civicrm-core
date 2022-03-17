@@ -13,7 +13,7 @@
   <div class="form-inline">
     <label for="afform-list-filter">{{:: ts('Filter:') }}</label>
     <input class="form-control" type="search" id="afform-list-filter" ng-model="$ctrl.searchAfformList" placeholder="&#xf002">
-    <div class="btn-group pull-right" ng-if="types[$ctrl.tab].options !== false">
+    <div class="btn-group pull-right" ng-if="types[$ctrl.tab].options !== false" af-gui-menu>
       <a ng-if="types[$ctrl.tab].default" href="{{ types[$ctrl.tab].default }}" class="btn btn-primary">
         {{ ts('New %1', {1: types[$ctrl.tab].label }) }}
       </a>
@@ -21,7 +21,7 @@
         <span ng-class="{'sr-only': types[$ctrl.tab].default}">{{ ts('New %1', {1: types[$ctrl.tab].label }) }}</span>
         <span class="caret"></span>
       </button>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu" ng-if="menu.open">
         <li ng-class="{disabled: !types[$ctrl.tab].options || !types[$ctrl.tab].options.length}">
           <input ng-if="types[$ctrl.tab].options && types[$ctrl.tab].options.length" type="search" class="form-control" placeholder="&#xf002" ng-model="searchCreateLinks.label">
           <a href ng-if="!types[$ctrl.tab].options"><i class="crm-i fa-spinner fa-spin"></i></a>

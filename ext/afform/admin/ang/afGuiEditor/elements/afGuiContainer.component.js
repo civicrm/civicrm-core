@@ -52,9 +52,35 @@
         return entityName === ctrl.editor.getSelectedEntityName();
       };
 
+      $scope.isSelectedSearchFieldset = function(node) {
+        var key = $scope.getSearchKey(node);
+        return key === ctrl.editor.getSelectedEntityName();
+      };
+
+      $scope.getSearchKey = function(node) {
+        var searchDisplays = afGui.findRecursive(node['#children'], function(item) {
+          return item['#tag'] && item['#tag'].indexOf('crm-search-display-') === 0 && item['search-name'];
+        });
+        if (searchDisplays && searchDisplays.length) {
+          return searchDisplays[0]['search-name'] + (searchDisplays[0]['display-name'] ? '.' + searchDisplays[0]['display-name'] : '');
+        }
+      };
+
+      this.getSearchDisplay = function(node) {
+        var searchKey = $scope.getSearchKey(node);
+        if (searchKey) {
+          return afGui.getSearchDisplay.apply(null, searchKey.split('.'));
+        }
+      };
+
       $scope.selectEntity = function() {
         if (ctrl.node['af-fieldset']) {
           ctrl.editor.selectEntity(ctrl.node['af-fieldset']);
+        } else if ('af-fieldset' in ctrl.node) {
+          var searchKey = $scope.getSearchKey(ctrl.node);
+          if (searchKey) {
+            ctrl.editor.selectEntity(searchKey);
+          }
         }
       };
 
@@ -269,8 +295,11 @@
         if (node['#tag'] === 'af-field') {
           return 'field';
         }
-        if ('af-fieldset' in node) {
+        if (node['af-fieldset']) {
           return 'fieldset';
+        }
+        else if ('af-fieldset' in node) {
+          return 'searchFieldset';
         }
         if (node['af-join']) {
           return 'join';
@@ -289,6 +318,7 @@
 
       this.removeElement = function(element) {
         afGui.removeRecursive($scope.getSetChildren(), {$$hashKey: element.$$hashKey});
+        ctrl.editor.onRemoveElement();
       };
 
       this.removeField = function(fieldName) {
@@ -320,8 +350,9 @@
         }
         // If entityName is not declared, this field belongs to a search
         var entityType,
+          searchDisplay = ctrl.getSearchDisplay(ctrl.node),
           prefix = _.includes(fieldName, '.') ? fieldName.split('.')[0] : null;
-        _.each(afGui.meta.searchDisplays, function(searchDisplay) {
+        if (searchDisplay) {
           if (prefix) {
             _.each(searchDisplay['saved_search_id.api_params'].join, function(join) {
               var joinInfo = join[0].split(' AS ');
@@ -334,10 +365,7 @@
           if (!entityType && fieldName && afGui.getField(searchDisplay['saved_search_id.api_entity'], fieldName)) {
             entityType = searchDisplay['saved_search_id.api_entity'];
           }
-          if (entityType) {
-            return false;
-          }
-        });
+        }
         return entityType || _.map(afGui.meta.searchDisplays, 'saved_search_id.api_entity')[0];
       };
 

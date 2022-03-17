@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('afAdmin').controller('afAdminList', function($scope, afforms, crmApi4, crmStatus) {
+  angular.module('afAdmin').controller('afAdminList', function($scope, afforms, crmApi4, crmStatus, afGui) {
     var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
       ctrl = $scope.$ctrl = this;
     this.sortField = 'title';
@@ -65,10 +65,13 @@
     }
 
     this.createLinks = function() {
-      ctrl.searchCreateLinks = '';
-      if ($scope.types[ctrl.tab].options) {
+      // Reset search input in dropdown
+      $scope.searchCreateLinks.label = '';
+      // A value means it's alredy loaded. Null means it's loading.
+      if ($scope.types[ctrl.tab].options || $scope.types[ctrl.tab].options === null) {
         return;
       }
+      $scope.types[ctrl.tab].options = null;
       var links = [];
 
       if (ctrl.tab === 'form') {
@@ -102,33 +105,7 @@
       }
 
       if (ctrl.tab === 'search') {
-        var searchNames = [];
-        // Non-aggregated query will return the same search multiple times - once per display
-        crmApi4('SavedSearch', 'get', {
-          select: ['name', 'label', 'display.name', 'display.label', 'display.type:icon'],
-          where: [['api_entity', 'IS NOT NULL'], ['api_params', 'IS NOT NULL']],
-          join: [['SearchDisplay AS display', 'LEFT', ['id', '=', 'display.saved_search_id']]],
-          orderBy: {'label':'ASC'}
-        }).then(function(searches) {
-          _.each(searches, function(search) {
-            // Add default display for each search (track searchNames in a var to just add once per search)
-            if (!_.includes(searchNames, search.name)) {
-              searchNames.push(search.name);
-              links.push({
-                url: '#create/search/' + search.name,
-                label: search.label + ': ' + ts('Search results table'),
-                icon: 'fa-table'
-              });
-            }
-            // If the search has no displays (other than the default) this will be empty
-            if (search['display.name']) {
-              links.push({
-                url: '#create/search/' + search.name + '.' + search['display.name'],
-                label: search.label + ': ' + search['display.label'],
-                icon: search['display.type:icon']
-              });
-            }
-          });
+        afGui.getAllSearchDisplays().then(function(links) {
           $scope.types.search.options = links;
         });
       }

@@ -137,6 +137,45 @@
           return CRM.afGuiEditor.searchDisplays[searchName + (displayName ? '.' + displayName : '')];
         },
 
+        getAllSearchDisplays: function() {
+          var links = [],
+            searchNames = [],
+            deferred = $q.defer();
+          // Non-aggregated query will return the same search multiple times - once per display
+          crmApi4('SavedSearch', 'get', {
+            select: ['name', 'label', 'display.name', 'display.label', 'display.type:name', 'display.type:icon'],
+            where: [['api_entity', 'IS NOT NULL'], ['api_params', 'IS NOT NULL']],
+            join: [['SearchDisplay AS display', 'LEFT', ['id', '=', 'display.saved_search_id']]],
+            orderBy: {'label':'ASC'}
+          }).then(function(searches) {
+            _.each(searches, function(search) {
+              // Add default display for each search (track searchNames in a var to just add once per search)
+              if (!_.includes(searchNames, search.name)) {
+                searchNames.push(search.name);
+                links.push({
+                  key: search.name,
+                  url: '#create/search/' + search.name,
+                  label: search.label + ': ' + ts('Search results table'),
+                  tag: 'crm-search-display-table',
+                  icon: 'fa-table'
+                });
+              }
+              // If the search has no displays (other than the default) this will be empty
+              if (search['display.name']) {
+                links.push({
+                  key: search.name + '.' + search['display.name'],
+                  url: '#create/search/' + search.name + '.' + search['display.name'],
+                  label: search.label + ': ' + search['display.label'],
+                  tag: search['display.type:name'],
+                  icon: search['display.type:icon']
+                });
+              }
+            });
+            deferred.resolve(links);
+          });
+          return deferred.promise;
+        },
+
         // Recursively searches a collection and its children using _.filter
         // Returns an array of all matches, or an object if the indexBy param is used
         findRecursive: function findRecursive(collection, predicate, indexBy) {
