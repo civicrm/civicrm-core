@@ -1313,7 +1313,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
             // the owed amount
             $contributionParams['total_amount'] = $amountOwed;
             $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-            $this->assign('balanceAmount', $amountOwed - $params['total_amount']);
+            $balanceAmount = $amountOwed - $params['total_amount'];
             $this->storePaymentCreateParams($params);
           }
         }
@@ -1515,6 +1515,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           $eventAmount = array_merge($eventAmount, $additionalParticipantDetails);
           $this->assign('amount', $eventAmount);
         }
+        // Ensure amounts are assigned to prevent notices/ test fails.
+        // But note this is not an ideal place - it should be handled as part of
+        // the workflow messages system - potentially as a token on the contribution.
+        $this->assign('balanceAmount', $balanceAmount ?? 0);
         $this->assign('totalTaxAmount', $totalTaxAmount ?? 0);
         $sendTemplateParams = [
           'workflow' => 'event_offline_receipt',

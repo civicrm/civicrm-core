@@ -590,6 +590,10 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     ];
     $form->submit($submitParams);
     $this->assertPartialPaymentResult($isQuickConfig, $mut);
+    $mut->checkAllMailLog([
+      'Total Paid: $20.00',
+      'Balance: $1,530.55',
+    ]);
   }
 
   /**
@@ -618,6 +622,10 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'payment_instrument_id' => $paymentInstrumentID,
     ]);
     $this->assertPartialPaymentResult($isQuickConfig, $mut);
+    $mut->checkAllMailLog([
+      'Total Paid: $20.00',
+      'Balance: $1,530.55',
+    ]);
   }
 
   /**
@@ -646,16 +654,14 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'check_number' => 879,
       'payment_instrument_id' => $paymentInstrumentID,
     ]);
-    $this->assertPartialPaymentResult($isQuickConfig, $mut, FALSE);
+    $this->assertPartialPaymentResult($isQuickConfig, $mut);
   }
 
   /**
    * @param bool $isQuickConfig
    * @param \CiviMailUtils $mut
-   * @param bool $isAmountPaidOnForm
-   *   Was the amount paid entered on the form (if so this should be on the receipt)
    */
-  protected function assertPartialPaymentResult($isQuickConfig, CiviMailUtils $mut, $isAmountPaidOnForm = TRUE) {
+  protected function assertPartialPaymentResult($isQuickConfig, CiviMailUtils $mut) {
     $paymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $expected = [
@@ -737,8 +743,6 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'Annual CiviCRM meet',
       'Registered Email',
       $isQuickConfig ? $this->formatMoneyInput(1550.55) . ' big - 1' : 'Price Field - big',
-      $isAmountPaidOnForm ? 'Total Paid: $20.00' : ' ',
-      'Balance: $1,530.55',
       'Financial Type: Event Fee',
       'Paid By: Check',
       'Check Number: 879',
