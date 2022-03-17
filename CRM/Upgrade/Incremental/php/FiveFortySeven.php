@@ -35,7 +35,7 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL): void {
     if ($rev === '5.47.alpha1' && version_compare($currentVer, '5.47', '<')) {
       // Note: This warning should only exist within a few patch releases of 5.47. Do not merge-forward.
-      $prose = ts('<strong>CiviEvent users may have migration problems with v%1.</strong> CiviEvent users should consider v5.46 instead. <a %2>More information</a>', [
+      $prose = ts('<strong>CiviEvent users may have migration problems with v%1.</strong> CiviEvent users should consider v5.46 instead. <a %2>(Learn more...)</a>', [
         1 => CRM_Utils_System::version(),
         2 => 'target="_blank" href="https://civicrm.org/redirect/event-timezone-5.47"',
       ]);
