@@ -30,3 +30,20 @@ af-form {
   top: 0;
   right: 0;
 }
+
+/* Collapsible containers */
+.af-collapsible > .af-title {
+  cursor: pointer;
+}
+.af-collapsible > .af-title:before {
+  font-family: "FontAwesome";
+  display: inline-block;
+  width: 1em;
+  content: "\f0d7";
+}
+.af-collapsible.af-collapsed > .af-title:before {
+  content: "\f0da";
+}
+.af-collapsible.af-collapsed > .af-title + * {
+  display: none;
+}

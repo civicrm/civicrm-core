@@ -122,6 +122,12 @@
         }
       };
 
+      this.getCollapsibleIcon = function() {
+        if (afGui.hasClass(ctrl.node, 'af-collapsible')) {
+          return afGui.hasClass(ctrl.node, 'af-collapsed') ? 'fa-caret-right' : 'fa-caret-down';
+        }
+      };
+
       // Sets min value for af-repeat as a string, returns it as an int
       $scope.getSetMin = function(val) {
         if (arguments.length) {
@@ -330,6 +336,33 @@
           types = ['af-container', 'af-text', 'af-button', 'af-markup'],
           type = _.intersection(types, classes);
         return type.length ? type[0].replace('af-', '') : null;
+      };
+
+      this.getSetTitle = function(value) {
+        if (arguments.length) {
+          if (value.length) {
+            ctrl.node['af-title'] = value;
+          } else {
+            delete ctrl.node['af-title'];
+            // With no title, cannot be collapsible
+            afGui.modifyClasses(ctrl.node, 'af-collapsible af-collapsed');
+          }
+        }
+        return ctrl.node['af-title'];
+      };
+
+      this.getToolTip = function() {
+        var text = '', nodeType;
+        if (!$scope.block) {
+          nodeType = ctrl.getNodeType(ctrl.node);
+          if (nodeType === 'fieldset') {
+            text = ctrl.editor.getEntity(ctrl.entityName).label;
+          } else if (nodeType === 'searchFieldset') {
+            text = ts('Search Display');
+          }
+          text += ' ' + $scope.tags[ctrl.node['#tag']];
+        }
+        return text;
       };
 
       this.removeElement = function(element) {

@@ -135,7 +135,7 @@
           // Create a new af-fieldset container for the entity
           var fieldset = _.cloneDeep(afGui.meta.elements.fieldset.element);
           fieldset['af-fieldset'] = type + num;
-          fieldset['#children'][0]['#children'][0]['#text'] = meta.label + ' ' + num;
+          fieldset['af-title'] = meta.label + ' ' + num;
           // Add boilerplate contents
           _.each(meta.boilerplate, function (tag) {
             fieldset['#children'].push(tag);
@@ -274,6 +274,7 @@
         var fieldset = {
           '#tag': 'div',
           'af-fieldset': '',
+          'af-title': display.label,
           '#children': [
             {
               '#tag': display.tag,
