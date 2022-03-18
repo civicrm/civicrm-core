@@ -1107,8 +1107,10 @@
       };
     })
 
-    // Editable text using ngModel & html5 contenteditable
-    // Usage: <span crm-ui-editable ng-model="my.data">{{ my.data }}</span>
+    // Single-line editable text using ngModel & html5 contenteditable
+    // Supports a `placeholder` attribute which shows up if empty and no `default-value`.
+    // The `default-value` attribute will force a value if empty (mutually-exclusive with `placeholder`).
+    // Usage: <span crm-ui-editable ng-model="model.text" placeholder="Enter text"></span>
     .directive("crmUiEditable", function() {
       return {
         restrict: "A",
@@ -1150,7 +1152,7 @@
             scope.$apply(read);
           });
 
-          element.attr('contenteditable', 'true').addClass('crm-editable-enabled');
+          element.attr('contenteditable', 'true');
         }
       };
     })

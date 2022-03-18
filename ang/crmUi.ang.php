@@ -6,6 +6,7 @@ return [
   'ext' => 'civicrm',
   'js' => ['ang/crmUi.js'],
   'partials' => ['ang/crmUi'],
+  'css' => ['ang/crmUI.css'],
   'requires' => array_merge(
     [
       'crmResource',

@@ -96,6 +96,7 @@
 #afGuiEditor .crm-editable-enabled:hover:not(:focus) {
   border: 2px dashed grey !important;
 }
+/* Undo Shoreditch add-ons */
 #afGuiEditor .crm-editable-enabled:before,
 #afGuiEditor .crm-editable-enabled:after {
   content: '';
