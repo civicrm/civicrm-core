@@ -868,6 +868,9 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   /**
    * Fetch object based on array of properties.
    *
+   * @deprecated This is called from a few places but creates rather than solves
+   * complexity.
+   *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults

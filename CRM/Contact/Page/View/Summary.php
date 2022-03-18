@@ -103,6 +103,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
   /**
    * View summary details of a contact.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function view() {
     // Add js for tabs, in-place editing, and jstree for tags
@@ -146,9 +148,21 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       'website' => [],
     ];
 
-    $params['id'] = $params['contact_id'] = $this->_contactId;
-    $params['noRelationships'] = $params['noNotes'] = $params['noGroups'] = TRUE;
-    $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults, TRUE);
+    $params['contact_id'] = $this->_contactId;
+
+    CRM_Contact_BAO_Contact::getValues($params, $defaults);
+    $defaults['im'] = CRM_Core_BAO_IM::getValues(['contact_id' => $params['contact_id']]);
+    $defaults['email'] = CRM_Core_BAO_Email::getValues(['contact_id' => $params['contact_id']]);
+    $defaults['openid'] = CRM_Core_BAO_OpenID::getValues(['contact_id' => $params['contact_id']]);
+    $defaults['phone'] = CRM_Core_BAO_Phone::getValues(['contact_id' => $params['contact_id']]);
+    $defaults['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $params['contact_id']], TRUE);
+    CRM_Core_BAO_Website::getValues($params, $defaults);
+    // Copy employer fields to the current_employer keys.
+    if (($defaults['contact_type'] === 'Individual') && $defaults['employer_id'] && $defaults['organization_name']) {
+      $defaults['current_employer'] = $defaults['organization_name'];
+      $defaults['current_employer_id'] = $defaults['employer_id'];
+    }
+
     // Let summary page know if outbound mail is disabled so email links can be built conditionally
     $mailingBackend = Civi::settings()->get('mailing_backend');
     $this->assign('mailingOutboundOption', $mailingBackend['outBound_option']);
@@ -257,14 +271,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       }
     }
     $this->assign('sharedAddresses', $sharedAddresses);
-
-    //get the current employer name
-    if (CRM_Utils_Array::value('contact_type', $defaults) == 'Individual') {
-      if ($contact->employer_id && $contact->organization_name) {
-        $defaults['current_employer'] = $contact->organization_name;
-        $defaults['current_employer_id'] = $contact->employer_id;
-      }
-    }
 
     $this->assign($defaults);
 
