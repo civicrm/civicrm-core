@@ -14,17 +14,18 @@
 {/if}
     <table class="form-layout-compressed{if $context EQ 'profile'} crm-profile-tagsandgroups{/if}">
       <tr>
-        {if $form.tag}
-          <td>
+        <td>
+          {if $form.tag}
             <div class="crm-section tag-section">
               {if !empty($title)}{$form.tag.label}<br>{/if}
               {$form.tag.html}
             </div>
-            {if $context NEQ 'profile'}
-              {include file="CRM/common/Tagset.tpl"}
-            {/if}
-          </td>
-        {/if}
+          {/if}
+          {if $context NEQ 'profile'}
+            {include file="CRM/common/Tagset.tpl"}
+          {/if}
+        </td>
+
         {if $form.group}
           <td>
             {if $groupElementType eq 'select'}
