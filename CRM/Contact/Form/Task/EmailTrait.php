@@ -118,7 +118,8 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @throws \CRM_Core_Exception
    * @throws \API_Exception
    */
-  protected function traitPreProcess() {
+  protected function traitPreProcess(): void {
+    $this->addExpectedSmartyVariable('rows');
     if ($this->isSearchContext()) {
       // Currently only the contact email form is callable outside search context.
       parent::preProcess();
