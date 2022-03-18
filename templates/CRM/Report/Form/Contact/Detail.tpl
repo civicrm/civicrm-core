@@ -180,7 +180,7 @@
 
         {if !$section }
             {*Statistics at the bottom of the page*}
-            {include file="CRM/Report/Form/Statistics.tpl" top="false" bottom=true}
+            {include file="CRM/Report/Form/Statistics.tpl" top=false bottom=true}
         {/if}
     {/if}
     {include file="CRM/Report/Form/ErrorMessage.tpl"}
