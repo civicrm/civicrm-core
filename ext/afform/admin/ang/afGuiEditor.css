@@ -204,6 +204,13 @@ body.af-gui-dragging {
   margin-top: 10px;
 }
 
+/* Card style */
+#afGuiEditor .af-gui-container.af-container-style-pane {
+  box-shadow: 1px 2px 8px 1px rgb(0, 0, 0, .3);
+  background: linear-gradient(to bottom, #f2f2f2 0 22px, transparent 22px 100%) no-repeat;
+  border-radius: 4px;
+}
+
 #afGuiEditor af-gui-container,
 #afGuiEditor af-gui-markup,
 #afGuiEditor af-gui-field,

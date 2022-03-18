@@ -249,6 +249,7 @@ class AfformAdminMeta {
         'element' => [
           '#tag' => 'fieldset',
           'af-fieldset' => NULL,
+          'class' => 'af-container',
           'af-title' => E::ts('Enter title'),
           '#children' => [],
         ],

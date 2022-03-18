@@ -25,14 +25,14 @@
 <div ng-if="!$ctrl.loading" ui-sortable="$ctrl.sortableOptions" ui-sortable-update="$ctrl.editor.onDrop" ng-model="getSetChildren" ng-model-options="{getterSetter: true}" class="af-gui-layout {{ getLayout() }}">
   <div ng-repeat="item in getSetChildren()" >
     <div ng-switch="$ctrl.getNodeType(item)">
-      <af-gui-container ng-switch-when="fieldset" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container af-gui-fieldset af-gui-container-type-{{ item['#tag'] }}" ng-class="{'af-entity-selected': isSelectedFieldset(item['af-fieldset'])}" entity-name="item['af-fieldset']" data-entity="{{ item['af-fieldset'] }}" ></af-gui-container>
-      <af-gui-container ng-switch-when="container" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container af-gui-container-type-{{ item['#tag'] }}" entity-name="$ctrl.entityName" data-entity="{{ $ctrl.getDataEntity() }}" ></af-gui-container>
+      <af-gui-container ng-switch-when="fieldset" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container af-gui-fieldset af-gui-container-type-{{ item['#tag'] + ' ' + item['class'] }}" ng-class="{'af-entity-selected': isSelectedFieldset(item['af-fieldset'])}" entity-name="item['af-fieldset']" data-entity="{{ item['af-fieldset'] }}" ></af-gui-container>
+      <af-gui-container ng-switch-when="container" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container af-gui-container-type-{{ item['#tag'] + ' ' + item['class'] }}" entity-name="$ctrl.entityName" data-entity="{{ $ctrl.getDataEntity() }}" ></af-gui-container>
       <af-gui-container ng-switch-when="join" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container" join="item['af-join']" entity-name="$ctrl.entityName + '-join-' + item['af-join']" data-entity="{{ $ctrl.entityName + '-join-' + item['af-join'] }}" ></af-gui-container>
       <af-gui-field ng-switch-when="field" node="item" delete-this="$ctrl.removeElement(item)" ></af-gui-field>
       <af-gui-text ng-switch-when="text" node="item" delete-this="$ctrl.removeElement(item)" class="af-gui-element af-gui-text" ></af-gui-text>
       <af-gui-markup ng-switch-when="markup" node="item" delete-this="$ctrl.removeElement(item)" class="af-gui-markup" ></af-gui-markup>
       <af-gui-button ng-switch-when="button" node="item" delete-this="$ctrl.removeElement(item)" class="af-gui-element af-gui-button" ></af-gui-button>
-      <af-gui-container ng-switch-when="searchFieldset" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container af-gui-fieldset af-gui-container-type-{{ item['#tag'] }}" ng-class="{'af-entity-selected': isSelectedSearchFieldset(item)}" data-entity="{{ getSearchKey(item) }}" ></af-gui-container>
+      <af-gui-container ng-switch-when="searchFieldset" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container af-gui-fieldset af-gui-container-type-{{ item['#tag'] + ' ' + item['class'] }}" ng-class="{'af-entity-selected': isSelectedSearchFieldset(item)}" data-entity="{{ getSearchKey(item) }}" ></af-gui-container>
       <af-gui-search-display ng-switch-when="searchDisplay" node="item" class="af-gui-element"></af-gui-search-display>
     </div>
   </div>
