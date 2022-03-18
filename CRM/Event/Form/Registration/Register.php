@@ -985,10 +985,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     // assign pay later stuff
     $this->_params['is_pay_later'] = CRM_Utils_Array::value('is_pay_later', $params, FALSE);
     $this->assign('is_pay_later', $params['is_pay_later']);
-    if ($params['is_pay_later']) {
-      $this->assign('pay_later_text', $this->_values['event']['pay_later_text']);
-      $this->assign('pay_later_receipt', $this->_values['event']['pay_later_receipt']);
-    }
+    $this->assign('pay_later_text', $params['is_pay_later'] ? $this->_values['event']['pay_later_text'] : NULL);
+    $this->assign('pay_later_receipt', $params['is_pay_later'] ? $this->_values['event']['pay_later_receipt'] : NULL);
 
     if (!$this->_allowConfirmation) {
       // check if the participant is already registered
