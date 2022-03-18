@@ -126,6 +126,15 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     if ($entity['type'] == 'Contact') {
       if ($mode == 'user') {
         $id = \CRM_Core_Session::getLoggedInContactID();
+
+        // if user is not logged in, check if we are passing in a contact id and checksum in the url
+        if (empty($id)) {
+          // get contact id and checksum from url
+          if (!empty($this->args[$entity['name']]) && !empty($this->args['cs'])
+            && \CRM_Contact_BAO_Contact_Utils::validChecksum($this->args[$entity['name']], $this->args['cs'])) {
+            $id = $this->args[$entity['name']];
+          }
+        }
       }
     }
     if ($id) {
