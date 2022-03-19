@@ -815,8 +815,9 @@ SET    version = '$version'
     $config = CRM_Core_Config::singleton();
     $config->userSystem->flush();
 
-    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, TRUE);
+    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
     // NOTE: triggerRebuild is FALSE becaues it will run again in a moment (via fixSchemaDifferences).
+    // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the Page. We reset later in doFinish().
 
     $versionCheck = new CRM_Utils_VersionCheck();
     $versionCheck->flushCache();
@@ -840,6 +841,7 @@ SET    version = '$version'
    * @return bool
    */
   public static function doFinish(): bool {
+    CRM_Core_Config::singleton()->cleanupCaches(TRUE);
     return TRUE;
   }
 
