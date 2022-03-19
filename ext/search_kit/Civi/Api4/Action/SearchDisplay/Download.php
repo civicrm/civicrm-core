@@ -193,7 +193,9 @@ class Download extends AbstractRunAction {
       $flag |= FILTER_FLAG_STRIP_HIGH;
     }
 
-    $filenameFallback = str_replace('%', '', filter_var($fileName, FILTER_SANITIZE_STRING, $flag));
+    /** @var string $filtered_name */
+    $filtered_name = filter_var($fileName, FILTER_UNSAFE_RAW, $flag);
+    $filenameFallback = str_replace('%', '', $filtered_name);
 
     $disposition = sprintf('attachment; filename="%s"', str_replace('"', '\\"', $filenameFallback));
     if ($fileName !== $filenameFallback) {
