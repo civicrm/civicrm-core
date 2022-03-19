@@ -192,7 +192,7 @@
       };
 
       this.getEntityDefn = function(entity) {
-        if (entity.type === 'Contact' && entity.data.contact_type) {
+        if (entity.type === 'Contact' && entity.data && entity.data.contact_type) {
           return editor.meta.entities[entity.data.contact_type];
         }
         return editor.meta.entities[entity.type];
@@ -202,12 +202,15 @@
       this.scrollToEntity = function(entityName) {
         var $canvas = $('#afGuiEditor-canvas-body'),
           $entity = $('.af-gui-container-type-fieldset[data-entity="' + entityName + '"]').first(),
+          scrollValue, maxScroll;
+        if ($entity.length) {
           // Scrolltop value needed to place entity's fieldset at top of canvas
-          scrollValue = $canvas.scrollTop() + ($entity.offset().top - $canvas.offset().top),
+          scrollValue = $canvas.scrollTop() + ($entity.offset().top - $canvas.offset().top);
           // Maximum possible scrollTop (height minus contents height, adjusting for padding)
           maxScroll = $('#afGuiEditor-canvas-body > *').height() - $canvas.height() + 20;
-        // Exceeding the maximum scrollTop breaks the animation so keep it under the limit
-        $canvas.animate({scrollTop: scrollValue > maxScroll ? maxScroll : scrollValue}, 500);
+          // Exceeding the maximum scrollTop breaks the animation so keep it under the limit
+          $canvas.animate({scrollTop: scrollValue > maxScroll ? maxScroll : scrollValue}, 500);
+        }
       };
 
       this.getAfform = function() {
