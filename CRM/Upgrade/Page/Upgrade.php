@@ -141,16 +141,15 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     // lets drop all the triggers here
     CRM_Core_DAO::dropTriggers();
 
-    $this->set('isUpgradePending', TRUE);
-
     // Persistent message storage across upgrade steps. TODO: Use structured message store
     // Note: In clustered deployments, this file must be accessible by all web-workers.
-    $this->set('postUpgradeMessageFile', CRM_Utils_File::tempnam('civicrm-post-upgrade'));
-    file_put_contents($this->get('postUpgradeMessageFile'), $postUpgradeMessage);
+    $postUpgradeMessageFile = CRM_Utils_File::tempnam('civicrm-post-upgrade');
+    Civi::settings()->set('CRM_Upgrade_Page_Upgrade_postUpgradeMessageFile', $postUpgradeMessageFile);
+    file_put_contents($postUpgradeMessageFile, $postUpgradeMessage);
 
     $queueRunner = new CRM_Queue_Runner([
       'title' => ts('CiviCRM Upgrade Tasks'),
-      'queue' => CRM_Upgrade_Form::buildQueue($currentVer, $latestVer, $this->get('postUpgradeMessageFile')),
+      'queue' => CRM_Upgrade_Form::buildQueue($currentVer, $latestVer, $postUpgradeMessageFile),
       'isMinimal' => TRUE,
       'pathPrefix' => 'civicrm/upgrade/queue',
       'onEndUrl' => CRM_Utils_System::url('civicrm/upgrade', 'action=finish', FALSE, NULL, FALSE),
@@ -167,18 +166,13 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     $upgrade = new CRM_Upgrade_Form();
     $template = CRM_Core_Smarty::singleton();
 
-    // If we're redirected from queue-runner, then isUpgradePending=true.
-    // If user then reloads the finish page, the isUpgradePending will be unset. (Because the session has been cleared.)
-    if ($this->get('isUpgradePending')) {
-      // TODO: Use structured message store
-      $postUpgradeMessage = file_get_contents($this->get('postUpgradeMessageFile'));
-
-      // This destroys $session, so do it after get('postUpgradeMessageFile')
-      CRM_Upgrade_Form::doFinish();
-    }
-    else {
-      // Session was destroyed! Can't recover messages.
-      $postUpgradeMessage = '';
+    // TODO: Use structured message store
+    // If we're redirected from queue-runner, then this will be set.
+    $postUpgradeMessageFile = Civi::settings()->get('CRM_Upgrade_Page_Upgrade_postUpgradeMessageFile');
+    $postUpgradeMessage = '';
+    if ($postUpgradeMessageFile && file_exists($postUpgradeMessageFile)) {
+      $postUpgradeMessage = file_get_contents($postUpgradeMessageFile);
+      Civi::settings()->set('CRM_Upgrade_Page_Upgrade_postUpgradeMessageFile', NULL);
     }
 
     // do a version check - after doFinish() sets the final version
