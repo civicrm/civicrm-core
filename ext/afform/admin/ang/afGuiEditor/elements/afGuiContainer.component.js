@@ -242,15 +242,14 @@
           layout: ctrl.node['#children']
         };
         if (ctrl.join) {
-          model.join = ctrl.join;
+          model.join_entity = ctrl.join;
         }
         if ($scope.block && $scope.block.original) {
           model.title = afGui.meta.blocks[$scope.block.original].title;
           model.name = afGui.meta.blocks[$scope.block.original].name;
-          model.block = afGui.meta.blocks[$scope.block.original].block;
         }
         else {
-          model.block = ctrl.getFieldEntityType();
+          model.entity_type = ctrl.getFieldEntityType();
         }
         dialogService.open('saveBlockDialog', '~/afGuiEditor/saveBlock.html', model, options)
           .then(function(block) {
