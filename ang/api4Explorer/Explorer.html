@@ -224,11 +224,13 @@
           </p>
         </div>
         <div ng-repeat="style in code[selectedTab.code]">
-          <button class="btn btn-xs btn-default pull-right" ng-click="$ctrl.copyCode('api4-code-' + selectedTab.code + '-' + style.name)">
-            <i class="crm-i fa-clipboard"></i>
-            {{:: ts('Copy') }}
-          </button>
-          <label>{{:: style.label }}</label>
+          <div class="clearfix">
+            <button class="btn btn-xs btn-default pull-right" ng-click="$ctrl.copyCode('api4-code-' + selectedTab.code + '-' + style.name)">
+              <i class="crm-i fa-clipboard"></i>
+              {{:: ts('Copy') }}
+            </button>
+            <label>{{:: style.label }}</label>
+          </div>
           <div>
             <pre class="prettyprint" id="api4-code-{{ selectedTab.code + '-' + style.name }}" ng-bind-html="style.code"></pre>
           </div>
