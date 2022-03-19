@@ -11,13 +11,14 @@
 
 use Civi\Api4\SubscriptionHistory;
 use Civi\Core\Event\PostEvent;
+use Civi\Core\HookInterface;
 
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implements \Civi\Test\HookInterface {
+class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implements HookInterface {
 
   /**
    * Deprecated add function
