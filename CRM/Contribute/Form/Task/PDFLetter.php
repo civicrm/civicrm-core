@@ -584,7 +584,9 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
         $html_message = str_replace('{contribution.' . $token . '}', implode($separator, $resolvedTokens[$token]), $html_message);
       }
     }
-    $tokenContext['contributionId'] = $contributionID;
+    else {
+      $tokenContext['contributionId'] = $contributionID;
+    }
     return CRM_Core_TokenSmarty::render(['html' => $html_message], $tokenContext)['html'];
   }
 
