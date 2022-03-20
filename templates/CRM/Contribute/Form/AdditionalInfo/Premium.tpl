@@ -69,5 +69,5 @@
   </script>
 {/if}
 {if $action ne 2 or $showOption eq true}
-  {$initHideBoxes}
+  {$initHideBoxes|smarty:nodefaults}
 {/if}

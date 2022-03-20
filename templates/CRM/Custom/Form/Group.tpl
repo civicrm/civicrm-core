@@ -73,7 +73,7 @@
       {crmButton p='civicrm/admin/custom/group/field' q="action=browse&reset=1&gid=$gid" icon="th-list"}{ts}Custom Fields for this Set{/ts}{/crmButton}
     </div>
 {/if}
-{if !empty($initHideBlocks)}{$initHideBlocks}{/if}
+{if !empty($initHideBlocks|smarty:nodefaults)}{$initHideBoxes|smarty:nodefaults}{/if}
 {literal}
 <script type="text/Javascript">
 CRM.$(function($) {

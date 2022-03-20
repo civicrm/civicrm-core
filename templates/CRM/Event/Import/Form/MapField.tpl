@@ -38,7 +38,7 @@
      </td>
    </tr>
  </table>
- {$initHideBoxes}
+ {$initHideBoxes|smarty:nodefaults}
 </div>
 {literal}
 <script type="text/javascript" >
