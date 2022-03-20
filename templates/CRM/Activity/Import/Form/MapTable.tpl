@@ -48,7 +48,7 @@
                     {if $wizard.currentStepName == 'Preview'}
                         {$mapper[$i]}
                     {else}
-                        {$form.mapper[$i].html}
+                        {$form.mapper[$i].html|smarty:nodefaults}
                     {/if}
                 </td>
 

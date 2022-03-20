@@ -98,7 +98,7 @@
                             {*/if*}
                         {/if}
                     {else}
-                        {$form.mapper[$i].html}
+                        {$form.mapper[$i].html|smarty:nodefaults}
                     {/if}
                 </td>
 

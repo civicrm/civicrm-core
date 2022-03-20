@@ -18,7 +18,7 @@
   <table class="form-layout-compressed">
     <tr class="crm-uf-field-form-block-field_name">
       <td class="label">{$form.field_name.label} {help id='field_name_0'}</td>
-      <td>{$form.field_name.html}<br />
+      <td>{$form.field_name.html|smarty:nodefaults}<br />
         <span class="description">&nbsp;{ts}Select the type of CiviCRM record and the field you want to include in this Profile.{/ts}</span></td>
     </tr>
     <tr class="crm-uf-field-form-block-label">
