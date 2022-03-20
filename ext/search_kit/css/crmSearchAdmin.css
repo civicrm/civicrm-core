@@ -201,6 +201,7 @@
 #bootstrap-theme.crm-search .crm-editable-enabled:hover:not(:focus) {
   border: 2px dashed grey !important;
 }
+/* Undo Shoreditch add-ons */
 #bootstrap-theme.crm-search .crm-editable-enabled:before,
 #bootstrap-theme.crm-search .crm-editable-enabled:after {
   content: '';

@@ -56,6 +56,16 @@
         return str ? _.unique(_.trim(str).split(/\s+/g)) : [];
       }
 
+      // Check if a node has class(es)
+      function hasClass(node, className) {
+        if (!node['class']) {
+          return false;
+        }
+        var classes = splitClass(node['class']),
+          classNames = className.split(' ');
+        return _.intersection(classes, classNames).length === classNames.length;
+      }
+
       function modifyClasses(node, toRemove, toAdd) {
         var classes = splitClass(node['class']);
         if (toRemove) {
@@ -64,7 +74,11 @@
         if (toAdd) {
           classes = _.unique(classes.concat(splitClass(toAdd)));
         }
-        node['class'] = classes.join(' ');
+        if (classes.length) {
+          node['class'] = classes.join(' ');
+        } else if ('class' in node) {
+          delete node['class'];
+        }
       }
 
       return {
@@ -202,6 +216,7 @@
         },
 
         splitClass: splitClass,
+        hasClass: hasClass,
         modifyClasses: modifyClasses,
         getStyles: getStyles,
         setStyle: setStyle,

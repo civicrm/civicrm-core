@@ -96,6 +96,7 @@
 #afGuiEditor .crm-editable-enabled:hover:not(:focus) {
   border: 2px dashed grey !important;
 }
+/* Undo Shoreditch add-ons */
 #afGuiEditor .crm-editable-enabled:before,
 #afGuiEditor .crm-editable-enabled:after {
   content: '';
@@ -141,7 +142,8 @@
   font-family: "Courier New", Courier, monospace;
   font-size: 12px;
 }
-#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-bar {
+#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-bar,
+#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container-title span:empty {
   opacity: 0;
 }
 #afGuiEditor-canvas [ui-sortable] .af-gui-bar {
@@ -152,11 +154,13 @@
   left: 0;
   padding-left: 15px;
 }
-#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-bar {
+#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-bar,
+#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-container-title span:empty {
   opacity: 1;
   transition: opacity .2s;
 }
-#afGuiEditor #afGuiEditor-canvas .af-gui-dragtarget > .af-gui-bar {
+#afGuiEditor #afGuiEditor-canvas .af-gui-dragtarget > .af-gui-bar,
+#afGuiEditor #afGuiEditor-canvas .af-gui-dragtarget > .af-gui-container-title span:empty {
   background-color: #d7e6ff;
   opacity: 1;
   transition: opacity .1s;
@@ -198,6 +202,13 @@ body.af-gui-dragging {
   min-height: 40px;
   margin-bottom: 10px;
   margin-top: 10px;
+}
+
+/* Card style */
+#afGuiEditor .af-gui-container.af-container-style-pane {
+  box-shadow: 1px 2px 8px 1px rgb(0, 0, 0, .3);
+  background: linear-gradient(to bottom, #f2f2f2 0 22px, transparent 22px 100%) no-repeat;
+  border-radius: 4px;
 }
 
 #afGuiEditor af-gui-container,
@@ -262,7 +273,8 @@ body.af-gui-dragging {
 }
 /* Fix button colors when bar is highlighted */
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button > span,
-#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > span {
+#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > span,
+#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-node-title {
   color: white;
 }
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:hover > span,
@@ -379,6 +391,12 @@ body.af-gui-dragging {
   margin-left: 5px;
   margin-right: 20px;
   position: relative;
+}
+#afGuiEditor .af-gui-container-title {
+  top: -21px;
+}
+#afGuiEditor .af-gui-container-title span:empty {
+  font-weight: lighter;
 }
 
 #afGuiEditor .af-gui-field-required:after {

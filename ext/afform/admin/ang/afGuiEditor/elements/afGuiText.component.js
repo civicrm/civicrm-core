@@ -13,7 +13,7 @@
         ctrl = this;
 
       $scope.tags = {
-        p: ts('Normal Text'),
+        p: ts('Paragraph'),
         legend: ts('Fieldset Legend'),
         h1: ts('Heading 1'),
         h2: ts('Heading 2'),

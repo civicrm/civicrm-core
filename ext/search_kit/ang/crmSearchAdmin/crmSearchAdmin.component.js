@@ -135,10 +135,11 @@
       };
 
       this.addDisplay = function(type) {
-        var count = _.filter(ctrl.savedSearch.displays, {type: type}).length;
+        var count = _.filter(ctrl.savedSearch.displays, {type: type}).length,
+          searchLabel = ctrl.savedSearch.label || searchMeta.getEntity(ctrl.savedSearch.api_entity).title_plural;
         ctrl.savedSearch.displays.push({
           type: type,
-          label: ctrl.displayTypes[type].label + (count ? ' ' + (++count) : '')
+          label: searchLabel + ' ' + ctrl.displayTypes[type].label + ' ' + (count + 1),
         });
         $scope.selectTab('display_' + (ctrl.savedSearch.displays.length - 1));
       };

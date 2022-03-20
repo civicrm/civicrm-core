@@ -10,8 +10,11 @@
       entityName: '<',
       deleteThis: '&'
     },
-    require: {editor: '^^afGuiEditor'},
-    controller: function($scope, crmApi4, dialogService, afGui) {
+    require: {
+      editor: '^^afGuiEditor',
+      parentContainer: '?^^afGuiContainer'
+    },
+    controller: function($scope, $element, crmApi4, dialogService, afGui) {
       var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
 
@@ -93,6 +96,10 @@
       var block = {};
       $scope.block = null;
 
+      this.isBlock = function() {
+        return 'layout' in block;
+      };
+
       $scope.getSetChildren = function(val) {
         var collection = block.layout || (ctrl.node && ctrl.node['#children']);
         return arguments.length ? (collection = val) : collection;
@@ -112,6 +119,12 @@
           ctrl.node.min = '1';
           ctrl.node['af-repeat'] = ts('Add');
           delete ctrl.node.data;
+        }
+      };
+
+      this.getCollapsibleIcon = function() {
+        if (afGui.hasClass(ctrl.node, 'af-collapsible')) {
+          return afGui.hasClass(ctrl.node, 'af-collapsed') ? 'fa-caret-right' : 'fa-caret-down';
         }
       };
 
@@ -254,6 +267,16 @@
         }, true));
       }
 
+      this.canSaveAsBlock = function() {
+        return !ctrl.node['af-fieldset'] &&
+          // Exclude blocks
+          !ctrl.isBlock() &&
+          // Exclude the child of a block
+          (!ctrl.parentContainer || !ctrl.parentContainer.isBlock()) &&
+          // Excludes search display containers and their children
+          (ctrl.entityName || '') === ctrl.getDataEntity();
+      };
+
       $scope.saveBlock = function() {
         var options = CRM.utils.adjustDialogDefaults({
           width: '500px',
@@ -315,6 +338,33 @@
         return type.length ? type[0].replace('af-', '') : null;
       };
 
+      this.getSetTitle = function(value) {
+        if (arguments.length) {
+          if (value.length) {
+            ctrl.node['af-title'] = value;
+          } else {
+            delete ctrl.node['af-title'];
+            // With no title, cannot be collapsible
+            afGui.modifyClasses(ctrl.node, 'af-collapsible af-collapsed');
+          }
+        }
+        return ctrl.node['af-title'];
+      };
+
+      this.getToolTip = function() {
+        var text = '', nodeType;
+        if (!$scope.block) {
+          nodeType = ctrl.getNodeType(ctrl.node);
+          if (nodeType === 'fieldset') {
+            text = ctrl.editor.getEntity(ctrl.entityName).label;
+          } else if (nodeType === 'searchFieldset') {
+            text = ts('Search Display');
+          }
+          text += ' ' + $scope.tags[ctrl.node['#tag']];
+        }
+        return text;
+      };
+
       this.removeElement = function(element) {
         afGui.removeRecursive($scope.getSetChildren(), {$$hashKey: element.$$hashKey});
         ctrl.editor.onRemoveElement();
@@ -326,6 +376,10 @@
 
       this.getEntityName = function() {
         return ctrl.entityName ? ctrl.entityName.split('-join-')[0] : null;
+      };
+
+      this.getDataEntity = function() {
+        return $element.attr('data-entity') || '';
       };
 
       this.getJoinEntity = function() {
@@ -342,16 +396,15 @@
 
       // Returns the entity type for fields within this conainer (join entity type if this is a join, else the primary entity type)
       this.getFieldEntityType = function(fieldName) {
+        var entityType;
         // If entityName is declared for this fieldset, return entity-type or join-type
         if (ctrl.entityName) {
           var joinType = ctrl.entityName.split('-join-');
-          return joinType[1] || (ctrl.editor && ctrl.editor.getEntity(joinType[0]).type);
-        }
-        // If entityName is not declared, this field belongs to a search
-        var entityType,
-          searchDisplay = ctrl.getSearchDisplay(ctrl.node),
-          prefix = _.includes(fieldName, '.') ? fieldName.split('.')[0] : null;
-        if (searchDisplay) {
+          entityType = joinType[1] || (ctrl.editor && ctrl.editor.getEntity(joinType[0]).type);
+        } else {
+          var searchKey = ctrl.getDataEntity(),
+            searchDisplay = afGui.getSearchDisplay.apply(null, searchKey.split('.')),
+            prefix = _.includes(fieldName, '.') ? fieldName.split('.')[0] : null;
           if (prefix) {
             _.each(searchDisplay['saved_search_id.api_params'].join, function(join) {
               var joinInfo = join[0].split(' AS ');
@@ -365,7 +418,8 @@
             entityType = searchDisplay['saved_search_id.api_entity'];
           }
         }
-        return entityType || _.map(afGui.meta.searchDisplays, 'saved_search_id.api_entity')[0];
+
+        return entityType;
       };
 
     }
