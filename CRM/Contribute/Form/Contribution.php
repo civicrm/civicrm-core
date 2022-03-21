@@ -280,14 +280,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->assignPremiumProduct($this->_id);
       $this->buildValuesAndAssignOnline_Note_Type($this->_id, $this->_values);
     }
+    if (!isset($this->_values['is_template'])) {
+      $this->_values['is_template'] = FALSE;
+    }
+    $this->assign('is_template', $this->_values['is_template']);
 
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
       $this->applyCustomData('Contribution', $this->getFinancialTypeID(), $this->_id);
-    }
-
-    if (!empty($this->_values['is_template'])) {
-      $this->assign('is_template', TRUE);
     }
 
     $this->_lineItems = [];
