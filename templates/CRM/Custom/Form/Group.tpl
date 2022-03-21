@@ -18,7 +18,7 @@
     </tr>
     <tr>
         <td class="label">{$form.extends.label}</td>
-        <td>{$form.extends.html} {help id="id-extends"}</td>
+        <td>{$form.extends.html|smarty:nodefaults} {help id="id-extends"}</td>
     </tr>
     <tr>
         <td class="label">{$form.weight.label}</td>
