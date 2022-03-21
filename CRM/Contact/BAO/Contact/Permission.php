@@ -230,7 +230,7 @@ WHERE contact_a.id = %1 AND $permission
     if (!$force) {
       // skip if already calculated
       if (!empty(Civi::$statics[__CLASS__]['processed'][$type][$userID])) {
-        \Civi::log()->debug("CRM_Contact_BAO_Contact_Permission::cache already called. Operation: $operation; UserID: $userID");
+        // \Civi::log()->debug("CRM_Contact_BAO_Contact_Permission::cache already called. Operation: $operation; UserID: $userID");
         return;
       }
     }
@@ -243,7 +243,7 @@ WHERE contact_a.id = %1 AND $permission
       // The default 3 second timeout should be enough for the other process to finish.
       // However this routine does not return the status either, so basically
       // its a "lets return and hope for the best"
-      \Civi::log()->debug("cache: aclcontact lock not acquired for user: $userID");
+      // \Civi::log()->debug("cache: aclcontact lock not acquired for user: $userID");
       return;
     }
 
@@ -263,13 +263,12 @@ AND    $operationClause
       if ($count > 0) {
         Civi::$statics[__CLASS__]['processed'][$type][$userID] = 1;
         $lock->release();
-        \Civi::log()
-          ->debug("CRM_Contact_BAO_Contact_Permission::cache already called via check query. Operation: $operation; UserID: $userID");
+        // \Civi::log()->debug("CRM_Contact_BAO_Contact_Permission::cache already called via check query. Operation: $operation; UserID: $userID");
         return;
       }
     }
 
-    \Civi::log()->debug("cache: building for $userID; operation=$operation; force=$force");
+    // \Civi::log()->debug("cache: building for $userID; operation=$operation; force=$force");
 
     $tables = [];
     $whereTables = [];
