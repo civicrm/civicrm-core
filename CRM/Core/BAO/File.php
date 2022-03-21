@@ -265,13 +265,6 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
       $cefIDs[] = $dao->cefID;
     }
 
-    if (!empty($cefIDs)) {
-      $cefIDs = implode(',', $cefIDs);
-      $sql = "DELETE FROM civicrm_entity_file where id IN ( $cefIDs )";
-      CRM_Core_DAO::executeQuery($sql);
-      $isDeleted = TRUE;
-    }
-
     if (!empty($cfIDs)) {
       // Delete file only if there no any entity using this file.
       $deleteFiles = [];
@@ -297,6 +290,14 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
       }
       $isDeleted = TRUE;
     }
+
+    if (!empty($cefIDs)) {
+      $cefIDs = implode(',', $cefIDs);
+      $sql = "DELETE FROM civicrm_entity_file where id IN ( $cefIDs )";
+      CRM_Core_DAO::executeQuery($sql);
+      $isDeleted = TRUE;
+    }
+
     return $isDeleted;
   }
 
