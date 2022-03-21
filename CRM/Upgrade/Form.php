@@ -841,7 +841,8 @@ SET    version = '$version'
    * @return bool
    */
   public static function doFinish(): bool {
-    CRM_Core_Config::singleton()->cleanupCaches(TRUE);
+    $session = CRM_Core_Session::singleton();
+    $session->reset(2);
     return TRUE;
   }
 
