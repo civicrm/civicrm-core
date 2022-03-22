@@ -42,15 +42,15 @@ SELECT @option_marital_id := max(id) from civicrm_option_group where name = 'cus
 -- * create option values (custom options for custom fields)
 -- *
 -- *******************************************************/
-INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`, `weight`, `is_active`, `is_default`)
-  VALUES (@option_most_id   , 'Education', 'Edu', 1, 1,0),
-         (@option_most_id   , 'Environment', 'Env', 2, 1,0),
-         (@option_most_id   , 'Social Justice', 'SocJus', 3, 1,0),
-         (@option_marital_id, 'Single', 'S', 1, 1,0),
-         (@option_marital_id, 'Married', 'M', 2, 1,0),
-         (@option_marital_id, 'Domestic Partner', 'D', 3, 1,0),
-         (@option_marital_id, 'Widowed', 'W', 4, 1,0),
-         (@option_marital_id, 'Other', 'O', 5, 1,0);
+INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `name`, `value`, `weight`, `is_active`, `is_default`)
+  VALUES (@option_most_id   , 'Education', 'Education', 'Edu', 1, 1,0),
+         (@option_most_id   , 'Environment', 'Environment', 'Env', 2, 1,0),
+         (@option_most_id   , 'Social Justice', 'Social_Justice', 'SocJus', 3, 1,0),
+         (@option_marital_id, 'Single', 'Single', 'S', 1, 1,0),
+         (@option_marital_id, 'Married', 'Married', 'M', 2, 1,0),
+         (@option_marital_id, 'Domestic Partner', 'Domestic_Partner', 'D', 3, 1,0),
+         (@option_marital_id, 'Widowed', 'Widowed', 'W', 4, 1,0),
+         (@option_marital_id, 'Other', 'Other', 'O', 5, 1,0);
 
 
 -- /*******************************************************
