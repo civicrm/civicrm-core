@@ -1313,7 +1313,10 @@ SELECT is_primary,
     // core#2379 - Limit geocode length to 14 characters to avoid validation error on save in UI.
     foreach (['geo_code_1', 'geo_code_2'] as $geocode) {
       if ($params[$geocode] ?? FALSE) {
-        $params[$geocode] = (float) substr($params[$geocode], 0, 14);
+        // ensure that if the geocoding provider (Google, OSM etc) has returned the string 'null' because they can't geocode, ensure that contacts are not placed on null island 0,0
+        if ($params[$geocode] !== 'null') {
+          $params[$geocode] = (float) substr($params[$geocode], 0, 14);
+        }
       }
     }
     return $providerExists;
