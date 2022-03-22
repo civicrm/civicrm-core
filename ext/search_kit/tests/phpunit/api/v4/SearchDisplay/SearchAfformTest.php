@@ -239,6 +239,12 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $this->assertCount(1, $refs);
     $this->assertEquals('Afform', $refs[0]['type']);
 
+    SearchDisplay::delete(FALSE)
+      ->addWhere('name', '=', 'TestDisplayToDelete')
+      ->execute();
+
+    $this->assertCount(1, Afform::get(FALSE)->addWhere('name', 'CONTAINS', 'TestAfformToDelete')->execute());
+
     SavedSearch::delete(FALSE)
       ->addWhere('name', '=', 'TestSearchToDelete')
       ->execute();
