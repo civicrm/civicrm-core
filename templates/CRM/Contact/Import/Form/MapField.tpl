@@ -34,6 +34,6 @@ if ( document.getElementsByName("saveMapping")[0].checked ) {
 </script>
 
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
- {$initHideBoxes}
+ {$initHideBoxes|smarty:nodefaults}
 
 </div>

@@ -22,7 +22,7 @@
  {include file="CRM/Contribute/Import/Form/MapTable.tpl}
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
- {$initHideBoxes}
+ {$initHideBoxes|smarty:nodefaults}
 </div>
 {literal}
 <script type="text/javascript" >
