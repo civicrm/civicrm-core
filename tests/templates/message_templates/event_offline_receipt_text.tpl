@@ -1,0 +1,10 @@
+contactID:::{$contactID}
+eventID:::{$eventID}
+participantID:::{$participantID}
+contact.id:::{contact.id}
+event.id:::{event.id}
+participant.id:::{participant.id}
+event.title:::{event.title}
+participant.status_id:name:::{participant.status_id:name}
+email:::{$email}
+event.pay_later_receipt:::{event.pay_later_receipt}

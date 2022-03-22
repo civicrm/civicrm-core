@@ -175,10 +175,12 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
    *
    */
   protected function getExposedFields(): array {
-    return ['event_type_id',
+    return [
+      'event_type_id',
       'title',
       'id',
       'event_tz',
+      'pay_later_receipt',
       'start_date',
       'end_date',
       'summary',

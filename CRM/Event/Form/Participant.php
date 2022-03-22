@@ -1499,7 +1499,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
                 }
               }
             }
-            $this->assign('totalTaxAmount', $totalTaxAmount);
             $this->assign('taxTerm', $this->getSalesTaxTerm());
             $this->assign('dataArray', $dataArray);
           }
@@ -1516,13 +1515,16 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           $eventAmount = array_merge($eventAmount, $additionalParticipantDetails);
           $this->assign('amount', $eventAmount);
         }
-
+        $this->assign('totalTaxAmount', $totalTaxAmount ?? 0);
         $sendTemplateParams = [
-          'groupName' => 'msg_tpl_workflow_event',
-          'valueName' => 'event_offline_receipt',
+          'workflow' => 'event_offline_receipt',
           'contactId' => $contactID,
           'isTest' => !empty($this->_defaultValues['is_test']),
           'PDFFilename' => ts('confirmation') . '.pdf',
+          'modelProps' => [
+            'participantID' => $this->_id,
+            'eventID' => $params['event_id'],
+          ],
         ];
 
         // try to send emails only if email id is present
