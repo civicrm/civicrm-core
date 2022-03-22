@@ -509,7 +509,7 @@ function afform_civicrm_pre($op, $entity, $id, &$params) {
       ->execute();
   }
   // When deleting a savedSearch, delete any Afforms which use the default display
-  if ($entity === 'SearchDisplay' && $op === 'delete') {
+  elseif ($entity === 'SavedSearch' && $op === 'delete') {
     $search = \Civi\Api4\SavedSearch::get(FALSE)
       ->addSelect('name')
       ->addWhere('id', '=', $id)
