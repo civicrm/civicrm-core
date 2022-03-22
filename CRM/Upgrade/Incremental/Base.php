@@ -195,7 +195,9 @@ class CRM_Upgrade_Incremental_Base {
     // Note: A good test-scenario is to install 5.45; enable logging and CiviGrant; disable searchkit+afform; then upgrade to 5.47.
     $schema = new CRM_Logging_Schema();
     $schema->fixSchemaDifferences();
-    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, TRUE);
+
+    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
+    // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the page. We reset later in doFinish().
 
     return TRUE;
   }
