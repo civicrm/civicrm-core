@@ -20,10 +20,35 @@ trait CRM_Upgrade_Incremental_php_TimezoneRevertTrait {
 
   public function createEventTzPreUpgradeMessage(): string {
     if (self::areEventsUsingTimestamp() && self::areThereAnyCiviEvents()) {
-      return '<div><span>' . ts('CiviEvent Timezones') . '</span><ul><li>' . ts('It is important that you run this upgrade under a user account that has the same CMS timezone setting as the user account that originally ran the upgrade to 5.47. Your timezone is %1. <a %2>(Learn more...)</a>', [
-        1 => CRM_Core_Config::singleton()->userSystem->getTimeZoneString(),
-        2 => 'target="_blank" href="https://civicrm.org/redirect/event-timezone-5.47"',
-      ]) . '</li></ul></div>';
+      $timezoneStats = $this->getTimezoneStats();
+      return '<div><span>' . ts('CiviEvent Timezone Rollback') . '</span><ul><li>'
+        . ts('The upgrade will rollback recent changes involving CiviEvent timezones.')
+        . '</li><li>'
+        . ts('This requires converting CiviEvent times. After conversion, <em>CiviEvent times may be skewed</em>.')
+        . '</li><li>'
+        . ts('To prevent or fix skewed times, please review <a %1>CiviEvent v5.47 Timezone Notice</a>.', [
+          1 => 'target="_blank" href="https://civicrm.org/redirect/event-timezone-5.47"',
+        ])
+        . '</li><li>'
+        . ts('The conversion will be performed with your active timezone (<strong><code>%1</code></strong>, <strong><code>%2</code></strong>).', [
+          1 => CRM_Core_Config::singleton()->userSystem->getTimeZoneString(),
+          2 => CRM_Core_Config::singleton()->userSystem->getTimeZoneOffset(),
+        ])
+        . '</li><li>'
+        . ts('The database has %1 events which all use the same timezone (<strong><code>%2</code></strong>).', [
+          1 => array_sum(array_column($timezoneStats, 'count')),
+          2 => $timezoneStats[0]['name'],
+          3 => count($timezoneStats),
+          4 => implode(', ', array_map(
+            function($stat) {
+              return sprintf('<strong><code>%s</code></strong> [%dx]', htmlentities($stat['name']), $stat['count']);
+            },
+            $timezoneStats
+          )),
+          'plural' => 'The database has %1 events with %3 timezones (%4).',
+          'count' => count($timezoneStats),
+        ])
+        . '</li></ul></div>';
     }
     return '';
   }
@@ -99,20 +124,13 @@ trait CRM_Upgrade_Incremental_php_TimezoneRevertTrait {
     return (bool) CRM_Core_DAO::singleValueQuery('SELECT COUNT(id) FROM civicrm_event');
   }
 
-  /**
-   * Return the event_tz that is used most often. The idea being that if they
-   * didn't change too much after upgrading to 5.47 this will be the timezone
-   * of the account that was used to do the original upgrade to 5.47.
-   * @return string
-   */
-  private static function getMajorityTimezone(): string {
-    $dao = CRM_Core_DAO::executeQuery('SELECT event_tz, COUNT(event_tz) AS cnt FROM civicrm_event GROUP BY event_tz ORDER BY COUNT(event_tz) DESC LIMIT 1');
-    if ($dao->fetch()) {
-      return $dao->event_tz;
+  private function getTimezoneStats(): array {
+    $dao = CRM_Core_DAO::executeQuery('SELECT event_tz, COUNT(*) AS `count` FROM civicrm_event GROUP BY event_tz ORDER BY COUNT(event_tz) DESC');
+    $r = [];
+    while ($dao->fetch()) {
+      $r[] = ['name' => $dao->event_tz ?: ts('Empty'), 'count' => $dao->count];
     }
-    // This shouldn't happen, because our function only gets called if there is
-    // at least one event in the system.
-    return '';
+    return $r;
   }
 
 }
