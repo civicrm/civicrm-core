@@ -26,12 +26,12 @@
 {ts}Membership Fee{/ts}
 
 ===========================================================
-{if !$useForMember && isset($membership_amount) && !empty($is_quick_config)}
+{if !$useForMember && $is_separate_payment && $membership_amount && !empty($is_quick_config)}
 {ts 1=$membership_name}%1 Membership{/ts}: {$membership_amount|crmMoney}
 {if $amount && !$is_separate_payment }
 {ts}Contribution Amount{/ts}: {$amount|crmMoney}
 -------------------------------------------
-{ts}Total{/ts}: {$amount+$membership_amount|crmMoney}
+{ts}Total{/ts}: {$amount|crmMoney}
 {/if}
 {elseif !$useForMember && !empty($lineItem) and !empty($priceSetID) & empty($is_quick_config)}
 {foreach from=$lineItem item=value key=priceset}
@@ -83,13 +83,13 @@
 --------------------------------------------------------------------------------------------------
 {/if}
 
-{if isset($totalTaxAmount)}
+{if $totalTaxAmount}
 {ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}
 {/if}
 
 {ts}Amount{/ts}: {$amount|crmMoney} {if isset($amount_level) } - {$amount_level} {/if}
 {/if}
-{elseif isset($membership_amount)}
+{elseif $is_separate_payment && $membership_amount}
 ===========================================================
 {ts}Membership Fee{/ts}
 

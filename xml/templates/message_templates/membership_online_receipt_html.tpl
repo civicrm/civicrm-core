@@ -78,7 +78,7 @@
        </th>
       </tr>
 
-      {if !$useForMember and isset($membership_amount) and !empty($is_quick_config)}
+      {if !$useForMember and $is_separate_payment && $membership_amount and !empty($is_quick_config)}
 
        <tr>
         <td {$labelStyle}>
@@ -102,7 +102,7 @@
            {ts}Total{/ts}
             </td>
             <td {$valueStyle}>
-            {$amount+$membership_amount|crmMoney}
+            {$amount|crmMoney}
            </td>
          </tr>
        {/if}
@@ -227,7 +227,7 @@
         {/foreach}
        {/if}
        {/if}
-       {if isset($totalTaxAmount)}
+       {if $totalTaxAmount}
         <tr>
          <td {$labelStyle}>
           {ts}Total Tax Amount{/ts}
@@ -249,7 +249,7 @@
       {/if}
 
 
-     {elseif isset($membership_amount)}
+     {elseif $is_separate_payment && $membership_amount}
 
 
       <tr>
