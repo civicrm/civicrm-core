@@ -53,8 +53,8 @@ af-form {
 .af-collapsible.af-collapsed > .af-title:before {
   content: "\f0da";
 }
-.af-collapsible.af-collapsed > .af-title + * {
-  display: none;
+.af-collapsible.af-collapsed > .af-title ~ * {
+  display: none !important;
 }
 
 /* Card style */
