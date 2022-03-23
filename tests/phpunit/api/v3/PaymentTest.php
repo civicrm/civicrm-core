@@ -23,19 +23,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   protected $_financialTypeId = 1;
 
   /**
-   * Should financials be checked after the test but before tear down.
-   *
-   * Ideally all tests (or at least all that call any financial api calls ) should do this but there
-   * are some test data issues and some real bugs currently blocking.
-   *
-   * @var bool
-   */
-  protected $isValidateFinancialsOnPostAssert = TRUE;
-
-  /**
    * Setup function.
-   *
-   * @throws \CiviCRM_API3_Exception
    */
   public function setUp(): void {
     parent::setUp();
@@ -105,8 +93,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   /**
    * Test multiple payments for contribution and assert if option
    * and is_payment returns the correct list of payments.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testMultiplePaymentsForContribution(): void {
     $params = [
@@ -151,7 +137,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * Retrieve Payment using trxn_id.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testGetPaymentWithTrxnID(): void {
     $individual2 = $this->individualCreate();
@@ -332,8 +317,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'Dear Anthony,',
       'Below you will find a receipt for this payment.',
       'Total Fee: $300.00',
+      'Total Paid: $300.00',
       'This Payment Amount: $150.00',
-      'Balance Owed: $0.00',
       'Thank you for completing this payment.',
     ]);
   }
@@ -412,9 +397,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * I mostly could not find a way to do it through the UI. But I did seem to once &
    * I want to be sure that if they ARE missing no fatal occurs so this tests
    * that in an artificial way.
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testAddPaymentMissingFinancialItems(): void {
     $contribution = $this->callAPISuccess('Contribution', 'create', [
@@ -506,8 +488,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    *
    * @param array $payment
    * @param array $expectedResult
-   *
-   * @throws \CRM_Core_Exception
    */
   public function checkPaymentResult(array $payment, array $expectedResult): void {
     $refreshedPayment = $this->callAPISuccessGetSingle('Payment', ['financial_trxn_id' => $payment['id']]);
@@ -593,8 +573,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   /**
    * Test negative payment using create API.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testRefundPayment(): void {
     $result = $this->callAPISuccess('Contribution', 'create', [
@@ -867,7 +845,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * Test create payment api for pay later contribution
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCreatePaymentPayLater(): void {
     $this->createLoggedInUser();
@@ -1070,8 +1047,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * @param $contributionID
    * @param $partialAmount
    * @param $totalAmount
-   *
-   * @throws \CRM_Core_Exception
    */
   public function createPartialPaymentOnContribution($contributionID, $partialAmount, $totalAmount): void {
     //Create partial payment
@@ -1232,8 +1207,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * @param int $paymentID
    * @param int $contributionID
    * @param int $amount
-   *
-   * @throws \CRM_Core_Exception
    */
   protected function checkPaymentIsValid(int $paymentID, int $contributionID, int $amount = 50): void {
     $payment = $this->callAPISuccess('Payment', 'getsingle', ['financial_trxn_id' => $paymentID]);
