@@ -1042,26 +1042,4 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     return $messages;
   }
 
-  /**
-   * Ensure that the CMS is providing a supported timezone.
-   *
-   * @return CRM_Utils_Check_Message[]
-   */
-  public function checkUFTimezoneValid() {
-    $messages = [];
-    $check_tz = CRM_Core_Config::singleton()->userSystem->getTimeZoneString();
-
-    if (!array_key_exists($check_tz, CRM_Core_SelectValues::timezone())) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('This system has an invalid timezone set. Please verify that your CMS has a timezone configured that is listed under the <a href="%1">PHP List of Supported Timezones</a>.', [1 => 'https://www.php.net/manual/en/timezones.php']),
-        ts('Missing or Invalid Timezone'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-clock-o'
-      );
-    }
-
-    return $messages;
-  }
-
 }

@@ -124,15 +124,13 @@
   </field>
   <field>
     <name>start_date</name>
-    <type>timestamp</type>
+    <type>datetime</type>
     <uniqueName>event_start_date</uniqueName>
     <title>Event Start Date</title>
     <headerPattern>/^start|(s(tart\s)?date)$/i</headerPattern>
     <import>true</import>
     <comment>Date and time that event starts.</comment>
     <add>1.7</add>
-    <required>false</required>
-    <default>NULL</default>
     <html>
       <type>Select Date</type>
       <formatType>activityDateTime</formatType>
@@ -140,15 +138,13 @@
   </field>
   <field>
     <name>end_date</name>
-    <type>timestamp</type>
+    <type>datetime</type>
     <uniqueName>event_end_date</uniqueName>
     <title>Event End Date</title>
     <headerPattern>/^end|(e(nd\s)?date)$/i</headerPattern>
     <import>true</import>
     <comment>Date and time that event ends. May be NULL if no defined end date/time</comment>
     <add>1.7</add>
-    <required>false</required>
-    <default>NULL</default>
     <html>
       <type>Select Date</type>
       <formatType>activityDateTime</formatType>
@@ -179,11 +175,9 @@
   </field>
   <field>
     <name>registration_start_date</name>
-    <type>timestamp</type>
+    <type>datetime</type>
     <comment>Date and time that online registration starts.</comment>
     <add>1.8</add>
-    <required>false</required>
-    <default>NULL</default>
     <html>
       <type>Select Date</type>
       <formatType>activityDateTime</formatType>
@@ -192,11 +186,9 @@
   </field>
   <field>
     <name>registration_end_date</name>
-    <type>timestamp</type>
+    <type>datetime</type>
     <comment>Date and time that online registration ends.</comment>
     <add>1.8</add>
-    <required>false</required>
-    <default>NULL</default>
     <html>
       <type>Select Date</type>
       <formatType>activityDateTime</formatType>
@@ -901,21 +893,5 @@
     <html>
       <type>CheckBox</type>
     </html>
-  </field>
-  <field>
-    <name>event_tz</name>
-    <type>text</type>
-    <uniqueName>event_tz</uniqueName>
-    <title>Event Time Zone</title>
-    <import>true</import>
-    <comment>Event's native time zone</comment>
-    <add>5.47</add>
-    <default>NULL</default>
-    <html>
-      <type>Select</type>
-    </html>
-    <pseudoconstant>
-      <callback>CRM_Core_SelectValues::timezone</callback>
-    </pseudoconstant>
   </field>
 </table>

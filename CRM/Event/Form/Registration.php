@@ -231,8 +231,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $params = ['id' => $this->_eventId];
       CRM_Event_BAO_Event::retrieve($params, $this->_values['event']);
 
-      CRM_Event_BAO_Event::setOutputTimeZone($this->_values['event'], $this->_values['event']['event_tz']);
-
       // check for is_monetary status
       $isMonetary = $this->_values['event']['is_monetary'] ?? NULL;
       // check for ability to add contributions of type
