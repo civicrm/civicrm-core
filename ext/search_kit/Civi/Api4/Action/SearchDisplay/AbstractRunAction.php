@@ -1013,22 +1013,28 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if (!empty($field['options'])) {
       $options = civicrm_api4($field['entity'], 'getFields', [
         'loadOptions' => TRUE,
+        'checkPermissions' => FALSE,
         'where' => [['name', '=', $field['name']]],
       ])->first()['options'] ?? [];
-      if (!empty($options[$value])) {
-        $this->filterLabels[] = $options[$value];
+      foreach ((array) $value as $val) {
+        if (!empty($options[$val])) {
+          $this->filterLabels[] = $options[$val];
+        }
       }
     }
     elseif (!empty($field['fk_entity'])) {
       $idField = CoreUtil::getIdFieldName($field['fk_entity']);
       $labelField = CoreUtil::getInfoItem($field['fk_entity'], 'label_field');
       if ($labelField) {
-        $record = civicrm_api4($field['fk_entity'], 'get', [
-          'where' => [[$idField, '=', $value]],
+        $records = civicrm_api4($field['fk_entity'], 'get', [
+          'checkPermissions' => $this->checkPermissions,
+          'where' => [[$idField, 'IN', (array) $value]],
           'select' => [$labelField],
-        ])->first() ?? NULL;
-        if (isset($record[$labelField])) {
-          $this->filterLabels[] = $record[$labelField];
+        ]);
+        foreach ($records as $record) {
+          if (isset($record[$labelField])) {
+            $this->filterLabels[] = $record[$labelField];
+          }
         }
       }
     }
