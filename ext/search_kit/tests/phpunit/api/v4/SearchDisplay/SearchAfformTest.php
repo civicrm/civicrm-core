@@ -46,9 +46,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
             'GROUP_CONCAT(DISTINCT Contact_Email_contact_id_01.email) AS GROUP_CONCAT_Contact_Email_contact_id_01_email',
           ],
           'orderBy' => [],
-          'where' => [
-            ['contact_type:name', '=', 'Individual'],
-          ],
+          'where' => [],
           'groupBy' => ['id'],
           'join' => [
             [
@@ -146,6 +144,12 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $params['filters'] = ['first_name' => 'tester2'];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertGreaterThan(1, $result->count());
+
+    // For a filter with options, ensure labels are set
+    $params['filters'] = ['contact_type' => ['Individual']];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertGreaterThan(1, $result->count());
+    $this->assertEquals(['Individual'], $result->labels);
 
     // Note that filters add a wildcard so the value `afform_test` matches all 3 sample contacts;
     // But the Afform markup contains `filters="{last_name: 'AfformTest'}"` which only matches 2.
