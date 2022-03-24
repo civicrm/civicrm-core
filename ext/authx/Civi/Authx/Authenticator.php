@@ -130,15 +130,40 @@ class Authenticator {
 
         try {
           $claims = \Civi::service('crypto.jwt')->decode($credValue);
-          $scopes = isset($claims['scope']) ? explode(' ', $claims['scope']) : [];
-          if (!in_array('authx', $scopes)) {
-            $this->reject('JWT does not permit general authentication');
+
+          // Dispatch event that allows extensions to override the checking of
+          // scope and/or sub claims. E.g. parse the sub claim in a different
+          // manner.
+          $event = new JwtClaimsCheckEvent($claims);
+          \Civi::dispatcher()->dispatch('civi.authx.jwtclaimscheck', $event);
+          $overrides = $event->getOverrides();
+
+          if (isset($overrides['scope'])) {
+            if ($overrides['scope']['reject']) {
+              $this->reject($overrides['scope']['message']);
+            }
           }
-          if (empty($claims['sub']) || substr($claims['sub'], 0, 4) !== 'cid:') {
-            $this->reject('JWT does not specify the contact ID (sub)');
+          else {
+            $scopes = isset($claims['scope']) ? explode(' ', $claims['scope']) : [];
+            if (!in_array('authx', $scopes)) {
+              $this->reject('JWT does not permit general authentication');
+            }
           }
-          $contactId = substr($claims['sub'], 4);
-          return ['contactId' => $contactId, 'credType' => 'jwt', 'jwt' => $claims];
+
+          if (isset($overrides['sub'])) {
+            if ($overrides['sub']['reject']) {
+              $this->reject($overrides['sub']['message']);
+            }
+            unset($overrides['sub']['reject']);
+            return ['credType' => 'jwt', 'jwt' => $claims] + $overrides['sub'];
+          }
+          else {
+            if (empty($claims['sub']) || substr($claims['sub'], 0, 4) !== 'cid:') {
+              $this->reject('JWT does not specify the contact ID (sub)');
+            }
+            $contactId = substr($claims['sub'], 4);
+            return ['contactId' => $contactId, 'credType' => 'jwt', 'jwt' => $claims];
+          }
         }
         catch (CryptoException $e) {
           // Invalid JWT. Proceed to check any other token sources.
