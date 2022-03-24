@@ -189,23 +189,4 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
     return TRUE;
   }
 
-  /**
-   * Add a column to a table if it doesn't already exist
-   *
-   * FIXME: Move to a shared class, delegate to CRM_Upgrade_Incremental_Base::addColumn
-   *
-   * @param string $table
-   * @param string $column
-   * @param string $properties
-   *
-   * @return bool
-   */
-  public static function addColumn($table, $column, $properties) {
-    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column, FALSE)) {
-      $query = "ALTER TABLE `$table` ADD COLUMN `$column` $properties";
-      CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
-    }
-    return TRUE;
-  }
-
 }

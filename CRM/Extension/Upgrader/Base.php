@@ -23,6 +23,7 @@ class CRM_Extension_Upgrader_Base implements CRM_Extension_Upgrader_Interface {
   use CRM_Extension_Upgrader_QueueTrait;
   use CRM_Extension_Upgrader_RevisionsTrait;
   use CRM_Extension_Upgrader_TasksTrait;
+  use CRM_Extension_Upgrader_SchemaTrait;
 
   /**
    * {@inheritDoc}
