@@ -144,8 +144,6 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
       $tokens['event_type_id:name']['text/html'] = CRM_Core_PseudoConstant::getName('CRM_Event_BAO_Event', 'event_type_id', $event['event_type_id']);
       $tokens['contact_phone']['text/html'] = $event['loc_block_id.phone_id.phone'];
       $tokens['contact_email']['text/html'] = $event['loc_block_id.email_id.email'];
-      $tokens['event_tz:label']['text/html'] = !empty($event['event_tz']) ? CRM_Core_SelectValues::timezone()[$event['event_tz']] : '';
-      $tokens['event_tz:name']['text/html'] = $event['event_tz'] ?? '';
 
       foreach ($this->getTokenMetadata() as $fieldName => $fieldSpec) {
         if (!isset($tokens[$fieldName])) {
@@ -178,7 +176,6 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
     return ['event_type_id',
       'title',
       'id',
-      'event_tz',
       'start_date',
       'end_date',
       'summary',

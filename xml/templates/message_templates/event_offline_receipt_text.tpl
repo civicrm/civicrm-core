@@ -42,7 +42,7 @@
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 
 {$event.event_title}
-{$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if} {$event.event_tz}
+{$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
 
 {if !empty($event.participant_role) and $event.participant_role neq 'Attendee' and empty($defaultRole)}
 {ts}Participant Role{/ts}: {$event.participant_role}

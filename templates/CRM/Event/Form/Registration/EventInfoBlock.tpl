@@ -18,27 +18,20 @@
     {/if}
     </td>
   </tr>
-  <tr class="crm-section event_date_time-section">
-      <td class="label">{ts}Event Start{/ts}</td>
-      <td class="content">
-          <time datetime="{$event.event_start_date_utc|date_format:"%Y-%m-%dT%H:%M:%S"}Z">{$event.event_start_date|crmDate}<span class="timezone"> {$event.event_tz}</span></time>
+  <tr><td>{ts}When{/ts}</td>
+      <td width="90%">
+        {$event.event_start_date|crmDate}
+        {if $event.event_end_date}
+            &nbsp; {ts}through{/ts} &nbsp;
+            {* Only show end time if end date = start date *}
+            {if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}
+                {$event.event_end_date|crmDate:0:1}
+            {else}
+                {$event.event_end_date|crmDate}
+            {/if}
+        {/if}
       </td>
   </tr>
-  {if $event.event_end_date}
-  <tr class="crm-section event_date_time-section">
-      <td class="label">{ts}Event End{/ts}</td>
-      <td class="content">
-          <time datetime="{$event.event_end_date_utc|date_format:"%Y-%m-%dT%H:%M:%S"}Z">{strip}
-          {* Only show end time if end date = start date *}
-          {if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}
-              {$event.event_end_date|crmDate:0:1}
-          {else}
-              {$event.event_end_date|crmDate}
-          {/if}
-          {/strip}<span class="timezone"> {$event.event_tz}</span></time>
-      </td>
-  </tr>
-  {/if}
 
   {if $isShowLocation}
     {if $location.address.1}

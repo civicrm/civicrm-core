@@ -361,19 +361,6 @@ ORDER BY start_date desc
         }
         CRM_Core_DAO::storeValues($dao, $manageEvent[$dao->id]);
 
-        // avoid enotices
-        foreach (CRM_Event_BAO_Event::tz_fields as $field) {
-          $manageEvent[$dao->id][$field . '_with_tz'] = NULL;
-        }
-        if (!is_null($dao->event_tz) && $dao->event_tz != CRM_Core_Config::singleton()->userSystem->getTimeZoneString()) {
-          foreach (CRM_Event_BAO_Event::tz_fields as $field) {
-            if (!empty($dao->{$field})) {
-              $manageEvent[$dao->id][$field . '_with_tz'] = CRM_Utils_Date::convertTimeZone($dao->{$field}, $dao->event_tz);
-            }
-          }
-        }
-        $manageEvent[$dao->id]['event_tz'] = $dao->event_tz ? CRM_Core_SelectValues::timezone()[$dao->event_tz] : FALSE;
-
         // form all action links
         $action = array_sum(array_keys($this->links()));
 

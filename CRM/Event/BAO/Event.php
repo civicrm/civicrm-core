@@ -15,7 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
-  const tz_fields = ['event_start_date', 'event_end_date', 'start_date', 'end_date', 'registration_start_date', 'registration_end_date'];
 
   /**
    * Fetch object based on array of properties.
@@ -780,7 +779,6 @@ SELECT
   civicrm_email.email as email,
   civicrm_event.title as title,
   civicrm_event.summary as summary,
-  civicrm_event.event_tz as event_tz,
   civicrm_event.start_date as start,
   civicrm_event.end_date as end,
   civicrm_event.description as description,
@@ -852,7 +850,6 @@ WHERE civicrm_event.is_active = 1
         $info['event_id'] = $dao->event_id;
         $info['summary'] = $dao->summary;
         $info['description'] = $dao->description;
-        $info['tz'] = $dao->event_tz ?? CRM_Core_Config::singleton()->userSystem->getTimeZoneString();
         $info['start_date'] = $dao->start;
         $info['end_date'] = $dao->end;
         $info['contact_email'] = $dao->email;
@@ -2435,54 +2432,6 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
       'icon' => 'fa-link',
     ];
     return $return;
-  }
-
-  /**
-   * Changes timezone-enabled fields to the correct zone for output and add local
-   * & UTC variants
-   *
-   * @param array $params
-   * @param $to_tz
-   *
-   * @return void
-   */
-  public static function setOutputTimeZone(array &$params, $to_tz = NULL) {
-    $to_tz = $to_tz ?? ($params['event_tz'] ?? NULL);
-
-    if (is_null($to_tz)) {
-      return;
-    }
-
-    foreach (CRM_Event_BAO_Event::tz_fields as $field) {
-      if (!empty($params[$field]) && empty($params[$field . '_local'])) {
-        $params[$field . '_utc'] = CRM_Utils_Date::convertTimeZone($params[$field], 'UTC');
-        $params[$field . '_local'] = $params[$field];
-        $params[$field] = CRM_Utils_Date::convertTimeZone($params[$field], $to_tz);
-      }
-    }
-
-  }
-
-  public static function setTimezones(CRM_Event_DAO_Event $event) {
-    // Pre-process time zoned fields into the PHP time zone, which should be the same as the database, to save as timestamp.
-    $timezone_event = ($event->event_tz ?: (!empty($event->id) ? CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $event->id, 'event_tz') : NULL));
-
-    foreach (self::tz_fields as $field) {
-      if (!empty($event->{$field})) {
-        $event->{$field} = CRM_Utils_Date::convertTimeZone($event->{$field}, NULL, $timezone_event);
-      }
-    }
-  }
-
-  public static function resetTimezones(CRM_Event_DAO_Event $event) {
-    // Process time zoned fields into their own time zone
-    $timezone_event = ($event->event_tz ?: (!empty($event->id) ? CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $event->id, 'event_tz') : NULL));
-
-    foreach (self::tz_fields as $field) {
-      if (!empty($event->{$field})) {
-        $event->{$field} = CRM_Utils_Date::convertTimeZone($event->{$field}, $timezone_event);
-      }
-    }
   }
 
 }

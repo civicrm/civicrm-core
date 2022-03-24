@@ -1892,15 +1892,13 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   protected function assignEventDetailsToTpl($eventID, $participantRoles, $receiptText, $isPaidEvent) {
     //use of the message template below requires variables in different format
     $events = [];
-    $returnProperties = ['event_type_id', 'fee_label', 'start_date', 'end_date', 'event_tz', 'is_show_location', 'title'];
+    $returnProperties = ['event_type_id', 'fee_label', 'start_date', 'end_date', 'is_show_location', 'title'];
 
     //get all event details.
     CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $eventID, $events, $returnProperties);
     $event = $events[$eventID];
     unset($event['start_date']);
     unset($event['end_date']);
-
-    CRM_Event_BAO_Event::setOutputTimeZone($event);
 
     $role = CRM_Event_PseudoConstant::participantRole();
 

@@ -1111,22 +1111,4 @@ class CRM_Core_SelectValues {
     ];
   }
 
-  public static function timezone() {
-    $tzlist = &Civi::$statics[__CLASS__]['tzlist'];
-
-    if (is_null($tzlist)) {
-      $tzlist = [];
-      foreach (timezone_identifiers_list() as $tz) {
-        // Actual timezone keys for PHP are mapped to human parts.
-        $tzlist[$tz] = str_replace('_', ' ', $tz);
-      }
-
-      // Add 'Etc/UTC' specially, as timezone_identifiers_list() does
-      // not include it, but it is the IANA long name for 'UTC'
-      $tzlist['Etc/UTC'] = ts('Etc/UTC');
-    }
-
-    return $tzlist;
-  }
-
 }
