@@ -285,15 +285,13 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $this->assign('module', 'Event Registration');
     //use of the message template below requires variables in different format
     $event = $events = [];
-    $returnProperties = ['fee_label', 'start_date', 'end_date', 'event_tz', 'is_show_location', 'title'];
+    $returnProperties = ['fee_label', 'start_date', 'end_date', 'is_show_location', 'title'];
 
     //get all event details.
     CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $params['event_id'], $events, $returnProperties);
     $event = $events[$params['event_id']];
     unset($event['start_date']);
     unset($event['end_date']);
-
-    CRM_Event_BAO_Event::setOutputTimeZone($event);
 
     $role = CRM_Event_PseudoConstant::participantRole();
     $participantRoles = $params['role_id'] ?? NULL;

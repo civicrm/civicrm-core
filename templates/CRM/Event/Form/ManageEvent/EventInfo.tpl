@@ -59,10 +59,6 @@
       <td class="label">{$form.description.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='description' id=$eventID}{/if}</td>
       <td>{$form.description.html}</td>
     </tr>
-    <tr class="crm-event-manage-eventinfo-form-block-event_tz">
-      <td class="label">{$form.event_tz.label}</td>
-      <td>{$form.event_tz.html}</td>
-    </tr>
     {if !$isTemplate}
       <tr class="crm-event-manage-eventinfo-form-block-start_date">
         <td class="label">{$form.start_date.label}</td>

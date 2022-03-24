@@ -22,20 +22,6 @@ class CRM_Event_Page_List extends CRM_Core_Page {
 
     $info = CRM_Event_BAO_Event::getCompleteInfo($start, $type, $id, $end);
 
-    foreach ($info as &$event) {
-      $event['start_date_utc'] = CRM_Utils_Date::convertTimeZone($event['start_date'], 'UTC');
-      $event['start_date'] = CRM_Utils_Date::convertTimeZone($event['start_date'], $event['tz']);
-
-      $event['end_date_utc'] = !empty($event['end_date']) ? CRM_Utils_Date::convertTimeZone($event['end_date'], 'UTC') : NULL;
-      $event['end_date'] = !empty($event['end_date']) ? CRM_Utils_date::convertTimeZone($event['end_date'], $event['tz']) : NULL;
-
-      $event['registration_start_date_utc'] = !empty($event['registration_start_date']) ? CRM_Utils_Date::convertTimeZone($event['registration_start_date'], 'UTC') : NULL;
-      $event['registration_start_date'] = !empty($event['registration_start_date']) ? CRM_Utils_date::convertTimeZone($event['registration_start_date'], $event['tz']) : NULL;
-
-      $event['registration_end_date_utc'] = !empty($event['registration_end_date']) ? CRM_Utils_Date::convertTimeZone($event['registration_end_date'], 'UTC') : NULL;
-      $event['registration_end_date'] = !empty($event['registration_end_date']) ? CRM_Utils_date::convertTimeZone($event['registration_end_date'], $event['tz']) : NULL;
-    }
-
     $this->assign('events', $info);
 
     // @todo Move this to eventcart extension

@@ -373,8 +373,6 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $eventParams = ['id' => $participant->event_id];
     CRM_Event_BAO_Event::retrieve($eventParams, $eventDetails);
 
-    CRM_Event_BAO_Event::setOutputTimeZone($eventDetails);
-
     //get default participant role.
     $eventDetails['participant_role'] = $participantRoles[$eventDetails['default_role_id']] ?? NULL;
     //get the location info
