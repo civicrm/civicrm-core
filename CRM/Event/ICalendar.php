@@ -48,15 +48,8 @@ class CRM_Event_ICalendar {
 
     $info = CRM_Event_BAO_Event::getCompleteInfo($start, $type, $id, $end);
 
-    foreach ($info as &$event) {
-      $event['start_date'] = CRM_Utils_Date::convertTimeZone($event['start_date'], $event['tz']);
-      $event['end_date'] = !empty($event['end_date']) ? CRM_Utils_date::convertTimeZone($event['end_date'], $event['tz']) : NULL;
-      $event['registration_start_date'] = !empty($event['registration_start_date']) ? CRM_Utils_date::convertTimeZone($event['registration_start_date'], $event['tz']) : NULL;
-      $event['registration_end_date'] = !empty($event['registration_end_date']) ? CRM_Utils_date::convertTimeZone($event['registration_end_date'], $event['tz']) : NULL;
-    }
-
     $template->assign('events', $info);
-    $template->assign('timezone', CRM_Core_Config::singleton()->userSystem->getTimeZoneString());
+    $template->assign('timezone', @date_default_timezone_get());
 
     // Send data to the correct template for formatting (iCal vs. gData)
     if ($rss) {

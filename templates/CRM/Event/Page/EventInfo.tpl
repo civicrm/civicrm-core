@@ -99,25 +99,20 @@
   {/if}
   <div class="clear"></div>
   <div class="crm-section event_date_time-section">
-      <div class="label">{ts}Event Start{/ts}</div>
+      <div class="label">{ts}When{/ts}</div>
       <div class="content">
-          <time datetime="{$event.event_start_date_utc|date_format:"%Y-%m-%dT%H:%M:%S"}Z">{$event.event_start_date|crmDate}<span class="timezone"> {$event.event_tz}</span></time>
-      </div>
-    <div class="clear"></div>
-  </div>
-  {if $event.event_end_date}
-  <div class="crm-section event_date_time-section">
-      <div class="label">{ts}Event End{/ts}</div>
-      <div class="content">
-          <time datetime="{$event.event_end_date_utc|date_format:"%Y-%m-%dT%H:%M:%S"}Z">{strip}
-          {* Only show end time if end date = start date *}
-          {if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}
-              {$event.event_end_date|crmDate:0:1}
-          {else}
-              {$event.event_end_date|crmDate}
-          {/if}
-          {/strip}<span class="timezone"> {$event.event_tz}</span></time>
-      {/if}
+        {strip}
+            {$event.event_start_date|crmDate}
+            {if $event.event_end_date}
+                &nbsp;{ts}through{/ts}&nbsp;
+                {* Only show end time if end date = start date *}
+                {if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}
+                    {$event.event_end_date|crmDate:0:1}
+                {else}
+                    {$event.event_end_date|crmDate}
+                {/if}
+            {/if}
+        {/strip}
       </div>
     <div class="clear"></div>
   </div>

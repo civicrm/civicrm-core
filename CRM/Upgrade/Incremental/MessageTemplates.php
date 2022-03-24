@@ -315,8 +315,16 @@ class CRM_Upgrade_Incremental_MessageTemplates {
         ],
       ],
       [
-        'version' => '5.47.alpha1',
-        'upgrade_descriptor' => ts('Add time zone to Event dates'),
+        'version' => '5.48.alpha1',
+        'upgrade_descriptor' => ts('Replace {receipt_text_renewal} with {receipt_text}'),
+        'templates' => [
+          ['name' => 'membership_offline_receipt', 'type' => 'html'],
+          ['name' => 'membership_offline_receipt', 'type' => 'text'],
+        ],
+      ],
+      [
+        'version' => '5.48.beta1',
+        'upgrade_descriptor' => ts('Revert time zone for Event dates'),
         'templates' => [
           ['name' => 'event_online_receipt', 'type' => 'html'],
           ['name' => 'event_online_receipt', 'type' => 'text'],
@@ -332,14 +340,6 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'participant_transferred', 'type' => 'text'],
           ['name' => 'payment_or_refund_notification', 'type' => 'html'],
           ['name' => 'payment_or_refund_notification', 'type' => 'text'],
-        ],
-      ],
-      [
-        'version' => '5.48.alpha1',
-        'upgrade_descriptor' => ts('Replace {receipt_text_renewal} with {receipt_text}'),
-        'templates' => [
-          ['name' => 'membership_offline_receipt', 'type' => 'html'],
-          ['name' => 'membership_offline_receipt', 'type' => 'text'],
         ],
       ],
     ];
