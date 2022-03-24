@@ -25,12 +25,12 @@
         </tr>
         {foreach from=$activeMembers item=activeMember}
         <tr class="{cycle values="odd-row,even-row"} {$activeMember.class}">
-          <td>{$activeMember.membership_type}</td>
-    <td>{$activeMember.join_date|crmDate}</td>
-          <td>{$activeMember.start_date|crmDate}</td>
-          <td>{$activeMember.end_date|crmDate}</td>
-          <td>{$activeMember.status}</td>
-          <td>{if $activeMember.renewPageId}<a href="{crmURL p='civicrm/contribute/transact' q="id=`$activeMember.renewPageId`&mid=`$activeMember.id`&reset=1"}">[ {ts}Renew Now{/ts} ]</a>{/if}</td>
+          <td class="crm-active-membership-membership_type">{$activeMember.membership_type}</td>
+          <td class="crm-active-membership-join_date">{$activeMember.join_date|crmDate}</td>
+          <td class="crm-active-membership-start_date">{$activeMember.start_date|crmDate}</td>
+          <td class="crm-active-membership-end_date">{$activeMember.end_date|crmDate}</td>
+          <td class="crm-active-membership-status">{$activeMember.status}</td>
+          <td class="crm-active-membership-renew">{if $activeMember.renewPageId}<a href="{crmURL p='civicrm/contribute/transact' q="id=`$activeMember.renewPageId`&mid=`$activeMember.id`&reset=1"}">[ {ts}Renew Now{/ts} ]</a>{/if}</td>
         </tr>
         {/foreach}
         </table>
@@ -56,12 +56,11 @@
         </tr>
         {foreach from=$inActiveMembers item=inActiveMember}
         <tr class="{cycle values="odd-row,even-row"} {$inActiveMember.class}">
-          <td>{$inActiveMember.membership_type}</td>
-          <td>{$inActiveMember.start_date|crmDate}</td>
-          <td>{$inActiveMember.end_date|crmDate}</td>
-          <td>{$inActiveMember.status}</td>
-          <td>{if $inActiveMember.renewPageId}<a href="{crmURL p='civicrm/contribute/transact' q="id=`$inActiveMember.renewPageId`&mid=`$inActiveMember.id`&reset=1"}">[ {ts}Renew Now{/ts} ]</a>{/if}</td>
-
+          <td class="crm-inactive-membership-membership_type">{$inActiveMember.membership_type}</td>
+          <td class="crm-inactive-membership-start_date">{$inActiveMember.start_date|crmDate}</td>
+          <td class="crm-inactive-membership-end_date">{$inActiveMember.end_date|crmDate}</td>
+          <td class="crm-inactive-membership-status">{$inActiveMember.status}</td>
+          <td class="crm-inactive-membership-renew">{if $inActiveMember.renewPageId}<a href="{crmURL p='civicrm/contribute/transact' q="id=`$inActiveMember.renewPageId`&mid=`$inActiveMember.id`&reset=1"}">[ {ts}Renew Now{/ts} ]</a>{/if}</td>
         </tr>
         {/foreach}
         </table>
