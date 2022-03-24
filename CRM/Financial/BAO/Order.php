@@ -814,7 +814,7 @@ class CRM_Financial_BAO_Order {
       $this->setPriceSetIDFromSelectedField($lineItem['price_field_id']);
       // Set any pre-calculation to zero as we will calculate.
       $lineItem['tax_amount'] = 0;
-      if ($this->isOverrideLineItemFinancialType($lineItem['financial_type_id']) !== FALSE) {
+      if (isset($lineItem['financial_type_id']) && $this->isOverrideLineItemFinancialType($lineItem['financial_type_id']) !== FALSE) {
         $lineItem['financial_type_id'] = $this->getOverrideFinancialTypeID();
       }
       $lineItem['tax_rate'] = $taxRate = $this->getTaxRate((int) $lineItem['financial_type_id']);
