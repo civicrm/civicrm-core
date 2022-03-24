@@ -22,11 +22,9 @@ trait CRM_Upgrade_Incremental_php_TimezoneRevertTrait {
     if (self::areEventsUsingTimestamp() && self::areThereAnyCiviEvents()) {
       $timezoneStats = $this->getTimezoneStats();
       return '<div><span>' . ts('CiviEvent Timezone Rollback') . '</span><ul><li>'
-        . ts('The upgrade will rollback recent changes involving CiviEvent timezones.')
+        . ts('CiviEvent v5.47.0 briefly introduced new timezone functionality. This will be removed, and times will be converted back to their old format.')
         . '</li><li>'
-        . ts('This requires converting CiviEvent times. After conversion, <em>CiviEvent times may be skewed</em>.')
-        . '</li><li>'
-        . ts('To prevent or fix skewed times, please review <a %1>CiviEvent v5.47 Timezone Notice</a>.', [
+        . ts('Unfortunately, <em>CiviEvent times may be inaccurate</em>. To prevent or fix inaccuracies, please review <a %1>CiviEvent v5.47 Timezone Notice</a>.', [
           1 => 'target="_blank" href="https://civicrm.org/redirect/event-timezone-5.47"',
         ])
         . '</li><li>'
