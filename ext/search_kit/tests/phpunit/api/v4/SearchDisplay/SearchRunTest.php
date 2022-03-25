@@ -841,7 +841,93 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
   }
 
   /**
-   * Test conditional styles
+   * Test conditional and field-based icons
+   */
+  public function testIcons() {
+    $subject = uniqid(__FUNCTION__);
+
+    $source = Contact::create(FALSE)->execute()->first();
+
+    $activities = [
+      ['activity_type_id:name' => 'Meeting', 'subject' => $subject, 'status_id:name' => 'Scheduled'],
+      ['activity_type_id:name' => 'Phone Call', 'subject' => $subject, 'status_id:name' => 'Completed'],
+    ];
+    Activity::save(FALSE)
+      ->addDefault('source_contact_id', $source['id'])
+      ->setRecords($activities)->execute();
+
+    $search = [
+      'api_entity' => 'Activity',
+      'api_params' => [
+        'version' => 4,
+        'select' => [
+          'id',
+        ],
+        'orderBy' => [],
+        'where' => [],
+        'groupBy' => [],
+        'join' => [],
+        'having' => [],
+      ],
+    ];
+
+    $display = [
+      'type' => 'table',
+      'settings' => [
+        'actions' => TRUE,
+        'limit' => 50,
+        'classes' => [
+          'table',
+          'table-striped',
+        ],
+        'pager' => [
+          'show_count' => TRUE,
+          'expose_limit' => TRUE,
+        ],
+        'sort' => [],
+        'columns' => [
+          [
+            'type' => 'field',
+            'key' => 'id',
+            'dataType' => 'Integer',
+            'label' => 'Activity ID',
+            'sortable' => TRUE,
+            'icons' => [
+              [
+                'field' => 'activity_type_id:icon',
+                'side' => 'left',
+              ],
+              [
+                'icon' => 'fa-star',
+                'side' => 'right',
+                'if' => [
+                  'status_id:name',
+                  '=',
+                  'Completed',
+                ],
+              ],
+            ],
+          ],
+        ],
+      ],
+      'acl_bypass' => FALSE,
+    ];
+
+    $result = SearchDisplay::Run(FALSE)
+      ->setSavedSearch($search)
+      ->setDisplay($display)
+      ->setReturn('page:1')
+      ->setSort([['id', 'ASC']])
+      ->execute();
+
+    // Icon based on activity type
+    $this->assertEquals([['class' => 'fa-slideshare', 'side' => 'left']], $result[0]['columns'][0]['icons']);
+    // Activity type icon + conditional icon based on status
+    $this->assertEquals([['class' => 'fa-phone', 'side' => 'left'], ['class' => 'fa-star', 'side' => 'right']], $result[1]['columns'][0]['icons']);
+  }
+
+  /**
+   * Test value substitutions with empty fields & placeholders
    */
   public function testPlaceholderFields() {
     $lastName = uniqid(__FUNCTION__);

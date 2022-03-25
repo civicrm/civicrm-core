@@ -261,6 +261,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if ($cssClass) {
       $out['cssClass'] = implode(' ', $cssClass);
     }
+    if (!empty($column['icons'])) {
+      $out['icons'] = $this->getColumnIcons($column['icons'], $data);
+    }
     return $out;
   }
 
@@ -295,7 +298,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     foreach ($styleRules as $clause) {
       $cssClass = $clause[0] ?? '';
       if ($cssClass) {
-        $condition = $this->getCssRuleCondition($clause);
+        $condition = $this->getRuleCondition(array_slice($clause, 1));
         if (is_null($condition[0]) || (ArrayQueryActionTrait::filterCompare($data, $condition))) {
           $classes[] = $cssClass;
         }
@@ -305,20 +308,45 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
+   * Evaluates conditional style rules
+   *
+   * @param array{icon: string, field: string, if: array, side: string}[] $icons
+   * @param array $data
+   * @return array
+   */
+  protected function getColumnIcons(array $icons, array $data) {
+    $result = [];
+    foreach ($icons as $icon) {
+      $iconClass = $icon['icon'] ?? NULL;
+      if (!$iconClass && !empty($icon['field'])) {
+        $iconClass = $data[$icon['field']] ?? NULL;
+      }
+      if ($iconClass) {
+        $condition = $this->getRuleCondition($icon['if'] ?? []);
+        if (!is_null($condition[0]) && !(ArrayQueryActionTrait::filterCompare($data, $condition))) {
+          continue;
+        }
+        $result[] = ['class' => $iconClass, 'side' => $icon['side'] ?? 'left'];
+      }
+    }
+    return $result;
+  }
+
+  /**
    * Returns the condition of a cssRules
    *
    * @param array $clause
    * @return array
    */
-  protected function getCssRuleCondition($clause) {
-    $fieldKey = $clause[1] ?? NULL;
+  protected function getRuleCondition($clause) {
+    $fieldKey = $clause[0] ?? NULL;
     // For fields used in group by, add aggregation and change operator to CONTAINS
     // NOTE: This doesn't support any other operators for aggregated fields.
     if ($fieldKey && $this->canAggregate($fieldKey)) {
-      $clause[2] = 'CONTAINS';
-      $fieldKey = 'GROUP_CONCAT_' . str_replace(['.', ':'], '_', $clause[1]);
+      $clause[1] = 'CONTAINS';
+      $fieldKey = 'GROUP_CONCAT_' . str_replace(['.', ':'], '_', $clause[0]);
     }
-    return [$fieldKey, $clause[2] ?? 'IS NOT EMPTY', $clause[3] ?? NULL];
+    return [$fieldKey, $clause[1] ?? 'IS NOT EMPTY', $clause[2] ?? NULL];
   }
 
   /**
@@ -331,6 +359,27 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $select = [];
     foreach ($cssRules as $clause) {
       $fieldKey = $clause[1] ?? NULL;
+      if ($fieldKey) {
+        // For fields used in group by, add aggregation
+        $select[] = $this->canAggregate($fieldKey) ? "GROUP_CONCAT($fieldKey) AS GROUP_CONCAT_" . str_replace(['.', ':'], '_', $fieldKey) : $fieldKey;
+      }
+    }
+    return $select;
+  }
+
+  /**
+   * Return fields needed for calculating a column's icons
+   *
+   * @param array $icons
+   * @return array
+   */
+  protected function getIconsSelect($icons) {
+    $select = [];
+    foreach ($icons as $icon) {
+      if (!empty($icon['field'])) {
+        $select[] = $icon['field'];
+      }
+      $fieldKey = $icon['if'][0] ?? NULL;
       if ($fieldKey) {
         // For fields used in group by, add aggregation
         $select[] = $this->canAggregate($fieldKey) ? "GROUP_CONCAT($fieldKey) AS GROUP_CONCAT_" . str_replace(['.', ':'], '_', $fieldKey) : $fieldKey;
@@ -840,10 +889,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $additions[] = $editable['id_path'];
         }
       }
-      // Add style conditions for the column
-      foreach ($this->getCssRulesSelect($column['cssRules'] ?? []) as $addition) {
-        $additions[] = $addition;
-      }
+      // Add style & icon conditions for the column
+      $additions = array_merge($additions,
+        $this->getCssRulesSelect($column['cssRules'] ?? []),
+        $this->getIconsSelect($column['icons'] ?? [])
+      );
     }
     // Add fields referenced via token
     $tokens = $this->getTokens($possibleTokens);
