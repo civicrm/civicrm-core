@@ -326,11 +326,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         $urlParams
       ));
     }
-    elseif (!empty($formValues['_qf_Merge_done'])) {
-      CRM_Core_Session::singleton()->pushUserContext($contactViewUrl);
-    }
-
-    elseif ($this->next && $this->_mergeId) {
+    elseif ($this->next && $this->_mergeId && empty($formValues['_qf_Merge_done'])) {
       $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $this->_gid, json_decode($this->criteria, TRUE), TRUE, $this->limit);
 
       $join = CRM_Dedupe_Merger::getJoinOnDedupeTable();
@@ -349,6 +345,9 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         $urlParams['action'] = 'update';
         CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/contact/merge', $urlParams));
       }
+    }
+    else {
+      CRM_Core_Session::singleton()->pushUserContext($contactViewUrl);
     }
   }
 
