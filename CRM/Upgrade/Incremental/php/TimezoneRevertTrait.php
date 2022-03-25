@@ -63,13 +63,22 @@ trait CRM_Upgrade_Incremental_php_TimezoneRevertTrait {
 
   public function addEventTzTasks(): void {
     if (self::areEventsUsingTimestamp()) {
-      $this->addTask('Add temporary backup start_date to civicrm_event', 'addColumn', 'civicrm_event', 'start_date_ts_bak', "timestamp NULL DEFAULT NULL COMMENT 'For troubleshooting upgrades post 5.47. Can drop this column if no issues.'");
-      $this->addTask('Add temporary backup end_date to civicrm_event', 'addColumn', 'civicrm_event', 'end_date_ts_bak', "timestamp NULL DEFAULT NULL COMMENT 'For troubleshooting upgrades post 5.47. Can drop this column if no issues.'");
-      $this->addTask('Add temporary backup registration_start_date to civicrm_event', 'addColumn', 'civicrm_event', 'registration_start_date_ts_bak', "timestamp NULL DEFAULT NULL COMMENT 'For troubleshooting upgrades post 5.47. Can drop this column if no issues.'");
-      $this->addTask('Add temporary backup registration_end_date to civicrm_event', 'addColumn', 'civicrm_event', 'registration_end_date_ts_bak', "timestamp NULL DEFAULT NULL COMMENT 'For troubleshooting upgrades post 5.47. Can drop this column if no issues.'");
-      $this->addTask('Backup CiviEvent times', 'fillBackupEventDates');
-      $this->addTask('Revert CiviEvent times', 'revertEventDates');
-      $this->addTask('Adapt CiviEvent times', 'convertModifiedEvents');
+      $actions = getenv('CIVICRM_TZ_REVERT')
+        ? explode(',', getenv('CIVICRM_TZ_REVERT'))
+        : ['backup', 'revert', 'adapt'];
+      if (in_array('backup', $actions)) {
+        $this->addTask('Add temporary backup start_date to civicrm_event', 'addColumn', 'civicrm_event', 'start_date_ts_bak', "timestamp NULL DEFAULT NULL COMMENT 'For troubleshooting upgrades post 5.47. Can drop this column if no issues.'");
+        $this->addTask('Add temporary backup end_date to civicrm_event', 'addColumn', 'civicrm_event', 'end_date_ts_bak', "timestamp NULL DEFAULT NULL COMMENT 'For troubleshooting upgrades post 5.47. Can drop this column if no issues.'");
+        $this->addTask('Add temporary backup registration_start_date to civicrm_event', 'addColumn', 'civicrm_event', 'registration_start_date_ts_bak', "timestamp NULL DEFAULT NULL COMMENT 'For troubleshooting upgrades post 5.47. Can drop this column if no issues.'");
+        $this->addTask('Add temporary backup registration_end_date to civicrm_event', 'addColumn', 'civicrm_event', 'registration_end_date_ts_bak', "timestamp NULL DEFAULT NULL COMMENT 'For troubleshooting upgrades post 5.47. Can drop this column if no issues.'");
+        $this->addTask('Backup CiviEvent times', 'fillBackupEventDates');
+      }
+      if (in_array('revert', $actions)) {
+        $this->addTask('Revert CiviEvent times', 'revertEventDates');
+      }
+      if (in_array('adapt', $actions)) {
+        $this->addTask('Adapt CiviEvent times', 'convertModifiedEvents');
+      }
     }
   }
 
