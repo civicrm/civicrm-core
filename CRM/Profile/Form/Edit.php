@@ -96,7 +96,13 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
 
       // CRM-16784: If there is no ID then this can't be an 'edit'
       else {
-        CRM_Core_Error::statusBounce(ts('No user/contact ID was specified, so the Profile cannot be used in edit mode.'));
+        // Redirect to 'create' profile instead.
+        $gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this);
+        $redirect = NULL;
+        if ($gid) {
+          $redirect = CRM_Utils_System::url('civicrm/profile/create', 'gid=' . $gid . '&reset=1');
+        }
+        CRM_Core_Error::statusBounce(ts('No user/contact ID was specified, so the Profile cannot be used in edit mode.'), $redirect);
       }
 
     }
