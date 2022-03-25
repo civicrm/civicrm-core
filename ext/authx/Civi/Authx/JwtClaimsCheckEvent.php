@@ -31,8 +31,8 @@ class JwtClaimsCheckEvent extends \Civi\Core\Event\GenericHookEvent {
   private $overrides = [];
 
   /**
-   * @param array List of validated JWT claims (I.e. decoded). Expected to
-   * contain at least 'sub' and 'scope' keys.
+   * @param array $claims List of validated JWT claims (I.e. decoded). Expected
+   * to contain at least 'sub' and 'scope' keys.
    */
   public function __construct(array $claims) {
     $this->claims = $claims;
@@ -42,10 +42,10 @@ class JwtClaimsCheckEvent extends \Civi\Core\Event\GenericHookEvent {
    * Reject the scope claim, using provided message in error response body. This
    * will override the default AuthX Authenticator handling of the scope.
    *
-   * @param   string  $message
+   * @param   string $message
    */
   public function rejectScope(string $message) {
-    $this->overrides['scope'] = ['reject' => true, 'message' => $message];
+    $this->overrides['scope'] = ['reject' => TRUE, 'message' => $message];
   }
 
   /**
@@ -53,7 +53,7 @@ class JwtClaimsCheckEvent extends \Civi\Core\Event\GenericHookEvent {
    * handling of the scope.
    */
   public function acceptScope() {
-    $this->overrides['scope'] = ['reject' => false];
+    $this->overrides['scope'] = ['reject' => FALSE];
   }
 
   /**
@@ -61,10 +61,10 @@ class JwtClaimsCheckEvent extends \Civi\Core\Event\GenericHookEvent {
    * will override the default AuthX Authenticator handling of the sub and
    * retrieval of the civicrm contact id.
    *
-   * @param   string  $message
+   * @param   string $message
    */
   public function rejectSub(string $message) {
-    $this->overrides['sub'] = ['reject' => true, 'message' => $message];
+    $this->overrides['sub'] = ['reject' => TRUE, 'message' => $message];
   }
 
   /**
@@ -84,7 +84,7 @@ class JwtClaimsCheckEvent extends \Civi\Core\Event\GenericHookEvent {
    * contactId. If contactId is present but not user or userId, it will be used
    * to find userId (user isn't used this this case).
    *
-   * @param   array{contactId?: int, userId?: int, user?: string}  $identifier
+   * @param   array{contactId?: int, userId?: int, user?: string} $identifier
    * Must contain at least one of contactId or (userId xor user)
    *
    */
@@ -97,23 +97,23 @@ class JwtClaimsCheckEvent extends \Civi\Core\Event\GenericHookEvent {
       throw new AuthxException("Only userId or user can be specified, not both");
     }
 
-    $this->overrides['sub'] = ['reject' => false] + $identifier;
+    $this->overrides['sub'] = ['reject' => FALSE] + $identifier;
   }
 
   /**
    * If listener has called acceptScope(), returned array  will have a key
-   * 'scope' set with value of ['reject' => false]
+   * 'scope' set with value of ['reject' => FALSE]
    *
    * If listener has called rejectScope(),  returned array will have a key
-   * 'scope' set with value of ['reject' => true, 'message' => string]
+   * 'scope' set with value of ['reject' => TRUE, 'message' => string]
    *
    * If listener has called acceptSub(), returned array will have a key 'sub'
-   * set with value of ['reject' => false, 'contactId' => integer,
+   * set with value of ['reject' => FALSE, 'contactId' => integer,
    * 'userId' => integer, 'user' => string]. reject will always be present,
    * while one or more of contactId, userId and userId will be set.
    *
    * If listener has called rejectSub(),  returned array will have a key 'sub'
-   * set with value of ['reject' => true, 'message' => string]
+   * set with value of ['reject' => TRUE, 'message' => string]
    *
    * If there are no listeners, or they have taken no action, will return an
    * empty array.
@@ -130,4 +130,5 @@ class JwtClaimsCheckEvent extends \Civi\Core\Event\GenericHookEvent {
   public function getHookValues() {
     return [$this->claims];
   }
+
 }
