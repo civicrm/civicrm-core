@@ -2840,10 +2840,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             'Amount' => CRM_Utils_Money::format($softCredit['amount'], $softCredit['currency']),
           ];
         }
-        $template->assign('softCreditTypes', $softCreditTypes);
-        $template->assign('softCredits', $softCredits);
       }
     }
+    $template->assign('softCreditTypes', $softCreditTypes ?? NULL);
+    $template->assign('softCredits', $softCredits ?? NULL);
 
     $dao = new CRM_Contribute_DAO_ContributionProduct();
     $dao->contribution_id = $this->id;
