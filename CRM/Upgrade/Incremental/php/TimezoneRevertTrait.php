@@ -67,8 +67,9 @@ trait CRM_Upgrade_Incremental_php_TimezoneRevertTrait {
       $this->addTask('Add temporary backup end_date to civicrm_event', 'addColumn', 'civicrm_event', 'end_date_ts_bak', "timestamp NULL DEFAULT NULL COMMENT 'For troubleshooting upgrades post 5.47. Can drop this column if no issues.'");
       $this->addTask('Add temporary backup registration_start_date to civicrm_event', 'addColumn', 'civicrm_event', 'registration_start_date_ts_bak', "timestamp NULL DEFAULT NULL COMMENT 'For troubleshooting upgrades post 5.47. Can drop this column if no issues.'");
       $this->addTask('Add temporary backup registration_end_date to civicrm_event', 'addColumn', 'civicrm_event', 'registration_end_date_ts_bak', "timestamp NULL DEFAULT NULL COMMENT 'For troubleshooting upgrades post 5.47. Can drop this column if no issues.'");
-      $this->addTask('Fill Backup Event Dates', 'fillBackupEventDates');
-      $this->addTask('Revert Event Dates', 'revertEventDates');
+      $this->addTask('Backup CiviEvent times', 'fillBackupEventDates');
+      $this->addTask('Revert CiviEvent times', 'revertEventDates');
+      $this->addTask('Adapt CiviEvent times', 'convertModifiedEvents');
     }
   }
 
@@ -89,11 +90,16 @@ trait CRM_Upgrade_Incremental_php_TimezoneRevertTrait {
   }
 
   /**
-   * dev/core#2122 - undo timestamp conversion from 5.47
+   * This is the straight-up opposite of the conversion done in `5.47.alpha1`.
+   * It flips the `TIMESTAMP`s back to `DATETIME`s. This should be a clean/straight
+   * revert - provided that the records have not changed.
+   *
+   * But some records may have changed. `convertModifiedEvents()` will address those.
+   *
    * @param \CRM_Queue_TaskContext $ctx
    * @return bool
    */
-  public static function revertEventDates(CRM_Queue_TaskContext $ctx): bool {
+  public static function revertEventDates(CRM_Queue_TaskContext $ctx = NULL): bool {
     // We only run if the field is timestamp, so don't need to check about that.
 
     // The original 5.47.alpha1 upgrade was executed with SQL helpers in CRM_Utils_File, which use
@@ -110,6 +116,153 @@ trait CRM_Upgrade_Incremental_php_TimezoneRevertTrait {
     $upgrade->source($sql, TRUE);
 
     return TRUE;
+  }
+
+  /**
+   * If a user edited an `Event` in the UI while running 5.47.alpha1 - 5.47.2, then `revertEventDates`
+   * won't be good enough. In particular:
+   *
+   * - It's likely to have activated the DST bug (based on the current-user's TZ).
+   * - The user could have filled-in/corrected the values of `event_tz` and/or each `TIMESTAMP` column.
+   *
+   * The algorithm reads backup values (eg `start_date_ts_bak`) and rewrites live values (eg `start_date`)
+   *
+   * It uses a heuristic approach to cleaning DST error ("skew"). This requires a _representative_
+   * timezone ("skewTz"). It should not be necessary to know the exact TZ of every edit -- as long as all TZs
+   * have similar DST rules. For example:
+   *
+   *   - Most locales in US+CA have the same DST rules. (`America/Los_Angeles` and `America/Chicago` are equally representative.)
+   *   - Most locales in Europe have the same DST rules. (`Europe/Helsinki` and `Europe/Berlin` are equally representative.)
+   *   - Most locales in Australia have the same DST rules.
+   *
+   * By default, this will borrow the current user (sysadmin)'s timezone as the representative skewTz.
+   * This can be overridden with env-var `CIVICRM_TZ_SKEW`.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @return bool
+   */
+  public static function convertModifiedEvents(CRM_Queue_TaskContext $ctx = NULL): bool {
+    $skewTz = self::pickSkewTz();
+    $mysqlTz = '+0:00';
+    $restoreMysqlTz = static::swapTz($mysqlTz);
+
+    $columns = [
+      'start_date' => 'start_date_ts_bak',
+      'end_date' => 'end_date_ts_bak',
+      'registration_start_date' => 'registration_start_date_ts_bak',
+      'registration_end_date' => 'registration_end_date_ts_bak',
+    ];
+
+    [$lowLogId, $highLogId] = self::findLogRange(
+      '5.47.alpha1',
+      (static::class === CRM_Upgrade_Incremental_php_FiveFortySeven::class) ? '5.47.3' : '5.48.beta2'
+    );
+
+    $eventModTimes = CRM_Utils_SQL_Select::from('civicrm_log')
+      ->select('entity_id, max(modified_date) as modified_date')
+      ->where('entity_table = "civicrm_event"')
+      ->where('id >= #lowLogId AND id <= #highLogId', ['lowLogId' => $lowLogId, 'highLogId' => $highLogId])
+      ->groupBy('entity_table, entity_id')
+      ->execute()
+      ->fetchMap('entity_id', 'modified_date');
+    if (empty($eventModTimes)) {
+      return TRUE;
+    }
+
+    $events = CRM_Utils_SQL_Select::from('civicrm_event')
+      ->select(['id', 'event_tz_bak'])
+      ->select(array_values($columns))
+      ->where('id in (#IDS)', ['IDS' => array_keys($eventModTimes)])
+      ->execute()
+      ->fetchAll();
+
+    foreach ($events as $event) {
+      $updates = [];
+      foreach ($columns as $outColumn => $inColumn) {
+        if (!empty($event[$inColumn])) {
+          $dstError = ($skewTz === 'IGNORE') ? 0 : static::findDstError($eventModTimes[$event['id']], $event[$inColumn], $skewTz);
+          // $event["{$inColumn}_err"] = $dstError;
+          $newValue = static::addSeconds(static::convertTz($event[$inColumn], $mysqlTz, $event['event_tz_bak']), $dstError);
+          $updates[] = $outColumn . ' = "' . CRM_Core_DAO::escapeString($newValue) . '"';
+        }
+        else {
+          $updates[] = $outColumn . ' = NULL';
+        }
+      }
+      $sql = sprintf('UPDATE civicrm_event SET %s WHERE id = %d', implode(',', $updates), (int) $event['id']);
+      // printf("\n[UTC, skewTz=%s]\n%s\n%s\n", $skewTz, json_encode($event), $sql);
+      CRM_Core_DAO::executeQuery($sql);
+    }
+
+    return TRUE;
+  }
+
+  public static function findDstError(string $modificationTime, string $targetValue, string $timeZone): int {
+    $tzObj = new DateTimeZone($timeZone);
+    $objA = new DateTime($modificationTime, $tzObj);
+    $objB = new DateTime($targetValue, $tzObj);
+    return $objA->getOffset() - $objB->getOffset();
+  }
+
+  public static function addSeconds(string $dateTime, int $skew): string {
+    if (!$skew) {
+      return $dateTime;
+    }
+    return date('Y-m-d H:i:s', strtotime($dateTime) + $skew);
+  }
+
+  public static function convertTz(string $dateTimeExpr, string $srcTz, string $destTz) {
+    $datetime = new DateTime($dateTimeExpr, new DateTimeZone($srcTz));
+    $datetime->setTimezone(new DateTimeZone($destTz));
+    return $datetime->format('Y-m-d H:i:s');
+  }
+
+  protected static function swapTz($newTz): CRM_Utils_AutoClean {
+    $startTz = CRM_Core_DAO::singleValueQuery('SELECT @@time_zone');
+    CRM_Core_DAO::executeQuery('SET time_zone = %1', [1 => ['+0:00', 'String']]);
+    return CRM_Utils_AutoClean::with(function() use ($startTz) {
+      CRM_Core_DAO::executeQuery('SET time_zone = %1', [1 => [$startTz, 'String']]);
+    });
+  }
+
+  /**
+   * Choose a representative timezone for identifying DST errors.
+   *
+   * Preference will be given to ENV['CIVICRM_TZ_SKEW'] or the current user's TZ.
+   *
+   * An explict value of `IGNORE` will opt-out of skew correction.
+   *
+   * @return string
+   */
+  protected static function pickSkewTz(): string {
+    $skewTz = getenv('CIVICRM_TZ_SKEW');
+    if (!$skewTz) {
+      $skewTz = CRM_Core_Config::singleton()->userSystem->getTimeZoneString();
+    }
+    if (!$skewTz) {
+      return 'IGNORE';
+    }
+    return $skewTz;
+  }
+
+  /**
+   * Find the slice of `civicrm_log` which occurred between version $X and version $Y.
+   *
+   * @param string $lowVersion
+   * @param string $highVersion
+   * @return array
+   */
+  protected static function findLogRange(string $lowVersion, string $highVersion): array {
+    $lowLog = CRM_Core_DAO::executeQuery('SELECT id FROM civicrm_log WHERE entity_table = "civicrm_domain" AND data LIKE %1 ORDER BY id LIMIT 1', [
+      1 => ['upgrade%' . $lowVersion . '.upgrade', 'String'],
+    ]);
+    $lowLogId = $lowLog->fetch() ? $lowLog->id : 1;
+
+    $highLog = CRM_Core_DAO::executeQuery('SELECT id FROM civicrm_log WHERE entity_table = "civicrm_domain" AND data LIKE %1 ORDER BY id LIMIT 1', [
+      1 => ['upgrade%' . $highVersion . '.upgrade', 'String'],
+    ]);
+    $highLogId = $highLog->fetch() ? $highLog->id : CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_log');
+    return array($lowLogId, $highLogId);
   }
 
   /**
