@@ -95,10 +95,20 @@ trait CRM_Upgrade_Incremental_php_TimezoneRevertTrait {
    */
   public static function revertEventDates(CRM_Queue_TaskContext $ctx): bool {
     // We only run if the field is timestamp, so don't need to check about that.
-    CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_event` MODIFY COLUMN `start_date` datetime DEFAULT NULL COMMENT 'Date and time that event starts.'");
-    CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_event` MODIFY COLUMN `end_date` datetime DEFAULT NULL COMMENT 'Date and time that event ends. May be NULL if no defined end date/time'");
-    CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_event` MODIFY COLUMN `registration_start_date` datetime DEFAULT NULL COMMENT 'Date and time that online registration starts.'");
-    CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_event` MODIFY COLUMN `registration_end_date` datetime DEFAULT NULL COMMENT 'Date and time that online registration ends.'");
+
+    // The original 5.47.alpha1 upgrade was executed with SQL helpers in CRM_Utils_File, which use
+    // a separate DSN/session. We need to use the same interface so that the `@@time_zone` is consistent
+    // with the prior update.
+
+    $sql = "ALTER TABLE `civicrm_event`
+      MODIFY COLUMN `start_date` datetime DEFAULT NULL COMMENT 'Date and time that event starts.',
+      MODIFY COLUMN `end_date` datetime DEFAULT NULL COMMENT 'Date and time that event ends. May be NULL if no defined end date/time',
+      MODIFY COLUMN `registration_start_date` datetime DEFAULT NULL COMMENT 'Date and time that online registration starts.',
+      MODIFY COLUMN `registration_end_date` datetime DEFAULT NULL COMMENT 'Date and time that online registration ends.';";
+
+    $upgrade = new CRM_Upgrade_Form();
+    $upgrade->source($sql, TRUE);
+
     return TRUE;
   }
 
