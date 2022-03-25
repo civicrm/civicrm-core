@@ -21,7 +21,7 @@
 
       // Select all rows on the current page
       selectPage: function() {
-        this.allRowsSelected = true;
+        this.allRowsSelected = (this.rowCount <= this.results.length);
         this.selectedRows = _.uniq(_.pluck(this.results, 'key'));
       },
 
