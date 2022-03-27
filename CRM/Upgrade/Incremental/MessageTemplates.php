@@ -315,8 +315,9 @@ class CRM_Upgrade_Incremental_MessageTemplates {
         ],
       ],
       [
-        'version' => '5.47.alpha1',
-        'upgrade_descriptor' => ts('Add time zone to Event dates'),
+        // This is the same list of templates that were modified in 5.47.alpha1. We need to update them again to undo the {$event.event_tz} bits.
+        'version' => '5.47.3',
+        'upgrade_descriptor' => ts('Revert time zone for Event dates'),
         'templates' => [
           ['name' => 'event_online_receipt', 'type' => 'html'],
           ['name' => 'event_online_receipt', 'type' => 'text'],

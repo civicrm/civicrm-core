@@ -21,6 +21,8 @@
  */
 class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental_Base {
 
+  use CRM_Upgrade_Incremental_php_TimezoneRevertTrait;
+
   /**
    * Compute any messages which should be displayed before upgrade.
    *
@@ -33,14 +35,6 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
    * @param null $currentVer
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL): void {
-    if ($rev === '5.47.alpha1' && version_compare($currentVer, '5.47', '<')) {
-      // Note: This warning should only exist within a few patch releases of 5.47. Do not merge-forward.
-      $prose = ts('<strong>CiviEvent users may have migration problems with v%1.</strong> CiviEvent users should consider v5.46 instead. <a %2>(Learn more...)</a>', [
-        1 => CRM_Utils_System::version(),
-        2 => 'target="_blank" href="https://civicrm.org/redirect/event-timezone-5.47"',
-      ]);
-      $preUpgradeMessage = '<p>' . $prose . '</p>' . $preUpgradeMessage;
-    }
     if ($rev === '5.47.alpha1') {
       $count = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_contact WHERE preferred_mail_format != "Both"');
       if ($count) {
@@ -54,6 +48,26 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
           ts('Your system has custom field groups with duplicate internal names. To ensure data integrity, the internal names will be automatically changed; user-facing titles will not be affected. Please review any custom code you may be using which relies on custom field group names.') .
           '</p>';
       }
+    }
+    if ($rev === '5.47.3') {
+      $preUpgradeMessage .= $this->createEventTzPreUpgradeMessage();
+    }
+  }
+
+  /**
+   * Compute any messages which should be displayed after upgrade.
+   *
+   * Note: This function is called iteratively for each incremental upgrade step.
+   * There must be a concrete step (eg 'X.Y.Z.mysql.tpl' or 'upgrade_X_Y_Z()').
+   *
+   * @param string $postUpgradeMessage
+   *   alterable.
+   * @param string $rev
+   *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
+   */
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev): void {
+    if ($rev === '5.47.3') {
+      $postUpgradeMessage .= $this->createEventTzPostUpgradeMessage();
     }
   }
 
@@ -77,10 +91,6 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
       "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Relationship last modified.'"
     );
     $this->addTask('Set initial value for relationship created_date and modified_date to start_date', 'updateRelationshipDates');
-    $this->addTask('core-issue#2122 - Add timezone column to Events', 'addColumn',
-      'civicrm_event', 'event_tz', "text NULL DEFAULT NULL COMMENT 'Event\'s native time zone'"
-    );
-    $this->addTask('core-issue#2122 - Set the timezone to the default for existing Events', 'setEventTZDefault');
     $this->addTask('Drop CustomGroup UI_name_extends index', 'dropIndex', 'civicrm_custom_group', 'UI_name_extends');
     $this->addTask('Add CustomGroup UI_name index', 'addIndex', 'civicrm_custom_group', ['name'], 'UI');
     if (CRM_Core_DAO::checkTableExists('civicrm_search_display')) {
@@ -99,6 +109,10 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
    */
   public function upgrade_5_47_1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+  }
+
+  public function upgrade_5_47_3($rev): void {
+    $this->addEventTzTasks();
   }
 
   /**
@@ -328,19 +342,6 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
         }
       }
     }
-    return TRUE;
-  }
-
-  /**
-   * Set the timezone to the default for existing Events.
-   *
-   * @param \CRM_Queue_TaskContext $ctx
-   * @return bool
-   */
-  public static function setEventTZDefault(CRM_Queue_TaskContext $ctx) {
-    // Set default for CiviCRM Events to user system timezone (most reasonable default);
-    $defaultTZ = CRM_Core_Config::singleton()->userSystem->getTimeZoneString();
-    CRM_Core_DAO::executeQuery('UPDATE `civicrm_event` SET `event_tz` = %1 WHERE `event_tz` IS NULL;', [1 => [$defaultTZ, 'String']]);
     return TRUE;
   }
 
