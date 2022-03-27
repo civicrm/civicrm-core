@@ -163,7 +163,7 @@
     function gpopUp() {
         var from   = document.getElementById('from').value;
         var to     = document.getElementById('to').value;
-        var URL    = "http://maps.google.com/maps?saddr=" + from + "&daddr=" + to;
+        var URL    = "https://maps.google.com/maps?saddr=" + from + "&daddr=" + to;
         day = new Date();
         id  = day.getTime();
         eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=0,width=780,height=640,left = 202,top = 100');");
