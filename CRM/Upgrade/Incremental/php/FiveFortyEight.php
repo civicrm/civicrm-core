@@ -21,6 +21,42 @@
  */
 class CRM_Upgrade_Incremental_php_FiveFortyEight extends CRM_Upgrade_Incremental_Base {
 
+  use CRM_Upgrade_Incremental_php_TimezoneRevertTrait;
+
+  /**
+   * Compute any messages which should be displayed beforeupgrade.
+   *
+   * Note: This function is called iteratively for each incremental upgrade step.
+   * There must be a concrete step (eg 'X.Y.Z.mysql.tpl' or 'upgrade_X_Y_Z()').
+   *
+   * @param string $preUpgradeMessage
+   * @param string $rev
+   *   a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'.
+   * @param null $currentVer
+   */
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL): void {
+    if ($rev === '5.48.beta2') {
+      $preUpgradeMessage .= $this->createEventTzPreUpgradeMessage();
+    }
+  }
+
+  /**
+   * Compute any messages which should be displayed after upgrade.
+   *
+   * Note: This function is called iteratively for each incremental upgrade step.
+   * There must be a concrete step (eg 'X.Y.Z.mysql.tpl' or 'upgrade_X_Y_Z()').
+   *
+   * @param string $postUpgradeMessage
+   *   alterable.
+   * @param string $rev
+   *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
+   */
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev): void {
+    if ($rev === '5.48.beta2') {
+      $postUpgradeMessage .= $this->createEventTzPostUpgradeMessage();
+    }
+  }
+
   /**
    * Upgrade step; adds tasks including 'runSql'.
    *
@@ -46,6 +82,17 @@ class CRM_Upgrade_Incremental_php_FiveFortyEight extends CRM_Upgrade_Incremental
     $this->addTask('Add "retry_interval" to "civicrm_queue"', 'addColumn', 'civicrm_queue', 'retry_interval',
       "int NULL COMMENT 'Number of seconds to wait before retrying a failed execution.'"
     );
+  }
+
+  /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_5_48_beta2($rev): void {
+    // $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addEventTzTasks();
   }
 
   /**
