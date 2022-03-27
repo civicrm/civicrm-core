@@ -1481,9 +1481,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * In WordPress, it is not usually possible to trigger theming outside of the WordPress theme process,
    * meaning that in order to render an error inside the theme we cannot exit on error.
    *
+   * @internal
    * @return bool
    */
-  public function exitAfterFatal() {
+  public function shouldExitAfterFatal() {
     $ret = TRUE;
     if (!is_admin() && !wp_doing_ajax()) {
       $ret = FALSE;
