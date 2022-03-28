@@ -150,7 +150,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
     $params['contact_id'] = $this->_contactId;
 
-    CRM_Contact_BAO_Contact::getValues($params, $defaults);
+    CRM_Contact_BAO_Contact::getValues(array_merge(['id' => $this->_contactId], $params), $defaults);
     $defaults['im'] = CRM_Core_BAO_IM::getValues(['contact_id' => $params['contact_id']]);
     $defaults['email'] = CRM_Core_BAO_Email::getValues(['contact_id' => $params['contact_id']]);
     $defaults['openid'] = CRM_Core_BAO_OpenID::getValues(['contact_id' => $params['contact_id']]);
@@ -158,7 +158,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $defaults['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $params['contact_id']], TRUE);
     CRM_Core_BAO_Website::getValues($params, $defaults);
     // Copy employer fields to the current_employer keys.
-    if (($defaults['contact_type'] === 'Individual') && $defaults['employer_id'] && $defaults['organization_name']) {
+    if (($defaults['contact_type'] === 'Individual') && !empty($defaults['employer_id']) && !empty($defaults['organization_name'])) {
       $defaults['current_employer'] = $defaults['organization_name'];
       $defaults['current_employer_id'] = $defaults['employer_id'];
     }
