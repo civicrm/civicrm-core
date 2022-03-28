@@ -261,7 +261,6 @@ WHERE  email = %2
     $doCached = CRM_Core_DAO::executeQuery($groupsCachedSQL, $groupsParams);
     $doAdded = CRM_Core_DAO::executeQuery($groupsAddedSQL, $groupsParams);
 
-
     if ($return) {
       $returnGroups = [];
       while ($doCached->fetch()) {
