@@ -323,7 +323,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
         ],
       ],
       [
-        'version' => '5.48.beta1',
+        'version' => '5.48.beta2',
         'upgrade_descriptor' => ts('Revert time zone for Event dates'),
         'templates' => [
           ['name' => 'event_online_receipt', 'type' => 'html'],
