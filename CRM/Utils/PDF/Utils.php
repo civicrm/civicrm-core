@@ -220,6 +220,7 @@ class CRM_Utils_PDF_Utils {
     $snappy->setOption("margin-right", $margins[2] . $margins[0]);
     $snappy->setOption("margin-bottom", $margins[3] . $margins[0]);
     $snappy->setOption("margin-left", $margins[4] . $margins[0]);
+    $snappy->setOption('enable-local-file-access', true);
     $pdf = $snappy->getOutputFromHtml($html);
     if ($output) {
       return $pdf;
