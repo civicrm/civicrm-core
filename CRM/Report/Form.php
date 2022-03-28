@@ -21,7 +21,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * @var string[]
    */
-  public $expectedSmartyVariables = ['pager', 'skip', 'sections', 'grandStat'];
+  public $expectedSmartyVariables = ['pager', 'skip', 'sections', 'grandStat', 'chartEnabled'];
 
   /**
    * Deprecated constant, Reports should be updated to use the getRowCount function.
@@ -2582,7 +2582,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
   /**
    * @param $value
-   * @param $row
+   * @param array $row
    * @param $selectedfield
    * @param $criteriaFieldName
    *
@@ -2603,7 +2603,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
   /**
    * @param $value
-   * @param $row
+   * @param array $row
    * @param $selectedField
    * @param $criteriaFieldName
    *
@@ -2623,7 +2623,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
   /**
    * @param $value
-   * @param $row
+   * @param array $row
    * @param $selectedfield
    * @param $criteriaFieldName
    *
@@ -2643,7 +2643,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
   /**
    * @param $value
-   * @param $row
+   * @param array $row
    * @param $selectedfield
    * @param $criteriaFieldName
    *
@@ -2655,7 +2655,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
   /**
    * @param $value
-   * @param $row
+   * @param array $row
    * @param $fieldname
    *
    * @return mixed
@@ -2682,7 +2682,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
   /**
    * @param $value
-   * @param $row
+   * @param array $row
    * @param $fieldname
    *
    * @return mixed
@@ -2866,7 +2866,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    * @param string $tableName
    * @param string $tableKey
    * @param string $fieldName
-   * @param string $field
+   * @param array $field
    *
    * @return bool
    */
@@ -5147,8 +5147,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   /**
    * CRM-17793 - Alter DateTime section header to group by date from the datetime field.
    *
-   * @param $tempTable
-   * @param $columnName
+   * @param string $tempTable
+   * @param string $columnName
    */
   public function alterSectionHeaderForDateTime($tempTable, $columnName) {
     // add new column with date value for the datetime field
@@ -5955,7 +5955,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
-   * @param $options
+   * @param array $options
    *
    * @return array
    */
