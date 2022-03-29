@@ -1119,12 +1119,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
         $smarty = CRM_Core_Smarty::singleton();
         $smarty->assign('dataArray', $dataArray);
-        $smarty->assign('totalTaxAmount', $params['tax_amount'] ?? NULL);
       }
 
       // lets store it in the form variable so postProcess hook can get to this and use it
       $form->_contributionID = $contribution->id;
     }
+    $form->assign('totalTaxAmount', $params['tax_amount'] ?? NULL);
 
     // process soft credit / pcp params first
     CRM_Contribute_BAO_ContributionSoft::formatSoftCreditParams($params, $form);
