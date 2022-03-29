@@ -112,6 +112,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
      *Create the array of variables to be sent to the processor from the $params array
      * passed into this function
      *
+     * NB: PayFlowPro does not accept URL Encoded parameters.
+     * Particularly problematic when amount contains grouping character: e.g 1,234.56 will return [4 - Invalid Amount]
      */
 
     $payflow_query_array = [
@@ -127,7 +129,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
       'CVV2' => $params['cvv2'],
       'EXPDATE' => urlencode(sprintf('%02d', (int) $params['month']) . substr($params['year'], 2, 2)),
       'ACCTTYPE' => urlencode($params['credit_card_type']),
-      'AMT' => urlencode($this->getAmount($params)),
+      'AMT' => $this->getAmount($params),
       'CURRENCY' => urlencode($params['currency']),
       'FIRSTNAME' => $params['billing_first_name'],
       //credit card name
