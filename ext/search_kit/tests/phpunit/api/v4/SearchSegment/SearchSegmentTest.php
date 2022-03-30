@@ -97,26 +97,28 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
           'having' => [],
         ],
       ],
+      'sort' => [['segment_Giving_Tier:label', 'ASC']],
     ];
 
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(4, $result);
 
-    $this->assertEquals('Low ball', $result[0]['columns'][0]['val']);
-    $this->assertEquals(1.5, $result[0]['data']['AVG_total_amount']);
+    // Results should be in alphabetical order by giving tier
+    $this->assertEquals('Heavy hitter', $result[0]['columns'][0]['val']);
+    $this->assertEquals(56.0, $result[0]['data']['AVG_total_amount']);
     $this->assertEquals(1, $result[0]['data']['COUNT_total_amount']);
 
-    $this->assertEquals('Minor league', $result[1]['columns'][0]['val']);
-    $this->assertEquals(15.0, $result[1]['data']['AVG_total_amount']);
-    $this->assertEquals(2, $result[1]['data']['COUNT_total_amount']);
+    $this->assertEquals('Low ball', $result[1]['columns'][0]['val']);
+    $this->assertEquals(1.5, $result[1]['data']['AVG_total_amount']);
+    $this->assertEquals(1, $result[1]['data']['COUNT_total_amount']);
 
     $this->assertEquals('Major league', $result[2]['columns'][0]['val']);
     $this->assertEquals(30.0, $result[2]['data']['AVG_total_amount']);
     $this->assertEquals(3, $result[2]['data']['COUNT_total_amount']);
 
-    $this->assertEquals('Heavy hitter', $result[3]['columns'][0]['val']);
-    $this->assertEquals(56.0, $result[3]['data']['AVG_total_amount']);
-    $this->assertEquals(1, $result[3]['data']['COUNT_total_amount']);
+    $this->assertEquals('Minor league', $result[3]['columns'][0]['val']);
+    $this->assertEquals(15.0, $result[3]['data']['AVG_total_amount']);
+    $this->assertEquals(2, $result[3]['data']['COUNT_total_amount']);
   }
 
 }

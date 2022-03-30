@@ -327,7 +327,7 @@ class Api4SelectQuery {
 
       try {
         $expr = $this->getExpression($item);
-        $column = $expr->render($this->apiFieldSpec);
+        $column = $this->renderExpr($expr);
 
         // Use FIELD() function to sort on pseudoconstant values
         $suffix = strstr($item, ':');
@@ -376,7 +376,7 @@ class Api4SelectQuery {
    */
   protected function buildGroupBy() {
     foreach ($this->getGroupBy() as $item) {
-      $this->query->groupBy($this->getExpression($item)->render($this->apiFieldSpec));
+      $this->query->groupBy($this->renderExpr($this->getExpression($item)));
     }
   }
 
@@ -1285,6 +1285,24 @@ class Api4SelectQuery {
       'implicit_join' => NULL,
       'explicit_join' => NULL,
     ];
+  }
+
+  /**
+   * Returns rendered expression or alias if it is already aliased in the SELECT clause.
+   *
+   * @param $expr
+   * @return mixed|string
+   */
+  protected function renderExpr($expr) {
+    $exprVal = explode(':', $expr->getExpr())[0];
+    // If this expression is already in use in the select clause, use the existing alias
+    // This allows calculated fields to be reused in SELECT, GROUP BY and ORDER BY
+    foreach ($this->selectAliases as $alias => $selectVal) {
+      if ($exprVal === explode(':', $selectVal)[0]) {
+        return "`$alias`";
+      }
+    }
+    return $expr->render($this->apiFieldSpec);
   }
 
   /**
