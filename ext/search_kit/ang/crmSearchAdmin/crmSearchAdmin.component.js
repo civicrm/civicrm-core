@@ -443,7 +443,7 @@
       };
 
       $scope.fieldsForGroupBy = function() {
-        return {results: ctrl.getAllFields('', ['Field', 'Custom'], function(key) {
+        return {results: ctrl.getAllFields('', ['Field', 'Custom', 'Extra'], function(key) {
             return _.contains(ctrl.savedSearch.api_params.groupBy, key);
           })
         };
