@@ -128,7 +128,10 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
    * @return array
    */
   protected function execute($entity, $action, $params = [], $index = NULL) {
-    $params['checkPermissions'] = TRUE;
+    // allow permission override
+    if (!isset($params['checkPermissions'])) {
+      $params['checkPermissions'] = TRUE;
+    }
 
     // Handle numeric indexes later so we can get the count
     $itemAt = CRM_Utils_Type::validate($index, 'Integer', FALSE);
