@@ -10,10 +10,20 @@
           <span class="badge">{{ tab.rowCount }}</span>
         </a>
       </li>
+      <li ng-class="{active: $ctrl.tab === 'segment'}">
+        <a href ng-click="$ctrl.tab = 'segment'"><i class="crm-i fa-object-group"></i>
+          {{:: ts('Data Segmentation') }}
+          <span class="badge">{{ $ctrl.searchSegmentCount }}</span>
+        </a>
+      </li>
     </ul>
-    <a class="btn btn-primary" href="#/create/Contact/">
+    <a class="btn btn-primary" href="#/create/Contact/" ng-if="$ctrl.tab !== 'segment'">
       <i class="crm-i fa-plus"></i>
       {{:: ts('New Search') }}
+    </a>
+    <a class="btn btn-primary" href ng-if="$ctrl.tab === 'segment'" title="{{:: ts('New Data Segment') }}" crm-dialog-popup="searchSegmentDialog" popup-tpl="~/crmSearchAdmin/searchSegment/editDialog.html">
+      <i class="crm-i fa-plus"></i>
+      {{:: ts('New Segment') }}
     </a>
   </div>
 
@@ -34,5 +44,8 @@
       </a>
     </div>
     <crm-search-admin-search-listing filters="tab.filters" tab-count="tab.rowCount"></crm-search-admin-search-listing>
+  </div>
+  <div ng-show="$ctrl.tab === 'segment'">
+    <crm-search-admin-segment-listing total-count="$ctrl.searchSegmentCount"></crm-search-admin-segment-listing>
   </div>
 </form>

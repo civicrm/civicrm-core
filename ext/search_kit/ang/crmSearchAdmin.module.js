@@ -72,6 +72,7 @@
       if (!this.tab) {
         this.tab = this.tabs[0].name;
       }
+      this.searchSegmentCount = null;
     })
 
     // Controller for creating a new search
