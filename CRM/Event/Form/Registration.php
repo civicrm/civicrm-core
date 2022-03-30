@@ -456,7 +456,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params, $this->_bltID));
 
     // The concept of contributeMode is deprecated.
-    if ($this->_contributeMode == 'direct' && empty($params['is_pay_later'])) {
+    if ($this->_contributeMode === 'direct' && empty($params['is_pay_later'])) {
       $date = CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $params));
       $date = CRM_Utils_Date::mysqlToIso($date);
       $this->assign('credit_card_exp_date', $date);
@@ -465,18 +465,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       );
     }
 
-    // assign is_email_confirm to templates
-    if (isset($this->_values['event']['is_email_confirm'])) {
-      $this->assign('is_email_confirm', $this->_values['event']['is_email_confirm']);
-    }
-
+    $this->assign('is_email_confirm', $this->_values['event']['is_email_confirm'] ?? NULL);
     // assign pay later stuff
-    $params['is_pay_later'] = CRM_Utils_Array::value('is_pay_later', $params, FALSE);
+    $params['is_pay_later'] = $params['is_pay_later'] ?? FALSE;
     $this->assign('is_pay_later', $params['is_pay_later']);
-    if ($params['is_pay_later']) {
-      $this->assign('pay_later_text', $this->getPayLaterLabel());
-      $this->assign('pay_later_receipt', $this->_values['event']['pay_later_receipt']);
-    }
+    $this->assign('pay_later_text', $params['is_pay_later'] ? $this->getPayLaterLabel() : FALSE);
+    $this->assign('pay_later_receipt', $params['is_pay_later'] ? $this->_values['event']['pay_later_receipt'] : NULL);
 
     // also assign all participantIDs to the template
     // useful in generating confirmation numbers if needed

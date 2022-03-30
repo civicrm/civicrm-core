@@ -29,7 +29,7 @@
 
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 
-{if isset($pay_later_receipt)}{$pay_later_receipt}{/if}
+{$pay_later_receipt}
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 
 {/if}
@@ -167,7 +167,7 @@
 {ts}Total Participants{/ts}: {$count}
 {/if}
 
-{if !empty($is_pay_later) }
+{if $is_pay_later}
 
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 
