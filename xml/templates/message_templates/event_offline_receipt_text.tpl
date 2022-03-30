@@ -25,7 +25,7 @@
 {/if}
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 
-{elseif !empty($is_pay_later)}
+{elseif $is_pay_later}
 
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 
