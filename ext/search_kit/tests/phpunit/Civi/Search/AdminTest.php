@@ -61,6 +61,10 @@ class AdminTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface
       $relationshipJoins[0]['defaults']
     );
 
+    $relationshipCacheJoins = $joins['RelationshipCache'];
+    $this->assertCount(4, $relationshipCacheJoins);
+    $this->assertEquals(['RelationshipType', 'Contact', 'Contact', 'Case'], array_column($relationshipCacheJoins, 'entity'));
+
     $eventParticipantJoins = \CRM_Utils_Array::findAll($joins['Event'], [
       'entity' => 'Participant',
       'alias' => 'Event_Participant_event_id',

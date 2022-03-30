@@ -240,7 +240,7 @@ class Admin {
         $bridge = in_array('EntityBridge', $entity['type']) ? $entity['name'] : NULL;
 
         // Non-bridge joins directly between 2 entities
-        if (!$bridge) {
+        if ($entity['searchable'] !== 'bridge') {
           foreach ($references as $reference) {
             $keyField = $fields[$reference->getReferenceKey()] ?? NULL;
             if (
@@ -288,7 +288,7 @@ class Admin {
           }
         }
         // Bridge joins go through an intermediary table
-        elseif (!empty($entity['bridge'])) {
+        if ($bridge && !empty($entity['bridge'])) {
           foreach ($entity['bridge'] as $targetKey => $bridgeInfo) {
             $baseKey = $bridgeInfo['to'];
             $reference = self::getReference($targetKey, $references);
