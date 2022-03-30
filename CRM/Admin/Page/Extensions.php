@@ -347,14 +347,18 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
       'version' => '',
       'description' => '',
       'license' => '',
+      'path' => '',
       'releaseDate' => '',
       'downloadUrl' => FALSE,
       'compatibility' => FALSE,
       'develStage' => FALSE,
       'comments' => FALSE,
     ];
-
-    return array_merge($defaultKeys, $info);
+    $info = array_merge($defaultKeys, $info);
+    foreach ($info['authors'] as &$author) {
+      $author = array_merge(['homepage' => ''], $author);
+    }
+    return $info;
   }
 
 }
