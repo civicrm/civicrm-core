@@ -94,7 +94,13 @@ trait CRM_Upgrade_Incremental_php_TimezoneRevertTrait {
   public static function fillBackupEventDates(CRM_Queue_TaskContext $ctx): bool {
     // We only run if the field is timestamp, so don't need to check about that.
     CRM_Core_DAO::executeQuery('UPDATE civicrm_event SET start_date_ts_bak = start_date, end_date_ts_bak = end_date, registration_start_date_ts_bak = registration_start_date, registration_end_date_ts_bak = registration_end_date');
-    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_event CHANGE COLUMN event_tz event_tz_bak text NULL DEFAULT NULL COMMENT 'For troubleshooting upgrades post 5.47. Can drop this column if no issues.'");
+    // don't try to localize since original was not localizable
+    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_event CHANGE COLUMN event_tz event_tz_bak text NULL DEFAULT NULL COMMENT 'For troubleshooting upgrades post 5.47. Can drop this column if no issues.'", [], TRUE, NULL, FALSE, FALSE);
+    // need to rebuild since otherwise view is out of date
+    $locales = CRM_Core_I18n::getMultilingual();
+    if ($locales) {
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL, TRUE);
+    }
     return TRUE;
   }
 
