@@ -1637,11 +1637,11 @@ VALUES
 ( 'civicrm_contact', 'civicrm_contact', 'Date Field', 'contact_date_reminder_options', 'Annual Options', 'date_field', NULL, NULL);
 
 INSERT INTO `civicrm_contact_type`
-  (`id`, `name`, `label`,`image_URL`, `parent_id`, `is_active`,`is_reserved`)
+  (`id`, `name`, `label`,`image_URL`, `parent_id`, `is_active`,`is_reserved`, `icon`)
  VALUES
-  ( 1, 'Individual'  , '{ts escape="sql"}Individual{/ts}'  , NULL, NULL, 1, 1),
-  ( 2, 'Household'   , '{ts escape="sql"}Household{/ts}'   , NULL, NULL, 1, 1),
-  ( 3, 'Organization', '{ts escape="sql"}Organization{/ts}', NULL, NULL, 1, 1);
+  ( 1, 'Individual'  , '{ts escape="sql"}Individual{/ts}'  , NULL, NULL, 1, 1, 'fa-user'),
+  ( 2, 'Household'   , '{ts escape="sql"}Household{/ts}'   , NULL, NULL, 1, 1, 'fa-home'),
+  ( 3, 'Organization', '{ts escape="sql"}Organization{/ts}', NULL, NULL, 1, 1, 'fa-building');
 
 {include file='civicrm_msg_template.tpl'}
 

@@ -69,6 +69,15 @@
     <add>3.1</add>
   </field>
   <field>
+    <name>icon</name>
+    <title>Icon</title>
+    <type>varchar</type>
+    <length>255</length>
+    <default>NULL</default>
+    <comment>crm-i icon class representing this contact type</comment>
+    <add>5.49</add>
+  </field>
+  <field>
     <name>parent_id</name>
     <title>Parent ID</title>
     <type>int unsigned</type>
