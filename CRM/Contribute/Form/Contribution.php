@@ -2052,7 +2052,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return CRM_Contribute_BAO_Contribution_Utils::getPendingCompleteFailedAndCancelledStatuses();
     }
     $statusNames = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
-    $statusNamesToUnset = [
+    $statusNamesToUnset = array_diff([
       // For records which represent a data template for a recurring
       // contribution that may not yet have a payment. This status should not
       // be available from forms. 'Template' contributions should only be created
@@ -2060,15 +2060,15 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // is_template field set to 1. This status excludes them from reports
       // that are still ignorant of the is_template field.
       'Template',
-    ];
+      'Partially paid',
+      'Pending refund',
+    ], [$this->getPreviousContributionStatus()]);
     switch ($this->getPreviousContributionStatus()) {
       case 'Completed':
         // [CRM-17498] Removing unsupported status change options.
         $statusNamesToUnset = array_merge($statusNamesToUnset, [
           'Pending',
           'Failed',
-          'Partially paid',
-          'Pending refund',
         ]);
         break;
 
