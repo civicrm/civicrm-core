@@ -119,7 +119,7 @@
 {/foreach}
 
 {if !empty($dataArray)}
-{if isset($totalAmount) and isset($totalTaxAmount)}
+{if $totalAmount and $totalTaxAmount}
 {ts}Amount before Tax{/ts}: {$totalAmount-$totalTaxAmount|crmMoney:$currency}
 {/if}
 
@@ -138,7 +138,7 @@
 {/foreach}
 {/if}
 
-{if isset($totalTaxAmount)}
+{if $totalTaxAmount}
 {ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}
 {/if}
 {if !empty($isPrimary)}

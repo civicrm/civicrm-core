@@ -213,7 +213,7 @@
         {/if}
        {/foreach}
        {if !empty($dataArray)}
-        {if isset($totalAmount) and isset($totalTaxAmount)}
+        {if $totalAmount and $totalTaxAmount}
         <tr>
          <td {$labelStyle}>
           {ts}Amount Before Tax:{/ts}
@@ -246,7 +246,7 @@
         </tr>
        {/foreach}
       {/if}
-      {if isset($totalTaxAmount)}
+      {if $totalTaxAmount}
        <tr>
         <td {$labelStyle}>
          {ts}Total Tax Amount{/ts}
