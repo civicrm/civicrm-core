@@ -1154,7 +1154,7 @@ Price Field - Price Field 1        1    $100.00       $100.00
     $strings = [
       'Total Tax Amount : $' . $this->formatMoneyInput(1000.00),
       'Total Amount : $' . $this->formatMoneyInput(11000.00),
-      'Date Received: April 21st, 2015',
+      'Date Received: 04/21/2015',
       'Paid By: Check',
       'Check Number: 12345',
     ];
@@ -1213,7 +1213,7 @@ Price Field - Price Field 1        1    $100.00       $100.00
     $strings = [
       'Total Tax Amount : $' . $this->formatMoneyInput(2000),
       'Total Amount : $' . $this->formatMoneyInput(22000.00),
-      'Date Received: April 21st, 2015',
+      'Date Received: 04/21/2015',
       'Paid By: Check',
       'Check Number: 12345',
       'Financial Type: Donation',
