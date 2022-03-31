@@ -97,6 +97,10 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
     $financialAccount->copyValues($params);
     $financialAccount->save();
 
+    if (!empty($params['custom']) && is_array($params['custom'])) {
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], static::$_tableName, $financialAccount->id, $op);
+    }
+
     // invoke post hook
     $op = 'create';
     if (!empty($params['id'])) {
