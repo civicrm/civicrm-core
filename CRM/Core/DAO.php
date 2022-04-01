@@ -3314,8 +3314,8 @@ SELECT contact_id
       return;
     }
     $label = $this->label ?? $this->title ?? NULL;
-    if (!$label && $label !== '0' && !$isRequired) {
-      // No label supplied and name not required, do nothing
+    if (!$label && $label !== '0') {
+      // No label supplied, do nothing
       return;
     }
     $maxLen = static::getSupportedFields()['name']['maxlength'] ?? 255;
