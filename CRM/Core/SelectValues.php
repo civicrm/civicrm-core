@@ -1176,4 +1176,21 @@ class CRM_Core_SelectValues {
     ];
   }
 
+  /**
+   * Columns from the option_value table which may or may not be used by each option_group.
+   *
+   * Note: Value is not listed here as it is not optional.
+   *
+   * @return string[]
+   */
+  public static function optionValueFields() {
+    return [
+      'name' => 'name',
+      'label' => 'label',
+      'description' => 'description',
+      'icon' => 'icon',
+      'color' => 'color',
+    ];
+  }
+
 }

@@ -5,9 +5,12 @@ return [
   [
     'name' => 'SearchDisplayType',
     'entity' => 'OptionGroup',
+    'update' => 'always',
+    'cleanup' => 'always',
     'params' => [
       'name' => 'search_display_type',
       'title' => 'Search Display Type',
+      'option_value_fields' => ['name', 'label', 'icon', 'description'],
     ],
   ],
   [

@@ -67,6 +67,9 @@ class CRM_Upgrade_Incremental_php_FiveFortyNine extends CRM_Upgrade_Incremental_
         $this->addTask("Update $tableName.$columnName to be NOT NULL", 'changeBooleanColumn', $tableName, $columnName, $defn);
       }
     }
+    $this->addTask('Add civicrm_option_group.option_value_fields column', 'addColumn',
+      'civicrm_option_group', 'option_value_fields', "varchar(128) DEFAULT \"name,label,description\" COMMENT 'Which optional columns from the option_value table are in use by this group.'");
+    $this->addTask('Populate civicrm_option_group.option_value_fields column', 'fillOptionValueFields');
   }
 
   /**
@@ -79,6 +82,28 @@ class CRM_Upgrade_Incremental_php_FiveFortyNine extends CRM_Upgrade_Incremental_
   public static function changeBooleanColumn(CRM_Queue_TaskContext $ctx, $tableName, $columnName, $defn) {
     CRM_Core_DAO::executeQuery("UPDATE `$tableName` SET `$columnName` = 0 WHERE `$columnName` IS NULL", [], TRUE, NULL, FALSE, FALSE);
     CRM_Core_DAO::executeQuery("ALTER TABLE `$tableName` CHANGE `$columnName` `$columnName` tinyint NOT NULL $defn", [], TRUE, NULL, FALSE, FALSE);
+    return TRUE;
+  }
+
+  public static function fillOptionValueFields(CRM_Queue_TaskContext $ctx) {
+    // By default every option group uses 'name,description'
+    // Note: description doesn't make sense for every group, but historically Civi has been lax
+    // about restricting its use.
+    CRM_Core_DAO::executeQuery("UPDATE `civicrm_option_group` SET `option_value_fields` = 'name,label,description'", [], TRUE, NULL, FALSE, FALSE);
+
+    $groupsWithDifferentFields = [
+      'name,label,description,color' => [
+        'activity_status',
+        'case_status',
+      ],
+      'name,label,description,icon' => [
+        'activity_type',
+      ],
+    ];
+    foreach ($groupsWithDifferentFields as $fields => $names) {
+      $in = '"' . implode('","', $names) . '"';
+      CRM_Core_DAO::executeQuery("UPDATE `civicrm_option_group` SET `option_value_fields` = '$fields' WHERE `name` IN ($in)", [], TRUE, NULL, FALSE, FALSE);
+    }
     return TRUE;
   }
 

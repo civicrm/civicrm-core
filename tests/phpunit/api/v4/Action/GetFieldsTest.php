@@ -105,4 +105,14 @@ class GetFieldsTest extends UnitTestCase {
     $this->assertTrue($actFields['subject']['nullable']);
   }
 
+  public function testGetSuffixes() {
+    $actFields = Activity::getFields(FALSE)
+      ->execute()->indexBy('name');
+
+    $this->assertEquals(['name', 'label', 'description'], $actFields['engagement_level']['suffixes']);
+    $this->assertEquals(['name', 'label', 'description', 'icon'], $actFields['activity_type_id']['suffixes']);
+    $this->assertEquals(['name', 'label', 'description', 'color'], $actFields['status_id']['suffixes']);
+    $this->assertEquals(['name', 'label', 'description', 'color'], $actFields['tags']['suffixes']);
+  }
+
 }
