@@ -732,4 +732,35 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $this->assertEquals('0', $recurring3Get['is_email_receipt']);
   }
 
+  /**
+   * Test that a recurring contribution created without a price set id can be accessed.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRetrieveContributionWithoutPriceSetField(): void {
+    // Create a recurring contribution.
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
+    // Add a contribution record to it.
+    $contribution = $this->callAPISuccess('Contribution', 'create', [
+      'contribution_recur_id' => $contributionRecur['id'],
+      'total_amount' => '3.00',
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 1,
+      'currency' => 'USD',
+      'contact_id' => $this->individualCreate(),
+      'contribution_status_id' => 1,
+      'receive_date' => 'yesterday',
+    ]);
+
+    // Delete the default price_field_id that is set for it.
+    $lineItems = \Civi\Api4\LineItem::update()
+      ->setCheckPermissions(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->addValue('price_field_id', NULL)
+      ->execute();
+
+    // Ensure this missing price_field_id doesn't cause problems.
+    CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionRecur['id']);
+  }
+
 }

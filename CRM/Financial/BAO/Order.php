@@ -809,11 +809,17 @@ class CRM_Financial_BAO_Order {
     // a template contribution.
     $this->setLineItemCount(count($lineItems));
 
-    foreach ($lineItems as &$lineItem) {
-      // Set the price set id if not set above. Note that the above
-      // requires it for line retrieval but we want to fix that as it
-      // should not be required at that point.
-      $this->setPriceSetIDFromSelectedField($lineItem['price_field_id']);
+    foreach ($lineItems as $k => &$lineItem) {
+      if (empty($lineItem['price_field_id'])) {
+        $component = !empty($lineItem['membership_type_id']) ? 'membership' : 'contribution';
+        $this->setPriceSetToDefault($component);
+      }
+      else {
+        // Set the price set id if not set above. Note that the above
+        // requires it for line retrieval but we want to fix that as it
+        // should not be required at that point.
+        $this->setPriceSetIDFromSelectedField($lineItem['price_field_id']);
+      }
       // Set any pre-calculation to zero as we will calculate.
       $lineItem['tax_amount'] = 0;
       if ($this->isOverrideLineItemFinancialType($lineItem['financial_type_id']) !== FALSE) {
