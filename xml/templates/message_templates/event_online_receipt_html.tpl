@@ -47,8 +47,8 @@
      {if !empty($isPrimary)}
       <p>{ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}</p>
      {/if}
-    {elseif !empty($is_pay_later) && empty($isAmountzero) && empty($isAdditionalParticipant)}
-     <p>{if isset($pay_later_receipt)}{$pay_later_receipt}{/if}</p> {* FIXME: this might be text rather than HTML *}
+    {elseif $is_pay_later && empty($isAmountzero) && empty($isAdditionalParticipant)}
+     <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
     {/if}
 
    </td>

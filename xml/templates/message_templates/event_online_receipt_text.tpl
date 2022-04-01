@@ -30,11 +30,11 @@
 {/if}
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
-{elseif !empty($is_pay_later) && empty($isAmountzero) && empty($isAdditionalParticipant)}
+{elseif $is_pay_later && empty($isAmountzero) && empty($isAdditionalParticipant)}
 
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
-{if isset($pay_later_receipt)}{$pay_later_receipt}{/if}
+{$pay_later_receipt}
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {/if}
