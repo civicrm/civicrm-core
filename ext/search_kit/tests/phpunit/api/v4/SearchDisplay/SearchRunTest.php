@@ -2,6 +2,7 @@
 namespace api\v4\SearchDisplay;
 
 use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\ContactType;
 use Civi\Api4\Email;
@@ -664,6 +665,46 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
       $repeat = civicrm_api4('SearchDisplay', 'run', $params);
       $this->assertEquals($seeded->column('data'), $repeat->column('data'));
     }
+  }
+
+  public function testRunWithGroupBy() {
+    Activity::delete(FALSE)
+      ->addWhere('activity_type_id:name', 'IN', ['Meeting', 'Phone Call'])
+      ->execute();
+
+    $cid = Contact::create(FALSE)
+      ->execute()->first()['id'];
+    $sampleData = [
+      ['subject' => 'abc', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid],
+      ['subject' => 'def', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid],
+      ['subject' => 'xyz', 'activity_type_id:name' => 'Phone Call', 'source_contact_id' => $cid],
+    ];
+    $aids = Activity::save(FALSE)
+      ->setRecords($sampleData)
+      ->execute()->column('id');
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Activity',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            "activity_type_id:label",
+            "GROUP_CONCAT(DISTINCT subject) AS GROUP_CONCAT_subject",
+          ],
+          'groupBy' => ['activity_type_id'],
+          'orderBy' => ['activity_type_id:label'],
+          'where' => [],
+        ],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+
+    $this->assertEquals(['abc', 'def'], $result[0]['data']['GROUP_CONCAT_subject']);
+    $this->assertEquals(['xyz'], $result[1]['data']['GROUP_CONCAT_subject']);
   }
 
   /**

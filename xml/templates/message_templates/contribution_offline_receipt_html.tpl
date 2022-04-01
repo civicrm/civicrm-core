@@ -157,7 +157,7 @@
         {ts}Date Received{/ts}
        </td>
        <td {$valueStyle}>
-         {contribution.receive_date}
+         {contribution.receive_date|crmDate:"shortdate"}
        </td>
       </tr>
      {/if}
@@ -168,7 +168,7 @@
         {ts}Receipt Date{/ts}
        </td>
        <td {$valueStyle}>
-         {contribution.receipt_date}
+         {contribution.receipt_date|crmDate:"shortdate"}
        </td>
       </tr>
      {/if}

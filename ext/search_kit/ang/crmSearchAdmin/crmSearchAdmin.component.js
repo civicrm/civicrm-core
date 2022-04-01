@@ -430,7 +430,7 @@
         }
         var arg = _.findWhere(searchMeta.parseExpr(col).args, {type: 'field'}) || {};
         // If the column is not a database field, no
-        if (!arg.field || !arg.field.entity || arg.field.type !== 'Field') {
+        if (!arg.field || !arg.field.entity || !_.includes(['Field', 'Custom'], arg.field.type)) {
           return false;
         }
         // If the column is used for a groupBy, no
