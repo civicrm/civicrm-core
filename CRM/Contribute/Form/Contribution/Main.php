@@ -1400,12 +1400,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     // Would be nice to someday understand the point of this set.
     $this->set('is_pay_later', $params['is_pay_later']);
     // assign pay later stuff
-    $this->_params['is_pay_later'] = CRM_Utils_Array::value('is_pay_later', $params, FALSE);
+    $this->_params['is_pay_later'] = $params['is_pay_later'];
     $this->assign('is_pay_later', $params['is_pay_later']);
-    if ($params['is_pay_later']) {
-      $this->assign('pay_later_text', $this->_values['pay_later_text']);
-      $this->assign('pay_later_receipt', CRM_Utils_Array::value('pay_later_receipt', $this->_values));
-    }
+    $this->assign('pay_later_text', $params['is_pay_later'] ? $this->_values['pay_later_text'] : NULL);
+    $this->assign('pay_later_receipt', ($params['is_pay_later'] && isset($this->_values['pay_later_receipt'])) ? $this->_values['pay_later_receipt'] : NULL);
 
     if ($this->_membershipBlock && $this->_membershipBlock['is_separate_payment'] && !empty($params['separate_amount'])) {
       $this->set('amount', $params['separate_amount']);
