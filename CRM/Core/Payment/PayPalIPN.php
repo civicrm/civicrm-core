@@ -133,19 +133,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       echo 'Failure: Invalid parameters<p>';
       return;
     }
-    if ($first) {
-      $recur->start_date = $now;
-    }
-    else {
-      $recur->modified_date = $now;
-    }
-
-    // make sure the contribution status is not done
-    // since order of ipn's is unknown
-    if ($recur->contribution_status_id != $contributionStatuses['Completed']) {
-      $recur->contribution_status_id = $contributionStatuses['In Progress'];
-    }
-    $recur->save();
 
     if (!$first) {
       // check if this contribution transaction is already processed
