@@ -2810,6 +2810,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // the way the pcpParams & honor Params section works is a baby-step towards this.
     $template = CRM_Core_Smarty::singleton();
     $template->assign('billingName', $values['billingName']);
+    // It is unclear if onBehalfProfile is still assigned & where - but
+    // it is still referred to in templates so avoid an e-notice.
+    // Credit card type is assigned on the form layer but should also be
+    // assigned when payment.create is called....
+    $template->ensureVariablesAreAssigned(['onBehalfProfile', 'credit_card_type']);
 
     //assign honor information to receipt message
     $softRecord = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->id);
@@ -2859,6 +2864,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $template->assign('price', $productDAO->price);
       $template->assign('sku', $productDAO->sku);
     }
+    else {
+      $template->assign('selectPremium', FALSE);
+    }
     $template->assign('title', $values['title'] ?? NULL);
     $values['amount'] = CRM_Utils_Array::value('total_amount', $input, (CRM_Utils_Array::value('amount', $input)), NULL);
     if (!$values['amount'] && isset($this->total_amount)) {
@@ -2873,7 +2881,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'title' => NULL,
     ];
 
-    if (strtolower($this->_component) == 'contribute') {
+    if (strtolower($this->_component) === 'contribute') {
       //PCP Info
       $softDAO = new CRM_Contribute_DAO_ContributionSoft();
       $softDAO->contribution_id = $this->id;
@@ -2916,7 +2924,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     if (!empty($values['softContributions'])) {
       $template->assign('softContributions', $values['softContributions']);
     }
-    if ($this->_component == 'event') {
+    if ($this->_component === 'event') {
       $template->assign('title', $values['event']['title']);
       $participantRoles = CRM_Event_PseudoConstant::participantRole();
       $viewRoles = [];
