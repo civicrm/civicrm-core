@@ -3523,10 +3523,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
           }
         }
       }
-      else {
-        // Prevents an e-notice in statistics.tpl.
-        $statistics['filters'] = [];
-      }
+    }
+    // Prevents an e-notice in statistics.tpl.
+    if (!isset($statistics['filters'])) {
+      $statistics['filters'] = [];
     }
   }
 
