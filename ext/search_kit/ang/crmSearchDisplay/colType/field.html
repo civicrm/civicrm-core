@@ -1,11 +1,14 @@
 <crm-search-display-editable row="row" col="colData" do-save="$ctrl.runSearch([apiCall], {}, row)" cancel="$ctrl.editing = null;" ng-if="colData.edit && $ctrl.editing && $ctrl.editing[0] === rowIndex && $ctrl.editing[1] === colIndex"></crm-search-display-editable>
 <span ng-if="::!colData.links" ng-class="{'crm-editable-enabled': colData.edit && !$ctrl.editing}" ng-click="colData.edit && !$ctrl.editing && ($ctrl.editing = [rowIndex, colIndex])">
+  <i ng-repeat="icon in colData.icons" ng-if="icon.side === 'left'" class="crm-i {{:: icon['class'] }}"></i>
   {{:: $ctrl.formatFieldValue(colData) }}
+  <i ng-repeat="icon in colData.icons" ng-if="icon.side === 'right'" class="crm-i {{:: icon['class'] }}"></i>
 </span>
 <span ng-if="::colData.links">
   <span ng-repeat="link in colData.links">
     <a target="{{:: link.target }}" href="{{:: link.url }}">
-      {{:: link.text }}</a><span ng-if="!$last">,
+      <i ng-repeat="icon in colData.icons" ng-if="icon.side === 'left'" class="crm-i {{:: icon['class'] }}"></i>
+      {{:: link.text }}<i ng-repeat="icon in colData.icons" ng-if="icon.side === 'right'" class="crm-i {{:: icon['class'] }}"></i></a><span ng-if="!$last">,
     </span>
   </span>
 </span>

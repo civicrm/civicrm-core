@@ -501,7 +501,7 @@
           prefix = typeof prefix === 'undefined' ? '' : prefix;
           _.each(fields, function(field) {
             var item = {
-              id: prefix + field.name + (field.options ? suffix : ''),
+              id: prefix + field.name + (field.suffixes && _.includes(field.suffixes, suffix.replace(':', '')) ? suffix : ''),
               text: field.label,
               description: field.description
             };
