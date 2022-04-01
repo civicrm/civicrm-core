@@ -608,9 +608,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('allPanes', $allPanes);
 
     $this->addFormRule(['CRM_Contribute_Form_Contribution', 'formRule'], $this);
+    $this->assign('formType', $this->_formType);
 
     if ($this->_formType) {
-      $this->assign('formType', $this->_formType);
       return;
     }
 
