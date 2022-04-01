@@ -804,7 +804,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     }, $apiParams['select']);
     $additions = [];
     // Add primary key field if actions are enabled
-    if (!empty($this->display['settings']['actions']) || !empty($this->display['settings']['draggable'])) {
+    // (only needed for non-dao entities, as Api4SelectQuery will auto-add the id)
+    if (!in_array('DAOEntity', CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'type')) &&
+      (!empty($this->display['settings']['actions']) || !empty($this->display['settings']['draggable']))
+    ) {
       $additions = CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'primary_key');
     }
     // Add draggable column (typically "weight")
