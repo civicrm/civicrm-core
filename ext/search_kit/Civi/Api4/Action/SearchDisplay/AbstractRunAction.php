@@ -537,35 +537,67 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   /**
    * @param $column
    * @param $data
-   * @return array{entity: string, input_type: string, data_type: string, options: bool, serialize: bool, fk_entity: string, value_key: string, record: array, value: mixed}|null
+   * @return array{entity: string, action: string, input_type: string, data_type: string, options: bool, serialize: bool, nullable: bool, fk_entity: string, value_key: string, record: array, value: mixed}|null
    */
   private function formatEditableColumn($column, $data) {
     $editable = $this->getEditableInfo($column['key']);
+    $editable['record'] = [];
+    // Generate params to edit existing record
     if (!empty($data[$editable['id_path']])) {
-      $access = civicrm_api4($editable['entity'], 'checkAccess', [
-        'action' => 'update',
-        'values' => [
-          $editable['id_key'] => $data[$editable['id_path']],
-        ],
-      ], 0)['access'];
-      if (!$access) {
-        return NULL;
-      }
-      $editable['record'] = [
-        $editable['id_key'] => $data[$editable['id_path']],
-      ];
+      $editable['action'] = 'update';
+      $editable['record'][$editable['id_key']] = $data[$editable['id_path']];
       $editable['value'] = $data[$editable['value_path']];
-      \CRM_Utils_Array::remove($editable, 'id_key', 'id_path', 'value_path');
-      return $editable;
+    }
+    // Generate params to create new record, if applicable
+    elseif ($editable['explicit_join']) {
+      $editable['action'] = 'create';
+      $editable['value'] = NULL;
+      $editable['nullable'] = FALSE;
+      // Get values for creation from the join clause
+      $join = $this->getQuery()->getExplicitJoin($editable['explicit_join']);
+      foreach ($join['on'] ?? [] as $clause) {
+        if (is_array($clause) && count($clause) === 3 && $clause[1] === '=') {
+          // Because clauses are reversible, check both directions to see which side has a fieldName belonging to this join
+          foreach ([0 => 2, 2 => 0] as $field => $value) {
+            if (strpos($clause[$field], $editable['explicit_join'] . '.') === 0) {
+              $fieldName = substr($clause[$field], strlen($editable['explicit_join']) + 1);
+              // If the value is a field, get it from the data
+              if (isset($data[$clause[$value]])) {
+                $editable['record'][$fieldName] = $data[$clause[$value]];
+              }
+              // If it's a literal bool or number
+              elseif (is_bool($clause[$value]) || is_numeric($clause[$value])) {
+                $editable['record'][$fieldName] = $clause[$value];
+              }
+              // If it's a literal string it will be quoted
+              elseif (is_string($clause[$value]) && in_array($clause[$value][0], ['"', "'"], TRUE) && substr($clause[$value], -1) === $clause[$value][0]) {
+                $editable['record'][$fieldName] = substr($clause[$value], 1, -1);
+              }
+            }
+          }
+        }
+      }
+    }
+    // Ensure current user has access
+    if ($editable['record']) {
+      $access = civicrm_api4($editable['entity'], 'checkAccess', [
+        'action' => $editable['action'],
+        'values' => $editable['record'],
+      ], 0)['access'];
+      if ($access) {
+        \CRM_Utils_Array::remove($editable, 'id_key', 'id_path', 'value_path', 'explicit_join');
+        return $editable;
+      }
     }
     return NULL;
   }
 
   /**
    * @param $key
-   * @return array{entity: string, input_type: string, data_type: string, options: bool, serialize: bool, nullable: bool, fk_entity: string, value_key: string, value_path: string, id_key: string, id_path: string}|null
+   * @return array{entity: string, input_type: string, data_type: string, options: bool, serialize: bool, nullable: bool, fk_entity: string, value_key: string, value_path: string, id_key: string, id_path: string, explicit_join: string}|null
    */
   private function getEditableInfo($key) {
+    // Strip pseudoconstant suffix
     [$key] = explode(':', $key);
     $field = $this->getField($key);
     // If field is an implicit join to another entity (not a custom group), use the original fk field
@@ -592,6 +624,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         'value_path' => $key,
         'id_key' => $idKey,
         'id_path' => $idPath,
+        'explicit_join' => $field['explicit_join'],
       ];
     }
     return NULL;

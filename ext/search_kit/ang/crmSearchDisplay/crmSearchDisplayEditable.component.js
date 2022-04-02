@@ -57,7 +57,7 @@
         var record = _.cloneDeep(col.edit.record);
         record[col.edit.value_key] = ctrl.value;
         $('input', $element).attr('disabled', true);
-        ctrl.doSave({apiCall: [col.edit.entity, 'update', {values: record}]});
+        ctrl.doSave({apiCall: [col.edit.entity, col.edit.action, {values: record}]});
       };
 
       function loadOptions() {
