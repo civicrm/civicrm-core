@@ -27,6 +27,16 @@ function temporary_timestamps(): string {
 }
 
 /**
+ * Implements hook_civicrm_triggerInfo().
+ *
+ * @see CRM_Utils_Hook::triggerInfo()
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_triggerInfo/
+ */
+function temporary_civicrm_triggerInfo(&$info, $tableName = NULL) {
+  CRM_Temporary_Schema::createSqlTriggers($info, $tableName);
+}
+
+/**
  * Implements hook_civicrm_config().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/
