@@ -23,6 +23,7 @@
 !/ext/contributioncancelactions
 !/ext/recaptcha
 !/ext/payflowpro
+!/ext/temporary
 !/ext/ckeditor4
 !/ext/legacycustomsearches
 !/ext/civiimport
