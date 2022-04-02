@@ -6,6 +6,27 @@ use CRM_Temporary_ExtensionUtil as E;
 // phpcs:enable
 
 /**
+ * Define the list of tables for which we manage temporal fields.
+ */
+// define('TEMPORARY_TIMESTAMP_TABLES', '/^civicrm_/');
+define('TEMPORARY_TIMESTAMP_TABLES', '/^civicrm_(mailing|note|entity|group|action)/');
+// define('TEMPORARY_TIMESTAMP_TABLES', '/^civicrm_note/');
+// define('TEMPORARY_TIMESTAMP_TABLES', '/^alskdjfasdf/');
+
+/**
+ * If the sysadmin has not set a timestamp, then which mode should we assume?
+ */
+define('TEMPORARY_TIMESTAMP_AUTO', 'ts');
+
+/**
+ * What is the current timestamp mode?
+ */
+function temporary_timestamps(): string {
+  $v = Civi::settings()->get('temporary_timestamps');
+  return ($v && $v !== 'auto') ? $v : TEMPORARY_TIMESTAMP_AUTO;
+}
+
+/**
  * Implements hook_civicrm_config().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/
@@ -124,12 +145,22 @@ function temporary_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
 /**
  * Implements hook_civicrm_entityTypes().
  *
- * Declare entity types provided by this module.
+ * Modify all DAO's - identify TIMESTAMPs and configure alternative schemas.
+ *
+ * Note: hook_entityTypes is one of those ~2 wonky hooks that runs very-early during boot.
+ * This means, eg, autoloading and Symfony priorities are unreliable for this hook.
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
  */
 function temporary_civicrm_entityTypes(&$entityTypes) {
-  _temporary_civix_civicrm_entityTypes($entityTypes);
+  // _temporary_civix_civicrm_entityTypes($entityTypes);
+
+  $mode = temporary_timestamps();
+  $callback = ['CRM_Temporary_DaoFilter_' . ucfirst($mode), 'filter'];
+  require_once __DIR__ . '/CRM/Temporary/DaoFilter/' . ucfirst($mode) . '.php';
+  foreach ($entityTypes as &$entity) {
+    $entity['fields_callback'][] = $callback;
+  }
 }
 
 /**
