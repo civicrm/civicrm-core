@@ -862,7 +862,7 @@ WHERE ($subtypeClause)";
    * @return array
    * @throws \API_Exception
    */
-  protected static function getAllContactTypes() {
+  public static function getAllContactTypes() {
     $cache = Civi::cache('contactTypes');
     $cacheKey = 'all_' . $GLOBALS['tsLocale'];
     $contactTypes = $cache->get($cacheKey);
