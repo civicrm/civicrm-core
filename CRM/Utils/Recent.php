@@ -122,6 +122,7 @@ class CRM_Utils_Recent {
         'image_url' => $others['imageUrl'] ?? NULL,
         'edit_url' => $others['editUrl'] ?? NULL,
         'delete_url' => $others['deleteUrl'] ?? NULL,
+        'icon' => $others['icon'] ?? self::getIcon($type, $others['subtype'] ?? NULL),
       ]
     );
 
@@ -134,6 +135,32 @@ class CRM_Utils_Recent {
 
     $session = CRM_Core_Session::singleton();
     $session->set(self::STORE_NAME, self::$_recent);
+  }
+
+  /**
+   * @param $type
+   * @param $subType
+   * @return string|null
+   */
+  private static function getIcon($type, $subType) {
+    $icon = NULL;
+    $contactTypes = CRM_Contact_BAO_ContactType::getAllContactTypes();
+    if (!empty($contactTypes[$type])) {
+      // Pick icon from contact sub-type first if available, then contact type
+      $subTypesAndType = array_merge((array) CRM_Utils_Array::explodePadded($subType), [$type]);
+      foreach ($subTypesAndType as $contactType) {
+        $icon = $icon ?? $contactTypes[$contactType]['icon'] ?? NULL;
+      }
+      // If no contact type icon, proceed to lookup icon from dao
+      $type = 'Contact';
+    }
+    if (!$icon) {
+      $daoClass = CRM_Core_DAO_AllCoreTables::getFullName($type);
+      if ($daoClass) {
+        $icon = $daoClass::$_icon;
+      }
+    }
+    return $icon ?: 'fa-gear';
   }
 
   /**
