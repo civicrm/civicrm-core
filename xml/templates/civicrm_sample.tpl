@@ -96,13 +96,13 @@ VALUES
    (@option_group_id_act, 'Interview', (SELECT @option_value_max_val := @option_value_max_val + 1), 'Interview',  NULL, 0, NULL, @option_value_max_val, 'Conduct a phone or in person interview.', 0, 0, 1, 'fa-comment-o');
 
 INSERT INTO `civicrm_contact_type`
-  ( `name`, `label`,`image_URL`, `parent_id`, `is_active`,`is_reserved`)
+  ( `name`, `label`,`image_URL`, `parent_id`, `is_active`, `is_reserved`, `icon`)
  VALUES
-  ( 'Student'     , '{ts escape="sql"}Student{/ts}'     , NULL, 1, 1, 0),
-  ( 'Parent'      , '{ts escape="sql"}Parent{/ts}'      , NULL, 1, 1, 0),
-  ( 'Staff'       , '{ts escape="sql"}Staff{/ts}'       , NULL, 1, 1, 0),
-  ( 'Team'        , '{ts escape="sql"}Team{/ts}'        , NULL, 3, 1, 0),
-  ( 'Sponsor'     , '{ts escape="sql"}Sponsor{/ts}'     , NULL, 3, 1, 0);
+  ( 'Student'     , '{ts escape="sql"}Student{/ts}'     , NULL, 1, 1, 0, 'fa-graduation-cap'),
+  ( 'Parent'      , '{ts escape="sql"}Parent{/ts}'      , NULL, 1, 1, 0, 'fa-user-circle-o'),
+  ( 'Staff'       , '{ts escape="sql"}Staff{/ts}'       , NULL, 1, 1, 0, 'fa-id-badge'),
+  ( 'Team'        , '{ts escape="sql"}Team{/ts}'        , NULL, 3, 1, 0, 'fa-users'),
+  ( 'Sponsor'     , '{ts escape="sql"}Sponsor{/ts}'     , NULL, 3, 1, 0, 'fa-leaf');
 
     SELECT @domain_id   := min(id) FROM civicrm_domain;
     SELECT @nav_indi    := id FROM civicrm_navigation WHERE name = 'New Individual';

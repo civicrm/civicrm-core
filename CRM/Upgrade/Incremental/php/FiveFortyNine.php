@@ -61,6 +61,9 @@ class CRM_Upgrade_Incremental_php_FiveFortyNine extends CRM_Upgrade_Incremental_
    *   The version number matching this function name
    */
   public function upgrade_5_49_alpha1($rev): void {
+    $this->addTask('Add civicrm_contact_type.icon column', 'addColumn',
+      'civicrm_contact_type', 'icon', "varchar(255) DEFAULT NULL COMMENT 'crm-i icon class representing this contact type'"
+    );
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     foreach ($this->booleanColumns as $tableName => $columns) {
       foreach ($columns as $columnName => $defn) {
