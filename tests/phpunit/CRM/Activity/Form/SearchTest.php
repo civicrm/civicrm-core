@@ -64,6 +64,10 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
         'campaign' => NULL,
         'campaign_id' => NULL,
         'repeat' => '',
+        'contact_sub_type' => NULL,
+        'activity_campaign_id' => NULL,
+        'activity_engagement_level' => NULL,
+        'recipients' => '',
       ],
     ], $rows);
   }
