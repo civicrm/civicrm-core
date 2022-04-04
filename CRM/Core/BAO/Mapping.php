@@ -197,7 +197,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
         $mappingOperator[$mapping->grouping][$mapping->column_number] = $mapping->operator;
       }
 
-      if (!empty($mapping->value)) {
+      if (isset($mapping->value)) {
         $mappingValue[$mapping->grouping][$mapping->column_number] = $mapping->value;
       }
     }
@@ -935,7 +935,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
           $defaults["operator[$x][$i]"] = $mappingOperator[$x][$i] ?? NULL;
         }
 
-        if (CRM_Utils_Array::value($i, CRM_Utils_Array::value($x, $mappingValue))) {
+        if (isset($mappingValue[$x][$i])) {
           $defaults["value[$x][$i]"] = $mappingValue[$x][$i] ?? NULL;
         }
       }
