@@ -92,7 +92,8 @@
     "civicrm/composer-compile-lib": "~0.3 || ~1.0",
     "ext-json": "*",
     "ezyang/htmlpurifier": "^4.13",
-    "phpoffice/phpspreadsheet": "^1.18"
+    "phpoffice/phpspreadsheet": "^1.18",
+    "symfony/polyfill-php73": "^1.25"
   },
   "scripts": {
     "post-install-cmd": [
