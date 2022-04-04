@@ -342,6 +342,14 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'payment_or_refund_notification', 'type' => 'text'],
         ],
       ],
+      [
+        'version' => '5.48.beta2',
+        'upgrade_descriptor' => ts('Include Participant heading for 1st Participant'),
+        'templates' => [
+          ['name' => 'event_online_receipt', 'type' => 'html'],
+          ['name' => 'event_online_receipt', 'type' => 'text'],
+        ],
+      ],
     ];
   }
 

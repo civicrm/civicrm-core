@@ -430,7 +430,7 @@
 
      {/if} {* End of conditional section for Paid events *}
 
-
+<tr><th {$headerStyle}>{ts}Participant Information - Participant 1{/ts}</th></tr>
 {if !empty($customPre)}
 {foreach from=$customPre item=customPr key=i}
    <tr> <th {$headerStyle}>{$customPre_grouptitle.$i}</th></tr>
@@ -461,7 +461,7 @@
 
 {if !empty($customProfile)}
 {foreach from=$customProfile.profile item=eachParticipant key=participantID}
-     <tr><th {$headerStyle}>{ts 1=$participantID+2}Participant %1{/ts} </th></tr>
+     <tr><th {$headerStyle}>{ts 1=$participantID+2}Participant Information - Participant %1{/ts} </th></tr>
      {foreach from=$eachParticipant item=eachProfile key=pid}
      <tr><th {$headerStyle}>{$customProfile.title.$pid}</th></tr>
      {foreach from=$eachProfile item=val key=field}

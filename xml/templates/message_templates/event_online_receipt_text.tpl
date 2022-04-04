@@ -227,6 +227,11 @@ You were registered by: {$payer.name}
 {/if}
 {/if} {* End of conditional section for Paid events *}
 
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
+
+{ts}Participant Information - Participant 1{/ts}
+
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 {if !empty($customPre)}
 {foreach from=$customPre item=customPr key=i}
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
@@ -245,7 +250,6 @@ You were registered by: {$payer.name}
 {if !empty($customPost)}
 {foreach from=$customPost item=customPos key=j}
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
-
 {$customPost_grouptitle.$j}
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
