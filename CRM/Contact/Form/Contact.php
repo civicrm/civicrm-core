@@ -736,7 +736,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
 
     if ($this->_action == CRM_Core_Action::UPDATE) {
-      $deleteExtra = json_encode(ts('Are you sure you want to delete contact image.'));
+      $deleteExtra = json_encode(ts('Are you sure you want to delete the contact image?'));
       $deleteURL = [
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete Contact Image'),

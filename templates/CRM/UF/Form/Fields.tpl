@@ -101,6 +101,15 @@
                value="{$formElement.value}" id="{$formElement.name}"
               >
             </span>
+          {elseif ( $profileFieldName eq 'image_URL' )}
+            {$formElement.html}
+            {if !empty($imageURL)}
+              <div class="crm-section contact_image-section">
+                <div class="content">
+                {include file="CRM/Contact/Page/ContactImage.tpl"}
+                </div>
+              </div>
+            {/if}
           {elseif $profileFieldName|substr:0:5 eq 'phone'}
             {assign var="phone_ext_field" value=$profileFieldName|replace:'phone':'phone_ext'}
             {$formElement.html}
