@@ -283,7 +283,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
         civicrm_api3('Attachment', 'create', [
           'entity_table' => 'civicrm_activity',
           'entity_id' => $activityId,
-          'name' => $fileName,
+          'name' => $fileName . '.' . $type,
           'mime_type' => $mimeType,
           'options' => [
             'move-file' => $tee->getFileName(),
