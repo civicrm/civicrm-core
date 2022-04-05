@@ -19,9 +19,9 @@ use Civi\Api4\Contact;
 class CRM_Contact_BAO_Contact_Utils {
 
   /**
-   * Given a contact type, get the contact image.
+   * Given a contact type or sub_type(s), generate markup for the contact type icon.
    *
-   * @param string $contactType
+   * @param string $contactTypes
    *   Contact type.
    * @param bool $urlOnly
    *   If we need to return only image url.
@@ -35,47 +35,43 @@ class CRM_Contact_BAO_Contact_Utils {
    * @return string
    * @throws \CRM_Core_Exception
    */
-  public static function getImage($contactType, $urlOnly = FALSE, $contactId = NULL, $addProfileOverlay = TRUE, $contactUrl = NULL) {
+  public static function getImage($contactTypes, $urlOnly = FALSE, $contactId = NULL, $addProfileOverlay = TRUE, $contactUrl = NULL) {
+    // Ensure string data is unserialized
+    $contactTypes = CRM_Utils_Array::explodePadded($contactTypes);
 
-    static $imageInfo = [];
+    $allContactTypeInfo = \CRM_Contact_BAO_ContactType::getAllContactTypes();
 
-    $contactType = CRM_Utils_Array::explodePadded($contactType);
-    $contactType = $contactType[0];
+    $imageInfo = ['url' => NULL, 'image' => NULL];
 
-    if (!array_key_exists($contactType, $imageInfo)) {
-      $imageInfo[$contactType] = [];
+    foreach ($contactTypes as $contactType) {
+      $typeInfo = $allContactTypeInfo[$contactType];
+      // Prefer the first type/subtype with an icon
+      if (!empty($typeInfo['icon'])) {
+        break;
+      }
 
-      $typeInfo = [];
-      $params = ['name' => $contactType];
-      CRM_Contact_BAO_ContactType::retrieve($params, $typeInfo);
-
+      // Fall back to using image_URL if no subtypes have an icon
       if (!empty($typeInfo['image_URL'])) {
         $imageUrl = $typeInfo['image_URL'];
-        $config = CRM_Core_Config::singleton();
 
         if (!preg_match("/^(\/|(http(s)?:)).+$/i", $imageUrl)) {
-          $imageUrl = $config->resourceBase . $imageUrl;
+          $imageUrl = CRM_Core_Config::singleton()->resourceBase . $imageUrl;
         }
-        $imageInfo[$contactType]['image'] = "<div class=\"icon crm-icon {$typeInfo['name']}-icon\" style=\"background: url('{$imageUrl}')\" title=\"{$contactType}\"></div>";
-        $imageInfo[$contactType]['url'] = $imageUrl;
+        $imageInfo['image'] = "<div class=\"icon crm-icon {$typeInfo['name']}-icon\" style=\"background: url('{$imageUrl}')\" title=\"{$contactType}\"></div>";
+        $imageInfo['url'] = $imageUrl;
       }
-      else {
-        if (!empty($typeInfo['parent_id'])) {
-          $type = CRM_Contact_BAO_ContactType::getBasicType($typeInfo['name']) . '-subtype';
-        }
-        else {
-          $type = $typeInfo['name'] ?? NULL;
-        }
+    }
 
-        // do not add title since it hides contact name
-        if ($addProfileOverlay) {
-          $imageInfo[$contactType]['image'] = "<div class=\"icon crm-icon {$type}-icon\"></div>";
-        }
-        else {
-          $imageInfo[$contactType]['image'] = "<div class=\"icon crm-icon {$type}-icon\" title=\"{$contactType}\"></div>";
-        }
-        $imageInfo[$contactType]['url'] = NULL;
-      }
+    // If subtype doesn't have an image or an icon, use the parent type
+    if (empty($imageUrl) && empty($typeInfo['icon']) && !empty($typeInfo['parent'])) {
+      $typeInfo = $allContactTypeInfo[$typeInfo['parent']];
+    }
+
+    // Prefer icon over image
+    if (!empty($typeInfo['icon'])) {
+      // do not add title since it hides contact name
+      $title = $addProfileOverlay ? '' : htmlspecialchars($typeInfo['label']);
+      $imageInfo['image'] = '<i class="crm-i fa-fw ' . $typeInfo['icon'] . '" title="' . $title . '"></i>';
     }
 
     if ($addProfileOverlay) {
@@ -91,13 +87,13 @@ class CRM_Contact_BAO_Contact_Utils {
         "reset=1&gid={$summaryOverlayProfileId}&id={$contactId}&snippet=4&is_show_email_task=1"
       );
 
-      $imageInfo[$contactType]['summary-link'] = '<a href="' . $contactURL . '" data-tooltip-url="' . $profileURL . '" class="crm-summary-link">' . $imageInfo[$contactType]['image'] . '</a>';
+      $imageInfo['summary-link'] = '<a href="' . $contactURL . '" data-tooltip-url="' . $profileURL . '" class="crm-summary-link">' . $imageInfo['image'] . '</a>';
     }
     else {
-      $imageInfo[$contactType]['summary-link'] = $imageInfo[$contactType]['image'];
+      $imageInfo['summary-link'] = $imageInfo['image'];
     }
 
-    return $urlOnly ? $imageInfo[$contactType]['url'] : $imageInfo[$contactType]['summary-link'];
+    return $urlOnly ? $imageInfo['url'] : $imageInfo['summary-link'];
   }
 
   /**
