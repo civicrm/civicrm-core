@@ -169,8 +169,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
 
     $recentOther = [
       'imageUrl' => $contactImageUrl,
-      'subtype' => $contactSubtype,
-      'isDeleted' => $isDeleted,
+      'is_deleted' => $isDeleted,
     ];
 
     if (CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)) {
@@ -186,7 +185,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     CRM_Utils_Recent::add($displayName,
       CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->_contactId}"),
       $this->_contactId,
-      $contactType,
+      'Contact',
       $this->_contactId,
       $displayName,
       $recentOther

@@ -2797,4 +2797,25 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
     ];
   }
 
+  /**
+   * Get icon for a particular activity (based on type).
+   *
+   * Example: `CRM_Activity_BAO_Activity::getIcon('Activity', 123)`
+   *
+   * @param string $entityName
+   *   Always "Activity".
+   * @param int $entityId
+   *   Id of the activity.
+   * @throws CRM_Core_Exception
+   */
+  public static function getEntityIcon(string $entityName, int $entityId) {
+    $field = Civi\Api4\Activity::getFields(FALSE)
+      ->addWhere('name', '=', 'activity_type_id')
+      ->setLoadOptions(['id', 'label', 'icon'])
+      ->execute()->single();
+    $activityTypes = array_column($field['options'], NULL, 'id');
+    $activityType = CRM_Core_DAO::getFieldValue(parent::class, $entityId, 'activity_type_id');
+    return $activityTypes[$activityType]['icon'] ?? self::$_icon;
+  }
+
 }

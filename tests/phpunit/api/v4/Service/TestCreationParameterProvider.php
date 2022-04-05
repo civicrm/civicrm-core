@@ -51,6 +51,7 @@ class TestCreationParameterProvider {
       'loadOptions' => TRUE,
       'where' => [
         ['OR', [['required', '=', TRUE], ['required_if', 'IS NOT EMPTY']]],
+        ['readonly', 'IS EMPTY'],
       ],
     ], 'name');
 
@@ -75,8 +76,6 @@ class TestCreationParameterProvider {
     if (isset($overrides[$entity])) {
       $requiredParams = array_merge($requiredParams, $overrides[$entity]);
     }
-
-    unset($requiredParams['id']);
 
     return $requiredParams;
   }
@@ -106,7 +105,7 @@ class TestCreationParameterProvider {
     }
     if ($field['name'] === 'entity_id') {
       // What could possibly go wrong with this?
-      switch ($field['table_name']) {
+      switch ($field['table_name'] ?? NULL) {
         case 'civicrm_financial_item':
           return $this->getFkID(FinancialItemCreationSpecProvider::DEFAULT_ENTITY);
 
