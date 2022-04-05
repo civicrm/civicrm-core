@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\ContributionRecur;
+
 /**
  * Class CRM_Core_Payment_PayPalProIPNTest
  * @group headless
@@ -123,6 +125,11 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $mut = new CiviMailUtils($this, TRUE);
     $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurTransaction());
     $paypalIPN->main();
+    $recur = ContributionRecur::get()
+      ->addWhere('contact_id', '=', $this->_contactID)
+      ->addSelect('contribution_status_id:name')
+      ->execute()->first();
+    $this->assertEquals('In Progress', $recur['contribution_status_id:name']);
     $mut->checkMailLog(['https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_subscr-find'], ['civicrm/contribute/unsubscribe', 'civicrm/contribute/updatebilling']);
     $mut->stop();
     $contribution1 = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $this->_contributionID]);
