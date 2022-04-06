@@ -186,6 +186,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @deprecated
    */
   public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('apiv4');
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
