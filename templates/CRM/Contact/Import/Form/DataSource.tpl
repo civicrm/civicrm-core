@@ -77,7 +77,7 @@
 
         {if $savedMapping}
          <tr  class="crm-import-datasource-form-block-savedMapping">
-              <td class="label"><label for="savedMapping">{if $loadedMapping}{ts}Select a Different Field Mapping{/ts}{else}{ts}Load Saved Field Mapping{/ts}{/if}</label></td>
+              <td class="label"><label for="savedMapping">{$form.savedMapping.label}</label></td>
               <td>{$form.savedMapping.html}<br />
       &nbsp;&nbsp;&nbsp;<span class="description">{ts}Select Saved Mapping or Leave blank to create a new One.{/ts}</span></td>
          </tr>

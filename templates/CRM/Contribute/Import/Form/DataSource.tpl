@@ -34,9 +34,9 @@
           <td>{$form.fieldSeparator.html}</td>
         </tr>
         <tr>{include file="CRM/Core/Date.tpl"}</tr>
-{if $savedMapping}
-      <tr> <td class="label">{if $loadedMapping}{ts}Select a Different Field Mapping{/ts}{else}{ts}Load Saved Field Mapping{/ts}{/if}</td><td>{$form.savedMapping.html}<br /> <span class="description">{ts}Select a saved field mapping if this file format matches a previous import.{/ts}</span></tr>
-{/if}
+  {if $savedMapping}
+        <tr> <td class="label">{$form.savedMapping.label}</td><td>{$form.savedMapping.html}<br /> <span class="description">{ts}Select a saved field mapping if this file format matches a previous import.{/ts}</span></tr>
+  {/if}
     </table>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
  </div>

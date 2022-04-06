@@ -53,7 +53,7 @@
        <tr class="crm-member-import-uploadfile-from-block-date">{include file="CRM/Core/Date.tpl"}</tr>
 {if $savedMapping}
        <tr  class="crm-member-import-uploadfile-from-block-savedMapping">
-         <td>{if $loadedMapping}{ts}Select a Different Field Mapping{/ts}{else}{ts}Load Saved Field Mapping{/ts}{/if}</td>
+         <td>{$form.savedMapping.label}</td>
          <td>{$form.savedMapping.html}<br />
            <span class="description">{ts}If you want to use a previously saved import field mapping - select it here.{/ts}</span>
          </td>
