@@ -954,6 +954,8 @@ December 21st, 2007
     ])->execute()->first()['id'];
     $this->ids['event'][0] = $this->eventCreate([
       'description' => 'event description',
+      'end_date' => 20081023,
+      'registration_end_date' => 20081015,
       $this->getCustomFieldName('text') => 'my field',
       'loc_block_id' => $locationBlockID,
     ])['id'];

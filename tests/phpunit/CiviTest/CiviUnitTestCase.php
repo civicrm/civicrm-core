@@ -864,7 +864,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       $this->ids['Contact']['participant'] = $params['contact_id'] = $this->individualCreate();
     }
     if (empty($params['event_id'])) {
-      $event = $this->eventCreate();
+      $event = $this->eventCreate(['end_date' => 20081023, 'registration_end_date' => 20081015]);
       $params['event_id'] = $event['id'];
     }
     $defaults = [
@@ -1119,10 +1119,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'event_type_id' => 1,
       'is_public' => 1,
       'start_date' => 20081021,
-      'end_date' => 20081023,
+      'end_date' => '+ 1 month',
       'is_online_registration' => 1,
       'registration_start_date' => 20080601,
-      'registration_end_date' => 20081015,
+      'registration_end_date' => '+ 1 month',
       'max_participants' => 100,
       'event_full_text' => 'Sorry! We are already full',
       'is_monetary' => 0,
