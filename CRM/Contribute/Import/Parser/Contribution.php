@@ -332,8 +332,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
 
           // process pledge payment assoc w/ the contribution
           return self::processPledgePayments($formatted);
-
-          return CRM_Import_Parser::VALID;
         }
         $labels = [
           'id' => 'Contribution ID',
