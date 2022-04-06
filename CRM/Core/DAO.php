@@ -3292,6 +3292,27 @@ SELECT contact_id
   }
 
   /**
+   * Overridable function to get icon for a particular entity.
+   *
+   * Example: `CRM_Contact_BAO_Contact::getIcon('Contact', 123)`
+   *
+   * @param string $entityName
+   *   Short name of the entity. This may seem redundant because the entity name can usually be inferred
+   *   from the BAO class being called, but not always. Some virtual entities share a BAO class.
+   * @param int $entityId
+   *   Id of the entity.
+   * @throws CRM_Core_Exception
+   */
+  public static function getEntityIcon(string $entityName, int $entityId) {
+    if (static::class === 'CRM_Core_DAO' || static::class !== CRM_Core_DAO_AllCoreTables::getBAOClassName(static::class)) {
+      throw new CRM_Core_Exception('CRM_Core_DAO::getIcon must be called on a BAO class e.g. CRM_Contact_BAO_Contact::getIcon("Contact", 123).');
+    }
+    // By default, just return the icon representing this entity. If there's more complex lookup to do,
+    // the BAO for this entity should override this method.
+    return static::$_icon;
+  }
+
+  /**
    * When creating a record without a supplied name,
    * create a unique, clean name derived from the label.
    *

@@ -1046,7 +1046,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     CRM_Utils_Recent::add($contact->display_name,
       CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $contact->id),
       $contact->id,
-      $this->_contactType,
+      'Contact',
       $contact->id,
       $contact->display_name,
       $recentOther

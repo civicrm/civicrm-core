@@ -742,7 +742,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       'id' => $contact->id,
       'is_deleted' => 1,
     ];
-    CRM_Utils_Hook::pre('update', $contact->contact_type, $contact->id, $updateParams);
+    CRM_Utils_Hook::pre('edit', $contact->contact_type, $contact->id, $updateParams);
 
     $params = [1 => [$contact->id, 'Integer']];
     $query = 'DELETE FROM civicrm_uf_match WHERE contact_id = %1';
@@ -752,7 +752,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     $contact->save();
     CRM_Core_BAO_Log::register($contact->id, 'civicrm_contact', $contact->id);
 
-    CRM_Utils_Hook::post('update', $contact->contact_type, $contact->id, $contact);
+    CRM_Utils_Hook::post('edit', $contact->contact_type, $contact->id, $contact);
 
     return TRUE;
   }
@@ -3734,6 +3734,30 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
     }
 
     return CRM_Contact_BAO_Contact_Permission::allow($record['id'], $actionType, $userID);
+  }
+
+  /**
+   * Get icon for a particular contact.
+   *
+   * Example: `CRM_Contact_BAO_Contact::getIcon('Contact', 123)`
+   *
+   * @param string $entityName
+   *   Always "Contact".
+   * @param int $entityId
+   *   Id of the contact.
+   * @throws CRM_Core_Exception
+   */
+  public static function getEntityIcon(string $entityName, int $entityId) {
+    $contactTypes = CRM_Contact_BAO_ContactType::getAllContactTypes();
+    $subTypes = CRM_Utils_Array::explodePadded(CRM_Core_DAO::getFieldValue(parent::class, $entityId, 'contact_sub_type'));
+    foreach ((array) $subTypes as $subType) {
+      if (!empty($contactTypes[$subType]['icon'])) {
+        return $contactTypes[$subType]['icon'];
+      }
+    }
+    // If no sub-type icon, lookup contact type
+    $contactType = CRM_Core_DAO::getFieldValue(parent::class, $entityId, 'contact_type');
+    return $contactTypes[$contactType]['icon'] ?? self::$_icon;
   }
 
 }

@@ -34,7 +34,7 @@ abstract class BasicEntity extends AbstractEntity {
   /**
    * Unique identifier for this entity.
    *
-   * @var string
+   * @var string|string[]
    */
   protected static $idField = 'id';
 
