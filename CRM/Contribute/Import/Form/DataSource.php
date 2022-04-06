@@ -30,7 +30,6 @@ class CRM_Contribute_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   public function buildQuickForm() {
     parent::buildQuickForm();
 
-    $duplicateOptions = [];
     $this->addRadio('onDuplicate', ts('Import mode'), [
       CRM_Import_Parser::DUPLICATE_SKIP => ts('Insert new contributions'),
       CRM_Import_Parser::DUPLICATE_UPDATE => ts('Update existing contributions'),
