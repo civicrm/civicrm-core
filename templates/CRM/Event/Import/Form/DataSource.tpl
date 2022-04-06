@@ -64,7 +64,7 @@
   </tr>
   {if $savedMapping}
   <tr class="crm-event-import-uploadfile-form-block-savedMapping">
-              <td class="label">{if $loadedMapping}{ts}Select a Different Field Mapping{/ts}{else}{ts}Load Saved Field Mapping{/ts}{/if}</dt>
+              <td class="label">{$form.savedMapping.label}</td>
               <td><span>{$form.savedMapping.html}</span> </td>
   </tr>
   <tr>

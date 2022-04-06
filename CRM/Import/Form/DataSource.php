@@ -66,10 +66,9 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
     $mappingArray = CRM_Core_BAO_Mapping::getCreateMappingValues('Import ' . static::IMPORT_ENTITY);
 
     $this->assign('savedMapping', $mappingArray);
-    $this->add('select', 'savedMapping', ts('Mapping Option'), ['' => ts('- select -')] + $mappingArray);
+    $this->add('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappingArray);
 
     if ($loadedMapping = $this->get('loadedMapping')) {
-      $this->assign('loadedMapping', $loadedMapping);
       $this->setDefaults(['savedMapping' => $loadedMapping]);
     }
 

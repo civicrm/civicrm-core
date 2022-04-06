@@ -145,7 +145,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     $mappingArray = CRM_Core_BAO_Mapping::getMappings('Import Contact');
 
     $this->assign('savedMapping', $mappingArray);
-    $this->addElement('select', 'savedMapping', ts('Mapping Option'), ['' => ts('- select -')] + $mappingArray);
+    $this->addElement('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappingArray);
 
     $js = ['onClick' => "buildSubTypes();buildDedupeRules();"];
     // contact types option
@@ -214,7 +214,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
       'fieldSeparator' => $config->fieldSeparator,
     ];
 
-    $this->assign('loadedMapping', $this->get('loadedMapping'));
     if ($this->get('loadedMapping')) {
       $defaults['savedMapping'] = $this->get('loadedMapping');
     }
