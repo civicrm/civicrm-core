@@ -185,7 +185,7 @@ class CRM_Core_Block {
    *   One of the class constants (ADD, SEARCH, etc.).
    * @param string $property
    *   The desired property.
-   * @param string $value
+   * @param mixed $value
    *   The value of the desired property.
    */
   public static function setProperty($id, $property, $value) {
@@ -413,12 +413,11 @@ class CRM_Core_Block {
     );
 
     foreach ($values as $key => $val) {
-      if (!empty($val['title'])) {
-        $values[$key]['name'] = CRM_Utils_Array::value('name', $val, $val['title']);
-      }
+      $values[$key]['name'] = $val['name'] ?? $val['title'];
+      $values[$key] += ['shortCuts' => []];
     }
 
-    self::setProperty(self::CREATE_NEW, 'templateValues', array('shortCuts' => $values));
+    self::setProperty(self::CREATE_NEW, 'templateValues', ['shortCuts' => $values]);
   }
 
   /**
