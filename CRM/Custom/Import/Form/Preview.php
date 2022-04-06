@@ -29,9 +29,8 @@ class CRM_Custom_Import_Form_Preview extends CRM_Import_Form_Preview {
       $mapDAO = new CRM_Core_DAO_Mapping();
       $mapDAO->id = $mappingId;
       $mapDAO->find(TRUE);
-      $this->assign('loadedMapping', $mappingId);
-      $this->assign('savedName', $mapDAO->name);
     }
+    $this->assign('savedMappingName', $mappingId ? $mapDAO->name : NULL);
 
     if ($skipColumnHeader) {
       $this->assign('skipColumnHeader', $skipColumnHeader);

@@ -13,8 +13,8 @@
  <div id="map-field">
     {strip}
     <table class="selector">
-    {if $loadedMapping}
-        <tr class="columnheader-dark"><th colspan="4">{ts 1=$savedName}Saved Field Mapping: %1{/ts}</td></tr>
+    {if $savedMappingName}
+        <tr class="columnheader-dark"><th colspan="4">{ts 1=$savedMappingName}Saved Field Mapping: %1{/ts}</td></tr>
     {/if}
         <tr class="columnheader">
       {if $showColNames}
@@ -23,7 +23,7 @@
           {assign var="totalRowsDisplay" value=$rowDisplayCount}
       {/if}
             {section name=rows loop=$totalRowsDisplay}
-                { if $smarty.section.rows.iteration == 1 and $showColNames}
+                {if $smarty.section.rows.iteration == 1 and $showColNames}
                   <td>{ts}Column Names{/ts}</td>
                 {elseif $showColNames}
                   <td>{ts 1=$smarty.section.rows.iteration-1}Import Data (row %1){/ts}</td>
@@ -111,7 +111,7 @@
     {if $wizard.currentStepName != 'Preview'}
     <div>
 
-      {if $loadedMapping}
+      {if $savedMappingName}
           <span>{$form.updateMapping.html} &nbsp;&nbsp; {$form.updateMapping.label}</span>
       {/if}
       <span>{$form.saveMapping.html} &nbsp;&nbsp; {$form.saveMapping.label}</span>

@@ -157,8 +157,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
 
       $mappingName = (string) civicrm_api3('Mapping', 'getvalue', ['id' => $savedMappingID, 'return' => 'name']);
       $this->set('loadedMapping', $savedMapping);
-      $this->assign('loadedMapping', $mappingName);
-      $this->assign('savedName', $mappingName);
       $this->add('hidden', 'mappingId', $savedMappingID);
 
       $this->addElement('checkbox', 'updateMapping', ts('Update this field mapping'), NULL);
@@ -166,7 +164,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
       $this->add('text', 'saveMappingName', ts('Name'));
       $this->add('text', 'saveMappingDesc', ts('Description'));
     }
-
+    $this->assign('savedMappingName', $mappingName ?? NULL);
     $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL, ['onclick' => "showSaveDetails(this)"]);
   }
 
