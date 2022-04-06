@@ -25,13 +25,20 @@ var isMailing    = false;
   text_message = "mailing_format";
   isMailing = false;
   {/literal}
-  {elseif $form.formClass eq 'CRM_SMS_Form_Upload' || $form.formClass eq 'CRM_Contact_Form_Task_SMS'}
+{elseif $form.formClass eq 'CRM_SMS_Form_Upload' || $form.formClass eq 'CRM_Contact_Form_Task_SMS'}
   {literal}
   prefix = "SMS";
   text_message = "sms_text_message";
   isMailing = true;
   {/literal}
-  {else}
+  {if $templateSelected}
+    {literal}
+      if ( document.getElementsByName(prefix + "saveTemplate")[0].checked ) {
+        document.getElementById(prefix + "template").selectedIndex = {/literal}{$templateSelected}{literal};
+      }
+    {/literal}
+  {/if}
+{else}
   {literal}
   text_message = "text_message";
   html_message = (cj("#edit-html-message-value").length > 0) ? "edit-html-message-value" : "html_message";
@@ -45,13 +52,6 @@ var isMailing    = false;
   {/literal}
 {/if}
 
-{if !empty($templateSelected)}
-  {literal}
-  if ( document.getElementsByName(prefix + "saveTemplate")[0].checked ) {
-    document.getElementById(prefix + "template").selectedIndex = {/literal}{$templateSelected}{literal};
-  }
-{/literal}
-{/if}
 {literal}
 
 /**
