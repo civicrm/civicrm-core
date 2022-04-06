@@ -128,6 +128,135 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   }
 
   /**
+   * Add 2 billing addresses using the `CRM_Core_BAO_Address::legacyCreate` mode
+   * Only the first array will remain as primary/billing due to the nature of how `legacyCreate` works
+   */
+  public function testMultipleBillingAddressesLegacymode() {
+    $contactId = $this->individualCreate();
+
+    $entityBlock = ['contact_id' => $contactId];
+    $params = [];
+    $params['contact_id'] = $contactId;
+    $params['address']['1'] = [
+      'street_address' => 'E 906N Pine Pl W',
+      'supplemental_address_1' => 'Editorial Dept',
+      'supplemental_address_2' => '',
+      'supplemental_address_3' => '',
+      'city' => 'El Paso',
+      'postal_code' => '88575',
+      'postal_code_suffix' => '',
+      'state_province_id' => '1001',
+      'country_id' => '1228',
+      'geo_code_1' => '31.694842',
+      'geo_code_2' => '-106.29998',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'is_billing' => '1',
+      'contact_id' => $contactId,
+    ];
+    $params['address']['2'] = [
+      'street_address' => '120 Terminal Road',
+      'supplemental_address_1' => 'A-wing:3037',
+      'supplemental_address_2' => 'Bandra',
+      'supplemental_address_3' => 'Somewhere',
+      'city' => 'Athens',
+      'postal_code' => '01903',
+      'state_province_id' => '1000',
+      'country_id' => '1228',
+      'geo_code_1' => '18.219023',
+      'geo_code_2' => '-105.00973',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'is_billing' => '1',
+      'contact_id' => $contactId,
+    ];
+
+    CRM_Core_BAO_Address::legacyCreate($params, $fixAddress = TRUE);
+
+    $address = CRM_Core_BAO_Address::getValues($entityBlock);
+
+    $this->assertEquals($address[1]['contact_id'], $contactId);
+    $this->assertEquals($address[1]['is_primary'], 1, 'In line '. __LINE__);
+    $this->assertEquals($address[1]['is_billing'], 1, 'In line '. __LINE__);
+
+    $this->assertEquals($address[2]['contact_id'], $contactId);
+    $this->assertEquals($address[2]['is_primary'], 0, 'In line '. __LINE__);
+    $this->assertEquals($address[2]['is_billing'], 0, 'In line '. __LINE__);
+
+    $this->contactDelete($contactId);
+  }
+
+  /**
+   * Add() 2 billing addresses, only the last one should be set as billing
+   * Using the `CRM_Core_BAO_Address::add` mode
+   *
+   */
+  public function testMultipleBillingAddressesCurrentmode() {
+    $contactId = $this->individualCreate();
+
+    $entityBlock = ['contact_id' => $contactId];
+    $params = [];
+    $params['contact_id'] = $contactId;
+    $params['address']['1'] = [
+      'street_address' => 'E 906N Pine Pl W',
+      'supplemental_address_1' => 'Editorial Dept',
+      'supplemental_address_2' => '',
+      'supplemental_address_3' => '',
+      'city' => 'El Paso',
+      'postal_code' => '88575',
+      'postal_code_suffix' => '',
+      'state_province_id' => '1001',
+      'country_id' => '1228',
+      'geo_code_1' => '31.694842',
+      'geo_code_2' => '-106.29998',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'is_billing' => '1',
+      'contact_id' => $contactId,
+    ];
+
+    CRM_Core_BAO_Address::add($params['address']['1'], $fixAddress = TRUE);
+
+    // Add address 2
+    $params['address']['2'] = [
+      'street_address' => '120 Terminal Road',
+      'supplemental_address_1' => 'A-wing:3037',
+      'supplemental_address_2' => 'Bandra',
+      'supplemental_address_3' => 'Somewhere',
+      'city' => 'Athens',
+      'postal_code' => '01903',
+      'state_province_id' => '1000',
+      'country_id' => '1228',
+      'geo_code_1' => '18.219023',
+      'geo_code_2' => '-105.00973',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'is_billing' => '1',
+      'contact_id' => $contactId,
+    ];
+
+    CRM_Core_BAO_Address::add($params['address']['2'], $fixAddress = TRUE);
+
+    $addresses = CRM_Core_BAO_Address::getValues($entityBlock);
+
+    // Sort the multidimensional array by id
+    usort($addresses, function($a, $b) {
+        return $a['id'] <=> $b['id'];
+    });
+
+    // Validate both results, remember that the keys have been reset to 0 after usort
+    $this->assertEquals($addresses[0]['contact_id'], $contactId);
+    $this->assertEquals($addresses[0]['is_primary'], 0, 'In line '. __LINE__);
+    $this->assertEquals($addresses[0]['is_billing'], 0, 'In line '. __LINE__);
+
+    $this->assertEquals($addresses[1]['contact_id'], $contactId);
+    $this->assertEquals($addresses[1]['is_primary'], 1,'In line '. __LINE__);
+    $this->assertEquals($addresses[1]['is_billing'], 1,'In line '. __LINE__);
+
+    $this->contactDelete($contactId);
+  }
+
+  /**
    * AllAddress() method ( )
    */
   public function testallAddress() {
