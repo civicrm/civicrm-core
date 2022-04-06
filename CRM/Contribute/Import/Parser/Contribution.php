@@ -329,7 +329,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           }
 
           // process pledge payment assoc w/ the contribution
-          return self::processPledgePayments($formatted);
+          return $this->processPledgePayments($formatted);
         }
         $labels = [
           'id' => 'Contribution ID',
@@ -383,7 +383,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
         }
 
         // process pledge payment assoc w/ the contribution
-        return self::processPledgePayments($formatted);
+        return $this->processPledgePayments($formatted);
       }
 
       // Using new Dedupe rule.
@@ -450,7 +450,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     }
 
     // process pledge payment assoc w/ the contribution
-    return self::processPledgePayments($formatted);
+    return $this->processPledgePayments($formatted);
   }
 
   /**
@@ -460,7 +460,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    *
    * @return int
    */
-  public function processPledgePayments(array $formatted) {
+  private function processPledgePayments(array $formatted) {
     if (!empty($formatted['pledge_payment_id']) && !empty($formatted['pledge_id'])) {
       //get completed status
       $completeStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
