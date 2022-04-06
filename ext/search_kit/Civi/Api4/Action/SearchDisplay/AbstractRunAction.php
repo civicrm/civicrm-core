@@ -999,7 +999,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     }
     // Get afform field filters
     $filterKeys = array_column(\CRM_Utils_Array::findAll(
-      $afform['layout'] ?? [],
+      $afform['searchDisplay']['fieldset'],
       ['#tag' => 'af-field']
     ), 'name');
     // Get filters passed into search display directive from Afform markup
@@ -1028,24 +1028,35 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    *
    * Verifies the searchDisplay is embedded in the afform and the user has permission to view it.
    *
-   * @return array|false|null
+   * @return array|false
    */
   private function loadAfform() {
     // Only attempt to load afform once.
     if ($this->afform && !isset($this->_afform)) {
       $this->_afform = FALSE;
       // Permission checks are enabled in this api call to ensure the user has permission to view the form
-      $afform = \Civi\Api4\Afform::get()
+      $afform = \Civi\Api4\Afform::get($this->getCheckPermissions())
         ->addWhere('name', '=', $this->afform)
-        ->setLayoutFormat('shallow')
+        ->setLayoutFormat('deep')
         ->execute()->first();
+      if (empty($afform['layout'])) {
+        return FALSE;
+      }
+      // Get all search display fieldsets (which will have an empty value for the af-fieldset attribute)
+      $fieldsets = \CRM_Utils_Array::findAll($afform['layout'], ['af-fieldset' => '']);
+      // As a fallback, search the entire afform in case the search display is not in a fieldset
+      $fieldsets['form'] = $afform['layout'];
       // Validate that the afform contains this search display
-      $afform['searchDisplay'] = \CRM_Utils_Array::findAll(
-          $afform['layout'] ?? [],
-          ['#tag' => "{$this->display['type:name']}", 'display-name' => $this->display['name']]
-        )[0] ?? NULL;
-      if ($afform['searchDisplay']) {
-        $this->_afform = $afform;
+      foreach ($fieldsets as $key => $fieldset) {
+        $afform['searchDisplay'] = \CRM_Utils_Array::findAll(
+            $fieldset,
+            ['#tag' => $this->display['type:name'], 'search-name' => $this->savedSearch['name'], 'display-name' => $this->display['name']]
+          )[0] ?? NULL;
+        if ($afform['searchDisplay']) {
+          // Set the fieldset for this display (if it is in one and we haven't fallen back to the whole form)
+          $afform['searchDisplay']['fieldset'] = $key === 'form' ? [] : $fieldset;
+          return $this->_afform = $afform;
+        }
       }
     }
     return $this->_afform;
