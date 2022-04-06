@@ -6,6 +6,7 @@
 
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionSoft;
+use Civi\Api4\OptionValue;
 
 /**
  *  Test Contribution import parser.
@@ -24,10 +25,13 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   protected $entity = 'Contribution';
 
   /**
-   * Setup function.
+   * Cleanup function.
+   *
+   * @throws \API_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    OptionValue::delete()->addWhere('name', '=', 'random')->execute();
     parent::tearDown();
   }
 
@@ -97,21 +101,18 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test payment types are passed.
+   *
+   * Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
    */
   public function testPaymentTypeLabel(): void {
+    $this->addRandomOption();
     $contactID = $this->individualCreate();
+
     $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type' => 'Donation', 'payment_instrument' => 'Check'];
-    // Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
     $this->assertEquals('Check', $contribution['payment_instrument']);
 
-    $this->callAPISuccess('OptionValue', 'create', [
-      'option_group_id' => 'payment_instrument',
-      'value' => 777,
-      'name' => 'random',
-      'label' => 'not at all random',
-    ]);
     $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type' => 'Donation', 'payment_instrument' => 'not at all random'];
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID, 'payment_instrument_id' => 'random']);
@@ -129,12 +130,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
     $this->assertEquals('Pending Label**', $contribution['contribution_status']);
 
-    $this->callAPISuccess('OptionValue', 'create', [
-      'option_group_id' => 'contribution_status',
-      'value' => 777,
-      'name' => 'random',
-      'label' => 'not at all random',
-    ]);
+    $this->addRandomOption('contribution_status');
     $values['contribution_status_id'] = 'not at all random';
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID, 'contribution_status_id' => 'random']);
@@ -246,6 +242,20 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $parser->_contactType = 'Individual';
     $parser->init();
     $this->assertEquals($expectedResult, $parser->import($onDuplicateAction, $values), 'Return code from parser import was not as expected');
+  }
+
+  /**
+   * Add a random extra option value
+   *
+   * @param string $optionGroup
+   */
+  protected function addRandomOption(string $optionGroup = 'payment_instrument'): void {
+    $this->callAPISuccess('OptionValue', 'create', [
+      'option_group_id' => $optionGroup,
+      'value' => 777,
+      'name' => 'random',
+      'label' => 'not at all random',
+    ]);
   }
 
 }
