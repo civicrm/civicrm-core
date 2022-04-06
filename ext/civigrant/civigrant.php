@@ -40,10 +40,10 @@ function civigrant_civicrm_entityTypes(&$entityTypes) {
 function civigrant_civicrm_links($context, $name, $id, &$links) {
   if ($context === 'create.new.shortcuts' && CRM_Core_Permission::check(['access CiviGrant', 'edit grants'])) {
     $links[] = [
-      'path' => 'civicrm/grant/add',
-      'query' => "reset=1&action=add&context=standalone",
       'ref' => 'new-grant',
+      'name' => 'Grant',
       'title' => ts('Grant'),
+      'url' => CRM_Utils_System::url('civicrm/grant/add', 'reset=1&action=add&context=standalone'),
     ];
   }
 }
