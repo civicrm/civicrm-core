@@ -134,7 +134,11 @@
    */
   CRM.tabHeader.resetTab = function(tab, force) {
     var $panel = CRM.tabHeader.getTabPanel(tab);
-    if ($(tab).hasClass('ui-tabs-active')) {
+    // Angular-based tabs - this event will trigger searchKit displays to refresh
+    if ($panel.children('crm-angular-js').length) {
+      $panel.find('form').first().trigger('crmPopupFormSuccess');
+    }
+    else if ($(tab).hasClass('ui-tabs-active')) {
       $panel.crmSnippet('refresh');
     }
     else if (force) {
