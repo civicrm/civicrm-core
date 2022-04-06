@@ -49,6 +49,25 @@ function civigrant_civicrm_links($context, $name, $id, &$links) {
 }
 
 /**
+ * Implements hook_civicrm_summaryActions().
+ *
+ * Add contact summary link to create new grant.
+ */
+function civigrant_civicrm_summaryActions(&$menu, $cid) {
+  $menu['grant'] = [
+    'title' => ts('Add Grant'),
+    'weight' => 26,
+    'ref' => 'new-grant',
+    'key' => 'grant',
+    'tab' => 'afsearchGrants',
+    'href' => CRM_Utils_System::url('civicrm/contact/view/grant',
+      'reset=1&action=add&context=grant'
+    ),
+    'permissions' => ['edit grants'],
+  ];
+}
+
+/**
  * Implements hook_civicrm_permission().
  *
  * Define CiviGrant permissions.
