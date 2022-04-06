@@ -154,11 +154,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    *   the result of this processing
    */
   public function summary(&$values) {
-    $erroneousField = NULL;
-    $response = $this->setActiveFieldValues($values, $erroneousField);
+    $this->setActiveFieldValues($values);
 
-    $params = &$this->getActiveFieldParams();
-    $errorMessage = NULL;
+    $params = $this->getActiveFieldParams();
 
     //for date-Formats
     $errorMessage = implode('; ', $this->formatDateFields($params));
