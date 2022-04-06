@@ -76,7 +76,7 @@
 
         else if (editor.getFormType() === 'block') {
           editor.layout['#children'] = editor.afform.layout;
-          editor.blockEntity = editor.afform.join_entity || editor.afform.entity_type;
+          editor.blockEntity = editor.afform.join_entity || editor.afform.entity_type || '*';
           $scope.entities[editor.blockEntity] = backfillEntityDefaults({
             type: editor.blockEntity,
             name: editor.blockEntity,
