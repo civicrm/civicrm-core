@@ -307,11 +307,21 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
     \CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
 
     $values = OptionValue::get(FALSE)
+      ->addSelect('*', 'local_modified_date', 'has_base')
       ->addWhere('option_group_id.name', '=', 'testManagedOptionGroup')
       ->execute();
 
     $this->assertCount(1, $values);
     $this->assertEquals('Option Value 1', $values[0]['label']);
+    $this->assertNull($values[0]['local_modified_date']);
+    $this->assertTrue($values[0]['has_base']);
+
+    // Update option 1, now it should have a local_modified_date
+    // And the new label should persist after a reconcile
+    $result = OptionValue::update(FALSE)
+      ->addWhere('id', '=', $values[0]['id'])
+      ->addValue('label', '1 New Label')
+      ->execute();
 
     $optionValue2 = [
       'module' => 'civicrm',
@@ -333,8 +343,8 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
         ],
       ],
     ];
-
     $this->_managedEntities[] = $optionValue2;
+
     \CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
 
     $values = OptionValue::get(FALSE)
@@ -344,9 +354,12 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
       ->execute();
 
     $this->assertCount(2, $values);
-    $this->assertEquals('Option Value 2', $values[1]['label']);
-    $this->assertNull($values[0]['local_modified_date']);
+    $this->assertEquals('1 New Label', $values[0]['label']);
+    $this->assertNotNull($values[0]['local_modified_date']);
     $this->assertTrue($values[0]['has_base']);
+    $this->assertEquals('Option Value 2', $values[1]['label']);
+    $this->assertNull($values[1]['local_modified_date']);
+    $this->assertTrue($values[1]['has_base']);
 
     $this->_managedEntities = [];
     \CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
