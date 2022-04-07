@@ -13,22 +13,22 @@
     {strip}
     <table>
       {if $savedMappingName}
-        <tr class="columnheader-dark"><th colspan="4">{ts 1=$savedMappingName}Saved Field Mapping: %1{/ts}</td></tr>
+        <tr class="columnheader-dark"><th colspan="4">{ts 1=$savedMappingName}Saved Field Mapping: %1{/ts}</th></tr>
       {/if}
         <tr class="columnheader">
-            {section name=rows loop=$rowDisplayCount}
-       {if $skipColumnHeader }
-                   {if $smarty.section.rows.iteration == 1}
-                     <th>{ts}Column Headers{/ts}</th>
-                   {else}
-                     <th>{ts 1=$smarty.section.rows.iteration}Import Data (row %1){/ts}</th>
-                   {/if}
-          {else}
-                  <th>{ts 1=$smarty.section.rows.iteration}Import Data (row %1){/ts}</th>
-                {/if}
-            {/section}
+          {section name=rows loop=$rowDisplayCount}
+            {if $skipColumnHeader }
+              {if $smarty.section.rows.iteration == 1}
+                <th>{ts}Column Headers{/ts}</th>
+              {else}
+                <th>{ts 1=$smarty.section.rows.iteration}Import Data (row %1){/ts}</th>
+              {/if}
+            {else}
+              <th>{ts 1=$smarty.section.rows.iteration}Import Data (row %1){/ts}</th>
+            {/if}
+          {/section}
 
-            <th>{ts}Matching CiviCRM Field{/ts}</th>
+          <th>{ts}Matching CiviCRM Field{/ts}</th>
         </tr>
 
         {*Loop on columns parsed from the import data rows*}
