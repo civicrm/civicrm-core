@@ -176,12 +176,12 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $address = CRM_Core_BAO_Address::getValues($entityBlock);
 
     $this->assertEquals($address[1]['contact_id'], $contactId);
-    $this->assertEquals($address[1]['is_primary'], 1, 'In line '. __LINE__);
-    $this->assertEquals($address[1]['is_billing'], 1, 'In line '. __LINE__);
+    $this->assertEquals($address[1]['is_primary'], 1, 'In line ' . __LINE__);
+    $this->assertEquals($address[1]['is_billing'], 1, 'In line ' . __LINE__);
 
     $this->assertEquals($address[2]['contact_id'], $contactId);
-    $this->assertEquals($address[2]['is_primary'], 0, 'In line '. __LINE__);
-    $this->assertEquals($address[2]['is_billing'], 0, 'In line '. __LINE__);
+    $this->assertEquals($address[2]['is_primary'], 0, 'In line ' . __LINE__);
+    $this->assertEquals($address[2]['is_billing'], 0, 'In line ' . __LINE__);
 
     $this->contactDelete($contactId);
   }
@@ -246,12 +246,12 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     // Validate both results, remember that the keys have been reset to 0 after usort
     $this->assertEquals($addresses[0]['contact_id'], $contactId);
-    $this->assertEquals($addresses[0]['is_primary'], 0, 'In line '. __LINE__);
-    $this->assertEquals($addresses[0]['is_billing'], 0, 'In line '. __LINE__);
+    $this->assertEquals($addresses[0]['is_primary'], 0, 'In line ' . __LINE__);
+    $this->assertEquals($addresses[0]['is_billing'], 0, 'In line ' . __LINE__);
 
     $this->assertEquals($addresses[1]['contact_id'], $contactId);
-    $this->assertEquals($addresses[1]['is_primary'], 1,'In line '. __LINE__);
-    $this->assertEquals($addresses[1]['is_billing'], 1,'In line '. __LINE__);
+    $this->assertEquals($addresses[1]['is_primary'], 1, 'In line ' . __LINE__);
+    $this->assertEquals($addresses[1]['is_billing'], 1, 'In line ' . __LINE__);
 
     $this->contactDelete($contactId);
   }
