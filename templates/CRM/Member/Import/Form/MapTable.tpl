@@ -12,8 +12,8 @@
  <div id="map-field">
     {strip}
     <table>
-    {if $loadedMapping}
-        <tr class="columnheader-dark"><th colspan="4">{ts 1=$savedName}Saved Field Mapping: %1{/ts}</td></tr>
+    {if $savedMappingName}
+        <tr class="columnheader-dark"><th colspan="4">{ts 1=$savedMappingName}Saved Field Mapping: %1{/ts}</td></tr>
     {/if}
         <tr class="columnheader">
             {section name=rows loop=$rowDisplayCount}
@@ -59,7 +59,7 @@
     {if $wizard.currentStepName != 'Preview'}
     <div>
 
-      {if $loadedMapping}
+      {if $savedMappingName}
           <span>{$form.updateMapping.html} &nbsp;&nbsp; {$form.updateMapping.label}</span>
       {/if}
       <span>{$form.saveMapping.html} &nbsp;&nbsp; {$form.saveMapping.label}</span>

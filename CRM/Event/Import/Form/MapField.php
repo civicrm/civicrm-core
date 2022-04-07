@@ -104,11 +104,6 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       //mapping is to be loaded from database
 
-      $params = array('id' => $savedMapping);
-      $temp = [];
-      $mappingDetails = CRM_Core_BAO_Mapping::retrieve($params, $temp);
-
-      $this->assign('loadedMapping', $mappingDetails->name);
       $this->set('loadedMapping', $savedMapping);
 
       $getMappingName = new CRM_Core_DAO_Mapping();
@@ -119,7 +114,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
         $mapperName = $getMappingName->name;
       }
 
-      $this->assign('savedName', $mapperName);
+      $this->assign('savedMappingName', $mapperName);
 
       $this->add('hidden', 'mappingId', $savedMapping);
 
