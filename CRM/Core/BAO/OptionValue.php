@@ -155,6 +155,9 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $params['option_group_id'], 'name', 'id'
     );
 
+    $op = $id ? 'edit' : 'create';
+    CRM_Utils_Hook::pre($op, 'OptionValue', $id, $params);
+
     // action is taken depending upon the mode
     $optionValue = new CRM_Core_DAO_OptionValue();
     $optionValue->copyValues($params);
@@ -217,6 +220,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     $optionValue->id = $id;
     $optionValue->save();
     CRM_Core_PseudoConstant::flush();
+
+    CRM_Utils_Hook::post($op, 'OptionValue', $id, $optionValue);
 
     // Create relationship for payment instrument options
     if (!empty($params['financial_account_id'])) {
