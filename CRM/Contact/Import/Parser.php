@@ -237,10 +237,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
       }
 
       if ($returnCode & self::DUPLICATE) {
-        if ($returnCode & self::MULTIPLE_DUPE) {
-          /* TODO: multi-dupes should be counted apart from singles
-           * on non-skip action */
-        }
         $this->_duplicateCount++;
         array_unshift($values, $this->_rowCount);
         $this->_duplicates[] = $values;
