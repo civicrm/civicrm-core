@@ -3030,18 +3030,6 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         'href' => CRM_Utils_System::url('civicrm/case/add', 'reset=1&action=add&context=case'),
         'permissions' => ['add cases'],
       ],
-      'grant' => [
-        'title' => ts('Add Grant'),
-        'weight' => 26,
-        'ref' => 'new-grant',
-        'key' => 'grant',
-        'tab' => 'grant',
-        'component' => 'CiviGrant',
-        'href' => CRM_Utils_System::url('civicrm/contact/view/grant',
-          'reset=1&action=add&context=grant'
-        ),
-        'permissions' => ['edit grants'],
-      ],
       'rel' => [
         'title' => ts('Add Relationship'),
         'weight' => 30,

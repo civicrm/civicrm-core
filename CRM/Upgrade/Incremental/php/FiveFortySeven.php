@@ -137,13 +137,6 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
             'name' => 'CiviGrant',
           ],
         ],
-        'OptionGroup_contact_view_options_OptionValue_CiviGrant' => [
-          'entity' => 'OptionValue',
-          'values' => [
-            'option_group_id:name' => 'contact_view_options',
-            'name' => 'CiviGrant',
-          ],
-        ],
         'OptionGroup_mapping_type_OptionValue_Export Grant' => [
           'entity' => 'OptionValue',
           'values' => [

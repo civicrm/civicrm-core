@@ -1,4 +1,6 @@
 <?php
+use CRM_Grant_ExtensionUtil as E;
+
 return [
   [
     'name' => 'SavedSearch_CiviGrant_Summary',
@@ -9,7 +11,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'CiviGrant_Summary',
-        'label' => 'CiviGrant Summary',
+        'label' => E::ts('CiviGrant Summary'),
         'form_values' => NULL,
         'search_custom_id' => NULL,
         'api_entity' => 'Grant',
@@ -18,7 +20,7 @@ return [
           'select' => [
             'status_id:label',
             'grant_type_id:label',
-            'amount_requested',
+            'amount_total',
             'amount_granted',
             'application_received_date',
             'grant_report_received',
@@ -45,7 +47,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Grant_Tab',
-        'label' => 'Grant Tab',
+        'label' => E::ts('Grant Tab'),
         'saved_search_id.name' => 'CiviGrant_Summary',
         'type' => 'table',
         'settings' => [
@@ -65,49 +67,49 @@ return [
               'type' => 'field',
               'key' => 'status_id:label',
               'dataType' => 'Integer',
-              'label' => 'Status',
+              'label' => E::ts('Status'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'grant_type_id:label',
               'dataType' => 'Integer',
-              'label' => 'Type',
+              'label' => E::ts('Type'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
-              'key' => 'amount_requested',
+              'key' => 'amount_total',
               'dataType' => 'Money',
-              'label' => 'Requested',
+              'label' => E::ts('Requested'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'amount_granted',
               'dataType' => 'Money',
-              'label' => 'Granted',
+              'label' => E::ts('Granted'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'application_received_date',
               'dataType' => 'Date',
-              'label' => 'Application received',
+              'label' => E::ts('Application received'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'grant_report_received',
               'dataType' => 'Boolean',
-              'label' => 'Report received',
+              'label' => E::ts('Report received'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'money_transfer_date',
               'dataType' => 'Date',
-              'label' => 'Money transferred',
+              'label' => E::ts('Money transferred'),
               'sortable' => TRUE,
             ],
             [
@@ -119,7 +121,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-external-link',
-                  'text' => 'View',
+                  'text' => E::ts('View'),
                   'style' => 'default',
                 ],
                 [
@@ -128,7 +130,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-pencil',
-                  'text' => 'Edit',
+                  'text' => E::ts('Edit'),
                   'style' => 'default',
                 ],
                 [
@@ -137,7 +139,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-trash',
-                  'text' => 'Delete',
+                  'text' => E::ts('Delete'),
                   'style' => 'danger',
                 ],
               ],

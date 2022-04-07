@@ -55,6 +55,9 @@ class CRM_Afform_Upgrader extends CRM_Afform_Upgrader_Base {
       }
       if (!empty($meta['entity_type'])) {
         $meta['type'] = 'block';
+        if ($meta['entity_type'] === '*') {
+          unset($meta['entity_type']);
+        }
       }
       file_put_contents($fileName, json_encode($meta, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
