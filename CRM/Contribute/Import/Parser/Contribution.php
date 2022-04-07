@@ -23,8 +23,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
   protected $_mapperKeys;
 
   private $_contactIdIndex;
-  private $_totalAmountIndex;
-  private $_contributionTypeIndex;
 
   protected $_mapperSoftCredit;
   //protected $_mapperPhoneType;
@@ -97,8 +95,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
 
     // FIXME: we should do this in one place together with Form/MapField.php
     $this->_contactIdIndex = -1;
-    $this->_totalAmountIndex = -1;
-    $this->_contributionTypeIndex = -1;
 
     $index = 0;
     foreach ($this->_mapperKeys as $key) {
@@ -107,13 +103,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           $this->_contactIdIndex = $index;
           break;
 
-        case 'total_amount':
-          $this->_totalAmountIndex = $index;
-          break;
-
-        case 'financial_type':
-          $this->_contributionTypeIndex = $index;
-          break;
       }
       $index++;
     }
