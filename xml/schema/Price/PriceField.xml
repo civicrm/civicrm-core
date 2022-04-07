@@ -95,6 +95,7 @@
     <title>Price Field Quantity Required?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Enter a quantity for this field?</comment>
     <add>1.8</add>
     <html>
@@ -143,6 +144,7 @@
     <title>Price Field Show Amounts?</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Should the price be displayed next to the label for each option?</comment>
     <html>
       <type>CheckBox</type>
@@ -165,6 +167,7 @@
     <type>boolean</type>
     <comment>Is this price field active</comment>
     <default>1</default>
+    <required>true</required>
     <add>1.8</add>
     <html>
       <type>CheckBox</type>
@@ -176,6 +179,7 @@
     <type>boolean</type>
     <comment>Is this price field required (value must be > 1)</comment>
     <default>1</default>
+    <required>true</required>
     <add>1.8</add>
     <html>
       <type>CheckBox</type>

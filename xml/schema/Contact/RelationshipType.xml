@@ -151,12 +151,15 @@
       <type>CheckBox</type>
     </html>
     <add>1.1</add>
+    <default>0</default>
+    <required>true</required>
   </field>
   <field>
     <name>is_active</name>
     <title>Relationship Type is Active</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Is this relationship type currently active (i.e. can be used when creating or editing relationships)?</comment>
     <html>
       <type>CheckBox</type>

@@ -68,6 +68,7 @@
     <title>Is Active</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <add>1.6</add>
   </field>
   <field>
@@ -89,6 +90,7 @@
     <title>Message Template Is Default?</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>is this the default message template for the workflow referenced by workflow_id?</comment>
     <add>3.1</add>
   </field>
@@ -97,6 +99,7 @@
     <title>Message Template Is Reserved?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>is this the reserved message template which we ship for the workflow referenced by workflow_id?</comment>
     <add>3.1</add>
   </field>
@@ -105,6 +108,7 @@
     <title>Message Template is used for SMS?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this message template used for sms?</comment>
     <add>4.5</add>
   </field>
