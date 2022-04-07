@@ -335,10 +335,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       }
 
       if ($returnCode == self::DUPLICATE) {
-        if ($returnCode == self::MULTIPLE_DUPE) {
-          /* TODO: multi-dupes should be counted apart from singles
-           * on non-skip action */
-        }
         $this->_duplicateCount++;
         $recordNumber = $this->_lineCount;
         if ($this->_haveColumnHeader) {
