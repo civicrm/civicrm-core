@@ -152,7 +152,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   public function run(
     $fileName,
     $separator,
-    &$mapper,
+    $mapper,
     $skipColumnHeader = FALSE,
     $mode = self::MODE_PREVIEW,
     $contactType = self::CONTACT_INDIVIDUAL,
