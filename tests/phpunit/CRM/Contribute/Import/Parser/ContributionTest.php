@@ -70,7 +70,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     ];
     $mapperSoftCredit = [NULL, NULL, NULL, 'external_identifier'];
     $mapperSoftCreditType = [NULL, NULL, NULL, '1'];
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Contribute_Import_Parser::SOFT_CREDIT, $mapperSoftCredit, NULL, $mapperSoftCreditType);
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT, $mapperSoftCredit, NULL, $mapperSoftCreditType);
 
     $contributionsOfMainContact = Contribution::get()->addWhere('contact_id', '=', $contact1Id)->execute();
     $this->assertCount(1, $contributionsOfMainContact, 'Contribution not added for primary contact');
