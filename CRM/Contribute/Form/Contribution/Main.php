@@ -352,19 +352,14 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->addElement('hidden', "email-{$this->_bltID}", 1);
       $this->add('text', 'total_amount', ts('Total Amount'), ['readonly' => TRUE], FALSE);
     }
-    $pps = $this->getProcessors();
+
     $this->addPaymentProcessorFieldsToForm();
-    if (!empty($pps) && count($pps) === 1) {
-      $ppKeys = array_keys($pps);
-      $currentPP = array_pop($ppKeys);
-      if ($currentPP === 0) {
-        $this->assign('is_pay_later', $this->_values['is_pay_later']);
-        $this->assign('pay_later_text', $this->getPayLaterLabel());
-      }
-    }
+    $this->assign('is_pay_later', $this->getCurrentPaymentProcessor() === 0 && $this->_values['is_pay_later']);
+    $this->assign('pay_later_text', $this->getCurrentPaymentProcessor() === 0 ? $this->getPayLaterLabel() : NULL);
 
     if ($contactID === 0) {
       $this->addCidZeroOptions();
+
     }
 
     //build pledge block.
@@ -1558,6 +1553,24 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   protected function hasSeparateMembershipPaymentAmount($params) {
     return $this->_separateMembershipPayment && (int) CRM_Member_BAO_MembershipType::getMembershipType($params['selectMembership'])['minimum_fee'];
+  }
+
+  /**
+   * Get the loaded payment processor - the default for the form.
+   *
+   * If the form is using 'pay later' then the value for the manual
+   * pay later processor is 0.
+   *
+   * @return int|null
+   */
+  protected function getCurrentPaymentProcessor(): ?int {
+    $pps = $this->getProcessors();
+    if (!empty($pps) && count($pps) === 1) {
+      $ppKeys = array_keys($pps);
+      return array_pop($ppKeys);
+    }
+    // It seems like this might be un=reachable as there should always be a processor...
+    return NULL;
   }
 
 }
