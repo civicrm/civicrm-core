@@ -622,7 +622,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     ])['values'][0];
 
     $this->assertEquals($createdMembershipID, $membershipAfterProcess['id']);
-    $this->assertArrayNotHasKey('is_override', $membershipAfterProcess);
     $this->assertArrayNotHasKey('status_override_end_date', $membershipAfterProcess);
   }
 
@@ -654,7 +653,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     ])['values'][0];
 
     $this->assertEquals($createdMembershipID, $membershipAfterProcess['id']);
-    $this->assertArrayNotHasKey('is_override', $membershipAfterProcess);
     $this->assertArrayNotHasKey('status_override_end_date', $membershipAfterProcess);
   }
 
