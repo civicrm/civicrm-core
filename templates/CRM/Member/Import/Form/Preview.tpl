@@ -73,7 +73,7 @@
 
 
  {* Table for mapping preview *}
- {include file="CRM/Member/Import/Form/MapTable.tpl}
+ {include file="CRM/Import/Form/MapTable.tpl"}
 
 
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
