@@ -24,8 +24,7 @@ class CRM_Activity_Import_Form_Preview extends CRM_Import_Form_Preview {
    * Set variables up before form is built.
    */
   public function preProcess() {
-    $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
-
+    parent::preProcess();
     // Get the data from the session.
     $dataValues = $this->get('dataValues');
     $mapper = $this->get('mapper');
@@ -41,14 +40,6 @@ class CRM_Activity_Import_Form_Preview extends CRM_Import_Form_Preview {
       $mapDAO->find(TRUE);
     }
     $this->assign('savedMappingName', $mappingId ? $mapDAO->name : NULL);
-
-    if ($skipColumnHeader) {
-      $this->assign('skipColumnHeader', $skipColumnHeader);
-      $this->assign('rowDisplayCount', 3);
-    }
-    else {
-      $this->assign('rowDisplayCount', 2);
-    }
 
     if ($invalidRowCount) {
       $urlParams = 'type=' . CRM_Import_Parser::ERROR . '&parser=CRM_Activity_Import_Parser';
@@ -92,7 +83,6 @@ class CRM_Activity_Import_Form_Preview extends CRM_Import_Form_Preview {
   public function postProcess() {
     $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
     $separator = $this->controller->exportValue('DataSource', 'fieldSeparator');
-    $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
     $invalidRowCount = $this->get('invalidRowCount');
     $conflictRowCount = $this->get('conflictRowCount');
     $onDuplicate = $this->get('onDuplicate');
@@ -117,7 +107,7 @@ class CRM_Activity_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
     $parser->run($fileName, $separator,
       $mapperFields,
-      $skipColumnHeader,
+      $this->getSubmittedValue('skipColumnHeader'),
       CRM_Import_Parser::MODE_IMPORT,
       $onDuplicate,
       $this->get('statusID'),

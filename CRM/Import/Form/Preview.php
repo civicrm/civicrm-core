@@ -21,7 +21,7 @@
  * TODO: CRM-11254 - if preProcess and postProcess functions can be reconciled between the 5 child classes,
  * those classes can be removed entirely and this class will not need to be abstract
  */
-abstract class CRM_Import_Form_Preview extends CRM_Core_Form {
+abstract class CRM_Import_Form_Preview extends CRM_Import_Forms {
 
   /**
    * Return a descriptive name for the page, used in wizard header.
@@ -30,6 +30,14 @@ abstract class CRM_Import_Form_Preview extends CRM_Core_Form {
    */
   public function getTitle() {
     return ts('Preview');
+  }
+
+  /**
+   * Assign common values to the template.
+   */
+  public function preProcess() {
+    $this->assign('skipColumnHeader', $this->getSubmittedValue('skipColumnHeader'));
+    $this->assign('rowDisplayCount', $this->getSubmittedValue('skipColumnHeader') ? 3 : 2);
   }
 
   /**
