@@ -1,15 +1,17 @@
 <?php
+use CRM_Grant_ExtensionUtil as E;
+
 return [
   [
     'name' => 'OptionGroup_advanced_search_options_OptionValue_CiviGrant',
     'entity' => 'OptionValue',
-    'cleanup' => 'unused',
-    'update' => 'unmodified',
+    'cleanup' => 'always',
+    'update' => 'always',
     'params' => [
       'version' => 4,
       'values' => [
         'option_group_id.name' => 'advanced_search_options',
-        'label' => 'Grants',
+        'label' => E::ts('Grants'),
         'value' => '12',
         'name' => 'CiviGrant',
         'grouping' => NULL,
@@ -26,6 +28,7 @@ return [
         'domain_id' => NULL,
         'visibility_id' => NULL,
       ],
+      'match' => ['option_group_id', 'name'],
     ],
   ],
 ];
