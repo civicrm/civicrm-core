@@ -40,11 +40,11 @@ class CRM_Member_Import_Form_Summary extends CRM_Import_Form_Summary {
     $onDuplicate = $this->get('onDuplicate');
     $mismatchCount = $this->get('unMatchCount');
     if ($duplicateRowCount > 0) {
-      $urlParams = 'type=' . CRM_Import_Parser::DUPLICATE . '&parser=CRM_Member_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::DUPLICATE . '&parser=CRM_Member_Import_Parser_Membership';
       $this->set('downloadDuplicateRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
     elseif ($mismatchCount) {
-      $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . '&parser=CRM_Member_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . '&parser=CRM_Member_Import_Parser_Membership';
       $this->set('downloadMismatchRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
     else {

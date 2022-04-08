@@ -54,17 +54,17 @@ class CRM_Member_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
 
     if ($invalidRowCount) {
-      $urlParams = 'type=' . CRM_Import_Parser::ERROR . '&parser=CRM_Member_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::ERROR . '&parser=CRM_Member_Import_Parser_Membership';
       $this->set('downloadErrorRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
 
     if ($conflictRowCount) {
-      $urlParams = 'type=' . CRM_Import_Parser::CONFLICT . '&parser=CRM_Member_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::CONFLICT . '&parser=CRM_Member_Import_Parser_Membership';
       $this->set('downloadConflictRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
 
     if ($mismatchCount) {
-      $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . '&parser=CRM_Member_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . '&parser=CRM_Member_Import_Parser_Membership';
       $this->set('downloadMismatchRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
 
@@ -169,11 +169,11 @@ class CRM_Member_Import_Form_Preview extends CRM_Import_Form_Preview {
       fclose($fd);
 
       $this->set('errorFile', $errorFile);
-      $urlParams = 'type=' . CRM_Import_Parser::ERROR . '&parser=CRM_Member_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::ERROR . '&parser=CRM_Member_Import_Parser_Membership';
       $this->set('downloadErrorRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
-      $urlParams = 'type=' . CRM_Import_Parser::CONFLICT . '&parser=CRM_Member_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::CONFLICT . '&parser=CRM_Member_Import_Parser_Membership';
       $this->set('downloadConflictRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
-      $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . '&parser=CRM_Member_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . '&parser=CRM_Member_Import_Parser_Membership';
       $this->set('downloadMismatchRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
   }
