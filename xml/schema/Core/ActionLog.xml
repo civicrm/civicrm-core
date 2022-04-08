@@ -88,6 +88,7 @@
     <title>Error?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Was there any error sending the reminder?</comment>
     <add>3.4</add>
   </field>

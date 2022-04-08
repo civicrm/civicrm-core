@@ -94,6 +94,7 @@
     <title>Dashlet Column</title>
     <comment>column no for this dashlet</comment>
     <default>0</default>
+    <required>true</required>
     <add>3.1</add>
     <drop>4.7</drop>
   </field>
@@ -103,6 +104,7 @@
     <title>Minimize Dashlet?</title>
     <comment>Is Minimized?</comment>
     <default>0</default>
+    <required>true</required>
     <add>3.1</add>
     <drop>4.7</drop>
   </field>
@@ -120,6 +122,7 @@
     <title>Is Fullscreen?</title>
     <comment>Is Fullscreen?</comment>
     <default>1</default>
+    <required>true</required>
     <add>3.1</add>
     <drop>4.7</drop>
   </field>
@@ -129,6 +132,7 @@
     <title>Is Dashlet Active?</title>
     <comment>Is this dashlet active?</comment>
     <default>0</default>
+    <required>true</required>
     <add>3.1</add>
   </field>
   <field>
@@ -137,6 +141,7 @@
     <title>Is Dashlet Reserved?</title>
     <comment>Is this dashlet reserved?</comment>
     <default>0</default>
+    <required>true</required>
     <add>3.1</add>
   </field>
   <field>
