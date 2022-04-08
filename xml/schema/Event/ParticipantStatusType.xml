@@ -62,8 +62,6 @@
     <title>Participant Status Is Reserved?></title>
     <type>boolean</type>
     <comment>whether this is a status type required by the system</comment>
-    <default>0</default>
-    <required>true</required>
     <add>3.0</add>
   </field>
   <field>
@@ -72,8 +70,6 @@
     <type>boolean</type>
     <default>1</default>
     <comment>whether this status type is active</comment>
-    <default>0</default>
-    <required>true</required>
     <add>3.0</add>
   </field>
   <field>
@@ -81,8 +77,6 @@
     <title>Participant Status Counts?</title>
     <type>boolean</type>
     <comment>whether this status type is counted against event size limit</comment>
-    <default>0</default>
-    <required>true</required>
     <add>3.0</add>
   </field>
   <field>

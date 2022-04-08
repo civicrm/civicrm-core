@@ -103,7 +103,6 @@
     <type>boolean</type>
     <title>Collapse Custom Group?</title>
     <default>0</default>
-    <required>true</required>
     <comment>Will this group be in collapsed or expanded mode on initial display ?</comment>
     <add>1.1</add>
   </field>
@@ -148,7 +147,6 @@
     <title>Custom Group Is Active?</title>
     <comment>Is this property active?</comment>
     <default>1</default>
-    <required>true</required>
     <add>1.1</add>
   </field>
   <field>
@@ -168,7 +166,6 @@
     <title>Supports Multiple Records</title>
     <comment>Does this group hold multiple values?</comment>
     <default>0</default>
-    <required>true</required>
     <add>2.0</add>
   </field>
   <field>
@@ -190,7 +187,6 @@
     <type>boolean</type>
     <title>Collapse Group Display</title>
     <default>0</default>
-    <required>true</required>
     <comment>Will this group be in collapsed or expanded mode on advanced search display ?</comment>
     <add>3.0</add>
   </field>
@@ -236,7 +232,6 @@
     <type>boolean</type>
     <title>Reserved Group?</title>
     <default>0</default>
-    <required>true</required>
     <comment>Is this a reserved Custom Group?</comment>
     <add>4.4</add>
   </field>
@@ -245,7 +240,6 @@
     <type>boolean</type>
     <title>Custom Group Is Public?</title>
     <default>1</default>
-    <required>true</required>
     <comment>Is this property public?</comment>
     <add>4.7</add>
   </field>

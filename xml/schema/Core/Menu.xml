@@ -154,8 +154,6 @@
     <name>is_active</name>
     <title>Enabled?</title>
     <type>boolean</type>
-    <default>1</default>
-    <required>true</required>
     <comment>Is this menu item active?</comment>
     <add>2.1</add>
   </field>
@@ -163,8 +161,6 @@
     <name>is_public</name>
     <title>Public?</title>
     <type>boolean</type>
-    <default>1</default>
-    <required>true</required>
     <comment>Is this menu accessible to the public?</comment>
     <add>2.1</add>
   </field>
@@ -172,8 +168,6 @@
     <name>is_exposed</name>
     <title>Exposed?</title>
     <type>boolean</type>
-    <default>1</default>
-    <required>true</required>
     <comment>Is this menu exposed to the navigation system?</comment>
     <add>2.1</add>
   </field>
@@ -181,8 +175,6 @@
     <name>is_ssl</name>
     <title>Use SSL?</title>
     <type>boolean</type>
-    <default>1</default>
-    <required>true</required>
     <comment>Should this menu be exposed via SSL if enabled?</comment>
     <add>2.1</add>
   </field>
@@ -217,8 +209,6 @@
     <name>skipBreadcrumb</name>
     <title>Hide Breadcrumb?</title>
     <type>boolean</type>
-    <default>0</default>
-    <required>true</required>
     <comment>skip this url being exposed to breadcrumb</comment>
     <add>2.2</add>
   </field>

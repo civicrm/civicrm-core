@@ -172,7 +172,6 @@
     <title>Test</title>
     <type>boolean</type>
     <default>0</default>
-    <required>true</required>
     <import>true</import>
     <add>1.7</add>
   </field>
@@ -182,7 +181,6 @@
     <title>Is Pay Later</title>
     <type>boolean</type>
     <default>0</default>
-    <required>true</required>
     <import>true</import>
     <headerPattern>/(is.)?(pay(.)?later)$/i</headerPattern>
     <add>2.1</add>
