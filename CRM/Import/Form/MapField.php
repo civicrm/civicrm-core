@@ -36,13 +36,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
   protected $_mapperFields;
 
   /**
-   * Loaded mapping ID
-   *
-   * @var int
-   */
-  protected $_loadedMappingId;
-
-  /**
    * Number of columns in import file
    *
    * @var int
