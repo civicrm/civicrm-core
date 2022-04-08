@@ -7,18 +7,19 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{* Event Import Wizard - Data Mapping table used by MapFields.tpl and Preview.tpl *}
-<div class="crm-block crm-form-block crm-event-import-maptable-form-block">
-<div id="map-field">
+{* Import Wizard - Data Mapping table used by MapFields.tpl and Preview.tpl *}
+<div class="crm-block crm-form-block crm-map-table-form-block">
+
+ <div id="map-field">
     {strip}
     <table>
     {if $savedMappingName}
-        <tr class="columnheader-dark"><th colspan="4">{ts 1=$savedMappingName}Saved Field Mapping: %1{/ts}</td></tr>
+      <tr class="columnheader-dark"><th colspan="4">{ts 1=$savedMappingName}Saved Field Mapping: %1{/ts}</td></tr>
     {/if}
         <tr class="columnheader">
             {section name=rows loop=$rowDisplayCount}
        {if $skipColumnHeader }
-                   { if $smarty.section.rows.iteration == 1 }
+                   {if $smarty.section.rows.iteration == 1}
                      <th>{ts}Column Headers{/ts}</th>
                    {else}
                      <th>{ts 1=$smarty.section.rows.iteration}Import Data (row %1){/ts}</th>
@@ -42,7 +43,8 @@
                 {/section}
 
                 {* Display mapper <select> field for 'Map Fields', and mapper value for 'Preview' *}
-                <td class="form-item even-row{if $wizard.currentStepName == 'Preview'} labels{/if}">
+                <td class="form-item even-row
+                    {if $wizard.currentStepName == 'Preview'}labels{/if}">
                     {if $wizard.currentStepName == 'Preview'}
                         {$mapper[$i]}
                     {else}
@@ -64,14 +66,15 @@
       {/if}
       <span>{$form.saveMapping.html} &nbsp;&nbsp; {$form.saveMapping.label}</span>
       <div id="saveDetails" class="form-item">
-     <table class="form-layout">
-            <tr class="crm-event_map_table-form-block-saveMappingName">
-           <td class="label">{$form.saveMappingName.label}</td><td>{$form.saveMappingName.html}</td>
-        </tr>
-        <tr class="crm-event_map_table-form-block-saveMappingDesc">
-           <td class="label">{$form.saveMappingDesc.label}</td><td>{$form.saveMappingDesc.html}</td>
-            </tr>
-     </table>
+        <table class="form-layout">
+          <tr class="crm-map-table-form-block-saveMappingName">
+            <td class="label">{$form.saveMappingName.label}</td><td>{$form.saveMappingName.html}</td>
+          </tr>
+          <tr class="crm-map-table-form-block-saveMappingDesc">
+            <td class="label">{$form.saveMappingDesc.label}</td>
+            <td>{$form.saveMappingDesc.html}</td>
+          </tr>
+        </table>
       </div>
       <script type="text/javascript">
              {if $mappingDetailsError }
