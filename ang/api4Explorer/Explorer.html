@@ -16,7 +16,6 @@
           </span>
           <input class="form-control api4-index" type="search" ng-model="index" ng-mouseenter="help('index', paramDoc('$index'))" ng-mouseleave="help()" placeholder="{{:: ts('Index') }}" />
           <button class="btn btn-success pull-right" crm-icon="fa-bolt" ng-disabled="!entity || !action || loading" ng-click="execute()" ng-mouseenter="help(ts('Execute'), executeDoc())" ng-mouseleave="help()">{{:: ts('Execute') }}</button>
-          <button class="btn btn-primary pull-right" crm-icon="fa-save" ng-show="perm.editGroups && action === 'get'" ng-click="save()" ng-mouseenter="help(ts('Save smart group'), saveDoc())" ng-mouseleave="help()">{{:: ts('Save...') }}</button>
         </div>
       </div>
       <div class="panel-body">
