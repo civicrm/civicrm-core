@@ -61,7 +61,7 @@ abstract class CRM_Event_Import_Parser extends CRM_Import_Parser {
   public function run(
     $fileName,
     $separator,
-    &$mapper,
+    $mapper,
     $skipColumnHeader = FALSE,
     $mode = self::MODE_PREVIEW,
     $contactType = self::CONTACT_INDIVIDUAL,

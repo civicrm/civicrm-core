@@ -150,7 +150,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
     $parser->setMaxLinesToProcess(100);
     $parser->run($fileName,
       $separator,
-      $mapper,
+      [],
       $skipColumnHeader,
       CRM_Import_Parser::MODE_MAPFIELD,
       $this->get('contactType')
