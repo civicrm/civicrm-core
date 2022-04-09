@@ -15,7 +15,7 @@
     {ts}None found.{/ts}
   </div>
   <div class="action-link">
-    {crmButton p="civicrm/campaign/add" q="reset=1" icon="crm-i fa-plus-circle" h=0}{ts}Add Campaign{/ts}{/crmButton}
+    {crmButton p="civicrm/campaign/add" q="reset=1" icon="plus-circle" h=0}{ts}Add Campaign{/ts}{/crmButton}
   </div>
 {elseif $buildSelector}
 
@@ -52,7 +52,7 @@
   </table>
 {else}
   <div class="action-link">
-    {crmButton p="civicrm/campaign/add" q="reset=1" icon="crm-i fa-plus-circle" h=0}{ts}Add Campaign{/ts}{/crmButton}
+    {crmButton p="civicrm/campaign/add" q="reset=1" icon="plus-circle" h=0}{ts}Add Campaign{/ts}{/crmButton}
   </div>
 {* build search form here *}
 
