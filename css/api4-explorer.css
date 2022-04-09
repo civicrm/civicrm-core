@@ -26,8 +26,8 @@
   border-bottom-left-radius: 0;
   margin-bottom: 0;
 }
-#bootstrap-theme .panel-heading li>a {
-  background-color: #f1f1f18c
+#bootstrap-theme .panel-heading li > a {
+  background-color: #f1f1f18c;
 }
 #bootstrap-theme.api4-explorer-page .explorer-code-panel pre {
   min-height: 3.3em;
