@@ -157,6 +157,10 @@
   width: 20em;
 }
 
+#bootstrap-theme.api4-explorer-page .form-control.api4-index {
+  width: 8em;
+}
+
 /* Another weird shoreditch fix */
 #bootstrap-theme .form-inline div.checkbox {
   margin-right: 1em;
