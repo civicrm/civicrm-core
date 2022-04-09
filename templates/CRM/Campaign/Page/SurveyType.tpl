@@ -4,7 +4,7 @@
 {else}
 {if $rows}
 <div class="action-link">
-  {crmButton p=$addSurveyType.0 q=$addSurveyType.1 icon="crm-i fa-plus-circle"}{ts 1=$GName}Add %1{/ts}{/crmButton}
+  {crmButton p=$addSurveyType.0 q=$addSurveyType.1 icon="plus-circle"}{ts 1=$GName}Add %1{/ts}{/crmButton}
 </div>
 
 <div id={$gName}>
@@ -41,7 +41,7 @@
         </table>
         {/strip}
         <div class="action-link">
-          {crmButton p=$addSurveyType.0 q=$addSurveyType.1 icon="crm-i fa-plus-circle"}{ts 1=$GName}Add %1{/ts}{/crmButton}
+          {crmButton p=$addSurveyType.0 q=$addSurveyType.1 icon="plus-circle"}{ts 1=$GName}Add %1{/ts}{/crmButton}
         </div>
 
 </div>

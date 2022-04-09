@@ -48,7 +48,7 @@
 
       {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          {crmButton q="action=add&reset=1" id="newbadge-layout" icon="crm-i fa-plus-circle"}{ts}New Badge Layout{/ts}{/crmButton}
+          {crmButton q="action=add&reset=1" id="newbadge-layout" icon="plus-circle"}{ts}New Badge Layout{/ts}{/crmButton}
         </div>
       {/if}
     </div>
