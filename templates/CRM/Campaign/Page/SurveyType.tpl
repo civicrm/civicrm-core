@@ -32,7 +32,7 @@
           <td class="crm-admin-options-label crm-editable" data-field="label">{$row.label}</td>
           <td class="crm-admin-options-value">{$row.value}</td>
           <td class="crm-admin-options-description">{if !empty($row.description)}{$row.description}{/if}</td>
-          <td class="nowrap crm-admin-options-order">{$row.weight}</td>
+          <td class="nowrap crm-admin-options-order">{$row.weight|smarty:nodefaults}</td>
           <td class="crm-admin-options-is_reserved">{if $row.is_reserved eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td class="crm-admin-options-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td>{$row.action|replace:'xx':$row.id}</td>
