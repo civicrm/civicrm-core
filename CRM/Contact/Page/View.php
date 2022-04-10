@@ -207,6 +207,9 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     // Add links for actions menu
     self::addUrls($this, $this->_contactId);
     $this->assign('groupOrganizationUrl', $this->getGroupOrganizationUrl($contactType));
+
+    // Assign deleteURL variable, used as part of ContactImage.tpl
+    self::$_template->ensureVariablesAreAssigned(['deleteURL']);
   }
 
   /**
