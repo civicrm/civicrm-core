@@ -222,7 +222,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * @param int $domainID
    * @param bool $reset
    *
-   * @return int|null
+   * @return int
    */
   public static function domainID($domainID = NULL, $reset = FALSE) {
     static $domain;
