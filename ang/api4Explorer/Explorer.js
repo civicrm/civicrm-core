@@ -19,7 +19,7 @@
     });
   });
 
-  angular.module('api4Explorer').controller('Api4Explorer', function($scope, $routeParams, $location, $timeout, $http, crmUiHelp, crmApi4, dialogService) {
+  angular.module('api4Explorer').controller('Api4Explorer', function($scope, $routeParams, $location, $timeout, $http, crmUiHelp, crmApi4) {
     var ts = $scope.ts = CRM.ts(),
       ctrl = $scope.$ctrl = this;
     $scope.entities = entities;
@@ -37,7 +37,6 @@
     $scope.crmUrl = CRM.url;
     $scope.perm = {
       accessDebugOutput: CRM.checkPerm('access debug output'),
-      editGroups: CRM.checkPerm('edit groups')
     };
     marked.setOptions({highlight: prettyPrintOne});
     var getMetaParams = {},
@@ -1122,102 +1121,9 @@
       return doc;
     };
 
-    $scope.saveDoc = function() {
-      return {
-        description: ts('Save API call as a smart group.'),
-        comment: ts('Create a SavedSearch using these API params to populate a smart group.') +
-          '\n\n' + ts('NOTE: you must select contact id as the only field.')
-      };
-    };
-
     $scope.$watch('params', writeCode, true);
     $scope.$watch('index', writeCode);
     writeCode();
-
-    $scope.save = function() {
-      $scope.params.limit = $scope.params.offset = 0;
-      if ($scope.params.chain.length) {
-        CRM.alert(ts('Smart groups are not compatible with API chaining.'), ts('Error'), 'error', {expires: 5000});
-        return;
-      }
-      if ($scope.params.select.length !== 1 || !_.includes($scope.params.select[0], 'id')) {
-        CRM.alert(ts('To create a smart group, the API must select contact id and no other fields.'), ts('Error'), 'error', {expires: 5000});
-        return;
-      }
-      var model = {
-        title: '',
-        description: '',
-        visibility: 'User and User Admin Only',
-        group_type: [],
-        id: null,
-        entity: $scope.entity,
-        params: JSON.parse(angular.toJson($scope.params))
-      };
-      model.params.version = 4;
-      delete model.params.chain;
-      delete model.params.debug;
-      delete model.params.limit;
-      delete model.params.offset;
-      delete model.params.orderBy;
-      delete model.params.checkPermissions;
-      var options = CRM.utils.adjustDialogDefaults({
-        width: '500px',
-        autoOpen: false,
-        title: ts('Save smart group')
-      });
-      dialogService.open('saveSearchDialog', '~/api4Explorer/SaveSearch.html', model, options);
-    };
-  });
-
-  angular.module('api4Explorer').controller('SaveSearchCtrl', function($scope, crmApi4, dialogService) {
-    var ts = $scope.ts = CRM.ts(),
-      model = $scope.model;
-    $scope.groupEntityRefParams = {
-      entity: 'Group',
-      api: {
-        params: {is_hidden: 0, is_active: 1, 'saved_search_id.api_entity': model.entity},
-        extra: ['saved_search_id', 'description', 'visibility', 'group_type']
-      },
-      select: {
-        allowClear: true,
-        minimumInputLength: 0,
-        placeholder: ts('Select existing group')
-      }
-    };
-    if (!CRM.checkPerm('administer reserved groups')) {
-      $scope.groupEntityRefParams.api.params.is_reserved = 0;
-    }
-    $scope.perm = {
-      administerReservedGroups: CRM.checkPerm('administer reserved groups')
-    };
-    $scope.options = CRM.vars.api4.groupOptions;
-    $scope.$watch('model.id', function(id) {
-      if (id) {
-        _.assign(model, $('#api-save-search-select-group').select2('data').extra);
-      }
-    });
-    $scope.cancel = function() {
-      dialogService.cancel('saveSearchDialog');
-    };
-    $scope.save = function() {
-      $('.ui-dialog:visible').block();
-      var group = model.id ? {id: model.id} : {title: model.title};
-      group.description = model.description;
-      group.visibility = model.visibility;
-      group.group_type = model.group_type;
-      group.saved_search_id = '$id';
-      var savedSearch = {
-        api_entity: model.entity,
-        api_params: model.params
-      };
-      if (group.id) {
-        savedSearch.id = model.saved_search_id;
-      }
-      crmApi4('SavedSearch', 'save', {records: [savedSearch], chain: {group: ['Group', 'save', {'records': [group]}]}})
-        .then(function(result) {
-          dialogService.close('saveSearchDialog', result[0]);
-        });
-    };
   });
 
   angular.module('api4Explorer').component('crmApi4Clause', {
