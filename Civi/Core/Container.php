@@ -168,9 +168,11 @@ class Container {
       'contactTypes' => 'contactTypes',
       'metadata' => 'metadata',
     ];
+    $verSuffixCaches = ['metadata'];
+    $verSuffix = '_' . preg_replace(';[^0-9a-z_];', '_', \CRM_Utils_System::version());
     foreach ($basicCaches as $cacheSvc => $cacheGrp) {
       $definitionParams = [
-        'name' => $cacheGrp,
+        'name' => $cacheGrp . (in_array($cacheGrp, $verSuffixCaches) ? $verSuffix : ''),
         'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
       ];
       // For Caches that we don't really care about the ttl for and/or maybe accessed
