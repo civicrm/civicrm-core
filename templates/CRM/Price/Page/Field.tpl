@@ -61,7 +61,7 @@
       <tr id="price_field-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
         <td class="crm-editable" data-field="label">{$row.label}</td>
         <td>{$row.html_type_display}</td>
-        <td class="nowrap">{$row.weight}</td>
+        <td class="nowrap">{$row.weight|smarty:nodefaults}</td>
         <td class="crm-editable" data-field="is_required" data-type="boolean">{if $row.is_required eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
         <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
         <td>{if $row.active_on}{$row.active_on|crmDate}{/if}</td>

@@ -70,7 +70,7 @@
               {/if}
               <td class="crm-price-option-is_default">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}</td>
               <td class="nowrap crm-price-option-financial-type-id">{$row.financial_type_id}</td>
-              <td class="nowrap crm-price-option-order">{$row.weight}</td>
+              <td class="nowrap crm-price-option-order">{$row.weight|smarty:nodefaults}</td>
               {if $getTaxDetails}
                 <td>{if $row.tax_rate != '' }
                       {$taxTerm} ({$row.tax_rate}%)
