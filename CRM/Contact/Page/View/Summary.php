@@ -165,33 +165,23 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $mailingBackend = Civi::settings()->get('mailing_backend');
     $this->assign('mailingOutboundOption', $mailingBackend['outBound_option']);
 
-    // @todo only address is still being special handled here.... Consolidate with other locations.
-    $communicationType = [
-      'address' => ['customData' => 1],
-    ];
-
-    foreach ($communicationType as $key => $value) {
-      if (!empty($defaults[$key])) {
-        foreach ($defaults[$key] as & $val) {
-          CRM_Utils_Array::lookupValue($val, 'location_type', CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', ['labelColumn' => 'display_name']), FALSE);
-        }
-        if (isset($value['customData'])) {
-          foreach ($defaults[$key] as $blockId => $blockVal) {
-            $idValue = $blockVal['id'];
-            if ($key == 'address') {
-              if (!empty($blockVal['master_id'])) {
-                $idValue = $blockVal['master_id'];
-              }
-            }
-            $groupTree = CRM_Core_BAO_CustomGroup::getTree(ucfirst($key), NULL, $idValue, NULL, [],
-              NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW);
-            // we setting the prefix to dnc_ below so that we don't overwrite smarty's grouptree var.
-            $defaults[$key][$blockId]['custom'] = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, "dnc_");
-          }
-          // reset template variable since that won't be of any use, and could be misleading
-          $this->assign("dnc_viewCustomData", NULL);
-        }
+    if (!empty($defaults['address'])) {
+      foreach ($defaults['address'] as & $val) {
+        CRM_Utils_Array::lookupValue($val, 'location_type', CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', ['labelColumn' => 'display_name']), FALSE);
       }
+
+      foreach ($defaults['address'] as $blockId => $blockVal) {
+        $idValue = $blockVal['id'];
+        if (!empty($blockVal['master_id'])) {
+          $idValue = $blockVal['master_id'];
+        }
+        $groupTree = CRM_Core_BAO_CustomGroup::getTree(ucfirst('address'), NULL, $idValue, NULL, [],
+          NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW);
+        // we setting the prefix to dnc_ below so that we don't overwrite smarty's grouptree var.
+        $defaults['address'][$blockId]['custom'] = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, "dnc_");
+      }
+      // reset template variable since that won't be of any use, and could be misleading
+      $this->assign("dnc_viewCustomData", NULL);
     }
 
     $defaults['gender_display'] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'gender_id', $defaults['gender_id'] ?? NULL);
