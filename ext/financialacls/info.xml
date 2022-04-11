@@ -18,7 +18,7 @@
   <version>5.50.alpha1</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.30</ver>
+    <ver>5.50</ver>
   </compatibility>
   <tags>
     <tag>mgmt:hidden</tag>

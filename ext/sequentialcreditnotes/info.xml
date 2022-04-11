@@ -21,7 +21,7 @@
   </tags>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.24</ver>
+    <ver>5.50</ver>
   </compatibility>
   <mixins>
     <mixin>setting-php@1.0.0</mixin>

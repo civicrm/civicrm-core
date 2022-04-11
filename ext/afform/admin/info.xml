@@ -16,7 +16,7 @@
   <version>5.50.alpha1</version>
   <develStage>beta</develStage>
   <compatibility>
-    <ver>5.23</ver>
+    <ver>5.50</ver>
   </compatibility>
   <comments>Form Builder provides a UI to administer and edit forms. It is an optional admin tool and not required for the forms to function.</comments>
   <requires>

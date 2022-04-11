@@ -18,7 +18,7 @@
   <version>5.50.alpha1</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.39</ver>
+    <ver>5.50</ver>
   </compatibility>
   <comments>This is the version of CKEditor that originally shipped with CiviCRM core</comments>
   <classloader>

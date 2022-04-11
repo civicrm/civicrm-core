@@ -21,7 +21,7 @@
   </tags>
   <develStage>alpha</develStage>
   <compatibility>
-    <ver>5.43</ver>
+    <ver>5.50</ver>
   </compatibility>
   <requires>
     <ext>org.civicrm.afform</ext>

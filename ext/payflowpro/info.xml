@@ -18,7 +18,7 @@
   <version>5.50.alpha1</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.0</ver>
+    <ver>5.50</ver>
   </compatibility>
   <comments>This extension is extraction of the original Core Payflow Pro Payment Processor</comments>
   <classloader>

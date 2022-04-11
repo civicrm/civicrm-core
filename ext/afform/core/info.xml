@@ -16,7 +16,7 @@
   <version>5.50.alpha1</version>
   <develStage>beta</develStage>
   <compatibility>
-    <ver>5.23</ver>
+    <ver>5.50</ver>
   </compatibility>
   <comments>The Form Core extension is required to use any dynamic form. To administer and edit forms, also install the Form Builder extension.</comments>
   <civix>
