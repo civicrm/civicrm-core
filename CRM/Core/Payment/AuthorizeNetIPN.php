@@ -121,7 +121,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     if ($input['response_code'] == 1) {
       // Approved
       if ($first) {
-        $recur->start_date = $now;
         $recur->trxn_id = $recur->processor_id;
         $isFirstOrLastRecurringPayment = CRM_Core_Payment::RECURRING_PAYMENT_START;
       }

@@ -288,10 +288,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
         break;
 
       case 'recurring_payment':
-        if ($first) {
-          $recur->start_date = $now;
-        }
-        else {
+        if (!$first) {
           if ($input['paymentStatus'] !== 'Completed') {
             throw new CRM_Core_Exception("Ignore all IPN payments that are not completed");
           }
@@ -319,11 +316,6 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
           $subscriptionPaymentStatus = CRM_Core_Payment::RECURRING_PAYMENT_END;
         }
 
-        // make sure the contribution status is not done
-        // since order of ipn's is unknown
-        if ($recur->contribution_status_id != $contributionStatuses['Completed']) {
-          $recur->contribution_status_id = $contributionStatuses['In Progress'];
-        }
         break;
     }
 
