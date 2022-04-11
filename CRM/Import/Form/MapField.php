@@ -19,7 +19,7 @@
  *
  * TODO: CRM-11254 - There's still a lot of duplicate code in the 5 child classes that should be moved here
  */
-abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
+abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
 
   /**
    * Cache of preview data values
