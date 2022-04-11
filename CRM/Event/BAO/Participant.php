@@ -1869,7 +1869,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     //verify participant status is still Registered
     if ($details['status'] != 'Registered') {
       $details['eligible'] = FALSE;
-      $details['ineligible_message'] = "You cannot transfer or cancel your registration for " . $eventTitle . ' as you are not currently registered for this event.';
+      $details['ineligible_message'] = ts('You cannot transfer or cancel your registration for %1 as you are not currently registered for this event.', [1 => $eventTitle]);
       return $details;
     }
     // Determine if it's too late to self-service cancel/transfer.
