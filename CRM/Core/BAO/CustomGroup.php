@@ -1896,7 +1896,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    * @return array|int
    * @throws \CRM_Core_Exception
    */
-  public static function buildCustomDataView(&$form, $groupTree, $returnCount = FALSE, $gID = NULL, $prefix = NULL, $customValueId = NULL, $entityId = NULL, $checkEditPermission = FALSE) {
+  public static function buildCustomDataView($form, $groupTree, $returnCount = FALSE, $gID = NULL, $prefix = NULL, $customValueId = NULL, $entityId = NULL, $checkEditPermission = FALSE) {
     // Filter out pesky extra info
     unset($groupTree['info']);
 
@@ -1988,7 +1988,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
         'groupId',
         'skipTitle',
       ]);
-      $form->assign_by_ref("{$prefix}viewCustomData", $details);
+      $form->assign("{$prefix}viewCustomData", $details);
       return $details;
     }
   }
