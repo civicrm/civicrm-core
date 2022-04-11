@@ -1225,6 +1225,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   /**
    * Submit in test mode.
    *
+   * Do not use this - we have figured out how to emulate form in tests now.
+   *
+   * See ConfirmTest.
+   *
+   * @deprecated
+   *
    * @param $params
    */
   public static function testSubmit($params) {

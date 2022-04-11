@@ -3215,6 +3215,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         $form->controller = new CRM_Event_Cart_Controller_Checkout();
         break;
 
+      case 'CRM_Event_Form_Registration_Confirm':
+        $form->controller = new CRM_Event_Controller_Registration();
+        break;
+
       case strpos($class, '_Form_') !== FALSE:
         $form->controller = new CRM_Core_Controller_Simple($class, $pageName);
         break;
