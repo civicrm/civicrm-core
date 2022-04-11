@@ -17,7 +17,7 @@
 /**
  * Base class for upload-only import forms (all but Contact import).
  */
-abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
+abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
 
   /**
    * Set variables up before form is built.
@@ -132,14 +132,8 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
    */
   protected function submitFileForMapping($parserClassName, $entity = NULL) {
     $this->controller->resetPage('MapField');
-
-    $fileName = $this->controller->exportValue($this->_name, 'uploadFile');
-    $skipColumnHeader = $this->controller->exportValue($this->_name, 'skipColumnHeader');
-
     $session = CRM_Core_Session::singleton();
     $session->set("dateTypes", $this->get('dateFormats'));
-
-    $separator = $this->controller->exportValue($this->_name, 'fieldSeparator');
 
     $mapper = [];
 
@@ -148,10 +142,11 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
       $parser->setEntity($this->get($entity));
     }
     $parser->setMaxLinesToProcess(100);
-    $parser->run($fileName,
-      $separator,
+    $parser->run(
+      $this->getSubmittedValue('uploadFile'),
+      $this->getSubmittedValue('fieldSeparator'),
       [],
-      $skipColumnHeader,
+      $this->getSubmittedValue('skipColumnHeader'),
       CRM_Import_Parser::MODE_MAPFIELD,
       $this->get('contactType')
     );
