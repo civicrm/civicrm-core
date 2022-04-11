@@ -1654,12 +1654,22 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * @deprecated
    *   This is used by CiviMail but will be made redundant by FlexMailer.
-   * @param CRM_Mailing_DAO_Mailing $mailing
+   * @param CRM_Mailing_DAO_Mailing|array $mailing
    *   The mailing which may or may not be sendable.
    * @return array
    *   List of error messages.
    */
   public static function checkSendable($mailing) {
+    if (is_array($mailing)) {
+      $params = $mailing;
+      $mailing = new \CRM_Mailing_BAO_Mailing();
+      $mailing->id = $params['id'] ?? NULL;
+      if ($mailing->id) {
+        $mailing->find(TRUE);
+      }
+      $mailing->copyValues($params);
+    }
+
     $errors = [];
     foreach (['subject', 'name', 'from_name', 'from_email'] as $field) {
       if (empty($mailing->{$field})) {
