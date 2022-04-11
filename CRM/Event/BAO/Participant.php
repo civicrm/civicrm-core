@@ -1168,7 +1168,7 @@ UPDATE  civicrm_participant
     }
 
     //thumb rule is if we triggering  primary participant need to triggered additional
-    $allParticipantIds = $primaryANDAdditonalIds = [];
+    $allParticipantIds = $primaryANDAdditionalIds = [];
     foreach ($participantIds as $id) {
       $allParticipantIds[] = $id;
       if (self::isPrimaryParticipant($id)) {
@@ -1181,7 +1181,7 @@ UPDATE  civicrm_participant
         }
         if (!empty($additionalIds)) {
           $allParticipantIds = array_merge($allParticipantIds, $additionalIds);
-          $primaryANDAdditonalIds[$id] = $additionalIds;
+          $primaryANDAdditionalIds[$id] = $additionalIds;
         }
       }
     }
@@ -1291,8 +1291,8 @@ UPDATE  civicrm_participant
       }
 
       //check is it primary and has additional.
-      if (array_key_exists($participantId, $primaryANDAdditonalIds)) {
-        foreach ($primaryANDAdditonalIds[$participantId] as $additionalId) {
+      if (array_key_exists($participantId, $primaryANDAdditionalIds)) {
+        foreach ($primaryANDAdditionalIds[$participantId] as $additionalId) {
 
           if ($emailType) {
             $mail = self::sendTransitionParticipantMail($additionalId,

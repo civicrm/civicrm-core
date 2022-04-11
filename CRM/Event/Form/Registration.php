@@ -1539,8 +1539,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
         //lets get additional participant id to cancel.
         if ($this->_allowConfirmation && is_array($cancelledIds)) {
-          $additonalId = $value['participant_id'] ?? NULL;
-          if ($additonalId && $key = array_search($additonalId, $cancelledIds)) {
+          $additionalId = $value['participant_id'] ?? NULL;
+          if ($additionalId && $key = array_search($additionalId, $cancelledIds)) {
             unset($cancelledIds[$key]);
           }
         }
