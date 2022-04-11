@@ -52,7 +52,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       $this->getInput($input);
 
       // load post ids in $ids
-      $this->getIDs($ids, $input);
+      $this->getIDs($ids);
       $paymentProcessorID = $this->getPaymentProcessorID();
 
       // Check if the contribution exists
@@ -205,14 +205,12 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    * Get ids from input.
    *
    * @param array $ids
-   * @param array $input
    *
    * @throws \CRM_Core_Exception
    */
-  public function getIDs(&$ids, $input) {
+  public function getIDs(&$ids) {
     $ids['contribution'] = $this->getContributionID();
-    $contributionRecur = $this->getContributionRecurObject($this->getRecurProcessorID(), (int) $this->retrieve('x_cust_id', 'Integer', FALSE, 0), $this->getContributionID());
-    $ids['contributionRecur'] = (int) $contributionRecur->id;
+    $ids['contributionRecur'] = $this->getContributionRecurID();
   }
 
   /**
@@ -348,6 +346,17 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
    */
   protected function getContributionID(): int {
     return (int) $this->retrieve('x_invoice_num', 'Integer');
+  }
+
+  /**
+   * Get the id of the recurring contribution.
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContributionRecurID(): int {
+    $contributionRecur = $this->getContributionRecurObject($this->getRecurProcessorID(), (int) $this->retrieve('x_cust_id', 'Integer', FALSE, 0), $this->getContributionID());
+    return (int) $contributionRecur->id;
   }
 
 }
