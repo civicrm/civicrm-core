@@ -594,7 +594,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     else {
       $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventID);
     }
-    CRM_Price_BAO_PriceSet::initSet($form, 'civicrm_event', $doNotIncludeExpiredFields, $priceSetId);
+    if ($priceSetId) {
+      CRM_Price_BAO_PriceSet::initSet($form, 'civicrm_event', $doNotIncludeExpiredFields, $priceSetId);
+    }
 
     if (property_exists($form, '_context') && ($form->_context == 'standalone'
         || $form->_context == 'participant')
@@ -821,7 +823,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $participantParams['custom'] = [];
     foreach ($form->_params as $paramName => $paramValue) {
       if (strpos($paramName, 'custom_') === 0) {
-        list($customFieldID, $customValueID) = CRM_Core_BAO_CustomField::getKeyID($paramName, TRUE);
+        [$customFieldID, $customValueID] = CRM_Core_BAO_CustomField::getKeyID($paramName, TRUE);
         CRM_Core_BAO_CustomField::formatCustomField($customFieldID, $participantParams['custom'], $paramValue, 'Participant', $customValueID);
 
       }
