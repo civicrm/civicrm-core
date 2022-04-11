@@ -159,6 +159,7 @@ class CRM_Contact_Form_Task_SMSCommon {
       $form->_contactDetails = civicrm_api3('Contact', 'get', [
         'id' => ['IN' => $form->_contactIds],
         'return' => ['sort_name', 'phone', 'do_not_sms', 'is_deceased', 'display_name'],
+        'options' => ['limit' => 0],
       ])['values'];
 
       // make a copy of all contact details
