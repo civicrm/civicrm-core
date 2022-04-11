@@ -228,8 +228,17 @@
 
       // CRM-14070 Hide limit-to when entity is activity
       function showHideLimitTo() {
+        // '1' is the value of "Activity" in the entity select box.
         $('#limit_to', $form).toggle(!($('#entity_0', $form).val() == '1'));
         if ($('#entity_0', $form).val() != '1' || !($('#entity_0').length)) {
+          // Some Event entity is selected.
+          if (['2', '3', '5'].includes($('#entity_0', $form).val())) {
+            $('#limit_to option[value="0"]', $form).attr('disabled','disabled').removeAttr('selected');
+          }
+          else {
+            $('#limit_to option[value="0"]', $form).removeAttr('disabled');
+          }
+          // Anything but Activity is selected.
           if ($('#limit_to', $form).val() == '') {
             $('tr.recipient:visible, #recipientList, #recipient, a.recipient').hide();
             $('a.limit_to').show();
@@ -241,6 +250,7 @@
           $("label[for='recipient']").text('{/literal}{$recipientLabels.other}{literal}');
         }
         else {
+          // Activity is selected.
           $('#recipient, a.recipient').show()
           $('#recipient').css("margin-left", "-2px");
           $('a.limit_to').hide();
