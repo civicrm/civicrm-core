@@ -19,7 +19,7 @@
   </tags>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.37</ver>
+    <ver>5.50</ver>
   </compatibility>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>

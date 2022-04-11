@@ -21,7 +21,7 @@
   </tags>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.31</ver>
+    <ver>5.50</ver>
   </compatibility>
   <comments>This is an extension to contain the eWAY Single Currency Payment Processor</comments>
   <classloader>

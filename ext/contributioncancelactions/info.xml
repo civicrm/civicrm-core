@@ -18,7 +18,7 @@
   <version>5.50.alpha1</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.32</ver>
+    <ver>5.50</ver>
   </compatibility>
   <comments>This code has been moved from core to a separate extension in 5.32. Note that if you disable it failed or cancelled contributions will not cause related memberships and participant records to be updated</comments>
   <classloader>

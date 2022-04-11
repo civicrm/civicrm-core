@@ -16,7 +16,7 @@
   <version>5.50.alpha1</version>
   <develStage>alpha</develStage>
   <compatibility>
-    <ver>5.23</ver>
+    <ver>5.50</ver>
   </compatibility>
   <requires>
     <ext>org.civicrm.afform</ext>

@@ -21,7 +21,7 @@
     <tag>mgmt:hidden</tag>
   </tags>
   <compatibility>
-    <ver>5.40</ver>
+    <ver>5.50</ver>
   </compatibility>
   <comments>This is hidden on install to give extensions that require it time to add it to their requires and to allow us to get it out of GroupContact load</comments>
   <classloader>
