@@ -108,7 +108,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     $showColNames = TRUE;
     if ('CRM_Import_DataSource_CSV' == $this->get('dataSource') &&
-      !$this->get('skipColumnHeader')
+      !$this->getSubmittedValue('skipColumnHeader')
     ) {
       $showColNames = FALSE;
     }
