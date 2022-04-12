@@ -404,12 +404,6 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
         $updateMappingFields->id = $mappingFieldsId[$i];
         $updateMappingFields->mapping_id = $params['mappingId'];
         $updateMappingFields->column_number = $i;
-
-        $explodedValues = explode('_', $mapperKeys[$i][0]);
-        $id = $explodedValues[0] ?? NULL;
-        $first = $explodedValues[1] ?? NULL;
-        $second = $explodedValues[2] ?? NULL;
-
         $updateMappingFields->name = $mapper[$i];
         $updateMappingFields->save();
       }
@@ -428,12 +422,6 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
         $saveMappingFields = new CRM_Core_DAO_MappingField();
         $saveMappingFields->mapping_id = $saveMapping->id;
         $saveMappingFields->column_number = $i;
-
-        $explodedValues = explode('_', $mapperKeys[$i][0]);
-        $id = $explodedValues[0] ?? NULL;
-        $first = $explodedValues[1] ?? NULL;
-        $second = $explodedValues[2] ?? NULL;
-
         $saveMappingFields->name = $mapper[$i];
         $saveMappingFields->save();
       }
