@@ -67,6 +67,9 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
     $this->assign('email', $email);
     $this->_email = $email;
 
+    $optOutURL = CRM_Utils_System::url("civicrm/mailing/optout", "reset=1&jid={$job_id}&qid={$queue_id}&h={$hash}");
+    $this->assign('optout_URL', $optOutURL);
+
     $groups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($job_id, $queue_id, $hash, TRUE);
     $this->assign('groups', $groups);
     $groupExist = NULL;
@@ -76,7 +79,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
       }
     }
     if (!$groupExist && !$isConfirm) {
-      $statusMsg = ts('%1 has already been unsubscribed.', [1 => $email]);
+      $statusMsg = ts('%1 has already been unsubscribed.', [1 => $displayName]);
       CRM_Core_Session::setStatus($statusMsg, '', 'error');
     }
     $this->assign('groupExist', $groupExist);
@@ -113,7 +116,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
       CRM_Mailing_Event_BAO_Unsubscribe::send_unsub_response($this->_queue_id, $groups, FALSE, $this->_job_id);
     }
 
-    $statusMsg = ts('%1 has been unsubscribed successfully.', [1 => $this->_email]);
+    $statusMsg = ts('%1 has been unsubscribed successfully.', [1 => $displayName]);
     CRM_Core_Session::setStatus($statusMsg, '', 'success');
   }
 
