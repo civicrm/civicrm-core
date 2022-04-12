@@ -253,6 +253,7 @@ AND    {$this->_componentClause}";
       $contactDetails = civicrm_api3('Contact', 'get', [
         'return' => ['email', 'do_not_email', 'is_deceased', 'on_hold'],
         'id' => ['IN' => $contactIds],
+        'options' => ['limit' => 0],
       ])['values'];
       $pdfElements['suppressedEmails'] = 0;
       $suppressedEmails = 0;
