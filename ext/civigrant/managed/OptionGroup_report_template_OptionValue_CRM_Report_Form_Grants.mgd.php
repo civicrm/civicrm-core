@@ -1,4 +1,6 @@
 <?php
+use CRM_Grant_ExtensionUtil as E;
+
 return [
   [
     'name' => 'OptionGroup_report_template_OptionValue_CRM_Report_Form_Grant_Detail',
@@ -9,7 +11,7 @@ return [
       'version' => 4,
       'values' => [
         'option_group_id.name' => 'report_template',
-        'label' => 'Grant Report (Detail)',
+        'label' => E::ts('Grant Report (Detail)'),
         'value' => 'grant/detail',
         'name' => 'CRM_Report_Form_Grant_Detail',
         'grouping' => NULL,
@@ -26,6 +28,7 @@ return [
         'domain_id' => NULL,
         'visibility_id' => NULL,
       ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -37,7 +40,7 @@ return [
       'version' => 4,
       'values' => [
         'option_group_id.name' => 'report_template',
-        'label' => 'Grant Report (Statistics)',
+        'label' => E::ts('Grant Report (Statistics)'),
         'value' => 'grant/statistics',
         'name' => 'CRM_Report_Form_Grant_Statistics',
         'grouping' => NULL,
@@ -54,6 +57,7 @@ return [
         'domain_id' => NULL,
         'visibility_id' => NULL,
       ],
+      'match' => ['option_group_id', 'name'],
     ],
   ],
 ];

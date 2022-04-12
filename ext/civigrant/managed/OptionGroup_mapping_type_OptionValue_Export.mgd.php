@@ -1,15 +1,17 @@
 <?php
+use CRM_Grant_ExtensionUtil as E;
+
 return [
   [
     'name' => 'OptionGroup_mapping_type_OptionValue_Export Grant',
     'entity' => 'OptionValue',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
         'option_group_id.name' => 'mapping_type',
-        'label' => 'Export Grant',
+        'label' => E::ts('Export Grant'),
         'value' => '13',
         'name' => 'Export Grant',
         'grouping' => NULL,
@@ -26,6 +28,7 @@ return [
         'domain_id' => NULL,
         'visibility_id' => NULL,
       ],
+      'match' => ['option_group_id', 'name'],
     ],
   ],
 ];

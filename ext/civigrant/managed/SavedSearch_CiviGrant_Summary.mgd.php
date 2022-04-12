@@ -5,7 +5,7 @@ return [
   [
     'name' => 'SavedSearch_CiviGrant_Summary',
     'entity' => 'SavedSearch',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -41,7 +41,7 @@ return [
   [
     'name' => 'SavedSearch_CiviGrant_Summary_SearchDisplay_Grant_Tab',
     'entity' => 'SearchDisplay',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
