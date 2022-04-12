@@ -132,8 +132,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    */
   protected function submitFileForMapping($parserClassName, $entity = NULL) {
     $this->controller->resetPage('MapField');
-    $session = CRM_Core_Session::singleton();
-    $session->set("dateTypes", $this->get('dateFormats'));
+    CRM_Core_Session::singleton()->set('dateTypes', $this->getSubmittedValue('dateFormats'));
 
     $mapper = [];
 
@@ -148,7 +147,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
       [],
       $this->getSubmittedValue('skipColumnHeader'),
       CRM_Import_Parser::MODE_MAPFIELD,
-      $this->get('contactType')
+      $this->getSubmittedValue('contactType')
     );
 
     // add all the necessary variables to the form

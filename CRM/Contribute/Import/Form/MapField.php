@@ -144,7 +144,8 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
-    $savedMappingID = $this->get('savedMapping');
+    $savedMappingID = $this->getSubmittedValue('savedMapping');
+
     $this->buildSavedMappingFields($savedMappingID);
 
     $this->addFormRule([
