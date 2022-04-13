@@ -3510,7 +3510,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                 $value = CRM_Utils_Array::value($op, $pair) . " " .
                   CRM_Utils_Array::value($val, $field['options'], $val);
               }
-              elseif ($val) {
+              elseif ($val || $val == '0') {
                 $value = CRM_Utils_Array::value($op, $pair) . " " . $val;
               }
             }
