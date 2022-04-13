@@ -271,7 +271,7 @@ class Api4SelectQuery {
           throw new \API_Exception('Cannot use existing field name as alias');
         }
         $this->selectAliases[$alias] = $expr->getExpr();
-        $this->query->select($expr->render($this->apiFieldSpec) . " AS `$alias`");
+        $this->query->select($expr->render($this) . " AS `$alias`");
       }
     }
   }
@@ -465,7 +465,7 @@ class Api4SelectQuery {
         ];
         FormattingUtil::formatInputValue($value, NULL, $fauxField, $operator);
       }
-      $fieldAlias = $expr->render($this->apiFieldSpec);
+      $fieldAlias = $expr->render($this);
     }
     // For HAVING, expr must be an item in the SELECT clause
     elseif ($type === 'HAVING') {
@@ -508,7 +508,7 @@ class Api4SelectQuery {
     elseif ($type === 'ON' || ($type === 'WHERE' && $isExpression)) {
       $expr = $this->getExpression($expr);
       $fieldName = count($expr->getFields()) === 1 ? $expr->getFields()[0] : NULL;
-      $fieldAlias = $expr->render($this->apiFieldSpec);
+      $fieldAlias = $expr->render($this);
       if (is_string($value)) {
         $valExpr = $this->getExpression($value);
         if ($expr->getType() === 'SqlField' && $valExpr->getType() === 'SqlString') {
@@ -517,7 +517,7 @@ class Api4SelectQuery {
           return $this->createSQLClause($fieldAlias, $operator, $value, $this->apiFieldSpec[$fieldName], $depth);
         }
         else {
-          $value = $valExpr->render($this->apiFieldSpec);
+          $value = $valExpr->render($this);
           return sprintf('%s %s %s', $fieldAlias, $operator, $value);
         }
       }
@@ -992,13 +992,13 @@ class Api4SelectQuery {
       // If this condition makes an explicit link between the bridge and another entity
       if ($op === '=' && $sideB && ($sideA === "$alias.{$baseRef->getReferenceKey()}" || $sideB === "$alias.{$baseRef->getReferenceKey()}")) {
         $expr = $sideA === "$alias.{$baseRef->getReferenceKey()}" ? $sideB : $sideA;
-        $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getReferenceKey()}` = " . $this->getExpression($expr)->render($this->apiFieldSpec);
+        $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getReferenceKey()}` = " . $this->getExpression($expr)->render($this);
         return FALSE;
       }
       // Explicit link with dynamic "entity_table" column
       elseif ($op === '=' && $baseRef->getTypeColumn() && ($sideA === "$alias.{$baseRef->getTypeColumn()}" || $sideB === "$alias.{$baseRef->getTypeColumn()}")) {
         $expr = $sideA === "$alias.{$baseRef->getTypeColumn()}" ? $sideB : $sideA;
-        $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getTypeColumn()}` = " . $this->getExpression($expr)->render($this->apiFieldSpec);
+        $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getTypeColumn()}` = " . $this->getExpression($expr)->render($this);
         return FALSE;
       }
       return TRUE;
@@ -1302,7 +1302,7 @@ class Api4SelectQuery {
         return "`$alias`";
       }
     }
-    return $expr->render($this->apiFieldSpec);
+    return $expr->render($this);
   }
 
   /**
