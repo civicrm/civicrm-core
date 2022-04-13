@@ -96,7 +96,11 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
     if (CIVICRM_UF === 'WordPress') {
       $cliRunners['wp'] = ['wp', 'wp eval \'civicrm_initialize();\'@PHP'];
     }
-    if (CIVICRM_UF === 'Drupal' || CIVICRM_UF === 'Backdrop') {
+    if (CIVICRM_UF === 'Drupal') {
+      $cliRunners['drush'] = ['drush', 'drush ev \'civicrm_initialize();\'@PHP'];
+    }
+    if (CIVICRM_UF === 'Backdrop' && version_compare(PHP_VERSION, '8', '<')) {
+      // At time of writing, "drush ev" doesn't work on our php80+backdrop environments
       $cliRunners['drush'] = ['drush', 'drush ev \'civicrm_initialize();\'@PHP'];
     }
     // TODO: Drupal8 w/drush (doesn't use civicrm_initialize?)
