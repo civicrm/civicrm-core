@@ -144,7 +144,8 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
-    $savedMappingID = $this->get('savedMapping');
+    $savedMappingID = $this->getSubmittedValue('savedMapping');
+
     $this->buildSavedMappingFields($savedMappingID);
 
     $this->addFormRule([
@@ -423,10 +424,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       return;
     }
 
-    $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
-    $separator = $this->controller->exportValue('DataSource', 'fieldSeparator');
-    $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
-
     $mapper = $mapperKeys = $mapperKeysMain = $mapperSoftCredit = $softCreditFields = $mapperPhoneType = $mapperSoftCreditType = [];
     $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
 
@@ -511,8 +508,13 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     $parser = new CRM_Contribute_Import_Parser_Contribution($mapperKeysMain, $mapperSoftCredit, $mapperPhoneType);
-    $parser->run($fileName, $separator, $mapper, $skipColumnHeader,
-      CRM_Import_Parser::MODE_PREVIEW, $this->get('contactType')
+    $parser->run(
+      $this->getSubmittedValue('uploadFile'),
+      $this->getSubmittedValue('fieldSeparator'),
+      $mapper,
+      $this->getSubmittedValue('skipColumnHeader'),
+      CRM_Import_Parser::MODE_PREVIEW,
+      $this->get('contactType')
     );
 
     // add all the necessary variables to the form

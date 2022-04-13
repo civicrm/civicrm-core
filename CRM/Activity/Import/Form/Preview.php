@@ -82,7 +82,6 @@ class CRM_Activity_Import_Form_Preview extends CRM_Import_Form_Preview {
    */
   public function postProcess() {
     $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
-    $separator = $this->controller->exportValue('DataSource', 'fieldSeparator');
     $invalidRowCount = $this->get('invalidRowCount');
     $conflictRowCount = $this->get('conflictRowCount');
     $onDuplicate = $this->get('onDuplicate');
@@ -105,7 +104,9 @@ class CRM_Activity_Import_Form_Preview extends CRM_Import_Form_Preview {
       }
       $mapperFields[] = implode(' - ', $header);
     }
-    $parser->run($fileName, $separator,
+    $parser->run(
+      $this->getSubmittedValue('uploadFile'),
+      $this->getSubmittedValue('fieldSeparator'),
       $mapperFields,
       $this->getSubmittedValue('skipColumnHeader'),
       CRM_Import_Parser::MODE_IMPORT,

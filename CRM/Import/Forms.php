@@ -29,6 +29,11 @@ class CRM_Import_Forms extends CRM_Core_Form {
   public function getSubmittedValue(string $fieldName) {
     $mappedValues = [
       'skipColumnHeader' => 'DataSource',
+      'fieldSeparator' => 'DataSource',
+      'uploadFile' => 'DataSource',
+      'contactType' => 'DataSource',
+      'dateFormats' => 'DataSource',
+      'savedMapping' => 'DataSource',
     ];
     if (array_key_exists($fieldName, $mappedValues)) {
       return $this->controller->exportValue($mappedValues[$fieldName], $fieldName);
