@@ -111,7 +111,7 @@
       <ul class="crm-contact-tabs-list">
         {foreach from=$allTabs item=tabValue}
           <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all{if is_numeric($tabValue.count)} crm-count-{$tabValue.count}{/if}{if $tabValue.class} {$tabValue.class}{/if}">
-            <a href="{if $tabValue.template}#contact-{$tabValue.id}{else}{$tabValue.url}{/if}" title="{$tabValue.title|escape}">
+            <a href="{if $tabValue.template}#contact-{$tabValue.id}{else}{$tabValue.url|smarty:nodefaults}{/if}" title="{$tabValue.title|escape}">
               <i class="{if !empty($tabValue.icon)}{$tabValue.icon}{else}crm-i fa-puzzle-piece{/if}" aria-hidden="true"></i>
               <span>{$tabValue.title}</span>
               {if empty($tabValue.hideCount)}<em>{if is_numeric($tabValue.count)}{$tabValue.count}{/if}</em>{/if}
