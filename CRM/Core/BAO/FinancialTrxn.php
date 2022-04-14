@@ -192,29 +192,6 @@ LIMIT 1;";
   }
 
   /**
-   * Given an entity_id and entity_table, check for corresponding entity_financial_trxn and financial_trxn record.
-   * @todo This should be moved to separate BAO for EntityFinancialTrxn when we start adding more code for that object.
-   *
-   * @param int $entity_id
-   *   Id of the entity usually the contactID.
-   *
-   * @return array
-   *   array of category id's the contact belongs to.
-   *
-   */
-  public static function getFinancialTrxnTotal($entity_id) {
-    $query = "
-      SELECT (ft.amount+SUM(ceft.amount)) AS total FROM civicrm_entity_financial_trxn AS ft
-LEFT JOIN civicrm_entity_financial_trxn AS ceft ON ft.financial_trxn_id = ceft.entity_id
-WHERE ft.entity_table = 'civicrm_contribution' AND ft.entity_id = %1
-        ";
-
-    $sqlParams = [1 => [$entity_id, 'Integer']];
-    return CRM_Core_DAO::singleValueQuery($query, $sqlParams);
-
-  }
-
-  /**
    * Given an financial_trxn_id  check for previous entity_financial_trxn.
    *
    * @param $financial_trxn_id
