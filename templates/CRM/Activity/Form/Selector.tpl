@@ -104,7 +104,7 @@
 
     <td>
       {if (!empty($row.id))}
-        {$row.action|replace:'xx':$row.id}
+        {$row.action|smarty:nodefaults|replace:'xx':$row.id}
       {else}
         {$row.action}
       {/if}

@@ -26,7 +26,7 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
           </td>
           <td class="crm-extensions-version">{$row.version|escape}</td>
           <td class="crm-extensions-description">{$row.type|capitalize}</td>
-          <td>{$row.action|replace:'xx':$row.id}</td>
+          <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
         <tr class="hiddenElement" id="crm-extensions-details-addnew-{$row.file}">
             <td>

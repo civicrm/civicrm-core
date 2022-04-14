@@ -79,7 +79,7 @@
                 <td>{$row.tax_amount|crmMoney}</td>
               {/if}
               <td id="row_{$row.id}_status" class="crm-price-option-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-              <td>{$row.action|replace:'xx':$row.id}</td>
+              <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
             </tr>
           {/foreach}
           </tbody>

@@ -81,7 +81,7 @@
                     <td>{$row.group_type}</td>
                     <td>{$row.id}</td>
                     <td>{$row.module}</td>
-                    <td>{$row.action|replace:'xx':$row.id}</td>
+                    <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
                   </tr>
                 {/if}
                 {/foreach}
@@ -126,7 +126,7 @@
                       <td>{$row.group_type}</td>
                       <td>{$row.id}</td>
                       <td>{$row.module}</td>
-                      <td>{$row.action|replace:'xx':$row.id}</td>
+                      <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
                     </tr>
                   {/if}
                 {/foreach}

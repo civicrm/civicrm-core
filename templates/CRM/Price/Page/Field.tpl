@@ -74,7 +74,7 @@
       </td>
             <td>{if $row.html_type eq "Text / Numeric Quantity" }{$row.tax_amount|crmMoney}{/if}</td>
         {/if}
-        <td class="field-action">{$row.action|replace:'xx':$row.id}</td>
+        <td class="field-action">{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
       </tr>
       {/foreach}
     </table>

@@ -41,7 +41,7 @@
         <td class="crmf-description crm-editable">{$row.description}</td>
         <td id="row_{$row.id}_status" class="crmf-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
         <td class="crmf-is_default">{if $row.is_default}{icon condition=$row.is_default}{ts}Default{/ts}{/icon}&nbsp;{/if}</td>
-        <td>{$row.action|replace:'xx':$row.id}</td>
+        <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
     </tr>
     {/foreach}
     </table>
