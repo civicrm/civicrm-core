@@ -118,7 +118,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     $now = date('YmdHis');
 
     $isFirstOrLastRecurringPayment = FALSE;
-    if ($input['response_code'] == 1) {
+    if ($this->isSuccess()) {
       // Approved
       if ($first) {
         $recur->start_date = $now;
@@ -168,7 +168,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
   public function getInput(&$input) {
     $input['amount'] = $this->retrieve('x_amount', 'String');
     $input['subscription_id'] = $this->getRecurProcessorID();
-    $input['response_code'] = $this->retrieve('x_response_code', 'Integer');
     $input['response_reason_code'] = $this->retrieve('x_response_reason_code', 'String', FALSE);
     $input['response_reason_text'] = $this->retrieve('x_response_reason_text', 'String', FALSE);
     $input['subscription_paynum'] = $this->retrieve('x_subscription_paynum', 'Integer', FALSE, 0);
@@ -180,7 +179,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     }
     // Only assume trxn_id 'should' have been returned for success.
     // Per CRM-17611 it would also not be passed back for a decline.
-    elseif ($input['response_code'] == 1) {
+    elseif ($this->isSuccess()) {
       $input['is_test'] = 1;
       $input['trxn_id'] = md5(uniqid(rand(), TRUE));
     }
@@ -199,6 +198,16 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     foreach ($params as $civiName => $resName) {
       $input[$civiName] = $this->retrieve($resName, 'String', FALSE);
     }
+  }
+
+  /**
+   * Was the transaction successful.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  private function isSuccess(): bool {
+    return $this->retrieve('x_response_code', 'Integer') === 1;
   }
 
   /**
