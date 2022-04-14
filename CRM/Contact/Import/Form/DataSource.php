@@ -59,7 +59,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     }
 
     while ($file = readdir($handler)) {
-      if ($file != '.' && $file != '..' &&
+      if ($file !== '.' && $file !== '..' &&
         in_array($file, $errorFiles) && !is_writable($config->uploadDir . $file)
       ) {
         $results[] = $file;
@@ -169,7 +169,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
 
     CRM_Core_Form_Date::buildAllowedDateFormats($this);
 
-    $config = CRM_Core_Config::singleton();
     $geoCode = FALSE;
     if (CRM_Utils_GeocodeProvider::getUsableClassName()) {
       $geoCode = TRUE;
@@ -200,18 +199,15 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
   /**
    * Set the default values of various form elements.
    *
-   * access        public
-   *
    * @return array
    *   reference to the array of default values
    */
   public function setDefaultValues() {
-    $config = CRM_Core_Config::singleton();
     $defaults = [
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
       'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
-      'fieldSeparator' => $config->fieldSeparator,
+      'fieldSeparator' => CRM_Core_Config::singleton()->fieldSeparator,
     ];
 
     if ($this->get('loadedMapping')) {
@@ -225,7 +221,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
    * @return array
    * @throws Exception
    */
-  private function _getDataSources() {
+  private function _getDataSources(): array {
     // Hmm... file-system scanners don't really belong in forms...
     if (isset(Civi::$statics[__CLASS__]['datasources'])) {
       return Civi::$statics[__CLASS__]['datasources'];
@@ -248,8 +244,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
       if (($fileType === 'file' || $fileType === 'link') &&
         preg_match('/^(.+)\.php$/', $dataSourceFile, $matches)
       ) {
-        $dataSourceClass = "CRM_Import_DataSource_" . $matches[1];
-        require_once $dataSourceDir . DIRECTORY_SEPARATOR . $dataSourceFile;
+        $dataSourceClass = 'CRM_Import_DataSource_' . $matches[1];
         $object = new $dataSourceClass();
         $info = $object->getInfo();
         if ($object->checkPermission()) {
