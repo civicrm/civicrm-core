@@ -1,4 +1,6 @@
 <?php
 return [
-  // DAO changed, but nothing in upgrader?
+  'civicrm_acl_entity_role' => [
+    'is_active' => "DEFAULT 1 COMMENT 'Is this property active?'",
+  ],
 ];

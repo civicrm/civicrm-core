@@ -55,7 +55,6 @@
     <required>true</required>
     <comment>Is this processor active?</comment>
     <add>1.8</add>
-    <default>1</default>
   </field>
   <field>
     <name>is_default</name>
@@ -65,7 +64,6 @@
     <required>true</required>
     <comment>Is this processor the default?</comment>
     <add>1.8</add>
-    <default>0</default>
   </field>
   <index>
     <name>UI_name</name>
