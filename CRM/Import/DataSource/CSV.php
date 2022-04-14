@@ -89,10 +89,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     );
 
     $form->set('originalColHeader', CRM_Utils_Array::value('original_col_header', $result));
-
-    $table = $result['import_table_name'];
-    $importJob = new CRM_Contact_Import_ImportJob($table);
-    $form->set('importTableName', $importJob->getTableName());
+    $form->set('importTableName', $result['import_table_name']);
   }
 
   /**
