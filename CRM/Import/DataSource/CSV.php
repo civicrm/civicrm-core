@@ -81,7 +81,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    */
   public function postProcess(&$params, &$db, &$form) {
     $file = $params['uploadFile']['name'];
-    $result = self::_CsvToTable($db,
+    $result = self::_CsvToTable(
       $file,
       CRM_Utils_Array::value('skipColumnHeader', $params, FALSE),
       CRM_Utils_Array::value('import_table_name', $params),
@@ -98,8 +98,6 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   /**
    * Create a table that matches the CSV file and populate it with the file's contents
    *
-   * @param object $db
-   *   Handle to the database connection.
    * @param string $file
    *   File name to load.
    * @param bool $headers
@@ -114,7 +112,6 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * @throws \CRM_Core_Exception
    */
   private static function _CsvToTable(
-    &$db,
     $file,
     $headers = FALSE,
     $tableName = NULL,
