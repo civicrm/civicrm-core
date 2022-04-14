@@ -441,7 +441,7 @@ class Api4SelectQuery {
    * @throws \API_Exception
    * @throws \Exception
    */
-  protected function composeClause(array $clause, string $type, int $depth) {
+  public function composeClause(array $clause, string $type, int $depth) {
     $field = NULL;
     // Pad array for unary operators
     [$expr, $operator, $value] = array_pad($clause, 3, NULL);

@@ -61,7 +61,6 @@ CREATE TABLE `civicrm_search_segment` (
   `label` varchar(255) NOT NULL COMMENT 'Label for identifying search segment (will appear as name of calculated field)',
   `description` varchar(255) COMMENT 'Description will appear when selecting SearchSegment in the fields dropdown.',
   `entity_name` varchar(255) NOT NULL COMMENT 'Entity for which this set is used.',
-  `field_name` varchar(255) NOT NULL COMMENT 'Field for which this set is used (may include pseudoconstant suffix).',
   `items` text COMMENT 'All items in set',
   PRIMARY KEY (`id`),
   UNIQUE INDEX `UI_name`(name)

@@ -12,6 +12,7 @@
 
 namespace Civi\Api4\Service\Spec\Provider;
 
+use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\SearchSegment;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
@@ -25,7 +26,7 @@ class SearchSegmentExtraFieldProvider implements Generic\SpecProviderInterface {
     foreach (self::getSets($spec->getEntity()) as $fullName => $set) {
       $field = new FieldSpec($fullName, $spec->getEntity());
       $field->setLabel($set['label']);
-      $field->setColumnName($set['field_name']);
+      $field->setColumnName('id');
       $field->setOptions(array_column($set['items'], 'label'));
       $field->setSuffixes(['label']);
       $field->setSqlRenderer([__CLASS__, 'renderSql']);
@@ -65,19 +66,21 @@ class SearchSegmentExtraFieldProvider implements Generic\SpecProviderInterface {
    * Generates the sql case statement with a clause for each item.
    *
    * @param array $field
+   * @param Civi\Api4\Query\Api4SelectQuery $query
    * @return string
    */
-  public static function renderSql(array $field): string {
+  public static function renderSql(array $field, Api4SelectQuery $query): string {
     $set = self::getSets($field['entity'])[$field['name']];
-    $sqlName = $field['sql_name'];
+
+    // Field prefix to use if entity comes from a join
+    $prefix = ($field['explicit_join'] ? $field['explicit_join'] . '.' : '') . ($field['implicit_join'] ? $field['implicit_join'] . '.' : '');
     $cases = [];
     foreach ($set['items'] as $index => $item) {
       $conditions = [];
-      if (isset($item['min'])) {
-        $conditions[] = $sqlName . ' >= ' . (float) $item['min'];
-      }
-      if (isset($item['max'])) {
-        $conditions[] = $sqlName . ' < ' . (float) $item['max'];
+      foreach ($item['when'] ?? [] as $clause) {
+        // Add field prefix
+        $clause[0] = $prefix . $clause[0];
+        $conditions[] = $query->composeClause($clause, 'WHERE', 0);
       }
       // If no conditions, this is the ELSE clause
       if (!$conditions) {
