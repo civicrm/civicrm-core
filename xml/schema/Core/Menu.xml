@@ -163,7 +163,7 @@
     <name>is_public</name>
     <title>Public?</title>
     <type>boolean</type>
-    <default>1</default>
+    <default>0</default>
     <required>true</required>
     <comment>Is this menu accessible to the public?</comment>
     <add>2.1</add>
