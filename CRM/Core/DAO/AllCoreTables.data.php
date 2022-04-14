@@ -367,6 +367,11 @@ return [
     'class' => 'CRM_Core_DAO_UFMatch',
     'table' => 'civicrm_uf_match',
   ],
+  'CRM_Core_DAO_UserJob' => [
+    'name' => 'UserJob',
+    'class' => 'CRM_Core_DAO_UserJob',
+    'table' => 'civicrm_user_job',
+  ],
   'CRM_Core_DAO_Timezone' => [
     'name' => 'Timezone',
     'class' => 'CRM_Core_DAO_Timezone',
