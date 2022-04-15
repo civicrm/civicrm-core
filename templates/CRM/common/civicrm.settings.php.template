@@ -41,9 +41,6 @@ global $civicrm_root, $civicrm_setting, $civicrm_paths;
  * Settings for Drupal 7.x:
  *      define( 'CIVICRM_UF'        , 'Drupal');
  *
- * Settings for Drupal 6.x:
- *      define( 'CIVICRM_UF'        , 'Drupal6');
- *
  * Settings for Joomla 1.7.x - 2.5.x:
  *      define( 'CIVICRM_UF'        , 'Joomla');
  *

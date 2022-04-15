@@ -14,7 +14,6 @@ class CRM_Core_Permission_GenericTest extends CiviUnitTestCase {
     $cases = [];
 
     $cases[] = ['CRM_Core_Permission_Drupal'];
-    $cases[] = ['CRM_Core_Permission_Drupal6'];
     $cases[] = ['CRM_Core_Permission_Joomla'];
     $cases[] = ['CRM_Core_Permission_WordPress'];
 
