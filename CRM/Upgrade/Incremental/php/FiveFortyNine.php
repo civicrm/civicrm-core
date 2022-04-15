@@ -41,14 +41,23 @@ class CRM_Upgrade_Incremental_php_FiveFortyNine extends CRM_Upgrade_Incremental_
       'civicrm_contact_type', 'icon', "varchar(255) DEFAULT NULL COMMENT 'crm-i icon class representing this contact type'"
     );
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add civicrm_option_group.option_value_fields column', 'addColumn',
+      'civicrm_option_group', 'option_value_fields', "varchar(128) DEFAULT \"name,label,description\" COMMENT 'Which optional columns from the option_value table are in use by this group.'");
+    $this->addTask('Populate civicrm_option_group.option_value_fields column', 'fillOptionValueFields');
+  }
+
+  /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_5_49_beta1($rev): void {
     foreach (static::findBooleanColumns() as $tableName => $columns) {
       foreach ($columns as $columnName => $defn) {
         $this->addTask("Update $tableName.$columnName to be NOT NULL", 'changeBooleanColumn', $tableName, $columnName, $defn);
       }
     }
-    $this->addTask('Add civicrm_option_group.option_value_fields column', 'addColumn',
-      'civicrm_option_group', 'option_value_fields', "varchar(128) DEFAULT \"name,label,description\" COMMENT 'Which optional columns from the option_value table are in use by this group.'");
-    $this->addTask('Populate civicrm_option_group.option_value_fields column', 'fillOptionValueFields');
   }
 
   /**
