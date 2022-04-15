@@ -1241,7 +1241,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $form->controller = new CRM_Event_Controller_Registration();
     $form->_params = $params['params'];
     // This happens in buildQuickForm so emulate here.
-    $form->_amount = $form->_totalAmount = CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value('totalAmount', $params));
+    $form->_amount = $form->_totalAmount = $params['totalAmount'] ?? 0;
     $form->set('params', $params['params']);
     $form->_values['custom_pre_id'] = $params['custom_pre_id'] ?? NULL;
     $form->_values['custom_post_id'] = $params['custom_post_id'] ?? NULL;
