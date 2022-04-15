@@ -1410,6 +1410,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'civicrm_uf_match' => [
         0 => 'contact_id',
       ],
+      'civicrm_user_job' => [
+        0 => 'created_id',
+      ],
       'civicrm_value_testgetcidref_1' => [
         0 => 'entity_id',
       ],
