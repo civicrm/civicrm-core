@@ -561,7 +561,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
 
           //passing contribution id is already registered.
-          $contribution = $this->processContribution($this, $value, $result, $contactID, $pending, $this->_paymentProcessor);
+          $contribution = $this->processContribution($value, $result, $contactID, $pending);
           $value['contributionID'] = $contribution->id;
           $value['receive_date'] = $contribution->receive_date;
           $value['trxn_id'] = $contribution->trxn_id;
@@ -876,23 +876,21 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   /**
    * Process the contribution.
    *
-   * @param CRM_Core_Form $form
    * @param array $params
    * @param array $result
    * @param int $contactID
    * @param bool $pending
-   * @param array $paymentProcessor
    *
    * @return \CRM_Contribute_BAO_Contribution
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  protected function processContribution(
-    &$form, $params, $result, $contactID,
-    $pending = FALSE,
-    $paymentProcessor = NULL
+  private function processContribution(
+    $params, $result, $contactID,
+    $pending = FALSE
   ) {
+    $form = $this;
     // Note this used to be shared with the backoffice form & no longer is, some code may no longer be required.
     $transaction = new CRM_Core_Transaction();
 
@@ -920,12 +918,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'campaign_id' => $params['campaign_id'] ?? NULL,
       'card_type_id' => $params['card_type_id'] ?? NULL,
       'pan_truncation' => $params['pan_truncation'] ?? NULL,
+      // The ternary is probably redundant - paymentProcessor should always be set.
+      // For pay-later contributions it will be the pay-later processor.
+      'payment_processor' => $this->_paymentProcessor ? $this->_paymentProcessor['id'] : NULL,
+      'payment_instrument_id' => $this->_paymentProcessor ? $this->_paymentProcessor['payment_instrument_id'] : NULL,
     ];
-
-    if ($paymentProcessor) {
-      $contribParams['payment_instrument_id'] = $paymentProcessor['payment_instrument_id'];
-      $contribParams['payment_processor'] = $paymentProcessor['id'];
-    }
 
     if (!$pending && $result) {
       $contribParams += [
