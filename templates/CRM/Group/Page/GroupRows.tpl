@@ -16,6 +16,6 @@
     {$row.description|mb_truncate:80:"...":true}
     </td>
     <td>{$row.visibility}</td>
-    <td>{$row.action|replace:'xx':$row.id}</td>
+    <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
     </tr>
 {/foreach}
