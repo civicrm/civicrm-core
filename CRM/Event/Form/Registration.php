@@ -293,7 +293,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $this->_paymentProcessorIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, CRM_Utils_Array::value('payment_processor',
           $this->_values['event']
         ));
-        $this->assignPaymentProcessor($isPayLater);
+        $this->assignPaymentProcessor((bool) $isPayLater);
       }
       //init event fee.
       self::initEventFee($this, $this->_eventId);

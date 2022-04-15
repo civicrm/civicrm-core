@@ -154,10 +154,33 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     }
     else {
       $this->_paymentProcessorIDs = [$payment_processor_id];
-      $this->assignPaymentProcessor(FALSE);
+      $this->assignPaymentProcessor();
       CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, FALSE);
     }
     $this->assign('currency', $this->getCurrency());
+  }
+
+  /**
+   * Assign the payment processor to the places is is traditionally assigned to..
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function assignPaymentProcessor() {
+    $this->_paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors([ucfirst($this->_mode) . 'Mode'], $this->_paymentProcessorIDs);
+
+    if (!empty($this->_paymentProcessors)) {
+      foreach ($this->_paymentProcessors as $paymentProcessorDetail) {
+        if (empty($this->_paymentProcessor) && $paymentProcessorDetail['is_default'] == 1 || (count($this->_paymentProcessors) == 1)
+        ) {
+          $this->_paymentProcessor = $paymentProcessorDetail;
+          $this->assign('paymentProcessor', $this->_paymentProcessor);
+          // Setting this is a bit of a legacy overhang.
+          $this->_paymentObject = $paymentProcessorDetail['object'];
+        }
+      }
+      // It's not clear why we set this on the form.
+      $this->set('paymentProcessors', $this->_paymentProcessors);
+    }
   }
 
   /**

@@ -16,7 +16,9 @@
  */
 
 /**
- * This class holds functionality shared between various front end forms.
+ * This class holds functionality shared between contribution and event forms.
+ *
+ * It should not be used by other forms.
  */
 trait CRM_Financial_Form_FrontEndPaymentFormTrait {
 
@@ -200,6 +202,34 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
       $ppKeys = array_keys($paymentProcessors);
       $currentPP = array_pop($ppKeys);
       $this->addElement('hidden', 'payment_processor_id', $currentPP);
+    }
+  }
+
+  /**
+   * Set paymentProcessors on the form and in the template for front end form usage..
+   *
+   * @param bool $isPayLaterEnabled
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function assignPaymentProcessor(bool $isPayLaterEnabled): void {
+    $this->_paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors([ucfirst($this->_mode) . 'Mode'], $this->_paymentProcessorIDs);
+    if ($isPayLaterEnabled) {
+      $this->_paymentProcessors[0] = CRM_Financial_BAO_PaymentProcessor::getPayment(0);
+    }
+
+    if (!empty($this->_paymentProcessors)) {
+      foreach ($this->_paymentProcessors as $paymentProcessorDetail) {
+        if (empty($this->_paymentProcessor) && $paymentProcessorDetail['is_default'] == 1 || (count($this->_paymentProcessors) == 1)
+        ) {
+          $this->_paymentProcessor = $paymentProcessorDetail;
+          $this->assign('paymentProcessor', $this->_paymentProcessor);
+          // Setting this is a bit of a legacy overhang.
+          $this->_paymentObject = $paymentProcessorDetail['object'];
+        }
+      }
+      // It's not clear why we set this on the form.
+      $this->set('paymentProcessors', $this->_paymentProcessors);
     }
   }
 

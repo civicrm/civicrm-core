@@ -874,36 +874,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * This if a front end form function for setting the payment processor.
-   *
-   * It would be good to sync it with the back-end function on abstractEditPayment & use one everywhere.
-   *
-   * @param bool $isPayLaterEnabled
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function assignPaymentProcessor($isPayLaterEnabled) {
-    $this->_paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors([ucfirst($this->_mode) . 'Mode'], $this->_paymentProcessorIDs);
-    if ($isPayLaterEnabled) {
-      $this->_paymentProcessors[0] = CRM_Financial_BAO_PaymentProcessor::getPayment(0);
-    }
-
-    if (!empty($this->_paymentProcessors)) {
-      foreach ($this->_paymentProcessors as $paymentProcessorID => $paymentProcessorDetail) {
-        if (empty($this->_paymentProcessor) && $paymentProcessorDetail['is_default'] == 1 || (count($this->_paymentProcessors) == 1)
-        ) {
-          $this->_paymentProcessor = $paymentProcessorDetail;
-          $this->assign('paymentProcessor', $this->_paymentProcessor);
-          // Setting this is a bit of a legacy overhang.
-          $this->_paymentObject = $paymentProcessorDetail['object'];
-        }
-      }
-      // It's not clear why we set this on the form.
-      $this->set('paymentProcessors', $this->_paymentProcessors);
-    }
-  }
-
-  /**
    * Assign an array of variables to the form/tpl
    *
    * @param array $values Array of [key => value] to assign to the form
