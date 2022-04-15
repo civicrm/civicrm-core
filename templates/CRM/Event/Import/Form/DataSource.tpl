@@ -9,17 +9,17 @@
 *}
 {* Import Wizard - Step 1 (choose data source) *}
 <div class="crm-block crm-form-block crm-import-datasource-form-block">
- {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
- {include file="CRM/common/WizardHeader.tpl"}
+  {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
+  {include file="CRM/common/WizardHeader.tpl"}
+  <div class="help">
+    {ts 1=$importEntity 2= $importEntities}The %1 Import Wizard allows you to easily upload %2 from other applications into CiviCRM.{/ts}
+    {ts}Files to be imported must be in the 'comma-separated-values' format (CSV) and must contain data needed to match an existing contact in your CiviCRM database.{/ts} {help id='upload'}
+  </div>
 
- <div class="help">
-    {ts}The Event Import Wizard allows you to easily upload event participation data such as event registrations from other applications into CiviCRM.{/ts}
-    {ts}Files to be imported must be in the 'comma-separated-values' format (CSV) and must contain data needed to match the participant data to an existing contact in your CiviCRM database.{/ts} {help id='upload'}
- </div>
  <div id="upload-file" class="form-item">
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
    <table class="form-layout">
-        <tr class="crm-event-import-uploadfile-form-block-uploadFile">
+        <tr class="crm-import-uploadfile-form-block-uploadFile">
             <td class="label">{$form.uploadFile.label}</td>
             <td>{$form.uploadFile.html}<br />
                 <span class="description">
@@ -31,7 +31,7 @@
             <td>&nbsp;</td>
       <td>{ts 1=$uploadSize}Maximum Upload File Size: %1 MB{/ts}</td>
         </tr>
-  <tr class="crm-participants-form-block-skipColumnHeader">
+     <tr class="crm-import-uploadfile-from-block-skipColumnHeader">
             <td>&nbsp;</td>
             <td>{$form.skipColumnHeader.html} {$form.skipColumnHeader.label}<br />
                 <span class="description">
@@ -39,7 +39,7 @@
                 </span>
             </td>
   </tr>
-  <tr class="crm-event-import-uploadfile-form-block-contactType">
+  <tr class="crm-import-uploadfile-form-block-contactType">
             <td class="label">{$form.contactType.label}</td>
             <td>{$form.contactType.html}<br />
                 <span class="description">
@@ -48,7 +48,7 @@
                 </span>
             </td>
   </tr>
-  <tr class="crm-event-import-uploadfile-form-block-onDuplicate">
+  <tr class="crm-import-uploadfile-form-block-onDuplicate">
             <td class="label">{$form.onDuplicate.label}</td>
       <td>{$form.onDuplicate.html} {help id="id-onDuplicate"}</td>
         </tr>
@@ -57,11 +57,11 @@
      <td class="label">{$form.fieldSeparator.label} {help id='id-fieldSeparator' file='CRM/Contact/Import/Form/DataSource'}</td>
      <td>{$form.fieldSeparator.html}</td>
    </tr>
-  <tr class="crm-event-import-uploadfile-form-block-date_format">
+  <tr class="crm-import-uploadfile-form-block-date_format">
             {include file="CRM/Core/Date.tpl"}
   </tr>
   {if $savedMapping}
-  <tr class="crm-event-import-uploadfile-form-block-savedMapping">
+  <tr class="crm-import-uploadfile-form-block-savedMapping">
               <td class="label">{$form.savedMapping.label}</td>
               <td><span>{$form.savedMapping.html}</span> </td>
   </tr>
