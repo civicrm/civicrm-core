@@ -723,7 +723,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $statusFieldName,
       $this->_onDuplicate,
       NULL, NULL, FALSE,
-      CRM_Contact_Import_Parser::DEFAULT_TIMEOUT,
+      CRM_Contact_Import_Parser_Contact::DEFAULT_TIMEOUT,
       $this->get('contactSubType'),
       $this->get('dedupe')
     );

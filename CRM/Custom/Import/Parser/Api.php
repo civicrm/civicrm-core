@@ -186,7 +186,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   }
 
   /**
-   * Adapted from CRM_Contact_Import_Parser::formatCommonData
+   * Adapted from CRM_Contact_Import_Parser_Contact::formatCommonData
    *
    * TODO: Is this function even necessary? All values get passed to the api anyway.
    *
