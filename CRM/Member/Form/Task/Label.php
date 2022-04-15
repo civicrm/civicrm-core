@@ -112,6 +112,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
       $memberships = civicrm_api3('membership', 'get', [
         'id' => ['IN' => $this->_memberIds],
         'return' => 'contact_id',
+        'options' => ['limit' => 0],
       ]);
       foreach ($memberships['values'] as $id => $membership) {
         if (isset($rows[$membership['contact_id']])) {
