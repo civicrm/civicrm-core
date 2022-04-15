@@ -8,12 +8,11 @@
  +--------------------------------------------------------------------+
 *}
 
-{* Multi-value Custom Data Import Wizard - Step 1 (upload data file) *}
-{* @var $form Contains the array for the form elements and other form associated information assigned to the template by the controller *}
+{* Import Wizard - Step 1 (choose data source) *}
+<div class="crm-block crm-form-block crm-import-datasource-form-block">
 
-<div class="crm-block crm-form-block crm-custom-import-uploadfile-form-block">
- {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
- {include file="CRM/common/WizardHeader.tpl"}
+  {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
+  {include file="CRM/common/WizardHeader.tpl"}
  {if !$fieldGroups}
   <div class="messages warning no-popup">
     {ts}This import screen cannot be used because there are no Multi-value custom data groups.{/ts}
