@@ -547,10 +547,7 @@ class CRM_Core_ManagedEntities {
         $declarations = array_merge($declarations, $component->getManagedEntities());
       }
     }
-    // Ideally, given a $moduleName like 'org.foo.demo' we'd just call the function `demo_civicrm_managed()`
-    // But alas, that only works with old-style hooks and not the event dispatcher.
-    // So here we go loading declarations from every module whether we need them or not.
-    CRM_Utils_Hook::managed($declarations);
+    CRM_Utils_Hook::managed($declarations, $modules);
     $this->validate($declarations);
     $this->setDeclarations($declarations);
   }
