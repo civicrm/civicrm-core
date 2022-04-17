@@ -183,6 +183,8 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
       'dateFormats' => $this->exportValue('dateFormats'),
       'savedMapping' => $this->exportValue('savedMapping'),
     ];
+    $this->set('dataSource', $this->getSubmittedValue('dataSource'));
+    $this->set('skipColumnHeader', $this->getSubmittedValue('skipColumnHeader'));
 
     foreach ($storeParams as $storeName => $value) {
       $this->set($storeName, $value);
