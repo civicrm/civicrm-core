@@ -19,9 +19,12 @@
         api_params: {
           version: 4,
           select: [
+            'id',
             'label',
             'description',
+            'entity_name',
             'entity_name:label',
+            'CONCAT("segment_", name) AS field_name',
             'items'
           ],
           join: [],
@@ -41,6 +44,9 @@
           {start: ts('Deleting...'), success: ts('Segment Deleted')},
           row
         );
+        // Delete field from metadata
+        var entity = searchMeta.getEntity(row.data.entity_name);
+        _.remove(entity.fields, {name: row.data.field_name});
       };
 
       function buildDisplaySettings() {
@@ -52,19 +58,17 @@
             actions: false,
             classes: ['table', 'table-striped'],
             sort: [['label', 'ASC']],
+            // Do not make columns editable because it would require a metadata refresh
             columns: [
               {
                 key: 'label',
                 label: ts('Label'),
-                title: ts('Edit Label'),
-                type: 'field',
-                editable: true
+                type: 'field'
               },
               {
                 key: 'description',
                 label: ts('Description'),
-                type: 'field',
-                editable: true
+                type: 'field'
               },
               {
                 key: 'entity_name:label',

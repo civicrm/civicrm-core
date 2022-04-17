@@ -8,7 +8,9 @@
     templateUrl: '~/crmSearchAdmin/searchSegment/crmSearchAdminSegment.html',
     controller: function ($scope, searchMeta, dialogService, crmApi4, crmStatus, formatForSelect2) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        ctrl = this;
+        ctrl = this,
+        originalEntity,
+        originalField;
 
       this.entitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect();
 
@@ -37,6 +39,8 @@
             where: [['id', '=', ctrl.segmentId]]
           }, 0).then(function(segment) {
             ctrl.segment = segment;
+            originalEntity = segment.entity_name;
+            originalField = 'segment_' + segment.name;
             searchMeta.loadFieldOptions([segment.entity_name]);
             $('.ui-dialog:visible').unblock();
           });
@@ -88,8 +92,28 @@
 
       this.save = function() {
         crmStatus({}, crmApi4('SearchSegment', 'save', {
-          records: [ctrl.segment]
-        })).then(function() {
+          records: [ctrl.segment],
+          chain: {
+            fields: [ctrl.segment.entity_name, 'getFields', {
+              loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
+              where: [['type', '=', 'Extra'], ['name', 'LIKE', 'segment_%']]
+            }]
+          }
+        }, 0)).then(function(saved) {
+          // If entity changed, remove field from orignal entity
+          if (originalEntity) {
+            _.remove(searchMeta.getEntity(originalEntity).fields, {name: originalField});
+          }
+          // Refresh all segment fields in this entity
+          var entity = searchMeta.getEntity(ctrl.segment.entity_name);
+          _.remove(entity.fields, function(field) {
+            return field.name.indexOf('segment_') === 0;
+          });
+          _.each(saved.fields, function(field) {
+            field.fieldName = field.name;
+            entity.fields.push(field);
+          });
+          entity.fields = _.sortBy(entity.fields, 'label');
           dialogService.close('searchSegmentDialog');
         });
       };
