@@ -228,7 +228,7 @@ class CRM_Contact_Import_ImportJob {
       $this->_statusID,
       $this->_totalRowCount,
       $this->_doGeocodeAddress,
-      CRM_Contact_Import_Parser::DEFAULT_TIMEOUT,
+      CRM_Contact_Import_Parser_Contact::DEFAULT_TIMEOUT,
       $this->_contactSubType,
       $this->_dedupe
     );

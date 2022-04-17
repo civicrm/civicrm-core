@@ -38,11 +38,11 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
     $mismatchCount = $this->get('unMatchCount');
     $unparsedAddressCount = $this->get('unparsedAddressCount');
     if ($duplicateRowCount > 0) {
-      $urlParams = 'type=' . CRM_Import_Parser::DUPLICATE . '&parser=CRM_Contact_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::DUPLICATE . '&parser=CRM_Contact_Import_Parser_Contact';
       $this->set('downloadDuplicateRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
     elseif ($mismatchCount) {
-      $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . '&parser=CRM_Contact_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . '&parser=CRM_Contact_Import_Parser_Contact';
       $this->set('downloadMismatchRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
     else {
@@ -50,7 +50,7 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
       $this->set('duplicateRowCount', $duplicateRowCount);
     }
     if ($unparsedAddressCount) {
-      $urlParams = 'type=' . CRM_Import_Parser::UNPARSED_ADDRESS_WARNING . '&parser=CRM_Contact_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::UNPARSED_ADDRESS_WARNING . '&parser=CRM_Contact_Import_Parser_Contact';
       $this->assign('downloadAddressRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
       $unparsedStreetAddressString = ts('Records imported successfully but unable to parse some of the street addresses');
       $this->assign('unparsedStreetAddressString', $unparsedStreetAddressString);

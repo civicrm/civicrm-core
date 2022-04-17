@@ -234,7 +234,7 @@ abstract class CRM_Custom_Import_Parser extends CRM_Import_Parser {
           ts('Reason'),
         ], $customHeaders);
         $this->_errorFileName = self::errorFileName(self::ERROR);
-        CRM_Contact_Import_Parser::exportCSV($this->_errorFileName, $headers, $this->_errors);
+        CRM_Contact_Import_Parser_Contact::exportCSV($this->_errorFileName, $headers, $this->_errors);
       }
       if ($this->_conflictCount) {
         $headers = array_merge([
@@ -242,7 +242,7 @@ abstract class CRM_Custom_Import_Parser extends CRM_Import_Parser {
           ts('Reason'),
         ], $customHeaders);
         $this->_conflictFileName = self::errorFileName(self::CONFLICT);
-        CRM_Contact_Import_Parser::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
+        CRM_Contact_Import_Parser_Contact::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
       }
       if ($this->_duplicateCount) {
         $headers = array_merge([
@@ -251,7 +251,7 @@ abstract class CRM_Custom_Import_Parser extends CRM_Import_Parser {
         ], $customHeaders);
 
         $this->_duplicateFileName = self::errorFileName(self::DUPLICATE);
-        CRM_Contact_Import_Parser::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
+        CRM_Contact_Import_Parser_Contact::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
       }
     }
     return $this->fini();
