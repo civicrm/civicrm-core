@@ -18,13 +18,11 @@
 /**
  * This class delegates to the chosen DataSource to grab the data to be imported.
  */
-class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
+class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
 
   private $_dataSource;
 
   private $_dataSourceIsValid = FALSE;
-
-  private $_dataSourceClassFile;
 
   private $_dataSourceClass;
 
@@ -97,12 +95,12 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
       $this->assign('showOnlyDataSourceFormPane', TRUE);
     }
 
-    $dataSources = $this->_getDataSources();
+    $dataSources = $this->getDataSources();
     if ($this->_dataSource && isset($dataSources[$this->_dataSource])) {
       $this->_dataSourceIsValid = TRUE;
       $this->assign('showDataSourceFormPane', TRUE);
       $dataSourcePath = explode('_', $this->_dataSource);
-      $templateFile = 'CRM/Contact/Import/Form/' . $dataSourcePath[3] . ".tpl";
+      $templateFile = 'CRM/Contact/Import/Form/' . $dataSourcePath[3] . '.tpl';
     }
     elseif ($this->_dataSource) {
       $this->invalidConfig('Invalid data source');
@@ -124,13 +122,10 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
       $this->_dataSourceClass->buildQuickForm($this);
     }
 
-    // Get list of data sources and display them as options
-    $dataSources = $this->_getDataSources();
-
     $this->assign('urlPath', "civicrm/import");
     $this->assign('urlPathVar', 'snippet=4');
 
-    $this->add('select', 'dataSource', ts('Data Source'), $dataSources, TRUE,
+    $this->add('select', 'dataSource', ts('Data Source'), $this->getDataSources(), TRUE,
       ['onchange' => 'buildDataSourceFormBlock(this.value);']
     );
 
@@ -219,48 +214,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     }
 
     return $defaults;
-  }
-
-  /**
-   * @return array
-   * @throws Exception
-   */
-  private function _getDataSources() {
-    // Hmm... file-system scanners don't really belong in forms...
-    if (isset(Civi::$statics[__CLASS__]['datasources'])) {
-      return Civi::$statics[__CLASS__]['datasources'];
-    }
-
-    // Open the data source dir and scan it for class files
-    global $civicrm_root;
-    $dataSourceDir = $civicrm_root . DIRECTORY_SEPARATOR . 'CRM' . DIRECTORY_SEPARATOR . 'Import' . DIRECTORY_SEPARATOR . 'DataSource' . DIRECTORY_SEPARATOR;
-    $dataSources = [];
-    if (!is_dir($dataSourceDir)) {
-      $this->invalidConfig("Import DataSource directory $dataSourceDir does not exist");
-    }
-    if (!$dataSourceHandle = opendir($dataSourceDir)) {
-      $this->invalidConfig("Unable to access DataSource directory $dataSourceDir");
-    }
-
-    while (($dataSourceFile = readdir($dataSourceHandle)) !== FALSE) {
-      $fileType = filetype($dataSourceDir . $dataSourceFile);
-      $matches = [];
-      if (($fileType === 'file' || $fileType === 'link') &&
-        preg_match('/^(.+)\.php$/', $dataSourceFile, $matches)
-      ) {
-        $dataSourceClass = "CRM_Import_DataSource_" . $matches[1];
-        require_once $dataSourceDir . DIRECTORY_SEPARATOR . $dataSourceFile;
-        $object = new $dataSourceClass();
-        $info = $object->getInfo();
-        if ($object->checkPermission()) {
-          $dataSources[$dataSourceClass] = $info['title'];
-        }
-      }
-    }
-    closedir($dataSourceHandle);
-
-    Civi::$statics[__CLASS__]['datasources'] = $dataSources;
-    return $dataSources;
   }
 
   /**

@@ -42,4 +42,28 @@ class CRM_Import_Forms extends CRM_Core_Form {
 
   }
 
+  /**
+   * Get the available datasource.
+   *
+   * Permission dependent, this will look like
+   * [
+   *   'CRM_Import_DataSource_CSV' => 'Comma-Separated Values (CSV)',
+   *   'CRM_Import_DataSource_SQL' => 'SQL Query',
+   * ]
+   *
+   * The label is translated.
+   *
+   * @return array
+   */
+  protected function getDataSources(): array {
+    $dataSources = [];
+    foreach (['CRM_Import_DataSource_SQL', 'CRM_Import_DataSource_CSV'] as $dataSourceClass) {
+      $object = new $dataSourceClass();
+      if ($object->checkPermission()) {
+        $dataSources[$dataSourceClass] = $object->getInfo()['title'];
+      }
+    }
+    return $dataSources;
+  }
+
 }

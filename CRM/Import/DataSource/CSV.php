@@ -24,7 +24,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * @return array
    *   collection of info about this data source
    */
-  public function getInfo() {
+  public function getInfo(): array {
     return ['title' => ts('Comma-Separated Values (CSV)')];
   }
 
