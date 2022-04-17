@@ -20,25 +20,9 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    * @param array $fileData
    *
    * @dataProvider getCsvFiles
-   * @throws \CRM_Core_Exception
    */
-  public function testToCsv(array $fileData) {
-    $dataSource = new CRM_Import_DataSource_CSV();
-    $params = [
-      'uploadFile' => [
-        'name' => __DIR__ . '/' . $fileData['filename'],
-      ],
-      'skipColumnHeader' => TRUE,
-    ];
-
-    // Get the PEAR::DB object
-    $dao = new CRM_Core_DAO();
-    $db = $dao->getDatabaseConnection();
-
-    $form = new CRM_Contact_Import_Form_DataSource();
-    $form->controller = new CRM_Contact_Import_Controller();
-
-    $dataSource->postProcess($params, $db, $form);
+  public function testToCsv(array $fileData): void {
+    $form = $this->submitDatasourceForm($fileData['filename']);
     $tableName = $form->get('importTableName');
     foreach (['first_name', 'last_name', 'email'] as $field) {
       $json = json_encode(CRM_Core_DAO::singleValueQuery("SELECT $field FROM $tableName"));
@@ -52,7 +36,7 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getCsvFiles() {
+  public function getCsvFiles(): array {
     return [
       // import.csv is utf8-encoded, with no BOM
       [
@@ -95,17 +79,20 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test the trim function
+   * Test the trim function.
+   *
    * @dataProvider trimDataProvider
+   *
    * @param string $input
    * @param string $expected
    */
-  public function testTrim(string $input, string $expected) {
+  public function testTrim(string $input, string $expected): void {
     $this->assertSame($expected, CRM_Import_DataSource_CSV::trimNonBreakingSpaces($input));
   }
 
   /**
-   * Dataprovider for testTrim
+   * DataProvider for testTrim.
+   *
    * @return array
    */
   public function trimDataProvider(): array {
@@ -132,27 +119,33 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    * skipped because of some checking for column-count matches in the import,
    * and so you don't hit the current fail.
    */
-  public function testBlankLineAtEnd() {
-    $dataSource = new CRM_Import_DataSource_CSV();
-    $params = [
-      'uploadFile' => [
-        'name' => __DIR__ . '/blankLineAtEnd.csv',
-      ],
-      'skipColumnHeader' => TRUE,
-    ];
-
-    // Get the PEAR::DB object
-    $dao = new CRM_Core_DAO();
-    $db = $dao->getDatabaseConnection();
-
-    $form = new CRM_Contact_Import_Form_DataSource();
-    $form->controller = new CRM_Contact_Import_Controller();
-
-    $dataSource->postProcess($params, $db, $form);
+  public function testBlankLineAtEnd(): void {
+    $form = $this->submitDatasourceForm('blankLineAtEnd.csv');
     $tableName = $form->get('importTableName');
     $json = json_encode(CRM_Core_DAO::singleValueQuery("SELECT email FROM $tableName"));
     $this->assertEquals('"yogi@yellowstone.park"', $json);
     CRM_Core_DAO::executeQuery("DROP TABLE $tableName");
+  }
+
+  /**
+   * Test submitting the datasource form.
+   *
+   * @param string $csvFileName
+   *
+   * @return \CRM_Contact_Import_Form_DataSource
+   */
+  protected function submitDatasourceForm(string $csvFileName): CRM_Contact_Import_Form_DataSource {
+    $_GET['dataSource'] = 'CRM_Import_DataSource_CSV';
+    /* @var CRM_Contact_Import_Form_DataSource $form */
+    $form = $this->getFormObject('CRM_Contact_Import_Form_DataSource', [
+      'uploadFile' => [
+        'name' => __DIR__ . '/' . $csvFileName,
+      ],
+      'skipColumnHeader' => TRUE,
+    ]);
+    $form->buildForm();
+    $form->postProcess();
+    return $form;
   }
 
 }
