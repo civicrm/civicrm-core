@@ -126,6 +126,8 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
 
   /**
    * Get the id of the employee relationship, checking it is valid.
+   * We check that contact_type_a is Individual, but not contact_type_b because there's
+   * nowhere in the code that requires it to be Organization.
    *
    * @return int|string
    *
@@ -137,7 +139,6 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
         $relationship = RelationshipType::get(FALSE)
           ->addWhere('name_a_b', '=', 'Employee of')
           ->addWhere('contact_type_a', '=', 'Individual')
-          ->addWhere('contact_type_b', '=', 'Organization')
           ->addSelect('id')->execute()->first();
         if (empty($relationship)) {
           throw new API_Exception('no valid relationship');
