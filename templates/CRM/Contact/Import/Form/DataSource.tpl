@@ -9,9 +9,6 @@
 *}
 
 <div class="crm-block crm-form-block crm-import-datasource-form-block">
-{if $showOnlyDataSourceFormPane}
-  {include file=$dataSourceFormTemplateFile}
-{else}
   {* Import Wizard - Step 1 (choose data source) *}
   {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
   {include file="CRM/common/WizardHeader.tpl"}
@@ -31,9 +28,6 @@
 
   {* Data source form pane is injected here when the data source is selected. *}
   <div id="data-source-form-block">
-    {if $dataSourceFormTemplateFile}
-      {include file=$dataSourceFormTemplateFile}
-    {/if}
   </div>
 
   <div id="common-form-controls" class="form-item">
@@ -178,5 +172,5 @@
 
     </script>
   {/literal}
-{/if}
+
 </div>
