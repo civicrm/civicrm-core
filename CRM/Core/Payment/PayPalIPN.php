@@ -194,14 +194,14 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     if (!$recur) {
-      if ($contribution->total_amount != $input['amount']) {
+      if ($contribution->total_amount != $input['total_amount']) {
         Civi::log()->debug('PayPalIPN: Amount values dont match between database and IPN request. (ID: ' . $contribution->id . ').');
         echo "Failure: Amount values dont match between database and IPN request<p>";
         return;
       }
     }
     else {
-      $contribution->total_amount = $input['amount'];
+      $contribution->total_amount = $input['total_amount'];
     }
 
     // check if contribution is already completed, if so we ignore this ipn
@@ -304,7 +304,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     $billingID = CRM_Core_BAO_LocationType::getBilling();
     $input['paymentStatus'] = $this->retrieve('payment_status', 'String', FALSE);
     $input['invoice'] = $this->retrieve('invoice', 'String', TRUE);
-    $input['amount'] = $this->retrieve('mc_gross', 'Money', FALSE);
     $input['total_amount'] = $this->retrieve('mc_gross', 'Money', FALSE);
     $input['reasonCode'] = $this->retrieve('ReasonCode', 'String', FALSE);
 
