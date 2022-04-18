@@ -93,7 +93,7 @@ abstract class CRM_Custom_Import_Parser extends CRM_Import_Parser {
       return FALSE;
     }
 
-    $this->_lineCount = $this->_warningCount = 0;
+    $this->_lineCount = 0;
     $this->_invalidRowCount = $this->_validCount = 0;
     $this->_totalCount = $this->_conflictCount = 0;
 
@@ -161,13 +161,6 @@ abstract class CRM_Custom_Import_Parser extends CRM_Import_Parser {
         if ($mode == self::MODE_MAPFIELD) {
           $this->_rows[] = $values;
           $this->_activeFieldCount = max($this->_activeFieldCount, count($values));
-        }
-      }
-
-      if ($returnCode & self::WARNING) {
-        $this->_warningCount++;
-        if ($this->_warningCount < $this->_maxWarningCount) {
-          $this->_warnings[] = $this->_lineCount;
         }
       }
 

@@ -97,12 +97,6 @@ abstract class CRM_Import_Parser {
   protected $_duplicates;
 
   /**
-   * Running total number of warnings
-   * @var int
-   */
-  protected $_warningCount;
-
-  /**
    * Maximum number of warnings to store
    * @var int
    */

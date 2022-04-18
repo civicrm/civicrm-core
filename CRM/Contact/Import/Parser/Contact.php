@@ -282,6 +282,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *
    * @return bool
    *   the result of this processing
+   *   CRM_Import_Parser::ERROR or CRM_Import_Parser::VALID
    */
   public function preview(&$values) {
     return $this->summary($values);
@@ -295,6 +296,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *
    * @return bool
    *   the result of this processing
+   *   CRM_Import_Parser::ERROR or CRM_Import_Parser::VALID
    */
   public function summary(&$values): int {
     $erroneousField = NULL;
@@ -2605,7 +2607,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     $this->init();
 
-    $this->_rowCount = $this->_warningCount = 0;
+    $this->_rowCount = 0;
     $this->_invalidRowCount = $this->_validCount = 0;
     $this->_totalCount = $this->_conflictCount = 0;
 
@@ -2687,13 +2689,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         if ($mode == self::MODE_MAPFIELD) {
           $this->_rows[] = $values;
           $this->_activeFieldCount = max($this->_activeFieldCount, count($values));
-        }
-      }
-
-      if ($returnCode & self::WARNING) {
-        $this->_warningCount++;
-        if ($this->_warningCount < $this->_maxWarningCount) {
-          $this->_warningCount[] = $line;
         }
       }
 

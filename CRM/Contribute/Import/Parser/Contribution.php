@@ -189,7 +189,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       return FALSE;
     }
 
-    $this->_lineCount = $this->_warningCount = $this->_validSoftCreditRowCount = $this->_validPledgePaymentRowCount = 0;
+    $this->_lineCount = $this->_validSoftCreditRowCount = $this->_validPledgePaymentRowCount = 0;
     $this->_invalidRowCount = $this->_validCount = $this->_invalidSoftCreditRowCount = $this->_invalidPledgePaymentRowCount = 0;
     $this->_totalCount = $this->_conflictCount = 0;
 
@@ -284,13 +284,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         if ($mode == self::MODE_MAPFIELD) {
           $this->_rows[] = $values;
           $this->_activeFieldCount = max($this->_activeFieldCount, count($values));
-        }
-      }
-
-      if ($returnCode == self::WARNING) {
-        $this->_warningCount++;
-        if ($this->_warningCount < $this->_maxWarningCount) {
-          $this->_warningCount[] = $line;
         }
       }
 
