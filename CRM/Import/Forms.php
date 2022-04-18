@@ -96,7 +96,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getDataSourceClassName(): ?string {
+  protected function getDataSourceClassName(): string {
     $className = CRM_Utils_Request::retrieveValue(
       'dataSource',
       'String'
