@@ -63,7 +63,7 @@ class Civi {
   /**
    * Get the event dispatcher.
    *
-   * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   * @return \Civi\Core\CiviEventDispatcherInterface
    */
   public static function dispatcher() {
     // NOTE: The dispatcher object is initially created as a boot service
