@@ -418,7 +418,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
       }
     }
-    return $this->fini();
   }
 
   /**
@@ -1109,12 +1108,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    */
   public function &getImportedContributions() {
     return $this->_newContributions;
-  }
-
-  /**
-   * The initializer code, called before the processing.
-   */
-  public function fini() {
   }
 
   /**

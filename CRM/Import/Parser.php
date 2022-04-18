@@ -213,40 +213,6 @@ abstract class CRM_Import_Parser {
   }
 
   /**
-   * Abstract function definitions.
-   */
-  abstract protected function init();
-
-  /**
-   * @return mixed
-   */
-  abstract protected function fini();
-
-  /**
-   * Preview.
-   *
-   * @param array $values
-   *
-   * @return mixed
-   */
-  abstract protected function preview(&$values);
-
-  /**
-   * @param $values
-   *
-   * @return mixed
-   */
-  abstract protected function summary(&$values);
-
-  /**
-   * @param $onDuplicate
-   * @param $values
-   *
-   * @return mixed
-   */
-  abstract protected function import($onDuplicate, &$values);
-
-  /**
    * Set and validate field values.
    *
    * @param array $elements

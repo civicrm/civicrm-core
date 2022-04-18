@@ -492,14 +492,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
   }
 
   /**
-   * The initializer code, called before the processing
-   *
-   * @return void
-   */
-  public function fini() {
-  }
-
-  /**
    * Format values
    *
    * @todo lots of tidy up needed here - very old function relocated.
@@ -930,7 +922,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
       }
     }
-    return $this->fini();
   }
 
   /**

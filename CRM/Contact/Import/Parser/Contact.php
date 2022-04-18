@@ -1307,12 +1307,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * The initializer code, called before the processing.
-   */
-  public function fini() {
-  }
-
-  /**
    * Check if an error in custom data.
    *
    * @param array $params
@@ -2788,8 +2782,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         self::exportCSV($this->_errorFileName, $headers, $this->_unparsedAddresses);
       }
     }
-    //echo "$this->_totalCount,$this->_invalidRowCount,$this->_conflictCount,$this->_duplicateCount";
-    return $this->fini();
   }
 
   /**
