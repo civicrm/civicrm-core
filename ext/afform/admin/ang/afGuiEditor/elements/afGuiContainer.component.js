@@ -46,9 +46,12 @@
         connectWith: '[ui-sortable]',
         cancel: 'input,textarea,button,select,option,a,.dropdown-menu',
         placeholder: 'af-gui-dropzone',
-        tolerance: 'pointer',
         scrollSpeed: 8,
-        containment: '#afGuiEditor-canvas-body'
+        containment: '#afGuiEditor-canvas-body',
+        helper: function(e, $el) {
+          // Prevent draggable item from being too large for the drop zones.
+          return $el.clone().css({width: '50px', height: '20px'});
+        }
       };
 
       $scope.isSelectedFieldset = function(entityName) {

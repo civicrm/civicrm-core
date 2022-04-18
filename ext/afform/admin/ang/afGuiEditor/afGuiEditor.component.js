@@ -370,15 +370,17 @@
       this.getSortableOptions = function(entityName) {
         if (!sortableOptions[entityName + '']) {
           sortableOptions[entityName + ''] = {
-            helper: 'clone',
             appendTo: '#afGuiEditor-canvas-body > af-gui-container',
             containment: '#afGuiEditor-canvas-body',
             update: editor.onDrop,
             items: '> div:not(.disabled)',
             connectWith: '#afGuiEditor-canvas ' + (entityName ? '[data-entity="' + entityName + '"] > ' : '') + '[ui-sortable]',
             placeholder: 'af-gui-dropzone',
-            tolerance: 'pointer',
-            scrollSpeed: 8
+            scrollSpeed: 8,
+            helper: function(e, $el) {
+              // Prevent draggable item from being too large for the drop zones.
+              return $el.clone().css({width: '50px', height: '20px'});
+            }
           };
         }
         return sortableOptions[entityName + ''];
