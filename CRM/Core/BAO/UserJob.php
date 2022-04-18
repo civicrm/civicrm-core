@@ -21,6 +21,22 @@
 class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob {
 
   /**
+   * Restrict access to the relevant user.
+   *
+   * Note that it is likely we might want to permit other users such as
+   * sysadmins to access other people's user_jobs in future but it has been
+   * kept tightly restricted for initial simplicity (ie do we want to
+   * use an existing permission? a new permission ? do they require
+   * 'view all contacts' etc.
+   *
+   * @inheritDoc
+   */
+  public function addSelectWhereClause(): array {
+    $clauses['created_id'] = '= ' . (int) CRM_Core_Session::getLoggedInContactID();
+    return $clauses;
+  }
+
+  /**
    * Get the statuses for Import Jobs.
    *
    * @return array

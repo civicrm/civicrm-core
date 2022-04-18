@@ -1543,6 +1543,18 @@ class CRM_Core_Permission {
     $permissions['option_value'] = $permissions['uf_group'];
     $permissions['option_group'] = $permissions['option_value'];
 
+    // User Job permissions - we access these using acls on the get action.
+    // For create it probably makes sense (at least initially) to be stricter
+    // as the forms doing the work can set the permission check to FALSE.
+    $permissions['user_job'] = [
+      'get' => [
+        'access CiviCRM',
+      ],
+      'default' => [
+        'administer CiviCRM',
+      ],
+    ];
+
     $permissions['custom_value'] = [
       'gettree' => ['access CiviCRM'],
     ];
