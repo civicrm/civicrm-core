@@ -263,18 +263,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Handle the values in mapField mode.
-   *
-   * @param array $values
-   *   The array of values belonging to this line.
-   *
-   * @return bool
-   */
-  public function mapField(&$values) {
-    return CRM_Import_Parser::VALID;
-  }
-
-  /**
    * Handle the values in preview mode.
    *
    * @param array $values
@@ -2662,7 +2650,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $this->_totalCount++;
 
       if ($mode == self::MODE_MAPFIELD) {
-        $returnCode = $this->mapField($values);
+        $returnCode = CRM_Import_Parser::VALID;
       }
       elseif ($mode == self::MODE_PREVIEW) {
         $returnCode = $this->preview($values);

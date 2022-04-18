@@ -223,15 +223,6 @@ abstract class CRM_Import_Parser {
   abstract protected function fini();
 
   /**
-   * Map field.
-   *
-   * @param array $values
-   *
-   * @return mixed
-   */
-  abstract protected function mapField(&$values);
-
-  /**
    * Preview.
    *
    * @param array $values
