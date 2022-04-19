@@ -17,7 +17,7 @@ namespace Civi\Core\Event;
  *
  * The QueryEvent fires whenever a SQL query is executed.
  */
-class QueryEvent extends \Symfony\Component\EventDispatcher\Event {
+class QueryEvent extends GenericHookEvent {
 
   /**
    * @var string
