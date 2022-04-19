@@ -21,6 +21,7 @@ namespace api\v4\Entity;
 use api\v4\UnitTestCase;
 use Civi\Api4\Domain;
 use Civi\Api4\Group;
+use Civi\Api4\Managed;
 use Civi\Api4\Navigation;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\OptionValue;
@@ -82,7 +83,7 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
       ],
     ];
 
-    \CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+    Managed::reconcile(FALSE)->addModule('civicrm')->execute();
 
     $search = SavedSearch::get(FALSE)
       ->addWhere('name', '=', 'TestManagedSavedSearch')
