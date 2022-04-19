@@ -5,7 +5,7 @@
  */
 class CRM_Custom_Import_Form_Preview extends CRM_Import_Form_Preview {
   public $_parser = 'CRM_Custom_Import_Parser_Api';
-  protected $_importParserUrl = '&parser=CRM_Custom_Import_Parser';
+  protected $_importParserUrl = '&parser=CRM_Custom_Import_Parser_Api';
 
   /**
    * Set variables up before form is built.
