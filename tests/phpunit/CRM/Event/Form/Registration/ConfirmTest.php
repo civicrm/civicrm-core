@@ -110,7 +110,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'contributeMode' => 'direct',
       'registerByID' => $individualID,
       'paymentProcessorObj' => CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID),
-      'totalAmount' => $this->formatMoneyInput(8000.67),
+      'totalAmount' => 8000.67,
       'params' => [
         [
           'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
