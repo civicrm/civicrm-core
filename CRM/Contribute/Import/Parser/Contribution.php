@@ -886,13 +886,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       return CRM_Import_Parser::ERROR;
     }
 
-    if ($onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE) {
-      $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($formatted,
-        NULL,
-        'Contribution'
-      );
-    }
-    else {
+    if ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
       //fix for CRM-2219 - Update Contribution
       // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
       if (!empty($paramValues['invoice_id']) || !empty($paramValues['trxn_id']) || !empty($paramValues['contribution_id'])) {
@@ -901,15 +895,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           'trxn_id' => $paramValues['trxn_id'] ?? NULL,
           'invoice_id' => $paramValues['invoice_id'] ?? NULL,
         ];
-
         $ids['contribution'] = CRM_Contribute_BAO_Contribution::checkDuplicateIds($dupeIds);
 
         if ($ids['contribution']) {
           $formatted['id'] = $ids['contribution'];
-          $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($formatted,
-            $formatted['id'],
-            'Contribution'
-          );
           //process note
           if (!empty($paramValues['note'])) {
             $noteID = [];
@@ -953,8 +942,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           }
 
           $formatted['id'] = $ids['contribution'];
-          $newContribution = CRM_Contribute_BAO_Contribution::create($formatted);
-          $this->_newContributions[] = $newContribution->id;
+
+          $newContribution = civicrm_api3('contribution', 'create', $formatted);
+          $this->_newContributions[] = $newContribution['id'];
 
           //return soft valid since we need to show how soft credits were added
           if (!empty($formatted['soft_credit'])) {
