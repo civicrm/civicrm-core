@@ -746,8 +746,8 @@ abstract class CRM_Utils_Hook {
       'civicrm_managed'
     );
     if ($modules) {
-      $entities = array_filter($entities, function($decl) use ($modules) {
-        return in_array($decl['module'], $modules, TRUE);
+      $entities = array_filter($entities, function($entity) use ($modules) {
+        return in_array($entity['module'], $modules, TRUE);
       });
     }
   }
