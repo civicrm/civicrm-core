@@ -29,13 +29,6 @@ class CRM_Core_ManagedEntities {
   protected $moduleIndex;
 
   /**
-   * Plan for what to do with each managed entity.
-   *
-   * @var array
-   */
-  protected $plan = [];
-
-  /**
    * @var array
    *   List of all entity declarations.
    * @see CRM_Utils_Hook::managed()
@@ -122,8 +115,8 @@ class CRM_Core_ManagedEntities {
   public function reconcile($modules = NULL) {
     $modules = $modules ? (array) $modules : NULL;
     $this->loadDeclarations($modules);
-    $this->createPlan($modules);
-    $this->reconcileEntities();
+    $plan = $this->createPlan($modules);
+    $this->reconcileEntities($plan);
   }
 
   /**
@@ -150,19 +143,21 @@ class CRM_Core_ManagedEntities {
 
   /**
    * Take appropriate action on every managed entity.
+   *
+   * @param array[] $plan
    */
-  private function reconcileEntities(): void {
-    foreach ($this->getManagedAction('update') as $item) {
+  private function reconcileEntities(array $plan): void {
+    foreach ($this->filterPlanByAction($plan, 'update') as $item) {
       $this->updateExistingEntity($item);
     }
     // reverse-order so that child entities are cleaned up before their parents
-    foreach (array_reverse($this->getManagedAction('delete')) as $item) {
+    foreach (array_reverse($this->filterPlanByAction($plan, 'delete')) as $item) {
       $this->removeStaleEntity($item);
     }
-    foreach ($this->getManagedAction('create') as $item) {
+    foreach ($this->filterPlanByAction($plan, 'create') as $item) {
       $this->insertNewEntity($item);
     }
-    foreach ($this->getManagedAction('disable') as $item) {
+    foreach ($this->filterPlanByAction($plan, 'disable') as $item) {
       $this->disableEntity($item);
     }
   }
@@ -170,12 +165,13 @@ class CRM_Core_ManagedEntities {
   /**
    * Get the managed entities that fit the criteria.
    *
+   * @param array[] $plan
    * @param string $action
    *
    * @return array
    */
-  private function getManagedAction(string $action): array {
-    return CRM_Utils_Array::findAll($this->plan, ['managed_action' => $action]);
+  private function filterPlanByAction(array $plan, string $action): array {
+    return CRM_Utils_Array::findAll($thisplan, ['managed_action' => $action]);
   }
 
   /**
@@ -556,29 +552,30 @@ class CRM_Core_ManagedEntities {
    * Builds $this->managedActions array
    *
    * @param array|null $modules
+   * @return array[]
    */
-  protected function createPlan($modules = NULL): void {
+  protected function createPlan($modules = NULL): array {
     $where = $modules ? [['module', 'IN', $modules]] : [];
     $managedEntities = Managed::get(FALSE)
       ->setWhere($where)
       ->execute();
-    $this->plan = [];
+    $plan = [];
     foreach ($managedEntities as $managedEntity) {
       $key = "{$managedEntity['module']}_{$managedEntity['name']}_{$managedEntity['entity_type']}";
       // Set to disable or delete if module is disabled or missing - it will be overwritten below module is active.
       $action = $this->isModuleDisabled($managedEntity['module']) ? 'disable' : 'delete';
-      $this->plan[$key] = array_merge($managedEntity, ['managed_action' => $action]);
+      $plan[$key] = array_merge($managedEntity, ['managed_action' => $action]);
     }
     foreach ($this->declarations as $declaration) {
       $key = "{$declaration['module']}_{$declaration['name']}_{$declaration['entity']}";
-      if (isset($this->plan[$key])) {
-        $this->plan[$key]['params'] = $declaration['params'];
-        $this->plan[$key]['managed_action'] = 'update';
-        $this->plan[$key]['cleanup'] = $declaration['cleanup'] ?? NULL;
-        $this->plan[$key]['update'] = $declaration['update'] ?? 'always';
+      if (isset($plan[$key])) {
+        $plan[$key]['params'] = $declaration['params'];
+        $plan[$key]['managed_action'] = 'update';
+        $plan[$key]['cleanup'] = $declaration['cleanup'] ?? NULL;
+        $plan[$key]['update'] = $declaration['update'] ?? 'always';
       }
       else {
-        $this->plan[$key] = [
+        $plan[$key] = [
           'module' => $declaration['module'],
           'name' => $declaration['name'],
           'entity_type' => $declaration['entity'],
@@ -589,6 +586,7 @@ class CRM_Core_ManagedEntities {
         ];
       }
     }
+    return $plan;
   }
 
 }
