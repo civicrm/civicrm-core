@@ -70,11 +70,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
   }
 
   /**
-   * Function of undocumented functionality required by the interface.
-   */
-  protected function fini() {}
-
-  /**
    * The initializer code, called before the processing.
    */
   public function init() {
@@ -649,7 +644,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
         self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
       }
     }
-    return $this->fini();
   }
 
   /**

@@ -282,7 +282,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
       }
     }
-    return $this->fini();
   }
 
   /**
@@ -929,14 +928,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    */
   public function &getImportedMemberships() {
     return $this->_newMemberships;
-  }
-
-  /**
-   * The initializer code, called before the processing
-   *
-   * @return void
-   */
-  public function fini() {
   }
 
   /**
