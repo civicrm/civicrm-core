@@ -39,4 +39,12 @@
     <page_callback>CRM_Contact_Import_Page_AJAX::status</page_callback>
     <access_arguments>import contacts,access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/import/datasource</path>
+    <title>Import</title>
+    <access_arguments>access CiviCRM</access_arguments>
+    <page_type>1</page_type>
+    <page_callback>CRM_Import_Form_DataSourceConfig</page_callback>
+    <weight>450</weight>
+  </item>
 </menu>

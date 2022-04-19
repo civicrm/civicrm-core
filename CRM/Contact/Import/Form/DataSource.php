@@ -18,15 +18,7 @@
 /**
  * This class delegates to the chosen DataSource to grab the data to be imported.
  */
-class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
-
-  private $_dataSource;
-
-  private $_dataSourceIsValid = FALSE;
-
-  private $_dataSourceClassFile;
-
-  private $_dataSourceClass;
+class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
 
   /**
    * Get any smarty elements that may not be present in the form.
@@ -59,7 +51,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     }
 
     while ($file = readdir($handler)) {
-      if ($file != '.' && $file != '..' &&
+      if ($file !== '.' && $file !== '..' &&
         in_array($file, $errorFiles) && !is_writable($config->uploadDir . $file)
       ) {
         $results[] = $file;
@@ -72,65 +64,19 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
         2 => $config->uploadDir,
       ]));
     }
-
-    $this->_dataSourceIsValid = FALSE;
-    $this->_dataSource = CRM_Utils_Request::retrieveValue(
-      'dataSource',
-      'String',
-      NULL,
-      FALSE,
-      'GET'
-    );
-
-    $this->_params = $this->controller->exportValues($this->_name);
-    if (!$this->_dataSource) {
-      //considering dataSource as base criteria instead of hidden_dataSource.
-      $this->_dataSource = CRM_Utils_Array::value('dataSource',
-        $_POST,
-        CRM_Utils_Array::value('dataSource',
-          $this->_params
-        )
-      );
-      $this->assign('showOnlyDataSourceFormPane', FALSE);
-    }
-    else {
-      $this->assign('showOnlyDataSourceFormPane', TRUE);
-    }
-
-    $dataSources = $this->_getDataSources();
-    if ($this->_dataSource && isset($dataSources[$this->_dataSource])) {
-      $this->_dataSourceIsValid = TRUE;
-      $this->assign('showDataSourceFormPane', TRUE);
-      $dataSourcePath = explode('_', $this->_dataSource);
-      $templateFile = 'CRM/Contact/Import/Form/' . $dataSourcePath[3] . ".tpl";
-    }
-    elseif ($this->_dataSource) {
-      $this->invalidConfig('Invalid data source');
-    }
-    $this->assign('dataSourceFormTemplateFile', $templateFile ?? NULL);
   }
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
 
-    // If there's a dataSource in the query string, we need to load
-    // the form from the chosen DataSource class
-    if ($this->_dataSourceIsValid) {
-      $this->_dataSourceClassFile = str_replace('_', '/', $this->_dataSource) . ".php";
-      require_once $this->_dataSourceClassFile;
-      $this->_dataSourceClass = new $this->_dataSource();
-      $this->_dataSourceClass->buildQuickForm($this);
-    }
-
-    // Get list of data sources and display them as options
-    $dataSources = $this->_getDataSources();
-
-    $this->assign('urlPath', "civicrm/import");
+    $this->assign('urlPath', 'civicrm/import/datasource');
     $this->assign('urlPathVar', 'snippet=4');
 
-    $this->add('select', 'dataSource', ts('Data Source'), $dataSources, TRUE,
+    $this->add('select', 'dataSource', ts('Data Source'), $this->getDataSources(), TRUE,
       ['onchange' => 'buildDataSourceFormBlock(this.value);']
     );
 
@@ -169,7 +115,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
 
     CRM_Core_Form_Date::buildAllowedDateFormats($this);
 
-    $config = CRM_Core_Config::singleton();
     $geoCode = FALSE;
     if (CRM_Utils_GeocodeProvider::getUsableClassName()) {
       $geoCode = TRUE;
@@ -182,6 +127,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     if (Civi::settings()->get('address_standardization_provider') === 'USPS') {
       $this->addElement('checkbox', 'disableUSPS', ts('Disable USPS address validation during import?'));
     }
+    $this->buildDataSourceFields();
 
     $this->addButtons([
       [
@@ -200,18 +146,15 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
   /**
    * Set the default values of various form elements.
    *
-   * access        public
-   *
    * @return array
    *   reference to the array of default values
    */
   public function setDefaultValues() {
-    $config = CRM_Core_Config::singleton();
     $defaults = [
-      'dataSource' => 'CRM_Import_DataSource_CSV',
+      'dataSource' => $this->getDefaultDataSource(),
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
       'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
-      'fieldSeparator' => $config->fieldSeparator,
+      'fieldSeparator' => CRM_Core_Config::singleton()->fieldSeparator,
     ];
 
     if ($this->get('loadedMapping')) {
@@ -222,54 +165,14 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
   }
 
   /**
-   * @return array
-   * @throws Exception
-   */
-  private function _getDataSources() {
-    // Hmm... file-system scanners don't really belong in forms...
-    if (isset(Civi::$statics[__CLASS__]['datasources'])) {
-      return Civi::$statics[__CLASS__]['datasources'];
-    }
-
-    // Open the data source dir and scan it for class files
-    global $civicrm_root;
-    $dataSourceDir = $civicrm_root . DIRECTORY_SEPARATOR . 'CRM' . DIRECTORY_SEPARATOR . 'Import' . DIRECTORY_SEPARATOR . 'DataSource' . DIRECTORY_SEPARATOR;
-    $dataSources = [];
-    if (!is_dir($dataSourceDir)) {
-      $this->invalidConfig("Import DataSource directory $dataSourceDir does not exist");
-    }
-    if (!$dataSourceHandle = opendir($dataSourceDir)) {
-      $this->invalidConfig("Unable to access DataSource directory $dataSourceDir");
-    }
-
-    while (($dataSourceFile = readdir($dataSourceHandle)) !== FALSE) {
-      $fileType = filetype($dataSourceDir . $dataSourceFile);
-      $matches = [];
-      if (($fileType === 'file' || $fileType === 'link') &&
-        preg_match('/^(.+)\.php$/', $dataSourceFile, $matches)
-      ) {
-        $dataSourceClass = "CRM_Import_DataSource_" . $matches[1];
-        require_once $dataSourceDir . DIRECTORY_SEPARATOR . $dataSourceFile;
-        $object = new $dataSourceClass();
-        $info = $object->getInfo();
-        if ($object->checkPermission()) {
-          $dataSources[$dataSourceClass] = $info['title'];
-        }
-      }
-    }
-    closedir($dataSourceHandle);
-
-    Civi::$statics[__CLASS__]['datasources'] = $dataSources;
-    return $dataSources;
-  }
-
-  /**
    * Call the DataSource's postProcess method.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     $this->controller->resetPage('MapField');
 
-    if ($this->_dataSourceIsValid) {
+    if (1) {
       // Setup the params array
       $this->_params = $this->controller->exportValues($this->_name);
 
@@ -287,26 +190,21 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
       }
       $this->set('disableUSPS', !empty($this->_params['disableUSPS']));
 
-      $this->set('dataSource', $this->_params['dataSource']);
+      $this->set('dataSource', $this->getSubmittedValue('dataSource'));
       $this->set('skipColumnHeader', CRM_Utils_Array::value('skipColumnHeader', $this->_params));
 
       CRM_Core_Session::singleton()->set('dateTypes', $storeParams['dateFormats']);
-
-      // Get the PEAR::DB object
-      $dao = new CRM_Core_DAO();
-      $db = $dao->getDatabaseConnection();
 
       //hack to prevent multiple tables.
       $this->_params['import_table_name'] = $this->get('importTableName');
       if (!$this->_params['import_table_name']) {
         $this->_params['import_table_name'] = 'civicrm_import_job_' . md5(uniqid(rand(), TRUE));
       }
-
-      $this->_dataSourceClass->postProcess($this->_params, $db, $this);
+      $this->instantiateDataSource();
 
       // We should have the data in the DB now, parse it
       $importTableName = $this->get('importTableName');
-      $fieldNames = $this->_prepareImportTable($db, $importTableName);
+      $fieldNames = $this->_prepareImportTable($importTableName);
       $mapper = [];
 
       $parser = new CRM_Contact_Import_Parser_Contact($mapper);
@@ -327,9 +225,22 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
       // add all the necessary variables to the form
       $parser->set($this);
     }
-    else {
-      $this->invalidConfig("Invalid DataSource on form post. This shouldn't happen!");
-    }
+  }
+
+  /**
+   * Instantiate the datasource.
+   *
+   * This gives the datasource a chance to do any table creation etc.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function instantiateDataSource(): void {
+    $dataSourceName = $this->getDataSourceClassName();
+    $dataSource = new $dataSourceName();
+    // Get the PEAR::DB object
+    $dao = new CRM_Core_DAO();
+    $db = $dao->getDatabaseConnection();
+    $dataSource->postProcess($this->_params, $db, $this);
   }
 
   /**
@@ -341,7 +252,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
    *
    * @return array
    */
-  private function _prepareImportTable($db, $importTableName) {
+  private function _prepareImportTable($importTableName) {
     /* TODO: Add a check for an existing _status field;
      *  if it exists, create __status instead and return that
      */
@@ -366,7 +277,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
                        ADD COLUMN ${statusFieldName}Msg TEXT,
                        ADD COLUMN $primaryKeyName INT PRIMARY KEY NOT NULL
                                AUTO_INCREMENT";
-    $db->query($alterQuery);
+    CRM_Core_DAO::executeQuery($alterQuery);
 
     return ['status' => $statusFieldName, 'pk' => $primaryKeyName];
   }

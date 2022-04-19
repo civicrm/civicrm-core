@@ -24,7 +24,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * @return array
    *   collection of info about this data source
    */
-  public function getInfo() {
+  public function getInfo(): array {
     return ['title' => ts('Comma-Separated Values (CSV)')];
   }
 
@@ -89,10 +89,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     );
 
     $form->set('originalColHeader', CRM_Utils_Array::value('original_col_header', $result));
-
-    $table = $result['import_table_name'];
-    $importJob = new CRM_Contact_Import_ImportJob($table);
-    $form->set('importTableName', $importJob->getTableName());
+    $form->set('importTableName', $result['import_table_name']);
   }
 
   /**
