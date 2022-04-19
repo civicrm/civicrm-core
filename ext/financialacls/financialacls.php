@@ -14,15 +14,7 @@ use CRM_Financialacls_ExtensionUtil as E;
  */
 function financialacls_civicrm_config(&$config) {
   _financialacls_civix_civicrm_config($config);
-}
-
-/**
- * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
- */
-function financialacls_civicrm_container($container) {
-  $dispatcherDefn = $container->getDefinition('dispatcher');
-  $container->addResource(new \Symfony\Component\Config\Resource\FileResource(__FILE__));
-  $dispatcherDefn->addMethodCall('addListener', ['civi.api4.authorizeRecord::Contribution', '_financialacls_civi_api4_authorizeContribution']);
+  \Civi::dispatcher()->addListener('civi.api4.authorizeRecord::Contribution', '_financialacls_civi_api4_authorizeContribution');
 }
 
 /**
