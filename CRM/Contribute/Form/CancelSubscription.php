@@ -100,8 +100,16 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
     $this->setTitle($this->_mid ? ts('Cancel Auto-renewal') : ts('Cancel Recurring Contribution'));
     $this->assign('mode', $this->_mode);
 
+    if ($this->isSelfService() || !$this->_paymentProcessorObj->supports('cancelRecurring')) {
+      // If we are self service (contact is cancelling for themselves via a cancel link)
+      // or the processor does not support cancellation then remove the fields
+      // specifying whether to notify the processor.
+      unset($this->entityFields['send_cancel_request']);
+    }
     if ($this->isSelfService()) {
-      unset($this->entityFields['send_cancel_request'], $this->entityFields['is_notify']);
+      // Arguably the is_notify field should be removed in self-service mode.
+      // Historically this has been the case...
+      unset($this->entityFields['is_notify']);
     }
 
     if ($this->getSubscriptionDetails()->contact_id) {
