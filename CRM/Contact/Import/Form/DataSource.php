@@ -209,7 +209,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
 
     // We should have the data in the DB now, parse it
     $importTableName = $this->get('importTableName');
-    $fieldNames = $this->_prepareImportTable($importTableName);
+    $this->_prepareImportTable($importTableName);
     $mapper = [];
 
     $parser = new CRM_Contact_Import_Parser_Contact($mapper);
@@ -219,8 +219,8 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
       $mapper,
       CRM_Import_Parser::MODE_MAPFIELD,
       $storeParams['contactType'],
-      $fieldNames['pk'],
-      $fieldNames['status'],
+      '_id',
+      '_status',
       CRM_Import_Parser::DUPLICATE_SKIP,
       NULL, NULL, FALSE,
       CRM_Contact_Import_Parser_Contact::DEFAULT_TIMEOUT,
