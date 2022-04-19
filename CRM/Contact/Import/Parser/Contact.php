@@ -2609,16 +2609,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $this->_activeFieldCount = count($this->_activeFields);
     }
 
-    if ($mode == self::MODE_IMPORT) {
-      //get the key of email field
-      foreach ($mapper as $key => $value) {
-        if (strtolower($value) == 'email') {
-          $emailKey = $key;
-          break;
-        }
-      }
-    }
-
     if ($statusID) {
       $this->progressImport($statusID);
       $startTimestamp = $currTimestamp = $prevTimestamp = time();
