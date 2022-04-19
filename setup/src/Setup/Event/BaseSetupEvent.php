@@ -1,9 +1,9 @@
 <?php
 namespace Civi\Setup\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Civi\Core\Event\GenericHookEvent;
 
-class BaseSetupEvent extends Event {
+class BaseSetupEvent extends GenericHookEvent {
 
   /**
    * @var \Civi\Setup\Model
