@@ -98,7 +98,7 @@
 
       function buildDataSourceFormBlock(dataSource)
       {
-        var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q=$urlPathVar}"{literal};
+        var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q=$urlPathVar|smarty:nodefaults}"{literal};
 
         if (!dataSource ) {
           var dataSource = cj("#dataSource").val();

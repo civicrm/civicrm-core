@@ -19,6 +19,13 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     NUM_ROWS_TO_INSERT = 100;
 
   /**
+   * Form fields declared for this datasource.
+   *
+   * @var string[]
+   */
+  protected $submittableFields = ['skipColumnHeader', 'uploadField'];
+
+  /**
    * Provides information about the data source.
    *
    * @return array
@@ -88,8 +95,12 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       CRM_Utils_Array::value('fieldSeparator', $params, ',')
     );
 
-    $form->set('originalColHeader', CRM_Utils_Array::value('original_col_header', $result));
+    $form->set('originalColHeader', CRM_Utils_Array::value('column_headers', $result));
     $form->set('importTableName', $result['import_table_name']);
+    $this->dataSourceMetadata = [
+      'table_name' => $result['import_table_name'],
+      'column_headers' => $result['column_headers'] ?? NULL,
+    ];
   }
 
   /**
@@ -135,7 +146,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     // create the column names from the CSV header or as col_0, col_1, etc.
     if ($headers) {
       //need to get original headers.
-      $result['original_col_header'] = $firstrow;
+      $result['column_headers'] = $firstrow;
 
       $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
       $columns = array_map($strtolower, $firstrow);
@@ -242,7 +253,6 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
 
     //get the import tmp table name.
     $result['import_table_name'] = $tableName;
-
     return $result;
   }
 
