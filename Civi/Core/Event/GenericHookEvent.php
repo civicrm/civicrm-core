@@ -61,7 +61,7 @@ namespace Civi\Core\Event;
  * foreach ($event->getReturnValues() as $retVal) { ... }
  * ```
  */
-class GenericHookEvent extends \Symfony\Component\EventDispatcher\Event {
+class GenericHookEvent extends Symfony4Event {
 
   /**
    * @var array
