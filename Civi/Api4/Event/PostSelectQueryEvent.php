@@ -13,9 +13,9 @@
 namespace Civi\Api4\Event;
 
 use Civi\Api4\Query\Api4SelectQuery;
-use Symfony\Component\EventDispatcher\Event;
+use Civi\Core\Event\GenericHookEvent;
 
-class PostSelectQueryEvent extends Event {
+class PostSelectQueryEvent extends GenericHookEvent {
 
   /**
    * @var array
