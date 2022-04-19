@@ -702,6 +702,21 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called for declaring managed entities via API.
    *
+   * @code
+   * // Example: Optimal skeleton for backward/forward compatibility
+   * function example_civicrm_managed(&$entities, ?array $modules = NULL) {
+   *   if ($modules !== NULL && !in_array(E::LONG_NAME, $modules, TRUE)) {
+   *     return;
+   *   }
+   *   $entities[] = [
+   *     'module' => E::LONG_NAME,
+   *     'name' => 'my_option_value',
+   *     'entity' => 'OptionValue',
+   *     'params' => [...],
+   *   ];
+   * }
+   * @endCode
+   *
    * @param array $entities
    *   List of pending entities. Each entity is an array with keys:
    *   + 'module': string; for module-extensions, this is the fully-qualifed name (e.g. "com.example.mymodule"); for CMS modules, the name is prefixed by the CMS (e.g. "drupal.mymodule")
@@ -715,15 +730,26 @@ abstract class CRM_Utils_Hook {
    *     - 'always' (default): always delete orphaned records
    *     - 'never': never delete orphaned records
    *     - 'unused': only delete orphaned records if there are no other references to it in the DB. (This is determined by calling the API's "getrefcount" action.)
+   * @param array|NULL $modules
+   *   (Added circa v5.50) If given, only report entities related to $modules. NULL is a wildcard ("all modules").
    *
+   *   This parameter is _advisory_ and is not supplied on older versions.
+   *   Listeners SHOULD self-censor (only report entities which match the filter).
+   *   However, all pre-existing listeners were unaware of this option, and they WILL over-report.
+   *   Over-reported data will be discarded.
    * @return null
    *   the return value is ignored
    */
-  public static function managed(&$entities) {
-    return self::singleton()->invoke(['entities'], $entities,
-      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+  public static function managed(&$entities, ?array $modules = NULL) {
+    self::singleton()->invoke(['entities', 'modules'], $entities, $modules,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_managed'
     );
+    if ($modules) {
+      $entities = array_filter($entities, function($entity) use ($modules) {
+        return in_array($entity['module'], $modules, TRUE);
+      });
+    }
   }
 
   /**

@@ -2,6 +2,8 @@
 
 namespace Civi\Api4\Utils;
 
+use CRM_Afform_ExtensionUtil as E;
+
 /**
  * Class AfformSaveTrait
  * @package Civi\Api4\Action\Afform
@@ -70,8 +72,7 @@ trait AfformSaveTrait {
       $isChanged('is_dashlet') ||
       (!empty($meta['is_dashlet']) && $isChanged('title'))
     ) {
-      // FIXME: more targeted reconciliation
-      \CRM_Core_ManagedEntities::singleton()->reconcile();
+      \CRM_Core_ManagedEntities::singleton()->reconcile(E::LONG_NAME);
     }
 
     // Right now, permission-checks are completely on-demand.

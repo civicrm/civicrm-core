@@ -23,6 +23,10 @@ return function ($mixInfo, $bootCache) {
       return;
     }
 
+    if (is_array($event->modules) && !in_array($mixInfo->longName, $event->modules, TRUE)) {
+      return;
+    }
+
     $mgdFiles = CRM_Utils_File::findFiles($mixInfo->getPath(), '*.mgd.php');
     sort($mgdFiles);
     foreach ($mgdFiles as $file) {

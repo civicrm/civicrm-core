@@ -125,7 +125,10 @@ function afform_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_managed
  */
-function afform_civicrm_managed(&$entities) {
+function afform_civicrm_managed(&$entities, $modules) {
+  if ($modules && !in_array(E::LONG_NAME, $modules, TRUE)) {
+    return;
+  }
   /** @var \CRM_Afform_AfformScanner $scanner */
   if (\Civi::container()->has('afform_scanner')) {
     $scanner = \Civi::service('afform_scanner');
