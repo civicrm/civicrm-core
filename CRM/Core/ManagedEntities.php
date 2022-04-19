@@ -29,13 +29,6 @@ class CRM_Core_ManagedEntities {
   protected $moduleIndex;
 
   /**
-   * @var array
-   *   List of all entity declarations.
-   * @see CRM_Utils_Hook::managed()
-   */
-  protected $declarations;
-
-  /**
    * Get an instance.
    * @param bool $fresh
    * @return \CRM_Core_ManagedEntities
@@ -114,8 +107,8 @@ class CRM_Core_ManagedEntities {
    */
   public function reconcile($modules = NULL) {
     $modules = $modules ? (array) $modules : NULL;
-    $this->loadDeclarations($modules);
-    $plan = $this->createPlan($modules);
+    $declarations = $this->getDeclarations($modules);
+    $plan = $this->createPlan($declarations, $modules);
     $this->reconcileEntities($plan);
   }
 
@@ -128,8 +121,8 @@ class CRM_Core_ManagedEntities {
     $mgd = new \CRM_Core_DAO_Managed();
     $mgd->copyValues($params);
     $mgd->find(TRUE);
-    $this->loadDeclarations([$mgd->module]);
-    $declarations = CRM_Utils_Array::findAll($this->declarations, [
+    $declarations = $this->getDeclarations([$mgd->module]);
+    $declarations = CRM_Utils_Array::findAll($declarations, [
       'module' => $mgd->module,
       'name' => $mgd->name,
       'entity' => $mgd->entity_type,
@@ -171,7 +164,7 @@ class CRM_Core_ManagedEntities {
    * @return array
    */
   private function filterPlanByAction(array $plan, string $action): array {
-    return CRM_Utils_Array::findAll($thisplan, ['managed_action' => $action]);
+    return CRM_Utils_Array::findAll($plan, ['managed_action' => $action]);
   }
 
   /**
@@ -374,15 +367,6 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * Get declarations.
-   *
-   * @return array|null
-   */
-  protected function getDeclarations() {
-    return $this->declarations;
-  }
-
-  /**
    * @param array $modules
    *   Array<CRM_Core_Module>.
    *
@@ -474,21 +458,6 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * @param array $declarations
-   * @param string $moduleName
-   *   Filter to a single module.
-   */
-  protected function setDeclarations(array $declarations, $moduleName = NULL) {
-    $this->declarations = [];
-    foreach ($declarations as $name => $declare) {
-      $declare += ['name' => $name];
-      if (!$moduleName || $declare['module'] === $moduleName) {
-        $this->declarations[$name] = $declare;
-      }
-    }
-  }
-
-  /**
    * @param string $entity
    * @param string $action
    * @param array $params
@@ -528,14 +497,15 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * Load declarations into the class property.
+   * Load managed entity declarations.
    *
    * This picks it up from hooks and enabled components.
    *
    * @param array|null $modules
    *   Limit reconciliation specified modules.
+   * @return array[]
    */
-  protected function loadDeclarations($modules = NULL): void {
+  protected function getDeclarations($modules = NULL): array {
     $declarations = [];
     // Exclude components if given a module name.
     if (!$modules || $modules === ['civicrm']) {
@@ -545,16 +515,20 @@ class CRM_Core_ManagedEntities {
     }
     CRM_Utils_Hook::managed($declarations, $modules);
     $this->validate($declarations);
-    $this->setDeclarations($declarations);
+    foreach (array_keys($declarations) as $name) {
+      $declarations[$name] += ['name' => $name];
+    }
+    return $declarations;
   }
 
   /**
    * Builds $this->managedActions array
    *
+   * @param array $declarations
    * @param array|null $modules
    * @return array[]
    */
-  protected function createPlan($modules = NULL): array {
+  protected function createPlan(array $declarations, $modules = NULL): array {
     $where = $modules ? [['module', 'IN', $modules]] : [];
     $managedEntities = Managed::get(FALSE)
       ->setWhere($where)
@@ -566,7 +540,7 @@ class CRM_Core_ManagedEntities {
       $action = $this->isModuleDisabled($managedEntity['module']) ? 'disable' : 'delete';
       $plan[$key] = array_merge($managedEntity, ['managed_action' => $action]);
     }
-    foreach ($this->declarations as $declaration) {
+    foreach ($declarations as $declaration) {
       $key = "{$declaration['module']}_{$declaration['name']}_{$declaration['entity']}";
       if (isset($plan[$key])) {
         $plan[$key]['params'] = $declaration['params'];
