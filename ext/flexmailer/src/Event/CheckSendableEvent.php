@@ -14,7 +14,7 @@ namespace Civi\FlexMailer\Event;
  * Class CheckSendableEvent
  * @package Civi\FlexMailer\Event
  */
-class CheckSendableEvent extends \Symfony\Component\EventDispatcher\Event {
+class CheckSendableEvent extends \Civi\Core\Event\GenericHookEvent {
 
   /**
    * @var array
