@@ -172,59 +172,58 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
   public function postProcess() {
     $this->controller->resetPage('MapField');
 
-    if (1) {
-      // Setup the params array
-      $this->_params = $this->controller->exportValues($this->_name);
+    // Setup the params array
+    $this->_params = $this->controller->exportValues($this->_name);
 
-      $storeParams = [
-        'onDuplicate' => $this->exportValue('onDuplicate'),
-        'dedupe' => $this->exportValue('dedupe'),
-        'contactType' => $this->exportValue('contactType'),
-        'contactSubType' => $this->exportValue('subType'),
-        'dateFormats' => $this->exportValue('dateFormats'),
-        'savedMapping' => $this->exportValue('savedMapping'),
-      ];
+    $storeParams = [
+      'onDuplicate' => $this->exportValue('onDuplicate'),
+      'dedupe' => $this->exportValue('dedupe'),
+      'contactType' => $this->exportValue('contactType'),
+      'contactSubType' => $this->exportValue('subType'),
+      'dateFormats' => $this->exportValue('dateFormats'),
+      'savedMapping' => $this->exportValue('savedMapping'),
+    ];
 
-      foreach ($storeParams as $storeName => $value) {
-        $this->set($storeName, $value);
-      }
-      $this->set('disableUSPS', !empty($this->_params['disableUSPS']));
-
-      $this->set('dataSource', $this->getSubmittedValue('dataSource'));
-      $this->set('skipColumnHeader', CRM_Utils_Array::value('skipColumnHeader', $this->_params));
-
-      CRM_Core_Session::singleton()->set('dateTypes', $storeParams['dateFormats']);
-
-      //hack to prevent multiple tables.
-      $this->_params['import_table_name'] = $this->get('importTableName');
-      if (!$this->_params['import_table_name']) {
-        $this->_params['import_table_name'] = 'civicrm_import_job_' . md5(uniqid(rand(), TRUE));
-      }
-      $this->instantiateDataSource();
-
-      // We should have the data in the DB now, parse it
-      $importTableName = $this->get('importTableName');
-      $fieldNames = $this->_prepareImportTable($importTableName);
-      $mapper = [];
-
-      $parser = new CRM_Contact_Import_Parser_Contact($mapper);
-      $parser->setMaxLinesToProcess(100);
-      $parser->run($importTableName,
-        $mapper,
-        CRM_Import_Parser::MODE_MAPFIELD,
-        $storeParams['contactType'],
-        $fieldNames['pk'],
-        $fieldNames['status'],
-        CRM_Import_Parser::DUPLICATE_SKIP,
-        NULL, NULL, FALSE,
-        CRM_Contact_Import_Parser_Contact::DEFAULT_TIMEOUT,
-        $storeParams['contactSubType'],
-        $storeParams['dedupe']
-      );
-
-      // add all the necessary variables to the form
-      $parser->set($this);
+    foreach ($storeParams as $storeName => $value) {
+      $this->set($storeName, $value);
     }
+    $this->set('disableUSPS', !empty($this->_params['disableUSPS']));
+
+    $this->set('dataSource', $this->getSubmittedValue('dataSource'));
+    $this->set('skipColumnHeader', CRM_Utils_Array::value('skipColumnHeader', $this->_params));
+
+    CRM_Core_Session::singleton()->set('dateTypes', $storeParams['dateFormats']);
+
+    //hack to prevent multiple tables.
+    $this->_params['import_table_name'] = $this->get('importTableName');
+    if (!$this->_params['import_table_name']) {
+      $this->_params['import_table_name'] = 'civicrm_import_job_' . md5(uniqid(rand(), TRUE));
+    }
+    $this->instantiateDataSource();
+
+    // We should have the data in the DB now, parse it
+    $importTableName = $this->get('importTableName');
+    $fieldNames = $this->_prepareImportTable($importTableName);
+    $mapper = [];
+
+    $parser = new CRM_Contact_Import_Parser_Contact($mapper);
+    $parser->setMaxLinesToProcess(100);
+    $parser->run($importTableName,
+      $mapper,
+      CRM_Import_Parser::MODE_MAPFIELD,
+      $storeParams['contactType'],
+      $fieldNames['pk'],
+      $fieldNames['status'],
+      CRM_Import_Parser::DUPLICATE_SKIP,
+      NULL, NULL, FALSE,
+      CRM_Contact_Import_Parser_Contact::DEFAULT_TIMEOUT,
+      $storeParams['contactSubType'],
+      $storeParams['dedupe']
+    );
+
+    // add all the necessary variables to the form
+    $parser->set($this);
+
   }
 
   /**
