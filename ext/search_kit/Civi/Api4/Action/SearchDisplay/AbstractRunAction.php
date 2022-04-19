@@ -772,13 +772,13 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     }
 
     $defaultSort = $this->display['settings']['sort'] ?? [];
-    $currentSort = $this->sort;
+    $currentSort = [];
 
-    // Verify requested sort corresponds to sortable columns
+    // Add requested sort after verifying it corresponds to sortable columns
     foreach ($this->sort as $item) {
       $column = array_column($this->display['settings']['columns'], NULL, 'key')[$item[0]] ?? NULL;
-      if (!$column || (isset($column['sortable']) && !$column['sortable'])) {
-        $currentSort = NULL;
+      if ($column && !(isset($column['sortable']) && !$column['sortable'])) {
+        $currentSort[] = $item;
       }
     }
 
@@ -787,6 +787,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       // Apply seed to random sorting
       if ($item[0] === 'RAND()' && isset($this->seed)) {
         $item[0] = 'RAND(' . $this->seed . ')';
+      }
+      // Prevent errors trying to orderBy nonaggregated columns when using groupBy
+      if ($this->canAggregate($item[0])) {
+        continue;
       }
       $orderBy[$item[0]] = $item[1];
     }
