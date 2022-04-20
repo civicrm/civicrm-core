@@ -224,12 +224,9 @@ function _financialacls_civicrm_get_accessible_financial_types(): array {
  * @throws \API_Exception
  */
 function _financialacls_civicrm_get_membership_type_clause(): string {
-  if (!CRM_Core_Component::isEnabled('CiviMember')) {
-    return 1;
-  }
   $financialTypes = _financialacls_civicrm_get_accessible_financial_types();
-  if ($financialTypes === [0]) {
-    return 0;
+  if ($financialTypes === [0] || !CRM_Core_Component::isEnabled('CiviMember')) {
+    return '= 0';
   }
   $membershipTypes = (array) MembershipType::get(FALSE)
     ->addWhere('financial_type_id', 'IN', $financialTypes)->execute()->indexBy('id');
