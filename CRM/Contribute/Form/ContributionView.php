@@ -358,6 +358,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($id, 'contribution', TRUE);
     $title = ts('View Payment');
     $this->assign('transaction', TRUE);
+    // Used in paymentInfoBlock.tpl
     $this->assign('payments', $paymentInfo['transaction']);
     $this->assign('paymentLinks', $paymentInfo['payment_links']);
     return $title;

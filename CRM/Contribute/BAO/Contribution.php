@@ -4271,50 +4271,50 @@ LIMIT 1;";
     }
     $actionLinks = [];
     $actionLinks[] = [
-      'url' => CRM_Utils_System::url('civicrm/payment', [
-        'action' => 'add',
-        'reset' => 1,
-        'id' => $id,
-        'is_refund' => 0,
-      ]),
+      'url' => 'civicrm/payment',
       'title' => ts('Record Payment'),
       'accessKey' => '',
       'ref' => '',
       'name' => '',
-      'qs' => '',
+      'qs' => [
+        'action' => 'add',
+        'reset' => 1,
+        'id' => $id,
+        'is_refund' => 0,
+      ],
       'extra' => '',
     ];
 
     if (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
       $actionLinks[] = [
-        'url' => CRM_Utils_System::url('civicrm/payment', [
+        'url' => 'civicrm/payment',
+        'title' => ts('Submit Credit Card payment'),
+        'accessKey' => '',
+        'ref' => '',
+        'name' => '',
+        'qs' => [
           'action' => 'add',
           'reset' => 1,
           'is_refund' => 0,
           'id' => $id,
           'mode' => 'live',
-        ]),
-        'title' => ts('Submit Credit Card payment'),
-        'accessKey' => '',
-        'ref' => '',
-        'name' => '',
-        'qs' => '',
+        ],
         'extra' => '',
       ];
     }
     if ($contributionStatus !== 'Pending') {
       $actionLinks[] = [
-        'url' => CRM_Utils_System::url('civicrm/payment', [
-          'action' => 'add',
-          'reset' => 1,
-          'id' => $id,
-          'is_refund' => 1,
-        ]),
+        'url' => 'civicrm/payment',
         'title' => ts('Record Refund'),
         'accessKey' => '',
         'ref' => '',
         'name' => '',
-        'qs' => '',
+        'qs' => [
+          'action' => 'add',
+          'reset' => 1,
+          'id' => $id,
+          'is_refund' => 1,
+        ],
         'extra' => '',
       ];
     }
@@ -4375,7 +4375,7 @@ LIMIT 1;";
 
     $clauses = [];
     foreach ($whereClauses as $key => $clause) {
-      $clauses[] = 'b.' . $key . ' ' . implode(' AND b.' . $key, (array) $clause);
+      $clauses[] = 'b.' . $key . ' ' . implode(' AND b.' . $key . ' ', (array) $clause);
     }
     $clauses[] = 'b.contact_id IN (' . $contactIDs . ')';
     $clauses[] = 'b.is_test = 0';
