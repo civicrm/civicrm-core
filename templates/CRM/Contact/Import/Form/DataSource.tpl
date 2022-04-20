@@ -43,8 +43,8 @@
              <td>{$form.onDuplicate.html} {help id='dupes'}</td>
          </tr>
          <tr class="crm-import-datasource-form-block-dedupe">
-             <td class="label">{$form.dedupe.label}</td>
-             <td><span id="contact-dedupe">{$form.dedupe.html}</span> {help id='id-dedupe_rule'}</td>
+             <td class="label">{$form.dedupe_rule_id.label}</td>
+             <td><span id="contact-dedupe_rule_id">{$form.dedupe_rule_id.html}</span> {help id='id-dedupe_rule'}</td>
          </tr>
          <tr class="crm-import-datasource-form-block-fieldSeparator">
              <td class="label">{$form.fieldSeparator.label}</td>
@@ -151,16 +151,16 @@
 
                         success: function(dedupe){
                                                    if ( dedupe.length == 0 ) {
-                                                      cj("#dedupe").empty();
+                                                      cj("#dedupe_rule_id").empty();
                                                       cj("#contact-dedupe").hide();
                                                    } else {
                                                        cj("#contact-dedupe").show();
-                                                       cj("#dedupe").empty();
+                                                       cj("#dedupe_rule_id").empty();
 
-                                                       cj("#dedupe").append("<option value=''>- {/literal}{ts escape='js'}select{/ts}{literal} -</option>");
+                                                       cj("#dedupe_rule_id").append("<option value=''>- {/literal}{ts escape='js'}select{/ts}{literal} -</option>");
                                                        for ( var key in  dedupe ) {
                                                            // stick these new options in the dedupe select
-                                                           cj("#dedupe").append("<option value="+key+">"+dedupe[key]+" </option>");
+                                                           cj("#dedupe_rule_id").append("<option value="+key+">"+dedupe[key]+" </option>");
                                                        }
                                                    }
 

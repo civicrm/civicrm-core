@@ -214,7 +214,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       'invalidRowCount' => $this->get('invalidRowCount'),
       'conflictRowCount' => $this->get('conflictRowCount'),
       'onDuplicate' => $this->get('onDuplicate'),
-      'dedupe' => $this->get('dedupe'),
+      'dedupe' => $this->getSubmittedValue('dedupe_rule_id'),
       'newGroupName' => $this->controller->exportValue($this->_name, 'newGroupName'),
       'newGroupDesc' => $this->controller->exportValue($this->_name, 'newGroupDesc'),
       'newGroupType' => $this->controller->exportValue($this->_name, 'newGroupType'),

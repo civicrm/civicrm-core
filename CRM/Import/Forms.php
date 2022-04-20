@@ -104,9 +104,13 @@ class CRM_Import_Forms extends CRM_Core_Form {
     'fieldSeparator' => 'DataSource',
     'uploadFile' => 'DataSource',
     'contactType' => 'DataSource',
+    'contactSubType' => 'DataSource',
     'dateFormats' => 'DataSource',
     'savedMapping' => 'DataSource',
     'dataSource' => 'DataSource',
+    'dedupe_rule_id' => 'DataSource',
+    'onDuplicate' => 'DataSource',
+    'disableUSPS' => 'DataSource',
   ];
 
   /**

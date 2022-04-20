@@ -707,7 +707,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       NULL, NULL, FALSE,
       CRM_Contact_Import_Parser_Contact::DEFAULT_TIMEOUT,
       $this->get('contactSubType'),
-      $this->get('dedupe')
+      $this->getSubmittedValue('dedupe_rule_id')
     );
     return $parser;
   }

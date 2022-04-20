@@ -111,7 +111,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
     $this->addRadio('contactType', ts('Contact Type'), $contactTypeOptions, [], NULL, FALSE, $contactTypeAttributes);
 
     $this->addElement('select', 'subType', ts('Subtype'));
-    $this->addElement('select', 'dedupe', ts('Dedupe Rule'));
+    $this->addElement('select', 'dedupe_rule_id', ts('Dedupe Rule'));
 
     CRM_Core_Form_Date::buildAllowedDateFormats($this);
 
@@ -182,19 +182,18 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
     $this->_params = $this->controller->exportValues($this->_name);
 
     $storeParams = [
-      'onDuplicate' => $this->exportValue('onDuplicate'),
-      'dedupe' => $this->exportValue('dedupe'),
-      'contactType' => $this->exportValue('contactType'),
-      'contactSubType' => $this->exportValue('subType'),
-      'dateFormats' => $this->exportValue('dateFormats'),
-      'savedMapping' => $this->exportValue('savedMapping'),
+      'onDuplicate' => $this->getSubmittedValue('onDuplicate'),
+      'dedupe' => $this->getSubmittedValue('dedupe_rule_id'),
+      'contactType' => $this->getSubmittedValue('contactType'),
+      'contactSubType' => $this->getSubmittedValue('subType'),
+      'dateFormats' => $this->getSubmittedValue('dateFormats'),
+      'savedMapping' => $this->getSubmittedValue('savedMapping'),
     ];
 
     foreach ($storeParams as $storeName => $value) {
       $this->set($storeName, $value);
     }
-    $this->set('disableUSPS', !empty($this->_params['disableUSPS']));
-
+    $this->set('disableUSPS', $this->getSubmittedValue('disableUSPS'));
     $this->set('dataSource', $this->getSubmittedValue('dataSource'));
     $this->set('skipColumnHeader', CRM_Utils_Array::value('skipColumnHeader', $this->_params));
 
@@ -216,16 +215,16 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
     $parser->setMaxLinesToProcess(100);
     $parser->setUserJobID($this->getUserJobID());
     $parser->run($importTableName,
-      $mapper,
+      [],
       CRM_Import_Parser::MODE_MAPFIELD,
-      $storeParams['contactType'],
+      $this->getSubmittedValue('contactType'),
       '_id',
       '_status',
       CRM_Import_Parser::DUPLICATE_SKIP,
       NULL, NULL, FALSE,
       CRM_Contact_Import_Parser_Contact::DEFAULT_TIMEOUT,
-      $storeParams['contactSubType'],
-      $storeParams['dedupe']
+      $this->getSubmittedValue('contactSubType'),
+      $this->getSubmittedValue('dedupe_rule_id')
     );
 
     // add all the necessary variables to the form
