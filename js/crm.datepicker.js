@@ -44,6 +44,7 @@
           .change(updateDataField)
           .timeEntry({
             spinnerImage: '',
+            useMouseWheel: false,
             show24Hours: settings.time === true || settings.time === undefined ? CRM.config.timeIs24Hr : settings.time == '24'
           });
         if (!placeholder) {
