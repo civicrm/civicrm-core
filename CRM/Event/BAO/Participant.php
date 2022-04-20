@@ -1866,8 +1866,8 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
       $details['ineligible_message'] = ts('This event registration can not be transferred or cancelled. Contact the event organizer if you have questions.');
       return $details;
     }
-    //verify participant status is still Registered
-    if ($details['status'] != 'Registered') {
+    // Verify participant status is one that can be self-cancelled
+    if (!in_array($details['status'], ['Registered', 'Pending from pay later', 'On waitlist'])) {
       $details['eligible'] = FALSE;
       $details['ineligible_message'] = ts('You cannot transfer or cancel your registration for %1 as you are not currently registered for this event.', [1 => $eventTitle]);
       return $details;
