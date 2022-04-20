@@ -25,6 +25,28 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   const IMPORT_ENTITY = 'Multi value custom data';
 
   /**
+   * Get the import entity (translated).
+   *
+   * Used for template layer text.
+   *
+   * @return string
+   */
+  protected function getTranslatedEntity(): string {
+    return ts('Multi-value Custom Data');
+  }
+
+  /**
+   * Get the import entity plural (translated).
+   *
+   * Used for template layer text.
+   *
+   * @return string
+   */
+  protected function getTranslatedEntities(): string {
+    return ts('multi-value custom data records');
+  }
+
+  /**
    * @return array
    */
   public function setDefaultValues() {

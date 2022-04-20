@@ -44,7 +44,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    * @return string
    */
   protected function getTranslatedEntity(): string {
-    return Civi\Api4\Utils\CoreUtil::getInfoItem($this::IMPORT_ENTITY, 'title');
+    return (string) Civi\Api4\Utils\CoreUtil::getInfoItem($this::IMPORT_ENTITY, 'title');
   }
 
   /**
@@ -55,8 +55,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    * @return string
    */
   protected function getTranslatedEntities(): string {
-    return Civi\Api4\Utils\CoreUtil::getInfoItem($this::IMPORT_ENTITY, 'title_plural');
-
+    return (string) Civi\Api4\Utils\CoreUtil::getInfoItem($this::IMPORT_ENTITY, 'title_plural');
   }
 
   /**
