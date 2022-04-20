@@ -179,6 +179,13 @@
     <access_arguments>administer CiviCRM</access_arguments>
   </item>
   <item>
+    <path>civicrm/dev/fake-error</path>
+    <page_callback>CRM_Core_Page_FakeError</page_callback>
+    <title>Fake Error</title>
+    <is_public>true</is_public>
+    <access_arguments>*always allow*</access_arguments>
+  </item>
+  <item>
     <path>civicrm/profile-editor/schema</path>
     <page_callback>CRM_UF_Page_ProfileEditor::getSchemaJSON</page_callback>
     <title>ProfileEditor</title>

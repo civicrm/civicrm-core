@@ -778,17 +778,6 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
   }
 
   /**
-   * @param $regexp
-   * @param \Psr\Http\Message\ResponseInterface $response
-   */
-  private function assertBodyRegexp($regexp, $response = NULL) {
-    $response = $this->resolveResponse($response);
-    $this->assertRegexp($regexp, (string) $response->getBody(),
-      'Response body does not match pattern' . $this->formatFailure($response));
-    return $this;
-  }
-
-  /**
    * @return int
    * @throws \CiviCRM_API3_Exception
    */

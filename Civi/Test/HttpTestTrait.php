@@ -146,6 +146,22 @@ trait HttpTestTrait {
   }
 
   /**
+   * @param string $regexp
+   * @param \Psr\Http\Message\ResponseInterface $response
+   * @param string $message
+   */
+  protected function assertBodyRegexp($regexp, $response = NULL, $message = NULL) {
+    if ($message) {
+      $message .= "\n";
+    }
+
+    $response = $this->resolveResponse($response);
+    $this->assertRegexp($regexp, (string) $response->getBody(),
+      $message . 'Response body does not match pattern' . $this->formatFailure($response));
+    return $this;
+  }
+
+  /**
    * @param \Psr\Http\Message\ResponseInterface|null $response
    * @return \Psr\Http\Message\ResponseInterface
    */
