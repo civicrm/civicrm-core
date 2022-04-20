@@ -16,42 +16,34 @@
     {if $savedMappingName}
         <tr class="columnheader-dark"><th colspan="4">{ts 1=$savedMappingName}Saved Field Mapping: %1{/ts}</td></tr>
     {/if}
-        <tr class="columnheader">
-      {if $showColNames}
-          {assign var="totalRowsDisplay" value=$rowDisplayCount+1}
-      {else}
-          {assign var="totalRowsDisplay" value=$rowDisplayCount}
-      {/if}
-            {section name=rows loop=$totalRowsDisplay}
-                {if $smarty.section.rows.iteration == 1 and $showColNames}
-                  <td>{ts}Column Names{/ts}</td>
-                {elseif $showColNames}
-                  <td>{ts 1=$smarty.section.rows.iteration-1}Import Data (row %1){/ts}</td>
-    {else}
-      <td>{ts 1=$smarty.section.rows.iteration}Import Data (row %1){/ts}</td>
-                {/if}
-            {/section}
 
-            <td>{ts}Matching CiviCRM Field{/ts}</td>
-        </tr>
+    {* Header row - has column for column names if they have been supplied *}
+    <tr class="columnheader">
+      {if $columnNames}
+        <td>{ts}Column Names{/ts}</td>
+      {/if}
+      {foreach from=$dataValues item=row key=index}
+        {math equation="x + y" x=$index y=1 assign="rowNumber"}
+        <td>{ts 1=$rowNumber}Import Data (row %1){/ts}</td>
+      {/foreach}
+      <td>{ts}Matching CiviCRM Field{/ts}</td>
+    </tr>
 
         {*Loop on columns parsed from the import data rows*}
-        {section name=cols loop=$columnCount}
-            {assign var="i" value=$smarty.section.cols.index}
+        {foreach from=$mapper key=i item=mapperField}
+
             <tr style="border: 1px solid #DDDDDD;">
 
-                {if $showColNames}
-                    <td class="even-row labels">{$columnNames[$i]}</td>
+                {if array_key_exists($i, $columnNames)}
+                  <td class="even-row labels">{$columnNames[$i]}</td>
                 {/if}
-
-                {section name=rows loop=$rowDisplayCount}
-                    {assign var="j" value=$smarty.section.rows.index}
-                    <td class="odd-row">{$dataValues[$j][$i]|escape}</td>
-                {/section}
+                {foreach from=$dataValues item=row key=index}
+                  <td class="odd-row">{$row[$i]|escape}</td>
+                {/foreach}
 
                 {* Display mapper <select> field for 'Map Fields', and mapper value for 'Preview' *}
                 <td class="form-item even-row{if $wizard.currentStepName == 'Preview'} labels{/if}">
-                    {if $wizard.currentStepName == 'Preview'}
+                  {if $wizard.currentStepName == 'Preview'}
                     {if $relatedContactDetails && $relatedContactDetails[$i] != ''}
                             {$mapper[$i]} - {$relatedContactDetails[$i]}
 
@@ -97,13 +89,13 @@
                                 {$mapper[$i]}
                             {*/if*}
                         {/if}
-                    {else}
-                        {$form.mapper[$i].html|smarty:nodefaults}
-                    {/if}
+                  {else}
+                    {$mapperField.html|smarty:nodefaults}
+                  {/if}
                 </td>
 
             </tr>
-        {/section}
+        {/foreach}
 
     </table>
   {/strip}

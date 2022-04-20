@@ -184,17 +184,16 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $this->_mapperRelatedContactWebsiteType = $mapperRelatedContactWebsiteType;
     // get IM service provider type id for related contact
     $this->_mapperRelatedContactImProvider = &$mapperRelatedContactImProvider;
+    $this->setFieldMetadata();
+    foreach ($this->getImportableFieldsMetadata() as $name => $field) {
+      $this->addField($name, $field['title'], CRM_Utils_Array::value('type', $field), CRM_Utils_Array::value('headerPattern', $field), CRM_Utils_Array::value('dataPattern', $field), CRM_Utils_Array::value('hasLocationType', $field));
+    }
   }
 
   /**
    * The initializer code, called before processing.
    */
   public function init() {
-    $this->setFieldMetadata();
-    foreach ($this->getImportableFieldsMetadata() as $name => $field) {
-      $this->addField($name, $field['title'], CRM_Utils_Array::value('type', $field), CRM_Utils_Array::value('headerPattern', $field), CRM_Utils_Array::value('dataPattern', $field), CRM_Utils_Array::value('hasLocationType', $field));
-    }
-
     $this->_newContacts = [];
 
     $this->setActiveFields($this->_mapperKeys);
@@ -2598,9 +2597,17 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $this->_conflicts = [];
     $this->_unparsedAddresses = [];
 
+    // Transitional support for deprecating table_name (and other fields)
+    // form input - the goal is to load them from userJob - but eventually
+    // we will just load the datasource object and this code will not know the
+    // table name.
+    if (!$tableName && $this->userJobID) {
+      $tableName = $this->getUserJob()['metadata']['DataSource']['table_name'];
+    }
+
     $this->_tableName = $tableName;
-    $this->_primaryKeyName = $primaryKeyName;
-    $this->_statusFieldName = $statusFieldName;
+    $this->_primaryKeyName = '_id';
+    $this->_statusFieldName = '_status';
 
     if ($mode == self::MODE_MAPFIELD) {
       $this->_rows = [];

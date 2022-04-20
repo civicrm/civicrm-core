@@ -246,7 +246,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
     $dao = new CRM_Core_DAO();
     $db = $dao->getDatabaseConnection();
     $dataSource->postProcess($this->_params, $db, $this);
-    $this->updateUserJobMetadata('DataSource', $dataSource->getDataSourceMetadata());
   }
 
   /**

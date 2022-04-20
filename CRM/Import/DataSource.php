@@ -96,6 +96,83 @@ abstract class CRM_Import_DataSource {
   }
 
   /**
+   * Get submitted value.
+   *
+   * Get a value submitted on the form.
+   *
+   * @return mixed
+   *
+   * @throws \API_Exception
+   */
+  protected function getSubmittedValue(string $valueName) {
+    return $this->getUserJob()['metadata']['submitted_values'][$valueName];
+  }
+
+  /**
+   * Get rows as an array.
+   *
+   * The array has all values.
+   *
+   * @param int $limit
+   * @param int $offset
+   *
+   * @return array
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function getRows(int $limit = 0, int $offset = 0) {
+    $query = 'SELECT * FROM ' . $this->getTableName();
+    if ($limit) {
+      $query .= ' LIMIT ' . $limit . ($offset ? (' OFFSET ' . $offset) : NULL);
+    }
+    $rows = [];
+    $result = CRM_Core_DAO::executeQuery($query);
+    while ($result->fetch()) {
+      $values = $result->toArray();
+      /* trim whitespace around the values */
+      foreach ($values as $k => $v) {
+        $values[$k] = trim($v, " \t\r\n");
+      }
+      // Historically we expect a non-associative array...
+      $rows[] = array_values($values);
+    }
+    return $rows;
+  }
+
+  /**
+   * Get an array of column headers, if any.
+   *
+   * Null is returned when there are none - ie because a csv file does not
+   * have an initial header row.
+   *
+   * This is presented to the user in the MapField screen so
+   * that can see what fields they are mapping.
+   *
+   * @return array
+   * @throws \API_Exception
+   */
+  public function getColumnHeaders(): array {
+    return $this->getUserJob()['metadata']['DataSource']['column_headers'];
+  }
+
+  /**
+   * Get an array of column headers, if any.
+   *
+   * Null is returned when there are none - ie because a csv file does not
+   * have an initial header row.
+   *
+   * This is presented to the user in the MapField screen so
+   * that can see what fields they are mapping.
+   *
+   * @return int
+   * @throws \API_Exception
+   */
+  public function getNumberOfColumns(): int {
+    return $this->getUserJob()['metadata']['DataSource']['number_of_columns'];
+  }
+
+  /**
    * Generated metadata relating to the the datasource.
    *
    * This is values that are computed within the DataSource class and
@@ -112,10 +189,41 @@ abstract class CRM_Import_DataSource {
   protected $dataSourceMetadata = [];
 
   /**
+   * Get metadata about the datasource.
+   *
    * @return array
+   *
+   * @throws \API_Exception
    */
   public function getDataSourceMetadata(): array {
+    if (!$this->dataSourceMetadata && $this->getUserJobID()) {
+      $this->dataSourceMetadata = $this->getUserJob()['metadata']['DataSource'];
+    }
+
     return $this->dataSourceMetadata;
+  }
+
+  /**
+   * Get the table name for the datajob.
+   *
+   * @return string|null
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function getTableName(): ?string {
+    // The old name is still stored...
+    $tableName = $this->getDataSourceMetadata()['table_name'];
+    if (!$tableName) {
+      return NULL;
+    }
+    if (strpos($tableName, 'civicrm_tmp_') !== 0
+      || !CRM_Utils_Rule::alphanumeric($tableName)) {
+      // The table name is generated and stored by code, not users so it
+      // should be safe - but a check seems prudent all the same.
+      throw new CRM_Core_Exception('Table cannot be deleted');
+    }
+    return $tableName;
   }
 
   /**
@@ -171,6 +279,25 @@ abstract class CRM_Import_DataSource {
   public function checkPermission() {
     $info = $this->getInfo();
     return empty($info['permissions']) || CRM_Core_Permission::check($info['permissions']);
+  }
+
+  /**
+   * @param string $key
+   * @param array $data
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function updateUserJobMetadata(string $key, array $data): void {
+    $metaData = array_merge(
+      $this->getUserJob()['metadata'],
+      [$key => $data]
+    );
+    UserJob::update(FALSE)
+      ->addWhere('id', '=', $this->getUserJobID())
+      ->setValues(['metadata' => $metaData])
+      ->execute();
+    $this->userJob['metadata'] = $metaData;
   }
 
 }

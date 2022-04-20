@@ -14,6 +14,8 @@
  * File for the CRM_Contact_Import_Form_MapFieldTest class.
  */
 
+use Civi\Api4\UserJob;
+
 /**
  *  Test contact import map field.
  *
@@ -43,20 +45,19 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * @param array $mapper
    * @param array $expecteds
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmit($params, $mapper, $expecteds = []) {
-    CRM_Core_DAO::executeQuery('CREATE TABLE IF NOT EXISTS civicrm_import_job_xxx (`nada` text, `first_name` text, `last_name` text, `address` text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci');
-    $form = $this->getFormObject('CRM_Contact_Import_Form_MapField');
+  public function testSubmit($params, $mapper, $expecteds = []): void {
+    $form = $this->getMapFieldFormObject('CRM_Contact_Import_Form_MapField');
     /* @var CRM_Contact_Import_Form_MapField $form */
     $form->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
     $form->_columnNames = ['nada', 'first_name', 'last_name', 'address'];
-    $form->set('importTableName', 'civicrm_import_job_xxx');
     $form->preProcess();
     $form->submit($params, $mapper);
 
-    CRM_Core_DAO::executeQuery("DROP TABLE civicrm_import_job_xxx");
+    CRM_Core_DAO::executeQuery('DROP TABLE civicrm_tmp_d_import_job_xxx');
     if (!empty($expecteds)) {
       foreach ($expecteds as $expected) {
         $result = $this->callAPISuccess($expected['entity'], 'get', array_merge($expected['values'], ['sequential' => 1]));
@@ -124,26 +125,32 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * Instantiate form object
+   * Instantiate MapField form object
    *
-   * @param string $class
-   * @param array $formValues
-   * @param string $pageName
-   * @param array $searchFormValues
-   *   Values for the search form if the form is a task eg.
-   *   for selected ids 6 & 8:
-   *   [
-   *      'radio_ts' => 'ts_sel',
-   *      'task' => CRM_Member_Task::PDF_LETTER,
-   *      'mark_x_6' => 1,
-   *      'mark_x_8' => 1,
-   *   ]
-   *
-   * @return \CRM_Core_Form
+   * @return \CRM_Contact_Import_Form_MapField
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public function getFormObject($class, $formValues = [], $pageName = '', $searchFormValues = []) {
-    $form = parent::getFormObject($class);
+  public function getMapFieldFormObject(): CRM_Contact_Import_Form_MapField {
+    CRM_Core_DAO::executeQuery('CREATE TABLE IF NOT EXISTS civicrm_tmp_d_import_job_xxx (`nada` text, `first_name` text, `last_name` text, `address` text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci');
+    $userJobID = UserJob::create()->setValues([
+      'metadata' => [
+        'submitted_values' => [
+          'dataSource' => 'CRM_Import_DataSource_SQL',
+          'sqlQuery' => 'SELECT * FROM civicrm_tmp_d_import_job_xxx',
+        ],
+      ],
+      'status_id:name' => 'draft',
+      'type_id:name' => 'contact_import',
+    ])->execute()->first()['id'];
+
+    $dataSource = new CRM_Import_DataSource_SQL($userJobID);
+    $params = ['sqlQuery' => 'SELECT * FROM civicrm_tmp_d_import_job_xxx'];
+    $null = NULL;
+    $form = $this->getFormObject('CRM_Contact_Import_Form_MapField');
+    $form->set('user_job_id', $userJobID);
+    $dataSource->postProcess($params, $null, $form);
+
     $contactFields = CRM_Contact_BAO_Contact::importableFields();
     $fields = [];
     foreach ($contactFields as $name => $field) {
@@ -184,9 +191,8 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testLoadSavedMappingDirect() {
+  public function testLoadSavedMappingDirect(): void {
     $this->entity = 'Contact';
     $this->createCustomGroupWithFieldOfType(['title' => 'My Field']);
     $this->setUpMapFieldForm();
@@ -388,7 +394,7 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
    * @throws \CRM_Core_Exception
    */
   private function setUpMapFieldForm() {
-    $this->form = $this->getFormObject('CRM_Contact_Import_Form_MapField');
+    $this->form = $this->getMapFieldFormObject();
     $this->form->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
   }
 

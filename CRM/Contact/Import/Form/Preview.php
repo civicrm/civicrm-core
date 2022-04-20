@@ -31,8 +31,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    * Set variables up before form is built.
    */
   public function preProcess() {
-    //get the data from the session
-    $dataValues = $this->get('dataValues');
     $mapper = $this->get('mapper');
     $invalidRowCount = $this->get('invalidRowCount');
     $conflictRowCount = $this->get('conflictRowCount');
@@ -82,7 +80,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       'locations',
       'phones',
       'ims',
-      'dataValues',
       'columnCount',
       'totalRowCount',
       'validRowCount',
@@ -103,6 +100,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     foreach ($properties as $property) {
       $this->assign($property, $this->get($property));
     }
+    $this->assign('dataValues', $this->getDataRows(2));
 
     $this->setStatusUrl();
 

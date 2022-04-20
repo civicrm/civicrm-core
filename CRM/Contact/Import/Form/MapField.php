@@ -75,10 +75,12 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function preProcess() {
-    $dataSource = $this->get('dataSource');
-    $skipColumnHeader = $this->get('skipColumnHeader');
     $this->_mapperFields = $this->get('fields');
     $this->_importTableName = $this->get('importTableName');
     $this->_onDuplicate = $this->get('onDuplicate');
@@ -142,35 +144,16 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->assign('highlightedFields', $highlightedFields);
     $this->_formattedFieldNames[$contactType] = $this->_mapperFields = array_merge($this->_mapperFields, $formattedFieldNames);
 
-    $columnNames = [];
-    //get original col headers from csv if present.
-    if ($dataSource == 'CRM_Import_DataSource_CSV' && $skipColumnHeader) {
-      $columnNames = $this->get('originalColHeader');
-    }
-    else {
-      // get the field names from the temp. DB table
-      $columnsQuery = "SHOW FIELDS FROM $this->_importTableName
-                         WHERE Field NOT LIKE '\_%'";
-      $columnsResult = CRM_Core_DAO::executeQuery($columnsQuery);
-      while ($columnsResult->fetch()) {
-        $columnNames[] = $columnsResult->Field;
-      }
-    }
+    $columnNames = $this->getColumnHeaders();
+    $this->assign('showColNames', !empty($columnNames));
 
-    $showColNames = TRUE;
-    if ($dataSource === 'CRM_Import_DataSource_CSV' && !$skipColumnHeader) {
-      $showColNames = FALSE;
-    }
-    $this->assign('showColNames', $showColNames);
-
-    $this->_columnCount = count($columnNames);
+    $this->_columnCount = $this->getNumberOfColumns();
     $this->_columnNames = $columnNames;
-    $this->assign('columnNames', $columnNames);
+    $this->assign('columnNames', $this->getColumnHeaders());
     //$this->_columnCount = $this->get( 'columnCount' );
     $this->assign('columnCount', $this->_columnCount);
-    $this->_dataValues = $this->get('dataValues');
+    $this->_dataValues = array_values($this->getDataRows(2));
     $this->assign('dataValues', $this->_dataValues);
-    $this->assign('rowDisplayCount', 2);
   }
 
   /**
@@ -243,7 +226,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     foreach ($mapperKeys as $key) {
       // check if there is a _a_b or _b_a in the key
       if (strpos($key, '_a_b') || strpos($key, '_b_a')) {
-        list($id, $first, $second) = explode('_', $key);
+        [$id, $first, $second] = explode('_', $key);
       }
       else {
         $id = $first = $second = NULL;
@@ -559,7 +542,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
 
       //relationship contact mapper info.
-      list($id, $first, $second) = CRM_Utils_System::explode('_', $fldName, 3);
+      [$id, $first, $second] = CRM_Utils_System::explode('_', $fldName, 3);
       if (($first === 'a' && $second === 'b') ||
         ($first === 'b' && $second === 'a')
       ) {
@@ -700,7 +683,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
 
       $mappingID = NULL;
-      for ($i = 0; $i < $this->_columnCount; $i++) {
+      foreach (array_keys($this->getColumnHeaders()) as $i) {
         $mappingID = $this->saveMappingField($mapperKeys, $saveMapping, $cType, $i, $mapper, $parserParameters);
       }
       $this->set('savedMapping', $mappingID);
@@ -712,15 +695,14 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $parserParameters['relatedContactPhoneType'], $parserParameters['relatedContactImProvider'],
       $parserParameters['mapperWebsiteType'], $parserParameters['relatedContactWebsiteType']
     );
+    $parser->setUserJobID($this->getUserJobID());
 
-    $primaryKeyName = $this->get('primaryKeyName');
-    $statusFieldName = $this->get('statusFieldName');
     $parser->run($this->_importTableName,
       $mapper,
       CRM_Import_Parser::MODE_PREVIEW,
       $this->get('contactType'),
-      $primaryKeyName,
-      $statusFieldName,
+      '_id',
+      '_status',
       $this->_onDuplicate,
       NULL, NULL, FALSE,
       CRM_Contact_Import_Parser_Contact::DEFAULT_TIMEOUT,
