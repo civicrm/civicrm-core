@@ -204,9 +204,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     CRM_Core_Error::debug_var('Fatal Error Details', $error, TRUE, TRUE, '', PEAR_LOG_ERR);
     CRM_Core_Error::backtrace('backTrace', TRUE);
 
+    $exit = TRUE;
     if ($config->initialized) {
       $content = $template->fetch('CRM/common/fatal.tpl');
       echo CRM_Utils_System::theme($content);
+      $exit = CRM_Utils_System::shouldExitAfterFatal();
     }
     else {
       echo "Sorry. A non-recoverable error has occurred. The error trace below might help to resolve the issue<p>";
@@ -217,7 +219,13 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       exit;
     }
     $runOnce = TRUE;
-    self::abend(CRM_Core_Error::FATAL_ERROR);
+
+    if ($exit) {
+      self::abend(CRM_Core_Error::FATAL_ERROR);
+    }
+    else {
+      self::inpageExceptionDisplay(CRM_Core_Error::FATAL_ERROR);
+    }
   }
 
   /**
@@ -442,9 +450,14 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
 
     echo CRM_Utils_System::theme($content);
+    $exit = CRM_Utils_System::shouldExitAfterFatal();
 
-    // fin
-    self::abend(CRM_Core_Error::FATAL_ERROR);
+    if ($exit) {
+      self::abend(CRM_Core_Error::FATAL_ERROR);
+    }
+    else {
+      self::inpageExceptionDisplay(CRM_Core_Error::FATAL_ERROR);
+    }
   }
 
   /**
@@ -998,13 +1011,44 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * Terminate execution abnormally.
    *
-   * @param string $code
+   * @param int $code
    */
   protected static function abend($code) {
     // do a hard rollback of any pending transactions
     // if we've come here, its because of some unexpected PEAR errors
     CRM_Core_Transaction::forceRollbackIfEnabled();
     CRM_Utils_System::civiExit($code);
+  }
+
+  /**
+   * Show in-page exception
+   * For situations where where calling abend will block the ability for a branded error screen
+   *
+   * Although the host page will run past this point, CiviCRM should not,
+   * therefore we trigger the civi.exit events
+   *
+   * @param string $code
+   */
+  protected static function inpageExceptionDisplay($code) {
+    // do a hard rollback of any pending transactions
+    // if we've come here, its because of some unexpected PEAR errors
+    CRM_Core_Transaction::forceRollbackIfEnabled();
+
+    if ($code > 0 && !headers_sent()) {
+      http_response_code(500);
+    }
+
+    // move things to CiviCRM cache as needed
+    CRM_Core_Session::storeSessionObjects();
+
+    if (Civi\Core\Container::isContainerBooted()) {
+      Civi::dispatcher()->dispatch('civi.core.exit');
+    }
+
+    $userSystem = CRM_Core_Config::singleton()->userSystem;
+    if (is_callable([$userSystem, 'onCiviExit'])) {
+      $userSystem->onCiviExit();
+    }
   }
 
   /**

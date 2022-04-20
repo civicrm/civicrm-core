@@ -602,6 +602,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function permissionDenied() {
     status_header(403);
+    global $civicrm_wp_title;
+    $civicrm_wp_title = ts('You do not have permission to access this page.');
     throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
   }
 
@@ -1471,6 +1473,24 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function showPasswordFieldWhenAdminCreatesUser() {
     return !$this->isUserRegistrationPermitted();
+  }
+
+  /**
+   * Should the current execution exit after a fatal error?
+   *
+   * In WordPress, it is not usually possible to trigger theming outside of the WordPress theme process,
+   * meaning that in order to render an error inside the theme we cannot exit on error.
+   *
+   * @internal
+   * @return bool
+   */
+  public function shouldExitAfterFatal() {
+    $ret = TRUE;
+    if (!is_admin() && !wp_doing_ajax()) {
+      $ret = FALSE;
+    }
+
+    return apply_filters('civicrm_exit_after_fatal', $ret);
   }
 
 }
