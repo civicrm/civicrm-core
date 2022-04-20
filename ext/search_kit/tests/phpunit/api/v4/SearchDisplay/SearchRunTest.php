@@ -954,4 +954,43 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertEquals('Contact', $result[0]['columns'][0]['val']);
   }
 
+  public function testGroupByContactType(): void {
+    $source = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['contact_type' => 'Individual'],
+      ['contact_type' => 'Individual'],
+      ['contact_type' => 'Individual'],
+      ['contact_type' => 'Organization'],
+      ['contact_type' => 'Organization'],
+      ['contact_type' => 'Household'],
+    ];
+    Contact::save(FALSE)
+      ->addDefault('source', $source)
+      ->setRecords($sampleData)
+      ->execute();
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['contact_type:label', 'COUNT(id) AS COUNT_id'],
+          'where' => [['source', '=', $source]],
+          'groupBy' => ['contact_type'],
+        ],
+      ],
+      'display' => NULL,
+      'afform' => NULL,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(3, $result);
+    $data = array_column(array_column((array) $result, 'data'), 'COUNT_id', 'contact_type:label');
+    $this->assertEquals(3, $data['Individual']);
+    $this->assertEquals(2, $data['Organization']);
+    $this->assertEquals(1, $data['Household']);
+  }
+
 }
