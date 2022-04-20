@@ -6,7 +6,7 @@
       segmentId: '<',
     },
     templateUrl: '~/crmSearchAdmin/searchSegment/crmSearchAdminSegment.html',
-    controller: function ($scope, searchMeta, dialogService, crmApi4, crmStatus, formatForSelect2) {
+    controller: function ($scope, searchMeta, dialogService, crmApi4, crmStatus) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this,
         originalEntity,
@@ -86,8 +86,18 @@
         return searchMeta.getField(fieldName, ctrl.segment.entity_name);
       };
 
+      // Select2-formatted fields that can be used in "when" clause, including :name suffix if applicable
       this.selectFields = function() {
-        return {results: formatForSelect2(searchMeta.getEntity(ctrl.segment.entity_name).fields, 'name', 'label', ['description'])};
+        var fields = {results: []};
+        _.each(searchMeta.getEntity(ctrl.segment.entity_name).fields, function(field) {
+          var item = {
+            id: field.name + (field.suffixes && _.includes(field.suffixes, 'name') ? ':name' : ''),
+            text: field.label,
+            description: field.description
+          };
+          fields.results.push(item);
+        });
+        return fields;
       };
 
       this.save = function() {
