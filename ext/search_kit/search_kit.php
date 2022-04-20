@@ -92,3 +92,14 @@ function search_kit_civicrm_pre($op, $entity, $id, &$params) {
       ->execute();
   }
 }
+
+/**
+ * Implements hook_civicrm_post().
+ */
+function search_kit_civicrm_post($op, $entity, $id, $object) {
+  // Flush fieldSpec cache when saving a SearchSegment
+  if ($entity === 'SearchSegment') {
+    \Civi::$statics['all_search_segments'] = NULL;
+    \Civi::cache('metadata')->clear();
+  }
+}

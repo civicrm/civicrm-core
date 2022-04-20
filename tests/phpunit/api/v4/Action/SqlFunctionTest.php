@@ -246,20 +246,23 @@ class SqlFunctionTest extends UnitTestCase {
   }
 
   public function testRandFunction() {
-    $cid = Contact::create(FALSE)
-      ->addValue('first_name', 'hello')
-      ->execute()->first()['id'];
+    Contact::save(FALSE)
+      ->setRecords(array_fill(0, 6, []))
+      ->execute();
 
     $result = Contact::get(FALSE)
       ->addSelect('RAND() AS rand')
       ->addOrderBy('RAND()')
       ->setDebug(TRUE)
-      ->setLimit(1)
+      ->setLimit(6)
       ->execute();
 
-    $this->assertStringContainsString('ORDER BY RAND()', $result->debug['sql'][0]);
-    $this->assertGreaterThanOrEqual(0, $result[0]['rand']);
-    $this->assertLessThan(1, $result[0]['rand']);
+    // Random numbers should have been ordered from least to greatest
+    $this->assertGreaterThanOrEqual($result[0]['rand'], $result[1]['rand']);
+    $this->assertGreaterThanOrEqual($result[1]['rand'], $result[2]['rand']);
+    $this->assertGreaterThanOrEqual($result[2]['rand'], $result[3]['rand']);
+    $this->assertGreaterThanOrEqual($result[3]['rand'], $result[4]['rand']);
+    $this->assertGreaterThanOrEqual($result[4]['rand'], $result[5]['rand']);
   }
 
   public function testYearInWhereClause() {

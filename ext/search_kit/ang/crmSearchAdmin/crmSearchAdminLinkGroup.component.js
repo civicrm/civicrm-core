@@ -50,7 +50,7 @@
 
       this.sortableOptions = {
         containment: 'tbody',
-        direction: 'vertical',
+        axis: 'y',
         helper: function(e, ui) {
           // Prevent table row width from changing during drag
           ui.children().each(function() {

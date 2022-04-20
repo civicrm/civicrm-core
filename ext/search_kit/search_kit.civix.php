@@ -300,5 +300,10 @@ function _search_kit_civix_civicrm_entityTypes(&$entityTypes) {
       'class' => 'CRM_Search_DAO_SearchDisplay',
       'table' => 'civicrm_search_display',
     ],
+    'CRM_Search_DAO_SearchSegment' => [
+      'name' => 'SearchSegment',
+      'class' => 'CRM_Search_DAO_SearchSegment',
+      'table' => 'civicrm_search_segment',
+    ],
   ]);
 }

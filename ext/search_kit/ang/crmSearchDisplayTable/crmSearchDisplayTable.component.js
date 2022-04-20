@@ -7,7 +7,8 @@
       search: '<',
       display: '<',
       settings: '<',
-      filters: '<'
+      filters: '<',
+      totalCount: '='
     },
     require: {
       afFieldset: '?^^afFieldset'
@@ -17,7 +18,6 @@
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in traits to this controller
         ctrl = angular.extend(this, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplaySortableTrait);
-
 
       this.$onInit = function() {
         this.initializeDisplay($scope, $element);

@@ -64,10 +64,10 @@ class SqlEquation extends SqlExpression {
   /**
    * Render the expression for insertion into the sql query
    *
-   * @param array $fieldList
+   * @param Civi\Api4\Query\Api4SelectQuery $query
    * @return string
    */
-  public function render(array $fieldList): string {
+  public function render(Api4SelectQuery $query): string {
     $output = [];
     foreach ($this->args as $arg) {
       // Just an operator
@@ -76,10 +76,10 @@ class SqlEquation extends SqlExpression {
       }
       // Surround fields with COALESCE to handle null values
       elseif (is_a($arg, SqlField::class)) {
-        $output[] = 'COALESCE(' . $arg->render($fieldList) . ', 0)';
+        $output[] = 'COALESCE(' . $arg->render($query) . ', 0)';
       }
       else {
-        $output[] = $arg->render($fieldList);
+        $output[] = $arg->render($query);
       }
     }
     return '(' . implode(' ', $output) . ')';

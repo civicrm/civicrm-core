@@ -189,4 +189,28 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
     return TRUE;
   }
 
+  /**
+   * Add SearchSegment table
+   * @return bool
+   */
+  public function upgrade_1007(): bool {
+    $this->ctx->log->info('Applying update 1007 - add SearchSegment table.');
+    if (!CRM_Core_DAO::singleValueQuery("SHOW TABLES LIKE 'civicrm_search_segment'")) {
+      $createTable = "
+CREATE TABLE `civicrm_search_segment` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique SearchSegment ID',
+  `name` varchar(255) NOT NULL COMMENT 'Unique name',
+  `label` varchar(255) NOT NULL COMMENT 'Label for identifying search segment (will appear as name of calculated field)',
+  `description` varchar(255) COMMENT 'Description will appear when selecting SearchSegment in the fields dropdown.',
+  `entity_name` varchar(255) NOT NULL COMMENT 'Entity for which this set is used.',
+  `items` text COMMENT 'All items in set',
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `UI_name`(name)
+)
+ENGINE=InnoDB ROW_FORMAT=DYNAMIC";
+      CRM_Core_DAO::executeQuery($createTable, [], TRUE, NULL, FALSE, FALSE);
+    }
+    return TRUE;
+  }
+
 }

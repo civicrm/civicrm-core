@@ -9,22 +9,25 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\Api4\Query;
 
-/**
- * Wild * sql expression
- */
-class SqlWild extends SqlExpression {
+namespace Civi\Api4\Service\Spec\Provider;
 
-  protected function initialize() {
+use Civi\Api4\Service\Spec\RequestSpec;
+
+class SearchSegmentSpecProvider implements Generic\SpecProviderInterface {
+
+  /**
+   * @inheritDoc
+   */
+  public function modifySpec(RequestSpec $spec) {
+    $spec->getFieldByName('name')->setRequired(FALSE);
   }
 
-  public function render(Api4SelectQuery $query): string {
-    return '*';
-  }
-
-  public static function getTitle(): string {
-    return ts('Wild');
+  /**
+   * @inheritDoc
+   */
+  public function applies($entity, $action) {
+    return $entity === 'SearchSegment';
   }
 
 }

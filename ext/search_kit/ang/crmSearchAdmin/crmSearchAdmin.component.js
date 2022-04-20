@@ -443,7 +443,7 @@
       };
 
       $scope.fieldsForGroupBy = function() {
-        return {results: ctrl.getAllFields('', ['Field', 'Custom'], function(key) {
+        return {results: ctrl.getAllFields('', ['Field', 'Custom', 'Extra'], function(key) {
             return _.contains(ctrl.savedSearch.api_params.groupBy, key);
           })
         };
@@ -575,57 +575,27 @@
         return _.findIndex(CRM.crmSearchAdmin.pseudoFields, {name: name}) >= 0;
       };
 
-      /**
-       * Fetch pseudoconstants for main entity + joined entities
-       *
-       * Sets an optionsLoaded property on each entity to avoid duplicate requests
-       *
-       * @var string entity - optional additional entity to load
-       */
+      // Ensure options are loaded for main entity + joined entities
+      // And an optional additional entity
       function loadFieldOptions(entity) {
-        var mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
-          entities = {};
+        // Main entity
+        var entitiesToLoad = [ctrl.savedSearch.api_entity];
 
-        function enqueue(entity) {
-          entity.optionsLoaded = false;
-          entities[entity.name] = [entity.name, 'getFields', {
-            loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
-            where: [['options', '!=', false]],
-            select: ['options']
-          }, {name: 'options'}];
-        }
-
-        if (typeof mainEntity.optionsLoaded === 'undefined') {
-          enqueue(mainEntity);
-        }
-
-        // Optional additional entity
-        if (entity && typeof searchMeta.getEntity(entity).optionsLoaded === 'undefined') {
-          enqueue(searchMeta.getEntity(entity));
-        }
-
+        // Join entities + bridge entities
         _.each(ctrl.savedSearch.api_params.join, function(join) {
-          var joinInfo = searchMeta.getJoin(join[0]),
-            joinEntity = searchMeta.getEntity(joinInfo.entity),
-            bridgeEntity = joinInfo.bridge ? searchMeta.getEntity(joinInfo.bridge) : null;
-          if (typeof joinEntity.optionsLoaded === 'undefined') {
-            enqueue(joinEntity);
-          }
-          if (bridgeEntity && typeof bridgeEntity.optionsLoaded === 'undefined') {
-            enqueue(bridgeEntity);
+          var joinInfo = searchMeta.getJoin(join[0]);
+          entitiesToLoad.push(joinInfo.entity);
+          if (joinInfo.bridge) {
+            entitiesToLoad.push(joinInfo.bridge);
           }
         });
-        if (!_.isEmpty(entities)) {
-          crmApi4(entities).then(function(results) {
-            _.each(results, function(fields, entityName) {
-              var entity = searchMeta.getEntity(entityName);
-              _.each(fields, function(options, fieldName) {
-                _.find(entity.fields, {name: fieldName}).options = options;
-              });
-              entity.optionsLoaded = true;
-            });
-          });
+
+        // Optional additional entity
+        if (entity) {
+          entitiesToLoad.push(entity);
         }
+
+        searchMeta.loadFieldOptions(entitiesToLoad);
       }
 
       // Build a list of all possible links to main entity & join entities

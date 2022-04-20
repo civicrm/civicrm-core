@@ -72,6 +72,7 @@
       if (!this.tab) {
         this.tab = this.tabs[0].name;
       }
+      this.searchSegmentCount = null;
     })
 
     // Controller for creating a new search
@@ -96,7 +97,7 @@
       $scope.$ctrl = this;
     })
 
-    .factory('searchMeta', function($q, formatForSelect2) {
+    .factory('searchMeta', function($q, crmApi4, formatForSelect2) {
       function getEntity(entityName) {
         if (entityName) {
           return _.find(CRM.crmSearchAdmin.schema, {name: entityName});
@@ -347,6 +348,32 @@
               }
             });
           });
+        },
+        // Ensure option lists are loaded for all fields with options
+        // Sets an optionsLoaded property on each entity to avoid duplicate requests
+        loadFieldOptions: function(entities) {
+          var entitiesToLoad = _.transform(entities, function(entitiesToLoad, entityName) {
+            var entity = getEntity(entityName);
+            if (!('optionsLoaded' in entity)) {
+              entity.optionsLoaded = false;
+              entitiesToLoad[entityName] = [entityName, 'getFields', {
+                loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
+                where: [['options', '!=', false]],
+                select: ['options']
+              }, {name: 'options'}];
+            }
+          }, {});
+          if (!_.isEmpty(entitiesToLoad)) {
+            crmApi4(entitiesToLoad).then(function(results) {
+              _.each(results, function(fields, entityName) {
+                var entity = getEntity(entityName);
+                _.each(fields, function(options, fieldName) {
+                  _.find(entity.fields, {name: fieldName}).options = options;
+                });
+                entity.optionsLoaded = true;
+              });
+            });
+          }
         },
         pickIcon: function() {
           var deferred = $q.defer();

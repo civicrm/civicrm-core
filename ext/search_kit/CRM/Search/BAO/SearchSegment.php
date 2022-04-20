@@ -9,22 +9,23 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\Api4\Query;
-
 /**
- * Wild * sql expression
+ * Search Segment BAO
  */
-class SqlWild extends SqlExpression {
+class CRM_Search_BAO_SearchSegment extends CRM_Search_DAO_SearchSegment {
 
-  protected function initialize() {
-  }
-
-  public function render(Api4SelectQuery $query): string {
-    return '*';
-  }
-
-  public static function getTitle(): string {
-    return ts('Wild');
+  /**
+   * Retrieve pseudoconstant options for $this->entity_name field
+   * @return array
+   */
+  public static function getDAOEntityOptions() {
+    return Civi\Api4\Entity::get(FALSE)
+      ->addSelect('name', 'title_plural')
+      ->addOrderBy('title_plural')
+      ->addWhere('type', 'CONTAINS', 'DAOEntity')
+      ->execute()
+      ->indexBy('name')
+      ->column('title_plural');
   }
 
 }
