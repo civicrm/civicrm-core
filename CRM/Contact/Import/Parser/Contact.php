@@ -2714,11 +2714,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         array_unshift($values, $this->_rowCount);
         $this->_unparsedAddresses[] = $values;
       }
-      // we give the derived class a way of aborting the process
-      // note that the return code could be multiple code or'ed together
-      if ($returnCode & self::STOP) {
-        break;
-      }
 
       // see if we've hit our timeout yet
       /* if ( $the_thing_with_the_stuff ) {
