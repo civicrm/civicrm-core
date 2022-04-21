@@ -944,12 +944,7 @@ abstract class CRM_Import_Parser {
         if ((strtolower(trim($customLabel['label'])) == strtolower(trim($v1))) ||
           (strtolower(trim($customValue)) == strtolower(trim($v1)))
         ) {
-          if ($fieldType == 'CheckBox') {
-            $values[$customValue] = 1;
-          }
-          else {
-            $values[] = $customValue;
-          }
+          $values[] = $customValue;
         }
       }
     }

@@ -221,6 +221,30 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test custom multi-value checkbox field is imported properly.
+   */
+  public function testCustomSerializedCheckBox(): void {
+    $this->createCustomGroupWithFieldOfType([], 'checkbox');
+    $customField = $this->getCustomFieldName('checkbox');
+    $contactID = $this->individualCreate();
+    $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type' => 'Donation', $customField => 'L,V'];
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP, NULL);
+    $initialContribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
+    $this->assertContains('L', $initialContribution[$customField], "Contribution Duplicate Skip Import contains L");
+    $this->assertContains('V', $initialContribution[$customField], "Contribution Duplicate Skip Import contains V");
+
+    // Now update.
+    $values['contribution_id'] = $initialContribution['id'];
+    $values[$customField] = 'V';
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
+
+    $updatedContribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $initialContribution['id']]);
+    $this->assertNotContains('L', $updatedContribution[$customField], "Contribution Duplicate Update Import does not contain L");
+    $this->assertContains('V', $updatedContribution[$customField], "Contribution Duplicate Update Import contains V");
+
+  }
+
+  /**
    * Run the import parser.
    *
    * @param array $originalValues
