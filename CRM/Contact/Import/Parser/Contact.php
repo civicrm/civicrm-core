@@ -2578,8 +2578,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param int $mode
    */
   public function set($store, $mode = self::MODE_SUMMARY) {
-    // To be removed in https://github.com/civicrm/civicrm-core/pull/23281
-    $store->set('fieldTypes', $this->getSelectTypes());
   }
 
   /**

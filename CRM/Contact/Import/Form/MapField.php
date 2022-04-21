@@ -134,7 +134,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $defaults = [];
     $mapperKeys = array_keys($this->_mapperFields);
     $hasColumnNames = !empty($this->_columnNames);
-    $hasLocationTypes = $this->get('fieldTypes');
 
     $this->_location_types = ['Primary' => ts('Primary')] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
@@ -207,7 +206,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         $values = [];
         foreach ($relatedFields as $name => $field) {
           $values[$name] = $field['title'];
-          if (isset($hasLocationTypes[$name])) {
+          if ($this->isLocationTypeRequired($name)) {
             $sel3[$key][$name] = $this->_location_types;
           }
           elseif ($name === 'url') {
@@ -271,7 +270,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
       else {
         $options = NULL;
-        if (!empty($hasLocationTypes[$key])) {
+        if ($this->isLocationTypeRequired($key)) {
           $options = $this->_location_types;
         }
         elseif ($key === 'url') {
@@ -649,6 +648,21 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
     }
     return $highlightedFields;
+  }
+
+  /**
+   * Get an array of fields with TRUE or FALSE to reflect need for location type.
+   *
+   * e.g ['first_name' => FALSE, 'email' => TRUE, 'street_address' => TRUE']
+   *
+   * @return bool
+   */
+  private function isLocationTypeRequired($name): bool {
+    static $fields = NULL;
+    if (!$fields) {
+      $fields = (new CRM_Contact_Import_Parser_Contact())->setUserJobID($this->getUserJobID())->getSelectTypes();
+    }
+    return (bool) ($fields[$name] ?? FALSE);
   }
 
 }
