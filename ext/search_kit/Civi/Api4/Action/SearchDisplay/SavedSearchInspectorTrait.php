@@ -157,8 +157,10 @@ trait SavedSearchInspectorTrait {
    * @return bool
    */
   private function canAggregate($fieldPath) {
-    $apiParams = $this->savedSearch['api_params'] ?? [];
+    // Disregard suffix
+    [$fieldPath] = explode(':', $fieldPath);
     $field = $this->getField($fieldPath);
+    $apiParams = $this->savedSearch['api_params'] ?? [];
 
     // If the query does not use grouping or the field doesn't exist, never
     if (empty($apiParams['groupBy']) || !$field) {
@@ -170,8 +172,7 @@ trait SavedSearchInspectorTrait {
     }
 
     // If the entity this column belongs to is being grouped by id, then also no
-    $suffix = strstr($fieldPath, ':') ?: '';
-    $idField = substr($fieldPath, 0, 0 - strlen($field['name'] . $suffix)) . CoreUtil::getIdFieldName($field['entity']);
+    $idField = substr($fieldPath, 0, 0 - strlen($field['name'])) . CoreUtil::getIdFieldName($field['entity']);
     return !in_array($idField, $apiParams['groupBy']);
   }
 
