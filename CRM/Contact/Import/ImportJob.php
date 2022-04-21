@@ -51,37 +51,6 @@ class CRM_Contact_Import_ImportJob {
   protected $_userJobID;
 
   /**
-   * @param string|null $tableName
-   * @param string|null $createSql
-   * @param bool $createTable
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function __construct($tableName = NULL, $createSql = NULL, $createTable = FALSE) {
-    $dao = new CRM_Core_DAO();
-    $db = $dao->getDatabaseConnection();
-
-    if ($createTable) {
-      if (!$createSql) {
-        throw new CRM_Core_Exception(ts('Either an existing table name or an SQL query to build one are required'));
-      }
-      if ($tableName) {
-        // Drop previous table if passed in and create new one.
-        $db->query("DROP TABLE IF EXISTS $tableName");
-      }
-      $table = CRM_Utils_SQL_TempTable::build()->setDurable();
-      $tableName = $table->getName();
-      $table->createWithQuery($createSql);
-    }
-
-    if (!$tableName) {
-      throw new CRM_Core_Exception(ts('Import Table is required.'));
-    }
-
-    $this->_tableName = $tableName;
-  }
-
-  /**
    * @return null|string
    */
   public function getTableName() {
@@ -92,19 +61,9 @@ class CRM_Contact_Import_ImportJob {
    * Has the job completed.
    *
    * @return bool
-   * @throws Exception
    */
-  public function isComplete() {
-    if (!$this->_statusFieldName) {
-      throw new CRM_Core_Exception("Could not get name of the import status field");
-    }
-    $query = "SELECT * FROM $this->_tableName
-                  WHERE  $this->_statusFieldName = 'NEW' LIMIT 1";
-    $result = CRM_Core_DAO::executeQuery($query);
-    if ($result->fetch()) {
-      return FALSE;
-    }
-    return TRUE;
+  public function isComplete(): bool {
+    return $this->_parser->isComplete();
   }
 
   /**
@@ -220,7 +179,7 @@ class CRM_Contact_Import_ImportJob {
       $parserParameters['relatedContactWebsiteType']
     );
     $this->_parser->setUserJobID($this->_userJobID);
-    $this->_parser->run($this->_tableName, $mapperFields,
+    $this->_parser->run(NULL, $mapperFields,
       CRM_Import_Parser::MODE_IMPORT,
       $this->_contactType,
       $this->_primaryKeyName,

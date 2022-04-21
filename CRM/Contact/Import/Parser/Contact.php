@@ -2583,15 +2583,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $this->_conflicts = [];
     $this->_unparsedAddresses = [];
 
-    // Transitional support for deprecating table_name (and other fields)
-    // form input - the goal is to load them from userJob - but eventually
-    // we will just load the datasource object and this code will not know the
-    // table name.
-    if (!$tableName && $this->userJobID) {
-      $tableName = $this->getUserJob()['metadata']['DataSource']['table_name'];
-    }
-
-    $this->_tableName = $tableName;
+    $this->_tableName = $tableName = $this->getUserJob()['metadata']['DataSource']['table_name'];
     $this->_primaryKeyName = '_id';
     $this->_statusFieldName = '_status';
 
@@ -3649,6 +3641,19 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $params = $this->getActiveFieldParams();
     $params['contact_type'] = $this->getContactType();
     return $params;
+  }
+
+  /**
+   * Is the job complete.
+   *
+   * This function transitionally accesses the table from the userJob
+   * directly - but the function should be moved to the dataSource class.
+   *
+   * @throws \API_Exception
+   */
+  public function isComplete() {
+    $tableName = $this->getUserJob()['metadata']['DataSource']['table_name'];
+    return (bool) CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM $tableName WHERE _status = 'NEW' LIMIT 1");
   }
 
 }

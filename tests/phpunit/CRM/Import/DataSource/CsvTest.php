@@ -28,15 +28,19 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    * @param array $fileData
    *
    * @dataProvider getCsvFiles
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testToCsv(array $fileData): void {
     $form = $this->submitDatasourceForm($fileData['filename']);
-    $tableName = $form->get('importTableName');
+    $csvObject = new CRM_Import_DataSource_Csv($form->getUserJobID());
+    $rows = $csvObject->getRows(0, 0, [], FALSE);
     foreach (['first_name', 'last_name', 'email'] as $field) {
-      $json = json_encode(CRM_Core_DAO::singleValueQuery("SELECT $field FROM $tableName"));
+      $json = json_encode($rows[0][$field]);
       $this->assertEquals($fileData["{$field}_json"], $json, "{$fileData['filename']} failed on $field");
     }
-    CRM_Core_DAO::executeQuery("DROP TABLE $tableName");
+    $csvObject->purge();
   }
 
   /**
@@ -129,10 +133,11 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    */
   public function testBlankLineAtEnd(): void {
     $form = $this->submitDatasourceForm('blankLineAtEnd.csv');
-    $tableName = $form->get('importTableName');
-    $json = json_encode(CRM_Core_DAO::singleValueQuery("SELECT email FROM $tableName"));
+    $csvObject = new CRM_Import_DataSource_Csv($form->getUserJobID());
+
+    $json = json_encode($csvObject->getRow()['email']);
     $this->assertEquals('"yogi@yellowstone.park"', $json);
-    CRM_Core_DAO::executeQuery("DROP TABLE $tableName");
+    $csvObject->purge();
   }
 
   /**
