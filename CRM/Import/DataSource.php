@@ -399,6 +399,7 @@ abstract class CRM_Import_DataSource {
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   *
    * @noinspection PhpUnusedParameterInspection
    */
   public function purge(array $newParams = []) :array {
