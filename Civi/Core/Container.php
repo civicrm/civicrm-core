@@ -617,6 +617,7 @@ class Container {
       \CRM_Extension_System::singleton(TRUE);
       \CRM_Extension_System::singleton()->getClassLoader()->register();
       \CRM_Extension_System::singleton()->getMixinLoader()->run();
+      \CRM_Utils_Hook::singleton()->commonBuildModuleList('civicrm_boot');
       $bootServices['dispatcher.boot']->setDispatchPolicy($mainDispatchPolicy);
 
       $runtime->includeCustomPath();
