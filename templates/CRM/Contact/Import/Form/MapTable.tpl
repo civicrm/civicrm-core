@@ -10,11 +10,11 @@
 <div class="crm-block crm-form-block crm-import-maptable-form-block">
 
 {* Import Wizard - Data Mapping table used by MapFields.tpl and Preview.tpl *}
- <div id="map-field">
+  <div id="map-field">
     {strip}
     <table class="selector">
     {if $savedMappingName}
-        <tr class="columnheader-dark"><th colspan="4">{ts 1=$savedMappingName}Saved Field Mapping: %1{/ts}</td></tr>
+      <tr class="columnheader-dark"><th colspan="4">{ts 1=$savedMappingName}Saved Field Mapping: %1{/ts}</td></tr>
     {/if}
 
     {* Header row - has column for column names if they have been supplied *}
@@ -29,127 +29,94 @@
       <td>{ts}Matching CiviCRM Field{/ts}</td>
     </tr>
 
-        {*Loop on columns parsed from the import data rows*}
-        {foreach from=$mapper key=i item=mapperField}
-
-            <tr style="border: 1px solid #DDDDDD;">
-
-                {if array_key_exists($i, $columnNames)}
-                  <td class="even-row labels">{$columnNames[$i]}</td>
-                {/if}
-                {foreach from=$dataValues item=row key=index}
-                  <td class="odd-row">{$row[$i]|escape}</td>
-                {/foreach}
-
-                {* Display mapper <select> field for 'Map Fields', and mapper value for 'Preview' *}
-                <td class="form-item even-row{if $wizard.currentStepName == 'Preview'} labels{/if}">
-                  {if $wizard.currentStepName == 'Preview'}
-                    {if $relatedContactDetails && $relatedContactDetails[$i] != ''}
-                            {$mapper[$i]} - {$relatedContactDetails[$i]}
-
-                            {if $relatedContactLocType && $relatedContactLocType[$i] != ''}
-                              - {$relatedContactLocType[$i]}
-                      {/if}
-
-                            {if $relatedContactPhoneType && $relatedContactPhoneType[$i] != ''}
-                              - {$relatedContactPhoneType[$i]}
-                      {/if}
-
-                            {* append IM Service Provider type for related contact *}
-                            {if  $relatedContactImProvider && $relatedContactImProvider[$i] != ''}
-                                - {$relatedContactImProvider[$i]}
-                            {/if}
-
-          {* append website type *}
-          {if  $relatedContactWebsiteType && $relatedContactWebsiteType[$i] != ''}
-                                - {$relatedContactWebsiteType[$i]}
-                            {/if}
-
-          {else}
-
-                            {if $locations[$i]}
-                                {$locations[$i]} -
-                            {/if}
-
-                            {if $phones[$i]}
-                                {$phones[$i]} -
-                            {/if}
-
-                            {* append IM Service provider type for contact *}
-                            {if $ims[$i]}
-                                {$ims[$i]} -
-                            {/if}
-
-          {* append website type *}
-                            {if $websites[$i]}
-                                {$websites[$i]} -
-                            {/if}
-
-                            {*else*}
-                                {$mapper[$i]}
-                            {*/if*}
-                        {/if}
-                  {else}
-                    {$mapperField.html|smarty:nodefaults}
-                  {/if}
-                </td>
-
-            </tr>
+    {*Loop on columns parsed from the import data rows*}
+    {foreach from=$mapper key=i item=mapperField}
+      <tr style="border: 1px solid #DDDDDD;">
+        {if array_key_exists($i, $columnNames)}
+          <td class="even-row labels">{$columnNames[$i]}</td>
+        {/if}
+        {foreach from=$dataValues item=row key=index}
+          <td class="odd-row">{$row[$i]|escape}</td>
         {/foreach}
 
-    </table>
+        {* Display mapper <select> field for 'Map Fields', and mapper value for 'Preview' *}
+        <td class="form-item even-row{if $wizard.currentStepName == 'Preview'} labels{/if}">
+          {if $wizard.currentStepName == 'Preview'}
+            {if $relatedContactDetails && $relatedContactDetails[$i] != ''}
+                {$mapper[$i]} - {$relatedContactDetails[$i]}
+              {if $relatedContactLocType && $relatedContactLocType[$i] != ''} - {$relatedContactLocType[$i]}{/if}
+              {if $relatedContactPhoneType && $relatedContactPhoneType[$i] != ''} - {$relatedContactPhoneType[$i]}{/if}
+              {* append IM Service Provider type for related contact *}
+              {if  $relatedContactImProvider && $relatedContactImProvider[$i] != ''} - {$relatedContactImProvider[$i]}{/if}
+              {* append website type *}
+              {if  $relatedContactWebsiteType && $relatedContactWebsiteType[$i] != ''} - {$relatedContactWebsiteType[$i]}{/if}
+            {else}
+              {if $locations[$i]}{$locations[$i]} - {/if}
+              {if $phones[$i]}{$phones[$i]} - {/if}
+              {* append IM Service provider type for contact *}
+              {if $ims[$i]}{$ims[$i]} - {/if}
+              {* append website type *}
+              {if $websites[$i]}{$websites[$i]} - {/if}
+              {$mapper[$i]}
+            {/if}
+          {else}
+            {$mapperField.html|smarty:nodefaults}
+          {/if}
+        </td>
+      </tr>
+    {/foreach}
+  </table>
   {/strip}
 
-    {if $wizard.currentStepName != 'Preview'}
+  {if $wizard.currentStepName != 'Preview'}
     <div>
-
       {if $savedMappingName}
-          <span>{$form.updateMapping.html} &nbsp;&nbsp; {$form.updateMapping.label}</span>
+        <span>{$form.updateMapping.html} &nbsp;&nbsp; {$form.updateMapping.label}</span>
       {/if}
       <span>{$form.saveMapping.html} &nbsp;&nbsp; {$form.saveMapping.label}</span>
       <div id="saveDetails" class="form-item">
-            <table class="form-layout-compressed">
-            <tr class="crm-import-maptable-form-block-saveMappingName">
-                        <td class="label">{$form.saveMappingName.label}</td>
-                        <td>{$form.saveMappingName.html}</td>
-                    </tr>
-            <tr class="crm-import-maptable-form-block-saveMappingName">
-                        <td class="label">{$form.saveMappingDesc.label}</td>
-                        <td>{$form.saveMappingDesc.html}</td>
-                    </tr>
-            </table>
+        <table class="form-layout-compressed">
+          <tr class="crm-import-maptable-form-block-saveMappingName">
+            <td class="label">{$form.saveMappingName.label}</td>
+            <td>{$form.saveMappingName.html}</td>
+          </tr>
+          <tr class="crm-import-maptable-form-block-saveMappingName">
+            <td class="label">{$form.saveMappingDesc.label}</td>
+            <td>{$form.saveMappingDesc.html}</td>
+          </tr>
+        </table>
       </div>
       <script type="text/javascript">
-             {if $mappingDetailsError }
-                cj('#saveDetails').show();
-             {else}
-              cj('#saveDetails').hide();
-             {/if}
+        {if $mappingDetailsError }
+          cj('#saveDetails').show();
+        {else}
+          cj('#saveDetails').hide();
+        {/if}
 
-           {literal}
-            function showSaveDetails(chkbox) {
-             if (chkbox.checked) {
+        {literal}
+          function showSaveDetails(chkbox) {
+            if (chkbox.checked) {
               document.getElementById("saveDetails").style.display = "block";
               document.getElementById("saveMappingName").disabled = false;
               document.getElementById("saveMappingDesc").disabled = false;
-             } else {
+            } else {
               document.getElementById("saveDetails").style.display = "none";
               document.getElementById("saveMappingName").disabled = true;
               document.getElementById("saveMappingDesc").disabled = true;
              }
-             }
-            cj('select[id^="mapper"][id$="[0]"]').addClass('huge');
-            {/literal}
-      {include file="CRM/common/highLightImport.tpl" relationship=true}
+          }
+          cj('select[id^="mapper"][id$="[0]"]').addClass('huge');
+        {/literal}
+        {include file="CRM/common/highLightImport.tpl" relationship=true}
 
-      {* // Set default location type *}
-      {literal}
-      CRM.$(function($) {
-        var defaultLocationType = "{/literal}{$defaultLocationType}{literal}";
-        if (defaultLocationType.length) {
-          $('#map-field').on('change', 'select[id^="mapper"][id$="_0"]', function() {
-            var select = $(this).next();
-            $('option', select).each(function() {
+        {* // Set default location type *}
+        {literal}
+        CRM.$(function($) {
+          var defaultLocationType = "{/literal}{$defaultLocationType}{literal}";
+          if (defaultLocationType.length) {
+            $('#map-field').on('change', 'select[id^="mapper"][id$="_0"]', function() {
+              var select = $(this).next();
+              $('option', select).each(function() {
               if ($(this).attr('value') == defaultLocationType
                 && $(this).text() == {/literal}{$defaultLocationTypeLabel|@json_encode}{literal}) {
                 select.val(defaultLocationType);
@@ -159,8 +126,8 @@
         }
       });
       {/literal}
-  </script>
+      </script>
     </div>
     {/if}
- </div>
+  </div>
 </div>
