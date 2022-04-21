@@ -157,6 +157,12 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
   protected function submitFileForMapping($parserClassName, $entity = NULL) {
     $this->controller->resetPage('MapField');
     CRM_Core_Session::singleton()->set('dateTypes', $this->getSubmittedValue('dateFormats'));
+    if (!$this->getUserJobID()) {
+      $this->createUserJob();
+    }
+    else {
+      $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
+    }
 
     $mapper = [];
 
@@ -165,6 +171,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
       $parser->setEntity($this->get($entity));
     }
     $parser->setMaxLinesToProcess(100);
+    $parser->setUserJobID($this->getUserJobID());
     $parser->run(
       $this->getSubmittedValue('uploadFile'),
       $this->getSubmittedValue('fieldSeparator'),
