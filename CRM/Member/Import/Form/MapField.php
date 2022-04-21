@@ -20,7 +20,6 @@
  */
 class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
 
-
   /**
    * store contactType.
    *
@@ -287,67 +286,65 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
   public static function formRule($fields, $files, $self) {
     $errors = [];
 
-    if (!array_key_exists('savedMapping', $fields)) {
-      $importKeys = [];
-      foreach ($fields['mapper'] as $mapperPart) {
-        $importKeys[] = $mapperPart[0];
-      }
-      // FIXME: should use the schema titles, not redeclare them
-      $requiredFields = array(
-        'membership_contact_id' => ts('Contact ID'),
-        'membership_type_id' => ts('Membership Type'),
-        'membership_start_date' => ts('Membership Start Date'),
-      );
+    $importKeys = [];
+    foreach ($fields['mapper'] as $mapperPart) {
+      $importKeys[] = $mapperPart[0];
+    }
+    // FIXME: should use the schema titles, not redeclare them
+    $requiredFields = array(
+      'membership_contact_id' => ts('Contact ID'),
+      'membership_type_id' => ts('Membership Type'),
+      'membership_start_date' => ts('Membership Start Date'),
+    );
 
-      $contactTypeId = $self->get('contactType');
-      $contactTypes = array(
-        CRM_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
-        CRM_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
-        CRM_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
-      );
-      $params = array(
-        'used' => 'Unsupervised',
-        'contact_type' => $contactTypes[$contactTypeId],
-      );
-      list($ruleFields, $threshold) = CRM_Dedupe_BAO_DedupeRuleGroup::dedupeRuleFieldsWeight($params);
-      $weightSum = 0;
-      foreach ($importKeys as $key => $val) {
-        if (array_key_exists($val, $ruleFields)) {
-          $weightSum += $ruleFields[$val];
-        }
+    $contactTypeId = $self->get('contactType');
+    $contactTypes = array(
+      CRM_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
+      CRM_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
+      CRM_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
+    );
+    $params = array(
+      'used' => 'Unsupervised',
+      'contact_type' => $contactTypes[$contactTypeId],
+    );
+    list($ruleFields, $threshold) = CRM_Dedupe_BAO_DedupeRuleGroup::dedupeRuleFieldsWeight($params);
+    $weightSum = 0;
+    foreach ($importKeys as $key => $val) {
+      if (array_key_exists($val, $ruleFields)) {
+        $weightSum += $ruleFields[$val];
       }
-      $fieldMessage = '';
-      foreach ($ruleFields as $field => $weight) {
-        $fieldMessage .= ' ' . $field . '(weight ' . $weight . ')';
-      }
+    }
+    $fieldMessage = '';
+    foreach ($ruleFields as $field => $weight) {
+      $fieldMessage .= ' ' . $field . '(weight ' . $weight . ')';
+    }
 
-      foreach ($requiredFields as $field => $title) {
-        if (!in_array($field, $importKeys)) {
-          if ($field == 'membership_contact_id') {
-            if ((($weightSum >= $threshold || in_array('external_identifier', $importKeys)) &&
-                $self->_onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE
-              ) ||
-              in_array('membership_id', $importKeys)
-            ) {
-              continue;
-            }
-            else {
-              if (!isset($errors['_qf_default'])) {
-                $errors['_qf_default'] = '';
-              }
-              $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', array(
-                1 => $threshold,
-              )) . ' ' . ts('(OR Membership ID if update mode.)') . '<br />';
-            }
+    foreach ($requiredFields as $field => $title) {
+      if (!in_array($field, $importKeys)) {
+        if ($field == 'membership_contact_id') {
+          if ((($weightSum >= $threshold || in_array('external_identifier', $importKeys)) &&
+              $self->_onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE
+            ) ||
+            in_array('membership_id', $importKeys)
+          ) {
+            continue;
           }
           else {
             if (!isset($errors['_qf_default'])) {
               $errors['_qf_default'] = '';
             }
-            $errors['_qf_default'] .= ts('Missing required field: %1', array(
-              1 => $title,
-            )) . '<br />';
+            $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', array(
+              1 => $threshold,
+            )) . ' ' . ts('(OR Membership ID if update mode.)') . '<br />';
           }
+        }
+        else {
+          if (!isset($errors['_qf_default'])) {
+            $errors['_qf_default'] = '';
+          }
+          $errors['_qf_default'] .= ts('Missing required field: %1', array(
+            1 => $title,
+          )) . '<br />';
         }
       }
     }
@@ -384,14 +381,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public function postProcess() {
     $params = $this->controller->exportValues('MapField');
-    //reload the mapfield if load mapping is pressed
-    if (!empty($params['savedMapping'])) {
-      $this->set('savedMapping', $params['savedMapping']);
-      $this->controller->resetPage($this->_name);
-      return;
-    }
     $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
-
     $mapper = [];
     $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
     $mapperKeysMain = [];
