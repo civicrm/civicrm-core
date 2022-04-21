@@ -178,6 +178,7 @@ class CRM_Contact_Import_ImportJob {
       $parserParameters['mapperWebsiteType'],
       $parserParameters['relatedContactWebsiteType']
     );
+
     $this->_parser->setUserJobID($this->_userJobID);
     $this->_parser->run(NULL, $mapperFields,
       CRM_Import_Parser::MODE_IMPORT,
