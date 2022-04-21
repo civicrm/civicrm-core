@@ -87,6 +87,8 @@
         </div>
         {assign var="totalAmount" value=$pendingAmount}
         {include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
+        {* This is required to allow the total_amount to be extracted from the form using javascript (eg. for Stripe) *}
+        <input type="hidden" id="total_amount" name="total_amount" value="{$totalAmount}">
       {else}
         <div class="display-block">
           <td class="label">{$form.total_amount.label}</td>
