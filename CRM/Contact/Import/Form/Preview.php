@@ -237,8 +237,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       'userJobID' => $this->getUserJobID(),
     );
 
-    $tableName = $this->get('importTableName');
-    $importJob = new CRM_Contact_Import_ImportJob($tableName);
+    $importJob = new CRM_Contact_Import_ImportJob();
     $importJob->setJobParams($importJobParams);
 
     // If ACL applies to the current user, update cache before running the import.

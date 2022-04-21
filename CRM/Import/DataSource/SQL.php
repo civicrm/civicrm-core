@@ -85,17 +85,14 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function postProcess(&$params, &$db, &$form) {
-    $importJob = new CRM_Contact_Import_ImportJob(
-      NULL,
-      $params['sqlQuery'], TRUE
-    );
-    $tableName = $importJob->getTableName();
+    $table = CRM_Utils_SQL_TempTable::build()->setDurable();
+    $tableName = $table->getName();
+    $table->createWithQuery($this->getSubmittedValue('sqlQuery'));
 
-    $form->set('importTableName', $tableName);
     // Get the names of the fields to be imported. Any fields starting with an
     // underscore are considered to be internal to the import process)
     $columnsResult = CRM_Core_DAO::executeQuery(
-      'SHOW FIELDS FROM ' . $importJob->getTableName() . "
+      'SHOW FIELDS FROM ' . $tableName . "
       WHERE Field NOT LIKE '\_%'");
 
     $columnNames = [];
@@ -105,7 +102,7 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
 
     $this->addTrackingFieldsToTable($tableName);
     $this->updateUserJobMetadata('DataSource', [
-      'table_name' => $importJob->getTableName(),
+      'table_name' => $tableName,
       'column_headers' => $columnNames,
       'number_of_columns' => count($columnNames),
     ]);

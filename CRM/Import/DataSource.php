@@ -24,6 +24,35 @@ use Civi\Api4\UserJob;
 abstract class CRM_Import_DataSource {
 
   /**
+   * @var \CRM_Core_DAO
+   */
+  private $queryResultObject;
+
+  /**
+   * @var int
+   */
+  private $limit;
+
+  /**
+   * @var int
+   */
+  private $offset;
+
+  /**
+   * Statuses of rows to fetch.
+   *
+   * @var array
+   */
+  private $statuses = [];
+
+  /**
+   * @param array $statuses
+   */
+  public function setStatuses(array $statuses): void {
+    $this->statuses = $statuses;
+  }
+
+  /**
    * Class constructor.
    *
    * @param int|null $userJobID
@@ -115,29 +144,67 @@ abstract class CRM_Import_DataSource {
    *
    * @param int $limit
    * @param int $offset
+   * @param array $statuses
+   * @param bool $nonAssociative
+   *   Return as a non-associative array?
    *
    * @return array
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public function getRows(int $limit = 0, int $offset = 0) {
-    $query = 'SELECT * FROM ' . $this->getTableName();
-    if ($limit) {
-      $query .= ' LIMIT ' . $limit . ($offset ? (' OFFSET ' . $offset) : NULL);
-    }
+  public function getRows(int $limit = 0, int $offset = 0, array $statuses = [], bool $nonAssociative = TRUE): array {
+    $this->limit = $limit;
+    $this->offset = $offset;
+    $this->statuses = $statuses;
+    $this->instantiateQueryObject();
     $rows = [];
-    $result = CRM_Core_DAO::executeQuery($query);
-    while ($result->fetch()) {
-      $values = $result->toArray();
+    while ($this->queryResultObject->fetch()) {
+      $values = $this->queryResultObject->toArray();
       /* trim whitespace around the values */
       foreach ($values as $k => $v) {
         $values[$k] = trim($v, " \t\r\n");
       }
       // Historically we expect a non-associative array...
-      $rows[] = array_values($values);
+      $rows[] = $nonAssociative ? array_values($values) : $values;
     }
+    $this->queryResultObject = NULL;
     return $rows;
+  }
+
+  /**
+   * Get the next row.
+   *
+   * @return array|null
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function getRow(): ?array {
+    if (!$this->queryResultObject) {
+      $this->instantiateQueryObject();
+    }
+    if (!$this->queryResultObject->fetch()) {
+      return NULL;
+    }
+    return $this->queryResultObject->toArray();
+  }
+
+  /**
+   * Get row count.
+   *
+   * The array has all values.
+   *
+   * @return int
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function getRowCount(array $statuses = []): int {
+    $query = 'SELECT count(*) FROM ' . $this->getTableName();
+    if (!empty($statuses)) {
+      $query .= ' WHERE _status IN (' . implode(',', $statuses) . ')';
+    }
+    return CRM_Core_DAO::singleValueQuery($query);
   }
 
   /**
@@ -306,6 +373,8 @@ abstract class CRM_Import_DataSource {
    *   some metadata.
    *
    * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @noinspection PhpUnusedParameterInspection
    */
   public function purge(array $newParams = []) :array {
     // The old name is still stored...
@@ -315,7 +384,6 @@ abstract class CRM_Import_DataSource {
     }
     return [];
   }
-
 
   /**
    * Add a status columns to the import table.
@@ -342,6 +410,22 @@ abstract class CRM_Import_DataSource {
        ADD COLUMN _statusMsg TEXT,
        ADD COLUMN _id INT PRIMARY KEY NOT NULL AUTO_INCREMENT"
     );
+  }
+
+  /**
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  private function instantiateQueryObject(): void {
+    $query = 'SELECT * FROM ' . $this->getTableName();
+    if (!empty($this->statuses)) {
+      $query .= ' WHERE _status IN (' . implode(',', $this->statuses) . ')';
+    }
+    if ($this->limit) {
+      $query .= ' LIMIT ' . $this->limit . ($this->offset ? (' OFFSET ' . $this->offset) : NULL);
+    }
+    $this->queryResultObject = CRM_Core_DAO::executeQuery($query);
   }
 
 }

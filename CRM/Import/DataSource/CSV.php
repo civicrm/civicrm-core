@@ -79,7 +79,6 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * @throws \API_Exception
    */
   public function postProcess(&$params, &$db, &$form) {
-    $firstRowIsColumnHeader = $params['skipColumnHeader'] ?? FALSE;
     $result = self::_CsvToTable(
       $this->getSubmittedValue('uploadFile')['name'],
       $this->getSubmittedValue('skipColumnHeader'),
@@ -87,11 +86,9 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     );
     $this->addTrackingFieldsToTable($result['import_table_name']);
 
-    $form->set('originalColHeader', CRM_Utils_Array::value('column_headers', $result));
-    $form->set('importTableName', $result['import_table_name']);
     $this->updateUserJobMetadata('DataSource', [
       'table_name' => $result['import_table_name'],
-      'column_headers' => $firstRowIsColumnHeader ? $result['column_headers'] : [],
+      'column_headers' => $this->getSubmittedValue('skipColumnHeader') ? $result['column_headers'] : [],
       'number_of_columns' => $result['number_of_columns'],
     ]);
   }
