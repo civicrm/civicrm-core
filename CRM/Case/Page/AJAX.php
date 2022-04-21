@@ -23,7 +23,7 @@ class CRM_Case_Page_AJAX {
   /**
    * @throws \CRM_Core_Exception
    */
-  public function processCaseTags() {
+  public static function processCaseTags() {
 
     $caseId = CRM_Utils_Type::escape($_POST['case_id'], 'Positive');
     $tags = CRM_Utils_Type::escape($_POST['tag'], 'String');
