@@ -391,6 +391,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->controller->resetPage($this->_name);
       return;
     }
+    $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
 
     $mapperKeys = [];
     $mapper = [];
@@ -468,6 +469,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     $parser = new CRM_Member_Import_Parser_Membership($mapperKeysMain, $mapperLocType, $mapperPhoneType);
+    $parser->setUserJobID($this->getUserJobID());
     $parser->run($this->getSubmittedValue('uploadFile'), $this->getSubmittedValue('fieldSeparator'), $mapper, $this->getSubmittedValue('skipColumnHeader'),
       CRM_Import_Parser::MODE_PREVIEW, $this->get('contactType')
     );

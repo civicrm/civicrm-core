@@ -100,7 +100,8 @@ class CRM_Member_Import_Form_Preview extends CRM_Import_Form_Preview {
       }
     }
 
-    $parser = new CRM_Member_Import_Parser_Membership($mapperKeys, $mapperLocType, $mapperPhoneType);
+    $parser = new CRM_Member_Import_Parser_Membership($mapperKeys);
+    $parser->setUserJobID($this->getUserJobID());
 
     $mapFields = $this->get('fields');
 
