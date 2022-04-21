@@ -17,6 +17,13 @@
 class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
 
   /**
+   * Form fields declared for this datasource.
+   *
+   * @var string[]
+   */
+  protected $submittableFields = ['sqlQuery'];
+
+  /**
    * Provides information about the data source.
    *
    * @return array
@@ -90,6 +97,9 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
     );
 
     $form->set('importTableName', $importJob->getTableName());
+    $this->dataSourceMetadata = [
+      'table_name' => $importJob->getTableName(),
+    ];
   }
 
 }

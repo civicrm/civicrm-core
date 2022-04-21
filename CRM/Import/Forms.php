@@ -15,32 +15,134 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\UserJob;
+
 /**
  * This class helps the forms within the import flow access submitted & parsed values.
  */
 class CRM_Import_Forms extends CRM_Core_Form {
 
   /**
-   * Get the submitted value, accessing it from whatever form in the flow it is submitted on.
+   * User job id.
+   *
+   * This is the primary key of the civicrm_user_job table which is used to
+   * track the import.
+   *
+   * @var int
+   */
+  protected $userJobID;
+
+  /**
+   * @return int|null
+   */
+  public function getUserJobID(): ?int {
+    if (!$this->userJobID && $this->get('user_job_id')) {
+      $this->userJobID = $this->get('user_job_id');
+    }
+    return $this->userJobID;
+  }
+
+  /**
+   * Set user job ID.
+   *
+   * @param int $userJobID
+   */
+  public function setUserJobID(int $userJobID): void {
+    $this->userJobID = $userJobID;
+    // This set allows other forms in the flow ot use $this->get('user_job_id').
+    $this->set('user_job_id', $userJobID);
+  }
+
+  /**
+   * User job details.
+   *
+   * This is the relevant row from civicrm_user_job.
+   *
+   * @var array
+   */
+  protected $userJob;
+
+  /**
+   * Get User Job.
+   *
+   * API call to retrieve the userJob row.
+   *
+   * @return array
+   *
+   * @throws \API_Exception
+   */
+  protected function getUserJob(): array {
+    if (!$this->userJob) {
+      $this->userJob = UserJob::get()
+        ->addWhere('id', '=', $this->getUserJobID())
+        ->execute()
+        ->first();
+    }
+    return $this->userJob;
+  }
+
+  /**
+   * Get submitted values stored in the user job.
+   *
+   * @return array
+   * @throws \API_Exception
+   */
+  protected function getUserJobSubmittedValues(): array {
+    return $this->getUserJob()['metadata']['submitted_values'];
+  }
+
+  /**
+   * Fields that may be submitted on any form in the flow.
+   *
+   * @var string[]
+   */
+  protected $submittableFields = [
+    // Skip column header is actually a field that would be added from the
+    // datasource - but currently only in contact, it is always there for
+    // other imports, ditto uploadFile.
+    'skipColumnHeader' => 'DataSource',
+    'fieldSeparator' => 'DataSource',
+    'uploadFile' => 'DataSource',
+    'contactType' => 'DataSource',
+    'dateFormats' => 'DataSource',
+    'savedMapping' => 'DataSource',
+    'dataSource' => 'DataSource',
+  ];
+
+  /**
+   * Get the submitted value, accessing it from whatever form in the flow it is
+   * submitted on.
+   *
    * @param string $fieldName
    *
    * @return mixed|null
+   * @throws \CRM_Core_Exception
    */
   public function getSubmittedValue(string $fieldName) {
-    $mappedValues = [
-      'skipColumnHeader' => 'DataSource',
-      'fieldSeparator' => 'DataSource',
-      'uploadFile' => 'DataSource',
-      'contactType' => 'DataSource',
-      'dateFormats' => 'DataSource',
-      'savedMapping' => 'DataSource',
-      'dataSource' => 'DataSource',
-    ];
+    if ($fieldName === 'dataSource') {
+      // Hard-coded handling for DataSource as it affects the contents of
+      // getSubmittableFields and can cause a loop.
+      return $this->controller->exportValue('DataSource', 'dataSource');
+    }
+    $mappedValues = $this->getSubmittableFields();
     if (array_key_exists($fieldName, $mappedValues)) {
       return $this->controller->exportValue($mappedValues[$fieldName], $fieldName);
     }
     return parent::getSubmittedValue($fieldName);
 
+  }
+
+  /**
+   * Get values submitted on any form in the multi-page import flow.
+   *
+   * @return array
+   */
+  public function getSubmittedValues(): array {
+    $values = [];
+    foreach (array_keys($this->getSubmittableFields()) as $key) {
+      $values[$key] = $this->getSubmittedValue($key);
+    }
+    return $values;
   }
 
   /**
@@ -96,7 +198,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getDataSourceClassName(): ?string {
+  protected function getDataSourceClassName(): string {
     $className = CRM_Utils_Request::retrieveValue(
       'dataSource',
       'String'
@@ -123,11 +225,45 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function buildDataSourceFields(): void {
-    $className = $this->getDataSourceClassName();
-    if ($className) {
-      $dataSourceClass = new $className();
+    $dataSourceClass = $this->getDataSourceObject();
+    if ($dataSourceClass) {
       $dataSourceClass->buildQuickForm($this);
     }
+  }
+
+  /**
+   * Get the relevant datasource object.
+   *
+   * @return \CRM_Import_DataSource|null
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDataSourceObject(): ?CRM_Import_DataSource {
+    $className = $this->getDataSourceClassName();
+    if ($className) {
+      /* @var CRM_Import_DataSource $dataSource */
+      return new $className($this->getUserJobID());
+    }
+    return NULL;
+  }
+
+  /**
+   * Allow the datasource class to add fields.
+   *
+   * This is called as a snippet in DataSourceConfig and
+   * also from DataSource::buildForm to add the fields such
+   * that quick form picks them up.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDataSourceFields(): array {
+    $className = $this->getDataSourceClassName();
+    if ($className) {
+      /* @var CRM_Import_DataSource $dataSourceClass */
+      $dataSourceClass = new $className();
+      return $dataSourceClass->getSubmittableFields();
+    }
+    return [];
   }
 
   /**
@@ -137,6 +273,64 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   protected function getDefaultDataSource(): string {
     return 'CRM_Import_DataSource_CSV';
+  }
+
+  /**
+   * Get the fields that can be submitted in the Import form flow.
+   *
+   * These could be on any form in the flow & are accessed the same way from
+   * all forms.
+   *
+   * @return string[]
+   * @throws \CRM_Core_Exception
+   */
+  protected function getSubmittableFields(): array {
+    $dataSourceFields = array_fill_keys($this->getDataSourceFields(), 'DataSource');
+    return array_merge($this->submittableFields, $dataSourceFields);
+  }
+
+  /**
+   * Create a user job to track the import.
+   *
+   * @return int
+   *
+   * @throws \API_Exception
+   */
+  protected function createUserJob(): int {
+    $id = UserJob::create(FALSE)
+      ->setValues([
+        'created_id' => CRM_Core_Session::getLoggedInContactID(),
+        'type_id:name' => 'contact_import',
+        'status_id:name' => 'draft',
+        // This suggests the data could be cleaned up after this.
+        'expires_date' => '+ 1 week',
+        'metadata' => [
+          'submitted_values' => $this->getSubmittedValues(),
+        ],
+      ])
+      ->execute()
+      ->first()['id'];
+    $this->setUserJobID($id);
+    return $id;
+  }
+
+  /**
+   * @param string $key
+   * @param array $data
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function updateUserJobMetadata(string $key, array $data): void {
+    $metaData = array_merge(
+      $this->getUserJob()['metadata'],
+      [$key => $data]
+    );
+    UserJob::update(FALSE)
+      ->addWhere('id', '=', $this->getUserJobID())
+      ->setValues(['metadata' => $metaData])
+      ->execute();
+    $this->userJob['metadata'] = $metaData;
   }
 
 }

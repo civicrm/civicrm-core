@@ -15,6 +15,14 @@
 class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
 
   /**
+   * Prepare for tests.
+   */
+  public function setUp(): void {
+    $this->createLoggedInUser();
+    parent::setUp();
+  }
+
+  /**
    * Test the to csv function.
    *
    * @param array $fileData

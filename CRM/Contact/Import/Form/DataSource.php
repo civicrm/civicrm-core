@@ -74,7 +74,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
   public function buildQuickForm() {
 
     $this->assign('urlPath', 'civicrm/import/datasource');
-    $this->assign('urlPathVar', 'snippet=4');
+    $this->assign('urlPathVar', 'snippet=4&user_job_id=' . $this->get('user_job_id'));
 
     $this->add('select', 'dataSource', ts('Data Source'), $this->getDataSources(), TRUE,
       ['onchange' => 'buildDataSourceFormBlock(this.value);']
@@ -168,10 +168,16 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
    * Call the DataSource's postProcess method.
    *
    * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function postProcess() {
     $this->controller->resetPage('MapField');
-
+    if (!$this->getUserJobID()) {
+      $this->createUserJob();
+    }
+    else {
+      $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
+    }
     // Setup the params array
     $this->_params = $this->controller->exportValues($this->_name);
 
@@ -208,6 +214,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
 
     $parser = new CRM_Contact_Import_Parser_Contact($mapper);
     $parser->setMaxLinesToProcess(100);
+    $parser->setUserJobID($this->getUserJobID());
     $parser->run($importTableName,
       $mapper,
       CRM_Import_Parser::MODE_MAPFIELD,
@@ -234,12 +241,12 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
    * @throws \CRM_Core_Exception
    */
   private function instantiateDataSource(): void {
-    $dataSourceName = $this->getDataSourceClassName();
-    $dataSource = new $dataSourceName();
+    $dataSource = $this->getDataSourceObject();
     // Get the PEAR::DB object
     $dao = new CRM_Core_DAO();
     $db = $dao->getDatabaseConnection();
     $dataSource->postProcess($this->_params, $db, $this);
+    $this->updateUserJobMetadata('DataSource', $dataSource->getDataSourceMetadata());
   }
 
   /**

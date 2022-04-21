@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\UserJob;
+
 /**
  *
  * @package CRM
@@ -40,6 +42,48 @@ abstract class CRM_Import_Parser {
    */
   const CONTACT_INDIVIDUAL = 1, CONTACT_HOUSEHOLD = 2, CONTACT_ORGANIZATION = 4;
 
+
+  /**
+   * User job id.
+   *
+   * This is the primary key of the civicrm_user_job table which is used to
+   * track the import.
+   *
+   * @var int
+   */
+  protected $userJobID;
+
+  /**
+   * @return int|null
+   */
+  public function getUserJobID(): ?int {
+    return $this->userJobID;
+  }
+
+  /**
+   * Set user job ID.
+   *
+   * @param int $userJobID
+   */
+  public function setUserJobID(int $userJobID): void {
+    $this->userJobID = $userJobID;
+  }
+
+  /**
+   * Get User Job.
+   *
+   * API call to retrieve the userJob row.
+   *
+   * @return array
+   *
+   * @throws \API_Exception
+   */
+  protected function getUserJob(): array {
+    return UserJob::get()
+      ->addWhere('id', '=', $this->getUserJobID())
+      ->execute()
+      ->first();
+  }
 
   /**
    * Total number of non empty lines
