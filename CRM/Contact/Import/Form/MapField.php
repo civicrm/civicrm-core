@@ -138,12 +138,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $this->_location_types = ['Primary' => ts('Primary')] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
-
-    // Pass default location to js
-    if ($defaultLocationType) {
-      $this->assign('defaultLocationType', $defaultLocationType->id);
-      $this->assign('defaultLocationTypeLabel', $this->_location_types[$defaultLocationType->id]);
-    }
+    $this->assign('defaultLocationType', $defaultLocationType->id);
+    $this->assign('defaultLocationTypeLabel', $this->_location_types[$defaultLocationType->id]);
 
     /* Initialize all field usages to false */
     foreach ($mapperKeys as $key) {
