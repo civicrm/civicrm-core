@@ -52,7 +52,6 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testDataSources(): void {
     $this->createLoggedInUser();

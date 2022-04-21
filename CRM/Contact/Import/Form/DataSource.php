@@ -176,6 +176,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
       $this->createUserJob();
     }
     else {
+      $this->flushDataSource();
       $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
     }
     // Setup the params array
@@ -209,11 +210,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
 
     CRM_Core_Session::singleton()->set('dateTypes', $storeParams['dateFormats']);
 
-    //hack to prevent multiple tables.
-    $this->_params['import_table_name'] = $this->get('importTableName');
-    if (!$this->_params['import_table_name']) {
-      $this->_params['import_table_name'] = 'civicrm_import_job_' . md5(uniqid(rand(), TRUE));
-    }
     $this->instantiateDataSource();
 
     // We should have the data in the DB now, parse it
