@@ -219,7 +219,7 @@ class Api4SelectQuery {
     }
     else {
       if ($this->forceSelectId) {
-        $keys = CoreUtil::getInfoItem($this->getEntity(), 'primary_key');
+        $keys = (array) CoreUtil::getInfoItem($this->getEntity(), 'primary_key');
         $select = array_merge($keys, $select);
       }
 
