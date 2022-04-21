@@ -71,14 +71,14 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
     $errors = [];
 
     // Makeshift query validation (case-insensitive regex matching on word boundaries)
-    $forbidden = ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP', 'SHOW', 'UPDATE', 'information_schema'];
+    $forbidden = ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP', 'SHOW', 'UPDATE', 'REPLACE', 'information_schema'];
     foreach ($forbidden as $pattern) {
       if (preg_match("/\\b$pattern\\b/i", $fields['sqlQuery'])) {
         $errors['sqlQuery'] = ts('The query contains the forbidden %1 command.', [1 => $pattern]);
       }
     }
 
-    return $errors ? $errors : TRUE;
+    return $errors ?: TRUE;
   }
 
   /**
@@ -88,7 +88,9 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
    * @param string $db
    * @param \CRM_Core_Form $form
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function postProcess(&$params, &$db, &$form) {
     $importJob = new CRM_Contact_Import_ImportJob(
@@ -97,9 +99,21 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
     );
 
     $form->set('importTableName', $importJob->getTableName());
-    $this->dataSourceMetadata = [
+    // Get the names of the fields to be imported. Any fields starting with an
+    // underscore are considered to be internal to the import process)
+    $columnsResult = CRM_Core_DAO::executeQuery(
+      'SHOW FIELDS FROM ' . $importJob->getTableName() . "
+      WHERE Field NOT LIKE '\_%'");
+
+    $columnNames = [];
+    while ($columnsResult->fetch()) {
+      $columnNames[] = $columnsResult->Field;
+    }
+    $this->updateUserJobMetadata('DataSource', [
       'table_name' => $importJob->getTableName(),
-    ];
+      'column_headers' => $columnNames,
+      'number_of_columns' => count($columnNames),
+    ]);
   }
 
 }

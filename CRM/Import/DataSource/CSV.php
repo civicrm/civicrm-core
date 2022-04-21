@@ -84,23 +84,26 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * @param string $db
    * @param \CRM_Core_Form $form
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function postProcess(&$params, &$db, &$form) {
     $file = $params['uploadFile']['name'];
+    $firstRowIsColumnHeader = $params['skipColumnHeader'] ?? FALSE;
     $result = self::_CsvToTable(
       $file,
-      CRM_Utils_Array::value('skipColumnHeader', $params, FALSE),
+      $firstRowIsColumnHeader,
       CRM_Utils_Array::value('import_table_name', $params),
       CRM_Utils_Array::value('fieldSeparator', $params, ',')
     );
 
     $form->set('originalColHeader', CRM_Utils_Array::value('column_headers', $result));
     $form->set('importTableName', $result['import_table_name']);
-    $this->dataSourceMetadata = [
+    $this->updateUserJobMetadata('DataSource', [
       'table_name' => $result['import_table_name'],
-      'column_headers' => $result['column_headers'] ?? NULL,
-    ];
+      'column_headers' => $firstRowIsColumnHeader ? $result['column_headers'] : [],
+      'number_of_columns' => $result['number_of_columns'],
+    ]);
   }
 
   /**
@@ -253,6 +256,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
 
     //get the import tmp table name.
     $result['import_table_name'] = $tableName;
+    $result['number_of_columns'] = $numColumns;
     return $result;
   }
 

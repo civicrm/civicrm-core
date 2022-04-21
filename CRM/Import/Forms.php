@@ -104,9 +104,13 @@ class CRM_Import_Forms extends CRM_Core_Form {
     'fieldSeparator' => 'DataSource',
     'uploadFile' => 'DataSource',
     'contactType' => 'DataSource',
+    'contactSubType' => 'DataSource',
     'dateFormats' => 'DataSource',
     'savedMapping' => 'DataSource',
     'dataSource' => 'DataSource',
+    'dedupe_rule_id' => 'DataSource',
+    'onDuplicate' => 'DataSource',
+    'disableUSPS' => 'DataSource',
   ];
 
   /**
@@ -331,6 +335,54 @@ class CRM_Import_Forms extends CRM_Core_Form {
       ->setValues(['metadata' => $metaData])
       ->execute();
     $this->userJob['metadata'] = $metaData;
+  }
+
+  /**
+   * Get column headers for the datasource or empty array if none apply.
+   *
+   * This would be the first row of a csv or the fields in an sql query.
+   *
+   * If the csv does not have a header row it will be empty.
+   *
+   * @return array
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function getColumnHeaders(): array {
+    return $this->getDataSourceObject()->getColumnHeaders();
+  }
+
+  /**
+   * Get the number of importable columns in the data source.
+   *
+   * @return int
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function getNumberOfColumns(): int {
+    return $this->getDataSourceObject()->getNumberOfColumns();
+  }
+
+  /**
+   * Get x data rows from the datasource.
+   *
+   * At this stage we are fetching from what has been stored in the form
+   * during `postProcess` on the DataSource form.
+   *
+   * In the future we will use the dataSource object, likely
+   * supporting offset as well.
+   *
+   * @param int $limit
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
+   */
+  protected function getDataRows(int $limit): array {
+    return $this->getDataSourceObject()->getRows($limit);
   }
 
 }

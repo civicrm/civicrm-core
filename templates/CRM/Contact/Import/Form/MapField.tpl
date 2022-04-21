@@ -19,7 +19,7 @@
 </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {* Table for mapping data to CRM fields *}
- {include file="CRM/Contact/Import/Form/MapTable.tpl}
+ {include file="CRM/Contact/Import/Form/MapTable.tpl" mapper=$form.mapper}
 
 <script type="text/javascript" >
 {literal}
