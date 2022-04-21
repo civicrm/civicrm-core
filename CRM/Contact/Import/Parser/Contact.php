@@ -287,8 +287,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *   CRM_Import_Parser::ERROR or CRM_Import_Parser::VALID
    */
   public function summary(&$values): int {
-    $erroneousField = NULL;
-    $this->setActiveFieldValues($values, $erroneousField);
+    $this->setActiveFieldValues($values);
     $rowNumber = (int) ($values[count($values) - 1]);
     $errorMessage = NULL;
     $errorRequired = FALSE;

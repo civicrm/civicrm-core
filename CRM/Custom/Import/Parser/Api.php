@@ -110,13 +110,11 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
    * @see CRM_Custom_Import_Parser_BaseClass::summary()
    */
   public function summary(&$values) {
-    $erroneousField = NULL;
-    $response = $this->setActiveFieldValues($values, $erroneousField);
+    $this->setActiveFieldValues($values);
     $errorRequired = FALSE;
     $missingField = '';
     $this->_params = &$this->getActiveFieldParams();
 
-    $formatted = $this->_params;
     $this->_updateWithId = FALSE;
     $this->_parseStreetAddress = CRM_Utils_Array::value('street_address_parsing', CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'address_options'), FALSE);
 
