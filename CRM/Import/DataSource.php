@@ -284,4 +284,37 @@ abstract class CRM_Import_DataSource {
     $this->userJob['metadata'] = $metaData;
   }
 
+  /**
+   * Purge any datasource related assets when the datasource is dropped.
+   *
+   * This is the datasource's chance to delete any tables etc that it created
+   * which will now not be used.
+   *
+   * @param array $newParams
+   *   If the dataSource is being updated to another variant of the same
+   *   class (eg. the csv upload was set to no column headers and they
+   *   have resubmitted WITH skipColumnHeader (first row is a header) then
+   *   the dataSource is still CSV and the params for the new intance
+   *   are passed in. When changing from csv to SQL (for example) newParams is
+   *   empty.
+   *
+   * @return array
+   *   The details to update the DataSource key in the userJob metadata to.
+   *   Generally and empty array but it the datasource decided (for example)
+   *   that the table it created earlier is still consistent with the new params
+   *   then it might decided not to drop the table and would want to retain
+   *   some metadata.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function purge(array $newParams = []) :array {
+    // The old name is still stored...
+    $oldTableName = $this->getTableName();
+    if ($oldTableName) {
+      CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS ' . $oldTableName);
+    }
+    return [];
+  }
+
 }

@@ -241,6 +241,35 @@ class CRM_Import_Forms extends CRM_Core_Form {
   }
 
   /**
+   * Flush datasource on re-submission of the form.
+   *
+   * If the form has been re-submitted the datasource might have changed.
+   * We tell the dataSource class to remove any tables (and potentially files)
+   * created last form submission.
+   *
+   * If the DataSource in use is unchanged (ie still CSV or still SQL)
+   * we also pass in the new variables. In theory it could decide that they
+   * have not actually changed and it doesn't need to do any cleanup.
+   *
+   * In practice the datasource classes blast away as they always have for now
+   * - however, the sql class, for example, might realise the fields it cares
+   * about are unchanged and not flush the table.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function flushDataSource(): void {
+    // If the form has been resubmitted the datasource might have changed.
+    // We give the datasource a chance to clean up any tables it might have
+    // created. If we are still using the same type of datasource (e.g still
+    // an sql query
+    $oldDataSource = $this->getUserJobSubmittedValues()['dataSource'];
+    $oldDataSourceObject = new $oldDataSource($this->getUserJobID());
+    $newParams = $this->getSubmittedValue('dataSource') === $oldDataSource ? $this->getSubmittedValues() : [];
+    $oldDataSourceObject->purge($newParams);
+  }
+
+  /**
    * Get the relevant datasource object.
    *
    * @return \CRM_Import_DataSource|null
