@@ -43,7 +43,12 @@ class CRM_Contact_Import_ImportJob {
   protected $_mapperKeys = [];
   protected $_mapFields;
 
+  /**
+   * @var CRM_Contact_Import_Parser_Contact
+   */
   protected $_parser;
+
+  protected $_userJobID;
 
   /**
    * @param string|null $tableName
@@ -218,7 +223,7 @@ class CRM_Contact_Import_ImportJob {
       $parserParameters['mapperWebsiteType'],
       $parserParameters['relatedContactWebsiteType']
     );
-
+    $this->_parser->setUserJobID($this->_userJobID);
     $this->_parser->run($this->_tableName, $mapperFields,
       CRM_Import_Parser::MODE_IMPORT,
       $this->_contactType,
