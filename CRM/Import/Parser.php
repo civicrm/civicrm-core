@@ -64,9 +64,12 @@ abstract class CRM_Import_Parser {
    * Set user job ID.
    *
    * @param int $userJobID
+   *
+   * @return self
    */
-  public function setUserJobID(int $userJobID): void {
+  public function setUserJobID(int $userJobID): self {
     $this->userJobID = $userJobID;
+    return $this;
   }
 
   /**
@@ -431,6 +434,9 @@ abstract class CRM_Import_Parser {
    */
   public function getSelectTypes() {
     $values = [];
+    // This is only called from the MapField form in isolation now,
+    // so we need to set the metadata.
+    $this->init();
     foreach ($this->_fields as $name => $field) {
       if (isset($field->_hasLocationType)) {
         $values[$name] = $field->_hasLocationType;

@@ -222,9 +222,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
       CRM_Import_Parser::MODE_MAPFIELD
     );
 
-    // add all the necessary variables to the form
-    $parser->set($this);
-
   }
 
   /**
