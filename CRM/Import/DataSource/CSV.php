@@ -36,14 +36,6 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   }
 
   /**
-   * Set variables up before form is built.
-   *
-   * @param CRM_Core_Form $form
-   */
-  public function preProcess(&$form) {
-  }
-
-  /**
    * This is function is called by the form object to get the DataSource's form snippet.
    *
    * It should add all fields necessary to get the data
@@ -56,9 +48,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   public function buildQuickForm(&$form) {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_CSV');
 
-    $config = CRM_Core_Config::singleton();
-
-    $uploadFileSize = CRM_Utils_Number::formatUnitSize($config->maxFileSize . 'm', TRUE);
+    $uploadFileSize = CRM_Utils_Number::formatUnitSize(Civi::settings()->get('maxFileSize') . 'm', TRUE);
     //Fetch uploadFileSize from php_ini when $config->maxFileSize is set to "no limit".
     if (empty($uploadFileSize)) {
       $uploadFileSize = CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'), TRUE);
