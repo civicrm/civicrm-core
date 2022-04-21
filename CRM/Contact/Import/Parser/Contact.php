@@ -2617,7 +2617,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     // get the contents of the temp. import table
     $query = "SELECT * FROM $tableName";
     if ($mode == self::MODE_IMPORT) {
-      $query .= " WHERE $statusFieldName = 'NEW'";
+      $query .= " WHERE _status = 'NEW'";
     }
     if ($this->_maxLinesToProcess > 0) {
       // Note this would only be the case in MapForm mode, where it is set to 100

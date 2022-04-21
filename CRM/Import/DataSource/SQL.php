@@ -89,8 +89,9 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
       NULL,
       $params['sqlQuery'], TRUE
     );
+    $tableName = $importJob->getTableName();
 
-    $form->set('importTableName', $importJob->getTableName());
+    $form->set('importTableName', $tableName);
     // Get the names of the fields to be imported. Any fields starting with an
     // underscore are considered to be internal to the import process)
     $columnsResult = CRM_Core_DAO::executeQuery(
@@ -101,6 +102,8 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
     while ($columnsResult->fetch()) {
       $columnNames[] = $columnsResult->Field;
     }
+
+    $this->addTrackingFieldsToTable($tableName);
     $this->updateUserJobMetadata('DataSource', [
       'table_name' => $importJob->getTableName(),
       'column_headers' => $columnNames,

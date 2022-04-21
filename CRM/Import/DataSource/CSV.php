@@ -76,14 +76,16 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function postProcess(&$params, &$db, &$form) {
     $firstRowIsColumnHeader = $params['skipColumnHeader'] ?? FALSE;
     $result = self::_CsvToTable(
-      $this->getDataSourceMetadata()['uploadFile']['name'],
-      $this->getDataSourceMetadata()['skipColumnHeader'],
-      $this->getDataSourceMetadata()['fieldSeparator'] ?? ','
+      $this->getSubmittedValue('uploadFile')['name'],
+      $this->getSubmittedValue('skipColumnHeader'),
+      $this->getSubmittedValue('fieldSeparator') ?? ','
     );
+    $this->addTrackingFieldsToTable($result['import_table_name']);
 
     $form->set('originalColHeader', CRM_Utils_Array::value('column_headers', $result));
     $form->set('importTableName', $result['import_table_name']);

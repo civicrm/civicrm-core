@@ -306,7 +306,6 @@ abstract class CRM_Import_DataSource {
    *   some metadata.
    *
    * @throws \API_Exception
-   * @throws \CRM_Core_Exception
    */
   public function purge(array $newParams = []) :array {
     // The old name is still stored...
@@ -315,6 +314,34 @@ abstract class CRM_Import_DataSource {
       CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS ' . $oldTableName);
     }
     return [];
+  }
+
+
+  /**
+   * Add a status columns to the import table.
+   *
+   * We add
+   *  _id - primary key
+   *  _status
+   *  _statusMsg
+   *
+   * Note that
+   * 1) the use of the preceding underscore has 2 purposes - it avoids clashing
+   *   with an id field (code comments from 14 years ago suggest perhaps there
+   *   could be cases where it still clashes but time didn't tell in this case)
+   * 2) the show fields query used to get the column names excluded the
+   *   administrative fields, relying on this convention.
+   * 3) we have the capitalisation on _statusMsg - @todo change to _status_message
+   *
+   * @param string $tableName
+   */
+  protected function addTrackingFieldsToTable(string $tableName): void {
+    CRM_Core_DAO::executeQuery("
+     ALTER TABLE $tableName
+       ADD COLUMN _status VARCHAR(32) DEFAULT 'NEW' NOT NULL,
+       ADD COLUMN _statusMsg TEXT,
+       ADD COLUMN _id INT PRIMARY KEY NOT NULL AUTO_INCREMENT"
+    );
   }
 
 }
