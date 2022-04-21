@@ -78,13 +78,11 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * @throws \CRM_Core_Exception
    */
   public function postProcess(&$params, &$db, &$form) {
-    $file = $params['uploadFile']['name'];
     $firstRowIsColumnHeader = $params['skipColumnHeader'] ?? FALSE;
     $result = self::_CsvToTable(
-      $file,
-      $firstRowIsColumnHeader,
-      NULL,
-      CRM_Utils_Array::value('fieldSeparator', $params, ',')
+      $this->getDataSourceMetadata()['uploadFile']['name'],
+      $this->getDataSourceMetadata()['skipColumnHeader'],
+      $this->getDataSourceMetadata()['fieldSeparator'] ?? ','
     );
 
     $form->set('originalColHeader', CRM_Utils_Array::value('column_headers', $result));
@@ -103,8 +101,6 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    *   File name to load.
    * @param bool $headers
    *   Whether the first row contains headers.
-   * @param string $tableName
-   *   Name of table from which data imported.
    * @param string $fieldSeparator
    *   Character that separates the various columns in the file.
    *
@@ -115,7 +111,6 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   private static function _CsvToTable(
     $file,
     $headers = FALSE,
-    $tableName = NULL,
     $fieldSeparator = ','
   ) {
     $result = [];
@@ -184,9 +179,6 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       }
     }
 
-    if ($tableName) {
-      CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS $tableName");
-    }
     $table = CRM_Utils_SQL_TempTable::build()->setDurable();
     $tableName = $table->getName();
     CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS $tableName");
