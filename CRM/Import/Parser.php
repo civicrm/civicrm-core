@@ -255,12 +255,8 @@ abstract class CRM_Import_Parser {
    *
    * @param array $elements
    *   array.
-   * @param $erroneousField
-   *   reference.
-   *
-   * @return int
    */
-  public function setActiveFieldValues($elements, &$erroneousField = NULL) {
+  public function setActiveFieldValues($elements): void {
     $maxCount = count($elements) < $this->_activeFieldCount ? count($elements) : $this->_activeFieldCount;
     for ($i = 0; $i < $maxCount; $i++) {
       $this->_activeFields[$i]->setValue($elements[$i]);
@@ -270,18 +266,6 @@ abstract class CRM_Import_Parser {
     for (; $i < $this->_activeFieldCount; $i++) {
       $this->_activeFields[$i]->resetValue();
     }
-
-    // now validate the fields and return false if error
-    $valid = self::VALID;
-    for ($i = 0; $i < $this->_activeFieldCount; $i++) {
-      if (!$this->_activeFields[$i]->validate()) {
-        // no need to do any more validation
-        $erroneousField = $i;
-        $valid = self::ERROR;
-        break;
-      }
-    }
-    return $valid;
   }
 
   /**

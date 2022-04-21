@@ -508,8 +508,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    *   the result of this processing
    */
   public function summary(&$values) {
-    $erroneousField = NULL;
-    $this->setActiveFieldValues($values, $erroneousField);
+
+    $this->setActiveFieldValues($values);
 
     $errorRequired = FALSE;
 

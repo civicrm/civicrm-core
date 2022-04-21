@@ -155,10 +155,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
    *   the result of this processing
    */
   public function summary(&$values) {
-    $erroneousField = NULL;
-
-    $response = $this->setActiveFieldValues($values, $erroneousField);
-    $errorRequired = FALSE;
+    $this->setActiveFieldValues($values);
     $index = -1;
 
     if ($this->_eventIndex > -1 && $this->_eventTitleIndex > -1) {
