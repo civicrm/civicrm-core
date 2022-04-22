@@ -1,5 +1,8 @@
 <?php
 
+use Civi\Api4\Mapping;
+use Civi\Api4\MappingField;
+
 /**
  * Class CRM_Import_ImportProcessor.
  *
@@ -452,6 +455,29 @@ class CRM_Import_ImportProcessor {
       'options' => ['limit' => 0],
     ])['values'];
     foreach ($fields as $index => $field) {
+      $fieldSpec = $this->getMetadata()[$fields[$index]['name']];
+      $fields[$index]['label'] = $fieldSpec['title'];
+      if (empty($field['location_type_id']) && !empty($fieldSpec['hasLocationType'])) {
+        $fields[$index]['location_type_id'] = 'Primary';
+      }
+    }
+    $this->mappingFields = $this->rekeyBySortedColumnNumbers($fields);
+  }
+
+  /**
+   * Load the mapping from the database into the pre-5.50 format.
+   *
+   * This is preserved as a copy the upgrade script can use - since the
+   * upgrade allows the other to be 'fixed'.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function legacyLoadSavedMapping() {
+    $fields = civicrm_api3('MappingField', 'get', [
+      'mapping_id' => $this->getMappingID(),
+      'options' => ['limit' => 0],
+    ])['values'];
+    foreach ($fields as $index => $field) {
       // Fix up the fact that for lost reasons we save by label not name.
       $fields[$index]['label'] = $field['name'];
       if (empty($field['relationship_type_id'])) {
@@ -587,6 +613,35 @@ class CRM_Import_ImportProcessor {
       return [$this->getFieldName($column), $this->getWebsiteTypeID($column)];
     }
     return [(string) $this->getFieldName($column), $this->getLocationTypeID($column), $this->getPhoneOrIMTypeID($column)];
+  }
+
+  /**
+   * This exists for use in the FiveFifty Upgrade
+   *
+   * @throws \API_Exception|\CiviCRM_API3_Exception
+   */
+  public static function convertSavedFields(): void {
+    $mappings = Mapping::get(FALSE)
+      ->setSelect(['id', 'contact_type'])
+      ->addWhere('mapping_type_id:name', '=', 'Import Contact')
+      ->execute();
+
+    foreach ($mappings as $mapping) {
+      $processor = new CRM_Import_ImportProcessor();
+      $processor->setMappingID($mapping['id']);
+      $processor->setMetadata(CRM_Contact_BAO_Contact::importableFields('All'));
+      $processor->legacyLoadSavedMapping();;
+      foreach ($processor->getMappingFields() as $field) {
+        // The if is mostly precautionary against running this more than once
+        // - which is common in dev if not live...
+        if ($field['name']) {
+          MappingField::update(FALSE)
+            ->setValues(['name' => $field['name']])
+            ->addWhere('id', '=', $field['id'])
+            ->execute();
+        }
+      }
+    }
   }
 
 }
