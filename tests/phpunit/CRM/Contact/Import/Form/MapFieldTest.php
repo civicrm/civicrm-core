@@ -50,7 +50,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    */
   public function testSubmit($params, $mapper, $expecteds = []): void {
-    $form = $this->getMapFieldFormObject('CRM_Contact_Import_Form_MapField');
+    $form = $this->getMapFieldFormObject();
     /* @var CRM_Contact_Import_Form_MapField $form */
     $form->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
     $form->_columnNames = ['nada', 'first_name', 'last_name', 'address'];
@@ -127,18 +127,24 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
   /**
    * Instantiate MapField form object
    *
+   * @param array $submittedValues
+   *   Values that would be submitted by the user.
+   *   Some defaults are provided.
+   *
    * @return \CRM_Contact_Import_Form_MapField
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public function getMapFieldFormObject(): CRM_Contact_Import_Form_MapField {
+  public function getMapFieldFormObject(array $submittedValues = []): CRM_Contact_Import_Form_MapField {
     CRM_Core_DAO::executeQuery('CREATE TABLE IF NOT EXISTS civicrm_tmp_d_import_job_xxx (`nada` text, `first_name` text, `last_name` text, `address` text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci');
+    $submittedValues = array_merge([
+      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'dataSource' => 'CRM_Import_DataSource_SQL',
+      'sqlQuery' => 'SELECT * FROM civicrm_tmp_d_import_job_xxx',
+    ], $submittedValues);
     $userJobID = UserJob::create()->setValues([
       'metadata' => [
-        'submitted_values' => [
-          'dataSource' => 'CRM_Import_DataSource_SQL',
-          'sqlQuery' => 'SELECT * FROM civicrm_tmp_d_import_job_xxx',
-        ],
+        'submitted_values' => $submittedValues,
       ],
       'status_id:name' => 'draft',
       'type_id:name' => 'contact_import',
@@ -147,7 +153,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     $dataSource = new CRM_Import_DataSource_SQL($userJobID);
     $params = ['sqlQuery' => 'SELECT * FROM civicrm_tmp_d_import_job_xxx'];
     $null = NULL;
-    $form = $this->getFormObject('CRM_Contact_Import_Form_MapField');
+    $form = $this->getFormObject('CRM_Contact_Import_Form_MapField', $submittedValues);
     $form->set('user_job_id', $userJobID);
     $dataSource->postProcess($params, $null, $form);
 
@@ -360,6 +366,16 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
       ['external ident', 'external_identifier'],
       ['external idg', 'external_identifier'],
     ];
+  }
+
+  /**
+   * This is accessed by virtue of the MetaDataTrait being included.
+   *
+   * The use of the metadataTrait came from a transitional refactor
+   * but it probably should be phased out again.
+   */
+  protected function getContactType() {
+    return $this->_contactType ?? 'Individual';
   }
 
   /**

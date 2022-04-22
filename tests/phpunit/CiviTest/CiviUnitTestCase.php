@@ -3220,8 +3220,14 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         break;
 
       case 'CRM_Contact_Import_Form_DataSource':
+      case 'CRM_Contact_Import_Form_MapField':
         $form->controller = new CRM_Contact_Import_Controller();
-        break;
+        $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
+        // The submitted values should be set on one or the other of the forms in the flow.
+        // For test simplicity we set on all rather than figuring out which ones go where....
+        $_SESSION['_' . $form->controller->_name . '_container']['values']['DataSource'] = $formValues;
+        $_SESSION['_' . $form->controller->_name . '_container']['values']['MapField'] = $formValues;
+        return $form;
 
       case strpos($class, '_Form_') !== FALSE:
         $form->controller = new CRM_Core_Controller_Simple($class, $pageName);

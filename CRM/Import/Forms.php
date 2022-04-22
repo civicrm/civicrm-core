@@ -294,6 +294,23 @@ class CRM_Import_Forms extends CRM_Core_Form {
   }
 
   /**
+   * Get the contact type selected for the import (on the datasource form).
+   *
+   * @return string
+   *   e.g Individual, Organization, Household.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContactType(): string {
+    $contactTypeMapping = [
+      CRM_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
+      CRM_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
+      CRM_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
+    ];
+    return $contactTypeMapping[$this->getSubmittedValue('contactType')];
+  }
+
+  /**
    * Create a user job to track the import.
    *
    * @return int

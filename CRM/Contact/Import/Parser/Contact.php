@@ -262,6 +262,13 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
+   * Get configured contact type.
+   */
+  protected function getContactType() {
+    return $this->_contactType ?? 'Individual';
+  }
+
+  /**
    * Handle the values in preview mode.
    *
    * @param array $values

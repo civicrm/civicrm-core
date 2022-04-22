@@ -104,13 +104,6 @@ trait CRM_Contact_Import_MetadataTrait {
   }
 
   /**
-   * Get configured contact type.
-   */
-  protected function getContactType() {
-    return $this->_contactType ?? 'Individual';
-  }
-
-  /**
    * Get configured contact sub type.
    *
    * @return string
