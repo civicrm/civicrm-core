@@ -373,13 +373,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $js .= "</script>\n";
     $this->assign('initHideBoxes', $js);
 
-    //set warning if mismatch in more than
-    if (isset($mappingName) &&
-      ($this->_columnCount != count($mappingName))
-    ) {
-      CRM_Core_Session::singleton()->setStatus(ts('The data columns in this import file appear to be different from the saved mapping. Please verify that you have selected the correct saved mapping before continuing.'));
-    }
-
     $this->setDefaults($defaults);
 
     $this->addButtons([
