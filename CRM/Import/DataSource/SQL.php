@@ -37,14 +37,6 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
   }
 
   /**
-   * Set variables up before form is built.
-   *
-   * @param CRM_Core_Form $form
-   */
-  public function preProcess(&$form) {
-  }
-
-  /**
    * This is function is called by the form object to get the DataSource's
    * form snippet. It should add all fields necesarry to get the data
    * uploaded to the temporary table in the DB.

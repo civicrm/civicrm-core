@@ -247,13 +247,6 @@ abstract class CRM_Import_DataSource {
   abstract public function getInfo();
 
   /**
-   * Set variables up before form is built.
-   *
-   * @param CRM_Core_Form $form
-   */
-  abstract public function preProcess(&$form);
-
-  /**
    * This is function is called by the form object to get the DataSource's form snippet.
    *
    * It should add all fields necessary to get the data uploaded to the temporary table in the DB.
@@ -261,15 +254,6 @@ abstract class CRM_Import_DataSource {
    * @param CRM_Core_Form $form
    */
   abstract public function buildQuickForm(&$form);
-
-  /**
-   * Process the form submission.
-   *
-   * @param array $params
-   * @param string $db
-   * @param CRM_Core_Form $form
-   */
-  abstract public function postProcess(&$params, &$db, &$form);
 
   /**
    * Determine if the current user has access to this data source.
