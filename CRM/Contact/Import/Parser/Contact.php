@@ -3533,4 +3533,40 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
   }
 
+  /**
+   * Get the civicrm_mapping_field appropriate layout for the mapper input.
+   *
+   * The input looks something like ['street_address', 1]
+   * and would be mapped to ['name' => 'street_address', 'location_type_id' => 1]
+   *
+   * @param array $fieldMapping
+   * @param int $mappingID
+   * @param int $columnNumber
+   *
+   * @return array
+   */
+  public function getMappingFieldFromMapperInput(array $fieldMapping, int $mappingID, int $columnNumber): array {
+    $isRelationshipField = preg_match('/\d*_a_b|b_a$/', $fieldMapping[0]);
+    $fieldName = $isRelationshipField ? $fieldMapping[1] : $fieldMapping[0];
+    $locationTypeID = NULL;
+    $possibleLocationField = $isRelationshipField ? 2 : 1;
+    if (isset($fieldMapping[$possibleLocationField]) && is_numeric($fieldMapping[$possibleLocationField])) {
+      if ($fieldName !== 'url') {
+        $locationTypeID = $fieldMapping[$possibleLocationField];
+      }
+    }
+    return [
+      'name' => $fieldName,
+      'mapping_id' => $mappingID,
+      'relationship_type_id' => $isRelationshipField ? substr($fieldMapping[1], 0, -4) : NULL,
+      'relationship_direction' => $isRelationshipField ? substr($fieldMapping[1], -4) : NULL,
+      'column_number' => $columnNumber,
+      'contact_type' => $this->getContactType(),
+      'website_type_id' => $fieldName !== 'url' ? NULL : ($isRelationshipField ? $fieldMapping[2] : $fieldMapping[1]),
+      'phone_type_id' => $fieldName !== 'phone' ? NULL : ($isRelationshipField ? $fieldMapping[3] : $fieldMapping[2]),
+      'im_provider_id' => $fieldName !== 'im' ? NULL : ($isRelationshipField ? $fieldMapping[3] : $fieldMapping[2]),
+      'location_type_id' => $locationTypeID,
+    ];
+  }
+
 }

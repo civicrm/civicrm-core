@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\MappingField;
+
 /**
  * This class gets the name of the file to upload.
  */
@@ -539,69 +541,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     //Updating Mapping Records
     if (!empty($params['updateMapping'])) {
-
-      $mappingFields = new CRM_Core_DAO_MappingField();
-      $mappingFields->mapping_id = $params['mappingId'];
-      $mappingFields->find();
-
-      $mappingFieldsId = [];
-      while ($mappingFields->fetch()) {
-        if ($mappingFields->id) {
-          $mappingFieldsId[$mappingFields->column_number] = $mappingFields->id;
-        }
-      }
-
       for ($i = 0; $i < $this->_columnCount; $i++) {
-        $updateMappingFields = new CRM_Core_DAO_MappingField();
-        $updateMappingFields->id = $mappingFieldsId[$i] ?? NULL;
-        $updateMappingFields->mapping_id = $params['mappingId'];
-        $updateMappingFields->column_number = $i;
-
-        $mapperKeyParts = explode('_', $mapperKeys[$i][0], 3);
-        $id = $mapperKeyParts[0] ?? NULL;
-        $first = $mapperKeyParts[1] ?? NULL;
-        $second = $mapperKeyParts[2] ?? NULL;
-        if (($first == 'a' && $second == 'b') || ($first == 'b' && $second == 'a')) {
-          $updateMappingFields->relationship_type_id = $id;
-          $updateMappingFields->relationship_direction = "{$first}_{$second}";
-          $updateMappingFields->name = ucwords(str_replace("_", " ", $mapperKeys[$i][1]));
-          // get phoneType id and provider id separately
-          // before updating mappingFields of phone and IM for related contact, CRM-3140
-          if (CRM_Utils_Array::value('1', $mapperKeys[$i]) == 'url') {
-            $updateMappingFields->website_type_id = $mapperKeys[$i][2] ?? NULL;
-          }
-          else {
-            if (CRM_Utils_Array::value('1', $mapperKeys[$i]) == 'phone') {
-              $updateMappingFields->phone_type_id = $mapperKeys[$i][3] ?? NULL;
-            }
-            elseif (CRM_Utils_Array::value('1', $mapperKeys[$i]) == 'im') {
-              $updateMappingFields->im_provider_id = $mapperKeys[$i][3] ?? NULL;
-            }
-            $updateMappingFields->location_type_id = isset($mapperKeys[$i][2]) && is_numeric($mapperKeys[$i][2]) ? $mapperKeys[$i][2] : NULL;
-          }
-        }
-        else {
-          $updateMappingFields->name = $mapper[$i];
-          $updateMappingFields->relationship_type_id = 'NULL';
-          $updateMappingFields->relationship_type_direction = 'NULL';
-          // to store phoneType id and provider id separately
-          // before updating mappingFields for phone and IM, CRM-3140
-          if (CRM_Utils_Array::value('0', $mapperKeys[$i]) == 'url') {
-            $updateMappingFields->website_type_id = $mapperKeys[$i][1] ?? NULL;
-          }
-          else {
-            if (($mapperKeys[$i][0] ?? NULL) === 'phone' || ($mapperKeys[$i][0] ?? NULL) === 'phone_ext') {
-              $updateMappingFields->phone_type_id = $mapperKeys[$i][2] ?? NULL;
-            }
-            elseif (CRM_Utils_Array::value('0', $mapperKeys[$i]) == 'im') {
-              $updateMappingFields->im_provider_id = $mapperKeys[$i][2] ?? NULL;
-            }
-            $locationTypeID = $parserParameters['mapperLocType'][$i];
-            // location_type_id is NULL for non-location fields, and for Primary location.
-            $updateMappingFields->location_type_id = is_numeric($locationTypeID) ? $locationTypeID : 'null';
-          }
-        }
-        $updateMappingFields->save();
+        $this->saveMappingField($params['mappingId'], $i, TRUE);
       }
     }
 
@@ -615,11 +556,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       $saveMapping = civicrm_api3('Mapping', 'create', $mappingParams);
 
-      $mappingID = NULL;
       foreach (array_keys($this->getColumnHeaders()) as $i) {
-        $mappingID = $this->saveMappingField($mapperKeys, $saveMapping, $this->getContactType(), $i, $mapper, $parserParameters);
+        $this->saveMappingField($saveMapping['id'], $i);
       }
-      $this->set('savedMapping', $mappingID);
+      $this->set('savedMapping', $saveMapping['id']);
     }
 
     $parser = new CRM_Contact_Import_Parser_Contact($mapperKeysMain, $parserParameters['mapperLocType'], $parserParameters['mapperPhoneType'],
@@ -646,65 +586,42 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * @param $mapperKeys
-   * @param array $saveMapping
-   * @param string $cType
-   * @param int $i
-   * @param array $mapper
-   * @param array $parserParameters
+   * Save the mapping field.
    *
-   * @return int
+   * @param int $mappingID
+   * @param int $columnNumber
+   * @param bool $isUpdate
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  protected function saveMappingField($mapperKeys, array $saveMapping, string $cType, int $i, array $mapper, array $parserParameters): int {
-    $saveMappingFields = new CRM_Core_DAO_MappingField();
-    $saveMappingFields->mapping_id = $saveMapping['id'];
-    $saveMappingFields->contact_type = $cType;
-    $saveMappingFields->column_number = $i;
-
-    $mapperKeyParts = explode('_', $mapperKeys[$i][0], 3);
-    $id = $mapperKeyParts[0] ?? NULL;
-    $first = $mapperKeyParts[1] ?? NULL;
-    $second = $mapperKeyParts[2] ?? NULL;
-    if (($first == 'a' && $second == 'b') || ($first == 'b' && $second == 'a')) {
-      $saveMappingFields->name = ucwords(str_replace("_", " ", $mapperKeys[$i][1]));
-      $saveMappingFields->relationship_type_id = $id;
-      $saveMappingFields->relationship_direction = "{$first}_{$second}";
-      // to get phoneType id and provider id separately
-      // before saving mappingFields of phone and IM for related contact, CRM-3140
-      if (CRM_Utils_Array::value('1', $mapperKeys[$i]) == 'url') {
-        $saveMappingFields->website_type_id = $mapperKeys[$i][2] ?? NULL;
-      }
-      else {
-        if (CRM_Utils_Array::value('1', $mapperKeys[$i]) == 'phone') {
-          $saveMappingFields->phone_type_id = $mapperKeys[$i][3] ?? NULL;
-        }
-        elseif (CRM_Utils_Array::value('1', $mapperKeys[$i]) == 'im') {
-          $saveMappingFields->im_provider_id = $mapperKeys[$i][3] ?? NULL;
-        }
-        $saveMappingFields->location_type_id = (isset($mapperKeys[$i][2]) && $mapperKeys[$i][2] !== 'Primary') ? $mapperKeys[$i][2] : NULL;
-      }
+  protected function saveMappingField(int $mappingID, int $columnNumber, bool $isUpdate = FALSE): void {
+    $fieldMapping = (array) $this->getSubmittedValue('mapper')[$columnNumber];
+    $mappedField = $this->getMappedField($fieldMapping, $mappingID, $columnNumber);
+    if ($isUpdate) {
+      MappingField::update(FALSE)
+        ->setValues($mappedField)
+        ->addWhere('column_number', '=', $columnNumber)
+        ->addWhere('mapping_id', '=', $mappingID)
+        ->execute();
     }
     else {
-      $saveMappingFields->name = $mapper[$i];
-      $locationTypeID = $parserParameters['mapperLocType'][$i];
-      // to get phoneType id and provider id separately
-      // before saving mappingFields of phone and IM, CRM-3140
-      if (CRM_Utils_Array::value('0', $mapperKeys[$i]) == 'url') {
-        $saveMappingFields->website_type_id = $mapperKeys[$i][1] ?? NULL;
-      }
-      else {
-        if (($mapperKeys[$i][0] ?? NULL) === 'phone' || ($mapperKeys[$i][0] ?? NULL) === 'phone_ext') {
-          $saveMappingFields->phone_type_id = $mapperKeys[$i][2] ?? NULL;
-        }
-        elseif (CRM_Utils_Array::value('0', $mapperKeys[$i]) == 'im') {
-          $saveMappingFields->im_provider_id = $mapperKeys[$i][2] ?? NULL;
-        }
-        $saveMappingFields->location_type_id = is_numeric($locationTypeID) ? $locationTypeID : NULL;
-      }
-      $saveMappingFields->relationship_type_id = NULL;
+      MappingField::create(FALSE)
+        ->setValues($mappedField)->execute();
     }
-    $saveMappingFields->save();
-    return $saveMappingFields->mapping_id;
+  }
+
+  /**
+   * Get the field mapped to the savable format.
+   *
+   * @param array $fieldMapping
+   * @param int $mappingID
+   * @param int $columnNumber
+   *
+   * @return array
+   */
+  protected function getMappedField(array $fieldMapping, int $mappingID, int $columnNumber): array {
+    return (new CRM_Contact_Import_Parser_Contact())->getMappingFieldFromMapperInput($fieldMapping, $mappingID, $columnNumber);
   }
 
   /**

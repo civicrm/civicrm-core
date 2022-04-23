@@ -29,14 +29,6 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
 
   /**
-   * Cleanup mappings in DB.
-   */
-  public function tearDown(): void {
-    $this->quickCleanup(['civicrm_mapping', 'civicrm_mapping_field'], TRUE);
-    parent::tearDown();
-  }
-
-  /**
    * Map field form.
    *
    * @var CRM_Contact_Import_Form_MapField
@@ -47,7 +39,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * Delete any saved mapping config.
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_mapping', 'civicrm_mapping_field']);
+    $this->quickCleanup(['civicrm_mapping', 'civicrm_mapping_field'], TRUE);
     parent::tearDown();
   }
 
@@ -68,7 +60,6 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    */
   public function testSubmit(array $params, array $mapper, array $expecteds = []): void {
     $form = $this->getMapFieldFormObject(['mapper' => $mapper]);
-    /* @var CRM_Contact_Import_Form_MapField $form */
     $form->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
     $form->preProcess();
     $form->submit($params, $mapper);
@@ -129,10 +120,10 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
             'count' => 4,
             'values' => [],
             'result' => [
-              0 => ['name' => '- do not import -'],
-              1 => ['name' => 'First Name'],
-              2 => ['name' => 'Last Name'],
-              3 => ['name' => 'Street Address', 'location_type_id' => 2],
+              0 => ['name' => 'do_not_import'],
+              1 => ['name' => 'first_name'],
+              2 => ['name' => 'last_name'],
+              3 => ['name' => 'street_address', 'location_type_id' => 2],
             ],
           ],
         ],
@@ -213,6 +204,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * In conjunction with testing our existing  function this  tests the methods we want to migrate to
    * to  clean it up.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
@@ -242,41 +234,41 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
   public function mapFieldDataProvider(): array {
     return [
       [
-        ['name' => 'First Name', 'contact_type' => 'Individual', 'column_number' => 0],
+        ['name' => 'first_name', 'contact_type' => 'Individual', 'column_number' => 0],
         "document.forms.MapField['mapper[0][1]'].style.display = 'none';
 document.forms.MapField['mapper[0][2]'].style.display = 'none';
 document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
         ['mapper[0]' => ['first_name', 0, NULL]],
       ],
       [
-        ['name' => 'Phone', 'contact_type' => 'Individual', 'column_number' => 0, 'phone_type_id' => 1, 'location_type_id' => 2],
+        ['name' => 'phone', 'contact_type' => 'Individual', 'column_number' => 0, 'phone_type_id' => 1, 'location_type_id' => 2],
         "document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
         ['mapper[0]' => ['phone', 2, 1]],
       ],
       [
-        ['name' => 'IM Screen Name', 'contact_type' => 'Individual', 'column_number' => 0, 'im_provider_id' => 1, 'location_type_id' => 2],
+        ['name' => 'im', 'contact_type' => 'Individual', 'column_number' => 0, 'im_provider_id' => 1, 'location_type_id' => 2],
         "document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
         ['mapper[0]' => ['im', 2, 1]],
       ],
       [
-        ['name' => 'Website', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id' => 1],
+        ['name' => 'url', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id' => 1],
         "document.forms.MapField['mapper[0][2]'].style.display = 'none';
 document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
         ['mapper[0]' => ['url', 1]],
       ],
       [
         // Yes, the relationship mapping really does use url whereas non relationship uses website because... legacy
-        ['name' => 'Url', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id' => 1, 'relationship_type_id' => 1, 'relationship_direction' => 'a_b'],
+        ['name' => 'url', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id' => 1, 'relationship_type_id' => 1, 'relationship_direction' => 'a_b'],
         "document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
         ['mapper[0]' => ['1_a_b', 'url', 1]],
       ],
       [
-        ['name' => 'Phone', 'contact_type' => 'Individual', 'column_number' => 0, 'phone_type_id' => 1, 'relationship_type_id' => 1, 'relationship_direction' => 'b_a'],
+        ['name' => 'phone', 'contact_type' => 'Individual', 'column_number' => 0, 'phone_type_id' => 1, 'relationship_type_id' => 1, 'relationship_direction' => 'b_a'],
         '',
         ['mapper[0]' => ['1_b_a', 'phone', 'Primary', 1]],
       ],
       [
-        ['name' => '- do not import -', 'contact_type' => 'Individual', 'column_number' => 0],
+        ['name' => 'do_not_import', 'contact_type' => 'Individual', 'column_number' => 0],
         "document.forms.MapField['mapper[0][1]'].style.display = 'none';
 document.forms.MapField['mapper[0][2]'].style.display = 'none';
 document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
