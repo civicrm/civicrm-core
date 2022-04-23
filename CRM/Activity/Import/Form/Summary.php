@@ -33,17 +33,7 @@ class CRM_Activity_Import_Form_Summary extends CRM_Import_Form_Summary {
     $this->set('totalRowCount', $totalRowCount);
 
     $invalidRowCount = $this->get('invalidRowCount');
-    $duplicateRowCount = $this->get('duplicateRowCount');
     $onDuplicate = $this->get('onDuplicate');
-
-    if ($duplicateRowCount > 0) {
-      $urlParams = 'type=' . CRM_Import_Parser::DUPLICATE . '&parser=CRM_Activity_Import_Parser_Activity';
-      $this->set('downloadDuplicateRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
-    }
-    else {
-      $duplicateRowCount = 0;
-      $this->set('duplicateRowCount', $duplicateRowCount);
-    }
 
     $this->assign('dupeError', FALSE);
 
@@ -62,9 +52,7 @@ class CRM_Activity_Import_Form_Summary extends CRM_Import_Form_Summary {
 
       // Only subtract dupes from successful import if we're skipping.
 
-      $this->set('validRowCount', $totalRowCount - $invalidRowCount -
-         $duplicateRowCount
-      );
+      $this->set('validRowCount', $totalRowCount - $invalidRowCount);
     }
     $this->assign('dupeActionString', $dupeActionString);
 
@@ -73,8 +61,6 @@ class CRM_Activity_Import_Form_Summary extends CRM_Import_Form_Summary {
       'validRowCount',
       'invalidRowCount',
       'downloadErrorRecordsUrl',
-      'duplicateRowCount',
-      'downloadDuplicateRecordsUrl',
       'groupAdditions',
     ];
     foreach ($properties as $property) {

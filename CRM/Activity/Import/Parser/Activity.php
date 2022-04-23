@@ -120,26 +120,14 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
   }
 
   /**
-   * Handle the values in preview mode.
-   *
-   * @param array $values
-   *   The array of values belonging to this line.
-   *
-   * @return bool
-   *   the result of this processing
-   */
-  public function preview(&$values) {
-    return $this->summary($values);
-  }
-
-  /**
    * Handle the values in summary mode.
    *
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return bool
-   *   the result of this processing
+   * @return int
+   *   CRM_Import_Parser::VALID for success or
+   *   CRM_Import_Parser::ERROR for error.
    */
   public function summary(&$values) {
     try {
@@ -160,8 +148,10 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return bool
-   *   the result of this processing
+   * @return int
+   *   CRM_Import_Parser::VALID for success or
+   *   CRM_Import_Parser::ERROR for error.
+   *
    * @throws \CRM_Core_Exception
    */
   public function import($onDuplicate, &$values) {
@@ -535,10 +525,8 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
       if ($mode == self::MODE_MAPFIELD) {
         $returnCode = CRM_Import_Parser::VALID;
       }
-      elseif ($mode == self::MODE_PREVIEW) {
-        $returnCode = $this->preview($values);
-      }
-      elseif ($mode == self::MODE_SUMMARY) {
+      // Note that MODE_SUMMARY seems to be never used.
+      elseif ($mode == self::MODE_PREVIEW || $mode == self::MODE_SUMMARY) {
         $returnCode = $this->summary($values);
       }
       elseif ($mode == self::MODE_IMPORT) {
@@ -570,19 +558,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
         $this->_errors[] = $values;
       }
 
-      if ($returnCode & self::DUPLICATE) {
-        $this->_duplicateCount++;
-        $recordNumber = $this->_lineCount;
-        if ($this->_haveColumnHeader) {
-          $recordNumber--;
-        }
-        array_unshift($values, $recordNumber);
-        $this->_duplicates[] = $values;
-        if ($onDuplicate != self::DUPLICATE_SKIP) {
-          $this->_validCount++;
-        }
-      }
-
       // if we are done processing the maxNumber of lines, break
       if ($this->_maxLinesToProcess > 0 && $this->_validCount >= $this->_maxLinesToProcess) {
         break;
@@ -608,16 +583,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
         );
         $this->_errorFileName = self::errorFileName(self::ERROR);
         self::exportCSV($this->_errorFileName, $headers, $this->_errors);
-      }
-
-      if ($this->_duplicateCount) {
-        $headers = array_merge(
-          [ts('Line Number'), ts('View Activity History URL')],
-          $customHeaders
-        );
-
-        $this->_duplicateFileName = self::errorFileName(self::DUPLICATE);
-        self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
       }
     }
   }
@@ -666,10 +631,8 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
    * Store parser values.
    *
    * @param CRM_Core_Session $store
-   *
-   * @param int $mode
    */
-  public function set($store, $mode = self::MODE_SUMMARY) {
+  public function set($store) {
     $store->set('fileSize', $this->_fileSize);
     $store->set('lineCount', $this->_lineCount);
     $store->set('separator', $this->_separator);
@@ -689,13 +652,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
 
     if (isset($this->_rows) && !empty($this->_rows)) {
       $store->set('dataValues', $this->_rows);
-    }
-
-    if ($mode == self::MODE_IMPORT) {
-      $store->set('duplicateRowCount', $this->_duplicateCount);
-      if ($this->_duplicateCount) {
-        $store->set('duplicatesFileName', $this->_duplicateFileName);
-      }
     }
   }
 

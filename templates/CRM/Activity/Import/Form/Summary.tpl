@@ -27,15 +27,6 @@
         {ts 1=$downloadErrorRecordsUrl}You can <a href='%1'>Download Errors</a>. You may then correct them, and import the new file with the corrected data.{/ts}
         </p>
     {/if}
-
-    {if $duplicateRowCount}
-        <p {if $dupeError}class="error"{/if}>
-        {ts count=$duplicateRowCount plural='CiviCRM has detected %count records which are duplicates of existing CiviCRM activity records.'}CiviCRM has detected one record which is a duplicate of existing CiviCRM activity record.{/ts} {$dupeActionString}
-        </p>
-        <p {if $dupeError}class="error"{/if}>
-        {ts 1=$downloadDuplicateRecordsUrl}You can <a href='%1'>Download Duplicates</a>. You may then review these records to determine if they are actually duplicates, and correct the transaction IDs for those that are not.{/ts}
-        </p>
-    {/if}
  </div>
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
  {* Summary of Import Results (record counts) *}
@@ -55,18 +46,6 @@
         </td>
     </tr>
     {/if}
-
-    {if $duplicateRowCount}
-    <tr class="error"><td class="label crm-grid-cell">{ts}Duplicate Rows{/ts}</td>
-        <td class="data">{$duplicateRowCount}</td>
-        <td class="explanation">{ts}Rows which are duplicates of existing CiviCRM activity records.{/ts} {$dupeActionString}
-            {if $duplicateRowCount}
-                <p><a href="{$downloadDuplicateRecordsUrl}">{ts}Download Duplicates{/ts}</a></p>
-            {/if}
-        </td>
-    </tr>
-    {/if}
-
     <tr><td class="label crm-grid-cell">{ts}Records Imported{/ts}</td>
         <td class="data">{$validRowCount}</td>
         <td class="explanation">{ts}Rows imported successfully.{/ts}</td>
