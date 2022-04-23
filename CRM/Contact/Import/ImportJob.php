@@ -84,12 +84,12 @@ class CRM_Contact_Import_ImportJob {
   }
 
   /**
-   * @param bool $dropIfComplete
+   * Has the job completed.
    *
    * @return bool
    * @throws Exception
    */
-  public function isComplete($dropIfComplete = TRUE) {
+  public function isComplete() {
     if (!$this->_statusFieldName) {
       throw new CRM_Core_Exception("Could not get name of the import status field");
     }
@@ -98,10 +98,6 @@ class CRM_Contact_Import_ImportJob {
     $result = CRM_Core_DAO::executeQuery($query);
     if ($result->fetch()) {
       return FALSE;
-    }
-    if ($dropIfComplete) {
-      $query = "DROP TABLE $this->_tableName";
-      CRM_Core_DAO::executeQuery($query);
     }
     return TRUE;
   }

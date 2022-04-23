@@ -107,15 +107,6 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
    * Clean up the import table we used.
    */
   public function postProcess() {
-    $dao = new CRM_Core_DAO();
-    $db = $dao->getDatabaseConnection();
-
-    $importTableName = $this->get('importTableName');
-    // do a basic sanity check here
-    if (strpos($importTableName, 'civicrm_import_job_') === 0) {
-      $query = "DROP TABLE IF EXISTS $importTableName";
-      $db->query($query);
-    }
   }
 
 }
