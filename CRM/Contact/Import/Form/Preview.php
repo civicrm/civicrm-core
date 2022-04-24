@@ -29,10 +29,11 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    $mapper = $this->get('mapper');
-    $invalidRowCount = $this->get('invalidRowCount');
     $conflictRowCount = $this->get('conflictRowCount');
     $mismatchCount = $this->get('unMatchCount');
     $columnNames = $this->get('columnNames');
@@ -60,11 +61,12 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       $this->set('tag', $tag);
     }
 
-    if ($invalidRowCount) {
-      $urlParams = 'type=' . CRM_Import_Parser::ERROR . '&parser=CRM_Contact_Import_Parser_Contact';
-      $this->set('downloadErrorRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
-    }
+    $this->assign('downloadErrorRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::ERROR));
+    $this->assign('invalidRowCount', $this->getRowCount(CRM_Import_Parser::ERROR));
+    $this->assign('validRowCount', $this->getRowCount(CRM_Import_Parser::VALID));
+    $this->assign('totalRowCount', $this->getRowCount([]));
 
+    // @todo conflict rows are still being output in the parser & not updating the temp table - fix
     if ($conflictRowCount) {
       $urlParams = 'type=' . CRM_Import_Parser::CONFLICT . '&parser=CRM_Contact_Import_Parser_Contact';
       $this->set('downloadConflictRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
@@ -76,12 +78,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
 
     $properties = array(
-      'columnCount',
-      'totalRowCount',
-      'validRowCount',
-      'invalidRowCount',
       'conflictRowCount',
-      'downloadErrorRecordsUrl',
       'downloadConflictRecordsUrl',
       'downloadMismatchRecordsUrl',
     );
@@ -91,7 +88,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     foreach ($properties as $property) {
       $this->assign($property, $this->get($property));
     }
-    $this->assign('dataValues', $this->getDataRows(2));
+    $this->assign('dataValues', $this->getDataRows([], 2));
 
     $this->setStatusUrl();
   }
@@ -263,9 +260,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
       $this->set('errorFile', $errorFile);
 
-      $urlParams = 'type=' . CRM_Import_Parser::ERROR . '&parser=CRM_Contact_Import_Parser_Contact';
-      $this->set('downloadErrorRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
-
+      // @todo - these should use the new url but are not reliably updating the table yet.
       $urlParams = 'type=' . CRM_Import_Parser::CONFLICT . '&parser=CRM_Contact_Import_Parser_Contact';
       $this->set('downloadConflictRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
 

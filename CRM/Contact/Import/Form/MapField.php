@@ -113,7 +113,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->assign('columnNames', $this->getColumnHeaders());
     //$this->_columnCount = $this->get( 'columnCount' );
     $this->assign('columnCount', $this->_columnCount);
-    $this->_dataValues = array_values($this->getDataRows(2));
+    $this->_dataValues = array_values($this->getDataRows([], 2));
     $this->assign('dataValues', $this->_dataValues);
   }
 

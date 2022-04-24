@@ -21,7 +21,7 @@
  * TODO: CRM-11254 - if preProcess and postProcess functions can be reconciled between the 5 child classes,
  * those classes can be removed entirely and this class will not need to be abstract
  */
-abstract class CRM_Import_Form_Summary extends CRM_Core_Form {
+abstract class CRM_Import_Form_Summary extends CRM_Import_Forms {
 
   /**
    * Build the form object.
