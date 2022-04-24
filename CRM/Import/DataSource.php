@@ -200,10 +200,8 @@ abstract class CRM_Import_DataSource {
    * @throws \CRM_Core_Exception
    */
   public function getRowCount(array $statuses = []): int {
-    $query = 'SELECT count(*) FROM ' . $this->getTableName();
-    if (!empty($statuses)) {
-      $query .= ' WHERE _status IN (' . implode(',', $statuses) . ')';
-    }
+    $this->statuses = $statuses;
+    $query = 'SELECT count(*) FROM ' . $this->getTableName() . ' ' . $this->getStatusClause();
     return CRM_Core_DAO::singleValueQuery($query);
   }
 
@@ -418,14 +416,40 @@ abstract class CRM_Import_DataSource {
    * @throws \CRM_Core_Exception
    */
   private function instantiateQueryObject(): void {
-    $query = 'SELECT * FROM ' . $this->getTableName();
-    if (!empty($this->statuses)) {
-      $query .= ' WHERE _status IN (' . implode(',', $this->statuses) . ')';
-    }
+    $query = 'SELECT * FROM ' . $this->getTableName() . ' ' . $this->getStatusClause();
     if ($this->limit) {
       $query .= ' LIMIT ' . $this->limit . ($this->offset ? (' OFFSET ' . $this->offset) : NULL);
     }
     $this->queryResultObject = CRM_Core_DAO::executeQuery($query);
+  }
+
+  /**
+   * Get the mapping of constants to database status codes.
+   *
+   * @return string[]
+   */
+  protected function getStatusMapping() {
+    return [
+      CRM_Import_Parser::VALID => 'imported',
+      CRM_Import_Parser::ERROR => 'error',
+      CRM_Import_Parser::DUPLICATE => 'duplicate',
+    ];
+  }
+
+  /**
+   * Get the status filter clause.
+   *
+   * @return string
+   */
+  private function getStatusClause(): string {
+    if (!empty($this->statuses)) {
+      $statuses = [];
+      foreach ($this->statuses as $status) {
+        $statuses[] = '"' . $this->getStatusMapping()[$status] . '"';
+      }
+      return ' WHERE _status IN (' . implode(',', $statuses) . ')';
+    }
+    return '';
   }
 
 }

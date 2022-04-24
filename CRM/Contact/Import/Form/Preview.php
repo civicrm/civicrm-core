@@ -60,11 +60,9 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       $this->set('tag', $tag);
     }
 
-    if ($invalidRowCount) {
-      $urlParams = 'type=' . CRM_Import_Parser::ERROR . '&parser=CRM_Contact_Import_Parser_Contact';
-      $this->set('downloadErrorRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
-    }
+    $this->set('downloadErrorRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::ERROR));
 
+    // @todo conflict rows are still being output in the parser & not updating the temp table - fix
     if ($conflictRowCount) {
       $urlParams = 'type=' . CRM_Import_Parser::CONFLICT . '&parser=CRM_Contact_Import_Parser_Contact';
       $this->set('downloadConflictRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
@@ -280,9 +278,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
       $this->set('errorFile', $errorFile);
 
-      $urlParams = 'type=' . CRM_Import_Parser::ERROR . '&parser=CRM_Contact_Import_Parser_Contact';
-      $this->set('downloadErrorRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
-
+      // @todo - these should use the new url but are not reliably updating the table yet.
       $urlParams = 'type=' . CRM_Import_Parser::CONFLICT . '&parser=CRM_Contact_Import_Parser_Contact';
       $this->set('downloadConflictRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
 

@@ -2728,15 +2728,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
 
-      if ($this->_invalidRowCount) {
-        // removed view url for invlaid contacts
-        $headers = array_merge([
-          ts('Line Number'),
-          ts('Reason'),
-        ], $customHeaders);
-        $this->_errorFileName = self::errorFileName(self::ERROR);
-        self::exportCSV($this->_errorFileName, $headers, $this->_errors);
-      }
       if ($this->_conflictCount) {
         $headers = array_merge([
           ts('Line Number'),
@@ -2744,15 +2735,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         ], $customHeaders);
         $this->_conflictFileName = self::errorFileName(self::CONFLICT);
         self::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
-      }
-      if ($this->_duplicateCount) {
-        $headers = array_merge([
-          ts('Line Number'),
-          ts('View Contact URL'),
-        ], $customHeaders);
-
-        $this->_duplicateFileName = self::errorFileName(self::DUPLICATE);
-        self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
       }
       if ($this->_unMatchCount) {
         $headers = array_merge([
@@ -3059,9 +3041,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $store->set('contactType', CRM_Import_Parser::CONTACT_ORGANIZATION);
     }
 
-    if ($this->_invalidRowCount) {
-      $store->set('errorsFileName', $this->_errorFileName);
-    }
     if ($this->_conflictCount) {
       $store->set('conflictsFileName', $this->_conflictFileName);
     }
@@ -3079,11 +3058,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if ($this->_duplicateCount) {
         $store->set('duplicatesFileName', $this->_duplicateFileName);
       }
-      if ($this->_unparsedAddressCount) {
-        $store->set('errorsFileName', $this->_errorFileName);
-      }
     }
-    //echo "$this->_totalCount,$this->_invalidRowCount,$this->_conflictCount,$this->_duplicateCount";
   }
 
   /**

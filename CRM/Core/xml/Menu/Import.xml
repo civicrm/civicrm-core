@@ -18,6 +18,12 @@
      <weight>410</weight>
   </item>
   <item>
+    <path>civicrm/import/outcome</path>
+    <title>Import results</title>
+    <access_arguments>access CiviCRM</access_arguments>
+    <page_callback>CRM_Import_Forms::outputCSV</page_callback>
+  </item>
+  <item>
      <path>civicrm/import/activity</path>
      <title>Import Activities</title>
      <access_arguments>import contacts,access CiviCRM</access_arguments>
