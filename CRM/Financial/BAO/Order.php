@@ -124,7 +124,7 @@ class CRM_Financial_BAO_Order {
    *
    * @var bool
    */
-  protected $isPermitOverrideFinancialTypeForMultipleLines = TRUE;
+  protected $isPermitOverrideFinancialTypeForMultipleLines = FALSE;
 
   /**
    * @return bool
