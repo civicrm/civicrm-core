@@ -89,20 +89,18 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $highlightedFields[] = 'email';
     $highlightedFields[] = 'external_identifier';
     //format custom field names, CRM-2676
+    $contactType = $this->getContactType();
     switch ($this->get('contactType')) {
       case CRM_Import_Parser::CONTACT_INDIVIDUAL:
-        $contactType = 'Individual';
         $highlightedFields[] = 'first_name';
         $highlightedFields[] = 'last_name';
         break;
 
       case CRM_Import_Parser::CONTACT_HOUSEHOLD:
-        $contactType = 'Household';
         $highlightedFields[] = 'household_name';
         break;
 
       case CRM_Import_Parser::CONTACT_ORGANIZATION:
-        $contactType = 'Organization';
         $highlightedFields[] = 'organization_name';
         break;
     }
@@ -661,23 +659,9 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       $saveMapping = civicrm_api3('Mapping', 'create', $mappingParams);
 
-      $contactType = $this->get('contactType');
-      switch ($contactType) {
-        case CRM_Import_Parser::CONTACT_INDIVIDUAL:
-          $cType = 'Individual';
-          break;
-
-        case CRM_Import_Parser::CONTACT_HOUSEHOLD:
-          $cType = 'Household';
-          break;
-
-        case CRM_Import_Parser::CONTACT_ORGANIZATION:
-          $cType = 'Organization';
-      }
-
       $mappingID = NULL;
       foreach (array_keys($this->getColumnHeaders()) as $i) {
-        $mappingID = $this->saveMappingField($mapperKeys, $saveMapping, $cType, $i, $mapper, $parserParameters);
+        $mappingID = $this->saveMappingField($mapperKeys, $saveMapping, $this->getContactType(), $i, $mapper, $parserParameters);
       }
       $this->set('savedMapping', $mappingID);
     }
