@@ -82,10 +82,8 @@ trait CRMTraits_Financial_PriceSetTrait {
    *
    * The price field is of type checkbox and each price-option
    * corresponds to a membership type
-   *
-   * @return array
    */
-  protected function createMembershipPriceSet(): array {
+  protected function createMembershipPriceSet(): void {
     $this->ids['PriceSet']['membership'] = (int) $this->callAPISuccess('PriceSet', 'create', [
       'is_quick_config' => 0,
       'extends' => 'CiviMember',
@@ -109,15 +107,11 @@ trait CRMTraits_Financial_PriceSetTrait {
         'price_field_id' => $this->ids['PriceField']['membership'],
         'label' => array_shift($labels),
         'amount' => array_shift($amounts),
-        'financial_type_id' => 'Donation',
+        'financial_type_id' => 'Member Dues',
         'membership_type_id' => $membershipTypeID,
         'membership_num_terms' => array_shift($membershipNumTerms),
       ])['id'];
     }
-    return [
-      $this->ids['PriceFieldValue']['AnnualRollingOrg2'] => 1,
-      $this->ids['PriceFieldValue']['AnnualRolling'] => 1,
-    ];
   }
 
   /**
