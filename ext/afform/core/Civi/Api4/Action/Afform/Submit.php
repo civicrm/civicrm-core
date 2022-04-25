@@ -4,6 +4,7 @@ namespace Civi\Api4\Action\Afform;
 
 use Civi\Afform\Event\AfformSubmitEvent;
 use Civi\Api4\AfformSubmission;
+use Civi\Api4\RelationshipType;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
@@ -28,7 +29,6 @@ class Submit extends AbstractProcessor {
     $entityValues = [];
     foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
       $entityValues[$entityName] = [];
-
       // Gather submitted field values from $values['fields'] and sub-entities from $values['joins']
       foreach ($this->values[$entityName] ?? [] as $values) {
         // Only accept values from fields on the form
@@ -47,8 +47,12 @@ class Submit extends AbstractProcessor {
         }
         $entityValues[$entityName][] = $values;
       }
-      // Predetermined values override submitted values
       if (!empty($entity['data'])) {
+        // If no submitted values but data exists, fill the minimum number of records
+        for ($index = 0; $index < $entity['min']; $index++) {
+          $entityValues[$entityName][$index] = $entityValues[$entityName][$index] ?? ['fields' => []];
+        }
+        // Predetermined values override submitted values
         foreach ($entityValues[$entityName] as $index => $vals) {
           $entityValues[$entityName][$index]['fields'] = $entity['data'] + $vals['fields'];
         }
@@ -94,7 +98,8 @@ class Submit extends AbstractProcessor {
           if (is_array($value)) {
             foreach ($value as $i => $val) {
               if (in_array($val, $entityNames, TRUE)) {
-                $records[$key]['fields'][$field][$i] = $this->_entityIds[$val][0]['id'] ?? NULL;
+                $refIds = array_filter(array_column($this->_entityIds[$val], 'id'));
+                array_splice($records[$key]['fields'][$field], $i, 1, $refIds);
               }
             }
           }
@@ -158,6 +163,64 @@ class Submit extends AbstractProcessor {
       catch (\API_Exception $e) {
         // What to do here? Sometimes we should silently ignore errors, e.g. an optional entity
         // intentionally left blank. Other times it's a real error the user should know about.
+      }
+    }
+  }
+
+  /**
+   * @param \Civi\Afform\Event\AfformSubmitEvent $event
+   */
+  public static function processRelationships(AfformSubmitEvent $event) {
+    if ($event->getEntityType() !== 'Relationship') {
+      return;
+    }
+    // Prevent processGenericEntity
+    $event->stopPropagation();
+    $api4 = $event->getSecureApi4();
+    $relationship = $event->records[0]['fields'] ?? [];
+    if (empty($relationship['contact_id_a']) || empty($relationship['contact_id_b']) || empty($relationship['relationship_type_id'])) {
+      return;
+    }
+    $relationshipType = RelationshipType::get(FALSE)
+      ->addWhere('id', '=', $relationship['relationship_type_id'])
+      ->execute()->single();
+    $isReciprocal = $relationshipType['label_a_b'] == $relationshipType['label_b_a'];
+    $isActive = !isset($relationship['is_active']) || !empty($relationship['is_active']);
+    // Each contact id could be multivalued (e.g. using `af-repeat`)
+    foreach ((array) $relationship['contact_id_a'] as $contact_id_a) {
+      foreach ((array) $relationship['contact_id_b'] as $contact_id_b) {
+        $params = $relationship;
+        $params['contact_id_a'] = $contact_id_a;
+        $params['contact_id_b'] = $contact_id_b;
+        // Check for existing relationships (if allowed)
+        if (!empty($event->getEntity()['actions']['update'])) {
+          $where = [
+            ['is_active', '=', $isActive],
+            ['relationship_type_id', '=', $relationship['relationship_type_id']],
+          ];
+          // Reciprocal relationship types need an extra check
+          if ($isReciprocal) {
+            $where[] = ['OR',
+              ['AND', ['contact_id_a', '=', $contact_id_a], ['contact_id_b', '=', $contact_id_b]],
+              ['AND', ['contact_id_a', '=', $contact_id_b], ['contact_id_b', '=', $contact_id_a]],
+            ];
+          }
+          else {
+            $where[] = ['contact_id_a', '=', $contact_id_a];
+            $where[] = ['contact_id_b', '=', $contact_id_b];
+          }
+          $existing = $api4('Relationship', 'get', ['where' => $where])->first();
+          if ($existing) {
+            $params['id'] = $existing['id'];
+            unset($params['contact_id_a'], $params['contact_id_b']);
+            // If this is a flipped reciprocal relationship, also flip the permissions
+            $params['is_permission_a_b'] = $relationship['is_permission_b_a'] ?? NULL;
+            $params['is_permission_b_a'] = $relationship['is_permission_a_b'] ?? NULL;
+          }
+        }
+        $api4('Relationship', 'save', [
+          'records' => [$params],
+        ]);
       }
     }
   }

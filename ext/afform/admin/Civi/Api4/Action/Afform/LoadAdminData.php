@@ -316,6 +316,10 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
         'data_type' => 'Array',
       ],
       [
+        'name' => 'entities',
+        'data_type' => 'Array',
+      ],
+      [
         'name' => 'fields',
         'data_type' => 'Array',
       ],

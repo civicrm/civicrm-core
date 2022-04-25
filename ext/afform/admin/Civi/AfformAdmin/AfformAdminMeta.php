@@ -104,7 +104,6 @@ class AfformAdminMeta {
       $params['values']['state_province_id'] = \Civi::settings()->get('defaultContactStateProvince');
     }
     $fields = (array) civicrm_api4($entityName, 'getFields', $params);
-
     // Add implicit joins to search fields
     if ($params['action'] === 'get') {
       foreach (array_reverse($fields, TRUE) as $index => $field) {
@@ -122,7 +121,24 @@ class AfformAdminMeta {
         }
       }
     }
-    return array_column($fields, NULL, 'name');
+    // Index by name
+    $fields = array_column($fields, NULL, 'name');
+    // Mix in alterations declared by afform entities
+    if ($params['action'] === 'create') {
+      $afEntity = self::getMetadata()['entities'][$entityName] ?? [];
+      if (!empty($afEntity['alterFields'])) {
+        foreach ($afEntity['alterFields'] as $fieldName => $changes) {
+          // Allow field to be deleted
+          if ($changes === FALSE) {
+            unset($fields[$fieldName]);
+          }
+          else {
+            $fields[$fieldName] = \CRM_Utils_Array::crmArrayMerge($changes, ($fields[$fieldName] ?? []));
+          }
+        }
+      }
+    }
+    return $fields;
   }
 
   /**

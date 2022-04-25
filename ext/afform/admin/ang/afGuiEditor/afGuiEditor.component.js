@@ -133,19 +133,21 @@
           var pos = 1 + _.findLastIndex(editor.layout['#children'], {'#tag': 'af-entity'});
           editor.layout['#children'].splice(pos, 0, $scope.entities[type + num]);
           // Create a new af-fieldset container for the entity
-          var fieldset = _.cloneDeep(afGui.meta.elements.fieldset.element);
-          fieldset['af-fieldset'] = type + num;
-          fieldset['af-title'] = meta.label + ' ' + num;
-          // Add boilerplate contents
-          _.each(meta.boilerplate, function (tag) {
-            fieldset['#children'].push(tag);
-          });
-          // Attempt to place the new af-fieldset after the last one on the form
-          pos = 1 + _.findLastIndex(editor.layout['#children'], 'af-fieldset');
-          if (pos) {
-            editor.layout['#children'].splice(pos, 0, fieldset);
-          } else {
-            editor.layout['#children'].push(fieldset);
+          if (meta.boilerplate !== false) {
+            var fieldset = _.cloneDeep(afGui.meta.elements.fieldset.element);
+            fieldset['af-fieldset'] = type + num;
+            fieldset['af-title'] = meta.label + ' ' + num;
+            // Add boilerplate contents
+            _.each(meta.boilerplate, function (tag) {
+              fieldset['#children'].push(tag);
+            });
+            // Attempt to place the new af-fieldset after the last one on the form
+            pos = 1 + _.findLastIndex(editor.layout['#children'], 'af-fieldset');
+            if (pos) {
+              editor.layout['#children'].splice(pos, 0, fieldset);
+            } else {
+              editor.layout['#children'].push(fieldset);
+            }
           }
           delete $scope.entities[type + num].loading;
           if (selectTab) {
