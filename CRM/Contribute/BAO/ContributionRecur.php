@@ -995,11 +995,12 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       ->execute()
       ->first();
 
-    if ($contribution->total_amount === NULL) {
+    if ($contribution->total_amount === NULL || $contribution->currency === NULL) {
+      // The contribution has not been fully loaded, so fetch a full copy now.
       $contribution->find(TRUE);
     }
 
-    if (!CRM_Utils_Money::equals($contributionRecur['amount'], $contribution->total_amount, $contribution->currency)) {
+    if ($contribution->currency !== $contributionRecur['currency'] || !CRM_Utils_Money::equals($contributionRecur['amount'], $contribution->total_amount, $contribution->currency)) {
       ContributionRecur::update(FALSE)
         ->addValue('amount', $contribution->total_amount)
         ->addValue('currency', $contribution->currency)
