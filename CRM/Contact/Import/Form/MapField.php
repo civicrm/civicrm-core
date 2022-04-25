@@ -158,9 +158,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * Build the form object.
    *
    * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
-    $savedMappingID = (int) $this->get('savedMapping');
+    $savedMappingID = (int) $this->getSubmittedValue('savedMapping');
     $this->buildSavedMappingFields($savedMappingID);
 
     $this->addFormRule(['CRM_Contact_Import_Form_MapField', 'formRule']);
@@ -329,13 +330,13 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $processor->setMappingID($savedMappingID);
     $processor->setFormName($formName);
     $processor->setMetadata($this->getContactImportMetadata());
-    $processor->setContactTypeByConstant($this->get('contactType'));
+    $processor->setContactTypeByConstant($this->getSubmittedValue('contactType'));
     $processor->setContactSubType($this->get('contactSubType'));
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
 
-      if ($this->get('savedMapping') && $processor->getFieldName($i)) {
+      if ($this->getSubmittedValue('savedMapping') && $processor->getFieldName($i)) {
         $defaults["mapper[$i]"] = $processor->getSavedQuickformDefaultsForColumn($i);
         $js .= $processor->getQuickFormJSForField($i);
       }

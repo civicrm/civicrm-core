@@ -35,6 +35,14 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
   protected $form;
 
   /**
+   * Delete any saved mapping config.
+   */
+  public function tearDown(): void {
+    $this->quickCleanup(['civicrm_mapping', 'civicrm_mapping_field']);
+    parent::tearDown();
+  }
+
+  /**
    * Test the form loads without error / notice and mappings are assigned.
    *
    * (Added in conjunction with fixed noting on mapping assignment).
@@ -49,11 +57,9 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmit($params, $mapper, $expecteds = []): void {
+  public function testSubmit(array $params, array $mapper, array $expecteds = []): void {
     $form = $this->getMapFieldFormObject();
-    /* @var CRM_Contact_Import_Form_MapField $form */
     $form->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
-    $form->_columnNames = ['nada', 'first_name', 'last_name', 'address'];
     $form->preProcess();
     $form->submit($params, $mapper);
 
@@ -79,7 +85,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getSubmitData() {
+  public function getSubmitData(): array {
     return [
       'basic_data' => [
         [
@@ -151,11 +157,11 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     ])->execute()->first()['id'];
 
     $dataSource = new CRM_Import_DataSource_SQL($userJobID);
-    $params = ['sqlQuery' => 'SELECT * FROM civicrm_tmp_d_import_job_xxx'];
     $null = NULL;
+    /* @var CRM_Contact_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Contact_Import_Form_MapField', $submittedValues);
     $form->set('user_job_id', $userJobID);
-    $dataSource->postProcess($params, $null, $form);
+    $dataSource->postProcess($submittedValues, $null, $form);
 
     $contactFields = CRM_Contact_BAO_Contact::importableFields();
     $fields = [];
@@ -163,6 +169,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
       $fields[$name] = $field['title'];
     }
     $form->set('fields', $fields);
+    $form->buildForm();
     return $form;
   }
 
@@ -175,17 +182,18 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * @param string $expectedJS
    * @param array $expectedDefaults
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
-  public function testLoadSavedMapping($fieldSpec, $expectedJS, $expectedDefaults) {
-    $this->setUpMapFieldForm();
-
+  public function testLoadSavedMapping(array $fieldSpec, string $expectedJS, array $expectedDefaults): void {
     $mapping = $this->callAPISuccess('Mapping', 'create', ['name' => 'my test']);
     $this->callAPISuccess('MappingField', 'create', array_merge(['mapping_id' => $mapping['id']], $fieldSpec));
-    $result = $this->loadSavedMapping($mapping['id'], $fieldSpec['column_number']);
-    $this->assertEquals($expectedJS, $result['js']);
-    $this->assertEquals($expectedDefaults, $result['defaults']);
+    $this->form = $this->form = $this->getMapFieldFormObject(['savedMapping' => $mapping['id'], 'sqlQuery' => 'SELECT nada FROM civicrm_tmp_d_import_job_xxx']);
+    $expectedJS = "<script type='text/javascript'>
+" . $expectedJS . '</script>';
+
+    $this->assertEquals($expectedJS, trim((string) CRM_Core_Smarty::singleton()->get_template_vars('initHideBoxes')));
+    $this->assertEquals($expectedDefaults, $this->form->_defaultValues);
   }
 
   /**
@@ -291,19 +299,19 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
   /**
    * Get data for map field tests.
    */
-  public function mapFieldDataProvider() {
+  public function mapFieldDataProvider(): array {
     return [
       [
-        ['name' => 'First Name', 'contact_type' => 'Individual', 'column_number' => 1],
-        "document.forms.MapField['mapper[1][1]'].style.display = 'none';
-document.forms.MapField['mapper[1][2]'].style.display = 'none';
-document.forms.MapField['mapper[1][3]'].style.display = 'none';\n",
-        ['mapper[1]' => ['first_name', 0, NULL]],
+        ['name' => 'First Name', 'contact_type' => 'Individual', 'column_number' => 0],
+        "document.forms.MapField['mapper[0][1]'].style.display = 'none';
+document.forms.MapField['mapper[0][2]'].style.display = 'none';
+document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+        ['mapper[0]' => ['first_name', 0, NULL]],
       ],
       [
-        ['name' => 'Phone', 'contact_type' => 'Individual', 'column_number' => 8, 'phone_type_id' => 1, 'location_type_id' => 2],
-        "document.forms.MapField['mapper[8][3]'].style.display = 'none';\n",
-        ['mapper[8]' => ['phone', 2, 1]],
+        ['name' => 'Phone', 'contact_type' => 'Individual', 'column_number' => 0, 'phone_type_id' => 1, 'location_type_id' => 2],
+        "document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+        ['mapper[0]' => ['phone', 2, 1]],
       ],
       [
         ['name' => 'IM Screen Name', 'contact_type' => 'Individual', 'column_number' => 0, 'im_provider_id' => 1, 'location_type_id' => 2],
@@ -342,12 +350,15 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
    *
    * @dataProvider getHeaderMatchDataProvider
    *
-   * @throws \CiviCRM_API3_Exception
+   * @param $columnHeader
+   * @param $mapsTo
+   *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public function testDefaultFromColumnNames($columnHeader, $mapsTo) {
+  public function testDefaultFromColumnNames($columnHeader, $mapsTo): void {
     $this->setUpMapFieldForm();
-    $this->assertEquals($mapsTo, $this->form->defaultFromColumnName($columnHeader, $this->getHeaderPatterns()));
+    $this->assertEquals($mapsTo, $this->form->defaultFromColumnName($columnHeader));
   }
 
   /**
@@ -355,7 +366,7 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
    *
    * @return array
    */
-  public function getHeaderMatchDataProvider() {
+  public function getHeaderMatchDataProvider(): array {
     return [
       ['Contact Id', 'id'],
       ['Contact ID', 'id'],
@@ -374,7 +385,7 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
    * The use of the metadataTrait came from a transitional refactor
    * but it probably should be phased out again.
    */
-  protected function getContactType() {
+  protected function getContactType(): string {
     return $this->_contactType ?? 'Individual';
   }
 
@@ -390,7 +401,7 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
    *
    * @throws \CiviCRM_API3_Exception
    */
-  protected function loadSavedMapping($mappingID, $columnNumber) {
+  protected function loadSavedMapping(int $mappingID, int $columnNumber): array {
     $processor = new CRM_Import_ImportProcessor();
     $processor->setMappingID($mappingID);
     $processor->setFormName('document.forms.MapField');
@@ -407,9 +418,10 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
   /**
    * Set up the mapping form.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  private function setUpMapFieldForm() {
+  private function setUpMapFieldForm(): void {
     $this->form = $this->getMapFieldFormObject();
     $this->form->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
   }
