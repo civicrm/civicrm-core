@@ -32,8 +32,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   protected $_dedupeFields;
 
-  protected static $customFields;
-
   /**
    * Attempt to match header labels with our mapper fields.
    *
@@ -77,31 +75,12 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->_mapperFields = $this->get('fields');
     $this->_importTableName = $this->get('importTableName');
     $this->_contactSubType = $this->get('contactSubType');
-    $highlightedFields = [];
-    $highlightedFields[] = 'email';
-    $highlightedFields[] = 'external_identifier';
     //format custom field names, CRM-2676
     $contactType = $this->getContactType();
-    switch ($this->get('contactType')) {
-      case CRM_Import_Parser::CONTACT_INDIVIDUAL:
-        $highlightedFields[] = 'first_name';
-        $highlightedFields[] = 'last_name';
-        break;
 
-      case CRM_Import_Parser::CONTACT_HOUSEHOLD:
-        $highlightedFields[] = 'household_name';
-        break;
-
-      case CRM_Import_Parser::CONTACT_ORGANIZATION:
-        $highlightedFields[] = 'organization_name';
-        break;
-    }
     $this->_contactType = $contactType;
     if ($this->isSkipDuplicates()) {
       unset($this->_mapperFields['id']);
-    }
-    else {
-      $highlightedFields[] = 'id';
     }
 
     if ($this->isIgnoreDuplicates()) {
@@ -125,13 +104,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
     // retrieve and highlight required custom fields
     $formattedFieldNames = $this->formatCustomFieldName($this->_mapperFields);
-    self::$customFields = CRM_Core_BAO_CustomField::getFields($this->_contactType);
-    foreach (self::$customFields as $key => $attr) {
-      if (!empty($attr['is_required'])) {
-        $highlightedFields[] = "custom_$key";
-      }
-    }
-    $this->assign('highlightedFields', $highlightedFields);
+
+    $this->assign('highlightedFields', $this->getHighlightedFields());
     $this->_formattedFieldNames[$contactType] = $this->_mapperFields = array_merge($this->_mapperFields, $formattedFieldNames);
 
     $columnNames = $this->getColumnHeaders();
@@ -755,6 +729,37 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   private function isSkipDuplicates(): bool {
     return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_SKIP;
+  }
+
+  /**
+   * Get the fields to be highlighted in the UI.
+   *
+   * The highlighted fields are those used to match
+   * to an existing contact.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function getHighlightedFields(): array {
+    $entityFields = [
+      'Individual' => ['first_name', 'last_name'],
+      'Organization' => ['organization_name'],
+      'Household' => ['household_name'],
+    ];
+    $highlightedFields = $entityFields[$this->getContactType()];
+    $highlightedFields[] = 'email';
+    $highlightedFields[] = 'external_identifier';
+    if (!$this->isSkipDuplicates()) {
+      $highlightedFields[] = 'id';
+    }
+    $customFields = CRM_Core_BAO_CustomField::getFields($this->getContactType());
+    foreach ($customFields as $key => $attr) {
+      if (!empty($attr['is_required'])) {
+        $highlightedFields[] = "custom_$key";
+      }
+    }
+    return $highlightedFields;
   }
 
 }
