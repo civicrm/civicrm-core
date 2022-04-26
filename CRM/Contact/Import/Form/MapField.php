@@ -30,13 +30,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   protected $_formattedFieldNames;
 
-  /**
-   * On duplicate.
-   *
-   * @var int
-   */
-  public $_onDuplicate;
-
   protected $_dedupeFields;
 
   protected static $customFields;
@@ -83,7 +76,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   public function preProcess() {
     $this->_mapperFields = $this->get('fields');
     $this->_importTableName = $this->get('importTableName');
-    $this->_onDuplicate = $this->get('onDuplicate');
     $this->_contactSubType = $this->get('contactSubType');
     $highlightedFields = [];
     $highlightedFields[] = 'email';
@@ -105,14 +97,14 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         break;
     }
     $this->_contactType = $contactType;
-    if ($this->_onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
+    if ($this->isSkipDuplicates()) {
       unset($this->_mapperFields['id']);
     }
     else {
       $highlightedFields[] = 'id';
     }
 
-    if ($this->_onDuplicate != CRM_Import_Parser::DUPLICATE_NOCHECK) {
+    if ($this->isIgnoreDuplicates()) {
       //Mark Dedupe Rule Fields as required, since it's used in matching contact
       foreach (CRM_Contact_BAO_ContactType::basicTypes() as $cType) {
         $ruleParams = [
@@ -268,7 +260,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
         //Modified the Relationship fields if the fields are
         //present in dedupe rule
-        if ($this->_onDuplicate != CRM_Import_Parser::DUPLICATE_NOCHECK && !empty($this->_dedupeFields[$cType]) &&
+        if ($this->isIgnoreDuplicates() && !empty($this->_dedupeFields[$cType]) &&
           is_array($this->_dedupeFields[$cType])
         ) {
           static $cTypeArray = [];
@@ -494,6 +486,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @return \CRM_Contact_Import_Parser_Contact
    * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function submit($params, $mapperKeys) {
     $mapper = $mapperKeysMain = $locations = [];
@@ -681,7 +674,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->get('contactType'),
       '_id',
       '_status',
-      $this->_onDuplicate,
+      (int) $this->getSubmittedValue('onDuplicate'),
       NULL, NULL, FALSE,
       CRM_Contact_Import_Parser_Contact::DEFAULT_TIMEOUT,
       $this->get('contactSubType'),
@@ -750,6 +743,27 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
     $saveMappingFields->save();
     return $saveMappingFields->mapping_id;
+  }
+
+  /**
+   * Did the user specify duplicates matching should not be attempted.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  private function isIgnoreDuplicates(): bool {
+    return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_NOCHECK;
+  }
+
+  /**
+   * Did the user specify duplicates should be skipped and not imported.
+   *
+   * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function isSkipDuplicates(): bool {
+    return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_SKIP;
   }
 
 }
