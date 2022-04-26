@@ -111,6 +111,11 @@ class CRM_Import_Forms extends CRM_Core_Form {
     'dedupe_rule_id' => 'DataSource',
     'onDuplicate' => 'DataSource',
     'disableUSPS' => 'DataSource',
+    'doGeocodeAddress' => 'DataSource',
+    // Note we don't add the save mapping instructions for MapField here
+    // (eg 'updateMapping') - as they really are an action for that form
+    // rather than part of the mapping config.
+    'mapper' => 'MapField',
   ];
 
   /**
