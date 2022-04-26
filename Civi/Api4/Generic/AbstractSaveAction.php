@@ -204,7 +204,7 @@ abstract class AbstractSaveAction extends AbstractAction {
       'action' => 'get',
       'where' => [
         ['type', 'IN', ['Field', 'Custom']],
-        ['name', 'NOT IN', CoreUtil::getInfoItem($this->getEntityName(), 'primary_key')],
+        ['name', 'NOT IN', (array) CoreUtil::getInfoItem($this->getEntityName(), 'primary_key')],
       ],
     ], ['name']);
   }
