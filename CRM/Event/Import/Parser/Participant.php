@@ -72,7 +72,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
    *
    * @param array $mapperKeys
    */
-  public function __construct(&$mapperKeys) {
+  public function __construct(&$mapperKeys = []) {
     parent::__construct();
     $this->_mapperKeys = &$mapperKeys;
   }
