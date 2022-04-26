@@ -419,8 +419,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $kernel->preHandle($request);
     $container = $kernel->rebuildContainer();
     // Add our request to the stack and route context.
-    $request->attributes->set(\Symfony\Cmf\Component\Routing\RouteObjectInterface::ROUTE_OBJECT, new \Symfony\Component\Routing\Route('<none>'));
-    $request->attributes->set(\Symfony\Cmf\Component\Routing\RouteObjectInterface::ROUTE_NAME, '<none>');
+    $request->attributes->set(\Drupal\Core\Routing\RouteObjectInterface::ROUTE_OBJECT, new \Symfony\Component\Routing\Route('<none>'));
+    $request->attributes->set(\Drupal\Core\Routing\RouteObjectInterface::ROUTE_NAME, '<none>');
     $container->get('request_stack')->push($request);
     $container->get('router.request_context')->fromRequest($request);
 
