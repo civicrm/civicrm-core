@@ -86,14 +86,14 @@
           </tr>
         </table>
       </div>
-      <script type="text/javascript">
-        {if $mappingDetailsError }
-          cj('#saveDetails').show();
-        {else}
-          cj('#saveDetails').hide();
-        {/if}
-
         {literal}
+        <script type="text/javascript">
+          if (cj('#saveMapping').prop('checked')) {
+            cj('#saveDetails').show();
+          } else {
+            cj('#saveDetails').hide();
+          }
+
           function showSaveDetails(chkbox) {
             if (chkbox.checked) {
               document.getElementById("saveDetails").style.display = "block";
