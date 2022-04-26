@@ -390,7 +390,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @return array
+   * @return array|true
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields) {
@@ -411,16 +411,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     if (!empty($fields['saveMapping'])) {
       $template->assign('isCheked', TRUE);
     }
-
-    if (!empty($errors)) {
-      $_flag = 1;
-      $assignError = new CRM_Core_Page();
-      $assignError->assign('mappingDetailsError', $_flag);
-      return $errors;
-    }
-    else {
-      return TRUE;
-    }
+    return empty($errors) ? TRUE : $errors;
   }
 
   /**
