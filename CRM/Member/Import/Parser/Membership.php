@@ -72,7 +72,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    *
    * @param $mapperKeys
    */
-  public function __construct($mapperKeys) {
+  public function __construct($mapperKeys = []) {
     parent::__construct();
     $this->_mapperKeys = $mapperKeys;
   }

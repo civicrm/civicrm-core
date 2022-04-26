@@ -64,7 +64,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
    *
    * @param array $mapperKeys
    */
-  public function __construct($mapperKeys) {
+  public function __construct($mapperKeys = []) {
     parent::__construct();
     $this->_mapperKeys = $mapperKeys;
   }
