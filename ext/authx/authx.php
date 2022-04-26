@@ -13,7 +13,7 @@ Civi::dispatcher()->addListener('civi.invoke.auth', function($e) {
     return (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'xheader', 'cred' => $_SERVER['HTTP_X_CIVI_AUTH'], 'siteKey' => $siteKey]);
   }
 
-  if (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
+  if (!empty($_SERVER['HTTP_AUTHORIZATION']) && !empty(Civi::settings()->get('authx_header_cred'))) {
     return (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'header', 'cred' => $_SERVER['HTTP_AUTHORIZATION'], 'siteKey' => $siteKey]);
   }
 
@@ -138,6 +138,7 @@ function authx_civicrm_config(&$config) {
  */
 function authx_civicrm_install() {
   _authx_civix_civicrm_install();
+
 }
 
 /**
@@ -165,6 +166,13 @@ function authx_civicrm_uninstall() {
  */
 function authx_civicrm_enable() {
   _authx_civix_civicrm_enable();
+  // If the system is already using HTTP `Authorization:` headers before installation/re-activation, then
+  // it's probably an extra/independent layer of security.
+  // Only activate support for `Authorization:` if this looks like a clean/amenable environment.
+  // @link https://github.com/civicrm/civicrm-core/pull/22837
+  if (empty($_SERVER['HTTP_AUTHORIZATION']) && NULL === Civi::settings()->getExplicit('authx_header_cred')) {
+    Civi::settings()->set('authx_header_cred', ['jwt', 'api_key']);
+  }
 }
 
 /**
