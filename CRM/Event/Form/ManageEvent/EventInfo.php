@@ -197,8 +197,10 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
   public static function formRule($values) {
     $errors = [];
 
-    if (!empty($values['end_date']) && ($values['end_date'] < $values['start_date'])) {
-      $errors['end_date'] = ts('End date should be after Start date.');
+    // Validate start/end date inputs
+    $validateDates = \CRM_Utils_Date::validateStartEndDatepickerInputs('start_date', $values['start_date'], 'end_date', $values['end_date']);
+    if ($validateDates !== TRUE) {
+      $errors[$validateDates['key']] = $validateDates['message'];
     }
 
     //CRM-4286
