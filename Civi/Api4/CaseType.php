@@ -22,4 +22,5 @@ namespace Civi\Api4;
  */
 class CaseType extends Generic\DAOEntity {
   use Generic\Traits\ManagedEntity;
+
 }
