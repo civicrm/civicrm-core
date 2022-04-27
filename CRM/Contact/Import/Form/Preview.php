@@ -291,7 +291,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     //hack to clean db
     //if job complete drop table.
-    $importJob->isComplete(TRUE);
+    $importJob->isComplete();
   }
 
 }
