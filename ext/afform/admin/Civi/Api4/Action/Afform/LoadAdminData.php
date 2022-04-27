@@ -135,7 +135,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
     if ($info['definition']['type'] === 'form') {
       if ($newForm) {
         $entities[] = $this->entity;
-        $defaultEntity = AfformAdminMeta::getAfformEntity($this->entity);
+        $defaultEntity = AfformAdminMeta::getMetadata()['entities'][$this->entity] ?? [];
         if (!empty($defaultEntity['boilerplate'])) {
           $scanBlocks($defaultEntity['boilerplate']);
         }
