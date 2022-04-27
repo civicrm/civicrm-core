@@ -49,9 +49,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'legal_name'        => 'Agileware',
     ]);
     $contactImportValues = [
-      "first_name"  => "Alok",
-      "last_name"   => "Patel",
-      "Employee of" => "Agileware",
+      'first_name' => 'Alok',
+      'last_name' => 'Patel',
+      'Employee of' => 'Agileware',
     ];
 
     $fields = array_keys($contactImportValues);
