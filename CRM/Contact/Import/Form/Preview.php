@@ -232,6 +232,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       'statusFieldName' => $this->get('statusFieldName'),
       'statusID' => $this->get('statusID'),
       'totalRowCount' => $this->get('totalRowCount'),
+      'userJobID' => $this->getUserJobID(),
     );
 
     $tableName = $this->get('importTableName');
