@@ -22,4 +22,13 @@ namespace Civi\Api4;
  */
 class Managed extends Generic\DAOEntity {
 
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Contact\GetChecksum
+   */
+  public static function reconcile($checkPermissions = TRUE) {
+    return (new Action\Managed\Reconcile(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
 }
