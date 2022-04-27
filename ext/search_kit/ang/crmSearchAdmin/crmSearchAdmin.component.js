@@ -389,7 +389,7 @@
       }
 
       this.addParam = function(name, value) {
-        if (value && !_.contains(ctrl.savedSearch.api_params[name], value)) {
+        if (value) {
           ctrl.savedSearch.api_params[name].push(value);
           // This needs to be called when adding a field as well as changing groupBy
           reconcileAggregateColumns();

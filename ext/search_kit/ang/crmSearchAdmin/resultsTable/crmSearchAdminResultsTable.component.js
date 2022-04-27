@@ -60,10 +60,7 @@
       };
 
       $scope.fieldsForSelect = function() {
-        return {results: ctrl.crmSearchAdmin.getAllFields(':label', ['Field', 'Custom', 'Extra', 'Pseudo'], function(key) {
-            return _.contains(ctrl.search.api_params.select, key);
-          })
-        };
+        return {results: ctrl.crmSearchAdmin.getAllFields(':label', ['Field', 'Custom', 'Extra', 'Pseudo'])};
       };
 
       $scope.addColumn = function(col) {
