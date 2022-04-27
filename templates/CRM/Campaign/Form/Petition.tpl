@@ -100,6 +100,18 @@
           <div class="description">{ts}Is this the default petition?{/ts}</div>
         </td>
       </tr>
+      <tr class="crm-campaign-survey-form-block-links">
+        <td class="label"><label>{ts}Links to sign this petition{/ts}</label></td>
+        <td>
+          {if $surveyId}
+            {ts}Public{/ts}: <pre>{$config->userFrameworkBaseURL}civicrm/petition/sign?sid={$surveyId}&amp;reset=1</pre><br/>
+            {ts}CiviMail{/ts}: <pre>{$config->userFrameworkBaseURL}civicrm/petition/sign?sid={$surveyId}&amp;reset=1&amp;&#123;contact.checksum&#125;&amp;cid=&#123;contact.contact_id&#125;</pre></br/>
+            <div class="description">{ts}Copy and paste the public link anywhere on the Internet, including social media. The CiviMail link should only be copied into a CiviMail message. It will pre-populate the profile with existing information for the person who receives the email.{/ts}</div>
+          {else}
+            <div class="description">{ts}The links will be visible after you save the petition.{/ts}</div>
+          {/if}
+        </td>
+      </tr>
     </table>
     {include file="CRM/common/customDataBlock.tpl"}
   {/if}
