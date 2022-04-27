@@ -54,6 +54,9 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     $modeValue = CRM_Contact_Form_Search::getModeValue(CRM_Utils_Array::value('component_mode', $values, CRM_Contact_BAO_Query::MODE_CONTACTS));
     $className = $modeValue['taskClassName'];
     $this->_task = $values['task'] ?? NULL;
+
+    // Add group custom data
+    CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'Group');
   }
 
   /**
@@ -104,6 +107,9 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     //CRM-14190
     CRM_Group_Form_Edit::buildParentGroups($this);
     CRM_Group_Form_Edit::buildGroupOrganizations($this);
+
+    // Build custom data
+    CRM_Custom_Form_CustomData::buildQuickForm($this);
 
     // get the group id for the saved search
     $groupID = NULL;
@@ -210,6 +216,8 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
       $params['id'] = CRM_Contact_BAO_SavedSearch::getName($this->_id, 'id');
     }
 
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($formValues, $this->_id, 'Group');
+
     $group = CRM_Contact_BAO_Group::create($params);
 
     // Update mapping with the name and description of the group.
@@ -242,6 +250,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     if (empty($defaults['parents'])) {
       $defaults['parents'] = CRM_Core_BAO_Domain::getGroupId();
     }
+    $defaults += CRM_Custom_Form_CustomData::setDefaultValues($this);
     return $defaults;
   }
 
