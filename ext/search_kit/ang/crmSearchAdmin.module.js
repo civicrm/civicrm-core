@@ -78,14 +78,14 @@
     // Controller for creating a new search
     .controller('searchCreate', function($scope, $routeParams, $location) {
       searchEntity = $routeParams.entity;
-      $scope.$ctrl = this;
+      var ctrl = $scope.$ctrl = this;
       this.savedSearch = {
         api_entity: searchEntity
       };
       // Changing entity will refresh the angular page
       $scope.$watch('$ctrl.savedSearch.api_entity', function(newEntity, oldEntity) {
         if (newEntity && oldEntity && newEntity !== oldEntity) {
-          $location.url('/create/' + newEntity);
+          $location.url('/create/' + newEntity + (ctrl.savedSearch.label ? '?label=' + ctrl.savedSearch.label : ''));
         }
       });
     })

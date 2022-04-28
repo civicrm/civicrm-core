@@ -58,6 +58,13 @@
             deep: true,
             default: defaults
           });
+
+          $scope.$bindToRoute({
+            param: 'label',
+            expr: '$ctrl.savedSearch.label',
+            format: 'raw',
+            default: ''
+          });
         }
 
         $scope.mainEntitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect();
