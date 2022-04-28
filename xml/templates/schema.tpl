@@ -32,7 +32,7 @@ CREATE TABLE `{$table.name}` ({assign var='first' value=true}
 {foreach from=$table.fields item=field}
 {if ! $first},{/if}{assign var='first' value=false}
 
-  `{$field.name}` {$field.sqlType}{if $field.collate} COLLATE {$field.collate}{/if}{if $field.required} {if $field.required == "false"}NULL{else}NOT NULL{/if}{/if}{if isset($field.autoincrement)} AUTO_INCREMENT{/if}{if $field.default|count_characters} DEFAULT {$field.default}{/if}{if $field.comment} COMMENT '{ts escape=sql}{$field.comment}{/ts}'{/if}
+  `{$field.name}` {$field.sqlType}{if $field.collate} COLLATE {$field.collate}{/if}{if $field.required} {if $field.required == "false"}NULL{else}NOT NULL{/if}{/if}{if isset($field.autoincrement)} AUTO_INCREMENT{/if}{if $field.default|crmCountCharacters} DEFAULT {$field.default}{/if}{if $field.comment} COMMENT '{ts escape=sql}{$field.comment}{/ts}'{/if}
 {/foreach}{* table.fields *}{strip}
 
 {/strip}{if $table.primaryKey}{if !$first},
