@@ -152,7 +152,8 @@ class ActionObjectProvider implements EventSubscriberInterface, ProviderInterfac
     if (!$entities) {
       // Load entities declared in API files
       foreach ($this->getAllApiClasses() as $className) {
-        $this->loadEntity($className, $entities);
+        $info = $className::getInfo();
+        $entities[$info['name']] = $info;
       }
       // Allow extensions to modify the list of entities
       $event = GenericHookEvent::create(['entities' => &$entities]);
@@ -162,19 +163,6 @@ class ActionObjectProvider implements EventSubscriberInterface, ProviderInterfac
     }
 
     return $entities;
-  }
-
-  /**
-   * @param \Civi\Api4\Generic\AbstractEntity $className
-   * @param array $entities
-   */
-  private function loadEntity($className, array &$entities) {
-    $info = $className::getInfo();
-    $daoName = $info['dao'] ?? NULL;
-    // Only include DAO entities from enabled components
-    if (!$daoName || !defined("{$daoName}::COMPONENT") || \CRM_Core_Component::isEnabled($daoName::COMPONENT)) {
-      $entities[$info['name']] = $info;
-    }
   }
 
   /**
