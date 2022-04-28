@@ -300,6 +300,9 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'entity' => 'Survey',
           'bao' => 'CRM_Campaign_BAO_Survey',
           'localizable' => 1,
+          'html' => [
+            'type' => 'Text',
+          ],
           'add' => '3.3',
         ],
         'campaign_id' => [
