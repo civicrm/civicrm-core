@@ -2877,4 +2877,22 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * This hook is called when rendering the dashboard (q=civicrm/user/dashboard)
+   *
+   * @param int $contactID
+   *   The contactID for whom the user dashboard is being rendered.
+   * @param array $dashboardElements
+   *   The array of user dashboard elements (widgets)
+   * @param CRM_Core_Page $page
+   *
+   * @return mixed
+   */
+  public static function userDashboard($contactID, &$dashboardElements, $page) {
+    return self::singleton()->invoke(['contactID', 'dashboardElements', 'page'], $contactID, $dashboardElements,
+      $page, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_userDashboard'
+    );
+  }
+
 }

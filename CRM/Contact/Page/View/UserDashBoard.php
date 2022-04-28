@@ -173,6 +173,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
         $dashboardElements[$index]['class'] = NULL;
       }
     }
+    CRM_Utils_Hook::userDashboard($this->_contactId, $dashboardElements, $this);
     $this->assign('dashboardElements', $dashboardElements);
 
     if (!empty($dashboardOptions['Groups'])) {
