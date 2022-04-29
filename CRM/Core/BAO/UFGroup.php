@@ -3550,7 +3550,7 @@ SELECT  group_id
   }
 
   /**
-   * Get the frontend_title for the profile, falling back on 'title' if none.
+   * Get the frontend_title for the profile, otherwise blank if none set.
    *
    * @param int $profileID
    *
@@ -3560,7 +3560,7 @@ SELECT  group_id
    */
   public static function getFrontEndTitle(int $profileID) {
     $profile = civicrm_api3('UFGroup', 'getsingle', ['id' => $profileID, 'return' => ['title', 'frontend_title']]);
-    return $profile['frontend_title'] ?? $profile['title'];
+    return trim($profile['frontend_title']);
   }
 
   /**
