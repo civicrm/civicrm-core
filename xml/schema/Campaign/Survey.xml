@@ -32,6 +32,9 @@
       <required>true</required>
       <localizable>true</localizable>
       <comment>Title of the Survey.</comment>
+      <html>
+        <type>Text</type>
+      </html>
       <import>true</import>
       <add>3.3</add>
   </field>
