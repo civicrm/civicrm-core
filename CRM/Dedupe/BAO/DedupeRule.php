@@ -39,6 +39,7 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
    *
    * @return string
    *   SQL query performing the search
+   *   or NULL if params is present and doesn't have and for a field.
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
@@ -71,6 +72,9 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
       $innerJoinClauses[] = "t2.{$this->rule_field} <> ''";
     }
 
+    $cidRefs = CRM_Core_DAO::getReferencesToContactTable();
+    $eidRefs = CRM_Core_DAO::getDynamicReferencesToTable('civicrm_contact');
+
     switch ($this->rule_table) {
       case 'civicrm_contact':
         $id = 'id';
@@ -86,30 +90,20 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
         }
         break;
 
-      case 'civicrm_address':
-      case 'civicrm_email':
-      case 'civicrm_im':
-      case 'civicrm_openid':
-      case 'civicrm_phone':
-      case 'civicrm_website':
-        $id = 'contact_id';
-        break;
-
-      case 'civicrm_note':
-        $id = 'entity_id';
-        if ($this->params) {
-          $where[] = "t1.entity_table = 'civicrm_contact'";
-        }
-        else {
-          $where[] = "t1.entity_table = 'civicrm_contact'";
-          $where[] = "t2.entity_table = 'civicrm_contact'";
-        }
-        break;
-
       default:
-        // custom data tables
-        if (preg_match('/^civicrm_value_/', $this->rule_table) || preg_match('/^custom_value_/', $this->rule_table)) {
-          $id = 'entity_id';
+        if (array_key_exists($this->rule_table, $eidRefs)) {
+          $id = $eidRefs[$this->rule_table][0];
+          $entity_table = $eidRefs[$this->rule_table][1];
+          if ($this->params) {
+            $where[] = "t1.$entity_table = 'civicrm_contact'";
+          }
+          else {
+            $where[] = "t1.$entity_table = 'civicrm_contact'";
+            $where[] = "t2.$entity_table = 'civicrm_contact'";
+          }
+        }
+        elseif (array_key_exists($this->rule_table, $cidRefs)) {
+          $id = $cidRefs[$this->rule_table][0];
         }
         else {
           throw new CRM_Core_Exception("Unsupported rule_table for civicrm_dedupe_rule.id of {$this->id}");
