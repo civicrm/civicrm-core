@@ -202,6 +202,7 @@
     options: {
       url: null,
       block: true,
+      post: null,
       crmForm: null
     },
     _originalContent: null,
@@ -287,12 +288,22 @@
         return false;
       });
     },
+    _ajax: function(url) {
+      if (!this.options.post || !this.isOriginalUrl()) {
+        return $.getJSON(url);
+      }
+      return $.post({
+        url: url,
+        dataType: 'json',
+        data: this.options.post
+      });
+    },
     refresh: function() {
       var that = this;
       var url = this._formatUrl(this.options.url, 'json');
       if (this.options.crmForm) $('form', this.element).ajaxFormUnbind();
       if (this.options.block) this.element.block();
-      $.getJSON(url, function(data) {
+      this._ajax(url).then(function(data) {
         if (data.status === 'redirect') {
           that.options.url = data.userContext;
           return that.refresh();
@@ -321,7 +332,7 @@
             $('[name="'+formElement+'"]', that.element).crmError(msg);
           });
         }
-      }).fail(function(data, msg, status) {
+      }, function(data, msg, status) {
         that._onFailure(data, status);
       });
     },
