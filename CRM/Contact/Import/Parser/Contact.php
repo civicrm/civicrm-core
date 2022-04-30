@@ -1305,6 +1305,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   public static function isErrorInCustomData($params, &$errorMessage, $csType = NULL, $relationships = NULL) {
     $dateType = CRM_Core_Session::singleton()->get("dateTypes");
+    $errors = [];
 
     if (!empty($params['contact_sub_type'])) {
       $csType = $params['contact_sub_type'] ?? NULL;
@@ -1338,11 +1339,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         /* check if it's a valid custom field id */
 
         if (!array_key_exists($customFieldID, $customFields)) {
-          self::addToErrorMsg(ts('field ID'), $errorMessage);
+          $errors[] = ts('field ID');
         }
         // validate null values for required custom fields of type boolean
         if (!empty($customFields[$customFieldID]['is_required']) && (empty($params['custom_' . $customFieldID]) && !is_numeric($params['custom_' . $customFieldID])) && $customFields[$customFieldID]['data_type'] == 'Boolean') {
-          self::addToErrorMsg($customFields[$customFieldID]['label'] . '::' . $customFields[$customFieldID]['groupTitle'], $errorMessage);
+          $errors[] = $customFields[$customFieldID]['label'] . '::' . $customFields[$customFieldID]['groupTitle'];
         }
 
         //For address custom fields, we do get actual custom field value as an inner array of
@@ -1364,12 +1365,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
               $value = $params[$key];
             }
             else {
-              self::addToErrorMsg($customFields[$customFieldID]['label'], $errorMessage);
+              $errors[] = $customFields[$customFieldID]['label'];
             }
           }
           elseif ($dataType == 'Boolean') {
             if (CRM_Utils_String::strtoboolstr($value) === FALSE) {
-              self::addToErrorMsg($customFields[$customFieldID]['label'] . '::' . $customFields[$customFieldID]['groupTitle'], $errorMessage);
+              $errors[] = $customFields[$customFieldID]['label'] . '::' . $customFields[$customFieldID]['groupTitle'];
             }
           }
           // need not check for label filed import
@@ -1381,7 +1382,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           if ((!$isSerialized && !in_array($htmlType, $selectHtmlTypes)) || $dataType == 'Boolean' || $dataType == 'ContactReference') {
             $valid = CRM_Core_BAO_CustomValue::typecheck($dataType, $value);
             if (!$valid) {
-              self::addToErrorMsg($customFields[$customFieldID]['label'], $errorMessage);
+              $errors[] = $customFields[$customFieldID]['label'];
             }
           }
 
@@ -1404,7 +1405,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
               }
 
               if (!$flag) {
-                self::addToErrorMsg($customFields[$customFieldID]['label'], $errorMessage);
+                $errors[] = $customFields[$customFieldID]['label'];
               }
             }
           }
@@ -1417,7 +1418,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
               }
             }
             if (!$flag) {
-              self::addToErrorMsg($customFields[$customFieldID]['label'], $errorMessage);
+              $errors[] = $customFields[$customFieldID]['label'];
             }
           }
           elseif ($isSerialized && $dataType === 'StateProvince') {
@@ -1428,7 +1429,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
                   continue;
                 }
                 else {
-                  self::addToErrorMsg($customFields[$customFieldID]['label'], $errorMessage);
+                  $errors[] = $customFields[$customFieldID]['label'];
                 }
               }
             }
@@ -1454,7 +1455,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
                 }
 
                 if ($error) {
-                  self::addToErrorMsg($customFields[$customFieldID]['label'], $errorMessage);
+                  $errors[] = $customFields[$customFieldID]['label'];
                 }
               }
             }
@@ -1487,6 +1488,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
         self::isErrorInCustomData($params[$key], $errorMessage, $csType, $relationships);
       }
+    }
+    if ($errors) {
+      $errorMessage .= ($errorMessage ? '; ' : '') . implode('; ', $errors);
     }
   }
 
@@ -1533,6 +1537,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *   A string containing all the error-fields.
    */
   public function isErrorInCoreData($params, &$errorMessage) {
+    $errors = [];
     foreach ($params as $key => $value) {
       if ($value) {
         $session = CRM_Core_Session::singleton();
@@ -1542,34 +1547,34 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           case 'birth_date':
             if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
               if (!CRM_Utils_Rule::date($params[$key])) {
-                self::addToErrorMsg(ts('Birth Date'), $errorMessage);
+                $errors[] = ts('Birth Date');
               }
             }
             else {
-              self::addToErrorMsg(ts('Birth-Date'), $errorMessage);
+              $errors[] = ts('Birth-Date');
             }
             break;
 
           case 'deceased_date':
             if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
               if (!CRM_Utils_Rule::date($params[$key])) {
-                self::addToErrorMsg(ts('Deceased Date'), $errorMessage);
+                $errors[] = ts('Deceased Date');
               }
             }
             else {
-              self::addToErrorMsg(ts('Deceased Date'), $errorMessage);
+              $errors[] = ts('Deceased Date');
             }
             break;
 
           case 'is_deceased':
             if (CRM_Utils_String::strtoboolstr($value) === FALSE) {
-              self::addToErrorMsg(ts('Deceased'), $errorMessage);
+              $errors[] = ts('Deceased');
             }
             break;
 
           case 'gender_id':
             if (!self::checkGender($value)) {
-              self::addToErrorMsg(ts('Gender'), $errorMessage);
+              $errors[] = ts('Gender');
             }
             break;
 
@@ -1578,28 +1583,28 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             $preffComm = explode(',', $value);
             foreach ($preffComm as $v) {
               if (!self::in_value(trim($v), CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method'))) {
-                self::addToErrorMsg(ts('Preferred Communication Method'), $errorMessage);
+                $errors[] = ts('Preferred Communication Method');
               }
             }
             break;
 
           case 'preferred_mail_format':
             if (!array_key_exists(strtolower($value), array_change_key_case(CRM_Core_SelectValues::pmf(), CASE_LOWER))) {
-              self::addToErrorMsg(ts('Preferred Mail Format'), $errorMessage);
+              $errors[] = ts('Preferred Mail Format');
             }
             break;
 
           case 'individual_prefix':
           case 'prefix_id':
             if (!self::in_value($value, CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'))) {
-              self::addToErrorMsg(ts('Individual Prefix'), $errorMessage);
+              $errors[] = ts('Individual Prefix');
             }
             break;
 
           case 'individual_suffix':
           case 'suffix_id':
             if (!self::in_value($value, CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id'))) {
-              self::addToErrorMsg(ts('Individual Suffix'), $errorMessage);
+              $errors[] = ts('Individual Suffix');
             }
             break;
 
@@ -1613,7 +1618,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
                     continue;
                   }
                   else {
-                    self::addToErrorMsg(ts('State/Province'), $errorMessage);
+                    $errors[] = ts('State/Province');
                   }
                 }
               }
@@ -1637,10 +1642,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
                     continue;
                   }
                   if (self::in_value($stateValue['country'], $countryIsoCodes) || self::in_value($stateValue['country'], $countryNames)) {
-                    self::addToErrorMsg(ts('Country input value is in table but not "available": "This Country is valid but is NOT in the list of Available Countries currently configured for your site. This can be viewed and modifed from Administer > Localization > Languages Currency Locations." '), $errorMessage);
+                    $errors[] = ts('Country input value is in table but not "available": "This Country is valid but is NOT in the list of Available Countries currently configured for your site. This can be viewed and modifed from Administer > Localization > Languages Currency Locations." ');
                   }
                   else {
-                    self::addToErrorMsg(ts('Country input value not in country table: "The Country value appears to be invalid. It does not match any value in CiviCRM table of countries."'), $errorMessage);
+                    $errors[] = ts('Country input value not in country table: "The Country value appears to be invalid. It does not match any value in CiviCRM table of countries."');
                   }
                 }
               }
@@ -1653,7 +1658,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
                 if ($county['county']) {
                   $countyNames = CRM_Core_PseudoConstant::county();
                   if (!empty($county['county']) && !in_array($county['county'], $countyNames)) {
-                    self::addToErrorMsg(ts('County input value not in county table: The County value appears to be invalid. It does not match any value in CiviCRM table of counties.'), $errorMessage);
+                    $errors[] = ts('County input value not in county table: The County value appears to be invalid. It does not match any value in CiviCRM table of counties.');
                   }
                 }
               }
@@ -1667,7 +1672,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
                   if (CRM_Utils_Rule::numeric($codeValue['geo_code_1'])) {
                     continue;
                   }
-                  self::addToErrorMsg(ts('Geo code 1'), $errorMessage);
+                  $errors[] = ts('Geo code 1');
                 }
               }
             }
@@ -1680,7 +1685,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
                   if (CRM_Utils_Rule::numeric($codeValue['geo_code_2'])) {
                     continue;
                   }
-                  self::addToErrorMsg(ts('Geo code 2'), $errorMessage);
+                  $errors[] = ts('Geo code 2');
                 }
               }
             }
@@ -1695,7 +1700,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
               'greeting_type' => 'email_greeting',
             ];
             if (!self::in_value($value, CRM_Core_PseudoConstant::greeting($emailGreetingFilter))) {
-              self::addToErrorMsg(ts('Email Greeting must be one of the configured format options. Check Administer >> System Settings >> Option Groups >> Email Greetings for valid values'), $errorMessage);
+              $errors[] = ts('Email Greeting must be one of the configured format options. Check Administer >> System Settings >> Option Groups >> Email Greetings for valid values');
             }
             break;
 
@@ -1705,7 +1710,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
               'greeting_type' => 'postal_greeting',
             ];
             if (!self::in_value($value, CRM_Core_PseudoConstant::greeting($postalGreetingFilter))) {
-              self::addToErrorMsg(ts('Postal Greeting must be one of the configured format options. Check Administer >> System Settings >> Option Groups >> Postal Greetings for valid values'), $errorMessage);
+              $errors[] = ts('Postal Greeting must be one of the configured format options. Check Administer >> System Settings >> Option Groups >> Postal Greetings for valid values');
             }
             break;
 
@@ -1715,7 +1720,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
               'greeting_type' => 'addressee',
             ];
             if (!self::in_value($value, CRM_Core_PseudoConstant::greeting($addresseeFilter))) {
-              self::addToErrorMsg(ts('Addressee must be one of the configured format options. Check Administer >> System Settings >> Option Groups >> Addressee for valid values'), $errorMessage);
+              $errors[] = ts('Addressee must be one of the configured format options. Check Administer >> System Settings >> Option Groups >> Addressee for valid values');
             }
             break;
 
@@ -1723,7 +1728,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             if (array_key_exists('email_greeting', $params)) {
               $emailGreetingLabel = key(CRM_Core_OptionGroup::values('email_greeting', TRUE, NULL, NULL, 'AND v.name = "Customized"'));
               if (CRM_Utils_Array::value('email_greeting', $params) != $emailGreetingLabel) {
-                self::addToErrorMsg(ts('Email Greeting - Custom'), $errorMessage);
+                $errors[] = ts('Email Greeting - Custom');
               }
             }
             break;
@@ -1732,7 +1737,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             if (array_key_exists('postal_greeting', $params)) {
               $postalGreetingLabel = key(CRM_Core_OptionGroup::values('postal_greeting', TRUE, NULL, NULL, 'AND v.name = "Customized"'));
               if (CRM_Utils_Array::value('postal_greeting', $params) != $postalGreetingLabel) {
-                self::addToErrorMsg(ts('Postal Greeting - Custom'), $errorMessage);
+                $errors[] = ts('Postal Greeting - Custom');
               }
             }
             break;
@@ -1741,7 +1746,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             if (array_key_exists('addressee', $params)) {
               $addresseeLabel = key(CRM_Core_OptionGroup::values('addressee', TRUE, NULL, NULL, 'AND v.name = "Customized"'));
               if (CRM_Utils_Array::value('addressee', $params) != $addresseeLabel) {
-                self::addToErrorMsg(ts('Addressee - Custom'), $errorMessage);
+                $errors[] = ts('Addressee - Custom');
               }
             }
             break;
@@ -1750,7 +1755,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             if (is_array($value)) {
               foreach ($value as $values) {
                 if (!empty($values['url']) && !CRM_Utils_Rule::url($values['url'])) {
-                  self::addToErrorMsg(ts('Website'), $errorMessage);
+                  $errors[] = ts('Website');
                   break;
                 }
               }
@@ -1764,7 +1769,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           case 'do_not_trade':
             if (CRM_Utils_Rule::boolean($value) == FALSE) {
               $key = ucwords(str_replace("_", " ", $key));
-              self::addToErrorMsg($key, $errorMessage);
+              $errors[] = $key;
             }
             break;
 
@@ -1772,7 +1777,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             if (is_array($value)) {
               foreach ($value as $values) {
                 if (!empty($values['email']) && !CRM_Utils_Rule::email($values['email'])) {
-                  self::addToErrorMsg($key, $errorMessage);
+                  $errors[] = $key;
                   break;
                 }
               }
@@ -1786,6 +1791,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             }
         }
       }
+    }
+    if ($errors) {
+      $errorMessage .= ($errorMessage ? '; ' : '') . implode('; ', $errors);
     }
   }
 
