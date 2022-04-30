@@ -184,16 +184,16 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $this->_mapperRelatedContactWebsiteType = $mapperRelatedContactWebsiteType;
     // get IM service provider type id for related contact
     $this->_mapperRelatedContactImProvider = &$mapperRelatedContactImProvider;
-    $this->setFieldMetadata();
-    foreach ($this->getImportableFieldsMetadata() as $name => $field) {
-      $this->addField($name, $field['title'], CRM_Utils_Array::value('type', $field), CRM_Utils_Array::value('headerPattern', $field), CRM_Utils_Array::value('dataPattern', $field), CRM_Utils_Array::value('hasLocationType', $field));
-    }
   }
 
   /**
    * The initializer code, called before processing.
    */
   public function init() {
+    $this->setFieldMetadata();
+    foreach ($this->getImportableFieldsMetadata() as $name => $field) {
+      $this->addField($name, $field['title'], CRM_Utils_Array::value('type', $field), CRM_Utils_Array::value('headerPattern', $field), CRM_Utils_Array::value('dataPattern', $field), CRM_Utils_Array::value('hasLocationType', $field));
+    }
     $this->_newContacts = [];
 
     $this->setActiveFields($this->_mapperKeys);
@@ -262,10 +262,42 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Get configured contact type.
+   * Gets the fields available for importing in a key-name, title format.
+   *
+   * @return array
+   *   eg. ['first_name' => 'First Name'.....]
+   *
+   * @throws \API_Exception
+   *
+   * @todo - we are constructing the metadata before we
+   * have set the contact type so we re-do it here.
+   *
+   * Once we have cleaned up the way the mapper is handled
+   * we can ditch all the existing _construct parameters in favour
+   * of just the userJobID - there are current open PRs towards this end.
    */
-  protected function getContactType() {
-    return $this->_contactType ?? 'Individual';
+  public function getAvailableFields(): array {
+    $this->setFieldMetadata();
+    $return = [];
+    foreach ($this->getImportableFieldsMetadata() as $name => $field) {
+      if ($name === 'id' && $this->isSkipDuplicates()) {
+        // Duplicates are being skipped so id matching is not availble.
+        continue;
+      }
+      $return[$name] = $field['title'];
+    }
+    return $return;
+  }
+
+  /**
+   * Did the user specify duplicates should be skipped and not imported.
+   *
+   * @return bool
+   *
+   * @throws \API_Exception
+   */
+  private function isSkipDuplicates(): bool {
+    return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_SKIP;
   }
 
   /**
@@ -2542,19 +2574,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     // TODO: Make the timeout actually work
     $this->_onDuplicate = $onDuplicate;
     $this->_dedupeRuleGroupID = $dedupeRuleGroupID;
-
-    switch ($contactType) {
-      case CRM_Import_Parser::CONTACT_INDIVIDUAL:
-        $this->_contactType = 'Individual';
-        break;
-
-      case CRM_Import_Parser::CONTACT_HOUSEHOLD:
-        $this->_contactType = 'Household';
-        break;
-
-      case CRM_Import_Parser::CONTACT_ORGANIZATION:
-        $this->_contactType = 'Organization';
-    }
+    // Since $this->_contactType is still being called directly do a get call
+    // here to make sure it is instantiated.
+    $this->getContactType();
 
     $this->_contactSubType = $contactSubType;
 
@@ -2624,8 +2646,16 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $returnCode = $this->summary($values);
       }
       elseif ($mode == self::MODE_IMPORT) {
-        //print "Running parser in import mode<br/>\n";
-        $returnCode = $this->import($onDuplicate, $values, $doGeocodeAddress);
+        try {
+          $returnCode = $this->import($onDuplicate, $values, $doGeocodeAddress);
+        }
+        catch (CiviCRM_API3_Exception $e) {
+          // When we catch errors here we are not adding to the errors array - mostly
+          // because that will become obsolete once https://github.com/civicrm/civicrm-core/pull/23292
+          // is merged and this will replace it as the main way to handle errors (ie. update the table
+          // and move on).
+          $this->setImportStatus((int) $values[count($values) - 1], 'ERROR', $e->getMessage());
+        }
         if ($statusID && (($this->_rowCount % 50) == 0)) {
           $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
         }
@@ -3010,7 +3040,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   public function set($store, $mode = self::MODE_SUMMARY) {
     $store->set('rowCount', $this->_rowCount);
-    $store->set('fields', $this->getSelectValues());
     $store->set('fieldTypes', $this->getSelectTypes());
 
     $store->set('columnCount', $this->_activeFieldCount);

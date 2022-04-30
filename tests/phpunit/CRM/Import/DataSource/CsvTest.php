@@ -150,6 +150,7 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
         'name' => __DIR__ . '/' . $csvFileName,
       ],
       'skipColumnHeader' => TRUE,
+      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
     ]);
     $form->buildForm();
     $form->postProcess();

@@ -206,6 +206,8 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
    * Process the mapped fields and map it into the uploaded file.
+   *
+   * @throws \API_Exception
    */
   public function postProcess() {
 
@@ -225,7 +227,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       'tag' => $this->controller->exportValue($this->_name, 'tag'),
       'allTags' => $this->get('tag'),
       'mapper' => $this->controller->exportValue('MapField', 'mapper'),
-      'mapFields' => $this->get('fields'),
+      'mapFields' => $this->getAvailableFields(),
       'contactType' => $this->get('contactType'),
       'contactSubType' => $this->get('contactSubType'),
       'primaryKeyName' => $this->get('primaryKeyName'),

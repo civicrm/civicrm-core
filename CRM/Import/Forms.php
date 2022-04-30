@@ -407,4 +407,18 @@ class CRM_Import_Forms extends CRM_Core_Form {
     return $this->getDataSourceObject()->getRows($limit);
   }
 
+  /**
+   * Get the fields available for import selection.
+   *
+   * @return array
+   *   e.g ['first_name' => 'First Name', 'last_name' => 'Last Name'....
+   *
+   * @throws \API_Exception
+   */
+  protected function getAvailableFields(): array {
+    $parser = new CRM_Contact_Import_Parser_Contact();
+    $parser->setUserJobID($this->getUserJobID());
+    return $parser->getAvailableFields();
+  }
+
 }

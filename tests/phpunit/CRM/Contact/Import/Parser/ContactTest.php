@@ -14,6 +14,8 @@
  * File for the CRM_Contact_Imports_Parser_ContactTest class.
  */
 
+use Civi\Api4\UserJob;
+
 /**
  *  Test contact import parser.
  *
@@ -451,6 +453,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * There is an expectation that you can import by label here.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
@@ -463,9 +466,11 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ['name' => 'prefix_id', 'column_number' => 3],
       ['name' => 'suffix_id', 'column_number' => 4],
     ];
+
     $processor = new CRM_Import_ImportProcessor();
     $processor->setMappingFields($mapping);
     $processor->setContactType('Individual');
+    $processor->setUserJobID($this->getUserJobID());
     $importer = $processor->getImporterObject();
 
     $contactValues = [
@@ -597,12 +602,13 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test importing 2 phones of different types.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testImportTwoPhonesDifferentTypes() {
+  public function testImportTwoPhonesDifferentTypes(): void {
     $processor = new CRM_Import_ImportProcessor();
-    $processor->setContactType('Individual');
+    $processor->setUserJobID($this->getUserJobID());
     $processor->setMappingFields(
       [
         ['name' => 'first_name'],
@@ -856,11 +862,13 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * Ensure we can import multiple preferred_communication_methods, single
    * gender, and single preferred language using both labels and values.
    *
-   * @throws \CRM_Core_Exception @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testImportFieldsWithVariousOptions() {
+  public function testImportFieldsWithVariousOptions(): void {
     $processor = new CRM_Import_ImportProcessor();
-    $processor->setContactType('Individual');
+    $processor->setUserJobID($this->getUserJobID());
     $processor->setMappingFields(
       [
         ['name' => 'first_name'],
@@ -871,7 +879,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ]
     );
     $importer = $processor->getImporterObject();
-    $fields = ['Ima', 'Texter', "SMS,Phone", "Female", "Danish"];
+    $fields = ['Ima', 'Texter', 'SMS,Phone', 'Female', 'Danish'];
     $importer->import(CRM_Import_Parser::DUPLICATE_NOCHECK, $fields);
     $contact = $this->callAPISuccessGetSingle('Contact', ['last_name' => 'Texter']);
 
@@ -952,6 +960,22 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->runImport($originalValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
     $result = $this->callAPISuccessGetSingle('Contact', $originalValues);
     return [$originalValues, $result];
+  }
+
+  /**
+   * @return mixed
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function getUserJobID() {
+    $userJobID = UserJob::create()->setValues([
+      'metadata' => [
+        'submitted_values' => ['contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL],
+      ],
+      'status_id:name' => 'draft',
+      'type_id:name' => 'contact_import',
+    ])->execute()->first()['id'];
+    return $userJobID;
   }
 
 }
