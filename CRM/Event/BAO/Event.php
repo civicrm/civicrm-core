@@ -112,6 +112,19 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
         $copy = self::copy($params['template_id']);
         $params['id'] = $copy->id;
         unset($params['template_id']);
+
+        //fix for api from template creation bug
+        civicrm_api4('ActionSchedule', 'update', [
+          'checkPermissions' => FALSE,
+          'values' => [
+            'mapping_id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
+          ],
+          'where' => [
+            ['entity_value', '=', $copy->id],
+            ['mapping_id', '=', CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID],
+          ],
+        ]);
+
       }
     }
 
