@@ -36,12 +36,14 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     $tasks = [$entity['name'] => []];
 
     if (array_key_exists($entity['name'], \CRM_Export_BAO_Export::getComponents())) {
+      $key = \CRM_Core_Key::get('CRM_Export_Controller_Standalone', TRUE);
       $tasks[$entity['name']]['export'] = [
         'title' => E::ts('Export %1', [1 => $entity['title_plural']]),
         'icon' => 'fa-file-excel-o',
         'crmPopup' => [
           'path' => "'civicrm/export/standalone'",
-          'query' => "{reset: 1, entity: '{$entity['name']}', id: ids.join(',')}",
+          'query' => "{reset: 1, entity: '{$entity['name']}'}",
+          'data' => "{id: ids.join(','), qfKey: '$key'}",
         ],
       ];
     }
@@ -99,12 +101,14 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
           if ($task['url'] === 'civicrm/task/pick-profile') {
             $task['title'] = E::ts('Profile Update');
           }
+          $key = \CRM_Core_Key::get(\CRM_Utils_Array::first((array) $task['class']), TRUE);
           $tasks[$entity['name']]['contact.' . $id] = [
             'title' => $task['title'],
             'icon' => $task['icon'] ?? 'fa-gear',
             'crmPopup' => [
               'path' => "'{$task['url']}'",
-              'query' => "{reset: 1, cids: ids.join(',')}",
+              'query' => "{reset: 1}",
+              'data' => "{cids: ids.join(','), qfKey: '$key'}",
             ],
           ];
         }
@@ -136,12 +140,13 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       // FIXME: tasks() function always checks permissions, should respect `$this->checkPermissions`
       foreach (\CRM_Contribute_Task::tasks() as $id => $task) {
         if (!empty($task['url'])) {
+          $key = \CRM_Core_Key::get(\CRM_Utils_Array::first((array) $task['class']), TRUE);
           $tasks[$entity['name']]['contribution.' . $id] = [
             'title' => $task['title'],
             'icon' => $task['icon'] ?? 'fa-gear',
             'crmPopup' => [
               'path' => "'{$task['url']}'",
-              'query' => "{id: ids.join(',')}",
+              'data' => "{id: ids.join(','), qfKey: '$key'}",
             ],
           ];
         }
