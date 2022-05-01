@@ -1574,7 +1574,7 @@ HERESQL;
     $relatedContacts = self::getRelatedContacts($caseId);
 
     $groupInfo = [];
-    $globalContacts = self::getGlobalContacts($groupInfo);
+    $globalContacts = self::getGlobalContacts($groupInfo, NULL, FALSE, FALSE, 0, 0);
 
     //unset values which are not required.
     foreach ($globalContacts as $k => & $v) {
