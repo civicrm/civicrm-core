@@ -519,4 +519,13 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
     $this->assertEquals('2025-06-11 12:15:30', $contact["$cgName.DateTime"]);
   }
 
+  public function testExtendsMetadata() {
+    $field = \Civi\Api4\CustomGroup::getFields(FALSE)
+      ->setLoadOptions(['id', 'name'])
+      ->addWhere('name', '=', 'extends')
+      ->execute()->first();
+    $options = array_column($field['options'], 'name', 'id');
+    $this->assertArrayHasKey('Participant', $options);
+  }
+
 }

@@ -2070,46 +2070,88 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
   }
 
   /**
-   * Get the list of types for objects that a custom group extends to.
+   * Deprecated function, use APIv4 getFields instead.
    *
+   * @deprecated
    * @param array $types
    *   Var which should have the list appended.
-   *
-   * @return array
-   *   Array of types.
-   * @throws \Exception
    */
   public static function getExtendedObjectTypes(&$types = []) {
-    static $flag = FALSE, $objTypes = [];
+    $cache = Civi::cache('metadata');
+    if (!$cache->has(__FUNCTION__)) {
+      $objTypes = [];
 
-    if (!$flag) {
-      $extendObjs = [];
-      CRM_Core_OptionValue::getValues(['name' => 'cg_extend_objects'], $extendObjs, 'weight', TRUE);
+      $extendObjs = \Civi\Api4\OptionValue::get(FALSE)
+        ->addSelect('value', 'grouping')
+        ->addWhere('option_group_id:name', '=', 'cg_extend_objects')
+        ->addWhere('grouping', 'IS NOT EMPTY')
+        ->addWhere('is_active', '=', TRUE)
+        ->execute()->indexBy('value')->column('grouping');
 
-      foreach ($extendObjs as $ovId => $ovValues) {
-        if ($ovValues['description']) {
-          // description is expected to be a callback func to subtypes
-          list($callback, $args) = explode(';', trim($ovValues['description']));
-
-          if (empty($args)) {
-            $args = [];
-          }
-
-          if (!is_array($args)) {
-            throw new CRM_Core_Exception('Arg is not of type array');
-          }
-
-          list($className) = explode('::', $callback);
-          require_once str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
-
-          $objTypes[$ovValues['value']] = call_user_func_array($callback, $args);
+      foreach ($extendObjs as $entityName => $grouping) {
+        try {
+          $objTypes[$entityName] = civicrm_api4($entityName, 'getFields', [
+            'loadOptions' => TRUE,
+            'where' => [['name', '=', $grouping]],
+            'checkPermissions' => FALSE,
+            'select' => ['options'],
+          ], 0)['options'] ?? NULL;
+        }
+        catch (\Civi\API\Exception\NotImplementedException $e) {
+          // Skip if component is disabled
         }
       }
-      $flag = TRUE;
+      $cache->set(__FUNCTION__, $objTypes);
+    }
+    else {
+      $objTypes = $cache->get(__FUNCTION__);
     }
 
     $types = array_merge($types, $objTypes);
-    return $objTypes;
+  }
+
+  /**
+   * Loads pseudoconstant option values for the `extends_entity_column_value` field.
+   *
+   * @param $context
+   * @param array $params
+   * @param array $props
+   * @return array
+   */
+  public static function getExtendsEntityColumnValueOptions($context, $params, $props = []) {
+    // Requesting this option list only makes sense if the value of 'extends' is known or can be looked up
+    if (!empty($props['id']) || !empty($props['name']) || !empty($props['extends'])) {
+      $id = $props['id'] ?? NULL;
+      $name = $props['name'] ?? NULL;
+      $extends = $props['extends'] ?? NULL;
+      $entityColumnId = $props['extends_entity_column_id'] ?? NULL;
+      if (!$extends) {
+        $extends = CRM_Core_DAO::getFieldValue(parent::class, $id ?: $name, 'extends', $id ? 'id' : 'name');
+      }
+      if (!array_key_exists('extends_entity_column_id', $props) && ($id || $name)) {
+        $entityColumnId = CRM_Core_DAO::getFieldValue(parent::class, $id ?: $name, 'extends_entity_column_id', $id ? 'id' : 'name');
+      }
+      // If there is an entityColumnId (currently only used by Participants) filter by that type.
+      if ($entityColumnId) {
+        $pseudoSelectors = CRM_Core_OptionGroup::values('custom_data_type', FALSE, FALSE, FALSE, NULL, 'name');
+        $extends = $pseudoSelectors[$entityColumnId];
+      }
+      $allOptions = self::getSubTypes();
+      return $allOptions[$extends] ?? [];
+    }
+    return [];
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = []) {
+    // This is necessary in order to pass $props to the callback function
+    if ($fieldName === 'extends_entity_column_value') {
+      $options = self::getExtendsEntityColumnValueOptions($context, [], $props);
+      return CRM_Core_PseudoConstant::formatArrayOptions($context, $options);
+    }
+    return parent::buildOptions($fieldName, $context, $props);
   }
 
   /**
@@ -2237,24 +2279,26 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
     return [$multipleFieldGroups, $groupTree];
   }
 
+  /**
+   * Use APIv4 getFields (or self::getExtendsEntityColumnValueOptions) instead of this beast.
+   * @deprecated
+   * @return array
+   */
   public static function getSubTypes(): array {
     $sel2 = [];
     $activityType = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
 
     $eventType = CRM_Core_OptionGroup::values('event_type');
-    $grantType = CRM_Core_OptionGroup::values('grant_type');
     $campaignTypes = CRM_Campaign_PseudoConstant::campaignType();
     $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
     $participantRole = CRM_Core_OptionGroup::values('participant_role');
 
     asort($activityType);
     asort($eventType);
-    asort($grantType);
     asort($membershipType);
     asort($participantRole);
 
     $sel2['Event'] = $eventType;
-    $sel2['Grant'] = $grantType;
     $sel2['Activity'] = $activityType;
     $sel2['Campaign'] = $campaignTypes;
     $sel2['Membership'] = $membershipType;

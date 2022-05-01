@@ -82,6 +82,9 @@
     <length>255</length>
     <comment>linking custom group for dynamic object</comment>
     <serialize>SEPARATOR_BOOKEND</serialize>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_CustomGroup::getExtendsEntityColumnValueOptions</callback>
+    </pseudoconstant>
     <add>1.6</add>
   </field>
   <field>

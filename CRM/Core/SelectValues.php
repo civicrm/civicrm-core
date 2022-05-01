@@ -223,10 +223,11 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Various pre defined extensions for dynamic properties and groups.
+   * List of all entities that can be extended by custom fields.
+   *
+   * Includes pseudo-entities for Contact and Participant, in order to present sub-types on the form.
    *
    * @return array
-   *
    */
   public static function customGroupExtends() {
     $customGroupExtends = [
@@ -238,17 +239,17 @@ class CRM_Core_SelectValues {
       'Membership' => ts('Memberships'),
       'Event' => ts('Events'),
       'Participant' => ts('Participants'),
-      'ParticipantRole' => ts('Participants (Role)'),
-      'ParticipantEventName' => ts('Participants (Event Name)'),
-      'ParticipantEventType' => ts('Participants (Event Type)'),
       'Pledge' => ts('Pledges'),
-      'Grant' => ts('Grants'),
       'Address' => ts('Addresses'),
       'Campaign' => ts('Campaigns'),
     ];
+    // Contact, Individual,
     $contactTypes = ['Contact' => ts('Contacts')] + self::contactType();
+    // ParticipantRole, ParticipantEventName, etc.
+    $pseudoSelectors = CRM_Core_OptionGroup::values('custom_data_type', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
+    // OptionValues provided by extensions
     $extendObjs = CRM_Core_OptionGroup::values('cg_extend_objects');
-    $customGroupExtends = array_merge($contactTypes, $customGroupExtends, $extendObjs);
+    $customGroupExtends = array_merge($contactTypes, $customGroupExtends, $extendObjs, $pseudoSelectors);
     return $customGroupExtends;
   }
 

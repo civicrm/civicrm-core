@@ -123,12 +123,6 @@ class CoreUtil {
           'column' => 'id',
         ];
 
-      case 'Participant':
-        return [
-          'extends' => ['Participant', 'ParticipantRole', 'ParticipantEventName', 'ParticipantEventType'],
-          'column' => 'id',
-        ];
-
       case 'RelationshipCache':
         return [
           'extends' => ['Relationship'],
