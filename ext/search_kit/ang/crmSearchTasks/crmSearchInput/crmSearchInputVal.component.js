@@ -102,7 +102,7 @@
           return '~/crmSearchTasks/crmSearchInput/text.html';
         }
 
-        if (field.input_type === 'Date') {
+        if (field.data_type === 'Date' || field.data_type === 'Timestamp') {
           return '~/crmSearchTasks/crmSearchInput/date.html';
         }
 
