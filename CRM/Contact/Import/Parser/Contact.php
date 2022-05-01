@@ -2597,6 +2597,18 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     if ($mode == self::MODE_IMPORT) {
       $query .= " WHERE $statusFieldName = 'NEW'";
     }
+    if ($this->_maxLinesToProcess > 0) {
+      // Note this would only be the case in MapForm mode, where it is set to 100
+      // rows. In fact mapField really only needs 2 rows - the reason for
+      // 100 seems to be that the other import classes are processing a
+      // csv file, and there was a concern that some rows might have more
+      // columns than others - hence checking 100 rows perhaps seemed like
+      // a good precaution presumably when determining the activeFieldsCount
+      // which is the number of columns a row might have.
+      // However, the mapField class may no longer use activeFieldsCount for contact
+      // to be continued....
+      $query .= ' LIMIT ' . $this->_maxLinesToProcess;
+    }
 
     $result = CRM_Core_DAO::executeQuery($query);
 
@@ -2607,9 +2619,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       /* trim whitespace around the values */
       foreach ($values as $k => $v) {
         $values[$k] = trim($v, " \t\r\n");
-      }
-      if (CRM_Utils_System::isNull($values)) {
-        continue;
       }
 
       $this->_totalCount++;
@@ -2678,11 +2687,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       // we give the derived class a way of aborting the process
       // note that the return code could be multiple code or'ed together
       if ($returnCode & self::STOP) {
-        break;
-      }
-
-      // if we are done processing the maxNumber of lines, break
-      if ($this->_maxLinesToProcess > 0 && $this->_validCount >= $this->_maxLinesToProcess) {
         break;
       }
 
