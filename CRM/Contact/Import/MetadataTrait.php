@@ -103,13 +103,4 @@ trait CRM_Contact_Import_MetadataTrait {
     return CRM_Utils_Array::collect('title', $this->getContactImportMetadata());
   }
 
-  /**
-   * Get configured contact sub type.
-   *
-   * @return string
-   */
-  protected function getContactSubType() {
-    return $this->_contactSubType ?? NULL;
-  }
-
 }

@@ -38,7 +38,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_email'], TRUE);
+    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_email', 'civicrm_user_job'], TRUE);
     parent::tearDown();
   }
 
@@ -59,7 +59,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $fields = array_keys($contactImportValues);
     $values = array_values($contactImportValues);
     $parser = new CRM_Contact_Import_Parser_Contact($fields, []);
-    $parser->_contactType = 'Individual';
+    $parser->setUserJobID($this->getUserJobID());
     $parser->init();
     $this->mapRelationshipFields($fields, $parser->getAllFields());
 
@@ -70,22 +70,21 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     ], [
       NULL,
       NULL,
-      "Organization",
+      'Organization',
     ], [
       NULL,
       NULL,
-      "organization_name",
+      'organization_name',
     ], [], [], [], [], []);
-
-    $parser->_contactType = 'Individual';
+    $parser->setUserJobID($this->getUserJobID());
     $parser->_onDuplicate = CRM_Import_Parser::DUPLICATE_UPDATE;
     $parser->init();
 
     $this->assertEquals(CRM_Import_Parser::VALID, $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values), 'Return code from parser import was not as expected');
     $this->callAPISuccess("Contact", "get", [
-      "first_name"        => "Alok",
-      "last_name"         => "Patel",
-      "organization_name" => "Agileware",
+      'first_name' => 'Alok',
+      'last_name' => 'Patel',
+      'organization_name' => 'Agileware',
     ]);
   }
 
@@ -921,7 +920,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     }
     $values = array_values($originalValues);
     $parser = new CRM_Contact_Import_Parser_Contact($fields, $mapperLocType);
-    $parser->_contactType = 'Individual';
+    $parser->setUserJobID($this->getUserJobID());
     $parser->_dedupeRuleGroupID = $ruleGroupId;
     $parser->_onDuplicate = $onDuplicateAction;
     $parser->init();
@@ -967,15 +966,17 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function getUserJobID() {
-    $userJobID = UserJob::create()->setValues([
+  protected function getUserJobID($submittedValues = []) {
+    return UserJob::create()->setValues([
       'metadata' => [
-        'submitted_values' => ['contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL],
+        'submitted_values' => array_merge([
+          'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+          'contactSubType' => '',
+        ], $submittedValues),
       ],
       'status_id:name' => 'draft',
       'type_id:name' => 'contact_import',
     ])->execute()->first()['id'];
-    return $userJobID;
   }
 
 }

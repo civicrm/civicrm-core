@@ -229,7 +229,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       'mapper' => $this->controller->exportValue('MapField', 'mapper'),
       'mapFields' => $this->getAvailableFields(),
       'contactType' => $this->get('contactType'),
-      'contactSubType' => $this->get('contactSubType'),
+      'contactSubType' => $this->getSubmittedValue('contactSubType'),
       'primaryKeyName' => $this->get('primaryKeyName'),
       'statusFieldName' => $this->get('statusFieldName'),
       'statusID' => $this->get('statusID'),

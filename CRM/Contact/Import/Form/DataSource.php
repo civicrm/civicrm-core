@@ -110,7 +110,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
     }
     $this->addRadio('contactType', ts('Contact Type'), $contactTypeOptions, [], NULL, FALSE, $contactTypeAttributes);
 
-    $this->addElement('select', 'subType', ts('Subtype'));
+    $this->addElement('select', 'contactSubType', ts('Subtype'));
     $this->addElement('select', 'dedupe_rule_id', ts('Dedupe Rule'));
 
     CRM_Core_Form_Date::buildAllowedDateFormats($this);
@@ -181,11 +181,21 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
     // Setup the params array
     $this->_params = $this->controller->exportValues($this->_name);
 
+    // @todo - this params are being set here because they were / possibly still
+    // are in some places being accessed by forms later in the flow
+    // ie CRM_Contact_Import_Form_MapField, CRM_Contact_Import_Form_Preview
+    // or CRM_Contact_Import_Form_Summary using `$this->get()
+    // which was the old way of saving values submitted on this form such that
+    // the other forms could access them. Now they should use
+    // `getSubmittedValue` or simply not get them if the only
+    // reason is to pass to the Parser which can itself
+    // call 'getSubmittedValue'
+    // Once the mentioned forms no longer call $this->get() all this 'setting'
+    // is obsolete.
     $storeParams = [
       'onDuplicate' => $this->getSubmittedValue('onDuplicate'),
       'dedupe' => $this->getSubmittedValue('dedupe_rule_id'),
       'contactType' => $this->getSubmittedValue('contactType'),
-      'contactSubType' => $this->getSubmittedValue('subType'),
       'dateFormats' => $this->getSubmittedValue('dateFormats'),
       'savedMapping' => $this->getSubmittedValue('savedMapping'),
     ];

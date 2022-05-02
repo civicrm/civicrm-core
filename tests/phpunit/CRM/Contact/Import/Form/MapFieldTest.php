@@ -145,6 +145,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery('CREATE TABLE IF NOT EXISTS civicrm_tmp_d_import_job_xxx (`nada` text, `first_name` text, `last_name` text, `address` text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci');
     $submittedValues = array_merge([
       'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactSubType' => '',
       'dataSource' => 'CRM_Import_DataSource_SQL',
       'sqlQuery' => 'SELECT * FROM civicrm_tmp_d_import_job_xxx',
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
@@ -388,6 +389,16 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
    */
   protected function getContactType(): string {
     return $this->_contactType ?? 'Individual';
+  }
+
+  /**
+   * This is accessed by virtue of the MetaDataTrait being included.
+   *
+   * The use of the metadataTrait came from a transitional refactor
+   * but it probably should be phased out again.
+   */
+  protected function getContactSubType(): string {
+    return $this->_contactSubType ?? '';
   }
 
   /**
