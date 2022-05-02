@@ -701,4 +701,11 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $this->assertArrayHasKey('ParticipantEventType', $extends);
   }
 
+  public function testMapTableName() {
+    $this->assertEquals('civicrm_case', CRM_Core_BAO_CustomGroup::mapTableName('Case'));
+    $this->assertEquals('civicrm_contact', CRM_Core_BAO_CustomGroup::mapTableName('Contact'));
+    $this->assertEquals('civicrm_contact', CRM_Core_BAO_CustomGroup::mapTableName('Individual'));
+    $this->assertEquals('civicrm_participant', CRM_Core_BAO_CustomGroup::mapTableName('Participant'));
+  }
+
 }

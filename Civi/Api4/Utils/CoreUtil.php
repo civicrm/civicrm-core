@@ -115,7 +115,7 @@ class CoreUtil {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function getCustomGroupExtends(string $entityName) {
-    // Custom_group.extends pretty much maps 1-1 with entity names, except for a couple oddballs (Contact, Participant).
+    // Custom_group.extends pretty much maps 1-1 with entity names, except for Contact.
     switch ($entityName) {
       case 'Contact':
         return [
