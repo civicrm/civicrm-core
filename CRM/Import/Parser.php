@@ -282,6 +282,16 @@ abstract class CRM_Import_Parser {
   public $_contactType;
 
   /**
+   * @param string $contactType
+   *
+   * @return CRM_Import_Parser
+   */
+  public function setContactType(string $contactType): CRM_Import_Parser {
+    $this->_contactType = $contactType;
+    return $this;
+  }
+
+  /**
    * Contact sub-type
    *
    * @var int|null
