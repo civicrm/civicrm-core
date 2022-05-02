@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Contact;
+use Civi\Api4\RelationshipType;
 
 require_once 'CRM/Utils/DeprecatedUtils.php';
 require_once 'api/v3/utils.php';
@@ -135,6 +136,17 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   protected $_statusFieldName;
 
   protected $fieldMetadata = [];
+
+  /**
+   * Relationship labels.
+   *
+   * Temporary cache of labels to reduce queries in getRelationshipLabels.
+   *
+   * @var array
+   *   e.g ['5a_b' => 'Employer', '5b_a' => 'Employee']
+   */
+  protected $relationshipLabels = [];
+
   /**
    * On duplicate
    *
@@ -3531,6 +3543,92 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $params['location_type_id'] = (int) (isset($primary) && $primary['count']) ? $primary['values'][0]['location_type_id'] : $defaultLocationType->id;
       $params['is_primary'] = 1;
     }
+  }
+
+  /**
+   * Get the civicrm_mapping_field appropriate layout for the mapper input.
+   *
+   * The input looks something like ['street_address', 1]
+   * and would be mapped to ['name' => 'street_address', 'location_type_id' =>
+   * 1]
+   *
+   * @param array $fieldMapping
+   * @param int $mappingID
+   * @param int $columnNumber
+   *
+   * @return array
+   * @throws \API_Exception
+   */
+  public function getMappingFieldFromMapperInput(array $fieldMapping, int $mappingID, int $columnNumber): array {
+    $isRelationshipField = preg_match('/\d*_a_b|b_a$/', $fieldMapping[0]);
+    $fieldName = $isRelationshipField ? $fieldMapping[1] : $fieldMapping[0];
+    $locationTypeID = NULL;
+    $possibleLocationField = $isRelationshipField ? 2 : 1;
+    if ($fieldName !== 'url' && is_numeric($fieldMapping[$possibleLocationField] ?? NULL)) {
+      $locationTypeID = $fieldMapping[$possibleLocationField];
+    }
+    return [
+      'name' => $fieldName,
+      'mapping_id' => $mappingID,
+      'relationship_type_id' => $isRelationshipField ? substr($fieldMapping[0], 0, -4) : NULL,
+      'relationship_direction' => $isRelationshipField ? substr($fieldMapping[0], -3) : NULL,
+      'column_number' => $columnNumber,
+      'contact_type' => $this->getContactType(),
+      'website_type_id' => $fieldName !== 'url' ? NULL : ($isRelationshipField ? $fieldMapping[2] : $fieldMapping[1]),
+      'phone_type_id' => $fieldName !== 'phone' ? NULL : ($isRelationshipField ? $fieldMapping[3] : $fieldMapping[2]),
+      'im_provider_id' => $fieldName !== 'im' ? NULL : ($isRelationshipField ? $fieldMapping[3] : $fieldMapping[2]),
+      'location_type_id' => $locationTypeID,
+    ];
+  }
+
+  /**
+   * @param array $mappedField
+   *   Field detail as would be saved in field_mapping table
+   *   or as returned from getMappingFieldFromMapperInput
+   *
+   * @return string
+   * @throws \API_Exception
+   */
+  public function getMappedFieldLabel(array $mappedField): string {
+    $this->setFieldMetadata();
+    $title = [];
+    if ($mappedField['relationship_type_id']) {
+      $title[] = $this->getRelationshipLabel($mappedField['relationship_type_id'], $mappedField['relationship_direction']);
+    }
+    $title[] = $this->getImportableFieldsMetadata()[$mappedField['name']]['title'];
+    if ($mappedField['location_type_id']) {
+      $title[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Address', 'location_type_id', $mappedField['location_type_id']);
+    }
+    if ($mappedField['website_type_id']) {
+      $title[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Website', 'website_type_id', $mappedField['website_type_id']);
+    }
+    if ($mappedField['phone_type_id']) {
+      $title[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Phone', 'phone_type_id', $mappedField['phone_type_id']);
+    }
+    if ($mappedField['im_provider_id']) {
+      $title[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $mappedField['provider_id']);
+    }
+    return implode(' - ', $title);
+  }
+
+  /**
+   * Get the relevant label for the relationship.
+   *
+   * @param int $id
+   * @param string $direction
+   *
+   * @return string
+   * @throws \API_Exception
+   */
+  protected function getRelationshipLabel(int $id, string $direction): string {
+    if (empty($this->relationshipLabels[$id . $direction])) {
+      $this->relationshipLabels[$id . $direction] =
+      $fieldName = 'label_' . $direction;
+      $this->relationshipLabels[$id . $direction] = (string) RelationshipType::get(FALSE)
+        ->addWhere('id', '=', $id)
+        ->addSelect($fieldName)->execute()->first()[$fieldName];
+    }
+    return $this->relationshipLabels[$id . $direction];
   }
 
 }
