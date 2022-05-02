@@ -619,9 +619,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param int $columnNumber
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   protected function getMappedField(array $fieldMapping, int $mappingID, int $columnNumber): array {
-    return (new CRM_Contact_Import_Parser_Contact())->getMappingFieldFromMapperInput($fieldMapping, $mappingID, $columnNumber);
+    return (new CRM_Contact_Import_Parser_Contact())->setContactType($this->getContactType())->getMappingFieldFromMapperInput($fieldMapping, $mappingID, $columnNumber);
   }
 
   /**
