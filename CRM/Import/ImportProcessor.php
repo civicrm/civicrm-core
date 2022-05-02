@@ -25,6 +25,27 @@ class CRM_Import_ImportProcessor {
   protected $metadata = [];
 
   /**
+   * Id of the created user job.
+   *
+   * @var int
+   */
+  protected $userJobID;
+
+  /**
+   * @return int
+   */
+  public function getUserJobID(): int {
+    return $this->userJobID;
+  }
+
+  /**
+   * @param int $userJobID
+   */
+  public function setUserJobID(int $userJobID): void {
+    $this->userJobID = $userJobID;
+  }
+
+  /**
    * Metadata keyed by field title.
    *
    * @var array
@@ -415,8 +436,8 @@ class CRM_Import_ImportProcessor {
       $this->getFieldWebsiteTypes()
       // $mapperRelatedContactWebsiteType = []
     );
+    $importer->setUserJobID($this->getUserJobID());
     $importer->init();
-    $importer->_contactType = $this->getContactType();
     return $importer;
   }
 

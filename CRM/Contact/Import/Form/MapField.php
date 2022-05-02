@@ -72,16 +72,13 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function preProcess() {
-    $this->_mapperFields = $this->get('fields');
+    $this->_mapperFields = $this->getAvailableFields();
     $this->_importTableName = $this->get('importTableName');
     $this->_contactSubType = $this->get('contactSubType');
     //format custom field names, CRM-2676
     $contactType = $this->getContactType();
 
     $this->_contactType = $contactType;
-    if ($this->isSkipDuplicates()) {
-      unset($this->_mapperFields['id']);
-    }
 
     if ($this->isIgnoreDuplicates()) {
       //Mark Dedupe Rule Fields as required, since it's used in matching contact
@@ -636,13 +633,13 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $parser->run($this->_importTableName,
       $mapper,
       CRM_Import_Parser::MODE_PREVIEW,
-      $this->get('contactType'),
+      NULL,
       '_id',
       '_status',
       (int) $this->getSubmittedValue('onDuplicate'),
       NULL, NULL, FALSE,
       CRM_Contact_Import_Parser_Contact::DEFAULT_TIMEOUT,
-      $this->get('contactSubType'),
+      $this->getSubmittedValue('contactSubType'),
       $this->getSubmittedValue('dedupe_rule_id')
     );
     return $parser;

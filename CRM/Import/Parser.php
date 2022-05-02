@@ -86,6 +86,36 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * Get the submitted value, as stored on the user job.
+   *
+   * @param string $fieldName
+   *
+   * @return mixed
+   *
+   * @throws \API_Exception
+   */
+  protected function getSubmittedValue(string $fieldName) {
+    return $this->getUserJob()['metadata']['submitted_values'][$fieldName];
+  }
+
+  /**
+   * Get configured contact type.
+   *
+   * @throws \API_Exception
+   */
+  protected function getContactType() {
+    if (!$this->_contactType) {
+      $contactTypeMapping = [
+        CRM_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
+        CRM_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
+        CRM_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
+      ];
+      $this->_contactType = $contactTypeMapping[$this->getSubmittedValue('contactType')];
+    }
+    return $this->_contactType;
+  }
+
+  /**
    * Total number of non empty lines
    * @var int
    */
@@ -233,7 +263,7 @@ abstract class CRM_Import_Parser {
   /**
    * Contact type
    *
-   * @var int
+   * @var string
    */
   public $_contactType;
   /**
