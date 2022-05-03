@@ -2507,10 +2507,12 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       if (!empty($value['no_display'])) {
         unset($this->_columnHeaders[$key]);
       }
-      foreach (['colspan', 'type'] as $expectedKey) {
-        if (!isset($this->_columnHeaders[$key][$expectedKey])) {
-          // Ensure it is set to prevent smarty notices.
-          $this->_columnHeaders[$key][$expectedKey] = FALSE;
+      else {
+        foreach (['colspan', 'type'] as $expectedKey) {
+          if (!isset($this->_columnHeaders[$key][$expectedKey])) {
+            // Ensure it is set to prevent smarty notices.
+            $this->_columnHeaders[$key][$expectedKey] = FALSE;
+          }
         }
       }
     }
