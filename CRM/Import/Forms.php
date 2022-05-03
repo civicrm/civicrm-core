@@ -416,7 +416,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @throws \API_Exception
    */
   protected function getDataRows(int $limit): array {
-    return $this->getDataSourceObject()->getRows($limit);
+    return $this->getDataSourceObject()->setLimit($limit)->getRows();
   }
 
   /**
