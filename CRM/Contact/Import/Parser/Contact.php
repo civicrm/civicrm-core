@@ -2928,18 +2928,19 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $params = [];
 
     for ($i = 0; $i < $this->_activeFieldCount; $i++) {
-      if ($this->_activeFields[$i]->_name == 'do_not_import') {
+      $fieldName = $this->_activeFields[$i]->_name;
+      if ($fieldName === 'do_not_import') {
         continue;
       }
 
       if (isset($this->_activeFields[$i]->_value)) {
         if (isset($this->_activeFields[$i]->_hasLocationType)) {
-          if (!isset($params[$this->_activeFields[$i]->_name])) {
-            $params[$this->_activeFields[$i]->_name] = [];
+          if (!isset($params[$fieldName])) {
+            $params[$fieldName] = [];
           }
 
           $value = [
-            $this->_activeFields[$i]->_name => $this->_activeFields[$i]->_value,
+            $fieldName => $this->_activeFields[$i]->_value,
             'location_type_id' => $this->_activeFields[$i]->_hasLocationType,
           ];
 
@@ -2952,20 +2953,20 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             $value['provider_id'] = $this->_activeFields[$i]->_imProvider;
           }
 
-          $params[$this->_activeFields[$i]->_name][] = $value;
+          $params[$fieldName][] = $value;
         }
         elseif (isset($this->_activeFields[$i]->_websiteType)) {
           $value = [
-            $this->_activeFields[$i]->_name => $this->_activeFields[$i]->_value,
+            $fieldName => $this->_activeFields[$i]->_value,
             'website_type_id' => $this->_activeFields[$i]->_websiteType,
           ];
 
-          $params[$this->_activeFields[$i]->_name][] = $value;
+          $params[$fieldName][] = $value;
         }
 
-        if (!isset($params[$this->_activeFields[$i]->_name])) {
+        if (!isset($params[$fieldName])) {
           if (!isset($this->_activeFields[$i]->_related)) {
-            $params[$this->_activeFields[$i]->_name] = $this->_activeFields[$i]->_value;
+            $params[$fieldName] = $this->_activeFields[$i]->_value;
           }
         }
 
