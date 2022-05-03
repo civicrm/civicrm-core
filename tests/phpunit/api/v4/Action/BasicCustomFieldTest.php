@@ -52,7 +52,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
     $getFields = Contact::getFields(FALSE);
     $this->assertEquals('Custom', $getFields->execute()->indexBy('name')['MyIndividualFields.FavColor']['type']);
     $this->assertContains('MyIndividualFields.FavColor', $getFields->setValues(['contact_type' => 'Individual'])->execute()->column('name'));
-    $this->assertNotContains('MyIndividualFields.FavColor', $getFields->setValues(['contact_type' => 'Household'])->execute()->column('name'));
+    $this->assertNotContains('MyIndividualFields.FavColor', $getFields->setValues(['contact_type:name' => 'Household'])->execute()->column('name'));
 
     $contactId = Contact::create(FALSE)
       ->addValue('first_name', 'Johann')
