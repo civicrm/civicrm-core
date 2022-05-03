@@ -116,6 +116,20 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * Get configured contact type.
+   *
+   * @return string|null
+   *
+   * @throws \API_Exception
+   */
+  public function getContactSubType() {
+    if (!$this->_contactSubType) {
+      $this->_contactSubType = $this->getSubmittedValue('contactSubType');
+    }
+    return $this->_contactSubType;
+  }
+
+  /**
    * Total number of non empty lines
    * @var int
    */
@@ -266,12 +280,23 @@ abstract class CRM_Import_Parser {
    * @var string
    */
   public $_contactType;
+
   /**
    * Contact sub-type
    *
-   * @var int
+   * @var int|null
    */
   public $_contactSubType;
+
+  /**
+   * @param int|null $contactSubType
+   *
+   * @return self
+   */
+  public function setContactSubType(?int $contactSubType): self {
+    $this->_contactSubType = $contactSubType;
+    return $this;
+  }
 
   /**
    * Class constructor.

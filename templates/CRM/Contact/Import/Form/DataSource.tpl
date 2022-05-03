@@ -36,7 +36,7 @@
          <tr class="crm-import-datasource-form-block-contactType">
        <td class="label">{$form.contactType.label}</td>
              <td>{$form.contactType.html} {help id='contact-type'}&nbsp;&nbsp;&nbsp;
-               <span id="contact-subtype">{$form.subType.label}&nbsp;&nbsp;&nbsp;{$form.subType.html} {help id='contact-sub-type'}</span></td>
+               <span id="contact-subtype">{$form.contactSubType.label}&nbsp;&nbsp;&nbsp;{$form.contactSubType.html} {help id='contact-sub-type'}</span></td>
          </tr>
          <tr class="crm-import-datasource-form-block-onDuplicate">
              <td class="label">{$form.onDuplicate.label}</td>
@@ -123,16 +123,16 @@
 
                         success: function(subtype){
                                                    if ( subtype.length == 0 ) {
-                                                      cj("#subType").empty();
+                                                      cj("#contactSubType").empty();
                                                       cj("#contact-subtype").hide();
                                                    } else {
                                                        cj("#contact-subtype").show();
-                                                       cj("#subType").empty();
+                                                       cj("#contactSubType").empty();
 
-                                                       cj("#subType").append("<option value=''>- {/literal}{ts escape='js'}select{/ts}{literal} -</option>");
+                                                       cj("#contactSubType").append("<option value=''>- {/literal}{ts escape='js'}select{/ts}{literal} -</option>");
                                                        for ( var key in  subtype ) {
                                                            // stick these new options in the subtype select
-                                                           cj("#subType").append("<option value="+key+">"+subtype[key]+" </option>");
+                                                           cj("#contactSubType").append("<option value="+key+">"+subtype[key]+" </option>");
                                                        }
                                                    }
 

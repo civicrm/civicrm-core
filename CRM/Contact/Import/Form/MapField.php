@@ -74,7 +74,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   public function preProcess() {
     $this->_mapperFields = $this->getAvailableFields();
     $this->_importTableName = $this->get('importTableName');
-    $this->_contactSubType = $this->get('contactSubType');
+    $this->_contactSubType = $this->getSubmittedValue('contactSubType');
     //format custom field names, CRM-2676
     $contactType = $this->getContactType();
 
@@ -294,7 +294,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $processor->setFormName($formName);
     $processor->setMetadata($this->getContactImportMetadata());
     $processor->setContactTypeByConstant($this->getSubmittedValue('contactType'));
-    $processor->setContactSubType($this->get('contactSubType'));
+    $processor->setContactSubType($this->getSubmittedValue('contactSubType'));
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);

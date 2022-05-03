@@ -316,6 +316,18 @@ class CRM_Import_Forms extends CRM_Core_Form {
   }
 
   /**
+   * Get the contact sub type selected for the import (on the datasource form).
+   *
+   * @return string|null
+   *   e.g Staff.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContactSubType(): ?string {
+    return $this->getSubmittedValue('contactSubType');
+  }
+
+  /**
    * Create a user job to track the import.
    *
    * @return int

@@ -2589,8 +2589,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     // Since $this->_contactType is still being called directly do a get call
     // here to make sure it is instantiated.
     $this->getContactType();
-
-    $this->_contactSubType = $contactSubType;
+    $this->getContactSubType();
 
     $this->init();
 
@@ -3055,6 +3054,17 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param int $mode
    */
   public function set($store, $mode = self::MODE_SUMMARY) {
+    // @todo - this params are being set here because they were / possibly still
+    // are in some places being accessed by forms later in the flow
+    // ie CRM_Contact_Import_Form_MapField, CRM_Contact_Import_Form_Preview
+    // or CRM_Contact_Import_Form_Summary using `$this->get()
+    // which was the old way of saving values submitted on this form such that
+    // the other forms could access them. Now they should use
+    // `getSubmittedValue` or simply not get them if the only
+    // reason is to pass to the Parser which can itself
+    // call 'getSubmittedValue'
+    // Once the mentioned forms no longer call $this->get() all this 'setting'
+    // is obsolete.
     $store->set('rowCount', $this->_rowCount);
     $store->set('fieldTypes', $this->getSelectTypes());
 
