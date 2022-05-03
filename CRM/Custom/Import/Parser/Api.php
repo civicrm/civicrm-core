@@ -504,12 +504,6 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
         }
       }
 
-      // we give the derived class a way of aborting the process
-      // note that the return code could be multiple code or'ed together
-      if ($returnCode & self::STOP) {
-        break;
-      }
-
       // if we are done processing the maxNumber of lines, break
       if ($this->_maxLinesToProcess > 0 && $this->_validCount >= $this->_maxLinesToProcess) {
         break;
