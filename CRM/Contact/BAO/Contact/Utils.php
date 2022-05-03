@@ -249,7 +249,7 @@ WHERE  id IN ( $idString )
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function createCurrentEmployerRelationship($contactID, $employerID, $previousEmployerID = NULL, $newContact = FALSE) {
+  public static function createCurrentEmployerRelationship($contactID, $employerID, $previousEmployerID = NULL, $newContact = FALSE): void {
     if (!$employerID) {
       // This function is not called in core with no organization & should not be
       // Refs CRM-15368,CRM-15547
@@ -258,11 +258,11 @@ WHERE  id IN ( $idString )
     }
     if (!is_numeric($employerID)) {
       $dupeIDs = CRM_Contact_BAO_Contact::getDuplicateContacts(['organization_name' => $employerID], 'Organization', 'Unsupervised', [], FALSE);
-      $employerID = reset($dupeIDs) ?: Contact::create(FALSE)
+      $employerID = (int) (reset($dupeIDs) ?: Contact::create(FALSE)
         ->setValues([
           'contact_type' => 'Organization',
           'organization_name' => $employerID,
-        ])->execute()->first()['id'];
+        ])->execute()->first()['id']);
     }
 
     $relationshipTypeID = CRM_Contact_BAO_RelationshipType::getEmployeeRelationshipTypeID();
