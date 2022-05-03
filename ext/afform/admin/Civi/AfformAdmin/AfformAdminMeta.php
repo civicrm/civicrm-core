@@ -196,6 +196,7 @@ class AfformAdminMeta {
         ],
         'submit' => [
           'title' => E::ts('Submit Button'),
+          'afform_type' => ['form'],
           'element' => [
             '#tag' => 'button',
             'class' => 'af-button btn btn-primary',
@@ -206,8 +207,22 @@ class AfformAdminMeta {
             ],
           ],
         ],
+        'reset' => [
+          'title' => E::ts('Reset Button'),
+          'afform_type' => ['form', 'search'],
+          'element' => [
+            '#tag' => 'button',
+            'class' => 'af-button btn btn-warning',
+            'type' => 'reset',
+            'crm-icon' => 'fa-undo',
+            '#children' => [
+              ['#text' => E::ts('Reset')],
+            ],
+          ],
+        ],
         'fieldset' => [
           'title' => E::ts('Fieldset'),
+          'afform_type' => ['form'],
           'element' => [
             '#tag' => 'fieldset',
             'af-fieldset' => NULL,
