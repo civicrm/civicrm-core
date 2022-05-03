@@ -398,7 +398,7 @@ abstract class AbstractAction implements \ArrayAccess {
    * @return array
    */
   public function getPermissions() {
-    $permissions = call_user_func([CoreUtil::getApiClass($this->_entityName), 'permissions']);
+    $permissions = call_user_func([CoreUtil::getApiClass($this->_entityName), 'permissions'], $this->_entityName);
     $permissions += [
       // applies to getFields, getActions, etc.
       'meta' => ['access CiviCRM'],
