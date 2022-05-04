@@ -41,7 +41,6 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
 
     //get the contact and event id and assing to session.
     $values = [];
-    $csContactID = NULL;
     if ($this->_participantId) {
       $params = ['id' => $this->_participantId];
       CRM_Core_DAO::commonRetrieve('CRM_Event_DAO_Participant', $params, $values,

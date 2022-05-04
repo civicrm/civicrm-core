@@ -418,7 +418,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       elseif ($participantNum) {
         $participantCount[$participantNum] = 'participant';
       }
-      $totalTaxAmount += CRM_Utils_Array::value('tax_amount', $record, 0);
+      $totalTaxAmount += $record['tax_amount'] ?? 0;
       if (!empty($record['is_primary'])) {
         $taxAmount = &$params[$participantNum]['tax_amount'];
       }
