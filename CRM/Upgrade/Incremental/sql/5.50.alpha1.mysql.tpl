@@ -1,6 +1,6 @@
 {* file to handle db changes in 5.50.alpha1 during upgrade *}
 
-CREATE TABLE `civicrm_user_job` (
+CREATE TABLE IF NOT EXISTS `civicrm_user_job` (
 `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Job ID',
 `name` varchar(64) COMMENT 'Unique name for job.',
 `created_id` int unsigned COMMENT 'FK to contact table.',
