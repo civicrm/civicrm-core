@@ -83,7 +83,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     $result = self::_CsvToTable(
       $file,
       $firstRowIsColumnHeader,
-      CRM_Utils_Array::value('import_table_name', $params),
+      NULL,
       CRM_Utils_Array::value('fieldSeparator', $params, ',')
     );
 
