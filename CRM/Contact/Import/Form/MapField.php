@@ -521,18 +521,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     $this->set('columnNames', $this->_columnNames);
-    $this->set('websites', $parserParameters['mapperWebsiteType']);
-    $this->set('locations', $locations);
-    $this->set('phones', $parserParameters['mapperPhoneType']);
-    $this->set('ims', $parserParameters['mapperImProvider']);
-    $this->set('related', $parserParameters['mapperRelated']);
-    $this->set('relatedContactType', $parserParameters['relatedContactType']);
-    $this->set('relatedContactDetails', $parserParameters['relatedContactDetails']);
-    $this->set('relatedContactLocType', $parserParameters['relatedContactLocType']);
-    $this->set('relatedContactPhoneType', $parserParameters['relatedContactPhoneType']);
-    $this->set('relatedContactImProvider', $parserParameters['relatedContactImProvider']);
-    $this->set('relatedContactWebsiteType', $parserParameters['relatedContactWebsiteType']);
-    $this->set('mapper', $mapper);
 
     // store mapping Id to display it in the preview page
     $this->set('loadMappingId', CRM_Utils_Array::value('mappingId', $params));

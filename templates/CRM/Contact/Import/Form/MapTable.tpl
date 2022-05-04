@@ -42,23 +42,7 @@
         {* Display mapper <select> field for 'Map Fields', and mapper value for 'Preview' *}
         <td class="form-item even-row{if $wizard.currentStepName == 'Preview'} labels{/if}">
           {if $wizard.currentStepName == 'Preview'}
-            {if $relatedContactDetails && $relatedContactDetails[$i] != ''}
-                {$mapper[$i]} - {$relatedContactDetails[$i]}
-              {if $relatedContactLocType && $relatedContactLocType[$i] != ''} - {$relatedContactLocType[$i]}{/if}
-              {if $relatedContactPhoneType && $relatedContactPhoneType[$i] != ''} - {$relatedContactPhoneType[$i]}{/if}
-              {* append IM Service Provider type for related contact *}
-              {if  $relatedContactImProvider && $relatedContactImProvider[$i] != ''} - {$relatedContactImProvider[$i]}{/if}
-              {* append website type *}
-              {if  $relatedContactWebsiteType && $relatedContactWebsiteType[$i] != ''} - {$relatedContactWebsiteType[$i]}{/if}
-            {else}
-              {if $locations[$i]}{$locations[$i]} - {/if}
-              {if $phones[$i]}{$phones[$i]} - {/if}
-              {* append IM Service provider type for contact *}
-              {if $ims[$i]}{$ims[$i]} - {/if}
-              {* append website type *}
-              {if $websites[$i]}{$websites[$i]} - {/if}
-              {$mapper[$i]}
-            {/if}
+            {$mapperField}
           {else}
             {$mapperField.html|smarty:nodefaults}
           {/if}

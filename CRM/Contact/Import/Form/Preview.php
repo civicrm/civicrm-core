@@ -76,10 +76,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
 
     $properties = array(
-      'mapper',
-      'locations',
-      'phones',
-      'ims',
       'columnCount',
       'totalRowCount',
       'validRowCount',
@@ -88,14 +84,9 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       'downloadErrorRecordsUrl',
       'downloadConflictRecordsUrl',
       'downloadMismatchRecordsUrl',
-      'related',
-      'relatedContactDetails',
-      'relatedContactLocType',
-      'relatedContactPhoneType',
-      'relatedContactImProvider',
-      'websites',
-      'relatedContactWebsiteType',
     );
+
+    $this->assign('mapper', $this->getMappedFieldLabels());
 
     foreach ($properties as $property) {
       $this->assign($property, $this->get($property));
@@ -294,6 +285,26 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     //hack to clean db
     //if job complete drop table.
     $importJob->isComplete();
+  }
+
+  /**
+   * Get the mapped fields as an array of labels.
+   *
+   * e.g
+   * ['First Name', 'Employee Of - First Name', 'Home - Street Address']
+   *
+   * @return array
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMappedFieldLabels(): array {
+    $mapper = [];
+    $parser = new CRM_Contact_Import_Parser_Contact();
+    $parser->setUserJobID($this->getUserJobID());
+    foreach ($this->getSubmittedValue('mapper') as $columnNumber => $mappedField) {
+      $mapper[$columnNumber] = $parser->getMappedFieldLabel($parser->getMappingFieldFromMapperInput($mappedField, 0, $columnNumber));
+    }
+    return $mapper;
   }
 
 }
