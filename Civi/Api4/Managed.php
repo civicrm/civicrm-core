@@ -11,7 +11,7 @@
 namespace Civi\Api4;
 
 /**
- * Managed (Managed entities).
+ * Managed entities API.
  *
  * Managed entities allow extensions to add and manage entities.
  *
@@ -24,7 +24,7 @@ class Managed extends Generic\DAOEntity {
 
   /**
    * @param bool $checkPermissions
-   * @return Action\Contact\GetChecksum
+   * @return Action\Managed\Reconcile
    */
   public static function reconcile($checkPermissions = TRUE) {
     return (new Action\Managed\Reconcile(__CLASS__, __FUNCTION__))
