@@ -29,6 +29,30 @@ class CRM_Upgrade_Incremental_php_FiveFifty extends CRM_Upgrade_Incremental_Base
    */
   public function upgrade_5_50_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask(ts('Convert import mappings to use names'), 'convertMappingFieldLabelsToNames', $rev);
+
+  }
+
+  /**
+   * Convert saved mapping fields for contact imports to use name rather than
+   * label.
+   *
+   * Currently the 'name' column in civicrm_mapping_field holds names like
+   * 'First Name' or, more tragically 'Contact ID (match to contact)'.
+   *
+   * This updates them to hold the name - eg. 'first_name' in conjunction with
+   * a
+   * change in the contact import.
+   *
+   * (Getting the other entities done is a stretch goal).
+   *
+   * @return bool
+   * @throws \API_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function convertMappingFieldLabelsToNames(): bool {
+    CRM_Import_ImportProcessor::convertSavedFields();
+    return TRUE;
   }
 
 }
