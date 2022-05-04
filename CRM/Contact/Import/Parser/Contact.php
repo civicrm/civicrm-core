@@ -3637,7 +3637,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Transform the input parameters into the
+   * Transform the input parameters into the form handled by the input routine.
    *
    * @param array $values
    *   Input parameters as they come in from the datasource
@@ -3653,11 +3653,13 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *     'phone' => ['phone' => '123', 'location_type_id' => 1, 'phone_type_id' => 1],
    *     '5_a_b' => ['contact_type' => 'Organization', 'url' => ['url' => 'https://example.org', 'website_type_id' => 1]]
    *     'im' => ['im' => 'my-handle', 'location_type_id' => 1, 'provider_id' => 1],
+   *
+   * @throws \API_Exception
    */
   public function getMappedRow(array $values): array {
     $this->setActiveFieldValues($values);
     $params = $this->getActiveFieldParams();
-    $params['contact_type'] = $this->_contactType;
+    $params['contact_type'] = $this->getContactType();
     return $params;
   }
 
