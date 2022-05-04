@@ -524,6 +524,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             $value['email'] = CRM_Utils_Array::valueByRegexKey('/^email-/', $value);
           }
 
+          // If registering from waitlist participant_id is set but contact_id is not.
+          // We need a contact ID to process the payment so set the "primary" contact ID.
+          if (empty($value['contact_id'])) {
+            $value['contact_id'] = $contactID;
+          }
+
           if (is_object($payment)) {
             // Not quite sure why we don't just user $value since it contains the data
             // from result
