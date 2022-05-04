@@ -320,7 +320,7 @@ function _civicrm_api3_get_DAO($name) {
   if ($name === 'MailingRecipients') {
     return 'CRM_Mailing_DAO_Recipients';
   }
-  if ($name === 'AclRole') {
+  if ($name === 'AclRole' || $name === 'ACLRole') {
     return 'CRM_ACL_DAO_ACLEntityRole';
   }
   // FIXME: DAO should be renamed CRM_SMS_DAO_SmsProvider
@@ -1128,6 +1128,10 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
  * @param string $entity
  */
 function _civicrm_api3_format_params_for_create(&$params, $entity) {
+  if (!$entity) {
+    return;
+  }
+  $entity = CRM_Core_DAO_AllCoreTables::convertEntityNameToCamel($entity);
   $nonGenericEntities = array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes(TRUE));
 
   $customFieldEntities = array_diff_key(CRM_Core_SelectValues::customGroupExtends(), array_fill_keys($nonGenericEntities, 1));
@@ -1958,7 +1962,7 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = []) {
  * @return array
  */
 function _civicrm_api_get_custom_fields($entity, &$params) {
-  $entity = _civicrm_api_get_camel_name($entity);
+  $entity = CRM_Core_DAO_AllCoreTables::convertEntityNameToCamel($entity);
   if ($entity == 'Contact') {
     // Use sub-type if available, otherwise "NULL" to fetch from all contact types
     $entity = $params['contact_type'] ?? NULL;

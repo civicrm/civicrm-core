@@ -877,15 +877,19 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
 
     $entitiesWithNamingIssues = [
-      'SmsProvider' => 'Provider',
+      'Acl' => 'ACL',
       'AclRole' => 'ACLEntityRole',
+      'Im' => 'IM',
       'Dedupe' => 'PrevNextCache',
       'Exception' => 'DedupeException',
+      'Pcp' => 'PCP',
+      'Rule' => 'DedupeRule',
       'RuleGroup' => 'DedupeRuleGroup',
+      'SmsProvider' => 'Provider',
     ];
 
-    $usableName = !empty($entitiesWithNamingIssues[$entityName]) ? $entitiesWithNamingIssues[$entityName] : $entityName;
-    $optionName = CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($usableName));
+    $usableName = $entitiesWithNamingIssues[$entityName] ?? $entityName;
+    $optionName = CRM_Core_DAO_AllCoreTables::getTableForEntityName($usableName);
 
     if (!isset(CRM_Core_BAO_CustomQuery::$extendsMap[$entityName])) {
       $createdValue = $this->callAPISuccess('OptionValue', 'create', [

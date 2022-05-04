@@ -384,7 +384,7 @@ class CRM_Core_DAO extends DB_DataObject {
             else {
               $options = CRM_Core_PseudoConstant::get($daoName, $fieldName);
               if (is_array($options)) {
-                $this->$dbName = $options[0];
+                $this->$dbName = $options[0] ?? NULL;
               }
               else {
                 $defaultValues = explode(',', $options);
