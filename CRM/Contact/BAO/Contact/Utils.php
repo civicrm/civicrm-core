@@ -341,7 +341,6 @@ WHERE  id IN ( $idString )
       'relationship_type_id' => $relationshipTypeID . '_a_b',
       'contact_check' => [$organizationID => TRUE],
     ];
-    $ids = ['contact' => $contactID];
 
     $relationshipIds = [];
     // check if the relationship is valid between contacts.
