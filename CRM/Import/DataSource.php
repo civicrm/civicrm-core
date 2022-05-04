@@ -24,6 +24,68 @@ use Civi\Api4\UserJob;
 abstract class CRM_Import_DataSource {
 
   /**
+   * @var \CRM_Core_DAO
+   */
+  private $queryResultObject;
+
+  /**
+   * @var int
+   */
+  private $limit;
+
+  /**
+   * @param int $limit
+   *
+   * @return CRM_Import_DataSource
+   */
+  public function setLimit(int $limit): CRM_Import_DataSource {
+    $this->limit = $limit;
+    $this->queryResultObject = NULL;
+    return $this;
+  }
+
+  /**
+   * @param int $offset
+   *
+   * @return CRM_Import_DataSource
+   */
+  public function setOffset(int $offset): CRM_Import_DataSource {
+    $this->offset = $offset;
+    $this->queryResultObject = NULL;
+    return $this;
+  }
+
+  /**
+   * @var int
+   */
+  private $offset;
+
+  /**
+   * Statuses of rows to fetch.
+   *
+   * @var array
+   */
+  private $statuses = [];
+
+  /**
+   * Current row.
+   *
+   * @var array
+   */
+  private $row;
+
+  /**
+   * @param array $statuses
+   *
+   * @return self
+   */
+  public function setStatuses(array $statuses): self {
+    $this->statuses = $statuses;
+    $this->queryResultObject = NULL;
+    return $this;
+  }
+
+  /**
    * Class constructor.
    *
    * @param int|null $userJobID
@@ -113,31 +175,61 @@ abstract class CRM_Import_DataSource {
    *
    * The array has all values.
    *
-   * @param int $limit
-   * @param int $offset
+   * @param bool $nonAssociative
+   *   Return as a non-associative array?
    *
    * @return array
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public function getRows(int $limit = 0, int $offset = 0) {
-    $query = 'SELECT * FROM ' . $this->getTableName();
-    if ($limit) {
-      $query .= ' LIMIT ' . $limit . ($offset ? (' OFFSET ' . $offset) : NULL);
-    }
+  public function getRows(bool $nonAssociative = TRUE): array {
     $rows = [];
-    $result = CRM_Core_DAO::executeQuery($query);
-    while ($result->fetch()) {
-      $values = $result->toArray();
-      /* trim whitespace around the values */
-      foreach ($values as $k => $v) {
-        $values[$k] = trim($v, " \t\r\n");
-      }
+    while ($this->getRow()) {
       // Historically we expect a non-associative array...
-      $rows[] = array_values($values);
+      $rows[] = $nonAssociative ? array_values($this->row) : $this->row;
     }
+    $this->queryResultObject = NULL;
     return $rows;
+  }
+
+  /**
+   * Get the next row.
+   *
+   * @return array|null
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function getRow(): ?array {
+    if (!$this->queryResultObject) {
+      $this->instantiateQueryObject();
+    }
+    if (!$this->queryResultObject->fetch()) {
+      return NULL;
+    }
+    $values = $this->queryResultObject->toArray();
+    /* trim whitespace around the values */
+    foreach ($values as $k => $v) {
+      $values[$k] = trim($v, " \t\r\n");
+    }
+    $this->row = $values;
+    return $values;
+  }
+
+  /**
+   * Get row count.
+   *
+   * The array has all values.
+   *
+   * @return int
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function getRowCount(array $statuses = []): int {
+    $this->statuses = $statuses;
+    $query = 'SELECT count(*) FROM ' . $this->getTableName() . ' ' . $this->getStatusClause();
+    return CRM_Core_DAO::singleValueQuery($query);
   }
 
   /**
@@ -282,6 +374,109 @@ abstract class CRM_Import_DataSource {
       ->setValues(['metadata' => $metaData])
       ->execute();
     $this->userJob['metadata'] = $metaData;
+  }
+
+  /**
+   * Purge any datasource related assets when the datasource is dropped.
+   *
+   * This is the datasource's chance to delete any tables etc that it created
+   * which will now not be used.
+   *
+   * @param array $newParams
+   *   If the dataSource is being updated to another variant of the same
+   *   class (eg. the csv upload was set to no column headers and they
+   *   have resubmitted WITH skipColumnHeader (first row is a header) then
+   *   the dataSource is still CSV and the params for the new intance
+   *   are passed in. When changing from csv to SQL (for example) newParams is
+   *   empty.
+   *
+   * @return array
+   *   The details to update the DataSource key in the userJob metadata to.
+   *   Generally and empty array but it the datasource decided (for example)
+   *   that the table it created earlier is still consistent with the new params
+   *   then it might decided not to drop the table and would want to retain
+   *   some metadata.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @noinspection PhpUnusedParameterInspection
+   */
+  public function purge(array $newParams = []) :array {
+    // The old name is still stored...
+    $oldTableName = $this->getTableName();
+    if ($oldTableName) {
+      CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS ' . $oldTableName);
+    }
+    return [];
+  }
+
+  /**
+   * Add a status columns to the import table.
+   *
+   * We add
+   *  _id - primary key
+   *  _status
+   *  _statusMsg
+   *
+   * Note that
+   * 1) the use of the preceding underscore has 2 purposes - it avoids clashing
+   *   with an id field (code comments from 14 years ago suggest perhaps there
+   *   could be cases where it still clashes but time didn't tell in this case)
+   * 2) the show fields query used to get the column names excluded the
+   *   administrative fields, relying on this convention.
+   * 3) we have the capitalisation on _statusMsg - @todo change to _status_message
+   *
+   * @param string $tableName
+   */
+  protected function addTrackingFieldsToTable(string $tableName): void {
+    CRM_Core_DAO::executeQuery("
+     ALTER TABLE $tableName
+       ADD COLUMN _status VARCHAR(32) DEFAULT 'NEW' NOT NULL,
+       ADD COLUMN _statusMsg TEXT,
+       ADD COLUMN _id INT PRIMARY KEY NOT NULL AUTO_INCREMENT"
+    );
+  }
+
+  /**
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  private function instantiateQueryObject(): void {
+    $query = 'SELECT * FROM ' . $this->getTableName() . ' ' . $this->getStatusClause();
+    if ($this->limit) {
+      $query .= ' LIMIT ' . $this->limit . ($this->offset ? (' OFFSET ' . $this->offset) : NULL);
+    }
+    $this->queryResultObject = CRM_Core_DAO::executeQuery($query);
+  }
+
+  /**
+   * Get the mapping of constants to database status codes.
+   *
+   * @return string[]
+   */
+  protected function getStatusMapping() {
+    return [
+      CRM_Import_Parser::VALID => 'imported',
+      CRM_Import_Parser::ERROR => 'error',
+      CRM_Import_Parser::DUPLICATE => 'duplicate',
+    ];
+  }
+
+  /**
+   * Get the status filter clause.
+   *
+   * @return string
+   */
+  private function getStatusClause(): string {
+    if (!empty($this->statuses)) {
+      $statuses = [];
+      foreach ($this->statuses as $status) {
+        $statuses[] = '"' . $this->getStatusMapping()[$status] . '"';
+      }
+      return ' WHERE _status IN (' . implode(',', $statuses) . ')';
+    }
+    return '';
   }
 
 }
