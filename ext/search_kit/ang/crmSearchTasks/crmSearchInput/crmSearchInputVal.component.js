@@ -21,7 +21,7 @@
 
         this.ngModel.$render = function() {
           ctrl.value = ctrl.ngModel.$viewValue;
-          if (!rendered && field.input_type === 'Date') {
+          if (!rendered && isDateField(field)) {
             setDateType();
           }
           rendered = true;
@@ -102,7 +102,7 @@
           return '~/crmSearchTasks/crmSearchInput/text.html';
         }
 
-        if (field.data_type === 'Date' || field.data_type === 'Timestamp') {
+        if (isDateField(field)) {
           return '~/crmSearchTasks/crmSearchInput/date.html';
         }
 
@@ -133,6 +133,10 @@
         var field = ctrl.field || {};
         return {results: formatForSelect2(field.options || [], ctrl.optionKey || 'id', 'label', ['description', 'color', 'icon'])};
       };
+
+      function isDateField(field) {
+        return field.data_type === 'Date' || field.data_type === 'Timestamp';
+      }
 
     }
   });
