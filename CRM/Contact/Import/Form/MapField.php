@@ -108,7 +108,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->_formattedFieldNames[$contactType] = $this->_mapperFields = array_merge($this->_mapperFields, $formattedFieldNames);
 
     $columnNames = $this->getColumnHeaders();
-    $this->assign('showColNames', !empty($columnNames));
 
     $this->_columnCount = $this->getNumberOfColumns();
     $this->_columnNames = $columnNames;

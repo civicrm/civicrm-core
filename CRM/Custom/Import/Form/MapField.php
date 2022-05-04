@@ -35,8 +35,6 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
     $this->_onDuplicate = $this->get('onDuplicate');
     if ($skipColumnHeader) {
-      //showColNames needs to be true to show "Column Names" column
-      $this->assign('showColNames', $skipColumnHeader);
       $this->assign('columnNames', $columnNames);
       /* if we had a column header to skip, stash it for later */
       $this->_columnHeaders = $this->_dataValues[0];
