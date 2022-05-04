@@ -54,17 +54,6 @@
     </tr>
     {/if}
 
-    {if $conflictRowCount}
-    <tr class="error"><td class="label crm-grid-cell">{ts}Conflicting Rows{/ts}</td>
-        <td class="data">{$conflictRowCount}</td>
-        <td class="explanation">{ts}Rows with conflicting email addresses within this file. These rows will be skipped (not imported).{/ts}
-            {if $conflictRowCount}
-                <div class="action-link"><a href="{$downloadConflictRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Conflicts{/ts}</a></div>
-            {/if}
-        </td>
-    </tr>
-    {/if}
-
     <tr>
     <td class="label crm-grid-cell">{ts}Valid Rows{/ts}</td>
         <td class="data">{$validRowCount}</td>

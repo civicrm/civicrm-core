@@ -77,17 +77,8 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       $this->set('downloadMismatchRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
 
-    $properties = array(
-      'conflictRowCount',
-      'downloadConflictRecordsUrl',
-      'downloadMismatchRecordsUrl',
-    );
-
     $this->assign('mapper', $this->getMappedFieldLabels());
 
-    foreach ($properties as $property) {
-      $this->assign($property, $this->get($property));
-    }
     $this->assign('dataValues', $this->getDataRows([], 2));
 
     $this->setStatusUrl();
