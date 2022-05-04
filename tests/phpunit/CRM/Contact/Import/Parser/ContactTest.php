@@ -941,6 +941,93 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test mapping fields within the Parser class.
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testMapFields(): void {
+    $parser = new CRM_Contact_Import_Parser_Contact(
+      // Array of field names
+      ['first_name', 'phone', NULL, 'im', NULL],
+      // Array of location types, ie columns 2 & 4 have types.
+      [NULL, 1, NULL, 1, NULL],
+      // Array of phone types
+      [NULL, 1, NULL, NULL, NULL],
+      // Array of im provider types
+      [NULL, NULL, NULL, 1, NULL],
+      // Array of filled in relationship values.
+      [NULL, NULL, '5_a_b', NULL, '5_a_b'],
+      // Array of the contact type to map to - note this can be determined from ^^
+      [NULL, NULL, 'Organization', NULL, 'Organization'],
+      // Related contact field names
+      [NULL, NULL, 'url', NULL, 'phone'],
+      // Related contact location types
+      [NULL, NULL, NULL, NULL, 1],
+      // Related contact phone types
+      [NULL, NULL, NULL, NULL, 1],
+      // Related contact im provider types
+      [NULL, NULL, NULL, NULL, NULL],
+      // Website types
+      [NULL, NULL, NULL, NULL, NULL],
+      // Related contact website types
+      [NULL, NULL, 1, NULL, NULL]
+    );
+    $parser->setUserJobID($this->getUserJobID([
+      'mapper' => [
+        ['first_name'],
+        ['phone', 1, 1],
+        ['5_a_b', 'url', 1],
+        ['im', 1, 1],
+        ['5_a_b', 'phone', 1, 1],
+      ],
+    ]));
+    $parser->init();
+    $params = $parser->getMappedRow(
+      ['Bob', '123', 'https://example.org', 'my-handle', '456']
+    );
+    $this->assertEquals([
+      'first_name' => 'Bob',
+      'phone' => [
+        [
+          'phone' => '123',
+          'location_type_id' => 1,
+          'phone_type_id' => 1,
+        ],
+      ],
+      '5_a_b' => [
+        'contact_type' => 'Organization',
+        'url' =>
+          [
+
+            [
+              'url' => 'https://example.org',
+              'website_type_id' => 1,
+            ],
+          ],
+        'phone' =>
+          [
+            [
+              'phone' => '456',
+              'location_type_id' => 1,
+              'phone_type_id' => 1,
+            ],
+          ],
+      ],
+      'im' =>
+        [
+
+          [
+            'im' => 'my-handle',
+            'location_type_id' => 1,
+            'provider_id' => 1,
+          ],
+        ],
+      'contact_type' => 'Individual',
+    ], $params);
+  }
+
+  /**
    * Set up the underlying contact.
    *
    * @param array $params

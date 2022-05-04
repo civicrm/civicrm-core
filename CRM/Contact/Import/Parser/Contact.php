@@ -337,7 +337,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *   CRM_Import_Parser::ERROR or CRM_Import_Parser::VALID
    */
   public function summary(&$values): int {
-    $this->setActiveFieldValues($values);
+    $params = $this->getMappedRow($values);
     $rowNumber = (int) ($values[count($values) - 1]);
     $errorMessage = NULL;
     $errorRequired = FALSE;
@@ -435,9 +435,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $this->_allExternalIdentifiers[$externalID] = $this->_lineCount;
     }
 
-    //Checking error in custom data
-    $params = &$this->getActiveFieldParams();
-    $params['contact_type'] = $this->_contactType;
     //date-format part ends
 
     $errorMessage = NULL;
@@ -3636,6 +3633,31 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         ->addSelect($fieldName)->execute()->first()[$fieldName];
     }
     return $this->relationshipLabels[$id . $direction];
+  }
+
+  /**
+   * Transform the input parameters into the
+   *
+   * @param array $values
+   *   Input parameters as they come in from the datasource
+   *   eg. ['Bob', 'Smith', 'bob@example.org', '123-456']
+   *
+   * @return array
+   *   Parameters mapped to CiviCRM fields based on the mapping
+   *   and specified contact type. eg.
+   *   [
+   *     'contact_type' => 'Individual',
+   *     'first_name' => 'Bob',
+   *     'last_name' => 'Smith',
+   *     'phone' => ['phone' => '123', 'location_type_id' => 1, 'phone_type_id' => 1],
+   *     '5_a_b' => ['contact_type' => 'Organization', 'url' => ['url' => 'https://example.org', 'website_type_id' => 1]]
+   *     'im' => ['im' => 'my-handle', 'location_type_id' => 1, 'provider_id' => 1],
+   */
+  public function getMappedRow(array $values): array {
+    $this->setActiveFieldValues($values);
+    $params = $this->getActiveFieldParams();
+    $params['contact_type'] = $this->_contactType;
+    return $params;
   }
 
 }
