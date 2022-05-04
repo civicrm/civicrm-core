@@ -2930,6 +2930,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         continue;
       }
       $relatedContactFieldName = $this->_activeFields[$i]->_relatedContactDetails;
+      $relatedContactType = $this->_activeFields[$i]->_relatedContactType;
 
       if (isset($this->_activeFields[$i]->_value)) {
         if (isset($this->_activeFields[$i]->_hasLocationType)) {
@@ -2974,8 +2975,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             $params[$this->_activeFields[$i]->_related] = [];
           }
 
-          if (!isset($params[$this->_activeFields[$i]->_related]['contact_type']) && !empty($this->_activeFields[$i]->_relatedContactType)) {
-            $params[$this->_activeFields[$i]->_related]['contact_type'] = $this->_activeFields[$i]->_relatedContactType;
+          if (!isset($params[$this->_activeFields[$i]->_related]['contact_type']) && !empty($relatedContactType)) {
+            $params[$this->_activeFields[$i]->_related]['contact_type'] = $relatedContactType;
           }
 
           if (isset($this->_activeFields[$i]->_relatedContactLocType) && !empty($this->_activeFields[$i]->_value)) {
