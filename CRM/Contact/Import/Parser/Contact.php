@@ -2932,6 +2932,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if ($fieldName === 'do_not_import') {
         continue;
       }
+      $relatedContactFieldName = $this->_activeFields[$i]->_relatedContactDetails;
 
       if (isset($this->_activeFields[$i]->_value)) {
         if (isset($this->_activeFields[$i]->_hasLocationType)) {
@@ -2981,13 +2982,13 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           }
 
           if (isset($this->_activeFields[$i]->_relatedContactLocType) && !empty($this->_activeFields[$i]->_value)) {
-            if (!empty($params[$this->_activeFields[$i]->_related][$this->_activeFields[$i]->_relatedContactDetails]) &&
-              !is_array($params[$this->_activeFields[$i]->_related][$this->_activeFields[$i]->_relatedContactDetails])
+            if (!empty($params[$this->_activeFields[$i]->_related][$relatedContactFieldName]) &&
+              !is_array($params[$this->_activeFields[$i]->_related][$relatedContactFieldName])
             ) {
-              $params[$this->_activeFields[$i]->_related][$this->_activeFields[$i]->_relatedContactDetails] = [];
+              $params[$this->_activeFields[$i]->_related][$relatedContactFieldName] = [];
             }
             $value = [
-              $this->_activeFields[$i]->_relatedContactDetails => $this->_activeFields[$i]->_value,
+              $relatedContactFieldName => $this->_activeFields[$i]->_value,
               'location_type_id' => $this->_activeFields[$i]->_relatedContactLocType,
             ];
 
@@ -3000,21 +3001,21 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
               $value['provider_id'] = $this->_activeFields[$i]->_relatedContactImProvider;
             }
 
-            $params[$this->_activeFields[$i]->_related][$this->_activeFields[$i]->_relatedContactDetails][] = $value;
+            $params[$this->_activeFields[$i]->_related][$relatedContactFieldName][] = $value;
           }
           elseif (isset($this->_activeFields[$i]->_relatedContactWebsiteType)) {
-            $params[$this->_activeFields[$i]->_related][$this->_activeFields[$i]->_relatedContactDetails][] = [
+            $params[$this->_activeFields[$i]->_related][$relatedContactFieldName][] = [
               'url' => $this->_activeFields[$i]->_value,
               'website_type_id' => $this->_activeFields[$i]->_relatedContactWebsiteType,
             ];
           }
           elseif (empty($this->_activeFields[$i]->_value) && isset($this->_activeFields[$i]->_relatedContactLocType)) {
-            if (empty($params[$this->_activeFields[$i]->_related][$this->_activeFields[$i]->_relatedContactDetails])) {
-              $params[$this->_activeFields[$i]->_related][$this->_activeFields[$i]->_relatedContactDetails] = [];
+            if (empty($params[$this->_activeFields[$i]->_related][$relatedContactFieldName])) {
+              $params[$this->_activeFields[$i]->_related][$relatedContactFieldName] = [];
             }
           }
           else {
-            $params[$this->_activeFields[$i]->_related][$this->_activeFields[$i]->_relatedContactDetails] = $this->_activeFields[$i]->_value;
+            $params[$this->_activeFields[$i]->_related][$relatedContactFieldName] = $this->_activeFields[$i]->_value;
           }
         }
       }
