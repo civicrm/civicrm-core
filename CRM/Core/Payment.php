@@ -1155,20 +1155,20 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Legacy. Better for a method to work on its own PropertyBag,
-   * but also, this function does not do very much.
+   * Get the submitted amount, padded to 2 decimal places, if needed.
    *
    * @param array $params
    *
    * @return string
-   * @throws \CRM_Core_Exception
    */
   protected function getAmount($params = []) {
     if (!CRM_Utils_Rule::numeric($params['amount'])) {
       CRM_Core_Error::deprecatedWarning('Passing Amount value that is not numeric is deprecated please report this in gitlab');
       return CRM_Utils_Money::formatUSLocaleNumericRounded(filter_var($params['amount'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION), 2);
     }
-    return CRM_Utils_Money::formatUSLocaleNumericRounded($params['amount'], 2);
+    // Amount is already formatted to a machine-friendly format but may NOT have
+    // decimal places - eg. it could be 1000.1 so this would return 1000.10.
+    return Civi::format()->machineMoney($params['amount']);
   }
 
   /**
