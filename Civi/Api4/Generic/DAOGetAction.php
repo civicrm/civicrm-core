@@ -109,19 +109,28 @@ class DAOGetAction extends AbstractGetAction {
     $onlyCount = $this->getSelect() === ['row_count'];
 
     if (!$onlyCount) {
+      // Typical case: fetch various fields.
       $query = new Api4SelectQuery($this);
       $rows = $query->run();
       \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($rows);
       $result->exchangeArray($rows);
+
       // No need to fetch count if we got a result set below the limit
       if (!$this->getLimit() || count($rows) < $this->getLimit()) {
-        $result->rowCount = count($rows) + $this->getOffset();
-        $getCount = FALSE;
+        if ($getCount) {
+          $result->setCountMatched(count($rows) + $this->getOffset());
+          $getCount = FALSE;
+        }
+        else {
+          // Set rowCount for backward compatibility.
+          $result->rowCount = count($rows) + $this->getOffset();
+        }
       }
     }
+
     if ($getCount) {
       $query = new Api4SelectQuery($this);
-      $result->rowCount = $query->getCount();
+      $result->setCountMatched($query->getCount());
     }
   }
 
