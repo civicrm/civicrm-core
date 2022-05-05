@@ -272,9 +272,21 @@ WHERE  id IN ( $idString )
       CRM_Core_Error::deprecatedWarning('attempting to create an employer with invalid contact types is deprecated');
       return;
     }
+    $relationshipIds = [];
     // create employee of relationship
-    [$duplicate, $relationshipIds]
-      = self::legacyCreateMultiple($relationshipTypeID, $employerID, $contactID);
+    $duplicate = CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
+      [
+        'contact_id_a' => $contactID,
+        'contact_id_b' => $employerID,
+        'relationship_type_id' => $relationshipTypeID,
+      ],
+      $contactID,
+      // step 2
+      $employerID
+    );
+    if (!$duplicate) {
+      $relationshipIds = self::legacyCreateMultiple($relationshipTypeID, $employerID, $contactID);
+    }
 
     // In case we change employer, clean previous employer related records.
     if (!$previousEmployerID && !$newContact) {
@@ -332,7 +344,6 @@ WHERE  id IN ( $idString )
    * @param int $contactID
    *
    * @return array
-   * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
   private static function legacyCreateMultiple(int $relationshipTypeID, int $organizationID, int $contactID): array {
@@ -355,24 +366,13 @@ WHERE  id IN ( $idString )
       'relationship_type_id' => $relationshipTypeID,
     ];
 
-    if (
-      CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
-        $contactFields,
-        $contactID,
-        // step 2
-        $organizationID
-      )
-    ) {
-      return [1, []];
-    }
-
     $singleInstanceParams = array_merge($params, $contactFields);
     $relationship = CRM_Contact_BAO_Relationship::add($singleInstanceParams);
     $relationshipIds[] = $relationship->id;
 
     CRM_Contact_BAO_Relationship::addRecent($params, $relationship);
 
-    return [0, $relationshipIds];
+    return $relationshipIds;
   }
 
   /**
