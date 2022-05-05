@@ -161,18 +161,6 @@ abstract class CRM_Import_Parser {
   protected $_errors;
 
   /**
-   * Total number of conflict lines
-   * @var int
-   */
-  protected $_conflictCount;
-
-  /**
-   * Array of conflict lines
-   * @var array
-   */
-  protected $_conflicts;
-
-  /**
    * Total number of duplicate (from database) lines
    * @var int
    */
@@ -259,13 +247,6 @@ abstract class CRM_Import_Parser {
    * @var string
    */
   protected $_errorFileName;
-
-  /**
-   * Filename of conflict data
-   *
-   * @var string
-   */
-  protected $_conflictFileName;
 
   /**
    * Filename of duplicate data
@@ -502,10 +483,6 @@ abstract class CRM_Import_Parser {
         $fileName .= '.errors';
         break;
 
-      case self::CONFLICT:
-        $fileName .= '.conflicts';
-        break;
-
       case self::DUPLICATE:
         $fileName .= '.duplicates';
         break;
@@ -536,10 +513,6 @@ abstract class CRM_Import_Parser {
     switch ($type) {
       case self::ERROR:
         $fileName = 'Import_Errors.csv';
-        break;
-
-      case self::CONFLICT:
-        $fileName = 'Import_Conflicts.csv';
         break;
 
       case self::DUPLICATE:

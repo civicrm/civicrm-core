@@ -34,7 +34,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    $conflictRowCount = $this->get('conflictRowCount');
     $mismatchCount = $this->get('unMatchCount');
     $columnNames = $this->get('columnNames');
     $this->_disableUSPS = $this->get('disableUSPS');
@@ -65,12 +64,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     $this->assign('invalidRowCount', $this->getRowCount(CRM_Import_Parser::ERROR));
     $this->assign('validRowCount', $this->getRowCount(CRM_Import_Parser::VALID));
     $this->assign('totalRowCount', $this->getRowCount([]));
-
-    // @todo conflict rows are still being output in the parser & not updating the temp table - fix
-    if ($conflictRowCount) {
-      $urlParams = 'type=' . CRM_Import_Parser::CONFLICT . '&parser=CRM_Contact_Import_Parser_Contact';
-      $this->set('downloadConflictRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
-    }
 
     if ($mismatchCount) {
       $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . '&parser=CRM_Contact_Import_Parser_Contact';
@@ -185,7 +178,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     $importJobParams = array(
       'doGeocodeAddress' => $this->controller->exportValue('DataSource', 'doGeocodeAddress'),
       'invalidRowCount' => $this->get('invalidRowCount'),
-      'conflictRowCount' => $this->get('conflictRowCount'),
       'onDuplicate' => $this->get('onDuplicate'),
       'dedupe' => $this->getSubmittedValue('dedupe_rule_id'),
       'newGroupName' => $this->controller->exportValue($this->_name, 'newGroupName'),
@@ -250,10 +242,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       fclose($fd);
 
       $this->set('errorFile', $errorFile);
-
-      // @todo - these should use the new url but are not reliably updating the table yet.
-      $urlParams = 'type=' . CRM_Import_Parser::CONFLICT . '&parser=CRM_Contact_Import_Parser_Contact';
-      $this->set('downloadConflictRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
 
       $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . '&parser=CRM_Contact_Import_Parser_Contact';
       $this->set('downloadMismatchRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));

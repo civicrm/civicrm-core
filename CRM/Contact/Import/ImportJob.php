@@ -26,7 +26,6 @@ class CRM_Contact_Import_ImportJob {
 
   protected $_doGeocodeAddress;
   protected $_invalidRowCount;
-  protected $_conflictRowCount;
   protected $_onDuplicate;
   protected $_dedupe;
   protected $_newGroupName;

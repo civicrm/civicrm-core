@@ -2576,11 +2576,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     $this->_rowCount = 0;
     $this->_invalidRowCount = $this->_validCount = 0;
-    $this->_totalCount = $this->_conflictCount = 0;
+    $this->_totalCount = 0;
 
     $this->_errors = [];
     $this->_warnings = [];
-    $this->_conflicts = [];
     $this->_unparsedAddresses = [];
 
     $this->_tableName = $tableName = $this->getUserJob()['metadata']['DataSource']['table_name'];
@@ -2672,12 +2671,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $this->_errors[] = $values;
       }
 
-      if ($returnCode & self::CONFLICT) {
-        $this->_conflictCount++;
-        array_unshift($values, $this->_rowCount);
-        $this->_conflicts[] = $values;
-      }
-
       if ($returnCode & self::NO_MATCH) {
         $this->_unMatchCount++;
         array_unshift($values, $this->_rowCount);
@@ -2715,14 +2708,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
 
-      if ($this->_conflictCount) {
-        $headers = array_merge([
-          ts('Line Number'),
-          ts('Reason'),
-        ], $customHeaders);
-        $this->_conflictFileName = self::errorFileName(self::CONFLICT);
-        self::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
-      }
       if ($this->_unMatchCount) {
         $headers = array_merge([
           ts('Line Number'),
@@ -3039,7 +3024,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $store->set('totalRowCount', $this->_totalCount);
     $store->set('validRowCount', $this->_validCount);
     $store->set('invalidRowCount', $this->_invalidRowCount);
-    $store->set('conflictRowCount', $this->_conflictCount);
     $store->set('unMatchCount', $this->_unMatchCount);
 
     switch ($this->_contactType) {
@@ -3055,9 +3039,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $store->set('contactType', CRM_Import_Parser::CONTACT_ORGANIZATION);
     }
 
-    if ($this->_conflictCount) {
-      $store->set('conflictsFileName', $this->_conflictFileName);
-    }
     if (isset($this->_rows) && !empty($this->_rows)) {
       $store->set('dataValues', $this->_rows);
     }

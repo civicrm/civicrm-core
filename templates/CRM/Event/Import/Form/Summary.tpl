@@ -38,15 +38,6 @@
         </p>
     {/if}
 
-    {if $conflictRowCount}
-        <p class="error">
-        {ts count=$conflictRowCount plural='CiviCRM has detected %count records with conflicting participant IDs within this data file or relative to existing participant records. These records have not been imported.'}CiviCRM has detected one record with conflicting participant ID within this data file or relative to existing participant records. This record has not been imported.{/ts}
-        </p>
-        <p class="error">
-        {ts 1=$downloadConflictRecordsUrl}You can <a href="%1">Download Conflicts</a>. You may then review these records to determine if they are actually conflicts, and correct the participant IDs for those that are not.{/ts}
-        </p>
-    {/if}
-
     {if $duplicateRowCount}
         <p {if $dupeError}class="error"{/if}>
         {ts count=$duplicateRowCount plural='CiviCRM has detected %count records which are duplicates of existing CiviCRM participant records.'}CiviCRM has detected one record which is a duplicate of existing CiviCRM participant record.{/ts} {$dupeActionString}
@@ -84,17 +75,6 @@
         <td class="explanation">{ts}Rows with mismatched participant IDs... (NOT updated).{/ts}
             {if $unMatchCount}
                 <p><a href="{$downloadMismatchRecordsUrl}">{ts}Download Mismatched participants{/ts}</a></p>
-            {/if}
-        </td>
-    </tr>
-    {/if}
-
-    {if $conflictRowCount}
-    <tr class="error"><td class="label crm-grid-cell">{ts}Conflicting Rows (skipped){/ts}</td>
-        <td class="data">{$conflictRowCount}</td>
-        <td class="explanation">{ts}Rows with conflicting participant IDs (NOT imported).{/ts}
-            {if $conflictRowCount}
-                <p><a href="{$downloadConflictRecordsUrl}">{ts}Download Conflicts{/ts}</a></p>
             {/if}
         </td>
     </tr>

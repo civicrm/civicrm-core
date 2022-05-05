@@ -441,7 +441,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @return array|int
    *   One or more of the statues available - e.g
    *   CRM_Import_Parser::VALID
-   *   or [CRM_Import_Parser::ERROR, CRM_Import_Parser::CONFLICT]
+   *   or [CRM_Import_Parser::ERROR, CRM_Import_Parser::VALID]
    *
    * @throws \CRM_Core_Exception
    * @throws \API_Exception
