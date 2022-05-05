@@ -2878,12 +2878,13 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *
    * @return array
    *   (reference ) associative array of name/value pairs
+   * @throws \API_Exception
    */
   public function &getActiveFieldParams() {
     $params = [];
 
-    for ($i = 0; $i < $this->_activeFieldCount; $i++) {
-      $fieldName = $this->_activeFields[$i]->_name;
+    foreach($this->getMappingFieldFromMapperInput($this->getSubmittedValue('mapper'), 0, 0) as $i => $mappedField) {
+      $fieldName = $mappedField['field_name'];
       if ($fieldName === 'do_not_import') {
         continue;
       }
