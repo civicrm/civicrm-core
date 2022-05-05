@@ -276,7 +276,7 @@
         var splitAs = expr.split(' AS '),
           info = {fn: null, args: [], alias: _.last(splitAs)},
           bracketPos = expr.indexOf('(');
-        if (bracketPos >= 0) {
+        if (bracketPos >= 0 && !_.findWhere(CRM.crmSearchAdmin.pseudoFields, {name: expr})) {
           parseFnArgs(info, splitAs[0]);
         } else {
           var arg = parseArg(splitAs[0]);
