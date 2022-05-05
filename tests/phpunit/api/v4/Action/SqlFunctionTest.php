@@ -265,7 +265,7 @@ class SqlFunctionTest extends UnitTestCase {
     $this->assertGreaterThanOrEqual($result[4]['rand'], $result[5]['rand']);
   }
 
-  public function testYearInWhereClause() {
+  public function testDateInWhereClause() {
     $lastName = uniqid(__FUNCTION__);
     $sampleData = [
       ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => '2009-11-11'],
@@ -291,6 +291,14 @@ class SqlFunctionTest extends UnitTestCase {
       ->selectRowCount()
       ->execute();
     $this->assertCount(2, $result);
+
+    // Try an expression in the value
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('MONTH(birth_date)', '=', 'MONTH("2030-11-12")', TRUE)
+      ->addSelect('birth_date')
+      ->execute()->single();
+    $this->assertEquals('2009-11-11', $result['birth_date']);
   }
 
 }
