@@ -273,7 +273,6 @@ WHERE  id IN ( $idString )
       return;
     }
     $relationshipIds = [];
-    // create employee of relationship
     $duplicate = CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
       [
         'contact_id_a' => $contactID,
@@ -281,11 +280,19 @@ WHERE  id IN ( $idString )
         'relationship_type_id' => $relationshipTypeID,
       ],
       $contactID,
-      // step 2
       $employerID
     );
     if (!$duplicate) {
-      $relationshipIds = [self::legacyCreateMultiple($relationshipTypeID, $employerID, $contactID)];
+      $params = [
+        'is_active' => TRUE,
+        'contact_check' => [$employerID => TRUE],
+        'contact_id_a' => $contactID,
+        'contact_id_b' => $employerID,
+        'relationship_type_id' => $relationshipTypeID,
+      ];
+      $relationship = CRM_Contact_BAO_Relationship::add($params);
+      CRM_Contact_BAO_Relationship::addRecent($params, $relationship);
+      $relationshipIds = [$relationship->id];
     }
 
     // In case we change employer, clean previous employer related records.
@@ -328,36 +335,6 @@ WHERE  id IN ( $idString )
         'relationship_type_id' => $relationshipTypeID . '_a_b',
       ], $ids, $action);
     }
-  }
-
-  /**
-   * Previously shared function in need of cleanup.
-   *
-   * Takes an associative array and creates a relationship object.
-   *
-   * @deprecated For single creates use the api instead (it's tested).
-   * For multiple a new variant of this function needs to be written and migrated to as this is a bit
-   * nasty
-   *
-   * @param int $relationshipTypeID
-   * @param int $organizationID
-   * @param int $contactID
-   *
-   * @return array
-   * @throws \CiviCRM_API3_Exception
-   */
-  private static function legacyCreateMultiple(int $relationshipTypeID, int $organizationID, int $contactID): int {
-    $params = [
-      'is_active' => TRUE,
-      'contact_check' => [$organizationID => TRUE],
-      'contact_id_a' => $contactID,
-      'contact_id_b' => $organizationID,
-      'relationship_type_id' => $relationshipTypeID,
-    ];
-    $relationship = CRM_Contact_BAO_Relationship::add($params);
-    CRM_Contact_BAO_Relationship::addRecent($params, $relationship);
-
-    return $relationship->id;
   }
 
   /**
