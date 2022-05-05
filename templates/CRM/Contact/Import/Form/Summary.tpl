@@ -33,7 +33,7 @@
         {ts count=$invalidRowCount plural='CiviCRM has detected invalid data and/or formatting errors in %count records. These records have not been imported.'}CiviCRM has detected invalid data and/or formatting errors in one record. This record has not been imported.{/ts}
         </p>
         <p class="error">
-        {ts 1=$downloadErrorRecordsUrl}You can <a href='%1'>Download Errors</a>. You may then correct them, and import the new file with the corrected data.{/ts}
+        {ts 1=$downloadErrorRecordsUrl|smarty:nodefaults}You can <a href='%1'>Download Errors</a>. You may then correct them, and import the new file with the corrected data.{/ts}
         </p>
     {/if}
 
@@ -75,7 +75,7 @@
         <td class="data">{$invalidRowCount}</td>
         <td class="explanation">{ts}Rows with invalid data in one or more fields (for example, invalid email address formatting). These rows will be skipped (not imported).{/ts}
             {if $invalidRowCount}
-                <div class="action-link"><a href="{$downloadErrorRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Errors{/ts}</a></div>
+                <div class="action-link"><a href="{$downloadErrorRecordsUrl|smarty:nodefaults}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Errors{/ts}</a></div>
             {/if}
         </td>
     </tr>

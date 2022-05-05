@@ -75,7 +75,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public function preProcess() {
     $this->_mapperFields = $this->getAvailableFields();
-    $this->_importTableName = $this->get('importTableName');
     $this->_contactSubType = $this->getSubmittedValue('contactSubType');
     //format custom field names, CRM-2676
     $contactType = $this->getContactType();
@@ -114,7 +113,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->assign('columnNames', $this->getColumnHeaders());
     //$this->_columnCount = $this->get( 'columnCount' );
     $this->assign('columnCount', $this->_columnCount);
-    $this->_dataValues = array_values($this->getDataRows(2));
+    $this->_dataValues = array_values($this->getDataRows([], 2));
     $this->assign('dataValues', $this->_dataValues);
   }
 
@@ -557,7 +556,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     );
     $parser->setUserJobID($this->getUserJobID());
 
-    $parser->run($this->_importTableName,
+    $parser->run(NULL,
       $mapper,
       CRM_Import_Parser::MODE_PREVIEW,
       NULL,

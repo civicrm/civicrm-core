@@ -16,6 +16,7 @@
  */
 
 use Civi\Api4\UserJob;
+use League\Csv\Writer;
 
 /**
  * This class helps the forms within the import flow access submitted & parsed values.
@@ -437,15 +438,103 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * In the future we will use the dataSource object, likely
    * supporting offset as well.
    *
-   * @param int $limit
-   *
-   * @return array
+   * @return array|int
+   *   One or more of the statues available - e.g
+   *   CRM_Import_Parser::VALID
+   *   or [CRM_Import_Parser::ERROR, CRM_Import_Parser::CONFLICT]
    *
    * @throws \CRM_Core_Exception
    * @throws \API_Exception
    */
-  protected function getDataRows(int $limit): array {
-    return $this->getDataSourceObject()->setLimit($limit)->getRows();
+  protected function getDataRows($statuses = [], int $limit = 0): array {
+    $statuses = (array) $statuses;
+    return $this->getDataSourceObject()->setLimit($limit)->setStatuses($statuses)->getRows();
+  }
+
+  /**
+   * Get the number of rows with the specified status.
+   *
+   * @param array|int $statuses
+   *
+   * @return int
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function getRowCount($statuses = []) {
+    $statuses = (array) $statuses;
+    return $this->getDataSourceObject()->getRowCount($statuses);
+  }
+
+  /**
+   * Outputs and downloads the csv of outcomes from an import job.
+   *
+   * This gets the rows from the temp table that match the relevant status
+   * and output them as a csv.
+   *
+   * @throws \API_Exception
+   * @throws \League\Csv\CannotInsertRecord
+   * @throws \CRM_Core_Exception
+   */
+  public static function outputCSV(): void {
+    $userJobID = CRM_Utils_Request::retrieveValue('user_job_id', 'Integer', NULL, TRUE);
+    $status = CRM_Utils_Request::retrieveValue('status', 'String', NULL, TRUE);
+    $saveFileName = CRM_Import_Parser::saveFileName($status);
+
+    $form = new CRM_Import_Forms();
+    $form->controller = new CRM_Core_Controller();
+    $form->set('user_job_id', $userJobID);
+
+    $form->getUserJob();
+    $writer = Writer::createFromFileObject(new SplTempFileObject());
+    $headers = $form->getColumnHeaders();
+    if ($headers) {
+      array_unshift($headers, ts('Reason'));
+      array_unshift($headers, ts('Line Number'));
+      $writer->insertOne($headers);
+    }
+    $writer->addFormatter(['CRM_Import_Forms', 'reorderOutput']);
+    // Note this might be more inefficient that iterating the result
+    // set & doing insertOne - possibly something to explore later.
+    $writer->insertAll($form->getDataRows($status));
+
+    CRM_Utils_System::setHttpHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
+    CRM_Utils_System::setHttpHeader('Content-Description', 'File Transfer');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'text/csv; charset=UTF-8');
+    $writer->output($saveFileName);
+    CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * When outputting the row as a csv, more the last 2 rows to the start.
+   *
+   * This is because the id and status message fields are at the end. It may make sense
+   * to move them to the start later, when order code cleanup has happened...
+   *
+   * @param array $record
+   */
+  public static function reorderOutput(array $record): array {
+    $rowNumber = array_pop($record);
+    $message = array_pop($record);
+    // Also pop off the status - but we are not going to use this at this stage.
+    array_pop($record);
+    array_unshift($record, $message);
+    array_unshift($record, $rowNumber);
+    return $record;
+  }
+
+  /**
+   * Get the url to download the relevant csv file.
+   * @param string $status
+   *
+   * @return string
+   */
+  protected function getDownloadURL(string $status): string {
+    return CRM_Utils_System::url('civicrm/import/outcome', [
+      'user_job_id' => $this->get('user_job_id'),
+      'status' => $status,
+      'reset' => 1,
+    ]);
   }
 
   /**

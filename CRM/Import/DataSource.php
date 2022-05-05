@@ -399,6 +399,7 @@ abstract class CRM_Import_DataSource {
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   *
    * @noinspection PhpUnusedParameterInspection
    */
   public function purge(array $newParams = []) :array {
@@ -453,13 +454,13 @@ abstract class CRM_Import_DataSource {
   /**
    * Get the mapping of constants to database status codes.
    *
-   * @return string[]
+   * @return array[]
    */
-  protected function getStatusMapping() {
+  protected function getStatusMapping(): array {
     return [
-      CRM_Import_Parser::VALID => 'imported',
-      CRM_Import_Parser::ERROR => 'error',
-      CRM_Import_Parser::DUPLICATE => 'duplicate',
+      CRM_Import_Parser::VALID => ['imported', 'new'],
+      CRM_Import_Parser::ERROR => ['error'],
+      CRM_Import_Parser::DUPLICATE => ['duplicate'],
     ];
   }
 
@@ -472,7 +473,9 @@ abstract class CRM_Import_DataSource {
     if (!empty($this->statuses)) {
       $statuses = [];
       foreach ($this->statuses as $status) {
-        $statuses[] = '"' . $this->getStatusMapping()[$status] . '"';
+        foreach ($this->getStatusMapping()[$status] as $statusName) {
+          $statuses[] = '"' . $statusName . '"';
+        }
       }
       return ' WHERE _status IN (' . implode(',', $statuses) . ')';
     }

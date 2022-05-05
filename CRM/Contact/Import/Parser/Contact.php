@@ -2583,15 +2583,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $this->_conflicts = [];
     $this->_unparsedAddresses = [];
 
-    // Transitional support for deprecating table_name (and other fields)
-    // form input - the goal is to load them from userJob - but eventually
-    // we will just load the datasource object and this code will not know the
-    // table name.
-    if (!$tableName && $this->userJobID) {
-      $tableName = $this->getUserJob()['metadata']['DataSource']['table_name'];
-    }
-
-    $this->_tableName = $tableName;
+    $this->_tableName = $tableName = $this->getUserJob()['metadata']['DataSource']['table_name'];
     $this->_primaryKeyName = '_id';
     $this->_statusFieldName = '_status';
 
@@ -2609,7 +2601,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     // get the contents of the temp. import table
     $query = "SELECT * FROM $tableName";
     if ($mode == self::MODE_IMPORT) {
-      $query .= " WHERE $statusFieldName = 'NEW'";
+      $query .= " WHERE _status = 'NEW'";
     }
     if ($this->_maxLinesToProcess > 0) {
       // Note this would only be the case in MapForm mode, where it is set to 100
@@ -2723,15 +2715,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
 
-      if ($this->_invalidRowCount) {
-        // removed view url for invlaid contacts
-        $headers = array_merge([
-          ts('Line Number'),
-          ts('Reason'),
-        ], $customHeaders);
-        $this->_errorFileName = self::errorFileName(self::ERROR);
-        self::exportCSV($this->_errorFileName, $headers, $this->_errors);
-      }
       if ($this->_conflictCount) {
         $headers = array_merge([
           ts('Line Number'),
@@ -2739,15 +2722,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         ], $customHeaders);
         $this->_conflictFileName = self::errorFileName(self::CONFLICT);
         self::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
-      }
-      if ($this->_duplicateCount) {
-        $headers = array_merge([
-          ts('Line Number'),
-          ts('View Contact URL'),
-        ], $customHeaders);
-
-        $this->_duplicateFileName = self::errorFileName(self::DUPLICATE);
-        self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
       }
       if ($this->_unMatchCount) {
         $headers = array_merge([
@@ -3072,9 +3046,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $store->set('contactType', CRM_Import_Parser::CONTACT_ORGANIZATION);
     }
 
-    if ($this->_invalidRowCount) {
-      $store->set('errorsFileName', $this->_errorFileName);
-    }
     if ($this->_conflictCount) {
       $store->set('conflictsFileName', $this->_conflictFileName);
     }
@@ -3092,11 +3063,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if ($this->_duplicateCount) {
         $store->set('duplicatesFileName', $this->_duplicateFileName);
       }
-      if ($this->_unparsedAddressCount) {
-        $store->set('errorsFileName', $this->_errorFileName);
-      }
     }
-    //echo "$this->_totalCount,$this->_invalidRowCount,$this->_conflictCount,$this->_duplicateCount";
   }
 
   /**
@@ -3649,6 +3616,19 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $params = $this->getActiveFieldParams();
     $params['contact_type'] = $this->getContactType();
     return $params;
+  }
+
+  /**
+   * Is the job complete.
+   *
+   * This function transitionally accesses the table from the userJob
+   * directly - but the function should be moved to the dataSource class.
+   *
+   * @throws \API_Exception
+   */
+  public function isComplete() {
+    $tableName = $this->getUserJob()['metadata']['DataSource']['table_name'];
+    return (bool) CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM $tableName WHERE _status = 'NEW' LIMIT 1");
   }
 
 }

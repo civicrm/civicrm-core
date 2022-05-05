@@ -27,7 +27,7 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
     // set the error message path to display
     $this->assign('errorFile', $this->get('errorFile'));
 
-    $totalRowCount = $this->get('totalRowCount');
+    $totalRowCount = $this->getRowCount();
     $relatedCount = $this->get('relatedCount');
     $totalRowCount += $relatedCount;
 
@@ -81,9 +81,6 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
     $this->assign('dupeActionString', $dupeActionString);
 
     $properties = [
-      'totalRowCount',
-      'validRowCount',
-      'invalidRowCount',
       'conflictRowCount',
       'downloadConflictRecordsUrl',
       'downloadErrorRecordsUrl',
@@ -98,6 +95,10 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
     foreach ($properties as $property) {
       $this->assign($property, $this->get($property));
     }
+    $this->assign('totalRowCount', $this->getRowCount());
+    $this->assign('validRowCount', $this->getRowCount(CRM_Import_Parser::VALID));
+    $this->assign('invalidRowCount', $this->getRowCount(CRM_Import_Parser::ERROR));
+    $this->assign('downloadDuplicateRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::DUPLICATE));
 
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/import/contact', 'reset=1'));
