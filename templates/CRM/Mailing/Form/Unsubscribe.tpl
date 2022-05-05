@@ -25,7 +25,6 @@
       <p>{ts}You are requesting to unsubscribe <strong>all email addresses for {$display_name}</strong> from the above mailing list.{/ts}</p>
       <p>
         {ts}If this is not your name, there is no need to do anything. You have <strong>not</strong> been added to any mailing lists.{/ts}
-        {ts}If you want to remove only the address {$email_masked} from all mailing lists, please use <a href='{$optout_URL}'>this Opt Out form</a>.{/ts}
         {ts}If you <strong>wish to unsubscribe {$display_name}</strong> please click the <strong>Unsubscribe</strong> button to confirm.{/ts}
       </p>
       <div class="crm-submit-buttons">
