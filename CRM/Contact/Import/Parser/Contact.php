@@ -2931,6 +2931,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
       $relatedContactFieldName = $this->_activeFields[$i]->_relatedContactDetails;
       $relatedContactType = $this->_activeFields[$i]->_relatedContactType;
+      $relatedContactLocationTypeID = $this->_activeFields[$i]->_relatedContactLocType;
+      $relatedContactWebsiteTypeID = $this->_activeFields[$i]->_relatedContactWebsiteType ?? NULL;
+      $relatedContactIMProviderID = $this->_activeFields[$i]->_relatedContactImProvider ?? NULL;
+      $relatedContactPhoneTypeID = $this->_activeFields[$i]->_relatedContactPhoneType ?? NULL;
 
       if (isset($this->_activeFields[$i]->_value)) {
         if (isset($this->_activeFields[$i]->_hasLocationType)) {
@@ -2979,7 +2983,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             $params[$this->_activeFields[$i]->_related]['contact_type'] = $relatedContactType;
           }
 
-          if (isset($this->_activeFields[$i]->_relatedContactLocType) && !empty($this->_activeFields[$i]->_value)) {
+          if (isset($relatedContactLocationTypeID) && !empty($this->_activeFields[$i]->_value)) {
             if (!empty($params[$this->_activeFields[$i]->_related][$relatedContactFieldName]) &&
               !is_array($params[$this->_activeFields[$i]->_related][$relatedContactFieldName])
             ) {
@@ -2987,27 +2991,27 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             }
             $value = [
               $relatedContactFieldName => $this->_activeFields[$i]->_value,
-              'location_type_id' => $this->_activeFields[$i]->_relatedContactLocType,
+              'location_type_id' => $relatedContactLocationTypeID,
             ];
 
-            if (isset($this->_activeFields[$i]->_relatedContactPhoneType)) {
-              $value['phone_type_id'] = $this->_activeFields[$i]->_relatedContactPhoneType;
+            if (isset($relatedContactPhoneTypeID)) {
+              $value['phone_type_id'] = $relatedContactPhoneTypeID;
             }
 
             // get IM service Provider type id for related contact
-            if (isset($this->_activeFields[$i]->_relatedContactImProvider)) {
-              $value['provider_id'] = $this->_activeFields[$i]->_relatedContactImProvider;
+            if (isset($relatedContactIMProviderID)) {
+              $value['provider_id'] = $relatedContactIMProviderID;
             }
 
             $params[$this->_activeFields[$i]->_related][$relatedContactFieldName][] = $value;
           }
-          elseif (isset($this->_activeFields[$i]->_relatedContactWebsiteType)) {
+          elseif (isset($relatedContactWebsiteTypeID)) {
             $params[$this->_activeFields[$i]->_related][$relatedContactFieldName][] = [
               'url' => $this->_activeFields[$i]->_value,
-              'website_type_id' => $this->_activeFields[$i]->_relatedContactWebsiteType,
+              'website_type_id' => $relatedContactWebsiteTypeID,
             ];
           }
-          elseif (empty($this->_activeFields[$i]->_value) && isset($this->_activeFields[$i]->_relatedContactLocType)) {
+          elseif (empty($this->_activeFields[$i]->_value) && isset($relatedContactLocationTypeID)) {
             if (empty($params[$this->_activeFields[$i]->_related][$relatedContactFieldName])) {
               $params[$this->_activeFields[$i]->_related][$relatedContactFieldName] = [];
             }
