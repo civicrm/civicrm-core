@@ -488,6 +488,7 @@
 
       this.getAllFields = function(suffix, allowedTypes, disabledIf, topJoin) {
         disabledIf = disabledIf || _.noop;
+        allowedTypes = allowedTypes || ['Field', 'Custom', 'Extra', 'Filter'];
 
         function formatEntityFields(entityName, join) {
           var prefix = join ? join.alias + '.' : '',
@@ -515,7 +516,7 @@
             if (disabledIf(item.id)) {
               item.disabled = true;
             }
-            if (!allowedTypes || _.includes(allowedTypes, field.type)) {
+            if (_.includes(allowedTypes, field.type)) {
               result.push(item);
             }
           });
@@ -550,7 +551,7 @@
         });
 
         // Include SearchKit's pseudo-fields if specifically requested
-        if (allowedTypes && _.includes(allowedTypes, 'Pseudo')) {
+        if (_.includes(allowedTypes, 'Pseudo')) {
           result.push({
             text: ts('Extra'),
             icon: 'fa-gear',
