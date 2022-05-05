@@ -37,15 +37,6 @@
         </p>
     {/if}
 
-    {if $conflictRowCount}
-        <p class="error">
-        {ts count=$conflictRowCount plural='CiviCRM has detected %count records with conflicting email addresses within this data file or relative to existing contact records. These records have not been imported.'}CiviCRM has detected one record with conflicting email addresses within this data file or relative to existing contact records. This record has not been imported.{/ts} {ts}CiviCRM does not allow multiple contact records to have the same primary email address.{/ts}
-        </p>
-        <p class="error">
-        {ts 1=$downloadConflictRecordsUrl}You can <a href='%1'>Download Conflicts</a>. You may then review these records to determine if they are actually conflicts, and correct the email addresses for those that are not.{/ts}
-        </p>
-    {/if}
-
     {if $duplicateRowCount}
         <p {if $dupeError}class="error"{/if}>
         {ts count=$duplicateRowCount plural='CiviCRM has detected %count records which are duplicates of existing CiviCRM contact records.'}CiviCRM has detected one record which is a duplicate of existing CiviCRM contact record.{/ts} {$dupeActionString}
@@ -87,17 +78,6 @@
         <td class="explanation">{ts}Rows with mismatched contact IDs... (NOT updated).{/ts}
             {if $unMatchCount}
                 <<div class="action-link"><a href="{$downloadMismatchRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Mismatched Contacts{/ts}</a></div>
-            {/if}
-        </td>
-    </tr>
-    {/if}
-
-    {if $conflictRowCount}
-    <tr class="error"><td class="label crm-grid-cell">{ts}Conflicting Rows (skipped){/ts}</td>
-        <td class="data">{$conflictRowCount}</td>
-        <td class="explanation">{ts}Rows with conflicting email addresses (NOT imported).{/ts}
-            {if $conflictRowCount}
-                <div class="action-link"><a href="{$downloadConflictRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Conflicts{/ts}</a></div>
             {/if}
         </td>
     </tr>

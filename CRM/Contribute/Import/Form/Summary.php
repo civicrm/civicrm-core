@@ -45,7 +45,6 @@ class CRM_Contribute_Import_Form_Summary extends CRM_Import_Form_Summary {
       $this->set('downloadPledgePaymentErrorRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
     $validPledgePaymentRowCount = $this->get('validPledgePaymentRowCount');
-    $conflictRowCount = $this->get('conflictRowCount');
     $duplicateRowCount = $this->get('duplicateRowCount');
     $onDuplicate = $this->get('onDuplicate');
     $mismatchCount = $this->get('unMatchCount');
@@ -80,7 +79,7 @@ class CRM_Contribute_Import_Form_Summary extends CRM_Import_Form_Summary {
       /* only subtract dupes from successful import if we're skipping */
 
       $this->set('validRowCount', $totalRowCount - $invalidRowCount -
-        $conflictRowCount - $duplicateRowCount - $mismatchCount - $invalidSoftCreditRowCount - $invalidPledgePaymentRowCount
+        $duplicateRowCount - $mismatchCount - $invalidSoftCreditRowCount - $invalidPledgePaymentRowCount
       );
     }
     $this->assign('dupeActionString', $dupeActionString);
@@ -91,8 +90,6 @@ class CRM_Contribute_Import_Form_Summary extends CRM_Import_Form_Summary {
       'invalidRowCount',
       'validSoftCreditRowCount',
       'invalidSoftCreditRowCount',
-      'conflictRowCount',
-      'downloadConflictRecordsUrl',
       'downloadErrorRecordsUrl',
       'duplicateRowCount',
       'downloadDuplicateRecordsUrl',

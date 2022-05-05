@@ -33,7 +33,6 @@ class CRM_Activity_Import_Form_Summary extends CRM_Import_Form_Summary {
     $this->set('totalRowCount', $totalRowCount);
 
     $invalidRowCount = $this->get('invalidRowCount');
-    $conflictRowCount = $this->get('conflictRowCount');
     $duplicateRowCount = $this->get('duplicateRowCount');
     $onDuplicate = $this->get('onDuplicate');
     $mismatchCount = $this->get('unMatchCount');
@@ -68,7 +67,7 @@ class CRM_Activity_Import_Form_Summary extends CRM_Import_Form_Summary {
       // Only subtract dupes from successful import if we're skipping.
 
       $this->set('validRowCount', $totalRowCount - $invalidRowCount -
-        $conflictRowCount - $duplicateRowCount - $mismatchCount
+         $duplicateRowCount - $mismatchCount
       );
     }
     $this->assign('dupeActionString', $dupeActionString);
@@ -77,8 +76,6 @@ class CRM_Activity_Import_Form_Summary extends CRM_Import_Form_Summary {
       'totalRowCount',
       'validRowCount',
       'invalidRowCount',
-      'conflictRowCount',
-      'downloadConflictRecordsUrl',
       'downloadErrorRecordsUrl',
       'duplicateRowCount',
       'downloadDuplicateRecordsUrl',

@@ -191,11 +191,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
     $this->_lineCount = $this->_validSoftCreditRowCount = $this->_validPledgePaymentRowCount = 0;
     $this->_invalidRowCount = $this->_validCount = $this->_invalidSoftCreditRowCount = $this->_invalidPledgePaymentRowCount = 0;
-    $this->_totalCount = $this->_conflictCount = 0;
+    $this->_totalCount = 0;
 
     $this->_errors = [];
     $this->_warnings = [];
-    $this->_conflicts = [];
     $this->_pledgePaymentErrors = [];
     $this->_softCreditErrors = [];
     if ($statusID) {
@@ -317,16 +316,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $this->_softCreditErrors[] = $values;
       }
 
-      if ($returnCode == self::CONFLICT) {
-        $this->_conflictCount++;
-        $recordNumber = $this->_lineCount;
-        if ($this->_haveColumnHeader) {
-          $recordNumber--;
-        }
-        array_unshift($values, $recordNumber);
-        $this->_conflicts[] = $values;
-      }
-
       if ($returnCode == self::DUPLICATE) {
         $this->_duplicateCount++;
         $recordNumber = $this->_lineCount;
@@ -387,14 +376,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         self::exportCSV($this->_softCreditErrorsFileName, $headers, $this->_softCreditErrors);
       }
 
-      if ($this->_conflictCount) {
-        $headers = array_merge([
-          ts('Line Number'),
-          ts('Reason'),
-        ], $customHeaders);
-        $this->_conflictFileName = self::errorFileName(self::CONFLICT);
-        self::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
-      }
       if ($this->_duplicateCount) {
         $headers = array_merge([
           ts('Line Number'),
@@ -536,7 +517,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     $store->set('validSoftCreditRowCount', $this->_validSoftCreditRowCount);
     $store->set('invalidPledgePaymentRowCount', $this->_invalidPledgePaymentRowCount);
     $store->set('validPledgePaymentRowCount', $this->_validPledgePaymentRowCount);
-    $store->set('conflictRowCount', $this->_conflictCount);
 
     switch ($this->_contactType) {
       case 'Individual':
@@ -553,9 +533,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
     if ($this->_invalidRowCount) {
       $store->set('errorsFileName', $this->_errorFileName);
-    }
-    if ($this->_conflictCount) {
-      $store->set('conflictsFileName', $this->_conflictFileName);
     }
     if (isset($this->_rows) && !empty($this->_rows)) {
       $store->set('dataValues', $this->_rows);

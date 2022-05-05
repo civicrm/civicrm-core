@@ -485,11 +485,10 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
 
     $this->_lineCount = 0;
     $this->_invalidRowCount = $this->_validCount = 0;
-    $this->_totalCount = $this->_conflictCount = 0;
+    $this->_totalCount = 0;
 
     $this->_errors = [];
     $this->_warnings = [];
-    $this->_conflicts = [];
 
     $this->_fileSize = number_format(filesize($fileName) / 1024.0, 2);
 
@@ -571,16 +570,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
         $this->_errors[] = $values;
       }
 
-      if ($returnCode & self::CONFLICT) {
-        $this->_conflictCount++;
-        $recordNumber = $this->_lineCount;
-        if ($this->_haveColumnHeader) {
-          $recordNumber--;
-        }
-        array_unshift($values, $recordNumber);
-        $this->_conflicts[] = $values;
-      }
-
       if ($returnCode & self::DUPLICATE) {
         $this->_duplicateCount++;
         $recordNumber = $this->_lineCount;
@@ -620,14 +609,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
         $this->_errorFileName = self::errorFileName(self::ERROR);
         self::exportCSV($this->_errorFileName, $headers, $this->_errors);
       }
-      if ($this->_conflictCount) {
-        $headers = array_merge(
-          [ts('Line Number'), ts('Reason')],
-          $customHeaders
-        );
-        $this->_conflictFileName = self::errorFileName(self::CONFLICT);
-        self::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
-      }
+
       if ($this->_duplicateCount) {
         $headers = array_merge(
           [ts('Line Number'), ts('View Activity History URL')],
@@ -700,14 +682,11 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
     $store->set('totalRowCount', $this->_totalCount);
     $store->set('validRowCount', $this->_validCount);
     $store->set('invalidRowCount', $this->_invalidRowCount);
-    $store->set('conflictRowCount', $this->_conflictCount);
 
     if ($this->_invalidRowCount) {
       $store->set('errorsFileName', $this->_errorFileName);
     }
-    if ($this->_conflictCount) {
-      $store->set('conflictsFileName', $this->_conflictFileName);
-    }
+
     if (isset($this->_rows) && !empty($this->_rows)) {
       $store->set('dataValues', $this->_rows);
     }

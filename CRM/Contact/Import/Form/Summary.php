@@ -32,7 +32,6 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
     $totalRowCount += $relatedCount;
 
     $invalidRowCount = $this->get('invalidRowCount');
-    $conflictRowCount = $this->get('conflictRowCount');
     $duplicateRowCount = $this->get('duplicateRowCount');
     $onDuplicate = $this->get('onDuplicate');
     $mismatchCount = $this->get('unMatchCount');
@@ -75,14 +74,12 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
     }
     //now we also create relative contact in update and fill mode
     $this->set('validRowCount', $totalRowCount - $invalidRowCount -
-      $conflictRowCount - $duplicateRowCount - $mismatchCount
+       $duplicateRowCount - $mismatchCount
     );
 
     $this->assign('dupeActionString', $dupeActionString);
 
     $properties = [
-      'conflictRowCount',
-      'downloadConflictRecordsUrl',
       'downloadErrorRecordsUrl',
       'duplicateRowCount',
       'downloadDuplicateRecordsUrl',
