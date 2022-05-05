@@ -1059,6 +1059,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
         'submitted_values' => array_merge([
           'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
           'contactSubType' => '',
+          'doGeocodeAddress' => 0,
         ], $submittedValues),
       ],
       'status_id:name' => 'draft',

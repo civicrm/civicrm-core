@@ -149,6 +149,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
       'contactSubType' => '',
       'dataSource' => 'CRM_Import_DataSource_SQL',
       'sqlQuery' => 'SELECT * FROM civicrm_tmp_d_import_job_xxx',
+      'dedupe_rule_id' => '',
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
     ], $submittedValues);
     $userJobID = UserJob::create()->setValues([

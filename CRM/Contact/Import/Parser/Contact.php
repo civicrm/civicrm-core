@@ -370,8 +370,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @param bool $doGeocodeAddress
-   *
    * @return bool
    *   the result of this processing
    *
@@ -379,9 +377,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \CRM_Core_Exception
    * @throws \API_Exception
    */
-  public function import($onDuplicate, &$values, $doGeocodeAddress = FALSE) {
+  public function import($onDuplicate, &$values) {
     $this->_unparsedStreetAddressContacts = [];
-    if (!$doGeocodeAddress) {
+    if (!$this->getSubmittedValue('doGeocodeAddress')) {
       // CRM-5854, reset the geocode method to null to prevent geocoding
       CRM_Utils_GeocodeProvider::disableForSession();
     }
@@ -2446,12 +2444,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param int $onDuplicate
    * @param int $statusID
    * @param int $totalRowCount
-   * @param bool $doGeocodeAddress
-   * @param int $timeout
-   * @param string $contactSubType
-   * @param int $dedupeRuleGroupID
    *
    * @return mixed
+   * @throws \API_Exception
    */
   public function run(
     $tableName,
@@ -2462,16 +2457,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $statusFieldName = '_status',
     $onDuplicate = self::DUPLICATE_SKIP,
     $statusID = NULL,
-    $totalRowCount = NULL,
-    $doGeocodeAddress = FALSE,
-    $timeout = CRM_Contact_Import_Parser_Contact::DEFAULT_TIMEOUT,
-    $contactSubType = NULL,
-    $dedupeRuleGroupID = NULL
+    $totalRowCount = NULL
   ) {
 
     // TODO: Make the timeout actually work
-    $this->_onDuplicate = $onDuplicate;
-    $this->_dedupeRuleGroupID = $dedupeRuleGroupID;
+    $this->_onDuplicate = $onDuplicate = $this->getSubmittedValue('onDuplicate');
+    $this->_dedupeRuleGroupID = $this->getSubmittedValue('dedupe_rule_id');
     // Since $this->_contactType is still being called directly do a get call
     // here to make sure it is instantiated.
     $this->getContactType();
@@ -2544,7 +2535,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
       elseif ($mode == self::MODE_IMPORT) {
         try {
-          $returnCode = $this->import($onDuplicate, $values, $doGeocodeAddress);
+          $returnCode = $this->import($onDuplicate, $values);
         }
         catch (CiviCRM_API3_Exception $e) {
           // When we catch errors here we are not adding to the errors array - mostly
