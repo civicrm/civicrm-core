@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9b33687888fc16f55cf7323e0fd8755c",
+    "content-hash": "4cb8d7de594faef8145b91723bc83f47",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -4440,16 +4440,16 @@
         },
         {
             "name": "totten/ca-config",
-            "version": "v17.05.0",
+            "version": "v22.05.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/totten/ca_config.git",
-                "reference": "461cf05f932897c37ca87e9a85283d4963b49f09"
+                "reference": "5d71e1587ea6b18532f0b72b06fab103c1dcf8db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/totten/ca_config/zipball/461cf05f932897c37ca87e9a85283d4963b49f09",
-                "reference": "461cf05f932897c37ca87e9a85283d4963b49f09",
+                "url": "https://api.github.com/repos/totten/ca_config/zipball/5d71e1587ea6b18532f0b72b06fab103c1dcf8db",
+                "reference": "5d71e1587ea6b18532f0b72b06fab103c1dcf8db",
                 "shasum": ""
             },
             "require": {
@@ -4475,9 +4475,9 @@
             "homepage": "https://github.com/totten/ca_config",
             "support": {
                 "issues": "https://github.com/totten/ca_config/issues",
-                "source": "https://github.com/totten/ca_config/tree/master"
+                "source": "https://github.com/totten/ca_config/tree/v22.05.0"
             },
-            "time": "2017-05-10T20:08:17+00:00"
+            "time": "2022-05-05T05:35:59+00:00"
         },
         {
             "name": "totten/lurkerlite",
@@ -4909,5 +4909,5 @@
     "platform-overrides": {
         "php": "7.2"
     },
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }
