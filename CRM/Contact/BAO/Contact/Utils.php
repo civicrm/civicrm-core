@@ -285,7 +285,7 @@ WHERE  id IN ( $idString )
       $employerID
     );
     if (!$duplicate) {
-      $relationshipIds = self::legacyCreateMultiple($relationshipTypeID, $employerID, $contactID);
+      $relationshipIds = [self::legacyCreateMultiple($relationshipTypeID, $employerID, $contactID)];
     }
 
     // In case we change employer, clean previous employer related records.
@@ -346,33 +346,18 @@ WHERE  id IN ( $idString )
    * @return array
    * @throws \CiviCRM_API3_Exception
    */
-  private static function legacyCreateMultiple(int $relationshipTypeID, int $organizationID, int $contactID): array {
+  private static function legacyCreateMultiple(int $relationshipTypeID, int $organizationID, int $contactID): int {
     $params = [
       'is_active' => TRUE,
-      'relationship_type_id' => $relationshipTypeID . '_a_b',
       'contact_check' => [$organizationID => TRUE],
-    ];
-
-    $relationshipIds = [];
-    // check if the relationship is valid between contacts.
-    // step 1: check if the relationship is valid if not valid skip and keep the count
-    // step 2: check the if two contacts already have a relationship if yes skip and keep the count
-    // step 3: if valid relationship then add the relation and keep the count
-
-    // step 1
-    $contactFields = [
       'contact_id_a' => $contactID,
       'contact_id_b' => $organizationID,
       'relationship_type_id' => $relationshipTypeID,
     ];
-
-    $singleInstanceParams = array_merge($params, $contactFields);
-    $relationship = CRM_Contact_BAO_Relationship::add($singleInstanceParams);
-    $relationshipIds[] = $relationship->id;
-
+    $relationship = CRM_Contact_BAO_Relationship::add($params);
     CRM_Contact_BAO_Relationship::addRecent($params, $relationship);
 
-    return $relationshipIds;
+    return $relationship->id;
   }
 
   /**
