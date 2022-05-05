@@ -48,7 +48,7 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
   public function testSinglePayment(): void {
     $this->setupMockHandler();
     $params = $this->getBillingParams();
-    $params['amount'] = 20.00;
+    $params['amount'] = 1020.00;
     $params['currency'] = 'AUD';
     $params['description'] = 'Test Contribution';
     $params['invoiceID'] = 'xyz';
@@ -244,7 +244,7 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
    */
   public function getExpectedSinglePaymentRequests(): array {
     return [
-      'USER[4]=test&VENDOR[4]=test&PARTNER[6]=PayPal&PWD[8]=test1234&TENDER[1]=C&TRXTYPE[1]=S&ACCT[16]=4111111111111111&CVV2[3]=123&EXPDATE[4]=1022&ACCTTYPE[4]=Visa&AMT[5]=20.00&CURRENCY[3]=AUD&FIRSTNAME[4]=John&LASTNAME[8]=O\'Connor&STREET[16]=8 Hobbitton Road&CITY[9]=The+Shire&STATE[3]=NSW&ZIP[4]=5010&COUNTRY[3]=AUS&EMAIL[24]=unittesteway@civicrm.org&CUSTIP[9]=127.0.0.1&COMMENT1[4]=4200&COMMENT2[4]=live&INVNUM[3]=xyz&ORDERDESC[17]=Test+Contribution&VERBOSITY[6]=MEDIUM&BILLTOCOUNTRY[3]=AUS',
+      'USER[4]=test&VENDOR[4]=test&PARTNER[6]=PayPal&PWD[8]=test1234&TENDER[1]=C&TRXTYPE[1]=S&ACCT[16]=4111111111111111&CVV2[3]=123&EXPDATE[4]=1022&ACCTTYPE[4]=Visa&AMT[7]=1020.00&CURRENCY[3]=AUD&FIRSTNAME[4]=John&LASTNAME[8]=O\'Connor&STREET[16]=8 Hobbitton Road&CITY[9]=The+Shire&STATE[3]=NSW&ZIP[4]=5010&COUNTRY[3]=AUS&EMAIL[24]=unittesteway@civicrm.org&CUSTIP[9]=127.0.0.1&COMMENT1[4]=4200&COMMENT2[4]=live&INVNUM[3]=xyz&ORDERDESC[17]=Test+Contribution&VERBOSITY[6]=MEDIUM&BILLTOCOUNTRY[3]=AUS',
     ];
   }
 

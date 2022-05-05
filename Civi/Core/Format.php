@@ -93,8 +93,34 @@ class Format {
       return '';
     }
     $formatter = $this->getMoneyFormatter($currency, $locale, NumberFormatter::DECIMAL);
-    $money = Money::of($amount, $currency, NULL, RoundingMode::HALF_UP);
-    return $money->formatWith($formatter);
+    return Money::of($amount, $currency, NULL, RoundingMode::HALF_UP)->formatWith($formatter);
+  }
+
+  /**
+   * Get a number formatted to a machine format with padded decimal places.
+   *
+   * This is intended to be a machine-friendly format that is also suitable
+   * for sending out to other systems that might expect 2 digits after the
+   * decimal point.
+   *
+   * Most currencies format to 2 decimal places so the default of 'USD' will
+   * achieve that.
+   *
+   * For example an input of 1000.1 will return 1000.10.
+   *
+   * This will ensure that
+   *
+   * @param string|float|int $amount
+   * @param string $currency
+   *
+   * @return string
+   *
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function machineMoney($amount, string $currency = 'USD'): string {
+    $formatter = $this->getMoneyFormatter($currency, 'en_US', NumberFormatter::DECIMAL, [NumberFormatter::GROUPING_USED => FALSE]);
+    return Money::of($amount, $currency, NULL, RoundingMode::HALF_UP)->formatWith($formatter);
   }
 
   /**
