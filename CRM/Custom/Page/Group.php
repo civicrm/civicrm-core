@@ -132,14 +132,13 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
       $customGroup[$id]['extends_display'] = $customGroupExtends[$customGroup[$id]['extends']];
     }
 
-    //fix for Displaying subTypes
+    // FIXME: This hardcoded array is mostly redundant with CRM_Core_BAO_CustomGroup::getSubTypes
     $subTypes = [];
 
     $subTypes['Activity'] = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
     $subTypes['Contribution'] = CRM_Contribute_PseudoConstant::financialType();
     $subTypes['Membership'] = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
     $subTypes['Event'] = CRM_Core_OptionGroup::values('event_type');
-    $subTypes['Grant'] = CRM_Core_OptionGroup::values('grant_type');
     $subTypes['Campaign'] = CRM_Campaign_PseudoConstant::campaignType();
     $subTypes['Participant'] = [];
     $subTypes['ParticipantRole'] = CRM_Core_OptionGroup::values('participant_role');

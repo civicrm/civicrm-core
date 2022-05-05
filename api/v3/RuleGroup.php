@@ -67,5 +67,5 @@ function civicrm_api3_rule_group_delete($params) {
  *   API result array
  */
 function civicrm_api3_rule_group_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'DedupeRuleGroup');
 }

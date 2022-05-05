@@ -685,9 +685,9 @@ VALUES
   (@option_group_id_pht, '{ts escape="sql"}Voicemail{/ts}' ,    5, 'Voicemail'  , NULL, 0, 0, 5, NULL, 0, 0, 1, NULL, NULL, NULL),
 
 -- custom data types.
-  (@option_group_id_cdt, 'Participant Role',       '1', 'ParticipantRole',      NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL , NULL),
-  (@option_group_id_cdt, 'Participant Event Name', '2', 'ParticipantEventName', NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL , NULL),
-  (@option_group_id_cdt, 'Participant Event Type', '3', 'ParticipantEventType', NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL , NULL),
+  (@option_group_id_cdt, '{ts escape="sql"}Participants (Role){/ts}',       '1', 'ParticipantRole',      'role_id',                0, 0, 1, NULL, 0, 0, 1, NULL, NULL , NULL),
+  (@option_group_id_cdt, '{ts escape="sql"}Participants (Event Name){/ts}', '2', 'ParticipantEventName', 'event_id',               0, 0, 2, NULL, 0, 0, 1, NULL, NULL , NULL),
+  (@option_group_id_cdt, '{ts escape="sql"}Participants (Event Type){/ts}', '3', 'ParticipantEventType', 'event_id.event_type_id', 0, 0, 3, NULL, 0, 0, 1, NULL, NULL , NULL),
 
 -- visibility.
   (@option_group_id_vis, 'Public', 1, 'public', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL , NULL),
@@ -1097,7 +1097,7 @@ VALUES
 
 -- custom group objects
   (@option_group_id_cgeo, '{ts escape="sql"}Survey{/ts}', 'Survey', 'civicrm_survey', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_cgeo, '{ts escape="sql"}Cases{/ts}',  'Case', 'civicrm_case',     NULL, 0, 0, 2, 'CRM_Case_PseudoConstant::caseType;', 0, 0, 1, NULL, NULL, NULL);
+  (@option_group_id_cgeo, '{ts escape="sql"}Cases{/ts}',  'Case',   'civicrm_case',  'case_type_id', 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL);
 
 -- CRM-6138
 {include file='languages.tpl'}

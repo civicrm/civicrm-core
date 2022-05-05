@@ -22,6 +22,8 @@ namespace api\v4\Action;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\Event;
+use Civi\Api4\FinancialType;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\Relationship;
 use Civi\Api4\RelationshipCache;
@@ -30,6 +32,16 @@ use Civi\Api4\RelationshipCache;
  * @group headless
  */
 class BasicCustomFieldTest extends BaseCustomValueTest {
+
+  public function tearDown(): void {
+    FinancialType::delete(FALSE)
+      ->addWhere('name', '=', 'Test_Type')
+      ->execute();
+    Event::delete(FALSE)
+      ->addWhere('id', '>', 0)
+      ->execute();
+    parent::tearDown();
+  }
 
   /**
    * @throws \API_Exception
@@ -517,6 +529,104 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
     $this->assertEquals('2025-05-10', $contact["$cgName.DateOnly"]);
     // Date time field should return all
     $this->assertEquals('2025-06-11 12:15:30', $contact["$cgName.DateTime"]);
+  }
+
+  public function testExtendsIdFilter() {
+    $fieldUnfiltered = \Civi\Api4\CustomGroup::getFields(FALSE)
+      ->setLoadOptions(['id', 'name', 'grouping'])
+      ->addWhere('name', '=', 'extends_entity_column_id')
+      ->execute()->first();
+    $this->assertCount(3, $fieldUnfiltered['options']);
+
+    $fieldFilteredByParticipant = \Civi\Api4\CustomGroup::getFields(FALSE)
+      ->setLoadOptions(['id', 'name', 'grouping'])
+      ->addWhere('name', '=', 'extends_entity_column_id')
+      ->addValue('extends', 'Participant')
+      ->execute()->first();
+    $this->assertEquals($fieldUnfiltered['options'], $fieldFilteredByParticipant['options']);
+
+    $participantOptions = array_column($fieldFilteredByParticipant['options'], 'grouping', 'name');
+    $this->assertEquals('event_id', $participantOptions['ParticipantEventName']);
+    $this->assertEquals('event_id.event_type_id', $participantOptions['ParticipantEventType']);
+    $this->assertEquals('role_id', $participantOptions['ParticipantRole']);
+
+    $fieldFilteredByContact = \Civi\Api4\CustomGroup::getFields(FALSE)
+      ->setLoadOptions(['id', 'name', 'grouping'])
+      ->addWhere('name', '=', 'extends_entity_column_id')
+      ->addValue('extends', 'Contact')
+      ->execute()->first();
+    $this->assertFalse($fieldFilteredByContact['options']);
+  }
+
+  public function testExtendsMetadata() {
+    $field = \Civi\Api4\CustomGroup::getFields(FALSE)
+      ->setLoadOptions(['id', 'name', 'grouping'])
+      ->addWhere('name', '=', 'extends')
+      ->execute()->first();
+    $options = array_column($field['options'], 'grouping', 'id');
+    $this->assertArrayNotHasKey('ParticipantRole', $options);
+    $this->assertArrayHasKey('Participant', $options);
+    $this->assertEquals('contact_sub_type', $options['Individual']);
+    $this->assertEquals('case_type_id', $options['Case']);
+
+    // Test contribution type
+    $financialType = FinancialType::create(FALSE)
+      ->addValue('name', 'Test_Type')
+      ->addValue('is_deductible', TRUE)
+      ->addValue('is_reserved', FALSE)
+      ->execute()->single();
+    $contributionGroup = CustomGroup::create(FALSE)
+      ->addValue('extends', 'Contribution')
+      ->addValue('title', 'Contribution Fields')
+      ->addValue('extends_entity_column_value:name', ['Test_Type'])
+      ->execute()->single();
+    $this->assertContains($financialType['id'], $contributionGroup['extends_entity_column_value']);
+  }
+
+  public function testExtendsParticipantMetadata() {
+    $event1 = Event::create(FALSE)
+      ->addValue('event_type_id:name', 'Fundraiser')
+      ->addValue('title', 'Test Fun Event')
+      ->addValue('start_date', '2022-05-02 18:24:00')
+      ->execute()->first();
+    $event2 = Event::create(FALSE)
+      ->addValue('event_type_id:name', 'Fundraiser')
+      ->addValue('title', 'Test Fun Event2')
+      ->addValue('start_date', '2022-05-02 18:24:00')
+      ->execute()->first();
+    $event3 = Event::create(FALSE)
+      ->addValue('event_type_id:name', 'Meeting')
+      ->addValue('title', 'Test Me Event')
+      ->addValue('start_date', '2022-05-02 18:24:00')
+      ->execute()->first();
+
+    $field = \Civi\Api4\CustomGroup::getFields(FALSE)
+      ->setLoadOptions(['id', 'name', 'label'])
+      ->addValue('extends_entity_column_id:name', 'ParticipantEventName')
+      ->addWhere('name', '=', 'extends_entity_column_value')
+      ->execute()->first();
+    $eventOptions = array_column($field['options'], 'label', 'id');
+    $this->assertEquals('Test Fun Event', $eventOptions[$event1['id']]);
+    $this->assertEquals('Test Fun Event2', $eventOptions[$event2['id']]);
+    $this->assertEquals('Test Me Event', $eventOptions[$event3['id']]);
+
+    $field = \Civi\Api4\CustomGroup::getFields(FALSE)
+      ->setLoadOptions(['id', 'name', 'label'])
+      ->addValue('extends_entity_column_id:name', 'ParticipantEventType')
+      ->addWhere('name', '=', 'extends_entity_column_value')
+      ->execute()->first();
+    $eventOptions = array_column($field['options'], 'name');
+    $this->assertContains('Meeting', $eventOptions);
+    $this->assertContains('Fundraiser', $eventOptions);
+
+    $field = \Civi\Api4\CustomGroup::getFields(FALSE)
+      ->setLoadOptions(['id', 'name', 'label'])
+      ->addValue('extends_entity_column_id:name', 'ParticipantRole')
+      ->addWhere('name', '=', 'extends_entity_column_value')
+      ->execute()->first();
+    $roleOptions = array_column($field['options'], 'name');
+    $this->assertContains('Volunteer', $roleOptions);
+    $this->assertContains('Attendee', $roleOptions);
   }
 
 }

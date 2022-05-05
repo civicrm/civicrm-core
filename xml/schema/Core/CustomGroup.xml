@@ -58,7 +58,7 @@
     <comment>Type of object this group extends (can add other options later e.g. contact_address, etc.).</comment>
     <add>1.1</add>
     <pseudoconstant>
-      <callback>CRM_Core_SelectValues::customGroupExtends</callback>
+      <callback>CRM_Core_BAO_CustomGroup::getCustomGroupExtendsOptions</callback>
     </pseudoconstant>
   </field>
   <field>
@@ -82,6 +82,9 @@
     <length>255</length>
     <comment>linking custom group for dynamic object</comment>
     <serialize>SEPARATOR_BOOKEND</serialize>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_CustomGroup::getExtendsEntityColumnValueOptions</callback>
+    </pseudoconstant>
     <add>1.6</add>
   </field>
   <field>

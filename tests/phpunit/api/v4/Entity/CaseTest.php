@@ -69,4 +69,15 @@ class CaseTest extends UnitTestCase {
     $this->assertEquals($contactID, $relationships[0]['contact_id_a']);
   }
 
+  public function testCgExtendsObjects() {
+    $field = \Civi\Api4\CustomGroup::getFields(FALSE)
+      ->setLoadOptions(TRUE)
+      ->addValue('extends', 'Case')
+      ->addWhere('name', '=', 'extends_entity_column_value')
+      ->execute()
+      ->first();
+
+    $this->assertContains('Test Case Type', $field['options']);
+  }
+
 }

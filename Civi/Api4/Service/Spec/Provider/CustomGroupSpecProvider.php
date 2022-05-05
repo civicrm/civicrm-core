@@ -14,20 +14,24 @@ namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
-class CustomGroupCreationSpecProvider implements Generic\SpecProviderInterface {
+class CustomGroupSpecProvider implements Generic\SpecProviderInterface {
 
   /**
    * @inheritDoc
    */
   public function modifySpec(RequestSpec $spec) {
-    $spec->getFieldByName('extends')->setRequired(TRUE);
+    $action = $spec->getAction();
+
+    $spec->getFieldByName('extends')
+      ->setRequired($action === 'create')
+      ->setSuffixes(['name', 'label', 'grouping']);
   }
 
   /**
    * @inheritDoc
    */
   public function applies($entity, $action) {
-    return $entity === 'CustomGroup' && $action === 'create';
+    return $entity === 'CustomGroup';
   }
 
 }
