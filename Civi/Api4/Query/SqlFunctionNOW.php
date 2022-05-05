@@ -14,11 +14,11 @@ namespace Civi\Api4\Query;
 /**
  * Sql function
  */
-class SqlFunctionCURDATE extends SqlFunction {
+class SqlFunctionNOW extends SqlFunction {
 
   protected static $category = self::CATEGORY_DATE;
 
-  protected static $dataType = 'Date';
+  protected static $dataType = 'Timestamp';
 
   protected static function params(): array {
     return [];
@@ -28,14 +28,14 @@ class SqlFunctionCURDATE extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('Today');
+    return ts('Now');
   }
 
   /**
    * @return string
    */
   public static function getDescription(): string {
-    return ts('The current date.');
+    return ts('The current date and time.');
   }
 
 }
