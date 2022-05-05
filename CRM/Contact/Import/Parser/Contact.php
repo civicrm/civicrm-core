@@ -312,6 +312,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   /**
    * Handle the values in preview mode.
    *
+   * Function will be deprecated in favour of validateValues.
+   *
    * @param array $values
    *   The array of values belonging to this line.
    *
@@ -326,6 +328,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   /**
    * Handle the values in summary mode.
    *
+   * Function will be deprecated in favour of validateValues.
+   *
    * @param array $values
    *   The array of values belonging to this line.
    *
@@ -334,108 +338,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *   CRM_Import_Parser::ERROR or CRM_Import_Parser::VALID
    */
   public function summary(&$values): int {
-    $params = $this->getMappedRow($values);
     $rowNumber = (int) ($values[count($values) - 1]);
     try {
-      $errorMessage = NULL;
-      $errorRequired = FALSE;
-      switch ($this->_contactType) {
-        case 'Individual':
-          $missingNames = [];
-          if ($this->_firstNameIndex < 0 || empty($values[$this->_firstNameIndex])) {
-            $errorRequired = TRUE;
-            $missingNames[] = ts('First Name');
-          }
-          if ($this->_lastNameIndex < 0 || empty($values[$this->_lastNameIndex])) {
-            $errorRequired = TRUE;
-            $missingNames[] = ts('Last Name');
-          }
-          if ($errorRequired) {
-            $and = ' ' . ts('and') . ' ';
-            $errorMessage = ts('Missing required fields:') . ' ' . implode($and, $missingNames);
-          }
-          break;
-
-        case 'Household':
-          if ($this->_householdNameIndex < 0 || empty($values[$this->_householdNameIndex])) {
-            $errorRequired = TRUE;
-            $errorMessage = ts('Missing required fields:') . ' ' . ts('Household Name');
-          }
-          break;
-
-        case 'Organization':
-          if ($this->_organizationNameIndex < 0 || empty($values[$this->_organizationNameIndex])) {
-            $errorRequired = TRUE;
-            $errorMessage = ts('Missing required fields:') . ' ' . ts('Organization Name');
-          }
-          break;
-      }
-
-      if ($this->_emailIndex >= 0) {
-        /* If we don't have the required fields, bail */
-
-        if ($this->_contactType === 'Individual' && !$this->_updateWithId) {
-          if ($errorRequired && empty($values[$this->_emailIndex])) {
-            if ($errorMessage) {
-              $errorMessage .= ' ' . ts('OR') . ' ' . ts('Email Address');
-            }
-            else {
-              $errorMessage = ts('Missing required field:') . ' ' . ts('Email Address');
-            }
-            throw new CRM_Core_Exception($errorMessage);
-          }
-        }
-
-        $email = $values[$this->_emailIndex] ?? NULL;
-        if ($email) {
-          if (!CRM_Utils_Rule::email($email)) {
-            throw new CRM_Core_Exception($errorMessage);
-          }
-        }
-      }
-      elseif ($errorRequired && !$this->_updateWithId) {
-        if ($errorMessage) {
-          $errorMessage .= ' ' . ts('OR') . ' ' . ts('Email Address');
-        }
-        else {
-          $errorMessage = ts('Missing required field:') . ' ' . ts('Email Address');
-        }
-        throw new CRM_Core_Exception($errorMessage);
-      }
-
-      //check for duplicate external Identifier
-      $externalID = $values[$this->_externalIdentifierIndex] ?? NULL;
-      if ($externalID) {
-        /* If it's a dupe,external Identifier  */
-
-        if ($externalDupe = CRM_Utils_Array::value($externalID, $this->_allExternalIdentifiers)) {
-          $errorMessage = ts('External ID conflicts with record %1', [1 => $externalDupe]);
-          throw new CRM_Core_Exception($errorMessage);
-        }
-        //otherwise, count it and move on
-        $this->_allExternalIdentifiers[$externalID] = $this->_lineCount;
-      }
-
-      //date-format part ends
-
-      $errorMessage = NULL;
-
-      //CRM-5125
-      //add custom fields for contact sub type
-      $csType = NULL;
-      if (!empty($this->_contactSubType)) {
-        $csType = $this->_contactSubType;
-      }
-
-      //checking error in custom data
-      $this->isErrorInCustomData($params, $errorMessage, $csType, $this->_relationships);
-
-      //checking error in core data
-      $this->isErrorInCoreData($params, $errorMessage);
-      if ($errorMessage) {
-        $tempMsg = "Invalid value for field(s) : $errorMessage";
-        throw new CRM_Core_Exception($tempMsg);
-      }
+      $this->validateValues($values);
     }
     catch (CRM_Core_Exception $e) {
       $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
@@ -3638,6 +3543,116 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   public function isComplete() {
     $tableName = $this->getUserJob()['metadata']['DataSource']['table_name'];
     return (bool) CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM $tableName WHERE _status = 'NEW' LIMIT 1");
+  }
+
+  /**
+   * Validate the import values.
+   *
+   * The values array represents a row in the datasource.
+   *
+   * @param array $values
+   */
+  public function validateValues(array $values): void {
+    $errorMessage = NULL;
+    $errorRequired = FALSE;
+    $params = $this->getMappedRow($values);
+    switch ($this->_contactType) {
+      case 'Individual':
+        $missingNames = [];
+        if ($this->_firstNameIndex < 0 || empty($values[$this->_firstNameIndex])) {
+          $errorRequired = TRUE;
+          $missingNames[] = ts('First Name');
+        }
+        if ($this->_lastNameIndex < 0 || empty($values[$this->_lastNameIndex])) {
+          $errorRequired = TRUE;
+          $missingNames[] = ts('Last Name');
+        }
+        if ($errorRequired) {
+          $and = ' ' . ts('and') . ' ';
+          $errorMessage = ts('Missing required fields:') . ' ' . implode($and, $missingNames);
+        }
+        break;
+
+      case 'Household':
+        if ($this->_householdNameIndex < 0 || empty($values[$this->_householdNameIndex])) {
+          $errorRequired = TRUE;
+          $errorMessage = ts('Missing required fields:') . ' ' . ts('Household Name');
+        }
+        break;
+
+      case 'Organization':
+        if ($this->_organizationNameIndex < 0 || empty($values[$this->_organizationNameIndex])) {
+          $errorRequired = TRUE;
+          $errorMessage = ts('Missing required fields:') . ' ' . ts('Organization Name');
+        }
+        break;
+    }
+
+    if ($this->_emailIndex >= 0) {
+      /* If we don't have the required fields, bail */
+
+      if ($this->_contactType === 'Individual' && !$this->_updateWithId) {
+        if ($errorRequired && empty($values[$this->_emailIndex])) {
+          if ($errorMessage) {
+            $errorMessage .= ' ' . ts('OR') . ' ' . ts('Email Address');
+          }
+          else {
+            $errorMessage = ts('Missing required field:') . ' ' . ts('Email Address');
+          }
+          throw new CRM_Core_Exception($errorMessage);
+        }
+      }
+
+      $email = $values[$this->_emailIndex] ?? NULL;
+      if ($email) {
+        if (!CRM_Utils_Rule::email($email)) {
+          throw new CRM_Core_Exception($errorMessage);
+        }
+      }
+    }
+    elseif ($errorRequired && !$this->_updateWithId) {
+      if ($errorMessage) {
+        $errorMessage .= ' ' . ts('OR') . ' ' . ts('Email Address');
+      }
+      else {
+        $errorMessage = ts('Missing required field:') . ' ' . ts('Email Address');
+      }
+      throw new CRM_Core_Exception($errorMessage);
+    }
+
+    //check for duplicate external Identifier
+    $externalID = $values[$this->_externalIdentifierIndex] ?? NULL;
+    if ($externalID) {
+      /* If it's a dupe,external Identifier  */
+
+      if ($externalDupe = CRM_Utils_Array::value($externalID, $this->_allExternalIdentifiers)) {
+        $errorMessage = ts('External ID conflicts with record %1', [1 => $externalDupe]);
+        throw new CRM_Core_Exception($errorMessage);
+      }
+      //otherwise, count it and move on
+      $this->_allExternalIdentifiers[$externalID] = $this->_lineCount;
+    }
+
+    //date-format part ends
+
+    $errorMessage = NULL;
+
+    //CRM-5125
+    //add custom fields for contact sub type
+    $csType = NULL;
+    if (!empty($this->_contactSubType)) {
+      $csType = $this->_contactSubType;
+    }
+
+    //checking error in custom data
+    $this->isErrorInCustomData($params, $errorMessage, $csType, $this->_relationships);
+
+    //checking error in core data
+    $this->isErrorInCoreData($params, $errorMessage);
+    if ($errorMessage) {
+      $tempMsg = "Invalid value for field(s) : $errorMessage";
+      throw new CRM_Core_Exception($tempMsg);
+    }
   }
 
 }
