@@ -245,6 +245,32 @@ class SqlFunctionTest extends UnitTestCase {
     }
   }
 
+  public function testCurrentDate() {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => 'now'],
+      ['first_name' => 'def', 'last_name' => $lastName, 'birth_date' => 'now - 1 year'],
+      ['first_name' => 'def', 'last_name' => $lastName, 'birth_date' => 'now - 10 year'],
+    ];
+    Contact::save(FALSE)
+      ->setRecords($sampleData)
+      ->execute();
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('birth_date', '=', 'CURDATE()', TRUE)
+      ->selectRowCount()
+      ->execute();
+    $this->assertCount(1, $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('birth_date', '<', 'DATE(NOW())', TRUE)
+      ->selectRowCount()
+      ->execute();
+    $this->assertCount(2, $result);
+  }
+
   public function testRandFunction() {
     Contact::save(FALSE)
       ->setRecords(array_fill(0, 6, []))
