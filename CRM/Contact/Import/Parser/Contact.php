@@ -48,8 +48,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   protected $_householdNameIndex;
   protected $_organizationNameIndex;
 
-  protected $_allEmails;
-
   protected $_phoneIndex;
 
   /**
@@ -237,7 +235,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     foreach ($this->_mapperKeys as $key) {
       if (substr($key, 0, 5) == 'email' && substr($key, 0, 14) != 'email_greeting') {
         $this->_emailIndex = $index;
-        $this->_allEmails = [];
       }
       if (substr($key, 0, 5) == 'phone') {
         $this->_phoneIndex = $index;
@@ -402,9 +399,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
           return CRM_Import_Parser::ERROR;
         }
-
-        /* otherwise, count it and move on */
-        $this->_allEmails[$email] = $this->_lineCount;
       }
     }
     elseif ($errorRequired && !$this->_updateWithId) {
