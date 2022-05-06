@@ -393,9 +393,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->controller->resetPage($this->_name);
       return;
     }
-    $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
-
-    $parser = $this->submit($params, $mapperKeys);
+    $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
+    $parser = $this->submit($params);
 
     // add all the necessary variables to the form
     $parser->set($this);
@@ -446,7 +445,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
-  public function submit($params, $mapperKeys) {
+  public function submit($params) {
+    $mapperKeys = $this->getSubmittedValue('mapper');
     $mapper = $mapperKeysMain = $locations = [];
     $parserParameters = CRM_Contact_Import_Parser_Contact::getParameterForParser($this->_columnCount);
 

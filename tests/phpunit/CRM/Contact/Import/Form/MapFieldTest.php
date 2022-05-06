@@ -60,9 +60,8 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    */
   public function testSubmit(array $params, array $mapper, array $expecteds = []): void {
     $form = $this->getMapFieldFormObject(['mapper' => $mapper]);
-    $form->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
     $form->preProcess();
-    $form->submit($params, $mapper);
+    $form->submit($params);
 
     CRM_Core_DAO::executeQuery('DROP TABLE civicrm_tmp_d_import_job_xxx');
     if (!empty($expecteds)) {
@@ -78,7 +77,6 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
         }
       }
     }
-    $this->quickCleanup(['civicrm_mapping', 'civicrm_mapping_field']);
   }
 
   /**

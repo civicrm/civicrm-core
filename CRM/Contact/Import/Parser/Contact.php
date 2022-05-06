@@ -2759,28 +2759,30 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *
    * @return array
    *   (reference ) associative array of name/value pairs
+   * @throws \API_Exception
    */
   public function &getActiveFieldParams() {
     $params = [];
-
-    for ($i = 0; $i < $this->_activeFieldCount; $i++) {
-      $fieldName = $this->_activeFields[$i]->_name;
+    $mapper = $this->getSubmittedValue('mapper');
+    foreach ($this->getFieldMappings() as $i => $mappedField) {
+      // The key is in the format 5_a_b where 5 is the relationship_type_id and a_b is the direction.
+      $relatedContactKey = $mappedField['relationship_type_id'] ? ($mappedField['relationship_type_id'] . '_' . $mappedField['relationship_direction']) : NULL;
+      $fieldName = $relatedContactKey ? NULL : $mappedField['name'];
       if ($fieldName === 'do_not_import') {
         continue;
       }
-      $relatedContactFieldName = $this->_activeFields[$i]->_relatedContactDetails;
+      $relatedContactFieldName = $relatedContactKey ? $mappedField['name'] : NULL;
+      // RelatedContactType is not part of the mapping but rather calculated from the relationship.
       $relatedContactType = $this->_activeFields[$i]->_relatedContactType;
-      $relatedContactLocationTypeID = $this->_activeFields[$i]->_relatedContactLocType;
-      $relatedContactWebsiteTypeID = $this->_activeFields[$i]->_relatedContactWebsiteType ?? NULL;
-      $relatedContactIMProviderID = $this->_activeFields[$i]->_relatedContactImProvider ?? NULL;
-      $relatedContactPhoneTypeID = $this->_activeFields[$i]->_relatedContactPhoneType ?? NULL;
-      // The key is in the format 5_a_b where 5 is the relationship_type_id and a_b is the direction.
-      $relatedContactKey = $this->_activeFields[$i]->_related;
+      $relatedContactLocationTypeID = $relatedContactKey ? $mappedField['location_type_id'] : NULL;
+      $relatedContactWebsiteTypeID = $relatedContactKey ? $mappedField['website_type_id'] : NULL;
+      $relatedContactIMProviderID = $relatedContactKey ? $mappedField['im_provider_id'] : NULL;
+      $relatedContactPhoneTypeID = $relatedContactKey ? $mappedField['phone_type_id'] : NULL;
 
-      $locationTypeID = $this->_activeFields[$i]->_hasLocationType;
-      $phoneTypeID = $this->_activeFields[$i]->_phoneType;
-      $imProviderID = $this->_activeFields[$i]->_imProvider ?? NULL;
-      $websiteTypeID = $this->_activeFields[$i]->_websiteType ?? NULL;
+      $locationTypeID = $relatedContactKey ? NULL : $mappedField['location_type_id'];
+      $phoneTypeID = $relatedContactKey ? NULL : $mappedField['phone_type_id'];
+      $imProviderID = $relatedContactKey ? NULL : $mappedField['im_provider_id'];
+      $websiteTypeID = $relatedContactKey ? NULL : $mappedField['website_type_id'];
 
       $importedValue = $this->_activeFields[$i]->_value;
 
@@ -3625,6 +3627,29 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $tempMsg = "Invalid value for field(s) : $errorMessage";
       throw new CRM_Core_Exception($tempMsg);
     }
+  }
+
+  /**
+   * Get the field mappings for the import.
+   *
+   * This is the same format as saved in civicrm_mapping_field except
+   * that location_type_id = 'Primary' rather than empty where relevant.
+   *
+   * @return array
+   * @throws \API_Exception
+   */
+  protected function getFieldMappings(): array {
+    $mappedFields = [];
+    foreach ($this->getSubmittedValue('mapper') as $i => $mapperRow) {
+      $mappedField = $this->getMappingFieldFromMapperInput($mapperRow, 0, $i);
+      if (!$mappedField['location_type_id'] && !empty($this->importableFieldsMetadata[$mappedField['name']]['hasLocationType'])) {
+        $mappedField['location_type_id'] = 'Primary';
+      }
+      // Just for clarity since 0 is a pseudovalue
+      unset($mappedField['mapping_id']);
+      $mappedFields[] = $mappedField;
+    }
+    return $mappedFields;
   }
 
 }
