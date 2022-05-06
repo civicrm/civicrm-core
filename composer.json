@@ -62,7 +62,7 @@
     "psr/log": "~1.0",
     "symfony/finder": "~3.0 || ~4.4",
     "tecnickcom/tcpdf" : "6.4.*",
-    "totten/ca-config": "~17.05",
+    "totten/ca-config": "~22.05",
     "zetacomponents/base": "1.9.*",
     "zetacomponents/mail": "1.9.*",
     "marcj/topsort": "~1.1",
