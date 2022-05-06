@@ -52,7 +52,7 @@ class RequestSpec implements \Iterator {
     $this->entityTableName = CoreUtil::getTableName($entity);
     // Set contact_type from id if possible
     if ($entity === 'Contact' && empty($values['contact_type']) && !empty($values['id'])) {
-      $values['contact_type'] = \CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $values['id'], 'contact_id');
+      $values['contact_type'] = \CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $values['id'], 'contact_type');
     }
     $this->values = $values;
   }
