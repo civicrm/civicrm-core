@@ -178,18 +178,11 @@ class CRM_Contact_Import_ImportJob {
       $parserParameters['relatedContactWebsiteType']
     );
     $this->_parser->setUserJobID($this->_userJobID);
-    $this->_parser->run(NULL, $mapperFields,
+    $this->_parser->run(
+      $mapperFields,
       CRM_Import_Parser::MODE_IMPORT,
-      $this->_contactType,
-      $this->_primaryKeyName,
-      $this->_statusFieldName,
-      $this->_onDuplicate,
       $this->_statusID,
-      $this->_totalRowCount,
-      $this->_doGeocodeAddress,
-      CRM_Contact_Import_Parser_Contact::DEFAULT_TIMEOUT,
-      $this->_contactSubType,
-      $this->_dedupe
+      $this->_totalRowCount
     );
 
     $contactIds = $this->_parser->getImportedContacts();

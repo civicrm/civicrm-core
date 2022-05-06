@@ -217,17 +217,9 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
     $parser = new CRM_Contact_Import_Parser_Contact($mapper);
     $parser->setMaxLinesToProcess(100);
     $parser->setUserJobID($this->getUserJobID());
-    $parser->run(NULL,
+    $parser->run(
       [],
-      CRM_Import_Parser::MODE_MAPFIELD,
-      $this->getSubmittedValue('contactType'),
-      '_id',
-      '_status',
-      CRM_Import_Parser::DUPLICATE_SKIP,
-      NULL, NULL, FALSE,
-      CRM_Contact_Import_Parser_Contact::DEFAULT_TIMEOUT,
-      $this->getSubmittedValue('contactSubType'),
-      $this->getSubmittedValue('dedupe_rule_id')
+      CRM_Import_Parser::MODE_MAPFIELD
     );
 
     // add all the necessary variables to the form
