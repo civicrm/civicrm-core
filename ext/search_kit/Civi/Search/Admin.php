@@ -46,6 +46,7 @@ class Admin {
       'defaultPagerSize' => \Civi::settings()->get('default_pager_size'),
       'defaultDisplay' => SearchDisplay::getDefault(FALSE)->setSavedSearch(['id' => NULL])->execute()->first(),
       'modules' => $extensions,
+      'defaultContactType' => \CRM_Contact_BAO_ContactType::basicTypeInfo()['Individual']['name'] ?? NULL,
       'tags' => Tag::get()
         ->addSelect('id', 'name', 'color', 'is_selectable', 'description')
         ->addWhere('used_for', 'CONTAINS', 'civicrm_saved_search')
