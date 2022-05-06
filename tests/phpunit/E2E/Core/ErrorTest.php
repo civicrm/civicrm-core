@@ -97,7 +97,7 @@ class ErrorTest extends \CiviEndToEndTestCase {
       'Backdrop' => '/body class=\".*not-logged-in/',
       'Drupal' => '/body class=\".*not-logged-in/',
       'Drupal8' => '/body class=\".*not-logged-in/',
-      'WordPress' => '/ role=.navigation./',
+      'WordPress' => '/( role=.navigation.| class=.site-header.)/',
     ];
     if (!isset($patterns[CIVICRM_UF])) {
       $this->markTestIncomplete('testErrorChrome() cannot check for chrome on ' . CIVICRM_UF);
