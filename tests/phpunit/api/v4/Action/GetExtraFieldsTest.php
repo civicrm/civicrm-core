@@ -45,11 +45,20 @@ class GetExtraFieldsTest extends UnitTestCase {
     $this->assertNotContains('contact_type', $individualFields);
     $this->assertContains('first_name', $individualFields);
 
-    $organizationFields = $getFields->setValues(['contact_type' => 'Organization'])->execute()->column('name');
+    $orgId = Contact::create(FALSE)->addValue('contact_type', 'Organization')->execute()->first()['id'];
+    $organizationFields = $getFields->setValues(['id' => $orgId])->execute()->column('name');
+    $this->assertContains('organization_name', $organizationFields);
     $this->assertContains('sic_code', $organizationFields);
     $this->assertNotContains('contact_type', $organizationFields);
     $this->assertNotContains('first_name', $organizationFields);
     $this->assertNotContains('household_name', $organizationFields);
+
+    $hhId = Contact::create(FALSE)->addValue('contact_type', 'Household')->execute()->first()['id'];
+    $householdFields = $getFields->setValues(['id' => $hhId])->execute()->column('name');
+    $this->assertNotContains('sic_code', $householdFields);
+    $this->assertNotContains('contact_type', $householdFields);
+    $this->assertNotContains('first_name', $householdFields);
+    $this->assertContains('household_name', $householdFields);
   }
 
   public function testGetOptionsAddress() {
