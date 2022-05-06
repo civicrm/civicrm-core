@@ -554,15 +554,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $parser->run(NULL,
       $mapper,
-      CRM_Import_Parser::MODE_PREVIEW,
-      NULL,
-      '_id',
-      '_status',
-      (int) $this->getSubmittedValue('onDuplicate'),
-      NULL, NULL, FALSE,
-      CRM_Contact_Import_Parser_Contact::DEFAULT_TIMEOUT,
-      $this->getSubmittedValue('contactSubType'),
-      $this->getSubmittedValue('dedupe_rule_id')
+      CRM_Import_Parser::MODE_PREVIEW
     );
     return $parser;
   }

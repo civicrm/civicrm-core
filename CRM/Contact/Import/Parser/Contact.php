@@ -2435,27 +2435,17 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   /**
    * Run import.
    *
-   * @param string $tableName
    * @param array $mapper
    * @param int $mode
-   * @param int $contactType
-   * @param string $primaryKeyName
-   * @param string $statusFieldName
-   * @param int $onDuplicate
    * @param int $statusID
    * @param int $totalRowCount
    *
    * @return mixed
-   * @throws \API_Exception
+   * @throws \API_Exception|\CRM_Core_Exception
    */
   public function run(
-    $tableName,
     $mapper = [],
     $mode = self::MODE_PREVIEW,
-    $contactType = self::CONTACT_INDIVIDUAL,
-    $primaryKeyName = '_id',
-    $statusFieldName = '_status',
-    $onDuplicate = self::DUPLICATE_SKIP,
     $statusID = NULL,
     $totalRowCount = NULL
   ) {
