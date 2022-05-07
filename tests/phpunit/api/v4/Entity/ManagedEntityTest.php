@@ -18,7 +18,7 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Domain;
 use Civi\Api4\Group;
 use Civi\Api4\Managed;
@@ -32,7 +32,7 @@ use Civi\Test\TransactionalInterface;
 /**
  * @group headless
  */
-class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, HookInterface {
+class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, HookInterface {
   /**
    * @var array[]
    */

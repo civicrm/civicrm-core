@@ -20,13 +20,14 @@
 namespace api\v4\Entity;
 
 use Civi\Api4\CiviCase;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Relationship;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class CaseTest extends UnitTestCase {
+class CaseTest extends Api4TestBase implements TransactionalInterface {
 
   public function setUp(): void {
     parent::setUp();

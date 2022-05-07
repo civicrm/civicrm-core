@@ -19,12 +19,13 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class IndexTest extends UnitTestCase {
+class IndexTest extends Api4TestBase implements TransactionalInterface {
 
   public function testIndex() {
     // Results indexed by name

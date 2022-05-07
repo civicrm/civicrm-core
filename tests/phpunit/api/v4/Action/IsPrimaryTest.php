@@ -24,12 +24,13 @@ use Civi\Api4\IM;
 use Civi\Api4\Phone;
 use Civi\Api4\Address;
 use Civi\Api4\OpenID;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class IsPrimaryTest extends UnitTestCase {
+class IsPrimaryTest extends Api4TestBase implements TransactionalInterface {
 
   /**
    * Test that creating a location entity or deleting one re-assigns is_primary correctly.

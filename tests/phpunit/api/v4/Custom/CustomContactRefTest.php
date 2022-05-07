@@ -17,7 +17,7 @@
  */
 
 
-namespace api\v4\Action;
+namespace api\v4\Custom;
 
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
@@ -26,7 +26,7 @@ use Civi\Api4\CustomGroup;
 /**
  * @group headless
  */
-class CustomContactRefTest extends BaseCustomValueTest {
+class CustomContactRefTest extends CustomTestBase {
 
   public function testGetWithJoin() {
     $firstName = uniqid('fav');

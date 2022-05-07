@@ -21,12 +21,13 @@ namespace api\v4\Entity;
 
 use Civi\Api4\Contact;
 use Civi\Api4\OptionValue;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class ContactJoinTest extends UnitTestCase {
+class ContactJoinTest extends Api4TestBase implements TransactionalInterface {
 
   public function setUpHeadless() {
     $relatedTables = [

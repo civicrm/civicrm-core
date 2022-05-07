@@ -26,7 +26,7 @@ use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\Entity;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Event\ValidateValuesEvent;
 use Civi\Api4\Service\Spec\CustomFieldSpec;
 use Civi\Api4\Service\Spec\FieldSpec;
@@ -35,11 +35,12 @@ use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\PostEvent;
 use Civi\Core\Event\PreEvent;
 use Civi\Test\HookInterface;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class ConformanceTest extends UnitTestCase implements HookInterface {
+class ConformanceTest extends Api4TestBase implements HookInterface, TransactionalInterface {
 
   use CheckAccessTrait;
   use TableDropperTrait;

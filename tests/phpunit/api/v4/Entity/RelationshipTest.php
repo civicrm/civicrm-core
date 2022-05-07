@@ -19,7 +19,7 @@
 namespace api\v4\Entity;
 
 use Civi\Api4\Contact;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Relationship;
 use Civi\Api4\RelationshipCache;
 use Civi\Test\TransactionalInterface;
@@ -30,7 +30,7 @@ use Civi\Test\TransactionalInterface;
  *
  * @group headless
  */
-class RelationshipTest extends UnitTestCase implements TransactionalInterface {
+class RelationshipTest extends Api4TestBase implements TransactionalInterface {
 
   public function testRelCacheCount() {
     $c1 = Contact::create(FALSE)->addValue('first_name', '1')->execute()->first()['id'];

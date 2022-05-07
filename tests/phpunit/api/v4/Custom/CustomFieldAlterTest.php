@@ -17,7 +17,7 @@
  */
 
 
-namespace api\v4\Action;
+namespace api\v4\Custom;
 
 use Civi\Api4\Activity;
 use Civi\Api4\CustomField;
@@ -26,7 +26,7 @@ use Civi\Api4\CustomGroup;
 /**
  * @group headless
  */
-class CustomFieldAlterTest extends BaseCustomValueTest {
+class CustomFieldAlterTest extends CustomTestBase {
 
   public function testChangeSerialize() {
     $contact = $this->createEntity(['type' => 'Individual']);

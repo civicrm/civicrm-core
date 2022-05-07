@@ -17,7 +17,7 @@
  */
 
 
-namespace api\v4\Action;
+namespace api\v4\Custom;
 
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
@@ -27,7 +27,7 @@ use api\v4\Traits\QueryCounterTrait;
 /**
  * @group headless
  */
-class CustomValuePerformanceTest extends BaseCustomValueTest {
+class CustomValuePerformanceTest extends CustomTestBase {
 
   use QueryCounterTrait;
 

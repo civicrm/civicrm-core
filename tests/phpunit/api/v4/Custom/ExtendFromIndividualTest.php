@@ -17,23 +17,23 @@
  */
 
 
-namespace api\v4\Action;
+namespace api\v4\Custom;
 
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
-use CRM_Core_BAO_CustomValueTable as CustomValueTable;
 
 /**
  * @group headless
  */
-class UpdateCustomValueTest extends BaseCustomValueTest {
+class ExtendFromIndividualTest extends CustomTestBase {
 
-  public function testGetWithCustomData() {
+  public function testGetWithNonStandardExtends() {
 
     $customGroup = CustomGroup::create(FALSE)
       ->addValue('title', 'MyContactFields')
-      ->addValue('extends', 'Contact')
+      // not Contact
+      ->addValue('extends', 'Individual')
       ->execute()
       ->first();
 
@@ -45,25 +45,21 @@ class UpdateCustomValueTest extends BaseCustomValueTest {
       ->execute();
 
     $contactId = Contact::create(FALSE)
-      ->addValue('first_name', 'Red')
+      ->addValue('first_name', 'Johann')
       ->addValue('last_name', 'Tester')
       ->addValue('contact_type', 'Individual')
       ->addValue('MyContactFields.FavColor', 'Red')
       ->execute()
       ->first()['id'];
 
-    Contact::update(FALSE)
+    $contact = Contact::get(FALSE)
+      ->addSelect('display_name')
+      ->addSelect('MyContactFields.FavColor')
       ->addWhere('id', '=', $contactId)
-      ->addValue('first_name', 'Red')
-      ->addValue('last_name', 'Tester')
-      ->addValue('contact_type', 'Individual')
-      ->addValue('MyContactFields.FavColor', 'Blue')
-      ->execute();
+      ->execute()
+      ->first();
 
-    $result = CustomValueTable::getEntityValues($contactId, 'Contact');
-
-    $this->assertEquals(1, count($result));
-    $this->assertContains('Blue', $result);
+    $this->assertEquals('Red', $contact['MyContactFields.FavColor']);
   }
 
 }

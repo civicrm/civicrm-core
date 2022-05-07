@@ -22,14 +22,13 @@ namespace api\v4;
 use api\v4\Traits\TestDataLoaderTrait;
 use Civi\Api4\UFMatch;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\TransactionalInterface;
 
 require_once 'api/Exception.php';
 
 /**
  * @group headless
  */
-class UnitTestCase extends \PHPUnit\Framework\TestCase implements HeadlessInterface, TransactionalInterface {
+class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterface {
 
   use TestDataLoaderTrait;
 

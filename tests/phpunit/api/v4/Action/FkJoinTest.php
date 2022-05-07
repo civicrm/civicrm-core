@@ -19,7 +19,7 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\CiviCase;
 use Civi\Api4\Contact;
@@ -28,11 +28,12 @@ use Civi\Api4\EntityTag;
 use Civi\Api4\Phone;
 use Civi\Api4\Relationship;
 use Civi\Api4\Tag;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class FkJoinTest extends UnitTestCase {
+class FkJoinTest extends Api4TestBase implements TransactionalInterface {
 
   public function setUpHeadless() {
     $this->loadDataSet('DefaultDataSet');

@@ -21,12 +21,12 @@ namespace api\v4\Spec;
 
 use Civi\Api4\Service\Spec\CustomFieldSpec;
 use Civi\Api4\Service\Spec\SpecFormatter;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class SpecFormatterTest extends UnitTestCase {
+class SpecFormatterTest extends Api4TestBase {
 
   /**
    * @dataProvider arrayFieldSpecProvider

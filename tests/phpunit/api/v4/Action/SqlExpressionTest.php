@@ -19,14 +19,15 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class SqlExpressionTest extends UnitTestCase {
+class SqlExpressionTest extends Api4TestBase implements TransactionalInterface {
 
   public function testSelectNull() {
     Contact::create()->addValue('first_name', 'bob')->setCheckPermissions(FALSE)->execute();

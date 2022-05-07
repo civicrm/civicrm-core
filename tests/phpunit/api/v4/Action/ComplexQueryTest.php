@@ -19,10 +19,11 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Test\CiviEnvBuilder;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
@@ -30,7 +31,7 @@ use Civi\Test\CiviEnvBuilder;
  * This class tests a series of complex query situations described in the
  * initial APIv4 specification
  */
-class ComplexQueryTest extends UnitTestCase {
+class ComplexQueryTest extends Api4TestBase implements TransactionalInterface {
 
   public function setUpHeadless(): CiviEnvBuilder {
     $this->loadDataSet('DefaultDataSet');

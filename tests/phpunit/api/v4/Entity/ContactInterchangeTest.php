@@ -20,7 +20,7 @@ namespace api\v4\Entity;
 
 use Civi\Api4\ActivityContact;
 use Civi\Api4\Contact;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -29,7 +29,7 @@ use Civi\Test\TransactionalInterface;
  *
  * @group headless
  */
-class ContactInterchangeTest extends UnitTestCase implements TransactionalInterface {
+class ContactInterchangeTest extends Api4TestBase implements TransactionalInterface {
 
   public function getExamples() {
     $apiWriters = [

@@ -19,16 +19,17 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Campaign;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class GetFieldsTest extends UnitTestCase {
+class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
 
   public function testOptionsAreReturned() {
     $fields = Contact::getFields(FALSE)

@@ -20,12 +20,13 @@
 namespace api\v4\Entity;
 
 use Civi\Api4\Setting;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class SettingTest extends UnitTestCase {
+class SettingTest extends Api4TestBase implements TransactionalInterface {
 
   public function testSettingASetting() {
     $setting = Setting::set()->addValue('menubar_position', 'above-crm-container')->setCheckPermissions(FALSE)->execute()->first();

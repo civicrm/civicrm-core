@@ -17,7 +17,7 @@
  */
 
 
-namespace api\v4\Action;
+namespace api\v4\Custom;
 
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
@@ -31,7 +31,7 @@ use Civi\Api4\RelationshipCache;
 /**
  * @group headless
  */
-class BasicCustomFieldTest extends BaseCustomValueTest {
+class BasicCustomFieldTest extends CustomTestBase {
 
   public function tearDown(): void {
     FinancialType::delete(FALSE)

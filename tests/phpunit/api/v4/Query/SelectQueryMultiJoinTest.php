@@ -20,14 +20,15 @@
 namespace api\v4\Query;
 
 use Civi\Api4\Email;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * Class SelectQueryMultiJoinTest
  * @package api\v4\Query
  * @group headless
  */
-class SelectQueryMultiJoinTest extends UnitTestCase {
+class SelectQueryMultiJoinTest extends Api4TestBase implements TransactionalInterface {
 
   public function setUpHeadless() {
     $this->cleanup(['tablesToTruncate' => ['civicrm_contact', 'civicrm_email']]);

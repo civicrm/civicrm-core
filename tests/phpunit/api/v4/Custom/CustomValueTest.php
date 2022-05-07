@@ -17,7 +17,7 @@
  */
 
 
-namespace api\v4\Action;
+namespace api\v4\Custom;
 
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
@@ -28,7 +28,7 @@ use Civi\Api4\Entity;
 /**
  * @group headless
  */
-class CustomValueTest extends BaseCustomValueTest {
+class CustomValueTest extends CustomTestBase {
 
   protected $contactID;
 

@@ -21,12 +21,13 @@ namespace api\v4\Query;
 
 use Civi\API\Request;
 use Civi\Api4\Query\Api4SelectQuery;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class Api4SelectQueryTest extends UnitTestCase {
+class Api4SelectQueryTest extends Api4TestBase implements TransactionalInterface {
 
   public function setUpHeadless() {
     $relatedTables = [

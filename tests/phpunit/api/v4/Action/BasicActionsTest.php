@@ -19,16 +19,17 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\MockBasicEntity;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Test\HookInterface;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class BasicActionsTest extends UnitTestCase implements HookInterface {
+class BasicActionsTest extends Api4TestBase implements HookInterface, TransactionalInterface {
 
   /**
    * Listens for civi.api4.entityTypes event to manually add this nonstandard entity
