@@ -36,20 +36,20 @@ INSERT IGNORE INTO `civicrm_state_province` (`country_id`, `abbreviation`, `name
 SELECT @option_group_id_cgeo := max(id) FROM civicrm_option_group WHERE name = 'cg_extend_objects';
 
 UPDATE civicrm_option_value
-  SET grouping = 'case_type_id', {localize field='description'}description = NULL{/localize}
+  SET `grouping` = 'case_type_id', {localize field='description'}description = NULL{/localize}
   WHERE option_group_id = @option_group_id_cgeo AND value = 'Case';
 
 SELECT @option_group_id_cdt := max(id) FROM civicrm_option_group WHERE name = 'custom_data_type';
 
 UPDATE civicrm_option_value
-  SET {localize field='label'}label = '{ts escape="sql"}Participants (Role){/ts}'{/localize}, grouping = 'role_id'
+  SET {localize field='label'}label = '{ts escape="sql"}Participants (Role){/ts}'{/localize}, `grouping` = 'role_id'
   WHERE option_group_id = @option_group_id_cdt AND name = 'ParticipantRole';
 
 UPDATE civicrm_option_value
-  SET {localize field='label'}label = '{ts escape="sql"}Participants (Event Name){/ts}'{/localize}, grouping = 'event_id'
+  SET {localize field='label'}label = '{ts escape="sql"}Participants (Event Name){/ts}'{/localize}, `grouping` = 'event_id'
   WHERE option_group_id = @option_group_id_cdt AND name = 'ParticipantEventName';
 
 UPDATE civicrm_option_value
-  SET {localize field='label'}label = '{ts escape="sql"}Participants (Event Type){/ts}'{/localize}, grouping = 'event_id.event_type_id'
+  SET {localize field='label'}label = '{ts escape="sql"}Participants (Event Type){/ts}'{/localize}, `grouping` = 'event_id.event_type_id'
   WHERE option_group_id = @option_group_id_cdt AND name = 'ParticipantEventType';
 

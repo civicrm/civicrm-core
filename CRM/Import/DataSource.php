@@ -459,7 +459,7 @@ abstract class CRM_Import_DataSource {
   protected function getStatusMapping(): array {
     return [
       CRM_Import_Parser::VALID => ['imported', 'new'],
-      CRM_Import_Parser::ERROR => ['error'],
+      CRM_Import_Parser::ERROR => ['error', 'invalid'],
       CRM_Import_Parser::DUPLICATE => ['duplicate'],
     ];
   }
