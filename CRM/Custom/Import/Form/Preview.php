@@ -18,7 +18,6 @@ class CRM_Custom_Import_Form_Preview extends CRM_Import_Form_Preview {
     $dataValues = $this->get('dataValues');
     $mapper = $this->get('mapper');
     $invalidRowCount = $this->get('invalidRowCount');
-    $mismatchCount = $this->get('unMatchCount');
     $entity = $this->get('_entity');
 
     //get the mapping name displayed if the mappingId is set
@@ -35,11 +34,6 @@ class CRM_Custom_Import_Form_Preview extends CRM_Import_Form_Preview {
       $this->set('downloadErrorRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
 
-    if ($mismatchCount) {
-      $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . $this->_importParserUrl;
-      $this->set('downloadMismatchRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
-    }
-
     $properties = [
       'mapper',
       'dataValues',
@@ -48,7 +42,6 @@ class CRM_Custom_Import_Form_Preview extends CRM_Import_Form_Preview {
       'validRowCount',
       'invalidRowCount',
       'downloadErrorRecordsUrl',
-      'downloadMismatchRecordsUrl',
     ];
 
     foreach ($properties as $property) {
@@ -119,8 +112,6 @@ class CRM_Custom_Import_Form_Preview extends CRM_Import_Form_Preview {
       $this->set('errorFile', $errorFile);
       $urlParams = 'type=' . CRM_Import_Parser::ERROR . $this->_importParserUrl;
       $this->set('downloadErrorRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
-      $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . $this->_importParserUrl;
-      $this->set('downloadMismatchRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
   }
 

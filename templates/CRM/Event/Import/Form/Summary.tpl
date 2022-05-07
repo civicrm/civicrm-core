@@ -20,15 +20,6 @@
     <strong>{ts}Import has completed successfully.{/ts}</strong> {ts}The information below summarizes the results.{/ts}
     </p>
 
-   {if $unMatchCount }
-        <p class="error">
-        {ts count=$unMatchCount plural='CiviCRM has detected mismatched participant IDs. These records have not been updated.'}CiviCRM has detected a mismatched participant ID. This record has not been updated.{/ts}
-        </p>
-        <p class="error">
-        {ts 1=$downloadMismatchRecordsUrl}You can <a href="%1">Download Mismatched Participants</a>. You may then correct them, and import the new file with the corrected data.{/ts}
-        </p>
-    {/if}
-
     {if $invalidRowCount }
         <p class="error">
         {ts count=$invalidRowCount plural='CiviCRM has detected invalid data and/or formatting errors in %count records. These records have not been imported.'}CiviCRM has detected invalid data and/or formatting errors in one record. This record has not been imported.{/ts}
@@ -64,17 +55,6 @@
         <td class="explanation">{ts}Rows with invalid data in one or more fields. These rows will be skipped (not imported).{/ts}
             {if $invalidRowCount}
                 <p><a href="{$downloadErrorRecordsUrl}">{ts}Download Errors{/ts}</a></p>
-            {/if}
-        </td>
-    </tr>
-    {/if}
-
-    {if $unMatchCount }
-    <tr class="error"><td class="label crm-grid-cell">{ts}Mismatched Rows (skipped){/ts}</td>
-        <td class="data">{$unMatchCount}</td>
-        <td class="explanation">{ts}Rows with mismatched participant IDs... (NOT updated).{/ts}
-            {if $unMatchCount}
-                <p><a href="{$downloadMismatchRecordsUrl}">{ts}Download Mismatched participants{/ts}</a></p>
             {/if}
         </td>
     </tr>

@@ -18,15 +18,6 @@
     <strong>{ts}Import has completed successfully.{/ts}</strong> {ts}The information below summarizes the results.{/ts}
     </p>
 
-   {if $unMatchCount }
-        <p class="error">
-        {ts count=$unMatchCount plural='CiviCRM has detected mismatched contribution IDs. These records have not been Updated.'}CiviCRM has detected mismatched contribution ID. This record has not been updated.{/ts}
-        </p>
-        <p class="error">
-        {ts 1=$downloadMismatchRecordsUrl}You can <a href='%1'>Download Mismatched Contributions</a>. You may then correct them, and import the new file with the corrected data.{/ts}
-        </p>
-    {/if}
-
     {if $invalidRowCount }
         <p class="error">
         {ts count=$invalidRowCount plural='CiviCRM has detected invalid data and/or formatting errors in %count records. These records have not been imported.'}CiviCRM has detected invalid data and/or formatting errors in one record. This record has not been imported.{/ts}
@@ -95,16 +86,6 @@
         <td class="explanation">{ts}Rows marked as pledge payments where the contributor and / or contribution amount could not be matched to a pending pledge payment. These contribution rows have been skipped (not imported).{/ts}
             {if $invalidPledgePaymentRowCount}
                 <p><a href="{$downloadPledgePaymentErrorRecordsUrl}">{ts}Download Errors{/ts}</a></p>
-            {/if}
-        </td>
-    </tr>
-    {/if}
-    {if $unMatchCount }
-    <tr class="error"><td class="label crm-grid-cell">{ts}Mismatched Rows (skipped){/ts}</td>
-        <td class="data">{$unMatchCount}</td>
-        <td class="explanation">{ts}Rows with mismatched contribution IDs... (NOT updated).{/ts}
-            {if $unMatchCount}
-                <p><a href="{$downloadMismatchRecordsUrl}">{ts}Download Mismatched Contributions{/ts}</a></p>
             {/if}
         </td>
     </tr>
