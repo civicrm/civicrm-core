@@ -31,6 +31,8 @@ class ErrorTest extends \CiviEndToEndTestCase {
     // Format: "{$uf}_{$testFunc}_{$errorType}"
     '/WordPress_testErrorStatus_(fatal|exception)/',
     '/Drupal_testErrorChrome_(fatal|exception)/',
+    '/Drupal8_testErrorChrome_(fatal|exception)/',
+    '/Backdrop_testErrorChrome_(fatal|exception)/',
   ];
 
   public function getErrorTypes() {
