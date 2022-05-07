@@ -96,10 +96,10 @@ class ErrorTest extends \CiviEndToEndTestCase {
   public function testErrorChrome(string $url, string $errorType) {
     $this->skipIfNonCompliant(__FUNCTION__, $errorType);
     $patterns = [
-      'Backdrop' => '/body class=\".*not-logged-in/',
-      'Drupal' => '/body class=\".*not-logged-in/',
-      'Drupal8' => '/body class=\".*not-logged-in/',
-      'WordPress' => '/ role=.navigation./',
+      'Backdrop' => '/href=.*user\/(login|register)/',
+      'Drupal' => '/href=.*user\/register/',
+      'Drupal8' => '/href=.*user\/(login|register)/',
+      'WordPress' => '/( role=.navigation.| class=.site-header.)/',
     ];
     if (!isset($patterns[CIVICRM_UF])) {
       $this->markTestIncomplete('testErrorChrome() cannot check for chrome on ' . CIVICRM_UF);
