@@ -348,6 +348,16 @@ abstract class CRM_Import_DataSource {
   abstract public function buildQuickForm(&$form);
 
   /**
+   * Initialize the datasource, based on the submitted values stored in the user job.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function initialize(): void {
+
+  }
+
+  /**
    * Determine if the current user has access to this data source.
    *
    * @return bool

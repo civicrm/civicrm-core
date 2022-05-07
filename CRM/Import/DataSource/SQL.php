@@ -74,17 +74,12 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
   }
 
   /**
-   * Process the form submission.
-   *
-   * @param array $params
-   * @param string $db
-   * @param \CRM_Core_Form $form
+   * Initialize the datasource, based on the submitted values stored in the user job.
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function postProcess(&$params, &$db, &$form) {
+  public function initialize(): void {
     $table = CRM_Utils_SQL_TempTable::build()->setDurable();
     $tableName = $table->getName();
     $table->createWithQuery($this->getSubmittedValue('sqlQuery'));

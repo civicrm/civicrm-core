@@ -68,17 +68,12 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   }
 
   /**
-   * Process the form submission.
-   *
-   * @param array $params
-   * @param string $db
-   * @param \CRM_Core_Form $form
+   * Initialize the datasource, based on the submitted values stored in the user job.
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
-  public function postProcess(&$params, &$db, &$form) {
+  public function initialize(): void {
     $result = self::_CsvToTable(
       $this->getSubmittedValue('uploadFile')['name'],
       $this->getSubmittedValue('skipColumnHeader'),

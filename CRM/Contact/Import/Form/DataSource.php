@@ -232,14 +232,11 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
    *
    * This gives the datasource a chance to do any table creation etc.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   private function instantiateDataSource(): void {
-    $dataSource = $this->getDataSourceObject();
-    // Get the PEAR::DB object
-    $dao = new CRM_Core_DAO();
-    $db = $dao->getDatabaseConnection();
-    $dataSource->postProcess($this->_params, $db, $this);
+    $this->getDataSourceObject()->initialize();
   }
 
   /**

@@ -163,7 +163,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     /* @var CRM_Contact_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Contact_Import_Form_MapField', $submittedValues);
     $form->set('user_job_id', $userJobID);
-    $dataSource->postProcess($submittedValues, $null, $form);
+    $dataSource->initialize();
 
     $contactFields = CRM_Contact_BAO_Contact::importableFields();
     $fields = [];
