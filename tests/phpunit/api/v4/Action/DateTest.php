@@ -23,12 +23,13 @@ use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
 use Civi\Api4\Relationship;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class DateTest extends UnitTestCase {
+class DateTest extends Api4TestBase implements TransactionalInterface {
 
   public function testRelationshipDate() {
     $c1 = Contact::create()

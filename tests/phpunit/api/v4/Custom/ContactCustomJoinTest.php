@@ -17,17 +17,16 @@
  */
 
 
-namespace api\v4\Entity;
+namespace api\v4\Custom;
 
 use Civi\Api4\Contact;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomField;
-use api\v4\Action\BaseCustomValueTest;
 
 /**
  * @group headless
  */
-class ContactCustomJoinTest extends BaseCustomValueTest {
+class ContactCustomJoinTest extends CustomTestBase {
 
   /**
    * Add test to ensure that in the very unusual and not really supported situation where there is a space in the

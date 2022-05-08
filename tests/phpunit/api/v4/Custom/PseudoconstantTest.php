@@ -17,7 +17,7 @@
  */
 
 
-namespace api\v4\Action;
+namespace api\v4\Custom;
 
 use Civi\Api4\Address;
 use Civi\Api4\Campaign;
@@ -35,7 +35,7 @@ use Civi\Api4\Tag;
 /**
  * @group headless
  */
-class PseudoconstantTest extends BaseCustomValueTest {
+class PseudoconstantTest extends CustomTestBase {
 
   public function testOptionValue() {
     $cid = Contact::create(FALSE)->addValue('first_name', 'bill')->execute()->first()['id'];

@@ -19,7 +19,7 @@
 namespace api\v4\Entity;
 
 use Civi\Api4\Contact;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Event\ValidateValuesEvent;
 use Civi\Test\TransactionalInterface;
 
@@ -28,7 +28,7 @@ use Civi\Test\TransactionalInterface;
  *
  * @group headless
  */
-class ValidateValuesTest extends UnitTestCase implements TransactionalInterface {
+class ValidateValuesTest extends Api4TestBase implements TransactionalInterface {
 
   private $lastValidator;
 

@@ -19,13 +19,13 @@
 
 namespace api\v4\Utils;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Utils\SelectUtil;
 
 /**
  * @group headless
  */
-class SelectUtilTest extends UnitTestCase {
+class SelectUtilTest extends Api4TestBase {
 
   private $emailFieldNames = [
     'id',

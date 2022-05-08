@@ -17,7 +17,7 @@
  */
 
 
-namespace api\v4\Action;
+namespace api\v4\Custom;
 
 use Civi\Api4\ACL;
 use Civi\Api4\Contact;
@@ -28,7 +28,7 @@ use Civi\Api4\CustomValue;
 /**
  * @group headless
  */
-class CustomGroupACLTest extends BaseCustomValueTest {
+class CustomGroupACLTest extends CustomTestBase {
 
   public function tearDown(): void {
     parent::tearDown();

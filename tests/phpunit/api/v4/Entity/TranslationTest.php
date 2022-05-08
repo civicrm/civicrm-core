@@ -19,12 +19,13 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class TranslationTest extends UnitTestCase {
+class TranslationTest extends Api4TestBase implements TransactionalInterface {
 
   protected $ids = [];
 

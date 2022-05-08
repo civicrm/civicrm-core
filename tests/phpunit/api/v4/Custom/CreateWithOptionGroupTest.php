@@ -17,7 +17,7 @@
  */
 
 
-namespace api\v4\Action;
+namespace api\v4\Custom;
 
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
@@ -26,7 +26,7 @@ use Civi\Api4\Contact;
 /**
  * @group headless
  */
-class CreateWithOptionGroupTest extends BaseCustomValueTest {
+class CreateWithOptionGroupTest extends CustomTestBase {
 
   public function testGetWithCustomData() {
     $group = uniqid('fava');

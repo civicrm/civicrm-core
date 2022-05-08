@@ -19,16 +19,17 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\Tag;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class GetExtraFieldsTest extends UnitTestCase {
+class GetExtraFieldsTest extends Api4TestBase implements TransactionalInterface {
 
   public function testGetFieldsByContactType() {
     $getFields = Contact::getFields(FALSE)->addSelect('name')->addWhere('type', '=', 'Field');

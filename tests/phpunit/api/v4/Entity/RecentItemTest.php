@@ -18,7 +18,7 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\RecentItem;
 use Civi\Api4\Contact;
 use Civi\Test\TransactionalInterface;
@@ -28,7 +28,7 @@ use Civi\Test\TransactionalInterface;
  *
  * @group headless
  */
-class RecentItemTest extends UnitTestCase implements TransactionalInterface {
+class RecentItemTest extends Api4TestBase implements TransactionalInterface {
 
   /**
    *

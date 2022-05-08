@@ -19,13 +19,14 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\GroupContact;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class GroupContactTest extends UnitTestCase {
+class GroupContactTest extends Api4TestBase implements TransactionalInterface {
 
   public function testCreate() {
     $contact = $this->createEntity(['type' => 'Individual']);

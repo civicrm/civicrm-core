@@ -20,12 +20,13 @@
 namespace api\v4\Action;
 
 use Civi\Api4\Contact;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class ResultTest extends UnitTestCase {
+class ResultTest extends Api4TestBase implements TransactionalInterface {
 
   public function testJsonSerialize() {
     $result = Contact::getFields(FALSE)->addWhere('type', '=', 'Field')->execute();

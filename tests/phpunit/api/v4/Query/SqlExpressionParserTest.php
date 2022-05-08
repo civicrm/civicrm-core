@@ -19,13 +19,14 @@
 
 namespace api\v4\Query;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Query\SqlExpression;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class SqlExpressionParserTest extends UnitTestCase {
+class SqlExpressionParserTest extends Api4TestBase implements TransactionalInterface {
 
   public function aggregateFunctions() {
     return [

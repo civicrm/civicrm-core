@@ -17,9 +17,8 @@
  */
 
 
-namespace api\v4\Utils;
+namespace api\v4\Custom;
 
-use api\v4\UnitTestCase;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\Utils\CoreUtil;
@@ -27,7 +26,7 @@ use Civi\Api4\Utils\CoreUtil;
 /**
  * @group headless
  */
-class CoreUtilTest extends UnitTestCase {
+class CoreUtilTest extends CustomTestBase {
 
   /**
    */

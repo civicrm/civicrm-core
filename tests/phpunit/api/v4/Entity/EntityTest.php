@@ -21,12 +21,13 @@ namespace api\v4\Entity;
 
 use Civi\API\Exception\NotImplementedException;
 use Civi\Api4\Entity;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class EntityTest extends UnitTestCase {
+class EntityTest extends Api4TestBase implements TransactionalInterface {
 
   public function testEntityGet() {
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviEvent');

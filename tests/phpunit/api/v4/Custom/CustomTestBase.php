@@ -17,13 +17,21 @@
  */
 
 
-namespace api\v4\Action;
+namespace api\v4\Custom;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomField;
 
-abstract class BaseCustomValueTest extends UnitTestCase {
+/**
+ * Use this base class for any APIv4 tests which create custom groups/fields,
+ * to ensure they get cleaned up properly.
+ *
+ * Note: The TransactionalInterface won't work with custom fields because of adding/dropping tables.
+ * So these tests have to do their own cleanup of any contacts or other entities created.
+ * The recommended way is to override the `tearDown` function and calling `parent::tearDown()`.
+ */
+abstract class CustomTestBase extends Api4TestBase {
 
   /**
    * Delete all created options groups.

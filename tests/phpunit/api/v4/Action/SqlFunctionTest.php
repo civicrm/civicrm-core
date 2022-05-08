@@ -19,15 +19,16 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class SqlFunctionTest extends UnitTestCase {
+class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
 
   public function testGetFunctions() {
     $functions = array_column(\CRM_Api4_Page_Api4Explorer::getSqlFunctions(), NULL, 'name');

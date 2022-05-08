@@ -19,13 +19,15 @@
 
 namespace api\v4\Action;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
 use Civi\Api4\Relationship;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class ContactGetTest extends \api\v4\UnitTestCase {
+class ContactGetTest extends Api4TestBase implements TransactionalInterface {
 
   public function testGetDeletedContacts() {
     $last_name = uniqid('deleteContactTest');

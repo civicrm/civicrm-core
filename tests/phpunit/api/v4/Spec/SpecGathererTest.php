@@ -23,7 +23,7 @@ use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface;
 use Civi\Api4\Service\Spec\SpecGatherer;
 use api\v4\Traits\OptionCleanupTrait;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use api\v4\Traits\TableDropperTrait;
@@ -32,7 +32,7 @@ use Prophecy\Argument;
 /**
  * @group headless
  */
-class SpecGathererTest extends UnitTestCase {
+class SpecGathererTest extends Api4TestBase {
 
   use TableDropperTrait;
   use OptionCleanupTrait;
