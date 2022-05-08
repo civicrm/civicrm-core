@@ -21,13 +21,6 @@
 class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
-   * Whether USPS validation should be disabled during import.
-   *
-   * @var bool
-   */
-  protected $_disableUSPS;
-
-  /**
    * Set variables up before form is built.
    *
    * @throws \API_Exception
@@ -36,7 +29,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
   public function preProcess() {
     $mismatchCount = $this->get('unMatchCount');
     $columnNames = $this->get('columnNames');
-    $this->_disableUSPS = $this->get('disableUSPS');
 
     //assign column names
     $this->assign('columnNames', $columnNames);
@@ -210,7 +202,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       CRM_ACL_BAO_Cache::deleteContactCacheEntry($userID);
     }
 
-    CRM_Utils_Address_USPS::disable($this->_disableUSPS);
+    CRM_Utils_Address_USPS::disable($this->getSubmittedValue('disableUSPS'));
 
     // run the import
     $importJob->runImport($this);
