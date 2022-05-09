@@ -34,11 +34,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   protected $_relationships;
 
   protected $_emailIndex;
-  protected $_firstNameIndex;
-  protected $_lastNameIndex;
-
-  protected $_householdNameIndex;
-  protected $_organizationNameIndex;
 
   protected $_phoneIndex;
 
@@ -55,7 +50,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   protected $_retCode;
 
   protected $_externalIdentifierIndex;
-  protected $_allExternalIdentifiers;
+  protected $_allExternalIdentifiers = [];
   protected $_parseStreetAddress;
 
   /**
@@ -184,10 +179,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     $this->_phoneIndex = -1;
     $this->_emailIndex = -1;
-    $this->_firstNameIndex = -1;
-    $this->_lastNameIndex = -1;
-    $this->_householdNameIndex = -1;
-    $this->_organizationNameIndex = -1;
     $this->_externalIdentifierIndex = -1;
 
     $index = 0;
@@ -198,22 +189,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if (substr($key, 0, 5) == 'phone') {
         $this->_phoneIndex = $index;
       }
-      if ($key == 'first_name') {
-        $this->_firstNameIndex = $index;
-      }
-      if ($key == 'last_name') {
-        $this->_lastNameIndex = $index;
-      }
-      if ($key == 'household_name') {
-        $this->_householdNameIndex = $index;
-      }
-      if ($key == 'organization_name') {
-        $this->_organizationNameIndex = $index;
-      }
-
       if ($key == 'external_identifier') {
         $this->_externalIdentifierIndex = $index;
-        $this->_allExternalIdentifiers = [];
       }
       $index++;
     }
@@ -353,7 +330,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       return $response;
     }
 
-    $params = &$this->getActiveFieldParams();
+    $params = $this->getMappedRow($values);
     $formatted = [
       'contact_type' => $this->_contactType,
     ];
@@ -2294,66 +2271,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $dupeCheck = TRUE,
     $dedupeRuleGroupID = NULL) {
 
-    $requiredCheck = TRUE;
-
     if (isset($params['id']) && is_numeric($params['id'])) {
-      $requiredCheck = FALSE;
-    }
-    if ($requiredCheck) {
-      $required = [
-        'Individual' => [
-          ['first_name', 'last_name'],
-          'email',
-        ],
-        'Household' => [
-          'household_name',
-        ],
-        'Organization' => [
-          'organization_name',
-        ],
-      ];
-
-      // contact_type has a limited number of valid values
-      if (empty($params['contact_type'])) {
-        throw new CRM_Core_Exception("No Contact Type");
-      }
-      $fields = $required[$params['contact_type']] ?? NULL;
-      if ($fields == NULL) {
-        throw new CRM_Core_Exception("Invalid Contact Type: {$params['contact_type']}");
-      }
-
+      // @todo - ensure this is tested & remove - expectation is api call further
+      // down validates it.
       if ($csType = CRM_Utils_Array::value('contact_sub_type', $params)) {
         if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($csType, $params['contact_type']))) {
           throw new CRM_Core_Exception("Invalid or Mismatched Contact Subtype: " . implode(', ', (array) $csType));
-        }
-      }
-
-      if (empty($params['contact_id']) && !empty($params['id'])) {
-        $valid = FALSE;
-        $error = '';
-        foreach ($fields as $field) {
-          if (is_array($field)) {
-            $valid = TRUE;
-            foreach ($field as $element) {
-              if (empty($params[$element])) {
-                $valid = FALSE;
-                $error .= $element;
-                break;
-              }
-            }
-          }
-          else {
-            if (!empty($params[$field])) {
-              $valid = TRUE;
-            }
-          }
-          if ($valid) {
-            break;
-          }
-        }
-
-        if (!$valid) {
-          throw new CRM_Core_Exception("Required fields not found for {$params['contact_type']} : $error");
         }
       }
     }
@@ -2595,13 +2518,19 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   /**
    * Format the field values for input to the api.
    *
+   * @param array $values
+   *   The row from the datasource.
+   *
    * @return array
-   *   (reference ) associative array of name/value pairs
+   *   Parameters mapped as described in getMappedRow
+   *
    * @throws \API_Exception
+   * @todo - clean this up a bit & merge back into `getMappedRow`
+   *
    */
-  public function &getActiveFieldParams() {
+  private function getParams(array $values): array {
     $params = [];
-    $mapper = $this->getSubmittedValue('mapper');
+
     foreach ($this->getFieldMappings() as $i => $mappedField) {
       // The key is in the format 5_a_b where 5 is the relationship_type_id and a_b is the direction.
       $relatedContactKey = $mappedField['relationship_type_id'] ? ($mappedField['relationship_type_id'] . '_' . $mappedField['relationship_direction']) : NULL;
@@ -2622,7 +2551,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $imProviderID = $relatedContactKey ? NULL : $mappedField['im_provider_id'];
       $websiteTypeID = $relatedContactKey ? NULL : $mappedField['website_type_id'];
 
-      $importedValue = $this->_activeFields[$i]->_value;
+      $importedValue = $values[$i];
 
       if (isset($importedValue)) {
         if (!$relatedContactKey) {
@@ -3339,8 +3268,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \API_Exception
    */
   public function getMappedRow(array $values): array {
-    $this->setActiveFieldValues($values);
-    $params = $this->getActiveFieldParams();
+    $params = $this->getParams($values);
     $params['contact_type'] = $this->getContactType();
     return $params;
   }
@@ -3364,41 +3292,39 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * The values array represents a row in the datasource.
    *
    * @param array $values
+   *
+   * @throws \API_Exception
    */
   public function validateValues(array $values): void {
     $errorMessage = NULL;
     $errorRequired = FALSE;
     $params = $this->getMappedRow($values);
-    switch ($this->_contactType) {
+    $missingNames = [];
+    switch ($params['contact_type']) {
       case 'Individual':
-        $missingNames = [];
-        if ($this->_firstNameIndex < 0 || empty($values[$this->_firstNameIndex])) {
-          $errorRequired = TRUE;
+        if (empty($params['first_name'])) {
           $missingNames[] = ts('First Name');
         }
-        if ($this->_lastNameIndex < 0 || empty($values[$this->_lastNameIndex])) {
-          $errorRequired = TRUE;
+        if (empty($params['last_name'])) {
           $missingNames[] = ts('Last Name');
-        }
-        if ($errorRequired) {
-          $and = ' ' . ts('and') . ' ';
-          $errorMessage = ts('Missing required fields:') . ' ' . implode($and, $missingNames);
         }
         break;
 
       case 'Household':
-        if ($this->_householdNameIndex < 0 || empty($values[$this->_householdNameIndex])) {
-          $errorRequired = TRUE;
-          $errorMessage = ts('Missing required fields:') . ' ' . ts('Household Name');
+        if (empty($params['household_name'])) {
+          $missingNames[] = ts('Missing required fields:') . ' ' . ts('Household Name');
         }
         break;
 
       case 'Organization':
-        if ($this->_organizationNameIndex < 0 || empty($values[$this->_organizationNameIndex])) {
-          $errorRequired = TRUE;
-          $errorMessage = ts('Missing required fields:') . ' ' . ts('Organization Name');
+        if (empty($params['organization_name'])) {
+          $missingNames[] = ts('Missing required fields:') . ' ' . ts('Organization Name');
         }
         break;
+    }
+    if (!empty($missingNames)) {
+      $errorMessage = ts('Missing required fields:') . ' ' . implode(' ' . ts('and') . ' ', $missingNames);
+      $errorRequired = TRUE;
     }
 
     if ($this->_emailIndex >= 0) {
