@@ -102,7 +102,6 @@ class CRM_Contact_Import_ImportJob {
       if ($selOne && (is_numeric($selOne) || $selOne === 'Primary')) {
         if ($fldName === 'url') {
           $header[] = $websiteTypes[$selOne];
-          $parserParameters['mapperWebsiteType'][$key] = $selOne;
         }
         else {
           $header[] = $locationTypes[$selOne];
@@ -141,19 +140,15 @@ class CRM_Contact_Import_ImportJob {
           if ($selTwo) {
             if ($selOne == 'url') {
               $header[] = $websiteTypes[$selTwo];
-              $parserParameters[$key]['relatedContactWebsiteType'][$key] = $selTwo;
             }
             else {
               $header[] = $locationTypes[$selTwo];
-              $parserParameters['relatedContactLocType'][$key] = $selTwo;
               if ($selThree) {
                 if ($selOne == 'phone' || $selOne == 'phone_ext') {
                   $header[] = $phoneTypes[$selThree];
-                  $parserParameters['relatedContactPhoneType'][$key] = $selThree;
                 }
                 elseif ($selOne == 'im') {
                   $header[] = $imProviders[$selThree];
-                  $parserParameters['relatedContactImProvider'][$key] = $selThree;
                 }
               }
             }
@@ -170,12 +165,7 @@ class CRM_Contact_Import_ImportJob {
       $parserParameters['mapperImProvider'],
       $parserParameters['mapperRelated'],
       $parserParameters['relatedContactType'],
-      $parserParameters['relatedContactDetails'],
-      $parserParameters['relatedContactLocType'],
-      $parserParameters['relatedContactPhoneType'],
-      $parserParameters['relatedContactImProvider'],
-      $parserParameters['mapperWebsiteType'],
-      $parserParameters['relatedContactWebsiteType']
+      $parserParameters['relatedContactDetails']
     );
     $this->_parser->setUserJobID($this->_userJobID);
     $this->_parser->run(
