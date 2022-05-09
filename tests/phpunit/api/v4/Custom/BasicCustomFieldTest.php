@@ -20,6 +20,7 @@
 namespace api\v4\Custom;
 
 use Civi\Api4\Contact;
+use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\OptionGroup;
@@ -554,12 +555,34 @@ class BasicCustomFieldTest extends CustomTestBase {
       'is_deductible' => TRUE,
       'is_reserved' => FALSE,
     ]);
+    $financialType2 = $this->createTestRecord('FinancialType', [
+      'name' => 'Fake_Type',
+      'is_deductible' => TRUE,
+      'is_reserved' => FALSE,
+    ]);
     $contributionGroup = CustomGroup::create(FALSE)
       ->addValue('extends', 'Contribution')
-      ->addValue('title', 'Contribution Fields')
+      ->addValue('title', 'Contribution_Fields')
       ->addValue('extends_entity_column_value:name', ['Test_Type'])
+      ->addChain('fields', CustomField::create()
+        ->addValue('custom_group_id', '$id')
+        ->addValue('label', 'Dummy')
+        ->addValue('html_type', 'Text')
+      )
       ->execute()->single();
     $this->assertContains($financialType['id'], $contributionGroup['extends_entity_column_value']);
+
+    $getFieldsWithTestType = Contribution::getFields(FALSE)
+      ->addValue('financial_type_id:name', 'Test_Type')
+      ->execute()->indexBy('name');
+    // Field should be included due to financial type
+    $this->assertArrayHasKey('Contribution_Fields.Dummy', $getFieldsWithTestType);
+
+    $getFieldsWithoutTestType = Contribution::getFields(FALSE)
+      ->addValue('financial_type_id:name', 'Fake_Type')
+      ->execute()->indexBy('name');
+    // Field should be excluded due to financial type
+    $this->assertArrayNotHasKey('Contribution_Fields.Dummy', $getFieldsWithoutTestType);
   }
 
   public function testExtendsParticipantMetadata() {

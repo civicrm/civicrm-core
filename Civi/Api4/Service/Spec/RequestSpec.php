@@ -50,9 +50,23 @@ class RequestSpec implements \Iterator {
     $this->entity = $entity;
     $this->action = $action;
     $this->entityTableName = CoreUtil::getTableName($entity);
-    // Set contact_type from id if possible
-    if ($entity === 'Contact' && empty($values['contact_type']) && !empty($values['id'])) {
-      $values['contact_type'] = \CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $values['id'], 'contact_type');
+
+    // If `id` given, lookup other values needed to filter custom fields
+    $customInfo = \Civi\Api4\Utils\CoreUtil::getCustomGroupExtends($entity);
+    $idCol = $customInfo['column'] ?? NULL;
+    if ($idCol && !empty($values[$idCol])) {
+      $grouping = (array) $customInfo['grouping'];
+      $lookupNeeded = array_diff($grouping, array_keys($values));
+      if ($lookupNeeded) {
+        $record = \civicrm_api4($entity, 'get', [
+          'checkPermissions' => FALSE,
+          'where' => [[$idCol, '=', $values[$idCol]]],
+          'select' => $lookupNeeded,
+        ])->first();
+        if ($record) {
+          $values += $record;
+        }
+      }
     }
     $this->values = $values;
   }
