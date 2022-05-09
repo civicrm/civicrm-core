@@ -49,24 +49,20 @@
         <td class="explanation">{ts}Total rows (participant records) in uploaded file.{/ts}</td>
     </tr>
 
-    {if $invalidRowCount }
-    <tr class="error"><td class="label crm-grid-cell">{ts}Invalid Rows (skipped){/ts}</td>
+    {if $invalidRowCount}
+      <tr class="error"><td class="label crm-grid-cell">{ts}Invalid Rows (skipped){/ts}</td>
         <td class="data">{$invalidRowCount}</td>
         <td class="explanation">{ts}Rows with invalid data in one or more fields. These rows will be skipped (not imported).{/ts}
-            {if $invalidRowCount}
-                <p><a href="{$downloadErrorRecordsUrl}">{ts}Download Errors{/ts}</a></p>
-            {/if}
+          <p><a href="{$downloadErrorRecordsUrl}">{ts}Download Errors{/ts}</a></p>
         </td>
     </tr>
     {/if}
 
     {if $duplicateRowCount}
-    <tr class="error"><td class="label crm-grid-cell">{ts}Duplicate Rows{/ts}</td>
+      <tr class="error"><td class="label crm-grid-cell">{ts}Duplicate Rows{/ts}</td>
         <td class="data">{$duplicateRowCount}</td>
         <td class="explanation">{ts}Rows which are duplicates of existing CiviCRM participant records.{/ts} {$dupeActionString}
-            {if $duplicateRowCount}
-                <p><a href="{$downloadDuplicateRecordsUrl}">{ts}Download Duplicates{/ts}</a></p>
-            {/if}
+          <p><a href="{$downloadDuplicateRecordsUrl}">{ts}Download Duplicates{/ts}</a></p>
         </td>
     </tr>
     {/if}

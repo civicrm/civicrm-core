@@ -39,12 +39,10 @@
     </tr>
 
     {if $invalidRowCount}
-    <tr class="error"><td class="label crm-grid-cell">{ts}Rows with Errors{/ts}</td>
+      <tr class="error"><td class="label crm-grid-cell">{ts}Rows with Errors{/ts}</td>
         <td class="data">{$invalidRowCount}</td>
         <td class="explanation">{ts}Rows with invalid data in one or more fields. These rows will be skipped (not imported).{/ts}
-            {if $invalidRowCount}
-                <p><a href="{$downloadErrorRecordsUrl}">{ts}Download Errors{/ts}</a></p>
-            {/if}
+          <p><a href="{$downloadErrorRecordsUrl}">{ts}Download Errors{/ts}</a></p>
         </td>
     </tr>
     {/if}
