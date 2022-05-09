@@ -6,6 +6,8 @@ require_once 'tests/phpunit/api/v4/Api4TestBase.php';
 require_once 'tests/phpunit/api/v4/Custom/CustomTestBase.php';
 
 use api\v4\Custom\CustomTestBase;
+use Civi\Api4\Activity;
+use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 
@@ -246,7 +248,7 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
     $this->assertEquals('abc', $result[0]['columns'][3]['val']);
     $this->assertEquals($childRel, $result[0]['columns'][3]['edit']['record']['id']);
     $this->assertNull($result[0]['columns'][4]['val']);
-    // $this->assertArrayNotHasKey('edit', $result[0]['columns'][4]);
+    $this->assertArrayNotHasKey('edit', $result[0]['columns'][4]);
 
     // Second contact has a spouse relation but not a child
     $this->assertEquals('s', $result[1]['columns'][1]['val']);
@@ -254,7 +256,7 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
     $this->assertEquals('Married', $result[1]['columns'][2]['val']);
     $this->assertEquals($spouseRel, $result[1]['columns'][2]['edit']['record']['id']);
     $this->assertNull($result[1]['columns'][3]['val']);
-    // $this->assertArrayNotHasKey('edit', $result[1]['columns'][3]);
+    $this->assertArrayNotHasKey('edit', $result[1]['columns'][3]);
     $this->assertNull($result[1]['columns'][4]['val']);
     $this->assertEquals($spouseRel, $result[1]['columns'][4]['edit']['record']['id']);
 
@@ -267,6 +269,118 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
     $this->assertArrayNotHasKey('edit', $result[2]['columns'][3]);
     $this->assertNull($result[2]['columns'][4]['val']);
     $this->assertArrayNotHasKey('edit', $result[2]['columns'][4]);
+  }
+
+  public function testEditableCustomFields() {
+    $subject = uniqid(__FUNCTION__);
+
+    $contact = Contact::create(FALSE)
+      ->execute()->single();
+
+    // CustomGroup based on Activity Type
+    CustomGroup::create(FALSE)
+      ->addValue('extends', 'Activity')
+      ->addValue('extends_entity_column_value:name', ['Meeting', 'Phone Call'])
+      ->addValue('title', 'meeting_phone')
+      ->addChain('field', CustomField::create()
+        ->addValue('custom_group_id', '$id')
+        ->addValue('label', 'sub_field')
+        ->addValue('html_type', 'Text')
+      )
+      ->execute();
+
+    $sampleData = [
+      ['activity_type_id:name' => 'Meeting', 'meeting_phone.sub_field' => 'Abc'],
+      ['activity_type_id:name' => 'Phone Call'],
+      ['activity_type_id:name' => 'Email'],
+    ];
+    $activity = $this->saveTestRecords('Activity', [
+      'defaults' => ['subject' => $subject, 'source_contact_id', $contact['id']],
+      'records' => $sampleData,
+    ]);
+
+    $activityTypes = array_column(
+      Activity::getFields(FALSE)->setLoadOptions(['id', 'name'])->addWhere('name', '=', 'activity_type_id')->execute()->single()['options'],
+      'id',
+      'name'
+    );
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Activity',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['subject', 'meeting_phone.sub_field'],
+          'where' => [['subject', '=', $subject]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'columns' => [
+            [
+              'key' => 'subject',
+              'label' => 'First',
+              'dataType' => 'String',
+              'type' => 'field',
+              'editable' => TRUE,
+            ],
+            [
+              'key' => 'meeting_phone.sub_field',
+              'label' => 'First',
+              'dataType' => 'String',
+              'type' => 'field',
+              'editable' => TRUE,
+            ],
+          ],
+          'sort' => [
+            ['id', 'ASC'],
+          ],
+        ],
+      ],
+      'afform' => NULL,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    // Custom field editable
+    $expectedCustomFieldEdit = [
+      'entity' => 'Activity',
+      'input_type' => 'Text',
+      'data_type' => 'String',
+      'options' => FALSE,
+      'serialize' => FALSE,
+      'nullable' => TRUE,
+      'fk_entity' => NULL,
+      'value_key' => 'meeting_phone.sub_field',
+      'record' => ['id' => $activity[0]['id']],
+      'action' => 'update',
+      'value' => 'Abc',
+    ];
+    $expectedSubjectEdit = ['value_key' => 'subject', 'value' => $subject] + $expectedCustomFieldEdit;
+
+    // First Activity
+    $this->assertEquals($expectedSubjectEdit, $result[0]['columns'][0]['edit']);
+    $this->assertEquals($expectedCustomFieldEdit, $result[0]['columns'][1]['edit']);
+    $this->assertEquals($activityTypes['Meeting'], $result[0]['data']['activity_type_id']);
+
+    // Second Activity
+    $expectedSubjectEdit['record']['id'] = $activity[1]['id'];
+    $expectedCustomFieldEdit['record']['id'] = $activity[1]['id'];
+    $expectedCustomFieldEdit['value'] = NULL;
+    $this->assertEquals($expectedSubjectEdit, $result[1]['columns'][0]['edit']);
+    $this->assertEquals($expectedCustomFieldEdit, $result[1]['columns'][1]['edit']);
+    $this->assertEquals($activityTypes['Phone Call'], $result[1]['data']['activity_type_id']);
+
+    // Third Activity
+    $expectedSubjectEdit['record']['id'] = $activity[2]['id'];
+    $this->assertEquals($expectedSubjectEdit, $result[2]['columns'][0]['edit']);
+    $this->assertTrue(!isset($result[2]['columns'][1]['edit']));
+    $this->assertEquals($activityTypes['Email'], $result[2]['data']['activity_type_id']);
   }
 
 }
