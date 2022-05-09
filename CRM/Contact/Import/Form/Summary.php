@@ -80,9 +80,6 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
     $this->assign('dupeActionString', $dupeActionString);
 
     $properties = [
-      'downloadErrorRecordsUrl',
-      'duplicateRowCount',
-      'downloadDuplicateRecordsUrl',
       'downloadMismatchRecordsUrl',
       'groupAdditions',
       'tagAdditions',
@@ -95,8 +92,9 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
     $this->assign('totalRowCount', $this->getRowCount());
     $this->assign('validRowCount', $this->getRowCount(CRM_Import_Parser::VALID));
     $this->assign('invalidRowCount', $this->getRowCount(CRM_Import_Parser::ERROR));
+    $this->assign('duplicateRowCount', $this->getRowCount(CRM_Import_Parser::DUPLICATE));
     $this->assign('downloadDuplicateRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::DUPLICATE));
-
+    $this->assign('downloadErrorRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::ERROR));
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/import/contact', 'reset=1'));
   }
