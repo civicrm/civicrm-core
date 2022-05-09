@@ -243,10 +243,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       if ($mode == self::MODE_MAPFIELD) {
         $returnCode = CRM_Import_Parser::VALID;
       }
-      elseif ($mode == self::MODE_PREVIEW) {
-        $returnCode = $this->preview($values);
-      }
-      elseif ($mode == self::MODE_SUMMARY) {
+      // Note that import summary appears to be unused
+      elseif ($mode == self::MODE_PREVIEW || $mode == self::MODE_SUMMARY) {
         $returnCode = $this->summary($values);
       }
       elseif ($mode == self::MODE_IMPORT) {
@@ -716,26 +714,13 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   }
 
   /**
-   * Handle the values in preview mode.
-   *
-   * @param array $values
-   *   The array of values belonging to this line.
-   *
-   * @return bool
-   *   the result of this processing
-   */
-  public function preview(&$values) {
-    return $this->summary($values);
-  }
-
-  /**
    * Handle the values in summary mode.
    *
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return bool
-   *   the result of this processing
+   * @return int
+   *   CRM_Import_Parser::VALID or CRM_Import_Parser::ERROR
    */
   public function summary(&$values) {
     $this->setActiveFieldValues($values);
@@ -769,14 +754,21 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return bool
-   *   the result of this processing
+   * @return int
+   *   the result of this processing - one of
+   *   - CRM_Import_Parser::VALID
+   *   - CRM_Import_Parser::ERROR
+   *   - CRM_Import_Parser::SOFT_CREDIT_ERROR
+   *   - CRM_Import_Parser::PLEDGE_PAYMENT_ERROR
+   *   - CRM_Import_Parser::DUPLICATE
+   *   - CRM_Import_Parser::SOFT_CREDIT (successful creation)
+   *   - CRM_Import_Parser::PLEDGE_PAYMENT (successful creation)
    */
   public function import($onDuplicate, &$values) {
     // first make sure this is a valid line
     $response = $this->summary($values);
     if ($response != CRM_Import_Parser::VALID) {
-      return $response;
+      return CRM_Import_Parser::ERROR;
     }
 
     $params = &$this->getActiveFieldParams();
