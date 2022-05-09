@@ -109,7 +109,9 @@
       };
 
       $scope.isRepeatable = function() {
-        return ctrl.node['af-fieldset'] || (block.directive && afGui.meta.blocks[block.directive].repeat) || ctrl.join;
+        return ctrl.join ||
+          (block.directive && afGui.meta.blocks[block.directive].repeat) ||
+          (ctrl.node['af-fieldset'] && ctrl.editor.getEntityDefn(ctrl.editor.getEntity(ctrl.node['af-fieldset'])) !== false);
       };
 
       this.toggleRepeat = function() {

@@ -13,7 +13,12 @@ use Civi\Api4\Afform;
  */
 class FormDataModel {
 
-  protected $defaults = ['security' => 'RBAC', 'actions' => ['create' => TRUE, 'update' => TRUE]];
+  protected $defaults = [
+    'security' => 'RBAC',
+    'actions' => ['create' => TRUE, 'update' => TRUE],
+    'min' => 1,
+    'max' => 1,
+  ];
 
   /**
    * @var array[]
@@ -136,9 +141,14 @@ class FormDataModel {
       if (!is_array($node) || !isset($node['#tag'])) {
         continue;
       }
-      elseif (isset($node['af-fieldset']) && !empty($node['#children'])) {
-        $searchDisplay = $node['af-fieldset'] ? NULL : $this->findSearchDisplay($node);
-        $this->parseFields($node['#children'], $node['af-fieldset'], $join, $searchDisplay);
+      elseif (isset($node['af-fieldset'])) {
+        $entity = $node['af-fieldset'] ?? NULL;
+        $searchDisplay = $entity ? NULL : $this->findSearchDisplay($node);
+        if ($entity && isset($node['af-repeat'])) {
+          $this->entities[$entity]['min'] = $node['min'] ?? 0;
+          $this->entities[$entity]['max'] = $node['max'] ?? NULL;
+        }
+        $this->parseFields($node['#children'] ?? [], $node['af-fieldset'], $join, $searchDisplay);
       }
       elseif ($searchDisplay && $node['#tag'] === 'af-field') {
         $this->searchDisplays[$searchDisplay]['fields'][$node['name']] = AHQ::getProps($node);

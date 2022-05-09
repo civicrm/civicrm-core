@@ -35,6 +35,7 @@
     <required>true</required>
     <comment>id of the first contact</comment>
     <html>
+      <type>EntityRef</type>
       <label>Contact A</label>
     </html>
     <add>1.1</add>
