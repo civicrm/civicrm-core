@@ -52,51 +52,46 @@
         {ts 1=$downloadAddressRecordsUrl}You can <a href='%1'>Download Street Address Records </a>. You may then edit those contact records and update the street address accordingly.{/ts}
         </p>
     {/if}
- </div>
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
+</div>
+<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
  {* Summary of Import Results (record counts) *}
- <table id="summary-counts" class="report">
+  <table id="summary-counts" class="report">
     <tr><td class="label crm-grid-cell">{ts}Total Rows{/ts}</td>
-        <td class="data">{$totalRowCount}</td>
-        <td class="explanation">{ts}Total number of rows in the imported data.{/ts}</td>
+      <td class="data">{$totalRowCount}</td>
+      <td class="explanation">{ts}Total number of rows in the imported data.{/ts}</td>
     </tr>
 
-    {if $invalidRowCount }
-    <tr class="error"><td class="label crm-grid-cell">{ts}Invalid Rows (skipped){/ts}</td>
+    {if $invalidRowCount}
+      <tr class="error"><td class="label crm-grid-cell">{ts}Invalid Rows (skipped){/ts}</td>
         <td class="data">{$invalidRowCount}</td>
         <td class="explanation">{ts}Rows with invalid data in one or more fields (for example, invalid email address formatting). These rows will be skipped (not imported).{/ts}
-            {if $invalidRowCount}
-                <div class="action-link"><a href="{$downloadErrorRecordsUrl|smarty:nodefaults}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Errors{/ts}</a></div>
-            {/if}
+          <div class="action-link"><a href="{$downloadErrorRecordsUrl|smarty:nodefaults}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Errors{/ts}</a></div>
         </td>
-    </tr>
+      </tr>
     {/if}
 
-    {if $unMatchCount }
-    <tr class="error"><td class="label crm-grid-cell">{ts}Mismatched Rows (skipped){/ts}</td>
+    {if $unMatchCount}
+      <tr class="error"><td class="label crm-grid-cell">{ts}Mismatched Rows (skipped){/ts}</td>
         <td class="data">{$unMatchCount}</td>
         <td class="explanation">{ts}Rows with mismatched contact IDs... (NOT updated).{/ts}
-            {if $unMatchCount}
-                <<div class="action-link"><a href="{$downloadMismatchRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Mismatched Contacts{/ts}</a></div>
-            {/if}
+          <div class="action-link"><a href="{$downloadMismatchRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Mismatched Contacts{/ts}</a></div>
         </td>
-    </tr>
+      </tr>
     {/if}
 
     {if $duplicateRowCount && $dupeError}
-    <tr class="error"><td class="label crm-grid-cell">{ts}Duplicate Rows{/ts}</td>
+      <tr class="error"><td class="label crm-grid-cell">{ts}Duplicate Rows{/ts}</td>
         <td class="data">{$duplicateRowCount}</td>
         <td class="explanation">{ts}Rows which are duplicates of existing CiviCRM contact records.{/ts} {$dupeActionString}
-            {if $duplicateRowCount}
-                <div class="action-link"><a href="{$downloadDuplicateRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Duplicates{/ts}</a></div>
-            {/if}
+          <div class="action-link"><a href="{$downloadDuplicateRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Duplicates{/ts}</a></div>
         </td>
     </tr>
     {/if}
 
-    <tr><td class="label crm-grid-cell">{ts}Total Contacts{/ts}</td>
-        <td class="data">{$validRowCount}</td>
-        <td class="explanation">{ts}Total number of contact records created or modified during the import.{/ts}</td>
+    <tr>
+      <td class="label crm-grid-cell">{ts}Total Contacts{/ts}</td>
+      <td class="data">{$validRowCount}</td>
+      <td class="explanation">{ts}Total number of contact records created or modified during the import.{/ts}</td>
     </tr>
 
     {if $groupAdditions}
