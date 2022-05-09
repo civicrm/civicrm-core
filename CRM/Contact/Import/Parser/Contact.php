@@ -30,7 +30,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
   protected $_mapperKeys = [];
   protected $_mapperRelated;
-  protected $_mapperRelatedContactType;
   protected $_mapperRelatedContactDetails;
   protected $_relationships;
 
@@ -168,7 +167,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     parent::__construct();
     $this->_mapperKeys = $mapperKeys;
     $this->_mapperRelated = &$mapperRelated;
-    $this->_mapperRelatedContactType = &$mapperRelatedContactType;
     $this->_mapperRelatedContactDetails = &$mapperRelatedContactDetails;
   }
 
@@ -183,7 +181,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $this->_newContacts = [];
 
     $this->setActiveFields($this->_mapperKeys);
-    $this->setActiveFieldRelatedContactType($this->_mapperRelatedContactType);
 
     $this->_phoneIndex = -1;
     $this->_emailIndex = -1;
@@ -2596,15 +2593,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * @param $elements
-   */
-  public function setActiveFieldRelatedContactType($elements) {
-    for ($i = 0; $i < count($elements); $i++) {
-      $this->_activeFields[$i]->_relatedContactType = $elements[$i];
-    }
-  }
-
-  /**
    * Format the field values for input to the api.
    *
    * @return array
@@ -2623,7 +2611,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
       $relatedContactFieldName = $relatedContactKey ? $mappedField['name'] : NULL;
       // RelatedContactType is not part of the mapping but rather calculated from the relationship.
-      $relatedContactType = $this->_activeFields[$i]->_relatedContactType;
+      $relatedContactType = $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction']);
       $relatedContactLocationTypeID = $relatedContactKey ? $mappedField['location_type_id'] : NULL;
       $relatedContactWebsiteTypeID = $relatedContactKey ? $mappedField['website_type_id'] : NULL;
       $relatedContactIMProviderID = $relatedContactKey ? $mappedField['im_provider_id'] : NULL;
@@ -3501,6 +3489,30 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $mappedFields[] = $mappedField;
     }
     return $mappedFields;
+  }
+
+  /**
+   * Get the related contact type.
+   *
+   * @param int|null $relationshipTypeID
+   * @param int|string $relationshipDirection
+   *
+   * @return null|string
+   *
+   * @throws \API_Exception
+   */
+  protected function getRelatedContactType($relationshipTypeID, $relationshipDirection): ?string {
+    if (!$relationshipTypeID) {
+      return NULL;
+    }
+    $cacheKey = $relationshipTypeID . $relationshipDirection;
+    if (!isset(Civi::$statics[__CLASS__][$cacheKey])) {
+      $relationshipField = 'contact_type_' . substr($relationshipDirection, -1);
+      Civi::$statics[__CLASS__][$cacheKey] = RelationshipType::get(FALSE)
+        ->addWhere('id', '=', $relationshipTypeID)
+        ->addSelect($relationshipField)->execute()->first()[$relationshipField];
+    }
+    return Civi::$statics[__CLASS__][$cacheKey];
   }
 
 }
