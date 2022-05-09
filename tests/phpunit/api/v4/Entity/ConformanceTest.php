@@ -20,7 +20,6 @@ namespace api\v4\Entity;
 
 use api\v4\Service\TestCreationParameterProvider;
 use api\v4\Traits\CheckAccessTrait;
-use api\v4\Traits\OptionCleanupTrait;
 use api\v4\Traits\TableDropperTrait;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\CustomField;
@@ -35,18 +34,14 @@ use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\PostEvent;
 use Civi\Core\Event\PreEvent;
 use Civi\Test\HookInterface;
-use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class ConformanceTest extends Api4TestBase implements HookInterface, TransactionalInterface {
+class ConformanceTest extends Api4TestBase implements HookInterface {
 
   use CheckAccessTrait;
   use TableDropperTrait;
-  use OptionCleanupTrait {
-    setUp as setUpOptionCleanup;
-  }
 
   /**
    * @var \api\v4\Service\TestCreationParameterProvider
@@ -61,7 +56,6 @@ class ConformanceTest extends Api4TestBase implements HookInterface, Transaction
   public function setUp(): void {
     // Enable all components
     \CRM_Core_BAO_ConfigSetting::enableAllComponents();
-    $this->setUpOptionCleanup();
     $this->loadDataSet('CaseType');
     $this->loadDataSet('ConformanceTest');
     $gatherer = new SpecGatherer();
