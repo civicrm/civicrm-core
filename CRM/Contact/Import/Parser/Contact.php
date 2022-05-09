@@ -2637,44 +2637,45 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $importedValue = $this->_activeFields[$i]->_value;
 
       if (isset($importedValue)) {
-        if (isset($locationTypeID)) {
+        if (!$relatedContactKey) {
+          if (isset($locationTypeID)) {
+            if (!isset($params[$fieldName])) {
+              $params[$fieldName] = [];
+            }
+
+            $value = [
+              $fieldName => $importedValue,
+              'location_type_id' => $locationTypeID,
+            ];
+
+            if (isset($phoneTypeID)) {
+              $value['phone_type_id'] = $phoneTypeID;
+            }
+
+            // get IM service Provider type id
+            if (isset($imProviderID)) {
+              $value['provider_id'] = $imProviderID;
+            }
+
+            $params[$fieldName][] = $value;
+          }
+          elseif (isset($websiteTypeID)) {
+            $value = [
+              $fieldName => $importedValue,
+              'website_type_id' => $websiteTypeID,
+            ];
+
+            $params[$fieldName][] = $value;
+          }
+
           if (!isset($params[$fieldName])) {
-            $params[$fieldName] = [];
+            if (!isset($relatedContactKey)) {
+              $params[$fieldName] = $importedValue;
+            }
           }
 
-          $value = [
-            $fieldName => $importedValue,
-            'location_type_id' => $locationTypeID,
-          ];
-
-          if (isset($phoneTypeID)) {
-            $value['phone_type_id'] = $phoneTypeID;
-          }
-
-          // get IM service Provider type id
-          if (isset($imProviderID)) {
-            $value['provider_id'] = $imProviderID;
-          }
-
-          $params[$fieldName][] = $value;
         }
-        elseif (isset($websiteTypeID)) {
-          $value = [
-            $fieldName => $importedValue,
-            'website_type_id' => $websiteTypeID,
-          ];
-
-          $params[$fieldName][] = $value;
-        }
-
-        if (!isset($params[$fieldName])) {
-          if (!isset($relatedContactKey)) {
-            $params[$fieldName] = $importedValue;
-          }
-        }
-
-        //minor fix for CRM-4062
-        if (isset($relatedContactKey)) {
+        else {
           if (!isset($params[$relatedContactKey])) {
             $params[$relatedContactKey] = [];
           }
