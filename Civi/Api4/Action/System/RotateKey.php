@@ -60,7 +60,7 @@ class RotateKey extends AbstractAction {
        * @param string $message
        * @param array $context
        */
-      public function log($level, $message, array $context = []) {
+      public function log($level, $message, array $context = []): void {
         $evalVar = function($m) use ($context) {
           return $context[$m[1]] ?? '';
         };

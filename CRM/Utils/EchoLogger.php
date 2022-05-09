@@ -23,7 +23,7 @@ class CRM_Utils_EchoLogger extends Psr\Log\AbstractLogger implements \Psr\Log\Lo
    * @param string $message
    * @param array $context
    */
-  public function log($level, $message, array $context = []) {
+  public function log($level, $message, array $context = []): void {
     echo $message . "\n";
   }
 
