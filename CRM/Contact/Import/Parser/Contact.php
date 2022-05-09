@@ -29,16 +29,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   use CRM_Contact_Import_MetadataTrait;
 
   protected $_mapperKeys = [];
-  protected $_mapperLocType = [];
-  protected $_mapperPhoneType;
-  protected $_mapperImProvider;
-  protected $_mapperWebsiteType;
   protected $_mapperRelated;
   protected $_mapperRelatedContactType;
   protected $_mapperRelatedContactDetails;
-  protected $_mapperRelatedContactEmailType;
-  protected $_mapperRelatedContactImProvider;
-  protected $_mapperRelatedContactWebsiteType;
   protected $_relationships;
 
   protected $_emailIndex;
@@ -169,31 +162,14 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param array $mapperRelated
    * @param array $mapperRelatedContactType
    * @param array $mapperRelatedContactDetails
-   * @param array $mapperRelatedContactLocType
-   * @param array $mapperRelatedContactPhoneType
-   * @param array $mapperRelatedContactImProvider
-   * @param array $mapperWebsiteType
-   * @param array $mapperRelatedContactWebsiteType
    */
   public function __construct(
-    $mapperKeys = [], $mapperLocType = [], $mapperPhoneType = [], $mapperImProvider = [], $mapperRelated = [], $mapperRelatedContactType = [], $mapperRelatedContactDetails = [], $mapperRelatedContactLocType = [], $mapperRelatedContactPhoneType = [], $mapperRelatedContactImProvider = [],
-    $mapperWebsiteType = [], $mapperRelatedContactWebsiteType = []
-  ) {
+    $mapperKeys = [], $mapperLocType = [], $mapperPhoneType = [], $mapperImProvider = [], $mapperRelated = [], $mapperRelatedContactType = [], $mapperRelatedContactDetails = []) {
     parent::__construct();
     $this->_mapperKeys = $mapperKeys;
-    $this->_mapperLocType = &$mapperLocType;
-    $this->_mapperPhoneType = &$mapperPhoneType;
-    $this->_mapperWebsiteType = $mapperWebsiteType;
-    // get IM service provider type id for contact
-    $this->_mapperImProvider = &$mapperImProvider;
     $this->_mapperRelated = &$mapperRelated;
     $this->_mapperRelatedContactType = &$mapperRelatedContactType;
     $this->_mapperRelatedContactDetails = &$mapperRelatedContactDetails;
-    $this->_mapperRelatedContactLocType = &$mapperRelatedContactLocType;
-    $this->_mapperRelatedContactPhoneType = &$mapperRelatedContactPhoneType;
-    $this->_mapperRelatedContactWebsiteType = $mapperRelatedContactWebsiteType;
-    // get IM service provider type id for related contact
-    $this->_mapperRelatedContactImProvider = &$mapperRelatedContactImProvider;
   }
 
   /**
@@ -207,21 +183,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $this->_newContacts = [];
 
     $this->setActiveFields($this->_mapperKeys);
-    $this->setActiveFieldLocationTypes($this->_mapperLocType);
-    $this->setActiveFieldPhoneTypes($this->_mapperPhoneType);
-    $this->setActiveFieldWebsiteTypes($this->_mapperWebsiteType);
-    //set active fields of IM provider of contact
-    $this->setActiveFieldImProviders($this->_mapperImProvider);
-
-    //related info
-    $this->setActiveFieldRelated($this->_mapperRelated);
     $this->setActiveFieldRelatedContactType($this->_mapperRelatedContactType);
-    $this->setActiveFieldRelatedContactDetails($this->_mapperRelatedContactDetails);
-    $this->setActiveFieldRelatedContactLocType($this->_mapperRelatedContactLocType);
-    $this->setActiveFieldRelatedContactPhoneType($this->_mapperRelatedContactPhoneType);
-    $this->setActiveFieldRelatedContactWebsiteType($this->_mapperRelatedContactWebsiteType);
-    //set active fields of IM provider of related contact
-    $this->setActiveFieldRelatedContactImProvider($this->_mapperRelatedContactImProvider);
 
     $this->_phoneIndex = -1;
     $this->_emailIndex = -1;
@@ -2636,111 +2598,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   /**
    * @param $elements
    */
-  public function setActiveFieldLocationTypes($elements) {
-    for ($i = 0; $i < count($elements); $i++) {
-      $this->_activeFields[$i]->_hasLocationType = $elements[$i];
-    }
-  }
-
-  /**
-   * @param $elements
-   */
-
-  /**
-   * @param $elements
-   */
-  public function setActiveFieldPhoneTypes($elements) {
-    for ($i = 0; $i < count($elements); $i++) {
-      $this->_activeFields[$i]->_phoneType = $elements[$i];
-    }
-  }
-
-  /**
-   * @param $elements
-   */
-  public function setActiveFieldWebsiteTypes($elements) {
-    for ($i = 0; $i < count($elements); $i++) {
-      $this->_activeFields[$i]->_websiteType = $elements[$i];
-    }
-  }
-
-  /**
-   * Set IM Service Provider type fields.
-   *
-   * @param array $elements
-   *   IM service provider type ids.
-   */
-  public function setActiveFieldImProviders($elements) {
-    for ($i = 0; $i < count($elements); $i++) {
-      $this->_activeFields[$i]->_imProvider = $elements[$i];
-    }
-  }
-
-  /**
-   * @param $elements
-   */
-  public function setActiveFieldRelated($elements) {
-    for ($i = 0; $i < count($elements); $i++) {
-      $this->_activeFields[$i]->_related = $elements[$i];
-    }
-  }
-
-  /**
-   * @param $elements
-   */
   public function setActiveFieldRelatedContactType($elements) {
     for ($i = 0; $i < count($elements); $i++) {
       $this->_activeFields[$i]->_relatedContactType = $elements[$i];
-    }
-  }
-
-  /**
-   * @param $elements
-   */
-  public function setActiveFieldRelatedContactDetails($elements) {
-    for ($i = 0; $i < count($elements); $i++) {
-      $this->_activeFields[$i]->_relatedContactDetails = $elements[$i];
-    }
-  }
-
-  /**
-   * @param $elements
-   */
-  public function setActiveFieldRelatedContactLocType($elements) {
-    for ($i = 0; $i < count($elements); $i++) {
-      $this->_activeFields[$i]->_relatedContactLocType = $elements[$i];
-    }
-  }
-
-  /**
-   * Set active field for related contact's phone type.
-   *
-   * @param array $elements
-   */
-  public function setActiveFieldRelatedContactPhoneType($elements) {
-    for ($i = 0; $i < count($elements); $i++) {
-      $this->_activeFields[$i]->_relatedContactPhoneType = $elements[$i];
-    }
-  }
-
-  /**
-   * @param $elements
-   */
-  public function setActiveFieldRelatedContactWebsiteType($elements) {
-    for ($i = 0; $i < count($elements); $i++) {
-      $this->_activeFields[$i]->_relatedContactWebsiteType = $elements[$i];
-    }
-  }
-
-  /**
-   * Set IM Service Provider type fields for related contacts.
-   *
-   * @param array $elements
-   *   IM service provider type ids of related contact.
-   */
-  public function setActiveFieldRelatedContactImProvider($elements) {
-    for ($i = 0; $i < count($elements); $i++) {
-      $this->_activeFields[$i]->_relatedContactImProvider = $elements[$i];
     }
   }
 
