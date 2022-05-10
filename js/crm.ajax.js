@@ -28,11 +28,13 @@
       path = path.split('#')[0];
     }
     frag = path.split('?');
+    // Remove basepage as it can be changed on some CMS eg. WordPress frontend.
+    frag[0] = frag[0].replace('civicrm/', '/');
     // Encode url path only if slashes in placeholder were also encoded
-    if (tplURL[mode].indexOf('civicrm/placeholder-url-path') >= 0) {
-      url = tplURL[mode].replace('civicrm/placeholder-url-path', frag[0]);
+    if (tplURL[mode].indexOf('/placeholder-url-path') >= 0) {
+      url = tplURL[mode].replace('/placeholder-url-path', frag[0]);
     } else {
-      url = tplURL[mode].replace('civicrm%2Fplaceholder-url-path', encodeURIComponent(frag[0]));
+      url = tplURL[mode].replace('%2Fplaceholder-url-path', encodeURIComponent(frag[0]));
     }
 
     if (_.isEmpty(query)) {
