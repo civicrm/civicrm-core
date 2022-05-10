@@ -736,6 +736,11 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Get combinations to test for validation.
+   *
+   * @return array[]
+   */
   public function validateDataProvider(): array {
     return [
       'individual_required' => [
@@ -752,6 +757,41 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
         'csv' => 'individual_invalid_related_email.csv',
         'mapper' => [['1_a_b', 'email', 1], ['first_name'], ['last_name']],
         'expected_error' => 'Invalid value for field(s) : email',
+      ],
+    ];
+  }
+
+  /**
+   * Test the import.
+   *
+   * @dataProvider importDataProvider
+   *
+   * @throws \API_Exception
+   */
+  public function testImport($csv, $mapper, $expectedError): void {
+    try {
+      $this->importCSV($csv, $mapper);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertSame($expectedError, $e->getMessage());
+      return;
+    }
+    if ($expectedError) {
+      $this->fail('expected error :' . $expectedError);
+    }
+  }
+
+  /**
+   * Get combinations to test for validation.
+   *
+   * @return array[]
+   */
+  public function importDataProvider(): array {
+    return [
+      'individual_invalid_sub_type' => [
+        'csv' => 'individual_invalid_contact_sub_type.csv',
+        'mapper' => [['first_name'], ['last_name'], ['contact_sub_type']],
+        'expected_error' => 'Invalid value for field(s) : type',
       ],
     ];
   }
@@ -1147,6 +1187,44 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $parser->setUserJobID($userJobID);
     $parser->init();
     $parser->validateValues(array_values($dataSource->getRow()));
+  }
+
+  /**
+   * Import the csv file values.
+   *
+   * This function uses a flow that mimics the UI flow.
+   *
+   * @param string $csv Name of csv file.
+   * @param array $mapper Mapping as entered on MapField form.
+   *   e.g [['first_name']['email', 1]].
+   * @param array $submittedValues
+   */
+  protected function importCSV(string $csv, array $mapper, array $submittedValues = []): void {
+    $submittedValues = array_merge([
+      'uploadFile' => ['name' => __DIR__ . '/../Form/data/' . $csv],
+      'skipColumnHeader' => TRUE,
+      'fieldSeparator' => ',',
+      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'mapper' => $mapper,
+      'dataSource' => 'CRM_Import_DataSource_CSV',
+      'file' => ['name' => $csv],
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
+      'groups' => [],
+    ], $submittedValues);
+    $form = $this->getFormObject('CRM_Contact_Import_Form_DataSource', $submittedValues);
+    $form->buildForm();
+    $form->postProcess();
+    $userJobID = $form->getUserJobID();
+    /* @var CRM_Contact_Import_Form_MapField $form */
+    $form = $this->getFormObject('CRM_Contact_Import_Form_MapField', $submittedValues);
+    $form->setUserJobID($userJobID);
+    $form->buildForm();
+    $form->postProcess();
+    /* @var CRM_Contact_Import_Form_MapField $form */
+    $form = $this->getFormObject('CRM_Contact_Import_Form_Preview', $submittedValues);
+    $form->setUserJobID($userJobID);
+    $form->buildForm();
+    $form->postProcess();
   }
 
 }
