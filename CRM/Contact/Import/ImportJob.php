@@ -155,7 +155,6 @@ class CRM_Contact_Import_ImportJob {
           }
         }
       }
-      $mapperFields[] = implode(' - ', $header);
     }
 
     $this->_parser = new CRM_Contact_Import_Parser_Contact(
@@ -169,7 +168,7 @@ class CRM_Contact_Import_ImportJob {
     );
     $this->_parser->setUserJobID($this->_userJobID);
     $this->_parser->run(
-      $mapperFields,
+      [],
       CRM_Import_Parser::MODE_IMPORT,
       $this->_statusID,
       $this->_totalRowCount
