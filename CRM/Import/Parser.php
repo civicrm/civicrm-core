@@ -499,6 +499,47 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * Validate that we have the required fields to create the contact or find it to update.
+   *
+   * Note that the users duplicate selection affects this as follows
+   * - if they did not select an update variant then the id field is not
+   *   permitted in the mapping - so we can assume the presence of id means
+   *   we should use it
+   * - the external_identifier field is valid in place of the other fields
+   *   when they have chosen update or fill - in this case we are only looking
+   *   to update an existing contact.
+   *
+   * @param string $contactType
+   * @param array $params
+   * @param bool $isPermitExistingMatchFields
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  protected function validateRequiredContactFields(string $contactType, array $params, bool $isPermitExistingMatchFields = TRUE): void {
+    if (!empty($params['id'])) {
+      return;
+    }
+    $requiredFields = [
+      'Individual' => [
+        'first_name_last_name' => ['first_name' => ts('First Name'), 'last_name' => ts('Last Name')],
+        'email' => ts('Email Address'),
+      ],
+      'Organization' => ['organization_name' => ts('Organization Name')],
+      'Household' => ['household_name' => ts('Household Name')],
+    ][$contactType];
+    if ($isPermitExistingMatchFields) {
+      $requiredFields['external_identifier'] = ts('External Identifier');
+      // Historically just an email has been accepted as it is 'usually good enough'
+      // for a dedupe rule look up - but really this is a stand in for
+      // whatever is needed to find an existing matching contact using the
+      // specified dedupe rule (or the default Unsupervised if not specified).
+      $requiredFields['email'] = ts('Email Address');
+    }
+    $this->validateRequiredFields($requiredFields, $params);
+  }
+
+  /**
    * Determines the file extension based on error code.
    *
    * @var int $type error code constant
@@ -1071,6 +1112,58 @@ abstract class CRM_Import_Parser {
     else {
       return explode(',', $error['error_message']['params'][0]);
     }
+  }
+
+  /**
+   * Validate that the field requirements are met in the params.
+   *
+   * @param array $requiredFields
+   * @param array $params
+   *   An array of required fields (fieldName => label)
+   *   - note this follows the and / or array nesting we see in permission checks
+   *   eg.
+   *   [
+   *     'email' => ts('Email'),
+   *     ['first_name' => ts('First Name'), 'last_name' => ts('Last Name')]
+   *   ]
+   *   Means 'email' OR 'first_name AND 'last_name'.
+   *
+   * @throws \CRM_Core_Exception
+   *   Exception thrown if field requirements are not met.
+   */
+  protected function validateRequiredFields(array $requiredFields, array $params): void {
+    $missingFields = [];
+    foreach ($requiredFields as $key => $required) {
+      if (!is_array($required)) {
+        $importParameter = $params[$key] ?? [];
+        if (!is_array($importParameter)) {
+          if (!empty($importParameter)) {
+            return;
+          }
+        }
+        else {
+          foreach ($importParameter as $locationValues) {
+            if (!empty($locationValues[$key])) {
+              return;
+            }
+          }
+        }
+
+        $missingFields[$key] = $required;
+      }
+      else {
+        foreach ($required as $field => $label) {
+          if (empty($params[$field])) {
+            $missing[$field] = $label;
+          }
+        }
+        if (empty($missing)) {
+          return;
+        }
+        $missingFields[$key] = implode(' ' . ts('and') . ' ', $missing);
+      }
+    }
+    throw new CRM_Core_Exception(ts('Missing required fields:') . ' ' . implode(' ' . ts('OR') . ' ', $missingFields));
   }
 
 }

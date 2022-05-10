@@ -33,10 +33,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   protected $_mapperRelatedContactDetails;
   protected $_relationships;
 
-  protected $_emailIndex;
-
-  protected $_phoneIndex;
-
   /**
    * Is update only permitted on an id match.
    *
@@ -143,18 +139,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     $this->setActiveFields($this->_mapperKeys);
 
-    $this->_phoneIndex = -1;
-    $this->_emailIndex = -1;
     $this->_externalIdentifierIndex = -1;
 
     $index = 0;
     foreach ($this->_mapperKeys as $key) {
-      if (substr($key, 0, 5) == 'email' && substr($key, 0, 14) != 'email_greeting') {
-        $this->_emailIndex = $index;
-      }
-      if (substr($key, 0, 5) == 'phone') {
-        $this->_phoneIndex = $index;
-      }
       if ($key == 'external_identifier') {
         $this->_externalIdentifierIndex = $index;
       }
@@ -162,14 +150,25 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
 
     $this->_updateWithId = FALSE;
-    if (in_array('id', $this->_mapperKeys) || ($this->_externalIdentifierIndex >= 0 && in_array($this->_onDuplicate, [
-      CRM_Import_Parser::DUPLICATE_UPDATE,
-      CRM_Import_Parser::DUPLICATE_FILL,
-    ]))) {
+    if (in_array('id', $this->_mapperKeys) || ($this->_externalIdentifierIndex >= 0 && $this->isUpdateExistingContacts())) {
       $this->_updateWithId = TRUE;
     }
 
     $this->_parseStreetAddress = CRM_Utils_Array::value('street_address_parsing', CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'address_options'), FALSE);
+  }
+
+  /**
+   * Is this a case where the user has opted to update existing contacts.
+   *
+   * @return bool
+   *
+   * @throws \API_Exception
+   */
+  private function isUpdateExistingContacts(): bool {
+    return in_array((int) $this->getSubmittedValue('onDuplicate'), [
+      CRM_Import_Parser::DUPLICATE_UPDATE,
+      CRM_Import_Parser::DUPLICATE_FILL,
+    ], TRUE);
   }
 
   /**
@@ -3087,66 +3086,14 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param array $values
    *
    * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function validateValues(array $values): void {
-    $errorMessage = NULL;
-    $errorRequired = FALSE;
     $params = $this->getMappedRow($values);
-    $missingNames = [];
-    switch ($params['contact_type']) {
-      case 'Individual':
-        if (empty($params['first_name'])) {
-          $missingNames[] = ts('First Name');
-        }
-        if (empty($params['last_name'])) {
-          $missingNames[] = ts('Last Name');
-        }
-        break;
-
-      case 'Household':
-        if (empty($params['household_name'])) {
-          $missingNames[] = ts('Missing required fields:') . ' ' . ts('Household Name');
-        }
-        break;
-
-      case 'Organization':
-        if (empty($params['organization_name'])) {
-          $missingNames[] = ts('Missing required fields:') . ' ' . ts('Organization Name');
-        }
-        break;
-    }
-    if (!empty($missingNames)) {
-      $errorMessage = ts('Missing required fields:') . ' ' . implode(' ' . ts('and') . ' ', $missingNames);
-      $errorRequired = TRUE;
-    }
-
-    if ($this->_emailIndex >= 0) {
-      /* If we don't have the required fields, bail */
-
-      if ($this->_contactType === 'Individual' && !$this->_updateWithId) {
-        if ($errorRequired && empty($values[$this->_emailIndex])) {
-          if ($errorMessage) {
-            $errorMessage .= ' ' . ts('OR') . ' ' . ts('Email Address');
-          }
-          else {
-            $errorMessage = ts('Missing required field:') . ' ' . ts('Email Address');
-          }
-          throw new CRM_Core_Exception($errorMessage);
-        }
-      }
-    }
-    elseif ($errorRequired && !$this->_updateWithId) {
-      if ($errorMessage) {
-        $errorMessage .= ' ' . ts('OR') . ' ' . ts('Email Address');
-      }
-      else {
-        $errorMessage = ts('Missing required field:') . ' ' . ts('Email Address');
-      }
-      throw new CRM_Core_Exception($errorMessage);
-    }
+    $this->validateRequiredContactFields($params['contact_type'], $params, $this->isUpdateExistingContacts());
 
     //check for duplicate external Identifier
-    $externalID = $values[$this->_externalIdentifierIndex] ?? NULL;
+    $externalID = $params['external_identifier'] ?? NULL;
     if ($externalID) {
       /* If it's a dupe,external Identifier  */
 
