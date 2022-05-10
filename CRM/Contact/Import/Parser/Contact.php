@@ -2216,27 +2216,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throw CRM_Core_Error
    */
   public function deprecated_validate_formatted_contact(&$params): void {
-    // Look for offending email addresses
-
-    if (array_key_exists('email', $params)) {
-      foreach ($params['email'] as $count => $values) {
-        if (!is_array($values)) {
-          continue;
-        }
-        if ($email = CRM_Utils_Array::value('email', $values)) {
-          // validate each email
-          if (!CRM_Utils_Rule::email($email)) {
-            throw new CRM_Core_Exception('No valid email address');
-          }
-
-          // check for loc type id.
-          if (empty($values['location_type_id'])) {
-            throw new CRM_Core_Exception('Location Type Id missing.');
-          }
-        }
-      }
-    }
-
     // Validate custom data fields
     if (array_key_exists('custom', $params) && is_array($params['custom'])) {
       foreach ($params['custom'] as $key => $custom) {
@@ -3338,13 +3317,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           else {
             $errorMessage = ts('Missing required field:') . ' ' . ts('Email Address');
           }
-          throw new CRM_Core_Exception($errorMessage);
-        }
-      }
-
-      $email = $values[$this->_emailIndex] ?? NULL;
-      if ($email) {
-        if (!CRM_Utils_Rule::email($email)) {
           throw new CRM_Core_Exception($errorMessage);
         }
       }

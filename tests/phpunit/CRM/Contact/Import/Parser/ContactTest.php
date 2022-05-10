@@ -743,6 +743,16 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
         'mapper' => [['last_name']],
         'expected_error' => 'Missing required fields: First Name OR Email Address',
       ],
+      'individual_bad_email' => [
+        'csv' => 'individual_invalid_email.csv',
+        'mapper' => [['email', 1], ['first_name'], ['last_name']],
+        'expected_error' => 'Invalid value for field(s) : email',
+      ],
+      'individual_related_bad_email' => [
+        'csv' => 'individual_invalid_related_email.csv',
+        'mapper' => [['1_a_b', 'email', 1], ['first_name'], ['last_name']],
+        'expected_error' => 'Invalid value for field(s) : email',
+      ],
     ];
   }
 
