@@ -5,7 +5,6 @@
  * @subpackage plugins
  */
 
-
 /**
  * Smarty count_characters modifier plugin
  *
@@ -15,21 +14,19 @@
  * @link http://smarty.php.net/manual/en/language.modifier.count.characters.php
  *          count_characters (Smarty online manual)
  * @author   Monte Ohrt <monte at ohrt dot com>
- * @param string
- * @param boolean include whitespace in the character count
+ * @param string $string
+ * @param boolean $include_spaces include whitespace in the character count
  * @return integer
  */
-function smarty_modifier_crmCountCharacters($string, $include_spaces = false)
-{
-    if ($include_spaces)
-       return(strlen($string));
+function smarty_modifier_crmCountCharacters($string, $include_spaces = FALSE) {
+  if ($include_spaces) {
+    return(strlen($string));
+  }
 
-    if (is_null($string)) {
-      return 0;
-    }
-    return preg_match_all("/[^\s]/",$string, $match);
+  if (is_null($string)) {
+    return 0;
+  }
+  return preg_match_all("/[^\s]/", $string, $match);
 }
 
 /* vim: set expandtab: */
-
-?>
