@@ -767,8 +767,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @dataProvider importDataProvider
    *
    * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  public function testImport($csv, $mapper, $expectedError): void {
+  public function testImport($csv, $mapper, $expectedError, $expectedOutcomes = []): void {
     try {
       $this->importCSV($csv, $mapper);
     }
@@ -778,6 +779,10 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     }
     if ($expectedError) {
       $this->fail('expected error :' . $expectedError);
+    }
+    $dataSource = new CRM_Import_DataSource_CSV(UserJob::get(FALSE)->setSelect(['id'])->execute()->first()['id']);
+    foreach ($expectedOutcomes as $outcome => $count) {
+      $this->assertEquals($dataSource->getRowCount([$outcome]), $count);
     }
   }
 
@@ -791,7 +796,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'individual_invalid_sub_type' => [
         'csv' => 'individual_invalid_contact_sub_type.csv',
         'mapper' => [['first_name'], ['last_name'], ['contact_sub_type']],
-        'expected_error' => 'Invalid value for field(s) : type',
+        'expected_error' => '',
+        'expected_outcomes' => [CRM_Import_Parser::NO_MATCH => 1],
       ],
     ];
   }

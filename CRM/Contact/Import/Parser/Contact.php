@@ -74,13 +74,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   protected $_newRelatedContacts;
 
-  /**
-   * Array of all the contacts whose street addresses are not parsed.
-   * of this import process
-   * @var array
-   */
-  protected $_unparsedStreetAddressContacts;
-
   protected $_tableName;
 
   /**
@@ -89,33 +82,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @var int
    */
   protected $_rowCount;
-
-  /**
-   * Running total number of un-matched Contacts.
-   *
-   * @var int
-   */
-  protected $_unMatchCount;
-
-  /**
-   * Array of unmatched lines.
-   *
-   * @var array
-   */
-  protected $_unMatch;
-
-  /**
-   * Total number of contacts with unparsed addresses
-   * @var int
-   */
-  protected $_unparsedAddressCount;
-
-  /**
-   * Filename of mismatch data
-   *
-   * @var string
-   */
-  protected $_misMatchFilemName;
 
   protected $_primaryKeyName;
   protected $_statusFieldName;
@@ -2418,12 +2384,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $this->_errors[] = $values;
       }
 
-      if ($returnCode & self::NO_MATCH) {
-        $this->_unMatchCount++;
-        array_unshift($values, $this->_rowCount);
-        $this->_unMatch[] = $values;
-      }
-
       if ($returnCode & self::DUPLICATE) {
         $this->_duplicateCount++;
         array_unshift($values, $this->_rowCount);
@@ -2433,44 +2393,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
 
+      if ($returnCode & self::NO_MATCH) {
+        $this->setImportStatus((int) $values[count($values) - 1], 'invalid_no_match', array_shift($values));
+      }
+
       if ($returnCode & self::UNPARSED_ADDRESS_WARNING) {
-        $this->_unparsedAddressCount++;
-        array_unshift($values, $this->_rowCount);
-        $this->_unparsedAddresses[] = $values;
-      }
-
-      // see if we've hit our timeout yet
-      /* if ( $the_thing_with_the_stuff ) {
-      do_something( );
-      } */
-    }
-
-    if ($mode == self::MODE_PREVIEW || $mode == self::MODE_IMPORT) {
-      $customHeaders = $mapper;
-
-      $customfields = CRM_Core_BAO_CustomField::getFields($this->_contactType);
-      foreach ($customHeaders as $key => $value) {
-        if ($id = CRM_Core_BAO_CustomField::getKeyID($value)) {
-          $customHeaders[$key] = $customfields[$id][0];
-        }
-      }
-
-      if ($this->_unMatchCount) {
-        $headers = array_merge([
-          ts('Line Number'),
-          ts('Reason'),
-        ], $customHeaders);
-
-        $this->_misMatchFilemName = self::errorFileName(self::NO_MATCH);
-        self::exportCSV($this->_misMatchFilemName, $headers, $this->_unMatch);
-      }
-      if ($this->_unparsedAddressCount) {
-        $headers = array_merge([
-          ts('Line Number'),
-          ts('Contact Edit URL'),
-        ], $customHeaders);
-        $this->_errorFileName = self::errorFileName(self::UNPARSED_ADDRESS_WARNING);
-        self::exportCSV($this->_errorFileName, $headers, $this->_unparsedAddresses);
+        $this->setImportStatus((int) $values[count($values) - 1], 'warning_unparsed_address', array_shift($values));
       }
     }
   }
@@ -2650,55 +2578,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param int $mode
    */
   public function set($store, $mode = self::MODE_SUMMARY) {
-    // @todo - this params are being set here because they were / possibly still
-    // are in some places being accessed by forms later in the flow
-    // ie CRM_Contact_Import_Form_MapField, CRM_Contact_Import_Form_Preview
-    // or CRM_Contact_Import_Form_Summary using `$this->get()
-    // which was the old way of saving values submitted on this form such that
-    // the other forms could access them. Now they should use
-    // `getSubmittedValue` or simply not get them if the only
-    // reason is to pass to the Parser which can itself
-    // call 'getSubmittedValue'
-    // Once the mentioned forms no longer call $this->get() all this 'setting'
-    // is obsolete.
-    $store->set('rowCount', $this->_rowCount);
+    // To be removed in https://github.com/civicrm/civicrm-core/pull/23281
     $store->set('fieldTypes', $this->getSelectTypes());
-
-    $store->set('columnCount', $this->_activeFieldCount);
-
-    $store->set('totalRowCount', $this->_totalCount);
-    $store->set('validRowCount', $this->_validCount);
-    $store->set('invalidRowCount', $this->_invalidRowCount);
-    $store->set('unMatchCount', $this->_unMatchCount);
-
-    switch ($this->_contactType) {
-      case 'Individual':
-        $store->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
-        break;
-
-      case 'Household':
-        $store->set('contactType', CRM_Import_Parser::CONTACT_HOUSEHOLD);
-        break;
-
-      case 'Organization':
-        $store->set('contactType', CRM_Import_Parser::CONTACT_ORGANIZATION);
-    }
-
-    if (isset($this->_rows) && !empty($this->_rows)) {
-      $store->set('dataValues', $this->_rows);
-    }
-
-    if ($this->_unMatchCount) {
-      $store->set('mismatchFileName', $this->_misMatchFilemName);
-    }
-
-    if ($mode == self::MODE_IMPORT) {
-      $store->set('duplicateRowCount', $this->_duplicateCount);
-      $store->set('unparsedAddressCount', $this->_unparsedAddressCount);
-      if ($this->_duplicateCount) {
-        $store->set('duplicatesFileName', $this->_duplicateFileName);
-      }
-    }
   }
 
   /**
