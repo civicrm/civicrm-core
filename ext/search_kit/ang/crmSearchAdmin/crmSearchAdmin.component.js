@@ -51,6 +51,10 @@
               defaults[param] = [];
             }
           });
+          // Default to Individuals
+          if (this.savedSearch.api_entity === 'Contact' && CRM.crmSearchAdmin.defaultContactType) {
+            defaults.where.push(['contact_type:name', '=', CRM.crmSearchAdmin.defaultContactType]);
+          }
 
           $scope.$bindToRoute({
             param: 'params',
