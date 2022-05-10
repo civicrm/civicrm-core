@@ -471,6 +471,8 @@ abstract class CRM_Import_DataSource {
       CRM_Import_Parser::VALID => ['imported', 'new'],
       CRM_Import_Parser::ERROR => ['error', 'invalid'],
       CRM_Import_Parser::DUPLICATE => ['duplicate'],
+      CRM_Import_Parser::NO_MATCH => ['invalid_no_match'],
+      CRM_Import_Parser::UNPARSED_ADDRESS_WARNING => ['warning_unparsed_address'],
     ];
   }
 

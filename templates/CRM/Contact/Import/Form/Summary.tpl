@@ -47,7 +47,7 @@
     {/if}
 
     {if $unparsedAddressCount}
-        <p class="error">{$unparsedStreetAddressString}</p>
+        <p class="error">{ts}Records imported successfully but unable to parse some of the street addresses{/ts}</p>
         <p class="error">
         {ts 1=$downloadAddressRecordsUrl}You can <a href='%1'>Download Street Address Records </a>. You may then edit those contact records and update the street address accordingly.{/ts}
         </p>

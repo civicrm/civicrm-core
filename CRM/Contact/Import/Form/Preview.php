@@ -34,7 +34,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    $mismatchCount = $this->get('unMatchCount');
     $columnNames = $this->get('columnNames');
     $this->_disableUSPS = $this->get('disableUSPS');
 
@@ -64,14 +63,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     $this->assign('invalidRowCount', $this->getRowCount(CRM_Import_Parser::ERROR));
     $this->assign('validRowCount', $this->getRowCount(CRM_Import_Parser::VALID));
     $this->assign('totalRowCount', $this->getRowCount([]));
-
-    if ($mismatchCount) {
-      $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . '&parser=CRM_Contact_Import_Parser_Contact';
-      $this->set('downloadMismatchRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
-    }
-
     $this->assign('mapper', $this->getMappedFieldLabels());
-
     $this->assign('dataValues', $this->getDataRows([], 2));
 
     $this->setStatusUrl();
@@ -191,7 +183,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       'allTags' => $this->get('tag'),
       'mapper' => $this->controller->exportValue('MapField', 'mapper'),
       'mapFields' => $this->getAvailableFields(),
-      'contactType' => $this->get('contactType'),
+      'contactType' => $this->getContactType(),
       'contactSubType' => $this->getSubmittedValue('contactSubType'),
       'primaryKeyName' => '_id',
       'statusFieldName' => '_status',
@@ -242,9 +234,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       fclose($fd);
 
       $this->set('errorFile', $errorFile);
-
-      $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . '&parser=CRM_Contact_Import_Parser_Contact';
-      $this->set('downloadMismatchRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
 
     //hack to clean db

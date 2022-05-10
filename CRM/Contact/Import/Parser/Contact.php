@@ -30,16 +30,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
   protected $_mapperKeys = [];
   protected $_mapperRelated;
-  protected $_mapperRelatedContactType;
   protected $_mapperRelatedContactDetails;
   protected $_relationships;
 
   protected $_emailIndex;
-  protected $_firstNameIndex;
-  protected $_lastNameIndex;
-
-  protected $_householdNameIndex;
-  protected $_organizationNameIndex;
 
   protected $_phoneIndex;
 
@@ -56,7 +50,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   protected $_retCode;
 
   protected $_externalIdentifierIndex;
-  protected $_allExternalIdentifiers;
+  protected $_allExternalIdentifiers = [];
   protected $_parseStreetAddress;
 
   /**
@@ -80,13 +74,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   protected $_newRelatedContacts;
 
-  /**
-   * Array of all the contacts whose street addresses are not parsed.
-   * of this import process
-   * @var array
-   */
-  protected $_unparsedStreetAddressContacts;
-
   protected $_tableName;
 
   /**
@@ -95,33 +82,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @var int
    */
   protected $_rowCount;
-
-  /**
-   * Running total number of un-matched Contacts.
-   *
-   * @var int
-   */
-  protected $_unMatchCount;
-
-  /**
-   * Array of unmatched lines.
-   *
-   * @var array
-   */
-  protected $_unMatch;
-
-  /**
-   * Total number of contacts with unparsed addresses
-   * @var int
-   */
-  protected $_unparsedAddressCount;
-
-  /**
-   * Filename of mismatch data
-   *
-   * @var string
-   */
-  protected $_misMatchFilemName;
 
   protected $_primaryKeyName;
   protected $_statusFieldName;
@@ -168,7 +128,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     parent::__construct();
     $this->_mapperKeys = $mapperKeys;
     $this->_mapperRelated = &$mapperRelated;
-    $this->_mapperRelatedContactType = &$mapperRelatedContactType;
     $this->_mapperRelatedContactDetails = &$mapperRelatedContactDetails;
   }
 
@@ -183,14 +142,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $this->_newContacts = [];
 
     $this->setActiveFields($this->_mapperKeys);
-    $this->setActiveFieldRelatedContactType($this->_mapperRelatedContactType);
 
     $this->_phoneIndex = -1;
     $this->_emailIndex = -1;
-    $this->_firstNameIndex = -1;
-    $this->_lastNameIndex = -1;
-    $this->_householdNameIndex = -1;
-    $this->_organizationNameIndex = -1;
     $this->_externalIdentifierIndex = -1;
 
     $index = 0;
@@ -201,22 +155,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if (substr($key, 0, 5) == 'phone') {
         $this->_phoneIndex = $index;
       }
-      if ($key == 'first_name') {
-        $this->_firstNameIndex = $index;
-      }
-      if ($key == 'last_name') {
-        $this->_lastNameIndex = $index;
-      }
-      if ($key == 'household_name') {
-        $this->_householdNameIndex = $index;
-      }
-      if ($key == 'organization_name') {
-        $this->_organizationNameIndex = $index;
-      }
-
       if ($key == 'external_identifier') {
         $this->_externalIdentifierIndex = $index;
-        $this->_allExternalIdentifiers = [];
       }
       $index++;
     }
@@ -356,7 +296,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       return $response;
     }
 
-    $params = &$this->getActiveFieldParams();
+    $params = $this->getMappedRow($values);
     $formatted = [
       'contact_type' => $this->_contactType,
     ];
@@ -2242,27 +2182,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throw CRM_Core_Error
    */
   public function deprecated_validate_formatted_contact(&$params): void {
-    // Look for offending email addresses
-
-    if (array_key_exists('email', $params)) {
-      foreach ($params['email'] as $count => $values) {
-        if (!is_array($values)) {
-          continue;
-        }
-        if ($email = CRM_Utils_Array::value('email', $values)) {
-          // validate each email
-          if (!CRM_Utils_Rule::email($email)) {
-            throw new CRM_Core_Exception('No valid email address');
-          }
-
-          // check for loc type id.
-          if (empty($values['location_type_id'])) {
-            throw new CRM_Core_Exception('Location Type Id missing.');
-          }
-        }
-      }
-    }
-
     // Validate custom data fields
     if (array_key_exists('custom', $params) && is_array($params['custom'])) {
       foreach ($params['custom'] as $key => $custom) {
@@ -2297,66 +2216,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $dupeCheck = TRUE,
     $dedupeRuleGroupID = NULL) {
 
-    $requiredCheck = TRUE;
-
     if (isset($params['id']) && is_numeric($params['id'])) {
-      $requiredCheck = FALSE;
-    }
-    if ($requiredCheck) {
-      $required = [
-        'Individual' => [
-          ['first_name', 'last_name'],
-          'email',
-        ],
-        'Household' => [
-          'household_name',
-        ],
-        'Organization' => [
-          'organization_name',
-        ],
-      ];
-
-      // contact_type has a limited number of valid values
-      if (empty($params['contact_type'])) {
-        throw new CRM_Core_Exception("No Contact Type");
-      }
-      $fields = $required[$params['contact_type']] ?? NULL;
-      if ($fields == NULL) {
-        throw new CRM_Core_Exception("Invalid Contact Type: {$params['contact_type']}");
-      }
-
+      // @todo - ensure this is tested & remove - expectation is api call further
+      // down validates it.
       if ($csType = CRM_Utils_Array::value('contact_sub_type', $params)) {
         if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($csType, $params['contact_type']))) {
           throw new CRM_Core_Exception("Invalid or Mismatched Contact Subtype: " . implode(', ', (array) $csType));
-        }
-      }
-
-      if (empty($params['contact_id']) && !empty($params['id'])) {
-        $valid = FALSE;
-        $error = '';
-        foreach ($fields as $field) {
-          if (is_array($field)) {
-            $valid = TRUE;
-            foreach ($field as $element) {
-              if (empty($params[$element])) {
-                $valid = FALSE;
-                $error .= $element;
-                break;
-              }
-            }
-          }
-          else {
-            if (!empty($params[$field])) {
-              $valid = TRUE;
-            }
-          }
-          if ($valid) {
-            break;
-          }
-        }
-
-        if (!$valid) {
-          throw new CRM_Core_Exception("Required fields not found for {$params['contact_type']} : $error");
         }
       }
     }
@@ -2519,12 +2384,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $this->_errors[] = $values;
       }
 
-      if ($returnCode & self::NO_MATCH) {
-        $this->_unMatchCount++;
-        array_unshift($values, $this->_rowCount);
-        $this->_unMatch[] = $values;
-      }
-
       if ($returnCode & self::DUPLICATE) {
         $this->_duplicateCount++;
         array_unshift($values, $this->_rowCount);
@@ -2534,44 +2393,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
 
+      if ($returnCode & self::NO_MATCH) {
+        $this->setImportStatus((int) $values[count($values) - 1], 'invalid_no_match', array_shift($values));
+      }
+
       if ($returnCode & self::UNPARSED_ADDRESS_WARNING) {
-        $this->_unparsedAddressCount++;
-        array_unshift($values, $this->_rowCount);
-        $this->_unparsedAddresses[] = $values;
-      }
-
-      // see if we've hit our timeout yet
-      /* if ( $the_thing_with_the_stuff ) {
-      do_something( );
-      } */
-    }
-
-    if ($mode == self::MODE_PREVIEW || $mode == self::MODE_IMPORT) {
-      $customHeaders = $mapper;
-
-      $customfields = CRM_Core_BAO_CustomField::getFields($this->_contactType);
-      foreach ($customHeaders as $key => $value) {
-        if ($id = CRM_Core_BAO_CustomField::getKeyID($value)) {
-          $customHeaders[$key] = $customfields[$id][0];
-        }
-      }
-
-      if ($this->_unMatchCount) {
-        $headers = array_merge([
-          ts('Line Number'),
-          ts('Reason'),
-        ], $customHeaders);
-
-        $this->_misMatchFilemName = self::errorFileName(self::NO_MATCH);
-        self::exportCSV($this->_misMatchFilemName, $headers, $this->_unMatch);
-      }
-      if ($this->_unparsedAddressCount) {
-        $headers = array_merge([
-          ts('Line Number'),
-          ts('Contact Edit URL'),
-        ], $customHeaders);
-        $this->_errorFileName = self::errorFileName(self::UNPARSED_ADDRESS_WARNING);
-        self::exportCSV($this->_errorFileName, $headers, $this->_unparsedAddresses);
+        $this->setImportStatus((int) $values[count($values) - 1], 'warning_unparsed_address', array_shift($values));
       }
     }
   }
@@ -2596,24 +2423,21 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * @param $elements
-   */
-  public function setActiveFieldRelatedContactType($elements) {
-    for ($i = 0; $i < count($elements); $i++) {
-      $this->_activeFields[$i]->_relatedContactType = $elements[$i];
-    }
-  }
-
-  /**
    * Format the field values for input to the api.
    *
+   * @param array $values
+   *   The row from the datasource.
+   *
    * @return array
-   *   (reference ) associative array of name/value pairs
+   *   Parameters mapped as described in getMappedRow
+   *
    * @throws \API_Exception
+   * @todo - clean this up a bit & merge back into `getMappedRow`
+   *
    */
-  public function &getActiveFieldParams() {
+  private function getParams(array $values): array {
     $params = [];
-    $mapper = $this->getSubmittedValue('mapper');
+
     foreach ($this->getFieldMappings() as $i => $mappedField) {
       // The key is in the format 5_a_b where 5 is the relationship_type_id and a_b is the direction.
       $relatedContactKey = $mappedField['relationship_type_id'] ? ($mappedField['relationship_type_id'] . '_' . $mappedField['relationship_direction']) : NULL;
@@ -2623,7 +2447,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
       $relatedContactFieldName = $relatedContactKey ? $mappedField['name'] : NULL;
       // RelatedContactType is not part of the mapping but rather calculated from the relationship.
-      $relatedContactType = $this->_activeFields[$i]->_relatedContactType;
+      $relatedContactType = $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction']);
       $relatedContactLocationTypeID = $relatedContactKey ? $mappedField['location_type_id'] : NULL;
       $relatedContactWebsiteTypeID = $relatedContactKey ? $mappedField['website_type_id'] : NULL;
       $relatedContactIMProviderID = $relatedContactKey ? $mappedField['im_provider_id'] : NULL;
@@ -2634,7 +2458,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $imProviderID = $relatedContactKey ? NULL : $mappedField['im_provider_id'];
       $websiteTypeID = $relatedContactKey ? NULL : $mappedField['website_type_id'];
 
-      $importedValue = $this->_activeFields[$i]->_value;
+      $importedValue = $values[$i];
 
       if (isset($importedValue)) {
         if (!$relatedContactKey) {
@@ -2754,55 +2578,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param int $mode
    */
   public function set($store, $mode = self::MODE_SUMMARY) {
-    // @todo - this params are being set here because they were / possibly still
-    // are in some places being accessed by forms later in the flow
-    // ie CRM_Contact_Import_Form_MapField, CRM_Contact_Import_Form_Preview
-    // or CRM_Contact_Import_Form_Summary using `$this->get()
-    // which was the old way of saving values submitted on this form such that
-    // the other forms could access them. Now they should use
-    // `getSubmittedValue` or simply not get them if the only
-    // reason is to pass to the Parser which can itself
-    // call 'getSubmittedValue'
-    // Once the mentioned forms no longer call $this->get() all this 'setting'
-    // is obsolete.
-    $store->set('rowCount', $this->_rowCount);
+    // To be removed in https://github.com/civicrm/civicrm-core/pull/23281
     $store->set('fieldTypes', $this->getSelectTypes());
-
-    $store->set('columnCount', $this->_activeFieldCount);
-
-    $store->set('totalRowCount', $this->_totalCount);
-    $store->set('validRowCount', $this->_validCount);
-    $store->set('invalidRowCount', $this->_invalidRowCount);
-    $store->set('unMatchCount', $this->_unMatchCount);
-
-    switch ($this->_contactType) {
-      case 'Individual':
-        $store->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
-        break;
-
-      case 'Household':
-        $store->set('contactType', CRM_Import_Parser::CONTACT_HOUSEHOLD);
-        break;
-
-      case 'Organization':
-        $store->set('contactType', CRM_Import_Parser::CONTACT_ORGANIZATION);
-    }
-
-    if (isset($this->_rows) && !empty($this->_rows)) {
-      $store->set('dataValues', $this->_rows);
-    }
-
-    if ($this->_unMatchCount) {
-      $store->set('mismatchFileName', $this->_misMatchFilemName);
-    }
-
-    if ($mode == self::MODE_IMPORT) {
-      $store->set('duplicateRowCount', $this->_duplicateCount);
-      $store->set('unparsedAddressCount', $this->_unparsedAddressCount);
-      if ($this->_duplicateCount) {
-        $store->set('duplicatesFileName', $this->_duplicateFileName);
-      }
-    }
   }
 
   /**
@@ -3351,8 +3128,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \API_Exception
    */
   public function getMappedRow(array $values): array {
-    $this->setActiveFieldValues($values);
-    $params = $this->getActiveFieldParams();
+    $params = $this->getParams($values);
     $params['contact_type'] = $this->getContactType();
     return $params;
   }
@@ -3376,41 +3152,39 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * The values array represents a row in the datasource.
    *
    * @param array $values
+   *
+   * @throws \API_Exception
    */
   public function validateValues(array $values): void {
     $errorMessage = NULL;
     $errorRequired = FALSE;
     $params = $this->getMappedRow($values);
-    switch ($this->_contactType) {
+    $missingNames = [];
+    switch ($params['contact_type']) {
       case 'Individual':
-        $missingNames = [];
-        if ($this->_firstNameIndex < 0 || empty($values[$this->_firstNameIndex])) {
-          $errorRequired = TRUE;
+        if (empty($params['first_name'])) {
           $missingNames[] = ts('First Name');
         }
-        if ($this->_lastNameIndex < 0 || empty($values[$this->_lastNameIndex])) {
-          $errorRequired = TRUE;
+        if (empty($params['last_name'])) {
           $missingNames[] = ts('Last Name');
-        }
-        if ($errorRequired) {
-          $and = ' ' . ts('and') . ' ';
-          $errorMessage = ts('Missing required fields:') . ' ' . implode($and, $missingNames);
         }
         break;
 
       case 'Household':
-        if ($this->_householdNameIndex < 0 || empty($values[$this->_householdNameIndex])) {
-          $errorRequired = TRUE;
-          $errorMessage = ts('Missing required fields:') . ' ' . ts('Household Name');
+        if (empty($params['household_name'])) {
+          $missingNames[] = ts('Missing required fields:') . ' ' . ts('Household Name');
         }
         break;
 
       case 'Organization':
-        if ($this->_organizationNameIndex < 0 || empty($values[$this->_organizationNameIndex])) {
-          $errorRequired = TRUE;
-          $errorMessage = ts('Missing required fields:') . ' ' . ts('Organization Name');
+        if (empty($params['organization_name'])) {
+          $missingNames[] = ts('Missing required fields:') . ' ' . ts('Organization Name');
         }
         break;
+    }
+    if (!empty($missingNames)) {
+      $errorMessage = ts('Missing required fields:') . ' ' . implode(' ' . ts('and') . ' ', $missingNames);
+      $errorRequired = TRUE;
     }
 
     if ($this->_emailIndex >= 0) {
@@ -3424,13 +3198,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           else {
             $errorMessage = ts('Missing required field:') . ' ' . ts('Email Address');
           }
-          throw new CRM_Core_Exception($errorMessage);
-        }
-      }
-
-      $email = $values[$this->_emailIndex] ?? NULL;
-      if ($email) {
-        if (!CRM_Utils_Rule::email($email)) {
           throw new CRM_Core_Exception($errorMessage);
         }
       }
@@ -3501,6 +3268,30 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $mappedFields[] = $mappedField;
     }
     return $mappedFields;
+  }
+
+  /**
+   * Get the related contact type.
+   *
+   * @param int|null $relationshipTypeID
+   * @param int|string $relationshipDirection
+   *
+   * @return null|string
+   *
+   * @throws \API_Exception
+   */
+  protected function getRelatedContactType($relationshipTypeID, $relationshipDirection): ?string {
+    if (!$relationshipTypeID) {
+      return NULL;
+    }
+    $cacheKey = $relationshipTypeID . $relationshipDirection;
+    if (!isset(Civi::$statics[__CLASS__][$cacheKey])) {
+      $relationshipField = 'contact_type_' . substr($relationshipDirection, -1);
+      Civi::$statics[__CLASS__][$cacheKey] = RelationshipType::get(FALSE)
+        ->addWhere('id', '=', $relationshipTypeID)
+        ->addSelect($relationshipField)->execute()->first()[$relationshipField];
+    }
+    return Civi::$statics[__CLASS__][$cacheKey];
   }
 
 }
