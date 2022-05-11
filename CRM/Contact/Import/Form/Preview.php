@@ -168,9 +168,9 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
   public function postProcess() {
 
     $importJobParams = array(
-      'doGeocodeAddress' => $this->controller->exportValue('DataSource', 'doGeocodeAddress'),
-      'invalidRowCount' => $this->get('invalidRowCount'),
-      'onDuplicate' => $this->get('onDuplicate'),
+      'doGeocodeAddress' => $this->getSubmittedValue('doGeocodeAddress'),
+      'invalidRowCount' => $this->getRowCount(CRM_Import_Parser::ERROR),
+      'onDuplicate' => $this->getSubmittedValue('onDuplicate'),
       'dedupe' => $this->getSubmittedValue('dedupe_rule_id'),
       'newGroupName' => $this->controller->exportValue($this->_name, 'newGroupName'),
       'newGroupDesc' => $this->controller->exportValue($this->_name, 'newGroupDesc'),
@@ -188,7 +188,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       'primaryKeyName' => '_id',
       'statusFieldName' => '_status',
       'statusID' => $this->get('statusID'),
-      'totalRowCount' => $this->get('totalRowCount'),
+      'totalRowCount' => $this->getRowCount([]),
       'userJobID' => $this->getUserJobID(),
     );
 

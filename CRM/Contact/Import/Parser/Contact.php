@@ -2288,23 +2288,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $this->init();
 
     $this->_rowCount = 0;
-    $this->_invalidRowCount = $this->_validCount = 0;
     $this->_totalCount = 0;
-
-    $this->_errors = [];
-    $this->_warnings = [];
-    $this->_unparsedAddresses = [];
 
     $this->_tableName = $tableName = $this->getUserJob()['metadata']['DataSource']['table_name'];
     $this->_primaryKeyName = '_id';
     $this->_statusFieldName = '_status';
-
-    if ($mode == self::MODE_MAPFIELD) {
-      $this->_rows = [];
-    }
-    else {
-      $this->_activeFieldCount = count($this->_activeFields);
-    }
 
     if ($statusID) {
       $this->progressImport($statusID);
@@ -2369,30 +2357,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $returnCode = self::ERROR;
       }
 
-      // note that a line could be valid but still produce a warning
-      if ($returnCode & self::VALID) {
-        $this->_validCount++;
-        if ($mode == self::MODE_MAPFIELD) {
-          $this->_rows[] = $values;
-          $this->_activeFieldCount = max($this->_activeFieldCount, count($values));
-        }
-      }
-
-      if ($returnCode & self::ERROR) {
-        $this->_invalidRowCount++;
-        array_unshift($values, $this->_rowCount);
-        $this->_errors[] = $values;
-      }
-
-      if ($returnCode & self::DUPLICATE) {
-        $this->_duplicateCount++;
-        array_unshift($values, $this->_rowCount);
-        $this->_duplicates[] = $values;
-        if ($onDuplicate != self::DUPLICATE_SKIP) {
-          $this->_validCount++;
-        }
-      }
-
       if ($returnCode & self::NO_MATCH) {
         $this->setImportStatus((int) $values[count($values) - 1], 'invalid_no_match', array_shift($values));
       }
@@ -2411,7 +2375,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *   Mapped array of values.
    */
   public function setActiveFields($fieldKeys) {
-    $this->_activeFieldCount = count($fieldKeys);
     foreach ($fieldKeys as $key) {
       if (empty($this->_fields[$key])) {
         $this->_activeFields[] = new CRM_Contact_Import_Field('', ts('- do not import -'));
