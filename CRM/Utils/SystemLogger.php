@@ -23,7 +23,7 @@ class CRM_Utils_SystemLogger extends Psr\Log\AbstractLogger implements \Psr\Log\
    * @param string $message
    * @param array $context
    */
-  public function log($level, $message, array $context = []) {
+  public function log($level, $message, array $context = []): void {
     if (!isset($context['hostname'])) {
       $context['hostname'] = CRM_Utils_System::ipAddress();
     }
