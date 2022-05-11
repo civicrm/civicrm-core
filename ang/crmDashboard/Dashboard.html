@@ -8,7 +8,7 @@
     </legend>
     <div ng-if="$ctrl.showInactive" ng-model="$ctrl.inactive" ui-sortable="$ctrl.sortableOptions" class="crm-dashboard-droppable">
       <div class="help">
-        {{ ts('Drag and drop dashlets onto the left or right columns below to add them to your dashboard. Changes are automatically saved.') }}
+        {{:: ts('Drag and drop dashlets onto the left or right columns below to add them to your dashboard. Changes are automatically saved.') }}
         <a crm-ui-help="hs({id: 'dash_configure', title: ts('Dashboard Configuration')})"></a>
       </div>
       <div ng-repeat="dashlet in $ctrl.inactive" class="crm-inactive-dashlet">
