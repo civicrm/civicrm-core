@@ -91,7 +91,7 @@
       this.getFunctions = function() {
         var allowedTypes = [], functions = [];
         if (ctrl.expr && ctrl.fieldArg) {
-          if (ctrl.crmSearchAdmin.canAggregate(ctrl.expr)) {
+          if (ctrl.mode !== 'groupBy' && ctrl.crmSearchAdmin.canAggregate(ctrl.expr)) {
             allowedTypes.push('aggregate');
           } else {
             allowedTypes.push('comparison', 'string');

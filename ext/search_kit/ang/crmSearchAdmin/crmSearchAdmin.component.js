@@ -145,6 +145,10 @@
         return _.includes(searchMeta.getEntity(ctrl.savedSearch.api_entity).params, param);
       };
 
+      this.hasFunction = function(expr) {
+        return expr.indexOf('(') > -1;
+      };
+
       this.addDisplay = function(type) {
         var count = _.filter(ctrl.savedSearch.displays, {type: type}).length,
           searchLabel = ctrl.savedSearch.label || searchMeta.getEntity(ctrl.savedSearch.api_entity).title_plural;
