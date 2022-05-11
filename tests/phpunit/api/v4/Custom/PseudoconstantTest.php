@@ -20,7 +20,6 @@
 namespace api\v4\Custom;
 
 use Civi\Api4\Address;
-use Civi\Api4\Campaign;
 use Civi\Api4\Contact;
 use Civi\Api4\Activity;
 use Civi\Api4\Contribution;
@@ -28,9 +27,7 @@ use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\Email;
 use Civi\Api4\EntityTag;
-use Civi\Api4\OptionValue;
 use Civi\Api4\Participant;
-use Civi\Api4\Tag;
 
 /**
  * @group headless
@@ -38,12 +35,12 @@ use Civi\Api4\Tag;
 class PseudoconstantTest extends CustomTestBase {
 
   public function testOptionValue() {
-    $cid = Contact::create(FALSE)->addValue('first_name', 'bill')->execute()->first()['id'];
+    $cid = $this->createTestRecord('Contact', ['first_name', 'bill'])['id'];
     $subject = uniqid('subject');
-    OptionValue::create()
-      ->addValue('option_group_id:name', 'activity_type')
-      ->addValue('label', 'Fake Type')
-      ->execute();
+    $this->createTestRecord('OptionValue', [
+      'option_group_id:name' => 'activity_type',
+      'label' => 'Fake Type',
+    ]);
 
     $options = Activity::getFields()
       ->addWhere('name', '=', 'activity_type_id')
@@ -52,17 +49,17 @@ class PseudoconstantTest extends CustomTestBase {
     $options = array_column($options, NULL, 'name');
     $this->assertEquals('Fake Type', $options['Fake_Type']['label']);
 
-    Activity::create()
-      ->addValue('activity_type_id:name', 'Meeting')
-      ->addValue('source_contact_id', $cid)
-      ->addValue('subject', $subject)
-      ->execute();
+    $this->createTestRecord('Activity', [
+      'activity_type_id:name' => 'Meeting',
+      'source_contact_id' => $cid,
+      'subject' => $subject,
+    ]);
 
-    Activity::create()
-      ->addValue('activity_type_id:name', 'Fake_Type')
-      ->addValue('source_contact_id', $cid)
-      ->addValue('subject', $subject)
-      ->execute();
+    $this->createTestRecord('Activity', [
+      'activity_type_id:name' => 'Fake_Type',
+      'source_contact_id' => $cid,
+      'subject' => $subject,
+    ]);
 
     $act = Activity::get()
       ->addWhere('activity_type_id:label', '=', 'Fake Type')
@@ -101,27 +98,28 @@ class PseudoconstantTest extends CustomTestBase {
   }
 
   public function testAddressOptions() {
-    $cid = Contact::create(FALSE)->addValue('first_name', 'addr')->execute()->first()['id'];
-    Address::save()
-      ->addRecord([
+    $cid = $this->createTestRecord('Contact', ['first_name', 'addr'])['id'];
+    $addressData = [
+      [
         'contact_id' => $cid,
         'state_province_id:abbr' => 'CA',
         'country_id:label' => 'United States',
         'street_address' => '1',
-      ])
-      ->addRecord([
+      ],
+      [
         'contact_id' => $cid,
         'state_province_id:abbr' => 'CA',
         'country_id:label' => 'Uruguay',
         'street_address' => '2',
-      ])
-      ->addRecord([
+      ],
+      [
         'contact_id' => $cid,
         'state_province_id:abbr' => 'CA',
         'country_id:abbr' => 'ES',
         'street_address' => '3',
-      ])
-      ->execute();
+      ],
+    ];
+    $this->saveTestRecords('Address', ['records' => $addressData]);
 
     $addr = Address::get()
       ->addWhere('contact_id', '=', $cid)
@@ -181,10 +179,10 @@ class PseudoconstantTest extends CustomTestBase {
       }
     }
 
-    $cid = Contact::create(FALSE)
-      ->addValue('first_name', 'col')
-      ->addValue('myPseudoconstantTest.Color:label', 'blü')
-      ->execute()->first()['id'];
+    $cid = $this->createTestRecord('Contact', [
+      'first_name' => 'col',
+      'myPseudoconstantTest.Color:label' => 'blü',
+    ])['id'];
 
     $result = Contact::get(FALSE)
       ->addWhere('id', '=', $cid)
@@ -195,14 +193,14 @@ class PseudoconstantTest extends CustomTestBase {
     $this->assertEquals('bl_', $result['myPseudoconstantTest.Color:name']);
     $this->assertEquals('b', $result['myPseudoconstantTest.Color']);
 
-    $cid1 = Contact::create(FALSE)
-      ->addValue('first_name', 'two')
-      ->addValue('myPseudoconstantTest.Technicolor:label', 'RED')
-      ->execute()->first()['id'];
-    $cid2 = Contact::create(FALSE)
-      ->addValue('first_name', 'two')
-      ->addValue('myPseudoconstantTest.Technicolor:label', 'GREEN')
-      ->execute()->first()['id'];
+    $cid1 = $this->createTestRecord('Contact', [
+      'first_name' => 'two',
+      'myPseudoconstantTest.Technicolor:label' => 'RED',
+    ])['id'];
+    $cid2 = $this->createTestRecord('Contact', [
+      'first_name' => 'two',
+      'myPseudoconstantTest.Technicolor:label' => 'GREEN',
+    ])['id'];
 
     // Test ordering by label
     $result = Contact::get(FALSE)
@@ -220,20 +218,22 @@ class PseudoconstantTest extends CustomTestBase {
   }
 
   public function testJoinOptions() {
-    $cid1 = Contact::create(FALSE)
-      ->addValue('first_name', 'Tom')
-      ->addValue('gender_id:label', 'Male')
-      ->addChain('email', Email::create()->setValues(['contact_id' => '$id', 'email' => 'tom@example.com', 'location_type_id:name' => 'Work']))
-      ->execute()->first()['id'];
-    $cid2 = Contact::create(FALSE)
-      ->addValue('first_name', 'Sue')
-      ->addValue('gender_id:name', 'Female')
-      ->addChain('email', Email::create()->setValues(['contact_id' => '$id', 'email' => 'sue@example.com', 'location_type_id:name' => 'Home']))
-      ->execute()->first()['id'];
-    $cid3 = Contact::create(FALSE)
-      ->addValue('first_name', 'Pat')
-      ->addChain('email', Email::create()->setValues(['contact_id' => '$id', 'email' => 'pat@example.com', 'location_type_id:name' => 'Home']))
-      ->execute()->first()['id'];
+    $cid1 = $this->createTestRecord('Contact', [
+      'first_name' => 'Tom',
+      'gender_id:label' => 'Male',
+    ])['id'];
+    $this->createTestRecord('Email', ['contact_id' => $cid1, 'email' => 'tom@example.com', 'location_type_id:name' => 'Work']);
+
+    $cid2 = $this->createTestRecord('Contact', [
+      'first_name' => 'Sue',
+      'gender_id:name' => 'Female',
+    ])['id'];
+    $this->createTestRecord('Email', ['contact_id' => $cid2, 'email' => 'sue@example.com', 'location_type_id:name' => 'Home']);
+
+    $cid3 = $this->createTestRecord('Contact', [
+      'first_name' => 'Pat',
+    ])['id'];
+    $this->createTestRecord('Email', ['contact_id' => $cid3, 'email' => 'pat@example.com', 'location_type_id:name' => 'Home']);
 
     $emails = Email::get()
       ->addSelect('location_type_id:name', 'contact_id.gender_id:label', 'email', 'contact_id')
@@ -260,11 +260,11 @@ class PseudoconstantTest extends CustomTestBase {
 
   public function testTagOptions() {
     $tag = uniqid('tag');
-    Tag::create(FALSE)
-      ->addValue('name', $tag)
-      ->addValue('description', 'colorful')
-      ->addValue('color', '#aabbcc')
-      ->execute();
+    $this->createTestRecord('Tag', [
+      'name' => $tag,
+      'description' => 'colorful',
+      'color' => '#aabbcc',
+    ]);
     $options = EntityTag::getFields()
       ->setLoadOptions(['id', 'name', 'color', 'description', 'label'])
       ->addWhere('name', '=', 'tag_id')
@@ -308,17 +308,17 @@ class PseudoconstantTest extends CustomTestBase {
 
     $campaignTitle = uniqid('Test ');
 
-    $campaignId = Campaign::create(FALSE)
-      ->addValue('title', $campaignTitle)
-      ->addValue('campaign_type_id', 1)
-      ->execute()->first()['id'];
+    $campaignId = $this->createTestRecord('Campaign', [
+      'title' => $campaignTitle,
+      'campaign_type_id' => 1,
+    ])['id'];
 
-    $contributionId = Contribution::create(FALSE)
-      ->addValue('campaign_id', $campaignId)
-      ->addValue('contact_id', $contact['id'])
-      ->addValue('financial_type_id', 1)
-      ->addValue('total_amount', .01)
-      ->execute()->first()['id'];
+    $contributionId = $this->createTestRecord('Contribution', [
+      'campaign_id' => $campaignId,
+      'contact_id' => $contact['id'],
+      'financial_type_id' => 1,
+      'total_amount' => .01,
+    ])['id'];
 
     // Even though the option list of campaigns is not available (prefetch = false)
     // We should still be able to get the title of the campaign as :label

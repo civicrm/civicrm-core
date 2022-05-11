@@ -52,43 +52,38 @@ class CustomContactRefTest extends CustomTestBase {
       ->addValue('serialize', 1)
       ->execute();
 
-    $favPersonId = Contact::create(FALSE)
-      ->addValue('first_name', $firstName)
-      ->addValue('last_name', 'Person')
-      ->addValue('contact_type', 'Individual')
-      ->execute()
-      ->first()['id'];
+    $favPersonId = $this->createTestRecord('Contact', [
+      'first_name' => $firstName,
+      'last_name' => 'Person',
+      'contact_type' => 'Individual',
+    ])['id'];
 
-    $favPeopleId1 = Contact::create(FALSE)
-      ->addValue('first_name', 'FirstFav')
-      ->addValue('last_name', 'People1')
-      ->addValue('contact_type', 'Individual')
-      ->execute()
-      ->first()['id'];
+    $favPeopleId1 = $this->createTestRecord('Contact', [
+      'first_name' => 'FirstFav',
+      'last_name' => 'People1',
+      'contact_type' => 'Individual',
+    ])['id'];
 
-    $favPeopleId2 = Contact::create(FALSE)
-      ->addValue('first_name', 'SecondFav')
-      ->addValue('last_name', 'People2')
-      ->addValue('contact_type', 'Individual')
-      ->execute()
-      ->first()['id'];
+    $favPeopleId2 = $this->createTestRecord('Contact', [
+      'first_name' => 'SecondFav',
+      'last_name' => 'People2',
+      'contact_type' => 'Individual',
+    ])['id'];
 
-    $contactId1 = Contact::create(FALSE)
-      ->addValue('first_name', 'Mya')
-      ->addValue('last_name', 'Tester')
-      ->addValue('contact_type', 'Individual')
-      ->addValue('MyContactRef.FavPerson', $favPersonId)
-      ->addValue('MyContactRef.FavPeople', [$favPeopleId2, $favPeopleId1])
-      ->execute()
-      ->first()['id'];
+    $contactId1 = $this->createTestRecord('Contact', [
+      'first_name' => 'Mya',
+      'last_name' => 'Tester',
+      'contact_type' => 'Individual',
+      'MyContactRef.FavPerson' => $favPersonId,
+      'MyContactRef.FavPeople' => [$favPeopleId2, $favPeopleId1],
+    ])['id'];
 
-    $contactId2 = Contact::create(FALSE)
-      ->addValue('first_name', 'Bea')
-      ->addValue('last_name', 'Tester')
-      ->addValue('contact_type', 'Individual')
-      ->addValue('MyContactRef.FavPeople', [$favPeopleId2])
-      ->execute()
-      ->first()['id'];
+    $contactId2 = $this->createTestRecord('Contact', [
+      'first_name' => 'Bea',
+      'last_name' => 'Tester',
+      'contact_type' => 'Individual',
+      'MyContactRef.FavPeople' => [$favPeopleId2],
+    ])['id'];
 
     $result = Contact::get(FALSE)
       ->addSelect('display_name')
@@ -139,13 +134,12 @@ class CustomContactRefTest extends CustomTestBase {
       ->addValue('data_type', 'ContactReference')
       ->execute();
 
-    $contactId = Contact::create(FALSE)
-      ->addValue('first_name', 'Mya')
-      ->addValue('last_name', 'Tester')
-      ->addValue('contact_type', 'Individual')
-      ->addValue('MyContactRef.FavPerson', 'user_contact_id')
-      ->execute()
-      ->first()['id'];
+    $contactId = $this->createTestRecord('Contact', [
+      'first_name' => 'Mya',
+      'last_name' => 'Tester',
+      'contact_type' => 'Individual',
+      'MyContactRef.FavPerson' => 'user_contact_id',
+    ])['id'];
 
     $contact = Contact::get(FALSE)
       ->addSelect('display_name')

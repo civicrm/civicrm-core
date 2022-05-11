@@ -70,14 +70,14 @@ class CreateWithOptionGroupTest extends CustomTestBase {
       ->addValue('data_type', 'Money')
       ->execute();
 
-    Contact::create(FALSE)
-      ->addValue('first_name', 'Jerome')
-      ->addValue('last_name', 'Tester')
-      ->addValue('contact_type', 'Individual')
-      ->addValue("$group.$colorField", 'r')
-      ->addValue("$group.$foodField", '1')
-      ->addValue('FinancialStuff.Salary', 50000)
-      ->execute();
+    $this->createTestRecord('Contact', [
+      'first_name' => 'Jerome',
+      'last_name' => 'Tester',
+      'contact_type' => 'Individual',
+      "$group.$colorField" => 'r',
+      "$group.$foodField" => '1',
+      'FinancialStuff.Salary' => 50000,
+    ]);
 
     $result = Contact::get(FALSE)
       ->addSelect('first_name')
@@ -136,23 +136,23 @@ class CreateWithOptionGroupTest extends CustomTestBase {
       ->addValue('data_type', 'Money')
       ->execute();
 
-    Contact::create(FALSE)
-      ->addValue('first_name', 'Red')
-      ->addValue('last_name', 'Corn')
-      ->addValue('contact_type', 'Individual')
-      ->addValue("$group.$colorField", 'r')
-      ->addValue("$group.$foodField", '1')
-      ->addValue('FinancialStuff.Salary', 10000)
-      ->execute();
+    $this->createTestRecord('Contact', [
+      'first_name' => 'Red',
+      'last_name' => 'Corn',
+      'contact_type' => 'Individual',
+      "$group.$colorField" => 'r',
+      "$group.$foodField" => '1',
+      'FinancialStuff.Salary' => 10000,
+    ]);
 
-    Contact::create(FALSE)
-      ->addValue('first_name', 'Blue')
-      ->addValue('last_name', 'Cheese')
-      ->addValue('contact_type', 'Individual')
-      ->addValue("$group.$colorField", 'b')
-      ->addValue("$group.$foodField", '3')
-      ->addValue('FinancialStuff.Salary', 500000)
-      ->execute();
+    $this->createTestRecord('Contact', [
+      'first_name' => 'Blue',
+      'last_name' => 'Cheese',
+      'contact_type' => 'Individual',
+      "$group.$colorField" => 'b',
+      "$group.$foodField" => '3',
+      'FinancialStuff.Salary' => 500000,
+    ]);
 
     $result = Contact::get(FALSE)
       ->addSelect('first_name')

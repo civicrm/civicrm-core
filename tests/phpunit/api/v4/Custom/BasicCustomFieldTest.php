@@ -22,26 +22,13 @@ namespace api\v4\Custom;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
-use Civi\Api4\Event;
-use Civi\Api4\FinancialType;
 use Civi\Api4\OptionGroup;
-use Civi\Api4\Relationship;
 use Civi\Api4\RelationshipCache;
 
 /**
  * @group headless
  */
 class BasicCustomFieldTest extends CustomTestBase {
-
-  public function tearDown(): void {
-    FinancialType::delete(FALSE)
-      ->addWhere('name', '=', 'Test_Type')
-      ->execute();
-    Event::delete(FALSE)
-      ->addWhere('id', '>', 0)
-      ->execute();
-    parent::tearDown();
-  }
 
   /**
    * @throws \API_Exception
@@ -66,13 +53,12 @@ class BasicCustomFieldTest extends CustomTestBase {
     $this->assertContains('MyIndividualFields.FavColor', $getFields->setValues(['contact_type' => 'Individual'])->execute()->column('name'));
     $this->assertNotContains('MyIndividualFields.FavColor', $getFields->setValues(['contact_type:name' => 'Household'])->execute()->column('name'));
 
-    $contactId = Contact::create(FALSE)
-      ->addValue('first_name', 'Johann')
-      ->addValue('last_name', 'Tester')
-      ->addValue('contact_type', 'Individual')
-      ->addValue('MyIndividualFields.FavColor', 'Red')
-      ->execute()
-      ->first()['id'];
+    $contactId = $this->createTestRecord('Contact', [
+      'first_name' => 'Johann',
+      'last_name' => 'Tester',
+      'contact_type' => 'Individual',
+      'MyIndividualFields.FavColor' => 'Red',
+    ])['id'];
 
     $contact = Contact::get(FALSE)
       ->addSelect('first_name')
@@ -158,21 +144,19 @@ class BasicCustomFieldTest extends CustomTestBase {
     // But the api will report is_required as not nullable
     $this->assertFalse($fields['MyContactFields2.FavFood']['nullable']);
 
-    $contactId1 = Contact::create(FALSE)
-      ->addValue('first_name', 'Johann')
-      ->addValue('last_name', 'Tester')
-      ->addValue('MyContactFields.FavColor', 'Red')
-      ->addValue('MyContactFields.FavFood', 'Cherry')
-      ->execute()
-      ->first()['id'];
+    $contactId1 = $this->createTestRecord('Contact', [
+      'first_name' => 'Johann',
+      'last_name' => 'Tester',
+      'MyContactFields.FavColor' => 'Red',
+      'MyContactFields.FavFood' => 'Cherry',
+    ])['id'];
 
-    $contactId2 = Contact::create(FALSE)
-      ->addValue('first_name', 'MaryLou')
-      ->addValue('last_name', 'Tester')
-      ->addValue('MyContactFields.FavColor', 'Purple')
-      ->addValue('MyContactFields.FavFood', 'Grapes')
-      ->execute()
-      ->first()['id'];
+    $contactId2 = $this->createTestRecord('Contact', [
+      'first_name' => 'MaryLou',
+      'last_name' => 'Tester',
+      'MyContactFields.FavColor' => 'Purple',
+      'MyContactFields.FavFood' => 'Grapes',
+    ])['id'];
 
     $contact = Contact::get(FALSE)
       ->addSelect('first_name')
@@ -287,26 +271,24 @@ class BasicCustomFieldTest extends CustomTestBase {
       ->execute()
     );
 
-    $parent = Contact::create(FALSE)
-      ->addValue('first_name', 'Parent')
-      ->addValue('last_name', 'Tester')
-      ->addValue('contact_type', 'Individual')
-      ->execute()
-      ->first()['id'];
+    $parent = $this->createTestRecord('Contact', [
+      'first_name' => 'Parent',
+      'last_name' => 'Tester',
+      'contact_type' => 'Individual',
+    ])['id'];
 
-    $child = Contact::create(FALSE)
-      ->addValue('first_name', 'Child')
-      ->addValue('last_name', 'Tester')
-      ->addValue('contact_type', 'Individual')
-      ->execute()
-      ->first()['id'];
+    $child = $this->createTestRecord('Contact', [
+      'first_name' => 'Child',
+      'last_name' => 'Tester',
+      'contact_type' => 'Individual',
+    ])['id'];
 
-    Relationship::create(FALSE)
-      ->addValue('contact_id_a', $parent)
-      ->addValue('contact_id_b', $child)
-      ->addValue('relationship_type_id', 1)
-      ->addValue("$cgName.PetName", 'Buddy')
-      ->execute();
+    $this->createTestRecord('Relationship', [
+      'contact_id_a' => $parent,
+      'contact_id_b' => $child,
+      'relationship_type_id' => 1,
+      "$cgName.PetName" => 'Buddy',
+    ]);
 
     // Test get directly from relationshipCache entity
     $results = RelationshipCache::get(FALSE)
@@ -351,25 +333,23 @@ class BasicCustomFieldTest extends CustomTestBase {
         ->addValue('data_type', 'String'))
       ->execute();
 
-    $parent = Contact::create(FALSE)
-      ->addValue('first_name', 'Parent')
-      ->addValue('last_name', 'Tester')
-      ->addValue("$cgName.FavColor", 'Purple')
-      ->execute()
-      ->first()['id'];
+    $parent = $this->createTestRecord('Contact', [
+      'first_name' => 'Parent',
+      'last_name' => 'Tester',
+      "$cgName.FavColor" => 'Purple',
+    ])['id'];
 
-    $child = Contact::create(FALSE)
-      ->addValue('first_name', 'Child')
-      ->addValue('last_name', 'Tester')
-      ->addValue("$cgName.FavColor", 'Cyan')
-      ->execute()
-      ->first()['id'];
+    $child = $this->createTestRecord('Contact', [
+      'first_name' => 'Child',
+      'last_name' => 'Tester',
+      "$cgName.FavColor" => 'Cyan',
+    ])['id'];
 
-    Relationship::create(FALSE)
-      ->addValue('contact_id_a', $parent)
-      ->addValue('contact_id_b', $child)
-      ->addValue('relationship_type_id', 1)
-      ->execute();
+    $this->createTestRecord('Relationship', [
+      'contact_id_a' => $parent,
+      'contact_id_b' => $child,
+      'relationship_type_id' => 1,
+    ]);
 
     $results = Contact::get(FALSE)
       ->addSelect('first_name', 'child.first_name', "$cgName.FavColor", "child.$cgName.FavColor")
@@ -514,13 +494,12 @@ class BasicCustomFieldTest extends CustomTestBase {
         ->addValue('time_format', '1'))
       ->execute();
 
-    $cid = Contact::create(FALSE)
-      ->addValue('first_name', 'Parent')
-      ->addValue('last_name', 'Tester')
-      ->addValue("$cgName.DateOnly", '2025-05-10')
-      ->addValue("$cgName.DateTime", '2025-06-11 12:15:30')
-      ->execute()
-      ->first()['id'];
+    $cid = $this->createTestRecord('Contact', [
+      'first_name' => 'Parent',
+      'last_name' => 'Tester',
+      "$cgName.DateOnly" => '2025-05-10',
+      "$cgName.DateTime" => '2025-06-11 12:15:30',
+    ])['id'];
     $contact = Contact::get(FALSE)
       ->addSelect('custom.*')
       ->addWhere('id', '=', $cid)
@@ -570,11 +549,11 @@ class BasicCustomFieldTest extends CustomTestBase {
     $this->assertEquals('case_type_id', $options['Case']);
 
     // Test contribution type
-    $financialType = FinancialType::create(FALSE)
-      ->addValue('name', 'Test_Type')
-      ->addValue('is_deductible', TRUE)
-      ->addValue('is_reserved', FALSE)
-      ->execute()->single();
+    $financialType = $this->createTestRecord('FinancialType', [
+      'name' => 'Test_Type',
+      'is_deductible' => TRUE,
+      'is_reserved' => FALSE,
+    ]);
     $contributionGroup = CustomGroup::create(FALSE)
       ->addValue('extends', 'Contribution')
       ->addValue('title', 'Contribution Fields')
@@ -584,21 +563,21 @@ class BasicCustomFieldTest extends CustomTestBase {
   }
 
   public function testExtendsParticipantMetadata() {
-    $event1 = Event::create(FALSE)
-      ->addValue('event_type_id:name', 'Fundraiser')
-      ->addValue('title', 'Test Fun Event')
-      ->addValue('start_date', '2022-05-02 18:24:00')
-      ->execute()->first();
-    $event2 = Event::create(FALSE)
-      ->addValue('event_type_id:name', 'Fundraiser')
-      ->addValue('title', 'Test Fun Event2')
-      ->addValue('start_date', '2022-05-02 18:24:00')
-      ->execute()->first();
-    $event3 = Event::create(FALSE)
-      ->addValue('event_type_id:name', 'Meeting')
-      ->addValue('title', 'Test Me Event')
-      ->addValue('start_date', '2022-05-02 18:24:00')
-      ->execute()->first();
+    $event1 = $this->createTestRecord('Event', [
+      'event_type_id:name' => 'Fundraiser',
+      'title' => 'Test Fun Event',
+      'start_date' => '2022-05-02 18:24:00',
+    ]);
+    $event2 = $this->createTestRecord('Event', [
+      'event_type_id:name' => 'Fundraiser',
+      'title' => 'Test Fun Event2',
+      'start_date' => '2022-05-02 18:24:00',
+    ]);
+    $event3 = $this->createTestRecord('Event', [
+      'event_type_id:name' => 'Meeting',
+      'title' => 'Test Me Event',
+      'start_date' => '2022-05-02 18:24:00',
+    ]);
 
     $field = \Civi\Api4\CustomGroup::getFields(FALSE)
       ->setLoadOptions(['id', 'name', 'label'])

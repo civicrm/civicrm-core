@@ -20,12 +20,11 @@
 namespace api\v4\Entity;
 
 use api\v4\Api4TestBase;
-use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class ExampleDataTest extends Api4TestBase implements TransactionalInterface {
+class ExampleDataTest extends Api4TestBase {
 
   /**
    * Basic canary test fetching a specific example.

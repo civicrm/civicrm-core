@@ -19,12 +19,11 @@
 namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
-use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class AbstractActionFunctionTest extends Api4TestBase implements TransactionalInterface {
+class AbstractActionFunctionTest extends Api4TestBase {
 
   public function testUndefinedParamException(): void {
     $this->expectException('API_Exception');

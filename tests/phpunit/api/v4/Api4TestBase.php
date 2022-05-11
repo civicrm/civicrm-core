@@ -56,9 +56,13 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
   /**
    */
   public function tearDown(): void {
-    // Delete all test records in reverse order to prevent fk constraints
-    foreach (array_reverse($this->testRecords) as $record) {
-      civicrm_api4($record[0], 'delete', ['checkPermissions' => FALSE, 'where' => $record[1]]);
+    $impliments = class_implements($this);
+    // If not created in a transaction, test records must be deleted
+    if (!in_array('Civi\Test\TransactionalInterface', $impliments, TRUE)) {
+      // Delete all test records in reverse order to prevent fk constraints
+      foreach (array_reverse($this->testRecords) as $record) {
+        civicrm_api4($record[0], 'delete', ['checkPermissions' => FALSE, 'where' => $record[1]]);
+      }
     }
   }
 
@@ -114,7 +118,7 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
    * @throws \Civi\API\Exception\NotImplementedException
    */
   public function createTestRecord(string $entityName, array $values = []) {
-    return $this->saveTestRecords($entityName, ['records' => [$values]])->first();
+    return $this->saveTestRecords($entityName, ['records' => [$values]])->single();
   }
 
   /**

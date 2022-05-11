@@ -73,15 +73,15 @@ class CustomValuePerformanceTest extends CustomTestBase {
 
     $this->beginQueryCount();
 
-    Contact::create(FALSE)
-      ->addValue('first_name', 'Red')
-      ->addValue('last_name', 'Tester')
-      ->addValue('contact_type', 'Individual')
-      ->addValue('MyContactFields.FavColor', 'r')
-      ->addValue('MyContactFields.FavAnimal', 'Sheep')
-      ->addValue('MyContactFields.FavLetter', 'z')
-      ->addValue('MyContactFields.FavFood', 'Coconuts')
-      ->execute();
+    $this->createTestRecord('Contact', [
+      'first_name' => 'Red',
+      'last_name' => 'Tester',
+      'contact_type' => 'Individual',
+      'MyContactFields.FavColor' => 'r',
+      'MyContactFields.FavAnimal' => 'Sheep',
+      'MyContactFields.FavLetter' => 'z',
+      'MyContactFields.FavFood' => 'Coconuts',
+    ]);
 
     Contact::get(FALSE)
       ->addSelect('display_name')
@@ -100,6 +100,8 @@ class CustomValuePerformanceTest extends CustomTestBase {
     // FIXME: This count is artificially high due to the line
     // $this->entity = Tables::getBriefName(Tables::getClassForTable($targetTable));
     // In class Joinable. TODO: Investigate why.
+    // $this->assertLessThan(10, $this->getQueryCount());
+
   }
 
 }

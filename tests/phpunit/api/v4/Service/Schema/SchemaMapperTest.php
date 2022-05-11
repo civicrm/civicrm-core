@@ -23,12 +23,11 @@ use Civi\Api4\Service\Schema\Joinable\Joinable;
 use Civi\Api4\Service\Schema\SchemaMap;
 use Civi\Api4\Service\Schema\Table;
 use api\v4\Api4TestBase;
-use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class SchemaMapperTest extends Api4TestBase implements TransactionalInterface {
+class SchemaMapperTest extends Api4TestBase {
 
   public function testWillHaveNoPathWithNoTables() {
     $map = new SchemaMap();
