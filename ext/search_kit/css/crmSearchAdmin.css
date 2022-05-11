@@ -70,7 +70,7 @@
   width: auto;
   border: 0 none;
   padding: 2px 5px;
-  text-transform: capitalize;
+  text-transform: none;
 }
 #bootstrap-theme.crm-search crm-search-clause > .btn-group {
   position: absolute;
