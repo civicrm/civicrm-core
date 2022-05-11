@@ -22,36 +22,23 @@ namespace api\v4\Entity;
 use Civi\Api4\Contact;
 use Civi\Api4\OptionValue;
 use api\v4\Api4TestBase;
-use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class ContactJoinTest extends Api4TestBase implements TransactionalInterface {
-
-  public function setUpHeadless() {
-    $relatedTables = [
-      'civicrm_address',
-      'civicrm_email',
-      'civicrm_phone',
-      'civicrm_openid',
-      'civicrm_im',
-      'civicrm_website',
-      'civicrm_activity',
-      'civicrm_activity_contact',
-    ];
-
-    $this->cleanup(['tablesToTruncate' => $relatedTables]);
-    $this->loadDataSet('SingleContact');
-
-    return parent::setUpHeadless();
-  }
+class ContactJoinTest extends Api4TestBase {
 
   public function testContactJoin() {
-    $contact = $this->getReference('test_contact_1');
+    $contact = $this->createTestRecord('Contact', [
+      'first_name' => uniqid(),
+      'last_name' => uniqid(),
+    ]);
     $entitiesToTest = ['Address', 'OpenID', 'IM', 'Website', 'Email', 'Phone'];
 
     foreach ($entitiesToTest as $entity) {
+      $this->createTestRecord($entity, [
+        'contact_id' => $contact['id'],
+      ]);
       $results = civicrm_api4($entity, 'get', [
         'where' => [['contact_id', '=', $contact['id']]],
         'select' => ['contact_id.*_name', 'contact_id.id'],
@@ -64,12 +51,12 @@ class ContactJoinTest extends Api4TestBase implements TransactionalInterface {
   }
 
   public function testJoinToPCMWillReturnArray() {
-    $contact = Contact::create()->setValues([
+    $contact = $this->createTestRecord('Contact', [
       'preferred_communication_method' => [1, 2, 3],
       'contact_type' => 'Individual',
       'first_name' => 'Test',
       'last_name' => 'PCM',
-    ])->execute()->first();
+    ]);
 
     $fetchedContact = Contact::get()
       ->addWhere('id', '=', $contact['id'])
@@ -89,19 +76,19 @@ class ContactJoinTest extends Api4TestBase implements TransactionalInterface {
     $optionValues = array_column($options, 'value');
     $labels = array_column($options, 'label');
 
-    $contact = Contact::create()->setValues([
+    $contact = $this->createTestRecord('Contact', [
       'preferred_communication_method' => $optionValues,
       'contact_type' => 'Individual',
       'first_name' => 'Test',
       'last_name' => 'PCM',
-    ])->execute()->first();
+    ]);
 
-    $contact2 = Contact::create()->setValues([
+    $contact2 = $this->createTestRecord('Contact', [
       'preferred_communication_method' => $optionValues,
       'contact_type' => 'Individual',
       'first_name' => 'Test',
       'last_name' => 'PCM2',
-    ])->execute()->first();
+    ]);
 
     $contactIds = array_column([$contact, $contact2], 'id');
 

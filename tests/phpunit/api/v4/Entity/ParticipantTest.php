@@ -54,7 +54,7 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
   public function testGet() {
     $rows = $this->getRowCount('civicrm_participant');
     if ($rows > 0) {
-      $this->markTestSkipped('Participant table must be empty');
+      $this->fail('Participant table must be empty');
     }
 
     // With no records:
@@ -76,36 +76,34 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
     $expectedFirstEventCount = ceil($participantCount / $eventCount);
 
     $dummy = [
-      'contacts' => $this->createEntity([
-        'type' => 'Individual',
-        'count' => $contactCount,
-        'seq' => 1,
+      'contacts' => $this->saveTestRecords('Contact', [
+        'records' => array_fill(0, $contactCount, []),
       ]),
-      'events' => $this->createEntity([
-        'type' => 'Event',
-        'count' => $eventCount,
-        'seq' => 1,
+      'events' => $this->saveTestRecords('Event', [
+        'records' => array_fill(0, $eventCount, []),
       ]),
       'sources' => ['Paddington', 'Springfield', 'Central'],
     ];
 
     // - create dummy participants record
+    $records = [];
     for ($i = 0; $i < $participantCount; $i++) {
-      $dummy['participants'][$i] = $this->sample([
-        'type' => 'Participant',
-        'overrides' => [
-          'event_id' => $dummy['events'][$i % $eventCount]['id'],
-          'contact_id' => $dummy['contacts'][$i % $contactCount]['id'],
-          // 3 = number of sources
-          'source' => $dummy['sources'][$i % 3],
-        ],
-      ])['sample_params'];
-
-      Participant::create()
-        ->setValues($dummy['participants'][$i])
-        ->setCheckPermissions(FALSE)
-        ->execute();
+      $records[] = [
+        'event_id' => $dummy['events'][$i % $eventCount]['id'],
+        'contact_id' => $dummy['contacts'][$i % $contactCount]['id'],
+        // 3 = number of sources
+        'source' => $dummy['sources'][$i % 3],
+      ];
     }
+    $this->saveTestRecords('Participant', [
+      'records' => $records,
+      'defaults' => [
+        'status_id' => 2,
+        'role_id' => 1,
+        'register_date' => 20070219,
+        'event_level' => 'Payment',
+      ],
+    ]);
     $sqlCount = $this->getRowCount('civicrm_participant');
     $this->assertEquals($participantCount, $sqlCount, "Unexpected count");
 
@@ -251,6 +249,17 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
 
     // Or if you search by id
     $this->assertCount(1, Participant::get()->selectRowCount()->addWhere('id', '=', $testParticipants->first()['id'])->execute());
+  }
+
+  /**
+   * Quick record counter
+   *
+   * @param string $table_name
+   * @returns int record count
+   */
+  private function getRowCount($table_name) {
+    $sql = "SELECT count(id) FROM $table_name";
+    return (int) \CRM_Core_DAO::singleValueQuery($sql);
   }
 
 }

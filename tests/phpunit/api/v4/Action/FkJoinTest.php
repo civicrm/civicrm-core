@@ -21,11 +21,9 @@ namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
-use Civi\Api4\CiviCase;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
 use Civi\Api4\EntityTag;
-use Civi\Api4\Phone;
 use Civi\Api4\Relationship;
 use Civi\Api4\Tag;
 use Civi\Test\TransactionalInterface;
@@ -34,12 +32,6 @@ use Civi\Test\TransactionalInterface;
  * @group headless
  */
 class FkJoinTest extends Api4TestBase implements TransactionalInterface {
-
-  public function setUpHeadless() {
-    $this->loadDataSet('DefaultDataSet');
-
-    return parent::setUpHeadless();
-  }
 
   public function tearDown(): void {
     $relatedTables = [
@@ -60,6 +52,10 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
    * loaded from the data set.
    */
   public function testThreeLevelJoin() {
+    $this->createTestRecord('Activity', [
+      'activity_type_id:name' => 'Phone Call',
+    ]);
+
     $results = Activity::get(FALSE)
       ->addWhere('activity_type_id:name', '=', 'Phone Call')
       ->execute();
@@ -68,50 +64,80 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
   }
 
   public function testOptionalJoin() {
-    // DefaultDataSet includes 2 phones for contact 1, 0 for contact 2.
+    $contact1 = $this->createTestRecord('Contact');
+    $contact2 = $this->createTestRecord('Contact');
+
+    $this->createTestRecord('Phone', [
+      'location_type_id:name' => 'Home',
+      'contact_id' => $contact1['id'],
+    ]);
+    $this->createTestRecord('Phone', [
+      'location_type_id:name' => 'Work',
+      'contact_id' => $contact1['id'],
+    ]);
+
     // We'll add one for contact 2 as a red herring to make sure we only get back the correct ones.
-    Phone::create(FALSE)
-      ->setValues(['contact_id' => $this->getReference('test_contact_2')['id'], 'phone' => '123456'])
-      ->execute();
+    $this->createTestRecord('Phone', [
+      'contact_id' => $contact2['id'],
+    ]);
     $contacts = Contact::get(FALSE)
       ->addJoin('Phone', FALSE)
       ->addSelect('id', 'phone.phone')
-      ->addWhere('id', 'IN', [$this->getReference('test_contact_1')['id']])
+      ->addWhere('id', 'IN', [$contact1['id']])
       ->addOrderBy('phone.id')
       ->execute();
     $this->assertCount(2, $contacts);
-    $this->assertEquals($this->getReference('test_contact_1')['id'], $contacts[0]['id']);
-    $this->assertEquals($this->getReference('test_contact_1')['id'], $contacts[1]['id']);
+    $this->assertEquals($contact1['id'], $contacts[0]['id']);
+    $this->assertEquals($contact1['id'], $contacts[1]['id']);
   }
 
   public function testRequiredJoin() {
+    $contact1 = $this->createTestRecord('Contact');
+    $contact2 = $this->createTestRecord('Contact');
+
+    $this->createTestRecord('Phone', [
+      'location_type_id:name' => 'Home',
+      'contact_id' => $contact1['id'],
+      'phone' => '+35355439483',
+    ]);
+    $this->createTestRecord('Phone', [
+      'location_type_id:name' => 'Work',
+      'contact_id' => $contact1['id'],
+    ]);
+
     // Joining with no condition
     $contacts = Contact::get(FALSE)
       ->addSelect('id', 'phone.phone')
       ->addJoin('Phone', TRUE)
-      ->addWhere('id', 'IN', [$this->getReference('test_contact_1')['id'], $this->getReference('test_contact_2')['id']])
+      ->addWhere('id', 'IN', [$contact1['id'], $contact2['id']])
       ->addOrderBy('phone.id')
       ->execute();
     $this->assertCount(2, $contacts);
-    $this->assertEquals($this->getReference('test_contact_1')['id'], $contacts[0]['id']);
-    $this->assertEquals($this->getReference('test_contact_1')['id'], $contacts[1]['id']);
+    $this->assertEquals($contact1['id'], $contacts[0]['id']);
+    $this->assertEquals($contact1['id'], $contacts[1]['id']);
 
     // Add is_primary condition, should result in only one record
     $contacts = Contact::get(FALSE)
       ->addSelect('id', 'phone.phone', 'phone.location_type_id')
       ->addJoin('Phone', TRUE, ['phone.is_primary', '=', TRUE])
-      ->addWhere('id', 'IN', [$this->getReference('test_contact_1')['id'], $this->getReference('test_contact_2')['id']])
+      ->addWhere('id', 'IN', [$contact1['id'], $contact2['id']])
       ->addOrderBy('phone.id')
       ->execute();
     $this->assertCount(1, $contacts);
-    $this->assertEquals($this->getReference('test_contact_1')['id'], $contacts[0]['id']);
+    $this->assertEquals($contact1['id'], $contacts[0]['id']);
     $this->assertEquals('+35355439483', $contacts[0]['phone.phone']);
     $this->assertEquals('1', $contacts[0]['phone.location_type_id']);
   }
 
   public function testImplicitJoinOnExplicitJoin() {
+    $contact1 = $this->createTestRecord('Contact');
+    $this->createTestRecord('Address', [
+      'contact_id' => $contact1['id'],
+      'country_id' => 1228,
+    ]);
+
     $contacts = Contact::get(FALSE)
-      ->addWhere('id', '=', $this->getReference('test_contact_1')['id'])
+      ->addWhere('id', '=', $contact1['id'])
       ->addJoin('Address AS address', TRUE, ['id', '=', 'address.contact_id'], ['address.location_type_id', '=', 1])
       ->addSelect('id', 'address.country_id.iso_code')
       ->execute();
@@ -120,11 +146,16 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
   }
 
   public function testExcludeJoin() {
+    $contact1 = $this->createTestRecord('Contact');
+    $this->createTestRecord('Address', [
+      'contact_id' => $contact1['id'],
+      'country_id' => 1228,
+    ]);
     $contacts = Contact::get(FALSE)
       ->addJoin('Address AS address', 'EXCLUDE', ['id', '=', 'address.contact_id'], ['address.location_type_id', '=', 1])
       ->addSelect('id')
       ->execute()->column('id');
-    $this->assertNotContains($this->getReference('test_contact_1')['id'], $contacts);
+    $this->assertNotContains($contact1['id'], $contacts);
   }
 
   public function testInvalidJoinAlias() {
@@ -433,36 +464,39 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
   }
 
   public function testJoinWithExpression() {
-    Phone::create(FALSE)
-      ->setValues(['contact_id' => $this->getReference('test_contact_1')['id'], 'phone' => '654321'])
-      ->execute();
+
+    $contact1 = $this->createTestRecord('Contact');
+    $contact2 = $this->createTestRecord('Contact');
+    $this->createTestRecord('Phone', [
+      'contact_id' => $contact1['id'],
+      'phone' => '654321',
+    ]);
+
     $contacts = Contact::get(FALSE)
       ->addSelect('id', 'phone.phone')
       ->addJoin('Phone', 'INNER', ['LOWER(phone.phone)', '=', "CONCAT('6', '5', '4', '3', '2', '1')"])
-      ->addWhere('id', 'IN', [$this->getReference('test_contact_1')['id'], $this->getReference('test_contact_2')['id']])
+      ->addWhere('id', 'IN', [$contact1['id'], $contact2['id']])
       ->addOrderBy('phone.id')
       ->execute();
     $this->assertCount(1, $contacts);
-    $this->assertEquals($this->getReference('test_contact_1')['id'], $contacts[0]['id']);
+    $this->assertEquals($contact1['id'], $contacts[0]['id']);
     $this->assertEquals('654321', $contacts[0]['phone.phone']);
   }
 
   public function testJoinCaseRoles() {
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
-    $this->loadDataSet('CaseType');
 
-    $contactID = $this->createEntity(['type' => 'Individual'])['id'];
-    $managerID = $this->createEntity(['type' => 'Individual'])['id'];
+    $contactID = $this->createTestRecord('Contact')['id'];
+    $managerID = $this->createTestRecord('Contact')['id'];
 
-    $case = CiviCase::create(FALSE)
-      ->addValue('case_type_id', $this->getReference('test_case_type_1')['id'])
-      ->addValue('status_id', 1)
-      ->addValue('creator_id', $managerID)
-      ->addValue('contact_id', $contactID)
-      ->execute()
-      ->first();
+    $caseType = $this->createTestRecord('CaseType');
+    $case = $this->createTestRecord('Case', [
+      'creator_id' => $managerID,
+      'contact_id' => $contactID,
+      'case_type_id' => $caseType['id'],
+    ]);
 
-    $contacts = \Civi\Api4\Contact::get()
+    $contacts = Contact::get(FALSE)
       ->addSelect('*', 'case.*')
       ->addJoin('Case AS case', 'INNER', 'RelationshipCache', ['id', '=', 'case.far_contact_id'], ['case.far_relation', '=', '"Parent of"'])
       ->addWhere('case.id', '=', $case['id'])

@@ -104,7 +104,7 @@ class CreateCustomValueTest extends CustomTestBase {
       ->addValue('time_format', 2)
       ->execute();
 
-    $contactID = $this->createEntity(['type' => 'Individual'])['id'];
+    $contactID = $this->createTestRecord('Contact')['id'];
 
     CustomValue::create('MyContactDateFields', FALSE)
       ->addValue('date_field', '2022-02-02')

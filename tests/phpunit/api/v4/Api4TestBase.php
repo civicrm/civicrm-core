@@ -19,8 +19,8 @@
 
 namespace api\v4;
 
-use api\v4\Traits\TestDataLoaderTrait;
 use Civi\Api4\UFMatch;
+use Civi\Api4\Utils\CoreUtil;
 use Civi\Test\HeadlessInterface;
 
 require_once 'api/Exception.php';
@@ -30,7 +30,12 @@ require_once 'api/Exception.php';
  */
 class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterface {
 
-  use TestDataLoaderTrait;
+  /**
+   * Records created which will be deleted during tearDown
+   *
+   * @var array
+   */
+  public $testRecords = [];
 
   /**
    * @see CiviUnitTestCase
@@ -46,6 +51,15 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
 
   public function setUpHeadless() {
     return \Civi\Test::headless()->apply();
+  }
+
+  /**
+   */
+  public function tearDown(): void {
+    // Delete all test records in reverse order to prevent fk constraints
+    foreach (array_reverse($this->testRecords) as $record) {
+      civicrm_api4($record[0], 'delete', ['checkPermissions' => FALSE, 'where' => $record[1]]);
+    }
   }
 
   /**
@@ -67,17 +81,6 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
   }
 
   /**
-   * Quick record counter
-   *
-   * @param string $table_name
-   * @returns int record count
-   */
-  public function getRowCount($table_name) {
-    $sql = "SELECT count(id) FROM $table_name";
-    return (int) \CRM_Core_DAO::singleValueQuery($sql);
-  }
-
-  /**
    * Emulate a logged in user since certain functions use that.
    * value to store a record in the DB (like activity)
    * @see https://issues.civicrm.org/jira/browse/CRM-8180
@@ -86,13 +89,13 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
    *   Contact ID of the created user.
    */
   public function createLoggedInUser() {
-    $contactID = $this->createEntity(['type' => 'Individual'])['id'];
+    $contactID = $this->createTestRecord('Contact')['id'];
     UFMatch::delete(FALSE)->addWhere('uf_id', '=', 6)->execute();
-    UFMatch::create(FALSE)->setValues([
+    $this->createTestRecord('UFMatch', [
       'contact_id' => $contactID,
       'uf_name' => 'superman',
       'uf_id' => 6,
-    ])->execute();
+    ]);
 
     $session = \CRM_Core_Session::singleton();
     $session->set('userID', $contactID);
@@ -100,177 +103,260 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
   }
 
   /**
-   * Create sample entities (using V3 for now).
+   * Inserts a test record, supplying all required values if not provided.
    *
-   * @param array $params
-   *   (type, seq, overrides, count)
+   * Test records will be automatically deleted during tearDown.
+   *
+   * @param string $entityName
+   * @param array $values
+   * @return array|null
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   */
+  public function createTestRecord(string $entityName, array $values = []) {
+    return $this->saveTestRecords($entityName, ['records' => [$values]])->first();
+  }
+
+  /**
+   * Saves one or more test records, supplying default values.
+   *
+   * Test records will be automatically deleted during tearDown.
+   *
+   * @param string $entityName
+   * @param array $saveParams
+   * @return \Civi\Api4\Generic\Result
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   */
+  public function saveTestRecords(string $entityName, array $saveParams) {
+    $saveParams += [
+      'checkPermissions' => FALSE,
+      'defaults' => [],
+    ];
+    $idField = CoreUtil::getIdFieldName($entityName);
+    foreach ($saveParams['records'] as &$record) {
+      $record += $saveParams['defaults'];
+      if (empty($record[$idField])) {
+        $this->getRequiredValuesToCreate($entityName, $record);
+      }
+    }
+    $saved = civicrm_api4($entityName, 'save', $saveParams);
+    foreach ($saved as $item) {
+      $this->testRecords[] = [$entityName, [[$idField, '=', $item[$idField]]]];
+    }
+    return $saved;
+  }
+
+  /**
+   * Get the required fields for the api entity + action.
+   *
+   * @param string $entity
+   * @param array $values
+   *
    * @return array
-   *   (either single, or array of array if count >1)
-   * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
+   */
+  public function getRequiredValuesToCreate(string $entity, &$values = []) {
+    $requiredFields = civicrm_api4($entity, 'getfields', [
+      'action' => 'create',
+      'loadOptions' => TRUE,
+      'where' => [
+        ['type', 'IN', ['Field', 'Extra']],
+        ['OR',
+          [
+            ['required', '=', TRUE],
+            // Include contitionally-required fields only if they don't create a circular FK reference
+            ['AND', [['required_if', 'IS NOT EMPTY'], ['fk_entity', '!=', $entity]]],
+          ],
+        ],
+        ['default_value', 'IS EMPTY'],
+        ['readonly', 'IS EMPTY'],
+      ],
+    ], 'name');
+
+    $extraValues = [];
+    foreach ($requiredFields as $fieldName => $requiredField) {
+      if (!isset($values[$fieldName])) {
+        $extraValues[$fieldName] = $this->getRequiredValue($requiredField);
+      }
+    }
+
+    // Hack in some extra per-entity values that couldn't be determined by metadata.
+    // Try to keep this to a minimum and improve metadata as a first-resort.
+
+    switch ($entity) {
+      case 'UFField':
+        $extraValues['field_name'] = 'activity_campaign_id';
+        break;
+
+      case 'Translation':
+        $extraValues['entity_table'] = 'civicrm_event';
+        $extraValues['entity_field'] = 'description';
+        $extraValues['entity_id'] = $this->getFkID('Event');
+        break;
+
+      case 'Case':
+        $extraValues['creator_id'] = $this->getFkID('Contact');
+        break;
+
+      case 'CaseContact':
+        // Prevent "already exists" error from using an existing contact id
+        $extraValues['contact_id'] = $this->createTestRecord('Contact')['id'];
+        break;
+
+      case 'CaseType':
+        $extraValues['definition'] = [
+          "activityTypes" => [
+            [
+              "name" => "Open Case",
+              "max_instances" => "1",
+            ],
+            [
+              "name" => "Follow up",
+            ],
+          ],
+          "activitySets" => [
+            [
+              "name" => "standard_timeline",
+              "label" => "Standard Timeline",
+              "timeline" => 1,
+              "activityTypes" => [
+                [
+                  "name" => "Open Case",
+                  "status" => "Completed",
+                ],
+                [
+                  "name" => "Follow up",
+                  "reference_activity" => "Open Case",
+                  "reference_offset" => "3",
+                  "reference_select" => "newest",
+                ],
+              ],
+            ],
+          ],
+          "timelineActivityTypes" => [
+            [
+              "name" => "Open Case",
+              "status" => "Completed",
+            ],
+            [
+              "name" => "Follow up",
+              "reference_activity" => "Open Case",
+              "reference_offset" => "3",
+              "reference_select" => "newest",
+            ],
+          ],
+          "caseRoles" => [
+            [
+              "name" => "Parent of",
+              "creator" => "1",
+              "manager" => "1",
+            ],
+          ],
+        ];
+        break;
+    }
+
+    $values += $extraValues;
+    return $values;
+  }
+
+  /**
+   * Attempt to get a value using field option, defaults, FKEntity, or a random
+   * value based on the data type.
+   *
+   * @param array $field
+   *
+   * @return mixed
    * @throws \Exception
    */
-  public static function createEntity($params) {
-    $params += [
-      'count' => 1,
-      'seq' => 0,
-    ];
-    $entities = [];
-    $entity = NULL;
-    for ($i = 0; $i < $params['count']; $i++) {
-      $params['seq']++;
-      $data = self::sample($params);
-      $api_params = ['sequential' => 1] + $data['sample_params'];
-      $result = civicrm_api3($data['entity'], 'create', $api_params);
-      if ($result['is_error']) {
-        throw new \Exception("creating $data[entity] failed");
-      }
-      $entity = $result['values'][0];
-      if (!($entity['id'] > 0)) {
-        throw new \Exception("created entity is malformed");
-      }
-      $entities[] = $entity;
+  private function getRequiredValue(array $field) {
+    if (!empty($field['options'])) {
+      return key($field['options']);
     }
-    return $params['count'] == 1 ? $entity : $entities;
+    if (!empty($field['fk_entity'])) {
+      return $this->getFkID($field['fk_entity']);
+    }
+    if (isset($field['default_value'])) {
+      return $field['default_value'];
+    }
+    if ($field['name'] === 'contact_id') {
+      return $this->getFkID('Contact');
+    }
+    if ($field['name'] === 'entity_id') {
+      // What could possibly go wrong with this?
+      switch ($field['table_name'] ?? NULL) {
+        case 'civicrm_financial_item':
+          return $this->getFkID(\Civi\Api4\Service\Spec\Provider\FinancialItemCreationSpecProvider::DEFAULT_ENTITY);
+
+        default:
+          return $this->getFkID('Contact');
+      }
+    }
+
+    $randomValue = $this->getRandomValue($field['data_type']);
+
+    if ($randomValue) {
+      return $randomValue;
+    }
+
+    throw new \API_Exception('Could not provide default value');
   }
 
   /**
-   * Helper function for creating sample entities.
+   * Get an ID for the appropriate entity.
    *
-   * Depending on the supplied sequence integer, plucks values from the dummy data.
-   * Constructs a foreign entity when an ID is required but isn't supplied in the overrides.
+   * @param string $fkEntity
    *
-   * Inspired by CiviUnitTestCase::
-   * @todo - extract this function to own class and share with CiviUnitTestCase?
-   * @param array $params
-   * - type: string roughly matching entity type
-   * - seq: (optional) int sequence number for the values of this type
-   * - overrides: (optional) array of fill in parameters
+   * @return int
    *
-   * @return array
-   *   - entity: string API entity type (usually the type supplied except for contact subtypes)
-   *   - sample_params: array API sample_params properties of sample entity
+   * @throws \API_Exception
    */
-  public static function sample($params) {
-    $params += [
-      'seq' => 0,
-      'overrides' => [],
-    ];
-    $type = $params['type'];
-    // sample data - if field is array then chosed based on `seq`
-    $sample_params = [];
-    if (in_array($type, ['Individual', 'Organization', 'Household'])) {
-      $sample_params['contact_type'] = $type;
-      $entity = 'Contact';
+  private function getFkID(string $fkEntity) {
+    $params = ['checkPermissions' => FALSE];
+    // Be predictable about what type of contact we select
+    if ($fkEntity === 'Contact') {
+      $params['where'] = [['contact_type', '=', 'Individual']];
     }
-    else {
-      $entity = $type;
+    $entityList = civicrm_api4($fkEntity, 'get', $params);
+    // If no existing entities, create one
+    if ($entityList->count() < 1) {
+      return $this->createTestRecord($fkEntity)['id'];
     }
-    // use the seq to pluck a set of params out
-    foreach (self::sampleData($type) as $key => $value) {
-      if (is_array($value)) {
-        $sample_params[$key] = $value[$params['seq'] % count($value)];
-      }
-      else {
-        $sample_params[$key] = $value;
-      }
-    }
-    if ($type == 'Individual') {
-      $sample_params['email'] = strtolower(
-        $sample_params['first_name'] . '_' . $sample_params['last_name'] . '@civicrm.org'
-      );
-      $sample_params['prefix_id'] = 3;
-      $sample_params['suffix_id'] = 3;
-    }
-    if (!count($sample_params)) {
-      throw new \Exception("unknown sample type: $type");
-    }
-    $sample_params = $params['overrides'] + $sample_params;
-    // make foreign enitiies if they haven't been supplied
-    foreach ($sample_params as $key => $value) {
-      if (substr($value, 0, 6) === 'dummy.') {
-        $foreign_entity = self::createEntity([
-          'type' => substr($value, 6),
-          'seq' => $params['seq'],
-        ]);
-        $sample_params[$key] = $foreign_entity['id'];
-      }
-    }
-    return compact("entity", "sample_params");
+
+    return $entityList->last()['id'];
   }
 
   /**
-   * Provider of sample data.
+   * @param $dataType
    *
-   * @return array
-   *   Array values represent a set of allowable items.
-   *   Strings in the form "dummy.Entity" require creating a foreign entity first.
+   * @return int|null|string
    */
-  public static function sampleData($type) {
-    $data = [
-      'Individual' => [
-        // The number of values in each list need to be coprime numbers to not have duplicates
-        'first_name' => ['Anthony', 'Joe', 'Terrence', 'Lucie', 'Albert', 'Bill', 'Kim'],
-        'middle_name' => ['J.', 'M.', 'P', 'L.', 'K.', 'A.', 'B.', 'C.', 'D', 'E.', 'Z.'],
-        'last_name' => ['Anderson', 'Miller', 'Smith', 'Collins', 'Peterson'],
-        'contact_type' => 'Individual',
-      ],
-      'Organization' => [
-        'organization_name' => [
-          'Unit Test Organization',
-          'Acme',
-          'Roberts and Sons',
-          'Cryo Space Labs',
-          'Sharper Pens',
-        ],
-      ],
-      'Household' => [
-        'household_name' => ['Unit Test household'],
-      ],
-      'Event' => [
-        'title' => 'Annual CiviCRM meet',
-        'summary' => 'If you have any CiviCRM related issues or want to track where CiviCRM is heading, Sign up now',
-        'description' => 'This event is intended to give brief idea about progess of CiviCRM and giving solutions to common user issues',
-        'event_type_id' => 1,
-        'is_public' => 1,
-        'start_date' => 20081021,
-        'end_date' => 20081023,
-        'is_online_registration' => 1,
-        'registration_start_date' => 20080601,
-        'registration_end_date' => 20081015,
-        'max_participants' => 100,
-        'event_full_text' => 'Sorry! We are already full',
-        'is_monetary' => 0,
-        'is_active' => 1,
-        'is_show_location' => 0,
-      ],
-      'Participant' => [
-        'event_id' => 'dummy.Event',
-        'contact_id' => 'dummy.Individual',
-        'status_id' => 2,
-        'role_id' => 1,
-        'register_date' => 20070219,
-        'source' => 'Wimbeldon',
-        'event_level' => 'Payment',
-      ],
-      'Contribution' => [
-        'contact_id' => 'dummy.Individual',
-        // donation, 2 = member, 3 = campaign contribution, 4=event
-        'financial_type_id' => 1,
-        'total_amount' => 7.3,
-      ],
-      'Activity' => [
-        //'activity_type_id' => 1,
-        'subject' => 'unit testing',
-        'source_contact_id' => 'dummy.Individual',
-      ],
-      'Group' => [
-        'title' => 'unit testing',
-      ],
-    ];
-    if ($type == 'Contact') {
-      $type = 'Individual';
+  private function getRandomValue($dataType) {
+    switch ($dataType) {
+      case 'Boolean':
+        return TRUE;
+
+      case 'Integer':
+        return random_int(1, 2000);
+
+      case 'String':
+        return \CRM_Utils_String::createRandom(10, implode('', range('a', 'z')));
+
+      case 'Text':
+        return \CRM_Utils_String::createRandom(100, implode('', range('a', 'z')));
+
+      case 'Money':
+        return sprintf('%d.%2d', rand(0, 2000), rand(10, 99));
+
+      case 'Date':
+        return '20100102';
+
+      case 'Timestamp':
+        return 'now';
     }
-    return $data[$type];
+
+    return NULL;
   }
 
 }
