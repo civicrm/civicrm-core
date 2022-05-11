@@ -949,7 +949,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
     $store->set('lineCount', $this->_lineCount);
     $store->set('separator', $this->_separator);
     $store->set('fields', $this->getSelectValues());
-    $store->set('fieldTypes', $this->getSelectTypes());
 
     $store->set('headerPatterns', $this->getHeaderPatterns());
     $store->set('dataPatterns', $this->getDataPatterns());
