@@ -148,7 +148,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     $hasHeaders = !empty($this->_columnHeaders);
     $headerPatterns = $this->get('headerPatterns');
     $dataPatterns = $this->get('dataPatterns');
-    $hasLocationTypes = $this->get('fieldTypes');
 
     /* Initialize all field usages to false */
 
