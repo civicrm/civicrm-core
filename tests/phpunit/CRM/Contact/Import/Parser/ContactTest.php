@@ -473,9 +473,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
 
     $processor = new CRM_Import_ImportProcessor();
     $processor->setMappingFields($mapping);
-    $processor->setUserJobID($this->getUserJobID([
-      'mapper' => $mapperInput,
-    ]));
+    $userJobID = $this->getUserJobID(['mapper' => $mapperInput]);
+    $processor->setUserJobID($userJobID);
     $importer = $processor->getImporterObject();
 
     $contactValues = [
@@ -1020,10 +1019,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     foreach ($fields as $index => $field) {
       $mapper[] = [$field, $mapperLocType[$index] ?? NULL, $field === 'phone' ? 1 : NULL];
     }
+    $userJobID = $this->getUserJobID(['mapper' => $mapper]);
     $parser = new CRM_Contact_Import_Parser_Contact($fields, $mapperLocType);
-    $parser->setUserJobID($this->getUserJobID([
-      'mapper' => $mapper,
-    ]));
+    $parser->setUserJobID($userJobID);
     $parser->_dedupeRuleGroupID = $ruleGroupId;
     $parser->_onDuplicate = $onDuplicateAction;
     $parser->init();
@@ -1157,17 +1155,27 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function getUserJobID($submittedValues = []) {
-    return UserJob::create()->setValues([
+    $userJobID = UserJob::create()->setValues([
       'metadata' => [
         'submitted_values' => array_merge([
           'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
           'contactSubType' => '',
           'doGeocodeAddress' => 0,
+          'dataSource' => 'CRM_Import_DataSource_SQL',
+          'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
         ], $submittedValues),
       ],
       'status_id:name' => 'draft',
       'type_id:name' => 'contact_import',
     ])->execute()->first()['id'];
+    if ($submittedValues['dataSource'] ?? NULL === 'CRM_Import_DataSource') {
+      $dataSource = new CRM_Import_DataSource_CSV($userJobID);
+    }
+    else {
+      $dataSource = new CRM_Import_DataSource_SQL($userJobID);
+    }
+    $dataSource->initialize();
+    return $userJobID;
   }
 
   /**
@@ -1186,9 +1194,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'skipColumnHeader' => TRUE,
       'fieldSeparator' => ',',
       'mapper' => $mapper,
+      'dataSource' => 'CRM_Import_DataSource_CSV',
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($userJobID);
-    $dataSource->initialize();
     $parser = new CRM_Contact_Import_Parser_Contact();
     $parser->setUserJobID($userJobID);
     $parser->init();

@@ -518,6 +518,10 @@ class CRM_Import_Forms extends CRM_Core_Form {
     $message = array_pop($record);
     // Also pop off the status - but we are not going to use this at this stage.
     array_pop($record);
+    // Related entities
+    array_pop($record);
+    // Entity_id
+    array_pop($record);
     array_unshift($record, $message);
     array_unshift($record, $rowNumber);
     return $record;

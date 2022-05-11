@@ -86,6 +86,22 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * Get the relevant datasource object.
+   *
+   * @return \CRM_Import_DataSource|null
+   *
+   * @throws \API_Exception
+   */
+  protected function getDataSourceObject(): ?CRM_Import_DataSource {
+    $className = $this->getSubmittedValue('dataSource');
+    if ($className) {
+      /* @var CRM_Import_DataSource $dataSource */
+      return new $className($this->getUserJobID());
+    }
+    return NULL;
+  }
+
+  /**
    * Get the submitted value, as stored on the user job.
    *
    * @param string $fieldName
@@ -96,6 +112,18 @@ abstract class CRM_Import_Parser {
    */
   protected function getSubmittedValue(string $fieldName) {
     return $this->getUserJob()['metadata']['submitted_values'][$fieldName];
+  }
+
+  /**
+   * Has the import completed.
+   *
+   * @return bool
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function isComplete() :bool {
+    return $this->getDataSourceObject()->isCompleted();
   }
 
   /**
