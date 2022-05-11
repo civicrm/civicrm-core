@@ -2442,7 +2442,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       // The key is in the format 5_a_b where 5 is the relationship_type_id and a_b is the direction.
       $relatedContactKey = $mappedField['relationship_type_id'] ? ($mappedField['relationship_type_id'] . '_' . $mappedField['relationship_direction']) : NULL;
       $fieldName = $relatedContactKey ? NULL : $mappedField['name'];
-      if ($fieldName === 'do_not_import') {
+      $importedValue = $values[$i];
+      if ($fieldName === 'do_not_import' || $importedValue === NULL) {
         continue;
       }
       $relatedContactFieldName = $relatedContactKey ? $mappedField['name'] : NULL;
@@ -2458,92 +2459,88 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $imProviderID = $relatedContactKey ? NULL : $mappedField['im_provider_id'];
       $websiteTypeID = $relatedContactKey ? NULL : $mappedField['website_type_id'];
 
-      $importedValue = $values[$i];
-
-      if (isset($importedValue)) {
-        if (!$relatedContactKey) {
-          if (isset($locationTypeID)) {
-            if (!isset($params[$fieldName])) {
-              $params[$fieldName] = [];
-            }
-
-            $value = [
-              $fieldName => $importedValue,
-              'location_type_id' => $locationTypeID,
-            ];
-
-            if (isset($phoneTypeID)) {
-              $value['phone_type_id'] = $phoneTypeID;
-            }
-
-            // get IM service Provider type id
-            if (isset($imProviderID)) {
-              $value['provider_id'] = $imProviderID;
-            }
-
-            $params[$fieldName][] = $value;
-          }
-          elseif (isset($websiteTypeID)) {
-            $value = [
-              $fieldName => $importedValue,
-              'website_type_id' => $websiteTypeID,
-            ];
-
-            $params[$fieldName][] = $value;
-          }
-
+      if (!$relatedContactKey) {
+        if (isset($locationTypeID)) {
           if (!isset($params[$fieldName])) {
-            if (!isset($relatedContactKey)) {
-              $params[$fieldName] = $importedValue;
-            }
+            $params[$fieldName] = [];
           }
 
+          $value = [
+            $fieldName => $importedValue,
+            'location_type_id' => $locationTypeID,
+          ];
+
+          if (isset($phoneTypeID)) {
+            $value['phone_type_id'] = $phoneTypeID;
+          }
+
+          // get IM service Provider type id
+          if (isset($imProviderID)) {
+            $value['provider_id'] = $imProviderID;
+          }
+
+          $params[$fieldName][] = $value;
+        }
+        elseif (isset($websiteTypeID)) {
+          $value = [
+            $fieldName => $importedValue,
+            'website_type_id' => $websiteTypeID,
+          ];
+
+          $params[$fieldName][] = $value;
+        }
+
+        if (!isset($params[$fieldName])) {
+          if (!isset($relatedContactKey)) {
+            $params[$fieldName] = $importedValue;
+          }
+        }
+
+      }
+      else {
+        if (!isset($params[$relatedContactKey])) {
+          $params[$relatedContactKey] = [];
+        }
+
+        if (!isset($params[$relatedContactKey]['contact_type']) && !empty($relatedContactType)) {
+          $params[$relatedContactKey]['contact_type'] = $relatedContactType;
+        }
+
+        if (isset($relatedContactLocationTypeID) && !empty($importedValue)) {
+          if (!empty($params[$relatedContactKey][$relatedContactFieldName]) &&
+            !is_array($params[$relatedContactKey][$relatedContactFieldName])
+          ) {
+            $params[$relatedContactKey][$relatedContactFieldName] = [];
+          }
+          $value = [
+            $relatedContactFieldName => $importedValue,
+            'location_type_id' => $relatedContactLocationTypeID,
+          ];
+
+          if (isset($relatedContactPhoneTypeID)) {
+            $value['phone_type_id'] = $relatedContactPhoneTypeID;
+          }
+
+          // get IM service Provider type id for related contact
+          if (isset($relatedContactIMProviderID)) {
+            $value['provider_id'] = $relatedContactIMProviderID;
+          }
+
+          $params[$relatedContactKey][$relatedContactFieldName][] = $value;
+        }
+        elseif (isset($relatedContactWebsiteTypeID)) {
+          $params[$relatedContactKey][$relatedContactFieldName][] = [
+            'url' => $importedValue,
+            'website_type_id' => $relatedContactWebsiteTypeID,
+          ];
+        }
+        elseif (empty($importedValue) && isset($relatedContactLocationTypeID)) {
+          if (empty($params[$relatedContactKey][$relatedContactFieldName])) {
+            $params[$relatedContactKey][$relatedContactFieldName] = [];
+          }
         }
         else {
-          if (!isset($params[$relatedContactKey])) {
-            $params[$relatedContactKey] = [];
-          }
-
-          if (!isset($params[$relatedContactKey]['contact_type']) && !empty($relatedContactType)) {
-            $params[$relatedContactKey]['contact_type'] = $relatedContactType;
-          }
-
-          if (isset($relatedContactLocationTypeID) && !empty($importedValue)) {
-            if (!empty($params[$relatedContactKey][$relatedContactFieldName]) &&
-              !is_array($params[$relatedContactKey][$relatedContactFieldName])
-            ) {
-              $params[$relatedContactKey][$relatedContactFieldName] = [];
-            }
-            $value = [
-              $relatedContactFieldName => $importedValue,
-              'location_type_id' => $relatedContactLocationTypeID,
-            ];
-
-            if (isset($relatedContactPhoneTypeID)) {
-              $value['phone_type_id'] = $relatedContactPhoneTypeID;
-            }
-
-            // get IM service Provider type id for related contact
-            if (isset($relatedContactIMProviderID)) {
-              $value['provider_id'] = $relatedContactIMProviderID;
-            }
-
-            $params[$relatedContactKey][$relatedContactFieldName][] = $value;
-          }
-          elseif (isset($relatedContactWebsiteTypeID)) {
-            $params[$relatedContactKey][$relatedContactFieldName][] = [
-              'url' => $importedValue,
-              'website_type_id' => $relatedContactWebsiteTypeID,
-            ];
-          }
-          elseif (empty($importedValue) && isset($relatedContactLocationTypeID)) {
-            if (empty($params[$relatedContactKey][$relatedContactFieldName])) {
-              $params[$relatedContactKey][$relatedContactFieldName] = [];
-            }
-          }
-          else {
-            $params[$relatedContactKey][$relatedContactFieldName] = $importedValue;
-          }
+          $params[$relatedContactKey][$relatedContactFieldName] = $importedValue;
         }
       }
     }
