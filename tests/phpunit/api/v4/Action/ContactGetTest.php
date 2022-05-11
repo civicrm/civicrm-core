@@ -330,9 +330,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
       ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => 'now - 1 year - 1 month'],
       ['first_name' => 'def', 'last_name' => $lastName, 'birth_date' => 'now - 21 year - 6 month'],
     ];
-    Contact::save(FALSE)
-      ->setRecords($sampleData)
-      ->execute();
+    $this->saveTestRecords('Contact', ['records' => $sampleData]);
 
     $result = Contact::get(FALSE)
       ->addWhere('last_name', '=', $lastName)
@@ -345,6 +343,30 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('age_years', '=', 21)
       ->addWhere('last_name', '=', $lastName)
       ->execute()->single();
+  }
+
+  /**
+   *
+   */
+  public function testGetWithCount() {
+    $myName = uniqid('count');
+    for ($i = 1; $i <= 20; ++$i) {
+      $this->createTestRecord('Contact', [
+        'first_name' => "Contact $i",
+        'last_name' => $myName,
+      ]);
+    }
+
+    $get1 = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $myName)
+      ->selectRowCount()
+      ->addSelect('first_name')
+      ->setLimit(10)
+      ->execute();
+
+    $this->assertEquals(20, $get1->count());
+    $this->assertCount(10, (array) $get1);
+
   }
 
 }

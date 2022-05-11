@@ -22,35 +22,23 @@ namespace api\v4\Query;
 use Civi\API\Request;
 use Civi\Api4\Query\Api4SelectQuery;
 use api\v4\Api4TestBase;
-use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class Api4SelectQueryTest extends Api4TestBase implements TransactionalInterface {
-
-  public function setUpHeadless() {
-    $relatedTables = [
-      'civicrm_address',
-      'civicrm_email',
-      'civicrm_phone',
-      'civicrm_openid',
-      'civicrm_im',
-      'civicrm_website',
-      'civicrm_activity',
-      'civicrm_activity_contact',
-    ];
-    $this->cleanup(['tablesToTruncate' => $relatedTables]);
-    $this->loadDataSet('DefaultDataSet');
-    $displayNameFormat = '{contact.first_name}{ }{contact.last_name}';
-    \Civi::settings()->set('display_name_format', $displayNameFormat);
-
-    return parent::setUpHeadless();
-  }
+class Api4SelectQueryTest extends Api4TestBase {
 
   public function testManyToOneJoin() {
-    $phoneNum = $this->getReference('test_phone_1')['phone'];
-    $contact = $this->getReference('test_contact_1');
+    $contact = $this->createTestRecord('Contact', [
+      'first_name' => uniqid(),
+      'last_name' => uniqid(),
+    ]);
+    $phone = $this->createTestRecord('Phone', [
+      'contact_id' => $contact['id'],
+      'phone' => uniqid(),
+    ]);
+
+    $phoneNum = $phone['phone'];
 
     $api = Request::create('Phone', 'get', [
       'version' => 4,

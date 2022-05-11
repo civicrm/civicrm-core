@@ -889,7 +889,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
           'period_type' => 'rolling',
           'member_of_contact_id' => 1,
           'financial_type_id:name' => 'Member Dues',
-          'duration_unit' => 1,
+          'duration_unit' => 'month',
         ]
       )->execute()->first()['id'];
     }

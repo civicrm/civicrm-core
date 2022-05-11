@@ -276,13 +276,13 @@ class PseudoconstantTest extends CustomTestBase {
   }
 
   public function testParticipantRole() {
-    $event = $this->createEntity(['type' => 'Event']);
-    $contact = $this->createEntity(['type' => 'Individual']);
-    $participant = Participant::create()
-      ->addValue('contact_id', $contact['id'])
-      ->addValue('event_id', $event['id'])
-      ->addValue('role_id:label', ['Attendee', 'Volunteer'])
-      ->execute()->first();
+    $event = $this->createTestRecord('Event');
+    $contact = $this->createTestRecord('Contact');
+    $participant = $this->createTestRecord('Participant', [
+      'contact_id' => $contact['id'],
+      'event_id' => $event['id'],
+      'role_id:label' => ['Attendee', 'Volunteer'],
+    ]);
 
     $search1 = Participant::get()
       ->addSelect('role_id', 'role_id:label')
@@ -304,7 +304,7 @@ class PseudoconstantTest extends CustomTestBase {
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
 
-    $contact = $this->createEntity(['type' => 'Individual']);
+    $contact = $this->createTestRecord('Contact');
 
     $campaignTitle = uniqid('Test ');
 

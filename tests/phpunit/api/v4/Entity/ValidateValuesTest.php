@@ -32,12 +32,12 @@ class ValidateValuesTest extends Api4TestBase implements TransactionalInterface 
 
   private $lastValidator;
 
-  protected function setUp(): void {
+  public function setUp(): void {
     $this->lastValidator = NULL;
     parent::setUp();
   }
 
-  protected function tearDown(): void {
+  public function tearDown(): void {
     $this->setValidator(NULL);
     parent::tearDown();
   }

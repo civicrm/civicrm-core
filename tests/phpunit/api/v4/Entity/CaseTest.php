@@ -19,47 +19,28 @@
 
 namespace api\v4\Entity;
 
-use Civi\Api4\CiviCase;
 use api\v4\Api4TestBase;
 use Civi\Api4\Relationship;
-use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class CaseTest extends Api4TestBase implements TransactionalInterface {
+class CaseTest extends Api4TestBase {
 
   public function setUp(): void {
     parent::setUp();
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
-    $this->loadDataSet('CaseType');
-  }
-
-  public function tearDown(): void {
-    $relatedTables = [
-      'civicrm_activity',
-      'civicrm_activity_contact',
-      'civicrm_relationship',
-      'civicrm_case_contact',
-      'civicrm_case_type',
-      'civicrm_case',
-    ];
-    $this->cleanup(['tablesToTruncate' => $relatedTables]);
-    parent::tearDown();
   }
 
   public function testCreateUsingLoggedInUser() {
     $uid = $this->createLoggedInUser();
 
-    $contactID = $this->createEntity(['type' => 'Individual'])['id'];
+    $contactID = $this->createTestRecord('Contact')['id'];
 
-    $case = CiviCase::create(FALSE)
-      ->addValue('case_type_id', $this->getReference('test_case_type_1')['id'])
-      ->addValue('creator_id', 'user_contact_id')
-      ->addValue('status_id', 1)
-      ->addValue('contact_id', $contactID)
-      ->execute()
-      ->first();
+    $case = $this->createTestRecord('Case', [
+      'creator_id' => 'user_contact_id',
+      'contact_id' => $contactID,
+    ]);
 
     $relationships = Relationship::get(FALSE)
       ->addWhere('case_id', '=', $case['id'])
@@ -71,6 +52,11 @@ class CaseTest extends Api4TestBase implements TransactionalInterface {
   }
 
   public function testCgExtendsObjects() {
+    $this->createTestRecord('CaseType', [
+      'title' => 'Test Case Type',
+      'name' => 'test_case_type1',
+    ]);
+
     $field = \Civi\Api4\CustomGroup::getFields(FALSE)
       ->setLoadOptions(TRUE)
       ->addValue('extends', 'Case')

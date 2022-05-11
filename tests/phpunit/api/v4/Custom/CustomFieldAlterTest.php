@@ -29,7 +29,7 @@ use Civi\Api4\CustomGroup;
 class CustomFieldAlterTest extends CustomTestBase {
 
   public function testChangeSerialize() {
-    $contact = $this->createEntity(['type' => 'Individual']);
+    $contact = $this->createTestRecord('Contact');
 
     $customGroup = CustomGroup::create(FALSE)
       ->addValue('title', 'MyFieldsToAlter')

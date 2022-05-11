@@ -14,23 +14,25 @@ namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
-class CustomGroupSpecProvider implements Generic\SpecProviderInterface {
+class MembershipTypeCreationSpecProvider implements Generic\SpecProviderInterface {
 
   /**
-   * @inheritDoc
+   * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    */
-  public function modifySpec(RequestSpec $spec) {
-    $action = $spec->getAction();
-
-    $spec->getFieldByName('extends')
-      ->setSuffixes(['name', 'label', 'grouping']);
+  public function modifySpec(RequestSpec $spec): void {
+    $spec->getFieldByName('duration_interval')->setDefaultValue(1);
   }
 
   /**
-   * @inheritDoc
+   * When does this apply.
+   *
+   * @param string $entity
+   * @param string $action
+   *
+   * @return bool
    */
-  public function applies($entity, $action) {
-    return $entity === 'CustomGroup';
+  public function applies($entity, $action): bool {
+    return $entity === 'MembershipType' && $action === 'create';
   }
 
 }

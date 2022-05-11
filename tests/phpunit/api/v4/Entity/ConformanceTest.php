@@ -18,7 +18,6 @@
 
 namespace api\v4\Entity;
 
-use api\v4\Service\TestCreationParameterProvider;
 use api\v4\Traits\CheckAccessTrait;
 use api\v4\Traits\TableDropperTrait;
 use Civi\API\Exception\UnauthorizedException;
@@ -29,7 +28,6 @@ use api\v4\Api4TestBase;
 use Civi\Api4\Event\ValidateValuesEvent;
 use Civi\Api4\Service\Spec\CustomFieldSpec;
 use Civi\Api4\Service\Spec\FieldSpec;
-use Civi\Api4\Service\Spec\SpecGatherer;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\PostEvent;
 use Civi\Core\Event\PreEvent;
@@ -44,11 +42,6 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
   use TableDropperTrait;
 
   /**
-   * @var \api\v4\Service\TestCreationParameterProvider
-   */
-  protected $creationParamProvider;
-
-  /**
    * Set up baseline for testing
    *
    * @throws \CRM_Core_Exception
@@ -56,10 +49,6 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
   public function setUp(): void {
     // Enable all components
     \CRM_Core_BAO_ConfigSetting::enableAllComponents();
-    $this->loadDataSet('CaseType');
-    $this->loadDataSet('ConformanceTest');
-    $gatherer = new SpecGatherer();
-    $this->creationParamProvider = new TestCreationParameterProvider($gatherer);
     parent::setUp();
     $this->resetCheckAccess();
   }
@@ -261,7 +250,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
     $this->setCheckAccessGrants(["{$entity}::create" => TRUE]);
     $this->assertEquals(0, $this->checkAccessCounts["{$entity}::create"]);
 
-    $requiredParams = $this->creationParamProvider->getRequired($entity);
+    $requiredParams = $this->getRequiredValuesToCreate($entity);
     $createResult = $entityClass::create()
       ->setValues($requiredParams)
       ->setCheckPermissions(!$isReadOnly)
@@ -293,7 +282,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
     $this->setCheckAccessGrants(["{$entity}::create" => FALSE]);
     $this->assertEquals(0, $this->checkAccessCounts["{$entity}::create"]);
 
-    $requiredParams = $this->creationParamProvider->getRequired($entity);
+    $requiredParams = $this->getRequiredValuesToCreate($entity);
 
     try {
       $entityClass::create()
