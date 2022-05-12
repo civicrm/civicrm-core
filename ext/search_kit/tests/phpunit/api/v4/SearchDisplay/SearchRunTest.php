@@ -1079,4 +1079,39 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertEquals(1, $data['Household']);
   }
 
+  public function testGroupByFunction(): void {
+    $source = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['birth_date' => '2009-02-05'],
+      ['birth_date' => '1999-02-22'],
+      ['birth_date' => '2012-05-06'],
+    ];
+    Contact::save(FALSE)
+      ->addDefault('source', $source)
+      ->setRecords($sampleData)
+      ->execute();
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['COUNT(id) AS COUNT_id'],
+          'where' => [['source', '=', $source]],
+          'groupBy' => ['MONTH(birth_date)'],
+        ],
+      ],
+      'display' => NULL,
+      'afform' => NULL,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(2, $result);
+    $data = array_column(array_column((array) $result, 'data'), 'COUNT_id');
+    sort($data);
+    $this->assertEquals([1, 2], $data);
+  }
+
 }
