@@ -1,6 +1,7 @@
 var cv = require('civicrm-cv')({mode: 'sync'});
 var _CV = cv('vars:show');
 var cmd =
+  'define("CIVICRM_KARMA", 1);' +
   'CRM_Core_BAO_ConfigSetting::enableComponent("CiviCase");' +
   'global $civicrm_root;' +
   '$f = CRM_Utils_File::addTrailingSlash($civicrm_root)."tmp/karma.cv.js";' +
