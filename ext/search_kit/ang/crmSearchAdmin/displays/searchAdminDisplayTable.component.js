@@ -44,7 +44,7 @@
 
       this.$onInit = function () {
         if (!ctrl.display.settings) {
-          ctrl.display.settings = _.extend({}, _.cloneDeep(CRM.crmSearchAdmin.defaultDisplay.settings), {columns: null});
+          ctrl.display.settings = _.extend({}, _.cloneDeep(CRM.crmSearchAdmin.defaultDisplay.settings), {columns: null, pager: {}});
           if (searchMeta.getEntity(ctrl.apiEntity).order_by) {
             ctrl.display.settings.sort.push([searchMeta.getEntity(ctrl.apiEntity).order_by, 'ASC']);
           }
