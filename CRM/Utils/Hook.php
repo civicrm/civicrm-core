@@ -2430,7 +2430,7 @@ abstract class CRM_Utils_Hook {
    *        For future-proofing, use a serializable callback (e.g. string/array).
    *        See also: Civi\Core\Resolver.
    *    - requires: array, list of required Angular modules.
-   *    - basePages: array, uncondtionally load this module onto the given Angular pages. [v4.7.21+]
+   *    - basePages: array, unconditionally load this module onto the given Angular pages. [v4.7.21+]
    *      If omitted, default to "array('civicrm/a')" for backward compat.
    *      For a utility that should only be loaded on-demand, use "array()".
    *      For a utility that should be loaded in all pages use, "array('*')".
