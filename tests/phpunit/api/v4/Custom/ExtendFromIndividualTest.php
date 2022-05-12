@@ -44,13 +44,12 @@ class ExtendFromIndividualTest extends CustomTestBase {
       ->addValue('data_type', 'String')
       ->execute();
 
-    $contactId = Contact::create(FALSE)
-      ->addValue('first_name', 'Johann')
-      ->addValue('last_name', 'Tester')
-      ->addValue('contact_type', 'Individual')
-      ->addValue('MyContactFields.FavColor', 'Red')
-      ->execute()
-      ->first()['id'];
+    $contactId = $this->createTestRecord('Contact', [
+      'first_name' => 'Johann',
+      'last_name' => 'Tester',
+      'contact_type' => 'Individual',
+      'MyContactFields.FavColor' => 'Red',
+    ])['id'];
 
     $contact = Contact::get(FALSE)
       ->addSelect('display_name')

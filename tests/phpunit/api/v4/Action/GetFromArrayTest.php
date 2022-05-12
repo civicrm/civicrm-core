@@ -21,12 +21,11 @@ namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\MockArrayEntity;
-use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class GetFromArrayTest extends Api4TestBase implements TransactionalInterface {
+class GetFromArrayTest extends Api4TestBase {
 
   public function testArrayGetWithLimit() {
     $result = MockArrayEntity::get()

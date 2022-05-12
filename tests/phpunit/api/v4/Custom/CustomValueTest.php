@@ -22,7 +22,6 @@ namespace api\v4\Custom;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomValue;
-use Civi\Api4\Contact;
 use Civi\Api4\Entity;
 
 /**
@@ -73,12 +72,11 @@ class CustomValueTest extends CustomTestBase {
       ->addValue('data_type', 'String')
       ->execute()->first();
 
-    $this->contactID = Contact::create(FALSE)
-      ->addValue('first_name', 'Johann')
-      ->addValue('last_name', 'Tester')
-      ->addValue('contact_type', 'Individual')
-      ->execute()
-      ->first()['id'];
+    $this->contactID = $this->createTestRecord('Contact', [
+      'first_name' => 'Johann',
+      'last_name' => 'Tester',
+      'contact_type' => 'Individual',
+    ])['id'];
 
     // Ensure virtual api entity has been created
     $entity = Entity::get(FALSE)
@@ -220,12 +218,11 @@ class CustomValueTest extends CustomTestBase {
 
     // CASE 3: Test CustomValue::replace
     // create a second contact which will be used to replace the custom values, created earlier
-    $secondContactID = Contact::create(FALSE)
-      ->addValue('first_name', 'Adam')
-      ->addValue('last_name', 'Tester')
-      ->addValue('contact_type', 'Individual')
-      ->execute()
-      ->first()['id'];
+    $secondContactID = $this->createTestRecord('Contact', [
+      'first_name' => 'Adam',
+      'last_name' => 'Tester',
+      'contact_type' => 'Individual',
+    ])['id'];
     // Replace all the records which was created earlier with entity_id = first contact
     //  with custom record [$colorField => 'g', 'entity_id' => $secondContactID]
     CustomValue::replace($group)

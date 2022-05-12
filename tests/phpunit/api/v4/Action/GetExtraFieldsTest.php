@@ -24,12 +24,11 @@ use Civi\Api4\Activity;
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\Tag;
-use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class GetExtraFieldsTest extends Api4TestBase implements TransactionalInterface {
+class GetExtraFieldsTest extends Api4TestBase {
 
   public function testGetFieldsByContactType() {
     $getFields = Contact::getFields(FALSE)->addSelect('name')->addWhere('type', '=', 'Field');

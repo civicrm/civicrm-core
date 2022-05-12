@@ -68,13 +68,16 @@ class CustomFieldAlterTest extends CustomTestBase {
       ->execute()
       ->first();
 
-    Activity::save(FALSE)
-      ->setDefaults(['activity_type_id' => 1, 'source_contact_id' => $contact['id']])
-      ->addRecord(['subject' => 'A1', 'MyFieldsToAlter.TestText' => 'A1', 'MyFieldsToAlter.TestOptions' => '1'])
-      ->addRecord(['subject' => 'A2', 'MyFieldsToAlter.TestText' => 'A2', 'MyFieldsToAlter.TestOptions' => '2'])
-      ->addRecord(['subject' => 'A3', 'MyFieldsToAlter.TestText' => 'A3', 'MyFieldsToAlter.TestOptions' => ''])
-      ->addRecord(['subject' => 'A4', 'MyFieldsToAlter.TestText' => 'A4', 'MyFieldsToAlter.TestCountry' => [1228, 1039]])
-      ->execute();
+    $sampeData = [
+      ['subject' => 'A1', 'MyFieldsToAlter.TestText' => 'A1', 'MyFieldsToAlter.TestOptions' => '1'],
+      ['subject' => 'A2', 'MyFieldsToAlter.TestText' => 'A2', 'MyFieldsToAlter.TestOptions' => '2'],
+      ['subject' => 'A3', 'MyFieldsToAlter.TestText' => 'A3', 'MyFieldsToAlter.TestOptions' => ''],
+      ['subject' => 'A4', 'MyFieldsToAlter.TestText' => 'A4', 'MyFieldsToAlter.TestCountry' => [1228, 1039]],
+    ];
+    $this->saveTestRecords('Activity', [
+      'defaults' => ['activity_type_id' => 1, 'source_contact_id' => $contact['id']],
+      'records' => $sampeData,
+    ]);
 
     $result = Activity::get(FALSE)
       ->addWhere('MyFieldsToAlter.TestText', 'IS NOT NULL')

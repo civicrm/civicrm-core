@@ -44,13 +44,12 @@ class UpdateCustomValueTest extends CustomTestBase {
       ->addValue('data_type', 'String')
       ->execute();
 
-    $contactId = Contact::create(FALSE)
-      ->addValue('first_name', 'Red')
-      ->addValue('last_name', 'Tester')
-      ->addValue('contact_type', 'Individual')
-      ->addValue('MyContactFields.FavColor', 'Red')
-      ->execute()
-      ->first()['id'];
+    $contactId = $this->createTestRecord('Contact', [
+      'first_name' => 'Red',
+      'last_name' => 'Tester',
+      'contact_type' => 'Individual',
+      'MyContactFields.FavColor' => 'Red',
+    ])['id'];
 
     Contact::update(FALSE)
       ->addWhere('id', '=', $contactId)
