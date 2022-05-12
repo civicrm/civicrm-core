@@ -130,6 +130,9 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    * edge case. Note if it has more than one column then the blank line gets
    * skipped because of some checking for column-count matches in the import,
    * and so you don't hit the current fail.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testBlankLineAtEnd(): void {
     $form = $this->submitDatasourceForm('blankLineAtEnd.csv');
@@ -146,6 +149,9 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    * @param string $csvFileName
    *
    * @return \CRM_Contact_Import_Form_DataSource
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function submitDatasourceForm(string $csvFileName): CRM_Contact_Import_Form_DataSource {
     $_GET['dataSource'] = 'CRM_Import_DataSource_CSV';
@@ -156,6 +162,7 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
       ],
       'skipColumnHeader' => TRUE,
       'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'dataSource' => 'CRM_Import_DataSource_CSV',
     ]);
     $form->buildForm();
     $form->postProcess();

@@ -811,7 +811,13 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       return CRM_Import_Parser::ERROR;
 
     }
-    // sleep(3);
+
+    if (empty($this->_unparsedStreetAddressContacts)) {
+      $this->setImportStatus((int) ($values[count($values) - 1]), 'IMPORTED', '', $contactID);
+      return CRM_Import_Parser::VALID;
+    }
+
+    // @todo - record unparsed address as 'imported' but the presence of a message is meaningful?
     return $this->processMessage($values, $statusFieldName, CRM_Import_Parser::VALID);
   }
 
@@ -2265,7 +2271,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param array $mapper
    * @param int $mode
    * @param int $statusID
-   * @param int $totalRowCount
    *
    * @return mixed
    * @throws \API_Exception|\CRM_Core_Exception
@@ -2273,8 +2278,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   public function run(
     $mapper = [],
     $mode = self::MODE_PREVIEW,
-    $statusID = NULL,
-    $totalRowCount = NULL
+    $statusID = NULL
   ) {
 
     // TODO: Make the timeout actually work
@@ -2288,32 +2292,19 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $this->init();
 
     $this->_rowCount = 0;
-    $this->_invalidRowCount = $this->_validCount = 0;
     $this->_totalCount = 0;
 
-    $this->_errors = [];
-    $this->_warnings = [];
-    $this->_unparsedAddresses = [];
-
-    $this->_tableName = $tableName = $this->getUserJob()['metadata']['DataSource']['table_name'];
     $this->_primaryKeyName = '_id';
     $this->_statusFieldName = '_status';
-
-    if ($mode == self::MODE_MAPFIELD) {
-      $this->_rows = [];
-    }
-    else {
-      $this->_activeFieldCount = count($this->_activeFields);
-    }
 
     if ($statusID) {
       $this->progressImport($statusID);
       $startTimestamp = $currTimestamp = $prevTimestamp = time();
     }
-    // get the contents of the temp. import table
-    $query = "SELECT * FROM $tableName";
+    $dataSource = $this->getDataSourceObject();
+    $totalRowCount = $dataSource->getRowCount(['new']);
     if ($mode == self::MODE_IMPORT) {
-      $query .= " WHERE _status = 'NEW'";
+      $dataSource->setStatuses(['new']);
     }
     if ($this->_maxLinesToProcess > 0) {
       // Note this would only be the case in MapForm mode, where it is set to 100
@@ -2325,19 +2316,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       // which is the number of columns a row might have.
       // However, the mapField class may no longer use activeFieldsCount for contact
       // to be continued....
-      $query .= ' LIMIT ' . $this->_maxLinesToProcess;
+      $dataSource->setLimit($this->_maxLinesToProcess);
     }
 
-    $result = CRM_Core_DAO::executeQuery($query);
-
-    while ($result->fetch()) {
-      $values = array_values($result->toArray());
+    while ($row = $dataSource->getRow()) {
+      $values = array_values($row);
       $this->_rowCount++;
-
-      /* trim whitespace around the values */
-      foreach ($values as $k => $v) {
-        $values[$k] = trim($v, " \t\r\n");
-      }
 
       $this->_totalCount++;
 
@@ -2369,30 +2353,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $returnCode = self::ERROR;
       }
 
-      // note that a line could be valid but still produce a warning
-      if ($returnCode & self::VALID) {
-        $this->_validCount++;
-        if ($mode == self::MODE_MAPFIELD) {
-          $this->_rows[] = $values;
-          $this->_activeFieldCount = max($this->_activeFieldCount, count($values));
-        }
-      }
-
-      if ($returnCode & self::ERROR) {
-        $this->_invalidRowCount++;
-        array_unshift($values, $this->_rowCount);
-        $this->_errors[] = $values;
-      }
-
-      if ($returnCode & self::DUPLICATE) {
-        $this->_duplicateCount++;
-        array_unshift($values, $this->_rowCount);
-        $this->_duplicates[] = $values;
-        if ($onDuplicate != self::DUPLICATE_SKIP) {
-          $this->_validCount++;
-        }
-      }
-
       if ($returnCode & self::NO_MATCH) {
         $this->setImportStatus((int) $values[count($values) - 1], 'invalid_no_match', array_shift($values));
       }
@@ -2411,7 +2371,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *   Mapped array of values.
    */
   public function setActiveFields($fieldKeys) {
-    $this->_activeFieldCount = count($fieldKeys);
     foreach ($fieldKeys as $key) {
       if (empty($this->_fields[$key])) {
         $this->_activeFields[] = new CRM_Contact_Import_Field('', ts('- do not import -'));
@@ -2575,8 +2534,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param int $mode
    */
   public function set($store, $mode = self::MODE_SUMMARY) {
-    // To be removed in https://github.com/civicrm/civicrm-core/pull/23281
-    $store->set('fieldTypes', $this->getSelectTypes());
   }
 
   /**
@@ -2626,29 +2583,21 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Set the import status for the given record.
-   *
-   * If this is a sql import then the sql table will be used and the update
-   * will not happen as the relevant fields don't exist in the table - hence
-   * the checks that statusField & primary key are set.
+   * Update the status of the import row to reflect the processing outcome.
    *
    * @param int $id
    * @param string $status
    * @param string $message
+   * @param int|null $entityID
+   *   Optional created entity ID
+   * @param array $relatedEntityIDs
+   *   Optional array e.g ['related_contact' => 4]
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  public function setImportStatus(int $id, string $status, string $message): void {
-    if ($this->_statusFieldName && $this->_primaryKeyName) {
-      CRM_Core_DAO::executeQuery("
-        UPDATE $this->_tableName
-        SET $this->_statusFieldName = %1,
-          {$this->_statusFieldName}Msg = %2
-        WHERE  $this->_primaryKeyName = %3
-      ", [
-        1 => [$status, 'String'],
-        2 => [$message, 'String'],
-        3 => [$id, 'Integer'],
-      ]);
-    }
+  public function setImportStatus(int $id, string $status, string $message, ?int $entityID = NULL, array $relatedEntityIDs = []): void {
+    $this->getDataSourceObject()->updateStatus($id, $status, $message, $entityID, $relatedEntityIDs);
   }
 
   /**
@@ -3128,19 +3077,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $params = $this->getParams($values);
     $params['contact_type'] = $this->getContactType();
     return $params;
-  }
-
-  /**
-   * Is the job complete.
-   *
-   * This function transitionally accesses the table from the userJob
-   * directly - but the function should be moved to the dataSource class.
-   *
-   * @throws \API_Exception
-   */
-  public function isComplete() {
-    $tableName = $this->getUserJob()['metadata']['DataSource']['table_name'];
-    return (bool) CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM $tableName WHERE _status = 'NEW' LIMIT 1");
   }
 
   /**

@@ -442,10 +442,53 @@ abstract class CRM_Import_DataSource {
   protected function addTrackingFieldsToTable(string $tableName): void {
     CRM_Core_DAO::executeQuery("
      ALTER TABLE $tableName
+       ADD COLUMN _entity_id INT,
+       ADD COLUMN _related_entity_ids JSON,
        ADD COLUMN _status VARCHAR(32) DEFAULT 'NEW' NOT NULL,
-       ADD COLUMN _statusMsg TEXT,
+       ADD COLUMN _status_message TEXT,
        ADD COLUMN _id INT PRIMARY KEY NOT NULL AUTO_INCREMENT"
     );
+  }
+
+  /**
+   * Has the import job completed.
+   *
+   * @return bool
+   *   True if no rows remain to be imported.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function isCompleted(): bool {
+    return (bool) $this->getRowCount(['new']);
+  }
+
+  /**
+   * Update the status of the import row to reflect the processing outcome.
+   *
+   * @param int $id
+   * @param string $status
+   * @param string $message
+   * @param int|null $entityID
+   *   Optional created entity ID
+   * @param array $relatedEntityIDs
+   *   Optional array e.g ['related_contact' => 4]
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function updateStatus(int $id, string $status, string $message, ? int $entityID = NULL, array $relatedEntityIDs = []): void {
+    $sql = 'UPDATE ' . $this->getTableName() . ' SET _status = %1, _status_message = %2 ';
+    $params = [1 => [$status, 'String'], 2 => [$message, 'String']];
+    if ($entityID) {
+      $sql .= ', _entity_id = %3';
+      $params[3] = [$entityID, 'Integer'];
+    }
+    if ($relatedEntityIDs) {
+      $sql .= ', _related_entities = %4';
+      $params[4] = [json_encode($relatedEntityIDs), 'String'];
+    }
+    CRM_Core_DAO::executeQuery($sql . ' WHERE _id = ' . $id, $params);
   }
 
   /**
@@ -473,6 +516,7 @@ abstract class CRM_Import_DataSource {
       CRM_Import_Parser::DUPLICATE => ['duplicate'],
       CRM_Import_Parser::NO_MATCH => ['invalid_no_match'],
       CRM_Import_Parser::UNPARSED_ADDRESS_WARNING => ['warning_unparsed_address'],
+      'new' => ['new'],
     ];
   }
 
