@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Pledge;
+use Civi\Api4\PledgePayment;
+
 /**
  *
  * @package CRM
@@ -552,43 +555,29 @@ WHERE  civicrm_pledge.id = %2
    *
    * @return int
    *   $statusId calculated status id of pledge
+   *
+   * @throws \API_Exception
    */
-  public static function calculatePledgeStatus($pledgeId) {
-    $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $pledgeStatusTypes = CRM_Pledge_BAO_Pledge::buildOptions('status_id', 'validate');
-
-    //return if the pledge is cancelled.
-    $currentPledgeStatusId = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge', $pledgeId, 'status_id', 'id', TRUE);
-    if ($currentPledgeStatusId == array_search('Cancelled', $pledgeStatusTypes)) {
-      return $currentPledgeStatusId;
+  public static function calculatePledgeStatus(int $pledgeId): int {
+    $pledge = Pledge::get(FALSE)->addWhere('id', '=', $pledgeId)->addSelect('status_id', 'status_id:name')->execute()->first();
+    // Return if the pledge is cancelled.
+    if ($pledge['status_id:name'] === 'Cancelled') {
+      return $pledge['status_id'];
     }
-
-    // retrieve all pledge payments for this particular pledge
-    $allPledgePayments = $allStatus = [];
-    $returnProperties = ['status_id'];
-    CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'pledge_id', $pledgeId, $allPledgePayments, $returnProperties);
-
-    // build pledge payment statuses
-    foreach ($allPledgePayments as $key => $value) {
-      $allStatus[$value['id']] = $paymentStatusTypes[$value['status_id']];
+    // retrieve all pledge payment statuses for this particular pledge
+    $pledgePaymentStatuses = PledgePayment::get(FALSE)
+      ->addWhere('pledge_id', '=', $pledgeId)
+      ->addSelect('status_id:name')
+      ->execute()->indexBy('status_id:name');
+    if (!empty($pledgePaymentStatuses['Overdue'])) {
+      // If one payment is overdue then the pledge itself is.
+      return CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Overdue');
     }
-
-    if (array_search('Overdue', $allStatus)) {
-      $statusId = array_search('Overdue', $pledgeStatusTypes);
+    if (!empty($pledgePaymentStatuses['Completed'])) {
+      // If all payments are completed the pledge is Completed, otherwise it is In Progress.
+      return count($pledgePaymentStatuses) === 1 ? CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Completed') : CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'In Progress');
     }
-    elseif (array_search('Completed', $allStatus)) {
-      if (count(array_count_values($allStatus)) == 1) {
-        $statusId = array_search('Completed', $pledgeStatusTypes);
-      }
-      else {
-        $statusId = array_search('In Progress', $pledgeStatusTypes);
-      }
-    }
-    else {
-      $statusId = array_search('Pending', $pledgeStatusTypes);
-    }
-
-    return $statusId;
+    return CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Pending');
   }
 
   /**
