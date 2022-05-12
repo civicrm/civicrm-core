@@ -18,6 +18,8 @@ class SqlFunctionABS extends SqlFunction {
 
   protected static $category = self::CATEGORY_MATH;
 
+  protected static $dataType = 'Integer';
+
   protected static function params(): array {
     return [
       [
