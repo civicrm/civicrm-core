@@ -29,7 +29,7 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
   public function preProcess() {
     // set the error message path to display
     $this->assign('errorFile', $this->get('errorFile'));
-    $onDuplicate = $this->get('onDuplicate');
+    $onDuplicate = $this->getSubmittedValue('onDuplicate');
     $this->assign('dupeError', FALSE);
 
     if ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {

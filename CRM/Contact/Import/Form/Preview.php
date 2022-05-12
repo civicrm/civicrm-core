@@ -34,8 +34,8 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    $columnNames = $this->get('columnNames');
-    $this->_disableUSPS = $this->get('disableUSPS');
+    $columnNames = $this->getColumnHeaders();
+    $this->_disableUSPS = $this->getSubmittedValue('disableUSPS');
 
     //assign column names
     $this->assign('columnNames', $columnNames);
