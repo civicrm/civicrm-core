@@ -2410,42 +2410,17 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $relatedContactType = $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction']);
       $relatedContactLocationTypeID = $relatedContactKey ? $mappedField['location_type_id'] : NULL;
       $relatedContactWebsiteTypeID = $relatedContactKey ? $mappedField['website_type_id'] : NULL;
-      $relatedContactIMProviderID = $relatedContactKey ? $mappedField['im_provider_id'] : NULL;
+      $relatedContactIMProviderID = $relatedContactKey ? $mappedField['provider_id'] : NULL;
       $relatedContactPhoneTypeID = $relatedContactKey ? $mappedField['phone_type_id'] : NULL;
 
-      $locationTypeID = $relatedContactKey ? NULL : $mappedField['location_type_id'];
-      $phoneTypeID = $relatedContactKey ? NULL : $mappedField['phone_type_id'];
-      $imProviderID = $relatedContactKey ? NULL : $mappedField['im_provider_id'];
-      $websiteTypeID = $relatedContactKey ? NULL : $mappedField['website_type_id'];
-
+      $locationFields = ['location_type_id', 'phone_type_id', 'provider_id', 'website_type_id'];
+      $value = array_filter(array_intersect_key($mappedField, array_fill_keys($locationFields, 1)));
       if (!$relatedContactKey) {
-        if (isset($locationTypeID)) {
+        if (!empty($value)) {
           if (!isset($params[$fieldName])) {
             $params[$fieldName] = [];
           }
-
-          $value = [
-            $fieldName => $importedValue,
-            'location_type_id' => $locationTypeID,
-          ];
-
-          if (isset($phoneTypeID)) {
-            $value['phone_type_id'] = $phoneTypeID;
-          }
-
-          // get IM service Provider type id
-          if (isset($imProviderID)) {
-            $value['provider_id'] = $imProviderID;
-          }
-
-          $params[$fieldName][] = $value;
-        }
-        elseif (isset($websiteTypeID)) {
-          $value = [
-            $fieldName => $importedValue,
-            'website_type_id' => $websiteTypeID,
-          ];
-
+          $value[$fieldName] = $importedValue;
           $params[$fieldName][] = $value;
         }
 
@@ -3185,6 +3160,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *
    * This is the same format as saved in civicrm_mapping_field except
    * that location_type_id = 'Primary' rather than empty where relevant.
+   * Also 'im_provider_id' is mapped to the 'real' field name 'provider_id'
    *
    * @return array
    * @throws \API_Exception
@@ -3196,8 +3172,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if (!$mappedField['location_type_id'] && !empty($this->importableFieldsMetadata[$mappedField['name']]['hasLocationType'])) {
         $mappedField['location_type_id'] = 'Primary';
       }
-      // Just for clarity since 0 is a pseudovalue
+      // Just for clarity since 0 is a pseudo-value
       unset($mappedField['mapping_id']);
+      // Annoyingly the civicrm_mapping_field name for this differs from civicrm_im.
+      // Test cover in `CRM_Contact_Import_Parser_ContactTest::testMapFields`
+      $mappedField['provider_id'] = $mappedField['im_provider_id'];
+      unset($mappedField['im_provider_id']);
       $mappedFields[] = $mappedField;
     }
     return $mappedFields;
