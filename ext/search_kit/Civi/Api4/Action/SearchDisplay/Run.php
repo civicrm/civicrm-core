@@ -2,6 +2,8 @@
 
 namespace Civi\Api4\Action\SearchDisplay;
 
+use Civi\API\Request;
+use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
@@ -52,6 +54,34 @@ class Run extends AbstractRunAction {
         }
         unset($apiParams['orderBy'], $apiParams['limit']);
         break;
+
+      case 'tally':
+        $this->applyFilters();
+        unset($apiParams['orderBy'], $apiParams['limit']);
+        $api = Request::create($entityName, 'get', $apiParams);
+        $query = new Api4SelectQuery($api);
+        $query->forceSelectId = FALSE;
+        $sql = $query->getSql();
+        $select = [];
+        foreach ($settings['columns'] as $col) {
+          if (!empty($col['tally']['fn']) && !empty($col['key'])) {
+            $fn = \CRM_Core_DAO::escapeString($col['tally']['fn']);
+            $key = \CRM_Core_DAO::escapeString($col['key']);
+            $select[] = $fn . '(`' . $key . '`) `' . $key . '`';
+          }
+        }
+        $query = 'SELECT ' . implode(', ', $select) . ' FROM (' . $sql . ') `api_query`';
+        $dao = \CRM_Core_DAO::executeQuery($query);
+        $dao->fetch();
+        $tally = [];
+        foreach ($settings['columns'] as $col) {
+          if (!empty($col['tally']['fn']) && !empty($col['key'])) {
+            $alias = str_replace('.', '_', $col['key']);
+            $tally[$col['key']] = $dao->$alias ?? NULL;
+          }
+        }
+        $result[] = $tally;
+        return;
 
       default:
         if (($settings['pager'] ?? FALSE) !== FALSE && preg_match('/^page:\d+$/', $key)) {
