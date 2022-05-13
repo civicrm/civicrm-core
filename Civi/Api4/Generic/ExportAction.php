@@ -92,6 +92,10 @@ class ExportAction extends AbstractAction {
       elseif (empty($field['fk_entity'])) {
         $select[] = $field['name'];
       }
+      // Needed for exporting the option group for a custom field
+      if ($entityType === 'CustomField' && ($field['fk_entity'] ?? NULL) === 'OptionGroup') {
+        $select[] = $field['name'];
+      }
     }
     $record = civicrm_api4($entityType, 'get', [
       'checkPermissions' => $this->checkPermissions,
@@ -131,6 +135,17 @@ class ExportAction extends AbstractAction {
     $name = ($parentName ?? '') . $entityType . '_' . ($record['name'] ?? count($this->exportedEntities[$entityType]));
     // Ensure safe characters, max length
     $name = \CRM_Utils_String::munge($name, '_', 127);
+    // Include option group with custom field
+    if ($entityType === 'CustomField') {
+      if (
+        !empty($record['option_group_id.name']) &&
+        // Sometimes fields share an option group; only export it once.
+        empty($this->exportedEntities['OptionGroup'][$record['option_group_id']])
+      ) {
+        $this->exportRecord('OptionGroup', $record['option_group_id'], $result);
+      }
+      unset($record['option_group_id']);
+    }
     $result[] = [
       'name' => $name,
       'entity' => $entityType,
@@ -151,6 +166,10 @@ class ExportAction extends AbstractAction {
       $references = [];
       foreach ($dao->findReferences() as $reference) {
         $refEntity = \CRM_Utils_Array::first($reference::fields())['entity'] ?? '';
+        // Custom fields don't really "belong" to option groups despite the reference
+        if ($refEntity === 'CustomField' && $entityType === 'OptionGroup') {
+          continue;
+        }
         // Limit references by domain
         if (property_exists($reference, 'domain_id')) {
           if (!isset($reference->domain_id)) {
