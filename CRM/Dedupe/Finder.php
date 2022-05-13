@@ -220,7 +220,11 @@ class CRM_Dedupe_Finder {
     }
 
     // handle custom data
-    $tree = CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1);
+
+    $subTypes = $fields['contact_sub_type'] ?? [];
+    // Only return custom for subType + unrestricted or return all custom
+    // fields.
+    $tree = CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1, $subTypes, NULL, TRUE, NULL, TRUE);
     CRM_Core_BAO_CustomGroup::postProcess($tree, $fields, TRUE);
     foreach ($tree as $key => $cg) {
       if (!is_int($key)) {
