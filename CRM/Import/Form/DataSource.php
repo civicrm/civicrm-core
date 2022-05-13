@@ -23,8 +23,12 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    * Set variables up before form is built.
    */
   public function preProcess() {
+    // Import options as an array of field names specific to the import
+    // (used by custom field import at time or writing) that will be included
+    // in the tpl.
+    $this->assign('import_options', []);
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
-    $params = "reset=1";
+    $params = 'reset=1';
     if ($this->_id) {
       $params .= "&id={$this->_id}";
     }

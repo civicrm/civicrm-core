@@ -74,10 +74,22 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     parent::buildQuickForm();
 
     $multipleCustomData = CRM_Core_BAO_CustomGroup::getMultipleFieldGroup();
-    $this->assign('fieldGroups', $multipleCustomData);
+    if (!$multipleCustomData) {
+      CRM_Core_Error::statusBounce(ts('This import screen cannot be used because there are no Multi-value custom data groups'));
+    }
     $this->add('select', 'multipleCustomData', ts('Multi-value Custom Data'), ['' => ts('- select -')] + $multipleCustomData, TRUE);
-
+    // Assign an array of fields that are specific to this import to be included.
+    $this->assign('import_options', ['multipleCustomData']);
     $this->addContactTypeSelector();
+  }
+
+  /**
+   * Is the custom data import available for use.
+   *
+   * @return bool
+   */
+  public static function isAvailable(): bool {
+    return CRM_Core_Permission::check('access CiviCRM') && CRM_Core_BAO_CustomGroup::getMultipleFieldGroup();
   }
 
   /**
