@@ -512,11 +512,16 @@ abstract class CRM_Import_Parser {
    * @param string $contactType
    * @param array $params
    * @param bool $isPermitExistingMatchFields
+   *   True if the it is enough to have fields which will enable us to find
+   *   an existing contact (eg. external_identifier).
+   * @param string $prefixString
+   *   String to include in the exception (e.g '(Child of)' if we are validating
+   *   a related contact.
    *
    * @return void
    * @throws \CRM_Core_Exception
    */
-  protected function validateRequiredContactFields(string $contactType, array $params, bool $isPermitExistingMatchFields = TRUE): void {
+  protected function validateRequiredContactFields(string $contactType, array $params, bool $isPermitExistingMatchFields = TRUE, $prefixString = ''): void {
     if (!empty($params['id'])) {
       return;
     }
@@ -536,7 +541,7 @@ abstract class CRM_Import_Parser {
       // specified dedupe rule (or the default Unsupervised if not specified).
       $requiredFields['email'] = ts('Email Address');
     }
-    $this->validateRequiredFields($requiredFields, $params);
+    $this->validateRequiredFields($requiredFields, $params, $prefixString);
   }
 
   /**
@@ -1127,11 +1132,11 @@ abstract class CRM_Import_Parser {
    *     ['first_name' => ts('First Name'), 'last_name' => ts('Last Name')]
    *   ]
    *   Means 'email' OR 'first_name AND 'last_name'.
+   * @param string $prefixString
    *
-   * @throws \CRM_Core_Exception
-   *   Exception thrown if field requirements are not met.
+   * @throws \CRM_Core_Exception Exception thrown if field requirements are not met.
    */
-  protected function validateRequiredFields(array $requiredFields, array $params): void {
+  protected function validateRequiredFields(array $requiredFields, array $params, $prefixString): void {
     $missingFields = [];
     foreach ($requiredFields as $key => $required) {
       if (!is_array($required)) {
@@ -1163,7 +1168,7 @@ abstract class CRM_Import_Parser {
         $missingFields[$key] = implode(' ' . ts('and') . ' ', $missing);
       }
     }
-    throw new CRM_Core_Exception(ts('Missing required fields:') . ' ' . implode(' ' . ts('OR') . ' ', $missingFields));
+    throw new CRM_Core_Exception(($prefixString ? ($prefixString . ' ') : '') . ts('Missing required fields:') . ' ' . implode(' ' . ts('OR') . ' ', $missingFields));
   }
 
 }
