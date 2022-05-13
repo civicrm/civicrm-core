@@ -204,10 +204,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
     foreach ($storeParams as $storeName => $value) {
       $this->set($storeName, $value);
     }
-    $this->set('disableUSPS', $this->getSubmittedValue('disableUSPS'));
-    $this->set('dataSource', $this->getSubmittedValue('dataSource'));
-    $this->set('skipColumnHeader', CRM_Utils_Array::value('skipColumnHeader', $this->_params));
-
     CRM_Core_Session::singleton()->set('dateTypes', $storeParams['dateFormats']);
 
     $this->instantiateDataSource();
