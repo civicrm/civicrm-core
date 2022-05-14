@@ -121,6 +121,112 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test import parser will update based on a custom rule match.
+   *
+   * In this case the contact has no external identifier.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testImportParserWithUpdateWithCustomRule(): void {
+    $this->createCustomGroupWithFieldsOfAllTypes();
+
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
+      'contact_type' => 'Individual',
+      'threshold' => 10,
+      'used' => 'General',
+      'name' => 'TestRule',
+      'title' => 'TestRule',
+      'is_reserved' => 0,
+    ]);
+    $this->callAPISuccess('Rule', 'create', [
+      'dedupe_rule_group_id' => $ruleGroup['id'],
+      'rule_table' => $this->getCustomGroupTable(),
+      'rule_weight' => 10,
+      'rule_field' => $this->getCustomFieldColumnName('text'),
+    ]);
+
+    $extra = [
+      $this->getCustomFieldName('select_string') => 'Yellow',
+      $this->getCustomFieldName('text') => 'Duplicate',
+    ];
+
+    [$originalValues, $result] = $this->setUpBaseContact($extra);
+
+    $contactValues = [
+      'first_name' => 'Tim',
+      'last_name' => 'Cook',
+      'email' => 'tim.cook@apple.com',
+      'nick_name' => 'Steve',
+      $this->getCustomFieldName('select_string') => 'Red',
+      $this->getCustomFieldName('text') => 'Duplicate',
+    ];
+
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, [], NULL, $ruleGroup['id']);
+    $contactValues['id'] = $result['id'];
+    $this->assertEquals('R', $this->callAPISuccessGetValue('Contact', ['id' => $result['id'], 'return' => $this->getCustomFieldName('select_string')]));
+    $this->callAPISuccessGetSingle('Contact', $contactValues);
+
+    $foundDupes = CRM_Dedupe_Finder::dupes($ruleGroup['id']);
+    $this->assertCount(0, $foundDupes);
+  }
+
+  /**
+   * Test import parser will update based on a custom rule match.
+   *
+   * In this case the contact has no external identifier.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testImportParserWithUpdateWithCustomRuleNoExternalIDMatch(): void {
+    $this->createCustomGroupWithFieldsOfAllTypes();
+
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
+      'contact_type' => 'Individual',
+      'threshold' => 10,
+      'used' => 'General',
+      'name' => 'TestRule',
+      'title' => 'TestRule',
+      'is_reserved' => 0,
+    ]);
+    $this->callAPISuccess('Rule', 'create', [
+      'dedupe_rule_group_id' => $ruleGroup['id'],
+      'rule_table' => $this->getCustomGroupTable(),
+      'rule_weight' => 10,
+      'rule_field' => $this->getCustomFieldColumnName('text'),
+    ]);
+
+    $extra = [
+      $this->getCustomFieldName('select_string') => 'Yellow',
+      $this->getCustomFieldName('text') => 'Duplicate',
+      'external_identifier' => 'ext-2',
+    ];
+
+    [$originalValues, $result] = $this->setUpBaseContact($extra);
+
+    $contactValues = [
+      'first_name' => 'Tim',
+      'last_name' => 'Cook',
+      'email' => 'tim.cook@apple.com',
+      'nick_name' => 'Steve',
+      'external_identifier' => 'ext-1',
+      $this->getCustomFieldName('select_string') => 'Red',
+      $this->getCustomFieldName('text') => 'Duplicate',
+    ];
+
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, [], NULL, $ruleGroup['id']);
+    $contactValues['id'] = $result['id'];
+    $this->assertEquals('R', $this->callAPISuccessGetValue('Contact', ['id' => $result['id'], 'return' => $this->getCustomFieldName('select_string')]));
+    $this->callAPISuccessGetSingle('Contact', $contactValues);
+
+    $foundDupes = CRM_Dedupe_Finder::dupes($ruleGroup['id']);
+    $this->assertCount(0, $foundDupes);
+  }
+
+  /**
    * Test import parser will update contacts with an external identifier.
    *
    * This is the basic test where the identifier matches the import parameters.
