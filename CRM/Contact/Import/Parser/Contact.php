@@ -29,13 +29,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   use CRM_Contact_Import_MetadataTrait;
 
   protected $_mapperKeys = [];
-  protected $_mapperRelated;
-  protected $_mapperRelatedContactDetails;
   protected $_relationships;
-
-  protected $_emailIndex;
-
-  protected $_phoneIndex;
 
   /**
    * Is update only permitted on an id match.
@@ -116,19 +110,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * Class constructor.
    *
    * @param array $mapperKeys
-   * @param array $mapperLocType
-   * @param array $mapperPhoneType
-   * @param array $mapperImProvider
-   * @param array $mapperRelated
-   * @param array $mapperRelatedContactType
-   * @param array $mapperRelatedContactDetails
    */
-  public function __construct(
-    $mapperKeys = [], $mapperLocType = [], $mapperPhoneType = [], $mapperImProvider = [], $mapperRelated = [], $mapperRelatedContactType = [], $mapperRelatedContactDetails = []) {
+  public function __construct($mapperKeys = []) {
     parent::__construct();
     $this->_mapperKeys = $mapperKeys;
-    $this->_mapperRelated = &$mapperRelated;
-    $this->_mapperRelatedContactDetails = &$mapperRelatedContactDetails;
   }
 
   /**
@@ -143,18 +128,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     $this->setActiveFields($this->_mapperKeys);
 
-    $this->_phoneIndex = -1;
-    $this->_emailIndex = -1;
     $this->_externalIdentifierIndex = -1;
 
     $index = 0;
     foreach ($this->_mapperKeys as $key) {
-      if (substr($key, 0, 5) == 'email' && substr($key, 0, 14) != 'email_greeting') {
-        $this->_emailIndex = $index;
-      }
-      if (substr($key, 0, 5) == 'phone') {
-        $this->_phoneIndex = $index;
-      }
       if ($key == 'external_identifier') {
         $this->_externalIdentifierIndex = $index;
       }
@@ -162,14 +139,25 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
 
     $this->_updateWithId = FALSE;
-    if (in_array('id', $this->_mapperKeys) || ($this->_externalIdentifierIndex >= 0 && in_array($this->_onDuplicate, [
-      CRM_Import_Parser::DUPLICATE_UPDATE,
-      CRM_Import_Parser::DUPLICATE_FILL,
-    ]))) {
+    if (in_array('id', $this->_mapperKeys) || ($this->_externalIdentifierIndex >= 0 && $this->isUpdateExistingContacts())) {
       $this->_updateWithId = TRUE;
     }
 
     $this->_parseStreetAddress = CRM_Utils_Array::value('street_address_parsing', CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'address_options'), FALSE);
+  }
+
+  /**
+   * Is this a case where the user has opted to update existing contacts.
+   *
+   * @return bool
+   *
+   * @throws \API_Exception
+   */
+  private function isUpdateExistingContacts(): bool {
+    return in_array((int) $this->getSubmittedValue('onDuplicate'), [
+      CRM_Import_Parser::DUPLICATE_UPDATE,
+      CRM_Import_Parser::DUPLICATE_FILL,
+    ], TRUE);
   }
 
   /**
@@ -644,15 +632,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
           //format common data, CRM-4062
           $this->formatCommonData($field, $formatting, $contactFields);
-
-          //do we have enough fields to create related contact.
-          $allowToCreate = $this->checkRelatedContactFields($key, $formatting);
-
-          if (!$allowToCreate) {
-            $errorMessage = ts('Related contact required fields are missing.');
-            array_unshift($values, $errorMessage);
-            return CRM_Import_Parser::NO_MATCH;
-          }
 
           //fixed for CRM-4148
           if (!empty($params[$key]['id'])) {
@@ -1931,50 +1910,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * @param $relKey
-   * @param array $params
-   *
-   * @return bool
-   */
-  public function checkRelatedContactFields($relKey, $params) {
-    //avoid blank contact creation.
-    $allowToCreate = FALSE;
-
-    //build the mapper field array.
-    static $relatedContactFields = [];
-    if (!isset($relatedContactFields[$relKey])) {
-      foreach ($this->_mapperRelated as $key => $name) {
-        if (!$name) {
-          continue;
-        }
-
-        if (!empty($relatedContactFields[$name]) && !is_array($relatedContactFields[$name])) {
-          $relatedContactFields[$name] = [];
-        }
-        $fldName = $this->_mapperRelatedContactDetails[$key] ?? NULL;
-        if ($fldName == 'url') {
-          $fldName = 'website';
-        }
-        if ($fldName) {
-          $relatedContactFields[$name][] = $fldName;
-        }
-      }
-    }
-
-    //validate for passed data.
-    if (is_array($relatedContactFields[$relKey])) {
-      foreach ($relatedContactFields[$relKey] as $fld) {
-        if (!empty($params[$fld])) {
-          $allowToCreate = TRUE;
-          break;
-        }
-      }
-    }
-
-    return $allowToCreate;
-  }
-
-  /**
    * get subtypes given the contact type
    *
    * @param string $contactType
@@ -3062,66 +2997,23 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param array $values
    *
    * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function validateValues(array $values): void {
-    $errorMessage = NULL;
-    $errorRequired = FALSE;
     $params = $this->getMappedRow($values);
-    $missingNames = [];
-    switch ($params['contact_type']) {
-      case 'Individual':
-        if (empty($params['first_name'])) {
-          $missingNames[] = ts('First Name');
-        }
-        if (empty($params['last_name'])) {
-          $missingNames[] = ts('Last Name');
-        }
-        break;
-
-      case 'Household':
-        if (empty($params['household_name'])) {
-          $missingNames[] = ts('Missing required fields:') . ' ' . ts('Household Name');
-        }
-        break;
-
-      case 'Organization':
-        if (empty($params['organization_name'])) {
-          $missingNames[] = ts('Missing required fields:') . ' ' . ts('Organization Name');
-        }
-        break;
-    }
-    if (!empty($missingNames)) {
-      $errorMessage = ts('Missing required fields:') . ' ' . implode(' ' . ts('and') . ' ', $missingNames);
-      $errorRequired = TRUE;
-    }
-
-    if ($this->_emailIndex >= 0) {
-      /* If we don't have the required fields, bail */
-
-      if ($this->_contactType === 'Individual' && !$this->_updateWithId) {
-        if ($errorRequired && empty($values[$this->_emailIndex])) {
-          if ($errorMessage) {
-            $errorMessage .= ' ' . ts('OR') . ' ' . ts('Email Address');
-          }
-          else {
-            $errorMessage = ts('Missing required field:') . ' ' . ts('Email Address');
-          }
-          throw new CRM_Core_Exception($errorMessage);
-        }
+    $this->validateRequiredContactFields($params['contact_type'], $params, $this->isUpdateExistingContacts());
+    foreach ($params as $key => $value) {
+      // If the key is a relationship key - eg. 5_a_b or 10_b_a
+      // then the value is an array that describes an existing contact.
+      // We need to check the fields are present to identify or create this
+      // contact.
+      if (preg_match('/^\d+_[a|b]_[a|b]$/', $key)) {
+        $this->validateRequiredContactFields($value['contact_type'], $value, TRUE, '(' . $this->getRelatedContactLabel(substr($key, 0, -4), substr($key, -3)) . ')');
       }
-    }
-    elseif ($errorRequired && !$this->_updateWithId) {
-      if ($errorMessage) {
-        $errorMessage .= ' ' . ts('OR') . ' ' . ts('Email Address');
-      }
-      else {
-        $errorMessage = ts('Missing required field:') . ' ' . ts('Email Address');
-      }
-      throw new CRM_Core_Exception($errorMessage);
     }
 
     //check for duplicate external Identifier
-    $externalID = $values[$this->_externalIdentifierIndex] ?? NULL;
+    $externalID = $params['external_identifier'] ?? NULL;
     if ($externalID) {
       /* If it's a dupe,external Identifier  */
 
@@ -3197,12 +3089,39 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     if (!$relationshipTypeID) {
       return NULL;
     }
-    $cacheKey = $relationshipTypeID . $relationshipDirection;
+    $relationshipField = 'contact_type_' . substr($relationshipDirection, -1);
+    return $this->getRelationshipType($relationshipTypeID, $relationshipDirection)[$relationshipField];
+  }
+
+  /**
+   * Get the related contact type.
+   *
+   * @param int|null $relationshipTypeID
+   * @param int|string $relationshipDirection
+   *
+   * @return null|string
+   *
+   * @throws \API_Exception
+   */
+  protected function getRelatedContactLabel($relationshipTypeID, $relationshipDirection): ?string {
+    $relationshipField = 'label_' . $relationshipDirection;
+    return $this->getRelationshipType($relationshipTypeID, $relationshipDirection)[$relationshipField];
+  }
+
+  /**
+   * Get the relationship type.
+   *
+   * @param int $relationshipTypeID
+   *
+   * @return string[]
+   * @throws \API_Exception
+   */
+  protected function getRelationshipType(int $relationshipTypeID): array {
+    $cacheKey = 'relationship_type' . $relationshipTypeID;
     if (!isset(Civi::$statics[__CLASS__][$cacheKey])) {
-      $relationshipField = 'contact_type_' . substr($relationshipDirection, -1);
       Civi::$statics[__CLASS__][$cacheKey] = RelationshipType::get(FALSE)
         ->addWhere('id', '=', $relationshipTypeID)
-        ->addSelect($relationshipField)->execute()->first()[$relationshipField];
+        ->addSelect('*')->execute()->first();
     }
     return Civi::$statics[__CLASS__][$cacheKey];
   }
