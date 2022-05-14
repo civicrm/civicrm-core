@@ -2345,8 +2345,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $relatedContactType = $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction']);
       $relatedContactLocationTypeID = $relatedContactKey ? $mappedField['location_type_id'] : NULL;
       $relatedContactWebsiteTypeID = $relatedContactKey ? $mappedField['website_type_id'] : NULL;
-      $relatedContactIMProviderID = $relatedContactKey ? $mappedField['provider_id'] : NULL;
-      $relatedContactPhoneTypeID = $relatedContactKey ? $mappedField['phone_type_id'] : NULL;
 
       $locationFields = ['location_type_id', 'phone_type_id', 'provider_id', 'website_type_id'];
       $value = array_filter(array_intersect_key($mappedField, array_fill_keys($locationFields, 1)));
@@ -2381,27 +2379,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           ) {
             $params[$relatedContactKey][$relatedContactFieldName] = [];
           }
-          $value = [
-            $relatedContactFieldName => $importedValue,
-            'location_type_id' => $relatedContactLocationTypeID,
-          ];
-
-          if (isset($relatedContactPhoneTypeID)) {
-            $value['phone_type_id'] = $relatedContactPhoneTypeID;
-          }
-
-          // get IM service Provider type id for related contact
-          if (isset($relatedContactIMProviderID)) {
-            $value['provider_id'] = $relatedContactIMProviderID;
-          }
-
+          $value[$relatedContactFieldName] = $importedValue;
           $params[$relatedContactKey][$relatedContactFieldName][] = $value;
         }
         elseif (isset($relatedContactWebsiteTypeID)) {
-          $params[$relatedContactKey][$relatedContactFieldName][] = [
-            'url' => $importedValue,
-            'website_type_id' => $relatedContactWebsiteTypeID,
-          ];
+          $value[$relatedContactFieldName] = $importedValue;
+          $params[$relatedContactKey][$relatedContactFieldName][] = $value;
         }
         elseif (empty($importedValue) && isset($relatedContactLocationTypeID)) {
           if (empty($params[$relatedContactKey][$relatedContactFieldName])) {
