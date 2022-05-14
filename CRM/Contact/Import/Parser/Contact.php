@@ -353,10 +353,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $errorMessage = $e->getMessage();
         array_unshift($values, $errorMessage);
 
-        $importRecordParams = [
-          $statusFieldName => 'ERROR',
-          "${statusFieldName}Msg" => $errorMessage,
-        ];
         $this->setImportStatus((int) $values[count($values) - 1], 'ERROR', $errorMessage);
         return CRM_Import_Parser::ERROR;
       }
