@@ -1925,6 +1925,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
     $checkParams = ['check_permissions' => FALSE, 'match' => $params];
     $checkParams['match']['contact_type'] = $this->_contactType;
+    $checkParams['dedupe_rule_id'] = $this->_dedupeRuleGroupID ?? NULL;
 
     $possibleMatches = civicrm_api3('Contact', 'duplicatecheck', $checkParams);
     if (!$extIDMatch) {
