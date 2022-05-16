@@ -91,6 +91,7 @@
     <type>boolean</type>
     <comment>if true - processing logic must reject transaction at confirmation stage if pay method != credit card</comment>
     <default>0</default>
+    <required>true</required>
     <add>1.3</add>
   </field>
   <field>
@@ -98,6 +99,7 @@
     <title>Is Monetary</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>if true - allows real-time monetary transactions otherwise non-monetary transactions</comment>
     <add>1.6</add>
   </field>
@@ -106,6 +108,7 @@
     <title>Is Recurring</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>if true - allows recurring contributions, valid only for PayPal_Standard</comment>
     <add>1.6</add>
   </field>
@@ -114,6 +117,7 @@
     <title>Confirmation Page?</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>if false, the confirm page in contribution pages gets skipped</comment>
     <add>4.2</add>
   </field>
@@ -139,6 +143,7 @@
     <title>Support Recurring Intervals</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>if true - supports recurring intervals</comment>
     <add>2.1</add>
   </field>
@@ -147,6 +152,7 @@
     <title>Recurring Installments?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>if true - asks user for recurring installments</comment>
     <add>4.3</add>
   </field>
@@ -155,6 +161,7 @@
     <title>Adjust Recurring Start Date</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>if true - user is able to adjust payment start date</comment>
     <add>4.7</add>
   </field>
@@ -163,6 +170,7 @@
     <title>Pay Later</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>if true - allows the user to send payment directly to the org later</comment>
     <add>2.0</add>
   </field>
@@ -226,6 +234,7 @@
     <type>boolean</type>
     <comment>if true, page will include an input text field where user can enter their own amount</comment>
     <default>0</default>
+    <required>true</required>
     <add>1.3</add>
   </field>
   <field>
@@ -299,6 +308,7 @@
     <type>boolean</type>
     <comment>if true, receipt is automatically emailed to contact on success</comment>
     <default>0</default>
+    <required>true</required>
     <add>1.3</add>
   </field>
   <field>
@@ -351,6 +361,8 @@
     <name>is_active</name>
     <title>Is Page Active?</title>
     <type>boolean</type>
+    <default>1</default>
+    <required>true</required>
     <comment>Is this property active?</comment>
     <add>1.3</add>
   </field>
@@ -373,6 +385,7 @@
     <type>boolean</type>
     <comment>Is this property active?</comment>
     <default>1</default>
+    <required>true</required>
     <add>1.5</add>
   </field>
   <field>
@@ -463,6 +476,7 @@
     <title>Is Contribution Page Shared?</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Can people share the contribution page through social media?</comment>
     <add>4.1</add>
   </field>
@@ -471,6 +485,7 @@
     <title>Is billing block required</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>if true - billing block is required for online contribution page</comment>
     <add>4.6</add>
   </field>

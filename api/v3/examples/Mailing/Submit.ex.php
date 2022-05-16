@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the Mailing.submit API.
  *
@@ -9,10 +14,10 @@ function mailing_submit_example() {
   $params = [
     'scheduled_date' => '2014-12-13 10:00:00',
     'approval_date' => '2014-12-13 00:00:00',
-    'id' => 22,
+    'id' => 23,
   ];
 
-  try{
+  try {
     $result = civicrm_api3('Mailing', 'submit', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -43,13 +48,13 @@ function mailing_submit_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 22,
+    'id' => 23,
     'values' => [
-      '22' => [
-        'id' => '22',
+      '23' => [
+        'id' => '23',
         'domain_id' => '1',
         'header_id' => '',
-        'footer_id' => '31',
+        'footer_id' => '33',
         'reply_id' => '8',
         'unsubscribe_id' => '5',
         'resubscribe_id' => '6',
@@ -73,12 +78,12 @@ https://civicrm.org
         'is_completed' => '',
         'msg_template_id' => '',
         'override_verp' => '1',
-        'created_id' => '45',
+        'created_id' => '48',
         'created_date' => '2013-07-28 08:49:19',
         'modified_date' => '2012-11-14 16:02:35',
-        'scheduled_id' => '46',
+        'scheduled_id' => '49',
         'scheduled_date' => '20130728085413',
-        'approver_id' => '46',
+        'approver_id' => '49',
         'approval_date' => '20130728085413',
         'approval_status_id' => '1',
         'approval_note' => '',
@@ -99,23 +104,23 @@ https://civicrm.org
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testMailerSubmit"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MailingTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
-*
-* To Learn about the API read
-* https://docs.civicrm.org/dev/en/latest/api/
-*
-* Browse the API on your own site with the API Explorer. It is in the main
-* CiviCRM menu, under: Support > Development > API Explorer.
-*
-* Read more about testing here
-* https://docs.civicrm.org/dev/en/latest/testing/
-*
-* API Standards documentation:
-* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testMailerSubmit"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MailingTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

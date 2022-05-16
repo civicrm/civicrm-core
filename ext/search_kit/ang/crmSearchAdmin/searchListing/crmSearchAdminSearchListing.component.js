@@ -3,8 +3,12 @@
 
   // Specialized searchDisplay, only used by Admins
   angular.module('crmSearchAdmin').component('crmSearchAdminSearchListing', {
-    templateUrl: '~/crmSearchAdmin/searchListing/crmSearchAdminSearchListing.html',
-    controller: function($scope, $q, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait, formatForSelect2) {
+    bindings: {
+      filters: '<',
+      tabCount: '='
+    },
+    templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
+    controller: function($scope, $element, $q, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in traits to this controller
         ctrl = angular.extend(this, searchDisplayBaseTrait, searchDisplaySortableTrait),
@@ -12,15 +16,8 @@
 
       this.searchDisplayPath = CRM.url('civicrm/search');
       this.afformPath = CRM.url('civicrm/admin/afform');
-      this.afformEnabled = CRM.crmSearchAdmin.afformEnabled;
-      this.afformAdminEnabled = CRM.crmSearchAdmin.afformAdminEnabled;
-      this.entitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect();
-      this.modules = _.sortBy(_.transform((CRM.crmSearchAdmin.modules), function(modules, label, key) {
-        modules.push({text: label, id: key});
-      }, []), 'text');
-
-      this.filters = {has_base: false};
-      this.totals = {};
+      this.afformEnabled = 'org.civicrm.afform' in CRM.crmSearchAdmin.modules;
+      this.afformAdminEnabled = 'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
 
       this.apiEntity = 'SavedSearch';
       this.search = {
@@ -41,6 +38,7 @@
             'modified_date',
             'has_base',
             'base_module:label',
+            'local_modified_date',
             'DATE(created_date) AS date_created',
             'DATE(modified_date) AS date_modified',
             'GROUP_CONCAT(display.name ORDER BY display.id) AS display_name',
@@ -63,33 +61,35 @@
 
       this.$onInit = function() {
         buildDisplaySettings();
-        this.initializeDisplay($scope, $());
+        this.initializeDisplay($scope, $element);
         // Keep tab counts up-to-date - put rowCount in current tab if there are no other filters
         $scope.$watch('$ctrl.rowCount', function(val) {
-          if (typeof val === 'number' && angular.equals({has_base: true}, ctrl.filters)) {
-            ctrl.totals.has_base = val;
-          }
-          else if (typeof val === 'number' && angular.equals({has_base: false}, ctrl.filters)) {
-            ctrl.totals.no_base = val;
+          if (typeof val === 'number' && angular.equals(['has_base'], getActiveFilters())) {
+            ctrl.tabCount = val;
           }
         });
-        // Initialize count for inactive tab
-        var params = ctrl.getApiParams('row_count');
-        params.filters.has_base = true;
-        crmApi4('SearchDisplay', 'run', params).then(function(result) {
-          ctrl.totals.has_base = result.count;
-        });
+        // Customize the noResultsText
+        $scope.$watch('$ctrl.filters', function() {
+          ctrl.settings.noResultsText = (angular.equals(['has_base'], getActiveFilters())) ?
+            ts('Welcome to Search Kit. Click the New Search button above to start composing your first search.') :
+            ts('No Saved Searches match filter criteria.');
+        }, true);
       };
 
-      // Change tabs and clear other filters
-      this.setHasBaseFilter = function(val) {
-        ctrl.filters = {has_base: val};
-        buildDisplaySettings();
-      };
+      // Get the names of in-use filters
+      function getActiveFilters() {
+        return _.keys(_.pick(ctrl.filters, function(val) {
+          return val !== null && (_.includes(['boolean', 'number'], typeof val) || val.length);
+        }));
+      }
 
       this.onPostRun.push(function(result) {
         _.each(result, function(row) {
           row.permissionToEdit = CRM.checkPerm('all CiviCRM permissions and ACLs') || !_.includes(row.data.display_acl_bypass, true);
+          // If main entity doesn't exist, no can edit
+          if (!row.data['api_entity:label']) {
+            row.permissionToEdit = false;
+          }
           // Saves rendering cycles to not show an empty menu of search displays
           if (!row.data.display_name) {
             row.openDisplayMenu = false;
@@ -146,7 +146,7 @@
           message: getMessage(),
         }).on('crmConfirm:yes', function() {
           $scope.$apply(function() {
-            return revert ? ctrl.revertSearch(search) : ctrl.deleteSearch(search);
+            return revert ? ctrl.revertSearch(row) : ctrl.deleteSearch(row);
           });
         }).block();
 
@@ -155,32 +155,26 @@
         });
       };
 
-      this.deleteSearch = function(search) {
-        crmStatus({start: ts('Deleting...'), success: ts('Search Deleted')},
-          crmApi4('SavedSearch', 'delete', {where: [['id', '=', search.id]]}).then(function() {
-            ctrl.rowCount = null;
-            ctrl.runSearch();
-          })
+      this.deleteSearch = function(row) {
+        ctrl.runSearch(
+          [['SavedSearch', 'delete', {where: [['id', '=', row.key]]}]],
+          {start: ts('Deleting...'), success: ts('Search Deleted')},
+          row
         );
       };
 
-      this.revertSearch = function(search) {
-        crmStatus({start: ts('Reverting...'), success: ts('Search Reverted')},
-          crmApi4('SavedSearch', 'revert', {
-            where: [['id', '=', search.id]],
+      this.revertSearch = function(row) {
+        ctrl.runSearch(
+          [['SavedSearch', 'revert', {
+            where: [['id', '=', row.key]],
             chain: {
               revertDisplays: ['SearchDisplay', 'revert', {'where': [['saved_search_id', '=', '$id'], ['has_base', '=', true]]}],
               deleteDisplays: ['SearchDisplay', 'delete', {'where': [['saved_search_id', '=', '$id'], ['has_base', '=', false]]}]
             }
-          }).then(function() {
-            ctrl.rowCount = null;
-            ctrl.runSearch();
-          })
+          }]],
+          {start: ts('Reverting...'), success: ts('Search Reverted')},
+          row
         );
-      };
-
-      this.getTags = function() {
-        return {results: formatForSelect2(CRM.crmSearchAdmin.tags, 'id', 'name', ['color', 'description'])};
       };
 
       function buildDisplaySettings() {
@@ -196,10 +190,14 @@
               searchMeta.fieldToColumn('label', {
                 label: true,
                 title: ts('Edit Label'),
-                editable: {entity: 'SavedSearch', id: 'id', name: 'label', value: 'label'}
+                editable: true
               }),
               searchMeta.fieldToColumn('api_entity:label', {
                 label: ts('For'),
+                empty_value: ts('Missing'),
+                cssRules: [
+                  ['font-italic', 'api_entity:label', 'IS EMPTY']
+                ]
               }),
               {
                 type: 'include',
@@ -237,6 +235,19 @@
               ]
             })
           );
+          ctrl.display.settings.columns.push(
+            // Using 'local_modified_date' as the column + an empty_value will only show the rewritten value
+            // if the record has been modified from its packaged state.
+            searchMeta.fieldToColumn('local_modified_date', {
+              label: ts('Modified'),
+              empty_value: ts('No'),
+              title: ts('Whether and when a search was modified from its packaged settings'),
+              rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'}),
+              cssRules: [
+                ['font-italic', 'local_modified_date', 'IS EMPTY']
+              ]
+            })
+          );
         } else {
           ctrl.display.settings.columns.push(
             searchMeta.fieldToColumn('created_date', {
@@ -245,14 +256,14 @@
               rewrite: ts('%1 by %2', {1: '[date_created]', 2: '[created_id.display_name]'})
             })
           );
+          ctrl.display.settings.columns.push(
+            searchMeta.fieldToColumn('modified_date', {
+              label: ts('Modified'),
+              title: '[modified_date]',
+              rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'})
+            })
+          );
         }
-        ctrl.display.settings.columns.push(
-          searchMeta.fieldToColumn('modified_date', {
-            label: ts('Last Modified'),
-            title: '[modified_date]',
-            rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'})
-          })
-        );
         ctrl.display.settings.columns.push({
           type: 'include',
           alignment: 'text-right',

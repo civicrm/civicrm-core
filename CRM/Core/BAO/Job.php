@@ -13,21 +13,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id: $
- *
  */
 
 /**
  * This class contains scheduled jobs related functions.
  */
 class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
-
-  /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
 
   /**
    * Add the payment-processor type in the db
@@ -44,26 +35,20 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
   }
 
   /**
-   * Retrieve DB object based on input parameters.
-   *
-   * It also stores all the retrieved values in the default array.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Core_DAO_Job|null
-   *   object on success, null otherwise
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $job = new CRM_Core_DAO_Job();
-    $job->copyValues($params);
-    if ($job->find(TRUE)) {
-      CRM_Core_DAO::storeValues($job, $defaults);
-      return $job;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**

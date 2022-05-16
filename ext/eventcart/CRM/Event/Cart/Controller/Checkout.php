@@ -6,7 +6,7 @@
 class CRM_Event_Cart_Controller_Checkout extends CRM_Core_Controller {
 
   /**
-   * @param null $title
+   * @param string $title
    * @param bool|int $action
    * @param bool $modal
    */

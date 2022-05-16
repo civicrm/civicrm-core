@@ -47,7 +47,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   /**
    * Retrieve the value of a setting from the DB table.
    *
-   * @param string $group
+   * @param string|null $group
    *   The group name of the item (deprecated).
    * @param string $name
    *   (required) The name under which this item is stored.
@@ -125,7 +125,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   /**
    * Store an item in the setting table.
    *
-   * @param $value
+   * @param mixed $value
    *   (required) The value that will be serialized and stored.
    * @param string $group
    *   The group name of the item (deprecated).
@@ -169,7 +169,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @param array $params
    *   (required) An api formatted array of keys and values.
-   * @param null $domains
+   * @param array|null $domains
    *
    * @throws API_Exception
    * @domains array an array of domains to get settings for. Default is the current domain
@@ -247,7 +247,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $getFieldsParams = ['version' => 3];
     if (count($settingParams) == 1) {
       // ie we are only setting one field - we'll pass it into getfields for efficiency
-      list($name) = array_keys($settingParams);
+      [$name] = array_keys($settingParams);
       $getFieldsParams['name'] = $name;
     }
     $fields = civicrm_api3('setting', 'getfields', $getFieldsParams);
@@ -420,9 +420,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * @param $group (deprecated)
+   * @param string $group
+   *   Deprecated parameter
    * @param string $name
-   * @param $value
+   * @param mixed $value
    * @param bool $system
    * @param int $userID
    * @param string $keyField
@@ -472,24 +473,26 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   /**
    * Check if environment is explicitly set.
    *
+   * @param $setting
+   *
    * @return bool
    */
-  public static function isEnvironmentSet($setting, $value = NULL) {
+  public static function isEnvironmentSet($setting): bool {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $environment = CRM_Core_Config::environment();
-    if ($setting == 'environment' && $environment) {
-      return TRUE;
-    }
-    return FALSE;
+    return $setting === 'environment' && $environment;
   }
 
   /**
    * Check if job is able to be executed by API.
    *
-   * @throws API_Exception
+   * @param $params
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function isAPIJobAllowedToRun($params) {
+  public static function isAPIJobAllowedToRun($params): void {
     $environment = CRM_Core_Config::environment(NULL, TRUE);
-    if ($environment != 'Production') {
+    if ($environment !== 'Production') {
       if (!empty($params['runInNonProductionEnvironment'])) {
         $mailing = Civi::settings()->get('mailing_backend_store');
         if ($mailing) {
@@ -497,7 +500,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
         }
       }
       else {
-        throw new Exception(ts("Job has not been executed as it is a %1 (non-production) environment.", [1 => $environment]));
+        throw new CRM_Core_Exception(ts('Job has not been executed as it is a %1 (non-production) environment.', [1 => $environment]));
       }
     }
   }
@@ -515,7 +518,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *   Specification of the setting (per *.settings.php).
    */
   public static function onChangeEnvironmentSetting($oldValue, $newValue, $metadata) {
-    if ($newValue != 'Production') {
+    if ($newValue !== 'Production') {
       $mailing = Civi::settings()->get('mailing_backend');
       if ($mailing['outBound_option'] != CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED) {
         Civi::settings()->set('mailing_backend_store', $mailing);

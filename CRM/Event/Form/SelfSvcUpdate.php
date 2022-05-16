@@ -187,7 +187,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    * @param array $fields
    *   Posted fields of the form.
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    *   list of errors to be posted back to the form

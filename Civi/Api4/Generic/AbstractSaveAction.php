@@ -142,7 +142,13 @@ abstract class AbstractSaveAction extends AbstractAction {
       $where = [];
       foreach ($record as $key => $val) {
         if (isset($val) && in_array($key, $this->match, TRUE)) {
-          $where[] = [$key, '=', $val];
+          if ($val === '' || is_null($val)) {
+            // If we want to match empty string we have to match on NULL/''
+            $where[] = [$key, 'IS EMPTY'];
+          }
+          else {
+            $where[] = [$key, '=', $val];
+          }
         }
       }
       if (count($where) === count($this->match)) {
@@ -198,7 +204,7 @@ abstract class AbstractSaveAction extends AbstractAction {
       'action' => 'get',
       'where' => [
         ['type', 'IN', ['Field', 'Custom']],
-        ['name', 'NOT IN', CoreUtil::getInfoItem($this->getEntityName(), 'primary_key')],
+        ['name', 'NOT IN', (array) CoreUtil::getInfoItem($this->getEntityName(), 'primary_key')],
       ],
     ], ['name']);
   }

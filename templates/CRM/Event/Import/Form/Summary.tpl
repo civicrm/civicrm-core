@@ -20,30 +20,12 @@
     <strong>{ts}Import has completed successfully.{/ts}</strong> {ts}The information below summarizes the results.{/ts}
     </p>
 
-   {if $unMatchCount }
-        <p class="error">
-        {ts count=$unMatchCount plural='CiviCRM has detected mismatched participant IDs. These records have not been updated.'}CiviCRM has detected a mismatched participant ID. This record has not been updated.{/ts}
-        </p>
-        <p class="error">
-        {ts 1=$downloadMismatchRecordsUrl}You can <a href="%1">Download Mismatched Participants</a>. You may then correct them, and import the new file with the corrected data.{/ts}
-        </p>
-    {/if}
-
     {if $invalidRowCount }
         <p class="error">
         {ts count=$invalidRowCount plural='CiviCRM has detected invalid data and/or formatting errors in %count records. These records have not been imported.'}CiviCRM has detected invalid data and/or formatting errors in one record. This record has not been imported.{/ts}
         </p>
         <p class="error">
         {ts 1=$downloadErrorRecordsUrl}You can <a href="%1">Download Errors</a>. You may then correct them, and import the new file with the corrected data.{/ts}
-        </p>
-    {/if}
-
-    {if $conflictRowCount}
-        <p class="error">
-        {ts count=$conflictRowCount plural='CiviCRM has detected %count records with conflicting participant IDs within this data file or relative to existing participant records. These records have not been imported.'}CiviCRM has detected one record with conflicting participant ID within this data file or relative to existing participant records. This record has not been imported.{/ts}
-        </p>
-        <p class="error">
-        {ts 1=$downloadConflictRecordsUrl}You can <a href="%1">Download Conflicts</a>. You may then review these records to determine if they are actually conflicts, and correct the participant IDs for those that are not.{/ts}
         </p>
     {/if}
 
@@ -67,46 +49,20 @@
         <td class="explanation">{ts}Total rows (participant records) in uploaded file.{/ts}</td>
     </tr>
 
-    {if $invalidRowCount }
-    <tr class="error"><td class="label crm-grid-cell">{ts}Invalid Rows (skipped){/ts}</td>
+    {if $invalidRowCount}
+      <tr class="error"><td class="label crm-grid-cell">{ts}Invalid Rows (skipped){/ts}</td>
         <td class="data">{$invalidRowCount}</td>
         <td class="explanation">{ts}Rows with invalid data in one or more fields. These rows will be skipped (not imported).{/ts}
-            {if $invalidRowCount}
-                <p><a href="{$downloadErrorRecordsUrl}">{ts}Download Errors{/ts}</a></p>
-            {/if}
-        </td>
-    </tr>
-    {/if}
-
-    {if $unMatchCount }
-    <tr class="error"><td class="label crm-grid-cell">{ts}Mismatched Rows (skipped){/ts}</td>
-        <td class="data">{$unMatchCount}</td>
-        <td class="explanation">{ts}Rows with mismatched participant IDs... (NOT updated).{/ts}
-            {if $unMatchCount}
-                <p><a href="{$downloadMismatchRecordsUrl}">{ts}Download Mismatched participants{/ts}</a></p>
-            {/if}
-        </td>
-    </tr>
-    {/if}
-
-    {if $conflictRowCount}
-    <tr class="error"><td class="label crm-grid-cell">{ts}Conflicting Rows (skipped){/ts}</td>
-        <td class="data">{$conflictRowCount}</td>
-        <td class="explanation">{ts}Rows with conflicting participant IDs (NOT imported).{/ts}
-            {if $conflictRowCount}
-                <p><a href="{$downloadConflictRecordsUrl}">{ts}Download Conflicts{/ts}</a></p>
-            {/if}
+          <p><a href="{$downloadErrorRecordsUrl}">{ts}Download Errors{/ts}</a></p>
         </td>
     </tr>
     {/if}
 
     {if $duplicateRowCount}
-    <tr class="error"><td class="label crm-grid-cell">{ts}Duplicate Rows{/ts}</td>
+      <tr class="error"><td class="label crm-grid-cell">{ts}Duplicate Rows{/ts}</td>
         <td class="data">{$duplicateRowCount}</td>
         <td class="explanation">{ts}Rows which are duplicates of existing CiviCRM participant records.{/ts} {$dupeActionString}
-            {if $duplicateRowCount}
-                <p><a href="{$downloadDuplicateRecordsUrl}">{ts}Download Duplicates{/ts}</a></p>
-            {/if}
+          <p><a href="{$downloadDuplicateRecordsUrl}">{ts}Download Duplicates{/ts}</a></p>
         </td>
     </tr>
     {/if}

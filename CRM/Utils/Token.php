@@ -855,7 +855,7 @@ class CRM_Utils_Token {
    *
    * @deprecated
    *
-   * @param $str ref to the string that will be scanned and modified
+   * @param string $str ref to the string that will be scanned and modified
    */
   public static function unescapeTokens(&$str) {
     $str = preg_replace('/\\\\|\{(\{\w+\.\w+\})\}/', '\\1', $str);
@@ -1178,6 +1178,7 @@ class CRM_Utils_Token {
     $className = NULL,
     $jobID = NULL
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('If you hit this in mailing code you should use flexmailer - otherwise use the token processor');
     $params = [];
     foreach ($contactIDs as $contactID) {
       $params[] = [
@@ -1959,6 +1960,10 @@ class CRM_Utils_Token {
           '$first_name' => 'contact.first_name',
           '$last_name' => 'contact.last_name',
           '$displayName' => 'contact.display_name',
+        ],
+        'membership_offline_receipt' => [
+          // receipt_text_renewal appears to be long gone.
+          'receipt_text_renewal' => 'receipt_text',
         ],
         'pledge_acknowledgement' => [
           '$domain' => 'no longer available / relevant',

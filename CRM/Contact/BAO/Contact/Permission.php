@@ -18,12 +18,16 @@ class CRM_Contact_BAO_Contact_Permission {
 
   /**
    * @var bool
+   *
+   * @deprecated
    */
-  public static $useTempTable = TRUE;
+  public static $useTempTable = FALSE;
 
   /**
    * Set whether to use a temporary table or not when building ACL Cache
    * @param bool $useTemporaryTable
+   *
+   * @deprecated
    */
   public static function setUseTemporaryTable($useTemporaryTable = TRUE) {
     self::$useTempTable = $useTemporaryTable;
@@ -31,7 +35,10 @@ class CRM_Contact_BAO_Contact_Permission {
 
   /**
    * Get variable for determining if we should use Temporary Table or not
+   *
    * @return bool
+   *
+   * @deprecated
    */
   public static function getUseTemporaryTable() {
     return self::$useTempTable;
@@ -195,7 +202,7 @@ WHERE contact_a.id = %1 AND $permission
    *
    * @param int $userID - contact_id of the ACLed user
    * @param int|string $type the type of operation (view|edit)
-   * @param bool $force - Should we force a recompute.
+   * @param bool $force - Should we force a recompute (only used for unit tests)
    *
    */
   public static function cache($userID, $type = CRM_Core_Permission::VIEW, $force = FALSE) {
@@ -223,10 +230,29 @@ WHERE contact_a.id = %1 AND $permission
     if (!$force) {
       // skip if already calculated
       if (!empty(Civi::$statics[__CLASS__]['processed'][$type][$userID])) {
+        // \Civi::log()->debug("CRM_Contact_BAO_Contact_Permission::cache already called. Operation: $operation; UserID: $userID");
         return;
       }
+    }
 
-      // run a query to see if the cache is filled
+    // grab a lock so other processes don't compete and do the same query
+    $lock = Civi::lockManager()->acquire("data.core.aclcontact.{$userID}");
+    if (!$lock->isAcquired()) {
+      // this can cause inconsistent results since we don"t know if the other process
+      // will fill up the cache before our calling routine needs it.
+      // The default 3 second timeout should be enough for the other process to finish.
+      // However this routine does not return the status either, so basically
+      // its a "lets return and hope for the best"
+      // \Civi::log()->debug("cache: aclcontact lock not acquired for user: $userID");
+      return;
+    }
+
+    if (!$force) {
+      // Check if the cache has already been built for this userID
+      // The lock guards against simultaneous building of the cache but we don't clear individual userIDs from the cache,
+      //   instead we truncate the whole table before calling cache() which may then be called multiple times.
+      // The only way we get to this point with the cache already filled is if two processes call cache() almost simultaneously
+      //   and the lock completes before the next process reaches the "get lock" call.
       $sql = "
 SELECT count(*)
 FROM   civicrm_acl_contact_cache
@@ -236,20 +262,13 @@ AND    $operationClause
       $count = CRM_Core_DAO::singleValueQuery($sql, $queryParams);
       if ($count > 0) {
         Civi::$statics[__CLASS__]['processed'][$type][$userID] = 1;
+        $lock->release();
+        // \Civi::log()->debug("CRM_Contact_BAO_Contact_Permission::cache already called via check query. Operation: $operation; UserID: $userID");
         return;
       }
     }
 
-    // grab a lock so other processes don't compete and do the same query
-    $lock = Civi::lockManager()->acquire("data.core.aclcontact.{$userID}");
-    if (!$lock->isAcquired()) {
-      // this can cause inconsistent results since we don't know if the other process
-      // will fill up the cache before our calling routine needs it.
-      // The default 3 second timeout should be enough for the other process to finish.
-      // However this routine does not return the status either, so basically
-      // its a "lets return and hope for the best"
-      return;
-    }
+    // \Civi::log()->debug("cache: building for $userID; operation=$operation; force=$force");
 
     $tables = [];
     $whereTables = [];
@@ -270,19 +289,8 @@ AND    $operationClause
     AND ac.user_id IS NULL
     ";*/
     $sql = " $from WHERE    $permission";
-    $useTempTable = self::getUseTemporaryTable();
-    if ($useTempTable) {
-      $aclContactsTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('aclccache')->setMemory();
-      $tempTable = $aclContactsTempTable->getName();
-      $aclContactsTempTable->createWithColumns('contact_id int, UNIQUE INDEX UI_contact (contact_id)');
-      CRM_Core_DAO::executeQuery("INSERT INTO {$tempTable} (contact_id) SELECT DISTINCT contact_a.id {$sql}");
-      CRM_Core_DAO::executeQuery("INSERT IGNORE INTO civicrm_acl_contact_cache (user_id, contact_id, operation) SELECT {$userID}, contact_id, '{$operation}' FROM {$tempTable}");
-      $aclContactsTempTable->drop();
-    }
-    else {
-      $sql = "SELECT DISTINCT $userID as user_id, contact_a.id as contact_id, '{$operation}' as operation" . $sql;
-      CRM_Core_DAO::executeQuery("INSERT IGNORE INTO civicrm_acl_contact_cache (user_id, contact_id, operation) {$sql}");
-    }
+    $sql = "SELECT $userID as user_id, contact_a.id as contact_id, '{$operation}' as operation" . $sql . ' GROUP BY contact_a.id';
+    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_contact_cache (user_id, contact_id, operation) {$sql}");
 
     // Add in a row for the logged in contact. Do not try to combine with the above query or an ugly OR will appear in
     // the permission clause.
@@ -290,7 +298,7 @@ AND    $operationClause
       ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact'))) {
       if (!CRM_Core_DAO::singleValueQuery("
         SELECT count(*) FROM civicrm_acl_contact_cache WHERE user_id = %1 AND contact_id = %1 AND operation = '{$operation}' LIMIT 1", $queryParams)) {
-        CRM_Core_DAO::executeQuery("INSERT IGNORE INTO civicrm_acl_contact_cache ( user_id, contact_id, operation ) VALUES(%1, %1, '{$operation}')", $queryParams);
+        CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation ) VALUES(%1, %1, '{$operation}')", $queryParams);
       }
     }
     Civi::$statics[__CLASS__]['processed'][$type][$userID] = 1;
@@ -298,7 +306,7 @@ AND    $operationClause
   }
 
   /**
-   * @param string $contactAlias
+   * @param string[]|string $contactAlias
    *
    * @return array
    */
@@ -504,7 +512,7 @@ SELECT second_degree_relationship.contact_id_{$second_direction['to']} AS contac
 
   /**
    * @param bool $checkSumValidationResult
-   * @param null $form
+   * @param CRM_Core_Form|null $form
    */
   public static function initChecksumAuthSrc($checkSumValidationResult = FALSE, $form = NULL) {
     $session = CRM_Core_Session::singleton();

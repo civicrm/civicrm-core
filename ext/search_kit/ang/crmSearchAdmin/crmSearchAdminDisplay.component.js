@@ -34,8 +34,7 @@
     },
     controller: function($scope, $timeout, searchMeta) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        ctrl = this,
-        afforms;
+        ctrl = this;
 
       this.isSuperAdmin = CRM.checkPerm('all CiviCRM permissions and ACLs');
       this.aclBypassHelp = ts('Only users with "all CiviCRM permissions and ACLs" can disable permission checks.');
@@ -186,19 +185,23 @@
       // Checks if a column contains a sortable value
       // Must be a real sql expression (not a pseudo-field like `result_row_num`)
       this.canBeSortable = function(col) {
+        // Column-header sorting is incompatible with draggable sorting
+        if (ctrl.display.settings.draggable) {
+          return false;
+        }
         var expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr),
           arg = (info && info.args && _.findWhere(info.args, {type: 'field'})) || {};
         return arg.field && arg.field.type !== 'Pseudo';
       };
 
-      // Aggregate functions (COUNT, AVG, MAX) cannot display as links, except for GROUP_CONCAT
+      // Aggregate functions (COUNT, AVG, MAX) cannot autogenerate links, except for GROUP_CONCAT
       // which gets special treatment in APIv4 to convert it to an array.
-      this.canBeLink = function(col) {
-        var expr = ctrl.getExprFromSelect(col.key),
+      function canUseLinks(colKey) {
+        var expr = ctrl.getExprFromSelect(colKey),
           info = searchMeta.parseExpr(expr);
         return !info.fn || info.fn.category !== 'aggregate' || info.fn.name === 'GROUP_CONCAT';
-      };
+      }
 
       var linkProps = ['path', 'entity', 'action', 'join', 'target'];
 
@@ -234,10 +237,13 @@
 
       this.getLinks = function(columnKey) {
         if (!ctrl.links) {
-          ctrl.links = {'*': ctrl.crmSearchAdmin.buildLinks()};
+          ctrl.links = {'*': ctrl.crmSearchAdmin.buildLinks(), '0': []};
         }
         if (!columnKey) {
           return ctrl.links['*'];
+        }
+        if (!canUseLinks(columnKey)) {
+          return ctrl.links['0'];
         }
         var expr = ctrl.getExprFromSelect(columnKey),
           info = searchMeta.parseExpr(expr),
@@ -306,7 +312,7 @@
               text: ts('Columns'),
               children: ctrl.crmSearchAdmin.getSelectFields(disabledIf)
             }
-          ].concat(ctrl.crmSearchAdmin.getAllFields('', ['Field', 'Custom'], disabledIf))
+          ].concat(ctrl.crmSearchAdmin.getAllFields('', ['Field', 'Custom', 'Extra'], disabledIf))
         };
       };
 

@@ -4,7 +4,7 @@
   angular.module('crmSearchTasks').component('crmSearchInputVal', {
     bindings: {
       field: '<',
-      'multi': '<',
+      'op': '<',
       'optionKey': '<'
     },
     require: {ngModel: 'ngModel'},
@@ -14,13 +14,14 @@
         ctrl = this;
 
       this.$onInit = function() {
-        var rendered = false;
+        var rendered = false,
+          field = this.field || {};
         ctrl.dateRanges = CRM.crmSearchTasks.dateRanges;
-        ctrl.entity = ctrl.field.fk_entity || ctrl.field.entity;
+        ctrl.entity = field.fk_entity || field.entity;
 
         this.ngModel.$render = function() {
           ctrl.value = ctrl.ngModel.$viewValue;
-          if (!rendered && ctrl.field.input_type === 'Date') {
+          if (!rendered && isDateField(field)) {
             setDateType();
           }
           rendered = true;
@@ -43,6 +44,16 @@
             ctrl.dateType = 'fixed';
           }
         }
+      };
+
+      this.isMulti = function() {
+        // If there's a search operator, return `true` if the operator takes multiple values, else `false`
+        if (ctrl.op) {
+          return ctrl.op === 'IN' || ctrl.op === 'NOT IN';
+        }
+        // If no search operator this is an input for e.g. the bulk update action
+        // Return `true` if the field is multi-valued, else `null`
+        return ctrl.field && (ctrl.field.serialize || ctrl.field.data_type === 'Array') ? true : null;
       };
 
       this.changeDateType = function() {
@@ -87,7 +98,11 @@
       this.getTemplate = function() {
         var field = ctrl.field || {};
 
-        if (field.input_type === 'Date') {
+        if (_.includes(['LIKE', 'NOT LIKE', 'REGEXP', 'NOT REGEXP'], ctrl.op)) {
+          return '~/crmSearchTasks/crmSearchInput/text.html';
+        }
+
+        if (isDateField(field)) {
           return '~/crmSearchTasks/crmSearchInput/date.html';
         }
 
@@ -99,7 +114,7 @@
           return '~/crmSearchTasks/crmSearchInput/select.html';
         }
 
-        if (field.fk_entity || field.name === 'id') {
+        if ((field.fk_entity || field.name === 'id') && !_.includes(['>', '<', '>=', '<='], ctrl.op)) {
           return '~/crmSearchTasks/crmSearchInput/entityRef.html';
         }
 
@@ -118,6 +133,10 @@
         var field = ctrl.field || {};
         return {results: formatForSelect2(field.options || [], ctrl.optionKey || 'id', 'label', ['description', 'color', 'icon'])};
       };
+
+      function isDateField(field) {
+        return field.data_type === 'Date' || field.data_type === 'Timestamp';
+      }
 
     }
   });

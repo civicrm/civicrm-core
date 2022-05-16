@@ -13,11 +13,11 @@ class CRM_Core_Reference_Basic implements CRM_Core_Reference_Interface {
   protected $targetKey;
 
   /**
-   * @param $refTable
-   * @param $refKey
-   * @param null $targetTable
+   * @param string $refTable
+   * @param string $refKey
+   * @param string $targetTable
    * @param string $targetKey
-   * @param null $refTypeColumn
+   * @param string|null $refTypeColumn
    */
   public function __construct($refTable, $refKey, $targetTable = NULL, $targetKey = 'id', $refTypeColumn = NULL) {
     $this->refTable = $refTable;
@@ -28,28 +28,28 @@ class CRM_Core_Reference_Basic implements CRM_Core_Reference_Interface {
   }
 
   /**
-   * @return mixed
+   * @return string
    */
   public function getReferenceTable() {
     return $this->refTable;
   }
 
   /**
-   * @return mixed
+   * @return string
    */
   public function getReferenceKey() {
     return $this->refKey;
   }
 
   /**
-   * @return null
+   * @return string|null
    */
   public function getTypeColumn() {
     return $this->refTypeColumn;
   }
 
   /**
-   * @return null
+   * @return string
    */
   public function getTargetTable() {
     return $this->targetTable;

@@ -1,9 +1,7 @@
 {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
 
-{if !empty($formValues.receipt_text_signup)}
-{$formValues.receipt_text_signup}
-{elseif !empty($formValues.receipt_text_renewal)}
-{$formValues.receipt_text_renewal}
+{if $receipt_text}
+{$receipt_text}
 {else}{ts}Thank you for this contribution.{/ts}{/if}
 
 {if empty($lineItem)}
@@ -43,7 +41,7 @@
 --------------------------------------------------------------------------------------------------
 
 {foreach from=$value item=line}
-{capture assign=ts_item}{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description} {$line.description}{/if}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.line_total|crmMoney|string_format:"%10s"}  {if !empty($dataArray)} {$line.unit_price*$line.qty|crmMoney:$currency|string_format:"%10s"} {if isset($line.tax_rate) and ($line.tax_rate != "" || $line.tax_amount != "")}  {$line.tax_rate|string_format:"%.2f"} %  {$line.tax_amount|crmMoney:$currency|string_format:"%10s"}  {else}                  {/if}   {$line.line_total+$line.tax_amount|crmMoney|string_format:"%10s"} {/if} {$line.start_date|string_format:"%20s"} {$line.end_date|string_format:"%20s"}
+{capture assign=ts_item}{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description} {$line.description}{/if}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.line_total|crmMoney|string_format:"%10s"}  {if !empty($dataArray)} {$line.unit_price*$line.qty|crmMoney:$currency|string_format:"%10s"} {if $line.tax_rate || $line.tax_amount != ""}  {$line.tax_rate|string_format:"%.2f"} %  {$line.tax_amount|crmMoney:$currency|string_format:"%10s"}  {else}                  {/if}   {$line.line_total+$line.tax_amount|crmMoney|string_format:"%10s"} {/if} {$line.start_date|string_format:"%20s"} {$line.end_date|string_format:"%20s"}
 {/foreach}
 {/foreach}
 
@@ -52,16 +50,16 @@
 
 {foreach from=$dataArray item=value key=priceset}
 {if $priceset}
-{if isset($taxTerm)}{$taxTerm}{/if} {$priceset|string_format:"%.2f"} %: {$value|crmMoney:$currency}
+{$taxTerm} {$priceset|string_format:"%.2f"} %: {$value|crmMoney:$currency}
 {elseif  $priceset == 0}
-{ts}No{/ts} {if isset($taxTerm)}{$taxTerm}{/if}: {$value|crmMoney:$currency}
+{ts}No{/ts} {$taxTerm}: {$value|crmMoney:$currency}
 {/if}
 {/foreach}
 {/if}
 --------------------------------------------------------------------------------------------------
 {/if}
 
-{if isset($totalTaxAmount)}
+{if $totalTaxAmount}
 {ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}
 {/if}
 

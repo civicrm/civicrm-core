@@ -440,7 +440,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */
@@ -785,7 +785,7 @@ HERESQL;
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */

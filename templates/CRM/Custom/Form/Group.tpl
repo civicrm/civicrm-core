@@ -18,7 +18,7 @@
     </tr>
     <tr>
         <td class="label">{$form.extends.label}</td>
-        <td>{$form.extends.html} {help id="id-extends"}</td>
+        <td>{$form.extends.html|smarty:nodefaults} {help id="id-extends"}</td>
     </tr>
     <tr>
         <td class="label">{$form.weight.label}</td>
@@ -73,7 +73,7 @@
       {crmButton p='civicrm/admin/custom/group/field' q="action=browse&reset=1&gid=$gid" icon="th-list"}{ts}Custom Fields for this Set{/ts}{/crmButton}
     </div>
 {/if}
-{if !empty($initHideBlocks)}{$initHideBlocks}{/if}
+{if !empty($initHideBlocks|smarty:nodefaults)}{$initHideBoxes|smarty:nodefaults}{/if}
 {literal}
 <script type="text/Javascript">
 CRM.$(function($) {

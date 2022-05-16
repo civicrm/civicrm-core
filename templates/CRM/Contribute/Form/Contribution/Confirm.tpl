@@ -13,7 +13,7 @@
 
 {include file="CRM/common/TrackingFields.tpl"}
 
-<div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-confirm-form-block">
+<div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-confirm-form-block" data-page-id="{$contributionPageID}" data-page-template="confirm">
   <div class="help">
     <p>{ts}Please verify the information below carefully. Click <strong>Go Back</strong> if you need to make changes.{/ts}
       {$continueText}
@@ -123,11 +123,11 @@
                 {if $frequency_unit eq 'day'}
                   <p><strong>{ts}I want to contribute this amount every day.{/ts}</strong></p>
                 {elseif $frequency_unit eq 'week'}
-                  <p><strong>{ts}I want to contribute this amount processed every week.{/ts}</strong></p>
+                  <p><strong>{ts}I want to contribute this amount every week.{/ts}</strong></p>
                 {elseif $frequency_unit eq 'month'}
-                  <p><strong>{ts}I want to contribute this amount processed every month.{/ts}</strong></p>
+                  <p><strong>{ts}I want to contribute this amount every month.{/ts}</strong></p>
                 {elseif $frequency_unit eq 'year'}
-                  <p><strong>{ts}I want to contribute this amount processed every year.{/ts}</strong></p>
+                  <p><strong>{ts}I want to contribute this amount every year.{/ts}</strong></p>
                 {/if}
               {/if}
             {/if}
@@ -169,7 +169,7 @@
       </div>
       <div class="display-block">
         <div class="label-left crm-section honoree_profile-section">
-          <strong>{$honorName}</strong></br>
+          <strong>{$honorName}</strong><br/>
           {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor'}
         </div>
       </div>

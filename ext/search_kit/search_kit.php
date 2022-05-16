@@ -39,27 +39,6 @@ function search_kit_civicrm_alterApiRoutePermissions(&$permissions, $entity, $ac
 }
 
 /**
- * Implements hook_civicrm_xmlMenu().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_xmlMenu
- */
-function search_kit_civicrm_xmlMenu(&$files) {
-  _search_kit_civix_civicrm_xmlMenu($files);
-}
-
-/**
- * Implements hook_civicrm_managed().
- *
- * Generate a list of entities to create/deactivate/delete when this module
- * is installed, disabled, uninstalled.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_managed
- */
-function search_kit_civicrm_managed(&$entities) {
-  _search_kit_civix_civicrm_managed($entities);
-}
-
-/**
  * Implements hook_civicrm_angularModules().
  *
  * Generate a list of Angular modules.
@@ -70,7 +49,6 @@ function search_kit_civicrm_managed(&$entities) {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_angularModules
  */
 function search_kit_civicrm_angularModules(&$angularModules) {
-  _search_kit_civix_civicrm_angularModules($angularModules);
   // Fetch all search tasks provided by extensions and add their Angular modules as crmSearchTasks dependencies
   $tasks = [];
   $null = NULL;
@@ -91,15 +69,6 @@ function search_kit_civicrm_angularModules(&$angularModules) {
 }
 
 /**
- * Implements hook_civicrm_alterSettingsFolders().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_alterSettingsFolders
- */
-function search_kit_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  _search_kit_civix_civicrm_alterSettingsFolders($metaDataFolders);
-}
-
-/**
  * Implements hook_civicrm_entityTypes().
  *
  * Declare entity types provided by this module.
@@ -111,25 +80,9 @@ function search_kit_civicrm_entityTypes(&$entityTypes) {
 }
 
 /**
- * Implements hook_civicrm_themes().
- */
-function search_kit_civicrm_themes(&$themes) {
-  _search_kit_civix_civicrm_themes($themes);
-}
-
-/**
  * Implements hook_civicrm_pre().
  */
 function search_kit_civicrm_pre($op, $entity, $id, &$params) {
-  // Supply default name/label when creating new SearchDisplay
-  if ($entity === 'SearchDisplay' && $op === 'create') {
-    if (empty($params['label'])) {
-      $params['label'] = $params['name'];
-    }
-    elseif (empty($params['name'])) {
-      $params['name'] = \CRM_Utils_String::munge($params['label']);
-    }
-  }
   // When deleting a saved search, also delete the displays
   // This would happen anyway in sql because of the ON DELETE CASCADE foreign key,
   // But this ensures that pre and post hooks are called
@@ -137,5 +90,16 @@ function search_kit_civicrm_pre($op, $entity, $id, &$params) {
     \Civi\Api4\SearchDisplay::delete(FALSE)
       ->addWhere('saved_search_id', '=', $id)
       ->execute();
+  }
+}
+
+/**
+ * Implements hook_civicrm_post().
+ */
+function search_kit_civicrm_post($op, $entity, $id, $object) {
+  // Flush fieldSpec cache when saving a SearchSegment
+  if ($entity === 'SearchSegment') {
+    \Civi::$statics['all_search_segments'] = NULL;
+    \Civi::cache('metadata')->clear();
   }
 }

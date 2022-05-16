@@ -1083,15 +1083,20 @@
           function update() {
             $timeout(function() {
               var newPageTitle = _.trim($el.html()),
-                newDocumentTitle = scope.crmDocumentTitle || $el.text();
+                newDocumentTitle = scope.crmDocumentTitle || $el.text(),
+                h1Count = 0;
               document.title = $('title').text().replace(documentTitle, newDocumentTitle);
               // If the CMS has already added title markup to the page, use it
               $('h1').not('.crm-container h1').each(function() {
-                if (_.trim($(this).html()) === pageTitle) {
+                if ($(this).hasClass('crm-page-title') || _.trim($(this).html()) === pageTitle) {
                   $(this).addClass('crm-page-title').html(newPageTitle);
                   $el.hide();
+                  ++h1Count;
                 }
               });
+              if (!h1Count) {
+                $el.show();
+              }
               pageTitle = newPageTitle;
               documentTitle = newDocumentTitle;
             });
@@ -1102,8 +1107,10 @@
       };
     })
 
-    // Editable text using ngModel & html5 contenteditable
-    // Usage: <span crm-ui-editable ng-model="my.data">{{ my.data }}</span>
+    // Single-line editable text using ngModel & html5 contenteditable
+    // Supports a `placeholder` attribute which shows up if empty and no `default-value`.
+    // The `default-value` attribute will force a value if empty (mutually-exclusive with `placeholder`).
+    // Usage: <span crm-ui-editable ng-model="model.text" placeholder="Enter text"></span>
     .directive("crmUiEditable", function() {
       return {
         restrict: "A",
@@ -1145,7 +1152,7 @@
             scope.$apply(read);
           });
 
-          element.attr('contenteditable', 'true').addClass('crm-editable-enabled');
+          element.attr('contenteditable', 'true');
         }
       };
     })

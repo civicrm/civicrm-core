@@ -24,32 +24,20 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   public static $_exportableFields = NULL;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
-   * Retrieve DB object based on input parameters.
-   *
-   * It also stores all the retrieved values in the default array.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Pledge_BAO_Pledge
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $pledge = new CRM_Pledge_DAO_Pledge();
-    $pledge->copyValues($params);
-    if ($pledge->find(TRUE)) {
-      CRM_Core_DAO::storeValues($pledge, $defaults);
-      return $pledge;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -153,24 +141,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
     }
     $paymentParams['status_id'] = $params['status_id'] ?? NULL;
 
-    CRM_Utils_Hook::pre($action, 'Pledge', $params['id'] ?? NULL, $params);
-    $pledge = new CRM_Pledge_DAO_Pledge();
-
-    // if pledge is complete update end date as current date
-    if ($pledge->status_id == 1) {
-      $pledge->end_date = date('Ymd');
-    }
-
-    $pledge->copyValues($params);
-    $pledge->save();
-    CRM_Utils_Hook::post($action, 'Pledge', $pledge->id, $pledge);
-
-    // handle custom data.
-    if (!empty($params['custom']) &&
-      is_array($params['custom'])
-    ) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_pledge', $pledge->id);
-    }
+    $pledge = self::writeRecord($params);
 
     // skip payment stuff in edit mode
     if (empty($params['id']) || $isRecalculatePledgePayment) {

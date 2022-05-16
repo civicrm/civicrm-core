@@ -1,8 +1,13 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the PaymentToken.create API.
  *
- * Create a payment token - Note use of relative dates here:
+ * Create a payment token - Note use of relative dates here:.
  * @link http://www.php.net/manual/en/datetime.formats.relative.php.
  *
  * @return array
@@ -11,12 +16,12 @@
 function payment_token_create_example() {
   $params = [
     'token' => 'fancy-token-xxxx',
-    'contact_id' => 3,
-    'created_id' => 3,
-    'payment_processor_id' => 1,
+    'contact_id' => 4,
+    'created_id' => 4,
+    'payment_processor_id' => 2,
   ];
 
-  try{
+  try {
     $result = civicrm_api3('PaymentToken', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -47,15 +52,15 @@ function payment_token_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 1,
+    'id' => 2,
     'values' => [
-      '1' => [
-        'id' => '1',
-        'contact_id' => '3',
-        'payment_processor_id' => '1',
+      '2' => [
+        'id' => '2',
+        'contact_id' => '4',
+        'payment_processor_id' => '2',
         'token' => 'fancy-token-xxxx',
         'created_date' => '2013-07-28 08:49:19',
-        'created_id' => '3',
+        'created_id' => '4',
         'expiry_date' => '',
         'email' => '',
         'billing_first_name' => '',
@@ -71,23 +76,23 @@ function payment_token_create_expectedresult() {
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testCreatePaymentToken"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/PaymentTokenTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
-*
-* To Learn about the API read
-* https://docs.civicrm.org/dev/en/latest/api/
-*
-* Browse the API on your own site with the API Explorer. It is in the main
-* CiviCRM menu, under: Support > Development > API Explorer.
-*
-* Read more about testing here
-* https://docs.civicrm.org/dev/en/latest/testing/
-*
-* API Standards documentation:
-* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testCreatePaymentToken"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/PaymentTokenTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

@@ -267,7 +267,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   * @param $string
+   * @param string $string
    *
    * @return int
    */
@@ -540,8 +540,6 @@ class CRM_Utils_Date {
    */
   public static function convertToDefaultDate(&$params, $dateType, $dateParam) {
     $now = getdate();
-    $cen = substr($now['year'], 0, 2);
-    $prevCen = $cen - 1;
 
     $value = NULL;
     if (!empty($params[$dateParam])) {
@@ -693,15 +691,15 @@ class CRM_Utils_Date {
     $month = ($month < 10) ? "0" . "$month" : $month;
     $day = ($day < 10) ? "0" . "$day" : $day;
 
-    $year = (int ) $year;
-    // simple heuristic to determine what century to use
-    // 00 - 20 is always 2000 - 2020
-    // 21 - 99 is always 1921 - 1999
-    if ($year < 21) {
-      $year = (strlen($year) == 1) ? $cen . '0' . $year : $cen . $year;
-    }
-    elseif ($year < 100) {
-      $year = $prevCen . $year;
+    $year = (int) $year;
+    if ($year < 100) {
+      $year = substr($now['year'], 0, 2) * 100 + $year;
+      if ($year > ($now['year'] + 5)) {
+        $year = $year - 100;
+      }
+      elseif ($year <= ($now['year'] - 95)) {
+        $year = $year + 100;
+      }
     }
 
     if ($params[$dateParam]) {
@@ -715,21 +713,9 @@ class CRM_Utils_Date {
   }
 
   /**
-   * @param $date
-   *
-   * @return bool
-   */
-  public static function isDate(&$date) {
-    if (CRM_Utils_System::isNull($date)) {
-      return FALSE;
-    }
-    return TRUE;
-  }
-
-  /**
    * Translate a TTL to a concrete expiration time.
    *
-   * @param NULL|int|DateInterval $ttl
+   * @param null|int|DateInterval $ttl
    * @param int $default
    *   The value to use if $ttl is not specified (NULL).
    * @return int
@@ -755,7 +741,7 @@ class CRM_Utils_Date {
   /**
    * Normalize a TTL.
    *
-   * @param NULL|int|DateInterval $ttl
+   * @param null|int|DateInterval $ttl
    * @param int $default
    *   The value to use if $ttl is not specified (NULL).
    * @return int
@@ -778,7 +764,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   * @param null $timeStamp
+   * @param int|false|null $timeStamp
    *
    * @return bool|string
    */
@@ -913,7 +899,7 @@ class CRM_Utils_Date {
    * @param date $targetDate
    *   Target Date. (show age on specific date)
    *
-   * @return int
+   * @return array
    *   array $results contains years or months
    */
   public static function calculateAge($birthDate, $targetDate = NULL) {
@@ -2227,6 +2213,59 @@ class CRM_Utils_Date {
     $systemTimeZone = new DateTimeZone(CRM_Core_Config::singleton()->userSystem->getTimeZoneString());
     $dateObject->setTimezone($systemTimeZone);
     return $dateObject->format($format);
+  }
+
+  /**
+   * Check if the value returned by a date picker has a date section (ie: includes
+   * a '-' character) if it includes a time section (ie: includes a ':').
+   *
+   * @param string $value
+   *   A date/time string input from a datepicker value.
+   *
+   * @return bool
+   *   TRUE if valid, FALSE if there is a time without a date.
+   */
+  public static function datePickerValueWithTimeHasDate($value) {
+    // If there's no : (time) or a : and a - (date) then return true
+    return (
+      strpos($value, ':') === FALSE
+      || strpos($value, ':') !== FALSE && strpos($value, '-') !== FALSE
+    );
+  }
+
+  /**
+   * Validate start and end dates entered on a form to make sure they are
+   * logical. Expects the form keys to be start_date and end_date.
+   *
+   * @param string $startFormKey
+   *   The form element key of the 'start date'
+   * @param string $startValue
+   *   The value of the 'start date'
+   * @param string $endFormKey
+   *   The form element key of the 'end date'
+   * @param string $endValue
+   * The value of the 'end date'
+   *
+   * @return array|bool
+   *   TRUE if valid, an array of the erroneous form key, and error message to
+   *   use otherwise.
+   */
+  public static function validateStartEndDatepickerInputs($startFormKey, $startValue, $endFormKey, $endValue) {
+
+    // Check date as well as time is set
+    if (!empty($startValue) && !self::datePickerValueWithTimeHasDate($startValue)) {
+      return ['key' => $startFormKey, 'message' => ts('Please enter a date as well as a time.')];
+    }
+    if (!empty($endValue) && !self::datePickerValueWithTimeHasDate($endValue)) {
+      return ['key' => $endFormKey, 'message' => ts('Please enter a date as well as a time.')];
+    }
+
+    // Check end date is after start date
+    if (!empty($startValue) && !empty($endValue) && $endValue < $startValue) {
+      return ['key' => $endFormKey, 'message' => ts('The end date should be after the start date.')];
+    }
+
+    return TRUE;
   }
 
 }

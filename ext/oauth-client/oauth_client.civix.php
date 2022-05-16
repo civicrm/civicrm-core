@@ -91,9 +91,9 @@ function _oauth_client_civix_civicrm_config(&$config = NULL) {
   }
   $configured = TRUE;
 
-  $template =& CRM_Core_Smarty::singleton();
+  $template = CRM_Core_Smarty::singleton();
 
-  $extRoot = dirname(__FILE__) . DIRECTORY_SEPARATOR;
+  $extRoot = __DIR__ . DIRECTORY_SEPARATOR;
   $extDir = $extRoot . 'templates';
 
   if (is_array($template->template_dir)) {
@@ -105,19 +105,6 @@ function _oauth_client_civix_civicrm_config(&$config = NULL) {
 
   $include_path = $extRoot . PATH_SEPARATOR . get_include_path();
   set_include_path($include_path);
-}
-
-/**
- * (Delegated) Implements hook_civicrm_xmlMenu().
- *
- * @param $files array(string)
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_xmlMenu
- */
-function _oauth_client_civix_civicrm_xmlMenu(&$files) {
-  foreach (_oauth_client_civix_glob(__DIR__ . '/xml/Menu/*.xml') as $file) {
-    $files[] = $file;
-  }
 }
 
 /**
@@ -218,136 +205,6 @@ function _oauth_client_civix_upgrader() {
 }
 
 /**
- * Search directory tree for files which match a glob pattern.
- *
- * Note: Dot-directories (like "..", ".git", or ".svn") will be ignored.
- * Note: Delegate to CRM_Utils_File::findFiles(), this function kept only
- * for backward compatibility of extension code that uses it.
- *
- * @param string $dir base dir
- * @param string $pattern , glob pattern, eg "*.txt"
- *
- * @return array
- */
-function _oauth_client_civix_find_files($dir, $pattern) {
-  return CRM_Utils_File::findFiles($dir, $pattern);
-}
-
-/**
- * (Delegated) Implements hook_civicrm_managed().
- *
- * Find any *.mgd.php files, merge their content, and return.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_managed
- */
-function _oauth_client_civix_civicrm_managed(&$entities) {
-  $mgdFiles = _oauth_client_civix_find_files(__DIR__, '*.mgd.php');
-  sort($mgdFiles);
-  foreach ($mgdFiles as $file) {
-    $es = include $file;
-    foreach ($es as $e) {
-      if (empty($e['module'])) {
-        $e['module'] = E::LONG_NAME;
-      }
-      if (empty($e['params']['version'])) {
-        $e['params']['version'] = '3';
-      }
-      $entities[] = $e;
-    }
-  }
-}
-
-/**
- * (Delegated) Implements hook_civicrm_caseTypes().
- *
- * Find any and return any files matching "xml/case/*.xml"
- *
- * Note: This hook only runs in CiviCRM 4.4+.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_caseTypes
- */
-function _oauth_client_civix_civicrm_caseTypes(&$caseTypes) {
-  if (!is_dir(__DIR__ . '/xml/case')) {
-    return;
-  }
-
-  foreach (_oauth_client_civix_glob(__DIR__ . '/xml/case/*.xml') as $file) {
-    $name = preg_replace('/\.xml$/', '', basename($file));
-    if ($name != CRM_Case_XMLProcessor::mungeCaseType($name)) {
-      $errorMessage = sprintf("Case-type file name is malformed (%s vs %s)", $name, CRM_Case_XMLProcessor::mungeCaseType($name));
-      throw new CRM_Core_Exception($errorMessage);
-    }
-    $caseTypes[$name] = [
-      'module' => E::LONG_NAME,
-      'name' => $name,
-      'file' => $file,
-    ];
-  }
-}
-
-/**
- * (Delegated) Implements hook_civicrm_angularModules().
- *
- * Find any and return any files matching "ang/*.ang.php"
- *
- * Note: This hook only runs in CiviCRM 4.5+.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_angularModules
- */
-function _oauth_client_civix_civicrm_angularModules(&$angularModules) {
-  if (!is_dir(__DIR__ . '/ang')) {
-    return;
-  }
-
-  $files = _oauth_client_civix_glob(__DIR__ . '/ang/*.ang.php');
-  foreach ($files as $file) {
-    $name = preg_replace(':\.ang\.php$:', '', basename($file));
-    $module = include $file;
-    if (empty($module['ext'])) {
-      $module['ext'] = E::LONG_NAME;
-    }
-    $angularModules[$name] = $module;
-  }
-}
-
-/**
- * (Delegated) Implements hook_civicrm_themes().
- *
- * Find any and return any files matching "*.theme.php"
- */
-function _oauth_client_civix_civicrm_themes(&$themes) {
-  $files = _oauth_client_civix_glob(__DIR__ . '/*.theme.php');
-  foreach ($files as $file) {
-    $themeMeta = include $file;
-    if (empty($themeMeta['name'])) {
-      $themeMeta['name'] = preg_replace(':\.theme\.php$:', '', basename($file));
-    }
-    if (empty($themeMeta['ext'])) {
-      $themeMeta['ext'] = E::LONG_NAME;
-    }
-    $themes[$themeMeta['name']] = $themeMeta;
-  }
-}
-
-/**
- * Glob wrapper which is guaranteed to return an array.
- *
- * The documentation for glob() says, "On some systems it is impossible to
- * distinguish between empty match and an error." Anecdotally, the return
- * result for an empty match is sometimes array() and sometimes FALSE.
- * This wrapper provides consistency.
- *
- * @link http://php.net/glob
- * @param string $pattern
- *
- * @return array
- */
-function _oauth_client_civix_glob($pattern) {
-  $result = glob($pattern);
-  return is_array($result) ? $result : [];
-}
-
-/**
  * Inserts a navigation menu item at a given place in the hierarchy.
  *
  * @param array $menu - menu hierarchy
@@ -426,18 +283,6 @@ function _oauth_client_civix_fixNavigationMenuItems(&$nodes, &$maxNavID, $parent
     if (isset($nodes[$origKey]['child']) && is_array($nodes[$origKey]['child'])) {
       _oauth_client_civix_fixNavigationMenuItems($nodes[$origKey]['child'], $maxNavID, $nodes[$origKey]['attributes']['navID']);
     }
-  }
-}
-
-/**
- * (Delegated) Implements hook_civicrm_alterSettingsFolders().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_alterSettingsFolders
- */
-function _oauth_client_civix_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  $settingsDir = __DIR__ . DIRECTORY_SEPARATOR . 'settings';
-  if (!in_array($settingsDir, $metaDataFolders) && is_dir($settingsDir)) {
-    $metaDataFolders[] = $settingsDir;
   }
 }
 

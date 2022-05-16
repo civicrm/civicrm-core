@@ -27,29 +27,7 @@
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_mailing_create($params) {
-  if (isset($params['template_options']) && is_array($params['template_options'])) {
-    $params['template_options'] = ($params['template_options'] === []) ? '{}' : json_encode($params['template_options']);
-  }
-  if (CRM_Mailing_Info::workflowEnabled()) {
-    // Note: 'schedule mailings' and 'approve mailings' can update certain fields, but can't create.
-
-    if (empty($params['id'])) {
-      if (!CRM_Core_Permission::check('access CiviMail') && !CRM_Core_Permission::check('create mailings')) {
-        throw new \Civi\API\Exception\UnauthorizedException("Cannot create new mailing. Required permission: 'access CiviMail' or 'create mailings'");
-      }
-    }
-
-    $safeParams = [];
-    $fieldPerms = CRM_Mailing_BAO_Mailing::getWorkflowFieldPerms();
-    foreach (array_keys($params) as $field) {
-      if (CRM_Core_Permission::check($fieldPerms[$field])) {
-        $safeParams[$field] = $params[$field];
-      }
-    }
-  }
-  else {
-    $safeParams = $params;
-  }
+  $safeParams = $params;
   $timestampCheck = TRUE;
   if (!empty($params['id']) && !empty($params['modified_date'])) {
     $timestampCheck = _civicrm_api3_compare_timestamps($safeParams['modified_date'], $safeParams['id'], 'Mailing');
@@ -58,9 +36,22 @@ function civicrm_api3_mailing_create($params) {
   if (!$timestampCheck) {
     throw new API_Exception("Mailing has not been saved, Content maybe out of date, please refresh the page and try again");
   }
+  // If we're going to autosend, then check validity before saving.
+  if (empty($params['is_completed']) && !empty($params['scheduled_date'])
+    && $params['scheduled_date'] !== 'null'
+    // This might have been passed in as empty to prevent us validating, is set skip.
+    && !isset($params['_evil_bao_validator_'])) {
 
-  // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
-  $safeParams['_evil_bao_validator_'] = \CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_SENDABLE', 'CRM_Mailing_BAO_Mailing::checkSendable');
+    // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
+    $function = \CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_SENDABLE', 'CRM_Mailing_BAO_Mailing::checkSendable');
+    $validationFunction = Civi\Core\Resolver::singleton()->get($function);
+    $errors = call_user_func($validationFunction, $params);
+    if (!empty($errors)) {
+      $fields = implode(',', array_keys($errors));
+      throw new CiviCRM_API3_Exception("Mailing cannot be sent. There are missing or invalid fields ($fields).", 'cannot-send', $errors);
+    }
+  }
+
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $safeParams, 'Mailing');
   return _civicrm_api3_mailing_get_formatResult($result);
 }
@@ -738,17 +729,23 @@ function civicrm_api3_mailing_stats($params) {
   if (empty($params['job_id'])) {
     $params['job_id'] = NULL;
   }
-  foreach (['Delivered', 'Bounces', 'Unsubscribers', 'Unique Clicks', 'Opened'] as $detail) {
+  foreach (['Recipients', 'Delivered', 'Bounces', 'Unsubscribers', 'Unique Clicks', 'Opened'] as $detail) {
     switch ($detail) {
+      case 'Recipients':
+        $stats[$params['mailing_id']] += [
+          $detail => CRM_Mailing_Event_BAO_Queue::getTotalCount($params['mailing_id'], $params['job_id']),
+        ];
+        break;
+
       case 'Delivered':
         $stats[$params['mailing_id']] += [
-          $detail => CRM_Mailing_Event_BAO_Delivered::getTotalCount($params['mailing_id'], $params['job_id'], (bool) $params['is_distinct'], $params['date']),
+          $detail => CRM_Mailing_Event_BAO_Delivered::getTotalCount($params['mailing_id'], $params['job_id'], $params['date']),
         ];
         break;
 
       case 'Bounces':
         $stats[$params['mailing_id']] += [
-          $detail => CRM_Mailing_Event_BAO_Bounce::getTotalCount($params['mailing_id'], $params['job_id'], (bool) $params['is_distinct'], $params['date']),
+          $detail => CRM_Mailing_Event_BAO_Bounce::getTotalCount($params['mailing_id'], $params['job_id'], $params['date']),
         ];
         break;
 

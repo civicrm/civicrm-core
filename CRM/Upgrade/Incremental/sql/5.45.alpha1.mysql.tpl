@@ -6,3 +6,8 @@ UPDATE civicrm_state_province SET name = 'Davao del Norte' WHERE country_id = @P
 UPDATE civicrm_state_province SET name = 'Davao de Oro' WHERE country_id = @PHILIPPINESID AND abbreviation = "COM" AND name = "Compostela Valley";
 UPDATE civicrm_state_province SET name = 'Kalinga' WHERE country_id = @PHILIPPINESID AND abbreviation = "KAL" AND name = "Kalinga-Apayso";
 UPDATE civicrm_state_province SET name = 'Cotabato' WHERE country_id = @PHILIPPINESID AND abbreviation = "NCO" AND name = "North Cotabato";
+
+-- Add missing state for Colombia
+SELECT @country_id := id from civicrm_country where name = 'Colombia' AND iso_code = 'CO';
+INSERT IGNORE INTO `civicrm_state_province` (`id`, `country_id`, `abbreviation`, `name`) VALUES
+(NULL, @country_id, 'HUI', 'Huila');

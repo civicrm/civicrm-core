@@ -13,14 +13,14 @@ div.crm-export-field-selector-outer:after {
   background-image: linear-gradient(to right, transparent, #efefe5);
 }
 table.crm-export-field-selector tbody tr {
-  background-color: #FAFAFA;
+  background-color: #fafafa;
 }
 table.crm-export-field-selector tbody tr:nth-child(odd) {
-  background-color: #EFEFEF;
+  background-color: #efefef;
 }
 table.crm-export-field-selector tfoot tr {
   background-color: white;
-  border-top: 2px solid #CFCEC3;
+  border-top: 2px solid #cfcec3;
 }
 table.crm-export-field-selector tfoot tr td > span {
   margin-left: 18px;

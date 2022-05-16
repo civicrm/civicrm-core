@@ -2,6 +2,8 @@
 
 namespace Civi\Authx;
 
+use Civi\Pipe\BasicPipeClient;
+use Civi\Pipe\JsonRpcMethodException;
 use Civi\Test\HttpTestTrait;
 use CRM_Authx_ExtensionUtil as E;
 use Civi\Test\EndToEndInterface;
@@ -126,7 +128,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     // Phase 1: Request fails if this credential type is not enabled
     \Civi::settings()->set("authx_{$flowType}_cred", []);
     $response = $http->send($request);
-    $this->assertFailedDueToProhibition($response);
+    $this->assertNotAuthenticated($flowType === 'header' ? 'anon' : 'prohibit', $response);
 
     // Phase 2: Request succeeds if this credential type is enabled
     \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
@@ -157,7 +159,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     // Phase 1: Request fails if this credential type is not enabled
     \Civi::settings()->set("authx_{$flowType}_cred", []);
     $response = $http->send($request);
-    $this->assertFailedDueToProhibition($response);
+    $this->assertNotAuthenticated($flowType === 'header' ? 'anon' : 'prohibit', $response);
 
     // Phase 2: Request succeeds if this credential type is enabled
     \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
@@ -178,13 +180,6 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     if (!defined('CIVICRM_SITE_KEY')) {
       $this->markTestIncomplete("Cannot run test without CIVICRM_SITE_KEY");
     }
-
-    $addParam = function($request, $key, $value) {
-      $query = $request->getUri()->getQuery();
-      return $request->withUri(
-        $request->getUri()->withQuery($query . '&' . urlencode($key) . '=' . urlencode($value))
-      );
-    };
 
     [$credType, $flowType] = ['pass', 'header'];
     $http = $this->createGuzzle(['http_errors' => FALSE]);
@@ -371,6 +366,59 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
   }
 
   /**
+   * Suppose a deployment has two layers of authorization:
+   *
+   * (1) a generic/site-wide HTTP restriction (perhaps enforced by a reverse proxy)
+   * (2) anything/everything else (CMS/login-form/parameter/X-Civi-Auth stuff).
+   *
+   * Layer (1) has an `Authorization:` header that should be ignored by `authx`.
+   *
+   * This test submits both layer (1) and layer (2) credentials and ensures that authx respects
+   * the layer (2).
+   */
+  public function testIgnoredHeaderAuthorization() {
+    // We may submit some other credential - it will be used.
+    $flowType = 'param';
+    $credType = 'api_key';
+
+    \Civi::settings()->set("authx_header_cred", []);
+    \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
+
+    $http = $this->createGuzzle(['http_errors' => FALSE]);
+
+    // We submit both the irrelevant `Authorization:` and the relevant `?_authx=...` (DemoCID).
+    $request = $this->applyAuth($this->requestMyContact(), 'api_key', 'header', $this->getLebowskiCID());
+    $request = $this->applyAuth($request, $credType, $flowType, $this->getDemoCID());
+    // $request = $request->withAddedHeader('Authorization', $irrelevantAuthorization);
+    $response = $http->send($request);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $credType, $flowType, $response);
+    if (!in_array('sendsExcessCookies', $this->quirks)) {
+      $this->assertNoCookies($response);
+    }
+  }
+
+  /**
+   * Similar to testIgnoredHeaderAuthorization(), but the Civi/CMS user is anonymous.
+   */
+  public function testIgnoredHeaderAuthorization_anon() {
+    $http = $this->createGuzzle(['http_errors' => FALSE]);
+
+    /** @var \Psr\Http\Message\RequestInterface $request */
+
+    // Variant 1: The `Authorization:` header is ignored (even if the content is totally fake/inauthentic).
+    \Civi::settings()->set("authx_header_cred", []);
+    $request = $this->requestMyContact()->withAddedHeader('Authorization', 'Basic ' . base64_encode("not:real"));
+    $response = $http->send($request);
+    $this->assertAnonymousContact($response);
+
+    // Variant 2: The `Authorization:` header is ignored (even if the content is sorta-real-ish for LebowskiCID).
+    \Civi::settings()->set("authx_header_cred", []);
+    $request = $this->applyAuth($this->requestMyContact(), 'api_key', 'header', $this->getLebowskiCID());
+    $response = $http->send($request);
+    $this->assertAnonymousContact($response);
+  }
+
+  /**
    * This consumer intends to make stateless requests with a handful of different identities,
    * but their browser happens to be cookie-enabled. Ensure that identities do not leak between requests.
    *
@@ -434,6 +482,8 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
   public function testJwtMiddleware() {
+    \Civi::settings()->revert("authx_param_cred");
+
     // HTTP GET with a specific user. Choose flow automatically.
     $response = $this->createGuzzle()->get('civicrm/authx/id', [
       'authx_user' => $GLOBALS['_CV']['DEMO_USER'],
@@ -461,6 +511,89 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       ]);
       $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), 'jwt', $flowType, $response);
     }
+  }
+
+  /**
+   * The internal API `authx_login()` should be used by background services to set the active user.
+   *
+   * To test this, we call `cv ev 'authx_login(...);'` and check the resulting identity.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testCliServiceLogin() {
+    $withCv = function($phpStmt) {
+      $cmd = strtr('cv ev -v @PHP', ['@PHP' => escapeshellarg($phpStmt)]);
+      exec($cmd, $output, $val);
+      $fullOutput = implode("\n", $output);
+      $this->assertEquals(0, $val, "Command returned error ($cmd) ($val):\n\"$fullOutput\"");
+      return json_decode($fullOutput, TRUE);
+    };
+
+    $principals = [
+      'contactId' => $this->getDemoCID(),
+      'userId' => $this->getDemoUID(),
+      'user' => $GLOBALS['_CV']['DEMO_USER'],
+    ];
+    foreach ($principals as $principalField => $principalValue) {
+      $msg = "Logged in with $principalField=$principalValue. We should see this user as authenticated.";
+
+      $loginArgs = ['principal' => [$principalField => $principalValue]];
+      $report = $withCv(sprintf('return authx_login(%s);', var_export($loginArgs, 1)));
+      $this->assertEquals($this->getDemoCID(), $report['contactId'], $msg);
+      $this->assertEquals($this->getDemoUID(), $report['userId'], $msg);
+      $this->assertEquals('script', $report['flow'], $msg);
+      $this->assertEquals('assigned', $report['credType'], $msg);
+      $this->assertEquals(FALSE, $report['useSession'], $msg);
+    }
+
+    $invalidPrincipals = [
+      ['contactId', 999999, AuthxException::CLASS, ';Contact ID 999999 is invalid;'],
+      ['userId', 999999, AuthxException::CLASS, ';Cannot login. Failed to determine contact ID.;'],
+      ['user', 'randuser' . mt_rand(0, 32767), AuthxException::CLASS, ';Must specify principal with valid user, userId, or contactId;'],
+    ];
+    foreach ($invalidPrincipals as $invalidPrincipal) {
+      [$principalField, $principalValue, $expectExceptionClass, $expectExceptionMessage] = $invalidPrincipal;
+
+      $loginArgs = ['principal' => [$principalField => $principalValue]];
+      $report = $withCv(sprintf('try { return authx_login(%s); } catch (Exception $e) { return [get_class($e), $e->getMessage()]; }', var_export($loginArgs, 1)));
+      $this->assertTrue(isset($report[0], $report[1]), "authx_login() should fail with invalid credentials ($principalField=>$principalValue). Received array: " . json_encode($report));
+      $this->assertRegExp($expectExceptionMessage, $report[1], "Invalid principal ($principalField=>$principalValue) should generate exception.");
+      $this->assertEquals($expectExceptionClass, $report[0], "Invalid principal ($principalField=>$principalValue) should generate exception.");
+    }
+  }
+
+  public function testCliPipeTrustedLogin() {
+    $rpc = new BasicPipeClient('cv ev \'Civi::pipe("tl");\'');
+    $this->assertEquals('trusted', $rpc->getWelcome()['t']);
+    $this->assertEquals(['login'], $rpc->getWelcome()['l']);
+
+    $login = $rpc->call('login', ['userId' => $this->getDemoUID()]);
+    $this->assertEquals($this->getDemoCID(), $login['contactId']);
+    $this->assertEquals($this->getDemoUID(), $login['userId']);
+
+    $me = $rpc->call('api3', ['Contact', 'get', ['id' => 'user_contact_id', 'sequential' => TRUE]]);
+    $this->assertEquals($this->getDemoCID(), $me['values'][0]['contact_id']);
+  }
+
+  public function testCliPipeUntrustedLogin() {
+    $rpc = new BasicPipeClient('cv ev \'Civi::pipe("ul");\'');
+    $this->assertEquals('untrusted', $rpc->getWelcome()['u']);
+    $this->assertEquals(['login'], $rpc->getWelcome()['l']);
+
+    try {
+      $rpc->call('login', ['userId' => $this->getDemoUID()]);
+      $this->fail('Untrusted sessions should require authentication credentials');
+    }
+    catch (JsonRpcMethodException $e) {
+      $this->assertRegExp(';not trusted;', $e->getMessage());
+    }
+
+    $login = $rpc->call('login', ['cred' => $this->credJwt($this->getDemoCID())]);
+    $this->assertEquals($this->getDemoCID(), $login['contactId']);
+    $this->assertEquals($this->getDemoUID(), $login['userId']);
+
+    $me = $rpc->call('api3', ['Contact', 'get', ['id' => 'user_contact_id', 'sequential' => TRUE]]);
+    $this->assertEquals($this->getDemoCID(), $me['values'][0]['contact_id']);
   }
 
   /**
@@ -663,6 +796,28 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
   }
 
   /**
+   * Assert that a request was not authenticated.
+   *
+   * @param string $mode
+   *   Expect that the  'prohibited' or 'anon'
+   * @param \Psr\Http\Message\ResponseInterface $response
+   */
+  private function assertNotAuthenticated(string $mode, $response) {
+    switch ($mode) {
+      case 'anon':
+        $this->assertAnonymousContact($response);
+        break;
+
+      case 'prohibit':
+        $this->assertFailedDueToProhibition($response);
+        break;
+
+      default:
+        throw new \RuntimeException("Invalid option: mode=$mode");
+    }
+  }
+
+  /**
    * @param \Psr\Http\Message\ResponseInterface $response
    */
   private function assertFailedDueToProhibition($response): void {
@@ -696,17 +851,6 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       preg_grep('/Set-Cookie/i', array_keys($response->getHeaders())),
       'Response should have cookies' . $this->formatFailure($response)
     );
-    return $this;
-  }
-
-  /**
-   * @param $regexp
-   * @param \Psr\Http\Message\ResponseInterface $response
-   */
-  private function assertBodyRegexp($regexp, $response = NULL) {
-    $response = $this->resolveResponse($response);
-    $this->assertRegexp($regexp, (string) $response->getBody(),
-      'Response body does not match pattern' . $this->formatFailure($response));
     return $this;
   }
 

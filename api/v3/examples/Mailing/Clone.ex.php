@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the Mailing.clone API.
  *
@@ -7,10 +12,10 @@
  */
 function mailing_clone_example() {
   $params = [
-    'id' => 27,
+    'id' => 28,
   ];
 
-  try{
+  try {
     $result = civicrm_api3('Mailing', 'clone', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -41,10 +46,10 @@ function mailing_clone_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 28,
+    'id' => 29,
     'values' => [
-      '28' => [
-        'id' => '28',
+      '29' => [
+        'id' => '29',
         'domain_id' => '1',
         'header_id' => '1',
         'footer_id' => '2',
@@ -63,7 +68,7 @@ function mailing_clone_expectedresult() {
         'body_text' => 'This is {contact.display_name}.
 https://civicrm.org
 {domain.address}{action.optOutUrl}',
-        'body_html' => '<link href=\'https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700\' rel=\'stylesheet\' type=\'text/css\'><p><a href=\"http://{action.forward}\">Forward this email</a><a href=\"{action.forward}\">Forward this email with no protocol</a></p<p>This is {contact.display_name}.</p><p><a href=\'https://civicrm.org/\'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>',
+        'body_html' => '<link href=\'https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700\' rel=\'stylesheet\' type=\'text/css\'><p><a href=\"{action.forward}\">Forward this email</a></p><p>This is {contact.display_name}.</p><p><a href=\'https://civicrm.org/\'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>',
         'url_tracking' => '1',
         'forward_replies' => 0,
         'auto_responder' => 0,
@@ -71,7 +76,7 @@ https://civicrm.org
         'is_completed' => '',
         'msg_template_id' => '',
         'override_verp' => '1',
-        'created_id' => '154',
+        'created_id' => '157',
         'created_date' => '2013-07-28 08:49:19',
         'modified_date' => '2012-11-14 16:02:35',
         'scheduled_id' => '',
@@ -97,23 +102,23 @@ https://civicrm.org
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testClone"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MailingTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
-*
-* To Learn about the API read
-* https://docs.civicrm.org/dev/en/latest/api/
-*
-* Browse the API on your own site with the API Explorer. It is in the main
-* CiviCRM menu, under: Support > Development > API Explorer.
-*
-* Read more about testing here
-* https://docs.civicrm.org/dev/en/latest/testing/
-*
-* API Standards documentation:
-* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testClone"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MailingTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

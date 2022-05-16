@@ -40,8 +40,9 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    *
    * @param array $params
    *
-   * @return bool|CRM_Core_BAO_Website
+   * @return CRM_Core_DAO_Website
    * @throws \CRM_Core_Exception
+   * @deprecated
    */
   public static function add($params) {
     CRM_Core_Error::deprecatedFunctionWarning('use apiv4');
@@ -119,9 +120,9 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param array $params
    * @param $values
    *
-   * @return bool
+   * @return array
    */
-  public static function &getValues(&$params = [], &$values = []) {
+  public static function &getValues($params = [], &$values = []) {
     $websites = [];
     $website = new CRM_Core_DAO_Website();
     $website->contact_id = $params['contact_id'];

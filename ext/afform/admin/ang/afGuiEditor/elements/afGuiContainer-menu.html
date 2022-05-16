@@ -1,5 +1,5 @@
-<li ng-if="!$ctrl.node['af-fieldset'] && !block.layout"><a href ng-click="saveBlock()">{{:: ts('Save as block') }}</a></li>
-<li ng-if="!$ctrl.node['af-fieldset'] && !block.layout" role="separator" class="divider"></li>
+<li ng-if="$ctrl.canSaveAsBlock()"><a href ng-click="saveBlock()">{{:: ts('Save as block') }}</a></li>
+<li ng-if="$ctrl.canSaveAsBlock()" role="separator" class="divider"></li>
 <li ng-if="tags[$ctrl.node['#tag']]">
   <div class="af-gui-field-select-in-dropdown form-inline" ng-click="$event.stopPropagation()">
     {{:: ts('Element:') }}
@@ -30,7 +30,9 @@
     </div>
   </div>
 </li>
+<li><af-gui-menu-item-collapsible ng-if="!block" node="$ctrl.node" class="af-gui-field-select-in-dropdown form-inline"></af-gui-menu-item-collapsible></li>
+<li><af-gui-menu-item-style node="$ctrl.node"></af-gui-menu-item-style></li>
 <li><af-gui-menu-item-border node="$ctrl.node"></af-gui-menu-item-border></li>
 <li><af-gui-menu-item-background node="$ctrl.node"></af-gui-menu-item-background></li>
 <li role="separator" class="divider"></li>
-<li><a href ng-click="$ctrl.deleteThis()"><span class="text-danger"><i class="crm-i fa-trash"></i> {{ !block ? ts('Delete this container') : ts('Delete this block') }}</span></a></li>
+<li><a href ng-click="$ctrl.deleteThis()"><span class="text-danger"><i class="crm-i fa-trash"></i> {{ !block ? ts('Remove container') : ts('Remove block') }}</span></a></li>

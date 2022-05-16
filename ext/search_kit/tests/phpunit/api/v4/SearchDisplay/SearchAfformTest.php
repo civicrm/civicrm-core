@@ -5,6 +5,7 @@ use Civi\Api4\Action\Afform\Save;
 use Civi\Api4\Afform;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
+use Civi\Api4\Phone;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\SearchDisplay;
 use Civi\Api4\Utils\CoreUtil;
@@ -46,9 +47,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
             'GROUP_CONCAT(DISTINCT Contact_Email_contact_id_01.email) AS GROUP_CONCAT_Contact_Email_contact_id_01_email',
           ],
           'orderBy' => [],
-          'where' => [
-            ['contact_type:name', '=', 'Individual'],
-          ],
+          'where' => [],
           'groupBy' => ['id'],
           'join' => [
             [
@@ -147,6 +146,12 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertGreaterThan(1, $result->count());
 
+    // For a filter with options, ensure labels are set
+    $params['filters'] = ['contact_type' => ['Individual']];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertGreaterThan(1, $result->count());
+    $this->assertEquals(['Individual'], $result->labels);
+
     // Note that filters add a wildcard so the value `afform_test` matches all 3 sample contacts;
     // But the Afform markup contains `filters="{last_name: 'AfformTest'}"` which only matches 2.
     $params['filters'] = ['source' => 'afform_test'];
@@ -155,6 +160,175 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
 
     // Filter by email address
     $params['filters'] = ['Contact_Email_contact_id_01.email' => $email];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(1, $result);
+  }
+
+  public function testRunMultipleSearchForm() {
+    $email = uniqid('tester@');
+
+    Contact::create(FALSE)
+      ->addValue('first_name', 'tester')
+      ->addValue('last_name', __FUNCTION__)
+      ->addValue('source', 'afform_multi_test')
+      ->addChain('emails', Email::save()
+        ->addDefault('contact_id', '$id')
+        ->addRecord(['email' => $email, 'location_type_id:name' => 'Home'])
+        ->addRecord(['email' => $email, 'location_type_id:name' => 'Work'])
+      )
+      ->addChain('phones', Phone::save()
+        ->addDefault('contact_id', '$id')
+        ->addRecord(['phone' => '123-4567', 'location_type_id:name' => 'Home'])
+        ->addRecord(['phone' => '234-5678', 'location_type_id:name' => 'Work'])
+      )
+      ->execute();
+
+    Contact::create(FALSE)
+      ->addValue('first_name', 'tester2')
+      ->addValue('last_name', __FUNCTION__)
+      ->addValue('source', 'afform_multi_test')
+      ->addChain('emails', Email::save()
+        ->addDefault('contact_id', '$id')
+        ->addRecord(['email' => 'other@test.com', 'location_type_id:name' => 'Other'])
+      )
+      ->addChain('phones', Phone::save()
+        ->addDefault('contact_id', '$id')
+        ->addRecord(['phone' => '123-4567', 'location_type_id:name' => 'Home'])
+        ->addRecord(['phone' => '234-5678', 'location_type_id:name' => 'Work'])
+      )
+      ->execute();
+
+    // Decoy contact just to make sure we don't get false-positives
+    Contact::create(FALSE)
+      ->addValue('first_name', 'tester3')
+      ->addValue('last_name', 'nobody')
+      ->addValue('source', 'decoy')
+      ->addChain('emails', Email::save()
+        ->addDefault('contact_id', '$id')
+        ->addRecord(['email' => $email, 'location_type_id:name' => 'Home'])
+      )
+      ->addChain('phones', Phone::save()
+        ->addDefault('contact_id', '$id')
+        ->addRecord(['phone' => '123-4567', 'location_type_id:name' => 'Home'])
+        ->addRecord(['phone' => '234-5678', 'location_type_id:name' => 'Work'])
+      )
+      ->execute();
+
+    $contactEmailSearch = SavedSearch::create(FALSE)
+      ->setValues([
+        'name' => 'TestContactEmailSearch',
+        'label' => 'TestContactEmailSearch',
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'id',
+            'display_name',
+            'GROUP_CONCAT(DISTINCT Contact_Email_contact_id_01.email) AS GROUP_CONCAT_Contact_Email_contact_id_01_email',
+          ],
+          'orderBy' => [],
+          'where' => [
+            ['contact_type:name', '=', 'Individual'],
+          ],
+          'groupBy' => ['id'],
+          'join' => [
+            [
+              'Email AS Contact_Email_contact_id_01',
+              'LEFT',
+              ['id', '=', 'Contact_Email_contact_id_01.contact_id'],
+            ],
+          ],
+          'having' => [],
+        ],
+      ])
+      ->execute()->first();
+
+    $contactEmailDisplay = SearchDisplay::create(FALSE)
+      ->setValues([
+        'name' => 'TestContactEmailDisplay',
+        'label' => 'TestContactEmailDisplay',
+        'saved_search_id.name' => 'TestContactEmailSearch',
+        'type' => 'table',
+        'settings' => [
+          'limit' => 50,
+          'pager' => TRUE,
+          'columns' => [
+            [
+              'key' => 'id',
+              'label' => 'Contact ID',
+              'dataType' => 'Integer',
+              'type' => 'field',
+            ],
+            [
+              'key' => 'display_name',
+              'label' => 'Display Name',
+              'dataType' => 'String',
+              'type' => 'field',
+            ],
+            [
+              'key' => 'GROUP_CONCAT_Contact_Email_contact_id_01_email',
+              'label' => 'Emails',
+              'dataType' => 'String',
+              'type' => 'field',
+            ],
+          ],
+        ],
+        'acl_bypass' => FALSE,
+      ])
+      ->execute()->first();
+
+    foreach (['Email', 'Phone'] as $entity) {
+      SavedSearch::create(FALSE)
+        ->setValues([
+          'name' => 'TestSearchFor' . $entity,
+          'label' => 'TestSearchFor' . $entity,
+          'api_entity' => $entity,
+          'api_params' => [
+            'version' => 4,
+            'select' => [
+              'id',
+              'contact_id.display_name',
+            ],
+            'orderBy' => [],
+            'where' => [],
+            'groupBy' => [],
+            'join' => [],
+            'having' => [],
+          ],
+        ])
+        ->execute();
+    }
+
+    $params = [
+      'return' => 'page:1',
+      'display' => NULL,
+      'afform' => 'testMultipleSearchForm',
+    ];
+
+    // This filter will not work because the search display is not within an <af-field>
+    $params['savedSearch'] = 'TestSearchForPhone';
+    $params['filters'] = ['location_type_id' => 1];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(4, $result);
+
+    $params['savedSearch'] = 'TestSearchForEmail';
+    $params['filters'] = ['location_type_id' => 1, 'contact_id.display_name' => __FUNCTION__];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(1, $result);
+
+    // Email filter will not work because it's in the wrong fieldset on the form
+    $params['filters'] = ['email' => $email, 'contact_id.display_name' => __FUNCTION__];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(3, $result);
+
+    // No filters will work; they are in the fieldset belonging to the non-default display
+    $params['savedSearch'] = 'TestContactEmailSearch';
+    $params['filters'] = ['source' => 'afform_multi_test', 'Contact_Email_contact_id_01.location_type_id' => 1];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertGreaterThanOrEqual(3, $result->count());
+
+    // Now the filters will work because they are in the fieldset for this display
+    $params['display'] = 'TestContactEmailDisplay';
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(1, $result);
   }
@@ -238,6 +412,12 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $refs = CoreUtil::getRefCount('SearchDisplay', $display['id']);
     $this->assertCount(1, $refs);
     $this->assertEquals('Afform', $refs[0]['type']);
+
+    SearchDisplay::delete(FALSE)
+      ->addWhere('name', '=', 'TestDisplayToDelete')
+      ->execute();
+
+    $this->assertCount(1, Afform::get(FALSE)->addWhere('name', 'CONTAINS', 'TestAfformToDelete')->execute());
 
     SavedSearch::delete(FALSE)
       ->addWhere('name', '=', 'TestSearchToDelete')

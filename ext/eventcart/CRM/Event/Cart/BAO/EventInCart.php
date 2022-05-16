@@ -11,13 +11,6 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   public $participants = [];
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Add participant to cart.
    *
    * @param $participant
@@ -164,7 +157,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   }
 
   /**
-   * @param null $event_cart
+   * @param CRM_Event_Cart_BAO_Cart|null $event_cart
    */
   public function load_associations($event_cart = NULL) {
     if ($this->assocations_loaded) {

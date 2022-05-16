@@ -19,6 +19,7 @@
  * This class generates form components for Financial Account
  */
 class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
+  use CRM_Core_Form_EntityFormTrait;
 
   /**
    * Flag if its a AR account type.
@@ -28,10 +29,23 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   protected $_isARFlag = FALSE;
 
   /**
+   * Explicitly declare the entity api name.
+   *
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'FinancialAccount';
+  }
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
     parent::preProcess();
+
+    // Add custom data to form
+    CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'FinancialAccount', $this->_id);
+    CRM_Custom_Form_CustomData::buildQuickForm($this);
 
     if ($this->_id) {
       $params = [
@@ -101,6 +115,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
       }
     }
 
+    $this->addCustomDataToForm();
     if ($this->_action == CRM_Core_Action::UPDATE &&
       CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $this->_id, 'is_reserved')
     ) {
@@ -115,7 +130,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    * @param array $values
    *   posted values of the form
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    *   list of errors to be posted back to the form
@@ -159,6 +174,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    */
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
+    $defaults = array_merge($defaults, CRM_Custom_Form_CustomData::setDefaultValues($this));
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['contact_id'] = CRM_Core_BAO_Domain::getDomain()->contact_id;
     }
@@ -180,6 +196,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     else {
       // store the submitted values in an array
       $params = $this->exportValues();
+      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($this->_submitValues, $this->_id, 'FinancialAccount');
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $params['id'] = $this->_id;

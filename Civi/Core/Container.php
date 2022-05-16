@@ -168,9 +168,11 @@ class Container {
       'contactTypes' => 'contactTypes',
       'metadata' => 'metadata',
     ];
+    $verSuffixCaches = ['metadata'];
+    $verSuffix = '_' . preg_replace(';[^0-9a-z_];', '_', \CRM_Utils_System::version());
     foreach ($basicCaches as $cacheSvc => $cacheGrp) {
       $definitionParams = [
-        'name' => $cacheGrp,
+        'name' => $cacheGrp . (in_array($cacheGrp, $verSuffixCaches) ? $verSuffix : ''),
         'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
       ];
       // For Caches that we don't really care about the ttl for and/or maybe accessed
@@ -230,7 +232,7 @@ class Container {
     $container->setDefinition('pear_mail', new Definition('Mail'))
       ->setFactory('CRM_Utils_Mail::createMailer')->setPublic(TRUE);
 
-    $container->setDefinition('crypto.registry', new Definition('Civi\Crypto\CryptoService'))
+    $container->setDefinition('crypto.registry', new Definition('Civi\Crypto\CryptoRegistry'))
       ->setFactory('Civi\Crypto\CryptoRegistry::createDefaultRegistry')->setPublic(TRUE);
 
     $container->setDefinition('crypto.token', new Definition('Civi\Crypto\CryptoToken', []))
@@ -261,6 +263,11 @@ class Container {
         ->setFactory([$class, 'singleton'])->setPublic(TRUE);
     }
     $container->setAlias('cache.short', 'cache.default')->setPublic(TRUE);
+
+    $container->setDefinition('civi.pipe', new Definition(
+      'Civi\Pipe\PipeSession',
+      []
+    ))->setPublic(TRUE)->setShared(FALSE);
 
     $container->setDefinition('resources', new Definition(
       'CRM_Core_Resources',
@@ -309,14 +316,14 @@ class Container {
             'table' => 'civicrm_case_activity',
             'when' => 'AFTER',
             'event' => ['INSERT'],
-            'sql' => "\nUPDATE civicrm_case SET modified_date = CURRENT_TIMESTAMP WHERE id = NEW.case_id;\n",
+            'sql' => "UPDATE civicrm_case SET modified_date = CURRENT_TIMESTAMP WHERE id = NEW.case_id;",
           ],
           [
             'upgrade_check' => ['table' => 'civicrm_case', 'column' => 'modified_date'],
             'table' => 'civicrm_activity',
             'when' => 'BEFORE',
             'event' => ['UPDATE', 'DELETE'],
-            'sql' => "\nUPDATE civicrm_case SET modified_date = CURRENT_TIMESTAMP WHERE id IN (SELECT ca.case_id FROM civicrm_case_activity ca WHERE ca.activity_id = OLD.id);\n",
+            'sql' => "UPDATE civicrm_case SET modified_date = CURRENT_TIMESTAMP WHERE id IN (SELECT ca.case_id FROM civicrm_case_activity ca WHERE ca.activity_id = OLD.id);",
           ],
         ],
       ]
@@ -401,6 +408,7 @@ class Container {
 
     $dispatcher->addListener('civi.api4.validate', $aliasMethodEvent('civi.api4.validate', 'getEntityName'), 100);
     $dispatcher->addListener('civi.api4.authorizeRecord', $aliasMethodEvent('civi.api4.authorizeRecord', 'getEntityName'), 100);
+    $dispatcher->addListener('civi.api4.entityTypes', ['\Civi\Api4\Provider\CustomEntityProvider', 'addCustomEntities'], 100);
 
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\InstallationCanary', 'check']);
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\DatabaseInitializer', 'initialize']);
@@ -607,7 +615,9 @@ class Container {
       \CRM_Core_DAO::init($runtime->dsn);
       \CRM_Utils_Hook::singleton(TRUE);
       \CRM_Extension_System::singleton(TRUE);
-      \CRM_Extension_System::singleton(TRUE)->getClassLoader()->register();
+      \CRM_Extension_System::singleton()->getClassLoader()->register();
+      \CRM_Extension_System::singleton()->getMixinLoader()->run();
+      \CRM_Utils_Hook::singleton()->commonBuildModuleList('civicrm_boot');
       $bootServices['dispatcher.boot']->setDispatchPolicy($mainDispatchPolicy);
 
       $runtime->includeCustomPath();

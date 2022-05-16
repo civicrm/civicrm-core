@@ -32,10 +32,20 @@ class AfformSearchMetadataInjector {
           foreach (pq(implode(',', $displayTags), $doc) as $component) {
             $searchName = pq($component)->attr('search-name');
             $displayName = pq($component)->attr('display-name');
-            if ($searchName && $displayName) {
-              $display = \Civi\Api4\SearchDisplay::get(FALSE)
-                ->addWhere('name', '=', $displayName)
-                ->addWhere('saved_search_id.name', '=', $searchName)
+            if ($searchName) {
+              // Fetch search display if name is provided
+              if (is_string($displayName) && strlen($displayName)) {
+                $searchDisplayGet = \Civi\Api4\SearchDisplay::get(FALSE)
+                  ->addWhere('name', '=', $displayName)
+                  ->addWhere('saved_search_id.name', '=', $searchName);
+              }
+              // Fall-back to the default display
+              else {
+                $displayName = NULL;
+                $searchDisplayGet = \Civi\Api4\SearchDisplay::getDefault(FALSE)
+                  ->setSavedSearch($searchName);
+              }
+              $display = $searchDisplayGet
                 ->addSelect('settings', 'saved_search_id.api_entity', 'saved_search_id.api_params')
                 ->execute()->first();
               if ($display) {

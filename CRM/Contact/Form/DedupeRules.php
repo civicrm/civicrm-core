@@ -40,6 +40,9 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
       CRM_Utils_System::permissionDenied();
       CRM_Utils_System::civiExit();
     }
+
+    Civi::resources()->addScriptFile('civicrm', 'js/crm.dedupeRules.js');
+
     $this->_options = CRM_Core_SelectValues::getDedupeRuleTypes();
     $this->_rgid = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
 
@@ -65,6 +68,8 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
       $this->_defaults['is_reserved'] = $rgDao->is_reserved;
       $this->assign('isReserved', $rgDao->is_reserved);
       $this->assign('ruleName', $rgDao->name);
+      $this->assign('ruleUsed', CRM_Core_SelectValues::getDedupeRuleTypes()[$rgDao->used]);
+      $this->assign('canChangeUsage', $rgDao->used === 'General');
       $ruleDao = new CRM_Dedupe_DAO_DedupeRule();
       $ruleDao->dedupe_rule_group_id = $this->_rgid;
       $ruleDao->find();
@@ -75,6 +80,11 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
         $this->_defaults["weight_$count"] = $ruleDao->rule_weight;
         $count++;
       }
+    }
+    else {
+      $this->_defaults['used'] = 'General';
+      $this->assign('ruleUsed', CRM_Core_SelectValues::getDedupeRuleTypes()['General']);
+      $this->assign('canChangeUsage', TRUE);
     }
     $supported = CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields($this->_contactType);
     if (is_array($supported)) {
@@ -96,7 +106,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
       'objectExists', ['CRM_Dedupe_DAO_DedupeRuleGroup', $this->_rgid, 'title']
     );
 
-    $this->addField('used', ['label' => ts('Usage')], TRUE);
+    $this->add('hidden', 'used');
     $reserved = $this->addField('is_reserved', ['label' => ts('Reserved?')]);
     if (!empty($this->_defaults['is_reserved'])) {
       $reserved->freeze();
@@ -128,7 +138,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    *   Posted values of the form.
    *
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    *   list of errors to be posted back to the form

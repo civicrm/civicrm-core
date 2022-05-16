@@ -46,7 +46,7 @@ function createChart( chartID, divName, xSize, ySize, data ) {
   links.style.marginBottom = '1rem';
   var linkSVG = document.createElement('a');
   linkSVG.href = '#';
-  linkSVG.textContent = 'Download chart (SVG)';
+  linkSVG.textContent = '{/literal}{ts escape="js"}Download chart (SVG){/ts}{literal}';
   linkSVG.addEventListener('click', e => {
     e.preventDefault();
     e.stopPropagation();
@@ -68,7 +68,7 @@ function createChart( chartID, divName, xSize, ySize, data ) {
   }
   var linkPNG = document.createElement('a');
   linkPNG.href = '#';
-  linkPNG.textContent = 'Download chart (PNG)';
+  linkPNG.textContent = '{/literal}{ts escape="js"}Download chart (PNG){/ts}{literal}';
   linkPNG.addEventListener('click', e => {
     e.preventDefault();
     e.stopPropagation();

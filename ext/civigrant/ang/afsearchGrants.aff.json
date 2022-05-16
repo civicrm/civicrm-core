@@ -1,0 +1,7 @@
+{
+    "type": "search",
+    "title": "Grants",
+    "contact_summary": "tab",
+    "server_route": "",
+    "permission": "access CiviGrant"
+}

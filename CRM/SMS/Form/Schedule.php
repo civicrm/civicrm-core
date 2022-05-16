@@ -100,7 +100,7 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
    *   The form values.
    *
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return bool
    *   True if either we deliver immediately, or the date is properly

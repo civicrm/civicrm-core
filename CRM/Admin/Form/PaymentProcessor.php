@@ -28,7 +28,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   protected $_testID;
 
   /**
-   * @var \CRM_Core_DAO_PaymentProcessor
+   * @var \CRM_Financial_DAO_PaymentProcessorType
    * Payment Processor DAO Object
    */
   protected $_paymentProcessorDAO;
@@ -269,7 +269,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   }
 
   /**
-   * @param $fields
+   * @param array $fields
    *
    * @return array|bool
    */
@@ -295,9 +295,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   }
 
   /**
-   * @param $fields
-   * @param $errors
-   * @param null $section
+   * @param array $fields
+   * @param array $errors
+   * @param string|null $section
    *
    * @return bool
    */

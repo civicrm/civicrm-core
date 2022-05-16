@@ -92,6 +92,8 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    * Set up variables to build the form.
    */
   public function preProcess() {
+    $this->addOptionalQuickFormElement('parents');
+    $this->addExpectedSmartyVariable('parent_groups');
     $this->_id = $this->get('id');
     if ($this->_id) {
       $breadCrumb = array(
@@ -364,6 +366,10 @@ WHERE  title = %1
         $this->_id,
         'Group'
       );
+
+      if (CRM_Core_Permission::check('administer Multiple Organizations') && CRM_Core_Permission::isMultisiteEnabled()) {
+        $params['organization_id'] = empty($params['organization_id']) ? 'null' : $params['organization_id'];
+      }
 
       $group = CRM_Contact_BAO_Group::create($params);
       // Set the entity id so it is available to postProcess hook consumers

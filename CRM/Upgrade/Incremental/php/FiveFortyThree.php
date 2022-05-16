@@ -26,28 +26,9 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
    * @param null $currentVer
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL): void {
-    // Example: Generate a pre-upgrade message.
-    if ($rev === '5.43.alpha1' && !empty(CRM_Core_Component::getEnabledComponents()['CiviCase'])) {
+    if ($rev === '5.43.alpha1' && CRM_Core_Component::isEnabled('CiviCase')) {
       $preUpgradeMessage .= '<p>' . ts('Minor changes have been made to how the tokens to render case.is_deleted, case.created_date and case.modified_date. See https://docs.civicrm.org/sysadmin/en/latest/upgrade/version-specific/ for more') . '</p>';
     }
-  }
-
-  /**
-   * Compute any messages which should be displayed after upgrade.
-   *
-   * Note: This function is called iteratively for each incremental upgrade step.
-   * There must be a concrete step (eg 'X.Y.Z.mysql.tpl' or 'upgrade_X_Y_Z()').
-   *
-   * @param string $postUpgradeMessage
-   *   alterable.
-   * @param string $rev
-   *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
-   */
-  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev): void {
-    // Example: Generate a post-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
-    // }
   }
 
   /**

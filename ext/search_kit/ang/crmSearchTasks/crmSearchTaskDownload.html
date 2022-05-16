@@ -1,4 +1,4 @@
-<div id="bootstrap-theme">
+<div id="bootstrap-theme" crm-dialog="crmSearchTask">
   <form ng-controller="crmSearchTaskDownload as $ctrl">
     <p>
       <strong ng-if="$ctrl.ids.length">{{:: ts('Download %1 %2', {1: $ctrl.ids.length, 2: $ctrl.entityTitle}) }}</strong>
@@ -20,16 +20,8 @@
         <div class="progress-bar progress-bar-striped active" role="progressbar" ng-style="{width: '' + $ctrl.progress + '%'}"></div>
       </div>
     </div>
-    <hr />
-    <div class="buttons text-right">
-      <button type="button" ng-click="$ctrl.cancel()" class="btn btn-danger" ng-hide="$ctrl.run">
-        <i class="crm-i fa-times"></i>
-        {{:: ts('Cancel') }}
-      </button>
-      <button ng-click="$ctrl.download()" class="btn btn-primary" ng-disabled="$ctrl.run">
-        <i class="crm-i fa-{{ $ctrl.run ? 'spin fa-spinner' : 'download' }}"></i>
-        {{:: ts('Download') }}
-      </button>
-    </div>
+
+    <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.run" ></crm-dialog-button>
+    <crm-dialog-button text="ts('Download')" icons="{primary: $ctrl.run ? 'fa-spin fa-spinner' : 'fa-download'}" on-click="$ctrl.download()" disabled="$ctrl.run" ></crm-dialog-button>
   </form>
 </div>

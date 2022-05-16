@@ -441,7 +441,7 @@ class CRM_Extension_Mapper {
   }
 
   /**
-   * @return array
+   * @return CRM_Extension_Info[]
    *   Ex: $result['org.civicrm.foobar'] = new CRM_Extension_Info(...).
    * @throws \CRM_Extension_Exception
    * @throws \Exception
@@ -538,6 +538,7 @@ class CRM_Extension_Mapper {
     }
     // FIXME: How can code so code wrong be so right?
     CRM_Extension_System::singleton()->getClassLoader()->refresh();
+    CRM_Extension_System::singleton()->getMixinLoader()->run(TRUE);
   }
 
   /**
@@ -545,7 +546,7 @@ class CRM_Extension_Mapper {
    * @todo We should improve this to return more appropriate text. eg. when an extension is not installed
    *   it should not say "version xx is installed".
    *
-   * @param array $remoteExtensionInfo
+   * @param CRM_Extension_Info $remoteExtensionInfo
    * @param array $localExtensionInfo
    *
    * @return string

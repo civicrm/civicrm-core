@@ -210,7 +210,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
     }
 
     // Adding the oddball "formatting" field here because there's no other place to put it
-    foreach (['Individual', 'Organization', 'Household'] as $type) {
+    foreach (CRM_Contact_BAO_ContactType::basicTypes() as $type) {
       if (isset($civiSchema[$type . 'Model'])) {
         $civiSchema[$type . 'Model']['schema'] += [
           'formatting' => [

@@ -1,4 +1,40 @@
-<div>
+<div class="af-gui-columns crm-flex-box">
+  <fieldset class="af-gui-entity-values">
+    <legend>{{:: ts('Filters:') }}</legend>
+    <div class="form-inline" ng-repeat="filter in $ctrl.filters">
+      <input class="form-control" ng-model="filter.name" ng-change="$ctrl.onChangeFilter($index)" crm-ui-select="{data: $ctrl.getFilterFields, placeholder: ' '}" />
+      <div class="input-group">
+        <div class="input-group-btn">
+          <button type="button" ng-switch="filter.mode" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span ng-switch-when="routeParams">{{:: ts('Url') }}</span>
+            <span ng-switch-when="val">{{:: ts('Value') }}</span>
+            <span ng-switch-when="options">{{:: ts('Current Contact') }}</span>
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li>
+              <a href ng-click="filter.mode = 'routeParams'; $ctrl.onChangeFilter($index)">{{:: ts('Url variable') }}</a>
+            </li>
+            <li>
+              <a href ng-click="filter.mode = 'val'; filter.value = ''">{{:: ts('Fixed value') }}</a>
+            </li>
+            <li ng-if="$ctrl.editor.afform.contact_summary">
+              <a href ng-click="filter.mode = 'options'; filter.value = 'contact_id';">{{:: ts('Current Contact') }}</a>
+            </li>
+          </ul>
+        </div>
+        <input ng-if="filter.mode === 'routeParams'" class="form-control" ng-model="filter.value" />
+        <span ng-if="filter.mode === 'val'">
+          <input class="form-control" af-gui-field-value="getField($ctrl.getFieldEntity(filter.name), filter.name)" ng-model="filter.value" />
+        </span>
+      </div>
+    </div>
+    <hr />
+    <div class="form-inline">
+      <input class="form-control" on-crm-ui-select="$ctrl.addFilter(selection)" crm-ui-select="{data: $ctrl.getFilterFields, placeholder: ts('Add filter')}" />
+    </div>
+  </fieldset>
+
   <fieldset class="af-gui-entity-palette">
     <legend class="form-inline">
       {{:: ts('Add:') }}
@@ -15,7 +51,7 @@
       </div>
       <div ng-if="blockList.length">
         <label>{{:: ts('Blocks') }}</label>
-        <div ui-sortable="$ctrl.editor.getSortableOptions()" ui-sortable-update="buildPaletteLists" ng-model="blockList">
+        <div ui-sortable="$ctrl.editor.getSortableOptions($ctrl.editor.getSelectedEntityName())" ui-sortable-update="buildPaletteLists" ng-model="blockList">
           <div ng-repeat="block in blockList" ng-class="{disabled: blockInUse(block)}">
             <div class="af-gui-palette-item">{{:: blockTitles[$index] }}</div>
           </div>
@@ -23,8 +59,8 @@
       </div>
       <div ng-if="calcFieldList.length">
         <label>{{:: ts('Calculated Fields') }}</label>
-        <div ui-sortable="$ctrl.editor.getSortableOptions()" ui-sortable-update="buildPaletteLists" ng-model="calcFieldList">
-          <div ng-repeat="field in calcFieldList" ng-class="{disabled: fieldInUse(field.name)}">
+        <div ui-sortable="$ctrl.editor.getSortableOptions($ctrl.editor.getSelectedEntityName())" ui-sortable-update="buildPaletteLists" ng-model="calcFieldList">
+          <div ng-repeat="field in calcFieldList" ng-class="{disabled: $ctrl.fieldInUse(field.name)}">
             <div class="af-gui-palette-item">{{:: field.defn.label }}</div>
           </div>
         </div>
@@ -32,8 +68,8 @@
       <div ng-repeat="fieldGroup in fieldList">
         <div ng-if="fieldGroup.fields.length">
           <label>{{:: fieldGroup.label }}</label>
-          <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="$ctrl.editor.onDrop" ng-model="fieldGroup.fields">
-            <div ng-repeat="field in fieldGroup.fields" ng-class="{disabled: fieldInUse(field.name)}">
+          <div ui-sortable="$ctrl.editor.getSortableOptions($ctrl.editor.getSelectedEntityName())" ui-sortable-update="buildPaletteLists" ng-model="fieldGroup.fields">
+            <div ng-repeat="field in fieldGroup.fields" ng-class="{disabled: $ctrl.fieldInUse(field.name)}">
               {{:: getField(fieldGroup.entityType, field.name).label }}
             </div>
           </div>

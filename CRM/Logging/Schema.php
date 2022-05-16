@@ -512,7 +512,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    * Get column query.
    *
    * @param string $col
-   * @param bool $createQuery
+   * @param array $createQuery
    *
    * @return array|mixed|string
    */
@@ -924,7 +924,7 @@ COLS;
    * Get trigger info.
    *
    * @param array $info
-   * @param null $tableName
+   * @param string|null $tableName
    * @param bool $force
    */
   public function triggerInfo(&$info, $tableName = NULL, $force = FALSE) {

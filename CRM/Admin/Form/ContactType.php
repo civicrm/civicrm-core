@@ -51,7 +51,15 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
         $enabled->freeze();
       }
     }
-    $this->addElement('text', 'image_URL', ts('Image URL'));
+    // TODO: Remove when dropping image_URL column
+    if ($this->_id) {
+      $imageUrl = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_ContactType', $this->_id, 'image_URL');
+      if ($imageUrl) {
+        $this->addElement('text', 'image_URL', ts('Image URL'));
+      }
+    }
+    $this->assign('hasImageUrl', !empty($imageUrl));
+    $this->add('text', 'icon', ts('Icon'), ['class' => 'crm-icon-picker', 'title' => ts('Choose Icon'), 'allowClear' => TRUE]);
     $this->add('text', 'description', ts('Description'),
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_ContactType', 'description')
     );
@@ -67,7 +75,7 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
    *   The input form values.
    *
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return bool|array
    *   true if no errors, else array of errors
@@ -120,6 +128,11 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
       if (is_null($this->_parentId)) {
         $params['is_active'] = 1;
       }
+    }
+
+    // If icon is set, it overrides image_URL
+    if (!empty($params['icon'])) {
+      $params['image_URL'] = '';
     }
 
     $contactType = CRM_Contact_BAO_ContactType::add($params);

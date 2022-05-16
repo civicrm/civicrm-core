@@ -9,12 +9,7 @@
 *}
 
 <div class="crm-block crm-form-block crm-import-datasource-form-block">
-{if $showOnlyDataSourceFormPane}
-  {include file=$dataSourceFormTemplateFile}
-{else}
   {* Import Wizard - Step 1 (choose data source) *}
-  {* @var $form Contains the array for the form elements and other form associated information assigned to the template by the controller *}
-
   {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
   {include file="CRM/common/WizardHeader.tpl"}
    <div class="help">
@@ -33,9 +28,6 @@
 
   {* Data source form pane is injected here when the data source is selected. *}
   <div id="data-source-form-block">
-    {if $dataSourceFormTemplateFile}
-      {include file=$dataSourceFormTemplateFile}
-    {/if}
   </div>
 
   <div id="common-form-controls" class="form-item">
@@ -44,15 +36,15 @@
          <tr class="crm-import-datasource-form-block-contactType">
        <td class="label">{$form.contactType.label}</td>
              <td>{$form.contactType.html} {help id='contact-type'}&nbsp;&nbsp;&nbsp;
-               <span id="contact-subtype">{$form.subType.label}&nbsp;&nbsp;&nbsp;{$form.subType.html} {help id='contact-sub-type'}</span></td>
+               <span id="contact-subtype">{$form.contactSubType.label}&nbsp;&nbsp;&nbsp;{$form.contactSubType.html} {help id='contact-sub-type'}</span></td>
          </tr>
          <tr class="crm-import-datasource-form-block-onDuplicate">
              <td class="label">{$form.onDuplicate.label}</td>
              <td>{$form.onDuplicate.html} {help id='dupes'}</td>
          </tr>
          <tr class="crm-import-datasource-form-block-dedupe">
-             <td class="label">{$form.dedupe.label}</td>
-             <td><span id="contact-dedupe">{$form.dedupe.html}</span> {help id='id-dedupe_rule'}</td>
+             <td class="label">{$form.dedupe_rule_id.label}</td>
+             <td><span id="contact-dedupe_rule_id">{$form.dedupe_rule_id.html}</span> {help id='id-dedupe_rule'}</td>
          </tr>
          <tr class="crm-import-datasource-form-block-fieldSeparator">
              <td class="label">{$form.fieldSeparator.label}</td>
@@ -77,7 +69,7 @@
 
         {if $savedMapping}
          <tr  class="crm-import-datasource-form-block-savedMapping">
-              <td class="label"><label for="savedMapping">{if $loadedMapping}{ts}Select a Different Field Mapping{/ts}{else}{ts}Load Saved Field Mapping{/ts}{/if}</label></td>
+              <td class="label"><label for="savedMapping">{$form.savedMapping.label}</label></td>
               <td>{$form.savedMapping.html}<br />
       &nbsp;&nbsp;&nbsp;<span class="description">{ts}Select Saved Mapping or Leave blank to create a new One.{/ts}</span></td>
          </tr>
@@ -106,7 +98,7 @@
 
       function buildDataSourceFormBlock(dataSource)
       {
-        var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q=$urlPathVar}"{literal};
+        var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q=$urlPathVar|smarty:nodefaults}"{literal};
 
         if (!dataSource ) {
           var dataSource = cj("#dataSource").val();
@@ -131,16 +123,16 @@
 
                         success: function(subtype){
                                                    if ( subtype.length == 0 ) {
-                                                      cj("#subType").empty();
+                                                      cj("#contactSubType").empty();
                                                       cj("#contact-subtype").hide();
                                                    } else {
                                                        cj("#contact-subtype").show();
-                                                       cj("#subType").empty();
+                                                       cj("#contactSubType").empty();
 
-                                                       cj("#subType").append("<option value=''>- {/literal}{ts escape='js'}select{/ts}{literal} -</option>");
+                                                       cj("#contactSubType").append("<option value=''>- {/literal}{ts escape='js'}select{/ts}{literal} -</option>");
                                                        for ( var key in  subtype ) {
                                                            // stick these new options in the subtype select
-                                                           cj("#subType").append("<option value="+key+">"+subtype[key]+" </option>");
+                                                           cj("#contactSubType").append("<option value="+key+">"+subtype[key]+" </option>");
                                                        }
                                                    }
 
@@ -159,16 +151,16 @@
 
                         success: function(dedupe){
                                                    if ( dedupe.length == 0 ) {
-                                                      cj("#dedupe").empty();
+                                                      cj("#dedupe_rule_id").empty();
                                                       cj("#contact-dedupe").hide();
                                                    } else {
                                                        cj("#contact-dedupe").show();
-                                                       cj("#dedupe").empty();
+                                                       cj("#dedupe_rule_id").empty();
 
-                                                       cj("#dedupe").append("<option value=''>- {/literal}{ts escape='js'}select{/ts}{literal} -</option>");
+                                                       cj("#dedupe_rule_id").append("<option value=''>- {/literal}{ts escape='js'}select{/ts}{literal} -</option>");
                                                        for ( var key in  dedupe ) {
                                                            // stick these new options in the dedupe select
-                                                           cj("#dedupe").append("<option value="+key+">"+dedupe[key]+" </option>");
+                                                           cj("#dedupe_rule_id").append("<option value="+key+">"+dedupe[key]+" </option>");
                                                        }
                                                    }
 
@@ -180,5 +172,5 @@
 
     </script>
   {/literal}
-{/if}
+
 </div>

@@ -213,6 +213,26 @@ case.custom_1 :' . '
   }
 
   /**
+   * Test that contribution recur tokens are consistently rendered.
+   */
+  public function testContributionRecurTokenRaw(): void {
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+      'schema' => ['contribution_recurId'],
+    ]);
+    $tokenProcessor->addMessage('not_specified', '{contribution_recur.amount}', 'text/plain');
+    $tokenProcessor->addMessage('money', '{contribution_recur.amount|crmMoney}', 'text/plain');
+    $tokenProcessor->addMessage('raw', '{contribution_recur.amount|raw}', 'text/plain');
+    $tokenProcessor->addMessage('moneyNumber', '{contribution_recur.amount|crmMoneyNumber}', 'text/plain');
+    $tokenProcessor->addRow(['contribution_recurId' => $this->getContributionRecurID()]);
+    $tokenProcessor->evaluate();
+    $this->assertEquals('€5,990.99', $tokenProcessor->getRow(0)->render('not_specified'));
+    $this->assertEquals('€5,990.99', $tokenProcessor->getRow(0)->render('money'));
+    $this->assertEquals('5990.99', $tokenProcessor->getRow(0)->render('raw'));
+  }
+
+  /**
    * Test money format tokens can respect passed in locale.
    */
   public function testMoneyFormat(): void {
@@ -438,7 +458,7 @@ contribution_recur.frequency_unit:name :year
 contribution_recur.contribution_status_id:label :Pending Label**
 contribution_recur.contribution_status_id:name :Pending
 contribution_recur.payment_processor_id:label :Dummy (test)
-contribution_recur.payment_processor_id:name :Dummy (test)
+contribution_recur.payment_processor_id:name :Dummy_test
 contribution_recur.financial_type_id:label :Member Dues
 contribution_recur.financial_type_id:name :Member Dues
 contribution_recur.payment_instrument_id:label :Check
@@ -598,6 +618,7 @@ Emerald City, Maine 90210
 
 event.info_url :' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=1
 event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=1
+event.pay_later_receipt :
 event.custom_1 :my field
 ';
   }
@@ -769,6 +790,7 @@ December 21st, 2007
       '{domain.id}' => ts('Domain ID'),
       '{domain.description}' => ts('Domain Description'),
       '{domain.now}' => 'Current time/date',
+      '{domain.tax_term}' => 'Sales tax term (e.g VAT)',
     ];
   }
 
@@ -881,6 +903,7 @@ December 21st, 2007
       '{event.location}' => 'Event Location',
       '{event.info_url}' => 'Event Info URL',
       '{event.registration_url}' => 'Event Registration URL',
+      '{event.pay_later_receipt}' => 'Pay Later Receipt Text',
       '{event.' . $this->getCustomFieldName('text') . '}' => 'Enter text here :: Group with field text',
     ];
   }
@@ -931,6 +954,8 @@ December 21st, 2007
     ])->execute()->first()['id'];
     $this->ids['event'][0] = $this->eventCreate([
       'description' => 'event description',
+      'end_date' => 20081023,
+      'registration_end_date' => 20081015,
       $this->getCustomFieldName('text') => 'my field',
       'loc_block_id' => $locationBlockID,
     ])['id'];

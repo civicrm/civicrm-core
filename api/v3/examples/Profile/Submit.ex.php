@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the Profile.submit API.
  *
@@ -7,7 +12,7 @@
  */
 function profile_submit_example() {
   $params = [
-    'profile_id' => 24,
+    'profile_id' => 25,
     'contact_id' => 5,
     'first_name' => 'abc2',
     'last_name' => 'xyz2',
@@ -17,7 +22,7 @@ function profile_submit_example() {
     'state_province-1' => '1000',
   ];
 
-  try{
+  try {
     $result = civicrm_api3('Profile', 'submit', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -108,23 +113,23 @@ function profile_submit_expectedresult() {
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testProfileSubmit"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ProfileTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
-*
-* To Learn about the API read
-* https://docs.civicrm.org/dev/en/latest/api/
-*
-* Browse the API on your own site with the API Explorer. It is in the main
-* CiviCRM menu, under: Support > Development > API Explorer.
-*
-* Read more about testing here
-* https://docs.civicrm.org/dev/en/latest/testing/
-*
-* API Standards documentation:
-* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testProfileSubmit"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ProfileTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

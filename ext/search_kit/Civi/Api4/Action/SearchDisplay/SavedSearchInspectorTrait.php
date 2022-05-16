@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\SearchDisplay;
 
+use Civi\API\Request;
 use Civi\Api4\Query\SqlExpression;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\Utils\CoreUtil;
@@ -38,6 +39,11 @@ trait SavedSearchInspectorTrait {
   private $_selectClause;
 
   /**
+   * @var array
+   */
+  private $_searchEntityFields;
+
+  /**
    * If SavedSearch is supplied as a string, this will load it as an array
    * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
@@ -48,7 +54,7 @@ trait SavedSearchInspectorTrait {
         ->addWhere('name', '=', $this->savedSearch)
         ->execute()->single();
     }
-    $this->_apiParams = ($this->savedSearch['api_params'] ?? []) + ['select' => [], 'where' => [], 'join' => [], 'having' => []];
+    $this->_apiParams = ($this->savedSearch['api_params'] ?? []) + ['select' => [], 'where' => []];
   }
 
   /**
@@ -57,7 +63,10 @@ trait SavedSearchInspectorTrait {
    * @return array|null
    */
   protected function getField($fieldName) {
-    return $this->getQuery() ? $this->getQuery()->getField($fieldName, FALSE) : NULL;
+    [$fieldName] = explode(':', $fieldName);
+    return $this->getQuery() ?
+      $this->getQuery()->getField($fieldName, FALSE) :
+      ($this->getEntityFields()[$fieldName] ?? NULL);
   }
 
   /**
@@ -65,7 +74,7 @@ trait SavedSearchInspectorTrait {
    * @return array{entity: string, alias: string, table: string, bridge: string|NULL}|NULL
    */
   protected function getJoin($joinAlias) {
-    return $this->getQuery()->getExplicitJoin($joinAlias);
+    return $this->getQuery() ? $this->getQuery()->getExplicitJoin($joinAlias) : NULL;
   }
 
   /**
@@ -76,14 +85,32 @@ trait SavedSearchInspectorTrait {
   }
 
   /**
-   * @return \Civi\Api4\Query\Api4SelectQuery
+   * Returns a Query object for the search entity, or FALSE if it doesn't have a DAO
+   *
+   * @return \Civi\Api4\Query\Api4SelectQuery|bool
    */
   private function getQuery() {
-    if (!$this->_selectQuery && !empty($this->savedSearch['api_entity'])) {
-      $api = \Civi\API\Request::create($this->savedSearch['api_entity'], 'get', $this->savedSearch['api_params']);
+    if (!isset($this->_selectQuery) && !empty($this->savedSearch['api_entity'])) {
+      if (!in_array('DAOEntity', CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'type'), TRUE)) {
+        return $this->_selectQuery = FALSE;
+      }
+      $api = Request::create($this->savedSearch['api_entity'], 'get', $this->savedSearch['api_params']);
       $this->_selectQuery = new \Civi\Api4\Query\Api4SelectQuery($api);
     }
     return $this->_selectQuery;
+  }
+
+  /**
+   * Used as a fallback for non-DAO entities which don't use the Query object
+   *
+   * @return array
+   */
+  private function getEntityFields() {
+    if (!isset($this->_searchEntityFields)) {
+      $this->_searchEntityFields = Request::create($this->savedSearch['api_entity'], 'get', $this->savedSearch['api_params'])
+        ->entityFields();
+    }
+    return $this->_searchEntityFields;
   }
 
   /**
@@ -130,8 +157,10 @@ trait SavedSearchInspectorTrait {
    * @return bool
    */
   private function canAggregate($fieldPath) {
-    $apiParams = $this->savedSearch['api_params'] ?? [];
+    // Disregard suffix
+    [$fieldPath] = explode(':', $fieldPath);
     $field = $this->getField($fieldPath);
+    $apiParams = $this->savedSearch['api_params'] ?? [];
 
     // If the query does not use grouping or the field doesn't exist, never
     if (empty($apiParams['groupBy']) || !$field) {
@@ -143,8 +172,7 @@ trait SavedSearchInspectorTrait {
     }
 
     // If the entity this column belongs to is being grouped by id, then also no
-    $suffix = strstr($fieldPath, ':') ?: '';
-    $idField = substr($fieldPath, 0, 0 - strlen($field['name'] . $suffix)) . CoreUtil::getIdFieldName($field['entity']);
+    $idField = substr($fieldPath, 0, 0 - strlen($field['name'])) . CoreUtil::getIdFieldName($field['entity']);
     return !in_array($idField, $apiParams['groupBy']);
   }
 

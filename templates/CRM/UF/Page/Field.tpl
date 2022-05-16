@@ -49,11 +49,11 @@
                 <td class="crm-editable crmf-is_searchable" data-type="boolean">{if $row.is_searchable eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
                 <td class="crm-editable crmf-in_selector" data-type="boolean">{if $row.in_selector eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
                 {/if}
-                <td class="nowrap">{$row.weight}</td>
+                <td class="nowrap">{$row.weight|smarty:nodefaults}</td>
                 <td class="crm-editable crmf-is_required" data-type="boolean">{if $row.is_required eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
                 <td class="crm-editable crmf-is_view" data-type="boolean">{if $row.is_view eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
                 <td>{if $row.is_reserved     eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-                <td>{$row.action|replace:'xx':$row.id}</td>
+                <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
             </tr>
             {/foreach}
         </table>

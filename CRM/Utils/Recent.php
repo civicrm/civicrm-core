@@ -14,6 +14,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  * Recent items utility class.
  */
@@ -24,7 +26,14 @@ class CRM_Utils_Recent {
    *
    * @var string
    */
-  const MAX_ITEMS = 30, STORE_NAME = 'CRM_Utils_Recent';
+  const STORE_NAME = 'CRM_Utils_Recent';
+
+  /**
+   * Max number of recent items to store
+   *
+   * @var int
+   */
+  const MAX_ITEMS = 30;
 
   /**
    * The list of recently viewed items.
@@ -68,35 +77,53 @@ class CRM_Utils_Recent {
   }
 
   /**
+   * Create function used by the API - supplies defaults
+   *
+   * @param array $params
+   */
+  public static function create(array $params) {
+    $params['title'] = $params['title'] ?? self::getTitle($params['entity_type'], $params['entity_id']);
+    $params['view_url'] = $params['view_url'] ?? self::getUrl($params['entity_type'], $params['entity_id'], 'view');
+    $params['edit_url'] = $params['edit_url'] ?? self::getUrl($params['entity_type'], $params['entity_id'], 'update');
+    $params['delete_url'] = $params['delete_url'] ?? (empty($params['is_deleted']) ? self::getUrl($params['entity_type'], $params['entity_id'], 'delete') : NULL);
+    self::add($params['title'], $params['view_url'], $params['entity_id'], $params['entity_type'], $params['contact_id'] ?? NULL, NULL, $params);
+    return $params;
+  }
+
+  /**
    * Add an item to the recent stack.
    *
    * @param string $title
    *   The title to display.
    * @param string $url
    *   The link for the above title.
-   * @param string $id
+   * @param string $entityId
    *   Object id.
-   * @param $type
+   * @param string $entityType
    * @param int $contactId
+   *   Deprecated, probably unused param
    * @param string $contactName
+   *   Deprecated, probably unused param
    * @param array $others
    */
   public static function add(
     $title,
     $url,
-    $id,
-    $type,
+    $entityId,
+    $entityType,
     $contactId,
     $contactName,
     $others = []
   ) {
+    $entityType = self::normalizeEntityType($entityType);
+
     // Abort if this entity type is not supported
-    if (!self::isProviderEnabled($type)) {
+    if (!self::isProviderEnabled($entityType)) {
       return;
     }
 
     // Ensure item is not already present in list
-    self::removeItems(['id' => $id, 'type' => $type]);
+    self::removeItems(['entity_id' => $entityId, 'entity_type' => $entityType]);
 
     if (!is_array($others)) {
       $others = [];
@@ -105,16 +132,28 @@ class CRM_Utils_Recent {
     array_unshift(self::$_recent,
       [
         'title' => $title,
+        // TODO: deprecate & remove "url" in favor of "view_url"
         'url' => $url,
-        'id' => $id,
-        'type' => $type,
+        'view_url' => $url,
+        // TODO: deprecate & remove "id" in favor of "entity_id"
+        'id' => $entityId,
+        'entity_id' => (int) $entityId,
+        // TODO: deprecate & remove "type" in favor of "entity_type"
+        'type' => $entityType,
+        'entity_type' => $entityType,
+        // Deprecated param
         'contact_id' => $contactId,
+        // Param appears to be unused
         'contactName' => $contactName,
         'subtype' => $others['subtype'] ?? NULL,
-        'isDeleted' => $others['isDeleted'] ?? FALSE,
+        // TODO: deprecate & remove "isDeleted" in favor of "is_deleted"
+        'isDeleted' => $others['is_deleted'] ?? $others['isDeleted'] ?? FALSE,
+        'is_deleted' => (bool) ($others['is_deleted'] ?? $others['isDeleted'] ?? FALSE),
+        // imageUrl is deprecated
         'image_url' => $others['imageUrl'] ?? NULL,
-        'edit_url' => $others['editUrl'] ?? NULL,
-        'delete_url' => $others['deleteUrl'] ?? NULL,
+        'edit_url' => $others['edit_url'] ?? $others['editUrl'] ?? NULL,
+        'delete_url' => $others['delete_url'] ?? $others['deleteUrl'] ?? NULL,
+        'icon' => $others['icon'] ?? self::getIcon($entityType, $entityId),
       ]
     );
 
@@ -130,15 +169,87 @@ class CRM_Utils_Recent {
   }
 
   /**
+   * Get default title for this item, based on the entity's `label_field`
+   *
+   * @param string $entityType
+   * @param int $entityId
+   * @return string|null
+   */
+  private static function getTitle($entityType, $entityId) {
+    $labelField = CoreUtil::getInfoItem($entityType, 'label_field');
+    $title = NULL;
+    if ($labelField) {
+      $record = civicrm_api4($entityType, 'get', [
+        'where' => [['id', '=', $entityId]],
+        'select' => [$labelField],
+      ], 0);
+      $title = $record[$labelField] ?? NULL;
+    }
+    return $title ?? (CoreUtil::getInfoItem($entityType, 'label_field'));
+  }
+
+  /**
+   * Get a link to view/update/delete a given entity.
+   *
+   * @param string $entityType
+   * @param int $entityId
+   * @param string $action
+   *   Either 'view', 'update', or 'delete'
+   * @return string|null
+   */
+  private static function getUrl($entityType, $entityId, $action) {
+    if ($action !== 'view') {
+      $check = civicrm_api4($entityType, 'checkAccess', [
+        'action' => $action,
+        'values' => ['id' => $entityId],
+      ], 0);
+      if (empty($check['access'])) {
+        return NULL;
+      }
+    }
+    $paths = (array) CoreUtil::getInfoItem($entityType, 'paths');
+    if (!empty($paths[$action])) {
+      return CRM_Utils_System::url(str_replace('[id]', $entityId, $paths[$action]));
+    }
+    return NULL;
+  }
+
+  /**
+   * @param $entityType
+   * @param $entityId
+   * @return string|null
+   */
+  private static function getIcon($entityType, $entityId) {
+    $icon = NULL;
+    $daoClass = CRM_Core_DAO_AllCoreTables::getFullName($entityType);
+    if ($daoClass) {
+      $icon = CRM_Core_DAO_AllCoreTables::getBAOClassName($daoClass)::getEntityIcon($entityType, $entityId);
+    }
+    return $icon ?: 'fa-gear';
+  }
+
+  /**
    * Callback for hook_civicrm_post().
    * @param \Civi\Core\Event\PostEvent $event
    */
   public static function on_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
-    if ($event->action === 'delete' && $event->id && CRM_Core_Session::getLoggedInContactID()) {
-      // Is this an entity that might be in the recent items list?
-      $providersPermitted = Civi::settings()->get('recentItemsProviders') ?: array_keys(self::getProviders());
-      if (in_array($event->entity, $providersPermitted)) {
-        self::del(['id' => $event->id, 'type' => $event->entity]);
+    if ($event->id && CRM_Core_Session::getLoggedInContactID()) {
+      $entityType = self::normalizeEntityType($event->entity);
+      if ($event->action === 'delete') {
+        // Is this an entity that might be in the recent items list?
+        $providersPermitted = Civi::settings()->get('recentItemsProviders') ?: array_keys(self::getProviders());
+        if (in_array($entityType, $providersPermitted)) {
+          self::del(['entity_id' => $event->id, 'entity_type' => $entityType]);
+        }
+      }
+      elseif ($event->action === 'edit') {
+        if (isset($event->object->is_deleted)) {
+          \Civi\Api4\RecentItem::update()
+            ->addWhere('entity_type', '=', $entityType)
+            ->addWhere('entity_id', '=', $event->id)
+            ->addValue('is_deleted', (bool) $event->object->is_deleted)
+            ->execute();
+        }
       }
     }
   }
@@ -152,7 +263,7 @@ class CRM_Utils_Recent {
 
     self::$_recent = array_filter(self::$_recent, function($item) use ($props) {
       foreach ($props as $key => $val) {
-        if (isset($item[$key]) && $item[$key] != $val) {
+        if (($item[$key] ?? NULL) != $val) {
           return TRUE;
         }
       }
@@ -192,12 +303,6 @@ class CRM_Utils_Recent {
    * @return bool
    */
   public static function isProviderEnabled($providerName) {
-
-    // Join contact types to providerName 'Contact'
-    $contactTypes = CRM_Contact_BAO_ContactType::contactTypes(TRUE);
-    if (in_array($providerName, $contactTypes)) {
-      $providerName = 'Contact';
-    }
     $allowed = TRUE;
 
     // Use core setting recentItemsProviders if configured
@@ -210,7 +315,21 @@ class CRM_Utils_Recent {
   }
 
   /**
+   * @param string $entityType
+   * @return string
+   */
+  private static function normalizeEntityType($entityType) {
+    // Change Individual/Organization/Household to 'Contact'
+    if (in_array($entityType, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE)) {
+      return 'Contact';
+    }
+    return $entityType;
+  }
+
+  /**
    * Gets the list of available providers to civi's recent items stack
+   *
+   * TODO: Make this an option group so extensions can extend it.
    *
    * @return array
    */

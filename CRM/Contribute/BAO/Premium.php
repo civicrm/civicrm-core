@@ -24,30 +24,16 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   private static $productInfo;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
+   * @deprecated
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contribute_DAO_Product
+   * @return CRM_Contribute_DAO_Product|NULL
    */
-  public static function retrieve(&$params, &$defaults) {
-    $premium = new CRM_Contribute_DAO_Product();
-    $premium->copyValues($params);
-    if ($premium->find(TRUE)) {
-      CRM_Core_DAO::storeValues($premium, $defaults);
-      return $premium;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve('CRM_Contribute_DAO_Product', $params, $defaults);
   }
 
   /**
@@ -151,22 +137,19 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Build Premium B im Contribution Pages.
+   * Build Premium Preview block for Contribution Pages.
    *
    * @param CRM_Core_Form $form
-   * @param int $productID
-   * @param int $premiumProductID
+   * @param int|null $productID
+   *
+   * @return void
    */
-  public function buildPremiumPreviewBlock($form, $productID, $premiumProductID = NULL) {
-    if ($premiumProductID) {
-      $dao = new CRM_Contribute_DAO_PremiumsProduct();
-      $dao->id = $premiumProductID;
-      $dao->find(TRUE);
-      $productID = $dao->product_id;
-    }
+  public static function buildPremiumPreviewBlock($form, $productID) {
     $productDAO = new CRM_Contribute_DAO_Product();
     $productDAO->id = $productID;
     $productDAO->is_active = 1;
+    $products = [];
+
     if ($productDAO->find(TRUE)) {
       CRM_Core_DAO::storeValues($productDAO, $products[$productDAO->id]);
     }

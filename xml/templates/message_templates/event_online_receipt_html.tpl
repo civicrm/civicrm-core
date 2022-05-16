@@ -224,7 +224,7 @@
                <td {$tdStyle}>
                 {$line.unit_price*$line.qty|crmMoney}
                </td>
-               {if isset($line.tax_rate) and ($line.tax_rate != "" || $line.tax_amount != "")}
+               {if $line.tax_rate || $line.tax_amount != ""}
                 <td {$tdStyle}>
                  {$line.tax_rate|string_format:"%.2f"}%
                 </td>
@@ -269,10 +269,10 @@
         {foreach from=$dataArray item=value key=priceset}
          <tr>
           {if $priceset || $priceset == 0}
-           <td>&nbsp;{if isset($taxTerm)}{$taxTerm}{/if} {$priceset|string_format:"%.2f"}%</td>
+           <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>
            <td>&nbsp;{$value|crmMoney:$currency}</td>
           {else}
-           <td>&nbsp;{ts}No{/ts} {if isset($taxTerm)}{$taxTerm}{/if}</td>
+           <td>&nbsp;{ts}No{/ts} {$taxTerm}</td>
            <td>&nbsp;{$value|crmMoney:$currency}</td>
           {/if}
          </tr>

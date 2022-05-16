@@ -29,20 +29,12 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   public static $_exportableFields = NULL;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Is CiviCase enabled?
    *
    * @return bool
    */
   public static function enabled() {
-    $config = CRM_Core_Config::singleton();
-    return in_array('CiviCase', $config->enableComponents);
+    return CRM_Core_Component::isEnabled('CiviCase');
   }
 
   /**
@@ -55,7 +47,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Case_BAO_Case
+   * @return CRM_Case_DAO_Case
    */
   public static function add(&$params) {
     $caseDAO = new CRM_Case_DAO_Case();
@@ -72,7 +64,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return CRM_Case_BAO_Case
+   * @return CRM_Case_DAO_Case
    */
   public static function &create(&$params) {
     // CRM-20958 - These fields are managed by MySQL triggers. Watch out for clients resaving stale timestamps.
@@ -224,7 +216,7 @@ WHERE civicrm_case.id = %1";
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @return bool
    */
   public static function del($id) {
@@ -424,6 +416,8 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
       "GROUP_CONCAT(DISTINCT IF(case_relationship.contact_id_b = $userID, case_relation_type.label_a_b, case_relation_type.label_b_a) SEPARATOR ', ') as case_role",
       't_act.activity_date_time as activity_date_time',
       't_act.id as activity_id',
+      'case_status.label AS case_status',
+      'civicrm_case_type.title AS case_type',
     ];
 
     $query = CRM_Contact_BAO_Query::appendAnyValueToSelect($selectClauses, 'case_id');
@@ -432,6 +426,11 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
       FROM civicrm_case
         INNER JOIN civicrm_case_contact ON civicrm_case.id = civicrm_case_contact.case_id
         INNER JOIN civicrm_contact ON civicrm_case_contact.contact_id = civicrm_contact.id
+        LEFT JOIN civicrm_case_type ON civicrm_case.case_type_id = civicrm_case_type.id
+        LEFT JOIN civicrm_option_group option_group_case_status ON ( option_group_case_status.name = 'case_status' )
+        LEFT JOIN civicrm_option_value case_status ON ( civicrm_case.status_id = case_status.value
+          AND option_group_case_status.id = case_status.option_group_id )
+
 HERESQL;
 
     // 'upcoming' and 'recent' show the next scheduled and most recent
@@ -761,6 +760,9 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
 
     $res = CRM_Core_DAO::executeQuery($query);
     while ($res->fetch()) {
+      if (!isset($rows[$res->case_type])) {
+        $rows[$res->case_type] = array_fill_keys($caseStatuses, []);
+      }
       if (!empty($rows[$res->case_type]) && !empty($rows[$res->case_type][$res->case_status])) {
         $rows[$res->case_type][$res->case_status]['count'] = $rows[$res->case_type][$res->case_status]['count'] + 1;
       }
@@ -1122,8 +1124,8 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
   /**
    * Helper function to generate a formatted contact link/name for display in the Case activities tab
    *
-   * @param $contactId
-   * @param $contactName
+   * @param int $contactId
+   * @param string $contactName
    *
    * @return string
    */
@@ -1519,16 +1521,16 @@ HERESQL;
   }
 
   /**
-   * @param $groupInfo
+   * @param array $groupInfo
    * @param null $sort
-   * @param null $showLinks
+   * @param bool $showLinks
    * @param bool $returnOnlyCount
    * @param int $offset
    * @param int $rowCount
    *
    * @return array
    */
-  public static function getGlobalContacts(&$groupInfo, $sort = NULL, $showLinks = NULL, $returnOnlyCount = FALSE, $offset = 0, $rowCount = 25) {
+  public static function getGlobalContacts(&$groupInfo, $sort = NULL, $showLinks = FALSE, $returnOnlyCount = FALSE, $offset = 0, $rowCount = 25) {
     $globalContacts = [];
 
     $settingsProcessor = new CRM_Case_XMLProcessor_Settings();
@@ -1572,7 +1574,7 @@ HERESQL;
     $relatedContacts = self::getRelatedContacts($caseId);
 
     $groupInfo = [];
-    $globalContacts = self::getGlobalContacts($groupInfo);
+    $globalContacts = self::getGlobalContacts($groupInfo, NULL, FALSE, FALSE, 0, 0);
 
     //unset values which are not required.
     foreach ($globalContacts as $k => & $v) {

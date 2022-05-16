@@ -14,8 +14,6 @@ namespace Civi\Api4\Utils;
 
 use Civi\API\Exception\NotImplementedException;
 use Civi\API\Request;
-use Civi\Api4\Entity;
-use Civi\Api4\Event\CreateApi4RequestEvent;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 class CoreUtil {
@@ -40,9 +38,11 @@ class CoreUtil {
    * @return string|\Civi\Api4\Generic\AbstractEntity
    */
   public static function getApiClass($entityName) {
-    $e = new CreateApi4RequestEvent($entityName);
-    \Civi::dispatcher()->dispatch('civi.api4.createRequest', $e);
-    return $e->className;
+    $className = 'Civi\Api4\\' . $entityName;
+    if (class_exists($className)) {
+      return $className;
+    }
+    return self::getInfoItem($entityName, 'class');
   }
 
   /**
@@ -53,20 +53,8 @@ class CoreUtil {
    * @return mixed
    */
   public static function getInfoItem(string $entityName, string $keyToReturn) {
-    // Because this function might be called thousands of times per request, read directly
-    // from the cache set by Apiv4 Entity.get to avoid the processing overhead of the API wrapper.
-    $cached = \Civi::cache('metadata')->get('api4.entities.info');
-    if ($cached) {
-      $info = $cached[$entityName] ?? NULL;
-    }
-    // If the cache is empty, calling Entity.get will populate it and we'll use it next time.
-    else {
-      $info = Entity::get(FALSE)
-        ->addWhere('name', '=', $entityName)
-        ->addSelect($keyToReturn)
-        ->execute()->first();
-    }
-    return $info ? $info[$keyToReturn] ?? NULL : NULL;
+    $provider = \Civi::service('action_object_provider');
+    return $provider->getEntities()[$entityName][$keyToReturn] ?? NULL;
   }
 
   /**
@@ -86,11 +74,7 @@ class CoreUtil {
    * @return string
    */
   public static function getTableName($entityName) {
-    if (strpos($entityName, 'Custom_') === 0) {
-      $customGroup = substr($entityName, 7);
-      return \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroup, 'table_name', 'name');
-    }
-    return AllCoreTables::getTableForEntityName($entityName);
+    return self::getInfoItem($entityName, 'table_name');
   }
 
   /**
@@ -100,15 +84,13 @@ class CoreUtil {
    * @return string|NULL
    */
   public static function getApiNameFromTableName($tableName) {
-    $entityName = AllCoreTables::getBriefName(AllCoreTables::getClassForTable($tableName));
-    // Real entities
-    if ($entityName) {
-      // Verify class exists
-      return self::getApiClass($entityName) ? $entityName : NULL;
+    $provider = \Civi::service('action_object_provider');
+    foreach ($provider->getEntities() as $entityName => $info) {
+      if (($info['table_name'] ?? NULL) === $tableName) {
+        return $entityName;
+      }
     }
-    // Multi-value custom group pseudo-entities
-    $customGroup = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $tableName, 'name', 'table_name');
-    return self::isCustomEntity($customGroup) ? "Custom_$customGroup" : NULL;
+    return NULL;
   }
 
   /**
@@ -133,17 +115,11 @@ class CoreUtil {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function getCustomGroupExtends(string $entityName) {
-    // Custom_group.extends pretty much maps 1-1 with entity names, except for a couple oddballs (Contact, Participant).
+    // Custom_group.extends pretty much maps 1-1 with entity names, except for Contact.
     switch ($entityName) {
       case 'Contact':
         return [
           'extends' => array_merge(['Contact'], array_keys(\CRM_Core_SelectValues::contactType())),
-          'column' => 'id',
-        ];
-
-      case 'Participant':
-        return [
-          'extends' => ['Participant', 'ParticipantRole', 'ParticipantEventName', 'ParticipantEventType'],
           'column' => 'id',
         ];
 

@@ -61,7 +61,7 @@ class CryptoRegistry {
    * @throws \CRM_Core_Exception
    * @throws \Civi\Crypto\Exception\CryptoException
    */
-  public static function createDefaultRegistry() {
+  public static function createDefaultRegistry(): CryptoRegistry {
     $registry = new static();
     $registry->addCipherSuite(new \Civi\Crypto\PhpseclibCipherSuite());
 
@@ -193,7 +193,7 @@ class CryptoRegistry {
   /**
    * @param CipherSuiteInterface $cipherSuite
    *   The encryption/decryption callback/handler
-   * @param string[]|NULL $names
+   * @param string[]|null $names
    *   Symbolic names. Ex: 'aes-cbc'
    *   If NULL, probe $cipherSuite->getNames()
    */

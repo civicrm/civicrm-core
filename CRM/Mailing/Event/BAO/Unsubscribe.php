@@ -23,13 +23,6 @@ require_once 'Mail/mime.php';
 class CRM_Mailing_Event_BAO_Unsubscribe extends CRM_Mailing_Event_DAO_Unsubscribe {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Unsubscribe a contact from the domain.
    *
    * @param int $job_id
@@ -230,7 +223,29 @@ WHERE  email = %2
       CRM_Contact_BAO_GroupContactCache::check(array_merge($groupIds, $baseGroupIds));
     }
 
-    $groupsSQL = "
+    /* https://lab.civicrm.org/dev/core/-/issues/3031
+     * When 2 separate tables are referenced in an OR clause the index will be used on one & not the other. At the sql
+     * level we usually deal with this by using UNION to join the 2 queries together - the patch is doing the same thing at
+     * the php level & probably as a result performs better than the original not-that-bad OR clause did & likely similarly to
+     * how a UNION would work.
+     */
+    $groupsCachedSQL = "
+            SELECT      grp.id as group_id,
+                        grp.title as title,
+                        grp.frontend_title as frontend_title,
+                        grp.frontend_description as frontend_description,
+                        grp.description as description,
+                        grp.saved_search_id as saved_search_id
+            FROM        civicrm_group grp
+            LEFT JOIN   civicrm_group_contact_cache gcc
+                ON      gcc.group_id = grp.id
+            WHERE       grp.is_hidden = 0
+                        $groupIdClause
+                AND     ((grp.saved_search_id is not null AND gcc.contact_id = %1)
+                            $baseGroupClause
+                        ) GROUP BY grp.id";
+
+    $groupsAddedSQL = "
             SELECT      grp.id as group_id,
                         grp.title as title,
                         grp.frontend_title as frontend_title,
@@ -240,33 +255,40 @@ WHERE  email = %2
             FROM        civicrm_group grp
             LEFT JOIN   civicrm_group_contact gc
                 ON      gc.group_id = grp.id
-            LEFT JOIN     civicrm_group_contact_cache gcc
-                ON      gcc.group_id = grp.id
             WHERE       grp.is_hidden = 0
                         $groupIdClause
-                AND     ((grp.saved_search_id is not null AND gcc.contact_id = %1)
-                            OR  (gc.contact_id = %1
+                AND     ((gc.contact_id = %1
                                 AND gc.status = 'Added')
                             $baseGroupClause
                         ) GROUP BY grp.id";
     $groupsParams = [
       1 => [$contact_id, 'Positive'],
     ];
-    $do = CRM_Core_DAO::executeQuery($groupsSQL, $groupsParams);
+    $doCached = CRM_Core_DAO::executeQuery($groupsCachedSQL, $groupsParams);
+    $doAdded = CRM_Core_DAO::executeQuery($groupsAddedSQL, $groupsParams);
 
     if ($return) {
       $returnGroups = [];
-      while ($do->fetch()) {
-        $returnGroups[$do->group_id] = [
-          'title' => !empty($do->frontend_title) ? $do->frontend_title : $do->title,
-          'description' => !empty($do->frontend_description) ? $do->frontend_description : $do->description,
+      while ($doCached->fetch()) {
+        $returnGroups[$doCached->group_id] = [
+          'title' => !empty($doCached->frontend_title) ? $doCached->frontend_title : $doCached->title,
+          'description' => !empty($doCached->frontend_description) ? $doCached->frontend_description : $doCached->description,
+        ];
+      }
+      while ($doAdded->fetch()) {
+        $returnGroups[$doAdded->group_id] = [
+          'title' => !empty($doAdded->frontend_title) ? $doAdded->frontend_title : $doAdded->title,
+          'description' => !empty($doAdded->frontend_description) ? $doAdded->frontend_description : $doAdded->description,
         ];
       }
       return $returnGroups;
     }
     else {
-      while ($do->fetch()) {
-        $groups[$do->group_id] = !empty($do->frontend_title) ? $do->frontend_title : $do->title;
+      while ($doCached->fetch()) {
+        $groups[$doCached->group_id] = !empty($doCached->frontend_title) ? $doCached->frontend_title : $doCached->title;
+      }
+      while ($doAdded->fetch()) {
+        $groups[$doAdded->group_id] = !empty($doAdded->frontend_title) ? $doAdded->frontend_title : $doAdded->title;
       }
     }
     $transaction = new CRM_Core_Transaction();
@@ -300,9 +322,9 @@ WHERE  email = %2
    * Send a response email informing the contact of the groups from which he.
    * has been unsubscribed.
    *
-   * @param string $queue_id
+   * @param int $queue_id
    *   The queue event ID.
-   * @param array $groups
+   * @param array|null $groups
    *   List of group IDs.
    * @param bool $is_domain
    *   Is this domain-level?.

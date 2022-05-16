@@ -1,6 +1,14 @@
-
 #bootstrap-theme .crm-search-criteria-column {
   min-width: 500px;
+}
+
+#bootstrap-theme .crm-search-nav-tabs {
+  position: relative;
+}
+#bootstrap-theme .crm-search-nav-tabs > a.btn {
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 #bootstrap-theme.crm-search .nav-stacked {
@@ -25,11 +33,8 @@
   cursor: not-allowed;
 }
 
-#bootstrap-theme.crm-search input.ng-invalid {
-  border-color: #8A1F11;
-}
 #bootstrap-theme.crm-search input.ng-invalid::placeholder {
-  color: #8A1F11;
+  color: #8a1f11;
 }
 
 #bootstrap-theme.crm-search ul.nav-stacked li {
@@ -65,7 +70,7 @@
   width: auto;
   border: 0 none;
   padding: 2px 5px;
-  text-transform: capitalize;
+  text-transform: none;
 }
 #bootstrap-theme.crm-search crm-search-clause > .btn-group {
   position: absolute;
@@ -103,10 +108,11 @@
   display: inline-block;
 }
 
-#bootstrap-theme.crm-search i.crm-search-move-icon {
+#bootstrap-theme i.crm-i.crm-search-move-icon {
   opacity: .5;
 }
-#bootstrap-theme.crm-search .crm-draggable:hover > * > i.crm-search-move-icon {
+#bootstrap-theme .crm-draggable:hover > i.crm-i.crm-search-move-icon,
+#bootstrap-theme .crm-draggable:hover > * > i.crm-i.crm-search-move-icon {
   opacity: 1;
 }
 
@@ -146,6 +152,7 @@
   position: relative;
   top: -5px;
   right: -9px;
+  vertical-align: top;
 }
 
 #bootstrap-theme.crm-search .api4-add-where-group-menu {
@@ -158,10 +165,6 @@
 
 #bootstrap-theme.crm-search .btn.form-control {
   height: 36px;
-}
-
-#bootstrap-theme.crm-search th.crm-search-result-select {
-  padding-right: 10px;
 }
 
 #bootstrap-theme .crm-search-delete-display {
@@ -199,6 +202,7 @@
 #bootstrap-theme.crm-search .crm-editable-enabled:hover:not(:focus) {
   border: 2px dashed grey !important;
 }
+/* Undo Shoreditch add-ons */
 #bootstrap-theme.crm-search .crm-editable-enabled:before,
 #bootstrap-theme.crm-search .crm-editable-enabled:after {
   content: '';
@@ -251,4 +255,21 @@
 #bootstrap-theme button.crm-search-admin-combo-button {
   min-width: 200px;
   text-align: left;
+}
+
+crm-search-admin-export,
+crm-search-admin-import {
+  display: block;
+}
+
+#bootstrap-theme .crm-search-admin-relative {
+  position: relative;
+  display: block;
+}
+
+#bootstrap-theme .crm-search-admin-right {
+  position: absolute;
+  top: 1px;
+  right: 0;
+  background-color: white;
 }

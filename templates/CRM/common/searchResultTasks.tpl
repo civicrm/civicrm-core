@@ -12,9 +12,9 @@
 <div id="search-status">
   <table class="form-layout-compressed">
   <tr>
-    <td class="font-size12pt" style="width: 40%;">
+    <td style="width: 40%;">
     {if !empty($savedSearch.name)}{$savedSearch.name} ({ts}smart group{/ts}) - {/if}
-    {ts count=$pager->_totalItems plural='%count Results'}%count Result{/ts}{if !empty($selectorLabel)}&nbsp;-&nbsp;{$selectorLabel}{/if}
+    {ts count=$pager->_totalItems plural='%count Results'}%count Result{/ts}{if $selectorLabel}&nbsp;-&nbsp;{$selectorLabel}{/if}
     {if $context == 'Event' && $participantCount && ( $pager->_totalItems ne $participantCount ) }
         <br />{ts}Actual participant count{/ts} : {$participantCount} {help id="id-actual_participant_count" file="CRM/Event/Form/Search/Results.hlp"} &nbsp;
     {/if}
@@ -34,7 +34,7 @@
   </tr>
 {/if}
   <tr>
-    <td class="font-size11pt"> {ts}Select Records{/ts}:</td>
+    <td>{ts}Select Records{/ts}:</td>
     <td class="nowrap">
       {$form.radio_ts.ts_all.html} <label for="{$ts_all_id}">{ts count=$pager->_totalItems plural='All %count records'}The found record{/ts}</label> &nbsp; {if $pager->_totalItems > 1} {$form.radio_ts.ts_sel.html} <label for="{$ts_sel_id}">{ts 1="<span></span>"}%1 Selected records only{/ts}</label>{/if}
     </td>

@@ -14,11 +14,11 @@
         <p>{ts count=$suppressedEmails plural='Email will NOT be sent to %count contacts - (no email address on file, or communication preferences specify DO NOT EMAIL, or contact is deceased).'}Email will NOT be sent to %count contact - (no email address on file, or communication preferences specify DO NOT EMAIL, or contact is deceased).{/ts}</p>
     </div>
 {/if}
-{crmSetting var="logged_in_email_setting" name="allow_mail_from_logged_in_contact"}
+
 <table class="form-layout-compressed">
   <tr id="selectEmailFrom" class="crm-contactEmail-form-block-fromEmailAddress crm-email-element">
     <td class="label">{$form.from_email_address.label}</td>
-    <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin logged_in_email_setting=$logged_in_email_setting}</td>
+    <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
   </tr>
     <tr class="crm-contactEmail-form-block-recipient">
        <td class="label">{if $single eq false}{ts}Recipient(s){/ts}{else}{$form.to.label}{/if}</td>
@@ -68,7 +68,7 @@
   {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignTrClass="crm-contactEmail-form-block-campaign_id"}
 </table>
 
-{include file="CRM/Contact/Form/Task/EmailCommon.tpl"}
+{include file="CRM/Contact/Form/Task/EmailCommon.tpl" noAttach=0}
 {include file="CRM/Activity/Form/FollowUp.tpl" type='email-'}
 
 <div class="spacer"> </div>

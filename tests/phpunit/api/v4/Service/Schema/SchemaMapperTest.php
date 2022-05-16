@@ -22,12 +22,12 @@ namespace api\v4\Service\Schema;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
 use Civi\Api4\Service\Schema\SchemaMap;
 use Civi\Api4\Service\Schema\Table;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class SchemaMapperTest extends UnitTestCase {
+class SchemaMapperTest extends Api4TestBase {
 
   public function testWillHaveNoPathWithNoTables() {
     $map = new SchemaMap();

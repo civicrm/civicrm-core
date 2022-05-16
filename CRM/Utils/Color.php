@@ -74,7 +74,7 @@ class CRM_Utils_Color {
   /**
    * Calculate a highlight color from a base color
    *
-   * @param $color
+   * @param string $color
    * @return string
    */
   public static function getHighlight($color) {
@@ -96,7 +96,7 @@ class CRM_Utils_Color {
   /**
    * Convert named color (e.g. springgreen) to hex
    *
-   * @param $colorName
+   * @param string $colorName
    * @return string|null
    */
   public static function nameToHex($colorName) {

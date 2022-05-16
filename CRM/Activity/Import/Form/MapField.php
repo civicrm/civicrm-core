@@ -84,14 +84,13 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
       // Get an array of the name values for mapping fields associated with this mapping_id.
       $mappingName = CRM_Core_BAO_Mapping::getMappingFieldValues($savedMapping, 'name');
 
-      $this->assign('loadedMapping', $savedMapping);
       $this->set('loadedMapping', $savedMapping);
 
       $params = ['id' => $savedMapping];
       $temp = [];
       $mappingDetails = CRM_Core_BAO_Mapping::retrieve($params, $temp);
 
-      $this->assign('savedName', $mappingDetails->name);
+      $this->assign('savedMappingName', $mappingDetails->name);
 
       $this->add('hidden', 'mappingId', $savedMapping);
 
@@ -326,10 +325,6 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
       return;
     }
 
-    $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
-    $separator = $this->controller->exportValue('DataSource', 'fieldSeparator');
-    $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
-
     $mapperKeys = [];
     $mapper = [];
     $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
@@ -392,7 +387,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     $parser = new CRM_Activity_Import_Parser_Activity($mapperKeysMain);
-    $parser->run($fileName, $separator, $mapper, $skipColumnHeader,
+    $parser->run($this->getSubmittedValue('uploadFile'), $this->getSubmittedValue('fieldSeparator'), $mapper, $this->getSubmittedValue('skipColumnHeader'),
       CRM_Import_Parser::MODE_PREVIEW
     );
 

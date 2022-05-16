@@ -111,6 +111,7 @@
     <type>boolean</type>
     <title>Header Financial Account?</title>
     <default>0</default>
+    <required>true</required>
     <comment>Is this a header account which does not allow transactions to be posted against it directly, but only to its sub-accounts?</comment>
     <add>4.3</add>
   </field>
@@ -118,7 +119,8 @@
     <name>is_deductible</name>
     <type>boolean</type>
     <title>Deductible Financial Account?</title>
-    <default>1</default>
+    <default>0</default>
+    <required>true</required>
     <comment>Is this account tax-deductible?</comment>
     <add>4.3</add>
   </field>
@@ -127,6 +129,7 @@
     <type>boolean</type>
     <title>Tax Financial Account?</title>
     <default>0</default>
+    <required>true</required>
     <comment>Is this account for taxes?</comment>
     <add>4.3</add>
   </field>
@@ -143,6 +146,8 @@
     <type>boolean</type>
     <title>Reserved Financial Account?</title>
     <comment>Is this a predefined system object?</comment>
+    <default>0</default>
+    <required>true</required>
     <add>4.3</add>
   </field>
   <field>
@@ -150,6 +155,8 @@
     <type>boolean</type>
     <title>Financial Account is Active</title>
     <comment>Is this property active?</comment>
+    <default>1</default>
+    <required>true</required>
     <add>4.3</add>
   </field>
   <field>
@@ -157,6 +164,8 @@
     <type>boolean</type>
     <title>Default Financial Account</title>
     <comment>Is this account the default one (or default tax one) for its financial_account_type?</comment>
+    <default>0</default>
+    <required>true</required>
     <add>4.3</add>
   </field>
   <index>

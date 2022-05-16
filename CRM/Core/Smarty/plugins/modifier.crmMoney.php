@@ -18,16 +18,24 @@
 /**
  * Format the given monetary amount (and currency) for display
  *
- * @param float $amount
+ * @param string|int|float $amount
  *   The monetary amount up for display.
- * @param string $currency
+ * @param string|null $currency
  *   The (optional) currency.
  *
  * @return string
  *   formatted monetary amount
- *
- * @throws \CRM_Core_Exception
  */
-function smarty_modifier_crmMoney($amount, $currency = NULL) {
-  return CRM_Utils_Money::format($amount, $currency);
+function smarty_modifier_crmMoney($amount, ?string $currency = NULL): string {
+  try {
+    return Civi::format()->money($amount, $currency);
+  }
+  catch (CRM_Core_Exception $e) {
+    // @todo escalate this to a deprecation notice. It turns out to be depressingly
+    // common for us to double process amount strings - if they are > 1000 then
+    // they wind up throwing an exception in the money function.
+    // It would be more correct to format in the smarty layer, only.
+    Civi::log()->warning('Invalid amount passed in as money - {money}', ['money' => $amount]);
+    return $amount;
+  }
 }

@@ -167,7 +167,9 @@ class CRM_Core_Page_AJAX {
     $output = json_encode($response);
 
     // CRM-11831 @see http://www.malsup.com/jquery/form/#file-upload
-    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+    // COMMENT: Wouldn't the `Accept:` header be more appropriate? Only use `X-Requested-With:` as a
+    // fallback where `Accept:` is missing?
+    if (CRM_Utils_REST::isWebServiceRequest()) {
       CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     }
     else {

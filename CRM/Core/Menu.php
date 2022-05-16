@@ -453,8 +453,8 @@ class CRM_Core_Menu {
   }
 
   /**
-   * @param $menu
-   * @param $path
+   * @param array $menu
+   * @param string|int $path
    */
   public static function buildReturnUrl(&$menu, $path) {
     if (!isset($menu[$path]['return_url'])) {
@@ -528,7 +528,7 @@ class CRM_Core_Menu {
   }
 
   /**
-   * @param $path string
+   * @param string $path
    *   Path of menu item to retrieve.
    *
    * @return array

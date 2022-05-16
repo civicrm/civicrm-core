@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the Activity.getfields API.
  *
@@ -10,7 +15,7 @@ function activity_getfields_example() {
     'action' => 'create',
   ];
 
-  try{
+  try {
     $result = civicrm_api3('Activity', 'getfields', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -40,16 +45,21 @@ function activity_getfields_expectedresult() {
   $expectedResult = [
     'is_error' => 0,
     'version' => 3,
-    'count' => 29,
+    'count' => 31,
     'values' => [
       'source_record_id' => [
         'name' => 'source_record_id',
         'type' => 1,
         'title' => 'Source Record',
         'description' => 'Artificial FK to original transaction (e.g. contribution) IF it is not an Activity. Table can be figured out through activity_type_id, and further through component registry.',
+        'where' => 'civicrm_activity.source_record_id',
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
+        'readonly' => TRUE,
+        'add' => '2.0',
+        'is_core_field' => TRUE,
       ],
       'activity_type_id' => [
         'name' => 'activity_type_id',
@@ -65,8 +75,10 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
         'html' => [
           'type' => 'Select',
+          'label' => 'Activity Type',
           'size' => 6,
           'maxlength' => 14,
         ],
@@ -74,38 +86,51 @@ function activity_getfields_expectedresult() {
           'optionGroupName' => 'activity_type',
           'optionEditPath' => 'civicrm/admin/options/activity_type',
         ],
+        'add' => '1.1',
+        'is_core_field' => TRUE,
       ],
       'activity_date_time' => [
         'name' => 'activity_date_time',
         'type' => 12,
         'title' => 'Activity Date',
         'description' => 'Date and time this activity is scheduled to occur. Formerly named scheduled_date_time.',
+        'required' => '',
         'import' => TRUE,
         'where' => 'civicrm_activity.activity_date_time',
         'headerPattern' => '/(activity.)?date(.time$)?/i',
         'export' => TRUE,
+        'default' => 'CURRENT_TIMESTAMP',
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
         'html' => [
           'type' => 'Select Date',
-          'format' => 'activityDateTime',
+          'formatType' => 'activityDateTime',
         ],
+        'add' => '2.0',
+        'is_core_field' => TRUE,
+        'api.default' => 'now',
       ],
       'phone_id' => [
         'name' => 'phone_id',
         'type' => 1,
-        'title' => 'Phone (called) ID',
+        'title' => 'Phone ID (called)',
         'description' => 'Phone ID of the number called (optional - used if an existing phone number is selected).',
+        'where' => 'civicrm_activity.phone_id',
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
         'FKClassName' => 'CRM_Core_DAO_Phone',
         'html' => [
           'type' => 'EntityRef',
+          'label' => 'Phone (called)',
           'size' => 6,
           'maxlength' => 14,
         ],
+        'add' => '2.0',
+        'is_core_field' => TRUE,
         'FKApiName' => 'Phone',
       ],
       'phone_number' => [
@@ -115,23 +140,31 @@ function activity_getfields_expectedresult() {
         'description' => 'Phone number in case the number does not exist in the civicrm_phone table.',
         'maxlength' => 64,
         'size' => 30,
+        'where' => 'civicrm_activity.phone_number',
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
         'html' => [
           'type' => 'Text',
           'maxlength' => 64,
           'size' => 30,
         ],
+        'add' => '2.0',
+        'is_core_field' => TRUE,
       ],
       'priority_id' => [
         'name' => 'priority_id',
         'type' => 1,
         'title' => 'Priority',
         'description' => 'ID of the priority given to this activity. Foreign key to civicrm_option_value.',
+        'import' => TRUE,
+        'where' => 'civicrm_activity.priority_id',
+        'export' => TRUE,
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
         'html' => [
           'type' => 'Select',
           'size' => 6,
@@ -141,36 +174,60 @@ function activity_getfields_expectedresult() {
           'optionGroupName' => 'priority',
           'optionEditPath' => 'civicrm/admin/options/priority',
         ],
+        'add' => '2.0',
+        'is_core_field' => TRUE,
       ],
       'parent_id' => [
         'name' => 'parent_id',
         'type' => 1,
-        'title' => 'Parent Activity Id',
+        'title' => 'Parent Activity ID',
         'description' => 'Parent meeting ID (if this is a follow-up item). This is not currently implemented',
+        'where' => 'civicrm_activity.parent_id',
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
         'FKClassName' => 'CRM_Activity_DAO_Activity',
+        'html' => [
+          'label' => 'Parent Activity',
+          'size' => 6,
+          'maxlength' => 14,
+        ],
+        'readonly' => TRUE,
+        'add' => '1.1',
+        'is_core_field' => TRUE,
         'FKApiName' => 'Activity',
       ],
       'is_auto' => [
         'name' => 'is_auto',
         'type' => 16,
         'title' => 'Auto',
+        'where' => 'civicrm_activity.is_auto',
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
+        'add' => '2.2',
+        'is_core_field' => TRUE,
       ],
       'relationship_id' => [
         'name' => 'relationship_id',
         'type' => 1,
-        'title' => 'Relationship Id',
+        'title' => 'Relationship ID',
         'description' => 'FK to Relationship ID',
-        'default' => 'NULL',
+        'where' => 'civicrm_activity.relationship_id',
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
         'FKClassName' => 'CRM_Contact_DAO_Relationship',
+        'html' => [
+          'label' => 'Relationship',
+          'size' => 6,
+          'maxlength' => 14,
+        ],
+        'add' => '2.2',
+        'is_core_field' => TRUE,
         'FKApiName' => 'Relationship',
       ],
       'is_current_revision' => [
@@ -185,33 +242,42 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-        'html' => [
-          'type' => 'CheckBox',
-        ],
+        'localizable' => 0,
+        'add' => '2.2',
+        'is_core_field' => TRUE,
       ],
       'original_id' => [
         'name' => 'original_id',
         'type' => 1,
-        'title' => 'Original Activity ID ',
+        'title' => 'Original Activity ID',
         'description' => 'Activity ID of the first activity record in versioning chain.',
+        'where' => 'civicrm_activity.original_id',
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
         'FKClassName' => 'CRM_Activity_DAO_Activity',
+        'html' => [
+          'label' => 'Original Activity',
+          'size' => 6,
+          'maxlength' => 14,
+        ],
+        'readonly' => TRUE,
+        'add' => '2.2',
+        'is_core_field' => TRUE,
         'FKApiName' => 'Activity',
       ],
       'weight' => [
         'name' => 'weight',
         'type' => 1,
         'title' => 'Order',
+        'where' => 'civicrm_activity.weight',
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-        'html' => [
-          'type' => 'Text',
-          'size' => 6,
-          'maxlength' => 14,
-        ],
+        'localizable' => 0,
+        'add' => '4.1',
+        'is_core_field' => TRUE,
       ],
       'is_star' => [
         'name' => 'is_star',
@@ -225,6 +291,12 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
+        'html' => [
+          'type' => 'Checkbox',
+        ],
+        'add' => '4.7',
+        'is_core_field' => TRUE,
       ],
       'id' => [
         'name' => 'id',
@@ -238,6 +310,15 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
+        'html' => [
+          'type' => 'Number',
+          'size' => 6,
+          'maxlength' => 14,
+        ],
+        'readonly' => TRUE,
+        'add' => '1.1',
+        'is_core_field' => TRUE,
         'uniqueName' => 'activity_id',
         'api.aliases' => [
           '0' => 'activity_id',
@@ -257,11 +338,14 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
         'html' => [
           'type' => 'Text',
           'maxlength' => 255,
           'size' => 45,
         ],
+        'add' => '1.1',
+        'is_core_field' => TRUE,
         'uniqueName' => 'activity_subject',
       ],
       'duration' => [
@@ -276,11 +360,14 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
         'html' => [
-          'type' => 'Text',
+          'type' => 'Number',
           'size' => 6,
           'maxlength' => 14,
         ],
+        'add' => '2.0',
+        'is_core_field' => TRUE,
         'uniqueName' => 'activity_duration',
       ],
       'location' => [
@@ -297,11 +384,14 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
         'html' => [
           'type' => 'Text',
           'maxlength' => 255,
           'size' => 45,
         ],
+        'add' => '1.1',
+        'is_core_field' => TRUE,
         'uniqueName' => 'activity_location',
       ],
       'details' => [
@@ -316,11 +406,14 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
         'html' => [
           'type' => 'RichTextEditor',
           'rows' => 2,
           'cols' => 80,
         ],
+        'add' => '1.1',
+        'is_core_field' => TRUE,
         'uniqueName' => 'activity_details',
       ],
       'status_id' => [
@@ -331,9 +424,11 @@ function activity_getfields_expectedresult() {
         'import' => TRUE,
         'where' => 'civicrm_activity.status_id',
         'headerPattern' => '/(activity.)?status(.label$)?/i',
+        'export' => TRUE,
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
         'html' => [
           'type' => 'Select',
           'size' => 6,
@@ -343,6 +438,8 @@ function activity_getfields_expectedresult() {
           'optionGroupName' => 'activity_status',
           'optionEditPath' => 'civicrm/admin/options/activity_status',
         ],
+        'add' => '2.0',
+        'is_core_field' => TRUE,
         'uniqueName' => 'activity_status_id',
         'api.aliases' => [
           '0' => 'activity_status',
@@ -359,9 +456,12 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
         'html' => [
-          'type' => 'Select',
+          'type' => 'CheckBox',
         ],
+        'add' => '2.0',
+        'is_core_field' => TRUE,
         'uniqueName' => 'activity_is_test',
       ],
       'medium_id' => [
@@ -369,10 +469,11 @@ function activity_getfields_expectedresult() {
         'type' => 1,
         'title' => 'Activity Medium',
         'description' => 'Activity Medium, Implicit FK to civicrm_option_value where option_group = encounter_medium.',
-        'default' => 'NULL',
+        'where' => 'civicrm_activity.medium_id',
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
         'html' => [
           'type' => 'Select',
           'size' => 6,
@@ -382,6 +483,8 @@ function activity_getfields_expectedresult() {
           'optionGroupName' => 'encounter_medium',
           'optionEditPath' => 'civicrm/admin/options/encounter_medium',
         ],
+        'add' => '2.2',
+        'is_core_field' => TRUE,
         'uniqueName' => 'activity_medium_id',
       ],
       'result' => [
@@ -391,14 +494,13 @@ function activity_getfields_expectedresult() {
         'description' => 'Currently being used to store result id for survey activity, FK to option value.',
         'maxlength' => 255,
         'size' => 45,
+        'where' => 'civicrm_activity.result',
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-        'html' => [
-          'type' => 'Text',
-          'maxlength' => 255,
-          'size' => 45,
-        ],
+        'localizable' => 0,
+        'add' => '3.3',
+        'is_core_field' => TRUE,
         'uniqueName' => 'activity_result',
       ],
       'is_deleted' => [
@@ -412,15 +514,18 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
         'html' => [
-          'type' => 'Text',
+          'type' => 'CheckBox',
         ],
+        'add' => '2.2',
+        'is_core_field' => TRUE,
         'uniqueName' => 'activity_is_deleted',
       ],
       'campaign_id' => [
         'name' => 'campaign_id',
         'type' => 1,
-        'title' => 'Campaign',
+        'title' => 'Campaign ID',
         'description' => 'The campaign for which this activity has been triggered.',
         'import' => TRUE,
         'where' => 'civicrm_activity.campaign_id',
@@ -428,9 +533,12 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
         'FKClassName' => 'CRM_Campaign_DAO_Campaign',
+        'component' => 'CiviCampaign',
         'html' => [
-          'type' => 'CheckBox',
+          'type' => 'EntityRef',
+          'label' => 'Campaign',
           'size' => 6,
           'maxlength' => 14,
         ],
@@ -438,7 +546,10 @@ function activity_getfields_expectedresult() {
           'table' => 'civicrm_campaign',
           'keyColumn' => 'id',
           'labelColumn' => 'title',
+          'prefetch' => 'FALSE',
         ],
+        'add' => '3.4',
+        'is_core_field' => TRUE,
         'uniqueName' => 'activity_campaign_id',
         'FKApiName' => 'Campaign',
       ],
@@ -453,6 +564,7 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
         'html' => [
           'type' => 'Select',
           'size' => 6,
@@ -462,16 +574,52 @@ function activity_getfields_expectedresult() {
           'optionGroupName' => 'engagement_index',
           'optionEditPath' => 'civicrm/admin/options/engagement_index',
         ],
+        'add' => '3.4',
+        'is_core_field' => TRUE,
         'uniqueName' => 'activity_engagement_level',
       ],
-      'source_contact_id' => [
-        'name' => 'source_contact_id',
-        'title' => 'Activity Source Contact',
-        'description' => 'Person who created this activity. Defaults to current user.',
-        'type' => 1,
-        'FKClassName' => 'CRM_Contact_DAO_Contact',
-        'api.default' => 'user_contact_id',
-        'FKApiName' => 'Contact',
+      'created_date' => [
+        'name' => 'created_date',
+        'type' => 256,
+        'title' => 'Created Date',
+        'description' => 'When was the activity was created.',
+        'required' => '',
+        'where' => 'civicrm_activity.created_date',
+        'export' => TRUE,
+        'default' => 'CURRENT_TIMESTAMP',
+        'table_name' => 'civicrm_activity',
+        'entity' => 'Activity',
+        'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
+        'html' => [
+          'type' => 'Select Date',
+          'label' => 'Created Date',
+        ],
+        'add' => '4.7',
+        'is_core_field' => TRUE,
+        'uniqueName' => 'activity_created_date',
+      ],
+      'modified_date' => [
+        'name' => 'modified_date',
+        'type' => 256,
+        'title' => 'Modified Date',
+        'description' => 'When was the activity (or closely related entity) was created or modified or deleted.',
+        'required' => '',
+        'where' => 'civicrm_activity.modified_date',
+        'export' => TRUE,
+        'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+        'table_name' => 'civicrm_activity',
+        'entity' => 'Activity',
+        'bao' => 'CRM_Activity_BAO_Activity',
+        'localizable' => 0,
+        'html' => [
+          'type' => 'Select Date',
+          'label' => 'Modified Date',
+        ],
+        'readonly' => TRUE,
+        'add' => '4.7',
+        'is_core_field' => TRUE,
+        'uniqueName' => 'activity_modified_date',
       ],
       'assignee_contact_id' => [
         'name' => 'assignee_id',
@@ -489,6 +637,16 @@ function activity_getfields_expectedresult() {
         'FKClassName' => 'CRM_Contact_DAO_Contact',
         'FKApiName' => 'Contact',
       ],
+      'source_contact_id' => [
+        'name' => 'source_contact_id',
+        'title' => 'Activity Source Contact',
+        'description' => 'Person who created this activity. Defaults to current user.',
+        'type' => 1,
+        'FKClassName' => 'CRM_Contact_DAO_Contact',
+        'api.default' => 'user_contact_id',
+        'FKApiName' => 'Contact',
+        'api.required' => TRUE,
+      ],
       'case_id' => [
         'name' => 'case_id',
         'title' => 'Case ID',
@@ -504,23 +662,23 @@ function activity_getfields_expectedresult() {
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testGetFields"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ActivityTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
-*
-* To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
-*
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
-*
-* Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
-*
-* API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testGetFields"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ActivityTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

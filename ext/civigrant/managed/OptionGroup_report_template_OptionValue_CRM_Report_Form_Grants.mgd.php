@@ -1,0 +1,63 @@
+<?php
+use CRM_Grant_ExtensionUtil as E;
+
+return [
+  [
+    'name' => 'OptionGroup_report_template_OptionValue_CRM_Report_Form_Grant_Detail',
+    'entity' => 'OptionValue',
+    'cleanup' => 'unused',
+    'update' => 'unmodified',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'option_group_id.name' => 'report_template',
+        'label' => E::ts('Grant Report (Detail)'),
+        'value' => 'grant/detail',
+        'name' => 'CRM_Report_Form_Grant_Detail',
+        'grouping' => NULL,
+        'filter' => 0,
+        'is_default' => FALSE,
+        'weight' => 30,
+        'description' => 'Grant Report Detail',
+        'is_optgroup' => FALSE,
+        'is_reserved' => FALSE,
+        'is_active' => TRUE,
+        'component_id' => NULL,
+        'icon' => NULL,
+        'color' => NULL,
+        'domain_id' => NULL,
+        'visibility_id' => NULL,
+      ],
+      'match' => ['name'],
+    ],
+  ],
+  [
+    'name' => 'OptionGroup_report_template_OptionValue_CRM_Report_Form_Grant_Statistics',
+    'entity' => 'OptionValue',
+    'cleanup' => 'unused',
+    'update' => 'unmodified',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'option_group_id.name' => 'report_template',
+        'label' => E::ts('Grant Report (Statistics)'),
+        'value' => 'grant/statistics',
+        'name' => 'CRM_Report_Form_Grant_Statistics',
+        'grouping' => NULL,
+        'filter' => 0,
+        'is_default' => FALSE,
+        'weight' => 42,
+        'description' => 'Shows statistics for Grants.',
+        'is_optgroup' => FALSE,
+        'is_reserved' => FALSE,
+        'is_active' => TRUE,
+        'component_id' => NULL,
+        'icon' => NULL,
+        'color' => NULL,
+        'domain_id' => NULL,
+        'visibility_id' => NULL,
+      ],
+      'match' => ['option_group_id', 'name'],
+    ],
+  ],
+];

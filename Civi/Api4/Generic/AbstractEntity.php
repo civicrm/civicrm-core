@@ -52,7 +52,7 @@ abstract class AbstractEntity {
    * @return \Civi\Api4\Generic\CheckAccessAction
    */
   public static function checkAccess() {
-    return new CheckAccessAction(self::getEntityName(), __FUNCTION__);
+    return new CheckAccessAction(static::getEntityName(), __FUNCTION__);
   }
 
   /**
@@ -64,7 +64,7 @@ abstract class AbstractEntity {
     $permissions = \CRM_Core_Permission::getEntityActionPermissions();
 
     // For legacy reasons the permissions are keyed by lowercase entity name
-    $lcentity = \CRM_Core_DAO_AllCoreTables::convertEntityNameToLower(self::getEntityName());
+    $lcentity = \CRM_Core_DAO_AllCoreTables::convertEntityNameToLower(static::getEntityName());
     // Merge permissions for this entity with the defaults
     return ($permissions[$lcentity] ?? []) + $permissions['default'];
   }
@@ -153,6 +153,7 @@ abstract class AbstractEntity {
       $info['icon'] = $dao::$_icon;
       $info['label_field'] = $dao::$_labelField;
       $info['dao'] = $dao;
+      $info['table_name'] = $dao::$_tableName;
     }
     foreach (ReflectionUtils::getTraits(static::class) as $trait) {
       $info['type'][] = self::stripNamespace($trait);
@@ -163,7 +164,13 @@ abstract class AbstractEntity {
       $info['description'] = $dao::getEntityDescription() ?? $info['description'] ?? NULL;
     }
     unset($info['package'], $info['method']);
-    return $info;
+
+    // Ensure all keys are snake_case
+    $keys = array_keys($info);
+    foreach ($keys as &$key) {
+      $key = \CRM_Utils_String::convertStringToSnakeCase($key);
+    }
+    return array_combine($keys, array_values($info));
   }
 
   /**

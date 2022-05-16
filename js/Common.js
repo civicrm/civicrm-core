@@ -483,8 +483,8 @@ if (!CRM.vars) CRM.vars = {};
           $('.crm-select2-row-description', '#select2-drop').each(function() {
             $(this).closest('.select2-result-label').attr('title', $(this).text());
           });
-          // Collapsible optgroups should be expanded when searching
-          if ($('#select2-drop.collapsible-optgroups-enabled .select2-search input.select2-input').val()) {
+          // Collapsible optgroups should be expanded when searching (searching happens within select2-drop for single selects, but within the element for multiselects; this handles both)
+          if ($('#select2-drop.collapsible-optgroups-enabled .select2-search input.select2-input, .select2-dropdown-open.collapsible-optgroups .select2-search-field input.select2-input').val()) {
             $('#select2-drop.collapsible-optgroups-enabled li.select2-result-with-children')
               .addClass('optgroup-expanded');
           }
@@ -809,7 +809,20 @@ if (!CRM.vars) CRM.vars = {};
       return '';
     }
     if (createLinks === true) {
-      createLinks = params.contact_type ? _.where(CRM.config.entityRef.links[entity], {type: params.contact_type}) : CRM.config.entityRef.links[entity];
+      if (!params.contact_type) {
+        createLinks = CRM.config.entityRef.links[entity];
+      }
+      else if (typeof params.contact_type === 'string') {
+        createLinks = _.where(CRM.config.entityRef.links[entity], {type: params.contact_type});
+      } else {
+        // lets assume it's an array with filters such as IN etc
+        createLinks = [];
+        _.each(params.contact_type, function(types) {
+          _.each(types, function(type) {
+            createLinks.push(_.findWhere(CRM.config.entityRef.links[entity], {type: type}));
+          });
+        });
+      }
     }
     _.each(createLinks, function(link) {
       markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">' +
@@ -1148,10 +1161,11 @@ if (!CRM.vars) CRM.vars = {};
           $(this).addClass('crm-tooltip-down');
         }
         if (!$(this).children('.crm-tooltip-wrapper').length) {
+          var tooltipContents = $(this)[0].hasAttribute('data-tooltip-url') ? $(this).attr('data-tooltip-url') : this.href;
           $(this).append('<div class="crm-tooltip-wrapper"><div class="crm-tooltip"></div></div>');
           $(this).children().children('.crm-tooltip')
             .html('<div class="crm-loading-element"></div>')
-            .load(this.href);
+            .load(tooltipContents);
         }
       })
       .on('mouseleave', 'a.crm-summary-link', function () {

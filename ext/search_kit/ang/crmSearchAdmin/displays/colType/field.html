@@ -4,7 +4,7 @@
     {{:: ts('Image') }}
   </label>
 </div>
-<div class="form-inline crm-search-admin-flex-row" ng-if=":: $ctrl.parent.canBeLink(col)">
+<div class="form-inline crm-search-admin-flex-row" >
   <label title="{{:: ts('Display as clickable link') }}" >
     <input type="checkbox" ng-checked="col.link" ng-click="$ctrl.parent.toggleLink(col)" >
     {{:: ts('Link') }}
@@ -51,4 +51,5 @@
     {{:: ts('In-Place Edit') }}
   </label>
 </div>
+<search-admin-icons item="col"></search-admin-icons>
 <search-admin-css-rules label="{{:: ts('Style') }}" item="col" default="col.key"></search-admin-css-rules>

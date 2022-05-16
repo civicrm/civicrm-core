@@ -226,7 +226,7 @@ class CRM_Core_IDS {
   /**
    * This function writes an entry about the intrusion to the database.
    *
-   * @param array $result
+   * @param IDS_Report $result
    * @param int $reaction
    *
    * @return bool

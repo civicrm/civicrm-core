@@ -56,9 +56,13 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
             'no_display' => TRUE,
             'required' => TRUE,
           ],
+          'case_id' => [
+            'title' => ts('Case ID'),
+            'type' => CRM_Utils_Type::T_INT,
+          ],
           'subject' => [
             'title' => ts('Subject'),
-            'required' => TRUE,
+            'default' => TRUE,
           ],
           'start_date' => [
             'title' => ts('Start Date'),
@@ -468,7 +472,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */

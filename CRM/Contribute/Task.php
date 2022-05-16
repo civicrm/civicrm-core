@@ -138,7 +138,7 @@ class CRM_Contribute_Task extends CRM_Core_Task {
   /**
    * Get links appropriate to the context of the row.
    *
-   * @param $row
+   * @param array $row
    *
    * @return array
    */

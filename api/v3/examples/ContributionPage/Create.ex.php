@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the ContributionPage.create API.
  *
@@ -12,13 +17,14 @@ function contribution_page_create_example() {
     'currency' => 'NZD',
     'goal_amount' => 34567,
     'is_pay_later' => 1,
+    'pay_later_text' => 'Send check',
     'is_monetary' => TRUE,
     'is_email_receipt' => TRUE,
     'receipt_from_email' => 'yourconscience@donate.com',
     'receipt_from_name' => 'Ego Freud',
   ];
 
-  try{
+  try {
     $result = civicrm_api3('ContributionPage', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -66,7 +72,7 @@ function contribution_page_create_expectedresult() {
         'is_recur_installments' => '',
         'adjust_recur_start_date' => '',
         'is_pay_later' => '1',
-        'pay_later_text' => '',
+        'pay_later_text' => 'Send check',
         'pay_later_receipt' => '',
         'is_partial_payment' => '',
         'initial_amount_label' => '',
@@ -97,6 +103,7 @@ function contribution_page_create_expectedresult() {
         'campaign_id' => '',
         'is_share' => '',
         'is_billing_required' => '',
+        'frontend_title' => '',
         'contribution_type_id' => '1',
       ],
     ],
@@ -106,23 +113,23 @@ function contribution_page_create_expectedresult() {
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testCreateContributionPage"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContributionPageTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
-*
-* To Learn about the API read
-* https://docs.civicrm.org/dev/en/latest/api/
-*
-* Browse the API on your own site with the API Explorer. It is in the main
-* CiviCRM menu, under: Support > Development > API Explorer.
-*
-* Read more about testing here
-* https://docs.civicrm.org/dev/en/latest/testing/
-*
-* API Standards documentation:
-* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "basicCreateTest"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/CiviUnitTestCase.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

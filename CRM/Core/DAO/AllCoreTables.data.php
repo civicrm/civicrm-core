@@ -232,11 +232,6 @@ return [
     'class' => 'CRM_Case_DAO_CaseType',
     'table' => 'civicrm_case_type',
   ],
-  'CRM_Grant_DAO_Grant' => [
-    'name' => 'Grant',
-    'class' => 'CRM_Grant_DAO_Grant',
-    'table' => 'civicrm_grant',
-  ],
   'CRM_Friend_DAO_Friend' => [
     'name' => 'Friend',
     'class' => 'CRM_Friend_DAO_Friend',
@@ -246,6 +241,11 @@ return [
     'name' => 'PledgeBlock',
     'class' => 'CRM_Pledge_DAO_PledgeBlock',
     'table' => 'civicrm_pledge_block',
+  ],
+  'CRM_Queue_DAO_Queue' => [
+    'name' => 'Queue',
+    'class' => 'CRM_Queue_DAO_Queue',
+    'table' => 'civicrm_queue',
   ],
   'CRM_Queue_DAO_QueueItem' => [
     'name' => 'QueueItem',
@@ -366,6 +366,11 @@ return [
     'name' => 'UFMatch',
     'class' => 'CRM_Core_DAO_UFMatch',
     'table' => 'civicrm_uf_match',
+  ],
+  'CRM_Core_DAO_UserJob' => [
+    'name' => 'UserJob',
+    'class' => 'CRM_Core_DAO_UserJob',
+    'table' => 'civicrm_user_job',
   ],
   'CRM_Core_DAO_Timezone' => [
     'name' => 'Timezone',
@@ -608,7 +613,7 @@ return [
     'table' => 'civicrm_mailing_spool',
   ],
   'CRM_Mailing_Event_DAO_Queue' => [
-    'name' => 'Queue',
+    'name' => 'MailingEventQueue',
     'class' => 'CRM_Mailing_Event_DAO_Queue',
     'table' => 'civicrm_mailing_event_queue',
   ],

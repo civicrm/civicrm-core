@@ -16,6 +16,7 @@ use Civi\API\Provider\ProviderInterface;
 use Civi\Api4\Generic\AbstractAction;
 use Civi\API\Events;
 use Civi\Api4\Utils\ReflectionUtils;
+use Civi\Core\Event\GenericHookEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -127,8 +128,7 @@ class ActionObjectProvider implements EventSubscriberInterface, ProviderInterfac
    * @return array
    */
   public function getEntityNames($version) {
-    /** FIXME */
-    return [];
+    return $version === 4 ? array_keys($this->getEntities()) : [];
   }
 
   /**
@@ -140,6 +140,52 @@ class ActionObjectProvider implements EventSubscriberInterface, ProviderInterfac
   public function getActionNames($version, $entity) {
     /** FIXME Civi\API\V4\Action\GetActions */
     return [];
+  }
+
+  /**
+   * Get all APIv4 entities
+   */
+  public function getEntities() {
+    $cache = \Civi::cache('metadata');
+    $entities = $cache->get('api4.entities.info', []);
+
+    if (!$entities) {
+      // Load entities declared in API files
+      foreach ($this->getAllApiClasses() as $className) {
+        $info = $className::getInfo();
+        $entities[$info['name']] = $info;
+      }
+      // Allow extensions to modify the list of entities
+      $event = GenericHookEvent::create(['entities' => &$entities]);
+      \Civi::dispatcher()->dispatch('civi.api4.entityTypes', $event);
+      ksort($entities);
+      $cache->set('api4.entities.info', $entities);
+    }
+
+    return $entities;
+  }
+
+  /**
+   * Scan all api directories to discover entities
+   * @return \Civi\Api4\Generic\AbstractEntity[]
+   */
+  private function getAllApiClasses() {
+    $classNames = [];
+    $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/Civi.php')],
+      array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
+    );
+    foreach ($locations as $location) {
+      $dir = \CRM_Utils_File::addTrailingSlash(dirname($location)) . 'Civi/Api4';
+      if (is_dir($dir)) {
+        foreach (glob("$dir/*.php") as $file) {
+          $className = 'Civi\Api4\\' . basename($file, '.php');
+          if (is_a($className, 'Civi\Api4\Generic\AbstractEntity', TRUE)) {
+            $classNames[] = $className;
+          }
+        }
+      }
+    }
+    return $classNames;
   }
 
 }

@@ -1,5 +1,5 @@
 <table class="crm-info-panel">
-    {if !empty($extension.urls)}
+    {if $extension.urls}
         {foreach from=$extension.urls key=label item=url}
             <tr><td class="label">{$label|escape}</td><td><a href="{$url|escape}">{$url|escape}</a></td></tr>
         {/foreach}
@@ -17,7 +17,7 @@
           {/foreach}
         </td>
     </tr>
-    {if !empty($extension.comments)}
+    {if $extension.comments}
     <tr>
       <td class="label">{ts}Comments{/ts}</td><td>{$extension.comments|escape}</td>
     </tr>
@@ -31,7 +31,7 @@
     <tr>
       <td class="label">{ts}License{/ts}</td><td>{$extension.license|escape}</td>
     </tr>
-    {if !empty($extension.develStage)}
+    {if $extension.develStage}
     <tr>
       <td class="label">{ts}Development stage{/ts}</td><td>{$extension.develStage|escape}</td>
     </tr>
@@ -54,15 +54,17 @@
     <tr>
         <td class="label">{ts}Compatible with{/ts}</td>
         <td>
-            {foreach from=$extension.compatibility.ver item=ver}
-                {$ver|escape} &nbsp;
-            {/foreach}
+            {if $extension.compatibility}
+                {foreach from=$extension.compatibility.ver item=ver}
+                    {$ver|escape} &nbsp;
+                {/foreach}
+            {/if}
         </td>
     </tr>
     <tr>
       <td class="label">{ts}Local path{/ts}</td><td>{if !empty($extension.path)}{$extension.path|escape}{/if}</td>
     </tr>
-    {if !empty($extension.downloadUrl)}
+    {if $extension.downloadUrl}
     <tr>
       <td class="label">{ts}Download location{/ts}</td><td>{$extension.downloadUrl|escape}</td>
     </tr>

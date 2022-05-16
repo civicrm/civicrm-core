@@ -177,7 +177,7 @@ class BasicGetFieldsAction extends BasicGetAction {
       if (!is_array($option)) {
         $option = [
           'id' => $id,
-          'name' => $option,
+          'name' => $id,
           'label' => $option,
         ];
       }
@@ -282,8 +282,15 @@ class BasicGetFieldsAction extends BasicGetAction {
       ],
       [
         'name' => 'required',
+        'description' => 'Is this field required when creating a new entity',
         'data_type' => 'Boolean',
         'default_value' => FALSE,
+      ],
+      [
+        'name' => 'nullable',
+        'description' => 'Whether a null value is allowed in this field',
+        'data_type' => 'Boolean',
+        'default_value' => TRUE,
       ],
       [
         'name' => 'required_if',

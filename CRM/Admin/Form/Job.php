@@ -116,7 +116,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
   }
 
   /**
-   * @param $fields
+   * @param array $fields
    *
    * @return array|bool
    * @throws API_Exception

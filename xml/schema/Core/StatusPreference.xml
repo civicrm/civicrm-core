@@ -76,7 +76,7 @@
     <default>1</default>
     <add>4.7</add>
     <pseudoconstant>
-      <callback>CRM_Utils_Check::getSeverityList</callback>
+      <callback>CRM_Utils_Check::getSeverityOptions</callback>
     </pseudoconstant>
   </field>
   <field>
@@ -100,6 +100,7 @@
     <title>Check Is Active</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Is this status check active?</comment>
     <add>5.19</add>
   </field>

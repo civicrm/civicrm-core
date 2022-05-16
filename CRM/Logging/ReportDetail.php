@@ -477,7 +477,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
    * @return string
    */
   private function convertForeignKeyValuesToLabels(string $fkClassName, string $field, int $keyval): string {
-    if (property_exists($fkClassName, '_labelField')) {
+    if ($fkClassName::$_labelField) {
       $labelValue = CRM_Core_DAO::getFieldValue($fkClassName, $keyval, $fkClassName::$_labelField);
       // Not sure if this should use ts - there's not a lot of context (`%1 (id: %2)`) - and also the similar field labels above don't use ts.
       return "{$labelValue} (id: {$keyval})";

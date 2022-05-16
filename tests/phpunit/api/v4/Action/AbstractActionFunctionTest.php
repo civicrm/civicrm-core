@@ -18,12 +18,12 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class AbstractActionFunctionTest extends UnitTestCase {
+class AbstractActionFunctionTest extends Api4TestBase {
 
   public function testUndefinedParamException(): void {
     $this->expectException('API_Exception');

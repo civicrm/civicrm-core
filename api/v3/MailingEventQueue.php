@@ -34,7 +34,7 @@ function civicrm_api3_mailing_event_queue_create($params) {
     ['job_id', 'contact_id'],
     FALSE
   );
-  return _civicrm_api3_basic_create('CRM_Mailing_Event_BAO_Queue', $params, 'Queue');
+  return _civicrm_api3_basic_create('CRM_Mailing_Event_BAO_Queue', $params, 'MailingEventQueue');
 }
 
 /**

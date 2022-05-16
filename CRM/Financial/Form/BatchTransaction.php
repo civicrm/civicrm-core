@@ -30,14 +30,14 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
 
   /**
    * Batch status name.
+   *
    * @var string
    */
-  protected $_batchStatus;
+  protected $_batchStatus = 'open';
 
   public function preProcess() {
     // This reuses some styles from search forms
     CRM_Core_Resources::singleton()->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
-
     self::$_entityID = CRM_Utils_Request::retrieve('bid', 'Positive') ? CRM_Utils_Request::retrieve('bid', 'Positive') : CRM_Utils_Array::value('batch_id', $_POST);
     $this->assign('entityID', self::$_entityID);
     if (isset(self::$_entityID)) {
@@ -45,7 +45,6 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
       $batchStatuses = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', ['labelColumn' => 'name', 'condition' => " v.value={$this->_batchStatusId}"]);
       $this->_batchStatus = $batchStatuses[$this->_batchStatusId];
       $this->assign('statusID', $this->_batchStatusId);
-      $this->assign('batchStatus', $this->_batchStatus);
       $validStatus = FALSE;
       if (in_array($this->_batchStatus, ['Open', 'Reopened'])) {
         $validStatus = TRUE;
@@ -68,6 +67,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
       ];
       $this->assign('columnHeaders', $columnHeaders);
     }
+    $this->assign('batchStatus', $this->_batchStatus);
   }
 
   /**

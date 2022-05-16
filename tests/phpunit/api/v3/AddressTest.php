@@ -609,4 +609,45 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->assertNotContains('Alabama', $result['values']);
   }
 
+  /**
+   * Ensure an update to the second address doesn't cause error.
+   *
+   * Avoid "db error: already exists" when re-saving the custom fields.
+   */
+  public function testUpdateSharedAddressWithCustomFields(): void {
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+    $params = $this->_params;
+    $params['custom_' . $ids['custom_field_id']] = 'custom string';
+    $firstAddress = $this->callAPISuccess($this->_entity, 'create', $params);
+    $contactIdB = $this->individualCreate();
+
+    $secondAddressParams = array_merge(['contact_id' => $contactIdB, 'master_id' => $firstAddress['id']], $firstAddress);
+    unset($secondAddressParams['id']);
+    $secondAddress = $this->callAPISuccess('Address', 'create', $secondAddressParams);
+    $this->callAPISuccess('Address', 'create', ['id' => $secondAddress['id'], 'contact_id' => $contactIdB, 'master_id' => $firstAddress['id']]);
+  }
+
+  /**
+   * Ensure that when geocoding fails and geocoders return the string 'null' that it is not translated into int 0 for geo_code_1 and geo_code_2 which would place the contact on null island (0,0)
+   */
+  public function testGeocodingAddress(): void {
+    $this->callAPISuccess('Setting', 'create', ['geoProvider' => 'TestProvider']);
+    $cid = $this->individualCreate();
+    $r = $this->callAPISuccess('Address', 'create', [
+      'contact_id' => $cid,
+      'location_type_id' => 1,
+      // Trigger geocoding to return 'null's for geo_code_1 and geo_code_2
+      'street_address' => 'Does not exist',
+      'city' => 'Hereville',
+      //'US',
+      'country_id' => 'US',
+      // 'California',
+      'state_province_id' => 'California',
+      'postal_code' => '94100',
+    ]);
+    $createdAddress = $this->callAPISuccess('Address', 'get', ['id' => $r['id']])['values'][$r['id']];
+    // If we have stored NULL values, then geo_code_1 should not be returned.
+    $this->assertFalse(isset($createdAddress['geo_code_1']));
+  }
+
 }

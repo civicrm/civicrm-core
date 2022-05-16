@@ -1,0 +1,14 @@
+<li ng-if="tags[$ctrl.node['#tag']]">
+  <div class="af-gui-field-select-in-dropdown form-inline" ng-click="$event.stopPropagation()">
+    {{:: ts('Element:') }}
+    <select class="form-control" ng-model="$ctrl.node['#tag']" title="{{:: ts('Container type') }}">
+      <option ng-repeat="(opt, label) in tags" value="{{ opt }}">{{ label }}</option>
+    </select>
+  </div>
+</li>
+<li><af-gui-menu-item-collapsible node="$ctrl.node" class="af-gui-field-select-in-dropdown form-inline"></af-gui-menu-item-collapsible></li>
+<li><af-gui-menu-item-style node="$ctrl.node"></af-gui-menu-item-style></li>
+<li><af-gui-menu-item-border node="$ctrl.node"></af-gui-menu-item-border></li>
+<li><af-gui-menu-item-background node="$ctrl.node"></af-gui-menu-item-background></li>
+<li role="separator" class="divider"></li>
+<li><a href ng-click="$ctrl.deleteThis()"><span class="text-danger"><i class="crm-i fa-trash"></i> {{:: ts('Remove display') }}</span></a></li>

@@ -17,13 +17,6 @@
 class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Create option value.
    *
    * Note that the create function calls 'add' but has more business logic.
@@ -97,23 +90,20 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Core_BAO_OptionValue
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $optionValue = new CRM_Core_DAO_OptionValue();
-    $optionValue->copyValues($params);
-    if ($optionValue->find(TRUE)) {
-      CRM_Core_DAO::storeValues($optionValue, $defaults);
-      return $optionValue;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -165,11 +155,14 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $params['option_group_id'], 'name', 'id'
     );
 
+    $op = $id ? 'edit' : 'create';
+    CRM_Utils_Hook::pre($op, 'OptionValue', $id, $params);
+
     // action is taken depending upon the mode
     $optionValue = new CRM_Core_DAO_OptionValue();
     $optionValue->copyValues($params);
 
-    $isDomainOptionGroup = in_array($groupName, CRM_Core_OptionGroup::$_domainIDGroups);
+    $isDomainOptionGroup = CRM_Core_OptionGroup::isDomainOptionGroup($groupName);
     // When creating a new option for a group that requires a domain, set default domain
     if ($isDomainOptionGroup && empty($params['id']) && (empty($params['domain_id']) || CRM_Utils_System::isNull($params['domain_id']))) {
       $optionValue->domain_id = CRM_Core_Config::domainID();
@@ -215,7 +208,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
         // CRM-21737 languages option group does not use unique values but unique names.
         $dao->name = $params['name'];
       }
-      if (in_array($groupName, CRM_Core_OptionGroup::$_domainIDGroups)) {
+      if (CRM_Core_OptionGroup::isDomainOptionGroup($groupName)) {
         $dao->domain_id = $optionValue->domain_id;
       }
       $dao->option_group_id = $params['option_group_id'];
@@ -227,6 +220,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     $optionValue->id = $id;
     $optionValue->save();
     CRM_Core_PseudoConstant::flush();
+
+    CRM_Utils_Hook::post($op, 'OptionValue', $id, $optionValue);
 
     // Create relationship for payment instrument options
     if (!empty($params['financial_account_id'])) {

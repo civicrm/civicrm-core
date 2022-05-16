@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the Membership.create API.
  *
@@ -8,7 +13,7 @@
 function membership_create_example() {
   $params = [
     'contact_id' => 3,
-    'membership_type_id' => 1,
+    'membership_type_id' => 'General',
     'join_date' => '2009-01-21',
     'start_date' => '2009-01-21',
     'end_date' => '2009-12-21',
@@ -18,7 +23,7 @@ function membership_create_example() {
     'custom_1' => 'custom string',
   ];
 
-  try{
+  try {
     $result = civicrm_api3('Membership', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -76,23 +81,23 @@ function membership_create_expectedresult() {
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testCreateWithCustom"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MembershipTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
-*
-* To Learn about the API read
-* https://docs.civicrm.org/dev/en/latest/api/
-*
-* Browse the API on your own site with the API Explorer. It is in the main
-* CiviCRM menu, under: Support > Development > API Explorer.
-*
-* Read more about testing here
-* https://docs.civicrm.org/dev/en/latest/testing/
-*
-* API Standards documentation:
-* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testCreateWithCustom"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MembershipTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

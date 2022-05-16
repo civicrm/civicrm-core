@@ -1,8 +1,13 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the Contact.get API.
  *
- * Get contact id of the current logged in user
+ * Get contact id of the current logged in user.
  *
  * @return array
  *   API result array
@@ -12,7 +17,7 @@ function contact_get_example() {
     'id' => 'user_contact_id',
   ];
 
-  try{
+  try {
     $result = civicrm_api3('Contact', 'get', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -49,8 +54,8 @@ function contact_get_expectedresult() {
         'contact_id' => '3',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
-        'sort_name' => 'User 202290815, Logged In',
-        'display_name' => 'Mr. Logged In User 202290815 II',
+        'sort_name' => 'User 707727958, Logged In',
+        'display_name' => 'Mr. Logged In User 707727958 II',
         'do_not_email' => 0,
         'do_not_phone' => 0,
         'do_not_mail' => 0,
@@ -67,7 +72,7 @@ function contact_get_expectedresult() {
         'preferred_mail_format' => 'Both',
         'first_name' => 'Logged In',
         'middle_name' => 'J.',
-        'last_name' => 'User 202290815',
+        'last_name' => 'User 707727958',
         'prefix_id' => '3',
         'suffix_id' => '3',
         'formal_title' => '',
@@ -97,7 +102,7 @@ function contact_get_expectedresult() {
         'phone_id' => '',
         'phone_type_id' => '',
         'phone' => '',
-        'email_id' => '1',
+        'email_id' => '3',
         'email' => 'anthony_anderson@civicrm.org',
         'on_hold' => 0,
         'im_id' => '',
@@ -122,23 +127,23 @@ function contact_get_expectedresult() {
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testLoggedInUserAPISupportToken"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
-*
-* To Learn about the API read
-* https://docs.civicrm.org/dev/en/latest/api/
-*
-* Browse the API on your own site with the API Explorer. It is in the main
-* CiviCRM menu, under: Support > Development > API Explorer.
-*
-* Read more about testing here
-* https://docs.civicrm.org/dev/en/latest/testing/
-*
-* API Standards documentation:
-* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testLoggedInUserAPISupportToken"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

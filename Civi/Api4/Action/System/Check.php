@@ -84,23 +84,16 @@ class Check extends \Civi\Api4\Generic\BasicGetAction {
         'data_type' => 'String',
       ],
       [
-        'name' => 'severity',
-        'title' => 'Severity',
-        'description' => 'Psr\Log\LogLevel string',
-        'data_type' => 'String',
-        'options' => array_combine(\CRM_Utils_Check::getSeverityList(), \CRM_Utils_Check::getSeverityList()),
-      ],
-      [
         'name' => 'severity_id',
         'title' => 'Severity ID',
         'description' => 'Integer representation of Psr\Log\LogLevel',
         'data_type' => 'Integer',
-        'options' => \CRM_Utils_Check::getSeverityList(),
+        'options' => \CRM_Utils_Check::getSeverityOptions(),
       ],
       [
         'name' => 'is_visible',
         'title' => 'is visible',
-        'description' => '0 if message has been hidden by the user',
+        'description' => 'FALSE if message has been hidden by the user',
         'data_type' => 'Boolean',
       ],
       [

@@ -74,7 +74,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
   /**
    * Test the content of the dashboard.
    */
-  public function testDashboardContentContributionsWithInvoicingEnabled() {
+  public function testDashboardContentContributionsWithInvoicingEnabled(): void {
     $this->contributions[] = $this->contributionCreate([
       'contact_id' => $this->contactID,
       'receive_date' => '2018-11-21',
@@ -137,10 +137,9 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
   /**
    * Test the content of the dashboard.
    *
-   * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testDashboardContentContributions() {
+  public function testDashboardContentContributions(): void {
     $this->contributionCreate(['contact_id' => $this->contactID]);
     $this->contributions[] = civicrm_api3('Contribution', 'get', [
       'contact_id' => $this->contactID,
@@ -151,7 +150,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     $expectedStrings = [
       'Your Contribution(s)',
       '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Received date</th><th>Receipt Sent</th><th>Balance</th><th>Status</th>',
-      '<td>$ 100.00 </td><td>Donation</td>',
+      '<td>$100.00 </td><td>Donation</td>',
       '<td>Completed</td>',
     ];
     $this->assertPageContains($expectedStrings);
@@ -183,8 +182,8 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     $expectedStrings = [
       'Your Contribution(s)',
       '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Received date</th><th>Receipt Sent</th><th>Balance</th><th>Status</th>',
-      '<td>$ 25.00 </td><td>Donation</td>',
-      '<td>$ 14.00</td><td>Partially paid</td>',
+      '<td>$25.00 </td><td>Donation</td>',
+      '<td>$14.00</td><td>Partially paid</td>',
       'Pay Now',
     ];
     $this->assertPageContains($expectedStrings);
@@ -193,7 +192,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
   /**
    * Run the user dashboard.
    */
-  protected function runUserDashboard() {
+  protected function runUserDashboard(): void {
     $_REQUEST = ['reset' => 1, 'id' => $this->contactID];
     $dashboard = new CRM_Contact_Page_View_UserDashBoard();
     $dashboard->_contactId = $this->contactID;

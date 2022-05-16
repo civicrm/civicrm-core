@@ -1,30 +1,30 @@
-<div class="form-inline">
-  <input class="form-control" style="width: 15em;" ng-model="$ctrl.fnName" crm-ui-select="{data: $ctrl.getFunctions, placeholder: ts('Function')}" ng-change="$ctrl.selectFunction()">
-  <label>{{ $ctrl.fieldArg.field.label }}</label>
-  <label ng-repeat="(val, label) in $ctrl.fn.params[0].flag_before">
-    <input type="checkbox" ng-checked="$ctrl.fieldArg.flag_before === val" ng-click="$ctrl.fieldArg.flag_before = ($ctrl.fieldArg.flag_before === val ? null : val); $ctrl.writeExpr();" >
-    {{ label }}
-  </label>
-  <div class="form-group" ng-repeat="arg in $ctrl.args" ng-if="arg !== $ctrl.fieldArg">
-    <select class="form-control" ng-if="$index && $ctrl.getParam($index).flag_before" ng-model="arg.flag_before" ng-change="$ctrl.writeExpr();">
-      <option ng-repeat="(val, label) in $ctrl.getParam($index).flag_before" value="{{ val }}">
-        {{ label }}
-      </option>
-    </select>
-    <span ng-switch="arg.type">
-      <input ng-switch-when="number" class="form-control" type="number" ng-model="arg.value" placeholder="{{ $ctrl.getParam($index).label }}" ng-change="$ctrl.changeArg($index)" ng-model-options="{updateOn: 'blur'}">
-      <input ng-switch-when="string" class="form-control" ng-model="arg.value" placeholder="{{ $ctrl.getParam($index).label }}" ng-change="$ctrl.changeArg($index)" ng-trim="false" ng-model-options="{updateOn: 'blur'}">
-      <input ng-switch-default class="form-control" ng-model="arg.value" crm-ui-select="{data: $ctrl.getFields, placeholder: $ctrl.getParam($index).label}" ng-change="$ctrl.changeArg($index)">
-    </span>
-  </div>
-  <div class="btn-group" ng-if="$ctrl.canAddArg()">
-    <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      <i class="crm-i fa-plus"></i> <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu">
-      <li ng-repeat="(name, type) in $ctrl.exprTypes" ng-show="$ctrl.getParam($ctrl.args.length).must_be.indexOf(name) >= 0">
-        <a href ng-click="$ctrl.addArg(name)">{{ type.label }}</a>
-      </li>
-    </ul>
-  </div>
+<span title="{{:: ts('Transform field using a function') }}">
+  <input class="form-control fa-crm-formula" style="min-width: 20px" ng-model="$ctrl.fnName" crm-ui-select="{data: $ctrl.getFunctions, placeholder: ' ', width: 'off', dropdownCss: {width: '275px'}}" ng-change="$ctrl.selectFunction()">
+</span>
+<label ng-hide="$ctrl.mode !== 'select' && !$ctrl.fn">{{ $ctrl.fieldArg.field.label }}</label>
+<label ng-repeat="(val, label) in $ctrl.fn.params[0].flag_before">
+  <input type="checkbox" ng-checked="$ctrl.fieldArg.flag_before === val" ng-click="$ctrl.fieldArg.flag_before = ($ctrl.fieldArg.flag_before === val ? null : val); $ctrl.writeExpr();" >
+  {{ label }}
+</label>
+<div class="form-group" ng-repeat="arg in $ctrl.args" ng-if="arg !== $ctrl.fieldArg">
+  <select class="form-control" ng-if="$index && $ctrl.getParam($index).flag_before" ng-model="arg.flag_before" ng-change="$ctrl.writeExpr();">
+    <option ng-repeat="(val, label) in $ctrl.getParam($index).flag_before" value="{{ val }}">
+      {{ label }}
+    </option>
+  </select>
+  <span ng-switch="arg.type">
+    <input ng-switch-when="number" class="form-control" type="number" ng-model="arg.value" placeholder="{{ $ctrl.getParam($index).label }}" ng-change="$ctrl.changeArg($index)" ng-model-options="{updateOn: 'blur'}">
+    <input ng-switch-when="string" class="form-control" ng-model="arg.value" placeholder="{{ $ctrl.getParam($index).label }}" ng-change="$ctrl.changeArg($index)" ng-trim="false" ng-model-options="{updateOn: 'blur'}">
+    <input ng-switch-default class="form-control" ng-model="arg.value" crm-ui-select="{data: $ctrl.getFields, placeholder: $ctrl.getParam($index).label}" ng-change="$ctrl.changeArg($index)">
+  </span>
+</div>
+<div class="btn-group" ng-if="$ctrl.canAddArg()">
+  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <i class="crm-i fa-plus"></i> <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <li ng-repeat="(name, type) in $ctrl.exprTypes" ng-show="$ctrl.getParam($ctrl.args.length).must_be.indexOf(name) >= 0">
+      <a href ng-click="$ctrl.addArg(name)">{{ type.label }}</a>
+    </li>
+  </ul>
 </div>

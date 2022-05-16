@@ -18,7 +18,7 @@
 /**
  * Create or updates an Pledge.
  *
- * @param $params
+ * @param array $params
  *
  * @return array
  *   Array containing 'is_error' to denote success or failure and details of the created pledge

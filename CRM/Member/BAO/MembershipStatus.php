@@ -14,26 +14,23 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
+class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus implements \Civi\Core\HookInterface {
 
   /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Member_BAO_MembershipStatus
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $membershipStatus = new CRM_Member_DAO_MembershipStatus();
-    $membershipStatus->copyValues($params);
-    if ($membershipStatus->find(TRUE)) {
-      CRM_Core_DAO::storeValues($membershipStatus, $defaults);
-      return $membershipStatus;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -150,29 +147,33 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * Delete membership status.
    *
    * @param int $membershipStatusId
-   *
+   * @deprecated
    * @throws CRM_Core_Exception
    */
   public static function del($membershipStatusId) {
-    // Check if any membership records are assigned this membership status
-    $dependency = ['Membership'];
-    foreach ($dependency as $name) {
-      $baoString = 'CRM_Member_BAO_' . $name;
-      $dao = new $baoString();
-      $dao->status_id = $membershipStatusId;
-      if ($dao->find(TRUE)) {
-        throw new CRM_Core_Exception(ts('This membership status cannot be deleted. Memberships exist with this status.'));
+    static::deleteRecord(['id' => $membershipStatusId]);
+  }
+
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete') {
+      // Check if any membership records are assigned this membership status
+      $dependency = ['Membership'];
+      foreach ($dependency as $name) {
+        $baoString = 'CRM_Member_BAO_' . $name;
+        $dao = new $baoString();
+        $dao->status_id = $event->id;
+        if ($dao->find(TRUE)) {
+          throw new CRM_Core_Exception(ts('This membership status cannot be deleted. Memberships exist with this status.'));
+        }
       }
+      CRM_Utils_Weight::delWeight('CRM_Member_DAO_MembershipStatus', $event->id);
+      CRM_Member_PseudoConstant::flush('membershipStatus');
     }
-    CRM_Utils_Weight::delWeight('CRM_Member_DAO_MembershipStatus', $membershipStatusId);
-    // Delete from Membership Status table
-    $membershipStatus = new CRM_Member_DAO_MembershipStatus();
-    $membershipStatus->id = $membershipStatusId;
-    if (!$membershipStatus->find()) {
-      throw new CRM_Core_Exception(ts('Cannot delete membership status ' . $membershipStatusId));
-    }
-    $membershipStatus->delete();
-    CRM_Member_PseudoConstant::flush('membershipStatus');
   }
 
   /**

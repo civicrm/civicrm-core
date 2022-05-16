@@ -11,7 +11,7 @@
 {include file="CRM/common/debug.tpl"}
 {/if}
 
-<div id="crm-container" class="crm-container{if !empty($urlIsPublic)} crm-public{/if}" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
+<div id="crm-container" class="crm-container{if $urlIsPublic} crm-public{/if}" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
 
 {if $breadcrumb}
   <div class="breadcrumb">
@@ -24,10 +24,19 @@
   </div>
 {/if}
 
-{if $pageTitle}
-  <div class="crm-title">
-    <h1 class="title">{if !empty($isDeleted)}<del>{/if}{$pageTitle}{if !empty($isDeleted)}</del>{/if}</h1>
-  </div>
+{if $urlIsPublic}
+    {if $pageTitle}
+      <div class="crm-title">
+        <h2 class="title">{$pageTitle}</h2>
+      </div>
+    {/if}
+{else}
+    {if $pageTitle}
+      <div class="crm-title">
+        <h1 class="title">{if $isDeleted}
+          <del>{/if}{$pageTitle}{if $isDeleted}</del>{/if}</h1>
+      </div>
+    {/if}
 {/if}
 
 {crmRegion name='page-header'}
@@ -46,7 +55,7 @@
 </div>
 
 {crmRegion name='page-footer'}
-{if !empty($urlIsPublic)}
+{if $urlIsPublic}
   {include file="CRM/common/publicFooter.tpl"}
 {else}
   {include file="CRM/common/footer.tpl"}

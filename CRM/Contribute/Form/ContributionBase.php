@@ -365,7 +365,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
       // this avoids getting E_NOTICE errors in php
       $setNullFields = [
-        'amount_block_is_active',
         'is_allow_other_amount',
         'footer_text',
       ];
@@ -450,16 +449,15 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     // check if one of the (amount , membership)  blocks is active or not.
     $this->_membershipBlock = $this->get('membershipBlock');
 
-    if (!$this->_values['amount_block_is_active'] &&
+    if (!$this->isFormSupportsNonMembershipContributions() &&
       !$this->_membershipBlock['is_active'] &&
       !$this->_priceSetId
     ) {
       CRM_Core_Error::statusBounce(ts('The requested online contribution page is missing a required Contribution Amount section or Membership section or Price Set. Please check with the site administrator for assistance.'));
     }
-
-    if ($this->_values['amount_block_is_active']) {
-      $this->set('amount_block_is_active', $this->_values['amount_block_is_active']);
-    }
+    // This can probably go as nothing it 'getting it' anymore since the values data is loaded
+    // on every form, rather than being passed from form to form.
+    $this->set('amount_block_is_active', $this->isFormSupportsNonMembershipContributions());
 
     $this->_contributeMode = $this->get('contributeMode');
     $this->assign('contributeMode', $this->_contributeMode);
@@ -526,7 +524,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       'amount_level',
     ];
 
-    $config = CRM_Core_Config::singleton();
     if (isset($this->_values['is_recur']) && !empty($this->_paymentProcessor['is_recur'])) {
       $this->assign('is_recur_enabled', 1);
       $vars = array_merge($vars, [
@@ -537,9 +534,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       ]);
     }
 
-    if (in_array('CiviPledge', $config->enableComponents) &&
-      CRM_Utils_Array::value('is_pledge', $this->_params) == 1
+    if (CRM_Core_Component::isEnabled('CiviPledge') &&
+      !empty($this->_params['is_pledge'])
     ) {
+      // TODO: Assigned variable appears to be unused
       $this->assign('pledge_enabled', 1);
 
       $vars = array_merge($vars, [
@@ -1011,9 +1009,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * Check template file exists.
    *
-   * @param string $suffix
+   * @param string|null $suffix
    *
-   * @return null|string
+   * @return string|null
+   *   Template file path, else null
    */
   public function checkTemplateFileExists($suffix = NULL) {
     if ($this->_id) {
@@ -1139,40 +1138,33 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Arguably the form should start to build $this->_params in the pre-process main page & use that array consistently throughout.
    */
   protected function setRecurringMembershipParams() {
-    $selectedMembershipTypeID = $this->_params['selectMembership'] ?? NULL;
-    if ($selectedMembershipTypeID) {
-      // @todo the price_x fields will ALWAYS allow us to determine the membership - so we should ignore
-      // 'selectMembership' and calculate from the price_x fields so we have one method that always works
-      // this is lazy & only catches when selectMembership is set, but the worst of all worlds would be to fix
-      // this with an else (calculate for price set).
-      $membershipTypes = CRM_Price_BAO_PriceSet::getMembershipTypesFromPriceSet($this->_priceSetId);
-      if (in_array($selectedMembershipTypeID, $membershipTypes['autorenew_required'])
-        || (in_array($selectedMembershipTypeID, $membershipTypes['autorenew_optional']) &&
-          !empty($this->_params['is_recur']))
-      ) {
-        $this->_params['auto_renew'] = TRUE;
-      }
+    $priceFieldId = array_key_first($this->_values['fee']);
+    // Why is this an array in CRM_Contribute_Form_Contribution_Main::submit and a string in CRM_Contribute_Form_Contribution_Confirm::preProcess()?
+    if (is_array($this->_params["price_{$priceFieldId}"])) {
+      $priceFieldValue = array_key_first($this->_params["price_{$priceFieldId}"]);
     }
-    if ((!empty($this->_params['selectMembership']) || !empty($this->_params['priceSetId']))
-      && !empty($this->_paymentProcessor['is_recur']) &&
-      !empty($this->_params['auto_renew'])
-      && empty($this->_params['is_recur']) && empty($this->_params['frequency_interval'])
-    ) {
+    else {
+      $priceFieldValue = $this->_params["price_{$priceFieldId}"];
+    }
+    $selectedMembershipTypeID = $this->_values['fee'][$priceFieldId]['options'][$priceFieldValue]['membership_type_id'] ?? NULL;
+    if (!$selectedMembershipTypeID) {
+      return;
+    }
 
+    $membershipTypes = CRM_Price_BAO_PriceSet::getMembershipTypesFromPriceSet($this->_priceSetId);
+    if (in_array($selectedMembershipTypeID, $membershipTypes['autorenew_required'])
+      || (in_array($selectedMembershipTypeID, $membershipTypes['autorenew_optional']) &&
+        !empty($this->_params['is_recur']))
+        && !empty($this->_paymentProcessor['is_recur'])
+    ) {
+      $this->_params['auto_renew'] = TRUE;
       $this->_params['is_recur'] = $this->_values['is_recur'] = 1;
-      // check if price set is not quick config
-      if (!empty($this->_params['priceSetId']) && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_params['priceSetId'], 'is_quick_config')) {
-        list($this->_params['frequency_interval'], $this->_params['frequency_unit']) = CRM_Price_BAO_PriceSet::getRecurDetails($this->_params['priceSetId']);
-      }
-      else {
-        // FIXME: set interval and unit based on selected membership type
-        $this->_params['frequency_interval'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-          $this->_params['selectMembership'], 'duration_interval'
-        );
-        $this->_params['frequency_unit'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-          $this->_params['selectMembership'], 'duration_unit'
-        );
-      }
+      $membershipTypeDetails = \Civi\Api4\MembershipType::get(FALSE)
+        ->addWhere('id', '=', $selectedMembershipTypeID)
+        ->execute()
+        ->first();
+      $this->_params['frequency_interval'] = $this->_params['frequency_interval'] ?? $this->_values['fee'][$priceFieldId]['options'][$priceFieldValue]['membership_num_terms'];
+      $this->_params['frequency_unit'] = $this->_params['frequency_unit'] ?? $membershipTypeDetails['duration_unit'];
     }
   }
 
@@ -1239,6 +1231,24 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     if (count($autoRenew) > 1) {
       $params['autoRenew'] = $autoRenew;
     }
+  }
+
+  /**
+   * Is payment for (non membership) contributions enabled on this form.
+   *
+   * This would be true in a case of contributions only or where both
+   * memberships and non-membership contributions are enabled (whether they
+   * are using quick config price sets or explicit price sets).
+   *
+   * The value is a database value in the config for the contribution page. It
+   * is loaded into values in ContributionBase::preProcess (called by this).
+   *
+   * @internal function is public to support validate but is for core use only.
+   *
+   * @return bool
+   */
+  public function isFormSupportsNonMembershipContributions(): bool {
+    return (bool) ($this->_values['amount_block_is_active'] ?? FALSE);
   }
 
 }

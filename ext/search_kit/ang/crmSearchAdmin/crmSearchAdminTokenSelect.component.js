@@ -28,14 +28,8 @@
 
       this.getTokens = function() {
         var allFields = ctrl.admin.getAllFields(ctrl.suffix || '', ['Field', 'Custom', 'Extra', 'Pseudo']);
-        _.eachRight(ctrl.admin.savedSearch.api_params.select, function(fieldName) {
-          allFields.unshift({
-            id: fieldName,
-            text: searchMeta.getDefaultLabel(fieldName)
-          });
-        });
         return {
-          results: allFields
+          results: ctrl.admin.getSelectFields().concat(allFields)
         };
       };
 

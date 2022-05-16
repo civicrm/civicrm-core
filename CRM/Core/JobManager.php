@@ -152,14 +152,14 @@ class CRM_Core_JobManager {
    * @return array
    *   ($id => CRM_Core_ScheduledJob)
    */
-  private function _getJobs() {
+  private function _getJobs(): array {
     $jobs = [];
     $dao = new CRM_Core_DAO_Job();
     $dao->orderBy('name');
     $dao->domain_id = CRM_Core_Config::domainID();
     $dao->find();
     while ($dao->fetch()) {
-      $temp = [];
+      $temp = ['class' => NULL, 'parameters' => NULL, 'last_run' => NULL];
       CRM_Core_DAO::storeValues($dao, $temp);
       $jobs[$dao->id] = new CRM_Core_ScheduledJob($temp);
     }

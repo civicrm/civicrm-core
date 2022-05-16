@@ -6,16 +6,17 @@
   <table class="{{:: $ctrl.settings.classes.join(' ') }}">
     <thead>
       <tr>
-        <th class="crm-search-result-select" ng-if=":: $ctrl.settings.actions">
-          <input type="checkbox" ng-disabled="$ctrl.loading || !$ctrl.results.length" ng-checked="$ctrl.allRowsSelected" ng-click="$ctrl.selectAllRows()" >
+        <th ng-class="{'crm-search-result-select': $ctrl.settings.actions}" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTaskHeader.html'" ng-if=":: $ctrl.settings.actions || $ctrl.settings.draggable">
         </th>
-        <th ng-repeat="col in $ctrl.settings.columns" ng-click="$ctrl.setSort(col, $event)" title="{{:: $ctrl.isSortable(col) ? ts('Click to sort results (shift-click to sort by multiple).') : '' }}">
+        <th ng-repeat="col in $ctrl.settings.columns" ng-click="$ctrl.setSort(col, $event)" class="{{:: $ctrl.isSortable(col) ? 'crm-sortable-col' : ''}}" title="{{:: $ctrl.isSortable(col) ? ts('Click to sort results (shift-click to sort by multiple).') : '' }}">
           <i ng-if=":: $ctrl.isSortable(col)" class="crm-i {{ $ctrl.getSort(col) }}"></i>
           <span>{{:: col.label }}</span>
         </th>
       </tr>
     </thead>
-    <tbody ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTable' + ($ctrl.loading ? 'Loading' : 'Body') + '.html'"></tbody>
+    <tbody ng-if="$ctrl.loading" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableLoading.html'"></tbody>
+    <tbody ng-if="!$ctrl.loading && !$ctrl.settings.draggable" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableBody.html'"></tbody>
+    <tbody ng-if="!$ctrl.loading && $ctrl.settings.draggable" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableBody.html'" ui-sortable="$ctrl.draggableOptions" ng-model="$ctrl.results"></tbody>
   </table>
   <div ng-include="'~/crmSearchDisplay/Pager.html'"></div>
 </div>

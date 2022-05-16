@@ -68,9 +68,27 @@
         });
       }, 2000);
 
+      // Sort inactive dashlets by label. This makes them easier to find if there is a large number.
+      function sortInactive() {
+        ctrl.inactive = _.sortBy(ctrl.inactive, 'label');
+      }
+
+      // Show/hide inactive dashlets
+      this.toggleInactive = function() {
+        // Ensure inactive dashlets are sorted before showing them
+        sortInactive();
+        ctrl.showInactive = !ctrl.showInactive;
+      };
+
+      this.filterApplies = function(dashlet) {
+        return !ctrl.filterInactive || _.includes(dashlet.label.toLowerCase(), ctrl.filterInactive.toLowerCase());
+      };
+
       this.removeDashlet = function(column, index) {
         ctrl.inactive.push(ctrl.columns[column][index]);
         ctrl.columns[column].splice(index, 1);
+        // Place the dashlet back in the correct abc order
+        sortInactive();
       };
 
       this.deleteDashlet = function(index) {

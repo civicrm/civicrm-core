@@ -88,7 +88,7 @@ class ReflectionUtils {
         elseif ($key == 'return') {
           $info['return'] = explode('|', $words[0]);
         }
-        elseif ($key == 'options' || $key == 'ui_join_filters') {
+        elseif ($key == 'options' || $key == 'ui_join_filters' || $key == 'groupWeightsBy') {
           $val = str_replace(', ', ',', implode(' ', $words));
           $info[$key] = explode(',', $val);
         }
@@ -177,6 +177,20 @@ class ReflectionUtils {
     catch (\ReflectionException $e) {
       throw new \RuntimeException(sprintf("Cannot inspect class %s.", $class));
     }
+  }
+
+  /**
+   * Check if a class method is deprecated
+   *
+   * @param string $className
+   * @param string $methodName
+   * @return bool
+   * @throws \ReflectionException
+   */
+  public static function isMethodDeprecated(string $className, string $methodName): bool {
+    $reflection = new \ReflectionClass($className);
+    $docBlock = $reflection->getMethod($methodName)->getDocComment();
+    return strpos($docBlock, "@deprecated") !== FALSE;
   }
 
   /**

@@ -17,13 +17,6 @@
 class CRM_Contact_BAO_Household extends CRM_Contact_DAO_Contact {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Update the household with primary contact id.
    *
    * @param int $primaryContactId

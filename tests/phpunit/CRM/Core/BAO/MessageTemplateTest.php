@@ -15,15 +15,14 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
 
   /**
    * Post test cleanup.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function tearDown():void {
     $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_im', 'civicrm_website', 'civicrm_openid', 'civicrm_email'], TRUE);
     parent::tearDown();
+    Civi::cache('metadata')->clear();
   }
 
-  public function testRenderTemplate() {
+  public function testRenderTemplate(): void {
     $contactId = $this->individualCreate([
       'first_name' => 'Abba',
       'last_name' => 'Baab',
@@ -44,36 +43,6 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $this->assertEquals('Hello testRenderTemplate Abba Baab!', $rendered['subject']);
     $this->assertEquals('Hello testRenderTemplate Abba Baab!', $rendered['text']);
     $this->assertStringContainsString('<p>Hello testRenderTemplate Abba Baab!</p>', $rendered['html']);
-  }
-
-  /**
-   * Check detection of contact's preferred mail.
-   *
-   * - ie if text then no html output is sent.
-   *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
-   */
-  public function testSendTemplateNoHtml(): void {
-    $contactId = $this->individualCreate([
-      'preferred_mail_format' => 'Text',
-      'first_name' => 'Mary',
-      'email' => 'mary_anderson@civicrm.org',
-    ]);
-    $mut = new CiviMailUtils($this, TRUE);
-    CRM_Core_BAO_MessageTemplate::sendTemplate(
-      [
-        'contactId' => $contactId,
-        'from' => 'admin@example.com',
-        'toEmail' => 'mary_anderson@civicrm.org',
-        'messageTemplate' => [
-          'msg_subject' => 'My subject',
-          'msg_text' => 'My text',
-          'msg_html' => 'My html',
-        ],
-      ]
-    );
-    $mut->checkMailLog(['My text', 'My subject'], ['My html']);
   }
 
   /**
@@ -107,7 +76,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $this->assertStringContainsString('<p>Hello testSendTemplate_RenderMode_OpenTemplate Abba Baab!</p>', $messageHtml);
   }
 
-  public function testSendTemplate_RenderMode_DefaultTpl() {
+  public function testSendTemplate_RenderMode_DefaultTpl(): void {
     CRM_Core_Transaction::create(TRUE)->run(function(CRM_Core_Transaction $tx) {
       $tx->rollback();
 
@@ -144,7 +113,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     });
   }
 
-  public function testSendTemplate_RenderMode_TokenContext() {
+  public function testSendTemplateRenderModeTokenContext(): void {
     CRM_Core_Transaction::create(TRUE)->run(function(CRM_Core_Transaction $tx) {
       $tx->rollback();
 

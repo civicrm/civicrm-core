@@ -28,7 +28,7 @@ class CRM_Utils_PDF_Utils {
    *   Ex: "HelloWorld.pdf".
    * @param bool $output
    *   FALSE to display PDF. TRUE to return as string.
-   * @param null $pdfFormat
+   * @param array|int|null $pdfFormat
    *   Unclear. Possibly PdfFormat or formValues.
    *
    * @return string|void
@@ -202,11 +202,11 @@ class CRM_Utils_PDF_Utils {
   }
 
   /**
-   * @param $paper_size
-   * @param $orientation
-   * @param $margins
-   * @param $html
-   * @param $output
+   * @param float|int[] $paper_size
+   * @param string $orientation
+   * @param array $margins
+   * @param string $html
+   * @param bool $output
    * @param string $fileName
    */
   public static function _html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName) {
@@ -234,10 +234,10 @@ class CRM_Utils_PDF_Utils {
   /**
    * convert value from one metric to another.
    *
-   * @param $value
-   * @param $from
-   * @param $to
-   * @param null $precision
+   * @param int $value
+   * @param string $from
+   * @param string $to
+   * @param int|null $precision
    *
    * @return float|int
    */

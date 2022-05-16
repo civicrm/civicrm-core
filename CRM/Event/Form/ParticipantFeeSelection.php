@@ -212,7 +212,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */
@@ -356,14 +356,16 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       $this->assign('isOnWaitlist', TRUE);
     }
     $this->assign('contactID', $this->_contactId);
-    $this->assign('participantID', $this->_participantId);
 
     $sendTemplateParams = [
-      'groupName' => 'msg_tpl_workflow_event',
-      'valueName' => 'event_offline_receipt',
+      'workflow' => 'event_offline_receipt',
       'contactId' => $this->_contactId,
       'isTest' => FALSE,
       'PDFFilename' => ts('confirmation') . '.pdf',
+      'modelProps' => [
+        'participantID' => $this->_participantId,
+        'eventID' => $params['event_id'],
+      ],
     ];
 
     // try to send emails only if email id is present

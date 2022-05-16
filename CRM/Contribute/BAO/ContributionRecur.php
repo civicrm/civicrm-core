@@ -435,6 +435,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
 
     // Retrieve the most recently added contribution
     $mostRecentContribution = Contribution::get(FALSE)
+      ->addSelect('custom.*', 'id', 'contact_id', 'campaign_id', 'financial_type_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'tax_amount', 'contribution_page_id', 'total_amount', 'is_test')
       ->addWhere('contribution_recur_id', '=', $id)
       ->addWhere('is_template', '=', 0)
       // we need this line otherwise the is test contribution don't work.
@@ -461,26 +462,21 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     // relevant values to ensure the activity reflects that.
     $relatedContact = CRM_Contribute_BAO_Contribution::getOnbehalfIds($mostRecentContribution['id']);
 
-    $templateContributionParams = [];
-    $templateContributionParams['is_test'] = $mostRecentContribution['is_test'];
+    $templateContributionParams = $mostRecentContribution;
+    unset($templateContributionParams['id']);
     $templateContributionParams['is_template'] = '1';
+    $templateContributionParams['contribution_status_id:name'] = 'Template';
     $templateContributionParams['skipRecentView'] = TRUE;
     $templateContributionParams['contribution_recur_id'] = $id;
-    $templateContributionParams['line_item'] = $mostRecentContribution['line_item'];
-    $templateContributionParams['status_id'] = 'Template';
-    foreach (['contact_id', 'campaign_id', 'financial_type_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'tax_amount', 'contribution_page_id', 'total_amount'] as $fieldName) {
-      if (isset($mostRecentContribution[$fieldName])) {
-        $templateContributionParams[$fieldName] = $mostRecentContribution[$fieldName];
-      }
-    }
     if (!empty($relatedContact['individual_id'])) {
       $templateContributionParams['on_behalf'] = TRUE;
       $templateContributionParams['source_contact_id'] = $relatedContact['individual_id'];
     }
     $templateContributionParams['source'] = $templateContributionParams['source'] ?? ts('Recurring contribution');
-    $templateContribution = civicrm_api3('Contribution', 'create', $templateContributionParams);
-    $temporaryObject = new CRM_Contribute_BAO_Contribution();
-    $temporaryObject->copyCustomFields($mostRecentContribution['id'], $templateContribution['id']);
+    $templateContribution = Contribution::create(FALSE)
+      ->setValues($templateContributionParams)
+      ->execute()
+      ->first();
     // Add new soft credit against current $contribution.
     CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($templateContributionParams['contribution_recur_id'], $templateContribution['id']);
     return $templateContribution['id'];
@@ -830,12 +826,17 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * Recurring contribution fields.
+   *
+   * @param CRM_Contribute_Form_Search $form
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function recurringContribution(&$form) {
-    // Recurring contribution fields
+  public static function recurringContribution($form): void {
+    // This assignment may be overwritten.
+    $form->assign('contribution_recur_pane_open', FALSE);
     foreach (self::getRecurringFields() as $key) {
-      if ($key == 'contribution_recur_payment_made' && !empty($form->_formValues) &&
+      if ($key === 'contribution_recur_payment_made' && !empty($form->_formValues) &&
         !CRM_Utils_System::isNull(CRM_Utils_Array::value($key, $form->_formValues))
       ) {
         $form->assign('contribution_recur_pane_open', TRUE);
@@ -978,6 +979,38 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   }
 
   /**
+   * If a template contribution is updated we need to update the amount on the recurring contribution.
+   *
+   * @param \CRM_Contribute_DAO_Contribution $contribution
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function updateOnTemplateUpdated(CRM_Contribute_DAO_Contribution $contribution) {
+    if (empty($contribution->contribution_recur_id)) {
+      return;
+    }
+    $contributionRecur = ContributionRecur::get(FALSE)
+      ->addWhere('id', '=', $contribution->contribution_recur_id)
+      ->execute()
+      ->first();
+
+    if ($contribution->total_amount === NULL || $contribution->currency === NULL) {
+      // The contribution has not been fully loaded, so fetch a full copy now.
+      $contribution->find(TRUE);
+    }
+
+    if ($contribution->currency !== $contributionRecur['currency'] || !CRM_Utils_Money::equals($contributionRecur['amount'], $contribution->total_amount, $contribution->currency)) {
+      ContributionRecur::update(FALSE)
+        ->addValue('amount', $contribution->total_amount)
+        ->addValue('currency', $contribution->currency)
+        ->addValue('modified_date', 'now')
+        ->addWhere('id', '=', $contributionRecur['id'])
+        ->execute();
+    }
+  }
+
+  /**
    * Is this recurring contribution now complete.
    *
    * Have all the payments expected been received now.
@@ -1037,8 +1070,8 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     $params = [];
     switch ($fieldName) {
       case 'payment_processor_id':
-        if (isset(\Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'])) {
-          return \Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'];
+        if (isset(\Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'][$context])) {
+          return \Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'][$context];
         }
         $baoName = 'CRM_Contribute_BAO_ContributionRecur';
         $params['condition']['test'] = "is_test = 0";
@@ -1057,7 +1090,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
         }
         $allProcessors = $liveProcessors + $testProcessors;
         ksort($allProcessors);
-        \Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'] = $allProcessors;
+        \Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'][$context] = $allProcessors;
         return $allProcessors;
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);

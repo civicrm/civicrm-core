@@ -22,7 +22,7 @@ namespace Civi\Api4;
  */
 class EntityFinancialTrxn extends Generic\DAOEntity {
   use Generic\Traits\EntityBridge;
-  use Generic\Traits\ReadOnly;
+  use Generic\Traits\ReadOnlyEntity;
 
   /**
    * @return array
@@ -30,8 +30,8 @@ class EntityFinancialTrxn extends Generic\DAOEntity {
   public static function getInfo() {
     $info = parent::getInfo();
     $info['bridge'] = [
-      'entity_id' => [],
-      'financial_trxn_id' => [],
+      'entity_id' => ['to' => 'financial_trxn_id'],
+      'financial_trxn_id' => ['to' => 'entity_id'],
     ];
     return $info;
   }

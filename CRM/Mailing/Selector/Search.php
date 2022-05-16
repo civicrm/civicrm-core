@@ -107,7 +107,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
   /**
    * The query object.
    *
-   * @var string
+   * @var CRM_Contact_BAO_Query
    */
   protected $_query;
 

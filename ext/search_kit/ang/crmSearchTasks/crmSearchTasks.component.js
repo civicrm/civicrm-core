@@ -42,6 +42,15 @@
         return $scope.$eval('' + ctrl.ids.length + action.number);
       };
 
+      this.getActionTitle = function(action) {
+        if (ctrl.isActionAllowed(action)) {
+          return ctrl.ids.length ?
+            ts('Perform action on %1 %2', {1: ctrl.ids.length, 2: ctrl.entityInfo[ctrl.ids.length === 1 ? 'title' : 'title_plural']}) :
+            ts('Perform action on all %1', {1: ctrl.entityInfo.title_plural});
+        }
+        return ts('Selected number must be %1', {1: action.number.replace('===', '')});
+      };
+
       this.doAction = function(action) {
         if (!ctrl.isActionAllowed(action)) {
           return;
@@ -65,6 +74,7 @@
         else if (action.uiDialog) {
           var options = CRM.utils.adjustDialogDefaults({
             autoOpen: false,
+            dialogClass: 'crm-search-task-dialog',
             title: action.title
           });
           dialogService.open('crmSearchTask', action.uiDialog.templateUrl, data, options)

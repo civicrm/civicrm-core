@@ -18,7 +18,7 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
       ->addValue('icon', 'crm-i fa-search-plus')
       ->addValue('has_separator', 2)
       ->addValue('weight', 99)
-      ->addValue('permission', 'administer CiviCRM data')
+      ->addValue('permission', ['administer CiviCRM data'])
       ->execute();
   }
 
@@ -51,6 +51,14 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
    * @return bool
    */
   public function upgrade_1001(): bool {
+    // If you upgrade direct from 5.35 to 5.40+ then upgrade_1001 which is
+    // from 5.36 triggers api4 to use the field that gets added in 5.40.
+    // So rather than rewrite all these upgrades in straight SQL, let's just
+    // add the field now, and then upgrade_1005 will be a no-op if upgrading
+    // from 5.36 or earlier.
+    $this->ctx->log->info('Applying update 1005 before 1001 to avoid chicken and egg problem.');
+    $this->addColumn('civicrm_search_display', 'acl_bypass', "tinyint DEFAULT 0 COMMENT 'Skip permission checks and ACLs when running this display.'");
+
     $this->ctx->log->info('Applying update 1001 - normalize search display columns.');
     $savedSearches = \Civi\Api4\SavedSearch::get(FALSE)
       ->addWhere('api_params', 'IS NOT NULL')
@@ -182,20 +190,25 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
   }
 
   /**
-   * Add a column to a table if it doesn't already exist
-   *
-   * FIXME: Move to a shared class, delegate to CRM_Upgrade_Incremental_Base::addColumn
-   *
-   * @param string $table
-   * @param string $column
-   * @param string $properties
-   *
+   * Add SearchSegment table
    * @return bool
    */
-  public static function addColumn($table, $column, $properties) {
-    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column, FALSE)) {
-      $query = "ALTER TABLE `$table` ADD COLUMN `$column` $properties";
-      CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
+  public function upgrade_1007(): bool {
+    $this->ctx->log->info('Applying update 1007 - add SearchSegment table.');
+    if (!CRM_Core_DAO::singleValueQuery("SHOW TABLES LIKE 'civicrm_search_segment'")) {
+      $createTable = "
+CREATE TABLE `civicrm_search_segment` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique SearchSegment ID',
+  `name` varchar(255) NOT NULL COMMENT 'Unique name',
+  `label` varchar(255) NOT NULL COMMENT 'Label for identifying search segment (will appear as name of calculated field)',
+  `description` varchar(255) COMMENT 'Description will appear when selecting SearchSegment in the fields dropdown.',
+  `entity_name` varchar(255) NOT NULL COMMENT 'Entity for which this set is used.',
+  `items` text COMMENT 'All items in set',
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `UI_name`(name)
+)
+ENGINE=InnoDB ROW_FORMAT=DYNAMIC";
+      CRM_Core_DAO::executeQuery($createTable, [], TRUE, NULL, FALSE, FALSE);
     }
     return TRUE;
   }

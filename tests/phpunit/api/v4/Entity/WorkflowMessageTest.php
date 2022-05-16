@@ -19,13 +19,14 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\WorkflowMessage;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class WorkflowMessageTest extends UnitTestCase {
+class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface {
 
   public function testGet() {
     $result = \Civi\Api4\WorkflowMessage::get(0)

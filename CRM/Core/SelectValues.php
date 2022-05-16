@@ -169,47 +169,71 @@ class CRM_Core_SelectValues {
    */
   public static function customHtmlType() {
     return [
-      'Text' => ts('Single-line input field (text or numeric)'),
-      'TextArea' => ts('Multi-line text box (textarea)'),
-      'Select' => ts('Drop-down (select list)'),
-      'Radio' => ts('Radio buttons'),
-      'CheckBox' => ts('Checkbox(es)'),
-      'Select Date' => ts('Select Date'),
-      'File' => ts('File'),
-      'RichTextEditor' => ts('Rich Text Editor'),
-      'Autocomplete-Select' => ts('Autocomplete-Select'),
-      'Link' => ts('Link'),
+      [
+        'id' => 'Text',
+        'name' => 'Single-line input field (text or numeric)',
+        'label' => ts('Single-line input field (text or numeric)'),
+      ],
+      [
+        'id' => 'TextArea',
+        'name' => 'Multi-line text box (textarea)',
+        'label' => ts('Multi-line text box (textarea)'),
+      ],
+      [
+        'id' => 'Select',
+        'name' => 'Drop-down (select list)',
+        'label' => ts('Drop-down (select list)'),
+      ],
+      [
+        'id' => 'Radio',
+        'name' => 'Radio buttons',
+        'label' => ts('Radio buttons'),
+      ],
+      [
+        'id' => 'CheckBox',
+        'name' => 'Checkbox(es)',
+        'label' => ts('Checkbox(es)'),
+      ],
+      [
+        'id' => 'Select Date',
+        'name' => 'Select Date',
+        'label' => ts('Select Date'),
+      ],
+      [
+        'id' => 'File',
+        'name' => 'File',
+        'label' => ts('File'),
+      ],
+      [
+        'id' => 'RichTextEditor',
+        'name' => 'Rich Text Editor',
+        'label' => ts('Rich Text Editor'),
+      ],
+      [
+        'id' => 'Autocomplete-Select',
+        'name' => 'Autocomplete-Select',
+        'label' => ts('Autocomplete-Select'),
+      ],
+      [
+        'id' => 'Link',
+        'name' => 'Link',
+        'label' => ts('Link'),
+      ],
     ];
   }
 
   /**
-   * Various pre defined extensions for dynamic properties and groups.
+   * List of entities to present on the Custom Group form.
+   *
+   * Includes pseudo-entities for Participant, in order to present sub-types on the form.
    *
    * @return array
-   *
    */
   public static function customGroupExtends() {
-    $customGroupExtends = [
-      'Activity' => ts('Activities'),
-      'Relationship' => ts('Relationships'),
-      'Contribution' => ts('Contributions'),
-      'ContributionRecur' => ts('Recurring Contributions'),
-      'Group' => ts('Groups'),
-      'Membership' => ts('Memberships'),
-      'Event' => ts('Events'),
-      'Participant' => ts('Participants'),
-      'ParticipantRole' => ts('Participants (Role)'),
-      'ParticipantEventName' => ts('Participants (Event Name)'),
-      'ParticipantEventType' => ts('Participants (Event Type)'),
-      'Pledge' => ts('Pledges'),
-      'Grant' => ts('Grants'),
-      'Address' => ts('Addresses'),
-      'Campaign' => ts('Campaigns'),
-    ];
-    $contactTypes = ['Contact' => ts('Contacts')] + self::contactType();
-    $extendObjs = CRM_Core_OptionGroup::values('cg_extend_objects');
-    $customGroupExtends = array_merge($contactTypes, $customGroupExtends, $extendObjs);
-    return $customGroupExtends;
+    $customGroupExtends = array_column(CRM_Core_BAO_CustomGroup::getCustomGroupExtendsOptions(), 'label', 'id');
+    // ParticipantRole, ParticipantEventName, etc.
+    $pseudoSelectors = CRM_Core_OptionGroup::values('custom_data_type', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
+    return array_merge($customGroupExtends, $pseudoSelectors);
   }
 
   /**
@@ -868,9 +892,21 @@ class CRM_Core_SelectValues {
    */
   public static function billingMode() {
     return [
-      CRM_Core_Payment::BILLING_MODE_FORM => 'form',
-      CRM_Core_Payment::BILLING_MODE_BUTTON => 'button',
-      CRM_Core_Payment::BILLING_MODE_NOTIFY => 'notify',
+      [
+        'id' => CRM_Core_Payment::BILLING_MODE_FORM,
+        'name' => 'form',
+        'label' => 'form',
+      ],
+      [
+        'id' => CRM_Core_Payment::BILLING_MODE_BUTTON,
+        'name' => 'button',
+        'label' => 'button',
+      ],
+      [
+        'id' => CRM_Core_Payment::BILLING_MODE_NOTIFY,
+        'name' => 'notify',
+        'label' => 'notify',
+      ],
     ];
   }
 
@@ -879,9 +915,21 @@ class CRM_Core_SelectValues {
    */
   public static function contributeMode() {
     return [
-      CRM_Core_Payment::BILLING_MODE_FORM => 'direct',
-      CRM_Core_Payment::BILLING_MODE_BUTTON => 'directIPN',
-      CRM_Core_Payment::BILLING_MODE_NOTIFY => 'notify',
+      [
+        'id' => CRM_Core_Payment::BILLING_MODE_FORM,
+        'name' => 'direct',
+        'label' => 'direct',
+      ],
+      [
+        'id' => CRM_Core_Payment::BILLING_MODE_BUTTON,
+        'name' => 'directIPN',
+        'label' => 'directIPN',
+      ],
+      [
+        'id' => CRM_Core_Payment::BILLING_MODE_NOTIFY,
+        'name' => 'notify',
+        'label' => 'notify',
+      ],
     ];
   }
 
@@ -1037,7 +1085,7 @@ class CRM_Core_SelectValues {
     ];
     $custom = civicrm_api3('CustomField', 'get', [
       'return' => ['name', 'label', 'custom_group_id.title'],
-      'custom_group_id.extends' => ['IN' => ['Contact', 'Individual', 'Organization', 'Household']],
+      'custom_group_id.extends' => ['IN' => array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes())],
       'data_type' => ['NOT IN' => ['ContactReference', 'Date', 'File']],
       'custom_group_id.is_active' => 1,
       'is_active' => 1,
@@ -1072,6 +1120,7 @@ class CRM_Core_SelectValues {
    */
   public static function fieldSerialization() {
     return [
+      CRM_Core_DAO::SERIALIZE_NONE => 'none',
       CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND => 'separator_bookend',
       CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED => 'separator_trimmed',
       CRM_Core_DAO::SERIALIZE_JSON => 'json',
@@ -1098,6 +1147,33 @@ class CRM_Core_SelectValues {
     return [
       'a_b' => ts('A to B'),
       'b_a' => ts('B to A'),
+    ];
+  }
+
+  /**
+   * @return array
+   */
+  public static function andOr() {
+    return [
+      'AND' => ts('And'),
+      'OR' => ts('Or'),
+    ];
+  }
+
+  /**
+   * Columns from the option_value table which may or may not be used by each option_group.
+   *
+   * Note: Value is not listed here as it is not optional.
+   *
+   * @return string[]
+   */
+  public static function optionValueFields() {
+    return [
+      'name' => 'name',
+      'label' => 'label',
+      'description' => 'description',
+      'icon' => 'icon',
+      'color' => 'color',
     ];
   }
 

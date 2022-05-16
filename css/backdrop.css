@@ -2,7 +2,7 @@
 
 /* Make status messages work with Backdrop styles */
 .crm-container :not(.crm-footer) .messages.status {
-  background-color: #E9EEBC;
+  background-color: #e9eebc;
   padding: 0.9em 0.625em 1em 3.438em;
   border: none;
 }
@@ -10,7 +10,7 @@
 .crm-container :not(.crm-footer) .messages.status .crm-i {
   font-size: 1.5rem;
   color: #fff;
-  background-color: #CFDE56;
+  background-color: #cfde56;
   position: absolute;
   padding: .4rem;
   left: 0;
@@ -22,7 +22,7 @@
   .crm-container :not(.crm-footer) .messages.status {
     padding-left: 4.375em;
   }
-  
+
   .crm-container :not(.crm-footer) .messages.status .crm-i {
     font-size: 1.75rem;
     padding: .5rem;

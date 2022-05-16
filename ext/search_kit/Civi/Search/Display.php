@@ -78,6 +78,14 @@ class Display {
           // Contacts and cases are too cumbersome to view in a popup
           'target' => in_array($entity, ['Contact', 'Case']) ? '_blank' : 'crm-popup',
         ],
+        'preview' => [
+          'action' => 'preview',
+          'entity' => $entity,
+          'text' => E::ts('Preview %1', $label),
+          'icon' => 'fa-eye',
+          'style' => 'default',
+          'target' => 'crm-popup',
+        ],
         'update' => [
           'action' => 'update',
           'entity' => $entity,
@@ -86,6 +94,14 @@ class Display {
           'style' => 'default',
           // Contacts and cases are too cumbersome to edit in a popup
           'target' => in_array($entity, ['Contact', 'Case']) ? '_blank' : 'crm-popup',
+        ],
+        'move' => [
+          'action' => 'move',
+          'entity' => $entity,
+          'text' => E::ts('Move %1', $label),
+          'icon' => 'fa-random',
+          'style' => 'default',
+          'target' => 'crm-popup',
         ],
         'delete' => [
           'action' => 'delete',

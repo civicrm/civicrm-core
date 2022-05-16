@@ -14,21 +14,20 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements \Civi\Test\HookInterface {
+class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements \Civi\Core\HookInterface {
 
   use CRM_Core_DynamicFKAccessTrait;
 
   /**
    * Get a list of valid statuses for translated-strings.
    *
-   * @return string[]
+   * @return array[]
    */
-  public static function getStatuses($context = NULL) {
-    $options = [
+  public static function getStatuses() {
+    return [
       ['id' => 1, 'name' => 'active', 'label' => ts('Active')],
       ['id' => 2, 'name' => 'draft', 'label' => ts('Draft')],
     ];
-    return self::formatPsuedoconstant($context, $options);
   }
 
   /**
@@ -65,24 +64,6 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements \Civi
   }
 
   /**
-   * Given a constant list of of id/name/label options, convert to the
-   * format required by pseudoconstant.
-   *
-   * @param string|NULL $context
-   * @param array $options
-   *   List of options, each as a record of id+name+label.
-   *   Ex: [['id' => 123, 'name' => 'foo_bar', 'label' => 'Foo Bar']]
-   *
-   * @return array|false
-   */
-  private static function formatPsuedoconstant($context, array $options) {
-    // https://docs.civicrm.org/dev/en/latest/framework/pseudoconstant/#context
-    $key = ($context === 'match') ? 'name' : 'id';
-    $value = ($context === 'validate') ? 'name' : 'label';
-    return array_combine(array_column($options, $key), array_column($options, $value));
-  }
-
-  /**
    * @return array
    *   List of data fields to translate, organized by table and column.
    *   Omitted/unlisted fields are not translated. Any listed field may be translated.
@@ -112,12 +93,12 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements \Civi
    * @param \Civi\Api4\Event\ValidateValuesEvent $e
    */
   public static function self_civi_api4_validate(\Civi\Api4\Event\ValidateValuesEvent $e) {
-    $statuses = self::getStatuses('validate');
+    $statuses = array_column(self::getStatuses(), 'id');
     $dataTypes = [CRM_Utils_Type::T_STRING, CRM_Utils_Type::T_TEXT, CRM_Utils_Type::T_LONGTEXT];
     $htmlTypes = ['Text', 'TextArea', 'RichTextEditor', ''];
 
     foreach ($e->records as $r => $record) {
-      if (array_key_exists('status_id', $record) && !isset($statuses[$record['status_id']])) {
+      if (array_key_exists('status_id', $record) && !in_array($record['status_id'], $statuses)) {
         $e->addError($r, 'status_id', 'invalid', ts('Invalid status'));
       }
 

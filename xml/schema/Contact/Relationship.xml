@@ -35,6 +35,7 @@
     <required>true</required>
     <comment>id of the first contact</comment>
     <html>
+      <type>EntityRef</type>
       <label>Contact A</label>
     </html>
     <add>1.1</add>
@@ -119,6 +120,7 @@
     <type>boolean</type>
     <title>Relationship Is Active</title>
     <default>1</default>
+    <required>true</required>
     <comment>is the relationship active ?</comment>
     <add>1.1</add>
     <html>
@@ -177,6 +179,24 @@
       <label>Case</label>
     </html>
     <add>2.2</add>
+  </field>
+  <field>
+    <name>created_date</name>
+    <type>timestamp</type>
+    <comment>Relationship created date.</comment>
+    <required>true</required>
+    <default>CURRENT_TIMESTAMP</default>
+    <add>5.47</add>
+  </field>
+  <field>
+    <name>modified_date</name>
+    <title>Relationship Modified Date</title>
+    <type>timestamp</type>
+    <required>true</required>
+    <comment>Relationship last modified.</comment>
+    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <add>5.47</add>
+    <readonly>true</readonly>
   </field>
   <foreignKey>
     <name>case_id</name>

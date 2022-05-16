@@ -602,6 +602,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function permissionDenied() {
     status_header(403);
+    global $civicrm_wp_title;
+    $civicrm_wp_title = ts('You do not have permission to access this page.');
     throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
   }
 
@@ -783,7 +785,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @param $dir
+   * @param string $dir
    *
    * @return bool
    */
@@ -963,7 +965,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
   /**
    * @param array $params
-   * @param $errors
+   * @param array $errors
    * @param string $emailName
    */
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
@@ -1401,8 +1403,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * is only as of PHP 7.3.0 that the setcookie() method supports the "SameSite"
    * attribute in its options and will accept "None" as a valid value.
    *
-   * @param $name The name of the cookie.
-   * @param $value The value of the cookie.
+   * @param string $name The name of the cookie.
+   * @param string $value The value of the cookie.
    * @param array $options The header options for the cookie.
    */
   private function setAuthCookie($name, $value, $options) {
@@ -1471,6 +1473,24 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function showPasswordFieldWhenAdminCreatesUser() {
     return !$this->isUserRegistrationPermitted();
+  }
+
+  /**
+   * Should the current execution exit after a fatal error?
+   *
+   * In WordPress, it is not usually possible to trigger theming outside of the WordPress theme process,
+   * meaning that in order to render an error inside the theme we cannot exit on error.
+   *
+   * @internal
+   * @return bool
+   */
+  public function shouldExitAfterFatal() {
+    $ret = TRUE;
+    if (!is_admin() && !wp_doing_ajax()) {
+      $ret = FALSE;
+    }
+
+    return apply_filters('civicrm_exit_after_fatal', $ret);
   }
 
 }

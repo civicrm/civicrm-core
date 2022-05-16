@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the Website.getfields API.
  *
@@ -10,7 +15,7 @@ function website_getfields_example() {
     'action' => 'get',
   ];
 
-  try{
+  try {
     $result = civicrm_api3('Website', 'getfields', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -53,6 +58,13 @@ function website_getfields_expectedresult() {
         'entity' => 'Website',
         'bao' => 'CRM_Core_BAO_Website',
         'localizable' => 0,
+        'html' => [
+          'type' => 'Number',
+          'size' => 6,
+          'maxlength' => 14,
+        ],
+        'readonly' => TRUE,
+        'add' => '3.2',
         'is_core_field' => TRUE,
         'api.aliases' => [
           '0' => 'website_id',
@@ -61,7 +73,7 @@ function website_getfields_expectedresult() {
       'contact_id' => [
         'name' => 'contact_id',
         'type' => 1,
-        'title' => 'Contact',
+        'title' => 'Contact ID',
         'description' => 'FK to Contact ID',
         'where' => 'civicrm_website.contact_id',
         'table_name' => 'civicrm_website',
@@ -69,6 +81,12 @@ function website_getfields_expectedresult() {
         'bao' => 'CRM_Core_BAO_Website',
         'localizable' => 0,
         'FKClassName' => 'CRM_Contact_DAO_Contact',
+        'html' => [
+          'label' => 'Contact',
+          'size' => 6,
+          'maxlength' => 14,
+        ],
+        'add' => '3.2',
         'is_core_field' => TRUE,
         'FKApiName' => 'Contact',
       ],
@@ -93,6 +111,7 @@ function website_getfields_expectedresult() {
           'maxlength' => 128,
           'size' => 30,
         ],
+        'add' => '3.2',
         'is_core_field' => TRUE,
       ],
       'website_type_id' => [
@@ -114,6 +133,7 @@ function website_getfields_expectedresult() {
           'optionGroupName' => 'website_type',
           'optionEditPath' => 'civicrm/admin/options/website_type',
         ],
+        'add' => '3.2',
         'is_core_field' => TRUE,
       ],
     ],
@@ -123,23 +143,23 @@ function website_getfields_expectedresult() {
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testGetFields"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/WebsiteTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
-*
-* To Learn about the API read
-* https://docs.civicrm.org/dev/en/latest/api/
-*
-* Browse the API on your own site with the API Explorer. It is in the main
-* CiviCRM menu, under: Support > Development > API Explorer.
-*
-* Read more about testing here
-* https://docs.civicrm.org/dev/en/latest/testing/
-*
-* API Standards documentation:
-* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testGetFields"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/WebsiteTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

@@ -116,7 +116,7 @@ class CRM_Core_Payment_Form {
       // This will cause the fields to be marked as required - but it is up to the payment processor to
       // validate it.
       $requiredPaymentFields[$field['name']] = $field['is_required'];
-      $paymentFieldsMetadata[$field['name']] = $field;
+      $paymentFieldsMetadata[$field['name']] = array_merge(['description' => ''], $field);
     }
 
     $form->assign('paymentFieldsMetadata', $paymentFieldsMetadata);
@@ -188,7 +188,7 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * @param array $paymentProcessor
+   * @param CRM_Core_Payment $paymentProcessor
    *
    * @return string
    */
@@ -214,11 +214,8 @@ class CRM_Core_Payment_Form {
    */
   public static function buildPaymentForm(&$form, $processor, $billing_profile_id, $isBackOffice, $paymentInstrumentID = NULL) {
     //if the form has address fields assign to the template so the js can decide what billing fields to show
-    $profileAddressFields = $form->get('profileAddressFields');
-    if (!empty($profileAddressFields)) {
-      $form->assign('profileAddressFields', $profileAddressFields);
-    }
-
+    $form->assign('profileAddressFields', $form->get('profileAddressFields') ?? NULL);
+    $form->addExpectedSmartyVariable('suppressSubmitButton');
     if (!empty($processor['object']) && $processor['object']->buildForm($form)) {
       return;
     }

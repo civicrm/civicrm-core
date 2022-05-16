@@ -19,12 +19,13 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class ContactIsDeletedTest extends UnitTestCase {
+class ContactIsDeletedTest extends Api4TestBase implements TransactionalInterface {
 
   public function setUpHeadless() {
     $relatedTables = [

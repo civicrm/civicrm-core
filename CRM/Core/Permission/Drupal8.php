@@ -41,7 +41,7 @@ class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase {
     if ($str == CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
       return TRUE;
     }
-    $acct = $userId ? \Drupal\user\Entity\User::load($userId) : \Drupal::currentUser();
+    $acct = ($userId === 0 ? \Drupal\user\Entity\User::getAnonymousUser() : ($userId ? \Drupal\user\Entity\User::load($userId) : \Drupal::currentUser()));
     return $acct->hasPermission($str);
   }
 

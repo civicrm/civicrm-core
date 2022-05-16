@@ -8,7 +8,14 @@
   </comment>
   <add>1.1</add>
   <log>true</log>
+  <title>Custom Field Group</title>
   <labelField>title</labelField>
+  <paths>
+    <add>civicrm/admin/custom/group/edit?action=add&amp;reset=1</add>
+    <update>civicrm/admin/custom/group/edit?action=update&amp;reset=1&amp;id=[id]</update>
+    <preview>civicrm/admin/custom/group/preview?reset=1&amp;gid=[id]</preview>
+    <delete>civicrm/admin/custom/group/delete?reset=1&amp;id=[id]</delete>
+  </paths>
   <field>
     <name>id</name>
     <type>int unsigned</type>
@@ -50,6 +57,9 @@
     <default>'Contact'</default>
     <comment>Type of object this group extends (can add other options later e.g. contact_address, etc.).</comment>
     <add>1.1</add>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_CustomGroup::getCustomGroupExtendsOptions</callback>
+    </pseudoconstant>
   </field>
   <field>
     <name>extends_entity_column_id</name>
@@ -72,6 +82,9 @@
     <length>255</length>
     <comment>linking custom group for dynamic object</comment>
     <serialize>SEPARATOR_BOOKEND</serialize>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_CustomGroup::getExtendsEntityColumnValueOptions</callback>
+    </pseudoconstant>
     <add>1.6</add>
   </field>
   <field>
@@ -93,6 +106,7 @@
     <type>boolean</type>
     <title>Collapse Custom Group?</title>
     <default>0</default>
+    <required>true</required>
     <comment>Will this group be in collapsed or expanded mode on initial display ?</comment>
     <add>1.1</add>
   </field>
@@ -137,6 +151,7 @@
     <title>Custom Group Is Active?</title>
     <comment>Is this property active?</comment>
     <default>1</default>
+    <required>true</required>
     <add>1.1</add>
   </field>
   <field>
@@ -156,6 +171,7 @@
     <title>Supports Multiple Records</title>
     <comment>Does this group hold multiple values?</comment>
     <default>0</default>
+    <required>true</required>
     <add>2.0</add>
   </field>
   <field>
@@ -177,6 +193,7 @@
     <type>boolean</type>
     <title>Collapse Group Display</title>
     <default>0</default>
+    <required>true</required>
     <comment>Will this group be in collapsed or expanded mode on advanced search display ?</comment>
     <add>3.0</add>
   </field>
@@ -188,11 +205,10 @@
     <add>2.1</add>
   </index>
   <index>
-    <name>UI_name_extends</name>
+    <name>UI_name</name>
     <fieldName>name</fieldName>
-    <fieldName>extends</fieldName>
     <unique>true</unique>
-    <add>2.1</add>
+    <add>5.47</add>
   </index>
   <field>
     <name>created_id</name>
@@ -223,6 +239,7 @@
     <type>boolean</type>
     <title>Reserved Group?</title>
     <default>0</default>
+    <required>true</required>
     <comment>Is this a reserved Custom Group?</comment>
     <add>4.4</add>
   </field>
@@ -231,6 +248,7 @@
     <type>boolean</type>
     <title>Custom Group Is Public?</title>
     <default>1</default>
+    <required>true</required>
     <comment>Is this property public?</comment>
     <add>4.7</add>
   </field>

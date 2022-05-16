@@ -311,7 +311,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * Subroutine to insert a Profile Editor widget.
    * depends on getProfileSelectorTypes
    *
-   * @param array &$form
+   * @param \CRM_Core_Form &$form
    * @param int $count
    *   Unique index.
    * @param string $prefix
@@ -321,7 +321,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * @param array $configs
    *   Optional, for addProfileSelector(), defaults to using getProfileSelectorTypes().
    */
-  public function buildMultipleProfileBottom(&$form, $count, $prefix = '', $label = 'Include Profile', $configs = NULL) {
+  public static function buildMultipleProfileBottom(&$form, $count, $prefix = '', $label = 'Include Profile', $configs = NULL) {
     extract((is_null($configs)) ? self::getProfileSelectorTypes() : $configs);
     $element = $prefix . "custom_post_id_multiple[$count]";
     $label .= '<br />' . ts('(bottom of page)');
@@ -392,7 +392,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * Build Email Block.
    *
    * @param CRM_Core_Form $form
-   *
    */
   public function buildMailBlock(&$form) {
     $form->registerRule('emailList', 'callback', 'emailList', 'CRM_Utils_Rule');
@@ -420,7 +419,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
   /**
    * Add local and global form rules.
-   *
    *
    * @return void
    */
@@ -460,10 +458,10 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         }
       }
 
-      if (isset($values['registration_start_date']) && isset($values['registration_end_date'])) {
-        if ($values['registration_end_date'] < $values['registration_start_date']) {
-          $errorMsg['registration_end_date'] = ts('Registration end date should be after Registration start date');
-        }
+      // Validate start/end date inputs
+      $validateDates = \CRM_Utils_Date::validateStartEndDatepickerInputs('registration_start_date', $values['registration_start_date'], 'registration_end_date', $values['registration_end_date']);
+      if ($validateDates !== TRUE) {
+        $errorMsg[$validateDates['key']] = $validateDates['message'];
       }
 
       //check that the selected profiles have either firstname+lastname or email required
@@ -621,7 +619,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * Collect all email fields for an array of profile ids.
    *
    * @param $profileIds
-   * @return bool
+   * @return array
    */
   public static function getEmailFields($profileIds) {
     $emailFields = [];
@@ -770,7 +768,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
   /**
    * Process the form submission.
-   *
    *
    * @return void
    */

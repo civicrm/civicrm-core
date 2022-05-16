@@ -12,6 +12,7 @@
 /**
  * Ensure that various queue implementations comply with the interface
  * @group headless
+ * @group queue
  */
 class CRM_Queue_QueueTest extends CiviUnitTestCase {
 
@@ -27,13 +28,19 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $queueSpecs[] = [
       [
         'type' => 'Sql',
-        'name' => 'test-queue',
+        'name' => 'test-queue-sql',
       ],
     ];
     $queueSpecs[] = [
       [
         'type' => 'Memory',
-        'name' => 'test-queue',
+        'name' => 'test-queue-mem',
+      ],
+    ];
+    $queueSpecs[] = [
+      [
+        'type' => 'SqlParallel',
+        'name' => 'test-queue-sqlparallel',
       ],
     ];
     return $queueSpecs;
@@ -50,7 +57,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
   public function tearDown(): void {
     CRM_Utils_Time::resetTime();
 
-    $tablesToTruncate = ['civicrm_queue_item'];
+    $tablesToTruncate = ['civicrm_queue_item', 'civicrm_queue'];
     $this->quickCleanup($tablesToTruncate);
     parent::tearDown();
   }
@@ -62,8 +69,12 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    * @param $queueSpec
    */
   public function testBasicUsage($queueSpec) {
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_queue');
     $this->queue = $this->queueService->create($queueSpec);
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_queue');
     $this->assertTrue($this->queue instanceof CRM_Queue_Queue);
+    $this->assertEquals($queueSpec['name'], $this->queue->getSpec('name'));
+    $this->assertEquals($queueSpec['type'], $this->queue->getSpec('type'));
 
     $this->queue->createItem([
       'test-key' => 'a',
@@ -197,6 +208,80 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->queue->deleteItem($item3);
 
     $this->assertEquals(0, $this->queue->numberOfItems());
+  }
+
+  /**
+   * Create a persistent queue via CRM_Queue_Service. Get a queue object with Civi::queue().
+   *
+   * @dataProvider getQueueSpecs
+   * @param $queueSpec
+   */
+  public function testPersistentUsage_service($queueSpec) {
+    $this->assertTrue(!empty($queueSpec['name']));
+    $this->assertTrue(!empty($queueSpec['type']));
+
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_queue');
+    $q1 = CRM_Queue_Service::singleton()->create($queueSpec + [
+      'is_persistent' => TRUE,
+    ]);
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_queue');
+
+    $q2 = Civi::queue($queueSpec['name']);
+    $this->assertInstanceOf('CRM_Queue_Queue_' . $queueSpec['type'], $q2);
+    $this->assertTrue($q1 === $q2);
+  }
+
+  /**
+   * Create a persistent queue via APIv4. Get a queue object with Civi::queue().
+   *
+   * @dataProvider getQueueSpecs
+   * @param $queueSpec
+   */
+  public function testPersistentUsage_api4($queueSpec) {
+    $this->assertTrue(!empty($queueSpec['name']));
+    $this->assertTrue(!empty($queueSpec['type']));
+
+    \Civi\Api4\Queue::create(0)
+      ->setValues($queueSpec)
+      ->execute();
+
+    $q1 = Civi::queue($queueSpec['name']);
+    $this->assertInstanceOf('CRM_Queue_Queue_' . $queueSpec['type'], $q1);
+
+    if ($queueSpec['type'] !== 'Memory') {
+      CRM_Queue_Service::singleton(TRUE);
+      $q2 = CRM_Queue_Service::singleton()->load([
+        'name' => $queueSpec['name'],
+        'is_persistent' => TRUE,
+      ]);
+      $this->assertInstanceOf('CRM_Queue_Queue_' . $queueSpec['type'], $q1);
+    }
+  }
+
+  public function testFacadeAutoCreate() {
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_queue');
+    $q1 = Civi::queue('testFacadeAutoCreate_q1', [
+      'type' => 'Sql',
+    ]);
+    $q2 = Civi::queue('testFacadeAutoCreate_q2', [
+      'type' => 'SqlParallel',
+    ]);
+    $q1Reload = Civi::queue('testFacadeAutoCreate_q1', [
+      /* q1 already exists, so it doesn't matter what type you give. */
+      'type' => 'ZoombaroombaFaketypeGoombapoompa',
+    ]);
+    $this->assertDBQuery(2, 'SELECT count(*) FROM civicrm_queue');
+    $this->assertInstanceOf('CRM_Queue_Queue_Sql', $q1);
+    $this->assertInstanceOf('CRM_Queue_Queue_SqlParallel', $q2);
+    $this->assertInstanceOf('CRM_Queue_Queue_Sql', $q1Reload);
+
+    try {
+      Civi::queue('testFacadeAutoCreate_q3' /* missing type */);
+      $this->fail('Queue lookup should fail. There is neither pre-existing registration nor new details.');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertRegExp(';Missing field "type";', $e->getMessage());
+    }
   }
 
   /**

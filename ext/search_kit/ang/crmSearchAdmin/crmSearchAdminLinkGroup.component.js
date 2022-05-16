@@ -8,11 +8,19 @@
       apiParams: '<',
       links: '<'
     },
+    require: {
+      crmSearchAdmin: '^crmSearchAdmin'
+    },
     templateUrl: '~/crmSearchAdmin/crmSearchAdminLinkGroup.html',
     controller: function ($scope, $element, $timeout, searchMeta) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this,
-        linkProps = ['path', 'entity', 'action', 'join', 'target', 'icon', 'text', 'style'];
+        linkProps = ['path', 'entity', 'action', 'join', 'target', 'icon', 'text', 'style', 'condition'];
+
+      ctrl.permissionOperators = [
+        {key: '=', value: ts('Has')},
+        {key: '!=', value: ts('Lacks')}
+      ];
 
       this.styles = CRM.crmSearchAdmin.styles;
 
@@ -20,9 +28,29 @@
         return _.findWhere(this.styles, {key: item.style});
       };
 
+      this.getField = searchMeta.getField;
+
+      this.fields = function() {
+        var selectFields = ctrl.crmSearchAdmin.getSelectFields();
+        var permissionField = [{
+          text: ts('Current User Permission'),
+          id: 'check user permission',
+          description: ts('Check permission of logged-in user')
+        }];
+        return {results: permissionField.concat(selectFields)};
+      };
+
+      this.onChangeCondition = function(item) {
+        if (item.condition[0]) {
+          item.condition[1] = '=';
+        } else {
+          item.condition = [];
+        }
+      };
+
       this.sortableOptions = {
         containment: 'tbody',
-        direction: 'vertical',
+        axis: 'y',
         helper: function(e, ui) {
           // Prevent table row width from changing during drag
           ui.children().each(function() {
@@ -32,23 +60,31 @@
         }
       };
 
+      this.permissions = CRM.crmSearchAdmin.permissions;
+
       $scope.pickIcon = function(index) {
         searchMeta.pickIcon().then(function(icon) {
           ctrl.group[index].icon = icon;
         });
       };
 
+      function setDefaults(item, newValue) {
+        _.each(linkProps, function(prop) {
+          item[prop] = newValue[prop] || (prop === 'condition' ? [] : '');
+        });
+      }
+
       this.addItem = function(item) {
-        ctrl.group.push(_.pick(item, linkProps));
+        var newItem = _.pick(item, linkProps);
+        setDefaults(newItem, newItem);
+        ctrl.group.push(newItem);
       };
 
       this.onChangeLink = function(item, newValue) {
         if (newValue.path === 'civicrm/') {
           newValue = JSON.parse(this.default);
         }
-        _.each(linkProps, function(prop) {
-          item[prop] = newValue[prop] || '';
-        });
+        setDefaults(item, newValue);
       };
 
       this.serialize = JSON.stringify;
@@ -58,10 +94,14 @@
           style: 'default',
           text: ts('Link'),
           icon: 'fa-external-link',
+          condition: [],
           path: 'civicrm/'
         });
         var defaultLinks = _.filter(ctrl.links, function(link) {
           return !link.join;
+        });
+        _.each(ctrl.group, function(item) {
+          setDefaults(item, item);
         });
         if (!ctrl.group.length) {
           if (defaultLinks.length) {

@@ -147,7 +147,7 @@ class CRM_Badge_BAO_Badge {
   }
 
   /**
-   * @param $formattedRow
+   * @param array $formattedRow
    */
   public function generateLabel($formattedRow) {
     switch ($formattedRow['labelFormat']) {
@@ -164,7 +164,7 @@ class CRM_Badge_BAO_Badge {
   }
 
   /**
-   * @param $formattedRow
+   * @param array $formattedRow
    * @param int $cellspacing
    */
   public function labelCreator(&$formattedRow, $cellspacing = 0) {
@@ -349,13 +349,12 @@ class CRM_Badge_BAO_Badge {
    *
    * @param string $img
    *   Image url.
-   *
-   * @param string $x
-   * @param string $y
-   * @param null $w
-   * @param null $h
+   * @param string|null $x
+   * @param string|null $y
+   * @param int|null $w
+   * @param int|null $h
    */
-  public function printImage($img, $x = '', $y = '', $w = NULL, $h = NULL) {
+  public function printImage($img, $x = NULL, $y = NULL, $w = NULL, $h = NULL) {
     if (!$x) {
       $x = $this->pdf->GetAbsX();
     }
@@ -375,12 +374,14 @@ class CRM_Badge_BAO_Badge {
   }
 
   /**
-   * @param $img
+   * @param string $img
+   *   Filename
    * @param int $imgRes
-   * @param null $w
-   * @param null $h
+   * @param int|null $w
+   * @param int|null $h
    *
-   * @return array
+   * @return int[]
+   *   [width, height]
    */
   public static function getImageProperties($img, $imgRes = 300, $w = NULL, $h = NULL) {
     $imgsize = getimagesize($img);

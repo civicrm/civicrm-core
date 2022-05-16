@@ -113,7 +113,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
   /**
    * The query object.
    *
-   * @var \CRM_Contact_BAO_Query
+   * @var CRM_Contact_BAO_Query
    */
   protected $_query;
 
@@ -249,6 +249,9 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         if (isset($result->$property)) {
           $row[$property] = $result->$property;
         }
+        else {
+          $row[$property] = NULL;
+        }
       }
 
       $contactId = $row['contact_id'] ?? NULL;
@@ -273,6 +276,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         $row['activity_type'] = CRM_Core_TestEntity::appendTestText($row['activity_type']);
       }
       $row['mailingId'] = '';
+      $row['recipients'] = '';
       if (
         $accessCiviMail &&
         ($mailingIDs === TRUE || in_array($result->source_record_id, $mailingIDs)) &&
@@ -395,7 +399,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
   }
 
   /**
-   * @return \CRM_Contact_BAO_Query
+   * @return CRM_Contact_BAO_Query
    */
   public function &getQuery() {
     return $this->_query;

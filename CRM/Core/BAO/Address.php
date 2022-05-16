@@ -66,6 +66,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
     CRM_Utils_Hook::pre($hook, 'Address', CRM_Utils_Array::value('id', $params), $params);
 
     CRM_Core_BAO_Block::handlePrimary($params, get_class());
+    CRM_Core_BAO_Block::handleBilling($params, get_class());
 
     // (prevent chaining 1 and 3) CRM-21214
     if (isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id'])) {
@@ -78,7 +79,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
     if ($address->id) {
       // first get custom field from master address if any
       if (isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id'])) {
-        $address->copyCustomFields($params['master_id'], $address->id);
+        $address->copyCustomFields($params['master_id'], $address->id, $hook);
       }
 
       if (isset($params['custom'])) {
@@ -962,13 +963,6 @@ SELECT is_primary,
     $query = 'SELECT id, contact_id FROM civicrm_address WHERE master_id = %1';
     $dao = CRM_Core_DAO::executeQuery($query, [1 => [$addressId, 'Integer']]);
 
-    // legacy - for api backward compatibility
-    if (!isset($params['add_relationship']) && isset($params['update_current_employer'])) {
-      // warning
-      CRM_Core_Error::deprecatedFunctionWarning('update_current_employer is deprecated, use add_relationship instead');
-      $params['add_relationship'] = $params['update_current_employer'];
-    }
-
     // Default to TRUE if not set to maintain api backward compatibility.
     $createRelationship = $params['add_relationship'] ?? TRUE;
 
@@ -1320,7 +1314,10 @@ SELECT is_primary,
     // core#2379 - Limit geocode length to 14 characters to avoid validation error on save in UI.
     foreach (['geo_code_1', 'geo_code_2'] as $geocode) {
       if ($params[$geocode] ?? FALSE) {
-        $params[$geocode] = (float) substr($params[$geocode], 0, 14);
+        // ensure that if the geocoding provider (Google, OSM etc) has returned the string 'null' because they can't geocode, ensure that contacts are not placed on null island 0,0
+        if ($params[$geocode] !== 'null') {
+          $params[$geocode] = (float) substr($params[$geocode], 0, 14);
+        }
       }
     }
     return $providerExists;

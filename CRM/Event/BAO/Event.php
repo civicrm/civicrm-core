@@ -17,30 +17,20 @@
 class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Event_DAO_Event
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $event = new CRM_Event_DAO_Event();
-    $event->copyValues($params);
-    if ($event->find(TRUE)) {
-      CRM_Core_DAO::storeValues($event, $defaults);
-      return $event;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -122,6 +112,19 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
         $copy = self::copy($params['template_id']);
         $params['id'] = $copy->id;
         unset($params['template_id']);
+
+        //fix for api from template creation bug
+        civicrm_api4('ActionSchedule', 'update', [
+          'checkPermissions' => FALSE,
+          'values' => [
+            'mapping_id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
+          ],
+          'where' => [
+            ['entity_value', '=', $copy->id],
+            ['mapping_id', '=', CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID],
+          ],
+        ]);
+
       }
     }
 
@@ -650,13 +653,12 @@ $event_summary_limit
   }
 
   /**
-   * Get the information to map a event.
+   * Get the information to map an event.
    *
    * @param int $id
    *   For which we want map info.
    *
-   * @return null|string
-   *   title of the event
+   * @return array
    */
   public static function &getMapInfo(&$id) {
 
@@ -1171,7 +1173,7 @@ WHERE civicrm_event.is_active = 1
           'credit_card_number' => CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $participantParams)),
           'credit_card_exp_date' => CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $participantParams))),
           'selfcancelxfer_time' => abs($values['event']['selfcancelxfer_time']),
-          'selfservice_preposition' => $values['event']['selfcancelxfer_time'] < 0 ? 'after' : 'before',
+          'selfservice_preposition' => $values['event']['selfcancelxfer_time'] < 0 ? ts('after') : ts('before'),
           'currency' => $values['event']['currency'] ?? CRM_Core_Config::singleton()->defaultCurrency,
         ]);
 
@@ -1261,7 +1263,7 @@ WHERE civicrm_event.is_active = 1
    * @param int $id
    * @param string $name
    * @param int $cid
-   * @param string $template
+   * @param \CRM_Core_Smarty $template
    * @param int $participantId
    * @param bool $isTest
    * @param bool $returnResults
@@ -1663,7 +1665,7 @@ WHERE  id = $cfID
                   }
                 }
                 elseif ($dao->data_type == 'Float') {
-                  $customVal = (float ) ($params[$name]);
+                  $customVal = (float) ($params[$name]);
                 }
                 elseif ($dao->data_type == 'Date') {
                   //@todo note the currently we are using default date time formatting. Since you can select/set
@@ -2233,7 +2235,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    *
    * @param int $eventId
    *   Event id.
-   * @param sting $extraWhereClause
+   * @param string $extraWhereClause
    *   Extra filter on participants.
    *
    * @return int
@@ -2361,11 +2363,12 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     // Special logic for fields whose options depend on context or properties
     switch ($fieldName) {
       case 'financial_type_id':
-        // @fixme - this is going to ignore context, better to get conditions, add params, and call PseudoConstant::get
-        // @fixme - https://lab.civicrm.org/dev/core/issues/547 if CiviContribute not enabled this causes an invalid query
-        //   because $relationTypeId is not set in CRM_Financial_BAO_FinancialType::getIncomeFinancialType()
-        if (array_key_exists('CiviContribute', CRM_Core_Component::getEnabledComponents())) {
-          return CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
+        // https://lab.civicrm.org/dev/core/issues/547 if CiviContribute not enabled this causes an invalid query
+        // @todo - the component is enabled check should be done within getIncomeFinancialType
+        // It looks to me like test cover was NOT added to cover the change
+        // that added this so we need to assume there is no test cover
+        if (CRM_Core_Component::isEnabled('CiviContribute')) {
+          return CRM_Financial_BAO_FinancialType::getIncomeFinancialType($props['check_permissions'] ?? TRUE);
         }
         return [];
     }

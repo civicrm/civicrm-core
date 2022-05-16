@@ -357,7 +357,7 @@ abstract class CRM_Utils_System_Base {
   /**
    * Get the relative path to the sites base url.
    *
-   * @return bool
+   * @return string|false
    */
   public function getRelativeBaseURL() {
     $absoluteBaseURL = $this->getAbsoluteBaseURL();
@@ -1097,6 +1097,17 @@ abstract class CRM_Utils_System_Base {
    */
   public function getUfGroupTypes() {
     return [];
+  }
+
+  /**
+   * Should the current execution exit after a fatal error?
+   * This is the appropriate functionality in most cases.
+   *
+   * @internal
+   * @return bool
+   */
+  public function shouldExitAfterFatal() {
+    return TRUE;
   }
 
 }

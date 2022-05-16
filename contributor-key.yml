@@ -9,6 +9,10 @@
   name        : Alan Dixon
   organization: Blackfly Solutions
 
+- github      : adriano66
+  organization: Future Processing
+  name        : Adrian
+
 - name        : Alexander Ferreras
 
 - github      : agh1
@@ -121,6 +125,9 @@
 
 - github      : arborrow
   name        : Anthony Borrow
+
+- github      : arnaudbroes
+  name        : Arnaud Broes
 
 - github      : AronNovakInovae
   name        : Aron Novak
@@ -239,6 +246,10 @@
 
 - name        : Cheryl Chase
   organization: Mathias Consulting
+
+- github      : chrisgaraffa
+  name        : Chris Garaffa
+  organization: AGH Strategies
 
 - github      : christianwach
   name        : Christian Wach
@@ -539,7 +550,12 @@
   name        : Guy Iaccarino
   organization: Greenleaf Advancement
 
+- github      : Guydn
+
 - github      : GValFr35
+
+- github      : homotechsual
+  name        : Mikey O'Toole
 
 - github      : hosseinamin
   name        : Hossein Amin
@@ -608,6 +624,10 @@
 - github      : ivan-compucorp
   name        : Ivan
   organization: CompuCorp
+
+- github      : iswilson
+  name        : Ian Wilson
+  organization: Registered Nurses' Association of Ontario
 
 - github      : J0WI
 
@@ -680,6 +700,8 @@
 
 - github      : joannechester
   name        : Joanne Chester
+
+- github      : joapta
 
 - github      : joels341
   name        : Joel Stevens
@@ -880,6 +902,9 @@
 
 - name        : Manish Zope
 
+- github      : mariav0
+  name        : Maria
+
 - github      : MarshCastle
   name        : Martin Castle
   organization: Circle Interactive
@@ -894,6 +919,10 @@
 
 - name        : Matt Allard
   organization: City of Winnipeg, Manitoba
+
+- github      : MattTrim1
+  name        : Matt Trim
+  organization: Circle Interactive
 
 - github      : mattwire
   name        : Matthew Wire
@@ -1032,6 +1061,8 @@
 
 - name        : Neil Zampella
 
+- github      : netzih
+
 - github      : nganivet
   name        : Nicolas Ganivet
   organization: CiviDesk
@@ -1064,6 +1095,9 @@
 
 - github      : nowszy
   name        : Pawel Nowak
+
+- github       : pboling
+  name         : Peter Boling
 
 - name        : Peter Bull
 
@@ -1488,6 +1522,10 @@
 - name        : William Gordon
   organization: British Humanist Association
 
+- github      : webmaster-cses-org-uk
+  name        : Adam Wood
+  organization: CSES (Chelmsford Science and Engineering Society)
+
 - github      : websiteexpress
   name        : James Forbes Keir
   organization: Website Express
@@ -1516,3 +1554,7 @@
 - github      : yashodha
   name        : Yashodha Chaku
   organization: CiviDesk
+
+- github      : rashedulislam
+  name        : Md Rashedul Islam
+  organization: Grype Digital Inc.

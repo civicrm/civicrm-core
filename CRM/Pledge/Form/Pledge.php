@@ -210,7 +210,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $defaults = [];
 
     $paneNames = [
-      'Payment Reminders' => 'PaymentReminders',
+      ts('Payment Reminders') => 'PaymentReminders',
     ];
     foreach ($paneNames as $name => $type) {
       $urlParams = "snippet=4&formType={$type}";
@@ -233,8 +233,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $this->assign('allPanes', $allPanes);
     $this->assign('showAdditionalInfo', $showAdditionalInfo);
 
+    $this->assign('formType', $this->_formType);
     if ($this->_formType) {
-      $this->assign('formType', $this->_formType);
       return;
     }
 
@@ -385,7 +385,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param $self
+   * @param self $self
    *
    *
    * @return bool|array

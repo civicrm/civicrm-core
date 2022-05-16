@@ -217,7 +217,7 @@
         {if empty($is_template)}
         <tr id="fromEmail" class="crm-contribution-form-block-receipt_date" style="display:none;">
           <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
+          <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
         </tr>
         {/if}
         {if empty($is_template)}
@@ -453,7 +453,7 @@
         });
 
         function showHideCancelInfo(obj) {
-          var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids}{literal}];
+          var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids|smarty:nodefaults}{literal}];
           if (cancelInfo_show_ids.indexOf(obj.val()) > -1) {
             $('#cancelInfo', $form).show();
             $('#total_amount', $form).attr('readonly', true);
@@ -493,7 +493,7 @@
       var choose = "{/literal}{ts escape='js'}Choose price set{/ts}{literal}";
       cj("#price_set_id option[value='']").html(choose);
 
-      cj('label[for="total_amount"]').text('{/literal}{ts}Total Amount{/ts}{literal}');
+      cj('label[for="total_amount"]').text('{/literal}{ts escape='js'}Total Amount{/ts}{literal}');
       cj(".crm-contribution-form-block-financial_type_id").show();
       cj("#financial_type_id option[value='']").attr('selected', true);
 
@@ -527,7 +527,7 @@
     var manual = "{/literal}{ts escape='js'}Manual contribution amount{/ts}{literal}";
     cj("#price_set_id option[value='']").html(manual);
 
-    cj('label[for="total_amount"]').text('{/literal}{ts}Price Sets{/ts}{literal}');
+    cj('label[for="total_amount"]').text('{/literal}{ts escape='js'}Price Sets{/ts}{literal}');
     if (financialtypeIds) {
       cj("#financial_type_id option[value="+financialtypeIds[priceSetId]+"]").prop('selected', true);
     }
@@ -597,7 +597,6 @@
           // replace all thousandMarker and change the separator to a dot
           totalAmount = totalAmount.replace(thousandMarker,'').replace(separator,'.');
 
-          var totalTaxAmount = '{/literal}{$totalTaxAmount}{literal}';
           var taxAmount = (taxRate/100)*totalAmount;
           taxAmount = isNaN (taxAmount) ? 0:taxAmount;
           var totalTaxAmount = taxAmount + Number(totalAmount);

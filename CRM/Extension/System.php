@@ -26,6 +26,7 @@ class CRM_Extension_System {
   private $manager = NULL;
   private $browser = NULL;
   private $downloader = NULL;
+  private $mixinLoader = NULL;
 
   /**
    * @var CRM_Extension_ClassLoader
@@ -241,6 +242,16 @@ class CRM_Extension_System {
       );
     }
     return $this->downloader;
+  }
+
+  /**
+   * @return CRM_Extension_MixinLoader;
+   */
+  public function getMixinLoader() {
+    if ($this->mixinLoader === NULL) {
+      $this->mixinLoader = new CRM_Extension_MixinLoader();
+    }
+    return $this->mixinLoader;
   }
 
   /**

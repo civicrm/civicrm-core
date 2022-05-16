@@ -5,9 +5,12 @@ $mgd = [
   [
     'name' => 'AfformType',
     'entity' => 'OptionGroup',
+    'update' => 'always',
+    'cleanup' => 'always',
     'params' => [
       'name' => 'afform_type',
       'title' => 'Afform Type',
+      'option_value_fields' => ['name', 'label', 'icon', 'description'],
     ],
   ],
   [

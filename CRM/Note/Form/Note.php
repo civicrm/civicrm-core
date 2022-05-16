@@ -72,8 +72,8 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   *
-   * @return void
+   * @return array
+   * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
     $defaults = [];
@@ -87,9 +87,12 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
         $defaults['parent_id'] = $defaults['entity_id'];
       }
     }
-    elseif ($this->_action & CRM_Core_Action::ADD && $this->_parentId) {
-      $defaults['parent_id'] = $this->_parentId;
-      $defaults['subject'] = 'Re: ' . CRM_Core_BAO_Note::getNoteSubject($this->_parentId);
+    elseif ($this->_action & CRM_Core_Action::ADD) {
+      $defaults['note_date'] = date('Y-m-d H:i:s');
+      if ($this->_parentId) {
+        $defaults['parent_id'] = $this->_parentId;
+        $defaults['subject'] = 'Re: ' . CRM_Core_BAO_Note::getNoteSubject($this->_parentId);
+      }
     }
     return $defaults;
   }
@@ -130,7 +133,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     }
 
     $this->addField('subject');
-    $this->addField('note_date', [], FALSE, FALSE);
+    $this->addField('note_date', [], TRUE, FALSE);
     $this->addField('note', [], TRUE);
     $this->addField('privacy');
     $this->add('hidden', 'parent_id');

@@ -87,7 +87,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
         'civicrm_website',
       ];
 
-      foreach (['Individual', 'Organization', 'Household'] as $ctype) {
+      foreach (CRM_Contact_BAO_ContactType::basicTypes() as $ctype) {
         // take the table.field pairs and their titles from importableFields() if the table is supported
         foreach (CRM_Contact_BAO_Contact::importableFields($ctype) as $iField) {
           if (isset($iField['where'])) {

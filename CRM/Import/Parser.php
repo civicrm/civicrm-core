@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\UserJob;
+
 /**
  *
  * @package CRM
@@ -42,6 +44,123 @@ abstract class CRM_Import_Parser {
 
 
   /**
+   * User job id.
+   *
+   * This is the primary key of the civicrm_user_job table which is used to
+   * track the import.
+   *
+   * @var int
+   */
+  protected $userJobID;
+
+  /**
+   * @return int|null
+   */
+  public function getUserJobID(): ?int {
+    return $this->userJobID;
+  }
+
+  /**
+   * Set user job ID.
+   *
+   * @param int $userJobID
+   *
+   * @return self
+   */
+  public function setUserJobID(int $userJobID): self {
+    $this->userJobID = $userJobID;
+    return $this;
+  }
+
+  /**
+   * Get User Job.
+   *
+   * API call to retrieve the userJob row.
+   *
+   * @return array
+   *
+   * @throws \API_Exception
+   */
+  protected function getUserJob(): array {
+    return UserJob::get()
+      ->addWhere('id', '=', $this->getUserJobID())
+      ->execute()
+      ->first();
+  }
+
+  /**
+   * Get the relevant datasource object.
+   *
+   * @return \CRM_Import_DataSource|null
+   *
+   * @throws \API_Exception
+   */
+  protected function getDataSourceObject(): ?CRM_Import_DataSource {
+    $className = $this->getSubmittedValue('dataSource');
+    if ($className) {
+      /* @var CRM_Import_DataSource $dataSource */
+      return new $className($this->getUserJobID());
+    }
+    return NULL;
+  }
+
+  /**
+   * Get the submitted value, as stored on the user job.
+   *
+   * @param string $fieldName
+   *
+   * @return mixed
+   *
+   * @throws \API_Exception
+   */
+  protected function getSubmittedValue(string $fieldName) {
+    return $this->getUserJob()['metadata']['submitted_values'][$fieldName];
+  }
+
+  /**
+   * Has the import completed.
+   *
+   * @return bool
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function isComplete() :bool {
+    return $this->getDataSourceObject()->isCompleted();
+  }
+
+  /**
+   * Get configured contact type.
+   *
+   * @throws \API_Exception
+   */
+  protected function getContactType() {
+    if (!$this->_contactType) {
+      $contactTypeMapping = [
+        CRM_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
+        CRM_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
+        CRM_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
+      ];
+      $this->_contactType = $contactTypeMapping[$this->getSubmittedValue('contactType')];
+    }
+    return $this->_contactType;
+  }
+
+  /**
+   * Get configured contact type.
+   *
+   * @return string|null
+   *
+   * @throws \API_Exception
+   */
+  public function getContactSubType() {
+    if (!$this->_contactSubType) {
+      $this->_contactSubType = $this->getSubmittedValue('contactSubType');
+    }
+    return $this->_contactSubType;
+  }
+
+  /**
    * Total number of non empty lines
    * @var int
    */
@@ -73,18 +192,6 @@ abstract class CRM_Import_Parser {
   protected $_errors;
 
   /**
-   * Total number of conflict lines
-   * @var int
-   */
-  protected $_conflictCount;
-
-  /**
-   * Array of conflict lines
-   * @var array
-   */
-  protected $_conflicts;
-
-  /**
    * Total number of duplicate (from database) lines
    * @var int
    */
@@ -95,12 +202,6 @@ abstract class CRM_Import_Parser {
    * @var array
    */
   protected $_duplicates;
-
-  /**
-   * Running total number of warnings
-   * @var int
-   */
-  protected $_warningCount;
 
   /**
    * Maximum number of warnings to store
@@ -179,13 +280,6 @@ abstract class CRM_Import_Parser {
   protected $_errorFileName;
 
   /**
-   * Filename of conflict data
-   *
-   * @var string
-   */
-  protected $_conflictFileName;
-
-  /**
    * Filename of duplicate data
    *
    * @var string
@@ -195,15 +289,36 @@ abstract class CRM_Import_Parser {
   /**
    * Contact type
    *
-   * @var int
+   * @var string
    */
   public $_contactType;
+
+  /**
+   * @param string $contactType
+   *
+   * @return CRM_Import_Parser
+   */
+  public function setContactType(string $contactType): CRM_Import_Parser {
+    $this->_contactType = $contactType;
+    return $this;
+  }
+
   /**
    * Contact sub-type
    *
-   * @var int
+   * @var int|null
    */
   public $_contactSubType;
+
+  /**
+   * @param int|null $contactSubType
+   *
+   * @return self
+   */
+  public function setContactSubType(?int $contactSubType): self {
+    $this->_contactSubType = $contactSubType;
+    return $this;
+  }
 
   /**
    * Class constructor.
@@ -213,59 +328,12 @@ abstract class CRM_Import_Parser {
   }
 
   /**
-   * Abstract function definitions.
-   */
-  abstract protected function init();
-
-  /**
-   * @return mixed
-   */
-  abstract protected function fini();
-
-  /**
-   * Map field.
-   *
-   * @param array $values
-   *
-   * @return mixed
-   */
-  abstract protected function mapField(&$values);
-
-  /**
-   * Preview.
-   *
-   * @param array $values
-   *
-   * @return mixed
-   */
-  abstract protected function preview(&$values);
-
-  /**
-   * @param $values
-   *
-   * @return mixed
-   */
-  abstract protected function summary(&$values);
-
-  /**
-   * @param $onDuplicate
-   * @param $values
-   *
-   * @return mixed
-   */
-  abstract protected function import($onDuplicate, &$values);
-
-  /**
    * Set and validate field values.
    *
    * @param array $elements
    *   array.
-   * @param $erroneousField
-   *   reference.
-   *
-   * @return int
    */
-  public function setActiveFieldValues($elements, &$erroneousField = NULL) {
+  public function setActiveFieldValues($elements): void {
     $maxCount = count($elements) < $this->_activeFieldCount ? count($elements) : $this->_activeFieldCount;
     for ($i = 0; $i < $maxCount; $i++) {
       $this->_activeFields[$i]->setValue($elements[$i]);
@@ -275,18 +343,6 @@ abstract class CRM_Import_Parser {
     for (; $i < $this->_activeFieldCount; $i++) {
       $this->_activeFields[$i]->resetValue();
     }
-
-    // now validate the fields and return false if error
-    $valid = self::VALID;
-    for ($i = 0; $i < $this->_activeFieldCount; $i++) {
-      if (!$this->_activeFields[$i]->validate()) {
-        // no need to do any more validation
-        $erroneousField = $i;
-        $valid = self::ERROR;
-        break;
-      }
-    }
-    return $valid;
   }
 
   /**
@@ -378,6 +434,9 @@ abstract class CRM_Import_Parser {
    */
   public function getSelectTypes() {
     $values = [];
+    // This is only called from the MapField form in isolation now,
+    // so we need to set the metadata.
+    $this->init();
     foreach ($this->_fields as $name => $field) {
       if (isset($field->_hasLocationType)) {
         $values[$name] = $field->_hasLocationType;
@@ -440,9 +499,55 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * Validate that we have the required fields to create the contact or find it to update.
+   *
+   * Note that the users duplicate selection affects this as follows
+   * - if they did not select an update variant then the id field is not
+   *   permitted in the mapping - so we can assume the presence of id means
+   *   we should use it
+   * - the external_identifier field is valid in place of the other fields
+   *   when they have chosen update or fill - in this case we are only looking
+   *   to update an existing contact.
+   *
+   * @param string $contactType
+   * @param array $params
+   * @param bool $isPermitExistingMatchFields
+   *   True if the it is enough to have fields which will enable us to find
+   *   an existing contact (eg. external_identifier).
+   * @param string $prefixString
+   *   String to include in the exception (e.g '(Child of)' if we are validating
+   *   a related contact.
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  protected function validateRequiredContactFields(string $contactType, array $params, bool $isPermitExistingMatchFields = TRUE, $prefixString = ''): void {
+    if (!empty($params['id'])) {
+      return;
+    }
+    $requiredFields = [
+      'Individual' => [
+        'first_name_last_name' => ['first_name' => ts('First Name'), 'last_name' => ts('Last Name')],
+        'email' => ts('Email Address'),
+      ],
+      'Organization' => ['organization_name' => ts('Organization Name')],
+      'Household' => ['household_name' => ts('Household Name')],
+    ][$contactType];
+    if ($isPermitExistingMatchFields) {
+      $requiredFields['external_identifier'] = ts('External Identifier');
+      // Historically just an email has been accepted as it is 'usually good enough'
+      // for a dedupe rule look up - but really this is a stand in for
+      // whatever is needed to find an existing matching contact using the
+      // specified dedupe rule (or the default Unsupervised if not specified).
+      $requiredFields['email'] = ts('Email Address');
+    }
+    $this->validateRequiredFields($requiredFields, $params, $prefixString);
+  }
+
+  /**
    * Determines the file extension based on error code.
    *
-   * @var $type error code constant
+   * @var int $type error code constant
    * @return string
    */
   public static function errorFileName($type) {
@@ -456,10 +561,6 @@ abstract class CRM_Import_Parser {
     switch ($type) {
       case self::ERROR:
         $fileName .= '.errors';
-        break;
-
-      case self::CONFLICT:
-        $fileName .= '.conflicts';
         break;
 
       case self::DUPLICATE:
@@ -492,10 +593,6 @@ abstract class CRM_Import_Parser {
     switch ($type) {
       case self::ERROR:
         $fileName = 'Import_Errors.csv';
-        break;
-
-      case self::CONFLICT:
-        $fileName = 'Import_Conflicts.csv';
         break;
 
       case self::DUPLICATE:
@@ -569,7 +666,7 @@ abstract class CRM_Import_Parser {
             $break = TRUE;
           }
           if (!$break) {
-            _civicrm_api3_deprecated_add_formatted_param($value, $contactFormatted);
+            $this->_civicrm_api3_deprecated_add_formatted_param($value, $contactFormatted);
           }
         }
         continue;
@@ -585,12 +682,351 @@ abstract class CRM_Import_Parser {
         $value['contact_type'] = $contactType;
       }
 
-      _civicrm_api3_deprecated_add_formatted_param($value, $contactFormatted);
+      $this->_civicrm_api3_deprecated_add_formatted_param($value, $contactFormatted);
     }
 
     $contactFormatted['contact_type'] = $contactType;
 
     return _civicrm_api3_deprecated_duplicate_formatted_contact($contactFormatted);
+  }
+
+  /**
+   * This function adds the contact variable in $values to the
+   * parameter list $params.  For most cases, $values should have length 1.  If
+   * the variable being added is a child of Location, a location_type_id must
+   * also be included.  If it is a child of phone, a phone_type must be included.
+   *
+   * @param array $values
+   *   The variable(s) to be added.
+   * @param array $params
+   *   The structured parameter list.
+   *
+   * @return bool|CRM_Utils_Error
+   */
+  private function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
+    // @todo - like most functions in import ... most of this is cruft....
+    // Crawl through the possible classes:
+    // Contact
+    //      Individual
+    //      Household
+    //      Organization
+    //          Location
+    //              Address
+    //              Email
+    //              Phone
+    //              IM
+    //      Note
+    //      Custom
+
+    // Cache the various object fields
+    static $fields = NULL;
+
+    if ($fields == NULL) {
+      $fields = [];
+    }
+
+    // first add core contact values since for other Civi modules they are not added
+    require_once 'CRM/Contact/BAO/Contact.php';
+    $contactFields = CRM_Contact_DAO_Contact::fields();
+    _civicrm_api3_store_values($contactFields, $values, $params);
+
+    if (isset($values['contact_type'])) {
+      // we're an individual/household/org property
+
+      $fields[$values['contact_type']] = CRM_Contact_DAO_Contact::fields();
+
+      _civicrm_api3_store_values($fields[$values['contact_type']], $values, $params);
+      return TRUE;
+    }
+
+    if (isset($values['individual_prefix'])) {
+      if (!empty($params['prefix_id'])) {
+        $prefixes = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
+        $params['prefix'] = $prefixes[$params['prefix_id']];
+      }
+      else {
+        $params['prefix'] = $values['individual_prefix'];
+      }
+      return TRUE;
+    }
+
+    if (isset($values['individual_suffix'])) {
+      if (!empty($params['suffix_id'])) {
+        $suffixes = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
+        $params['suffix'] = $suffixes[$params['suffix_id']];
+      }
+      else {
+        $params['suffix'] = $values['individual_suffix'];
+      }
+      return TRUE;
+    }
+
+    // CRM-4575
+    if (isset($values['email_greeting'])) {
+      if (!empty($params['email_greeting_id'])) {
+        $emailGreetingFilter = [
+          'contact_type' => $params['contact_type'] ?? NULL,
+          'greeting_type' => 'email_greeting',
+        ];
+        $emailGreetings = CRM_Core_PseudoConstant::greeting($emailGreetingFilter);
+        $params['email_greeting'] = $emailGreetings[$params['email_greeting_id']];
+      }
+      else {
+        $params['email_greeting'] = $values['email_greeting'];
+      }
+
+      return TRUE;
+    }
+
+    if (isset($values['postal_greeting'])) {
+      if (!empty($params['postal_greeting_id'])) {
+        $postalGreetingFilter = [
+          'contact_type' => $params['contact_type'] ?? NULL,
+          'greeting_type' => 'postal_greeting',
+        ];
+        $postalGreetings = CRM_Core_PseudoConstant::greeting($postalGreetingFilter);
+        $params['postal_greeting'] = $postalGreetings[$params['postal_greeting_id']];
+      }
+      else {
+        $params['postal_greeting'] = $values['postal_greeting'];
+      }
+      return TRUE;
+    }
+
+    if (isset($values['addressee'])) {
+      $params['addressee'] = $values['addressee'];
+      return TRUE;
+    }
+
+    if (isset($values['gender'])) {
+      if (!empty($params['gender_id'])) {
+        $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
+        $params['gender'] = $genders[$params['gender_id']];
+      }
+      else {
+        $params['gender'] = $values['gender'];
+      }
+      return TRUE;
+    }
+
+    if (!empty($values['preferred_communication_method'])) {
+      $comm = [];
+      $pcm = array_change_key_case(array_flip(CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method')), CASE_LOWER);
+
+      $preffComm = explode(',', $values['preferred_communication_method']);
+      foreach ($preffComm as $v) {
+        $v = strtolower(trim($v));
+        if (array_key_exists($v, $pcm)) {
+          $comm[$pcm[$v]] = 1;
+        }
+      }
+
+      $params['preferred_communication_method'] = $comm;
+      return TRUE;
+    }
+
+    // format the website params.
+    if (!empty($values['url'])) {
+      static $websiteFields;
+      if (!is_array($websiteFields)) {
+        require_once 'CRM/Core/DAO/Website.php';
+        $websiteFields = CRM_Core_DAO_Website::fields();
+      }
+      if (!array_key_exists('website', $params) ||
+        !is_array($params['website'])
+      ) {
+        $params['website'] = [];
+      }
+
+      $websiteCount = count($params['website']);
+      _civicrm_api3_store_values($websiteFields, $values,
+        $params['website'][++$websiteCount]
+      );
+
+      return TRUE;
+    }
+
+    // get the formatted location blocks into params - w/ 3.0 format, CRM-4605
+    if (!empty($values['location_type_id'])) {
+      static $fields = NULL;
+      if ($fields == NULL) {
+        $fields = [];
+      }
+
+      foreach (['Phone', 'Email', 'IM', 'OpenID', 'Phone_Ext'] as $block) {
+        $name = strtolower($block);
+        if (!array_key_exists($name, $values)) {
+          continue;
+        }
+
+        if ($name === 'phone_ext') {
+          $block = 'Phone';
+        }
+
+        // block present in value array.
+        if (!array_key_exists($name, $params) || !is_array($params[$name])) {
+          $params[$name] = [];
+        }
+
+        if (!array_key_exists($block, $fields)) {
+          $className = "CRM_Core_DAO_$block";
+          $fields[$block] =& $className::fields();
+        }
+
+        $blockCnt = count($params[$name]);
+
+        // copy value to dao field name.
+        if ($name == 'im') {
+          $values['name'] = $values[$name];
+        }
+
+        _civicrm_api3_store_values($fields[$block], $values,
+          $params[$name][++$blockCnt]
+        );
+
+        if (empty($params['id']) && ($blockCnt == 1)) {
+          $params[$name][$blockCnt]['is_primary'] = TRUE;
+        }
+
+        // we only process single block at a time.
+        return TRUE;
+      }
+
+      // handle address fields.
+      if (!array_key_exists('address', $params) || !is_array($params['address'])) {
+        $params['address'] = [];
+      }
+
+      $addressCnt = 1;
+      foreach ($params['address'] as $cnt => $addressBlock) {
+        if (CRM_Utils_Array::value('location_type_id', $values) ==
+          CRM_Utils_Array::value('location_type_id', $addressBlock)
+        ) {
+          $addressCnt = $cnt;
+          break;
+        }
+        $addressCnt++;
+      }
+
+      if (!array_key_exists('Address', $fields)) {
+        $fields['Address'] = CRM_Core_DAO_Address::fields();
+      }
+
+      // Note: we doing multiple value formatting here for address custom fields, plus putting into right format.
+      // The actual formatting (like date, country ..etc) for address custom fields is taken care of while saving
+      // the address in CRM_Core_BAO_Address::create method
+      if (!empty($values['location_type_id'])) {
+        static $customFields = [];
+        if (empty($customFields)) {
+          $customFields = CRM_Core_BAO_CustomField::getFields('Address');
+        }
+        // make a copy of values, as we going to make changes
+        $newValues = $values;
+        foreach ($values as $key => $val) {
+          $customFieldID = CRM_Core_BAO_CustomField::getKeyID($key);
+          if ($customFieldID && array_key_exists($customFieldID, $customFields)) {
+            // mark an entry in fields array since we want the value of custom field to be copied
+            $fields['Address'][$key] = NULL;
+
+            $htmlType = $customFields[$customFieldID]['html_type'] ?? NULL;
+            if (CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID]) && $val) {
+              $mulValues = explode(',', $val);
+              $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
+              $newValues[$key] = [];
+              foreach ($mulValues as $v1) {
+                foreach ($customOption as $v2) {
+                  if ((strtolower($v2['label']) == strtolower(trim($v1))) ||
+                    (strtolower($v2['value']) == strtolower(trim($v1)))
+                  ) {
+                    if ($htmlType == 'CheckBox') {
+                      $newValues[$key][$v2['value']] = 1;
+                    }
+                    else {
+                      $newValues[$key][] = $v2['value'];
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        // consider new values
+        $values = $newValues;
+      }
+
+      _civicrm_api3_store_values($fields['Address'], $values, $params['address'][$addressCnt]);
+
+      $addressFields = [
+        'county',
+        'country',
+        'state_province',
+        'supplemental_address_1',
+        'supplemental_address_2',
+        'supplemental_address_3',
+        'StateProvince.name',
+      ];
+
+      foreach ($addressFields as $field) {
+        if (array_key_exists($field, $values)) {
+          if (!array_key_exists('address', $params)) {
+            $params['address'] = [];
+          }
+          $params['address'][$addressCnt][$field] = $values[$field];
+        }
+      }
+
+      if ($addressCnt == 1) {
+
+        $params['address'][$addressCnt]['is_primary'] = TRUE;
+      }
+      return TRUE;
+    }
+
+    if (isset($values['note'])) {
+      // add a note field
+      if (!isset($params['note'])) {
+        $params['note'] = [];
+      }
+      $noteBlock = count($params['note']) + 1;
+
+      $params['note'][$noteBlock] = [];
+      if (!isset($fields['Note'])) {
+        $fields['Note'] = CRM_Core_DAO_Note::fields();
+      }
+
+      // get the current logged in civicrm user
+      $session = CRM_Core_Session::singleton();
+      $userID = $session->get('userID');
+
+      if ($userID) {
+        $values['contact_id'] = $userID;
+      }
+
+      _civicrm_api3_store_values($fields['Note'], $values, $params['note'][$noteBlock]);
+
+      return TRUE;
+    }
+
+    // Check for custom field values
+
+    if (empty($fields['custom'])) {
+      $fields['custom'] = &CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $values),
+        FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE
+      );
+    }
+
+    foreach ($values as $key => $value) {
+      if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
+        // check if it's a valid custom field id
+
+        if (!array_key_exists($customFieldID, $fields['custom'])) {
+          return civicrm_api3_create_error('Invalid custom field ID');
+        }
+        else {
+          $params[$key] = $value;
+        }
+      }
+    }
   }
 
   /**
@@ -654,12 +1090,7 @@ abstract class CRM_Import_Parser {
         if ((strtolower(trim($customLabel['label'])) == strtolower(trim($v1))) ||
           (strtolower(trim($customValue)) == strtolower(trim($v1)))
         ) {
-          if ($fieldType == 'CheckBox') {
-            $values[$customValue] = 1;
-          }
-          else {
-            $values[] = $customValue;
-          }
+          $values[] = $customValue;
         }
       }
     }
@@ -686,6 +1117,58 @@ abstract class CRM_Import_Parser {
     else {
       return explode(',', $error['error_message']['params'][0]);
     }
+  }
+
+  /**
+   * Validate that the field requirements are met in the params.
+   *
+   * @param array $requiredFields
+   * @param array $params
+   *   An array of required fields (fieldName => label)
+   *   - note this follows the and / or array nesting we see in permission checks
+   *   eg.
+   *   [
+   *     'email' => ts('Email'),
+   *     ['first_name' => ts('First Name'), 'last_name' => ts('Last Name')]
+   *   ]
+   *   Means 'email' OR 'first_name AND 'last_name'.
+   * @param string $prefixString
+   *
+   * @throws \CRM_Core_Exception Exception thrown if field requirements are not met.
+   */
+  protected function validateRequiredFields(array $requiredFields, array $params, $prefixString): void {
+    $missingFields = [];
+    foreach ($requiredFields as $key => $required) {
+      if (!is_array($required)) {
+        $importParameter = $params[$key] ?? [];
+        if (!is_array($importParameter)) {
+          if (!empty($importParameter)) {
+            return;
+          }
+        }
+        else {
+          foreach ($importParameter as $locationValues) {
+            if (!empty($locationValues[$key])) {
+              return;
+            }
+          }
+        }
+
+        $missingFields[$key] = $required;
+      }
+      else {
+        foreach ($required as $field => $label) {
+          if (empty($params[$field])) {
+            $missing[$field] = $label;
+          }
+        }
+        if (empty($missing)) {
+          return;
+        }
+        $missingFields[$key] = implode(' ' . ts('and') . ' ', $missing);
+      }
+    }
+    throw new CRM_Core_Exception(($prefixString ? ($prefixString . ' ') : '') . ts('Missing required fields:') . ' ' . implode(' ' . ts('OR') . ' ', $missingFields));
   }
 
 }

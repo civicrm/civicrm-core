@@ -352,19 +352,14 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->addElement('hidden', "email-{$this->_bltID}", 1);
       $this->add('text', 'total_amount', ts('Total Amount'), ['readonly' => TRUE], FALSE);
     }
-    $pps = $this->getProcessors();
+
     $this->addPaymentProcessorFieldsToForm();
-    if (!empty($pps) && count($pps) === 1) {
-      $ppKeys = array_keys($pps);
-      $currentPP = array_pop($ppKeys);
-      if ($currentPP === 0) {
-        $this->assign('is_pay_later', $this->_values['is_pay_later']);
-        $this->assign('pay_later_text', $this->getPayLaterLabel());
-      }
-    }
+    $this->assign('is_pay_later', $this->getCurrentPaymentProcessor() === 0 && $this->_values['is_pay_later']);
+    $this->assign('pay_later_text', $this->getCurrentPaymentProcessor() === 0 ? $this->getPayLaterLabel() : NULL);
 
     if ($contactID === 0) {
       $this->addCidZeroOptions();
+
     }
 
     //build pledge block.
@@ -372,7 +367,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     //don't build membership block when pledge_id is passed
     if (empty($this->_values['pledge_id']) && empty($this->_ccid)) {
       $this->_separateMembershipPayment = FALSE;
-      if (in_array('CiviMember', $config->enableComponents)) {
+      if (CRM_Core_Component::isEnabled('CiviMember')) {
         $isTest = 0;
         if ($this->_action & CRM_Core_Action::PREVIEW) {
           $isTest = 1;
@@ -426,8 +421,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     //don't build pledge block when mid is passed
     if (!$this->_mid && empty($this->_ccid)) {
-      $config = CRM_Core_Config::singleton();
-      if (in_array('CiviPledge', $config->enableComponents) && !empty($this->_values['pledge_block_id'])) {
+      if (CRM_Core_Component::isEnabled('CiviPledge') && !empty($this->_values['pledge_block_id'])) {
         CRM_Pledge_BAO_PledgeBlock::buildPledgeBlock($this);
       }
     }
@@ -549,6 +543,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   private function buildMembershipBlock($cid, $selectedMembershipTypeID = NULL, $isTest = NULL) {
     $separateMembershipPayment = FALSE;
+    $this->addOptionalQuickFormElement('auto_renew');
     if ($this->_membershipBlock) {
       $this->_currentMemberships = [];
 
@@ -757,11 +752,12 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     $frUnits = $form->_values['recur_frequency_unit'] ?? NULL;
+    $frequencyUnits = CRM_Core_OptionGroup::values('recur_frequency_units', FALSE, FALSE, TRUE);
     if (empty($frUnits) &&
       $className == 'CRM_Contribute_Form_Contribution'
     ) {
       $frUnits = implode(CRM_Core_DAO::VALUE_SEPARATOR,
-        CRM_Core_OptionGroup::values('recur_frequency_units')
+        CRM_Core_OptionGroup::values('recur_frequency_units', FALSE, FALSE, FALSE, NULL, 'value')
       );
     }
 
@@ -783,15 +779,14 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     // CRM 10860, display text instead of a dropdown if there's only 1 frequency unit
     if (count($unitVals) == 1) {
       $form->assign('one_frequency_unit', TRUE);
-      $unit = $unitVals[0];
-      $form->add('hidden', 'frequency_unit', $unit);
+      $form->add('hidden', 'frequency_unit', $unitVals[0]);
       if (!empty($form->_values['is_recur_interval']) || $className == 'CRM_Contribute_Form_Contribution') {
-        $unit .= "(s)";
+        $unit = CRM_Contribute_BAO_Contribution::getUnitLabelWithPlural($unitVals[0]);
         $form->assign('frequency_unit', $unit);
       }
       else {
         $is_recur_label = ts('I want to contribute this amount every %1',
-          [1 => $unit]
+          [1 => $frequencyUnits[$unitVals[0]]]
         );
         $form->assign('all_text_recur', TRUE);
       }
@@ -799,12 +794,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     else {
       $form->assign('one_frequency_unit', FALSE);
       $units = [];
-      $frequencyUnits = CRM_Core_OptionGroup::values('recur_frequency_units', FALSE, FALSE, TRUE);
       foreach ($unitVals as $key => $val) {
         if (array_key_exists($val, $frequencyUnits)) {
           $units[$val] = $frequencyUnits[$val];
           if (!empty($form->_values['is_recur_interval']) || $className == 'CRM_Contribute_Form_Contribution') {
-            $units[$val] = "{$frequencyUnits[$val]}(s)";
+            $units[$val] = CRM_Contribute_BAO_Contribution::getUnitLabelWithPlural($val);
             $unit = ts('Every');
           }
         }
@@ -947,7 +941,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
       // CRM-12233
       if ($membershipIsActive && empty($self->_membershipBlock['is_required'])
-        && $self->_values['amount_block_is_active']
+        && $self->isFormSupportsNonMembershipContributions()
       ) {
         $membershipFieldId = $contributionFieldId = $errorKey = $otherFieldId = NULL;
         foreach ($self->_values['fee'] as $fieldKey => $fieldValue) {
@@ -1401,12 +1395,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     // Would be nice to someday understand the point of this set.
     $this->set('is_pay_later', $params['is_pay_later']);
     // assign pay later stuff
-    $this->_params['is_pay_later'] = CRM_Utils_Array::value('is_pay_later', $params, FALSE);
+    $this->_params['is_pay_later'] = $params['is_pay_later'];
     $this->assign('is_pay_later', $params['is_pay_later']);
-    if ($params['is_pay_later']) {
-      $this->assign('pay_later_text', $this->_values['pay_later_text']);
-      $this->assign('pay_later_receipt', CRM_Utils_Array::value('pay_later_receipt', $this->_values));
-    }
+    $this->assign('pay_later_text', $params['is_pay_later'] ? $this->_values['pay_later_text'] : NULL);
+    $this->assign('pay_later_receipt', ($params['is_pay_later'] && isset($this->_values['pay_later_receipt'])) ? $this->_values['pay_later_receipt'] : NULL);
 
     if ($this->_membershipBlock && $this->_membershipBlock['is_separate_payment'] && !empty($params['separate_amount'])) {
       $this->set('amount', $params['separate_amount']);
@@ -1561,6 +1553,24 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   protected function hasSeparateMembershipPaymentAmount($params) {
     return $this->_separateMembershipPayment && (int) CRM_Member_BAO_MembershipType::getMembershipType($params['selectMembership'])['minimum_fee'];
+  }
+
+  /**
+   * Get the loaded payment processor - the default for the form.
+   *
+   * If the form is using 'pay later' then the value for the manual
+   * pay later processor is 0.
+   *
+   * @return int|null
+   */
+  protected function getCurrentPaymentProcessor(): ?int {
+    $pps = $this->getProcessors();
+    if (!empty($pps) && count($pps) === 1) {
+      $ppKeys = array_keys($pps);
+      return array_pop($ppKeys);
+    }
+    // It seems like this might be un=reachable as there should always be a processor...
+    return NULL;
   }
 
 }

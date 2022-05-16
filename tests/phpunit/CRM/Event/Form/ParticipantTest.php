@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\Participant;
+
 /**
  *  Test CRM_Event_Form_Registration functions.
  *
@@ -22,18 +24,11 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Should financials be checked after the test but before tear down.
-   *
-   * @var bool
-   */
-  protected $isValidateFinancialsOnPostAssert = TRUE;
-
-  /**
    * Initial test of submit function.
    *
    * @throws \Exception
    */
-  public function testSubmit() {
+  public function testSubmit(): void {
     $form = $this->getForm();
     $form->submit([
       'register_date' => date('Ymd'),
@@ -262,8 +257,9 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @dataProvider getThousandSeparators
    * @throws \Exception
    */
-  public function testParticipantOfflineReceipt($thousandSeparator) {
+  public function testParticipantOfflineReceipt(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
+    $this->swapMessageTemplateForTestTemplate('event_offline_receipt', 'text');
     $mut = new CiviMailUtils($this, TRUE);
     // Create an email associated with the logged in contact
     $loggedInContactID = $this->createLoggedInUser();
@@ -298,7 +294,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
     // Use the email created as the from email ensuring we are passing a numeric from to test dev/core#1069
     $this->setCurrencySeparators($thousandSeparator);
-    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1]);
+    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1, 'pay_later_receipt' => 'pay us']);
     $form->_mode = 'Live';
     $form->_quickConfig = TRUE;
     $form->_fromEmails = [
@@ -308,13 +304,24 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $submitParams = $this->getSubmitParamsForCreditCardPayment($paymentProcessorID);
     $submitParams['from_email_address'] = $email['id'];
     $form->submit($submitParams);
+    $participantID = Participant::get()->addWhere('event_id', '=', $this->getEventID())->execute()->first()['id'];
     //Check if type is correctly populated in mails.
     //Also check the string email is present not numeric from.
     $mut->checkMailLog([
+      'contactID:::' . $this->getContactID(),
+      'contact.id:::' . $this->getContactID(),
+      'eventID:::' . $this->getEventID(),
+      'event.id:::' . $this->getEventID(),
+      'participantID:::' . $participantID,
+      'participant.id:::' . $participantID,
       '<p>Test event type - 1</p>',
+      'event.title:::Annual CiviCRM meet',
+      'participant.status_id:name:::Registered',
       'testloggedinreceiptemail@civicrm.org',
+      'event.pay_later_receipt:::pay us',
       $this->formatMoneyInput(1550.55),
     ]);
+
     $this->callAPISuccess('Email', 'delete', ['id' => $email['id']]);
   }
 
@@ -537,13 +544,15 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * Test submitting a partially paid event registration.
    *
    * In this case the participant status is selected as 'partially paid' and
-   * a contribution is created for the full amount with a payment equal to the entered amount.
+   * a contribution is created for the full amount with a payment equal to the
+   * entered amount.
    *
    * @dataProvider getBooleanDataProvider
    *
    * @param bool $isQuickConfig
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitPartialPayment($isQuickConfig) {
     $mut = new CiviMailUtils($this, TRUE);
@@ -728,8 +737,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'Annual CiviCRM meet',
       'Registered Email',
       $isQuickConfig ? $this->formatMoneyInput(1550.55) . ' big - 1' : 'Price Field - big',
-      $isAmountPaidOnForm ? 'Total Paid: $ 20.00' : ' ',
-      'Balance: $ 1,530.55',
+      $isAmountPaidOnForm ? 'Total Paid: $20.00' : ' ',
+      'Balance: $1,530.55',
       'Financial Type: Event Fee',
       'Paid By: Check',
       'Check Number: 879',

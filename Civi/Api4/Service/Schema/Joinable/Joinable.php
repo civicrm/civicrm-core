@@ -244,7 +244,7 @@ class Joinable {
   }
 
   /**
-   * @param int|NULL $serialize
+   * @param int|null $serialize
    *
    * @return $this
    */

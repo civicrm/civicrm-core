@@ -23,7 +23,7 @@ class FieldSpec {
   // DataTypeSpecTrait: dataType, serialize, fkEntity
   use \Civi\Schema\Traits\DataTypeSpecTrait;
 
-  // OptionsSpecTrait: options, optionsCallback
+  // OptionsSpecTrait: options, optionsCallback, suffixes
   use \Civi\Schema\Traits\OptionsSpecTrait;
 
   // GuiSpecTrait: label, inputType, inputAttrs, helpPre, helpPost
@@ -62,6 +62,11 @@ class FieldSpec {
 
   /**
    * @var bool
+   */
+  public $nullable = TRUE;
+
+  /**
+   * @var string
    */
   public $requiredIf;
 
@@ -130,6 +135,24 @@ class FieldSpec {
   /**
    * @return bool
    */
+  public function getNullable() {
+    return $this->nullable;
+  }
+
+  /**
+   * @param bool $nullable
+   *
+   * @return $this
+   */
+  public function setNullable(bool $nullable) {
+    $this->nullable = $nullable;
+
+    return $this;
+  }
+
+  /**
+   * @return bool
+   */
   public function isRequired() {
     return $this->required;
   }
@@ -146,14 +169,14 @@ class FieldSpec {
   }
 
   /**
-   * @return bool
+   * @return string
    */
   public function getRequiredIf() {
     return $this->requiredIf;
   }
 
   /**
-   * @param bool $requiredIf
+   * @param string $requiredIf
    *
    * @return $this
    */

@@ -46,13 +46,13 @@
 {ts}Contribution Details{/ts}
 
 ===============================================================================
-{if isset($totalAmount)}
+{if $totalAmount}
 {ts}Total Fee{/ts}: {$totalAmount|crmMoney}
 {/if}
-{if isset($totalPaid)}
+{if $totalPaid}
 {ts}Total Paid{/ts}: {$totalPaid|crmMoney}
 {/if}
-{if isset($amountOwed)}
+{if $amountOwed}
 {ts}Balance Owed{/ts}: {$amountOwed|crmMoney} {* This will be zero after final payment. *}
 {/if}
 

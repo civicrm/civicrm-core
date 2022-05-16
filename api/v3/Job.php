@@ -98,7 +98,7 @@ function civicrm_api3_job_get($params) {
  * @param array $params
  */
 function civicrm_api3_job_delete($params) {
-  _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
@@ -555,7 +555,7 @@ function civicrm_api3_job_process_batch_merge($params) {
 /**
  * Metadata for batch merge function.
  *
- * @param $params
+ * @param array $params
  */
 function _civicrm_api3_job_process_batch_merge_spec(&$params) {
   $params['rule_group_id'] = [

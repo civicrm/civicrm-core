@@ -308,7 +308,7 @@ WHERE      t.table_name = 'Activity' AND
       }
     }
 
-    $form->add('select', 'table', ts('Tables'), $tables);
+    $form->add('select', 'table', ts('in...'), $tables);
 
     $form->assign('csID', $form->get('csid'));
 

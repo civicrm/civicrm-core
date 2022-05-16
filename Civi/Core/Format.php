@@ -23,22 +23,27 @@ class Format {
   /**
    * Get formatted money
    *
-   * @param string $amount
+   * @param string|int|float|BigDecimal $amount
    * @param string|null $currency
    *   Currency, defaults to site currency if not provided.
    * @param string|null $locale
    *
    * @return string
    *
+   * @throws \CRM_Core_Exception
+   *
    * @noinspection PhpDocMissingThrowsInspection
    * @noinspection PhpUnhandledExceptionInspection
    */
-  public function money(string $amount, ?string $currency = NULL, ?string $locale = NULL): string {
+  public function money($amount, ?string $currency = NULL, ?string $locale = NULL): string {
+    if (($amount = $this->checkAndConvertAmount($amount)) === '') {
+      return '';
+    }
     if (!$currency) {
       $currency = Civi::settings()->get('defaultCurrency');
     }
     if (!isset($locale)) {
-      $locale = CRM_Core_I18n::getLocale();
+      $locale = Civi::settings()->get('format_locale') ?? CRM_Core_I18n::getLocale();
     }
     $money = Money::of($amount, $currency, NULL, RoundingMode::HALF_UP);
     $formatter = $this->getMoneyFormatter($currency, $locale);
@@ -58,11 +63,15 @@ class Format {
    *   add any padding.
    *
    * @return string
+   * @throws \CRM_Core_Exception
    */
   public function number($amount, ?string $locale = NULL, array $attributes = [
     NumberFormatter::MIN_FRACTION_DIGITS => 0,
     NumberFormatter::MAX_FRACTION_DIGITS => 8,
   ]): string {
+    if (($amount = $this->checkAndConvertAmount($amount)) === '') {
+      return '';
+    }
     $formatter = $this->getMoneyFormatter(NULL, $locale, NumberFormatter::DECIMAL, $attributes);
     return $formatter->format($amount);
   }
@@ -72,7 +81,7 @@ class Format {
    *
    * @param string|float|int $amount
    * @param string $currency
-   * @param $locale
+   * @param string|null $locale
    *
    * @return string
    *
@@ -80,9 +89,38 @@ class Format {
    * @noinspection PhpUnhandledExceptionInspection
    */
   public function moneyNumber($amount, string $currency, $locale): string {
+    if (($amount = $this->checkAndConvertAmount($amount)) === '') {
+      return '';
+    }
     $formatter = $this->getMoneyFormatter($currency, $locale, NumberFormatter::DECIMAL);
-    $money = Money::of($amount, $currency, NULL, RoundingMode::HALF_UP);
-    return $money->formatWith($formatter);
+    return Money::of($amount, $currency, NULL, RoundingMode::HALF_UP)->formatWith($formatter);
+  }
+
+  /**
+   * Get a number formatted to a machine format with padded decimal places.
+   *
+   * This is intended to be a machine-friendly format that is also suitable
+   * for sending out to other systems that might expect 2 digits after the
+   * decimal point.
+   *
+   * Most currencies format to 2 decimal places so the default of 'USD' will
+   * achieve that.
+   *
+   * For example an input of 1000.1 will return 1000.10.
+   *
+   * This will ensure that
+   *
+   * @param string|float|int $amount
+   * @param string $currency
+   *
+   * @return string
+   *
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function machineMoney($amount, string $currency = 'USD'): string {
+    $formatter = $this->getMoneyFormatter($currency, 'en_US', NumberFormatter::DECIMAL, [NumberFormatter::GROUPING_USED => FALSE]);
+    return Money::of($amount, $currency, NULL, RoundingMode::HALF_UP)->formatWith($formatter);
   }
 
   /**
@@ -98,6 +136,9 @@ class Format {
    * @noinspection PhpUnhandledExceptionInspection
    */
   public function moneyLong($amount, ?string $currency, ?string $locale): string {
+    if (($amount = $this->checkAndConvertAmount($amount)) === '') {
+      return '';
+    }
     $formatter = $this->getMoneyFormatter($currency, $locale, NumberFormatter::CURRENCY, [
       NumberFormatter::MAX_FRACTION_DIGITS => 9,
     ]);
@@ -118,6 +159,9 @@ class Format {
    * @noinspection PhpUnhandledExceptionInspection
    */
   public function moneyNumberLong($amount, ?string $currency, ?string $locale): string {
+    if (($amount = $this->checkAndConvertAmount($amount)) === '') {
+      return '';
+    }
     $formatter = $this->getMoneyFormatter($currency, $locale, NumberFormatter::DECIMAL, [
       NumberFormatter::MAX_FRACTION_DIGITS => 9,
     ]);
@@ -132,7 +176,7 @@ class Format {
    * we are looking at how to manage an 'opt in'
    */
   protected function isUseSeparatorSettings(): bool {
-    return !CRM_Utils_Constant::value('IGNORE_SEPARATOR_CONFIG');
+    return !Civi::settings()->get('format_locale') && !CRM_Utils_Constant::value('IGNORE_SEPARATOR_CONFIG');
   }
 
   /**
@@ -179,6 +223,30 @@ class Format {
       \Civi::$statics[$cacheKey] = $formatter;
     }
     return \Civi::$statics[$cacheKey];
+  }
+
+  /**
+   * Since the input can be various data types and values, we need to handle
+   * them before passing on to the Brick libraries which would throw exceptions
+   * for ones that we are ok just converting to the empty string.
+   *
+   * @param string|int|float|BigDecimal $amount
+   * @return string
+   *   Either the empty string if an empty-ish value, or the original amount as a string.
+   * @throws \CRM_Core_Exception
+   */
+  private function checkAndConvertAmount($amount): string {
+    // Empty value => empty string
+    // FALSE should be an error but some smarty variables are filled with FALSE to avoid ENOTICES.
+    if (is_null($amount) || $amount === '' || $amount === FALSE) {
+      return '';
+    }
+    // Verify the amount is a number or numeric string/object.
+    // We cast to string because it can be a BigDecimal object.
+    if ($amount === TRUE || !is_numeric((string) $amount)) {
+      throw new \CRM_Core_Exception('Invalid value for type money');
+    }
+    return (string) $amount;
   }
 
 }

@@ -16,9 +16,8 @@
  */
 
 /**
- * This class provides the functionality to delete a group of
- * contacts. This class provides functionality for the actual
- * addition of contacts to groups.
+ * This class provides the functionality to tag a group of
+ * activities (or a single activity)
  */
 class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
 

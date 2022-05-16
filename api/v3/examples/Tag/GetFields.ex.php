@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the Tag.getfields API.
  *
@@ -12,7 +17,7 @@ function tag_getfields_example() {
     'action' => 'create',
   ];
 
-  try{
+  try {
     $result = civicrm_api3('Tag', 'getfields', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -55,6 +60,13 @@ function tag_getfields_expectedresult() {
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
         'localizable' => 0,
+        'html' => [
+          'type' => 'Number',
+          'size' => 6,
+          'maxlength' => 14,
+        ],
+        'readonly' => TRUE,
+        'add' => '1.1',
         'is_core_field' => TRUE,
         'api.aliases' => [
           '0' => 'tag',
@@ -73,6 +85,7 @@ function tag_getfields_expectedresult() {
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
         'localizable' => 0,
+        'add' => '1.1',
         'is_core_field' => TRUE,
         'api.required' => 1,
       ],
@@ -88,20 +101,31 @@ function tag_getfields_expectedresult() {
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
         'localizable' => 0,
+        'add' => '1.1',
         'is_core_field' => TRUE,
       ],
       'parent_id' => [
         'name' => 'parent_id',
         'type' => 1,
-        'title' => 'Parent Tag',
+        'title' => 'Parent Tag ID',
         'description' => 'Optional parent id for this tag.',
         'where' => 'civicrm_tag.parent_id',
-        'default' => 'NULL',
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
         'localizable' => 0,
         'FKClassName' => 'CRM_Core_DAO_Tag',
+        'html' => [
+          'label' => 'Parent Tag',
+          'size' => 6,
+          'maxlength' => 14,
+        ],
+        'pseudoconstant' => [
+          'table' => 'civicrm_tag',
+          'keyColumn' => 'id',
+          'labelColumn' => 'name',
+        ],
+        'add' => '1.1',
         'is_core_field' => TRUE,
         'FKApiName' => 'Tag',
       ],
@@ -116,6 +140,7 @@ function tag_getfields_expectedresult() {
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
         'localizable' => 0,
+        'add' => '2.1',
         'is_core_field' => TRUE,
       ],
       'is_reserved' => [
@@ -127,6 +152,7 @@ function tag_getfields_expectedresult() {
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
         'localizable' => 0,
+        'add' => '3.2',
         'is_core_field' => TRUE,
       ],
       'is_tagset' => [
@@ -138,6 +164,7 @@ function tag_getfields_expectedresult() {
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
         'localizable' => 0,
+        'add' => '3.2',
         'is_core_field' => TRUE,
       ],
       'used_for' => [
@@ -147,7 +174,6 @@ function tag_getfields_expectedresult() {
         'maxlength' => 64,
         'size' => 30,
         'where' => 'civicrm_tag.used_for',
-        'default' => 'NULL',
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
@@ -162,13 +188,14 @@ function tag_getfields_expectedresult() {
           'optionGroupName' => 'tag_used_for',
           'optionEditPath' => 'civicrm/admin/options/tag_used_for',
         ],
+        'add' => '3.2',
         'is_core_field' => TRUE,
         'api.default' => 'civicrm_contact',
       ],
       'created_id' => [
         'name' => 'created_id',
         'type' => 1,
-        'title' => 'Tag Created By',
+        'title' => 'Created By Contact ID',
         'description' => 'FK to civicrm_contact, who created this tag',
         'where' => 'civicrm_tag.created_id',
         'table_name' => 'civicrm_tag',
@@ -176,6 +203,12 @@ function tag_getfields_expectedresult() {
         'bao' => 'CRM_Core_BAO_Tag',
         'localizable' => 0,
         'FKClassName' => 'CRM_Contact_DAO_Contact',
+        'html' => [
+          'label' => 'Created By',
+          'size' => 6,
+          'maxlength' => 14,
+        ],
+        'add' => '3.4',
         'is_core_field' => TRUE,
         'FKApiName' => 'Contact',
       ],
@@ -187,11 +220,11 @@ function tag_getfields_expectedresult() {
         'maxlength' => 255,
         'size' => 45,
         'where' => 'civicrm_tag.color',
-        'default' => 'NULL',
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
         'localizable' => 0,
+        'add' => '4.7',
         'is_core_field' => TRUE,
       ],
       'created_date' => [
@@ -204,6 +237,7 @@ function tag_getfields_expectedresult() {
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
         'localizable' => 0,
+        'add' => '3.4',
         'is_core_field' => TRUE,
       ],
     ],
@@ -213,23 +247,23 @@ function tag_getfields_expectedresult() {
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testTagGetfields"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/TagTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
-*
-* To Learn about the API read
-* https://docs.civicrm.org/dev/en/latest/api/
-*
-* Browse the API on your own site with the API Explorer. It is in the main
-* CiviCRM menu, under: Support > Development > API Explorer.
-*
-* Read more about testing here
-* https://docs.civicrm.org/dev/en/latest/testing/
-*
-* API Standards documentation:
-* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testTagGetfields"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/TagTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

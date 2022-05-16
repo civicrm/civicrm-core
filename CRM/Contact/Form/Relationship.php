@@ -473,7 +473,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   * @param $relationshipList
+   * @param array $relationshipList
    *
    * @return array
    */

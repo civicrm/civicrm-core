@@ -104,7 +104,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    *
    * @param $restrict
    * @param bool $skipPermission
-   * @param null $profileIds
+   * @param int[]|null $profileIds
    *
    * @param bool $isShowEmailTaskLink
    *
@@ -388,11 +388,14 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   }
 
   /**
-   * @param string $suffix
+   * Check template file exists.
    *
-   * @return null|string
+   * @param string|null $suffix
+   *
+   * @return string|null
+   *   Template file path, else null
    */
-  public function checkTemplateFileExists($suffix = '') {
+  public function checkTemplateFileExists($suffix = NULL) {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Page/{$this->_gid}/Dynamic.{$suffix}tpl";
       $template = CRM_Core_Page::getTemplate();

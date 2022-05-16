@@ -15,9 +15,9 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
    *
    * @dataProvider formList
    */
-  public function testOpeningForms(string $url) {
+  public function testOpeningForms(string $url): void {
     $this->createLoggedInUser();
-
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
     $_SERVER['REQUEST_URI'] = $url;
     $urlParts = explode('?', $url);
     $_GET['q'] = $urlParts[0];
@@ -39,7 +39,7 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
   }
 
   /**
-   * Dataprovider for testOpeningForms().
+   * Data provider for testOpeningForms().
    * TODO: Add more forms!
    *
    * @return array
@@ -49,6 +49,9 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
       // Array key is descriptive term to make it clearer which form it is when it fails.
       'Add New Tag' => [
         'civicrm/tag/edit?action=add&parent_id=',
+      ],
+      'Location Type' => [
+        'civicrm/admin/locationType?reset=1',
       ],
       'Assign Account to Financial Type' => [
         'civicrm/admin/financial/financialType/accounts?action=add&reset=1&aid=1',
@@ -61,6 +64,12 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
       ],
       'New Email' => [
         'civicrm/activity/email/add?atype=3&action=add&reset=1&context=standalone',
+      ],
+      'Message Templates' => [
+        'civicrm/admin/messageTemplates?reset=1',
+      ],
+      'Scheduled Jobs' => [
+        'civicrm/admin/job?reset=1',
       ],
     ];
   }

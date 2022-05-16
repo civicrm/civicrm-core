@@ -234,7 +234,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         CRM_Core_Error::statusBounce(ts("This Membership is linked to a contribution. You must have 'delete in CiviContribute' permission in order to delete this record."));
       }
     }
-
+    $mems_by_org = [];
     if ($this->_action & CRM_Core_Action::ADD) {
       if ($this->_contactID) {
         //check whether contact has a current membership so we can alert user that they may want to do a renewal instead
@@ -249,7 +249,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           foreach ($cMemTypes as $memTypeID) {
             $memberorgs[$memTypeID] = CRM_Member_BAO_MembershipType::getMembershipType($memTypeID)['member_of_contact_id'];
           }
-          $mems_by_org = [];
           foreach ($contactMemberships as $mem) {
             $mem['member_of_contact_id'] = $memberorgs[$mem['membership_type_id']] ?? NULL;
             if (!empty($mem['membership_end_date'])) {
@@ -272,7 +271,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             );
             $mems_by_org[$mem['member_of_contact_id']] = $mem;
           }
-          $this->assign('existingContactMemberships', $mems_by_org);
         }
       }
       else {
@@ -287,6 +285,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $resources->addSetting(['existingMems' => $passthru]);
       }
     }
+    $this->assign('existingContactMemberships', $mems_by_org);
 
     if (!$this->_memType) {
       $params = CRM_Utils_Request::exportValues();
@@ -377,10 +376,7 @@ DESC limit 1");
     if (empty($defaults['join_date'])) {
       $defaults['join_date'] = CRM_Utils_Time::date('Y-m-d');
     }
-
-    if (!empty($defaults['membership_end_date'])) {
-      $this->assign('endDate', $defaults['membership_end_date']);
-    }
+    $this->assign('endDate', $defaults['membership_end_date'] ?? NULL);
 
     return $defaults;
   }
@@ -598,7 +594,7 @@ DESC limit 1");
       );
 
       $this->add('select', 'contribution_status_id',
-        ts('Payment Status'), CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses('membership')
+        ts('Payment Status'), CRM_Contribute_BAO_Contribution_Utils::getPendingAndCompleteStatuses()
       );
       $this->add('text', 'check_number', ts('Check Number'),
         CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution', 'check_number')
@@ -940,12 +936,8 @@ DESC limit 1");
     }
 
     $form->assign('module', 'Membership');
-    $form->assign('contactID', $formValues['contact_id']);
-
-    $form->assign('membershipID', $this->getMembershipID());
 
     if (!empty($formValues['contribution_id'])) {
-      $form->assign('contributionID', $formValues['contribution_id']);
       $form->assign('currency', CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $formValues['contribution_id'], 'currency'));
     }
     else {
@@ -987,16 +979,19 @@ DESC limit 1");
 
     CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
-        'groupName' => 'msg_tpl_workflow_membership',
-        'valueName' => 'membership_offline_receipt',
-        'contactId' => $form->_receiptContactId,
+        'workflow' => 'membership_offline_receipt',
         'from' => $receiptFrom,
         'toName' => $form->_contributorDisplayName,
         'toEmail' => $form->_contributorEmail,
         'PDFFilename' => ts('receipt') . '.pdf',
         'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
-        'contributionId' => $formValues['contribution_id'],
         'isTest' => (bool) ($form->_action & CRM_Core_Action::PREVIEW),
+        'modelProps' => [
+          'receiptText' => $this->getSubmittedValue('receipt_text'),
+          'contributionId' => $formValues['contribution_id'],
+          'contactId' => $form->_receiptContactId,
+          'membershipId' => $this->getMembershipID(),
+        ],
       ]
     );
 
@@ -1364,9 +1359,9 @@ DESC limit 1");
     if ($this->getSubmittedValue('send_receipt') && $receiptSend) {
       $formValues['contact_id'] = $this->_contactID;
       $formValues['contribution_id'] = $contributionId;
-      // We really don't need a distinct receipt_text_signup vs receipt_text_renewal as they are
-      // handled in the receipt. But by setting one we avoid breaking templates for now
-      // although at some point we should switch in the templates.
+      // receipt_text_signup is no longer used in receipts from 5.47
+      // but may linger in some sites that have not updated their
+      // templates.
       $formValues['receipt_text_signup'] = $formValues['receipt_text'];
       // send email receipt
       $this->assignBillingName();
@@ -1518,7 +1513,7 @@ DESC limit 1");
   /**
    * Get status message for create action.
    *
-   * @return array|string
+   * @return string
    * @throws \CiviCRM_API3_Exception
    */
   protected function getStatusMessageForCreate(): string {

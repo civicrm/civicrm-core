@@ -18,15 +18,7 @@
 /**
  * This class delegates to the chosen DataSource to grab the data to be imported.
  */
-class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
-
-  private $_dataSource;
-
-  private $_dataSourceIsValid = FALSE;
-
-  private $_dataSourceClassFile;
-
-  private $_dataSourceClass;
+class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
 
   /**
    * Get any smarty elements that may not be present in the form.
@@ -59,7 +51,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     }
 
     while ($file = readdir($handler)) {
-      if ($file != '.' && $file != '..' &&
+      if ($file !== '.' && $file !== '..' &&
         in_array($file, $errorFiles) && !is_writable($config->uploadDir . $file)
       ) {
         $results[] = $file;
@@ -72,65 +64,19 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
         2 => $config->uploadDir,
       ]));
     }
-
-    $this->_dataSourceIsValid = FALSE;
-    $this->_dataSource = CRM_Utils_Request::retrieveValue(
-      'dataSource',
-      'String',
-      NULL,
-      FALSE,
-      'GET'
-    );
-
-    $this->_params = $this->controller->exportValues($this->_name);
-    if (!$this->_dataSource) {
-      //considering dataSource as base criteria instead of hidden_dataSource.
-      $this->_dataSource = CRM_Utils_Array::value('dataSource',
-        $_POST,
-        CRM_Utils_Array::value('dataSource',
-          $this->_params
-        )
-      );
-      $this->assign('showOnlyDataSourceFormPane', FALSE);
-    }
-    else {
-      $this->assign('showOnlyDataSourceFormPane', TRUE);
-    }
-
-    $dataSources = $this->_getDataSources();
-    if ($this->_dataSource && isset($dataSources[$this->_dataSource])) {
-      $this->_dataSourceIsValid = TRUE;
-      $this->assign('showDataSourceFormPane', TRUE);
-      $dataSourcePath = explode('_', $this->_dataSource);
-      $templateFile = 'CRM/Contact/Import/Form/' . $dataSourcePath[3] . ".tpl";
-    }
-    elseif ($this->_dataSource) {
-      $this->invalidConfig('Invalid data source');
-    }
-    $this->assign('dataSourceFormTemplateFile', $templateFile ?? NULL);
   }
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
 
-    // If there's a dataSource in the query string, we need to load
-    // the form from the chosen DataSource class
-    if ($this->_dataSourceIsValid) {
-      $this->_dataSourceClassFile = str_replace('_', '/', $this->_dataSource) . ".php";
-      require_once $this->_dataSourceClassFile;
-      $this->_dataSourceClass = new $this->_dataSource();
-      $this->_dataSourceClass->buildQuickForm($this);
-    }
+    $this->assign('urlPath', 'civicrm/import/datasource');
+    $this->assign('urlPathVar', 'snippet=4&user_job_id=' . $this->get('user_job_id'));
 
-    // Get list of data sources and display them as options
-    $dataSources = $this->_getDataSources();
-
-    $this->assign('urlPath', "civicrm/import");
-    $this->assign('urlPathVar', 'snippet=4');
-
-    $this->add('select', 'dataSource', ts('Data Source'), $dataSources, TRUE,
+    $this->add('select', 'dataSource', ts('Data Source'), $this->getDataSources(), TRUE,
       ['onchange' => 'buildDataSourceFormBlock(this.value);']
     );
 
@@ -145,7 +91,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     $mappingArray = CRM_Core_BAO_Mapping::getMappings('Import Contact');
 
     $this->assign('savedMapping', $mappingArray);
-    $this->addElement('select', 'savedMapping', ts('Mapping Option'), ['' => ts('- select -')] + $mappingArray);
+    $this->addElement('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappingArray);
 
     $js = ['onClick' => "buildSubTypes();buildDedupeRules();"];
     // contact types option
@@ -164,12 +110,11 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     }
     $this->addRadio('contactType', ts('Contact Type'), $contactTypeOptions, [], NULL, FALSE, $contactTypeAttributes);
 
-    $this->addElement('select', 'subType', ts('Subtype'));
-    $this->addElement('select', 'dedupe', ts('Dedupe Rule'));
+    $this->addElement('select', 'contactSubType', ts('Subtype'));
+    $this->addElement('select', 'dedupe_rule_id', ts('Dedupe Rule'));
 
     CRM_Core_Form_Date::buildAllowedDateFormats($this);
 
-    $config = CRM_Core_Config::singleton();
     $geoCode = FALSE;
     if (CRM_Utils_GeocodeProvider::getUsableClassName()) {
       $geoCode = TRUE;
@@ -182,6 +127,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     if (Civi::settings()->get('address_standardization_provider') === 'USPS') {
       $this->addElement('checkbox', 'disableUSPS', ts('Disable USPS address validation during import?'));
     }
+    $this->buildDataSourceFields();
 
     $this->addButtons([
       [
@@ -200,21 +146,17 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
   /**
    * Set the default values of various form elements.
    *
-   * access        public
-   *
    * @return array
    *   reference to the array of default values
    */
   public function setDefaultValues() {
-    $config = CRM_Core_Config::singleton();
     $defaults = [
-      'dataSource' => 'CRM_Import_DataSource_CSV',
+      'dataSource' => $this->getDefaultDataSource(),
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
       'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
-      'fieldSeparator' => $config->fieldSeparator,
+      'fieldSeparator' => CRM_Core_Config::singleton()->fieldSeparator,
     ];
 
-    $this->assign('loadedMapping', $this->get('loadedMapping'));
     if ($this->get('loadedMapping')) {
       $defaults['savedMapping'] = $this->get('loadedMapping');
     }
@@ -223,153 +165,71 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
   }
 
   /**
-   * @return array
-   * @throws Exception
-   */
-  private function _getDataSources() {
-    // Hmm... file-system scanners don't really belong in forms...
-    if (isset(Civi::$statics[__CLASS__]['datasources'])) {
-      return Civi::$statics[__CLASS__]['datasources'];
-    }
-
-    // Open the data source dir and scan it for class files
-    global $civicrm_root;
-    $dataSourceDir = $civicrm_root . DIRECTORY_SEPARATOR . 'CRM' . DIRECTORY_SEPARATOR . 'Import' . DIRECTORY_SEPARATOR . 'DataSource' . DIRECTORY_SEPARATOR;
-    $dataSources = [];
-    if (!is_dir($dataSourceDir)) {
-      $this->invalidConfig("Import DataSource directory $dataSourceDir does not exist");
-    }
-    if (!$dataSourceHandle = opendir($dataSourceDir)) {
-      $this->invalidConfig("Unable to access DataSource directory $dataSourceDir");
-    }
-
-    while (($dataSourceFile = readdir($dataSourceHandle)) !== FALSE) {
-      $fileType = filetype($dataSourceDir . $dataSourceFile);
-      $matches = [];
-      if (($fileType === 'file' || $fileType === 'link') &&
-        preg_match('/^(.+)\.php$/', $dataSourceFile, $matches)
-      ) {
-        $dataSourceClass = "CRM_Import_DataSource_" . $matches[1];
-        require_once $dataSourceDir . DIRECTORY_SEPARATOR . $dataSourceFile;
-        $object = new $dataSourceClass();
-        $info = $object->getInfo();
-        if ($object->checkPermission()) {
-          $dataSources[$dataSourceClass] = $info['title'];
-        }
-      }
-    }
-    closedir($dataSourceHandle);
-
-    Civi::$statics[__CLASS__]['datasources'] = $dataSources;
-    return $dataSources;
-  }
-
-  /**
    * Call the DataSource's postProcess method.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function postProcess() {
     $this->controller->resetPage('MapField');
-
-    if ($this->_dataSourceIsValid) {
-      // Setup the params array
-      $this->_params = $this->controller->exportValues($this->_name);
-
-      $storeParams = [
-        'onDuplicate' => $this->exportValue('onDuplicate'),
-        'dedupe' => $this->exportValue('dedupe'),
-        'contactType' => $this->exportValue('contactType'),
-        'contactSubType' => $this->exportValue('subType'),
-        'dateFormats' => $this->exportValue('dateFormats'),
-        'savedMapping' => $this->exportValue('savedMapping'),
-      ];
-
-      foreach ($storeParams as $storeName => $value) {
-        $this->set($storeName, $value);
-      }
-      $this->set('disableUSPS', !empty($this->_params['disableUSPS']));
-
-      $this->set('dataSource', $this->_params['dataSource']);
-      $this->set('skipColumnHeader', CRM_Utils_Array::value('skipColumnHeader', $this->_params));
-
-      CRM_Core_Session::singleton()->set('dateTypes', $storeParams['dateFormats']);
-
-      // Get the PEAR::DB object
-      $dao = new CRM_Core_DAO();
-      $db = $dao->getDatabaseConnection();
-
-      //hack to prevent multiple tables.
-      $this->_params['import_table_name'] = $this->get('importTableName');
-      if (!$this->_params['import_table_name']) {
-        $this->_params['import_table_name'] = 'civicrm_import_job_' . md5(uniqid(rand(), TRUE));
-      }
-
-      $this->_dataSourceClass->postProcess($this->_params, $db, $this);
-
-      // We should have the data in the DB now, parse it
-      $importTableName = $this->get('importTableName');
-      $fieldNames = $this->_prepareImportTable($db, $importTableName);
-      $mapper = [];
-
-      $parser = new CRM_Contact_Import_Parser_Contact($mapper);
-      $parser->setMaxLinesToProcess(100);
-      $parser->run($importTableName,
-        $mapper,
-        CRM_Import_Parser::MODE_MAPFIELD,
-        $storeParams['contactType'],
-        $fieldNames['pk'],
-        $fieldNames['status'],
-        CRM_Import_Parser::DUPLICATE_SKIP,
-        NULL, NULL, FALSE,
-        CRM_Contact_Import_Parser::DEFAULT_TIMEOUT,
-        $storeParams['contactSubType'],
-        $storeParams['dedupe']
-      );
-
-      // add all the necessary variables to the form
-      $parser->set($this);
+    if (!$this->getUserJobID()) {
+      $this->createUserJob();
     }
     else {
-      $this->invalidConfig("Invalid DataSource on form post. This shouldn't happen!");
+      $this->flushDataSource();
+      $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
     }
+    // Setup the params array
+    $this->_params = $this->controller->exportValues($this->_name);
+
+    // @todo - this params are being set here because they were / possibly still
+    // are in some places being accessed by forms later in the flow
+    // ie CRM_Contact_Import_Form_MapField, CRM_Contact_Import_Form_Preview
+    // or CRM_Contact_Import_Form_Summary using `$this->get()
+    // which was the old way of saving values submitted on this form such that
+    // the other forms could access them. Now they should use
+    // `getSubmittedValue` or simply not get them if the only
+    // reason is to pass to the Parser which can itself
+    // call 'getSubmittedValue'
+    // Once the mentioned forms no longer call $this->get() all this 'setting'
+    // is obsolete.
+    $storeParams = [
+      'onDuplicate' => $this->getSubmittedValue('onDuplicate'),
+      'dedupe' => $this->getSubmittedValue('dedupe_rule_id'),
+      'contactType' => $this->getSubmittedValue('contactType'),
+      'dateFormats' => $this->getSubmittedValue('dateFormats'),
+      'savedMapping' => $this->getSubmittedValue('savedMapping'),
+    ];
+
+    foreach ($storeParams as $storeName => $value) {
+      $this->set($storeName, $value);
+    }
+    CRM_Core_Session::singleton()->set('dateTypes', $storeParams['dateFormats']);
+
+    $this->instantiateDataSource();
+
+    $mapper = [];
+
+    $parser = new CRM_Contact_Import_Parser_Contact($mapper);
+    $parser->setMaxLinesToProcess(100);
+    $parser->setUserJobID($this->getUserJobID());
+    $parser->run(
+      [],
+      CRM_Import_Parser::MODE_MAPFIELD
+    );
+
   }
 
   /**
-   * Add a PK and status column to the import table so we can track our progress.
-   * Returns the name of the primary key and status columns
+   * Instantiate the datasource.
    *
-   * @param $db
-   * @param string $importTableName
+   * This gives the datasource a chance to do any table creation etc.
    *
-   * @return array
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  private function _prepareImportTable($db, $importTableName) {
-    /* TODO: Add a check for an existing _status field;
-     *  if it exists, create __status instead and return that
-     */
-
-    $statusFieldName = '_status';
-    $primaryKeyName = '_id';
-
-    $this->set('primaryKeyName', $primaryKeyName);
-    $this->set('statusFieldName', $statusFieldName);
-
-    /* Make sure the PK is always last! We rely on this later.
-     * Should probably stop doing that at some point, but it
-     * would require moving to associative arrays rather than
-     * relying on numerical order of the fields. This could in
-     * turn complicate matters for some DataSources, which
-     * would also not be good. Decisions, decisions...
-     */
-
-    $alterQuery = "ALTER TABLE $importTableName
-                       ADD COLUMN $statusFieldName VARCHAR(32)
-                            DEFAULT 'NEW' NOT NULL,
-                       ADD COLUMN ${statusFieldName}Msg TEXT,
-                       ADD COLUMN $primaryKeyName INT PRIMARY KEY NOT NULL
-                               AUTO_INCREMENT";
-    $db->query($alterQuery);
-
-    return ['status' => $statusFieldName, 'pk' => $primaryKeyName];
+  private function instantiateDataSource(): void {
+    $this->getDataSourceObject()->initialize();
   }
 
   /**

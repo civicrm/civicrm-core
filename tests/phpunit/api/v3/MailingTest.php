@@ -77,15 +77,21 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_mailing_create.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
-  public function testMailerCreateSuccess(): void {
+  public function testMailerCreateSuccess(int $version): void {
+    $this->_apiversion = $version;
+    $this->enableCiviCampaign();
     $this->callAPISuccess('Campaign', 'create', ['name' => 'big campaign', 'title' => 'abc']);
     $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + ['scheduled_date' => 'now', 'campaign_id' => 'big campaign'], __FUNCTION__, __FILE__);
-    $jobs = $this->callAPISuccess('mailing_job', 'get', ['mailing_id' => $result['id']]);
+    $jobs = $this->callAPISuccess('MailingJob', 'get', ['mailing_id' => $result['id']]);
     $this->assertEquals(1, $jobs['count']);
     // return isn't working on this in getAndCheck so lets not check it for now
     unset($this->_params['created_id']);
-    $this->getAndCheck($this->_params, $result['id'], 'mailing');
+    $this->getAndCheck($this->_params, $result['id'], 'Mailing');
   }
 
   /**
@@ -103,9 +109,12 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   /**
    * Create a completed mailing (e.g when importing from a provider).
    *
-   * @throws \CRM_Core_Exception
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
-  public function testMailerCreateCompleted() {
+  public function testMailerCreateCompleted(int $version): void {
+    $this->_apiversion = $version;
     $this->_params['body_html'] = 'I am completed so it does not matter if there is an opt out link since I have already been sent by another system';
     $this->_params['is_completed'] = 1;
     $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + ['scheduled_date' => 'now'], __FUNCTION__, __FILE__);
@@ -120,7 +129,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   /**
    * Per CRM-20316 the mailing should still create without created_id (not mandatory).
    */
-  public function testMailerCreateSuccessNoCreatedID() {
+  public function testMailerCreateSuccessNoCreatedID(): void {
     unset($this->_params['created_id']);
     $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + ['scheduled_date' => 'now'], __FUNCTION__, __FILE__);
     $this->getAndCheck($this->_params, $result['id'], 'mailing');
@@ -295,37 +304,6 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertRegexp('!>Forward this email</a>!', $previewResult['values']['body_html']);
     $this->assertRegexp('!<a href="([^"]+)civicrm/mailing/forward&amp;amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
     $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
-  }
-
-  /**
-   *
-   */
-  public function testMailerPreviewExtraScheme() {
-    try {
-      \Civi::settings()->set('flexmailer_traditional', 'bao');
-
-      $contactID = $this->individualCreate();
-      $displayName = $this->callAPISuccess('contact', 'get', ['id' => $contactID]);
-      $displayName = $displayName['values'][$contactID]['display_name'];
-      $this->assertNotEmpty($displayName);
-
-      $params = $this->_params;
-      $params['body_html'] = '<a href="http://{action.forward}">Forward this email written in ckeditor</a>';
-      $params['api.Mailing.preview'] = [
-        'id' => '$value.id',
-        'contact_id' => $contactID,
-      ];
-      $params['options']['force_rollback'] = 1;
-
-      $result = $this->callAPISuccess('mailing', 'create', $params);
-      $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
-      $this->assertRegexp('!>Forward this email written in ckeditor</a>!', $previewResult['values']['body_html']);
-      $this->assertRegexp('!<a href="([^"]+)civicrm/mailing/forward&amp;amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
-      $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
-
-    } finally {
-      \Civi::settings()->revert('flexmailer_traditional');
-    }
   }
 
   public function testMailerPreviewUnknownContact(): void {
@@ -827,6 +805,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
     $result = $this->callAPISuccess('mailing', 'stats', ['mailing_id' => $mail['id']]);
     $expectedResult = [
       //since among 100 mails 20 has been bounced
+      'Recipients' => 100,
       'Delivered' => 80,
       'Bounces' => 20,
       'Opened' => 20,

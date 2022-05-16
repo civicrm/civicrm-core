@@ -16,7 +16,7 @@
       {$form.prefix_id.html}
     </td>
     {/if}
-    {if !empty($form.formal_title)}
+    {if $form.formal_title}
     <td>
       {$form.formal_title.label}<br/>
       {$form.formal_title.html}

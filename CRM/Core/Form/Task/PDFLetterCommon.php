@@ -196,7 +196,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    * @param array $fields
    *   The input form values.
    * @param array $files
-   * @param array $self
+   * @param self $self
    *   Additional values form 'this'.
    *
    * @return bool
@@ -325,7 +325,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
   /**
    * @deprecated
    *
-   * @param $message
+   * @param string $message
    */
   public static function formatMessage(&$message) {
     $newLineOperators = [

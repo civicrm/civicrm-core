@@ -114,6 +114,7 @@
   <field>
     <name>is_public</name>
     <type>boolean</type>
+    <required>true</required>
     <title>Is Event Public</title>
     <default>1</default>
     <comment>Public events will be included in the iCal feeds. Access to private event information may be limited using ACLs.</comment>
@@ -153,6 +154,7 @@
   <field>
     <name>is_online_registration</name>
     <type>boolean</type>
+    <required>true</required>
     <title>Is Online Registration</title>
     <default>0</default>
     <comment>If true, include registration link on Event Info page.</comment>
@@ -223,6 +225,7 @@
     <name>is_monetary</name>
     <title>Is this a PAID event?</title>
     <type>boolean</type>
+    <required>true</required>
     <default>0</default>
     <comment>If true, one or more fee amounts must be set and a Payment Processor must be configured for Online Event Registration.</comment>
     <add>1.7</add>
@@ -267,6 +270,7 @@
     <name>is_map</name>
     <title>Map Enabled</title>
     <type>boolean</type>
+    <required>true</required>
     <default>0</default>
     <comment>Include a map block on the Event Information page when geocode info is available and a mapping provider has been specified?</comment>
     <add>1.7</add>
@@ -278,6 +282,7 @@
     <name>is_active</name>
     <title>Is Active</title>
     <type>boolean</type>
+    <required>true</required>
     <default>0</default>
     <comment>Is this Event enabled or disabled/cancelled?</comment>
     <add>1.7</add>
@@ -301,6 +306,7 @@
   <field>
     <name>is_show_location</name>
     <type>boolean</type>
+    <required>true</required>
     <title>show location</title>
     <default>1</default>
     <comment>If true, show event location.</comment>
@@ -410,6 +416,7 @@
   <field>
     <name>is_email_confirm</name>
     <type>boolean</type>
+    <required>true</required>
     <title>Is confirm email</title>
     <default>0</default>
     <comment>If true, confirmation is automatically emailed to contact on successful registration.</comment>
@@ -533,6 +540,7 @@
     <name>is_pay_later</name>
     <title>Pay Later Allowed</title>
     <type>boolean</type>
+    <required>true</required>
     <default>0</default>
     <comment>if true - allows the user to send payment directly to the org later</comment>
     <add>2.0</add>
@@ -566,6 +574,7 @@
     <name>is_partial_payment</name>
     <title>Partial Payments Enabled</title>
     <type>boolean</type>
+    <required>true</required>
     <default>0</default>
     <comment>is partial payment enabled for this event</comment>
     <add>4.3</add>
@@ -610,6 +619,7 @@
     <name>is_multiple_registrations</name>
     <title>Allow Multiple Registrations</title>
     <type>boolean</type>
+    <required>true</required>
     <default>0</default>
     <comment>if true - allows the user to register multiple participants for event</comment>
     <add>2.1</add>
@@ -628,6 +638,7 @@
   <field>
     <name>allow_same_participant_emails</name>
     <type>boolean</type>
+    <required>true</required>
     <title>Does Event allow multiple registrations from same email address?</title>
     <default>0</default>
     <comment>if true - allows the user to register multiple registrations from same email address.</comment>
@@ -640,6 +651,8 @@
     <name>has_waitlist</name>
     <title>Waitlist Enabled</title>
     <type>boolean</type>
+    <required>true</required>
+    <default>0</default>
     <comment>Whether the event has waitlist support.</comment>
     <add>3.0</add>
     <html>
@@ -649,6 +662,8 @@
   <field>
     <name>requires_approval</name>
     <type>boolean</type>
+    <required>true</required>
+    <default>0</default>
     <comment>Whether participants require approval before they can finish registering.</comment>
     <add>3.0</add>
     <html>
@@ -669,6 +684,7 @@
   <field>
     <name>allow_selfcancelxfer</name>
     <type>boolean</type>
+    <required>true</required>
     <default>0</default>
     <title>Allow Self-service Cancellation or Transfer</title>
     <comment>Allow self service cancellation or transfer for event?</comment>
@@ -718,6 +734,7 @@
     <name>is_template</name>
     <title>Is an Event Template</title>
     <type>boolean</type>
+    <required>true</required>
     <default>0</default>
     <required>true</required>
     <comment>whether the event has template</comment>
@@ -814,6 +831,7 @@
     <name>is_share</name>
     <title>Is shared through social media</title>
     <type>boolean</type>
+    <required>true</required>
     <default>1</default>
     <comment>Can people share the event through social media?</comment>
     <add>4.1</add>
@@ -825,6 +843,7 @@
     <name>is_confirm_enabled</name>
     <title>Is the booking confirmation screen enabled?</title>
     <type>boolean</type>
+    <required>true</required>
     <default>1</default>
     <comment>If false, the event booking confirmation screen gets skipped</comment>
     <add>4.5</add>
@@ -887,6 +906,7 @@
     <name>is_billing_required</name>
     <title>Is billing block required</title>
     <type>boolean</type>
+    <required>true</required>
     <default>0</default>
     <comment>if true than billing block is required this event</comment>
     <add>4.6</add>

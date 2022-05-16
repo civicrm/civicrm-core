@@ -10,11 +10,25 @@
  */
 
 /**
- * The queue runner is a helper which runs all jobs in a queue.
+ * `CRM_Queue_Runner` runs a list tasks from a queue. It originally supported the database-upgrade
+ * queue. Consequently, this runner is optimal for queues which are:
  *
- * The queue runner is most useful for one-off queues (such as an upgrade);
- * if the intention is to develop a dedicated, long-running worker thread,
- * then one should consider writing a new queue consumer.
+ * - Short lived and discrete. You have a fixed list of tasks that will be run to completion.
+ * - Strictly linear. Tasks must run 1-by-1. Often, one task depends on the success of a previous task.
+ * - Slightly dangerous. An error, omission, or mistake indicates that the database is in an
+ *   inconsistent state. Errors call for skilled human intervention.
+ *
+ * This runner supports a few modes of operation, eg
+ *
+ * - `runAllViaWeb()`: Use a web-browser and a series of AJAX requests to perform all steps.
+ *   If there is an error, prompt the sysadmin/user to decide how to handle it.
+ * - `runAll()`: Run all tasks, 1-by-1, back-to-back. If there is an error, give up.
+ *   This is used by some CLI upgrades.
+ *
+ * This runner is not appropriate for all queues or workloads, so you might choose or create
+ * a different runner. For example, `CRM_Queue_Autorunner` is geared toward background task lists.
+ *
+ * @see CRM_Queue_Autorunner
  */
 class CRM_Queue_Runner {
 
@@ -203,7 +217,7 @@ class CRM_Queue_Runner {
           $exception = new Exception('Task returned false');
         }
       }
-      catch (Exception$e) {
+      catch (Exception $e) {
         $isOK = FALSE;
         $exception = $e;
       }
@@ -302,7 +316,7 @@ class CRM_Queue_Runner {
    *
    * @param bool $isOK
    *   TRUE if the task completed successfully.
-   * @param Exception|NULL $exception
+   * @param Exception|null $exception
    *   If applicable, an unhandled exception that arose during execution.
    *
    * @return array

@@ -59,8 +59,14 @@ class GroupContact extends Generic\DAOEntity {
   public static function getInfo() {
     $info = parent::getInfo();
     $info['bridge'] = [
-      'group_id' => ['description' => ts('Static (non-smart) group contacts')],
-      'contact_id' => ['description' => ts('Static (non-smart) group contacts')],
+      'group_id' => [
+        'to' => 'contact_id',
+        'description' => ts('Static (non-smart) group contacts'),
+      ],
+      'contact_id' => [
+        'to' => 'group_id',
+        'description' => ts('Static (non-smart) group contacts'),
+      ],
     ];
     return $info;
   }

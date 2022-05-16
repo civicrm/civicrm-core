@@ -30,7 +30,7 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
    * No of website blocks for inline edit.
    * @var int
    */
-  private $_blockCount = 6;
+  private $_blockCount = 26;
 
   /**
    * Call preprocess.

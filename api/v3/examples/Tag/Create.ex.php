@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the Tag.create API.
  *
@@ -11,7 +16,7 @@ function tag_create_example() {
     'description' => 'Outside undie-wearers',
   ];
 
-  try{
+  try {
     $result = civicrm_api3('Tag', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -49,9 +54,9 @@ function tag_create_expectedresult() {
         'name' => 'Super Heros',
         'description' => 'Outside undie-wearers',
         'parent_id' => '',
-        'is_selectable' => '1',
-        'is_reserved' => 0,
-        'is_tagset' => 0,
+        'is_selectable' => '',
+        'is_reserved' => '',
+        'is_tagset' => '',
         'used_for' => 'civicrm_contact',
         'created_id' => '',
         'color' => '',
@@ -64,23 +69,23 @@ function tag_create_expectedresult() {
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testCreate"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/TagTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
-*
-* To Learn about the API read
-* https://docs.civicrm.org/dev/en/latest/api/
-*
-* Browse the API on your own site with the API Explorer. It is in the main
-* CiviCRM menu, under: Support > Development > API Explorer.
-*
-* Read more about testing here
-* https://docs.civicrm.org/dev/en/latest/testing/
-*
-* API Standards documentation:
-* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testCreate"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/TagTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

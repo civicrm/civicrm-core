@@ -148,6 +148,14 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
   protected $_openedPanes = [];
 
+  public function __construct($state = NULL, $action = CRM_Core_Action::NONE, $method = 'post', $name = NULL) {
+    parent::__construct($state, $action, $method, $name);
+    // Because this is a static variable, reset it in case it got changed elsewhere.
+    // Should only come up during unit tests.
+    // Note the only subclass that seems to set this does it in preprocess (custom searches)
+    self::$_selectorName = 'CRM_Contact_Selector';
+  }
+
   /**
    * Explicitly declare the entity api name.
    */
@@ -392,9 +400,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'name' => CRM_Contact_BAO_SavedSearch::getName($this->_ssID, 'title'),
         'search_custom_id' => $search_custom_id,
       ];
-      $this->assign_by_ref('savedSearch', $savedSearchValues);
-      $this->assign('ssID', $this->_ssID);
     }
+    $this->assign('savedSearch', $savedSearchValues ?? NULL);
+    $this->assign('ssID', $this->_ssID);
 
     if ($this->_context === 'smog') {
       // CRM-11788, we might want to do this for all of search where force=1
@@ -429,11 +437,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $ssID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $this->_groupID, 'saved_search_id');
         $this->assign('ssID', $ssID);
 
-        //get the saved search edit link
-        if ($ssID) {
-          $this->_ssID = $ssID;
-          $this->assign('editSmartGroupURL', CRM_Contact_BAO_SavedSearch::getEditSearchUrl($ssID));
-        }
+        $this->_ssID = $ssID;
+        $this->assign('editSmartGroupURL', $ssID ? CRM_Contact_BAO_SavedSearch::getEditSearchUrl($ssID) : FALSE);
 
         // Set dynamic page title for 'Show Members of Group'
         $this->setTitle(ts('Contacts in Group: %1', [1 => $this->_group[$this->_groupID]]));

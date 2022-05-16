@@ -104,11 +104,6 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       //mapping is to be loaded from database
 
-      $params = array('id' => $savedMapping);
-      $temp = [];
-      $mappingDetails = CRM_Core_BAO_Mapping::retrieve($params, $temp);
-
-      $this->assign('loadedMapping', $mappingDetails->name);
       $this->set('loadedMapping', $savedMapping);
 
       $getMappingName = new CRM_Core_DAO_Mapping();
@@ -119,7 +114,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
         $mapperName = $getMappingName->name;
       }
 
-      $this->assign('savedName', $mapperName);
+      $this->assign('savedMappingName', $mapperName);
 
       $this->add('hidden', 'mappingId', $savedMapping);
 
@@ -138,7 +133,6 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     $hasHeaders = !empty($this->_columnHeaders);
     $headerPatterns = $this->get('headerPatterns');
     $dataPatterns = $this->get('dataPatterns');
-    $hasLocationTypes = $this->get('fieldTypes');
     /* Initialize all field usages to false */
 
     foreach ($mapperKeys as $key) {
@@ -268,7 +262,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
    *   Posted values of the form.
    *
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    *   list of errors to be posted back to the form
@@ -371,11 +365,6 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
       return;
     }
 
-    $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
-    $separator = $this->controller->exportValue('DataSource', 'fieldSeparator');
-    $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
-
-    $mapperKeys = [];
     $mapper = [];
     $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
     $mapperKeysMain = [];
@@ -409,12 +398,6 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
         $updateMappingFields->id = $mappingFieldsId[$i];
         $updateMappingFields->mapping_id = $params['mappingId'];
         $updateMappingFields->column_number = $i;
-
-        $explodedValues = explode('_', $mapperKeys[$i][0]);
-        $id = $explodedValues[0] ?? NULL;
-        $first = $explodedValues[1] ?? NULL;
-        $second = $explodedValues[2] ?? NULL;
-
         $updateMappingFields->name = $mapper[$i];
         $updateMappingFields->save();
       }
@@ -433,12 +416,6 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
         $saveMappingFields = new CRM_Core_DAO_MappingField();
         $saveMappingFields->mapping_id = $saveMapping->id;
         $saveMappingFields->column_number = $i;
-
-        $explodedValues = explode('_', $mapperKeys[$i][0]);
-        $id = $explodedValues[0] ?? NULL;
-        $first = $explodedValues[1] ?? NULL;
-        $second = $explodedValues[2] ?? NULL;
-
         $saveMappingFields->name = $mapper[$i];
         $saveMappingFields->save();
       }
@@ -446,7 +423,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     $parser = new CRM_Event_Import_Parser_Participant($mapperKeysMain);
-    $parser->run($fileName, $separator, $mapper, $skipColumnHeader,
+    $parser->run($this->getSubmittedValue('uploadFile'), $this->getSubmittedValue('fieldSeparator'), $mapper, $this->getSubmittedValue('skipColumnHeader'),
       CRM_Import_Parser::MODE_PREVIEW, $this->get('contactType')
     );
     // add all the necessary variables to the form

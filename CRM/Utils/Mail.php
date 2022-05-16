@@ -159,6 +159,7 @@ class CRM_Utils_Mail {
    *   fullPath : complete pathname to the file
    *   mime_type: mime type of the attachment
    *   cleanName: the user friendly name of the attachmment
+   * contactId : contact id to send the email to (optional)
    *
    * @param array $params
    *   (by reference).
@@ -183,13 +184,19 @@ class CRM_Utils_Mail {
       return FALSE;
     }
 
-    $textMessage = $params['text'] ?? NULL;
-    $htmlMessage = $params['html'] ?? NULL;
-    $attachments = $params['attachments'] ?? NULL;
-
-    // CRM-6224
-    if (trim(CRM_Utils_String::htmlToText($htmlMessage)) == '') {
+    $htmlMessage = $params['html'] ?? FALSE;
+    if (trim(CRM_Utils_String::htmlToText((string) $htmlMessage)) === '') {
       $htmlMessage = FALSE;
+    }
+    $attachments = $params['attachments'] ?? NULL;
+    if (!empty($params['text'])) {
+      $textMessage = $params['text'];
+    }
+    else {
+      $textMessage = CRM_Utils_String::htmlToText($htmlMessage);
+      // Render the &amp; entities in text mode, so that the links work.
+      // This is copied from the Action Schedule send code.
+      $textMessage = str_replace('&amp;', '&', $textMessage);
     }
 
     $headers = [];
@@ -436,7 +443,7 @@ class CRM_Utils_Mail {
 
   /**
    * @param string $name
-   * @param $email
+   * @param string $email
    * @param bool $useQuote
    *
    * @return null|string

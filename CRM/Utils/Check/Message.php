@@ -149,19 +149,22 @@ class CRM_Utils_Check_Message {
    *
    * @param string $title
    *   Text displayed on the status message as a link or button.
-   * @param string $confirmation
+   * @param string|false $confirmation
    *   Optional confirmation message before performing action
    * @param string $type
    *   Currently supports: api3 or href
    * @param array $params
    *   Params to be passed to CRM.api3 or CRM.url depending on type
+   * @param string $icon
+   *   Fa-icon class for the button
    */
-  public function addAction($title, $confirmation, $type, $params) {
+  public function addAction($title, $confirmation, $type, $params, $icon = NULL) {
     $this->actions[] = [
       'title' => $title,
       'confirm' => $confirmation,
       'type' => $type,
       'params' => $params,
+      'icon' => $icon,
     ];
   }
 

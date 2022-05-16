@@ -40,8 +40,8 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
   protected $_revertedId;
 
   /**
-   * @param null $title
-   * @param null $mode
+   * @param string $title
+   * @param int $mode
    */
   public function __construct($title = NULL, $mode = NULL) {
     parent::__construct($title, $mode);
@@ -252,7 +252,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
     // find all objects
     $messageTemplate->find();
     while ($messageTemplate->fetch()) {
-      $values[$messageTemplate->id] = [];
+      $values[$messageTemplate->id] = ['class' => ''];
       CRM_Core_DAO::storeValues($messageTemplate, $values[$messageTemplate->id]);
       // populate action links
       $this->action($messageTemplate, $action, $values[$messageTemplate->id], $links, CRM_Core_Permission::EDIT);

@@ -89,7 +89,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    * Check if a resource url is within the drupal directory and format appropriately.
    *
-   * @param $url (reference)
+   * @param string $url
+   *   URL (reference).
    *
    * @return bool
    *   TRUE for internal paths, FALSE for external. The drupal_add_js fn is able to add js more

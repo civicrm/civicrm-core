@@ -27,7 +27,7 @@
  *   API result array
  */
 function civicrm_api3_rule_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Rule');
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'DedupeRule');
 }
 
 /**
@@ -67,5 +67,5 @@ function civicrm_api3_rule_delete($params) {
  *   API result array
  */
 function civicrm_api3_rule_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Rule');
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'DedupeRule');
 }

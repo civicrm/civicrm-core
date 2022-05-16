@@ -316,7 +316,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
             ->tokens('contact', $token, "cs={$cs}");
         }
         elseif ($token === 'signature_html') {
-          $row->format('text/html')->tokens('contact', $token, html_entity_decode($row->context['contact'][$token]));
+          $row->format('text/html')->tokens('contact', $token, html_entity_decode($this->getFieldValue($row, $token)));
         }
         else {
           parent::evaluateToken($row, $this->entity, $token, $row->context['contact']);

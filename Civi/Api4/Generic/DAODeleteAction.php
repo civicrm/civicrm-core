@@ -14,6 +14,7 @@ namespace Civi\Api4\Generic;
 
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Api4\Utils\ReflectionUtils;
 
 /**
  * Delete one or more $ENTITIES.
@@ -56,7 +57,8 @@ class DAODeleteAction extends AbstractBatchAction {
     $ids = [];
     $baoName = $this->getBaoName();
 
-    if ($this->getEntityName() !== 'EntityTag' && method_exists($baoName, 'del')) {
+    // Use BAO::del() method if it is not deprecated
+    if (method_exists($baoName, 'del') && !ReflectionUtils::isMethodDeprecated($baoName, 'del')) {
       foreach ($items as $item) {
         $args = [$item['id']];
         $bao = call_user_func_array([$baoName, 'del'], $args);

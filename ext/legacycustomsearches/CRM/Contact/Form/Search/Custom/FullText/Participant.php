@@ -29,9 +29,8 @@ class CRM_Contact_Form_Search_Custom_FullText_Participant extends CRM_Contact_Fo
    * @return bool
    */
   public function isActive() {
-    $config = CRM_Core_Config::singleton();
-    return in_array('CiviEvent', $config->enableComponents) &&
-    CRM_Core_Permission::check('view event participants');
+    return CRM_Core_Component::isEnabled('CiviEvent') &&
+      CRM_Core_Permission::check('view event participants');
   }
 
   /**

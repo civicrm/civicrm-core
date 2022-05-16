@@ -9,10 +9,10 @@
       row: '<',
       col: '<',
       cancel: '&',
-      onSuccess: '&'
+      doSave: '&'
     },
     templateUrl: '~/crmSearchDisplay/crmSearchDisplayEditable.html',
-    controller: function($scope, $element, crmApi4, crmStatus) {
+    controller: function($scope, $element, crmApi4) {
       var ctrl = this,
         initialValue,
         col;
@@ -29,6 +29,7 @@
           options: col.edit.options,
           fk_entity: col.edit.fk_entity,
           serialize: col.edit.serialize,
+          nullable: col.edit.nullable
         };
 
         $(document).on('keydown.crmSearchDisplayEditable', function(e) {
@@ -36,8 +37,6 @@
             $scope.$apply(function() {
               ctrl.cancel();
             });
-          } else if (e.key === 'Enter') {
-            $scope.$apply(ctrl.save);
           }
         });
 
@@ -58,9 +57,7 @@
         var record = _.cloneDeep(col.edit.record);
         record[col.edit.value_key] = ctrl.value;
         $('input', $element).attr('disabled', true);
-        crmStatus({}, crmApi4(col.edit.entity, 'update', {
-          values: record
-        })).then(ctrl.onSuccess);
+        ctrl.doSave({apiCall: [col.edit.entity, col.edit.action, {values: record}]});
       };
 
       function loadOptions() {
@@ -73,7 +70,7 @@
           action: 'update',
           select: ['options'],
           loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
-          where: [['name', '=', ctrl.field.name]],
+          where: [['name', '=', ctrl.field.name]]
         }, 0).then(function(field) {
           ctrl.field.options = optionsCache[cacheKey] = field.options;
         });

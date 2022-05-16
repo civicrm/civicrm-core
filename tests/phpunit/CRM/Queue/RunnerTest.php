@@ -12,6 +12,7 @@
 /**
  * Ensure that various queue implementations comply with the interface
  * @group headless
+ * @group queue
  */
 class CRM_Queue_RunnerTest extends CiviUnitTestCase {
 

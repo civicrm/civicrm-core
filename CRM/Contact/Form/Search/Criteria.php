@@ -55,6 +55,10 @@ class CRM_Contact_Form_Search_Criteria {
       }
     }
 
+    // Suppress e-notices for tag fields if not set...
+    $form->addOptionalQuickFormElement('tag_types_text');
+    $form->addOptionalQuickFormElement('tag_set');
+    $form->addOptionalQuickFormElement('all_tag_types');
     if ($form->_searchOptions['tags']) {
       // multiselect for categories
       $contactTags = CRM_Core_BAO_Tag::getTags();
@@ -82,7 +86,7 @@ class CRM_Contact_Form_Search_Criteria {
           $showAllTagTypes = TRUE;
         }
       }
-      $tagTypesText = implode(" or ", $tagsTypes);
+      $tagTypesText = implode(' or ', $tagsTypes);
       if ($showAllTagTypes) {
         $form->add('checkbox', 'all_tag_types', ts('Include tags used for %1', [1 => $tagTypesText]));
         $form->add('hidden', 'tag_types_text', $tagTypesText);
@@ -599,7 +603,8 @@ class CRM_Contact_Form_Search_Criteria {
    */
   public static function custom(&$form) {
     $form->add('hidden', 'hidden_custom', 1);
-    $extends = array_merge(['Contact', 'Individual', 'Household', 'Organization'],
+    $extends = array_merge(['Contact'],
+      CRM_Contact_BAO_ContactType::basicTypes(),
       CRM_Contact_BAO_ContactType::subTypes()
     );
     $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE,

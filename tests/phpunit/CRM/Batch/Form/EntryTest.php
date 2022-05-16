@@ -88,6 +88,8 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    */
   public function setUp(): void {
     parent::setUp();
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviMember');
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
 
     $params = [
       'contact_type_a' => 'Individual',

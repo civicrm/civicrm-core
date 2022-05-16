@@ -19,12 +19,12 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class ExampleDataTest extends UnitTestCase {
+class ExampleDataTest extends Api4TestBase {
 
   /**
    * Basic canary test fetching a specific example.

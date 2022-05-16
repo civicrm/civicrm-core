@@ -226,7 +226,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
    *   Posted values of the form.
    *
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    *   list of errors to be posted back to the form
@@ -252,11 +252,10 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       }
     }
 
-    //CRM-11494
-    $start = CRM_Utils_Date::processDate($values['start_date']);
-    $end = CRM_Utils_Date::processDate($values['end_date']);
-    if (($end < $start) && ($end != 0)) {
-      $errors['end_date'] = ts('End date should be after Start date.');
+    // Validate start/end date inputs
+    $validateDates = \CRM_Utils_Date::validateStartEndDatepickerInputs('start_date', $values['start_date'], 'end_date', $values['end_date']);
+    if ($validateDates !== TRUE) {
+      $errors[$validateDates['key']] = $validateDates['message'];
     }
 
     if (!empty($self->_values['payment_processor']) && $financialType = CRM_Contribute_BAO_Contribution::validateFinancialType($values['financial_type_id'])) {

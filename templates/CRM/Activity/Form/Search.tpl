@@ -19,7 +19,7 @@
         {strip}
           <table class="form-layout">
             <tr>
-              <td class="font-size12pt" colspan="2">
+              <td colspan="2">
                 {$form.sort_name.label}&nbsp;&nbsp;{$form.sort_name.html|crmAddClass:'twenty'}
                 <div>
                   <div class="description font-italic">{ts}Complete OR Partial Name{/ts}

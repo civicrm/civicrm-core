@@ -37,25 +37,14 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
   protected $_outBound_option = NULL;
 
   /**
-   * Is this a webtest
-   * @var bool
-   */
-  protected $_webtest = FALSE;
-
-  /**
    * Constructor.
    *
-   * @param CiviSeleniumTestCase|CiviUnitTestCase $unit_test The currently running test
+   * @param CiviUnitTestCase $unit_test The currently running test
    * @param bool $startImmediately
    *   Start writing to db now or wait until start() is called.
    */
   public function __construct(&$unit_test, $startImmediately = TRUE) {
     $this->_ut = $unit_test;
-
-    // Check if running under webtests or not
-    if (is_subclass_of($unit_test, 'CiviSeleniumTestCase')) {
-      $this->_webtest = TRUE;
-    }
 
     if ($startImmediately) {
       $this->start();
@@ -76,61 +65,29 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
    * Start writing emails to db instead of current option.
    */
   public function start() {
-    if ($this->_webtest) {
-      // Change outbound mail setting
-      $this->_ut->openCiviPage('admin/setting/smtp', "reset=1", "_qf_Smtp_next");
+    // save current setting for outbound option, then change it
+    $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+      'mailing_backend'
+    );
 
-      // First remember the current setting
-      $this->_outBound_option = $this->getSelectedOutboundOption();
+    $this->_outBound_option = $mailingBackend['outBound_option'];
+    $mailingBackend['outBound_option'] = CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB;
 
-      $this->_ut->click('xpath=//input[@name="outBound_option" and @value="' . CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB . '"]');
-      $this->_ut->clickLink("_qf_Smtp_next");
+    Civi::settings()->set('mailing_backend', $mailingBackend);
 
-      // Is there supposed to be a status message displayed when outbound email settings are changed?
-      // assert something?
-
-    }
-    else {
-
-      // save current setting for outbound option, then change it
-      $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-        'mailing_backend'
-      );
-
-      $this->_outBound_option = $mailingBackend['outBound_option'];
-      $mailingBackend['outBound_option'] = CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB;
-
-      Civi::settings()->set('mailing_backend', $mailingBackend);
-
-      $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-        'mailing_backend'
-      );
-    }
+    $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+      'mailing_backend'
+    );
   }
 
   public function stop() {
-    if ($this->_webtest) {
-      if ($this->_outBound_option != CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB) {
-        // Change outbound mail setting
-        $this->_ut->openCiviPage('admin/setting/smtp', "reset=1", "_qf_Smtp_next");
-        $this->_ut->click('xpath=//input[@name="outBound_option" and @value="' . $this->_outBound_option . '"]');
-        // There will be a warning when switching from test to live mode
-        if ($this->_outBound_option != CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED) {
-          $this->_ut->getAlert();
-        }
-        $this->_ut->clickLink("_qf_Smtp_next");
-      }
-    }
-    else {
+    $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+      'mailing_backend'
+    );
 
-      $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-        'mailing_backend'
-      );
+    $mailingBackend['outBound_option'] = $this->_outBound_option;
 
-      $mailingBackend['outBound_option'] = $this->_outBound_option;
-
-      Civi::settings()->set('mailing_backend', $mailingBackend);
-    }
+    Civi::settings()->set('mailing_backend', $mailingBackend);
   }
 
   /**
@@ -141,27 +98,9 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
   public function getMostRecentEmail($type = 'raw') {
     $msg = '';
 
-    if ($this->_webtest) {
-      // I don't understand but for some reason we have to load the page twice for a recent mailing to appear.
-      $this->_ut->openCiviPage('mailing/browse/archived', 'reset=1');
-      $this->_ut->openCiviPage('mailing/browse/archived', 'reset=1', 'css=td.crm-mailing-name');
-    }
-    // We can't fetch mailing headers from webtest so we'll only try if the format is raw
-    if ($this->_webtest && $type == 'raw') {
-      // This should select the first "Report" link in the table, which is sorted by Completion Date descending, so in theory is the most recent email. Not sure of a more robust way at the moment.
-      $this->_ut->clickLink('xpath=//tr[contains(@id, "crm-mailing_")]//a[text()="Report"]');
-
-      // Also not sure how robust this is, but there isn't a good
-      // identifier for this link either.
-      $this->_ut->waitForElementPresent('xpath=//a[contains(text(), "View complete message")]');
-      $this->_ut->clickAjaxLink('xpath=//a[contains(text(), "View complete message")]');
-      $msg = $this->_ut->getText('css=.ui-dialog-content.crm-ajax-container');
-    }
-    else {
-      $dao = CRM_Core_DAO::executeQuery('SELECT headers, body FROM civicrm_mailing_spool ORDER BY id DESC LIMIT 1');
-      if ($dao->fetch()) {
-        $msg = $dao->headers . "\n\n" . $dao->body;
-      }
+    $dao = CRM_Core_DAO::executeQuery('SELECT headers, body FROM civicrm_mailing_spool ORDER BY id DESC LIMIT 1');
+    if ($dao->fetch()) {
+      $msg = $dao->headers . "\n\n" . $dao->body;
     }
 
     switch ($type) {
@@ -187,9 +126,6 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
   public function getAllMessages($type = 'raw') {
     $msgs = [];
 
-    if ($this->_webtest) {
-      throw new CRM_Core_Exception('Not implemented: getAllMessages for WebTest');
-    }
     $dao = CRM_Core_DAO::executeQuery('SELECT headers, body FROM civicrm_mailing_spool ORDER BY id');
     while ($dao->fetch()) {
       $msgs[] = $dao->headers . "\n\n" . $dao->body;
@@ -208,23 +144,6 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
     }
 
     return $msgs;
-  }
-
-  /**
-   * @return int
-   */
-  public function getSelectedOutboundOption() {
-    $selectedOption = CRM_Mailing_Config::OUTBOUND_OPTION_MAIL;
-    // Is there a better way to do this? How do you get the currently selected value of a radio button in selenium?
-    for ($i = 0; $i <= 5; $i++) {
-      if ($i != CRM_Mailing_Config::OUTBOUND_OPTION_MOCK) {
-        if ($this->_ut->getValue('xpath=//input[@name="outBound_option" and @value="' . $i . '"]') == "on") {
-          $selectedOption = $i;
-          break;
-        }
-      }
-    }
-    return $selectedOption;
   }
 
   /*
@@ -330,16 +249,11 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
    * @throws \CRM_Core_Exception
    */
   public function clearMessages($limit = 0) {
-    if ($this->_webtest) {
-      throw new \CRM_Core_Exception("Not implemented: clearMessages for WebTest");
+    $sql = 'DELETE FROM civicrm_mailing_spool ORDER BY id DESC';
+    if ($limit) {
+      $sql .= ' LIMIT ' . $limit;
     }
-    else {
-      $sql = 'DELETE FROM civicrm_mailing_spool ORDER BY id DESC';
-      if ($limit) {
-        $sql .= ' LIMIT ' . $limit;
-      }
-      CRM_Core_DAO::executeQuery($sql);
-    }
+    CRM_Core_DAO::executeQuery($sql);
   }
 
   /**

@@ -10,7 +10,7 @@
     </div>
     <hr />
     <div class="form-inline">
-      <input class="form-control" ng-model="controls.addValue" crm-ui-select="{data: valuesFields}" placeholder="Add value" />
+      <input class="form-control" on-crm-ui-select="$ctrl.addValue(selection)" crm-ui-select="{data: valuesFields, placeholder: ts('Add value')}" />
     </div>
   </fieldset>
 

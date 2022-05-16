@@ -104,7 +104,7 @@
   <tr>
     <th {$headerStyle}>{ts}Contribution Details{/ts}</th>
   </tr>
-  {if isset($totalAmount)}
+  {if $totalAmount}
   <tr>
     <td {$labelStyle}>
       {ts}Total Fee{/ts}
@@ -114,7 +114,7 @@
     </td>
   </tr>
   {/if}
-  {if isset($totalPaid)}
+  {if $totalPaid}
   <tr>
     <td {$labelStyle}>
       {ts}Total Paid{/ts}
@@ -124,7 +124,7 @@
     </td>
   </tr>
   {/if}
-  {if isset($amountOwed)}
+  {if $amountOwed}
   <tr>
     <td {$labelStyle}>
       {ts}Balance Owed{/ts}

@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the Activity.getsingle API.
  *
@@ -18,7 +23,7 @@ function activity_getsingle_example() {
     ],
   ];
 
-  try{
+  try {
     $result = civicrm_api3('Activity', 'getsingle', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -48,8 +53,16 @@ function activity_getsingle_expectedresult() {
   $expectedResult = [
     'id' => '1',
     'subject' => 'Make-it-Happen Meeting',
+    'assignee_contact_id' => [],
+    'assignee_contact_name' => [
+      '5' => 'C Shore',
+    ],
+    'assignee_contact_sort_name' => [
+      '5' => 'Shore, C',
+    ],
     'source_contact_id' => '6',
     'source_contact_name' => 'D Bug',
+    'source_contact_sort_name' => 'Bug, D',
     'target_contact_id' => [
       '1' => '4',
     ],
@@ -57,9 +70,9 @@ function activity_getsingle_expectedresult() {
       '3' => 'A Cat',
       '4' => 'B Good',
     ],
-    'assignee_contact_id' => [],
-    'assignee_contact_name' => [
-      '5' => 'C Shore',
+    'target_contact_sort_name' => [
+      '3' => 'Cat, A',
+      '4' => 'Good, B',
     ],
   ];
 
@@ -67,23 +80,23 @@ function activity_getsingle_expectedresult() {
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testActivityReturnTargetAssigneeName"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ActivityTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
-*
-* To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
-*
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
-*
-* Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
-*
-* API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testActivityReturnTargetAssigneeName"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ActivityTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

@@ -135,9 +135,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    */
   public function buildQuickForm() {
     $this->preventAjaxSubmit();
-    if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $this->assign('isAdmin', 1);
-    }
+    $this->assign('isAdmin', CRM_Core_Permission::check('administer CiviCRM'));
 
     $this->add('select', 'from_email_address', ts('From'), $this->_fromEmails, TRUE);
     if ($this->_selectedOutput != 'email') {
@@ -368,7 +366,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'resourceBase' => $config->userFrameworkResourceURL,
         'defaultCurrency' => $config->defaultCurrency,
         'amount' => $contribution->total_amount,
-        'currency' => $contribution->currency,
         'amountDue' => $amountDue,
         'amountPaid' => $amountPaid,
         'invoice_date' => $invoiceDate,
@@ -416,9 +413,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $sendTemplateParams = [
         'groupName' => 'msg_tpl_workflow_contribution',
         'valueName' => 'contribution_invoice_receipt',
-        'contactId' => $contribution->contact_id,
         'tplParams' => $tplParams,
         'PDFFilename' => $pdfFileName,
+        'tokenContext' => ['contributionId' => $contribution->id, 'contactId' => $contribution->contact_id],
       ];
 
       // from email address

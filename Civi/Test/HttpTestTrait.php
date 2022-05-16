@@ -117,7 +117,7 @@ trait HttpTestTrait {
 
   /**
    * @param $expectCode
-   * @param \Psr\Http\Message\ResponseInterface|NULL $response
+   * @param \Psr\Http\Message\ResponseInterface|null $response
    *   If NULL, then it uses the last response.
    *
    * @return $this
@@ -132,7 +132,7 @@ trait HttpTestTrait {
 
   /**
    * @param $expectType
-   * @param \Psr\Http\Message\ResponseInterface|NULL $response
+   * @param \Psr\Http\Message\ResponseInterface|null $response
    *   If NULL, then it uses the last response.
    *
    * @return $this
@@ -146,7 +146,23 @@ trait HttpTestTrait {
   }
 
   /**
-   * @param \Psr\Http\Message\ResponseInterface|NULL $response
+   * @param string $regexp
+   * @param \Psr\Http\Message\ResponseInterface $response
+   * @param string $message
+   */
+  protected function assertBodyRegexp($regexp, $response = NULL, $message = NULL) {
+    if ($message) {
+      $message .= "\n";
+    }
+
+    $response = $this->resolveResponse($response);
+    $this->assertRegexp($regexp, (string) $response->getBody(),
+      $message . 'Response body does not match pattern' . $this->formatFailure($response));
+    return $this;
+  }
+
+  /**
+   * @param \Psr\Http\Message\ResponseInterface|null $response
    * @return \Psr\Http\Message\ResponseInterface
    */
   protected function resolveResponse($response) {

@@ -61,6 +61,22 @@ class CRM_Utils_Check {
   }
 
   /**
+   * @return array[]
+   */
+  public static function getSeverityOptions() {
+    return [
+      ['id' => 0, 'name' => \Psr\Log\LogLevel::DEBUG, 'label' => ts('Debug')],
+      ['id' => 1, 'name' => \Psr\Log\LogLevel::INFO, 'label' => ts('Info')],
+      ['id' => 2, 'name' => \Psr\Log\LogLevel::NOTICE, 'label' => ts('Notice')],
+      ['id' => 3, 'name' => \Psr\Log\LogLevel::WARNING, 'label' => ts('Warning')],
+      ['id' => 4, 'name' => \Psr\Log\LogLevel::ERROR, 'label' => ts('Error')],
+      ['id' => 5, 'name' => \Psr\Log\LogLevel::CRITICAL, 'label' => ts('Critical')],
+      ['id' => 6, 'name' => \Psr\Log\LogLevel::ALERT, 'label' => ts('Alert')],
+      ['id' => 7, 'name' => \Psr\Log\LogLevel::EMERGENCY, 'label' => ts('Emergency')],
+    ];
+  }
+
+  /**
    * Display daily system status alerts (admin only).
    */
   public function showPeriodicAlerts() {
@@ -146,7 +162,7 @@ class CRM_Utils_Check {
   /**
    * Throw an exception if any of the checks fail.
    *
-   * @param array|NULL $messages
+   * @param array|null $messages
    *   [CRM_Utils_Check_Message]
    * @param string $threshold
    *
@@ -238,28 +254,11 @@ class CRM_Utils_Check {
    * @return string
    */
   public static function toStatusLabel($level) {
-    switch ($level) {
-      case 7:
-        return ts('System Status: Emergency');
-
-      case 6:
-        return ts('System Status: Alert');
-
-      case 5:
-        return ts('System Status: Critical');
-
-      case 4:
-        return ts('System Status: Error');
-
-      case 3:
-        return ts('System Status: Warning');
-
-      case 2:
-        return ts('System Status: Notice');
-
-      default:
-        return ts('System Status: Ok');
+    if ($level > 1) {
+      $options = array_column(self::getSeverityOptions(), 'label', 'id');
+      return ts('System Status: %1', [1 => $options[$level]]);
     }
+    return ts('System Status: Ok');
   }
 
 }

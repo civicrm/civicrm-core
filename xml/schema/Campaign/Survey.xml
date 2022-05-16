@@ -32,6 +32,9 @@
       <required>true</required>
       <localizable>true</localizable>
       <comment>Title of the Survey.</comment>
+      <html>
+        <type>Text</type>
+      </html>
       <import>true</import>
       <add>3.3</add>
   </field>
@@ -142,6 +145,7 @@
     <title>Survey Is Active</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Is this survey enabled or disabled/cancelled?</comment>
     <add>3.3</add>
   </field>
@@ -151,6 +155,7 @@
     <title>Is Default Survey</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this default survey?</comment>
     <add>3.3</add>
   </field>
@@ -227,6 +232,7 @@
     <title>No Email Verification</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Bypass the email verification.</comment>
     <add>4.2</add>
   </field>
@@ -257,6 +263,7 @@
     <title>Is shared through social media</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Can people share the petition through social media?</comment>
     <add>4.4</add>
   </field>

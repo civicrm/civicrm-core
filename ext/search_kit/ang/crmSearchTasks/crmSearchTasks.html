@@ -1,14 +1,20 @@
-<div class="btn-group" title="{{:: ts('Perform action on selected items.') }}">
-  <button type="button" ng-disabled="$ctrl.displayController.loading || !$ctrl.displayController.results.length" ng-click="$ctrl.getTasks()" class="btn dropdown-toggle btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<div class="btn-group">
+  <button type="button"
+    ng-disabled="$ctrl.displayController.loading || !$ctrl.displayController.results.length"
+    ng-click="$ctrl.getTasks()"
+    class="btn dropdown-toggle btn-default"
+    title="{{:: ts('Perform action on selected items.') }}"
+    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+  >
     <i class="crm-i fa-pencil"></i>
     {{:: ts('Action') }} <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
-    <li ng-class="{disabled: !$ctrl.isActionAllowed(action)}" ng-repeat="action in $ctrl.tasks">
-      <a href ng-click="$ctrl.doAction(action)"><i class="fa {{:: action.icon }}"></i> {{:: action.title }}</a>
+    <li ng-class="{disabled: !$ctrl.isActionAllowed(action)}" ng-repeat="action in $ctrl.tasks" title="{{ $ctrl.getActionTitle(action) }}">
+      <a href ng-click="$ctrl.doAction(action)"><i class="crm-i {{:: action.icon }}"></i> {{:: action.title }}</a>
     </li>
     <li class="disabled" ng-if="!$ctrl.tasks">
-      <a href><i class="fa fa-spinner fa-spin"></i></a>
+      <a href><i class="crm-i fa-spinner fa-spin"></i></a>
     </li>
   </ul>
 </div>

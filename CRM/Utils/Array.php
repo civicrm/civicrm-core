@@ -109,8 +109,8 @@ class CRM_Utils_Array {
   /**
    * Recursively searches through a given array for all matches
    *
-   * @param $collection
-   * @param $predicate
+   * @param array|null $collection
+   * @param array|callable|string $predicate
    * @return array
    */
   public static function findAll($collection, $predicate) {

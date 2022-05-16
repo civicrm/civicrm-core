@@ -130,7 +130,7 @@ class CRM_Extension_Manager {
    * Class constructor.
    *
    * @param CRM_Extension_Container_Interface $fullContainer
-   * @param CRM_Extension_Container_Basic|FALSE $defaultContainer
+   * @param CRM_Extension_Container_Basic|false $defaultContainer
    * @param CRM_Extension_Mapper $mapper
    * @param array $typeManagers
    */
@@ -566,7 +566,7 @@ class CRM_Extension_Manager {
   /**
    * Return current processes for given extension.
    *
-   * @param String $key extension key
+   * @param string $key extension key
    *
    * @return array
    */
@@ -578,7 +578,7 @@ class CRM_Extension_Manager {
    * Determine if the extension specified is currently involved in an install
    * or enable process. Just sugar code to make things more readable.
    *
-   * @param String $key extension key
+   * @param string $key extension key
    *
    * @return bool
    */

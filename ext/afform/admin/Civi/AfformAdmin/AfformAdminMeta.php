@@ -4,6 +4,7 @@ namespace Civi\AfformAdmin;
 
 use Civi\Api4\Entity;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Core\Event\GenericHookEvent;
 use CRM_AfformAdmin_ExtensionUtil as E;
 
 class AfformAdminMeta {
@@ -31,25 +32,6 @@ class AfformAdminMeta {
     return [
       'afform_type' => $afformTypes,
     ];
-  }
-
-  /**
-   * @param $entityName
-   * @return array|void
-   */
-  public static function getAfformEntity($entityName) {
-    // Optimization: look here before scanning every other extension
-    global $civicrm_root;
-    $fileName = \CRM_Utils_File::addTrailingSlash($civicrm_root) . "ext/afform/admin/afformEntities/$entityName.php";
-    if (is_file($fileName)) {
-      return include $fileName;
-    }
-    foreach (\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles() as $ext) {
-      $fileName = \CRM_Utils_File::addTrailingSlash(dirname($ext['filePath'])) . "afformEntities/$entityName.php";
-      if (is_file($fileName)) {
-        return include $fileName;
-      }
-    }
   }
 
   /**
@@ -109,7 +91,7 @@ class AfformAdminMeta {
       'select' => ['name', 'label', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize', 'data_type', 'fk_entity', 'readonly'],
       'where' => [['input_type', 'IS NOT NULL']],
     ];
-    if (in_array($entityName, ['Individual', 'Household', 'Organization'])) {
+    if (in_array($entityName, \CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE)) {
       $params['values']['contact_type'] = $entityName;
       $entityName = 'Contact';
     }
@@ -122,7 +104,6 @@ class AfformAdminMeta {
       $params['values']['state_province_id'] = \Civi::settings()->get('defaultContactStateProvince');
     }
     $fields = (array) civicrm_api4($entityName, 'getFields', $params);
-
     // Add implicit joins to search fields
     if ($params['action'] === 'get') {
       foreach (array_reverse($fields, TRUE) as $index => $field) {
@@ -140,7 +121,24 @@ class AfformAdminMeta {
         }
       }
     }
-    return array_column($fields, NULL, 'name');
+    // Index by name
+    $fields = array_column($fields, NULL, 'name');
+    // Mix in alterations declared by afform entities
+    if ($params['action'] === 'create') {
+      $afEntity = self::getMetadata()['entities'][$entityName] ?? [];
+      if (!empty($afEntity['alterFields'])) {
+        foreach ($afEntity['alterFields'] as $fieldName => $changes) {
+          // Allow field to be deleted
+          if ($changes === FALSE) {
+            unset($fields[$fieldName]);
+          }
+          else {
+            $fields[$fieldName] = \CRM_Utils_Array::crmArrayMerge($changes, ($fields[$fieldName] ?? []));
+          }
+        }
+      }
+    }
+    return $fields;
   }
 
   /**
@@ -148,146 +146,149 @@ class AfformAdminMeta {
    *
    * @return array
    */
-  public static function getGuiSettings() {
-    $data = [
-      'entities' => [
+  public static function getMetadata() {
+    $data = \Civi::cache('metadata')->get('afform_admin.metadata');
+    if (!$data) {
+      $entities = [
         '*' => [
           'label' => E::ts('Content Block'),
           'icon' => 'fa-pencil-square-o',
           'fields' => [],
         ],
-      ],
-    ];
+      ];
 
-    // Explicitly load Contact and Custom entities because they do not have afformEntity files
-    $entities = Entity::get(TRUE)
-      ->addClause('OR', ['name', '=', 'Contact'], ['type', 'CONTAINS', 'CustomValue'])
-      ->execute()->indexBy('name');
-    foreach ($entities as $name => $entity) {
-      $data['entities'][$name] = self::entityToAfformMeta($entity);
-    }
-
-    $contactTypes = \CRM_Contact_BAO_ContactType::basicTypeInfo();
-
-    // Call getFields on getFields to get input type labels
-    $inputTypeLabels = \Civi\Api4\Contact::getFields()
-      ->setLoadOptions(TRUE)
-      ->setAction('getFields')
-      ->addWhere('name', '=', 'input_type')
-      ->execute()
-      ->column('options')[0];
-
-    // Scan all extensions for entities & input types
-    foreach (\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles() as $ext) {
-      $dir = \CRM_Utils_File::addTrailingSlash(dirname($ext['filePath']));
-      if (is_dir($dir)) {
-        // Scan for entities
-        foreach (glob($dir . 'afformEntities/*.php') as $file) {
-          $entityInfo = include $file;
-          $entityName = basename($file, '.php');
-          $apiInfo = self::getApiEntity($entityInfo['entity'] ?? $entityName);
-          // Skip disabled contact types & entities from disabled components/extensions
-          if (!$apiInfo) {
-            continue;
-          }
-          $entityInfo += $apiInfo;
-          $data['entities'][$entityName] = $entityInfo;
-        }
-        // Scan for input types, use label from getFields if available
-        foreach (glob($dir . 'ang/afGuiEditor/inputType/*.html') as $file) {
-          $name = basename($file, '.html');
-          $data['inputType'][] = [
-            'name' => $name,
-            'label' => $inputTypeLabels[$name] ?? E::ts($name),
-          ];
-        }
+      // Explicitly load Contact and Custom entities because they do not have afformEntity files
+      $contactAndCustom = Entity::get(TRUE)
+        ->addClause('OR', ['name', '=', 'Contact'], ['type', 'CONTAINS', 'CustomValue'])
+        ->execute()->indexBy('name');
+      foreach ($contactAndCustom as $name => $entity) {
+        $entities[$name] = self::entityToAfformMeta($entity);
       }
-    }
 
-    // Todo: add method for extensions to define other elements
-    $data['elements'] = [
-      'container' => [
-        'title' => E::ts('Container'),
-        'element' => [
-          '#tag' => 'div',
-          'class' => 'af-container',
-          '#children' => [],
-        ],
-      ],
-      'text' => [
-        'title' => E::ts('Text box'),
-        'element' => [
-          '#tag' => 'p',
-          'class' => 'af-text',
-          '#children' => [
-            ['#text' => E::ts('Enter text')],
+      // Call getFields on getFields to get input type labels
+      $inputTypeLabels = \Civi\Api4\Contact::getFields()
+        ->setLoadOptions(TRUE)
+        ->setAction('getFields')
+        ->addWhere('name', '=', 'input_type')
+        ->execute()
+        ->column('options')[0];
+      // Scan for input types, use label from getFields if available
+      $inputTypes = [];
+      foreach (glob(__DIR__ . '/../../ang/afGuiEditor/inputType/*.html') as $file) {
+        $name = basename($file, '.html');
+        $inputTypes[] = [
+          'name' => $name,
+          'label' => $inputTypeLabels[$name] ?? E::ts($name),
+        ];
+      }
+
+      // Static elements
+      $elements = [
+        'container' => [
+          'title' => E::ts('Container'),
+          'element' => [
+            '#tag' => 'div',
+            'class' => 'af-container',
+            '#children' => [],
           ],
         ],
-      ],
-      'markup' => [
-        'title' => E::ts('Rich content'),
-        'element' => [
-          '#tag' => 'div',
-          'class' => 'af-markup',
-          '#markup' => FALSE,
-        ],
-      ],
-      'submit' => [
-        'title' => E::ts('Submit Button'),
-        'element' => [
-          '#tag' => 'button',
-          'class' => 'af-button btn btn-primary',
-          'crm-icon' => 'fa-check',
-          'ng-click' => 'afform.submit()',
-          '#children' => [
-            ['#text' => E::ts('Submit')],
-          ],
-        ],
-      ],
-      'fieldset' => [
-        'title' => E::ts('Fieldset'),
-        'element' => [
-          '#tag' => 'fieldset',
-          'af-fieldset' => NULL,
-          '#children' => [
-            [
-              '#tag' => 'legend',
-              'class' => 'af-text',
-              '#children' => [
-                [
-                  '#text' => E::ts('Enter title'),
-                ],
-              ],
+        'text' => [
+          'title' => E::ts('Text box'),
+          'element' => [
+            '#tag' => 'p',
+            'class' => 'af-text',
+            '#children' => [
+              ['#text' => E::ts('Enter text')],
             ],
           ],
         ],
-      ],
-    ];
-
-    $data['styles'] = [
-      'default' => E::ts('Default'),
-      'primary' => E::ts('Primary'),
-      'success' => E::ts('Success'),
-      'info' => E::ts('Info'),
-      'warning' => E::ts('Warning'),
-      'danger' => E::ts('Danger'),
-    ];
-
-    $data['permissions'] = [];
-    $perms = \Civi\Api4\Permission::get()
-      ->addWhere('group', 'IN', ['afformGeneric', 'const', 'civicrm', 'cms'])
-      ->addWhere('is_active', '=', 1)
-      ->setOrderBy(['title' => 'ASC'])
-      ->execute();
-    foreach ($perms as $perm) {
-      $data['permissions'][] = [
-        'id' => $perm['name'],
-        'text' => $perm['title'],
-        'description' => $perm['description'] ?? NULL,
+        'markup' => [
+          'title' => E::ts('Rich content'),
+          'element' => [
+            '#tag' => 'div',
+            'class' => 'af-markup',
+            '#markup' => FALSE,
+          ],
+        ],
+        'submit' => [
+          'title' => E::ts('Submit Button'),
+          'afform_type' => ['form'],
+          'element' => [
+            '#tag' => 'button',
+            'class' => 'af-button btn btn-primary',
+            'crm-icon' => 'fa-check',
+            'ng-click' => 'afform.submit()',
+            '#children' => [
+              ['#text' => E::ts('Submit')],
+            ],
+          ],
+        ],
+        'reset' => [
+          'title' => E::ts('Reset Button'),
+          'afform_type' => ['form', 'search'],
+          'element' => [
+            '#tag' => 'button',
+            'class' => 'af-button btn btn-warning',
+            'type' => 'reset',
+            'crm-icon' => 'fa-undo',
+            '#children' => [
+              ['#text' => E::ts('Reset')],
+            ],
+          ],
+        ],
+        'fieldset' => [
+          'title' => E::ts('Fieldset'),
+          'afform_type' => ['form'],
+          'element' => [
+            '#tag' => 'fieldset',
+            'af-fieldset' => NULL,
+            'class' => 'af-container',
+            'af-title' => E::ts('Enter title'),
+            '#children' => [],
+          ],
+        ],
       ];
+
+      $styles = [
+        'default' => E::ts('Default'),
+        'primary' => E::ts('Primary'),
+        'success' => E::ts('Success'),
+        'info' => E::ts('Info'),
+        'warning' => E::ts('Warning'),
+        'danger' => E::ts('Danger'),
+      ];
+
+      $perms = \Civi\Api4\Permission::get()
+        ->addWhere('group', 'IN', ['afformGeneric', 'const', 'civicrm', 'cms'])
+        ->addWhere('is_active', '=', 1)
+        ->setOrderBy(['title' => 'ASC'])
+        ->execute();
+      $permissions = [];
+      foreach ($perms as $perm) {
+        $permissions[] = [
+          'id' => $perm['name'],
+          'text' => $perm['title'],
+          'description' => $perm['description'] ?? NULL,
+        ];
+      }
+
+      $dateRanges = \CRM_Utils_Array::makeNonAssociative(\CRM_Core_OptionGroup::values('relative_date_filters'), 'id', 'label');
+      $dateRanges = array_merge([['id' => '{}', 'label' => E::ts('Choose Date Range')]], $dateRanges);
+
+      // Allow data to be modified by event listeners
+      $data = [
+        // @see afform-entity-php/mixin.php
+        'entities' => &$entities,
+        'inputTypes' => &$inputTypes,
+        'elements' => &$elements,
+        'styles' => &$styles,
+        'permissions' => &$permissions,
+        'dateRanges' => &$dateRanges,
+      ];
+      $event = GenericHookEvent::create($data);
+      \Civi::dispatcher()->dispatch('civi.afform_admin.metadata', $event);
+      \Civi::cache('metadata')->set('afform_admin.metadata', $data);
     }
-    $dateRanges = \CRM_Utils_Array::makeNonAssociative(\CRM_Core_OptionGroup::values('relative_date_filters'), 'id', 'label');
-    $data['dateRanges'] = array_merge([['id' => '{}', 'label' => E::ts('Choose Date Range')]], $dateRanges);
 
     return $data;
   }

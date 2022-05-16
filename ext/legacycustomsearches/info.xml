@@ -15,19 +15,22 @@
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2021-07-25</releaseDate>
-  <version>5.45.alpha1</version>
+  <version>5.51.alpha1</version>
   <develStage>stable</develStage>
   <tags>
     <tag>mgmt:hidden</tag>
   </tags>
   <compatibility>
-    <ver>5.40</ver>
+    <ver>5.51</ver>
   </compatibility>
   <comments>This is hidden on install to give extensions that require it time to add it to their requires and to allow us to get it out of GroupContact load</comments>
   <classloader>
     <psr0 prefix="CRM_" path=""/>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
+  <mixins>
+    <mixin>menu-xml@1.0.0</mixin>
+  </mixins>
   <civix>
     <namespace>CRM/Legacycustomsearches</namespace>
   </civix>

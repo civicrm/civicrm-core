@@ -18,11 +18,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
 
   protected $_summary = NULL;
   protected $_interval = NULL;
-  protected $_charts = [
-    '' => 'Tabular',
-    'barChart' => 'Bar Chart',
-    'pieChart' => 'Pie Chart',
-  ];
+
   protected $_add2groupSupported = FALSE;
 
   protected $_customGroupExtends = ['Membership'];
@@ -158,6 +154,13 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
 
     // If we have campaigns enabled, add those elements to both the fields, filters and group by
     $this->addCampaignFields('civicrm_membership', TRUE);
+
+    // Add charts support
+    $this->_charts = [
+      '' => ts('Tabular'),
+      'barChart' => ts('Bar Chart'),
+      'pieChart' => ts('Pie Chart'),
+    ];
 
     $this->_groupFilter = TRUE;
     $this->_currencyColumn = 'civicrm_contribution_currency';
@@ -360,7 +363,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */

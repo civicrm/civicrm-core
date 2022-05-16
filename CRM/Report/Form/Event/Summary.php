@@ -18,12 +18,6 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
-  protected $_charts = [
-    '' => 'Tabular',
-    'barChart' => 'Bar Chart',
-    'pieChart' => 'Pie Chart',
-  ];
-
   protected $_add2groupSupported = FALSE;
 
   protected $_customGroupExtends = [
@@ -105,6 +99,14 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form {
       ],
     ];
     $this->_currencyColumn = 'civicrm_participant_fee_currency';
+
+    // Add charts support
+    $this->_charts = [
+      '' => ts('Tabular'),
+      'barChart' => ts('Bar Chart'),
+      'pieChart' => ts('Pie Chart'),
+    ];
+
     parent::__construct();
   }
 

@@ -167,6 +167,35 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   public $_compId;
 
   /**
+   * Contribution ID.
+   *
+   * @var int|null
+   */
+  protected $contributionID;
+
+  /**
+   * Get the contribution id that has been created or is being edited.
+   *
+   * @internal - not supported for outside core.
+   *
+   * @return int|null
+   */
+  protected function getContributionID(): ?int {
+    return $this->contributionID;
+  }
+
+  /**
+   * Set the contribution id that has been created or is being edited.
+   *
+   * @internal - not supported for outside core.
+   *
+   * @param int|null $contributionID
+   */
+  protected function setContributionID(?int $contributionID): void {
+    $this->contributionID = $contributionID;
+  }
+
+  /**
    * Store the line items if price set used.
    * @var array
    */
@@ -634,9 +663,10 @@ WHERE  contribution_id = {$id}
       }
       //here we are setting up the billing contact - if different from the member they are already created
       // but they will get billing details assigned
+      $addressParams['contact_id'] = $this->_contributorContactID;
       CRM_Contact_BAO_Contact::createProfileContact($addressParams, $fields,
         $this->_contributorContactID, NULL, NULL,
-        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type')
+        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contributorContactID, 'contact_type')
       );
     }
 

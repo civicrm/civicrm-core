@@ -60,10 +60,9 @@
       <div class="crm-public-form-item crm-section additional_participants-section" id="noOfparticipants">
         <div class="label">{$form.additional_participants.label} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span></div>
         <div class="content">
-          {$form.additional_participants.html}{if $contact_id || $contact_id == NULL}{ts}(including yourself){/ts}{/if}
+          {$form.additional_participants.html}{if $contact_id || $contact_id == NULL}&nbsp;{ts}(including yourself){/ts}{/if}
           <br/>
-          <span
-            class="description">{ts}Fill in your registration information on this page. If you are registering additional people, you will be able to enter their registration information after you complete this page and click &quot;Review your registration&quot;.{/ts}</span>
+          <div class="description" id="additionalParticipantsDescription" style="display: none;">{ts}Fill in your registration information on this page. You will be able to enter the registration information for additional people after you complete this page and click &quot;Continue&quot;.{/ts}</div>
         </div>
         <div class="clear"></div>
       </div>
@@ -159,7 +158,13 @@
     {literal}
 
     cj("#additional_participants").change(function () {
-      skipPaymentMethod();
+      if (typeof skipPaymentMethod == 'function') {
+        // For free event there is no involvement of payment processor, hence
+        // this function is not available. if above condition not present
+        // then you will receive JS Error in case you change multiple
+        // registrant option.
+        skipPaymentMethod();
+      }
     });
 
   {/literal}
@@ -167,6 +172,26 @@
     pcpAnonymous();
   {/if}
   {literal}
+
+  CRM.$(function($) {
+    $('#additional_participants').change(function() {
+      toggleAdditionalParticipants();
+      allowParticipant();
+    });
+
+    function toggleAdditionalParticipants() {
+      var submit_button = $("#crm-submit-buttons > button").html();
+      var review_translated = '{/literal}{ts escape="js"}Review{/ts}{literal}';
+      var continue_translated = '{/literal}{ts escape="js"}Continue{/ts}{literal}';
+      if ($('#additional_participants').val()) {
+        $("#additionalParticipantsDescription").show();
+        $("#crm-submit-buttons > button").html(submit_button.replace(review_translated, continue_translated));
+      } else {
+        $("#additionalParticipantsDescription").hide();
+        $("#crm-submit-buttons > button").html(submit_button.replace(continue_translated, review_translated));
+      }
+    }
+  });
 
   function allowParticipant() {
     {/literal}{if $allowGroupOnWaitlist}{literal}
@@ -225,7 +250,13 @@
         cj("#bypass_payment").val(0);
       }
       //reset value since user don't want or not eligible for waitlist
-      skipPaymentMethod();
+      if (typeof skipPaymentMethod == 'function') {
+        // For free event there is no involvement of payment processor, hence
+        // this function is not available. if above condition not present
+        // then you will receive JS Error in case register multiple participants
+        // enabled and require approval.
+        skipPaymentMethod();
+      }
     }
   }
 

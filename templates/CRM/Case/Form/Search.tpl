@@ -21,7 +21,7 @@
         {strip}
             <table class="form-layout">
             <tr class="crm-case-search-form-block-sort_name">
-               <td class="font-size12pt" colspan="2">
+               <td colspan="2">
                    {$form.sort_name.label}&nbsp;&nbsp;{$form.sort_name.html|crmAddClass:'twenty'}
                </td>
               <td>{include file="CRM/common/formButtons.tpl" location="top"}</td>

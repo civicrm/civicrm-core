@@ -131,6 +131,7 @@
     <uniqueName>case_deleted</uniqueName>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <import>true</import>
     <html>
       <type>CheckBox</type>
@@ -153,6 +154,7 @@
     <html>
       <label>Created Date</label>
     </html>
+    <readonly>true</readonly>
     <add>4.7</add>
   </field>
   <field>

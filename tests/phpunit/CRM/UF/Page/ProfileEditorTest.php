@@ -48,7 +48,7 @@ class CRM_UF_Page_ProfileEditorTest extends CiviUnitTestCase {
   public function testGetSchemaWithHooks() {
     CRM_Utils_Hook::singleton()->setHook('civicrm_alterUFFields', [$this, 'hook_civicrm_alterUFFIelds']);
     $schema = CRM_UF_Page_ProfileEditor::getSchema(['IndividualModel', 'GrantModel']);
-    $this->assertEquals('Grant', $schema['GrantModel']['schema']['grant_decision_date']['civiFieldType']);
+    $this->assertEquals('Grant', $schema['GrantModel']['schema']['grant_id']['civiFieldType']);
   }
 
   /**
@@ -61,7 +61,12 @@ class CRM_UF_Page_ProfileEditorTest extends CiviUnitTestCase {
   }
 
   public function hook_civicrm_alterUFFIelds(&$fields) {
-    $fields['Grant'] = CRM_Grant_BAO_Grant::exportableFields();
+    $fields['Grant'] = [
+      'grant_id' => [
+        'name' => 'id',
+        'title' => 'Grant ID',
+      ],
+    ];
   }
 
 }

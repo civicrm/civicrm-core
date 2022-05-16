@@ -40,9 +40,9 @@ class CRM_Utils_Mail_Logger {
   }
 
   /**
-   * @param $to
-   * @param $headers
-   * @param $message
+   * @param string|string[] $to
+   * @param string[] $headers
+   * @param string $message
    */
   public static function log(&$to, &$headers, &$message) {
     if (is_array($to)) {

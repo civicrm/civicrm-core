@@ -4,15 +4,6 @@ require_once 'sequentialcreditnotes.civix.php';
 use Civi\Api4\Contribution;
 
 /**
- * Implements hook_civicrm_alterSettingsFolders().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_alterSettingsFolders
- */
-function sequentialcreditnotes_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  _sequentialcreditnotes_civix_civicrm_alterSettingsFolders($metaDataFolders);
-}
-
-/**
  * Add a creditnote_id if appropriate.
  *
  * If the contribution is created with cancelled or refunded status, add credit note id

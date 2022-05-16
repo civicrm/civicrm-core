@@ -22,7 +22,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
    * Prior to version 5.7.5 mysql only supports a single named lock. This variable is
    * part of the skullduggery involved in 'say it's no so Frank'.
    *
-   * See further comments on the aquire function.
+   * See further comments on the acquire function.
    *
    * @var bool
    */

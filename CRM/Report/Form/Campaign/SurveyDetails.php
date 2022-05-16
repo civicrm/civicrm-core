@@ -493,7 +493,7 @@ INNER JOIN  civicrm_option_value val ON ( val.option_group_id = survey.result_id
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    */
   private function _formatSurveyResult(&$rows) {
     $surveyIds = $this->_params['survey_id_value'] ?? NULL;
@@ -544,7 +544,7 @@ INNER JOIN  civicrm_survey survey ON ( survey.result_id = grp.id )
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    */
   private function _formatSurveyResponseData(&$rows) {
     $surveyIds = $this->_params['survey_id_value'] ?? NULL;

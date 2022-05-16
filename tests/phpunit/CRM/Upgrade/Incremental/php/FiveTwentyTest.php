@@ -328,8 +328,8 @@ ENDXML;
   /**
    * Set up some original and expected xml pairs.
    *
-   * @param $relationshipTypeNames array
-   * @param $stage int
+   * @param array $relationshipTypeNames
+   * @param int $stage
    *   We run it in a couple passes because we want to test with and without
    *   warning messages.
    * @return array
@@ -919,8 +919,8 @@ ENDXMLDIFFNAMEEXPECTED;
   /**
    * Helper to add a case type to the database.
    *
-   * @param $name string
-   * @param $xml string
+   * @param string $name
+   * @param string $xml
    *
    * @return int
    */

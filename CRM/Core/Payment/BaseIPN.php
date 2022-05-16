@@ -333,7 +333,7 @@ class CRM_Core_Payment_BaseIPN {
    * @todo This is part of a bigger refactor for dev/core/issues/927 - "duplicate" functionality exists in CRM_Contribute_BAO_Contribution::cancel()
    * @param \CRM_Member_BAO_Membership $membership
    * @param int $membershipStatusID
-   * @param boolean $onlyCancelPendingMembership
+   * @param bool $onlyCancelPendingMembership
    *   Do we only cancel pending memberships? OR memberships in any status? (see CRM-18688)
    * @fixme Historically failed() cancelled membership in any status, cancelled() cancelled only pending memberships so we retain that behaviour for now.
    * @deprecated

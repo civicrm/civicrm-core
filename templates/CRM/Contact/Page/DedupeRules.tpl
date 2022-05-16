@@ -23,13 +23,13 @@
     {if $brows}
     {include file="CRM/common/jsortable.tpl"}
     {foreach from=$brows key=contactType item=rows}
-      <div id="browseValues_{$contactType}">
+      <div id="browseValues_{$contactType}" class="crm-clearfix">
         <div>
         {strip}
           <table id="options_{$contactType}" class="display mergecontact">
             <thead>
             <tr>
-              <th>{ts 1=$contactType}%1 Rules{/ts}</th>
+              <th>{ts 1=$contactTypes.$contactType}%1 Rules{/ts}</th>
               <th>{ts}Usage{/ts}</th>
               <th></th>
             </tr>
@@ -38,14 +38,14 @@
               <tr class="{cycle values="odd-row,even-row"}">
                 <td>{$row.title}</td>
                 <td>{$row.used_display}</td>
-                <td>{$row.action|replace:'xx':$row.id}</td>
+                <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
               </tr>
             {/foreach}
           </table>
         {/strip}
        </div>
        <div style="float:right">
-            {crmButton q="action=add&contact_type=$contactType&reset=1" icon="plus-circle"}{ts 1=$contactType}Add Rule for %1s{/ts}{/crmButton}
+            {crmButton q="action=add&contact_type=$contactType&reset=1" icon="plus-circle"}{ts 1=$contactTypes.$contactType}Add %1 Rule{/ts}{/crmButton}
         </div>
       </div>
     {/foreach}

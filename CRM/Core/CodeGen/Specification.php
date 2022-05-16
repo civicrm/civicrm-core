@@ -110,8 +110,8 @@ class CRM_Core_CodeGen_Specification {
   }
 
   /**
-   * @param $tables
-   * @param string $classNames
+   * @param array $tables
+   * @param string[] $classNames
    */
   public function resolveForeignKeys(&$tables, &$classNames) {
     foreach (array_keys($tables) as $name) {
@@ -120,8 +120,8 @@ class CRM_Core_CodeGen_Specification {
   }
 
   /**
-   * @param $tables
-   * @param string $classNames
+   * @param array $tables
+   * @param string[] $classNames
    * @param string $name
    */
   public function resolveForeignKey(&$tables, &$classNames, $name) {
@@ -142,7 +142,7 @@ class CRM_Core_CodeGen_Specification {
   }
 
   /**
-   * @param $tables
+   * @param array $tables
    *
    * @return array
    */
@@ -161,7 +161,7 @@ class CRM_Core_CodeGen_Specification {
   }
 
   /**
-   * @param $tables
+   * @param array $tables
    * @param int $valid
    * @param string $name
    *
@@ -222,7 +222,7 @@ class CRM_Core_CodeGen_Specification {
       'labelName' => substr($name, 8),
       'className' => $this->classNames[$name],
       'bao' => ($useBao ? str_replace('DAO', 'BAO', $this->classNames[$name]) : $this->classNames[$name]),
-      'entity' => $klass,
+      'entity' => $tableXML->entity ?? $klass,
       'attributes_simple' => trim($database['tableAttributes_simple']),
       'attributes_modern' => trim($database['tableAttributes_modern']),
       'comment' => $this->value('comment', $tableXML),
@@ -303,19 +303,18 @@ class CRM_Core_CodeGen_Specification {
   public function getField(&$fieldXML, &$fields) {
     $name = trim((string ) $fieldXML->name);
     $field = ['name' => $name, 'localizable' => ((bool) $fieldXML->localizable) ? 1 : 0];
-    $type = (string ) $fieldXML->type;
+    $type = (string) $fieldXML->type;
     switch ($type) {
       case 'varchar':
       case 'char':
         $field['length'] = (int) $fieldXML->length;
         $field['sqlType'] = "$type({$field['length']})";
-        $field['phpType'] = 'string';
         $field['crmType'] = 'CRM_Utils_Type::T_STRING';
         $field['size'] = $this->getSize($fieldXML);
         break;
 
       case 'text':
-        $field['sqlType'] = $field['phpType'] = $type;
+        $field['sqlType'] = $type;
         $field['crmType'] = 'CRM_Utils_Type::T_' . strtoupper($type);
         // CRM-13497 see fixme below
         $field['rows'] = isset($fieldXML->html) ? $this->value('rows', $fieldXML->html) : NULL;
@@ -323,7 +322,7 @@ class CRM_Core_CodeGen_Specification {
         break;
 
       case 'datetime':
-        $field['sqlType'] = $field['phpType'] = $type;
+        $field['sqlType'] = $type;
         $field['crmType'] = 'CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME';
         break;
 
@@ -331,29 +330,24 @@ class CRM_Core_CodeGen_Specification {
         // need this case since some versions of mysql do not have boolean as a valid column type and hence it
         // is changed to tinyint. hopefully after 2 yrs this case can be removed.
         $field['sqlType'] = 'tinyint';
-        $field['phpType'] = 'bool';
         $field['crmType'] = 'CRM_Utils_Type::T_' . strtoupper($type);
         break;
 
       case 'decimal':
         $length = $fieldXML->length ? $fieldXML->length : '20,2';
         $field['sqlType'] = 'decimal(' . $length . ')';
-        $field['phpType'] = 'float';
         $field['crmType'] = 'CRM_Utils_Type::T_MONEY';
         $field['precision'] = $length . ',';
         break;
 
       case 'float':
         $field['sqlType'] = 'double';
-        $field['phpType'] = 'float';
         $field['crmType'] = 'CRM_Utils_Type::T_FLOAT';
         break;
 
       default:
-        $field['phpType'] = $this->value('phpType', $fieldXML, $type);
         $field['sqlType'] = $type;
         if ($type == 'int unsigned' || $type == 'tinyint') {
-          $field['phpType'] = 'int';
           $field['crmType'] = 'CRM_Utils_Type::T_INT';
         }
         else {
@@ -361,6 +355,9 @@ class CRM_Core_CodeGen_Specification {
         }
         break;
     }
+
+    $field['phpType'] = $this->getPhpType($fieldXML);
+    $field['phpNullable'] = $this->getPhpNullable($fieldXML);
 
     $field['required'] = $this->value('required', $fieldXML);
     $field['collate'] = $this->value('collate', $fieldXML);
@@ -479,6 +476,54 @@ class CRM_Core_CodeGen_Specification {
   }
 
   /**
+   * Returns the PHPtype used within the DAO object
+   *
+   * @param object $fieldXML
+   * @return string
+   */
+  private function getPhpType($fieldXML) {
+    $type = $fieldXML->type;
+    $phpType = $this->value('phpType', $fieldXML, 'string');
+
+    if ($type == 'int' || $type == 'int unsigned' || $type == 'tinyint') {
+      $phpType = 'int';
+    }
+
+    if ($type == 'float' || $type == 'decimal') {
+      $phpType = 'float';
+    }
+
+    if ($type == 'boolean') {
+      $phpType = 'bool';
+    }
+
+    if ($phpType !== 'string') {
+      // Values are almost always fetched from the database as string
+      $phpType .= '|string';
+    }
+
+    return $phpType;
+  }
+
+  /**
+   * Returns whether the field is nullable in PHP.
+   * Either because:
+   *  - The SQL field is nullable
+   *  - The field is a primary key, and so is null before new objects are saved
+   *
+   * @param object $fieldXML
+   * @return bool
+   */
+  private function getPhpNullable($fieldXML) {
+    $required = $this->value('required', $fieldXML);
+    if ($required) {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
+  /**
    * @param string $name
    *
    * @return string
@@ -516,6 +561,7 @@ class CRM_Core_CodeGen_Specification {
     $auto = $this->value('autoincrement', $primaryXML);
     if (isset($fields[$name])) {
       $fields[$name]['autoincrement'] = $auto;
+      $fields[$name]['phpNullable'] = TRUE;
     }
 
     $primaryKey = [
@@ -660,7 +706,7 @@ class CRM_Core_CodeGen_Specification {
     $foreignKey = [
       'idColumn' => trim($foreignXML->idColumn),
       'typeColumn' => trim($foreignXML->typeColumn),
-      'key' => trim($this->value('key', $foreignXML)),
+      'key' => trim($this->value('key', $foreignXML) ?? ''),
     ];
     $dynamicForeignKeys[] = $foreignKey;
   }

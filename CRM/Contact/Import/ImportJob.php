@@ -26,7 +26,6 @@ class CRM_Contact_Import_ImportJob {
 
   protected $_doGeocodeAddress;
   protected $_invalidRowCount;
-  protected $_conflictRowCount;
   protected $_onDuplicate;
   protected $_dedupe;
   protected $_newGroupName;
@@ -43,38 +42,12 @@ class CRM_Contact_Import_ImportJob {
   protected $_mapperKeys = [];
   protected $_mapFields;
 
+  /**
+   * @var CRM_Contact_Import_Parser_Contact
+   */
   protected $_parser;
 
-  /**
-   * @param null $tableName
-   * @param null $createSql
-   * @param bool $createTable
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function __construct($tableName = NULL, $createSql = NULL, $createTable = FALSE) {
-    $dao = new CRM_Core_DAO();
-    $db = $dao->getDatabaseConnection();
-
-    if ($createTable) {
-      if (!$createSql) {
-        throw new CRM_Core_Exception(ts('Either an existing table name or an SQL query to build one are required'));
-      }
-      if ($tableName) {
-        // Drop previous table if passed in and create new one.
-        $db->query("DROP TABLE IF EXISTS $tableName");
-      }
-      $table = CRM_Utils_SQL_TempTable::build()->setDurable();
-      $tableName = $table->getName();
-      $table->createWithQuery($createSql);
-    }
-
-    if (!$tableName) {
-      throw new CRM_Core_Exception(ts('Import Table is required.'));
-    }
-
-    $this->_tableName = $tableName;
-  }
+  protected $_userJobID;
 
   /**
    * @return null|string
@@ -84,26 +57,12 @@ class CRM_Contact_Import_ImportJob {
   }
 
   /**
-   * @param bool $dropIfComplete
+   * Has the job completed.
    *
    * @return bool
-   * @throws Exception
    */
-  public function isComplete($dropIfComplete = TRUE) {
-    if (!$this->_statusFieldName) {
-      throw new CRM_Core_Exception("Could not get name of the import status field");
-    }
-    $query = "SELECT * FROM $this->_tableName
-                  WHERE  $this->_statusFieldName = 'NEW' LIMIT 1";
-    $result = CRM_Core_DAO::executeQuery($query);
-    if ($result->fetch()) {
-      return FALSE;
-    }
-    if ($dropIfComplete) {
-      $query = "DROP TABLE $this->_tableName";
-      CRM_Core_DAO::executeQuery($query);
-    }
-    return TRUE;
+  public function isComplete(): bool {
+    return $this->_parser->isComplete();
   }
 
   /**
@@ -143,7 +102,6 @@ class CRM_Contact_Import_ImportJob {
       if ($selOne && (is_numeric($selOne) || $selOne === 'Primary')) {
         if ($fldName === 'url') {
           $header[] = $websiteTypes[$selOne];
-          $parserParameters['mapperWebsiteType'][$key] = $selOne;
         }
         else {
           $header[] = $locationTypes[$selOne];
@@ -182,26 +140,21 @@ class CRM_Contact_Import_ImportJob {
           if ($selTwo) {
             if ($selOne == 'url') {
               $header[] = $websiteTypes[$selTwo];
-              $parserParameters[$key]['relatedContactWebsiteType'][$key] = $selTwo;
             }
             else {
               $header[] = $locationTypes[$selTwo];
-              $parserParameters['relatedContactLocType'][$key] = $selTwo;
               if ($selThree) {
                 if ($selOne == 'phone' || $selOne == 'phone_ext') {
                   $header[] = $phoneTypes[$selThree];
-                  $parserParameters['relatedContactPhoneType'][$key] = $selThree;
                 }
                 elseif ($selOne == 'im') {
                   $header[] = $imProviders[$selThree];
-                  $parserParameters['relatedContactImProvider'][$key] = $selThree;
                 }
               }
             }
           }
         }
       }
-      $mapperFields[] = implode(' - ', $header);
     }
 
     $this->_parser = new CRM_Contact_Import_Parser_Contact(
@@ -211,26 +164,14 @@ class CRM_Contact_Import_ImportJob {
       $parserParameters['mapperImProvider'],
       $parserParameters['mapperRelated'],
       $parserParameters['relatedContactType'],
-      $parserParameters['relatedContactDetails'],
-      $parserParameters['relatedContactLocType'],
-      $parserParameters['relatedContactPhoneType'],
-      $parserParameters['relatedContactImProvider'],
-      $parserParameters['mapperWebsiteType'],
-      $parserParameters['relatedContactWebsiteType']
+      $parserParameters['relatedContactDetails']
     );
-
-    $this->_parser->run($this->_tableName, $mapperFields,
+    $this->_parser->setUserJobID($this->_userJobID);
+    $this->_parser->run(
+      [],
       CRM_Import_Parser::MODE_IMPORT,
-      $this->_contactType,
-      $this->_primaryKeyName,
-      $this->_statusFieldName,
-      $this->_onDuplicate,
       $this->_statusID,
-      $this->_totalRowCount,
-      $this->_doGeocodeAddress,
-      CRM_Contact_Import_Parser::DEFAULT_TIMEOUT,
-      $this->_contactSubType,
-      $this->_dedupe
+      $this->_totalRowCount
     );
 
     $contactIds = $this->_parser->getImportedContacts();

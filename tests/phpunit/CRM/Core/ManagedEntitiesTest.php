@@ -103,6 +103,28 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
         'update' => 'never',
       ],
     ];
+    $this->fixtures['com.example.two-CustomGroup'] = [
+      'module' => 'com.example.two',
+      'name' => 'CustomGroup',
+      'entity' => 'CustomGroup',
+      'params' => [
+        'version' => 3,
+        'name' => 'test_custom_group_two',
+        'title' => 'Test custom group two',
+        'extends' => 'Individual',
+      ],
+    ];
+    $this->fixtures['com.example.three-CustomGroup'] = [
+      'module' => 'com.example.three',
+      'name' => 'CustomGroup',
+      'entity' => 'CustomGroup',
+      'params' => [
+        'version' => 3,
+        'name' => 'test_custom_group_three',
+        'title' => 'Test custom group three',
+        'extends' => 'Individual',
+      ],
+    ];
 
     $this->apiKernel = \Civi::service('civi_api_kernel');
     $this->adhocProvider = new \Civi\API\Provider\AdhocProvider(3, 'CustomSearch');
@@ -579,6 +601,39 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     // Ensure that com.example.one-CustomField is deleted
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_custom_field WHERE name = "test_custom_field"');
 
+  }
+
+  /**
+   * The hook_managed signature expanded slightly (adding the `$modules` filter).
+   * Pre-existing implementations may over-report (ie return entities despite the `$modules` filter).
+   * This test ensures that the framework respects the `$modules` filter (even if specific implementations don't).
+   */
+  public function testHookManaged_FilterModule() {
+    $this->managedEntities = [
+      $this->fixtures['com.example.one-bar'],
+      $this->fixtures['com.example.two-CustomGroup'],
+      $this->fixtures['com.example.three-CustomGroup'],
+    ];
+
+    $entitiesAll = [];
+    CRM_Utils_Hook::managed($entitiesAll);
+    $this->assertEquals($this->managedEntities, $entitiesAll);
+    $this->assertEquals(3, count($entitiesAll));
+
+    $entitiesTwoOnly = [];
+    CRM_Utils_Hook::managed($entitiesTwoOnly, ['com.example.two']);
+    $this->assertEquals([$this->fixtures['com.example.two-CustomGroup']], array_values($entitiesTwoOnly));
+    $this->assertEquals(1, count($entitiesTwoOnly));
+
+    $entitiesTwoExtra = [];
+    CRM_Utils_Hook::managed($entitiesTwoExtra, ['com.example.two', 'com.example.extra']);
+    $this->assertEquals([$this->fixtures['com.example.two-CustomGroup']], array_values($entitiesTwoExtra));
+    $this->assertEquals(1, count($entitiesTwoExtra));
+
+    $entitiesTwoThree = [];
+    CRM_Utils_Hook::managed($entitiesTwoThree, ['com.example.two', 'com.example.three']);
+    $this->assertEquals([$this->fixtures['com.example.two-CustomGroup'], $this->fixtures['com.example.three-CustomGroup']], array_values($entitiesTwoThree));
+    $this->assertEquals(2, count($entitiesTwoThree));
   }
 
 }

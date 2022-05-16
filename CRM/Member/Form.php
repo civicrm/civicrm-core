@@ -99,7 +99,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   /**
    * Add to the status message.
    *
-   * @param $message
+   * @param string $message
    */
   protected function addStatusMessage($message) {
     $this->statusMessage[] = $message;
@@ -159,6 +159,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
     $this->assign('context', $this->_context);
     $this->assign('membershipMode', $this->_mode);
+    $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
     $this->allMembershipTypeDetails = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, [], TRUE);
     foreach ($this->allMembershipTypeDetails as $index => $membershipType) {
       if ($membershipType['auto_renew']) {
@@ -237,10 +238,8 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     $this->assign('recurProcessor', json_encode($this->_recurPaymentProcessors));
     // Build the form for auto renew. This is displayed when in credit card mode or update mode.
     // The reason for showing it in update mode is not that clear.
+    $this->assign('allowAutoRenew', $this->_mode && !empty($this->_recurPaymentProcessors));
     if ($this->_mode || ($this->_action & CRM_Core_Action::UPDATE)) {
-      if (!empty($this->_recurPaymentProcessors)) {
-        $this->assign('allowAutoRenew', TRUE);
-      }
 
       $autoRenewElement = $this->addElement('checkbox', 'auto_renew', ts('Membership renewed automatically'),
         NULL, ['onclick' => "showHideByValue('auto_renew','','send-receipt','table-row','radio',true); showHideNotice( );"]

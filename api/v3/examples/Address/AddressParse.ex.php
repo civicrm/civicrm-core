@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the Address.create API.
  *
@@ -12,10 +17,10 @@ function address_create_example() {
     'street_parsing' => 1,
     'street_address' => '54A Excelsior Ave. Apt 1C',
     'location_type_id' => 8,
-    'contact_id' => 4,
+    'contact_id' => 3,
   ];
 
-  try{
+  try {
     $result = civicrm_api3('Address', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -46,11 +51,11 @@ function address_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 1,
+    'id' => 2,
     'values' => [
-      '1' => [
-        'id' => '1',
-        'contact_id' => '4',
+      '2' => [
+        'id' => '2',
+        'contact_id' => '3',
         'location_type_id' => '8',
         'is_primary' => '1',
         'is_billing' => 0,
@@ -68,23 +73,23 @@ function address_create_expectedresult() {
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testCreateAddressParsing"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/AddressTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
-*
-* To Learn about the API read
-* https://docs.civicrm.org/dev/en/latest/api/
-*
-* Browse the API on your own site with the API Explorer. It is in the main
-* CiviCRM menu, under: Support > Development > API Explorer.
-*
-* Read more about testing here
-* https://docs.civicrm.org/dev/en/latest/testing/
-*
-* API Standards documentation:
-* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testCreateAddressParsing"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/AddressTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

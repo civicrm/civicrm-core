@@ -35,8 +35,6 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
     $this->_onDuplicate = $this->get('onDuplicate');
     if ($skipColumnHeader) {
-      //showColNames needs to be true to show "Column Names" column
-      $this->assign('showColNames', $skipColumnHeader);
       $this->assign('columnNames', $columnNames);
       /* if we had a column header to skip, stash it for later */
       $this->_columnHeaders = $this->_dataValues[0];
@@ -56,17 +54,30 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
   }
 
   /**
+   * Override contact import metadata with multi-value custom fields.
+   *
+   * Used to match saved mapping fields.
+   *
+   * @return array
+   */
+  protected function getContactImportMetadata(): array {
+    $contactFields = CRM_Contact_BAO_Contact::importableFields('All', FALSE, FALSE, FALSE, TRUE, TRUE);
+    $contactFields['contact_id'] = $contactFields['id'];
+    $contactFields['contact_id']['name'] = 'contact_id';
+    return $contactFields;
+  }
+
+  /**
    * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.
    *
-   * @return array
+   * @return array|bool
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields) {
     $errors = [];
-    $fieldMessage = NULL;
     if (!array_key_exists('savedMapping', $fields)) {
       $importKeys = [];
       foreach ($fields['mapper'] as $mapperPart) {
@@ -89,7 +100,7 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
       }
       else {
         if (CRM_Core_BAO_Mapping::checkMapping($nameField, CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Import Multi value custom data'))) {
-          $errors['saveMappingName'] = ts('Duplicate ' . $self->_mappingType . 'Mapping Name');
+          $errors['saveMappingName'] = ts('Duplicate Mapping Name');
         }
       }
     }
@@ -131,12 +142,8 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
       return;
     }
 
-    $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
-    $separator = $this->controller->exportValue('DataSource', 'fieldSeparator');
-    $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
     $this->_entity = $this->controller->exportValue('DataSource', 'entity');
 
-    $mapperKeys = [];
     $mapper = [];
     $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
     $mapperKeysMain = [];
@@ -171,12 +178,7 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
         $updateMappingFields->mapping_id = $params['mappingId'];
         $updateMappingFields->column_number = $i;
 
-        $explodedValues = explode('_', $mapperKeys[$i][0]);
-        $id = $explodedValues[0] ?? NULL;
-        $first = $explodedValues[1] ?? NULL;
-        $second = $explodedValues[2] ?? NULL;
-
-        $updateMappingFields->name = $mapper[$i];
+        $updateMappingFields->name = $this->getMappingFieldName($mapper[$i]);
         $updateMappingFields->save();
       }
     }
@@ -195,12 +197,7 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
         $saveMappingFields->mapping_id = $saveMapping->id;
         $saveMappingFields->column_number = $i;
 
-        $explodedValues = explode('_', $mapperKeys[$i][0]);
-        $id = $explodedValues[0] ?? NULL;
-        $first = $explodedValues[1] ?? NULL;
-        $second = $explodedValues[2] ?? NULL;
-
-        $saveMappingFields->name = $mapper[$i];
+        $saveMappingFields->name = $this->getMappingFieldName($mapper[$i]);
         $saveMappingFields->save();
       }
       $this->set('savedMapping', $saveMappingFields->mapping_id);
@@ -209,11 +206,20 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
 
     $parser = new $this->_parser($mapperKeysMain);
     $parser->setEntity($this->_multipleCustomData);
-    $parser->run($fileName, $separator, $mapper, $skipColumnHeader,
+    $parser->run($this->getSubmittedValue('uploadFile'), $this->getSubmittedValue('fieldSeparator'), $mapper, $this->getSubmittedValue('skipColumnHeader'),
       CRM_Import_Parser::MODE_PREVIEW, $this->get('contactType')
     );
     // add all the necessary variables to the form
     $parser->set($this);
+  }
+
+  private function getMappingFieldName($label) {
+    $name = array_search($label, $this->_mapperFields);
+    // The `CRM_Import_ImportProcessor::getNameFromLabel` function expects custom fields like "fieldLabel :: groupLabel"
+    if ($name && strpos($name, 'custom_') === 0) {
+      return $label . ' :: ' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_multipleCustomData, 'title');
+    }
+    return $label;
   }
 
 }

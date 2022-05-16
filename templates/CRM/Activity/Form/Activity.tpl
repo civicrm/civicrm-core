@@ -63,7 +63,7 @@
     </td>
   </tr>
 
-  {if !empty($form.separation)}
+  {if $form.separation}
     <tr class="crm-activity-form-block-separation crm-is-multi-activity-wrapper">
       <td class="label">{$form.separation.label}</td>
       <td>{$form.separation.html} {help id="separation"}</td>
@@ -91,8 +91,8 @@
       </td>
   </tr>
 
-  {if !empty($activityTypeFile)}
-  {include file="CRM/$crmDir/Form/Activity/$activityTypeFile.tpl"}
+  {if $activityTypeFile}
+    {include file="CRM/$crmDir/Form/Activity/$activityTypeFile.tpl"}
   {/if}
 
   <tr class="crm-activity-form-block-subject">
@@ -156,7 +156,7 @@
     <td class="label">{$form.result.label}</td><td class="view-value">{$form.result.html}</td>
   </tr>
   {/if}
-  {if !empty($form.tag.html)}
+  {if $form.tag}
   <tr class="crm-activity-form-block-tag">
     <td class="label">{$form.tag.label}</td>
     <td class="view-value">
@@ -165,7 +165,7 @@
   </tr>
   {/if}
 
-  {if !empty($tagsetInfo.activity)}
+  {if $isTagset}
     <tr class="crm-activity-form-block-tag_set">
       {include file="CRM/common/Tagset.tpl" tagsetType='activity' tableLayout=true}
     </tr>
@@ -282,4 +282,4 @@
   {/if}
   </div>{* end of form block*}
 
-{include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl" entityID=$activityId entityTable="civicrm_activity"}
+{include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl" entityID=$activityId entityTable="civicrm_activity" isRepeatingEntity=false}

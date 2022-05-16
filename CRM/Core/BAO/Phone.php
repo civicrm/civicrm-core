@@ -76,9 +76,8 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    *
    * @param int $id
    *   The contact id.
-   *
    * @param bool $updateBlankLocInfo
-   * @param null $type
+   * @param string|null $type
    * @param array $filters
    *
    * @return array
@@ -149,10 +148,8 @@ ORDER BY civicrm_phone.is_primary DESC,  phone_id ASC ";
    * This is called from CRM_Core_BAO_Block as a calculated function.
    *
    * @param array $entityElements
-   *   The array containing entity_id and.
-   *   entity_table name
-   *
-   * @param null $type
+   *   The array containing entity_id and entity_table name
+   * @param string|null $type
    *
    * @return array
    *   the array of phone ids which are potential numbers
@@ -205,7 +202,7 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
   /**
    * Set NULL to phone, mapping, uffield
    *
-   * @param $optionId
+   * @param int $optionId
    *   Value of option to be deleted.
    */
   public static function setOptionToNull($optionId) {

@@ -26,7 +26,7 @@
               <td class="label" for="receive_date_relative">
                 <label>{ts}Contribution Dates{/ts}</label>
               </td>
-              {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="receive_date" colspan="2"}
+              {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="receive_date" to='' from='' colspan="2" class='' hideRelativeLabel=0}
             </tr>
             <tr class="crm-contact-custom-search-contributionDetails-form-block-financial_type">
                 <td class="label" for="financial_type_id">

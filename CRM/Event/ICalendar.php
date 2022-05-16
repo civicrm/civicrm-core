@@ -47,6 +47,7 @@ class CRM_Event_ICalendar {
     $config = CRM_Core_Config::singleton();
 
     $info = CRM_Event_BAO_Event::getCompleteInfo($start, $type, $id, $end);
+
     $template->assign('events', $info);
     $template->assign('timezone', @date_default_timezone_get());
 

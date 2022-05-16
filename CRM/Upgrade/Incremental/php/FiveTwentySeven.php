@@ -10,7 +10,8 @@
  */
 
 /**
- * Upgrade logic for FiveTwentySeven */
+ * Upgrade logic for FiveTwentySeven
+ */
 class CRM_Upgrade_Incremental_php_FiveTwentySeven extends CRM_Upgrade_Incremental_Base {
 
   /**
@@ -33,27 +34,6 @@ class CRM_Upgrade_Incremental_php_FiveTwentySeven extends CRM_Upgrade_Incrementa
       $preUpgradeMessage .= '<p>' . ts('Starting with version 5.28.0, CiviCRM will require the PHP Internationalization extension (PHP-Intl). In preparation for this, the system check will show a warning beginning in 5.27.0 if your site lacks this extension.') . '</p>';
     }
   }
-
-  /**
-   * Compute any messages which should be displayed after upgrade.
-   *
-   * @param string $postUpgradeMessage
-   *   alterable.
-   * @param string $rev
-   *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
-   */
-  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
-    // Example: Generate a post-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
-    // }
-  }
-
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
-   */
 
   /**
    * Upgrade function.

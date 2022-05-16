@@ -18,7 +18,7 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Test\TransactionalInterface;
@@ -28,7 +28,7 @@ use Civi\Test\TransactionalInterface;
  *
  * @group headless
  */
-class AddressTest extends UnitTestCase implements TransactionalInterface {
+class AddressTest extends Api4TestBase implements TransactionalInterface {
 
   /**
    * Check that 2 addresses for the same contact can't both be primary

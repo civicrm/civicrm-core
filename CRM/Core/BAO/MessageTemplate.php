@@ -15,7 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Api4\Email;
 use Civi\Api4\MessageTemplate;
 use Civi\WorkflowMessage\WorkflowMessage;
 
@@ -24,26 +23,23 @@ require_once 'Mail/mime.php';
 /**
  * Class CRM_Core_BAO_MessageTemplate.
  */
-class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
+class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implements \Civi\Core\HookInterface {
 
   /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Core_DAO_MessageTemplate
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $messageTemplates = new CRM_Core_DAO_MessageTemplate();
-    $messageTemplates->copyValues($params);
-    if ($messageTemplates->find(TRUE)) {
-      CRM_Core_DAO::storeValues($messageTemplates, $defaults);
-      return $messageTemplates;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -165,7 +161,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * Delete the Message Templates.
    *
    * @param int $messageTemplatesID
-   *
+   * @deprecated
    * @throws \CRM_Core_Exception
    */
   public static function del($messageTemplatesID) {
@@ -174,18 +170,25 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       throw new CRM_Core_Exception(ts('Invalid Message template'));
     }
 
-    // Set mailing msg template col to NULL
-    $query = "UPDATE civicrm_mailing
-                  SET msg_template_id = NULL
-                  WHERE msg_template_id = %1";
-
-    $params = [1 => [$messageTemplatesID, 'Integer']];
-    CRM_Core_DAO::executeQuery($query, $params);
-
-    $messageTemplates = new CRM_Core_DAO_MessageTemplate();
-    $messageTemplates->id = $messageTemplatesID;
-    $messageTemplates->delete();
+    static::deleteRecord(['id' => $messageTemplatesID]);
+    // Yikes - bad idea setting status messages in BAO CRUD functions. Don't do this.
     CRM_Core_Session::setStatus(ts('Selected message template has been deleted.'), ts('Deleted'), 'success');
+  }
+
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete') {
+      // Set mailing msg template col to NULL
+      $query = "UPDATE civicrm_mailing
+                    SET msg_template_id = NULL
+                    WHERE msg_template_id = %1";
+      $params = [1 => [$event->id, 'Integer']];
+      CRM_Core_DAO::executeQuery($query, $params);
+    }
   }
 
   /**
@@ -390,20 +393,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     // send the template, honouring the target user’s preferences (if any)
     $sent = FALSE;
     if (!empty($params['toEmail'])) {
-      // @todo - consider whether we really should be loading
-      // this based on 'the first email in the db that matches'.
-      // when we likely have the contact id. OTOH people probably barely
-      // use preferredMailFormat these days - the good fight against html
-      // emails was lost a decade ago...
-      $preferredMailFormatArray = Email::get(FALSE)->addWhere('email', '=', $params['toEmail'])->addSelect('contact_id.preferred_mail_format')->execute()->first();
-      $preferredMailFormat = $preferredMailFormatArray['contact_id.preferred_mail_format'] ?? 'Both';
-
-      if ($preferredMailFormat === 'HTML') {
-        $params['text'] = NULL;
-      }
-      if ($preferredMailFormat === 'Text') {
-        $params['html'] = NULL;
-      }
 
       $config = CRM_Core_Config::singleton();
       if ($isAttachPDF) {

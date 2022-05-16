@@ -19,13 +19,6 @@ use Civi\Api4\Contribution;
 class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_ContributionSoft {
 
   /**
-   * Construct method.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Add contribution soft credit record.
    *
    * @param array $params
@@ -180,23 +173,21 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Contribute_BAO_ContributionSoft
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $contributionSoft = new CRM_Contribute_DAO_ContributionSoft();
-    $contributionSoft->copyValues($params);
-    if ($contributionSoft->find(TRUE)) {
-      CRM_Core_DAO::storeValues($contributionSoft, $defaults);
-      return $contributionSoft;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('apiv4');
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -383,7 +374,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     $contactId = $params['cid'];
 
     $filter = NULL;
-    if ($params['context'] == 'membership' && !empty($params['entityID']) && $contactId) {
+    if ($params['context'] === 'membership' && !empty($params['entityID']) && $contactId) {
       $filter = " AND cc.id IN (SELECT contribution_id FROM civicrm_membership_payment WHERE membership_id = {$params['entityID']})";
     }
 
@@ -408,6 +399,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @param array $dTParams
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public static function getSoftContributionList($contact_id, $filter = NULL, $isTest = 0, &$dTParams = NULL) {
     $config = CRM_Core_Config::singleton();
@@ -478,7 +470,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     $dTParams['total'] = CRM_Core_DAO::singleValueQuery('SELECT FOUND_ROWS()');
     $result = [];
     while ($cs->fetch()) {
-      $result[$cs->id]['amount'] = CRM_Utils_Money::format($cs->amount, $cs->currency);
+      $result[$cs->id]['amount'] = Civi::format()->money($cs->amount, $cs->currency);
       $result[$cs->id]['currency'] = $cs->currency;
       $result[$cs->id]['contributor_id'] = $cs->contributor_id;
       $result[$cs->id]['contribution_id'] = $cs->contribution_id;

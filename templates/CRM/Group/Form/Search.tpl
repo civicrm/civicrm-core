@@ -91,7 +91,7 @@
       <th data-data="description" data-orderable="false" cell-class="crm-group-description crmf-description {$editableClass}" class='crm-group-description'>{ts}Description{/ts}</th>
       <th data-data="group_type" cell-class="crm-group-group_type" class='crm-group-group_type'>{ts}Group Type{/ts}</th>
       <th data-data="visibility" cell-class="crm-group-visibility crmf-visibility {$editableClass}" cell-data-type="select" class='crm-group-visibility'>{ts}Visibility{/ts}</th>
-      {if !empty($showOrgInfo)}
+      {if $showOrgInfo}
         <th data-data="org_info" data-orderable="false" cell-class="crm-group-org_info" class='crm-group-org_info'>{ts}Organization{/ts}</th>
       {/if}
       <th data-data="links" data-orderable="false" cell-class="crm-group-group_links" class='crm-group-group_links'>&nbsp;</th>
@@ -186,7 +186,7 @@
     // show hide children
     var context = $('#crm-main-content-wrapper');
     $('table.crm-group-selector', context).on( 'click', 'span.show-children', function(){
-      var showOrgInfo = {/literal}{if $showOrgInfo}"{$showOrgInfo}"{else}"0"{/if}{literal};
+      var showOrgInfo = {/literal}{if $showOrgInfo}true{else}false{/if}{literal};
       var rowID = $(this).parents('tr').prop('id');
       var parentRow = rowID.split('_');
       var parent_id = parentRow[1];

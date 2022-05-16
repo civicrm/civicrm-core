@@ -24,13 +24,6 @@ require_once 'Mail/mime.php';
 class CRM_Mailing_Event_BAO_Subscribe extends CRM_Mailing_Event_DAO_Subscribe {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Register a subscription event.  Create a new contact if one does not
    * already exist.
    *
@@ -44,8 +37,8 @@ class CRM_Mailing_Event_BAO_Subscribe extends CRM_Mailing_Event_DAO_Subscribe {
    *   during event registration.
    * @param string $context
    *
-   * @return int|null
-   *   $se_id      The id of the subscription event, null on failure
+   * @return CRM_Mailing_Event_BAO_Subscribe|null
+   *   $se_id      The subscription event object, null on failure
    */
   public static function &subscribe($group_id, $email, $contactId = NULL, $context = NULL) {
     // CRM-1797 - allow subscription only to public groups

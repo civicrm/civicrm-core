@@ -32,6 +32,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     'inheritLocale' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'lcMessages' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'legacyEncoding' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'format_locale' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'monetaryThousandSeparator' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'monetaryDecimalPoint' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'moneyformat' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
@@ -43,11 +44,9 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $config = CRM_Core_Config::singleton();
-
     $this->setTitle(ts('Settings - Localization'));
 
-    $warningTitle = json_encode(ts("Warning"));
+    $warningTitle = json_encode(ts('Warning'));
     $defaultLocaleOptions = CRM_Admin_Form_Setting_Localization::getDefaultLocaleOptions();
 
     if (CRM_Core_I18n::isMultiLingual()) {
@@ -98,7 +97,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
   }
 
   /**
-   * @param $fields
+   * @param array $fields
    *
    * @return array|bool
    */
@@ -230,8 +229,8 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
   /**
    * Replace available currencies by the ones provided
    *
-   * @param $currencies array of currencies ['USD', 'CAD']
-   * @param $default default currency
+   * @param string[] $currencies array of currencies ['USD', 'CAD']
+   * @param string $default default currency
    */
   public static function updateEnabledCurrencies($currencies, $default) {
 
@@ -339,7 +338,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     $currencies = array_keys(CRM_Core_OptionGroup::values('currencies_enabled'));
     if (!in_array($newCurrency, $currencies)) {
       if (empty($currencies)) {
-        $currencies = [$values['defaultCurrency']];
+        $currencies = [$newCurrency];
       }
       else {
         $currencies[] = $newCurrency;

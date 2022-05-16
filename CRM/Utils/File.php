@@ -293,7 +293,7 @@ class CRM_Utils_File {
   }
 
   /**
-   * @param string|NULL $dsn
+   * @param string|null $dsn
    *   Use NULL to load the default/active connection from CRM_Core_DAO.
    *   Otherwise, give a full DSN string.
    * @param string $fileName
@@ -312,7 +312,7 @@ class CRM_Utils_File {
 
   /**
    *
-   * @param string|NULL $dsn
+   * @param string|null $dsn
    * @param string $queryString
    * @param string $prefix
    * @param bool $dieOnErrors
@@ -377,7 +377,7 @@ class CRM_Utils_File {
   }
 
   /**
-   * @param $ext
+   * @param string $ext
    *
    * @return bool
    */
@@ -1101,6 +1101,52 @@ HTACCESS;
    */
   public static function getExtensionFromPath($path) {
     return pathinfo($path, PATHINFO_EXTENSION);
+  }
+
+  /**
+   * Wrapper for is_dir() to avoid flooding logs when open_basedir is used.
+   *
+   * Don't use this function as a swap-in replacement for is_dir() for all
+   * situations as this might silence errors that you want to know about
+   * and would help troubleshoot problems. It should only be used when
+   * doing something like iterating over a set of folders where you know some
+   * of them might not legitimately exist or might be outside open_basedir
+   * because you're trying to find the right one. If you expect the path you're
+   * checking to be inside open_basedir, then you should use the regular
+   * is_dir(). (e.g. it might not exist but might be something
+   * like a cache folder in templates_c, which can't be outside open_basedir,
+   * so there you would use regular is_dir).
+   *
+   * **** Security alert ****
+   * If you change this function so that it would be possible to return
+   * TRUE without checking the real value of is_dir() then it opens up a
+   * possible security issue.
+   * It should either return FALSE, or the value returned from is_dir().
+   *
+   * @param string|null $dir
+   * @return bool|null
+   *   In php8 the return value from is_dir() is always bool but in php7 it can be null.
+   */
+  public static function isDir(?string $dir) {
+    set_error_handler(function($errno, $errstr) {
+      // If this is open_basedir-related, convert it to an exception so we
+      // can catch it.
+      if (strpos($errstr, 'open_basedir restriction in effect') !== FALSE) {
+        throw new \ErrorException($errstr, $errno);
+      }
+      // Continue with normal error handling so other errors still happen.
+      return FALSE;
+    });
+    try {
+      $is_dir = is_dir($dir);
+    }
+    catch (\ErrorException $e) {
+      $is_dir = FALSE;
+    }
+    finally {
+      restore_error_handler();
+    }
+    return $is_dir;
   }
 
 }

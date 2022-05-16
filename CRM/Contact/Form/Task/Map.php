@@ -118,7 +118,7 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
    * @param array $ids
    * @param int $locationId
    *   Location_id.
-   * @param CRM_Core_Page $page
+   * @param CRM_Core_Form $page
    * @param bool $addBreadCrumb
    * @param string $type
    */
@@ -209,12 +209,12 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
     }
 
     $center = [
-      'lat' => (float ) $sumLat / count($locations),
-      'lng' => (float ) $sumLng / count($locations),
+      'lat' => (float) $sumLat / count($locations),
+      'lng' => (float) $sumLng / count($locations),
     ];
     $span = [
-      'lat' => (float ) ($maxLat - $minLat),
-      'lng' => (float ) ($maxLng - $minLng),
+      'lat' => (float) ($maxLat - $minLat),
+      'lng' => (float) ($maxLng - $minLng),
     ];
     $page->assign_by_ref('center', $center);
     $page->assign_by_ref('span', $span);

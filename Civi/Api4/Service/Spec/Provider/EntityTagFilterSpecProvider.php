@@ -33,7 +33,7 @@ class EntityTagFilterSpecProvider implements Generic\SpecProviderInterface {
       ->setType('Filter')
       ->setOperators(['IN', 'NOT IN'])
       ->addSqlFilter([__CLASS__, 'getTagFilterSql'])
-      ->setSuffixes(['id', 'name', 'label', 'description', 'color'])
+      ->setSuffixes(['name', 'label', 'description', 'color'])
       ->setOptionsCallback([__CLASS__, 'getTagList']);
     $spec->addFieldSpec($field);
   }

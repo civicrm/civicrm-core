@@ -25,6 +25,28 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   const IMPORT_ENTITY = 'Multi value custom data';
 
   /**
+   * Get the import entity (translated).
+   *
+   * Used for template layer text.
+   *
+   * @return string
+   */
+  protected function getTranslatedEntity(): string {
+    return ts('Multi-value Custom Data');
+  }
+
+  /**
+   * Get the import entity plural (translated).
+   *
+   * Used for template layer text.
+   *
+   * @return string
+   */
+  protected function getTranslatedEntities(): string {
+    return ts('multi-value custom data records');
+  }
+
+  /**
    * @return array
    */
   public function setDefaultValues() {
@@ -35,9 +57,9 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
       'multipleCustomData' => $this->_id,
     ];
 
-    if ($loadeMapping = $this->get('loadedMapping')) {
-      $this->assign('loadedMapping', $loadeMapping);
-      $defaults['savedMapping'] = $loadeMapping;
+    $loadedMapping = $this->get('loadedMapping');
+    if ($loadedMapping) {
+      $defaults['savedMapping'] = $loadedMapping;
     }
 
     return $defaults;
@@ -52,6 +74,7 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     parent::buildQuickForm();
 
     $multipleCustomData = CRM_Core_BAO_CustomGroup::getMultipleFieldGroup();
+    $this->assign('fieldGroups', $multipleCustomData);
     $this->add('select', 'multipleCustomData', ts('Multi-value Custom Data'), ['' => ts('- select -')] + $multipleCustomData, TRUE);
 
     $this->addContactTypeSelector();

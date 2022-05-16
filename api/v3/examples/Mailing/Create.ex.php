@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the Mailing.create API.
  *
@@ -11,17 +16,17 @@ function mailing_create_example() {
     'body_text' => 'This is {contact.display_name}.
 https://civicrm.org
 {domain.address}{action.optOutUrl}',
-    'body_html' => '<link href=\'https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700\' rel=\'stylesheet\' type=\'text/css\'><p><a href=\"http://{action.forward}\">Forward this email</a><a href=\"{action.forward}\">Forward this email with no protocol</a></p<p>This is {contact.display_name}.</p><p><a href=\'https://civicrm.org/\'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>',
+    'body_html' => '<link href=\'https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700\' rel=\'stylesheet\' type=\'text/css\'><p><a href=\"{action.forward}\">Forward this email</a></p><p>This is {contact.display_name}.</p><p><a href=\'https://civicrm.org/\'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>',
     'name' => 'mailing name',
-    'created_id' => 15,
+    'created_id' => 18,
     'header_id' => '',
     'footer_id' => '',
     'groups' => [
       'include' => [
-        '0' => 13,
+        '0' => 15,
       ],
       'exclude' => [
-        '0' => 14,
+        '0' => 16,
       ],
     ],
     'mailings' => [
@@ -42,7 +47,7 @@ https://civicrm.org
     ],
   ];
 
-  try{
+  try {
     $result = civicrm_api3('Mailing', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -73,10 +78,10 @@ function mailing_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 9,
+    'id' => 10,
     'values' => [
-      '9' => [
-        'id' => '9',
+      '10' => [
+        'id' => '10',
         'domain_id' => '1',
         'header_id' => '',
         'footer_id' => '',
@@ -95,7 +100,7 @@ function mailing_create_expectedresult() {
         'body_text' => 'This is {contact.display_name}.
 https://civicrm.org
 {domain.address}{action.optOutUrl}',
-        'body_html' => '<link href=\'https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700\' rel=\'stylesheet\' type=\'text/css\'><p><a href=\"http://{action.forward}\">Forward this email</a><a href=\"{action.forward}\">Forward this email with no protocol</a></p<p>This is {contact.display_name}.</p><p><a href=\'https://civicrm.org/\'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>',
+        'body_html' => '<link href=\'https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700\' rel=\'stylesheet\' type=\'text/css\'><p><a href=\"{action.forward}\">Forward this email</a></p><p>This is {contact.display_name}.</p><p><a href=\'https://civicrm.org/\'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>',
         'url_tracking' => '1',
         'forward_replies' => 0,
         'auto_responder' => 0,
@@ -103,7 +108,7 @@ https://civicrm.org
         'is_completed' => '',
         'msg_template_id' => '',
         'override_verp' => '1',
-        'created_id' => '15',
+        'created_id' => '18',
         'created_date' => '2013-07-28 08:49:19',
         'modified_date' => '2012-11-14 16:02:35',
         'scheduled_id' => '',
@@ -129,9 +134,9 @@ https://civicrm.org
           'values' => [
             '0' => [
               'id' => '4',
-              'mailing_id' => '9',
-              'contact_id' => '16',
-              'email_id' => '16',
+              'mailing_id' => '10',
+              'contact_id' => '19',
+              'email_id' => '19',
               'api.contact.getvalue' => 'Mr. Includer Person II',
               'api.email.getvalue' => 'include.me@example.org',
             ],
@@ -145,23 +150,23 @@ https://civicrm.org
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testMailerPreviewRecipients"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MailingTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
-*
-* To Learn about the API read
-* https://docs.civicrm.org/dev/en/latest/api/
-*
-* Browse the API on your own site with the API Explorer. It is in the main
-* CiviCRM menu, under: Support > Development > API Explorer.
-*
-* Read more about testing here
-* https://docs.civicrm.org/dev/en/latest/testing/
-*
-* API Standards documentation:
-* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testMailerPreviewRecipients"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MailingTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

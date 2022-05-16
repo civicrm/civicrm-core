@@ -22,7 +22,7 @@ class SqlNumber extends SqlExpression {
     \CRM_Utils_Type::validate($this->expr, 'Float');
   }
 
-  public function render(array $fieldList): string {
+  public function render(Api4SelectQuery $query): string {
     return $this->expr;
   }
 

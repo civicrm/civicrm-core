@@ -25,11 +25,11 @@
 {/if}
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 
-{elseif !empty($is_pay_later)}
+{elseif $is_pay_later}
 
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 
-{if isset($pay_later_receipt)}{$pay_later_receipt}{/if}
+{$pay_later_receipt}
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 
 {/if}
@@ -113,21 +113,21 @@
 
 {foreach from=$value item=line}
 {if !empty($pricesetFieldsCount) }{capture assign=ts_participant_count}{$line.participant_count}{/capture}{/if}
-{capture assign=ts_item}{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description} {$line.description}{/if}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.qty|string_format:"%5s"} {$line.unit_price|crmMoney|string_format:"%10s"} {if !empty($dataArray)} {$line.unit_price*$line.qty|crmMoney:$currency|string_format:"%10s"} {if isset($line.tax_rate) and ($line.tax_rate != "" || $line.tax_amount != "")}  {$line.tax_rate|string_format:"%.2f"} %  {$line.tax_amount|crmMoney:$currency|string_format:"%10s"} {else}                  {/if}  {/if}  {$line.line_total+$line.tax_amount|crmMoney|string_format:"%10s"} {if !empty($ts_participant_count)}{$ts_participant_count|string_format:"%10s"}{/if}
+{capture assign=ts_item}{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description} {$line.description}{/if}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.qty|string_format:"%5s"} {$line.unit_price|crmMoney|string_format:"%10s"} {if !empty($dataArray)} {$line.unit_price*$line.qty|crmMoney:$currency|string_format:"%10s"} {if $line.tax_rate || $line.tax_amount != ""}  {$line.tax_rate|string_format:"%.2f"} %  {$line.tax_amount|crmMoney:$currency|string_format:"%10s"} {else}                  {/if}  {/if}  {$line.line_total+$line.tax_amount|crmMoney|string_format:"%10s"} {if !empty($ts_participant_count)}{$ts_participant_count|string_format:"%10s"}{/if}
 {/foreach}
 {/if}
 {/foreach}
 
 {if !empty($dataArray)}
-{if isset($totalAmount) and isset($totalTaxAmount)}
+{if $totalAmount and $totalTaxAmount}
 {ts}Amount before Tax{/ts}: {$totalAmount-$totalTaxAmount|crmMoney:$currency}
 {/if}
 
 {foreach from=$dataArray item=value key=priceset}
 {if $priceset || $priceset == 0}
-{if isset($taxTerm)}{$taxTerm}{/if} {$priceset|string_format:"%.2f"}%: {$value|crmMoney:$currency}
+{$taxTerm} {$priceset|string_format:"%.2f"}%: {$value|crmMoney:$currency}
 {else}
-{ts}No{/ts} {if isset($taxTerm)}{$taxTerm}{/if}: {$value|crmMoney:$currency}
+{ts}No{/ts} {$taxTerm}: {$value|crmMoney:$currency}
 {/if}
 {/foreach}
 {/if}
@@ -138,7 +138,7 @@
 {/foreach}
 {/if}
 
-{if isset($totalTaxAmount)}
+{if $totalTaxAmount}
 {ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}
 {/if}
 {if !empty($isPrimary)}
@@ -167,7 +167,7 @@
 {ts}Total Participants{/ts}: {$count}
 {/if}
 
-{if !empty($is_pay_later) }
+{if $is_pay_later}
 
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 

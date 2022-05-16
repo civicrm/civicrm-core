@@ -20,12 +20,13 @@
 namespace api\v4\Action;
 
 use Civi\Api4\Event;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class RequiredFieldTest extends UnitTestCase {
+class RequiredFieldTest extends Api4TestBase implements TransactionalInterface {
 
   public function testRequired() {
     $msg = '';

@@ -20,27 +20,27 @@
       </tr>
       <tr>
         <td><label for="contribution_recur_start_date_relative">{$form.contribution_recur_start_date_relative.label}</label></td>
-        {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="contribution_recur_start_date" colspan="2" hideRelativeLabel=1}
+        {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="contribution_recur_start_date" to='' from='' colspan="2" hideRelativeLabel=1 class =''}
       </tr>
       <tr>
         <td><label for="contribution_recur_end_date_relative">{$form.contribution_recur_end_date_relative.label}</label></td>
-        {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="contribution_recur_end_date" colspan="2" hideRelativeLabel=1}
+        {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="contribution_recur_end_date" to='' from='' colspan="2" hideRelativeLabel=1 class =''}
       </tr>
       <tr>
         <td><label for="contribution_recur_modified_date_relative">{$form.contribution_recur_modified_date_relative.label}</label></td>
-        {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="contribution_recur_modified_date" colspan="2" hideRelativeLabel=1}
+        {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="contribution_recur_modified_date" to='' from='' colspan="2" class ='' hideRelativeLabel=1}
       </tr>
       <tr>
         <td><label for="contribution_recur_next_sched_contribution_date_relative">{$form.contribution_recur_next_sched_contribution_date_relative.label}</label></td>
-        {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="contribution_recur_next_sched_contribution_date" colspan="2" hideRelativeLabel=1}
+        {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="contribution_recur_next_sched_contribution_date" to='' from='' colspan="2" hideRelativeLabel=1 class=''}
       </tr>
       <tr>
         <td><label for="contribution_recur_failure_rety_date_relative">{$form.contribution_recur_failure_retry_date_relative.label}</label></td>
-        {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="contribution_recur_failure_retry_date" colspan="2" hideRelativeLabel=1}
+        {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="contribution_recur_failure_retry_date" to='' from='' colspan="2" hideRelativeLabel=1 class=''}
       </tr>
       <tr>
         <td><label for="contribution_recur_cancel_date_relative">{$form.contribution_recur_cancel_date_relative.label}</label></td>
-        {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="contribution_recur_cancel_date" colspan="2" hideRelativeLabel=1}
+        {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="contribution_recur_cancel_date" to='' from='' colspan="2" hideRelativeLabel=1 class=''}
       </tr>
       <tr>
         <td>{ts}Status{/ts}</td>

@@ -23,7 +23,7 @@ require_once 'HTML/QuickForm/Rule/Email.php';
 class CRM_Utils_Rule {
 
   /**
-   * @param $str
+   * @param string|null $str
    * @param int $maxLength
    *
    * @return bool
@@ -44,7 +44,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $str
+   * @param string|null $str
    *
    * @return bool
    */
@@ -53,7 +53,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $str
+   * @param string|null $str
    *
    * @return bool
    */
@@ -74,7 +74,7 @@ class CRM_Utils_Rule {
   /**
    * Validate that a string is a valid MySQL column name or alias.
    *
-   * @param $str
+   * @param string|null $str
    *
    * @return bool
    */
@@ -104,7 +104,7 @@ class CRM_Utils_Rule {
    *
    * Empty string should be treated as invalid and ignored => default = ASC.
    *
-   * @param $str
+   * @param string $str
    * @return bool
    */
   public static function mysqlOrderByDirection($str) {
@@ -118,7 +118,7 @@ class CRM_Utils_Rule {
   /**
    * Validate that a string is valid order by clause.
    *
-   * @param $str
+   * @param string $str
    * @return bool
    */
   public static function mysqlOrderBy($str) {
@@ -150,7 +150,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $str
+   * @param string $str
    *
    * @return bool
    */
@@ -171,7 +171,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $phone
+   * @param string|null $phone
    *
    * @return bool
    */
@@ -189,7 +189,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $query
+   * @param string|null $query
    *
    * @return bool
    */
@@ -208,7 +208,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $url
+   * @param string|null $url
    *
    * @return bool
    */
@@ -225,7 +225,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $url
+   * @param string|null $url
    *
    * @return bool
    */
@@ -238,7 +238,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $string
+   * @param string $string
    *
    * @return bool
    */
@@ -248,7 +248,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $domain
+   * @param string $domain
    *
    * @return bool
    */
@@ -261,10 +261,10 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
-   * @param null $default
+   * @param string $value
+   * @param string|null $default
    *
-   * @return null
+   * @return string|null
    */
   public static function date($value, $default = NULL) {
     if (is_string($value) &&
@@ -276,10 +276,10 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
-   * @param null $default
+   * @param string $value
+   * @param string|null $default
    *
-   * @return null|string
+   * @return string|null
    */
   public static function dateTime($value, $default = NULL) {
     $result = $default;
@@ -410,7 +410,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
+   * @param mixed $value
    *
    * @return bool
    */
@@ -443,7 +443,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
+   * @param mixed $value
    *
    * @return bool
    */
@@ -462,7 +462,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
+   * @param mixed $value
    *
    * @return bool
    */
@@ -478,7 +478,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
+   * @param mixed $value
    *
    * @return bool
    */
@@ -504,7 +504,7 @@ class CRM_Utils_Rule {
    * @see \CRM_Utils_RuleTest::alphanumericData
    *   for examples of vales that give TRUE/FALSE here
    *
-   * @param $value
+   * @param string $value
    *
    * @return bool
    */
@@ -513,8 +513,8 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
-   * @param $noOfDigit
+   * @param string $value
+   * @param int $noOfDigit
    *
    * @return bool
    */
@@ -525,7 +525,7 @@ class CRM_Utils_Rule {
   /**
    * Strict validation of 6-digit hex color notation per html5 <input type="color">
    *
-   * @param $value
+   * @param string $value
    * @return bool
    */
   public static function color($value) {
@@ -587,7 +587,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
+   * @param string $value
    *
    * @return bool
    */
@@ -605,7 +605,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
+   * @param mixed $value
    * @param int $maxLength
    *
    * @return bool
@@ -620,7 +620,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
+   * @param bool|string $value
    *
    * @return bool
    */
@@ -635,7 +635,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
+   * @param mixed $value
    *
    * @return bool
    */
@@ -697,7 +697,7 @@ class CRM_Utils_Rule {
    * allow between 4-6 digits as postal code since india needs 6 and US needs 5 (or
    * if u disregard the first 0, 4 (thanx excel!)
    * FIXME: we need to figure out how to localize such rules
-   * @param $value
+   * @param string $value
    *
    * @return bool
    */
@@ -756,24 +756,6 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * See how file rules are written in HTML/QuickForm/file.php
-   * Checks to make sure the uploaded file is html
-   *
-   * @param array $elementValue
-   *
-   * @return bool
-   *   True if file has been uploaded, false otherwise
-   */
-  public static function htmlFile($elementValue) {
-    if ((isset($elementValue['error']) && $elementValue['error'] == 0) ||
-      (!empty($elementValue['tmp_name']) && $elementValue['tmp_name'] != 'none')
-    ) {
-      return CRM_Utils_File::isHtmlFile($elementValue['tmp_name']);
-    }
-    return FALSE;
-  }
-
-  /**
    * Check if there is a record with the same name in the db.
    *
    * @param string $value
@@ -804,8 +786,8 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
-   * @param $type
+   * @param string $value
+   * @param string $type
    *
    * @return bool
    */
@@ -814,8 +796,8 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
-   * @param $type
+   * @param string $value
+   * @param string $type
    *
    * @return bool
    */
@@ -824,7 +806,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
+   * @param mixed $value
    *
    * @return bool
    */
@@ -856,7 +838,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $path
+   * @param string $path
    *
    * @return bool
    */
@@ -878,8 +860,8 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
-   * @param null $actualElementValue
+   * @param mixed $value
+   * @param mixed $actualElementValue
    *
    * @return bool
    */
@@ -944,7 +926,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $key
+   * @param mixed $key
    *
    * @return bool
    */

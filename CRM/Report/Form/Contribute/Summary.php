@@ -16,11 +16,6 @@
  */
 class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
 
-  protected $_charts = [
-    '' => 'Tabular',
-    'barChart' => 'Bar Chart',
-    'pieChart' => 'Pie Chart',
-  ];
   protected $_customGroupExtends = ['Contribution', 'Contact', 'Individual'];
   protected $_customGroupGroupBy = TRUE;
 
@@ -337,6 +332,13 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     ] + $this->addAddressFields();
 
     $this->addCampaignFields('civicrm_contribution', TRUE);
+
+    // Add charts support
+    $this->_charts = [
+      '' => ts('Tabular'),
+      'barChart' => ts('Bar Chart'),
+      'pieChart' => ts('Pie Chart'),
+    ];
 
     $this->_tagFilter = TRUE;
     $this->_groupFilter = TRUE;
@@ -1014,7 +1016,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         $mode[] = CRM_Utils_Money::format($modeDAO->amount, $modeDAO->currency);
       }
       else {
-        $mode[] = 'N/A';
+        $mode[] = ts('N/A');
       }
     }
     return $mode;

@@ -576,7 +576,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */

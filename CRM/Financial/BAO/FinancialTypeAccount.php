@@ -17,13 +17,6 @@
 class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFinancialAccount {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Fetch object based on array of properties.
    *
    * @param array $params
@@ -93,7 +86,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
 
     $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_EntityFinancialAccount', $financialTypeAccountId, 'entity_id');
     // check dependencies
-    // FIXME more table containing financial_type_id to come
+    // FIXME hardcoded list = bad
     $dependency = [
       ['Contribute', 'Contribution'],
       ['Contribute', 'ContributionPage'],
@@ -107,12 +100,14 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
 
     foreach ($dependency as $name) {
       $daoString = 'CRM_' . $name[0] . '_DAO_' . $name[1];
-      /* @var \CRM_Core_DAO $dao */
-      $dao = new $daoString();
-      $dao->financial_type_id = $financialTypeId;
-      if ($dao->find(TRUE)) {
-        $check = TRUE;
-        break;
+      if (class_exists($daoString)) {
+        /* @var \CRM_Core_DAO $dao */
+        $dao = new $daoString();
+        $dao->financial_type_id = $financialTypeId;
+        if ($dao->find(TRUE)) {
+          $check = TRUE;
+          break;
+        }
       }
     }
 

@@ -124,7 +124,7 @@ class CRM_Financial_BAO_Order {
    *
    * @var bool
    */
-  protected $isPermitOverrideFinancialTypeForMultipleLines = TRUE;
+  protected $isPermitOverrideFinancialTypeForMultipleLines = FALSE;
 
   /**
    * @return bool
@@ -316,7 +316,7 @@ class CRM_Financial_BAO_Order {
    *
    * @internal use in tested core code only.
    *
-   * @param \CRM_Core_Form|NULL $form
+   * @param \CRM_Core_Form|null $form
    */
   public function setForm(?CRM_Core_Form $form): void {
     $this->form = $form;
@@ -793,12 +793,14 @@ class CRM_Financial_BAO_Order {
     }
     else {
       foreach ($this->getPriceOptions() as $fieldID => $valueID) {
-        $this->setPriceSetIDFromSelectedField($fieldID);
-        $throwAwayArray = [];
-        // @todo - still using getLine for now but better to bring it to this class & do a better job.
-        $newLines = CRM_Price_BAO_PriceSet::getLine($params, $throwAwayArray, $this->getPriceSetID(), $this->getPriceFieldSpec($fieldID), $fieldID)[1];
-        foreach ($newLines as $newLine) {
-          $lineItems[$newLine['price_field_value_id']] = $newLine;
+        if ($valueID !== '') {
+          $this->setPriceSetIDFromSelectedField($fieldID);
+          $throwAwayArray = [];
+          // @todo - still using getLine for now but better to bring it to this class & do a better job.
+          $newLines = CRM_Price_BAO_PriceSet::getLine($params, $throwAwayArray, $this->getPriceSetID(), $this->getPriceFieldSpec($fieldID), $fieldID)[1];
+          foreach ($newLines as $newLine) {
+            $lineItems[$newLine['price_field_value_id']] = $newLine;
+          }
         }
       }
     }
@@ -817,7 +819,7 @@ class CRM_Financial_BAO_Order {
       if ($this->isOverrideLineItemFinancialType($lineItem['financial_type_id']) !== FALSE) {
         $lineItem['financial_type_id'] = $this->getOverrideFinancialTypeID();
       }
-      $taxRate = $this->getTaxRate((int) $lineItem['financial_type_id']);
+      $lineItem['tax_rate'] = $taxRate = $this->getTaxRate((int) $lineItem['financial_type_id']);
       if ($this->getOverrideTotalAmount() !== FALSE) {
         $this->addTotalsToLineBasedOnOverrideTotal((int) $lineItem['financial_type_id'], $lineItem);
       }
@@ -1030,7 +1032,7 @@ class CRM_Financial_BAO_Order {
    * @return void
    */
   protected function addTotalsToLineBasedOnOverrideTotal(int $financialTypeID, array &$lineItem): void {
-    $taxRate = $this->getTaxRate($financialTypeID);
+    $lineItem['tax_rate'] = $taxRate = $this->getTaxRate($financialTypeID);
     if ($taxRate) {
       // Total is tax inclusive.
       $lineItem['tax_amount'] = ($taxRate / 100) * $this->getOverrideTotalAmount() / (1 + ($taxRate / 100));

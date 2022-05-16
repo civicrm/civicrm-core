@@ -15,7 +15,7 @@
    <dl>
      {section name=count start=1 loop=`$maxMapper`}
      {assign var='i' value=$smarty.section.count.index}
-       <dt>{$form.mapper[$i].label}</dt><dd>{$form.mapper[$i].html}<span class="tundra" id="id_map_mapper[{$i}]_1"><span id="id_mapper[{$i}]_1"></span></span><span class="tundra" id="id_map_mapper[{$i}]_2"><span id="id_mapper[{$i}]_2"></span></span><span class="tundra" id="id_map_mapper[{$i}]_3"><span id="id_mapper[{$i}]_3"></span></span></dd>
+       <dt>{$form.mapper[$i].label}</dt><dd>{$form.mapper[$i].html|smarty:nodefaults}<span class="tundra" id="id_map_mapper[{$i}]_1"><span id="id_mapper[{$i}]_1"></span></span><span class="tundra" id="id_map_mapper[{$i}]_2"><span id="id_mapper[{$i}]_2"></span></span><span class="tundra" id="id_map_mapper[{$i}]_3"><span id="id_mapper[{$i}]_3"></span></span></dd>
 
        {literal}
         <script type="text/javascript">

@@ -2,8 +2,7 @@
 
 <table>
   <!--
-    NOTE: To facilitate upgrades, manually copy the CREATE TABLE statement
-    from sql/civicrm.mysql to sql/civicrm_queue_item.mysql
+    NOTE: To facilitate upgrades, manually copy any ALTER TABLE statements to CRM_Queue_BAO_QueueItem.
   -->
   <base>CRM/Queue</base>
   <class>QueueItem</class>
@@ -12,7 +11,7 @@
   <add>4.2</add>
   <field>
     <name>id</name>
-    <title>Queue ID</title>
+    <title>Queue Item ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <html>
@@ -29,6 +28,7 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Name of the queue which includes this item</comment>
+    <!-- This SHOULD match `civicrm_queue.name`; however, historically, it has been required to create records in `civicrm_queue`. -->
     <required>true</required>
     <html>
       <type>Text</type>
@@ -64,7 +64,18 @@
       <formatType>activityDateTime</formatType>
     </html>
   </field>
-
+  <field>
+    <name>run_count</name>
+    <title>Run Count</title>
+    <comment>Number of times execution has been attempted.</comment>
+    <type>int</type>
+    <default>0</default>
+    <required>true</required>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>5.48</add>
+  </field>
   <field>
     <name>data</name>
     <title>Queue item data</title>

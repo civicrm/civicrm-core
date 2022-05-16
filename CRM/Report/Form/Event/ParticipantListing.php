@@ -476,7 +476,7 @@ ORDER BY  cv.label
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */

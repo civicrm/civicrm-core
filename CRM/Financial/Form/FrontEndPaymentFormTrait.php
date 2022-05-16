@@ -110,7 +110,7 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
    * This is an early cut of what will ideally eventually be a hooklike call to the
    * CRM_Invoicing_Utils class with a potential end goal of moving this handling to an extension.
    *
-   * @param $tplLineItems
+   * @param array $tplLineItems
    */
   protected function alterLineItemsForTemplate(&$tplLineItems) {
     if (!CRM_Invoicing_Utils::isInvoicingEnabled()) {
@@ -185,7 +185,7 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
     $optAttributes = [];
     foreach ($paymentProcessors as $ppKey => $ppval) {
       if ($ppKey > 0) {
-        $optAttributes[$ppKey]['class'] = 'payment_processor_' . strtolower($this->_paymentProcessors[$ppKey]['payment_processor_type']);
+        $optAttributes[$ppKey]['class'] = 'payment_processor_' . strtolower(CRM_Utils_String::munge($this->_paymentProcessors[$ppKey]['payment_processor_type'], '-'));
       }
       else {
         $optAttributes[$ppKey]['class'] = 'payment_processor_paylater';

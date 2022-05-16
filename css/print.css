@@ -1,77 +1,81 @@
 /* CiviCRM Print Media Stylesheet */
 
 /* Hide any buttons or other form items when printing*/
-#crm-container .buttons, #crm-container .crm-submit-buttons, #crm-container .crm-actions-ribbon, #crm-container .crm-form-submit {
-     display: none;
+#crm-container .buttons,
+#crm-container .crm-submit-buttons,
+#crm-container .crm-actions-ribbon,
+#crm-container .crm-form-submit {
+  display: none;
 }
 
-table.form-layout td, table.form-layout th {
+table.form-layout td,
+table.form-layout th {
   border: 1px solid grey;
   padding: 4px;
   margin: 0px;
 }
 
-.form-item .element-right{
-     display: none;
- }
+.form-item .element-right {
+  display: none;
+}
 #crm-container {
-    overflow: visible !important;
-    font-family      : DejaVu Sans, serif;
-    margin           : 0px 10px 0px 10px;
+  overflow: visible !important;
+  font-family: DejaVu Sans, serif;
+  margin: 0px 10px 0px 10px;
 }
 
 /* CSS for Print and PDF of Reports */
 #crm-container .report-layout {
-    border           : 1px groove #DDDDDD;
-    width            : 100%;
-    border-collapse  : collapse;
+  border: 1px groove #dddddd;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 #crm-container .bold {
-    font-weight      : bold;
-    font-size        : 1.1em;
+  font-weight: bold;
+  font-size: 1.1em;
 }
 
 #crm-container .criterial-group {
-    border-bottom: 2px solid #DCDCDC;
+  border-bottom: 2px solid #dcdcdc;
 }
 
 #crm-container .reports-header-right {
-    text-align       : right;
+  text-align: right;
 }
 
 #crm-container .reports-header {
-    text-align       : left;
+  text-align: left;
 }
 
 #crm-container .report-contents {
-    border           : 1px groove #DDDDDD;
-    padding          : 4px;
-    width            : 20%;
+  border: 1px groove #dddddd;
+  padding: 4px;
+  width: 20%;
 }
 
 #crm-container .report-contents-right {
-    border           : 1px groove #DDDDDD;
-    padding          : 4px;
-    text-align       : right;
+  border: 1px groove #dddddd;
+  padding: 4px;
+  text-align: right;
 }
 
 #crm-container table.report-layout td {
-    border           : 1px groove #DDDDDD;
-    padding          : 4px;
+  border: 1px groove #dddddd;
+  padding: 4px;
 }
 
 #crm-container table.report-layout tr {
-    font-size        : 0.9em;
+  font-size: 0.9em;
 }
 
 #crm-container table.report-layout tr.group-row {
-    font-size        : 1em;
+  font-size: 1em;
 }
 
 #crm-container table.report-layout tr.total-row {
-   font-size        : 1em;
-   border-top       : 2px groove #DCDCDC;
+  font-size: 1em;
+  border-top: 2px groove #dcdcdc;
 }
 
 #crm-container div.page-break {
@@ -80,52 +84,53 @@ table.form-layout td, table.form-layout th {
 }
 
 #crm-container .report-label {
-    text-align       : right;
-    font-weight      : bold;
+  text-align: right;
+  font-weight: bold;
 }
 
 #crm-container table.report-layout th {
-    padding          : 4px;
-    background-color : #DCDCDC;
-    /*text-align       : left;*/
-    vertical-align   : top;
+  padding: 4px;
+  background-color: #dcdcdc;
+  /*text-align       : left;*/
+  vertical-align: top;
 }
 
 #crm-container table.report-layout th.report-contents {
-    background-color : #F5F5F5;
+  background-color: #f5f5f5;
 }
 
 #crm-container table.report-layout th.statistics {
-    width            : 5%;
-    white-space      : nowrap;
-    text-align       : left;
+  width: 5%;
+  white-space: nowrap;
+  text-align: left;
 }
 
-#crm-container table.report-layout th.statistics, #crm-container table.report-layout th.label {
-    width            : 20%;
-    text-align       : left;
+#crm-container table.report-layout th.statistics,
+#crm-container table.report-layout th.label {
+  width: 20%;
+  text-align: left;
 }
 
 #crm-container h1 {
-    text-align       : center;
-    font-size        : 1.5em;
-    font-style       : italic;
-    margin           : 0;
+  text-align: center;
+  font-size: 1.5em;
+  font-style: italic;
+  margin: 0;
 }
 
 #crm-container h2 {
-    text-align       : left;
-    font-size        : 1.2em;
+  text-align: left;
+  font-size: 1.2em;
 }
 
 
 #crm-container div#report-date {
-    font-size        : .8em;
-    font-style       : italic;
-    float            : right;
+  font-size: .8em;
+  font-style: italic;
+  float: right;
 }
 
 /* Fix for CRM-19869 */
 tr {
-    page-break-inside: avoid;
+  page-break-inside: avoid;
 }

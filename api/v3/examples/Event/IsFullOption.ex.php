@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the Event.getsingle API.
  *
@@ -13,7 +18,7 @@ function event_getsingle_example() {
     'return.is_full' => 1,
   ];
 
-  try{
+  try {
     $result = civicrm_api3('Event', 'getsingle', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -66,7 +71,7 @@ function event_getsingle_expectedresult() {
     'allow_selfcancelxfer' => 0,
     'selfcancelxfer_time' => 0,
     'is_template' => 0,
-    'created_date' => '2019-08-20 19:17:20',
+    'created_date' => '2022-01-17 12:29:42',
     'is_share' => '1',
     'is_confirm_enabled' => '1',
     'is_billing_required' => 0,
@@ -78,23 +83,23 @@ function event_getsingle_expectedresult() {
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testGetSingleReturnIsFull"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/EventTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
-*
-* To Learn about the API read
-* https://docs.civicrm.org/dev/en/latest/api/
-*
-* Browse the API on your own site with the API Explorer. It is in the main
-* CiviCRM menu, under: Support > Development > API Explorer.
-*
-* Read more about testing here
-* https://docs.civicrm.org/dev/en/latest/testing/
-*
-* API Standards documentation:
-* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testGetSingleReturnIsFull"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/EventTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

@@ -1,10 +1,15 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the Contact.getsingle API.
  *
  * This demonstrates use of the 'format.single_entity_array' param.
  * This param causes the only contact to be returned as an array without the other levels.
- * It will be ignored if there is not exactly 1 result
+ * It will be ignored if there is not exactly 1 result.
  *
  * @return array
  *   API result array
@@ -14,7 +19,7 @@ function contact_getsingle_example() {
     'id' => 3,
   ];
 
-  try{
+  try {
     $result = civicrm_api3('Contact', 'getsingle', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -93,7 +98,7 @@ function contact_getsingle_expectedresult() {
     'phone_id' => '',
     'phone_type_id' => '',
     'phone' => '',
-    'email_id' => '1',
+    'email_id' => '3',
     'email' => 'anthony_anderson@civicrm.org',
     'on_hold' => 0,
     'im_id' => '',
@@ -116,23 +121,23 @@ function contact_getsingle_expectedresult() {
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testContactGetSingleEntityArray"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
-*
-* To Learn about the API read
-* https://docs.civicrm.org/dev/en/latest/api/
-*
-* Browse the API on your own site with the API Explorer. It is in the main
-* CiviCRM menu, under: Support > Development > API Explorer.
-*
-* Read more about testing here
-* https://docs.civicrm.org/dev/en/latest/testing/
-*
-* API Standards documentation:
-* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testContactGetSingleEntityArray"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

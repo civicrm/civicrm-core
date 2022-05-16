@@ -26,7 +26,7 @@
     {/if}
 
     {if $is_pay_later}
-     <p>{if isset($pay_later_receipt)}{$pay_later_receipt}{/if}</p> {* FIXME: this might be text rather than HTML *}
+     <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
     {/if}
 
    </td>
@@ -178,7 +178,7 @@
               <td>
                {$line.unit_price*$line.qty|crmMoney}
               </td>
-              {if isset($line.tax_rate) and ($line.tax_rate != "" || $line.tax_amount != "")}
+              {if ($line.tax_rate || $line.tax_amount != "")}
                <td>
                 {$line.tax_rate|string_format:"%.2f"}%
                </td>
@@ -217,17 +217,17 @@
         {foreach from=$dataArray item=value key=priceset}
          <tr>
          {if $priceset || $priceset == 0}
-           <td>&nbsp;{if isset($taxTerm)}{$taxTerm}{/if} {$priceset|string_format:"%.2f"}%</td>
+           <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>
            <td>&nbsp;{$value|crmMoney:$currency}</td>
          {else}
-           <td>&nbsp;{ts}NO{/ts} {if isset($taxTerm)}{$taxTerm}{/if}</td>
+           <td>&nbsp;{ts}NO{/ts} {$taxTerm}</td>
            <td>&nbsp;{$value|crmMoney:$currency}</td>
          {/if}
          </tr>
         {/foreach}
        {/if}
        {/if}
-       {if isset($totalTaxAmount)}
+       {if $totalTaxAmount}
         <tr>
          <td {$labelStyle}>
           {ts}Total Tax Amount{/ts}

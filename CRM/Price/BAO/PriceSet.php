@@ -29,13 +29,6 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
   public static $_defaultPriceSet = NULL;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Takes an associative array and creates a price set object.
    *
    * @param array $params
@@ -76,17 +69,20 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
   }
 
   /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Price_DAO_PriceSet
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    return CRM_Core_DAO::commonRetrieve('CRM_Price_DAO_PriceSet', $params, $defaults);
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -732,28 +728,23 @@ WHERE  id = %1";
    * @return string
    *   Text for civicrm_contribution.amount_level field.
    */
-  public static function getAmountLevelText($params) {
+  public static function getAmountLevelText($params): string {
     $priceSetID = $params['priceSetId'];
     $priceFieldSelection = self::filterPriceFieldsFromParams($priceSetID, $params);
     $priceFieldMetadata = self::getCachedPriceSetDetail($priceSetID);
-    $displayParticipantCount = NULL;
 
     $amount_level = [];
     foreach ($priceFieldMetadata['fields'] as $field) {
       if (!empty($priceFieldSelection[$field['id']])) {
-        $qtyString = '';
-        if ($field['is_enter_qty']) {
-          $qtyString = ' - ' . (float) $params['price_' . $field['id']];
-        }
         // We deliberately & specifically exclude contribution amount as it has a specific meaning.
         // ie. it represents the default price field for a contribution. Another approach would be not
         // to give it a label if we don't want it to show.
         if ($field['label'] !== ts('Contribution Amount')) {
-          $amount_level[] = $field['label'] . $qtyString;
+          $amount_level[] = $field['label'] . ($field['is_enter_qty'] ? ' - ' . (float) $params['price_' . $field['id']] : '');
         }
       }
     }
-    return CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
+    return CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . CRM_Core_DAO::VALUE_SEPARATOR;
   }
 
   /**
@@ -1249,28 +1240,6 @@ GROUP BY     mt.member_of_contact_id ";
     }
 
     return $autoRenewOption;
-  }
-
-  /**
-   * Retrieve auto renew frequency and interval.
-   *
-   * @param int $priceSetId
-   *   Price set id.
-   *
-   * @return array
-   *   associate array of frequency interval and unit
-   */
-  public static function getRecurDetails($priceSetId) {
-    $query = 'SELECT mt.duration_interval, mt.duration_unit
-            FROM civicrm_price_field_value pfv
-            INNER JOIN civicrm_membership_type mt ON pfv.membership_type_id = mt.id
-            INNER JOIN civicrm_price_field pf ON pfv.price_field_id = pf.id
-            WHERE pf.price_set_id = %1 LIMIT 1';
-
-    $params = [1 => [$priceSetId, 'Integer']];
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-    $dao->fetch();
-    return [$dao->duration_interval, $dao->duration_unit];
   }
 
   /**

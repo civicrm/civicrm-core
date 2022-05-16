@@ -68,8 +68,6 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
     //using for display purpose.
     $form->assign('commPreference', $commPreference);
 
-    $form->addField('preferred_mail_format', ['entity' => 'contact', 'label' => ts('Email Format')]);
-
     $form->addField('is_opt_out', ['entity' => 'contact', 'label' => ts('NO BULK EMAILS (User Opt Out)')]);
 
     $form->addField('communication_style_id', ['entity' => 'contact', 'type' => 'RadioGroup']);
@@ -145,9 +143,6 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
       }
     }
 
-    if (array_key_exists('preferred_mail_format', $fields) && empty($fields['preferred_mail_format'])) {
-      $errors['preferred_mail_format'] = ts('Please select an email format preferred by this contact.');
-    }
     return empty($errors) ? TRUE : $errors;
   }
 

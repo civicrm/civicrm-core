@@ -506,8 +506,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCreateGetFieldsWithCustom(): void {
-    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
-    $idsContact = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTest.php');
+    $ids = $this->entityCustomGroupWithSingleFieldCreate('ContributionCustomFields', __FILE__);
+    $idsContact = $this->entityCustomGroupWithSingleFieldCreate('ContactCustomFields', 'ContactTest.php');
     $result = $this->callAPISuccess('Contribution', 'getfields', []);
     $this->assertArrayHasKey('custom_' . $ids['custom_field_id'], $result['values']);
     $this->assertArrayNotHasKey('custom_' . $idsContact['custom_field_id'], $result['values']);
@@ -1390,7 +1390,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Function tests that financial records are updated when Payment Instrument is changed.
    */
-  public function testCreateUpdateContributionPaymentInstrument() {
+  public function testCreateUpdateContributionPaymentInstrument(): void {
     $instrumentId = $this->_addPaymentInstrument();
     $contribParams = [
       'contact_id' => $this->_individualId,
@@ -1406,12 +1406,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $contribution['id'],
       'payment_instrument_id' => $instrumentId,
     ]);
-    $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $newParams);
     $this->assertAPISuccess($contribution);
     $this->checkFinancialTrxnPaymentInstrumentChange($contribution['id'], 4, $instrumentId);
 
     // cleanup - delete created payment instrument
-    $this->_deletedAddedPaymentInstrument();
+    $this->deletedAddedPaymentInstrument();
   }
 
   /**
@@ -1438,7 +1438,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->checkFinancialTrxnPaymentInstrumentChange($contribution['id'], 4, $instrumentId, -100);
 
     // cleanup - delete created payment instrument
-    $this->_deletedAddedPaymentInstrument();
+    $this->deletedAddedPaymentInstrument();
   }
 
   /**
@@ -2052,8 +2052,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Note that we are creating a logged in user because email goes out from
    * that person
    */
-  public function testCompleteTransaction() {
+  public function testCompleteTransaction(): void {
     $mut = new CiviMailUtils($this, TRUE);
+    Civi::settings()->set('tax_term', 'GST');
     $this->swapMessageTemplateForTestTemplate();
     $this->createLoggedInUser();
     $params = array_merge($this->_params, ['contribution_status_id' => 2]);
@@ -2074,6 +2075,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       "receipt_date:::\n",
       'title:::Contribution',
       'contributionStatus:::Completed',
+      'taxTerm:::GST',
     ]);
     $mut->stop();
     $this->revertTemplateToReservedTemplate();
@@ -2082,7 +2084,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test completing a transaction via the API with a non-USD transaction.
    */
-  public function testCompleteTransactionEuro() {
+  public function testCompleteTransactionEuro(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $this->swapMessageTemplateForTestTemplate();
     $this->createLoggedInUser();
@@ -3062,7 +3064,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * CRM-14151 - Test completing a transaction via the API.
    */
-  public function testCompleteTransactionWithReceiptDateSet() {
+  public function testCompleteTransactionWithReceiptDateSet(): void {
     $this->swapMessageTemplateForTestTemplate();
     $mut = new CiviMailUtils($this, TRUE);
     $this->createLoggedInUser();
@@ -3139,6 +3141,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * If passed in it will override the default from contribution page.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testCompleteTransactionWithEmailReceiptInputTrue(): void {
@@ -3148,15 +3151,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     // Create a Contribution Page with is_email_receipt = FALSE
     $contributionPageID = $this->createQuickConfigContributionPage($contributionPageParams);
     $this->_params['contribution_page_id'] = $contributionPageID;
-    $params = array_merge($this->_params, ['contribution_status_id' => 2, 'receipt_date' => 'now']);
-    $contribution = $this->callAPISuccess('contribution', 'create', $params);
-    // Complete the transaction overriding is_email_receipt to = TRUE
-    $this->callAPISuccess('contribution', 'completetransaction', [
+    $params = array_merge($this->_params, ['contribution_status_id' => 2, 'receipt_date' => 'now', 'amount_level' => 'amount entered']);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params);
+    // Complete the transaction overriding is_email_receipt to = TRUE.
+    $this->callAPISuccess('Contribution', 'completetransaction', [
       'id' => $contribution['id'],
       'is_email_receipt' => 1,
     ]);
     $mut->checkMailLog([
       'Contribution Information',
+      'amount entered',
     ]);
     $mut->stop();
   }
@@ -3652,7 +3656,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'receipt_from_email' => 'api@civicrm.org',
     ]);
     $mut->checkMailLog([
-      '$ 100.00',
+      '$100.00',
       'Contribution Information',
     ], [
       'Event',
@@ -4192,7 +4196,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     return $optionValue['values'][$optionValue['id']]['value'];
   }
 
-  public function _deletedAddedPaymentInstrument() {
+  public function deletedAddedPaymentInstrument() {
     $result = $this->callAPISuccess('OptionValue', 'get', [
       'option_group_id' => 'payment_instrument',
       'name' => 'Test Card',

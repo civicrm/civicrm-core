@@ -6,8 +6,10 @@
   {assign var=profileFieldName value=$field.name}
   {if $prefix}
     {assign var="formElement" value=$form.$prefix.$profileFieldName}
+    {assign var="rowIdentifier" value=$form.$prefix.$profileFieldName.id}
   {else}
     {assign var="formElement" value=$form.$profileFieldName}
+    {assign var="rowIdentifier" value=$field.name}
   {/if}
 
   {if $field.groupTitle != $fieldset}
@@ -41,12 +43,12 @@
   {elseif $profileFieldName}
     {* Show explanatory text for field if not in 'view' or 'preview' modes *}
     {if $field.help_pre && $action neq 4 && $action neq 1028}
-      <div class="crm-section helprow-{$profileFieldName}-section helprow-pre" id="helprow-{$profileFieldName}">
+      <div class="crm-section helprow-{$profileFieldName}-section helprow-pre" id="helprow-{$rowIdentifier}">
         <div class="content description">{$field.help_pre}</div>
       </div>
     {/if}
     {if $field.options_per_line != 0}
-      <div class="crm-section editrow_{$profileFieldName}-section form-item" id="editrow-{$profileFieldName}">
+      <div class="crm-section editrow_{$profileFieldName}-section form-item" id="editrow-{$rowIdentifier}">
         <div class="label option-label">{$formElement.label}</div>
         <div class="content 3">
 
@@ -77,7 +79,7 @@
         <div class="clear"></div>
       </div>
     {else}
-      <div class="crm-section editrow_{$profileFieldName}-section form-item" id="editrow-{$profileFieldName}">
+      <div class="crm-section editrow_{$profileFieldName}-section form-item" id="editrow-{$rowIdentifier}">
         <div class="label">
           {$formElement.label}
         </div>
@@ -99,6 +101,15 @@
                value="{$formElement.value}" id="{$formElement.name}"
               >
             </span>
+          {elseif ( $profileFieldName eq 'image_URL' )}
+            {$formElement.html}
+            {if !empty($imageURL)}
+              <div class="crm-section contact_image-section">
+                <div class="content">
+                {include file="CRM/Contact/Page/ContactImage.tpl"}
+                </div>
+              </div>
+            {/if}
           {elseif $profileFieldName|substr:0:5 eq 'phone'}
             {assign var="phone_ext_field" value=$profileFieldName|replace:'phone':'phone_ext'}
             {$formElement.html}
@@ -134,7 +145,7 @@
     {/if}
     {* Show explanatory text for field if not in 'view' or 'preview' modes *}
     {if $field.help_post && $action neq 4 && $action neq 1028}
-      <div class="crm-section helprow-{$profileFieldName}-section helprow-post" id="helprow-{$profileFieldName}">
+      <div class="crm-section helprow-{$profileFieldName}-section helprow-post" id="helprow-{$rowIdentifier}">
         <div class="content description">{$field.help_post}</div>
       </div>
     {/if}

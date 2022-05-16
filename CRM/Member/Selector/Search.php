@@ -103,7 +103,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   /**
    * The query object.
    *
-   * @var string
+   * @var CRM_Contact_BAO_Query
    */
   protected $_query;
 
@@ -165,17 +165,17 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    *
    * @param string $status
    * @param bool $isPaymentProcessor
-   * @param null $accessContribution
-   * @param null $qfKey
-   * @param null $context
+   * @param bool $accessContribution
+   * @param string|null $qfKey
+   * @param string|null $context
    * @param bool $isCancelSupported
    *
    * @return array
    */
   public static function &links(
     $status = 'all',
-    $isPaymentProcessor = NULL,
-    $accessContribution = NULL,
+    $isPaymentProcessor = FALSE,
+    $accessContribution = FALSE,
     $qfKey = NULL,
     $context = NULL,
     $isCancelSupported = FALSE
@@ -308,19 +308,15 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
     $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE,
       "billing_mode IN ( 1, 3 )"
     );
+    $isPaymentProcessor = FALSE;
     if (count($processors) > 0) {
-      $this->_isPaymentProcessor = TRUE;
-    }
-    else {
-      $this->_isPaymentProcessor = FALSE;
+      $isPaymentProcessor = TRUE;
     }
 
     // Only show credit card membership signup and renewal if user has CiviContribute permission
+    $accessContribution = FALSE;
     if (CRM_Core_Permission::access('CiviContribute')) {
-      $this->_accessContribution = TRUE;
-    }
-    else {
-      $this->_accessContribution = FALSE;
+      $accessContribution = TRUE;
     }
 
     //get all campaigns.
@@ -375,8 +371,8 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
 
         $isCancelSupported = CRM_Member_BAO_Membership::isCancelSubscriptionSupported($row['membership_id']);
         $links = self::links('all',
-          $this->_isPaymentProcessor,
-          $this->_accessContribution,
+          $isPaymentProcessor,
+          $accessContribution,
           $this->_key,
           $this->_context,
           $isCancelSupported
@@ -524,7 +520,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   /**
    * Alphabet query.
    *
-   * @return mixed
+   * @return CRM_Core_DAO
    */
   public function alphabetQuery() {
     return $this->_query->alphabetQuery();

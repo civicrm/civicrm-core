@@ -188,6 +188,41 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
   }
 
   /**
+   * Check that the site is configured with a signing-key.
+   *
+   * The current infrastructure for signatures was introduced circa 5.36. Specifically,
+   * most sites should now define `CIVICRM_SIGN_KEYS`. However, this could be missing for
+   * sites which either (a) upgraded from an earlier release or (b) used an unpatched installer.
+   *
+   * @return CRM_Utils_Check_Message[]
+   */
+  public function checkSigningKey(): array {
+    $messages = [];
+
+    try {
+      $found = !empty(Civi::service('crypto.registry')->findKey('SIGN'));
+      // Subtle point: We really want to know if there are any `SIGN`ing keys. The most
+      // typical way to define `SIGN`ing keys is to configure `CIVICRM_SIGN_KEYS`.
+    }
+    catch (\Civi\Crypto\Exception\CryptoException $e) {
+      $found = FALSE;
+    }
+    if (!$found) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('Some components and extensions may need to generate cryptographic signatures. Please configure <a %1>CIVICRM_SIGN_KEYS</a>. ',
+          [1 => 'href="https://docs.civicrm.org/sysadmin/en/latest/setup/secret-keys/" target="_blank"']
+        ),
+        ts('Signing Key Recommended'),
+        \Psr\Log\LogLevel::NOTICE,
+        'fa-lock'
+      );
+    }
+
+    return $messages;
+  }
+
+  /**
    * Check that some files are not present.
    *
    * These files have generally been deleted but Civi source tree but could be
@@ -293,6 +328,35 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
   }
 
   /**
+   * Check to see if anonymous user has excessive permissions.
+   * @return CRM_Utils_Check_Message[]
+   */
+  public function checkAnonPermissions() {
+    $messages = [];
+    $permissions = [];
+    // These specific permissions were referenced in a security submission.
+    // This functionality is generally useful -- may be good to expand to a longer list.
+    $checkPerms = ['access CiviContribute', 'edit contributions'];
+    foreach ($checkPerms as $checkPerm) {
+      if (CRM_Core_Config::singleton()->userPermissionClass->check($checkPerm, 0)) {
+        $permissions[] = $checkPerm;
+      }
+    }
+    if (!empty($permissions)) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('The system configuration grants anonymous users an <em>unusually broad</em> list of permissions. This could compromise security. Please reassess whether these permissions are required: %1', [
+          1 => '<ul><li><tt>' . implode('</tt></li><li><tt>', $permissions) . '</tt></li></ul>',
+        ]),
+        ts('Unusual Permissions for Anonymous Users'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-lock'
+      );
+    }
+    return $messages;
+  }
+
+  /**
    * Determine whether $url is a public, browsable listing for $dir
    *
    * @param string $dir
@@ -362,7 +426,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @param $topic
+   * @param string $topic
    *
    * @return string
    */

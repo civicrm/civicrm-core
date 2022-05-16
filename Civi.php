@@ -106,12 +106,61 @@ class Civi {
   }
 
   /**
+   * Fetch a queue object.
+   *
+   * Note: Historically, `CRM_Queue_Queue` objects were not persistently-registered. Persistence
+   * is now encouraged. This facade has a bias towards persistently-registered queues.
+   *
+   * @param string $name
+   *   The name of a persistent/registered queue (stored in `civicrm_queue`)
+   * @param array{type: string, is_autorun: bool, reset: bool, is_persistent: bool} $params
+   *   Specification for a queue.
+   *   This is not required for accessing an existing queue.
+   *   Specify this if you wish to auto-create the queue or to include advanced options (eg `reset`).
+   *   Example: ['type' => 'SqlParallel']
+   *   Defaults: ['reset'=>FALSE, 'is_persistent'=>TRUE, 'is_autorun'=>FALSE]
+   * @return \CRM_Queue_Queue
+   * @see \CRM_Queue_Service
+   */
+  public static function queue(string $name, array $params = []): CRM_Queue_Queue {
+    $defaults = ['reset' => FALSE, 'is_persistent' => TRUE];
+    $params = array_merge($defaults, $params, ['name' => $name]);
+    return CRM_Queue_Service::singleton()->create($params);
+  }
+
+  /**
    * Obtain the formatting object.
    *
    * @return \Civi\Core\Format
    */
   public static function format(): Format {
     return new Civi\Core\Format();
+  }
+
+  /**
+   * Initiate a bidirectional pipe for exchanging a series of multiple API requests.
+   *
+   * @param string $negotiationFlags
+   *   List of pipe initialization flags. Some combination of the following:
+   *    - 'v': Report version in connection header.
+   *    - 'j': Report JSON-RPC flavors in connection header.
+   *    - 'l': Report on login support in connection header.
+   *    - 't': Trusted session. Logins do not require credentials. API calls may execute with or without permission-checks.
+   *    - 'u': Untrusted session. Logins require credentials. API calls may only execute with permission-checks.
+   *
+   *   The `Civi::pipe()` entry-point is designed to be amenable to shell orchestration (SSH/cv/drush/wp-cli/etc).
+   *   The negotiation flags are therefore condensed to individual characters.
+   *
+   *   It is possible to preserve compatibility while adding new default-flags. However, removing default-flags
+   *   is more likely to be a breaking-change.
+   *
+   *   When adding a new flag, consider whether mutable `option()`s may be more appropriate.
+   * @see \Civi\Pipe\PipeSession
+   */
+  public static function pipe(string $negotiationFlags = 'vtl'): void {
+    Civi::service('civi.pipe')
+      ->setIO(STDIN, STDOUT)
+      ->run($negotiationFlags);
   }
 
   /**

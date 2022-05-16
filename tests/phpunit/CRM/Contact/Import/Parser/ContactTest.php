@@ -14,6 +14,8 @@
  * File for the CRM_Contact_Imports_Parser_ContactTest class.
  */
 
+use Civi\Api4\UserJob;
+
 /**
  *  Test contact import parser.
  *
@@ -32,16 +34,19 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
 
   /**
    * Tear down after test.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_email'], TRUE);
+    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_email', 'civicrm_user_job'], TRUE);
     parent::tearDown();
   }
 
   /**
    * Test that import parser will add contact with employee of relationship.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testImportParserWithEmployeeOfRelationship(): void {
     $this->organizationCreate([
@@ -49,41 +54,39 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'legal_name'        => 'Agileware',
     ]);
     $contactImportValues = [
-      "first_name"  => "Alok",
-      "last_name"   => "Patel",
-      "Employee of" => "Agileware",
+      'first_name' => 'Alok',
+      'last_name' => 'Patel',
+      'Employee of' => 'Agileware',
     ];
 
     $fields = array_keys($contactImportValues);
     $values = array_values($contactImportValues);
-    $parser = new CRM_Contact_Import_Parser_Contact($fields, []);
-    $parser->_contactType = 'Individual';
-    $parser->init();
-    $this->mapRelationshipFields($fields, $parser->getAllFields());
+    $userJobID = $this->getUserJobID([
+      'mapper' => [['first_name'], ['last_name'], ['5_a_b', 'organization_name']],
+    ]);
 
     $parser = new CRM_Contact_Import_Parser_Contact($fields, [], [], [], [
       NULL,
       NULL,
-      $fields[2],
+      '5_a_b',
     ], [
       NULL,
       NULL,
-      "Organization",
+      'Organization',
     ], [
       NULL,
       NULL,
-      "organization_name",
-    ], [], [], [], [], []);
-
-    $parser->_contactType = 'Individual';
+      'organization_name',
+    ]);
+    $parser->setUserJobID($userJobID);
     $parser->_onDuplicate = CRM_Import_Parser::DUPLICATE_UPDATE;
     $parser->init();
 
     $this->assertEquals(CRM_Import_Parser::VALID, $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values), 'Return code from parser import was not as expected');
-    $this->callAPISuccess("Contact", "get", [
-      "first_name"        => "Alok",
-      "last_name"         => "Patel",
-      "organization_name" => "Agileware",
+    $this->callAPISuccess('Contact', 'get', [
+      'first_name' => 'Alok',
+      'last_name' => 'Patel',
+      'organization_name' => 'Agileware',
     ]);
   }
 
@@ -91,6 +94,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * Test that import parser will not fail when same external_identifier found
    * of deleted contact.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
@@ -114,7 +118,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * In this case the contact has no external identifier.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testImportParserWithUpdateWithoutExternalIdentifier(): void {
     [$originalValues, $result] = $this->setUpBaseContact();
@@ -132,7 +138,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testImportParserWithUpdateWithExternalIdentifier() {
+  public function testImportParserWithUpdateWithExternalIdentifier(): void {
     [$originalValues, $result] = $this->setUpBaseContact(['external_identifier' => 'windows']);
 
     $this->assertEquals($result['id'], CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', 'windows', 'id', 'external_identifier', TRUE));
@@ -155,7 +161,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testImportParserWithUpdateWithExternalIdentifierButNoPrimaryMatch() {
+  public function testImportParserWithUpdateWithExternalIdentifierButNoPrimaryMatch(): void {
     [$originalValues, $result] = $this->setUpBaseContact([
       'external_identifier' => 'windows',
       'email' => NULL,
@@ -180,7 +186,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testImportParserWithUpdateWithContactID() {
+  public function testImportParserWithUpdateWithContactID(): void {
     [$originalValues, $result] = $this->setUpBaseContact([
       'external_identifier' => '',
       'email' => NULL,
@@ -200,7 +206,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testImportParserWithUpdateWithNoExternalIdentifier() {
+  public function testImportParserWithUpdateWithNoExternalIdentifier(): void {
     [$originalValues, $result] = $this->setUpBaseContact();
     $originalValues['nick_name'] = 'Old Bill';
     $originalValues['external_identifier'] = 'windows';
@@ -229,9 +235,11 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test that the import parser adds the address to the right location.
    *
-   * @throws \Exception
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testImportBillingAddress() {
+  public function testImportBillingAddress(): void {
     [$contactValues] = $this->setUpBaseContact();
     $contactValues['nick_name'] = 'Old Bill';
     $contactValues['external_identifier'] = 'android';
@@ -451,6 +459,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * There is an expectation that you can import by label here.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
@@ -463,9 +472,12 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ['name' => 'prefix_id', 'column_number' => 3],
       ['name' => 'suffix_id', 'column_number' => 4],
     ];
+    $mapperInput = [['first_name'], ['last_name'], ['email', CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Email', 'location_type_id', 'Home')], ['prefix_id'], ['suffix_id']];
+
     $processor = new CRM_Import_ImportProcessor();
     $processor->setMappingFields($mapping);
-    $processor->setContactType('Individual');
+    $userJobID = $this->getUserJobID(['mapper' => $mapperInput]);
+    $processor->setUserJobID($userJobID);
     $importer = $processor->getImporterObject();
 
     $contactValues = [
@@ -597,12 +609,15 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test importing 2 phones of different types.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testImportTwoPhonesDifferentTypes() {
+  public function testImportTwoPhonesDifferentTypes(): void {
     $processor = new CRM_Import_ImportProcessor();
-    $processor->setContactType('Individual');
+    $processor->setUserJobID($this->getUserJobID([
+      'mapper' => [['first_name'], ['last_name'], ['email'], ['phone', 1, 2], ['phone', 1, 1]],
+    ]));
     $processor->setMappingFields(
       [
         ['name' => 'first_name'],
@@ -673,8 +688,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $contactValues['city'] = 'Big City';
     $contactID = $this->callAPISuccessGetValue('Contact', ['external_identifier' => 'android', 'return' => 'id']);
     $originalAddress = $this->callAPISuccess('Address', 'create', ['location_type_id' => 2, 'street_address' => 'small house', 'contact_id' => $contactID]);
-    $originalPhone = $this->callAPISuccess('phone', 'create', ['location_type_id' => 2, 'phone' => '1234', 'contact_id' => $contactID]);
-    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, [0 => NULL, 1 => NULL, 2 => 'Primary', 3 => NULL, 4 => NULL, 5 => 'Primary', 6 => 'Primary', 7 => 'Primary']);
+    $originalPhone = $this->callAPISuccess('phone', 'create', ['location_type_id' => 2, 'phone' => '1234', 'contact_id' => $contactID, 'phone_type_id' => 1]);
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, []);
     $phone = $this->callAPISuccessGetSingle('Phone', ['phone' => '98765']);
     $this->assertEquals(2, $phone['location_type_id']);
     $this->assertEquals($originalPhone['id'], $phone['id']);
@@ -701,6 +716,134 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     ];
     CRM_Contact_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
     $this->assertEquals([], $errorMessage);
+  }
+
+  /**
+   * Test the import validation.
+   *
+   * @dataProvider validateDataProvider
+   *
+   * @param string $csv
+   * @param array $mapper
+   * @param string $expectedError
+   * @param array $submittedValues
+   *
+   * @throws \API_Exception
+   */
+  public function testValidation(string $csv, array $mapper, string $expectedError = '', $submittedValues = []): void {
+    try {
+      $this->validateCSV($csv, $mapper, $submittedValues);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertSame($expectedError, $e->getMessage());
+      return;
+    }
+    if ($expectedError) {
+      $this->fail('expected error :' . $expectedError);
+    }
+  }
+
+  /**
+   * Get combinations to test for validation.
+   *
+   * @return array[]
+   */
+  public function validateDataProvider(): array {
+    return [
+      'individual_required' => [
+        'csv' => 'individual_invalid_missing_name.csv',
+        'mapper' => [['last_name']],
+        'expected_error' => 'Missing required fields: First Name OR Email Address',
+      ],
+      'individual_related_required_met' => [
+        'csv' => 'individual_valid_with_related_email.csv',
+        'mapper' => [['first_name'], ['last_name'], ['1_a_b', 'email']],
+        'expected_error' => '',
+      ],
+      'individual_related_required_not_met' => [
+        'csv' => 'individual_invalid_with_related_phone.csv',
+        'mapper' => [['first_name'], ['last_name'], ['1_a_b', 'phone', 1, 2]],
+        'expected_error' => '(Child of) Missing required fields: First Name and Last Name OR Email Address OR External Identifier',
+      ],
+      'individual_bad_email' => [
+        'csv' => 'individual_invalid_email.csv',
+        'mapper' => [['email', 1], ['first_name'], ['last_name']],
+        'expected_error' => 'Invalid value for field(s) : email',
+      ],
+      'individual_related_bad_email' => [
+        'csv' => 'individual_invalid_related_email.csv',
+        'mapper' => [['1_a_b', 'email', 1], ['first_name'], ['last_name']],
+        'expected_error' => 'Invalid value for field(s) : email',
+      ],
+      'individual_invalid_external_identifier_only' => [
+        // External identifier is only enough in upgrade mode.
+        'csv' => 'individual_invalid_external_identifier_only.csv',
+        'mapper' => [['external_identifier'], ['gender_id']],
+        'expected_error' => 'Missing required fields: First Name and Last Name OR Email Address',
+      ],
+      'individual_invalid_external_identifier_only_update_mode' => [
+        // External identifier only enough in upgrade mode, so no error here.
+        'csv' => 'individual_invalid_external_identifier_only.csv',
+        'mapper' => [['external_identifier'], ['gender_id']],
+        'expected_error' => '',
+        'submitted_values' => ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE],
+      ],
+      'organization_email_no_organization_name' => [
+        // Email is only enough in upgrade mode.
+        'csv' => 'organization_email_no_organization_name.csv',
+        'mapper' => [['email'], ['phone', 1, 1]],
+        'expected_error' => 'Missing required fields: Organization Name',
+        'submitted_values' => ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP, 'contactType' => CRM_Import_Parser::CONTACT_ORGANIZATION],
+      ],
+      'organization_email_no_organization_name_update_mode' => [
+        // Email is enough in upgrade mode (at least to pass validate).
+        'csv' => 'organization_email_no_organization_name.csv',
+        'mapper' => [['email'], ['phone', 1, 1]],
+        'expected_error' => '',
+        'submitted_values' => ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE, 'contactType' => CRM_Import_Parser::CONTACT_ORGANIZATION],
+      ],
+    ];
+  }
+
+  /**
+   * Test the import.
+   *
+   * @dataProvider importDataProvider
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function testImport($csv, $mapper, $expectedError, $expectedOutcomes = []): void {
+    try {
+      $this->importCSV($csv, $mapper);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertSame($expectedError, $e->getMessage());
+      return;
+    }
+    if ($expectedError) {
+      $this->fail('expected error :' . $expectedError);
+    }
+    $dataSource = new CRM_Import_DataSource_CSV(UserJob::get(FALSE)->setSelect(['id'])->execute()->first()['id']);
+    foreach ($expectedOutcomes as $outcome => $count) {
+      $this->assertEquals($dataSource->getRowCount([$outcome]), $count);
+    }
+  }
+
+  /**
+   * Get combinations to test for validation.
+   *
+   * @return array[]
+   */
+  public function importDataProvider(): array {
+    return [
+      'individual_invalid_sub_type' => [
+        'csv' => 'individual_invalid_contact_sub_type.csv',
+        'mapper' => [['first_name'], ['last_name'], ['contact_sub_type']],
+        'expected_error' => '',
+        'expected_outcomes' => [CRM_Import_Parser::NO_MATCH => 1],
+      ],
+    ];
   }
 
   /**
@@ -856,11 +999,15 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * Ensure we can import multiple preferred_communication_methods, single
    * gender, and single preferred language using both labels and values.
    *
-   * @throws \CRM_Core_Exception @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testImportFieldsWithVariousOptions() {
+  public function testImportFieldsWithVariousOptions(): void {
     $processor = new CRM_Import_ImportProcessor();
-    $processor->setContactType('Individual');
+    $processor->setUserJobID($this->getUserJobID([
+      'mapper' => [['first_name'], ['last_name'], ['preferred_communication_method'], ['gender_id'], ['preferred_language']],
+    ]));
     $processor->setMappingFields(
       [
         ['name' => 'first_name'],
@@ -871,7 +1018,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ]
     );
     $importer = $processor->getImporterObject();
-    $fields = ['Ima', 'Texter', "SMS,Phone", "Female", "Danish"];
+    $fields = ['Ima', 'Texter', 'SMS,Phone', 'Female', 'Danish'];
     $importer->import(CRM_Import_Parser::DUPLICATE_NOCHECK, $fields);
     $contact = $this->callAPISuccessGetSingle('Contact', ['last_name' => 'Texter']);
 
@@ -904,6 +1051,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @param int|null $ruleGroupId
    *   To test against a specific dedupe rule group, pass its ID as this argument.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
@@ -912,10 +1060,14 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       $fields = array_keys($originalValues);
     }
     $values = array_values($originalValues);
+    $mapper = [];
+    foreach ($fields as $index => $field) {
+      $mapper[] = [$field, $mapperLocType[$index] ?? NULL, $field === 'phone' ? 1 : NULL];
+    }
+    $userJobID = $this->getUserJobID(['mapper' => $mapper, 'onDuplicate' => $onDuplicateAction]);
     $parser = new CRM_Contact_Import_Parser_Contact($fields, $mapperLocType);
-    $parser->_contactType = 'Individual';
+    $parser->setUserJobID($userJobID);
     $parser->_dedupeRuleGroupID = $ruleGroupId;
-    $parser->_onDuplicate = $onDuplicateAction;
     $parser->init();
     $this->assertEquals($expectedResult, $parser->import($onDuplicateAction, $values), 'Return code from parser import was not as expected');
   }
@@ -931,6 +1083,93 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
         $fields[$elementIndex] = $key;
       }
     }
+  }
+
+  /**
+   * Test mapping fields within the Parser class.
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testMapFields(): void {
+    $parser = new CRM_Contact_Import_Parser_Contact(
+      // Array of field names
+      ['first_name', 'phone', NULL, 'im', NULL],
+      // Array of location types, ie columns 2 & 4 have types.
+      [NULL, 1, NULL, 1, NULL],
+      // Array of phone types
+      [NULL, 1, NULL, NULL, NULL],
+      // Array of im provider types
+      [NULL, NULL, NULL, 1, NULL],
+      // Array of filled in relationship values.
+      [NULL, NULL, '5_a_b', NULL, '5_a_b'],
+      // Array of the contact type to map to - note this can be determined from ^^
+      [NULL, NULL, 'Organization', NULL, 'Organization'],
+      // Related contact field names
+      [NULL, NULL, 'url', NULL, 'phone'],
+      // Related contact location types
+      [NULL, NULL, NULL, NULL, 1],
+      // Related contact phone types
+      [NULL, NULL, NULL, NULL, 1],
+      // Related contact im provider types
+      [NULL, NULL, NULL, NULL, NULL],
+      // Website types
+      [NULL, NULL, NULL, NULL, NULL],
+      // Related contact website types
+      [NULL, NULL, 1, NULL, NULL]
+    );
+    $parser->setUserJobID($this->getUserJobID([
+      'mapper' => [
+        ['first_name'],
+        ['phone', 1, 1],
+        ['5_a_b', 'url', 1],
+        ['im', 1, 1],
+        ['5_a_b', 'phone', 1, 1],
+      ],
+    ]));
+    $parser->init();
+    $params = $parser->getMappedRow(
+      ['Bob', '123', 'https://example.org', 'my-handle', '456']
+    );
+    $this->assertEquals([
+      'first_name' => 'Bob',
+      'phone' => [
+        [
+          'phone' => '123',
+          'location_type_id' => 1,
+          'phone_type_id' => 1,
+        ],
+      ],
+      '5_a_b' => [
+        'contact_type' => 'Organization',
+        'url' =>
+          [
+
+            [
+              'url' => 'https://example.org',
+              'website_type_id' => 1,
+            ],
+          ],
+        'phone' =>
+          [
+            [
+              'phone' => '456',
+              'location_type_id' => 1,
+              'phone_type_id' => 1,
+            ],
+          ],
+      ],
+      'im' =>
+        [
+
+          [
+            'im' => 'my-handle',
+            'location_type_id' => 1,
+            'provider_id' => 1,
+          ],
+        ],
+      'contact_type' => 'Individual',
+    ], $params);
   }
 
   /**
@@ -952,6 +1191,104 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->runImport($originalValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
     $result = $this->callAPISuccessGetSingle('Contact', $originalValues);
     return [$originalValues, $result];
+  }
+
+  /**
+   * @return mixed
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function getUserJobID($submittedValues = []) {
+    $userJobID = UserJob::create()->setValues([
+      'metadata' => [
+        'submitted_values' => array_merge([
+          'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+          'contactSubType' => '',
+          'doGeocodeAddress' => 0,
+          'dataSource' => 'CRM_Import_DataSource_SQL',
+          'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
+          'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+        ], $submittedValues),
+      ],
+      'status_id:name' => 'draft',
+      'type_id:name' => 'contact_import',
+    ])->execute()->first()['id'];
+    if ($submittedValues['dataSource'] ?? NULL === 'CRM_Import_DataSource') {
+      $dataSource = new CRM_Import_DataSource_CSV($userJobID);
+    }
+    else {
+      $dataSource = new CRM_Import_DataSource_SQL($userJobID);
+    }
+    $dataSource->initialize();
+    return $userJobID;
+  }
+
+  /**
+   * Validate the csv file values.
+   *
+   * @param string $csv Name of csv file.
+   * @param array $mapper Mapping as entered on MapField form.
+   *   e.g [['first_name']['email', 1]].
+   * @param array $submittedValues
+   *   Any submitted values overrides.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function validateCSV(string $csv, array $mapper, $submittedValues): void {
+    $userJobID = $this->getUserJobID(array_merge([
+      'uploadFile' => ['name' => __DIR__ . '/../Form/data/' . $csv],
+      'skipColumnHeader' => TRUE,
+      'fieldSeparator' => ',',
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'mapper' => $mapper,
+      'dataSource' => 'CRM_Import_DataSource_CSV',
+    ], $submittedValues));
+
+    $dataSource = new CRM_Import_DataSource_CSV($userJobID);
+    $parser = new CRM_Contact_Import_Parser_Contact();
+    $parser->setUserJobID($userJobID);
+    $parser->init();
+    $parser->validateValues(array_values($dataSource->getRow()));
+  }
+
+  /**
+   * Import the csv file values.
+   *
+   * This function uses a flow that mimics the UI flow.
+   *
+   * @param string $csv Name of csv file.
+   * @param array $mapper Mapping as entered on MapField form.
+   *   e.g [['first_name']['email', 1]].
+   * @param array $submittedValues
+   */
+  protected function importCSV(string $csv, array $mapper, array $submittedValues = []): void {
+    $submittedValues = array_merge([
+      'uploadFile' => ['name' => __DIR__ . '/../Form/data/' . $csv],
+      'skipColumnHeader' => TRUE,
+      'fieldSeparator' => ',',
+      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'mapper' => $mapper,
+      'dataSource' => 'CRM_Import_DataSource_CSV',
+      'file' => ['name' => $csv],
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
+      'groups' => [],
+    ], $submittedValues);
+    $form = $this->getFormObject('CRM_Contact_Import_Form_DataSource', $submittedValues);
+    $form->buildForm();
+    $form->postProcess();
+    $userJobID = $form->getUserJobID();
+    /* @var CRM_Contact_Import_Form_MapField $form */
+    $form = $this->getFormObject('CRM_Contact_Import_Form_MapField', $submittedValues);
+    $form->setUserJobID($userJobID);
+    $form->buildForm();
+    $form->postProcess();
+    /* @var CRM_Contact_Import_Form_MapField $form */
+    $form = $this->getFormObject('CRM_Contact_Import_Form_Preview', $submittedValues);
+    $form->setUserJobID($userJobID);
+    $form->buildForm();
+    $form->postProcess();
   }
 
 }

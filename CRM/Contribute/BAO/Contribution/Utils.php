@@ -207,6 +207,14 @@ LIMIT 1
   /**
    * Get contribution statuses by entity e.g. contribution, membership or 'participant'
    *
+   * @deprecated
+   *
+   * This is called from a couple of places outside of core so it has been made
+   * unused and deprecated rather than having the now-obsolete parameter change.
+   * It should work much the same for the places that call it with a notice. It is
+   * not an api function & not supported for use outside core. Extensions should write
+   * their own functions.
+   *
    * @param string $usedFor
    * @param string $name
    *   Contribution ID
@@ -216,7 +224,10 @@ LIMIT 1
    */
   public static function getContributionStatuses($usedFor = 'contribution', $name = NULL) {
     $statusNames = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
-
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    if ($usedFor !== 'contribution') {
+      return self::getPendingAndCompleteStatuses();
+    }
     $statusNamesToUnset = [
       // For records which represent a data template for a recurring
       // contribution that may not yet have a payment. This status should not
@@ -228,21 +239,7 @@ LIMIT 1
     ];
     // on create fetch statuses on basis of component
     if (!$name) {
-      $statusNamesToUnset = array_merge($statusNamesToUnset, [
-        'Refunded',
-        'Chargeback',
-        'Pending refund',
-        'In Progress',
-        'Overdue',
-        'Partially paid',
-      ]);
-
-      if ($usedFor && $usedFor !== 'contribution') {
-        $statusNamesToUnset = array_merge($statusNamesToUnset, [
-          'Cancelled',
-          'Failed',
-        ]);
-      }
+      return self::getPendingCompleteFailedAndCancelledStatuses();
     }
     else {
       switch ($name) {
@@ -299,6 +296,34 @@ LIMIT 1
     }
 
     return $statuses;
+  }
+
+  /**
+   * Get the options for pending and completed as an array with labels as values.
+   *
+   * @return array
+   */
+  public static function getPendingAndCompleteStatuses(): array {
+    $statusIDS = [
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+    ];
+    return array_intersect_key(CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id'), array_flip($statusIDS));
+  }
+
+  /**
+   * Get the options for pending and completed as an array with labels as values.
+   *
+   * @return array
+   */
+  public static function getPendingCompleteFailedAndCancelledStatuses(): array {
+    $statusIDS = [
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Failed'),
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'),
+    ];
+    return array_intersect_key(CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id'), array_flip($statusIDS));
   }
 
   /**

@@ -118,7 +118,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
   /**
    * The query object
    *
-   * @var string
+   * @var CRM_Contact_BAO_Query
    */
   protected $_query;
 
@@ -140,7 +140,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
    * @param string $context
    * @param null $compContext
    *
-   * @return \CRM_Contribute_Selector_Search
+   * @return CRM_Contribute_Selector_Search
    */
   public function __construct(
     &$queryParams,
@@ -356,7 +356,8 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       );
 
       $checkLineItem = FALSE;
-      $row = [];
+      // Set defaults to empty to prevent e-notices.
+      $row = ['amount_level' => ''];
       // Now check for lineItems
       if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
         $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($result->id);
@@ -499,6 +500,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
         'sort' => 'total_amount',
         'direction' => CRM_Utils_Sort::DONTCARE,
         'field_name' => 'total_amount',
+        'type' => '',
       ],
     ];
     if ($this->_includeSoftCredits) {
@@ -511,6 +513,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
               'sort' => 'contribution_soft_credit_amount',
               'field_name' => 'contribution_soft_credit_amount',
               'direction' => CRM_Utils_Sort::DONTCARE,
+              'type' => '',
             ],
           ]
         );
@@ -524,12 +527,14 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
             'sort' => 'financial_type',
             'field_name' => 'financial_type',
             'direction' => CRM_Utils_Sort::DONTCARE,
+            'type' => '',
           ],
           [
             'name' => ts('Source'),
             'sort' => 'contribution_source',
             'field_name' => 'contribution_source',
             'direction' => CRM_Utils_Sort::DONTCARE,
+            'type' => '',
           ],
           [
             'name' => ts('Received'),
@@ -550,6 +555,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
             'sort' => 'contribution_status',
             'field_name' => 'contribution_status',
             'direction' => CRM_Utils_Sort::DONTCARE,
+            'type' => '',
           ],
         ]
       );
@@ -559,6 +565,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
         'sort' => 'product_name',
         'field_name' => 'product_name',
         'direction' => CRM_Utils_Sort::DONTCARE,
+        'type' => '',
       ];
     }
     if (!$this->_single) {
@@ -566,7 +573,9 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
         [
           'name' => ts('Name'),
           'sort' => 'sort_name',
+          'field_name' => '',
           'direction' => CRM_Utils_Sort::DONTCARE,
+          'type' => '',
         ],
       ];
     }
@@ -579,11 +588,13 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
             'name' => ts('Soft Credit For'),
             'sort' => 'contribution_soft_credit_name',
             'direction' => CRM_Utils_Sort::DONTCARE,
+            'field_name' => '',
           ],
           [
             'name' => ts('Soft Credit Type'),
             'sort' => 'contribution_soft_credit_type',
             'direction' => CRM_Utils_Sort::ASCENDING,
+            'field_name' => '',
           ],
         ]
       );
@@ -591,7 +602,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     self::$_columnHeaders
       = array_merge(
         self::$_columnHeaders, [
-          ['desc' => ts('Actions'), 'type' => 'actions'],
+          ['desc' => ts('Actions'), 'type' => 'actions', 'field_name' => ''],
         ]
       );
     foreach (array_keys(self::$_columnHeaders) as $index) {
@@ -611,7 +622,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
   }
 
   /**
-   * @return \CRM_Contact_BAO_Query
+   * @return CRM_Contact_BAO_Query
    */
   public function &getQuery() {
     return $this->_query;

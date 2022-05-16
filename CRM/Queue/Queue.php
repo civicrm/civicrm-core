@@ -26,21 +26,24 @@ abstract class CRM_Queue_Queue {
   private $_name;
 
   /**
+   * @var array{name: string, type: string, runner: string, batch_limit: int, lease_time: ?int, retry_limit: int, retry_interval: ?int}
+   * @see \CRM_Queue_Service::create()
+   */
+  protected $queueSpec;
+
+  /**
    * Create a reference to queue. After constructing the queue, one should
    * usually call createQueue (if it's a new queue) or loadQueue (if it's
    * known to be an existing queue).
    *
-   * @param array $queueSpec
-   *   Array with keys:
-   *   - type: string, required, e.g. "interactive", "immediate", "stomp",
-   *     "beanstalk"
-   *   - name: string, required, e.g. "upgrade-tasks"
-   *   - reset: bool, optional; if a queue is found, then it should be
-   *     flushed; default to TRUE
-   *   - (additional keys depending on the queue provider).
+   * @param array{name: string, type: string, runner: string, batch_limit: int, lease_time: ?int, retry_limit: int, retry_interval: ?int} $queueSpec
+   *   Ex: ['name' => 'my-import', 'type' => 'SqlParallel']
+   *   The full definition of queueSpec is defined in CRM_Queue_Service.
+   * @see \CRM_Queue_Service::create()
    */
   public function __construct($queueSpec) {
     $this->_name = $queueSpec['name'];
+    $this->queueSpec = $queueSpec;
   }
 
   /**
@@ -50,6 +53,16 @@ abstract class CRM_Queue_Queue {
    */
   public function getName() {
     return $this->_name;
+  }
+
+  /**
+   * Get a property from the queueSpec.
+   *
+   * @param string $field
+   * @return mixed|null
+   */
+  public function getSpec(string $field) {
+    return $this->queueSpec[$field] ?? NULL;
   }
 
   /**

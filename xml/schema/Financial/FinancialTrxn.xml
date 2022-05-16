@@ -126,6 +126,7 @@
     <title>Is Payment?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <import>true</import>
     <comment>Is this entry either a payment or a reversal of a payment?</comment>
     <add>4.7</add>

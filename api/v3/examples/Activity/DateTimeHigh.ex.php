@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the Activity.get API.
  *
@@ -12,9 +17,10 @@ function activity_get_example() {
     'source_contact_id' => 1,
     'filter.activity_date_time_high' => '20120101000000',
     'sequential' => 1,
+    'return' => 'activity_date_time',
   ];
 
-  try{
+  try {
     $result = civicrm_api3('Activity', 'get', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -49,20 +55,10 @@ function activity_get_expectedresult() {
     'values' => [
       '0' => [
         'id' => '1',
-        'activity_type_id' => '9999',
-        'subject' => 'Make-it-Happen Meeting',
         'activity_date_time' => '2011-01-01 00:00:00',
-        'duration' => '120',
-        'location' => 'Pennsylvania',
-        'details' => 'a test activity',
-        'status_id' => '1',
-        'priority_id' => '1',
-        'is_test' => 0,
-        'is_auto' => 0,
-        'is_current_revision' => '1',
-        'is_deleted' => 0,
-        'is_star' => 0,
         'source_contact_id' => '1',
+        'source_contact_name' => 'Mr. Anthony Anderson II',
+        'source_contact_sort_name' => 'Anderson, Anthony',
       ],
     ],
   ];
@@ -71,23 +67,23 @@ function activity_get_expectedresult() {
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testGetFilterMaxDate"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ActivityTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
-*
-* To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
-*
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
-*
-* Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
-*
-* API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testGetFilterMaxDate"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ActivityTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

@@ -9,10 +9,10 @@
 *}
 {ts 1=$totalSelectedContacts}Number of selected contacts: %1{/ts}
 
-{if !empty($searchtype) && $searchtype eq 'ts_sel'}
+{if $isSelectedContacts}
 <div id="popupContainer">
   <div class="crm-block crm-form-block crm-search-form-block">
-    <table id="selectedRecords-{if !empty($group)}{$group.id}{/if}" class="display crm-copy-fields crm-sortable">
+    <table id="selectedRecords-" class="display crm-copy-fields crm-sortable">
       <thead>
       <tr class="columnheader">
         <th class="contact_details">{ts}Name{/ts}</th>
@@ -32,7 +32,7 @@
 <a href="#" id="popup-button" title="{ts}View Selected Contacts{/ts}">{ts}View Selected Contacts{/ts}</a>
 {/if}
 
-{if !empty($searchtype) && $searchtype eq 'ts_sel'}
+{if $isSelectedContacts}
 {literal}
 <script type="text/javascript">
   CRM.$(function($) {
@@ -56,8 +56,8 @@
     });
 
     var count = 0; var columns = ''; var sortColumn = '';
-    $('#selectedRecords-{/literal}{$group.id}{literal} th').each(function() {
-      if ($(this).attr('class') == 'contact_details') {
+    $('#selectedRecords- th').each(function() {
+      if ($(this).attr('class') === 'contact_details') {
         sortColumn += '[' + count + ', "asc" ],';
         columns += '{"sClass": "contact_details"},';
       }

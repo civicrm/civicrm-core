@@ -58,7 +58,7 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
           'There are no custom data sets for activity type "%1". To create one, <a href="%2" target="%3">click here</a>.',
           [
             1 => $activityTypes[$subTypeId],
-            2 => CRM_Utils_System::url('civicrm/admin/custom/group', 'action=add&reset=1'),
+            2 => CRM_Utils_System::url('civicrm/admin/custom/group/edit', 'action=add&reset=1'),
             3 => '_blank',
           ]
         )

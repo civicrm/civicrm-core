@@ -909,8 +909,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test creating a current employer through API.
    *
    * Check it will re-activate a de-activated employer
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testContactCreateDuplicateCurrentEmployerEnables(): void {
     // Set up  - create employer relationship.
@@ -2275,7 +2273,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->individualCreate($contactParams_2);
 
     $result = $this->callAPISuccess('contact', 'get', ['sort_name' => 'Blackwell F']);
-    $this->assertEquals(1, $result['count']);
+    // Since #22060 we expect both results as space is being replaced with wildcard
+    $this->assertEquals(2, $result['count']);
   }
 
   /**
@@ -3154,14 +3153,17 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test that delete with skip undelete respects permissions.
-   * TODO: Api4
+   *
+   * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactDeletePermissions(): void {
+  public function testContactDeletePermissions(int $version): void {
+    $this->_apiversion = $version;
     $contactID = $this->individualCreate();
-    $tag = $this->callAPISuccess('Tag', 'create', ['name' => 'to be deleted']);
+    $this->quickCleanup(['civicrm_entity_tag', 'civicrm_tag']);
+    $tag = $this->callAPISuccess('Tag', 'create', ['name' => uniqid('to be deleted')]);
     $this->callAPISuccess('EntityTag', 'create', ['entity_id' => $contactID, 'tag_id' => $tag['id']]);
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
     $this->callAPIFailure('Contact', 'delete', [
@@ -3169,12 +3171,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'check_permissions' => 1,
       'skip_undelete' => 1,
     ]);
+    $this->callAPISuccessGetCount('EntityTag', ['entity_id' => $contactID], 1);
     $this->callAPISuccess('Contact', 'delete', [
       'id' => $contactID,
       'check_permissions' => 0,
       'skip_undelete' => 1,
     ]);
     $this->callAPISuccessGetCount('EntityTag', ['entity_id' => $contactID], 0);
+    $this->quickCleanup(['civicrm_entity_tag', 'civicrm_tag']);
   }
 
   /**

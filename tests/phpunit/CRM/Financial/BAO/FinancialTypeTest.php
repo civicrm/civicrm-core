@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\MembershipType;
+
 /**
  * Class CRM_Financial_BAO_FinancialTypeTest
  * @group headless
@@ -159,8 +161,8 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     $types = [];
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
     $expectedResult = [
-      1 => "Donation",
-      2 => "Member Dues",
+      1 => 'Donation',
+      2 => 'Member Dues',
     ];
     $this->assertEquals($expectedResult, $types, 'Verify that only certain financial types can be retrieved');
 
@@ -173,11 +175,12 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method testgetAvailableMembershipTypes()
+   * Check method test getAvailableMembershipTypes()
+   *
+   * @throws \API_Exception
    */
-  public function testgetAvailableMembershipTypes() {
+  public function testGetAvailableMembershipTypes(): void {
     // Create Membership types
-    $ids = [];
     $params = [
       'name' => 'Type One',
       'domain_id' => 1,
@@ -190,12 +193,11 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
       'visibility' => 'Public',
       'is_active' => 1,
     ];
-
-    $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
+    MembershipType::create()->setValues($params)->execute();
     // Add another
     $params['name'] = 'Type Two';
     $params['financial_type_id'] = 2;
-    $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
+    MembershipType::create()->setValues($params)->execute();
 
     $this->setACL();
 
@@ -300,28 +302,6 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     ]);
     $perm = CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributions->id, 'view');
     $this->assertEquals($perm, TRUE, 'Verify that lineitems now have permission.');
-  }
-
-  /**
-   * Check method testisACLFinancialTypeStatus()
-   */
-  public function testBuildPermissionedClause() {
-    $this->setACL();
-    $this->setPermissions([
-      'view contributions of type Donation',
-      'view contributions of type Member Dues',
-    ]);
-    CRM_Financial_BAO_FinancialType::buildPermissionedClause($whereClause, 'contribution');
-    $this->assertEquals($whereClause, ' civicrm_contribution.financial_type_id IN (1,2)');
-    $this->setPermissions([
-      'view contributions of type Donation',
-      'view contributions of type Member Dues',
-      'view contributions of type Event Fee',
-    ]);
-    $whereClause = NULL;
-
-    CRM_Financial_BAO_FinancialType::buildPermissionedClause($whereClause, 'contribution');
-    $this->assertEquals($whereClause, ' civicrm_contribution.financial_type_id IN (1,4,2)');
   }
 
 }

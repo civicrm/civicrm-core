@@ -17,7 +17,7 @@
 
 /**
  * This implements the profile page for all contacts. It uses a selector
- * object to do the actual dispay. The fields displayd are controlled by
+ * object to do the actual display. The fields displayed are controlled by
  * the admin
  */
 class CRM_Mailing_Page_Browse extends CRM_Core_Page {

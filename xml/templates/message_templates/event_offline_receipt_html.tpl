@@ -36,8 +36,8 @@
      {if !empty($isPrimary)}
       <p>{ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}</p>
      {/if}
-    {elseif !empty($is_pay_later)}
-     <p>{if isset($pay_later_receipt)}{$pay_later_receipt}{/if}</p> {* FIXME: this might be text rather than HTML *}
+    {elseif $is_pay_later}
+     <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
     {/if}
 
    </td>
@@ -185,7 +185,7 @@
                <td>
                 {$line.unit_price*$line.qty|crmMoney}
                </td>
-               {if isset($line.tax_rate) and ($line.tax_rate != "" || $line.tax_amount != "")}
+               {if $line.tax_rate || $line.tax_amount != ""}
                 <td>
                  {$line.tax_rate|string_format:"%.2f"}%
                 </td>
@@ -213,7 +213,7 @@
         {/if}
        {/foreach}
        {if !empty($dataArray)}
-        {if isset($totalAmount) and isset($totalTaxAmount)}
+        {if $totalAmount and $totalTaxAmount}
         <tr>
          <td {$labelStyle}>
           {ts}Amount Before Tax:{/ts}
@@ -226,10 +226,10 @@
         {foreach from=$dataArray item=value key=priceset}
           <tr>
            {if $priceset || $priceset == 0}
-            <td>&nbsp;{if isset($taxTerm)}{$taxTerm}{/if} {$priceset|string_format:"%.2f"}%</td>
+            <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>
             <td>&nbsp;{$value|crmMoney:$currency}</td>
            {else}
-            <td>&nbsp;{ts}No{/ts} {if isset($taxTerm)}{$taxTerm}{/if}</td>
+            <td>&nbsp;{ts}No{/ts} {$taxTerm}</td>
             <td>&nbsp;{$value|crmMoney:$currency}</td>
            {/if}
           </tr>
@@ -246,7 +246,7 @@
         </tr>
        {/foreach}
       {/if}
-      {if isset($totalTaxAmount)}
+      {if $totalTaxAmount}
        <tr>
         <td {$labelStyle}>
          {ts}Total Tax Amount{/ts}
@@ -301,10 +301,10 @@
        </td>
      </tr>
      {/if}
-       {if !empty($is_pay_later)}
+       {if $is_pay_later}
         <tr>
          <td colspan="2" {$labelStyle}>
-          {if isset($pay_later_receipt)}{$pay_later_receipt}{/if}
+          {$pay_later_receipt}
          </td>
         </tr>
        {/if}

@@ -581,7 +581,16 @@ class CRM_Contact_BAO_Query {
     }
     if (isset($component) && !$this->_skipPermission) {
       // Unit test coverage in api_v3_FinancialTypeACLTest::testGetACLContribution.
-      CRM_Financial_BAO_FinancialType::buildPermissionedClause($this->_whereClause, $component);
+      $clauses = [];
+      if ($component === 'contribution') {
+        $clauses = CRM_Contribute_BAO_Contribution::getSelectWhereClause();
+      }
+      if ($component === 'membership') {
+        $clauses = CRM_Member_BAO_Membership::getSelectWhereClause();
+      }
+      if ($clauses) {
+        $this->_whereClause .= ' AND ' . implode(' AND ', $clauses);
+      }
     }
 
     $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode, $apiEntity);
@@ -2038,7 +2047,7 @@ class CRM_Contact_BAO_Query {
    * @return string
    * @throws \CRM_Core_Exception
    */
-  public function whereClause($isForcePrimaryEmailOnly = NULL) {
+  public function whereClause($isForcePrimaryEmailOnly = NULL): string {
     $this->_where[0] = [];
     $this->_qill[0] = [];
 
@@ -2108,7 +2117,7 @@ class CRM_Contact_BAO_Query {
       }
     }
 
-    return implode(' AND ', $andClauses);
+    return $andClauses ? implode(' AND ', $andClauses) : ' 1 ';
   }
 
   /**
@@ -2539,7 +2548,7 @@ class CRM_Contact_BAO_Query {
    *   Search on primary location. See note below.
    * @param int $mode
    *   Determines search mode based on bitwise MODE_* constants.
-   * @param string|NULL $apiEntity
+   * @param string|null $apiEntity
    *   Determines search mode based on entity by string.
    *
    * The $primaryLocation flag only seems to be used when
@@ -3478,7 +3487,7 @@ WHERE  $smartGroupClause
     // Replace spaces with wildcards for a LIKE operation
     // UNLESS string contains a comma (this exception is a tiny bit questionable)
     // Also need to check if there is space in between sort name.
-    elseif ($op == 'LIKE' && strpos($value, ',') === FALSE && strpos($value, ' ') === TRUE) {
+    elseif ($op == 'LIKE' && strpos($value, ',') === FALSE && strpos($value, ' ') !== FALSE) {
       $value = str_replace(' ', '%', $value);
     }
     $value = CRM_Core_DAO::escapeString(trim($value));
@@ -4753,19 +4762,20 @@ civicrm_relationship.start_date > {$today}
    * @param $fieldName
    *
    * @return bool
-   * @throws \CiviCRM_API3_Exception
+   * @throws Exception
    */
   public static function isCustomDateField($fieldName) {
     if (($customFieldID = CRM_Core_BAO_CustomField::getKeyID($fieldName)) == FALSE) {
       return FALSE;
     }
     try {
-      $customFieldDataType = civicrm_api3('CustomField', 'getvalue', ['id' => $customFieldID, 'return' => 'data_type']);
+      $customFieldData = CRM_Core_BAO_CustomField::getFieldObject($customFieldID);
+      $customFieldDataType = $customFieldData->data_type;
       if ('Date' == $customFieldDataType) {
         return TRUE;
       }
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (Exception $e) {
     }
     return FALSE;
   }
@@ -4869,16 +4879,15 @@ civicrm_relationship.start_date > {$today}
   }
 
   /**
-   * Include Select columns in groupBy clause.
+   * Include select columns in groupBy clause.
    *
    * @param array $selectClauses
-   * @param array $groupBy - Columns already included in GROUP By clause.
+   * @param array|string|null $groupBy - Columns already included in GROUP By clause.
    *
    * @return string
    */
   public static function getGroupByFromSelectColumns($selectClauses, $groupBy = NULL) {
     $groupBy = (array) $groupBy;
-    $mysqlVersion = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
     $sqlMode = CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode');
 
     //return if ONLY_FULL_GROUP_BY is not enabled.
@@ -4948,7 +4957,7 @@ civicrm_relationship.start_date > {$today}
    *
    * @param bool $skipOrderAndLimit
    *
-   * @return CRM_Core_DAO
+   * @return string|null|CRM_Core_DAO
    */
   public function searchQuery(
     $offset = 0, $rowCount = 0, $sort = NULL,
@@ -5136,7 +5145,7 @@ civicrm_relationship.start_date > {$today}
 
     $this->appendFinancialTypeWhereAndFromToQueryStrings($where, $from);
 
-    $summary = ['total' => []];
+    $summary = ['total' => [], 'soft_credit' => ['count' => 0, 'avg' => 0, 'amount' => 0]];
     $this->addBasicStatsToSummary($summary, $where, $from);
 
     if (CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled()) {
@@ -5700,7 +5709,6 @@ civicrm_relationship.start_date > {$today}
       ts('Activities') => 'civicrm_activity',
       ts('Pledges') => 'civicrm_pledge',
       ts('Cases') => 'civicrm_case',
-      ts('Grants') => 'civicrm_grant',
       ts('Address Fields') => 'civicrm_address',
       ts('Notes') => 'civicrm_note',
       ts('Change Log') => 'civicrm_log',
@@ -6701,7 +6709,7 @@ AND   displayRelType.is_active = 1
     GROUP BY currency";
 
     $dao = CRM_Core_DAO::executeQuery($query);
-
+    $summary['cancel'] = ['count' => 0, 'amount' => 0, 'avg' => 0];
     if ($dao->N <= 1) {
       if ($dao->fetch()) {
         $summary['cancel']['count'] = $dao->cancel_count;

@@ -19,15 +19,17 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Api4\Activity;
 use Civi\Api4\Campaign;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class GetFieldsTest extends UnitTestCase {
+class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
 
   public function testOptionsAreReturned() {
     $fields = Contact::getFields(FALSE)
@@ -91,6 +93,27 @@ class GetFieldsTest extends UnitTestCase {
       ->execute()->indexBy('name');
     $this->assertFalse($fields['campaign_id']['options']);
     $this->assertEquals(['name', 'label'], $fields['campaign_id']['suffixes']);
+  }
+
+  public function testRequiredAndNullable() {
+    $actFields = Activity::getFields(FALSE)
+      ->setAction('create')
+      ->execute()->indexBy('name');
+
+    $this->assertTrue($actFields['activity_type_id']['required']);
+    $this->assertFalse($actFields['activity_type_id']['nullable']);
+    $this->assertFalse($actFields['subject']['required']);
+    $this->assertTrue($actFields['subject']['nullable']);
+  }
+
+  public function testGetSuffixes() {
+    $actFields = Activity::getFields(FALSE)
+      ->execute()->indexBy('name');
+
+    $this->assertEquals(['name', 'label', 'description'], $actFields['engagement_level']['suffixes']);
+    $this->assertEquals(['name', 'label', 'description', 'icon'], $actFields['activity_type_id']['suffixes']);
+    $this->assertEquals(['name', 'label', 'description', 'color'], $actFields['status_id']['suffixes']);
+    $this->assertEquals(['name', 'label', 'description', 'color'], $actFields['tags']['suffixes']);
   }
 
 }

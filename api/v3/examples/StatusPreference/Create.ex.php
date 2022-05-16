@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the StatusPreference.create API.
  *
@@ -14,7 +19,7 @@ function status_preference_create_example() {
     'check_info' => '',
   ];
 
-  try{
+  try {
     $result = civicrm_api3('StatusPreference', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -45,16 +50,17 @@ function status_preference_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 4,
+    'id' => 7,
     'values' => [
-      '4' => [
-        'id' => '4',
+      '7' => [
+        'id' => '7',
         'domain_id' => '1',
         'name' => 'test_check',
         'hush_until' => '20151212000000',
         'ignore_severity' => '5',
         'prefs' => '',
         'check_info' => '',
+        'is_active' => '',
       ],
     ],
   ];
@@ -63,23 +69,23 @@ function status_preference_create_expectedresult() {
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testCreateSeverityByName"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/StatusPreferenceTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
-*
-* To Learn about the API read
-* https://docs.civicrm.org/dev/en/latest/api/
-*
-* Browse the API on your own site with the API Explorer. It is in the main
-* CiviCRM menu, under: Support > Development > API Explorer.
-*
-* Read more about testing here
-* https://docs.civicrm.org/dev/en/latest/testing/
-*
-* API Standards documentation:
-* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testCreateSeverityByName"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/StatusPreferenceTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

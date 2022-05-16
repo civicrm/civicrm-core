@@ -17,13 +17,6 @@
 class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_TrackableURLOpen {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Track a click-through and return the URL to redirect.
    *
    * If the numbers don't match up, return the base url.
@@ -208,7 +201,7 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
   /**
    * Get tracked url count for each mailing for a given set of mailing IDs.
    *
-   * @param int $mailingIDs
+   * @param int[] $mailingIDs
    *   IDs of the mailing (comma separated).
    * @param int $contactID
    *   ID of the contact.

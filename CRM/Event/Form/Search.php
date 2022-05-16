@@ -200,9 +200,9 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
           'id' => $this->_ssID,
           'name' => CRM_Contact_BAO_SavedSearch::getName($this->_ssID, 'title'),
         ];
-        $this->assign_by_ref('savedSearch', $savedSearchValues);
-        $this->assign('ssID', $this->_ssID);
       }
+      $this->assign('savedSearch', $savedSearchValues ?? NULL);
+      $this->assign('ssID', $this->_ssID);
 
       $this->addTaskMenu($tasks);
     }

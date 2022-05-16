@@ -3,6 +3,11 @@
  * @file
  * File for the CRM_Contribute_Import_Parser_ContributionTest class.
  */
+
+use Civi\Api4\Contribution;
+use Civi\Api4\ContributionSoft;
+use Civi\Api4\OptionValue;
+
 /**
  *  Test Contribution import parser.
  *
@@ -10,7 +15,6 @@
  * @group headless
  */
 class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
-  protected $_tablesToTruncate = [];
   use CRMTraits_Custom_CustomDataTrait;
 
   /**
@@ -21,10 +25,13 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   protected $entity = 'Contribution';
 
   /**
-   * Setup function.
+   * Cleanup function.
+   *
+   * @throws \API_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    OptionValue::delete()->addWhere('name', '=', 'random')->execute();
     parent::tearDown();
   }
 
@@ -39,7 +46,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testImportParserWithSoftCreditsByExternalIdentifier($thousandSeparator) {
+  public function testImportParserWithSoftCreditsByExternalIdentifier(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $contact1Params = [
       'first_name' => 'Contact',
@@ -63,26 +70,22 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     ];
     $mapperSoftCredit = [NULL, NULL, NULL, 'external_identifier'];
     $mapperSoftCreditType = [NULL, NULL, NULL, '1'];
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Contribute_Import_Parser::SOFT_CREDIT, $mapperSoftCredit, NULL, $mapperSoftCreditType);
-    $params = ['contact_id' => $contact1Id];
-    $values = [];
-    $contributionsOfMainContact = CRM_Contribute_BAO_Contribution::retrieve($params, $values, $values);
-    $this->assertEquals(1230.99, $contributionsOfMainContact->total_amount);
-    $this->assertEquals(1230.99, $contributionsOfMainContact->net_amount);
-    $this->assertEquals(0, $contributionsOfMainContact->fee_amount);
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT, $mapperSoftCredit, NULL, $mapperSoftCreditType);
 
-    $params['contact_id'] = $contact2Id;
-    $contributionsOfSoftContact = CRM_Contribute_BAO_ContributionSoft::retrieve($params, $values);
-    $this->assertEquals(1, $contributionsOfMainContact->N, 'Contribution not added for primary contact');
-    $this->assertEquals(1, $contributionsOfSoftContact->N, 'Soft Contribution not added for secondary contact');
-    $this->callAPISuccess('ContributionSoft', 'Delete', ['id' => $contributionsOfSoftContact->id]);
-    $this->callAPISuccess('Contribution', 'Delete', ['id' => $contributionsOfMainContact->id]);
+    $contributionsOfMainContact = Contribution::get()->addWhere('contact_id', '=', $contact1Id)->execute();
+    $this->assertCount(1, $contributionsOfMainContact, 'Contribution not added for primary contact');
+    $this->assertEquals(1230.99, $contributionsOfMainContact->first()['total_amount']);
+    $this->assertEquals(1230.99, $contributionsOfMainContact->first()['net_amount']);
+    $this->assertEquals(0, $contributionsOfMainContact->first()['fee_amount']);
+
+    $contributionsOfSoftContact = ContributionSoft::get()->addWhere('contact_id', '=', $contact2Id)->execute();
+    $this->assertCount(1, $contributionsOfSoftContact, 'Contribution Soft not added for primary contact');
   }
 
   /**
    * Test dates are parsed
    */
-  public function testParsedDates() {
+  public function testParsedDates(): void {
     $mapperKeys = [];
     $form = new CRM_Contribute_Import_Parser_Contribution($mapperKeys);
     $params = ['receive_date' => '20/10/2019'];
@@ -99,22 +102,17 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   /**
    * Test payment types are passed.
    *
-   * @throws \CRM_Core_Exception
+   * Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
    */
-  public function testPaymentTypeLabel() {
+  public function testPaymentTypeLabel(): void {
+    $this->addRandomOption();
     $contactID = $this->individualCreate();
+
     $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type' => 'Donation', 'payment_instrument' => 'Check'];
-    // Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
     $this->assertEquals('Check', $contribution['payment_instrument']);
 
-    $this->callAPISuccess('OptionValue', 'create', [
-      'option_group_id' => 'payment_instrument',
-      'value' => 777,
-      'name' => 'random',
-      'label' => 'not at all random',
-    ]);
     $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type' => 'Donation', 'payment_instrument' => 'not at all random'];
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID, 'payment_instrument_id' => 'random']);
@@ -123,10 +121,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test handling of contribution statuses.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testContributionStatusLabel() {
+  public function testContributionStatusLabel(): void {
     $contactID = $this->individualCreate();
     $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type' => 'Donation', 'payment_instrument' => 'Check', 'contribution_status_id' => 'Pending'];
     // Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
@@ -134,12 +130,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
     $this->assertEquals('Pending Label**', $contribution['contribution_status']);
 
-    $this->callAPISuccess('OptionValue', 'create', [
-      'option_group_id' => 'contribution_status',
-      'value' => 777,
-      'name' => 'random',
-      'label' => 'not at all random',
-    ]);
+    $this->addRandomOption('contribution_status');
     $values['contribution_status_id'] = 'not at all random';
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID, 'contribution_status_id' => 'random']);
@@ -157,11 +148,9 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test dates are parsed
-   *
-   * @throws \CRM_Core_Exception
+   * Test dates are parsed.
    */
-  public function testParsedCustomDates() {
+  public function testParsedCustomDates(): void {
     $this->createCustomGroupWithFieldOfType([], 'date');
     $mapperKeys = [];
     $form = new CRM_Contribute_Import_Parser_Contribution($mapperKeys);
@@ -181,7 +170,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('CustomGroup', 'delete', ['id' => $this->ids['CustomGroup']['Custom Group']]);
   }
 
-  public function testParsedCustomOption() {
+  public function testParsedCustomOption(): void {
     $contactID = $this->individualCreate();
     $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type' => 'Donation', 'payment_instrument' => 'Check', 'contribution_status_id' => 'Pending'];
     // Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
@@ -200,10 +189,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test phone is included if it is part of dedupe rule.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testPhoneMatchOnContact() {
+  public function testPhoneMatchOnContact(): void {
     // Update existing unsupervised rule, change to general.
     $unsupervisedRuleGroup = $this->callApiSuccess('RuleGroup', 'getsingle', [
       'used' => 'Unsupervised',
@@ -230,7 +217,31 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'rule_field' => 'phone_numeric',
     ]);
     $fields = CRM_Contribute_BAO_Contribution::importableFields();
-    $this->assertTrue(array_key_exists('phone', $fields));
+    $this->assertArrayHasKey('phone', $fields);
+  }
+
+  /**
+   * Test custom multi-value checkbox field is imported properly.
+   */
+  public function testCustomSerializedCheckBox(): void {
+    $this->createCustomGroupWithFieldOfType([], 'checkbox');
+    $customField = $this->getCustomFieldName('checkbox');
+    $contactID = $this->individualCreate();
+    $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type' => 'Donation', $customField => 'L,V'];
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP, NULL);
+    $initialContribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
+    $this->assertContains('L', $initialContribution[$customField], "Contribution Duplicate Skip Import contains L");
+    $this->assertContains('V', $initialContribution[$customField], "Contribution Duplicate Skip Import contains V");
+
+    // Now update.
+    $values['contribution_id'] = $initialContribution['id'];
+    $values[$customField] = 'V';
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
+
+    $updatedContribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $initialContribution['id']]);
+    $this->assertNotContains('L', $updatedContribution[$customField], "Contribution Duplicate Update Import does not contain L");
+    $this->assertContains('V', $updatedContribution[$customField], "Contribution Duplicate Update Import contains V");
+
   }
 
   /**
@@ -239,14 +250,14 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    * @param array $originalValues
    *
    * @param int $onDuplicateAction
-   * @param int $expectedResult
+   * @param int|null $expectedResult
    * @param array|null $mapperSoftCredit
    * @param array|null $mapperPhoneType
    * @param array|null $mapperSoftCreditType
    * @param array|null $fields
    *   Array of field names. Will be calculated from $originalValues if not passed in.
    */
-  protected function runImport($originalValues, $onDuplicateAction, $expectedResult, $mapperSoftCredit = NULL, $mapperPhoneType = NULL, $mapperSoftCreditType = NULL, $fields = NULL) {
+  protected function runImport(array $originalValues, int $onDuplicateAction, ?int $expectedResult, array $mapperSoftCredit = NULL, array $mapperPhoneType = NULL, array $mapperSoftCreditType = NULL, array $fields = NULL): void {
     if (!$fields) {
       $fields = array_keys($originalValues);
     }
@@ -255,6 +266,20 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $parser->_contactType = 'Individual';
     $parser->init();
     $this->assertEquals($expectedResult, $parser->import($onDuplicateAction, $values), 'Return code from parser import was not as expected');
+  }
+
+  /**
+   * Add a random extra option value
+   *
+   * @param string $optionGroup
+   */
+  protected function addRandomOption(string $optionGroup = 'payment_instrument'): void {
+    $this->callAPISuccess('OptionValue', 'create', [
+      'option_group_id' => $optionGroup,
+      'value' => 777,
+      'name' => 'random',
+      'label' => 'not at all random',
+    ]);
   }
 
 }

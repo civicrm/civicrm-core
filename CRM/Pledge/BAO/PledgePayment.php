@@ -17,13 +17,6 @@
 class CRM_Pledge_BAO_PledgePayment extends CRM_Pledge_DAO_PledgePayment {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Get pledge payment details.
    *
    * @param int $pledgeId
@@ -178,25 +171,20 @@ WHERE     pledge_id = %1
   }
 
   /**
-   * Retrieve DB object based on input parameters.
-   *
-   * It also stores all the retrieved values in the default array.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Pledge_BAO_PledgePayment
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $payment = new CRM_Pledge_BAO_PledgePayment();
-    $payment->copyValues($params);
-    if ($payment->find(TRUE)) {
-      CRM_Core_DAO::storeValues($payment, $defaults);
-      return $payment;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -471,8 +459,8 @@ WHERE  civicrm_pledge.id = %2
    *
    * @param array $params
    *
-   * @return array
-   *   Next scheduled date as an array
+   * @return string
+   *   Next scheduled date in the format YmdHis
    */
   public static function calculateBaseScheduleDate(&$params) {
     $date = [];

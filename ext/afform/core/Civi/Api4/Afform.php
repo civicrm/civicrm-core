@@ -2,7 +2,6 @@
 
 namespace Civi\Api4;
 
-use Civi\Api4\Generic\BasicBatchAction;
 use Civi\Api4\Generic\BasicGetFieldsAction;
 
 /**
@@ -105,33 +104,11 @@ class Afform extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions
-   * @return Generic\BasicBatchAction
+   * @return Action\Afform\Revert
    */
   public static function revert($checkPermissions = TRUE) {
-    return (new BasicBatchAction('Afform', __FUNCTION__, function($item, BasicBatchAction $action) {
-      $scanner = \Civi::service('afform_scanner');
-      $files = [
-        \CRM_Afform_AfformScanner::METADATA_FILE,
-        \CRM_Afform_AfformScanner::LAYOUT_FILE,
-      ];
-
-      foreach ($files as $file) {
-        $metaPath = $scanner->createSiteLocalPath($item['name'], $file);
-        if (file_exists($metaPath)) {
-          if (!@unlink($metaPath)) {
-            throw new \API_Exception("Failed to remove afform overrides in $file");
-          }
-        }
-      }
-
-      // We may have changed list of files covered by the cache.
-      _afform_clear();
-
-      // FIXME if `server_route` changes, then flush the menu cache.
-      // FIXME if asset-caching is enabled, then flush the asset cache
-
-      return $item;
-    }))->setCheckPermissions($checkPermissions);
+    return (new Action\Afform\Revert('Afform', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**

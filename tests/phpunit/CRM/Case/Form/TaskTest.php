@@ -11,9 +11,9 @@ class CRM_Case_Form_TaskTest extends CiviCaseTestCase {
    * Test the order of the corresponding ids in the output matches the order
    * of the ids in the input, i.e. case_contacts matches cases.
    *
-   * @param $input array
-   * @param $selected_search_results array
-   * @param $expected array
+   * @param array $input
+   * @param array $selected_search_results
+   * @param array $expected
    *
    * @dataProvider contactIDProvider
    */

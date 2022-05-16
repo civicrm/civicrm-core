@@ -19,30 +19,29 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class SaveTest extends UnitTestCase {
+class SaveTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testSaveWithMatchingCriteria() {
-    $records = [
-      ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'abc'],
-      ['first_name' => 'Two', 'last_name' => 'Test', 'external_identifier' => 'def'],
-    ];
-
+  /**
+   * @dataProvider getMatchingCriteriaDataProvider
+   * @return void
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testSaveWithMatchingCriteria($matchCriteria, $records, $changes, $expected) {
     $contacts = Contact::save(FALSE)
       ->setRecords($records)
       ->execute();
 
-    $records[0]['last_name'] = $records[1]['last_name'] = 'Changed';
-    $records[0]['external_identifier'] = 'ghi';
-
     $modified = Contact::save(FALSE)
-      ->setRecords($records)
-      ->setMatch(['first_name', 'external_identifier'])
+      ->setRecords($changes)
+      ->setMatch($matchCriteria)
       ->execute();
 
     $this->assertGreaterThan($contacts[0]['id'], $modified[0]['id']);
@@ -54,15 +53,55 @@ class SaveTest extends UnitTestCase {
       ->addWhere('id', 'IN', $ids)
       ->addOrderBy('id')
       ->execute();
-    $expected = [
-      // Original insert
-      ['id' => $contacts[0]['id'], 'first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'abc'],
-      // Match+update
-      ['id' => $contacts[1]['id'], 'first_name' => 'Two', 'last_name' => 'Changed', 'external_identifier' => 'def'],
-      // Subsequent insert
-      ['id' => $modified[0]['id'], 'first_name' => 'One', 'last_name' => 'Changed', 'external_identifier' => 'ghi'],
-    ];
+
+    for ($index = 0; $index < count($expected); $index++) {
+      $expected[$index]['id'] = $contacts[0]['id'] + $index;
+    }
     $this->assertEquals($expected, (array) $get);
+  }
+
+  public function getMatchingCriteriaDataProvider() {
+    // data = [ match criteria, records, modifiedRecords, expected results ]
+    $data[] = [
+      ['first_name', 'external_identifier'],
+      [
+        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'abc'],
+        ['first_name' => 'Two', 'last_name' => 'Test', 'external_identifier' => 'def'],
+      ],
+      [
+        ['first_name' => 'One', 'last_name' => 'Changed', 'external_identifier' => 'ghi'],
+        ['first_name' => 'Two', 'last_name' => 'Changed', 'external_identifier' => 'def'],
+      ],
+      [
+        // Original insert
+        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'abc'],
+        // Match+update
+        ['first_name' => 'Two', 'last_name' => 'Changed', 'external_identifier' => 'def'],
+        // Subsequent insert
+        ['first_name' => 'One', 'last_name' => 'Changed', 'external_identifier' => 'ghi'],
+      ],
+    ];
+    // Test that we get a match on an empty string (eg. external_identifier => '')
+    $data[] = [
+      ['first_name', 'last_name', 'external_identifier'],
+      [
+        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'abc'],
+        ['first_name' => 'Two', 'last_name' => 'Test', 'external_identifier' => ''],
+      ],
+      [
+        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'ghi'],
+        ['first_name' => 'Two', 'last_name' => 'Test', 'external_identifier' => ''],
+      ],
+      [
+        // Original insert
+        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'abc'],
+        // Match+update
+        ['first_name' => 'Two', 'last_name' => 'Test', 'external_identifier' => ''],
+        // Subsequent insert
+        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'ghi'],
+      ],
+    ];
+    return $data;
   }
 
 }

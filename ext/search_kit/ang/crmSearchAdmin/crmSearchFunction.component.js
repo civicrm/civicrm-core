@@ -3,6 +3,7 @@
 
   angular.module('crmSearchAdmin').component('crmSearchFunction', {
     bindings: {
+      mode: '@',
       expr: '='
     },
     require: {
@@ -35,6 +36,13 @@
         ctrl.fnName = !info.fn ? '' : info.fn.name;
         initFunction();
       };
+
+      // Watch if field is switched
+      $scope.$watch('$ctrl.expr', function(newExpr, oldExpr) {
+        if (oldExpr && newExpr && newExpr.indexOf('(') < 0) {
+          ctrl.$onInit();
+        }
+      });
 
       this.addArg = function(exprType) {
         var param = ctrl.getParam(ctrl.args.length);
@@ -83,7 +91,7 @@
       this.getFunctions = function() {
         var allowedTypes = [], functions = [];
         if (ctrl.expr && ctrl.fieldArg) {
-          if (ctrl.crmSearchAdmin.canAggregate(ctrl.expr)) {
+          if (ctrl.mode !== 'groupBy' && ctrl.crmSearchAdmin.canAggregate(ctrl.expr)) {
             allowedTypes.push('aggregate');
           } else {
             allowedTypes.push('comparison', 'string');
@@ -118,11 +126,11 @@
         delete ctrl.fieldArg.flag_before;
         ctrl.args = [ctrl.fieldArg];
         if (ctrl.fn) {
-          var exprType, pos = 0,
-            uiDefaults = ctrl.fn.params[0].ui_defaults || [];
+          var exprType,
+            pos = 0;
           // Add non-field args to the beginning if needed
-          while (uiDefaults[pos] && uiDefaults[pos].type && uiDefaults[pos].type !== 'SqlField') {
-            exprType = uiDefaults[pos].type;
+          while (!_.includes(ctrl.fn.params[pos].must_be, 'SqlField')) {
+            exprType = ctrl.fn.params[pos].must_be[0];
             ctrl.args.splice(pos, 0, {
               type: ctrl.exprTypes[exprType].type,
               value: exprType === 'SqlNumber' ? 0 : ''
@@ -160,7 +168,10 @@
           // Replace fake function "e"
           ctrl.expr = (ctrl.fnName === 'e' ? '' : ctrl.fnName) + '(';
           ctrl.expr += args.join('');
-          ctrl.expr += ') AS ' + makeAlias();
+          ctrl.expr += ')';
+          if (ctrl.mode === 'select') {
+            ctrl.expr += ' AS ' + makeAlias();
+          }
         } else {
           ctrl.expr = ctrl.args[0].value;
         }

@@ -22,6 +22,5 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class FinancialType extends Generic\DAOEntity {
-  use Generic\Traits\OptionList;
 
 }

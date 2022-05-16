@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 
-{if empty($gName)}
+{if !$gName}
   {include file="CRM/Admin/Page/OptionGroup.tpl"}
 
 {elseif $action eq 1 or $action eq 2 or $action eq 8}
@@ -48,7 +48,7 @@
     {else}
       {ts}You can use this page to define one or more general Email Addresses that can be selected as the From Address. EXAMPLE: <em>"Client Services" &lt;clientservices@example.org&gt;</em>{/ts}
     {/if}
-  {elseif !empty($isLocked)}
+  {elseif $isLocked}
     {ts}This option group is reserved for system use. You cannot add or delete options in this list.{/ts}
   {else}
     {ts 1=$gLabel}The existing option choices for %1 group are listed below. You can add, edit or delete them from this screen.{/ts}
@@ -58,11 +58,11 @@
 
 <div class="crm-content-block crm-block">
 {if $rows}
-{if !isset($isLocked) || $isLocked ne 1}
+  {if $isLocked ne 1}
     <div class="action-link">
-        {crmButton p="civicrm/admin/options/$gName" q='action=add&reset=1' class="new-option" icon="plus-circle"}{if !isset($gLabel)}{ts}Add Option{/ts}{else}{ts 1=$gLabel}Add %1{/ts}{/if}{/crmButton}
+      {crmButton p="civicrm/admin/options/$gName" q='action=add&reset=1' class="new-option" icon="plus-circle"}{if !$gLabel}{ts}Add Option{/ts}{else}{ts 1=$gLabel}Add %1{/ts}{/if}{/crmButton}
     </div>
-{/if}
+  {/if}
 {foreach from=$rows item=row}
   {if !empty($row.icon)}{assign var='hasIcons' value=TRUE}{/if}
 {/foreach}
@@ -73,10 +73,10 @@
         <table id="options" class="row-highlight">
          <thead>
          <tr>
-            {if !empty($hasIcons)}
+            {if $hasIcons}
               <th></th>
             {/if}
-            {if !empty($showComponent)}
+            {if $showComponent}
                 <th>{ts}Component{/ts}</th>
             {/if}
             <th>
@@ -101,11 +101,10 @@
                 {/if}
             </th>
             {if $gName eq "payment_instrument"}<th>{ts}Account{/ts}</th>{/if}
-            {if !empty($showCounted)}<th>{ts}Counted?{/ts}</th>{/if}
-            {if !empty($showVisibility)}<th>{ts}Visibility{/ts}</th>{/if}
+            {if $showCounted}<th>{ts}Counted?{/ts}</th>{/if}
             <th id="nosort">{ts}Description{/ts}</th>
             <th>{ts}Order{/ts}</th>
-            {if !empty($showIsDefault)}<th>{ts}Default{/ts}</th>{/if}
+            {if $showIsDefault}<th>{ts}Default{/ts}</th>{/if}
             <th>{ts}Reserved{/ts}</th>
             <th>{ts}Enabled?{/ts}</th>
             <th></th>
@@ -114,34 +113,33 @@
           <tbody>
         {foreach from=$rows item=row}
           <tr id="option_value-{$row.id}" class="crm-admin-options crm-admin-options_{$row.id} crm-entity {cycle values="odd-row,even-row"}{if NOT $row.is_active} disabled{/if}">
-            {if !empty($hasIcons)}
+            {if $hasIcons}
               <td class="crm-admin-options-icon"><i class="crm-i {$row.icon}" aria-hidden="true"></i></td>
             {/if}
-            {if !empty($showComponent)}
+            {if $showComponent}
               <td class="crm-admin-options-component_name">{$row.component_name}</td>
             {/if}
-            <td class="crm-admin-options-label crm-editable" data-field="label" {if !empty($row.color)}style="background-color: {$row.color}; color: {$row.color|colorContrast};"{/if}>
-              {if !empty($row.label)}{$row.label}{/if}
+            <td class="crm-admin-options-label crm-editable" data-field="label" {if $row.color}style="background-color: {$row.color}; color: {$row.color|colorContrast};"{/if}>
+              {$row.label}
             </td>
             {if $gName eq "case_status"}
               <td class="crm-admin-options-grouping">{$row.grouping}</td>
             {/if}
-            <td class="crm-admin-options-value">{if isset($row.value)}{$row.value}{/if}</td>
+            <td class="crm-admin-options-value">{$row.value}</td>
             {if $gName eq "payment_instrument"}
               <td>{$row.financial_account}</td>
             {/if}
-            {if !empty($showCounted)}
+            {if $showCounted}
               <td class="center crm-admin-options-filter">{icon condition=$row.filter}{ts}Counted{/ts}{/icon}</td>
             {/if}
-            {if !empty($showVisibility)}<td class="crm-admin-visibility_label">{$row.visibility_label}</td>{/if}
-            <td class="crm-admin-options-description crm-editable" data-field="description" data-type="textarea">{if isset($row.description)}{$row.description}{/if}</td>
-            <td class="nowrap crm-admin-options-order">{if isset($row.weight)}{$row.weight}{/if}</td>
-            {if !empty($showIsDefault)}
-              <td class="crm-admin-options-is_default" align="center">{if !empty($row.is_default)}{icon}{ts}Default{/ts}{/icon}{/if}&nbsp;</td>
+            <td class="crm-admin-options-description crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
+            <td class="nowrap crm-admin-options-order">{if $row.weight}{$row.weight|smarty:nodefaults}{/if}</td>
+            {if $showIsDefault}
+              <td class="crm-admin-options-is_default" align="center">{if $row.is_default}{icon}{ts}Default{/ts}{/icon}{/if}&nbsp;</td>
             {/if}
             <td class="crm-admin-options-is_reserved">{if $row.is_reserved eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td class="crm-admin-options-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-            <td>{$row.action|replace:'xx':$row.id}</td>
+            <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
           </tr>
         {/foreach}
         </tbody>
@@ -156,8 +154,8 @@
     </div>
 {/if}
     <div class="action-link">
-      {if !isset($isLocked) || $isLocked ne 1}
-        {crmButton p="civicrm/admin/options/$gName" q='action=add&reset=1' class="new-option" icon="plus-circle"}{if !isset($gLabel)}{ts}Add Option{/ts}{else}{ts 1=$gLabel}Add %1{/ts}{/if}{/crmButton}
+      {if $isLocked ne 1}
+        {crmButton p="civicrm/admin/options/$gName" q='action=add&reset=1' class="new-option" icon="plus-circle"}{if !$gLabel}{ts}Add Option{/ts}{else}{ts 1=$gLabel}Add %1{/ts}{/if}{/crmButton}
       {/if}
       {crmButton p="civicrm/admin/options" q="action=browse&reset=1" class="cancel" icon="check"}{ts}Done{/ts}{/crmButton}
     </div>

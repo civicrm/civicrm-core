@@ -48,8 +48,17 @@ class CRM_Contact_Form_Edit_Phone {
       'placeholder' => NULL,
     ]);
     //main phone number with crm_phone class
-    $form->addField("phone[$blockId][phone]", ['entity' => 'phone', 'class' => 'crm_phone twelve', 'aria-label' => ts('Phone %1', [1 => $blockId])]);
-    $form->addField("phone[$blockId][phone_ext]", ['entity' => 'phone', 'aria-label' => ts('Phone Extension %1', [1 => $blockId])]);
+    $form->addField("phone[$blockId][phone]", [
+      'entity' => 'phone',
+      'class' => 'crm_phone twelve',
+      'aria-label' => ts('Phone %1', [1 => $blockId]),
+      'label' => ts('Phone %1:', [1 => $blockId]),
+    ]);
+    $form->addField("phone[$blockId][phone_ext]", [
+      'entity' => 'phone',
+      'aria-label' => ts('Phone Extension %1', [1 => $blockId]),
+      'label' => ts('ext.', ['context' => 'phone_ext']),
+    ]);
     if (isset($form->_contactType) || $blockEdit) {
       //Block type select
       $form->addField("phone[$blockId][location_type_id]", [

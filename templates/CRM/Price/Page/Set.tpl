@@ -52,7 +52,7 @@
           <td class="crmf-title crm-editable">{$row.title}</td>
           <td class="crmf-extends">{$row.extends}</td>
           <td class="crmf-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td>{$row.action|replace:'xx':$row.id}</td>
+          <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
         </table>

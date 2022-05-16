@@ -331,7 +331,7 @@ abstract class CRM_Utils_Hook {
    *   The type of operation being performed.
    * @param string $objectName
    *   The name of the object.
-   * @param int $id
+   * @param int|null $id
    *   The object id if available.
    * @param array $params
    *   The parameters used for object creation / editing.
@@ -702,6 +702,21 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called for declaring managed entities via API.
    *
+   * @code
+   * // Example: Optimal skeleton for backward/forward compatibility
+   * function example_civicrm_managed(&$entities, ?array $modules = NULL) {
+   *   if ($modules !== NULL && !in_array(E::LONG_NAME, $modules, TRUE)) {
+   *     return;
+   *   }
+   *   $entities[] = [
+   *     'module' => E::LONG_NAME,
+   *     'name' => 'my_option_value',
+   *     'entity' => 'OptionValue',
+   *     'params' => [...],
+   *   ];
+   * }
+   * @endCode
+   *
    * @param array $entities
    *   List of pending entities. Each entity is an array with keys:
    *   + 'module': string; for module-extensions, this is the fully-qualifed name (e.g. "com.example.mymodule"); for CMS modules, the name is prefixed by the CMS (e.g. "drupal.mymodule")
@@ -715,15 +730,26 @@ abstract class CRM_Utils_Hook {
    *     - 'always' (default): always delete orphaned records
    *     - 'never': never delete orphaned records
    *     - 'unused': only delete orphaned records if there are no other references to it in the DB. (This is determined by calling the API's "getrefcount" action.)
+   * @param array|NULL $modules
+   *   (Added circa v5.50) If given, only report entities related to $modules. NULL is a wildcard ("all modules").
    *
+   *   This parameter is _advisory_ and is not supplied on older versions.
+   *   Listeners SHOULD self-censor (only report entities which match the filter).
+   *   However, all pre-existing listeners were unaware of this option, and they WILL over-report.
+   *   Over-reported data will be discarded.
    * @return null
    *   the return value is ignored
    */
-  public static function managed(&$entities) {
-    return self::singleton()->invoke(['entities'], $entities,
-      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+  public static function managed(&$entities, ?array $modules = NULL) {
+    self::singleton()->invoke(['entities', 'modules'], $entities, $modules,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_managed'
     );
+    if ($modules) {
+      $entities = array_filter($entities, function($entity) use ($modules) {
+        return in_array($entity['module'], $modules, TRUE);
+      });
+    }
   }
 
   /**
@@ -2361,12 +2387,12 @@ abstract class CRM_Utils_Hook {
    * Issue CRM-14276
    * Add a hook for altering the display name
    *
-   * hook_civicrm_contact_get_displayname(&$display_name, $objContact)
+   * hook_civicrm_contact_get_displayname(&$display_name, $contactId, $dao)
    *
    * @param string $displayName
    * @param int $contactId
-   * @param object $dao
-   *   The contact object.
+   * @param CRM_Core_DAO $dao
+   *   A DAO object containing contact fields + primary email field as "email".
    *
    * @return mixed
    */
@@ -2404,7 +2430,7 @@ abstract class CRM_Utils_Hook {
    *        For future-proofing, use a serializable callback (e.g. string/array).
    *        See also: Civi\Core\Resolver.
    *    - requires: array, list of required Angular modules.
-   *    - basePages: array, uncondtionally load this module onto the given Angular pages. [v4.7.21+]
+   *    - basePages: array, unconditionally load this module onto the given Angular pages. [v4.7.21+]
    *      If omitted, default to "array('civicrm/a')" for backward compat.
    *      For a utility that should only be loaded on-demand, use "array()".
    *      For a utility that should be loaded in all pages use, "array('*')".
@@ -2589,11 +2615,8 @@ abstract class CRM_Utils_Hook {
    * inserted in civicrm_financial_trxn table
    *
    * @param array $deferredRevenues
-   *
-   * @param array $contributionDetails
-   *
+   * @param CRM_Contribute_BAO_Contribution $contributionDetails
    * @param bool $update
-   *
    * @param string $context
    *
    * @return mixed

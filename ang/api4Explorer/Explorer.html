@@ -16,7 +16,6 @@
           </span>
           <input class="form-control api4-index" type="search" ng-model="index" ng-mouseenter="help('index', paramDoc('$index'))" ng-mouseleave="help()" placeholder="{{:: ts('Index') }}" />
           <button class="btn btn-success pull-right" crm-icon="fa-bolt" ng-disabled="!entity || !action || loading" ng-click="execute()" ng-mouseenter="help(ts('Execute'), executeDoc())" ng-mouseleave="help()">{{:: ts('Execute') }}</button>
-          <button class="btn btn-primary pull-right" crm-icon="fa-save" ng-show="perm.editGroups && action === 'get'" ng-click="save()" ng-mouseenter="help(ts('Save smart group'), saveDoc())" ng-mouseleave="help()">{{:: ts('Save...') }}</button>
         </div>
       </div>
       <div class="panel-body">
@@ -203,9 +202,37 @@
         </ul>
       </div>
       <div class="panel-body">
+        <div class="alert alert-danger" ng-if="selectedTab.code === 'rest' && !$ctrl.authxEnabled">
+          <p>
+            {{:: ts('To enable REST authentication, the AuthX extension must be installed.') }}
+            <a target="_blank" ng-href="{{ crmUrl('civicrm/admin/extensions') }}">
+              <i class="crm-i fa-gear"> {{:: ts('Manage Extensions') }}</i>
+            </a>
+          </p>
+        </div>
+        <div class="alert alert-warning" ng-if="selectedTab.code === 'rest' && $ctrl.authxEnabled">
+          <p>
+            <a target="_blank" ng-href="{{ crmUrl('civicrm/admin/setting/authx', {reset: 1}) }}">
+              <i class="crm-i fa-gear"> {{:: ts('Configure REST Authentication') }}</i>
+            </a>
+          </p>
+          <p>
+            <a target="_blank" href="https://docs.civicrm.org/dev/en/latest/api/v4/rest/">
+              <i class="crm-i fa-external-link"> {{:: ts('REST Documentation') }}</i>
+            </a>
+          </p>
+        </div>
         <div ng-repeat="style in code[selectedTab.code]">
-          <label>{{:: style.label }}</label>
-          <div><pre class="prettyprint" ng-bind-html="style.code"></pre></div>
+          <div class="clearfix">
+            <button class="btn btn-xs btn-default pull-right" ng-click="$ctrl.copyCode('api4-code-' + selectedTab.code + '-' + style.name)">
+              <i class="crm-i fa-clipboard"></i>
+              {{:: ts('Copy') }}
+            </button>
+            <label>{{:: style.label }}</label>
+          </div>
+          <div>
+            <pre class="prettyprint" id="api4-code-{{ selectedTab.code + '-' + style.name }}" ng-bind-html="style.code"></pre>
+          </div>
         </div>
       </div>
     </div>
@@ -241,7 +268,15 @@
       </div>
       <div class="panel-body">
         <div ng-show="selectedTab.result === 'result'">
-          <pre class="prettyprint" ng-repeat="code in result" ng-bind-html="code"></pre>
+          <div ng-repeat="code in result">
+            <div class="clearfix">
+              <button ng-if="$index" class="btn btn-xs btn-default pull-right" ng-click="$ctrl.copyCode('api4-result-' + $index)">
+                <i class="crm-i fa-clipboard"></i>
+                {{:: ts('Copy') }}
+              </button>
+            </div>
+            <pre class="prettyprint" id="api4-result-{{ $index }}" ng-bind-html="code"></pre>
+          </div>
         </div>
         <div ng-if="::perm.accessDebugOutput" ng-show="selectedTab.result === 'debug'">
           <pre ng-if="debug" class="prettyprint" ng-bind-html="debug"></pre>

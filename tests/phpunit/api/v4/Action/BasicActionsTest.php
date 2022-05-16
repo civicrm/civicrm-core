@@ -19,16 +19,17 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\MockBasicEntity;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Test\HookInterface;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class BasicActionsTest extends UnitTestCase implements HookInterface {
+class BasicActionsTest extends Api4TestBase implements HookInterface, TransactionalInterface {
 
   /**
    * Listens for civi.api4.entityTypes event to manually add this nonstandard entity
@@ -212,7 +213,8 @@ class BasicActionsTest extends UnitTestCase implements HookInterface {
     // Simple options should be expanded to non-assoc array
     $this->assertCount(2, $getFields);
     $this->assertEquals('one', $getFields['group']['options'][0]['id']);
-    $this->assertEquals('First', $getFields['group']['options'][0]['name']);
+    // Name is interchangeable with id
+    $this->assertEquals('one', $getFields['group']['options'][0]['name']);
     $this->assertEquals('First', $getFields['group']['options'][0]['label']);
     $this->assertFalse(isset($getFields['group']['options'][0]['color']));
     // Complex options should give all requested properties
@@ -400,7 +402,7 @@ class BasicActionsTest extends UnitTestCase implements HookInterface {
   public function testPseudoconstantMatch() {
     $records = [
       ['group:label' => 'First', 'shape' => 'round', 'fruit:name' => 'banana'],
-      ['group:name' => 'Second', 'shape' => 'square', 'fruit:label' => 'Pear'],
+      ['group:name' => 'two', 'shape' => 'square', 'fruit:label' => 'Pear'],
     ];
     $this->replaceRecords($records);
 
@@ -412,7 +414,7 @@ class BasicActionsTest extends UnitTestCase implements HookInterface {
     $this->assertEquals('round', $results[0]['shape']);
     $this->assertEquals('one', $results[0]['group']);
     $this->assertEquals('First', $results[0]['group:label']);
-    $this->assertEquals('First', $results[0]['group:name']);
+    $this->assertEquals('one', $results[0]['group:name']);
     $this->assertEquals(3, $results[0]['fruit']);
     $this->assertEquals('Banana', $results[0]['fruit:label']);
     $this->assertEquals('banana', $results[0]['fruit:name']);

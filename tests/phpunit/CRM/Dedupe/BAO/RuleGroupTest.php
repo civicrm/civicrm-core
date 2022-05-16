@@ -1,10 +1,110 @@
 <?php
 
+class CRM_Dedupe_DAO_TestEntity extends CRM_Core_DAO {
+
+  /**
+   * Returns foreign keys and entity references.
+   *
+   * @return array
+   *   [CRM_Core_Reference_Interface]
+   */
+  public static function getReferenceColumns() {
+    if (!isset(Civi::$statics[__CLASS__]['links'])) {
+      Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic('civicrm_dedupe_test_table', 'contact_id', 'civicrm_contact', 'id');
+    }
+    return Civi::$statics[__CLASS__]['links'];
+  }
+
+  /**
+   * Returns all the column names of this table
+   *
+   * @return array
+   */
+  public static function &fields() {
+    if (!isset(Civi::$statics[__CLASS__]['fields'])) {
+      Civi::$statics[__CLASS__]['fields'] = [
+        'id' => [
+          'name' => 'id',
+          'type' => CRM_Utils_Type::T_INT,
+          'required' => TRUE,
+          'where' => 'civicrm_dedupe_test_table.id',
+          'table_name' => 'civicrm_dedupe_test_table',
+          'entity' => 'TestEntity',
+        ],
+        'contact_id' => [
+          'name' => 'contact_id',
+          'type' => CRM_Utils_Type::T_INT,
+          'where' => 'civicrm_dedupe_test_table.contact_id',
+          'table_name' => 'civicrm_dedupe_test_table',
+          'entity' => 'TestEntity',
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ],
+        'dedupe_test_field' => [
+          'name' => 'dedupe_test_field',
+          'type' => CRM_Utils_Type::T_STRING,
+          'maxlength' => 64,
+          'size' => 8,
+          'import' => TRUE,
+          'where' => 'civicrm_dedupe_test_table.dedupe_test_field',
+          'table_name' => 'civicrm_dedupe_test_table',
+          'entity' => 'TestEntity',
+        ],
+      ];
+    }
+    return Civi::$statics[__CLASS__]['fields'];
+  }
+
+}
+
 /**
  * Class CRM_Dedupe_BAO_RuleGroupTest
  * @group headless
  */
 class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
+
+  /**
+   * IDs of created contacts.
+   *
+   * @var array
+   */
+  protected $contactIDs = [];
+
+  /**
+   * ID of the group holding the contacts.
+   *
+   * @var int
+   */
+  protected $groupID;
+
+  /**
+   * @var \Civi\API\Kernel
+   */
+  protected $apiKernel;
+
+  /**
+   * @var \Civi\API\Provider\AdhocProvider
+   */
+  protected $adhocProvider;
+
+  /**
+   * Clean up after the test.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function tearDown(): void {
+
+    foreach ($this->contactIDs as $contactId) {
+      $this->contactDelete($contactId);
+    }
+    if ($this->groupID) {
+      $this->callAPISuccess('group', 'delete', ['id' => $this->groupID]);
+    }
+    $this->quickCleanup(['civicrm_contact'], TRUE);
+    CRM_Core_DAO::executeQuery("DELETE r FROM civicrm_dedupe_rule_group rg INNER JOIN civicrm_dedupe_rule r ON rg.id = r.dedupe_rule_group_id WHERE rg.is_reserved = 0 AND used = 'General'");
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_dedupe_rule_group WHERE is_reserved = 0 AND used = 'General'");
+
+    parent::tearDown();
+  }
 
   /**
    * Test that sort_name is included in supported fields.
@@ -98,6 +198,181 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
           'url' => 'Website',
         ],
     ], $fields);
+  }
+
+  /**
+   * Test hook_dupeQuery match on custom entity field.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testHookDupeQueryMatch() {
+    $this->hookClass->setHook('civicrm_dupeQuery', [$this, 'hook_civicrm_dupeQuery']);
+
+    \CRM_Core_DAO_AllCoreTables::init(TRUE);
+
+    \CRM_Core_DAO_AllCoreTables::registerEntityType('TestEntity', 'CRM_Dedupe_DAO_TestEntity', 'civicrm_dedupe_test_table');
+    $this->apiKernel = \Civi::service('civi_api_kernel');
+    $this->adhocProvider = new \Civi\API\Provider\AdhocProvider(3, 'TestEntity');
+    $this->apiKernel->registerApiProvider($this->adhocProvider);
+
+    //DedupeRule.php call this hook to get the type for the field.
+    $this->adhocProvider->addAction('getfields', 'access CiviCRM', function ($apiRequest) {
+      return [
+        'values' => [
+          'id' => [
+            'name' => 'id',
+            'type' => CRM_Utils_Type::T_INT,
+          ],
+          'contact_id' => [
+            'name' => 'contact_id',
+            'type' => CRM_Utils_Type::T_INT,
+          ],
+          'dedupe_test_field' => [
+            'name' => 'dedupe_test_field',
+            'type' => CRM_Utils_Type::T_STRING,
+          ],
+        ],
+      ];
+    });
+
+    CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS civicrm_dedupe_test_table');
+    // Setup our custom enity table.
+    $sql = "CREATE TABLE `civicrm_dedupe_test_table` (
+      `id` int(10) UNSIGNED NOT NULL COMMENT 'Unique ID',
+      `contact_id` int(10) UNSIGNED DEFAULT NULL,
+      `dedupe_test_field` varchar(64) DEFAULT NULL
+    )";
+
+    CRM_Core_DAO::executeQuery($sql);
+
+    $sql = "ALTER TABLE `civicrm_dedupe_test_table` ADD INDEX `FK_civicrm_dedupe_test_table_contact_id` (`contact_id`);";
+
+    CRM_Core_DAO::executeQuery($sql);
+
+    $params = [
+      'name' => 'Dupe Group',
+      'title' => 'New Test Dupe Group',
+      'domain_id' => 1,
+      'is_active' => 1,
+      'visibility' => 'Public Pages',
+    ];
+
+    $result = $this->callAPISuccess('group', 'create', $params);
+    $this->groupID = $result['id'];
+
+    $params = [
+      [
+        'first_name' => 'robin',
+        'last_name' => 'hood',
+        'contact_type' => 'Individual',
+      ],
+      [
+        'first_name' => 'bob',
+        'last_name' => 'dobbs',
+        'contact_type' => 'Individual',
+      ],
+    ];
+
+    $count = 1;
+    $contact_id;
+    foreach ($params as $param) {
+      $contact = $this->callAPISuccess('contact', 'create', $param);
+      $this->contactIDs[$count++] = $contact['id'];
+
+      $grpParams = [
+        'contact_id' => $contact['id'],
+        'group_id' => $this->groupID,
+      ];
+      $this->callAPISuccess('group_contact', 'create', $grpParams);
+
+      CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_dedupe_test_table` (`id`, `contact_id`, `dedupe_test_field`) VALUES (" . $count . "," . $contact['id'] . ", 'duplicate');");
+      $contact_id = $contact['id'];
+    }
+
+    // verify that all contacts have been created separately
+    $this->assertEquals(count($this->contactIDs), 2, 'Check for number of contacts.');
+
+    // Create our RuleGroup with one rule.
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
+      'contact_type' => 'Individual',
+      'threshold' => 10,
+      'used' => 'General',
+      'name' => 'TestRule',
+      'title' => 'TestRule',
+      'is_reserved' => 0,
+    ]);
+
+    foreach (['dedupe_test_field'] as $field) {
+      $rules[$field] = $this->callAPISuccess('Rule', 'create', [
+        'dedupe_rule_group_id' => $ruleGroup['id'],
+        'rule_weight' => 10,
+        'rule_field' => $field,
+        'rule_table' => 'civicrm_dedupe_test_table',
+      ]);
+    }
+
+    // Test op supportedFields
+    $fields = CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields('Individual');
+    $this->assertEquals([
+      'dedupe_test_field' => 'Test Field',
+    ], $fields['civicrm_dedupe_test_table']);
+
+    // Test rule finds a match.
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
+
+    $this->assertCount(1, $foundDupes);
+
+    // Test rule finds no match.
+    CRM_Core_DAO::executeQuery("UPDATE `civicrm_dedupe_test_table` SET dedupe_test_field = 'not a duplicate' WHERE contact_id = $contact_id;");
+
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
+
+    $this->assertCount(0, $foundDupes);
+
+    CRM_Core_DAO::executeQuery('DROP TABLE civicrm_dedupe_test_table');
+    \CRM_Core_DAO_AllCoreTables::init(TRUE);
+  }
+
+  /**
+   * Implements hook_civicrm_dupeQuery().
+   *
+   * Locks in expected params
+   *
+   */
+  public function hook_civicrm_dupeQuery($baoObject, $op, &$objectData) {
+    $this->assertContains($op, ['supportedFields', 'dedupeIndexes', 'query', 'table', 'threshold']);
+    switch ($op) {
+      case 'supportedFields':
+        $this->assertIsArray($objectData);
+        $this->assertNull($baoObject);
+        $objectData['Individual']['civicrm_dedupe_test_table'] = [
+          'dedupe_test_field' => 'Test Field',
+        ];
+        break;
+
+      case 'dedupeIndexes':
+        //Not tested.
+        break;
+
+      case 'query':
+        $this->assertIsArray($objectData);
+        $this->assertInstanceOf(CRM_Dedupe_BAO_DedupeRule::class, $baoObject);
+        if ($baoObject->rule_table == 'civicrm_dedupe_test_table') {
+          $objectData = $baoObject->entitySql('contact_id');
+        }
+        break;
+
+      case 'table':
+        $this->assertIsArray($objectData);
+        $this->assertInstanceOf(CRM_Dedupe_BAO_DedupeRuleGroup::class, $baoObject);
+        break;
+
+      case 'threshold':
+        $this->assertIsString($objectData);
+        $this->assertInstanceOf(CRM_Dedupe_BAO_DedupeRuleGroup::class, $baoObject);
+        break;
+
+    }
   }
 
 }

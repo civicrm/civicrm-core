@@ -56,6 +56,16 @@
         return str ? _.unique(_.trim(str).split(/\s+/g)) : [];
       }
 
+      // Check if a node has class(es)
+      function hasClass(node, className) {
+        if (!node['class']) {
+          return false;
+        }
+        var classes = splitClass(node['class']),
+          classNames = className.split(' ');
+        return _.intersection(classes, classNames).length === classNames.length;
+      }
+
       function modifyClasses(node, toRemove, toAdd) {
         var classes = splitClass(node['class']);
         if (toRemove) {
@@ -64,7 +74,11 @@
         if (toAdd) {
           classes = _.unique(classes.concat(splitClass(toAdd)));
         }
-        node['class'] = classes.join(' ');
+        if (classes.length) {
+          node['class'] = classes.join(' ');
+        } else if ('class' in node) {
+          delete node['class'];
+        }
       }
 
       return {
@@ -137,6 +151,45 @@
           return CRM.afGuiEditor.searchDisplays[searchName + (displayName ? '.' + displayName : '')];
         },
 
+        getAllSearchDisplays: function() {
+          var links = [],
+            searchNames = [],
+            deferred = $q.defer();
+          // Non-aggregated query will return the same search multiple times - once per display
+          crmApi4('SavedSearch', 'get', {
+            select: ['name', 'label', 'display.name', 'display.label', 'display.type:name', 'display.type:icon'],
+            where: [['api_entity', 'IS NOT NULL'], ['api_params', 'IS NOT NULL']],
+            join: [['SearchDisplay AS display', 'LEFT', ['id', '=', 'display.saved_search_id']]],
+            orderBy: {'label':'ASC'}
+          }).then(function(searches) {
+            _.each(searches, function(search) {
+              // Add default display for each search (track searchNames in a var to just add once per search)
+              if (!_.includes(searchNames, search.name)) {
+                searchNames.push(search.name);
+                links.push({
+                  key: search.name,
+                  url: '#create/search/' + search.name,
+                  label: search.label + ': ' + ts('Search results table'),
+                  tag: 'crm-search-display-table',
+                  icon: 'fa-table'
+                });
+              }
+              // If the search has no displays (other than the default) this will be empty
+              if (search['display.name']) {
+                links.push({
+                  key: search.name + '.' + search['display.name'],
+                  url: '#create/search/' + search.name + '.' + search['display.name'],
+                  label: search.label + ': ' + search['display.label'],
+                  tag: search['display.type:name'],
+                  icon: search['display.type:icon']
+                });
+              }
+            });
+            deferred.resolve(links);
+          });
+          return deferred.promise;
+        },
+
         // Recursively searches a collection and its children using _.filter
         // Returns an array of all matches, or an object if the indexBy param is used
         findRecursive: function findRecursive(collection, predicate, indexBy) {
@@ -163,6 +216,7 @@
         },
 
         splitClass: splitClass,
+        hasClass: hasClass,
         modifyClasses: modifyClasses,
         getStyles: getStyles,
         setStyle: setStyle,
@@ -181,7 +235,7 @@
   $(function() {
     // Shoehorn in a non-angular widget for picking icons
     $('#crm-container').append('<div style="display:none"><input id="af-gui-icon-picker"></div>');
-    CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').done(function() {
+    CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').then(function() {
       $('#af-gui-icon-picker').crmIconPicker();
     });
     // Add css classes while dragging

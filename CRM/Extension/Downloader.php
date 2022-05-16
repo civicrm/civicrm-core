@@ -16,6 +16,26 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Extension_Downloader {
+
+  /**
+   * @var GuzzleHttp\Client
+   */
+  protected $guzzleClient;
+
+  /**
+   * @return \GuzzleHttp\Client
+   */
+  public function getGuzzleClient(): \GuzzleHttp\Client {
+    return $this->guzzleClient ?? new \GuzzleHttp\Client();
+  }
+
+  /**
+   * @param \GuzzleHttp\Client $guzzleClient
+   */
+  public function setGuzzleClient(\GuzzleHttp\Client $guzzleClient) {
+    $this->guzzleClient = $guzzleClient;
+  }
+
   /**
    * @var CRM_Extension_Container_Basic
    * The place where downloaded extensions are ultimately stored
@@ -136,14 +156,12 @@ class CRM_Extension_Downloader {
    *   Whether the download was successful.
    */
   public function fetch($remoteFile, $localFile) {
-    $result = CRM_Utils_HttpClient::singleton()->fetch($remoteFile, $localFile);
-    switch ($result) {
-      case CRM_Utils_HttpClient::STATUS_OK:
-        return TRUE;
-
-      default:
-        return FALSE;
+    $client = $this->getGuzzleClient();
+    $response = $client->request('GET', $remoteFile, ['sink' => $localFile, 'timeout' => \Civi::settings()->get('http_timeout')]);
+    if ($response->getStatusCode() === 200) {
+      return TRUE;
     }
+    return FALSE;
   }
 
   /**

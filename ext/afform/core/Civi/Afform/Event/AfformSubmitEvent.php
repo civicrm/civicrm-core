@@ -14,9 +14,9 @@ use Civi\Api4\Utils\CoreUtil;
  * If special processing for an entity type is desired, add a new listener with a higher priority
  * than 0, and do one of two things:
  *
- * 1. Fully process the save, and cancel event propagation to bypass `processGenericEntity`.
- * 2. Manipulate the $records and allow the default listener to perform the save.
- *    Setting $record['fields'] = NULL will cancel saving a record, e.g. if the record is not valid.
+ * 1. Fully process the save, and call `$event->stopPropagation()` to skip `processGenericEntity`.
+ * 2. Manipulate the $records and allow `processGenericEntity` to perform the save.
+ *    Setting $record['fields'] = NULL will prevent saving a record, e.g. if the record is not valid.
  *
  * @package Civi\Afform\Event
  */
@@ -86,6 +86,13 @@ class AfformSubmitEvent extends AfformBaseEvent {
    */
   public function getEntityName(): string {
     return $this->entityName;
+  }
+
+  /**
+   * @return array{type: string, fields: array, joins: array, security: string, actions: array}
+   */
+  public function getEntity() {
+    return $this->getFormDataModel()->getEntity($this->entityName);
   }
 
   /**

@@ -49,7 +49,10 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
     if (!CRM_Utils_Type::validate($this->_key, 'ExtensionKey') && !empty($this->_key)) {
       throw new CRM_Core_Exception('Extension Key does not match expected standard');
     }
-    $this->label = $remoteExtensionRows[$this->_key]['label'] ?? $this->_key;
+
+    $name = $remoteExtensionRows[$this->_key]['label'] ?? $localExtensionRows[$this->_key]['label'] ?? NULL;
+    $this->label = $name ? sprintf('%s (<em>%s</em>)', htmlentities($name), htmlentities($this->_key))
+        : sprintf('<em>%s</em>', htmlentities($this->_key));
     $session = CRM_Core_Session::singleton();
     $url = CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1&action=browse');
     $session->pushUserContext($url);
@@ -151,7 +154,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param array $self
+   * @param self $self
    *   This object.
    *
    * @return bool|array

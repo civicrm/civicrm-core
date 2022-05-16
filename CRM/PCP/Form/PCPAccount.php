@@ -115,6 +115,33 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
       }
 
       CRM_Core_BAO_UFGroup::setProfileDefaults($this->_contactID, $fields, $this->_defaults);
+
+      if (!empty($this->_defaults['image_URL'])) {
+        $this->assign("imageURL", CRM_Utils_File::getImageURL($this->_defaults['image_URL']));
+        $this->removeFileRequiredRules('image_URL');
+
+        $deleteExtra = json_encode(ts('Are you sure you want to delete the contact image?'));
+        $deleteURL = [
+          CRM_Core_Action::DELETE => [
+            'name' => ts('Delete Contact Image'),
+            'url' => 'civicrm/contact/image',
+            'qs' => 'reset=1&cid=' . $this->_contactID . '&action=delete',
+            'extra' => 'onclick = "' . htmlspecialchars("if (confirm($deleteExtra)) this.href+='&confirmed=1'; else return false;") . '"',
+          ],
+        ];
+        $deleteURL = CRM_Core_Action::formLink($deleteURL,
+          CRM_Core_Action::DELETE,
+          [
+            'id' => $this->_contactID,
+          ],
+          ts('more'),
+          FALSE,
+          'contact.image.delete',
+          'Contact',
+          $this->_contactID
+        );
+        $this->assign('deleteURL', $deleteURL);
+      }
     }
     //set custom field defaults
     foreach ($this->_fields as $name => $field) {
@@ -181,10 +208,19 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
       $this->assign('campaignName', CRM_Event_PseudoConstant::event($this->_pageId));
     }
 
+    // get the value from session, this is set if there is any file upload field
+    $uploadNames = $this->get('uploadNames');
+    if (!empty($uploadNames)) {
+      $buttonName = 'upload';
+    }
+    else {
+      $buttonName = 'next';
+    }
+
     if ($this->_single) {
       $button = [
         [
-          'type' => 'next',
+          'type' => $buttonName,
           'name' => ts('Save'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
@@ -197,7 +233,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     }
     else {
       $button[] = [
-        'type' => 'next',
+        'type' => $buttonName,
         'name' => ts('Continue'),
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
@@ -214,7 +250,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param $self
+   * @param self $self
    *
    *
    * @return bool|array
@@ -265,6 +301,10 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     }
 
     $this->_contactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($params, 'Individual', 'Unsupervised', [], FALSE);
+
+    if (!empty($params['image_URL'])) {
+      CRM_Contact_BAO_Contact::processImageParams($params);
+    }
 
     $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $this->_fields, $this->_contactID);
     $this->set('contactID', $contactID);

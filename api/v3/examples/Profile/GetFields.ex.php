@@ -1,8 +1,13 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the Profile.getfields API.
  *
- * demonstrates retrieving profile fields passing in an id
+ * demonstrates retrieving profile fields passing in an id.
  *
  * @return array
  *   API result array
@@ -10,10 +15,10 @@
 function profile_getfields_example() {
   $params = [
     'action' => 'submit',
-    'profile_id' => 22,
+    'profile_id' => 23,
   ];
 
-  try{
+  try {
     $result = civicrm_api3('Profile', 'getfields', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -72,6 +77,7 @@ function profile_getfields_expectedresult() {
         'is_required' => 0,
         'table_name' => 'civicrm_value__addcustomfie_1',
         'column_name' => '_addcustomfieldtoprofile_1',
+        'serialize' => 0,
         'where' => 'civicrm_value__addcustomfie_1._addcustomfieldtoprofile_1',
         'extends_table' => 'civicrm_contact',
         'search_table' => 'contact_a',
@@ -103,6 +109,7 @@ function profile_getfields_expectedresult() {
           'maxlength' => 64,
           'size' => 6,
         ],
+        'add' => '1.1',
         'is_core_field' => TRUE,
         'api.required' => 0,
         'help_pre' => '',
@@ -124,6 +131,8 @@ function profile_getfields_expectedresult() {
         'FKClassName' => 'CRM_Core_DAO_StateProvince',
         'html' => [
           'type' => 'ChainSelect',
+          'label' => 'State/Province',
+          'controlField' => 'country_id',
           'size' => 6,
           'maxlength' => 14,
         ],
@@ -131,7 +140,9 @@ function profile_getfields_expectedresult() {
           'table' => 'civicrm_state_province',
           'keyColumn' => 'id',
           'labelColumn' => 'name',
+          'abbrColumn' => 'abbreviation',
         ],
+        'add' => '1.1',
         'is_core_field' => TRUE,
         'FKApiName' => 'StateProvince',
         'api.required' => '1',
@@ -154,6 +165,7 @@ function profile_getfields_expectedresult() {
         'FKClassName' => 'CRM_Core_DAO_Country',
         'html' => [
           'type' => 'Select',
+          'label' => 'Country',
           'size' => 6,
           'maxlength' => 14,
         ],
@@ -164,6 +176,7 @@ function profile_getfields_expectedresult() {
           'nameColumn' => 'iso_code',
           'abbrColumn' => 'iso_code',
         ],
+        'add' => '1.1',
         'is_core_field' => TRUE,
         'FKApiName' => 'Country',
         'api.required' => '1',
@@ -190,9 +203,11 @@ function profile_getfields_expectedresult() {
         'localizable' => 0,
         'html' => [
           'type' => 'Text',
+          'label' => 'Phone',
           'maxlength' => 32,
           'size' => 20,
         ],
+        'add' => '1.1',
         'is_core_field' => TRUE,
         'api.required' => '1',
         'help_pre' => '',
@@ -222,6 +237,7 @@ function profile_getfields_expectedresult() {
           'maxlength' => 254,
           'size' => 30,
         ],
+        'add' => '1.1',
         'is_core_field' => TRUE,
         'api.required' => '1',
         'help_pre' => '',
@@ -243,15 +259,18 @@ function profile_getfields_expectedresult() {
         'headerPattern' => '/^last|(l(ast\\s)?name)$/i',
         'dataPattern' => '/^\\w+(\\s\\w+)?+$/',
         'export' => TRUE,
+        'contactType' => 'Individual',
         'table_name' => 'civicrm_contact',
         'entity' => 'contact',
         'bao' => 'CRM_Contact_BAO_Contact',
         'localizable' => 0,
         'html' => [
           'type' => 'Text',
+          'label' => 'Last Name',
           'maxlength' => 64,
           'size' => 30,
         ],
+        'add' => '1.1',
         'is_core_field' => TRUE,
         'api.required' => '1',
         'help_pre' => '',
@@ -271,15 +290,18 @@ function profile_getfields_expectedresult() {
         'headerPattern' => '/^first|(f(irst\\s)?name)$/i',
         'dataPattern' => '/^\\w+$/',
         'export' => TRUE,
+        'contactType' => 'Individual',
         'table_name' => 'civicrm_contact',
         'entity' => 'contact',
         'bao' => 'CRM_Contact_BAO_Contact',
         'localizable' => 0,
         'html' => [
           'type' => 'Text',
+          'label' => 'First Name',
           'maxlength' => 64,
           'size' => 30,
         ],
+        'add' => '1.1',
         'is_core_field' => TRUE,
         'api.required' => '1',
         'help_pre' => '',
@@ -299,23 +321,23 @@ function profile_getfields_expectedresult() {
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testGetFields"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ProfileTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
-*
-* To Learn about the API read
-* https://docs.civicrm.org/dev/en/latest/api/
-*
-* Browse the API on your own site with the API Explorer. It is in the main
-* CiviCRM menu, under: Support > Development > API Explorer.
-*
-* Read more about testing here
-* https://docs.civicrm.org/dev/en/latest/testing/
-*
-* API Standards documentation:
-* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testGetFields"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ProfileTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

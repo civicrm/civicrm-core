@@ -18,7 +18,7 @@
 /**
  * BAO object for crm_note table.
  */
-class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Test\HookInterface {
+class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInterface {
   use CRM_Core_DynamicFKAccessTrait;
 
   /**
@@ -237,7 +237,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Test\HookInte
    *
    * @return array
    */
-  public static function &getValues(&$params, &$values, $numNotes = self::MAX_NOTES) {
+  public static function &getValues($params, &$values, $numNotes = self::MAX_NOTES) {
     if (empty($params)) {
       return NULL;
     }

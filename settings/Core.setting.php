@@ -28,7 +28,7 @@ return [
     'pseudoconstant' => [
       'optionGroupName' => 'contact_view_options',
     ],
-    'default' => '123456789101113',
+    'default' => '1234567891013',
     'add' => '4.1',
     'title' => ts('Viewing Contacts'),
     'is_domain' => '1',

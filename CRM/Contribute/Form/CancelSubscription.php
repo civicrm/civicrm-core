@@ -100,8 +100,16 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
     $this->setTitle($this->_mid ? ts('Cancel Auto-renewal') : ts('Cancel Recurring Contribution'));
     $this->assign('mode', $this->_mode);
 
+    if ($this->isSelfService() || !$this->_paymentProcessorObj->supports('cancelRecurring')) {
+      // If we are self service (contact is cancelling for themselves via a cancel link)
+      // or the processor does not support cancellation then remove the fields
+      // specifying whether to notify the processor.
+      unset($this->entityFields['send_cancel_request']);
+    }
     if ($this->isSelfService()) {
-      unset($this->entityFields['send_cancel_request'], $this->entityFields['is_notify']);
+      // Arguably the is_notify field should be removed in self-service mode.
+      // Historically this has been the case...
+      unset($this->entityFields['is_notify']);
     }
 
     if ($this->getSubscriptionDetails()->contact_id) {
@@ -239,15 +247,11 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
         $msgType = 'info';
       }
       else {
-        $tplParams['recur_frequency_interval'] = $this->getSubscriptionDetails()->frequency_interval;
-        $tplParams['recur_frequency_unit'] = $this->getSubscriptionDetails()->frequency_unit;
-        $tplParams['amount'] = CRM_Utils_Money::format($this->getSubscriptionDetails()->amount, $this->getSubscriptionDetails()->currency);
-        $tplParams['contact'] = ['display_name' => $this->_donorDisplayName];
         $status = ts('The recurring contribution of %1, every %2 %3 has been cancelled.',
           [
-            1 => $tplParams['amount'],
-            2 => $tplParams['recur_frequency_interval'],
-            3 => $tplParams['recur_frequency_unit'],
+            1 => CRM_Utils_Money::format($this->getSubscriptionDetails()->amount, $this->getSubscriptionDetails()->currency),
+            2 => $this->getSubscriptionDetails()->frequency_interval,
+            3 => $this->getSubscriptionDetails()->frequency_unit,
           ]
         );
         $msgTitle = 'Contribution Cancelled';
@@ -262,6 +266,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
             'valueName' => $this->_mode == 'auto_renew' ? 'membership_autorenew_cancelled' : 'contribution_recurring_cancelled',
             'contactId' => $this->getSubscriptionDetails()->contact_id,
             'tplParams' => $tplParams,
+            'tokenContext' => ['contribution_recurId' => $this->getContributionRecurID()],
             //'isTest'    => $isTest, set this from _objects
             'PDFFilename' => 'receipt.pdf',
             'from' => CRM_Contribute_BAO_ContributionRecur::getRecurFromAddress($this->getContributionRecurID()),

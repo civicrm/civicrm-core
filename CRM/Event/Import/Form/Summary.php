@@ -35,17 +35,11 @@ class CRM_Event_Import_Form_Summary extends CRM_Import_Form_Summary {
     $this->set('totalRowCount', $totalRowCount);
 
     $invalidRowCount = $this->get('invalidRowCount');
-    $conflictRowCount = $this->get('conflictRowCount');
     $duplicateRowCount = $this->get('duplicateRowCount');
     $onDuplicate = $this->get('onDuplicate');
-    $mismatchCount = $this->get('unMatchCount');
     if ($duplicateRowCount > 0) {
-      $urlParams = 'type=' . CRM_Import_Parser::DUPLICATE . '&parser=CRM_Event_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::DUPLICATE . '&parser=CRM_Event_Import_Parser_Participant';
       $this->set('downloadDuplicateRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
-    }
-    elseif ($mismatchCount) {
-      $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . '&parser=CRM_Event_Import_Parser';
-      $this->set('downloadMismatchRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
     else {
       $duplicateRowCount = 0;
@@ -70,7 +64,7 @@ class CRM_Event_Import_Form_Summary extends CRM_Import_Form_Summary {
       /* only subtract dupes from successful import if we're skipping */
 
       $this->set('validRowCount', $totalRowCount - $invalidRowCount -
-        $conflictRowCount - $duplicateRowCount - $mismatchCount
+        $duplicateRowCount
       );
     }
     $this->assign('dupeActionString', $dupeActionString);
@@ -79,14 +73,10 @@ class CRM_Event_Import_Form_Summary extends CRM_Import_Form_Summary {
       'totalRowCount',
       'validRowCount',
       'invalidRowCount',
-      'conflictRowCount',
-      'downloadConflictRecordsUrl',
       'downloadErrorRecordsUrl',
       'duplicateRowCount',
       'downloadDuplicateRecordsUrl',
-      'downloadMismatchRecordsUrl',
       'groupAdditions',
-      'unMatchCount',
     ];
     foreach ($properties as $property) {
       $this->assign($property, $this->get($property));

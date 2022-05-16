@@ -73,10 +73,10 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     ];
 
     $customField = $this->callAPIAndDocument('custom_field', 'create', $params, __FUNCTION__, __FILE__);
-    $params['id'] = $customField['id'];
-    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+    $customField['label'] = 'Name2';
+    $customFieldEdited = $this->callAPISuccess('custom_field', 'create', $customField);
 
-    $this->assertNotNull($customField['id']);
+    $this->assertNotNull($customFieldEdited['id']);
   }
 
   /**
@@ -106,14 +106,14 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   public function testCustomFieldCreateAllAvailableFormInputs() {
     $gid = $this->customGroupCreate(['extends' => 'Individual', 'title' => 'testAllFormInputs']);
 
-    $dtype = CRM_Core_BAO_CustomField::dataType();
+    $dtype = $customFieldDataType = array_column(CRM_Core_BAO_CustomField::dataType(), 'id');
     $htype = CRM_Custom_Form_Field::$_dataToHTML;
 
     // Legacy html types returned by v3
     $htype['StateProvince'] = ['Select State/Province'];
     $htype['Country'] = ['Select Country'];
 
-    foreach ($dtype as $dkey => $dvalue) {
+    foreach ($dtype as $dkey) {
       foreach ($htype[$dkey] as $hvalue) {
         $this->_loopingCustomFieldCreateTest($this->_buildParams($gid['id'], $hvalue, $dkey));
       }
@@ -203,7 +203,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $optionGroup = $this->callAPISuccess('option_group', 'getsingle', [
       'id' => $optionGroupID,
     ]);
-    $this->assertEquals('Country', $optionGroup['title']);
+    $this->assertEquals('select_test_group :: Country', $optionGroup['title']);
     $optionValueCount = $this->callAPISuccess('option_value', 'getcount', [
       'option_group_id' => $optionGroupID,
     ]);

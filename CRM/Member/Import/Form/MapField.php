@@ -117,11 +117,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       //mapping is to be loaded from database
 
-      $params = array('id' => $savedMapping);
-      $temp = [];
-      $mappingDetails = CRM_Core_BAO_Mapping::retrieve($params, $temp);
-
-      $this->assign('loadedMapping', $mappingDetails->name);
       $this->set('loadedMapping', $savedMapping);
 
       $getMappingName = new CRM_Core_DAO_Mapping();
@@ -132,7 +127,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
         $mapperName = $getMappingName->name;
       }
 
-      $this->assign('savedName', $mapperName);
+      $this->assign('savedMappingName', $mapperName);
 
       $this->add('hidden', 'mappingId', $savedMapping);
 
@@ -153,7 +148,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     $hasHeaders = !empty($this->_columnHeaders);
     $headerPatterns = $this->get('headerPatterns');
     $dataPatterns = $this->get('dataPatterns');
-    $hasLocationTypes = $this->get('fieldTypes');
 
     /* Initialize all field usages to false */
 
@@ -285,7 +279,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
    *   Posted values of the form.
    *
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    *   list of errors to be posted back to the form
@@ -396,35 +390,15 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->controller->resetPage($this->_name);
       return;
     }
+    $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
 
-    $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
-    $separator = $this->controller->exportValue('DataSource', 'fieldSeparator');
-    $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
-
-    $mapperKeys = [];
     $mapper = [];
     $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
     $mapperKeysMain = [];
-    $mapperLocType = [];
-    $mapperPhoneType = [];
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $mapper[$i] = $this->_mapperFields[$mapperKeys[$i][0]];
       $mapperKeysMain[$i] = $mapperKeys[$i][0];
-
-      if (!empty($mapperKeys[$i][1]) && is_numeric($mapperKeys[$i][1])) {
-        $mapperLocType[$i] = $mapperKeys[$i][1];
-      }
-      else {
-        $mapperLocType[$i] = NULL;
-      }
-
-      if (!empty($mapperKeys[$i][2]) && (!is_numeric($mapperKeys[$i][2]))) {
-        $mapperPhoneType[$i] = $mapperKeys[$i][2];
-      }
-      else {
-        $mapperPhoneType[$i] = NULL;
-      }
     }
 
     $this->set('mapper', $mapper);
@@ -451,11 +425,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
         $updateMappingFields->id = $mappingFieldsId[$i];
         $updateMappingFields->mapping_id = $params['mappingId'];
         $updateMappingFields->column_number = $i;
-
-        $mapperKeyParts = explode('_', $mapperKeys[$i][0], 3);
-        $id = $mapperKeyParts[0] ?? NULL;
-        $first = $mapperKeyParts[1] ?? NULL;
-        $second = $mapperKeyParts[2] ?? NULL;
         $updateMappingFields->name = $mapper[$i];
         $updateMappingFields->save();
       }
@@ -475,19 +444,15 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
         $saveMappingFields = new CRM_Core_DAO_MappingField();
         $saveMappingFields->mapping_id = $saveMapping->id;
         $saveMappingFields->column_number = $i;
-
-        $mapperKeyParts = explode('_', $mapperKeys[$i][0], 3);
-        $id = $mapperKeyParts[0] ?? NULL;
-        $first = $mapperKeyParts[1] ?? NULL;
-        $second = $mapperKeyParts[2] ?? NULL;
         $saveMappingFields->name = $mapper[$i];
         $saveMappingFields->save();
       }
       $this->set('savedMapping', $saveMappingFields->mapping_id);
     }
 
-    $parser = new CRM_Member_Import_Parser_Membership($mapperKeysMain, $mapperLocType, $mapperPhoneType);
-    $parser->run($fileName, $separator, $mapper, $skipColumnHeader,
+    $parser = new CRM_Member_Import_Parser_Membership($mapperKeysMain);
+    $parser->setUserJobID($this->getUserJobID());
+    $parser->run($this->getSubmittedValue('uploadFile'), $this->getSubmittedValue('fieldSeparator'), $mapper, $this->getSubmittedValue('skipColumnHeader'),
       CRM_Import_Parser::MODE_PREVIEW, $this->get('contactType')
     );
     // add all the necessary variables to the form

@@ -1,22 +1,31 @@
 .af-api4-action-running {
-    cursor: not-allowed;
-    color: black;
+  cursor: not-allowed;
+  color: black;
 }
 a.af-api4-action-idle {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .af-container.af-layout-cols {
-    display: flex;
+  display: flex;
+  flex-wrap: wrap;
 }
 .af-container.af-layout-cols > * {
-    flex: 1;
+  flex: 1;
 }
 .af-container.af-layout-inline > * {
-    display: inline-block;
-    margin-right: .5em;
-    vertical-align: top;
+  display: inline-block;
+  margin-right: .5em;
+  vertical-align: top;
 }
+.af-container.af-layout-cols > .af-title {
+  flex: 0 0 100%;
+}
+.af-container.af-layout-inline > .af-title {
+  display: block;
+  width: 100%;
+}
+
 af-form {
   display: block;
 }
@@ -29,4 +38,45 @@ af-form {
   position: absolute;
   top: 0;
   right: 0;
+}
+
+/* Collapsible containers */
+.af-collapsible > .af-title {
+  cursor: pointer;
+}
+.af-collapsible > .af-title:before {
+  font-family: "FontAwesome";
+  display: inline-block;
+  width: 1em;
+  content: "\f0d7";
+}
+.af-collapsible.af-collapsed > .af-title:before {
+  content: "\f0da";
+}
+.af-collapsible.af-collapsed > .af-title ~ * {
+  display: none !important;
+}
+
+/* Card style */
+#bootstrap-theme .af-container-style-pane {
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 1px 2px 8px 1px rgba(0, 0, 0, 0.3);
+  margin: 10px;
+  padding: 5px;
+}
+#bootstrap-theme .af-container-style-pane > .af-title {
+  background-color: #70716b;
+  color: white;
+  padding: 5px;
+  border-radius: 4px 4px 0 0;
+  position: relative;
+  top: -5px;
+  left: -5px;
+  width: calc(100% + 10px);
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+#bootstrap-theme .af-container-style-pane.af-collapsed > .af-title {
+  margin-bottom: 0;
 }

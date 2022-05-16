@@ -30,7 +30,7 @@ class FormattingUtil {
   /**
    * @var string[]
    */
-  public static $pseudoConstantSuffixes = ['name', 'abbr', 'label', 'color', 'description', 'icon'];
+  public static $pseudoConstantSuffixes = ['name', 'abbr', 'label', 'color', 'description', 'icon', 'grouping'];
 
   /**
    * Massage values into the format the BAO expects for a write operation
@@ -56,7 +56,8 @@ class FormattingUtil {
       /*
        * Because of the wacky way that database values are saved we need to format
        * some of the values here. In this strange world the string 'null' is used to
-       * unset values. Hence if we encounter true null we change it to string 'null'.
+       * unset values. If we encounter true null at this layer we change it to an empty string
+       * and it will be converted to 'null' by CRM_Core_DAO::copyValues.
        *
        * If we encounter the string 'null' then we assume the user actually wants to
        * set the value to string null. However since the string null is reserved for
@@ -66,7 +67,7 @@ class FormattingUtil {
        * 'Null'.
        */
       elseif (array_key_exists($name, $params) && $params[$name] === NULL) {
-        $params[$name] = 'null';
+        $params[$name] = '';
       }
     }
 
@@ -79,14 +80,14 @@ class FormattingUtil {
    * This is used by read AND write actions (Get, Create, Update, Replace)
    *
    * @param $value
-   * @param string $fieldName
+   * @param string|null $fieldName
    * @param array $fieldSpec
-   * @param string $operator (only for 'get' actions)
-   * @param int $index (for recursive loops)
+   * @param string|null $operator (only for 'get' actions)
+   * @param null $index (for recursive loops)
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public static function formatInputValue(&$value, $fieldName, $fieldSpec, &$operator = NULL, $index = NULL) {
+  public static function formatInputValue(&$value, ?string $fieldName, array $fieldSpec, &$operator = NULL, $index = NULL) {
     // Evaluate pseudoconstant suffix
     $suffix = strpos($fieldName, ':');
     if ($suffix) {
@@ -116,7 +117,7 @@ class FormattingUtil {
 
     switch ($fieldSpec['data_type'] ?? NULL) {
       case 'Timestamp':
-        $value = self::formatDateValue('Y-m-d H:i:s', $value, $operator, $index);
+        $value = self::formatDateValue('YmdHis', $value, $operator, $index);
         break;
 
       case 'Date':
@@ -125,7 +126,7 @@ class FormattingUtil {
     }
 
     $hic = \CRM_Utils_API_HTMLInputCoder::singleton();
-    if (is_string($value) && !$hic->isSkippedField($fieldSpec['name'])) {
+    if (is_string($value) && $fieldName && !$hic->isSkippedField($fieldSpec['name'])) {
       $value = $hic->encodeValue($value);
     }
   }
@@ -141,7 +142,7 @@ class FormattingUtil {
    * @param $index
    * @return array|string
    */
-  private static function formatDateValue($format, $value, &$operator = NULL, $index = NULL) {
+  public static function formatDateValue($format, $value, &$operator = NULL, $index = NULL) {
     // Non-relative dates (or if no search operator)
     if (!$operator || !array_key_exists($value, \CRM_Core_OptionGroup::values('relative_date_filters'))) {
       return date($format, strtotime($value));
@@ -191,7 +192,6 @@ class FormattingUtil {
    * @throws \CRM_Core_Exception
    */
   public static function formatOutputValues(&$results, $fields, $action = 'get', $selectAliases = []) {
-    $fieldOptions = [];
     foreach ($results as &$result) {
       $contactTypePaths = [];
       foreach ($result as $key => $value) {
@@ -210,16 +210,17 @@ class FormattingUtil {
         }
         // Evaluate pseudoconstant suffixes
         $suffix = strrpos($fieldName, ':');
+        $fieldOptions = NULL;
         if ($suffix) {
-          $fieldOptions[$fieldName] = $fieldOptions[$fieldName] ?? self::getPseudoconstantList($field, $fieldName, $result, $action);
+          $fieldOptions = self::getPseudoconstantList($field, $fieldName, $result, $action);
           $dataType = NULL;
         }
         if ($fieldExpr->supportsExpansion) {
           if (!empty($field['serialize']) && is_string($value)) {
             $value = \CRM_Core_DAO::unSerializeField($value, $field['serialize']);
           }
-          if (isset($fieldOptions[$fieldName])) {
-            $value = self::replacePseudoconstant($fieldOptions[$fieldName], $value);
+          if (isset($fieldOptions)) {
+            $value = self::replacePseudoconstant($fieldOptions, $value);
           }
         }
         // Keep track of contact types for self::contactFieldsToRemove
@@ -338,6 +339,10 @@ class FormattingUtil {
         case 'Money':
         case 'Float':
           return (float) $value;
+
+        case 'Date':
+          // Strip time from date-only fields
+          return substr($value, 0, 10);
       }
     }
     return $value;

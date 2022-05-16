@@ -167,4 +167,3 @@ Which leads to this structure:
  {civicrm.files}/ang/afl-address.aff.json
  {civicrm.files}/ang/afl-address.aff.html
 ```
-

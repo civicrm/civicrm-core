@@ -4,6 +4,8 @@
 /ext/*
 !/ext/afform
 !/ext/authx
+!/ext/civigrant
+!/ext/civicrm_admin_ui
 !/ext/sequentialcreditnotes
 !/ext/flexmailer
 !/ext/eventcart

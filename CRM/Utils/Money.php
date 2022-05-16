@@ -146,9 +146,9 @@ class CRM_Utils_Money {
    * 1.234 != 1.236 with a currency precision of 2 decimal points
    * 1.300 != 1.200 with a currency precision of 2 decimal points
    *
-   * @param $value1
-   * @param $value2
-   * @param $currency
+   * @param int|float $value1
+   * @param int|float $value2
+   * @param string $currency
    *
    * @return bool
    */

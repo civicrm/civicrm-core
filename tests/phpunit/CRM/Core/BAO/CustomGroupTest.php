@@ -687,4 +687,25 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $this->assertEquals($expectedName, $group->name);
   }
 
+  public function testCustomGroupExtends() {
+    $extends = \CRM_Core_SelectValues::customGroupExtends();
+    $this->assertArrayHasKey('Contribution', $extends);
+    $this->assertArrayHasKey('Case', $extends);
+    $this->assertArrayHasKey('Contact', $extends);
+    $this->assertArrayHasKey('Individual', $extends);
+    $this->assertArrayHasKey('Household', $extends);
+    $this->assertArrayHasKey('Organization', $extends);
+    $this->assertArrayHasKey('Participant', $extends);
+    $this->assertArrayHasKey('ParticipantRole', $extends);
+    $this->assertArrayHasKey('ParticipantEventName', $extends);
+    $this->assertArrayHasKey('ParticipantEventType', $extends);
+  }
+
+  public function testMapTableName() {
+    $this->assertEquals('civicrm_case', CRM_Core_BAO_CustomGroup::mapTableName('Case'));
+    $this->assertEquals('civicrm_contact', CRM_Core_BAO_CustomGroup::mapTableName('Contact'));
+    $this->assertEquals('civicrm_contact', CRM_Core_BAO_CustomGroup::mapTableName('Individual'));
+    $this->assertEquals('civicrm_participant', CRM_Core_BAO_CustomGroup::mapTableName('Participant'));
+  }
+
 }

@@ -19,11 +19,11 @@
 {* @var $form Contains the array for the form elements and other form associated information assigned to the template by the controller *}
 
  {* Table for mapping data to CRM fields *}
- {include file="CRM/Member/Import/Form/MapTable.tpl}
+ {include file="CRM/Import/Form/MapTable.tpl"}
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
- {$initHideBoxes}
+ {$initHideBoxes|smarty:nodefaults}
 {literal}
 <script type="text/javascript" >
 if ( document.getElementsByName("saveMapping")[0].checked ) {

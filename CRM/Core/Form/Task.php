@@ -156,9 +156,10 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
     $searchFormValues = $form->getSearchFormValues();
 
     $form->_task = $searchFormValues['task'];
-
+    $isSelectedContacts = ($searchFormValues['radio_ts'] ?? NULL) === 'ts_sel';
+    $form->assign('isSelectedContacts', $isSelectedContacts);
     $entityIds = [];
-    if ($searchFormValues['radio_ts'] == 'ts_sel') {
+    if ($isSelectedContacts) {
       foreach ($searchFormValues as $name => $value) {
         if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
           $entityIds[] = substr($name, CRM_Core_Form::CB_PREFIX_LEN);

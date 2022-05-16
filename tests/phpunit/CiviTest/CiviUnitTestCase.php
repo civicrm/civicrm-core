@@ -409,6 +409,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
     $this->renameLabels();
     $this->ensureMySQLMode(['IGNORE_SPACE', 'ERROR_FOR_DIVISION_BY_ZERO', 'STRICT_TRANS_TABLES']);
+    putenv('CIVICRM_SMARTY_DEFAULT_ESCAPE=1');
   }
 
   /**
@@ -743,19 +744,19 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   public function membershipRenewalDate($durationUnit, $membershipEndDate) {
     // We only have an end_date if frequency units match, otherwise membership won't be autorenewed and dates won't be calculated.
     $renewedMembershipEndDate = new DateTime($membershipEndDate);
+    // We have to add 1 day first in case it's the end of the month, then subtract afterwards
+    // eg. 2018-02-28 should renew to 2018-03-31, if we just added 1 month we'd get 2018-03-28
+    $renewedMembershipEndDate->add(new DateInterval('P1D'));
     switch ($durationUnit) {
       case 'year':
         $renewedMembershipEndDate->add(new DateInterval('P1Y'));
         break;
 
       case 'month':
-        // We have to add 1 day first in case it's the end of the month, then subtract afterwards
-        // eg. 2018-02-28 should renew to 2018-03-31, if we just added 1 month we'd get 2018-03-28
-        $renewedMembershipEndDate->add(new DateInterval('P1D'));
         $renewedMembershipEndDate->add(new DateInterval('P1M'));
-        $renewedMembershipEndDate->sub(new DateInterval('P1D'));
         break;
     }
+    $renewedMembershipEndDate->sub(new DateInterval('P1D'));
     return $renewedMembershipEndDate->format('Y-m-d');
   }
 
@@ -863,7 +864,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       $this->ids['Contact']['participant'] = $params['contact_id'] = $this->individualCreate();
     }
     if (empty($params['event_id'])) {
-      $event = $this->eventCreate();
+      $event = $this->eventCreate(['end_date' => 20081023, 'registration_end_date' => 20081015]);
       $params['event_id'] = $event['id'];
     }
     $defaults = [
@@ -890,6 +891,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $processorParams = [
       'domain_id' => 1,
       'name' => 'Dummy',
+      'title' => 'Dummy',
       'payment_processor_type_id' => 'Dummy',
       'financial_account_id' => 12,
       'is_test' => TRUE,
@@ -1117,10 +1119,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'event_type_id' => 1,
       'is_public' => 1,
       'start_date' => 20081021,
-      'end_date' => 20081023,
+      'end_date' => '+ 1 month',
       'is_online_registration' => 1,
       'registration_start_date' => 20080601,
-      'registration_end_date' => 20081015,
+      'registration_end_date' => '+ 1 month',
       'max_participants' => 100,
       'event_full_text' => 'Sorry! We are already full',
       'is_monetary' => 0,
@@ -2018,8 +2020,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param $entity
    * @param int $delete
    * @param string $errorText
-   *
-   * @throws CRM_Core_Exception
    */
   public function getAndCheck(array $params, int $id, $entity, int $delete = 1, string $errorText = ''): void {
 
@@ -2403,6 +2403,21 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
+   * Get the rendered contents from a form.
+   *
+   * @param string $formName
+   *
+   * @return false|string
+   */
+  protected function getRenderedFormContents(string $formName) {
+    $form = $this->getFormObject($formName);
+    $form->buildForm();
+    ob_start();
+    $form->controller->_actions['display']->perform($form, 'display');
+    return ob_get_clean();
+  }
+
+  /**
    * Set up initial recurring payment allowing subsequent IPN payments.
    *
    * @param array $recurParams (Optional)
@@ -2719,7 +2734,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param string $templateName
    * @param string $type
    */
-  protected function swapMessageTemplateForTestTemplate($templateName = 'contribution_online_receipt', $type = 'html') {
+  protected function swapMessageTemplateForTestTemplate($templateName = 'contribution_online_receipt', $type = 'html'): void {
     $testTemplate = file_get_contents(__DIR__ . '/../../templates/message_templates/' . $templateName . '_' . $type . '.tpl');
     CRM_Core_DAO::executeQuery(
       "UPDATE civicrm_msg_template
@@ -2790,7 +2805,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'return' => ['total_amount', 'fee_amount', 'net_amount'],
     ]);
     $this->assertEquals($contribution['total_amount'] - $contribution['fee_amount'], $contribution['net_amount']);
-    if ($context == 'pending') {
+    if ($context === 'pending') {
       $trxn = CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams);
       $this->assertNull($trxn, 'No Trxn to be created until IPN callback');
       return;
@@ -2799,14 +2814,14 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $trxnParams = [
       'id' => $trxn['financial_trxn_id'],
     ];
-    if ($context != 'online' && $context != 'payLater') {
+    if ($context !== 'online' && $context !== 'payLater') {
       $compareParams = [
         'to_financial_account_id' => 6,
         'total_amount' => (float) CRM_Utils_Array::value('total_amount', $params, 100.00),
         'status_id' => 1,
       ];
     }
-    if ($context == 'feeAmount') {
+    if ($context === 'feeAmount') {
       $compareParams['fee_amount'] = 50;
     }
     elseif ($context === 'online') {
@@ -2838,7 +2853,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'status_id' => 1,
       'financial_account_id' => CRM_Utils_Array::value('financial_account_id', $params, 1),
     ];
-    if ($context == 'payLater') {
+    if ($context === 'payLater') {
       $compareParams = [
         'amount' => (float) CRM_Utils_Array::value('total_amount', $params, 100.00),
         'status_id' => 3,
@@ -3200,6 +3215,26 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         $form->controller = new CRM_Event_Cart_Controller_Checkout();
         break;
 
+      case 'CRM_Event_Form_Registration_Confirm':
+        $form->controller = new CRM_Event_Controller_Registration();
+        break;
+
+      case 'CRM_Contact_Import_Form_DataSource':
+      case 'CRM_Contact_Import_Form_MapField':
+      case 'CRM_Contact_Import_Form_Preview':
+        $form->controller = new CRM_Contact_Import_Controller();
+        $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
+        // The submitted values should be set on one or the other of the forms in the flow.
+        // For test simplicity we set on all rather than figuring out which ones go where....
+        $_SESSION['_' . $form->controller->_name . '_container']['values']['DataSource'] = $formValues;
+        $_SESSION['_' . $form->controller->_name . '_container']['values']['MapField'] = $formValues;
+        $_SESSION['_' . $form->controller->_name . '_container']['values']['Preview'] = $formValues;
+        return $form;
+
+      case strpos($class, '_Form_') !== FALSE:
+        $form->controller = new CRM_Core_Controller_Simple($class, $pageName);
+        break;
+
       default:
         $form->controller = new CRM_Core_Controller();
     }
@@ -3495,7 +3530,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function validateAllPayments() {
+  protected function validateAllPayments(): void {
     $payments = $this->callAPISuccess('Payment', 'get', [
       'return' => ['total_amount', 'tax_amount'],
       'options' => ['limit' => 0],
@@ -3546,10 +3581,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
   /**
    * @return array|int
-   * @throws \CRM_Core_Exception
    */
   protected function createRuleGroup() {
-    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
+    return $this->callAPISuccess('RuleGroup', 'create', [
       'contact_type' => 'Individual',
       'threshold' => 8,
       'used' => 'General',
@@ -3557,7 +3591,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'title' => 'TestRule',
       'is_reserved' => 0,
     ]);
-    return $ruleGroup;
   }
 
   /**
@@ -3567,7 +3600,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function basicCreateTest(int $version) {
+  protected function basicCreateTest(int $version): void {
     $this->_apiversion = $version;
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
@@ -3582,7 +3615,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function basicDeleteTest($version) {
+  protected function basicDeleteTest(int $version): void {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $deleteParams = ['id' => $result['id']];
@@ -3628,7 +3661,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * This query takes about 2 minutes on a DB with 10s of millions of contacts.
    */
-  public function assertLocationValidity() {
+  public function assertLocationValidity(): void {
     $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM
 
 (SELECT a1.contact_id

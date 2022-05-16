@@ -1,9 +1,14 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the Contact.create API.
  *
  * Single function to create contact with partipation & contribution.
- * Note that in the case of 'contribution' the 'create' is implied (api.contribution.create)
+ * Note that in the case of 'contribution' the 'create' is implied (api.contribution.create).
  *
  * @return array
  *   API result array
@@ -13,7 +18,7 @@ function contact_create_example() {
     'contact_type' => 'Individual',
     'display_name' => 'dlobo',
     'api.participant' => [
-      'event_id' => 43,
+      'event_id' => 41,
       'status_id' => 1,
       'role_id' => 1,
       'format.only_id' => 1,
@@ -29,7 +34,7 @@ function contact_create_example() {
     ],
   ];
 
-  try{
+  try {
     $result = civicrm_api3('Contact', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -60,10 +65,10 @@ function contact_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 5,
+    'id' => 7,
     'values' => [
-      '5' => [
-        'id' => '5',
+      '7' => [
+        'id' => '7',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
         'do_not_email' => 0,
@@ -135,23 +140,23 @@ function contact_create_expectedresult() {
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testCreateParticipantWithPayment"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ParticipantTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
-*
-* To Learn about the API read
-* https://docs.civicrm.org/dev/en/latest/api/
-*
-* Browse the API on your own site with the API Explorer. It is in the main
-* CiviCRM menu, under: Support > Development > API Explorer.
-*
-* Read more about testing here
-* https://docs.civicrm.org/dev/en/latest/testing/
-*
-* API Standards documentation:
-* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testCreateParticipantWithPayment"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ParticipantTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

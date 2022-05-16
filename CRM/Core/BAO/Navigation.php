@@ -20,13 +20,6 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   const CACHE_KEY_STRLEN = 8;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Update the is_active flag in the db.
    *
    * @param int $id
@@ -42,12 +35,11 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * Add/update navigation record.
+   * Deprecated in favor of APIv4
    *
+   * @deprecated
    * @param array $params Submitted values
-   *
    * @return CRM_Core_DAO_Navigation
-   *   navigation object
    */
   public static function add(&$params) {
     $navigation = new CRM_Core_DAO_Navigation();
@@ -83,27 +75,21 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Core_BAO_Navigation|null
-   *   object on success, NULL otherwise
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $navigation = new CRM_Core_DAO_Navigation();
-    $navigation->copyValues($params);
-
-    $navigation->domain_id = CRM_Core_Config::domainID();
-
-    if ($navigation->find(TRUE)) {
-      CRM_Core_DAO::storeValues($navigation, $defaults);
-      return $navigation;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    $params['domain_id'] = CRM_Core_Config::domainID();
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -376,9 +362,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
         $componentName = CRM_Core_Permission::getComponentName($key);
 
         if ($componentName) {
-          if (!in_array($componentName, CRM_Core_Config::singleton()->enableComponents) ||
-            !CRM_Core_Permission::check($key)
-          ) {
+          if (!CRM_Core_Component::isEnabled($componentName) || !CRM_Core_Permission::check($key)) {
             $showItem = FALSE;
             if ($operator == 'AND') {
               return FALSE;
@@ -702,7 +686,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
    * care about output params appended.
    *
    * @param string $url
-   * @param array $url_params
+   * @param string $url_params
    *
    * @param int|null $parent_id
    *   Optionally restrict to one parent.

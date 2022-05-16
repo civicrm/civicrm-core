@@ -18,7 +18,7 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\OptionValue;
 use Civi\Test\TransactionalInterface;
@@ -26,7 +26,7 @@ use Civi\Test\TransactionalInterface;
 /**
  * @group headless
  */
-class OptionValueTest extends UnitTestCase implements TransactionalInterface {
+class OptionValueTest extends Api4TestBase implements TransactionalInterface {
 
   public function testNullDefault() {
     OptionGroup::create(FALSE)
@@ -53,6 +53,74 @@ class OptionValueTest extends UnitTestCase implements TransactionalInterface {
       ->execute();
 
     $this->assertTrue(OptionValue::get(FALSE)->addWhere('id', '=', $defaultId)->execute()->first()['is_default']);
+  }
+
+  public function testUpdateWeights() {
+    $getValues = function($groupName) {
+      return OptionValue::get(FALSE)
+        ->addWhere('option_group_id.name', '=', $groupName)
+        ->addOrderBy('weight')
+        ->execute()->indexBy('value')->column('weight');
+    };
+
+    // Create 2 option groups. Control group is to ensure updating one doesn't affect the other
+    foreach (['controlGroup', 'experimentalGroup'] as $groupName) {
+      OptionGroup::create(FALSE)
+        ->addValue('name', $groupName)
+        ->execute();
+      $sampleData = [
+        ['label' => 'One', 'value' => 1],
+        ['label' => 'Two', 'value' => 2],
+        ['label' => 'Three', 'value' => 3],
+        ['label' => 'Four', 'value' => 4],
+      ];
+      OptionValue::save(FALSE)
+        ->setRecords($sampleData)
+        ->addDefault('option_group_id.name', $groupName)
+        ->execute();
+      // Default weights should have been set during create
+      $this->assertEquals([1 => 1, 2 => 2, 3 => 3, 4 => 4], $getValues($groupName));
+    }
+
+    // Move first option to last position
+    OptionValue::update(FALSE)
+      ->addWhere('option_group_id.name', '=', 'experimentalGroup')
+      ->addWhere('value', '=', 1)
+      ->addValue('weight', 4)
+      ->execute();
+    // Experimental group should be updated, control group should not
+    $this->assertEquals([2 => 1, 3 => 2, 4 => 3, 1 => 4], $getValues('experimentalGroup'));
+    $this->assertEquals([1 => 1, 2 => 2, 3 => 3, 4 => 4], $getValues('controlGroup'));
+
+    // Move 2nd (new first) option to last position
+    OptionValue::update(FALSE)
+      ->addWhere('option_group_id.name', '=', 'experimentalGroup')
+      ->addWhere('value', '=', 2)
+      ->addValue('weight', 4)
+      ->execute();
+    // Experimental group should be updated, control group should not
+    $this->assertEquals([3 => 1, 4 => 2, 1 => 3, 2 => 4], $getValues('experimentalGroup'));
+    $this->assertEquals([1 => 1, 2 => 2, 3 => 3, 4 => 4], $getValues('controlGroup'));
+
+    // Move last option to first position
+    OptionValue::update(FALSE)
+      ->addWhere('option_group_id.name', '=', 'experimentalGroup')
+      ->addWhere('value', '=', 2)
+      ->addValue('weight', 1)
+      ->execute();
+    // Experimental group should be updated, control group should not
+    $this->assertEquals([2 => 1, 3 => 2, 4 => 3, 1 => 4], $getValues('experimentalGroup'));
+    $this->assertEquals([1 => 1, 2 => 2, 3 => 3, 4 => 4], $getValues('controlGroup'));
+
+    // Same thing again - should have no impact
+    OptionValue::update(FALSE)
+      ->addWhere('option_group_id.name', '=', 'experimentalGroup')
+      ->addWhere('value', '=', 2)
+      ->addValue('weight', 1)
+      ->execute();
+    // Nothing should have changed
+    $this->assertEquals([2 => 1, 3 => 2, 4 => 3, 1 => 4], $getValues('experimentalGroup'));
+    $this->assertEquals([1 => 1, 2 => 2, 3 => 3, 4 => 4], $getValues('controlGroup'));
   }
 
 }

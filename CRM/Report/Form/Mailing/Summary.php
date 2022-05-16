@@ -24,11 +24,6 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
 
   public $_drilldownReport = ['mailing/detail' => 'Link to Detail Report'];
 
-  protected $_charts = [
-    '' => 'Tabular',
-    'barchart' => 'Bar Chart',
-  ];
-
   /**
    * Class constructor.
    */
@@ -287,6 +282,13 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     ];
     // If we have campaigns enabled, add those elements to both the fields, filters.
     $this->addCampaignFields('civicrm_mailing');
+
+    // Add charts support
+    $this->_charts = [
+      '' => ts('Tabular'),
+      'barChart' => ts('Bar Chart'),
+    ];
+
     parent::__construct();
   }
 
@@ -513,7 +515,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */

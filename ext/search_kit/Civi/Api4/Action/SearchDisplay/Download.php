@@ -46,10 +46,10 @@ class Download extends AbstractRunAction {
   ];
 
   /**
-   * @param \Civi\Api4\Generic\Result $result
+   * @param \Civi\Api4\Result\SearchDisplayRunResult $result
    * @throws \API_Exception
    */
-  protected function processResult(\Civi\Api4\Generic\Result $result) {
+  protected function processResult(\Civi\Api4\Result\SearchDisplayRunResult $result) {
     $entityName = $this->savedSearch['api_entity'];
     $apiParams =& $this->_apiParams;
     $settings = $this->display['settings'];
@@ -193,7 +193,9 @@ class Download extends AbstractRunAction {
       $flag |= FILTER_FLAG_STRIP_HIGH;
     }
 
-    $filenameFallback = str_replace('%', '', filter_var($fileName, FILTER_SANITIZE_STRING, $flag));
+    /** @var string $filtered_name */
+    $filtered_name = filter_var($fileName, FILTER_UNSAFE_RAW, $flag);
+    $filenameFallback = str_replace('%', '', $filtered_name);
 
     $disposition = sprintf('attachment; filename="%s"', str_replace('"', '\\"', $filenameFallback));
     if ($fileName !== $filenameFallback) {

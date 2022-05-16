@@ -45,7 +45,7 @@
 
                   var value = el.val();
 
-                  CRM.api3('MessageTemplate', 'getlist', { params: { id: value }, label_field: 'msg_title' }).then(function(tlist) {
+                  CRM.api3('MessageTemplate', 'getlist', {params: {id: value}, label_field: 'msg_title'}).then(function(tlist) {
 
                       var template = {};
 
@@ -72,7 +72,7 @@
                     }
 
                     rcpAjaxState.page_i = page_num - rcpAjaxState.page_n;
-                    var filterParams = { is_active: 1, workflow_name: { "IS NULL": 1 } };
+                    var filterParams = {is_active: 1, workflow_name: {"IS NULL": 1}};
 
                     var params = {
                       input: input,
@@ -88,9 +88,9 @@
                   },
                   results: function(data) {
 
-                    results = {
+                    var results = {
                       children: $.map(data.values, function(obj) {
-                        return { id: obj.id, text: obj.label };
+                        return {id: obj.id, text: obj.label};
                       })
                     };
 
@@ -98,13 +98,10 @@
                       results.text = ts('Message Templates');
                     }
 
-                    more = data.more_results;
-
-                    if (more && !data.more_results) {
-                      rcpAjaxState.page_n += rcpAjaxState.page_i;
-                    }
-
-                    return { more: more, results: [ results ] };
+                    return {
+                      more: data.more_results,
+                      results: [results]
+                    };
                   },
                 }
             });

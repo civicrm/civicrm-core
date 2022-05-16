@@ -435,14 +435,14 @@ class CRM_Contribute_Form_AdditionalInfo {
 
     [$sendReceipt] = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
-        'groupName' => 'msg_tpl_workflow_contribution',
-        'valueName' => 'contribution_offline_receipt',
+        'workflow' => 'contribution_offline_receipt',
         'contactId' => $params['contact_id'],
         'contributionId' => $params['contribution_id'],
+        'tokenContext' => ['contributionId' => (int) $params['contribution_id'], 'contactId' => $params['contact_id']],
         'from' => $params['from_email_address'],
         'toName' => $contributorDisplayName,
         'toEmail' => $contributorEmail,
-        'isTest' => $form->_mode == 'test',
+        'isTest' => $form->_mode === 'test',
         'PDFFilename' => ts('receipt') . '.pdf',
         'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
       ]

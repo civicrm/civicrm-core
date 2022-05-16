@@ -51,6 +51,7 @@ function afform_civicrm_config(&$config) {
   $dispatcher = Civi::dispatcher();
   $dispatcher->addListener('civi.afform.submit', ['\Civi\Api4\Action\Afform\Submit', 'processGenericEntity'], 0);
   $dispatcher->addListener('civi.afform.submit', ['\Civi\Api4\Action\Afform\Submit', 'preprocessContact'], 10);
+  $dispatcher->addListener('civi.afform.submit', ['\Civi\Api4\Action\Afform\Submit', 'processRelationships'], 1);
   $dispatcher->addListener('hook_civicrm_angularModules', ['\Civi\Afform\AngularDependencyMapper', 'autoReq'], -1000);
   $dispatcher->addListener('hook_civicrm_alterAngular', ['\Civi\Afform\AfformMetadataInjector', 'preprocess']);
   $dispatcher->addListener('hook_civicrm_check', ['\Civi\Afform\StatusChecks', 'hook_civicrm_check']);
@@ -61,15 +62,6 @@ function afform_civicrm_config(&$config) {
     $dispatcher->addListener('hook_civicrm_tokens', ['\Civi\Afform\Tokens', 'hook_civicrm_tokens']);
     $dispatcher->addListener('hook_civicrm_tokenValues', ['\Civi\Afform\Tokens', 'hook_civicrm_tokenValues']);
   }
-}
-
-/**
- * Implements hook_civicrm_xmlMenu().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_xmlMenu
- */
-function afform_civicrm_xmlMenu(&$files) {
-  _afform_civix_civicrm_xmlMenu($files);
 }
 
 /**
@@ -134,9 +126,10 @@ function afform_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_managed
  */
-function afform_civicrm_managed(&$entities) {
-  _afform_civix_civicrm_managed($entities);
-
+function afform_civicrm_managed(&$entities, $modules) {
+  if ($modules && !in_array(E::LONG_NAME, $modules, TRUE)) {
+    return;
+  }
   /** @var \CRM_Afform_AfformScanner $scanner */
   if (\Civi::container()->has('afform_scanner')) {
     $scanner = \Civi::service('afform_scanner');
@@ -159,14 +152,17 @@ function afform_civicrm_managed(&$entities) {
       // ideal cleanup policy might be to (a) deactivate if used and (b) remove if unused
       'cleanup' => 'always',
       'params' => [
-        'version' => 3,
-        // Q: Should we loop through all domains?
-        'domain_id' => CRM_Core_BAO_Domain::getDomain()->id,
-        'is_active' => TRUE,
-        'name' => $afform['name'],
-        'label' => $afform['title'] ?? E::ts('(Untitled)'),
-        'directive' => _afform_angular_module_name($afform['name'], 'dash'),
-        'permission' => "@afform:" . $afform['name'],
+        'version' => 4,
+        'values' => [
+          // Q: Should we loop through all domains?
+          'domain_id' => 'current_domain',
+          'is_active' => TRUE,
+          'name' => $afform['name'],
+          'label' => $afform['title'] ?? E::ts('(Untitled)'),
+          'directive' => _afform_angular_module_name($afform['name'], 'dash'),
+          'permission' => "@afform:" . $afform['name'],
+          'url' => NULL,
+        ],
       ],
     ];
   }
@@ -273,8 +269,6 @@ function afform_civicrm_contactSummaryBlocks(&$blocks) {
  * Generate a list of Afform Angular modules.
  */
 function afform_civicrm_angularModules(&$angularModules) {
-  _afform_civix_civicrm_angularModules($angularModules);
-
   $afforms = \Civi\Api4\Afform::get(FALSE)
     ->setSelect(['name', 'requires', 'module_name', 'directive_name'])
     ->execute();
@@ -322,15 +316,6 @@ function _afform_get_partials($moduleName, $module) {
 }
 
 /**
- * Implements hook_civicrm_alterSettingsFolders().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_alterSettingsFolders
- */
-function afform_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  _afform_civix_civicrm_alterSettingsFolders($metaDataFolders);
-}
-
-/**
  * Implements hook_civicrm_entityTypes().
  *
  * Declare entity types provided by this module.
@@ -339,13 +324,6 @@ function afform_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
  */
 function afform_civicrm_entityTypes(&$entityTypes) {
   _afform_civix_civicrm_entityTypes($entityTypes);
-}
-
-/**
- * Implements hook_civicrm_themes().
- */
-function afform_civicrm_themes(&$themes) {
-  _afform_civix_civicrm_themes($themes);
 }
 
 /**
@@ -363,7 +341,7 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
   $moduleName = _afform_angular_module_name($params['name'], 'camel');
   $formMetaData = (array) civicrm_api4('Afform', 'get', [
     'checkPermissions' => FALSE,
-    'select' => ['redirect', 'name'],
+    'select' => ['redirect', 'name', 'title'],
     'where' => [['name', '=', $params['name']]],
   ], 0);
   $smarty = CRM_Core_Smarty::singleton();
@@ -392,7 +370,6 @@ function afform_civicrm_alterMenu(&$items) {
       $items[$meta['server_route']] = [
         'page_callback' => 'CRM_Afform_Page_AfformBase',
         'page_arguments' => 'afform=' . urlencode($name),
-        'title' => $meta['title'] ?? '',
         'access_arguments' => [["@afform:$name"], 'and'],
         'is_public' => $meta['is_public'],
       ];
@@ -536,7 +513,7 @@ function afform_civicrm_pre($op, $entity, $id, &$params) {
       ->execute();
   }
   // When deleting a savedSearch, delete any Afforms which use the default display
-  if ($entity === 'SearchDisplay' && $op === 'delete') {
+  elseif ($entity === 'SavedSearch' && $op === 'delete') {
     $search = \Civi\Api4\SavedSearch::get(FALSE)
       ->addSelect('name')
       ->addWhere('id', '=', $id)

@@ -182,31 +182,23 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * Retrieve DB object based on input parameters.
-   *
-   * It also stores all the retrieved values in the default array.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   * @param array $values
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array of criteria values.
+   * @param array $defaults
+   *   Array to be populated with found values.
    *
-   * @return CRM_Core_DAO_ActionSchedule|null
-   *   object on success, null otherwise
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$values) {
+  public static function retrieve($params, &$defaults) {
     if (empty($params)) {
       return NULL;
     }
-    $actionSchedule = new CRM_Core_DAO_ActionSchedule();
-
-    $actionSchedule->copyValues($params);
-
-    if ($actionSchedule->find(TRUE)) {
-      CRM_Core_DAO::storeValues($actionSchedule, $values);
-      return $actionSchedule;
-    }
-    return NULL;
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**

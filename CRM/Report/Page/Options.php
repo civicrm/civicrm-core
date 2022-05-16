@@ -32,21 +32,21 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
   /**
    * The option group name.
    *
-   * @var array
+   * @var string|null
    */
   public static $_gName = NULL;
 
   /**
    * The option group name in display format (capitalized, without underscores...etc)
    *
-   * @var array
+   * @var string|null
    */
-  public static $_GName = NULL;
+  public static $_gLabel = NULL;
 
   /**
    * The option group id.
    *
-   * @var array
+   * @var int|null
    */
   public static $_gId = NULL;
 
@@ -58,17 +58,11 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
     $this->_id = CRM_Utils_Request::retrieve('id', 'String', $this, FALSE);
 
     self::$_gName = "report_template";
+    self::$_gLabel = ts("Report Template");
+    self::$_gId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', self::$_gName, 'id', 'name');
 
-    if (self::$_gName) {
-      self::$_gId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', self::$_gName, 'id', 'name');
-    }
-    else {
-      CRM_Core_Error::statusBounce(ts('Unable to determine the Option Group'));
-    }
-
-    self::$_GName = ucwords(str_replace('_', ' ', self::$_gName));
-
-    $this->assign('GName', self::$_GName);
+    $this->assign('gName', self::$_gName);
+    $this->assign('gLabel', self::$_gLabel);
     $newReportURL = CRM_Utils_System::url("civicrm/admin/report/register",
       'reset=1'
     );
@@ -99,23 +93,23 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/report/register/' . self::$_gName,
           'qs' => 'action=update&id=%%id%%&reset=1',
-          'title' => ts('Edit %1', [1 => self::$_gName]),
+          'title' => ts('Edit %1', [1 => self::$_gLabel]),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
-          'title' => ts('Disable %1', [1 => self::$_gName]),
+          'title' => ts('Disable %1', [1 => self::$_gLabel]),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
-          'title' => ts('Enable %1', [1 => self::$_gName]),
+          'title' => ts('Enable %1', [1 => self::$_gLabel]),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/report/register/' . self::$_gName,
           'qs' => 'action=delete&id=%%id%%&reset=1',
-          'title' => ts('Delete %1 Type', [1 => self::$_gName]),
+          'title' => ts('Delete %1 Type', [1 => self::$_gLabel]),
         ],
       ];
     }
@@ -168,7 +162,7 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
    *   name of this page.
    */
   public function editName() {
-    return self::$_GName;
+    return self::$_gLabel;
   }
 
   /**

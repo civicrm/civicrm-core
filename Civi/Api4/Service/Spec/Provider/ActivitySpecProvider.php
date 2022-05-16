@@ -23,6 +23,12 @@ class ActivitySpecProvider implements Generic\SpecProviderInterface {
   public function modifySpec(RequestSpec $spec) {
     $action = $spec->getAction();
 
+    // The database default '1' is problematic as the option list is user-configurable,
+    // so activity type '1' doesn't necessarily exist. Best make the field required.
+    $spec->getFieldByName('activity_type_id')
+      ->setDefaultValue(NULL)
+      ->setRequired($action === 'create');
+
     $field = new FieldSpec('source_contact_id', 'Activity', 'Integer');
     $field->setTitle(ts('Source Contact'));
     $field->setLabel(ts('Added by'));

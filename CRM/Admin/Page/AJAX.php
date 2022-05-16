@@ -224,7 +224,7 @@ class CRM_Admin_Page_AJAX {
           $ret['content'] = ts('Are you sure you want to disable this ACL?');
           break;
 
-        case 'CRM_ACL_BAO_EntityRole':
+        case 'CRM_ACL_BAO_ACLEntityRole':
           $ret['content'] = ts('Are you sure you want to disable this ACL Role Assignment?');
           break;
 

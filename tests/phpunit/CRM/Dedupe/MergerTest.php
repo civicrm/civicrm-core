@@ -1302,9 +1302,6 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'civicrm_financial_item' => [
         0 => 'contact_id',
       ],
-      'civicrm_grant' => [
-        0 => 'contact_id',
-      ],
       'civicrm_group' => [
         0 => 'created_id',
         1 => 'modified_id',
@@ -1413,6 +1410,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'civicrm_uf_match' => [
         0 => 'contact_id',
       ],
+      'civicrm_user_job' => [
+        0 => 'created_id',
+      ],
       'civicrm_value_testgetcidref_1' => [
         0 => 'entity_id',
       ],
@@ -1458,8 +1458,6 @@ WHERE
 
   /**
    * Test that declaring a custom join for search kit does not break merge.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testMergeWithDeclaredSearchJoin(): void {
     $this->hookClass->setHook('civicrm_entityTypes', [

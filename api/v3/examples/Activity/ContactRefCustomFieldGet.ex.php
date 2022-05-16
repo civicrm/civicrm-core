@@ -1,8 +1,13 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Test Generated example demonstrating the Activity.get API.
  *
- * Get with Contact Ref Custom Field
+ * Get with Contact Ref Custom Field.
  *
  * @return array
  *   API result array
@@ -13,7 +18,7 @@ function activity_get_example() {
     'id' => 1,
   ];
 
-  try{
+  try {
     $result = civicrm_api3('Activity', 'get', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -61,10 +66,14 @@ function activity_get_expectedresult() {
         'is_current_revision' => '1',
         'is_deleted' => 0,
         'is_star' => 0,
+        'created_date' => '2013-07-28 08:49:19',
+        'modified_date' => '2012-11-14 16:02:35',
         'custom_1' => 'defaultValue',
         'custom_2_id' => '1',
         'custom_2' => 'Anderson, Anthony',
         'source_contact_id' => '1',
+        'source_contact_name' => 'Mr. Anthony Anderson II',
+        'source_contact_sort_name' => 'Anderson, Anthony',
         'custom_1_1' => 'defaultValue',
         'custom_2_1' => 'Anderson, Anthony',
         'custom_2_1_id' => '1',
@@ -76,23 +85,23 @@ function activity_get_expectedresult() {
 }
 
 /*
-* This example has been generated from the API test suite.
-* The test that created it is called "testActivityCreateCustomContactRefField"
-* and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ActivityTest.php
-*
-* You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
-*
-* To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
-*
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
-*
-* Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
-*
-* API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
-*/
+ * This example has been generated from the API test suite.
+ * The test that created it is called "testActivityCreateCustomContactRefField"
+ * and can be found at:
+ * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ActivityTest.php
+ *
+ * You can see the outcome of the API tests at
+ * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+ *
+ * To Learn about the API read
+ * https://docs.civicrm.org/dev/en/latest/api/
+ *
+ * Browse the API on your own site with the API Explorer. It is in the main
+ * CiviCRM menu, under: Support > Development > API Explorer.
+ *
+ * Read more about testing here
+ * https://docs.civicrm.org/dev/en/latest/testing/
+ *
+ * API Standards documentation:
+ * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+ */

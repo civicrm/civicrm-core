@@ -1,0 +1,19 @@
+{htxt id="id-from_email-title"}
+  {ts}From Address{/ts}
+{/htxt}
+{htxt id="id-from_email"}
+{crmSetting var="allow_mail_from_logged_in_contact" name="allow_mail_from_logged_in_contact"}
+{if $allow_mail_from_logged_in_contact}
+  <p>{ts}By default, CiviCRM uses the primary email address of the logged in user as the FROM address when sending emails to contacts. However, users with Administer CiviCRM permission can configure one or more general email addresses that can be selected as an alternative. EXAMPLE: "Client Services" &lt;clientservices@example.org&gt;{/ts}</p>
+{else}
+  <p>{ts}CiviCRM is currently configured to only use the defined From Email addresses. If you wish to be able to use the email address of the logged in user as the From Address you will need to set the setting "Allow mail from logged in contact" setting. Users with Administer CiviCRM can set this setting in the SMTP settings.{/ts}<p>
+    {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM')}
+        {capture assign="smtpUrl"}{crmURL p="civicrm/admin/setting/smtp" q="reset=1"}{/capture}
+      <p>{ts 1=$smtpUrl}Go to <a href='%1'>Settings - Outbound Mail</a> to enable the usage of the logged in contact's email address as the from email{/ts}</p>
+    {/if}
+{/if}
+{if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM')}
+    {capture assign="fromConfig"}{crmURL p="civicrm/admin/options/from_email_address" q="reset=1"}{/capture}
+  <p>{ts 1=$fromConfig}Go to <a href='%1'>Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a> to add or edit general email addresses. Make sure these email addresses are valid email accounts with your email service provider.{/ts}</p>
+{/if}
+{/htxt}

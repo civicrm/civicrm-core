@@ -15,8 +15,6 @@ namespace Civi\Api4\Generic\Traits;
  * A bridge is a small table that provides an intermediary link between two other tables.
  *
  * The API can automatically incorporate a Bridge into a join expression.
- *
- * Note: at time of writing this trait does nothing except affect the "type" shown in Entity::get() metadata.
  */
 trait EntityBridge {
 
@@ -29,12 +27,19 @@ trait EntityBridge {
    */
   public static function getInfo() {
     $info = parent::getInfo();
+    $bridgeFields = [];
     if (!empty($info['dao'])) {
       foreach (($info['dao'])::fields() as $field) {
         if (!empty($field['FKClassName']) || $field['name'] === 'entity_id') {
-          $info['bridge'][$field['name']] = [];
+          $bridgeFields[] = $field['name'];
         }
       }
+    }
+    if (count($bridgeFields) === 2) {
+      $info['bridge'] = [
+        $bridgeFields[0] => ['to' => $bridgeFields[1]],
+        $bridgeFields[1] => ['to' => $bridgeFields[0]],
+      ];
     }
     return $info;
   }

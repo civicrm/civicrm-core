@@ -43,8 +43,7 @@ class CRM_Contact_BAO_Query_Hook {
   /**
    * Get or build the list of search objects (via hook).
    *
-   * @return array
-   *   Array of CRM_Contact_BAO_Query_Interface objects
+   * @return CRM_Contact_BAO_Query_Interface[]
    */
   public function getSearchQueryObjects() {
     if ($this->_queryObjects === NULL) {
@@ -148,6 +147,28 @@ class CRM_Contact_BAO_Query_Hook {
     foreach (self::getSearchQueryObjects() as $obj) {
       $obj->setAdvancedSearchPaneTemplatePath($paneTemplatePathArray, $type);
     }
+  }
+
+  /**
+   * This gives the opportunity for a single hook to return default fields.
+   *
+   * It only runs if no core components have defaults for this $mode.
+   * The expectation is that only one hook will handle this mode, so just
+   * the first one to return a value is used.
+   *
+   * @param $mode
+   * @return array|null
+   */
+  public function getDefaultReturnProperties($mode) {
+    foreach ($this->getSearchQueryObjects() as $obj) {
+      if (method_exists($obj, 'defaultReturnProperties')) {
+        $properties = $obj::defaultReturnProperties($mode);
+        if ($properties) {
+          return $properties;
+        }
+      }
+    }
+    return NULL;
   }
 
 }

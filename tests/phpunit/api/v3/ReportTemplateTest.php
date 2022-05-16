@@ -54,7 +54,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count']);
     $entityId = $result['id'];
     $this->assertIsNumeric($entityId);
-    $this->assertEquals(7, $result['values'][$entityId]['component_id']);
+    $caseComponentId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Component', 'CiviCase', 'id', 'name');
+    $this->assertEquals($caseComponentId, $result['values'][$entityId]['component_id']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
       AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "report_template") ');
@@ -1282,6 +1283,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'civicrm_contact_contact_source_link' => '/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=' . $this->contactIDs[2],
       'civicrm_contact_contact_source_hover' => 'View Contact Summary for this Contact',
       'civicrm_activity_activity_type_id_hover' => 'View Activity Record',
+      'class' => NULL,
     ];
     $row = $rows[0];
     // This link is not relative - skip for now
@@ -1387,24 +1389,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'order_bys' => [['column' => 'sort_name', 'order' => 'ASC', 'section' => '1']],
       'options' => ['metadata' => ['sql']],
     ]);
-  }
-
-  /**
-   * Test contact subtype filter on grant report.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testGrantReportSeparatedFilter() {
-    $contactID = $this->individualCreate(['contact_sub_type' => ['Student', 'Parent']]);
-    $contactID2 = $this->individualCreate();
-    $this->callAPISuccess('Grant', 'create', ['contact_id' => $contactID, 'status_id' => 1, 'grant_type_id' => 1, 'amount_total' => 1]);
-    $this->callAPISuccess('Grant', 'create', ['contact_id' => $contactID2, 'status_id' => 1, 'grant_type_id' => 1, 'amount_total' => 1]);
-    $rows = $this->callAPISuccess('report_template', 'getrows', [
-      'report_id' => 'grant/detail',
-      'contact_sub_type_op' => 'in',
-      'contact_sub_type_value' => ['Student'],
-    ]);
-    $this->assertEquals(1, $rows['count']);
   }
 
   /**
@@ -1647,6 +1631,46 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertEquals('<strong>10.00</strong>', $rows['values'][$contact]['civicrm_contribution_total_amount'], 'should only include the $10 contribution');
 
     $this->callAPISuccess('Contact', 'delete', ['id' => $contact]);
+  }
+
+  /**
+   * Basic test of the repeat contributions report.
+   */
+  public function testRepeatContributions() {
+    // our sorting options are limited in this report - default is last name so let's ensure order
+    $contact1 = $this->individualCreate(['last_name' => 'aaaaa']);
+    $contact2 = $this->individualCreate(['last_name' => 'zzzzz']);
+    $this->contributionCreate(['contact_id' => $contact1, 'receive_date' => (date('Y') - 1) . '-07-01', 'financial_type_id' => 1, 'total_amount' => '10']);
+    $this->contributionCreate(['contact_id' => $contact1, 'receive_date' => (date('Y') - 1) . '-08-01', 'financial_type_id' => 1, 'total_amount' => '20']);
+    $this->contributionCreate(['contact_id' => $contact1, 'receive_date' => date('Y') . '-01-01', 'financial_type_id' => 1, 'total_amount' => '40']);
+    $this->contributionCreate(['contact_id' => $contact2, 'receive_date' => (date('Y') - 1) . '-09-01', 'financial_type_id' => 1, 'total_amount' => '80']);
+    $rows = $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => 'contribute/repeat',
+      'receive_date1' => 'previous.year',
+      'receive_date2' => 'this.year',
+      'fields' => [
+        'sort_name' => 1,
+      ],
+    ]);
+
+    $this->assertCount(2, $rows['values']);
+
+    // Should have for both this year and last, and last year was multiple.
+    $this->assertEquals($contact1, $rows['values'][0]['contact_civireport_id'], "doesn't seem to be the right contact 1");
+    $this->assertSame('30.00', $rows['values'][0]['contribution1_total_amount_sum']);
+    $this->assertSame('2', $rows['values'][0]['contribution1_total_amount_count']);
+    $this->assertSame('40.00', $rows['values'][0]['contribution2_total_amount_sum']);
+    $this->assertSame('1', $rows['values'][0]['contribution2_total_amount_count']);
+
+    // Should only have for last year.
+    $this->assertEquals($contact2, $rows['values'][1]['contact_civireport_id'], "doesn't seem to be the right contact 2");
+    $this->assertSame('80.00', $rows['values'][1]['contribution1_total_amount_sum']);
+    $this->assertSame('1', $rows['values'][1]['contribution1_total_amount_count']);
+    $this->assertNull($rows['values'][1]['contribution2_total_amount_sum']);
+    $this->assertNull($rows['values'][1]['contribution2_total_amount_count']);
+
+    $this->callAPISuccess('Contact', 'delete', ['id' => $contact1]);
+    $this->callAPISuccess('Contact', 'delete', ['id' => $contact2]);
   }
 
   /**

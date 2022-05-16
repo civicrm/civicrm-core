@@ -65,11 +65,6 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
       }
     }
 
-    //store custom data
-    if (!empty($params['custom']) && is_array($params['custom'])) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_campaign', $campaign->id);
-    }
-
     return $campaign;
   }
 
@@ -92,27 +87,20 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
   }
 
   /**
-   * Retrieve DB object based on input parameters.
-   *
-   * It also stores all the retrieved values in the default array.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return \CRM_Campaign_DAO_Campaign|null
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $campaign = new CRM_Campaign_DAO_Campaign();
-
-    $campaign->copyValues($params);
-
-    if ($campaign->find(TRUE)) {
-      CRM_Core_DAO::storeValues($campaign, $defaults);
-      return $campaign;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -299,7 +287,7 @@ Order By  camp.title";
    * @return bool
    */
   public static function isCampaignEnable(): bool {
-    return in_array('CiviCampaign', CRM_Core_Config::singleton()->enableComponents, TRUE);
+    return CRM_Core_Component::isEnabled('CiviCampaign');
   }
 
   /**

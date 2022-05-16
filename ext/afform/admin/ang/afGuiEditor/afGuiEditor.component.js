@@ -24,6 +24,7 @@
       this.afform = null;
       $scope.saving = false;
       $scope.selectedEntityName = null;
+      $scope.searchDisplayListFilter = {};
       this.meta = afGui.meta;
       var editor = this,
         sortableOptions = {};
@@ -73,10 +74,12 @@
             editor.layout['#children'].push(afGui.meta.elements.submit.element);
           }
         }
-
-        else if (editor.getFormType() === 'block') {
+        else {
           editor.layout['#children'] = editor.afform.layout;
-          editor.blockEntity = editor.afform.join_entity || editor.afform.entity_type;
+        }
+
+        if (editor.getFormType() === 'block') {
+          editor.blockEntity = editor.afform.join_entity || editor.afform.entity_type || '*';
           $scope.entities[editor.blockEntity] = backfillEntityDefaults({
             type: editor.blockEntity,
             name: editor.blockEntity,
@@ -85,11 +88,7 @@
         }
 
         else if (editor.getFormType() === 'search') {
-          editor.layout['#children'] = afGui.findRecursive(editor.afform.layout, {'af-fieldset': ''})[0]['#children'];
-          editor.searchDisplay = afGui.findRecursive(editor.layout['#children'], function(item) {
-            return item['#tag'] && item['#tag'].indexOf('crm-search-display-') === 0;
-          })[0];
-          editor.searchFilters = getSearchFilterOptions();
+          editor.searchDisplays = getSearchDisplaysOnForm();
         }
 
         // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
@@ -134,19 +133,21 @@
           var pos = 1 + _.findLastIndex(editor.layout['#children'], {'#tag': 'af-entity'});
           editor.layout['#children'].splice(pos, 0, $scope.entities[type + num]);
           // Create a new af-fieldset container for the entity
-          var fieldset = _.cloneDeep(afGui.meta.elements.fieldset.element);
-          fieldset['af-fieldset'] = type + num;
-          fieldset['#children'][0]['#children'][0]['#text'] = meta.label + ' ' + num;
-          // Add boilerplate contents
-          _.each(meta.boilerplate, function (tag) {
-            fieldset['#children'].push(tag);
-          });
-          // Attempt to place the new af-fieldset after the last one on the form
-          pos = 1 + _.findLastIndex(editor.layout['#children'], 'af-fieldset');
-          if (pos) {
-            editor.layout['#children'].splice(pos, 0, fieldset);
-          } else {
-            editor.layout['#children'].push(fieldset);
+          if (meta.boilerplate !== false) {
+            var fieldset = _.cloneDeep(afGui.meta.elements.fieldset.element);
+            fieldset['af-fieldset'] = type + num;
+            fieldset['af-title'] = meta.label + ' ' + num;
+            // Add boilerplate contents
+            _.each(meta.boilerplate, function (tag) {
+              fieldset['#children'].push(tag);
+            });
+            // Attempt to place the new af-fieldset after the last one on the form
+            pos = 1 + _.findLastIndex(editor.layout['#children'], 'af-fieldset');
+            if (pos) {
+              editor.layout['#children'].splice(pos, 0, fieldset);
+            } else {
+              editor.layout['#children'].push(fieldset);
+            }
           }
           delete $scope.entities[type + num].loading;
           if (selectTab) {
@@ -193,7 +194,7 @@
       };
 
       this.getEntityDefn = function(entity) {
-        if (entity.type === 'Contact' && entity.data.contact_type) {
+        if (entity.type === 'Contact' && entity.data && entity.data.contact_type) {
           return editor.meta.entities[entity.data.contact_type];
         }
         return editor.meta.entities[entity.type];
@@ -203,12 +204,15 @@
       this.scrollToEntity = function(entityName) {
         var $canvas = $('#afGuiEditor-canvas-body'),
           $entity = $('.af-gui-container-type-fieldset[data-entity="' + entityName + '"]').first(),
+          scrollValue, maxScroll;
+        if ($entity.length) {
           // Scrolltop value needed to place entity's fieldset at top of canvas
-          scrollValue = $canvas.scrollTop() + ($entity.offset().top - $canvas.offset().top),
+          scrollValue = $canvas.scrollTop() + ($entity.offset().top - $canvas.offset().top);
           // Maximum possible scrollTop (height minus contents height, adjusting for padding)
           maxScroll = $('#afGuiEditor-canvas-body > *').height() - $canvas.height() + 20;
-        // Exceeding the maximum scrollTop breaks the animation so keep it under the limit
-        $canvas.animate({scrollTop: scrollValue > maxScroll ? maxScroll : scrollValue}, 500);
+          // Exceeding the maximum scrollTop breaks the animation so keep it under the limit
+          $canvas.animate({scrollTop: scrollValue > maxScroll ? maxScroll : scrollValue}, 500);
+        }
       };
 
       this.getAfform = function() {
@@ -222,19 +226,109 @@
       this.toggleContactSummary = function() {
         if (editor.afform.contact_summary) {
           editor.afform.contact_summary = false;
-          if (editor.afform.type === 'search') {
-            delete editor.searchDisplay.filters;
-          }
+          _.each(editor.searchDisplays, function(searchDisplay) {
+            delete searchDisplay.element.filters;
+          });
         } else {
           editor.afform.contact_summary = 'block';
-          if (editor.afform.type === 'search') {
-            editor.searchDisplay.filters = editor.searchFilters[0].key;
-          }
+          _.each(editor.searchDisplays, function(searchDisplay) {
+            var filterOptions = getSearchFilterOptions(searchDisplay.settings);
+            if (filterOptions.length) {
+              searchDisplay.element.filters = filterOptions[0].key;
+            }
+          });
         }
       };
 
-      function getSearchFilterOptions() {
-        var searchDisplay = afGui.getSearchDisplay(editor.searchDisplay['search-name'], editor.searchDisplay['display-name']),
+      // Collects all search displays currently on the form
+      function getSearchDisplaysOnForm() {
+        var searchFieldsets = afGui.findRecursive(editor.afform.layout, {'af-fieldset': ''});
+        return _.transform(searchFieldsets, function(searchDisplays, fieldset) {
+          var displayElement = afGui.findRecursive(fieldset['#children'], function(item) {
+            return item['search-name'] && item['#tag'] && item['#tag'].indexOf('crm-search-display-') === 0;
+          })[0];
+          if (displayElement) {
+            searchDisplays[displayElement['search-name'] + (displayElement['display-name'] ? '.' + displayElement['display-name'] : '')] = {
+              element: displayElement,
+              fieldset: fieldset,
+              settings: afGui.getSearchDisplay(displayElement['search-name'], displayElement['display-name'])
+            };
+          }
+        }, {});
+      }
+
+      // Load data for "Add search display" dropdown
+      this.getSearchDisplaySelector = function() {
+        // Reset search input in dropdown
+        $scope.searchDisplayListFilter.label = '';
+        // A value means it's alredy loaded. Null means it's loading.
+        if (!editor.searchOptions && editor.searchOptions !== null) {
+          editor.searchOptions = null;
+          afGui.getAllSearchDisplays().then(function(links) {
+            editor.searchOptions = links;
+          });
+        }
+      };
+
+      this.addSearchDisplay = function(display) {
+        var searchName = display.key.split('.')[0];
+        var displayName = display.key.split('.')[1] || '';
+        var fieldset = {
+          '#tag': 'div',
+          'af-fieldset': '',
+          'af-title': display.label,
+          '#children': [
+            {
+              '#tag': display.tag,
+              'search-name': searchName,
+              'display-name': displayName,
+            }
+          ]
+        };
+        var meta = {
+          fieldset: fieldset,
+          element: fieldset['#children'][0],
+          settings: afGui.getSearchDisplay(searchName, displayName),
+        };
+        editor.searchDisplays[display.key] = meta;
+
+        function addToCanvas() {
+          editor.layout['#children'].push(fieldset);
+          editor.selectEntity(display.key);
+        }
+        if (meta.settings) {
+          addToCanvas();
+        } else {
+          $timeout(editor.adjustTabWidths);
+          crmApi4('Afform', 'loadAdminData', {
+            definition: {type: 'search'},
+            entity: display.key
+          }, 0).then(function(data) {
+            afGui.addMeta(data);
+            meta.settings = afGui.getSearchDisplay(searchName, displayName);
+            addToCanvas();
+          });
+        }
+      };
+
+      // Triggered by afGuiContainer.removeElement
+      this.onRemoveElement = function() {
+        // Keep this.searchDisplays in-sync when deleteing stuff from the form
+        if (editor.getFormType() === 'search') {
+          var current = getSearchDisplaysOnForm();
+          _.each(_.keys(editor.searchDisplays), function(key) {
+            if (!(key in current)) {
+              delete editor.searchDisplays[key];
+              editor.selectEntity(null);
+            }
+          });
+        }
+      };
+
+      // This function used to be needed to build a menu of available contact_id fields
+      // but is no longer used for that and is overkill for what it does now.
+      function getSearchFilterOptions(searchDisplay) {
+        var
           entityCount = {},
           options = [];
 
@@ -278,15 +372,17 @@
       this.getSortableOptions = function(entityName) {
         if (!sortableOptions[entityName + '']) {
           sortableOptions[entityName + ''] = {
-            helper: 'clone',
             appendTo: '#afGuiEditor-canvas-body > af-gui-container',
             containment: '#afGuiEditor-canvas-body',
             update: editor.onDrop,
             items: '> div:not(.disabled)',
             connectWith: '#afGuiEditor-canvas ' + (entityName ? '[data-entity="' + entityName + '"] > ' : '') + '[ui-sortable]',
             placeholder: 'af-gui-dropzone',
-            tolerance: 'pointer',
-            scrollSpeed: 8
+            scrollSpeed: 8,
+            helper: function(e, $el) {
+              // Prevent draggable item from being too large for the drop zones.
+              return $el.clone().css({width: '50px', height: '20px'});
+            }
           };
         }
         return sortableOptions[entityName + ''];

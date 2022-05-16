@@ -122,7 +122,9 @@
         $scope.elementList.length = 0;
         $scope.elementTitles.length = 0;
         _.each(afGui.meta.elements, function(element, name) {
-          if (!search || _.contains(name, search) || _.contains(element.title.toLowerCase(), search)) {
+          if (
+            (!element.afform_type || _.contains(element.afform_type, 'form')) &&
+            (!search || _.contains(name, search) || _.contains(element.title.toLowerCase(), search))) {
             var node = _.cloneDeep(element.element);
             if (name === 'fieldset') {
               if (!ctrl.editor.allowEntityConfig) {
@@ -194,22 +196,21 @@
         return found.match;
       }
 
+      this.addValue = function(fieldName) {
+        if (fieldName) {
+          if (!ctrl.entity.data) {
+            ctrl.entity.data = {};
+          }
+          ctrl.entity.data[fieldName] = '';
+        }
+      };
+
       this.$onInit = function() {
         // When a new block is saved, update the list
         this.meta = afGui.meta;
         $scope.$watchCollection('$ctrl.meta.blocks', function() {
           $scope.controls.fieldSearch = '';
           ctrl.buildPaletteLists();
-        });
-
-        $scope.$watch('controls.addValue', function(fieldName) {
-          if (fieldName) {
-            if (!ctrl.entity.data) {
-              ctrl.entity.data = {};
-            }
-            ctrl.entity.data[fieldName] = '';
-            $scope.controls.addValue = '';
-          }
         });
       };
     }

@@ -23,13 +23,6 @@ require_once 'Mail/mime.php';
 class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Confirm a pending subscription.
    *
    * @param int $contact_id
@@ -100,7 +93,11 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $component->is_active = 1;
     $component->component_type = 'Welcome';
 
-    $component->find(TRUE);
+    // we should return early if welcome email temaplate is disabled
+    // this means confirmation email will not be sent
+    if (!$component->find(TRUE)) {
+      return $group->title;
+    }
 
     $html = $component->body_html;
 

@@ -394,7 +394,7 @@ WHERE  inst.report_id = %1";
     $_REQUEST['reset'] = CRM_Utils_Array::value('reset', $params, 1);
 
     $optionVal = self::getValueFromUrl($instanceId);
-    $messages = ["Report Mail Triggered..."];
+    $messages = ['Report Mail Triggered...'];
 
     $templateInfo = CRM_Core_OptionGroup::getRowValues('report_template', $optionVal, 'value');
     $obj = new CRM_Report_Page_Instance();

@@ -13,7 +13,7 @@
 
 {include file="CRM/common/TrackingFields.tpl"}
 
-<div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-thankyou-form-block">
+<div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-thankyou-form-block" data-page-id="{$contributionPageID}" data-page-template="thankyou">
   {if $thankyou_text}
     <div id="thankyou_text" class="crm-section thankyou_text-section">
       {$thankyou_text}
@@ -202,7 +202,7 @@
       </div>
       <div class="display-block">
        <div class="label-left crm-section honoree_profile-section">
-          <strong>{$honorName}</strong></br>
+          <strong>{$honorName}</strong><br/>
           {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields prefix='honor'}
         </div>
       </div>

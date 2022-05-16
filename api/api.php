@@ -125,7 +125,8 @@ function civicrm_api4(string $entity, string $action, array $params = [], $index
  *
  * @throws CiviCRM_API3_Exception
  *
- * @return array
+ * @return array|int
+ *   Dependant on the $action
  */
 function civicrm_api3(string $entity, string $action, array $params = []) {
   $params['version'] = 3;
@@ -179,7 +180,7 @@ function _civicrm_api3_api_getfields(&$apiRequest) {
  * 'format.is_success' => 1
  * will result in a boolean success /fail being returned if that is what you need.
  *
- * @param $result
+ * @param mixed $result
  *
  * @return bool
  *   true if error, false otherwise

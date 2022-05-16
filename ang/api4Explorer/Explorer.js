@@ -19,7 +19,7 @@
     });
   });
 
-  angular.module('api4Explorer').controller('Api4Explorer', function($scope, $routeParams, $location, $timeout, $http, crmUiHelp, crmApi4, dialogService) {
+  angular.module('api4Explorer').controller('Api4Explorer', function($scope, $routeParams, $location, $timeout, $http, crmUiHelp, crmApi4) {
     var ts = $scope.ts = CRM.ts(),
       ctrl = $scope.$ctrl = this;
     $scope.entities = entities;
@@ -33,10 +33,10 @@
     $scope.availableParams = {};
     params = $scope.params = {};
     $scope.index = '';
-    $scope.selectedTab = {result: 'result', code: 'php'};
+    $scope.selectedTab = {result: 'result'};
+    $scope.crmUrl = CRM.url;
     $scope.perm = {
       accessDebugOutput: CRM.checkPerm('access debug output'),
-      editGroups: CRM.checkPerm('edit groups')
     };
     marked.setOptions({highlight: prettyPrintOne});
     var getMetaParams = {},
@@ -53,7 +53,7 @@
     $scope.status = 'default';
     $scope.loading = false;
     $scope.controls = {};
-    $scope.langs = ['php', 'js', 'ang', 'cli'];
+    $scope.langs = ['php', 'js', 'ang', 'cli', 'rest'];
     $scope.joinTypes = [{k: 'LEFT', v: 'LEFT JOIN'}, {k: 'INNER', v: 'INNER JOIN'}, {k: 'EXCLUDE', v: 'EXCLUDE'}];
     $scope.bridgeEntities = _.filter(schema, function(entity) {return _.includes(entity.type, 'EntityBridge');});
     $scope.code = {
@@ -73,9 +73,13 @@
         {name: 'short', label: ts('CV (short)'), code: ''},
         {name: 'long', label: ts('CV (long)'), code: ''},
         {name: 'pipe', label: ts('CV (pipe)'), code: ''}
+      ],
+      rest: [
+        {name: 'curl', label: ts('Curl'), code: ''},
+        {name: 'restphp', label: ts('PHP (std)'), code: ''},
+        {name: 'guzzle', label: ts('PHP + Guzzle'), code: ''}
       ]
     };
-    this.resultFormat = 'json';
     this.resultFormats = [
       {
         name: 'json',
@@ -86,16 +90,40 @@
         label: ts('View as PHP')
       },
     ];
+    this.authxEnabled = CRM.vars.api4.authxEnabled;
 
     if (!entities.length) {
       formatForSelect2(schema, entities, 'name', ['description', 'icon']);
     }
 
+    // Prefix other url args with an underscore to avoid conflicts with param names
     $scope.$bindToRoute({
       expr: 'index',
-      param: 'index',
+      param: '_index',
       default: ''
     });
+    $scope.$bindToRoute({
+      expr: 'selectedTab.code',
+      param: '_lang',
+      format: 'raw',
+      default: 'php'
+    });
+    $scope.$bindToRoute({
+      expr: '$ctrl.resultFormat',
+      param: '_format',
+      format: 'raw',
+      default: 'json'
+    });
+
+    // Copy text to the clipboard
+    this.copyCode = function(domId) {
+      var node = document.getElementById(domId);
+      var range = document.createRange();
+      range.selectNode(node);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+      document.execCommand('copy');
+    };
 
     function ucfirst(str) {
       return str[0].toUpperCase() + str.slice(1);
@@ -657,6 +685,14 @@
       return str.trim();
     }
 
+    // Url-encode suitable for use in a bash script
+    function curlEscape(str) {
+      return encodeURIComponent(str).
+        replace(/['()*]/g, function(c) {
+          return "%" + c.charCodeAt(0).toString(16);
+        });
+    }
+
     function writeCode() {
       var code = {},
         entity = $scope.entity,
@@ -667,7 +703,8 @@
       if ($scope.entity && $scope.action) {
         delete params.debug;
         if (action.slice(0, 3) === 'get') {
-          result = entity.substr(0, 7) === 'Custom_' ? _.camelCase(entity.substr(7)) : entity;
+          var args = getEntity(entity).class_args || [];
+          result = args[0] ? _.camelCase(args[0]) : entity;
           result = lcfirst(action.replace(/s$/, '').slice(3) || result);
         }
         var results = lcfirst(_.isNumber(index) ? result : pluralize(result)),
@@ -765,6 +802,61 @@
                   code.short += ' ' + key + '=' + (typeof param === 'string' ? cliFormat(param) : cliFormat(JSON.stringify(param)));
               }
             });
+            break;
+
+          case 'rest':
+            var restUrl = CRM.vars.api4.restUrl
+              .replace('CRMAPI4ENTITY', entity)
+              .replace('CRMAPI4ACTION', action);
+            var cleanUrl;
+            if (CRM.vars.api4.restUrl.endsWith('/CRMAPI4ENTITY/CRMAPI4ACTION')) {
+              cleanUrl = CRM.vars.api4.restUrl.replace('/CRMAPI4ENTITY/CRMAPI4ACTION', '/');
+            }
+            var restCred = 'Bearer MY_API_KEY';
+
+            // CURL
+            code.curl =
+              "CRM_URL='" + restUrl + "'\n" +
+              "CRM_AUTH='X-Civi-Auth: " + restCred + "'\n\n" +
+              'curl -X POST -H "$CRM_AUTH" "$CRM_URL" \\' + "\n" +
+              "-d 'params=" + curlEscape(JSON.stringify(params));
+            if (index || index === 0) {
+              code.curl += '&index=' + curlEscape(JSON.stringify(index));
+            }
+            code.curl += "'";
+
+            var queryParams = "['params' => json_encode($params)" +
+              ((typeof index === 'number') ? ", 'index' => " + JSON.stringify(index) : '') +
+              ((index && typeof index !== 'number') ? ", 'index' => json_encode(" + phpFormat(index) + ')' : '') +
+              "]";
+
+            // Guzzle
+            code.guzzle =
+              "$params = " + phpFormat(params, 2) + ";\n" +
+              "$client = new \\GuzzleHttp\\Client([\n" +
+              (cleanUrl ? "  'base_uri' => '" + cleanUrl + "',\n" : '') +
+              "  'headers' => ['X-Civi-Auth' => " + phpFormat(restCred) + "],\n" +
+              "]);\n" +
+              "$response = $client->get('" + (cleanUrl ? entity + '/' + action : restUrl) + "', [\n" +
+              "  'form_params' => " + queryParams + ",\n" +
+              "]);\n" +
+              '$' + results + " = json_decode((string) $response->getBody(), TRUE);";
+
+            // PHP StdLib
+            code.restphp =
+              "$url = '" + restUrl + "';\n" +
+              "$params = " + phpFormat(params, 2) + ";\n" +
+              "$request = stream_context_create([\n" +
+              "  'http' => [\n" +
+              "    'method' => 'POST',\n" +
+              "    'header' => [\n" +
+              "      'Content-Type: application/x-www-form-urlencoded',\n" +
+              "      " + phpFormat('X-Civi-Auth: ' + restCred) + ",\n" +
+              "    ],\n" +
+              "    'content' => http_build_query(" + queryParams + "),\n" +
+              "  ]\n" +
+              "]);\n" +
+              '$' + results + " = json_decode(file_get_contents($url, FALSE, $request), TRUE);\n";
         }
       }
       _.each($scope.code, function(vals) {
@@ -777,20 +869,24 @@
     // Format oop params
     function formatOOP(entity, action, params, indent) {
       var info = getEntity(entity),
+        arrayParams = ['groupBy', 'records'],
         newLine = "\n" + _.repeat(' ', indent),
         code = '\\' + info.class + '::' + action + '(',
-        perm = params.checkPermissions === false ? 'FALSE' : '';
-      if (entity.substr(0, 7) !== 'Custom_') {
-        code += perm + ')';
-      } else {
-        code += "'" + entity.substr(7) + "'" + (perm ? ', ' : '') + perm + ")";
+        args = _.cloneDeep(info.class_args || []);
+      if (params.checkPermissions === false) {
+        args.push(false);
       }
+      code += _.map(args, phpFormat).join(', ') + ')';
       _.each(params, function(param, key) {
         var val = '';
         if (typeof objectParams[key] !== 'undefined' && key !== 'chain') {
           _.each(param, function(item, index) {
             val = phpFormat(index) + ', ' + phpFormat(item, 2 + indent);
             code += newLine + "->add" + ucfirst(key).replace(/s$/, '') + '(' + val + ')';
+          });
+        } else if (_.includes(arrayParams, key)) {
+          _.each(param, function(item) {
+            code += newLine + "->add" + ucfirst(key).replace(/s$/, '') + '(' + phpFormat(item, 2 + indent) + ')';
           });
         } else if (key === 'where') {
           _.each(param, function (clause) {
@@ -879,6 +975,9 @@
     };
 
     ctrl.formatResult = function() {
+      if (!response) {
+        return;
+      }
       $scope.result = [formatMeta(response.meta)];
       switch (ctrl.resultFormat) {
         case 'json':
@@ -886,7 +985,7 @@
           break;
 
         case 'php':
-          $scope.result.push(prettyPrintOne((_.isArray(response.values) ? '(' + response.values.length + ') ' : '') + _.escape(phpFormat(response.values, 2, 2)), 'php', 1));
+          $scope.result.push(prettyPrintOne('return ' + _.escape(phpFormat(response.values, 2, 2)) + ';', 'php', 1));
           break;
       }
     };
@@ -1022,102 +1121,9 @@
       return doc;
     };
 
-    $scope.saveDoc = function() {
-      return {
-        description: ts('Save API call as a smart group.'),
-        comment: ts('Create a SavedSearch using these API params to populate a smart group.') +
-          '\n\n' + ts('NOTE: you must select contact id as the only field.')
-      };
-    };
-
     $scope.$watch('params', writeCode, true);
     $scope.$watch('index', writeCode);
     writeCode();
-
-    $scope.save = function() {
-      $scope.params.limit = $scope.params.offset = 0;
-      if ($scope.params.chain.length) {
-        CRM.alert(ts('Smart groups are not compatible with API chaining.'), ts('Error'), 'error', {expires: 5000});
-        return;
-      }
-      if ($scope.params.select.length !== 1 || !_.includes($scope.params.select[0], 'id')) {
-        CRM.alert(ts('To create a smart group, the API must select contact id and no other fields.'), ts('Error'), 'error', {expires: 5000});
-        return;
-      }
-      var model = {
-        title: '',
-        description: '',
-        visibility: 'User and User Admin Only',
-        group_type: [],
-        id: null,
-        entity: $scope.entity,
-        params: JSON.parse(angular.toJson($scope.params))
-      };
-      model.params.version = 4;
-      delete model.params.chain;
-      delete model.params.debug;
-      delete model.params.limit;
-      delete model.params.offset;
-      delete model.params.orderBy;
-      delete model.params.checkPermissions;
-      var options = CRM.utils.adjustDialogDefaults({
-        width: '500px',
-        autoOpen: false,
-        title: ts('Save smart group')
-      });
-      dialogService.open('saveSearchDialog', '~/api4Explorer/SaveSearch.html', model, options);
-    };
-  });
-
-  angular.module('api4Explorer').controller('SaveSearchCtrl', function($scope, crmApi4, dialogService) {
-    var ts = $scope.ts = CRM.ts(),
-      model = $scope.model;
-    $scope.groupEntityRefParams = {
-      entity: 'Group',
-      api: {
-        params: {is_hidden: 0, is_active: 1, 'saved_search_id.api_entity': model.entity},
-        extra: ['saved_search_id', 'description', 'visibility', 'group_type']
-      },
-      select: {
-        allowClear: true,
-        minimumInputLength: 0,
-        placeholder: ts('Select existing group')
-      }
-    };
-    if (!CRM.checkPerm('administer reserved groups')) {
-      $scope.groupEntityRefParams.api.params.is_reserved = 0;
-    }
-    $scope.perm = {
-      administerReservedGroups: CRM.checkPerm('administer reserved groups')
-    };
-    $scope.options = CRM.vars.api4.groupOptions;
-    $scope.$watch('model.id', function(id) {
-      if (id) {
-        _.assign(model, $('#api-save-search-select-group').select2('data').extra);
-      }
-    });
-    $scope.cancel = function() {
-      dialogService.cancel('saveSearchDialog');
-    };
-    $scope.save = function() {
-      $('.ui-dialog:visible').block();
-      var group = model.id ? {id: model.id} : {title: model.title};
-      group.description = model.description;
-      group.visibility = model.visibility;
-      group.group_type = model.group_type;
-      group.saved_search_id = '$id';
-      var savedSearch = {
-        api_entity: model.entity,
-        api_params: model.params
-      };
-      if (group.id) {
-        savedSearch.id = model.saved_search_id;
-      }
-      crmApi4('SavedSearch', 'save', {records: [savedSearch], chain: {group: ['Group', 'save', {'records': [group]}]}})
-        .then(function(result) {
-          dialogService.close('saveSearchDialog', result[0]);
-        });
-    };
   });
 
   angular.module('api4Explorer').component('crmApi4Clause', {

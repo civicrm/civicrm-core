@@ -19,7 +19,7 @@
 </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {* Table for mapping data to CRM fields *}
- {include file="CRM/Contact/Import/Form/MapTable.tpl}
+ {include file="CRM/Contact/Import/Form/MapTable.tpl" mapper=$form.mapper}
 
 <script type="text/javascript" >
 {literal}
@@ -34,6 +34,6 @@ if ( document.getElementsByName("saveMapping")[0].checked ) {
 </script>
 
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
- {$initHideBoxes}
+ {$initHideBoxes|smarty:nodefaults}
 
 </div>

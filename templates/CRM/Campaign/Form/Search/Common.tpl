@@ -23,7 +23,7 @@
     {strip}
       <table class="form-layout">
         <tr>
-          <td class="font-size12pt">
+          <td>
             {$form.campaign_survey_id.label}
           </td>
           <td>
@@ -31,17 +31,17 @@
           </td>
 
           {if $showInterviewer}
-            <td class="font-size12pt">
+            <td>
               {$form.survey_interviewer_id.label}
             </td>
-            <td class="font-size12pt ">
+            <td>
               {$form.survey_interviewer_id.html}
             </td>
           {/if}
 
         </tr>
         <tr>
-          <td class="font-size12pt">
+          <td>
             {$form.sort_name.label}
           </td>
           <td colspan="3">
@@ -64,13 +64,13 @@
         </tr>
 
         <tr>
-          <td class="font-size12pt">
+          <td>
             {$form.street_address.label}
           </td>
           <td>
             {$form.street_address.html}
           </td>
-          <td class="font-size12pt">
+          <td>
             {$form.street_name.label}
           </td>
           <td>
@@ -78,13 +78,13 @@
           </td>
         </tr>
         <tr>
-          <td class="font-size12pt">
+          <td>
             {$form.street_unit.label}
           </td>
           <td>
             {$form.street_unit.html}
           </td>
-          <td class="font-size12pt">
+          <td>
             {$form.city.label}
           </td>
           <td>
@@ -92,14 +92,14 @@
           </td>
         </tr>
         <tr>
-          <td class="font-size12pt">
+          <td>
             {$form.street_number.label}
           </td>
           <td>
             {$form.street_number.html}
           </td>
 
-          <td class="font-size12pt">
+          <td>
             {$form.postal_code.label}
           </td>
           <td>
@@ -110,7 +110,7 @@
           <tr>
             {if $customSearchFields.ward}
               {assign var='ward' value=$customSearchFields.ward}
-              <td class="font-size12pt">
+              <td>
                 {$form.$ward.label}
               </td>
               <td>
@@ -120,7 +120,7 @@
 
             {if $customSearchFields.precinct}
               {assign var='precinct' value=$customSearchFields.precinct}
-              <td class="font-size12pt">
+              <td>
                 {$form.$precinct.label}
               </td>
               <td>

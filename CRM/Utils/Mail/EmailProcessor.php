@@ -45,35 +45,6 @@ class CRM_Utils_Mail_EmailProcessor {
   }
 
   /**
-   * Delete old files from a given directory (recursively).
-   *
-   * @param string $dir
-   *   Directory to cleanup.
-   * @param int $age
-   *   Files older than this many seconds will be deleted (default: 60 days).
-   */
-  public static function cleanupDir($dir, $age = 5184000) {
-    // return early if we can’t read/write the dir
-    if (!is_writable($dir) or !is_readable($dir) or !is_dir($dir)) {
-      return;
-    }
-
-    foreach (scandir($dir) as $file) {
-
-      // don’t go up the directory stack and skip new files/dirs
-      if ($file == '.' or $file == '..') {
-        continue;
-      }
-      if (filemtime("$dir/$file") > time() - $age) {
-        continue;
-      }
-
-      // it’s an old file/dir, so delete/recurse
-      is_dir("$dir/$file") ? self::cleanupDir("$dir/$file", $age) : unlink("$dir/$file");
-    }
-  }
-
-  /**
    * Process the mailboxes that aren't default (ie. that aren't used by civiMail for the bounce).
    *
    * @return bool

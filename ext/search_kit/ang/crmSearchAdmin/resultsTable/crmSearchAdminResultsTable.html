@@ -7,8 +7,7 @@
   <table class="{{:: $ctrl.settings.classes.join(' ') }}">
     <thead>
       <tr ng-model="$ctrl.search.api_params.select" ui-sortable="sortableColumnOptions">
-        <th class="crm-search-result-select" ng-if=":: $ctrl.settings.actions">
-          <input type="checkbox" ng-disabled="$ctrl.loading || !$ctrl.results.length" ng-checked="$ctrl.allRowsSelected" ng-click="$ctrl.selectAllRows()" >
+        <th class="crm-search-result-select" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTaskHeader.html'" ng-if=":: $ctrl.settings.actions">
         </th>
         <th ng-repeat="item in $ctrl.search.api_params.select" ng-click="$ctrl.setSort($ctrl.settings.columns[$index], $event)" title="{{$index || !$ctrl.crmSearchAdmin.groupExists ? ts('Drag to reorder columns, click to sort results (shift-click to sort by multiple).') : ts('Column reserved for smart group.')}}">
           <i ng-if=":: $ctrl.isSortable($ctrl.settings.columns[$index])" class="crm-i {{ $ctrl.getSort($ctrl.settings.columns[$index]) }}"></i>

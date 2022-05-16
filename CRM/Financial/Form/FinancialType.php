@@ -44,12 +44,6 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    // Check permission for Financial Type when ACL-FT is enabled
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
-      && !CRM_Core_Permission::check('administer CiviCRM Financial Types')
-    ) {
-      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
-    }
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     parent::preProcess();
     $this->setPageTitle(ts('Financial Type'));

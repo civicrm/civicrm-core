@@ -7,7 +7,9 @@
  * @method array getContributionRecur()
  */
 class CRM_Contribute_WorkflowMessage_RecurringEdit extends Civi\WorkflowMessage\GenericWorkflowMessage {
-  const WORKFLOW = 'contribution_recurring_edit';
+  use CRM_Contribute_WorkflowMessage_RecurringTrait;
+
+  public const WORKFLOW = 'contribution_recurring_edit';
 
   /**
    * The recurring contribution contact.
@@ -21,23 +23,6 @@ class CRM_Contribute_WorkflowMessage_RecurringEdit extends Civi\WorkflowMessage\
   public $contact;
 
   /**
-   * The recurring contribution.
-   *
-   * @var array|null
-   *
-   * @scope tokenContext as contribution_recur
-   *
-   * @required
-   */
-  public $contributionRecur;
-
-  /**
-   * @var int
-   * @scope tokenContext as contribution_recurId
-   */
-  public $contributionRecurId;
-
-  /**
    * Smarty template historically defined a property 'receipt_from_email'.
    * (Note the asymmetric lack of 'receipt_from_name'.)
    *
@@ -48,21 +33,32 @@ class CRM_Contribute_WorkflowMessage_RecurringEdit extends Civi\WorkflowMessage\
    */
   public $receiptFromEmail;
 
-  public function setContributionRecur(array $contributionRecur) {
-    $this->contributionRecur = $contributionRecur;
-    if (!empty($contributionRecur['id'])) {
-      $this->contributionRecurId = $contributionRecur['id'];
-    }
-    return $this;
-  }
-
+  /**
+   * Export tokens to smarty as variables.
+   *
+   * The key represents the smarty token and the value is the token as
+   * requested from the token processor.
+   *
+   * The token is 'the entire part between the curly quotes' eg.
+   *
+   * '{contribution_recur.amount|crmMoney}.
+   *
+   * Unlike using the contribution directly it will default to 'raw' formatting.
+   *
+   * @param array $export
+   */
   protected function exportExtraTokenContext(array &$export): void {
     $export['smartyTokenAlias']['installments'] = 'contribution_recur.installments';
-    $export['smartyTokenAlias']['amount'] = 'contribution_recur.amount';
+    $export['smartyTokenAlias']['amount'] = 'contribution_recur.amount|crmMoney';
     $export['smartyTokenAlias']['recur_frequency_unit'] = 'contribution_recur.frequency_unit:label';
     $export['smartyTokenAlias']['recur_frequency_interval'] = 'contribution_recur.frequency_interval';
   }
 
+  /**
+   * Extra variables to be exported to smarty based on being calculated.
+   *
+   * @param array $export
+   */
   protected function exportExtraTplParams(array &$export): void {
     if (empty($export['receipt_from_email']) && !empty($this->from)) {
       // At a minimum, we can at least autofill 'receipt_from_email' in the case where it's missing.
