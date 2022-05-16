@@ -220,7 +220,14 @@ class CRM_Utils_PDF_Utils {
     $snappy->setOption("margin-right", $margins[2] . $margins[0]);
     $snappy->setOption("margin-bottom", $margins[3] . $margins[0]);
     $snappy->setOption("margin-left", $margins[4] . $margins[0]);
-    $snappy->setOption('enable-local-file-access', TRUE);
+    try {
+      // address https://github.com/mileszs/wicked_pdf/pull/920
+      $snappy->setOption('enable-local-file-access', TRUE);
+    } catch (\InvalidArgumentException $x) {
+      // must be wkhtmltopdf v <=0.12.5
+      // so, fine...
+    }
+    
     $pdf = $snappy->getOutputFromHtml($html);
     if ($output) {
       return $pdf;
