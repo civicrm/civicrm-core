@@ -587,7 +587,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     try {
       $remotes = $extensionSystem->getBrowser()->getExtensions();
     }
-    catch (CRM_Extension_Exception $e) {
+    catch (CRM_Extension_Exception | \GuzzleHttp\Exception\GuzzleException $e) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         $e->getMessage(),
