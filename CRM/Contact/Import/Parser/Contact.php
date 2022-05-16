@@ -770,7 +770,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
     if ($this->_updateWithId) {
       //return warning if street address is unparsed, CRM-5886
-      return $this->processMessage($values, $statusFieldName, $this->_retCode);
+      return $this->processMessage($values, $this->_retCode);
     }
     //dupe checking
     if (is_array($newContact) && civicrm_error($newContact)) {
@@ -793,7 +793,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
 
     // @todo - record unparsed address as 'imported' but the presence of a message is meaningful?
-    return $this->processMessage($values, $statusFieldName, CRM_Import_Parser::VALID);
+    return $this->processMessage($values, CRM_Import_Parser::VALID);
   }
 
   /**
@@ -1882,13 +1882,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *
    * @param array $values
    *   The array of values belonging to each row.
-   * @param array $statusFieldName
-   *   Store formatted date in this array.
    * @param $returnCode
    *
    * @return int
    */
-  public function processMessage(&$values, $statusFieldName, $returnCode) {
+  private function processMessage(&$values, $returnCode) {
     if (empty($this->_unparsedStreetAddressContacts)) {
       $this->setImportStatus((int) ($values[count($values) - 1]), 'IMPORTED', '');
     }
@@ -2107,7 +2105,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     $this->setImportStatus((int) $values[count($values) - 1], 'Imported', '');
     //return warning if street address is not parsed, CRM-5886
-    return $this->processMessage($values, $statusFieldName, CRM_Import_Parser::VALID);
+    return $this->processMessage($values, CRM_Import_Parser::VALID);
   }
 
   /**
