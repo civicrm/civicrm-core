@@ -1711,6 +1711,29 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       foreach ($paymentResults as $result) {
         //CRM-18211: Fix situation where second contribution doesn't exist because it is optional.
         if ($result['contribution_id']) {
+          if (($result['payment_status_id'] ?? NULL) == 1) {
+            try {
+              civicrm_api3('Payment', 'create', [
+                'contribution_id' => $result['contribution_id'],
+                'trxn_id' => $result['trxn_id'] ?? NULL,
+                'order_reference' => $result['order_reference'] ?? NULL,
+                'payment_processor_id' => $result['payment_processor_id'] ?? $this->_paymentProcessor['id'],
+                'total_amount' => $result['total_amount'],
+                'fee_amount' => $result['fee_amount'] ?? NULL,
+                // @fixme: trxn_date, card_type_id, pan_truncation are not parameters returned by doPayment - maybe get from $contribution->.. instead?
+                'trxn_date' => $result['receive_date'] ?? NULL,
+                'card_type_id' => $result['card_type_id'] ?? NULL,
+                'pan_truncation' => $result['pan_truncation'] ?? NULL,
+              ]);
+            }
+            catch (CiviCRM_API3_Exception $e) {
+              if ($e->getErrorCode() != 'contribution_completed') {
+                \Civi::log()->error('CRM_Contribute_Form_Contribution_Confirm::completeTransaction CiviCRM_API3_Exception: ' . $e->getMessage());
+                throw new CRM_Core_Exception('Failed to update contribution in database');
+              }
+            }
+          }
+
           $this->completeTransaction($result['result'], $result['contribution_id']);
         }
       }
@@ -2554,6 +2577,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           'payment_processor_id' => $result['payment_processor_id'] ?? $this->_paymentProcessor['id'],
           'total_amount' => $result['total_amount'],
           'fee_amount' => $result['fee_amount'] ?? NULL,
+          // @fixme: trxn_date, card_type_id, pan_truncation are not parameters returned by doPayment - maybe get from $contribution->.. instead?
           'trxn_date' => $result['receive_date'] ?? NULL,
           'card_type_id' => $result['card_type_id'] ?? NULL,
           'pan_truncation' => $result['pan_truncation'] ?? NULL,

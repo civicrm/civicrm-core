@@ -1465,11 +1465,14 @@ abstract class CRM_Core_Payment {
    *
    * Payment processors should set payment_status_id if it set the status to Refunded in case the transaction is successful
    *
-   * @param array $params
+   * @param array|PropertyBag $params
    *
+   * @return array
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function doRefund(&$params) {}
+  public function doRefund(&$params) {
+    return [];
+  }
 
   /**
    * Query payment processor for details about a transaction.

@@ -1132,7 +1132,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
       try {
         $completeStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-        $result = $payment->doPayment($paymentParams, 'contribute');
+        $result = $payment->doPayment($paymentParams);
         $this->assign('trxn_id', $result['trxn_id']);
         $contribution->trxn_id = $result['trxn_id'];
         /* Our scenarios here are
@@ -1147,6 +1147,19 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
          */
         if ($result['payment_status_id'] == $completeStatusId) {
           try {
+            civicrm_api3('Payment', 'create', [
+              'contribution_id' => $contribution->id,
+              'trxn_id' => $result['trxn_id'],
+              'payment_processor_id' => $this->_paymentProcessor['id'],
+              'total_amount' => $contribution->total_amount,
+              'fee_amount' => $result['fee_amount'] ?? NULL,
+              'order_reference' => $result['order_reference'] ?? NULL,
+              'is_send_contribution_notification' => 0,
+              // @fixme: trxn_date, card_type_id, pan_truncation are not parameters returned by doPayment - maybe get from $contribution->.. instead?
+              'trxn_date' => $contribution->receive_date,
+              'card_type_id' => $paymentParams['card_type_id'] ?? NULL,
+              'pan_truncation' => $paymentParams['pan_truncation'] ?? NULL,
+            ]);
             civicrm_api3('contribution', 'completetransaction', [
               'id' => $contribution->id,
               'trxn_id' => $result['trxn_id'],
@@ -1158,7 +1171,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
               'is_email_receipt' => FALSE,
             ]);
             // This has now been set to 1 in the DB - declare it here also
-            $contribution->contribution_status_id = 1;
+            // $contribution->contribution_status_id = 1;
+            // Refresh the contribution as it will have been updated to Completed in the DB
+            $contribution->find(TRUE);
           }
           catch (CiviCRM_API3_Exception $e) {
             if ($e->getErrorCode() != 'contribution_completed') {
