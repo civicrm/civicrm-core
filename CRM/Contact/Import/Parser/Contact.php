@@ -2335,8 +2335,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         continue;
       }
       $relatedContactFieldName = $relatedContactKey ? $mappedField['name'] : NULL;
-      // RelatedContactType is not part of the mapping but rather calculated from the relationship.
-      $relatedContactType = $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction']);
       $relatedContactLocationTypeID = $relatedContactKey ? $mappedField['location_type_id'] : NULL;
       $relatedContactWebsiteTypeID = $relatedContactKey ? $mappedField['website_type_id'] : NULL;
 
@@ -2358,11 +2356,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
       else {
         if (!isset($params[$relatedContactKey])) {
-          $params[$relatedContactKey] = [];
-        }
-
-        if (!isset($params[$relatedContactKey]['contact_type']) && !empty($relatedContactType)) {
-          $params[$relatedContactKey]['contact_type'] = $relatedContactType;
+          $params[$relatedContactKey] = ['contact_type' => $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction'])];
         }
 
         if (isset($relatedContactLocationTypeID) && !empty($importedValue)) {
