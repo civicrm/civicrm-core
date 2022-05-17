@@ -1041,7 +1041,7 @@ class CRM_Financial_BAO_Order {
     else {
       $lineItem['line_total'] = $this->getOverrideTotalAmount();
     }
-    $lineItem['unit_price'] = $lineItem['line_total'] / $lineItem['qty'];
+    $lineItem['unit_price'] = $lineItem['line_total'] / ($lineItem['qty'] ?? 1);
   }
 
   /**
