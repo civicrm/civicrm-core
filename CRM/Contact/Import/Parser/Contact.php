@@ -2872,15 +2872,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   public function validateValues(array $values): void {
     $params = $this->getMappedRow($values);
-    $this->validateRequiredContactFields($params['contact_type'], $params, $this->isUpdateExistingContacts());
-    foreach ($params as $key => $value) {
-      // If the key is a relationship key - eg. 5_a_b or 10_b_a
-      // then the value is an array that describes an existing contact.
-      // We need to check the fields are present to identify or create this
-      // contact.
-      if (preg_match('/^\d+_[a|b]_[a|b]$/', $key)) {
-        $this->validateRequiredContactFields($value['contact_type'], $value, TRUE, '(' . $this->getRelatedContactLabel(substr($key, 0, -4), substr($key, -3)) . ')');
-      }
+    $contacts = array_merge(['0' => $params], $this->getRelatedContactsParams($params));
+    foreach ($contacts as $value) {
+      // If we are referencing a related contact, or are in update mode then we
+      // don't need all the required fields if we have enough to find an existing contact.
+      $useExistingMatchFields = !empty($value['relationship_type_id']) || $this->isUpdateExistingContacts();
+      $this->validateRequiredContactFields($value['contact_type'], $value, $useExistingMatchFields, !empty($value['relationship_label']) ? '(' . $value['relationship_label'] . ')' : '');
     }
 
     //check for duplicate external Identifier
@@ -2961,7 +2958,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       return NULL;
     }
     $relationshipField = 'contact_type_' . substr($relationshipDirection, -1);
-    return $this->getRelationshipType($relationshipTypeID, $relationshipDirection)[$relationshipField];
+    return $this->getRelationshipType($relationshipTypeID)[$relationshipField];
   }
 
   /**
@@ -2976,7 +2973,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   protected function getRelatedContactLabel($relationshipTypeID, $relationshipDirection): ?string {
     $relationshipField = 'label_' . $relationshipDirection;
-    return $this->getRelationshipType($relationshipTypeID, $relationshipDirection)[$relationshipField];
+    return $this->getRelationshipType($relationshipTypeID)[$relationshipField];
   }
 
   /**
@@ -3017,6 +3014,38 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     else {
       $contactArray[$fieldName] = $this->getTransformedFieldValue($fieldName, $importedValue);
     }
+  }
+
+  /**
+   * Get any related contacts designated for update.
+   *
+   * This extracts the parts that relate to separate related
+   * contacts from the 'params' array.
+   *
+   * It is probably a bit silly not to nest them more clearly in
+   * `getParams` in the first place & maybe in future we can do that.
+   *
+   * @param array $params
+   *
+   * @return array
+   *   e.g ['5_a_b' => ['contact_type' => 'Organization', 'organization_name' => 'The Firm']]
+   * @throws \API_Exception
+   */
+  protected function getRelatedContactsParams(array $params): array {
+    $relatedContacts = [];
+    foreach ($params as $key => $value) {
+      // If the key is a relationship key - eg. 5_a_b or 10_b_a
+      // then the value is an array that describes an existing contact.
+      // We need to check the fields are present to identify or create this
+      // contact.
+      if (preg_match('/^\d+_[a|b]_[a|b]$/', $key)) {
+        $value['relationship_type_id'] = substr($key, 0, -4);
+        $value['relationship_direction'] = substr($key, -3);
+        $value['relationship_label'] = $this->getRelationshipLabel($value['relationship_type_id'], $value['relationship_direction']);
+        $relatedContacts[$key] = $value;
+      }
+    }
+    return $relatedContacts;
   }
 
 }
