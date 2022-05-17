@@ -42,27 +42,33 @@ function _civicrm_api3_deprecated_duplicate_formatted_contact($params) {
 
     if ($contact->find(TRUE)) {
       if ($params['contact_type'] != $contact->contact_type) {
-        return civicrm_api3_create_error("Mismatched contact IDs OR Mismatched contact Types");
+        return ['is_error' => 1, 'error_message' => 'Mismatched contact IDs OR Mismatched contact Types'];
       }
-
-      $error = CRM_Core_Error::createError("Found matching contacts: $contact->id",
-        CRM_Core_Error::DUPLICATE_CONTACT,
-        'Fatal', $contact->id
-      );
-      return civicrm_api3_create_error($error->pop());
+      return [
+        'is_error' => 1,
+        'error_message' => [
+          'code' => CRM_Core_Error::DUPLICATE_CONTACT,
+          'params' => $contact->id,
+          'level' => 'Fatal',
+          'message' => "Found matching contacts: $contact->id",
+        ],
+      ];
     }
   }
   else {
     $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, $params['contact_type'], 'Unsupervised');
 
     if (!empty($ids)) {
-      $ids = implode(',', $ids);
-      $error = CRM_Core_Error::createError("Found matching contacts: $ids",
-        CRM_Core_Error::DUPLICATE_CONTACT,
-        'Fatal', $ids
-      );
-      return civicrm_api3_create_error($error->pop());
+      return [
+        'is_error' => 1,
+        'error_message' => [
+          'code' => CRM_Core_Error::DUPLICATE_CONTACT,
+          'params' => $ids,
+          'level' => 'Fatal',
+          'message' => 'Found matching contacts: ' . implode(',', $ids),
+        ],
+      ];
     }
   }
-  return civicrm_api3_create_success(TRUE);
+  return ['is_error' => 0];
 }
