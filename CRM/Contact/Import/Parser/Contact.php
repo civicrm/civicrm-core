@@ -300,28 +300,26 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     $params = $this->getMappedRow($values);
     $formatted = [
-      'contact_type' => $this->_contactType,
+      'contact_type' => $this->getContactType(),
     ];
 
     $contactFields = CRM_Contact_DAO_Contact::import();
 
-    if (!empty($this->_contactSubType)) {
-      $params['contact_sub_type'] = $this->_contactSubType;
-    }
+    $params['contact_sub_type'] = $this->getContactSubType() ?: ($params['contact_sub_type'] ?? NULL);
 
-    if ($subType = CRM_Utils_Array::value('contact_sub_type', $params)) {
-      if (CRM_Contact_BAO_ContactType::isExtendsContactType($subType, $this->_contactType, FALSE, 'label')) {
-        $subTypes = CRM_Contact_BAO_ContactType::subTypePairs($this->_contactType, FALSE, NULL);
-        $params['contact_sub_type'] = array_search($subType, $subTypes);
-      }
-      elseif (!CRM_Contact_BAO_ContactType::isExtendsContactType($subType, $this->_contactType)) {
-        $message = "Mismatched or Invalid Contact Subtype.";
-        array_unshift($values, $message);
-        return CRM_Import_Parser::NO_MATCH;
+    if ($params['contact_sub_type']) {
+      if (CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'], $this->getContactType(), FALSE, 'label')) {
+        // I think this bit is switching a passed in label to
+        // a name.
+        $subTypes = CRM_Contact_BAO_ContactType::subTypePairs($this->getContactType(), FALSE, NULL);
+        $params['contact_sub_type'] = array_search($params['contact_sub_type'], $subTypes);
       }
     }
 
     try {
+      if ($params['contact_sub_type'] && !CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'], $this->getContactType())) {
+        throw new CRM_Core_Exception('Mismatched or Invalid Contact Subtype.', CRM_Import_Parser::NO_MATCH);
+      }
       $params['id'] = $formatted['id'] = $this->lookupContactID($params, ($this->isSkipDuplicates() || $this->isIgnoreDuplicates()));
     }
     catch (CRM_Core_Exception $e) {

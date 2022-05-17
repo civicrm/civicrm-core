@@ -15,6 +15,7 @@
  */
 
 use Civi\Api4\Contact;
+use Civi\Api4\RelationshipType;
 use Civi\Api4\UserJob;
 
 /**
@@ -37,7 +38,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * Tear down after test.
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_email', 'civicrm_user_job'], TRUE);
+    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_email', 'civicrm_user_job', 'civicrm_relationship'], TRUE);
+    RelationshipType::delete()->addWhere('name_a_b', '=', 'Dad to')->execute();
     parent::tearDown();
   }
 
@@ -250,9 +252,11 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test updating an existing contact with external_identifier match but subtype mismatch.
    *
+   * The subtype is updated, as there is no conflicting contact data.
+   *
    * @throws \Exception
    */
-  public function testImportParserWithUpdateWithExternalIdentifierSubtypeMismatch(): void {
+  public function testImportParserWithUpdateWithExternalIdentifierSubtypeChange(): void {
     $contactID = $this->individualCreate(['external_identifier' => 'billy', 'first_name' => 'William', 'contact_sub_type' => 'Parent']);
     $this->runImport([
       'external_identifier' => 'billy',
@@ -1284,6 +1288,28 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $parser->setUserJobID($userJobID);
     $parser->init();
     return [$dataSource, $parser];
+  }
+
+  /**
+   * @param int $contactID
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function addChild(int $contactID): void {
+    $relatedContactID = $this->individualCreate();
+    $relationshipTypeID = RelationshipType::create()->setValues([
+      'name_a_b' => 'Dad to',
+      'name_b_a' => 'Sleep destroyer of',
+      'contact_type_a' => 'Individual',
+      'contact_type_b' => 'Individual',
+      'contact_sub_type_a' => 'Parent',
+    ])->execute()->first()['id'];
+    \Civi\Api4\Relationship::create()->setValues([
+      'relationship_type_id' => $relationshipTypeID,
+      'contact_id_a' => $contactID,
+      'contact_id_b' => $relatedContactID,
+    ])->execute();
   }
 
   /**
