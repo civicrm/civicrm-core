@@ -60,8 +60,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    *   a table-keyed array of field-keyed arrays holding supported fields' titles
    */
   public static function supportedFields($requestedType) {
-    static $fields = NULL;
-    if (!$fields) {
+    if (!isset(Civi::$statics[__CLASS__]['supportedFields'])) {
       // this is needed, as we're piggy-backing importableFields() below
       $replacements = [
         'civicrm_country.name' => 'civicrm_address.country_id',
@@ -109,8 +108,9 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
         // Justice League vs The Justice League but these could have the same sort_name if 'the the'
         // exension is installed (https://github.com/eileenmcnaughton/org.wikimedia.thethe)
         $fields[$ctype]['civicrm_contact']['sort_name'] = ts('Sort Name');
-        // add custom data fields
-        foreach (CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1) as $key => $cg) {
+
+        // add all custom data fields including those only for sub_types.
+        foreach (CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1, [], NULL, TRUE, NULL, TRUE) as $key => $cg) {
           if (!is_int($key)) {
             continue;
           }
@@ -119,9 +119,13 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
           }
         }
       }
+      //Does this have to run outside of cache?
+      CRM_Utils_Hook::dupeQuery(CRM_Core_DAO::$_nullObject, 'supportedFields', $fields);
+      Civi::$statics[__CLASS__]['supportedFields'] = $fields;
     }
-    CRM_Utils_Hook::dupeQuery(CRM_Core_DAO::$_nullObject, 'supportedFields', $fields);
-    return !empty($fields[$requestedType]) ? $fields[$requestedType] : [];
+
+    return Civi::$statics[__CLASS__]['supportedFields'][$requestedType] ?? [];
+
   }
 
   /**

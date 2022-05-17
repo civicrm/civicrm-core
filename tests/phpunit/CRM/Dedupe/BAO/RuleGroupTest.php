@@ -62,6 +62,8 @@ class CRM_Dedupe_DAO_TestEntity extends CRM_Core_DAO {
  */
 class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
 
+  use CRMTraits_Custom_CustomDataTrait;
+
   /**
    * IDs of created contacts.
    *
@@ -107,21 +109,13 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that sort_name is included in supported fields.
+   * Get the list of supportedFields to test against.
    *
-   * This feels like kind of a brittle test but since I debated actually making it
-   * importable in the schema & bottled out at least some degree of test support
-   * to ensure the field remains 'hacked in' seems important.
+   * This is a statically maintained (in this test list).
    *
-   * This will at least surface any changes that affect this function.
-   *
-   * In general we do have a bit of a problem with having overloaded the meaning of
-   * importable & exportable fields.
    */
-  public function testSupportedFields() {
-    $fields = CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields('Organization');
-
-    $this->assertEquals([
+  public function getSupportedFields() {
+    return [
       'civicrm_address' =>
         [
           'name' => 'Address Name',
@@ -197,7 +191,64 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
         [
           'url' => 'Website',
         ],
-    ], $fields);
+    ];
+  }
+
+  /**
+   * Test that sort_name is included in supported fields.
+   *
+   * This feels like kind of a brittle test but since I debated actually making it
+   * importable in the schema & bottled out at least some degree of test support
+   * to ensure the field remains 'hacked in' seems important.
+   *
+   * This will at least surface any changes that affect this function.
+   *
+   * In general we do have a bit of a problem with having overloaded the meaning of
+   * importable & exportable fields.
+   */
+  public function testSupportedFields() {
+    $fields = CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields('Organization');
+
+    $this->assertEquals($this->getSupportedFields(), $fields);
+  }
+
+  /**
+   * Test that custom_fields are included in supported fields.
+   *
+   */
+  public function testSupportedCustomFields() {
+    //Create custom group with fields of all types to test.
+    $customGroup = $this->createCustomGroup(['extends' => 'Organization']);
+
+    $customGroupID = $this->ids['CustomGroup']['Custom Group'];
+    $cf = $this->createTextCustomField(['custom_group_id' => $customGroupID]);
+
+    $fields = $this->getSupportedFields();
+    $fields[$this->getCustomGroupTable()][$cf['column_name']] = 'Custom Group' . ' : ' . $cf['label'];
+
+    $this->assertEquals($fields, CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields('Organization'));
+  }
+
+  /**
+   * Test that custom_fields for a sub_type are included in supported fields.
+   *
+   * dev/core#2300 Can not use Custom Fields defined on a contact_sub_type in
+   * dedupe rule.
+   *
+   */
+  public function testSupportedCustomFieldsSubtype() {
+
+    //Create custom group with fields of all types to test.
+    $contactType = $this->callAPISuccess('ContactType', 'create', ['name' => 'Big Bank', 'label' => 'biggee', 'parent_id' => 'Organization']);
+    $customGroup = $this->createCustomGroup(['extends' => 'Organization', 'extends_entity_column_value' => ['Big_Bank']]);
+
+    $customGroupID = $this->ids['CustomGroup']['Custom Group'];
+    $cf = $this->createTextCustomField(['custom_group_id' => $customGroupID]);
+
+    $fields = $this->getSupportedFields();
+    $fields[$this->getCustomGroupTable()][$cf['column_name']] = 'Custom Group' . ' : ' . $cf['label'];
+
+    $this->assertEquals($fields, CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields('Organization'));
   }
 
   /**
