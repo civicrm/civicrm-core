@@ -180,6 +180,7 @@
         var fnName = expr.split('(')[0],
           argString = expr.substr(fnName.length + 1, expr.length - fnName.length - 2);
         info.fn = _.find(CRM.crmSearchAdmin.functions, {name: fnName || 'e'});
+        info.data_type = (info.fn && info.fn.data_type) || null;
 
         function getKeyword(whitelist) {
           var keyword;
@@ -238,6 +239,9 @@
             }
           }
         });
+        if (!info.data_type && info.args.length) {
+          info.data_type = info.args[0].data_type;
+        }
       }
       // @param {String} arg
       function parseArg(arg) {
@@ -245,11 +249,13 @@
         if (arg && !isNaN(arg)) {
           return {
             type: 'number',
+            data_type: Number.isInteger(+arg) ? 'Integer' : 'Float',
             value: +arg
           };
         } else if (_.includes(['"', "'"], arg.substr(0, 1))) {
           return {
             type: 'string',
+            data_type: 'String',
             value: arg.substr(1, arg.length - 2)
           };
         } else if (arg) {
@@ -262,6 +268,7 @@
               value: arg,
               path: split[0],
               field: fieldAndJoin.field,
+              data_type: fieldAndJoin.field.data_type,
               join: fieldAndJoin.join,
               prefix: prefixPos > 0 ? split[0].substring(0, prefixPos) : '',
               suffix: !split[1] ? '' : ':' + split[1]
@@ -274,7 +281,7 @@
           return;
         }
         var splitAs = expr.split(' AS '),
-          info = {fn: null, args: [], alias: _.last(splitAs)},
+          info = {fn: null, args: [], alias: _.last(splitAs), data_type: null},
           bracketPos = expr.indexOf('(');
         if (bracketPos >= 0 && !_.findWhere(CRM.crmSearchAdmin.pseudoFields, {name: expr})) {
           parseFnArgs(info, splitAs[0]);
@@ -282,6 +289,7 @@
           var arg = parseArg(splitAs[0]);
           if (arg) {
             arg.param = 0;
+            info.data_type = arg.data_type;
             info.args.push(arg);
           }
         }
@@ -330,6 +338,25 @@
         parseExpr: parseExpr,
         getDefaultLabel: getDefaultLabel,
         fieldToColumn: fieldToColumn,
+        // Supply default aggregate function appropriate to the data_type
+        getDefaultAggregateFn: function(info) {
+          var ret = {flag_before: ''};
+          switch (info.data_type) {
+            case 'Integer':
+              // For the `id` field, default to COUNT, otherwise SUM
+              ret.fnName = (info.args[0] && info.args[0].field && info.args[0].field.name === 'id') ? 'COUNT' : 'SUM';
+              break;
+
+            case 'Float':
+              ret.fnName = 'SUM';
+              break;
+
+            default:
+              ret.fnName = 'GROUP_CONCAT';
+              ret.flag_before = 'DISTINCT ';
+          }
+          return ret;
+        },
         // Find all possible search columns that could serve as contact_id for a smart group
         getSmartGroupColumns: function(api_entity, api_params) {
           var joins = _.pluck((api_params.join || []), 0);

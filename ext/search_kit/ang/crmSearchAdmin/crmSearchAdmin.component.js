@@ -12,7 +12,6 @@
         afformLoad,
         fieldsForJoinGetters = {};
 
-      this.DEFAULT_AGGREGATE_FN = 'GROUP_CONCAT';
       this.afformEnabled = 'org.civicrm.afform' in CRM.crmSearchAdmin.modules;
       this.afformAdminEnabled = 'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
       this.displayTypes = _.indexBy(CRM.crmSearchAdmin.displayTypes, 'id');
@@ -331,7 +330,8 @@
           if (ctrl.canAggregate(col)) {
             // Ensure all non-grouped columns are aggregated if using GROUP BY
             if (!info.fn || info.fn.category !== 'aggregate') {
-              ctrl.savedSearch.api_params.select[pos] = ctrl.DEFAULT_AGGREGATE_FN + '(DISTINCT ' + fieldExpr + ') AS ' + ctrl.DEFAULT_AGGREGATE_FN + '_' + fieldExpr.replace(/[.:]/g, '_');
+              var dfl = searchMeta.getDefaultAggregateFn(info);
+              ctrl.savedSearch.api_params.select[pos] = dfl.fnName + '(' + dfl.flag_before + fieldExpr + ') AS ' + dfl.fnName + '_' + fieldExpr.replace(/[.:]/g, '_');
             }
           } else {
             // Remove aggregate functions when no grouping
