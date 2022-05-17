@@ -2352,9 +2352,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
 
         if (!isset($params[$fieldName])) {
-          if (!isset($relatedContactKey)) {
-            $params[$fieldName] = $importedValue;
-          }
+          $params[$fieldName] = $importedValue;
         }
 
       }
