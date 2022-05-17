@@ -223,11 +223,12 @@ class CRM_Utils_PDF_Utils {
     try {
       // address https://github.com/mileszs/wicked_pdf/pull/920
       $snappy->setOption('enable-local-file-access', TRUE);
-    } catch (\InvalidArgumentException $x) {
+    }
+    catch (\InvalidArgumentException $x) {
       // must be wkhtmltopdf v <=0.12.5
       // so, fine...
     }
-    
+
     $pdf = $snappy->getOutputFromHtml($html);
     if ($output) {
       return $pdf;
