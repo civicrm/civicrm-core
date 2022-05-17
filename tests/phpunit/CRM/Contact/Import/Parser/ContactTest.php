@@ -271,16 +271,26 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testImportParserWithUpdateWithExternalIdentifierTypeMismatch(): void {
+  public function testImportParserWithUpdateWithTypeMismatch(): void {
     $contactID = $this->organizationCreate(['external_identifier' => 'billy']);
     $this->runImport([
       'external_identifier' => 'billy',
       'nick_name' => 'Old Bill',
-    ], CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::NO_MATCH);
+    ], CRM_Import_Parser::DUPLICATE_UPDATE, FALSE);
     $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contactID]);
     $this->assertEquals('', $contact['nick_name']);
     $this->assertEquals('billy', $contact['external_identifier']);
     $this->assertEquals('Organization', $contact['contact_type']);
+
+    $this->runImport([
+      'id' => $contactID,
+      'nick_name' => 'Old Bill',
+    ], CRM_Import_Parser::DUPLICATE_UPDATE, FALSE);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contactID]);
+    $this->assertEquals('', $contact['nick_name']);
+    $this->assertEquals('billy', $contact['external_identifier']);
+    $this->assertEquals('Organization', $contact['contact_type']);
+
   }
 
   /**
