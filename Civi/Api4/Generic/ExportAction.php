@@ -129,6 +129,8 @@ class ExportAction extends AbstractAction {
       }
     }
     $name = ($parentName ?? '') . $entityType . '_' . ($record['name'] ?? count($this->exportedEntities[$entityType]));
+    // Ensure safe characters, max length
+    $name = \CRM_Utils_String::munge($name, '_', 127);
     $result[] = [
       'name' => $name,
       'entity' => $entityType,
