@@ -1241,8 +1241,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     foreach ($fields as $index => $field) {
       $mapper[] = [$field, $mapperLocType[$index] ?? NULL, $field === 'phone' ? 1 : NULL];
     }
-    $userJobID = $this->getUserJobID(['mapper' => $mapper, 'onDuplicate' => $onDuplicateAction]);
-    $parser = new CRM_Contact_Import_Parser_Contact($fields, $mapperLocType);
+    $userJobID = $this->getUserJobID(['mapper' => $mapper, 'onDuplicate' => $onDuplicateAction, 'dedupe_rule_id' => $ruleGroupId]);
+    $parser = new CRM_Contact_Import_Parser_Contact($fields);
     $parser->setUserJobID($userJobID);
     $parser->_dedupeRuleGroupID = $ruleGroupId;
     $parser->init();
@@ -1412,6 +1412,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
           'dataSource' => 'CRM_Import_DataSource_SQL',
           'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
           'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+          'dedupe_rule_id' => NULL,
         ], $submittedValues),
       ],
       'status_id:name' => 'draft',

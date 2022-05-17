@@ -200,6 +200,20 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
+   * Did the user specify duplicates checking should be skipped, resulting in possible duplicate contacts.
+   *
+   * Note we still need to check for external_identifier as it will hard-fail
+   * if we duplicate.
+   *
+   * @return bool
+   *
+   * @throws \API_Exception
+   */
+  private function isIgnoreDuplicates(): bool {
+    return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_NOCHECK;
+  }
+
+  /**
    * Handle the values in preview mode.
    *
    * Function will be deprecated in favour of validateValues.
@@ -291,42 +305,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     $contactFields = CRM_Contact_DAO_Contact::import();
 
-    //check if external identifier exists in database
-    if (!empty($params['external_identifier']) && (!empty($params['id']) || in_array($onDuplicate, [
-      CRM_Import_Parser::DUPLICATE_SKIP,
-      CRM_Import_Parser::DUPLICATE_NOCHECK,
-    ]))) {
-
-      $extIDResult = civicrm_api3('Contact', 'get', [
-        'external_identifier' => $params['external_identifier'],
-        'showAll' => 'all',
-        'return' => ['id', 'contact_is_deleted'],
-      ]);
-      if (isset($extIDResult['id'])) {
-        // record with matching external identifier does exist.
-        $internalCid = $extIDResult['id'];
-        if ($internalCid != CRM_Utils_Array::value('id', $params)) {
-          if ($extIDResult['values'][$internalCid]['contact_is_deleted'] == 1) {
-            // And it is deleted. What to do? If we skip it, they user
-            // will be under the impression that the record exists in
-            // the database, yet they won't be able to find it. If we
-            // don't skip it, the database will try to insert a new record
-            // with an external_identifier that is non-unique. So...
-            // we will update this contact to remove the external_identifier
-            // and let a new record be created.
-            $update_params = ['id' => $internalCid, 'external_identifier' => ''];
-            civicrm_api3('Contact', 'create', $update_params);
-          }
-          else {
-            $errorMessage = ts('External ID already exists in Database.');
-            array_unshift($values, $errorMessage);
-            $this->setImportStatus((int) $values[count($values) - 1], 'ERROR', $errorMessage);
-            return CRM_Import_Parser::DUPLICATE;
-          }
-        }
-      }
-    }
-
     if (!empty($this->_contactSubType)) {
       $params['contact_sub_type'] = $this->_contactSubType;
     }
@@ -343,23 +321,17 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
     }
 
+    try {
+      $params['id'] = $formatted['id'] = $this->lookupContactID($params, ($this->isSkipDuplicates() || $this->isIgnoreDuplicates()));
+    }
+    catch (CRM_Core_Exception $e) {
+      $statuses = [CRM_Import_Parser::DUPLICATE => 'DUPLICATE', CRM_Import_Parser::ERROR => 'ERROR', CRM_Import_Parser::NO_MATCH => 'invalid_no_match'];
+      $this->setImportStatus((int) $values[count($values) - 1], $statuses[$e->getErrorCode()], $e->getMessage());
+      return FALSE;
+    }
     // Get contact id to format common data in update/fill mode,
     // prioritising a dedupe rule check over an external_identifier check, but falling back on ext id.
-    if ($this->_updateWithId && empty($params['id'])) {
-      try {
-        $possibleMatches = $this->getPossibleContactMatches($params);
-      }
-      catch (CRM_Core_Exception $e) {
-        $errorMessage = $e->getMessage();
-        array_unshift($values, $errorMessage);
 
-        $this->setImportStatus((int) $values[count($values) - 1], 'ERROR', $errorMessage);
-        return CRM_Import_Parser::ERROR;
-      }
-      foreach ($possibleMatches as $possibleID) {
-        $params['id'] = $formatted['id'] = $possibleID;
-      }
-    }
     //format common data, CRM-4062
     $this->formatCommonData($params, $formatted, $contactFields);
 
@@ -1892,53 +1864,31 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @see https://issues.civicrm.org/jira/browse/CRM-17275
    *
    * @param array $params
+   * @param int|null $extIDMatch
+   * @param int|null $dedupeRuleID
    *
-   * @return array
-   *   IDs of possible matches.
+   * @return int|null
+   *   IDs of a possible.
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  protected function getPossibleContactMatches($params) {
-    $extIDMatch = NULL;
-
-    if (!empty($params['external_identifier'])) {
-      // Check for any match on external id, deleted or otherwise.
-      $extIDContact = civicrm_api3('Contact', 'get', [
-        'external_identifier' => $params['external_identifier'],
-        'showAll' => 'all',
-        'return' => ['id', 'contact_is_deleted'],
-      ]);
-      if (isset($extIDContact['id'])) {
-        $extIDMatch = $extIDContact['id'];
-
-        if ($extIDContact['values'][$extIDMatch]['contact_is_deleted'] == 1) {
-          // If the contact is deleted, update external identifier to be blank
-          // to avoid key error from MySQL.
-          $params = ['id' => $extIDMatch, 'external_identifier' => ''];
-          civicrm_api3('Contact', 'create', $params);
-
-          // And now it is no longer a match.
-          $extIDMatch = NULL;
-        }
-      }
-    }
-    $checkParams = ['check_permissions' => FALSE, 'match' => $params];
-    $checkParams['match']['contact_type'] = $this->_contactType;
-    $checkParams['dedupe_rule_id'] = $this->_dedupeRuleGroupID ?? NULL;
-
+  protected function getPossibleContactMatch(array $params, ?int $extIDMatch, ?int $dedupeRuleID): ?int {
+    $checkParams = ['check_permissions' => FALSE, 'match' => $params, 'dedupe_rule_id' => $dedupeRuleID];
     $possibleMatches = civicrm_api3('Contact', 'duplicatecheck', $checkParams);
     if (!$extIDMatch) {
-      return array_keys($possibleMatches['values']);
+      // Historically we have used the last ID - it is not clear if this was
+      // deliberate.
+      return array_key_last($possibleMatches['values']);
     }
     if ($possibleMatches['count']) {
       if (array_key_exists($extIDMatch, $possibleMatches['values'])) {
-        return [$extIDMatch];
+        return $extIDMatch;
       }
       throw new CRM_Core_Exception(ts(
         'Matching this contact based on the de-dupe rule would cause an external ID conflict'));
     }
-    return [$extIDMatch];
+    return $extIDMatch;
   }
 
   /**
@@ -3047,6 +2997,76 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
     }
     return $relatedContacts;
+  }
+
+  /**
+   * Look up for an existing contact with the given external_identifier.
+   *
+   * If the identifier is found on a deleted contact then it is not a match
+   * but it must be removed from that contact to allow the new contact to
+   * have that external_identifier.
+   *
+   * @param string|null $externalIdentifier
+   *
+   * @return int|null
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function lookupExternalIdentifier(?string $externalIdentifier): ?int {
+    if (!$externalIdentifier) {
+      return NULL;
+    }
+    // Check for any match on external id, deleted or otherwise.
+    $foundContact = civicrm_api3('Contact', 'get', [
+      'external_identifier' => $externalIdentifier,
+      'showAll' => 'all',
+      'sequential' => TRUE,
+      'return' => ['id', 'contact_is_deleted'],
+    ]);
+    if (empty($foundContact['id'])) {
+      return NULL;
+    }
+    if (!empty($foundContact['values'][0]['contact_is_deleted'])) {
+      // If the contact is deleted, update external identifier to be blank
+      // to avoid key error from MySQL.
+      $params = ['id' => $foundContact['id'], 'external_identifier' => ''];
+      civicrm_api3('Contact', 'create', $params);
+      return NULL;
+    }
+    return (int) $foundContact['id'];
+  }
+
+  /**
+   * Lookup the contact's contact ID.
+   *
+   * @param array $params
+   * @param bool $isDuplicateIfExternalIdentifierExists
+   *
+   * @return int|null
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function lookupContactID(array $params, bool $isDuplicateIfExternalIdentifierExists): ?int {
+    $extIDMatch = $this->lookupExternalIdentifier($params['external_identifier'] ?? NULL);
+    $contactID = !empty($params['id']) ? (int) $params['id'] : NULL;
+    //check if external identifier exists in database
+    if ($extIDMatch && $contactID && $extIDMatch !== $contactID) {
+      throw new CRM_Core_Exception(ts('Existing external ID does not match the imported contact ID.'), CRM_Import_Parser::ERROR);
+    }
+    if ($extIDMatch && $isDuplicateIfExternalIdentifierExists) {
+      throw new CRM_Core_Exception(ts('External ID already exists in Database.'), CRM_Import_Parser::DUPLICATE);
+    }
+    if ($contactID) {
+      return $contactID;
+    }
+    // Time to see if we can find an existing contact ID to make this an update
+    // not a create.
+    if ($extIDMatch || $this->isUpdateExistingContacts()) {
+      return $this->getPossibleContactMatch($params, $extIDMatch, $this->getSubmittedValue('dedupe_rule_id'));
+    }
+    return NULL;
   }
 
 }
