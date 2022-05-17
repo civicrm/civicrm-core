@@ -1105,6 +1105,10 @@ abstract class CRM_Import_Parser {
    * @return array
    */
   protected function getIdsOfMatchingContacts(array $formatted):array {
+    if ($formatted['id'] ?? NULL) {
+      return [$formatted['id']];
+    }
+
     // the call to the deprecated function seems to add no value other that to do an additional
     // check for the contact_id & type.
     $error = _civicrm_api3_deprecated_duplicate_formatted_contact($formatted);
