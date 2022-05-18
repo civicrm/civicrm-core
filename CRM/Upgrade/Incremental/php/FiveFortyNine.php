@@ -21,20 +21,35 @@
  */
 class CRM_Upgrade_Incremental_php_FiveFortyNine extends CRM_Upgrade_Incremental_Base {
 
+  /**
+   * When executing 5.49.2 upgrade-step, it decides whether to fix limit-to. Remember that decision.
+   *
+   * Note: You cannot _generally_ use object-properties to communicate between functions in this class
+   * (because they reset in diff AJAX requests).
+   *
+   * However, you can _specifically_ communicate between `upgrade_N_N_N()` and `setPostUpgradeMessage()`.
+   * This is because they are guaranteed to run in the same call (as part of `doIncrementalUpgradeStep()`).
+   *
+   * @var bool|null
+   */
+  private $executedLimitToFix;
+
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
-    if ($rev == '5.49.0' || $rev == '5.49.1') {
-      $preUpgradeMessage .= '<p>' . ts('This site previously executed an early version of 5.49, which may have incorrectly modified some scheduled reminders. Some records (%1) should be inspected for accuracy. <a %2>(Learn more...)</a>', [
-        1 => CRM_Core_DAO::singleValueQuery("SELECT GROUP_CONCAT(id) FROM civicrm_action_schedule WHERE limit_to=0 AND (recipient_manual IS NOT NULL OR group_id IS NOT NULL)"),
-        2 => 'target="blank" href="https://civicrm.org/redirect/reminders-5.49"',
-      ]);
+    $willExecuteLimitToFix = (bool) version_compare(CRM_Core_BAO_Domain::version(), '5.49.beta1', '>=');
+    if ($rev == '5.49.2' && $willExecuteLimitToFix) {
+      $message = $this->createLimitToMessage();
+      if ($message) {
+        $preUpgradeMessage .= "<p>{$message}</p>";
+      }
     }
   }
 
-  public function setpostUpgradeMessage(&$preUpgradeMessage, $rev) {
-    if ($rev == '5.49.beta1' || $rev == '5.49.0' || $rev == '5.49.1') {
-      $postUpgradeMessage .= '<br/>' . ts("WARNING: The column \"<code>civicrm_action_schedule.limit_to</code>\" is now a required boolean field. Please ensure all the schedule reminders (especially with 'Also Include' option) are correct. For more detail please check <a href='%1' target='_blank'>here</a>.", [
-        1 => 'https://lab.civicrm.org/dev/core/-/issues/3464',
-      ]);
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+    if ($rev == '5.49.2' && $this->executedLimitToFix === TRUE) {
+      $message = $this->createLimitToMessage();
+      if ($message) {
+        $postUpgradeMessage .= "<p><strong>" . ts('WARNING') . "</strong>: {$message}</p>";
+      }
     }
   }
 
@@ -91,8 +106,22 @@ class CRM_Upgrade_Incremental_php_FiveFortyNine extends CRM_Upgrade_Incremental_
     if (empty($startRev)) {
       throw new \RuntimeException("Error: Was somebody too clever about modifying the upgrader? We're missing a little-known but very-handy parameter!");
     }
-    if (version_compare($startRev, '5.49.beta1', '>=')) {
+    $this->executedLimitToFix = (bool) version_compare($startRev, '5.49.beta1', '>=');
+    if ($this->executedLimitToFix) {
       $this->addTask('Revert civicrm_action_schedule.limit_to to be NULL', 'changeBooleanColumnLimitTo');
+    }
+  }
+
+  public function createLimitToMessage(): ?string {
+    $suspectRecords = CRM_Core_DAO::singleValueQuery("SELECT GROUP_CONCAT(id SEPARATOR \", #\") FROM civicrm_action_schedule WHERE limit_to=0 AND (recipient_manual IS NOT NULL OR group_id IS NOT NULL)");
+    if (!empty($suspectRecords)) {
+      return ts('This site previously executed an early version of 5.49, which may have incorrectly modified some scheduled reminders. After upgrading, review these reminders (<code>%1</code>). <a %2>(Learn more...)</a>', [
+        1 => '#' . $suspectRecords,
+        2 => 'target="blank" href="https://civicrm.org/redirect/reminders-5.49"',
+      ]);
+    }
+    else {
+      return NULL;
     }
   }
 
