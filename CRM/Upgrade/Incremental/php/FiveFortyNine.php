@@ -21,13 +21,20 @@
  */
 class CRM_Upgrade_Incremental_php_FiveFortyNine extends CRM_Upgrade_Incremental_Base {
 
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+    if ($rev == '5.49.0' || $rev == '5.49.1') {
+      $preUpgradeMessage .= '<p>' . ts('This site previously executed an early version of 5.49, which may have incorrectly modified some scheduled reminders. Some records (%1) should be inspected for accuracy. <a %2>(Learn more...)</a>', [
+        1 => CRM_Core_DAO::singleValueQuery("SELECT GROUP_CONCAT(id) FROM civicrm_action_schedule WHERE limit_to=0 AND (recipient_manual IS NOT NULL OR group_id IS NOT NULL)"),
+        2 => 'target="blank" href="https://civicrm.org/redirect/reminders-5.49"',
+      ]);
+    }
+  }
+
   public function setpostUpgradeMessage(&$preUpgradeMessage, $rev) {
-    if ($rev == '5.49.beta1') {
-      if ($this->hasConfigBackendData()) {
-        $postUpgradeMessage .= '<br/>' . ts("WARNING: The column \"<code>civicrm_action_schedule.limit_to</code>\" is now a required boolean field. Please ensure all the schedule reminders (especially with 'Also Include' option) are correct. For more detail please check <a href='%1' target='_blank'>here</a>.", [
-          1 => 'https://lab.civicrm.org/dev/core/-/issues/3464',
-        ]);
-      }
+    if ($rev == '5.49.beta1' || $rev == '5.49.0' || $rev == '5.49.1') {
+      $postUpgradeMessage .= '<br/>' . ts("WARNING: The column \"<code>civicrm_action_schedule.limit_to</code>\" is now a required boolean field. Please ensure all the schedule reminders (especially with 'Also Include' option) are correct. For more detail please check <a href='%1' target='_blank'>here</a>.", [
+        1 => 'https://lab.civicrm.org/dev/core/-/issues/3464',
+      ]);
     }
   }
 
@@ -75,8 +82,8 @@ class CRM_Upgrade_Incremental_php_FiveFortyNine extends CRM_Upgrade_Incremental_
    *
    * @param string $rev
    */
-  public function upgrade_5_49_2($rev) {
-    if (version_compare(CRM_Core_BAO_Domain::version(), '5.49', '>=') {
+  public function upgrade_5_49_0($rev) {
+    if (version_compare(CRM_Core_BAO_Domain::version(), '5.49.beta1', '>=')) {
       $this->addtask('Revert civicrm_action_schedule.limit_to to be NULL', 'changeBooleanColumnLimitTo');
     }
   }
