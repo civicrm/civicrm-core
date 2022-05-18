@@ -93,6 +93,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   protected $metadataHandledFields = [
     'gender_id',
+    'contact_type',
+    'contact_sub_type',
   ];
 
   /**
@@ -434,27 +436,13 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
 
     $params = $this->getMappedRow($values);
-    $formatted = [
-      'contact_type' => $this->getContactType(),
-    ];
+    $formatted = array_filter(array_intersect_key($params, array_fill_keys($this->metadataHandledFields, 1)));
 
     $contactFields = CRM_Contact_DAO_Contact::import();
 
     $params['contact_sub_type'] = $this->getContactSubType() ?: ($params['contact_sub_type'] ?? NULL);
 
-    if ($params['contact_sub_type']) {
-      if (CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'], $this->getContactType(), FALSE, 'label')) {
-        // I think this bit is switching a passed in label to
-        // a name.
-        $subTypes = CRM_Contact_BAO_ContactType::subTypePairs($this->getContactType(), FALSE, NULL);
-        $params['contact_sub_type'] = array_search($params['contact_sub_type'], $subTypes);
-      }
-    }
-
     try {
-      if ($params['contact_sub_type'] && !CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'], $this->getContactType())) {
-        throw new CRM_Core_Exception('Mismatched or Invalid Contact Subtype.', CRM_Import_Parser::NO_MATCH);
-      }
       $params['id'] = $formatted['id'] = $this->lookupContactID($params, ($this->isSkipDuplicates() || $this->isIgnoreDuplicates()));
     }
     catch (CRM_Core_Exception $e) {
@@ -462,6 +450,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $this->setImportStatus((int) $values[count($values) - 1], $statuses[$e->getErrorCode()], $e->getMessage());
       return FALSE;
     }
+
     // Get contact id to format common data in update/fill mode,
     // prioritising a dedupe rule check over an external_identifier check, but falling back on ext id.
 
@@ -919,21 +908,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *   Contact DAO fields.
    */
   private function formatCommonData($params, &$formatted, $contactFields) {
-    $csType = [
-      CRM_Utils_Array::value('contact_type', $formatted),
-    ];
-
-    //CRM-5125
-    //add custom fields for contact sub type
-    if (!empty($this->_contactSubType)) {
-      $csType = $this->_contactSubType;
-    }
-
-    if ($relCsType = CRM_Utils_Array::value('contact_sub_type', $formatted)) {
-      $csType = $relCsType;
-    }
-
-    $customFields = CRM_Core_BAO_CustomField::getFields($formatted['contact_type'], FALSE, FALSE, $csType);
+    $customFields = CRM_Core_BAO_CustomField::getFields($formatted['contact_type'], FALSE, FALSE, $formatted['contact_sub_type'] ?? NULL);
 
     $addressCustomFields = CRM_Core_BAO_CustomField::getFields('Address');
     $customFields = $customFields + $addressCustomFields;
@@ -1243,6 +1218,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   public function isErrorInCoreData($params, &$errorMessage) {
     $errors = [];
+    if (!empty($params['contact_sub_type']) && !CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'], $params['contact_type'])) {
+      $errors[] = ts('Mismatched or Invalid Contact Subtype.');
+    }
+
     foreach ($params as $key => $value) {
       if ($value === 'invalid_import_value') {
         $errors[] = $this->getFieldMetadata($key)['title'];
@@ -2014,16 +1993,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $dupeCheck = TRUE,
     $dedupeRuleGroupID = NULL) {
 
-    if (isset($params['id']) && is_numeric($params['id'])) {
-      // @todo - ensure this is tested & remove - expectation is api call further
-      // down validates it.
-      if ($csType = CRM_Utils_Array::value('contact_sub_type', $params)) {
-        if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($csType, $params['contact_type']))) {
-          throw new CRM_Core_Exception("Invalid or Mismatched Contact Subtype: " . implode(', ', (array) $csType));
-        }
-      }
-    }
-
     if ($dupeCheck) {
       // @todo switch to using api version
       // $dupes = civicrm_api3('Contact', 'duplicatecheck', (array('match' => $params, 'dedupe_rule_id' => $dedupeRuleGroupID)));
@@ -2713,7 +2682,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     if ($mappedField['relationship_type_id']) {
       $title[] = $this->getRelationshipLabel($mappedField['relationship_type_id'], $mappedField['relationship_direction']);
     }
-    $title[] = $this->getImportableFieldsMetadata()[$mappedField['name']]['title'];
+    $title[] = $this->getFieldMetadata($mappedField['name'])['title'];
     if ($mappedField['location_type_id']) {
       $title[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Address', 'location_type_id', $mappedField['location_type_id']);
     }
@@ -2772,6 +2741,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   public function getMappedRow(array $values): array {
     $params = $this->getParams($values);
     $params['contact_type'] = $this->getContactType();
+    if ($this->getContactSubType()) {
+      $params['contact_sub_type'] = $this->getContactSubType();
+    }
     return $params;
   }
 
@@ -2811,16 +2783,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     //date-format part ends
 
     $errorMessage = NULL;
-
-    //CRM-5125
-    //add custom fields for contact sub type
-    $csType = NULL;
-    if (!empty($this->_contactSubType)) {
-      $csType = $this->_contactSubType;
-    }
-
     //checking error in custom data
-    $this->isErrorInCustomData($params, $errorMessage, $csType);
+    $this->isErrorInCustomData($params, $errorMessage, $params['contact_sub_type'] ?? NULL);
 
     //checking error in core data
     $this->isErrorInCoreData($params, $errorMessage);
