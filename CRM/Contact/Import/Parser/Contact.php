@@ -2340,6 +2340,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if (!empty($value)) {
         $value[$fieldName] = $importedValue;
       }
+      if ($relatedContactKey && !isset($params[$relatedContactKey])) {
+        $params[$relatedContactKey] = ['contact_type' => $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction'])];
+      }
       if (!$relatedContactKey) {
         if (!empty($value)) {
           if (!isset($params[$fieldName])) {
@@ -2354,10 +2357,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
       }
       else {
-        if (!isset($params[$relatedContactKey])) {
-          $params[$relatedContactKey] = ['contact_type' => $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction'])];
-        }
-
         if (!empty($value)) {
           $params[$relatedContactKey][$fieldName][] = $importedValue ? [] : $value;
         }
