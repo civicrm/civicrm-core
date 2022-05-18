@@ -80,11 +80,19 @@ class CRM_Upgrade_Incremental_php_FiveFortyNine extends CRM_Upgrade_Incremental_
   /**
    * Upgrade function.
    *
-   * @param string $rev
+   * @param string $currentRev
+   *   DB revision (which we are currently applying)
+   * @param string $startRev
+   *   DB revision (when the upgrade started)
+   * @param string $finalRev
+   *   DB revision (that we're aiming to reach, in the end)
    */
-  public function upgrade_5_49_0($rev) {
-    if (version_compare(CRM_Core_BAO_Domain::version(), '5.49.beta1', '>=')) {
-      $this->addtask('Revert civicrm_action_schedule.limit_to to be NULL', 'changeBooleanColumnLimitTo');
+  public function upgrade_5_49_2($currentRev, $startRev, $finalRev) {
+    if (empty($startRev)) {
+      throw new \RuntimeException("Error: Was somebody too clever about modifying the upgrader? We're missing a little-known but very-handy parameter!");
+    }
+    if (version_compare($startRev, '5.49.beta1', '>=')) {
+      $this->addTask('Revert civicrm_action_schedule.limit_to to be NULL', 'changeBooleanColumnLimitTo');
     }
   }
 
