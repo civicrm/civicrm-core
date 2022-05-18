@@ -2329,65 +2329,32 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     foreach ($this->getFieldMappings() as $i => $mappedField) {
       // The key is in the format 5_a_b where 5 is the relationship_type_id and a_b is the direction.
       $relatedContactKey = $mappedField['relationship_type_id'] ? ($mappedField['relationship_type_id'] . '_' . $mappedField['relationship_direction']) : NULL;
-      $fieldName = $relatedContactKey ? NULL : $mappedField['name'];
+      $fieldName = $mappedField['name'];
       $importedValue = $values[$i];
       if ($fieldName === 'do_not_import' || $importedValue === NULL) {
         continue;
       }
-      $relatedContactFieldName = $relatedContactKey ? $mappedField['name'] : NULL;
-      // RelatedContactType is not part of the mapping but rather calculated from the relationship.
-      $relatedContactType = $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction']);
-      $relatedContactLocationTypeID = $relatedContactKey ? $mappedField['location_type_id'] : NULL;
-      $relatedContactWebsiteTypeID = $relatedContactKey ? $mappedField['website_type_id'] : NULL;
 
       $locationFields = ['location_type_id', 'phone_type_id', 'provider_id', 'website_type_id'];
-      $value = array_filter(array_intersect_key($mappedField, array_fill_keys($locationFields, 1)));
-      if (!$relatedContactKey) {
-        if (!empty($value)) {
-          if (!isset($params[$fieldName])) {
-            $params[$fieldName] = [];
-          }
-          $value[$fieldName] = $importedValue;
-          $params[$fieldName][] = $value;
-        }
+      $locationValues = array_filter(array_intersect_key($mappedField, array_fill_keys($locationFields, 1)));
 
-        if (!isset($params[$fieldName])) {
-          if (!isset($relatedContactKey)) {
-            $params[$fieldName] = $importedValue;
-          }
+      $contactArray = &$params;
+      if ($relatedContactKey) {
+        if (!isset($params[$relatedContactKey])) {
+          $params[$relatedContactKey] = ['contact_type' => $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction'])];
         }
+        $contactArray = &$params[$relatedContactKey];
+      }
 
+      if (!empty($locationValues)) {
+        $locationValues[$fieldName] = $importedValue;
+        $contactArray[$fieldName] = (array) ($contactArray[$fieldName] ?? []);
+        $contactArray[$fieldName][] = $locationValues;
       }
       else {
-        if (!isset($params[$relatedContactKey])) {
-          $params[$relatedContactKey] = [];
-        }
-
-        if (!isset($params[$relatedContactKey]['contact_type']) && !empty($relatedContactType)) {
-          $params[$relatedContactKey]['contact_type'] = $relatedContactType;
-        }
-
-        if (isset($relatedContactLocationTypeID) && !empty($importedValue)) {
-          if (!empty($params[$relatedContactKey][$relatedContactFieldName]) &&
-            !is_array($params[$relatedContactKey][$relatedContactFieldName])
-          ) {
-            $params[$relatedContactKey][$relatedContactFieldName] = [];
-          }
-          $value[$relatedContactFieldName] = $importedValue;
-          $params[$relatedContactKey][$relatedContactFieldName][] = $value;
-        }
-        elseif (isset($relatedContactWebsiteTypeID)) {
-          $value[$relatedContactFieldName] = $importedValue;
-          $params[$relatedContactKey][$relatedContactFieldName][] = $value;
-        }
-        elseif (empty($importedValue) && isset($relatedContactLocationTypeID)) {
-          if (empty($params[$relatedContactKey][$relatedContactFieldName])) {
-            $params[$relatedContactKey][$relatedContactFieldName] = [];
-          }
-        }
-        else {
-          $params[$relatedContactKey][$relatedContactFieldName] = $importedValue;
-        }
+        // @todo - this is really the best point to convert labels
+        // to values.
+        $contactArray[$fieldName] = $importedValue;
       }
     }
 
