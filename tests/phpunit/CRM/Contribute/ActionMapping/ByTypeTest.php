@@ -261,7 +261,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     $this->schedule->start_action_date = 'receive_date';
     $this->schedule->entity_value = CRM_Utils_Array::implodePadded(NULL);
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
-    $this->schedule->limit_to = 1;
+    $this->schedule->limit_to = 2;
     $this->schedule->recipient = 'soft_credit_type';
     $this->schedule->recipient_listing = CRM_Utils_Array::implodePadded([3]);
   }

@@ -140,7 +140,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->fixtures['sched_activity_1day'] = [
       'name' => 'One_Day_Phone_Call_Notice',
       'title' => 'One Day Phone Call Notice',
-      'limit_to' => '1',
+      'limit_to' => '2',
       'absolute_date' => NULL,
       'body_html' => '<p>1-Day (non-repeating) (for {activity.subject})</p>',
       'body_text' => '1-Day (non-repeating) (for {activity.subject})',
@@ -172,7 +172,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->fixtures['sched_activity_5minute'] = [
       'name' => 'Five_Minute_Phone_Call_Notice',
       'title' => 'Five Minute Phone Call Notice',
-      'limit_to' => '1',
+      'limit_to' => '2',
       'absolute_date' => NULL,
       'body_html' => '<p>5 minutes (for {activity.subject})</p>',
       'body_text' => '5 minutes (non-repeating) (for {activity.subject})',
@@ -202,7 +202,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->fixtures['sched_activity_1day_r'] = [
       'name' => 'One_Day_Phone_Call_Notice_R',
       'title' => 'One Day Phone Call Notice R',
-      'limit_to' => 1,
+      'limit_to' => 2,
       'absolute_date' => NULL,
       'body_html' => '<p>1-Day (repeating)</p>',
       'body_text' => '1-Day (repeating)',
@@ -233,7 +233,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->fixtures['sched_activity_1day_r_on_abs_date'] = [
       'name' => 'One_Day_Phone_Call_Notice_R',
       'title' => 'One Day Phone Call Notice R',
-      'limit_to' => 1,
+      'limit_to' => 2,
       'absolute_date' => CRM_Utils_Date::processDate('20120614100000'),
       'body_html' => '<p>1-Day (repeating)</p>',
       'body_text' => '1-Day (repeating)',
@@ -263,7 +263,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->fixtures['sched_event_name_1day_on_abs_date'] = [
       'name' => 'sched_event_name_1day_on_abs_date',
       'title' => 'sched_event_name_1day_on_abs_date',
-      'limit_to' => 1,
+      'limit_to' => 2,
       'absolute_date' => CRM_Utils_Date::processDate('20120614100000'),
       'body_html' => '<p>sched_event_name_1day_on_abs_date</p>',
       'body_text' => 'sched_event_name_1day_on_abs_date',
@@ -752,7 +752,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'end_frequency_unit' => 'month',
       'entity_status' => '',
       'entity_value' => '',
-      'limit_to' => 0,
+      'limit_to' => 3,
       'group_id' => '',
       'is_active' => 1,
       'is_repeat' => '1',
@@ -1416,7 +1416,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'end_frequency_unit' => '',
       'entity_status' => 1,
       'entity_value' => 'birth_date',
-      'limit_to' => 1,
+      'limit_to' => 2,
       'group_id' => $groupID,
       'is_active' => 1,
       'is_repeat' => '0',

@@ -246,7 +246,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
         'start_action_condition' => 'before',
         'start_action_unit' => 'hour',
         'group_id' => $groupID,
-        'limit_to' => FALSE,
+        'limit_to' => 3,
       ]);
       $this->callAPISuccess('group_contact', 'create', [
         'contact_id' => $contactID,
@@ -280,7 +280,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'start_action_condition' => 'before',
       'start_action_unit' => 'day',
       'group_id' => $groupID,
-      'limit_to' => TRUE,
+      'limit_to' => 2,
       'sms_provider_id' => $provider['id'],
       'mode' => 'User_Preference',
     ]);
@@ -349,7 +349,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'start_action_condition' => 'before',
       'start_action_unit' => 'day',
       'group_id' => $groupId,
-      'limit_to' => FALSE,
+      'limit_to' => 3,
       'mode' => 'Email',
     ]);
 
@@ -384,7 +384,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'start_action_condition' => 'before',
       'start_action_unit' => 'day',
       'group_id' => $groupId,
-      'limit_to' => FALSE,
+      'limit_to' => 3,
       'mode' => 'Email',
     ]);
     $this->callAPISuccess('event', 'delete', ['id' => $eventId]);
@@ -417,7 +417,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'start_action_condition' => 'before',
       'start_action_unit' => 'day',
       'group_id' => $groupID,
-      'limit_to' => TRUE,
+      'limit_to' => 2,
       'sms_provider_id' => $provider['id'],
       'mode' => 'SMS',
     ]);

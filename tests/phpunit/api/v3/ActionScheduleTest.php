@@ -58,7 +58,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
     $params = [
       'title' => $title,
       'recipient' => $assigneeID,
-      'limit_to' => 1,
+      'limit_to' => 2,
       'entity_value' => 'Meeting',
       'entity_status' => 'Scheduled',
       'is_active' => 1,
@@ -101,7 +101,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
     $params = [
       'title' => $title,
       'recipient' => $assigneeID,
-      'limit_to' => 1,
+      'limit_to' => 2,
       'entity_value' => 'Meeting',
       'entity_status' => 'Scheduled',
       'is_active' => 1,

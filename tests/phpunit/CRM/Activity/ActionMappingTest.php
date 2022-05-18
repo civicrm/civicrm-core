@@ -273,7 +273,7 @@ class CRM_Activity_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappin
    * Set the recipient to "Choose Recipient(s): Bob".
    */
   public function recipientIsBob() {
-    $this->schedule->limit_to = 1;
+    $this->schedule->limit_to = 2;
     $this->schedule->recipient = NULL;
     $this->schedule->recipient_listing = NULL;
     $this->schedule->recipient_manual = $this->contacts['bob']['id'];
@@ -283,7 +283,7 @@ class CRM_Activity_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappin
    * Set the recipient to "Activity Assignee".
    */
   public function recipientIsActivityAssignee() {
-    $this->schedule->limit_to = 1;
+    $this->schedule->limit_to = 2;
     $this->schedule->recipient = 1;
     $this->schedule->recipient_listing = NULL;
     $this->schedule->recipient_manual = NULL;
@@ -293,7 +293,7 @@ class CRM_Activity_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappin
    * Set the recipient to "Activity Source".
    */
   public function recipientIsActivitySource() {
-    $this->schedule->limit_to = 1;
+    $this->schedule->limit_to = 2;
     $this->schedule->recipient = 2;
     $this->schedule->recipient_listing = NULL;
     $this->schedule->recipient_manual = NULL;

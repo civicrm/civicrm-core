@@ -232,7 +232,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $recipientLabels = ['activity' => ts('Recipients'), 'other' => ts('Limit or Add Recipients')];
     $this->assign('recipientLabels', $recipientLabels);
 
-    $this->add('select', 'limit_to', ts('Limit Options'), $limitOptions, FALSE, ['onChange' => "showHideByValue('limit_to','','recipient', 'select','select',true);"]);
+    $this->add('select', 'limit_to', ts('Limit Options'), CRM_Core_SelectValues::getLimitToValues(), FALSE, ['onChange' => "showHideByValue('limit_to','1','recipient', 'select','select',true);"]);
 
     $this->add('select', 'recipient', $recipientLabels['other'], $entityRecipientLabels,
       FALSE, ['onchange' => "showHideByValue('recipient','manual','recipientManual','table-row','select',false); showHideByValue('recipient','group','recipientGroup','table-row','select',false);"]
@@ -358,7 +358,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         'target_id' => 'recipient_manual_id',
       ],
     ];
-    if ($fields['limit_to'] != '' && array_key_exists($fields['recipient'], $recipientKind) && empty($fields[$recipientKind[$fields['recipient']]['target_id']])) {
+    if ($fields['limit_to'] != 1 && array_key_exists($fields['recipient'], $recipientKind) && empty($fields[$recipientKind[$fields['recipient']]['target_id']])) {
       $errors[$recipientKind[$fields['recipient']]['target_id']] = ts('If "Also include" or "Limit to" are selected, you must specify at least one %1', [1 => $recipientKind[$fields['recipient']]['name']]);
     }
 
@@ -547,7 +547,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $params['group_id'] = $values['group_id'];
       $params['recipient_manual'] = $params['recipient'] = $params['recipient_listing'] = 'null';
     }
-    elseif (isset($values['recipient_listing']) && isset($values['limit_to']) && !CRM_Utils_System::isNull($values['recipient_listing']) && !CRM_Utils_System::isNull($values['limit_to'])) {
+    elseif (isset($values['recipient_listing']) && isset($values['limit_to']) && !CRM_Utils_System::isNull($values['recipient_listing'])) {
       $params['recipient'] = $values['recipient'] ?? NULL;
       $params['recipient_listing'] = implode(CRM_Core_DAO::VALUE_SEPARATOR,
         CRM_Utils_Array::value('recipient_listing', $values)
@@ -567,7 +567,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     else {
       $params['mapping_id'] = $values['entity'][0];
       if ($params['mapping_id'] == 1) {
-        $params['limit_to'] = 1;
+        $params['limit_to'] = 2;
       }
 
       $entity_value = CRM_Utils_Array::value(1, $values['entity'], []);

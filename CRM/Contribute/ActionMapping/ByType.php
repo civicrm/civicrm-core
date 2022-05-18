@@ -209,7 +209,7 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
         ->param('selectedStatuses', $selectedStatuses);
     }
 
-    if ($schedule->recipient_listing && $schedule->limit_to) {
+    if ($schedule->recipient_listing && in_array($schedule->limit_to, [2, 3])) {
       switch ($schedule->recipient) {
         case 'soft_credit_type':
           $query['casContactIdField'] = 'soft.contact_id';

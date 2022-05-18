@@ -90,9 +90,9 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\Mapping {
     $query['casContactTableAlias'] = NULL;
     $query['casDateField'] = 'e.activity_date_time';
 
-    if (!is_null($schedule->limit_to)) {
+    if (in_array($schedule->limit_to, [2, 3])) {
       $activityContacts = \CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-      if ($schedule->limit_to == 0 || !isset($activityContacts[$schedule->recipient])) {
+      if ($schedule->limit_to == 3) {
         $recipientTypeId = \CRM_Utils_Array::key('Activity Targets', $activityContacts);
       }
       else {

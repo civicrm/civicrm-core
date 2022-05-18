@@ -153,7 +153,7 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
    * Limit possible recipients to Alice.
    */
   public function limitToRecipientAlice() {
-    $this->schedule->limit_to = 1;
+    $this->schedule->limit_to = 2;
     $this->schedule->recipient = NULL;
     $this->schedule->recipient_listing = NULL;
     $this->schedule->recipient_manual = $this->contacts['alice']['id'];
@@ -163,7 +163,7 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
    * Limit possible recipients to Bob.
    */
   public function limitToRecipientBob() {
-    $this->schedule->limit_to = 1;
+    $this->schedule->limit_to = 2;
     $this->schedule->recipient = NULL;
     $this->schedule->recipient_listing = NULL;
     $this->schedule->recipient_manual = $this->contacts['bob']['id'];
@@ -173,7 +173,7 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
    * Also include recipient Bob.
    */
   public function alsoRecipientBob() {
-    $this->schedule->limit_to = 0;
+    $this->schedule->limit_to = 3;
     $this->schedule->recipient = NULL;
     $this->schedule->recipient_listing = NULL;
     $this->schedule->recipient_manual = $this->contacts['bob']['id'];

@@ -212,7 +212,7 @@
         var mappingID = $('#entity_0', $form).val() || $('[name^=mappingID]', $form).val();
         var recipient = $("#recipient", $form).val();
         $("#recipientList", $form).hide();
-        if ($('#limit_to').val() != '' ) {
+        if ($('#limit_to').val() != '1' ) {
           $.getJSON(CRM.url('civicrm/ajax/recipientListing'), {mappingID: mappingID, recipientType: recipient},
             function (result) {
               if (!CRM._.isEmpty(result.recipients)) {
@@ -233,13 +233,13 @@
         if ($('#entity_0', $form).val() != '1' || !($('#entity_0').length)) {
           // Some Event entity is selected.
           if (['2', '3', '5'].includes($('#entity_0', $form).val())) {
-            $('#limit_to option[value="0"]', $form).attr('disabled','disabled').removeAttr('selected');
+            $('#limit_to option[value="3"]', $form).attr('disabled','disabled').removeAttr('selected');
           }
           else {
-            $('#limit_to option[value="0"]', $form).removeAttr('disabled');
+            $('#limit_to option[value="3"]', $form).removeAttr('disabled');
           }
           // Anything but Activity is selected.
-          if ($('#limit_to', $form).val() == '') {
+          if ($('#limit_to', $form).val() == '1') {
             $('tr.recipient:visible, #recipientList, #recipient, a.recipient').hide();
             $('a.limit_to').show();
           }

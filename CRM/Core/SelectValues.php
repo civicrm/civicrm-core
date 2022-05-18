@@ -1189,4 +1189,17 @@ class CRM_Core_SelectValues {
     ];
   }
 
+  /**
+   * Limit-to options for schedule reminders.
+   *
+   * @return array
+   */
+  public static function getLimitToValues() {
+    return [
+      1 => ts('Neither'),
+      2 => ts('Limit or Add Recipients'),
+      3 => ts('Also Include'),
+    ];
+  }
+
 }
