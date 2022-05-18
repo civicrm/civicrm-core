@@ -21,6 +21,16 @@
  */
 class CRM_Upgrade_Incremental_php_FiveFortyNine extends CRM_Upgrade_Incremental_Base {
 
+  public function setpostUpgradeMessage(&$preUpgradeMessage, $rev) {
+    if ($rev == '5.49.beta1') {
+      if ($this->hasConfigBackendData()) {
+        $postUpgradeMessage .= '<br/>' . ts("WARNING: The column \"<code>civicrm_action_schedule.limit_to</code>\" is now a required boolean field. Please ensure all the schedule reminders (especially with 'Also Include' option) are correct. For more detail please check <a href='%1' target='_blank'>here</a>.", [
+          1 => 'https://lab.civicrm.org/dev/core/-/issues/3464',
+        ]);
+      }
+    }
+  }
+
   public static function findBooleanColumns(): array {
     $r = [];
     $files = CRM_Utils_File::findFiles(__DIR__ . '/FiveFortyNine', '*.bool.php');
@@ -66,7 +76,9 @@ class CRM_Upgrade_Incremental_php_FiveFortyNine extends CRM_Upgrade_Incremental_
    * @param string $rev
    */
   public function upgrade_5_49_2($rev) {
-    $this->addtask('Revert civicrm_action_schedule.limit_to to be NULL', 'changeBooleanColumnLimitTo');
+    if (version_compare(CRM_Core_BAO_Domain::version(), '5.49', '>=') {
+      $this->addtask('Revert civicrm_action_schedule.limit_to to be NULL', 'changeBooleanColumnLimitTo');
+    }
   }
 
   /**
