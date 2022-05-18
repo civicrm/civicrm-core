@@ -14,6 +14,7 @@
  * File for the CRM_Contact_Imports_Parser_ContactTest class.
  */
 
+use Civi\Api4\Contact;
 use Civi\Api4\UserJob;
 
 /**
@@ -871,6 +872,52 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the handling of validation when importing genders.
+   *
+   * If it's not gonna import it should fail at the validation stage...
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportGenders(): void {
+    $mapper = [
+      ['first_name'],
+      ['last_name'],
+      ['gender_id'],
+      ['1_a_b', 'first_name'],
+      ['1_a_b', 'last_name'],
+      ['1_a_b', 'gender_id'],
+      ['do_not_import'],
+    ];
+    $csv = 'individual_genders.csv';
+    /* @var CRM_Import_DataSource_CSV $dataSource */
+    /* @var \CRM_Contact_Import_Parser_Contact $parser */
+    [$dataSource, $parser] = $this->getDataSourceAndParser($csv, $mapper, []);
+    while ($values = $dataSource->getRow()) {
+      try {
+        $parser->validateValues(array_values($values));
+        if ($values['expected'] !== 'Valid') {
+          $this->fail($values['gender'] . ' should not have been valid');
+        }
+      }
+      catch (CRM_Core_Exception $e) {
+        if ($values['expected'] !== 'Invalid') {
+          $this->fail($values['gender'] . ' should have been valid');
+        }
+      }
+    }
+
+    $this->importCSV($csv, $mapper);
+    $contacts = Contact::get()
+      ->addWhere('first_name', '=', 'Madame')
+      ->addSelect('gender_id:name')->execute();
+    foreach ($contacts as $contact) {
+      $this->assertEquals('Female', $contact['gender_id:name']);
+    }
+    $this->assertCount(8, $contacts);
+  }
+
+  /**
    * Test that setting duplicate action to fill doesn't blow away data
    * that exists, but does fill in where it's empty.
    *
@@ -1097,6 +1144,33 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * @param string $csv
+   * @param array $mapper
+   * @param array $submittedValues
+   *
+   * @return array
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function getDataSourceAndParser(string $csv, array $mapper, array $submittedValues): array {
+    $userJobID = $this->getUserJobID(array_merge([
+      'uploadFile' => ['name' => __DIR__ . '/../Form/data/' . $csv],
+      'skipColumnHeader' => TRUE,
+      'fieldSeparator' => ',',
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'mapper' => $mapper,
+      'dataSource' => 'CRM_Import_DataSource_CSV',
+    ], $submittedValues));
+
+    $dataSource = new CRM_Import_DataSource_CSV($userJobID);
+    $parser = new CRM_Contact_Import_Parser_Contact();
+    $parser->setUserJobID($userJobID);
+    $parser->init();
+    return [$dataSource, $parser];
+  }
+
+  /**
    * @param array $fields Array of fields to be imported
    * @param array $allfields Array of all fields which can be part of import
    */
@@ -1260,20 +1334,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   protected function validateCSV(string $csv, array $mapper, $submittedValues): void {
-    $userJobID = $this->getUserJobID(array_merge([
-      'uploadFile' => ['name' => __DIR__ . '/../Form/data/' . $csv],
-      'skipColumnHeader' => TRUE,
-      'fieldSeparator' => ',',
-      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
-      'mapper' => $mapper,
-      'dataSource' => 'CRM_Import_DataSource_CSV',
-    ], $submittedValues));
-
-    $dataSource = new CRM_Import_DataSource_CSV($userJobID);
-    $parser = new CRM_Contact_Import_Parser_Contact();
-    $parser->setUserJobID($userJobID);
-    $parser->init();
+    [$dataSource, $parser] = $this->getDataSourceAndParser($csv, $mapper, $submittedValues);
     $parser->validateValues(array_values($dataSource->getRow()));
   }
 

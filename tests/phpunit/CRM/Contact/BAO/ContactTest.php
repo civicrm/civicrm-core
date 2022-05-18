@@ -495,13 +495,14 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Test case for resolveDefaults( ).
    *
+   * @todo the resolveDefaults function is on it's way out - so is this test...
+   *
    * Test all pseudoConstant, stateProvince, country.
    */
   public function testResolveDefaults() {
     $params = [
       'prefix_id' => 3,
       'suffix_id' => 2,
-      'gender_id' => 2,
       'birth_date' => '1983-12-13',
     ];
 
@@ -515,8 +516,6 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     CRM_Contact_BAO_Contact::resolveDefaults($params);
 
     //check the resolve values.
-    $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
-    $this->assertEquals($genders[$params['gender_id']], $params['gender'], 'Check for gender.');
     $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
     $this->assertEquals($prefix[$params['prefix_id']], $params['prefix'], 'Check for prefix.');
     $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
