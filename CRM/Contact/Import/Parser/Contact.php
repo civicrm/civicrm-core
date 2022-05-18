@@ -1306,41 +1306,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Check if value present in all genders or.
-   * as a substring of any gender value, if yes than return corresponding gender.
-   * eg value might be  m/M, ma/MA, mal/MAL, male return 'Male'
-   * but if value is 'maleabc' than return false
-   *
-   * @param string $gender
-   *   Check this value across gender values.
-   *
-   * retunr gender value / false
-   *
-   * @return bool
-   */
-  public function checkGender($gender) {
-    $gender = trim($gender, '.');
-    if (!$gender) {
-      return FALSE;
-    }
-
-    $allGenders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
-    foreach ($allGenders as $key => $value) {
-      if (strlen($gender) > strlen($value)) {
-        continue;
-      }
-      if ($gender == $value) {
-        return $value;
-      }
-      if (substr_compare($value, $gender, 0, strlen($gender), TRUE) === 0) {
-        return $value;
-      }
-    }
-
-    return FALSE;
-  }
-
-  /**
    * Check if an error in Core( non-custom fields ) field
    *
    * @param array $params
@@ -1350,6 +1315,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   public function isErrorInCoreData($params, &$errorMessage) {
     $errors = [];
     foreach ($params as $key => $value) {
+      if ($value === 'invalid_import_value') {
+        $errors[] = $this->getFieldMetadata($key)['title'];
+      }
       if ($value) {
         $session = CRM_Core_Session::singleton();
         $dateType = $session->get("dateTypes");
@@ -1380,12 +1348,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           case 'is_deceased':
             if (CRM_Utils_String::strtoboolstr($value) === FALSE) {
               $errors[] = ts('Deceased');
-            }
-            break;
-
-          case 'gender_id':
-            if (!self::checkGender($value)) {
-              $errors[] = ts('Gender');
             }
             break;
 
@@ -2323,23 +2285,14 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $locationFields = ['location_type_id', 'phone_type_id', 'provider_id', 'website_type_id'];
       $locationValues = array_filter(array_intersect_key($mappedField, array_fill_keys($locationFields, 1)));
 
-      $contactArray = &$params;
       if ($relatedContactKey) {
         if (!isset($params[$relatedContactKey])) {
           $params[$relatedContactKey] = ['contact_type' => $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction'])];
         }
-        $contactArray = &$params[$relatedContactKey];
-      }
-
-      if (!empty($locationValues)) {
-        $locationValues[$fieldName] = $importedValue;
-        $contactArray[$fieldName] = (array) ($contactArray[$fieldName] ?? []);
-        $contactArray[$fieldName][] = $locationValues;
+        $this->addFieldToParams($params[$relatedContactKey], $locationValues, $fieldName, $importedValue);
       }
       else {
-        // @todo - this is really the best point to convert labels
-        // to values.
-        $contactArray[$fieldName] = $importedValue;
+        $this->addFieldToParams($params, $locationValues, $fieldName, $importedValue);
       }
     }
 
@@ -2538,17 +2491,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     if (isset($values['addressee'])) {
       $params['addressee'] = $values['addressee'];
-      return TRUE;
-    }
-
-    if (isset($values['gender'])) {
-      if (!empty($params['gender_id'])) {
-        $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
-        $params['gender'] = $genders[$params['gender_id']];
-      }
-      else {
-        $params['gender'] = $values['gender'];
-      }
       return TRUE;
     }
 
@@ -3053,6 +2995,28 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         ->addSelect('*')->execute()->first();
     }
     return Civi::$statics[__CLASS__][$cacheKey];
+  }
+
+  /**
+   * Add the given field to the contact array.
+   *
+   * @param array $contactArray
+   * @param array $locationValues
+   * @param string $fieldName
+   * @param mixed $importedValue
+   *
+   * @return void
+   * @throws \API_Exception
+   */
+  private function addFieldToParams(array &$contactArray, array $locationValues, string $fieldName, $importedValue): void {
+    if (!empty($locationValues)) {
+      $locationValues[$fieldName] = $importedValue;
+      $contactArray[$fieldName] = (array) ($contactArray[$fieldName] ?? []);
+      $contactArray[$fieldName][] = $locationValues;
+    }
+    else {
+      $contactArray[$fieldName] = $this->getTransformedFieldValue($fieldName, $importedValue);
+    }
   }
 
 }

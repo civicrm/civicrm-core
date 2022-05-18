@@ -1,0 +1,17 @@
+first_name,Last Name,Gender,mum_first_name,mum_last_name,mum_gender,Expected
+Madame,1,Female,Mum,1,,Valid
+Madame,2,FEMALE,Mum,2,,Valid
+Madame,3,female,Mum,3,,Valid
+Madame,4,Female.,Mum,4,,Invalid
+Madame,5,F,Mum,5,,Invalid
+Madame,6,f,Mum,6,,Invalid
+Madame,7,Cat,Mum,7,,Invalid
+Madame,8,1,Mum,8,,Valid
+Daughter,9,,Madame,9,Female,Valid
+Daughter,10,,Madame,10,FEMALE,Valid
+Daughter,11,,Madame,11,female,Valid
+Daughter,12,,Madame,12,Female.,Invalid
+Daughter,13,,Madame,13,F,Invalid
+Daughter,14,,Madame,14,f,Invalid
+Daughter,15,,Madame,15,Cat,Invalid
+Daughter,16,,Madame,16,1,Valid

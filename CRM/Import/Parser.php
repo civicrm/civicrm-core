@@ -1175,4 +1175,73 @@ abstract class CRM_Import_Parser {
     throw new CRM_Core_Exception(($prefixString ? ($prefixString . ' ') : '') . ts('Missing required fields:') . ' ' . implode(' ' . ts('OR') . ' ', $missingFields));
   }
 
+  /**
+   * Get the field value, transformed by metadata.
+   *
+   * @param string $fieldName
+   * @param string|int $importedValue
+   *   Value as it came in from the datasource.
+   *
+   * @return string|array|bool|int
+   * @throws \API_Exception
+   */
+  protected function getTransformedFieldValue(string $fieldName, $importedValue) {
+    // For now only do gender_id as we need to work through removing duplicate handling
+    if ($fieldName !== 'gender_id' || empty($importedValue)) {
+      return $importedValue;
+    }
+    return $this->getFieldOptions($fieldName)[$importedValue] ?? 'invalid_import_value';
+  }
+
+  /**
+   * @param string $fieldName
+   *
+   * @return false|array
+   *
+   * @throws \API_Exception
+   */
+  protected function getFieldOptions(string $fieldName) {
+    return $this->getFieldMetadata($fieldName, TRUE)['options'];
+  }
+
+  /**
+   * Get the metadata for the field.
+   *
+   * @param string $fieldName
+   * @param bool $loadOptions
+   *
+   * @return array
+   * @throws \API_Exception
+   */
+  protected function getFieldMetadata(string $fieldName, bool $loadOptions = FALSE): array {
+    $fieldMetadata = $this->getImportableFieldsMetadata()[$fieldName];
+    if ($loadOptions && !isset($fieldMetadata['options'])) {
+      if (empty($fieldMetadata['pseudoconstant'])) {
+        $this->importableFieldsMetadata[$fieldName]['options'] = FALSE;
+      }
+      else {
+        $options = civicrm_api4($fieldMetadata['entity'], 'getFields', [
+          'loadOptions' => ['id', 'name', 'label'],
+          'where' => [['name', '=', $fieldMetadata['name']]],
+          'select' => ['options'],
+        ])->first()['options'];
+        // We create an array of the possible variants - notably including
+        // name AND label as either might be used, and capitalisation variants.
+        $values = [];
+        foreach ($options as $option) {
+          $values[$option['id']] = $option['id'];
+          $values[$option['label']] = $option['id'];
+          $values[$option['name']] = $option['id'];
+          $values[strtoupper($option['name'])] = $option['id'];
+          $values[strtolower($option['name'])] = $option['id'];
+          $values[strtoupper($option['label'])] = $option['id'];
+          $values[strtolower($option['label'])] = $option['id'];
+        }
+        $this->importableFieldsMetadata[$fieldName]['options'] = $values;
+      }
+      return $this->importableFieldsMetadata[$fieldName];
+    }
+    return $fieldMetadata;
+  }
+
 }
