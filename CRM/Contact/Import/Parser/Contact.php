@@ -2336,33 +2336,25 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
 
       $locationFields = ['location_type_id', 'phone_type_id', 'provider_id', 'website_type_id'];
-      $value = array_filter(array_intersect_key($mappedField, array_fill_keys($locationFields, 1)));
-      if (!empty($value)) {
-        $value[$fieldName] = $importedValue;
-      }
-      if ($relatedContactKey && !isset($params[$relatedContactKey])) {
-        $params[$relatedContactKey] = ['contact_type' => $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction'])];
-      }
-      if (!$relatedContactKey) {
-        if (!empty($value)) {
-          if (!isset($params[$fieldName])) {
-            $params[$fieldName] = [];
-          }
-          $params[$fieldName][] = $value;
-        }
+      $locationValues = array_filter(array_intersect_key($mappedField, array_fill_keys($locationFields, 1)));
 
-        if (!isset($params[$fieldName])) {
-          $params[$fieldName] = $importedValue;
+      $contactArray = &$params;
+      if ($relatedContactKey) {
+        if (!isset($params[$relatedContactKey])) {
+          $params[$relatedContactKey] = ['contact_type' => $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction'])];
         }
+        $contactArray = &$params[$relatedContactKey];
+      }
 
+      if (!empty($locationValues)) {
+        $locationValues[$fieldName] = $importedValue;
+        $contactArray[$fieldName] = (array) ($contactArray[$fieldName] ?? []);
+        $contactArray[$fieldName][] = $locationValues;
       }
       else {
-        if (!empty($value)) {
-          $params[$relatedContactKey][$fieldName][] = $importedValue ? [] : $value;
-        }
-        else {
-          $params[$relatedContactKey][$fieldName] = $importedValue;
-        }
+        // @todo - this is really the best point to convert labels
+        // to values.
+        $contactArray[$fieldName] = $importedValue;
       }
     }
 
