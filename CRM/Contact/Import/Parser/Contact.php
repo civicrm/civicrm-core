@@ -2329,12 +2329,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     foreach ($this->getFieldMappings() as $i => $mappedField) {
       // The key is in the format 5_a_b where 5 is the relationship_type_id and a_b is the direction.
       $relatedContactKey = $mappedField['relationship_type_id'] ? ($mappedField['relationship_type_id'] . '_' . $mappedField['relationship_direction']) : NULL;
-      $fieldName = $relatedContactKey ? NULL : $mappedField['name'];
+      $fieldName = $mappedField['name'];
       $importedValue = $values[$i];
       if ($fieldName === 'do_not_import' || $importedValue === NULL) {
         continue;
       }
-      $relatedContactFieldName = $relatedContactKey ? $mappedField['name'] : NULL;
 
       $locationFields = ['location_type_id', 'phone_type_id', 'provider_id', 'website_type_id'];
       $value = array_filter(array_intersect_key($mappedField, array_fill_keys($locationFields, 1)));
@@ -2360,10 +2359,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
 
         if (!empty($value)) {
-          $params[$relatedContactKey][$relatedContactFieldName][] = $importedValue ? [] : $value;
+          $params[$relatedContactKey][$fieldName][] = $importedValue ? [] : $value;
         }
         else {
-          $params[$relatedContactKey][$relatedContactFieldName] = $importedValue;
+          $params[$relatedContactKey][$fieldName] = $importedValue;
         }
       }
     }
