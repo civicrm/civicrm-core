@@ -2335,17 +2335,17 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         continue;
       }
       $relatedContactFieldName = $relatedContactKey ? $mappedField['name'] : NULL;
-      $relatedContactLocationTypeID = $relatedContactKey ? $mappedField['location_type_id'] : NULL;
-      $relatedContactWebsiteTypeID = $relatedContactKey ? $mappedField['website_type_id'] : NULL;
 
       $locationFields = ['location_type_id', 'phone_type_id', 'provider_id', 'website_type_id'];
       $value = array_filter(array_intersect_key($mappedField, array_fill_keys($locationFields, 1)));
+      if (!empty($value)) {
+        $value[$fieldName] = $importedValue;
+      }
       if (!$relatedContactKey) {
         if (!empty($value)) {
           if (!isset($params[$fieldName])) {
             $params[$fieldName] = [];
           }
-          $value[$fieldName] = $importedValue;
           $params[$fieldName][] = $value;
         }
 
@@ -2359,23 +2359,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           $params[$relatedContactKey] = ['contact_type' => $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction'])];
         }
 
-        if (isset($relatedContactLocationTypeID) && !empty($importedValue)) {
-          if (!empty($params[$relatedContactKey][$relatedContactFieldName]) &&
-            !is_array($params[$relatedContactKey][$relatedContactFieldName])
-          ) {
-            $params[$relatedContactKey][$relatedContactFieldName] = [];
-          }
-          $value[$relatedContactFieldName] = $importedValue;
-          $params[$relatedContactKey][$relatedContactFieldName][] = $value;
-        }
-        elseif (isset($relatedContactWebsiteTypeID)) {
-          $value[$relatedContactFieldName] = $importedValue;
-          $params[$relatedContactKey][$relatedContactFieldName][] = $value;
-        }
-        elseif (empty($importedValue) && isset($relatedContactLocationTypeID)) {
-          if (empty($params[$relatedContactKey][$relatedContactFieldName])) {
-            $params[$relatedContactKey][$relatedContactFieldName] = [];
-          }
+        if (!empty($value)) {
+          $params[$relatedContactKey][$relatedContactFieldName][] = $importedValue ? [] : $value;
         }
         else {
           $params[$relatedContactKey][$relatedContactFieldName] = $importedValue;
