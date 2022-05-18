@@ -2235,18 +2235,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     if ($mode == self::MODE_IMPORT) {
       $dataSource->setStatuses(['new']);
     }
-    if ($this->_maxLinesToProcess > 0) {
-      // Note this would only be the case in MapForm mode, where it is set to 100
-      // rows. In fact mapField really only needs 2 rows - the reason for
-      // 100 seems to be that the other import classes are processing a
-      // csv file, and there was a concern that some rows might have more
-      // columns than others - hence checking 100 rows perhaps seemed like
-      // a good precaution presumably when determining the activeFieldsCount
-      // which is the number of columns a row might have.
-      // However, the mapField class may no longer use activeFieldsCount for contact
-      // to be continued....
-      $dataSource->setLimit($this->_maxLinesToProcess);
-    }
 
     while ($row = $dataSource->getRow()) {
       $values = array_values($row);
@@ -2254,10 +2242,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
       $this->_totalCount++;
 
-      if ($mode == self::MODE_MAPFIELD) {
-        $returnCode = CRM_Import_Parser::VALID;
-      }
-      elseif ($mode == self::MODE_PREVIEW) {
+      if ($mode == self::MODE_PREVIEW) {
         $returnCode = $this->preview($values);
       }
       elseif ($mode == self::MODE_SUMMARY) {

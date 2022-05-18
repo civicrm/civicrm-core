@@ -179,8 +179,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
       $this->flushDataSource();
       $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
     }
-    // Setup the params array
-    $this->_params = $this->controller->exportValues($this->_name);
 
     // @todo - this params are being set here because they were / possibly still
     // are in some places being accessed by forms later in the flow
@@ -194,9 +192,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
     // Once the mentioned forms no longer call $this->get() all this 'setting'
     // is obsolete.
     $storeParams = [
-      'onDuplicate' => $this->getSubmittedValue('onDuplicate'),
-      'dedupe' => $this->getSubmittedValue('dedupe_rule_id'),
-      'contactType' => $this->getSubmittedValue('contactType'),
       'dateFormats' => $this->getSubmittedValue('dateFormats'),
       'savedMapping' => $this->getSubmittedValue('savedMapping'),
     ];
@@ -207,17 +202,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
     CRM_Core_Session::singleton()->set('dateTypes', $storeParams['dateFormats']);
 
     $this->instantiateDataSource();
-
-    $mapper = [];
-
-    $parser = new CRM_Contact_Import_Parser_Contact($mapper);
-    $parser->setMaxLinesToProcess(100);
-    $parser->setUserJobID($this->getUserJobID());
-    $parser->run(
-      [],
-      CRM_Import_Parser::MODE_MAPFIELD
-    );
-
   }
 
   /**
