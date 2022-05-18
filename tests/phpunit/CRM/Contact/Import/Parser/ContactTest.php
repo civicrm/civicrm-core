@@ -153,6 +153,42 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test updating an existing contact with external_identifier match but subtype mismatch.
+   *
+   * @throws \Exception
+   */
+  public function testImportParserWithUpdateWithExternalIdentifierSubtypeMismatch(): void {
+    $contactID = $this->individualCreate(['external_identifier' => 'billy', 'first_name' => 'William', 'contact_sub_type' => 'Parent']);
+    $this->runImport([
+      'external_identifier' => 'billy',
+      'nick_name' => 'Old Bill',
+      'contact_sub_type' => 'Staff',
+    ], CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contactID]);
+    $this->assertEquals('Old Bill', $contact['nick_name']);
+    $this->assertEquals('William', $contact['first_name']);
+    $this->assertEquals('billy', $contact['external_identifier']);
+    $this->assertEquals(['Staff'], $contact['contact_sub_type']);
+  }
+
+  /**
+   * Test updating an existing contact with external_identifier match but subtype mismatch.
+   *
+   * @throws \Exception
+   */
+  public function testImportParserWithUpdateWithExternalIdentifierTypeMismatch(): void {
+    $contactID = $this->organizationCreate(['external_identifier' => 'billy']);
+    $this->runImport([
+      'external_identifier' => 'billy',
+      'nick_name' => 'Old Bill',
+    ], CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::NO_MATCH);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contactID]);
+    $this->assertEquals('', $contact['nick_name']);
+    $this->assertEquals('billy', $contact['external_identifier']);
+    $this->assertEquals('Organization', $contact['contact_type']);
+  }
+
+  /**
    * Test import parser will fallback to external identifier.
    *
    * In this case no primary match exists (e.g the details are not supplied) so it falls back on external identifier.
