@@ -110,9 +110,7 @@ class CoreUtil {
    * For a given API Entity, return the types of custom fields it supports and the column they join to.
    *
    * @param string $entityName
-   * @return array|mixed|null
-   * @throws \API_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
+   * @return array{extends: array, column: string, grouping: mixed}|null
    */
   public static function getCustomGroupExtends(string $entityName) {
     // Custom_group.extends pretty much maps 1-1 with entity names, except for Contact.
@@ -121,18 +119,23 @@ class CoreUtil {
         return [
           'extends' => array_merge(['Contact'], array_keys(\CRM_Core_SelectValues::contactType())),
           'column' => 'id',
+          'grouping' => ['contact_type', 'contact_sub_type'],
         ];
 
       case 'RelationshipCache':
         return [
           'extends' => ['Relationship'],
           'column' => 'relationship_id',
+          'grouping' => 'relationship_type_id',
         ];
     }
-    if (array_key_exists($entityName, \CRM_Core_SelectValues::customGroupExtends())) {
+    $customGroupExtends = array_column(\CRM_Core_BAO_CustomGroup::getCustomGroupExtendsOptions(), NULL, 'id');
+    $extendsSubGroups = \CRM_Core_BAO_CustomGroup::getExtendsEntityColumnIdOptions();
+    if (array_key_exists($entityName, $customGroupExtends)) {
       return [
         'extends' => [$entityName],
         'column' => 'id',
+        'grouping' => ($customGroupExtends[$entityName]['grouping'] ?: array_column(\CRM_Utils_Array::findAll($extendsSubGroups, ['extends' => $entityName]), 'grouping', 'id')) ?: NULL,
       ];
     }
     return NULL;

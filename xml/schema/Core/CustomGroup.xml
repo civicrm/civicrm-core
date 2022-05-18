@@ -72,7 +72,8 @@
     </pseudoconstant>
     <add>2.2</add>
     <html>
-      <type>Select</type>
+      <type>ChainSelect</type>
+      <controlField>extends</controlField>
     </html>
   </field>
   <field>
@@ -85,6 +86,10 @@
     <pseudoconstant>
       <callback>CRM_Core_BAO_CustomGroup::getExtendsEntityColumnValueOptions</callback>
     </pseudoconstant>
+    <html>
+      <type>ChainSelect</type>
+      <controlField>extends_entity_column_id</controlField>
+    </html>
     <add>1.6</add>
   </field>
   <field>
