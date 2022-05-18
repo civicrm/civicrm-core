@@ -445,73 +445,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public function submit($params) {
     $mapperKeys = $this->getSubmittedValue('mapper');
-    $mapper = $mapperKeysMain = $locations = [];
-    $parserParameters = CRM_Contact_Import_Parser_Contact::getParameterForParser($this->_columnCount);
-
-    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
-    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
-    $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-    $locationTypes['Primary'] = ts('Primary');
+    $mapperKeysMain = [];
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
-
-      $fldName = $mapperKeys[$i][0] ?? NULL;
-      $selOne = $mapperKeys[$i][1] ?? NULL;
-      $selTwo = $mapperKeys[$i][2] ?? NULL;
-      $selThree = $mapperKeys[$i][3] ?? NULL;
-      $mapper[$i] = $this->_mapperFields[$mapperKeys[$i][0]];
-      $mapperKeysMain[$i] = $fldName;
-
-      //need to differentiate non location elements.
-      if ($selOne && (is_numeric($selOne) || $selOne === 'Primary')) {
-        if ($fldName === 'url') {
-          $parserParameters['mapperWebsiteType'][$i] = $websiteTypes[$selOne];
-        }
-        else {
-          $locations[$i] = $locationTypes[$selOne];
-          $parserParameters['mapperLocType'][$i] = $selOne;
-          if ($selTwo && is_numeric($selTwo)) {
-            if ($fldName === 'phone' || $fldName === 'phone_ext') {
-              $parserParameters['mapperPhoneType'][$i] = $phoneTypes[$selTwo];
-            }
-            elseif ($fldName === 'im') {
-              $parserParameters['mapperImProvider'][$i] = $imProviders[$selTwo];
-            }
-          }
-        }
-      }
-
-      //relationship contact mapper info.
-      [$id, $first, $second] = CRM_Utils_System::explode('_', $fldName, 3);
-      if (($first === 'a' && $second === 'b') ||
-        ($first === 'b' && $second === 'a')
-      ) {
-        $parserParameters['mapperRelated'][$i] = $this->_mapperFields[$fldName];
-        if ($selOne) {
-          if ($selOne === 'url') {
-            $parserParameters['relatedContactWebsiteType'][$i] = $websiteTypes[$selTwo];
-          }
-          else {
-            $parserParameters['relatedContactLocType'][$i] = $locationTypes[$selTwo] ?? NULL;
-            if ($selThree) {
-              if ($selOne === 'phone' || $selOne === 'phone_ext') {
-                $parserParameters['relatedContactPhoneType'][$i] = $phoneTypes[$selThree];
-              }
-              elseif ($selOne === 'im') {
-                $parserParameters['relatedContactImProvider'][$i] = $imProviders[$selThree];
-              }
-            }
-          }
-
-          //get the related contact type.
-          $relationType = new CRM_Contact_DAO_RelationshipType();
-          $relationType->id = $id;
-          $relationType->find(TRUE);
-          $parserParameters['relatedContactType'][$i] = $relationType->{"contact_type_$second"};
-          $parserParameters['relatedContactDetails'][$i] = $this->_formattedFieldNames[$parserParameters['relatedContactType'][$i]][$selOne];
-        }
-      }
+      $mapperKeysMain[$i] = $mapperKeys[$i][0] ?? NULL;
     }
 
     $this->set('columnNames', $this->_columnNames);
@@ -542,12 +479,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->set('savedMapping', $saveMapping['id']);
     }
 
-    $parser = new CRM_Contact_Import_Parser_Contact($mapperKeysMain, $parserParameters['mapperLocType'], $parserParameters['mapperPhoneType'],
-      $parserParameters['mapperImProvider'], $parserParameters['mapperRelated'], $parserParameters['relatedContactType'],
-      $parserParameters['relatedContactDetails'], $parserParameters['relatedContactLocType'],
-      $parserParameters['relatedContactPhoneType'], $parserParameters['relatedContactImProvider'],
-      $parserParameters['mapperWebsiteType'], $parserParameters['relatedContactWebsiteType']
-    );
+    $parser = new CRM_Contact_Import_Parser_Contact($mapperKeysMain);
     $parser->setUserJobID($this->getUserJobID());
 
     $parser->run(

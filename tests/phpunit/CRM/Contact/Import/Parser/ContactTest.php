@@ -65,19 +65,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'mapper' => [['first_name'], ['last_name'], ['5_a_b', 'organization_name']],
     ]);
 
-    $parser = new CRM_Contact_Import_Parser_Contact($fields, [], [], [], [
-      NULL,
-      NULL,
-      '5_a_b',
-    ], [
-      NULL,
-      NULL,
-      'Organization',
-    ], [
-      NULL,
-      NULL,
-      'organization_name',
-    ]);
+    $parser = new CRM_Contact_Import_Parser_Contact($fields);
     $parser->setUserJobID($userJobID);
     $parser->_onDuplicate = CRM_Import_Parser::DUPLICATE_UPDATE;
     $parser->init();

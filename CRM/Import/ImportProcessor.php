@@ -423,22 +423,7 @@ class CRM_Import_ImportProcessor {
    * @throws \CiviCRM_API3_Exception
    */
   public function getImporterObject() {
-    $importer = new CRM_Contact_Import_Parser_Contact(
-      $this->getFieldNames(),
-      $this->getFieldLocationTypes(),
-      $this->getFieldPhoneTypes(),
-      $this->getFieldIMProviderTypes(),
-      // @todo - figure out related mappings.
-      // $mapperRelated = [], $mapperRelatedContactType = [], $mapperRelatedContactDetails = [], $mapperRelatedContactLocType = [], $mapperRelatedContactPhoneType = [], $mapperRelatedContactImProvider = [],
-      [],
-      [],
-      [],
-      [],
-      [],
-      [],
-      $this->getFieldWebsiteTypes()
-      // $mapperRelatedContactWebsiteType = []
-    );
+    $importer = new CRM_Contact_Import_Parser_Contact($this->getFieldNames());
     $importer->setUserJobID($this->getUserJobID());
     $importer->init();
     return $importer;
