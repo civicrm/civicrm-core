@@ -2258,20 +2258,24 @@ WHERE  ce.loc_block_id = $locBlockId";
     //3. consider event seat as a sum of all seats from line items in case price field value carries count.
 
     $query = "
-    SELECT  IF ( SUM( value.count*lineItem.qty ),
-                 SUM( value.count*lineItem.qty ) +
-                 COUNT( DISTINCT participant.id ) -
-                 COUNT( DISTINCT IF ( value.count, participant.id, NULL ) ),
-                 COUNT( DISTINCT participant.id ) )
-      FROM  civicrm_participant participant
-INNER JOIN  civicrm_contact contact ON ( contact.id = participant.contact_id AND contact.is_deleted = 0 )
-INNER JOIN  civicrm_event event ON ( event.id = participant.event_id )
-LEFT  JOIN  civicrm_line_item lineItem ON ( lineItem.entity_id    = participant.id
-                                       AND  lineItem.entity_table = 'civicrm_participant' )
-LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field_value_id AND value.count )
-     WHERE  ( participant.event_id = %1 )
-            AND participant.is_test = 0
-            {$extraWhereClause}
+  SELECT
+  IF
+    -- If the line item count * the line item quantity is not 0
+    (SUM(price_field_value.`count` * lineItem.qty),
+    -- then use the count * the quantity, ensuring each
+    -- actual participant record gets a result
+    SUM(price_field_value.`count` * lineItem.qty)
+      + COUNT(DISTINCT participant.id )
+      - COUNT(DISTINCT IF (price_field_value.`count`, participant.id, NULL)),
+    -- if the line item count is NULL or 0 then count the participants
+    COUNT(DISTINCT participant.id))
+  FROM civicrm_participant participant
+    INNER JOIN  civicrm_contact contact ON (contact.id = participant.contact_id AND contact.is_deleted = 0)
+    INNER JOIN  civicrm_event event ON ( event.id = participant.event_id )
+    LEFT JOIN  civicrm_line_item lineItem ON ( lineItem.entity_id = participant.id AND  lineItem.entity_table = 'civicrm_participant' )
+    LEFT JOIN  civicrm_price_field_value price_field_value ON (price_field_value.id = lineItem.price_field_value_id AND price_field_value.`count`)
+  WHERE  (participant.event_id = %1) AND participant.is_test = 0
+    {$extraWhereClause}
   GROUP BY  participant.event_id";
 
     return (int) CRM_Core_DAO::singleValueQuery($query, [1 => [$eventId, 'Positive']]);
