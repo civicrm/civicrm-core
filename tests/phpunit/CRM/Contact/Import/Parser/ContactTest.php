@@ -870,9 +870,12 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @dataProvider validateDataProvider
    *
    * @param string $csv
-   * @param array $mapper
+   * @param array $mapper Mapping as entered on MapField form.
+   *   e.g [['first_name']['email', 1]].
+   *   {@see \CRM_Contact_Import_Parser_Contact::getMappingFieldFromMapperInput}
    * @param string $expectedError
    * @param array $submittedValues
+   *
    *
    * @throws \API_Exception
    */
@@ -1300,7 +1303,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
 
   /**
    * @param string $csv
-   * @param array $mapper
+   * @param array $mapper Mapping as entered on MapField form.
+   *   e.g [['first_name']['email', 1]].
+   *   {@see \CRM_Contact_Import_Parser_Contact::getMappingFieldFromMapperInput}
    * @param array $submittedValues
    *
    * @return array
@@ -1505,6 +1510,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @param string $csv Name of csv file.
    * @param array $mapper Mapping as entered on MapField form.
    *   e.g [['first_name']['email', 1]].
+   *   {@see \CRM_Contact_Import_Parser_Contact::getMappingFieldFromMapperInput}
    * @param array $submittedValues
    *   Any submitted values overrides.
    *
@@ -1524,6 +1530,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @param string $csv Name of csv file.
    * @param array $mapper Mapping as entered on MapField form.
    *   e.g [['first_name']['email', 1]].
+   *   {@see \CRM_Contact_Import_Parser_Contact::getMappingFieldFromMapperInput}
    * @param array $submittedValues
    */
   protected function importCSV(string $csv, array $mapper, array $submittedValues = []): void {
@@ -1556,7 +1563,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
 
   /**
    * @param string $csv
-   * @param array $mapper
+   * @param array $mapper Mapping as entered on MapField form.
+   *   e.g [['first_name']['email', 1]].
    * @param string $field
    * @param array $submittedValues
    *   Values submitted in the form process.

@@ -51,7 +51,9 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * @dataProvider getSubmitData
    *
    * @param array $params
-   * @param array $mapper
+   * @param array $mapper Mapping as entered on MapField form.
+   *   e.g [['first_name']['email', 1]].
+   *   {@see \CRM_Contact_Import_Parser_Contact::getMappingFieldFromMapperInput}
    * @param array $expecteds
    *
    * @throws \API_Exception
