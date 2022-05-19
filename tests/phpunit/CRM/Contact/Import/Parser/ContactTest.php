@@ -273,6 +273,27 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test updating an existing contact with external_identifier match but subtype mismatch.
    *
+   * The subtype is not updated, as there is conflicting contact data.
+   *
+   * @throws \Exception
+   */
+  public function testImportParserUpdateWithExternalIdentifierSubtypeChangeFail(): void {
+    $contactID = $this->individualCreate(['external_identifier' => 'billy', 'first_name' => 'William', 'contact_sub_type' => 'Parent']);
+    $this->addChild($contactID);
+
+    $this->runImport([
+      'external_identifier' => 'billy',
+      'nick_name' => 'Old Bill',
+      'contact_sub_type' => 'Staff',
+    ], CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contactID]);
+    $this->assertEquals('', $contact['nick_name']);
+    $this->assertEquals(['Parent'], $contact['contact_sub_type']);
+  }
+
+  /**
+   * Test updating an existing contact with external_identifier match but subtype mismatch.
+   *
    * @throws \Exception
    */
   public function testImportParserWithUpdateWithTypeMismatch(): void {
