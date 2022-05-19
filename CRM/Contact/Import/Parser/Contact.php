@@ -1944,11 +1944,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $cid = NULL;
 
     $vals = ['contact_id' => $contactId];
-
-    if ($onDuplicate == CRM_Import_Parser::DUPLICATE_REPLACE) {
-      civicrm_api('contact', 'delete', $vals);
-      $cid = CRM_Contact_BAO_Contact::createProfileContact($formatted, $contactFields, $contactId, NULL, NULL, $formatted['contact_type']);
-    }
     if (in_array((int) $onDuplicate, [CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::DUPLICATE_FILL], TRUE)) {
       $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $contactId);
     }
