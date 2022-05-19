@@ -108,7 +108,7 @@ class CRM_Upgrade_Incremental_php_FiveFortyNine extends CRM_Upgrade_Incremental_
     }
     $this->executedLimitToFix = (bool) version_compare($startRev, '5.49.beta1', '>=');
     if ($this->executedLimitToFix) {
-      $this->addTask('Revert civicrm_action_schedule.limit_to to be NULL', 'changeBooleanColumnLimitTo');
+      $this->addTask('Update "civicrm_action_schedule.limit_to" to re-enable "NULL" values', 'changeBooleanColumnLimitTo');
     }
   }
 
