@@ -29,7 +29,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   use CRM_Contact_Import_MetadataTrait;
 
   protected $_mapperKeys = [];
-  protected $_relationships;
 
   /**
    * Is update only permitted on an id match.
@@ -1053,9 +1052,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *   A string containing all the error-fields.
    *
    * @param null $csType
-   * @param null $relationships
    */
-  public static function isErrorInCustomData($params, &$errorMessage, $csType = NULL, $relationships = NULL) {
+  public static function isErrorInCustomData($params, &$errorMessage, $csType = NULL) {
     $dateType = CRM_Core_Session::singleton()->get("dateTypes");
     $errors = [];
 
@@ -1214,18 +1212,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           }
         }
       }
-      elseif (is_array($params[$key]) && isset($params[$key]["contact_type"])) {
+      elseif (is_array($params[$key]) && isset($params[$key]["contact_type"]) && in_array(substr($key, -3), ['a_b', 'b_a'], TRUE)) {
         //CRM-5125
         //supporting custom data of related contact subtypes
-        $relation = NULL;
-        if ($relationships) {
-          if (array_key_exists($key, $relationships)) {
-            $relation = $key;
-          }
-          elseif (CRM_Utils_Array::key($key, $relationships)) {
-            $relation = CRM_Utils_Array::key($key, $relationships);
-          }
-        }
+        $relation = $key;
         if (!empty($relation)) {
           [$id, $first, $second] = CRM_Utils_System::explode('_', $relation, 3);
           $direction = "contact_sub_type_$second";
@@ -1238,7 +1228,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           }
         }
 
-        self::isErrorInCustomData($params[$key], $errorMessage, $csType, $relationships);
+        self::isErrorInCustomData($params[$key], $errorMessage, $csType);
       }
     }
     if ($errors) {
@@ -1894,8 +1884,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   protected function setFieldMetadata() {
     $this->setImportableFieldsMetadata($this->getContactImportMetadata());
-    // Probably no longer needed but here for now.
-    $this->_relationships = $this->getRelationships();
   }
 
   /**
@@ -2825,7 +2813,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
 
     //checking error in custom data
-    $this->isErrorInCustomData($params, $errorMessage, $csType, $this->_relationships);
+    $this->isErrorInCustomData($params, $errorMessage, $csType);
 
     //checking error in core data
     $this->isErrorInCoreData($params, $errorMessage);
