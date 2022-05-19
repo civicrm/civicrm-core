@@ -120,14 +120,13 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param $customFieldID
    * @param array $customFields
    * @param array $params
-   * @param array $addressCustomFields
    * @param $value
    * @param string $key
    * @param $dateType
    *
    * @return ?string
    */
-  private function validateCustomField($customFieldID, array $customFields, array $params, array $addressCustomFields, $value, string $key, $dateType): ?string {
+  private function validateCustomField($customFieldID, array $customFields, array $params, $value, string $key, $dateType): ?string {
     if (!array_key_exists($customFieldID, $customFields)) {
       return ts('field ID');
     }
@@ -136,11 +135,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       return $customFields[$customFieldID]['label'] . '::' . $customFields[$customFieldID]['groupTitle'];
     }
 
-    //For address custom fields, we do get actual custom field value as an inner array of
-    //values so need to modify
-    if (array_key_exists($customFieldID, $addressCustomFields)) {
-      $value = $value[0][$key];
-    }
     /* validate the data against the CF type */
 
     if ($value) {
@@ -148,15 +142,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $htmlType = $customFields[$customFieldID]['html_type'];
       $isSerialized = CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID]);
       if ($dataType == 'Date') {
-        if (array_key_exists($customFieldID, $addressCustomFields) && CRM_Utils_Date::convertToDefaultDate($params[$key][0], $dateType, $key)) {
-          $value = $params[$key][0][$key];
+        if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
+          return NULL;
         }
-        elseif (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
-          $value = $params[$key];
-        }
-        else {
-          return $customFields[$customFieldID]['label'];
-        }
+        return $customFields[$customFieldID]['label'];
       }
       elseif ($dataType == 'Boolean') {
         if (CRM_Utils_String::strtoboolstr($value) === FALSE) {
@@ -1225,12 +1214,26 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
 
     $addressCustomFields = CRM_Core_BAO_CustomField::getFields('Address');
-    $customFields = $customFields + $addressCustomFields;
+    $parser = new CRM_Contact_Import_Parser_Contact();
     foreach ($params as $key => $value) {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-        /* check if it's a valid custom field id */
-        $parser = new CRM_Contact_Import_Parser_Contact();
-        $errors[] = $parser->validateCustomField($customFieldID, $customFields, $params, $addressCustomFields, $value, $key, $dateType);
+        //For address custom fields, we do get actual custom field value as an inner array of
+        //values so need to modify
+        if (array_key_exists($customFieldID, $addressCustomFields)) {
+          $value = $value[0][$key];
+          $dataType = $addressCustomFields[$customFieldID]['data_type'];
+          if ($dataType === 'Date') {
+            $input = ['custom_' . $customFieldID => $value];
+          }
+          else {
+            $input = $params;
+          }
+          $errors[] = $parser->validateCustomField($customFieldID, $addressCustomFields, $input, $value, $key, $dateType);
+        }
+        else {
+          /* check if it's a valid custom field id */
+          $errors[] = $parser->validateCustomField($customFieldID, $customFields, $params, $value, $key, $dateType);
+        }
       }
       elseif (is_array($params[$key]) && isset($params[$key]["contact_type"])) {
         //CRM-5125
