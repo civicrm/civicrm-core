@@ -200,6 +200,20 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
+   * Did the user specify duplicates checking should be skipped, resulting in possible duplicate contacts.
+   *
+   * Note we still need to check for external_identifier as it will hard-fail
+   * if we duplicate.
+   *
+   * @return bool
+   *
+   * @throws \API_Exception
+   */
+  private function isIgnoreDuplicates(): bool {
+    return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_NOCHECK;
+  }
+
+  /**
    * Handle the values in preview mode.
    *
    * Function will be deprecated in favour of validateValues.
@@ -286,80 +300,36 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     $params = $this->getMappedRow($values);
     $formatted = [
-      'contact_type' => $this->_contactType,
+      'contact_type' => $this->getContactType(),
     ];
 
     $contactFields = CRM_Contact_DAO_Contact::import();
 
-    //check if external identifier exists in database
-    if (!empty($params['external_identifier']) && (!empty($params['id']) || in_array($onDuplicate, [
-      CRM_Import_Parser::DUPLICATE_SKIP,
-      CRM_Import_Parser::DUPLICATE_NOCHECK,
-    ]))) {
+    $params['contact_sub_type'] = $this->getContactSubType() ?: ($params['contact_sub_type'] ?? NULL);
 
-      $extIDResult = civicrm_api3('Contact', 'get', [
-        'external_identifier' => $params['external_identifier'],
-        'showAll' => 'all',
-        'return' => ['id', 'contact_is_deleted'],
-      ]);
-      if (isset($extIDResult['id'])) {
-        // record with matching external identifier does exist.
-        $internalCid = $extIDResult['id'];
-        if ($internalCid != CRM_Utils_Array::value('id', $params)) {
-          if ($extIDResult['values'][$internalCid]['contact_is_deleted'] == 1) {
-            // And it is deleted. What to do? If we skip it, they user
-            // will be under the impression that the record exists in
-            // the database, yet they won't be able to find it. If we
-            // don't skip it, the database will try to insert a new record
-            // with an external_identifier that is non-unique. So...
-            // we will update this contact to remove the external_identifier
-            // and let a new record be created.
-            $update_params = ['id' => $internalCid, 'external_identifier' => ''];
-            civicrm_api3('Contact', 'create', $update_params);
-          }
-          else {
-            $errorMessage = ts('External ID already exists in Database.');
-            array_unshift($values, $errorMessage);
-            $this->setImportStatus((int) $values[count($values) - 1], 'ERROR', $errorMessage);
-            return CRM_Import_Parser::DUPLICATE;
-          }
-        }
+    if ($params['contact_sub_type']) {
+      if (CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'], $this->getContactType(), FALSE, 'label')) {
+        // I think this bit is switching a passed in label to
+        // a name.
+        $subTypes = CRM_Contact_BAO_ContactType::subTypePairs($this->getContactType(), FALSE, NULL);
+        $params['contact_sub_type'] = array_search($params['contact_sub_type'], $subTypes);
       }
     }
 
-    if (!empty($this->_contactSubType)) {
-      $params['contact_sub_type'] = $this->_contactSubType;
-    }
-
-    if ($subType = CRM_Utils_Array::value('contact_sub_type', $params)) {
-      if (CRM_Contact_BAO_ContactType::isExtendsContactType($subType, $this->_contactType, FALSE, 'label')) {
-        $subTypes = CRM_Contact_BAO_ContactType::subTypePairs($this->_contactType, FALSE, NULL);
-        $params['contact_sub_type'] = array_search($subType, $subTypes);
+    try {
+      if ($params['contact_sub_type'] && !CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'], $this->getContactType())) {
+        throw new CRM_Core_Exception('Mismatched or Invalid Contact Subtype.', CRM_Import_Parser::NO_MATCH);
       }
-      elseif (!CRM_Contact_BAO_ContactType::isExtendsContactType($subType, $this->_contactType)) {
-        $message = "Mismatched or Invalid Contact Subtype.";
-        array_unshift($values, $message);
-        return CRM_Import_Parser::NO_MATCH;
-      }
+      $params['id'] = $formatted['id'] = $this->lookupContactID($params, ($this->isSkipDuplicates() || $this->isIgnoreDuplicates()));
     }
-
+    catch (CRM_Core_Exception $e) {
+      $statuses = [CRM_Import_Parser::DUPLICATE => 'DUPLICATE', CRM_Import_Parser::ERROR => 'ERROR', CRM_Import_Parser::NO_MATCH => 'invalid_no_match'];
+      $this->setImportStatus((int) $values[count($values) - 1], $statuses[$e->getErrorCode()], $e->getMessage());
+      return FALSE;
+    }
     // Get contact id to format common data in update/fill mode,
     // prioritising a dedupe rule check over an external_identifier check, but falling back on ext id.
-    if ($this->_updateWithId && empty($params['id'])) {
-      try {
-        $possibleMatches = $this->getPossibleContactMatches($params);
-      }
-      catch (CRM_Core_Exception $e) {
-        $errorMessage = $e->getMessage();
-        array_unshift($values, $errorMessage);
 
-        $this->setImportStatus((int) $values[count($values) - 1], 'ERROR', $errorMessage);
-        return CRM_Import_Parser::ERROR;
-      }
-      foreach ($possibleMatches as $possibleID) {
-        $params['id'] = $formatted['id'] = $possibleID;
-      }
-    }
     //format common data, CRM-4062
     $this->formatCommonData($params, $formatted, $contactFields);
 
@@ -376,8 +346,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           $updateflag = TRUE;
           foreach ($matchedIDs as $contactId) {
             if ($params['id'] == $contactId) {
-              $contactType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params['id'], 'contact_type');
-              if ($formatted['contact_type'] == $contactType) {
+              if (1) {
                 //validation of subtype for update mode
                 //CRM-5125
                 $contactSubType = NULL;
@@ -397,12 +366,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
                   $this->_retCode = CRM_Import_Parser::VALID;
                 }
               }
-              else {
-                $message = "Mismatched contact Types :";
-                array_unshift($values, $message);
-                $updateflag = FALSE;
-                $this->_retCode = CRM_Import_Parser::NO_MATCH;
-              }
             }
           }
           if ($updateflag) {
@@ -413,11 +376,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
       else {
-        $contactType = NULL;
         if (!empty($params['id'])) {
-          $contactType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params['id'], 'contact_type');
-          if ($contactType) {
-            if ($formatted['contact_type'] == $contactType) {
+          if (1) {
+            if (1) {
               //validation of subtype for update mode
               //CRM-5125
               $contactSubType = NULL;
@@ -435,20 +396,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
                 $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $params['id'], FALSE, $this->_dedupeRuleGroupID);
                 $this->_retCode = CRM_Import_Parser::VALID;
               }
-            }
-            else {
-              $message = "Mismatched contact Types :";
-              array_unshift($values, $message);
-              $this->_retCode = CRM_Import_Parser::NO_MATCH;
-            }
-          }
-          else {
-            // we should avoid multiple errors for single record
-            // since we have already retCode and we trying to force again.
-            if ($this->_retCode != CRM_Import_Parser::NO_MATCH) {
-              $message = "No contact found for this contact ID:" . $params['id'];
-              array_unshift($values, $message);
-              $this->_retCode = CRM_Import_Parser::NO_MATCH;
             }
           }
         }
@@ -1892,52 +1839,31 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @see https://issues.civicrm.org/jira/browse/CRM-17275
    *
    * @param array $params
+   * @param int|null $extIDMatch
+   * @param int|null $dedupeRuleID
    *
-   * @return array
-   *   IDs of possible matches.
+   * @return int|null
+   *   IDs of a possible.
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  protected function getPossibleContactMatches($params) {
-    $extIDMatch = NULL;
-
-    if (!empty($params['external_identifier'])) {
-      // Check for any match on external id, deleted or otherwise.
-      $extIDContact = civicrm_api3('Contact', 'get', [
-        'external_identifier' => $params['external_identifier'],
-        'showAll' => 'all',
-        'return' => ['id', 'contact_is_deleted'],
-      ]);
-      if (isset($extIDContact['id'])) {
-        $extIDMatch = $extIDContact['id'];
-
-        if ($extIDContact['values'][$extIDMatch]['contact_is_deleted'] == 1) {
-          // If the contact is deleted, update external identifier to be blank
-          // to avoid key error from MySQL.
-          $params = ['id' => $extIDMatch, 'external_identifier' => ''];
-          civicrm_api3('Contact', 'create', $params);
-
-          // And now it is no longer a match.
-          $extIDMatch = NULL;
-        }
-      }
-    }
-    $checkParams = ['check_permissions' => FALSE, 'match' => $params];
-    $checkParams['match']['contact_type'] = $this->_contactType;
-
+  protected function getPossibleContactMatch(array $params, ?int $extIDMatch, ?int $dedupeRuleID): ?int {
+    $checkParams = ['check_permissions' => FALSE, 'match' => $params, 'dedupe_rule_id' => $dedupeRuleID];
     $possibleMatches = civicrm_api3('Contact', 'duplicatecheck', $checkParams);
     if (!$extIDMatch) {
-      return array_keys($possibleMatches['values']);
+      // Historically we have used the last ID - it is not clear if this was
+      // deliberate.
+      return array_key_last($possibleMatches['values']);
     }
     if ($possibleMatches['count']) {
       if (array_key_exists($extIDMatch, $possibleMatches['values'])) {
-        return [$extIDMatch];
+        return $extIDMatch;
       }
       throw new CRM_Core_Exception(ts(
         'Matching this contact based on the de-dupe rule would cause an external ID conflict'));
     }
-    return [$extIDMatch];
+    return $extIDMatch;
   }
 
   /**
@@ -2872,15 +2798,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   public function validateValues(array $values): void {
     $params = $this->getMappedRow($values);
-    $this->validateRequiredContactFields($params['contact_type'], $params, $this->isUpdateExistingContacts());
-    foreach ($params as $key => $value) {
-      // If the key is a relationship key - eg. 5_a_b or 10_b_a
-      // then the value is an array that describes an existing contact.
-      // We need to check the fields are present to identify or create this
-      // contact.
-      if (preg_match('/^\d+_[a|b]_[a|b]$/', $key)) {
-        $this->validateRequiredContactFields($value['contact_type'], $value, TRUE, '(' . $this->getRelatedContactLabel(substr($key, 0, -4), substr($key, -3)) . ')');
-      }
+    $contacts = array_merge(['0' => $params], $this->getRelatedContactsParams($params));
+    foreach ($contacts as $value) {
+      // If we are referencing a related contact, or are in update mode then we
+      // don't need all the required fields if we have enough to find an existing contact.
+      $useExistingMatchFields = !empty($value['relationship_type_id']) || $this->isUpdateExistingContacts();
+      $this->validateRequiredContactFields($value['contact_type'], $value, $useExistingMatchFields, !empty($value['relationship_label']) ? '(' . $value['relationship_label'] . ')' : '');
     }
 
     //check for duplicate external Identifier
@@ -2961,7 +2884,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       return NULL;
     }
     $relationshipField = 'contact_type_' . substr($relationshipDirection, -1);
-    return $this->getRelationshipType($relationshipTypeID, $relationshipDirection)[$relationshipField];
+    return $this->getRelationshipType($relationshipTypeID)[$relationshipField];
   }
 
   /**
@@ -2976,7 +2899,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   protected function getRelatedContactLabel($relationshipTypeID, $relationshipDirection): ?string {
     $relationshipField = 'label_' . $relationshipDirection;
-    return $this->getRelationshipType($relationshipTypeID, $relationshipDirection)[$relationshipField];
+    return $this->getRelationshipType($relationshipTypeID)[$relationshipField];
   }
 
   /**
@@ -3017,6 +2940,124 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     else {
       $contactArray[$fieldName] = $this->getTransformedFieldValue($fieldName, $importedValue);
     }
+  }
+
+  /**
+   * Get any related contacts designated for update.
+   *
+   * This extracts the parts that relate to separate related
+   * contacts from the 'params' array.
+   *
+   * It is probably a bit silly not to nest them more clearly in
+   * `getParams` in the first place & maybe in future we can do that.
+   *
+   * @param array $params
+   *
+   * @return array
+   *   e.g ['5_a_b' => ['contact_type' => 'Organization', 'organization_name' => 'The Firm']]
+   * @throws \API_Exception
+   */
+  protected function getRelatedContactsParams(array $params): array {
+    $relatedContacts = [];
+    foreach ($params as $key => $value) {
+      // If the key is a relationship key - eg. 5_a_b or 10_b_a
+      // then the value is an array that describes an existing contact.
+      // We need to check the fields are present to identify or create this
+      // contact.
+      if (preg_match('/^\d+_[a|b]_[a|b]$/', $key)) {
+        $value['relationship_type_id'] = substr($key, 0, -4);
+        $value['relationship_direction'] = substr($key, -3);
+        $value['relationship_label'] = $this->getRelationshipLabel($value['relationship_type_id'], $value['relationship_direction']);
+        $relatedContacts[$key] = $value;
+      }
+    }
+    return $relatedContacts;
+  }
+
+  /**
+   * Look up for an existing contact with the given external_identifier.
+   *
+   * If the identifier is found on a deleted contact then it is not a match
+   * but it must be removed from that contact to allow the new contact to
+   * have that external_identifier.
+   *
+   * @param string|null $externalIdentifier
+   * @param string $contactType
+   *
+   * @return int|null
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function lookupExternalIdentifier(?string $externalIdentifier, string $contactType): ?int {
+    if (!$externalIdentifier) {
+      return NULL;
+    }
+    // Check for any match on external id, deleted or otherwise.
+    $foundContact = civicrm_api3('Contact', 'get', [
+      'external_identifier' => $externalIdentifier,
+      'showAll' => 'all',
+      'sequential' => TRUE,
+      'return' => ['id', 'contact_is_deleted', 'contact_type'],
+    ]);
+    if (empty($foundContact['id'])) {
+      return NULL;
+    }
+    if (!empty($foundContact['values'][0]['contact_is_deleted'])) {
+      // If the contact is deleted, update external identifier to be blank
+      // to avoid key error from MySQL.
+      $params = ['id' => $foundContact['id'], 'external_identifier' => ''];
+      civicrm_api3('Contact', 'create', $params);
+      return NULL;
+    }
+    if ($foundContact['values'][0]['contact_type'] !== $contactType) {
+      throw new CRM_Core_Exception('Mismatched contact Types', CRM_Import_Parser::NO_MATCH);
+    }
+    return (int) $foundContact['id'];
+  }
+
+  /**
+   * Lookup the contact's contact ID.
+   *
+   * @param array $params
+   * @param bool $isDuplicateIfExternalIdentifierExists
+   *
+   * @return int|null
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function lookupContactID(array $params, bool $isDuplicateIfExternalIdentifierExists): ?int {
+    $extIDMatch = $this->lookupExternalIdentifier($params['external_identifier'] ?? NULL, $params['contact_type']);
+    $contactID = !empty($params['id']) ? (int) $params['id'] : NULL;
+    //check if external identifier exists in database
+    if ($extIDMatch && $contactID && $extIDMatch !== $contactID) {
+      throw new CRM_Core_Exception(ts('Existing external ID does not match the imported contact ID.'), CRM_Import_Parser::ERROR);
+    }
+    if ($extIDMatch && $isDuplicateIfExternalIdentifierExists) {
+      throw new CRM_Core_Exception(ts('External ID already exists in Database.'), CRM_Import_Parser::DUPLICATE);
+    }
+    if ($contactID) {
+      $existingContact = Contact::get(FALSE)
+        ->addWhere('id', '=', $contactID)
+        // Don't auto-filter deleted - people use import to undelete.
+        ->addWhere('is_deleted', 'IN', [0, 1])
+        ->addSelect('contact_type')->execute()->first();
+      if (empty($existingContact['id'])) {
+        throw new CRM_Core_Exception('No contact found for this contact ID:' . $params['id'], CRM_Import_Parser::NO_MATCH);
+      }
+      if ($existingContact['contact_type'] !== $params['contact_type']) {
+        throw new CRM_Core_Exception('Mismatched contact Types', CRM_Import_Parser::NO_MATCH);
+      }
+      return $contactID;
+    }
+    // Time to see if we can find an existing contact ID to make this an update
+    // not a create.
+    if ($extIDMatch || $this->isUpdateExistingContacts()) {
+      return $this->getPossibleContactMatch($params, $extIDMatch, $this->getSubmittedValue('dedupe_rule_id'));
+    }
+    return NULL;
   }
 
 }

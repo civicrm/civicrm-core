@@ -15,6 +15,7 @@
  */
 
 use Civi\Api4\Contact;
+use Civi\Api4\RelationshipType;
 use Civi\Api4\UserJob;
 
 /**
@@ -37,7 +38,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * Tear down after test.
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_email', 'civicrm_user_job'], TRUE);
+    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_email', 'civicrm_user_job', 'civicrm_relationship'], TRUE);
+    RelationshipType::delete()->addWhere('name_a_b', '=', 'Dad to')->execute();
     parent::tearDown();
   }
 
@@ -121,6 +123,112 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test import parser will update based on a custom rule match.
+   *
+   * In this case the contact has no external identifier.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testImportParserWithUpdateWithCustomRule(): void {
+    $this->createCustomGroupWithFieldsOfAllTypes();
+
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
+      'contact_type' => 'Individual',
+      'threshold' => 10,
+      'used' => 'General',
+      'name' => 'TestRule',
+      'title' => 'TestRule',
+      'is_reserved' => 0,
+    ]);
+    $this->callAPISuccess('Rule', 'create', [
+      'dedupe_rule_group_id' => $ruleGroup['id'],
+      'rule_table' => $this->getCustomGroupTable(),
+      'rule_weight' => 10,
+      'rule_field' => $this->getCustomFieldColumnName('text'),
+    ]);
+
+    $extra = [
+      $this->getCustomFieldName('select_string') => 'Yellow',
+      $this->getCustomFieldName('text') => 'Duplicate',
+    ];
+
+    [$originalValues, $result] = $this->setUpBaseContact($extra);
+
+    $contactValues = [
+      'first_name' => 'Tim',
+      'last_name' => 'Cook',
+      'email' => 'tim.cook@apple.com',
+      'nick_name' => 'Steve',
+      $this->getCustomFieldName('select_string') => 'Red',
+      $this->getCustomFieldName('text') => 'Duplicate',
+    ];
+
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, [], NULL, $ruleGroup['id']);
+    $contactValues['id'] = $result['id'];
+    $this->assertEquals('R', $this->callAPISuccessGetValue('Contact', ['id' => $result['id'], 'return' => $this->getCustomFieldName('select_string')]));
+    $this->callAPISuccessGetSingle('Contact', $contactValues);
+
+    $foundDupes = CRM_Dedupe_Finder::dupes($ruleGroup['id']);
+    $this->assertCount(0, $foundDupes);
+  }
+
+  /**
+   * Test import parser will update based on a custom rule match.
+   *
+   * In this case the contact has no external identifier.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testImportParserWithUpdateWithCustomRuleNoExternalIDMatch(): void {
+    $this->createCustomGroupWithFieldsOfAllTypes();
+
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
+      'contact_type' => 'Individual',
+      'threshold' => 10,
+      'used' => 'General',
+      'name' => 'TestRule',
+      'title' => 'TestRule',
+      'is_reserved' => 0,
+    ]);
+    $this->callAPISuccess('Rule', 'create', [
+      'dedupe_rule_group_id' => $ruleGroup['id'],
+      'rule_table' => $this->getCustomGroupTable(),
+      'rule_weight' => 10,
+      'rule_field' => $this->getCustomFieldColumnName('text'),
+    ]);
+
+    $extra = [
+      $this->getCustomFieldName('select_string') => 'Yellow',
+      $this->getCustomFieldName('text') => 'Duplicate',
+      'external_identifier' => 'ext-2',
+    ];
+
+    [$originalValues, $result] = $this->setUpBaseContact($extra);
+
+    $contactValues = [
+      'first_name' => 'Tim',
+      'last_name' => 'Cook',
+      'email' => 'tim.cook@apple.com',
+      'nick_name' => 'Steve',
+      'external_identifier' => 'ext-1',
+      $this->getCustomFieldName('select_string') => 'Red',
+      $this->getCustomFieldName('text') => 'Duplicate',
+    ];
+
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, [], NULL, $ruleGroup['id']);
+    $contactValues['id'] = $result['id'];
+    $this->assertEquals('R', $this->callAPISuccessGetValue('Contact', ['id' => $result['id'], 'return' => $this->getCustomFieldName('select_string')]));
+    $this->callAPISuccessGetSingle('Contact', $contactValues);
+
+    $foundDupes = CRM_Dedupe_Finder::dupes($ruleGroup['id']);
+    $this->assertCount(0, $foundDupes);
+  }
+
+  /**
    * Test import parser will update contacts with an external identifier.
    *
    * This is the basic test where the identifier matches the import parameters.
@@ -144,9 +252,11 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test updating an existing contact with external_identifier match but subtype mismatch.
    *
+   * The subtype is updated, as there is no conflicting contact data.
+   *
    * @throws \Exception
    */
-  public function testImportParserWithUpdateWithExternalIdentifierSubtypeMismatch(): void {
+  public function testImportParserWithUpdateWithExternalIdentifierSubtypeChange(): void {
     $contactID = $this->individualCreate(['external_identifier' => 'billy', 'first_name' => 'William', 'contact_sub_type' => 'Parent']);
     $this->runImport([
       'external_identifier' => 'billy',
@@ -165,16 +275,26 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testImportParserWithUpdateWithExternalIdentifierTypeMismatch(): void {
+  public function testImportParserWithUpdateWithTypeMismatch(): void {
     $contactID = $this->organizationCreate(['external_identifier' => 'billy']);
     $this->runImport([
       'external_identifier' => 'billy',
       'nick_name' => 'Old Bill',
-    ], CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::NO_MATCH);
+    ], CRM_Import_Parser::DUPLICATE_UPDATE, FALSE);
     $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contactID]);
     $this->assertEquals('', $contact['nick_name']);
     $this->assertEquals('billy', $contact['external_identifier']);
     $this->assertEquals('Organization', $contact['contact_type']);
+
+    $this->runImport([
+      'id' => $contactID,
+      'nick_name' => 'Old Bill',
+    ], CRM_Import_Parser::DUPLICATE_UPDATE, FALSE);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contactID]);
+    $this->assertEquals('', $contact['nick_name']);
+    $this->assertEquals('billy', $contact['external_identifier']);
+    $this->assertEquals('Organization', $contact['contact_type']);
+
   }
 
   /**
@@ -1135,8 +1255,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     foreach ($fields as $index => $field) {
       $mapper[] = [$field, $mapperLocType[$index] ?? NULL, $field === 'phone' ? 1 : NULL];
     }
-    $userJobID = $this->getUserJobID(['mapper' => $mapper, 'onDuplicate' => $onDuplicateAction]);
-    $parser = new CRM_Contact_Import_Parser_Contact($fields, $mapperLocType);
+    $userJobID = $this->getUserJobID(['mapper' => $mapper, 'onDuplicate' => $onDuplicateAction, 'dedupe_rule_id' => $ruleGroupId]);
+    $parser = new CRM_Contact_Import_Parser_Contact($fields);
     $parser->setUserJobID($userJobID);
     $parser->_dedupeRuleGroupID = $ruleGroupId;
     $parser->init();
@@ -1168,6 +1288,28 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $parser->setUserJobID($userJobID);
     $parser->init();
     return [$dataSource, $parser];
+  }
+
+  /**
+   * @param int $contactID
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function addChild(int $contactID): void {
+    $relatedContactID = $this->individualCreate();
+    $relationshipTypeID = RelationshipType::create()->setValues([
+      'name_a_b' => 'Dad to',
+      'name_b_a' => 'Sleep destroyer of',
+      'contact_type_a' => 'Individual',
+      'contact_type_b' => 'Individual',
+      'contact_sub_type_a' => 'Parent',
+    ])->execute()->first()['id'];
+    \Civi\Api4\Relationship::create()->setValues([
+      'relationship_type_id' => $relationshipTypeID,
+      'contact_id_a' => $contactID,
+      'contact_id_b' => $relatedContactID,
+    ])->execute();
   }
 
   /**
@@ -1306,6 +1448,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
           'dataSource' => 'CRM_Import_DataSource_SQL',
           'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
           'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+          'dedupe_rule_id' => NULL,
         ], $submittedValues),
       ],
       'status_id:name' => 'draft',
