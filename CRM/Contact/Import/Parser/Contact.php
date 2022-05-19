@@ -340,7 +340,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $createNewContact = FALSE;
       // @todo - it feels like all the rows from here to the end of the IF
       // could be removed in favour of a simple check for whether the contact_type & id match
-      $matchedIDs = $this->getIdsOfMatchingContacts($formatted);
+      $matchedIDs = [$params['id']];
       if (!empty($matchedIDs)) {
         if (count($matchedIDs) >= 1) {
           $updateflag = TRUE;

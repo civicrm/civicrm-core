@@ -1098,32 +1098,6 @@ abstract class CRM_Import_Parser {
   }
 
   /**
-   * Get the ids of any contacts that match according to the rule.
-   *
-   * @param array $formatted
-   *
-   * @return array
-   */
-  protected function getIdsOfMatchingContacts(array $formatted):array {
-    if ($formatted['id'] ?? NULL) {
-      return [$formatted['id']];
-    }
-
-    // the call to the deprecated function seems to add no value other that to do an additional
-    // check for the contact_id & type.
-    $error = _civicrm_api3_deprecated_duplicate_formatted_contact($formatted);
-    if (!CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
-      return [];
-    }
-    if (is_array($error['error_message']['params'][0])) {
-      return $error['error_message']['params'][0];
-    }
-    else {
-      return explode(',', $error['error_message']['params'][0]);
-    }
-  }
-
-  /**
    * Validate that the field requirements are met in the params.
    *
    * @param array $requiredFields
