@@ -346,25 +346,23 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           $updateflag = TRUE;
           foreach ($matchedIDs as $contactId) {
             if ($params['id'] == $contactId) {
-              if (1) {
-                //validation of subtype for update mode
-                //CRM-5125
-                $contactSubType = NULL;
-                if (!empty($params['contact_sub_type'])) {
-                  $contactSubType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params['id'], 'contact_sub_type');
-                }
+              //validation of subtype for update mode
+              //CRM-5125
+              $contactSubType = NULL;
+              if (!empty($params['contact_sub_type'])) {
+                $contactSubType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params['id'], 'contact_sub_type');
+              }
 
-                if (!empty($contactSubType) && (!CRM_Contact_BAO_ContactType::isAllowEdit($params['id'], $contactSubType) && $contactSubType != CRM_Utils_Array::value('contact_sub_type', $formatted))) {
+              if (!empty($contactSubType) && (!CRM_Contact_BAO_ContactType::isAllowEdit($params['id'], $contactSubType) && $contactSubType != CRM_Utils_Array::value('contact_sub_type', $formatted))) {
 
-                  $message = "Mismatched contact SubTypes :";
-                  array_unshift($values, $message);
-                  $updateflag = FALSE;
-                  $this->_retCode = CRM_Import_Parser::NO_MATCH;
-                }
-                else {
-                  $updateflag = FALSE;
-                  $this->_retCode = CRM_Import_Parser::VALID;
-                }
+                $message = "Mismatched contact SubTypes :";
+                array_unshift($values, $message);
+                $updateflag = FALSE;
+                $this->_retCode = CRM_Import_Parser::NO_MATCH;
+              }
+              else {
+                $updateflag = FALSE;
+                $this->_retCode = CRM_Import_Parser::VALID;
               }
             }
           }
@@ -377,26 +375,22 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
       else {
         if (!empty($params['id'])) {
-          if (1) {
-            if (1) {
-              //validation of subtype for update mode
-              //CRM-5125
-              $contactSubType = NULL;
-              if (!empty($params['contact_sub_type'])) {
-                $contactSubType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params['id'], 'contact_sub_type');
-              }
+          //validation of subtype for update mode
+          //CRM-5125
+          $contactSubType = NULL;
+          if (!empty($params['contact_sub_type'])) {
+            $contactSubType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params['id'], 'contact_sub_type');
+          }
 
-              if (!empty($contactSubType) && (!CRM_Contact_BAO_ContactType::isAllowEdit($params['id'], $contactSubType) && $contactSubType != CRM_Utils_Array::value('contact_sub_type', $formatted))) {
+          if (!empty($contactSubType) && (!CRM_Contact_BAO_ContactType::isAllowEdit($params['id'], $contactSubType) && $contactSubType != CRM_Utils_Array::value('contact_sub_type', $formatted))) {
 
-                $message = "Mismatched contact SubTypes :";
-                array_unshift($values, $message);
-                $this->_retCode = CRM_Import_Parser::NO_MATCH;
-              }
-              else {
-                $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $params['id'], FALSE, $this->_dedupeRuleGroupID);
-                $this->_retCode = CRM_Import_Parser::VALID;
-              }
-            }
+            $message = "Mismatched contact SubTypes :";
+            array_unshift($values, $message);
+            $this->_retCode = CRM_Import_Parser::NO_MATCH;
+          }
+          else {
+            $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $params['id'], FALSE, $this->_dedupeRuleGroupID);
+            $this->_retCode = CRM_Import_Parser::VALID;
           }
         }
         else {
