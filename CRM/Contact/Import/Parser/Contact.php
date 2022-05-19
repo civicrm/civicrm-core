@@ -2056,24 +2056,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         return civicrm_api3_create_error($error->pop());
       }
     }
-
-    // check for organisations with same name
-    if (!empty($params['current_employer'])) {
-      $organizationParams = ['organization_name' => $params['current_employer']];
-      $dupeIds = CRM_Contact_BAO_Contact::getDuplicateContacts($organizationParams, 'Organization', 'Supervised', [], FALSE);
-
-      // check for mismatch employer name and id
-      if (!empty($params['employer_id']) && !in_array($params['employer_id'], $dupeIds)
-      ) {
-        throw new CRM_Core_Exception('Employer name and Employer id Mismatch');
-      }
-
-      // show error if multiple organisation with same name exist
-      if (empty($params['employer_id']) && (count($dupeIds) > 1)
-      ) {
-        return civicrm_api3_create_error('Found more than one Organisation with same Name.');
-      }
-    }
   }
 
   /**
