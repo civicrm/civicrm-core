@@ -549,7 +549,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $editable['value'] = $data[$editable['value_path']];
     }
     // Generate params to create new record, if applicable
-    elseif ($editable['explicit_join']) {
+    elseif ($editable['explicit_join'] && !$this->getJoin($editable['explicit_join'])['bridge']) {
       $editable['action'] = 'create';
       $editable['value'] = NULL;
       $editable['nullable'] = FALSE;
@@ -576,6 +576,21 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
             }
           }
         }
+      }
+      // Ensure all required values exist for create action
+      $vals = array_keys(array_filter($editable['record']));
+      $vals[] = $editable['value_key'];
+      $missingRequiredFields = civicrm_api4($editable['entity'], 'getFields', [
+        'action' => 'create',
+        'where' => [
+          ['type', '=', 'Field'],
+          ['required', '=', TRUE],
+          ['default_value', 'IS NULL'],
+          ['name', 'NOT IN', $vals],
+        ],
+      ]);
+      if ($missingRequiredFields->count() || count($vals) === 1) {
+        return NULL;
       }
     }
     // Ensure current user has access

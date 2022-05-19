@@ -61,7 +61,16 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
     if (!in_array('Civi\Test\TransactionalInterface', $impliments, TRUE)) {
       // Delete all test records in reverse order to prevent fk constraints
       foreach (array_reverse($this->testRecords) as $record) {
-        civicrm_api4($record[0], 'delete', ['checkPermissions' => FALSE, 'where' => $record[1]]);
+        $params = ['checkPermissions' => FALSE, 'where' => $record[1]];
+
+        // Set useTrash param if it exists
+        $entityClass = CoreUtil::getApiClass($record[0]);
+        $deleteAction = $entityClass::delete();
+        if (property_exists($deleteAction, 'useTrash')) {
+          $params['useTrash'] = FALSE;
+        }
+
+        civicrm_api4($record[0], 'delete', $params);
       }
     }
   }
