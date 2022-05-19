@@ -21,6 +21,38 @@
  */
 class CRM_Upgrade_Incremental_php_FiveFortyNine extends CRM_Upgrade_Incremental_Base {
 
+  /**
+   * When executing 5.49.2 upgrade-step, it decides whether to fix limit-to. Remember that decision.
+   *
+   * Note: You cannot _generally_ use object-properties to communicate between functions in this class
+   * (because they reset in diff AJAX requests).
+   *
+   * However, you can _specifically_ communicate between `upgrade_N_N_N()` and `setPostUpgradeMessage()`.
+   * This is because they are guaranteed to run in the same call (as part of `doIncrementalUpgradeStep()`).
+   *
+   * @var bool|null
+   */
+  private $executedLimitToFix;
+
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+    $willExecuteLimitToFix = (bool) version_compare(CRM_Core_BAO_Domain::version(), '5.49.beta1', '>=');
+    if ($rev == '5.49.2' && $willExecuteLimitToFix) {
+      $message = $this->createLimitToMessage();
+      if ($message) {
+        $preUpgradeMessage .= "<p>{$message}</p>";
+      }
+    }
+  }
+
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+    if ($rev == '5.49.2' && $this->executedLimitToFix === TRUE) {
+      $message = $this->createLimitToMessage();
+      if ($message) {
+        $postUpgradeMessage .= "<p><strong>" . ts('WARNING') . "</strong>: {$message}</p>";
+      }
+    }
+  }
+
   public static function findBooleanColumns(): array {
     $r = [];
     $files = CRM_Utils_File::findFiles(__DIR__ . '/FiveFortyNine', '*.bool.php');
@@ -58,6 +90,48 @@ class CRM_Upgrade_Incremental_php_FiveFortyNine extends CRM_Upgrade_Incremental_
         $this->addTask("Update $tableName.$columnName to be NOT NULL", 'changeBooleanColumn', $tableName, $columnName, $defn);
       }
     }
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $currentRev
+   *   DB revision (which we are currently applying)
+   * @param string $startRev
+   *   DB revision (when the upgrade started)
+   * @param string $finalRev
+   *   DB revision (that we're aiming to reach, in the end)
+   */
+  public function upgrade_5_49_2($currentRev, $startRev, $finalRev) {
+    if (empty($startRev)) {
+      throw new \RuntimeException("Error: Was somebody too clever about modifying the upgrader? We're missing a little-known but very-handy parameter!");
+    }
+    $this->executedLimitToFix = (bool) version_compare($startRev, '5.49.beta1', '>=');
+    if ($this->executedLimitToFix) {
+      $this->addTask('Update "civicrm_action_schedule.limit_to" to re-enable "NULL" values', 'changeBooleanColumnLimitTo');
+    }
+  }
+
+  public function createLimitToMessage(): ?string {
+    $suspectRecords = CRM_Core_DAO::singleValueQuery("SELECT GROUP_CONCAT(id SEPARATOR \", #\") FROM civicrm_action_schedule WHERE limit_to=0 AND (recipient_manual IS NOT NULL OR group_id IS NOT NULL)");
+    if (!empty($suspectRecords)) {
+      return ts('This site previously executed an early version of 5.49, which may have incorrectly modified some scheduled reminders. After upgrading, review these reminders (<code>%1</code>). <a %2>(Learn more...)</a>', [
+        1 => '#' . $suspectRecords,
+        2 => 'target="blank" href="https://civicrm.org/redirect/reminders-5.49"',
+      ]);
+    }
+    else {
+      return NULL;
+    }
+  }
+
+  /**
+   * Revert boolean default civicrm_action_schedule.limit_to to be NULL
+   */
+  public static function changeBooleanColumnLimitTo() {
+    CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_action_schedule` CHANGE `limit_to` `limit_to` tinyint NULL COMMENT 'Is this the recipient criteria limited to OR in addition to?'", [], TRUE, NULL, FALSE, FALSE);
+    CRM_Core_DAO::executeQuery("UPDATE `civicrm_action_schedule` SET `limit_to` = NULL WHERE `limit_to` = 0 AND `group_id` IS NULL AND recipient_manual IS NULL", [], TRUE, NULL, FALSE, FALSE);
+    return TRUE;
   }
 
   /**
