@@ -373,36 +373,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           }
         }
       }
-      else {
-        if (!empty($params['id'])) {
-          //validation of subtype for update mode
-          //CRM-5125
-          $contactSubType = NULL;
-          if (!empty($params['contact_sub_type'])) {
-            $contactSubType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params['id'], 'contact_sub_type');
-          }
-
-          if (!empty($contactSubType) && (!CRM_Contact_BAO_ContactType::isAllowEdit($params['id'], $contactSubType) && $contactSubType != CRM_Utils_Array::value('contact_sub_type', $formatted))) {
-
-            $message = "Mismatched contact SubTypes :";
-            array_unshift($values, $message);
-            $this->_retCode = CRM_Import_Parser::NO_MATCH;
-          }
-          else {
-            $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $params['id'], FALSE, $this->_dedupeRuleGroupID);
-            $this->_retCode = CRM_Import_Parser::VALID;
-          }
-        }
-        else {
-          //CRM-4148
-          //now we want to create new contact on update/fill also.
-          $createNewContact = TRUE;
-        }
-      }
-
-      if (isset($newContact) && is_a($newContact, 'CRM_Contact_BAO_Contact')) {
-        $relationship = TRUE;
-      }
     }
 
     //fixed CRM-4148
