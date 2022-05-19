@@ -290,7 +290,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     // first make sure this is a valid line
     //$this->_updateWithId = false;
     $response = $this->summary($values);
-    $statusFieldName = $this->_statusFieldName;
 
     if ($response != CRM_Import_Parser::VALID) {
       $this->setImportStatus((int) $values[count($values) - 1], 'Invalid', "Invalid (Error Code: $response)");
@@ -717,7 +716,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $code = NULL;
 
       if (($code = CRM_Utils_Array::value('code', $newContact['error_message'])) && ($code == CRM_Core_Error::DUPLICATE_CONTACT)) {
-        return $this->handleDuplicateError($newContact, $statusFieldName, $values, $onDuplicate, $formatted, $contactFields);
+        return $this->handleDuplicateError($newContact, $values, $onDuplicate, $formatted, $contactFields);
       }
       // Not a dupe, so we had an error
       $errorMessage = $newContact['error_message'];
@@ -1888,7 +1887,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
   /**
    * @param array $newContact
-   * @param $statusFieldName
    * @param array $values
    * @param int $onDuplicate
    * @param array $formatted
@@ -1900,7 +1898,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function handleDuplicateError(array $newContact, $statusFieldName, array $values, int $onDuplicate, array $formatted, array $contactFields): int {
+  private function handleDuplicateError(array $newContact, array $values, int $onDuplicate, array $formatted, array $contactFields): int {
     $urls = [];
     // need to fix at some stage and decide if the error will return an
     // array or string, crude hack for now
