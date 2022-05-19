@@ -1982,10 +1982,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param bool $dupeCheck
    * @param null|int $dedupeRuleGroupID
    *
+   * @return ?array
    * @throws \CRM_Core_Exception
    */
   public function deprecated_contact_check_params(
-    &$params,
+    $params,
     $dupeCheck = TRUE,
     $dedupeRuleGroupID = NULL) {
 
@@ -2004,12 +2005,17 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       // $dupes = civicrm_api3('Contact', 'duplicatecheck', (array('match' => $params, 'dedupe_rule_id' => $dedupeRuleGroupID)));
       // $ids = $dupes['count'] ? implode(',', array_keys($dupes['values'])) : NULL;
       $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, $params['contact_type'], 'Unsupervised', [], CRM_Utils_Array::value('check_permissions', $params), $dedupeRuleGroupID);
+
       if ($ids != NULL) {
-        $error = CRM_Core_Error::createError("Found matching contacts: " . implode(',', $ids),
-          CRM_Core_Error::DUPLICATE_CONTACT,
-          'Fatal', $ids
-        );
-        return civicrm_api3_create_error($error->pop());
+        return [
+          'is_error' => 1,
+          'error_message' => [
+            'code' => CRM_Core_Error::DUPLICATE_CONTACT,
+            'params' => $ids,
+            'level' => 'Fatal',
+            'message' => 'Found matching contacts: ' . implode(',', $ids),
+          ],
+        ];
       }
     }
 
