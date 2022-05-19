@@ -111,7 +111,7 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
           throw new \API_Exception('Illegal expression');
         }
         $baoName = CoreUtil::getBAOFromApiName($this->getEntityName());
-        $options = $baoName::buildOptions($fieldName, $context);
+        $options = $baoName::buildOptions($fieldName, $context) ?: [];
         $this->values[$fieldName] = FormattingUtil::replacePseudoconstant($options, $this->values[$key], TRUE);
         unset($this->values[$key]);
       }
