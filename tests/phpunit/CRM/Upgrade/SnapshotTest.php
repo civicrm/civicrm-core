@@ -12,29 +12,28 @@ class CRM_Upgrade_SnapshotTest extends CiviUnitTestCase {
     CRM_Upgrade_Snapshot::$cleanupAfter = 4;
   }
 
-  // protected function tearDown(): void {
-  //   // We just throw a lot of random stuff in the DB. Don't care about slow cleanup, since this test is a schema-heavy oddball with low# iterations.
-  //   // \Civi\Test::headless()->apply(TRUE);
-  //   parent::tearDown();
-  // }
-
   /**
-   * "php" requirement (composer.json) should match
-   * CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER.
+   * This example creates a snapshot based on particular sliver of data (ie
+   * the "display_name" and "sort_name" for "Individual" records). It ensures that:
+   *
+   * 1. Some columns are copied - while other columns are not (based on `select()`).
+   * 2. Some rows are copied - while other rows are not (based on `where()`).
+   * 3. Multiple pages of data are copied.
    */
-  public function testBasicLifecycle(): void {
+  public function testContent(): void {
     for ($i = 0; $i < 15; $i++) {
       $this->individualCreate([], $i);
       $this->organizationCreate([], $i);
     }
 
     $this->runAll(CRM_Upgrade_Snapshot::createTasks('5.45', 'names', CRM_Utils_SQL_Select::from('civicrm_contact')
-      ->select('id, display_name, sort_name')
+      ->select('id, display_name, sort_name, modified_date')
       ->where('contact_type = "Individual"')
     ));
     $this->assertTrue(CRM_Core_DAO::checkTableExists('civicrm_snap_v5_45_names'));
     $this->assertSameSchema('civicrm_contact.display_name', 'civicrm_snap_v5_45_names.display_name');
     $this->assertSameSchema('civicrm_contact.sort_name', 'civicrm_snap_v5_45_names.sort_name');
+    $this->assertSameSchema('civicrm_contact.modified_date', 'civicrm_snap_v5_45_names.modified_date');
     $this->assertTrue(CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_contact', 'legal_name'));
     $this->assertFalse(CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_snap_v5_45_names', 'legal_name'));
 
@@ -45,12 +44,35 @@ class CRM_Upgrade_SnapshotTest extends CiviUnitTestCase {
     $this->assertTrue($liveContacts > $liveIndividuals);
     $this->assertGreaterThan(CRM_Upgrade_Snapshot::$pageSize, $snapCount, "There should be more than 1 page of data in the snapshot. Found $snapCount records.");
 
+    CRM_Core_DAO::executeQuery('DROP TABLE civicrm_snap_v5_45_names');
+  }
+
+  /**
+   * This example creates multiple snapshots (attributed to different versions, v5.45 and v5.50),
+   * and it ensures that they can be cleaned-up by future upgrades (eg v5.52 and v5.58).
+   */
+  public function testBasicLifecycle(): void {
+    for ($i = 0; $i < 15; $i++) {
+      $this->individualCreate([], $i);
+      $this->organizationCreate([], $i);
+    }
+    $this->eventCreate([]);
+    $this->eventCreate([]);
+
+    $this->runAll(CRM_Upgrade_Snapshot::createTasks('5.45', 'names', CRM_Utils_SQL_Select::from('civicrm_contact')
+      ->select('id, display_name, sort_name')
+      ->where('contact_type = "Individual"')
+    ));
+    $this->assertTrue(CRM_Core_DAO::checkTableExists('civicrm_snap_v5_45_names'));
+    $this->assertSameSchema('civicrm_contact.display_name', 'civicrm_snap_v5_45_names.display_name');
+    $this->assertGreaterThan(1, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_snap_v5_45_names'));
+
     $this->runAll(CRM_Upgrade_Snapshot::createTasks('5.50', 'dates', CRM_Utils_SQL_Select::from('civicrm_event')
       ->select('id, start_date, end_date, registration_start_date, registration_end_date')
     ));
     $this->assertTrue(CRM_Core_DAO::checkTableExists('civicrm_snap_v5_50_dates'));
     $this->assertSameSchema('civicrm_event.start_date', 'civicrm_snap_v5_50_dates.start_date');
-    $this->assertSameSchema('civicrm_event.registration_end_date', 'civicrm_snap_v5_50_dates.registration_end_date');
+    $this->assertGreaterThan(1, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_snap_v5_50_dates'));
 
     CRM_Upgrade_Snapshot::cleanupTask(NULL, '5.52', 6);
     $this->assertFalse(CRM_Core_DAO::checkTableExists('civicrm_snap_v5_45_names'));
