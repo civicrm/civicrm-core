@@ -444,6 +444,16 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     try {
       $params['id'] = $formatted['id'] = $this->lookupContactID($params, ($this->isSkipDuplicates() || $this->isIgnoreDuplicates()));
+      if ($params['id'] && $params['contact_sub_type']) {
+        $contactSubType = Contact::get(FALSE)
+          ->addWhere('id', '=', $params['id'])
+          ->addSelect('contact_sub_type')
+          ->execute()
+          ->first()['contact_sub_type'];
+        if (!empty($contactSubType) && $contactSubType[0] !== $params['contact_sub_type'] && !CRM_Contact_BAO_ContactType::isAllowEdit($params['id'], $contactSubType[0])) {
+          throw new CRM_Core_Exception('Mismatched contact SubTypes :', CRM_Import_Parser::NO_MATCH);
+        }
+      }
     }
     catch (CRM_Core_Exception $e) {
       $statuses = [CRM_Import_Parser::DUPLICATE => 'DUPLICATE', CRM_Import_Parser::ERROR => 'ERROR', CRM_Import_Parser::NO_MATCH => 'invalid_no_match'];
@@ -466,36 +476,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       // could be removed in favour of a simple check for whether the contact_type & id match
       $matchedIDs = $this->getIdsOfMatchingContacts($formatted);
       if (!empty($matchedIDs)) {
-        if (count($matchedIDs) >= 1) {
-          $updateflag = TRUE;
-          foreach ($matchedIDs as $contactId) {
-            if ($params['id'] == $contactId) {
-              //validation of subtype for update mode
-              //CRM-5125
-              $contactSubType = NULL;
-              if (!empty($params['contact_sub_type'])) {
-                $contactSubType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params['id'], 'contact_sub_type');
-              }
 
-              if (!empty($contactSubType) && (!CRM_Contact_BAO_ContactType::isAllowEdit($params['id'], $contactSubType) && $contactSubType != CRM_Utils_Array::value('contact_sub_type', $formatted))) {
-
-                $message = "Mismatched contact SubTypes :";
-                array_unshift($values, $message);
-                $updateflag = FALSE;
-                $this->_retCode = CRM_Import_Parser::NO_MATCH;
-              }
-              else {
-                $updateflag = FALSE;
-                $this->_retCode = CRM_Import_Parser::VALID;
-              }
-            }
-          }
-          if ($updateflag) {
-            $message = "Mismatched contact IDs OR Mismatched contact Types :";
-            array_unshift($values, $message);
-            $this->_retCode = CRM_Import_Parser::NO_MATCH;
-          }
-        }
       }
     }
 
