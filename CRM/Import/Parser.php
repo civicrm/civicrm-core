@@ -1201,6 +1201,18 @@ abstract class CRM_Import_Parser {
     if (empty($importedValue) || !in_array($fieldName, $this->metadataHandledFields, TRUE)) {
       return $importedValue;
     }
+    $fieldMetadata = $this->getFieldMetadata($fieldName);
+    if ($fieldMetadata['type'] === CRM_Utils_Type::T_BOOLEAN) {
+      $value = CRM_Utils_String::strtoboolstr($importedValue);
+      if ($value !== FALSE) {
+        return (bool) $value;
+      }
+      return 'invalid_import_value';
+    }
+    if ($fieldMetadata['type'] === CRM_Utils_Type::T_DATE) {
+      $value = CRM_Utils_Date::formatDate($importedValue, $this->getSubmittedValue('dateFormats'));
+      return ($value) ?: 'invalid_import_value';
+    }
     return $this->getFieldOptions($fieldName)[$importedValue] ?? 'invalid_import_value';
   }
 

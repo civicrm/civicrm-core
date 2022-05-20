@@ -89,12 +89,15 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * The end result is that all fields will be & this will go but for now it is
    * opt in.
    *
-   * @var array
+   * @var string[]
    */
   protected $metadataHandledFields = [
-    'gender_id',
     'contact_type',
     'contact_sub_type',
+    'gender_id',
+    'birth_date',
+    'deceased_date',
+    'is_deceased',
   ];
 
   /**
@@ -931,17 +934,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           }
         }
       }
-
-      if ($key == 'birth_date' && $val) {
-        CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key);
-      }
-      elseif ($key == 'deceased_date' && $val) {
-        CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key);
-        $params['is_deceased'] = 1;
-      }
-      elseif ($key == 'is_deceased' && $val) {
-        $params[$key] = CRM_Utils_String::strtoboolstr($val);
-      }
     }
 
     //now format custom data.
@@ -1209,38 +1201,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $errors[] = $this->getFieldMetadata($key)['title'];
       }
       if ($value) {
-        $session = CRM_Core_Session::singleton();
-        $dateType = $session->get("dateTypes");
 
         switch ($key) {
-          case 'birth_date':
-            if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
-              if (!CRM_Utils_Rule::date($params[$key])) {
-                $errors[] = ts('Birth Date');
-              }
-            }
-            else {
-              $errors[] = ts('Birth-Date');
-            }
-            break;
-
-          case 'deceased_date':
-            if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
-              if (!CRM_Utils_Rule::date($params[$key])) {
-                $errors[] = ts('Deceased Date');
-              }
-            }
-            else {
-              $errors[] = ts('Deceased Date');
-            }
-            break;
-
-          case 'is_deceased':
-            if (CRM_Utils_String::strtoboolstr($value) === FALSE) {
-              $errors[] = ts('Deceased');
-            }
-            break;
-
           case 'preferred_communication_method':
             $preffComm = [];
             $preffComm = explode(',', $value);
