@@ -28,6 +28,8 @@ class CRM_Upgrade_Incremental_php_FiveFifty extends CRM_Upgrade_Incremental_Base
    *   The version number matching this function name
    */
   public function upgrade_5_50_alpha1($rev): void {
+    $this->addSnapshotTask('mappings', CRM_Utils_SQL_Select::from('civicrm_mapping'));
+    $this->addSnapshotTask('fields', CRM_Utils_SQL_Select::from('civicrm_mapping_field'));
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask(ts('Convert import mappings to use names'), 'convertMappingFieldLabelsToNames', $rev);
 
