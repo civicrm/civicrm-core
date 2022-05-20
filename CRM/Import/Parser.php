@@ -1220,12 +1220,17 @@ abstract class CRM_Import_Parser {
    *
    * @param string $fieldName
    * @param bool $loadOptions
+   * @param bool $limitToContactType
+   *   Only show fields for the type to import (not appropriate when looking up
+   *   related contact fields).
+   *
    *
    * @return array
    * @throws \API_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
    */
-  protected function getFieldMetadata(string $fieldName, bool $loadOptions = FALSE): array {
-    $fieldMetadata = $this->getImportableFieldsMetadata()[$fieldName];
+  protected function getFieldMetadata(string $fieldName, bool $loadOptions = FALSE, $limitToContactType = FALSE): array {
+    $fieldMetadata = $this->getImportableFieldsMetadata()[$fieldName] ?? ($limitToContactType ? NULL : CRM_Contact_BAO_Contact::importableFields('All')[$fieldName]);
     if ($loadOptions && !isset($fieldMetadata['options'])) {
       if (empty($fieldMetadata['pseudoconstant'])) {
         $this->importableFieldsMetadata[$fieldName]['options'] = FALSE;

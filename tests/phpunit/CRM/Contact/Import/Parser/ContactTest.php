@@ -16,6 +16,7 @@
 
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
+use Civi\Api4\ContactType;
 use Civi\Api4\RelationshipType;
 use Civi\Api4\UserJob;
 
@@ -41,6 +42,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_email', 'civicrm_user_job', 'civicrm_relationship'], TRUE);
     RelationshipType::delete()->addWhere('name_a_b', '=', 'Dad to')->execute();
+    ContactType::delete()->addWhere('name', '=', 'baby')->execute();
     parent::tearDown();
   }
 
@@ -990,7 +992,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
         'csv' => 'individual_invalid_contact_sub_type.csv',
         'mapper' => [['first_name'], ['last_name'], ['contact_sub_type']],
         'expected_error' => '',
-        'expected_outcomes' => [CRM_Import_Parser::NO_MATCH => 1],
+        'expected_outcomes' => [CRM_Import_Parser::ERROR => 1],
       ],
     ];
   }
@@ -1051,13 +1053,51 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     // Date types should be picked up from submitted values but still some clean up to do.
     CRM_Core_Session::singleton()->set('dateTypes', $dateType);
     $this->validateMultiRowCsv($csv, $mapper, 'custom_' . $addressCustomFieldID, ['dateFormats' => $dateType]);
-    $fields = ['contact_id.birth_date', 'contact_id.deceased_date', 'contact_id.custom_' . $contactCustomFieldID, $addressCustomFieldID];
-    $contacts = Address::get()->addWhere('contact_id.first_name', '=', 'Joe')->setSelect($fields)->execute();
+    $fields = [
+      'contact_id.birth_date',
+      'contact_id.deceased_date',
+      'contact_id.custom_' . $contactCustomFieldID,
+      $addressCustomFieldID,
+    ];
+    $contacts = Address::get()
+      ->addWhere('contact_id.first_name', '=', 'Joe')
+      ->setSelect($fields)
+      ->execute();
     foreach ($contacts as $contact) {
       foreach ($fields as $field) {
         $this->assertEquals('2008-09-01', $contact[$field]);
       }
     }
+  }
+
+  /**
+   * @throws \API_Exception
+   */
+  public function testImportContactSubTypes(): void {
+    ContactType::create()->setValues([
+      'name' => 'baby',
+      'label' => 'Infant',
+      'parent_id:name' => 'Individual',
+    ])->execute();
+    $mapper = [
+      ['first_name'],
+      ['last_name'],
+      ['5_a_b', 'organization_name'],
+      ['contact_sub_type'],
+      ['5_a_b', 'contact_sub_type'],
+    ];
+    $csv = 'individual_contact_sub_types.csv';
+    $field = 'contact_sub_type';
+
+    $this->validateMultiRowCsv($csv, $mapper, $field);
+    $this->importCSV($csv, $mapper);
+    $contacts = Contact::get()
+      ->addWhere('last_name', '=', 'Green')
+      ->addSelect('contact_sub_type:name')->execute();
+    foreach ($contacts as $contact) {
+      $this->assertEquals(['baby'], $contact['contact_sub_type:name']);
+    }
+    $this->assertCount(3, $contacts);
   }
 
   /**

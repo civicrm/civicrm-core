@@ -1,0 +1,8 @@
+first_name,Last Name,Organization,Contact Subtype,Organization SubType,expected
+Joe,Green,Greenfingers,baby,,Valid
+Joe,Green,Greenfingers,Infant,,Valid
+Joe,Green,Greenfingers,infant,,Valid
+Joe,Green,Greenfingers,rando,,Invalid
+Joe,Green,Greenfingers,,baby,Invalid
+Joe,Green,Greenfingers,,Infant,Invalid
+Joe,Green,Greenfingers,,infant,Invalid
