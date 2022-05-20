@@ -2051,7 +2051,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   /**
    * Run import.
    *
-   * @param array $mapper
+   * @param array $mapper Mapping as entered on MapField form.
+   *   e.g [['first_name']['email', 1]].
+   *   {@see \CRM_Contact_Import_Parser_Contact::getMappingFieldFromMapperInput}
    * @param int $mode
    * @param int $statusID
    *
@@ -2648,6 +2650,13 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * 1]
    *
    * @param array $fieldMapping
+   *   Field as submitted on the MapField form - this is a non-associative array,
+   *   the keys of which depend on the data/ field. Generally it will be one of
+   *   [$fieldName],
+   *   [$fieldName, $locationTypeID, $phoneTypeIDOrIMProviderIDIfRelevant],
+   *   [$fieldName, $websiteTypeID],
+   *   If the mapping is for a related contact it will be as above but the first
+   *   key will be the relationship key - eg. 5_a_b.
    * @param int $mappingID
    * @param int $columnNumber
    *
