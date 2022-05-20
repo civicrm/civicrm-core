@@ -2253,30 +2253,29 @@ WHERE  ce.loc_block_id = $locBlockId";
 
     //event seats calculation :
     //1. consider event seat as a single when participant does not have line item.
-    //2. consider event seat as a single when participant has line items but does not
-    //   have count for corresponding price field value ( ie price field value does not carry any seat )
-    //3. consider event seat as a sum of all seats from line items in case price field value carries count.
+    //2. consider event seat as a single when participant has line items but count for corresponding price field value is NULL
+    //  (ie price field value does not carry any seat)
+    //3. consider event seat as a sum of all seats from line items if price_field_value has a non NULL count.
 
     $query = "
+ SELECT SUM(participant_count)
+FROM (
   SELECT
-  IF
-    -- If the line item count * the line item quantity is not 0
-    (SUM(price_field_value.`count` * lineItem.qty),
-    -- then use the count * the quantity, ensuring each
-    -- actual participant record gets a result
-    SUM(price_field_value.`count` * lineItem.qty)
-      + COUNT(DISTINCT participant.id )
-      - COUNT(DISTINCT IF (price_field_value.`count`, participant.id, NULL)),
-    -- if the line item count is NULL or 0 then count the participants
-    COUNT(DISTINCT participant.id))
+   -- The use of MAX here is so that we can use GROUP BY to ensure we
+   -- ONLY get 1 row per participant (It is not totally clear why we wouldn't
+   -- but the previous query had handling for that possibility.
+   MAX(
+     IF(ISNULL(price_field_value.`count`), 1, price_field_value.`count` * line_item.qty)
+   ) AS participant_count
+
   FROM civicrm_participant participant
     INNER JOIN  civicrm_contact contact ON (contact.id = participant.contact_id AND contact.is_deleted = 0)
     INNER JOIN  civicrm_event event ON ( event.id = participant.event_id )
-    LEFT JOIN  civicrm_line_item lineItem ON ( lineItem.entity_id = participant.id AND  lineItem.entity_table = 'civicrm_participant' )
-    LEFT JOIN  civicrm_price_field_value price_field_value ON (price_field_value.id = lineItem.price_field_value_id AND price_field_value.`count`)
+    LEFT JOIN  civicrm_line_item line_item ON (line_item.entity_id = participant.id AND line_item.entity_table = 'civicrm_participant' )
+    LEFT JOIN  civicrm_price_field_value price_field_value ON (price_field_value.id = line_item.price_field_value_id)
   WHERE  (participant.event_id = %1) AND participant.is_test = 0
     {$extraWhereClause}
-  GROUP BY  participant.event_id";
+  GROUP BY  participant.id) as participants";
 
     return (int) CRM_Core_DAO::singleValueQuery($query, [1 => [$eventId, 'Positive']]);
   }
