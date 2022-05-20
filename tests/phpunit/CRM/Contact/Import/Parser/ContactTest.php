@@ -14,6 +14,7 @@
  * File for the CRM_Contact_Imports_Parser_ContactTest class.
  */
 
+use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\RelationshipType;
 use Civi\Api4\UserJob;
@@ -850,7 +851,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * Test the determination of whether a custom field is valid.
    */
   public function testCustomFieldValidation(): void {
-    $errorMessage = [];
+    $errorMessage = '';
     $customGroup = $this->customGroupCreate([
       'extends' => 'Contact',
       'title' => 'ABC',
@@ -860,7 +861,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'custom_' . $customField['id'] => 'Label1|Label2',
     ];
     CRM_Contact_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
-    $this->assertEquals([], $errorMessage);
+    $this->assertEquals(NULL, $errorMessage);
   }
 
   /**
@@ -1035,6 +1036,40 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       $this->assertEquals('Female', $contact['gender_id:name']);
     }
     $this->assertCount(8, $contacts);
+  }
+
+  /**
+   * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function testValidateDateData(): void {
+    $addressCustomGroupID = $this->createCustomGroup(['extends' => 'Address', 'name' => 'Address']);
+    $contactCustomGroupID = $this->createCustomGroup(['extends' => 'Contact', 'name' => 'Contact']);
+    $addressCustomFieldID = $this->createDateCustomField(['custom_group_id' => $addressCustomGroupID])['id'];
+    $contactCustomFieldID = $this->createDateCustomField(['custom_group_id' => $contactCustomGroupID])['id'];
+    $csv = 'individual_dates_type1.csv';
+    $dateType = CRM_Core_Form_Date::DATE_yyyy_mm_dd;
+    $mapper = [
+      ['first_name'],
+      ['last_name'],
+      ['birth_date'],
+      ['deceased_date'],
+      ['custom_' . $contactCustomFieldID],
+      ['custom_' . $addressCustomFieldID, 1],
+      ['street_address', 1],
+      ['do_not_import'],
+    ];
+    // Date types should be picked up from submitted values but still some clean up to do.
+    CRM_Core_Session::singleton()->set('dateTypes', $dateType);
+    $this->validateMultiRowCsv($csv, $mapper, 'custom_' . $addressCustomFieldID, ['dateFormats' => $dateType]);
+    $fields = ['contact_id.birth_date', 'contact_id.deceased_date', 'contact_id.custom_' . $contactCustomFieldID, $addressCustomFieldID];
+    $contacts = Address::get()->addWhere('contact_id.first_name', '=', 'Joe')->setSelect($fields)->execute();
+    foreach ($contacts as $contact) {
+      foreach ($fields as $field) {
+        $this->assertEquals('2008-09-01', $contact[$field]);
+      }
+    }
   }
 
   /**
@@ -1517,6 +1552,36 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $form->setUserJobID($userJobID);
     $form->buildForm();
     $form->postProcess();
+  }
+
+  /**
+   * @param string $csv
+   * @param array $mapper
+   * @param string $field
+   * @param array $submittedValues
+   *   Values submitted in the form process.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  private function validateMultiRowCsv(string $csv, array $mapper, string $field, $submittedValues): void {
+    /* @var CRM_Import_DataSource_CSV $dataSource */
+    /* @var \CRM_Contact_Import_Parser_Contact $parser */
+    [$dataSource, $parser] = $this->getDataSourceAndParser($csv, $mapper, $submittedValues);
+    while ($values = $dataSource->getRow()) {
+      try {
+        $parser->validateValues(array_values($values));
+        if ($values['expected'] !== 'Valid') {
+          $this->fail($values[$field] . ' should not have been valid');
+        }
+      }
+      catch (CRM_Core_Exception $e) {
+        if ($values['expected'] !== 'Invalid') {
+          $this->fail($values[$field] . ' should have been valid');
+        }
+      }
+    }
   }
 
 }

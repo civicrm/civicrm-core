@@ -116,6 +116,129 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
+   * @param $customFieldID
+   * @param array $customFields
+   * @param array $params
+   * @param $value
+   * @param string $key
+   * @param $dateType
+   *
+   * @return ?string
+   */
+  private function validateCustomField($customFieldID, array $customFields, array $params, $value, string $key, $dateType): ?string {
+    if (!array_key_exists($customFieldID, $customFields)) {
+      return ts('field ID');
+    }
+    // validate null values for required custom fields of type boolean
+    if (!empty($customFields[$customFieldID]['is_required']) && (empty($params['custom_' . $customFieldID]) && !is_numeric($params['custom_' . $customFieldID])) && $customFields[$customFieldID]['data_type'] == 'Boolean') {
+      return $customFields[$customFieldID]['label'] . '::' . $customFields[$customFieldID]['groupTitle'];
+    }
+
+    /* validate the data against the CF type */
+
+    if ($value) {
+      $dataType = $customFields[$customFieldID]['data_type'];
+      $htmlType = $customFields[$customFieldID]['html_type'];
+      $isSerialized = CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID]);
+      if ($dataType == 'Date') {
+        if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
+          return NULL;
+        }
+        return $customFields[$customFieldID]['label'];
+      }
+      elseif ($dataType == 'Boolean') {
+        if (CRM_Utils_String::strtoboolstr($value) === FALSE) {
+          return $customFields[$customFieldID]['label'] . '::' . $customFields[$customFieldID]['groupTitle'];
+        }
+      }
+      // need not check for label filed import
+      $selectHtmlTypes = [
+        'CheckBox',
+        'Select',
+        'Radio',
+      ];
+      if ((!$isSerialized && !in_array($htmlType, $selectHtmlTypes)) || $dataType == 'Boolean' || $dataType == 'ContactReference') {
+        $valid = CRM_Core_BAO_CustomValue::typecheck($dataType, $value);
+        if (!$valid) {
+          return $customFields[$customFieldID]['label'];
+        }
+      }
+
+      // check for values for custom fields for checkboxes and multiselect
+      if ($isSerialized && $dataType != 'ContactReference') {
+        $value = trim($value);
+        $value = str_replace('|', ',', $value);
+        $mulValues = explode(',', $value);
+        $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
+        foreach ($mulValues as $v1) {
+          if (strlen($v1) == 0) {
+            continue;
+          }
+
+          $flag = FALSE;
+          foreach ($customOption as $v2) {
+            if ((strtolower(trim($v2['label'])) == strtolower(trim($v1))) || (strtolower(trim($v2['value'])) == strtolower(trim($v1)))) {
+              $flag = TRUE;
+            }
+          }
+
+          if (!$flag) {
+            return $customFields[$customFieldID]['label'];
+          }
+        }
+      }
+      elseif ($htmlType == 'Select' || ($htmlType == 'Radio' && $dataType != 'Boolean')) {
+        $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
+        $flag = FALSE;
+        foreach ($customOption as $v2) {
+          if ((strtolower(trim($v2['label'])) == strtolower(trim($value))) || (strtolower(trim($v2['value'])) == strtolower(trim($value)))) {
+            $flag = TRUE;
+          }
+        }
+        if (!$flag) {
+          return $customFields[$customFieldID]['label'];
+        }
+      }
+      elseif ($isSerialized && $dataType === 'StateProvince') {
+        $mulValues = explode(',', $value);
+        foreach ($mulValues as $stateValue) {
+          if ($stateValue) {
+            if (self::in_value(trim($stateValue), CRM_Core_PseudoConstant::stateProvinceAbbreviation()) || self::in_value(trim($stateValue), CRM_Core_PseudoConstant::stateProvince())) {
+              continue;
+            }
+            else {
+              return $customFields[$customFieldID]['label'];
+            }
+          }
+        }
+      }
+      elseif ($isSerialized && $dataType == 'Country') {
+        $mulValues = explode(',', $value);
+        foreach ($mulValues as $countryValue) {
+          if ($countryValue) {
+            CRM_Core_PseudoConstant::populate($countryNames, 'CRM_Core_DAO_Country', TRUE, 'name', 'is_active');
+            CRM_Core_PseudoConstant::populate($countryIsoCodes, 'CRM_Core_DAO_Country', TRUE, 'iso_code');
+            $limitCodes = CRM_Core_BAO_Country::countryLimit();
+
+            $error = TRUE;
+            foreach ([$countryNames, $countryIsoCodes, $limitCodes] as $values) {
+              if (in_array(trim($countryValue), $values)) {
+                $error = FALSE;
+                break;
+              }
+            }
+
+            if ($error) {
+              return $customFields[$customFieldID]['label'];
+            }
+          }
+        }
+      }
+    }
+    return NULL;
+  }
+
+  /**
    * The initializer code, called before processing.
    */
   public function init() {
@@ -1052,133 +1175,25 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
 
     $addressCustomFields = CRM_Core_BAO_CustomField::getFields('Address');
-    $customFields = $customFields + $addressCustomFields;
+    $parser = new CRM_Contact_Import_Parser_Contact();
     foreach ($params as $key => $value) {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-        /* check if it's a valid custom field id */
-
-        if (!array_key_exists($customFieldID, $customFields)) {
-          $errors[] = ts('field ID');
-        }
-        // validate null values for required custom fields of type boolean
-        if (!empty($customFields[$customFieldID]['is_required']) && (empty($params['custom_' . $customFieldID]) && !is_numeric($params['custom_' . $customFieldID])) && $customFields[$customFieldID]['data_type'] == 'Boolean') {
-          $errors[] = $customFields[$customFieldID]['label'] . '::' . $customFields[$customFieldID]['groupTitle'];
-        }
-
         //For address custom fields, we do get actual custom field value as an inner array of
         //values so need to modify
         if (array_key_exists($customFieldID, $addressCustomFields)) {
           $value = $value[0][$key];
+          $dataType = $addressCustomFields[$customFieldID]['data_type'];
+          if ($dataType === 'Date') {
+            $input = ['custom_' . $customFieldID => $value];
+          }
+          else {
+            $input = $params;
+          }
+          $errors[] = $parser->validateCustomField($customFieldID, $addressCustomFields, $input, $value, $key, $dateType);
         }
-        /* validate the data against the CF type */
-
-        if ($value) {
-          $dataType = $customFields[$customFieldID]['data_type'];
-          $htmlType = $customFields[$customFieldID]['html_type'];
-          $isSerialized = CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID]);
-          if ($dataType == 'Date') {
-            if (array_key_exists($customFieldID, $addressCustomFields) && CRM_Utils_Date::convertToDefaultDate($params[$key][0], $dateType, $key)) {
-              $value = $params[$key][0][$key];
-            }
-            elseif (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
-              $value = $params[$key];
-            }
-            else {
-              $errors[] = $customFields[$customFieldID]['label'];
-            }
-          }
-          elseif ($dataType == 'Boolean') {
-            if (CRM_Utils_String::strtoboolstr($value) === FALSE) {
-              $errors[] = $customFields[$customFieldID]['label'] . '::' . $customFields[$customFieldID]['groupTitle'];
-            }
-          }
-          // need not check for label filed import
-          $selectHtmlTypes = [
-            'CheckBox',
-            'Select',
-            'Radio',
-          ];
-          if ((!$isSerialized && !in_array($htmlType, $selectHtmlTypes)) || $dataType == 'Boolean' || $dataType == 'ContactReference') {
-            $valid = CRM_Core_BAO_CustomValue::typecheck($dataType, $value);
-            if (!$valid) {
-              $errors[] = $customFields[$customFieldID]['label'];
-            }
-          }
-
-          // check for values for custom fields for checkboxes and multiselect
-          if ($isSerialized && $dataType != 'ContactReference') {
-            $value = trim($value);
-            $value = str_replace('|', ',', $value);
-            $mulValues = explode(',', $value);
-            $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
-            foreach ($mulValues as $v1) {
-              if (strlen($v1) == 0) {
-                continue;
-              }
-
-              $flag = FALSE;
-              foreach ($customOption as $v2) {
-                if ((strtolower(trim($v2['label'])) == strtolower(trim($v1))) || (strtolower(trim($v2['value'])) == strtolower(trim($v1)))) {
-                  $flag = TRUE;
-                }
-              }
-
-              if (!$flag) {
-                $errors[] = $customFields[$customFieldID]['label'];
-              }
-            }
-          }
-          elseif ($htmlType == 'Select' || ($htmlType == 'Radio' && $dataType != 'Boolean')) {
-            $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
-            $flag = FALSE;
-            foreach ($customOption as $v2) {
-              if ((strtolower(trim($v2['label'])) == strtolower(trim($value))) || (strtolower(trim($v2['value'])) == strtolower(trim($value)))) {
-                $flag = TRUE;
-              }
-            }
-            if (!$flag) {
-              $errors[] = $customFields[$customFieldID]['label'];
-            }
-          }
-          elseif ($isSerialized && $dataType === 'StateProvince') {
-            $mulValues = explode(',', $value);
-            foreach ($mulValues as $stateValue) {
-              if ($stateValue) {
-                if (self::in_value(trim($stateValue), CRM_Core_PseudoConstant::stateProvinceAbbreviation()) || self::in_value(trim($stateValue), CRM_Core_PseudoConstant::stateProvince())) {
-                  continue;
-                }
-                else {
-                  $errors[] = $customFields[$customFieldID]['label'];
-                }
-              }
-            }
-          }
-          elseif ($isSerialized && $dataType == 'Country') {
-            $mulValues = explode(',', $value);
-            foreach ($mulValues as $countryValue) {
-              if ($countryValue) {
-                CRM_Core_PseudoConstant::populate($countryNames, 'CRM_Core_DAO_Country', TRUE, 'name', 'is_active');
-                CRM_Core_PseudoConstant::populate($countryIsoCodes, 'CRM_Core_DAO_Country', TRUE, 'iso_code');
-                $limitCodes = CRM_Core_BAO_Country::countryLimit();
-
-                $error = TRUE;
-                foreach ([
-                  $countryNames,
-                  $countryIsoCodes,
-                  $limitCodes,
-                ] as $values) {
-                  if (in_array(trim($countryValue), $values)) {
-                    $error = FALSE;
-                    break;
-                  }
-                }
-
-                if ($error) {
-                  $errors[] = $customFields[$customFieldID]['label'];
-                }
-              }
-            }
-          }
+        else {
+          /* check if it's a valid custom field id */
+          $errors[] = $parser->validateCustomField($customFieldID, $customFields, $params, $value, $key, $dateType);
         }
       }
       elseif (is_array($params[$key]) && isset($params[$key]["contact_type"]) && in_array(substr($key, -3), ['a_b', 'b_a'], TRUE)) {
@@ -1201,7 +1216,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
     }
     if ($errors) {
-      $errorMessage .= ($errorMessage ? '; ' : '') . implode('; ', $errors);
+      $errorMessage .= ($errorMessage ? '; ' : '') . implode('; ', array_filter($errors));
     }
   }
 
