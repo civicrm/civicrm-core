@@ -54,6 +54,18 @@ abstract class CRM_Import_Parser {
   protected $userJobID;
 
   /**
+   * Fields which are being handled by metadata formatting & validation functions.
+   *
+   * This is intended as a temporary parameter as we phase in metadata handling.
+   *
+   * The end result is that all fields will be & this will go but for now it is
+   * opt in.
+   *
+   * @var array
+   */
+  protected $metadataHandledFields = [];
+
+  /**
    * @return int|null
    */
   public function getUserJobID(): ?int {
@@ -1186,8 +1198,8 @@ abstract class CRM_Import_Parser {
    * @throws \API_Exception
    */
   protected function getTransformedFieldValue(string $fieldName, $importedValue) {
-    // For now only do gender_id as we need to work through removing duplicate handling
-    if ($fieldName !== 'gender_id' || empty($importedValue)) {
+    // For now only do gender_id etc as we need to work through removing duplicate handling
+    if (empty($importedValue) || !in_array($fieldName, $this->metadataHandledFields, TRUE)) {
       return $importedValue;
     }
     return $this->getFieldOptions($fieldName)[$importedValue] ?? 'invalid_import_value';

@@ -82,6 +82,20 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   protected $fieldMetadata = [];
 
   /**
+   * Fields which are being handled by metadata formatting & validation functions.
+   *
+   * This is intended as a temporary parameter as we phase in metadata handling.
+   *
+   * The end result is that all fields will be & this will go but for now it is
+   * opt in.
+   *
+   * @var array
+   */
+  protected $metadataHandledFields = [
+    'gender_id',
+  ];
+
+  /**
    * Relationship labels.
    *
    * Temporary cache of labels to reduce queries in getRelationshipLabels.
