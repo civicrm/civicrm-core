@@ -72,7 +72,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    * Set variables up before form is built.
    */
   public function preProcess() {
-    $this->_mapperFields = $this->get('fields');
+    $this->_mapperFields = $this->getAvailableFields();
     asort($this->_mapperFields);
 
     $this->_columnCount = $this->get('columnCount');
@@ -198,11 +198,8 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
         $mappingName = $mappingName[1];
         $mappingContactType = $mappingContactType[1];
         if (isset($mappingName[$i])) {
-          if ($mappingName[$i] != ts('- do not import -')) {
-
-            $mappingHeader = array_keys($this->_mapperFields, $mappingName[$i]);
-            // reusing contact_type field array for soft credit
-            $softField = $mappingContactType[$i] ?? 0;
+          if ($mappingName[$i] != ts('do_not_import')) {
+            $softField = $mappingContactType[$i] ?? '';
 
             if (!$softField) {
               $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
@@ -211,10 +208,10 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
             $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
             $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
             $defaults["mapper[$i]"] = [
-              CRM_Utils_Array::value(0, $mappingHeader),
-              ($softField) ? $softField : "",
-              "",
-              "",
+              $mappingName[$i],
+              $softField,
+              // Since the soft credit type id is not stored we can't load it here.
+              '',
             ];
             $jsSet = TRUE;
           }
@@ -461,27 +458,8 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     //Updating Mapping Records
     if (!empty($params['updateMapping'])) {
-      $mappingFields = new CRM_Core_DAO_MappingField();
-      $mappingFields->mapping_id = $params['mappingId'];
-      $mappingFields->find();
-
-      $mappingFieldsId = [];
-      while ($mappingFields->fetch()) {
-        if ($mappingFields->id) {
-          $mappingFieldsId[$mappingFields->column_number] = $mappingFields->id;
-        }
-      }
-
       for ($i = 0; $i < $this->_columnCount; $i++) {
-        $updateMappingFields = new CRM_Core_DAO_MappingField();
-        $updateMappingFields->id = $mappingFieldsId[$i];
-        $updateMappingFields->mapping_id = $params['mappingId'];
-        $updateMappingFields->column_number = $i;
-        $updateMappingFields->name = $mapper[$i];
-
-        //reuse contact_type field in db to store fields associated with soft credit
-        $updateMappingFields->contact_type = $mapperSoftCredit[$i] ?? NULL;
-        $updateMappingFields->save();
+        $this->saveMappingField($params['mappingId'], $i, TRUE);
       }
     }
 
@@ -495,16 +473,9 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       $saveMapping = CRM_Core_BAO_Mapping::add($mappingParams);
 
       for ($i = 0; $i < $this->_columnCount; $i++) {
-        $saveMappingFields = new CRM_Core_DAO_MappingField();
-        $saveMappingFields->mapping_id = $saveMapping->id;
-        $saveMappingFields->column_number = $i;
-        $saveMappingFields->name = $mapper[$i];
-
-        //reuse contact_type field in db to store fields associated with soft credit
-        $saveMappingFields->contact_type = $mapperSoftCredit[$i] ?? NULL;
-        $saveMappingFields->save();
+        $this->saveMappingField($saveMapping->id, $i, FALSE);
       }
-      $this->set('savedMapping', $saveMappingFields->mapping_id);
+      $this->set('savedMapping', $saveMapping->id);
     }
 
     $parser = new CRM_Contribute_Import_Parser_Contribution($mapperKeysMain, $mapperSoftCredit, $mapperPhoneType);
@@ -519,6 +490,15 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     // add all the necessary variables to the form
     $parser->set($this);
+  }
+
+  /**
+   * @return \CRM_Contribute_Import_Parser_Contribution
+   */
+  protected function getParser(): CRM_Contribute_Import_Parser_Contribution {
+    $parser = new CRM_Contribute_Import_Parser_Contribution();
+    $parser->setUserJobID($this->getUserJobID());
+    return $parser;
   }
 
 }

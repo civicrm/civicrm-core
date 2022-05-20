@@ -261,4 +261,13 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     return $mapper;
   }
 
+  /**
+   * @return \CRM_Contact_Import_Parser_Contact
+   */
+  protected function getParser(): CRM_Contact_Import_Parser_Contact {
+    $parser = new CRM_Contact_Import_Parser_Contact();
+    $parser->setUserJobID($this->getUserJobID());
+    return $parser;
+  }
+
 }

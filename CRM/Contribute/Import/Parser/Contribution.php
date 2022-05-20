@@ -657,37 +657,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * The initializer code, called before the processing
    */
   public function init() {
-    $fields = CRM_Contribute_BAO_Contribution::importableFields($this->_contactType, FALSE);
-
-    $fields = array_merge($fields,
-      [
-        'soft_credit' => [
-          'title' => ts('Soft Credit'),
-          'softCredit' => TRUE,
-          'headerPattern' => '/Soft Credit/i',
-        ],
-      ]
-    );
-
-    // add pledge fields only if its is enabled
-    if (CRM_Core_Permission::access('CiviPledge')) {
-      $pledgeFields = [
-        'pledge_payment' => [
-          'title' => ts('Pledge Payment'),
-          'headerPattern' => '/Pledge Payment/i',
-        ],
-        'pledge_id' => [
-          'title' => ts('Pledge ID'),
-          'headerPattern' => '/Pledge ID/i',
-        ],
-      ];
-
-      $fields = array_merge($fields, $pledgeFields);
-    }
-    foreach ($fields as $name => $field) {
-      $field['type'] = CRM_Utils_Array::value('type', $field, CRM_Utils_Type::T_INT);
-      $field['dataPattern'] = CRM_Utils_Array::value('dataPattern', $field, '//');
-      $field['headerPattern'] = CRM_Utils_Array::value('headerPattern', $field, '//');
+    $this->setFieldMetadata();
+    foreach ($this->getImportableFieldsMetadata() as $name => $field) {
       $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern']);
     }
 
@@ -709,6 +680,49 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
       }
       $index++;
+    }
+  }
+
+  /**
+   * Set field metadata.
+   */
+  protected function setFieldMetadata() {
+    if (empty($this->importableFieldsMetadata)) {
+      $fields = CRM_Contribute_BAO_Contribution::importableFields($this->_contactType, FALSE);
+
+      $fields = array_merge($fields,
+        [
+          'soft_credit' => [
+            'title' => ts('Soft Credit'),
+            'softCredit' => TRUE,
+            'headerPattern' => '/Soft Credit/i',
+          ],
+        ]
+      );
+
+      // add pledge fields only if its is enabled
+      if (CRM_Core_Permission::access('CiviPledge')) {
+        $pledgeFields = [
+          'pledge_payment' => [
+            'title' => ts('Pledge Payment'),
+            'headerPattern' => '/Pledge Payment/i',
+          ],
+          'pledge_id' => [
+            'title' => ts('Pledge ID'),
+            'headerPattern' => '/Pledge ID/i',
+          ],
+        ];
+
+        $fields = array_merge($fields, $pledgeFields);
+      }
+      foreach ($fields as $name => $field) {
+        $fields[$name] = array_merge([
+          'type' => CRM_Utils_Type::T_INT,
+          'dataPattern' => '//',
+          'headerPattern' => '//',
+        ], $field);
+      }
+      $this->importableFieldsMetadata = $fields;
     }
   }
 
@@ -1551,6 +1565,37 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     }
 
     return NULL;
+  }
+
+  /**
+   * Get the civicrm_mapping_field appropriate layout for the mapper input.
+   *
+   * The input looks something like ['street_address', 1]
+   * and would be mapped to ['name' => 'street_address', 'location_type_id' =>
+   * 1]
+   *
+   * @param array $fieldMapping
+   * @param int $mappingID
+   * @param int $columnNumber
+   *
+   * @return array
+   * @throws \API_Exception
+   */
+  public function getMappingFieldFromMapperInput(array $fieldMapping, int $mappingID, int $columnNumber): array {
+    $isRelationshipField = preg_match('/\d*_a_b|b_a$/', $fieldMapping[0]);
+    $fieldName = $isRelationshipField ? $fieldMapping[1] : $fieldMapping[0];
+    return [
+      'name' => $fieldMapping[0],
+      'mapping_id' => $mappingID,
+      'column_number' => $columnNumber,
+      // The name of the field to match the soft credit on is (crazily)
+      // stored in 'contact_type'
+      'contact_type' => $fieldMapping[1] ?? NULL,
+      // We also store the field in a sensible key, even if it isn't saved sensibly.
+      'soft_credit_match_field' => $fieldMapping[1] ?? NULL,
+      // This field is actually not saved at all :-( It is lost each time.
+      'soft_credit_type_id' => $fieldMapping[2] ?? NULL,
+    ];
   }
 
 }

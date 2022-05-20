@@ -15,8 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Api4\MappingField;
-
 /**
  * This class gets the name of the file to upload.
  */
@@ -458,7 +456,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     //Updating Mapping Records
     if (!empty($params['updateMapping'])) {
-      for ($i = 0; $i < $this->_columnCount; $i++) {
+      foreach (array_keys($this->getColumnHeaders()) as $i) {
         $this->saveMappingField($params['mappingId'], $i, TRUE);
       }
     }
@@ -487,46 +485,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       CRM_Import_Parser::MODE_PREVIEW
     );
     return $parser;
-  }
-
-  /**
-   * Save the mapping field.
-   *
-   * @param int $mappingID
-   * @param int $columnNumber
-   * @param bool $isUpdate
-   *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
-   */
-  protected function saveMappingField(int $mappingID, int $columnNumber, bool $isUpdate = FALSE): void {
-    $fieldMapping = (array) $this->getSubmittedValue('mapper')[$columnNumber];
-    $mappedField = $this->getMappedField($fieldMapping, $mappingID, $columnNumber);
-    if ($isUpdate) {
-      MappingField::update(FALSE)
-        ->setValues($mappedField)
-        ->addWhere('column_number', '=', $columnNumber)
-        ->addWhere('mapping_id', '=', $mappingID)
-        ->execute();
-    }
-    else {
-      MappingField::create(FALSE)
-        ->setValues($mappedField)->execute();
-    }
-  }
-
-  /**
-   * Get the field mapped to the savable format.
-   *
-   * @param array $fieldMapping
-   * @param int $mappingID
-   * @param int $columnNumber
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  protected function getMappedField(array $fieldMapping, int $mappingID, int $columnNumber): array {
-    return (new CRM_Contact_Import_Parser_Contact())->setContactType($this->getContactType())->getMappingFieldFromMapperInput($fieldMapping, $mappingID, $columnNumber);
   }
 
   /**
@@ -593,6 +551,15 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       Civi::$statics[__CLASS__]['location_fields'] = (new CRM_Contact_Import_Parser_Contact())->setUserJobID($this->getUserJobID())->getSelectTypes();
     }
     return (bool) (Civi::$statics[__CLASS__]['location_fields'][$name] ?? FALSE);
+  }
+
+  /**
+   * @return \CRM_Contact_Import_Parser_Contact
+   */
+  protected function getParser(): CRM_Contact_Import_Parser_Contact {
+    $parser = new CRM_Contact_Import_Parser_Contact();
+    $parser->setUserJobID($this->getUserJobID());
+    return $parser;
   }
 
 }
