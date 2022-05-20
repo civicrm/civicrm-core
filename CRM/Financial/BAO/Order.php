@@ -1043,6 +1043,8 @@ class CRM_Financial_BAO_Order {
     }
     if (!empty($lineItem['qty'])) {
       $lineItem['unit_price'] = $lineItem['line_total'] / $lineItem['qty'];
+    } else {
+      $lineItem['unit_price'] = $lineItem['line_total'];
     }
   }
 
