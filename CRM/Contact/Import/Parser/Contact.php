@@ -136,15 +136,15 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param array $customFields
    * @param array $params
    * @param $value
-   * @param string $key
    * @param $dateType
    *
    * @return ?string
    */
-  private function validateCustomField($customFieldID, array $customFields, array $params, $value, string $key, $dateType): ?string {
+  private function validateCustomField($customFieldID, array $customFields, array $params, $value, $dateType): ?string {
     if (!array_key_exists($customFieldID, $customFields)) {
       return ts('field ID');
     }
+    $fieldMetaData = $customFields[$customFieldID];
     // validate null values for required custom fields of type boolean
     if (!empty($customFields[$customFieldID]['is_required']) && (empty($params['custom_' . $customFieldID]) && !is_numeric($params['custom_' . $customFieldID])) && $customFields[$customFieldID]['data_type'] == 'Boolean') {
       return $customFields[$customFieldID]['label'] . '::' . $customFields[$customFieldID]['groupTitle'];
@@ -156,11 +156,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $dataType = $customFields[$customFieldID]['data_type'];
       $htmlType = $customFields[$customFieldID]['html_type'];
       $isSerialized = CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID]);
-      if ($dataType == 'Date') {
-        if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
+      if ($dataType === 'Date') {
+        $params = ['date_field' => $value];
+        if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, 'date_field')) {
           return NULL;
         }
-        return $customFields[$customFieldID]['label'];
+        return $fieldMetaData['label'];
       }
       elseif ($dataType == 'Boolean') {
         if (CRM_Utils_String::strtoboolstr($value) === FALSE) {
@@ -1159,11 +1160,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           else {
             $input = $params;
           }
-          $errors[] = $parser->validateCustomField($customFieldID, $addressCustomFields, $input, $value, $key, $dateType);
+          $errors[] = $parser->validateCustomField($customFieldID, $addressCustomFields, $input, $value, $dateType);
         }
         else {
           /* check if it's a valid custom field id */
-          $errors[] = $parser->validateCustomField($customFieldID, $customFields, $params, $value, $key, $dateType);
+          $errors[] = $parser->validateCustomField($customFieldID, $customFields, $params, $value, $dateType);
         }
       }
       elseif (is_array($params[$key]) && isset($params[$key]["contact_type"]) && in_array(substr($key, -3), ['a_b', 'b_a'], TRUE)) {
