@@ -1,0 +1,181 @@
+<?php
+/*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
+ */
+
+/**
+ * Provide helpers for recording data snapshots during an upgrade.
+ */
+class CRM_Upgrade_Snapshot {
+
+  public static $pageSize = 50 * 1000;
+
+  /**
+   * How long should we retain old snapshots?
+   *
+   * Time is measured in terms of MINOR versions - eg "4" means "retain for 4 MINOR versions".
+   * Thus, on v5.60, you could delete any snapshots predating 5.56.
+   *
+   * @var int
+   */
+  public static $cleanupAfter = 4;
+
+  /**
+   * List of reasons why the snapshots are not running.
+   *
+   * @var array|null
+   */
+  private static $activationIssues;
+
+  /**
+   * Get a list of reasons why the snapshots should not run.
+   * @return array
+   *   List of printable messages.
+   */
+  public static function getActivationIssues(): array {
+    if (static::$activationIssues === NULL) {
+      // TODO This policy should probably be more configurable, eg via `setting` or `define()`.
+
+      $limits = [
+        'civicrm_contact' => 200 * 1000,
+        'civicrm_contribution' => 200 * 1000,
+        'civicrm_activity' => 200 * 1000,
+        'civicrm_case' => 200 * 1000,
+        'civicrm_mailing' => 200 * 1000,
+        'civicrm_event' => 200 * 1000,
+      ];
+
+      static::$activationIssues = [];
+      foreach ($limits as $table => $limit) {
+        try {
+          $count = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM `{$table}`");
+        }
+        catch (\Exception $e) {
+          $count = 0;
+        }
+        if ($count > $limit) {
+          static::$activationIssues["count_{$table}"] = ts('Table "%1" has a large number of records (%2 > %3).', [
+            1 => $table,
+            2 => $count,
+            3 => $limit,
+          ]);
+        }
+      }
+
+      if (CRM_Core_I18n::isMultilingual()) {
+        static::$activationIssues['multilingual'] = ts('Multilingual snapshots have not been implemented.');
+      }
+    }
+
+    return static::$activationIssues;
+  }
+
+  /**
+   * Create the name of a MySQL snapshot table.
+   *
+   * @param string $version
+   *   Ex: '5.50'
+   * @param string $name
+   *   Ex: 'dates'
+   * @return string
+   *   Ex: 'civicrm_snap_v5_50_dates'
+   */
+  public static function createTableName(string $version, string $name): string {
+    [$major, $minor] = explode('.', $version);
+    return sprintf('civicrm_snap_v%s_%s_%s', $major, $minor, $name);
+  }
+
+  /**
+   * Build a set of queueable tasks which will store a snapshot.
+   *
+   * @param string $version
+   * @param string $name
+   * @param \CRM_Utils_SQL_Select $select
+   * @throws \CRM_Core_Exception
+   */
+  public static function createTasks(string $version, string $name, CRM_Utils_SQL_Select $select): iterable {
+    $destTable = static::createTableName($version, $name);
+    $srcTable = \Civi\Test\Invasive::get([$select, 'from']);
+
+    // Sometimes, backups fail and people rollback and try again. Reset prior snapshots.
+    CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS `{$destTable}`");
+
+    $maxId = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) FROM `{$srcTable}`");
+    $pageSize = CRM_Upgrade_Snapshot::$pageSize;
+    for ($offset = 0; $offset <= $maxId; $offset += $pageSize) {
+      $title = ts('Create snapshot from "%1" (%2: %3 => %4)', [
+        1 => $srcTable,
+        2 => $name,
+        3 => $offset,
+        4 => $offset + $pageSize,
+      ]);
+      $pageSelect = $select->copy()->where('id >= #MIN AND id < #MAX', [
+        'MIN' => $offset,
+        'MAX' => $offset + $pageSize,
+      ]);
+      $sqlAction = ($offset === 0) ? "CREATE TABLE {$destTable} AS " : "INSERT INTO {$destTable} ";
+      yield new CRM_Queue_Task(
+        [static::class, 'insertSnapshotTask'],
+        [$sqlAction . $pageSelect->toSQL()],
+        $title
+      );
+    }
+  }
+
+  /**
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param string $sql
+   * @return bool
+   */
+  public static function insertSnapshotTask(CRM_Queue_TaskContext $ctx, string $sql): bool {
+    CRM_Core_DAO::executeQuery($sql);
+    // If anyone works on multilingual support, you might need to set $i18nRewrite. But doesn't matter since skip ML completely.
+    return TRUE;
+  }
+
+  /**
+   * Cleanup any old snapshot tables.
+   *
+   * @param CRM_Queue_TaskContext|null $ctx
+   * @param string|null $version
+   *   The current version of CiviCRM.
+   * @param int|null $cleanupAfter
+   *   How long should we retain old snapshots?
+   *   Time is measured in terms of MINOR versions - eg "4" means "retain for 4 MINOR versions".
+   *   Thus, on v5.60, you could delete any snapshots predating 5.56.
+   */
+  public static function cleanupTask(?CRM_Queue_TaskContext $ctx = NULL, ?string $version = NULL, ?int $cleanupAfter = NULL): void {
+    $version = $version ?: CRM_Core_BAO_Domain::version();
+    $cleanupAfter = $cleanupAfter ?: static::$cleanupAfter;
+
+    [$major, $minor] = explode('.', $version);
+    $cutoff = $major . '.' . max(0, $minor - $cleanupAfter);
+
+    $dao = new CRM_Core_DAO();
+    $query = "
+      SELECT TABLE_NAME as tableName
+      FROM   INFORMATION_SCHEMA.TABLES
+      WHERE  TABLE_SCHEMA = %1
+      AND TABLE_NAME LIKE 'civicrm_snap_v%'
+    ";
+    $tables = CRM_Core_DAO::executeQuery($query, [1 => [$dao->database(), 'String']])
+      ->fetchMap('tableName', 'tableName');
+
+    $oldTables = array_filter($tables, function($table) use ($cutoff) {
+      if (preg_match(';^civicrm_snap_v(\d+)_(\d+)_;', $table, $m)) {
+        $generatedVer = $m[1] . '.' . $m[2];
+        return (bool) version_compare($generatedVer, $cutoff, '<');
+      }
+      return FALSE;
+    });
+
+    array_map(['CRM_Core_BAO_SchemaHandler', 'dropTable'], $oldTables);
+  }
+
+}
