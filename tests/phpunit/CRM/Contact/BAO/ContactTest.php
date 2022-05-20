@@ -76,7 +76,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $contactId = $contact->id;
 
     $this->assertInstanceOf('CRM_Contact_DAO_Contact', $contact, 'Check for created object');
-
+    $createdContact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact->id]);
     $this->assertEquals($params['first_name'], $contact->first_name, 'Check for first name creation.');
     $this->assertEquals($params['last_name'], $contact->last_name, 'Check for last name creation.');
     $this->assertEquals($params['middle_name'], $contact->middle_name, 'Check for middle name creation.');
@@ -94,14 +94,10 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($params['suffix_id'], $contact->suffix_id, 'Check for suffix_id creation.');
     $this->assertEquals($params['job_title'], $contact->job_title, 'Check for job_title creation.');
     $this->assertEquals($params['gender_id'], $contact->gender_id, 'Check for gender_id creation.');
-    $this->assertEquals('1', $contact->is_deceased, 'Check for is_deceased creation.');
-    $this->assertEquals(CRM_Utils_Date::processDate($params['birth_date']),
-      $contact->birth_date, 'Check for birth_date creation.'
-    );
-    $this->assertEquals(CRM_Utils_Date::processDate($params['deceased_date']),
-      $contact->deceased_date, 'Check for deceased_date creation.'
-    );
     $this->assertEquals('135', $contact->preferred_communication_method);
+    $this->assertEquals(1, $createdContact['is_deceased'], 'Check is_deceased');
+    $this->assertEquals('1961-06-06', $createdContact['birth_date'], 'Check birth_date');
+    $this->assertEquals('1991-07-07', $createdContact['deceased_date'], 'Check deceased_date');
 
     $updateParams = [
       'contact_type' => 'Individual',
