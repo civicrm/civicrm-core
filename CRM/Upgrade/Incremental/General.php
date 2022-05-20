@@ -129,6 +129,19 @@ class CRM_Upgrade_Incremental_General {
         2 => 'https://github.com/JMAConsulting/biz.jmaconsulting.financialaclreport',
       ]);
     }
+
+    $snapshotIssues = CRM_Upgrade_Snapshot::getActivationIssues();
+    if ($snapshotIssues) {
+      $preUpgradeMessage .= '<details>';
+      $preUpgradeMessage .= '<summary>' . ts('This upgrade will NOT use automatic snapshots.') . '</summary>';
+      $preUpgradeMessage .= '<p>' . ts('If an upgrade problem is discovered in the future, automatic snapshots may help recover. However, they also require additional storage and may not be available or appropriate in all configurations.') . '</p>';
+      $preUpgradeMessage .= ts('Here are the reasons why automatic snapshots are disabled:');
+      $preUpgradeMessage .= '<ul>' . implode("", array_map(
+          function($issue) {
+            return sprintf('<li>%s</li>', $issue);
+          }, $snapshotIssues)) . '</ul>';
+      $preUpgradeMessage .= '</details>';
+    }
   }
 
   /**
