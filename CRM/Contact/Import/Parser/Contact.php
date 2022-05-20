@@ -483,7 +483,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     //fixed CRM-4148
     //now we create new contact in update/fill mode also.
     $contactID = NULL;
-    if ($createNewContact || ($this->_retCode != CRM_Import_Parser::NO_MATCH && $this->_updateWithId)) {
+    if ($createNewContact || ($this->_updateWithId)) {
       // @todo - there are multiple places where formatting is done that need consolidation.
       // This handles where the label has been passed in and it has gotten this far.
       // probably a bunch of hard-coded stuff could be removed to rely on this.
