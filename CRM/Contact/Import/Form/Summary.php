@@ -35,9 +35,6 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
     if ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
       $this->assign('dupeActionString', ts('These records have been updated with the imported data.'));
     }
-    elseif ($onDuplicate == CRM_Import_Parser::DUPLICATE_REPLACE) {
-      $this->assign('dupeActionString', ts('These records have been replaced with the imported data.'));
-    }
     elseif ($onDuplicate == CRM_Import_Parser::DUPLICATE_FILL) {
       $this->assign('dupeActionString', ts('These records have been filled in with the imported data.'));
     }
