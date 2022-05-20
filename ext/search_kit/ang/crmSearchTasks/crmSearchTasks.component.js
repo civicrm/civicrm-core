@@ -67,7 +67,7 @@
         if (action.crmPopup) {
           var path = $scope.$eval(action.crmPopup.path, data),
             query = action.crmPopup.query && $scope.$eval(action.crmPopup.query, data);
-          CRM.loadForm(CRM.url(path, query))
+          CRM.loadForm(CRM.url(path, query), {post: action.crmPopup.data && $scope.$eval(action.crmPopup.data, data)})
             .on('crmFormSuccess', ctrl.refresh);
         }
         // If action uses dialogService
