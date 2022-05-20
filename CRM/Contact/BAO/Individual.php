@@ -67,8 +67,6 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       $params['individual_suffix'] = $suffix = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'suffix_id', $suffix_id);
     }
 
-    $params['is_deceased'] = CRM_Utils_Array::value('is_deceased', $params, FALSE);
-
     $individual = NULL;
     if ($contact->id) {
       $individual = new CRM_Contact_BAO_Contact();
