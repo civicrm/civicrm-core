@@ -192,6 +192,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           continue;
         }
         $individualTaxAmount = 0;
+        $append = '';
         //display tax amount on confirmation page
         $taxAmount += $v['tax_amount'];
         if (is_array($v)) {
@@ -1255,6 +1256,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $form->_paymentProcessor = $params['paymentProcessorObj'];
     }
     $form->postProcess();
+    return $form;
   }
 
   /**
