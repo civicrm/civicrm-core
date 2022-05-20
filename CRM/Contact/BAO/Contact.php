@@ -138,6 +138,9 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
     }
     $params = array_merge($defaults, $params);
 
+    if (!empty($params['deceased_date']) && $params['deceased_date'] !== 'null') {
+      $params['is_deceased'] = TRUE;
+    }
     $allNull = $contact->copyValues($params);
 
     $contact->id = $contactID;
