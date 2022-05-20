@@ -42,7 +42,6 @@ abstract class CRM_Import_Parser {
    */
   const CONTACT_INDIVIDUAL = 1, CONTACT_HOUSEHOLD = 2, CONTACT_ORGANIZATION = 4;
 
-
   /**
    * User job id.
    *

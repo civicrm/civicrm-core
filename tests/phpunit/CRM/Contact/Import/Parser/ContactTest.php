@@ -1014,22 +1014,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ['do_not_import'],
     ];
     $csv = 'individual_genders.csv';
-    /* @var CRM_Import_DataSource_CSV $dataSource */
-    /* @var \CRM_Contact_Import_Parser_Contact $parser */
-    [$dataSource, $parser] = $this->getDataSourceAndParser($csv, $mapper, []);
-    while ($values = $dataSource->getRow()) {
-      try {
-        $parser->validateValues(array_values($values));
-        if ($values['expected'] !== 'Valid') {
-          $this->fail($values['gender'] . ' should not have been valid');
-        }
-      }
-      catch (CRM_Core_Exception $e) {
-        if ($values['expected'] !== 'Invalid') {
-          $this->fail($values['gender'] . ' should have been valid');
-        }
-      }
-    }
+    $this->validateMultiRowCsv($csv, $mapper, 'gender');
 
     $this->importCSV($csv, $mapper);
     $contacts = Contact::get()
@@ -1562,10 +1547,13 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Validate a csv with multiple rows in it.
+   *
    * @param string $csv
    * @param array $mapper Mapping as entered on MapField form.
    *   e.g [['first_name']['email', 1]].
    * @param string $field
+   *   Name of the field whose data should be output in the error message.
    * @param array $submittedValues
    *   Values submitted in the form process.
    *
@@ -1573,7 +1561,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  private function validateMultiRowCsv(string $csv, array $mapper, string $field, $submittedValues): void {
+  private function validateMultiRowCsv(string $csv, array $mapper, string $field, $submittedValues = []): void {
     /* @var CRM_Import_DataSource_CSV $dataSource */
     /* @var \CRM_Contact_Import_Parser_Contact $parser */
     [$dataSource, $parser] = $this->getDataSourceAndParser($csv, $mapper, $submittedValues);
