@@ -778,16 +778,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    *
    */
   public static function resolveDefaults(&$defaults, $reverse = FALSE) {
-    // Hack for birth_date.
-    if (!empty($defaults['birth_date'])) {
-      if (is_array($defaults['birth_date'])) {
-        $defaults['birth_date'] = CRM_Utils_Date::format($defaults['birth_date'], '-');
-      }
-    }
-
-    CRM_Utils_Array::lookupValue($defaults, 'prefix', CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'), $reverse);
-    CRM_Utils_Array::lookupValue($defaults, 'suffix', CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id'), $reverse);
-    CRM_Utils_Array::lookupValue($defaults, 'communication_style', CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'communication_style_id'), $reverse);
 
     //lookup value of email/postal greeting, addressee, CRM-4575
     foreach (self::$_greetingTypes as $greeting) {

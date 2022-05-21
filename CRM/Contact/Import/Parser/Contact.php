@@ -12,7 +12,6 @@
 use Civi\Api4\Contact;
 use Civi\Api4\RelationshipType;
 
-require_once 'CRM/Utils/DeprecatedUtils.php';
 require_once 'api/v3/utils.php';
 
 /**
@@ -98,6 +97,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     'birth_date',
     'deceased_date',
     'is_deceased',
+    'prefix_id',
+    'suffix_id',
+    'communication_style',
+    'preferred_language',
   ];
 
   /**
@@ -476,25 +479,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     //now we create new contact in update/fill mode also.
     $contactID = NULL;
     if (1) {
-      // @todo - there are multiple places where formatting is done that need consolidation.
-      // This handles where the label has been passed in and it has gotten this far.
-      // probably a bunch of hard-coded stuff could be removed to rely on this.
-      $fields = Contact::getFields(FALSE)
-        ->addWhere('options', '=', TRUE)
-        ->setLoadOptions(TRUE)
-        ->execute()->indexBy('name');
-      foreach ($fields as $fieldName => $fieldSpec) {
-        if (isset($formatted[$fieldName]) && is_array($formatted[$fieldName])) {
-          // If we have an array at this stage, it's probably a multi-select
-          // field that has already been parsed properly into the value that
-          // should be inserted into the database.
-          continue;
-        }
-        if (!empty($formatted[$fieldName])
-          && empty($fieldSpec['options'][$formatted[$fieldName]])) {
-          $formatted[$fieldName] = array_search($formatted[$fieldName], $fieldSpec['options'], TRUE) ?? $formatted[$fieldName];
-        }
-      }
       //CRM-4430, don't carry if not submitted.
       if ($this->_updateWithId && !empty($params['id'])) {
         $contactID = $params['id'];
@@ -1184,20 +1168,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           case 'preferred_mail_format':
             if (!array_key_exists(strtolower($value), array_change_key_case(CRM_Core_SelectValues::pmf(), CASE_LOWER))) {
               $errors[] = ts('Preferred Mail Format');
-            }
-            break;
-
-          case 'individual_prefix':
-          case 'prefix_id':
-            if (!self::in_value($value, CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'))) {
-              $errors[] = ts('Individual Prefix');
-            }
-            break;
-
-          case 'individual_suffix':
-          case 'suffix_id':
-            if (!self::in_value($value, CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id'))) {
-              $errors[] = ts('Individual Suffix');
             }
             break;
 

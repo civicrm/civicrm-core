@@ -500,11 +500,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Test all pseudoConstant, stateProvince, country.
    */
   public function testResolveDefaults() {
-    $params = [
-      'prefix_id' => 3,
-      'suffix_id' => 2,
-      'birth_date' => '1983-12-13',
-    ];
+    $params = [];
 
     $params['address'][1] = [
       'location_type_id' => 1,
@@ -515,11 +511,6 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     // @todo - we are testing this with $reverse = FALSE but it is never called that way!
     CRM_Contact_BAO_Contact::resolveDefaults($params);
 
-    //check the resolve values.
-    $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-    $this->assertEquals($prefix[$params['prefix_id']], $params['prefix'], 'Check for prefix.');
-    $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
-    $this->assertEquals($suffix[$params['suffix_id']], $params['suffix'], 'Check for suffix.');
     $this->assertEquals(1004, $params['address'][1]['state_province_id']);
     $this->assertEquals(CRM_Core_PseudoConstant::country($params['address'][1]['country_id']),
       $params['address'][1]['country'],
