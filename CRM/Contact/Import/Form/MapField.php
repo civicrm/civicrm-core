@@ -277,7 +277,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
     }
 
-    $js = "<script type='text/javascript'>\n";
     $formName = 'document.forms.' . $this->_name;
     //used to warn for mismatch column count or mismatch mapping
     CRM_Core_Session::singleton()->setStatus(NULL);
@@ -287,16 +286,18 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $processor->setMetadata($this->getContactImportMetadata());
     $processor->setContactTypeByConstant($this->getSubmittedValue('contactType'));
     $processor->setContactSubType($this->getSubmittedValue('contactSubType'));
+    $submittedMapperValue = $this->getSubmittedValue('mapper');
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
 
       if ($this->getSubmittedValue('savedMapping') && $processor->getFieldName($i)) {
         $defaults["mapper[$i]"] = $processor->getSavedQuickformDefaultsForColumn($i);
-        $js .= $processor->getQuickFormJSForField($i);
+      }
+      elseif (!empty($submittedMapperValue)) {
+        $defaults["mapper[$i]"] = $submittedMapperValue[$i];
       }
       else {
-        $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
         if ($hasColumnNames) {
           // do array search first to see if has mapped key
           $columnKey = array_search($this->_columnNames[$i], $this->getFieldTitles());
@@ -324,8 +325,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $sel->setOptions([$sel1, $sel2, $sel3, $sel4]);
     }
 
-    $js .= "</script>\n";
-    $this->assign('initHideBoxes', $js);
+    $this->assignJsToHideUnusedFields($defaults);
 
     $this->setDefaults($defaults);
 
@@ -560,6 +560,33 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $parser = new CRM_Contact_Import_Parser_Contact();
     $parser->setUserJobID($this->getUserJobID());
     return $parser;
+  }
+
+  /**
+   * Assign js to hide hide unused fields.
+   *
+   * The mapper fields use QuickForm hierarchical select and, depending on the
+   * first field selection may offer more (hierarchical) fields. Eg. if you
+   * choose 'phone' for the first field then 2 more fields will give you
+   * the chance to enter the phone_type_id and location_type_id.
+   *
+   * When loading the field we hide these hierarchical fields if they are empty,
+   * by js which is assigned here.
+   *
+   * @param array $defaults
+   */
+  protected function assignJsToHideUnusedFields(array $defaults): void {
+    $js = ["<script type='text/javascript'>"];
+    foreach ($defaults as $row => $mapperValues) {
+      foreach ([1, 2, 3] as $columnNumber) {
+        if (empty($mapperValues[$columnNumber])) {
+          $rowNumber = str_replace('mapper[', '', substr($row, 0, -1));
+          $js[] = "cj('#mapper_{$rowNumber}_{$columnNumber}').hide();";
+        }
+      }
+    }
+    $js[] = "</script>\n";
+    $this->assign('initHideBoxes', implode("\n", $js));
   }
 
 }

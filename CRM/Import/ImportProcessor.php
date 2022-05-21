@@ -536,47 +536,6 @@ class CRM_Import_ImportProcessor {
   }
 
   /**
-   * Get the relevant js for quickform.
-   *
-   * @param int $column
-   *
-   * @return string
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function getQuickFormJSForField($column) {
-    $columnNumbersToHide = [];
-    if ($this->getFieldName($column) === 'do_not_import') {
-      $columnNumbersToHide = [1, 2, 3];
-    }
-    elseif ($this->getRelationshipKey($column)) {
-      if (!$this->getWebsiteTypeID($column) && !$this->getLocationTypeID($column)) {
-        $columnNumbersToHide[] = 2;
-      }
-      if (!$this->getFieldName($column)) {
-        $columnNumbersToHide[] = 1;
-      }
-      if (!$this->getPhoneOrIMTypeID($column)) {
-        $columnNumbersToHide[] = 3;
-      }
-    }
-    else {
-      if (!$this->getLocationTypeID($column) && !$this->getWebsiteTypeID($column)) {
-        $columnNumbersToHide[] = 1;
-      }
-      if (!$this->getPhoneOrIMTypeID($column)) {
-        $columnNumbersToHide[] = 2;
-      }
-      $columnNumbersToHide[] = 3;
-    }
-
-    $jsClauses = [];
-    foreach ($columnNumbersToHide as $columnNumber) {
-      $jsClauses[] = $this->getFormName() . "['mapper[$column][" . $columnNumber . "]'].style.display = 'none';";
-    }
-    return empty($jsClauses) ? '' : implode("\n", $jsClauses) . "\n";
-  }
-
-  /**
    * Get the defaults for the column from the saved mapping.
    *
    * @param int $column

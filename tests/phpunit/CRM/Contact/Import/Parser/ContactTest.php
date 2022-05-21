@@ -1113,6 +1113,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ['5_a_b', 'organization_name'],
       ['contact_sub_type'],
       ['5_a_b', 'contact_sub_type'],
+      ['do_not_import'],
     ];
     $csv = 'individual_contact_sub_types.csv';
     $field = 'contact_sub_type';
