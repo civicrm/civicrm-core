@@ -1253,4 +1253,107 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertEquals([1, 2], $data);
   }
 
+  public function testEditableContactFields() {
+    $source = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['contact_type' => 'Individual', 'first_name' => 'One'],
+      ['contact_type' => 'Individual'],
+      ['contact_type' => 'Organization'],
+      ['contact_type' => 'Household'],
+    ];
+    $contact = Contact::save(FALSE)
+      ->addDefault('source', $source)
+      ->setRecords($sampleData)
+      ->execute();
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['first_name', 'organization_name', 'household_name'],
+          'where' => [['source', '=', $source]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'columns' => [
+            [
+              'key' => 'first_name',
+              'label' => 'First',
+              'dataType' => 'String',
+              'type' => 'field',
+              'editable' => TRUE,
+            ],
+            [
+              'key' => 'organization_name',
+              'label' => 'First',
+              'dataType' => 'String',
+              'type' => 'field',
+              'editable' => TRUE,
+            ],
+            [
+              'key' => 'household_name',
+              'label' => 'First',
+              'dataType' => 'String',
+              'type' => 'field',
+              'editable' => TRUE,
+            ],
+          ],
+          'sort' => [
+            ['id', 'ASC'],
+          ],
+        ],
+      ],
+      'afform' => NULL,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    // First Individual
+    $expectedFirstNameEdit = [
+      'entity' => 'Contact',
+      'input_type' => 'Text',
+      'data_type' => 'String',
+      'options' => FALSE,
+      'serialize' => FALSE,
+      'nullable' => TRUE,
+      'fk_entity' => NULL,
+      'value_key' => 'first_name',
+      'record' => ['id' => $contact[0]['id']],
+      'action' => 'update',
+      'value' => 'One',
+    ];
+    // Ensure first_name is editable but not organization_name or household_name
+    $this->assertEquals($expectedFirstNameEdit, $result[0]['columns'][0]['edit']);
+    $this->assertTrue(!isset($result[0]['columns'][1]['edit']));
+    $this->assertTrue(!isset($result[0]['columns'][2]['edit']));
+
+    // Second Individual
+    $expectedFirstNameEdit['record']['id'] = $contact[1]['id'];
+    $expectedFirstNameEdit['value'] = NULL;
+    $this->assertEquals($expectedFirstNameEdit, $result[1]['columns'][0]['edit']);
+    $this->assertTrue(!isset($result[1]['columns'][1]['edit']));
+    $this->assertTrue(!isset($result[1]['columns'][2]['edit']));
+
+    // Third contact: Organization
+    $expectedFirstNameEdit['record']['id'] = $contact[2]['id'];
+    $expectedFirstNameEdit['value_key'] = 'organization_name';
+    $this->assertTrue(!isset($result[2]['columns'][0]['edit']));
+    $this->assertEquals($expectedFirstNameEdit, $result[2]['columns'][1]['edit']);
+    $this->assertTrue(!isset($result[2]['columns'][2]['edit']));
+
+    // Third contact: Household
+    $expectedFirstNameEdit['record']['id'] = $contact[3]['id'];
+    $expectedFirstNameEdit['value_key'] = 'household_name';
+    $this->assertTrue(!isset($result[3]['columns'][0]['edit']));
+    $this->assertTrue(!isset($result[3]['columns'][1]['edit']));
+    $this->assertEquals($expectedFirstNameEdit, $result[3]['columns'][2]['edit']);
+  }
+
 }
