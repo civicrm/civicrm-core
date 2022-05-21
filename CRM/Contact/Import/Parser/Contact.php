@@ -472,12 +472,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     // Support Match and Update Via Contact ID
     if ($this->_updateWithId && isset($params['id'])) {
       $createNewContact = FALSE;
-      // @todo - it feels like all the rows from here to the end of the IF
-      // could be removed in favour of a simple check for whether the contact_type & id match
-      $matchedIDs = $this->getIdsOfMatchingContacts($formatted);
-      if (!empty($matchedIDs)) {
-
-      }
     }
 
     //fixed CRM-4148
