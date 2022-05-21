@@ -6,6 +6,7 @@ use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\ContactType;
 use Civi\Api4\Email;
+use Civi\Api4\Phone;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\SearchDisplay;
 use Civi\Api4\UFMatch;
@@ -307,6 +308,144 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     }
     catch (\Exception $e) {
     }
+  }
+
+  /**
+   * Test in-place editable for update and create.
+   */
+  public function testInPlaceEditAndCreate() {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'One', 'last_name' => $lastName],
+      ['last_name' => $lastName],
+    ];
+    $contacts = Contact::save(FALSE)->setRecords($sampleData)->execute()->column('id');
+    $email = Email::create(FALSE)
+      ->addValue('contact_id', $contacts[0])
+      ->addValue('email', 'testmail@unit.test')
+      ->execute()->single()['id'];
+    $phone = Phone::create(FALSE)
+      ->addValue('contact_id', $contacts[1])
+      ->addValue('phone', '123456')
+      ->execute()->single()['id'];
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['first_name', 'Contact_Email_contact_id_01.email', 'Contact_Phone_contact_id_01.phone'],
+          'where' => [['last_name', '=', $lastName]],
+          'join' => [
+            [
+              "Email AS Contact_Email_contact_id_01",
+              "LEFT",
+              ["id", "=", "Contact_Email_contact_id_01.contact_id"],
+              ["Contact_Email_contact_id_01.is_primary", "=", TRUE],
+            ],
+            [
+              "Phone AS Contact_Phone_contact_id_01",
+              "LEFT",
+              ["id", "=", "Contact_Phone_contact_id_01.contact_id"],
+            ],
+          ],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'limit' => 20,
+          'pager' => FALSE,
+          'columns' => [
+            [
+              'key' => 'first_name',
+              'label' => 'Name',
+              'type' => 'field',
+              'editable' => TRUE,
+            ],
+            [
+              'key' => 'Contact_Email_contact_id_01.email',
+              'label' => 'Email',
+              'type' => 'field',
+              'editable' => TRUE,
+            ],
+            [
+              'key' => 'Contact_Phone_contact_id_01.phone',
+              'label' => 'Phone',
+              'type' => 'field',
+              'editable' => TRUE,
+            ],
+          ],
+          'sort' => [
+            ['id', 'ASC'],
+          ],
+        ],
+      ],
+    ];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+
+    // Contact 1 first name can be updated
+    $this->assertEquals('One', $result[0]['columns'][0]['val']);
+    $this->assertEquals($contacts[0], $result[0]['columns'][0]['edit']['record']['id']);
+    $this->assertEquals('Contact', $result[0]['columns'][0]['edit']['entity']);
+    $this->assertEquals('Text', $result[0]['columns'][0]['edit']['input_type']);
+    $this->assertEquals('String', $result[0]['columns'][0]['edit']['data_type']);
+    $this->assertEquals('first_name', $result[0]['columns'][0]['edit']['value_key']);
+    $this->assertEquals('update', $result[0]['columns'][0]['edit']['action']);
+    $this->assertEquals('One', $result[0]['columns'][0]['edit']['value']);
+
+    // Contact 1 email can be updated
+    $this->assertEquals('testmail@unit.test', $result[0]['columns'][1]['val']);
+    $this->assertEquals($email, $result[0]['columns'][1]['edit']['record']['id']);
+    $this->assertEquals('Email', $result[0]['columns'][1]['edit']['entity']);
+    $this->assertEquals('Text', $result[0]['columns'][1]['edit']['input_type']);
+    $this->assertEquals('String', $result[0]['columns'][1]['edit']['data_type']);
+    $this->assertEquals('email', $result[0]['columns'][1]['edit']['value_key']);
+    $this->assertEquals('update', $result[0]['columns'][1]['edit']['action']);
+    $this->assertEquals('testmail@unit.test', $result[0]['columns'][1]['edit']['value']);
+
+    // Contact 1 - new phone can be created
+    $this->assertNull($result[0]['columns'][2]['val']);
+    $this->assertEquals(['contact_id' => $contacts[0]], $result[0]['columns'][2]['edit']['record']);
+    $this->assertEquals('Phone', $result[0]['columns'][2]['edit']['entity']);
+    $this->assertEquals('Text', $result[0]['columns'][2]['edit']['input_type']);
+    $this->assertEquals('String', $result[0]['columns'][2]['edit']['data_type']);
+    $this->assertEquals('phone', $result[0]['columns'][2]['edit']['value_key']);
+    $this->assertEquals('create', $result[0]['columns'][2]['edit']['action']);
+    $this->assertNull($result[0]['columns'][2]['edit']['value']);
+
+    // Contact 2 first name can be added
+    $this->assertNull($result[1]['columns'][0]['val']);
+    $this->assertEquals($contacts[1], $result[1]['columns'][0]['edit']['record']['id']);
+    $this->assertEquals('Contact', $result[1]['columns'][0]['edit']['entity']);
+    $this->assertEquals('Text', $result[1]['columns'][0]['edit']['input_type']);
+    $this->assertEquals('String', $result[1]['columns'][0]['edit']['data_type']);
+    $this->assertEquals('first_name', $result[1]['columns'][0]['edit']['value_key']);
+    $this->assertEquals('update', $result[1]['columns'][0]['edit']['action']);
+    $this->assertNull($result[1]['columns'][0]['edit']['value']);
+
+    // Contact 2 - new email can be created
+    $this->assertNull($result[1]['columns'][1]['val']);
+    $this->assertEquals(['contact_id' => $contacts[1], 'is_primary' => TRUE], $result[1]['columns'][1]['edit']['record']);
+    $this->assertEquals('Email', $result[1]['columns'][1]['edit']['entity']);
+    $this->assertEquals('Text', $result[1]['columns'][1]['edit']['input_type']);
+    $this->assertEquals('String', $result[1]['columns'][1]['edit']['data_type']);
+    $this->assertEquals('email', $result[1]['columns'][1]['edit']['value_key']);
+    $this->assertEquals('create', $result[1]['columns'][1]['edit']['action']);
+    $this->assertNull($result[1]['columns'][1]['edit']['value']);
+
+    // Contact 2 phone can be updated
+    $this->assertEquals('123456', $result[1]['columns'][2]['val']);
+    $this->assertEquals($phone, $result[1]['columns'][2]['edit']['record']['id']);
+    $this->assertEquals('Phone', $result[1]['columns'][2]['edit']['entity']);
+    $this->assertEquals('Text', $result[1]['columns'][2]['edit']['input_type']);
+    $this->assertEquals('String', $result[1]['columns'][2]['edit']['data_type']);
+    $this->assertEquals('phone', $result[1]['columns'][2]['edit']['value_key']);
+    $this->assertEquals('update', $result[1]['columns'][2]['edit']['action']);
+    $this->assertEquals('123456', $result[1]['columns'][2]['edit']['value']);
   }
 
   /**
