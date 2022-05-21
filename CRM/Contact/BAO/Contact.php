@@ -147,9 +147,9 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
 
     if ($contact->contact_type === 'Individual') {
       $allNull = FALSE;
-      // @todo allow the lines below to be overridden by input or hooks & add tests,
-      // as has been done for households and organizations.
-      // Format individual fields.
+      // @todo get rid of this - most of this formatting should
+      // be done by time we get here - maybe start with some
+      // deprecation notices.
       CRM_Contact_BAO_Individual::format($params, $contact);
     }
 

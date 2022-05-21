@@ -1050,17 +1050,21 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \Civi\API\Exception\UnauthorizedException
+   * Test date validation.
+   *
+   * @dataProvider dateDataProvider
+   *
+   * @param string $csv
+   * @param int $dateType
+   *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public function testValidateDateData(): void {
+  public function testValidateDateData($csv, $dateType): void {
     $addressCustomGroupID = $this->createCustomGroup(['extends' => 'Address', 'name' => 'Address']);
     $contactCustomGroupID = $this->createCustomGroup(['extends' => 'Contact', 'name' => 'Contact']);
     $addressCustomFieldID = $this->createDateCustomField(['custom_group_id' => $addressCustomGroupID])['id'];
     $contactCustomFieldID = $this->createDateCustomField(['custom_group_id' => $contactCustomGroupID])['id'];
-    $csv = 'individual_dates_type1.csv';
-    $dateType = CRM_Core_Form_Date::DATE_yyyy_mm_dd;
     $mapper = [
       ['first_name'],
       ['last_name'],
@@ -1073,20 +1077,23 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     ];
     // Date types should be picked up from submitted values but still some clean up to do.
     CRM_Core_Session::singleton()->set('dateTypes', $dateType);
-    $this->validateMultiRowCsv($csv, $mapper, 'custom_' . $addressCustomFieldID, ['dateFormats' => $dateType]);
+    $this->validateMultiRowCsv($csv, $mapper, 'custom_date_one', ['dateFormats' => $dateType]);
     $fields = [
       'contact_id.birth_date',
       'contact_id.deceased_date',
+      'contact_id.is_deceased',
       'contact_id.custom_' . $contactCustomFieldID,
       $addressCustomFieldID,
     ];
-    $contacts = Address::get()
-      ->addWhere('contact_id.first_name', '=', 'Joe')
-      ->setSelect($fields)
-      ->execute();
+    $contacts = Address::get()->addWhere('contact_id.first_name', '=', 'Joe')->setSelect($fields)->execute();
     foreach ($contacts as $contact) {
       foreach ($fields as $field) {
-        $this->assertEquals('2008-09-01', $contact[$field]);
+        if ($field === 'contact_is_deceased') {
+          $this->assertTrue($contact[$field]);
+        }
+        else {
+          $this->assertEquals('2008-09-01', $contact[$field]);
+        }
       }
     }
   }
@@ -1119,6 +1126,22 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       $this->assertEquals(['baby'], $contact['contact_sub_type:name']);
     }
     $this->assertCount(3, $contacts);
+  }
+
+  /**
+   * Data provider for date tests.
+   *
+   * @return array[]
+   */
+  public function dateDataProvider(): array {
+    return [
+      'type_1' => ['csv' => 'individual_dates_type1.csv', 'dateType' => CRM_Core_Form_Date::DATE_yyyy_mm_dd],
+      'type_2' => ['csv' => 'individual_dates_type2.csv', 'dateType' => CRM_Core_Form_Date::DATE_mm_dd_yy],
+      'type_4' => ['csv' => 'individual_dates_type4.csv', 'dateType' => CRM_Core_Form_Date::DATE_mm_dd_yyyy],
+      'type_8' => ['csv' => 'individual_dates_type8.csv', 'dateType' => CRM_Core_Form_Date::DATE_Month_dd_yyyy],
+      'type_16' => ['csv' => 'individual_dates_type16.csv', 'dateType' => CRM_Core_Form_Date::DATE_dd_mon_yy],
+      'type_32' => ['csv' => 'individual_dates_type32.csv', 'dateType' => CRM_Core_Form_Date::DATE_dd_mm_yyyy],
+    ];
   }
 
   /**
@@ -1535,6 +1558,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
           'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
           'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
           'dedupe_rule_id' => NULL,
+          'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
         ], $submittedValues),
       ],
       'status_id:name' => 'draft',
