@@ -2928,7 +2928,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     // Time to see if we can find an existing contact ID to make this an update
     // not a create.
     if ($extIDMatch || $this->isUpdateExistingContacts()) {
-      return $this->getPossibleContactMatch($params, $extIDMatch, $this->getSubmittedValue('dedupe_rule_id'));
+      return $this->getPossibleContactMatch($params, $extIDMatch, $this->getSubmittedValue('dedupe_rule_id') ?: NULL);
     }
     return NULL;
   }
