@@ -1511,7 +1511,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $formatted['updateBlankLocInfo'] = FALSE;
     }
 
-    [$data, $contactDetails] = $this->formatProfileContactParams($formatted, $contactFields, $contactId, NULL, $formatted['contact_type']);
+    [$data, $contactDetails] = $this->formatProfileContactParams($formatted, $contactFields, $contactId, $formatted['contact_type']);
 
     // manage is_opt_out
     if (array_key_exists('is_opt_out', $contactFields) && array_key_exists('is_opt_out', $formatted)) {
@@ -1564,9 +1564,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param array $params
    * @param array $fields
    * @param int|null $contactID
-   * @param int|null $ufGroupId
    * @param string|null $ctype
-   * @param bool $skipCustom
    *
    * @return array
    */
@@ -1574,9 +1572,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     &$params,
     $fields,
     $contactID = NULL,
-    $ufGroupId = NULL,
-    $ctype = NULL,
-    $skipCustom = FALSE
+    $ctype = NULL
   ) {
 
     $data = $contactDetails = [];
@@ -1591,18 +1587,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
     else {
       //we should get contact type only if contact
-      if ($ufGroupId) {
-        $data['contact_type'] = CRM_Core_BAO_UFField::getProfileType($ufGroupId, TRUE, FALSE, TRUE);
-
-        //special case to handle profile with only contact fields
-        if ($data['contact_type'] == 'Contact') {
-          $data['contact_type'] = 'Individual';
-        }
-        elseif (CRM_Contact_BAO_ContactType::isaSubType($data['contact_type'])) {
-          $data['contact_type'] = CRM_Contact_BAO_ContactType::getBasicType($data['contact_type']);
-        }
-      }
-      elseif ($ctype) {
+      if ($ctype) {
         $data['contact_type'] = $ctype;
       }
       else {
@@ -1814,7 +1799,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           //save email/postal greeting and addressee values if any, CRM-4575
           $data[$key . '_id'] = $value;
         }
-        elseif (!$skipCustom && ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
+        elseif (($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
           // for autocomplete transfer hidden value instead of label
           if ($params[$key] && isset($params[$key . '_id'])) {
             $value = $params[$key . '_id'];
