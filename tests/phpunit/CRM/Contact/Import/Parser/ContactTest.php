@@ -1186,8 +1186,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ['state_province', $homeID],
       // No location type ID means 'Primary'
       ['email'],
-      // @todo - use this, not do_not_import ['signature_text'],
-      ['do_not_import'],
+      ['signature_text'],
       ['im', NULL, $skypeTypeID],
       ['url', $mainWebsiteTypeID],
       ['phone', $homeID, $phoneTypeID],
@@ -1199,8 +1198,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       [$childKey, 'country'],
       [$childKey, 'state_province'],
       [$childKey, 'email', $homeID],
-      // @todo - use this, not do_not_import [$childKey, 'signature_text', $homeID],
-      ['do_not_import'],
+      [$childKey, 'signature_text', $homeID],
       [$childKey, 'im', $homeID, $skypeTypeID],
       [$childKey, 'url', $linkedInTypeID],
       // Same location type, different phone typ in these phones
@@ -1253,6 +1251,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->assertCount(0, $contacts['sis@example.com']['website']);
     $this->assertCount(2, $contacts['Soccer Superstars']['website']);
     $this->assertCount(1, $contacts['Susie Jones']['email']);
+    $this->assertEquals('Regards', $contacts['Susie Jones']['email'][0]['signature_text']);
     $this->assertCount(1, $contacts['Mum Jones']['email']);
     $this->assertCount(1, $contacts['sis@example.com']['email']);
     $this->assertCount(1, $contacts['Soccer Superstars']['email']);
