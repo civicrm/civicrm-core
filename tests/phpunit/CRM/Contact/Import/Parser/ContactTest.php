@@ -20,6 +20,7 @@ use Civi\Api4\ContactType;
 use Civi\Api4\Email;
 use Civi\Api4\IM;
 use Civi\Api4\LocationType;
+use Civi\Api4\OpenID;
 use Civi\Api4\Phone;
 use Civi\Api4\RelationshipType;
 use Civi\Api4\UserJob;
@@ -1227,6 +1228,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       [$employeeKey, 'do_not_import'],
       // Second website, different type.
       [$employeeKey, 'url', $linkedInTypeID],
+      ['openid'],
     ];
     $this->validateCSV($csv, $mapper);
 
@@ -1238,6 +1240,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ->addChain('website', Website::get()->addWhere('contact_id', '=', '$id'))
       ->addChain('im', IM::get()->addWhere('contact_id', '=', '$id'))
       ->addChain('email', Email::get()->addWhere('contact_id', '=', '$id'))
+      ->addChain('openid', OpenID::get()->addWhere('contact_id', '=', '$id'))
       ->execute()->indexBy('display_name');
     $this->assertCount(4, $contacts);
     $this->assertCount(1, $contacts['Susie Jones']['phone']);
@@ -1261,6 +1264,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->assertCount(1, $contacts['Mum Jones']['address']);
     $this->assertCount(1, $contacts['sis@example.com']['address']);
     $this->assertCount(1, $contacts['Soccer Superstars']['address']);
+    $this->assertCount(1, $contacts['Susie Jones']['openid']);
   }
 
   /**

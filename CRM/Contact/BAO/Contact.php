@@ -797,7 +797,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       );
     }
 
-    $blocks = ['address', 'im'];
+    $blocks = ['address'];
     foreach ($blocks as $name) {
       if (!array_key_exists($name, $defaults) || !is_array($defaults[$name])) {
         continue;
@@ -841,14 +841,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
           CRM_Utils_Array::lookupValue($values,
             'county',
             $countyList,
-            $reverse
-          );
-        }
-
-        if ($name == 'im') {
-          CRM_Utils_Array::lookupValue($values,
-            'provider',
-            CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'),
             $reverse
           );
         }
