@@ -1511,7 +1511,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $formatted['updateBlankLocInfo'] = FALSE;
     }
 
-    [$data, $contactDetails] = CRM_Contact_BAO_Contact::formatProfileContactParams($formatted, $contactFields, $contactId, NULL, $formatted['contact_type']);
+    [$data, $contactDetails] = $this->formatProfileContactParams($formatted, $contactFields, $contactId, NULL, $formatted['contact_type']);
 
     // manage is_opt_out
     if (array_key_exists('is_opt_out', $contactFields) && array_key_exists('is_opt_out', $formatted)) {
@@ -1553,6 +1553,401 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
     }
     return $newContact;
+  }
+
+  /**
+   * Legacy format profile contact parameters.
+   *
+   * This is a formerly shared function - most of the stuff in it probably does
+   * nothing but copied here to star unravelling that...
+   *
+   * @param array $params
+   * @param array $fields
+   * @param int|null $contactID
+   * @param int|null $ufGroupId
+   * @param string|null $ctype
+   * @param bool $skipCustom
+   *
+   * @return array
+   */
+  private function formatProfileContactParams(
+    &$params,
+    $fields,
+    $contactID = NULL,
+    $ufGroupId = NULL,
+    $ctype = NULL,
+    $skipCustom = FALSE
+  ) {
+
+    $data = $contactDetails = [];
+
+    // get the contact details (hier)
+    if ($contactID) {
+      $details = CRM_Contact_BAO_Contact::getHierContactDetails($contactID, $fields);
+
+      $contactDetails = $details[$contactID];
+      $data['contact_type'] = $contactDetails['contact_type'] ?? NULL;
+      $data['contact_sub_type'] = $contactDetails['contact_sub_type'] ?? NULL;
+    }
+    else {
+      //we should get contact type only if contact
+      if ($ufGroupId) {
+        $data['contact_type'] = CRM_Core_BAO_UFField::getProfileType($ufGroupId, TRUE, FALSE, TRUE);
+
+        //special case to handle profile with only contact fields
+        if ($data['contact_type'] == 'Contact') {
+          $data['contact_type'] = 'Individual';
+        }
+        elseif (CRM_Contact_BAO_ContactType::isaSubType($data['contact_type'])) {
+          $data['contact_type'] = CRM_Contact_BAO_ContactType::getBasicType($data['contact_type']);
+        }
+      }
+      elseif ($ctype) {
+        $data['contact_type'] = $ctype;
+      }
+      else {
+        $data['contact_type'] = 'Individual';
+      }
+    }
+
+    //fix contact sub type CRM-5125
+    if (array_key_exists('contact_sub_type', $params) &&
+      !empty($params['contact_sub_type'])
+    ) {
+      $data['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type']);
+    }
+    elseif (array_key_exists('contact_sub_type_hidden', $params) &&
+      !empty($params['contact_sub_type_hidden'])
+    ) {
+      // if profile was used, and had any subtype, we obtain it from there
+      //CRM-13596 - add to existing contact types, rather than overwriting
+      if (empty($data['contact_sub_type'])) {
+        // If we don't have a contact ID the $data['contact_sub_type'] will not be defined...
+        $data['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type_hidden']);
+      }
+      else {
+        $data_contact_sub_type_arr = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
+        if (!in_array($params['contact_sub_type_hidden'], $data_contact_sub_type_arr)) {
+          //CRM-20517 - make sure contact_sub_type gets the correct delimiters
+          $data['contact_sub_type'] = trim($data['contact_sub_type'], CRM_Core_DAO::VALUE_SEPARATOR);
+          $data['contact_sub_type'] = CRM_Core_DAO::VALUE_SEPARATOR . $data['contact_sub_type'] . CRM_Utils_Array::implodePadded($params['contact_sub_type_hidden']);
+        }
+      }
+    }
+
+    if ($ctype == 'Organization') {
+      $data['organization_name'] = $contactDetails['organization_name'] ?? NULL;
+    }
+    elseif ($ctype == 'Household') {
+      $data['household_name'] = $contactDetails['household_name'] ?? NULL;
+    }
+
+    $locationType = [];
+    $count = 1;
+
+    if ($contactID) {
+      //add contact id
+      $data['contact_id'] = $contactID;
+      $primaryLocationType = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID);
+    }
+    else {
+      $defaultLocation = CRM_Core_BAO_LocationType::getDefault();
+      $defaultLocationId = $defaultLocation->id;
+    }
+
+    $billingLocationTypeId = CRM_Core_BAO_LocationType::getBilling();
+
+    $blocks = ['email', 'phone', 'im', 'openid'];
+
+    $multiplFields = ['url'];
+    // prevent overwritten of formatted array, reset all block from
+    // params if it is not in valid format (since import pass valid format)
+    foreach ($blocks as $blk) {
+      if (array_key_exists($blk, $params) &&
+        !is_array($params[$blk])
+      ) {
+        unset($params[$blk]);
+      }
+    }
+
+    $primaryPhoneLoc = NULL;
+    $session = CRM_Core_Session::singleton();
+    foreach ($params as $key => $value) {
+      [$fieldName, $locTypeId, $typeId] = CRM_Utils_System::explode('-', $key, 3);
+
+      if ($locTypeId == 'Primary') {
+        if ($contactID) {
+          if (in_array($fieldName, $blocks)) {
+            $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, $fieldName);
+          }
+          else {
+            $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, 'address');
+          }
+          $primaryLocationType = $locTypeId;
+        }
+        else {
+          $locTypeId = $defaultLocationId;
+        }
+      }
+
+      if (is_numeric($locTypeId) &&
+        !in_array($fieldName, $multiplFields) &&
+        substr($fieldName, 0, 7) != 'custom_'
+      ) {
+        $index = $locTypeId;
+
+        if (is_numeric($typeId)) {
+          $index .= '-' . $typeId;
+        }
+        if (!in_array($index, $locationType)) {
+          $locationType[$count] = $index;
+          $count++;
+        }
+
+        $loc = CRM_Utils_Array::key($index, $locationType);
+
+        $blockName = $this->getLocationEntityForKey($fieldName);
+
+        $data[$blockName][$loc]['location_type_id'] = $locTypeId;
+
+        //set is_billing true, for location type "Billing"
+        if ($locTypeId == $billingLocationTypeId) {
+          $data[$blockName][$loc]['is_billing'] = 1;
+        }
+
+        if ($contactID) {
+          //get the primary location type
+          if ($locTypeId == $primaryLocationType) {
+            $data[$blockName][$loc]['is_primary'] = 1;
+          }
+        }
+        elseif ($locTypeId == $defaultLocationId) {
+          $data[$blockName][$loc]['is_primary'] = 1;
+        }
+
+        if (in_array($fieldName, ['phone'])) {
+          if ($typeId) {
+            $data['phone'][$loc]['phone_type_id'] = $typeId;
+          }
+          else {
+            $data['phone'][$loc]['phone_type_id'] = '';
+          }
+          $data['phone'][$loc]['phone'] = $value;
+
+          //special case to handle primary phone with different phone types
+          // in this case we make first phone type as primary
+          if (isset($data['phone'][$loc]['is_primary']) && !$primaryPhoneLoc) {
+            $primaryPhoneLoc = $loc;
+          }
+
+          if ($loc != $primaryPhoneLoc) {
+            unset($data['phone'][$loc]['is_primary']);
+          }
+        }
+        elseif ($fieldName == 'email') {
+          $data['email'][$loc]['email'] = $value;
+          if (empty($contactID)) {
+            $data['email'][$loc]['is_primary'] = 1;
+          }
+        }
+        elseif ($fieldName == 'im') {
+          if (isset($params[$key . '-provider_id'])) {
+            $data['im'][$loc]['provider_id'] = $params[$key . '-provider_id'];
+          }
+          if (strpos($key, '-provider_id') !== FALSE) {
+            $data['im'][$loc]['provider_id'] = $params[$key];
+          }
+          else {
+            $data['im'][$loc]['name'] = $value;
+          }
+        }
+        elseif ($fieldName == 'openid') {
+          $data['openid'][$loc]['openid'] = $value;
+        }
+        else {
+          if ($fieldName === 'state_province') {
+            // CRM-3393
+            if (is_numeric($value) && ((int ) $value) >= 1000) {
+              $data['address'][$loc]['state_province_id'] = $value;
+            }
+            elseif (empty($value)) {
+              $data['address'][$loc]['state_province_id'] = '';
+            }
+            else {
+              $data['address'][$loc]['state_province'] = $value;
+            }
+          }
+          elseif ($fieldName === 'country') {
+            // CRM-3393
+            if (is_numeric($value) && ((int ) $value) >= 1000
+            ) {
+              $data['address'][$loc]['country_id'] = $value;
+            }
+            elseif (empty($value)) {
+              $data['address'][$loc]['country_id'] = '';
+            }
+            else {
+              $data['address'][$loc]['country'] = $value;
+            }
+          }
+          elseif ($fieldName === 'county') {
+            $data['address'][$loc]['county_id'] = $value;
+          }
+          elseif ($fieldName == 'address_name') {
+            $data['address'][$loc]['name'] = $value;
+          }
+          elseif (substr($fieldName, 0, 14) === 'address_custom') {
+            $data['address'][$loc][substr($fieldName, 8)] = $value;
+          }
+          else {
+            $data[$blockName][$loc][$fieldName] = $value;
+          }
+        }
+      }
+      else {
+        if (substr($key, 0, 4) === 'url-') {
+          $websiteField = explode('-', $key);
+          $data['website'][$websiteField[1]]['website_type_id'] = $websiteField[1];
+          $data['website'][$websiteField[1]]['url'] = $value;
+        }
+        elseif (in_array($key, CRM_Contact_BAO_Contact::$_greetingTypes, TRUE)) {
+          //save email/postal greeting and addressee values if any, CRM-4575
+          $data[$key . '_id'] = $value;
+        }
+        elseif (!$skipCustom && ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
+          // for autocomplete transfer hidden value instead of label
+          if ($params[$key] && isset($params[$key . '_id'])) {
+            $value = $params[$key . '_id'];
+          }
+
+          // we need to append time with date
+          if ($params[$key] && isset($params[$key . '_time'])) {
+            $value .= ' ' . $params[$key . '_time'];
+          }
+
+          // if auth source is not checksum / login && $value is blank, do not proceed - CRM-10128
+          if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 &&
+            ($value == '' || !isset($value))
+          ) {
+            continue;
+          }
+
+          $valueId = NULL;
+          if (!empty($params['customRecordValues'])) {
+            if (is_array($params['customRecordValues']) && !empty($params['customRecordValues'])) {
+              foreach ($params['customRecordValues'] as $recId => $customFields) {
+                if (is_array($customFields) && !empty($customFields)) {
+                  foreach ($customFields as $customFieldName) {
+                    if ($customFieldName == $key) {
+                      $valueId = $recId;
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          //CRM-13596 - check for contact_sub_type_hidden first
+          if (array_key_exists('contact_sub_type_hidden', $params)) {
+            $type = $params['contact_sub_type_hidden'];
+          }
+          else {
+            $type = $data['contact_type'];
+            if (!empty($data['contact_sub_type'])) {
+              $type = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
+            }
+          }
+
+          CRM_Core_BAO_CustomField::formatCustomField($customFieldId,
+            $data['custom'],
+            $value,
+            $type,
+            $valueId,
+            $contactID,
+            FALSE,
+            FALSE
+          );
+        }
+        elseif ($key === 'edit') {
+          continue;
+        }
+        else {
+          if ($key === 'location') {
+            foreach ($value as $locationTypeId => $field) {
+              foreach ($field as $block => $val) {
+                if ($block === 'address' && array_key_exists('address_name', $val)) {
+                  $value[$locationTypeId][$block]['name'] = $value[$locationTypeId][$block]['address_name'];
+                }
+              }
+            }
+          }
+          if ($key === 'phone' && isset($params['phone_ext'])) {
+            $data[$key] = $value;
+            foreach ($value as $cnt => $phoneBlock) {
+              if ($params[$key][$cnt]['location_type_id'] == $params['phone_ext'][$cnt]['location_type_id']) {
+                $data[$key][$cnt]['phone_ext'] = CRM_Utils_Array::retrieveValueRecursive($params['phone_ext'][$cnt], 'phone_ext');
+              }
+            }
+          }
+          elseif (in_array($key, ['nick_name', 'job_title', 'middle_name', 'birth_date', 'gender_id', 'current_employer', 'prefix_id', 'suffix_id'])
+            && ($value == '' || !isset($value)) &&
+            ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 ||
+            ($key === 'current_employer' && empty($params['current_employer']))) {
+            // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value
+            // to avoid update with empty values
+            continue;
+          }
+          else {
+            $data[$key] = $value;
+          }
+        }
+      }
+    }
+
+    if (!isset($data['contact_type'])) {
+      $data['contact_type'] = 'Individual';
+    }
+
+    //set the values for checkboxes (do_not_email, do_not_mail, do_not_trade, do_not_phone)
+    $privacy = CRM_Core_SelectValues::privacy();
+    foreach ($privacy as $key => $value) {
+      if (array_key_exists($key, $fields)) {
+        // do not reset values for existing contacts, if fields are added to a profile
+        if (array_key_exists($key, $params)) {
+          $data[$key] = $params[$key];
+          if (empty($params[$key])) {
+            $data[$key] = 0;
+          }
+        }
+        elseif (!$contactID) {
+          $data[$key] = 0;
+        }
+      }
+    }
+
+    return [$data, $contactDetails];
+  }
+
+  /**
+   * Get the relevant location entity for the array key.
+   *
+   * Based on the field name we determine which location entity
+   * we are dealing with. Apart from a few specific ones they
+   * are mostly 'address' (the default).
+   *
+   * @param string $fieldName
+   *
+   * @return string
+   */
+  private static function getLocationEntityForKey($fieldName) {
+    if (in_array($fieldName, ['email', 'phone', 'im', 'openid'])) {
+      return $fieldName;
+    }
+    if ($fieldName === 'phone_ext') {
+      return 'phone';
+    }
+    return 'address';
   }
 
   /**
