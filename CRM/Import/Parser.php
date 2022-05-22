@@ -1223,6 +1223,14 @@ abstract class CRM_Import_Parser {
       return $importedValue;
     }
     $fieldMetadata = $this->getFieldMetadata($fieldName);
+    if ($fieldName === 'url') {
+      return CRM_Utils_Rule::url($importedValue) ? $importedValue : 'invalid_import_value';
+    }
+
+    if ($fieldName === 'email') {
+      return CRM_Utils_Rule::email($importedValue) ? $importedValue : 'invalid_import_value';
+    }
+
     if ($fieldMetadata['type'] === CRM_Utils_Type::T_BOOLEAN) {
       $value = CRM_Utils_String::strtoboolstr($importedValue);
       if ($value !== FALSE) {
@@ -1280,16 +1288,20 @@ abstract class CRM_Import_Parser {
         'where' => [['name', '=', empty($fieldMap[$fieldName]) ? $fieldMetadata['name'] : $fieldName]],
         'select' => ['options'],
       ])->first()['options'];
-      // We create an array of the possible variants - notably including
-      // name AND label as either might be used. We also lower case before checking
-      $values = [];
-      foreach ($options as $option) {
-        $values[$option['id']] = $option['id'];
-        $values[mb_strtolower($option['name'])] = $option['id'];
-        $values[mb_strtolower($option['label'])] = $option['id'];
+      if (is_array($options)) {
+        // We create an array of the possible variants - notably including
+        // name AND label as either might be used. We also lower case before checking
+        $values = [];
+        foreach ($options as $option) {
+          $values[$option['id']] = $option['id'];
+          $values[mb_strtolower($option['name'])] = $option['id'];
+          $values[mb_strtolower($option['label'])] = $option['id'];
+        }
+        $this->importableFieldsMetadata[$fieldMapName]['options'] = $values;
       }
-
-      $this->importableFieldsMetadata[$fieldMapName]['options'] = $values;
+      else {
+        $this->importableFieldsMetadata[$fieldMapName]['options'] = $options;
+      }
       return $this->importableFieldsMetadata[$fieldMapName];
     }
     return $fieldMetadata;

@@ -101,6 +101,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     'suffix_id',
     'communication_style',
     'preferred_language',
+    'phone',
+    'im',
+    'openid',
+    'email',
+    'website',
+    'url',
   ];
 
   /**
@@ -280,7 +286,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
 
     $params = $this->getMappedRow($values);
-    $formatted = array_filter(array_intersect_key($params, array_fill_keys($this->metadataHandledFields, 1)), 'strlen');
+    $formatted = array_intersect_key($params, array_fill_keys($this->metadataHandledFields, 1));
+    foreach ($formatted as $key => $value) {
+      if (!is_array($value) && !strlen($value)) {
+        unset($formatted[$key]);
+      }
+    }
 
     $contactFields = CRM_Contact_DAO_Contact::import();
 
@@ -397,9 +408,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           $relationType->find(TRUE);
           $direction = "contact_sub_type_$second";
 
-          $formatting = [
-            'contact_type' => $params[$key]['contact_type'],
-          ];
+          $formatting = array_filter(array_intersect_key($field, array_fill_keys($this->metadataHandledFields, 1)));
 
           //set subtype for related contact CRM-5125
           if (isset($relationType->$direction)) {
@@ -728,11 +737,23 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
     }
-
+    $metadataBlocks = ['phone', 'im', 'openid', 'email'];
+    foreach ($metadataBlocks as $block) {
+      foreach ($formatted[$block] ?? [] as $blockKey => $blockValues) {
+        if ($blockValues['location_type_id'] === 'Primary') {
+          $this->fillPrimary($formatted[$block][$blockKey], $blockValues, $block, $formatted['id'] ?? NULL);
+        }
+      }
+    }
     //now format custom data.
     foreach ($params as $key => $field) {
+      if (in_array($key, $metadataBlocks, TRUE)) {
+        // This location block is already fully handled at this point.
+        continue;
+      }
       if (is_array($field)) {
         $isAddressCustomField = FALSE;
+
         foreach ($field as $value) {
           $break = FALSE;
           if (is_array($value)) {
@@ -741,8 +762,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
                 $isAddressCustomField = TRUE;
                 break;
               }
-              // check if $value does not contain IM provider or phoneType
-              if (($name !== 'phone_type_id' || $name !== 'provider_id') && ($testForEmpty === '' || $testForEmpty == NULL)) {
+
+              if (($testForEmpty === '' || $testForEmpty == NULL)) {
                 $break = TRUE;
                 break;
               }
@@ -1111,17 +1132,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             }
             break;
 
-          case 'url':
-            if (is_array($value)) {
-              foreach ($value as $values) {
-                if (!empty($values['url']) && !CRM_Utils_Rule::url($values['url'])) {
-                  $errors[] = ts('Website');
-                  break;
-                }
-              }
-            }
-            break;
-
           case 'do_not_email':
           case 'do_not_phone':
           case 'do_not_mail':
@@ -1130,17 +1140,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             if (CRM_Utils_Rule::boolean($value) == FALSE) {
               $key = ucwords(str_replace("_", " ", $key));
               $errors[] = $key;
-            }
-            break;
-
-          case 'email':
-            if (is_array($value)) {
-              foreach ($value as $values) {
-                if (!empty($values['email']) && !CRM_Utils_Rule::email($values['email'])) {
-                  $errors[] = $key;
-                  break;
-                }
-              }
             }
             break;
 
@@ -1382,32 +1381,15 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     $billingLocationTypeId = CRM_Core_BAO_LocationType::getBilling();
 
-    $blocks = ['email', 'phone', 'im', 'openid'];
-
     $multiplFields = ['url'];
-    // prevent overwritten of formatted array, reset all block from
-    // params if it is not in valid format (since import pass valid format)
-    foreach ($blocks as $blk) {
-      if (array_key_exists($blk, $params) &&
-        !is_array($params[$blk])
-      ) {
-        unset($params[$blk]);
-      }
-    }
 
-    $primaryPhoneLoc = NULL;
     $session = CRM_Core_Session::singleton();
     foreach ($params as $key => $value) {
       [$fieldName, $locTypeId, $typeId] = CRM_Utils_System::explode('-', $key, 3);
 
       if ($locTypeId == 'Primary') {
         if ($contactID) {
-          if (in_array($fieldName, $blocks)) {
-            $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, $fieldName);
-          }
-          else {
-            $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, 'address');
-          }
+          $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, 'address');
           $primaryLocationType = $locTypeId;
         }
         else {
@@ -1450,44 +1432,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           $data[$blockName][$loc]['is_primary'] = 1;
         }
 
-        if (in_array($fieldName, ['phone'])) {
-          if ($typeId) {
-            $data['phone'][$loc]['phone_type_id'] = $typeId;
-          }
-          else {
-            $data['phone'][$loc]['phone_type_id'] = '';
-          }
-          $data['phone'][$loc]['phone'] = $value;
-
-          //special case to handle primary phone with different phone types
-          // in this case we make first phone type as primary
-          if (isset($data['phone'][$loc]['is_primary']) && !$primaryPhoneLoc) {
-            $primaryPhoneLoc = $loc;
-          }
-
-          if ($loc != $primaryPhoneLoc) {
-            unset($data['phone'][$loc]['is_primary']);
-          }
-        }
-        elseif ($fieldName == 'email') {
-          $data['email'][$loc]['email'] = $value;
-          if (empty($contactID)) {
-            $data['email'][$loc]['is_primary'] = 1;
-          }
-        }
-        elseif ($fieldName == 'im') {
-          if (isset($params[$key . '-provider_id'])) {
-            $data['im'][$loc]['provider_id'] = $params[$key . '-provider_id'];
-          }
-          if (strpos($key, '-provider_id') !== FALSE) {
-            $data['im'][$loc]['provider_id'] = $params[$key];
-          }
-          else {
-            $data['im'][$loc]['name'] = $value;
-          }
-        }
-        elseif ($fieldName == 'openid') {
-          $data['openid'][$loc]['openid'] = $value;
+        if (0) {
         }
         else {
           if ($fieldName === 'state_province') {
@@ -1520,12 +1465,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
       else {
-        if (substr($key, 0, 4) === 'url-') {
-          $websiteField = explode('-', $key);
-          $data['website'][$websiteField[1]]['website_type_id'] = $websiteField[1];
-          $data['website'][$websiteField[1]]['url'] = $value;
-        }
-        elseif (in_array($key, CRM_Contact_BAO_Contact::$_greetingTypes, TRUE)) {
+        if (in_array($key, CRM_Contact_BAO_Contact::$_greetingTypes, TRUE)) {
           //save email/postal greeting and addressee values if any, CRM-4575
           $data[$key . '_id'] = $value;
         }
@@ -1583,15 +1523,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
               }
             }
           }
-          if ($key === 'phone' && isset($params['phone_ext'])) {
-            $data[$key] = $value;
-            foreach ($value as $cnt => $phoneBlock) {
-              if ($params[$key][$cnt]['location_type_id'] == $params['phone_ext'][$cnt]['location_type_id']) {
-                $data[$key][$cnt]['phone_ext'] = CRM_Utils_Array::retrieveValueRecursive($params['phone_ext'][$cnt], 'phone_ext');
-              }
-            }
-          }
-          elseif (in_array($key, ['nick_name', 'job_title', 'middle_name', 'birth_date', 'gender_id', 'current_employer', 'prefix_id', 'suffix_id'])
+          if (in_array($key, ['nick_name', 'job_title', 'middle_name', 'birth_date', 'gender_id', 'current_employer', 'prefix_id', 'suffix_id'])
             && ($value == '' || !isset($value)) &&
             ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 ||
             ($key === 'current_employer' && empty($params['current_employer']))) {
@@ -1658,10 +1590,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $defaults, FALSE, FALSE);
 
     $locationFields = [
-      'email' => 'email',
-      'phone' => 'phone',
-      'im' => 'name',
-      'website' => 'website',
       'address' => 'address',
     ];
 
@@ -1711,15 +1639,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
             if (isset($getValue)) {
               foreach ($getValue as $cnt => $values) {
-                if ($locKeys == 'website') {
-                  if (($getValue[$cnt]['website_type_id'] == $params[$locKeys][$key]['website_type_id'])) {
-                    unset($params[$locKeys][$key]);
-                  }
-                }
-                else {
-                  if ((!empty($getValue[$cnt]['location_type_id']) && !empty($params[$locKeys][$key]['location_type_id'])) && $getValue[$cnt]['location_type_id'] == $params[$locKeys][$key]['location_type_id']) {
-                    unset($params[$locKeys][$key]);
-                  }
+                if ((!empty($getValue[$cnt]['location_type_id']) && !empty($params[$locKeys][$key]['location_type_id'])) && $getValue[$cnt]['location_type_id'] == $params[$locKeys][$key]['location_type_id']) {
+                  unset($params[$locKeys][$key]);
                 }
               }
             }
@@ -2244,7 +2165,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     //          Location
     //              Address
     //              Email
-    //              Phone
     //              IM
     //      Note
     //      Custom
@@ -2341,26 +2261,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       return TRUE;
     }
 
-    // format the website params.
-    if (!empty($values['url'])) {
-      static $websiteFields;
-      if (!is_array($websiteFields)) {
-        $websiteFields = CRM_Core_DAO_Website::fields();
-      }
-      if (!array_key_exists('website', $params) ||
-        !is_array($params['website'])
-      ) {
-        $params['website'] = [];
-      }
-
-      $websiteCount = count($params['website']);
-      _civicrm_api3_store_values($websiteFields, $values,
-        $params['website'][++$websiteCount]
-      );
-
-      return TRUE;
-    }
-
     if (isset($values['note'])) {
       // add a note field
       if (!isset($params['note'])) {
@@ -2409,53 +2309,16 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   /**
    * Format location block ready for importing.
    *
-   * There is some test coverage for this in CRM_Contact_Import_Parser_ContactTest
-   * e.g. testImportPrimaryAddress.
+   * There is some test coverage for this in
+   * CRM_Contact_Import_Parser_ContactTest e.g. testImportPrimaryAddress.
    *
    * @param array $values
    * @param array $params
    *
    * @return bool
+   * @throws \CiviCRM_API3_Exception
    */
   protected function formatLocationBlock(&$values, &$params) {
-    $blockTypes = [
-      'phone' => 'Phone',
-      'email' => 'Email',
-      'im' => 'IM',
-      'openid' => 'OpenID',
-      'phone_ext' => 'Phone',
-    ];
-    foreach ($blockTypes as $blockFieldName => $block) {
-      if (!array_key_exists($blockFieldName, $values)) {
-        continue;
-      }
-      $blockIndex = $values['location_type_id'] . (!empty($values['phone_type_id']) ? '_' . $values['phone_type_id'] : '');
-
-      // block present in value array.
-      if (!array_key_exists($blockFieldName, $params) || !is_array($params[$blockFieldName])) {
-        $params[$blockFieldName] = [];
-      }
-
-      $fields[$block] = $this->getMetadataForEntity($block);
-
-      // copy value to dao field name.
-      if ($blockFieldName == 'im') {
-        $values['name'] = $values[$blockFieldName];
-      }
-
-      _civicrm_api3_store_values($fields[$block], $values,
-        $params[$blockFieldName][$blockIndex]
-      );
-
-      $this->fillPrimary($params[$blockFieldName][$blockIndex], $values, $block, CRM_Utils_Array::value('id', $params));
-
-      if (empty($params['id']) && (count($params[$blockFieldName]) == 1)) {
-        $params[$blockFieldName][$blockIndex]['is_primary'] = TRUE;
-      }
-
-      // we only process single block at a time.
-      return TRUE;
-    }
 
     // handle address fields.
     if (!array_key_exists('address', $params) || !is_array($params['address'])) {
@@ -2605,9 +2468,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $fieldName = $isRelationshipField ? $fieldMapping[1] : $fieldMapping[0];
     $locationTypeID = NULL;
     $possibleLocationField = $isRelationshipField ? 2 : 1;
-    if ($fieldName !== 'url' && is_numeric($fieldMapping[$possibleLocationField] ?? NULL)) {
+    $entity = strtolower($this->getFieldEntity($fieldName));
+    if ($entity !== 'website' && is_numeric($fieldMapping[$possibleLocationField] ?? NULL)) {
       $locationTypeID = $fieldMapping[$possibleLocationField];
     }
+
     return [
       'name' => $fieldName,
       'mapping_id' => $mappingID,
@@ -2615,9 +2480,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       'relationship_direction' => $isRelationshipField ? substr($fieldMapping[0], -3) : NULL,
       'column_number' => $columnNumber,
       'contact_type' => $this->getContactType(),
-      'website_type_id' => $fieldName !== 'url' ? NULL : ($isRelationshipField ? $fieldMapping[2] : $fieldMapping[1]),
-      'phone_type_id' => $fieldName !== 'phone' ? NULL : ($isRelationshipField ? $fieldMapping[3] : $fieldMapping[2]),
-      'im_provider_id' => $fieldName !== 'im' ? NULL : ($isRelationshipField ? $fieldMapping[3] : $fieldMapping[2]),
+      'website_type_id' => $entity !== 'website' ? NULL : ($isRelationshipField ? $fieldMapping[2] : $fieldMapping[1]),
+      'phone_type_id' => $entity !== 'phone' ? NULL : ($isRelationshipField ? $fieldMapping[3] : $fieldMapping[2]),
+      'im_provider_id' => $entity !== 'im' ? NULL : ($isRelationshipField ? $fieldMapping[3] : $fieldMapping[2]),
       'location_type_id' => $locationTypeID,
     ];
   }
@@ -2869,6 +2734,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $fieldMap = ['country' => 'country_id'];
       $realFieldName = empty($fieldMap[$fieldName]) ? $fieldName : $fieldMap[$fieldName];
       $entity = strtolower($this->getFieldEntity($fieldName));
+
       // The entity key is either location_type_id for address, email - eg. 1, or
       // location_type_id + '_' + phone_type_id or im_provider_id
       // or the value for website(since websites are not historically one-per-type)
@@ -2877,7 +2743,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $entityKey .= '_' . ($locationValues['phone_type_id'] ?? '' . $locationValues['provider_id'] ?? '');
       }
       $fieldValue = $this->getTransformedFieldValue($realFieldName, $importedValue);
-      $availableCountries = $this->getAvailableCountries();
+
       if (!empty($fieldValue) && $realFieldName === 'country_id') {
         if ($this->getAvailableCountries() && empty($this->getAvailableCountries()[$fieldValue])) {
           // We restrict to allowed countries for address fields - but not custom country fields.
@@ -2889,7 +2755,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if (!isset($contactArray[$entity][$entityKey])) {
         $contactArray[$entity][$entityKey] = $locationValues;
       }
-      if (!isset($locationValues[$fieldName])) {
+      // Honestly I'll explain in comment_final_version(revision_2)_use_this_one...
+      $reallyRealFieldName = $fieldName === 'im' ? 'name' : $fieldName;
+      $contactArray[$entity][$entityKey][$reallyRealFieldName] = $fieldValue;
+
+      if (!isset($locationValues[$fieldName]) && $entity === 'address') {
         // These lines add the values to params 'the old way'
         // The old way is then re-formatted by formatCommonData more
         // or less as per below.

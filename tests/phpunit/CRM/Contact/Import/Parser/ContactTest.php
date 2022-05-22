@@ -53,7 +53,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * Tear down after test.
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_email', 'civicrm_user_job', 'civicrm_relationship'], TRUE);
+    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_openid', 'civicrm_email', 'civicrm_user_job', 'civicrm_relationship', 'civicrm_im', 'civicrm_website'], TRUE);
     RelationshipType::delete()->addWhere('name_a_b', '=', 'Dad to')->execute();
     ContactType::delete()->addWhere('name', '=', 'baby')->execute();
     parent::tearDown();
@@ -952,12 +952,12 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'individual_bad_email' => [
         'csv' => 'individual_invalid_email.csv',
         'mapper' => [['email', 1], ['first_name'], ['last_name']],
-        'expected_error' => 'Invalid value for field(s) : email',
+        'expected_error' => 'Invalid value for field(s) : Email',
       ],
       'individual_related_bad_email' => [
         'csv' => 'individual_invalid_related_email.csv',
         'mapper' => [['1_a_b', 'email', 1], ['first_name'], ['last_name']],
-        'expected_error' => 'Invalid value for field(s) : email',
+        'expected_error' => 'Invalid value for field(s) : (Child of) Email',
       ],
       'individual_invalid_external_identifier_only' => [
         // External identifier is only enough in upgrade mode.
@@ -1216,7 +1216,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test location importing, including for related contacts.
    *
-   * @throws \CRM_Core_Exception
    * @throws \API_Exception
    */
   public function testImportLocations(): void {
@@ -1271,7 +1270,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       [$siblingKey, 'state_province', $homeID],
       [$siblingKey, 'email', $homeID],
       [$siblingKey, 'signature_text', $homeID],
-      [$childKey, 'im', $homeID, $skypeTypeID],
+      [$siblingKey, 'im', $homeID, $skypeTypeID],
       // The 2 is website_type_id (yes, small hard-coding cheat)
       [$siblingKey, 'url', $linkedInTypeID],
       [$siblingKey, 'phone', $workID, $phoneTypeID],
@@ -1285,8 +1284,36 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       [$employeeKey, 'do_not_import'],
       // Second website, different type.
       [$employeeKey, 'url', $linkedInTypeID],
+      ['openid'],
     ];
     $this->validateCSV($csv, $mapper);
+
+    $this->importCSV($csv, $mapper);
+    $contacts = $this->getImportedContacts();
+    $this->assertCount(4, $contacts);
+    $this->assertCount(1, $contacts['Susie Jones']['phone']);
+    $this->assertEquals('123', $contacts['Susie Jones']['phone'][0]['phone_ext']);
+    $this->assertCount(2, $contacts['Mum Jones']['phone']);
+    $this->assertCount(1, $contacts['sis@example.com']['phone']);
+    $this->assertCount(0, $contacts['Soccer Superstars']['phone']);
+    $this->assertCount(1, $contacts['Susie Jones']['website']);
+    $this->assertCount(1, $contacts['Mum Jones']['website']);
+    $this->assertCount(0, $contacts['sis@example.com']['website']);
+    $this->assertCount(2, $contacts['Soccer Superstars']['website']);
+    $this->assertCount(1, $contacts['Susie Jones']['email']);
+    $this->assertEquals('Regards', $contacts['Susie Jones']['email'][0]['signature_text']);
+    $this->assertCount(1, $contacts['Mum Jones']['email']);
+    $this->assertCount(1, $contacts['sis@example.com']['email']);
+    $this->assertCount(1, $contacts['Soccer Superstars']['email']);
+    $this->assertCount(1, $contacts['Susie Jones']['im']);
+    $this->assertCount(1, $contacts['Mum Jones']['im']);
+    $this->assertCount(0, $contacts['sis@example.com']['im']);
+    $this->assertCount(0, $contacts['Soccer Superstars']['im']);
+    $this->assertCount(1, $contacts['Susie Jones']['address']);
+    $this->assertCount(1, $contacts['Mum Jones']['address']);
+    $this->assertCount(1, $contacts['sis@example.com']['address']);
+    $this->assertCount(1, $contacts['Soccer Superstars']['address']);
+    $this->assertCount(1, $contacts['Susie Jones']['openid']);
   }
 
   /**
@@ -1659,13 +1686,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
             'website_type_id' => 1,
           ],
         ],
-        // We still pump out the legacy key too - for now!
-        'url' => [
-          'https://example.org' => [
-            'url' => 'https://example.org',
-            'website_type_id' => 1,
-          ],
-        ],
         'phone' => [
           '1_1' => [
             'phone' => '456',
@@ -1676,7 +1696,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ],
       'im' => [
         '1_1' => [
-          'im' => 'my-handle',
+          'name' => 'my-handle',
           'location_type_id' => 1,
           'provider_id' => 1,
         ],
