@@ -300,10 +300,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     // https://github.com/civicrm/civicrm-core/pull/17324
     // and/or related get merged, then we should remove the REQUEST reference here.
     $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
-    // Allow POST if `$_GET['reset'] == 1` because standalone search actions require a
-    // (potentially large) amount of data to the server and must make the page request using POST.
-    // See https://lab.civicrm.org/dev/core/-/issues/3222
-    if (!$key && (!empty($_GET['reset']) || in_array($_SERVER['REQUEST_METHOD'], ['GET', 'HEAD']))) {
+    if (!$key && in_array($_SERVER['REQUEST_METHOD'], ['GET', 'HEAD'])) {
       // Generate a key if this is an initial request without one.
       // We allow HEAD here because it is used by bots to validate URLs, so if
       // we issue a 500 server error to them they may think the site is broken.
