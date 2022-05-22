@@ -17,9 +17,13 @@
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\ContactType;
+use Civi\Api4\Email;
+use Civi\Api4\IM;
 use Civi\Api4\LocationType;
+use Civi\Api4\Phone;
 use Civi\Api4\RelationshipType;
 use Civi\Api4\UserJob;
+use Civi\Api4\Website;
 
 /**
  *  Test contact import parser.
@@ -1181,7 +1185,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ['state_province', $homeID],
       // No location type ID means 'Primary'
       ['email'],
-      ['signature_text'],
+      // @todo - use this, not do_not_import ['signature_text'],
+      ['do_not_import'],
       ['im', NULL, $skypeTypeID],
       ['url', $mainWebsiteTypeID],
       ['phone', $homeID, $phoneTypeID],
@@ -1193,7 +1198,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       [$childKey, 'country'],
       [$childKey, 'state_province'],
       [$childKey, 'email', $homeID],
-      [$childKey, 'signature_text', $homeID],
+      // @todo - use this, not do_not_import [$childKey, 'signature_text', $homeID],
+      ['do_not_import'],
       [$childKey, 'im', $homeID, $skypeTypeID],
       [$childKey, 'url', $linkedInTypeID],
       // Same location type, different phone typ in these phones
@@ -1207,7 +1213,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       [$siblingKey, 'state_province', $homeID],
       [$siblingKey, 'email', $homeID],
       [$siblingKey, 'signature_text', $homeID],
-      [$childKey, 'im', $homeID, $skypeTypeID],
+      [$siblingKey, 'im', $homeID, $skypeTypeID],
       // The 2 is website_type_id (yes, small hard-coding cheat)
       [$siblingKey, 'url', $linkedInTypeID],
       [$siblingKey, 'phone', $workID, $phoneTypeID],
@@ -1223,6 +1229,38 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       [$employeeKey, 'url', $linkedInTypeID],
     ];
     $this->validateCSV($csv, $mapper);
+
+    $this->importCSV($csv, $mapper);
+    $contacts = Contact::get()
+      ->addWhere('display_name', 'IN', ['Susie Jones', 'Mum Jones', 'sis@example.com', 'Soccer Superstars'])
+      ->addChain('phone', Phone::get()->addWhere('contact_id', '=', '$id'))
+      ->addChain('address', Address::get()->addWhere('contact_id', '=', '$id'))
+      ->addChain('website', Website::get()->addWhere('contact_id', '=', '$id'))
+      ->addChain('im', IM::get()->addWhere('contact_id', '=', '$id'))
+      ->addChain('email', Email::get()->addWhere('contact_id', '=', '$id'))
+      ->execute()->indexBy('display_name');
+    $this->assertCount(4, $contacts);
+    $this->assertCount(1, $contacts['Susie Jones']['phone']);
+    $this->assertEquals('123', $contacts['Susie Jones']['phone'][0]['phone_ext']);
+    $this->assertCount(2, $contacts['Mum Jones']['phone']);
+    $this->assertCount(1, $contacts['sis@example.com']['phone']);
+    $this->assertCount(0, $contacts['Soccer Superstars']['phone']);
+    $this->assertCount(1, $contacts['Susie Jones']['website']);
+    $this->assertCount(1, $contacts['Mum Jones']['website']);
+    $this->assertCount(0, $contacts['sis@example.com']['website']);
+    $this->assertCount(2, $contacts['Soccer Superstars']['website']);
+    $this->assertCount(1, $contacts['Susie Jones']['email']);
+    $this->assertCount(1, $contacts['Mum Jones']['email']);
+    $this->assertCount(1, $contacts['sis@example.com']['email']);
+    $this->assertCount(1, $contacts['Soccer Superstars']['email']);
+    $this->assertCount(1, $contacts['Susie Jones']['im']);
+    $this->assertCount(1, $contacts['Mum Jones']['im']);
+    $this->assertCount(0, $contacts['sis@example.com']['im']);
+    $this->assertCount(0, $contacts['Soccer Superstars']['im']);
+    $this->assertCount(1, $contacts['Susie Jones']['address']);
+    $this->assertCount(1, $contacts['Mum Jones']['address']);
+    $this->assertCount(1, $contacts['sis@example.com']['address']);
+    $this->assertCount(1, $contacts['Soccer Superstars']['address']);
   }
 
   /**

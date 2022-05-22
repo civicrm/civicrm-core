@@ -1176,6 +1176,9 @@ abstract class CRM_Import_Parser {
       return $importedValue;
     }
     $fieldMetadata = $this->getFieldMetadata($fieldName);
+    if ($fieldName === 'url') {
+      return CRM_Utils_Rule::url($importedValue) ? $importedValue : 'invalid_import_value';
+    }
     if ($fieldMetadata['type'] === CRM_Utils_Type::T_BOOLEAN) {
       $value = CRM_Utils_String::strtoboolstr($importedValue);
       if ($value !== FALSE) {
@@ -1244,6 +1247,23 @@ abstract class CRM_Import_Parser {
       return $this->importableFieldsMetadata[$fieldName];
     }
     return $fieldMetadata;
+  }
+
+  /**
+   * @param $fieldName
+   *
+   * @return mixed|null
+   * @throws \API_Exception
+   */
+  protected function getFieldEntity($fieldName) {
+    $metadata = $this->getFieldMetadata($fieldName);
+    if ($fieldName === 'do_not_import') {
+      return NULL;
+    }
+    if (!isset($metadata['entity'])) {
+      return $metadata['extends'];
+    }
+    return $this->getFieldMetadata($fieldName)['entity'];
   }
 
 }

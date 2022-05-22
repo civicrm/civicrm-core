@@ -797,7 +797,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       );
     }
 
-    $blocks = ['address', 'im', 'phone'];
+    $blocks = ['address', 'im'];
     foreach ($blocks as $name) {
       if (!array_key_exists($name, $defaults) || !is_array($defaults[$name])) {
         continue;
@@ -849,14 +849,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
           CRM_Utils_Array::lookupValue($values,
             'provider',
             CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'),
-            $reverse
-          );
-        }
-
-        if ($name == 'phone') {
-          CRM_Utils_Array::lookupValue($values,
-            'phone_type',
-            CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id'),
             $reverse
           );
         }
