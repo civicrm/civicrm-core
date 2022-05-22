@@ -41,8 +41,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         'icon' => 'fa-file-excel-o',
         'crmPopup' => [
           'path' => "'civicrm/export/standalone'",
-          'query' => "{reset: 1, entity: '{$entity['name']}'}",
-          'data' => "{id: ids.join(',')}",
+          'query' => "{reset: 1, entity: '{$entity['name']}', id: ids.join(',')}",
         ],
       ];
     }
@@ -105,8 +104,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
             'icon' => $task['icon'] ?? 'fa-gear',
             'crmPopup' => [
               'path' => "'{$task['url']}'",
-              'query' => "{reset: 1}",
-              'data' => "{cids: ids.join(',')}",
+              'query' => "{reset: 1, cids: ids.join(',')}",
             ],
           ];
         }
@@ -143,7 +141,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
             'icon' => $task['icon'] ?? 'fa-gear',
             'crmPopup' => [
               'path' => "'{$task['url']}'",
-              'data' => "{id: ids.join(',')}",
+              'query' => "{id: ids.join(',')}",
             ],
           ];
         }
