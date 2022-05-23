@@ -471,16 +471,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $this->formatCommonData($params, $formatted, $contactFields);
 
     $relationship = FALSE;
-    $createNewContact = TRUE;
-    // Support Match and Update Via Contact ID
-    if ($this->_updateWithId && isset($params['id'])) {
-      $createNewContact = FALSE;
-    }
 
     //fixed CRM-4148
     //now we create new contact in update/fill mode also.
     $contactID = NULL;
-    if ($createNewContact || ($this->_updateWithId)) {
+    if (1) {
       // @todo - there are multiple places where formatting is done that need consolidation.
       // This handles where the label has been passed in and it has gotten this far.
       // probably a bunch of hard-coded stuff could be removed to rely on this.
