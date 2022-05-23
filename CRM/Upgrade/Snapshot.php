@@ -119,7 +119,8 @@ class CRM_Upgrade_Snapshot {
         'MIN' => $offset,
         'MAX' => $offset + $pageSize,
       ]);
-      $sqlAction = ($offset === 0) ? "CREATE TABLE {$destTable} AS " : "INSERT INTO {$destTable} ";
+      $sqlAction = ($offset === 0) ? "CREATE TABLE {$destTable} ROW_FORMAT=COMPRESSED AS " : "INSERT INTO {$destTable} ";
+      // Note: 'CREATE TABLE AS' implicitly preserves the character-set of the source-material, so we don't set that explicitly.
       yield new CRM_Queue_Task(
         [static::class, 'insertSnapshotTask'],
         [$sqlAction . $pageSelect->toSQL()],
