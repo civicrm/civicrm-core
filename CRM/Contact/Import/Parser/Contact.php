@@ -892,19 +892,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $addressCustomFields = CRM_Core_BAO_CustomField::getFields('Address');
     $customFields = $customFields + $addressCustomFields;
 
-    //if a Custom Email Greeting, Custom Postal Greeting or Custom Addressee is mapped, and no "Greeting / Addressee Type ID" is provided, then automatically set the type = Customized, CRM-4575
-    $elements = [
-      'email_greeting_custom' => 'email_greeting',
-      'postal_greeting_custom' => 'postal_greeting',
-      'addressee_custom' => 'addressee',
-    ];
-    foreach ($elements as $k => $v) {
-      if (array_key_exists($k, $params) && !(array_key_exists($v, $params))) {
-        $label = key(CRM_Core_OptionGroup::values($v, TRUE, NULL, NULL, 'AND v.name = "Customized"'));
-        $params[$v] = $label;
-      }
-    }
-
     //format date first
     $session = CRM_Core_Session::singleton();
     $dateType = $session->get("dateTypes");
@@ -1995,18 +1982,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if (array_key_exists($key, $locationFields)) {
         continue;
       }
-      if (in_array($key, [
-        'email_greeting',
-        'postal_greeting',
-        'addressee',
-      ])) {
-        // CRM-4575, need to null custom
-        if ($params["{$key}_id"] != 4) {
-          $params["{$key}_custom"] = 'null';
-        }
-        unset($params[$key]);
-      }
-      else {
+
+      if (1) {
         if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key)) {
           $custom_params = ['id' => $contact['id'], 'return' => $key];
           $getValue = civicrm_api3('Contact', 'getvalue', $custom_params);

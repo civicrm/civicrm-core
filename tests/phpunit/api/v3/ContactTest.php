@@ -2400,6 +2400,43 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the greeting fields update sensibly.
+   */
+  public function testGreetingUpdates(): void {
+    $contactID = $this->individualCreate();
+    $greetingFields = ['email_greeting_id:name', 'email_greeting_display', 'email_greeting_custom'];
+    $currentGreetings = $this->callAPISuccessGetSingle('Contact', ['id' => $contactID, 'version' => 4, 'return' => $greetingFields]);
+    $this->assertEquals('Dear {contact.first_name}', $currentGreetings['email_greeting_id:name']);
+    // Change to customized greeting.
+    $this->callAPISuccess('Contact', 'create', [
+      'id' => $contactID,
+      'email_greeting_id' => 'Customized',
+      'email_greeting_custom' => 'Howdy',
+    ]);
+    $currentGreetings = $this->callAPISuccessGetSingle('Contact', ['version' => 4, 'id' => $contactID, 'return' => $greetingFields]);
+    $this->assertEquals('Customized', $currentGreetings['email_greeting_id:name']);
+    $this->assertEquals('Howdy', $currentGreetings['email_greeting_custom']);
+    $this->assertEquals('Howdy', $currentGreetings['email_greeting_display']);
+
+    // Change back to standard, check email_greeting_custom set to NULL.
+    $this->callAPISuccess('Contact', 'create', [
+      'id' => $contactID,
+      'email_greeting_id' => 'Dear {contact.first_name}',
+    ]);
+    $currentGreetings = $this->callAPISuccessGetSingle('Contact', ['id' => $contactID, 'version' => 4, 'return' => $greetingFields]);
+    $this->assertNull($currentGreetings['email_greeting_custom']);
+
+    $this->callAPISuccess('Contact', 'create', [
+      'id' => $contactID,
+      'email_greeting_custom' => 'Howdy',
+    ]);
+    $currentGreetings = $this->callAPISuccessGetSingle('Contact', ['version' => 4, 'id' => $contactID, 'return' => $greetingFields]);
+    $this->assertEquals('Customized', $currentGreetings['email_greeting_id:name']);
+    $this->assertEquals('Howdy', $currentGreetings['email_greeting_custom']);
+    $this->assertEquals('Howdy', $currentGreetings['email_greeting_display']);
+  }
+
+  /**
    * Test Address parameters
    *
    * This include state_province, state_province_name, country

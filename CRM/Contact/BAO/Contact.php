@@ -506,6 +506,9 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
     $missingGreetingParams = [];
 
     foreach ($allGreetingParams as $greetingIndex => $greetingParam) {
+      if (!empty($params[$greetingIndex . '_custom']) && empty($params[$greetingParam])) {
+        $params[$greetingParam] = CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', $greetingParam, 'Customized');
+      }
       // An empty string means NULL
       if (($params[$greetingParam] ?? NULL) === '') {
         $params[$greetingParam] = 'null';
