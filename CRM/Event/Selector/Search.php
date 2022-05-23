@@ -154,6 +154,9 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     $this->_single = $single;
     $this->_limit = $limit;
     $this->_context = $context;
+    if($context == 'search') {
+      $this->_context = 'participant';
+    }
     $this->_compContext = $compContext;
 
     $this->_eventClause = $eventClause;
