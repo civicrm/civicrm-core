@@ -214,42 +214,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           return $fieldMetaData['label'];
         }
       }
-      elseif ($isSerialized && $dataType === 'StateProvince') {
-        $mulValues = explode(',', $value);
-        foreach ($mulValues as $stateValue) {
-          if ($stateValue) {
-            if (self::in_value(trim($stateValue), CRM_Core_PseudoConstant::stateProvinceAbbreviation()) || self::in_value(trim($stateValue), CRM_Core_PseudoConstant::stateProvince())) {
-              continue;
-            }
-            else {
-              return $fieldMetaData['label'];
-            }
-          }
-        }
-      }
-      elseif ($isSerialized && $dataType == 'Country') {
-        $mulValues = explode(',', $value);
-        foreach ($mulValues as $countryValue) {
-          if ($countryValue) {
-            CRM_Core_PseudoConstant::populate($countryNames, 'CRM_Core_DAO_Country', TRUE, 'name', 'is_active');
-            CRM_Core_PseudoConstant::populate($countryIsoCodes, 'CRM_Core_DAO_Country', TRUE, 'iso_code');
-            $limitCodes = CRM_Core_BAO_Country::countryLimit();
-
-            $error = TRUE;
-            foreach ([$countryNames, $countryIsoCodes, $limitCodes] as $values) {
-              if (in_array(trim($countryValue), $values)) {
-                $error = FALSE;
-                break;
-              }
-            }
-
-            if ($error) {
-              return $fieldMetaData['label'];
-            }
-          }
-        }
-      }
     }
+
     return NULL;
   }
 
