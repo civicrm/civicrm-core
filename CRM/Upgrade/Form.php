@@ -539,7 +539,7 @@ SET    version = '$version'
     if (empty(CRM_Upgrade_Snapshot::getActivationIssues())) {
       $task = new CRM_Queue_Task(
         ['CRM_Upgrade_Snapshot', 'cleanupTask'],
-        [],
+        ['core'],
         "Cleanup old upgrade snapshots"
       );
       $queue->createItem($task, ['weight' => 0]);

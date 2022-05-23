@@ -172,9 +172,9 @@ class CRM_Upgrade_Incremental_Base {
    * @throws \CRM_Core_Exception
    */
   protected function addSnapshotTask(string $name, CRM_Utils_SQL_Select $select): void {
-    if (!preg_match(';^[a-z0-9_]+$;', $name)) {
-      throw new \CRM_Core_Exception("Malformed snapshot name: $name");
-    }
+    CRM_Upgrade_Snapshot::createTableName('core', $this->getMajorMinor(), $name);
+    // ^^ To simplify QA -- we should always throw an exception for bad snapshot names, even if the local policy doesn't use snapshots.
+
     if (!empty(CRM_Upgrade_Snapshot::getActivationIssues())) {
       return;
     }
@@ -183,7 +183,7 @@ class CRM_Upgrade_Incremental_Base {
       'type' => 'Sql',
       'name' => CRM_Upgrade_Form::QUEUE_NAME,
     ]);
-    foreach (CRM_Upgrade_Snapshot::createTasks($this->getMajorMinor(), $name, $select) as $task) {
+    foreach (CRM_Upgrade_Snapshot::createTasks('core', $this->getMajorMinor(), $name, $select) as $task) {
       $queue->createItem($task, ['weight' => -1]);
     }
   }

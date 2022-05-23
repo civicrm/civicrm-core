@@ -79,28 +79,53 @@ class CRM_Upgrade_Snapshot {
   /**
    * Create the name of a MySQL snapshot table.
    *
+   * @param string $owner
+   *   Name of the component/module/extension that owns the snapshot.
+   *   Ex: 'core', 'sequentialcreditnotes', 'oauth_client'
    * @param string $version
    *   Ex: '5.50'
    * @param string $name
    *   Ex: 'dates'
    * @return string
    *   Ex: 'civicrm_snap_v5_50_dates'
+   * @throws \CRM_Core_Exception
+   *   If the resulting table name would be invalid, then this throws an exception.
    */
-  public static function createTableName(string $version, string $name): string {
-    [$major, $minor] = explode('.', $version);
-    return sprintf('civicrm_snap_v%s_%s_%s', $major, $minor, $name);
+  public static function createTableName(string $owner, string $version, string $name): string {
+    $versionParts = explode('.', $version);
+    if (count($versionParts) !== 2) {
+      throw new \CRM_Core_Exception("Snapshot support is currently only defined for two-part version (MAJOR.MINOR). Found ($version).");
+      // If you change this, be sure to consider `cleanupTask()` as well.
+      // One reason you might change it -- if you were going to track with the internal schema-numbers from an extension.
+      // Of course, you could get similar effect with "0.{$schemaNumber}" eg "5002" ==> "0.5002"
+    }
+    $versionExpr = ($versionParts[0] . '_' . $versionParts[1]);
+
+    $table = sprintf('civicrm_snap_%s_v%s_%s', $owner, $versionExpr, $name);
+    if (!preg_match(';^[a-z0-9_]+$;', $table)) {
+      throw new CRM_Core_Exception("Malformed snapshot name ($table)");
+    }
+    if (strlen($table) > 64) {
+      throw new CRM_Core_Exception("Snapshot name is too long ($table)");
+    }
+
+    return $table;
   }
 
   /**
    * Build a set of queueable tasks which will store a snapshot.
    *
+   * @param string $owner
+   *   Name of the component/module/extension that owns the snapshot.
+   *   Ex: 'core', 'sequentialcreditnotes', 'oauth_client'
    * @param string $version
+   *   Ex: '5.50'
    * @param string $name
    * @param \CRM_Utils_SQL_Select $select
    * @throws \CRM_Core_Exception
    */
-  public static function createTasks(string $version, string $name, CRM_Utils_SQL_Select $select): iterable {
-    $destTable = static::createTableName($version, $name);
+  public static function createTasks(string $owner, string $version, string $name, CRM_Utils_SQL_Select $select): iterable {
+    $destTable = static::createTableName($owner, $version, $name);
     $srcTable = \Civi\Test\Invasive::get([$select, 'from']);
 
     // Sometimes, backups fail and people rollback and try again. Reset prior snapshots.
@@ -144,6 +169,8 @@ class CRM_Upgrade_Snapshot {
    * Cleanup any old snapshot tables.
    *
    * @param CRM_Queue_TaskContext|null $ctx
+   * @param string $owner
+   *   Ex: 'core', 'sequentialcreditnotes', 'oauth_client'
    * @param string|null $version
    *   The current version of CiviCRM.
    * @param int|null $cleanupAfter
@@ -151,7 +178,7 @@ class CRM_Upgrade_Snapshot {
    *   Time is measured in terms of MINOR versions - eg "4" means "retain for 4 MINOR versions".
    *   Thus, on v5.60, you could delete any snapshots predating 5.56.
    */
-  public static function cleanupTask(?CRM_Queue_TaskContext $ctx = NULL, ?string $version = NULL, ?int $cleanupAfter = NULL): void {
+  public static function cleanupTask(?CRM_Queue_TaskContext $ctx = NULL, string $owner = 'core', ?string $version = NULL, ?int $cleanupAfter = NULL): void {
     $version = $version ?: CRM_Core_BAO_Domain::version();
     $cleanupAfter = $cleanupAfter ?: static::$cleanupAfter;
 
@@ -163,13 +190,15 @@ class CRM_Upgrade_Snapshot {
       SELECT TABLE_NAME as tableName
       FROM   INFORMATION_SCHEMA.TABLES
       WHERE  TABLE_SCHEMA = %1
-      AND TABLE_NAME LIKE 'civicrm_snap_v%'
+      AND TABLE_NAME LIKE %2
     ";
-    $tables = CRM_Core_DAO::executeQuery($query, [1 => [$dao->database(), 'String']])
-      ->fetchMap('tableName', 'tableName');
+    $tables = CRM_Core_DAO::executeQuery($query, [
+      1 => [$dao->database(), 'String'],
+      2 => ["civicrm_snap_{$owner}_v%", 'String'],
+    ])->fetchMap('tableName', 'tableName');
 
-    $oldTables = array_filter($tables, function($table) use ($cutoff) {
-      if (preg_match(';^civicrm_snap_v(\d+)_(\d+)_;', $table, $m)) {
+    $oldTables = array_filter($tables, function($table) use ($owner, $cutoff) {
+      if (preg_match(";^civicrm_snap_{$owner}_v(\d+)_(\d+)_;", $table, $m)) {
         $generatedVer = $m[1] . '.' . $m[2];
         return (bool) version_compare($generatedVer, $cutoff, '<');
       }
