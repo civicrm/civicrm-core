@@ -17,6 +17,7 @@
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\ContactType;
+use Civi\Api4\LocationType;
 use Civi\Api4\RelationshipType;
 use Civi\Api4\UserJob;
 
@@ -1145,6 +1146,86 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test location importing, including for related contacts.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
+   */
+  public function testImportLocations(): void {
+    $csv = 'individual_locations_with_related.csv';
+    $relationships = (array) RelationshipType::get()->addSelect('name_a_b', 'id')->addWhere('name_a_b', 'IN', [
+      'Child of',
+      'Sibling of',
+      'Employee of',
+    ])->execute()->indexBy('name_a_b');
+
+    $childKey = $relationships['Child of']['id'] . '_a_b';
+    $siblingKey = $relationships['Sibling of']['id'] . '_a_b';
+    $employeeKey = $relationships['Employee of']['id'] . '_a_b';
+    $locations = LocationType::get()->execute()->indexBy('name');
+    $phoneTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', 'Phone');
+    $mobileTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', 'Mobile');
+    $skypeTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'provider_id', 'Skype');
+    $mainWebsiteTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Website', 'website_type_id', 'Main');
+    $linkedInTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Website', 'website_type_id', 'LinkedIn');
+    $homeID = $locations['Home']['id'];
+    $workID = $locations['Work']['id'];
+    $mapper = [
+      ['first_name'],
+      ['last_name'],
+      ['birth_date'],
+      ['street_address', $homeID],
+      ['city', $homeID],
+      ['postal_code', $homeID],
+      ['country', $homeID],
+      ['state_province', $homeID],
+      // No location type ID means 'Primary'
+      ['email'],
+      ['signature_text'],
+      ['im', NULL, $skypeTypeID],
+      ['url', $mainWebsiteTypeID],
+      ['phone', $homeID, $phoneTypeID],
+      ['phone_ext', $homeID, $phoneTypeID],
+      [$childKey, 'first_name'],
+      [$childKey, 'last_name'],
+      [$childKey, 'street_address'],
+      [$childKey, 'city'],
+      [$childKey, 'country'],
+      [$childKey, 'state_province'],
+      [$childKey, 'email', $homeID],
+      [$childKey, 'signature_text', $homeID],
+      [$childKey, 'im', $homeID, $skypeTypeID],
+      [$childKey, 'url', $linkedInTypeID],
+      // Same location type, different phone typ in these phones
+      [$childKey, 'phone', $homeID, $phoneTypeID],
+      [$childKey, 'phone_ext', $homeID, $phoneTypeID],
+      [$childKey, 'phone', $homeID, $mobileTypeID],
+      [$childKey, 'phone_ext', $homeID, $mobileTypeID],
+      [$siblingKey, 'street_address', $homeID],
+      [$siblingKey, 'city', $homeID],
+      [$siblingKey, 'country', $homeID],
+      [$siblingKey, 'state_province', $homeID],
+      [$siblingKey, 'email', $homeID],
+      [$siblingKey, 'signature_text', $homeID],
+      [$childKey, 'im', $homeID, $skypeTypeID],
+      // The 2 is website_type_id (yes, small hard-coding cheat)
+      [$siblingKey, 'url', $linkedInTypeID],
+      [$siblingKey, 'phone', $workID, $phoneTypeID],
+      [$siblingKey, 'phone_ext', $workID, $phoneTypeID],
+      [$employeeKey, 'organization_name'],
+      [$employeeKey, 'url', $mainWebsiteTypeID],
+      [$employeeKey, 'email', $homeID],
+      [$employeeKey, 'do_not_import'],
+      [$employeeKey, 'street_address', $homeID],
+      [$employeeKey, 'supplemental_address_1', $homeID],
+      [$employeeKey, 'do_not_import'],
+      // Second website, different type.
+      [$employeeKey, 'url', $linkedInTypeID],
+    ];
+    $this->validateCSV($csv, $mapper);
+  }
+
+  /**
    * Test that setting duplicate action to fill doesn't blow away data
    * that exists, but does fill in where it's empty.
    *
@@ -1585,9 +1666,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *   Any submitted values overrides.
    *
    * @throws \API_Exception
-   * @throws \CRM_Core_Exception
    */
-  protected function validateCSV(string $csv, array $mapper, $submittedValues): void {
+  protected function validateCSV(string $csv, array $mapper, array $submittedValues = []): void {
     [$dataSource, $parser] = $this->getDataSourceAndParser($csv, $mapper, $submittedValues);
     $parser->validateValues(array_values($dataSource->getRow()));
   }
@@ -1612,6 +1692,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'mapper' => $mapper,
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'file' => ['name' => $csv],
+      'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
       'groups' => [],
     ], $submittedValues);
