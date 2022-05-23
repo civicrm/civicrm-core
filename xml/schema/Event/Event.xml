@@ -307,7 +307,7 @@
     <name>is_show_location</name>
     <type>boolean</type>
     <required>true</required>
-    <title>show location</title>
+    <title>Show Location</title>
     <default>1</default>
     <comment>If true, show event location.</comment>
     <add>1.7</add>
