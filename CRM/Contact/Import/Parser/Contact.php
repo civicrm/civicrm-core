@@ -137,19 +137,18 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   /**
    * @param $customFieldID
    * @param array $customFields
-   * @param array $params
    * @param $value
    * @param $dateType
    *
    * @return ?string
    */
-  private function validateCustomField($customFieldID, array $customFields, array $params, $value, $dateType): ?string {
+  private function validateCustomField($customFieldID, array $customFields, $value, $dateType): ?string {
     if (!array_key_exists($customFieldID, $customFields)) {
       return ts('field ID');
     }
     $fieldMetaData = $customFields[$customFieldID];
     // validate null values for required custom fields of type boolean
-    if (!empty($customFields[$customFieldID]['is_required']) && (empty($params['custom_' . $customFieldID]) && !is_numeric($params['custom_' . $customFieldID])) && $customFields[$customFieldID]['data_type'] == 'Boolean') {
+    if (!empty($customFields[$customFieldID]['is_required']) && (empty($value) && !is_numeric($value)) && $customFields[$customFieldID]['data_type'] == 'Boolean') {
       return $customFields[$customFieldID]['label'] . '::' . $customFields[$customFieldID]['groupTitle'];
     }
 
@@ -1126,18 +1125,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         //values so need to modify
         if (array_key_exists($customFieldID, $addressCustomFields)) {
           $value = $value[0][$key];
-          $dataType = $addressCustomFields[$customFieldID]['data_type'];
-          if ($dataType === 'Date') {
-            $input = ['custom_' . $customFieldID => $value];
-          }
-          else {
-            $input = $params;
-          }
-          $errors[] = $parser->validateCustomField($customFieldID, $addressCustomFields, $input, $value, $dateType);
+          $errors[] = $parser->validateCustomField($customFieldID, $addressCustomFields, $value, $dateType);
         }
         else {
           /* check if it's a valid custom field id */
-          $errors[] = $parser->validateCustomField($customFieldID, $customFields, $params, $value, $dateType);
+          $errors[] = $parser->validateCustomField($customFieldID, $customFields, $value, $dateType);
         }
       }
       elseif (is_array($params[$key]) && isset($params[$key]["contact_type"]) && in_array(substr($key, -3), ['a_b', 'b_a'], TRUE)) {
