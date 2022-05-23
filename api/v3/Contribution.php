@@ -618,14 +618,11 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
 function civicrm_api3_contribution_repeattransaction($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, ['contribution_recur_id', 'original_contribution_id']);
   if (empty($params['original_contribution_id'])) {
-    //  CRM-19873 call with test mode.
-    $params['original_contribution_id'] = civicrm_api3('contribution', 'getvalue', [
-      'return' => 'id',
-      'contribution_status_id' => ['IN' => ['Completed']],
-      'contribution_recur_id' => $params['contribution_recur_id'],
-      'contribution_test' => CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $params['contribution_recur_id'], 'is_test'),
-      'options' => ['limit' => 1, 'sort' => 'id DESC'],
-    ]);
+    $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($params['contribution_recur_id']);
+    if (empty($templateContribution)) {
+      throw new CiviCRM_API3_Exception('Contribution.repeattransaction failed to get original_contribution_id for recur with ID: ' . $params['contribution_recur_id']);
+    }
+    $params['original_contribution_id'] = $templateContribution['id'];
   }
   $contribution = new CRM_Contribute_BAO_Contribution();
   $contribution->id = $params['original_contribution_id'];

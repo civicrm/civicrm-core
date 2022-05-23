@@ -489,7 +489,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *
    * @param int $id
    * @param array $overrides
-   *   Parameters that should be overriden. Add unit tests if using parameters other than total_amount & financial_type_id.
+   *   Parameters that should be overridden. Add unit tests if using parameters other than total_amount & financial_type_id.
    *
    * @return array
    *
