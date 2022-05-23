@@ -3008,7 +3008,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $title[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Phone', 'phone_type_id', $mappedField['phone_type_id']);
     }
     if ($mappedField['im_provider_id']) {
-      $title[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $mappedField['provider_id']);
+      $title[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $mappedField['im_provider_id']);
     }
     return implode(' - ', $title);
   }
