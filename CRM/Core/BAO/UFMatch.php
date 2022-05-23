@@ -241,34 +241,31 @@ AND    domain_id = %2
           if ($config->userSystem->is_drupal) {
             $primary_email = $uniqId;
           }
-          elseif ($uf == 'WordPress') {
+          elseif ($uf === 'WordPress') {
             $primary_email = $user->user_email;
           }
           else {
             $primary_email = $user->email;
           }
-          $params = ['email-Primary' => $primary_email];
+          $params = ['email' => $primary_email];
         }
 
-        if ($ctype == 'Organization') {
+        if ($ctype === 'Organization') {
           $params['organization_name'] = $uniqId;
         }
-        elseif ($ctype == 'Household') {
+        elseif ($ctype === 'Household') {
           $params['household_name'] = $uniqId;
         }
 
-        if (!$ctype) {
-          $ctype = "Individual";
-        }
-        $params['contact_type'] = $ctype;
+        $params['contact_type'] = $ctype ?? 'Individual';
 
         // extract first / middle / last name
         // for joomla
-        if ($uf == 'Joomla' && $user->name) {
+        if ($uf === 'Joomla' && $user->name) {
           CRM_Utils_String::extractName($user->name, $params);
         }
 
-        if ($uf == 'WordPress') {
+        if ($uf === 'WordPress') {
           if ($user->first_name) {
             $params['first_name'] = $user->first_name;
           }
@@ -278,7 +275,7 @@ AND    domain_id = %2
           }
         }
 
-        $contactId = CRM_Contact_BAO_Contact::createProfileContact($params);
+        $contactId = civicrm_api3('Contact', 'create', $params)['id'];
         $ufmatch->contact_id = $contactId;
         $ufmatch->uf_name = $uniqId;
       }
