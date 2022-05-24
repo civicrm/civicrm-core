@@ -40,7 +40,10 @@ class CRM_Upgrade_Snapshot {
    */
   public static function getActivationIssues(): array {
     if (static::$activationIssues === NULL) {
-      // TODO This policy should probably be more configurable, eg via `setting` or `define()`.
+      $policy = CRM_Utils_Constant::value('CIVICRM_UPGRADE_SNAPSHOT', 'auto');
+      if ($policy === TRUE) {
+        return [];
+      }
 
       $limits = [
         'civicrm_contact' => 200 * 1000,
@@ -70,6 +73,10 @@ class CRM_Upgrade_Snapshot {
 
       if (CRM_Core_I18n::isMultilingual()) {
         static::$activationIssues['multilingual'] = ts('Multilingual snapshots have not been implemented.');
+      }
+
+      if ($policy === FALSE) {
+        static::$activationIssues['override'] = ts('Snapshots disabled by override (CIVICRM_UPGRADE_SNAPSHOT).');
       }
     }
 

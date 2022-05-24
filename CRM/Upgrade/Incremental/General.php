@@ -140,6 +140,10 @@ class CRM_Upgrade_Incremental_General {
           function($issue) {
             return sprintf('<li>%s</li>', $issue);
           }, $snapshotIssues)) . '</ul>';
+      $preUpgradeMessage .= '<p>' . ts('You may enable snapshots in "<code>%1</code>" by setting the experimental option "<code>%2</code>".', [
+        1 => 'civicrm.settings.php',
+        2 => htmlentities('define(\'CIVICRM_UPGRADE_SNAPSHOT\', TRUE)'),
+      ]) . '</p>';
       $preUpgradeMessage .= '</details>';
     }
   }
