@@ -807,19 +807,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
             $values['vcard_name'] = $vcardNames[$values['location_type_id']];
           }
 
-          if (!CRM_Utils_Array::lookupValue($values,
-              'country',
-              CRM_Core_PseudoConstant::country(),
-              $reverse
-            ) &&
-            $reverse
-          ) {
-            CRM_Utils_Array::lookupValue($values,
-              'country',
-              CRM_Core_PseudoConstant::countryIsoCode(),
-              $reverse
-            );
-          }
           $stateProvinceID = self::resolveStateProvinceID($values, $values['country_id'] ?? NULL);
           if ($stateProvinceID) {
             $values['state_province_id'] = $stateProvinceID;

@@ -1203,7 +1203,7 @@ abstract class CRM_Import_Parser {
         $missingFields[$key] = implode(' ' . ts('and') . ' ', $missing);
       }
     }
-    throw new CRM_Core_Exception(($prefixString ? ($prefixString . ' ') : '') . ts('Missing required fields:') . ' ' . implode(' ' . ts('OR') . ' ', $missingFields));
+    throw new CRM_Core_Exception($prefixString . ts('Missing required fields:') . ' ' . implode(' ' . ts('OR') . ' ', $missingFields));
   }
 
   /**
@@ -1217,8 +1217,9 @@ abstract class CRM_Import_Parser {
    * @throws \API_Exception
    */
   protected function getTransformedFieldValue(string $fieldName, $importedValue) {
+    $transformableFields = array_merge($this->metadataHandledFields, ['country_id']);
     // For now only do gender_id etc as we need to work through removing duplicate handling
-    if (empty($importedValue) || !in_array($fieldName, $this->metadataHandledFields, TRUE)) {
+    if (empty($importedValue) || !in_array($fieldName, $transformableFields, TRUE)) {
       return $importedValue;
     }
     $fieldMetadata = $this->getFieldMetadata($fieldName);
@@ -1233,7 +1234,12 @@ abstract class CRM_Import_Parser {
       $value = CRM_Utils_Date::formatDate($importedValue, $this->getSubmittedValue('dateFormats'));
       return ($value) ?: 'invalid_import_value';
     }
-    return $this->getFieldOptions($fieldName)[is_numeric($importedValue) ? $importedValue : mb_strtolower($importedValue)] ?? 'invalid_import_value';
+    $options = $this->getFieldOptions($fieldName);
+    if ($options !== FALSE) {
+      $comparisonValue = is_numeric($importedValue) ? $importedValue : mb_strtolower($importedValue);
+      return $options[$comparisonValue] ?? 'invalid_import_value';
+    }
+    return $importedValue;
   }
 
   /**
@@ -1262,28 +1268,29 @@ abstract class CRM_Import_Parser {
    * @throws \Civi\API\Exception\NotImplementedException
    */
   protected function getFieldMetadata(string $fieldName, bool $loadOptions = FALSE, $limitToContactType = FALSE): array {
-    $fieldMetadata = $this->getImportableFieldsMetadata()[$fieldName] ?? ($limitToContactType ? NULL : CRM_Contact_BAO_Contact::importableFields('All')[$fieldName]);
+
+    $fieldMap = ['country_id' => 'country'];
+    $fieldMapName = empty($fieldMap[$fieldName]) ? $fieldName : $fieldMap[$fieldName];
+
+    $fieldMetadata = $this->getImportableFieldsMetadata()[$fieldMapName] ?? ($limitToContactType ? NULL : CRM_Contact_BAO_Contact::importableFields('All')[$fieldMapName]);
     if ($loadOptions && !isset($fieldMetadata['options'])) {
-      if (empty($fieldMetadata['pseudoconstant'])) {
-        $this->importableFieldsMetadata[$fieldName]['options'] = FALSE;
+
+      $options = civicrm_api4($this->getFieldEntity($fieldName), 'getFields', [
+        'loadOptions' => ['id', 'name', 'label'],
+        'where' => [['name', '=', empty($fieldMap[$fieldName]) ? $fieldMetadata['name'] : $fieldName]],
+        'select' => ['options'],
+      ])->first()['options'];
+      // We create an array of the possible variants - notably including
+      // name AND label as either might be used. We also lower case before checking
+      $values = [];
+      foreach ($options as $option) {
+        $values[$option['id']] = $option['id'];
+        $values[mb_strtolower($option['name'])] = $option['id'];
+        $values[mb_strtolower($option['label'])] = $option['id'];
       }
-      else {
-        $options = civicrm_api4($fieldMetadata['entity'], 'getFields', [
-          'loadOptions' => ['id', 'name', 'label'],
-          'where' => [['name', '=', $fieldMetadata['name']]],
-          'select' => ['options'],
-        ])->first()['options'];
-        // We create an array of the possible variants - notably including
-        // name AND label as either might be used. We also lower case before checking
-        $values = [];
-        foreach ($options as $option) {
-          $values[$option['id']] = $option['id'];
-          $values[mb_strtolower($option['name'])] = $option['id'];
-          $values[mb_strtolower($option['label'])] = $option['id'];
-        }
-        $this->importableFieldsMetadata[$fieldName]['options'] = $values;
-      }
-      return $this->importableFieldsMetadata[$fieldName];
+
+      $this->importableFieldsMetadata[$fieldMapName]['options'] = $values;
+      return $this->importableFieldsMetadata[$fieldMapName];
     }
     return $fieldMetadata;
   }

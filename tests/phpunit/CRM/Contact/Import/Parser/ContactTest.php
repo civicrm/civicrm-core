@@ -17,9 +17,14 @@
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\ContactType;
+use Civi\Api4\Email;
+use Civi\Api4\IM;
 use Civi\Api4\LocationType;
+use Civi\Api4\OpenID;
+use Civi\Api4\Phone;
 use Civi\Api4\RelationshipType;
 use Civi\Api4\UserJob;
+use Civi\Api4\Website;
 
 /**
  *  Test contact import parser.
@@ -36,6 +41,13 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @var string
    */
   protected $entity = 'Contact';
+
+  /**
+   * Array of existing relationships.
+   *
+   * @var array
+   */
+  private $relationships = [];
 
   /**
    * Tear down after test.
@@ -1050,6 +1062,63 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test importing state country & county.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportCountryStateCounty(): void {
+    $childKey = $this->getRelationships()['Child of']['id'] . '_a_b';
+    // @todo - rows that don't work yet are set to do_not_import.
+    // $addressCustomGroupID = $this->createCustomGroup(['extends' => 'Address', 'name' => 'Address']);
+    // $contactCustomGroupID = $this->createCustomGroup(['extends' => 'Contact', 'name' => 'Contact']);
+    // $addressCustomFieldID = $this->createCountryCustomField(['custom_group_id' => $addressCustomGroupID])['id'];
+    // $contactCustomFieldID = $this->createMultiCountryCustomField(['custom_group_id' => $contactCustomGroupID])['id'];
+    // $customField = 'custom_' . $contactCustomFieldID;
+    // $addressCustomField = 'custom_' . $addressCustomFieldID;
+
+    $mapper = [
+      ['first_name'],
+      ['last_name'],
+      ['email'],
+      ['county'],
+      ['country'],
+      ['state_province'],
+      // [$customField, 'state_province'],
+      ['do_not_import'],
+      // [$customField, 'country'],
+      ['do_not_import'],
+      // [$addressCustomField, 'country'],
+      ['do_not_import'],
+      // [$addressCustomField, 'state_province'],
+      ['do_not_import'],
+      [$childKey, 'first_name'],
+      [$childKey, 'last_name'],
+      [$childKey, 'email'],
+      [$childKey, 'state_province'],
+      [$childKey, 'country'],
+      [$childKey, 'county'],
+      // [$childKey, $addressCustomField, 'country'],
+      ['do_not_import'],
+      // [$childKey, $addressCustomField, 'state_province'],
+      ['do_not_import'],
+      // [$childKey, $customField, 'country'],
+      ['do_not_import'],
+      // [$childKey, $customField, 'state_province'],
+      ['do_not_import'],
+    ];
+    $csv = 'individual_country_state_county_with_related.csv';
+    $this->validateMultiRowCsv($csv, $mapper, 'error_value');
+
+    $this->importCSV($csv, $mapper);
+    $contacts = $this->getImportedContacts();
+    foreach ($contacts as $contact) {
+      $this->assertEquals(1013, $contact['address'][0]['country_id']);
+    }
+    $this->assertCount(2, $contacts);
+  }
+
+  /**
    * Test date validation.
    *
    * @dataProvider dateDataProvider
@@ -1152,11 +1221,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    */
   public function testImportLocations(): void {
     $csv = 'individual_locations_with_related.csv';
-    $relationships = (array) RelationshipType::get()->addSelect('name_a_b', 'id')->addWhere('name_a_b', 'IN', [
-      'Child of',
-      'Sibling of',
-      'Employee of',
-    ])->execute()->indexBy('name_a_b');
+    $relationships = $this->getRelationships();
 
     $childKey = $relationships['Child of']['id'] . '_a_b';
     $siblingKey = $relationships['Sibling of']['id'] . '_a_b';
@@ -1335,7 +1400,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * CRM-19888 default country should be used if ambigous.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testImportAmbiguousStateCountry(): void {
     $this->callAPISuccess('Setting', 'create', ['defaultContactCountry' => 1228]);
@@ -1502,6 +1569,21 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * @return array
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  private function getRelationships(): array {
+    if (empty($this->relationships)) {
+      $this->relationships = (array) RelationshipType::get()
+        ->addSelect('name_a_b', 'id')
+        ->execute()
+        ->indexBy('name_a_b');
+    }
+    return $this->relationships;
+  }
+
+  /**
    * @param array $fields Array of fields to be imported
    * @param array $allfields Array of all fields which can be part of import
    */
@@ -1563,7 +1645,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->assertEquals([
       'first_name' => 'Bob',
       'phone' => [
-        [
+        '1_1' => [
           'phone' => '123',
           'location_type_id' => 1,
           'phone_type_id' => 1,
@@ -1571,32 +1653,34 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ],
       '5_a_b' => [
         'contact_type' => 'Organization',
-        'url' =>
-          [
-
-            [
-              'url' => 'https://example.org',
-              'website_type_id' => 1,
-            ],
-          ],
-        'phone' =>
-          [
-            [
-              'phone' => '456',
-              'location_type_id' => 1,
-              'phone_type_id' => 1,
-            ],
-          ],
-      ],
-      'im' =>
-        [
-
-          [
-            'im' => 'my-handle',
-            'location_type_id' => 1,
-            'provider_id' => 1,
+        'website' => [
+          'https://example.org' => [
+            'url' => 'https://example.org',
+            'website_type_id' => 1,
           ],
         ],
+        // We still pump out the legacy key too - for now!
+        'url' => [
+          'https://example.org' => [
+            'url' => 'https://example.org',
+            'website_type_id' => 1,
+          ],
+        ],
+        'phone' => [
+          '1_1' => [
+            'phone' => '456',
+            'location_type_id' => 1,
+            'phone_type_id' => 1,
+          ],
+        ],
+      ],
+      'im' => [
+        '1_1' => [
+          'im' => 'my-handle',
+          'location_type_id' => 1,
+          'provider_id' => 1,
+        ],
+      ],
       'contact_type' => 'Individual',
     ], $params);
   }
@@ -1797,6 +1881,24 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
         }
       }
     }
+  }
+
+  /**
+   * Get the contacts we imported (Susie Jones & family).
+   *
+   * @return array
+   * @throws \API_Exception
+   */
+  public function getImportedContacts(): array {
+    return (array) Contact::get()
+      ->addWhere('display_name', 'IN', ['Susie Jones', 'Mum Jones', 'sis@example.com', 'Soccer Superstars'])
+      ->addChain('phone', Phone::get()->addWhere('contact_id', '=', '$id'))
+      ->addChain('address', Address::get()->addWhere('contact_id', '=', '$id'))
+      ->addChain('website', Website::get()->addWhere('contact_id', '=', '$id'))
+      ->addChain('im', IM::get()->addWhere('contact_id', '=', '$id'))
+      ->addChain('email', Email::get()->addWhere('contact_id', '=', '$id'))
+      ->addChain('openid', OpenID::get()->addWhere('contact_id', '=', '$id'))
+      ->execute()->indexBy('display_name');
   }
 
 }
