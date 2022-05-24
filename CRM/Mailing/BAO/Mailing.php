@@ -1163,11 +1163,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     $mailParams = $headers;
-    if ($text && ($test || $contact['preferred_mail_format'] == 'Text' ||
-        $contact['preferred_mail_format'] == 'Both' ||
-        ($contact['preferred_mail_format'] == 'HTML' && !array_key_exists('html', $pEmails))
-      )
-    ) {
+    if ($text) {
       $textBody = implode('', $text);
       if ($useSmarty) {
         $textBody = $smarty->fetch("string:$textBody");
@@ -1175,10 +1171,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $mailParams['text'] = $textBody;
     }
 
-    if ($html && ($test || ($contact['preferred_mail_format'] == 'HTML' ||
-          $contact['preferred_mail_format'] == 'Both'
-        ))
-    ) {
+    if ($html) {
       $htmlBody = implode('', $html);
       if ($useSmarty) {
         $htmlBody = $smarty->fetch("string:$htmlBody");
