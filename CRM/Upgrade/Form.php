@@ -536,6 +536,15 @@ SET    version = '$version'
     );
     $queue->createItem($task, ['weight' => 0]);
 
+    if (empty(CRM_Upgrade_Snapshot::getActivationIssues())) {
+      $task = new CRM_Queue_Task(
+        ['CRM_Upgrade_Snapshot', 'cleanupTask'],
+        ['civicrm'],
+        "Cleanup old upgrade snapshots"
+      );
+      $queue->createItem($task, ['weight' => 0]);
+    }
+
     $task = new CRM_Queue_Task(
       ['CRM_Upgrade_Form', 'disableOldExtensions'],
       [$postUpgradeMessageFile],
