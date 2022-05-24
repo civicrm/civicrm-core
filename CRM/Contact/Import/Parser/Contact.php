@@ -136,28 +136,24 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
   /**
    * @param $customFieldID
-   * @param array $customFields
    * @param $value
+   * @param array $fieldMetaData
    * @param $dateType
    *
    * @return ?string
    */
-  private function validateCustomField($customFieldID, array $customFields, $value, $dateType): ?string {
-    if (!array_key_exists($customFieldID, $customFields)) {
-      return ts('field ID');
-    }
-    $fieldMetaData = $customFields[$customFieldID];
+  private function validateCustomField($customFieldID, $value, array $fieldMetaData, $dateType): ?string {
     // validate null values for required custom fields of type boolean
-    if (!empty($customFields[$customFieldID]['is_required']) && (empty($value) && !is_numeric($value)) && $customFields[$customFieldID]['data_type'] == 'Boolean') {
-      return $customFields[$customFieldID]['label'] . '::' . $customFields[$customFieldID]['groupTitle'];
+    if (!empty($fieldMetaData['is_required']) && (empty($value) && !is_numeric($value)) && $fieldMetaData['data_type'] == 'Boolean') {
+      return $fieldMetaData['label'] . '::' . $fieldMetaData['groupTitle'];
     }
 
     /* validate the data against the CF type */
 
     if ($value) {
-      $dataType = $customFields[$customFieldID]['data_type'];
-      $htmlType = $customFields[$customFieldID]['html_type'];
-      $isSerialized = CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID]);
+      $dataType = $fieldMetaData['data_type'];
+      $htmlType = $fieldMetaData['html_type'];
+      $isSerialized = CRM_Core_BAO_CustomField::isSerialized($fieldMetaData);
       if ($dataType === 'Date') {
         $params = ['date_field' => $value];
         if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, 'date_field')) {
@@ -167,7 +163,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
       elseif ($dataType == 'Boolean') {
         if (CRM_Utils_String::strtoboolstr($value) === FALSE) {
-          return $customFields[$customFieldID]['label'] . '::' . $customFields[$customFieldID]['groupTitle'];
+          return $fieldMetaData['label'] . '::' . $fieldMetaData['groupTitle'];
         }
       }
       // need not check for label filed import
@@ -179,7 +175,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if ((!$isSerialized && !in_array($htmlType, $selectHtmlTypes)) || $dataType == 'Boolean' || $dataType == 'ContactReference') {
         $valid = CRM_Core_BAO_CustomValue::typecheck($dataType, $value);
         if (!$valid) {
-          return $customFields[$customFieldID]['label'];
+          return $fieldMetaData['label'];
         }
       }
 
@@ -202,7 +198,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           }
 
           if (!$flag) {
-            return $customFields[$customFieldID]['label'];
+            return $fieldMetaData['label'];
           }
         }
       }
@@ -215,7 +211,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           }
         }
         if (!$flag) {
-          return $customFields[$customFieldID]['label'];
+          return $fieldMetaData['label'];
         }
       }
       elseif ($isSerialized && $dataType === 'StateProvince') {
@@ -226,7 +222,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
               continue;
             }
             else {
-              return $customFields[$customFieldID]['label'];
+              return $fieldMetaData['label'];
             }
           }
         }
@@ -248,7 +244,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             }
 
             if ($error) {
-              return $customFields[$customFieldID]['label'];
+              return $fieldMetaData['label'];
             }
           }
         }
@@ -1120,11 +1116,14 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         //values so need to modify
         if (array_key_exists($customFieldID, $addressCustomFields)) {
           $value = $value[0][$key];
-          $errors[] = $parser->validateCustomField($customFieldID, $addressCustomFields, $value, $dateType);
+          $errors[] = $parser->validateCustomField($customFieldID, $value, $addressCustomFields[$customFieldID], $dateType);
         }
         else {
+          if (!array_key_exists($customFieldID, $customFields)) {
+            return ts('field ID');
+          }
           /* check if it's a valid custom field id */
-          $errors[] = $parser->validateCustomField($customFieldID, $customFields, $value, $dateType);
+          $errors[] = $parser->validateCustomField($customFieldID, $value, $customFields[$customFieldID], $dateType);
         }
       }
       elseif (is_array($params[$key]) && isset($params[$key]["contact_type"]) && in_array(substr($key, -3), ['a_b', 'b_a'], TRUE)) {
