@@ -53,7 +53,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testImportParserWithEmployeeOfRelationship(): void {
     $this->organizationCreate([
@@ -70,15 +69,15 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $values = array_values($contactImportValues);
     $userJobID = $this->getUserJobID([
       'mapper' => [['first_name'], ['last_name'], ['5_a_b', 'organization_name']],
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
     ]);
 
     $parser = new CRM_Contact_Import_Parser_Contact($fields);
     $parser->setUserJobID($userJobID);
-    $parser->_onDuplicate = CRM_Import_Parser::DUPLICATE_UPDATE;
     $parser->init();
 
     $this->assertEquals(CRM_Import_Parser::VALID, $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values), 'Return code from parser import was not as expected');
-    $this->callAPISuccess('Contact', 'get', [
+    $this->callAPISuccessGetSingle('Contact', [
       'first_name' => 'Alok',
       'last_name' => 'Patel',
       'organization_name' => 'Agileware',
