@@ -1429,6 +1429,27 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * Validate the import file, updating the import table with results.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function validate(): void {
+    $dataSource = $this->getDataSourceObject();
+    while ($row = $dataSource->getRow()) {
+      try {
+        $rowNumber = $row['_id'];
+        $values = array_values($row);
+        $this->validateValues($values);
+        $this->setImportStatus($rowNumber, 'NEW', '');
+      }
+      catch (CRM_Core_Exception $e) {
+        $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
+      }
+    }
+  }
+
+  /**
    * Search the value for the string 'invalid_import_value'.
    *
    * If the string is found it indicates the fields was rejected

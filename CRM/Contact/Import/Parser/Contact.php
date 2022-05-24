@@ -1634,9 +1634,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
     $dataSource = $this->getDataSourceObject();
     $totalRowCount = $dataSource->getRowCount(['new']);
-    if ($mode == self::MODE_IMPORT) {
-      $dataSource->setStatuses(['new']);
-    }
+    $dataSource->setStatuses(['new']);
 
     while ($row = $dataSource->getRow()) {
       $values = array_values($row);
@@ -1644,29 +1642,21 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
       $this->_totalCount++;
 
-      if ($mode == self::MODE_PREVIEW) {
-        $returnCode = $this->preview($values);
+      try {
+        $returnCode = $this->import($onDuplicate, $values);
       }
-      elseif ($mode == self::MODE_SUMMARY) {
-        $returnCode = $this->summary($values);
+      catch (CiviCRM_API3_Exception $e) {
+        // When we catch errors here we are not adding to the errors array - mostly
+        // because that will become obsolete once https://github.com/civicrm/civicrm-core/pull/23292
+        // is merged and this will replace it as the main way to handle errors (ie. update the table
+        // and move on).
+        $this->setImportStatus((int) $values[count($values) - 1], 'ERROR', $e->getMessage());
       }
-      elseif ($mode == self::MODE_IMPORT) {
-        try {
-          $returnCode = $this->import($onDuplicate, $values);
-        }
-        catch (CiviCRM_API3_Exception $e) {
-          // When we catch errors here we are not adding to the errors array - mostly
-          // because that will become obsolete once https://github.com/civicrm/civicrm-core/pull/23292
-          // is merged and this will replace it as the main way to handle errors (ie. update the table
-          // and move on).
-          $this->setImportStatus((int) $values[count($values) - 1], 'ERROR', $e->getMessage());
-        }
-        if ($statusID && (($this->_rowCount % 50) == 0)) {
-          $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
-        }
+      if ($statusID && (($this->_rowCount % 50) == 0)) {
+        $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
       }
-      // @todo this should be done within import - it probably is!
-      if (isset($returnCode) && $returnCode === self::UNPARSED_ADDRESS_WARNING) {
+
+      if ($returnCode & self::UNPARSED_ADDRESS_WARNING) {
         $this->setImportStatus((int) $values[count($values) - 1], 'warning_unparsed_address', array_shift($values));
       }
     }
