@@ -2896,6 +2896,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $pcpDAO->id = $softDAO->pcp_id;
         if ($pcpDAO->find(TRUE)) {
           $pcpParams['title'] = $pcpDAO->title;
+
+          // do not display PCP block in receipt if not enabled for the PCP poge
+          if (empty($pcpDAO->is_honor_roll)) {
+            $pcpParams['pcpBlock'] = FALSE;
+          }
         }
       }
     }
