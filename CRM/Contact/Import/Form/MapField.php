@@ -302,24 +302,23 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           // do array search first to see if has mapped key
           $columnKey = array_search($this->_columnNames[$i], $this->getFieldTitles());
           if (isset($this->_fieldUsed[$columnKey])) {
-            $defaults["mapper[$i]"] = [$columnKey];
-            $this->_fieldUsed[$key] = TRUE;
+            $defaults["mapper[$i]"] = $this->createMapperDefault($columnKey, $sel2, $sel3);
+            $this->_fieldUsed[$columnKey] = TRUE;
           }
           else {
             // Infer the default from the column names if we have them
-            $defaults["mapper[$i]"] = [
+            $defaults["mapper[$i]"] = $this->createMapperDefault(
               $this->defaultFromColumnName($this->_columnNames[$i]),
-              0,
-            ];
+              $sel2, $sel3
+            );
           }
         }
         else {
           // Otherwise guess the default from the form of the data
-          $defaults["mapper[$i]"] = [
+          $defaults["mapper[$i]"] = $this->createMapperDefault(
             $this->defaultFromData($this->getDataPatterns(), $i),
-            //                     $defaultLocationType->id
-            0,
-          ];
+            $sel2, $sel3
+          );
         }
       }
       $sel->setOptions([$sel1, $sel2, $sel3, $sel4]);
@@ -581,12 +580,38 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       foreach ([1, 2, 3] as $columnNumber) {
         if (empty($mapperValues[$columnNumber])) {
           $rowNumber = str_replace('mapper[', '', substr($row, 0, -1));
-          $js[] = "cj('#mapper_{$rowNumber}_{$columnNumber}').hide();";
+          $js[] = "CRM.\$('#mapper_{$rowNumber}_{$columnNumber}').hide();";
         }
       }
     }
     $js[] = "</script>\n";
     $this->assign('initHideBoxes', implode("\n", $js));
+  }
+
+  /**
+   * Create the defaults for mapper fields.
+   *
+   * Some fields need a second or third value. These are extracted from
+   * $sel2, $sel3 - the select option lists.
+   *
+   * @param string $key
+   * @param array $sel2
+   * @param array $sel3
+   *
+   * @return array
+   */
+  protected function createMapperDefault($key, $sel2, $sel3): array {
+    $def = [$key];
+    if (!empty($sel2[$key]) && is_array($sel2[$key])) {
+      reset($sel2[$key]);
+      $subkey = key($sel2[$key]);
+      $def[] = $subkey;
+      if (!empty($sel3[$key][$subkey]) && is_array($sel3[$key][$subkey])) {
+        reset($sel3[$key][$subkey]);
+        $def[] = key($sel3[$key][$subkey]);
+      }
+    }
+    return $def;
   }
 
 }
