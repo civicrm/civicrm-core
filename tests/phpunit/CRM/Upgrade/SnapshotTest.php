@@ -13,22 +13,22 @@ class CRM_Upgrade_SnapshotTest extends CiviUnitTestCase {
   }
 
   public function testTableNames_good() {
-    $this->assertEquals('civicrm_snap_core_v5_45_stuff', CRM_Upgrade_Snapshot::createTableName('core', '5.45', 'stuff'));
-    $this->assertEquals('civicrm_snap_core_v5_50_stuffy_things', CRM_Upgrade_Snapshot::createTableName('core', '5.50', 'stuffy_things'));
-    $this->assertEquals('civicrm_snap_oauth_client_v12_34_ext_things', CRM_Upgrade_Snapshot::createTableName('oauth_client', '12.34', 'ext_things'));
-    $this->assertEquals('civicrm_snap_oauth_client_v0_1234_ext_things', CRM_Upgrade_Snapshot::createTableName('oauth_client', '0.1234', 'ext_things'));
+    $this->assertEquals('snap_civicrm_v5_45_stuff', CRM_Upgrade_Snapshot::createTableName('civicrm', '5.45', 'stuff'));
+    $this->assertEquals('snap_civicrm_v5_50_stuffy_things', CRM_Upgrade_Snapshot::createTableName('civicrm', '5.50', 'stuffy_things'));
+    $this->assertEquals('snap_oauth_client_v12_34_ext_things', CRM_Upgrade_Snapshot::createTableName('oauth_client', '12.34', 'ext_things'));
+    $this->assertEquals('snap_oauth_client_v0_1234_ext_things', CRM_Upgrade_Snapshot::createTableName('oauth_client', '0.1234', 'ext_things'));
   }
 
   public function testTableNames_bad() {
     try {
-      CRM_Upgrade_Snapshot::createTableName('core', '5.45', 'ab&cd');
+      CRM_Upgrade_Snapshot::createTableName('civicrm', '5.45', 'ab&cd');
       $this->fail('Accepted invalid name');
     }
     catch (CRM_Core_Exception $e) {
       $this->assertRegExp('/Malformed snapshot name/', $e->getMessage());
     }
     try {
-      CRM_Upgrade_Snapshot::createTableName('core', '5.45', 'loremipsumdolorsitametconsecteturadipiscingelitseddoeiusmod');
+      CRM_Upgrade_Snapshot::createTableName('civicrm', '5.45', 'loremipsumdolorsitametconsecteturadipiscingelitseddoeiusmod');
       $this->fail('Accepted excessive name');
     }
     catch (CRM_Core_Exception $e) {
@@ -50,25 +50,25 @@ class CRM_Upgrade_SnapshotTest extends CiviUnitTestCase {
       $this->organizationCreate([], $i);
     }
 
-    $this->runAll(CRM_Upgrade_Snapshot::createTasks('core', '5.45', 'names', CRM_Utils_SQL_Select::from('civicrm_contact')
+    $this->runAll(CRM_Upgrade_Snapshot::createTasks('civicrm', '5.45', 'names', CRM_Utils_SQL_Select::from('civicrm_contact')
       ->select('id, display_name, sort_name, modified_date')
       ->where('contact_type = "Individual"')
     ));
-    $this->assertTrue(CRM_Core_DAO::checkTableExists('civicrm_snap_core_v5_45_names'));
-    $this->assertSameSchema('civicrm_contact.display_name', 'civicrm_snap_core_v5_45_names.display_name');
-    $this->assertSameSchema('civicrm_contact.sort_name', 'civicrm_snap_core_v5_45_names.sort_name');
-    $this->assertSameSchema('civicrm_contact.modified_date', 'civicrm_snap_core_v5_45_names.modified_date');
+    $this->assertTrue(CRM_Core_DAO::checkTableExists('snap_civicrm_v5_45_names'));
+    $this->assertSameSchema('civicrm_contact.display_name', 'snap_civicrm_v5_45_names.display_name');
+    $this->assertSameSchema('civicrm_contact.sort_name', 'snap_civicrm_v5_45_names.sort_name');
+    $this->assertSameSchema('civicrm_contact.modified_date', 'snap_civicrm_v5_45_names.modified_date');
     $this->assertTrue(CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_contact', 'legal_name'));
-    $this->assertFalse(CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_snap_core_v5_45_names', 'legal_name'));
+    $this->assertFalse(CRM_Core_BAO_SchemaHandler::checkIfFieldExists('snap_civicrm_v5_45_names', 'legal_name'));
 
     $liveContacts = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_contact');
     $liveIndividuals = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_contact WHERE contact_type = "Individual"');
-    $snapCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_snap_core_v5_45_names');
+    $snapCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM snap_civicrm_v5_45_names');
     $this->assertEquals($liveIndividuals, $snapCount, 'The snapshot should have as many records as live table.');
     $this->assertTrue($liveContacts > $liveIndividuals);
     $this->assertGreaterThan(CRM_Upgrade_Snapshot::$pageSize, $snapCount, "There should be more than 1 page of data in the snapshot. Found $snapCount records.");
 
-    CRM_Core_DAO::executeQuery('DROP TABLE civicrm_snap_core_v5_45_names');
+    CRM_Core_DAO::executeQuery('DROP TABLE snap_civicrm_v5_45_names');
   }
 
   /**
@@ -83,28 +83,28 @@ class CRM_Upgrade_SnapshotTest extends CiviUnitTestCase {
     $this->eventCreate([]);
     $this->eventCreate([]);
 
-    $this->runAll(CRM_Upgrade_Snapshot::createTasks('core', '5.45', 'names', CRM_Utils_SQL_Select::from('civicrm_contact')
+    $this->runAll(CRM_Upgrade_Snapshot::createTasks('civicrm', '5.45', 'names', CRM_Utils_SQL_Select::from('civicrm_contact')
       ->select('id, display_name, sort_name')
       ->where('contact_type = "Individual"')
     ));
-    $this->assertTrue(CRM_Core_DAO::checkTableExists('civicrm_snap_core_v5_45_names'));
-    $this->assertSameSchema('civicrm_contact.display_name', 'civicrm_snap_core_v5_45_names.display_name');
-    $this->assertGreaterThan(1, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_snap_core_v5_45_names'));
+    $this->assertTrue(CRM_Core_DAO::checkTableExists('snap_civicrm_v5_45_names'));
+    $this->assertSameSchema('civicrm_contact.display_name', 'snap_civicrm_v5_45_names.display_name');
+    $this->assertGreaterThan(1, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM snap_civicrm_v5_45_names'));
 
-    $this->runAll(CRM_Upgrade_Snapshot::createTasks('core', '5.50', 'dates', CRM_Utils_SQL_Select::from('civicrm_event')
+    $this->runAll(CRM_Upgrade_Snapshot::createTasks('civicrm', '5.50', 'dates', CRM_Utils_SQL_Select::from('civicrm_event')
       ->select('id, start_date, end_date, registration_start_date, registration_end_date')
     ));
-    $this->assertTrue(CRM_Core_DAO::checkTableExists('civicrm_snap_core_v5_50_dates'));
-    $this->assertSameSchema('civicrm_event.start_date', 'civicrm_snap_core_v5_50_dates.start_date');
-    $this->assertGreaterThan(1, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_snap_core_v5_50_dates'));
+    $this->assertTrue(CRM_Core_DAO::checkTableExists('snap_civicrm_v5_50_dates'));
+    $this->assertSameSchema('civicrm_event.start_date', 'snap_civicrm_v5_50_dates.start_date');
+    $this->assertGreaterThan(1, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM snap_civicrm_v5_50_dates'));
 
-    CRM_Upgrade_Snapshot::cleanupTask(NULL, 'core', '5.52', 6);
-    $this->assertFalse(CRM_Core_DAO::checkTableExists('civicrm_snap_core_v5_45_names'));
-    $this->assertTrue(CRM_Core_DAO::checkTableExists('civicrm_snap_core_v5_50_dates'));
+    CRM_Upgrade_Snapshot::cleanupTask(NULL, 'civicrm', '5.52', 6);
+    $this->assertFalse(CRM_Core_DAO::checkTableExists('snap_civicrm_v5_45_names'));
+    $this->assertTrue(CRM_Core_DAO::checkTableExists('snap_civicrm_v5_50_dates'));
 
-    CRM_Upgrade_Snapshot::cleanupTask(NULL, 'core', '5.58', 6);
-    $this->assertFalse(CRM_Core_DAO::checkTableExists('civicrm_snap_core_v5_45_names'));
-    $this->assertFalse(CRM_Core_DAO::checkTableExists('civicrm_snap_core_v5_50_dates'));
+    CRM_Upgrade_Snapshot::cleanupTask(NULL, 'civicrm', '5.58', 6);
+    $this->assertFalse(CRM_Core_DAO::checkTableExists('snap_civicrm_v5_45_names'));
+    $this->assertFalse(CRM_Core_DAO::checkTableExists('snap_civicrm_v5_50_dates'));
   }
 
   /**

@@ -81,13 +81,13 @@ class CRM_Upgrade_Snapshot {
    *
    * @param string $owner
    *   Name of the component/module/extension that owns the snapshot.
-   *   Ex: 'core', 'sequentialcreditnotes', 'oauth_client'
+   *   Ex: 'civicrm', 'sequentialcreditnotes', 'oauth_client'
    * @param string $version
    *   Ex: '5.50'
    * @param string $name
    *   Ex: 'dates'
    * @return string
-   *   Ex: 'civicrm_snap_v5_50_dates'
+   *   Ex: 'snap_civicrm_v5_50_dates'
    * @throws \CRM_Core_Exception
    *   If the resulting table name would be invalid, then this throws an exception.
    */
@@ -101,7 +101,7 @@ class CRM_Upgrade_Snapshot {
     }
     $versionExpr = ($versionParts[0] . '_' . $versionParts[1]);
 
-    $table = sprintf('civicrm_snap_%s_v%s_%s', $owner, $versionExpr, $name);
+    $table = sprintf('snap_%s_v%s_%s', $owner, $versionExpr, $name);
     if (!preg_match(';^[a-z0-9_]+$;', $table)) {
       throw new CRM_Core_Exception("Malformed snapshot name ($table)");
     }
@@ -117,7 +117,7 @@ class CRM_Upgrade_Snapshot {
    *
    * @param string $owner
    *   Name of the component/module/extension that owns the snapshot.
-   *   Ex: 'core', 'sequentialcreditnotes', 'oauth_client'
+   *   Ex: 'civicrm', 'sequentialcreditnotes', 'oauth_client'
    * @param string $version
    *   Ex: '5.50'
    * @param string $name
@@ -170,7 +170,7 @@ class CRM_Upgrade_Snapshot {
    *
    * @param CRM_Queue_TaskContext|null $ctx
    * @param string $owner
-   *   Ex: 'core', 'sequentialcreditnotes', 'oauth_client'
+   *   Ex: 'civicrm', 'sequentialcreditnotes', 'oauth_client'
    * @param string|null $version
    *   The current version of CiviCRM.
    * @param int|null $cleanupAfter
@@ -178,7 +178,7 @@ class CRM_Upgrade_Snapshot {
    *   Time is measured in terms of MINOR versions - eg "4" means "retain for 4 MINOR versions".
    *   Thus, on v5.60, you could delete any snapshots predating 5.56.
    */
-  public static function cleanupTask(?CRM_Queue_TaskContext $ctx = NULL, string $owner = 'core', ?string $version = NULL, ?int $cleanupAfter = NULL): void {
+  public static function cleanupTask(?CRM_Queue_TaskContext $ctx = NULL, string $owner = 'civicrm', ?string $version = NULL, ?int $cleanupAfter = NULL): void {
     $version = $version ?: CRM_Core_BAO_Domain::version();
     $cleanupAfter = $cleanupAfter ?: static::$cleanupAfter;
 
@@ -194,11 +194,11 @@ class CRM_Upgrade_Snapshot {
     ";
     $tables = CRM_Core_DAO::executeQuery($query, [
       1 => [$dao->database(), 'String'],
-      2 => ["civicrm_snap_{$owner}_v%", 'String'],
+      2 => ["snap_{$owner}_v%", 'String'],
     ])->fetchMap('tableName', 'tableName');
 
     $oldTables = array_filter($tables, function($table) use ($owner, $cutoff) {
-      if (preg_match(";^civicrm_snap_{$owner}_v(\d+)_(\d+)_;", $table, $m)) {
+      if (preg_match(";^snap_{$owner}_v(\d+)_(\d+)_;", $table, $m)) {
         $generatedVer = $m[1] . '.' . $m[2];
         return (bool) version_compare($generatedVer, $cutoff, '<');
       }
