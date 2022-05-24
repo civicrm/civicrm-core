@@ -120,6 +120,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     }
     if ($this->isMoneyField($field)) {
       $currency = $this->getCurrency($row);
+      if (empty($fieldValue) && !is_numeric($fieldValue)) {
+        $fieldValue = 0;
+      }
       if (!$currency) {
         // too hard basket for now - just do what we always did.
         return $row->format('text/plain')->tokens($entity, $field,
