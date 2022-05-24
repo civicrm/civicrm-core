@@ -1246,4 +1246,26 @@ abstract class CRM_Import_Parser {
     return $fieldMetadata;
   }
 
+  /**
+   * @param $fieldName
+   *
+   * @return mixed|null
+   * @throws \API_Exception
+   */
+  protected function getFieldEntity($fieldName) {
+    $metadata = $this->getFieldMetadata($fieldName);
+    if ($fieldName === 'do_not_import') {
+      return NULL;
+    }
+    if (!isset($metadata['entity'])) {
+      return $metadata['extends'];
+    }
+    $entity = $this->getFieldMetadata($fieldName)['entity'];
+    // Our metadata for these is fugly. Handling the fugliness during retrieval.
+    if (in_array($entity, ['Country', 'StateProvince', 'County'], TRUE)) {
+      return 'Address';
+    }
+    return $this->getFieldMetadata($fieldName)['entity'];
+  }
+
 }

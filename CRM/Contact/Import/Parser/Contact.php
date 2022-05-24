@@ -1665,7 +1665,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
         $loc = CRM_Utils_Array::key($index, $locationType);
 
-        $blockName = $this->getLocationEntityForKey($fieldName);
+        $blockName = strtolower($this->getFieldEntity($fieldName));
 
         $data[$blockName][$loc]['location_type_id'] = $locTypeId;
 
@@ -1872,27 +1872,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
 
     return [$data, $contactDetails];
-  }
-
-  /**
-   * Get the relevant location entity for the array key.
-   *
-   * Based on the field name we determine which location entity
-   * we are dealing with. Apart from a few specific ones they
-   * are mostly 'address' (the default).
-   *
-   * @param string $fieldName
-   *
-   * @return string
-   */
-  private static function getLocationEntityForKey($fieldName) {
-    if (in_array($fieldName, ['email', 'phone', 'im', 'openid'])) {
-      return $fieldName;
-    }
-    if ($fieldName === 'phone_ext') {
-      return 'phone';
-    }
-    return 'address';
   }
 
   /**
