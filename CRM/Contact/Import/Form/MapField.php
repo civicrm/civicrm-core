@@ -302,7 +302,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           // do array search first to see if has mapped key
           $columnKey = array_search($this->_columnNames[$i], $this->getFieldTitles());
           if (isset($this->_fieldUsed[$columnKey])) {
-            $defaults["mapper[$i]"] = $columnKey;
+            $defaults["mapper[$i]"] = [$columnKey];
             $this->_fieldUsed[$key] = TRUE;
           }
           else {
