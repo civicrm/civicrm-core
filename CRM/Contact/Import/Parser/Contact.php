@@ -298,17 +298,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $params['contact_sub_type'] = $this->getContactSubType() ?: ($params['contact_sub_type'] ?? NULL);
 
     try {
-      $params['id'] = $formatted['id'] = $this->lookupContactID($params, ($this->isSkipDuplicates() || $this->isIgnoreDuplicates()));
-      if ($params['id'] && $params['contact_sub_type']) {
-        $contactSubType = Contact::get(FALSE)
-          ->addWhere('id', '=', $params['id'])
-          ->addSelect('contact_sub_type')
-          ->execute()
-          ->first()['contact_sub_type'];
-        if (!empty($contactSubType) && $contactSubType[0] !== $params['contact_sub_type'] && !CRM_Contact_BAO_ContactType::isAllowEdit($params['id'], $contactSubType[0])) {
-          throw new CRM_Core_Exception('Mismatched contact SubTypes :', CRM_Import_Parser::NO_MATCH);
-        }
-      }
+      [$formatted, $params] = $this->processContact($params, $formatted);
     }
     catch (CRM_Core_Exception $e) {
       $statuses = [CRM_Import_Parser::DUPLICATE => 'DUPLICATE', CRM_Import_Parser::ERROR => 'ERROR', CRM_Import_Parser::NO_MATCH => 'invalid_no_match'];
@@ -397,69 +387,18 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if ((CRM_Core_Error::isAPIError($newContact, CRM_Core_ERROR::DUPLICATE_CONTACT) || is_a($newContact, 'CRM_Contact_BAO_Contact')) && $primaryContactId) {
 
         //relationship contact insert
-        foreach ($params as $key => $field) {
-          [$id, $first, $second] = CRM_Utils_System::explode('_', $key, 3);
-          if (!($first == 'a' && $second == 'b') && !($first == 'b' && $second == 'a')) {
-            continue;
+        foreach ($this->getRelatedContactsParams($params) as $key => $field) {
+          $formatting = $field;
+          try {
+            [$formatting, $field] = $this->processContact($field, $formatting);
+          }
+          catch (CRM_Core_Exception $e) {
+            $statuses = [CRM_Import_Parser::DUPLICATE => 'DUPLICATE', CRM_Import_Parser::ERROR => 'ERROR', CRM_Import_Parser::NO_MATCH => 'invalid_no_match'];
+            $this->setImportStatus((int) $values[count($values) - 1], $statuses[$e->getErrorCode()], $e->getMessage());
+            return FALSE;
           }
 
-          $relationType = new CRM_Contact_DAO_RelationshipType();
-          $relationType->id = $id;
-          $relationType->find(TRUE);
-          $direction = "contact_sub_type_$second";
-
-          $formatting = array_filter(array_intersect_key($field, array_fill_keys($this->metadataHandledFields, 1)));
-
-          //set subtype for related contact CRM-5125
-          if (isset($relationType->$direction)) {
-            //validation of related contact subtype for update mode
-            if ($relCsType = CRM_Utils_Array::value('contact_sub_type', $params[$key]) && $relCsType != $relationType->$direction) {
-              $errorMessage = ts("Mismatched or Invalid contact subtype found for this related contact.");
-              array_unshift($values, $errorMessage);
-              return CRM_Import_Parser::NO_MATCH;
-            }
-            else {
-              $formatting['contact_sub_type'] = $relationType->$direction;
-            }
-          }
-
-          $contactFields = NULL;
           $contactFields = CRM_Contact_DAO_Contact::import();
-
-          //Relation on the basis of External Identifier.
-          if (empty($params[$key]['id']) && !empty($params[$key]['external_identifier'])) {
-            $params[$key]['id'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params[$key]['external_identifier'], 'id', 'external_identifier');
-          }
-          // check for valid related contact id in update/fill mode, CRM-4424
-          if (in_array($onDuplicate, [
-            CRM_Import_Parser::DUPLICATE_UPDATE,
-            CRM_Import_Parser::DUPLICATE_FILL,
-          ]) && !empty($params[$key]['id'])) {
-            $relatedContactType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params[$key]['id'], 'contact_type');
-            if (!$relatedContactType) {
-              $errorMessage = ts("No contact found for this related contact ID: %1", [1 => $params[$key]['id']]);
-              array_unshift($values, $errorMessage);
-              return CRM_Import_Parser::NO_MATCH;
-            }
-
-            //validation of related contact subtype for update mode
-            //CRM-5125
-            $relatedCsType = NULL;
-            if (!empty($formatting['contact_sub_type'])) {
-              $relatedCsType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params[$key]['id'], 'contact_sub_type');
-            }
-
-            if (!empty($relatedCsType) && (!CRM_Contact_BAO_ContactType::isAllowEdit($params[$key]['id'], $relatedCsType) &&
-                $relatedCsType != CRM_Utils_Array::value('contact_sub_type', $formatting))
-            ) {
-              $errorMessage = ts("Mismatched or Invalid contact subtype found for this related contact.") . ' ' . ts("ID: %1", [1 => $params[$key]['id']]);
-              array_unshift($values, $errorMessage);
-              return CRM_Import_Parser::NO_MATCH;
-            }
-            // get related contact id to format data in update/fill mode,
-            //if external identifier is present, CRM-4423
-            $formatting['id'] = $params[$key]['id'];
-          }
 
           //format common data, CRM-4062
           $this->formatCommonData($field, $formatting, $contactFields);
@@ -2039,7 +1978,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
       if ($relatedContactKey) {
         if (!isset($params[$relatedContactKey])) {
-          $params[$relatedContactKey] = ['contact_type' => $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction'])];
+          $params[$relatedContactKey] = [
+            // These will be over-written by any the importer has chosen but defaults are based on the relationship.
+            'contact_type' => $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction']),
+            'contact_sub_type' => $this->getRelatedContactSubType($mappedField['relationship_type_id'], $mappedField['relationship_direction']),
+          ];
         }
         $this->addFieldToParams($params[$relatedContactKey], $locationValues, $fieldName, $importedValue);
       }
@@ -2586,7 +2529,14 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $useExistingMatchFields = !empty($value['relationship_type_id']) || $this->isUpdateExistingContacts();
       $prefixString = !empty($value['relationship_label']) ? '(' . $value['relationship_label'] . ') ' : '';
       $this->validateRequiredContactFields($value['contact_type'], $value, $useExistingMatchFields, $prefixString);
+
       $errors = array_merge($errors, $this->getInvalidValuesForContact($value, $prefixString));
+      if (!empty($value['relationship_type_id'])) {
+        $requiredSubType = $this->getRelatedContactSubType($value['relationship_type_id'], $value['relationship_direction']);
+        if ($requiredSubType && $value['contact_sub_type'] && $requiredSubType !== $value['contact_sub_type']) {
+          throw new CRM_Core_Exception($prefixString . ts('Mismatched or Invalid contact subtype found for this related contact.'));
+        }
+      }
     }
 
     //check for duplicate external Identifier
@@ -2682,6 +2632,24 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       return NULL;
     }
     $relationshipField = 'contact_type_' . substr($relationshipDirection, -1);
+    return $this->getRelationshipType($relationshipTypeID)[$relationshipField];
+  }
+
+  /**
+   * Get the related contact sub type.
+   *
+   * @param int|null $relationshipTypeID
+   * @param int|string $relationshipDirection
+   *
+   * @return null|string
+   *
+   * @throws \API_Exception
+   */
+  protected function getRelatedContactSubType(int $relationshipTypeID, $relationshipDirection): ?string {
+    if (!$relationshipTypeID) {
+      return NULL;
+    }
+    $relationshipField = 'contact_sub_type_' . substr($relationshipDirection, -1);
     return $this->getRelationshipType($relationshipTypeID)[$relationshipField];
   }
 
@@ -2863,6 +2831,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   protected function lookupContactID(array $params, bool $isDuplicateIfExternalIdentifierExists): ?int {
     $extIDMatch = $this->lookupExternalIdentifier($params['external_identifier'] ?? NULL, $params['contact_type']);
+    if (!empty($params['external_identifier']) && !$extIDMatch && $isDuplicateIfExternalIdentifierExists) {
+      throw new CRM_Core_Exception(ts('Existing external ID lookup failed.'), CRM_Import_Parser::ERROR);
+    }
     $contactID = !empty($params['id']) ? (int) $params['id'] : NULL;
     //check if external identifier exists in database
     if ($extIDMatch && $contactID && $extIDMatch !== $contactID) {
@@ -2891,6 +2862,30 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       return $this->getPossibleContactMatch($params, $extIDMatch, $this->getSubmittedValue('dedupe_rule_id') ?: NULL);
     }
     return NULL;
+  }
+
+  /**
+   * @param array $params
+   * @param array $formatted
+   * @return array[]
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function processContact(array $params, array $formatted): array {
+    $params['id'] = $formatted['id'] = $this->lookupContactID($params, ($this->isSkipDuplicates() || $this->isIgnoreDuplicates()));
+    if ($params['id'] && $params['contact_sub_type']) {
+      $contactSubType = Contact::get(FALSE)
+        ->addWhere('id', '=', $params['id'])
+        ->addSelect('contact_sub_type')
+        ->execute()
+        ->first()['contact_sub_type'];
+      if (!empty($contactSubType) && $contactSubType[0] !== $params['contact_sub_type'] && !CRM_Contact_BAO_ContactType::isAllowEdit($params['id'], $contactSubType[0])) {
+        throw new CRM_Core_Exception('Mismatched contact SubTypes :', CRM_Import_Parser::NO_MATCH);
+      }
+    }
+    return array($formatted, $params);
   }
 
 }

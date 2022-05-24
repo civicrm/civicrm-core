@@ -300,7 +300,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'external_identifier' => 'billy',
       'nick_name' => 'Old Bill',
       'contact_sub_type' => 'Staff',
-    ], CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
+    ], CRM_Import_Parser::DUPLICATE_UPDATE, FALSE);
     $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contactID]);
     $this->assertEquals('', $contact['nick_name']);
     $this->assertEquals(['Parent'], $contact['contact_sub_type']);
@@ -1541,7 +1541,14 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $parser->setUserJobID($userJobID);
     $parser->_dedupeRuleGroupID = $ruleGroupId;
     $parser->init();
-    $this->assertEquals($expectedResult, $parser->import($onDuplicateAction, $values), 'Return code from parser import was not as expected');
+    $result = $parser->import($onDuplicateAction, $values);
+    $dataSource = new CRM_Import_DataSource_CSV($userJobID);
+    if ($result === FALSE && $expectedResult !== FALSE) {
+      // Import is moving away from returning a status - this is a better way to check
+      $this->assertGreaterThan(0, $dataSource->getRowCount([$expectedResult]));
+      return;
+    }
+    $this->assertEquals($expectedResult, $result, 'Return code from parser import was not as expected');
   }
 
   /**
@@ -1680,6 +1687,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ],
       '5_a_b' => [
         'contact_type' => 'Organization',
+        'contact_sub_type' => NULL,
         'website' => [
           'https://example.org' => [
             'url' => 'https://example.org',
@@ -1911,7 +1919,12 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    */
   public function getImportedContacts(): array {
     return (array) Contact::get()
-      ->addWhere('display_name', 'IN', ['Susie Jones', 'Mum Jones', 'sis@example.com', 'Soccer Superstars'])
+      ->addWhere('display_name', 'IN', [
+        'Susie Jones',
+        'Mum Jones',
+        'sis@example.com',
+        'Soccer Superstars',
+      ])
       ->addChain('phone', Phone::get()->addWhere('contact_id', '=', '$id'))
       ->addChain('address', Address::get()->addWhere('contact_id', '=', '$id'))
       ->addChain('website', Website::get()->addWhere('contact_id', '=', '$id'))
@@ -1919,6 +1932,42 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ->addChain('email', Email::get()->addWhere('contact_id', '=', '$id'))
       ->addChain('openid', OpenID::get()->addWhere('contact_id', '=', '$id'))
       ->execute()->indexBy('display_name');
+  }
+
+  /**
+   * Test that import parser will not throw error if Related Contact is not found via passed in External ID.
+   *
+   * Currently fails because validation assumes the Related contact will be found.
+   * When it is later not found creating the contact via the API throws an
+   * error for missing required fields.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testImportParserWithExternalIdForRelationship(): void {
+    $contactImportValues = [
+      'first_name' => 'Alok',
+      'last_name' => 'Patel',
+      'Employee of' => 'related external identifier',
+    ];
+
+    $mapper = [
+      ['first_name'],
+      ['last_name'],
+      ['5_a_b', 'external_identifier'],
+    ];
+    $fields = array_keys($contactImportValues);
+    $values = array_values($contactImportValues);
+    $userJobID = $this->getUserJobID([
+      'mapper' => $mapper,
+    ]);
+
+    $parser = new CRM_Contact_Import_Parser_Contact($fields);
+    $parser->setUserJobID($userJobID);
+    $parser->init();
+
+    $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values);
   }
 
 }
