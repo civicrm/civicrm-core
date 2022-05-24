@@ -1233,7 +1233,7 @@ abstract class CRM_Import_Parser {
       $value = CRM_Utils_Date::formatDate($importedValue, $this->getSubmittedValue('dateFormats'));
       return ($value) ?: 'invalid_import_value';
     }
-    return $this->getFieldOptions($fieldName)[$importedValue] ?? 'invalid_import_value';
+    return $this->getFieldOptions($fieldName)[is_numeric($importedValue) ? $importedValue : mb_strtolower($importedValue)] ?? 'invalid_import_value';
   }
 
   /**
@@ -1274,16 +1274,12 @@ abstract class CRM_Import_Parser {
           'select' => ['options'],
         ])->first()['options'];
         // We create an array of the possible variants - notably including
-        // name AND label as either might be used, and capitalisation variants.
+        // name AND label as either might be used. We also lower case before checking
         $values = [];
         foreach ($options as $option) {
           $values[$option['id']] = $option['id'];
-          $values[$option['label']] = $option['id'];
-          $values[$option['name']] = $option['id'];
-          $values[strtoupper($option['name'])] = $option['id'];
-          $values[strtolower($option['name'])] = $option['id'];
-          $values[strtoupper($option['label'])] = $option['id'];
-          $values[strtolower($option['label'])] = $option['id'];
+          $values[mb_strtolower($option['name'])] = $option['id'];
+          $values[mb_strtolower($option['label'])] = $option['id'];
         }
         $this->importableFieldsMetadata[$fieldName]['options'] = $values;
       }
