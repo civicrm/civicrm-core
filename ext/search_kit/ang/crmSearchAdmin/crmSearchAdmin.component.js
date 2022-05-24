@@ -330,8 +330,9 @@
           if (ctrl.canAggregate(col)) {
             // Ensure all non-grouped columns are aggregated if using GROUP BY
             if (!info.fn || info.fn.category !== 'aggregate') {
-              var dfl = searchMeta.getDefaultAggregateFn(info);
-              ctrl.savedSearch.api_params.select[pos] = dfl.fnName + '(' + dfl.flag_before + fieldExpr + ') AS ' + dfl.fnName + '_' + fieldExpr.replace(/[.:]/g, '_');
+              var dflFn = searchMeta.getDefaultAggregateFn(info) || 'GROUP_CONCAT',
+                flagBefore = dflFn === 'GROUP_CONCAT' ? 'DISTINCT ' : '';
+              ctrl.savedSearch.api_params.select[pos] = dflFn + '(' + flagBefore + fieldExpr + ') AS ' + dflFn + '_' + fieldExpr.replace(/[.:]/g, '_');
             }
           } else {
             // Remove aggregate functions when no grouping

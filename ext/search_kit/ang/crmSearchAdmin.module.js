@@ -340,22 +340,20 @@
         fieldToColumn: fieldToColumn,
         // Supply default aggregate function appropriate to the data_type
         getDefaultAggregateFn: function(info) {
-          var ret = {flag_before: ''};
+          var arg = info.args[0] || {};
+          if (arg.suffix) {
+            return null;
+          }
           switch (info.data_type) {
             case 'Integer':
               // For the `id` field, default to COUNT, otherwise SUM
-              ret.fnName = (info.args[0] && info.args[0].field && info.args[0].field.name === 'id') ? 'COUNT' : 'SUM';
-              break;
+              return (!info.fn && arg.field && arg.field.name === 'id') ? 'COUNT' : 'SUM';
 
             case 'Float':
-              ret.fnName = 'SUM';
-              break;
-
-            default:
-              ret.fnName = 'GROUP_CONCAT';
-              ret.flag_before = 'DISTINCT ';
+            case 'Money':
+              return 'SUM';
           }
-          return ret;
+          return null;
         },
         // Find all possible search columns that could serve as contact_id for a smart group
         getSmartGroupColumns: function(api_entity, api_params) {
