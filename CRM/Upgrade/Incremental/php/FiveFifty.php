@@ -21,6 +21,17 @@
  */
 class CRM_Upgrade_Incremental_php_FiveFifty extends CRM_Upgrade_Incremental_Base {
 
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+    parent::setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
+    if ($rev === '5.50.alpha1') {
+      $preUpgradeMessage = '<p>' . ts('To improve data-protection, CiviCRM (5.50+) may create snapshots of upgraded data ("snap_*" tables). The upgrader will automatically prune old snapshots. The "snap_*" tables should generally follow the same backup/replication rules as other MySQL tables, but advanced administrators may fine-tune per preference.') . '</p>'
+        . $preUpgradeMessage;
+      // The issue here is that most backup/replication rules are per-database (eg `mysqldump DB_NAME`), but some
+      // systems have special filters in their backup configuration (eg `civicrm_*` vs `civicrm_tmp_*` vs `log_civicrm_*`).
+      // We want to let these users know there's a change -- without scaring the regular users who don't have that.
+    }
+  }
+
   /**
    * Upgrade step; adds tasks including 'runSql'.
    *
