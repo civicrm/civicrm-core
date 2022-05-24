@@ -1040,12 +1040,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             }
             break;
 
-          case 'preferred_mail_format':
-            if (!array_key_exists(strtolower($value), array_change_key_case(CRM_Core_SelectValues::pmf(), CASE_LOWER))) {
-              $errors[] = ts('Preferred Mail Format');
-            }
-            break;
-
           case 'state_province':
             if (!empty($value)) {
               foreach ($value as $stateValue) {

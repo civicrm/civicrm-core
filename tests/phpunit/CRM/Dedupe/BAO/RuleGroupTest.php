@@ -158,7 +158,6 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
           'postal_greeting_custom' => 'Postal Greeting Custom',
           'preferred_communication_method' => 'Preferred Communication Method',
           'preferred_language' => 'Preferred Language',
-          'preferred_mail_format' => 'Preferred Mail Format',
           'sic_code' => 'Sic Code',
           'user_unique_id' => 'Unique ID (OpenID)',
           'sort_name' => 'Sort Name',

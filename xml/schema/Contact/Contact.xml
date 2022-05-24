@@ -331,7 +331,7 @@
     <type>varchar</type>
     <length>8</length>
     <default>"Both"</default>
-    <import>true</import>
+    <import>false</import>
     <headerPattern>/^p(ref\w*\s)?m(ail\s)?f(orm\w*)$/i</headerPattern>
     <comment>What is the preferred mode of sending an email.</comment>
     <add>1.1</add>
