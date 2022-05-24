@@ -1603,6 +1603,60 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that import parser will not match the imported primary to
+   * an existing contact via the related contacts fields.
+   *
+   * Currently fails because CRM_Dedupe_Finder::formatParams($input, $contactType);
+   * called in getDuplicateContacts flattens the contact array adding the
+   * related contacts values to the primary contact.
+   *
+   * https://github.com/civicrm/civicrm-core/blob/ca13ec46eae2042604e4e106c6cb3dc0439db3e2/CRM/Dedupe/Finder.php#L238
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testImportParserDoesNotMatchPrimaryToRelated(): void {
+    $this->individualCreate([
+      'first_name' => 'Bob',
+      'last_name' => 'Dobbs',
+      'email' => 'tim.cook@apple.com',
+    ]);
+
+    $contactImportValues = [
+      'first_name' => 'Alok',
+      'last_name' => 'Patel',
+      'Employee of' => 'email',
+    ];
+
+    $mapper = [
+      ['first_name'],
+      ['last_name'],
+      ['5_a_b', 'email'],
+    ];
+    $fields = array_keys($contactImportValues);
+    $values = array_values($contactImportValues);
+    $values[] = 'tim.cook@apple.com';
+
+    $userJobID = $this->getUserJobID([
+      'mapper' => $mapper,
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
+    ]);
+
+    $parser = new CRM_Contact_Import_Parser_Contact($fields);
+    $parser->setUserJobID($userJobID);
+    $parser->init();
+
+    $this->assertEquals(CRM_Import_Parser::ERROR, $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values), 'Return code from parser import was not as expected');
+    $this->callAPISuccessGetSingle('Contact', [
+      'first_name' => 'Bob',
+      'last_name' => 'Dobbs',
+      'email' => 'tim.cook@apple.com',
+    ]);
+  }
+
+  /**
    * Set up the underlying contact.
    *
    * @param array $params
