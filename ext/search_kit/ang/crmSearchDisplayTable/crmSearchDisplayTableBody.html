@@ -1,5 +1,5 @@
 <tr ng-repeat="(rowIndex, row) in $ctrl.results">
-  <td ng-if=":: $ctrl.settings.actions || $ctrl.settings.draggable" class="{{:: row.cssClass }}">
+  <td ng-if=":: $ctrl.hasExtraFirstColumn()" class="{{:: row.cssClass }}">
     <span ng-if=":: $ctrl.settings.draggable" class="crm-draggable" title="{{:: ts('Drag to reposition') }}">
       <i class="crm-i fa-arrows-v"></i>
     </span>

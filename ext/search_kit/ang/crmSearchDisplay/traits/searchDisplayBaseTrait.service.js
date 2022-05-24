@@ -82,6 +82,10 @@
         $scope.$watch('$ctrl.filters', onChangeFilters, true);
       },
 
+      hasExtraFirstColumn: function() {
+        return this.settings.actions || this.settings.draggable || (this.settings.tally && this.settings.tally.label);
+      },
+
       getAfformFilters: function() {
         return _.pick(this.afFieldset ? this.afFieldset.getFieldData() : {}, function(val) {
           return val !== null && (_.includes(['boolean', 'number'], typeof val) || val.length);
