@@ -1036,10 +1036,16 @@ class CRM_Financial_BAO_Order {
     if ($taxRate) {
       // Total is tax inclusive.
       $lineItem['tax_amount'] = ($taxRate / 100) * $this->getOverrideTotalAmount() / (1 + ($taxRate / 100));
-      $lineItem['line_total'] = $lineItem['unit_price'] = $this->getOverrideTotalAmount() - $lineItem['tax_amount'];
+      $lineItem['line_total'] = $this->getOverrideTotalAmount() - $lineItem['tax_amount'];
     }
     else {
-      $lineItem['line_total'] = $lineItem['unit_price'] = $this->getOverrideTotalAmount();
+      $lineItem['line_total'] = $this->getOverrideTotalAmount();
+    }
+    if (!empty($lineItem['qty'])) {
+      $lineItem['unit_price'] = $lineItem['line_total'] / $lineItem['qty'];
+    }
+    else {
+      $lineItem['unit_price'] = $lineItem['line_total'];
     }
   }
 
