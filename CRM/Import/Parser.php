@@ -1334,14 +1334,9 @@ abstract class CRM_Import_Parser {
 
       // check for values for custom fields for checkboxes and multiselect
       if ($isSerialized && $dataType != 'ContactReference') {
-        $value = trim($value);
-        $value = str_replace('|', ',', $value);
-        $mulValues = explode(',', $value);
+        $mulValues = array_filter(explode(',', str_replace('|', ',', trim($value))), 'strlen');
         $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
         foreach ($mulValues as $v1) {
-          if (strlen($v1) == 0) {
-            continue;
-          }
 
           $flag = FALSE;
           foreach ($customOption as $v2) {

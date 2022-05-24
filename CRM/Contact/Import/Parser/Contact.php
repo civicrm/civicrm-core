@@ -280,7 +280,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
 
     $params = $this->getMappedRow($values);
-    $formatted = array_filter(array_intersect_key($params, array_fill_keys($this->metadataHandledFields, 1)));
+    $formatted = array_filter(array_intersect_key($params, array_fill_keys($this->metadataHandledFields, 1)), 'strlen');
 
     $contactFields = CRM_Contact_DAO_Contact::import();
 
