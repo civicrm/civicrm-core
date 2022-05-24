@@ -934,11 +934,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             if (!empty($value['location_type_id'])) {
               $this->formatLocationBlock($value, $formatted);
             }
-            else {
-              // @todo - this is still reachable - e.g. import with related contact info like firstname,lastname,spouse-first-name,spouse-last-name,spouse-home-phone
-              CRM_Core_Error::deprecatedFunctionWarning('this is not expected to be reachable now');
-              $this->formatContactParameters($value, $formatted);
-            }
           }
         }
         if (!$isAddressCustomField) {
