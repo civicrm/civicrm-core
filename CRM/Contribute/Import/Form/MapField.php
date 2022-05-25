@@ -38,7 +38,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     $requiredFields = [
       $contactORContributionId == 'contribution_id' ? 'contribution_id' : 'contribution_contact_id' => $contactORContributionId == 'contribution_id' ? ts('Contribution ID') : ts('Contact ID'),
       'total_amount' => ts('Total Amount'),
-      'financial_type' => ts('Financial Type'),
+      'financial_type_id' => ts('Financial Type'),
     ];
 
     foreach ($requiredFields as $field => $title) {
@@ -93,7 +93,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     else {
       $this->assign('rowDisplayCount', 2);
     }
-    $highlightedFields = ['financial_type', 'total_amount'];
+    $highlightedFields = ['financial_type_id', 'total_amount'];
     //CRM-2219 removing other required fields since for updation only
     //invoice id or trxn id or contribution id is required.
     if ($this->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
