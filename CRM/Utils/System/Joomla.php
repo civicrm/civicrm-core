@@ -38,10 +38,17 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function createUser(&$params, $mail) {
     $baseDir = JPATH_SITE;
-    require_once $baseDir . '/components/com_users/models/registration.php';
-
     $userParams = JComponentHelper::getParams('com_users');
-    $model = new UsersModelRegistration();
+
+    if (version_compare(JVERSION, '4.0.0', 'ge')) {
+      $model = JFactory::getApplication()->bootComponent('com_users')->getMVCFactory()->createModel('Registration', 'Site');
+      $model->set('data', new \stdClass());
+    }
+    else {
+      require_once $baseDir . '/components/com_users/models/registration.php';
+      $model = new UsersModelRegistration();
+    }
+
     $ufID = NULL;
 
     // get the default usertype
