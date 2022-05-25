@@ -262,6 +262,45 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * Gets the fields available for importing in a key-name, title format.
+   *
+   * @return array
+   *   eg. ['first_name' => 'First Name'.....]
+   *
+   * @throws \API_Exception
+   *
+   * @todo - we are constructing the metadata before we
+   * have set the contact type so we re-do it here.
+   *
+   * Once we have cleaned up the way the mapper is handled
+   * we can ditch all the existing _construct parameters in favour
+   * of just the userJobID - there are current open PRs towards this end.
+   */
+  public function getAvailableFields(): array {
+    $this->setFieldMetadata();
+    $return = [];
+    foreach ($this->getImportableFieldsMetadata() as $name => $field) {
+      if ($name === 'id' && $this->isSkipDuplicates()) {
+        // Duplicates are being skipped so id matching is not availble.
+        continue;
+      }
+      $return[$name] = $field['title'];
+    }
+    return $return;
+  }
+
+  /**
+   * Did the user specify duplicates should be skipped and not imported.
+   *
+   * @return bool
+   *
+   * @throws \API_Exception
+   */
+  protected function isSkipDuplicates(): bool {
+    return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_SKIP;
+  }
+
+  /**
    * Array of the fields that are actually part of the import process
    * the position in the array also dictates their position in the import
    * file

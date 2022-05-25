@@ -193,4 +193,44 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     return '';
   }
 
+  /**
+   * Get the field mapped to the savable format.
+   *
+   * @param array $fieldMapping
+   * @param int $mappingID
+   * @param int $columnNumber
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMappedField(array $fieldMapping, int $mappingID, int $columnNumber): array {
+    return $this->getParser()->getMappingFieldFromMapperInput($fieldMapping, $mappingID, $columnNumber);
+  }
+
+  /**
+   * Save the mapping field.
+   *
+   * @param int $mappingID
+   * @param int $columnNumber
+   * @param bool $isUpdate
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function saveMappingField(int $mappingID, int $columnNumber, bool $isUpdate = FALSE): void {
+    $fieldMapping = (array) $this->getSubmittedValue('mapper')[$columnNumber];
+    $mappedField = $this->getMappedField($fieldMapping, $mappingID, $columnNumber);
+    if ($isUpdate) {
+      Civi\Api4\MappingField::update(FALSE)
+        ->setValues($mappedField)
+        ->addWhere('column_number', '=', $columnNumber)
+        ->addWhere('mapping_id', '=', $mappingID)
+        ->execute();
+    }
+    else {
+      Civi\Api4\MappingField::create(FALSE)
+        ->setValues($mappedField)->execute();
+    }
+  }
+
 }

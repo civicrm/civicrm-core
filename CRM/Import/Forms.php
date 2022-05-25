@@ -550,9 +550,16 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @throws \API_Exception
    */
   protected function getAvailableFields(): array {
-    $parser = new CRM_Contact_Import_Parser_Contact();
-    $parser->setUserJobID($this->getUserJobID());
-    return $parser->getAvailableFields();
+    return $this->getParser()->getAvailableFields();
+  }
+
+  /**
+   * Get an instance of the parser class.
+   *
+   * @return \CRM_Contact_Import_Parser_Contact|\CRM_Contribute_Import_Parser_Contribution
+   */
+  protected function getParser() {
+    return NULL;
   }
 
 }
