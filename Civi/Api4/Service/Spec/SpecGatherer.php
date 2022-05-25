@@ -122,6 +122,7 @@ class SpecGatherer {
 
     $query = CustomField::get(FALSE)
       ->setSelect(['custom_group_id.name', 'custom_group_id.title', '*'])
+      ->addWhere('is_active', '=', TRUE)
       ->addWhere('custom_group_id.is_multiple', '=', '0');
 
     // Contact custom groups are extra complicated because contact_type can be a value for extends
@@ -196,6 +197,7 @@ class SpecGatherer {
   private function getCustomGroupFields($customGroup, RequestSpec $specification) {
     $customFields = CustomField::get(FALSE)
       ->addWhere('custom_group_id.name', '=', $customGroup)
+      ->addWhere('is_active', '=', TRUE)
       ->setSelect(['custom_group_id.name', 'custom_group_id.table_name', 'custom_group_id.title', '*'])
       ->execute();
 

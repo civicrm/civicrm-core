@@ -90,7 +90,7 @@ class CustomValueTest extends CustomTestBase {
     $this->assertEquals('secondary', $entity['searchable']);
 
     // Retrieve and check the fields of CustomValue = Custom_$group
-    $fields = CustomValue::getFields($group)->setLoadOptions(TRUE)->setCheckPermissions(FALSE)->execute();
+    $fields = CustomValue::getFields($group, FALSE)->setLoadOptions(TRUE)->execute();
     $expectedResult = [
       [
         'custom_group' => $group,
@@ -251,6 +251,16 @@ class CustomValueTest extends CustomTestBase {
         $this->assertEquals($expectedResult[$key][$attr], $result[$key][$attr]);
       }
     }
+
+    // Disable a field
+    CustomField::update(FALSE)
+      ->addValue('is_active', FALSE)
+      ->addWhere('id', '=', $multiField['id'])
+      ->execute();
+
+    $result = CustomValue::get($group)->execute()->single();
+    $this->assertArrayHasKey($colorFieldName, $result);
+    $this->assertArrayNotHasKey($multiFieldName, $result);
 
     // CASE 4: Test CustomValue::delete
     // There is only record left whose id = 3, delete that record on basis of criteria id = 3
