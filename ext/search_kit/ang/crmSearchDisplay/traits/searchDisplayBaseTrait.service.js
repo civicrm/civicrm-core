@@ -46,7 +46,10 @@
         }
 
         // Popup forms in this display or surrounding Afform trigger a refresh
-        $element.closest('form').on('crmPopupFormSuccess', this.getResults);
+        $element.closest('form').on('crmPopupFormSuccess', function() {
+          ctrl.rowCount = null;
+          ctrl.getResults();
+        });
 
         function onChangeFilters() {
           ctrl.page = 1;
