@@ -59,4 +59,29 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
     $this->assertTrue($addresses[1]['is_primary']);
   }
 
+  public function testSearchProximity() {
+    $cid = $this->createTestRecord('Contact')['id'];
+    $sampleData = [
+      ['geo_code_1' => 20, 'geo_code_2' => 20],
+      ['geo_code_1' => 21, 'geo_code_2' => 21],
+      ['geo_code_1' => 19, 'geo_code_2' => 19],
+      ['geo_code_1' => 15, 'geo_code_2' => 15],
+    ];
+    $addreses = $this->saveTestRecords('Address', [
+      'records' => $sampleData,
+      'defaults' => ['contact_id' => $cid],
+    ])->column('id');
+
+    $result = Address::get(FALSE)
+      ->addWhere('contact_id', '=', $cid)
+      ->addWhere('proximity', '<=', ['distance' => 600, 'geo_code_1' => 20, 'geo_code_2' => 20])
+      ->execute()->column('id');
+
+    $this->assertCount(3, $result);
+    $this->assertContains($addreses[0], $result);
+    $this->assertContains($addreses[1], $result);
+    $this->assertContains($addreses[2], $result);
+    $this->assertNotContains($addreses[3], $result);
+  }
+
 }
