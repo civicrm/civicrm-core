@@ -237,31 +237,31 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     return [
       [
         ['name' => 'first_name', 'contact_type' => 'Individual', 'column_number' => 0],
-        "cj('#mapper_0_1').hide();
-cj('#mapper_0_2').hide();
-cj('#mapper_0_3').hide();\n",
+        "CRM.$('#mapper_0_1').hide();
+CRM.$('#mapper_0_2').hide();
+CRM.$('#mapper_0_3').hide();\n",
         ['mapper[0]' => ['first_name', 0, NULL]],
       ],
       [
         ['name' => 'phone', 'contact_type' => 'Individual', 'column_number' => 0, 'phone_type_id' => 1, 'location_type_id' => 2],
-        "cj('#mapper_0_3').hide();\n",
+        "CRM.$('#mapper_0_3').hide();\n",
         ['mapper[0]' => ['phone', 2, 1]],
       ],
       [
         ['name' => 'im', 'contact_type' => 'Individual', 'column_number' => 0, 'im_provider_id' => 1, 'location_type_id' => 2],
-        "cj('#mapper_0_3').hide();\n",
+        "CRM.$('#mapper_0_3').hide();\n",
         ['mapper[0]' => ['im', 2, 1]],
       ],
       [
         ['name' => 'url', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id' => 1],
-        "cj('#mapper_0_2').hide();
-cj('#mapper_0_3').hide();\n",
+        "CRM.$('#mapper_0_2').hide();
+CRM.$('#mapper_0_3').hide();\n",
         ['mapper[0]' => ['url', 1]],
       ],
       [
         // Yes, the relationship mapping really does use url whereas non relationship uses website because... legacy
         ['name' => 'url', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id' => 1, 'relationship_type_id' => 1, 'relationship_direction' => 'a_b'],
-        "cj('#mapper_0_3').hide();\n",
+        "CRM.$('#mapper_0_3').hide();\n",
         ['mapper[0]' => ['1_a_b', 'url', 1]],
       ],
       [
@@ -271,9 +271,9 @@ cj('#mapper_0_3').hide();\n",
       ],
       [
         ['name' => 'do_not_import', 'contact_type' => 'Individual', 'column_number' => 0],
-        "cj('#mapper_0_1').hide();
-cj('#mapper_0_2').hide();
-cj('#mapper_0_3').hide();\n",
+        "CRM.$('#mapper_0_1').hide();
+CRM.$('#mapper_0_2').hide();
+CRM.$('#mapper_0_3').hide();\n",
         ['mapper[0]' => []],
       ],
     ];
