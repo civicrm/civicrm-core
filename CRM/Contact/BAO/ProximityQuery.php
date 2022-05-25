@@ -89,45 +89,6 @@ class CRM_Contact_BAO_ProximityQuery {
   }
 
   /**
-   * Convert longitude and latitude to earth-centered earth-fixed coordinates.
-   * X axis is 0 long, 0 lat; Y axis is 90 deg E; Z axis is north pole.
-   *
-   * @param float $longitude
-   * @param float $latitude
-   * @param float|int $height
-   *
-   * @return array
-   */
-  public static function earthXYZ($longitude, $latitude, $height = 0) {
-    $long = deg2rad($longitude);
-    $lat = deg2rad($latitude);
-
-    $cosLong = cos($long);
-    $cosLat = cos($lat);
-    $sinLong = sin($long);
-    $sinLat = sin($lat);
-
-    $radius = self::$_earthRadiusSemiMajor / sqrt(1 - self::$_earthEccentricitySQ * $sinLat * $sinLat);
-
-    $x = ($radius + $height) * $cosLat * $cosLong;
-    $y = ($radius + $height) * $cosLat * $sinLong;
-    $z = ($radius * (1 - self::$_earthEccentricitySQ) + $height) * $sinLat;
-
-    return [$x, $y, $z];
-  }
-
-  /**
-   * Convert a given angle to earth-surface distance.
-   *
-   * @param float $angle
-   * @param float $latitude
-   * @return float
-   */
-  public static function earthArcLength($angle, $latitude) {
-    return deg2rad($angle) * self::earthRadius($latitude);
-  }
-
-  /**
    * Estimate the min and max longitudes within $distance of a given location.
    *
    * @param float $longitude
@@ -213,9 +174,6 @@ class CRM_Contact_BAO_ProximityQuery {
    */
   public static function where($latitude, $longitude, $distance, $tablePrefix = 'civicrm_address') {
     self::initialize();
-
-    $params = [];
-    $clause = [];
 
     list($minLongitude, $maxLongitude) = self::earthLongitudeRange($longitude, $latitude, $distance);
     list($minLatitude, $maxLatitude) = self::earthLatitudeRange($longitude, $latitude, $distance);
