@@ -148,4 +148,16 @@ class CRM_Member_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
   }
 
+  /**
+   * @return \CRM_Member_Import_Parser_Membership
+   */
+  protected function getParser(): CRM_Member_Import_Parser_Membership {
+    if (!$this->parser) {
+      $this->parser = new CRM_Member_Import_Parser_Membership();
+      $this->parser->setUserJobID($this->getUserJobID());
+      $this->parser->init();
+    }
+    return $this->parser;
+  }
+
 }
