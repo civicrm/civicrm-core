@@ -59,4 +59,16 @@ class CRM_Contribute_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     $this->submitFileForMapping('CRM_Contribute_Import_Parser_Contribution');
   }
 
+  /**
+   * @return \CRM_Contribute_Import_Parser_Contribution
+   */
+  protected function getParser(): CRM_Contribute_Import_Parser_Contribution {
+    if (!$this->parser) {
+      $this->parser = new CRM_Contribute_Import_Parser_Contribution();
+      $this->parser->setUserJobID($this->getUserJobID());
+      $this->parser->init();
+    }
+    return $this->parser;
+  }
+
 }

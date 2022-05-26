@@ -496,9 +496,12 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @return \CRM_Contribute_Import_Parser_Contribution
    */
   protected function getParser(): CRM_Contribute_Import_Parser_Contribution {
-    $parser = new CRM_Contribute_Import_Parser_Contribution();
-    $parser->setUserJobID($this->getUserJobID());
-    return $parser;
+    if (!$this->parser) {
+      $this->parser = new CRM_Contribute_Import_Parser_Contribution();
+      $this->parser->setUserJobID($this->getUserJobID());
+      $this->parser->init();
+    }
+    return $this->parser;
   }
 
 }

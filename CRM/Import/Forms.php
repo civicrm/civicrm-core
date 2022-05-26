@@ -64,6 +64,11 @@ class CRM_Import_Forms extends CRM_Core_Form {
   protected $userJob;
 
   /**
+   * @var \CRM_Import_Parser
+   */
+  protected $parser;
+
+  /**
    * Get User Job.
    *
    * API call to retrieve the userJob row.

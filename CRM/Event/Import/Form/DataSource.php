@@ -59,4 +59,16 @@ class CRM_Event_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     $this->submitFileForMapping('CRM_Event_Import_Parser_Participant');
   }
 
+  /**
+   * @return CRM_Event_Import_Parser_Participant
+   */
+  protected function getParser(): CRM_Event_Import_Parser_Participant {
+    if (!$this->parser) {
+      $this->parser = new CRM_Event_Import_Parser_Participant();
+      $this->parser->setUserJobID($this->getUserJobID());
+      $this->parser->init();
+    }
+    return $this->parser;
+  }
+
 }

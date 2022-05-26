@@ -395,4 +395,16 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
     $parser->set($this);
   }
 
+  /**
+   * @return CRM_Activity_Import_Parser_Activity
+   */
+  protected function getParser(): CRM_Activity_Import_Parser_Activity {
+    if (!$this->parser) {
+      $this->parser = new CRM_Activity_Import_Parser_Activity();
+      $this->parser->setUserJobID($this->getUserJobID());
+      $this->parser->init();
+    }
+    return $this->parser;
+  }
+
 }
