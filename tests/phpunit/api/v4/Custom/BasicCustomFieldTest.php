@@ -95,6 +95,25 @@ class BasicCustomFieldTest extends CustomTestBase {
       ->execute()
       ->first();
     $this->assertEquals(NULL, $contact['MyIndividualFields.FavColor']);
+
+    // Disable the field and it disappears from getFields and from the API output.
+    CustomField::update(FALSE)
+      ->addWhere('custom_group_id:name', '=', 'MyIndividualFields')
+      ->addWhere('name', '=', 'FavColor')
+      ->addValue('is_active', FALSE)
+      ->execute();
+
+    $getFields = Contact::getFields(FALSE)
+      ->execute()->column('name');
+    $this->assertContains('first_name', $getFields);
+    $this->assertNotContains('MyIndividualFields.FavColor', $getFields);
+
+    $contact = Contact::get(FALSE)
+      ->addSelect('MyIndividualFields.FavColor')
+      ->addWhere('id', '=', $contactId)
+      ->execute()
+      ->first();
+    $this->assertArrayNotHasKey('MyIndividualFields.FavColor', $contact);
   }
 
   public function testWithTwoFields() {
