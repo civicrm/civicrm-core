@@ -84,6 +84,13 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * Countries that the site is restricted to
+   *
+   * @var array|false
+   */
+  private $availableCountries;
+
+  /**
    * Get User Job.
    *
    * API call to retrieve the userJob row.
@@ -1363,6 +1370,76 @@ abstract class CRM_Import_Parser {
     }
 
     return NULL;
+  }
+
+  /**
+   * Get the entity for the given field.
+   *
+   * @param string $fieldName
+   *
+   * @return mixed|null
+   * @throws \API_Exception
+   */
+  protected function getFieldEntity(string $fieldName) {
+    if ($fieldName === 'do_not_import') {
+      return NULL;
+    }
+    $metadata = $this->getFieldMetadata($fieldName);
+    if (!isset($metadata['entity'])) {
+      return in_array($metadata['extends'], ['Individual', 'Organization', 'Household'], TRUE) ? 'Contact' : $metadata['extends'];
+    }
+
+    // Our metadata for these is fugly. Handling the fugliness during retrieval.
+    if (in_array($metadata['entity'], ['Country', 'StateProvince', 'County'], TRUE)) {
+      return 'Address';
+    }
+    return $metadata['entity'];
+  }
+
+  /**
+   * Search the value for the string 'invalid_import_value'.
+   *
+   * If the string is found it indicates the fields was rejected
+   * during `getTransformedValue` as not having valid data.
+   *
+   * @param string|array|int $value
+   * @param string $key
+   * @param string $prefixString
+   *
+   * @return array
+   * @throws \API_Exception
+   */
+  protected function getInvalidValues($value, string $key, string $prefixString = ''): array {
+    $errors = [];
+    if ($value === 'invalid_import_value') {
+      $errors[] = $prefixString . $this->getFieldMetadata($key)['title'];
+    }
+    elseif (is_array($value)) {
+      foreach ($value as $innerKey => $innerValue) {
+        $result = $this->getInvalidValues($innerValue, $innerKey, $prefixString);
+        if (!empty($result)) {
+          $errors = array_merge($result, $errors);
+        }
+      }
+    }
+    return array_filter($errors);
+  }
+
+  /**
+   * Get the available countries.
+   *
+   * If the site is not configured with a restriction then all countries are valid
+   * but otherwise only a select array are.
+   *
+   * @return array|false
+   *   FALSE indicates no restrictions.
+   */
+  protected function getAvailableCountries() {
+    if ($this->availableCountries === NULL) {
+      $availableCountries = Civi::settings()->get('countryLimit');
+      $this->availableCountries = !empty($availableCountries) ? array_fill_keys($availableCountries, TRUE) : FALSE;
+    }
+    return $this->availableCountries;
   }
 
 }
