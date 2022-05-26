@@ -424,15 +424,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    * @return void
    */
   public function init() {
-    $this->fieldMetadata = CRM_Member_BAO_Membership::importableFields($this->_contactType, FALSE);
-
-    foreach ($this->fieldMetadata as $name => $field) {
-      // @todo - we don't really need to do all this.... fieldMetadata is just fine to use as is.
-      $field['type'] = CRM_Utils_Array::value('type', $field, CRM_Utils_Type::T_INT);
-      $field['dataPattern'] = CRM_Utils_Array::value('dataPattern', $field, '//');
-      $field['headerPattern'] = CRM_Utils_Array::value('headerPattern', $field, '//');
-      $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern']);
-    }
+    $this->setFieldMetadata();
 
     $this->_newMemberships = [];
 
@@ -1043,6 +1035,25 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    */
   protected function isContactIDColumnPresent(): bool {
     return in_array('membership_contact_id', $this->_mapperKeys, TRUE);
+  }
+
+  /**
+   * Set field metadata.
+   */
+  protected function setFieldMetadata(): void {
+    if (empty($this->importableFieldsMetadata)) {
+      $metadata = CRM_Member_BAO_Membership::importableFields($this->_contactType, FALSE);
+
+      foreach ($this->fieldMetadata as $name => $field) {
+        // @todo - we don't really need to do all this.... fieldMetadata is just fine to use as is.
+        $field['type'] = CRM_Utils_Array::value('type', $field, CRM_Utils_Type::T_INT);
+        $field['dataPattern'] = CRM_Utils_Array::value('dataPattern', $field, '//');
+        $field['headerPattern'] = CRM_Utils_Array::value('headerPattern', $field, '//');
+        $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern']);
+      }
+      // We are consolidating on `importableFieldsMetadata` - but both still used.
+      $this->importableFieldsMetadata = $this->fieldMetadata = $metadata;
+    }
   }
 
 }
