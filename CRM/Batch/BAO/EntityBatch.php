@@ -45,7 +45,7 @@ class CRM_Batch_BAO_EntityBatch extends CRM_Batch_DAO_EntityBatch {
         ->execute()
         ->first();
       if ($batchCurrency && $batchCurrency !== $trxn['currency']) {
-        throw new \CRM_Core_Exception(ts('You can not add items of two different currencies to a single contribution batch.'));
+        throw new \CRM_Core_Exception(ts('You cannot add items of two different currencies to a single contribution batch. Batch id %1 currency: %2. Entity id %3 currency: %4.', [1 => $batchId, 2 => $batchCurrency, 3 => $entityId, 4 => $trxn['currency']]));
       }
       if ($batchPID && $trxn && $batchPID !== $trxn['payment_instrument_id']) {
         $paymentInstrument = CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'payment_instrument_id', $batchPID);
