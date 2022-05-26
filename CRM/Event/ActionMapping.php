@@ -149,7 +149,7 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
     if ($schedule->recipient_listing && $schedule->limit_to) {
       switch ($schedule->recipient) {
         case 'participant_role':
-          $regex = "([[:cntrl:]]|^)" . implode('([[:cntrl:]]|$)|([[:cntrl:]]|^)', (array) $schedule->recipient_listing) . "([[:cntrl:]]|$)";
+          $regex = "([[:cntrl:]]|^)" . implode('([[:cntrl:]]|$)|([[:cntrl:]]|^)', \CRM_Utils_Array::explodePadded($schedule->recipient_listing)) . "([[:cntrl:]]|$)";
           $query->where("e.role_id REGEXP (@regex)")
             ->param('regex', $regex);
           break;
