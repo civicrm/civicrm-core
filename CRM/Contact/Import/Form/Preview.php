@@ -242,26 +242,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
   }
 
   /**
-   * Get the mapped fields as an array of labels.
-   *
-   * e.g
-   * ['First Name', 'Employee Of - First Name', 'Home - Street Address']
-   *
-   * @return array
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
-   */
-  protected function getMappedFieldLabels(): array {
-    $mapper = [];
-    $parser = new CRM_Contact_Import_Parser_Contact();
-    $parser->setUserJobID($this->getUserJobID());
-    foreach ($this->getSubmittedValue('mapper') as $columnNumber => $mappedField) {
-      $mapper[$columnNumber] = $parser->getMappedFieldLabel($parser->getMappingFieldFromMapperInput($mappedField, 0, $columnNumber));
-    }
-    return $mapper;
-  }
-
-  /**
    * @return \CRM_Contact_Import_Parser_Contact
    */
   protected function getParser(): CRM_Contact_Import_Parser_Contact {
