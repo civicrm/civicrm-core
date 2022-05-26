@@ -739,8 +739,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     }
 
     $params = $this->getMappedRow($values);
-    $formatted = ['version' => 3, 'skipRecentView' => TRUE, 'skipCleanMoney' => FALSE];
-
+    $formatted = ['version' => 3, 'skipRecentView' => TRUE, 'skipCleanMoney' => FALSE, 'contribution_id' => $params['id'] ?? NULL];
     //CRM-10994
     if (isset($params['total_amount']) && $params['total_amount'] == 0) {
       $params['total_amount'] = '0.00';
@@ -1537,6 +1536,30 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       throw new CRM_Core_Exception(ts('Invalid email address(duplicate) %1 for Soft Credit. Row was skipped', [1 => $params['email']]));
     }
     return $emails->first()['contact_id'];
+  }
+
+  /**
+   * @param array $mappedField
+   *   Field detail as would be saved in field_mapping table
+   *   or as returned from getMappingFieldFromMapperInput
+   *
+   * @return string
+   * @throws \API_Exception
+   */
+  public function getMappedFieldLabel(array $mappedField): string {
+    if (empty($this->importableFieldsMetadata)) {
+      $this->setFieldMetadata();
+    }
+    $title = [];
+    $title[] = $this->getFieldMetadata($mappedField['name'])['title'];
+    if ($mappedField['soft_credit_match_field']) {
+      $title[] = $this->getFieldMetadata($mappedField['soft_credit_match_field'])['title'];
+    }
+    if ($mappedField['soft_credit_type_id']) {
+      $title[] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', $mappedField['soft_credit_type_id']);
+    }
+
+    return implode(' - ', $title);
   }
 
 }

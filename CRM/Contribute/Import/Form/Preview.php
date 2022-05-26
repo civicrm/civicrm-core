@@ -27,9 +27,6 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
     parent::preProcess();
     //get the data from the session
     $dataValues = $this->get('dataValues');
-    $mapper = $this->get('mapper');
-    $softCreditFields = $this->get('softCreditFields');
-    $mapperSoftCreditType = $this->get('mapperSoftCreditType');
     $invalidRowCount = $this->get('invalidRowCount');
 
     //get the mapping name displayed if the mappingId is set
@@ -47,9 +44,6 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
 
     $properties = [
-      'mapper',
-      'softCreditFields',
-      'mapperSoftCreditType',
       'dataValues',
       'columnCount',
       'totalRowCount',
@@ -58,10 +52,30 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
       'downloadErrorRecordsUrl',
     ];
     $this->setStatusUrl();
+    $this->assign('mapper', $this->getMappedFieldLabels());
 
     foreach ($properties as $property) {
       $this->assign($property, $this->get($property));
     }
+  }
+
+  /**
+   * Get the mapped fields as an array of labels.
+   *
+   * e.g
+   * ['First Name', 'Employee Of - First Name', 'Home - Street Address']
+   *
+   * @return array
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMappedFieldLabels(): array {
+    $mapper = [];
+    $parser = $this->getParser();
+    foreach ($this->getSubmittedValue('mapper') as $columnNumber => $mappedField) {
+      $mapper[$columnNumber] = $parser->getMappedFieldLabel($parser->getMappingFieldFromMapperInput($mappedField, 0, $columnNumber));
+    }
+    return $mapper;
   }
 
   /**

@@ -299,7 +299,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  protected function getUserJobID(array $submittedValues = []): array {
+  protected function getUserJobID(array $submittedValues = []): int {
     $userJobID = UserJob::create()->setValues([
       'metadata' => [
         'submitted_values' => array_merge([
