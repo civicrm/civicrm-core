@@ -184,8 +184,9 @@ class CRM_Upgrade_Snapshot {
    *   How long should we retain old snapshots?
    *   Time is measured in terms of MINOR versions - eg "4" means "retain for 4 MINOR versions".
    *   Thus, on v5.60, you could delete any snapshots predating 5.56.
+   * @return bool
    */
-  public static function cleanupTask(?CRM_Queue_TaskContext $ctx = NULL, string $owner = 'civicrm', ?string $version = NULL, ?int $cleanupAfter = NULL): void {
+  public static function cleanupTask(?CRM_Queue_TaskContext $ctx = NULL, string $owner = 'civicrm', ?string $version = NULL, ?int $cleanupAfter = NULL): bool {
     $version = $version ?: CRM_Core_BAO_Domain::version();
     $cleanupAfter = $cleanupAfter ?: static::$cleanupAfter;
 
@@ -213,6 +214,7 @@ class CRM_Upgrade_Snapshot {
     });
 
     array_map(['CRM_Core_BAO_SchemaHandler', 'dropTable'], $oldTables);
+    return TRUE;
   }
 
 }
