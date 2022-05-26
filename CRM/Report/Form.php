@@ -3067,9 +3067,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     if ($applyLimit && empty($this->_params['charts'])) {
       $this->limit();
     }
-    CRM_Utils_Hook::alterReportVar('sql', $this, $this);
 
     $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
+    CRM_Utils_Hook::alterReportVar('sql', $sql, $this);
+
     $this->addToDeveloperTab($sql);
     return $sql;
   }
