@@ -27,6 +27,7 @@ class AddressGetSpecProvider implements Generic\SpecProviderInterface {
     $field = new FieldSpec('proximity', 'Address', 'Boolean');
     $field->setLabel(ts('Address Proximity'))
       ->setTitle(ts('Address Proximity'))
+      ->setInputType('Location')
       ->setColumnName('geo_code_1')
       ->setDescription(ts('Address is within a given distance to a location'))
       ->setType('Filter')

@@ -9,7 +9,7 @@
     },
     require: {ngModel: 'ngModel'},
     template: '<div class="form-group" ng-include="$ctrl.getTemplate()"></div>',
-    controller: function($scope, formatForSelect2) {
+    controller: function($scope, formatForSelect2, crmApi4) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
@@ -95,11 +95,31 @@
         }
       };
 
+      this.lookupAddress = function() {
+        ctrl.value.geo_code_1 = null;
+        ctrl.value.geo_code_2 = null;
+        if (ctrl.value.address) {
+          crmApi4('Address', 'getCoordinates', {
+            address: ctrl.value.address
+          }).then(function(coordinates) {
+            if (coordinates[0]) {
+              ctrl.value.geo_code_1 = coordinates[0].geo_code_1;
+              ctrl.value.geo_code_2 = coordinates[0].geo_code_2;
+            }
+          });
+        }
+      };
+
       this.getTemplate = function() {
         var field = ctrl.field || {};
 
         if (_.includes(['LIKE', 'NOT LIKE', 'REGEXP', 'NOT REGEXP'], ctrl.op)) {
           return '~/crmSearchTasks/crmSearchInput/text.html';
+        }
+
+        if (field.input_type === 'Location') {
+          ctrl.value = ctrl.value || {distance_unit: CRM.crmSearchAdmin.defaultDistanceUnit};
+          return '~/crmSearchTasks/crmSearchInput/location.html';
         }
 
         if (isDateField(field)) {
