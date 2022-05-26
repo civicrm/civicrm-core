@@ -1419,22 +1419,25 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     if (!isset($this->id)) {
       return [];
     }
-    $mg = new CRM_Mailing_DAO_MailingGroup();
-    $mgtable = CRM_Mailing_DAO_MailingGroup::getTableName();
-    $group = CRM_Contact_BAO_Group::getTableName();
 
-    $mg->query("SELECT      $group.title as name FROM $mgtable
-                    INNER JOIN  $group ON $mgtable.entity_id = $group.id
-                    WHERE       $mgtable.mailing_id = {$this->id}
-                        AND     $mgtable.entity_table = '$group'
-                        AND     $mgtable.group_type = 'Include'
-                    ORDER BY    $group.name");
+    $mailingGroups = \Civi\Api4\MailingGroup::get()
+      ->addSelect('group.title', 'group.frontend_title')
+      ->addJoin('Group AS group', 'LEFT', ['entity_id', '=', 'group.id'])
+      ->addWhere('mailing_id', '=', $this->id)
+      ->addWhere('entity_table', '=', 'civicrm_group')
+      ->addWhere('group_type', '=', 'Include')
+      ->execute();
 
-    $groups = [];
-    while ($mg->fetch()) {
-      $groups[] = $mg->name;
+    $groupNames = [];
+
+    foreach ($mailingGroups as $mg) {
+      $name = $mg['group.frontend_title'] ?? $mg['group.title'];
+      if ($name) {
+        $groupNames[] = $name;
+      }
     }
-    return $groups;
+
+    return $groupNames;
   }
 
   /**
