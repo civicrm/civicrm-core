@@ -19,13 +19,14 @@
  * @return integer
  */
 function smarty_modifier_crmCountCharacters($string, $include_spaces = FALSE) {
+  if (is_null($string)) {
+    return 0;
+  }
+
   if ($include_spaces) {
     return(strlen($string));
   }
 
-  if (is_null($string)) {
-    return 0;
-  }
   return preg_match_all("/[^\s]/", $string, $match);
 }
 
