@@ -106,7 +106,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     else {
       $savedMapping = $this->get('savedMapping');
 
-      list($mappingName) = CRM_Core_BAO_Mapping::getMappingFields($savedMapping);
+      [$mappingName] = CRM_Core_BAO_Mapping::getMappingFields($savedMapping);
 
       $mappingName = $mappingName[1];
 
@@ -169,10 +169,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       $jsSet = FALSE;
       if ($this->get('savedMapping')) {
         if (isset($mappingName[$i])) {
-          if ($mappingName[$i] != ts('- do not import -')) {
-
-            $mappingHeader = array_keys($this->_mapperFields, $mappingName[$i]);
-
+          if ($mappingName[$i] != ts('do_not_import')) {
             //When locationType is not set
             $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
 
@@ -181,7 +178,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
 
             $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
 
-            $defaults["mapper[$i]"] = array($mappingHeader[0]);
+            $defaults["mapper[$i]"] = [$mappingName[$i]];
             $jsSet = TRUE;
           }
           else {
@@ -208,7 +205,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
       else {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_" . $i . "_');\n";
-        if ($hasHeaders) {
+        if ($this->getSubmittedValue('skipColumnHeader')) {
           // Infer the default from the skipped headers if we have them
           $defaults["mapper[$i]"] = array(
             $this->defaultFromHeader($this->_columnHeaders[$i],
@@ -293,27 +290,27 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       'membership_start_date' => ts('Membership Start Date'),
     );
 
-    $contactTypeId = $self->get('contactType');
-    $contactTypes = array(
-      CRM_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
-      CRM_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
-      CRM_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
-    );
-    $params = array(
-      'used' => 'Unsupervised',
-      'contact_type' => $contactTypes[$contactTypeId],
-    );
+      $contactTypeId = $self->get('contactType');
+      $contactTypes = array(
+        CRM_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
+        CRM_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
+        CRM_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
+      );
+      $params = array(
+        'used' => 'Unsupervised',
+        'contact_type' => $contactTypes[$contactTypeId],
+      );
     list($ruleFields, $threshold) = CRM_Dedupe_BAO_DedupeRuleGroup::dedupeRuleFieldsWeight($params);
-    $weightSum = 0;
-    foreach ($importKeys as $key => $val) {
-      if (array_key_exists($val, $ruleFields)) {
-        $weightSum += $ruleFields[$val];
+      $weightSum = 0;
+      foreach ($importKeys as $key => $val) {
+        if (array_key_exists($val, $ruleFields)) {
+          $weightSum += $ruleFields[$val];
+        }
       }
-    }
-    $fieldMessage = '';
-    foreach ($ruleFields as $field => $weight) {
-      $fieldMessage .= ' ' . $field . '(weight ' . $weight . ')';
-    }
+      $fieldMessage = '';
+      foreach ($ruleFields as $field => $weight) {
+        $fieldMessage .= ' ' . $field . '(weight ' . $weight . ')';
+      }
 
     foreach ($requiredFields as $field => $title) {
       if (!in_array($field, $importKeys)) {
@@ -395,24 +392,8 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
     //Updating Mapping Records
     if (!empty($params['updateMapping'])) {
-      $mappingFields = new CRM_Core_DAO_MappingField();
-      $mappingFields->mapping_id = $params['mappingId'];
-      $mappingFields->find();
-
-      $mappingFieldsId = [];
-      while ($mappingFields->fetch()) {
-        if ($mappingFields->id) {
-          $mappingFieldsId[$mappingFields->column_number] = $mappingFields->id;
-        }
-      }
-
       for ($i = 0; $i < $this->_columnCount; $i++) {
-        $updateMappingFields = new CRM_Core_DAO_MappingField();
-        $updateMappingFields->id = $mappingFieldsId[$i];
-        $updateMappingFields->mapping_id = $params['mappingId'];
-        $updateMappingFields->column_number = $i;
-        $updateMappingFields->name = $mapper[$i];
-        $updateMappingFields->save();
+        $this->saveMappingField($params['mappingId'], $i, TRUE);
       }
     }
 
@@ -426,14 +407,9 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       $saveMapping = CRM_Core_BAO_Mapping::add($mappingParams);
 
       for ($i = 0; $i < $this->_columnCount; $i++) {
-
-        $saveMappingFields = new CRM_Core_DAO_MappingField();
-        $saveMappingFields->mapping_id = $saveMapping->id;
-        $saveMappingFields->column_number = $i;
-        $saveMappingFields->name = $mapper[$i];
-        $saveMappingFields->save();
+        $this->saveMappingField($saveMapping->id, $i);
       }
-      $this->set('savedMapping', $saveMappingFields->mapping_id);
+      $this->set('savedMapping', $saveMapping->id);
     }
 
     $parser = new CRM_Member_Import_Parser_Membership($mapperKeysMain);

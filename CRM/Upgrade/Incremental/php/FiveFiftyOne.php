@@ -91,6 +91,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
     $fieldMap[ts(ts('Payment Method'))] = 'payment_instrument_id';
     $fieldMap[ts('- do not import -')] = 'do_not_import';
 
+    // Membership fields
     foreach ($mappings as $mapping) {
       if (!empty($fieldMap[$mapping['name']])) {
         MappingField::update(FALSE)
@@ -99,6 +100,32 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
           ->execute();
       }
     }
+
+    // Membership fields...
+    // Yes - I know they could be combined - but it's also less confusing this way.
+    $mappings = MappingField::get(FALSE)
+      ->setSelect(['id', 'name'])
+      ->addWhere('mapping_id.mapping_type_id:name', '=', 'Import Membership')
+      ->execute();
+    $fields = CRM_Member_BAO_Membership::importableFields('All', FALSE);;
+    $fieldMap = [];
+    foreach ($fields as $fieldName => $field) {
+      $fieldMap[$field['title']] = $fieldName;
+      if (!empty($field['html']['label'])) {
+        $fieldMap[$field['html']['label']] = $fieldName;
+      }
+    }
+    $fieldMap[ts('- do not import -')] = 'do_not_import';
+
+    foreach ($mappings as $mapping) {
+      if (!empty($fieldMap[$mapping['name']])) {
+        MappingField::update(FALSE)
+          ->addWhere('id', '=', $mapping['id'])
+          ->addValue('name', $fieldMap[$mapping['name']])
+          ->execute();
+      }
+    }
+
     return TRUE;
   }
 

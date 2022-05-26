@@ -75,17 +75,8 @@ class CRM_Member_Import_Form_Preview extends CRM_Import_Form_Preview {
     $onDuplicate = $this->get('onDuplicate');
 
     $mapper = $this->controller->exportValue('MapField', 'mapper');
-    $mapperKeys = [];
-    // Note: we keep the multi-dimension array (even thought it's not
-    // needed in the case of memberships import) so that we can merge
-    // the common code with contacts import later and subclass contact
-    // and membership imports from there
-    foreach ($mapper as $key => $value) {
-      $mapperKeys[$key] = $mapper[$key][0];
-    }
 
-    $parser = new CRM_Member_Import_Parser_Membership($mapperKeys);
-    $parser->setUserJobID($this->getUserJobID());
+    $parser = $this->getParser();
 
     $mapFields = $this->get('fields');
 
