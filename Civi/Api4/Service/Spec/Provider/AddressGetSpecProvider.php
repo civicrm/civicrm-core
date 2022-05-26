@@ -12,6 +12,7 @@
 
 namespace Civi\Api4\Service\Spec\Provider;
 
+use Civi\Api4\Address;
 use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
@@ -64,6 +65,12 @@ class AddressGetSpecProvider implements Generic\SpecProviderInterface {
       $distance = $distance * 1000.00;
     }
 
+    if (!isset($value['geo_code_1'], $value['geo_code_2'])) {
+      $value = Address::getCoordinates(FALSE)
+        ->setAddress($value['address'])
+        ->execute()->first();
+    }
+
     if (
       isset($value['geo_code_1']) && is_numeric($value['geo_code_1']) &&
       isset($value['geo_code_2']) && is_numeric($value['geo_code_2'])
@@ -75,7 +82,6 @@ class AddressGetSpecProvider implements Generic\SpecProviderInterface {
         explode('.', $fieldAlias)[0]
       );
     }
-    // Todo: If address string given without lat/long, convert it.
 
     return '(0)';
   }
