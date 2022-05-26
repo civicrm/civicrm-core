@@ -311,8 +311,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     //format common data, CRM-4062
     $this->formatCommonData($params, $formatted, $contactFields);
 
-    $relationship = FALSE;
-
     //fixed CRM-4148
     //now we create new contact in update/fill mode also.
     $contactID = NULL;
@@ -325,7 +323,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
 
     if (isset($newContact) && is_object($newContact) && ($newContact instanceof CRM_Contact_BAO_Contact)) {
-      $relationship = TRUE;
       $newContact = clone($newContact);
       $contactID = $newContact->id;
       $this->_newContacts[] = $contactID;
@@ -344,7 +341,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         return CRM_Import_Parser::DUPLICATE;
       }
 
-      $relationship = TRUE;
       // CRM-10433/CRM-20739 - IDs could be string or array; handle accordingly
       if (!is_array($dupeContactIDs = $newContact['error_message']['params'][0])) {
         $dupeContactIDs = explode(',', $dupeContactIDs);
@@ -376,7 +372,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       CRM_Utils_Hook::import('Contact', 'process', $this, $hookParams);
     }
 
-    if ($relationship) {
+    if (1) {
       $primaryContactId = NULL;
       if (CRM_Core_Error::isAPIError($newContact, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
         if ($dupeCount == 1 && CRM_Utils_Rule::integer($contactID)) {
