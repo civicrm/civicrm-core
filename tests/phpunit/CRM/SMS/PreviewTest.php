@@ -27,7 +27,7 @@ class CRM_SMS_PreviewTest extends CiviUnitTestCase {
   /**
    * Test SMS preview.
    */
-  public function testSMSPreview() {
+  public function testSMSPreview(): void {
     $result = $this->callAPISuccess('SmsProvider', 'create', [
       'title' => 'test SMS provider',
       'username' => 'test',
@@ -41,10 +41,10 @@ class CRM_SMS_PreviewTest extends CiviUnitTestCase {
     $provider_id = $result['id'];
     $result = $this->callAPISuccess('Mailing', 'create', [
       'name' => "Test1",
-      'from_name' => "+12223334444",
-      'from_email' => "test@test.com",
+      'from_name' => '+12223334444',
+      'from_email' => 'test@test.com',
       'replyto_email' => "test@test.com",
-      'body_text' => "Testing body",
+      'body_text' => 'Testing body',
       'sms_provider_id' => $provider_id,
       'header_id' => NULL,
       'footer_id' => NULL,
