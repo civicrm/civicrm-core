@@ -694,7 +694,7 @@ abstract class CRM_Import_Parser {
    */
   protected function checkContactDuplicate(&$formatValues) {
     //retrieve contact id using contact dedupe rule
-    $formatValues['contact_type'] = $formatValues['contact_type'] ?? $this->_contactType;
+    $formatValues['contact_type'] = $formatValues['contact_type'] ?? $this->getContactType();
     $formatValues['version'] = 3;
     require_once 'CRM/Utils/DeprecatedUtils.php';
     $params = $formatValues;
@@ -723,7 +723,7 @@ abstract class CRM_Import_Parser {
       }
       // CRM-17040, Considering only primary contact when importing contributions. So contribution inserts into primary contact
       // instead of soft credit contact.
-      if (is_array($field) && $key != "soft_credit") {
+      if (is_array($field) && $key !== "soft_credit") {
         foreach ($field as $value) {
           $break = FALSE;
           if (is_array($value)) {

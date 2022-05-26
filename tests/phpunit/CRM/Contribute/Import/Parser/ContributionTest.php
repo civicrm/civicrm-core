@@ -7,6 +7,7 @@
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionSoft;
 use Civi\Api4\OptionValue;
+use Civi\Api4\UserJob;
 
 /**
  *  Test Contribution import parser.
@@ -68,9 +69,13 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'external_identifier' => 'ext-1',
       'soft_credit' => 'ext-2',
     ];
-    $mapperSoftCredit = [NULL, NULL, NULL, 'external_identifier'];
-    $mapperSoftCreditType = [NULL, NULL, NULL, '1'];
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT, $mapperSoftCredit, NULL, $mapperSoftCreditType);
+    $mapping = [
+      ['name' => 'total_amount'],
+      ['name' => 'financial_type_id'],
+      ['name' => 'external_identifier'],
+      ['name' => 'soft_credit', 'soft_credit_type_id' => 1, 'soft_credit_match_field' => 'external_identifier'],
+    ];
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT, $mapping);
 
     $contributionsOfMainContact = Contribution::get()->addWhere('contact_id', '=', $contact1Id)->execute();
     $this->assertCount(1, $contributionsOfMainContact, 'Contribution not added for primary contact');
@@ -251,21 +256,73 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    *
    * @param int $onDuplicateAction
    * @param int|null $expectedResult
-   * @param array|null $mapperSoftCredit
-   * @param array|null $mapperPhoneType
-   * @param array|null $mapperSoftCreditType
+   * @param array|null $mappings
    * @param array|null $fields
    *   Array of field names. Will be calculated from $originalValues if not passed in.
    */
-  protected function runImport(array $originalValues, int $onDuplicateAction, ?int $expectedResult, array $mapperSoftCredit = NULL, array $mapperPhoneType = NULL, array $mapperSoftCreditType = NULL, array $fields = NULL): void {
+  protected function runImport(array $originalValues, int $onDuplicateAction, ?int $expectedResult, array $mappings = [], array $fields = NULL): void {
     if (!$fields) {
       $fields = array_keys($originalValues);
     }
+    $mapper = [];
+    if ($mappings) {
+      foreach ($mappings as $mapping) {
+        $fieldInput = [$mapping['name']];
+        if (!empty($mapping['soft_credit_type_id'])) {
+          $fieldInput[1] = $mapping['soft_credit_match_field'];
+          $fieldInput[2] = $mapping['soft_credit_type_id'];
+        }
+        $mapper[] = $fieldInput;
+      }
+    }
+    else {
+      foreach ($fields as $field) {
+        $mapper[] = [$field];
+      }
+    }
     $values = array_values($originalValues);
-    $parser = new CRM_Contribute_Import_Parser_Contribution($fields, $mapperSoftCredit, $mapperPhoneType, $mapperSoftCreditType);
-    $parser->_contactType = 'Individual';
+    $parser = new CRM_Contribute_Import_Parser_Contribution($fields);
+    $parser->setUserJobID($this->getUserJobID([
+      'onDuplicate' => $onDuplicateAction,
+      'mapper' => $mapper,
+    ]));
     $parser->init();
+
     $this->assertEquals($expectedResult, $parser->import($onDuplicateAction, $values), 'Return code from parser import was not as expected');
+  }
+
+  /**
+   * @param array $submittedValues
+   *
+   * @return array
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function getUserJobID(array $submittedValues = []): array {
+    $userJobID = UserJob::create()->setValues([
+      'metadata' => [
+        'submitted_values' => array_merge([
+          'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+          'contactSubType' => '',
+          'dataSource' => 'CRM_Import_DataSource_SQL',
+          'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
+          'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+          'dedupe_rule_id' => NULL,
+          'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
+        ], $submittedValues),
+      ],
+      'status_id:name' => 'draft',
+      'type_id:name' => 'contact_import',
+    ])->execute()->first()['id'];
+    if ($submittedValues['dataSource'] ?? NULL === 'CRM_Import_DataSource') {
+      $dataSource = new CRM_Import_DataSource_CSV($userJobID);
+    }
+    else {
+      $dataSource = new CRM_Import_DataSource_SQL($userJobID);
+    }
+    $dataSource->initialize();
+    return $userJobID;
   }
 
   /**

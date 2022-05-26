@@ -69,28 +69,13 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
    */
   public function postProcess() {
     $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
-    $invalidRowCount = $this->get('invalidRowCount');
     $onDuplicate = $this->get('onDuplicate');
-    $mapperSoftCreditType = $this->get('mapperSoftCreditType');
-
+    $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
     $mapper = $this->controller->exportValue('MapField', 'mapper');
-    $mapperKeys = [];
-    $mapperSoftCredit = [];
-    $mapperPhoneType = [];
 
-    foreach ($mapper as $key => $value) {
-      $mapperKeys[$key] = $mapper[$key][0];
-      if (isset($mapper[$key][0]) && $mapper[$key][0] == 'soft_credit' && isset($mapper[$key])) {
-        $mapperSoftCredit[$key] = $mapper[$key][1] ?? '';
-        $mapperSoftCreditType[$key] = $mapperSoftCreditType[$key]['value'];
-      }
-      else {
-        $mapperSoftCredit[$key] = $mapperSoftCreditType[$key] = NULL;
-      }
-    }
-
-    $parser = new CRM_Contribute_Import_Parser_Contribution($mapperKeys, $mapperSoftCredit, $mapperPhoneType, $mapperSoftCreditType);
+    $parser = new CRM_Contribute_Import_Parser_Contribution();
     $parser->setUserJobID($this->getUserJobID());
+
     $mapFields = $this->get('fields');
 
     foreach ($mapper as $key => $value) {

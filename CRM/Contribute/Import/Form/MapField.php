@@ -166,7 +166,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     foreach ($mapperKeys as $key) {
       $this->_fieldUsed[$key] = FALSE;
     }
-    $this->_location_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $sel1 = $this->_mapperFields;
 
     if (!$this->get('onDuplicate')) {
@@ -420,8 +419,9 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->controller->resetPage($this->_name);
       return;
     }
+    $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
 
-    $mapper = $mapperKeys = $mapperKeysMain = $mapperSoftCredit = $softCreditFields = $mapperPhoneType = $mapperSoftCreditType = [];
+    $mapper = $mapperKeysMain = $mapperSoftCredit = $softCreditFields = $mapperPhoneType = $mapperSoftCreditType = [];
     $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
 
     $softCreditTypes = CRM_Core_OptionGroup::values('soft_credit_type');
@@ -478,7 +478,8 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->set('savedMapping', $saveMapping->id);
     }
 
-    $parser = new CRM_Contribute_Import_Parser_Contribution($mapperKeysMain, $mapperSoftCredit, $mapperPhoneType);
+    $parser = new CRM_Contribute_Import_Parser_Contribution($mapperKeysMain);
+    $parser->setUserJobID($this->getUserJobID());
     $parser->run(
       $this->getSubmittedValue('uploadFile'),
       $this->getSubmittedValue('fieldSeparator'),

@@ -15,17 +15,15 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Contact;
+use Civi\Api4\Email;
+
 /**
  * Class to parse contribution csv files.
  */
 class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
   protected $_mapperKeys;
-
-  private $_contactIdIndex;
-
-  protected $_mapperSoftCredit;
-  //protected $_mapperPhoneType;
 
   /**
    * Array of successfully imported contribution id's
@@ -38,15 +36,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * Class constructor.
    *
    * @param $mapperKeys
-   * @param array $mapperSoftCredit
-   * @param null $mapperPhoneType
-   * @param array $mapperSoftCreditType
    */
-  public function __construct(&$mapperKeys = [], $mapperSoftCredit = [], $mapperPhoneType = NULL, $mapperSoftCreditType = []) {
+  public function __construct($mapperKeys = []) {
     parent::__construct();
-    $this->_mapperKeys = &$mapperKeys;
-    $this->_mapperSoftCredit = &$mapperSoftCredit;
-    $this->_mapperSoftCreditType = &$mapperSoftCreditType;
+    $this->_mapperKeys = $mapperKeys;
   }
 
   /**
@@ -164,19 +157,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       throw new CRM_Core_Exception('Unable to determine import file');
     }
     $fileName = $fileName['name'];
-
-    switch ($contactType) {
-      case self::CONTACT_INDIVIDUAL:
-        $this->_contactType = 'Individual';
-        break;
-
-      case self::CONTACT_HOUSEHOLD:
-        $this->_contactType = 'Household';
-        break;
-
-      case self::CONTACT_ORGANIZATION:
-        $this->_contactType = 'Organization';
-    }
+    // Since $this->_contactType is still being called directly do a get call
+    // here to make sure it is instantiated.
+    $this->getContactType();
 
     $this->init();
 
@@ -405,65 +388,24 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   }
 
   /**
-   * Store the soft credit field information.
+   * Get the field mappings for the import.
    *
-   * This  was perhaps done this way on the believe that a lot of code pain
-   * was worth it to avoid negligible-cost array iterations. Perhaps we could prioritise
-   * readability & maintainability next since we can just work with functions to retrieve
-   * data from the metadata.
-   *
-   * @param array $elements
-   */
-  public function setActiveFieldSoftCredit($elements) {
-    foreach ((array) $elements as $i => $element) {
-      $this->_activeFields[$i]->_softCreditField = $element;
-    }
-  }
-
-  /**
-   * Store the soft credit field type information.
-   *
-   * This  was perhaps done this way on the believe that a lot of code pain
-   * was worth it to avoid negligible-cost array iterations. Perhaps we could prioritise
-   * readability & maintainability next since we can just work with functions to retrieve
-   * data from the metadata.
-   *
-   * @param array $elements
-   */
-  public function setActiveFieldSoftCreditType($elements) {
-    foreach ((array) $elements as $i => $element) {
-      $this->_activeFields[$i]->_softCreditType = $element;
-    }
-  }
-
-  /**
-   * Format the field values for input to the api.
+   * This is the same format as saved in civicrm_mapping_field except
+   * that location_type_id = 'Primary' rather than empty where relevant.
+   * Also 'im_provider_id' is mapped to the 'real' field name 'provider_id'
    *
    * @return array
-   *   (reference ) associative array of name/value pairs
+   * @throws \API_Exception
    */
-  public function &getActiveFieldParams() {
-    $params = [];
-    for ($i = 0; $i < $this->_activeFieldCount; $i++) {
-      if (isset($this->_activeFields[$i]->_value)) {
-        if (isset($this->_activeFields[$i]->_softCreditField)) {
-          if (!isset($params[$this->_activeFields[$i]->_name])) {
-            $params[$this->_activeFields[$i]->_name] = [];
-          }
-          $params[$this->_activeFields[$i]->_name][$i][$this->_activeFields[$i]->_softCreditField] = $this->_activeFields[$i]->_value;
-          if (isset($this->_activeFields[$i]->_softCreditType)) {
-            $params[$this->_activeFields[$i]->_name][$i]['soft_credit_type_id'] = $this->_activeFields[$i]->_softCreditType;
-          }
-        }
-
-        if (!isset($params[$this->_activeFields[$i]->_name])) {
-          if (!isset($this->_activeFields[$i]->_softCreditField)) {
-            $params[$this->_activeFields[$i]->_name] = $this->_activeFields[$i]->_value;
-          }
-        }
-      }
+  protected function getFieldMappings(): array {
+    $mappedFields = [];
+    foreach ($this->getSubmittedValue('mapper') as $i => $mapperRow) {
+      $mappedField = $this->getMappingFieldFromMapperInput($mapperRow, 0, $i);
+      // Just for clarity since 0 is a pseudo-value
+      unset($mappedField['mapping_id']);
+      $mappedFields[] = $mappedField;
     }
-    return $params;
+    return $mappedFields;
   }
 
   /**
@@ -695,22 +637,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     $this->_newContributions = [];
 
     $this->setActiveFields($this->_mapperKeys);
-    $this->setActiveFieldSoftCredit($this->_mapperSoftCredit);
-    $this->setActiveFieldSoftCreditType($this->_mapperSoftCreditType);
-
-    // FIXME: we should do this in one place together with Form/MapField.php
-    $this->_contactIdIndex = -1;
-
-    $index = 0;
-    foreach ($this->_mapperKeys as $key) {
-      switch ($key) {
-        case 'contribution_contact_id':
-          $this->_contactIdIndex = $index;
-          break;
-
-      }
-      $index++;
-    }
   }
 
   /**
@@ -766,9 +692,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    *   CRM_Import_Parser::VALID or CRM_Import_Parser::ERROR
    */
   public function summary(&$values) {
-    $this->setActiveFieldValues($values);
-
-    $params = $this->getActiveFieldParams();
+    $params = $this->getMappedRow($values);
 
     //for date-Formats
     $errorMessage = implode('; ', $this->formatDateFields($params));
@@ -814,7 +738,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       return CRM_Import_Parser::ERROR;
     }
 
-    $params = &$this->getActiveFieldParams();
+    $params = $this->getMappedRow($values);
     $formatted = ['version' => 3, 'skipRecentView' => TRUE, 'skipCleanMoney' => FALSE];
 
     //CRM-10994
@@ -842,9 +766,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     ) {
       $paramValues['contact_type'] = $this->_contactType;
     }
-    elseif (!empty($params['soft_credit'])) {
-      $paramValues['contact_type'] = $this->_contactType;
-    }
     elseif (!empty($paramValues['pledge_payment'])) {
       $paramValues['contact_type'] = $this->_contactType;
     }
@@ -853,7 +774,14 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     if (!empty($paramValues['pledge_payment'])) {
       $paramValues['onDuplicate'] = $onDuplicate;
     }
-    $formatError = $this->deprecatedFormatParams($paramValues, $formatted, TRUE, $onDuplicate);
+    try {
+      $formatError = $this->deprecatedFormatParams($paramValues, $formatted, TRUE, $onDuplicate);
+    }
+    catch (CRM_Core_Exception $e) {
+      array_unshift($values, $e->getMessage());
+      $errorMapping = ['soft_credit' => self::SOFT_CREDIT_ERROR, 'pledge_payment' => self::PLEDGE_PAYMENT_ERROR];
+      return $errorMapping[$e->getErrorCode()] ?? CRM_Import_Parser::ERROR;
+    }
 
     if ($formatError) {
       array_unshift($values, $formatError['error_message']);
@@ -950,7 +878,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       }
     }
 
-    if ($this->_contactIdIndex < 0) {
+    if (empty($formatted['contact_id'])) {
 
       $error = $this->checkContactDuplicate($paramValues);
 
@@ -1208,6 +1136,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @param int $onDuplicate
    *
    * @return array|CRM_Error
+   * @throws \CRM_Core_Exception
    */
   private function deprecatedFormatParams($params, &$values, $create = FALSE, $onDuplicate = NULL) {
     require_once 'CRM/Utils/DeprecatedUtils.php';
@@ -1252,7 +1181,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       }
 
       switch ($key) {
-        case 'contribution_contact_id':
+        case 'contact_id':
           if (!CRM_Utils_Rule::integer($value)) {
             return civicrm_api3_create_error("contact_id not valid: $value");
           }
@@ -1267,9 +1196,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           elseif ($svq == 1) {
             return civicrm_api3_create_error("Invalid Contact ID: contact_id $value is a soft-deleted contact.");
           }
-
-          $values['contact_id'] = $values['contribution_contact_id'];
-          unset($values['contribution_contact_id']);
+          $values['contact_id'] = $value;
           break;
 
         case 'contact_type':
@@ -1369,58 +1296,11 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         case 'soft_credit':
           // import contribution record according to select contact type
           // validate contact id and external identifier.
-          $value[$key] = $mismatchContactType = $softCreditContactIds = '';
-          if (isset($params[$key]) && is_array($params[$key])) {
-            foreach ($params[$key] as $softKey => $softParam) {
-              $contactId = $softParam['contact_id'] ?? NULL;
-              $externalId = $softParam['external_identifier'] ?? NULL;
-              $email = $softParam['email'] ?? NULL;
-              if ($contactId || $externalId) {
-                require_once 'CRM/Contact/DAO/Contact.php';
-                $contact = new CRM_Contact_DAO_Contact();
-                $contact->id = $contactId;
-                $contact->external_identifier = $externalId;
-                $errorMsg = NULL;
-                if (!$contact->find(TRUE)) {
-                  $field = $contactId ? ts('Contact ID') : ts('External ID');
-                  $errorMsg = ts("Soft Credit %1 - %2 doesn't exist. Row was skipped.",
-                    [1 => $field, 2 => $contactId ? $contactId : $externalId]);
-                }
-
-                if ($errorMsg) {
-                  return civicrm_api3_create_error($errorMsg);
-                }
-
-                // finally get soft credit contact id.
-                $values[$key][$softKey] = $softParam;
-                $values[$key][$softKey]['contact_id'] = $contact->id;
-              }
-              elseif ($email) {
-                if (!CRM_Utils_Rule::email($email)) {
-                  return civicrm_api3_create_error("Invalid email address $email provided for Soft Credit. Row was skipped");
-                }
-
-                // get the contact id from duplicate contact rule, if more than one contact is returned
-                // we should return error, since current interface allows only one-one mapping
-                $emailParams = [
-                  'email' => $email,
-                  'contact_type' => $params['contact_type'],
-                ];
-                $checkDedupe = _civicrm_api3_deprecated_duplicate_formatted_contact($emailParams);
-                if (!$checkDedupe['is_error']) {
-                  return civicrm_api3_create_error("Invalid email address(doesn't exist) $email for Soft Credit. Row was skipped");
-                }
-                $matchingContactIds = explode(',', $checkDedupe['error_message']['params'][0]);
-                if (count($matchingContactIds) > 1) {
-                  return civicrm_api3_create_error("Invalid email address(duplicate) $email for Soft Credit. Row was skipped");
-                }
-                if (count($matchingContactIds) == 1) {
-                  $contactId = $matchingContactIds[0];
-                  unset($softParam['email']);
-                  $values[$key][$softKey] = $softParam + ['contact_id' => $contactId];
-                }
-              }
-            }
+          foreach ($value as $softKey => $softParam) {
+            $values['soft_credit'][$softKey] = [
+              'contact_id' => $this->lookupMatchingContact($softParam),
+              'soft_credit_type_id' => $softParam['soft_credit_type_id'],
+            ];
           }
           break;
 
@@ -1593,8 +1473,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @throws \API_Exception
    */
   public function getMappingFieldFromMapperInput(array $fieldMapping, int $mappingID, int $columnNumber): array {
-    $isRelationshipField = preg_match('/\d*_a_b|b_a$/', $fieldMapping[0]);
-    $fieldName = $isRelationshipField ? $fieldMapping[1] : $fieldMapping[0];
     return [
       'name' => $fieldMapping[0],
       'mapping_id' => $mappingID,
@@ -1607,6 +1485,58 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       // This field is actually not saved at all :-( It is lost each time.
       'soft_credit_type_id' => $fieldMapping[2] ?? NULL,
     ];
+  }
+
+  /**
+   * Lookup matching contact.
+   *
+   * This looks up the matching contact from the contact id, external identifier
+   * or email. For the email a straight email search is done - this is equivalent
+   * to what happens on a dedupe rule lookup when the only field is 'email' - but
+   * we can't be sure the rule is 'just email' - and we are not collecting the
+   * fields for any other lookup in the case of soft credits (if we
+   * extend this function to main-contact-lookup we can handle full dedupe
+   * lookups - but note the error messages will need tweaking.
+   *
+   * @param array $params
+   *
+   * @return int
+   *   Contact ID
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  private function lookupMatchingContact(array $params): int {
+    $lookupField = !empty($params['contact_id']) ? 'contact_id' : (!empty($params['external_identifier']) ? 'external_identifier' : 'email');
+    if (empty($params['email'])) {
+      $contact = Contact::get(FALSE)->addSelect('id')
+        ->addWhere($lookupField, '=', $params[$lookupField])
+        ->execute();
+      if (count($contact) !== 1) {
+        throw new CRM_Core_Exception(ts("Soft Credit %1 - %2 doesn't exist. Row was skipped.",
+          [
+            1 => $this->getFieldMetadata($lookupField),
+            2 => $params['contact_id'] ?? $params['external_identifier'],
+          ]));
+      }
+      return $contact->first()['id'];
+    }
+
+    if (!CRM_Utils_Rule::email($params['email'])) {
+      throw new CRM_Core_Exception(ts('Invalid email address %1 provided for Soft Credit. Row was skipped'), [1 => $params['email']]);
+    }
+    $emails = Email::get(FALSE)
+      ->addWhere('contact_id.is_deleted', '=', 0)
+      ->addWhere('contact_id.contact_type', '=', $this->getContactType())
+      ->addWhere('email', '=', $params['email'])
+      ->addSelect('contact_id')->execute();
+    if (count($emails) === 0) {
+      throw new CRM_Core_Exception(ts("Invalid email address(doesn't exist) %1 for Soft Credit. Row was skipped", [1 => $params['email']]));
+    }
+    if (count($emails) > 1) {
+      throw new CRM_Core_Exception(ts('Invalid email address(duplicate) %1 for Soft Credit. Row was skipped', [1 => $params['email']]));
+    }
+    return $emails->first()['contact_id'];
   }
 
 }
