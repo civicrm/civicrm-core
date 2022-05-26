@@ -1294,11 +1294,6 @@ abstract class CRM_Import_Parser {
    * @return ?string
    */
   protected function validateCustomField($customFieldID, $value, array $fieldMetaData, $dateType): ?string {
-    // validate null values for required custom fields of type boolean
-    if (!empty($fieldMetaData['is_required']) && (empty($value) && !is_numeric($value)) && $fieldMetaData['data_type'] == 'Boolean') {
-      return $fieldMetaData['label'] . '::' . $fieldMetaData['groupTitle'];
-    }
-
     /* validate the data against the CF type */
 
     if ($value) {
@@ -1312,7 +1307,7 @@ abstract class CRM_Import_Parser {
         }
         return $fieldMetaData['label'];
       }
-      elseif ($dataType == 'Boolean') {
+      elseif ($dataType === 'Boolean') {
         if (CRM_Utils_String::strtoboolstr($value) === FALSE) {
           return $fieldMetaData['label'] . '::' . $fieldMetaData['groupTitle'];
         }
