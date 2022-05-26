@@ -579,8 +579,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   protected function getMappedFieldLabels(): array {
     $mapper = [];
-    $parser = new CRM_Contact_Import_Parser_Contact();
-    $parser->setUserJobID($this->getUserJobID());
+    $parser = $this->getParser();
     foreach ($this->getSubmittedValue('mapper') as $columnNumber => $mappedField) {
       $mapper[$columnNumber] = $parser->getMappedFieldLabel($parser->getMappingFieldFromMapperInput($mappedField, 0, $columnNumber));
     }
