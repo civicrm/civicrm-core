@@ -34,13 +34,6 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Import_Form_DataSource {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-
-    // FIXME: This 'onDuplicate' form element is never used -- copy/paste error?
-    $this->addRadio('onDuplicate', ts('On duplicate entries'), [
-      CRM_Import_Parser::DUPLICATE_SKIP => ts('Skip'),
-      CRM_Import_Parser::DUPLICATE_UPDATE => ts('Update'),
-      CRM_Import_Parser::DUPLICATE_FILL => ts('Fill'),
-    ]);
   }
 
   /**
@@ -48,7 +41,6 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Import_Form_DataSource {
    */
   public function postProcess() {
     $this->storeFormValues([
-      'onDuplicate',
       'dateFormats',
       'savedMapping',
     ]);

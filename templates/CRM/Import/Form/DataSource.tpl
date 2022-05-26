@@ -34,26 +34,30 @@
            </span>
          </td>
        </tr>
-       <tr class="crm-import-uploadfile-from-block-contactType">
-         <td class="label">{$form.contactType.label}</td>
-         <td>{$form.contactType.html}<br />
-           <span class="description">
-             {ts 1=$importEntities}Select 'Individual' if you are importing %1 made by individual persons.{/ts}
-             {ts 1=$importEntities}Select 'Organization' or 'Household' if you are importing %1 made by contacts of that type. (NOTE: Some built-in contact types may not be enabled for your site.){/ts}
-           </span>
-         </td>
-       </tr>
-       <tr class="crm-import-uploadfile-from-block-onDuplicate">
-         <td class="label">{$form.onDuplicate.label}</td>
-         <td>{$form.onDuplicate.html} {help id="id-onDuplicate"}</td>
-       </tr>
+      {if array_key_exists('contactType', $form)}
+        <tr class="crm-import-uploadfile-from-block-contactType">
+          <td class="label">{$form.contactType.label}</td>
+          <td>{$form.contactType.html}<br />
+            <span class="description">
+              {ts 1=$importEntities}Select 'Individual' if you are importing %1 made by individual persons.{/ts}
+              {ts 1=$importEntities}Select 'Organization' or 'Household' if you are importing %1 made by contacts of that type. (NOTE: Some built-in contact types may not be enabled for your site.){/ts}
+            </span>
+          </td>
+        </tr>
+      {/if}
+      {if array_key_exists('onDuplicate', $form)}
+        <tr class="crm-import-uploadfile-from-block-onDuplicate">
+          <td class="label">{$form.onDuplicate.label}</td>
+          <td>{$form.onDuplicate.html} {help id="id-onDuplicate"}</td>
+        </tr>
+      {/if}
         <tr class="crm-import-datasource-form-block-fieldSeparator">
           <td class="label">{$form.fieldSeparator.label} {help id='id-fieldSeparator' file='CRM/Contact/Import/Form/DataSource'}</td>
           <td>{$form.fieldSeparator.html}</td>
         </tr>
-       <tr class="crm-import-uploadfile-from-block-date">{include file="CRM/Core/Date.tpl"}</tr>
+       <tr class="crm-import-uploadfile-form-block-date">{include file="CRM/Core/Date.tpl"}</tr>
        {if $savedMapping}
-         <tr class="crm-import-uploadfile-from-block-savedMapping">
+         <tr class="crm-import-uploadfile-form-block-savedMapping">
            <td>{$form.savedMapping.label}</td>
            <td>{$form.savedMapping.html}<br />
              <span class="description">{ts}If you want to use a previously saved import field mapping - select it here.{/ts}</span>
