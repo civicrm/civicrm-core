@@ -113,7 +113,7 @@ class api_v3_EntityBatchTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_financial_trxn',
     ];
     $result = $this->callAPIFailure($this->_entity, 'create', $secondEntityBatchParams);
-    $this->assertEquals('You can not add items of two different currencies to a single contribution batch.', $result['error_message']);
+    $this->assertEquals("You cannot add items of two different currencies to a single contribution batch. Batch id {$batchId} currency: USD. Entity id {$secondFinancialTrxnId} currency: CAD.", $result['error_message']);
   }
 
 }
