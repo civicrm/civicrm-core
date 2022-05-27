@@ -316,12 +316,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
       }
     }
 
-    //date-Format part ends
-    static $indieFields = NULL;
-    if ($indieFields == NULL) {
-      $indieFields = CRM_Event_BAO_Participant::import();
-    }
-
     $formatValues = [];
     foreach ($params as $key => $field) {
       if ($field == NULL || $field === '') {

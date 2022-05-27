@@ -793,12 +793,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     }
     $this->formatInput($params, $formatted);
 
-    static $indieFields = NULL;
-    if ($indieFields == NULL) {
-      $tempIndieFields = CRM_Contribute_DAO_Contribution::import();
-      $indieFields = $tempIndieFields;
-    }
-
     $paramValues = [];
     foreach ($params as $key => $field) {
       if ($field == NULL || $field === '') {
