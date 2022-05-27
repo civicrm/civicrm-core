@@ -244,7 +244,7 @@ class CRM_Utils_Recent {
       }
       elseif ($event->action === 'edit') {
         if (isset($event->object->is_deleted)) {
-          \Civi\Api4\RecentItem::update()
+          \Civi\Api4\RecentItem::update(FALSE)
             ->addWhere('entity_type', '=', $entityType)
             ->addWhere('entity_id', '=', $event->id)
             ->addValue('is_deleted', (bool) $event->object->is_deleted)
