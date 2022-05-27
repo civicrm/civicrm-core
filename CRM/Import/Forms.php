@@ -567,4 +567,23 @@ class CRM_Import_Forms extends CRM_Core_Form {
     return NULL;
   }
 
+  /**
+   * Get the mapped fields as an array of labels.
+   *
+   * e.g
+   * ['First Name', 'Employee Of - First Name', 'Home - Street Address']
+   *
+   * @return array
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMappedFieldLabels(): array {
+    $mapper = [];
+    $parser = $this->getParser();
+    foreach ($this->getSubmittedValue('mapper') as $columnNumber => $mappedField) {
+      $mapper[$columnNumber] = $parser->getMappedFieldLabel($parser->getMappingFieldFromMapperInput($mappedField, 0, $columnNumber));
+    }
+    return $mapper;
+  }
+
 }
