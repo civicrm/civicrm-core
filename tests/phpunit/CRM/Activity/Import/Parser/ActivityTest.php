@@ -296,10 +296,7 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
         ],
         'expected_error' => '',
       ],
-
-      // @todo This is also inconsistent. The map UI requires target contact
-      // but import is fine leaving it blank. In general civi is fine with
-      // a blank target so possibly map UI should not require it.
+      // a way to find the contact id is required.
       15 => [
         'input' => [
           'target_contact_id' => '',
@@ -307,7 +304,7 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
           'activity_date_time' => $some_date,
           'activity_subject' => 'asubj',
         ],
-        'expected_error' => '',
+        'expected_error' => 'No matching Contact found for ()',
       ],
 
     ];
