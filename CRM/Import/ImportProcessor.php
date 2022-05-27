@@ -440,13 +440,24 @@ class CRM_Import_ImportProcessor {
       'options' => ['limit' => 0],
     ])['values'];
     foreach ($fields as $index => $field) {
-      $fieldSpec = $this->getMetadata()[$fields[$index]['name']];
+      $fieldSpec = $this->getFieldMetadata($field['name']);
       $fields[$index]['label'] = $fieldSpec['title'];
       if (empty($field['location_type_id']) && !empty($fieldSpec['hasLocationType'])) {
         $fields[$index]['location_type_id'] = 'Primary';
       }
     }
     $this->mappingFields = $this->rekeyBySortedColumnNumbers($fields);
+  }
+
+  /**
+   * Get the metadata for the field.
+   *
+   * @param string $fieldName
+   *
+   * @return array
+   */
+  protected function getFieldMetadata(string $fieldName): array {
+    return $this->getMetadata()[$fieldName] ?? CRM_Contact_BAO_Contact::importableFields('All')[$fieldName];
   }
 
   /**

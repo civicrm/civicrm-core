@@ -84,6 +84,13 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * Countries that the site is restricted to
+   *
+   * @var array|false
+   */
+  private $availableCountries;
+
+  /**
    * Get User Job.
    *
    * API call to retrieve the userJob row.
@@ -1196,7 +1203,7 @@ abstract class CRM_Import_Parser {
         $missingFields[$key] = implode(' ' . ts('and') . ' ', $missing);
       }
     }
-    throw new CRM_Core_Exception(($prefixString ? ($prefixString . ' ') : '') . ts('Missing required fields:') . ' ' . implode(' ' . ts('OR') . ' ', $missingFields));
+    throw new CRM_Core_Exception($prefixString . ts('Missing required fields:') . ' ' . implode(' ' . ts('OR') . ' ', $missingFields));
   }
 
   /**
@@ -1210,11 +1217,20 @@ abstract class CRM_Import_Parser {
    * @throws \API_Exception
    */
   protected function getTransformedFieldValue(string $fieldName, $importedValue) {
+    $transformableFields = array_merge($this->metadataHandledFields, ['country_id']);
     // For now only do gender_id etc as we need to work through removing duplicate handling
-    if (empty($importedValue) || !in_array($fieldName, $this->metadataHandledFields, TRUE)) {
+    if (empty($importedValue) || !in_array($fieldName, $transformableFields, TRUE)) {
       return $importedValue;
     }
     $fieldMetadata = $this->getFieldMetadata($fieldName);
+    if ($fieldName === 'url') {
+      return CRM_Utils_Rule::url($importedValue) ? $importedValue : 'invalid_import_value';
+    }
+
+    if ($fieldName === 'email') {
+      return CRM_Utils_Rule::email($importedValue) ? $importedValue : 'invalid_import_value';
+    }
+
     if ($fieldMetadata['type'] === CRM_Utils_Type::T_BOOLEAN) {
       $value = CRM_Utils_String::strtoboolstr($importedValue);
       if ($value !== FALSE) {
@@ -1226,7 +1242,12 @@ abstract class CRM_Import_Parser {
       $value = CRM_Utils_Date::formatDate($importedValue, $this->getSubmittedValue('dateFormats'));
       return ($value) ?: 'invalid_import_value';
     }
-    return $this->getFieldOptions($fieldName)[$importedValue] ?? 'invalid_import_value';
+    $options = $this->getFieldOptions($fieldName);
+    if ($options !== FALSE) {
+      $comparisonValue = is_numeric($importedValue) ? $importedValue : mb_strtolower($importedValue);
+      return $options[$comparisonValue] ?? 'invalid_import_value';
+    }
+    return $importedValue;
   }
 
   /**
@@ -1255,32 +1276,33 @@ abstract class CRM_Import_Parser {
    * @throws \Civi\API\Exception\NotImplementedException
    */
   protected function getFieldMetadata(string $fieldName, bool $loadOptions = FALSE, $limitToContactType = FALSE): array {
-    $fieldMetadata = $this->getImportableFieldsMetadata()[$fieldName] ?? ($limitToContactType ? NULL : CRM_Contact_BAO_Contact::importableFields('All')[$fieldName]);
+
+    $fieldMap = ['country_id' => 'country'];
+    $fieldMapName = empty($fieldMap[$fieldName]) ? $fieldName : $fieldMap[$fieldName];
+
+    $fieldMetadata = $this->getImportableFieldsMetadata()[$fieldMapName] ?? ($limitToContactType ? NULL : CRM_Contact_BAO_Contact::importableFields('All')[$fieldMapName]);
     if ($loadOptions && !isset($fieldMetadata['options'])) {
-      if (empty($fieldMetadata['pseudoconstant'])) {
-        $this->importableFieldsMetadata[$fieldName]['options'] = FALSE;
-      }
-      else {
-        $options = civicrm_api4($fieldMetadata['entity'], 'getFields', [
-          'loadOptions' => ['id', 'name', 'label'],
-          'where' => [['name', '=', $fieldMetadata['name']]],
-          'select' => ['options'],
-        ])->first()['options'];
+
+      $options = civicrm_api4($this->getFieldEntity($fieldName), 'getFields', [
+        'loadOptions' => ['id', 'name', 'label'],
+        'where' => [['name', '=', empty($fieldMap[$fieldName]) ? $fieldMetadata['name'] : $fieldName]],
+        'select' => ['options'],
+      ])->first()['options'];
+      if (is_array($options)) {
         // We create an array of the possible variants - notably including
-        // name AND label as either might be used, and capitalisation variants.
+        // name AND label as either might be used. We also lower case before checking
         $values = [];
         foreach ($options as $option) {
           $values[$option['id']] = $option['id'];
-          $values[$option['label']] = $option['id'];
-          $values[$option['name']] = $option['id'];
-          $values[strtoupper($option['name'])] = $option['id'];
-          $values[strtolower($option['name'])] = $option['id'];
-          $values[strtoupper($option['label'])] = $option['id'];
-          $values[strtolower($option['label'])] = $option['id'];
+          $values[mb_strtolower($option['name'])] = $option['id'];
+          $values[mb_strtolower($option['label'])] = $option['id'];
         }
-        $this->importableFieldsMetadata[$fieldName]['options'] = $values;
+        $this->importableFieldsMetadata[$fieldMapName]['options'] = $values;
       }
-      return $this->importableFieldsMetadata[$fieldName];
+      else {
+        $this->importableFieldsMetadata[$fieldMapName]['options'] = $options;
+      }
+      return $this->importableFieldsMetadata[$fieldMapName];
     }
     return $fieldMetadata;
   }
@@ -1327,14 +1349,9 @@ abstract class CRM_Import_Parser {
 
       // check for values for custom fields for checkboxes and multiselect
       if ($isSerialized && $dataType != 'ContactReference') {
-        $value = trim($value);
-        $value = str_replace('|', ',', $value);
-        $mulValues = explode(',', $value);
+        $mulValues = array_filter(explode(',', str_replace('|', ',', trim($value))), 'strlen');
         $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
         foreach ($mulValues as $v1) {
-          if (strlen($v1) == 0) {
-            continue;
-          }
 
           $flag = FALSE;
           foreach ($customOption as $v2) {
@@ -1363,6 +1380,76 @@ abstract class CRM_Import_Parser {
     }
 
     return NULL;
+  }
+
+  /**
+   * Get the entity for the given field.
+   *
+   * @param string $fieldName
+   *
+   * @return mixed|null
+   * @throws \API_Exception
+   */
+  protected function getFieldEntity(string $fieldName) {
+    if ($fieldName === 'do_not_import') {
+      return NULL;
+    }
+    $metadata = $this->getFieldMetadata($fieldName);
+    if (!isset($metadata['entity'])) {
+      return in_array($metadata['extends'], ['Individual', 'Organization', 'Household'], TRUE) ? 'Contact' : $metadata['extends'];
+    }
+
+    // Our metadata for these is fugly. Handling the fugliness during retrieval.
+    if (in_array($metadata['entity'], ['Country', 'StateProvince', 'County'], TRUE)) {
+      return 'Address';
+    }
+    return $metadata['entity'];
+  }
+
+  /**
+   * Search the value for the string 'invalid_import_value'.
+   *
+   * If the string is found it indicates the fields was rejected
+   * during `getTransformedValue` as not having valid data.
+   *
+   * @param string|array|int $value
+   * @param string $key
+   * @param string $prefixString
+   *
+   * @return array
+   * @throws \API_Exception
+   */
+  protected function getInvalidValues($value, string $key, string $prefixString = ''): array {
+    $errors = [];
+    if ($value === 'invalid_import_value') {
+      $errors[] = $prefixString . $this->getFieldMetadata($key)['title'];
+    }
+    elseif (is_array($value)) {
+      foreach ($value as $innerKey => $innerValue) {
+        $result = $this->getInvalidValues($innerValue, $innerKey, $prefixString);
+        if (!empty($result)) {
+          $errors = array_merge($result, $errors);
+        }
+      }
+    }
+    return array_filter($errors);
+  }
+
+  /**
+   * Get the available countries.
+   *
+   * If the site is not configured with a restriction then all countries are valid
+   * but otherwise only a select array are.
+   *
+   * @return array|false
+   *   FALSE indicates no restrictions.
+   */
+  protected function getAvailableCountries() {
+    if ($this->availableCountries === NULL) {
+      $availableCountries = Civi::settings()->get('countryLimit');
+      $this->availableCountries = !empty($availableCountries) ? array_fill_keys($availableCountries, TRUE) : FALSE;
+    }
+    return $this->availableCountries;
   }
 
 }

@@ -512,10 +512,6 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     CRM_Contact_BAO_Contact::resolveDefaults($params);
 
     $this->assertEquals(1004, $params['address'][1]['state_province_id']);
-    $this->assertEquals(CRM_Core_PseudoConstant::country($params['address'][1]['country_id']),
-      $params['address'][1]['country'],
-      'Check for country.'
-    );
   }
 
   /**
