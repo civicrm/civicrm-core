@@ -23,8 +23,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
 
   protected $_mapperKeys;
 
-  private $_contactIdIndex;
-
   /**
    * Array of successfully imported activity id's
    *
@@ -103,20 +101,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
     $this->_newActivity = [];
 
     $this->setActiveFields($this->_mapperKeys);
-
-    // FIXME: we should do this in one place together with Form/MapField.php
-    $this->_contactIdIndex = -1;
-
-    $index = 0;
-    foreach ($this->_mapperKeys as $key) {
-      switch ($key) {
-        case 'target_contact_id':
-        case 'external_identifier':
-          $this->_contactIdIndex = $index;
-          break;
-      }
-      $index++;
-    }
   }
 
   /**
@@ -186,16 +170,15 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
       }
     }
 
-    if ($this->_contactIdIndex < 0) {
+    if (empty($params['external_identifier']) && empty($params['target_contact_id'])) {
 
       // Retrieve contact id using contact dedupe rule.
       // Since we are supporting only individual's activity import.
       $params['contact_type'] = 'Individual';
       $params['version'] = 3;
-      $error = _civicrm_api3_deprecated_duplicate_formatted_contact($params);
+      $matchedIDs = CRM_Contact_BAO_Contact::getDuplicateContacts($params, 'Individual');
 
-      if (CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
-        $matchedIDs = explode(',', $error['error_message']['params'][0]);
+      if (!empty($matchedIDs)) {
         if (count($matchedIDs) > 1) {
           array_unshift($values, 'Multiple matching contact records detected for this row. The activity was not imported');
           return CRM_Import_Parser::ERROR;
