@@ -1703,7 +1703,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // If this is a single membership-related contribution, it won't have
       // be performed yet, so do it now.
       if ($isPaidMembership && !$isProcessSeparateMembershipTransaction) {
-        $paymentActionResult = $payment->doPayment($paymentParams, 'contribute');
+        $paymentActionResult = $payment->doPayment($paymentParams);
         $paymentResults[] = ['contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentActionResult];
       }
       // Do not send an email if Recurring transaction is done via Direct Mode
@@ -1711,7 +1711,26 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       foreach ($paymentResults as $result) {
         //CRM-18211: Fix situation where second contribution doesn't exist because it is optional.
         if ($result['contribution_id']) {
-          $this->completeTransaction($result['result'], $result['contribution_id']);
+          if (($result['result']['payment_status_id'] ?? NULL) == 1) {
+            try {
+              civicrm_api3('contribution', 'completetransaction', [
+                'id' => $result['contribution_id'],
+                'trxn_id' => $result['result']['trxn_id'] ?? NULL,
+                'payment_processor_id' => $result['result']['payment_processor_id'] ?? $this->_paymentProcessor['id'],
+                'is_transactional' => FALSE,
+                'fee_amount' => $result['result']['fee_amount'] ?? NULL,
+                'receive_date' => $result['result']['receive_date'] ?? NULL,
+                'card_type_id' => $result['result']['card_type_id'] ?? NULL,
+                'pan_truncation' => $result['result']['pan_truncation'] ?? NULL,
+              ]);
+            }
+            catch (CiviCRM_API3_Exception $e) {
+              if ($e->getErrorCode() != 'contribution_completed') {
+                \Civi::log()->error('CRM_Contribute_Form_Contribution_Confirm::completeTransaction CiviCRM_API3_Exception: ' . $e->getMessage());
+                throw new CRM_Core_Exception('Failed to update contribution in database');
+              }
+            }
+          }
         }
       }
       return;
@@ -1736,8 +1755,19 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $paymentProcessorIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_values['payment_processor'] ?? NULL);
           $this->_paymentProcessor['id'] = $paymentProcessorIDs[0];
         }
-        $result = ['payment_status_id' => 1, 'contribution' => $membershipContribution];
-        $this->completeTransaction($result, $result['contribution']->id);
+        try {
+          civicrm_api3('contribution', 'completetransaction', [
+            'id' => $membershipContribution->id,
+            'payment_processor_id' => $this->_paymentProcessor['id'],
+            'is_transactional' => FALSE,
+          ]);
+        }
+        catch (CiviCRM_API3_Exception $e) {
+          if ($e->getErrorCode() != 'contribution_completed') {
+            \Civi::log()->error('CRM_Contribute_Form_Contribution_Confirm::completeTransaction CiviCRM_API3_Exception: ' . $e->getMessage());
+            throw new CRM_Core_Exception('Failed to update contribution in database');
+          }
+        }
       }
       // return as completeTransaction() already sends the receipt mail.
       return;
@@ -1859,7 +1889,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       else {
         $payment = $this->_paymentProcessor['object'];
       }
-      $result = $payment->doPayment($tempParams, 'contribute');
+      $result = $payment->doPayment($tempParams);
       $this->set('membership_trx_id', $result['trxn_id']);
       $this->assign('membership_trx_id', $result['trxn_id']);
     }
@@ -2365,7 +2395,26 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
       if (!empty($result['contribution'])) {
         // It seems this line is hit when there is a zero dollar transaction & in tests, not sure when else.
-        $this->completeTransaction($result, $result['contribution']->id);
+        if (($result['payment_status_id'] ?? NULL) == 1) {
+          try {
+            civicrm_api3('contribution', 'completetransaction', [
+              'id' => $result['contribution']->id,
+              'trxn_id' => $result['trxn_id'] ?? NULL,
+              'payment_processor_id' => $result['payment_processor_id'] ?? $this->_paymentProcessor['id'],
+              'is_transactional' => FALSE,
+              'fee_amount' => $result['fee_amount'] ?? NULL,
+              'receive_date' => $result['receive_date'] ?? NULL,
+              'card_type_id' => $result['card_type_id'] ?? NULL,
+              'pan_truncation' => $result['pan_truncation'] ?? NULL,
+            ]);
+          }
+          catch (CiviCRM_API3_Exception $e) {
+            if ($e->getErrorCode() != 'contribution_completed') {
+              \Civi::log()->error('CRM_Contribute_Form_Contribution_Confirm::completeTransaction CiviCRM_API3_Exception: ' . $e->getMessage());
+              throw new CRM_Core_Exception('Failed to update contribution in database');
+            }
+          }
+        }
       }
       return $result;
     }
@@ -2537,6 +2586,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * Completing will trigger update of related entities and emails.
    *
+   * @deprecated
+   *
    * @param array $result
    * @param int $contributionID
    *
@@ -2544,6 +2595,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @throws \Exception
    */
   protected function completeTransaction($result, $contributionID) {
+    CRM_Core_Error::deprecatedWarning('Use API3 Payment.create');
     if (($result['payment_status_id'] ?? NULL) == 1) {
       try {
         civicrm_api3('contribution', 'completetransaction', [
