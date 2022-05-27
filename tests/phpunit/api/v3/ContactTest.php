@@ -2347,7 +2347,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $contact = $this->callAPISuccess('contact', 'create', array_merge($this->_params, $params));
 
     $result = $this->callAPISuccess('contact', 'getsingle', ['id' => $contact['id']]);
-    $this->assertEquals('Both', $result['preferred_mail_format']);
 
     $this->assertEquals('en_US', $result['preferred_language']);
     $this->assertEquals(1, $result['communication_style_id']);
