@@ -114,6 +114,9 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if ($user && $user->getEmail() != $email) {
       $user->setEmail($email);
 
+      // Skip requirement for password when changing the current user fields
+      $user->_skipProtectedUserFieldConstraint = TRUE;
+
       if (!count($user->validate())) {
         $user->save();
       }
