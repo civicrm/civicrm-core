@@ -54,7 +54,7 @@ class CRM_Upgrade_Incremental_General {
    *
    * @see install/index.php
    */
-  const MIN_INSTALL_MYSQL_VER = '5.6.5';
+  const MIN_INSTALL_MYSQL_VER = '5.7';
 
   /**
    * Compute any messages which should be displayed before upgrade.
