@@ -3014,7 +3014,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     // fields array is missing because form building etc is skipped
     // in dashboard mode for report
     //@todo - this could be done in the dashboard no we have a setter
-    if (empty($this->_params['fields']) && !$this->_noFields) {
+    if (empty($this->_params['fields']) && !$this->_noFields
+      && empty($this->_params['task'])
+    ) {
       $this->setParams($this->_formValues);
     }
 
