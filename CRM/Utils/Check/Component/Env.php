@@ -1009,7 +1009,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     $messages = [];
     $version = CRM_Utils_SQL::getDatabaseVersion();
     $minRecommendedVersion = CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_MYSQL_VER;
-    $mariaDbRecommendedVersion = '10.1';
+    $mariaDbRecommendedVersion = CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_MARIADB_VER;
     $upcomingCiviChangeVersion = '5.34';
     if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), $minRecommendedVersion, '<')) {
       $messages[] = new CRM_Utils_Check_Message(
