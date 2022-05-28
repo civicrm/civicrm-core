@@ -287,28 +287,34 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $processor->setMetadata($this->getContactImportMetadata());
     $processor->setContactTypeByConstant($this->getSubmittedValue('contactType'));
     $processor->setContactSubType($this->getSubmittedValue('contactSubType'));
+    $mapper = $this->getSubmittedValue('mapper');
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
+      $last_key = 0;
 
-      if ($this->getSubmittedValue('savedMapping') && $processor->getFieldName($i)) {
+      // Don't set any defaults if we are going to the next page.
+      // ... or coming back.
+      // But do add the js.
+      if (!empty($mapper)) {
+        $last_key = array_key_last($mapper[$i]);
+      }
+      else if ($this->getSubmittedValue('savedMapping') && $processor->getFieldName($i)) {
         $defaults["mapper[$i]"] = $processor->getSavedQuickformDefaultsForColumn($i);
-        $js .= $processor->getQuickFormJSForField($i);
+        $last_key = array_key_last($defaults["mapper[$i]"]) ?? 0;
       }
       else {
-        $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
         if ($hasColumnNames) {
           // do array search first to see if has mapped key
           $columnKey = array_search($this->_columnNames[$i], $this->getFieldTitles());
           if (isset($this->_fieldUsed[$columnKey])) {
-            $defaults["mapper[$i]"] = $columnKey;
+            $defaults["mapper[$i]"] = [$columnKey];
             $this->_fieldUsed[$key] = TRUE;
           }
           else {
             // Infer the default from the column names if we have them
             $defaults["mapper[$i]"] = [
               $this->defaultFromColumnName($this->_columnNames[$i]),
-              0,
             ];
           }
         }
@@ -316,10 +322,14 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           // Otherwise guess the default from the form of the data
           $defaults["mapper[$i]"] = [
             $this->defaultFromData($this->getDataPatterns(), $i),
-            //                     $defaultLocationType->id
-            0,
           ];
         }
+        $last_key = array_key_last($defaults["mapper[$i]"]) ?? 0;
+      }
+      // Call swapOptions on the deepest select element to hide the empty select lists above it.
+      // But we don't need to hide anything above $sel4.
+      if ($last_key < 3) {
+        $js .= "swapOptions($formName, 'mapper[$i]', $last_key, 4, 'hs_mapper_0_');\n";
       }
       $sel->setOptions([$sel1, $sel2, $sel3, $sel4]);
     }

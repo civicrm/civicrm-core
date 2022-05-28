@@ -547,47 +547,6 @@ class CRM_Import_ImportProcessor {
   }
 
   /**
-   * Get the relevant js for quickform.
-   *
-   * @param int $column
-   *
-   * @return string
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function getQuickFormJSForField($column) {
-    $columnNumbersToHide = [];
-    if ($this->getFieldName($column) === 'do_not_import') {
-      $columnNumbersToHide = [1, 2, 3];
-    }
-    elseif ($this->getRelationshipKey($column)) {
-      if (!$this->getWebsiteTypeID($column) && !$this->getLocationTypeID($column)) {
-        $columnNumbersToHide[] = 2;
-      }
-      if (!$this->getFieldName($column)) {
-        $columnNumbersToHide[] = 1;
-      }
-      if (!$this->getPhoneOrIMTypeID($column)) {
-        $columnNumbersToHide[] = 3;
-      }
-    }
-    else {
-      if (!$this->getLocationTypeID($column) && !$this->getWebsiteTypeID($column)) {
-        $columnNumbersToHide[] = 1;
-      }
-      if (!$this->getPhoneOrIMTypeID($column)) {
-        $columnNumbersToHide[] = 2;
-      }
-      $columnNumbersToHide[] = 3;
-    }
-
-    $jsClauses = [];
-    foreach ($columnNumbersToHide as $columnNumber) {
-      $jsClauses[] = $this->getFormName() . "['mapper[$column][" . $columnNumber . "]'].style.display = 'none';";
-    }
-    return empty($jsClauses) ? '' : implode("\n", $jsClauses) . "\n";
-  }
-
-  /**
    * Get the defaults for the column from the saved mapping.
    *
    * @param int $column
@@ -596,19 +555,33 @@ class CRM_Import_ImportProcessor {
    * @throws \CiviCRM_API3_Exception
    */
   public function getSavedQuickformDefaultsForColumn($column) {
+    $fieldMapping = [];
+
+    // $sel1 is either unmapped, a relationship or a target field.
     if ($this->getFieldName($column) === 'do_not_import') {
-      return [];
+      return $fieldMapping;
     }
+
     if ($this->getValidRelationshipKey($column)) {
-      if ($this->getWebsiteTypeID($column)) {
-        return [$this->getValidRelationshipKey($column), $this->getFieldName($column), $this->getWebsiteTypeID($column)];
-      }
-      return [$this->getValidRelationshipKey($column), $this->getFieldName($column), $this->getLocationTypeID($column), $this->getPhoneOrIMTypeID($column)];
-    }
+      $fieldMapping[] = $this->getValidRelationshipKey($column);
+    } 
+    
+    // $sel1 
+    $fieldMapping[] = $this->getFieldName($column);
+  
+    // $sel2
     if ($this->getWebsiteTypeID($column)) {
-      return [$this->getFieldName($column), $this->getWebsiteTypeID($column)];
+      $fieldMapping[] = $this->getWebsiteTypeID($column);
+    } 
+    else if ($this->getLocationTypeID($column)) {
+      $fieldMapping[] = $this->getLocationTypeID($column);
+    } 
+
+    // $sel3
+    if ($this->getPhoneOrIMTypeID($column)) {
+      $fieldMapping[] = $this->getPhoneOrIMTypeID($column);
     }
-    return [(string) $this->getFieldName($column), $this->getLocationTypeID($column), $this->getPhoneOrIMTypeID($column)];
+    return $fieldMapping;
   }
 
   /**
