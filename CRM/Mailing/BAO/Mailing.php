@@ -2758,7 +2758,20 @@ WHERE  civicrm_mailing_job.id = %1
 
     // Split up the parent jobs into multiple child jobs
     $mailerJobSize = Civi::settings()->get('mailerJobSize');
-    CRM_Mailing_BAO_MailingJob::runJobs_pre($mailerJobSize, $mode);
+    // use half the total run limit in the hope AB mailings get sent out evenly (dev/mail#97)
+    $halfMailerBatchLimit = (int) Civi::settings()->get('mailerBatchLimit') / 2;
+
+    if ($halfMailerBatchLimit == 0) {
+      $offset = $mailerJobSize;
+    }
+    elseif ($mailerJobSize == 0) {
+      $offset = $halfMailerBatchLimit;
+    }
+    else {
+      $offset = min($mailerJobSize, $halfMailerBatchLimit);
+    }
+
+    CRM_Mailing_BAO_MailingJob::runJobs_pre($offset, $mode);
     CRM_Mailing_BAO_MailingJob::runJobs(NULL, $mode);
     CRM_Mailing_BAO_MailingJob::runJobs_post($mode);
 
