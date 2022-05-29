@@ -113,11 +113,8 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
 
   /**
    *  Test Import.
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
-  public function testImport() {
+  public function testImport(): void {
     $this->individualCreate();
     $contact2Params = [
       'first_name' => 'Anthonita',
