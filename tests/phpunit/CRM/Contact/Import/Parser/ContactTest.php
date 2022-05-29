@@ -1550,6 +1550,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    */
   protected function runImport(array $originalValues, $onDuplicateAction, $expectedResult, $fieldMapping = [], $fields = NULL, int $ruleGroupId = NULL): void {
     $values = array_values($originalValues);
+    // Stand in for row number.
+    $values[] = 1;
+
     if ($fieldMapping) {
       $fields = [];
       foreach ($fieldMapping as $mappedField) {
@@ -1855,6 +1858,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $fields = array_keys($contactImportValues);
     $values = array_values($contactImportValues);
     $values[] = 'tim.cook@apple.com';
+    // Stand in for row number.
+    $values[] = 1;
 
     $userJobID = $this->getUserJobID([
       'mapper' => $mapper,
@@ -1863,9 +1868,11 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
 
     $parser = new CRM_Contact_Import_Parser_Contact($fields);
     $parser->setUserJobID($userJobID);
-    $parser->init();
+    $dataSource = new CRM_Import_DataSource_CSV($userJobID);
 
-    $this->assertEquals(CRM_Import_Parser::ERROR, $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values), 'Return code from parser import was not as expected');
+    $parser->init();
+    $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values);
+    $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::ERROR]));
     $this->callAPISuccessGetSingle('Contact', [
       'first_name' => 'Bob',
       'last_name' => 'Dobbs',

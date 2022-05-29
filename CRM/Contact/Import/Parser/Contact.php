@@ -230,7 +230,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *   CRM_Import_Parser::ERROR or CRM_Import_Parser::VALID
    */
   public function summary(&$values): int {
-    $rowNumber = (int) ($values[count($values) - 1]);
+    $rowNumber = (int) ($values[array_key_last($values)]);
     try {
       $this->validateValues($values);
     }
@@ -270,6 +270,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \API_Exception
    */
   public function import($onDuplicate, &$values) {
+    $rowNumber = (int) $values[array_key_last($values)];
     $this->_unparsedStreetAddressContacts = [];
     if (!$this->getSubmittedValue('doGeocodeAddress')) {
       // CRM-5854, reset the geocode method to null to prevent geocoding
@@ -282,7 +283,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     if ($response != CRM_Import_Parser::VALID) {
       $this->setImportStatus((int) $values[count($values) - 1], 'Invalid', "Invalid (Error Code: $response)");
-      return $response;
+      return FALSE;
     }
 
     $params = $this->getMappedRow($values);
@@ -302,7 +303,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
     catch (CRM_Core_Exception $e) {
       $statuses = [CRM_Import_Parser::DUPLICATE => 'DUPLICATE', CRM_Import_Parser::ERROR => 'ERROR', CRM_Import_Parser::NO_MATCH => 'invalid_no_match'];
-      $this->setImportStatus((int) $values[count($values) - 1], $statuses[$e->getErrorCode()], $e->getMessage());
+      $this->setImportStatus($rowNumber, $statuses[$e->getErrorCode()], $e->getMessage());
       return FALSE;
     }
 
@@ -334,10 +335,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     elseif (is_array($newContact)) {
       // if duplicate, no need of further processing
       if ($onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
-        $errorMessage = "Skipping duplicate record";
-        array_unshift($values, $errorMessage);
-        $this->setImportStatus((int) $values[count($values) - 1], 'DUPLICATE', $errorMessage);
-        return CRM_Import_Parser::DUPLICATE;
+        $this->setImportStatus($rowNumber, 'DUPLICATE', 'Skipping duplicate record');
+        return FALSE;
       }
 
       // CRM-10433/CRM-20739 - IDs could be string or array; handle accordingly
@@ -441,9 +440,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           }
 
           if (!empty($relatedCsType) && (!CRM_Contact_BAO_ContactType::isAllowEdit($matchedIDs[0], $relatedCsType) && $relatedCsType != CRM_Utils_Array::value('contact_sub_type', $formatting))) {
-            $errorMessage = ts("Mismatched or Invalid contact subtype found for this related contact.");
-            array_unshift($values, $errorMessage);
-            return CRM_Import_Parser::NO_MATCH;
+            $this->setImportStatus((int) $values[count($values) - 1], 'invalid_no_match', 'Mismatched or Invalid contact subtype found for this related contact.');
+            return FALSE;
           }
           else {
             $this->createContact($formatting, $contactFields, $onDuplicate, $matchedIDs[0]);
@@ -1859,15 +1857,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
         }
       }
-      else {
-        $returnCode = self::ERROR;
-      }
-
-      if ($returnCode & self::NO_MATCH) {
-        $this->setImportStatus((int) $values[count($values) - 1], 'invalid_no_match', array_shift($values));
-      }
-
-      if ($returnCode & self::UNPARSED_ADDRESS_WARNING) {
+      // @todo this should be done within import - it probably is!
+      if (isset($returnCode) && $returnCode === self::UNPARSED_ADDRESS_WARNING) {
         $this->setImportStatus((int) $values[count($values) - 1], 'warning_unparsed_address', array_shift($values));
       }
     }
