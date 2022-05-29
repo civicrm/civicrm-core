@@ -5,3 +5,5 @@ Susie,Jones,susie@example.com,,Australia,NSW,NSW,Australia,Australia,NSW,Mum,Jon
 Susie,Jones,susie@example.com,,AU,New South Wales,New South Wales,AU,AU,New South Wales,Mum,Jones,mum@example.com,New South Wales,AU,,AU,New South Wales,Australia,New South Wales,Valid,
 Susie,Jones,susie@example.com,,1013,New South Wales,,1013,1013,New South Wales,Mum,Jones,mum@example.com,New South Wales,1013,,1013,New South Wales,1013,New South Wales,Valid,
 Susie,Jones,susie@example.com,,AUSTRALIA,,,,,,Mum,Jones,mum@example.com,,austRalia,,,,,,Valid,
+Susie,Jones,susie@example.com,,AU,NEW South Wales,NEW South Wales,AU,AU,NEW South Wales,Mum,Jones,mum@example.com,NEW South Wales,AU,,AU,NEW South Wales,Australia,NEW South Wales,Valid,
+Susie,Jones,susie@example.com,,NZ,NEW South Wales,,,,,Mum,Jones,mum@example.com,New South Wales,AU,,AU,New South Wales,Australia,New South Wales,Invalid,Wrong country+state

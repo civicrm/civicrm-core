@@ -2305,7 +2305,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * @param int $version
    *
-   * @throws \CRM_Core_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testSetPreferredCommunicationNull(int $version): void {
