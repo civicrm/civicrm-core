@@ -27,7 +27,7 @@ function civicrm_api3_generic_getList($apiRequest) {
   $meta = civicrm_api3_generic_getfields(['action' => 'get'] + $apiRequest, FALSE)['values'];
 
   // If the user types an integer into the search
-  $forceIdSearch = empty($request['id']) && !empty($request['input']) && !empty($meta['id']) && CRM_Utils_Rule::positiveInteger($request['input']);
+  $forceIdSearch = empty($request['id']) && !empty($request['input']) && !empty($meta['id']) && CRM_Utils_Rule::positiveInteger($request['input']) && (substr($request['input'], 0, 1) !== '0');
   // Add an extra page of results for the record with an exact id match
   if ($forceIdSearch) {
     $request['page_num'] = ($request['page_num'] ?? 1) - 1;
