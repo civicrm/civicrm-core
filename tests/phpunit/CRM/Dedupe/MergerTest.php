@@ -705,7 +705,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testGetRowsElementsAndInfoSpecialInfo() {
+  public function testGetRowsElementsAndInfoSpecialInfo(): void {
     $contact1 = $this->individualCreate([
       'preferred_communication_method' => [],
       'communication_style_id' => 'Familiar',

@@ -1501,18 +1501,19 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $importer->import(CRM_Import_Parser::DUPLICATE_NOCHECK, $fields);
     $contact = $this->callAPISuccessGetSingle('Contact', ['last_name' => 'Texter']);
 
-    $this->assertEquals([4, 1], $contact['preferred_communication_method'], "Import multiple preferred communication methods using labels.");
-    $this->assertEquals(1, $contact['gender_id'], "Import gender with label.");
-    $this->assertEquals('da_DK', $contact['preferred_language'], "Import preferred language with label.");
+    $this->assertEquals([4, 1], $contact['preferred_communication_method'], 'Import multiple preferred communication methods using labels.');
+    $this->assertEquals(1, $contact['gender_id'], 'Import gender with label.');
+    $this->assertEquals('da_DK', $contact['preferred_language'], 'Import preferred language with label.');
+    $this->callAPISuccess('Contact', 'delete', ['id' => $contact['id']]);
 
     $importer = $processor->getImporterObject();
-    $fields = ['Ima', 'Texter', "4,1", "1", "da_DK"];
+    $fields = ['Ima', 'Texter', '4,1', '1', 'da_DK'];
     $importer->import(CRM_Import_Parser::DUPLICATE_NOCHECK, $fields);
     $contact = $this->callAPISuccessGetSingle('Contact', ['last_name' => 'Texter']);
 
-    $this->assertEquals([4, 1], $contact['preferred_communication_method'], "Import multiple preferred communication methods using values.");
-    $this->assertEquals(1, $contact['gender_id'], "Import gender with id.");
-    $this->assertEquals('da_DK', $contact['preferred_language'], "Import preferred language with value.");
+    $this->assertEquals([4, 1], $contact['preferred_communication_method'], 'Import multiple preferred communication methods using values.');
+    $this->assertEquals(1, $contact['gender_id'], 'Import gender with id.');
+    $this->assertEquals('da_DK', $contact['preferred_language'], 'Import preferred language with value.');
   }
 
   /**

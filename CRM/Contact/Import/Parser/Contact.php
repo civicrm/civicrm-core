@@ -101,6 +101,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     'suffix_id',
     'communication_style',
     'preferred_language',
+    'preferred_communication_method',
     'phone',
     'im',
     'openid',
@@ -723,13 +724,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $key => $field,
       ];
 
-      if (($key !== 'preferred_communication_method') && (array_key_exists($key, $contactFields))) {
-        // due to merging of individual table and
-        // contact table, we need to avoid
-        // preferred_communication_method forcefully
-        $formatValues['contact_type'] = $formatted['contact_type'];
-      }
-
       if ($key == 'id' && isset($field)) {
         $formatted[$key] = $field;
       }
@@ -941,15 +935,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if ($value) {
 
         switch ($key) {
-          case 'preferred_communication_method':
-            $preffComm = [];
-            $preffComm = explode(',', $value);
-            foreach ($preffComm as $v) {
-              if (!self::in_value(trim($v), CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method'))) {
-                $errors[] = ts('Preferred Communication Method');
-              }
-            }
-            break;
 
           case 'state_province':
             if (!empty($value)) {
@@ -2179,22 +2164,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     if (isset($values['addressee'])) {
       $params['addressee'] = $values['addressee'];
-      return TRUE;
-    }
-
-    if (!empty($values['preferred_communication_method'])) {
-      $comm = [];
-      $pcm = array_change_key_case(array_flip(CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method')), CASE_LOWER);
-
-      $preffComm = explode(',', $values['preferred_communication_method']);
-      foreach ($preffComm as $v) {
-        $v = strtolower(trim($v));
-        if (array_key_exists($v, $pcm)) {
-          $comm[$pcm[$v]] = 1;
-        }
-      }
-
-      $params['preferred_communication_method'] = $comm;
       return TRUE;
     }
 
