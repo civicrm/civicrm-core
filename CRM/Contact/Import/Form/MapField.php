@@ -299,7 +299,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       if (!empty($mapper)) {
         $last_key = array_key_last($mapper[$i]);
       }
-      else if ($this->getSubmittedValue('savedMapping') && $processor->getFieldName($i)) {
+      elseif ($this->getSubmittedValue('savedMapping') && $processor->getFieldName($i)) {
         $defaults["mapper[$i]"] = $processor->getSavedQuickformDefaultsForColumn($i);
         $last_key = array_key_last($defaults["mapper[$i]"]) ?? 0;
       }

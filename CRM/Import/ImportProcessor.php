@@ -564,18 +564,18 @@ class CRM_Import_ImportProcessor {
 
     if ($this->getValidRelationshipKey($column)) {
       $fieldMapping[] = $this->getValidRelationshipKey($column);
-    } 
-    
-    // $sel1 
+    }
+
+    // $sel1
     $fieldMapping[] = $this->getFieldName($column);
-  
+
     // $sel2
     if ($this->getWebsiteTypeID($column)) {
       $fieldMapping[] = $this->getWebsiteTypeID($column);
-    } 
-    else if ($this->getLocationTypeID($column)) {
+    }
+    elseif ($this->getLocationTypeID($column)) {
       $fieldMapping[] = $this->getLocationTypeID($column);
-    } 
+    }
 
     // $sel3
     if ($this->getPhoneOrIMTypeID($column)) {
