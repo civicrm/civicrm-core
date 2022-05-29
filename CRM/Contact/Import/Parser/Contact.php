@@ -2123,28 +2123,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     // @todo - remove this after confirming this is just a compilation of other-wise-cached fields.
     static $fields = [];
 
-    if (isset($values['individual_prefix'])) {
-      if (!empty($params['prefix_id'])) {
-        $prefixes = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-        $params['prefix'] = $prefixes[$params['prefix_id']];
-      }
-      else {
-        $params['prefix'] = $values['individual_prefix'];
-      }
-      return TRUE;
-    }
-
-    if (isset($values['individual_suffix'])) {
-      if (!empty($params['suffix_id'])) {
-        $suffixes = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
-        $params['suffix'] = $suffixes[$params['suffix_id']];
-      }
-      else {
-        $params['suffix'] = $values['individual_suffix'];
-      }
-      return TRUE;
-    }
-
     // CRM-4575
     if (isset($values['email_greeting'])) {
       if (!empty($params['email_greeting_id'])) {
