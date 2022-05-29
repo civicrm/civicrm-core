@@ -291,7 +291,7 @@ abstract class CRM_Import_Parser {
         // Duplicates are being skipped so id matching is not availble.
         continue;
       }
-      $return[$name] = $field['title'];
+      $return[$name] = $field['html']['label'] ?? $field['title'];
     }
     return $return;
   }

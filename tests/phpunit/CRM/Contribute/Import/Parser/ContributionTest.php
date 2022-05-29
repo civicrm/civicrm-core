@@ -64,7 +64,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $contact2Id = $this->individualCreate($contact2Params);
     $values = [
       'total_amount' => $this->formatMoneyInput(1230.99),
-      'financial_type' => 'Donation',
+      'financial_type_id' => 'Donation',
       'external_identifier' => 'ext-1',
       'soft_credit' => 'ext-2',
     ];
@@ -108,12 +108,12 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->addRandomOption();
     $contactID = $this->individualCreate();
 
-    $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type' => 'Donation', 'payment_instrument' => 'Check'];
+    $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type_id' => 'Donation', 'payment_instrument_id' => 'Check'];
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
     $this->assertEquals('Check', $contribution['payment_instrument']);
 
-    $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type' => 'Donation', 'payment_instrument' => 'not at all random'];
+    $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type_id' => 'Donation', 'payment_instrument_id' => 'not at all random'];
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID, 'payment_instrument_id' => 'random']);
     $this->assertEquals('not at all random', $contribution['payment_instrument']);
@@ -124,7 +124,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    */
   public function testContributionStatusLabel(): void {
     $contactID = $this->individualCreate();
-    $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type' => 'Donation', 'payment_instrument' => 'Check', 'contribution_status_id' => 'Pending'];
+    $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type_id' => 'Donation', 'payment_instrument_id' => 'Check', 'contribution_status_id' => 'Pending'];
     // Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
@@ -172,7 +172,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
 
   public function testParsedCustomOption(): void {
     $contactID = $this->individualCreate();
-    $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type' => 'Donation', 'payment_instrument' => 'Check', 'contribution_status_id' => 'Pending'];
+    $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type_id' => 'Donation', 'payment_instrument_id' => 'Check', 'contribution_status_id' => 'Pending'];
     // Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['contact_id' => $contactID]);
@@ -227,7 +227,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->createCustomGroupWithFieldOfType([], 'checkbox');
     $customField = $this->getCustomFieldName('checkbox');
     $contactID = $this->individualCreate();
-    $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type' => 'Donation', $customField => 'L,V'];
+    $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type_id' => 'Donation', $customField => 'L,V'];
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP, NULL);
     $initialContribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
     $this->assertContains('L', $initialContribution[$customField], "Contribution Duplicate Skip Import contains L");

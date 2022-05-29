@@ -1336,21 +1336,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           }
           break;
 
-        case 'financial_type':
-          // @todo add test like testPaymentTypeLabel & remove these lines in favour of 'default' part of switch.
-          require_once 'CRM/Contribute/PseudoConstant.php';
-          $contriTypes = CRM_Contribute_PseudoConstant::financialType();
-          foreach ($contriTypes as $val => $type) {
-            if (strtolower($value) == strtolower($type)) {
-              $values['financial_type_id'] = $val;
-              break;
-            }
-          }
-          if (empty($values['financial_type_id'])) {
-            return civicrm_api3_create_error("Financial Type is not valid: $value");
-          }
-          break;
-
         case 'soft_credit':
           // import contribution record according to select contact type
           // validate contact id and external identifier.
@@ -1531,6 +1516,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           if (isset($fields[$key]) &&
             // Yay - just for a surprise we are inconsistent on whether we pass the pseudofield (payment_instrument)
             // or the field name (contribution_status_id)
+            // @todo - payment_instrument is goneburger - now payment_instrument_id - how
+            // can we simplify.
             (!empty($fields[$key]['is_pseudofield_for']) || !empty($fields[$key]['pseudoconstant']))
           ) {
             $realField = $fields[$key]['is_pseudofield_for'] ?? $key;

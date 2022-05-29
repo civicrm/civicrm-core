@@ -289,6 +289,8 @@ class CRM_Core_OptionValue {
 
       $nameTitle = [];
       if ($mode == 'contribute') {
+        // @todo - remove this - the only code place that calls
+        // this function in a way that would hit this is commented 'remove this'
         // This is part of a move towards standardising option values but we
         // should derive them from the fields array so am deprecating it again...
         // note that the reason this was needed was that payment_instrument_id was
