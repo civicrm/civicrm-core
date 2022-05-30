@@ -327,8 +327,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     //now we create new contact in update/fill mode also.
     $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $params['id'] ?? NULL, TRUE, $this->_dedupeRuleGroupID);
 
-    if (is_object($newContact) && ($newContact instanceof CRM_Contact_BAO_Contact)) {
-      $newContact = clone($newContact);
+    if (!is_array($newContact)) {
       $contactID = $newContact->id;
       $this->_newContacts[] = $contactID;
 
@@ -337,7 +336,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $this->_retCode = CRM_Import_Parser::VALID;
       }
     }
-    elseif (is_array($newContact)) {
+    else {
       // if duplicate, no need of further processing
       if ($onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
         $this->setImportStatus($rowNumber, 'DUPLICATE', 'Skipping duplicate record');
@@ -382,7 +381,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $primaryContactId = $newContact->id;
     }
 
-    if ((is_array($newContact) || is_a($newContact, 'CRM_Contact_BAO_Contact')) && $primaryContactId) {
+    if ($primaryContactId) {
 
       //relationship contact insert
       foreach ($this->getRelatedContactsParams($params) as $key => $field) {
@@ -469,7 +468,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           $this->_newRelatedContacts[] = $relativeContact[] = $relContactId;
         }
 
-        if (is_array($relatedNewContact) || ($relatedNewContact instanceof CRM_Contact_BAO_Contact)) {
+        if (1) {
           //fix for CRM-1993.Checks for duplicate related contacts
           if (count($matchedIDs) >= 1) {
             //if more than one duplicate contact
@@ -1608,9 +1607,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     if (is_array($newContact)) {
       $contactID = $newContact[0];
-      if (is_array($contactID)) {
-        $contactID = array_pop($contactID);
-      }
       if (!in_array($contactID, $this->_newContacts)) {
         $this->_newContacts[] = $contactID;
       }
