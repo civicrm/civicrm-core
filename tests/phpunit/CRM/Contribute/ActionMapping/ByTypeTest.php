@@ -41,24 +41,50 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
   public function createTestCases() {
     $cs = [];
 
-    // FIXME: CRM-19415: The right email content goes out, but it appears that the dates are incorrect.
-    //    $cs[] = array(
-    //      '2015-02-01 00:00:00',
-    //      'addAliceDues scheduleForAny startOnTime useHelloFirstName alsoRecipientBob',
-    //      array(
-    //        array(
-    //          'time' => '2015-02-01 00:00:00',
-    //          'to' => array('alice@example.org'),
-    //          'subject' => '/Hello, Alice.*via subject/',
-    //        ),
-    //        array(
-    //          'time' => '2015-02-01 00:00:00',
-    //          'to' => array('bob@example.org'),
-    //          'subject' => '/Hello, Bob.*via subject/',
-    //          // It might make more sense to get Alice's details... but path of least resistance...
-    //        ),
-    //      ),
-    //    );
+    $cs[] = [
+      '2015-02-01 00:00:00',
+      'addAliceDues scheduleForAny startOnTime useHelloFirstNameStatus alsoRecipientBob',
+      [
+        [
+          'time' => '2015-01-20 00:00:00',
+          'to' => ['bob@example.org'],
+          'subject' => '/Hello, Bob. @. \(via subject\)/',
+          // I'm not sure this behavior is what I would expect.
+          // - INTUITION: As someone browsing the admin UI, my guess is that "Also Include" behaves like a "CC"
+          //   (where Alice's data drives the notification, and Bob gets a copy of the message).
+          // - REALITY: The "also include" recipient, Bob, is treated as a recipient on day #1 (even
+          //   before any reminder becomes ripe for the organic recipient, Alice). The `{contact.*}`
+          //   details are filled in with Bob's information. In effect, Bob gets an early/preview
+          //   message that hints at how messages will look for Alice. However, Bob doesn't have
+          //   a contribution record, so some tokens (`{contribution.contribution_status_id:name}`)
+          //   don't work.
+          // - WHAT SHOULD IT DO: I'm not sure. The reality seems quirky and vaguely broken.
+          //   The CC behavior would be more "clearly defined" IMHO. OTOH, CC would also be more noisy.
+          //   The present behavior (early/preview message) maybe serves a different+valid business-need,
+          //   but the problems+limits seem essential.
+        ],
+        [
+          'time' => '2015-02-01 00:00:00',
+          'to' => ['alice@example.org'],
+          'subject' => '/Hello, Alice. @Completed. \(via subject\)/',
+        ],
+      ],
+    ];
+
+    $cs[] = [
+      '2015-02-01 00:00:00',
+      'scheduleForAny startOnTime useHelloFirstNameStatus alsoRecipientBob',
+      [
+        [
+          'time' => '2015-01-20 00:00:00',
+          'to' => ['bob@example.org'],
+          'subject' => '/Hello, Bob. @. \(via subject\)/',
+          // This is consistent with example+analysis above - The "Also Include" recipient gets
+          // an early/preview message without `{contribution.*}` tokens. This may be good or bad behavior.
+          // The test helps to show what the behavior is.
+        ],
+      ],
+    ];
 
     $cs[] = [
       '2015-02-01 00:00:00',
