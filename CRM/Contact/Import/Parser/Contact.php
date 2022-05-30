@@ -536,17 +536,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
     //dupe checking
     if (is_array($newContact)) {
-      $code = NULL;
-
-      if (($code = CRM_Utils_Array::value('code', $newContact['error_message'])) && ($code == CRM_Core_Error::DUPLICATE_CONTACT)) {
-        return $this->handleDuplicateError($newContact, $values, $onDuplicate, $formatted, $contactFields);
-      }
-      // Not a dupe, so we had an error
-      $errorMessage = $newContact['error_message'];
-      array_unshift($values, $errorMessage);
-      $this->setImportStatus((int) $values[count($values) - 1], 'ERROR', $errorMessage);
-      return CRM_Import_Parser::ERROR;
-
+      return $this->handleDuplicateError($newContact, $values, $onDuplicate, $formatted, $contactFields);
     }
 
     if (empty($this->_unparsedStreetAddressContacts)) {
