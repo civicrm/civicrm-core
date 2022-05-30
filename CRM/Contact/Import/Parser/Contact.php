@@ -1154,17 +1154,24 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     //get the prefix id etc if exists
     CRM_Contact_BAO_Contact::resolveDefaults($formatted, TRUE);
 
-    //@todo direct call to API function not supported.
-    // setting required check to false, CRM-2839
-    // plus we do our own required check in import
-    try {
-      $error = $this->deprecated_contact_check_params($formatted, $dupeCheck, $dedupeRuleGroupID);
-      if ($error) {
-        return $error;
+    if ($dupeCheck) {
+      // @todo this is already done in lookupContactID
+      // the differences are that a couple of functions are callled in between
+      // and that call doesn't error out if multiple are found. - once
+      // those 2 things are fixed this can go entirely.
+      $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($formatted, $formatted['contact_type'], 'Unsupervised', [], FALSE, $dedupeRuleGroupID);
+
+      if ($ids != NULL) {
+        return [
+          'is_error' => 1,
+          'error_message' => [
+            'code' => CRM_Core_Error::DUPLICATE_CONTACT,
+            'params' => $ids,
+            'level' => 'Fatal',
+            'message' => 'Found matching contacts: ' . implode(',', $ids),
+          ],
+        ];
       }
-    }
-    catch (CRM_Core_Exception $e) {
-      return ['error_message' => $e->getMessage(), 'is_error' => 1, 'code' => $e->getCode()];
     }
 
     if ($contactId) {
@@ -1804,39 +1811,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $this->setImportStatus((int) $values[count($values) - 1], 'Imported', '');
     //return warning if street address is not parsed, CRM-5886
     return $this->processMessage($values, CRM_Import_Parser::VALID);
-  }
-
-  /**
-   * @param array $params
-   * @param bool $dupeCheck
-   * @param null|int $dedupeRuleGroupID
-   *
-   * @return ?array
-   * @throws \CRM_Core_Exception
-   */
-  public function deprecated_contact_check_params(
-    $params,
-    $dupeCheck = TRUE,
-    $dedupeRuleGroupID = NULL) {
-
-    if ($dupeCheck) {
-      // @todo switch to using api version
-      // $dupes = civicrm_api3('Contact', 'duplicatecheck', (array('match' => $params, 'dedupe_rule_id' => $dedupeRuleGroupID)));
-      // $ids = $dupes['count'] ? implode(',', array_keys($dupes['values'])) : NULL;
-      $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, $params['contact_type'], 'Unsupervised', [], CRM_Utils_Array::value('check_permissions', $params), $dedupeRuleGroupID);
-
-      if ($ids != NULL) {
-        return [
-          'is_error' => 1,
-          'error_message' => [
-            'code' => CRM_Core_Error::DUPLICATE_CONTACT,
-            'params' => $ids,
-            'level' => 'Fatal',
-            'message' => 'Found matching contacts: ' . implode(',', $ids),
-          ],
-        ];
-      }
-    }
   }
 
   /**
