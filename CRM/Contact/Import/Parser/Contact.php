@@ -319,7 +319,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     if ($this->_updateWithId && !empty($params['id'])) {
       $contactID = $params['id'];
     }
-    $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $contactID, TRUE, $this->_dedupeRuleGroupID);
+    $dupeCheck = FALSE;
+    if (is_null($contactID) && ($onDuplicate != CRM_Import_Parser::DUPLICATE_NOCHECK)) {
+      $dupeCheck = (bool) ($onDuplicate);
+    }
+    $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $contactID, $dupeCheck, $this->_dedupeRuleGroupID);
 
     if (is_object($newContact) && ($newContact instanceof CRM_Contact_BAO_Contact)) {
       $newContact = clone($newContact);
@@ -409,7 +413,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           $relatedNewContact = CRM_Contact_BAO_Contact::retrieve($contact, $defaults);
         }
         else {
-          $relatedNewContact = $this->createContact($formatting, $contactFields, $onDuplicate, NULL, FALSE);
+          $dupeCheck = FALSE;
+          if ($onDuplicate != CRM_Import_Parser::DUPLICATE_NOCHECK) {
+            $dupeCheck = (bool) ($onDuplicate);
+          }
+          $relatedNewContact = $this->createContact($formatting, $contactFields, $onDuplicate, NULL, $dupeCheck);
         }
 
         if (is_object($relatedNewContact) || ($relatedNewContact instanceof CRM_Contact_BAO_Contact)) {
@@ -454,7 +462,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             return CRM_Import_Parser::NO_MATCH;
           }
           else {
-            $updatedContact = $this->createContact($formatting, $contactFields, $onDuplicate, $matchedIDs[0]);
+            $dupeCheck = FALSE;
+            if (is_null($matchedIDs[0]) && ($onDuplicate != CRM_Import_Parser::DUPLICATE_NOCHECK)) {
+              $dupeCheck = (bool) ($onDuplicate);
+            }
+            $updatedContact = $this->createContact($formatting, $contactFields, $onDuplicate, $matchedIDs[0], $dupeCheck);
           }
         }
         static $relativeContact = [];
@@ -1138,18 +1150,14 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param array $contactFields
    * @param int $onDuplicate
    * @param int $contactId
-   * @param bool $requiredCheck
-   * @param int $dedupeRuleGroupID
+   * @param bool $dupeCheck
+   * @param null $dedupeRuleGroupID
    *
    * @return array|bool|\CRM_Contact_BAO_Contact|\CRM_Core_Error|null
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function createContact(&$formatted, &$contactFields, $onDuplicate, $contactId = NULL, $requiredCheck = TRUE, $dedupeRuleGroupID = NULL) {
-    $dupeCheck = FALSE;
-    $newContact = NULL;
-
-    if (is_null($contactId) && ($onDuplicate != CRM_Import_Parser::DUPLICATE_NOCHECK)) {
-      $dupeCheck = (bool) ($onDuplicate);
-    }
+  public function createContact(&$formatted, &$contactFields, $onDuplicate, $contactId, $dupeCheck, $dedupeRuleGroupID = NULL) {
 
     //get the prefix id etc if exists
     CRM_Contact_BAO_Contact::resolveDefaults($formatted, TRUE);
@@ -1773,7 +1781,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     $vals = ['contact_id' => $contactId];
     if (in_array((int) $onDuplicate, [CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::DUPLICATE_FILL], TRUE)) {
-      $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $contactId);
+      $dupeCheck = FALSE;
+      if (is_null($contactId) && ($onDuplicate != CRM_Import_Parser::DUPLICATE_NOCHECK)) {
+        $dupeCheck = (bool) ($onDuplicate);
+      }
+      $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $contactId, $dupeCheck);
     }
     // else skip does nothing and just returns an error code.
     if ($cid) {
