@@ -344,10 +344,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         return FALSE;
       }
 
-      // CRM-10433/CRM-20739 - IDs could be string or array; handle accordingly
-      if (!is_array($dupeContactIDs = $newContact['error_message']['params'][0])) {
-        $dupeContactIDs = explode(',', $dupeContactIDs);
-      }
+      $dupeContactIDs = $newContact;
       $dupeCount = count($dupeContactIDs);
       $contactID = array_pop($dupeContactIDs);
       // check to see if we had more than one duplicate contact id.
@@ -424,10 +421,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         // To update/fill contact, get the matching contact Ids if duplicate contact found
         // otherwise get contact Id from object of related contact
         if (is_array($relatedNewContact)) {
-          $matchedIDs = $relatedNewContact['error_message']['params'][0];
-          if (!is_array($matchedIDs)) {
-            $matchedIDs = explode(',', $matchedIDs);
-          }
+          $matchedIDs = $relatedNewContact;
         }
         else {
           $matchedIDs[] = $relatedNewContact->id;
@@ -1003,19 +997,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       // and that call doesn't error out if multiple are found. - once
       // those 2 things are fixed this can go entirely.
       $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($formatted, $formatted['contact_type'], 'Unsupervised', [], FALSE, $dedupeRuleGroupID);
-
-      if ($ids != NULL) {
-        // @todo - this should be unreachable as lookupContact will have populated
-        // contact ID OR exited if muliple.
-        return [
-          'is_error' => 1,
-          'error_message' => [
-            'code' => CRM_Core_Error::DUPLICATE_CONTACT,
-            'params' => $ids,
-            'level' => 'Fatal',
-            'message' => 'Found matching contacts: ' . implode(',', $ids),
-          ],
-        ];
+      if (!empty($ids)) {
+        return $ids;
       }
     }
 
@@ -1573,7 +1556,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * @param array $newContact
+   * @param array $cids
    * @param array $values
    * @param int $onDuplicate
    * @param array $formatted
@@ -1585,17 +1568,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  private function handleDuplicateError(array $newContact, array $values, int $onDuplicate, array $formatted, array $contactFields): int {
+  private function handleDuplicateError(array $cids, array $values, int $onDuplicate, array $formatted, array $contactFields): int {
     // This is expected to be unreachable.
     $urls = [];
-    // need to fix at some stage and decide if the error will return an
-    // array or string, crude hack for now
-    if (is_array($newContact['error_message']['params'][0])) {
-      $cids = $newContact['error_message']['params'][0];
-    }
-    else {
-      $cids = explode(',', $newContact['error_message']['params'][0]);
-    }
 
     foreach ($cids as $cid) {
       $urls[] = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $cid, TRUE);
@@ -1632,7 +1607,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
 
     if (is_array($newContact)) {
-      $contactID = $newContact['error_message']['params'][0];
+      $contactID = $newContact[0];
       if (is_array($contactID)) {
         $contactID = array_pop($contactID);
       }
