@@ -1106,6 +1106,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ['do_not_import'],
       // [$childKey, $customField, 'state_province'],
       ['do_not_import'],
+      // mapField Form expects all fields to be mapped.
+      ['do_not_import'],
+      ['do_not_import'],
     ];
     $csv = 'individual_country_state_county_with_related.csv';
     $this->validateMultiRowCsv($csv, $mapper, 'error_value');
@@ -1182,6 +1185,10 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ['5_a_b', 'organization_name'],
       ['contact_sub_type'],
       ['5_a_b', 'contact_sub_type'],
+      // mapField Form expects all fields to be mapped.
+      ['do_not_import'],
+      ['do_not_import'],
+      ['do_not_import'],
     ];
     $csv = 'individual_contact_sub_types.csv';
     $field = 'contact_sub_type';

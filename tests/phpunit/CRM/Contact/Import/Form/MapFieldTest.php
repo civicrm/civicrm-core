@@ -237,31 +237,28 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     return [
       [
         ['name' => 'first_name', 'contact_type' => 'Individual', 'column_number' => 0],
-        "document.forms.MapField['mapper[0][1]'].style.display = 'none';
-document.forms.MapField['mapper[0][2]'].style.display = 'none';
-document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
-        ['mapper[0]' => ['first_name', 0, NULL]],
+        "swapOptions(document.forms.MapField, 'mapper[0]', 0, 4, 'hs_mapper_0_');\n",
+        ['mapper[0]' => ['first_name']],
       ],
       [
         ['name' => 'phone', 'contact_type' => 'Individual', 'column_number' => 0, 'phone_type_id' => 1, 'location_type_id' => 2],
-        "document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+        "swapOptions(document.forms.MapField, 'mapper[0]', 2, 4, 'hs_mapper_0_');\n",
         ['mapper[0]' => ['phone', 2, 1]],
       ],
       [
         ['name' => 'im', 'contact_type' => 'Individual', 'column_number' => 0, 'im_provider_id' => 1, 'location_type_id' => 2],
-        "document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+        "swapOptions(document.forms.MapField, 'mapper[0]', 2, 4, 'hs_mapper_0_');\n",
         ['mapper[0]' => ['im', 2, 1]],
       ],
       [
         ['name' => 'url', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id' => 1],
-        "document.forms.MapField['mapper[0][2]'].style.display = 'none';
-document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+        "swapOptions(document.forms.MapField, 'mapper[0]', 1, 4, 'hs_mapper_0_');\n",
         ['mapper[0]' => ['url', 1]],
       ],
       [
         // Yes, the relationship mapping really does use url whereas non relationship uses website because... legacy
         ['name' => 'url', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id' => 1, 'relationship_type_id' => 1, 'relationship_direction' => 'a_b'],
-        "document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+        "swapOptions(document.forms.MapField, 'mapper[0]', 2, 4, 'hs_mapper_0_');\n",
         ['mapper[0]' => ['1_a_b', 'url', 1]],
       ],
       [
@@ -271,9 +268,7 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
       ],
       [
         ['name' => 'do_not_import', 'contact_type' => 'Individual', 'column_number' => 0],
-        "document.forms.MapField['mapper[0][1]'].style.display = 'none';
-document.forms.MapField['mapper[0][2]'].style.display = 'none';
-document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+        "swapOptions(document.forms.MapField, 'mapper[0]', 0, 4, 'hs_mapper_0_');\n",
         ['mapper[0]' => []],
       ],
     ];
@@ -354,9 +349,8 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
 
     $defaults = [];
     $defaults["mapper[$columnNumber]"] = $processor->getSavedQuickformDefaultsForColumn($columnNumber);
-    $js = $processor->getQuickFormJSForField($columnNumber);
 
-    return ['defaults' => $defaults, 'js' => $js];
+    return ['defaults' => $defaults];
   }
 
   /**
