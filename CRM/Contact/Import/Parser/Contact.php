@@ -1786,14 +1786,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
 
     if (is_array($newContact)) {
-      if (empty($newContact['error_message']['params'])) {
-        // different kind of error other than DUPLICATE
-        $errorMessage = $newContact['error_message'];
-        array_unshift($values, $errorMessage);
-        $this->setImportStatus((int) $values[count($values) - 1], 'ERROR', $errorMessage);
-        return CRM_Import_Parser::ERROR;
-      }
-
       $contactID = $newContact['error_message']['params'][0];
       if (is_array($contactID)) {
         $contactID = array_pop($contactID);
