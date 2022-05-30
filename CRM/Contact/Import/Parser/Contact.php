@@ -114,6 +114,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     'postal_greeting_id',
     'addressee',
     'addressee_id',
+    'geo_code_1',
+    'geo_code_2',
   ];
 
   /**
@@ -947,32 +949,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
                   if (!empty($county['county']) && !in_array($county['county'], $countyNames)) {
                     $errors[] = ts('County input value not in county table: The County value appears to be invalid. It does not match any value in CiviCRM table of counties.');
                   }
-                }
-              }
-            }
-            break;
-
-          case 'geo_code_1':
-            if (!empty($value)) {
-              foreach ($value as $codeValue) {
-                if (!empty($codeValue['geo_code_1'])) {
-                  if (CRM_Utils_Rule::numeric($codeValue['geo_code_1'])) {
-                    continue;
-                  }
-                  $errors[] = ts('Geo code 1');
-                }
-              }
-            }
-            break;
-
-          case 'geo_code_2':
-            if (!empty($value)) {
-              foreach ($value as $codeValue) {
-                if (!empty($codeValue['geo_code_2'])) {
-                  if (CRM_Utils_Rule::numeric($codeValue['geo_code_2'])) {
-                    continue;
-                  }
-                  $errors[] = ts('Geo code 2');
                 }
               }
             }

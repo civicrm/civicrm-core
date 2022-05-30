@@ -1186,6 +1186,9 @@ abstract class CRM_Import_Parser {
       return CRM_Utils_Rule::email($importedValue) ? $importedValue : 'invalid_import_value';
     }
 
+    if ($fieldMetadata['type'] === CRM_Utils_Type::T_FLOAT) {
+      return CRM_Utils_Rule::numeric($importedValue) ? $importedValue : 'invalid_import_value';
+    }
     if ($fieldMetadata['type'] === CRM_Utils_Type::T_BOOLEAN) {
       $value = CRM_Utils_String::strtoboolstr($importedValue);
       if ($value !== FALSE) {

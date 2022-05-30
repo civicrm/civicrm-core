@@ -1978,6 +1978,23 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test geocode validation.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportGeocodes(): void {
+    $mapper = [
+      ['first_name'],
+      ['last_name'],
+      ['geo_code_1', 1],
+      ['geo_code_2', 1],
+    ];
+    $csv = 'individual_geocode.csv';
+    $this->validateMultiRowCsv($csv, $mapper, 'GeoCode2');
+  }
+
+  /**
    * Validate the csv file values.
    *
    * @param string $csv Name of csv file.
