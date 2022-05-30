@@ -782,17 +782,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    */
   public static function resolveDefaults(&$defaults, $reverse = FALSE) {
 
-    //lookup value of email/postal greeting, addressee, CRM-4575
-    foreach (self::$_greetingTypes as $greeting) {
-      $filterCondition = [
-        'contact_type' => $defaults['contact_type'] ?? NULL,
-        'greeting_type' => $greeting,
-      ];
-      CRM_Utils_Array::lookupValue($defaults, $greeting,
-        CRM_Core_PseudoConstant::greeting($filterCondition), $reverse
-      );
-    }
-
     $blocks = ['address'];
     foreach ($blocks as $name) {
       if (!array_key_exists($name, $defaults) || !is_array($defaults[$name])) {

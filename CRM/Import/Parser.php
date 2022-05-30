@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\CustomField;
 use Civi\Api4\UserJob;
 
 /**
@@ -818,43 +819,6 @@ abstract class CRM_Import_Parser {
       return TRUE;
     }
 
-    // CRM-4575
-    if (isset($values['email_greeting'])) {
-      if (!empty($params['email_greeting_id'])) {
-        $emailGreetingFilter = [
-          'contact_type' => $params['contact_type'] ?? NULL,
-          'greeting_type' => 'email_greeting',
-        ];
-        $emailGreetings = CRM_Core_PseudoConstant::greeting($emailGreetingFilter);
-        $params['email_greeting'] = $emailGreetings[$params['email_greeting_id']];
-      }
-      else {
-        $params['email_greeting'] = $values['email_greeting'];
-      }
-
-      return TRUE;
-    }
-
-    if (isset($values['postal_greeting'])) {
-      if (!empty($params['postal_greeting_id'])) {
-        $postalGreetingFilter = [
-          'contact_type' => $params['contact_type'] ?? NULL,
-          'greeting_type' => 'postal_greeting',
-        ];
-        $postalGreetings = CRM_Core_PseudoConstant::greeting($postalGreetingFilter);
-        $params['postal_greeting'] = $postalGreetings[$params['postal_greeting_id']];
-      }
-      else {
-        $params['postal_greeting'] = $values['postal_greeting'];
-      }
-      return TRUE;
-    }
-
-    if (isset($values['addressee'])) {
-      $params['addressee'] = $values['addressee'];
-      return TRUE;
-    }
-
     if (isset($values['gender'])) {
       if (!empty($params['gender_id'])) {
         $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
@@ -1268,15 +1232,27 @@ abstract class CRM_Import_Parser {
    */
   protected function getFieldMetadata(string $fieldName, bool $loadOptions = FALSE, $limitToContactType = FALSE): array {
 
-    $fieldMap = ['country_id' => 'country'];
+    $fieldMap = $this->getOddlyMappedMetadataFields();
     $fieldMapName = empty($fieldMap[$fieldName]) ? $fieldName : $fieldMap[$fieldName];
 
-    $fieldMetadata = $this->getImportableFieldsMetadata()[$fieldMapName] ?? ($limitToContactType ? NULL : CRM_Contact_BAO_Contact::importableFields('All')[$fieldMapName]);
-    if ($loadOptions && !isset($fieldMetadata['options'])) {
+    // This whole business of only loading metadata for one type when we actually need it for all is ... dubious.
+    if (empty($this->getImportableFieldsMetadata()[$fieldMapName])) {
+      if ($loadOptions || !$limitToContactType) {
+        $this->importableFieldsMetadata[$fieldMapName] = CRM_Contact_BAO_Contact::importableFields('All')[$fieldMapName];
+      }
+    }
 
+    $fieldMetadata = $this->getImportableFieldsMetadata()[$fieldMapName];
+    if ($loadOptions && !isset($fieldMetadata['options'])) {
+      $optionFieldName = empty($fieldMap[$fieldName]) ? $fieldMetadata['name'] : $fieldName;
+      if (!empty($fieldMetadata['custom_group_id'])) {
+        $customField = CustomField::get(FALSE)->addWhere('id', '=', $fieldMetadata['custom_field_id'])
+          ->addSelect('name', 'custom_group_id.name')->execute()->first();
+        $optionFieldName = $customField['custom_group_id.name'] . '.' . $customField['name'];
+      }
       $options = civicrm_api4($this->getFieldEntity($fieldName), 'getFields', [
-        'loadOptions' => ['id', 'name', 'label'],
-        'where' => [['name', '=', empty($fieldMap[$fieldName]) ? $fieldMetadata['name'] : $fieldName]],
+        'loadOptions' => ['id', 'name', 'label', 'abbr'],
+        'where' => [['name', '=', $optionFieldName]],
         'select' => ['options'],
       ])->first()['options'];
       if (is_array($options)) {
@@ -1284,9 +1260,15 @@ abstract class CRM_Import_Parser {
         // name AND label as either might be used. We also lower case before checking
         $values = [];
         foreach ($options as $option) {
-          $values[$option['id']] = $option['id'];
-          $values[mb_strtolower($option['name'])] = $option['id'];
-          $values[mb_strtolower($option['label'])] = $option['id'];
+          $idKey = is_numeric($option['id']) ? $option['id'] : mb_strtolower($option['id']);
+          $values[$idKey] = $option['id'];
+          foreach (['name', 'label', 'abbr'] as $key) {
+            $optionValue = mb_strtolower($option[$key] ?? '');
+            if ($optionValue !== '') {
+              $values[$optionValue] = $option['id'];
+            }
+          }
+
         }
         $this->importableFieldsMetadata[$fieldMapName]['options'] = $values;
       }
@@ -1385,6 +1367,9 @@ abstract class CRM_Import_Parser {
     if ($fieldName === 'do_not_import') {
       return NULL;
     }
+    if (in_array($fieldName, ['email_greeting_id', 'postal_greeting_id', 'addressee_id'], TRUE)) {
+      return 'Contact';
+    }
     $metadata = $this->getFieldMetadata($fieldName);
     if (!isset($metadata['entity'])) {
       return in_array($metadata['extends'], ['Individual', 'Organization', 'Household'], TRUE) ? 'Contact' : $metadata['extends'];
@@ -1441,6 +1426,22 @@ abstract class CRM_Import_Parser {
       $this->availableCountries = !empty($availableCountries) ? array_fill_keys($availableCountries, TRUE) : FALSE;
     }
     return $this->availableCountries;
+  }
+
+  /**
+   * Get the metadata field for which importable fields does not key the actual field name.
+   *
+   * @return string[]
+   */
+  protected function getOddlyMappedMetadataFields(): array {
+    return [
+      'country_id' => 'country',
+      'state_province_id' => 'state_province',
+      'county_id' => 'county',
+      'email_greeting_id' => 'email_greeting',
+      'postal_greeting_id' => 'postal_greeting',
+      'addressee_id' => 'addressee',
+    ];
   }
 
 }
