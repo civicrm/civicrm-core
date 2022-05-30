@@ -419,7 +419,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $matchedIDs = [];
         // To update/fill contact, get the matching contact Ids if duplicate contact found
         // otherwise get contact Id from object of related contact
-        if (is_array($relatedNewContact) && civicrm_error($relatedNewContact)) {
+        if (is_array($relatedNewContact)) {
           if (CRM_Core_Error::isAPIError($relatedNewContact, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
             $matchedIDs = $relatedNewContact['error_message']['params'][0];
             if (!is_array($matchedIDs)) {
@@ -543,7 +543,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       return $this->processMessage($values, $this->_retCode);
     }
     //dupe checking
-    if (is_array($newContact) && civicrm_error($newContact)) {
+    if (is_array($newContact)) {
       $code = NULL;
 
       if (($code = CRM_Utils_Array::value('code', $newContact['error_message'])) && ($code == CRM_Core_Error::DUPLICATE_CONTACT)) {
@@ -1141,7 +1141,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param bool $requiredCheck
    * @param int $dedupeRuleGroupID
    *
-   * @return array|bool|\CRM_Contact_BAO_Contact|\CRM_Core_Error|null
+   * @return array|\CRM_Contact_BAO_Contact
+   *   If a duplicate is found an array is returned, otherwise CRM_Contact_BAO_Contact
    */
   public function createContact(&$formatted, &$contactFields, $onDuplicate, $contactId = NULL, $requiredCheck = TRUE, $dedupeRuleGroupID = NULL) {
     $dupeCheck = FALSE;
@@ -1784,7 +1785,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $newContact = CRM_Contact_BAO_Contact::retrieve($contact, $defaults);
     }
 
-    if (civicrm_error($newContact)) {
+    if (is_array($newContact)) {
       if (empty($newContact['error_message']['params'])) {
         // different kind of error other than DUPLICATE
         $errorMessage = $newContact['error_message'];
