@@ -108,6 +108,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     'email',
     'website',
     'url',
+    'email_greeting',
+    'email_greeting_id',
+    'postal_greeting',
+    'postal_greeting_id',
+    'addressee',
+    'addressee_id',
   ];
 
   /**
@@ -288,10 +294,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
 
     $params = $this->getMappedRow($values);
-    $formatted = array_intersect_key($params, array_fill_keys($this->metadataHandledFields, 1));
-    foreach ($formatted as $key => $value) {
-      if (!is_array($value) && !strlen($value)) {
-        unset($formatted[$key]);
+    $formatted = [];
+    foreach ($params as $key => $value) {
+      if ($value !== '') {
+        $formatted[$key] = $value;
       }
     }
 
@@ -972,66 +978,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             }
             break;
 
-          //check for any error in email/postal greeting, addressee,
-          //custom email/postal greeting, custom addressee, CRM-4575
-
-          case 'email_greeting':
-            $emailGreetingFilter = [
-              'contact_type' => $this->_contactType,
-              'greeting_type' => 'email_greeting',
-            ];
-            if (!self::in_value($value, CRM_Core_PseudoConstant::greeting($emailGreetingFilter))) {
-              $errors[] = ts('Email Greeting must be one of the configured format options. Check Administer >> System Settings >> Option Groups >> Email Greetings for valid values');
-            }
-            break;
-
-          case 'postal_greeting':
-            $postalGreetingFilter = [
-              'contact_type' => $this->_contactType,
-              'greeting_type' => 'postal_greeting',
-            ];
-            if (!self::in_value($value, CRM_Core_PseudoConstant::greeting($postalGreetingFilter))) {
-              $errors[] = ts('Postal Greeting must be one of the configured format options. Check Administer >> System Settings >> Option Groups >> Postal Greetings for valid values');
-            }
-            break;
-
-          case 'addressee':
-            $addresseeFilter = [
-              'contact_type' => $this->_contactType,
-              'greeting_type' => 'addressee',
-            ];
-            if (!self::in_value($value, CRM_Core_PseudoConstant::greeting($addresseeFilter))) {
-              $errors[] = ts('Addressee must be one of the configured format options. Check Administer >> System Settings >> Option Groups >> Addressee for valid values');
-            }
-            break;
-
-          case 'email_greeting_custom':
-            if (array_key_exists('email_greeting', $params)) {
-              $emailGreetingLabel = key(CRM_Core_OptionGroup::values('email_greeting', TRUE, NULL, NULL, 'AND v.name = "Customized"'));
-              if (CRM_Utils_Array::value('email_greeting', $params) != $emailGreetingLabel) {
-                $errors[] = ts('Email Greeting - Custom');
-              }
-            }
-            break;
-
-          case 'postal_greeting_custom':
-            if (array_key_exists('postal_greeting', $params)) {
-              $postalGreetingLabel = key(CRM_Core_OptionGroup::values('postal_greeting', TRUE, NULL, NULL, 'AND v.name = "Customized"'));
-              if (CRM_Utils_Array::value('postal_greeting', $params) != $postalGreetingLabel) {
-                $errors[] = ts('Postal Greeting - Custom');
-              }
-            }
-            break;
-
-          case 'addressee_custom':
-            if (array_key_exists('addressee', $params)) {
-              $addresseeLabel = key(CRM_Core_OptionGroup::values('addressee', TRUE, NULL, NULL, 'AND v.name = "Customized"'));
-              if (CRM_Utils_Array::value('addressee', $params) != $addresseeLabel) {
-                $errors[] = ts('Addressee - Custom');
-              }
-            }
-            break;
-
           case 'do_not_email':
           case 'do_not_phone':
           case 'do_not_mail':
@@ -1373,11 +1319,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
       else {
-        if (in_array($key, CRM_Contact_BAO_Contact::$_greetingTypes, TRUE)) {
-          //save email/postal greeting and addressee values if any, CRM-4575
-          $data[$key . '_id'] = $value;
-        }
-        elseif (($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
+        if (($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
           // for autocomplete transfer hidden value instead of label
           if ($params[$key] && isset($params[$key . '_id'])) {
             $value = $params[$key . '_id'];
@@ -2048,43 +1990,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     // @todo - remove this after confirming this is just a compilation of other-wise-cached fields.
     static $fields = [];
 
-    // CRM-4575
-    if (isset($values['email_greeting'])) {
-      if (!empty($params['email_greeting_id'])) {
-        $emailGreetingFilter = [
-          'contact_type' => $params['contact_type'] ?? NULL,
-          'greeting_type' => 'email_greeting',
-        ];
-        $emailGreetings = CRM_Core_PseudoConstant::greeting($emailGreetingFilter);
-        $params['email_greeting'] = $emailGreetings[$params['email_greeting_id']];
-      }
-      else {
-        $params['email_greeting'] = $values['email_greeting'];
-      }
-
-      return TRUE;
-    }
-
-    if (isset($values['postal_greeting'])) {
-      if (!empty($params['postal_greeting_id'])) {
-        $postalGreetingFilter = [
-          'contact_type' => $params['contact_type'] ?? NULL,
-          'greeting_type' => 'postal_greeting',
-        ];
-        $postalGreetings = CRM_Core_PseudoConstant::greeting($postalGreetingFilter);
-        $params['postal_greeting'] = $postalGreetings[$params['postal_greeting_id']];
-      }
-      else {
-        $params['postal_greeting'] = $values['postal_greeting'];
-      }
-      return TRUE;
-    }
-
-    if (isset($values['addressee'])) {
-      $params['addressee'] = $values['addressee'];
-      return TRUE;
-    }
-
     if (isset($values['note'])) {
       // add a note field
       if (!isset($params['note'])) {
@@ -2620,6 +2525,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
     }
     else {
+      $fieldName = array_search($fieldName, $this->getOddlyMappedMetadataFields(), TRUE) ?: $fieldName;
       $contactArray[$fieldName] = $this->getTransformedFieldValue($fieldName, $importedValue);
     }
   }
