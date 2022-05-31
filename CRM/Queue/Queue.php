@@ -44,6 +44,35 @@ abstract class CRM_Queue_Queue {
   public function __construct($queueSpec) {
     $this->_name = $queueSpec['name'];
     $this->queueSpec = $queueSpec;
+    unset($this->queueSpec['status']);
+    // Status may be meaningfully + independently toggled (eg when using type=SqlParallel,error=abort).
+    // Retaining a copy of 'status' in here would be misleading.
+  }
+
+  /**
+   * Determine whether this queue is currently active.
+   *
+   * @return bool
+   *   TRUE if runners should continue claiming new tasks from this queue
+   * @throws \CRM_Core_Exception
+   */
+  public function isActive(): bool {
+    $status = CRM_Core_DAO::getFieldValue('CRM_Queue_DAO_Queue', $this->_name, 'status', 'name', TRUE);
+    // Note: In the future, we may want to incorporate other data (like maintenance-mode or upgrade-status) in deciding active queues.
+    return ($status === 'active');
+  }
+
+  /**
+   * Change the status of the queue.
+   *
+   * @param string $status
+   *   Ex: 'active', 'draft', 'aborted'
+   */
+  public function setStatus(string $status): void {
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_queue SET status = %1 WHERE name = %2', [
+      1 => ['aborted', 'String'],
+      2 => [$this->getName(), 'String'],
+    ]);
   }
 
   /**
