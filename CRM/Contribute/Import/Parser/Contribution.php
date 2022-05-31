@@ -467,6 +467,36 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   }
 
   /**
+   * Transform the input parameters into the form handled by the input routine.
+   *
+   * @param array $values
+   *   Input parameters as they come in from the datasource
+   *   eg. ['Bob', 'Smith', 'bob@example.org', '123-456']
+   *
+   * @return array
+   *   Parameters mapped to CiviCRM fields based on the mapping. eg.
+   *   [
+   *     'total_amount' => '1230.99',
+   *     'financial_type_id' => 1,
+   *     'external_identifier' => 'abcd',
+   *     'soft_credit' => [3 => ['external_identifier' => '123', 'soft_credit_type_id' => 1]]
+   *
+   * @throws \API_Exception
+   */
+  public function getMappedRow(array $values): array {
+    $params = [];
+    foreach ($this->getFieldMappings() as $i => $mappedField) {
+      if (!empty($mappedField['soft_credit_match_field'])) {
+        $params['soft_credit'][$i] = ['soft_credit_type_id' => $mappedField['soft_credit_type_id'], $mappedField['soft_credit_match_field'] => $values[$i]];
+      }
+      else {
+        $params[$this->getFieldMetadata($mappedField['name'])['name']] = $values[$i];
+      }
+    }
+    return $params;
+  }
+
+  /**
    * @param string $name
    * @param $title
    * @param int $type

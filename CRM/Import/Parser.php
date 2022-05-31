@@ -330,7 +330,7 @@ abstract class CRM_Import_Parser {
    * file
    * @var array
    */
-  protected $_activeFields;
+  protected $_activeFields = [];
 
   /**
    * Cache the count of active fields
@@ -1510,6 +1510,27 @@ abstract class CRM_Import_Parser {
    */
   protected function isAmbiguous(string $fieldName, $importedValue): bool {
     return !empty($this->ambiguousOptions[$fieldName][mb_strtolower($importedValue)]);
+  }
+
+  /**
+   * Get the field mappings for the import.
+   *
+   * This is the same format as saved in civicrm_mapping_field except
+   * that location_type_id = 'Primary' rather than empty where relevant.
+   * Also 'im_provider_id' is mapped to the 'real' field name 'provider_id'
+   *
+   * @return array
+   * @throws \API_Exception
+   */
+  protected function getFieldMappings(): array {
+    $mappedFields = [];
+    foreach ($this->getSubmittedValue('mapper') as $i => $mapperRow) {
+      $mappedField = $this->getMappingFieldFromMapperInput($mapperRow, 0, $i);
+      // Just for clarity since 0 is a pseudo-value
+      unset($mappedField['mapping_id']);
+      $mappedFields[] = $mappedField;
+    }
+    return $mappedFields;
   }
 
 }
