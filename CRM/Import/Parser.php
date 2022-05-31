@@ -866,22 +866,6 @@ abstract class CRM_Import_Parser {
       return TRUE;
     }
 
-    if (!empty($values['preferred_communication_method'])) {
-      $comm = [];
-      $pcm = array_change_key_case(array_flip(CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method')), CASE_LOWER);
-
-      $preffComm = explode(',', $values['preferred_communication_method']);
-      foreach ($preffComm as $v) {
-        $v = strtolower(trim($v));
-        if (array_key_exists($v, $pcm)) {
-          $comm[$pcm[$v]] = 1;
-        }
-      }
-
-      $params['preferred_communication_method'] = $comm;
-      return TRUE;
-    }
-
     // format the website params.
     if (!empty($values['url'])) {
       static $websiteFields;
@@ -1223,6 +1207,13 @@ abstract class CRM_Import_Parser {
       return $importedValue;
     }
     $fieldMetadata = $this->getFieldMetadata($fieldName);
+    if (!empty($fieldMetadata['serialize']) && count(explode(',', $importedValue)) > 1) {
+      $values = [];
+      foreach (explode(',', $importedValue) as $value) {
+        $values[] = $this->getTransformedFieldValue($fieldName, $value);
+      }
+      return $values;
+    }
     if ($fieldName === 'url') {
       return CRM_Utils_Rule::url($importedValue) ? $importedValue : 'invalid_import_value';
     }
