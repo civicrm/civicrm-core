@@ -1121,12 +1121,14 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   public function testImportCountryStateCounty(): void {
     $childKey = $this->getRelationships()['Child of']['id'] . '_a_b';
     // @todo - rows that don't work yet are set to do_not_import.
-    // $addressCustomGroupID = $this->createCustomGroup(['extends' => 'Address', 'name' => 'Address']);
-    // $contactCustomGroupID = $this->createCustomGroup(['extends' => 'Contact', 'name' => 'Contact']);
-    // $addressCustomFieldID = $this->createCountryCustomField(['custom_group_id' => $addressCustomGroupID])['id'];
-    // $contactCustomFieldID = $this->createMultiCountryCustomField(['custom_group_id' => $contactCustomGroupID])['id'];
-    // $customField = 'custom_' . $contactCustomFieldID;
-    // $addressCustomField = 'custom_' . $addressCustomFieldID;
+    $addressCustomGroupID = $this->createCustomGroup(['extends' => 'Address', 'name' => 'Address']);
+    $contactCustomGroupID = $this->createCustomGroup(['extends' => 'Contact', 'name' => 'Contact']);
+    $addressCustomFieldID = $this->createCountryCustomField(['custom_group_id' => $addressCustomGroupID])['id'];
+    $contactCustomFieldID = $this->createMultiCountryCustomField(['custom_group_id' => $contactCustomGroupID])['id'];
+    $contactStateCustomFieldID = $this->createStateCustomField(['custom_group_id' => $contactCustomGroupID])['id'];
+    $customField = 'custom_' . $contactCustomFieldID;
+    $addressCustomField = 'custom_' . $addressCustomFieldID;
+    $contactStateCustomField = 'custom_' . $contactStateCustomFieldID;
 
     $mapper = [
       ['first_name'],
@@ -1135,12 +1137,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ['county'],
       ['country'],
       ['state_province'],
-      // [$customField, 'state_province'],
-      ['do_not_import'],
-      // [$customField, 'country'],
-      ['do_not_import'],
-      // [$addressCustomField, 'country'],
-      ['do_not_import'],
+      [$contactStateCustomField],
+      [$customField],
+      [$addressCustomField],
       // [$addressCustomField, 'state_province'],
       ['do_not_import'],
       [$childKey, 'first_name'],
@@ -1168,6 +1167,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $contacts = $this->getImportedContacts();
     foreach ($contacts as $contact) {
       $this->assertEquals(1013, $contact['address'][0]['country_id']);
+      $this->assertEquals(1640, $contact['address'][0]['state_province_id']);
     }
     $this->assertCount(2, $contacts);
   }

@@ -66,6 +66,22 @@ abstract class CRM_Import_Parser {
   protected $metadataHandledFields = [];
 
   /**
+   * Potentially ambiguous options.
+   *
+   * For example 'UT' is a state in more than one country.
+   *
+   * @var array
+   */
+  protected $ambiguousOptions = [];
+
+  /**
+   * States to country mapping.
+   *
+   * @var array
+   */
+  protected $statesByCountry = [];
+
+  /**
    * @return int|null
    */
   public function getUserJobID(): ?int {
@@ -1165,9 +1181,7 @@ abstract class CRM_Import_Parser {
    * @throws \API_Exception
    */
   protected function getTransformedFieldValue(string $fieldName, $importedValue) {
-    $transformableFields = array_merge($this->metadataHandledFields, ['country_id']);
-    // For now only do gender_id etc as we need to work through removing duplicate handling
-    if (empty($importedValue) || !in_array($fieldName, $transformableFields, TRUE)) {
+    if (empty($importedValue)) {
       return $importedValue;
     }
     $fieldMetadata = $this->getFieldMetadata($fieldName);
@@ -1202,6 +1216,12 @@ abstract class CRM_Import_Parser {
     }
     $options = $this->getFieldOptions($fieldName);
     if ($options !== FALSE) {
+      if ($this->isAmbiguous($fieldName, $importedValue)) {
+        // We can't transform it at this stage. Perhaps later we can with
+        // other information such as country.
+        return $importedValue;
+      }
+
       $comparisonValue = is_numeric($importedValue) ? $importedValue : mb_strtolower($importedValue);
       return $options[$comparisonValue] ?? 'invalid_import_value';
     }
@@ -1247,10 +1267,26 @@ abstract class CRM_Import_Parser {
 
     $fieldMetadata = $this->getImportableFieldsMetadata()[$fieldMapName];
     if ($loadOptions && !isset($fieldMetadata['options'])) {
+      if (($fieldMetadata['data_type'] ?? '') === 'StateProvince') {
+        // Probably already loaded and also supports abbreviations - eg. NSW.
+        // Supporting for core AND custom state fields is more consistent.
+        $this->importableFieldsMetadata[$fieldMapName]['options'] = $this->getFieldOptions('state_province_id');
+        return $this->importableFieldsMetadata[$fieldMapName];
+      }
+      if (($fieldMetadata['data_type'] ?? '') === 'Country') {
+        // Probably already loaded and also supports abbreviations - eg. NSW.
+        // Supporting for core AND custom state fields is more consistent.
+        $this->importableFieldsMetadata[$fieldMapName]['options'] = $this->getFieldOptions('country_id');
+        return $this->importableFieldsMetadata[$fieldMapName];
+      }
       $optionFieldName = empty($fieldMap[$fieldName]) ? $fieldMetadata['name'] : $fieldName;
+
       if (!empty($fieldMetadata['custom_group_id'])) {
-        $customField = CustomField::get(FALSE)->addWhere('id', '=', $fieldMetadata['custom_field_id'])
-          ->addSelect('name', 'custom_group_id.name')->execute()->first();
+        $customField = CustomField::get(FALSE)
+          ->addWhere('id', '=', $fieldMetadata['custom_field_id'])
+          ->addSelect('name', 'custom_group_id.name')
+          ->execute()
+          ->first();
         $optionFieldName = $customField['custom_group_id.name'] . '.' . $customField['name'];
       }
       $options = civicrm_api4($this->getFieldEntity($fieldName), 'getFields', [
@@ -1268,10 +1304,17 @@ abstract class CRM_Import_Parser {
           foreach (['name', 'label', 'abbr'] as $key) {
             $optionValue = mb_strtolower($option[$key] ?? '');
             if ($optionValue !== '') {
-              $values[$optionValue] = $option['id'];
+              if (isset($values[$optionValue]) && $values[$optionValue] !== $option['id']) {
+                if (!isset($this->ambiguousOptions[$fieldName][$optionValue])) {
+                  $this->ambiguousOptions[$fieldName][$optionValue] = [$values[$optionValue]];
+                }
+                $this->ambiguousOptions[$fieldName][$optionValue][] = $option['id'];
+              }
+              else {
+                $values[$optionValue] = $option['id'];
+              }
             }
           }
-
         }
         $this->importableFieldsMetadata[$fieldMapName]['options'] = $values;
       }
@@ -1445,6 +1488,28 @@ abstract class CRM_Import_Parser {
       'postal_greeting_id' => 'postal_greeting',
       'addressee_id' => 'addressee',
     ];
+  }
+
+  /**
+   * Get the default country for the site.
+   *
+   * @return int
+   */
+  protected function getSiteDefaultCountry(): int {
+    if (!isset($this->siteDefaultCountry)) {
+      $this->siteDefaultCountry = (int) Civi::settings()->get('defaultContactCountry');
+    }
+    return $this->siteDefaultCountry;
+  }
+
+  /**
+   * Is the option ambiguous.
+   *
+   * @param string $fieldName
+   * @param string $importedValue
+   */
+  protected function isAmbiguous(string $fieldName, $importedValue): bool {
+    return !empty($this->ambiguousOptions[$fieldName][mb_strtolower($importedValue)]);
   }
 
 }
