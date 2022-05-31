@@ -598,4 +598,13 @@ class CRM_Utils_Address {
     return CRM_Utils_Address::format($addressFields);
   }
 
+  /**
+   * @return string
+   */
+  public static function getDefaultDistanceUnit() {
+    $countryDefault = Civi::settings()->get('defaultContactCountry');
+    // US, UK use miles. Everything else is Km
+    return ($countryDefault == '1228' || $countryDefault == '1226') ? 'miles' : 'km';
+  }
+
 }

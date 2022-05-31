@@ -61,6 +61,10 @@
         return expr.indexOf('(') > -1;
       };
 
+      this.areFunctionsAllowed = function(expr) {
+        return this.allowFunctions && ctrl.getField(expr).type !== 'Filter';
+      };
+
       this.addGroup = function(op) {
         ctrl.clauses.push([op, []]);
       };
