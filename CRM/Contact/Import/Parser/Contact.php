@@ -331,7 +331,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $this->_retCode = CRM_Import_Parser::VALID;
       }
     }
-    elseif (CRM_Core_Error::isAPIError($newContact, CRM_Core_Error::DUPLICATE_CONTACT)) {
+    elseif (is_array($newContact)) {
       // if duplicate, no need of further processing
       if ($onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
         $errorMessage = "Skipping duplicate record";
@@ -372,7 +372,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
 
     $primaryContactId = NULL;
-    if (CRM_Core_Error::isAPIError($newContact, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
+    if (is_array($newContact)) {
       if ($dupeCount == 1 && CRM_Utils_Rule::integer($contactID)) {
         $primaryContactId = $contactID;
       }
@@ -381,7 +381,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $primaryContactId = $newContact->id;
     }
 
-    if ((CRM_Core_Error::isAPIError($newContact, CRM_Core_ERROR::DUPLICATE_CONTACT) || is_a($newContact, 'CRM_Contact_BAO_Contact')) && $primaryContactId) {
+    if ((is_array($newContact) || is_a($newContact, 'CRM_Contact_BAO_Contact')) && $primaryContactId) {
 
       //relationship contact insert
       foreach ($this->getRelatedContactsParams($params) as $key => $field) {
@@ -419,18 +419,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $matchedIDs = [];
         // To update/fill contact, get the matching contact Ids if duplicate contact found
         // otherwise get contact Id from object of related contact
-        if (is_array($relatedNewContact) && civicrm_error($relatedNewContact)) {
-          if (CRM_Core_Error::isAPIError($relatedNewContact, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
-            $matchedIDs = $relatedNewContact['error_message']['params'][0];
-            if (!is_array($matchedIDs)) {
-              $matchedIDs = explode(',', $matchedIDs);
-            }
-          }
-          else {
-            $errorMessage = $relatedNewContact['error_message'];
-            array_unshift($values, $errorMessage);
-            $this->setImportStatus((int) $values[count($values) - 1], 'ERROR', $errorMessage);
-            return CRM_Import_Parser::ERROR;
+        if (is_array($relatedNewContact)) {
+          $matchedIDs = $relatedNewContact['error_message']['params'][0];
+          if (!is_array($matchedIDs)) {
+            $matchedIDs = explode(',', $matchedIDs);
           }
         }
         else {
@@ -454,11 +446,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             return CRM_Import_Parser::NO_MATCH;
           }
           else {
-            $updatedContact = $this->createContact($formatting, $contactFields, $onDuplicate, $matchedIDs[0]);
+            $this->createContact($formatting, $contactFields, $onDuplicate, $matchedIDs[0]);
           }
         }
         static $relativeContact = [];
-        if (CRM_Core_Error::isAPIError($relatedNewContact, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
+        if (is_array($relatedNewContact)) {
           if (count($matchedIDs) >= 1) {
             $relContactId = $matchedIDs[0];
             //add relative contact to count during update & fill mode.
@@ -480,7 +472,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           $this->_newRelatedContacts[] = $relativeContact[] = $relContactId;
         }
 
-        if (CRM_Core_Error::isAPIError($relatedNewContact, CRM_Core_ERROR::DUPLICATE_CONTACT) || ($relatedNewContact instanceof CRM_Contact_BAO_Contact)) {
+        if (is_array($relatedNewContact) || ($relatedNewContact instanceof CRM_Contact_BAO_Contact)) {
           //fix for CRM-1993.Checks for duplicate related contacts
           if (count($matchedIDs) >= 1) {
             //if more than one duplicate contact
@@ -543,18 +535,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       return $this->processMessage($values, $this->_retCode);
     }
     //dupe checking
-    if (is_array($newContact) && civicrm_error($newContact)) {
-      $code = NULL;
-
-      if (($code = CRM_Utils_Array::value('code', $newContact['error_message'])) && ($code == CRM_Core_Error::DUPLICATE_CONTACT)) {
-        return $this->handleDuplicateError($newContact, $values, $onDuplicate, $formatted, $contactFields);
-      }
-      // Not a dupe, so we had an error
-      $errorMessage = $newContact['error_message'];
-      array_unshift($values, $errorMessage);
-      $this->setImportStatus((int) $values[count($values) - 1], 'ERROR', $errorMessage);
-      return CRM_Import_Parser::ERROR;
-
+    if (is_array($newContact)) {
+      return $this->handleDuplicateError($newContact, $values, $onDuplicate, $formatted, $contactFields);
     }
 
     if (empty($this->_unparsedStreetAddressContacts)) {
@@ -1141,7 +1123,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param bool $requiredCheck
    * @param int $dedupeRuleGroupID
    *
-   * @return array|bool|\CRM_Contact_BAO_Contact|\CRM_Core_Error|null
+   * @return array|\CRM_Contact_BAO_Contact
+   *   If a duplicate is found an array is returned, otherwise CRM_Contact_BAO_Contact
    */
   public function createContact(&$formatted, &$contactFields, $onDuplicate, $contactId = NULL, $requiredCheck = TRUE, $dedupeRuleGroupID = NULL) {
     $dupeCheck = FALSE;
@@ -1784,15 +1767,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $newContact = CRM_Contact_BAO_Contact::retrieve($contact, $defaults);
     }
 
-    if (civicrm_error($newContact)) {
-      if (empty($newContact['error_message']['params'])) {
-        // different kind of error other than DUPLICATE
-        $errorMessage = $newContact['error_message'];
-        array_unshift($values, $errorMessage);
-        $this->setImportStatus((int) $values[count($values) - 1], 'ERROR', $errorMessage);
-        return CRM_Import_Parser::ERROR;
-      }
-
+    if (is_array($newContact)) {
       $contactID = $newContact['error_message']['params'][0];
       if (is_array($contactID)) {
         $contactID = array_pop($contactID);
