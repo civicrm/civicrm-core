@@ -232,7 +232,7 @@ function authx_civicrm_permission(&$permissions) {
  */
 function authx_civicrm_navigationMenu(&$menu) {
   _authx_civix_insert_navigation_menu($menu, 'Administer/System Settings', [
-    'label' => E::ts('Configure Authentication'),
+    'label' => E::ts('Authentication'),
     'name' => 'authx_admin',
     'url' => 'civicrm/admin/setting/authx',
     'permission' => 'administer CiviCRM',
