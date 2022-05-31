@@ -32,6 +32,10 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
   public function upgrade_5_51_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask(ts('Convert import mappings to use names'), 'convertMappingFieldLabelsToNames', $rev);
+    $this->addTask('Add column "civicrm_queue.status"', 'addColumn', 'civicrm_queue',
+      'status', "varchar(16) NULL DEFAULT 'active' COMMENT 'Execution status'");
+    $this->addTask('Add column "civicrm_queue.error"', 'addColumn', 'civicrm_queue',
+      'error', "varchar(16) NULL COMMENT 'Fallback behavior for unhandled errors'");
   }
 
   /**

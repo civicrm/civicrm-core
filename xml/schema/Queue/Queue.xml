@@ -123,4 +123,35 @@
     </html>
     <add>5.48</add>
   </field>
+  <field>
+    <name>status</name>
+    <title>Status</title>
+    <type>varchar</type>
+    <length>16</length>
+    <comment>Execution status</comment>
+    <required>false</required>
+    <default>'active'</default>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>5.51</add>
+    <pseudoconstant>
+      <callback>CRM_Queue_BAO_Queue::getStatuses</callback>
+    </pseudoconstant>
+  </field>
+  <field>
+    <name>error</name>
+    <title>Error Mode</title>
+    <type>varchar</type>
+    <length>16</length>
+    <comment>Fallback behavior for unhandled errors</comment>
+    <required>false</required>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>5.51</add>
+    <pseudoconstant>
+      <callback>CRM_Queue_BAO_Queue::getErrorModes</callback>
+    </pseudoconstant>
+  </field>
 </table>
