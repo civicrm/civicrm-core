@@ -638,6 +638,49 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test greeting imports.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testGreetings(): void {
+    $contactValues = [
+      'first_name' => 'Bill',
+      'last_name' => 'Gates',
+      // id = 2
+      'email_greeting' => 'Dear {contact.prefix_id:label} {contact.first_name} {contact.last_name}',
+      // id = 3
+      'postal_greeting' => 'Dear {contact.prefix_id:label} {contact.last_name}',
+      // id = 1
+      'addressee' => '{contact.prefix_id:label}{ }{contact.first_name}{ }{contact.middle_name}{ }{contact.last_name}{ }{contact.suffix_id:label}',
+      5 => 1,
+    ];
+    $userJobID = $this->getUserJobID(['mapper' => [['first_name'], ['last_name'], ['email_greeting'], ['postal_greeting'], ['addressee']]]);
+    $parser = new CRM_Contact_Import_Parser_Contact(array_keys($contactValues));
+    $parser->setUserJobID($userJobID);
+    $values = array_values($contactValues);
+    $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values);
+    $contact = Contact::get(FALSE)->addWhere('last_name', '=', 'Gates')->addSelect('email_greeting_id', 'postal_greeting_id', 'addressee_id')->execute()->first();
+    $this->assertEquals(2, $contact['email_greeting_id']);
+    $this->assertEquals(3, $contact['postal_greeting_id']);
+    $this->assertEquals(1, $contact['addressee_id']);
+
+    Contact::delete()->addWhere('id', '=', $contact['id'])->setUseTrash(TRUE)->execute();
+
+    // Now try again with numbers.
+    $values[2] = 2;
+    $values[3] = 3;
+    $values[4] = 1;
+    $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values);
+    $contact = Contact::get(FALSE)->addWhere('last_name', '=', 'Gates')->addSelect('email_greeting_id', 'postal_greeting_id', 'addressee_id')->execute()->first();
+    $this->assertEquals(2, $contact['email_greeting_id']);
+    $this->assertEquals(3, $contact['postal_greeting_id']);
+    $this->assertEquals(1, $contact['addressee_id']);
+
+  }
+
+  /**
    * Test prefix & suffix work when you specify the label.
    *
    * There is an expectation that you can import by label here.
