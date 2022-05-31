@@ -11,6 +11,7 @@
 
 use Civi\Api4\Contact;
 use Civi\Api4\RelationshipType;
+use Civi\Api4\StateProvince;
 
 require_once 'api/v3/utils.php';
 
@@ -661,7 +662,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
     }
-    $metadataBlocks = ['phone', 'im', 'openid', 'email'];
+    $metadataBlocks = ['phone', 'im', 'openid', 'email', 'address'];
     foreach ($metadataBlocks as $block) {
       foreach ($formatted[$block] ?? [] as $blockKey => $blockValues) {
         if ($blockValues['location_type_id'] === 'Primary') {
@@ -869,18 +870,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
         //For address custom fields, we do get actual custom field value as an inner array of
         //values so need to modify
-        if (array_key_exists($customFieldID, $addressCustomFields)) {
-          $locationTypeID = array_key_first($value);
-          $value = $value[$locationTypeID][$key];
-          $errors[] = $parser->validateCustomField($customFieldID, $value, $addressCustomFields[$customFieldID], $dateType);
+        if (!array_key_exists($customFieldID, $customFields)) {
+          return ts('field ID');
         }
-        else {
-          if (!array_key_exists($customFieldID, $customFields)) {
-            return ts('field ID');
-          }
-          /* check if it's a valid custom field id */
-          $errors[] = $parser->validateCustomField($customFieldID, $value, $customFields[$customFieldID], $dateType);
-        }
+        /* check if it's a valid custom field id */
+        $errors[] = $parser->validateCustomField($customFieldID, $value, $customFields[$customFieldID], $dateType);
       }
       elseif (is_array($params[$key]) && isset($params[$key]["contact_type"]) && in_array(substr($key, -3), ['a_b', 'b_a'], TRUE)) {
         //CRM-5125
@@ -923,37 +917,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if ($value) {
 
         switch ($key) {
-
-          case 'state_province':
-            if (!empty($value)) {
-              foreach ($value as $stateValue) {
-                if ($stateValue['state_province']) {
-                  if (self::in_value($stateValue['state_province'], CRM_Core_PseudoConstant::stateProvinceAbbreviation()) ||
-                    self::in_value($stateValue['state_province'], CRM_Core_PseudoConstant::stateProvince())
-                  ) {
-                    continue;
-                  }
-                  else {
-                    $errors[] = ts('State/Province');
-                  }
-                }
-              }
-            }
-            break;
-
-          case 'county':
-            if (!empty($value)) {
-              foreach ($value as $county) {
-                if ($county['county']) {
-                  $countyNames = CRM_Core_PseudoConstant::county();
-                  if (!empty($county['county']) && !in_array($county['county'], $countyNames)) {
-                    $errors[] = ts('County input value not in county table: The County value appears to be invalid. It does not match any value in CiviCRM table of counties.');
-                  }
-                }
-              }
-            }
-            break;
-
           case 'do_not_email':
           case 'do_not_phone':
           case 'do_not_mail':
@@ -1038,9 +1001,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     if (is_null($contactId) && ($onDuplicate != CRM_Import_Parser::DUPLICATE_NOCHECK)) {
       $dupeCheck = (bool) ($onDuplicate);
     }
-
-    //get the prefix id etc if exists
-    CRM_Contact_BAO_Contact::resolveDefaults($formatted, TRUE);
 
     if ($dupeCheck) {
       // @todo this is already done in lookupContactID
@@ -1828,6 +1788,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
     }
 
+    $this->fillStateProvince($params);
+
     return $params;
   }
 
@@ -2024,12 +1986,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \CiviCRM_API3_Exception
    */
   protected function formatLocationBlock(&$values, &$params) {
-
-    // handle address fields.
-    if (!array_key_exists('address', $params) || !is_array($params['address'])) {
-      $params['address'] = [];
-    }
-
     // Note: we doing multiple value formatting here for address custom fields, plus putting into right format.
     // The actual formatting (like date, country ..etc) for address custom fields is taken care of while saving
     // the address in CRM_Core_BAO_Address::create method
@@ -2070,33 +2026,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $values = $newValues;
     }
 
-    $fields['Address'] = $this->getMetadataForEntity('Address');
-    // @todo this is kinda replicated below....
-    _civicrm_api3_store_values($fields['Address'], $values, $params['address'][$values['location_type_id']]);
-
-    $addressFields = [
-      'county',
-      'country_id',
-      'state_province',
-      'supplemental_address_1',
-      'supplemental_address_2',
-      'supplemental_address_3',
-      'StateProvince.name',
-    ];
-    foreach (array_keys($customFields) as $customFieldID) {
-      $addressFields[] = 'custom_' . $customFieldID;
-    }
-
-    foreach ($addressFields as $field) {
-      if (array_key_exists($field, $values)) {
-        if (!array_key_exists('address', $params)) {
-          $params['address'] = [];
-        }
-        $params['address'][$values['location_type_id']][$field] = $values[$field];
-      }
-    }
-
-    $this->fillPrimary($params['address'][$values['location_type_id']], $values, 'address', CRM_Utils_Array::value('id', $params));
     return TRUE;
   }
 
@@ -2317,8 +2246,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     //date-format part ends
 
     $errorMessage = implode(', ', $errors);
-    //checking error in custom data
-    $this->isErrorInCustomData($params, $errorMessage, $params['contact_sub_type'] ?? NULL);
 
     //checking error in core data
     $this->isErrorInCoreData($params, $errorMessage);
@@ -2461,7 +2388,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   private function addFieldToParams(array &$contactArray, array $locationValues, string $fieldName, $importedValue): void {
     if (!empty($locationValues)) {
-      $fieldMap = ['country' => 'country_id'];
+      $fieldMap = ['country' => 'country_id', 'state_province' => 'state_province_id', 'county' => 'county_id'];
       $realFieldName = empty($fieldMap[$fieldName]) ? $fieldName : $fieldMap[$fieldName];
       $entity = strtolower($this->getFieldEntity($fieldName));
 
@@ -2474,31 +2401,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
       $fieldValue = $this->getTransformedFieldValue($realFieldName, $importedValue);
 
-      if (!empty($fieldValue) && $realFieldName === 'country_id') {
-        if ($this->getAvailableCountries() && empty($this->getAvailableCountries()[$fieldValue])) {
-          // We restrict to allowed countries for address fields - but not custom country fields.
-          $fieldValue = 'invalid_import_value';
-        }
-      }
-
-      // The new way...
       if (!isset($contactArray[$entity][$entityKey])) {
         $contactArray[$entity][$entityKey] = $locationValues;
       }
-      // Honestly I'll explain in comment_final_version(revision_2)_use_this_one...
-      $reallyRealFieldName = $fieldName === 'im' ? 'name' : $fieldName;
+      // So im has really non-standard handling...
+      $reallyRealFieldName = $realFieldName === 'im' ? 'name' : $realFieldName;
       $contactArray[$entity][$entityKey][$reallyRealFieldName] = $fieldValue;
-
-      if (!isset($locationValues[$fieldName]) && $entity === 'address') {
-        // These lines add the values to params 'the old way'
-        // The old way is then re-formatted by formatCommonData more
-        // or less as per below.
-        // @todo - stop doing this & remove handling in formatCommonData.
-        $locationValues[$fieldName] = $fieldValue;
-        $contactArray[$fieldName] = (array) ($contactArray[$fieldName] ?? []);
-        $contactArray[$fieldName][$entityKey] = $locationValues;
-        $contactArray[$entity][$entityKey][$realFieldName] = $fieldValue;
-      }
     }
     else {
       $fieldName = array_search($fieldName, $this->getOddlyMappedMetadataFields(), TRUE) ?: $fieldName;
@@ -2649,6 +2557,113 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
     }
     return array($formatted, $params);
+  }
+
+  /**
+   * Try to get the correct state province using what country information we have.
+   *
+   * If the state matches more than one possibility then either the imported
+   * country of the site country should help us....
+   *
+   * @param string $stateProvince
+   * @param int|null|string $countryID
+   *
+   * @return int|string
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  private function tryToResolveStateProvince(string $stateProvince, $countryID) {
+    // Try to disambiguate since we likely have the country now.
+    $possibleStates = $this->ambiguousOptions['state_province_id'][mb_strtolower($stateProvince)];
+    if ($countryID) {
+      return $this->checkStatesForCountry($countryID, $possibleStates) ?: 'invalid_import_value';
+    }
+    // Try the default country next.
+    $defaultCountryMatch = $this->checkStatesForCountry($this->getSiteDefaultCountry(), $possibleStates);
+    if ($defaultCountryMatch) {
+      return $defaultCountryMatch;
+    }
+
+    if ($this->getAvailableCountries()) {
+      $countryMatches = [];
+      foreach ($this->getAvailableCountries() as $availableCountryID) {
+        $possible = $this->checkStatesForCountry($availableCountryID, $possibleStates);
+        if ($possible) {
+          $countryMatches[] = $possible;
+        }
+      }
+      if (count($countryMatches) === 1) {
+        return reset($countryMatches);
+      }
+
+    }
+    return $stateProvince;
+  }
+
+  /**
+   * @param array $params
+   *
+   * @return array
+   * @throws \API_Exception
+   */
+  private function fillStateProvince(array &$params): array {
+    foreach ($params as $key => $value) {
+      if ($key === 'address') {
+        foreach ($value as $index => $address) {
+          $stateProvinceID = $address['state_province_id'] ?? NULL;
+          if ($stateProvinceID) {
+            if (!is_numeric($stateProvinceID)) {
+              $params['address'][$index]['state_province_id'] = $this->tryToResolveStateProvince($stateProvinceID, $address['country_id'] ?? NULL);
+            }
+            elseif (!empty($address['country_id']) && is_numeric($address['country_id'])) {
+              if (!$this->checkStatesForCountry((int) $address['country_id'], [$stateProvinceID])) {
+                $params['address'][$index]['state_province_id'] = 'invalid_import_value';
+              }
+            }
+          }
+        }
+      }
+      elseif (is_array($value) && !in_array($key, ['email', 'phone', 'im', 'website', 'openid'], TRUE)) {
+        $this->fillStateProvince($params[$key]);
+      }
+    }
+    return $params;
+  }
+
+  /**
+   * Check is any of the given states correlate to the country.
+   *
+   * @param int $countryID
+   * @param array $possibleStates
+   *
+   * @return int|null
+   * @throws \API_Exception
+   */
+  private function checkStatesForCountry(int $countryID, array $possibleStates) {
+    foreach ($possibleStates as $index => $state) {
+      if (!empty($this->statesByCountry[$state])) {
+        if ($this->statesByCountry[$state] === $countryID) {
+          return $state;
+        }
+        unset($possibleStates[$index]);
+      }
+    }
+    if (!empty($possibleStates)) {
+      $states = StateProvince::get(FALSE)
+        ->addSelect('country_id')
+        ->addWhere('id', 'IN', $possibleStates)
+        ->execute()
+        ->indexBy('country_id');
+      foreach ($states as $state) {
+        $this->statesByCountry[$state['id']] = $state['country_id'];
+      }
+      foreach ($possibleStates as $state) {
+        if ($this->statesByCountry[$state] === $countryID) {
+          return $state;
+        }
+      }
+    }
+    return FALSE;
   }
 
 }
