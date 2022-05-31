@@ -1385,22 +1385,27 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   public static function processPcp(&$page, $params): array {
     $params['pcp_made_through_id'] = $page->_pcpId;
-    $page->assign('pcpBlock', TRUE);
-    if (!empty($params['pcp_display_in_roll']) && empty($params['pcp_roll_nickname'])) {
-      $params['pcp_roll_nickname'] = ts('Anonymous');
-      $params['pcp_is_anonymous'] = 1;
-    }
-    else {
-      $params['pcp_is_anonymous'] = 0;
-    }
-    foreach ([
-      'pcp_display_in_roll',
-      'pcp_is_anonymous',
-      'pcp_roll_nickname',
-      'pcp_personal_note',
-    ] as $val) {
-      if (!empty($params[$val])) {
-        $page->assign($val, $params[$val]);
+
+    $page->assign('pcpBlock', FALSE);
+    // display honor roll data only if it's enabled for the PCP page
+    if (!empty($page->_pcpInfo['is_honor_roll'])) {
+      $page->assign('pcpBlock', TRUE);
+      if (!empty($params['pcp_display_in_roll']) && empty($params['pcp_roll_nickname'])) {
+        $params['pcp_roll_nickname'] = ts('Anonymous');
+        $params['pcp_is_anonymous'] = 1;
+      }
+      else {
+        $params['pcp_is_anonymous'] = 0;
+      }
+      foreach ([
+        'pcp_display_in_roll',
+        'pcp_is_anonymous',
+        'pcp_roll_nickname',
+        'pcp_personal_note',
+      ] as $val) {
+        if (!empty($params[$val])) {
+          $page->assign($val, $params[$val]);
+        }
       }
     }
 
