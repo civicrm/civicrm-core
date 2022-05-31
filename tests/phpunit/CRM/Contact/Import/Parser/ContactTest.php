@@ -2111,10 +2111,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test that import parser will not throw error if Related Contact is not found via passed in External ID.
    *
-   * Currently fails because validation assumes the Related contact will be found.
-   * When it is later not found creating the contact via the API throws an
-   * error for missing required fields.
-   *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
@@ -2124,12 +2120,14 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'first_name' => 'Alok',
       'last_name' => 'Patel',
       'Employee of' => 'related external identifier',
+      'organization_name' => 'Big shop',
     ];
 
     $mapper = [
       ['first_name'],
       ['last_name'],
       ['5_a_b', 'external_identifier'],
+      ['5_a_b', 'organization_name'],
     ];
     $fields = array_keys($contactImportValues);
     $values = array_values($contactImportValues);
@@ -2142,6 +2140,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $parser->init();
 
     $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values);
+    $this->callAPISuccessGetCount('Contact', ['organization_name' => 'Big shop'], 2);
   }
 
 }

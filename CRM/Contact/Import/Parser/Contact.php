@@ -309,7 +309,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $params['contact_sub_type'] = $this->getContactSubType() ?: ($params['contact_sub_type'] ?? NULL);
 
     try {
-      [$formatted, $params] = $this->processContact($params, $formatted);
+      [$formatted, $params] = $this->processContact($params, $formatted, TRUE);
     }
     catch (CRM_Core_Exception $e) {
       $statuses = [CRM_Import_Parser::DUPLICATE => 'DUPLICATE', CRM_Import_Parser::ERROR => 'ERROR', CRM_Import_Parser::NO_MATCH => 'invalid_no_match'];
@@ -325,12 +325,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     //fixed CRM-4148
     //now we create new contact in update/fill mode also.
-    $contactID = NULL;
-    //CRM-4430, don't carry if not submitted.
-    if ($this->_updateWithId && !empty($params['id'])) {
-      $contactID = $params['id'];
-    }
-    $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $contactID, TRUE, $this->_dedupeRuleGroupID);
+    $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $params['id'] ?? NULL, TRUE, $this->_dedupeRuleGroupID);
 
     if (is_object($newContact) && ($newContact instanceof CRM_Contact_BAO_Contact)) {
       $newContact = clone($newContact);
@@ -396,7 +391,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       foreach ($this->getRelatedContactsParams($params) as $key => $field) {
         $formatting = $field;
         try {
-          [$formatting, $field] = $this->processContact($field, $formatting);
+          [$formatting, $field] = $this->processContact($field, $formatting, FALSE);
         }
         catch (CRM_Core_Exception $e) {
           $statuses = [CRM_Import_Parser::DUPLICATE => 'DUPLICATE', CRM_Import_Parser::ERROR => 'ERROR', CRM_Import_Parser::NO_MATCH => 'invalid_no_match'];
@@ -410,9 +405,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $this->formatCommonData($field, $formatting, $contactFields);
 
         //fixed for CRM-4148
-        if (!empty($params[$key]['id'])) {
+        if (!empty($formatting['id'])) {
           $contact = [
-            'contact_id' => $params[$key]['id'],
+            'contact_id' => $formatting['id'],
           ];
           $defaults = [];
           $relatedNewContact = CRM_Contact_BAO_Contact::retrieve($contact, $defaults);
@@ -1010,6 +1005,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($formatted, $formatted['contact_type'], 'Unsupervised', [], FALSE, $dedupeRuleGroupID);
 
       if ($ids != NULL) {
+        // @todo - this should be unreachable as lookupContact will have populated
+        // contact ID OR exited if muliple.
         return [
           'is_error' => 1,
           'error_message' => [
@@ -1521,9 +1518,13 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $checkParams = ['check_permissions' => FALSE, 'match' => $params, 'dedupe_rule_id' => $dedupeRuleID];
     $possibleMatches = civicrm_api3('Contact', 'duplicatecheck', $checkParams);
     if (!$extIDMatch) {
-      // Historically we have used the last ID - it is not clear if this was
-      // deliberate.
-      return array_key_last($possibleMatches['values']);
+      if (count($possibleMatches['values']) === 1) {
+        return array_key_last($possibleMatches['values']);
+      }
+      if (count($possibleMatches['values']) > 1) {
+        throw new CRM_Core_Exception(ts('Record duplicates multiple contacts'));
+      }
+      return NULL;
     }
     if ($possibleMatches['count']) {
       if (array_key_exists($extIDMatch, $possibleMatches['values'])) {
@@ -1585,6 +1586,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   private function handleDuplicateError(array $newContact, array $values, int $onDuplicate, array $formatted, array $contactFields): int {
+    // This is expected to be unreachable.
     $urls = [];
     // need to fix at some stage and decide if the error will return an
     // array or string, crude hack for now
@@ -1603,6 +1605,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     // If we duplicate more than one record, skip no matter what
     if (count($cids) > 1) {
+      // Now done in lookup contact
       $errorMessage = ts('Record duplicates multiple contacts');
       //combine error msg to avoid mismatch between error file columns.
       $errorMessage .= "\n" . $url_string;
@@ -2492,25 +2495,23 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * Lookup the contact's contact ID.
    *
    * @param array $params
-   * @param bool $isDuplicateIfExternalIdentifierExists
+   * @param bool $isMainContact
    *
    * @return int|null
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function lookupContactID(array $params, bool $isDuplicateIfExternalIdentifierExists): ?int {
+  protected function lookupContactID(array $params, bool $isMainContact): ?int {
     $extIDMatch = $this->lookupExternalIdentifier($params['external_identifier'] ?? NULL, $params['contact_type']);
-    if (!empty($params['external_identifier']) && !$extIDMatch && $isDuplicateIfExternalIdentifierExists) {
-      throw new CRM_Core_Exception(ts('Existing external ID lookup failed.'), CRM_Import_Parser::ERROR);
-    }
     $contactID = !empty($params['id']) ? (int) $params['id'] : NULL;
     //check if external identifier exists in database
     if ($extIDMatch && $contactID && $extIDMatch !== $contactID) {
       throw new CRM_Core_Exception(ts('Existing external ID does not match the imported contact ID.'), CRM_Import_Parser::ERROR);
     }
-    if ($extIDMatch && $isDuplicateIfExternalIdentifierExists) {
+    if ($extIDMatch && $isMainContact && ($this->isSkipDuplicates() || $this->isIgnoreDuplicates())) {
       throw new CRM_Core_Exception(ts('External ID already exists in Database.'), CRM_Import_Parser::DUPLICATE);
     }
     if ($contactID) {
@@ -2538,14 +2539,15 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   /**
    * @param array $params
    * @param array $formatted
+   * @param bool $isMainContact
+   *
    * @return array[]
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function processContact(array $params, array $formatted): array {
-    $params['id'] = $formatted['id'] = $this->lookupContactID($params, ($this->isSkipDuplicates() || $this->isIgnoreDuplicates()));
+  protected function processContact(array $params, array $formatted, bool $isMainContact): array {
+    $params['id'] = $formatted['id'] = $this->lookupContactID($params, $isMainContact);
     if ($params['id'] && $params['contact_sub_type']) {
       $contactSubType = Contact::get(FALSE)
         ->addWhere('id', '=', $params['id'])
