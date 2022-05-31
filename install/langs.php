@@ -14,6 +14,7 @@
   'en_CA' => 'English (Canada)',
   'en_GB' => 'English (United Kingdom)',
   'en_US' => 'English (United States)',
+  'en_ZA' => 'English (South Africa)',
   'et_EE' => 'Estonian',
   'fi_FI' => 'Finnish',
   'fr_CA' => 'French (Canada)',
