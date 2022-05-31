@@ -18,7 +18,7 @@
 /**
  * This class delegates to the chosen DataSource to grab the data to be imported.
  */
-class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
+class CRM_Contact_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
   /**
    * Get any smarty elements that may not be present in the form.
@@ -172,14 +172,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
    */
   public function postProcess() {
     $this->controller->resetPage('MapField');
-    if (!$this->getUserJobID()) {
-      $this->createUserJob();
-    }
-    else {
-      $this->flushDataSource();
-      $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
-    }
-
+    $this->processDatasource();
     // @todo - this params are being set here because they were / possibly still
     // are in some places being accessed by forms later in the flow
     // ie CRM_Contact_Import_Form_MapField, CRM_Contact_Import_Form_Preview
@@ -201,19 +194,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Forms {
     }
     CRM_Core_Session::singleton()->set('dateTypes', $storeParams['dateFormats']);
 
-    $this->instantiateDataSource();
-  }
-
-  /**
-   * Instantiate the datasource.
-   *
-   * This gives the datasource a chance to do any table creation etc.
-   *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
-   */
-  private function instantiateDataSource(): void {
-    $this->getDataSourceObject()->initialize();
   }
 
   /**

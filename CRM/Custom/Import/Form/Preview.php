@@ -69,6 +69,7 @@ class CRM_Custom_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
 
     $parser = new $this->_parser($mapperKeys);
+    $parser->setUserJobID($this->getUserJobID());
     $parser->setEntity($entity);
 
     $mapFields = $this->get('fields');
