@@ -11,6 +11,7 @@
 
 use Civi\Api4\Contact;
 use Civi\Api4\RelationshipType;
+use Civi\Api4\StateProvince;
 
 require_once 'api/v3/utils.php';
 
@@ -114,6 +115,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     'postal_greeting_id',
     'addressee',
     'addressee_id',
+    'geo_code_1',
+    'geo_code_2',
   ];
 
   /**
@@ -306,7 +309,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $params['contact_sub_type'] = $this->getContactSubType() ?: ($params['contact_sub_type'] ?? NULL);
 
     try {
-      [$formatted, $params] = $this->processContact($params, $formatted);
+      [$formatted, $params] = $this->processContact($params, $formatted, TRUE);
     }
     catch (CRM_Core_Exception $e) {
       $statuses = [CRM_Import_Parser::DUPLICATE => 'DUPLICATE', CRM_Import_Parser::ERROR => 'ERROR', CRM_Import_Parser::NO_MATCH => 'invalid_no_match'];
@@ -322,12 +325,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     //fixed CRM-4148
     //now we create new contact in update/fill mode also.
-    $contactID = NULL;
-    //CRM-4430, don't carry if not submitted.
-    if ($this->_updateWithId && !empty($params['id'])) {
-      $contactID = $params['id'];
-    }
-    $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $contactID, TRUE, $this->_dedupeRuleGroupID);
+    $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $params['id'] ?? NULL, TRUE, $this->_dedupeRuleGroupID);
 
     if (is_object($newContact) && ($newContact instanceof CRM_Contact_BAO_Contact)) {
       $newContact = clone($newContact);
@@ -393,7 +391,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       foreach ($this->getRelatedContactsParams($params) as $key => $field) {
         $formatting = $field;
         try {
-          [$formatting, $field] = $this->processContact($field, $formatting);
+          [$formatting, $field] = $this->processContact($field, $formatting, FALSE);
         }
         catch (CRM_Core_Exception $e) {
           $statuses = [CRM_Import_Parser::DUPLICATE => 'DUPLICATE', CRM_Import_Parser::ERROR => 'ERROR', CRM_Import_Parser::NO_MATCH => 'invalid_no_match'];
@@ -407,9 +405,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $this->formatCommonData($field, $formatting, $contactFields);
 
         //fixed for CRM-4148
-        if (!empty($params[$key]['id'])) {
+        if (!empty($formatting['id'])) {
           $contact = [
-            'contact_id' => $params[$key]['id'],
+            'contact_id' => $formatting['id'],
           ];
           $defaults = [];
           $relatedNewContact = CRM_Contact_BAO_Contact::retrieve($contact, $defaults);
@@ -659,7 +657,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
     }
-    $metadataBlocks = ['phone', 'im', 'openid', 'email'];
+    $metadataBlocks = ['phone', 'im', 'openid', 'email', 'address'];
     foreach ($metadataBlocks as $block) {
       foreach ($formatted[$block] ?? [] as $blockKey => $blockValues) {
         if ($blockValues['location_type_id'] === 'Primary') {
@@ -867,18 +865,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
         //For address custom fields, we do get actual custom field value as an inner array of
         //values so need to modify
-        if (array_key_exists($customFieldID, $addressCustomFields)) {
-          $locationTypeID = array_key_first($value);
-          $value = $value[$locationTypeID][$key];
-          $errors[] = $parser->validateCustomField($customFieldID, $value, $addressCustomFields[$customFieldID], $dateType);
+        if (!array_key_exists($customFieldID, $customFields)) {
+          return ts('field ID');
         }
-        else {
-          if (!array_key_exists($customFieldID, $customFields)) {
-            return ts('field ID');
-          }
-          /* check if it's a valid custom field id */
-          $errors[] = $parser->validateCustomField($customFieldID, $value, $customFields[$customFieldID], $dateType);
-        }
+        /* check if it's a valid custom field id */
+        $errors[] = $parser->validateCustomField($customFieldID, $value, $customFields[$customFieldID], $dateType);
       }
       elseif (is_array($params[$key]) && isset($params[$key]["contact_type"]) && in_array(substr($key, -3), ['a_b', 'b_a'], TRUE)) {
         //CRM-5125
@@ -921,63 +912,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if ($value) {
 
         switch ($key) {
-
-          case 'state_province':
-            if (!empty($value)) {
-              foreach ($value as $stateValue) {
-                if ($stateValue['state_province']) {
-                  if (self::in_value($stateValue['state_province'], CRM_Core_PseudoConstant::stateProvinceAbbreviation()) ||
-                    self::in_value($stateValue['state_province'], CRM_Core_PseudoConstant::stateProvince())
-                  ) {
-                    continue;
-                  }
-                  else {
-                    $errors[] = ts('State/Province');
-                  }
-                }
-              }
-            }
-            break;
-
-          case 'county':
-            if (!empty($value)) {
-              foreach ($value as $county) {
-                if ($county['county']) {
-                  $countyNames = CRM_Core_PseudoConstant::county();
-                  if (!empty($county['county']) && !in_array($county['county'], $countyNames)) {
-                    $errors[] = ts('County input value not in county table: The County value appears to be invalid. It does not match any value in CiviCRM table of counties.');
-                  }
-                }
-              }
-            }
-            break;
-
-          case 'geo_code_1':
-            if (!empty($value)) {
-              foreach ($value as $codeValue) {
-                if (!empty($codeValue['geo_code_1'])) {
-                  if (CRM_Utils_Rule::numeric($codeValue['geo_code_1'])) {
-                    continue;
-                  }
-                  $errors[] = ts('Geo code 1');
-                }
-              }
-            }
-            break;
-
-          case 'geo_code_2':
-            if (!empty($value)) {
-              foreach ($value as $codeValue) {
-                if (!empty($codeValue['geo_code_2'])) {
-                  if (CRM_Utils_Rule::numeric($codeValue['geo_code_2'])) {
-                    continue;
-                  }
-                  $errors[] = ts('Geo code 2');
-                }
-              }
-            }
-            break;
-
           case 'do_not_email':
           case 'do_not_phone':
           case 'do_not_mail':
@@ -1063,9 +997,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $dupeCheck = (bool) ($onDuplicate);
     }
 
-    //get the prefix id etc if exists
-    CRM_Contact_BAO_Contact::resolveDefaults($formatted, TRUE);
-
     if ($dupeCheck) {
       // @todo this is already done in lookupContactID
       // the differences are that a couple of functions are callled in between
@@ -1074,6 +1005,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($formatted, $formatted['contact_type'], 'Unsupervised', [], FALSE, $dedupeRuleGroupID);
 
       if ($ids != NULL) {
+        // @todo - this should be unreachable as lookupContact will have populated
+        // contact ID OR exited if muliple.
         return [
           'is_error' => 1,
           'error_message' => [
@@ -1585,9 +1518,13 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $checkParams = ['check_permissions' => FALSE, 'match' => $params, 'dedupe_rule_id' => $dedupeRuleID];
     $possibleMatches = civicrm_api3('Contact', 'duplicatecheck', $checkParams);
     if (!$extIDMatch) {
-      // Historically we have used the last ID - it is not clear if this was
-      // deliberate.
-      return array_key_last($possibleMatches['values']);
+      if (count($possibleMatches['values']) === 1) {
+        return array_key_last($possibleMatches['values']);
+      }
+      if (count($possibleMatches['values']) > 1) {
+        throw new CRM_Core_Exception(ts('Record duplicates multiple contacts'));
+      }
+      return NULL;
     }
     if ($possibleMatches['count']) {
       if (array_key_exists($extIDMatch, $possibleMatches['values'])) {
@@ -1649,6 +1586,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   private function handleDuplicateError(array $newContact, array $values, int $onDuplicate, array $formatted, array $contactFields): int {
+    // This is expected to be unreachable.
     $urls = [];
     // need to fix at some stage and decide if the error will return an
     // array or string, crude hack for now
@@ -1667,6 +1605,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     // If we duplicate more than one record, skip no matter what
     if (count($cids) > 1) {
+      // Now done in lookup contact
       $errorMessage = ts('Record duplicates multiple contacts');
       //combine error msg to avoid mismatch between error file columns.
       $errorMessage .= "\n" . $url_string;
@@ -1851,6 +1790,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $this->addFieldToParams($params, $locationValues, $fieldName, $importedValue);
       }
     }
+
+    $this->fillStateProvince($params);
 
     return $params;
   }
@@ -2048,12 +1989,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \CiviCRM_API3_Exception
    */
   protected function formatLocationBlock(&$values, &$params) {
-
-    // handle address fields.
-    if (!array_key_exists('address', $params) || !is_array($params['address'])) {
-      $params['address'] = [];
-    }
-
     // Note: we doing multiple value formatting here for address custom fields, plus putting into right format.
     // The actual formatting (like date, country ..etc) for address custom fields is taken care of while saving
     // the address in CRM_Core_BAO_Address::create method
@@ -2094,33 +2029,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $values = $newValues;
     }
 
-    $fields['Address'] = $this->getMetadataForEntity('Address');
-    // @todo this is kinda replicated below....
-    _civicrm_api3_store_values($fields['Address'], $values, $params['address'][$values['location_type_id']]);
-
-    $addressFields = [
-      'county',
-      'country_id',
-      'state_province',
-      'supplemental_address_1',
-      'supplemental_address_2',
-      'supplemental_address_3',
-      'StateProvince.name',
-    ];
-    foreach (array_keys($customFields) as $customFieldID) {
-      $addressFields[] = 'custom_' . $customFieldID;
-    }
-
-    foreach ($addressFields as $field) {
-      if (array_key_exists($field, $values)) {
-        if (!array_key_exists('address', $params)) {
-          $params['address'] = [];
-        }
-        $params['address'][$values['location_type_id']][$field] = $values[$field];
-      }
-    }
-
-    $this->fillPrimary($params['address'][$values['location_type_id']], $values, 'address', CRM_Utils_Array::value('id', $params));
     return TRUE;
   }
 
@@ -2341,8 +2249,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     //date-format part ends
 
     $errorMessage = implode(', ', $errors);
-    //checking error in custom data
-    $this->isErrorInCustomData($params, $errorMessage, $params['contact_sub_type'] ?? NULL);
 
     //checking error in core data
     $this->isErrorInCoreData($params, $errorMessage);
@@ -2485,7 +2391,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   private function addFieldToParams(array &$contactArray, array $locationValues, string $fieldName, $importedValue): void {
     if (!empty($locationValues)) {
-      $fieldMap = ['country' => 'country_id'];
+      $fieldMap = ['country' => 'country_id', 'state_province' => 'state_province_id', 'county' => 'county_id'];
       $realFieldName = empty($fieldMap[$fieldName]) ? $fieldName : $fieldMap[$fieldName];
       $entity = strtolower($this->getFieldEntity($fieldName));
 
@@ -2498,31 +2404,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
       $fieldValue = $this->getTransformedFieldValue($realFieldName, $importedValue);
 
-      if (!empty($fieldValue) && $realFieldName === 'country_id') {
-        if ($this->getAvailableCountries() && empty($this->getAvailableCountries()[$fieldValue])) {
-          // We restrict to allowed countries for address fields - but not custom country fields.
-          $fieldValue = 'invalid_import_value';
-        }
-      }
-
-      // The new way...
       if (!isset($contactArray[$entity][$entityKey])) {
         $contactArray[$entity][$entityKey] = $locationValues;
       }
-      // Honestly I'll explain in comment_final_version(revision_2)_use_this_one...
-      $reallyRealFieldName = $fieldName === 'im' ? 'name' : $fieldName;
+      // So im has really non-standard handling...
+      $reallyRealFieldName = $realFieldName === 'im' ? 'name' : $realFieldName;
       $contactArray[$entity][$entityKey][$reallyRealFieldName] = $fieldValue;
-
-      if (!isset($locationValues[$fieldName]) && $entity === 'address') {
-        // These lines add the values to params 'the old way'
-        // The old way is then re-formatted by formatCommonData more
-        // or less as per below.
-        // @todo - stop doing this & remove handling in formatCommonData.
-        $locationValues[$fieldName] = $fieldValue;
-        $contactArray[$fieldName] = (array) ($contactArray[$fieldName] ?? []);
-        $contactArray[$fieldName][$entityKey] = $locationValues;
-        $contactArray[$entity][$entityKey][$realFieldName] = $fieldValue;
-      }
     }
     else {
       $fieldName = array_search($fieldName, $this->getOddlyMappedMetadataFields(), TRUE) ?: $fieldName;
@@ -2608,25 +2495,23 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * Lookup the contact's contact ID.
    *
    * @param array $params
-   * @param bool $isDuplicateIfExternalIdentifierExists
+   * @param bool $isMainContact
    *
    * @return int|null
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function lookupContactID(array $params, bool $isDuplicateIfExternalIdentifierExists): ?int {
+  protected function lookupContactID(array $params, bool $isMainContact): ?int {
     $extIDMatch = $this->lookupExternalIdentifier($params['external_identifier'] ?? NULL, $params['contact_type']);
-    if (!empty($params['external_identifier']) && !$extIDMatch && $isDuplicateIfExternalIdentifierExists) {
-      throw new CRM_Core_Exception(ts('Existing external ID lookup failed.'), CRM_Import_Parser::ERROR);
-    }
     $contactID = !empty($params['id']) ? (int) $params['id'] : NULL;
     //check if external identifier exists in database
     if ($extIDMatch && $contactID && $extIDMatch !== $contactID) {
       throw new CRM_Core_Exception(ts('Existing external ID does not match the imported contact ID.'), CRM_Import_Parser::ERROR);
     }
-    if ($extIDMatch && $isDuplicateIfExternalIdentifierExists) {
+    if ($extIDMatch && $isMainContact && ($this->isSkipDuplicates() || $this->isIgnoreDuplicates())) {
       throw new CRM_Core_Exception(ts('External ID already exists in Database.'), CRM_Import_Parser::DUPLICATE);
     }
     if ($contactID) {
@@ -2654,14 +2539,15 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   /**
    * @param array $params
    * @param array $formatted
+   * @param bool $isMainContact
+   *
    * @return array[]
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function processContact(array $params, array $formatted): array {
-    $params['id'] = $formatted['id'] = $this->lookupContactID($params, ($this->isSkipDuplicates() || $this->isIgnoreDuplicates()));
+  protected function processContact(array $params, array $formatted, bool $isMainContact): array {
+    $params['id'] = $formatted['id'] = $this->lookupContactID($params, $isMainContact);
     if ($params['id'] && $params['contact_sub_type']) {
       $contactSubType = Contact::get(FALSE)
         ->addWhere('id', '=', $params['id'])
@@ -2673,6 +2559,113 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
     }
     return array($formatted, $params);
+  }
+
+  /**
+   * Try to get the correct state province using what country information we have.
+   *
+   * If the state matches more than one possibility then either the imported
+   * country of the site country should help us....
+   *
+   * @param string $stateProvince
+   * @param int|null|string $countryID
+   *
+   * @return int|string
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  private function tryToResolveStateProvince(string $stateProvince, $countryID) {
+    // Try to disambiguate since we likely have the country now.
+    $possibleStates = $this->ambiguousOptions['state_province_id'][mb_strtolower($stateProvince)];
+    if ($countryID) {
+      return $this->checkStatesForCountry($countryID, $possibleStates) ?: 'invalid_import_value';
+    }
+    // Try the default country next.
+    $defaultCountryMatch = $this->checkStatesForCountry($this->getSiteDefaultCountry(), $possibleStates);
+    if ($defaultCountryMatch) {
+      return $defaultCountryMatch;
+    }
+
+    if ($this->getAvailableCountries()) {
+      $countryMatches = [];
+      foreach ($this->getAvailableCountries() as $availableCountryID) {
+        $possible = $this->checkStatesForCountry($availableCountryID, $possibleStates);
+        if ($possible) {
+          $countryMatches[] = $possible;
+        }
+      }
+      if (count($countryMatches) === 1) {
+        return reset($countryMatches);
+      }
+
+    }
+    return $stateProvince;
+  }
+
+  /**
+   * @param array $params
+   *
+   * @return array
+   * @throws \API_Exception
+   */
+  private function fillStateProvince(array &$params): array {
+    foreach ($params as $key => $value) {
+      if ($key === 'address') {
+        foreach ($value as $index => $address) {
+          $stateProvinceID = $address['state_province_id'] ?? NULL;
+          if ($stateProvinceID) {
+            if (!is_numeric($stateProvinceID)) {
+              $params['address'][$index]['state_province_id'] = $this->tryToResolveStateProvince($stateProvinceID, $address['country_id'] ?? NULL);
+            }
+            elseif (!empty($address['country_id']) && is_numeric($address['country_id'])) {
+              if (!$this->checkStatesForCountry((int) $address['country_id'], [$stateProvinceID])) {
+                $params['address'][$index]['state_province_id'] = 'invalid_import_value';
+              }
+            }
+          }
+        }
+      }
+      elseif (is_array($value) && !in_array($key, ['email', 'phone', 'im', 'website', 'openid'], TRUE)) {
+        $this->fillStateProvince($params[$key]);
+      }
+    }
+    return $params;
+  }
+
+  /**
+   * Check is any of the given states correlate to the country.
+   *
+   * @param int $countryID
+   * @param array $possibleStates
+   *
+   * @return int|null
+   * @throws \API_Exception
+   */
+  private function checkStatesForCountry(int $countryID, array $possibleStates) {
+    foreach ($possibleStates as $index => $state) {
+      if (!empty($this->statesByCountry[$state])) {
+        if ($this->statesByCountry[$state] === $countryID) {
+          return $state;
+        }
+        unset($possibleStates[$index]);
+      }
+    }
+    if (!empty($possibleStates)) {
+      $states = StateProvince::get(FALSE)
+        ->addSelect('country_id')
+        ->addWhere('id', 'IN', $possibleStates)
+        ->execute()
+        ->indexBy('country_id');
+      foreach ($states as $state) {
+        $this->statesByCountry[$state['id']] = $state['country_id'];
+      }
+      foreach ($possibleStates as $state) {
+        if ($this->statesByCountry[$state] === $countryID) {
+          return $state;
+        }
+      }
+    }
+    return FALSE;
   }
 
 }

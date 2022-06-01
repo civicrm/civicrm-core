@@ -1121,12 +1121,14 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   public function testImportCountryStateCounty(): void {
     $childKey = $this->getRelationships()['Child of']['id'] . '_a_b';
     // @todo - rows that don't work yet are set to do_not_import.
-    // $addressCustomGroupID = $this->createCustomGroup(['extends' => 'Address', 'name' => 'Address']);
-    // $contactCustomGroupID = $this->createCustomGroup(['extends' => 'Contact', 'name' => 'Contact']);
-    // $addressCustomFieldID = $this->createCountryCustomField(['custom_group_id' => $addressCustomGroupID])['id'];
-    // $contactCustomFieldID = $this->createMultiCountryCustomField(['custom_group_id' => $contactCustomGroupID])['id'];
-    // $customField = 'custom_' . $contactCustomFieldID;
-    // $addressCustomField = 'custom_' . $addressCustomFieldID;
+    $addressCustomGroupID = $this->createCustomGroup(['extends' => 'Address', 'name' => 'Address']);
+    $contactCustomGroupID = $this->createCustomGroup(['extends' => 'Contact', 'name' => 'Contact']);
+    $addressCustomFieldID = $this->createCountryCustomField(['custom_group_id' => $addressCustomGroupID])['id'];
+    $contactCustomFieldID = $this->createMultiCountryCustomField(['custom_group_id' => $contactCustomGroupID])['id'];
+    $contactStateCustomFieldID = $this->createStateCustomField(['custom_group_id' => $contactCustomGroupID])['id'];
+    $customField = 'custom_' . $contactCustomFieldID;
+    $addressCustomField = 'custom_' . $addressCustomFieldID;
+    $contactStateCustomField = 'custom_' . $contactStateCustomFieldID;
 
     $mapper = [
       ['first_name'],
@@ -1135,12 +1137,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ['county'],
       ['country'],
       ['state_province'],
-      // [$customField, 'state_province'],
-      ['do_not_import'],
-      // [$customField, 'country'],
-      ['do_not_import'],
-      // [$addressCustomField, 'country'],
-      ['do_not_import'],
+      [$contactStateCustomField],
+      [$customField],
+      [$addressCustomField],
       // [$addressCustomField, 'state_province'],
       ['do_not_import'],
       [$childKey, 'first_name'],
@@ -1168,6 +1167,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $contacts = $this->getImportedContacts();
     foreach ($contacts as $contact) {
       $this->assertEquals(1013, $contact['address'][0]['country_id']);
+      $this->assertEquals(1640, $contact['address'][0]['state_province_id']);
     }
     $this->assertCount(2, $contacts);
   }
@@ -1978,6 +1978,23 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test geocode validation.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportGeocodes(): void {
+    $mapper = [
+      ['first_name'],
+      ['last_name'],
+      ['geo_code_1', 1],
+      ['geo_code_2', 1],
+    ];
+    $csv = 'individual_geocode.csv';
+    $this->validateMultiRowCsv($csv, $mapper, 'GeoCode2');
+  }
+
+  /**
    * Validate the csv file values.
    *
    * @param string $csv Name of csv file.
@@ -2094,10 +2111,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test that import parser will not throw error if Related Contact is not found via passed in External ID.
    *
-   * Currently fails because validation assumes the Related contact will be found.
-   * When it is later not found creating the contact via the API throws an
-   * error for missing required fields.
-   *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
@@ -2107,12 +2120,14 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'first_name' => 'Alok',
       'last_name' => 'Patel',
       'Employee of' => 'related external identifier',
+      'organization_name' => 'Big shop',
     ];
 
     $mapper = [
       ['first_name'],
       ['last_name'],
       ['5_a_b', 'external_identifier'],
+      ['5_a_b', 'organization_name'],
     ];
     $fields = array_keys($contactImportValues);
     $values = array_values($contactImportValues);
@@ -2125,6 +2140,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $parser->init();
 
     $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values);
+    $this->callAPISuccessGetCount('Contact', ['organization_name' => 'Big shop'], 2);
   }
 
 }

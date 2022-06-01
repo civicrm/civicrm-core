@@ -781,46 +781,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    *
    */
   public static function resolveDefaults(&$defaults, $reverse = FALSE) {
-
-    $blocks = ['address'];
-    foreach ($blocks as $name) {
-      if (!array_key_exists($name, $defaults) || !is_array($defaults[$name])) {
-        continue;
-      }
-      foreach ($defaults[$name] as $count => & $values) {
-
-        //get location type id.
-        CRM_Utils_Array::lookupValue($values, 'location_type', CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'), $reverse);
-
-        if ($name == 'address') {
-          // FIXME: lookupValue doesn't work for vcard_name
-          if (!empty($values['location_type_id'])) {
-            $vcardNames = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', ['labelColumn' => 'vcard_name']);
-            $values['vcard_name'] = $vcardNames[$values['location_type_id']];
-          }
-
-          $stateProvinceID = self::resolveStateProvinceID($values, $values['country_id'] ?? NULL);
-          if ($stateProvinceID) {
-            $values['state_province_id'] = $stateProvinceID;
-          }
-
-          if (!empty($values['state_province_id'])) {
-            $countyList = CRM_Core_PseudoConstant::countyForState($values['state_province_id']);
-          }
-          else {
-            $countyList = CRM_Core_PseudoConstant::county();
-          }
-          CRM_Utils_Array::lookupValue($values,
-            'county',
-            $countyList,
-            $reverse
-          );
-        }
-
-        // Kill the reference.
-        unset($values);
-      }
-    }
   }
 
   /**
