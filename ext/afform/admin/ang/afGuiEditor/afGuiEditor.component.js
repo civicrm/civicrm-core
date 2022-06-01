@@ -27,7 +27,23 @@
       $scope.searchDisplayListFilter = {};
       this.meta = afGui.meta;
       var editor = this,
+        undoHistory = [],
+        undoPosition = 0,
+        undoAction = null,
         sortableOptions = {};
+
+      // ngModelOptions to debounce input
+      // Used to prevent cluttering the undo history with every keystroke
+      this.debounceMode = {
+        updateOn: 'default blur',
+        debounce: {
+          default: 2000,
+          blur: 0
+        }
+      };
+
+      // Above mode for use with getterSetter
+      this.debounceWithGetterSetter = _.assign({getterSetter: true}, this.debounceMode);
 
       this.$onInit = function() {
         // Load the current form plus blocks & fields
@@ -38,13 +54,34 @@
         $timeout(fixEditorHeight);
         $timeout(editor.adjustTabWidths);
         $(window)
+          .off('.afGuiEditor')
           .on('resize.afGuiEditor', fixEditorHeight)
-          .on('resize.afGuiEditor', editor.adjustTabWidths);
+          .on('resize.afGuiEditor', editor.adjustTabWidths)
+          .on('keyup.afGuiEditor', editor.onKeyup);
+
+        // Warn of unsaved changes
+        window.onbeforeunload = function(e) {
+          if (!editor.isSaved()) {
+            e.returnValue = ts("Form has not been saved.");
+            return e.returnValue;
+          }
+        };
       };
 
       this.$onDestroy = function() {
         $(window).off('.afGuiEditor');
+        window.onbeforeunload = null;
       };
+
+      function setEditorLayout() {
+        editor.layout = {};
+        if (editor.getFormType() === 'form') {
+          editor.layout['#children'] = afGui.findRecursive(editor.afform.layout, {'#tag': 'af-form'})[0]['#children'];
+        }
+        else {
+          editor.layout['#children'] = editor.afform.layout;
+        }
+      }
 
       // Initialize the current form
       function initializeForm() {
@@ -60,12 +97,11 @@
         }
         $scope.canvasTab = 'layout';
         $scope.layoutHtml = '';
-        editor.layout = {'#children': []};
         $scope.entities = {};
+        setEditorLayout();
 
         if (editor.getFormType() === 'form') {
           editor.allowEntityConfig = true;
-          editor.layout['#children'] = afGui.findRecursive(editor.afform.layout, {'#tag': 'af-form'})[0]['#children'];
           $scope.entities = _.mapValues(afGui.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name'), backfillEntityDefaults);
 
           if (editor.mode === 'create') {
@@ -73,9 +109,6 @@
             editor.afform.create_submission = true;
             editor.layout['#children'].push(afGui.meta.elements.submit.element);
           }
-        }
-        else {
-          editor.layout['#children'] = editor.afform.layout;
         }
 
         if (editor.getFormType() === 'block') {
@@ -91,12 +124,72 @@
           editor.searchDisplays = getSearchDisplaysOnForm();
         }
 
-        // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
-        $scope.changesSaved = editor.mode === 'edit' ? 1 : false;
-        $scope.$watch('editor.afform', function () {
-          $scope.changesSaved = $scope.changesSaved === 1;
+        // Initialize undo history
+        undoAction = 'initialLoad';
+        undoHistory = [{
+          afform: _.cloneDeep(editor.afform),
+          saved: editor.mode === 'edit',
+          selectedEntityName: null
+        }];
+        $scope.$watch('editor.afform', function(newValue, oldValue) {
+          if (!undoAction && newValue && oldValue) {
+            // Clear "redo" history
+            if (undoPosition) {
+              undoHistory.splice(0, undoPosition);
+              undoPosition = 0;
+            }
+            undoHistory.unshift({
+              afform: _.cloneDeep(editor.afform),
+              saved: false,
+              selectedEntityName: $scope.selectedEntityName
+            });
+            // Trim to a total length of 20
+            if (undoHistory.length > 20) {
+              undoHistory.splice(20, undoHistory.length - 20);
+            }
+          }
+          undoAction = null;
         }, true);
       }
+
+      // Undo/redo keys (ctrl-z, ctrl-shift-z)
+      this.onKeyup = function(e) {
+        if (e.key === 'z' && e.ctrlKey && e.shiftKey) {
+          editor.redo();
+        }
+        else if (e.key === 'z' && e.ctrlKey) {
+          editor.undo();
+        }
+      };
+
+      this.canUndo = function() {
+        return !!undoHistory[undoPosition + 1];
+      };
+
+      this.canRedo = function() {
+        return !!undoHistory[undoPosition - 1];
+      };
+
+      // Revert to a previous/next revision in the undo history
+      function changeHistory(direction) {
+        if (!undoHistory[undoPosition + direction]) {
+          return;
+        }
+        undoPosition += direction;
+        undoAction = 'change';
+        editor.afform = _.cloneDeep(undoHistory[undoPosition].afform);
+        setEditorLayout();
+        $scope.canvasTab = 'layout';
+        $scope.selectedEntityName = undoHistory[undoPosition].selectedEntityName;
+      }
+
+      this.undo = _.wrap(1, changeHistory);
+
+      this.redo = _.wrap(-1, changeHistory);
+
+      this.isSaved = function() {
+        return undoHistory[undoPosition].saved;
+      };
 
       this.getFormType = function() {
         return editor.afform.type;
@@ -414,14 +507,20 @@
         var afform = JSON.parse(angular.toJson(editor.afform));
         // This might be set to undefined by validation
         afform.server_route = afform.server_route || '';
-        $scope.saving = $scope.changesSaved = true;
+        $scope.saving = true;
         crmApi4('Afform', 'save', {formatWhitespace: true, records: [afform]})
           .then(function (data) {
             $scope.saving = false;
-            editor.afform.name = data[0].name;
-            if (editor.mode !== 'edit') {
-              $location.url('/edit/' + data[0].name);
+            // When saving a new form for the first time
+            if (!editor.afform.name) {
+              undoAction = 'save';
+              editor.afform.name = data[0].name;
             }
+            // Update undo history - mark current snapshot as "saved"
+            _.each(undoHistory, function(snapshot, index) {
+              snapshot.saved = index === undoPosition;
+              snapshot.afform.name = data[0].name;
+            });
           });
       };
 

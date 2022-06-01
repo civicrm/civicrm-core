@@ -5,14 +5,14 @@
       {{:: ts('Title') }} <span class="crm-marker">*</span>
     </label>
     <p class="help-block" ng-if=":: editor.afform.type !== 'block'">{{:: ts('Public title (usually displayed at the top of the form).') }}</p>
-    <input ng-model="editor.afform.title" class="form-control" id="af_config_form_title" required title="{{:: ts('Required') }}" />
+    <input ng-model="editor.afform.title" class="form-control" id="af_config_form_title" required title="{{:: ts('Required') }}" ng-model-options="editor.debounceMode" >
   </div>
 
   <div class="form-group">
     <label for="af_config_form_description">
       {{:: ts('Description') }}
     </label>
-    <textarea ng-model="editor.afform.description" class="form-control" id="af_config_form_description"></textarea>
+    <textarea ng-model="editor.afform.description" class="form-control" id="af_config_form_description" ng-model-options="editor.debounceMode"></textarea>
     <p class="help-block">{{:: ts("Internal note about the form's purpose (not displayed on form).") }}</p>
     <!-- Description is "semi-private": not generally public, but not audited for secrecy -->
   </div>
@@ -22,7 +22,7 @@
     <label for="af_config_form_permission">
       {{:: ts('Permission') }}
     </label>
-    <input ng-model="editor.afform.permission" class="form-control" id="af_config_form_permission" crm-ui-select="{data: editor.meta.permissions}" />
+    <input ng-model="editor.afform.permission" class="form-control" id="af_config_form_permission" crm-ui-select="{data: editor.meta.permissions}" >
     <p class="help-block">{{:: ts('What permission is required to use this form?') }}</p>
   </div>
 
@@ -34,7 +34,7 @@
       <label for="af_config_form_server_route">
         {{:: ts('Page') }}
       </label>
-      <input ng-model="editor.afform.server_route" name="server_route" class="form-control" id="af_config_form_server_route" pattern="^civicrm\/[-0-9a-zA-Z\/_]+$" onfocus="this.value = this.value || 'civicrm/'" onblur="if (this.value === 'civicrm/') this.value = ''" title="{{:: ts('Path must begin with &quot;civicrm/&quot;') }}">
+      <input ng-model="editor.afform.server_route" name="server_route" class="form-control" id="af_config_form_server_route" pattern="^civicrm\/[-0-9a-zA-Z\/_]+$" onfocus="this.value = this.value || 'civicrm/'" onblur="if (this.value === 'civicrm/') this.value = ''" title="{{:: ts('Path must begin with &quot;civicrm/&quot;') }}" ng-model-options="editor.debounceMode">
       <p class="help-block">{{:: ts('Expose the form as a standalone webpage. (Example: "civicrm/my-form")') }}</p>
     </div>
 
@@ -92,7 +92,7 @@
       <label for="af_config_redirect">
         {{:: ts('Post-Submit Page') }}
       </label>
-      <input ng-model="editor.afform.redirect" name="redirect" class="form-control" id="af_config_redirect" title="{{:: ts('Post-Submit Page') }}" pattern="^((http|https):\/\/|\/|civicrm\/)[-0-9a-zA-Z\/_.]\S+$" title="{{:: ts('Post-Submit Page must be either an absolute url, a relative url or a path starting with CiviCRM') }}"/>
+      <input ng-model="editor.afform.redirect" name="redirect" class="form-control" id="af_config_redirect" title="{{:: ts('Post-Submit Page') }}" pattern="^((http|https):\/\/|\/|civicrm\/)[-0-9a-zA-Z\/_.]\S+$" title="{{:: ts('Post-Submit Page must be either an absolute url, a relative url or a path starting with CiviCRM') }}" ng-model-options="editor.debounceMode" >
       <p class="help-block">{{:: ts('Enter a URL or path that the form should redirect to following a successful submission.') }}</p>
     </div>
   </fieldset>
