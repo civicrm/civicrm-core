@@ -871,24 +871,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         /* check if it's a valid custom field id */
         $errors[] = $parser->validateCustomField($customFieldID, $value, $customFields[$customFieldID], $dateType);
       }
-      elseif (is_array($params[$key]) && isset($params[$key]["contact_type"]) && in_array(substr($key, -3), ['a_b', 'b_a'], TRUE)) {
-        //CRM-5125
-        //supporting custom data of related contact subtypes
-        $relation = $key;
-        if (!empty($relation)) {
-          [$id, $first, $second] = CRM_Utils_System::explode('_', $relation, 3);
-          $direction = "contact_sub_type_$second";
-          $relationshipType = new CRM_Contact_BAO_RelationshipType();
-          $relationshipType->id = $id;
-          if ($relationshipType->find(TRUE)) {
-            if (isset($relationshipType->$direction)) {
-              $params[$key]['contact_sub_type'] = $relationshipType->$direction;
-            }
-          }
-        }
-
-        self::isErrorInCustomData($params[$key], $errorMessage, $csType);
-      }
     }
     if ($errors) {
       $errorMessage .= ($errorMessage ? '; ' : '') . implode('; ', array_filter($errors));
