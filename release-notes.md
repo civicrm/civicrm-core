@@ -20,6 +20,7 @@ Other resources for identifying changes are:
 Released June 1, 2022
 
 - **[Synopsis](release-notes/5.50.0.md#synopsis)**
+- **[Security advisories](release-notes/5.50.0.md#security)**
 - **[Features](release-notes/5.50.0.md#features)**
 - **[Bugs resolved](release-notes/5.50.0.md#bugs)**
 - **[Miscellany](release-notes/5.50.0.md#misc)**
