@@ -86,28 +86,42 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
       ->addValue('html_type', 'Text')
       ->execute();
 
+    // Unconditional Contact CustomGroup
+    CustomGroup::create(FALSE)
+      ->addValue('extends', 'Contact')
+      ->addValue('title', 'always')
+      ->addChain('field', CustomField::create()
+        ->addValue('custom_group_id', '$id')
+        ->addValue('label', 'on')
+        ->addValue('html_type', 'Text')
+      )->execute();
+
     $allFields = Contact::getFields(FALSE)
       ->execute()->indexBy('name');
     $this->assertArrayHasKey('contact_sub.sub_field', $allFields);
     $this->assertArrayHasKey('org_group.sub_field', $allFields);
+    $this->assertArrayHasKey('always.on', $allFields);
 
     $fieldsWithSubtype = Contact::getFields(FALSE)
       ->addValue('id', $contact2['id'])
       ->execute()->indexBy('name');
     $this->assertArrayHasKey('contact_sub.sub_field', $fieldsWithSubtype);
     $this->assertArrayNotHasKey('org_group.sub_field', $fieldsWithSubtype);
+    $this->assertArrayHasKey('always.on', $fieldsWithSubtype);
 
     $fieldsNoSubtype = Contact::getFields(FALSE)
       ->addValue('id', $contact1['id'])
       ->execute()->indexBy('name');
     $this->assertArrayNotHasKey('contact_sub.sub_field', $fieldsNoSubtype);
     $this->assertArrayNotHasKey('org_group.sub_field', $fieldsNoSubtype);
+    $this->assertArrayHasKey('always.on', $fieldsNoSubtype);
 
     $groupFields = Contact::getFields(FALSE)
       ->addValue('id', $org['id'])
       ->execute()->indexBy('name');
     $this->assertArrayNotHasKey('contact_sub.sub_field', $groupFields);
     $this->assertArrayHasKey('org_group.sub_field', $groupFields);
+    $this->assertArrayHasKey('always.on', $groupFields);
   }
 
   public function testCustomGetFieldsForParticipantSubTypes() {
@@ -185,10 +199,22 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
       )
       ->execute();
 
+    // Unconditional Participant CustomGroup
+    CustomGroup::create(FALSE)
+      ->addValue('extends', 'Participant')
+      ->addValue('title', 'always')
+      ->addChain('field', CustomField::create()
+        ->addValue('custom_group_id', '$id')
+        ->addValue('label', 'on')
+        ->addValue('html_type', 'Text')
+      )
+      ->execute();
+
     $allFields = Participant::getFields(FALSE)->execute()->indexBy('name');
     $this->assertArrayHasKey('meeting_conference.sub_field', $allFields);
     $this->assertArrayHasKey('volunteer_host.sub_field', $allFields);
     $this->assertArrayHasKey('event_2_and_3.sub_field', $allFields);
+    $this->assertArrayHasKey('always.on', $allFields);
 
     $participant0Fields = Participant::getFields(FALSE)
       ->addValue('id', $participants[0]['id'])
@@ -196,6 +222,7 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
     $this->assertArrayHasKey('meeting_conference.sub_field', $participant0Fields);
     $this->assertArrayNotHasKey('volunteer_host.sub_field', $participant0Fields);
     $this->assertArrayNotHasKey('event_2_and_3.sub_field', $participant0Fields);
+    $this->assertArrayHasKey('always.on', $participant0Fields);
 
     $participant1Fields = Participant::getFields(FALSE)
       ->addValue('id', $participants[1]['id'])
@@ -203,6 +230,7 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
     $this->assertArrayHasKey('meeting_conference.sub_field', $participant1Fields);
     $this->assertArrayHasKey('volunteer_host.sub_field', $participant1Fields);
     $this->assertArrayHasKey('event_2_and_3.sub_field', $participant1Fields);
+    $this->assertArrayHasKey('always.on', $participant1Fields);
 
     $participant2Fields = Participant::getFields(FALSE)
       ->addValue('id', $participants[2]['id'])
@@ -217,6 +245,7 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
     $this->assertArrayNotHasKey('meeting_conference.sub_field', $participant3Fields);
     $this->assertArrayHasKey('volunteer_host.sub_field', $participant3Fields);
     $this->assertArrayNotHasKey('event_3_and_3.sub_field', $participant3Fields);
+    $this->assertArrayHasKey('always.on', $participant3Fields);
   }
 
 }

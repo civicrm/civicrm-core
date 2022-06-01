@@ -141,7 +141,9 @@ class SpecGatherer {
         $query->addWhere('custom_group_id.extends_entity_column_value', 'IS EMPTY');
       }
       else {
-        $clause = [];
+        $clause = [
+          ['custom_group_id.extends_entity_column_value', 'IS EMPTY'],
+        ];
         foreach ((array) $values[$grouping] as $value) {
           $clause[] = ['custom_group_id.extends_entity_column_value', 'CONTAINS', $value];
         }
@@ -179,6 +181,13 @@ class SpecGatherer {
         }
       }
       if ($clauses) {
+        $clauses[] = [
+          'AND',
+          [
+            ['custom_group_id.extends_entity_column_id', 'IS EMPTY'],
+            ['custom_group_id.extends_entity_column_value', 'IS EMPTY'],
+          ],
+        ];
         $query->addClause('OR', $clauses);
       }
     }
