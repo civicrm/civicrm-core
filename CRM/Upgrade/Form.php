@@ -599,6 +599,14 @@ SET    version = '$version'
     );
     $queue->createItem($task, ['weight' => 1000]);
 
+    $task = new CRM_Queue_Task(
+      ['CRM_Upgrade_Form', 'enqueueExtUpgrades'],
+      [$rev, $latestVer, $latestVer, $postUpgradeMessageFile],
+      "Assess extension upgrades"
+    );
+    // This places the extension-upgrades after `doCoreFinish` - but before new extensions (`addExtensionTask()`)
+    $queue->createItem($task, ['weight' => 1500]);
+
     return $queue;
   }
 
@@ -828,6 +836,23 @@ SET    version = '$version'
     // Force a rebuild of CiviCRM asset cache in case things have changed.
     \Civi::service('asset_builder')->clear(FALSE);
 
+    return TRUE;
+  }
+
+  /**
+   * After core schema is up-to-date, ensure that
+   * @param \CRM_Queue_TaskContext $ctx
+   * @return bool
+   */
+  public static function enqueueExtUpgrades(CRM_Queue_TaskContext $ctx): bool {
+    CRM_Core_Config::singleton(TRUE, TRUE);
+    CRM_Upgrade_DispatchPolicy::assertActive('upgrade.finish');
+    if (CRM_Extension_Upgrades::hasPending()) {
+      CRM_Extension_Upgrades::fillQueue($ctx->queue);
+      // ISSUE: Core-upgrade tasks and ext-upgrade tasks need to run with different `DispatchPolicy`s
+      // (`upgrade.main` vs `upgrade.finish` or `NULL`).
+      // Can we make policy transitions sticky -- eg maybe a setting or session-variable?
+    }
     return TRUE;
   }
 
