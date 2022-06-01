@@ -78,7 +78,7 @@ class CRM_Activity_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
 
     $parser = new CRM_Activity_Import_Parser_Activity($mapperKeys);
-
+    $parser->setUserJobID($this->getUserJobID());
     $mapFields = $this->get('fields');
 
     foreach ($mapper as $key => $value) {

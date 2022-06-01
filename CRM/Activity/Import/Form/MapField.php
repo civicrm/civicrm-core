@@ -324,8 +324,8 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->controller->resetPage($this->_name);
       return;
     }
+    $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
 
-    $mapperKeys = [];
     $mapper = [];
     $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
     $mapperKeysMain = [];
@@ -387,6 +387,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     $parser = new CRM_Activity_Import_Parser_Activity($mapperKeysMain);
+    $parser->setUserJobID($this->getUserJobID());
     $parser->run($this->getSubmittedValue('uploadFile'), $this->getSubmittedValue('fieldSeparator'), $mapper, $this->getSubmittedValue('skipColumnHeader'),
       CRM_Import_Parser::MODE_PREVIEW
     );

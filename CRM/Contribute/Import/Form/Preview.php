@@ -90,7 +90,7 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
 
     $parser = new CRM_Contribute_Import_Parser_Contribution($mapperKeys, $mapperSoftCredit, $mapperPhoneType, $mapperSoftCreditType);
-
+    $parser->setUserJobID($this->getUserJobID());
     $mapFields = $this->get('fields');
 
     foreach ($mapper as $key => $value) {

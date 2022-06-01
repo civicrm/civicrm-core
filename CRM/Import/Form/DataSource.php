@@ -157,12 +157,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
   protected function submitFileForMapping($parserClassName, $entity = NULL) {
     $this->controller->resetPage('MapField');
     CRM_Core_Session::singleton()->set('dateTypes', $this->getSubmittedValue('dateFormats'));
-    if (!$this->getUserJobID()) {
-      $this->createUserJob();
-    }
-    else {
-      $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
-    }
+    $this->processDatasource();
 
     $mapper = [];
 
@@ -192,6 +187,35 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    */
   public function getTitle() {
     return ts('Upload Data');
+  }
+
+  /**
+   * Process the datasource submission - setting up the job and data source.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function processDatasource(): void {
+    if (!$this->getUserJobID()) {
+      $this->createUserJob();
+    }
+    else {
+      $this->flushDataSource();
+      $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
+    }
+    $this->instantiateDataSource();
+  }
+
+  /**
+   * Instantiate the datasource.
+   *
+   * This gives the datasource a chance to do any table creation etc.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  private function instantiateDataSource(): void {
+    $this->getDataSourceObject()->initialize();
   }
 
 }

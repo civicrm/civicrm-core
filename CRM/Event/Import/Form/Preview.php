@@ -83,7 +83,7 @@ class CRM_Event_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
 
     $parser = new CRM_Event_Import_Parser_Participant($mapperKeys);
-
+    $parser->setUserJobID($this->getUserJobID());
     $mapFields = $this->get('fields');
 
     foreach ($mapper as $key => $value) {
