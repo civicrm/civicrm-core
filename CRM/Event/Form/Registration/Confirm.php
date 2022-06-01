@@ -192,6 +192,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           continue;
         }
         $individualTaxAmount = 0;
+        $append = '';
         //display tax amount on confirmation page
         $taxAmount += $v['tax_amount'];
         if (is_array($v)) {
@@ -522,6 +523,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           // thus provide mapping for it with a different email value
           if (empty($value['email'])) {
             $value['email'] = CRM_Utils_Array::valueByRegexKey('/^email-/', $value);
+          }
+
+          // If registering from waitlist participant_id is set but contact_id is not.
+          // We need a contact ID to process the payment so set the "primary" contact ID.
+          if (empty($value['contact_id'])) {
+            $value['contact_id'] = $contactID;
           }
 
           if (is_object($payment)) {
@@ -1249,6 +1256,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $form->_paymentProcessor = $params['paymentProcessorObj'];
     }
     $form->postProcess();
+    return $form;
   }
 
   /**

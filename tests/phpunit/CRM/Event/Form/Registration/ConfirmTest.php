@@ -218,6 +218,159 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
+   * Tests missing contactID when registering for paid event from waitlist
+   * https://github.com/civicrm/civicrm-core/pull/23358, https://lab.civicrm.org/extensions/stripe/-/issues/347
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testWaitlistRegistrationContactIdParam() {
+    // @todo - figure out why this doesn't pass validate financials
+    $this->isValidateFinancialsOnPostAssert = FALSE;
+    $paymentProcessorID = $this->processorCreate();
+    /* @var \CRM_Core_Payment_Dummy $processor */
+    $processor = Civi\Payment\System::singleton()->getById($paymentProcessorID);
+    $processor->setDoDirectPaymentResult(['fee_amount' => 1.67]);
+    $params = ['is_monetary' => 1, 'financial_type_id' => 1];
+    $event = $this->eventCreatePaid($params, [['name' => 'test', 'amount' => 8000.67]]);
+    $individualID = $this->individualCreate();
+    //$this->submitForm($event['id'], [
+    $form = CRM_Event_Form_Registration_Confirm::testSubmit([
+      'id' => $event['id'],
+      'contributeMode' => 'direct',
+      'registerByID' => $individualID,
+      'paymentProcessorObj' => CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID),
+      'amount' => 8000.67,
+      'amount_level' => 'Tiny-tots (ages 5-8) - 1',
+      'params' => [
+        [
+          'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
+          'entryURL' => 'http://dmaster.local/civicrm/event/register?reset=1&amp;id=3',
+          'first_name' => 'k',
+          'last_name' => 'p',
+          'email-Primary' => 'demo@example.com',
+          'hidden_processor' => '1',
+          'credit_card_number' => '4111111111111111',
+          'cvv2' => '123',
+          'credit_card_exp_date' => [
+            'M' => '1',
+            'Y' => date('Y') + 1,
+          ],
+          'credit_card_type' => 'Visa',
+          'billing_first_name' => 'p',
+          'billing_middle_name' => '',
+          'billing_last_name' => 'p',
+          'billing_street_address-5' => 'p',
+          'billing_city-5' => 'p',
+          'billing_state_province_id-5' => '1061',
+          'billing_postal_code-5' => '7',
+          'billing_country_id-5' => '1228',
+          'priceSetId' => '6',
+          'price_7' => [
+            13 => 1,
+          ],
+          'payment_processor_id' => $paymentProcessorID,
+          'bypass_payment' => '',
+          'is_primary' => 1,
+          'is_pay_later' => 0,
+          'contact_id' => $individualID,
+          'campaign_id' => NULL,
+          'defaultRole' => 1,
+          'participant_role_id' => '1',
+          'currencyID' => 'USD',
+          'amount_level' => 'Tiny-tots (ages 5-8) - 1',
+          'amount' => $this->formatMoneyInput(8000.67),
+          'tax_amount' => NULL,
+          'year' => '2019',
+          'month' => '1',
+          'ip_address' => '127.0.0.1',
+          'invoiceID' => '57adc34957a29171948e8643ce906332',
+          'button' => '_qf_Register_upload',
+          'billing_state_province-5' => 'AP',
+          'billing_country-5' => 'US',
+        ],
+      ],
+    ]);
+    $this->callAPISuccessGetCount('Participant', [], 1);
+
+    $value = $form->get('value');
+    $this->assertArrayHasKey('contact_id', $value, 'contact_id missing in $value array');
+    $this->assertEquals($value['contact_id'], $individualID, 'Invalid contact_id in $value array.');
+
+    // Add someone to the waitlist.
+    $waitlistContactId = $this->individualCreate();
+    $waitlistContact   = $this->callAPISuccess('Contact', 'getsingle', ['id' => $waitlistContactId]);
+    $waitlistParticipantId = $this->participantCreate(['event_id' => $event['id'], 'contact_id' => $waitlistContactId, 'status_id' => 'On waitlist']);
+
+    $waitlistParticipant = $this->callAPISuccess('Participant', 'getsingle', ['id' => $waitlistParticipantId, 'return' => ["participant_status"]]);
+    $this->assertEquals($waitlistParticipant['participant_status'], 'On waitlist', 'Invalid participant status. Expecting: On waitlist');
+
+    $form = CRM_Event_Form_Registration_Confirm::testSubmit([
+      'id' => $event['id'],
+      'contributeMode' => 'direct',
+      'registerByID' => $waitlistContactId,
+      'paymentProcessorObj' => CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID),
+      'amount' => 8000.67,
+      'amount_level' => 'Tiny-tots (ages 5-8) - 1',
+      'params' => [
+        [
+          'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
+          'entryURL' => 'http://dmaster.local/civicrm/event/register?reset=1&amp;id=3',
+          'first_name' => $waitlistContact['first_name'],
+          'last_name' => $waitlistContact['last_name'],
+          'email-Primary' => $waitlistContact['email'],
+          'hidden_processor' => '1',
+          'credit_card_number' => '4111111111111111',
+          'cvv2' => '123',
+          'credit_card_exp_date' => [
+            'M' => '1',
+            'Y' => date('Y') + 1,
+          ],
+          'credit_card_type' => 'Visa',
+          'billing_first_name' => $waitlistContact['first_name'],
+          'billing_middle_name' => '',
+          'billing_last_name' => $waitlistContact['last_name'],
+          'billing_street_address-5' => 'p',
+          'billing_city-5' => 'p',
+          'billing_state_province_id-5' => '1061',
+          'billing_postal_code-5' => '7',
+          'billing_country_id-5' => '1228',
+          'priceSetId' => '6',
+          'price_7' => [
+            13 => 1,
+          ],
+          'payment_processor_id' => $paymentProcessorID,
+          'bypass_payment' => '',
+          'is_primary' => 1,
+          'is_pay_later' => 0,
+          'participant_id' => $waitlistParticipantId,
+          'campaign_id' => NULL,
+          'defaultRole' => 1,
+          'participant_role_id' => '1',
+          'currencyID' => 'USD',
+          'amount_level' => 'Tiny-tots (ages 5-8) - 1',
+          'amount' => $this->formatMoneyInput(8000.67),
+          'tax_amount' => NULL,
+          'year' => '2019',
+          'month' => '1',
+          'ip_address' => '127.0.0.1',
+          'invoiceID' => '68adc34957a29171948e8643ce906332',
+          'button' => '_qf_Register_upload',
+          'billing_state_province-5' => 'AP',
+          'billing_country-5' => 'US',
+        ],
+      ],
+    ]);
+    $this->callAPISuccessGetCount('Participant', [], 2);
+
+    $waitlistParticipant = $this->callAPISuccess('Participant', 'getsingle', ['id' => $waitlistParticipantId, 'return' => ["participant_status"]]);
+    $this->assertEquals($waitlistParticipant['participant_status'], 'Registered', 'Invalid participant status. Expecting: Registered');
+
+    $value = $form->get('value');
+    $this->assertArrayHasKey('contactID', $value, 'contactID missing in waitlist registration $value array');
+    $this->assertEquals($value['contactID'], $waitlistParticipant['contact_id'], 'Invalid contactID in waitlist $value array.');
+  }
+
+  /**
    * Test for Tax amount for multiple participant.
    *
    * @throws \CRM_Core_Exception
