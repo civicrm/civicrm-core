@@ -321,7 +321,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     // prioritising a dedupe rule check over an external_identifier check, but falling back on ext id.
 
     //format common data, CRM-4062
-    $this->formatCommonData($params, $formatted, $contactFields);
+    $this->formatCommonData($params, $formatted);
 
     //fixed CRM-4148
     //now we create new contact in update/fill mode also.
@@ -402,7 +402,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $contactFields = CRM_Contact_DAO_Contact::import();
 
         //format common data, CRM-4062
-        $this->formatCommonData($field, $formatting, $contactFields);
+        $this->formatCommonData($field, $formatting);
 
         //fixed for CRM-4148
         if (!empty($formatting['id'])) {
@@ -624,10 +624,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *   Contain record values.
    * @param array $formatted
    *   Array of formatted data.
-   * @param array $contactFields
-   *   Contact DAO fields.
    */
-  private function formatCommonData($params, &$formatted, $contactFields) {
+  private function formatCommonData($params, &$formatted) {
     $customFields = CRM_Core_BAO_CustomField::getFields($formatted['contact_type'], FALSE, FALSE, $formatted['contact_sub_type'] ?? NULL);
 
     $addressCustomFields = CRM_Core_BAO_CustomField::getFields('Address');
