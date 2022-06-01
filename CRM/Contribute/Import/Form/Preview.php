@@ -27,9 +27,6 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
     parent::preProcess();
     //get the data from the session
     $dataValues = $this->get('dataValues');
-    $mapper = $this->get('mapper');
-    $softCreditFields = $this->get('softCreditFields');
-    $mapperSoftCreditType = $this->get('mapperSoftCreditType');
     $invalidRowCount = $this->get('invalidRowCount');
 
     //get the mapping name displayed if the mappingId is set
@@ -47,9 +44,6 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
 
     $properties = [
-      'mapper',
-      'softCreditFields',
-      'mapperSoftCreditType',
       'dataValues',
       'columnCount',
       'totalRowCount',
@@ -58,6 +52,7 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
       'downloadErrorRecordsUrl',
     ];
     $this->setStatusUrl();
+    $this->assign('mapper', $this->getMappedFieldLabels());
 
     foreach ($properties as $property) {
       $this->assign($property, $this->get($property));
@@ -65,32 +60,36 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
   }
 
   /**
+   * Get the mapped fields as an array of labels.
+   *
+   * e.g
+   * ['First Name', 'Employee Of - First Name', 'Home - Street Address']
+   *
+   * @return array
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMappedFieldLabels(): array {
+    $mapper = [];
+    $parser = $this->getParser();
+    foreach ($this->getSubmittedValue('mapper') as $columnNumber => $mappedField) {
+      $mapper[$columnNumber] = $parser->getMappedFieldLabel($parser->getMappingFieldFromMapperInput($mappedField, 0, $columnNumber));
+    }
+    return $mapper;
+  }
+
+  /**
    * Process the mapped fields and map it into the uploaded file preview the file and extract some summary statistics.
    */
   public function postProcess() {
     $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
-    $invalidRowCount = $this->get('invalidRowCount');
     $onDuplicate = $this->get('onDuplicate');
-    $mapperSoftCreditType = $this->get('mapperSoftCreditType');
-
+    $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
     $mapper = $this->controller->exportValue('MapField', 'mapper');
-    $mapperKeys = [];
-    $mapperSoftCredit = [];
-    $mapperPhoneType = [];
 
-    foreach ($mapper as $key => $value) {
-      $mapperKeys[$key] = $mapper[$key][0];
-      if (isset($mapper[$key][0]) && $mapper[$key][0] == 'soft_credit' && isset($mapper[$key])) {
-        $mapperSoftCredit[$key] = $mapper[$key][1] ?? '';
-        $mapperSoftCreditType[$key] = $mapperSoftCreditType[$key]['value'];
-      }
-      else {
-        $mapperSoftCredit[$key] = $mapperSoftCreditType[$key] = NULL;
-      }
-    }
-
-    $parser = new CRM_Contribute_Import_Parser_Contribution($mapperKeys, $mapperSoftCredit, $mapperPhoneType, $mapperSoftCreditType);
+    $parser = new CRM_Contribute_Import_Parser_Contribution();
     $parser->setUserJobID($this->getUserJobID());
+
     $mapFields = $this->get('fields');
 
     foreach ($mapper as $key => $value) {

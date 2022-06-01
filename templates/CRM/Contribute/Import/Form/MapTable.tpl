@@ -44,11 +44,7 @@
                 {* Display mapper <select> field for 'Map Fields', and mapper value for 'Preview' *}
                 <td class="form-item even-row{if $wizard.currentStepName == 'Preview'} labels{/if}">
                     {if $wizard.currentStepName == 'Preview'}
-          {if $softCreditFields && $softCreditFields[$i] != ''}
-          {$mapper[$i]} - {$softCreditFields[$i]} {if $mapperSoftCreditType[$i]}({$mapperSoftCreditType[$i].label}){/if}
-      {else}
           {$mapper[$i]}
-      {/if}
                     {else}
                         {$form.mapper[$i].html|smarty:nodefaults}
                     {/if}
