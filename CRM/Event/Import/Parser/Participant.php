@@ -223,7 +223,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         }
         else {
           foreach ($val as $role) {
-            if (!CRM_Contact_Import_Parser_Contact::in_value(trim($role), $roleIDs)) {
+            if (!$this->in_value(trim($role), $roleIDs)) {
               CRM_Contact_Import_Parser_Contact::addToErrorMsg('Participant Role', $errorMessage);
               break;
             }
@@ -238,7 +238,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
             break;
           }
         }
-        elseif (!CRM_Contact_Import_Parser_Contact::in_value($val, $statusIDs)) {
+        elseif (!$this->in_value($val, $statusIDs)) {
           CRM_Contact_Import_Parser_Contact::addToErrorMsg('Participant Status', $errorMessage);
           break;
         }
@@ -1017,6 +1017,24 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
     }
     fwrite($fd, implode("\n", $output));
     fclose($fd);
+  }
+
+  /**
+   * Check a value present or not in a array.
+   *
+   * @param $value
+   * @param $valueArray
+   *
+   * @return bool
+   */
+  protected function in_value($value, $valueArray) {
+    foreach ($valueArray as $key => $v) {
+      //fix for CRM-1514
+      if (strtolower(trim($v, ".")) == strtolower(trim($value, "."))) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }

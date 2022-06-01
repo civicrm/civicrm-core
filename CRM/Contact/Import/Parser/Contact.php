@@ -653,24 +653,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Ckeck a value present or not in a array.
-   *
-   * @param $value
-   * @param $valueArray
-   *
-   * @return bool
-   */
-  public static function in_value($value, $valueArray) {
-    foreach ($valueArray as $key => $v) {
-      //fix for CRM-1514
-      if (strtolower(trim($v, ".")) == strtolower(trim($value, "."))) {
-        return TRUE;
-      }
-    }
-    return FALSE;
-  }
-
-  /**
    * Build error-message containing error-fields
    *
    * Once upon a time there was a dev who hadn't heard of implode. That dev wrote this function.
