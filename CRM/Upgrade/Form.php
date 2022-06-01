@@ -803,10 +803,7 @@ SET    version = '$version'
    * @throws \CRM_Core_Exception
    */
   public static function doCoreFinish(): bool {
-    Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.finish'));
-    $restore = \CRM_Utils_AutoClean::with(function() {
-      Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.main'));
-    });
+    $restore = \CRM_Upgrade_DispatchPolicy::useTemporarily('upgrade.finish');
 
     $upgrade = new CRM_Upgrade_Form();
     list($ignore, $latestVer) = $upgrade->getUpgradeVersions();

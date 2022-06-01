@@ -17,6 +17,25 @@
 class CRM_Upgrade_DispatchPolicy {
 
   /**
+   * Create an auto-clean object which temporarily applies the preferred policy.
+   *
+   * @code
+   * $cleanup = CRM_Upgrade_DispatchPolicy::useTemporarily('upgrade.finish');
+   * doStuff();
+   * unset($cleanup);
+   * @endCode
+   *
+   * @param string $name
+   * @return \CRM_Utils_AutoClean
+   */
+  public static function useTemporarily(string $name): CRM_Utils_AutoClean {
+    Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get($name));
+    return \CRM_Utils_AutoClean::with(function() {
+      Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.main'));
+    });
+  }
+
+  /**
    * Determine the dispatch policy
    *
    * @param string $phase
