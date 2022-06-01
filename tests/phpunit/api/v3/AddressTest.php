@@ -52,6 +52,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->locationTypeDelete($this->_locationTypeID);
     $this->contactDelete($this->_contactID);
     $this->quickCleanup(['civicrm_address', 'civicrm_relationship']);
+    $this->callAPISuccess('Setting', 'create', ['geoProvider' => NULL]);
     parent::tearDown();
   }
 

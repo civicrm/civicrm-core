@@ -31,12 +31,12 @@ class GetCoordinates extends \Civi\Api4\Generic\AbstractAction {
   protected $address;
 
   public function _run(Result $result) {
-    $gecodingClassName = CRM_Utils_GeocodeProvider::getUsableClassName();
-    $geocodingProvider = CRM_Utils_GeocodeProvider::getConfiguredProvider();
+    $geocodingClassName = \CRM_Utils_GeocodeProvider::getUsableClassName();
+    $geocodingProvider = \CRM_Utils_GeocodeProvider::getConfiguredProvider();
     if (!is_callable([$geocodingProvider, 'getCoordinates'])) {
       throw new \API_Exception('Geocoding provider does not support getCoordinates');
     }
-    $coord = \$geocodingClassName::getCoordinates($this->address);
+    $coord = $geocodingClassName::getCoordinates($this->address);
     if (isset($coord['geo_code_1'], $coord['geo_code_2'])) {
       $result[] = $coord;
     }

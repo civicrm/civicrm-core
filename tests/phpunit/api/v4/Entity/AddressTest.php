@@ -30,6 +30,13 @@ use Civi\Test\TransactionalInterface;
  */
 class AddressTest extends Api4TestBase implements TransactionalInterface {
 
+  public function setUp():void {
+    \Civi\Api4\Setting::revert()
+      ->addSelect('geoProvider')
+      ->execute();
+    parent::setUp();
+  }
+
   /**
    * Check that 2 addresses for the same contact can't both be primary
    */
