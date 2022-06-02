@@ -400,77 +400,21 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         //format common data, CRM-4062
         $this->formatCommonData($field, $formatting, $contactFields);
 
-        //fixed for CRM-4148
-        if (!empty($formatting['id'])) {
-          $contact = [
-            'contact_id' => $formatting['id'],
-          ];
-          $defaults = [];
-          $relatedNewContact = CRM_Contact_BAO_Contact::retrieve($contact, $defaults);
-        }
-        else {
-          $relatedNewContact = $this->createContact($formatting, $contactFields, $onDuplicate, NULL, FALSE);
-        }
-
-        if (is_object($relatedNewContact) || ($relatedNewContact instanceof CRM_Contact_BAO_Contact)) {
-          $relatedNewContact = clone($relatedNewContact);
-        }
-
-        $matchedIDs = [];
-        // To update/fill contact, get the matching contact Ids if duplicate contact found
-        // otherwise get contact Id from object of related contact
-        if (is_array($relatedNewContact)) {
-          $matchedIDs = $relatedNewContact;
-        }
-        else {
-          $matchedIDs[] = $relatedNewContact->id;
-        }
-        // update/fill related contact after getting matching Contact Ids, CRM-4424
-        if (in_array($onDuplicate, [
-          CRM_Import_Parser::DUPLICATE_UPDATE,
-          CRM_Import_Parser::DUPLICATE_FILL,
-        ])) {
-          //validation of related contact subtype for update mode
-          //CRM-5125
-          $relatedCsType = NULL;
-          if (!empty($formatting['contact_sub_type'])) {
-            $relatedCsType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $matchedIDs[0], 'contact_sub_type');
+        if (empty($formatting['id']) || $this->isUpdateExistingContacts()) {
+          try {
+            $relatedNewContact = $this->createContact($formatting, $contactFields, $onDuplicate, $formatting['id']);
           }
-
-          if (!empty($relatedCsType) && (!CRM_Contact_BAO_ContactType::isAllowEdit($matchedIDs[0], $relatedCsType) && $relatedCsType != CRM_Utils_Array::value('contact_sub_type', $formatting))) {
-            $this->setImportStatus((int) $values[count($values) - 1], 'invalid_no_match', 'Mismatched or Invalid contact subtype found for this related contact.');
+          catch (CiviCRM_API3_Exception $e) {
+            $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
             return FALSE;
           }
-          else {
-            $this->createContact($formatting, $contactFields, $onDuplicate, $matchedIDs[0]);
-          }
-        }
-        static $relativeContact = [];
-        if (is_array($relatedNewContact)) {
-          if (count($matchedIDs) >= 1) {
-            $relContactId = $matchedIDs[0];
-            //add relative contact to count during update & fill mode.
-            //logic to make count distinct by contact id.
-            if ($this->_newRelatedContacts || !empty($relativeContact)) {
-              $reContact = array_keys($relativeContact, $relContactId);
-
-              if (empty($reContact)) {
-                $this->_newRelatedContacts[] = $relativeContact[] = $relContactId;
-              }
-            }
-            else {
-              $this->_newRelatedContacts[] = $relativeContact[] = $relContactId;
-            }
-          }
-        }
-        else {
           $relContactId = $relatedNewContact->id;
-          $this->_newRelatedContacts[] = $relativeContact[] = $relContactId;
+          $this->_newRelatedContacts[$relContactId] = $relContactId;
         }
 
         if (1) {
           //fix for CRM-1993.Checks for duplicate related contacts
-          if (count($matchedIDs) >= 1) {
+          if (1) {
             //if more than one duplicate contact
             //found, create relationship with first contact
             // now create the relationship record
