@@ -382,63 +382,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           $relContactId = $relatedNewContact->id;
           $this->_newRelatedContacts[$relContactId] = $relContactId;
         }
-
-        if (1) {
-          //fix for CRM-1993.Checks for duplicate related contacts
-          if (1) {
-            //if more than one duplicate contact
-            //found, create relationship with first contact
-            // now create the relationship record
-            $relationParams = [
-              'relationship_type_id' => $key,
-              'contact_check' => [
-                $relContactId => 1,
-              ],
-              'is_active' => 1,
-              'skipRecentView' => TRUE,
-            ];
-
-            // we only handle related contact success, we ignore failures for now
-            // at some point wold be nice to have related counts as separate
-            $relationIds = [
-              'contact' => $primaryContactId,
-            ];
-
-            [$valid, $duplicate] = self::legacyCreateMultiple($relationParams, $relationIds);
-
-            if ($valid || $duplicate) {
-              $relationIds['contactTarget'] = $relContactId;
-              $action = ($duplicate) ? CRM_Core_Action::UPDATE : CRM_Core_Action::ADD;
-              CRM_Contact_BAO_Relationship::relatedMemberships($primaryContactId, $relationParams, $relationIds, $action);
-            }
-
-            //handle current employer, CRM-3532
-            if ($valid) {
-              $allRelationships = CRM_Core_PseudoConstant::relationshipType('name');
-              $relationshipTypeId = str_replace([
-                '_a_b',
-                '_b_a',
-              ], [
-                '',
-                '',
-              ], $key);
-              $relationshipType = str_replace($relationshipTypeId . '_', '', $key);
-              $orgId = $individualId = NULL;
-              if ($allRelationships[$relationshipTypeId]["name_{$relationshipType}"] == 'Employee of') {
-                $orgId = $relContactId;
-                $individualId = $primaryContactId;
-              }
-              elseif ($allRelationships[$relationshipTypeId]["name_{$relationshipType}"] == 'Employer of') {
-                $orgId = $primaryContactId;
-                $individualId = $relContactId;
-              }
-              if ($orgId && $individualId) {
-                $currentEmpParams[$individualId] = $orgId;
-                CRM_Contact_BAO_Contact_Utils::setCurrentEmployer($currentEmpParams);
-              }
-            }
-          }
-        }
+        $this->createRelationship($key, $relContactId, $primaryContactId);
       }
     }
     if ($this->_updateWithId) {
@@ -913,6 +857,71 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       throw new CRM_Core_Exception($tempMsg);
     }
     return $errorMessage;
+  }
+
+  /**
+   * @param $key
+   * @param $relContactId
+   * @param $primaryContactId
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function createRelationship($key, $relContactId, $primaryContactId): void {
+    //if more than one duplicate contact
+    //found, create relationship with first contact
+    // now create the relationship record
+    $relationParams = [
+      'relationship_type_id' => $key,
+      'contact_check' => [
+        $relContactId => 1,
+      ],
+      'is_active' => 1,
+      'skipRecentView' => TRUE,
+    ];
+
+    // we only handle related contact success, we ignore failures for now
+    // at some point wold be nice to have related counts as separate
+    $relationIds = [
+      'contact' => $primaryContactId,
+    ];
+
+    [
+      $valid,
+      $duplicate
+    ] = self::legacyCreateMultiple($relationParams, $relationIds);
+
+    if ($valid || $duplicate) {
+      $relationIds['contactTarget'] = $relContactId;
+      $action = ($duplicate) ? CRM_Core_Action::UPDATE : CRM_Core_Action::ADD;
+      CRM_Contact_BAO_Relationship::relatedMemberships($primaryContactId, $relationParams, $relationIds, $action);
+    }
+
+    //handle current employer, CRM-3532
+    if ($valid) {
+      $allRelationships = CRM_Core_PseudoConstant::relationshipType('name');
+      $relationshipTypeId = str_replace([
+        '_a_b',
+        '_b_a',
+      ], [
+        '',
+        '',
+      ], $key);
+      $relationshipType = str_replace($relationshipTypeId . '_', '', $key);
+      $orgId = $individualId = NULL;
+      if ($allRelationships[$relationshipTypeId]["name_{$relationshipType}"] == 'Employee of') {
+        $orgId = $relContactId;
+        $individualId = $primaryContactId;
+      }
+      elseif ($allRelationships[$relationshipTypeId]["name_{$relationshipType}"] == 'Employer of') {
+        $orgId = $primaryContactId;
+        $individualId = $relContactId;
+      }
+      if ($orgId && $individualId) {
+        $currentEmpParams[$individualId] = $orgId;
+        CRM_Contact_BAO_Contact_Utils::setCurrentEmployer($currentEmpParams);
+      }
+    }
   }
 
   /**
