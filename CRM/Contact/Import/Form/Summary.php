@@ -27,7 +27,8 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    // set the error message path to display
+    // @todo - totally unclear that this errorFile could ever be set / render.
+    // Probably it can go.
     $this->assign('errorFile', $this->get('errorFile'));
     $onDuplicate = $this->getSubmittedValue('onDuplicate');
     $this->assign('dupeError', FALSE);
@@ -44,8 +45,8 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
       $this->assign('dupeError', TRUE);
     }
 
-    $this->assign('groupAdditions', $this->get('groupAdditions'));
-    $this->assign('tagAdditions', $this->get('tagAdditions'));
+    $this->assign('groupAdditions', $this->getUserJob()['metadata']['summary_info']['groups']);
+    $this->assign('tagAdditions', $this->getUserJob()['metadata']['summary_info']['tags']);
     $this->assign('totalRowCount', $this->getRowCount());
     $this->assign('validRowCount', $this->getRowCount(CRM_Import_Parser::VALID) + $this->getRowCount(CRM_Import_Parser::UNPARSED_ADDRESS_WARNING));
     $this->assign('invalidRowCount', $this->getRowCount(CRM_Import_Parser::ERROR));

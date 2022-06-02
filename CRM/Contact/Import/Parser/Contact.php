@@ -209,6 +209,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   public function import($onDuplicate, &$values) {
     $rowNumber = (int) $values[array_key_last($values)];
+
     $this->_unparsedStreetAddressContacts = [];
     if (!$this->getSubmittedValue('doGeocodeAddress')) {
       // CRM-5854, reset the geocode method to null to prevent geocoding
@@ -251,11 +252,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     //fixed CRM-4148
     //now we create new contact in update/fill mode also.
     $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $params['id'] ?? NULL, TRUE, $this->_dedupeRuleGroupID);
-
-    if (!is_array($newContact)) {
-      $contactID = $newContact->id;
-      $this->_newContacts[] = $contactID;
-    }
+    $this->createdContacts[$newContact->id] = $contactID = $newContact->id;
 
     if ($contactID) {
       // call import hook
@@ -296,18 +293,17 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         if (empty($formatting['id']) || $this->isUpdateExistingContacts()) {
           try {
             $relatedNewContact = $this->createContact($formatting, $contactFields, $onDuplicate, $formatting['id']);
+            $relContactId = $relatedNewContact->id;
+            $this->createdContacts[$relContactId] = $relContactId;
           }
           catch (CiviCRM_API3_Exception $e) {
             $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
             return FALSE;
           }
-          $relContactId = $relatedNewContact->id;
-          $this->_newRelatedContacts[$relContactId] = $relContactId;
         }
         $this->createRelationship($key, $relContactId, $primaryContactId);
       }
     }
-
     $this->setImportStatus($rowNumber, $this->getStatus(CRM_Import_Parser::VALID), $this->getSuccessMessage(), $contactID);
     return CRM_Import_Parser::VALID;
   }
@@ -569,16 +565,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @return array
    */
   public function getImportedContacts() {
-    return $this->_newContacts;
-  }
-
-  /**
-   * Get the array of successfully imported related contact id's
-   *
-   * @return array
-   */
-  public function &getRelatedImportedContacts() {
-    return $this->_newRelatedContacts;
+    return $this->createdContacts;
   }
 
   /**
@@ -1256,6 +1243,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     // here to make sure it is instantiated.
     $this->getContactType();
     $this->getContactSubType();
+    // Reset user job in case to null in case it was loaded prior to the job being complete.
+    $this->userJob = NULL;
 
     $this->init();
 
@@ -1290,6 +1279,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
       }
     }
+    $this->doPostImportActions();
   }
 
   /**

@@ -54,6 +54,13 @@ abstract class CRM_Import_Parser {
   protected $userJobID;
 
   /**
+   * The user job in use.
+   *
+   * @var array
+   */
+  protected $userJob;
+
+  /**
    * Potentially ambiguous options.
    *
    * For example 'UT' is a state in more than one country.
@@ -75,6 +82,13 @@ abstract class CRM_Import_Parser {
   public function getUserJobID(): ?int {
     return $this->userJobID;
   }
+
+  /**
+   * Ids of contacts created this iteration.
+   *
+   * @var array
+   */
+  protected $createdContacts = [];
 
   /**
    * Set user job ID.
@@ -105,10 +119,13 @@ abstract class CRM_Import_Parser {
    * @throws \API_Exception
    */
   protected function getUserJob(): array {
-    return UserJob::get()
-      ->addWhere('id', '=', $this->getUserJobID())
-      ->execute()
-      ->first();
+    if (empty($this->userJob)) {
+      $this->userJob = UserJob::get()
+        ->addWhere('id', '=', $this->getUserJobID())
+        ->execute()
+        ->first();
+    }
+    return $this->userJob;
   }
 
   /**
@@ -604,6 +621,76 @@ abstract class CRM_Import_Parser {
       $requiredFields['email'] = ts('Email Address');
     }
     $this->validateRequiredFields($requiredFields, $params, $prefixString);
+  }
+
+  protected function doPostImportActions() {
+    $userJob = $this->getUserJob();
+    $summaryInfo = $userJob['metadata']['summary_info'];
+    $actions = $userJob['metadata']['post_actions'];
+    if (!empty($actions['group'])) {
+      $groupAdditions = $this->addImportedContactsToNewGroup($this->createdContacts, $actions['group']);
+      foreach ($actions['group'] as $groupID) {
+        $summaryInfo['groups'][$groupID]['added'] += $groupAdditions[$groupID]['added'];
+        $summaryInfo['groups'][$groupID]['notAdded'] += $groupAdditions[$groupID]['notAdded'];
+      }
+    }
+    if (!empty($actions['tag'])) {
+      $tagAdditions = $this->tagImportedContactsWithNewTag($this->createdContacts, $actions['tag']);
+      foreach ($actions['tag'] as $tagID) {
+        $summaryInfo['tags'][$tagID]['added'] += $tagAdditions[$tagID]['added'];
+        $summaryInfo['tags'][$tagID]['notAdded'] += $tagAdditions[$tagID]['notAdded'];
+      }
+    }
+
+    $this->userJob['metadata']['summary_info'] = $summaryInfo;
+    UserJob::update(FALSE)->addWhere('id', '=', $userJob['id'])->setValues(['metadata' => $this->userJob['metadata']])->execute();
+  }
+
+  /**
+   * Add imported contacts to groups.
+   *
+   * @param array $contactIDs
+   * @param array $groups
+   *
+   * @return array
+   */
+  private function addImportedContactsToNewGroup(array $contactIDs, array $groups): array {
+    $groupAdditions = [];
+    foreach ($groups as $groupID) {
+      // @todo - this function has been in use historically but it does not seem
+      // to add much efficiency of get + create api calls
+      // and it doesn't give enough control over cache flushing for smaller batches.
+      // Note that the import updates a lot of enities & checking & updating the group
+      // shouldn't add much performance wise. However, cache flushing will
+      $addCount = CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIDs, $groupID);
+      $groupAdditions[$groupID] = [
+        'added' => (int) $addCount[1],
+        'notAdded' => (int) $addCount[2],
+      ];
+    }
+    return $groupAdditions;
+  }
+
+  /**
+   * Tag imported contacts.
+   *
+   * @param array $contactIDs
+   * @param array $tags
+   *
+   * @return array
+   */
+  private function tagImportedContactsWithNewTag(array $contactIDs, array $tags) {
+    $tagAdditions = [];
+    foreach ($tags as $tagID) {
+      // @todo - this function has been in use historically but it does not seem
+      // to add much efficiency of get + create api calls
+      // and it doesn't give enough control over cache flushing for smaller batches.
+      // Note that the import updates a lot of enities & checking & updating the group
+      // shouldn't add much performance wise. However, cache flushing will
+      $outcome = CRM_Core_BAO_EntityTag::addEntitiesToTag($contactIDs, $tagID, 'civicrm_contact', FALSE);
+      $tagAdditions[$tagID] = ['added' => $outcome[1], 'notAdded' => $outcome[2]];
+    }
+    return $tagAdditions;
   }
 
   /**
