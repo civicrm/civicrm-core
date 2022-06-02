@@ -54,18 +54,6 @@ abstract class CRM_Import_Parser {
   protected $userJobID;
 
   /**
-   * Fields which are being handled by metadata formatting & validation functions.
-   *
-   * This is intended as a temporary parameter as we phase in metadata handling.
-   *
-   * The end result is that all fields will be & this will go but for now it is
-   * opt in.
-   *
-   * @var array
-   */
-  protected $metadataHandledFields = [];
-
-  /**
    * Potentially ambiguous options.
    *
    * For example 'UT' is a state in more than one country.
