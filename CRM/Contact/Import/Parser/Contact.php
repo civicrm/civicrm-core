@@ -30,7 +30,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
   protected $_mapperKeys = [];
   protected $_allExternalIdentifiers = [];
-  protected $_parseStreetAddress;
 
   /**
    * Array of successfully imported contact id's
@@ -89,6 +88,13 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   public $_dedupeRuleGroupID = NULL;
 
   /**
+   * Addresses that failed to parse.
+   *
+   * @var array
+   */
+  private $_unparsedStreetAddressContacts = [];
+
+  /**
    * The initializer code, called before processing.
    */
   public function init() {
@@ -96,8 +102,13 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     foreach ($this->getImportableFieldsMetadata() as $name => $field) {
       $this->addField($name, $field['title'], CRM_Utils_Array::value('type', $field), CRM_Utils_Array::value('headerPattern', $field), CRM_Utils_Array::value('dataPattern', $field), CRM_Utils_Array::value('hasLocationType', $field));
     }
+  }
 
-    $this->_parseStreetAddress = CRM_Utils_Array::value('street_address_parsing', CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'address_options'), FALSE);
+  /**
+   * Is street address parsing enabled for the site.
+   */
+  protected function isParseStreetAddress() : bool {
+    return (bool) (CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'address_options')['street_address_parsing'] ?? FALSE);
   }
 
   /**
@@ -529,7 +540,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
 
     // parse street address, CRM-5450
-    if ($this->_parseStreetAddress) {
+    if ($this->isParseStreetAddress()) {
       if (array_key_exists('address', $formatted) && is_array($formatted['address'])) {
         foreach ($formatted['address'] as $instance => & $address) {
           $streetAddress = $address['street_address'] ?? NULL;
@@ -674,10 +685,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       'contact' => $primaryContactId,
     ];
 
-    [
-      $valid,
-      $duplicate
-    ] = self::legacyCreateMultiple($relationParams, $relationIds);
+    [$valid, $duplicate] = self::legacyCreateMultiple($relationParams, $relationIds);
 
     if ($valid || $duplicate) {
       $relationIds['contactTarget'] = $relContactId;
@@ -776,7 +784,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $newContact = CRM_Contact_BAO_Contact::retrieve($contact, $defaults);
 
     //get the id of the contact whose street address is not parsable, CRM-5886
-    if ($this->_parseStreetAddress && property_exists($newContact, 'address') && $newContact->address) {
+    if ($this->isParseStreetAddress() && property_exists($newContact, 'address') && $newContact->address) {
       foreach ($newContact->address as $address) {
         if (!empty($address['street_address']) && (empty($address['street_number']) || empty($address['street_name']))) {
           $this->_unparsedStreetAddressContacts[] = [
@@ -2171,7 +2179,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   protected function getStatus($outcome): string {
     if ($outcome === CRM_Import_Parser::VALID) {
-      return empty($this->_parseStreetAddress) ? 'IMPORTED' : 'warning_unparsed_address';
+      return empty($this->_unparsedStreetAddressContacts) ? 'IMPORTED' : 'warning_unparsed_address';
     }
     return [
       CRM_Import_Parser::DUPLICATE => 'DUPLICATE',

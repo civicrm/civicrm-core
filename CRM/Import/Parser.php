@@ -1542,7 +1542,6 @@ abstract class CRM_Import_Parser {
     return $mappedFields;
   }
 
-
   /**
    * Check if an error in custom data.
    *
