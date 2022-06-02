@@ -104,4 +104,26 @@ class api_v3_CountryTest extends CiviUnitTestCase {
     $this->assertEquals(1, $check);
   }
 
+  public function testGetStatesWithChaining(): void {
+    $result = $this->callAPISuccess('Country', 'getsingle', [
+      'iso_code' => 'US',
+      'api.Address.getoptions' => [
+        'field' => 'state_province_id',
+        'country_id' => '$value.id',
+        'sequential' => 0,
+      ],
+    ]);
+    // Ensure that when Sequential is passed as part of the chain params it is respected
+    $this->assertEquals('Alabama', $result['api.Address.getoptions']['values'][1000]);
+    $result = $this->callAPISuccess('Country', 'getsingle', [
+      'iso_code' => 'US',
+      'api.Address.getoptions' => [
+        'field' => 'state_province_id',
+        'country_id' => '$value.id',
+      ],
+    ]);
+    $this->assertEquals('Alabama', $result['api.Address.getoptions']['values'][0]['value']);
+    $this->assertEquals(1000, $result['api.Address.getoptions']['values'][0]['key']);
+  }
+
 }
