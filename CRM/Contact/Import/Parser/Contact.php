@@ -40,7 +40,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @var bool
    */
   protected $_updateWithId;
-  protected $_retCode;
 
   protected $_externalIdentifierIndex;
   protected $_allExternalIdentifiers = [];
@@ -310,8 +309,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       [$formatted, $params] = $this->processContact($params, $formatted, TRUE);
     }
     catch (CRM_Core_Exception $e) {
-      $statuses = [CRM_Import_Parser::DUPLICATE => 'DUPLICATE', CRM_Import_Parser::ERROR => 'ERROR', CRM_Import_Parser::NO_MATCH => 'invalid_no_match'];
-      $this->setImportStatus($rowNumber, $statuses[$e->getErrorCode()], $e->getMessage());
+      $this->setImportStatus($rowNumber, $this->getStatus($e->getErrorCode()), $e->getMessage());
       return FALSE;
     }
 
@@ -328,11 +326,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     if (!is_array($newContact)) {
       $contactID = $newContact->id;
       $this->_newContacts[] = $contactID;
-
-      //get return code if we create new contact in update mode, CRM-4148
-      if ($this->_updateWithId) {
-        $this->_retCode = CRM_Import_Parser::VALID;
-      }
     }
 
     if ($contactID) {
@@ -385,18 +378,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $this->createRelationship($key, $relContactId, $primaryContactId);
       }
     }
-    if ($this->_updateWithId) {
-      //return warning if street address is unparsed, CRM-5886
-      return $this->processMessage($values, $this->_retCode);
-    }
 
-    if (empty($this->_unparsedStreetAddressContacts)) {
-      $this->setImportStatus((int) ($values[count($values) - 1]), 'IMPORTED', '', $contactID);
-      return CRM_Import_Parser::VALID;
-    }
-
-    // @todo - record unparsed address as 'imported' but the presence of a message is meaningful?
-    return $this->processMessage($values, CRM_Import_Parser::VALID);
+    $this->setImportStatus($rowNumber, $this->getStatus(CRM_Import_Parser::VALID), $this->getSuccessMessage(), $contactID);
+    return CRM_Import_Parser::VALID;
   }
 
   /**
@@ -987,7 +971,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $newContact = CRM_Contact_BAO_Contact::retrieve($contact, $defaults);
 
     //get the id of the contact whose street address is not parsable, CRM-5886
-    if ($this->_parseStreetAddress && is_object($newContact) && property_exists($newContact, 'address') && $newContact->address) {
+    if ($this->_parseStreetAddress && property_exists($newContact, 'address') && $newContact->address) {
       foreach ($newContact->address as $address) {
         if (!empty($address['street_address']) && (empty($address['street_number']) || empty($address['street_name']))) {
           $this->_unparsedStreetAddressContacts[] = [
@@ -1372,29 +1356,20 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Generate status and error message for unparsed street address records.
+   * Get the message for a successful import.
    *
-   * @param array $values
-   *   The array of values belonging to each row.
-   * @param $returnCode
-   *
-   * @return int
+   * @return string
    */
-  private function processMessage(&$values, $returnCode) {
-    if (empty($this->_unparsedStreetAddressContacts)) {
-      $this->setImportStatus((int) ($values[count($values) - 1]), 'IMPORTED', '');
-    }
-    else {
-      $errorMessage = ts("Record imported successfully but unable to parse the street address: ");
+  private function getSuccessMessage(): string {
+    if (!empty($this->_unparsedStreetAddressContacts)) {
+      $errorMessage = ts('Record imported successfully but unable to parse the street address: ');
       foreach ($this->_unparsedStreetAddressContacts as $contactInfo => $contactValue) {
         $contactUrl = CRM_Utils_System::url('civicrm/contact/add', 'reset=1&action=update&cid=' . $contactValue['id'], TRUE, NULL, FALSE);
-        $errorMessage .= "\n Contact ID:" . $contactValue['id'] . " <a href=\"$contactUrl\"> " . $contactValue['streetAddress'] . "</a>";
+        $errorMessage .= "\n Contact ID:" . $contactValue['id'] . " <a href=\"$contactUrl\"> " . $contactValue['streetAddress'] . '</a>';
       }
-      array_unshift($values, $errorMessage);
-      $returnCode = CRM_Import_Parser::UNPARSED_ADDRESS_WARNING;
-      $this->setImportStatus((int) ($values[count($values) - 1]), 'ERROR', $errorMessage);
+      return $errorMessage;
     }
-    return $returnCode;
+    return '';
   }
 
   /**
@@ -1463,7 +1438,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
   /**
    * @param array $cids
-   * @param array $values
+   * @param int $rowNumber
    * @param int $onDuplicate
    * @param array $formatted
    * @param array $contactFields
@@ -1474,7 +1449,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  private function handleDuplicateError(array $cids, array $values, int $onDuplicate, array $formatted, array $contactFields): int {
+  private function handleDuplicateError(array $cids, $rowNumber, int $onDuplicate, array $formatted, array $contactFields): int {
     // This is expected to be unreachable.
     $urls = [];
 
@@ -1490,8 +1465,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $errorMessage = ts('Record duplicates multiple contacts');
       //combine error msg to avoid mismatch between error file columns.
       $errorMessage .= "\n" . $url_string;
-      array_unshift($values, $errorMessage);
-      $this->setImportStatus((int) $values[count($values) - 1], 'ERROR', $errorMessage);
+      $this->setImportStatus($rowNumber, 'ERROR', $errorMessage);
       return CRM_Import_Parser::ERROR;
     }
 
@@ -1520,14 +1494,13 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
     //CRM-262 No Duplicate Checking
     if ($onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
-      array_unshift($values, $url_string);
-      $this->setImportStatus((int) $values[count($values) - 1], 'DUPLICATE', 'Skipping duplicate record');
+      $this->setImportStatus($rowNumber, 'DUPLICATE', 'Skipping duplicate record');
       return CRM_Import_Parser::DUPLICATE;
     }
 
-    $this->setImportStatus((int) $values[count($values) - 1], 'Imported', '');
     //return warning if street address is not parsed, CRM-5886
-    return $this->processMessage($values, CRM_Import_Parser::VALID);
+    $this->setImportStatus($rowNumber, $this->getStatus(CRM_Import_Parser::VALID), $this->getSuccessMessage(), $contactID);
+    return CRM_Import_Parser::VALID;
   }
 
   /**
@@ -1579,7 +1552,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $this->_totalCount++;
 
       try {
-        $returnCode = $this->import($onDuplicate, $values);
+        $this->import($onDuplicate, $values);
       }
       catch (CiviCRM_API3_Exception $e) {
         // When we catch errors here we are not adding to the errors array - mostly
@@ -1590,10 +1563,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
       if ($statusID && (($this->_rowCount % 50) == 0)) {
         $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
-      }
-
-      if ($returnCode & self::UNPARSED_ADDRESS_WARNING) {
-        $this->setImportStatus((int) $values[count($values) - 1], 'warning_unparsed_address', array_shift($values));
       }
     }
   }
@@ -2512,6 +2481,22 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
     }
     return FALSE;
+  }
+
+  /**
+   * @param $outcome
+   *
+   * @return string
+   */
+  protected function getStatus($outcome): string {
+    if ($outcome === CRM_Import_Parser::VALID) {
+      return empty($this->_parseStreetAddress) ? 'IMPORTED' : 'warning_unparsed_address';
+    }
+    return [
+      CRM_Import_Parser::DUPLICATE => 'DUPLICATE',
+      CRM_Import_Parser::ERROR => 'ERROR',
+      CRM_Import_Parser::NO_MATCH => 'invalid_no_match',
+    ][$outcome];
   }
 
 }
