@@ -182,7 +182,7 @@ class ChainSubscriber implements EventSubscriberInterface {
           $enforcedSubParams['version'] = $version;
           // Copy check_permissions from parent.
           $enforcedSubParams['check_permissions'] = $params['check_permissions'] ?? NULL;
-          $enforcedSubParams['sequential'] = 1;
+          $defaultSubParams['sequential'] = 1;
           $enforcedSubParams['api.has_parent'] = 1;
           // Inspect $newparams, the passed in params for the chain call.
           if (array_key_exists(0, $newparams)) {
