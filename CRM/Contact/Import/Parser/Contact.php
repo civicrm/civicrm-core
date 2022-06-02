@@ -62,9 +62,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   protected $_rowCount;
 
-  protected $_primaryKeyName;
-  protected $_statusFieldName;
-
   protected $fieldMetadata = [];
 
   /**
@@ -1269,9 +1266,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     $this->_rowCount = 0;
     $this->_totalCount = 0;
-
-    $this->_primaryKeyName = '_id';
-    $this->_statusFieldName = '_status';
 
     if ($statusID) {
       $this->progressImport($statusID);
