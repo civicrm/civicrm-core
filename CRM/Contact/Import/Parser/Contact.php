@@ -1547,54 +1547,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Format the field values for input to the api.
-   *
-   * @param array $values
-   *   The row from the datasource.
-   *
-   * @return array
-   *   Parameters mapped as described in getMappedRow
-   *
-   * @throws \API_Exception
-   * @todo - clean this up a bit & merge back into `getMappedRow`
-   *
-   */
-  private function getParams(array $values): array {
-    $params = ['relationship' => []];
-
-    foreach ($this->getFieldMappings() as $i => $mappedField) {
-      // The key is in the format 5_a_b where 5 is the relationship_type_id and a_b is the direction.
-      $relatedContactKey = $mappedField['relationship_type_id'] ? ($mappedField['relationship_type_id'] . '_' . $mappedField['relationship_direction']) : NULL;
-      $fieldName = $mappedField['name'];
-      $importedValue = $values[$i];
-      if ($fieldName === 'do_not_import' || $importedValue === NULL) {
-        continue;
-      }
-
-      $locationFields = ['location_type_id', 'phone_type_id', 'provider_id', 'website_type_id'];
-      $locationValues = array_filter(array_intersect_key($mappedField, array_fill_keys($locationFields, 1)));
-
-      if ($relatedContactKey) {
-        if (!isset($params['relationship'][$relatedContactKey])) {
-          $params['relationship'][$relatedContactKey] = [
-            // These will be over-written by any the importer has chosen but defaults are based on the relationship.
-            'contact_type' => $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction']),
-            'contact_sub_type' => $this->getRelatedContactSubType($mappedField['relationship_type_id'], $mappedField['relationship_direction']),
-          ];
-        }
-        $this->addFieldToParams($params['relationship'][$relatedContactKey], $locationValues, $fieldName, $importedValue);
-      }
-      else {
-        $this->addFieldToParams($params, $locationValues, $fieldName, $importedValue);
-      }
-    }
-
-    $this->fillStateProvince($params);
-
-    return $params;
-  }
-
-  /**
    * @param string $name
    * @param $title
    * @param int $type
@@ -1998,7 +1950,37 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \API_Exception
    */
   public function getMappedRow(array $values): array {
-    $params = $this->getParams($values);
+    $params = ['relationship' => []];
+
+    foreach ($this->getFieldMappings() as $i => $mappedField) {
+      // The key is in the format 5_a_b where 5 is the relationship_type_id and a_b is the direction.
+      $relatedContactKey = $mappedField['relationship_type_id'] ? ($mappedField['relationship_type_id'] . '_' . $mappedField['relationship_direction']) : NULL;
+      $fieldName = $mappedField['name'];
+      $importedValue = $values[$i];
+      if ($fieldName === 'do_not_import' || $importedValue === NULL) {
+        continue;
+      }
+
+      $locationFields = ['location_type_id', 'phone_type_id', 'provider_id', 'website_type_id'];
+      $locationValues = array_filter(array_intersect_key($mappedField, array_fill_keys($locationFields, 1)));
+
+      if ($relatedContactKey) {
+        if (!isset($params['relationship'][$relatedContactKey])) {
+          $params['relationship'][$relatedContactKey] = [
+            // These will be over-written by any the importer has chosen but defaults are based on the relationship.
+            'contact_type' => $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction']),
+            'contact_sub_type' => $this->getRelatedContactSubType($mappedField['relationship_type_id'], $mappedField['relationship_direction']),
+          ];
+        }
+        $this->addFieldToParams($params['relationship'][$relatedContactKey], $locationValues, $fieldName, $importedValue);
+      }
+      else {
+        $this->addFieldToParams($params, $locationValues, $fieldName, $importedValue);
+      }
+    }
+
+    $this->fillStateProvince($params);
+
     $params['contact_type'] = $this->getContactType();
     if ($this->getContactSubType()) {
       $params['contact_sub_type'] = $this->getContactSubType();
