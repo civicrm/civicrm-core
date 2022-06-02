@@ -709,44 +709,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Check if an error in Core( non-custom fields ) field
-   *
-   * @param array $params
-   * @param string $errorMessage
-   *   A string containing all the error-fields.
-   */
-  public function isErrorInCoreData($params, &$errorMessage) {
-    $errors = [];
-
-    foreach ($params as $key => $value) {
-      if ($value) {
-
-        switch ($key) {
-          case 'do_not_email':
-          case 'do_not_phone':
-          case 'do_not_mail':
-          case 'do_not_sms':
-          case 'do_not_trade':
-            if (CRM_Utils_Rule::boolean($value) == FALSE) {
-              $key = ucwords(str_replace("_", " ", $key));
-              $errors[] = $key;
-            }
-            break;
-
-          default:
-            if (is_array($params[$key]) && isset($params[$key]["contact_type"])) {
-              //check for any relationship data ,FIX ME
-              self::isErrorInCoreData($params[$key], $errorMessage);
-            }
-        }
-      }
-    }
-    if ($errors) {
-      $errorMessage .= ($errorMessage ? '; ' : '') . implode('; ', $errors);
-    }
-  }
-
-  /**
    * Ckeck a value present or not in a array.
    *
    * @param $value
@@ -834,7 +796,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $errorMessage = implode(', ', $errors);
 
     //checking error in core data
-    $this->isErrorInCoreData($params, $errorMessage);
     if ($errorMessage) {
       $tempMsg = "Invalid value for field(s) : $errorMessage";
       throw new CRM_Core_Exception($tempMsg);
