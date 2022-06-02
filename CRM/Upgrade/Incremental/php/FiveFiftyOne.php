@@ -32,6 +32,30 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
   public function upgrade_5_51_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask(ts('Convert import mappings to use names'), 'convertMappingFieldLabelsToNames', $rev);
+    $this->addTask('Add column "civicrm_queue.status"', 'addColumn', 'civicrm_queue',
+      'status', "varchar(16) NULL DEFAULT 'active' COMMENT 'Execution status'");
+    $this->addTask('Add column "civicrm_queue.error"', 'addColumn', 'civicrm_queue',
+      'error', "varchar(16) NULL COMMENT 'Fallback behavior for unhandled errors'");
+    $this->addTask('Backfill "civicrm_queue.status" and "civicrm_queue.error")', 'fillQueueColumns');
+  }
+
+  public static function fillQueueColumns($ctx): bool {
+    // Generally, anything we do here is nonsensical because there shouldn't be much real world data,
+    // and the goal is to require something specific going forward (for anything that has an automatic runner).
+    // But this ensures that satisfy the invariant.
+    //
+    // What default value of "error" should apply to pre-existing queues (if they somehow exist)?
+    // Go back to our heuristic "short-term/finite queue <=> abort" vs "long-term/infinite queue <=> log".
+    // We don't have adequate data to differentiate these, so some will be wrong/suboptimal.
+    // What's the impact of getting it wrong?
+    // - For a finite/short-term queue, work has finished already (or will finish soon), so there is
+    //   very limited impact to wrongly setting `error=delete`.
+    // - For an infinite/long-term queue, work will continue indefinitely into the future. The impact
+    //   of wrongly setting `error=abort` would continue indefinitely to the future.
+    // Therefore, backfilling `error=log` is less-problematic than backfilling `error=abort`.
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_queue SET error = "delete" WHERE runner IS NOT NULL AND error IS NULL');
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_queue SET status = IF(runner IS NULL, NULL, "active")');
+    return TRUE;
   }
 
   /**

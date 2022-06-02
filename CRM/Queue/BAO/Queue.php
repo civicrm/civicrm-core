@@ -21,6 +21,49 @@
 class CRM_Queue_BAO_Queue extends CRM_Queue_DAO_Queue {
 
   /**
+   * Get a list of valid statuses.
+   *
+   * The status determines whether automatic background-execution may proceed.
+   *
+   * @return string[]
+   */
+  public static function getStatuses($context = NULL) {
+    return [
+      'active' => ts('Active'),
+      // ^^ The queue is active. It will execute tasks at the nearest convenience.
+      'complete' => ts('Complete'),
+      // ^^ The queue will no longer execute tasks - because no new tasks are expected. Everything is complete.
+      'draft' => ts('Draft'),
+      // ^^ The queue is not ready to execute tasks - because we are still curating a list of tasks.
+      'aborted' => ts('Aborted'),
+      // ^^ The queue will no longer execute tasks - because it encountered an unhandled error.
+    ];
+  }
+
+  /**
+   * Get a list of valid error modes.
+   *
+   * This error-mode determines what to do if (1) a task encounters an unhandled
+   * exception, and (2) there are no hooks, and (3) there are no retries.
+   *
+   * Support for specific error-modes may depend on the `runner`.
+   *
+   * @return string[]
+   */
+  public static function getErrorModes($context = NULL) {
+    return [
+      'delete' => ts('Delete failed tasks'),
+      // ^^ Give up on the task. Carry-on with other tasks.
+      // This is more suitable if the queue is a service that lives forever and handles new/independent tasks as-they-come.
+      'abort' => ts('Abort the queue-runner'),
+      // ^^ Set the queue status to 'aborted'.
+      // This is more suitable if the queue is a closed batch of interdependent tasks.
+      // For linear queues (`Sql`), this will stop any new task-runs. For parallel queues (`SqlParallel`),
+      // it will also stop new task-runs, but on-going tasks must wind-down on their own.
+    ];
+  }
+
+  /**
    * Get a list of valid queue types.
    *
    * @return string[]

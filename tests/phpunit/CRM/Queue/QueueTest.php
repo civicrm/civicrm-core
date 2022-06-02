@@ -63,6 +63,51 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
   }
 
   /**
+   * If the queue has an automatic background runner (`runner`), then it
+   * must also have an `error` policy.
+   */
+  public function testRunnerRequiresErrorPolicy() {
+    try {
+      $q1 = Civi::queue('test/incomplete/1', [
+        'type' => 'Sql',
+        'runner' => 'task',
+      ]);
+      $this->fail('Should fail without error policy');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertRegExp('/Invalid error mode/', $e->getMessage());
+    }
+
+    $q2 = Civi::queue('test/complete/2', [
+      'type' => 'Sql',
+      'runner' => 'task',
+      'error' => 'delete',
+    ]);
+    $this->assertTrue($q2 instanceof CRM_Queue_Queue_Sql);
+  }
+
+  public function testStatuses() {
+    $q1 = Civi::queue('test/valid/default', [
+      'type' => 'Sql',
+      'runner' => 'task',
+      'error' => 'delete',
+    ]);
+    $this->assertTrue($q1 instanceof CRM_Queue_Queue_Sql);
+    $this->assertDBQuery('active', "SELECT status FROM civicrm_queue WHERE name = 'test/valid/default'");
+
+    foreach (['draft', 'active', 'complete', 'aborted'] as $n => $exampleStatus) {
+      $q1 = Civi::queue("test/valid/$n", [
+        'type' => 'Sql',
+        'runner' => 'task',
+        'error' => 'delete',
+        'status' => $exampleStatus,
+      ]);
+      $this->assertTrue($q1 instanceof CRM_Queue_Queue_Sql);
+      $this->assertDBQuery($exampleStatus, "SELECT status FROM civicrm_queue WHERE name = 'test/valid/$n'");
+    }
+  }
+
+  /**
    * Create a few queue items; alternately enqueue and dequeue various
    *
    * @dataProvider getQueueSpecs

@@ -117,13 +117,14 @@ class Civi {
    *   Specification for a queue.
    *   This is not required for accessing an existing queue.
    *   Specify this if you wish to auto-create the queue or to include advanced options (eg `reset`).
-   *   Example: ['type' => 'SqlParallel']
+   *   Example: ['type' => 'Sql', 'error' => 'abort']
+   *   Example: ['type' => 'SqlParallel', 'error' => 'delete']
    *   Defaults: ['reset'=>FALSE, 'is_persistent'=>TRUE, 'is_autorun'=>FALSE]
    * @return \CRM_Queue_Queue
    * @see \CRM_Queue_Service
    */
   public static function queue(string $name, array $params = []): CRM_Queue_Queue {
-    $defaults = ['reset' => FALSE, 'is_persistent' => TRUE];
+    $defaults = ['reset' => FALSE, 'is_persistent' => TRUE, 'status' => 'active'];
     $params = array_merge($defaults, $params, ['name' => $name]);
     return CRM_Queue_Service::singleton()->create($params);
   }
