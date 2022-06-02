@@ -37,7 +37,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *
    * @var array
    */
-  protected $_newContacts;
+  protected $_newContacts = [];
 
   /**
    * Line count id.
@@ -89,16 +89,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   public $_dedupeRuleGroupID = NULL;
 
   /**
-   * Class constructor.
-   *
-   * @param array $mapperKeys
-   */
-  public function __construct($mapperKeys = []) {
-    parent::__construct();
-    $this->_mapperKeys = $mapperKeys;
-  }
-
-  /**
    * The initializer code, called before processing.
    */
   public function init() {
@@ -106,9 +96,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     foreach ($this->getImportableFieldsMetadata() as $name => $field) {
       $this->addField($name, $field['title'], CRM_Utils_Array::value('type', $field), CRM_Utils_Array::value('headerPattern', $field), CRM_Utils_Array::value('dataPattern', $field), CRM_Utils_Array::value('hasLocationType', $field));
     }
-    $this->_newContacts = [];
-
-    $this->setActiveFields($this->_mapperKeys);
 
     $this->_parseStreetAddress = CRM_Utils_Array::value('street_address_parsing', CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'address_options'), FALSE);
   }
@@ -1293,24 +1280,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
       if ($statusID && (($this->_rowCount % 50) == 0)) {
         $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
-      }
-    }
-  }
-
-  /**
-   * Given a list of the importable field keys that the user has selected.
-   * set the active fields array to this list
-   *
-   * @param array $fieldKeys
-   *   Mapped array of values.
-   */
-  public function setActiveFields($fieldKeys) {
-    foreach ($fieldKeys as $key) {
-      if (empty($this->_fields[$key])) {
-        $this->_activeFields[] = new CRM_Contact_Import_Field('', ts('- do not import -'));
-      }
-      else {
-        $this->_activeFields[] = clone($this->_fields[$key]);
       }
     }
   }
