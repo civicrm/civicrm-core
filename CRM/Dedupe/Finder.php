@@ -237,7 +237,12 @@ class CRM_Dedupe_Finder {
 
     // if the key is dotted, keep just the last part of it
     foreach ($flat as $key => $value) {
-      if (substr_count($key, '.')) {
+      // check if there is a _a_b or _b_a in the key
+      if (strpos($key, '_a_b') || strpos($key, '_b_a')) {
+        // Relationship key from an import.
+        unset($flat[$key]);
+      }
+      elseif (substr_count($key, '.')) {
         $last = explode('.', $key);
         $last = array_pop($last);
         // make sure the first occurrence is kept, not the last

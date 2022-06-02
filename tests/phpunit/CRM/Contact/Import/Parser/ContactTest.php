@@ -1891,19 +1891,16 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $contactImportValues = [
       'first_name' => 'Alok',
       'last_name' => 'Patel',
-      'Employee of' => 'email',
+      'Child of' => 'tim.cook@apple.com',
     ];
 
     $mapper = [
       ['first_name'],
       ['last_name'],
-      ['5_a_b', 'email'],
+      ['1_a_b', 'email'],
     ];
     $fields = array_keys($contactImportValues);
     $values = array_values($contactImportValues);
-    $values[] = 'tim.cook@apple.com';
-    // Stand in for row number.
-    $values[] = 1;
 
     $userJobID = $this->getUserJobID([
       'mapper' => $mapper,
@@ -1912,11 +1909,10 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
 
     $parser = new CRM_Contact_Import_Parser_Contact($fields);
     $parser->setUserJobID($userJobID);
-    $dataSource = new CRM_Import_DataSource_CSV($userJobID);
 
     $parser->init();
     $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values);
-    $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::ERROR]));
+
     $this->callAPISuccessGetSingle('Contact', [
       'first_name' => 'Bob',
       'last_name' => 'Dobbs',
