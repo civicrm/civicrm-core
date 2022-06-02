@@ -1838,7 +1838,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
           'phone_type_id' => 1,
         ],
       ],
-      'related_contacts' => [
+      'relationship' => [
         '5_a_b' => [
           'contact_type' => 'Organization',
           'contact_sub_type' => NULL,
