@@ -350,15 +350,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       CRM_Utils_Hook::import('Contact', 'process', $this, $hookParams);
     }
 
-    $primaryContactId = NULL;
-    if (is_array($newContact)) {
-      if ($dupeCount == 1 && CRM_Utils_Rule::integer($contactID)) {
-        $primaryContactId = $contactID;
-      }
-    }
-    else {
-      $primaryContactId = $newContact->id;
-    }
+    $primaryContactId = $newContact->id;
 
     if ($primaryContactId) {
 
