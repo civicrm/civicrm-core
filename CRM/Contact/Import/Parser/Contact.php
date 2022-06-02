@@ -466,16 +466,28 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Format common params data to proper format to store.
+   * Format common params data to the format that was required a very long time ago.
+   *
+   * I think the only useful things this function does now are
+   *  1) calls fillPrimary
+   *  2) possibly the street address parsing.
+   *
+   * The other hundred lines do stuff that is done elsewhere. Custom fields
+   * should already be formatted by getTransformedValue and we don't need to
+   * re-rewrite them to a BAO style array since we call the api which does that.
+   *
+   * The call to formatLocationBlock just does the address custom fields which,
+   * are already formatted by this point.
+   *
+   * @deprecated
    *
    * @param array $params
    *   Contain record values.
    * @param array $formatted
    *   Array of formatted data.
-   * @param array $contactFields
-   *   Contact DAO fields.
    */
-  private function formatCommonData($params, &$formatted, $contactFields) {
+  private function formatCommonData($params, &$formatted) {
+    // @todo - remove just about everything in this function. See docblock.
     $customFields = CRM_Core_BAO_CustomField::getFields($formatted['contact_type'], FALSE, FALSE, $formatted['contact_sub_type'] ?? NULL);
 
     $addressCustomFields = CRM_Core_BAO_CustomField::getFields('Address');
@@ -612,19 +624,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     ) {
       // @todo calling api functions directly is not supported
       _civicrm_api3_custom_format_params($params, $formatted, $extends);
-    }
-
-    // to check if not update mode and unset the fields with empty value.
-    if (!$this->_updateWithId && array_key_exists('custom', $formatted)) {
-      foreach ($formatted['custom'] as $customKey => $customvalue) {
-        if (empty($formatted['custom'][$customKey][-1]['is_required'])) {
-          $formatted['custom'][$customKey][-1]['is_required'] = $customFields[$customKey]['is_required'];
-        }
-        $emptyValue = $customvalue[-1]['value'] ?? NULL;
-        if (!isset($emptyValue)) {
-          unset($formatted['custom'][$customKey]);
-        }
-      }
     }
 
     // parse street address, CRM-5450
@@ -1848,16 +1847,21 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   /**
    * Format location block ready for importing.
    *
+   * Note this formatting should all be by the time the code reaches this point
+   *
    * There is some test coverage for this in
    * CRM_Contact_Import_Parser_ContactTest e.g. testImportPrimaryAddress.
    *
+   * @deprecated
+   *
    * @param array $values
-   * @param array $params
    *
    * @return bool
    * @throws \CiviCRM_API3_Exception
    */
-  protected function formatLocationBlock(&$values, &$params) {
+  protected function formatLocationBlock(&$values) {
+    // @todo - remove this function.
+    // Original explantion .....
     // Note: we doing multiple value formatting here for address custom fields, plus putting into right format.
     // The actual formatting (like date, country ..etc) for address custom fields is taken care of while saving
     // the address in CRM_Core_BAO_Address::create method
