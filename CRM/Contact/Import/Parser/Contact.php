@@ -328,6 +328,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $params['id'] ?? NULL, TRUE, $this->_dedupeRuleGroupID);
 
     if (!is_array($newContact)) {
+      // This would only ever be TRUE if processContact failed to find a match & createContact did
+      CRM_Core_Error::deprecatedWarning('should be unreachable');
       $contactID = $newContact->id;
       $this->_newContacts[] = $contactID;
 
@@ -1569,6 +1571,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   private function handleDuplicateError(array $cids, array $values, int $onDuplicate, array $formatted, array $contactFields): int {
     // This is expected to be unreachable.
+    CRM_Core_Error::deprecatedFunctionWarning('should be unreachable');
     $urls = [];
 
     foreach ($cids as $cid) {
