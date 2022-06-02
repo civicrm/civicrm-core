@@ -117,7 +117,8 @@ class Civi {
    *   Specification for a queue.
    *   This is not required for accessing an existing queue.
    *   Specify this if you wish to auto-create the queue or to include advanced options (eg `reset`).
-   *   Example: ['type' => 'SqlParallel', 'error' => 'drop']
+   *   Example: ['type' => 'Sql', 'error' => 'abort']
+   *   Example: ['type' => 'SqlParallel', 'error' => 'delete']
    *   Defaults: ['reset'=>FALSE, 'is_persistent'=>TRUE, 'is_autorun'=>FALSE]
    * @return \CRM_Queue_Queue
    * @see \CRM_Queue_Service

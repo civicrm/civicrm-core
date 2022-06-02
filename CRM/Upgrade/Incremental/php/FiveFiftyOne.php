@@ -49,7 +49,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
     // We don't have adequate data to differentiate these, so some will be wrong/suboptimal.
     // What's the impact of getting it wrong?
     // - For a finite/short-term queue, work has finished already (or will finish soon), so there is
-    //   very limited impact to wrongly setting `error=log`.
+    //   very limited impact to wrongly setting `error=delete`.
     // - For an infinite/long-term queue, work will continue indefinitely into the future. The impact
     //   of wrongly setting `error=abort` would continue indefinitely to the future.
     // Therefore, backfilling `error=log` is less-problematic than backfilling `error=abort`.
