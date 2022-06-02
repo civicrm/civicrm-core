@@ -336,25 +336,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $this->_retCode = CRM_Import_Parser::VALID;
       }
     }
-    else {
-      // if duplicate, no need of further processing
-      if ($onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
-        $this->setImportStatus($rowNumber, 'DUPLICATE', 'Skipping duplicate record');
-        return FALSE;
-      }
-
-      $dupeContactIDs = $newContact;
-      $dupeCount = count($dupeContactIDs);
-      $contactID = array_pop($dupeContactIDs);
-      // check to see if we had more than one duplicate contact id.
-      // if we have more than one, the record will be rejected below
-      if ($dupeCount == 1) {
-        // there was only one dupe, we will continue normally...
-        if (!in_array($contactID, $this->_newContacts)) {
-          $this->_newContacts[] = $contactID;
-        }
-      }
-    }
 
     if ($contactID) {
       // call import hook
@@ -473,10 +454,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     if ($this->_updateWithId) {
       //return warning if street address is unparsed, CRM-5886
       return $this->processMessage($values, $this->_retCode);
-    }
-    //dupe checking
-    if (is_array($newContact)) {
-      return $this->handleDuplicateError($newContact, $values, $onDuplicate, $formatted, $contactFields);
     }
 
     if (empty($this->_unparsedStreetAddressContacts)) {
@@ -841,9 +818,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   public function isErrorInCoreData($params, &$errorMessage) {
     $errors = [];
-    if (!empty($params['contact_sub_type']) && !CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'], $params['contact_type'])) {
-      $errors[] = ts('Mismatched or Invalid Contact Subtype.');
-    }
 
     foreach ($params as $key => $value) {
       if ($value) {
@@ -923,27 +897,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param bool $requiredCheck
    * @param int $dedupeRuleGroupID
    *
-   * @return array|\CRM_Contact_BAO_Contact
+   * @return \CRM_Contact_BAO_Contact
    *   If a duplicate is found an array is returned, otherwise CRM_Contact_BAO_Contact
    */
   public function createContact(&$formatted, &$contactFields, $onDuplicate, $contactId = NULL, $requiredCheck = TRUE, $dedupeRuleGroupID = NULL) {
-    $dupeCheck = FALSE;
-    $newContact = NULL;
-
-    if (is_null($contactId) && ($onDuplicate != CRM_Import_Parser::DUPLICATE_NOCHECK)) {
-      $dupeCheck = (bool) ($onDuplicate);
-    }
-
-    if ($dupeCheck) {
-      // @todo this is already done in lookupContactID
-      // the differences are that a couple of functions are callled in between
-      // and that call doesn't error out if multiple are found. - once
-      // those 2 things are fixed this can go entirely.
-      $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($formatted, $formatted['contact_type'], 'Unsupervised', [], FALSE, $dedupeRuleGroupID);
-      if (!empty($ids)) {
-        return $ids;
-      }
-    }
 
     if ($contactId) {
       $this->formatParams($formatted, $onDuplicate, (int) $contactId);
@@ -1456,8 +1413,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if (array_key_exists($extIDMatch, $possibleMatches['values'])) {
         return $extIDMatch;
       }
-      throw new CRM_Core_Exception(ts(
-        'Matching this contact based on the de-dupe rule would cause an external ID conflict'));
+      throw new CRM_Core_Exception(ts('Matching this contact based on the de-dupe rule would cause an external ID conflict'));
     }
     return $extIDMatch;
   }
@@ -1638,7 +1594,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *
    */
   private function getParams(array $values): array {
-    $params = [];
+    $params = ['relationship' => []];
 
     foreach ($this->getFieldMappings() as $i => $mappedField) {
       // The key is in the format 5_a_b where 5 is the relationship_type_id and a_b is the direction.
@@ -1653,14 +1609,14 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $locationValues = array_filter(array_intersect_key($mappedField, array_fill_keys($locationFields, 1)));
 
       if ($relatedContactKey) {
-        if (!isset($params[$relatedContactKey])) {
-          $params[$relatedContactKey] = [
+        if (!isset($params['relationship'][$relatedContactKey])) {
+          $params['relationship'][$relatedContactKey] = [
             // These will be over-written by any the importer has chosen but defaults are based on the relationship.
             'contact_type' => $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction']),
             'contact_sub_type' => $this->getRelatedContactSubType($mappedField['relationship_type_id'], $mappedField['relationship_direction']),
           ];
         }
-        $this->addFieldToParams($params[$relatedContactKey], $locationValues, $fieldName, $importedValue);
+        $this->addFieldToParams($params['relationship'][$relatedContactKey], $locationValues, $fieldName, $importedValue);
       }
       else {
         $this->addFieldToParams($params, $locationValues, $fieldName, $importedValue);
@@ -2101,6 +2057,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $this->validateRequiredContactFields($value['contact_type'], $value, $useExistingMatchFields, $prefixString);
 
       $errors = array_merge($errors, $this->getInvalidValuesForContact($value, $prefixString));
+      if (!empty($value['contact_sub_type']) && !CRM_Contact_BAO_ContactType::isExtendsContactType($value['contact_sub_type'], $value['contact_type'])) {
+        $errors[] = ts('Mismatched or Invalid Contact Subtype.');
+      }
       if (!empty($value['relationship_type_id'])) {
         $requiredSubType = $this->getRelatedContactSubType($value['relationship_type_id'], $value['relationship_direction']);
         if ($requiredSubType && $value['contact_sub_type'] && $requiredSubType !== $value['contact_sub_type']) {
@@ -2289,7 +2248,13 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
     else {
       $fieldName = array_search($fieldName, $this->getOddlyMappedMetadataFields(), TRUE) ?: $fieldName;
-      $contactArray[$fieldName] = $this->getTransformedFieldValue($fieldName, $importedValue);
+      $importedValue = $this->getTransformedFieldValue($fieldName, $importedValue);
+      if ($importedValue === '' && !empty($contactArray[$fieldName])) {
+        // If we have already calculated contact type or subtype based on the relationship
+        // do not overwrite it with an empty value.
+        return;
+      }
+      $contactArray[$fieldName] = $importedValue;
     }
   }
 
@@ -2310,7 +2275,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   protected function getRelatedContactsParams(array $params): array {
     $relatedContacts = [];
-    foreach ($params as $key => $value) {
+    foreach ($params['relationship'] as $key => $value) {
       // If the key is a relationship key - eg. 5_a_b or 10_b_a
       // then the value is an array that describes an existing contact.
       // We need to check the fields are present to identify or create this
@@ -2406,8 +2371,15 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
     // Time to see if we can find an existing contact ID to make this an update
     // not a create.
-    if ($extIDMatch || $this->isUpdateExistingContacts()) {
-      return $this->getPossibleContactMatch($params, $extIDMatch, $this->getSubmittedValue('dedupe_rule_id') ?: NULL);
+    if ($extIDMatch || !$this->isIgnoreDuplicates()) {
+      if (isset($params['relationship'])) {
+        unset($params['relationship']);
+      }
+      $id = $this->getPossibleContactMatch($params, $extIDMatch, $this->getSubmittedValue('dedupe_rule_id') ?: NULL);
+      if ($id && $this->isSkipDuplicates()) {
+        throw new CRM_Core_Exception(ts('Contact matched by dedupe rule already exists in the database.'), CRM_Import_Parser::DUPLICATE);
+      }
+      return $id;
     }
     return NULL;
   }

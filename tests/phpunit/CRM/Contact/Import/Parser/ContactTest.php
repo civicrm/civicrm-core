@@ -1838,20 +1838,22 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
           'phone_type_id' => 1,
         ],
       ],
-      '5_a_b' => [
-        'contact_type' => 'Organization',
-        'contact_sub_type' => NULL,
-        'website' => [
-          'https://example.org' => [
-            'url' => 'https://example.org',
-            'website_type_id' => 1,
+      'related_contacts' => [
+        '5_a_b' => [
+          'contact_type' => 'Organization',
+          'contact_sub_type' => NULL,
+          'website' => [
+            'https://example.org' => [
+              'url' => 'https://example.org',
+              'website_type_id' => 1,
+            ],
           ],
-        ],
-        'phone' => [
-          '1_1' => [
-            'phone' => '456',
-            'location_type_id' => 1,
-            'phone_type_id' => 1,
+          'phone' => [
+            '1_1' => [
+              'phone' => '456',
+              'location_type_id' => 1,
+              'phone_type_id' => 1,
+            ],
           ],
         ],
       ],
@@ -1888,40 +1890,29 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'email' => 'tim.cook@apple.com',
     ]);
 
-    $contactImportValues = [
-      'first_name' => 'Alok',
-      'last_name' => 'Patel',
-      'Employee of' => 'email',
-    ];
-
     $mapper = [
       ['first_name'],
       ['last_name'],
-      ['5_a_b', 'email'],
+      ['1_a_b', 'email'],
     ];
-    $fields = array_keys($contactImportValues);
-    $values = array_values($contactImportValues);
-    $values[] = 'tim.cook@apple.com';
-    // Stand in for row number.
-    $values[] = 1;
+    $values = ['Alok', 'Patel', 'tim.cook@apple.com', 1];
 
     $userJobID = $this->getUserJobID([
       'mapper' => $mapper,
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
     ]);
 
-    $parser = new CRM_Contact_Import_Parser_Contact($fields);
+    $parser = new CRM_Contact_Import_Parser_Contact();
     $parser->setUserJobID($userJobID);
-    $dataSource = new CRM_Import_DataSource_CSV($userJobID);
-
     $parser->init();
     $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values);
-    $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::ERROR]));
     $this->callAPISuccessGetSingle('Contact', [
       'first_name' => 'Bob',
       'last_name' => 'Dobbs',
       'email' => 'tim.cook@apple.com',
     ]);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['first_name' => 'Alok', 'last_name' => 'Patel']);
+    $this->assertEmpty($contact['email']);
   }
 
   /**
