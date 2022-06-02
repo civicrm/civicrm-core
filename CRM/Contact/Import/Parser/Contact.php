@@ -29,19 +29,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   use CRM_Contact_Import_MetadataTrait;
 
   protected $_mapperKeys = [];
-
-  /**
-   * Is update only permitted on an id match.
-   *
-   * Note this historically was true for when id or external identifier was
-   * present. However, CRM-17275 determined that a dedupe-match could over-ride
-   * external identifier.
-   *
-   * @var bool
-   */
-  protected $_updateWithId;
-
-  protected $_externalIdentifierIndex;
   protected $_allExternalIdentifiers = [];
   protected $_parseStreetAddress;
 
@@ -125,21 +112,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $this->_newContacts = [];
 
     $this->setActiveFields($this->_mapperKeys);
-
-    $this->_externalIdentifierIndex = -1;
-
-    $index = 0;
-    foreach ($this->_mapperKeys as $key) {
-      if ($key == 'external_identifier') {
-        $this->_externalIdentifierIndex = $index;
-      }
-      $index++;
-    }
-
-    $this->_updateWithId = FALSE;
-    if (in_array('id', $this->_mapperKeys) || ($this->_externalIdentifierIndex >= 0 && $this->isUpdateExistingContacts())) {
-      $this->_updateWithId = TRUE;
-    }
 
     $this->_parseStreetAddress = CRM_Utils_Array::value('street_address_parsing', CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'address_options'), FALSE);
   }
