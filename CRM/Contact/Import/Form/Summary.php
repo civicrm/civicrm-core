@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\UserJob;
+
 /**
  * This class summarizes the import results.
  */
@@ -27,16 +29,15 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    // @todo - totally unclear that this errorFile could ever be set / render.
-    // Probably it can go.
-    $this->assign('errorFile', $this->get('errorFile'));
-    $onDuplicate = $this->getSubmittedValue('onDuplicate');
+    $userJobID = CRM_Utils_Request::retrieve('user_job_id', 'String', $this, TRUE);
+    $userJob = UserJob::get(TRUE)->addWhere('id', '=', $userJobID)->execute()->first();
+    $onDuplicate = $userJob['metadata']['submitted_values']['onDuplicate'];
     $this->assign('dupeError', FALSE);
 
-    if ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
+    if ($onDuplicate === CRM_Import_Parser::DUPLICATE_UPDATE) {
       $this->assign('dupeActionString', ts('These records have been updated with the imported data.'));
     }
-    elseif ($onDuplicate == CRM_Import_Parser::DUPLICATE_FILL) {
+    elseif ($onDuplicate === CRM_Import_Parser::DUPLICATE_FILL) {
       $this->assign('dupeActionString', ts('These records have been filled in with the imported data.'));
     }
     else {

@@ -646,6 +646,28 @@ abstract class CRM_Import_Parser {
     UserJob::update(FALSE)->addWhere('id', '=', $userJob['id'])->setValues(['metadata' => $this->userJob['metadata']])->execute();
   }
 
+  public function queue() {
+    $dataSource = $this->getDataSourceObject();
+    $totalRowCount = $totalRows = $dataSource->getRowCount(['new']);
+    $queue = Civi::queue('user_job_' . $this->getUserJobID(), ['type' => 'Sql', 'error' => 'abort']);
+    $offset = 0;
+    $batchSize = 5;
+    while ($totalRows > 0) {
+      if ($totalRows < $batchSize) {
+        $batchSize = $totalRows;
+      }
+      $task = new CRM_Queue_Task(
+        [get_class($this), 'runImport'],
+        ['userJobID' => $this->getUserJobID(), 'limit' => $batchSize],
+        ts('Processed %1 rows out of %2', [1 => $offset + $batchSize, 2 => $totalRowCount])
+      );
+      $queue->createItem($task);
+      $totalRows -= $batchSize;
+      $offset += $batchSize;
+    }
+
+  }
+
   /**
    * Add imported contacts to groups.
    *
@@ -1675,6 +1697,7 @@ abstract class CRM_Import_Parser {
         $parserClass = $userJobType['class'];
       }
     }
+    /* @var \CRM_Import_Parser $parser */
     $parser = new $parserClass();
     $parser->setUserJobID($userJobID);
     // Not sure if we still need to init....

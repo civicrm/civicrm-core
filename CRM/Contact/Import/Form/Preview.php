@@ -24,25 +24,6 @@ use Civi\Api4\Tag;
 class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
-   * Whether USPS validation should be disabled during import.
-   *
-   * @var bool
-   */
-  protected $_disableUSPS;
-
-  /**
-   * Set variables up before form is built.
-   *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
-   */
-  public function preProcess() {
-    parent::preProcess();
-    $this->_disableUSPS = $this->getSubmittedValue('disableUSPS');
-    $this->setStatusUrl();
-  }
-
-  /**
    * Build the form object.
    */
   public function buildQuickForm() {
@@ -92,7 +73,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    * @param $files
    * @param self $self
    *
-   * @return array
+   * @return array|bool
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $files, $self) {
@@ -210,43 +191,19 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       CRM_ACL_BAO_Cache::deleteContactCacheEntry($userID);
     }
 
-    CRM_Utils_Address_USPS::disable($this->_disableUSPS);
+    CRM_Utils_Address_USPS::disable($this->getSubmittedValue('disableUSPS'));
 
     // run the import
 
-    $this->_parser = $this->getParser();
-    $this->_parser->run(
-      [],
-      CRM_Import_Parser::MODE_IMPORT,
-      $this->get('statusID')
-    );
-
-    // Clear all caches, forcing any searches to recheck the ACLs or group membership as the import
-    // may have changed it.
-    CRM_Contact_BAO_Contact_Utils::clearContactCaches(TRUE);
-
-    // check if there is any error occurred
-    // @todo - it's really unclear that this error code should still exist...
-    $errorStack = CRM_Core_Error::singleton();
-    $errors = $errorStack->getErrors();
-    $errorMessage = [];
-
-    if (is_array($errors)) {
-      foreach ($errors as $key => $value) {
-        $errorMessage[] = $value['message'];
-      }
-
-      // there is no fileName since this is a sql import
-      // so fudge it
-      $config = CRM_Core_Config::singleton();
-      $errorFile = $config->uploadDir . "sqlImport.error.log";
-      if ($fd = fopen($errorFile, 'w')) {
-        fwrite($fd, implode('\n', $errorMessage));
-      }
-      fclose($fd);
-
-      $this->set('errorFile', $errorFile);
-    }
+    $parser = $this->getParser();
+    $parser->queue();
+    $queue = Civi::queue('user_job_' . $this->getUserJobID());
+    $runner = new CRM_Queue_Runner([
+      'queue' => $queue,
+      'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
+      'onEndUrl' => CRM_Utils_System::url('civicrm/import/contact/summary', ['user_job_id' => $this->getUserJobID(), 'reset' => 1]),
+    ]);
+    $runner->runAllViaWeb();
   }
 
   /**

@@ -53,7 +53,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * Tear down after test.
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_openid', 'civicrm_email', 'civicrm_user_job', 'civicrm_relationship', 'civicrm_im', 'civicrm_website'], TRUE);
+    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_openid', 'civicrm_email', 'civicrm_user_job', 'civicrm_relationship', 'civicrm_im', 'civicrm_website', 'civicrm_queue', 'civicrm_queue_item'], TRUE);
     RelationshipType::delete()->addWhere('name_a_b', '=', 'Dad to')->execute();
     ContactType::delete()->addWhere('name', '=', 'baby')->execute();
     parent::tearDown();
@@ -2040,7 +2040,18 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $form = $this->getFormObject('CRM_Contact_Import_Form_Preview', $submittedValues);
     $form->setUserJobID($userJobID);
     $form->buildForm();
-    $form->postProcess();
+
+    try {
+      $form->postProcess();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $queue = Civi::queue('user_job_' . $userJobID);
+      $runner = new CRM_Queue_Runner([
+        'queue' => $queue,
+        'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
+      ]);
+      $runner->runAll();
+    }
   }
 
   /**
@@ -2075,6 +2086,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
         }
       }
     }
+    UserJob::delete()->addWhere('id', '=', $parser->getUserJobID())->execute();
   }
 
   /**
