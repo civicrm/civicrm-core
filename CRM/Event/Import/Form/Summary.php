@@ -30,8 +30,6 @@ class CRM_Event_Import_Form_Summary extends CRM_Import_Form_Summary {
     $this->assign('errorFile', $this->get('errorFile'));
 
     $totalRowCount = $this->get('totalRowCount');
-    $relatedCount = $this->get('relatedCount');
-    $totalRowCount += $relatedCount;
     $this->set('totalRowCount', $totalRowCount);
 
     $invalidRowCount = $this->get('invalidRowCount');

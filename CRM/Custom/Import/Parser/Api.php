@@ -135,7 +135,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
     $errorMessage = NULL;
 
     $contactType = $this->_contactType ? $this->_contactType : 'Organization';
-    CRM_Contact_Import_Parser_Contact::isErrorInCustomData($this->_params + ['contact_type' => $contactType], $errorMessage, $this->_contactSubType, NULL);
+    $this->isErrorInCustomData($this->_params + ['contact_type' => $contactType], $errorMessage, $this->_contactSubType, NULL);
 
     // pseudoconstants
     if ($errorMessage) {

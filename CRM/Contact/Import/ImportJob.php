@@ -88,9 +88,6 @@ class CRM_Contact_Import_ImportJob {
     $relatedContactIds = $this->_parser->getRelatedImportedContacts();
     if ($relatedContactIds) {
       $contactIds = array_merge($contactIds, $relatedContactIds);
-      if ($form) {
-        $form->set('relatedCount', count($relatedContactIds));
-      }
     }
 
     if ($this->_newGroupName || count($this->_groups)) {

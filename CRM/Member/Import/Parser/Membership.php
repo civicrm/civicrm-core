@@ -586,7 +586,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
     $params['contact_type'] = 'Membership';
 
     //checking error in custom data
-    CRM_Contact_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
+    $this->isErrorInCustomData($params, $errorMessage);
 
     if ($errorMessage) {
       $tempMsg = "Invalid value for field(s) : $errorMessage";

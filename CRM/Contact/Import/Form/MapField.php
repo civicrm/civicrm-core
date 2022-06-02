@@ -400,10 +400,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       return;
     }
     $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
-    $parser = $this->submit($params);
-
-    // add all the necessary variables to the form
-    $parser->set($this);
+    $this->submit($params);
   }
 
   /**
@@ -447,18 +444,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param $params
    * @param $mapperKeys
    *
-   * @return \CRM_Contact_Import_Parser_Contact
    * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function submit($params) {
-    $mapperKeys = $this->getSubmittedValue('mapper');
-    $mapperKeysMain = [];
-
-    for ($i = 0; $i < $this->_columnCount; $i++) {
-      $mapperKeysMain[$i] = $mapperKeys[$i][0] ?? NULL;
-    }
-
     $this->set('columnNames', $this->_columnNames);
 
     // store mapping Id to display it in the preview page
@@ -487,14 +476,9 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->set('savedMapping', $saveMapping['id']);
     }
 
-    $parser = new CRM_Contact_Import_Parser_Contact($mapperKeysMain);
+    $parser = new CRM_Contact_Import_Parser_Contact();
     $parser->setUserJobID($this->getUserJobID());
-
-    $parser->run(
-      [],
-      CRM_Import_Parser::MODE_PREVIEW
-    );
-    return $parser;
+    $parser->validate();
   }
 
   /**

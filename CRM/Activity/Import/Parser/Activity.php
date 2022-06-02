@@ -358,7 +358,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
     $errorMessage = NULL;
     // Checking error in custom data.
     $params['contact_type'] = 'Activity';
-    CRM_Contact_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
+    $this->isErrorInCustomData($params, $errorMessage);
     if ($errorMessage) {
       throw new CRM_Core_Exception('Invalid value for field(s) : ' . $errorMessage);
     }
