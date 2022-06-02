@@ -248,7 +248,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
 
     $params['contact_type'] = 'Participant';
     //checking error in custom data
-    CRM_Contact_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
+    $this->isErrorInCustomData($params, $errorMessage);
 
     if ($errorMessage) {
       $tempMsg = "Invalid value for field(s) : $errorMessage";

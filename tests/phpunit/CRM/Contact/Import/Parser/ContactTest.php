@@ -946,7 +946,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $params = [
       'custom_' . $customField['id'] => 'Label1|Label2',
     ];
-    CRM_Contact_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
+    $parser = new CRM_Contact_Import_Parser_Contact();
+    $parser->isErrorInCustomData($params, $errorMessage);
     $this->assertEquals(NULL, $errorMessage);
   }
 

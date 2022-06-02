@@ -701,7 +701,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     $params['contact_type'] = 'Contribution';
 
     //checking error in custom data
-    CRM_Contact_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
+    $this->isErrorInCustomData($params, $errorMessage);
 
     if ($errorMessage) {
       $tempMsg = "Invalid value for field(s) : $errorMessage";

@@ -1554,4 +1554,79 @@ abstract class CRM_Import_Parser {
     return $mappedFields;
   }
 
+
+  /**
+   * Check if an error in custom data.
+   *
+   * @deprecated all of this is duplicated if getTransformedValue is used.
+   *
+   * @param array $params
+   * @param string $errorMessage
+   *   A string containing all the error-fields.
+   *
+   * @param null $csType
+   */
+  public function isErrorInCustomData($params, &$errorMessage, $csType = NULL) {
+    $dateType = CRM_Core_Session::singleton()->get("dateTypes");
+    $errors = [];
+
+    if (!empty($params['contact_sub_type'])) {
+      $csType = $params['contact_sub_type'] ?? NULL;
+    }
+
+    if (empty($params['contact_type'])) {
+      $params['contact_type'] = 'Individual';
+    }
+
+    // get array of subtypes - CRM-18708
+    if (in_array($csType, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE)) {
+      $csType = $this->getSubtypes($params['contact_type']);
+    }
+
+    if (is_array($csType)) {
+      // fetch custom fields for every subtype and add it to $customFields array
+      // CRM-18708
+      $customFields = [];
+      foreach ($csType as $cType) {
+        $customFields += CRM_Core_BAO_CustomField::getFields($params['contact_type'], FALSE, FALSE, $cType);
+      }
+    }
+    else {
+      $customFields = CRM_Core_BAO_CustomField::getFields($params['contact_type'], FALSE, FALSE, $csType);
+    }
+
+    foreach ($params as $key => $value) {
+      if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
+        //For address custom fields, we do get actual custom field value as an inner array of
+        //values so need to modify
+        if (!array_key_exists($customFieldID, $customFields)) {
+          return ts('field ID');
+        }
+        /* check if it's a valid custom field id */
+        $errors[] = $this->validateCustomField($customFieldID, $value, $customFields[$customFieldID], $dateType);
+      }
+    }
+    if ($errors) {
+      $errorMessage .= ($errorMessage ? '; ' : '') . implode('; ', array_filter($errors));
+    }
+  }
+
+  /**
+   * get subtypes given the contact type
+   *
+   * @param string $contactType
+   * @return array $subTypes
+   */
+  protected function getSubtypes($contactType) {
+    $subTypes = [];
+    $types = CRM_Contact_BAO_ContactType::subTypeInfo($contactType);
+
+    if (count($types) > 0) {
+      foreach ($types as $type) {
+        $subTypes[] = $type['name'];
+      }
+    }
+    return $subTypes;
+  }
+
 }
