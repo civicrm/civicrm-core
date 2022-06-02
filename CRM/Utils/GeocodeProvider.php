@@ -89,11 +89,10 @@ class CRM_Utils_GeocodeProvider {
   }
 
   /**
-   * Reset geoprovider (after it has been disabled).
+   * Reset geoprovider (after settting has been changed).
    */
   public static function reset() {
     self::$providerClassName = NULL;
-    self::getUsableClassName();
   }
 
 }
