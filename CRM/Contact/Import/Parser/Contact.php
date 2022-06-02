@@ -287,28 +287,26 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       CRM_Utils_GeocodeProvider::disableForSession();
     }
 
-    // first make sure this is a valid line
-    //$this->_updateWithId = false;
-    $response = $this->summary($values);
-
-    if ($response != CRM_Import_Parser::VALID) {
-      $this->setImportStatus((int) $values[count($values) - 1], 'Invalid', "Invalid (Error Code: $response)");
-      return FALSE;
-    }
-
-    $params = $this->getMappedRow($values);
-    $formatted = [];
-    foreach ($params as $key => $value) {
-      if ($value !== '') {
-        $formatted[$key] = $value;
-      }
-    }
-
-    $contactFields = CRM_Contact_DAO_Contact::import();
-
-    $params['contact_sub_type'] = $this->getContactSubType() ?: ($params['contact_sub_type'] ?? NULL);
-
     try {
+      $params = $this->getMappedRow($values);
+      // it is questionable whether we need to do validate here
+      // - normally it has already been done in the form flow
+      // and generally only lines that passed that will
+      // get to the import function. It might be that it
+      // is really only here cos it used to be combined with getMappedRow
+      $this->validateParams($params);
+
+      $formatted = [];
+      foreach ($params as $key => $value) {
+        if ($value !== '') {
+          $formatted[$key] = $value;
+        }
+      }
+
+      $contactFields = CRM_Contact_DAO_Contact::import();
+
+      $params['contact_sub_type'] = $this->getContactSubType() ?: ($params['contact_sub_type'] ?? NULL);
+
       [$formatted, $params] = $this->processContact($params, $formatted, TRUE);
     }
     catch (CRM_Core_Exception $e) {
@@ -867,6 +865,62 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     else {
       $errorMessage = $errorName;
     }
+  }
+
+  /**
+   * @param array $params
+   *
+   * @return string|null
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   */
+  protected function validateParams(array $params): ?string {
+    $contacts = array_merge(['0' => $params], $this->getRelatedContactsParams($params));
+    $errors = [];
+    foreach ($contacts as $value) {
+      // If we are referencing a related contact, or are in update mode then we
+      // don't need all the required fields if we have enough to find an existing contact.
+      $useExistingMatchFields = !empty($value['relationship_type_id']) || $this->isUpdateExistingContacts();
+      $prefixString = !empty($value['relationship_label']) ? '(' . $value['relationship_label'] . ') ' : '';
+      $this->validateRequiredContactFields($value['contact_type'], $value, $useExistingMatchFields, $prefixString);
+
+      $errors = array_merge($errors, $this->getInvalidValuesForContact($value, $prefixString));
+      if (!empty($value['contact_sub_type']) && !CRM_Contact_BAO_ContactType::isExtendsContactType($value['contact_sub_type'], $value['contact_type'])) {
+        $errors[] = ts('Mismatched or Invalid Contact Subtype.');
+      }
+      if (!empty($value['relationship_type_id'])) {
+        $requiredSubType = $this->getRelatedContactSubType($value['relationship_type_id'], $value['relationship_direction']);
+        if ($requiredSubType && $value['contact_sub_type'] && $requiredSubType !== $value['contact_sub_type']) {
+          throw new CRM_Core_Exception($prefixString . ts('Mismatched or Invalid contact subtype found for this related contact.'));
+        }
+      }
+    }
+
+    //check for duplicate external Identifier
+    $externalID = $params['external_identifier'] ?? NULL;
+    if ($externalID) {
+      /* If it's a dupe,external Identifier  */
+
+      if ($externalDupe = CRM_Utils_Array::value($externalID, $this->_allExternalIdentifiers)) {
+        $errorMessage = ts('External ID conflicts with record %1', [1 => $externalDupe]);
+        throw new CRM_Core_Exception($errorMessage);
+      }
+      //otherwise, count it and move on
+      $this->_allExternalIdentifiers[$externalID] = $this->_lineCount;
+    }
+
+    //date-format part ends
+
+    $errorMessage = implode(', ', $errors);
+
+    //checking error in core data
+    $this->isErrorInCoreData($params, $errorMessage);
+    if ($errorMessage) {
+      $tempMsg = "Invalid value for field(s) : $errorMessage";
+      throw new CRM_Core_Exception($tempMsg);
+    }
+    return $errorMessage;
   }
 
   /**
@@ -2029,50 +2083,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   public function validateValues(array $values): void {
     $params = $this->getMappedRow($values);
-    $contacts = array_merge(['0' => $params], $this->getRelatedContactsParams($params));
-    $errors = [];
-    foreach ($contacts as $value) {
-      // If we are referencing a related contact, or are in update mode then we
-      // don't need all the required fields if we have enough to find an existing contact.
-      $useExistingMatchFields = !empty($value['relationship_type_id']) || $this->isUpdateExistingContacts();
-      $prefixString = !empty($value['relationship_label']) ? '(' . $value['relationship_label'] . ') ' : '';
-      $this->validateRequiredContactFields($value['contact_type'], $value, $useExistingMatchFields, $prefixString);
-
-      $errors = array_merge($errors, $this->getInvalidValuesForContact($value, $prefixString));
-      if (!empty($value['contact_sub_type']) && !CRM_Contact_BAO_ContactType::isExtendsContactType($value['contact_sub_type'], $value['contact_type'])) {
-        $errors[] = ts('Mismatched or Invalid Contact Subtype.');
-      }
-      if (!empty($value['relationship_type_id'])) {
-        $requiredSubType = $this->getRelatedContactSubType($value['relationship_type_id'], $value['relationship_direction']);
-        if ($requiredSubType && $value['contact_sub_type'] && $requiredSubType !== $value['contact_sub_type']) {
-          throw new CRM_Core_Exception($prefixString . ts('Mismatched or Invalid contact subtype found for this related contact.'));
-        }
-      }
-    }
-
-    //check for duplicate external Identifier
-    $externalID = $params['external_identifier'] ?? NULL;
-    if ($externalID) {
-      /* If it's a dupe,external Identifier  */
-
-      if ($externalDupe = CRM_Utils_Array::value($externalID, $this->_allExternalIdentifiers)) {
-        $errorMessage = ts('External ID conflicts with record %1', [1 => $externalDupe]);
-        throw new CRM_Core_Exception($errorMessage);
-      }
-      //otherwise, count it and move on
-      $this->_allExternalIdentifiers[$externalID] = $this->_lineCount;
-    }
-
-    //date-format part ends
-
-    $errorMessage = implode(', ', $errors);
-
-    //checking error in core data
-    $this->isErrorInCoreData($params, $errorMessage);
-    if ($errorMessage) {
-      $tempMsg = "Invalid value for field(s) : $errorMessage";
-      throw new CRM_Core_Exception($tempMsg);
-    }
+    $this->validateParams($params);
   }
 
   /**
