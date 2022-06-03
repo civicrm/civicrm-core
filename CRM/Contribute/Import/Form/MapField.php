@@ -433,7 +433,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       if (isset($mapperKeys[$i][0]) && $mapperKeys[$i][0] == 'soft_credit') {
         $mapperSoftCredit[$i] = $mapperKeys[$i][1];
         if (strpos($mapperSoftCredit[$i], '_') !== FALSE) {
-          list($first, $second) = explode('_', $mapperSoftCredit[$i]);
+          [$first, $second] = explode('_', $mapperSoftCredit[$i]);
           $softCreditFields[$i] = ucwords($first . " " . $second);
         }
         else {
