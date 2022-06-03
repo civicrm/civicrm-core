@@ -26,6 +26,14 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
    */
   public $releaseTimes;
 
+  /**
+   * Number of times each queue item has been attempted.
+   *
+   * @var array
+   *   array(queueItemId => int $count),
+   */
+  protected $runCounts;
+
   public $nextQueueItemId = 1;
 
   /**
@@ -52,6 +60,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   public function createQueue() {
     $this->items = [];
     $this->releaseTimes = [];
+    $this->runCounts = [];
   }
 
   /**
@@ -68,6 +77,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   public function deleteQueue() {
     $this->items = NULL;
     $this->releaseTimes = NULL;
+    $this->runCounts = NULL;
   }
 
   /**
@@ -92,6 +102,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
     $id = $this->nextQueueItemId++;
     // force copy, no unintendedsharing effects from pointers
     $this->items[$id] = serialize($data);
+    $this->runCounts[$id] = 0;
   }
 
   /**
@@ -106,22 +117,26 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   /**
    * Get and remove the next item.
    *
-   * @param int $leaseTime
-   *   Seconds.
-   *
+   * @param int|null $leaseTime
+   *   Hold a lease on the claimed item for $X seconds.
+   *   If NULL, inherit a queue default (`$queueSpec['lease_time']`) or system default (`DEFAULT_LEASE_TIME`).
    * @return object
    *   Includes key 'data' that matches the inputted data.
    */
-  public function claimItem($leaseTime = 3600) {
+  public function claimItem($leaseTime = NULL) {
+    $leaseTime = $leaseTime ?: $this->getSpec('lease_time') ?: static::DEFAULT_LEASE_TIME;
+
     // foreach hits the items in order -- but we short-circuit after the first
     foreach ($this->items as $id => $data) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
       if (empty($this->releaseTimes[$id]) || $this->releaseTimes[$id] < $nowEpoch) {
         $this->releaseTimes[$id] = $nowEpoch + $leaseTime;
+        $this->runCounts[$id]++;
 
         $item = new stdClass();
         $item->id = $id;
         $item->data = unserialize($data);
+        $item->run_count = $this->runCounts[$id];
         return $item;
       }
       else {
@@ -136,21 +151,25 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   /**
    * Get the next item.
    *
-   * @param int $leaseTime
-   *   Seconds.
-   *
+   * @param int|null $leaseTime
+   *   Hold a lease on the claimed item for $X seconds.
+   *   If NULL, inherit a queue default (`$queueSpec['lease_time']`) or system default (`DEFAULT_LEASE_TIME`).
    * @return object
    *   With key 'data' that matches the inputted data.
    */
-  public function stealItem($leaseTime = 3600) {
+  public function stealItem($leaseTime = NULL) {
+    $leaseTime = $leaseTime ?: $this->getSpec('lease_time') ?: static::DEFAULT_LEASE_TIME;
+
     // foreach hits the items in order -- but we short-circuit after the first
     foreach ($this->items as $id => $data) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
       $this->releaseTimes[$id] = $nowEpoch + $leaseTime;
+      $this->runCounts[$id]++;
 
       $item = new stdClass();
       $item->id = $id;
       $item->data = unserialize($data);
+      $item->run_count = $this->runCounts[$id];
       return $item;
     }
     // nothing in queue
@@ -166,6 +185,20 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   public function deleteItem($item) {
     unset($this->items[$item->id]);
     unset($this->releaseTimes[$item->id]);
+    unset($this->runCounts[$item->id]);
+  }
+
+  /**
+   * Get the full data for an item.
+   *
+   * This is a passive peek - it does not claim/steal/release anything.
+   *
+   * @param int|string $id
+   *   The unique ID of the task within the queue.
+   * @return CRM_Queue_DAO_QueueItem|object|null $dao
+   */
+  public function fetchItem($id) {
+    return $this->items[$id] ?? NULL;
   }
 
   /**
@@ -175,7 +208,13 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
    *   The item returned by claimItem.
    */
   public function releaseItem($item) {
-    unset($this->releaseTimes[$item->id]);
+    if (empty($this->queueSpec['retry_interval'])) {
+      unset($this->releaseTimes[$item->id]);
+    }
+    else {
+      $nowEpoch = CRM_Utils_Time::getTimeRaw();
+      $this->releaseTimes[$item->id] = $nowEpoch + $this->queueSpec['retry_interval'];
+    }
   }
 
 }
