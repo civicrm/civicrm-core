@@ -28,7 +28,7 @@
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <mixins>
-    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>mgd-php@1.1.0</mixin>
   </mixins>
   <civix>
     <namespace>CRM/Ewaysingle</namespace>

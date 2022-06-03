@@ -33,6 +33,6 @@
     <angularModule>crmCivicrmAdminUi</angularModule>
   </civix>
   <mixins>
-    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>mgd-php@1.1.0</mixin>
   </mixins>
 </extension>
