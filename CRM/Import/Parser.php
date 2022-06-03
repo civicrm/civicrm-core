@@ -1608,6 +1608,30 @@ abstract class CRM_Import_Parser {
     return !empty($this->ambiguousOptions[$fieldName][mb_strtolower($importedValue)]);
   }
 
+
+  /**
+   * Get the civicrm_mapping_field appropriate layout for the mapper input.
+   *
+   * For simple parsers (not contribution or contact) the input looks like
+   * ['first_name', 'custom_32']
+   * and it is converted to
+   *
+   *  ['name' => 'first_name', 'mapping_id' => 1, 'column_number' => 5],
+   *
+   * @param array $fieldMapping
+   * @param int $mappingID
+   * @param int $columnNumber
+   *
+   * @return array
+   */
+  public function getMappingFieldFromMapperInput(array $fieldMapping, int $mappingID, int $columnNumber): array {
+    return [
+      'name' => $fieldMapping[0],
+      'mapping_id' => $mappingID,
+      'column_number' => $columnNumber,
+    ];
+  }
+
   /**
    * Get the field mappings for the import.
    *
