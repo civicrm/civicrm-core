@@ -24,6 +24,8 @@ return function ($mixInfo, $bootCache) {
       return;
     }
 
+    // Optimization: if managed entities were requested for specific module(s),
+    // check name and return early if not applicable.
     if (is_array($event->modules) && !in_array($mixInfo->longName, $event->modules, TRUE)) {
       return;
     }
