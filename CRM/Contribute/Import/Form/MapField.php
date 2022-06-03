@@ -72,27 +72,15 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    * Set variables up before form is built.
    */
   public function preProcess() {
+    parent::preProcess();
     $this->_mapperFields = $this->getAvailableFields();
     asort($this->_mapperFields);
 
     $this->_columnCount = $this->get('columnCount');
-    $this->assign('columnCount', $this->_columnCount);
-    $this->_dataValues = $this->get('dataValues');
-    $this->assign('dataValues', $this->_dataValues);
+    $skipColumnHeader = $this->getSubmittedValue('skipColumnHeader');
+    $this->_onDuplicate = $this->getSubmittedValue('onDuplicate');
+    $this->assign('skipColumnHeader', $skipColumnHeader);
 
-    $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
-    $this->_onDuplicate = $this->get('onDuplicate', $onDuplicate ?? "");
-
-    if ($skipColumnHeader) {
-      $this->assign('skipColumnHeader', $skipColumnHeader);
-      $this->assign('rowDisplayCount', 3);
-      // If we had a column header to skip, stash it for later
-
-      $this->_columnHeaders = $this->_dataValues[0];
-    }
-    else {
-      $this->assign('rowDisplayCount', 2);
-    }
     $highlightedFields = ['financial_type_id', 'total_amount'];
     //CRM-2219 removing other required fields since for updation only
     //invoice id or trxn id or contribution id is required.
@@ -157,10 +145,11 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $defaults = [];
     $mapperKeys = array_keys($this->_mapperFields);
-    $hasHeaders = !empty($this->_columnHeaders);
-    $headerPatterns = $this->get('headerPatterns');
-    $dataPatterns = $this->get('dataPatterns');
-    $mapperKeysValues = $this->controller->exportValue($this->_name, 'mapper');
+    $hasHeaders = $this->getSubmittedValue('skipColumnHeader');
+    $headerPatterns = $this->getHeaderPatterns();
+    $dataPatterns = $this->getDataPatterns();
+    $mapperKeysValues = $this->getSubmittedValue('mapper');
+    $columnHeaders = $this->getColumnHeaders();
 
     /* Initialize all field usages to false */
     foreach ($mapperKeys as $key) {
@@ -188,7 +177,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     //used to warn for mismatch column count or mismatch mapping
     $warning = 0;
 
-    for ($i = 0; $i < $this->_columnCount; $i++) {
+    foreach ($columnHeaders as $i => $columnHeader) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
       $jsSet = FALSE;
       if ($this->get('savedMapping')) {
@@ -228,7 +217,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
           $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
 
           if ($hasHeaders) {
-            $defaults["mapper[$i]"] = [$this->defaultFromHeader($this->_columnHeaders[$i], $headerPatterns)];
+            $defaults["mapper[$i]"] = [$this->defaultFromHeader($columnHeader, $headerPatterns)];
           }
           else {
             $defaults["mapper[$i]"] = [$this->defaultFromData($dataPatterns, $i)];
@@ -240,7 +229,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
         if ($hasHeaders) {
           // do array search first to see if has mapped key
-          $columnKey = array_search($this->_columnHeaders[$i], $this->_mapperFields);
+          $columnKey = array_search($columnHeader, $this->_mapperFields);
           if (isset($this->_fieldUsed[$columnKey])) {
             $defaults["mapper[$i]"] = $columnKey;
             $this->_fieldUsed[$key] = TRUE;
@@ -248,7 +237,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
           else {
             // Infer the default from the column names if we have them
             $defaults["mapper[$i]"] = [
-              $this->defaultFromHeader($this->_columnHeaders[$i], $headerPatterns),
+              $this->defaultFromHeader($columnHeader, $headerPatterns),
               0,
             ];
           }
