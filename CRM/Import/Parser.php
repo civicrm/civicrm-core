@@ -1537,7 +1537,7 @@ abstract class CRM_Import_Parser {
    * @return array
    * @throws \API_Exception
    */
-  protected function getInvalidValues($value, string $key, string $prefixString = ''): array {
+  protected function getInvalidValues($value, string $key = '', string $prefixString = ''): array {
     $errors = [];
     if ($value === 'invalid_import_value') {
       $errors[] = $prefixString . $this->getFieldMetadata($key)['title'];

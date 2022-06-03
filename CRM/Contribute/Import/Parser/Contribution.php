@@ -380,7 +380,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $params['soft_credit'][$i] = ['soft_credit_type_id' => $mappedField['soft_credit_type_id'], $mappedField['soft_credit_match_field'] => $values[$i]];
       }
       else {
-        $params[$this->getFieldMetadata($mappedField['name'])['name']] = $values[$i];
+        $params[$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
       }
     }
     return $params;
@@ -634,15 +634,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   public function summary(&$values) {
     $rowNumber = (int) ($values[array_key_last($values)]);
     $params = $this->getMappedRow($values);
-
-    //for date-Formats
-    $errorMessage = implode('; ', $this->formatDateFields($params));
-    //date-Format part ends
-
+    $errorMessage = implode(';', $this->getInvalidValues($params));
     $params['contact_type'] = 'Contribution';
-
-    //checking error in custom data
-    $this->isErrorInCustomData($params, $errorMessage);
 
     if ($errorMessage) {
       $tempMsg = "Invalid value for field(s) : $errorMessage";
@@ -682,7 +675,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     }
 
     $params = $this->getMappedRow($values);
-    $formatted = ['version' => 3, 'skipRecentView' => TRUE, 'skipCleanMoney' => FALSE, 'contribution_id' => $params['id'] ?? NULL];
+    $formatted = array_merge(['version' => 3, 'skipRecentView' => TRUE, 'skipCleanMoney' => FALSE, 'contribution_id' => $params['id'] ?? NULL], $params);
     //CRM-10994
     if (isset($params['total_amount']) && $params['total_amount'] == 0) {
       $params['total_amount'] = '0.00';
@@ -1095,41 +1088,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     require_once 'CRM/Utils/DeprecatedUtils.php';
     // copy all the contribution fields as is
     require_once 'api/v3/utils.php';
-    $fields = CRM_Core_DAO::getExportableFieldsWithPseudoConstants('CRM_Contribute_BAO_Contribution');
-
-    _civicrm_api3_store_values($fields, $params, $values);
-
-    $customFields = CRM_Core_BAO_CustomField::getFields('Contribution', FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE);
 
     foreach ($params as $key => $value) {
       // ignore empty values or empty arrays etc
       if (CRM_Utils_System::isNull($value)) {
-        continue;
-      }
-
-      // Handling Custom Data
-      if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-        $values[$key] = $value;
-        $type = $customFields[$customFieldID]['html_type'];
-        if (CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID])) {
-          $values[$key] = self::unserializeCustomValue($customFieldID, $value, $type);
-        }
-        elseif ($type == 'Select' || $type == 'Radio' ||
-          ($type == 'Autocomplete-Select' &&
-            $customFields[$customFieldID]['data_type'] == 'String'
-          )
-        ) {
-          $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
-          foreach ($customOption as $customFldID => $customValue) {
-            $val = $customValue['value'] ?? NULL;
-            $label = $customValue['label'] ?? NULL;
-            $label = strtolower($label);
-            $value = strtolower(trim($value));
-            if (($value == $label) || ($value == strtolower($val))) {
-              $values[$key] = $val;
-            }
-          }
-        }
         continue;
       }
 
@@ -1218,15 +1180,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
             if ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
               return civicrm_api3_create_error("Empty Contribution and Invoice and Transaction ID. Row was skipped.");
             }
-          }
-          break;
-
-        case 'receive_date':
-        case 'cancel_date':
-        case 'receipt_date':
-        case 'thankyou_date':
-          if (!CRM_Utils_Rule::dateTime($value)) {
-            return civicrm_api3_create_error("$key not a valid date: $value");
           }
           break;
 
@@ -1374,20 +1327,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           $values['contribution_campaign_id'] = $params['contribution_campaign_id'];
           break;
 
-        default:
-          // Hande name or label for fields with options.
-          if (isset($fields[$key]) &&
-            // Yay - just for a surprise we are inconsistent on whether we pass the pseudofield (payment_instrument)
-            // or the field name (contribution_status_id)
-            // @todo - payment_instrument is goneburger - now payment_instrument_id - how
-            // can we simplify.
-            (!empty($fields[$key]['is_pseudofield_for']) || !empty($fields[$key]['pseudoconstant']))
-          ) {
-            $realField = $fields[$key]['is_pseudofield_for'] ?? $key;
-            $realFieldSpec = $fields[$realField];
-            $values[$key] = $this->parsePseudoConstantField($value, $realFieldSpec);
-          }
-          break;
       }
     }
 
