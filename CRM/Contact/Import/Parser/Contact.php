@@ -1358,24 +1358,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Update the status of the import row to reflect the processing outcome.
-   *
-   * @param int $id
-   * @param string $status
-   * @param string $message
-   * @param int|null $entityID
-   *   Optional created entity ID
-   * @param array $relatedEntityIDs
-   *   Optional array e.g ['related_contact' => 4]
-   *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
-   */
-  public function setImportStatus(int $id, string $status, string $message, ?int $entityID = NULL, array $relatedEntityIDs = []): void {
-    $this->getDataSourceObject()->updateStatus($id, $status, $message, $entityID, $relatedEntityIDs);
-  }
-
-  /**
    * Format contact parameters.
    *
    * @todo this function needs re-writing & re-merging into the main function.

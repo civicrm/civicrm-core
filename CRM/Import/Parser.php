@@ -1608,7 +1608,6 @@ abstract class CRM_Import_Parser {
     return !empty($this->ambiguousOptions[$fieldName][mb_strtolower($importedValue)]);
   }
 
-
   /**
    * Get the civicrm_mapping_field appropriate layout for the mapper input.
    *
@@ -1725,6 +1724,22 @@ abstract class CRM_Import_Parser {
       }
     }
     return $subTypes;
+  }
+
+  /**
+   * Update the status of the import row to reflect the processing outcome.
+   *
+   * @param int $id
+   * @param string $status
+   * @param string $message
+   * @param int|null $entityID
+   *   Optional created entity ID
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function setImportStatus(int $id, string $status, string $message, ?int $entityID = NULL): void {
+    $this->getDataSourceObject()->updateStatus($id, $status, $message, $entityID);
   }
 
 }
