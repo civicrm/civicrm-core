@@ -36,8 +36,7 @@ abstract class CRM_Import_Form_Preview extends CRM_Import_Forms {
    * Assign common values to the template.
    */
   public function preProcess() {
-    $this->assign('skipColumnHeader', $this->getSubmittedValue('skipColumnHeader'));
-    $this->assign('rowDisplayCount', $this->getSubmittedValue('skipColumnHeader') ? 3 : 2);
+    $this->assignPreviewVariables();
   }
 
   /**
@@ -89,6 +88,33 @@ abstract class CRM_Import_Form_Preview extends CRM_Import_Forms {
     }
     $statusUrl = CRM_Utils_System::url('civicrm/ajax/status', "id={$statusID}", FALSE, NULL, FALSE);
     $this->assign('statusUrl', $statusUrl);
+  }
+
+  /**
+   * Assign smarty variables for the preview screen.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function assignPreviewVariables(): void {
+    $this->assign('downloadErrorRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::ERROR));
+    $this->assign('invalidRowCount', $this->getRowCount(CRM_Import_Parser::ERROR));
+    $this->assign('validRowCount', $this->getRowCount(CRM_Import_Parser::VALID));
+    $this->assign('totalRowCount', $this->getRowCount([]));
+    $this->assign('mapper', $this->getMappedFieldLabels());
+    $this->assign('dataValues', $this->getDataRows([], 2));
+    $this->assign('columnNames', $this->getColumnHeaders());
+    //get the mapping name displayed if the mappingId is set
+    $mappingId = $this->get('loadMappingId');
+    if ($mappingId) {
+      $mapDAO = new CRM_Core_DAO_Mapping();
+      $mapDAO->id = $mappingId;
+      $mapDAO->find(TRUE);
+    }
+    $this->assign('savedMappingName', $mappingId ? $mapDAO->name : NULL);
+    $this->assign('skipColumnHeader', $this->getSubmittedValue('skipColumnHeader'));
+    // rowDisplayCount is deprecated - it used to be used with {section} but we have nearly gotten rid of it.
+    $this->assign('rowDisplayCount', $this->getSubmittedValue('skipColumnHeader') ? 3 : 2);
   }
 
 }

@@ -34,22 +34,8 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    $columnNames = $this->getColumnHeaders();
+    parent::preProcess();
     $this->_disableUSPS = $this->getSubmittedValue('disableUSPS');
-
-    //assign column names
-    $this->assign('columnNames', $columnNames);
-
-    //get the mapping name displayed if the mappingId is set
-    $mappingId = $this->get('loadMappingId');
-    if ($mappingId) {
-      $mapDAO = new CRM_Core_DAO_Mapping();
-      $mapDAO->id = $mappingId;
-      $mapDAO->find(TRUE);
-    }
-    $this->assign('savedMappingName', $mappingId ? $mapDAO->name : NULL);
-
-    $this->assign('rowDisplayCount', 2);
 
     $groups = CRM_Core_PseudoConstant::nestedGroup();
     $this->set('groups', $groups);
@@ -58,13 +44,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     if ($tag) {
       $this->set('tag', $tag);
     }
-
-    $this->assign('downloadErrorRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::ERROR));
-    $this->assign('invalidRowCount', $this->getRowCount(CRM_Import_Parser::ERROR));
-    $this->assign('validRowCount', $this->getRowCount(CRM_Import_Parser::VALID));
-    $this->assign('totalRowCount', $this->getRowCount([]));
-    $this->assign('mapper', $this->getMappedFieldLabels());
-    $this->assign('dataValues', $this->getDataRows([], 2));
 
     $this->setStatusUrl();
   }

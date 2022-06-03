@@ -510,7 +510,7 @@ abstract class CRM_Import_Parser {
   /**
    * @return array
    */
-  public function getHeaderPatterns() {
+  public function getHeaderPatterns(): array {
     $values = [];
     foreach ($this->_fields as $name => $field) {
       if (isset($field->_headerPattern)) {
@@ -523,7 +523,7 @@ abstract class CRM_Import_Parser {
   /**
    * @return array
    */
-  public function getDataPatterns() {
+  public function getDataPatterns():array {
     $values = [];
     foreach ($this->_fields as $name => $field) {
       $values[$name] = $field->_dataPattern;
