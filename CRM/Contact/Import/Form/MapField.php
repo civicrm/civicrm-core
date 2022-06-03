@@ -392,13 +392,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public function postProcess() {
     $params = $this->controller->exportValues('MapField');
-
-    //reload the mapfield if load mapping is pressed
-    if (!empty($params['savedMapping'])) {
-      $this->set('savedMapping', $params['savedMapping']);
-      $this->controller->resetPage($this->_name);
-      return;
-    }
     $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
     $this->submit($params);
   }
