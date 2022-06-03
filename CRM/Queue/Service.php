@@ -142,6 +142,12 @@ class CRM_Queue_Service {
       return $loaded;
     }
 
+    if (isset($queueSpec['template'])) {
+      $base = $this->findQueueSpec(['name' => $queueSpec['template']]);
+      $reset = ['is_template' => 0];
+      $queueSpec = array_merge($base, $reset, $queueSpec);
+    }
+
     $this->validateQueueSpec($queueSpec);
 
     $dao = new CRM_Queue_DAO_Queue();
