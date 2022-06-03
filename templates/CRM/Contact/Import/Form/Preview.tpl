@@ -128,9 +128,7 @@
         <table class="form-layout-compressed">
             <tr><td style="width: 14em;"></td>
              <td class="listing-box" style="margin-bottom: 0em; width: 15em;">
-        {foreach from=$form.tag item="tag_val"}
-          <div>{$tag_val.html}</div>
-        {/foreach}
+               {$form.tag.html}
             </td>
           </tr>
         </table>

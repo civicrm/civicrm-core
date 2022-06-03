@@ -586,4 +586,53 @@ class CRM_Import_Forms extends CRM_Core_Form {
     return $mapper;
   }
 
+  /**
+   * Assign variables required for the MapField form.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function assignMapFieldVariables(): void {
+    $this->addExpectedSmartyVariable('highlightedRelFields');
+    $this->_columnCount = $this->getNumberOfColumns();
+    $this->_columnNames = $this->getColumnHeaders();
+    $this->_dataValues = array_values($this->getDataRows([], 2));
+    $this->assign('columnNames', $this->getColumnHeaders());
+    $this->assign('highlightedFields', $this->getHighlightedFields());
+    $this->assign('columnCount', $this->_columnCount);
+    $this->assign('dataValues', $this->_dataValues);
+  }
+
+  /**
+   * Get the fields to be highlighted in the UI.
+   *
+   * The highlighted fields are those used to match
+   * to an existing entity.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getHighlightedFields(): array {
+    return [];
+  }
+
+  /**
+   * Get the data patterns to pattern match the incoming data.
+   *
+   * @return array
+   */
+  public function getDataPatterns(): array {
+    return $this->getParser()->getDataPatterns();
+  }
+
+  /**
+   * Get the data patterns to pattern match the incoming data.
+   *
+   * @return array
+   */
+  public function getHeaderPatterns(): array {
+    return $this->getParser()->getHeaderPatterns();
+  }
+
 }

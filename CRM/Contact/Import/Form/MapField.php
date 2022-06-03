@@ -101,17 +101,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     // retrieve and highlight required custom fields
     $formattedFieldNames = $this->formatCustomFieldName($this->_mapperFields);
 
-    $this->assign('highlightedFields', $this->getHighlightedFields());
     $this->_formattedFieldNames[$contactType] = $this->_mapperFields = array_merge($this->_mapperFields, $formattedFieldNames);
-
-    $columnNames = $this->getColumnHeaders();
-
-    $this->_columnCount = $this->getNumberOfColumns();
-    $this->_columnNames = $columnNames;
-    $this->assign('columnNames', $this->getColumnHeaders());
-    $this->assign('columnCount', $this->_columnCount);
-    $this->_dataValues = array_values($this->getDataRows([], 2));
-    $this->assign('dataValues', $this->_dataValues);
+    $this->assignMapFieldVariables();
   }
 
   /**
@@ -505,7 +496,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @throws \CRM_Core_Exception
    */
-  private function getHighlightedFields(): array {
+  protected function getHighlightedFields(): array {
     $entityFields = [
       'Individual' => ['first_name', 'last_name'],
       'Organization' => ['organization_name'],

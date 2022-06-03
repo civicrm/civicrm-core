@@ -67,6 +67,14 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   }
 
   /**
+   * Shared preProcess code.
+   */
+  public function preProcess() {
+    $this->assignMapFieldVariables();
+    parent::preProcess();
+  }
+
+  /**
    * Attempt to match header labels with our mapper fields.
    *
    * @param string $header
