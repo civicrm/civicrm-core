@@ -57,13 +57,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
   protected $_lineCount;
 
   /**
-   * Whether the file has a column header or not
-   *
-   * @var bool
-   */
-  protected $_haveColumnHeader;
-
-  /**
    * Class constructor.
    *
    * @param $mapperKeys
@@ -95,37 +88,10 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
     $mode = self::MODE_PREVIEW,
     $contactType = self::CONTACT_INDIVIDUAL,
     $onDuplicate = self::DUPLICATE_SKIP,
-    $statusID = NULL,
-    $totalRowCount = NULL
+    $statusID = NULL
   ) {
-    if (!is_array($fileName)) {
-      throw new CRM_Core_Exception('Unable to determine import file');
-    }
-    $fileName = $fileName['name'];
-
-    switch ($contactType) {
-      case self::CONTACT_INDIVIDUAL:
-        $this->_contactType = 'Individual';
-        break;
-
-      case self::CONTACT_HOUSEHOLD:
-        $this->_contactType = 'Household';
-        break;
-
-      case self::CONTACT_ORGANIZATION:
-        $this->_contactType = 'Organization';
-    }
-
+    $this->_contactType = $this->getContactType();
     $this->init();
-
-    $this->_haveColumnHeader = $skipColumnHeader;
-
-    $this->_separator = $separator;
-
-    $fd = fopen($fileName, "r");
-    if (!$fd) {
-      return FALSE;
-    }
 
     $this->_lineCount = 0;
     $this->_invalidRowCount = $this->_validCount = 0;
@@ -133,8 +99,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
 
     $this->_errors = [];
     $this->_warnings = [];
-
-    $this->_fileSize = number_format(filesize($fileName) / 1024.0, 2);
 
     if ($mode == self::MODE_MAPFIELD) {
       $this->_rows = [];
@@ -146,31 +110,12 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
       $this->progressImport($statusID);
       $startTimestamp = $currTimestamp = $prevTimestamp = CRM_Utils_Time::time();
     }
-
-    while (!feof($fd)) {
+    $dataSource = $this->getDataSourceObject();
+    $totalRowCount = $dataSource->getRowCount(['new']);
+    $dataSource->setStatuses(['new']);
+    while ($row = $dataSource->getRow()) {
+      $values = array_values($row);
       $this->_lineCount++;
-
-      $values = fgetcsv($fd, 8192, $separator);
-      if (!$values) {
-        continue;
-      }
-
-      self::encloseScrub($values);
-
-      // skip column header if we're not in mapfield mode
-      if ($mode != self::MODE_MAPFIELD && $skipColumnHeader) {
-        $skipColumnHeader = FALSE;
-        continue;
-      }
-
-      /* trim whitespace around the values */
-      $empty = TRUE;
-      foreach ($values as $k => $v) {
-        $values[$k] = trim($v, " \t\r\n");
-      }
-      if (CRM_Utils_System::isNull($values)) {
-        continue;
-      }
 
       $this->_totalCount++;
 
@@ -184,7 +129,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         $returnCode = $this->summary($values);
       }
       elseif ($mode == self::MODE_IMPORT) {
-        $returnCode = $this->import($onDuplicate, $values);
+        $returnCode = $this->import($this->getSubmittedValue('onDuplicate'), $values);
         if ($statusID && (($this->_lineCount % 50) == 0)) {
           $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
         }
@@ -214,18 +159,11 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         $recordNumber = $this->_lineCount;
         array_unshift($values, $recordNumber);
         $this->_duplicates[] = $values;
-        if ($onDuplicate != self::DUPLICATE_SKIP) {
+        if ($this->getSubmittedValue('onDuplicate') != self::DUPLICATE_SKIP) {
           $this->_validCount++;
         }
       }
-
-      // if we are done processing the maxNumber of lines, break
-      if ($this->_maxLinesToProcess > 0 && $this->_validCount >= $this->_maxLinesToProcess) {
-        break;
-      }
     }
-
-    fclose($fd);
 
     if ($mode == self::MODE_PREVIEW || $mode == self::MODE_IMPORT) {
       $customHeaders = $mapper;
@@ -353,9 +291,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    * @return void
    */
   public function set($store, $mode = self::MODE_SUMMARY) {
-    $store->set('fileSize', $this->_fileSize);
     $store->set('lineCount', $this->_lineCount);
-    $store->set('separator', $this->_separator);
 
     $store->set('dataPatterns', $this->getDataPatterns());
     $store->set('columnCount', $this->_activeFieldCount);

@@ -28,39 +28,12 @@ class CRM_Member_Import_Form_Preview extends CRM_Import_Form_Preview {
    */
   public function preProcess() {
     parent::preProcess();
-    //get the data from the session
-    $dataValues = $this->get('dataValues');
-    $mapper = $this->get('mapper');
     $invalidRowCount = $this->get('invalidRowCount');
-
-    //get the mapping name displayed if the mappingId is set
-    $mappingId = $this->get('loadMappingId');
-    if ($mappingId) {
-      $mapDAO = new CRM_Core_DAO_Mapping();
-      $mapDAO->id = $mappingId;
-      $mapDAO->find(TRUE);
-    }
-    $this->assign('savedMappingName', $mappingId ? $mapDAO->name : NULL);
-
     if ($invalidRowCount) {
       $urlParams = 'type=' . CRM_Import_Parser::ERROR . '&parser=CRM_Member_Import_Parser_Membership';
       $this->set('downloadErrorRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
-
-    $properties = [
-      'mapper',
-      'dataValues',
-      'columnCount',
-      'totalRowCount',
-      'validRowCount',
-      'invalidRowCount',
-      'downloadErrorRecordsUrl',
-    ];
     $this->setStatusUrl();
-
-    foreach ($properties as $property) {
-      $this->assign($property, $this->get($property));
-    }
   }
 
   /**
@@ -89,12 +62,11 @@ class CRM_Member_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
     $parser->run($this->getSubmittedValue('uploadFile'), $this->getSubmittedValue('fieldSeparator'),
       $mapperFields,
-      $this->getSubmittedValue('skipColumnHeader'),
+      NULL,
       CRM_Import_Parser::MODE_IMPORT,
-      $this->get('contactType'),
-      $onDuplicate,
-      $this->get('statusID'),
-      $this->get('totalRowCount')
+      NULL,
+      NULL,
+      $this->get('statusID')
     );
 
     // add all the necessary variables to the form

@@ -21,13 +21,6 @@
 class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
-   * store contactType.
-   *
-   * @var int
-   */
-  public static $_contactType = NULL;
-
-  /**
    * Set variables up before form is built.
    *
    * @return void
@@ -35,22 +28,15 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
   public function preProcess() {
     $this->_mapperFields = $this->get('fields');
     asort($this->_mapperFields);
-
-    $this->_columnCount = $this->get('columnCount');
-    $this->assign('columnCount', $this->_columnCount);
-    $this->_dataValues = $this->get('dataValues');
-    $this->assign('dataValues', $this->_dataValues);
+    parent::preProcess();
 
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
     $this->_onDuplicate = $this->get('onDuplicate', $onDuplicate ?? "");
 
     $highlightedFields = [];
-    if ($skipColumnHeader) {
+    if ($this->getSubmittedValue('skipColumnHeader')) {
       $this->assign('skipColumnHeader', $skipColumnHeader);
       $this->assign('rowDisplayCount', 3);
-      /* if we had a column header to skip, stash it for later */
-
-      $this->_columnHeaders = $this->_dataValues[0];
     }
     else {
       $this->assign('rowDisplayCount', 2);
@@ -58,7 +44,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     //CRM-2219 removing other required fields since for updation only
     //membership id is required.
-    if ($this->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
+    if ($this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_UPDATE) {
       $remove = array('membership_contact_id', 'email', 'first_name', 'last_name', 'external_identifier');
       foreach ($remove as $value) {
         unset($this->_mapperFields[$value]);
@@ -85,8 +71,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     // modify field title
     $this->_mapperFields['status_id'] = ts('Membership Status');
     $this->_mapperFields['membership_type_id'] = ts('Membership Type');
-
-    self::$_contactType = $this->get('contactType');
     $this->assign('highlightedFields', $highlightedFields);
   }
 
@@ -141,8 +125,8 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     $defaults = [];
     $mapperKeys = array_keys($this->_mapperFields);
     $hasHeaders = !empty($this->_columnHeaders);
-    $headerPatterns = $this->get('headerPatterns');
-    $dataPatterns = $this->get('dataPatterns');
+    $headerPatterns = $this->getHeaderPatterns();
+    $dataPatterns = $this->getDataPatterns();
 
     /* Initialize all field usages to false */
 
@@ -289,17 +273,10 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       'membership_type_id' => ts('Membership Type'),
       'membership_start_date' => ts('Membership Start Date'),
     );
-
-      $contactTypeId = $self->get('contactType');
-      $contactTypes = array(
-        CRM_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
-        CRM_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
-        CRM_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
-      );
-      $params = array(
-        'used' => 'Unsupervised',
-        'contact_type' => $contactTypes[$contactTypeId],
-      );
+    $params = array(
+      'used' => 'Unsupervised',
+      'contact_type' => $self->getContactType(),
+    );
     list($ruleFields, $threshold) = CRM_Dedupe_BAO_DedupeRuleGroup::dedupeRuleFieldsWeight($params);
       $weightSum = 0;
       foreach ($importKeys as $key => $val) {
@@ -415,7 +392,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     $parser = new CRM_Member_Import_Parser_Membership($mapperKeysMain);
     $parser->setUserJobID($this->getUserJobID());
     $parser->run($this->getSubmittedValue('uploadFile'), $this->getSubmittedValue('fieldSeparator'), $mapper, $this->getSubmittedValue('skipColumnHeader'),
-      CRM_Import_Parser::MODE_PREVIEW, $this->get('contactType')
+      CRM_Import_Parser::MODE_PREVIEW
     );
     // add all the necessary variables to the form
     $parser->set($this);
