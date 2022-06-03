@@ -21,110 +21,20 @@
 class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
-   * Set variables up before form is built.
-   *
-   * @return void
-   */
-  public function preProcess() {
-    $this->_mapperFields = $this->get('fields');
-    asort($this->_mapperFields);
-    parent::preProcess();
-
-    $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
-    $this->_onDuplicate = $this->get('onDuplicate', $onDuplicate ?? "");
-
-    $highlightedFields = [];
-    if ($this->getSubmittedValue('skipColumnHeader')) {
-      $this->assign('skipColumnHeader', $skipColumnHeader);
-      $this->assign('rowDisplayCount', 3);
-    }
-    else {
-      $this->assign('rowDisplayCount', 2);
-    }
-
-    //CRM-2219 removing other required fields since for updation only
-    //membership id is required.
-    if ($this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_UPDATE) {
-      $remove = array('membership_contact_id', 'email', 'first_name', 'last_name', 'external_identifier');
-      foreach ($remove as $value) {
-        unset($this->_mapperFields[$value]);
-      }
-      $highlightedFieldsArray = array('membership_id', 'membership_start_date', 'membership_type_id');
-      foreach ($highlightedFieldsArray as $name) {
-        $highlightedFields[] = $name;
-      }
-    }
-    elseif ($this->_onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
-      unset($this->_mapperFields['membership_id']);
-      $highlightedFieldsArray = array(
-        'membership_contact_id',
-        'email',
-        'external_identifier',
-        'membership_start_date',
-        'membership_type_id',
-      );
-      foreach ($highlightedFieldsArray as $name) {
-        $highlightedFields[] = $name;
-      }
-    }
-
-    // modify field title
-    $this->_mapperFields['status_id'] = ts('Membership Status');
-    $this->_mapperFields['membership_type_id'] = ts('Membership Type');
-    $this->assign('highlightedFields', $highlightedFields);
-  }
-
-  /**
    * Build the form object.
    *
    * @return void
    */
   public function buildQuickForm() {
-    //to save the current mappings
-    if (!$this->get('savedMapping')) {
-      $saveDetailsName = ts('Save this field mapping');
-      $this->applyFilter('saveMappingName', 'trim');
-      $this->add('text', 'saveMappingName', ts('Name'));
-      $this->add('text', 'saveMappingDesc', ts('Description'));
-    }
-    else {
-      $savedMapping = $this->get('savedMapping');
-
-      [$mappingName] = CRM_Core_BAO_Mapping::getMappingFields($savedMapping);
-
-      $mappingName = $mappingName[1];
-
-      //mapping is to be loaded from database
-
-      $this->set('loadedMapping', $savedMapping);
-
-      $getMappingName = new CRM_Core_DAO_Mapping();
-      $getMappingName->id = $savedMapping;
-      $getMappingName->mapping_type = 'Import Memberships';
-      $getMappingName->find();
-      while ($getMappingName->fetch()) {
-        $mapperName = $getMappingName->name;
-      }
-
-      $this->assign('savedMappingName', $mapperName);
-
-      $this->add('hidden', 'mappingId', $savedMapping);
-
-      $this->addElement('checkbox', 'updateMapping', ts('Update this field mapping'), NULL);
-      $saveDetailsName = ts('Save as a new field mapping');
-      $this->add('text', 'saveMappingName', ts('Name'));
-      $this->add('text', 'saveMappingDesc', ts('Description'));
-    }
-
-    $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL, array('onclick' => "showSaveDetails(this)"));
-
+    $this->buildSavedMappingFields($this->getSubmittedValue('savedMapping'));
     $this->addFormRule(array('CRM_Member_Import_Form_MapField', 'formRule'), $this);
 
     //-------- end of saved mapping stuff ---------
 
     $defaults = [];
     $mapperKeys = array_keys($this->_mapperFields);
-    $hasHeaders = !empty($this->_columnHeaders);
+    $columnHeaders = $this->getColumnHeaders();
+    $hasHeaders = $this->getSubmittedValue('skipColumnHeader');
     $headerPatterns = $this->getHeaderPatterns();
     $dataPatterns = $this->getDataPatterns();
 
@@ -135,7 +45,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
     $this->_location_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $sel1 = $this->_mapperFields;
-    if (!$this->get('onDuplicate')) {
+    if (!$this->getSubmittedValue('onDuplicate')) {
       unset($sel1['id']);
       unset($sel1['membership_id']);
     }
@@ -148,7 +58,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     //used to warn for mismatch column count or mismatch mapping
     $warning = 0;
 
-    for ($i = 0; $i < $this->_columnCount; $i++) {
+    foreach ($columnHeaders as $i => $columnHeader) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', array(1 => $i)), NULL);
       $jsSet = FALSE;
       if ($this->get('savedMapping')) {
@@ -179,7 +89,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
           $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_" . $i . "_');\n";
 
           if ($hasHeaders) {
-            $defaults["mapper[$i]"] = array($this->defaultFromHeader($this->_columnHeaders[$i], $headerPatterns));
+            $defaults["mapper[$i]"] = array($this->defaultFromHeader($columnHeader, $headerPatterns));
           }
           else {
             $defaults["mapper[$i]"] = array($this->defaultFromData($dataPatterns, $i));
@@ -192,7 +102,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
         if ($this->getSubmittedValue('skipColumnHeader')) {
           // Infer the default from the skipped headers if we have them
           $defaults["mapper[$i]"] = array(
-            $this->defaultFromHeader($this->_columnHeaders[$i],
+            $this->defaultFromHeader($columnHeader,
               $headerPatterns
             ),
             //                     $defaultLocationType->id
@@ -277,23 +187,23 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       'used' => 'Unsupervised',
       'contact_type' => $self->getContactType(),
     );
-    list($ruleFields, $threshold) = CRM_Dedupe_BAO_DedupeRuleGroup::dedupeRuleFieldsWeight($params);
-      $weightSum = 0;
-      foreach ($importKeys as $key => $val) {
-        if (array_key_exists($val, $ruleFields)) {
-          $weightSum += $ruleFields[$val];
-        }
+    [$ruleFields, $threshold] = CRM_Dedupe_BAO_DedupeRuleGroup::dedupeRuleFieldsWeight($params);
+    $weightSum = 0;
+    foreach ($importKeys as $key => $val) {
+      if (array_key_exists($val, $ruleFields)) {
+        $weightSum += $ruleFields[$val];
       }
-      $fieldMessage = '';
-      foreach ($ruleFields as $field => $weight) {
-        $fieldMessage .= ' ' . $field . '(weight ' . $weight . ')';
-      }
+    }
+    $fieldMessage = '';
+    foreach ($ruleFields as $field => $weight) {
+      $fieldMessage .= ' ' . $field . '(weight ' . $weight . ')';
+    }
 
     foreach ($requiredFields as $field => $title) {
       if (!in_array($field, $importKeys)) {
         if ($field == 'membership_contact_id') {
           if ((($weightSum >= $threshold || in_array('external_identifier', $importKeys)) &&
-              $self->_onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE
+              $self->getSubmittedValue('onDuplicate') != CRM_Import_Parser::DUPLICATE_UPDATE
             ) ||
             in_array('membership_id', $importKeys)
           ) {
@@ -344,58 +254,12 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Process the mapped fields and map it into the uploaded file
-   * preview the file and extract some summary statistics
+   * Get the mapping name per the civicrm_mapping_field.type_id option group.
    *
-   * @return void
+   * @return string
    */
-  public function postProcess() {
-    $params = $this->controller->exportValues('MapField');
-    $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
-    $mapper = [];
-    $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
-    $mapperKeysMain = [];
-
-    for ($i = 0; $i < $this->_columnCount; $i++) {
-      $mapper[$i] = $this->_mapperFields[$mapperKeys[$i][0]];
-      $mapperKeysMain[$i] = $mapperKeys[$i][0];
-    }
-
-    $this->set('mapper', $mapper);
-
-    // store mapping Id to display it in the preview page
-    if (!empty($params['mappingId'])) {
-      $this->set('loadMappingId', $params['mappingId']);
-    }
-    //Updating Mapping Records
-    if (!empty($params['updateMapping'])) {
-      for ($i = 0; $i < $this->_columnCount; $i++) {
-        $this->saveMappingField($params['mappingId'], $i, TRUE);
-      }
-    }
-
-    //Saving Mapping Details and Records
-    if (!empty($params['saveMapping'])) {
-      $mappingParams = array(
-        'name' => $params['saveMappingName'],
-        'description' => $params['saveMappingDesc'],
-        'mapping_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Import Membership'),
-      );
-      $saveMapping = CRM_Core_BAO_Mapping::add($mappingParams);
-
-      for ($i = 0; $i < $this->_columnCount; $i++) {
-        $this->saveMappingField($saveMapping->id, $i);
-      }
-      $this->set('savedMapping', $saveMapping->id);
-    }
-
-    $parser = new CRM_Member_Import_Parser_Membership($mapperKeysMain);
-    $parser->setUserJobID($this->getUserJobID());
-    $parser->run($this->getSubmittedValue('uploadFile'), $this->getSubmittedValue('fieldSeparator'), $mapper, $this->getSubmittedValue('skipColumnHeader'),
-      CRM_Import_Parser::MODE_PREVIEW
-    );
-    // add all the necessary variables to the form
-    $parser->set($this);
+  public function getMappingTypeName(): string {
+    return 'Import Membership';
   }
 
   /**
@@ -408,6 +272,52 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->parser->init();
     }
     return $this->parser;
+  }
+
+  /**
+   * Get the fields to be highlighted in the UI.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getHighlightedFields(): array {
+    $highlightedFields = [];
+    //CRM-2219 removing other required fields since for updation only
+    //membership id is required.
+    if ($this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_UPDATE) {
+      $remove = [
+        'membership_contact_id',
+        'email',
+        'first_name',
+        'last_name',
+        'external_identifier',
+      ];
+      foreach ($remove as $value) {
+        unset($this->_mapperFields[$value]);
+      }
+      $highlightedFieldsArray = [
+        'membership_id',
+        'membership_start_date',
+        'membership_type_id',
+      ];
+      foreach ($highlightedFieldsArray as $name) {
+        $highlightedFields[] = $name;
+      }
+    }
+    elseif ($this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_SKIP) {
+      unset($this->_mapperFields['membership_id']);
+      $highlightedFieldsArray = [
+        'membership_contact_id',
+        'email',
+        'external_identifier',
+        'membership_start_date',
+        'membership_type_id',
+      ];
+      foreach ($highlightedFieldsArray as $name) {
+        $highlightedFields[] = $name;
+      }
+    }
+    return $highlightedFields;
   }
 
 }

@@ -34,6 +34,11 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
 
   /**
+   * @var int
+   */
+  protected $userJobID;
+
+  /**
    * Membership type name used in test function.
    *
    * @var string
@@ -104,6 +109,9 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'civicrm_membership_payment',
       'civicrm_contact',
       'civicrm_email',
+      'civicrm_user_job',
+      'civicrm_queue',
+      'civicrm_queue_item',
     ];
     $this->relationshipTypeDelete($this->_relationshipTypeId);
     $this->membershipTypeDelete(['id' => $this->_membershipTypeID]);
@@ -380,6 +388,74 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $membership = $this->callAPISuccessGetSingle('Membership', []);
     $this->assertEquals('blah', $membership[$this->getCustomFieldName('text')]);
     $this->assertEquals('R', $membership[$this->getCustomFieldName('select_string')]);
+  }
+
+  /**
+   * Test the full form-flow import.
+   */
+  public function testImportCSV() :void {
+    $this->importCSV('memberships.csv', [
+      ['name' => 'membership_contact_id'],
+      ['name' => 'membership_source'],
+      ['name' => 'membership_type_id'],
+      ['name' => 'membership_start_date'],
+      ['name' => 'do_not_import'],
+    ]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('ERROR', $row['_status']);
+    $this->assertEquals('Invalid value for field(s) : Membership Type', $row['_status_message']);
+  }
+
+  /**
+   * Import the csv file values.
+   *
+   * This function uses a flow that mimics the UI flow.
+   *
+   * @param string $csv Name of csv file.
+   * @param array $fieldMappings
+   * @param array $submittedValues
+   */
+  protected function importCSV(string $csv, array $fieldMappings, array $submittedValues = []): void {
+    $submittedValues = array_merge([
+      'uploadFile' => ['name' => __DIR__ . '/data/' . $csv],
+      'skipColumnHeader' => TRUE,
+      'fieldSeparator' => ',',
+      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
+      'dataSource' => 'CRM_Import_DataSource_CSV',
+      'file' => ['name' => $csv],
+      'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
+      'groups' => [],
+    ], $submittedValues);
+    $form = $this->getFormObject('CRM_Member_Import_Form_DataSource', $submittedValues);
+    $form->buildForm();
+    $form->postProcess();
+    $this->userJobID = $form->getUserJobID();
+    $form = $this->getFormObject('CRM_Member_Import_Form_MapField', $submittedValues);
+    $form->setUserJobID($this->userJobID);
+    $form->buildForm();
+    $form->postProcess();
+    /* @var CRM_Member_Import_Form_MapField $form */
+    $form = $this->getFormObject('CRM_Member_Import_Form_Preview', $submittedValues);
+    $form->setUserJobID($this->userJobID);
+    $form->buildForm();
+    $form->postProcess();
+  }
+
+  /**
+   * @param array $mappings
+   *
+   * @return array
+   */
+  protected function getMapperFromFieldMappings(array $mappings): array {
+    $mapper = [];
+    foreach ($mappings as $mapping) {
+      $fieldInput = [$mapping['name']];
+      $mapper[] = $fieldInput;
+    }
+    return $mapper;
   }
 
 }
