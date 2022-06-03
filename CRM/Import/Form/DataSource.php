@@ -63,7 +63,10 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    */
   public function buildQuickForm() {
     $config = CRM_Core_Config::singleton();
-
+    // When we switch to using the DataSource.tpl used by Contact we can remove this in
+    // favour of the one used by Contact - I was trying to consolidate
+    // first & got stuck on https://github.com/civicrm/civicrm-core/pull/23458
+    $this->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_CSV');
     $uploadFileSize = CRM_Utils_Number::formatUnitSize($config->maxFileSize . 'm', TRUE);
 
     //Fetch uploadFileSize from php_ini when $config->maxFileSize is set to "no limit".
