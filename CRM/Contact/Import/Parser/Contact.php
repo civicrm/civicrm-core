@@ -194,77 +194,55 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
 
-      $contactFields = CRM_Contact_DAO_Contact::import();
-
       $params['contact_sub_type'] = $this->getContactSubType() ?: ($params['contact_sub_type'] ?? NULL);
 
       [$formatted, $params] = $this->processContact($params, $formatted, TRUE);
-    }
-    catch (CRM_Core_Exception $e) {
-      $this->setImportStatus($rowNumber, $this->getStatus($e->getErrorCode()), $e->getMessage());
-      return FALSE;
-    }
 
-    // Get contact id to format common data in update/fill mode,
-    // prioritising a dedupe rule check over an external_identifier check, but falling back on ext id.
+      // Get contact id to format common data in update/fill mode,
+      // prioritising a dedupe rule check over an external_identifier check, but falling back on ext id.
 
-    //format common data, CRM-4062
-    $this->formatCommonData($params, $formatted, $contactFields);
+      //format common data, CRM-4062
+      $this->formatCommonData($params, $formatted);
 
-    //fixed CRM-4148
-    //now we create new contact in update/fill mode also.
-    $newContact = $this->createContact($formatted, $params['id'] ?? NULL);
-    $this->createdContacts[$newContact->id] = $contactID = $newContact->id;
+      $newContact = $this->createContact($formatted, $params['id'] ?? NULL);
+      $this->createdContacts[$newContact->id] = $contactID = $newContact->id;
 
-    if ($contactID) {
-      // call import hook
-      $currentImportID = end($values);
+      if ($contactID) {
+        // call import hook
+        $currentImportID = end($values);
 
-      $hookParams = [
-        'contactID' => $contactID,
-        'importID' => $currentImportID,
-        'importTempTable' => $this->_tableName,
-        'fieldHeaders' => $this->_mapperKeys,
-        'fields' => $this->_activeFields,
-      ];
+        $hookParams = [
+          'contactID' => $contactID,
+          'importID' => $currentImportID,
+          'importTempTable' => $this->_tableName,
+          'fieldHeaders' => $this->_mapperKeys,
+          'fields' => $this->_activeFields,
+        ];
 
-      CRM_Utils_Hook::import('Contact', 'process', $this, $hookParams);
-    }
+        CRM_Utils_Hook::import('Contact', 'process', $this, $hookParams);
+      }
 
-    $primaryContactId = $newContact->id;
-
-    if ($primaryContactId) {
+      $primaryContactId = $newContact->id;
 
       //relationship contact insert
       foreach ($this->getRelatedContactsParams($params) as $key => $field) {
         $formatting = $field;
-        try {
-          [$formatting, $field] = $this->processContact($field, $formatting, FALSE);
-        }
-        catch (CRM_Core_Exception $e) {
-          $statuses = [CRM_Import_Parser::DUPLICATE => 'DUPLICATE', CRM_Import_Parser::ERROR => 'ERROR', CRM_Import_Parser::NO_MATCH => 'invalid_no_match'];
-          $this->setImportStatus((int) $values[count($values) - 1], $statuses[$e->getErrorCode()], $e->getMessage());
-          return FALSE;
-        }
-
-        $contactFields = CRM_Contact_DAO_Contact::import();
+        [$formatting, $field] = $this->processContact($field, $formatting, FALSE);
 
         //format common data, CRM-4062
-        $this->formatCommonData($field, $formatting, $contactFields);
+        $this->formatCommonData($field, $formatting);
 
         if (empty($formatting['id']) || $this->isUpdateExistingContacts()) {
-          try {
-            $relatedNewContact = $this->createContact($formatting, $formatting['id']);
-            $relContactId = $relatedNewContact->id;
-            $this->createdContacts[$relContactId] = $relContactId;
-          }
-          catch (CiviCRM_API3_Exception $e) {
-            $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
-            return FALSE;
-          }
+          $relatedNewContact = $this->createContact($formatting, $formatting['id']);
+          $relContactId = $relatedNewContact->id;
+          $this->createdContacts[$relContactId] = $relContactId;
         }
         $this->createRelationship($key, $relContactId, $primaryContactId);
       }
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->setImportStatus($rowNumber, $this->getStatus($e->getErrorCode()), $e->getMessage());
+      return FALSE;
     }
     $this->setImportStatus($rowNumber, $this->getStatus(CRM_Import_Parser::VALID), $this->getSuccessMessage(), $contactID);
     return CRM_Import_Parser::VALID;
