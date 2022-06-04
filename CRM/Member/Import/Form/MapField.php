@@ -61,7 +61,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     foreach ($columnHeaders as $i => $columnHeader) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', array(1 => $i)), NULL);
       $jsSet = FALSE;
-      if ($this->get('savedMapping')) {
+      if ($this->getSubmittedValue('savedMapping')) {
         if (isset($mappingName[$i])) {
           if ($mappingName[$i] != ts('do_not_import')) {
             //When locationType is not set

@@ -254,6 +254,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    * @return void
    */
   public function init() {
+    // Force re-load of user job.
+    unset($this->userJob);
     $this->setFieldMetadata();
 
     $this->_newMemberships = [];
