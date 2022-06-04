@@ -290,7 +290,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
       if ($val) {
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
           if ($customFields[$customFieldID]['data_type'] == 'Date') {
-            CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
+            $this->formatCustomDate($params, $formatted, $dateType, $key);
             unset($params[$key]);
           }
           elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {

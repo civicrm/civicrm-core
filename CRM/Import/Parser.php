@@ -1278,6 +1278,9 @@ abstract class CRM_Import_Parser {
     if ($fieldMetadata['type'] === CRM_Utils_Type::T_FLOAT) {
       return CRM_Utils_Rule::numeric($importedValue) ? $importedValue : 'invalid_import_value';
     }
+    if ($fieldMetadata['type'] === CRM_Utils_Type::T_MONEY) {
+      return CRM_Utils_Rule::money($importedValue, TRUE) ? CRM_Utils_Rule::cleanMoney($importedValue) : 'invalid_import_value';
+    }
     if ($fieldMetadata['type'] === CRM_Utils_Type::T_BOOLEAN) {
       $value = CRM_Utils_String::strtoboolstr($importedValue);
       if ($value !== FALSE) {
@@ -1285,7 +1288,7 @@ abstract class CRM_Import_Parser {
       }
       return 'invalid_import_value';
     }
-    if ($fieldMetadata['type'] === CRM_Utils_Type::T_DATE) {
+    if ($fieldMetadata['type'] === CRM_Utils_Type::T_DATE || $fieldMetadata['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME) || $fieldMetadata['type'] === CRM_Utils_Type::T_TIMESTAMP) {
       $value = CRM_Utils_Date::formatDate($importedValue, $this->getSubmittedValue('dateFormats'));
       return ($value) ?: 'invalid_import_value';
     }
@@ -1740,6 +1743,24 @@ abstract class CRM_Import_Parser {
    */
   protected function setImportStatus(int $id, string $status, string $message, ?int $entityID = NULL): void {
     $this->getDataSourceObject()->updateStatus($id, $status, $message, $entityID);
+  }
+
+  /**
+   * Convert any given date string to default date array.
+   *
+   * @param array $params
+   *   Has given date-format.
+   * @param array $formatted
+   *   Store formatted date in this array.
+   * @param int $dateType
+   *   Type of date.
+   * @param string $dateParam
+   *   Index of params.
+   */
+  public static function formatCustomDate(&$params, &$formatted, $dateType, $dateParam) {
+    //fix for CRM-2687
+    CRM_Utils_Date::convertToDefaultDate($params, $dateType, $dateParam);
+    $formatted[$dateParam] = CRM_Utils_Date::processDate($params[$dateParam]);
   }
 
 }

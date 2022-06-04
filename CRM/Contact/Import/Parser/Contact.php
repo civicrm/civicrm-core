@@ -413,7 +413,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         //we should not update Date to null, CRM-4062
         if ($val && ($customFields[$customFieldID]['data_type'] == 'Date')) {
           //CRM-21267
-          CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
+          $this->formatCustomDate($params, $formatted, $dateType, $key);
         }
         elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
           if (empty($val) && !is_numeric($val) && $this->_onDuplicate == CRM_Import_Parser::DUPLICATE_FILL) {
@@ -1135,24 +1135,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
     }
-  }
-
-  /**
-   * Convert any given date string to default date array.
-   *
-   * @param array $params
-   *   Has given date-format.
-   * @param array $formatted
-   *   Store formatted date in this array.
-   * @param int $dateType
-   *   Type of date.
-   * @param string $dateParam
-   *   Index of params.
-   */
-  public static function formatCustomDate(&$params, &$formatted, $dateType, $dateParam) {
-    //fix for CRM-2687
-    CRM_Utils_Date::convertToDefaultDate($params, $dateType, $dateParam);
-    $formatted[$dateParam] = CRM_Utils_Date::processDate($params[$dateParam]);
   }
 
   /**

@@ -588,10 +588,24 @@ class CRM_Utils_Rule {
 
   /**
    * @param string $value
+   * @param bool $checkSeparatorOrder
+   *   Should the order of the separators be checked. ie if the thousand
+   *   separator is , then it should never be after the decimal separator .
+   *   so 1.300,23 would be invalid in that case. Honestly I'm amazed this
+   *   check wasn't being done but in the interest of caution adding as opt in.
+   *   Note clean money would convert this to 1.30023....
    *
    * @return bool
    */
-  public static function money($value) {
+  public static function money($value, $checkSeparatorOrder = FALSE) {
+    // We can't rely on only one var being passed so can't type-hint to a bool.
+    if ($checkSeparatorOrder === TRUE) {
+      $thousandSeparatorPosition = strpos((string) $value, \Civi::settings()->get('monetaryThousandSeparator'));
+      $decimalSeparatorPosition = strpos((string) $value, \Civi::settings()->get('monetaryDecimalPoint'));
+      if ($thousandSeparatorPosition && $decimalSeparatorPosition && $thousandSeparatorPosition > $decimalSeparatorPosition) {
+        return FALSE;
+      }
+    }
     $value = self::cleanMoney($value);
 
     if (self::integer($value)) {

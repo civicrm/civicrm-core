@@ -668,7 +668,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
           }
           if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
             if ($customFields[$customFieldID]['data_type'] == 'Date') {
-              CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
+              $this->formatCustomDate($params, $formatted, $dateType, $key);
               unset($params[$key]);
             }
             elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {

@@ -247,9 +247,11 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
             0,
           ];
         }
-        if (!empty($mapperKeysValues) && $mapperKeysValues[$i][0] == 'soft_credit') {
-          $js .= "cj('#mapper_" . $i . "_1').val($mapperKeysValues[$i][1]);\n";
-          $js .= "cj('#mapper_" . $i . "_2').val($mapperKeysValues[$i][2]);\n";
+        if (!empty($mapperKeysValues) && ($mapperKeysValues[$i][0] ?? NULL) === 'soft_credit') {
+          $softCreditField = $mapperKeysValues[$i][1];
+          $softCreditTypeID = $mapperKeysValues[$i][2];
+          $js .= "cj('#mapper_" . $i . "_1').val($softCreditField);\n";
+          $js .= "cj('#mapper_" . $i . "_2').val($softCreditTypeID);\n";
         }
       }
       $sel->setOptions([$sel1, $sel2, $sel3, $sel4]);
@@ -453,8 +455,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->getSubmittedValue('fieldSeparator'),
       $mapper,
       $this->getSubmittedValue('skipColumnHeader'),
-      CRM_Import_Parser::MODE_PREVIEW,
-      $this->get('contactType')
+      CRM_Import_Parser::MODE_PREVIEW
     );
 
     // add all the necessary variables to the form
