@@ -49,17 +49,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   const SOFT_CREDIT = 512, SOFT_CREDIT_ERROR = 1024, PLEDGE_PAYMENT = 2048, PLEDGE_PAYMENT_ERROR = 4096;
 
   /**
-   * @var string
-   */
-  protected $_fileName;
-
-  /**
-   * Imported file size
-   * @var int
-   */
-  protected $_fileSize;
-
-  /**
    * Separator being used
    * @var string
    */
@@ -137,7 +126,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @param int $contactType
    * @param int $onDuplicate
    * @param int $statusID
-   * @param int $totalRowCount
    *
    * @return mixed
    * @throws Exception
@@ -150,13 +138,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     $mode = self::MODE_PREVIEW,
     $contactType = self::CONTACT_INDIVIDUAL,
     $onDuplicate = self::DUPLICATE_SKIP,
-    $statusID = NULL,
-    $totalRowCount = NULL
+    $statusID = NULL
   ) {
-    if (!is_array($fileName)) {
-      throw new CRM_Core_Exception('Unable to determine import file');
-    }
-    $fileName = $fileName['name'];
     // Since $this->_contactType is still being called directly do a get call
     // here to make sure it is instantiated.
     $this->getContactType();
@@ -164,13 +147,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     $this->init();
 
     $this->_haveColumnHeader = $skipColumnHeader;
-
-    $this->_separator = $separator;
-
-    $fd = fopen($fileName, "r");
-    if (!$fd) {
-      return FALSE;
-    }
 
     $this->_lineCount = $this->_validSoftCreditRowCount = $this->_validPledgePaymentRowCount = 0;
     $this->_invalidRowCount = $this->_validCount = $this->_invalidSoftCreditRowCount = $this->_invalidPledgePaymentRowCount = 0;
@@ -185,8 +161,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       $startTimestamp = $currTimestamp = $prevTimestamp = time();
     }
 
-    $this->_fileSize = number_format(filesize($fileName) / 1024.0, 2);
-
     if ($mode == self::MODE_MAPFIELD) {
       $this->_rows = [];
     }
@@ -194,32 +168,13 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       $this->_activeFieldCount = count($this->_activeFields);
     }
 
-    while (!feof($fd)) {
+    $dataSource = $this->getDataSourceObject();
+    $totalRowCount = $dataSource->getRowCount(['new']);
+    $dataSource->setStatuses(['new']);
+
+    while ($row = $dataSource->getRow()) {
+      $values = array_values($row);
       $this->_lineCount++;
-
-      $values = fgetcsv($fd, 8192, $separator);
-      if (!$values) {
-        continue;
-      }
-
-      self::encloseScrub($values);
-
-      // skip column header if we're not in mapfield mode
-      if ($mode != self::MODE_MAPFIELD && $skipColumnHeader) {
-        $skipColumnHeader = FALSE;
-        continue;
-      }
-
-      /* trim whitespace around the values */
-
-      $empty = TRUE;
-      foreach ($values as $k => $v) {
-        $values[$k] = trim($v, " \t\r\n");
-      }
-
-      if (CRM_Utils_System::isNull($values)) {
-        continue;
-      }
 
       $this->_totalCount++;
 
@@ -309,14 +264,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           $this->_validCount++;
         }
       }
-
-      // if we are done processing the maxNumber of lines, break
-      if ($this->_maxLinesToProcess > 0 && $this->_validCount >= $this->_maxLinesToProcess) {
-        break;
-      }
     }
-
-    fclose($fd);
 
     if ($mode == self::MODE_PREVIEW || $mode == self::MODE_IMPORT) {
       $customHeaders = $mapper;
@@ -432,7 +380,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $params['soft_credit'][$i] = ['soft_credit_type_id' => $mappedField['soft_credit_type_id'], $mappedField['soft_credit_match_field'] => $values[$i]];
       }
       else {
-        $params[$this->getFieldMetadata($mappedField['name'])['name']] = $values[$i];
+        $params[$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
       }
     }
     return $params;
@@ -470,18 +418,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @param int $mode
    */
   public function set($store, $mode = self::MODE_SUMMARY) {
-    $store->set('fileSize', $this->_fileSize);
-    $store->set('lineCount', $this->_lineCount);
-    $store->set('separator', $this->_separator);
-    $store->set('fields', $this->getSelectValues());
-
-    $store->set('headerPatterns', $this->getHeaderPatterns());
-    $store->set('dataPatterns', $this->getDataPatterns());
-    $store->set('columnCount', $this->_activeFieldCount);
-
     $store->set('totalRowCount', $this->_totalCount);
     $store->set('validRowCount', $this->_validCount);
     $store->set('invalidRowCount', $this->_invalidRowCount);
+
     $store->set('invalidSoftCreditRowCount', $this->_invalidSoftCreditRowCount);
     $store->set('validSoftCreditRowCount', $this->_validSoftCreditRowCount);
     $store->set('invalidPledgePaymentRowCount', $this->_invalidPledgePaymentRowCount);
@@ -692,21 +632,16 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    *   CRM_Import_Parser::VALID or CRM_Import_Parser::ERROR
    */
   public function summary(&$values) {
+    $rowNumber = (int) ($values[array_key_last($values)]);
     $params = $this->getMappedRow($values);
-
-    //for date-Formats
-    $errorMessage = implode('; ', $this->formatDateFields($params));
-    //date-Format part ends
-
+    $errorMessage = implode(';', $this->getInvalidValues($params));
     $params['contact_type'] = 'Contribution';
-
-    //checking error in custom data
-    $this->isErrorInCustomData($params, $errorMessage);
 
     if ($errorMessage) {
       $tempMsg = "Invalid value for field(s) : $errorMessage";
       array_unshift($values, $tempMsg);
       $errorMessage = NULL;
+      $this->setImportStatus($rowNumber, 'ERROR', $tempMsg);
       return CRM_Import_Parser::ERROR;
     }
 
@@ -732,6 +667,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    *   - CRM_Import_Parser::PLEDGE_PAYMENT (successful creation)
    */
   public function import($onDuplicate, &$values) {
+    $rowNumber = (int) ($values[array_key_last($values)]);
     // first make sure this is a valid line
     $response = $this->summary($values);
     if ($response != CRM_Import_Parser::VALID) {
@@ -739,7 +675,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     }
 
     $params = $this->getMappedRow($values);
-    $formatted = ['version' => 3, 'skipRecentView' => TRUE, 'skipCleanMoney' => FALSE, 'contribution_id' => $params['id'] ?? NULL];
+    $formatted = array_merge(['version' => 3, 'skipRecentView' => TRUE, 'skipCleanMoney' => FALSE, 'contribution_id' => $params['id'] ?? NULL], $params);
     //CRM-10994
     if (isset($params['total_amount']) && $params['total_amount'] == 0) {
       $params['total_amount'] = '0.00';
@@ -779,6 +715,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     catch (CRM_Core_Exception $e) {
       array_unshift($values, $e->getMessage());
       $errorMapping = ['soft_credit' => self::SOFT_CREDIT_ERROR, 'pledge_payment' => self::PLEDGE_PAYMENT_ERROR];
+      $this->setImportStatus($rowNumber, $errorMapping[$e->getErrorCode()] ?? CRM_Import_Parser::ERROR, $e->getMessage());
       return $errorMapping[$e->getErrorCode()] ?? CRM_Import_Parser::ERROR;
     }
 
@@ -790,6 +727,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       if (CRM_Utils_Array::value('error_data', $formatError) == 'pledge_payment') {
         return self::PLEDGE_PAYMENT_ERROR;
       }
+      $this->setImportStatus($rowNumber, 'ERROR', '');
       return CRM_Import_Parser::ERROR;
     }
 
@@ -873,6 +811,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         }
         $errorMsg = implode(' AND ', $errorMsg);
         array_unshift($values, 'Matching Contribution record not found for ' . $errorMsg . '. Row was skipped.');
+        $this->setImportStatus($rowNumber, 'ERROR', 'Matching Contribution record not found for ' . $errorMsg . '. Row was skipped.');
         return CRM_Import_Parser::ERROR;
       }
     }
@@ -885,6 +824,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $matchedIDs = explode(',', $error['error_message']['params'][0]);
         if (count($matchedIDs) > 1) {
           array_unshift($values, 'Multiple matching contact records detected for this row. The contribution was not imported');
+          $this->setImportStatus($rowNumber, 'ERROR', 'Multiple matching contact records detected for this row. The contribution was not imported');
           return CRM_Import_Parser::ERROR;
         }
         $cid = $matchedIDs[0];
@@ -895,11 +835,13 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           if (is_array($newContribution['error_message'])) {
             array_unshift($values, $newContribution['error_message']['message']);
             if ($newContribution['error_message']['params'][0]) {
+              $this->setImportStatus($rowNumber, 'DUPLICATE', $newContribution['error_message']['message']);
               return CRM_Import_Parser::DUPLICATE;
             }
           }
           else {
             array_unshift($values, $newContribution['error_message']);
+            $this->setImportStatus($rowNumber, 'ERROR', $newContribution['error_message']);
             return CRM_Import_Parser::ERROR;
           }
         }
@@ -943,8 +885,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           $disp = $params['external_identifier'];
         }
       }
-
-      array_unshift($values, 'No matching Contact found for (' . $disp . ')');
+      $errorMessage = 'No matching Contact found for (' . $disp . ')';
+      $this->setImportStatus($rowNumber, 'ERROR', $errorMessage);
+      array_unshift($values, $errorMessage);
       return CRM_Import_Parser::ERROR;
     }
 
@@ -953,7 +896,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       $checkCid->external_identifier = $paramValues['external_identifier'];
       $checkCid->find(TRUE);
       if ($checkCid->id != $formatted['contact_id']) {
-        array_unshift($values, 'Mismatch of External ID:' . $paramValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id']);
+        $errorMessage = 'Mismatch of External ID:' . $paramValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id'];
+        array_unshift($values, $errorMessage);
+        $this->setImportStatus($rowNumber, 'ERROR', $errorMessage);
         return CRM_Import_Parser::ERROR;
       }
     }
@@ -962,11 +907,13 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       if (is_array($newContribution['error_message'])) {
         array_unshift($values, $newContribution['error_message']['message']);
         if ($newContribution['error_message']['params'][0]) {
+          $this->setImportStatus($rowNumber, 'DUPLICATE', '');
           return CRM_Import_Parser::DUPLICATE;
         }
       }
       else {
         array_unshift($values, $newContribution['error_message']);
+        $this->setImportStatus($rowNumber, 'ERROR', $newContribution['error_message']);
         return CRM_Import_Parser::ERROR;
       }
     }
@@ -1141,41 +1088,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     require_once 'CRM/Utils/DeprecatedUtils.php';
     // copy all the contribution fields as is
     require_once 'api/v3/utils.php';
-    $fields = CRM_Core_DAO::getExportableFieldsWithPseudoConstants('CRM_Contribute_BAO_Contribution');
-
-    _civicrm_api3_store_values($fields, $params, $values);
-
-    $customFields = CRM_Core_BAO_CustomField::getFields('Contribution', FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE);
 
     foreach ($params as $key => $value) {
       // ignore empty values or empty arrays etc
       if (CRM_Utils_System::isNull($value)) {
-        continue;
-      }
-
-      // Handling Custom Data
-      if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-        $values[$key] = $value;
-        $type = $customFields[$customFieldID]['html_type'];
-        if (CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID])) {
-          $values[$key] = self::unserializeCustomValue($customFieldID, $value, $type);
-        }
-        elseif ($type == 'Select' || $type == 'Radio' ||
-          ($type == 'Autocomplete-Select' &&
-            $customFields[$customFieldID]['data_type'] == 'String'
-          )
-        ) {
-          $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
-          foreach ($customOption as $customFldID => $customValue) {
-            $val = $customValue['value'] ?? NULL;
-            $label = $customValue['label'] ?? NULL;
-            $label = strtolower($label);
-            $value = strtolower(trim($value));
-            if (($value == $label) || ($value == strtolower($val))) {
-              $values[$key] = $val;
-            }
-          }
-        }
         continue;
       }
 
@@ -1264,15 +1180,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
             if ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
               return civicrm_api3_create_error("Empty Contribution and Invoice and Transaction ID. Row was skipped.");
             }
-          }
-          break;
-
-        case 'receive_date':
-        case 'cancel_date':
-        case 'receipt_date':
-        case 'thankyou_date':
-          if (!CRM_Utils_Rule::dateTime($value)) {
-            return civicrm_api3_create_error("$key not a valid date: $value");
           }
           break;
 
@@ -1420,20 +1327,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           $values['contribution_campaign_id'] = $params['contribution_campaign_id'];
           break;
 
-        default:
-          // Hande name or label for fields with options.
-          if (isset($fields[$key]) &&
-            // Yay - just for a surprise we are inconsistent on whether we pass the pseudofield (payment_instrument)
-            // or the field name (contribution_status_id)
-            // @todo - payment_instrument is goneburger - now payment_instrument_id - how
-            // can we simplify.
-            (!empty($fields[$key]['is_pseudofield_for']) || !empty($fields[$key]['pseudoconstant']))
-          ) {
-            $realField = $fields[$key]['is_pseudofield_for'] ?? $key;
-            $realFieldSpec = $fields[$realField];
-            $values[$key] = $this->parsePseudoConstantField($value, $realFieldSpec);
-          }
-          break;
       }
     }
 
@@ -1509,7 +1402,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     $lookupField = !empty($params['contact_id']) ? 'contact_id' : (!empty($params['external_identifier']) ? 'external_identifier' : 'email');
     if (empty($params['email'])) {
       $contact = Contact::get(FALSE)->addSelect('id')
-        ->addWhere($lookupField, '=', $params[$lookupField])
+        ->addWhere($lookupField === 'contact_id' ? 'id' : $lookupField, '=', $params[$lookupField])
         ->execute();
       if (count($contact) !== 1) {
         throw new CRM_Core_Exception(ts("Soft Credit %1 - %2 doesn't exist. Row was skipped.",
@@ -1560,6 +1453,21 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     }
 
     return implode(' - ', $title);
+  }
+
+  /**
+   * Get the metadata field for which importable fields does not key the actual field name.
+   *
+   * @return string[]
+   */
+  protected function getOddlyMappedMetadataFields(): array {
+    $uniqueNames = ['contribution_id', 'contribution_contact_id', 'contribution_cancel_date', 'contribution_source', 'contribution_check_number'];
+    $fields = [];
+    foreach ($uniqueNames as $name) {
+      $fields[$this->importableFieldsMetadata[$name]['name']] = $name;
+    }
+    // Include the parent fields as they could be present if required for matching ...in theory.
+    return array_merge($fields, parent::getOddlyMappedMetadataFields());
   }
 
 }

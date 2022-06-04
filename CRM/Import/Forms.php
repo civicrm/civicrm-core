@@ -137,7 +137,10 @@ class CRM_Import_Forms extends CRM_Core_Form {
     if ($fieldName === 'dataSource') {
       // Hard-coded handling for DataSource as it affects the contents of
       // getSubmittableFields and can cause a loop.
-      return $this->controller->exportValue('DataSource', 'dataSource');
+      // Note that the non-contact imports are not currently sharing the DataSource.tpl
+      // that adds the CSV/SQL options & hence fall back on this hidden field.
+      // - todo - switch to the same DataSource.tpl for all.
+      return $this->controller->exportValue('DataSource', 'dataSource') ?? $this->controller->exportValue('DataSource', 'hidden_dataSource');
     }
     $mappedValues = $this->getSubmittableFields();
     if (array_key_exists($fieldName, $mappedValues)) {
