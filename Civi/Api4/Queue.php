@@ -34,6 +34,7 @@ class Queue extends \Civi\Api4\Generic\DAOEntity {
     return [
       'meta' => ['access CiviCRM'],
       'default' => ['administer queues'],
+      'get' => ['access CiviCRM'],
       'runItem' => [\CRM_Core_Permission::ALWAYS_DENY_PERMISSION],
     ];
   }
