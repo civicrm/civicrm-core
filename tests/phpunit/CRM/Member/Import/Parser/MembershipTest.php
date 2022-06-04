@@ -70,6 +70,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $this->_relationshipTypeId = $this->relationshipTypeCreate($params);
     $this->_orgContactID = $this->organizationCreate();
     $this->_financialTypeId = 1;
+    $this->restoreMembershipTypes();
     $this->_membershipTypeName = 'Mickey Mouse Club Member';
     $params = [
       'name' => $this->_membershipTypeName,
@@ -91,8 +92,6 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $this->_membershipTypeID = $membershipType->id;
 
     $this->_mebershipStatusID = $this->membershipStatusCreate('test status');
-    $session = CRM_Core_Session::singleton();
-    $session->set('dateTypes', 1);
   }
 
   /**
@@ -408,6 +407,24 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the full form-flow import.
+   */
+  public function testImportTSV() :void {
+    $this->individualCreate(['email' => 'member@example.com']);
+    $this->importCSV('memberships_valid.tsv', [
+      ['name' => 'email'],
+      ['name' => 'membership_source'],
+      ['name' => 'membership_type_id'],
+      ['name' => 'membership_start_date'],
+      ['name' => 'do_not_import'],
+    ], ['fieldSeparator' => 'tab']);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status']);
+    $this->callAPISuccessGetSingle('Membership', []);
+  }
+
+  /**
    * Import the csv file values.
    *
    * This function uses a flow that mimics the UI flow.
@@ -430,8 +447,12 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'groups' => [],
     ], $submittedValues);
     $form = $this->getFormObject('CRM_Member_Import_Form_DataSource', $submittedValues);
+    $values = $_SESSION['_' . $form->controller->_name . '_container']['values'];
     $form->buildForm();
     $form->postProcess();
+    // This gets reset in DataSource so re-do....
+    $_SESSION['_' . $form->controller->_name . '_container']['values'] = $values;
+
     $this->userJobID = $form->getUserJobID();
     $form = $this->getFormObject('CRM_Member_Import_Form_MapField', $submittedValues);
     $form->setUserJobID($this->userJobID);
