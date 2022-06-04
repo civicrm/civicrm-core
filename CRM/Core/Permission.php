@@ -1052,6 +1052,11 @@ class CRM_Core_Permission {
         'edit all contacts',
       ],
     ];
+    // Readonly relationship_cache table
+    $permissions['relationship_cache'] = [
+      // get is managed by BAO::addSelectWhereClause
+      'get' => [],
+    ];
 
     // CRM-17741 - Permissions for RelationshipType.
     $permissions['relationship_type'] = [
