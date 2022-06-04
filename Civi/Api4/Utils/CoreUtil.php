@@ -13,6 +13,7 @@
 namespace Civi\Api4\Utils;
 
 use Civi\API\Exception\NotImplementedException;
+use Civi\API\Exception\UnauthorizedException;
 use Civi\API\Request;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
@@ -212,10 +213,16 @@ class CoreUtil {
    */
   public static function checkAccessDelegated(string $entityName, string $actionName, array $record, int $userID) {
     $apiRequest = Request::create($entityName, $actionName, ['version' => 4]);
-    // TODO: Should probably emit civi.api.authorize for checking guardian permission; but in APIv4 with std cfg, this is de-facto equivalent.
-    if (!$apiRequest->isAuthorized()) {
+    // First check gatekeeper permissions via the kernel
+    $kernel = \Civi::service('civi_api_kernel');
+    try {
+      [$actionObjectProvider] = $kernel->resolve($apiRequest);
+      $kernel->authorize($actionObjectProvider, $apiRequest);
+    }
+    catch (UnauthorizedException $e) {
       return FALSE;
     }
+    // Gatekeeper permission check passed, now check fine-grained permission
     return static::checkAccessRecord($apiRequest, $record, $userID);
   }
 
