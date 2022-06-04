@@ -187,13 +187,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     try {
       $params = $this->getMappedRow($values);
-      // it is questionable whether we need to do validate here
-      // - normally it has already been done in the form flow
-      // and generally only lines that passed that will
-      // get to the import function. It might be that it
-      // is really only here cos it used to be combined with getMappedRow
-      $this->validateParams($params);
-
       $formatted = [];
       foreach ($params as $key => $value) {
         if ($value !== '') {
