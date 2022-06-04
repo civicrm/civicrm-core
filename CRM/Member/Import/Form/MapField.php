@@ -38,11 +38,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     $headerPatterns = $this->getHeaderPatterns();
     $dataPatterns = $this->getDataPatterns();
 
-    /* Initialize all field usages to false */
-
-    foreach ($mapperKeys as $key) {
-      $this->_fieldUsed[$key] = FALSE;
-    }
     $this->_location_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $sel1 = $this->_mapperFields;
     if (!$this->getSubmittedValue('onDuplicate')) {
