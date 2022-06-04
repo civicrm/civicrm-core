@@ -25,6 +25,15 @@ class CRM_Event_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   const IMPORT_ENTITY = 'Participant';
 
   /**
+   * Get the name of the type to be stored in civicrm_user_job.type_id.
+   *
+   * @return string
+   */
+  public function getUserJobType(): string {
+    return 'participant_import';
+  }
+
+  /**
    * Build the form object.
    *
    * @return void
