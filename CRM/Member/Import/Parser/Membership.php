@@ -316,36 +316,9 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         $params['join_date'] = $params['start_date'];
       }
 
-      $session = CRM_Core_Session::singleton();
-      $dateType = CRM_Core_Session::singleton()->get('dateTypes');
       $formatted = $params;
-
-      $customDataType = !empty($params['contact_type']) ? $params['contact_type'] : 'Membership';
-      $customFields = CRM_Core_BAO_CustomField::getFields($customDataType);
-
       // don't add to recent items, CRM-4399
       $formatted['skipRecentView'] = TRUE;
-      foreach ($params as $key => $val) {
-        if ($val) {
-          switch ($key) {
-            case 'status_id':
-              // @todo - we can do this based on the presence of 'pseudoconstant' in the metadata rather than field specific.
-              $params[$key] = $this->parsePseudoConstantField($val, $this->fieldMetadata[$key]);
-              break;
-
-          }
-          if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-            if ($customFields[$customFieldID]['data_type'] == 'Date') {
-              $this->formatCustomDate($params, $formatted, $dateType, $key);
-              unset($params[$key]);
-            }
-            elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
-              $params[$key] = CRM_Utils_String::strtoboolstr($val);
-            }
-          }
-        }
-      }
-      //date-Format part ends
 
       $formatValues = [];
       foreach ($params as $key => $field) {
@@ -371,7 +344,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         //fix for CRM-2219 Update Membership
         // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
         if (!empty($formatted['is_override']) && empty($formatted['status_id'])) {
-          array_unshift($values, 'Required parameter missing: Status');
           $this->setImportStatus($rowNumber, 'ERROR', 'Required parameter missing: Status');
           return CRM_Import_Parser::ERROR;
         }
@@ -409,17 +381,16 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
       }
 
       //Format dates
-      $startDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('start_date', $formatted), '%Y-%m-%d');
-      $endDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('end_date', $formatted), '%Y-%m-%d');
-      $joinDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('join_date', $formatted), '%Y-%m-%d');
+      $startDate = $formatted['start_date'];
+      $endDate = $formatted['end_date'] ?? NULL;
+      $joinDate = $formatted['join_date'];
 
-      if (empty($formatValues['contact_id'])) {
+      if (empty($formatValues['id']) && empty($formatValues['contact_id'])) {
         $error = $this->checkContactDuplicate($formatValues);
 
         if (CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
           $matchedIDs = explode(',', $error['error_message']['params'][0]);
           if (count($matchedIDs) > 1) {
-            array_unshift($values, 'Multiple matching contact records detected for this row. The membership was not imported');
             $this->setImportStatus($rowNumber, 'ERROR', 'Multiple matching contact records detected for this row. The membership was not imported');
             return CRM_Import_Parser::ERROR;
           }
@@ -511,7 +482,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
           $checkCid->external_identifier = $formatValues['external_identifier'];
           $checkCid->find(TRUE);
           if ($checkCid->id != $formatted['contact_id']) {
-            array_unshift($values, 'Mismatch of External ID:' . $formatValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id']);
             $this->setImportStatus($rowNumber, 'ERROR', 'Mismatch of External ID:' . $formatValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id']);
             return CRM_Import_Parser::ERROR;
           }
@@ -545,7 +515,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         }
         elseif (empty($formatted['is_override'])) {
           if (empty($calcStatus)) {
-            array_unshift($values, 'Status in import row (' . CRM_Utils_Array::value('status_id', $formatValues) . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.');
             $this->setImportStatus($rowNumber, 'ERROR', 'Status in import row (' . CRM_Utils_Array::value('status_id', $formatValues) . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.');
             return CRM_Import_Parser::ERROR;
           }
@@ -635,15 +604,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
 
     foreach ($params as $key => $value) {
 
-      //Handling Custom Data
-      if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-        $values[$key] = $value;
-        $type = $customFields[$customFieldID]['html_type'];
-        if (CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID])) {
-          $values[$key] = self::unserializeCustomValue($customFieldID, $value, $type);
-        }
-      }
-
       switch ($key) {
         case 'contact_id':
           if (!CRM_Utils_Rule::integer($value)) {
@@ -656,13 +616,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
           );
           if (!$svq) {
             throw new Exception("Invalid Contact ID: There is no contact record with contact_id = $value.");
-          }
-          $values[$key] = $value;
-          break;
-
-        case 'membership_type_id':
-          if (!array_key_exists($value, CRM_Member_PseudoConstant::membershipType())) {
-            throw new Exception('Invalid Membership Type Id');
           }
           $values[$key] = $value;
           break;

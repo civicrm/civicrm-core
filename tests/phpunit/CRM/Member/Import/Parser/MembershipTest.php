@@ -50,7 +50,9 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    *
    * @var string
    */
-  protected $_membershipTypeID = NULL;
+  protected $_membershipTypeID;
+
+  protected $entity = 'Membership';
 
   /**
    * Set up for test.
@@ -393,7 +395,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    * Test the full form-flow import.
    */
   public function testImportCSV() :void {
-    $this->importCSV('memberships.csv', [
+    $this->importCSV('memberships_invalid.csv', [
       ['name' => 'membership_contact_id'],
       ['name' => 'membership_source'],
       ['name' => 'membership_type_id'],
@@ -422,6 +424,30 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $row = $dataSource->getRow();
     $this->assertEquals('IMPORTED', $row['_status']);
     $this->callAPISuccessGetSingle('Membership', []);
+  }
+
+  /**
+   * Test dates are parsed.
+   */
+  public function testUpdateWithCustomDates(): void {
+    $this->createCustomGroupWithFieldOfType([], 'date');
+    $contactID = $this->individualCreate(['external_identifier' => 'ext-1']);
+    $this->callAPISuccess('Membership', 'create', [
+      'contact_id' => $contactID,
+      'membership_type_id' => 'General',
+      'start_date' => '2020-10-01',
+    ]);
+    $mapping = [
+      ['name' => 'membership_id'],
+      ['name' => 'membership_source'],
+      ['name' => 'membership_type_id'],
+      ['name' => 'membership_start_date'],
+      ['name' => $this->getCustomFieldName('date')],
+    ];
+    $this->importCSV('memberships_update_custom_date.csv', $mapping, ['dateFormats' => 32]);
+    $membership = $this->callAPISuccessGetSingle('Membership', []);
+    $this->assertEquals('2021-03-23', $membership['start_date']);
+    $this->assertEquals('2019-03-23 00:00:00', $membership[$this->getCustomFieldName('date')]);
   }
 
   /**
