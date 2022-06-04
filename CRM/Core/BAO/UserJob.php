@@ -32,7 +32,11 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob {
    * @inheritDoc
    */
   public function addSelectWhereClause(): array {
-    $clauses['created_id'] = '= ' . (int) CRM_Core_Session::getLoggedInContactID();
+    $clauses = [];
+    if (!\CRM_Core_Permission::check('administer queues')) {
+      $clauses['created_id'] = '= ' . (int) CRM_Core_Session::getLoggedInContactID();
+    }
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
     return $clauses;
   }
 
