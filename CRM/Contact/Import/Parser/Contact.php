@@ -86,6 +86,18 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
+   * Get the fields to track the import.
+   *
+   * @return array
+   */
+  public function getTrackingFields(): array {
+    return [
+      'related_contact_created' => 'INT COMMENT "Number of related contacts created"',
+      'related_contact_matched' => 'INT COMMENT "Number of related contacts found (& potentially updated)"',
+    ];
+  }
+
+  /**
    * Is street address parsing enabled for the site.
    */
   protected function isParseStreetAddress() : bool {
@@ -172,7 +184,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @return bool
    *   the result of this processing
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    * @throws \API_Exception
    */
@@ -194,23 +205,17 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
 
-      $params['contact_sub_type'] = $this->getContactSubType() ?: ($params['contact_sub_type'] ?? NULL);
-
       [$formatted, $params] = $this->processContact($params, $formatted, TRUE);
-
-      // Get contact id to format common data in update/fill mode,
-      // prioritising a dedupe rule check over an external_identifier check, but falling back on ext id.
 
       //format common data, CRM-4062
       $this->formatCommonData($params, $formatted);
 
       $newContact = $this->createContact($formatted, $params['id'] ?? NULL);
-      $this->createdContacts[$newContact->id] = $contactID = $newContact->id;
+      $contactID = $newContact->id;
 
       if ($contactID) {
         // call import hook
         $currentImportID = end($values);
-
         $hookParams = [
           'contactID' => $contactID,
           'importID' => $currentImportID,
@@ -218,7 +223,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           'fieldHeaders' => $this->_mapperKeys,
           'fields' => $this->_activeFields,
         ];
-
         CRM_Utils_Hook::import('Contact', 'process', $this, $hookParams);
       }
 
@@ -234,17 +238,35 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
         if (empty($formatting['id']) || $this->isUpdateExistingContacts()) {
           $relatedNewContact = $this->createContact($formatting, $formatting['id']);
-          $relContactId = $relatedNewContact->id;
-          $this->createdContacts[$relContactId] = $relContactId;
+          $formatting['id'] = $relatedNewContact->id;
         }
-        $this->createRelationship($key, $relContactId, $primaryContactId);
+        if (empty($relatedContacts[$formatting['id']])) {
+          $relatedContacts[$formatting['id']] = 'new';
+        }
+
+        $this->createRelationship($key, $formatting['id'], $primaryContactId);
       }
     }
     catch (CRM_Core_Exception $e) {
       $this->setImportStatus($rowNumber, $this->getStatus($e->getErrorCode()), $e->getMessage());
       return FALSE;
     }
-    $this->setImportStatus($rowNumber, $this->getStatus(CRM_Import_Parser::VALID), $this->getSuccessMessage(), $contactID);
+    // We can probably stop catching this once https://github.com/civicrm/civicrm-core/pull/23471
+    // is merged - testImportParserWithExternalIdForRelationship will confirm....
+    catch (CiviCRM_API3_Exception $e) {
+      $this->setImportStatus($rowNumber, $this->getStatus($e->getErrorCode()), $e->getMessage());
+      return FALSE;
+    }
+    $extraFields = ['related_contact_created' => 0, 'related_contact_matched' => 0];
+    foreach ($relatedContacts as $key => $outcome) {
+      if ($outcome === 'new') {
+        $extraFields['related_contact_created']++;
+      }
+      else {
+        $extraFields['related_contact_matched']++;
+      }
+    }
+    $this->setImportStatus($rowNumber, $this->getStatus(CRM_Import_Parser::VALID), $this->getSuccessMessage(), $contactID, $extraFields);
     return CRM_Import_Parser::VALID;
   }
 
@@ -497,15 +519,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
     }
-  }
-
-  /**
-   * Get the array of successfully imported contact id's
-   *
-   * @return array
-   */
-  public function getImportedContacts() {
-    return $this->createdContacts;
   }
 
   /**
@@ -1878,7 +1891,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   protected function processContact(array $params, array $formatted, bool $isMainContact): array {
     $params['id'] = $formatted['id'] = $this->lookupContactID($params, $isMainContact);
-    if ($params['id'] && $params['contact_sub_type']) {
+    if ($params['id'] && !empty($params['contact_sub_type'])) {
       $contactSubType = Contact::get(FALSE)
         ->addWhere('id', '=', $params['id'])
         ->addSelect('contact_sub_type')

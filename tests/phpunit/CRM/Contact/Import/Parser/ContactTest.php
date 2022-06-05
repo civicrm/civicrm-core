@@ -50,6 +50,13 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   private $relationships = [];
 
   /**
+   * User Job ID.
+   *
+   * @var int
+   */
+  private $userJobID;
+
+  /**
    * Tear down after test.
    */
   public function tearDown(): void {
@@ -1125,7 +1132,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    */
   public function testImportCountryStateCounty(): void {
     $childKey = $this->getRelationships()['Child of']['id'] . '_a_b';
-    // @todo - rows that don't work yet are set to do_not_import.
     $addressCustomGroupID = $this->createCustomGroup(['extends' => 'Address', 'name' => 'Address']);
     $contactCustomGroupID = $this->createCustomGroup(['extends' => 'Contact', 'name' => 'Contact']);
     $addressCustomFieldID = $this->createCountryCustomField(['custom_group_id' => $addressCustomGroupID])['id'];
@@ -1175,6 +1181,11 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       $this->assertEquals(1640, $contact['address'][0]['state_province_id']);
     }
     $this->assertCount(2, $contacts);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $dataSource->setOffset(4);
+    $dataSource->setLimit(1);
+    $row = $dataSource->getRow();
+    $this->assertEquals(1, $row['_related_contact_matched']);
   }
 
   /**
@@ -1385,7 +1396,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @throw \Exception
    */
-  public function testImportFill() {
+  public function testImportFill(): void {
     // Create a custom field group for testing.
     $this->createCustomGroup([
       'title' => 'importFillGroup',
@@ -1623,13 +1634,14 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
         ];
       }
     }
-    $userJobID = $this->getUserJobID(['mapper' => $mapper, 'onDuplicate' => $onDuplicateAction, 'dedupe_rule_id' => $ruleGroupId]);
-    $parser = new CRM_Contact_Import_Parser_Contact($fields);
-    $parser->setUserJobID($userJobID);
+    $this->userJobID = $this->getUserJobID(['mapper' => $mapper, 'onDuplicate' => $onDuplicateAction, 'dedupe_rule_id' => $ruleGroupId]);
+    $parser = new CRM_Contact_Import_Parser_Contact();
+    $parser->setUserJobID($this->userJobID);
     $parser->_dedupeRuleGroupID = $ruleGroupId;
     $parser->init();
+
     $result = $parser->import($values);
-    $dataSource = new CRM_Import_DataSource_CSV($userJobID);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     if ($result === FALSE && $expectedResult !== FALSE) {
       // Import is moving away from returning a status - this is a better way to check
       $this->assertGreaterThan(0, $dataSource->getRowCount([$expectedResult]));
@@ -2035,15 +2047,15 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $form = $this->getFormObject('CRM_Contact_Import_Form_DataSource', $submittedValues);
     $form->buildForm();
     $form->postProcess();
-    $userJobID = $form->getUserJobID();
+    $this->userJobID = $form->getUserJobID();
     /* @var CRM_Contact_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Contact_Import_Form_MapField', $submittedValues);
-    $form->setUserJobID($userJobID);
+    $form->setUserJobID($this->userJobID);
     $form->buildForm();
     $form->postProcess();
     /* @var CRM_Contact_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Contact_Import_Form_Preview', $submittedValues);
-    $form->setUserJobID($userJobID);
+    $form->setUserJobID($this->userJobID);
     $form->buildForm();
 
     try {

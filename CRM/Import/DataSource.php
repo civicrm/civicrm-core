@@ -435,19 +435,54 @@ abstract class CRM_Import_DataSource {
    *   could be cases where it still clashes but time didn't tell in this case)
    * 2) the show fields query used to get the column names excluded the
    *   administrative fields, relying on this convention.
-   * 3) we have the capitalisation on _statusMsg - @todo change to _status_message
+   * 3) we have the capitalisation on _statusMsg - @param string $tableName
    *
-   * @param string $tableName
+   * @throws \API_Exception
+   * @todo change to _status_message
    */
   protected function addTrackingFieldsToTable(string $tableName): void {
     CRM_Core_DAO::executeQuery("
      ALTER TABLE $tableName
        ADD COLUMN _entity_id INT,
-       ADD COLUMN _related_entity_ids LONGTEXT,
+       " . $this->getAdditionalTrackingFields() . "
        ADD COLUMN _status VARCHAR(32) DEFAULT 'NEW' NOT NULL,
        ADD COLUMN _status_message TEXT,
        ADD COLUMN _id INT PRIMARY KEY NOT NULL AUTO_INCREMENT"
     );
+  }
+
+  /**
+   * Get any additional import specific tracking fields.
+   *
+   * @throws \API_Exception
+   */
+  private function getAdditionalTrackingFields(): string {
+    $sql = '';
+    $fields = $this->getParser()->getTrackingFields();
+    foreach ($fields as $fieldName => $spec) {
+      $sql .= 'ADD COLUMN  _' . $fieldName . ' ' . $spec . ',';
+    }
+    return $sql;
+  }
+
+  /**
+   * Get the import parser.
+   *
+   * @return CRM_Import_Parser
+   *
+   * @throws \API_Exception
+   */
+  private function getParser() {
+    $parserClass = '';
+    foreach (CRM_Core_BAO_UserJob::getTypes() as $type) {
+      if ($this->getUserJob()['type_id'] === $type['id']) {
+        $parserClass = $type['class'];
+      }
+    }
+    /* @var \CRM_Import_Parser */
+    $parser = new $parserClass();
+    $parser->setUserJobID($this->getUserJobID());
+    return $parser;
   }
 
   /**
@@ -471,22 +506,24 @@ abstract class CRM_Import_DataSource {
    * @param string $message
    * @param int|null $entityID
    *   Optional created entity ID
-   * @param array $relatedEntityIDs
+   * @param array $additionalFields
    *   Optional array e.g ['related_contact' => 4]
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public function updateStatus(int $id, string $status, string $message, ? int $entityID = NULL, array $relatedEntityIDs = []): void {
+  public function updateStatus(int $id, string $status, string $message, ? int $entityID = NULL, array $additionalFields = []): void {
     $sql = 'UPDATE ' . $this->getTableName() . ' SET _status = %1, _status_message = %2 ';
     $params = [1 => [$status, 'String'], 2 => [$message, 'String']];
     if ($entityID) {
       $sql .= ', _entity_id = %3';
       $params[3] = [$entityID, 'Integer'];
     }
-    if ($relatedEntityIDs) {
-      $sql .= ', _related_entities = %4';
-      $params[4] = [json_encode($relatedEntityIDs), 'String'];
+    $nextParam = 4;
+    foreach ($additionalFields as $fieldName => $value) {
+      $sql .= ', _' . $fieldName . ' = %' . $nextParam;
+      $params[$nextParam] = is_numeric($value) ? [$value, 'Int'] : [json_encode($value), 'String'];
+      $nextParam++;
     }
     CRM_Core_DAO::executeQuery($sql . ' WHERE _id = ' . $id, $params);
   }

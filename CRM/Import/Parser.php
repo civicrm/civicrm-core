@@ -110,6 +110,14 @@ abstract class CRM_Import_Parser {
   private $availableCountries;
 
   /**
+   *
+   * @return array
+   */
+  public function getTrackingFields(): array {
+    return [];
+  }
+
+  /**
    * Get User Job.
    *
    * API call to retrieve the userJob row.
@@ -1842,12 +1850,16 @@ abstract class CRM_Import_Parser {
    * @param string $message
    * @param int|null $entityID
    *   Optional created entity ID
+   * @param array $additionalFields
+   *  Additional fields to be tracked
    *
    * @noinspection PhpDocMissingThrowsInspection
    * @noinspection PhpUnhandledExceptionInspection
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  protected function setImportStatus(int $id, string $status, string $message, ?int $entityID = NULL): void {
-    $this->getDataSourceObject()->updateStatus($id, $status, $message, $entityID);
+  protected function setImportStatus(int $id, string $status, string $message, ?int $entityID = NULL, $additionalFields = []): void {
+    $this->getDataSourceObject()->updateStatus($id, $status, $message, $entityID, $additionalFields);
   }
 
   /**
