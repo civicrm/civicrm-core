@@ -21,6 +21,15 @@
 class CRM_Contact_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
   /**
+   * Get the name of the type to be stored in civicrm_user_job.type_id.
+   *
+   * @return string
+   */
+  public function getUserJobType(): string {
+    return 'contact_import';
+  }
+
+  /**
    * Get any smarty elements that may not be present in the form.
    *
    * To make life simpler for smarty we ensure they are set to null

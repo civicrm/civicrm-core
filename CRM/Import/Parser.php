@@ -1656,6 +1656,52 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * Run import.
+   *
+   * @param \CRM_Queue_TaskContext $taskContext
+   *
+   * @param int $userJobID
+   * @param int $limit
+   *
+   * @return bool
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public static function runImport($taskContext, $userJobID, $limit) {
+    $userJob = UserJob::get()->addWhere('id', '=', $userJobID)->addSelect('type_id')->execute()->first();
+    $parserClass = NULL;
+    foreach (CRM_Core_BAO_UserJob::getTypes() as $userJobType) {
+      if ($userJob['type_id'] === $userJobType['id']) {
+        $parserClass = $userJobType['class'];
+      }
+    }
+    $parser = new $parserClass();
+    $parser->setUserJobID($userJobID);
+    // Not sure if we still need to init....
+    $parser->init();
+    $dataSource = $parser->getDataSourceObject();
+    $dataSource->setStatuses(['new']);
+    $dataSource->setLimit($limit);
+
+    while ($row = $dataSource->getRow()) {
+      $values = array_values($row);
+
+      try {
+        $parser->import($parser->getSubmittedValue('onDuplicate'), $values);
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        // When we catch errors here we are not adding to the errors array - mostly
+        // because that will become obsolete once https://github.com/civicrm/civicrm-core/pull/23292
+        // is merged and this will replace it as the main way to handle errors (ie. update the table
+        // and move on).
+        $parser->setImportStatus((int) $values[count($values) - 1], 'ERROR', $e->getMessage());
+      }
+    }
+    $parser->doPostImportActions();
+    return TRUE;
+  }
+
+  /**
    * Check if an error in custom data.
    *
    * @deprecated all of this is duplicated if getTransformedValue is used.

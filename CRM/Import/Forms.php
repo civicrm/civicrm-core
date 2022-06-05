@@ -376,7 +376,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
     $id = UserJob::create(FALSE)
       ->setValues([
         'created_id' => CRM_Core_Session::getLoggedInContactID(),
-        'type_id:name' => 'contact_import',
+        'type_id:name' => $this->getUserJobType(),
         'status_id:name' => 'draft',
         // This suggests the data could be cleaned up after this.
         'expires_date' => '+ 1 week',

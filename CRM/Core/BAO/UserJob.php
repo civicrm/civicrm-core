@@ -86,6 +86,37 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob {
         'id' => 1,
         'name' => 'contact_import',
         'label' => ts('Contact Import'),
+        'class' => 'CRM_Contact_Import_Parser_Contact',
+      ],
+      [
+        'id' => 2,
+        'name' => 'contribution_import',
+        'label' => ts('Contribution Import'),
+        'class' => 'CRM_Contribute_Import_Parser_Contribution',
+      ],
+      [
+        'id' => 3,
+        'name' => 'membership_import',
+        'label' => ts('Membership Import'),
+        'class' => 'CRM_Member_Import_Parser_Membership',
+      ],
+      [
+        'id' => 4,
+        'name' => 'activity_import',
+        'label' => ts('Activity Import'),
+        'class' => 'CRM_Activity_Import_Parser_Activity',
+      ],
+      [
+        'id' => 5,
+        'name' => 'participant_import',
+        'label' => ts('Participant Import'),
+        'class' => 'CRM_Event_Import_Parser_Participant',
+      ],
+      [
+        'id' => 6,
+        'name' => 'custom_field_import',
+        'label' => ts('Multiple Value Custom Field Import'),
+        'class' => 'CRM_Custom_Import_Parser_Api',
       ],
     ];
   }

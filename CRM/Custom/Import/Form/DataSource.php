@@ -25,6 +25,15 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   const IMPORT_ENTITY = 'Multi value custom data';
 
   /**
+   * Get the name of the type to be stored in civicrm_user_job.type_id.
+   *
+   * @return string
+   */
+  public function getUserJobType(): string {
+    return 'custom_field_import';
+  }
+
+  /**
    * Get the import entity (translated).
    *
    * Used for template layer text.
