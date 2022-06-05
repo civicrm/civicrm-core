@@ -6309,15 +6309,13 @@ AND   displayRelType.is_active = 1
   public static function getWildCardedValue($wildcard, $op, $value) {
     if ($wildcard && $op === 'LIKE') {
       if (CRM_Core_Config::singleton()->includeWildCardInName && (substr($value, 0, 1) != '%')) {
-        return "%$value%";
+        $value = "%$value";
       }
-      else {
-        return "$value%";
+      if (substr($value, -1, 1) != '%') {
+        $value = "$value%";
       }
     }
-    else {
-      return "$value";
-    }
+    return "$value";
   }
 
   /**
