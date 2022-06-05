@@ -1129,7 +1129,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         return array_key_last($possibleMatches['values']);
       }
       if (count($possibleMatches['values']) > 1) {
-        throw new CRM_Core_Exception(ts('Record duplicates multiple contacts'));
+        throw new CRM_Core_Exception(ts('Record duplicates multiple contacts: ') . implode(',', array_keys($possibleMatches['values'])), CRM_Import_Parser::ERROR);
+
       }
       return NULL;
     }

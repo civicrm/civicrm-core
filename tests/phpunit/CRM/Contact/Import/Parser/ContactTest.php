@@ -1060,9 +1060,11 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public function testImport($csv, $mapper, $expectedError, $expectedOutcomes = []): void {
+  public function testImport($csv, $mapper, $expectedError, $expectedOutcomes = [], $contactType = NULL): void {
     try {
-      $this->importCSV($csv, $mapper);
+      $this->importCSV($csv, $mapper, [
+        'contactType' => $contactType ?? CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      ]);
     }
     catch (CRM_Core_Exception $e) {
       $this->assertSame($expectedError, $e->getMessage());
@@ -1089,6 +1091,16 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
         'mapper' => [['first_name'], ['last_name'], ['contact_sub_type']],
         'expected_error' => '',
         'expected_outcomes' => [CRM_Import_Parser::ERROR => 1],
+      ],
+      'organization_multiple_duplicates_invalid' => [
+        'csv' => 'organization_multiple_duplicates_invalid.csv',
+        'mapper' => [['organization_name'], ['email']],
+        'expected_error' => '',
+        'expected_outcomes' => [
+          CRM_Import_Parser::VALID => 2,
+          CRM_Import_Parser::ERROR => 1,
+        ],
+        'contact_type' => CRM_Import_Parser::CONTACT_ORGANIZATION,
       ],
     ];
   }
