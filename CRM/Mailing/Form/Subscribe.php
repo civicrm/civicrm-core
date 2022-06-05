@@ -119,10 +119,6 @@ ORDER BY title";
         'name' => ts('Subscribe'),
         'isDefault' => TRUE,
       ],
-      [
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ],
     ]);
   }
 
