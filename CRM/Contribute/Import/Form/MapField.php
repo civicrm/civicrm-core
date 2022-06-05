@@ -73,8 +73,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public function preProcess() {
     parent::preProcess();
-    $this->_mapperFields = $this->getAvailableFields();
-    asort($this->_mapperFields);
 
     $this->_columnCount = $this->get('columnCount');
     $skipColumnHeader = $this->getSubmittedValue('skipColumnHeader');
@@ -181,7 +179,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
       $jsSet = FALSE;
       if ($this->get('savedMapping')) {
-        list($mappingName, $mappingContactType) = CRM_Core_BAO_Mapping::getMappingFields($savedMappingID);
+        [$mappingName, $mappingContactType] = CRM_Core_BAO_Mapping::getMappingFields($savedMappingID);
 
         $mappingName = $mappingName[1];
         $mappingContactType = $mappingContactType[1];
@@ -249,9 +247,11 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
             0,
           ];
         }
-        if (!empty($mapperKeysValues) && $mapperKeysValues[$i][0] == 'soft_credit') {
-          $js .= "cj('#mapper_" . $i . "_1').val($mapperKeysValues[$i][1]);\n";
-          $js .= "cj('#mapper_" . $i . "_2').val($mapperKeysValues[$i][2]);\n";
+        if (!empty($mapperKeysValues) && ($mapperKeysValues[$i][0] ?? NULL) === 'soft_credit') {
+          $softCreditField = $mapperKeysValues[$i][1];
+          $softCreditTypeID = $mapperKeysValues[$i][2];
+          $js .= "cj('#mapper_" . $i . "_1').val($softCreditField);\n";
+          $js .= "cj('#mapper_" . $i . "_2').val($softCreditTypeID);\n";
         }
       }
       $sel->setOptions([$sel1, $sel2, $sel3, $sel4]);
@@ -326,7 +326,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
         'used' => 'Unsupervised',
         'contact_type' => $contactTypes[$contactTypeId] ?? '',
       ];
-      list($ruleFields, $threshold) = CRM_Dedupe_BAO_DedupeRuleGroup::dedupeRuleFieldsWeight($params);
+      [$ruleFields, $threshold] = CRM_Dedupe_BAO_DedupeRuleGroup::dedupeRuleFieldsWeight($params);
       $weightSum = 0;
       foreach ($importKeys as $key => $val) {
         if (array_key_exists($val, $ruleFields)) {
@@ -445,27 +445,8 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     // store mapping Id to display it in the preview page
     $this->set('loadMappingId', CRM_Utils_Array::value('mappingId', $params));
 
-    //Updating Mapping Records
-    if (!empty($params['updateMapping'])) {
-      for ($i = 0; $i < $this->_columnCount; $i++) {
-        $this->saveMappingField($params['mappingId'], $i, TRUE);
-      }
-    }
-
-    //Saving Mapping Details and Records
-    if (!empty($params['saveMapping'])) {
-      $mappingParams = [
-        'name' => $params['saveMappingName'],
-        'description' => $params['saveMappingDesc'],
-        'mapping_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Import Contribution'),
-      ];
-      $saveMapping = CRM_Core_BAO_Mapping::add($mappingParams);
-
-      for ($i = 0; $i < $this->_columnCount; $i++) {
-        $this->saveMappingField($saveMapping->id, $i, FALSE);
-      }
-      $this->set('savedMapping', $saveMapping->id);
-    }
+    $mappingType = 'Import Contribution';
+    $this->saveMapping($mappingType);
 
     $parser = new CRM_Contribute_Import_Parser_Contribution($mapperKeysMain);
     $parser->setUserJobID($this->getUserJobID());
@@ -474,8 +455,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->getSubmittedValue('fieldSeparator'),
       $mapper,
       $this->getSubmittedValue('skipColumnHeader'),
-      CRM_Import_Parser::MODE_PREVIEW,
-      $this->get('contactType')
+      CRM_Import_Parser::MODE_PREVIEW
     );
 
     // add all the necessary variables to the form

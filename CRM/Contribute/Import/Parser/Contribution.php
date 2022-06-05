@@ -111,13 +111,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   protected $_softCreditErrorsFileName;
 
   /**
-   * Whether the file has a column header or not
-   *
-   * @var bool
-   */
-  protected $_haveColumnHeader;
-
-  /**
    * @param string $fileName
    * @param string $separator
    * @param $mapper
@@ -145,8 +138,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     $this->getContactType();
 
     $this->init();
-
-    $this->_haveColumnHeader = $skipColumnHeader;
 
     $this->_lineCount = $this->_validSoftCreditRowCount = $this->_validPledgePaymentRowCount = 0;
     $this->_invalidRowCount = $this->_validCount = $this->_invalidSoftCreditRowCount = $this->_invalidPledgePaymentRowCount = 0;
@@ -225,9 +216,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       if ($returnCode == self::ERROR) {
         $this->_invalidRowCount++;
         $recordNumber = $this->_lineCount;
-        if ($this->_haveColumnHeader) {
-          $recordNumber--;
-        }
         array_unshift($values, $recordNumber);
         $this->_errors[] = $values;
       }
@@ -235,9 +223,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       if ($returnCode == self::PLEDGE_PAYMENT_ERROR) {
         $this->_invalidPledgePaymentRowCount++;
         $recordNumber = $this->_lineCount;
-        if ($this->_haveColumnHeader) {
-          $recordNumber--;
-        }
         array_unshift($values, $recordNumber);
         $this->_pledgePaymentErrors[] = $values;
       }
@@ -245,9 +230,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       if ($returnCode == self::SOFT_CREDIT_ERROR) {
         $this->_invalidSoftCreditRowCount++;
         $recordNumber = $this->_lineCount;
-        if ($this->_haveColumnHeader) {
-          $recordNumber--;
-        }
         array_unshift($values, $recordNumber);
         $this->_softCreditErrors[] = $values;
       }
@@ -255,9 +237,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       if ($returnCode == self::DUPLICATE) {
         $this->_duplicateCount++;
         $recordNumber = $this->_lineCount;
-        if ($this->_haveColumnHeader) {
-          $recordNumber--;
-        }
         array_unshift($values, $recordNumber);
         $this->_duplicates[] = $values;
         if ($onDuplicate != self::DUPLICATE_SKIP) {
@@ -376,6 +355,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   public function getMappedRow(array $values): array {
     $params = [];
     foreach ($this->getFieldMappings() as $i => $mappedField) {
+      if ($mappedField['name'] === 'do_not_import' || $mappedField['name'] === NULL) {
+        continue;
+      }
       if (!empty($mappedField['soft_credit_match_field'])) {
         $params['soft_credit'][$i] = ['soft_credit_type_id' => $mappedField['soft_credit_type_id'], $mappedField['soft_credit_match_field'] => $values[$i]];
       }
@@ -640,7 +622,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     if ($errorMessage) {
       $tempMsg = "Invalid value for field(s) : $errorMessage";
       array_unshift($values, $tempMsg);
-      $errorMessage = NULL;
       $this->setImportStatus($rowNumber, 'ERROR', $tempMsg);
       return CRM_Import_Parser::ERROR;
     }
@@ -675,7 +656,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     }
 
     $params = $this->getMappedRow($values);
-    $formatted = array_merge(['version' => 3, 'skipRecentView' => TRUE, 'skipCleanMoney' => FALSE, 'contribution_id' => $params['id'] ?? NULL], $params);
+    $formatted = array_merge(['version' => 3, 'skipRecentView' => TRUE, 'skipCleanMoney' => TRUE, 'contribution_id' => $params['id'] ?? NULL], $params);
     //CRM-10994
     if (isset($params['total_amount']) && $params['total_amount'] == 0) {
       $params['total_amount'] = '0.00';
@@ -968,61 +949,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   }
 
   /**
-   * Format date fields from input to mysql.
-   *
-   * @param array $params
-   *
-   * @return array
-   *   Error messages, if any.
-   */
-  public function formatDateFields(&$params) {
-    $errorMessage = [];
-    $dateType = CRM_Core_Session::singleton()->get('dateTypes');
-    foreach ($params as $key => $val) {
-      if ($val) {
-        switch ($key) {
-          case 'receive_date':
-            if ($dateValue = CRM_Utils_Date::formatDate($params[$key], $dateType)) {
-              $params[$key] = $dateValue;
-            }
-            else {
-              $errorMessage[] = ts('Receive Date');
-            }
-            break;
-
-          case 'cancel_date':
-            if ($dateValue = CRM_Utils_Date::formatDate($params[$key], $dateType)) {
-              $params[$key] = $dateValue;
-            }
-            else {
-              $errorMessage[] = ts('Cancel Date');
-            }
-            break;
-
-          case 'receipt_date':
-            if ($dateValue = CRM_Utils_Date::formatDate($params[$key], $dateType)) {
-              $params[$key] = $dateValue;
-            }
-            else {
-              $errorMessage[] = ts('Receipt date');
-            }
-            break;
-
-          case 'thankyou_date':
-            if ($dateValue = CRM_Utils_Date::formatDate($params[$key], $dateType)) {
-              $params[$key] = $dateValue;
-            }
-            else {
-              $errorMessage[] = ts('Thankyou Date');
-            }
-            break;
-        }
-      }
-    }
-    return $errorMessage;
-  }
-
-  /**
    * Format input params to suit api handling.
    *
    * Over time all the parts of  deprecatedFormatParams
@@ -1034,36 +960,15 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @param array $formatted
    */
   public function formatInput(&$params, &$formatted = []) {
-    $dateType = CRM_Core_Session::singleton()->get('dateTypes');
-    $customDataType = !empty($params['contact_type']) ? $params['contact_type'] : 'Contribution';
-    $customFields = CRM_Core_BAO_CustomField::getFields($customDataType);
-    // @todo call formatDateFields & move custom data handling there.
-    // Also note error handling for dates is currently in  deprecatedFormatParams
-    // we should use the error handling in formatDateFields.
     foreach ($params as $key => $val) {
       // @todo - call formatDateFields instead.
       if ($val) {
         switch ($key) {
-          case 'receive_date':
-          case 'cancel_date':
-          case 'receipt_date':
-          case 'thankyou_date':
-            $params[$key] = CRM_Utils_Date::formatDate($params[$key], $dateType);
-            break;
 
           case 'pledge_payment':
             $params[$key] = CRM_Utils_String::strtobool($val);
             break;
 
-        }
-        if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-          if ($customFields[$customFieldID]['data_type'] == 'Date') {
-            CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
-            unset($params[$key]);
-          }
-          elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
-            $params[$key] = CRM_Utils_String::strtoboolstr($val);
-          }
         }
       }
     }
@@ -1180,16 +1085,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
             if ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
               return civicrm_api3_create_error("Empty Contribution and Invoice and Transaction ID. Row was skipped.");
             }
-          }
-          break;
-
-        case 'non_deductible_amount':
-        case 'total_amount':
-        case 'fee_amount':
-        case 'net_amount':
-          // @todo add test like testPaymentTypeLabel & remove these lines as we can anticipate error will still be caught & handled.
-          if (!CRM_Utils_Rule::money($value)) {
-            return civicrm_api3_create_error("$key not a valid amount: $value");
           }
           break;
 

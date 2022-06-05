@@ -71,6 +71,8 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    */
   public function preProcess() {
     $this->assignMapFieldVariables();
+    $this->_mapperFields = $this->getAvailableFields();
+    asort($this->_mapperFields);
     parent::preProcess();
   }
 
@@ -238,6 +240,37 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     else {
       Civi\Api4\MappingField::create(FALSE)
         ->setValues($mappedField)->execute();
+    }
+  }
+
+  /**
+   * Save the Field Mapping.
+   *
+   * @param string $mappingType
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function saveMapping(string $mappingType): void {
+    //Updating Mapping Records
+    if ($this->getSubmittedValue('updateMapping')) {
+      foreach (array_keys($this->getColumnHeaders()) as $i) {
+        $this->saveMappingField($this->getSubmittedValue('mappingId'), $i, TRUE);
+      }
+    }
+    //Saving Mapping Details and Records
+    if ($this->getSubmittedValue('saveMapping')) {
+      $mappingParams = [
+        'name' => $this->getSubmittedValue('saveMappingName'),
+        'description' => $this->getSubmittedValue('saveMappingDesc'),
+        'mapping_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', $mappingType),
+      ];
+      $saveMapping = CRM_Core_BAO_Mapping::add($mappingParams);
+
+      foreach (array_keys($this->getColumnHeaders()) as $i) {
+        $this->saveMappingField($saveMapping->id, $i, FALSE);
+      }
+      $this->set('savedMapping', $saveMapping->id);
     }
   }
 
