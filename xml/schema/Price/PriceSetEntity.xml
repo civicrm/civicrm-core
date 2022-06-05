@@ -33,7 +33,7 @@
   </field>
   <field>
     <name>entity_id</name>
-    <title>Entity IF</title>
+    <title>Entity ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Item in table</comment>
