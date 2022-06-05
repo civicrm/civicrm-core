@@ -383,6 +383,18 @@ function afform_civicrm_alterMenu(&$items) {
 }
 
 /**
+ * Implements hook_civicrm_permission().
+ *
+ * Define Afform permissions.
+ */
+function afform_civicrm_permission(&$permissions) {
+  $permissions['administer afform'] = [
+    E::ts('Form Builder: edit and delete forms'),
+    E::ts('Allows non-admin users to create, update and delete forms'),
+  ];
+}
+
+/**
  * Implements hook_civicrm_permission_check().
  *
  * This extends the list of permissions available in `CRM_Core_Permission:check()`

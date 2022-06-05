@@ -1,6 +1,6 @@
 {
-    "type": "search",
+    "type": "system",
     "title": "Submissions",
     "server_route": "civicrm/admin/afform/submissions",
-    "permission": "administer CiviCRM"
+    "permission": [["administer CiviCRM", "administer afform"]]
 }
