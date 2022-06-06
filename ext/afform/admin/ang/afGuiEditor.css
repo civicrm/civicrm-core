@@ -41,6 +41,7 @@
   height: 44px;
   padding: 5px 10px 10px 10px;
   border-bottom: 1px solid #ddd;
+  position: relative;
 }
 #afGuiEditor .panel-heading ul.nav-tabs {
   border-bottom: 0 none;
@@ -62,6 +63,10 @@
   height: 33px;
   font-size: 12px;
   margin: 0;
+}
+#afGuiEditor .form-inline.af-gui-canvas-control-buttons {
+  position: absolute;
+  left: 48%;
 }
 
 #afGuiEditor .panel-body {
