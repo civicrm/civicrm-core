@@ -24,6 +24,15 @@
 abstract class CRM_Import_Form_Summary extends CRM_Import_Forms {
 
   /**
+   * Set variables up before form is built.
+   *
+   * @return void
+   */
+  public function preProcess() {
+    $this->assignOutputURLs();
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {
@@ -43,6 +52,19 @@ abstract class CRM_Import_Form_Summary extends CRM_Import_Forms {
    */
   public function getTitle() {
     return ts('Summary');
+  }
+
+  protected function assignOutputURLs(): void {
+    $this->assign('totalRowCount', $this->getRowCount());
+    $this->assign('validRowCount', $this->getRowCount(CRM_Import_Parser::VALID) + $this->getRowCount(CRM_Import_Parser::UNPARSED_ADDRESS_WARNING));
+    $this->assign('invalidRowCount', $this->getRowCount(CRM_Import_Parser::ERROR));
+    $this->assign('duplicateRowCount', $this->getRowCount(CRM_Import_Parser::DUPLICATE));
+    $this->assign('unMatchCount', $this->getRowCount(CRM_Import_Parser::NO_MATCH));
+    $this->assign('unparsedAddressCount', $this->getRowCount(CRM_Import_Parser::UNPARSED_ADDRESS_WARNING));
+    $this->assign('downloadDuplicateRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::DUPLICATE));
+    $this->assign('downloadErrorRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::ERROR));
+    $this->assign('downloadMismatchRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::NO_MATCH));
+    $this->assign('downloadAddressRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::UNPARSED_ADDRESS_WARNING));
   }
 
 }
