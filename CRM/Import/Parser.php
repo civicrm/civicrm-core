@@ -151,7 +151,8 @@ abstract class CRM_Import_Parser {
    *
    * @return mixed
    *
-   * @throws \API_Exception
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
    */
   protected function getSubmittedValue(string $fieldName) {
     return $this->getUserJob()['metadata']['submitted_values'][$fieldName];
@@ -327,6 +328,15 @@ abstract class CRM_Import_Parser {
    */
   protected function isSkipDuplicates(): bool {
     return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_SKIP;
+  }
+
+  /**
+   * Did the user specify duplicates should be filled with missing data.
+   *
+   * @return bool
+   */
+  protected function isFillDuplicates(): bool {
+    return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_FILL;
   }
 
   /**
@@ -644,6 +654,28 @@ abstract class CRM_Import_Parser {
 
     $this->userJob['metadata']['summary_info'] = $summaryInfo;
     UserJob::update(FALSE)->addWhere('id', '=', $userJob['id'])->setValues(['metadata' => $this->userJob['metadata']])->execute();
+  }
+
+  public function queue() {
+    $dataSource = $this->getDataSourceObject();
+    $totalRowCount = $totalRows = $dataSource->getRowCount(['new']);
+    $queue = Civi::queue('user_job_' . $this->getUserJobID(), ['type' => 'Sql', 'error' => 'abort']);
+    $offset = 0;
+    $batchSize = 5;
+    while ($totalRows > 0) {
+      if ($totalRows < $batchSize) {
+        $batchSize = $totalRows;
+      }
+      $task = new CRM_Queue_Task(
+        [get_class($this), 'runImport'],
+        ['userJobID' => $this->getUserJobID(), 'limit' => $batchSize],
+        ts('Processed %1 rows out of %2', [1 => $offset + $batchSize, 2 => $totalRowCount])
+      );
+      $queue->createItem($task);
+      $totalRows -= $batchSize;
+      $offset += $batchSize;
+    }
+
   }
 
   /**
@@ -1675,6 +1707,7 @@ abstract class CRM_Import_Parser {
         $parserClass = $userJobType['class'];
       }
     }
+    /* @var \CRM_Import_Parser $parser */
     $parser = new $parserClass();
     $parser->setUserJobID($userJobID);
     // Not sure if we still need to init....
@@ -1685,17 +1718,7 @@ abstract class CRM_Import_Parser {
 
     while ($row = $dataSource->getRow()) {
       $values = array_values($row);
-
-      try {
-        $parser->import($parser->getSubmittedValue('onDuplicate'), $values);
-      }
-      catch (CiviCRM_API3_Exception $e) {
-        // When we catch errors here we are not adding to the errors array - mostly
-        // because that will become obsolete once https://github.com/civicrm/civicrm-core/pull/23292
-        // is merged and this will replace it as the main way to handle errors (ie. update the table
-        // and move on).
-        $parser->setImportStatus((int) $values[count($values) - 1], 'ERROR', $e->getMessage());
-      }
+      $parser->import($values);
     }
     $parser->doPostImportActions();
     return TRUE;

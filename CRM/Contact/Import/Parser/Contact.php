@@ -45,13 +45,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   protected $_lineCount;
 
-  /**
-   * Array of successfully imported related contact id's
-   *
-   * @var array
-   */
-  protected $_newRelatedContacts;
-
   protected $_tableName;
 
   /**
@@ -72,20 +65,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *   e.g ['5a_b' => 'Employer', '5b_a' => 'Employee']
    */
   protected $relationshipLabels = [];
-
-  /**
-   * On duplicate
-   *
-   * @var int
-   */
-  public $_onDuplicate;
-
-  /**
-   * Dedupe rule group id to use if set
-   *
-   * @var int
-   */
-  public $_dedupeRuleGroupID = NULL;
 
   /**
    * Addresses that failed to parse.
@@ -183,20 +162,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Get Array of all the fields that could potentially be part
-   * import process
-   *
-   * @return array
-   */
-  public function getAllFields() {
-    return $this->_fields;
-  }
-
-  /**
    * Handle the values in import mode.
    *
-   * @param int $onDuplicate
-   *   The code for what action to take on duplicates.
    * @param array $values
    *   The array of values belonging to this line.
    *
@@ -207,7 +174,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \CRM_Core_Exception
    * @throws \API_Exception
    */
-  public function import($onDuplicate, &$values) {
+  public function import($values) {
     $rowNumber = (int) $values[array_key_last($values)];
 
     $this->_unparsedStreetAddressContacts = [];
@@ -251,7 +218,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     //fixed CRM-4148
     //now we create new contact in update/fill mode also.
-    $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $params['id'] ?? NULL, TRUE, $this->_dedupeRuleGroupID);
+    $newContact = $this->createContact($formatted, $params['id'] ?? NULL);
     $this->createdContacts[$newContact->id] = $contactID = $newContact->id;
 
     if ($contactID) {
@@ -292,7 +259,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
         if (empty($formatting['id']) || $this->isUpdateExistingContacts()) {
           try {
-            $relatedNewContact = $this->createContact($formatting, $contactFields, $onDuplicate, $formatting['id']);
+            $relatedNewContact = $this->createContact($formatting, $formatting['id']);
             $relContactId = $relatedNewContact->id;
             $this->createdContacts[$relContactId] = $relContactId;
           }
@@ -416,7 +383,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           $this->formatCustomDate($params, $formatted, $dateType, $key);
         }
         elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
-          if (empty($val) && !is_numeric($val) && $this->_onDuplicate == CRM_Import_Parser::DUPLICATE_FILL) {
+          if (empty($val) && !is_numeric($val) && $this->isFillDuplicates()) {
             //retain earlier value when Import mode is `Fill`
             unset($params[$key]);
           }
@@ -711,19 +678,15 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * Method for creating contact.
    *
    * @param array $formatted
-   * @param array $contactFields
-   * @param int $onDuplicate
    * @param int $contactId
-   * @param bool $requiredCheck
-   * @param int $dedupeRuleGroupID
    *
    * @return \CRM_Contact_BAO_Contact
    *   If a duplicate is found an array is returned, otherwise CRM_Contact_BAO_Contact
    */
-  public function createContact(&$formatted, &$contactFields, $onDuplicate, $contactId = NULL, $requiredCheck = TRUE, $dedupeRuleGroupID = NULL) {
+  public function createContact(&$formatted, $contactId = NULL) {
 
     if ($contactId) {
-      $this->formatParams($formatted, $onDuplicate, (int) $contactId);
+      $this->formatParams($formatted, (int) $contactId);
     }
 
     // Resetting and rebuilding cache could be expensive.
@@ -740,6 +703,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $formatted['updateBlankLocInfo'] = FALSE;
     }
 
+    $contactFields = CRM_Contact_DAO_Contact::import();
     [$data, $contactDetails] = $this->formatProfileContactParams($formatted, $contactFields, $contactId, $formatted['contact_type']);
 
     // manage is_opt_out
@@ -1054,12 +1018,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param array $params
    *   reference to an array containing all the.
    *   values for import
-   * @param int $onDuplicate
    * @param int $cid
    *   contact id.
    */
-  public function formatParams(&$params, $onDuplicate, $cid) {
-    if ($onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
+  public function formatParams(&$params, $cid) {
+    if ($this->isSkipDuplicates()) {
       return;
     }
 
@@ -1070,7 +1033,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $defaults = [];
     $contactObj = CRM_Contact_BAO_Contact::retrieve($contactParams, $defaults);
 
-    $modeFill = ($onDuplicate == CRM_Import_Parser::DUPLICATE_FILL);
+    $modeFill = $this->isFillDuplicates();
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($params['contact_type'], NULL, $cid, 0, NULL);
     CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $defaults, FALSE, FALSE);
@@ -1198,70 +1161,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   protected function setFieldMetadata() {
     $this->setImportableFieldsMetadata($this->getContactImportMetadata());
-  }
-
-  /**
-   * Run import.
-   *
-   * @param array $mapper Mapping as entered on MapField form.
-   *   e.g [['first_name']['email', 1]].
-   *   {@see \CRM_Contact_Import_Parser_Contact::getMappingFieldFromMapperInput}
-   * @param int $mode
-   * @param int $statusID
-   *
-   * @return mixed
-   * @throws \API_Exception|\CRM_Core_Exception
-   */
-  public function run(
-    $mapper = [],
-    $mode = self::MODE_PREVIEW,
-    $statusID = NULL
-  ) {
-
-    // TODO: Make the timeout actually work
-    $this->_onDuplicate = $onDuplicate = $this->getSubmittedValue('onDuplicate');
-    $this->_dedupeRuleGroupID = $this->getSubmittedValue('dedupe_rule_id');
-    // Since $this->_contactType is still being called directly do a get call
-    // here to make sure it is instantiated.
-    $this->getContactType();
-    $this->getContactSubType();
-    // Reset user job in case to null in case it was loaded prior to the job being complete.
-    $this->userJob = NULL;
-
-    $this->init();
-
-    $this->_rowCount = 0;
-    $this->_totalCount = 0;
-
-    if ($statusID) {
-      $this->progressImport($statusID);
-      $startTimestamp = $currTimestamp = $prevTimestamp = time();
-    }
-    $dataSource = $this->getDataSourceObject();
-    $totalRowCount = $dataSource->getRowCount(['new']);
-    $dataSource->setStatuses(['new']);
-
-    while ($row = $dataSource->getRow()) {
-      $values = array_values($row);
-      $this->_rowCount++;
-
-      $this->_totalCount++;
-
-      try {
-        $this->import($onDuplicate, $values);
-      }
-      catch (CiviCRM_API3_Exception $e) {
-        // When we catch errors here we are not adding to the errors array - mostly
-        // because that will become obsolete once https://github.com/civicrm/civicrm-core/pull/23292
-        // is merged and this will replace it as the main way to handle errors (ie. update the table
-        // and move on).
-        $this->setImportStatus((int) $values[count($values) - 1], 'ERROR', $e->getMessage());
-      }
-      if ($statusID && (($this->_rowCount % 50) == 0)) {
-        $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
-      }
-    }
-    $this->doPostImportActions();
   }
 
   /**
@@ -2139,7 +2038,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       CRM_Import_Parser::DUPLICATE => 'DUPLICATE',
       CRM_Import_Parser::ERROR => 'ERROR',
       CRM_Import_Parser::NO_MATCH => 'invalid_no_match',
-    ][$outcome];
+    ][$outcome] ?? 'ERROR';
   }
 
 }
