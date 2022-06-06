@@ -195,6 +195,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       // CRM-5854, reset the geocode method to null to prevent geocoding
       CRM_Utils_GeocodeProvider::disableForSession();
     }
+    $relatedContacts = [];
 
     try {
       $params = $this->getMappedRow($values);
@@ -230,18 +231,16 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
       //relationship contact insert
       foreach ($this->getRelatedContactsParams($params) as $key => $field) {
-        $formatting = $field;
-        [$formatting, $field] = $this->processContact($field, $formatting, FALSE);
-
+        [$formatting, $field] = $this->processContact($field, $field, FALSE);
         //format common data, CRM-4062
         $this->formatCommonData($field, $formatting);
-
+        $isUpdate = empty($formatting['id']) ? 'new' : 'updated';
         if (empty($formatting['id']) || $this->isUpdateExistingContacts()) {
           $relatedNewContact = $this->createContact($formatting, $formatting['id']);
           $formatting['id'] = $relatedNewContact->id;
         }
         if (empty($relatedContacts[$formatting['id']])) {
-          $relatedContacts[$formatting['id']] = 'new';
+          $relatedContacts[$formatting['id']] = $isUpdate;
         }
 
         $this->createRelationship($key, $formatting['id'], $primaryContactId);
@@ -258,7 +257,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       return FALSE;
     }
     $extraFields = ['related_contact_created' => 0, 'related_contact_matched' => 0];
-    foreach ($relatedContacts as $key => $outcome) {
+    foreach ($relatedContacts as $outcome) {
       if ($outcome === 'new') {
         $extraFields['related_contact_created']++;
       }
