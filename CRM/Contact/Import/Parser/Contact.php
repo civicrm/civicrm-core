@@ -77,6 +77,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * The initializer code, called before processing.
    */
   public function init() {
+    // Force re-load of user job.
+    unset($this->userJob);
     $this->setFieldMetadata();
     foreach ($this->getImportableFieldsMetadata() as $name => $field) {
       $this->addField($name, $field['title'], CRM_Utils_Array::value('type', $field), CRM_Utils_Array::value('headerPattern', $field), CRM_Utils_Array::value('dataPattern', $field), CRM_Utils_Array::value('hasLocationType', $field));

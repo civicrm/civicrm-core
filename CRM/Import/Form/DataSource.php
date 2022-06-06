@@ -158,7 +158,6 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    *   Entity to set for paraser currently only for custom import
    */
   protected function submitFileForMapping($parserClassName, $entity = NULL) {
-    $this->controller->resetPage('MapField');
     CRM_Core_Session::singleton()->set('dateTypes', $this->getSubmittedValue('dateFormats'));
     $this->processDatasource();
 
@@ -181,6 +180,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
 
     // add all the necessary variables to the form
     $parser->set($this);
+    $this->controller->resetPage('MapField');
   }
 
   /**

@@ -77,6 +77,22 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   }
 
   /**
+   * Process the mapped fields and map it into the uploaded file
+   * preview the file and extract some summary statistics
+   *
+   * @return void
+   * @noinspection PhpDocSignatureInspection
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function postProcess() {
+    $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
+    $this->saveMapping($this->getMappingTypeName());
+    $parser = $this->getParser();
+    $parser->init();
+    $parser->validate();
+  }
+
+  /**
    * Attempt to match header labels with our mapper fields.
    *
    * @param string $header
@@ -230,6 +246,9 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   protected function saveMappingField(int $mappingID, int $columnNumber, bool $isUpdate = FALSE): void {
     $fieldMapping = (array) $this->getSubmittedValue('mapper')[$columnNumber];
     $mappedField = $this->getMappedField($fieldMapping, $mappingID, $columnNumber);
+    if (empty($mappedField['name'])) {
+      $mappedField['name'] = 'do_not_import';
+    }
     if ($isUpdate) {
       Civi\Api4\MappingField::update(FALSE)
         ->setValues($mappedField)
