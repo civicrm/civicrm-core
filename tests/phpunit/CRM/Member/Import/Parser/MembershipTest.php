@@ -157,7 +157,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
 
     $importObject = $this->createImportObject(['email', 'membership_type_id', 'membership_start_date', 'membership_join_date']);
     foreach ($params as $values) {
-      $this->assertEquals(CRM_Import_Parser::VALID, $importObject->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values), $values[0]);
+      $this->assertEquals(CRM_Import_Parser::VALID, $importObject->import($values), $values[0]);
     }
     $result = $this->callAPISuccess('membership', 'get', ['sequential' => 1])['values'];
     $this->assertCount(2, $result);
@@ -170,11 +170,12 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testImportOverriddenMembershipButWithoutStatus() {
+  public function testImportOverriddenMembershipButWithoutStatus(): void {
     $this->individualCreate(['email' => 'anthony_anderson2@civicrm.org']);
     $membershipImporter = new CRM_Member_Import_Parser_Membership();
     $membershipImporter->setUserJobID($this->getUserJobID([
-      ['email'], ['membership_type_id'], ['membership_start_date'], ['member_is_override'],
+      'mapper' => [['email'], ['membership_type_id'], ['membership_start_date'], ['member_is_override']],
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
     ]));
     $membershipImporter->init();
     $membershipImporter->_contactType = 'Individual';
@@ -186,7 +187,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       TRUE,
     ];
 
-    $importResponse = $membershipImporter->import(CRM_Import_Parser::DUPLICATE_UPDATE, $importValues);
+    $importResponse = $membershipImporter->import($importValues);
     $this->assertEquals(CRM_Import_Parser::ERROR, $importResponse);
     $this->assertContains('Required parameter missing: Status', $importValues);
   }
@@ -214,7 +215,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'New',
     ];
 
-    $importResponse = $membershipImporter->import(CRM_Import_Parser::DUPLICATE_UPDATE, $importValues);
+    $importResponse = $membershipImporter->import($importValues);
     $this->assertEquals(CRM_Import_Parser::VALID, $importResponse);
   }
 
@@ -235,31 +236,37 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       date('Y-m-d'),
     ];
 
-    $importResponse = $membershipImporter->import(CRM_Import_Parser::DUPLICATE_UPDATE, $importValues);
+    $importResponse = $membershipImporter->import($importValues);
     $this->assertEquals(CRM_Import_Parser::VALID, $importResponse);
   }
 
   public function testImportOverriddenMembershipWithInvalidOverrideEndDate(): void {
     $this->individualCreate(['email' => 'anthony_anderson5@civicrm.org']);
-
+    $this->userJobID = $this->getUserJobID([
+      'mapper' => [['email'], ['membership_type_id'], ['membership_start_date'], ['member_is_override'], ['status_id'], ['status_override_end_date']],
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
+    ]);
     $membershipImporter = new CRM_Member_Import_Parser_Membership();
-    $membershipImporter->setUserJobID($this->getUserJobID([
-      ['email'], ['membership_type_id'], ['membership_start_date'], ['member_is_override'], ['status_id'], ['status_override_end_date'],
-    ]));
+    $membershipImporter->setUserJobID($this->userJobID);
     $membershipImporter->init();
 
     $importValues = [
       'anthony_anderson5@civicrm.org',
-      'New',
+      'General',
       date('Y-m-d'),
-      TRUE,
+      1,
       $this->_mebershipStatusID,
       'abc',
     ];
+    try {
+      $importResponse = $membershipImporter->validateValues($importValues);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertEquals('Invalid value for field(s) : Status Override End Date', $e->getMessage());
+      return;
+    }
+    $this->fail('Exception expected');
 
-    $importResponse = $membershipImporter->import(CRM_Import_Parser::DUPLICATE_UPDATE, $importValues);
-    $this->assertEquals(CRM_Import_Parser::ERROR, $importResponse);
-    $this->assertContains('Required parameter missing: Status', $importValues);
   }
 
   /**
@@ -292,7 +299,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'New-renamed',
     ];
 
-    $importResponse = $membershipImporter->import(CRM_Import_Parser::DUPLICATE_UPDATE, $importValues);
+    $importResponse = $membershipImporter->import($importValues);
     $this->assertEquals(CRM_Import_Parser::VALID, $importResponse);
     $createdStatusID = $this->callAPISuccessGetValue('Membership', ['return' => 'status_id']);
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'New'), $createdStatusID);
@@ -330,9 +337,6 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    * @param array $submittedValues
    *
    * @return int
-   *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
    */
   protected function getUserJobID(array $submittedValues = []): int {
     $userJobID = UserJob::create()->setValues([
@@ -384,7 +388,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'Red',
     ];
 
-    $importResponse = $membershipImporter->import(CRM_Import_Parser::DUPLICATE_UPDATE, $importValues);
+    $importResponse = $membershipImporter->import($importValues);
     $this->assertEquals(CRM_Import_Parser::VALID, $importResponse);
     $membership = $this->callAPISuccessGetSingle('Membership', []);
     $this->assertEquals('blah', $membership[$this->getCustomFieldName('text')]);

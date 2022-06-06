@@ -1843,8 +1843,8 @@ abstract class CRM_Import_Parser {
    * @param int|null $entityID
    *   Optional created entity ID
    *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
    */
   protected function setImportStatus(int $id, string $status, string $message, ?int $entityID = NULL): void {
     $this->getDataSourceObject()->updateStatus($id, $status, $message, $entityID);

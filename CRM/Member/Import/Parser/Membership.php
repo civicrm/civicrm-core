@@ -108,7 +108,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
     while ($row = $dataSource->getRow()) {
       $values = array_values($row);
       if ($mode == self::MODE_IMPORT) {
-        $this->import($this->getSubmittedValue('onDuplicate'), $values);
+        $this->import($values);
         if ($statusID && (($this->_lineCount % 50) == 0)) {
           $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
         }
@@ -298,15 +298,14 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
   /**
    * Handle the values in import mode.
    *
-   * @param int $onDuplicate
-   *   The code for what action to take on duplicates.
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return bool
-   *   the result of this processing
+   * @return int|void|null
+   *   the result of this processing - which is ignored
    */
-  public function import($onDuplicate, &$values) {
+  public function import($values) {
+    $onDuplicate = $this->getSubmittedValue('onDuplicate');
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
       $params = $this->getMappedRow($values);
@@ -344,8 +343,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         //fix for CRM-2219 Update Membership
         // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
         if (!empty($formatted['is_override']) && empty($formatted['status_id'])) {
-          $this->setImportStatus($rowNumber, 'ERROR', 'Required parameter missing: Status');
-          return CRM_Import_Parser::ERROR;
+          throw new CRM_Core_Exception('Required parameter missing: Status', CRM_Import_Parser::ERROR);
         }
 
         if (!empty($formatValues['membership_id'])) {
@@ -372,11 +370,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
             $this->setImportStatus($rowNumber, 'IMPORTED', 'Required parameter missing: Status');
             return CRM_Import_Parser::VALID;
           }
-          else {
-            array_unshift($values, 'Matching Membership record not found for Membership ID ' . $formatValues['membership_id'] . '. Row was skipped.');
-            $this->setImportStatus($rowNumber, 'ERROR', 'Matching Membership record not found for Membership ID ' . $formatValues['membership_id'] . '. Row was skipped.');
-            return CRM_Import_Parser::ERROR;
-          }
+          throw new CRM_Core_Exception('Matching Membership record not found for Membership ID ' . $formatValues['membership_id'] . '. Row was skipped.', CRM_Import_Parser::ERROR);
         }
       }
 
@@ -391,8 +385,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         if (CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
           $matchedIDs = explode(',', $error['error_message']['params'][0]);
           if (count($matchedIDs) > 1) {
-            $this->setImportStatus($rowNumber, 'ERROR', 'Multiple matching contact records detected for this row. The membership was not imported');
-            return CRM_Import_Parser::ERROR;
+            throw new CRM_Core_Exception('Multiple matching contact records detected for this row. The membership was not imported', CRM_Import_Parser::ERROR);
           }
           else {
             $cid = $matchedIDs[0];
@@ -426,13 +419,11 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
             }
             elseif (empty($formatted['is_override'])) {
               if (empty($calcStatus)) {
-                $this->setImportStatus($rowNumber, 'ERROR', 'Status in import row (' . $formatValues['status_id'] . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.');
-                return CRM_Import_Parser::ERROR;
+                throw new CRM_Core_Exception('Status in import row (' . $formatValues['status_id'] . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.', CRM_Import_Parser::ERROR);
               }
               if ($formatted['status_id'] != $calcStatus['id']) {
                 //Status Hold" is either NOT mapped or is FALSE
-                $this->setImportStatus($rowNumber, 'ERROR', 'Status in import row (' . $formatValues['status_id'] . ') does not match calculated status based on your configured Membership Status Rules (' . $calcStatus['name'] . '). Record was not imported.');
-                return CRM_Import_Parser::ERROR;
+                throw new CRM_Core_Exception('Status in import row (' . $formatValues['status_id'] . ') does not match calculated status based on your configured Membership Status Rules (' . $calcStatus['name'] . '). Record was not imported.', CRM_Import_Parser::ERROR);
               }
             }
 
@@ -472,8 +463,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
               $disp = $params['external_identifier'];
             }
           }
-          $this->setImportStatus($rowNumber, 'ERROR', 'No matching Contact found for (' . $disp . ')');
-          return CRM_Import_Parser::ERROR;
+          throw new CRM_Core_Exception('No matching Contact found for (' . $disp . ')', CRM_Import_Parser::ERROR);
         }
       }
       else {
@@ -482,8 +472,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
           $checkCid->external_identifier = $formatValues['external_identifier'];
           $checkCid->find(TRUE);
           if ($checkCid->id != $formatted['contact_id']) {
-            $this->setImportStatus($rowNumber, 'ERROR', 'Mismatch of External ID:' . $formatValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id']);
-            return CRM_Import_Parser::ERROR;
+            throw new CRM_Core_Exception('Mismatch of External ID:' . $formatValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id'], CRM_Import_Parser::ERROR);
           }
         }
 
@@ -515,14 +504,11 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         }
         elseif (empty($formatted['is_override'])) {
           if (empty($calcStatus)) {
-            $this->setImportStatus($rowNumber, 'ERROR', 'Status in import row (' . CRM_Utils_Array::value('status_id', $formatValues) . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.');
-            return CRM_Import_Parser::ERROR;
+            throw new CRM_Core_Exception('Status in import row (' . CRM_Utils_Array::value('status_id', $formatValues) . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.', CRM_Import_Parser::ERROR);
           }
-          elseif ($formatted['status_id'] != $calcStatus['id']) {
+          if ($formatted['status_id'] != $calcStatus['id']) {
             //Status Hold" is either NOT mapped or is FALSE
-            array_unshift($values, 'Status in import row (' . CRM_Utils_Array::value('status_id', $formatValues) . ') does not match calculated status based on your configured Membership Status Rules (' . $calcStatus['name'] . '). Record was not imported.');
-            $this->setImportStatus($rowNumber, 'ERROR', 'Status in import row (' . CRM_Utils_Array::value('status_id', $formatValues) . ') does not match calculated status based on your configured Membership Status Rules (' . $calcStatus['name'] . '). Record was not imported.');
-            return CRM_Import_Parser::ERROR;
+            throw new CRM_Core_Exception($rowNumber, 'ERROR', 'Status in import row (' . CRM_Utils_Array::value('status_id', $formatValues) . ') does not match calculated status based on your configured Membership Status Rules (' . $calcStatus['name'] . '). Record was not imported.', CRM_Import_Parser::ERROR);
           }
         }
 
@@ -533,8 +519,11 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         return CRM_Import_Parser::VALID;
       }
     }
-    catch (Exception $e) {
-      array_unshift($values, $e->getMessage());
+    catch (CRM_Core_Exception $e) {
+      $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
+      return CRM_Import_Parser::ERROR;
+    }
+    catch (CiviCRM_API3_Exception $e) {
       $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
       return CRM_Import_Parser::ERROR;
     }
