@@ -1575,21 +1575,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Validate the import values.
-   *
-   * The values array represents a row in the datasource.
-   *
-   * @param array $values
-   *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
-   */
-  public function validateValues(array $values): void {
-    $params = $this->getMappedRow($values);
-    $this->validateParams($params);
-  }
-
-  /**
    * Get the invalid values in the params for the given contact.
    *
    * @param array|int|string $value

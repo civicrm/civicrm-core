@@ -369,7 +369,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function validateValues(array $values): void {
+  public function validateValues(array $values): void {
     // Check required fields if this is not an update.
     if (!$this->getFieldValue($values, 'activity_id')) {
       if (!$this->getFieldValue($values, 'activity_label')

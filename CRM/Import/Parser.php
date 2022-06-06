@@ -1568,6 +1568,21 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * Validate the import values.
+   *
+   * The values array represents a row in the datasource.
+   *
+   * @param array $values
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function validateValues(array $values): void {
+    $params = $this->getMappedRow($values);
+    $this->validateParams($params);
+  }
+
+  /**
    * Search the value for the string 'invalid_import_value'.
    *
    * If the string is found it indicates the fields was rejected
