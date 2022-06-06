@@ -568,7 +568,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if (!empty($value['relationship_type_id'])) {
         $requiredSubType = $this->getRelatedContactSubType($value['relationship_type_id'], $value['relationship_direction']);
         if ($requiredSubType && $value['contact_sub_type'] && $requiredSubType !== $value['contact_sub_type']) {
-          throw new CRM_Core_Exception($prefixString . ts('Mismatched or Invalid contact subtype found for this related contact.'));
+          // Tested in CRM_Contact_Import_Parser_ContactTest::testImportContactSubTypes
+          throw new CRM_Core_Exception($prefixString . ts('Mismatched or Invalid contact subtype found for this related contact.'), CRM_Import_Parser::ERROR);
         }
       }
     }
@@ -1138,7 +1139,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if (array_key_exists($extIDMatch, $possibleMatches['values'])) {
         return $extIDMatch;
       }
-      throw new CRM_Core_Exception(ts('Matching this contact based on the de-dupe rule would cause an external ID conflict'));
+      throw new CRM_Core_Exception(ts('Matching this contact based on the de-dupe rule would cause an external ID conflict'), CRM_Import_Parser::ERROR);
     }
     return $extIDMatch;
   }

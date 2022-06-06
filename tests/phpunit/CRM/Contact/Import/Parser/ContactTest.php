@@ -1060,19 +1060,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public function testImport($csv, $mapper, $expectedError, $expectedOutcomes = [], $contactType = NULL): void {
-    try {
-      $this->importCSV($csv, $mapper, [
-        'contactType' => $contactType ?? CRM_Import_Parser::CONTACT_INDIVIDUAL,
-      ]);
-    }
-    catch (CRM_Core_Exception $e) {
-      $this->assertSame($expectedError, $e->getMessage());
-      return;
-    }
-    if ($expectedError) {
-      $this->fail('expected error :' . $expectedError);
-    }
+  public function testImport($csv, $mapper, $expectedError, $expectedOutcomes = [], $submittedValues = []): void {
+    $this->importCSV($csv, $mapper, $submittedValues);
     $dataSource = new CRM_Import_DataSource_CSV(UserJob::get(FALSE)->setSelect(['id'])->execute()->first()['id']);
     foreach ($expectedOutcomes as $outcome => $count) {
       $this->assertEquals($dataSource->getRowCount([$outcome]), $count);
@@ -1092,6 +1081,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
         'expected_error' => '',
         'expected_outcomes' => [CRM_Import_Parser::ERROR => 1],
       ],
+      //Record duplicates multiple contacts
       'organization_multiple_duplicates_invalid' => [
         'csv' => 'organization_multiple_duplicates_invalid.csv',
         'mapper' => [['organization_name'], ['email']],
@@ -1100,7 +1090,19 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
           CRM_Import_Parser::VALID => 2,
           CRM_Import_Parser::ERROR => 1,
         ],
-        'contact_type' => CRM_Import_Parser::CONTACT_ORGANIZATION,
+        'submitted_values' => [
+          'contactType' => CRM_Import_Parser::CONTACT_ORGANIZATION,
+        ],
+      ],
+      //Matching this contact based on the de-dupe rule would cause an external ID conflict
+      'individual_invalid_external_identifier_email_mismatch' => [
+        'csv' => 'individual_invalid_external_identifier_email_mismatch.csv',
+        'mapper' => [['first_name'], ['last_name'], ['email'], ['external_identifier']],
+        'expected_error' => '',
+        'expected_outcomes' => [
+          CRM_Import_Parser::VALID => 2,
+          CRM_Import_Parser::ERROR => 1,
+        ],
       ],
     ];
   }
