@@ -151,7 +151,8 @@ abstract class CRM_Import_Parser {
    *
    * @return mixed
    *
-   * @throws \API_Exception
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
    */
   protected function getSubmittedValue(string $fieldName) {
     return $this->getUserJob()['metadata']['submitted_values'][$fieldName];
@@ -327,6 +328,15 @@ abstract class CRM_Import_Parser {
    */
   protected function isSkipDuplicates(): bool {
     return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_SKIP;
+  }
+
+  /**
+   * Did the user specify duplicates should be filled with missing data.
+   *
+   * @return bool
+   */
+  protected function isFillDuplicates(): bool {
+    return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_FILL;
   }
 
   /**
@@ -1710,7 +1720,7 @@ abstract class CRM_Import_Parser {
       $values = array_values($row);
 
       try {
-        $parser->import($parser->getSubmittedValue('onDuplicate'), $values);
+        $parser->import($values);
       }
       catch (CiviCRM_API3_Exception $e) {
         // When we catch errors here we are not adding to the errors array - mostly

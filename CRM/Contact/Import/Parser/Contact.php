@@ -164,8 +164,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   /**
    * Handle the values in import mode.
    *
-   * @param int $onDuplicate
-   *   The code for what action to take on duplicates.
    * @param array $values
    *   The array of values belonging to this line.
    *
@@ -176,7 +174,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \CRM_Core_Exception
    * @throws \API_Exception
    */
-  public function import($onDuplicate, &$values) {
+  public function import(&$values) {
     $rowNumber = (int) $values[array_key_last($values)];
 
     $this->_unparsedStreetAddressContacts = [];
@@ -220,7 +218,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     //fixed CRM-4148
     //now we create new contact in update/fill mode also.
-    $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $params['id'] ?? NULL, TRUE, $this->getSubmittedValue('dedupe_rule_id'));
+    $newContact = $this->createContact($formatted, $contactFields, $params['id'] ?? NULL, TRUE, $this->getSubmittedValue('dedupe_rule_id'));
     $this->createdContacts[$newContact->id] = $contactID = $newContact->id;
 
     if ($contactID) {
@@ -261,7 +259,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
         if (empty($formatting['id']) || $this->isUpdateExistingContacts()) {
           try {
-            $relatedNewContact = $this->createContact($formatting, $contactFields, $onDuplicate, $formatting['id']);
+            $relatedNewContact = $this->createContact($formatting, $contactFields, $formatting['id']);
             $relContactId = $relatedNewContact->id;
             $this->createdContacts[$relContactId] = $relContactId;
           }
@@ -385,7 +383,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           $this->formatCustomDate($params, $formatted, $dateType, $key);
         }
         elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
-          if (empty($val) && !is_numeric($val) && $this->_onDuplicate == CRM_Import_Parser::DUPLICATE_FILL) {
+          if (empty($val) && !is_numeric($val) && $this->isFillDuplicates()) {
             //retain earlier value when Import mode is `Fill`
             unset($params[$key]);
           }
@@ -681,18 +679,15 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *
    * @param array $formatted
    * @param array $contactFields
-   * @param int $onDuplicate
    * @param int $contactId
-   * @param bool $requiredCheck
-   * @param int $dedupeRuleGroupID
    *
    * @return \CRM_Contact_BAO_Contact
    *   If a duplicate is found an array is returned, otherwise CRM_Contact_BAO_Contact
    */
-  public function createContact(&$formatted, &$contactFields, $onDuplicate, $contactId = NULL, $requiredCheck = TRUE, $dedupeRuleGroupID = NULL) {
+  public function createContact(&$formatted, &$contactFields, $contactId = NULL) {
 
     if ($contactId) {
-      $this->formatParams($formatted, $onDuplicate, (int) $contactId);
+      $this->formatParams($formatted, (int) $contactId);
     }
 
     // Resetting and rebuilding cache could be expensive.
@@ -1023,12 +1018,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param array $params
    *   reference to an array containing all the.
    *   values for import
-   * @param int $onDuplicate
    * @param int $cid
    *   contact id.
    */
-  public function formatParams(&$params, $onDuplicate, $cid) {
-    if ($onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
+  public function formatParams(&$params, $cid) {
+    if ($this->isSkipDuplicates()) {
       return;
     }
 
@@ -1039,7 +1033,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $defaults = [];
     $contactObj = CRM_Contact_BAO_Contact::retrieve($contactParams, $defaults);
 
-    $modeFill = ($onDuplicate == CRM_Import_Parser::DUPLICATE_FILL);
+    $modeFill = $this->isFillDuplicates();
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($params['contact_type'], NULL, $cid, 0, NULL);
     CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $defaults, FALSE, FALSE);
