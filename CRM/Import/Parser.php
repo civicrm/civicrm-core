@@ -635,8 +635,8 @@ abstract class CRM_Import_Parser {
 
   protected function doPostImportActions() {
     $userJob = $this->getUserJob();
-    $summaryInfo = $userJob['metadata']['summary_info'];
-    $actions = $userJob['metadata']['post_actions'];
+    $summaryInfo = $userJob['metadata']['summary_info'] ?? [];
+    $actions = $userJob['metadata']['post_actions'] ?? [];
     if (!empty($actions['group'])) {
       $groupAdditions = $this->addImportedContactsToNewGroup($this->createdContacts, $actions['group']);
       foreach ($actions['group'] as $groupID) {
@@ -1575,7 +1575,8 @@ abstract class CRM_Import_Parser {
   protected function getInvalidValues($value, string $key = '', string $prefixString = ''): array {
     $errors = [];
     if ($value === 'invalid_import_value') {
-      $errors[] = $prefixString . $this->getFieldMetadata($key)['title'];
+      $metadata = $this->getFieldMetadata($key);
+      $errors[] = $prefixString . ($metadata['html']['label'] ?? $metadata['title']);
     }
     elseif (is_array($value)) {
       foreach ($value as $innerKey => $innerValue) {
@@ -1667,6 +1668,40 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * @param array $mappedField
+   *   Field detail as would be saved in field_mapping table
+   *   or as returned from getMappingFieldFromMapperInput
+   *
+   * @return string
+   * @throws \API_Exception
+   */
+  public function getMappedFieldLabel(array $mappedField): string {
+    $this->setFieldMetadata();
+    return $this->getFieldMetadata($mappedField['name'])['title'];
+  }
+
+  /**
+   * Get the row from the csv mapped to our parameters.
+   *
+   * @param array $values
+   *
+   * @return array
+   * @throws \API_Exception
+   */
+  public function getMappedRow(array $values): array {
+    $params = [];
+    foreach ($this->getFieldMappings() as $i => $mappedField) {
+      if ($mappedField['name'] === 'do_not_import') {
+        continue;
+      }
+      if ($mappedField['name']) {
+        $params[$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
+      }
+    }
+    return $params;
+  }
+
+  /**
    * Get the field mappings for the import.
    *
    * This is the same format as saved in civicrm_mapping_field except
@@ -1678,7 +1713,8 @@ abstract class CRM_Import_Parser {
    */
   protected function getFieldMappings(): array {
     $mappedFields = [];
-    foreach ($this->getSubmittedValue('mapper') as $i => $mapperRow) {
+    $mapper = $this->getSubmittedValue('mapper');
+    foreach ($mapper as $i => $mapperRow) {
       $mappedField = $this->getMappingFieldFromMapperInput($mapperRow, 0, $i);
       // Just for clarity since 0 is a pseudo-value
       unset($mappedField['mapping_id']);

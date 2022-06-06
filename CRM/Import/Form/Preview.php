@@ -117,4 +117,14 @@ abstract class CRM_Import_Form_Preview extends CRM_Import_Forms {
     $this->assign('rowDisplayCount', $this->getSubmittedValue('skipColumnHeader') ? 3 : 2);
   }
 
+  /**
+   * Process the mapped fields and map it into the uploaded file
+   * preview the file and extract some summary statistics
+   *
+   * @return void
+   */
+  public function postProcess() {
+    CRM_Import_Parser::runImport(NULL, $this->getUserJobID(), 0);
+  }
+
 }
