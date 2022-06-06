@@ -9,7 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Campaign;
 use Civi\Api4\CustomField;
+use Civi\Api4\Event;
 use Civi\Api4\UserJob;
 
 /**
@@ -1325,7 +1327,7 @@ abstract class CRM_Import_Parser {
     if (!empty($fieldMetadata['serialize']) && count(explode(',', $importedValue)) > 1) {
       $values = [];
       foreach (explode(',', $importedValue) as $value) {
-        $values[] = $this->getTransformedFieldValue($fieldName, $value);
+        $values[] = $this->getTransformedFieldValue($fieldName, trim($value));
       }
       return $values;
     }
@@ -1364,6 +1366,24 @@ abstract class CRM_Import_Parser {
 
       $comparisonValue = is_numeric($importedValue) ? $importedValue : mb_strtolower($importedValue);
       return $options[$comparisonValue] ?? 'invalid_import_value';
+    }
+    if (!empty($fieldMetadata['FKClassName']) || !empty($fieldMetadata['pseudoconstant']['prefetch'])) {
+      // @todo - make this generic - for fields where getOptions doesn't fetch
+      // getOptions does not retrieve these fields with high potential results
+      if ($fieldName === 'event_id') {
+        if (!isset(Civi::$statics[__CLASS__][$fieldName][$importedValue])) {
+          $event = Event::get()->addWhere('title', '=', $importedValue)->addSelect('id')->execute()->first();
+          Civi::$statics[__CLASS__][$fieldName][$importedValue] = $event['id'] ?? FALSE;
+        }
+        return Civi::$statics[__CLASS__][$fieldName][$importedValue] ?? 'invalid_import_value';
+      }
+      if ($fieldMetadata['name'] === 'campaign_id') {
+        if (!isset(Civi::$statics[__CLASS__][$fieldName][$importedValue])) {
+          $campaign = Campaign::get()->addClause('OR', ['title', '=', $importedValue], ['name', '=', $importedValue])->addSelect('id')->execute()->first();
+          Civi::$statics[__CLASS__][$fieldName][$importedValue] = $campaign['id'] ?? FALSE;
+        }
+        return Civi::$statics[__CLASS__][$fieldName][$importedValue] ?? 'invalid_import_value';
+      }
     }
     return $importedValue;
   }
@@ -1606,6 +1626,8 @@ abstract class CRM_Import_Parser {
 
   /**
    * @param array $params
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function validateParams(array $params): void {
     $this->validateRequiredFields($this->getRequiredFields(), $params);
@@ -1629,18 +1651,27 @@ abstract class CRM_Import_Parser {
    * @param string $prefixString
    *
    * @return array
-   * @throws \API_Exception
    */
   protected function getInvalidValues($value, string $key = '', string $prefixString = ''): array {
     $errors = [];
     if ($value === 'invalid_import_value') {
-      $metadata = $this->getFieldMetadata($key);
-      $errors[] = $prefixString . ($metadata['html']['label'] ?? $metadata['title']);
+      if (!is_numeric($key)) {
+        $metadata = $this->getFieldMetadata($key);
+        $errors[] = $prefixString . ($metadata['html']['label'] ?? $metadata['title']);
+      }
+      else {
+        // Numeric key suggests we are drilling into option values
+        $errors[] = TRUE;
+      }
     }
     elseif (is_array($value)) {
       foreach ($value as $innerKey => $innerValue) {
         $result = $this->getInvalidValues($innerValue, $innerKey, $prefixString);
-        if (!empty($result)) {
+        if ($result === [TRUE]) {
+          $metadata = $this->getFieldMetadata($key);
+          $errors[] = $prefixString . ($metadata['html']['label'] ?? $metadata['title']);
+        }
+        elseif (!empty($result)) {
           $errors = array_merge($result, $errors);
         }
       }
