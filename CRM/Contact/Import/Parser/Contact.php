@@ -174,7 +174,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \CRM_Core_Exception
    * @throws \API_Exception
    */
-  public function import(&$values) {
+  public function import($values) {
     $rowNumber = (int) $values[array_key_last($values)];
 
     $this->_unparsedStreetAddressContacts = [];

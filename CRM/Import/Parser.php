@@ -1718,17 +1718,7 @@ abstract class CRM_Import_Parser {
 
     while ($row = $dataSource->getRow()) {
       $values = array_values($row);
-
-      try {
-        $parser->import($values);
-      }
-      catch (CiviCRM_API3_Exception $e) {
-        // When we catch errors here we are not adding to the errors array - mostly
-        // because that will become obsolete once https://github.com/civicrm/civicrm-core/pull/23292
-        // is merged and this will replace it as the main way to handle errors (ie. update the table
-        // and move on).
-        $parser->setImportStatus((int) $values[count($values) - 1], 'ERROR', $e->getMessage());
-      }
+      $parser->import($values);
     }
     $parser->doPostImportActions();
     return TRUE;

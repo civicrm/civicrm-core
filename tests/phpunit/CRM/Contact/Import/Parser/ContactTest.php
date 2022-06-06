@@ -88,7 +88,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $parser->setUserJobID($userJobID);
     $parser->init();
 
-    $this->assertEquals(CRM_Import_Parser::VALID, $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values), 'Return code from parser import was not as expected');
+    $this->assertEquals(CRM_Import_Parser::VALID, $parser->import($values), 'Return code from parser import was not as expected');
     $this->callAPISuccessGetSingle('Contact', [
       'first_name' => 'Alok',
       'last_name' => 'Patel',
@@ -656,11 +656,14 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'addressee' => '{contact.prefix_id:label}{ }{contact.first_name}{ }{contact.middle_name}{ }{contact.last_name}{ }{contact.suffix_id:label}',
       5 => 1,
     ];
-    $userJobID = $this->getUserJobID(['mapper' => [['first_name'], ['last_name'], ['email_greeting'], ['postal_greeting'], ['addressee']]]);
-    $parser = new CRM_Contact_Import_Parser_Contact(array_keys($contactValues));
+    $userJobID = $this->getUserJobID([
+      'mapper' => [['first_name'], ['last_name'], ['email_greeting'], ['postal_greeting'], ['addressee']],
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
+    ]);
+    $parser = new CRM_Contact_Import_Parser_Contact();
     $parser->setUserJobID($userJobID);
     $values = array_values($contactValues);
-    $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values);
+    $parser->import($values);
     $contact = Contact::get(FALSE)->addWhere('last_name', '=', 'Gates')->addSelect('email_greeting_id', 'postal_greeting_id', 'addressee_id')->execute()->first();
     $this->assertEquals(2, $contact['email_greeting_id']);
     $this->assertEquals(3, $contact['postal_greeting_id']);
@@ -672,7 +675,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $values[2] = 2;
     $values[3] = 3;
     $values[4] = 1;
-    $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values);
+    $parser->import($values);
     $contact = Contact::get(FALSE)->addWhere('last_name', '=', 'Gates')->addSelect('email_greeting_id', 'postal_greeting_id', 'addressee_id')->execute()->first();
     $this->assertEquals(2, $contact['email_greeting_id']);
     $this->assertEquals(3, $contact['postal_greeting_id']);
@@ -702,7 +705,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
 
     $processor = new CRM_Import_ImportProcessor();
     $processor->setMappingFields($mapping);
-    $userJobID = $this->getUserJobID(['mapper' => $mapperInput]);
+    $userJobID = $this->getUserJobID(['mapper' => $mapperInput, 'onDuplicate' => CRM_Import_Parser::DUPLICATE_NOCHECK]);
     $processor->setUserJobID($userJobID);
     $importer = $processor->getImporterObject();
 
@@ -713,7 +716,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'special',
       'III',
     ];
-    $importer->import(CRM_Import_Parser::DUPLICATE_NOCHECK, $contactValues);
+    $importer->import($contactValues);
 
     $contact = $this->callAPISuccessGetSingle('Contact', ['first_name' => 'Bill', 'prefix_id' => 'new_one', 'suffix_id' => 'III']);
     $this->assertEquals('special Bill Gates III', $contact['display_name']);
@@ -846,6 +849,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $processor = new CRM_Import_ImportProcessor();
     $processor->setUserJobID($this->getUserJobID([
       'mapper' => [['first_name'], ['last_name'], ['email'], ['phone', 1, 2], ['phone', 1, 1]],
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
     ]));
     $processor->setMappingFields(
       [
@@ -858,7 +862,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     );
     $importer = $processor->getImporterObject();
     $fields = ['First Name', 'new last name', 'bob@example.com', '1234', '5678'];
-    $importer->import(CRM_Import_Parser::DUPLICATE_UPDATE, $fields);
+    $importer->import($fields);
     $contact = $this->callAPISuccessGetSingle('Contact', ['last_name' => 'new last name']);
     $phones = $this->callAPISuccess('Phone', 'get', ['contact_id' => $contact['id']])['values'];
     $this->assertCount(2, $phones);
@@ -1544,6 +1548,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $processor = new CRM_Import_ImportProcessor();
     $processor->setUserJobID($this->getUserJobID([
       'mapper' => [['first_name'], ['last_name'], ['preferred_communication_method'], ['gender_id'], ['preferred_language']],
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_NOCHECK,
     ]));
     $processor->setMappingFields(
       [
@@ -1556,7 +1561,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     );
     $importer = $processor->getImporterObject();
     $fields = ['Ima', 'Texter', 'SMS,Phone', 'Female', 'Danish'];
-    $importer->import(CRM_Import_Parser::DUPLICATE_NOCHECK, $fields);
+    $importer->import($fields);
     $contact = $this->callAPISuccessGetSingle('Contact', ['last_name' => 'Texter']);
 
     $this->assertEquals([4, 1], $contact['preferred_communication_method'], 'Import multiple preferred communication methods using labels.');
@@ -1566,7 +1571,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
 
     $importer = $processor->getImporterObject();
     $fields = ['Ima', 'Texter', '4,1', '1', 'da_DK'];
-    $importer->import(CRM_Import_Parser::DUPLICATE_NOCHECK, $fields);
+    $importer->import($fields);
     $contact = $this->callAPISuccessGetSingle('Contact', ['last_name' => 'Texter']);
 
     $this->assertEquals([4, 1], $contact['preferred_communication_method'], 'Import multiple preferred communication methods using values.');
@@ -1623,7 +1628,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $parser->setUserJobID($userJobID);
     $parser->_dedupeRuleGroupID = $ruleGroupId;
     $parser->init();
-    $result = $parser->import($onDuplicateAction, $values);
+    $result = $parser->import($values);
     $dataSource = new CRM_Import_DataSource_CSV($userJobID);
     if ($result === FALSE && $expectedResult !== FALSE) {
       // Import is moving away from returning a status - this is a better way to check
@@ -1906,7 +1911,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $parser = new CRM_Contact_Import_Parser_Contact();
     $parser->setUserJobID($userJobID);
     $parser->init();
-    $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values);
+    $parser->import($values);
     $this->callAPISuccessGetSingle('Contact', [
       'first_name' => 'Bob',
       'last_name' => 'Dobbs',
@@ -2137,17 +2142,17 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ['5_a_b', 'external_identifier'],
       ['5_a_b', 'organization_name'],
     ];
-    $fields = array_keys($contactImportValues);
+
     $values = array_values($contactImportValues);
     $userJobID = $this->getUserJobID([
       'mapper' => $mapper,
     ]);
 
-    $parser = new CRM_Contact_Import_Parser_Contact($fields);
+    $parser = new CRM_Contact_Import_Parser_Contact();
     $parser->setUserJobID($userJobID);
     $parser->init();
 
-    $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values);
+    $parser->import($values);
     $this->callAPISuccessGetCount('Contact', ['organization_name' => 'Big shop'], $isOrganizationProvided ? 2 : 0);
   }
 
