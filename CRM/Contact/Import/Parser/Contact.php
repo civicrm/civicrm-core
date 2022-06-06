@@ -218,7 +218,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     //fixed CRM-4148
     //now we create new contact in update/fill mode also.
-    $newContact = $this->createContact($formatted, $contactFields, $params['id'] ?? NULL, TRUE, $this->getSubmittedValue('dedupe_rule_id'));
+    $newContact = $this->createContact($formatted, $params['id'] ?? NULL);
     $this->createdContacts[$newContact->id] = $contactID = $newContact->id;
 
     if ($contactID) {
@@ -259,7 +259,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
         if (empty($formatting['id']) || $this->isUpdateExistingContacts()) {
           try {
-            $relatedNewContact = $this->createContact($formatting, $contactFields, $formatting['id']);
+            $relatedNewContact = $this->createContact($formatting, $formatting['id']);
             $relContactId = $relatedNewContact->id;
             $this->createdContacts[$relContactId] = $relContactId;
           }
@@ -678,13 +678,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * Method for creating contact.
    *
    * @param array $formatted
-   * @param array $contactFields
    * @param int $contactId
    *
    * @return \CRM_Contact_BAO_Contact
    *   If a duplicate is found an array is returned, otherwise CRM_Contact_BAO_Contact
    */
-  public function createContact(&$formatted, &$contactFields, $contactId = NULL) {
+  public function createContact(&$formatted, $contactId = NULL) {
 
     if ($contactId) {
       $this->formatParams($formatted, (int) $contactId);
@@ -704,6 +703,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $formatted['updateBlankLocInfo'] = FALSE;
     }
 
+    $contactFields = CRM_Contact_DAO_Contact::import();
     [$data, $contactDetails] = $this->formatProfileContactParams($formatted, $contactFields, $contactId, $formatted['contact_type']);
 
     // manage is_opt_out
