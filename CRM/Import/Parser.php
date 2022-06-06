@@ -1676,6 +1676,10 @@ abstract class CRM_Import_Parser {
    * @throws \API_Exception
    */
   public function getMappedFieldLabel(array $mappedField): string {
+    // doNotImport is on it's way out - skip fields will be '' once all is done.
+    if ($mappedField['name'] === 'doNotImport') {
+      return '';
+    }
     $this->setFieldMetadata();
     return $this->getFieldMetadata($mappedField['name'])['title'];
   }

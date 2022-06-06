@@ -81,11 +81,8 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
    * The initializer code, called before the processing.
    */
   public function init() {
-    $fields = CRM_Event_BAO_Participant::importableFields($this->_contactType, FALSE);
-    $fields['event_id']['title'] = 'Event ID';
-    $eventfields = &CRM_Event_BAO_Event::fields();
-    $fields['event_title'] = $eventfields['event_title'];
-
+    $this->setFieldMetadata();
+    $fields = $this->importableFieldsMetadata;
     foreach ($fields as $name => $field) {
       $field['type'] = CRM_Utils_Array::value('type', $field, CRM_Utils_Type::T_INT);
       $field['dataPattern'] = CRM_Utils_Array::value('dataPattern', $field, '//');
@@ -1035,6 +1032,21 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
       }
     }
     return FALSE;
+  }
+
+  /**
+   * Set up field metadata.
+   *
+   * @return void
+   */
+  protected function setFieldMetadata(): void {
+    if (empty($this->importableFieldsMetadata)) {
+      $fields = CRM_Event_BAO_Participant::importableFields($this->_contactType, FALSE);
+      $fields['event_id']['title'] = 'Event ID';
+      $eventfields = CRM_Event_BAO_Event::fields();
+      $fields['event_title'] = $eventfields['event_title'];
+      $this->importableFieldsMetadata = $fields;
+    }
   }
 
 }
