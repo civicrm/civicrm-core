@@ -6,13 +6,14 @@ require_once 'CRM/Core/Page.php';
  * An example page which queues several tasks and then executes them
  */
 class CRM_Demoqueue_Page_DemoQueue extends CRM_Core_Page {
-  const QUEUE_NAME = 'demo-queue';
 
   function run() {
-    $queue = CRM_Queue_Service::singleton()->create([
+    $queueName = 'demoqueue_' . time();
+
+    $queue = Civi::queue($queueName, [
       'type' => 'Sql',
-      'name' => self::QUEUE_NAME,
-      'reset' => TRUE,
+      'runner' => 'task',
+      'error' => 'abort',
     ]);
 
     for ($i = 0; $i < 5; $i++) {
@@ -29,6 +30,12 @@ class CRM_Demoqueue_Page_DemoQueue extends CRM_Core_Page {
         ));
       }
     }
+
+    \Civi\Api4\UserJob::create()->setValues([
+      'type_id:label' => 'Contact Import',
+      'status_id:name' => 'in_progress',
+      'queue_id.name' => $queue->getName(),
+    ])->execute();
 
     $runner = new CRM_Queue_Runner([
       'title' => ts('Demo Queue Runner'),
