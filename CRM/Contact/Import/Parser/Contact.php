@@ -105,34 +105,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Is this a case where the user has opted to update existing contacts.
-   *
-   * @return bool
-   *
-   * @throws \API_Exception
-   */
-  private function isUpdateExistingContacts(): bool {
-    return in_array((int) $this->getSubmittedValue('onDuplicate'), [
-      CRM_Import_Parser::DUPLICATE_UPDATE,
-      CRM_Import_Parser::DUPLICATE_FILL,
-    ], TRUE);
-  }
-
-  /**
-   * Did the user specify duplicates checking should be skipped, resulting in possible duplicate contacts.
-   *
-   * Note we still need to check for external_identifier as it will hard-fail
-   * if we duplicate.
-   *
-   * @return bool
-   *
-   * @throws \API_Exception
-   */
-  private function isIgnoreDuplicates(): bool {
-    return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_NOCHECK;
-  }
-
-  /**
    * Handle the values in preview mode.
    *
    * Function will be deprecated in favour of validateValues.
@@ -235,7 +207,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         //format common data, CRM-4062
         $this->formatCommonData($field, $formatting);
         $isUpdate = empty($formatting['id']) ? 'new' : 'updated';
-        if (empty($formatting['id']) || $this->isUpdateExistingContacts()) {
+        if (empty($formatting['id']) || $this->isUpdateExisting()) {
           $relatedNewContact = $this->createContact($formatting, $formatting['id']);
           $formatting['id'] = $relatedNewContact->id;
         }
@@ -545,18 +517,17 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   /**
    * @param array $params
    *
-   * @return string|null
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  protected function validateParams(array $params): ?string {
+  protected function validateParams(array $params): void {
     $contacts = array_merge(['0' => $params], $this->getRelatedContactsParams($params));
     $errors = [];
     foreach ($contacts as $value) {
       // If we are referencing a related contact, or are in update mode then we
       // don't need all the required fields if we have enough to find an existing contact.
-      $useExistingMatchFields = !empty($value['relationship_type_id']) || $this->isUpdateExistingContacts();
+      $useExistingMatchFields = !empty($value['relationship_type_id']) || $this->isUpdateExisting();
       $prefixString = !empty($value['relationship_label']) ? '(' . $value['relationship_label'] . ') ' : '';
       $this->validateRequiredContactFields($value['contact_type'], $value, $useExistingMatchFields, $prefixString);
 
@@ -595,7 +566,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $tempMsg = "Invalid value for field(s) : $errorMessage";
       throw new CRM_Core_Exception($tempMsg);
     }
-    return $errorMessage;
   }
 
   /**

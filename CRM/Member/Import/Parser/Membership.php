@@ -268,11 +268,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    *
    * @param array $values
    *   The array of values belonging to this line.
-   *
-   * @return bool
-   *   the result of this processing
    */
-  public function validateValues($values) {
+  public function validateValues($values): void {
     $params = $this->getMappedRow($values);
     $errors = [];
     foreach ($params as $key => $value) {
@@ -281,7 +278,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
 
     if (empty($params['membership_type_id'])) {
       $errors[] = ts('Missing required fields');
-      return NULL;
+      return;
     }
 
     //To check whether start date or join date is provided
@@ -291,8 +288,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
     if ($errors) {
       throw new CRM_Core_Exception('Invalid value for field(s) : ' . implode(',', $errors));
     }
-
-    return CRM_Import_Parser::VALID;
   }
 
   /**

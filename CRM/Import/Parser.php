@@ -181,9 +181,9 @@ abstract class CRM_Import_Parser {
   /**
    * Get configured contact type.
    *
-   * @throws \API_Exception
+   * @return string
    */
-  protected function getContactType() {
+  protected function getContactType(): string {
     if (!$this->_contactType) {
       $contactTypeMapping = [
         CRM_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
@@ -199,10 +199,8 @@ abstract class CRM_Import_Parser {
    * Get configured contact type.
    *
    * @return string|null
-   *
-   * @throws \API_Exception
    */
-  public function getContactSubType() {
+  public function getContactSubType(): ?string {
     if (!$this->_contactSubType) {
       $this->_contactSubType = $this->getSubmittedValue('contactSubType');
     }
@@ -336,6 +334,30 @@ abstract class CRM_Import_Parser {
    */
   protected function isSkipDuplicates(): bool {
     return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_SKIP;
+  }
+
+  /**
+   * Is this a case where the user has opted to update existing contacts.
+   *
+   * @return bool
+   */
+  protected function isUpdateExisting(): bool {
+    return in_array((int) $this->getSubmittedValue('onDuplicate'), [
+      CRM_Import_Parser::DUPLICATE_UPDATE,
+      CRM_Import_Parser::DUPLICATE_FILL,
+    ], TRUE);
+  }
+
+  /**
+   * Did the user specify duplicates checking should be skipped, resulting in possible duplicate contacts.
+   *
+   * Note we still need to check for external_identifier as it will hard-fail
+   * if we duplicate.
+   *
+   * @return bool
+   */
+  protected function isIgnoreDuplicates(): bool {
+    return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_NOCHECK;
   }
 
   /**
@@ -1250,7 +1272,7 @@ abstract class CRM_Import_Parser {
    *
    * @throws \CRM_Core_Exception Exception thrown if field requirements are not met.
    */
-  protected function validateRequiredFields(array $requiredFields, array $params, $prefixString): void {
+  protected function validateRequiredFields(array $requiredFields, array $params, $prefixString = ''): void {
     $missingFields = [];
     foreach ($requiredFields as $key => $required) {
       if (!is_array($required)) {
@@ -1366,10 +1388,10 @@ abstract class CRM_Import_Parser {
    *   Only show fields for the type to import (not appropriate when looking up
    *   related contact fields).
    *
-   *
    * @return array
-   * @throws \API_Exception
-   * @throws \Civi\API\Exception\NotImplementedException
+   *
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
    */
   protected function getFieldMetadata(string $fieldName, bool $loadOptions = FALSE, $limitToContactType = FALSE): array {
 
@@ -1583,6 +1605,20 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * @param array $params
+   */
+  protected function validateParams(array $params): void {
+    $this->validateRequiredFields($this->getRequiredFields(), $params);
+    $errors = [];
+    foreach ($params as $key => $value) {
+      $errors = array_merge($this->getInvalidValues($value, $key), $errors);
+    }
+    if ($errors) {
+      throw new CRM_Core_Exception('Invalid value for field(s) : ' . implode(',', $errors));
+    }
+  }
+
+  /**
    * Search the value for the string 'invalid_import_value'.
    *
    * If the string is found it indicates the fields was rejected
@@ -1699,6 +1735,10 @@ abstract class CRM_Import_Parser {
    * @throws \API_Exception
    */
   public function getMappedFieldLabel(array $mappedField): string {
+    // doNotImport is on it's way out - skip fields will be '' once all is done.
+    if ($mappedField['name'] === 'doNotImport') {
+      return '';
+    }
     $this->setFieldMetadata();
     return $this->getFieldMetadata($mappedField['name'])['title'];
   }

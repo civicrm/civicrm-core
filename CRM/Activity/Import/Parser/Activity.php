@@ -127,8 +127,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
   /**
    * Handle the values in import mode.
    *
-   * @param int $onDuplicate
-   *   The code for what action to take on duplicates.
    * @param array $values
    *   The array of values belonging to this line.
    *
@@ -138,7 +136,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
    *
    * @throws \CRM_Core_Exception
    */
-  public function import($onDuplicate, &$values) {
+  public function import(&$values) {
     // First make sure this is a valid line
     try {
       $this->validateValues($values);
@@ -493,8 +491,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
       }
 
       // Trim whitespace around the values.
-
-      $empty = TRUE;
       foreach ($values as $k => $v) {
         $values[$k] = trim($v, " \t\r\n");
       }
@@ -513,7 +509,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
         $returnCode = $this->summary($values);
       }
       elseif ($mode == self::MODE_IMPORT) {
-        $returnCode = $this->import($onDuplicate, $values);
+        $returnCode = $this->import($values);
         if ($statusID && (($this->_lineCount % 50) == 0)) {
           $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
         }

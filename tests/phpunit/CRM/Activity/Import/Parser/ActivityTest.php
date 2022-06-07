@@ -50,10 +50,6 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
    *
    * So far this is just testing the class constructor & preparing for more
    * tests.
-   *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testImport(): void {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Activity'], 'checkbox');
@@ -101,7 +97,7 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
     $importer = $this->createImportObject(array_keys($values));
     $params = array_values($values);
     CRM_Core_Session::singleton()->set('dateTypes', 1);
-    $outcome = $importer->import(NULL, $params);
+    $outcome = $importer->import($params);
     $this->assertEquals($expectedOutcome, $outcome);
     // If there was an error it's in element 0
     return $outcome === CRM_Import_Parser::VALID ? '' : $params[0];
