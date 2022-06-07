@@ -316,6 +316,14 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
+    /* Before we do any loading, let's start the session and write to it.
+     * We typically call authenticate only when we need to bootstrap the CMS
+     * directly via Civi and hence bypass the normal CMS auth and bootstrap
+     * process typically done in CLI and cron scripts. See: CRM-12648
+     */
+    $session = CRM_Core_Session::singleton();
+    $session->set('civicrmInitSession', TRUE);
+
     $system = new CRM_Utils_System_Drupal8();
     $system->loadBootStrap([], FALSE);
 

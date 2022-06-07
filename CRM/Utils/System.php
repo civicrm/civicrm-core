@@ -754,18 +754,6 @@ class CRM_Utils_System {
   public static function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     $config = CRM_Core_Config::singleton();
 
-    /* Before we do any loading, let's start the session and write to it.
-     * We typically call authenticate only when we need to bootstrap the CMS
-     * directly via Civi and hence bypass the normal CMS auth and bootstrap
-     * process typically done in CLI and cron scripts. See: CRM-12648
-     *
-     * Q: Can we move this to the userSystem class so that it can be tuned
-     * per-CMS? For example, when dealing with UnitTests UF, does it need to
-     * do this session write since the original issue was for Drupal.
-     */
-    $session = CRM_Core_Session::singleton();
-    $session->set('civicrmInitSession', TRUE);
-
     return $config->userSystem->authenticate($name, $password, $loadCMSBootstrap, $realPath);
   }
 
