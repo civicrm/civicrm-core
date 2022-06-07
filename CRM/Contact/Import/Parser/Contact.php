@@ -86,38 +86,22 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
+   * Get the fields to track the import.
+   *
+   * @return array
+   */
+  public function getTrackingFields(): array {
+    return [
+      'related_contact_created' => 'INT COMMENT "Number of related contacts created"',
+      'related_contact_matched' => 'INT COMMENT "Number of related contacts found (& potentially updated)"',
+    ];
+  }
+
+  /**
    * Is street address parsing enabled for the site.
    */
   protected function isParseStreetAddress() : bool {
     return (bool) (CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'address_options')['street_address_parsing'] ?? FALSE);
-  }
-
-  /**
-   * Is this a case where the user has opted to update existing contacts.
-   *
-   * @return bool
-   *
-   * @throws \API_Exception
-   */
-  private function isUpdateExistingContacts(): bool {
-    return in_array((int) $this->getSubmittedValue('onDuplicate'), [
-      CRM_Import_Parser::DUPLICATE_UPDATE,
-      CRM_Import_Parser::DUPLICATE_FILL,
-    ], TRUE);
-  }
-
-  /**
-   * Did the user specify duplicates checking should be skipped, resulting in possible duplicate contacts.
-   *
-   * Note we still need to check for external_identifier as it will hard-fail
-   * if we duplicate.
-   *
-   * @return bool
-   *
-   * @throws \API_Exception
-   */
-  private function isIgnoreDuplicates(): bool {
-    return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_NOCHECK;
   }
 
   /**
@@ -172,7 +156,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @return bool
    *   the result of this processing
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    * @throws \API_Exception
    */
@@ -184,16 +167,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       // CRM-5854, reset the geocode method to null to prevent geocoding
       CRM_Utils_GeocodeProvider::disableForSession();
     }
+    $relatedContacts = [];
 
     try {
       $params = $this->getMappedRow($values);
-      // it is questionable whether we need to do validate here
-      // - normally it has already been done in the form flow
-      // and generally only lines that passed that will
-      // get to the import function. It might be that it
-      // is really only here cos it used to be combined with getMappedRow
-      $this->validateParams($params);
-
       $formatted = [];
       foreach ($params as $key => $value) {
         if ($value !== '') {
@@ -201,79 +178,66 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
 
-      $contactFields = CRM_Contact_DAO_Contact::import();
-
-      $params['contact_sub_type'] = $this->getContactSubType() ?: ($params['contact_sub_type'] ?? NULL);
-
       [$formatted, $params] = $this->processContact($params, $formatted, TRUE);
+
+      //format common data, CRM-4062
+      $this->formatCommonData($params, $formatted);
+
+      $newContact = $this->createContact($formatted, $params['id'] ?? NULL);
+      $contactID = $newContact->id;
+
+      if ($contactID) {
+        // call import hook
+        $currentImportID = end($values);
+        $hookParams = [
+          'contactID' => $contactID,
+          'importID' => $currentImportID,
+          'importTempTable' => $this->_tableName,
+          'fieldHeaders' => $this->_mapperKeys,
+          'fields' => $this->_activeFields,
+        ];
+        CRM_Utils_Hook::import('Contact', 'process', $this, $hookParams);
+      }
+
+      $primaryContactId = $newContact->id;
+
+      //relationship contact insert
+      foreach ($this->getRelatedContactsParams($params) as $key => $field) {
+        [$formatting, $field] = $this->processContact($field, $field, FALSE);
+        //format common data, CRM-4062
+        $this->formatCommonData($field, $formatting);
+        $isUpdate = empty($formatting['id']) ? 'new' : 'updated';
+        if (empty($formatting['id']) || $this->isUpdateExisting()) {
+          $relatedNewContact = $this->createContact($formatting, $formatting['id']);
+          $formatting['id'] = $relatedNewContact->id;
+        }
+        if (empty($relatedContacts[$formatting['id']])) {
+          $relatedContacts[$formatting['id']] = $isUpdate;
+        }
+
+        $this->createRelationship($key, $formatting['id'], $primaryContactId);
+      }
     }
     catch (CRM_Core_Exception $e) {
       $this->setImportStatus($rowNumber, $this->getStatus($e->getErrorCode()), $e->getMessage());
       return FALSE;
     }
-
-    // Get contact id to format common data in update/fill mode,
-    // prioritising a dedupe rule check over an external_identifier check, but falling back on ext id.
-
-    //format common data, CRM-4062
-    $this->formatCommonData($params, $formatted, $contactFields);
-
-    //fixed CRM-4148
-    //now we create new contact in update/fill mode also.
-    $newContact = $this->createContact($formatted, $params['id'] ?? NULL);
-    $this->createdContacts[$newContact->id] = $contactID = $newContact->id;
-
-    if ($contactID) {
-      // call import hook
-      $currentImportID = end($values);
-
-      $hookParams = [
-        'contactID' => $contactID,
-        'importID' => $currentImportID,
-        'importTempTable' => $this->_tableName,
-        'fieldHeaders' => $this->_mapperKeys,
-        'fields' => $this->_activeFields,
-      ];
-
-      CRM_Utils_Hook::import('Contact', 'process', $this, $hookParams);
+    // We can probably stop catching this once https://github.com/civicrm/civicrm-core/pull/23471
+    // is merged - testImportParserWithExternalIdForRelationship will confirm....
+    catch (CiviCRM_API3_Exception $e) {
+      $this->setImportStatus($rowNumber, $this->getStatus($e->getErrorCode()), $e->getMessage());
+      return FALSE;
     }
-
-    $primaryContactId = $newContact->id;
-
-    if ($primaryContactId) {
-
-      //relationship contact insert
-      foreach ($this->getRelatedContactsParams($params) as $key => $field) {
-        $formatting = $field;
-        try {
-          [$formatting, $field] = $this->processContact($field, $formatting, FALSE);
-        }
-        catch (CRM_Core_Exception $e) {
-          $statuses = [CRM_Import_Parser::DUPLICATE => 'DUPLICATE', CRM_Import_Parser::ERROR => 'ERROR', CRM_Import_Parser::NO_MATCH => 'invalid_no_match'];
-          $this->setImportStatus((int) $values[count($values) - 1], $statuses[$e->getErrorCode()], $e->getMessage());
-          return FALSE;
-        }
-
-        $contactFields = CRM_Contact_DAO_Contact::import();
-
-        //format common data, CRM-4062
-        $this->formatCommonData($field, $formatting, $contactFields);
-
-        if (empty($formatting['id']) || $this->isUpdateExistingContacts()) {
-          try {
-            $relatedNewContact = $this->createContact($formatting, $formatting['id']);
-            $relContactId = $relatedNewContact->id;
-            $this->createdContacts[$relContactId] = $relContactId;
-          }
-          catch (CiviCRM_API3_Exception $e) {
-            $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
-            return FALSE;
-          }
-        }
-        $this->createRelationship($key, $relContactId, $primaryContactId);
+    $extraFields = ['related_contact_created' => 0, 'related_contact_matched' => 0];
+    foreach ($relatedContacts as $outcome) {
+      if ($outcome === 'new') {
+        $extraFields['related_contact_created']++;
+      }
+      else {
+        $extraFields['related_contact_matched']++;
       }
     }
-    $this->setImportStatus($rowNumber, $this->getStatus(CRM_Import_Parser::VALID), $this->getSuccessMessage(), $contactID);
+    $this->setImportStatus($rowNumber, $this->getStatus(CRM_Import_Parser::VALID), $this->getSuccessMessage(), $contactID, $extraFields);
     return CRM_Import_Parser::VALID;
   }
 
@@ -529,15 +493,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Get the array of successfully imported contact id's
-   *
-   * @return array
-   */
-  public function getImportedContacts() {
-    return $this->createdContacts;
-  }
-
-  /**
    * Build error-message containing error-fields
    *
    * Once upon a time there was a dev who hadn't heard of implode. That dev wrote this function.
@@ -562,18 +517,17 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   /**
    * @param array $params
    *
-   * @return string|null
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  protected function validateParams(array $params): ?string {
+  protected function validateParams(array $params): void {
     $contacts = array_merge(['0' => $params], $this->getRelatedContactsParams($params));
     $errors = [];
     foreach ($contacts as $value) {
       // If we are referencing a related contact, or are in update mode then we
       // don't need all the required fields if we have enough to find an existing contact.
-      $useExistingMatchFields = !empty($value['relationship_type_id']) || $this->isUpdateExistingContacts();
+      $useExistingMatchFields = !empty($value['relationship_type_id']) || $this->isUpdateExisting();
       $prefixString = !empty($value['relationship_label']) ? '(' . $value['relationship_label'] . ') ' : '';
       $this->validateRequiredContactFields($value['contact_type'], $value, $useExistingMatchFields, $prefixString);
 
@@ -584,7 +538,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if (!empty($value['relationship_type_id'])) {
         $requiredSubType = $this->getRelatedContactSubType($value['relationship_type_id'], $value['relationship_direction']);
         if ($requiredSubType && $value['contact_sub_type'] && $requiredSubType !== $value['contact_sub_type']) {
-          throw new CRM_Core_Exception($prefixString . ts('Mismatched or Invalid contact subtype found for this related contact.'));
+          // Tested in CRM_Contact_Import_Parser_ContactTest::testImportContactSubTypes
+          throw new CRM_Core_Exception($prefixString . ts('Mismatched or Invalid contact subtype found for this related contact.'), CRM_Import_Parser::ERROR);
         }
       }
     }
@@ -611,7 +566,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $tempMsg = "Invalid value for field(s) : $errorMessage";
       throw new CRM_Core_Exception($tempMsg);
     }
-    return $errorMessage;
   }
 
   /**
@@ -1145,7 +1099,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         return array_key_last($possibleMatches['values']);
       }
       if (count($possibleMatches['values']) > 1) {
-        throw new CRM_Core_Exception(ts('Record duplicates multiple contacts'));
+        throw new CRM_Core_Exception(ts('Record duplicates multiple contacts: ') . implode(',', array_keys($possibleMatches['values'])), CRM_Import_Parser::ERROR);
+
       }
       return NULL;
     }
@@ -1153,7 +1108,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if (array_key_exists($extIDMatch, $possibleMatches['values'])) {
         return $extIDMatch;
       }
-      throw new CRM_Core_Exception(ts('Matching this contact based on the de-dupe rule would cause an external ID conflict'));
+      throw new CRM_Core_Exception(ts('Matching this contact based on the de-dupe rule would cause an external ID conflict'), CRM_Import_Parser::ERROR);
     }
     return $extIDMatch;
   }
@@ -1590,21 +1545,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Validate the import values.
-   *
-   * The values array represents a row in the datasource.
-   *
-   * @param array $values
-   *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
-   */
-  public function validateValues(array $values): void {
-    $params = $this->getMappedRow($values);
-    $this->validateParams($params);
-  }
-
-  /**
    * Get the invalid values in the params for the given contact.
    *
    * @param array|int|string $value
@@ -1907,7 +1847,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   protected function processContact(array $params, array $formatted, bool $isMainContact): array {
     $params['id'] = $formatted['id'] = $this->lookupContactID($params, $isMainContact);
-    if ($params['id'] && $params['contact_sub_type']) {
+    if ($params['id'] && !empty($params['contact_sub_type'])) {
       $contactSubType = Contact::get(FALSE)
         ->addWhere('id', '=', $params['id'])
         ->addSelect('contact_sub_type')

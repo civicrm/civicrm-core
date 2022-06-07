@@ -50,6 +50,13 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   private $relationships = [];
 
   /**
+   * User Job ID.
+   *
+   * @var int
+   */
+  private $userJobID;
+
+  /**
    * Tear down after test.
    */
   public function tearDown(): void {
@@ -1053,17 +1060,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public function testImport($csv, $mapper, $expectedError, $expectedOutcomes = []): void {
-    try {
-      $this->importCSV($csv, $mapper);
-    }
-    catch (CRM_Core_Exception $e) {
-      $this->assertSame($expectedError, $e->getMessage());
-      return;
-    }
-    if ($expectedError) {
-      $this->fail('expected error :' . $expectedError);
-    }
+  public function testImport($csv, $mapper, $expectedError, $expectedOutcomes = [], $submittedValues = []): void {
+    $this->importCSV($csv, $mapper, $submittedValues);
     $dataSource = new CRM_Import_DataSource_CSV(UserJob::get(FALSE)->setSelect(['id'])->execute()->first()['id']);
     foreach ($expectedOutcomes as $outcome => $count) {
       $this->assertEquals($dataSource->getRowCount([$outcome]), $count);
@@ -1082,6 +1080,29 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
         'mapper' => [['first_name'], ['last_name'], ['contact_sub_type']],
         'expected_error' => '',
         'expected_outcomes' => [CRM_Import_Parser::ERROR => 1],
+      ],
+      //Record duplicates multiple contacts
+      'organization_multiple_duplicates_invalid' => [
+        'csv' => 'organization_multiple_duplicates_invalid.csv',
+        'mapper' => [['organization_name'], ['email']],
+        'expected_error' => '',
+        'expected_outcomes' => [
+          CRM_Import_Parser::VALID => 2,
+          CRM_Import_Parser::ERROR => 1,
+        ],
+        'submitted_values' => [
+          'contactType' => CRM_Import_Parser::CONTACT_ORGANIZATION,
+        ],
+      ],
+      //Matching this contact based on the de-dupe rule would cause an external ID conflict
+      'individual_invalid_external_identifier_email_mismatch' => [
+        'csv' => 'individual_invalid_external_identifier_email_mismatch.csv',
+        'mapper' => [['first_name'], ['last_name'], ['email'], ['external_identifier']],
+        'expected_error' => '',
+        'expected_outcomes' => [
+          CRM_Import_Parser::VALID => 2,
+          CRM_Import_Parser::ERROR => 1,
+        ],
       ],
     ];
   }
@@ -1125,7 +1146,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    */
   public function testImportCountryStateCounty(): void {
     $childKey = $this->getRelationships()['Child of']['id'] . '_a_b';
-    // @todo - rows that don't work yet are set to do_not_import.
     $addressCustomGroupID = $this->createCustomGroup(['extends' => 'Address', 'name' => 'Address']);
     $contactCustomGroupID = $this->createCustomGroup(['extends' => 'Contact', 'name' => 'Contact']);
     $addressCustomFieldID = $this->createCountryCustomField(['custom_group_id' => $addressCustomGroupID])['id'];
@@ -1175,6 +1195,11 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       $this->assertEquals(1640, $contact['address'][0]['state_province_id']);
     }
     $this->assertCount(2, $contacts);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $dataSource->setOffset(4);
+    $dataSource->setLimit(1);
+    $row = $dataSource->getRow();
+    $this->assertEquals(1, $row['_related_contact_matched']);
   }
 
   /**
@@ -1385,7 +1410,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @throw \Exception
    */
-  public function testImportFill() {
+  public function testImportFill(): void {
     // Create a custom field group for testing.
     $this->createCustomGroup([
       'title' => 'importFillGroup',
@@ -1623,13 +1648,14 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
         ];
       }
     }
-    $userJobID = $this->getUserJobID(['mapper' => $mapper, 'onDuplicate' => $onDuplicateAction, 'dedupe_rule_id' => $ruleGroupId]);
-    $parser = new CRM_Contact_Import_Parser_Contact($fields);
-    $parser->setUserJobID($userJobID);
+    $this->userJobID = $this->getUserJobID(['mapper' => $mapper, 'onDuplicate' => $onDuplicateAction, 'dedupe_rule_id' => $ruleGroupId]);
+    $parser = new CRM_Contact_Import_Parser_Contact();
+    $parser->setUserJobID($this->userJobID);
     $parser->_dedupeRuleGroupID = $ruleGroupId;
     $parser->init();
+
     $result = $parser->import($values);
-    $dataSource = new CRM_Import_DataSource_CSV($userJobID);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     if ($result === FALSE && $expectedResult !== FALSE) {
       // Import is moving away from returning a status - this is a better way to check
       $this->assertGreaterThan(0, $dataSource->getRowCount([$expectedResult]));
@@ -2035,22 +2061,22 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $form = $this->getFormObject('CRM_Contact_Import_Form_DataSource', $submittedValues);
     $form->buildForm();
     $form->postProcess();
-    $userJobID = $form->getUserJobID();
+    $this->userJobID = $form->getUserJobID();
     /* @var CRM_Contact_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Contact_Import_Form_MapField', $submittedValues);
-    $form->setUserJobID($userJobID);
+    $form->setUserJobID($this->userJobID);
     $form->buildForm();
     $form->postProcess();
     /* @var CRM_Contact_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Contact_Import_Form_Preview', $submittedValues);
-    $form->setUserJobID($userJobID);
+    $form->setUserJobID($this->userJobID);
     $form->buildForm();
 
     try {
       $form->postProcess();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $queue = Civi::queue('user_job_' . $userJobID);
+      $queue = Civi::queue('user_job_' . $this->userJobID);
       $runner = new CRM_Queue_Runner([
         'queue' => $queue,
         'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
