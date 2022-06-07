@@ -297,4 +297,25 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     }
   }
 
+  /**
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function getFieldMappings(): array {
+    $savedMappingID = $this->getSubmittedValue('savedMapping');
+    if ($savedMappingID) {
+      $fieldMappings = MappingField::get(FALSE)
+        ->addWhere('mapping_id', '=', $savedMappingID)
+        ->execute()
+        ->indexBy('column_number');
+
+      if ((count($this->getColumnHeaders()) !== count($fieldMappings))) {
+        CRM_Core_Session::singleton()->setStatus(ts('The data columns in this import file appear to be different from the saved mapping. Please verify that you have selected the correct saved mapping before continuing.'));
+      }
+      return (array) $fieldMappings;
+    }
+    return [];
+  }
+
 }

@@ -50,12 +50,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     $js = "<script type='text/javascript'>\n";
     $formName = 'document.forms.' . $this->_name;
 
-    //used to warn for mismatch column count or mismatch mapping
-    $warning = 0;
-    $savedMappingID = $this->getSubmittedValue('savedMapping');
-    if ($savedMappingID) {
-      $fieldMappings = \Civi\Api4\MappingField::get(FALSE)->addWhere('mapping_id', '=', $savedMappingID)->execute()->indexBy('column_number');
-    }
+    $fieldMappings = $this->getFieldMappings();
 
     foreach ($columnHeaders as $i => $columnHeader) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', array(1 => $i)), NULL);
@@ -122,21 +117,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
     $js .= "</script>\n";
     $this->assign('initHideBoxes', $js);
-
-    //set warning if mismatch in more than
-    if (isset($mappingName)) {
-      if (($this->_columnCount != count($mappingName))) {
-        $warning++;
-      }
-    }
-    if ($warning != 0 && $this->get('savedMapping')) {
-      $session = CRM_Core_Session::singleton();
-      $session::setStatus(ts('The data columns in this import file appear to be different from the saved mapping. Please verify that you have selected the correct saved mapping before continuing.'));
-    }
-    else {
-      $session = CRM_Core_Session::singleton();
-      $session::setStatus(NULL);
-    }
 
     $this->setDefaults($defaults);
 

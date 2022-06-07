@@ -159,6 +159,45 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
       }
     }
 
+    // Activity fields...
+    // Yes - I know they could be combined - but it's also less confusing this way.
+    $mappings = MappingField::get(FALSE)
+      ->setSelect(['id', 'name'])
+      ->addWhere('mapping_id.mapping_type_id:name', '=', 'Import Activity')
+      ->execute();
+
+    $activityContact = CRM_Activity_BAO_ActivityContact::import();
+    $activityTarget['target_contact_id'] = $activityContact['contact_id'];
+    $fields = array_merge(CRM_Activity_BAO_Activity::importableFields(),
+      $activityTarget
+    );
+
+    $fields = array_merge($fields, [
+      'source_contact_id' => [
+        'title' => ts('Source Contact'),
+        'headerPattern' => '/Source.Contact?/i',
+      ],
+    ]);
+
+    $fieldMap = [];
+    foreach ($fields as $fieldName => $field) {
+      $fieldMap[$field['title']] = $fieldName;
+      if (!empty($field['html']['label'])) {
+        $fieldMap[$field['html']['label']] = $fieldName;
+      }
+    }
+    $fieldMap[ts('- do not import -')] = 'do_not_import';
+    $fieldMap[ts('Activity Type Label')] = 'activity_type_id';
+
+    foreach ($mappings as $mapping) {
+      if (!empty($fieldMap[$mapping['name']])) {
+        MappingField::update(FALSE)
+          ->addWhere('id', '=', $mapping['id'])
+          ->addValue('name', $fieldMap[$mapping['name']])
+          ->execute();
+      }
+    }
+
     return TRUE;
   }
 
