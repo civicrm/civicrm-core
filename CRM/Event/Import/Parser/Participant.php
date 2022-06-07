@@ -113,21 +113,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
   }
 
   /**
-   * Validate the values.
-   *
-   * @param array $values
-   *   The array of values belonging to this line.
-   *
-   * @return bool
-   *   the result of this processing
-   */
-  public function validateValues($values) {
-    $params = $this->getMappedRow($values);
-    $this->validateParams($params);
-    return CRM_Import_Parser::VALID;
-  }
-
-  /**
    * Handle the values in summary mode.
    *
    * @param array $values
