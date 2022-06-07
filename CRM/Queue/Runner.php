@@ -141,6 +141,44 @@ class CRM_Queue_Runner {
   }
 
   /**
+   * [EXPERIMENTAL] Run all tasks interactively. Redirect to a screen which presents the progress.
+   *
+   * The exact mechanism and pageflow may be determined by the system configuration --
+   * environments which support multiprocessing (background queue-workers) can use those;
+   * otherwise, they can use the traditional AJAX runner.
+   *
+   * To ensure portability, requesters must satisfy the requirements of *both/all*
+   * execution mechanisms.
+   */
+  public function runAllInteractive() {
+    $this->assertRequirementsWeb();
+    $this->assertRequirementsBackground();
+
+    $userJob = $this->findUserJob();
+    $userJob['metadata']['runner'] = [
+      'title' => $this->title,
+      'onEndUrl' => $this->onEndUrl,
+      // 'onEnd' ==> No, see comments in assertRequirementsBackground()
+    ];
+    \Civi\Api4\UserJob::save(FALSE)->setRecords([$userJob])->execute();
+
+    if (Civi::settings()->get('enableBackgroundQueue')) {
+      return $this->runAllViaBackground();
+    }
+    else {
+      return $this->runAllViaWeb();
+    }
+  }
+
+  protected function runAllViaBackground() {
+    $url = CRM_Utils_System::url('civicrm/queue/monitor', ['name' => $this->queue->getName()]);
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_queue SET status = "active" WHERE name = %1', [
+      1 => [$this->queue->getName(), 'String'],
+    ]);
+    CRM_Utils_System::redirect($url);
+  }
+
+  /**
    * Redirect to the web-based queue-runner and evaluate all tasks in a queue.
    */
   public function runAllViaWeb() {
@@ -398,6 +436,69 @@ class CRM_Queue_Runner {
         return static::ERROR_ABORT;
     }
 
+  }
+
+  /**
+   * Find the `UserJob` that corresponds to this queue (if any).
+   *
+   * @return array|null
+   *   The record, per APIv4.
+   *   This may return NULL. UserJobs are required for `runAllInteractively()` and
+   *   `runAllViaBackground()`, but (for backward compatibility) they are not required for `runAllViaWeb()`.
+   */
+  protected function findUserJob(): ?array {
+    return \Civi\Api4\UserJob::get(FALSE)
+      ->addWhere('queue_id.name', '=', $this->queue->getName())
+      ->execute()
+      ->first();
+  }
+
+  /**
+   * Assert that we meet the requirements for running tasks in background.
+   * @throws \CRM_Core_Exception
+   */
+  protected function assertRequirementsBackground(): void {
+    $prefix = sprintf('Cannot execute queue "%s".', $this->queue->getName());
+
+    if (CRM_Core_Config::isUpgradeMode()) {
+      // Too many dependencies for use in upgrading - eg background runner relies on APIv4, and
+      // monitoring relies on APIv4 and Angular-modules. Only use runAllViaWeb() for upgrade-mode.
+      throw new \CRM_Core_Exception($prefix . ' It does not support upgrade mode.');
+    }
+
+    if (!$this->queue->getSpec('runner')) {
+      throw new \CRM_Core_Exception($prefix . ' The "civicrm_queue.runner" property is missing.');
+    }
+
+    $errorModes = CRM_Queue_BAO_Queue::getErrorModes();
+    if (!isset($errorModes[$this->queue->getSpec('error')])) {
+      throw new \CRM_Core_Exception($prefix . ' The "civicrm_queue.error" property is invalid.');
+    }
+
+    if ($this->onEnd) {
+      throw new \CRM_Core_Exception($prefix . ' The "onEnd" property is not supported by background workers. However, "hook_civicrm_queueStatus" is supported by both foreground and background.');
+      // Also: There's nowhere to store it. 'UserJob.metadata' allows remote CRUD, which means you cannot securely store callables.
+    }
+
+    $userJob = $this->findUserJob();
+    if (!$userJob) {
+      throw new \CRM_Core_Exception($prefix . ' There is no associated UserJob.');
+    }
+  }
+
+  /**
+   * Assert that we meet the requirements for running tasks via AJAX.
+   * @throws \CRM_Core_Exception
+   */
+  protected function assertRequirementsWeb(): void {
+    $prefix = sprintf('Cannot execute queue "%s".', $this->queue->getName());
+
+    $runnerType = $this->queue->getSpec('runner');
+    if ($runnerType && $runnerType !== 'task') {
+      // The AJAX frontend doesn't read `runner` (so it's not required here); but
+      // it only truly support `task` data (at time of writing). Anything else indicates confusion.
+      throw new \CRM_Core_Exception($prefix . ' AJAX workers only support "runner=task".');
+    }
   }
 
 }
