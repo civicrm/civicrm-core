@@ -307,7 +307,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
    *   List of matching files, relative to the extension base dir.
    * @see glob()
    */
-  public function glob($ext, $patterns, $flags = NULL) {
+  public function glob($ext, $patterns, $flags = 0) {
     $path = $this->getPath($ext);
     $patterns = (array) $patterns;
     $files = [];
