@@ -102,6 +102,7 @@ class CRM_Queue_Runner {
    *   Array with keys:
    *   - queue: CRM_Queue_Queue
    *   - errorMode: int, ERROR_CONTINUE or ERROR_ABORT.
+   *     If omitted, it inherits from `$queue->spec['error']` or falls back to `ERROR_ABORT`.
    *   - onEnd: mixed, a callback to update the UI after running; should be
    *     both callable and serializable.
    *   - onEndUrl: string, the URL to which one redirects.
@@ -111,7 +112,7 @@ class CRM_Queue_Runner {
   public function __construct($runnerSpec) {
     $this->title = CRM_Utils_Array::value('title', $runnerSpec, ts('Queue Runner'));
     $this->queue = $runnerSpec['queue'];
-    $this->errorMode = CRM_Utils_Array::value('errorMode', $runnerSpec, self::ERROR_ABORT);
+    $this->errorMode = CRM_Utils_Array::value('errorMode', $runnerSpec, $this->pickErrorMode($this->queue));
     $this->isMinimal = CRM_Utils_Array::value('isMinimal', $runnerSpec, FALSE);
     $this->onEnd = $runnerSpec['onEnd'] ?? NULL;
     $this->onEndUrl = $runnerSpec['onEndUrl'] ?? NULL;
@@ -367,6 +368,33 @@ class CRM_Queue_Runner {
       $this->taskCtx->log = CRM_Core_Error::createDebugLogger();
     }
     return $this->taskCtx;
+  }
+
+  /**
+   * If the runner doesn't its own error-policy, then try to inherit the policy
+   * from the queue configuration.
+   *
+   * @param \CRM_Queue_Queue $queue
+   * @return int
+   */
+  protected function pickErrorMode(CRM_Queue_Queue $queue) {
+    switch ($queue->getSpec('error')) {
+      case 'delete':
+        return static::ERROR_CONTINUE;
+
+      case 'abort':
+      case '':
+      case NULL:
+        // ERROR_ABORT is the traditional default for AJAX runner.
+        return static::ERROR_ABORT;
+
+      default:
+        Civi::log()->warning('Unrecognized queue error mode: {mode}', [
+          'mode' => $queue->getSpec('error'),
+        ]);
+        return static::ERROR_ABORT;
+    }
+
   }
 
 }
