@@ -695,8 +695,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         if (CRM_Utils_Array::value('error_data', $formatError) == 'pledge_payment') {
           return self::PLEDGE_PAYMENT_ERROR;
         }
-        $this->setImportStatus($rowNumber, 'ERROR', '');
-        return CRM_Import_Parser::ERROR;
+        throw new CRM_Core_Exception('', CRM_Import_Parser::ERROR);
       }
 
       if ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
@@ -778,9 +777,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
             }
           }
           $errorMsg = implode(' AND ', $errorMsg);
-          array_unshift($values, 'Matching Contribution record not found for ' . $errorMsg . '. Row was skipped.');
-          $this->setImportStatus($rowNumber, 'ERROR', 'Matching Contribution record not found for ' . $errorMsg . '. Row was skipped.');
-          return CRM_Import_Parser::ERROR;
+          throw new CRM_Core_Exception('Matching Contribution record not found for ' . $errorMsg . '. Row was skipped.', CRM_Import_Parser::ERROR);
         }
       }
 
@@ -791,9 +788,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         if (CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
           $matchedIDs = explode(',', $error['error_message']['params'][0]);
           if (count($matchedIDs) > 1) {
-            array_unshift($values, 'Multiple matching contact records detected for this row. The contribution was not imported');
-            $this->setImportStatus($rowNumber, 'ERROR', 'Multiple matching contact records detected for this row. The contribution was not imported');
-            return CRM_Import_Parser::ERROR;
+            throw new CRM_Core_Exception('Multiple matching contact records detected for this row. The contribution was not imported', CRM_Import_Parser::ERROR);
           }
           $cid = $matchedIDs[0];
           $formatted['contact_id'] = $cid;
@@ -808,9 +803,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
               }
             }
             else {
-              array_unshift($values, $newContribution['error_message']);
-              $this->setImportStatus($rowNumber, 'ERROR', $newContribution['error_message']);
-              return CRM_Import_Parser::ERROR;
+              throw new CRM_Core_Exception($newContribution['error_message'], CRM_Import_Parser::ERROR);
             }
           }
 
@@ -854,9 +847,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           }
         }
         $errorMessage = 'No matching Contact found for (' . $disp . ')';
-        $this->setImportStatus($rowNumber, 'ERROR', $errorMessage);
-        array_unshift($values, $errorMessage);
-        return CRM_Import_Parser::ERROR;
+        throw new CRM_Core_Exception($errorMessage, CRM_Import_Parser::ERROR);
       }
 
       if (!empty($paramValues['external_identifier'])) {
@@ -865,9 +856,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $checkCid->find(TRUE);
         if ($checkCid->id != $formatted['contact_id']) {
           $errorMessage = 'Mismatch of External ID:' . $paramValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id'];
-          array_unshift($values, $errorMessage);
-          $this->setImportStatus($rowNumber, 'ERROR', $errorMessage);
-          return CRM_Import_Parser::ERROR;
+          throw new CRM_Core_Exception($errorMessage, CRM_Import_Parser::ERROR);
         }
       }
       $newContribution = civicrm_api('contribution', 'create', $formatted);
@@ -880,9 +869,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           }
         }
         else {
-          array_unshift($values, $newContribution['error_message']);
-          $this->setImportStatus($rowNumber, 'ERROR', $newContribution['error_message']);
-          return CRM_Import_Parser::ERROR;
+          throw new CRM_Core_Exception($newContribution['error_message'], CRM_Import_Parser::ERROR);
         }
       }
 
