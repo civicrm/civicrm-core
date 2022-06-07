@@ -45,8 +45,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       unset($sel1['membership_id']);
     }
 
-    $sel2[''] = NULL;
-
     $js = "<script type='text/javascript'>\n";
     $formName = 'document.forms.' . $this->_name;
 
@@ -113,7 +111,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
           );
         }
       }
-      $sel->setOptions(array($sel1, $sel2));
+      $sel->setOptions([$sel1]);
     }
     $js .= "</script>\n";
     $this->assign('initHideBoxes', $js);

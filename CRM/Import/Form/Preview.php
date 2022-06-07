@@ -124,7 +124,25 @@ abstract class CRM_Import_Form_Preview extends CRM_Import_Forms {
    * @return void
    */
   public function postProcess() {
-    CRM_Import_Parser::runImport(NULL, $this->getUserJobID(), 0);
+    $this->runTheImport();
+  }
+
+  /**
+   * Run the import.
+   */
+  protected function runTheImport(): void {
+    $parser = $this->getParser();
+    $parser->queue();
+    $queue = Civi::queue('user_job_' . $this->getUserJobID());
+    $runner = new CRM_Queue_Runner([
+      'queue' => $queue,
+      'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
+      'onEndUrl' => CRM_Utils_System::url('civicrm/import/contact/summary', [
+        'user_job_id' => $this->getUserJobID(),
+        'reset' => 1,
+      ]),
+    ]);
+    $runner->runAllViaWeb();
   }
 
 }
