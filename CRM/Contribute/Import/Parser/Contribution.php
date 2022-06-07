@@ -177,7 +177,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $returnCode = $this->summary($values);
       }
       elseif ($mode == self::MODE_IMPORT) {
-        $returnCode = $this->import($onDuplicate, $values);
+        $returnCode = $this->import($values);
         if ($statusID && (($this->_lineCount % 50) == 0)) {
           $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
         }
@@ -239,7 +239,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $recordNumber = $this->_lineCount;
         array_unshift($values, $recordNumber);
         $this->_duplicates[] = $values;
-        if ($onDuplicate != self::DUPLICATE_SKIP) {
+        if (!$this->isSkipDuplicates()) {
           $this->_validCount++;
         }
       }
@@ -632,8 +632,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   /**
    * Handle the values in import mode.
    *
-   * @param int $onDuplicate
-   *   The code for what action to take on duplicates.
    * @param array $values
    *   The array of values belonging to this line.
    *
@@ -647,15 +645,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    *   - CRM_Import_Parser::SOFT_CREDIT (successful creation)
    *   - CRM_Import_Parser::PLEDGE_PAYMENT (successful creation)
    */
-  public function import($onDuplicate, &$values) {
+  public function import(&$values) {
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
-      // first make sure this is a valid line
-      $response = $this->summary($values);
-      if ($response != CRM_Import_Parser::VALID) {
-        return CRM_Import_Parser::ERROR;
-      }
-
       $params = $this->getMappedRow($values);
       $formatted = array_merge(['version' => 3, 'skipRecentView' => TRUE, 'skipCleanMoney' => TRUE, 'contribution_id' => $params['id'] ?? NULL], $params);
       //CRM-10994
@@ -673,12 +665,12 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       }
 
       //import contribution record according to select contact type
-      if ($onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP &&
+      if ($this->isSkipDuplicates() &&
         (!empty($paramValues['contribution_contact_id']) || !empty($paramValues['external_identifier']))
       ) {
         $paramValues['contact_type'] = $this->_contactType;
       }
-      elseif ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE &&
+      elseif ($this->isUpdateExisting() &&
         (!empty($paramValues['contribution_id']) || !empty($values['trxn_id']) || !empty($paramValues['invoice_id']))
       ) {
         $paramValues['contact_type'] = $this->_contactType;
@@ -687,11 +679,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $paramValues['contact_type'] = $this->_contactType;
       }
 
-      //need to pass $onDuplicate to check import mode.
-      if (!empty($paramValues['pledge_payment'])) {
-        $paramValues['onDuplicate'] = $onDuplicate;
-      }
-      $formatError = $this->deprecatedFormatParams($paramValues, $formatted, TRUE, $onDuplicate);
+      $formatError = $this->deprecatedFormatParams($paramValues, $formatted);
 
       if ($formatError) {
         array_unshift($values, $formatError['error_message']);
@@ -701,11 +689,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         if (CRM_Utils_Array::value('error_data', $formatError) == 'pledge_payment') {
           return self::PLEDGE_PAYMENT_ERROR;
         }
-        $this->setImportStatus($rowNumber, 'ERROR', '');
-        return CRM_Import_Parser::ERROR;
+        throw new CRM_Core_Exception('', CRM_Import_Parser::ERROR);
       }
 
-      if ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
+      if ($this->isUpdateExisting()) {
         //fix for CRM-2219 - Update Contribution
         // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
         if (!empty($paramValues['invoice_id']) || !empty($paramValues['trxn_id']) || !empty($paramValues['contribution_id'])) {
@@ -784,9 +771,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
             }
           }
           $errorMsg = implode(' AND ', $errorMsg);
-          array_unshift($values, 'Matching Contribution record not found for ' . $errorMsg . '. Row was skipped.');
-          $this->setImportStatus($rowNumber, 'ERROR', 'Matching Contribution record not found for ' . $errorMsg . '. Row was skipped.');
-          return CRM_Import_Parser::ERROR;
+          throw new CRM_Core_Exception('Matching Contribution record not found for ' . $errorMsg . '. Row was skipped.', CRM_Import_Parser::ERROR);
         }
       }
 
@@ -797,9 +782,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         if (CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
           $matchedIDs = explode(',', $error['error_message']['params'][0]);
           if (count($matchedIDs) > 1) {
-            array_unshift($values, 'Multiple matching contact records detected for this row. The contribution was not imported');
-            $this->setImportStatus($rowNumber, 'ERROR', 'Multiple matching contact records detected for this row. The contribution was not imported');
-            return CRM_Import_Parser::ERROR;
+            throw new CRM_Core_Exception('Multiple matching contact records detected for this row. The contribution was not imported', CRM_Import_Parser::ERROR);
           }
           $cid = $matchedIDs[0];
           $formatted['contact_id'] = $cid;
@@ -807,16 +790,12 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           $newContribution = civicrm_api('contribution', 'create', $formatted);
           if (civicrm_error($newContribution)) {
             if (is_array($newContribution['error_message'])) {
-              array_unshift($values, $newContribution['error_message']['message']);
               if ($newContribution['error_message']['params'][0]) {
-                $this->setImportStatus($rowNumber, 'DUPLICATE', $newContribution['error_message']['message']);
-                return CRM_Import_Parser::DUPLICATE;
+                throw new CRM_Core_Exception($newContribution['error_message']['message'], CRM_Import_Parser::DUPLICATE);
               }
             }
             else {
-              array_unshift($values, $newContribution['error_message']);
-              $this->setImportStatus($rowNumber, 'ERROR', $newContribution['error_message']);
-              return CRM_Import_Parser::ERROR;
+              throw new CRM_Core_Exception($newContribution['error_message'], CRM_Import_Parser::ERROR);
             }
           }
 
@@ -860,9 +839,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           }
         }
         $errorMessage = 'No matching Contact found for (' . $disp . ')';
-        $this->setImportStatus($rowNumber, 'ERROR', $errorMessage);
-        array_unshift($values, $errorMessage);
-        return CRM_Import_Parser::ERROR;
+        throw new CRM_Core_Exception($errorMessage, CRM_Import_Parser::ERROR);
       }
 
       if (!empty($paramValues['external_identifier'])) {
@@ -871,24 +848,18 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $checkCid->find(TRUE);
         if ($checkCid->id != $formatted['contact_id']) {
           $errorMessage = 'Mismatch of External ID:' . $paramValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id'];
-          array_unshift($values, $errorMessage);
-          $this->setImportStatus($rowNumber, 'ERROR', $errorMessage);
-          return CRM_Import_Parser::ERROR;
+          throw new CRM_Core_Exception($errorMessage, CRM_Import_Parser::ERROR);
         }
       }
       $newContribution = civicrm_api('contribution', 'create', $formatted);
       if (civicrm_error($newContribution)) {
         if (is_array($newContribution['error_message'])) {
-          array_unshift($values, $newContribution['error_message']['message']);
           if ($newContribution['error_message']['params'][0]) {
-            $this->setImportStatus($rowNumber, 'DUPLICATE', '');
-            return CRM_Import_Parser::DUPLICATE;
+            throw new CRM_Core_Exception('', CRM_Import_Parser::DUPLICATE);
           }
         }
         else {
-          array_unshift($values, $newContribution['error_message']);
-          $this->setImportStatus($rowNumber, 'ERROR', $newContribution['error_message']);
-          return CRM_Import_Parser::ERROR;
+          throw new CRM_Core_Exception($newContribution['error_message'], CRM_Import_Parser::ERROR);
         }
       }
 
@@ -905,8 +876,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     }
     catch (CRM_Core_Exception $e) {
       array_unshift($values, $e->getMessage());
-      $errorMapping = ['soft_credit' => self::SOFT_CREDIT_ERROR, 'pledge_payment' => self::PLEDGE_PAYMENT_ERROR];
-      $this->setImportStatus($rowNumber, $errorMapping[$e->getErrorCode()] ?? CRM_Import_Parser::ERROR, $e->getMessage());
+      $errorMapping = [self::SOFT_CREDIT_ERROR => 'soft_credit_error', self::PLEDGE_PAYMENT_ERROR => 'pledge_payment_error', CRM_Import_Parser::DUPLICATE => 'DUPLICATE'];
+      $this->setImportStatus($rowNumber, $errorMapping[$e->getErrorCode()] ?? 'ERROR', $e->getMessage());
       return $errorMapping[$e->getErrorCode()] ?? CRM_Import_Parser::ERROR;
     }
   }
@@ -984,12 +955,11 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @param array $values
    *   The reformatted properties that we can use internally.
    * @param bool $create
-   * @param int $onDuplicate
    *
    * @return array|CRM_Error
    * @throws \CRM_Core_Exception
    */
-  private function deprecatedFormatParams($params, &$values, $create = FALSE, $onDuplicate = NULL) {
+  private function deprecatedFormatParams($params, &$values, $create = FALSE) {
     require_once 'CRM/Utils/DeprecatedUtils.php';
     // copy all the contribution fields as is
     require_once 'api/v3/utils.php';
@@ -1082,15 +1052,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
             }
           }
           else {
-            if ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
+            if ($this->isUpdateExisting()) {
               return civicrm_api3_create_error("Empty Contribution and Invoice and Transaction ID. Row was skipped.");
             }
-          }
-          break;
-
-        case 'currency':
-          if (!CRM_Utils_Rule::currencyCode($value)) {
-            return civicrm_api3_create_error("currency not a valid code: $value");
           }
           break;
 
@@ -1122,7 +1086,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           // retrieve pledge details as well as to validate pledge ID
 
           // first need to check for update mode
-          if ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE &&
+          if ($this->isUpdateExisting() &&
             ($params['contribution_id'] || $params['trxn_id'] || $params['invoice_id'])
           ) {
             $contribution = new CRM_Contribute_DAO_Contribution();
