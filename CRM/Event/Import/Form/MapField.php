@@ -15,8 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Api4\MappingField;
-
 /**
  * This class gets the name of the file to upload
  */
@@ -65,16 +63,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     $hasHeaders = $this->getSubmittedValue('skipColumnHeader');
     $headerPatterns = $this->getHeaderPatterns();
     $dataPatterns = $this->getDataPatterns();
-    $savedMappingID = $this->getSubmittedValue('savedMapping');
-    //used to warn for mismatch column count or mismatch mapping
-    $warning = 0;
-    if ($savedMappingID) {
-      $fieldMappings = MappingField::get(FALSE)->addWhere('mapping_id', '=', $savedMappingID)->execute()->indexBy('column_number');
-      //set warning if mismatch in more than
-      if (($this->_columnCount != count($fieldMappings))) {
-        $warning++;
-      }
-    }
+    $fieldMappings = $this->getFieldMappings();
     /* Initialize all field usages to false */
 
     foreach ($mapperKeys as $key) {
@@ -144,16 +133,6 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
     $js .= "</script>\n";
     $this->assign('initHideBoxes', $js);
-
-    if ($warning != 0 && $this->getSubmittedValue('savedMapping')) {
-      $session = CRM_Core_Session::singleton();
-      $session->setStatus(ts('The data columns in this import file appear to be different from the saved mapping. Please verify that you have selected the correct saved mapping before continuing.'));
-    }
-    else {
-      $session = CRM_Core_Session::singleton();
-      $session->setStatus(NULL);
-    }
-
     $this->setDefaults($defaults);
 
     $this->addButtons(array(

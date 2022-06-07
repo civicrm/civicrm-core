@@ -1,7 +1,7 @@
 <?php
 
 /**
- *  File for the Membership import class
+ *  File for the Participant import class
  *
  *  (PHP 5)
  *

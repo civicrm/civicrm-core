@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\UserJob;
+
 /**
  * This class summarizes the import results.
  *
@@ -65,6 +67,22 @@ abstract class CRM_Import_Form_Summary extends CRM_Import_Forms {
     $this->assign('downloadErrorRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::ERROR));
     $this->assign('downloadMismatchRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::NO_MATCH));
     $this->assign('downloadAddressRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::UNPARSED_ADDRESS_WARNING));
+    $userJobID = CRM_Utils_Request::retrieve('user_job_id', 'String', $this, TRUE);
+    $userJob = UserJob::get(TRUE)->addWhere('id', '=', $userJobID)->execute()->first();
+    $onDuplicate = (int) $userJob['metadata']['submitted_values']['onDuplicate'];
+    $this->assign('dupeError', FALSE);
+    if ($onDuplicate === CRM_Import_Parser::DUPLICATE_UPDATE) {
+      $dupeActionString = ts('These records have been updated with the imported data.');
+    }
+    elseif ($onDuplicate === CRM_Import_Parser::DUPLICATE_FILL) {
+      $dupeActionString = ts('These records have been filled in with the imported data.');
+    }
+    else {
+      // Skip by default.
+      $dupeActionString = ts('These records have not been imported.');
+      $this->assign('dupeError', TRUE);
+    }
+    $this->assign('dupeActionString', $dupeActionString);
   }
 
 }
