@@ -159,37 +159,37 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
    *   the result of this processing
    */
   public function import($onDuplicate, &$values) {
-    $response = $this->summary($values);
-    if ($response != CRM_Import_Parser::VALID) {
-      return $response;
-    }
-
-    $this->_updateWithId = FALSE;
-    $this->_parseStreetAddress = CRM_Utils_Array::value('street_address_parsing', CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'address_options'), FALSE);
-
-    $contactType = $this->_contactType ? $this->_contactType : 'Organization';
-    $formatted = [
-      'contact_type' => $contactType,
-    ];
-
-    if (isset($this->_params['external_identifier']) && !isset($this->_params['contact_id'])) {
-      $checkCid = new CRM_Contact_DAO_Contact();
-      $checkCid->external_identifier = $this->_params['external_identifier'];
-      $checkCid->find(TRUE);
-      $formatted['id'] = $checkCid->id;
-    }
-    else {
-      $formatted['id'] = $this->_params['contact_id'];
-    }
-
-    $this->formatCommonData($this->_params, $formatted);
-    foreach ($formatted['custom'] as $key => $val) {
-      $this->_params['custom_' . $key] = $val[-1]['value'];
-    }
-    $this->_params['skipRecentView'] = TRUE;
-    $this->_params['check_permissions'] = TRUE;
-    $this->_params['entity_id'] = $formatted['id'];
     try {
+      $response = $this->summary($values);
+      if ($response != CRM_Import_Parser::VALID) {
+        return $response;
+      }
+
+      $this->_updateWithId = FALSE;
+      $this->_parseStreetAddress = CRM_Utils_Array::value('street_address_parsing', CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'address_options'), FALSE);
+
+      $contactType = $this->_contactType ? $this->_contactType : 'Organization';
+      $formatted = [
+        'contact_type' => $contactType,
+      ];
+
+      if (isset($this->_params['external_identifier']) && !isset($this->_params['contact_id'])) {
+        $checkCid = new CRM_Contact_DAO_Contact();
+        $checkCid->external_identifier = $this->_params['external_identifier'];
+        $checkCid->find(TRUE);
+        $formatted['id'] = $checkCid->id;
+      }
+      else {
+        $formatted['id'] = $this->_params['contact_id'];
+      }
+
+      $this->formatCommonData($this->_params, $formatted);
+      foreach ($formatted['custom'] as $key => $val) {
+        $this->_params['custom_' . $key] = $val[-1]['value'];
+      }
+      $this->_params['skipRecentView'] = TRUE;
+      $this->_params['check_permissions'] = TRUE;
+      $this->_params['entity_id'] = $formatted['id'];
       civicrm_api3('custom_value', 'create', $this->_params);
     }
     catch (CiviCRM_API3_Exception $e) {
