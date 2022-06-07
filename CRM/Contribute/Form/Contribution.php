@@ -311,7 +311,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->assign('payNow', $this->_payNow);
       $this->setTitle(ts('Pay with Credit Card'));
     }
-    elseif (!empty($this->_values['is_template'])) {
+    elseif ($this->_values['is_template']) {
       $this->setPageTitle(ts('Template Contribution'));
     }
     elseif ($this->_mode) {
@@ -440,6 +440,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     else {
       $defaults['refund_trxn_id'] = $defaults['trxn_id'] ?? NULL;
+    }
+
+    if (!empty($defaults['contribution_status_id'])
+      && ('Template' === CRM_Contribute_PseudoConstant::contributionStatus($defaults['contribution_status_id'], 'name'))
+    ) {
+      $this->getElement('contribution_status_id')->freeze();
     }
 
     if (!$this->_id && empty($defaults['receive_date'])) {
@@ -695,8 +701,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
+    // If contribution is a template receive date is not required
+    $receiveDateRequired = !$this->_values['is_template'];
     // add various dates
-    $this->addField('receive_date', ['entity' => 'contribution'], !$this->_mode, FALSE);
+    $this->addField('receive_date', ['entity' => 'contribution'], $receiveDateRequired, FALSE);
     $this->addField('receipt_date', ['entity' => 'contribution'], FALSE, FALSE);
     $this->addField('cancel_date', ['entity' => 'contribution', 'label' => ts('Cancelled / Refunded Date')], FALSE, FALSE);
 
@@ -884,6 +892,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (($self->_action & CRM_Core_Action::UPDATE)
       && $self->_id
       && $self->_values['contribution_status_id'] != $fields['contribution_status_id']
+      && $self->_values['is_template'] != 1
     ) {
       CRM_Contribute_BAO_Contribution::checkStatusValidation($self->_values, $fields, $errors);
     }
@@ -943,6 +952,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     // Get the submitted form values.
     $submittedValues = $this->controller->exportValues($this->_name);
+    if ($this->_values['is_template']) {
+      // If we are a template contribution we don't allow the contribution_status_id to be set
+      //   on the form but we need it for the submit function.
+      $submittedValues['is_template'] = $this->_values['is_template'];
+      $submittedValues['contribution_status_id'] = $this->_values['contribution_status_id'];
+    }
 
     try {
       $contribution = $this->submit($submittedValues, $this->_action, $this->_ppID);
