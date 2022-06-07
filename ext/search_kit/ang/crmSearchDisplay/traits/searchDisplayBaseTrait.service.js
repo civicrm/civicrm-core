@@ -21,6 +21,11 @@
         this.limit = this.settings.limit;
         this.sort = this.settings.sort ? _.cloneDeep(this.settings.sort) : [];
         this.seed = Date.now();
+        this.placeholders = [];
+        var placeholderCount = 'placeholder' in this.settings ? this.settings.placeholder : 5;
+        for (var p=0; p < placeholderCount; ++p) {
+          this.placeholders.push({});
+        }
 
         this.getResults = _.debounce(function() {
           $scope.$apply(function() {

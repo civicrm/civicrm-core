@@ -72,6 +72,7 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
           'show_count' => TRUE,
           'expose_limit' => TRUE,
         ],
+        'placeholder' => 5,
         'sort' => [],
         'columns' => [],
       ],
