@@ -20,6 +20,7 @@ namespace api\v4\Entity;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\Queue;
+use Civi\Api4\UserJob;
 use Civi\Core\Event\GenericHookEvent;
 
 /**
@@ -354,6 +355,112 @@ class QueueTest extends Api4TestBase {
     }
 
     $this->assertEquals(['playinghooky_err', 'playinghooky_err', 'playinghooky_err'], \Civi::$statics[__CLASS__]['doSomethingLog']);
+  }
+
+  /**
+   * If a queue is created as part of a user-job, then it has a fixed scope-of-work. The status
+   * should flip after completing its work.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testUserJobQueue_Completion() {
+    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_userjob';
+
+    $firedQueueStatus = [];
+    \Civi::dispatcher()->addListener('hook_civicrm_queueStatus', function($e) use (&$firedQueueStatus) {
+      $firedQueueStatus[$e->queue->getName()] = $e->status;
+    });
+
+    $queue = \Civi::queue($queueName, [
+      'type' => 'Sql',
+      'runner' => 'task',
+      'error' => 'delete',
+    ]);
+    $this->assertEquals(0, $queue->numberOfItems());
+
+    $userJob = \Civi\Api4\UserJob::create(FALSE)->setValues([
+      'type_id:label' => 'Contact Import',
+      'status_id:name' => 'in_progress',
+      'queue_id.name' => $queue->getName(),
+    ])->execute()->single();
+
+    \Civi::queue($queueName)->createItem(new \CRM_Queue_Task(
+      [QueueTest::class, 'doSomething'],
+      ['first']
+    ));
+    \Civi::queue($queueName)->createItem(new \CRM_Queue_Task(
+      [QueueTest::class, 'doSomething'],
+      ['second']
+    ));
+
+    // Verify initial status
+    $this->assertEquals(2, $queue->numberOfItems());
+    $this->assertEquals(FALSE, isset($firedQueueStatus[$queueName]));
+    $this->assertEquals(TRUE, $queue->isActive());
+    $this->assertEquals(4, UserJob::get()->addWhere('id', '=', $userJob['id'])->execute()->first()['status_id']);
+
+    // OK, let's run both items - and check status afterward.
+    Queue::runItems(FALSE)->setQueue($queueName)->execute()->single();
+    $this->assertEquals(1, $queue->numberOfItems());
+    $this->assertEquals(FALSE, isset($firedQueueStatus[$queueName]));
+    $this->assertEquals(TRUE, $queue->isActive());
+    $this->assertEquals(4, UserJob::get()->addWhere('id', '=', $userJob['id'])->execute()->first()['status_id']);
+
+    Queue::runItems(FALSE)->setQueue($queueName)->execute()->single();
+    $this->assertEquals(0, $queue->numberOfItems());
+    $this->assertEquals('completed', $firedQueueStatus[$queueName]);
+    $this->assertEquals(FALSE, $queue->isActive());
+    $this->assertEquals(1, UserJob::get()->addWhere('id', '=', $userJob['id'])->execute()->first()['status_id']);
+  }
+
+  /**
+   * If a queue is created as a long-term service, then its work is never complete.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testServiceQueue_NeverComplete() {
+    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_service';
+
+    $firedQueueStatus = [];
+    \Civi::dispatcher()->addListener('hook_civicrm_queueStatus', function($e) use (&$firedQueueStatus) {
+      $firedQueueStatus[$e->queue->getName()] = $e->status;
+    });
+
+    $queue = \Civi::queue($queueName, [
+      'type' => 'Sql',
+      'runner' => 'task',
+      'error' => 'delete',
+    ]);
+    $this->assertEquals(0, $queue->numberOfItems());
+
+    \Civi::queue($queueName)->createItem(new \CRM_Queue_Task(
+      [QueueTest::class, 'doSomething'],
+      ['first']
+    ));
+    \Civi::queue($queueName)->createItem(new \CRM_Queue_Task(
+      [QueueTest::class, 'doSomething'],
+      ['second']
+    ));
+
+    // Verify initial status
+    $this->assertEquals(2, $queue->numberOfItems());
+    $this->assertEquals(FALSE, isset($firedQueueStatus[$queueName]));
+    $this->assertEquals(TRUE, $queue->isActive());
+
+    // OK, let's run both items - and check status afterward.
+    Queue::runItems(FALSE)->setQueue($queueName)->execute()->single();
+    $this->assertEquals(1, $queue->numberOfItems());
+    $this->assertEquals(FALSE, isset($firedQueueStatus[$queueName]));
+    $this->assertEquals(TRUE, $queue->isActive());
+
+    Queue::runItems(FALSE)->setQueue($queueName)->execute()->single();
+    $this->assertEquals(0, $queue->numberOfItems());
+    $this->assertEquals(FALSE, isset($firedQueueStatus[$queueName]));
+    $this->assertEquals(TRUE, $queue->isActive());
   }
 
   public static function doSomething(\CRM_Queue_TaskContext $ctx, string $something) {

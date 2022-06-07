@@ -2,6 +2,8 @@
 
 namespace Civi\Api4\Action\Queue;
 
+use Civi\Core\Event\GenericHookEvent;
+
 /**
  * Run an enqueued item (task).
  *
@@ -91,6 +93,10 @@ class RunItems extends \Civi\Api4\Generic\AbstractAction {
     foreach ($items as $itemPos => $item) {
       $result[] = ['outcome' => $outcomes[$itemPos], 'item' => $this->createItemStub($item)];
     }
+
+    \Civi::dispatcher()->dispatch('civi.queue.check', GenericHookEvent::create([
+      'queue' => $queue,
+    ]));
   }
 
   private function validateItemStubs(): void {

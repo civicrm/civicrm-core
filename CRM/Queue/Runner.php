@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Event\GenericHookEvent;
+
 /**
  * `CRM_Queue_Runner` runs a list tasks from a queue. It originally supported the database-upgrade
  * queue. Consequently, this runner is optimal for queues which are:
@@ -228,6 +230,10 @@ class CRM_Queue_Runner {
       else {
         $this->releaseErrorItem($item);
       }
+
+      \Civi::dispatcher()->dispatch('civi.queue.check', GenericHookEvent::create([
+        'queue' => $this->queue,
+      ]));
 
       return $this->formatTaskResult($isOK, $exception);
     }

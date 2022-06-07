@@ -462,4 +462,35 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->assertEquals(0, $this->queue->numberOfItems());
   }
 
+  public function testSetStatus() {
+    $fired = ['status-changes' => []];
+    \Civi::dispatcher()->addListener('hook_civicrm_queueStatus', function ($e) use (&$fired) {
+      $fired[$e->queue->getName()][] = $e->status;
+    });
+
+    $q = Civi::queue('status-changes', [
+      'type' => 'Sql',
+    ]);
+    $this->assertEquals([], $fired['status-changes']);
+
+    $q->setStatus('draft');
+    $this->assertEquals(['draft'], $fired['status-changes']);
+
+    $q->setStatus('draft');
+    $q->setStatus('draft');
+    $q->setStatus('draft');
+    $this->assertEquals(['draft'], $fired['status-changes']);
+
+    $q->setStatus('active');
+    $this->assertEquals(['draft', 'active'], $fired['status-changes']);
+
+    $q->setStatus('active');
+    $q->setStatus('active');
+    $q->setStatus('active');
+    $this->assertEquals(['draft', 'active'], $fired['status-changes']);
+
+    $q->setStatus('completed');
+    $this->assertEquals(['draft', 'active', 'completed'], $fired['status-changes']);
+  }
+
 }
