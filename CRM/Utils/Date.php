@@ -2125,7 +2125,7 @@ class CRM_Utils_Date {
       $ruleName = 'date';
       if ($dateType == 1) {
         $matches = [];
-        if (preg_match("/(\s(([01]\d)|[2][0-3]):([0-5]\d))$/", $date, $matches)) {
+        if (preg_match("/(\s(([01]\d)|[2][0-3]):([0-5]\d):?[0-5]?\d?)$/", $date, $matches)) {
           $ruleName = 'dateTime';
           if (strpos($date, '-') !== FALSE) {
             $dateVal .= array_shift($matches);
