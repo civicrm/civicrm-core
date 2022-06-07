@@ -330,22 +330,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $this->setDefaults($defaults);
 
-    $this->addButtons([
-      [
-        'type' => 'back',
-        'name' => ts('Previous'),
-      ],
-      [
-        'type' => 'next',
-        'name' => ts('Continue'),
-        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-        'isDefault' => TRUE,
-      ],
-      [
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ],
-    ]);
+    $this->addFormButtons();
   }
 
   /**
