@@ -608,6 +608,7 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
 
       // Split status and status id into 2 fields
       // Fixme: it would be better to leave as 1 field and intelligently handle both during import
+      // note import undoes this - it is still here in case the search usage uses it.
       $participantStatus = [
         'participant_status' => [
           'title' => ts('Participant Status'),
@@ -619,6 +620,7 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
 
       // Split role and role id into 2 fields
       // Fixme: it would be better to leave as 1 field and intelligently handle both during import
+      // note import undoes this - it is still here in case the search usage uses it.
       $participantRole = [
         'participant_role' => [
           'title' => ts('Participant Role'),

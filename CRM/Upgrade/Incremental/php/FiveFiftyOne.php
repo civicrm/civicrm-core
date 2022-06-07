@@ -126,6 +126,39 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
       }
     }
 
+    // Participant fields...
+    // Yes - I know they could be combined - but it's also less confusing this way.
+    $mappings = MappingField::get(FALSE)
+      ->setSelect(['id', 'name'])
+      ->addWhere('mapping_id.mapping_type_id:name', '=', 'Import Participant')
+      ->execute();
+
+    $fields = CRM_Event_BAO_Participant::importableFields('All', FALSE);
+    $fields['event_id']['title'] = 'Event ID';
+    $eventfields = CRM_Event_BAO_Event::fields();
+    $fields['event_title'] = $eventfields['event_title'];
+
+    $fieldMap = [];
+    foreach ($fields as $fieldName => $field) {
+      $fieldMap[$field['title']] = $fieldName;
+      if (!empty($field['html']['label'])) {
+        $fieldMap[$field['html']['label']] = $fieldName;
+      }
+    }
+    $fieldMap[ts('- do not import -')] = 'do_not_import';
+    $fieldMap[ts('Participant Status')] = 'participant_status_id';
+    $fieldMap[ts('Participant Role')] = 'participant_role_id';
+    $fieldMap[ts('Event Title')] = 'event_id';
+
+    foreach ($mappings as $mapping) {
+      if (!empty($fieldMap[$mapping['name']])) {
+        MappingField::update(FALSE)
+          ->addWhere('id', '=', $mapping['id'])
+          ->addValue('name', $fieldMap[$mapping['name']])
+          ->execute();
+      }
+    }
+
     return TRUE;
   }
 

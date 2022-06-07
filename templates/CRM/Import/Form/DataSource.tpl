@@ -40,7 +40,7 @@
           <td>{$form.contactType.html}<br />
             <span class="description">
               {ts 1=$importEntities}Select 'Individual' if you are importing %1 made by individual persons.{/ts}
-              {ts 1=$importEntities}Select 'Organization' or 'Household' if you are importing %1 made by contacts of that type. (NOTE: Some built-in contact types may not be enabled for your site.){/ts}
+              {ts 1=$importEntities}Select 'Organization' or 'Household' if you are importing %1 to contacts of that type.{/ts}
             </span>
           </td>
         </tr>

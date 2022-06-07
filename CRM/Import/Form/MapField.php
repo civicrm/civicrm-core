@@ -14,6 +14,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\MappingField;
+
 /**
  * This class gets the name of the file to upload.
  *
@@ -249,16 +251,18 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     if (empty($mappedField['name'])) {
       $mappedField['name'] = 'do_not_import';
     }
-    if ($isUpdate) {
-      Civi\Api4\MappingField::update(FALSE)
-        ->setValues($mappedField)
-        ->addWhere('column_number', '=', $columnNumber)
-        ->addWhere('mapping_id', '=', $mappingID)
-        ->execute();
+    $existing = MappingField::get(FALSE)
+      ->addWhere('column_number', '=', $columnNumber)
+      ->addWhere('mapping_id', '=', $mappingID)->execute()->first();
+    if (empty($existing['id'])) {
+      MappingField::create(FALSE)
+        ->setValues($mappedField)->execute();
     }
     else {
-      Civi\Api4\MappingField::create(FALSE)
-        ->setValues($mappedField)->execute();
+      MappingField::update(FALSE)
+        ->setValues($mappedField)
+        ->addWhere('id', '=', $existing['id'])
+        ->execute();
     }
   }
 
