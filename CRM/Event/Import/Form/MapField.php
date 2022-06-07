@@ -56,40 +56,8 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @return void
    */
   public function buildQuickForm() {
-
-    //to save the current mappings
-    if (!$this->getSubmittedValue('savedMapping')) {
-      $saveDetailsName = ts('Save this field mapping');
-      $this->applyFilter('saveMappingName', 'trim');
-      $this->add('text', 'saveMappingName', ts('Name'));
-      $this->add('text', 'saveMappingDesc', ts('Description'));
-    }
-    else {
-      $savedMapping = $this->getSubmittedValue('savedMapping');
-      //mapping is to be loaded from database
-
-      $this->set('loadedMapping', $savedMapping);
-
-      $getMappingName = new CRM_Core_DAO_Mapping();
-      $getMappingName->id = $savedMapping;
-      $getMappingName->mapping_type = 'Import Participants';
-      $getMappingName->find();
-      while ($getMappingName->fetch()) {
-        $mapperName = $getMappingName->name;
-      }
-
-      $this->assign('savedMappingName', $mapperName);
-
-      $this->add('hidden', 'mappingId', $savedMapping);
-
-      $this->addElement('checkbox', 'updateMapping', ts('Update this field mapping'), NULL);
-      $saveDetailsName = ts('Save as a new field mapping');
-      $this->add('text', 'saveMappingName', ts('Name'));
-      $this->add('text', 'saveMappingDesc', ts('Description'));
-    }
-
-    $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL, array('onclick' => "showSaveDetails(this)"));
-
+    $savedMappingID = (int) $this->getSubmittedValue('savedMapping');
+    $this->buildSavedMappingFields($savedMappingID);
     $this->addFormRule(array('CRM_Event_Import_Form_MapField', 'formRule'), $this);
 
     $defaults = [];
@@ -351,7 +319,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @return string
    */
   public function getMappingTypeName(): string {
-    return 'Import Participant';
+    return 'Import Participants';
   }
 
 }
