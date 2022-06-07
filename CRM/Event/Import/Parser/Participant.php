@@ -75,6 +75,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
    * The initializer code, called before the processing.
    */
   public function init() {
+    unset($this->userJob);
     $this->setFieldMetadata();
     foreach ($this->importableFieldsMetadata as $name => $field) {
       $field['type'] = CRM_Utils_Array::value('type', $field, CRM_Utils_Type::T_INT);

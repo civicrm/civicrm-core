@@ -62,7 +62,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $defaults = [];
     $mapperKeys = array_keys($this->_mapperFields);
-    $hasHeaders = !empty($this->_columnHeaders);
+    $hasHeaders = $this->getSubmittedValue('skipColumnHeader');
     $headerPatterns = $this->getHeaderPatterns();
     $dataPatterns = $this->getDataPatterns();
     $savedMappingID = $this->getSubmittedValue('savedMapping');
@@ -111,7 +111,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
           $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_" . $i . "_');\n";
 
           if ($hasHeaders) {
-            $defaults["mapper[$i]"] = array($this->defaultFromHeader($this->_columnHeaders[$i], $headerPatterns));
+            $defaults["mapper[$i]"] = array($this->defaultFromHeader($columnHeader, $headerPatterns));
           }
           else {
             $defaults["mapper[$i]"] = array($this->defaultFromData($dataPatterns, $i));
@@ -124,7 +124,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
         if ($hasHeaders) {
           // Infer the default from the skipped headers if we have them
           $defaults["mapper[$i]"] = array(
-            $this->defaultFromHeader($this->_columnHeaders[$i],
+            $this->defaultFromHeader($columnHeader,
               $headerPatterns
             ),
             //                     $defaultLocationType->id
