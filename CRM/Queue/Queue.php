@@ -71,10 +71,14 @@ abstract class CRM_Queue_Queue {
    *   Ex: 'active', 'draft', 'aborted'
    */
   public function setStatus(string $status): void {
-    CRM_Core_DAO::executeQuery('UPDATE civicrm_queue SET status = %1 WHERE name = %2', [
-      1 => ['aborted', 'String'],
+    $result = CRM_Core_DAO::executeQuery('UPDATE civicrm_queue SET status = %1 WHERE name = %2', [
+      1 => [$status, 'String'],
       2 => [$this->getName(), 'String'],
     ]);
+    // If multiple workers try to setStatus('completed') at roughly the same time, only one will fire an event.
+    if ($result->affectedRows() > 0) {
+      CRM_Utils_Hook::queueStatus($this, $status);
+    }
   }
 
   /**

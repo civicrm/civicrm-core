@@ -2756,6 +2756,21 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Fired if the status of a queue changes.
+   *
+   * @param \CRM_Queue_Queue $queue
+   * @param string $status
+   *   New status.
+   *   Ex: 'completed', 'active', 'aborted'
+   */
+  public static function queueStatus(CRM_Queue_Queue $queue, string $status): void {
+    self::singleton()->invoke(['queue', 'status'], $queue, $status,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_queueStatus'
+    );
+  }
+
+  /**
    * This is called if automatic execution of a queue-task fails.
    *
    * The `$outcome` may be modified. For example, you might inspect the $item and $exception -- and then
