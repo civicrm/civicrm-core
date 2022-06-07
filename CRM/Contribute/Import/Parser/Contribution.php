@@ -650,12 +650,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   public function import($onDuplicate, &$values) {
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
-      // first make sure this is a valid line
-      $response = $this->summary($values);
-      if ($response != CRM_Import_Parser::VALID) {
-        return CRM_Import_Parser::ERROR;
-      }
-
       $params = $this->getMappedRow($values);
       $formatted = array_merge(['version' => 3, 'skipRecentView' => TRUE, 'skipCleanMoney' => TRUE, 'contribution_id' => $params['id'] ?? NULL], $params);
       //CRM-10994
