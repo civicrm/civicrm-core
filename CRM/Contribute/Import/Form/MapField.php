@@ -316,15 +316,9 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
         $importKeys[] = $mapperPart[0];
       }
 
-      $contactTypeId = $self->get('contactType');
-      $contactTypes = [
-        CRM_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
-        CRM_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
-        CRM_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
-      ];
       $params = [
         'used' => 'Unsupervised',
-        'contact_type' => $contactTypes[$contactTypeId] ?? '',
+        'contact_type' => $self->getContactType(),
       ];
       [$ruleFields, $threshold] = CRM_Dedupe_BAO_DedupeRuleGroup::dedupeRuleFieldsWeight($params);
       $weightSum = 0;
