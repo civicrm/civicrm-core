@@ -324,7 +324,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     ]));
     $parser->init();
 
-    $this->assertEquals($expectedResult, $parser->import($onDuplicateAction, $values), 'Return code from parser import was not as expected');
+    $this->assertEquals($expectedResult, $parser->import($values), 'Return code from parser import was not as expected');
   }
 
   /**
