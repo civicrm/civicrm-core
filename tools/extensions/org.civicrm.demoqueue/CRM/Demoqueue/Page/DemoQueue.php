@@ -40,10 +40,10 @@ class CRM_Demoqueue_Page_DemoQueue extends CRM_Core_Page {
     $runner = new CRM_Queue_Runner([
       'title' => ts('Demo Queue Runner'),
       'queue' => $queue,
-      'onEnd' => ['CRM_Demoqueue_Page_DemoQueue', 'onEnd'],
+      // Deprecated; only works on AJAX runner // 'onEnd' => ['CRM_Demoqueue_Page_DemoQueue', 'onEnd'],
       'onEndUrl' => CRM_Utils_System::url('civicrm/demo-queue/done'),
     ]);
-    $runner->runAllViaWeb(); // does not return
+    $runner->runAllInteractive(); // does not return
   }
 
   /**
