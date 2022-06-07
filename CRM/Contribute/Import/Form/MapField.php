@@ -418,29 +418,9 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $mapper[$i] = $this->_mapperFields[$mapperKeys[$i][0]];
       $mapperKeysMain[$i] = $mapperKeys[$i][0];
-
-      if (isset($mapperKeys[$i][0]) && $mapperKeys[$i][0] == 'soft_credit') {
-        $mapperSoftCredit[$i] = $mapperKeys[$i][1];
-        if (strpos($mapperSoftCredit[$i], '_') !== FALSE) {
-          [$first, $second] = explode('_', $mapperSoftCredit[$i]);
-          $softCreditFields[$i] = ucwords($first . " " . $second);
-        }
-        else {
-          $softCreditFields[$i] = $mapperSoftCredit[$i];
-        }
-        $mapperSoftCreditType[$i] = [
-          'value' => $mapperKeys[$i][2] ?? '',
-          'label' => $softCreditTypes[$mapperKeys[$i][2]] ?? '',
-        ];
-      }
-      else {
-        $mapperSoftCredit[$i] = $softCreditFields[$i] = $mapperSoftCreditType[$i] = NULL;
-      }
     }
 
     $this->set('mapper', $mapper);
-    $this->set('softCreditFields', $softCreditFields);
-    $this->set('mapperSoftCreditType', $mapperSoftCreditType);
 
     // store mapping Id to display it in the preview page
     $this->set('loadMappingId', CRM_Utils_Array::value('mappingId', $params));
