@@ -53,7 +53,18 @@ trait CRMTraits_Import_ParserTrait {
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
     $this->assertTrue($form->validate());
-    $form->postProcess();
+    try {
+      $form->postProcess();
+      $this->fail('Expected a redirect');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $queue = Civi::queue('user_job_' . $this->userJobID);
+      $runner = new CRM_Queue_Runner([
+        'queue' => $queue,
+        'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
+      ]);
+      $runner->runAll();
+    }
   }
 
   /**
