@@ -97,10 +97,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
         }
       }
 
-      $sel->setOptions([
-        $sel1,
-        ['' => NULL],
-      ]);
+      $sel->setOptions([$sel1]);
     }
     $js .= "</script>\n";
     $this->assign('initHideBoxes', $js);
