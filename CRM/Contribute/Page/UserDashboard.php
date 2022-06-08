@@ -41,9 +41,6 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
       ],
     ])['values'];
 
-    // We want oldest first, just among the most recent contributions
-    $rows = array_reverse($rows);
-
     foreach ($rows as $index => &$row) {
       // This is required for tpl logic. We should move away from hard-code this to adding an array of actions to the row
       // which the tpl can iterate through - this should allow us to cope with competing attempts to add new buttons
