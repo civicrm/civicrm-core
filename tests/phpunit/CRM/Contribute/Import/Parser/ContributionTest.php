@@ -88,6 +88,10 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
 
     $contributionsOfSoftContact = ContributionSoft::get()->addWhere('contact_id', '=', $contact2Id)->execute();
     $this->assertCount(1, $contributionsOfSoftContact, 'Contribution Soft not added for primary contact');
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::ERROR]));
+    $this->assertEquals(1, $dataSource->getRowCount([CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT]));
+    $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
   }
 
   /**
@@ -172,6 +176,26 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(5, $contribution['values'][$contribution['id']]['custom_' . $this->ids['CustomField']['radio']]);
     $this->callAPISuccess('CustomField', 'delete', ['id' => $this->ids['CustomField']['radio']]);
     $this->callAPISuccess('CustomGroup', 'delete', ['id' => $this->ids['CustomGroup']['Custom Group']]);
+  }
+
+  /**
+   * Test importing to a pledge.
+   */
+  public function testPledgeImport(): void {
+    $contactID = $this->individualCreate(['email' => 'mum@example.com']);
+    $pledgeID = $this->pledgeCreate(['contact_id' => $contactID]);
+    $this->importCSV('pledge.csv', [
+      ['name' => 'email'],
+      ['name' => 'total_amount'],
+      ['name' => 'pledge_id'],
+      ['name' => 'receive_date'],
+      ['name' => 'financial_type_id'],
+    ], ['onDuplicate' => CRM_Import_Parser::NO_MATCH]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $this->assertEquals(1, $dataSource->getRowCount([CRM_Contribute_Import_Parser_Contribution::PLEDGE_PAYMENT]));
+    $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
+    $this->callAPISuccessGetSingle('PledgePayment', ['pledge_id' => $pledgeID, 'contribution_id' => $contribution['id']]);
   }
 
   /**

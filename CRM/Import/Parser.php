@@ -1630,7 +1630,9 @@ abstract class CRM_Import_Parser {
    * @throws \CRM_Core_Exception
    */
   protected function validateParams(array $params): void {
-    $this->validateRequiredFields($this->getRequiredFields(), $params);
+    if (empty($params['id'])) {
+      $this->validateRequiredFields($this->getRequiredFields(), $params);
+    }
     $errors = [];
     foreach ($params as $key => $value) {
       $errors = array_merge($this->getInvalidValues($value, $key), $errors);
@@ -1941,10 +1943,8 @@ abstract class CRM_Import_Parser {
    *
    * @noinspection PhpDocMissingThrowsInspection
    * @noinspection PhpUnhandledExceptionInspection
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
    */
-  protected function setImportStatus(int $id, string $status, string $message, ?int $entityID = NULL, $additionalFields = []): void {
+  protected function setImportStatus(int $id, string $status, string $message = '', ?int $entityID = NULL, $additionalFields = []): void {
     $this->getDataSourceObject()->updateStatus($id, $status, $message, $entityID, $additionalFields);
   }
 
