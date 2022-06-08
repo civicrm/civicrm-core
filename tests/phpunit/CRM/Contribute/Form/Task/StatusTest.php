@@ -50,7 +50,7 @@ class CRM_Contribute_Form_Task_StatusTest extends CiviUnitTestCase {
     $contributionId = $contribution['id'];
     $form->setContributionIds([$contributionId]);
 
-    $form->buildQuickForm();
+    $form->buildQuickForm(); $this->assertTrue($form->validate());
 
     $params = [
       "is_email_receipt" => '1',
@@ -98,7 +98,7 @@ class CRM_Contribute_Form_Task_StatusTest extends CiviUnitTestCase {
     $contributionId = $contribution['id'];
     $form->setContributionIds([$contributionId]);
 
-    $form->buildQuickForm();
+    $form->buildQuickForm(); $this->assertTrue($form->validate());
 
     $params = [
       "is_email_receipt" => '0',

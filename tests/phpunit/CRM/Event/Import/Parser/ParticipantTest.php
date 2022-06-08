@@ -78,7 +78,7 @@ class CRM_Participant_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     /* @var \CRM_Event_Import_Form_DataSource $form */
     $form = $this->getFormObject('CRM_Event_Import_Form_DataSource', $submittedValues);
     $values = $_SESSION['_' . $form->controller->_name . '_container']['values'];
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
     // This gets reset in DataSource so re-do....
     $_SESSION['_' . $form->controller->_name . '_container']['values'] = $values;
@@ -87,12 +87,12 @@ class CRM_Participant_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     /* @var CRM_Event_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Event_Import_Form_MapField', $submittedValues);
     $form->setUserJobID($this->userJobID);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
     /* @var CRM_Event_Import_Form_Preview $form */
     $form = $this->getFormObject('CRM_Event_Import_Form_Preview', $submittedValues);
     $form->setUserJobID($this->userJobID);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
   }
 

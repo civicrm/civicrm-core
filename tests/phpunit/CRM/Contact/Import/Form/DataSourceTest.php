@@ -40,7 +40,7 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
   public function testBuildForm(): void {
     $this->callAPISuccess('Mapping', 'create', ['name' => 'Well dressed ducks', 'mapping_type_id' => 'Import Contact']);
     $form = $this->getFormObject('CRM_Contact_Import_Form_DataSource');
-    $form->buildQuickForm();
+    $form->buildQuickForm(); $this->assertTrue($form->validate());
     $this->assertEquals([1 => 'Well dressed ducks'], CRM_Core_Smarty::singleton()->get_template_vars('savedMapping'));
   }
 
@@ -95,7 +95,7 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
     ];
     // Mimic form re-submission with new values.
     $_SESSION['_' . $form->controller->_name . '_container']['values']['DataSource'] = $csvFormValues;
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
     // The user job id should not have changed.
     $this->assertEquals($userJobID, $form->getUserJobID());
@@ -126,7 +126,7 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
   private function submitDataSourceForm(array $sqlFormValues): CRM_Contact_Import_Form_DataSource {
     /** @var CRM_Contact_Import_Form_DataSource $form */
     $form = $this->getFormObject('CRM_Contact_Import_Form_DataSource', $sqlFormValues);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
     return $form;
   }

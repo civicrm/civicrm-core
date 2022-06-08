@@ -41,7 +41,7 @@ class CRM_Profile_Form_EditTest extends CiviUnitTestCase {
     $form = $this->getFormObject('CRM_Profile_Form_Edit');
     $form->set('gid', $profileID);
     $form->set('id', $id);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
     $this->assertEquals('civicrm/Mr. Anthony Anderson II', CRM_Core_Session::singleton()->popUserContext());
   }

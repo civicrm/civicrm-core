@@ -1145,7 +1145,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'contribution_status_id' => $isCompleted ? 1 : 2,
       'price_set_id' => 0,
     ]);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [

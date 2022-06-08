@@ -29,7 +29,7 @@ class CRM_Contact_Form_Search_CriteriaTest extends CiviUnitTestCase {
     $form = new CRM_Contact_Form_Search_Advanced();
     $form->controller = new CRM_Contact_Controller_Search();
     $form->preProcess();
-    $form->buildQuickForm();
+    $form->buildQuickForm(); $this->assertTrue($form->validate());
     $onHoldElemenClass = (get_class($form->_elements[$form->_elementIndex['email_on_hold']]));
     $this->assertEquals('HTML_QuickForm_select', $onHoldElemenClass, 'civimail_multiple_bulk_emails setting = 1, so email_on_hold should be a select element.');
 
@@ -38,7 +38,7 @@ class CRM_Contact_Form_Search_CriteriaTest extends CiviUnitTestCase {
     $form = new CRM_Contact_Form_Search_Advanced();
     $form->controller = new CRM_Contact_Controller_Search();
     $form->preProcess();
-    $form->buildQuickForm();
+    $form->buildQuickForm(); $this->assertTrue($form->validate());
     $onHoldElemenClass = (get_class($form->_elements[$form->_elementIndex['email_on_hold']]));
     $this->assertEquals('HTML_QuickForm_advcheckbox', $onHoldElemenClass, 'civimail_multiple_bulk_emails setting = 0, so email_on_hold should be a checkbox.');
   }

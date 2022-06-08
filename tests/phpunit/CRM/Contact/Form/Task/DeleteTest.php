@@ -48,7 +48,7 @@ class CRM_Contact_Form_Task_DeleteTest extends CiviUnitTestCase {
     $form = $this->getFormObject('CRM_Contact_Form_Task_Delete');
     $form->set('cid', $this->deleted_contact_id);
     $form->preProcess();
-    $form->buildQuickForm();
+    $form->buildQuickForm(); $this->assertTrue($form->validate());
     $form->setDefaultValues();
     $form->postProcess();
 
@@ -79,7 +79,7 @@ class CRM_Contact_Form_Task_DeleteTest extends CiviUnitTestCase {
     $form->set('cid', $this->deleted_contact_id);
     $form->set('restore', '1');
     $form->preProcess();
-    $form->buildQuickForm();
+    $form->buildQuickForm(); $this->assertTrue($form->validate());
     $form->setDefaultValues();
     $form->postProcess();
 
@@ -113,7 +113,7 @@ class CRM_Contact_Form_Task_DeleteTest extends CiviUnitTestCase {
     $form->set('cid', $this->deleted_contact_id);
     $form->set('skip_undelete', '1');
     $form->preProcess();
-    $form->buildQuickForm();
+    $form->buildQuickForm(); $this->assertTrue($form->validate());
     $form->setDefaultValues();
     $form->postProcess();
 
@@ -141,7 +141,7 @@ class CRM_Contact_Form_Task_DeleteTest extends CiviUnitTestCase {
     $form = $this->getFormObject('CRM_Contact_Form_Task_Delete');
     $form->set('cid', $this->deleted_contact_id);
     $form->preProcess();
-    $form->buildQuickForm();
+    $form->buildQuickForm(); $this->assertTrue($form->validate());
     $form->setDefaultValues();
     $form->postProcess();
 

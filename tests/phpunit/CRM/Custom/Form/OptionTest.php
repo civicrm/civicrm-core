@@ -28,7 +28,7 @@ class CRM_Custom_Form_OptionTest extends CiviUnitTestCase {
     $form->set('id', $optionValue['id']);
     $form->set('fid', $customField['id']);
     $form->set('gid', $customGroup['id']);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
 
     ob_start();
     $form->controller->_actions['display']->perform($form, 'display');

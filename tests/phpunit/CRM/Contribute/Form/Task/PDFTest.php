@@ -54,7 +54,7 @@ class CRM_Contribute_Form_Task_PDFTest extends CiviUnitTestCase {
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDF', [
       'receipt_update' => 1,
     ], NULL, $searchValues);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
     $status = CRM_Core_Session::singleton()->getStatus(TRUE);
     $this->assertEquals([

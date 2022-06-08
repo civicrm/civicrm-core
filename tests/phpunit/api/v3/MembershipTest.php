@@ -171,7 +171,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'contribution_status_id' => 3,
     ]);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
 
     $this->callAPISuccessGetSingle('Activity', [
@@ -255,7 +255,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'contribution_status_id' => 1,
     ]);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
     $memberships = $this->callAPISuccess('Membership', 'get', ['sort' => 'contact_id', 'sequential' => 1])['values'];
 

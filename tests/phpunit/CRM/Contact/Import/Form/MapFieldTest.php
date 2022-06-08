@@ -173,7 +173,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
       $fields[$name] = $field['title'];
     }
     $form->set('fields', $fields);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     return $form;
   }
 

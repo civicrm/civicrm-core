@@ -2121,7 +2121,7 @@ Price Field - Price Field 1        1    $100.00       $100.00
   protected function getContributionForm(array $formValues): CRM_Contribute_Form_Contribution {
     /* @var CRM_Contribute_Form_Contribution $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Contribution', $formValues);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     return $form;
   }
 

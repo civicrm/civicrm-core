@@ -128,7 +128,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
     $form = $this->getFormObject('CRM_Price_Form_Field');
     $_REQUEST['sid'] = $priceSetID;
     $form->preProcess();
-    $form->buildQuickForm();
+    $form->buildQuickForm(); $this->assertTrue($form->validate());
     $form->_action = CRM_Core_Action::ADD;
     $errors = CRM_Price_Form_Field::formRule(
       [

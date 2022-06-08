@@ -103,7 +103,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'contribution_page_id' => $this->_contributionPageID,
       'is_recur' => TRUE,
     ]);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     try {
       $form->postProcess();
     }

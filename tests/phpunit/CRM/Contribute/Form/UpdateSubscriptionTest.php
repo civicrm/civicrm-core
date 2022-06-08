@@ -27,7 +27,7 @@ class CRM_Contribute_Form_UpdateSubscriptionTest extends CiviUnitTestCase {
     /* @var CRM_Contribute_Form_UpdateSubscription $form */
     $form = $this->getFormObject('CRM_Contribute_Form_UpdateSubscription', ['is_notify' => TRUE]);
     $form->set('crid', $this->getContributionRecurID());
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     try {
       $form->postProcess();
     }

@@ -56,7 +56,7 @@ class CRM_Event_Form_Task_BadgeTest extends CiviUnitTestCase {
         'mark_x_' . $participantID => 1,
       ]
     );
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     try {
       $form->postProcess();
     }

@@ -1461,7 +1461,7 @@ Expires: ',
   protected function getContributionForm(array $formValues): CRM_Contribute_Form_Contribution {
     /* @var CRM_Contribute_Form_Contribution $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Contribution', $formValues);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     return $form;
   }
 
@@ -1525,7 +1525,7 @@ Expires: ',
       'total_amount' => 55,
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
     ]);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
 
     // ensure that the LineItem data remain the same

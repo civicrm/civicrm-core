@@ -399,7 +399,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $_REQUEST['id'] = $this->ids['Contribution'][0] ?? $this->_contributionId;
     /* @var CRM_Contribute_Form_AdditionalPayment $form*/
     $form = $this->getFormObject('CRM_Contribute_Form_AdditionalPayment', $submitParams);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
   }
 

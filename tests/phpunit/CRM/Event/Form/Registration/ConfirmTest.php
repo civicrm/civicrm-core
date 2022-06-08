@@ -790,7 +790,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $form = $this->getFormObject('CRM_Event_Form_Registration_Confirm', []);
     $form->set('params', [$params]);
     $form->set('registerByID', $this->createLoggedInUser());
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
   }
 

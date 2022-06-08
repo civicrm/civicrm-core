@@ -83,7 +83,7 @@ class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
       'subject' => '{contact.first_name} {membership.source}',
       'html_message' => $htmlMessage,
     ], NULL, $searchFormValues);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     try {
       $form->postProcess();
     }

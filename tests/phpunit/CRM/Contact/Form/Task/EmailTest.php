@@ -111,7 +111,7 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
     $form->_allContactIds = $form->_toContactIds = $form->_contactIds;
     $form->_fromEmails = [$loggedInEmail['id'] => 'mickey@mouse.com'];
     $form->isSearchContext = FALSE;
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $this->assertEquals([
       'html_message' => '<br/><br/>--<p>This is a test Signature</p>',
       'text_message' => '

@@ -33,25 +33,25 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
     $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy']);
 
     $form = $this->getThankYouFormWithContribution($paymentProcessorID, FALSE, FALSE);
-    $form->buildQuickForm();
+    $form->buildQuickForm(); $this->assertTrue($form->validate());
     $isPendingOutcome = $form->get_template_vars('isPendingOutcome');
 
     $this->assertEquals(FALSE, $isPendingOutcome, 'Outcome should not be pending.');
 
     $form = $this->getThankYouFormWithContribution($paymentProcessorID, TRUE, FALSE);
-    $form->buildQuickForm();
+    $form->buildQuickForm(); $this->assertTrue($form->validate());
     $isPendingOutcome = $form->get_template_vars('isPendingOutcome');
 
     $this->assertEquals(TRUE, $isPendingOutcome, 'Outcome should be pending.');
 
     $form = $this->getThankYouFormWithContribution($paymentProcessorID, FALSE, TRUE);
-    $form->buildQuickForm();
+    $form->buildQuickForm(); $this->assertTrue($form->validate());
     $isPendingOutcome = $form->get_template_vars('isPendingOutcome');
 
     $this->assertEquals(FALSE, $isPendingOutcome, 'Outcome should not be pending.');
 
     $form = $this->getThankYouFormWithContribution($paymentProcessorID, TRUE, TRUE);
-    $form->buildQuickForm();
+    $form->buildQuickForm(); $this->assertTrue($form->validate());
     $isPendingOutcome = $form->get_template_vars('isPendingOutcome');
 
     $this->assertEquals(TRUE, $isPendingOutcome, 'Outcome should be pending.');

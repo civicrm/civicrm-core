@@ -1671,7 +1671,7 @@ $text
       'to' => $contactId1 . '::email@example.com,' . $contactId2 . '::email2@example.com',
     ], [], []);
     $form->set('cid', $contactId1 . ',' . $contactId2);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
 
     $result = $this->callAPISuccess('activity', 'get', ['campaign_id' => $campaign_id]);
@@ -1740,7 +1740,7 @@ $textValue
       'attachDesc_1' => '',
     ], [], []);
     $form->set('cid', $contactId1 . ',' . $contactId2 . ',' . $contactId3);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
 
     $result = $this->callAPISuccess('Activity', 'get', ['campaign_id' => $this->getCampaignID()]);
@@ -1813,7 +1813,7 @@ $textValue
       'attachDesc_1' => '',
     ], [], []);
     $form->set('cid', $contactId1 . ',' . $contactId2);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
 
     $result = $this->callAPISuccess('activity', 'get', ['campaign_id' => $campaign_id]);
@@ -2663,7 +2663,7 @@ $textValue
       'to' => $contactId . '::' . 'email@example.com',
       'from_email_address' => 'from@example.com',
     ], $submittedValues));
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     return $form;
   }
 
@@ -2680,7 +2680,7 @@ $textValue
       'to' => $contactId . '::' . 'email@example.com',
       'from_email_address' => 'from@example.com',
     ], $submittedValues));
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     return $form;
   }
 

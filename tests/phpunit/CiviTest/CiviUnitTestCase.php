@@ -2411,7 +2411,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
   protected function getRenderedFormContents(string $formName) {
     $form = $this->getFormObject($formName);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     ob_start();
     $form->controller->_actions['display']->perform($form, 'display');
     return ob_get_clean();

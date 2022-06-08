@@ -3536,7 +3536,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_page_id' => $this->_ids['contribution_page'],
       'source' => 'Membership Signup and Renewal',
     ]);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
 
     // Case 2: After successful payment for Pending backoffice there are three activities created

@@ -159,7 +159,7 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
     $form->set('id', $contributionPage['id']);
     CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPage['id'], $this->priceSetId);
     $form->preProcess();
-    $form->buildQuickForm();
+    $form->buildQuickForm(); $this->assertTrue($form->validate());
     // Need these values to create more realistic submit params (in getSubmitParams).
     $this->paymentProcessorId = $paymentProcessor;
     $this->contributionPageId = (int) $contributionPage['id'];

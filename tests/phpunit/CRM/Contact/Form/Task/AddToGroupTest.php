@@ -44,7 +44,7 @@ class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
     $form->preProcess();
     $form->_contactIds = [$contactId];
     $form->set('_componentIds', [$contactId]);
-    $form->buildQuickForm();
+    $form->buildQuickForm(); $this->assertTrue($form->validate());
     $form->setDefaultValues();
     $form->postProcess();
 
@@ -80,7 +80,7 @@ class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
     $form->preProcess();
     $form->_contactIds = [$contactId];
     $form->set('_componentIds', [$contactId]);
-    $form->buildQuickForm();
+    $form->buildQuickForm(); $this->assertTrue($form->validate());
     $form->setDefaultValues();
     $form->postProcess();
 

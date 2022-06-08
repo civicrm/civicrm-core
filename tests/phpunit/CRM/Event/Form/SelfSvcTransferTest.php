@@ -24,7 +24,7 @@ class CRM_Event_Form_SelfSvcTransferTest extends CiviUnitTestCase {
     $form = $this->getFormObject('CRM_Event_Form_SelfSvcTransfer', [
       'email' => 'new@example.org',
     ]);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
     $emails = $mut->getAllMessages();
     $this->assertStringContainsString('Registration Confirmation - Annual CiviCRM meet - Mr. Anthony', $emails[0]);

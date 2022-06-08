@@ -2059,18 +2059,18 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'groups' => [],
     ], $submittedValues);
     $form = $this->getFormObject('CRM_Contact_Import_Form_DataSource', $submittedValues);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
     $this->userJobID = $form->getUserJobID();
     /* @var CRM_Contact_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Contact_Import_Form_MapField', $submittedValues);
     $form->setUserJobID($this->userJobID);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
     /* @var CRM_Contact_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Contact_Import_Form_Preview', $submittedValues);
     $form->setUserJobID($this->userJobID);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
 
     try {
       $form->postProcess();

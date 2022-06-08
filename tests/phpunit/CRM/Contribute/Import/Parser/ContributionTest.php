@@ -221,17 +221,17 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'groups' => [],
     ], $submittedValues);
     $form = $this->getFormObject('CRM_Contribute_Import_Form_DataSource', $submittedValues);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
     $this->userJobID = $form->getUserJobID();
     $form = $this->getFormObject('CRM_Contribute_Import_Form_MapField', $submittedValues);
     $form->setUserJobID($this->userJobID);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
     /* @var CRM_Contribute_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Contribute_Import_Form_Preview', $submittedValues);
     $form->setUserJobID($this->userJobID);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
   }
 

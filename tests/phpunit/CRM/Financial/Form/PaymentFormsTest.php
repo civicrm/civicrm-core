@@ -88,7 +88,7 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
         $formValues = array_merge($genericParams, $values['submitValues'], ['qfKey' => $qfKey]);
         $form = $this->getFormObject($formName, $formValues);
         $form->preProcess();
-        $form->buildQuickForm();
+        $form->buildQuickForm(); $this->assertTrue($form->validate());
         $form->postProcess();
         $qfKey = $form->controller->_key;
       }

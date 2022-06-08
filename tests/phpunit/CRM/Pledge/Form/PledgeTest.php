@@ -39,7 +39,7 @@ class CRM_Pledge_Form_PledgeTest extends CiviUnitTestCase {
       'frequency_day' => 4,
       'status' => 'Pending',
     ]);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
     $mut->checkAllMailLog([
       'Default Domain Name Anthony',

@@ -449,7 +449,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $form->_activityTypeFile = 'ChangeCaseStatus';
 
     $form->preProcess();
-    $form->buildQuickForm();
+    $form->buildQuickForm(); $this->assertTrue($form->validate());
     $form->setDefaultValues();
 
     // Now submit the form. Store the date used so we can check it later.

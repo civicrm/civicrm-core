@@ -25,7 +25,7 @@ class CRM_Event_Form_SelfSvcUpdateTest extends CiviUnitTestCase {
       'email' => 'new@example.org',
       'action' => 2,
     ]);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
     $mut->checkAllMailLog([
       'Your Event Registration has been cancelled',

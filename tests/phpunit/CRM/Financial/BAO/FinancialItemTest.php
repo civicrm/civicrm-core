@@ -268,7 +268,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
       'price_set_id' => 0,
     ]);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [

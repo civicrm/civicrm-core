@@ -54,7 +54,7 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
       'check_number' => '123XA',
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
     ]);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
     // fetch the financial trxn record later used in setting default values of payment edit form
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualID]);
@@ -124,7 +124,7 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
       'check_number' => $checkNumber1,
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
     ]);
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     $form->postProcess();
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualID]);
     $payments = CRM_Contribute_BAO_Contribution::getPaymentInfo($contribution['id'], 'contribute', TRUE);

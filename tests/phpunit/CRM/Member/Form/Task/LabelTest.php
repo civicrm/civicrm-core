@@ -41,7 +41,7 @@ class CRM_Member_Form_Task_LabelTest extends CiviUnitTestCase {
     ];
     $form->preProcess();
     $form->ids = [$membershipID => $membershipID];
-    $form->buildForm();
+    $form->buildForm(); $this->assertTrue($form->validate());
     try {
       $form->postProcess();
     }
