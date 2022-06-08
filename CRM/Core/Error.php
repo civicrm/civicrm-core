@@ -660,7 +660,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     // Use multiple (but stable) inputs for hash information.
     $md5inputs = [
       defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : 'NO_SITE_KEY',
-      $config->userFrameworkBaseURL,
+      CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE),
       md5($config->dsn),
       $config->dsn,
     ];
