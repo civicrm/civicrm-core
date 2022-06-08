@@ -140,14 +140,14 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
 
     $fieldMap = [];
     foreach ($fields as $fieldName => $field) {
-      $fieldMap[$field['title']] = $fieldName;
+      $fieldMap[$field['title']] = $field['name'] ?? $fieldName;
       if (!empty($field['html']['label'])) {
-        $fieldMap[$field['html']['label']] = $fieldName;
+        $fieldMap[$field['html']['label']] = $field['name'] ?? $fieldName;
       }
     }
     $fieldMap[ts('- do not import -')] = 'do_not_import';
-    $fieldMap[ts('Participant Status')] = 'participant_status_id';
-    $fieldMap[ts('Participant Role')] = 'participant_role_id';
+    $fieldMap[ts('Participant Status')] = 'status_id';
+    $fieldMap[ts('Participant Role')] = 'role_id';
     $fieldMap[ts('Event Title')] = 'event_id';
 
     foreach ($mappings as $mapping) {

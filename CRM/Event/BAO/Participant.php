@@ -578,6 +578,10 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
    * @param bool $checkPermission
    *   Is this a permissioned retrieval?
    *
+   * @deprecated only called from event search, but without most of the details
+   * returned. Event search should call stop using this & get the metadata
+   * a better way.
+   *
    * @return array
    *   array of importable Fields
    */

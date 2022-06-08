@@ -41,7 +41,6 @@ class CRM_Event_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   public function buildQuickForm() {
     parent::buildQuickForm();
 
-    $duplicateOptions = [];
     $this->addRadio('onDuplicate', ts('On Duplicate Entries'), [
       CRM_Import_Parser::DUPLICATE_SKIP => ts('Skip'),
       CRM_Import_Parser::DUPLICATE_UPDATE => ts('Update'),
@@ -50,22 +49,6 @@ class CRM_Event_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     $this->setDefaults(['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
 
     $this->addContactTypeSelector();
-  }
-
-  /**
-   * Process the uploaded file.
-   *
-   * @return void
-   */
-  public function postProcess() {
-    $this->storeFormValues([
-      'onDuplicate',
-      'contactType',
-      'dateFormats',
-      'savedMapping',
-    ]);
-
-    $this->submitFileForMapping('CRM_Event_Import_Parser_Participant');
   }
 
   /**
