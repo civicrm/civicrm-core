@@ -12,6 +12,7 @@
 
 namespace Civi\Api4\Generic;
 
+use Civi\API\Request;
 use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Utils\CoreUtil;
 
@@ -97,6 +98,7 @@ class DAOGetAction extends AbstractGetAction {
     }
 
     $this->setDefaultWhereClause();
+    $this->setJoinDefaults();
     $this->expandSelectClauseWildcards();
     $this->getObjects($result);
   }
@@ -220,6 +222,27 @@ class DAOGetAction extends AbstractGetAction {
    */
   public function getJoin(): array {
     return $this->join;
+  }
+
+  /**
+   * Set alias and default clauses for a join
+   */
+  private function setJoinDefaults() {
+    foreach ($this->join as &$join) {
+      [$entity, $alias] = array_pad(explode(' AS ', $join[0]), 2, NULL);
+      if (!$alias) {
+        $alias = strtolower($entity);
+        $join[0] = $entity . ' AS ' . $alias;
+      }
+      $clauses = array_filter($join, 'is_array');
+      $fields = Request::create($entity, 'get', ['version' => 4])->entityFields();
+      foreach ($fields as $field) {
+        $fieldAlias = $alias . '.' . $field['name'];
+        if (isset($field['default_value']) && !$this->_whereContains($fieldAlias) && !$this->_whereContains($fieldAlias, $clauses)) {
+          $join[] = [$fieldAlias, '=', $field['default_value']];
+        }
+      }
+    }
   }
 
 }

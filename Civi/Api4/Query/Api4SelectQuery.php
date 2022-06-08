@@ -709,20 +709,19 @@ class Api4SelectQuery {
    */
   private function addExplicitJoins() {
     foreach ($this->getJoin() as $join) {
-      // First item in the array is the entity name
+      // First item in the array is the entity name...
       $entity = array_shift($join);
-      // Which might contain an alias. Split on the keyword "AS"
-      list($entity, $alias) = array_pad(explode(' AS ', $entity), 2, NULL);
+      // ...and alias. Split on the keyword "AS"
+      [$entity, $alias] = explode(' AS ', $entity);
       // Ensure permissions
       if (!$this->checkEntityAccess($entity)) {
         continue;
       }
-      // Ensure alias is a safe string, and supply default if not given
-      $alias = $alias ?: strtolower($entity);
+      // Ensure alias is a safe string
       if ($alias === self::MAIN_TABLE_ALIAS || !preg_match('/^[-\w]{1,256}$/', $alias)) {
         throw new \API_Exception('Illegal join alias: "' . $alias . '"');
       }
-      // First item in the array is a boolean indicating if the join is required (aka INNER or LEFT).
+      // First item in the array is a string indicating if the join is required (aka INNER or LEFT).
       // The rest are join conditions.
       $side = array_shift($join);
       // If omitted, supply default (LEFT); and legacy support for boolean values
