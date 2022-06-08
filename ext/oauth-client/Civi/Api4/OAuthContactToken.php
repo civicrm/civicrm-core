@@ -17,11 +17,6 @@ class OAuthContactToken extends Generic\DAOEntity {
     return $action->setCheckPermissions($checkPermissions);
   }
 
-  public static function get($checkPermissions = TRUE) {
-    $action = new Action\OAuthContactToken\Get(static::class, __FUNCTION__);
-    return $action->setCheckPermissions($checkPermissions);
-  }
-
   public static function update($checkPermissions = TRUE) {
     $action = new Action\OAuthContactToken\Update(static::class, __FUNCTION__);
     return $action->setCheckPermissions($checkPermissions);
