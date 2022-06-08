@@ -468,7 +468,7 @@ abstract class CRM_Import_Parser {
 
   /**
    * Format the field values for input to the api.
-   *
+   * @deprecated
    * @return array
    *   (reference) associative array of name/value pairs
    */
@@ -567,6 +567,12 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * Get an array of field names with their headerPatterns.
+   *
+   * headerPatterns come from the xml schema and attempt to match
+   * the field based on the data if column headers are used.
+   *
+   * @todo use the importableFieldMetaData - stop setting _fields.
    * @return array
    */
   public function getHeaderPatterns(): array {
@@ -580,6 +586,12 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * Get an array of field names with their dataPatterns.
+   *
+   * dataPatterns come from the xml schema and attempt to match
+   * the field based on the data if column headers are not used.
+   *
+   * @todo use the importableFieldMetaData - stop setting _fields.
    * @return array
    */
   public function getDataPatterns():array {
@@ -595,7 +607,7 @@ abstract class CRM_Import_Parser {
    *
    * @param array $values
    * @param string $enclosure
-   *
+   * @deprecated
    * @return void
    */
   public static function encloseScrub(&$values, $enclosure = "'") {
@@ -610,7 +622,7 @@ abstract class CRM_Import_Parser {
 
   /**
    * Setter function.
-   *
+   * @deprecated
    * @param int $max
    *
    * @return void
@@ -759,7 +771,7 @@ abstract class CRM_Import_Parser {
 
   /**
    * Determines the file extension based on error code.
-   *
+   * @deprecated
    * @var int $type error code constant
    * @return string
    */
@@ -825,6 +837,9 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * @deprecated - still called from a couple of classes but probably only
+   * $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, $params['contact_type'], 'Unsupervised');
+   * does something - maybe look to use the lookupContact in the Contact Parser
    * Check if contact is a duplicate .
    *
    * @param array $formatValues
@@ -904,6 +919,7 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * @deprecated - does this still do anything not already done?
    * This function adds the contact variable in $values to the
    * parameter list $params.  For most cases, $values should have length 1.  If
    * the variable being added is a child of Location, a location_type_id must
@@ -1190,6 +1206,7 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * @deprecated - probably no longer called.
    * Parse a field which could be represented by a label or name value rather than the DB value.
    *
    * We will try to match name first or (per https://lab.civicrm.org/dev/core/issues/1285 if we have an id.
@@ -1226,6 +1243,7 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * @deprecated still used? getTransformedValue should do this
    * This is code extracted from 4 places where this exact snippet was being duplicated.
    *
    * FIXME: Extracting this was a first step, but there's also
@@ -1487,6 +1505,7 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * @deprecated - probably no longer called.
    * @param $customFieldID
    * @param $value
    * @param array $fieldMetaData
@@ -1959,6 +1978,8 @@ abstract class CRM_Import_Parser {
    *   Type of date.
    * @param string $dateParam
    *   Index of params.
+   *
+   * @deprecated
    */
   public static function formatCustomDate(&$params, &$formatted, $dateType, $dateParam) {
     //fix for CRM-2687

@@ -108,7 +108,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * Handle the values in preview mode.
    *
    * Function will be deprecated in favour of validateValues.
-   *
+   * @deprecated probably not used now.
    * @param array $values
    *   The array of values belonging to this line.
    *
@@ -127,7 +127,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *
    * @param array $values
    *   The array of values belonging to this line.
-   *
+   * @deprecated probably not used now.
    * @return int
    *   the result of this processing
    *   CRM_Import_Parser::ERROR or CRM_Import_Parser::VALID
@@ -498,7 +498,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * Once upon a time there was a dev who hadn't heard of implode. That dev wrote this function.
    *
    * @todo just say no!
-   *
+   * @deprecated probably not used now.
    * @param string $errorName
    *   A string containing error-field name.
    * @param string $errorMessage
@@ -1141,7 +1141,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
   /**
    * Store parser values.
-   *
+   * @deprecated probably not used now.
    * @param CRM_Core_Session $store
    *
    * @param int $mode
@@ -1151,7 +1151,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
   /**
    * Export data to a CSV file.
-   *
+   * @deprecated probably not used now.
    * @param string $fileName
    * @param array $header
    * @param array $data

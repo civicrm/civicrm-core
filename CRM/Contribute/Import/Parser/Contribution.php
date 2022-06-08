@@ -111,6 +111,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   protected $_softCreditErrorsFileName;
 
   /**
+   * @deprecated probably not used now.
    * @param string $fileName
    * @param string $separator
    * @param $mapper
@@ -278,7 +279,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * Store parser values.
    *
    * @param CRM_Core_Session $store
-   *
+   * @deprecated probably not used now.
    * @param int $mode
    */
   public function set($store, $mode = self::MODE_SUMMARY) {
@@ -329,7 +330,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
   /**
    * Export data to a CSV file.
-   *
+   * @deprecated probably not used now.
    * @param string $fileName
    * @param array $header
    * @param array $data
@@ -369,7 +370,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    *
    * @param int $type
    *   Error code constant.
-   *
+   * @deprecated probably not used now.
    * @return string
    */
   public static function errorFileName($type) {
@@ -487,7 +488,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    *
    * @param array $values
    *   The array of values belonging to this line.
-   *
+   * @deprecated probably not used now.
    * @return int
    *   CRM_Import_Parser::VALID or CRM_Import_Parser::ERROR
    */
