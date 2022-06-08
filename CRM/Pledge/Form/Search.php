@@ -190,11 +190,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
 
     $this->fixFormValues();
 
-    // We don't show test records in summaries or dashboards
-    if (empty($this->_formValues['pledge_test']) && $this->_force) {
-      $this->_formValues["pledge_test"] = 0;
-    }
-
     foreach (['pledge_amount_low', 'pledge_amount_high'] as $f) {
       if (isset($this->_formValues[$f])) {
         $this->_formValues[$f] = CRM_Utils_Rule::cleanMoney($this->_formValues[$f]);
