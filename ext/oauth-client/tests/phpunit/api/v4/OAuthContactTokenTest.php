@@ -137,7 +137,7 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
     $strangerTokenCreateVals = $this->getTestTokenCreateValues(
       $client, $notLoggedInContactID, 'other');
 
-    $this->usePerms(['manage all OAuth contact tokens']);
+    $this->usePerms(['manage all OAuth contact tokens', 'edit all contacts']);
     $createOtherContactToken = Civi\Api4\OAuthContactToken::create()
       ->setValues($strangerTokenCreateVals)
       ->execute();
@@ -149,7 +149,7 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
     $this->assertEquals($strangerTokenCreateVals['access_token'], $token['access_token']);
     $this->assertEquals($strangerTokenCreateVals['refresh_token'], $token['refresh_token']);
 
-    $this->usePerms(['manage my OAuth contact tokens']);
+    $this->usePerms(['manage my OAuth contact tokens', 'edit my contact']);
     $createOwnToken = Civi\Api4\OAuthContactToken::create()
       ->setValues($ownTokenCreateVals)
       ->execute();
@@ -161,7 +161,7 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
     $this->assertEquals($ownTokenCreateVals['access_token'], $token['access_token']);
     $this->assertEquals($ownTokenCreateVals['refresh_token'], $token['refresh_token']);
 
-    $this->usePerms(['manage my OAuth contact tokens']);
+    $this->usePerms(['manage my OAuth contact tokens', 'edit all contacts']);
     try {
       Civi\Api4\OAuthContactToken::create()
         ->setValues($strangerTokenCreateVals)
@@ -217,7 +217,7 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
       $notLoggedInContactID
     );
 
-    $this->usePerms(['manage all OAuth contact tokens', 'view all contacts']);
+    $this->usePerms(['manage all OAuth contact tokens', 'edit all contacts']);
     $updateTokensWithFullAccess = Civi\Api4\OAuthContactToken::update()
       ->addWhere('contact_id', '=', $notLoggedInContactID)
       ->setValues(['access_token' => 'stranger-token-revised'])
@@ -226,7 +226,7 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
     $token = $updateTokensWithFullAccess->first();
     $this->assertEquals($strangerContactToken['id'], $token['id']);
 
-    $this->usePerms(['manage my OAuth contact tokens', 'view my contact']);
+    $this->usePerms(['manage my OAuth contact tokens', 'edit my contact']);
     $updateTokensWithLimitedAccess = Civi\Api4\OAuthContactToken::update()
       ->addWhere('client_id.guid', '=', $client['guid'])
       ->setValues(['access_token' => 'own-token-revised'])
@@ -235,7 +235,7 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
     $token = $updateTokensWithLimitedAccess->first();
     $this->assertEquals($ownContactToken['id'], $token['id']);
 
-    $this->usePerms(['manage my OAuth contact tokens', 'view my contact']);
+    $this->usePerms(['manage my OAuth contact tokens', 'edit my contact']);
     $getUpdatedTokensWithLimitedAccess = Civi\Api4\OAuthContactToken::get()
       ->execute();
     $this->assertCount(1, $getUpdatedTokensWithLimitedAccess);
@@ -243,17 +243,12 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
     $this->assertEquals($loggedInContactID, $token['contact_id']);
     $this->assertEquals("own-token-revised", $token['access_token']);
 
-    $this->usePerms(['manage my OAuth contact tokens', 'view my contact']);
-    try {
-      Civi\Api4\OAuthContactToken::update()
-        ->addWhere('contact_id', '=', $notLoggedInContactID)
-        ->setValues(['access_token' => "stranger-token-revised"])
-        ->execute();
-      $this->fail('Expected \Civi\API\Exception\UnauthorizedException but none was thrown');
-    }
-    catch (\Civi\API\Exception\UnauthorizedException $e) {
-      // exception successfully thrown
-    }
+    $this->usePerms(['manage my OAuth contact tokens', 'view all contacts']);
+    $updates = Civi\Api4\OAuthContactToken::update()
+      ->addWhere('contact_id', '=', $notLoggedInContactID)
+      ->setValues(['access_token' => "stranger-token-revised"])
+      ->execute();
+    $this->assertCount(0, $updates, 'User should not have access to update');
 
     $this->usePerms(['manage my OAuth contact tokens', 'view my contact']);
     $updateTokensForWrongContact = Civi\Api4\OAuthContactToken::update()
@@ -269,30 +264,30 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
     [$loggedInContactID, $notLoggedInContactID] = $this->createTestContactIDs();
     $this->createOwnAndStrangerTokens($client, $loggedInContactID, $notLoggedInContactID);
 
-    $this->usePerms(['manage my OAuth contact tokens', 'view all contacts']);
+    $this->usePerms(['manage my OAuth contact tokens', 'edit all contacts']);
     $deleteTokensWithLimitedAccess = Civi\Api4\OAuthContactToken::delete()
       ->setWhere([['client_id.guid', '=', $client['guid']]])
       ->execute();
 
-    $this->usePerms(['manage my OAuth contact tokens', 'view all contacts']);
+    $this->usePerms(['manage my OAuth contact tokens', 'edit all contacts']);
     $getTokensWithLimitedAccess = Civi\Api4\OAuthContactToken::get()->execute();
     $this->assertCount(0, $getTokensWithLimitedAccess);
 
-    $this->usePerms(['manage all OAuth contact tokens', 'view all contacts']);
+    $this->usePerms(['manage all OAuth contact tokens', 'edit all contacts']);
     $getTokensWithFullAccess = Civi\Api4\OAuthContactToken::get()->execute();
     $this->assertCount(1, $getTokensWithFullAccess);
 
     $this->usePerms(['manage my OAuth contact tokens', 'view all contacts']);
-    $this->expectException(\Civi\API\Exception\UnauthorizedException::class);
-    Civi\Api4\OAuthContactToken::delete()
+    $deleted = Civi\Api4\OAuthContactToken::delete()
       ->addWhere('contact_id', '=', $notLoggedInContactID)
       ->execute();
+    $this->assertCount(0, $deleted);
   }
 
   public function testGetByScope() {
     $client = $this->createClient();
 
-    $this->usePerms(['manage all OAuth contact tokens', 'view all contacts']);
+    $this->usePerms(['manage all OAuth contact tokens', 'edit all contacts']);
     $tokenCreationVals = [
       'client_id' => $client['id'],
       'contact_id' => 1,
