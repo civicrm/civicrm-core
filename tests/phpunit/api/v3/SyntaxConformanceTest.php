@@ -1262,22 +1262,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
-   * @dataProvider entities
-   * @param $Entity
-   */
-  public function testWithoutParam_create($Entity) {
-    $this->expectException(CiviCRM_API3_Exception::class);
-    if ($Entity === 'Setting') {
-      $this->markTestSkipped('It seems OK for setting to skip here as it silently sips invalid params');
-    }
-    elseif ($Entity === 'Mailing') {
-      $this->markTestSkipped('It seems OK for "Mailing" to skip here because you can create empty drafts');
-    }
-    // should create php complaining that a param is missing
-    civicrm_api3($Entity, 'Create');
-  }
-
-  /**
    * @dataProvider entities_create
    *
    * Check that create doesn't work with an invalid
@@ -1317,24 +1301,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       $lowercase_entity = _civicrm_api_get_entity_name_from_camel($Entity);
       $this->assertEquals($lowercase_entity . $expected, $result['sort']);
     }
-  }
-
-  /**
-   * @dataProvider entities_create
-   *
-   * Check that create doesn't work with an invalid
-   * @param $Entity
-   * @throws \PHPUnit\Framework\IncompleteTestError
-   */
-  public function testInvalidID_create($Entity) {
-    // turn test off for noew
-    $this->markTestIncomplete("Entity [ $Entity ] cannot be mocked - no known DAO");
-    return;
-    if (in_array($Entity, $this->toBeImplemented['create'])) {
-      // $this->markTestIncomplete("civicrm_api3_{$Entity}_create to be implemented");
-      return;
-    }
-    $result = $this->callAPIFailure($Entity, 'Create', ['id' => 999]);
   }
 
   /**
