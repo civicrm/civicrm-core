@@ -177,141 +177,14 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $returnCode = $this->summary($values);
       }
       elseif ($mode == self::MODE_IMPORT) {
-        $returnCode = $this->import($values);
+        $this->import($values);
         if ($statusID && (($this->_lineCount % 50) == 0)) {
           $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
         }
       }
-      else {
-        $returnCode = self::ERROR;
-      }
 
-      // note that a line could be valid but still produce a warning
-      if ($returnCode == self::VALID) {
-        $this->_validCount++;
-        if ($mode == self::MODE_MAPFIELD) {
-          $this->_rows[] = $values;
-          $this->_activeFieldCount = max($this->_activeFieldCount, count($values));
-        }
-      }
-
-      if ($returnCode == self::SOFT_CREDIT) {
-        $this->_validSoftCreditRowCount++;
-        $this->_validCount++;
-        if ($mode == self::MODE_MAPFIELD) {
-          $this->_rows[] = $values;
-          $this->_activeFieldCount = max($this->_activeFieldCount, count($values));
-        }
-      }
-
-      if ($returnCode == self::PLEDGE_PAYMENT) {
-        $this->_validPledgePaymentRowCount++;
-        $this->_validCount++;
-        if ($mode == self::MODE_MAPFIELD) {
-          $this->_rows[] = $values;
-          $this->_activeFieldCount = max($this->_activeFieldCount, count($values));
-        }
-      }
-
-      if ($returnCode == self::ERROR) {
-        $this->_invalidRowCount++;
-        $recordNumber = $this->_lineCount;
-        array_unshift($values, $recordNumber);
-        $this->_errors[] = $values;
-      }
-
-      if ($returnCode == self::PLEDGE_PAYMENT_ERROR) {
-        $this->_invalidPledgePaymentRowCount++;
-        $recordNumber = $this->_lineCount;
-        array_unshift($values, $recordNumber);
-        $this->_pledgePaymentErrors[] = $values;
-      }
-
-      if ($returnCode == self::SOFT_CREDIT_ERROR) {
-        $this->_invalidSoftCreditRowCount++;
-        $recordNumber = $this->_lineCount;
-        array_unshift($values, $recordNumber);
-        $this->_softCreditErrors[] = $values;
-      }
-
-      if ($returnCode == self::DUPLICATE) {
-        $this->_duplicateCount++;
-        $recordNumber = $this->_lineCount;
-        array_unshift($values, $recordNumber);
-        $this->_duplicates[] = $values;
-        if (!$this->isSkipDuplicates()) {
-          $this->_validCount++;
-        }
-      }
     }
 
-    if ($mode == self::MODE_PREVIEW || $mode == self::MODE_IMPORT) {
-      $customHeaders = $mapper;
-
-      $customfields = CRM_Core_BAO_CustomField::getFields('Contribution');
-      foreach ($customHeaders as $key => $value) {
-        if ($id = CRM_Core_BAO_CustomField::getKeyID($value)) {
-          $customHeaders[$key] = $customfields[$id][0];
-        }
-      }
-      if ($this->_invalidRowCount) {
-        // removed view url for invlaid contacts
-        $headers = array_merge([
-          ts('Line Number'),
-          ts('Reason'),
-        ], $customHeaders);
-        $this->_errorFileName = self::errorFileName(self::ERROR);
-        self::exportCSV($this->_errorFileName, $headers, $this->_errors);
-      }
-
-      if ($this->_invalidPledgePaymentRowCount) {
-        // removed view url for invlaid contacts
-        $headers = array_merge([
-          ts('Line Number'),
-          ts('Reason'),
-        ], $customHeaders);
-        $this->_pledgePaymentErrorsFileName = self::errorFileName(self::PLEDGE_PAYMENT_ERROR);
-        self::exportCSV($this->_pledgePaymentErrorsFileName, $headers, $this->_pledgePaymentErrors);
-      }
-
-      if ($this->_invalidSoftCreditRowCount) {
-        // removed view url for invlaid contacts
-        $headers = array_merge([
-          ts('Line Number'),
-          ts('Reason'),
-        ], $customHeaders);
-        $this->_softCreditErrorsFileName = self::errorFileName(self::SOFT_CREDIT_ERROR);
-        self::exportCSV($this->_softCreditErrorsFileName, $headers, $this->_softCreditErrors);
-      }
-
-      if ($this->_duplicateCount) {
-        $headers = array_merge([
-          ts('Line Number'),
-          ts('View Contribution URL'),
-        ], $customHeaders);
-
-        $this->_duplicateFileName = self::errorFileName(self::DUPLICATE);
-        self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
-      }
-    }
-  }
-
-  /**
-   * Given a list of the importable field keys that the user has selected
-   * set the active fields array to this list
-   *
-   * @param array $fieldKeys mapped array of values
-   */
-  public function setActiveFields($fieldKeys) {
-    $this->_activeFieldCount = count($fieldKeys);
-    foreach ($fieldKeys as $key) {
-      if (empty($this->_fields[$key])) {
-        $this->_activeFields[] = new CRM_Contribute_Import_Field('', ts('- do not import -'));
-      }
-      else {
-        $this->_activeFields[] = clone($this->_fields[$key]);
-      }
-    }
   }
 
   /**
@@ -333,6 +206,15 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       $mappedFields[] = $mappedField;
     }
     return $mappedFields;
+  }
+
+  /**
+   * Get the required fields.
+   *
+   * @return array
+   */
+  public function getRequiredFields(): array {
+    return ['id' => ts('Contribution ID'), ['financial_type_id' => ts('Financial Type'), 'total_amount' => ts('Total Amount')]];
   }
 
   /**
@@ -555,10 +437,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     foreach ($this->getImportableFieldsMetadata() as $name => $field) {
       $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern']);
     }
-
-    $this->_newContributions = [];
-
-    $this->setActiveFields($this->_mapperKeys);
   }
 
   /**
@@ -581,13 +459,13 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       // add pledge fields only if its is enabled
       if (CRM_Core_Permission::access('CiviPledge')) {
         $pledgeFields = [
-          'pledge_payment' => [
-            'title' => ts('Pledge Payment'),
-            'headerPattern' => '/Pledge Payment/i',
-          ],
           'pledge_id' => [
             'title' => ts('Pledge ID'),
             'headerPattern' => '/Pledge ID/i',
+            'name' => 'pledge_id',
+            'entity' => 'Pledge',
+            'type' => CRM_Utils_Type::T_INT,
+            'options' => FALSE,
           ],
         ];
 
@@ -620,9 +498,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     $params['contact_type'] = 'Contribution';
 
     if ($errorMessage) {
-      $tempMsg = "Invalid value for field(s) : $errorMessage";
-      array_unshift($values, $tempMsg);
-      $this->setImportStatus($rowNumber, 'ERROR', $tempMsg);
+      $this->setImportStatus($rowNumber, 'ERROR', "Invalid value for field(s) : $errorMessage");
       return CRM_Import_Parser::ERROR;
     }
 
@@ -634,18 +510,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    *
    * @param array $values
    *   The array of values belonging to this line.
-   *
-   * @return int
-   *   the result of this processing - one of
-   *   - CRM_Import_Parser::VALID
-   *   - CRM_Import_Parser::ERROR
-   *   - CRM_Import_Parser::SOFT_CREDIT_ERROR
-   *   - CRM_Import_Parser::PLEDGE_PAYMENT_ERROR
-   *   - CRM_Import_Parser::DUPLICATE
-   *   - CRM_Import_Parser::SOFT_CREDIT (successful creation)
-   *   - CRM_Import_Parser::PLEDGE_PAYMENT (successful creation)
    */
-  public function import(&$values) {
+  public function import($values): void {
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
       $params = $this->getMappedRow($values);
@@ -682,12 +548,11 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       $formatError = $this->deprecatedFormatParams($paramValues, $formatted);
 
       if ($formatError) {
-        array_unshift($values, $formatError['error_message']);
         if (CRM_Utils_Array::value('error_data', $formatError) == 'soft_credit') {
-          return self::SOFT_CREDIT_ERROR;
+          throw new CRM_Core_Exception('', self::SOFT_CREDIT_ERROR);
         }
         if (CRM_Utils_Array::value('error_data', $formatError) == 'pledge_payment') {
-          return self::PLEDGE_PAYMENT_ERROR;
+          throw new CRM_Core_Exception('', self::PLEDGE_PAYMENT_ERROR);
         }
         throw new CRM_Core_Exception('', CRM_Import_Parser::ERROR);
       }
@@ -754,11 +619,14 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
             //return soft valid since we need to show how soft credits were added
             if (!empty($formatted['soft_credit'])) {
-              return self::SOFT_CREDIT;
+              $this->setImportStatus($rowNumber, $this->getStatus(self::SOFT_CREDIT));
+              return;
             }
 
             // process pledge payment assoc w/ the contribution
-            return $this->processPledgePayments($formatted);
+            $this->processPledgePayments($formatted);
+            $this->setImportStatus($rowNumber, $this->getStatus(self::PLEDGE_PAYMENT));
+            return;
           }
           $labels = [
             'id' => 'Contribution ID',
@@ -804,11 +672,13 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
           //return soft valid since we need to show how soft credits were added
           if (!empty($formatted['soft_credit'])) {
-            return self::SOFT_CREDIT;
+            $this->setImportStatus($rowNumber, $this->getStatus(self::SOFT_CREDIT));
+            return;
           }
 
-          // process pledge payment assoc w/ the contribution
-          return $this->processPledgePayments($formatted);
+          $this->processPledgePayments($formatted);
+          $this->setImportStatus($rowNumber, $this->getStatus(self::PLEDGE_PAYMENT));
+          return;
         }
 
         // Using new Dedupe rule.
@@ -868,26 +738,44 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
       //return soft valid since we need to show how soft credits were added
       if (!empty($formatted['soft_credit'])) {
-        return self::SOFT_CREDIT;
+        $this->setImportStatus($rowNumber, $this->getStatus(self::SOFT_CREDIT), '');
+        return;
       }
 
       // process pledge payment assoc w/ the contribution
-      return $this->processPledgePayments($formatted);
+      $this->processPledgePayments($formatted);
+      $this->setImportStatus($rowNumber, $this->getStatus(self::PLEDGE_PAYMENT));
+      return;
+
     }
     catch (CRM_Core_Exception $e) {
-      array_unshift($values, $e->getMessage());
-      $errorMapping = [self::SOFT_CREDIT_ERROR => 'soft_credit_error', self::PLEDGE_PAYMENT_ERROR => 'pledge_payment_error', CRM_Import_Parser::DUPLICATE => 'DUPLICATE'];
-      $this->setImportStatus($rowNumber, $errorMapping[$e->getErrorCode()] ?? 'ERROR', $e->getMessage());
-      return $errorMapping[$e->getErrorCode()] ?? CRM_Import_Parser::ERROR;
+      $this->setImportStatus($rowNumber, $this->getStatus($e->getErrorCode()), $e->getMessage());
     }
+  }
+
+  /**
+   * Get the status to record.
+   *
+   * @param int|null $code
+   *
+   * @return string
+   */
+  protected function getStatus(?int $code): string {
+    $errorMapping = [
+      self::SOFT_CREDIT_ERROR => 'soft_credit_error',
+      self::PLEDGE_PAYMENT_ERROR => 'pledge_payment_error',
+      self::SOFT_CREDIT => 'soft_credit_imported',
+      self::PLEDGE_PAYMENT => 'pledge_payment_imported',
+      CRM_Import_Parser::DUPLICATE => 'DUPLICATE',
+      CRM_Import_Parser::VALID => 'IMPORTED',
+    ];
+    return $errorMapping[$code] ?? 'ERROR';
   }
 
   /**
    * Process pledge payments.
    *
    * @param array $formatted
-   *
-   * @return int
    */
   private function processPledgePayments(array $formatted) {
     if (!empty($formatted['pledge_payment_id']) && !empty($formatted['pledge_id'])) {
@@ -905,8 +793,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         NULL,
         $formatted['total_amount']
       );
-
-      return self::PLEDGE_PAYMENT;
     }
   }
 
@@ -1069,25 +955,15 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           }
           break;
 
-        case 'pledge_payment':
         case 'pledge_id':
-
-          // giving respect to pledge_payment flag.
-          if (empty($params['pledge_payment'])) {
-            break;
-          }
-
           // get total amount of from import fields
           $totalAmount = $params['total_amount'] ?? NULL;
-
-          $onDuplicate = $params['onDuplicate'] ?? NULL;
-
           // we need to get contact id $contributionContactID to
           // retrieve pledge details as well as to validate pledge ID
 
           // first need to check for update mode
           if ($this->isUpdateExisting() &&
-            ($params['contribution_id'] || $params['trxn_id'] || $params['invoice_id'])
+            ($params['id'] || $params['trxn_id'] || $params['invoice_id'])
           ) {
             $contribution = new CRM_Contribute_DAO_Contribution();
             if ($params['contribution_id']) {
@@ -1107,7 +983,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
               }
             }
             else {
-              return civicrm_api3_create_error('No match found for specified contact in pledge payment data. Row was skipped.');
+              throw new CRM_Core_Exception('No match found for specified contact in pledge payment data. Row was skipped.');
             }
           }
           else {

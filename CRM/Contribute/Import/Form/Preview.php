@@ -57,66 +57,6 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
   }
 
   /**
-   * Process the mapped fields and map it into the uploaded file preview the file and extract some summary statistics.
-   */
-  public function postProcess() {
-    $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
-    $onDuplicate = $this->get('onDuplicate');
-    $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
-    $mapper = $this->controller->exportValue('MapField', 'mapper');
-
-    $parser = new CRM_Contribute_Import_Parser_Contribution();
-    $parser->setUserJobID($this->getUserJobID());
-
-    $mapFields = $this->get('fields');
-
-    foreach ($mapper as $key => $value) {
-      $header = [];
-      if (isset($mapFields[$mapper[$key][0]])) {
-        $header[] = $mapFields[$mapper[$key][0]];
-      }
-      $mapperFields[] = implode(' - ', $header);
-    }
-    $parser->run(
-      $this->getSubmittedValue('uploadFile'),
-      $this->getSubmittedValue('fieldSeparator'),
-      $mapperFields,
-      $this->getSubmittedValue('skipColumnHeader'),
-      CRM_Import_Parser::MODE_IMPORT,
-      $this->getSubmittedValue('contactType'),
-      $onDuplicate,
-      $this->get('statusID'),
-      $this->get('totalRowCount')
-    );
-
-    // Add all the necessary variables to the form.
-    $parser->set($this, CRM_Import_Parser::MODE_IMPORT);
-
-    // Check if there is any error occurred.
-
-    $errorStack = CRM_Core_Error::singleton();
-    $errors = $errorStack->getErrors();
-    $errorMessage = [];
-
-    if (is_array($errors)) {
-      foreach ($errors as $key => $value) {
-        $errorMessage[] = $value['message'];
-      }
-
-      $errorFile = $fileName['name'] . '.error.log';
-
-      if ($fd = fopen($errorFile, 'w')) {
-        fwrite($fd, implode('\n', $errorMessage));
-      }
-      fclose($fd);
-
-      $this->set('errorFile', $errorFile);
-      $urlParams = 'type=' . CRM_Import_Parser::ERROR . '&parser=CRM_Contribute_Import_Parser_Contribution';
-      $this->set('downloadErrorRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
-    }
-  }
-
-  /**
    * @return \CRM_Contribute_Import_Parser_Contribution
    */
   protected function getParser(): CRM_Contribute_Import_Parser_Contribution {

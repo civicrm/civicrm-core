@@ -447,7 +447,10 @@ abstract class CRM_Import_DataSource {
        " . $this->getAdditionalTrackingFields() . "
        ADD COLUMN _status VARCHAR(32) DEFAULT 'NEW' NOT NULL,
        ADD COLUMN _status_message TEXT,
-       ADD COLUMN _id INT PRIMARY KEY NOT NULL AUTO_INCREMENT"
+       ADD COLUMN _id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+       ADD INDEX(_id),
+       ADD INDEX(_status)
+       "
     );
   }
 
@@ -548,11 +551,15 @@ abstract class CRM_Import_DataSource {
    */
   protected function getStatusMapping(): array {
     return [
-      CRM_Import_Parser::VALID => ['imported', 'new'],
-      CRM_Import_Parser::ERROR => ['error', 'invalid'],
+      CRM_Import_Parser::VALID => ['imported', 'new', 'soft_credit_imported', 'pledge_payment_imported'],
+      CRM_Import_Parser::ERROR => ['error', 'invalid', 'soft_credit_error', 'pledge_payment_error'],
       CRM_Import_Parser::DUPLICATE => ['duplicate'],
       CRM_Import_Parser::NO_MATCH => ['invalid_no_match'],
       CRM_Import_Parser::UNPARSED_ADDRESS_WARNING => ['warning_unparsed_address'],
+      CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT_ERROR => ['soft_credit_error'],
+      CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT => ['soft_credit_imported'],
+      CRM_Contribute_Import_Parser_Contribution::PLEDGE_PAYMENT => ['pledge_payment_imported'],
+      CRM_Contribute_Import_Parser_Contribution::PLEDGE_PAYMENT_ERROR => ['pledge_payment_error'],
       'new' => ['new'],
     ];
   }

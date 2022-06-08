@@ -88,6 +88,10 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
 
     $contributionsOfSoftContact = ContributionSoft::get()->addWhere('contact_id', '=', $contact2Id)->execute();
     $this->assertCount(1, $contributionsOfSoftContact, 'Contribution Soft not added for primary contact');
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::ERROR]));
+    $this->assertEquals(1, $dataSource->getRowCount([CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT]));
+    $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
   }
 
   /**
@@ -123,12 +127,12 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
 
     $this->addRandomOption('contribution_status');
     $values['contribution_status_id'] = 'not at all random';
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID, 'contribution_status_id' => 'random']);
     $this->assertEquals('not at all random', $contribution['contribution_status']);
 
     $values['contribution_status_id'] = 'just say no';
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::ERROR);
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID], 2);
 
     // Per https://lab.civicrm.org/dev/core/issues/1285 it's a bit arguable but Ok we can support id...
@@ -172,6 +176,26 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(5, $contribution['values'][$contribution['id']]['custom_' . $this->ids['CustomField']['radio']]);
     $this->callAPISuccess('CustomField', 'delete', ['id' => $this->ids['CustomField']['radio']]);
     $this->callAPISuccess('CustomGroup', 'delete', ['id' => $this->ids['CustomGroup']['Custom Group']]);
+  }
+
+  /**
+   * Test importing to a pledge.
+   */
+  public function testPledgeImport(): void {
+    $contactID = $this->individualCreate(['email' => 'mum@example.com']);
+    $pledgeID = $this->pledgeCreate(['contact_id' => $contactID]);
+    $this->importCSV('pledge.csv', [
+      ['name' => 'email'],
+      ['name' => 'total_amount'],
+      ['name' => 'pledge_id'],
+      ['name' => 'receive_date'],
+      ['name' => 'financial_type_id'],
+    ], ['onDuplicate' => CRM_Import_Parser::NO_MATCH]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $this->assertEquals(1, $dataSource->getRowCount([CRM_Contribute_Import_Parser_Contribution::PLEDGE_PAYMENT]));
+    $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
+    $this->callAPISuccessGetSingle('PledgePayment', ['pledge_id' => $pledgeID, 'contribution_id' => $contribution['id']]);
   }
 
   /**
@@ -304,7 +328,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    * @param array|null $fields
    *   Array of field names. Will be calculated from $originalValues if not passed in.
    */
-  protected function runImport(array $originalValues, int $onDuplicateAction, ?int $expectedResult, array $mappings = [], array $fields = NULL): void {
+  protected function runImport(array $originalValues, int $onDuplicateAction, ?int $expectedResult = NULL, array $mappings = [], array $fields = NULL): void {
     if (!$fields) {
       $fields = array_keys($originalValues);
     }
@@ -323,8 +347,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'mapper' => $mapper,
     ]));
     $parser->init();
-
-    $this->assertEquals($expectedResult, $parser->import($values), 'Return code from parser import was not as expected');
+    $parser->import($values);
   }
 
   /**

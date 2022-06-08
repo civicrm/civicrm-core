@@ -376,49 +376,12 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Process the mapped fields and map it into the uploaded file preview the file and extract some summary statistics.
+   * Get the mapping name per the civicrm_mapping_field.type_id option group.
+   *
+   * @return string
    */
-  public function postProcess() {
-    $params = $this->controller->exportValues('MapField');
-
-    //reload the mapfield if load mapping is pressed
-    if (!empty($params['savedMapping'])) {
-      $this->set('savedMapping', $params['savedMapping']);
-      $this->controller->resetPage($this->_name);
-      return;
-    }
-    $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
-
-    $mapper = $mapperKeysMain = $mapperSoftCredit = $softCreditFields = $mapperPhoneType = $mapperSoftCreditType = [];
-    $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
-
-    $softCreditTypes = CRM_Core_OptionGroup::values('soft_credit_type');
-
-    for ($i = 0; $i < $this->_columnCount; $i++) {
-      $mapper[$i] = $this->_mapperFields[$mapperKeys[$i][0]];
-      $mapperKeysMain[$i] = $mapperKeys[$i][0];
-    }
-
-    $this->set('mapper', $mapper);
-
-    // store mapping Id to display it in the preview page
-    $this->set('loadMappingId', CRM_Utils_Array::value('mappingId', $params));
-
-    $mappingType = 'Import Contribution';
-    $this->saveMapping($mappingType);
-
-    $parser = new CRM_Contribute_Import_Parser_Contribution($mapperKeysMain);
-    $parser->setUserJobID($this->getUserJobID());
-    $parser->run(
-      $this->getSubmittedValue('uploadFile'),
-      $this->getSubmittedValue('fieldSeparator'),
-      $mapper,
-      $this->getSubmittedValue('skipColumnHeader'),
-      CRM_Import_Parser::MODE_PREVIEW
-    );
-
-    // add all the necessary variables to the form
-    $parser->set($this);
+  public function getMappingTypeName(): string {
+    return 'Import Contribution';
   }
 
   /**
