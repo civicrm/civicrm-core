@@ -127,12 +127,12 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
 
     $this->addRandomOption('contribution_status');
     $values['contribution_status_id'] = 'not at all random';
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID, 'contribution_status_id' => 'random']);
     $this->assertEquals('not at all random', $contribution['contribution_status']);
 
     $values['contribution_status_id'] = 'just say no';
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::ERROR);
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID], 2);
 
     // Per https://lab.civicrm.org/dev/core/issues/1285 it's a bit arguable but Ok we can support id...
@@ -328,7 +328,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    * @param array|null $fields
    *   Array of field names. Will be calculated from $originalValues if not passed in.
    */
-  protected function runImport(array $originalValues, int $onDuplicateAction, ?int $expectedResult, array $mappings = [], array $fields = NULL): void {
+  protected function runImport(array $originalValues, int $onDuplicateAction, ?int $expectedResult = NULL, array $mappings = [], array $fields = NULL): void {
     if (!$fields) {
       $fields = array_keys($originalValues);
     }
@@ -347,8 +347,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'mapper' => $mapper,
     ]));
     $parser->init();
-
-    $this->assertEquals($expectedResult, $parser->import($values), 'Return code from parser import was not as expected');
+    $parser->import($values);
   }
 
   /**
