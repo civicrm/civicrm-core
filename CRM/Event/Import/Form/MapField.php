@@ -57,84 +57,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     $savedMappingID = (int) $this->getSubmittedValue('savedMapping');
     $this->buildSavedMappingFields($savedMappingID);
     $this->addFormRule(array('CRM_Event_Import_Form_MapField', 'formRule'), $this);
-
-    $defaults = [];
-    $mapperKeys = array_keys($this->_mapperFields);
-    $hasHeaders = $this->getSubmittedValue('skipColumnHeader');
-    $headerPatterns = $this->getHeaderPatterns();
-    $dataPatterns = $this->getDataPatterns();
-    $fieldMappings = $this->getFieldMappings();
-    /* Initialize all field usages to false */
-
-    foreach ($mapperKeys as $key) {
-      $this->_fieldUsed[$key] = FALSE;
-    }
-    $this->_location_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-    $sel1 = $this->_mapperFields;
-
-    $js = "<script type='text/javascript'>\n";
-    $formName = 'document.forms.' . $this->_name;
-
-    foreach ($this->getColumnHeaders() as $i => $columnHeader) {
-      $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', array(1 => $i)), NULL);
-      $jsSet = FALSE;
-      if ($this->getSubmittedValue('savedMapping')) {
-        $fieldMapping = $fieldMappings[$i] ?? NULL;
-        if (isset($fieldMappings[$i])) {
-          if ($fieldMapping['name'] !== ts('do_not_import')) {
-            $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
-            $defaults["mapper[$i]"] = [$fieldMapping['name']];
-            $jsSet = TRUE;
-          }
-          else {
-            $defaults["mapper[$i]"] = [];
-          }
-          if (!$jsSet) {
-            for ($k = 1; $k < 4; $k++) {
-              $js .= "{$formName}['mapper[$i][$k]'].style.display = 'none';\n";
-            }
-          }
-        }
-        else {
-          // this load section to help mapping if we ran out of saved columns when doing Load Mapping
-          $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_" . $i . "_');\n";
-
-          if ($hasHeaders) {
-            $defaults["mapper[$i]"] = array($this->defaultFromHeader($columnHeader, $headerPatterns));
-          }
-          else {
-            $defaults["mapper[$i]"] = array($this->defaultFromData($dataPatterns, $i));
-          }
-        }
-        //end of load mapping
-      }
-      else {
-        $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_" . $i . "_');\n";
-        if ($hasHeaders) {
-          // Infer the default from the skipped headers if we have them
-          $defaults["mapper[$i]"] = array(
-            $this->defaultFromHeader($columnHeader,
-              $headerPatterns
-            ),
-            //                     $defaultLocationType->id
-            0,
-          );
-        }
-        else {
-          // Otherwise guess the default from the form of the data
-          $defaults["mapper[$i]"] = array(
-            $this->defaultFromData($dataPatterns, $i),
-            //                     $defaultLocationType->id
-            0,
-          );
-        }
-      }
-      $sel->setOptions([$sel1]);
-    }
-    $js .= "</script>\n";
-    $this->assign('initHideBoxes', $js);
-    $this->setDefaults($defaults);
-
+    $this->addMapper();
     $this->addFormButtons();
   }
 
@@ -154,7 +77,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     $errors = [];
     // define so we avoid notices below
     $errors['_qf_default'] = '';
-    $contactFieldsBelowWeightMessage = NULL;
+
     if (!array_key_exists('savedMapping', $fields)) {
       $importKeys = [];
       foreach ($fields['mapper'] as $mapperPart) {

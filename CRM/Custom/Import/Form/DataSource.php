@@ -90,22 +90,6 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   }
 
   /**
-   * Process the uploaded file.
-   *
-   * @return void
-   */
-  public function postProcess() {
-    $this->storeFormValues([
-      'contactType',
-      'dateFormats',
-      'savedMapping',
-      'multipleCustomData',
-    ]);
-
-    $this->submitFileForMapping('CRM_Custom_Import_Parser_Api', 'multipleCustomData');
-  }
-
-  /**
    * @return CRM_Custom_Import_Parser_Api
    */
   protected function getParser(): CRM_Custom_Import_Parser_Api {

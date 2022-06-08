@@ -1479,7 +1479,7 @@ abstract class CRM_Import_Parser {
         $this->importableFieldsMetadata[$fieldMapName]['options'] = $values;
       }
       else {
-        $this->importableFieldsMetadata[$fieldMapName]['options'] = $options;
+        $this->importableFieldsMetadata[$fieldMapName]['options'] = $options ?: FALSE;
       }
       return $this->importableFieldsMetadata[$fieldMapName];
     }

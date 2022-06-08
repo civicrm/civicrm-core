@@ -20,11 +20,4 @@
  */
 class CRM_Contribute_Import_Form_Summary extends CRM_Import_Form_Summary {
 
-  /**
-   * Set variables up before form is built.
-   */
-  public function preProcess() {
-    parent::preProcess();
-  }
-
 }

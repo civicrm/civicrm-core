@@ -150,10 +150,19 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
   }
 
   /**
+   * Common postProcessing.
+   */
+  public function postProcess() {
+    $this->processDatasource();
+    $this->controller->resetPage('MapField');
+    parent::postProcess();
+  }
+
+  /**
    * Common form postProcess.
+   * @deprecated - just use postProcess.
    *
    * @param string $parserClassName
-   *
    * @param string|null $entity
    *   Entity to set for paraser currently only for custom import
    */
