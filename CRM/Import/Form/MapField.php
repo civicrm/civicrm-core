@@ -95,6 +95,28 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   }
 
   /**
+   * Add the form buttons.
+   */
+  protected function addFormButtons(): void {
+    $this->addButtons([
+      [
+        'type' => 'back',
+        'name' => ts('Previous'),
+      ],
+      [
+        'type' => 'next',
+        'name' => ts('Continue'),
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
+  }
+
+  /**
    * Attempt to match header labels with our mapper fields.
    *
    * @param string $header
