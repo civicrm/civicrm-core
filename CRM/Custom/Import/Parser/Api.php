@@ -64,8 +64,8 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
       $params['skipRecentView'] = TRUE;
       $params['check_permissions'] = TRUE;
       $params['entity_id'] = $formatted['id'];
-      $contactID = civicrm_api3('custom_value', 'create', $params)['id'];
-      $this->setImportStatus($rowNumber, 'IMPORTED', '', $contactID);
+      civicrm_api3('custom_value', 'create', $params);
+      $this->setImportStatus($rowNumber, 'IMPORTED', '', $formatted['id']);
     }
     catch (CiviCRM_API3_Exception $e) {
       $this->setImportStatus($rowNumber, 'ERROR', '', $e->getMessage());
