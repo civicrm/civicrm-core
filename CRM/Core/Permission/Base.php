@@ -70,7 +70,7 @@ class CRM_Core_Permission_Base {
         return $name;
 
       default:
-        return CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
+        return $perm;
     }
   }
 

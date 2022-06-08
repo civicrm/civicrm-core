@@ -20,8 +20,8 @@ class CRM_Core_Permission_BaseTest extends CiviUnitTestCase {
     $cases[] = ['cms:universal name2', 'local name2'];
     $cases[] = ['cms:unknown universal name', CRM_Core_Permission::ALWAYS_DENY_PERMISSION];
     $cases[] = ['myruntime:foo', 'foo'];
-    $cases[] = ['otherruntime:foo', CRM_Core_Permission::ALWAYS_DENY_PERMISSION];
-    $cases[] = ['otherruntime:foo:bar', CRM_Core_Permission::ALWAYS_DENY_PERMISSION];
+    $cases[] = ['otherruntime:foo', 'otherruntime:foo'];
+    $cases[] = ['otherruntime:foo:bar', 'otherruntime:foo:bar'];
     $cases[] = [CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION, CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION];
 
     return $cases;
