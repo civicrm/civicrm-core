@@ -193,7 +193,12 @@ class CiviEventDispatcher extends EventDispatcher {
           // This condition indicates a structural problem and merits a consistent failure-mode.
           // If you believe some special case merits an exemption, then you could add it to `$bootDispatchPolicy`.
 
-          throw new \RuntimeException("The event \"$eventName\" attempted to fire before CiviCRM was fully loaded. Skipping.");
+          // An `Exception` would be ideal for preventing new bugs, but it can be too noisy for systems with pre-existing bugs.
+          // throw new \RuntimeException("The event \"$eventName\" attempted to fire before CiviCRM was fully loaded. Skipping.");
+          // Complain to web-user and sysadmin. Log a backtrace. We're pre-boot, so don't use high-level services.
+          error_log("The event \"$eventName\" attempted to fire before CiviCRM was fully loaded. Skipping.\n" . \CRM_Core_Error::formatBacktrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), FALSE));
+          trigger_error("The event \"$eventName\" attempted to fire before CiviCRM was fully loaded. Skipping.", E_USER_WARNING);
+          return $event;
 
         default:
           throw new \RuntimeException("The dispatch policy for \"$eventName\" is unrecognized ($mode).");
