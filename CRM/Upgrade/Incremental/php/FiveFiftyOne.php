@@ -198,6 +198,30 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
       }
     }
 
+    // Multiple custom
+    $mappings = MappingField::get(FALSE)
+      ->setSelect(['id', 'name'])
+      ->addWhere('mapping_id.mapping_type_id:name', '=', 'Import Multi value custom data')
+      ->execute();
+    $allFields = civicrm_api3('custom_field', 'get', ['custom_group_id.is_multiple' => TRUE, 'return' => ['label', 'custom_group_id.title']])['values'];
+    $fieldMap = [];
+    foreach ($allFields as $field) {
+      $label = $field['label'] . ' :: ' . $field['custom_group_id.title'];
+      $fieldMap[$label] = 'custom_' . $field['id'];
+    }
+
+    $fieldMap[ts('- do not import -')] = 'do_not_import';
+    $fieldMap[ts('Contact ID')] = 'contact_id';
+    $fieldMap[ts('External Identifier')] = 'external_identifier';
+    foreach ($mappings as $mapping) {
+      if (!empty($fieldMap[$mapping['name']])) {
+        MappingField::update(FALSE)
+          ->addWhere('id', '=', $mapping['id'])
+          ->addValue('name', $fieldMap[$mapping['name']])
+          ->execute();
+      }
+    }
+
     return TRUE;
   }
 
