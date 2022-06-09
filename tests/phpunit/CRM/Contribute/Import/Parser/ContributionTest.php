@@ -27,11 +27,6 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   protected $entity = 'Contribution';
 
   /**
-   * @var int
-   */
-  protected $userJobID;
-
-  /**
    * Cleanup function.
    *
    * @throws \API_Exception
@@ -363,21 +358,49 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param array $mappings
+   * Get the import's datasource form.
    *
-   * @return array
+   * Defaults to contribution - other classes should override.
+   *
+   * @param array $submittedValues
+   *
+   * @return \CRM_Contribute_Import_Form_DataSource|\CRM_Core_Form|\CRM_Custom_Import_Form_DataSource
+   * @noinspection PhpUnnecessaryLocalVariableInspection
    */
-  protected function getMapperFromFieldMappings(array $mappings): array {
-    $mapper = [];
-    foreach ($mappings as $mapping) {
-      $fieldInput = [$mapping['name']];
-      if (!empty($mapping['soft_credit_type_id'])) {
-        $fieldInput[1] = $mapping['soft_credit_match_field'];
-        $fieldInput[2] = $mapping['soft_credit_type_id'];
-      }
-      $mapper[] = $fieldInput;
-    }
-    return $mapper;
+  protected function getDataSourceForm(array $submittedValues) {
+    return $this->getFormObject('CRM_Contribute_Import_Form_DataSource', $submittedValues);
+  }
+
+  /**
+   * Get the import's mapField form.
+   *
+   * Defaults to contribution - other classes should override.
+   *
+   * @param array $submittedValues
+   *
+   * @return \CRM_Contribute_Import_Form_MapField
+   * @noinspection PhpUnnecessaryLocalVariableInspection
+   */
+  protected function getMapFieldForm(array $submittedValues): CRM_Contribute_Import_Form_MapField {
+    /* @var \CRM_Contribute_Import_Form_MapField $form */
+    $form = $this->getFormObject('CRM_Contribute_Import_Form_MapField', $submittedValues);
+    return $form;
+  }
+
+  /**
+   * Get the import's preview form.
+   *
+   * Defaults to contribution - other classes should override.
+   *
+   * @param array $submittedValues
+   *
+   * @return \CRM_Contribute_Import_Form_Preview
+   * @noinspection PhpUnnecessaryLocalVariableInspection
+   */
+  protected function getPreviewForm(array $submittedValues): CRM_Contribute_Import_Form_Preview {
+    /* @var CRM_Contribute_Import_Form_Preview $form */
+    $form = $this->getFormObject('CRM_Contribute_Import_Form_Preview', $submittedValues);
+    return $form;
   }
 
 }

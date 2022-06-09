@@ -1,5 +1,6 @@
 <?php
 
+use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 
 /**
@@ -175,35 +176,40 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
    *
    * @return array
    *
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
    */
-  private function getGroupFieldsForImport($customGroupID) {
+  private function getGroupFieldsForImport(int $customGroupID): array {
     $importableFields = [];
-    $params = ['custom_group_id' => $customGroupID];
-    $group = CustomGroup::get(FALSE)->addSelect('extends')->addWhere('id', '=', $customGroupID)->execute()->first();
-    $allFields = civicrm_api3('custom_field', 'get', $params);
-    $fields = $allFields['values'];
-    foreach ($fields as $id => $values) {
+    $fields = (array) CustomField::get(FALSE)
+      ->addSelect('*', 'custom_group_id.is_multiple', 'custom_group_id.name', 'custom_group_id.extends')
+      ->addWhere('custom_group_id', '=', $customGroupID)->execute();
+
+    foreach ($fields as $values) {
       $datatype = $values['data_type'] ?? NULL;
       if ($datatype === 'File') {
         continue;
       }
       /* generate the key for the fields array */
-      $key = "custom_$id";
-      $regexp = preg_replace('/[.,;:!?]/', '', CRM_Utils_Array::value(0, $values));
+      $key = 'custom_' . $values['id'];
+      $regexp = preg_replace('/[.,;:!?]/', '', $values['label']);
       $importableFields[$key] = [
         'name' => $key,
         'title' => $values['label'] ?? NULL,
         'headerPattern' => '/' . preg_quote($regexp, '/') . '/',
         'import' => 1,
-        'custom_field_id' => $id,
-        'options_per_line' => $values['options_per_line'] ?? NULL,
-        'data_type' => $values['data_type'] ?? NULL,
-        'html_type' => $values['html_type'] ?? NULL,
+        'custom_field_id' => $values['id'],
+        'options_per_line' => $values['options_per_line'],
+        'data_type' => $values['data_type'],
+        'html_type' => $values['html_type'],
         'type' => CRM_Core_BAO_CustomField::dataToType()[$values['data_type']],
-        'is_search_range' => $values['is_search_range'] ?? NULL,
-        'date_format' => $values['date_format'] ?? NULL,
-        'time_format' => $values['time_format'] ?? NULL,
-        'extends' => $group['extends'],
+        'is_search_range' => $values['is_search_range'],
+        'date_format' => $values['date_format'],
+        'time_format' => $values['time_format'],
+        'extends' => $values['custom_group_id.extends'],
+        'custom_group_id' => $customGroupID,
+        'custom_group_id.name' => $values['custom_group_id.name'],
+        'is_multiple' => $values['custom_group_id.is_multiple'],
       ];
     }
     return $importableFields;

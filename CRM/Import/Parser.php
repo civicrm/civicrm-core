@@ -1441,19 +1441,28 @@ abstract class CRM_Import_Parser {
       }
       $optionFieldName = empty($fieldMap[$fieldName]) ? $fieldMetadata['name'] : $fieldName;
 
-      if (!empty($fieldMetadata['custom_group_id'])) {
-        $customField = CustomField::get(FALSE)
-          ->addWhere('id', '=', $fieldMetadata['custom_field_id'])
-          ->addSelect('name', 'custom_group_id.name')
-          ->execute()
-          ->first();
-        $optionFieldName = $customField['custom_group_id.name'] . '.' . $customField['name'];
+      if (!empty($fieldMetadata['custom_field_id']) && !empty($fieldMetadata['is_multiple'])) {
+        $options = civicrm_api4('Custom_' . $fieldMetadata['custom_group_id.name'], 'getFields', [
+          'loadOptions' => ['id', 'name', 'label', 'abbr'],
+          'where' => [['custom_field_id', '=', $fieldMetadata['custom_field_id']]],
+          'select' => ['options'],
+        ])->first()['options'];
       }
-      $options = civicrm_api4($this->getFieldEntity($fieldName), 'getFields', [
-        'loadOptions' => ['id', 'name', 'label', 'abbr'],
-        'where' => [['name', '=', $optionFieldName]],
-        'select' => ['options'],
-      ])->first()['options'];
+      else {
+        if (!empty($fieldMetadata['custom_group_id'])) {
+          $customField = CustomField::get(FALSE)
+            ->addWhere('id', '=', $fieldMetadata['custom_field_id'])
+            ->addSelect('name', 'custom_group_id.name')
+            ->execute()
+            ->first();
+          $optionFieldName = $customField['custom_group_id.name'] . '.' . $customField['name'];
+        }
+        $options = civicrm_api4($this->getFieldEntity($fieldName), 'getFields', [
+          'loadOptions' => ['id', 'name', 'label', 'abbr'],
+          'where' => [['name', '=', $optionFieldName]],
+          'select' => ['options'],
+        ])->first()['options'];
+      }
       if (is_array($options)) {
         // We create an array of the possible variants - notably including
         // name AND label as either might be used. We also lower case before checking
