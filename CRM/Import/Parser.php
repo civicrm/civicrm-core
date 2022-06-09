@@ -1372,7 +1372,7 @@ abstract class CRM_Import_Parser {
       // getOptions does not retrieve these fields with high potential results
       if ($fieldName === 'event_id') {
         if (!isset(Civi::$statics[__CLASS__][$fieldName][$importedValue])) {
-          $event = Event::get()->addWhere('title', '=', $importedValue)->addSelect('id')->execute()->first();
+          $event = Event::get()->addClause('OR', ['title', '=', $importedValue], ['id', '=', $importedValue])->addSelect('id')->execute()->first();
           Civi::$statics[__CLASS__][$fieldName][$importedValue] = $event['id'] ?? FALSE;
         }
         return Civi::$statics[__CLASS__][$fieldName][$importedValue] ?? 'invalid_import_value';
@@ -1484,6 +1484,39 @@ abstract class CRM_Import_Parser {
       return $this->importableFieldsMetadata[$fieldMapName];
     }
     return $fieldMetadata;
+  }
+
+  /**
+   * Get the field metadata for fields to be be offered to match the contact.
+   *
+   * @return array
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  protected function getContactMatchingFields(): array {
+    $contactFields = CRM_Contact_BAO_Contact::importableFields($this->getContactType(), NULL);
+    $fields = ['external_identifier' => $contactFields['external_identifier']];
+    $fields['external_identifier']['title'] .= ' (match to contact)';
+    // Using new Dedupe rule.
+    $ruleParams = [
+      'contact_type' => $this->getContactType(),
+      'used' => $this->getSubmittedValue('dedupe_rule_id') ?? 'Unsupervised',
+    ];
+    $fieldsArray = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
+
+    if (is_array($fieldsArray)) {
+      foreach ($fieldsArray as $value) {
+        $customFieldId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
+          $value,
+          'id',
+          'column_name'
+        );
+        $value = trim($customFieldId ? 'custom_' . $customFieldId : $value);
+        $fields[$value] = $contactFields[$value] ?? NULL;
+        $title = $fields[$value]['title'] . ' (match to contact)';
+        $fields[$value]['title'] = $title;
+      }
+    }
+    return $fields;
   }
 
   /**
@@ -1773,7 +1806,8 @@ abstract class CRM_Import_Parser {
       return '';
     }
     $this->setFieldMetadata();
-    return $this->getFieldMetadata($mappedField['name'])['title'];
+    $metadata = $this->getFieldMetadata($mappedField['name']);
+    return $metadata['html']['label'] ?? $metadata['title'];
   }
 
   /**

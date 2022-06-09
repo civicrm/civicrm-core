@@ -86,21 +86,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
   }
 
   /**
-   * Get the metadata field for which importable fields does not key the actual field name.
-   *
-   * @return string[]
-   */
-  protected function getOddlyMappedMetadataFields(): array {
-    $uniqueNames = ['participant_id', 'participant_campaign_id', 'participant_contact_id', 'participant_status_id', 'participant_role_id', 'participant_register_date', 'participant_source', 'participant_is_pay_later'];
-    $fields = [];
-    foreach ($uniqueNames as $name) {
-      $fields[$this->importableFieldsMetadata[$name]['name']] = $name;
-    }
-    // Include the parent fields as they could be present if required for matching ...in theory.
-    return array_merge($fields, parent::getOddlyMappedMetadataFields());
-  }
-
-  /**
    * Handle the values in preview mode.
    *
    * @param array $values
@@ -535,78 +520,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
   }
 
   /**
-   * @param string $fileName
-   * @param string $separator
-   * @param $mapper
-   * @param bool $skipColumnHeader
-   * @param int $mode
-   *
-   * @return mixed
-   * @throws Exception
-   */
-  public function run(
-    $fileName,
-    $separator,
-    $mapper,
-    $skipColumnHeader = FALSE,
-    $mode = self::MODE_PREVIEW
-  ) {
-    if (!is_array($fileName)) {
-      throw new CRM_Core_Exception('Unable to determine import file');
-    }
-    $fileName = $fileName['name'];
-    $this->getContactType();
-    $this->init();
-
-    $this->_haveColumnHeader = $skipColumnHeader;
-
-    $this->_separator = $separator;
-
-    $fd = fopen($fileName, "r");
-    if (!$fd) {
-      return FALSE;
-    }
-
-    $this->_lineCount = 0;
-    $this->_invalidRowCount = $this->_validCount = 0;
-    $this->_totalCount = 0;
-
-    $this->_errors = [];
-    $this->_warnings = [];
-
-    $this->_fileSize = number_format(filesize($fileName) / 1024.0, 2);
-
-    if ($mode == self::MODE_MAPFIELD) {
-      $this->_rows = [];
-    }
-    else {
-      $this->_activeFieldCount = count($this->_activeFields);
-    }
-
-    $dataSource = $this->getDataSourceObject();
-    $dataSource->setStatuses(['new']);
-    while ($row = $dataSource->getRow()) {
-      $this->_lineCount++;
-      $values = array_values($row);
-
-      $this->_totalCount++;
-
-      if ($mode == self::MODE_MAPFIELD) {
-        $returnCode = CRM_Import_Parser::VALID;
-      }
-      elseif ($mode == self::MODE_PREVIEW) {
-        $returnCode = $this->preview($values);
-      }
-      elseif ($mode == self::MODE_SUMMARY) {
-        $returnCode = $this->summary($values);
-      }
-      elseif ($mode == self::MODE_IMPORT) {
-        $returnCode = $this->import($values);
-      }
-    }
-  }
-
-  /**
    * Given a list of the importable field keys that the user has selected
    * set the active fields array to this list
    *
@@ -653,105 +566,39 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
   }
 
   /**
-   * Store parser values.
-   *
-   * @param CRM_Core_Session $store
-   *
-   * @param int $mode
-   *
-   * @return void
-   */
-  public function set($store, $mode = self::MODE_SUMMARY) {
-    $store->set('fileSize', $this->_fileSize);
-    $store->set('lineCount', $this->_lineCount);
-    $store->set('separator', $this->_separator);
-    $store->set('fields', $this->getSelectValues());
-
-    $store->set('headerPatterns', $this->getHeaderPatterns());
-    $store->set('dataPatterns', $this->getDataPatterns());
-    $store->set('columnCount', $this->_activeFieldCount);
-
-    $store->set('totalRowCount', $this->_totalCount);
-    $store->set('validRowCount', $this->_validCount);
-    $store->set('invalidRowCount', $this->_invalidRowCount);
-
-    switch ($this->_contactType) {
-      case 'Individual':
-        $store->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
-        break;
-
-      case 'Household':
-        $store->set('contactType', CRM_Import_Parser::CONTACT_HOUSEHOLD);
-        break;
-
-      case 'Organization':
-        $store->set('contactType', CRM_Import_Parser::CONTACT_ORGANIZATION);
-    }
-
-    if ($this->_invalidRowCount) {
-      $store->set('errorsFileName', $this->_errorFileName);
-    }
-    if (isset($this->_rows) && !empty($this->_rows)) {
-      $store->set('dataValues', $this->_rows);
-    }
-
-    if ($mode == self::MODE_IMPORT) {
-      $store->set('duplicateRowCount', $this->_duplicateCount);
-      if ($this->_duplicateCount) {
-        $store->set('duplicatesFileName', $this->_duplicateFileName);
-      }
-    }
-  }
-
-  /**
-   * Export data to a CSV file.
-   *
-   * @param string $fileName
-   * @param array $header
-   * @param array $data
-   *
-   * @return void
-   */
-  public static function exportCSV($fileName, $header, $data) {
-    $output = [];
-    $fd = fopen($fileName, 'w');
-
-    foreach ($header as $key => $value) {
-      $header[$key] = "\"$value\"";
-    }
-    $config = CRM_Core_Config::singleton();
-    $output[] = implode($config->fieldSeparator, $header);
-
-    foreach ($data as $datum) {
-      foreach ($datum as $key => $value) {
-        if (is_array($value)) {
-          foreach ($value[0] as $k1 => $v1) {
-            if ($k1 == 'location_type_id') {
-              continue;
-            }
-            $datum[$k1] = $v1;
-          }
-        }
-        else {
-          $datum[$key] = "\"$value\"";
-        }
-      }
-      $output[] = implode($config->fieldSeparator, $datum);
-    }
-    fwrite($fd, implode("\n", $output));
-    fclose($fd);
-  }
-
-  /**
    * Set up field metadata.
    *
    * @return void
    */
   protected function setFieldMetadata(): void {
     if (empty($this->importableFieldsMetadata)) {
-      $fields = CRM_Event_BAO_Participant::importableFields($this->getContactType(), FALSE);
-      // We can't import event type, the other two duplicate id fields that work fine.
-      unset($fields['participant_role'], $fields['participant_status'], $fields['event_type']);
+      $fields = array_merge(
+        [
+          '' => ['title' => ts('- do not import -')],
+          'participant_note' => [
+            'title' => ts('Participant Note'),
+            'name' => 'participant_note',
+            'headerPattern' => '/(participant.)?note$/i',
+            'data_type' => CRM_Utils_Type::T_TEXT,
+            'options' => FALSE,
+          ],
+        ],
+        CRM_Event_DAO_Participant::import(),
+        CRM_Core_BAO_CustomField::getFieldsForImport('Participant'),
+        $this->getContactMatchingFields()
+      );
+
+      $fields['participant_contact_id']['title'] .= ' (match to contact)';
+      $fields['participant_contact_id']['html']['label'] = $fields['participant_contact_id']['title'];
+      foreach ($fields as $index => $field) {
+        if (isset($field['name']) && $field['name'] !== $index) {
+          // undo unique names - participant is the primary
+          // entity and no others have conflicting unique names
+          // if we ever added them the should have unique names - v4api style
+          $fields[$field['name']] = $field;
+          unset($fields[$index]);
+        }
+      }
       $this->importableFieldsMetadata = $fields;
     }
   }

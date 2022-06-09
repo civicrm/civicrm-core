@@ -85,7 +85,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
       // FIXME: should use the schema titles, not redeclare them
       $requiredFields = array(
-        'participant_contact_id' => ts('Contact ID'),
+        'contact_id' => ts('Contact ID'),
         'event_id' => ts('Event ID'),
       );
 
@@ -93,13 +93,13 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       foreach ($requiredFields as $field => $title) {
         if (!in_array($field, $importKeys)) {
-          if ($field == 'participant_contact_id') {
+          if ($field === 'contact_id') {
             if (!$contactFieldsBelowWeightMessage || in_array('external_identifier', $importKeys) ||
               in_array('participant_id', $importKeys)
             ) {
               continue;
             }
-            if ($self->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
+            if ($self->isUpdateExisting()) {
               $errors['_qf_default'] .= ts('Missing required field: Provide Participant ID') . '<br />';
             }
             else {
@@ -166,16 +166,15 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
    * Get the fields to highlight.
    *
    * @return array
-   * @throws \CRM_Core_Exception
    */
   protected function getHighlightedFields(): array {
     $highlightedFields = [];
-    if ($this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_UPDATE) {
+    if ($this->isUpdateExisting()) {
       $highlightedFieldsArray = [
-        'participant_id',
+        'id',
         'event_id',
         'event_title',
-        'participant_status_id',
+        'status_id',
       ];
       foreach ($highlightedFieldsArray as $name) {
         $highlightedFields[] = $name;
@@ -184,14 +183,17 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     elseif ($this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_SKIP ||
       $this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_NOCHECK
     ) {
+      // this should be retrieved from the parser.
       $highlightedFieldsArray = [
-        'participant_contact_id',
+        'contact_id',
         'event_id',
         'email',
         'first_name',
         'last_name',
+        'organization_name',
+        'household_name',
         'external_identifier',
-        'participant_status_id',
+        'status_id',
       ];
       foreach ($highlightedFieldsArray as $name) {
         $highlightedFields[] = $name;
@@ -206,7 +208,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @return string
    */
   public function getMappingTypeName(): string {
-    return 'Import Participants';
+    return 'Import Participant';
   }
 
 }

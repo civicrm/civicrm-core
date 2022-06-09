@@ -24,6 +24,7 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
+use Civi\Api4\Mapping;
 use Civi\Api4\UserJob;
 
 /**
@@ -49,6 +50,8 @@ class CRM_Participant_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       'civicrm_user_job',
       'civicrm_queue',
       'civicrm_queue_item',
+      'civicrm_mapping',
+      'civicrm_mapping_field',
     ], TRUE);
     parent::tearDown();
   }
@@ -74,6 +77,9 @@ class CRM_Participant_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
       'groups' => [],
+      'saveMapping' => TRUE,
+      'saveMappingName' => 'my mapping',
+      'saveMappingDesc' => 'new mapping',
     ], $submittedValues);
     /* @var \CRM_Event_Import_Form_DataSource $form */
     $form = $this->getFormObject('CRM_Event_Import_Form_DataSource', $submittedValues);
@@ -88,11 +94,13 @@ class CRM_Participant_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $form = $this->getFormObject('CRM_Event_Import_Form_MapField', $submittedValues);
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
+    $this->assertTrue($form->validate());
     $form->postProcess();
     /* @var CRM_Event_Import_Form_Preview $form */
     $form = $this->getFormObject('CRM_Event_Import_Form_Preview', $submittedValues);
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
+    $this->assertTrue($form->validate());
     $form->postProcess();
   }
 
@@ -112,29 +120,45 @@ class CRM_Participant_Import_Parser_ParticipantTest extends CiviUnitTestCase {
 
   /**
    * Test the full form-flow import.
+   *
+   * @dataProvider importData
    */
-  public function testImportCSV() :void {
+  public function testImportCSV($csv, $mapper) :void {
     $this->campaignCreate(['name' => 'Soccer cup']);
     $this->eventCreate(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
     $this->individualCreate(['email' => 'mum@example.com']);
-    $this->importCSV('participant.csv', [
-      ['name' => 'event_id'],
-      ['name' => 'participant_campaign_id'],
-      ['name' => 'email'],
-      ['name' => 'participant_fee_amount'],
-      ['name' => 'participant_fee_currency'],
-      ['name' => 'participant_fee_level'],
-      ['name' => 'participant_is_pay_later'],
-      ['name' => 'participant_role_id'],
-      ['name' => 'participant_source'],
-      ['name' => 'participant_status_id'],
-      ['name' => 'participant_register_date'],
-      ['name' => 'do_not_import'],
-    ]);
+    $this->importCSV($csv, $mapper);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
     $this->assertEquals('IMPORTED', $row['_status']);
     $this->callAPISuccessGetSingle('Participant', ['campaign_id' => 'Soccer Cup']);
+    $mapping = Mapping::get()->addWhere('mapping_type_id:name', '=', 'Import Participant')->execute()->first();
+    $this->assertEquals('my mapping', $mapping['name']);
+    $this->assertEquals('new mapping', $mapping['description']);
+  }
+
+  /**
+   * Data provider for importCSV.
+   */
+  public function importData(): array {
+    $defaultMapper = [
+      ['name' => 'event_id'],
+      ['name' => 'campaign_id'],
+      ['name' => 'email'],
+      ['name' => 'fee_amount'],
+      ['name' => 'fee_currency'],
+      ['name' => 'fee_level'],
+      ['name' => 'is_pay_later'],
+      ['name' => 'role_id'],
+      ['name' => 'source'],
+      ['name' => 'status_id'],
+      ['name' => 'register_date'],
+      ['name' => 'do_not_import'],
+    ];
+    return [
+      ['csv' => 'participant.csv', 'mapper' => $defaultMapper],
+      ['csv' => 'participant_with_event_id.csv', 'mapper' => $defaultMapper],
+    ];
   }
 
   /**

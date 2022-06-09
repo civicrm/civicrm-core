@@ -14,6 +14,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Mapping;
 use Civi\Api4\MappingField;
 
 /**
@@ -88,7 +89,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    */
   public function postProcess() {
     $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
-    $this->saveMapping($this->getMappingTypeName());
+    $this->saveMapping();
     $parser = $this->getParser();
     $parser->init();
     $parser->validate();
@@ -291,12 +292,10 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   /**
    * Save the Field Mapping.
    *
-   * @param string $mappingType
-   *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  protected function saveMapping(string $mappingType): void {
+  protected function saveMapping(): void {
     //Updating Mapping Records
     if ($this->getSubmittedValue('updateMapping')) {
       foreach (array_keys($this->getColumnHeaders()) as $i) {
@@ -305,17 +304,16 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     }
     //Saving Mapping Details and Records
     if ($this->getSubmittedValue('saveMapping')) {
-      $mappingParams = [
+      $savedMappingID = Mapping::create(FALSE)->setValues([
         'name' => $this->getSubmittedValue('saveMappingName'),
         'description' => $this->getSubmittedValue('saveMappingDesc'),
-        'mapping_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', $mappingType),
-      ];
-      $saveMapping = CRM_Core_BAO_Mapping::add($mappingParams);
+        'mapping_type_id:name' => $this->getMappingTypeName(),
+      ])->execute()->first()['id'];
 
       foreach (array_keys($this->getColumnHeaders()) as $i) {
-        $this->saveMappingField($saveMapping->id, $i, FALSE);
+        $this->saveMappingField($savedMappingID, $i, FALSE);
       }
-      $this->set('savedMapping', $saveMapping->id);
+      $this->set('savedMapping', $savedMappingID);
     }
   }
 

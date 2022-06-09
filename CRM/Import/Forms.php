@@ -132,7 +132,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @param string $fieldName
    *
    * @return mixed|null
-   * @throws \CRM_Core_Exception
    */
   public function getSubmittedValue(string $fieldName) {
     if ($fieldName === 'dataSource') {
@@ -301,8 +300,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * This is called as a snippet in DataSourceConfig and
    * also from DataSource::buildForm to add the fields such
    * that quick form picks them up.
-   *
-   * @throws \CRM_Core_Exception
    */
   protected function getDataSourceFields(): array {
     $className = $this->getDataSourceClassName();
@@ -330,7 +327,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * all forms.
    *
    * @return string[]
-   * @throws \CRM_Core_Exception
    */
   protected function getSubmittableFields(): array {
     $dataSourceFields = array_fill_keys($this->getDataSourceFields(), 'DataSource');
@@ -637,6 +633,14 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   public function getHeaderPatterns(): array {
     return $this->getParser()->getHeaderPatterns();
+  }
+
+  /**
+   * Has the user chosen to update existing records.
+   * @return bool
+   */
+  protected function isUpdateExisting(): bool {
+    return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_UPDATE;
   }
 
 }
