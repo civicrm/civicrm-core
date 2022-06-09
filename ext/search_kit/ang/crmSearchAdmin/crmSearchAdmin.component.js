@@ -240,8 +240,12 @@
         function addEntityJoins(entity, stack, baseEntity) {
           return _.transform(CRM.crmSearchAdmin.joins[entity], function(joinEntities, join) {
             var num = 0;
-            // Add all joins that don't just point directly back to the original entity
-            if (!(baseEntity === join.entity && !join.multi)) {
+            if (
+              // Exclude joins that singly point back to the original entity
+              !(baseEntity === join.entity && !join.multi) &&
+              // Exclude joins to bridge tables
+              !searchMeta.getEntity(join.entity).bridge
+            ) {
               do {
                 appendJoin(joinEntities, join, ++num, stack, entity);
               } while (addNum((stack ? stack + '_' : '') + join.alias, num) in existingJoins);
