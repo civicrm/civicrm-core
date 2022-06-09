@@ -16,7 +16,6 @@
     "CRM_Contact_Import_Form_MapField::buildQuickForm()": "toxicAlert",
     "CRM_Contact_Import_Parser_Contact::formatCommonData()": "toxicAlert",
     "CRM_Contact_Import_Parser_Contact::formatContactParameters()": "toxicAlert",
-    "CRM_Contact_Import_Parser_Contact::run()": "toxicAlert",
     "CRM_Contact_Import_Parser_Contact::import()": "toxicAlert",
     "CRM_Contribute_BAO_Contribution::recordFinancialAccounts()": "toxicAlert",
     "CRM_Contribute_BAO_Contribution::transitionComponents()": "toxicAlert",
