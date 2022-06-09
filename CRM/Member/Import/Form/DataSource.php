@@ -53,22 +53,6 @@ class CRM_Member_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   }
 
   /**
-   * Process the uploaded file.
-   *
-   * @return void
-   */
-  public function postProcess() {
-    $this->storeFormValues([
-      'onDuplicate',
-      'contactType',
-      'dateFormats',
-      'savedMapping',
-    ]);
-
-    $this->submitFileForMapping('CRM_Member_Import_Parser_Membership');
-  }
-
-  /**
    * @return \CRM_Member_Import_Parser_Membership
    */
   protected function getParser(): CRM_Member_Import_Parser_Membership {
