@@ -187,7 +187,13 @@ class CiviEventDispatcher extends EventDispatcher {
           throw new \RuntimeException("The dispatch policy prohibits event \"$eventName\".");
 
         case 'not-ready':
-          throw new \RuntimeException("CiviCRM has not bootstrapped sufficiently to fire event \"$eventName\".");
+          // The system is not ready to run hooks -- eg it has not finished loading the extension main-files.
+          // If you fire a hook at this point, it will not be received by the intended listeners.
+          // In practice, many hooks involve cached data-structures, so a premature hook is liable to have spooky side-effects.
+          // This condition indicates a structural problem and merits a consistent failure-mode.
+          // If you believe some special case merits an exemption, then you could add it to `$bootDispatchPolicy`.
+
+          throw new \RuntimeException("The event \"$eventName\" attempted to fire before CiviCRM was fully loaded. Skipping.");
 
         default:
           throw new \RuntimeException("The dispatch policy for \"$eventName\" is unrecognized ($mode).");
