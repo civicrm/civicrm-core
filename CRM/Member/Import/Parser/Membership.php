@@ -20,8 +20,6 @@
  */
 class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
 
-  protected $_mapperKeys;
-
   /**
    * Array of metadata for all available fields.
    *
@@ -57,107 +55,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
   protected $_lineCount;
 
   /**
-   * Class constructor.
-   *
-   * @param $mapperKeys
-   */
-  public function __construct($mapperKeys = []) {
-    parent::__construct();
-    $this->_mapperKeys = $mapperKeys;
-  }
-
-  /**
-   * @param string $fileName
-   * @param string $separator
-   * @param $mapper
-   * @param bool $skipColumnHeader
-   * @param int $mode
-   * @param int $contactType
-   * @param int $onDuplicate
-   * @param int $statusID
-   *
-   * @return mixed
-   * @throws Exception
-   */
-  public function run(
-    $fileName,
-    $separator,
-    $mapper,
-    $skipColumnHeader = FALSE,
-    $mode = self::MODE_PREVIEW,
-    $contactType = self::CONTACT_INDIVIDUAL,
-    $onDuplicate = self::DUPLICATE_SKIP,
-    $statusID = NULL
-  ) {
-    $this->_contactType = $this->getContactType();
-    $this->init();
-
-    $this->_lineCount = 0;
-    $this->_invalidRowCount = $this->_validCount = 0;
-    $this->_totalCount = 0;
-
-    $this->_errors = [];
-    $this->_warnings = [];
-    if ($statusID) {
-      $this->progressImport($statusID);
-      $startTimestamp = $currTimestamp = $prevTimestamp = CRM_Utils_Time::time();
-    }
-    $dataSource = $this->getDataSourceObject();
-    $totalRowCount = $dataSource->getRowCount(['new']);
-    $dataSource->setStatuses(['new']);
-    while ($row = $dataSource->getRow()) {
-      $values = array_values($row);
-      if ($mode == self::MODE_IMPORT) {
-        $this->import($values);
-        if ($statusID && (($this->_lineCount % 50) == 0)) {
-          $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
-        }
-      }
-    }
-  }
-
-  /**
-   * Given a list of the importable field keys that the user has selected
-   * set the active fields array to this list
-   *
-   * @param array $fieldKeys mapped array of values
-   *
-   * @return void
-   */
-  public function setActiveFields($fieldKeys) {
-    $this->_activeFieldCount = count($fieldKeys);
-    foreach ($fieldKeys as $key) {
-      if (empty($this->_fields[$key])) {
-        $this->_activeFields[] = new CRM_Member_Import_Field('', ts('- do not import -'));
-      }
-      else {
-        $this->_activeFields[] = clone($this->_fields[$key]);
-      }
-    }
-  }
-
-  /**
-   * Format the field values for input to the api.
-   *
-   * @return array
-   *   (reference ) associative array of name/value pairs
-   */
-  public function getParams() {
-    $this->getSubmittedValue('mapper');
-    $params = [];
-    for ($i = 0; $i < $this->_activeFieldCount; $i++) {
-      if (isset($this->_activeFields[$i]->_value)
-        && !isset($params[$this->_activeFields[$i]->_name])
-        && !isset($this->_activeFields[$i]->_related)
-      ) {
-
-        $params[$this->_activeFields[$i]->_name] = $this->_activeFields[$i]->_value;
-      }
-    }
-    return $params;
-  }
-
-  /**
    * @param string $name
    * @param $title
    * @param int $type
@@ -181,86 +78,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         );
       }
     }
-  }
-
-  /**
-   * Store parser values.
-   *
-   * @param CRM_Core_Session $store
-   *
-   * @param int $mode
-   *
-   * @return void
-   */
-  public function set($store, $mode = self::MODE_SUMMARY) {
-    $store->set('lineCount', $this->_lineCount);
-    $store->set('validRowCount', $this->_validCount);
-    $store->set('invalidRowCount', $this->_invalidRowCount);
-
-    if ($this->_invalidRowCount) {
-      $store->set('errorsFileName', $this->_errorFileName);
-    }
-
-    if ($mode == self::MODE_IMPORT) {
-      $store->set('duplicateRowCount', $this->_duplicateCount);
-      if ($this->_duplicateCount) {
-        $store->set('duplicatesFileName', $this->_duplicateFileName);
-      }
-    }
-  }
-
-  /**
-   * Export data to a CSV file.
-   *
-   * @param string $fileName
-   * @param array $header
-   * @param array $data
-   *
-   * @return void
-   */
-  public static function exportCSV($fileName, $header, $data) {
-    $output = [];
-    $fd = fopen($fileName, 'w');
-
-    foreach ($header as $key => $value) {
-      $header[$key] = "\"$value\"";
-    }
-    $config = CRM_Core_Config::singleton();
-    $output[] = implode($config->fieldSeparator, $header);
-
-    foreach ($data as $datum) {
-      foreach ($datum as $key => $value) {
-        if (is_array($value)) {
-          foreach ($value[0] as $k1 => $v1) {
-            if ($k1 == 'location_type_id') {
-              continue;
-            }
-            $datum[$k1] = $v1;
-          }
-        }
-        else {
-          $datum[$key] = "\"$value\"";
-        }
-      }
-      $output[] = implode($config->fieldSeparator, $datum);
-    }
-    fwrite($fd, implode("\n", $output));
-    fclose($fd);
-  }
-
-  /**
-   * The initializer code, called before the processing
-   *
-   * @return void
-   */
-  public function init() {
-    // Force re-load of user job.
-    unset($this->userJob);
-    $this->setFieldMetadata();
-
-    $this->_newMemberships = [];
-
-    $this->setActiveFields($this->_mapperKeys);
   }
 
   /**
@@ -300,7 +117,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    *   the result of this processing - which is ignored
    */
   public function import($values) {
-    $onDuplicate = $this->getSubmittedValue('onDuplicate');
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
       $params = $this->getMappedRow($values);
@@ -328,7 +144,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
       //@todo find a way to test removing this formatting
       $formatError = $this->membership_format_params($formatValues, $formatted, TRUE);
 
-      if ($onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE) {
+      if ($this->isUpdateExisting()) {
         $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($formatted,
           NULL,
           'Membership'
@@ -392,7 +208,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
               $startDate,
               $endDate
             );
-            self::formattedDates($calcDates, $formatted);
+            $this->formattedDates($calcDates, $formatted);
 
             //fix for CRM-3570, exclude the statuses those having is_admin = 1
             //now user can import is_admin if is override is true.
@@ -432,7 +248,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         else {
           // Using new Dedupe rule.
           $ruleParams = [
-            'contact_type' => $this->_contactType,
+            'contact_type' => $this->getContactType(),
             'used' => 'Unsupervised',
           ];
           $fieldsArray = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
@@ -477,7 +293,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
           $startDate,
           $endDate
         );
-        self::formattedDates($calcDates, $formatted);
+        $this->formattedDates($calcDates, $formatted);
         //end of date calculation part
 
         //fix for CRM-3570, exclude the statuses those having is_admin = 1
@@ -508,9 +324,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         }
 
         $newMembership = civicrm_api3('membership', 'create', $formatted);
-
-        $this->_newMemberships[] = $newMembership['id'];
-        $this->setImportStatus($rowNumber, 'IMPORTED', '');
+        $this->setImportStatus($rowNumber, 'IMPORTED', '', $newMembership['id']);
         return CRM_Import_Parser::VALID;
       }
     }
@@ -522,15 +336,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
       $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
       return CRM_Import_Parser::ERROR;
     }
-  }
-
-  /**
-   * Get the array of successfully imported membership id's
-   *
-   * @return array
-   */
-  public function &getImportedMemberships() {
-    return $this->_newMemberships;
   }
 
   /**
@@ -583,8 +388,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
     require_once 'api/v3/utils.php';
     $fields = CRM_Member_DAO_Membership::fields();
     _civicrm_api3_store_values($fields, $params, $values);
-
-    $customFields = CRM_Core_BAO_CustomField::getFields('Membership');
 
     foreach ($params as $key => $value) {
 

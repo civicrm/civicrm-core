@@ -1802,6 +1802,17 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * The initializer code, called before the processing
+   *
+   * @return void
+   */
+  public function init() {
+    // Force re-load of user job.
+    unset($this->userJob);
+    $this->setFieldMetadata();
+  }
+
+  /**
    * @param array $mappedField
    *   Field detail as would be saved in field_mapping table
    *   or as returned from getMappingFieldFromMapperInput
