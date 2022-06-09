@@ -192,18 +192,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
 
     CRM_Utils_Address_USPS::disable($this->getSubmittedValue('disableUSPS'));
-
-    // run the import
-
-    $parser = $this->getParser();
-    $parser->queue();
-    $queue = Civi::queue('user_job_' . $this->getUserJobID());
-    $runner = new CRM_Queue_Runner([
-      'queue' => $queue,
-      'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
-      'onEndUrl' => CRM_Utils_System::url('civicrm/import/contact/summary', ['user_job_id' => $this->getUserJobID(), 'reset' => 1]),
-    ]);
-    $runner->runAllViaWeb();
+    $this->runTheImport();
   }
 
   /**

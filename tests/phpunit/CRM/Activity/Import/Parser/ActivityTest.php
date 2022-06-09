@@ -28,6 +28,7 @@ use Civi\Api4\UserJob;
  */
 class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
+  use CRMTraits_Import_ParserTrait;
 
   /**
    * @var int|null
@@ -316,49 +317,6 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Import the csv file values.
-   *
-   * This function uses a flow that mimics the UI flow.
-   *
-   * @param string $csv Name of csv file.
-   * @param array $fieldMappings
-   * @param array $submittedValues
-   */
-  protected function importCSV(string $csv, array $fieldMappings, array $submittedValues = []): void {
-    $submittedValues = array_merge([
-      'uploadFile' => ['name' => __DIR__ . '/data/' . $csv],
-      'skipColumnHeader' => TRUE,
-      'fieldSeparator' => ',',
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
-      'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
-      'dataSource' => 'CRM_Import_DataSource_CSV',
-      'file' => ['name' => $csv],
-      'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
-      'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
-      'groups' => [],
-    ], $submittedValues);
-    /* @var \CRM_Activity_Import_Form_DataSource $form */
-    $form = $this->getFormObject('CRM_Activity_Import_Form_DataSource', $submittedValues);
-    $values = $_SESSION['_' . $form->controller->_name . '_container']['values'];
-    $form->buildForm();
-    $form->postProcess();
-    // This gets reset in DataSource so re-do....
-    $_SESSION['_' . $form->controller->_name . '_container']['values'] = $values;
-
-    $this->userJobID = $form->getUserJobID();
-    /* @var CRM_Activity_Import_Form_MapField $form */
-    $form = $this->getFormObject('CRM_Activity_Import_Form_MapField', $submittedValues);
-    $form->setUserJobID($this->userJobID);
-    $form->buildForm();
-    $form->postProcess();
-    /* @var CRM_Activity_Import_Form_Preview $form */
-    $form = $this->getFormObject('CRM_Activity_Import_Form_Preview', $submittedValues);
-    $form->setUserJobID($this->userJobID);
-    $form->buildForm();
-    $form->postProcess();
-  }
-
-  /**
    * @param array $mappings
    *
    * @return array
@@ -425,6 +383,54 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
     }
     $dataSource->initialize();
     return $userJobID;
+  }
+
+  /**
+   * Get the import's datasource form.
+   *
+   * Defaults to contribution - other classes should override.
+   *
+   * @param array $submittedValues
+   *
+   * @return \CRM_Activity_Import_Form_DataSource
+   * @noinspection PhpUnnecessaryLocalVariableInspection
+   */
+  protected function getDataSourceForm(array $submittedValues): CRM_Activity_Import_Form_DataSource {
+    /* @var \CRM_Activity_Import_Form_DataSource $form */
+    $form = $this->getFormObject('CRM_Activity_Import_Form_DataSource', $submittedValues);
+    return $form;
+  }
+
+  /**
+   * Get the import's mapField form.
+   *
+   * Defaults to contribution - other classes should override.
+   *
+   * @param array $submittedValues
+   *
+   * @return \CRM_Activity_Import_Form_MapField
+   * @noinspection PhpUnnecessaryLocalVariableInspection
+   */
+  protected function getMapFieldForm(array $submittedValues): CRM_Activity_Import_Form_MapField {
+    /* @var \CRM_Activity_Import_Form_MapField $form */
+    $form = $this->getFormObject('CRM_Activity_Import_Form_MapField', $submittedValues);
+    return $form;
+  }
+
+  /**
+   * Get the import's preview form.
+   *
+   * Defaults to contribution - other classes should override.
+   *
+   * @param array $submittedValues
+   *
+   * @return \CRM_Activity_Import_Form_Preview
+   * @noinspection PhpUnnecessaryLocalVariableInspection
+   */
+  protected function getPreviewForm(array $submittedValues): CRM_Activity_Import_Form_Preview {
+    /* @var CRM_Activity_Import_Form_Preview $form */
+    $form = $this->getFormObject('CRM_Activity_Import_Form_Preview', $submittedValues);
+    return $form;
   }
 
 }

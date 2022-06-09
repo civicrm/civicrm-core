@@ -492,7 +492,17 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $form = $this->getFormObject('CRM_Member_Import_Form_Preview', $submittedValues);
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
-    $form->postProcess();
+    try {
+      $form->postProcess();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $queue = Civi::queue('user_job_' . $this->userJobID);
+      $runner = new CRM_Queue_Runner([
+        'queue' => $queue,
+        'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
+      ]);
+      $runner->runAll();
+    }
   }
 
   /**

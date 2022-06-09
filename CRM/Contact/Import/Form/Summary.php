@@ -30,7 +30,8 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
    */
   public function preProcess() {
     $userJobID = CRM_Utils_Request::retrieve('user_job_id', 'String', $this, TRUE);
-    $userJob = UserJob::get(TRUE)->addWhere('id', '=', $userJobID)->execute()->first();
+    $userJob = UserJob::get(TRUE)->addWhere('id', '=', $userJobID)->addSelect('metadata', 'type_id:label')->execute()->first();
+    $this->setTitle($userJob['type_id:label']);
     $onDuplicate = $userJob['metadata']['submitted_values']['onDuplicate'];
     $this->assign('dupeError', FALSE);
 
@@ -46,17 +47,11 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
       $this->assign('dupeError', TRUE);
     }
 
-    $this->assign('groupAdditions', $this->getUserJob()['metadata']['summary_info']['groups']);
-    $this->assign('tagAdditions', $this->getUserJob()['metadata']['summary_info']['tags']);
+    $this->assign('groupAdditions', $this->getUserJob()['metadata']['summary_info']['groups'] ?? []);
+    $this->assign('tagAdditions', $this->getUserJob()['metadata']['summary_info']['tags'] ?? []);
     $this->assignOutputURLs();
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/import/contact', 'reset=1'));
-  }
-
-  /**
-   * Clean up the import table we used.
-   */
-  public function postProcess() {
   }
 
 }
