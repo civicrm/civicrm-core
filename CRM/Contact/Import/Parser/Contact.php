@@ -105,49 +105,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Handle the values in preview mode.
-   *
-   * Function will be deprecated in favour of validateValues.
-   *
-   * @param array $values
-   *   The array of values belonging to this line.
-   *
-   * @return bool
-   *   the result of this processing
-   *   CRM_Import_Parser::ERROR or CRM_Import_Parser::VALID
-   */
-  public function preview(&$values) {
-    return $this->summary($values);
-  }
-
-  /**
-   * Handle the values in summary mode.
-   *
-   * Function will be deprecated in favour of validateValues.
-   *
-   * @param array $values
-   *   The array of values belonging to this line.
-   *
-   * @return int
-   *   the result of this processing
-   *   CRM_Import_Parser::ERROR or CRM_Import_Parser::VALID
-   */
-  public function summary(&$values): int {
-    $rowNumber = (int) ($values[array_key_last($values)]);
-    try {
-      $this->validateValues($values);
-    }
-    catch (CRM_Core_Exception $e) {
-      $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
-      array_unshift($values, $e->getMessage());
-      return CRM_Import_Parser::ERROR;
-    }
-    $this->setImportStatus($rowNumber, 'NEW', '');
-
-    return CRM_Import_Parser::VALID;
-  }
-
-  /**
    * Handle the values in import mode.
    *
    * @param array $values
@@ -1147,52 +1104,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param int $mode
    */
   public function set($store, $mode = self::MODE_SUMMARY) {
-  }
-
-  /**
-   * Export data to a CSV file.
-   *
-   * @param string $fileName
-   * @param array $header
-   * @param array $data
-   */
-  public static function exportCSV($fileName, $header, $data) {
-
-    if (file_exists($fileName) && !is_writable($fileName)) {
-      CRM_Core_Error::movedSiteError($fileName);
-    }
-    //hack to remove '_status', '_statusMsg' and '_id' from error file
-    $errorValues = [];
-    $dbRecordStatus = ['IMPORTED', 'ERROR', 'DUPLICATE', 'INVALID', 'NEW'];
-    foreach ($data as $rowCount => $rowValues) {
-      $count = 0;
-      foreach ($rowValues as $key => $val) {
-        if (in_array($val, $dbRecordStatus) && $count == (count($rowValues) - 3)) {
-          break;
-        }
-        $errorValues[$rowCount][$key] = $val;
-        $count++;
-      }
-    }
-    $data = $errorValues;
-
-    $output = [];
-    $fd = fopen($fileName, 'w');
-
-    foreach ($header as $key => $value) {
-      $header[$key] = "\"$value\"";
-    }
-    $config = CRM_Core_Config::singleton();
-    $output[] = implode($config->fieldSeparator, $header);
-
-    foreach ($data as $datum) {
-      foreach ($datum as $key => $value) {
-        $datum[$key] = "\"$value\"";
-      }
-      $output[] = implode($config->fieldSeparator, $datum);
-    }
-    fwrite($fd, implode("\n", $output));
-    fclose($fd);
   }
 
   /**
