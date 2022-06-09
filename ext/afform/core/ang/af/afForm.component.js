@@ -69,6 +69,11 @@
       function postProcess() {
         var metaData = ctrl.getFormMeta();
 
+        $element.trigger('crmFormSuccess', {
+          afform: metaData,
+          data: data
+        });
+
         if (metaData.redirect) {
           var url = metaData.redirect;
           if (url.indexOf('civicrm/') === 0) {
