@@ -48,11 +48,11 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
         }
         if ($field == $contactORContributionId) {
           if (!($weightSum >= $threshold || in_array('external_identifier', $importKeys)) &&
-            $self->_onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE
+            !$self->isUpdateExisting()
           ) {
             $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', [1 => $threshold]) . '<br />';
           }
-          elseif ($self->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE &&
+          elseif ($self->isUpdateExisting() &&
             !(in_array('invoice_id', $importKeys) || in_array('trxn_id', $importKeys) ||
               in_array('contribution_id', $importKeys)
             )
@@ -74,15 +74,10 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
   public function preProcess() {
     parent::preProcess();
 
-    $this->_columnCount = $this->get('columnCount');
-    $skipColumnHeader = $this->getSubmittedValue('skipColumnHeader');
-    $this->_onDuplicate = $this->getSubmittedValue('onDuplicate');
-    $this->assign('skipColumnHeader', $skipColumnHeader);
-
     $highlightedFields = ['financial_type_id', 'total_amount'];
     //CRM-2219 removing other required fields since for updation only
     //invoice id or trxn id or contribution id is required.
-    if ($this->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
+    if ($this->isUpdateExisting()) {
       $remove = [
         'contribution_contact_id',
         'email',
@@ -104,7 +99,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
         $highlightedFields[] = $key;
       }
     }
-    elseif ($this->_onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
+    elseif ($this->isSkipExisting()) {
       unset($this->_mapperFields['contribution_id']);
       $highlightedFieldsArray = [
         'contribution_contact_id',
@@ -155,7 +150,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
     $sel1 = $this->_mapperFields;
 
-    if (!$this->get('onDuplicate')) {
+    if (!$this->isUpdateExisting()) {
       unset($sel1['id']);
       unset($sel1['contribution_id']);
     }
@@ -178,7 +173,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     foreach ($columnHeaders as $i => $columnHeader) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
       $jsSet = FALSE;
-      if ($this->get('savedMapping')) {
+      if ($this->getSubmittedValue('savedMapping')) {
         [$mappingName, $mappingContactType] = CRM_Core_BAO_Mapping::getMappingFields($savedMappingID);
 
         $mappingName = $mappingName[1];
@@ -265,7 +260,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
         $warning++;
       }
     }
-    if ($warning != 0 && $this->get('savedMapping')) {
+    if ($warning != 0 && $this->getSubmittedValue('savedMapping')) {
       $session = CRM_Core_Session::singleton();
       $session->setStatus(ts('The data columns in this import file appear to be different from the saved mapping. Please verify that you have selected the correct saved mapping before continuing.'));
     }
@@ -294,7 +289,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
   public static function formRule($fields, $files, $self) {
     $errors = [];
     $fieldMessage = NULL;
-    $contactORContributionId = $self->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE ? 'contribution_id' : 'contribution_contact_id';
+    $contactORContributionId = $self->isUpdateExisting() ? 'contribution_id' : 'contribution_contact_id';
     if (!array_key_exists('savedMapping', $fields)) {
       $importKeys = [];
       foreach ($fields['mapper'] as $mapperPart) {
@@ -327,7 +322,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       $errors = self::checkRequiredFields($self, $contactORContributionId, $importKeys, $errors, $weightSum, $threshold, $fieldMessage);
 
       //at least one field should be mapped during update.
-      if ($self->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
+      if ($self->isUpdateExisting()) {
         $atleastOne = FALSE;
         foreach ($self->_mapperFields as $key => $field) {
           if (in_array($key, $importKeys) &&

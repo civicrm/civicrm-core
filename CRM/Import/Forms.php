@@ -575,7 +575,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
    *
    * @return array
    * @throws \API_Exception
-   * @throws \CRM_Core_Exception
    */
   protected function getMappedFieldLabels(): array {
     $mapper = [];
@@ -641,6 +640,14 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   protected function isUpdateExisting(): bool {
     return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_UPDATE;
+  }
+
+  /**
+   * Has the user chosen to update existing records.
+   * @return bool
+   */
+  protected function isSkipExisting(): bool {
+    return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_SKIP;
   }
 
 }
