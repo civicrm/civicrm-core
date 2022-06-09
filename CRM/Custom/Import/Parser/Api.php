@@ -1,7 +1,6 @@
 <?php
 
 use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
 
 /**
  * Class CRM_Custom_Import_Parser_Api
@@ -82,8 +81,8 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
       $importableFields = $this->getGroupFieldsForImport($customGroupID);
       $this->importableFieldsMetadata = array_merge([
         'do_not_import' => ['title' => ts('- do not import -')],
-        'contact_id' => ['title' => ts('Contact ID'), 'name' => 'contact_id', 'type' => CRM_Utils_Type::T_INT, 'options' => FALSE],
-        'external_identifier' => ['title' => ts('External Identifier'), 'name' => 'external_identifier', 'type' => CRM_Utils_Type::T_INT, 'options' => FALSE],
+        'contact_id' => ['title' => ts('Contact ID'), 'name' => 'contact_id', 'type' => CRM_Utils_Type::T_INT, 'options' => FALSE, 'headerPattern' => '/contact?|id$/i'],
+        'external_identifier' => ['title' => ts('External Identifier'), 'name' => 'external_identifier', 'type' => CRM_Utils_Type::T_INT, 'options' => FALSE, 'headerPattern' => '/external\s?id/i'],
       ], $importableFields);
     }
   }
@@ -196,7 +195,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
       $importableFields[$key] = [
         'name' => $key,
         'title' => $values['label'] ?? NULL,
-        'headerPattern' => '/' . preg_quote($regexp, '/') . '/',
+        'headerPattern' => '/' . preg_quote($regexp, '/') . '/i',
         'import' => 1,
         'custom_field_id' => $values['id'],
         'options_per_line' => $values['options_per_line'],

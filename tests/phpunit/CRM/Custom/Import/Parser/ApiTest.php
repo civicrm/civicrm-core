@@ -38,7 +38,6 @@ class CRM_Custom_Import_Parser_ApiTest extends CiviUnitTestCase {
     $this->assertEquals('ERROR', $row['_status']);
   }
 
-
   /**
    * Get the import's datasource form.
    *

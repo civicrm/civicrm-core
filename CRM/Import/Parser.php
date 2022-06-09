@@ -571,9 +571,9 @@ abstract class CRM_Import_Parser {
    */
   public function getHeaderPatterns(): array {
     $values = [];
-    foreach ($this->_fields as $name => $field) {
-      if (isset($field->_headerPattern)) {
-        $values[$name] = $field->_headerPattern;
+    foreach ($this->importableFieldsMetadata as $name => $field) {
+      if (isset($field['headerPattern'])) {
+        $values[$name] = $field['headerPattern'] ?: '//';
       }
     }
     return $values;
