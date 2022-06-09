@@ -21,31 +21,6 @@
  */
 class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
 
-  protected $_mapperKeys;
-
-  /**
-   * Array of successfully imported activity id's
-   *
-   * @var array
-   */
-  protected $_newActivity;
-
-  /**
-   * Total number of lines in file.
-   * @var int
-   */
-  protected $_lineCount;
-
-  /**
-   * Class constructor.
-   *
-   * @param array $mapperKeys
-   */
-  public function __construct($mapperKeys = []) {
-    parent::__construct();
-    $this->_mapperKeys = $mapperKeys;
-  }
-
   /**
    * The initializer code, called before the processing.
    */
@@ -61,31 +36,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
       }
       $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern']);
     }
-
-    $this->_newActivity = [];
-
-    $this->setActiveFields($this->_mapperKeys);
-  }
-
-  /**
-   * Handle the values in summary mode.
-   *
-   * @param array $values
-   *   The array of values belonging to this line.
-   *
-   * @return int
-   *   CRM_Import_Parser::VALID for success or
-   *   CRM_Import_Parser::ERROR for error.
-   */
-  public function summary(&$values) {
-    try {
-      $this->validateValues($values);
-    }
-    catch (CRM_Core_Exception $e) {
-      return $this->addError($values, [$e->getMessage()]);
-    }
-
-    return CRM_Import_Parser::VALID;
   }
 
   /**
@@ -214,22 +164,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
   }
 
   /**
-   *
-   * Get the value for the given field from the row of values.
-   *
-   * @param array $row
-   * @param string $fieldName
-   *
-   * @return null|string
-   */
-  protected function getFieldValue(array $row, string $fieldName) {
-    if (!is_numeric($this->getFieldIndex($fieldName))) {
-      return NULL;
-    }
-    return $row[$this->getFieldIndex($fieldName)] ?? NULL;
-  }
-
-  /**
    * @return array
    */
   protected function getRequiredFields(): array {
@@ -237,194 +171,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
   }
 
   /**
-   * Get the index for the given field.
-   *
-   * @param string $fieldName
-   *
-   * @return false|int
-   */
-  protected function getFieldIndex(string $fieldName) {
-    return array_search($fieldName, $this->_mapperKeys, TRUE);
-
-  }
-
-  /**
-   * Add an error to the values.
-   *
-   * @param array $values
-   * @param array $error
-   *
-   * @return int
-   */
-  protected function addError(array &$values, array $error): int {
-    array_unshift($values, implode(';', $error));
-    return CRM_Import_Parser::ERROR;
-  }
-
-  /**
-   * Validate that the activity type id does not conflict with the label.
-   *
-   * @param array $values
-   *
-   * @return void
-   * @throws \CRM_Core_Exception
-   */
-  protected function validateActivityTypeIDAndLabel(array $values): void {
-    $activityLabel = $this->getFieldValue($values, 'activity_label');
-    $activityTypeID = $this->getFieldValue($values, 'activity_type_id');
-    if ($activityLabel && $activityTypeID
-      && $activityLabel !== CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $activityTypeID)) {
-      throw new CRM_Core_Exception(ts('Activity type label and Activity type ID are in conflict'));
-    }
-  }
-
-  /**
-   * Is the supplied date field valid based on selected date format.
-   *
-   * @param string $value
-   *
-   * @return bool
-   */
-  protected function isValidDate(string $value): bool {
-    return (bool) CRM_Utils_Date::formatDate($value, CRM_Core_Session::singleton()->get('dateTypes'));
-  }
-
-  /**
-   * Is the supplied field a valid contact id.
-   *
-   * @param string|int $value
-   *
-   * @return bool
-   */
-  protected function isValidContactID($value): bool {
-    if (!CRM_Utils_Rule::integer($value)) {
-      return FALSE;
-    }
-    if (!CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_contact WHERE id = " . (int) $value)) {
-      return FALSE;
-    }
-    return TRUE;
-  }
-
-  /**
-   * Validate custom fields.
-   *
-   * @param array $values
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function validateCustomFields($values):void {
-    $this->setActiveFieldValues($values);
-    $params = $this->getActiveFieldParams();
-    $errorMessage = NULL;
-    // Checking error in custom data.
-    $params['contact_type'] = 'Activity';
-    $this->isErrorInCustomData($params, $errorMessage);
-    if ($errorMessage) {
-      throw new CRM_Core_Exception('Invalid value for field(s) : ' . $errorMessage);
-    }
-  }
-
-  /**
-   * Get array of parameters formatted for the api from the submitted values.
-   *
-   * @param array $values
-   *
-   * @return array
-   */
-  protected function getApiReadyParams(array $values): array {
-    $this->setActiveFieldValues($values);
-    $params = $this->getActiveFieldParams();
-    if ($this->getFieldValue($values, 'activity_label')) {
-      $params['activity_type_id'] = array_search(
-         $this->getFieldValue($values, 'activity_label'),
-         CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'create'),
-        TRUE
-      );
-    }
-    return $params;
-  }
-
-  /**
-   * @param array $fileName
-   * @param string $separator
-   * @param $mapper
-   * @param bool $skipColumnHeader
-   * @param int $mode
-   * @param int $onDuplicate
-   * @param int $statusID
-   * @param int $totalRowCount
-   */
-  public function run(
-    array $fileName,
-          $separator,
-          $mapper,
-          $skipColumnHeader = FALSE,
-          $mode = self::MODE_PREVIEW,
-          $onDuplicate = self::DUPLICATE_SKIP,
-          $statusID = NULL,
-          $totalRowCount = NULL
-  ) {
-    $this->init();
-
-    $this->_lineCount = 0;
-    $this->_invalidRowCount = $this->_validCount = 0;
-    $this->_totalCount = 0;
-
-    $this->_errors = [];
-    $this->_warnings = [];
-    if ($mode == self::MODE_MAPFIELD) {
-      $this->_rows = [];
-    }
-    else {
-      $this->_activeFieldCount = count($this->_activeFields);
-    }
-    if ($statusID) {
-      $this->progressImport($statusID);
-      $startTimestamp = $currTimestamp = $prevTimestamp = time();
-    }
-
-    $dataSource = $this->getDataSourceObject();
-    $dataSource->setStatuses(['new']);
-    while ($row = $dataSource->getRow()) {
-      $this->_lineCount++;
-      $values = array_values($row);
-      $this->_totalCount++;
-
-      if ($mode == self::MODE_MAPFIELD) {
-        $returnCode = CRM_Import_Parser::VALID;
-      }
-      // Note that MODE_SUMMARY seems to be never used.
-      elseif ($mode == self::MODE_PREVIEW || $mode == self::MODE_SUMMARY) {
-        $returnCode = $this->summary($values);
-      }
-      elseif ($mode == self::MODE_IMPORT) {
-        $this->import($values);
-        if ($statusID && (($this->_lineCount % 50) == 0)) {
-          $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
-        }
-      }
-    }
-  }
-
-  /**
-   * Given a list of the importable field keys that the user has selected set the active fields array to this list.
-   *
-   * @param array $fieldKeys
-   */
-  public function setActiveFields($fieldKeys) {
-    $this->_activeFieldCount = count($fieldKeys);
-    foreach ($fieldKeys as $key) {
-      if (empty($this->_fields[$key])) {
-        $this->_activeFields[] = new CRM_Activity_Import_Field('', ts('- do not import -'));
-      }
-      else {
-        $this->_activeFields[] = clone($this->_fields[$key]);
-      }
-    }
-  }
-
-  /**
+   * @deprecated - these are just used in a couple of parent class functions now.
    * @param string $name
    * @param $title
    * @param int $type
@@ -448,55 +195,51 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
   }
 
   /**
-   * Store parser values.
-   *
-   * @param CRM_Core_Session $store
-   */
-  public function set($store) {}
-
-  /**
-   * Export data to a CSV file.
-   *
-   * @param string $fileName
-   * @param array $header
-   * @param array $data
-   */
-  public static function exportCSV($fileName, $header, $data) {
-    $output = [];
-    $fd = fopen($fileName, 'w');
-
-    foreach ($header as $key => $value) {
-      $header[$key] = "\"$value\"";
-    }
-    $config = CRM_Core_Config::singleton();
-    $output[] = implode($config->fieldSeparator, $header);
-
-    foreach ($data as $datum) {
-      foreach ($datum as $key => $value) {
-        $datum[$key] = "\"$value\"";
-      }
-      $output[] = implode($config->fieldSeparator, $datum);
-    }
-    fwrite($fd, implode("\n", $output));
-    fclose($fd);
-  }
-
-  /**
    * Ensure metadata is loaded.
    */
   protected function setFieldMetadata(): void {
     if (empty($this->importableFieldsMetadata)) {
       $activityContact = CRM_Activity_BAO_ActivityContact::import();
-      $activityTarget['target_contact_id'] = $activityContact['contact_id'];
-      $fields = array_merge(CRM_Activity_BAO_Activity::importableFields(),
-        $activityTarget
-      );
+      $fields = ['' => ['title' => ts('- do not import -')]];
+
+      $tmpFields = CRM_Activity_DAO_Activity::import();
+      $contactFields = CRM_Contact_BAO_Contact::importableFields('Individual', NULL);
+
+      // Using new Dedupe rule.
+      $ruleParams = [
+        'contact_type' => 'Individual',
+        'used' => 'Unsupervised',
+      ];
+      $fieldsArray = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
+
+      $tmpConatctField = [];
+      if (is_array($fieldsArray)) {
+        foreach ($fieldsArray as $value) {
+          $customFieldId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
+            $value,
+            'id',
+            'column_name'
+          );
+          $value = $customFieldId ? 'custom_' . $customFieldId : $value;
+          $tmpConatctField[trim($value)] = $contactFields[trim($value)];
+          $tmpConatctField[trim($value)]['title'] = $tmpConatctField[trim($value)]['title'] . " (match to contact)";
+        }
+      }
+      $tmpConatctField['external_identifier'] = $contactFields['external_identifier'];
+      $tmpConatctField['external_identifier']['title'] = $contactFields['external_identifier']['title'] . " (match to contact)";
+      $fields = array_merge($fields, $tmpConatctField);
+      $fields = array_merge($fields, $tmpFields);
+      $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Activity'));
 
       $fields = array_merge($fields, [
         'source_contact_id' => [
           'title' => ts('Source Contact'),
           'headerPattern' => '/Source.Contact?/i',
+          'name' => 'source_type_id',
+          'options' => FALSE,
+          'type' => CRM_Utils_Type::T_INT,
         ],
+        'target_contact_id' => $activityContact['contact_id'],
       ]);
       $this->importableFieldsMetadata = $fields;
     }
