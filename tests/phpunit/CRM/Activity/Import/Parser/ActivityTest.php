@@ -31,11 +31,6 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
   use CRMTraits_Import_ParserTrait;
 
   /**
-   * @var int|null
-   */
-  private $userJobID;
-
-  /**
    * Prepare for tests.
    */
   public function setUp():void {
