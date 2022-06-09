@@ -10,7 +10,7 @@
 
             {* Header row - has column for column names if they have been supplied *}
           <tr class="columnheader">
-              {if $columnNames}
+              {if $showColumnNames}
                 <td>{ts}Column Names{/ts}</td>
               {/if}
               {foreach from=$dataValues item=row key=index}
@@ -23,7 +23,7 @@
             {*Loop on columns parsed from the import data rows*}
             {foreach from=$mapper key=i item=mapperField}
               <tr style="border: 1px solid #DDDDDD;">
-                  {if array_key_exists($i, $columnNames)}
+                  {if $showColumnNames}
                     <td class="even-row labels">{$columnNames[$i]}</td>
                   {/if}
                   {foreach from=$dataValues item=row key=index}

@@ -74,7 +74,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * @throws \CRM_Core_Exception
    */
   public function initialize(): void {
-    $result = self::_CsvToTable(
+    $result = $this->csvToTable(
       $this->getSubmittedValue('uploadFile')['name'],
       $this->getSubmittedValue('skipColumnHeader'),
       $this->getSubmittedValue('fieldSeparator') ?? ','
@@ -83,7 +83,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
 
     $this->updateUserJobMetadata('DataSource', [
       'table_name' => $result['import_table_name'],
-      'column_headers' => $this->getSubmittedValue('skipColumnHeader') ? $result['column_headers'] : [],
+      'column_headers' => $result['column_headers'],
       'number_of_columns' => $result['number_of_columns'],
     ]);
   }
@@ -102,7 +102,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    *   name of the created table
    * @throws \CRM_Core_Exception
    */
-  private static function _CsvToTable(
+  private function csvToTable(
     $file,
     $headers = FALSE,
     $fieldSeparator = ','
@@ -124,7 +124,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     }
 
     $firstrow = fgetcsv($fd, 0, $fieldSeparator);
-
+    $result['column_headers'] = array_fill(0, count($firstrow), '');
     // create the column names from the CSV header or as col_0, col_1, etc.
     if ($headers) {
       //need to get original headers.

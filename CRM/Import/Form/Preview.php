@@ -113,6 +113,7 @@ abstract class CRM_Import_Form_Preview extends CRM_Import_Forms {
     }
     $this->assign('savedMappingName', $mappingId ? $mapDAO->name : NULL);
     $this->assign('skipColumnHeader', $this->getSubmittedValue('skipColumnHeader'));
+    $this->assign('showColumnNames', $this->getSubmittedValue('skipColumnHeader'));
     // rowDisplayCount is deprecated - it used to be used with {section} but we have nearly gotten rid of it.
     $this->assign('rowDisplayCount', $this->getSubmittedValue('skipColumnHeader') ? 3 : 2);
   }
