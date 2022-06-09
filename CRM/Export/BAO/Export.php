@@ -251,6 +251,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       if (method_exists($parserName, 'errorFileName') &&
         method_exists($parserName, 'saveFileName')
       ) {
+        CRM_Core_Error::deprecatedWarning('unused code');
         $errorFileName = $parserName::errorFileName($type);
         $saveFileName = $parserName::saveFileName($type);
         if (!empty($errorFileName) && !empty($saveFileName)) {

@@ -55,20 +55,6 @@ class CRM_Contribute_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   }
 
   /**
-   * Process the uploaded file.
-   */
-  public function postProcess() {
-    $this->storeFormValues([
-      'onDuplicate',
-      'contactType',
-      'dateFormats',
-      'savedMapping',
-    ]);
-
-    $this->submitFileForMapping('CRM_Contribute_Import_Parser_Contribution');
-  }
-
-  /**
    * @return \CRM_Contribute_Import_Parser_Contribution
    */
   protected function getParser(): CRM_Contribute_Import_Parser_Contribution {

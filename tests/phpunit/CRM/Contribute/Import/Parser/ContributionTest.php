@@ -17,6 +17,7 @@ use Civi\Api4\UserJob;
  */
 class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
+  use CRMTraits_Import_ParserTrait;
 
   /**
    * Default entity for class.
@@ -196,43 +197,6 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
     $this->callAPISuccessGetSingle('PledgePayment', ['pledge_id' => $pledgeID, 'contribution_id' => $contribution['id']]);
-  }
-
-  /**
-   * Import the csv file values.
-   *
-   * This function uses a flow that mimics the UI flow.
-   *
-   * @param string $csv Name of csv file.
-   * @param array $fieldMappings
-   * @param array $submittedValues
-   */
-  protected function importCSV(string $csv, array $fieldMappings, array $submittedValues = []): void {
-    $submittedValues = array_merge([
-      'uploadFile' => ['name' => __DIR__ . '/data/' . $csv],
-      'skipColumnHeader' => TRUE,
-      'fieldSeparator' => ',',
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
-      'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
-      'dataSource' => 'CRM_Import_DataSource_CSV',
-      'file' => ['name' => $csv],
-      'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
-      'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
-      'groups' => [],
-    ], $submittedValues);
-    $form = $this->getFormObject('CRM_Contribute_Import_Form_DataSource', $submittedValues);
-    $form->buildForm();
-    $form->postProcess();
-    $this->userJobID = $form->getUserJobID();
-    $form = $this->getFormObject('CRM_Contribute_Import_Form_MapField', $submittedValues);
-    $form->setUserJobID($this->userJobID);
-    $form->buildForm();
-    $form->postProcess();
-    /* @var CRM_Contribute_Import_Form_MapField $form */
-    $form = $this->getFormObject('CRM_Contribute_Import_Form_Preview', $submittedValues);
-    $form->setUserJobID($this->userJobID);
-    $form->buildForm();
-    $form->postProcess();
   }
 
   /**

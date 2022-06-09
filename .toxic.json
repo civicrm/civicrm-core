@@ -32,7 +32,6 @@
     "CRM_Contribute_Form_Contribution_Main::formRule()": "toxicAlert",
     "CRM_Contribute_Form_Contribution_Main::submit()": "toxicAlert",
     "CRM_Contribute_Form_Task_Invoice::printPDF()": "toxicAlert",
-    "CRM_Contribute_Import_Parser_Contribution::run()": "toxicAlert",
     "CRM_Core_BAO_ActionScheduleTest::setUp()": "toxicAlert",
     "CRM_Core_BAO_CustomField::formatCustomField()": "toxicAlert",
     "CRM_Core_BAO_CustomGroup::getTree()": "toxicAlert",
