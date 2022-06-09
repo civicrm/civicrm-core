@@ -36,6 +36,8 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
       'status', "varchar(16) NULL DEFAULT 'active' COMMENT 'Execution status'");
     $this->addTask('Add column "civicrm_queue.error"', 'addColumn', 'civicrm_queue',
       'error', "varchar(16) NULL COMMENT 'Fallback behavior for unhandled errors'");
+    $this->addTask('Add column "civicrm_queue.is_template"', 'addColumn', 'civicrm_queue',
+      'is_template', "tinyint NOT NULL DEFAULT 0 COMMENT 'Is this a template configuration (for use by other/future queues)?'");
     $this->addTask('Backfill "civicrm_queue.status" and "civicrm_queue.error")', 'fillQueueColumns');
   }
 
