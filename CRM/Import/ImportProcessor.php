@@ -439,12 +439,22 @@ class CRM_Import_ImportProcessor {
       'mapping_id' => $this->getMappingID(),
       'options' => ['limit' => 0],
     ])['values'];
+    $skipped = [];
     foreach ($fields as $index => $field) {
+      if (!$this->isValidField($field['name'])) {
+        // This scenario could occur if the name of a saved mapping field
+        // changed or became unavailable https://lab.civicrm.org/dev/core/-/issues/3511.
+        $skipped[] = $field['name'];
+        $fields[$index]['name'] = $field['name'] = 'do_not_import';
+      }
       $fieldSpec = $this->getFieldMetadata($field['name']);
       $fields[$index]['label'] = $fieldSpec['title'];
       if (empty($field['location_type_id']) && !empty($fieldSpec['hasLocationType'])) {
         $fields[$index]['location_type_id'] = 'Primary';
       }
+    }
+    if (!empty($skipped)) {
+      CRM_Core_Session::setStatus(ts('Invalid saved mappings were skipped') . ':' . implode(', ', $skipped));
     }
     $this->mappingFields = $this->rekeyBySortedColumnNumbers($fields);
   }
@@ -458,6 +468,19 @@ class CRM_Import_ImportProcessor {
    */
   protected function getFieldMetadata(string $fieldName): array {
     return $this->getMetadata()[$fieldName] ?? CRM_Contact_BAO_Contact::importableFields('All')[$fieldName];
+  }
+
+  /**
+   * Is the field valid for this import.
+   *
+   * If not defined in metadata is is not valid.
+   *
+   * @param string $fieldName
+   *
+   * @return bool
+   */
+  public function isValidField(string $fieldName): bool {
+    return isset($this->getMetadata()[$fieldName]) || isset(CRM_Contact_BAO_Contact::importableFields('All')[$fieldName]);
   }
 
   /**
