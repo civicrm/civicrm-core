@@ -201,6 +201,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * The initializer code, called before the processing
    */
   public function init() {
+    // Force re-load of user job.
+    unset($this->userJob);
     $this->setFieldMetadata();
     foreach ($this->getImportableFieldsMetadata() as $name => $field) {
       $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern']);
@@ -212,7 +214,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    */
   protected function setFieldMetadata() {
     if (empty($this->importableFieldsMetadata)) {
-      $fields = CRM_Contribute_BAO_Contribution::importableFields($this->_contactType, FALSE);
+      $fields = CRM_Contribute_BAO_Contribution::importableFields($this->getContactType(), FALSE);
 
       $fields = array_merge($fields,
         [
@@ -220,6 +222,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
             'title' => ts('Soft Credit'),
             'softCredit' => TRUE,
             'headerPattern' => '/Soft Credit/i',
+            'options' => FALSE,
           ],
         ]
       );
@@ -251,29 +254,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   }
 
   /**
-   * Handle the values in summary mode.
-   *
-   * @param array $values
-   *   The array of values belonging to this line.
-   *
-   * @return int
-   *   CRM_Import_Parser::VALID or CRM_Import_Parser::ERROR
-   */
-  public function summary(&$values) {
-    $rowNumber = (int) ($values[array_key_last($values)]);
-    $params = $this->getMappedRow($values);
-    $errorMessage = implode(';', $this->getInvalidValues($params));
-    $params['contact_type'] = 'Contribution';
-
-    if ($errorMessage) {
-      $this->setImportStatus($rowNumber, 'ERROR', "Invalid value for field(s) : $errorMessage");
-      return CRM_Import_Parser::ERROR;
-    }
-
-    return CRM_Import_Parser::VALID;
-  }
-
-  /**
    * Handle the values in import mode.
    *
    * @param array $values
@@ -302,15 +282,15 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       if ($this->isSkipDuplicates() &&
         (!empty($paramValues['contribution_contact_id']) || !empty($paramValues['external_identifier']))
       ) {
-        $paramValues['contact_type'] = $this->_contactType;
+        $paramValues['contact_type'] = $this->getContactType();
       }
       elseif ($this->isUpdateExisting() &&
         (!empty($paramValues['contribution_id']) || !empty($values['trxn_id']) || !empty($paramValues['invoice_id']))
       ) {
-        $paramValues['contact_type'] = $this->_contactType;
+        $paramValues['contact_type'] = $this->getContactType();
       }
       elseif (!empty($paramValues['pledge_payment'])) {
-        $paramValues['contact_type'] = $this->_contactType;
+        $paramValues['contact_type'] = $this->getContactType();
       }
 
       $formatError = $this->deprecatedFormatParams($paramValues, $formatted);
@@ -451,7 +431,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
         // Using new Dedupe rule.
         $ruleParams = [
-          'contact_type' => $this->_contactType,
+          'contact_type' => $this->getContactType(),
           'used' => 'Unsupervised',
         ];
         $fieldsArray = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
