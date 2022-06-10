@@ -220,13 +220,13 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
             'id',
             'column_name'
           );
-          $value = $customFieldId ? 'custom_' . $customFieldId : $value;
-          $tmpConatctField[trim($value)] = $contactFields[trim($value)];
-          $tmpConatctField[trim($value)]['title'] = $tmpConatctField[trim($value)]['title'] . " (match to contact)";
+          $value = trim($customFieldId ? 'custom_' . $customFieldId : $value);
+          $tmpConatctField[$value] = $contactFields[$value];
+          $tmpConatctField[$value]['title'] = $tmpConatctField[$value]['title'] . " (match to contact)";
         }
       }
       $tmpConatctField['external_identifier'] = $contactFields['external_identifier'];
-      $tmpConatctField['external_identifier']['title'] = $contactFields['external_identifier']['title'] . " (match to contact)";
+      $tmpConatctField['external_identifier']['title'] = $contactFields['external_identifier']['title'] . ' (match to contact)';
       $fields = array_merge($fields, $tmpConatctField);
       $fields = array_merge($fields, $tmpFields);
       $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Activity'));
@@ -239,7 +239,13 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
           'options' => FALSE,
           'type' => CRM_Utils_Type::T_INT,
         ],
-        'target_contact_id' => $activityContact['contact_id'],
+        'target_contact_id' => [
+          'title' => ts('Target Contact'),
+          'headerPattern' => '/Target.Contact?/i',
+          'name' => 'target_type_id',
+          'options' => FALSE,
+          'type' => CRM_Utils_Type::T_INT,
+        ],
       ]);
       $this->importableFieldsMetadata = $fields;
     }
