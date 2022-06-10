@@ -46,18 +46,6 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   }
 
   /**
-   * Process the uploaded file.
-   */
-  public function postProcess() {
-    $this->storeFormValues([
-      'dateFormats',
-      'savedMapping',
-    ]);
-
-    $this->submitFileForMapping('CRM_Activity_Import_Parser_Activity');
-  }
-
-  /**
    * @return CRM_Activity_Import_Parser_Activity
    */
   protected function getParser(): CRM_Activity_Import_Parser_Activity {

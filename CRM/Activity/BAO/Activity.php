@@ -1449,7 +1449,7 @@ WHERE entity_id =%1 AND entity_table = %2";
    * next week or so, before this can be called complete.
    *
    * @param bool $status
-   *
+   * @deprecated
    * @return array
    *   array of importable Fields
    */
