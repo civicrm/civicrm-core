@@ -442,7 +442,7 @@ SET    version = '$version'
         [
           1 => CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER,
           2 => CRM_Utils_SQL::getDatabaseVersion(),
-          3 => '10.1',
+          3 => CRM_Upgrade_Incremental_General::MIN_INSTALL_MARIADB_VER,
           4 => $latestVer,
         ]);
     }
