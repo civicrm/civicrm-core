@@ -121,6 +121,7 @@ class Manager {
       $angularModules['ui.bootstrap'] = include "$civicrm_root/ang/ui.bootstrap.ang.php";
       $angularModules['ui.sortable'] = include "$civicrm_root/ang/ui.sortable.ang.php";
       $angularModules['unsavedChanges'] = include "$civicrm_root/ang/unsavedChanges.ang.php";
+      $angularModules['crmQueueMonitor'] = include "$civicrm_root/ang/crmQueueMonitor.ang.php";
       $angularModules['crmStatusPage'] = include "$civicrm_root/ang/crmStatusPage.ang.php";
       $angularModules['exportui'] = include "$civicrm_root/ang/exportui.ang.php";
       $angularModules['api4Explorer'] = include "$civicrm_root/ang/api4Explorer.ang.php";

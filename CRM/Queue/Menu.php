@@ -65,6 +65,15 @@ class CRM_Queue_Menu {
         $menuPath['access_callback'] = ['CRM_Core_Permission', 'checkMenu'];
         break;
 
+      case 'civicrm/queue/monitor':
+        // Not supported: case 'civicrm/upgrade/queue/monitor':
+        $menuPath['path'] = $path;
+        $menuPath['title'] = 'Queue Monitor';
+        $menuPath['page_callback'] = 'CRM_Queue_Page_Monitor';
+        $menuPath['access_arguments'][0][] = 'access CiviCRM';
+        $menuPath['access_callback'] = ['CRM_Core_Permission', 'checkMenu'];
+        break;
+
       default:
         // unrecognized
     }
