@@ -68,7 +68,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     $cases = $this->fromToData();
     foreach ($cases as $caseDescription => $case) {
       $obj = new CRM_Utils_Date();
-      list($calculatedFrom, $calculatedTo) = $obj->getFromTo($case['relative'], $case['from'], $case['to']);
+      [$calculatedFrom, $calculatedTo] = $obj->getFromTo($case['relative'], $case['from'], $case['to']);
       $this->assertEquals($case['expectedFrom'], $calculatedFrom, "Expected From failed for case $caseDescription");
       $this->assertEquals($case['expectedTo'], $calculatedTo, "Expected To failed for case $caseDescription");
     }
@@ -322,6 +322,31 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       $this->assertEquals($expectNames, $actualNames, "Check temporal names in $lang");
       unset($useLocale);
     }
+  }
+
+  /**
+   * Test formatDate function.
+   *
+   * @dataProvider dateDataProvider
+   *
+   * Test the format function used in imports. Note most forms
+   * are able to format pre-submit but the import needs to parse the date.
+   */
+  public function testFormatDate($date, $format, $expected): void {
+    $this->assertEquals($expected, CRM_Utils_Date::formatDate($date, $format));
+  }
+
+  /**
+   * Data provider for date formats.
+   *
+   * @return array[]
+   */
+  public function dateDataProvider(): array {
+    return [
+      ['date' => '2022-10-01', 'format' => CRM_Core_Form_Date::DATE_yyyy_mm_dd, 'expected' => '20221001'],
+      ['date' => '2022-10-01 15:54', 'format' => CRM_Core_Form_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155400'],
+      ['date' => '2022-10-01 15:54:56', 'format' => CRM_Core_Form_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155456'],
+    ];
   }
 
 }
