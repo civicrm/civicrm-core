@@ -328,14 +328,13 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     CRM_Core_Session::setStatus($message, ts('Contacts Merged'), 'success');
 
     $urlParams = ['reset' => 1, 'cid' => $this->_cid, 'rgid' => $this->_rgid, 'gid' => $this->_gid, 'limit' => $this->limit, 'criteria' => $this->criteria];
-    $contactViewUrl = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'cid' => $this->_cid]);
 
+    // When clicking "Merge and go to listing"
     if (!empty($formValues['_qf_Merge_submit'])) {
       $urlParams['action'] = "update";
-      CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/contact/dedupefind',
-        $urlParams
-      ));
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/dedupefind', $urlParams));
     }
+    // When clicking "Merge and go to next pair"
     elseif ($this->next && $this->_mergeId && empty($formValues['_qf_Merge_done'])) {
       $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $this->_gid, json_decode($this->criteria, TRUE), TRUE, $this->limit);
 
@@ -353,12 +352,15 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         $urlParams['oid'] = $pos['next']['id2'];
         $urlParams['mergeId'] = $pos['next']['mergeId'];
         $urlParams['action'] = 'update';
-        CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/contact/merge', $urlParams));
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/merge', $urlParams));
       }
     }
-    else {
-      CRM_Core_Session::singleton()->pushUserContext($contactViewUrl);
-    }
+    // When clicking "Merge and View Result" or when used from search forms
+    // Note: search might load this action in a popup, so cannot use a redirect.
+    $contactViewUrl = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'cid' => $this->_cid]);
+    CRM_Core_Session::singleton()->pushUserContext($contactViewUrl);
+    // I think this bit is needed because this is a multi-step form.
+    $this->controller->setDestination($contactViewUrl);
   }
 
   /**
