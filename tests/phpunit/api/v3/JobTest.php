@@ -2344,11 +2344,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
     if (empty($_SERVER['QUERY_STRING'])) {
       $_SERVER['QUERY_STRING'] = 'reset=1';
     }
-
+    ob_start();
     $this->callAPISuccess('job', 'mail_report', [
       'instanceId' => $this->report_instance['id'],
       'format' => 'print',
     ]);
+    ob_end_clean();
 
     $message = $mut->getMostRecentEmail('ezc');
 
@@ -2380,10 +2381,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
       $_SERVER['QUERY_STRING'] = 'reset=1';
     }
 
+    ob_start();
     $this->callAPISuccess('job', 'mail_report', [
       'instanceId' => $this->report_instance['id'],
       'format' => 'pdf',
     ]);
+    ob_end_clean();
 
     $message = $mut->getMostRecentEmail('ezc');
 
@@ -2424,11 +2427,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
     if (empty($_SERVER['QUERY_STRING'])) {
       $_SERVER['QUERY_STRING'] = 'reset=1';
     }
-
+    ob_start();
     $this->callAPISuccess('job', 'mail_report', [
       'instanceId' => $this->report_instance['id'],
       'format' => 'csv',
     ]);
+    ob_end_clean();
 
     $message = $mut->getMostRecentEmail('ezc');
 
