@@ -107,6 +107,38 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     }
   }
 
+  public function testTemplating() {
+    \Civi\Api4\Queue::create()->setValues([
+      'is_template' => TRUE,
+      'name' => 'test/template',
+      'type' => 'SqlParallel',
+      'runner' => 'task',
+      'error' => 'delete',
+    ])->execute();
+    $this->assertDBQuery(1, "SELECT is_template FROM civicrm_queue WHERE name = 'test/template'");
+
+    $qActive = Civi::queue('test/my-active', [
+      'template' => 'test/template',
+    ]);
+    $this->assertEquals('test/my-active', $qActive->getName());
+    $this->assertEquals('SqlParallel', $qActive->getSpec('type'));
+    $this->assertEquals('task', $qActive->getSpec('runner'));
+    $this->assertEquals('delete', $qActive->getSpec('error'));
+    $this->assertDBQuery('active', "SELECT status FROM civicrm_queue WHERE name = 'test/my-active'");
+    $this->assertDBQuery(0, "SELECT is_template FROM civicrm_queue WHERE name = 'test/my-active'");
+
+    $qDraft = Civi::queue('test/my-draft', [
+      'template' => 'test/template',
+      'status' => 'draft',
+    ]);
+    $this->assertEquals('test/my-draft', $qDraft->getName());
+    $this->assertEquals('SqlParallel', $qDraft->getSpec('type'));
+    $this->assertEquals('task', $qDraft->getSpec('runner'));
+    $this->assertEquals('delete', $qDraft->getSpec('error'));
+    $this->assertDBQuery('draft', "SELECT status FROM civicrm_queue WHERE name = 'test/my-draft'");
+    $this->assertDBQuery(0, "SELECT is_template FROM civicrm_queue WHERE name = 'test/my-active'");
+  }
+
   /**
    * Create a few queue items; alternately enqueue and dequeue various
    *
