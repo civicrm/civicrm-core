@@ -103,8 +103,9 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
             $disp = $params['external_identifier'];
           }
         }
-
-        throw new CRM_Core_Exception('No matching Contact found for (' . $disp . ')');
+        if (empty($params['id'])) {
+          throw new CRM_Core_Exception('No matching Contact found for (' . $disp . ')');
+        }
       }
       if (!empty($params['external_identifier'])) {
         $targetContactId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
