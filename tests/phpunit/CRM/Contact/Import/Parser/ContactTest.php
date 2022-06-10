@@ -18,6 +18,8 @@ use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\ContactType;
 use Civi\Api4\Email;
+use Civi\Api4\Group;
+use Civi\Api4\GroupContact;
 use Civi\Api4\IM;
 use Civi\Api4\LocationType;
 use Civi\Api4\OpenID;
@@ -1069,12 +1071,34 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportContactToGroup(): void {
+    $this->individualCreate();
+    $this->importCSV('contact_id_only.csv', [['id']], [
+      'newGroupName' => 'My New Group',
+    ]);
+    $dataSource = new CRM_Import_DataSource_CSV(UserJob::get(FALSE)->setSelect(['id'])->execute()->first()['id']);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status']);
+    $group = Group::get()->addWhere('title', '=', 'My New Group')->execute()->first();
+    $this->assertCount(1, GroupContact::get()->addWhere('group_id', '=', $group['id'])->execute());
+  }
+
+  /**
    * Get combinations to test for validation.
    *
    * @return array[]
    */
   public function importDataProvider(): array {
     return [
+      'individual_unicode.csv' => [
+        'csv' => 'individual_unicode.csv',
+        'mapper' => [['first_name'], ['last_name'], ['url', 1], ['country', 1]],
+        'expected_error' => '',
+        'expected_outcomes' => [CRM_Import_Parser::VALID => 1],
+      ],
       'individual_invalid_sub_type' => [
         'csv' => 'individual_invalid_contact_sub_type.csv',
         'mapper' => [['first_name'], ['last_name'], ['contact_sub_type']],
@@ -2059,11 +2083,18 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'groups' => [],
     ], $submittedValues);
     $form = $this->getFormObject('CRM_Contact_Import_Form_DataSource', $submittedValues);
+    $values = $_SESSION['_' . $form->controller->_name . '_container']['values'];
+
     $form->buildForm();
     $form->postProcess();
     $this->userJobID = $form->getUserJobID();
+
+    // This gets reset in DataSource so re-do....
+    $_SESSION['_' . $form->controller->_name . '_container']['values'] = $values;
+
     /* @var CRM_Contact_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Contact_Import_Form_MapField', $submittedValues);
+
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
     $form->postProcess();

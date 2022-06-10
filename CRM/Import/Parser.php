@@ -1364,7 +1364,7 @@ abstract class CRM_Import_Parser {
         return $importedValue;
       }
 
-      $comparisonValue = is_numeric($importedValue) ? $importedValue : mb_strtolower($importedValue);
+      $comparisonValue = $this->getComparisonValue($importedValue);
       return $options[$comparisonValue] ?? 'invalid_import_value';
     }
     if (!empty($fieldMetadata['FKClassName']) || !empty($fieldMetadata['pseudoconstant']['prefetch'])) {
@@ -1468,10 +1468,10 @@ abstract class CRM_Import_Parser {
         // name AND label as either might be used. We also lower case before checking
         $values = [];
         foreach ($options as $option) {
-          $idKey = is_numeric($option['id']) ? $option['id'] : mb_strtolower($option['id']);
+          $idKey = $this->getComparisonValue($option['id']);
           $values[$idKey] = $option['id'];
           foreach (['name', 'label', 'abbr'] as $key) {
-            $optionValue = mb_strtolower($option[$key] ?? '');
+            $optionValue = $this->getComparisonValue($option[$key] ?? '');
             if ($optionValue !== '') {
               if (isset($values[$optionValue]) && $values[$optionValue] !== $option['id']) {
                 if (!isset($this->ambiguousOptions[$fieldName][$optionValue])) {
@@ -1775,7 +1775,7 @@ abstract class CRM_Import_Parser {
    * @param string $importedValue
    */
   protected function isAmbiguous(string $fieldName, $importedValue): bool {
-    return !empty($this->ambiguousOptions[$fieldName][mb_strtolower($importedValue)]);
+    return !empty($this->ambiguousOptions[$fieldName][$this->getComparisonValue($importedValue)]);
   }
 
   /**
@@ -1994,11 +1994,18 @@ abstract class CRM_Import_Parser {
    *   Optional created entity ID
    * @param array $additionalFields
    *  Additional fields to be tracked
+   * @param array $createdContactIDs
    *
    * @noinspection PhpDocMissingThrowsInspection
    * @noinspection PhpUnhandledExceptionInspection
    */
-  protected function setImportStatus(int $id, string $status, string $message = '', ?int $entityID = NULL, $additionalFields = []): void {
+  protected function setImportStatus(int $id, string $status, string $message = '', ?int $entityID = NULL, $additionalFields = [], $createdContactIDs = []): void {
+    foreach ($createdContactIDs as $createdContactID) {
+      // Store any created contacts for post_actions like tag or add to group.
+      // These are done on a 'per-batch' status in processPorstActions
+      // so holding in a property is OK.
+      $this->createdContacts[$createdContactID] = $createdContactID;
+    }
     $this->getDataSourceObject()->updateStatus($id, $status, $message, $entityID, $additionalFields);
   }
 
@@ -2018,6 +2025,22 @@ abstract class CRM_Import_Parser {
     //fix for CRM-2687
     CRM_Utils_Date::convertToDefaultDate($params, $dateType, $dateParam);
     $formatted[$dateParam] = CRM_Utils_Date::processDate($params[$dateParam]);
+  }
+
+  /**
+   * Get the value to use for option comparison purposes.
+   *
+   * We do a case-insensitive comparison, also swapping ’ for '
+   * which has at least one known usage (Côte d’Ivoire).
+   *
+   * Note we do this to both sides of the comparison.
+   *
+   * @param int|string|false|null $importedValue
+   *
+   * @return false|int|string|null
+   */
+  protected function getComparisonValue($importedValue) {
+    return is_numeric($importedValue) ? $importedValue : mb_strtolower(str_replace('’', "'", $importedValue));
   }
 
 }
