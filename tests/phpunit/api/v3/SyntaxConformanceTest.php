@@ -1573,52 +1573,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   /**
    * Create two entities and make sure delete action only deletes one!
    *
-   * @dataProvider entities_delete
-   *
-   * limitations include the problem with avoiding loops when creating test objects -
-   * hence FKs only set by createTestObject when required. e.g parent_id on campaign is not being followed through
-   * Currency - only seems to support US
-   * @param $entityName
-   * @throws \PHPUnit\Framework\IncompleteTestError
-   */
-  public function testByID_delete($entityName) {
-    // turn test off for noew
-    $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
-    return;
-
-    if (in_array($entityName, self::toBeSkipped_automock(TRUE))) {
-      // $this->markTestIncomplete("civicrm_api3_{$Entity}_create to be implemented");
-      return;
-    }
-    $startCount = $this->callAPISuccess($entityName, 'getcount', []);
-    $createcount = 2;
-    $baos = $this->getMockableBAOObjects($entityName, $createcount);
-    [$baoObj1, $baoObj2] = $baos;
-
-    // make sure exactly 2 exist
-    $result = $this->callAPISuccess($entityName, 'getcount', [],
-      $createcount + $startCount
-    );
-
-    $this->callAPISuccess($entityName, 'delete', ['id' => $baoObj2->id]);
-    //make sure 1 less exists now
-    $result = $this->callAPISuccess($entityName, 'getcount', [],
-      ($createcount + $startCount) - 1
-    );
-
-    //make sure id #1 exists
-    $result = $this->callAPISuccess($entityName, 'getcount', ['id' => $baoObj1->id],
-      1
-    );
-    //make sure id #2 desn't exist
-    $result = $this->callAPISuccess($entityName, 'getcount', ['id' => $baoObj2->id],
-      0
-    );
-  }
-
-  /**
-   * Create two entities and make sure delete action only deletes one!
-   *
    * @dataProvider entities_getfields
    * @param $entity
    */
