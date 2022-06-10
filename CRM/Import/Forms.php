@@ -597,6 +597,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
     $this->_columnNames = $this->getColumnHeaders();
     $this->_dataValues = array_values($this->getDataRows([], 2));
     $this->assign('columnNames', $this->getColumnHeaders());
+    $this->assign('showColumnNames', $this->getSubmittedValue('skipColumnHeader'));
     $this->assign('highlightedFields', $this->getHighlightedFields());
     $this->assign('columnCount', $this->_columnCount);
     $this->assign('dataValues', $this->_dataValues);
