@@ -167,8 +167,6 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Test overriding a membership but not providing status.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testImportOverriddenMembershipButWithoutStatus(): void {
     $this->individualCreate(['email' => 'anthony_anderson2@civicrm.org']);
@@ -178,7 +176,6 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
     ]));
     $membershipImporter->init();
-    $membershipImporter->_contactType = 'Individual';
 
     $importValues = [
       'anthony_anderson2@civicrm.org',
@@ -186,18 +183,21 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       date('Y-m-d'),
       TRUE,
     ];
+    try {
+      $membershipImporter->validateValues($importValues);
+      $this->fail('validation error expected.');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertContains('Required parameter missing: Status', $e->getMessage());
+      return;
+    }
 
-    $importResponse = $membershipImporter->import($importValues);
-    $this->assertEquals(CRM_Import_Parser::ERROR, $importResponse);
-    $this->assertContains('Required parameter missing: Status', $importValues);
   }
 
   /**
    * Test that the passed in status is respected.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testImportOverriddenMembershipWithStatus() {
+  public function testImportOverriddenMembershipWithStatus(): void {
     $this->individualCreate(['email' => 'anthony_anderson3@civicrm.org']);
     $membershipImporter = $this->createImportObject([
       'email',
@@ -259,7 +259,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'abc',
     ];
     try {
-      $importResponse = $membershipImporter->validateValues($importValues);
+      $membershipImporter->validateValues($importValues);
     }
     catch (CRM_Core_Exception $e) {
       $this->assertEquals('Invalid value for field(s) : Status Override End Date', $e->getMessage());
@@ -272,9 +272,8 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   /**
    * Test that memberships can still be imported if the status is renamed.
    *
-   * @throws \CRM_Core_Exception
    */
-  public function testImportMembershipWithRenamedStatus() {
+  public function testImportMembershipWithRenamedStatus(): void {
     $this->individualCreate(['email' => 'anthony_anderson3@civicrm.org']);
 
     $this->callAPISuccess('MembershipStatus', 'get', [

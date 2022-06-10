@@ -85,6 +85,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    *
    * @param array $values
    *   The array of values belonging to this line.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function validateValues($values): void {
     $params = $this->getMappedRow($values);
@@ -101,6 +103,10 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
     //To check whether start date or join date is provided
     if (empty($params['start_date']) && empty($params['join_date'])) {
       $errors[] = 'Membership Start Date is required to create a memberships.';
+    }
+    //fix for CRM-2219 Update Membership
+    if ($this->isUpdateExisting() && !empty($params['is_override']) && empty($params['status_id'])) {
+      $errors[] = 'Required parameter missing: Status';
     }
     if ($errors) {
       throw new CRM_Core_Exception('Invalid value for field(s) : ' . implode(',', $errors));
@@ -142,20 +148,15 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
 
       //format params to meet api v2 requirements.
       //@todo find a way to test removing this formatting
-      $formatError = $this->membership_format_params($formatValues, $formatted, TRUE);
+      $this->membership_format_params($formatValues, $formatted, TRUE);
 
-      if ($this->isUpdateExisting()) {
+      if (!$this->isUpdateExisting()) {
         $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($formatted,
           NULL,
           'Membership'
         );
       }
       else {
-        //fix for CRM-2219 Update Membership
-        // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
-        if (!empty($formatted['is_override']) && empty($formatted['status_id'])) {
-          throw new CRM_Core_Exception('Required parameter missing: Status', CRM_Import_Parser::ERROR);
-        }
 
         if (!empty($formatValues['membership_id'])) {
           $dao = new CRM_Member_BAO_Membership();
