@@ -162,9 +162,6 @@
       "angular-ui-sortable": {
         "url": "https://github.com/angular-ui/ui-sortable/archive/v0.19.0.zip"
       },
-      "angular-ui-utils": {
-        "url": "https://github.com/angular-ui/ui-utils/archive/v0.1.1.zip"
-      },
       "angular-unsavedChanges": {
         "url": "https://github.com/facultymatt/angular-unsavedChanges/archive/v0.1.1.zip",
         "ignore": [".*", "node_modules", "bower_components", "test", "tests"]
