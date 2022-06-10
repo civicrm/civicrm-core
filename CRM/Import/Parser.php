@@ -1994,11 +1994,18 @@ abstract class CRM_Import_Parser {
    *   Optional created entity ID
    * @param array $additionalFields
    *  Additional fields to be tracked
+   * @param array $createdContactIDs
    *
    * @noinspection PhpDocMissingThrowsInspection
    * @noinspection PhpUnhandledExceptionInspection
    */
-  protected function setImportStatus(int $id, string $status, string $message = '', ?int $entityID = NULL, $additionalFields = []): void {
+  protected function setImportStatus(int $id, string $status, string $message = '', ?int $entityID = NULL, $additionalFields = [], $createdContactIDs = []): void {
+    foreach ($createdContactIDs as $createdContactID) {
+      // Store any created contacts for post_actions like tag or add to group.
+      // These are done on a 'per-batch' status in processPorstActions
+      // so holding in a property is OK.
+      $this->createdContacts[$createdContactID] = $createdContactID;
+    }
     $this->getDataSourceObject()->updateStatus($id, $status, $message, $entityID, $additionalFields);
   }
 

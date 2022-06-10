@@ -194,7 +194,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $extraFields['related_contact_matched']++;
       }
     }
-    $this->setImportStatus($rowNumber, $this->getStatus(CRM_Import_Parser::VALID), $this->getSuccessMessage(), $contactID, $extraFields);
+    $this->setImportStatus($rowNumber, $this->getStatus(CRM_Import_Parser::VALID), $this->getSuccessMessage(), $contactID, $extraFields, [$contactID]);
     return CRM_Import_Parser::VALID;
   }
 
