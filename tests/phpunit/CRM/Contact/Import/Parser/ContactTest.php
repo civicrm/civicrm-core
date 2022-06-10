@@ -1075,6 +1075,12 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    */
   public function importDataProvider(): array {
     return [
+      'individual_unicode.csv' => [
+        'csv' => 'individual_unicode.csv',
+        'mapper' => [['first_name'], ['last_name'], ['url', 1], ['country', 1]],
+        'expected_error' => '',
+        'expected_outcomes' => [CRM_Import_Parser::VALID => 1],
+      ],
       'individual_invalid_sub_type' => [
         'csv' => 'individual_invalid_contact_sub_type.csv',
         'mapper' => [['first_name'], ['last_name'], ['contact_sub_type']],
