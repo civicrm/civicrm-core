@@ -457,6 +457,35 @@ class CRM_Import_Forms extends CRM_Core_Form {
   }
 
   /**
+   * Get the datasource rows ready for csv output.
+   *
+   * @param array $statuses
+   * @param int $limit
+   *
+   * @return array
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function getOutputRows($statuses = [], int $limit = 0) {
+    $statuses = (array) $statuses;
+    return $this->getDataSourceObject()->setLimit($limit)->setStatuses($statuses)
+      ->setSelectFields(array_merge(['_id', '_status_message'], $this->getColumnHeaders()))
+      ->setStatuses($statuses)->getRows();
+  }
+
+  /**
+   * Get the column headers for the output csv.
+   *
+   * @return array
+   */
+  protected function getOutputColumnsHeaders(): array {
+    $headers = $this->getColumnHeaders();
+    array_unshift($headers, ts('Reason'));
+    array_unshift($headers, ts('Line Number'));
+    return $headers;
+  }
+
+  /**
    * Get the number of rows with the specified status.
    *
    * @param array|int $statuses
@@ -492,44 +521,17 @@ class CRM_Import_Forms extends CRM_Core_Form {
 
     $form->getUserJob();
     $writer = Writer::createFromFileObject(new SplTempFileObject());
-    $headers = $form->getColumnHeaders();
-    if ($headers) {
-      array_unshift($headers, ts('Reason'));
-      array_unshift($headers, ts('Line Number'));
-      $writer->insertOne($headers);
-    }
-    $writer->addFormatter(['CRM_Import_Forms', 'reorderOutput']);
+    $headers = $form->getOutputColumnsHeaders();
+    $writer->insertOne($headers);
     // Note this might be more inefficient that iterating the result
     // set & doing insertOne - possibly something to explore later.
-    $writer->insertAll($form->getDataRows($status));
+    $writer->insertAll($form->getOutputRows($status));
 
     CRM_Utils_System::setHttpHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
     CRM_Utils_System::setHttpHeader('Content-Description', 'File Transfer');
     CRM_Utils_System::setHttpHeader('Content-Type', 'text/csv; charset=UTF-8');
     $writer->output($saveFileName);
     CRM_Utils_System::civiExit();
-  }
-
-  /**
-   * When outputting the row as a csv, more the last 2 rows to the start.
-   *
-   * This is because the id and status message fields are at the end. It may make sense
-   * to move them to the start later, when order code cleanup has happened...
-   *
-   * @param array $record
-   */
-  public static function reorderOutput(array $record): array {
-    $rowNumber = array_pop($record);
-    $message = array_pop($record);
-    // Also pop off the status - but we are not going to use this at this stage.
-    array_pop($record);
-    // Related entities
-    array_pop($record);
-    // Entity_id
-    array_pop($record);
-    array_unshift($record, $message);
-    array_unshift($record, $rowNumber);
-    return $record;
   }
 
   /**
@@ -597,7 +599,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
     $this->_columnNames = $this->getColumnHeaders();
     $this->_dataValues = array_values($this->getDataRows([], 2));
     $this->assign('columnNames', $this->getColumnHeaders());
-    $this->assign('showColumnNames', $this->getSubmittedValue('skipColumnHeader'));
+    $this->assign('showColumnNames', $this->getSubmittedValue('skipColumnHeader') || $this->getSubmittedValue('dataSource') !== 'CRM_Import_DataSource');
     $this->assign('highlightedFields', $this->getHighlightedFields());
     $this->assign('columnCount', $this->_columnCount);
     $this->assign('dataValues', $this->_dataValues);

@@ -124,7 +124,6 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     }
 
     $firstrow = fgetcsv($fd, 0, $fieldSeparator);
-    $result['column_headers'] = array_fill(0, count($firstrow), '');
     // create the column names from the CSV header or as col_0, col_1, etc.
     if ($headers) {
       //need to get original headers.
@@ -169,8 +168,9 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     else {
       $columns = [];
       foreach ($firstrow as $i => $_) {
-        $columns[] = "col_$i";
+        $columns[] = "column_$i";
       }
+      $result['column_headers'] = $columns;
     }
 
     $table = CRM_Utils_SQL_TempTable::build()->setDurable();

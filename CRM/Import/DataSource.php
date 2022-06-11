@@ -68,6 +68,30 @@ abstract class CRM_Import_DataSource {
   private $statuses = [];
 
   /**
+   * Fields to select.
+   *
+   * @var array
+   */
+  private $selectFields;
+
+  /**
+   * @return array|null
+   */
+  public function getSelectFields(): ?array {
+    return $this->selectFields;
+  }
+
+  /**
+   * @param array $selectFields
+   *
+   * @return CRM_Import_DataSource
+   */
+  public function setSelectFields(array $selectFields): CRM_Import_DataSource {
+    $this->selectFields = $selectFields;
+    return $this;
+  }
+
+  /**
    * Current row.
    *
    * @var array
@@ -537,11 +561,18 @@ abstract class CRM_Import_DataSource {
    * @throws \CRM_Core_Exception
    */
   private function instantiateQueryObject(): void {
-    $query = 'SELECT * FROM ' . $this->getTableName() . ' ' . $this->getStatusClause();
+    $query = 'SELECT ' . $this->getSelectClause() . ' FROM ' . $this->getTableName() . ' ' . $this->getStatusClause();
     if ($this->limit) {
       $query .= ' LIMIT ' . $this->limit . ($this->offset ? (' OFFSET ' . $this->offset) : NULL);
     }
     $this->queryResultObject = CRM_Core_DAO::executeQuery($query);
+  }
+
+  /**
+   * @return string
+   */
+  private function getSelectClause(): string {
+    return $this->getSelectFields() ? implode(', ', $this->getSelectFields()) : '*';
   }
 
   /**
