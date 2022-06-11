@@ -1785,6 +1785,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   private function tryToResolveStateProvince(string $stateProvince, $countryID) {
+    if ($stateProvince === 'invalid_import_value') {
+      return $stateProvince;
+    }
     // Try to disambiguate since we likely have the country now.
     $possibleStates = $this->ambiguousOptions['state_province_id'][mb_strtolower($stateProvince)];
     if ($countryID) {

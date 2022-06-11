@@ -369,6 +369,7 @@ class CRM_Utils_Date {
 
         $hour24 = (int) substr($dateString, 11, 2);
         $minute = (int) substr($dateString, 14, 2);
+        $second = (int) substr($dateString, 16, 2);
       }
       else {
         $year = (int) substr($dateString, 0, 4);
@@ -377,6 +378,7 @@ class CRM_Utils_Date {
 
         $hour24 = (int) substr($dateString, 8, 2);
         $minute = (int) substr($dateString, 10, 2);
+        $second = (int) substr($dateString, 12, 2);
       }
 
       if ($day % 10 == 1 and $day != 11) {
@@ -430,13 +432,12 @@ class CRM_Utils_Date {
         '%P' => $type,
         '%A' => $type,
         '%Y' => $year,
+        '%s' => str_pad($second, 2, 0, STR_PAD_LEFT),
       ];
 
       return strtr($format, $date);
     }
-    else {
-      return '';
-    }
+    return '';
   }
 
   /**
@@ -2101,15 +2102,23 @@ class CRM_Utils_Date {
   }
 
   /**
+   * Date formatting for imports where date format is specified.
+   *
+   * Note this is used for imports (only) because the importer can
+   * specify the format.
+   *
+   * Tests are in CRM_Utils_DateTest::testFormatDate
+   *
    * @param $date
+   *   Date string as entered.
    * @param $dateType
+   *   One of the constants like CRM_Core_Form_Date::DATE_yyyy_mm_dd.
    *
    * @return null|string
    */
   public static function formatDate($date, $dateType) {
-    $formattedDate = NULL;
     if (empty($date)) {
-      return $formattedDate;
+      return NULL;
     }
 
     // 1. first convert date to default format.
@@ -2122,32 +2131,28 @@ class CRM_Utils_Date {
 
     if (CRM_Utils_Date::convertToDefaultDate($dateParams, $dateType, $dateKey)) {
       $dateVal = $dateParams[$dateKey];
-      $ruleName = 'date';
       if ($dateType == 1) {
         $matches = [];
-        if (preg_match("/(\s(([01]\d)|[2][0-3]):([0-5]\d):?[0-5]?\d?)$/", $date, $matches)) {
-          $ruleName = 'dateTime';
+        // The seconds part of this regex is not quite right - but it does succeed
+        // in clarifying whether there is a time component or not - which is all it is meant
+        // to do.
+        if (preg_match('/(\s(([01]\d)|[2][0-3]):([0-5]\d):?[0-5]?\d?)$/', $date, $matches)) {
           if (strpos($date, '-') !== FALSE) {
             $dateVal .= array_shift($matches);
           }
+          if (!CRM_Utils_Rule::dateTime($dateVal)) {
+            return NULL;
+          }
+          $dateVal = CRM_Utils_Date::customFormat(preg_replace("/(:|\s)?/", '', $dateVal), '%Y%m%d%H%i%s');
+          return $dateVal;
         }
       }
 
       // validate date.
-      $valid = CRM_Utils_Rule::$ruleName($dateVal);
-
-      if ($valid) {
-        // format date and time to default.
-        if ($ruleName == 'dateTime') {
-          $dateVal = CRM_Utils_Date::customFormat(preg_replace("/(:|\s)?/", "", $dateVal), '%Y%m%d%H%i');
-          // hack to add seconds
-          $dateVal .= '00';
-        }
-        $formattedDate = $dateVal;
-      }
+      return CRM_Utils_Rule::date($dateVal) ? $dateVal : NULL;
     }
 
-    return $formattedDate;
+    return NULL;
   }
 
   /**

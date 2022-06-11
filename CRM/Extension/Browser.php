@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use GuzzleHttp\Exception\GuzzleException;
+
 /**
  * This class glues together the various parts of the extension
  * system.
@@ -250,7 +252,15 @@ class CRM_Extension_Browser {
     $url = $this->getRepositoryUrl() . $this->indexPath;
 
     $client = $this->getGuzzleClient();
-    $response = $client->request('GET', $url, ['sink' => $filename, 'timeout' => \Civi::settings()->get('http_timeout')]);
+    try {
+      $response = $client->request('GET', $url, [
+        'sink' => $filename,
+        'timeout' => \Civi::settings()->get('http_timeout'),
+      ]);
+    }
+    catch (GuzzleException $e) {
+      throw new CRM_Extension_Exception(ts('The CiviCRM public extensions directory at %1 could not be contacted - please check your webserver can make external HTTP requests', [1 => $this->getRepositoryUrl()]), 'connection_error');
+    }
     restore_error_handler();
 
     if ($response->getStatusCode() !== 200) {
