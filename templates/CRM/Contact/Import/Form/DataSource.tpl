@@ -80,7 +80,9 @@
       {if $form.disableUSPS}
         <tr class="crm-import-datasource-form-block-disableUSPS">
           <td class="label"></td>
-          <td>{$form.disableUSPS.html} <label for="disableUSPS">{$form.disableUSPS.label}</label></td>
+          <td>{$form.disableUSPS.html} <label for="disableUSPS">{$form.disableUSPS.label}</label><br />
+             &nbsp;&nbsp;&nbsp; <span class="description">{ts}Uncheck at your own risk as batch processing violates USPS API TOS.{/ts}</span>
+          </td>
         </tr>
       {/if}
     </table>
