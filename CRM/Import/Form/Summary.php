@@ -35,19 +35,6 @@ abstract class CRM_Import_Form_Summary extends CRM_Import_Forms {
   }
 
   /**
-   * Build the form object.
-   */
-  public function buildQuickForm() {
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Done'),
-          'isDefault' => TRUE,
-        ),
-    ));
-  }
-
-  /**
    * Return a descriptive name for the page, used in wizard header.
    *
    * @return string
