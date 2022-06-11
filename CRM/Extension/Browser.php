@@ -35,11 +35,8 @@ class CRM_Extension_Browser {
   const SINGLE_FILE_PATH = '/single';
 
   /**
-   * The name of the single JSON extension cache file.
+   * Timeout for when the connection or the server is slow
    */
-  const CACHE_JSON_FILE = 'extensions.json';
-
-  // timeout for when the connection or the server is slow
   const CHECK_TIMEOUT = 5;
 
   /**
@@ -66,16 +63,10 @@ class CRM_Extension_Browser {
    *   URL of the remote repository.
    * @param string $indexPath
    *   Relative path of the 'index' file within the repository.
-   * @param string $cacheDir
-   *   Local path in which to cache files.
    */
-  public function __construct($repoUrl, $indexPath, $cacheDir) {
+  public function __construct($repoUrl, $indexPath) {
     $this->repoUrl = $repoUrl;
-    $this->cacheDir = $cacheDir;
     $this->indexPath = empty($indexPath) ? self::SINGLE_FILE_PATH : $indexPath;
-    if ($cacheDir && !file_exists($cacheDir) && is_dir(dirname($cacheDir)) && is_writable(dirname($cacheDir))) {
-      CRM_Utils_File::createDir($cacheDir, FALSE);
-    }
   }
 
   /**
@@ -101,10 +92,7 @@ class CRM_Extension_Browser {
    * Refresh the cache of remotely-available extensions.
    */
   public function refresh() {
-    $file = $this->getTsPath();
-    if (file_exists($file)) {
-      unlink($file);
-    }
+    \Civi::cache('extension_browser')->flush();
   }
 
   /**
@@ -118,22 +106,10 @@ class CRM_Extension_Browser {
       return [];
     }
 
+    // We used to check for the cache filesystem permissions, but it is now stored in DB
+    // If no new requirements have come up, consider removing this function after CiviCRM 5.60.
+    // The tests may need to be updated as well (tests/phpunit/CRM/Extension/BrowserTest.php).
     $errors = [];
-
-    if (!$this->cacheDir || !is_dir($this->cacheDir) || !is_writable($this->cacheDir)) {
-      $civicrmDestination = urlencode(CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1'));
-      $url = CRM_Utils_System::url('civicrm/admin/setting/path', "reset=1&civicrmDestination=${civicrmDestination}");
-      $errors[] = array(
-        'title' => ts('Directory Unwritable'),
-        'message' => ts('Your extensions cache directory (%1) is not web server writable. Please go to the <a href="%2">path setting page</a> and correct it.<br/>',
-          array(
-            1 => $this->cacheDir,
-            2 => $url,
-          )
-        ),
-      );
-    }
-
     return $errors;
   }
 
@@ -149,8 +125,8 @@ class CRM_Extension_Browser {
     }
 
     $exts = [];
-
     $remote = $this->_discoverRemote();
+
     if (is_array($remote)) {
       foreach ($remote as $dc => $e) {
         $exts[$e->key] = $e;
@@ -184,31 +160,12 @@ class CRM_Extension_Browser {
    * @throws CRM_Extension_Exception_ParseException
    */
   private function _discoverRemote() {
-    $tsPath = $this->getTsPath();
-    $timestamp = FALSE;
-
-    if (file_exists($tsPath)) {
-      $timestamp = file_get_contents($tsPath);
-    }
-
-    // 3 minutes ago for now
-    $outdated = (int) $timestamp < (time() - 180) ? TRUE : FALSE;
-
-    if (!$timestamp || $outdated) {
-      $remotes = json_decode($this->grabRemoteJson(), TRUE);
-    }
-    else {
-      $remotes = json_decode($this->grabCachedJson(), TRUE);
-    }
-
+    $remotes = json_decode($this->grabCachedJson(), TRUE);
     $this->_remotesDiscovered = [];
+
     foreach ((array) $remotes as $id => $xml) {
       $ext = CRM_Extension_Info::loadFromString($xml);
       $this->_remotesDiscovered[] = $ext;
-    }
-
-    if (file_exists(dirname($tsPath))) {
-      file_put_contents($tsPath, (string) time());
     }
 
     return $this->_remotesDiscovered;
@@ -221,12 +178,9 @@ class CRM_Extension_Browser {
    * @return string
    */
   private function grabCachedJson() {
-    $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE . '.' . md5($this->getRepositoryUrl());
-    $json = NULL;
-    if (file_exists($filename)) {
-      $json = file_get_contents($filename);
-    }
-    if (empty($json)) {
+    $cacheKey = $this->getCacheKey();
+    $json = \Civi::cache('extension_browser')->get($cacheKey);
+    if ($json === NULL) {
       $json = $this->grabRemoteJson();
     }
     return $json;
@@ -248,13 +202,10 @@ class CRM_Extension_Browser {
       return '';
     }
 
-    $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE . '.' . md5($this->getRepositoryUrl());
     $url = $this->getRepositoryUrl() . $this->indexPath;
-
     $client = $this->getGuzzleClient();
     try {
       $response = $client->request('GET', $url, [
-        'sink' => $filename,
         'timeout' => \Civi::settings()->get('http_timeout'),
       ]);
     }
@@ -267,15 +218,18 @@ class CRM_Extension_Browser {
       throw new CRM_Extension_Exception(ts('The CiviCRM public extensions directory at %1 could not be contacted - please check your webserver can make external HTTP requests', [1 => $this->getRepositoryUrl()]), 'connection_error');
     }
 
-    // Don't call grabCachedJson here, that would risk infinite recursion
-    return file_get_contents($filename);
+    $json = $response->getBody()->getContents();
+    $cacheKey = $this->getCacheKey();
+    \Civi::cache('extension_browser')->set($cacheKey, $json);
+    return $json;
   }
 
   /**
-   * @return string
+   * Returns a cache key based on the repository URL, which can be updated
+   * by admins in civicrm.settings.php or passed as a command-line option to cv.
    */
-  private function getTsPath() {
-    return $this->cacheDir . DIRECTORY_SEPARATOR . 'timestamp.txt';
+  private function getCacheKey() {
+    return 'extdir_' . md5($this->getRepositoryUrl());
   }
 
   /**
