@@ -160,7 +160,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   public function getMappedRow(array $values): array {
     $params = [];
     foreach ($this->getFieldMappings() as $i => $mappedField) {
-      if ($mappedField['name'] === 'do_not_import' || $mappedField['name'] === NULL) {
+      if ($mappedField['name'] === 'do_not_import' || !$mappedField['name']) {
         continue;
       }
       if (!empty($mappedField['soft_credit_match_field'])) {
@@ -223,6 +223,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
             'softCredit' => TRUE,
             'headerPattern' => '/Soft Credit/i',
             'options' => FALSE,
+            'type' => CRM_Utils_Type::T_STRING,
           ],
         ]
       );
@@ -925,6 +926,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   public function getMappedFieldLabel(array $mappedField): string {
     if (empty($this->importableFieldsMetadata)) {
       $this->setFieldMetadata();
+    }
+    if ($mappedField['name'] === '') {
+      return '';
     }
     $title = [];
     $title[] = $this->getFieldMetadata($mappedField['name'])['title'];
