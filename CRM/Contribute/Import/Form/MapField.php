@@ -143,6 +143,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     $dataPatterns = $this->getDataPatterns();
     $mapperKeysValues = $this->getSubmittedValue('mapper');
     $columnHeaders = $this->getColumnHeaders();
+    $fieldMappings = $this->getFieldMappings();
 
     /* Initialize all field usages to false */
     foreach ($mapperKeys as $key) {
@@ -174,12 +175,13 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
       $jsSet = FALSE;
       if ($this->getSubmittedValue('savedMapping')) {
+        // $mappingContactType is not really a contact type - the data has been mangled
+        // into that field - see https://lab.civicrm.org/dev/core/-/issues/654
         [$mappingName, $mappingContactType] = CRM_Core_BAO_Mapping::getMappingFields($savedMappingID);
-
-        $mappingName = $mappingName[1];
+        $fieldMapping = $fieldMappings[$i] ?? NULL;
         $mappingContactType = $mappingContactType[1];
-        if (isset($mappingName[$i])) {
-          if ($mappingName[$i] != ts('do_not_import')) {
+        if (isset($fieldMappings[$i])) {
+          if ($fieldMapping['name'] !== ts('do_not_import')) {
             $softField = $mappingContactType[$i] ?? '';
 
             if (!$softField) {
@@ -189,7 +191,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
             $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
             $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
             $defaults["mapper[$i]"] = [
-              $mappingName[$i],
+              $fieldMapping['name'],
               $softField,
               // Since the soft credit type id is not stored we can't load it here.
               '',
@@ -253,22 +255,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
     $js .= "</script>\n";
     $this->assign('initHideBoxes', $js);
-
-    //set warning if mismatch in more than
-    if (isset($mappingName)) {
-      if (($this->_columnCount != count($mappingName))) {
-        $warning++;
-      }
-    }
-    if ($warning != 0 && $this->getSubmittedValue('savedMapping')) {
-      $session = CRM_Core_Session::singleton();
-      $session->setStatus(ts('The data columns in this import file appear to be different from the saved mapping. Please verify that you have selected the correct saved mapping before continuing.'));
-    }
-    else {
-      $session = CRM_Core_Session::singleton();
-      $session->setStatus(NULL);
-    }
-
     $this->setDefaults($defaults);
 
     $this->addFormButtons();
