@@ -57,4 +57,22 @@ class CRM_Contribute_Form_UpdateSubscriptionTest extends CiviUnitTestCase {
     ];
   }
 
+  /**
+   * Test the Additional Details pane loads for recurring contributions.
+   */
+  public function testAdditionalDetails() {
+    $this->addContribution();
+    $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($this->getContributionRecurID());
+    $_GET['q'] = $_REQUEST['q'] = 'civicrm/contact/view/contribution';
+    $_GET['snippet'] = $_REQUEST['snippet'] = 4;
+    $_GET['id'] = $_REQUEST['id'] = $templateContribution['id'];
+    $_GET['formType'] = $_REQUEST['formType'] = 'AdditionalDetail';
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', []);
+    $form->buildForm();
+    unset($_GET['q'], $_REQUEST['q']);
+    unset($_GET['snippet'], $_REQUEST['snippet']);
+    unset($_GET['id'], $_REQUEST['id']);
+    unset($_GET['formType'], $_REQUEST['formType']);
+  }
+
 }
