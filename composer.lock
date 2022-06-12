@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4e838bb74d3f8a86df51dd86b6d58c2a",
+    "content-hash": "99c1c2664bd882eb657072896ba9fbe6",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -672,49 +672,6 @@
                 "source": "https://github.com/dompdf/dompdf/tree/v1.2.1"
             },
             "time": "2022-03-24T12:57:42+00:00"
-        },
-        {
-            "name": "electrolinux/phpquery",
-            "version": "0.9.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/electrolinux/phpquery.git",
-                "reference": "6cb8afcfe8cd4ce45f2f8c27d561383037c27a3a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/electrolinux/phpquery/zipball/6cb8afcfe8cd4ce45f2f8c27d561383037c27a3a",
-                "reference": "6cb8afcfe8cd4ce45f2f8c27d561383037c27a3a",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "phpQuery/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Tobiasz Cudnik",
-                    "email": "tobiasz.cudnik@gmail.com",
-                    "homepage": "https://github.com/TobiaszCudnik",
-                    "role": "Developer"
-                },
-                {
-                    "name": "didier Belot",
-                    "role": "Packager"
-                }
-            ],
-            "description": "phpQuery is a server-side, chainable, CSS3 selector driven Document Object Model (DOM) API based on jQuery JavaScript Library",
-            "homepage": "http://code.google.com/p/phpquery/",
-            "support": {
-                "source": "https://github.com/electrolinux/phpquery/tree/0.9.6"
-            },
-            "time": "2013-03-21T12:39:33+00:00"
         },
         {
             "name": "ezyang/htmlpurifier",
@@ -3335,6 +3292,53 @@
                 "source": "https://github.com/ralouphie/getallheaders/tree/develop"
             },
             "time": "2019-03-08T08:55:37+00:00"
+        },
+        {
+            "name": "rubobaquero/phpquery",
+            "version": "0.9.15",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rubobaquero/phpquery.git",
+                "reference": "d2c3c1bb8a9d48dd0f1230bda2413ce38108b5fe"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rubobaquero/phpquery/zipball/d2c3c1bb8a9d48dd0f1230bda2413ce38108b5fe",
+                "reference": "d2c3c1bb8a9d48dd0f1230bda2413ce38108b5fe",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "phpQuery/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "didier Belot",
+                    "homepage": "https://github.com/electrolinux/phpquery",
+                    "role": "Packager, maintainer"
+                },
+                {
+                    "name": "Tobiasz Cudnik",
+                    "email": "tobiasz.cudnik@gmail.com",
+                    "homepage": "https://github.com/TobiaszCudnik",
+                    "role": "Developer"
+                }
+            ],
+            "description": "phpQuery is a server-side, chainable, CSS3 selector driven Document Object Model (DOM) API based on jQuery JavaScript Library",
+            "homepage": "http://code.google.com/p/phpquery/",
+            "support": {
+                "source": "https://github.com/rubobaquero/phpquery/tree/0.9.15"
+            },
+            "time": "2022-05-03T12:31:11+00:00"
         },
         {
             "name": "sabberworm/php-css-parser",
