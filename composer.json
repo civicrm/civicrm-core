@@ -51,7 +51,7 @@
     "cache/integration-tests": "~0.17.0",
     "dompdf/dompdf" : "~1.2.1",
     "firebase/php-jwt": ">=3 <6",
-    "electrolinux/phpquery": "^0.9.6",
+    "rubobaquero/phpquery": "^0.9.15",
     "symfony/config": "~3.0 || ~4.4",
     "symfony/polyfill-iconv": "~1.0",
     "symfony/dependency-injection": "~3.0 || ~4.4",
@@ -277,9 +277,6 @@
     "patches": {
       "adrienrn/php-mimetyper": {
         "Update gitignore to ensure that sites that manage via git don't miss out on the important db.json file": "https://patch-diff.githubusercontent.com/raw/adrienrn/php-mimetyper/pull/15.patch"
-      },
-      "electrolinux/phpquery": {
-        "PHP7.4 Fix for array access using {} instead of []": "https://raw.githubusercontent.com/civicrm/civicrm-core/fe45bdfc4f3e3d3deb27e3d853cdbc7f616620a9/tools/scripts/composer/patches/php74_array_access_fix_phpquery.patch"
       },
       "pear/db": {
         "Apply CiviCRM Customisations for the pear:db package": "https://raw.githubusercontent.com/civicrm/civicrm-core/2ad420c394/tools/scripts/composer/pear_db_civicrm_changes.patch"
