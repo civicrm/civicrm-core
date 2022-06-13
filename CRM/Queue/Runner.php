@@ -184,10 +184,16 @@ class CRM_Queue_Runner {
   public function runAllViaWeb() {
     $_SESSION['queueRunners'][$this->qrid] = serialize($this);
     $url = CRM_Utils_System::url($this->pathPrefix . '/runner', 'reset=1&qrid=' . urlencode($this->qrid));
-    // If this was persistent/registered queue, ensure that no one else tries to execute it.
-    CRM_Core_DAO::executeQuery('UPDATE civicrm_queue SET status = NULL WHERE name = %1', [
-      1 => [$this->queue->getName(), 'String'],
-    ]);
+    try {
+      // If this was persistent/registered queue, ensure that no one else tries to execute it.
+      CRM_Core_DAO::executeQuery('UPDATE civicrm_queue SET status = NULL WHERE name = %1', [
+        1 => [$this->queue->getName(), 'String'],
+      ]);
+    }
+    catch (PEAR_Exception $e) {
+      // For sites being upgraded the field may not exist as yet.
+      // https://lab.civicrm.org/dev/core/-/issues/3653
+    }
     CRM_Utils_System::redirect($url);
   }
 
