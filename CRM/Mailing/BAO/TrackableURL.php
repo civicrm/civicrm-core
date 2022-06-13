@@ -66,14 +66,16 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
         $hrefExists = TRUE;
       }
 
-      $tracker->url = $url;
-      $tracker->mailing_id = $mailing_id;
+      $params = ['url' => $url, 'mailing_id' => $mailing_id];
+      CRM_Utils_Hook::pre('create', 'TrackableURL', NULL, $params);
+      $tracker->copyValues($params);
 
       if (!$tracker->find(TRUE)) {
         $tracker->save();
       }
-      $id = $tracker->id;
 
+      $id = $tracker->id;
+      CRM_Utils_Hook::post('create', 'TrackableURL', $id, $tracker);
       $redirect = CRM_Utils_System::externUrl('extern/url', "u=$id");
       $urlCache[$mailing_id . $url] = $redirect;
     }
