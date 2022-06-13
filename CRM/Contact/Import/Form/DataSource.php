@@ -164,6 +164,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Form_DataSource {
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
       'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
       'fieldSeparator' => CRM_Core_Config::singleton()->fieldSeparator,
+      'disableUSPS' => TRUE,
     ];
 
     if ($this->get('loadedMapping')) {
