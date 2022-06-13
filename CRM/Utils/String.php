@@ -692,18 +692,22 @@ class CRM_Utils_String {
    * @param string $string
    *   E.g. "view all contacts". Syntax: "[prefix:]name".
    * @param string|null $defaultPrefix
+   * @param string $validPrefixPattern
+   *   A regular expression used to determine if a prefix is valid.
+   *   To wit: Prefixes MUST be strictly alphanumeric.
    *
    * @return array
    *   (0 => string|NULL $prefix, 1 => string $value)
    */
-  public static function parsePrefix($delim, $string, $defaultPrefix = NULL) {
+  public static function parsePrefix($delim, $string, $defaultPrefix = NULL, $validPrefixPattern = '/^[A-Za-z0-9]+$/') {
     $pos = strpos($string, $delim);
     if ($pos === FALSE) {
       return [$defaultPrefix, $string];
     }
-    else {
-      return [substr($string, 0, $pos), substr($string, 1 + $pos)];
-    }
+
+    $lhs = substr($string, 0, $pos);
+    $rhs = substr($string, 1 + $pos);
+    return preg_match($validPrefixPattern, $lhs) ? [$lhs, $rhs] : [$defaultPrefix, $string];
   }
 
   /**
