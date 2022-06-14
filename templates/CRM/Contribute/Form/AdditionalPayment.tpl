@@ -23,6 +23,11 @@
       {icon icon="fa-info-circle"}{/icon}{ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
     </div>
   {/if}
+  {if $paymentType EQ 'refund'}
+    <div class="messages status no-popup">
+      {icon icon="fa-info-circle"}{/icon} {ts}Use this form to record a manual refund. If a payment processor was used to make payment it will not be notified.{/ts}
+    </div>
+  {/if}
   {if $newCredit AND $contributionMode EQ null}
     {if $contactId}
       {capture assign=ccModeLink}{crmURL p='civicrm/payment/add' q="reset=1&action=add&cid=`$contactId`&id=`$id`&component=`$component`&mode=live"}{/capture}
