@@ -26,6 +26,42 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
   public $submitOnce = TRUE;
 
   /**
+   * Validate that required fields are present.
+   *
+   * @param array $importKeys
+   *
+   * return string|null
+   */
+  protected static function validateRequiredFields(array $importKeys): ?string {
+    $fieldMessage = NULL;
+    if (in_array('activity_id', $importKeys, TRUE)) {
+      return NULL;
+    }
+    $requiredFields = [
+      'target_contact_id' => ts('Contact ID'),
+      'activity_date_time' => ts('Activity Date'),
+      'activity_subject' => ts('Activity Subject'),
+      'activity_type_id' => ts('Activity Type ID'),
+    ];
+
+    $contactFieldsBelowWeightMessage = self::validateRequiredContactMatchFields('Individual', $importKeys);
+    foreach ($requiredFields as $field => $title) {
+      if (!in_array($field, $importKeys)) {
+        if ($field === 'target_contact_id') {
+          if (!$contactFieldsBelowWeightMessage || in_array('external_identifier', $importKeys)) {
+            continue;
+          }
+          $fieldMessage .= ts('Missing required contact matching fields.')
+            . $contactFieldsBelowWeightMessage
+            . '<br />';
+        }
+        $fieldMessage .= ts('Missing required field: %1', [1 => $title]) . '<br />';
+      }
+    }
+    return $fieldMessage;
+  }
+
+  /**
    * Build the form object.
    *
    * @throws \CiviCRM_API3_Exception
@@ -121,49 +157,14 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
     // define so we avoid notices below
     $errors['_qf_default'] = '';
 
-    $fieldMessage = NULL;
     if (!array_key_exists('savedMapping', $fields)) {
       $importKeys = [];
       foreach ($fields['mapper'] as $mapperPart) {
         $importKeys[] = $mapperPart[0];
       }
-      // FIXME: should use the schema titles, not redeclare them
-      $requiredFields = [
-        'target_contact_id' => ts('Contact ID'),
-        'activity_date_time' => ts('Activity Date'),
-        'activity_subject' => ts('Activity Subject'),
-        'activity_type_id' => ts('Activity Type ID'),
-      ];
-
-      $contactFieldsBelowWeightMessage = self::validateRequiredContactMatchFields('Individual', $importKeys);
-      foreach ($requiredFields as $field => $title) {
-        if (!in_array($field, $importKeys)) {
-          if ($field === 'target_contact_id') {
-            if (!$contactFieldsBelowWeightMessage || in_array('external_identifier', $importKeys)) {
-              continue;
-            }
-            else {
-              $errors['_qf_default'] .= ts('Missing required contact matching fields.')
-                . $contactFieldsBelowWeightMessage
-                . '<br />';
-            }
-          }
-          elseif ($field === 'activity_type_id') {
-            if (in_array('activity_label', $importKeys)) {
-              continue;
-            }
-            else {
-              $errors['_qf_default'] .= ts('Missing required field: Provide %1 or %2',
-                  [
-                    1 => $title,
-                    2 => 'Activity Type Label',
-                  ]) . '<br />';
-            }
-          }
-          else {
-            $errors['_qf_default'] .= ts('Missing required field: %1', [1 => $title]) . '<br />';
-          }
-        }
+      $missingFields = self::validateRequiredFields($importKeys);
+      if ($missingFields) {
+        $errors['_qf_default'] = $missingFields;
       }
     }
 
