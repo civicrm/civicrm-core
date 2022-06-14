@@ -239,7 +239,7 @@
     };
   });
 
-  crmCaseType.controller('CaseTypeCtrl', function($scope, crmApi, apiCalls, crmUiHelp) {
+  crmCaseType.controller('CaseTypeCtrl', function($scope, $timeout, crmApi, apiCalls, crmUiHelp) {
     var defaultAssigneeDefaultValue, ts;
 
     (function init () {
@@ -254,6 +254,10 @@
       initCaseType();
       initCaseTypeDefinition();
       initSelectedStatuses();
+
+      $timeout(function() {
+        $('form[name=editCaseTypeForm] .crmCaseType-acttab').tabs({show: true, hide: true});
+      });
     })();
 
     /// Stores the api calls results in the $scope object

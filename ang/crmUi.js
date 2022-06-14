@@ -628,7 +628,12 @@
             }
           }
 
-          init();
+          // If using ngOptions, wait for them to load
+          if (attrs.ngOptions) {
+            $timeout(init);
+          } else {
+            init();
+          }
         }
       };
     })
@@ -759,14 +764,22 @@
         templateUrl: '~/crmUi/tabset.html',
         transclude: true,
         controllerAs: 'crmUiTabSetCtrl',
-        controller: function($scope, $parse) {
-          var tabs = $scope.tabs = []; // array<$scope>
+        controller: function($scope, $element, $timeout) {
+          var init;
+          $scope.tabs = [];
           this.add = function(tab) {
             if (!tab.id) throw "Tab is missing 'id'";
-            tabs.push(tab);
+            $scope.tabs.push(tab);
+
+            // Init jQuery.tabs() once all tabs have been added
+            if (init) {
+              $timeout.cancel(init);
+            }
+            init = $timeout(function() {
+              $element.find('.crm-tabset').tabs($scope.tabSetOptions);
+            });
           };
-        },
-        link: function (scope, element, attrs) {}
+        }
       };
     })
 

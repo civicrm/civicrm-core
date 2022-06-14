@@ -8,8 +8,7 @@ Required vars: mailing, crmMailingConst
       <select
         crm-ui-id="subform.header_id"
         name="header_id"
-        ui-jq="select2"
-        ui-options="{dropdownAutoWidth : true, allowClear: true}"
+        crm-ui-select="{dropdownAutoWidth : true, allowClear: true}"
         ng-change="checkTokens(mailing, '*')"
         ng-model="mailing.header_id"
         ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'Header'} | orderBy:'name'">
@@ -20,8 +19,7 @@ Required vars: mailing, crmMailingConst
       <select
         crm-ui-id="subform.footer_id"
         name="footer_id"
-        ui-jq="select2"
-        ui-options="{dropdownAutoWidth : true, allowClear: true}"
+        crm-ui-select="{dropdownAutoWidth : true, allowClear: true}"
         ng-change="checkTokens(mailing, '*')"
         ng-model="mailing.footer_id"
         ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'Footer'} | orderBy:'name'">
