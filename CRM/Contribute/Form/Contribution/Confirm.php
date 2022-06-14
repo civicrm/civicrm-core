@@ -1418,12 +1418,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $membershipParams
    * @param int $contactID
    * @param array $customFieldsFormatted
-   * @param array $fieldTypes
    * @param array $premiumParams
    * @param array $membershipLineItems
    *   Line items specifically relating to memberships.
    */
-  protected function processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams,
+  protected function processMembership($membershipParams, $contactID, $customFieldsFormatted, $premiumParams,
                                 $membershipLineItems): void {
 
     $membershipTypeIDs = (array) $membershipParams['selectMembership'];
@@ -1454,7 +1453,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $membershipParams['contribution_source'] = $this->_params['membership_source'];
     }
 
-    $this->postProcessMembership($membershipParams, $contactID, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipType, $membershipTypeIDs, $isPaidMembership, $this->_membershipId, $isProcessSeparateMembershipTransaction, $financialTypeID,
+    $this->postProcessMembership($membershipParams, $contactID, $premiumParams, $customFieldsFormatted, $membershipType, $membershipTypeIDs, $isPaidMembership, $this->_membershipId, $isProcessSeparateMembershipTransaction, $financialTypeID,
       $membershipLineItems);
 
     $this->assign('membership_assign', TRUE);
@@ -1471,7 +1470,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param array $premiumParams
    * @param null $customFieldsFormatted
-   * @param null $includeFieldTypes
    *
    * @param array $membershipDetails
    *
@@ -1492,7 +1490,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   protected function postProcessMembership(
     $membershipParams, $contactID, $premiumParams,
-    $customFieldsFormatted, $includeFieldTypes, $membershipDetails, $membershipTypeIDs, $isPaidMembership, $membershipID,
+    $customFieldsFormatted, $membershipDetails, $membershipTypeIDs, $isPaidMembership, $membershipID,
     $isProcessSeparateMembershipTransaction, $financialTypeID, $unprocessedLineItems) {
     // Assign $this to $form while we eliminate it.
     $form = $this;
@@ -1781,7 +1779,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
       $emailValues,
       $isTest, FALSE,
-      $includeFieldTypes
+      ['Contact', 'Organization', 'Membership']
     );
   }
 
@@ -2523,7 +2521,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
     }
 
-    $customFieldsFormatted = $fieldTypes = [];
+    $customFieldsFormatted = [];
     if (!empty($membershipParams['onbehalf']) &&
       is_array($membershipParams['onbehalf'])
     ) {
@@ -2540,7 +2538,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           );
         }
       }
-      $fieldTypes = ['Contact', 'Organization', 'Membership'];
     }
 
     $membershipParams = $this->getMembershipParamsFromPriceSet($membershipParams);
@@ -2559,7 +2556,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
       }
       try {
-        $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams, $membershipLineItems);
+        $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $premiumParams, $membershipLineItems);
       }
       catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
         CRM_Core_Session::singleton()->setStatus($e->getMessage());
