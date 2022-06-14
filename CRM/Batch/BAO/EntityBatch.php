@@ -26,6 +26,7 @@ class CRM_Batch_BAO_EntityBatch extends CRM_Batch_DAO_EntityBatch {
     // Only write the EntityBatch record if the financial trxn and batch match on currency and payment instrument.
     $batchId = $params['batch_id'] ?? NULL;
     $entityId = $params['entity_id'] ?? NULL;
+    $entityTable = $params['entity_table'] ?? 'civicrm_financial_trxn';
     // Not having a batch ID and entity ID is only acceptable on an update.
     if (!$batchId) {
       $existingEntityBatch = \Civi\Api4\EntityBatch::get(FALSE)
@@ -36,7 +37,7 @@ class CRM_Batch_BAO_EntityBatch extends CRM_Batch_DAO_EntityBatch {
       $entityId = $existingEntityBatch['entity_id'] ?? NULL;
     }
     // There should never be a legitimate case where a record has an ID but no batch ID but SyntaxConformanceTest says otherwise.
-    if ($batchId) {
+    if ($batchId && $entityTable === 'civicrm_financial_trxn') {
       $batchCurrency = self::getBatchCurrency($batchId);
       $batchPID = (int) CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $batchId, 'payment_instrument_id');
       $trxn = \Civi\Api4\FinancialTrxn::get(FALSE)
