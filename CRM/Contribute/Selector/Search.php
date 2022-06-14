@@ -265,12 +265,12 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
    *   Total number of rows
    */
   public function getTotalCount($action) {
-    return $this->_query->searchQuery(0, 0, NULL,
-      TRUE, FALSE,
-      FALSE, FALSE,
-      FALSE,
-      $this->_contributionClause
-    );
+    $contributeQuery = \Civi\Api4\Contribution::get(FALSE)
+      ->selectRowCount();
+    $contributeQuery = $this->addApi4Where($contributeQuery);
+    /** @var \Civi\Api4\Generic\DAOGetAction $contributeQuery */
+    $result = $contributeQuery->execute()->count();
+    return $result;
   }
 
   /**
@@ -287,20 +287,10 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
    * @param string $output
    *   What should the result set include (web/email/csv).
    *
-   * @return int
-   *   the total number of rows for this action
+   * @return array
+   *   rows in the given offset and rowCount
    */
   public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
-    if ($this->_includeSoftCredits) {
-      // especial sort order when rows include soft credits
-      $sort = $sort->orderBy() . ", civicrm_contribution.id, civicrm_contribution_soft.id";
-    }
-    $result = $this->_query->searchQuery($offset, $rowCount, $sort,
-      FALSE, FALSE,
-      FALSE, FALSE,
-      FALSE,
-      $this->_contributionClause
-    );
     // process the result of the query
     $rows = [];
 
@@ -339,16 +329,58 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       }
     }
 
-    // get all contribution status
-    $contributionStatuses = CRM_Core_OptionGroup::values('contribution_status',
-      FALSE, FALSE, FALSE, NULL, 'name', FALSE
-    );
+    $contributeQuery = \Civi\Api4\Contribution::get(FALSE)
+      ->setLimit($rowCount)
+      ->setOffset($offset)
+      ->addSelect(
+        '*',
+        'contribution_status_id:label',
+        'contribution_status_id:name',
+        'financial_type_id:label',
+        'campaign_id.title',
+        'contact_id.contact_type:name',
+        'contact_id.contact_sub_type:name',
+        'contact_id.sort_name',
+      );
 
-    //get all campaigns.
-    $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
+    $contributeQuery = $this->addApi4Where($contributeQuery);
 
-    while ($result->fetch()) {
-      $this->_query->convertToPseudoNames($result);
+    if ($sort->getCurrentSortID()) {
+      $contributeQuery = $this->addApi4OrderBy($contributeQuery, $sort->_vars[$sort->getCurrentSortID()]);
+      unset($sort->_vars[$sort->getCurrentSortID()]);
+    }
+
+    foreach ($sort->_vars as $sortItem) {
+      $contributeQuery = $this->addApi4OrderBy($contributeQuery, $sortItem);
+    }
+
+    if ($this->_includeSoftCredits) {
+      // especial sort order when rows include soft credits
+      $contributeQuery->addOrderBy('id');
+      $contributeQuery->addJoin('ContributionSoft AS contribution_soft', 'LEFT');
+      $contributeQuery->addOrderBy('contribution_soft.id');
+    }
+
+    $results = $contributeQuery->execute();
+    foreach ($results as &$apiResult) {
+      $apiResult['contribution_id'] = $apiResult['id'];
+    }
+
+    foreach ($results as $result) {
+      // Map old searchQuery keys from API4 result
+      $result['financial_type'] = $result['financial_type_id:label'];
+      $result['contribution_source'] = $result['source'];
+      $result['contribution_status'] = $result['contribution_status_id:label'];
+      $result['contribution_status_name'] = $result['contribution_status_id:name'];
+      $result['contact_type'] = $result['contact_id.contact_type:name'];
+      $result['contact_sub_type'] = $result['contact_id.contact_sub_type:name'];
+      $result['contribution_cancel_date'] = $result['cancel_date'];
+      // Used on event participant contribution listing
+      $result['sort_name'] = $result['contact_id.sort_name'];
+
+      $resultArray = $result;
+      $result = json_decode(json_encode($result));
+
       $links = self::links($componentId,
           $componentAction,
           $qfKey,
@@ -393,13 +425,11 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       //carry campaign on selectors.
       // @todo - I can't find any evidence that 'carrying' the campaign on selectors actually
       // results in it being displayed anywhere so why do we do this???
-      $row['campaign'] = $allCampaigns[$result->contribution_campaign_id] ?? NULL;
-      $row['campaign_id'] = $result->contribution_campaign_id;
+      $row['campaign'] = $resultArray['campaign_id.title'] ?? NULL;
+      $row['campaign_id'] = $resultArray['campaign_id'];
 
       // add contribution status name
-      $row['contribution_status_name'] = CRM_Utils_Array::value($row['contribution_status_id'],
-        $contributionStatuses
-      );
+      $row['contribution_status_name'] = $resultArray['contribution_status_id:name'];
 
       $isPayLater = FALSE;
       if ($result->is_pay_later && CRM_Utils_Array::value('contribution_status_name', $row) == 'Pending') {
@@ -479,6 +509,72 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     }
 
     return $rows;
+  }
+
+  /**
+   * @param \Civi\Api4\Contribution $contributeQuery
+   * @param array $sortItem
+   *
+   * @return \Civi\Api4\Contribution
+   */
+  private function addApi4OrderBy($contributeQuery, $sortItem) {
+    // Map old searchQuery keys to API4 keys
+    $sortMap = [
+      'financial_type' => 'financial_type_id:label',
+      'contribution_source' => 'source',
+      'contribution_status' => 'contribution_status_id:label',
+    ];
+    if (array_key_exists($sortItem['name'], $sortMap)) {
+      $sortItem['name'] = $sortMap[$sortItem['name']];
+    }
+
+    if ($sortItem['direction'] === 1) {
+      $contributeQuery->addOrderBy($sortItem['name'], 'ASC');
+    }
+    elseif ($sortItem['direction'] === 2) {
+      $contributeQuery->addOrderBy($sortItem['name'], 'DESC');
+    }
+    return $contributeQuery;
+  }
+
+  /**
+   * @param \Civi\Api4\Contribution $contributeQuery
+   *
+   * @return \Civi\Api4\Contribution
+   */
+  private function addApi4Where($contributeQuery) {
+    $contributeQuery->addWhere('is_test', 'IN', [TRUE, FALSE]);
+
+    foreach ($this->_queryParams as $queryParam) {
+      $whereMap = [
+        'contribution_id' => 'id',
+      ];
+      if (array_key_exists($queryParam[0], $whereMap)) {
+        $queryParam[0] = $whereMap[$queryParam[0]];
+      }
+      if ($queryParam[0] === 'contribution_participant_id') {
+        $lineItem = \Civi\Api4\LineItem::get(FALSE)
+          ->addWhere('entity_table:name', '=', 'civicrm_participant')
+          ->addWhere('entity_id', '=', $queryParam[2])
+          ->execute()
+          ->first();
+        $queryParam[0] = 'id';
+        $queryParam[2] = $lineItem['contribution_id'];
+      }
+
+      if ($queryParam[0] === 'contribution_membership_id') {
+        $lineItem = \Civi\Api4\LineItem::get(FALSE)
+          ->addWhere('entity_table:name', '=', 'civicrm_membership')
+          ->addWhere('entity_id', '=', $queryParam[2])
+          ->execute()
+          ->first();
+        $queryParam[0] = 'id';
+        $queryParam[2] = $lineItem['contribution_id'];
+      }
+
+      $contributeQuery->addWhere($queryParam[0], $queryParam[1], $queryParam[2]);
+    }
+    return $contributeQuery;
   }
 
   /**
