@@ -467,6 +467,14 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
         CRM_Event_BAO_Participant::fixEventLevel($row['amount_level']);
       }
 
+      $balance = CRM_Contribute_BAO_Contribution::getContributionBalance($result->contribution_id, $result->total_amount);
+      if (($balance == $result->total_amount) || empty($balance)) {
+        $row['balance'] = NULL;
+      }
+      else {
+        $row['balance'] = CRM_Utils_Money::formatLocaleNumericRoundedByCurrency($balance, $row['currency']);
+      }
+
       $rows[] = $row;
     }
 
@@ -496,7 +504,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     $pre = [];
     self::$_columnHeaders = [
       [
-        'name' => $this->_includeSoftCredits ? ts('Contribution Amount') : ts('Amount'),
+        'name' => ($this->_includeSoftCredits ? ts('Contribution Amount') : ts('Amount')) . ' (due)',
         'sort' => 'total_amount',
         'direction' => CRM_Utils_Sort::DONTCARE,
         'field_name' => 'total_amount',
