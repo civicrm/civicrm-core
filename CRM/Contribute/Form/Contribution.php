@@ -445,7 +445,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (!empty($defaults['contribution_status_id'])
       && ('Template' === CRM_Contribute_PseudoConstant::contributionStatus($defaults['contribution_status_id'], 'name'))
     ) {
-      $this->getElement('contribution_status_id')->freeze();
+      if ($this->elementExists('contribution_status_id')) {
+        $this->getElement('contribution_status_id')->freeze();
+      }
     }
 
     if (!$this->_id && empty($defaults['receive_date'])) {
