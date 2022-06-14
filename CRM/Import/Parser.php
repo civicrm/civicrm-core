@@ -1385,6 +1385,10 @@ abstract class CRM_Import_Parser {
         return Civi::$statics[__CLASS__][$fieldName][$importedValue] ?? 'invalid_import_value';
       }
     }
+    if ($fieldMetadata['type'] === CRM_Utils_Type::T_INT) {
+      // We have resolved the options now so any remaining ones should be integers.
+      return CRM_Utils_Rule::numeric($importedValue) ? $importedValue : 'invalid_import_value';
+    }
     return $importedValue;
   }
 
