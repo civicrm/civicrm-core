@@ -4346,6 +4346,9 @@ LIMIT 1;";
         'extra' => '',
       ];
     }
+
+    CRM_Utils_Hook::links('contribution.edit.action', 'Contribution', $id, $actionLinks);
+
     return $actionLinks;
   }
 
