@@ -53,7 +53,6 @@
         </p>
     {/if}
 </div>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
  {* Summary of Import Results (record counts) *}
   <table id="summary-counts" class="report">
     <tr><td class="label crm-grid-cell">{ts}Total Rows{/ts}</td>
@@ -124,5 +123,4 @@
 
  </table>
 
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

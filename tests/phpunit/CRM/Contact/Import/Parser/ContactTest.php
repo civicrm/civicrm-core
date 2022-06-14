@@ -2004,6 +2004,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
           'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
           'contactSubType' => '',
           'doGeocodeAddress' => 0,
+          'disableUSPS' => 0,
           'dataSource' => 'CRM_Import_DataSource_SQL',
           'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
           'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,

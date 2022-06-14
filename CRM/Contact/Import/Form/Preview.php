@@ -191,7 +191,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       CRM_ACL_BAO_Cache::deleteContactCacheEntry($userID);
     }
 
-    CRM_Utils_Address_USPS::disable($this->getSubmittedValue('disableUSPS'));
     $this->runTheImport();
   }
 

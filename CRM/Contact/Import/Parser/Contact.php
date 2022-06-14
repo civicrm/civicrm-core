@@ -119,6 +119,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   public function import($values) {
     $rowNumber = (int) $values[array_key_last($values)];
 
+    // Put this here for now since we're gettting run by a job and need to
+    // reset it for each task run.
+    CRM_Utils_Address_USPS::disable($this->getSubmittedValue('disableUSPS'));
+
     $this->_unparsedStreetAddressContacts = [];
     if (!$this->getSubmittedValue('doGeocodeAddress')) {
       // CRM-5854, reset the geocode method to null to prevent geocoding

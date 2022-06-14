@@ -184,16 +184,7 @@ class CRM_Queue_Runner {
   public function runAllViaWeb() {
     $_SESSION['queueRunners'][$this->qrid] = serialize($this);
     $url = CRM_Utils_System::url($this->pathPrefix . '/runner', 'reset=1&qrid=' . urlencode($this->qrid));
-    try {
-      // If this was persistent/registered queue, ensure that no one else tries to execute it.
-      CRM_Core_DAO::executeQuery('UPDATE civicrm_queue SET status = NULL WHERE name = %1', [
-        1 => [$this->queue->getName(), 'String'],
-      ]);
-    }
-    catch (PEAR_Exception $e) {
-      // For sites being upgraded the field may not exist as yet.
-      // https://lab.civicrm.org/dev/core/-/issues/3653
-    }
+    $this->disableBackgroundExecution();
     CRM_Utils_System::redirect($url);
   }
 
@@ -208,6 +199,7 @@ class CRM_Queue_Runner {
    *   failed task
    */
   public function runAll() {
+    $this->disableBackgroundExecution();
     $taskResult = $this->formatTaskResult(TRUE);
     while ($taskResult['is_continue']) {
       // setRaiseException should't be necessary here, but there's a bug
@@ -505,6 +497,26 @@ class CRM_Queue_Runner {
       // it only truly support `task` data (at time of writing). Anything else indicates confusion.
       throw new \CRM_Core_Exception($prefix . ' AJAX workers only support "runner=task".');
     }
+  }
+
+  /**
+   * Ensure that background workers will not try to run this queue.
+   */
+  protected function disableBackgroundExecution(): void {
+    if (CRM_Core_Config::isUpgradeMode()) {
+      // Versions <=5.50 do not have `status` column.
+      if (!CRM_Core_DAO::checkTableExists('civicrm_queue') || !CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_queue', 'status')) {
+        // The system doesn't have automatic background workers yet. Neither necessary nor possible to toggle `status`.
+        // See also: https://lab.civicrm.org/dev/core/-/issues/3653
+        return;
+      }
+    }
+
+    // We don't actually know if the queue was registered persistently.
+    // But if it was, then it should be disabled.
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_queue SET status = NULL WHERE name = %1', [
+      1 => [$this->queue->getName(), 'String'],
+    ]);
   }
 
 }
