@@ -92,7 +92,17 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
 
     $columnNames = [];
     while ($columnsResult->fetch()) {
-      $columnNames[] = $columnsResult->Field;
+      if (strpos($columnsResult->Field, ' ') !== FALSE) {
+        // Remove spaces as the Database object does this
+        // $keys = str_replace(array(".", " "), "_", array_keys($array));
+        // https://lab.civicrm.org/dev/core/-/issues/1337
+        $usableColumnName = str_replace(' ', '_', $columnsResult->Field);
+        CRM_Core_DAO::executeQuery('ALTER TABLE ' . $tableName . ' CHANGE `' . $columnsResult->Field . '` ' . $usableColumnName . ' ' . $columnsResult->Type);
+        $columnNames[] = $usableColumnName;
+      }
+      else {
+        $columnNames[] = $columnsResult->Field;
+      }
     }
 
     $this->addTrackingFieldsToTable($tableName);
