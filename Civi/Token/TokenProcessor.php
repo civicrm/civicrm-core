@@ -480,7 +480,7 @@ class TokenProcessor {
           return $value->getAmount();
 
         default:
-          throw new \CRM_Core_Exception("Invalid token filter: $filter");
+          throw new \CRM_Core_Exception("Invalid token filter: " . json_encode($filter, JSON_UNESCAPED_SLASHES));
       }
     }
 
@@ -502,7 +502,7 @@ class TokenProcessor {
         }
 
       default:
-        throw new \CRM_Core_Exception("Invalid token filter: $filter");
+        throw new \CRM_Core_Exception("Invalid token filter: " . json_encode($filter, JSON_UNESCAPED_SLASHES));
     }
   }
 
