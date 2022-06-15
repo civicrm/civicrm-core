@@ -21,8 +21,13 @@ on:
         description: Autocommit to branch (y or n)
         required: false
         default: 'n'
+permissions:
+  contents: read
+
 jobs:
   runregen:
+    permissions:
+      contents: write  # for Git to git push
     runs-on: ubuntu-latest
     name: Run Regen
     services:
