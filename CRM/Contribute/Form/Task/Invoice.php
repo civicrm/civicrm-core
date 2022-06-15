@@ -411,8 +411,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
       $pdfFileName = $contribution->invoice_number . ".pdf";
       $sendTemplateParams = [
-        'groupName' => 'msg_tpl_workflow_contribution',
-        'valueName' => 'contribution_invoice_receipt',
+        'workflow' => 'contribution_invoice_receipt',
         'tplParams' => $tplParams,
         'PDFFilename' => $pdfFileName,
         'tokenContext' => ['contributionId' => $contribution->id, 'contactId' => $contribution->contact_id],
