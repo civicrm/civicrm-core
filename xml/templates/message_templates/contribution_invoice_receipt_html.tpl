@@ -60,7 +60,7 @@
         </tr>
         <tr>
           <td><font size="1" align="right"> {$country}</font></td>
-          <td><font size="1" align="right">{if !empty($source)}{$source}{/if}</font></td>
+          <td><font size="1" align="right">{contribution.source}</font></td>
           <td valign="top" style="white-space: nowrap"><font size="1" align="right">{if $domain_email}{$domain_email}{/if}</font> </td>
         </tr>
         <tr>
@@ -154,7 +154,7 @@
               <tr>
                 <td colspan="5"></td>
               </tr>
-              {if $contribution_status_id == $pendingStatusId && $is_pay_later == 1}
+              {if '{contribution_status_id.name}' == 'Pending' && '{contribution.is_pay_later}' == 1}
                 <tr>
                   <td colspan="3"><b><font size="1" align="center">{ts 1=$dueDate}DUE DATE: %1{/ts}</font></b></td>
                   <td colspan="2"></td>
@@ -165,7 +165,7 @@
         </tr>
       </table>
 
-      {if $contribution_status_id == $pendingStatusId && $is_pay_later == 1}
+      {if '{contribution_status_id.name}' === 'Pending' && '{contribution.is_pay_later}' == 1}
         <table style="margin-top:5px;" width="100%" border="0" cellpadding="0" cellspacing="0">
           <tr>
             <td><img src="{$resourceBase}/i/contribute/cut_line.png" height="15"></td>
@@ -195,7 +195,7 @@
                   <td><font size="1" align="right">{contribution.invoice_number}</font></td>
                 </tr>
                 <tr><td colspan="5" style="color:#F5F5F5;"><hr></td></tr>
-                {if $is_pay_later == 1}
+                {if '{contribution.is_pay_later}' == 1}
                   <tr>
                     <td><font size="1" align="right" style="font-weight:bold;">{ts}Amount Due:{/ts}</font></td>
                     <td><font size="1" align="right" style="font-weight:bold;">{contribution.total_amount}</font></td>
@@ -216,7 +216,7 @@
               </table>
       {/if}
 
-      {if $contribution_status_id == $refundedStatusId || $contribution_status_id == $cancelledStatusId}
+      {if '{contribution_status_id.name}' === 'Refunded' || '{contribution_status_id.name}' == 'Cancelled'}
       {if $config->empoweredBy}
         <table style="margin-top:2px;padding-left:7px;page-break-before: always;">
           <tr>
@@ -363,7 +363,7 @@
                 <td style="padding-left:28px;text-align:right;"><b><font size="1">{ts 1=$currency}TOTAL %1{/ts}</font></b></td>
                 <td style="padding-left:28px;text-align:right;"><font size="1">{contribution.total_amount}</font></td>
               </tr>
-              {if $is_pay_later == 0}
+              {if '{contribution.is_pay_later}' == 0}
                 <tr>
                   <td colspan="3"></td>
                   <td style="padding-left:28px;text-align:right;"><font size="1">{ts}LESS Credit to invoice(s){/ts}</font></td>

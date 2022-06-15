@@ -240,12 +240,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $contribution->id = $contribID;
       $contribution->fetch();
       $contribution->loadRelatedObjects($input, $ids, TRUE);
-
-      $input['amount'] = $contribution->total_amount;
-      $input['invoice_id'] = $contribution->invoice_id;
       $input['receive_date'] = $contribution->receive_date;
-      $input['contribution_status_id'] = $contribution->contribution_status_id;
-      $input['organization_name'] = $contribution->_relatedObjects['contact']->organization_name;
 
       // Fetch the billing address. getValues should prioritize the billing
       // address, otherwise will return the primary address.
@@ -323,7 +318,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
         $title = CRM_Utils_Array::value('title', CRM_Utils_Array::value($contribution->contribution_page_id, $mailDetails));
       }
-      $source = $contribution->source;
 
       $config = CRM_Core_Config::singleton();
       if (!isset($params['forPage'])) {
@@ -352,9 +346,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       // parameters to be assign for template
       $tplParams = [
         'title' => $title,
-        'component' => $input['component'],
         'id' => $contribution->id,
-        'source' => $source,
         'resourceBase' => $config->userFrameworkResourceURL,
         'defaultCurrency' => $config->defaultCurrency,
         'invoice_date' => $invoiceDate,
@@ -379,7 +371,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         // Kept for backwards compatibility
         'stateProvinceAbbreviation' => $billingAddress['state_province_abbreviation'] ?? NULL,
         'country' => $billingAddress['country'] ?? NULL,
-        'is_pay_later' => $contribution->is_pay_later,
         'organization_name' => $contribution->_relatedObjects['contact']->organization_name,
         'domain_organization' => $domain->name,
         'domain_street_address' => CRM_Utils_Array::value('street_address', CRM_Utils_Array::value('1', $locationDefaults['address'])),
