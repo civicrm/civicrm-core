@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+
 /**
  * Class CRM_Core_BAO_FinancialTrxnTest
  * @group headless
@@ -53,7 +55,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetTotalPayments() {
+  public function testGetTotalPayments(): void {
     $contactId = $this->individualCreate();
 
     $params = [
@@ -81,13 +83,19 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id']);
     $this->assertEquals(0, $totalPaymentAmount, 'Amount not matching.');
 
+    $this->assertEquals(0, Contribution::get()->addWhere('id', '=', $contribution['id'])
+      ->addSelect('paid_amount')->execute()->first()['paid_amount']);
     $params['id'] = $contribution['id'];
     $params['contribution_status_id'] = 1;
 
     $contribution = $this->callAPISuccess('Contribution', 'create', $params);
 
     $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id']);
+    $this->assertEquals('200.00', Contribution::get()->addWhere('id', '=', $contribution['id'])
+      ->addSelect('paid_amount')->execute()->first()['paid_amount']);
+
     $this->assertEquals('200.00', $totalPaymentAmount, 'Amount not matching.');
+
   }
 
   /**

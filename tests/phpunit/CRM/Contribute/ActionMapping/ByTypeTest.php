@@ -315,6 +315,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       total_amount = {contribution.total_amount}
       net_amount = {contribution.net_amount}
       fee_amount = {contribution.fee_amount}
+      paid_amount = {contribution.amount_paid}
       campaign_id = {contribution.campaign_id}
       campaign name = {contribution.campaign_id:name}
       campaign label = {contribution.campaign_id:label}';
@@ -341,6 +342,8 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'total_amount = €100.00',
       'net_amount = €95.00',
       'fee_amount = €5.00',
+      'paid_amount' => '€100.00',
+      'balance_amount' => '€0.00',
       'campaign_id = 1',
       'campaign name = big_campaign',
       'campaign label = Campaign',

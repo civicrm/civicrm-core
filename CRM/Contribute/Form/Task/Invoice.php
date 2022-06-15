@@ -263,9 +263,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       if ($contribution->contribution_status_id == $refundedStatusId || $contribution->contribution_status_id == $cancelledStatusId) {
         $creditNoteId = $contribution->creditnote_id;
       }
-      if (!$contribution->invoice_number) {
-        $contribution->invoice_number = CRM_Contribute_BAO_Contribution::getInvoiceNumber($contribution->id);
-      }
 
       //to obtain due date for PDF invoice
       $contributionReceiveDate = date('F j,Y', strtotime(date($input['receive_date'])));
@@ -273,9 +270,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $dueDateSetting = Civi::settings()->get('invoice_due_date');
       $dueDatePeriodSetting = Civi::settings()->get('invoice_due_date_period');
       $dueDate = date('F j, Y', strtotime($contributionReceiveDate . "+" . $dueDateSetting . "" . $dueDatePeriodSetting));
-
-      $amountPaid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribID, TRUE);
-      $amountDue = ($input['amount'] - $amountPaid);
 
       // retrieving the subtotal and sum of same tax_rate
       $dataArray = [];
@@ -361,13 +355,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'component' => $input['component'],
         'id' => $contribution->id,
         'source' => $source,
-        'invoice_number' => $contribution->invoice_number,
-        'invoice_id' => $contribution->invoice_id,
         'resourceBase' => $config->userFrameworkResourceURL,
         'defaultCurrency' => $config->defaultCurrency,
-        'amount' => $contribution->total_amount,
-        'amountDue' => $amountDue,
-        'amountPaid' => $amountPaid,
         'invoice_date' => $invoiceDate,
         'dueDate' => $dueDate,
         'notes' => $invoiceNotes,
@@ -411,8 +400,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
       $pdfFileName = $contribution->invoice_number . ".pdf";
       $sendTemplateParams = [
-        'groupName' => 'msg_tpl_workflow_contribution',
-        'valueName' => 'contribution_invoice_receipt',
+        'workflow' => 'contribution_invoice_receipt',
         'tplParams' => $tplParams,
         'PDFFilename' => $pdfFileName,
         'tokenContext' => ['contributionId' => $contribution->id, 'contactId' => $contribution->contact_id],
