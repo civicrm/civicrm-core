@@ -306,8 +306,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $values['title'] = $mailDetails[$contribution->_relatedObjects['event']->id]['title'] ?? NULL;
         $values['confirm_from_name'] = $mailDetails[$contribution->_relatedObjects['event']->id]['confirm_from_name'] ?? NULL;
         $values['confirm_from_email'] = $mailDetails[$contribution->_relatedObjects['event']->id]['confirm_from_email'] ?? NULL;
-
-        $title = $mailDetails[$contribution->_relatedObjects['event']->id]['title'] ?? NULL;
       }
       elseif ($contribution->_component == 'contribute') {
         $daoName = 'CRM_Contribute_DAO_ContributionPage';
@@ -326,8 +324,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $values['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', CRM_Utils_Array::value($contribution->contribution_page_id, $mailDetails));
         $values['cc_receipt'] = CRM_Utils_Array::value('cc_receipt', CRM_Utils_Array::value($contribution->contribution_page_id, $mailDetails));
         $values['bcc_receipt'] = CRM_Utils_Array::value('bcc_receipt', CRM_Utils_Array::value($contribution->contribution_page_id, $mailDetails));
-
-        $title = CRM_Utils_Array::value('title', CRM_Utils_Array::value($contribution->contribution_page_id, $mailDetails));
       }
       $source = $contribution->source;
 
@@ -357,8 +353,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
       // parameters to be assign for template
       $tplParams = [
-        'title' => $title,
-        'component' => $input['component'],
         'id' => $contribution->id,
         'source' => $source,
         'invoice_number' => $contribution->invoice_number,
@@ -377,7 +371,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'pendingStatusId' => $pendingStatusId,
         'cancelledStatusId' => $cancelledStatusId,
         'contribution_status_id' => $contribution->contribution_status_id,
-        'contributionStatusName' => CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id),
         'subTotal' => $subTotal,
         'street_address' => $billingAddress['street_address'] ?? NULL,
         'supplemental_address_1' => $billingAddress['supplemental_address_1'] ?? NULL,
