@@ -155,13 +155,17 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
       TRUE, 'currency', $this->_subscriptionDetails->currency, TRUE
     );
 
+    // https://lab.civicrm.org/dev/financial/-/issues/197 https://github.com/civicrm/civicrm-core/pull/23796
+    // Revert freezing on total_amount field on recurring form - particularly affects IATs
+    // This will need revisiting in the future as updating amount on recur does not work for multiple lineitems.
+    // Also there are "point of truth" issues ie. is the amount on template contribution or recur the current one?
     // The amount on the recurring contribution should not be updated directly. If we update the amount using a template contribution the recurring contribution
     //   will be updated automatically.
-    $paymentProcessorObj = Civi\Payment\System::singleton()->getById(CRM_Contribute_BAO_ContributionRecur::getPaymentProcessorID($this->contributionRecurID));
-    $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($this->contributionRecurID);
-    if (!empty($templateContribution['id']) && $paymentProcessorObj->supportsEditRecurringContribution()) {
-      $amountField->freeze();
-    }
+    // $paymentProcessorObj = Civi\Payment\System::singleton()->getById(CRM_Contribute_BAO_ContributionRecur::getPaymentProcessorID($this->contributionRecurID));
+    // $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($this->contributionRecurID);
+    // if (!empty($templateContribution['id']) && $paymentProcessorObj->supportsEditRecurringContribution()) {
+    //   $amountField->freeze();
+    // }
 
     $this->add('text', 'installments', ts('Number of Installments'), ['size' => 20], FALSE);
 
