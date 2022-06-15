@@ -401,6 +401,8 @@ WHERE ceft.entity_id = %1";
    * @param int $contributionID
    * @param bool $includeRefund
    *
+   * @deprecated use Apiv4.
+   *
    * @return float
    */
   public static function getTotalPayments($contributionID, $includeRefund = FALSE): float {
