@@ -346,6 +346,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       // parameters to be assign for template
       $tplParams = [
         'title' => $title,
+        'component' => $input['component'],
         'id' => $contribution->id,
         'resourceBase' => $config->userFrameworkResourceURL,
         'defaultCurrency' => $config->defaultCurrency,
