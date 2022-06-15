@@ -93,7 +93,6 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
     $priceFieldValueId = $this->getPriceFieldValue($membershipTypeID);
     $form->testSubmit(array_merge($this->getSubmitParams(), [
       'price_' . $this->priceSetId => $priceFieldValueId,
-      'is_recur' => 1,
     ]));
     $this->assertEquals(1, $form->_params['is_recur']);
   }
@@ -107,7 +106,7 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
     $priceFieldValueId = $this->getPriceFieldValue($membershipTypeID);
     $form->testSubmit(array_merge($this->getSubmitParams(), [
       'price_' . $this->priceSetId => $priceFieldValueId,
-      'is_recur' => 0,
+      'auto_renew' => 0,
     ]));
     $this->assertEquals(0, $form->_params['is_recur']);
   }
