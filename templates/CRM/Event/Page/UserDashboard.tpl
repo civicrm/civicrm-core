@@ -31,7 +31,7 @@
                             {if $row.event_end_date}
                                 &nbsp; - &nbsp;
                                 {* Only show end time if end date = start date *}
-                                {if $row.event_end_date|date_format:"%Y%m%d" == $row.event_start_date|date_format:"%Y%m%d"}
+                                {if $row.event_end_date|crmDate:"%Y%m%d" == $row.event_start_date|crmDate:"%Y%m%d"}
                                     {$row.event_end_date|crmDate:0:1}
                                 {else}
                                     {$row.event_end_date|crmDate}

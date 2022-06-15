@@ -27,7 +27,7 @@ CALSCALE:GREGORIAN
 DTSTAMP;TZID={$timezone}:{$event.start_date|crmICalDate}
 DTSTART;TZID={$timezone}:{$event.start_date|crmICalDate}
 {else}
-DTSTAMP;TZID={$timezone}:{$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'|crmICalDate}
+DTSTAMP;TZID={$timezone}:{$smarty.now|crmDate:'%Y-%m-%d %H:%M:%S'|crmICalDate}
 {/if}
 {if $event.end_date}
 DTEND;TZID={$timezone}:{$event.end_date|crmICalDate}

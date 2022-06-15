@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}// http://civicrm.org/licensing
-// <script> Generated {$smarty.now|date_format:'%d %b %Y %H:%M:%S'}
+// <script> Generated {$smarty.now|crmDate:'%d %b %Y %H:%M:%S'}
 {* This file should only contain strings and settings which rarely change *}
 (function($) {ldelim}
   // Config settings

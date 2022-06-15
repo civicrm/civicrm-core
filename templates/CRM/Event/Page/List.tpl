@@ -32,7 +32,7 @@
         <td class="nowrap" data-order="{$event.start_date|crmDate:'%Y-%m-%d'}">
           {if $event.start_date}{$event.start_date|crmDate}{if $event.end_date}<br /><em>{ts}through{/ts}</em><br />{strip}
             {* Only show end time if end date = start date *}
-            {if $event.end_date|date_format:"%Y%m%d" == $event.start_date|date_format:"%Y%m%d"}
+            {if $event.end_date|crmDate:"%Y%m%d" == $event.start_date|crmDate:"%Y%m%d"}
               {$event.end_date|crmDate:0:1}
             {else}
               {$event.end_date|crmDate}

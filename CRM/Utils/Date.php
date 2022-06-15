@@ -369,7 +369,7 @@ class CRM_Utils_Date {
 
         $hour24 = (int) substr($dateString, 11, 2);
         $minute = (int) substr($dateString, 14, 2);
-        $second = (int) substr($dateString, 16, 2);
+        $second = (int) substr($dateString, 17, 2);
       }
       else {
         $year = (int) substr($dateString, 0, 4);
@@ -433,6 +433,7 @@ class CRM_Utils_Date {
         '%A' => $type,
         '%Y' => $year,
         '%s' => str_pad($second, 2, 0, STR_PAD_LEFT),
+        '%S' => str_pad($second, 2, 0, STR_PAD_LEFT),
       ];
 
       return strtr($format, $date);
