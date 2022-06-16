@@ -251,7 +251,8 @@
         formatName: 'msg_html',
         formats: [
           {id: 0, name: 'msg_html', label: ts('HTML')},
-          {id: 1, name: 'msg_text', label: ts('Text')}
+          {id: 1, name: 'msg_html_raw', label: ts('HTML (Raw)')},
+          {id: 2, name: 'msg_text', label: ts('Text')}
         ],
         revisionName: $ctrl.tab,
         revisions: _.reduce(revisionTypes, function(acc, revType){
