@@ -9,15 +9,17 @@
  +--------------------------------------------------------------------+
  */
 
+use Brick\Money\Money;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
+use Civi\Api4\LineItem;
 
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur {
+class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur implements Civi\Test\HookInterface {
 
   /**
    * Create recurring contribution.
@@ -92,6 +94,40 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     }
 
     return $recurring;
+  }
+
+  /**
+   * Event fired after modifying a recurring contribution.
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    if ($event->action === 'edit') {
+      if (is_numeric($event->object->amount)) {
+        $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($event->object->id);
+        if (empty($templateContribution['id'])) {
+          return;
+        }
+        $lines = LineItem::get(FALSE)
+          ->addWhere('contribution_id', '=', $templateContribution['id'])
+          ->addWhere('contribution_id.is_template', '=', TRUE)
+          ->addSelect('contribution_id.total_amount')
+          ->execute();
+        if (count($lines) === 1) {
+          $contributionAmount = $lines->first()['contribution_id.total_amount'];
+          // USD here is just ensuring both are in the same format.
+          if (Money::of($contributionAmount, 'USD')->compareTo(Money::of($event->object->amount, 'USD'))) {
+            // If different then we need to update
+            // the contribution. Note that if this is being called
+            // as a result of the contribution having been updated then there will
+            // be no difference.
+            Contribution::update(FALSE)
+              ->addWhere('id', '=', $templateContribution['id'])
+              ->setValues(['total_amount' => $event->object->amount])
+              ->execute();
+          }
+        }
+      }
+    }
   }
 
   /**
