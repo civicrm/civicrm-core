@@ -1413,7 +1413,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       return [];
     }
 
-    $mailingGroups = \Civi\Api4\MailingGroup::get()
+    $mailingGroups = \Civi\Api4\MailingGroup::get(FALSE)
       ->addSelect('group.title', 'group.frontend_title')
       ->addJoin('Group AS group', 'LEFT', ['entity_id', '=', 'group.id'])
       ->addWhere('mailing_id', '=', $this->id)
