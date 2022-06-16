@@ -470,7 +470,7 @@ abstract class CRM_Import_DataSource {
        ADD COLUMN _entity_id INT,
        " . $this->getAdditionalTrackingFields() . "
        ADD COLUMN _status VARCHAR(32) DEFAULT 'NEW' NOT NULL,
-       ADD COLUMN _status_message TEXT,
+       ADD COLUMN _status_message LONGTEXT,
        ADD COLUMN _id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
        ADD INDEX(_id),
        ADD INDEX(_status)
