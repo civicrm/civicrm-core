@@ -200,6 +200,18 @@ class Container {
       ]
     ))->setFactory('CRM_Utils_Cache::create')->setPublic(TRUE);
 
+    // Memcache is limited to 1 MB by default, and since this is not read often
+    // it does not make much sense in Redis either.
+    $container->setDefinition('cache.extension_browser', new Definition(
+      'CRM_Utils_Cache_Interface',
+      [
+        [
+          'name' => 'extension_browser',
+          'type' => ['SqlGroup', 'ArrayCache'],
+        ],
+      ]
+    ))->setFactory('CRM_Utils_Cache::create')->setPublic(TRUE);
+
     $container->setDefinition('sql_triggers', new Definition(
       'Civi\Core\SqlTriggers',
       []
