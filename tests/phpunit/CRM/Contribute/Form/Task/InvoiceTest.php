@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Address;
+use Civi\Api4\Domain;
+
 /**
  *  Test APIv3 civicrm_contribute_* functions
  *
@@ -170,7 +173,9 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
    */
   public function testThatInvoiceShowsTheActualContributionCurrencyInsteadOfTheDefaultOne(): void {
     $this->setDefaultCurrency('USD');
-
+    $contactID = Domain::get()->addSelect('contact_id')->execute()->first()['contact_id'];
+    Address::create()->setValues(['contact_id' => $contactID, 'city' => 'Beverley Hills', 'state_province_id:label' => 'California', 'country_id:label' => 'United States', 'postal_code' => 90210])->execute();
+    Civi::cache('metadata')->clear();
     $this->_individualId = $this->individualCreate();
 
     $contributionID = $this->setupContribution();
@@ -189,7 +194,10 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $this->assertStringContainsString('£100.00', $invoiceHTML);
     $this->assertStringContainsString('Amount GBP', $invoiceHTML);
     $this->assertStringContainsString('TOTAL GBP', $invoiceHTML);
-
+    $this->assertStringContainsString('California', $invoiceHTML);
+    $this->assertStringContainsString('90210', $invoiceHTML);
+    $this->assertStringContainsString('United States', $invoiceHTML);
+    $this->assertStringContainsString('Default Domain Name', $invoiceHTML);
   }
 
   /**

@@ -17,7 +17,7 @@
         <tr>
           <td width="30%"><b><font size="4" align="center">{ts}INVOICE{/ts}</font></b></td>
           <td width="50%" valign="bottom"><b><font size="1" align="center">{ts}Invoice Date:{/ts}</font></b></td>
-          <td valign="bottom" style="white-space: nowrap"><b><font size="1" align="right">{$domain_organization}</font></b></td>
+          <td valign="bottom" style="white-space: nowrap"><b><font size="1" align="right">{domain.name}</font></b></td>
         </tr>
         <tr>
           {if $organization_name}
@@ -28,8 +28,8 @@
           <td><font size="1" align="right">{$invoice_date}</font></td>
           <td style="white-space: nowrap">
             <font size="1" align="right">
-              {if $domain_street_address }{$domain_street_address}{/if}
-              {if $domain_supplemental_address_1 }{$domain_supplemental_address_1}{/if}
+              {domain.street_address}
+              {domain.supplemental_address_1}
            </font>
           </td>
         </tr>
@@ -38,35 +38,35 @@
           <td><b><font size="1" align="right">{ts}Invoice Number:{/ts}</font></b></td>
           <td>
             <font size="1" align="right">
-              {if $domain_supplemental_address_2 }{$domain_supplemental_address_2}{/if}
-              {if $domain_state }{$domain_state}{/if}
+              {domain.supplemental_address_2}
+              {domain.state_province_id:label}
            </font>
           </td>
         </tr>
         <tr>
           <td><font size="1" align="center">{$supplemental_address_2} {$stateProvinceAbbreviation}</font></td>
-          <td><font size="1" align="right">{$invoice_number}</font></td>
+          <td><font size="1" align="right">{contribution.invoice_number}</font></td>
           <td style="white-space: nowrap">
             <font size="1" align="right">
-              {if $domain_city}{$domain_city}{/if}
-              {if $domain_postal_code }{$domain_postal_code}{/if}
+              {domain.city}
+              {domain.postal_code}
            </font>
           </td>
         </tr>
         <tr>
           <td><font size="1" align="right">{$city}  {$postal_code}</font></td>
           <td height="10"><b><font size="1" align="right">{ts}Reference:{/ts}</font></b></td>
-          <td><font size="1" align="right">{if $domain_country}{$domain_country}{/if}</font></td>
+          <td><font size="1" align="right">{domain.country_id:label}</font></td>
         </tr>
         <tr>
           <td><font size="1" align="right"> {$country}</font></td>
-          <td><font size="1" align="right">{if !empty($source)}{$source}{/if}</font></td>
-          <td valign="top" style="white-space: nowrap"><font size="1" align="right">{if $domain_email}{$domain_email}{/if}</font> </td>
+          <td><font size="1" align="right">{contribution.source}</font></td>
+          <td valign="top" style="white-space: nowrap"><font size="1" align="right">{domain.email}</font> </td>
         </tr>
         <tr>
           <td></td>
           <td></td>
-          <td valign="top"><font size="1" align="right">{if $domain_phone}{$domain_phone}{/if}</font> </td>
+          <td valign="top"><font size="1" align="right">{domain.phone}</font> </td>
         </tr>
       </table>
 
@@ -75,7 +75,7 @@
                 <th style="text-align:left;font-weight:bold;width:100%"><font size="1">{ts}Description{/ts}</font></th>
                 <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{ts}Quantity{/ts}</font></th>
                 <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{ts}Unit Price{/ts}</font></th>
-                <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{$taxTerm}</font></th>
+                <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{domain.tax_term}</font></th>
                 <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{ts 1=$currency}Amount %1{/ts}</font></th>
               </tr>
               {foreach from=$lineItem item=value key=priceset name=taxpricevalue}
@@ -175,13 +175,13 @@
         <table style="margin-top:5px;font-family: Arial, Verdana, sans-serif" width="100%" border="0" cellpadding="5" cellspacing="0" id="desc">
           <tr>
             <td width="60%"><b><font size="4" align="right">{ts}PAYMENT ADVICE{/ts}</font></b><br/><br/><font size="1" align="left"><b>{ts}To:{/ts}</b><div style="width:24em;word-wrap:break-word;">
-              {$domain_organization}<br />
-              {$domain_street_address} {$domain_supplemental_address_1}<br />
-              {$domain_supplemental_address_2} {$domain_state}<br />
-              {$domain_city} {$domain_postal_code}<br />
-              {$domain_country}<br />
-              {$domain_email}</div>
-              {$domain_phone}<br />
+              {domain.name}<br />
+              {domain.street_address} {domain.supplemental_address_1}<br />
+              {domain.supplemental_address_2} {domain.state_province_id:label}<br />
+              {domain.city} {domain.postal_code}<br />
+              {domain.country_id:label}<br />
+              {domain.email}</div>
+              {domain.phone}<br />
              </font><br/><br/><font size="1" align="left">{$notes}</font>
             </td>
             <td width="40%">
@@ -229,7 +229,7 @@
         <tr>
           <td style="padding-left:15px;"><b><font size="4" align="center">{ts}CREDIT NOTE{/ts}</font></b></td>
           <td style="padding-left:30px;"><b><font size="1" align="right">{ts}Date:{/ts}</font></b></td>
-          <td><font size="1" align="right">{$domain_organization}</font></td>
+          <td><font size="1" align="right">{domain.name}</font></td>
         </tr>
         <tr>
           {if $organization_name}
@@ -240,8 +240,8 @@
           <td style="padding-left:30px;"><font size="1" align="right">{$invoice_date}</font></td>
           <td>
             <font size="1" align="right">
-              {if $domain_street_address }{$domain_street_address}{/if}
-              {if $domain_supplemental_address_1 }{$domain_supplemental_address_1}{/if}
+              {domain.street_address}
+              {domain.supplemental_address_1}
            </font>
           </td>
         </tr>
@@ -250,8 +250,8 @@
           <td style="padding-left:30px;"><b><font size="1" align="right">{ts}Credit Note Number:{/ts}</font></b></td>
           <td>
             <font size="1" align="right">
-              {if $domain_supplemental_address_2 }{$domain_supplemental_address_2}{/if}
-              {if $domain_state }{$domain_state}{/if}
+              {domain.supplemental_address_2}
+              {domain.state_province_id:label}
            </font>
           </td>
         </tr>
@@ -260,8 +260,8 @@
           <td style="padding-left:30px;"><font size="1" align="right">{$creditnote_id}</font></td>
           <td>
             <font size="1" align="right">
-              {if $domain_city}{$domain_city}{/if}
-              {if $domain_postal_code }{$domain_postal_code}{/if}
+              {domain.city}
+              {domain.postal_code}
            </font>
           </td>
         </tr>
@@ -270,7 +270,7 @@
           <td height="10" style="padding-left:30px;"><b><font size="1" align="right">{ts}Reference:{/ts}</font></b></td>
           <td>
             <font size="1" align="right">
-              {if $domain_country}{$domain_country}{/if}
+              {domain.country_id:label}
            </font>
           </td>
         </tr>
@@ -279,7 +279,7 @@
           <td style="padding-left:30px;"><font size="1" align="right">{$source}</font></td>
           <td>
             <font size="1" align="right">
-              {if $domain_email}{$domain_email}{/if}
+              {domain.email}
            </font>
           </td>
         </tr>
@@ -288,7 +288,7 @@
           <td></td>
           <td>
             <font size="1" align="right">
-              {if $domain_phone}{$domain_phone}{/if}
+              {domain.phone}
            </font>
           </td>
         </tr>
@@ -302,7 +302,7 @@
                 <th style="padding-right:28px;text-align:left;font-weight:bold;width:200px;"><font size="1">{ts}Description{/ts}</font></th>
                 <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{ts}Quantity{/ts}</font></th>
                 <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{ts}Unit Price{/ts}</font></th>
-                <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{$taxTerm}</font></th>
+                <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{domain.tax_term}</font></th>
                 <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{ts 1=$currency}Amount %1{/ts}</font></th>
               </tr>
               {foreach from=$lineItem item=value key=priceset name=pricevalue}

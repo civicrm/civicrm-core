@@ -722,6 +722,8 @@ December 21st, 2007
 
   /**
    * Test that domain tokens are consistently rendered.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testDomainTokenConsistency(): void {
     $tokens = CRM_Core_SelectValues::domainTokens();
@@ -730,10 +732,16 @@ December 21st, 2007
       'controller' => __CLASS__,
       'smarty' => FALSE,
     ]);
-    $tokens['{domain.id}'] = 'Domain ID';
-    $tokens['{domain.description}'] = 'Domain Description';
-    $tokens['{domain.now}'] = 'Current time/date';
+    $contactID = \Civi\Api4\Domain::get()->addSelect('contact_id')->execute()->first()['contact_id'];
+    Address::create()->setValues(['contact_id' => $contactID, 'city' => 'Beverley Hills', 'state_province_id:label' => 'California', 'country_id:label' => 'United States', 'postal_code' => 90210])->execute();
     $this->assertEquals($tokens, $tokenProcessor->listTokens());
+    $tokenProcessor->addMessage('message', implode("\n", array_keys($tokens)), 'text/plain');
+    $tokenProcessor->addRow();
+    $tokenProcessor->evaluate();
+    $this->assertStringContainsString('Beverley Hills
+90210
+California
+United States', $tokenProcessor->getRow(0)->render('message'));
   }
 
   /**
@@ -783,14 +791,22 @@ December 21st, 2007
    */
   public function getDomainTokens(): array {
     return [
-      '{domain.name}' => ts('Domain name'),
-      '{domain.address}' => ts('Domain (organization) address'),
-      '{domain.phone}' => ts('Domain (organization) phone'),
-      '{domain.email}' => 'Domain (organization) email',
+      '{domain.name}' => ts('Domain Name'),
+      '{domain.address}' => ts('Domain (Organization) Full Address'),
+      '{domain.phone}' => ts('Domain (Organization) Phone'),
+      '{domain.email}' => 'Domain (Organization) Email',
       '{domain.id}' => ts('Domain ID'),
       '{domain.description}' => ts('Domain Description'),
       '{domain.now}' => 'Current time/date',
       '{domain.tax_term}' => 'Sales tax term (e.g VAT)',
+      '{domain.street_address}' => 'Domain (Organization) Street Address',
+      '{domain.supplemental_address_1}' => 'Domain (Organization) Supplemental Address',
+      '{domain.supplemental_address_2}' => 'Domain (Organization) Supplemental Address 2',
+      '{domain.supplemental_address_3}' => 'Domain (Organization) Supplemental Address 3',
+      '{domain.city}' => 'Domain (Organization) City',
+      '{domain.postal_code}' => 'Domain (Organization) Postal Code',
+      '{domain.state_province_id:label}' => 'Domain (Organization) State',
+      '{domain.country_id:label}' => 'Domain (Organization) Country',
     ];
   }
 
