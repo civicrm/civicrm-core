@@ -54,6 +54,10 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
   private function addExampleData(GenericWorkflowMessage $messageTemplate): void {
     $messageTemplate->setContact(\Civi\Test::example('entity/Contact/Barb'));
     $messageTemplate->setContribution(\Civi\Test::example('entity/Contribution/Euro5990/completed'));
+    $mockOrder = new CRM_Financial_BAO_Order();
+    $mockOrder->setTemplateContributionID(50);
+    $mockOrder->setPriceSetToDefault('contribution');
+    $messageTemplate->setOrder($mockOrder);
   }
 
 }
