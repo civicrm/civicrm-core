@@ -451,6 +451,12 @@ class CRM_Financial_BAO_Order {
       foreach ($this->getPriceOptions() as $fieldID => $valueID) {
         $this->setPriceSetIDFromSelectedField($fieldID);
       }
+      if (!$this->priceSetID && $this->getTemplateContributionID()) {
+        // Load the line items from the contribution.
+        foreach ($this->getLineItems() as $lineItem) {
+          return $lineItem['price_field_id.price_set_id'];
+        }
+      }
     }
     return $this->priceSetID;
   }
@@ -1099,6 +1105,7 @@ class CRM_Financial_BAO_Order {
         'entity_id',
         'entity_table',
         'price_field_id',
+        'price_field_id.price_set_id',
         'price_field_value_id',
         'financial_type_id',
         'label',
