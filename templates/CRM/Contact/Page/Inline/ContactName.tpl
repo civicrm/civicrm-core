@@ -8,15 +8,17 @@
  +--------------------------------------------------------------------+
 *}
 <div id="crm-contactname-content" {if $permission EQ 'edit'}class="crm-inline-edit" data-edit-params='{ldelim}"cid": "{$contactId}", "class_name": "CRM_Contact_Form_Inline_ContactName"{rdelim}' data-dependent-fields='["#crm-communication-pref-content"]'{/if}>
-  <div class="crm-inline-block-content"{if $permission EQ 'edit'} title="{ts}Edit Contact Name{/ts}"{/if}>
-    {if $permission EQ 'edit'}
-      <div class="crm-edit-help">
-        <span class="crm-i fa-pencil" aria-hidden="true"></span> {ts}Edit name{/ts}
-      </div>
-    {/if}
+  {crmRegion name="contact-page-contactname"}
+    <div class="crm-inline-block-content"{if $permission EQ 'edit'} title="{ts}Edit Contact Name{/ts}"{/if}>
+      {if $permission EQ 'edit'}
+        <div class="crm-edit-help">
+          <span class="crm-i fa-pencil" aria-hidden="true"></span> {ts}Edit name{/ts}
+        </div>
+      {/if}
 
-    <div class="crm-summary-display_name">
-      {$title}{if $domainContact} ({ts}default organization{/ts}){/if}
+      <div class="crm-summary-display_name">
+        {$title}{if $domainContact} ({ts}default organization{/ts}){/if}
+      </div>
     </div>
-  </div>
+  {/crmRegion}
 </div>
