@@ -791,22 +791,22 @@ United States', $tokenProcessor->getRow(0)->render('message'));
    */
   public function getDomainTokens(): array {
     return [
-      '{domain.name}' => ts('Domain name'),
-      '{domain.address}' => ts('Domain (organization) address'),
-      '{domain.phone}' => ts('Domain (organization) phone'),
-      '{domain.email}' => 'Domain (organization) email',
+      '{domain.name}' => ts('Domain Name'),
+      '{domain.address}' => ts('Domain (Organization) Full Address'),
+      '{domain.phone}' => ts('Domain (Organization) Phone'),
+      '{domain.email}' => 'Domain (Organization) Email',
       '{domain.id}' => ts('Domain ID'),
       '{domain.description}' => ts('Domain Description'),
       '{domain.now}' => 'Current time/date',
       '{domain.tax_term}' => 'Sales tax term (e.g VAT)',
-      '{domain.street_address}' => 'Domain (organization) street address',
-      '{domain.supplemental_address_1}' => 'Domain (organization) Supplemental Address',
-      '{domain.supplemental_address_2}' => 'Domain (organization) Supplemental Address 2',
-      '{domain.supplemental_address_3}' => 'Domain (organization) Supplemental Address 3',
-      '{domain.city}' => 'Domain (organization) City',
-      '{domain.postal_code}' => 'Domain (organization) Postal Code',
-      '{domain.state_province_id:label}' => 'Domain (organization) State',
-      '{domain.country_id:label}' => 'Domain (organization) Country',
+      '{domain.street_address}' => 'Domain (Organization) Street Address',
+      '{domain.supplemental_address_1}' => 'Domain (Organization) Supplemental Address',
+      '{domain.supplemental_address_2}' => 'Domain (Organization) Supplemental Address 2',
+      '{domain.supplemental_address_3}' => 'Domain (Organization) Supplemental Address 3',
+      '{domain.city}' => 'Domain (Organization) City',
+      '{domain.postal_code}' => 'Domain (Organization) Postal Code',
+      '{domain.state_province_id:label}' => 'Domain (Organization) State',
+      '{domain.country_id:label}' => 'Domain (Organization) Country',
     ];
   }
 
