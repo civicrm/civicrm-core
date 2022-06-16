@@ -20,11 +20,7 @@
           <td valign="bottom" style="white-space: nowrap"><b><font size="1" align="right">{domain.name}</font></b></td>
         </tr>
         <tr>
-          {if $organization_name}
-            <td><font size="1" align="center">{contact.display_name}  ({$organization_name})</font></td>
-          {else}
-            <td><font size="1" align="center">{contact.display_name}</font></td>
-          {/if}
+          <td><font size="1" align="center">{contact.display_name}{if '{contact.current_employer}'} ({contact.current_employer}){/if}</font></td>
           <td><font size="1" align="right">{$invoice_date}</font></td>
           <td style="white-space: nowrap">
             <font size="1" align="right">
@@ -192,7 +188,7 @@
                 </tr>
                 <tr>
                   <td><font size="1" align="right" style="font-weight:bold;">{ts}Invoice Number:{/ts}</font></td>
-                  <td><font size="1" align="right">{$invoice_number}</font></td>
+                  <td><font size="1" align="right">{contribution.invoice_number}</font></td>
                 </tr>
                 <tr><td colspan="5" style="color:#F5F5F5;"><hr></td></tr>
                 {if $is_pay_later == 1}
@@ -232,11 +228,7 @@
           <td><font size="1" align="right">{domain.name}</font></td>
         </tr>
         <tr>
-          {if $organization_name}
-            <td style="padding-left:17px;"><font size="1" align="center">{contact.display_name}  ({$organization_name})</font></td>
-          {else}
-            <td style="padding-left:17px;"><font size="1" align="center">{contact.display_name}</font></td>
-          {/if}
+          <td style="padding-left:17px;"><font size="1" align="center">{contact.display_name}{if '{contact.current_employer}'} ({contact.current_employer}){/if}</font></td>
           <td style="padding-left:30px;"><font size="1" align="right">{$invoice_date}</font></td>
           <td>
             <font size="1" align="right">
