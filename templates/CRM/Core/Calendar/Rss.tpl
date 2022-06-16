@@ -27,8 +27,8 @@
 {/if}
 {if $event.start_date}{ts}When{/ts}: {$event.start_date|crmDate}{if $event.end_date} {ts}through{/ts} {strip}
         {* Only show end time if end date = start date *}
-        {if $event.end_date|date_format:"%Y%m%d" == $event.start_date|date_format:"%Y%m%d"}
-            {$event.end_date|date_format:"%I:%M %p"}
+        {if $event.end_date|crmDate:"%Y%m%d" == $event.start_date|crmDate:"%Y%m%d"}
+            {$event.end_date|crmDate:"%I:%M %p"}
         {else}
             {$event.end_date|crmDate}
         {/if}{/strip}
