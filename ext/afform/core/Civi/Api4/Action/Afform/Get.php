@@ -45,10 +45,8 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         'has_base' => TRUE,
         'type' => 'form',
       ];
-      if ($afform['type'] === 'form') {
-        // afCore and af would normally get required by AngularDependencyMapper but that only works on file-based afforms
-        $afform['requires'] = array_unique(array_merge(['afCore', 'af'], $afform['requires'] ?? []));
-      }
+      // afCore and af would normally get required by AngularDependencyMapper but that only works on file-based afforms
+      $afform['requires'] = array_unique(array_merge(['afCore', 'af'], $afform['requires'] ?? []));
       if (!in_array($name, $names)) {
         $names[] = $name;
       }
