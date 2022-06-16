@@ -369,7 +369,7 @@ class CRM_Utils_Date {
 
         $hour24 = (int) substr($dateString, 11, 2);
         $minute = (int) substr($dateString, 14, 2);
-        $second = (int) substr($dateString, 16, 2);
+        $second = (int) substr($dateString, 17, 2);
       }
       else {
         $year = (int) substr($dateString, 0, 4);

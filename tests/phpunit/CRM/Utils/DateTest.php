@@ -270,6 +270,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%p"), "pm");
     $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%P"), "PM");
     $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%Y"), "2018");
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%s"), "44");
   }
 
   /**
