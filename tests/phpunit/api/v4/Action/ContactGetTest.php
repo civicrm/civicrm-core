@@ -366,7 +366,35 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
 
     $this->assertEquals(20, $get1->count());
     $this->assertCount(10, (array) $get1);
+  }
 
+  public function testGetWithPrimaryEmailPhoneIM() {
+    $lastName = uniqid(__FUNCTION__);
+    $email = uniqid() . '@example.com';
+    $phone = uniqid('phone');
+    $im = uniqid('im');
+    $c1 = $this->createTestRecord('Contact', ['last_name' => $lastName]);
+    $c2 = $this->createTestRecord('Contact', ['last_name' => $lastName]);
+    $c3 = $this->createTestRecord('Contact', ['last_name' => $lastName]);
+
+    $this->createTestRecord('Email', ['email' => $email, 'contact_id' => $c1['id']]);
+    $this->createTestRecord('Email', ['email' => 'not@primary.com', 'contact_id' => $c1['id']]);
+    $this->createTestRecord('Phone', ['phone' => $phone, 'contact_id' => $c1['id']]);
+    $this->createTestRecord('IM', ['name' => $im, 'contact_id' => $c2['id']]);
+
+    $results = Contact::get(FALSE)
+      ->addSelect('id', 'primary_email', 'primary_phone', 'primary_im')
+      ->addWhere('last_name', '=', $lastName)
+      ->addOrderBy('id')
+      ->execute();
+
+    $this->assertEquals($email, $results[0]['primary_email']);
+    $this->assertEquals($phone, $results[0]['primary_phone']);
+    $this->assertEquals($im, $results[1]['primary_im']);
+    $this->assertNull($results[0]['primary_im']);
+    $this->assertNull($results[2]['primary_email']);
+    $this->assertNull($results[2]['primary_phone']);
+    $this->assertNull($results[2]['primary_im']);
   }
 
 }

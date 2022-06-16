@@ -35,6 +35,24 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
       ->setOptionsCallback([__CLASS__, 'getGroupList']);
     $spec->addFieldSpec($field);
 
+    // Email, phone, IM
+    $entities = [
+      'Email' => ts('Email (primary)'),
+      'Phone' => ts('Phone (primary)'),
+      'IM' => ts('IM (primary)'),
+    ];
+    foreach ($entities as $entity => $label) {
+      $name = 'primary_' . strtolower($entity);
+      $field = new FieldSpec($name, 'Contact', 'String');
+      $field->setLabel($label)
+        ->setTitle($label)
+        ->setColumnName('id')
+        ->setType('Extra')
+        ->setReadonly(TRUE)
+        ->setSqlRenderer([__CLASS__, 'getPrimary']);
+      $spec->addFieldSpec($field);
+    }
+
     // Age field
     if (!$spec->getValue('contact_type') || $spec->getValue('contact_type') === 'Individual') {
       $field = new FieldSpec('age_years', 'Contact', 'Integer');
@@ -106,6 +124,19 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
       }
     }
     return $options;
+  }
+
+  /**
+   * Generate SQL for primary email/phone/im field
+   * @param array $field
+   * @return string
+   */
+  public static function getPrimary(array $field) {
+    $entity = \CRM_Core_DAO_AllCoreTables::convertEntityNameToCamel(str_replace('primary_', '', $field['name']));
+    $dao = \CRM_Core_DAO_AllCoreTables::getFullName($entity);
+    $table = $dao::$_tableName;
+    $column = $dao::$_labelField;
+    return "(SELECT `$column` FROM `$table` WHERE `contact_id` = {$field['sql_name']} AND `is_primary` = 1 LIMIT 1)";
   }
 
   /**
