@@ -131,6 +131,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
 
       $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
       $columns = array_map($strtolower, $firstrow);
+      $columns = array_map('trim', $columns);
       $columns = str_replace(' ', '_', $columns);
       $columns = preg_replace('/[^a-z_]/', '', $columns);
 

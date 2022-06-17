@@ -166,6 +166,7 @@ class Test {
     if (!isset(self::$singletons['codeGen'])) {
       $civiRoot = str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__));
       $codeGen = new \CRM_Core_CodeGen_Main("$civiRoot/CRM/Core/DAO", "$civiRoot/sql", $civiRoot, "$civiRoot/templates", NULL, "UnitTests", NULL, "$civiRoot/xml/schema/Schema.xml", NULL);
+      $codeGen->setVerbose(FALSE);
       $codeGen->init();
       self::$singletons['codeGen'] = $codeGen;
     }
