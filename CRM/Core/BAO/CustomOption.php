@@ -165,7 +165,7 @@ class CRM_Core_BAO_CustomOption {
    *
    */
   public static function del($optionId) {
-    // get the customFieldID
+    // Get the Custom Field ID.
     $query = "
 SELECT f.id as id, f.data_type as dataType
 FROM   civicrm_option_value v,
@@ -177,6 +177,8 @@ AND    g.id    = v.option_group_id";
     $params = [1 => [$optionId, 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     if ($dao->fetch()) {
+
+      // Empty the value.
       if (in_array($dao->dataType,
         ['Int', 'Float', 'Money', 'Boolean']
       )) {
@@ -185,21 +187,30 @@ AND    g.id    = v.option_group_id";
       else {
         $value = '';
       }
-      $params = [
+
+      // Fire "pre" hook.
+      $hookParams = [
         'optionId' => $optionId,
         'fieldId' => $dao->id,
+        'fieldDataType' => $dao->dataType,
         'value' => $value,
       ];
-      // delete this value from the tables
+      CRM_Utils_Hook::pre('delete', 'CustomOption', $optionId, $hookParams);
+
+      // Delete this value from the tables.
       self::updateValue($optionId, $value);
 
-      // also delete this option value
+      // Also delete this Option Value.
       $query = "
 DELETE
 FROM   civicrm_option_value
 WHERE  id = %1";
       $params = [1 => [$optionId, 'Integer']];
       CRM_Core_DAO::executeQuery($query, $params);
+
+      // Fire "post" hook.
+      CRM_Utils_Hook::post('delete', 'CustomOption', $optionId);
+
     }
   }
 
