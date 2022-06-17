@@ -127,7 +127,7 @@
               <tr>
                 <td colspan="3"></td>
                 <td style="text-align:right;white-space: nowrap"><font size="1">
-                  {if $contribution_status_id == $refundedStatusId}
+                  {if '{contribution.contribution_status_id:name}' == 'Refunded'}
                     {ts}Amount Credited{/ts}
                   {else}
                     {ts}Amount Paid{/ts}
@@ -150,7 +150,7 @@
               <tr>
                 <td colspan="5"></td>
               </tr>
-              {if $contribution_status_id == $pendingStatusId && $is_pay_later == 1}
+              {if '{contribution.contribution_status_id:name}' == 'Pending' && '{contribution.is_pay_later}' == 1}
                 <tr>
                   <td colspan="3"><b><font size="1" align="center">{ts 1=$dueDate}DUE DATE: %1{/ts}</font></b></td>
                   <td colspan="2"></td>
@@ -161,7 +161,7 @@
         </tr>
       </table>
 
-      {if $contribution_status_id == $pendingStatusId && $is_pay_later == 1}
+      {if '{contribution.contribution_status_id:name}' == 'Pending' && '{contribution.is_pay_later}' == 1}
         <table style="margin-top:5px;" width="100%" border="0" cellpadding="0" cellspacing="0">
           <tr>
             <td><img src="{$resourceBase}/i/contribute/cut_line.png" height="15"></td>
@@ -212,7 +212,7 @@
               </table>
       {/if}
 
-      {if $contribution_status_id == $refundedStatusId || $contribution_status_id == $cancelledStatusId}
+      {if '{contribution.contribution_status_id:name}' === 'Refunded' || '{contribution.contribution_status_id:name}' === 'Cancelled'}
       {if $config->empoweredBy}
         <table style="margin-top:2px;padding-left:7px;page-break-before: always;">
           <tr>
@@ -249,7 +249,7 @@
         </tr>
         <tr>
           <td style="padding-left:17px;"><font size="1" align="center">{$supplemental_address_2}  {$stateProvinceAbbreviation}</font></td>
-          <td style="padding-left:30px;"><font size="1" align="right">{$creditnote_id}</font></td>
+          <td style="padding-left:30px;"><font size="1" align="right">{contribution.creditnote_id}</font></td>
           <td>
             <font size="1" align="right">
               {domain.city}
@@ -268,7 +268,7 @@
         </tr>
         <tr>
           <td></td>
-          <td style="padding-left:30px;"><font size="1" align="right">{$source}</font></td>
+          <td style="padding-left:30px;"><font size="1" align="right">{contribution.source}</font></td>
           <td>
             <font size="1" align="right">
               {domain.email}
@@ -355,7 +355,7 @@
                 <td style="padding-left:28px;text-align:right;"><b><font size="1">{ts 1=$currency}TOTAL %1{/ts}</font></b></td>
                 <td style="padding-left:28px;text-align:right;"><font size="1">{$amount|crmMoney:$currency}</font></td>
               </tr>
-              {if $is_pay_later == 0}
+              {if '{contribution.is_pay_later}' == 0}
                 <tr>
                   <td colspan="3"></td>
                   <td style="padding-left:28px;text-align:right;"><font size="1">{ts}LESS Credit to invoice(s){/ts}</font></td>
@@ -404,7 +404,7 @@
               <tr>
                 <td colspan="2"></td>
                 <td><font size="1" align="right" style="font-weight:bold;">{ts}Credit Note#:{/ts}</font></td>
-                <td><font size="1" align="right">{$creditnote_id}</font></td>
+                <td><font size="1" align="right">{contribution.creditnote_id}</font></td>
               </tr>
               <tr><td colspan="5"style="color:#F5F5F5;"><hr></hr></td></tr>
               <tr>

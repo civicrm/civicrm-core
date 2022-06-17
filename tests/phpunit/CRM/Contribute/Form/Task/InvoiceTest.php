@@ -44,11 +44,22 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
       'forPage' => 1,
     ];
 
-    $this->_individualId = $this->individualCreate();
+    $contactID = $this->individualCreate();
+    $this->callAPISuccess('Address', 'create', [
+      'contact_id' => $contactID,
+      'street_address' => '9 Downing Street',
+      'state_province_id' => 'Maine',
+      'supplemental_address_1' => 'Back Alley',
+      'supplemental_address_2' => 'Left corner',
+      'postal_code' => 90990,
+      'city' => 'Auckland',
+      'country_id' => 'US',
+    ]);
     $contributionParams = [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $contactID,
       'total_amount' => 100,
       'financial_type_id' => 'Donation',
+      'source' => 'Donor gift',
     ];
     $result = $this->callAPISuccess('Contribution', 'create', $contributionParams);
 
@@ -75,6 +86,11 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $this->assertStringNotContainsString('Due Date', $invoiceHTML[$result['id']]);
     $this->assertStringNotContainsString('PAYMENT ADVICE', $invoiceHTML[$result['id']]);
     $this->assertStringContainsString('Mr. Anthony Anderson II', $invoiceHTML[$result['id']]);
+    $this->assertStringContainsString('Left corner ME', $invoiceHTML[$result['id']]);
+    $this->assertStringContainsString('9 Downing Street Back Alley', $invoiceHTML[$result['id']]);
+    $this->assertStringContainsString('Auckland  90990', $invoiceHTML[$result['id']]);
+    $this->assertStringContainsString('United States', $invoiceHTML[$result['id']]);
+    $this->assertStringContainsString('Donor gift', $invoiceHTML[$result['id']]);
 
     $this->assertStringContainsString('Due Date', $invoiceHTML[$contribution['id']]);
     $this->assertStringContainsString('PAYMENT ADVICE', $invoiceHTML[$contribution['id']]);
