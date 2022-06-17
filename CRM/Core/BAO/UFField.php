@@ -1041,6 +1041,33 @@ SELECT  id
   }
 
   /**
+   * Get pseudoconstant list for `field_name`
+   *
+   * Includes APIv4-style names for custom fields for portability.
+   *
+   * @return array
+   */
+  public static function getAvailableFieldOptions() {
+    $fields = self::getAvailableFieldsFlat();
+    $fields['formatting'] = ['title' => ts('Formatting')];
+    $options = [];
+    foreach ($fields as $fieldName => $field) {
+      $option = [
+        'id' => $fieldName,
+        'name' => $fieldName,
+        'label' => $field['title'],
+      ];
+      if (!empty($field['custom_group_id']) && !empty($field['id'])) {
+        $groupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $field['custom_group_id']);
+        $fieldName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $field['id']);
+        $option['name'] = "$groupName.$fieldName";
+      }
+      $options[] = $option;
+    }
+    return $options;
+  }
+
+  /**
    * Determine whether the given field_name is valid.
    *
    * @param string $fieldName
