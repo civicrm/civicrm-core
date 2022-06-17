@@ -117,7 +117,7 @@ class Test {
           throw new \RuntimeException("\\Civi\\Test::headless() requires CIVICRM_UF=UnitTests");
         }
         $dbName = \Civi\Test::dsn('database');
-        echo "Installing {$dbName} schema\n";
+        fprintf(STDERR, "Installing {$dbName} schema\n");
         \Civi\Test::schema()->dropAll();
       }, 'headless-drop')
       ->coreSchema()
