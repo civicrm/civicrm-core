@@ -125,12 +125,7 @@ ENDOUTPUT;
    * Test when you choose PDF from the actions dropdown.
    *
    * We're not too concerned about the actual report rows - there's other
-   * tests for that - we're more interested in does it echo it in pdf
-   * format.
-   *
-   * This isn't great but otherwise dompdf complains about headers already sent.
-   * @runInSeparateProcess
-   * @preserveGlobalState disabled
+   * tests for that - we're more interested in does it hit the pdf output function.
    */
   public function testOutputPdf(): void {
     $contents = '';
@@ -159,11 +154,8 @@ ENDOUTPUT;
       $_SERVER['QUERY_STRING'] = 'reset=1';
     }
 
-    // A bit weird - it will send the output to the browser, which here is the
-    // console, then throw a specific exception. So we capture the output
-    // and the exception.
+    // In the unit text context it throws an exception for us to check.
     try {
-      ob_start();
       CRM_Report_Utils_Report::processReport([
         'instanceId' => $report_instance['id'],
         'format' => 'pdf',
@@ -171,9 +163,9 @@ ENDOUTPUT;
       ]);
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $contents = ob_get_clean();
+      $contents = $e->errorData['html'];
+      $this->assertEquals('pdf', $e->errorData['output']);
     }
-    $this->assertStringStartsWith('%PDF', $contents);
     $this->assertStringContainsString("id_value={$last_contact['id']}", $contents);
   }
 
