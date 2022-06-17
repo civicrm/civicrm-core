@@ -500,6 +500,9 @@ class TokenProcessor {
           require_once 'CRM/Core/Smarty/plugins/modifier.crmDate.php';
           return \smarty_modifier_crmDate($value->format('Y-m-d H:i:s'), $filter[1] ?? NULL);
         }
+        if ($value === '') {
+          return $value;
+        }
 
       default:
         throw new \CRM_Core_Exception("Invalid token filter: $filter");
