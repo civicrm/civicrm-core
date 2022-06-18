@@ -94,4 +94,11 @@ trait CRMTraits_Import_ParserTrait {
     return $mapper;
   }
 
+  /**
+   * @return \CRM_Import_DataSource
+   */
+  protected function getDataSource(): CRM_Import_DataSource {
+    return new CRM_Import_DataSource_CSV($this->userJobID);
+  }
+
 }

@@ -24,6 +24,7 @@ use Civi\Api4\IM;
 use Civi\Api4\LocationType;
 use Civi\Api4\OpenID;
 use Civi\Api4\Phone;
+use Civi\Api4\Relationship;
 use Civi\Api4\RelationshipType;
 use Civi\Api4\UserJob;
 use Civi\Api4\Website;
@@ -36,6 +37,7 @@ use Civi\Api4\Website;
  */
 class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
+  use CRMTraits_Import_ParserTrait;
 
   /**
    * Main entity for the class.
@@ -50,13 +52,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @var array
    */
   private $relationships = [];
-
-  /**
-   * User Job ID.
-   *
-   * @var int
-   */
-  private $userJobID;
 
   /**
    * Tear down after test.
@@ -313,6 +308,32 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contactID]);
     $this->assertEquals('', $contact['nick_name']);
     $this->assertEquals(['Parent'], $contact['contact_sub_type']);
+  }
+
+  /**
+   * Test updating an existing contact with external_identifier match but subtype mismatch.
+   *
+   * The subtype is not updated, as there is conflicting contact data.
+   */
+  public function testImportParserUpdateWithExistingRelatedMatch(): void {
+    $contactID = $this->individualCreate([
+      'external_identifier' => 'billy',
+      'first_name' => 'William',
+      'last_name' => 'The Kid',
+      'email' => 'billy-the-kid@example.com',
+      'contact_sub_type' => 'Parent',
+    ]);
+    $this->addChild($contactID);
+    $this->importCSV('individual_related_create.csv', [
+      ['first_name'], ['last_name'], [$this->relationships['Dad to'], 'first_name'], [$this->relationships['Dad to'], 'last_name'], [$this->relationships['Dad to'], 'email'],
+    ], [
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+    ]);
+    $dataSource = $this->getDataSource();
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status']);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status']);
   }
 
   /**
@@ -1219,7 +1240,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       $this->assertEquals(1640, $contact['address'][0]['state_province_id']);
     }
     $this->assertCount(2, $contacts);
-    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $dataSource = $this->getDataSource();
     $dataSource->setOffset(4);
     $dataSource->setLimit(1);
     $row = $dataSource->getRow();
@@ -1679,7 +1700,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $parser->init();
 
     $result = $parser->import($values);
-    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $dataSource = $this->getDataSource();
     if ($result === FALSE && $expectedResult !== FALSE) {
       // Import is moving away from returning a status - this is a better way to check
       $this->assertGreaterThan(0, $dataSource->getRowCount([$expectedResult]));
@@ -1721,7 +1742,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @param int $contactID
    *
    * @throws \API_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function addChild(int $contactID): void {
     $relatedContactID = $this->individualCreate();
@@ -1732,11 +1752,12 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'contact_type_b' => 'Individual',
       'contact_sub_type_a' => 'Parent',
     ])->execute()->first()['id'];
-    \Civi\Api4\Relationship::create()->setValues([
+    Relationship::create()->setValues([
       'relationship_type_id' => $relationshipTypeID,
       'contact_id_a' => $contactID,
       'contact_id_b' => $relatedContactID,
     ])->execute();
+    $this->relationships['Dad to'] = $relationshipTypeID . '_a_b';
   }
 
   /**
@@ -1824,19 +1845,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       $mapper[] = $mapping;
     }
     return $mapper;
-  }
-
-  /**
-   * @param array $fields Array of fields to be imported
-   * @param array $allfields Array of all fields which can be part of import
-   */
-  private function mapRelationshipFields(&$fields, $allfields) {
-    foreach ($allfields as $key => $fieldtocheck) {
-      $elementIndex = array_search($fieldtocheck->_title, $fields);
-      if ($elementIndex !== FALSE) {
-        $fields[$elementIndex] = $key;
-      }
-    }
   }
 
   /**
