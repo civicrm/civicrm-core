@@ -65,8 +65,9 @@ class ExportCustomGroupTest extends CustomTestBase {
     $this->assertEquals($export[5]['params']['values']['option_group_id.name'], $export[1]['params']['values']['name']);
     // Should be only name, not id
     $this->assertArrayNotHasKey('option_group_id', $export[5]['params']['values']);
+    // Field with no options
+    $this->assertNull($export[6]['params']['values']['option_group_id']);
     $this->assertArrayNotHasKey('option_group_id.name', $export[6]['params']['values']);
-    $this->assertArrayNotHasKey('option_group_id', $export[6]['params']['values']);
     $this->assertArrayNotHasKey('option_values', $export[6]['params']['values']);
   }
 
