@@ -92,8 +92,18 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   public function getTrackingFields(): array {
     return [
-      'related_contact_created' => 'INT COMMENT "Number of related contacts created"',
-      'related_contact_matched' => 'INT COMMENT "Number of related contacts found (& potentially updated)"',
+      'related_contact_created' => [
+        'name' => 'related_contact_created',
+        'operation' => 'SUM',
+        'type' => 'INT',
+        'description' => ts('Number of related contacts created'),
+      ],
+      'related_contact_matched' => [
+        'name' => 'related_contact_matched',
+        'operation' => 'SUM',
+        'type' => 'INT',
+        'description' => ts('Number of related contacts found (and potentially updated)'),
+      ],
     ];
   }
 
