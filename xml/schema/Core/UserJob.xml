@@ -7,6 +7,9 @@
   <comment>Tracking for user jobs (eg. imports).</comment>
   <add>5.50</add>
   <log>false</log>
+  <paths>
+    <view>civicrm/import/contact/summary?reset=1&amp;user_job_id=[id]</view>
+  </paths>
   <field>
     <name>id</name>
     <title>User Job ID</title>
