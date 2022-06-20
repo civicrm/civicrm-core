@@ -1061,13 +1061,27 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \League\Csv\CannotInsertRecord
    */
-  public function testImport($csv, $mapper, $expectedError, $expectedOutcomes = [], $submittedValues = []): void {
+  public function testImport($csv, $mapper, $expectedOutcomes = [], $submittedValues = []): void {
     $this->importCSV($csv, $mapper, $submittedValues);
     $dataSource = new CRM_Import_DataSource_CSV(UserJob::get(FALSE)->setSelect(['id'])->execute()->first()['id']);
     foreach ($expectedOutcomes as $outcome => $count) {
       $this->assertEquals($dataSource->getRowCount([$outcome]), $count);
     }
+    ob_start();
+    $_REQUEST['user_job_id'] = $dataSource->getUserJobID();
+    $_REQUEST['status'] = array_key_first($expectedOutcomes);
+    try {
+      CRM_Import_Forms::outputCSV();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      // For now just check it got this far without error.
+      ob_end_clean();
+      return;
+    }
+    ob_end_clean();
+    $this->fail('Should have resulted in a premature exit exception');
   }
 
   /**
@@ -1093,23 +1107,25 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    */
   public function importDataProvider(): array {
     return [
+      'column_names_casing.csv' => [
+        'csv' => 'column_names_casing.csv',
+        'mapper' => [['first_name'], ['last_name'], ['do_not_import'], ['do_not_import'], ['do_not_import'], ['do_not_import']],
+        'expected_outcomes' => [CRM_Import_Parser::VALID => 1],
+      ],
       'individual_unicode.csv' => [
         'csv' => 'individual_unicode.csv',
         'mapper' => [['first_name'], ['last_name'], ['url', 1], ['country', 1]],
-        'expected_error' => '',
         'expected_outcomes' => [CRM_Import_Parser::VALID => 1],
       ],
       'individual_invalid_sub_type' => [
         'csv' => 'individual_invalid_contact_sub_type.csv',
         'mapper' => [['first_name'], ['last_name'], ['contact_sub_type']],
-        'expected_error' => '',
         'expected_outcomes' => [CRM_Import_Parser::ERROR => 1],
       ],
       //Record duplicates multiple contacts
       'organization_multiple_duplicates_invalid' => [
         'csv' => 'organization_multiple_duplicates_invalid.csv',
         'mapper' => [['organization_name'], ['email']],
-        'expected_error' => '',
         'expected_outcomes' => [
           CRM_Import_Parser::VALID => 2,
           CRM_Import_Parser::ERROR => 1,
@@ -1122,7 +1138,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'individual_invalid_external_identifier_email_mismatch' => [
         'csv' => 'individual_invalid_external_identifier_email_mismatch.csv',
         'mapper' => [['first_name'], ['last_name'], ['email'], ['external_identifier']],
-        'expected_error' => '',
         'expected_outcomes' => [
           CRM_Import_Parser::VALID => 2,
           CRM_Import_Parser::ERROR => 1,

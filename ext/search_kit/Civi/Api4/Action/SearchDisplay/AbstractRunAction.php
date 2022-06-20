@@ -779,8 +779,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    */
   protected function applyFilters() {
     // Allow all filters that are included in SELECT clause or are fields on the Afform.
-    $afformFilters = $this->getAfformFilters();
-    $allowedFilters = array_merge($this->getSelectAliases(), $afformFilters);
+    $fieldFilters = $this->getAfformFilterFields();
+    $directiveFilters = $this->getAfformDirectiveFilters();
+    $allowedFilters = array_merge($this->getSelectAliases(), $fieldFilters, $directiveFilters);
 
     // Ignore empty strings
     $filters = array_filter($this->filters, [$this, 'hasValue']);
@@ -793,7 +794,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       if (in_array($key, $allowedFilters, TRUE) || !array_diff($fieldNames, $allowedFilters)) {
         $this->applyFilter($fieldNames, $value);
       }
-      if (in_array($key, $afformFilters, TRUE)) {
+      // Filter labels are used to set the page title for drilldown forms
+      if (in_array($key, $directiveFilters, TRUE)) {
         $this->addFilterLabel($key, $value);
       }
     }
@@ -1051,22 +1053,36 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * Returns a list of filter fields and directive filters
+   * Returns a list of afform fields used as search filters
    *
-   * Automatically applies directive filters
+   * Limited to the current display
    *
-   * @return array
+   * @return string[]
    */
-  private function getAfformFilters() {
+  private function getAfformFilterFields() {
+    $afform = $this->loadAfform();
+    if ($afform) {
+      return array_column(\CRM_Utils_Array::findAll(
+        $afform['searchDisplay']['fieldset'],
+        ['#tag' => 'af-field']
+      ), 'name');
+    }
+    return [];
+  }
+
+  /**
+   * Finds all directive filters and applies the ones with a literal value
+   *
+   * Returns the list of filters that did not get auto-applied (value was passed via js)
+   *
+   * @return string[]
+   */
+  private function getAfformDirectiveFilters() {
     $afform = $this->loadAfform();
     if (!$afform) {
       return [];
     }
-    // Get afform field filters
-    $filterKeys = array_column(\CRM_Utils_Array::findAll(
-      $afform['searchDisplay']['fieldset'],
-      ['#tag' => 'af-field']
-    ), 'name');
+    $filterKeys = [];
     // Get filters passed into search display directive from Afform markup
     $filterAttr = $afform['searchDisplay']['filters'] ?? NULL;
     if ($filterAttr && is_string($filterAttr) && $filterAttr[0] === '{') {

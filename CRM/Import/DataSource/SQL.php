@@ -84,11 +84,9 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
     $tableName = $table->getName();
     $table->createWithQuery($this->getSubmittedValue('sqlQuery'));
 
-    // Get the names of the fields to be imported. Any fields starting with an
-    // underscore are considered to be internal to the import process)
+    // Get the names of the fields to be imported.
     $columnsResult = CRM_Core_DAO::executeQuery(
-      'SHOW FIELDS FROM ' . $tableName . "
-      WHERE Field NOT LIKE '\_%'");
+      'SHOW FIELDS FROM ' . $tableName);
 
     $columnNames = [];
     while ($columnsResult->fetch()) {
