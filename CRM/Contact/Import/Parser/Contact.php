@@ -1742,7 +1742,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         unset($params['relationship']);
       }
       $id = $this->getPossibleContactMatch($params, $extIDMatch, $this->getSubmittedValue('dedupe_rule_id') ?: NULL);
-      if ($id && $this->isSkipDuplicates()) {
+      if ($id && $isMainContact && $this->isSkipDuplicates()) {
         throw new CRM_Core_Exception(ts('Contact matched by dedupe rule already exists in the database.'), CRM_Import_Parser::DUPLICATE);
       }
       return $id;

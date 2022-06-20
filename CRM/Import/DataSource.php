@@ -75,6 +75,13 @@ abstract class CRM_Import_DataSource {
   private $selectFields;
 
   /**
+   * The name of the import table.
+   *
+   * @var string
+   */
+  private $tableName;
+
+  /**
    * @return array|null
    */
   public function getSelectFields(): ?array {
@@ -351,13 +358,22 @@ abstract class CRM_Import_DataSource {
     if (!$tableName) {
       return NULL;
     }
-    if (strpos($tableName, 'civicrm_tmp_') !== 0
-      || !CRM_Utils_Rule::alphanumeric($tableName)) {
-      // The table name is generated and stored by code, not users so it
-      // should be safe - but a check seems prudent all the same.
-      throw new CRM_Core_Exception('Table cannot be deleted');
+    if (!$this->tableName) {
+      // If we are just loading this table we will do some validation.
+      // In the case of viewing historical jobs the table could have
+      // been deleted so we check that when we first load it.
+      if (strpos($tableName, 'civicrm_tmp_') !== 0
+        || !CRM_Utils_Rule::alphanumeric($tableName)) {
+        // The table name is generated and stored by code, not users so it
+        // should be safe - but a check seems prudent all the same.
+        throw new CRM_Core_Exception('Table cannot be deleted');
+      }
+      if (!CRM_Core_DAO::singleValueQuery('SHOW TABLES LIKE %1', [1 => [$tableName, 'String']])) {
+        throw new CRM_Import_Exception_ImportTableUnavailable('table deleted');
+      }
+      $this->tableName = $tableName;
     }
-    return $tableName;
+    return $this->tableName;
   }
 
   /**
@@ -488,7 +504,7 @@ abstract class CRM_Import_DataSource {
        ADD COLUMN _entity_id INT,
        " . $this->getAdditionalTrackingFields() . "
        ADD COLUMN _status VARCHAR(32) DEFAULT 'NEW' NOT NULL,
-       ADD COLUMN _status_message TEXT,
+       ADD COLUMN _status_message LONGTEXT,
        ADD COLUMN _id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
        ADD INDEX(_id),
        ADD INDEX(_status)
