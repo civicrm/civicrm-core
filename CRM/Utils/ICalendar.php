@@ -33,6 +33,7 @@ class CRM_Utils_ICalendar {
    */
   public static function formatText($text) {
     $text = strip_tags($text);
+    $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML401, 'UTF-8');
     $text = str_replace("\\", "\\\\", $text);
     $text = str_replace(',', '\,', $text);
     $text = str_replace(';', '\;', $text);
