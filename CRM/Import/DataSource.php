@@ -273,6 +273,24 @@ abstract class CRM_Import_DataSource {
   }
 
   /**
+   * Get the field names of the fields holding data in the import tracking table.
+   *
+   * @return array
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function getDataFieldNames(): array {
+    $result = CRM_Core_DAO::executeQuery(
+      'SHOW FIELDS FROM ' . $this->getTableName() . "
+      WHERE Field NOT LIKE '\_%'");
+    $fields = [];
+    while ($result->fetch()) {
+      $fields[] = $result->Field;
+    }
+    return $fields;
+  }
+
+  /**
    * Get an array of column headers, if any.
    *
    * Null is returned when there are none - ie because a csv file does not
@@ -572,7 +590,7 @@ abstract class CRM_Import_DataSource {
    * @return string
    */
   private function getSelectClause(): string {
-    return $this->getSelectFields() ? implode(', ', $this->getSelectFields()) : '*';
+    return $this->getSelectFields() ? '`' . implode('`, `', $this->getSelectFields()) . '`' : '*';
   }
 
   /**

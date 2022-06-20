@@ -117,7 +117,7 @@ class Test {
           throw new \RuntimeException("\\Civi\\Test::headless() requires CIVICRM_UF=UnitTests");
         }
         $dbName = \Civi\Test::dsn('database');
-        echo "Installing {$dbName} schema\n";
+        fprintf(STDERR, "Installing {$dbName} schema\n");
         \Civi\Test::schema()->dropAll();
       }, 'headless-drop')
       ->coreSchema()
@@ -166,6 +166,7 @@ class Test {
     if (!isset(self::$singletons['codeGen'])) {
       $civiRoot = str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__));
       $codeGen = new \CRM_Core_CodeGen_Main("$civiRoot/CRM/Core/DAO", "$civiRoot/sql", $civiRoot, "$civiRoot/templates", NULL, "UnitTests", NULL, "$civiRoot/xml/schema/Schema.xml", NULL);
+      $codeGen->setVerbose(FALSE);
       $codeGen->init();
       self::$singletons['codeGen'] = $codeGen;
     }

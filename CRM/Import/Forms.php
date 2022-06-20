@@ -468,9 +468,9 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   protected function getOutputRows($statuses = [], int $limit = 0) {
     $statuses = (array) $statuses;
-    return $this->getDataSourceObject()->setLimit($limit)->setStatuses($statuses)
-      ->setSelectFields(array_merge(['_id', '_status_message'], $this->getColumnHeaders()))
-      ->setStatuses($statuses)->getRows();
+    $dataSource = $this->getDataSourceObject()->setLimit($limit)->setStatuses($statuses)->setStatuses($statuses);
+    $dataSource->setSelectFields(array_merge(['_id', '_status_message'], $dataSource->getDataFieldNames()));
+    return $dataSource->getRows();
   }
 
   /**
@@ -512,7 +512,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   public static function outputCSV(): void {
     $userJobID = CRM_Utils_Request::retrieveValue('user_job_id', 'Integer', NULL, TRUE);
-    $status = CRM_Utils_Request::retrieveValue('status', 'String', NULL, TRUE);
+    $status = (int) CRM_Utils_Request::retrieveValue('status', 'String', NULL, TRUE);
     $saveFileName = CRM_Import_Parser::saveFileName($status);
 
     $form = new CRM_Import_Forms();
@@ -523,13 +523,9 @@ class CRM_Import_Forms extends CRM_Core_Form {
     $writer = Writer::createFromFileObject(new SplTempFileObject());
     $headers = $form->getOutputColumnsHeaders();
     $writer->insertOne($headers);
-    // Note this might be more inefficient that iterating the result
+    // Note this might be more inefficient by iterating the result
     // set & doing insertOne - possibly something to explore later.
     $writer->insertAll($form->getOutputRows($status));
-
-    CRM_Utils_System::setHttpHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
-    CRM_Utils_System::setHttpHeader('Content-Description', 'File Transfer');
-    CRM_Utils_System::setHttpHeader('Content-Type', 'text/csv; charset=UTF-8');
     $writer->output($saveFileName);
     CRM_Utils_System::civiExit();
   }

@@ -795,7 +795,7 @@ abstract class CRM_Import_Parser {
   /**
    * Determines the file name based on error code.
    *
-   * @var $type error code constant
+   * @var int $type code constant
    * @return string
    */
   public static function saveFileName($type) {
