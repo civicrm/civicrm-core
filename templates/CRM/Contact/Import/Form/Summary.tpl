@@ -16,10 +16,11 @@
  {include file="CRM/common/WizardHeader.tpl"}
 <div class="help">
     <p>
-    {ts}<strong>Import has completed successfully.</strong> The information below summarizes the results.{/ts}
+      <strong>{ts}Import has completed successfully.{/ts}</strong>
+    {if $outputUnavailable}{ts}Detailed information is no longer available.{/ts}{else}{ts}The information below summarizes the results.{/ts}{/if}
     </p>
 
-   {if $unMatchCount }
+   {if $unMatchCount}
         <p class="error">
         {ts count=$unMatchCount plural='CiviCRM has detected mismatched contact IDs. These records have not been updated.'}CiviCRM has detected mismatched contact ID. This record has not been updated.{/ts}
         </p>
@@ -52,8 +53,9 @@
         {ts 1=$downloadAddressRecordsUrl}You can <a href='%1'>Download Street Address Records </a>. You may then edit those contact records and update the street address accordingly.{/ts}
         </p>
     {/if}
-</div>
- {* Summary of Import Results (record counts) *}
+  </div>
+  {if !$outputUnavailable}
+  {* Summary of Import Results (record counts) *}
   <table id="summary-counts" class="report">
     <tr><td class="label crm-grid-cell">{ts}Total Rows{/ts}</td>
       <td class="data">{$totalRowCount}</td>
@@ -122,5 +124,6 @@
     {/if}
 
  </table>
+  {/if}
 
 </div>
