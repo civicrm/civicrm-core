@@ -801,7 +801,7 @@ function ts($text, $params = []) {
     if ($bootstrapReady) {
       // just got ready: determine whether there is a working custom translation function
       $config = CRM_Core_Config::singleton();
-      if (isset($config->customTranslateFunction) and function_exists($config->customTranslateFunction)) {
+      if (!empty($config->customTranslateFunction) && function_exists($config->customTranslateFunction)) {
         $function = $config->customTranslateFunction;
       }
     }
