@@ -51,7 +51,7 @@ class Joinable {
   protected $alias;
 
   /**
-   * @var array
+   * @var string[]
    */
   protected $conditions = [];
 
@@ -103,15 +103,18 @@ class Joinable {
    * @return array
    */
   public function getConditionsForJoin(string $baseTableAlias, string $tableAlias) {
-    $baseCondition = sprintf(
+    $conditions = [];
+    $conditions[] = sprintf(
       '`%s`.`%s` =  `%s`.`%s`',
       $baseTableAlias,
       $this->baseColumn,
       $tableAlias,
       $this->targetColumn
     );
-
-    return array_merge([$baseCondition], $this->conditions);
+    foreach ($this->conditions as $condition) {
+      $conditions[] = str_replace(['{base_table}', '{target_table}'], [$baseTableAlias, $tableAlias], $condition);
+    }
+    return $conditions;
   }
 
   /**
@@ -190,11 +193,11 @@ class Joinable {
   }
 
   /**
-   * @param $condition
+   * @param string $condition
    *
    * @return $this
    */
-  public function addCondition($condition) {
+  public function addCondition(string $condition) {
     $this->conditions[] = $condition;
 
     return $this;
@@ -208,7 +211,7 @@ class Joinable {
   }
 
   /**
-   * @param array $conditions
+   * @param string[] $conditions
    *
    * @return $this
    */
