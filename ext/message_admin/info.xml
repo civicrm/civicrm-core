@@ -16,9 +16,6 @@
   </urls>
   <releaseDate>2021-06-12</releaseDate>
   <version>5.53.alpha1</version>
-  <tags>
-    <tag>mgmt:hidden</tag>
-  </tags>
   <develStage>alpha</develStage>
   <compatibility>
     <ver>5.53</ver>
