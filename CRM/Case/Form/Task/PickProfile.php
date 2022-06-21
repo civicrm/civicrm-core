@@ -33,4 +33,31 @@ class CRM_Case_Form_Task_PickProfile extends CRM_Core_Form_Task_PickProfile {
    */
   public static $entityShortname = 'case';
 
+  /**
+   * Get the name of the table for the relevant entity.
+   *
+   * @return string
+   */
+  public function getTableName() {
+    return $this::$tableName;
+  }
+
+  /**
+   * Get the query mode (eg. CRM_Core_BAO_Query::MODE_CASE)
+   *
+   * @return int
+   */
+  public function getQueryMode() {
+    return CRM_Contact_BAO_Query::MODE_CASE;
+  }
+
+  /**
+   * Get the group by clause for the component.
+   *
+   * @return string
+   */
+  public function getEntityAliasField() {
+    return $this::$entityShortname . '_id';
+  }
+
 }
