@@ -38,7 +38,9 @@ class CRM_Utils_ICalendar {
     $text = str_replace(',', '\,', $text);
     $text = str_replace(';', '\;', $text);
     $text = str_replace(["\r\n", "\n", "\r"], "\\n ", $text);
-    $text = implode("\n ", mb_str_split($text, 50));
+    // Remove this check after PHP 7.4 becomes a minimum requirement
+    $str_split = function_exists('mb_str_split') ? 'mb_str_split' : 'str_split';
+    $text = implode("\n ", $str_split($text, 50));
     return $text;
   }
 
@@ -51,6 +53,7 @@ class CRM_Utils_ICalendar {
    * @return string
    */
   public static function unformatText($text) {
+    $text = str_replace("\n ", "", $text);
     $text = str_replace('\n ', "\n", $text);
     $text = str_replace('\;', ';', $text);
     $text = str_replace('\,', ',', $text);
