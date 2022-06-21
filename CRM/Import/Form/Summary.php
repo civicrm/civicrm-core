@@ -62,6 +62,8 @@ abstract class CRM_Import_Form_Summary extends CRM_Import_Forms {
       $this->assign('downloadAddressRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::UNPARSED_ADDRESS_WARNING));
       $this->assign('downloadPledgePaymentErrorRecordsUrl', $this->getDownloadURL(CRM_Contribute_Import_Parser_Contribution::PLEDGE_PAYMENT_ERROR));
       $this->assign('downloadSoftCreditErrorRecordsUrl', $this->getDownloadURL(CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT_ERROR));
+      $this->assign('trackingSummary', $this->getTrackingSummary());
+
       $userJobID = CRM_Utils_Request::retrieve('user_job_id', 'String', $this, TRUE);
       $userJob = UserJob::get(TRUE)
         ->addWhere('id', '=', $userJobID)

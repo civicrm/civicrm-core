@@ -90,10 +90,17 @@
     {/if}
 
     <tr>
-      <td class="label crm-grid-cell">{ts}Total Contacts{/ts}</td>
+      <td class="label crm-grid-cell">{ts}Total Rows Imported{/ts}</td>
       <td class="data">{$validRowCount}</td>
-      <td class="explanation">{ts}Total number of contact records created or modified during the import.{/ts}</td>
+      <td class="explanation">{ts}Total number of primary records created or modified during the import.{/ts}</td>
     </tr>
+    {foreach from=$trackingSummary item="summaryRow"}
+      <tr>
+        <td class="label crm-grid-cell"></td>
+        <td class="data">{$summaryRow.value}</td>
+        <td class="explanation">{$summaryRow.description}</td>
+      </tr>
+    {/foreach}
 
     {if $groupAdditions}
     <tr><td class="label crm-grid-cell">{ts}Import to Groups{/ts}</td>

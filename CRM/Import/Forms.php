@@ -545,6 +545,32 @@ class CRM_Import_Forms extends CRM_Core_Form {
   }
 
   /**
+   * Get the url to download the relevant csv file.
+   * @param string $status
+   *
+   * @return string
+   */
+
+  /**
+   *
+   * @return array
+   */
+  public function getTrackingSummary(): array {
+    $summary = [];
+    $fields = $this->getParser()->getTrackingFields();
+    $row = $this->getDataSourceObject()->setAggregateFields($fields)->getRow();
+    foreach ($fields as $fieldName => $field) {
+      $summary[] = [
+        'field_name' => $fieldName,
+        'description' => $field['description'],
+        'value' => $row[$fieldName],
+      ];
+    }
+
+    return $summary;
+  }
+
+  /**
    * Get the fields available for import selection.
    *
    * @return array
@@ -562,6 +588,14 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @return \CRM_Contact_Import_Parser_Contact|\CRM_Contribute_Import_Parser_Contribution
    */
   protected function getParser() {
+    foreach (CRM_Core_BAO_UserJob::getTypes() as $jobType) {
+      if ($jobType['id'] === $this->getUserJob()['type_id']) {
+        $className = $jobType['class'];
+        $classObject = new $className();
+        $classObject->setUserJobID($this->getUserJobID());
+        return $classObject;
+      };
+    }
     return NULL;
   }
 

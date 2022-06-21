@@ -75,6 +75,13 @@ abstract class CRM_Import_DataSource {
   private $selectFields;
 
   /**
+   * Fields to select as aggregates.
+   *
+   * @var array
+   */
+  private $aggregateFields;
+
+  /**
    * The name of the import table.
    *
    * @var string
@@ -96,6 +103,23 @@ abstract class CRM_Import_DataSource {
   public function setSelectFields(array $selectFields): CRM_Import_DataSource {
     $this->selectFields = $selectFields;
     return $this;
+  }
+
+  /**
+   * @param array $fields
+   *
+   * @return CRM_Import_DataSource
+   */
+  public function setAggregateFields(array $fields): CRM_Import_DataSource {
+    $this->aggregateFields = $fields;
+    return $this;
+  }
+
+  /**
+   * @return array|null
+   */
+  public function getAggregateFields(): ?array {
+    return $this->aggregateFields;
   }
 
   /**
@@ -521,7 +545,7 @@ abstract class CRM_Import_DataSource {
     $sql = '';
     $fields = $this->getParser()->getTrackingFields();
     foreach ($fields as $fieldName => $spec) {
-      $sql .= 'ADD COLUMN  _' . $fieldName . ' ' . $spec . ',';
+      $sql .= 'ADD COLUMN  _' . $fieldName . ' ' . $spec['type'] . ',';
     }
     return $sql;
   }
@@ -606,6 +630,13 @@ abstract class CRM_Import_DataSource {
    * @return string
    */
   private function getSelectClause(): string {
+    if ($this->getAggregateFields()) {
+      $fields = [];
+      foreach ($this->getAggregateFields() as $field) {
+        $fields[] = $field['operation'] . '(_' . $field['name'] . ') as ' . $field['name'];
+      }
+      return implode(',', $fields);
+    }
     return $this->getSelectFields() ? '`' . implode('`, `', $this->getSelectFields()) . '`' : '*';
   }
 
