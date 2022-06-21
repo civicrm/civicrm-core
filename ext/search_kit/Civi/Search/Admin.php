@@ -192,6 +192,19 @@ class Admin {
             array_splice($entity['fields'], $index, 0, [$newField]);
           }
         }
+        // Useful address fields (see ContactSchemaMapSubscriber)
+        if ($entity['name'] === 'Contact') {
+          $addressFields = ['city', 'state_province_id', 'country_id'];
+          foreach ($addressFields as $fieldName) {
+            foreach (['primary', 'billing'] as $type) {
+              $newField = \CRM_Utils_Array::findAll($schema['Address']['fields'], ['name' => $fieldName])[0];
+              $newField['name'] = "address_$type.$fieldName";
+              $arg = [1 => $newField['label']];
+              $newField['label'] = $type === 'primary' ? ts('Address (primary) %1', $arg) : ts('Address (billing) %1', $arg);
+              $entity['fields'][] = $newField;
+            }
+          }
+        }
       }
     }
     return array_values($schema);
