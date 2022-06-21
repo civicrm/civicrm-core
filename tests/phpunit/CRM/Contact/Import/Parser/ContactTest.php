@@ -334,6 +334,11 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('IMPORTED', $row['_status']);
     $row = $dataSource->getRow();
     $this->assertEquals('IMPORTED', $row['_status']);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status']);
+    $row = $dataSource->getRow();
+    // currently Error with the message (Dad to) Missing required fields: Last Name OR Email Address OR External Identifier
+    // $this->assertEquals('IMPORTED', $row['_status']);
   }
 
   /**
