@@ -798,6 +798,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{domain.id}' => ts('Domain ID'),
       '{domain.description}' => ts('Domain Description'),
       '{domain.now}' => 'Current time/date',
+      '{domain.base_url}' => 'Domain absolute base url',
       '{domain.tax_term}' => 'Sales tax term (e.g VAT)',
       '{domain.street_address}' => 'Domain (Organization) Street Address',
       '{domain.supplemental_address_1}' => 'Domain (Organization) Supplemental Address',

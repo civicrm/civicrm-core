@@ -56,6 +56,7 @@ class CRM_Core_DomainTokens extends AbstractTokenSubscriber {
       'id' => ts('Domain ID'),
       'description' => ts('Domain Description'),
       'now' => ts('Current time/date'),
+      'base_url' => ts('Domain absolute base url'),
       'tax_term' => ts('Sales tax term (e.g VAT)'),
     ];
   }
@@ -125,6 +126,7 @@ class CRM_Core_DomainTokens extends AbstractTokenSubscriber {
       $email = reset($loc['email']);
       $tokens['phone'] = $phone['phone'] ?? '';
       $tokens['email'] = $email['email'] ?? '';
+      $tokens['base_url'] = Civi::paths()->getVariable('cms.root', 'url');
       $tokens['tax_term'] = (string) Civi::settings()->get('tax_term');
       Civi::cache('metadata')->set($cacheKey, $tokens);
     }
