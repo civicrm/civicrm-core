@@ -84,7 +84,10 @@ class ExampleDataLoader {
       $this->scanExampleClasses(\Civi::paths()->getPath('[civicrm.root]/'), 'Civi/*/WorkflowMessage', '\\'),
       $this->scanExampleClasses(\Civi::paths()->getPath('[civicrm.root]/'), 'Civi/WorkflowMessage', '\\'),
       $this->scanExampleClasses(\Civi::paths()->getPath('[civicrm.root]/tests/phpunit/'), 'CRM/*/WorkflowMessage', '_'),
-      $this->scanExampleClasses(\Civi::paths()->getPath('[civicrm.root]/tests/phpunit/'), 'Civi/*/WorkflowMessage', '\\')
+      $this->scanExampleClasses(\Civi::paths()->getPath('[civicrm.root]/tests/phpunit/'), 'Civi/*/WorkflowMessage', '\\'),
+      $this->scanExampleClasses(\Civi::paths()->getPath('[civicrm.ext]/'), 'Civi/*/WorkflowMessage', '\\'),
+      $this->scanExampleClasses(\Civi::paths()->getPath('[civicrm.ext]/'), 'Civi/WorkflowMessage', '\\'),
+      $this->scanExampleClasses(\Civi::paths()->getPath('[civicrm.ext]/tests/phpunit/'), 'Civi/*/WorkflowMessage', '\\')
     );
 
     $all = [];
