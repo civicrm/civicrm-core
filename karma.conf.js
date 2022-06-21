@@ -42,7 +42,6 @@ module.exports = function(config) {
       'bower_components/angular-route/angular-route.js',
       'bower_components/angular-mocks/angular-mocks.js',
       'bower_components/angular-ui-sortable/sortable.js',
-      'bower_components/angular-ui-utils/ui-utils.js',
       'bower_components/angular-unsavedChanges/dist/unsavedChanges.js',
       'js/crm.ajax.js',
       'ang/*.js',
