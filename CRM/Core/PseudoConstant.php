@@ -1603,9 +1603,7 @@ WHERE  id = %1
     if (!isset($options[0]) || !is_array($options[0])) {
       // For validate context, machine names are expected in place of labels.
       // A flat array has no names so use the ids for both key and value.
-      return $context === 'validate' ?
-        array_combine(array_keys($options), array_keys($options)) :
-        $options;
+      return $options;
     }
     $result = [];
     $key = ($context === 'match') ? 'name' : 'id';
