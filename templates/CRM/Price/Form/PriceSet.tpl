@@ -70,16 +70,16 @@
                       {if ($option.tax_amount || $option.tax_amount == "0") && $displayOpt && $invoicing}
                         {assign var="amount" value=`$option.amount+$option.tax_amount`}
                         {if $displayOpt == 'Do_not_show'}
-                          {$amount|crmMoney}
+                          {$amount|crmMoney:$currency}
                         {elseif $displayOpt == 'Inclusive'}
-                          {$amount|crmMoney}
-                          <span class='crm-price-amount-label'> {ts 1=$taxTerm 2=$option.tax_amount|crmMoney}(includes %1 of %2){/ts}</span>
+                          {$amount|crmMoney:$currency}
+                          <span class='crm-price-amount-label'> {ts 1=$taxTerm 2=$option.tax_amount|crmMoney:$currency}(includes %1 of %2){/ts}</span>
                         {else}
-                          {$option.amount|crmMoney}
-                          <span class='crm-price-amount-label'> + {$option.tax_amount|crmMoney} {$taxTerm}</span>
+                          {$option.amount|crmMoney:$currency}
+                          <span class='crm-price-amount-label'> + {$option.tax_amount|crmMoney:$currency} {$taxTerm}</span>
                         {/if}
                       {else}
-                        {$option.amount|crmMoney} {$fieldHandle} {$form.$fieldHandle.frozen}
+                        {$option.amount|crmMoney:$currency} {$fieldHandle} {$form.$fieldHandle.frozen}
                       {/if}
                       {if $form.$element_name.frozen EQ 1} ({ts}Sold out{/ts}){/if}
                     {/foreach}
