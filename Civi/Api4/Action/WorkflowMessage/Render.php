@@ -75,13 +75,24 @@ class Render extends \Civi\Api4\Generic\AbstractAction {
 
   public function _run(\Civi\Api4\Generic\Result $result) {
     $this->validateValues();
+    global $moneyFormatLocale;
+    $separatorConfig = \CRM_Utils_Constant::value('IGNORE_SEPARATOR_CONFIG');
+    $originalValue = $moneyFormatLocale;
 
+    if ($this->getTranslationLanguage()) {
+      // Passing in translation language forces money formatting, useful when the
+      // template is previewed before being saved.
+      $moneyFormatLocale = $this->getTranslationLanguage();
+      putenv('IGNORE_SEPARATOR_CONFIG=' . 1);
+    }
     $r = \CRM_Core_BAO_MessageTemplate::renderTemplate([
       'model' => $this->_model,
       'messageTemplate' => $this->getMessageTemplate(),
       'messageTemplateId' => $this->getMessageTemplateId(),
+      'language' => $this->getPreferredLanguage(),
     ]);
-
+    $moneyFormatLocale = $originalValue;
+    putenv('IGNORE_SEPARATOR_CONFIG=' . $separatorConfig);
     $result[] = \CRM_Utils_Array::subset($r, ['subject', 'html', 'text']);
   }
 
