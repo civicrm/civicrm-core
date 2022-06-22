@@ -1321,7 +1321,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         \Civi\Api4\Relationship::create(FALSE)
           ->addValue('contact_id_a', $contactID)
           ->addValue('contact_id_b', $orgID)
-          ->addValue('relationship_type_id', $relTypeId = CRM_Contact_BAO_RelationshipType::getEmployeeRelationshipTypeID())
+          ->addValue('relationship_type_id', CRM_Contact_BAO_RelationshipType::getEmployeeRelationshipTypeID())
           ->addValue('is_permission_a_b:name', 'View and update')
           ->execute();
       }
