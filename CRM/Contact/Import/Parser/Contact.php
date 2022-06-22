@@ -92,8 +92,18 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   public function getTrackingFields(): array {
     return [
-      'related_contact_created' => 'INT COMMENT "Number of related contacts created"',
-      'related_contact_matched' => 'INT COMMENT "Number of related contacts found (& potentially updated)"',
+      'related_contact_created' => [
+        'name' => 'related_contact_created',
+        'operation' => 'SUM',
+        'type' => 'INT',
+        'description' => ts('Number of related contacts created'),
+      ],
+      'related_contact_matched' => [
+        'name' => 'related_contact_matched',
+        'operation' => 'SUM',
+        'type' => 'INT',
+        'description' => ts('Number of related contacts found (and potentially updated)'),
+      ],
     ];
   }
 
@@ -198,7 +208,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $extraFields['related_contact_matched']++;
       }
     }
-    $this->setImportStatus($rowNumber, $this->getStatus(CRM_Import_Parser::VALID), $this->getSuccessMessage(), $contactID, $extraFields, [$contactID]);
+    $this->setImportStatus($rowNumber, $this->getStatus(CRM_Import_Parser::VALID), $this->getSuccessMessage(), $contactID, $extraFields, array_merge(array_keys($relatedContacts), [$contactID]));
     return CRM_Import_Parser::VALID;
   }
 
@@ -1436,14 +1446,16 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       $locationValues = array_filter(array_intersect_key($mappedField, array_fill_keys($locationFields, 1)));
 
       if ($relatedContactKey) {
-        if (!isset($params['relationship'][$relatedContactKey])) {
-          $params['relationship'][$relatedContactKey] = [
-            // These will be over-written by any the importer has chosen but defaults are based on the relationship.
-            'contact_type' => $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction']),
-            'contact_sub_type' => $this->getRelatedContactSubType($mappedField['relationship_type_id'], $mappedField['relationship_direction']),
-          ];
+        if ($importedValue !== '') {
+          if (!isset($params['relationship'][$relatedContactKey])) {
+            $params['relationship'][$relatedContactKey] = [
+              // These will be over-written by any the importer has chosen but defaults are based on the relationship.
+              'contact_type' => $this->getRelatedContactType($mappedField['relationship_type_id'], $mappedField['relationship_direction']),
+              'contact_sub_type' => $this->getRelatedContactSubType($mappedField['relationship_type_id'], $mappedField['relationship_direction']),
+            ];
+          }
+          $this->addFieldToParams($params['relationship'][$relatedContactKey], $locationValues, $fieldName, $importedValue);
         }
-        $this->addFieldToParams($params['relationship'][$relatedContactKey], $locationValues, $fieldName, $importedValue);
       }
       else {
         $this->addFieldToParams($params, $locationValues, $fieldName, $importedValue);

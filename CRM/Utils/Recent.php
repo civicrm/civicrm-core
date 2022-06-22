@@ -182,6 +182,7 @@ class CRM_Utils_Recent {
       $record = civicrm_api4($entityType, 'get', [
         'where' => [['id', '=', $entityId]],
         'select' => [$labelField],
+        'checkPermissions' => FALSE,
       ], 0);
       $title = $record[$labelField] ?? NULL;
     }

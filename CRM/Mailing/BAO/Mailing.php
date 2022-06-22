@@ -1413,7 +1413,12 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       return [];
     }
 
-    $mailingGroups = \Civi\Api4\MailingGroup::get()
+    /*
+    This bypasses permissions to maintain compatibility with the SQL it replaced.  This should ideally not bypass
+    permissions in the future, but it's called by some extensions during mail processing, when cron isn't necessarily
+    called with a logged-in user.
+     */
+    $mailingGroups = \Civi\Api4\MailingGroup::get(FALSE)
       ->addSelect('group.title', 'group.frontend_title')
       ->addJoin('Group AS group', 'LEFT', ['entity_id', '=', 'group.id'])
       ->addWhere('mailing_id', '=', $this->id)
