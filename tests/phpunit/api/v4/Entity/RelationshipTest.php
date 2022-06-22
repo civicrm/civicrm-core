@@ -47,7 +47,7 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(2, $cacheRecords);
   }
 
-  public function testRelCacheCalcFields() {
+  public function testRelationshipCacheCalcFields(): void {
     $c1 = Contact::create(FALSE)->addValue('first_name', '1')->execute()->first()['id'];
     $c2 = Contact::create(FALSE)->addValue('first_name', '2')->execute()->first()['id'];
     $relationship = Relationship::create(FALSE)
@@ -57,7 +57,7 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
         'relationship_type_id' => 1,
         'description' => "Wow, we're related!",
         'is_permission_a_b' => 1,
-        'is_permission_b_a' => 2,
+        'is_permission_b_a:name' => 'View only',
       ])->execute()->first();
     $relationship = Relationship::get(FALSE)
       ->addWhere('id', '=', $relationship['id'])
