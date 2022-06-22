@@ -179,12 +179,16 @@ class CRM_Utils_Recent {
     $labelField = CoreUtil::getInfoItem($entityType, 'label_field');
     $title = NULL;
     if ($labelField) {
-      $record = civicrm_api4($entityType, 'get', [
-        'where' => [['id', '=', $entityId]],
-        'select' => [$labelField],
-        'checkPermissions' => FALSE,
-      ], 0);
-      $title = $record[$labelField] ?? NULL;
+      try {
+        $record = civicrm_api4($entityType, 'get', [
+          'where' => [['id', '=', $entityId]],
+          'select' => [$labelField],
+        ])->first();
+      }
+      catch (\API_Exception $e) {
+        $record = [];
+      }
+      $title = $record[$labelField] ?? ts('Unknown record');
     }
     return $title ?? (CoreUtil::getInfoItem($entityType, 'label_field'));
   }
