@@ -20,6 +20,7 @@
 namespace api\v4\Entity;
 
 use api\v4\Api4TestBase;
+use Civi\Api4\ExampleData;
 use Civi\Api4\WorkflowMessage;
 use Civi\Test\TransactionalInterface;
 
@@ -28,16 +29,21 @@ use Civi\Test\TransactionalInterface;
  */
 class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testGet() {
-    $result = \Civi\Api4\WorkflowMessage::get(0)
+  /**
+   * Basic get test.
+   *
+   * @throws \API_Exception
+   */
+  public function testGet(): void {
+    $result = WorkflowMessage::get(FALSE)
       ->addWhere('name', 'LIKE', 'case%')
       ->execute()
       ->indexBy('name');
     $this->assertTrue(isset($result['case_activity']));
   }
 
-  public function testRenderDefaultTemplate() {
-    $ex = \Civi\Api4\ExampleData::get(0)
+  public function testRenderDefaultTemplate(): void {
+    $ex = ExampleData::get(FALSE)
       ->addWhere('name', '=', 'workflow/case_activity/CaseModelExample')
       ->addSelect('data')
       ->addChain('render', WorkflowMessage::render()
@@ -50,12 +56,12 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
   }
 
   public function testRenderCustomTemplate() {
-    $ex = \Civi\Api4\ExampleData::get(0)
+    $ex = ExampleData::get(0)
       ->addWhere('name', '=', 'workflow/case_activity/CaseModelExample')
       ->addSelect('data')
       ->execute()
       ->single();
-    $result = \Civi\Api4\WorkflowMessage::render(0)
+    $result = WorkflowMessage::render(0)
       ->setWorkflow('case_activity')
       ->setValues($ex['data']['modelProps'])
       ->setMessageTemplate([
@@ -92,21 +98,25 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
   }
 
   /**
+   * Test examples render.
+   *
+   * Only examples tagged phpunit will be checked.
+   *
    * @param string $name
    * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    * @dataProvider getRenderExamples
    */
-  public function testRenderExamples(string $name) {
-    $example = \Civi\Api4\ExampleData::get(0)
+  public function testRenderExamples(string $name): void {
+    $example = ExampleData::get(FALSE)
       ->addWhere('name', '=', $name)
       ->addSelect('name', 'file', 'data', 'asserts')
       ->execute()
       ->single();
 
-    $this->assertTrue(!empty($example['data']['modelProps']), sprintf('Example (%s) is tagged phpunit. It should have modelProps.', $example['name']));
-    $this->assertTrue(!empty($example['asserts']['default']), sprintf('Example (%s) is tagged phpunit. It should have assertions.', $example['name']));
-    $result = \Civi\Api4\WorkflowMessage::render(0)
+    $this->assertNotEmpty($example['data']['modelProps'], sprintf('Example (%s) is tagged phpunit. It should have modelProps.', $example['name']));
+    $this->assertNotEmpty($example['asserts']['default'], sprintf('Example (%s) is tagged phpunit. It should have assertions.', $example['name']));
+    $result = WorkflowMessage::render(FALSE)
       ->setWorkflow($example['data']['workflow'])
       ->setValues($example['data']['modelProps'])
       ->execute()

@@ -294,6 +294,13 @@ class CRM_Financial_BAO_Order {
   protected $priceFieldMetadata = [];
 
   /**
+   * Metadata for price field values.
+   *
+   * @var array
+   */
+  protected $priceFieldValueMetadata = [];
+
+  /**
    * Metadata for price sets.
    *
    * @var array
@@ -577,6 +584,22 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Get the metadata for the given field value.
+   *
+   * @internal use in tested core code only.
+   *
+   * @param int $id
+   *
+   * @return array
+   */
+  public function getPriceFieldValueSpec(int $id) :array {
+    if (!isset($this->priceFieldValueMetadata[$id])) {
+      $this->priceFieldValueMetadata[$id] = PriceFieldValue::get(FALSE)->addWhere('id', '=', $id)->execute()->first();
+    }
+    return $this->priceFieldValueMetadata[$id];
+  }
+
+  /**
    * Get the metadata for the fields in the price set.
    *
    * @internal use in tested core code only.
@@ -832,6 +855,7 @@ class CRM_Financial_BAO_Order {
       elseif ($taxRate) {
         $lineItem['tax_amount'] = ($taxRate / 100) * $lineItem['line_total'];
       }
+      $lineItem['title'] = $lineItem['label'];
     }
     return $lineItems;
   }
@@ -949,7 +973,8 @@ class CRM_Financial_BAO_Order {
       $this->addTotalsToLineBasedOnOverrideTotal((int) $lineItem['financial_type_id'], $lineItem);
     }
     else {
-      $lineItem['tax_amount'] = ($this->getTaxRate($lineItem['financial_type_id']) / 100) * $lineItem['line_total'];
+      $lineItem['tax_rate'] = $this->getTaxRate($lineItem['financial_type_id']);
+      $lineItem['tax_amount'] = ($lineItem['tax_rate'] / 100) * $lineItem['line_total'];
     }
     if (!empty($lineItem['membership_type_id'])) {
       $lineItem['entity_table'] = 'civicrm_membership';
@@ -959,6 +984,32 @@ class CRM_Financial_BAO_Order {
     }
     if ($this->getPriceSetID() === $this->getDefaultPriceSetForComponent('contribution')) {
       $this->fillDefaultContributionLine($lineItem);
+    }
+    if (empty($lineItem['label'])) {
+      $lineItem['label'] = PriceFieldValue::get(FALSE)->addWhere('id', '=', (int) $lineItem['price_field_value_id'])->addSelect('label')->execute()->first()['label'];
+    }
+    if (empty($lineItem['price_field_id']) && !empty($lineItem['membership_type_id'])) {
+      // We have to 'guess' the price field since the calling code hasn't
+      // passed it in (which it really should but ... history).
+      foreach ($this->priceFieldMetadata as $pricefield) {
+        foreach ($pricefield['options'] ?? [] as $option) {
+          if ((int) $option['membership_type_id'] === $lineItem['membership_type_id']) {
+            $lineItem['price_field_id'] = $pricefield['id'];
+            $lineItem['price_field_value_id'] = $option['id'];
+          }
+        }
+      }
+    }
+    if (empty($lineItem['title'])) {
+      // Title is used in output for workflow templates.
+      $htmlType = !empty($this->priceFieldMetadata) ? $this->getPriceFieldSpec($lineItem['price_field_id'])['html_type'] : NULL;
+      $lineItem['title'] = (!$htmlType || $htmlType === 'Text') ? $lineItem['label'] : $this->getPriceFieldSpec($lineItem['price_field_id'])['label'] . ' : ' . $lineItem['label'];
+      if (!empty($lineItem['price_field_value_id'])) {
+        $description = $this->priceFieldValueMetadata[$lineItem['price_field_value_id']]['description'] ?? '';
+        if ($description) {
+          $lineItem['title'] .= ' ' . CRM_Utils_String::ellipsify($description, 30);
+        }
+      }
     }
     $this->lineItems[$index] = $lineItem;
   }
@@ -1013,6 +1064,7 @@ class CRM_Financial_BAO_Order {
         foreach ($field['options'] as $option) {
           if ((int) $option['membership_type_id'] === (int) $lineItem['membership_type_id']) {
             $lineItem['price_field_id'] = $field['id'];
+            $lineItem['price_field_id.label'] = $field['label'];
             $lineItem['price_field_value_id'] = $option['id'];
             $lineItem['qty'] = 1;
           }
@@ -1105,6 +1157,7 @@ class CRM_Financial_BAO_Order {
         'entity_id',
         'entity_table',
         'price_field_id',
+        'price_field_id.label',
         'price_field_id.price_set_id',
         'price_field_value_id',
         'financial_type_id',
@@ -1149,6 +1202,7 @@ class CRM_Financial_BAO_Order {
     $defaults = [
       'qty' => 1,
       'price_field_id' => $this->getDefaultPriceFieldID(),
+      'price_field_id.label' => $this->defaultPriceField['label'],
       'price_field_value_id' => $this->getDefaultPriceFieldValueID(),
       'entity_table' => 'civicrm_contribution',
       'unit_price' => $lineItem['line_total'],

@@ -1,5 +1,8 @@
 <?php
 
+use Civi\Api4\PriceField;
+use Civi\Api4\PriceFieldValue;
+use Civi\Api4\PriceSet;
 use Civi\Api4\WorkflowMessage;
 use Civi\WorkflowMessage\GenericWorkflowMessage;
 use Civi\WorkflowMessage\WorkflowMessageExample;
@@ -21,7 +24,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
       yield [
         'name' => 'workflow/' . $workflow . '/basic_eur',
         'title' => ts('Completed Contribution') . ' : ' . 'EUR',
-        'tags' => ['preview'],
+        'tags' => $workflow === 'contribution_offline_receipt' ? ['phpunit', 'preview'] : ['preview'],
         'workflow' => $workflow,
       ];
       yield [
@@ -31,6 +34,16 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
         'workflow' => 'contribution_offline_receipt',
         'currency' => 'CAD',
       ];
+      $priceSet = $this->getNonQuickConfigPriceSet();
+      if ($priceSet) {
+        yield [
+          'name' => 'workflow/' . $workflow . '/' . 'price_set_' . $priceSet['name'],
+          'title' => ts('Completed Contribution') . ' : ' . $priceSet['title'],
+          'tags' => ['preview'],
+          'workflow' => 'contribution_offline_receipt',
+          'is_show_line_items' => TRUE,
+        ];
+      }
     }
   }
 
@@ -47,6 +60,37 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
     $messageTemplate = new $workFlow['class']();
     $this->addExampleData($messageTemplate, $example);
     $example['data'] = $this->toArray($messageTemplate);
+    switch ($example['workflow']) {
+      case 'contribution_online_receipt':
+        $example['asserts'] = [
+          'default' => [
+            ['for' => 'subject', 'regex' => '/Receipt - FIXME Contribution Title - Barbara Johnson/'],
+            ['for' => 'html', 'regex' => '/table id="crm-event_receipt"/'],
+            ['for' => 'html', 'regex' => '/Dear Barb,/'],
+          ],
+        ];
+        break;
+
+      // This does not yet get hit - placeholder
+      case 'contribution_offline_receipt':
+        $example['asserts'] = [
+          'default' => [
+            ['for' => 'subject', 'regex' => '/Contribution Receipt - Barbara Johnson/'],
+            ['for' => 'text', 'regex' => '/Transaction ID: 123/'],
+          ],
+        ];
+        break;
+
+      // This does not yet get hit - placeholder
+      case 'contribution_invoice_receipt':
+        $example['asserts'] = [
+          'default' => [
+            ['for' => 'subject', 'regex' => '/Invoice - Barbara Johnso/'],
+            ['for' => 'html', 'regex' => '/Amount Paid/'],
+          ],
+        ];
+        break;
+    }
   }
 
   /**
@@ -68,9 +112,68 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
     }
     $mockOrder = new CRM_Financial_BAO_Order();
     $mockOrder->setTemplateContributionID(50);
-    $mockOrder->setPriceSetToDefault('contribution');
+    if (empty($example['is_show_line_items'])) {
+      $mockOrder->setPriceSetToDefault('contribution');
+      $mockOrder->setOverrideTotalAmount($contribution['total_amount']);
+      $mockOrder->setDefaultFinancialTypeID($contribution['financial_type_id']);
+    }
+    else {
+      $priceSet = $this->getNonQuickConfigPriceSet();
+      $mockOrder->setPriceSetID($priceSet['id']);
+      if ($priceSet['financial_type_id']) {
+        $mockOrder->setDefaultFinancialTypeID($priceSet['financial_type_id']);
+      }
+    }
+    foreach (PriceField::get()->addWhere('price_set_id', '=', $mockOrder->getPriceSetID())->execute() as $index => $priceField) {
+      $priceFieldValue = PriceFieldValue::get()->addWhere('price_field_id', '=', $priceField['id'])->execute()->first();
+      if (empty($example['is_show_line_items'])) {
+        $priceFieldValue['amount'] = $contribution['total_amount'];
+        $priceFieldValue['financial_type_id'] = $contribution['financial_type_id'];
+      }
+      $this->setLineItem($mockOrder, $priceField, $priceFieldValue, $index);
+    }
+
+    $contribution['total_amount'] = $mockOrder->getTotalAmount();
+    $contribution['tax_amount'] = $mockOrder->getTotalTaxAmount() ? round($mockOrder->getTotalTaxAmount(), 2) : 0;
+    $messageTemplate->setContribution($contribution);
     $messageTemplate->setOrder($mockOrder);
     $messageTemplate->setContribution($contribution);
+  }
+
+  /**
+   * Get a non-quick-config price set.
+   *
+   * @return array|null
+   * @throws \API_Exception
+   */
+  private function getNonQuickConfigPriceSet(): ?array {
+    // Permission check defaults to true - likely implicitly OK but may need to be false.
+    return PriceSet::get()
+      ->addWhere('is_quick_config', '=', FALSE)
+      ->execute()
+      ->first();
+  }
+
+  /**
+   * @param \CRM_Financial_BAO_Order $mockOrder
+   * @param $priceField
+   * @param array|null $priceFieldValue
+   * @param $index
+   *
+   * @throws \API_Exception
+   */
+  private function setLineItem(CRM_Financial_BAO_Order $mockOrder, $priceField, ?array $priceFieldValue, $index): void {
+    $mockOrder->setLineItem([
+      'price_field_id' => $priceField['id'],
+      'price_field_id.label' => $priceField['label'],
+      'price_field_value_id' => $priceFieldValue['id'],
+      'qty' => $priceField['is_enter_qty'] ? 2 : 1,
+      'unit_price' => $priceFieldValue['amount'],
+      'line_total' => $priceField['is_enter_qty'] ? ($priceFieldValue['amount'] * 2) : $priceFieldValue['amount'],
+      'label' => $priceFieldValue['label'],
+      'financial_type_id' => $priceFieldValue['financial_type_id'],
+      'non_deductible_amount' => $priceFieldValue['non_deductible_amount'],
+    ], $index);
   }
 
 }

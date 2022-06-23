@@ -14,7 +14,7 @@ class Euro5990 extends \Civi\Test\EntityExample {
     $base = [
       'id' => 50,
       'contact_id' => 100,
-      'financial_type_id' => 'Member dues',
+      'financial_type_id' => 2,
       'payment_instrument_id:label' => 'Debit Card',
       'contribution_page_id' => 2,
       'receive_date' => '2021-07-23 15:39:20',
@@ -26,7 +26,6 @@ class Euro5990 extends \Civi\Test\EntityExample {
       'total_amount' => 5990.99,
       'fee_amount' => 0.99,
       'net_amount' => 5990,
-      'tax_amount' => 60,
       'currency' => 'EUR',
       'source' => 'Online donation',
       'amount_level' => 'premium purchased',
