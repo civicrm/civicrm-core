@@ -3141,6 +3141,7 @@ span.crm-select-item-color {
 }
 
 .crm-container.ui-dialog {
+  background-color: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
 }
 .crm-container.ui-dialog.ui-resizable:before {
