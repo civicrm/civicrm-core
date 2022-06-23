@@ -367,9 +367,11 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         // @todo not used in shipped template for a very long time, if ever, remove
         // token is available.
         'id' => $contribution->id,
+        // @todo not used in shipped template from 5.52
         'source' => $source,
         // @todo not used in shipped template from 5.52
         'invoice_number' => $contribution->invoice_number,
+        // @todo not used in shipped template from 5.52
         'invoice_id' => $contribution->invoice_id,
         'resourceBase' => $config->userFrameworkResourceURL,
         // @todo not used in shipped template for a long time
@@ -382,9 +384,13 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'notes' => $invoiceNotes,
         'lineItem' => $lineItem,
         'dataArray' => $dataArray,
+        // @todo not used in shipped template from 5.52
         'refundedStatusId' => $refundedStatusId,
+        // @todo not used in shipped template from 5.52
         'pendingStatusId' => $pendingStatusId,
+        // @todo not used in shipped template from 5.52
         'cancelledStatusId' => $cancelledStatusId,
+        // @todo not used in shipped template from 5.52
         'contribution_status_id' => $contribution->contribution_status_id,
         // @todo not used in shipped template for a long time
         'contributionStatusName' => CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id),
@@ -401,8 +407,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         // Kept for backwards compatibility
         'stateProvinceAbbreviation' => $billingAddress['state_province_abbreviation'] ?? NULL,
         'country' => $billingAddress['country'] ?? NULL,
-        'is_pay_later' => $contribution->is_pay_later,
         // @todo not used in shipped template from 5.52
+        'is_pay_later' => $contribution->is_pay_later,
+        // @todo not used in shipped template from 5.52 - from here down
         'organization_name' => $contribution->_relatedObjects['contact']->organization_name,
         'domain_organization' => $domain->name,
         'domain_street_address' => CRM_Utils_Array::value('street_address', CRM_Utils_Array::value('1', $locationDefaults['address'])),
