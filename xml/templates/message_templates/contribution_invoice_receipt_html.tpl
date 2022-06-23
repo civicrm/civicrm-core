@@ -288,8 +288,8 @@
 
       <table style="margin-top:75px;font-family: Arial, Verdana, sans-serif" width="100%" border="0" cellpadding="5" cellspacing="5" id="desc">
         <tr>
-          <td colspan="2" {$valueStyle}>
-            <table> {* FIXME: style this table so that it looks like the text version (justification, etc.) *}
+          <td colspan="2">
+            <table>
               <tr>
                 <th style="padding-right:28px;text-align:left;font-weight:bold;width:200px;"><font size="1">{ts}Description{/ts}</font></th>
                 <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{ts}Quantity{/ts}</font></th>
