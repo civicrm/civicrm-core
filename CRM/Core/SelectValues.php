@@ -1041,9 +1041,21 @@ class CRM_Core_SelectValues {
    */
   public static function getPermissionedRelationshipOptions() {
     return [
-      CRM_Contact_BAO_Relationship::NONE => ts('None'),
-      CRM_Contact_BAO_Relationship::VIEW => ts('View only'),
-      CRM_Contact_BAO_Relationship::EDIT => ts('View and update'),
+      [
+        'id' => CRM_Contact_BAO_Relationship::NONE,
+        'name' => 'None',
+        'label' => ts('None'),
+      ],
+      [
+        'id' => CRM_Contact_BAO_Relationship::VIEW,
+        'name' => 'View only',
+        'label' => ts('View only'),
+      ],
+      [
+        'id' => CRM_Contact_BAO_Relationship::EDIT,
+        'name' => 'View and update',
+        'label' => ts('View and update'),
+      ],
     ];
   }
 
