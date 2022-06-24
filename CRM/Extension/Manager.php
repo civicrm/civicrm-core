@@ -225,6 +225,9 @@ class CRM_Extension_Manager {
     }
 
     $this->refresh();
+    // It might be useful to reset the container, but (given dev/core#3686) that's not likely to do much.
+    // \Civi::reset();
+    // \CRM_Core_Config::singleton(TRUE, TRUE);
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
   }
 
@@ -311,6 +314,8 @@ class CRM_Extension_Manager {
     $this->statuses = NULL;
     $this->mapper->refresh();
     if (!CRM_Core_Config::isUpgradeMode()) {
+      \Civi::reset();
+      \CRM_Core_Config::singleton(TRUE, TRUE);
       CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
 
       $schema = new CRM_Logging_Schema();
@@ -422,6 +427,8 @@ class CRM_Extension_Manager {
 
     $this->statuses = NULL;
     $this->mapper->refresh();
+    \Civi::reset();
+    \CRM_Core_Config::singleton(TRUE, TRUE);
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
 
     $this->popProcess($keys);
@@ -480,6 +487,8 @@ class CRM_Extension_Manager {
 
     $this->statuses = NULL;
     $this->mapper->refresh();
+    // At the analogous step of `install()` or `disable()`, it would reset the container.
+    // But here, the extension goes from "disabled=>uninstall". All we really need is to reconcile mgd's.
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
     $this->popProcess($keys);
   }
