@@ -65,21 +65,25 @@ class Container {
       return $containerBuilder;
     }
 
-    $envId = \CRM_Core_Config_Runtime::getId();
+    $envId = md5(implode(',', array_merge(
+      [\CRM_Core_Config_Runtime::getId()],
+      array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'prefix')
+    )));
     $file = \Civi::paths()->getPath("[civicrm.compile]/CachedCiviContainer.{$envId}.php");
+    $containerCacheClass = "CachedCiviContainer_{$envId}";
     $containerConfigCache = new ConfigCache($file, $cacheMode === 'auto');
     if (!$containerConfigCache->isFresh()) {
       $containerBuilder = $this->createContainer();
       $containerBuilder->compile();
       $dumper = new PhpDumper($containerBuilder);
       $containerConfigCache->write(
-        $dumper->dump(['class' => 'CachedCiviContainer']),
+        $dumper->dump(['class' => $containerCacheClass]),
         $containerBuilder->getResources()
       );
     }
 
     require_once $file;
-    $c = new \CachedCiviContainer();
+    $c = new $containerCacheClass();
     return $c;
   }
 
