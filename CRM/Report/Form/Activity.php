@@ -273,7 +273,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'title' => ts('Activity Status'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::activityStatus(),
+            'options' => CRM_Activity_BAO_Activity::buildOptions('status_id', 'get'),
           ],
           'location' => [
             'title' => ts('Location'),
@@ -861,8 +861,8 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
    */
   public function alterDisplay(&$rows) {
     $entryFound = FALSE;
-    $activityType = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
-    $activityStatus = CRM_Core_PseudoConstant::activityStatus();
+    $activityType = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'get');
+    $activityStatus = CRM_Activity_BAO_Activity::buildOptions('status_id', 'get');
     $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
     $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
     $viewLinks = FALSE;

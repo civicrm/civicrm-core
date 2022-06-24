@@ -1044,7 +1044,7 @@ INNER JOIN  civicrm_survey survey ON ( activity.source_record_id = survey.id )
    *   success message
    */
   public static function releaseRespondent($params) {
-    $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
+    $activityStatus = CRM_Activity_BAO_Activity::buildOptions('status_id', 'validate');
     $reserveStatusId = array_search('Scheduled', $activityStatus);
     $surveyActivityTypes = CRM_Campaign_BAO_Survey::getSurveyActivityType();
     if (!empty($surveyActivityTypes) && is_array($surveyActivityTypes)) {

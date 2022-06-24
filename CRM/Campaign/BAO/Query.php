@@ -166,7 +166,7 @@ class CRM_Campaign_BAO_Query {
         return;
 
       case 'survey_status_id':
-        $activityStatus = CRM_Core_PseudoConstant::activityStatus();
+        $activityStatus = CRM_Activity_BAO_Activity::buildOptions('status_id', 'get');
 
         $query->_qill[$grouping][] = ts('Survey Status - %1', [1 => $activityStatus[$value]]);
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_activity.status_id',
@@ -444,7 +444,7 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
     $searchVoterFor = $params['campaign_search_voter_for'] ?? NULL;
 
     //get the survey activities.
-    $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
+    $activityStatus = CRM_Activity_BAO_Activity::buildOptions('status_id', 'validate');
     $status = ['Scheduled'];
     if ($searchVoterFor == 'reserve') {
       $status[] = 'Completed';

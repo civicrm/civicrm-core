@@ -380,7 +380,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
       return $rows;
     }
 
-    $activityStatus = CRM_Core_PseudoConstant::activityStatus();
+    $activityStatus = CRM_Activity_BAO_Activity::buildOptions('status_id', 'get');
 
     $engagementLevels = CRM_Campaign_PseudoConstant::engagementLevel();
 

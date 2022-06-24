@@ -197,7 +197,7 @@ class CRM_Campaign_Page_AJAX {
     }
     else {
       //get the survey status in where clause.
-      $scheduledStatusId = array_search('Scheduled', CRM_Core_PseudoConstant::activityStatus('name'));
+      $scheduledStatusId = array_search('Scheduled', CRM_Activity_BAO_Activity::buildOptions('status_id', 'validate'));
       if ($scheduledStatusId) {
         $params['survey_status_id'] = $scheduledStatusId;
       }
@@ -401,7 +401,7 @@ class CRM_Campaign_Page_AJAX {
       }
       if ($createActivity) {
         $isReserved = CRM_Utils_String::strtoboolstr(CRM_Utils_Type::escape($_POST['isReserved'], 'String'));
-        $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
+        $activityStatus = CRM_Activity_BAO_Activity::buildOptions('status_id', 'validate');
         $scheduledStatusId = array_search('Scheduled', $activityStatus);
         if ($isReserved) {
           $surveyValues = [];

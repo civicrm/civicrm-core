@@ -83,7 +83,7 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
     $params = ['id' => $this->_surveyId];
     $this->_surveyDetails = CRM_Campaign_BAO_Survey::retrieve($params, $surveyDetails);
 
-    $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
+    $activityStatus = CRM_Activity_BAO_Activity::buildOptions('status_id', 'validate');
     $statusIds = [];
     foreach (['Scheduled'] as $name) {
       if ($statusId = array_search($name, $activityStatus)) {

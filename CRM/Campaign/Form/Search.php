@@ -341,7 +341,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
       $this->_operation == 'release'
     ) {
       //to conduct interview / release activity status should be scheduled.
-      $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
+      $activityStatus = CRM_Activity_BAO_Activity::buildOptions('status_id', 'validate');
       if ($scheduledStatusId = array_search('Scheduled', $activityStatus)) {
         $this->_formValues['survey_status_id'] = $scheduledStatusId;
       }

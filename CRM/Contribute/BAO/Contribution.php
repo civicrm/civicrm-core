@@ -16,6 +16,7 @@ use Civi\Api4\ContributionRecur;
 use Civi\Api4\LineItem;
 use Civi\Api4\ContributionSoft;
 use Civi\Api4\PaymentProcessor;
+use Civi\Api4\RelationshipType;
 
 /**
  *
@@ -2225,8 +2226,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       );
     }
 
-    $activityTypeIds = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
-    $activityTypeId = array_search('Contribution', $activityTypeIds);
+    $activityTypeId = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Contribution');
 
     if ($activityTypeId && $contributorId) {
       $activityQuery = "
@@ -2251,22 +2251,20 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
       // for on behalf contribution source is individual and contributor is organization
       if ($sourceContactId && $sourceContactId != $contributorId) {
-        $relationshipTypeIds = CRM_Core_PseudoConstant::relationshipType('name');
-        // get rel type id for employee of relation
-        foreach ($relationshipTypeIds as $id => $typeVals) {
-          if ($typeVals['name_a_b'] == 'Employee of') {
-            $relationshipTypeId = $id;
-            break;
-          }
-        }
+        $relationshipType = RelationshipType::get(FALSE)
+          ->addSelect('id')
+          ->addWhere('name_a_b', '=', 'Employee of')
+          ->execute()->first();
 
-        $rel = new CRM_Contact_DAO_Relationship();
-        $rel->relationship_type_id = $relationshipTypeId;
-        $rel->contact_id_a = $sourceContactId;
-        $rel->contact_id_b = $contributorId;
-        if ($rel->find(TRUE)) {
-          $ids['individual_id'] = $rel->contact_id_a;
-          $ids['organization_id'] = $rel->contact_id_b;
+        if (!empty($relationshipType)) {
+          $rel = new CRM_Contact_DAO_Relationship();
+          $rel->relationship_type_id = $relationshipType['id'];
+          $rel->contact_id_a = $sourceContactId;
+          $rel->contact_id_b = $contributorId;
+          if ($rel->find(TRUE)) {
+            $ids['individual_id'] = $rel->contact_id_a;
+            $ids['organization_id'] = $rel->contact_id_b;
+          }
         }
       }
     }

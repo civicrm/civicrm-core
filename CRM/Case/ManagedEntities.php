@@ -65,7 +65,7 @@ class CRM_Case_ManagedEntities {
    */
   public static function createManagedActivityTypes(CRM_Case_XMLRepository $xmlRepo, CRM_Core_ManagedEntities $me) {
     $result = [];
-    $validActTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name');
+    $validActTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate');
 
     $actTypes = $xmlRepo->getAllDeclaredActivityTypes();
     foreach ($actTypes as $actType) {

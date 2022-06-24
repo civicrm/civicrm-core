@@ -51,7 +51,7 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
     $subTypeId = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey', $this->_surveyId, 'activity_type_id');
     if (!CRM_Core_BAO_CustomGroup::autoCreateByActivityType($subTypeId)) {
       // everything
-      $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE, FALSE);
+      $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'get');
       // FIXME: Displays weird "/\ Array" message; doesn't work with tabs
       CRM_Core_Session::setStatus(
         ts(

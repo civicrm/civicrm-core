@@ -23,7 +23,7 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
    */
   public function __construct() {
 
-    $this->activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
+    $this->activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'get');
     asort($this->activityTypes);
 
     $this->_columns = [

@@ -23,7 +23,7 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
 
     $this->activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
     asort($this->activityTypes);
-    $this->activityStatuses = CRM_Core_PseudoConstant::activityStatus();
+    $this->activityStatuses = CRM_Activity_BAO_Activity::buildOptions('status_id', 'get');
 
     $this->_columns = [
       'civicrm_contact' => [

@@ -591,7 +591,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
    */
   public function alterDisplay(&$rows) {
     $entryFound = FALSE;
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
+    $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'get');
 
     foreach ($rows as $rowNum => $row) {
       if (array_key_exists('civicrm_case_status_id', $row)) {

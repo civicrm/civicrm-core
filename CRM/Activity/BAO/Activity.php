@@ -2384,7 +2384,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
     $viewOnlyCaseActivityTypeIDs = array_flip(CRM_Activity_BAO_Activity::getViewOnlyActivityTypeIDs());
 
     if (!empty($activities)) {
-      $activityStatus = CRM_Core_PseudoConstant::activityStatus();
+      $activityStatus = CRM_Activity_BAO_Activity::buildOptions('status_id', 'get');
 
       // Check logged in user for permission.
       $page = new CRM_Core_Page();

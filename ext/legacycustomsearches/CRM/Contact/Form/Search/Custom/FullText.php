@@ -372,7 +372,7 @@ WHERE      t.table_name = 'Activity' AND
     }
     $dao = CRM_Core_DAO::executeQuery($sql);
 
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
+    $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'get');
     $roleIds = CRM_Event_PseudoConstant::participantRole();
     while ($dao->fetch()) {
       $row = [];

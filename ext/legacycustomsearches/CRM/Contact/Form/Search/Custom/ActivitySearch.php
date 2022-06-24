@@ -104,7 +104,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
     );
 
     // textbox for Activity Status
-    $activityStatus = ['' => ts(' - select status - ')] + CRM_Core_PseudoConstant::activityStatus();
+    $activityStatus = ['' => ts(' - select status - ')] + CRM_Activity_BAO_Activity::buildOptions('status_id', 'get');
 
     $form->add('select', 'activity_status_id', ts('Activity Status'),
       $activityStatus,

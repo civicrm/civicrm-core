@@ -2719,7 +2719,7 @@ WHERE {$whereClause}";
       $dao->contact_id = $contactId;
       $dao->whereAdd("status_id != $deceasedStatusId");
       $dao->find();
-      $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
+
       $allStatus = CRM_Member_PseudoConstant::membershipStatus();
       $memCount = 0;
       while ($dao->fetch()) {
@@ -2748,7 +2748,7 @@ WHERE {$whereClause}";
           'source_contact_id' => $userId,
           'target_contact_id' => $dao->contact_id,
           'source_record_id' => $dao->id,
-          'activity_type_id' => array_search('Change Membership Status', $activityTypes),
+          'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Membership Status'),
           'status_id' => 2,
           'version' => 3,
           'priority_id' => 2,

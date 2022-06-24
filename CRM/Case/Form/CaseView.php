@@ -497,7 +497,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     }
     $form->add('select', 'activity_type_filter_id', ts('Activity Type'), ['' => ts('- select activity type -')] + $aTypesFilter, FALSE, ['id' => 'activity_type_filter_id_' . $form->_caseID]);
 
-    $activityStatus = CRM_Core_PseudoConstant::activityStatus();
+    $activityStatus = CRM_Activity_BAO_Activity::buildOptions('status_id', 'get');
     $form->add('select', 'status_id', ts('Status'), ["" => ts(' - any status - ')] + $activityStatus, FALSE, ['id' => 'status_id_' . $form->_caseID]);
 
     // activity date search filters

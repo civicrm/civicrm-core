@@ -127,7 +127,7 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
 
     $recentContactDisplay = CRM_Contact_BAO_Contact::displayName($recentContactId);
     // add the recently created Activity
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
+    $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'get');
 
     $title = "";
     if (isset($activitySubject)) {

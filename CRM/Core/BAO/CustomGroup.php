@@ -309,7 +309,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       return TRUE;
     }
     // everything
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE, FALSE);
+    $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'get');
     $params = [
       'version' => 3,
       'extends' => 'Activity',

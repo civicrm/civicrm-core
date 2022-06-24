@@ -846,7 +846,7 @@ WHERE  civicrm_participant.id = {$participantId}
     $params = [
       'source_record_id' => $id,
       // activity type id for event registration
-      'activity_type_id' => 5,
+      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Event Registration'),
     ];
 
     CRM_Activity_BAO_Activity::deleteActivity($params);

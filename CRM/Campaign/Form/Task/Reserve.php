@@ -70,7 +70,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     CRM_Campaign_BAO_Survey::retrieve($params, $this->_surveyDetails);
 
     //get the survey activities.
-    $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
+    $activityStatus = CRM_Activity_BAO_Activity::buildOptions('status_id', 'validate');
     $statusIds = [];
     foreach (['Scheduled'] as $name) {
       if ($statusId = array_search($name, $activityStatus)) {
@@ -220,7 +220,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     //add reservation.
     $countVoters = 0;
     $maxVoters = $this->_surveyDetails['max_number_of_contacts'] ?? NULL;
-    $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
+    $activityStatus = CRM_Activity_BAO_Activity::buildOptions('status_id', 'validate');
     $statusHeld = array_search('Scheduled', $activityStatus);
 
     $reservedVoterIds = [];

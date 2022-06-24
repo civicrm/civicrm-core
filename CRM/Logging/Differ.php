@@ -300,7 +300,7 @@ WHERE lt.log_conn_id = %1
             break;
 
           case 'civicrm_activity':
-            $values[$table]['status_id'] = CRM_Core_PseudoConstant::activityStatus();
+            $values[$table]['status_id'] = CRM_Activity_BAO_Activity::buildOptions('status_id', 'get');
             break;
         }
 
