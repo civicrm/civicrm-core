@@ -2342,6 +2342,56 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test event registration that is limited to a participant role.
+   * @dataProvider provideEventRegistrationLimitToData
+   * @throws \CRM_Core_Exception
+   */
+  public function testEventRegistrationLimitTo($testValue, $select): void {
+    // Create event+participant with start_date = 20120315, end_date = 20120615.
+    $params = $this->fixtures['participant'];
+    $params['event_id'] = $this->callAPISuccess('Event', 'create', array_merge($this->fixtures['participant']['event_id'], ['event_type_id' => 1]))['id'];
+    $params['status_id'] = 2;
+    $params['role_id'] = $testValue['role_id'];
+    $params['contact_id'] = $this->individualCreate(array_merge($this->fixtures['contact'], ['email' => 'test-event@example.com']));
+    $this->callAPISuccess('Participant', 'create', $params);
+
+    $actionSchedule = $this->fixtures['sched_event_type_start_1week_before'];
+    $actionSchedule['limit_to'] = TRUE;
+    $actionSchedule['recipient'] = 'participant_role';
+    $actionSchedule['recipient_listing'] = $testValue['recipient_listing'];
+    $actionSchedule['entity_value'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'event_type_id');
+    $this->callAPISuccess('action_schedule', 'create', $actionSchedule);
+
+    // end_date=2012-06-15 ; schedule is 2 weeks before end_date
+    $this->assertCronRuns([
+      [
+        'time' => '2012-03-08 01:00:00',
+        'recipients' => $select ? [['test-event@example.com']] : [],
+      ],
+    ]);
+  }
+
+  /**
+   * provides testdata for testEventRegistrationLimitTo
+   * @return array[]
+   */
+  public function provideEventRegistrationLimitToData() {
+    return [
+       [['role_id' => 1, 'recipient_listing' => 1], TRUE],
+       [['role_id' => 1, 'recipient_listing' => 2], FALSE],
+       [['role_id' => [1, 2], 'recipient_listing' => 2], TRUE],
+       [['role_id' => [1, 3], 'recipient_listing' => 2], FALSE],
+       [['role_id' => 1, 'recipient_listing' => \CRM_Utils_Array::implodePadded([1])], TRUE],
+       [['role_id' => 1, 'recipient_listing' => \CRM_Utils_Array::implodePadded([1, 2])], TRUE],
+       [['role_id' => 2, 'recipient_listing' => \CRM_Utils_Array::implodePadded([1, 2])], TRUE],
+       [['role_id' => 3, 'recipient_listing' => \CRM_Utils_Array::implodePadded([1, 2])], FALSE],
+       [['role_id' => [1, 3], 'recipient_listing' => \CRM_Utils_Array::implodePadded([1, 2])], TRUE],
+       [['role_id' => [3, 2], 'recipient_listing' => \CRM_Utils_Array::implodePadded([1, 2])], TRUE],
+       [['role_id' => [3, 4], 'recipient_listing' => \CRM_Utils_Array::implodePadded([1, 2])], FALSE],
+    ];
+  }
+
+  /**
    * Test schedule on event end date.
    *
    * @throws \CRM_Core_Exception
