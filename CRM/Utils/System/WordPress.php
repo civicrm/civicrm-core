@@ -881,6 +881,12 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       'role' => get_option('default_role'),
     ];
 
+    // The notify parameter was ignored on WordPress and default behaviour was to always notify.
+    // Preserve that behaviour but allow the "notify" parameter to be used.
+    if (!isset($params['notify'])) {
+      $params['notify'] = TRUE;
+    }
+
     // If there's a password add it, otherwise generate one.
     if (!empty($params['cms_pass'])) {
       $user_data['user_pass'] = $params['cms_pass'];
@@ -939,8 +945,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       wp_signon($creds, FALSE);
     }
 
-    // Fire the new user action. Sends notification email by default.
-    do_action('register_new_user', $uid);
+    if ($params['notify']) {
+      // Fire the new user action. Sends notification email by default.
+      do_action('register_new_user', $uid);
+    }
 
     // Restore the CiviCRM-WordPress listeners.
     $this->hooks_core_add();
