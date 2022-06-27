@@ -80,8 +80,18 @@ class CRM_Utils_Recent {
    * Create function used by the API - supplies defaults
    *
    * @param array $params
+   * @param Civi\Api4\Generic\AbstractAction $action
    */
-  public static function create(array $params) {
+  public static function create(array $params, Civi\Api4\Generic\AbstractAction $action) {
+    if ($action->getCheckPermissions()) {
+      $allowed = civicrm_api4($params['entity_type'], 'checkAccess', [
+        'action' => 'get',
+        'values' => ['id' => $params['entity_id']],
+      ], 0);
+      if (empty($allowed['access'])) {
+        return [];
+      }
+    }
     $params['title'] = $params['title'] ?? self::getTitle($params['entity_type'], $params['entity_id']);
     $params['view_url'] = $params['view_url'] ?? self::getUrl($params['entity_type'], $params['entity_id'], 'view');
     $params['edit_url'] = $params['edit_url'] ?? self::getUrl($params['entity_type'], $params['entity_id'], 'update');
@@ -182,10 +192,11 @@ class CRM_Utils_Recent {
       $record = civicrm_api4($entityType, 'get', [
         'where' => [['id', '=', $entityId]],
         'select' => [$labelField],
+        'checkPermissions' => FALSE,
       ], 0);
       $title = $record[$labelField] ?? NULL;
     }
-    return $title ?? (CoreUtil::getInfoItem($entityType, 'label_field'));
+    return $title ?? (CoreUtil::getInfoItem($entityType, 'title'));
   }
 
   /**
