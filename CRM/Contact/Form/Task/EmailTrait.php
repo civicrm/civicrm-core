@@ -258,7 +258,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
       'followup_activity_type_id' => [
         'type' => 'select',
         'label' => ts('Followup Activity'),
-        'attributes' => ['' => '- ' . ts('select activity') . ' -'] + CRM_Core_PseudoConstant::ActivityType(FALSE),
+        'attributes' => ['' => '- ' . ts('select activity') . ' -'] + CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'search'),
         'extra' => ['class' => 'crm-select2'],
       ],
       'followup_activity_subject' => [

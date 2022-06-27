@@ -380,8 +380,6 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
       return $rows;
     }
 
-    $activityStatus = CRM_Activity_BAO_Activity::buildOptions('status_id', 'get');
-
     $engagementLevels = CRM_Campaign_PseudoConstant::engagementLevel();
 
     // CRM-4418
@@ -406,7 +404,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
         $row['class'] = 'status-ontime';
       }
 
-      $row['status'] = $row['status_id'] ? $activityStatus[$row['status_id']] : NULL;
+      $row['status'] = $row['status_id'] ? CRM_Core_Pseudoconstant::getLabel('CRM_Activity_BAO_Activity', 'status_id', $row['status_id']) : NULL;
 
       if ($engagementLevel = CRM_Utils_Array::value('engagement_level', $row)) {
         $row['engagement_level'] = CRM_Utils_Array::value($engagementLevel, $engagementLevels, $engagementLevel);

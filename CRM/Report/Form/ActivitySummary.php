@@ -130,13 +130,13 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
             'title' => ts('Activity Type'),
             'default' => 0,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE),
+            'options' => CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'get'),
           ],
           'status_id' => [
             'title' => ts('Activity Status'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Activity_BAO_Activity::buildOptions('status_id', 'get'),
+            'options' => CRM_Activity_BAO_Activity::buildOptions('status_id', 'search'),
           ],
           'priority_id' => [
             'title' => ts('Activity Priority'),

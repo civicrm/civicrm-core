@@ -558,11 +558,10 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
 
   // Legacy extras
   if (!empty($params['contact_id'])) {
-    $statusOptions = CRM_Activity_BAO_Activity::buildOptions('status_id', 'get');
     $typeOptions = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate');
     foreach ($activities as $key => &$activityArray) {
       if (!empty($activityArray['status_id'])) {
-        $activityArray['status'] = $statusOptions[$activityArray['status_id']];
+        $activityArray['status'] = CRM_Core_Pseudoconstant::getLabel('CRM_Activity_BAO_Activity', 'status_id', $activityArray['status_id']);
       }
       if (!empty($activityArray['activity_type_id'])) {
         $activityArray['activity_name'] = $typeOptions[$activityArray['activity_type_id']];

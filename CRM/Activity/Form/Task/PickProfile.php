@@ -79,7 +79,7 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
     $types = ['Activity'];
     $profiles = CRM_Core_BAO_UFGroup::getProfiles($types, TRUE);
 
-    $activityTypeIds = array_flip(CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name'));
+    $activityTypeIds = array_flip(CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate'));
     $nonEditableActivityTypeIds = [
       $activityTypeIds['Email'],
       $activityTypeIds['Bulk Email'],

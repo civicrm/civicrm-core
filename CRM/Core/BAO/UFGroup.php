@@ -1081,8 +1081,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
           $params[$index] = implode(',', $entityTags);
         }
         elseif ($name == 'activity_status_id') {
-          $activityStatus = CRM_Activity_BAO_Activity::buildOptions('status_id', 'get');
-          $values[$index] = $activityStatus[$details->$name];
+          $values[$index] = CRM_Core_Pseudoconstant::getLabel('CRM_Activity_BAO_Activity', 'status_id', $details->$name);
           $params[$index] = $details->$name;
         }
         elseif ($name == 'activity_date_time') {
@@ -2127,7 +2126,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
     elseif ($fieldName == 'activity_status_id') {
       $form->add('select', $name, $title,
-        CRM_Activity_BAO_Activity::buildOptions('status_id', 'get'), $required, ['placeholder' => TRUE]
+        CRM_Activity_BAO_Activity::buildOptions('status_id', 'search'), $required, ['placeholder' => TRUE]
       );
     }
     elseif ($fieldName == 'activity_engagement_level') {

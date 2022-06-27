@@ -273,7 +273,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'title' => ts('Activity Status'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Activity_BAO_Activity::buildOptions('status_id', 'get'),
+            'options' => CRM_Activity_BAO_Activity::buildOptions('status_id', 'search'),
           ],
           'location' => [
             'title' => ts('Location'),
@@ -564,7 +564,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
                 empty($this->_params['activity_type_id_value'])
               ) {
                 if (empty($this->_params['include_case_activities_value'])) {
-                  $this->activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'label', TRUE);
+                  $componentId = CRM_Core_Component::getComponentID('CiviCase');
+                  $this->activityTypes = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, " AND v.component_id !={$componentId} OR v.component_id IS NULL");
                 }
                 $actTypes = array_flip($this->activityTypes);
                 $clause = "( {$this->_aliases['civicrm_activity']}.activity_type_id IN (" .

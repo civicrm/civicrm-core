@@ -1268,12 +1268,13 @@ HERESQL;
     $activityTypeId = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $activityId, 'activity_type_id');
     // If it's a case activity
     if ($caseId) {
-      $nonCaseActivityTypes = CRM_Core_PseudoConstant::activityType();
-      if (!empty($nonCaseActivityTypes[$activityTypeId])) {
-        $anyActivity = TRUE;
+      $componentId = CRM_Core_Component::getComponentID('CiviCase');
+      $caseActivityTypes = CRM_Core_OptionGroup::values('activity_type', TRUE, FALSE, FALSE, " AND v.component_id={$componentId}");
+      if (!empty($caseActivityTypes[$activityTypeId])) {
+        $anyActivity = FALSE;
       }
       else {
-        $anyActivity = FALSE;
+        $anyActivity = TRUE;
       }
       $tplParams['isCaseActivity'] = 1;
       $tplParams['client_id'] = $clientId;

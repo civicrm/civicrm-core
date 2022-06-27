@@ -908,7 +908,7 @@ HERESQL;
    */
   public function alterComponentDisplay(&$componentRows) {
     // custom code to alter rows
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
+    $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'get');
     $activityStatus = CRM_Activity_BAO_Activity::buildOptions('status_id', 'get');
 
     $entryFound = FALSE;

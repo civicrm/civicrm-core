@@ -643,7 +643,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     $transaction = new CRM_Core_Transaction();
 
     //delete activity record
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
+    $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate');
 
     $params = [];
     $deleteActivity = FALSE;
@@ -2500,7 +2500,7 @@ WHERE {$whereClause}";
    * @todo document me - I seem a bit out of date....
    */
   public static function _getActTypes() {
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
+    $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate');
     self::$_renewalActType = CRM_Utils_Array::key('Membership Renewal', $activityTypes);
     self::$_signupActType = CRM_Utils_Array::key('Membership Signup', $activityTypes);
   }

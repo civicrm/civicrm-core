@@ -1314,7 +1314,7 @@ class CRM_Core_CodeGen_GenerateData {
         $activityDAO = new CRM_Activity_DAO_Activity();
         $activityId = CRM_Core_OptionGroup::values('activity_type', NULL, NULL, NULL, ' AND v.name IN ("Tell A Friend", "Pledge Acknowledgment")');
         $activityTypeID = $this->randomIndex($activityId);
-        $activity = CRM_Core_PseudoConstant::activityType();
+        $activity = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'get');
         $activityDAO->activity_type_id = $activityTypeID;
         $activityDAO->subject = "Subject for $activity[$activityTypeID]";
         $activityDAO->activity_date_time = $this->randomDate();

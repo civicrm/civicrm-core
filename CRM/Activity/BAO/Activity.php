@@ -2384,8 +2384,6 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
     $viewOnlyCaseActivityTypeIDs = array_flip(CRM_Activity_BAO_Activity::getViewOnlyActivityTypeIDs());
 
     if (!empty($activities)) {
-      $activityStatus = CRM_Activity_BAO_Activity::buildOptions('status_id', 'get');
-
       // Check logged in user for permission.
       $page = new CRM_Core_Page();
       CRM_Contact_Page_View::checkUserPermission($page, $params['contact_id']);
@@ -2511,7 +2509,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
         }
 
         $activity['activity_date_time'] = CRM_Utils_Date::customFormat($values['activity_date_time']);
-        $activity['status_id'] = $activityStatus[$values['status_id']];
+        $activity['status_id'] = CRM_Core_Pseudoconstant::getLabel('CRM_Activity_BAO_Activity', 'status_id', $values['status_id']);
 
         // Get action links.
         //

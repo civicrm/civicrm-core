@@ -271,10 +271,10 @@ abstract class Mapping implements MappingInterface {
     static $valueLabelMap = NULL;
     if ($valueLabelMap === NULL) {
       // CRM-20510: Include CiviCampaign activity types along with CiviCase IF component is enabled
-      $valueLabelMap['activity_type'] = \CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
+      $valueLabelMap['activity_type'] = \CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'search');
       asort($valueLabelMap['activity_type']);
 
-      $valueLabelMap['activity_status'] = \CRM_Activity_BAO_Activity::buildOptions('status_id', 'get');
+      $valueLabelMap['activity_status'] = \CRM_Activity_BAO_Activity::buildOptions('status_id', 'search');
       $valueLabelMap['event_type'] = \CRM_Event_PseudoConstant::eventType();
       $valueLabelMap['civicrm_event'] = \CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
       $valueLabelMap['civicrm_participant_status_type'] = \CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');

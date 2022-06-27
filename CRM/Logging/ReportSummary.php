@@ -124,7 +124,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
 
         'bracket_info' => [
           'entity_column' => 'activity_type_id',
-          'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE),
+          'options' => CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'get'),
           'lookup_table' => 'log_civicrm_activity',
         ],
       ],

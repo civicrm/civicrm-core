@@ -22,7 +22,7 @@ class CRM_Activity_Form_ActivityFilter extends CRM_Core_Form {
 
   public function buildQuickForm() {
     // add activity search filter
-    $activityOptions = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
+    $activityOptions = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'get');
     asort($activityOptions);
 
     $this->add('select', 'activity_type_filter_id', ts('Include'), $activityOptions, FALSE, ['class' => 'crm-select2', 'multiple' => TRUE, 'placeholder' => ts('- all activity type(s) -')]);

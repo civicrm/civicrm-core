@@ -166,9 +166,7 @@ class CRM_Campaign_BAO_Query {
         return;
 
       case 'survey_status_id':
-        $activityStatus = CRM_Activity_BAO_Activity::buildOptions('status_id', 'get');
-
-        $query->_qill[$grouping][] = ts('Survey Status - %1', [1 => $activityStatus[$value]]);
+        $query->_qill[$grouping][] = ts('Survey Status - %1', [1 => CRM_Core_Pseudoconstant::getLabel('CRM_Activity_BAO_Activity', 'status_id', $value)]);
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_activity.status_id',
           $op, $value, 'Integer'
         );

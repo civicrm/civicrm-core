@@ -143,7 +143,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   public function setFields() {
     // Remove print document activity type
     $unwanted = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, "AND v.name = 'Print PDF Letter'");
-    $activityTypes = array_diff_key(CRM_Core_PseudoConstant::ActivityType(FALSE), $unwanted);
+    $activityTypes = array_diff_key(CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'search'), $unwanted);
 
     $this->_fields = [
       'subject' => [

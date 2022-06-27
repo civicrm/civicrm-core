@@ -189,7 +189,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
       $currentTaskValue = $taskMapping[$this->_operation] ?? NULL;
       $taskValue = array($currentTaskValue => $allTasks[$currentTaskValue]);
       if ($this->_operation == 'interview' && !empty($this->_formValues['campaign_survey_id'])) {
-        $activityTypes = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
+        $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'search');
 
         $surveyTypeId = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey',
           $this->_formValues['campaign_survey_id'],

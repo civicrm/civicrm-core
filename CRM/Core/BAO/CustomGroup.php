@@ -1026,7 +1026,7 @@ ORDER BY civicrm_custom_group.weight,
 
       //include case activities customdata if case is enabled
       if (in_array('Activity', $extends)) {
-        $extendValues = implode(',', array_keys(CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE)));
+        $extendValues = implode(',', array_keys(CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'get')));
         $where .= " AND ( civicrm_custom_group.extends_entity_column_value IS NULL OR REPLACE( civicrm_custom_group.extends_entity_column_value, %2, ' ') IN ($extendValues) ) ";
         $params[2] = [CRM_Core_DAO::VALUE_SEPARATOR, 'String'];
       }
@@ -2347,7 +2347,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
    */
   public static function getSubTypes(): array {
     $sel2 = [];
-    $activityType = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
+    $activityType = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'search');
 
     $eventType = CRM_Core_OptionGroup::values('event_type');
     $campaignTypes = CRM_Campaign_PseudoConstant::campaignType();
