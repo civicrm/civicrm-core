@@ -66,11 +66,16 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
     $this->assertRegExp('/The role is myrole./', $result['text']);
   }
 
+  public function testRenderExamplesBaseline() {
+    $examples = $this->getRenderExamples();
+    $this->assertTrue(isset($examples['workflow/contribution_recurring_edit/AlexCancelled']));
+  }
+
   public function getRenderExamples(): array {
     $metas = \Civi\Test::examples()->getMetas();
     $results = [];
     foreach ($metas as $name => $meta) {
-      if (empty($meta['workflow'])) {
+      if (!empty($meta['data']['workflow'])) {
         continue;
       }
       if (empty($meta['tags']) || !in_array('phpunit', $meta['tags'])) {
