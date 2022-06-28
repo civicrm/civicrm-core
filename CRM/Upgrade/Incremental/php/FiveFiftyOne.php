@@ -47,6 +47,16 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
     $this->addTask('Backfill "civicrm_queue.status" and "civicrm_queue.error")', 'fillQueueColumns');
   }
 
+  /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_5_51_beta1($rev): void {
+    $this->addTask('Convert UserJob table type_id to job_type', 'updateUserJobTable');
+  }
+
   public static function fillQueueColumns($ctx): bool {
     // Generally, anything we do here is nonsensical because there shouldn't be much real world data,
     // and the goal is to require something specific going forward (for anything that has an automatic runner).
@@ -230,6 +240,35 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
       }
     }
 
+    return TRUE;
+  }
+
+  /**
+   * Update user job table to use a text job_type not an integer type_id.
+   *
+   * This makes it easier for non-core classes to register types as
+   * sequential is not required.
+   *
+   * @param $context
+   *
+   * @return bool
+   */
+  public static function updateUserJobTable($context): bool {
+    self::addColumn($context, 'civicrm_user_job', 'job_type', 'varchar(64) NOT NULL');
+    // This is really only for rc-upgraders. There has been no stable with type_id.
+    CRM_Core_DAO::executeQuery(
+      "UPDATE civicrm_user_job SET job_type =
+      CASE
+        WHEN type_id = 1 THEN 'contact_import'
+        WHEN type_id = 2 THEN 'contribution_import'
+        WHEN type_id = 3 THEN 'membership_import'
+        WHEN type_id = 4 THEN 'activity_import'
+        WHEN type_id = 5 THEN 'participant_import'
+        WHEN type_id = 6 THEN 'custom_field_import'
+      END
+      "
+    );
+    self::dropColumn($context, 'civicrm_user_job', 'type_id');
     return TRUE;
   }
 

@@ -142,37 +142,37 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements \Civi\Core\Ho
   public static function getTypes(): array {
     return [
       [
-        'id' => 1,
+        'id' => 'contact_import',
         'name' => 'contact_import',
         'label' => ts('Contact Import'),
         'class' => 'CRM_Contact_Import_Parser_Contact',
       ],
       [
-        'id' => 2,
+        'id' => 'contribution_import',
         'name' => 'contribution_import',
         'label' => ts('Contribution Import'),
         'class' => 'CRM_Contribute_Import_Parser_Contribution',
       ],
       [
-        'id' => 3,
+        'id' => 'membership_import',
         'name' => 'membership_import',
         'label' => ts('Membership Import'),
         'class' => 'CRM_Member_Import_Parser_Membership',
       ],
       [
-        'id' => 4,
+        'id' => 'activity_import',
         'name' => 'activity_import',
         'label' => ts('Activity Import'),
         'class' => 'CRM_Activity_Import_Parser_Activity',
       ],
       [
-        'id' => 5,
+        'id' => 'participant_import',
         'name' => 'participant_import',
         'label' => ts('Participant Import'),
         'class' => 'CRM_Event_Import_Parser_Participant',
       ],
       [
-        'id' => 6,
+        'id' => 'custom_field_import',
         'name' => 'custom_field_import',
         'label' => ts('Multiple Value Custom Field Import'),
         'class' => 'CRM_Custom_Import_Parser_Api',
