@@ -95,7 +95,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetTotalPaymentsParticipantOrder() {
+  public function testGetTotalPaymentsParticipantOrder(): void {
     $orderID = $this->createPartiallyPaidParticipantOrder()['id'];
     $params = [
       'contribution_id' => $orderID,

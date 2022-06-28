@@ -141,9 +141,6 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       '***********1111',
       'Expires: May 2025',
     ]);
-
-    $mut->stop();
-    $mut->clearMessages();
   }
 
   /**
