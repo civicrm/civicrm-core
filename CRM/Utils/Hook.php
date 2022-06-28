@@ -1677,6 +1677,22 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * (EXPERIMENTAL) Scan extensions for a list of auto-registered interfaces.
+   *
+   * This hook is currently experimental. It is a means to implementing `mixin/scan-classes@1`.
+   * If there are no major difficulties circa 5.55, then it can be marked stable.
+   *
+   * @param string[] $classes
+   *   List of classes which may be of interest to the class-scanner.
+   */
+  public static function scanClasses(array &$classes) {
+    self::singleton()->invoke(['classes'], $classes, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_scanClasses'
+    );
+  }
+
+  /**
    * This hook is called when we are determining the contactID for a specific
    * email address
    *
