@@ -53,7 +53,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
    * @param string $rev
    *   The version number matching this function name
    */
-  public function upgrade_5_51_beta1($rev): void {
+  public function upgrade_5_51_beta2($rev): void {
     $this->addTask('Convert UserJob table type_id to job_type', 'updateUserJobTable');
   }
 
