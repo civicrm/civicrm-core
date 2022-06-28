@@ -32,6 +32,8 @@ use Civi\Api4\Utils\ReflectionUtils;
  * @method bool getDebug()
  * @method $this setChain(array $chain)
  * @method array getChain()
+ * @method $this setLanguage(string|null $language)
+ * @method string|null getLanguage()
  */
 abstract class AbstractAction implements \ArrayAccess {
 
@@ -43,6 +45,18 @@ abstract class AbstractAction implements \ArrayAccess {
    * @var int
    */
   protected $version = 4;
+
+  /**
+   * Language (optional).
+   *
+   * If set then listeners such as the Translation subsystem may alter
+   * the output.
+   *
+   * @var string
+   *
+   * @optionsCallback getPreferredLanguageOptions
+   */
+  protected $language;
 
   /**
    * Additional api requests - will be called once per result.
@@ -562,6 +576,17 @@ abstract class AbstractAction implements \ArrayAccess {
         $this->_debugOutput['callback'] = get_class($callable);
       }
     }
+  }
+
+  /**
+   * Get available preferred languages.
+   *
+   * @return array
+   */
+  protected function getPreferredLanguageOptions(): array {
+    $languages = \CRM_Contact_BAO_Contact::buildOptions('preferred_language');
+    ksort($languages);
+    return array_keys($languages);
   }
 
 }

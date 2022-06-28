@@ -3,6 +3,7 @@
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\MessageTemplate;
+use Civi\Api4\Translation;
 use Civi\Token\TokenProcessor;
 
 /**
@@ -198,6 +199,40 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $this->assertEquals('[case #' . $msg->getIdHash() . '] Test 123', $subject);
     $this->assertStringContainsString('Your Case Role(s) : Sand grain counter', $message);
     $this->assertStringContainsString('Case ID : 1234', $message);
+  }
+
+  /**
+   * Test that translated strings are rendered for templates where they exist.
+   *
+   * @throws \API_Exception|\CRM_Core_Exception
+   */
+  public function testGetTranslatedTemplate(): void {
+    $this->individualCreate(['preferred_language' => 'fr_FR']);
+    $this->contributionCreate(['contact_id' => $this->ids['Contact']['individual_0']]);
+    $this->addTranslation();
+
+    $messageTemplate = MessageTemplate::get()
+      ->addWhere('is_default', '=', 1)
+      ->addWhere('workflow_name', 'IN', ['contribution_online_receipt', 'contribution_offline_receipt'])
+      ->addSelect('id', 'msg_subject', 'msg_html', 'workflow_name')
+      ->setLanguage('fr_FR')
+      ->execute()->indexBy('workflow_name');
+
+    $this->assertFrenchTranslationRetrieved($messageTemplate['contribution_online_receipt']);
+
+    $this->assertStringContainsString('{ts}Contribution Receipt{/ts}', $messageTemplate['contribution_offline_receipt']['msg_subject']);
+    $this->assertStringContainsString('Below you will find a receipt', $messageTemplate['contribution_offline_receipt']['msg_html']);
+    $this->assertArrayNotHasKey('actual_language', $messageTemplate['contribution_offline_receipt']);
+
+    $messageTemplate = MessageTemplate::get()
+      ->addWhere('is_default', '=', 1)
+      ->addWhere('workflow_name', 'IN', ['contribution_online_receipt', 'contribution_offline_receipt'])
+      ->addSelect('id', 'msg_subject', 'msg_html', 'workflow_name')
+      ->setLanguage('fr_CA')
+      ->execute()->indexBy('workflow_name');
+
+    $this->assertFrenchTranslationRetrieved($messageTemplate['contribution_online_receipt']);
+
   }
 
   /**
@@ -917,6 +952,40 @@ id |' . $tokenData['contact_id'] . '
 t_stuff.favourite_emoticon |
 ';
     return $expected;
+  }
+
+  /**
+   * @return mixed
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  private function addTranslation() {
+    $messageTemplateID = MessageTemplate::get()
+      ->addWhere('is_default', '=', 1)
+      ->addWhere('workflow_name', '=', 'contribution_online_receipt')
+      ->addSelect('id')
+      ->execute()->first()['id'];
+
+    Translation::save()->setRecords([
+      ['entity_field' => 'msg_subject', 'string' => 'Bonjour'],
+      ['entity_field' => 'msg_html', 'string' => 'Voila!'],
+      ['entity_field' => 'msg_text', 'string' => '{contribution.total_amount}'],
+    ])->setDefaults([
+      'entity_table' => 'civicrm_msg_template',
+      'entity_id' => $messageTemplateID,
+      'status_id:name' => 'active',
+      'language' => 'fr_FR',
+    ])->execute();
+    return $messageTemplateID;
+  }
+
+  /**
+   * @param $contribution_online_receipt
+   */
+  private function assertFrenchTranslationRetrieved($contribution_online_receipt): void {
+    $this->assertEquals('Bonjour', $contribution_online_receipt['msg_subject']);
+    $this->assertEquals('Voila!', $contribution_online_receipt['msg_html']);
+    $this->assertEquals('fr_FR', $contribution_online_receipt['actual_language']);
   }
 
 }

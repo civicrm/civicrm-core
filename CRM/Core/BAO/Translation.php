@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Generic\AbstractAction;
+use Civi\Api4\Translation;
+
 /**
  *
  * @package CRM
@@ -142,6 +145,124 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements \Civi
         $e->addError($r, 'entity_id', 'nonexistent_id', ts('Entity does not exist'));
       }
     }
+  }
+
+  /**
+   * Callback for hook_civicrm_post().
+   *
+   * Flush out cached values.
+   *
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event): void {
+    unset(Civi::$statics[__CLASS__]);
+  }
+
+  /**
+   * Implements hook_civicrm_apiWrappers().
+   *
+   * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_apiWrappers/
+   *
+   * @see \CRM_Utils_Hook::apiWrappers()
+   * @throws \CRM_Core_Exception
+   */
+  public static function hook_civicrm_apiWrappers(&$wrappers, $apiRequest): void {
+    // Only implement for apiv4 & not in a circular way.
+    if ($apiRequest['entity'] === 'Translation'
+      || $apiRequest['entity'] === 'Entity'
+      || !$apiRequest instanceof AbstractAction
+      // Only intervene in 'get'. Code handling save type actions left out of scope.
+      || $apiRequest['action'] !== 'get'
+    ) {
+      return;
+    }
+
+    $apiLanguage = $apiRequest->getLanguage();
+    if (!$apiLanguage || $apiRequest->getLanguage() === Civi::settings()->get('lcMessages')) {
+      return;
+    }
+
+    if ($apiRequest['action'] === 'get') {
+      if (!isset(\Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$apiRequest->getPreferredLanguage()])) {
+        $translated = self::getTranslatedFieldsForRequest($apiRequest);
+        // @todo - once https://github.com/civicrm/civicrm-core/pull/24063 is merged
+        // this could set any defined translation fields that don't have a translation
+        // for one or more fields in the set to '' - ie 'if any are defined for
+        // an entity/language then all must be' - it seems like being strict on this
+        // now will make it easier later....
+        if (!empty($translated['fields']['msg_html']) && !isset($translated['fields']['msg_text'])) {
+          $translated['fields']['msg_text'] = '';
+        }
+        foreach ($translated['fields'] as $field) {
+          \Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$apiRequest->getLanguage()]['fields'][$field['entity_id']][$field['entity_field']] = $field['string'];
+          \Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$apiRequest->getLanguage()]['language'] = $translated['language'];
+        }
+      }
+      if (!empty(\Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$apiRequest->getLanguage()])) {
+        $wrappers[] = new CRM_Core_BAO_TranslateGetWrapper(\Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$apiRequest->getLanguage()]);
+      }
+
+    }
+  }
+
+  /**
+   * @param \Civi\Api4\Generic\AbstractAction $apiRequest
+   * @return array translated fields.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected static function getTranslatedFieldsForRequest(AbstractAction $apiRequest): array {
+    $translations = Translation::get()
+      ->addWhere('entity_table', '=', CRM_Core_DAO_AllCoreTables::getTableForEntityName($apiRequest['entity']))
+      ->setCheckPermissions(FALSE)
+      ->setSelect(['entity_field', 'entity_id', 'string', 'language']);
+    if ((substr($apiRequest->getLanguage(), '-3', '3') !== '_NO')) {
+      // Generally we want to check for any translations of the base language
+      // and prefer, for example, French French over US English for French Canadians.
+      // Sites that genuinely want to cater to both will add translations for both
+      // and we work through preferences below.
+      $translations->addWhere('language', 'LIKE', substr($apiRequest->getLanguage(), 0, 2) . '%');
+    }
+    else {
+      // And here we have ... the Norwegians. They have three main variants which
+      // share the same country suffix but not language prefix. As with other languages
+      // any Norwegian is better than no Norwegian and sites that care will do multiple
+      $translations->addWhere('language', 'LIKE', '%_NO');
+    }
+    $fields = $translations->execute();
+    $languages = [];
+    foreach ($fields as $index => $field) {
+      $languages[$field['language']][$index] = $field;
+    }
+    if (isset($languages[$apiRequest->getLanguage()])) {
+      return ['fields' => $languages[$apiRequest->getLanguage()], 'language' => $apiRequest->getLanguage()];
+    }
+    if (count($languages) === 1) {
+      return ['fields' => reset($languages), 'language' => key($languages)];
+    }
+    if (count($languages) > 1) {
+      // In this situation we have multiple language options but no exact match.
+      // This might be, for example, a case where we have, for example, a US English and
+      // a British English, but no Kiwi English. In that case the best is arguable
+      // but I think we all agree that we want to avoid Aussie English here.
+      $defaultLanguages = [
+        'de' => 'de_DE',
+        'en' => 'en_US',
+        'fr' => 'fr_FR',
+        'es' => 'es_ES',
+        'nl' => 'nl_NL',
+        'pt' => 'pt_PT',
+        'zh' => 'zh_TW',
+      ];
+      $defaultLanguage = $defaultLanguages[substr($apiRequest->getLanguage()(), 0, 2)] ?? NULL;
+      if (isset($languages[$defaultLanguage])) {
+        return ['fields' => $languages[$defaultLanguage], 'language' => $defaultLanguage];
+      }
+      // We have no way to determine which is best from the available variants.
+      // If the site wants more control they can translate to the variants.
+      return ['fields' => reset($languages), 'language' => key($languages)];
+    }
+    return [];
   }
 
 }
