@@ -52,7 +52,7 @@ class CRM_Case_WorkflowMessage_CaseActivityTest extends CiviUnitTestCase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testExampleGet() {
-    $file = \Civi::paths()->getPath('[civicrm.root]/tests/phpunit/CRM/Case/WorkflowMessage/CaseActivity/CaseModelExample.ex.php');
+    $file = \Civi::paths()->getPath('[civicrm.root]/tests/phpunit/CRM/Case/WorkflowMessage/CaseActivity/CaseModelExample.php');
     $name = 'workflow/case_activity/CaseModelExample';
 
     $this->assertTrue(file_exists($file), "Expect find canary file ($file)");

@@ -1487,13 +1487,7 @@ class CRM_Utils_System {
     // a bit aggressive, but livable for now
     CRM_Utils_Cache::singleton()->flush();
 
-    // Traditionally, systems running on memory-backed caches were quite
-    // zealous about destroying *all* memory-backed caches during a flush().
-    // These flushes simulate that legacy behavior. However, they should probably
-    // be removed at some point.
-    $localDrivers = ['CRM_Utils_Cache_ArrayCache', 'CRM_Utils_Cache_NoCache'];
-    if (Civi\Core\Container::isContainerBooted()
-      && !in_array(get_class(CRM_Utils_Cache::singleton()), $localDrivers)) {
+    if (Civi\Core\Container::isContainerBooted()) {
       Civi::cache('long')->flush();
       Civi::cache('settings')->flush();
       Civi::cache('js_strings')->flush();
@@ -1503,6 +1497,7 @@ class CRM_Utils_System {
       Civi::cache('customData')->flush();
       Civi::cache('contactTypes')->clear();
       Civi::cache('metadata')->clear();
+      \Civi\Core\ClassScanner::cache('index')->flush();
       CRM_Extension_System::singleton()->getCache()->flush();
       CRM_Cxn_CiviCxnHttp::singleton()->getCache()->flush();
     }
