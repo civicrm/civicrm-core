@@ -22,6 +22,12 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     Civi::cache('metadata')->clear();
   }
 
+  /**
+   * Basic render function test.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
   public function testRenderTemplate(): void {
     $contactId = $this->individualCreate([
       'first_name' => 'Abba',
