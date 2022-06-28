@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\PriceField;
 use Civi\Api4\PriceSet;
 
 /**
@@ -23,7 +24,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   protected $_individualId;
   protected $_contribution;
-  protected $_financialTypeId = 1;
+  protected $financialTypeID = 1;
   protected $_entity = 'Contribution';
   protected $_params;
   protected $_ids = [];
@@ -87,7 +88,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
       'total_amount' => 100.00,
-      'financial_type_id' => $this->_financialTypeId,
+      'financial_type_id' => $this->financialTypeID,
       'non_deductible_amount' => 10.00,
       'fee_amount' => 5.00,
       'net_amount' => 95.00,
@@ -637,12 +638,20 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   /**
    * Ensure that price field are shown during pay later/pending Contribution
    *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $isTaxed
+   *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testEmailReceiptOnPayLater(): void {
-    $donationFT = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Donation', 'id', 'name');
+  public function testEmailReceiptOnPayLater(bool $isTaxed): void {
+    $financialTypeID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Donation', 'id', 'name');
+    if ($isTaxed) {
+      $this->enableTaxAndInvoicing();
+      $this->addTaxAccountToFinancialType($financialTypeID);
+    }
     $priceSetID = PriceSet::create(FALSE)->setValues([
       'title' => 'Price Set abcd',
       'is_active' => TRUE,
@@ -666,14 +675,15 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'is_active' => ['1' => 1, '2' => 1],
       'price_set_id' => $priceSetID,
       'is_enter_qty' => 1,
-      'financial_type_id' => $donationFT,
+      'financial_type_id' => $financialTypeID,
     ];
-    $priceField = CRM_Price_BAO_PriceField::create($paramsField);
-    $priceFieldValue = $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $priceField->id]);
+
+    $priceFieldID = PriceField::create()->setValues($paramsField)->execute()->first()['id'];
+    $priceFieldValue = $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $priceFieldID]);
 
     $params = [
       'total_amount' => 100,
-      'financial_type_id' => $donationFT,
+      'financial_type_id' => $financialTypeID,
       'contact_id' => $this->_individualId,
       'is_email_receipt' => TRUE,
       'from_email_address' => 'test@test.com',
@@ -683,23 +693,61 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
     foreach ($priceFieldValue['values'] as $id => $price) {
       if ($price['amount'] == 100) {
-        $params['price_' . $priceField->id] = [$id => 1];
+        $params['price_' . $priceFieldID] = [$id => 1];
       }
     }
     $form = $this->getContributionForm($params);
-    $mut = new CiviMailUtils($this, TRUE);
+    $mailUtil = new CiviMailUtils($this, TRUE);
     $form->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetID));
     $form->postProcess();
+    if ($isTaxed) {
+      $mailUtil->checkMailLog([
+        'Dear Anthony,
+Below you will find a receipt for this contribution.
+===========================================================
+Contribution Information
+===========================================================
+Contributor: Mr. Anthony Anderson II
+Financial Type: Donation
+---------------------------------------------------------
+Item                             Qty       Each    Subtotal Tax Rate Tax Amount       Total
+----------------------------------------------------------
+Price Field 1                      1    $100.00    $100.00  10.00 %       $10.00        $110.00
 
-    $mut->checkMailLog([
-      'Financial Type: Donation
+
+Amount before Tax : $100.00
+Sales Tax 10.00% : $10.00
+
+Total Tax Amount : $10.00
+Total Amount : $110.00
+Date Received: ' . date('m/d/Y') . '
+Receipt Date: ' . date('m/d/Y') . '
+Paid By: Check',
+      ]);
+    }
+    else {
+      $mailUtil->checkMailLog([
+        'Dear Anthony,
+Below you will find a receipt for this contribution.
+===========================================================
+Contribution Information
+===========================================================
+Contributor: Mr. Anthony Anderson II
+Financial Type: Donation
 ---------------------------------------------------------
 Item                             Qty       Each       Total
 ----------------------------------------------------------
-Price Field - Price Field 1        1    $100.00       $100.00
-',
-    ]);
-    $mut->stop();
+Price Field 1                      1    $100.00       $100.00
+
+
+
+Total Amount : $100.00
+Date Received: ' . date('m/d/Y') . '
+Receipt Date: ' . date('m/d/Y') . '
+Paid By: Check',
+      ],
+      ['Amount before Tax', 'Tax Amount']);
+    }
   }
 
   /**
@@ -1036,18 +1084,29 @@ Price Field - Price Field 1        1    $100.00       $100.00
    *
    * @dataProvider getThousandSeparators
    */
-  public function testSubmitSaleTax($thousandSeparator) {
+  public function testSubmitSaleTax(string $thousandSeparator): void {
+    $mailUtil = new CiviMailUtils($this, TRUE);
     $this->setCurrencySeparators($thousandSeparator);
     $this->enableTaxAndInvoicing();
-    $this->addTaxAccountToFinancialType($this->_financialTypeId);
+    $this->addTaxAccountToFinancialType($this->financialTypeID);
     $this->submitContributionForm([
       'total_amount' => $this->formatMoneyInput(1000.00),
-      'financial_type_id' => $this->_financialTypeId,
+      'financial_type_id' => $this->financialTypeID,
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
       'price_set_id' => 0,
+      'is_email_receipt' => 1,
+      'from_email_address' => 'demo@example.com',
     ]);
+
+    $mailUtil->checkAllMailLog([
+      'Total Tax Amount : $' . $this->formatMoneyInput(100),
+      'Total Amount : $' . $this->formatMoneyInput(1100),
+      'Paid By: Check',
+    ], []);
+    $mailUtil->clearMessages();
+
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [
         'contact_id' => $this->_individualId,
@@ -1069,8 +1128,15 @@ Price Field - Price Field 1        1    $100.00       $100.00
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
+      'is_email_receipt' => 1,
+      'from_email_address' => 'demo@example.com',
     ], $contribution['id']);
 
+    $mailUtil->checkAllMailLog([
+      'Total Tax Amount : $' . $this->formatMoneyInput(100),
+      'Total Amount : $' . $this->formatMoneyInput(1100),
+      'Paid By: Check',
+    ], []);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId]);
     // Check if total amount is unchanged
     $this->assertEquals(1100, $contribution['total_amount']);
@@ -1084,7 +1150,7 @@ Price Field - Price Field 1        1    $100.00       $100.00
    */
   public function testSubmitWithOutSaleTax(): void {
     $this->enableTaxAndInvoicing();
-    $this->addTaxAccountToFinancialType($this->_financialTypeId);
+    $this->addTaxAccountToFinancialType($this->financialTypeID);
     $this->submitContributionForm([
       'total_amount' => 100,
       'financial_type_id' => 3,
@@ -1122,7 +1188,7 @@ Price Field - Price Field 1        1    $100.00       $100.00
   public function testReSubmitSaleTax(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $this->enableTaxAndInvoicing();
-    $this->addTaxAccountToFinancialType($this->_financialTypeId);
+    $this->addTaxAccountToFinancialType($this->financialTypeID);
     $contribution = $this->doInitialSubmit();
     $this->assertEquals(11000, $contribution['total_amount']);
     $this->assertEquals(1000, $contribution['tax_amount']);
@@ -1182,7 +1248,7 @@ Price Field - Price Field 1        1    $100.00       $100.00
   public function testReSubmitSaleTaxAlteredAmount(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $this->enableTaxAndInvoicing();
-    $this->addTaxAccountToFinancialType($this->_financialTypeId);
+    $this->addTaxAccountToFinancialType($this->financialTypeID);
     $contribution = $this->doInitialSubmit();
 
     $mut = new CiviMailUtils($this, TRUE);
@@ -1244,7 +1310,7 @@ Price Field - Price Field 1        1    $100.00       $100.00
   protected function doInitialSubmit() {
     $this->submitContributionForm([
       'total_amount' => $this->formatMoneyInput(10000),
-      'financial_type_id' => $this->_financialTypeId,
+      'financial_type_id' => $this->financialTypeID,
       'receive_date' => '2015-04-21 00:00:00',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
@@ -1700,7 +1766,7 @@ Price Field - Price Field 1        1    $100.00       $100.00
   public function testOpeningWidgetAdminPage(): void {
     $page_id = $this->callAPISuccess('ContributionPage', 'create', [
       'title' => 'my page',
-      'financial_type_id' => $this->_financialTypeId,
+      'financial_type_id' => $this->financialTypeID,
       'payment_processor' => $this->paymentProcessorID,
     ])['id'];
     $_REQUEST = ['reset' => 1, 'action' => 'update', 'id' => $page_id];

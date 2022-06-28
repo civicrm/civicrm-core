@@ -30,6 +30,7 @@ use Civi\Api4\Address;
 use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\FinancialAccount;
 use Civi\Api4\FinancialType;
 use Civi\Api4\LineItem;
 use Civi\Api4\MembershipType;
@@ -1922,6 +1923,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
           'Event Fee',
         ]
       )->execute();
+      FinancialAccount::delete(FALSE)->addClause(
+        'OR',
+        [['name', 'LIKE', 'Financial-Type -%'], ['name', 'LIKE', 'Sales tax %']]
+      )->execute();
     }
     catch (API_Exception $e) {
       $this->fail('failed to cleanup financial types ' . $e->getMessage());
@@ -3016,31 +3021,32 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * Add Sales Tax Account for the financial type.
    *
-   * @param int $financialTypeId
+   * @param int $financialTypeID
    *
    * @param array $accountParams
    *
    * @return CRM_Financial_DAO_EntityFinancialAccount
-   * @throws \CRM_Core_Exception
+   *
+   * @noinspection PhpDocMissingThrowsInspection
    */
-  protected function addTaxAccountToFinancialType(int $financialTypeId, $accountParams = []) {
+  protected function addTaxAccountToFinancialType(int $financialTypeID, array $accountParams = []): CRM_Financial_DAO_EntityFinancialAccount {
     $params = array_merge([
-      'name' => 'Sales tax account ' . substr(sha1(rand()), 0, 4),
+      'name' => 'Sales tax account - test - ' . $financialTypeID,
       'financial_account_type_id' => key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Liability' ")),
       'is_deductible' => 1,
       'is_tax' => 1,
       'tax_rate' => 10,
       'is_active' => 1,
     ], $accountParams);
-    $account = CRM_Financial_BAO_FinancialAccount::add($params);
+    $financialAccountID = FinancialAccount::create()->setValues($params)->execute()->first()['id'];
     $entityParams = [
       'entity_table' => 'civicrm_financial_type',
-      'entity_id' => $financialTypeId,
+      'entity_id' => $financialTypeID,
       'account_relationship' => key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' ")),
     ];
 
     // set tax rate (as 10) for provided financial type ID to static variable, later used to fetch tax rates of all financial types
-    \Civi::$statics['CRM_Core_PseudoConstant']['taxRates'][$financialTypeId] = $params['tax_rate'];
+    \Civi::$statics['CRM_Core_PseudoConstant']['taxRates'][$financialTypeID] = $params['tax_rate'];
 
     //CRM-20313: As per unique index added in civicrm_entity_financial_account table,
     //  first check if there's any record on basis of unique key (entity_table, account_relationship, entity_id)
@@ -3050,7 +3056,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     if ($dao->fetch()) {
       $entityParams['id'] = $dao->id;
     }
-    $entityParams['financial_account_id'] = $account->id;
+    $entityParams['financial_account_id'] = $financialAccountID;
 
     return CRM_Financial_BAO_FinancialTypeAccount::add($entityParams);
   }
