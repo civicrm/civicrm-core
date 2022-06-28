@@ -524,7 +524,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
       $mailContent['subject'] = $subjectOverride;
     }
 
-    return $mailContent;
+    return [$mailContent, $apiCall->getTranslationLanguage()];
   }
 
 }
