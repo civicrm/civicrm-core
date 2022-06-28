@@ -32,6 +32,8 @@ use Civi\Api4\Utils\ReflectionUtils;
  * @method bool getDebug()
  * @method $this setChain(array $chain)
  * @method array getChain()
+ * @method $this setPreferredLanguage(string|null $language)
+ * @method string|null getPreferredLanguage()
  */
 abstract class AbstractAction implements \ArrayAccess {
 
@@ -43,6 +45,16 @@ abstract class AbstractAction implements \ArrayAccess {
    * @var int
    */
   protected $version = 4;
+
+  /**
+   * Preferred Language (optional).
+   *
+   * If set then listeners such as the Translation subsystem may alter
+   * the output.
+   *
+   * @var string
+   */
+  protected $preferredLanguage;
 
   /**
    * Additional api requests - will be called once per result.
