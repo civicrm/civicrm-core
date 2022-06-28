@@ -40,6 +40,9 @@ return new class() extends EventCheck implements HookInterface {
     'Precedence' => ['type' => 'string|NULL', 'for' => ['civimail', 'flexmailer'], 'regex' => '/(bulk|first-class|list)/'],
     'job_id' => ['type' => 'int|NULL', 'for' => ['civimail', 'flexmailer']],
 
+    // ## Language
+    'language' => ['type' => 'string|NULL', 'for' => ['messageTemplate']],
+
     // ## Content
 
     'subject' => ['for' => ['messageTemplate', 'singleEmail'], 'type' => 'string'],
