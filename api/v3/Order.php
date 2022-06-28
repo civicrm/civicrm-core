@@ -94,6 +94,10 @@ function civicrm_api3_order_create(array $params): array {
         $order->setEntityParameters($lineItems['params'], $index);
       }
       foreach ($lineItems['line_item'] as $innerIndex => $lineItem) {
+        // For historical reasons it might be name.
+        if (!empty($lineItem['membership_type_id']) && !is_numeric($lineItem['membership_type_id'])) {
+          $lineItem['membership_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'membership_type_id', $lineItems['params']['membership_type_id']);
+        }
         $lineIndex = $index . '+' . $innerIndex;
         $order->setLineItem($lineItem, $lineIndex);
         $order->addLineItemToEntityParameters($lineIndex, $index);
