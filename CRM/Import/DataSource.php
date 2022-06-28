@@ -562,6 +562,7 @@ abstract class CRM_Import_DataSource {
     foreach (CRM_Core_BAO_UserJob::getTypes() as $type) {
       if ($this->getUserJob()['job_type'] === $type['id']) {
         $parserClass = $type['class'];
+        break;
       }
     }
     /* @var \CRM_Import_Parser */

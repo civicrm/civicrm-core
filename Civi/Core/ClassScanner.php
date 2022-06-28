@@ -135,6 +135,7 @@ class ClassScanner {
     static::scanFolders($classes, $civicrmRoot, 'CRM/*/WorkflowMessage', '_');
     static::scanFolders($classes, $civicrmRoot, 'Civi/*/WorkflowMessage', '\\');
     static::scanFolders($classes, $civicrmRoot, 'Civi/WorkflowMessage', '\\');
+    static::scanFolders($classes, $civicrmRoot, 'CRM/*/Import', '_');
     if (\CRM_Utils_Constant::value('CIVICRM_UF') === 'UnitTests') {
       static::scanFolders($classes, $civicrmRoot . 'tests/phpunit', 'CRM/*/WorkflowMessage', '_');
       static::scanFolders($classes, $civicrmRoot . 'tests/phpunit', 'Civi/*/WorkflowMessage', '\\');

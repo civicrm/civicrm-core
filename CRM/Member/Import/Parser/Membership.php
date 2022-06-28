@@ -55,6 +55,26 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
   protected $_lineCount;
 
   /**
+   * Get information about the provided job.
+   *  - name
+   *  - id (generally the same as name)
+   *  - label
+   *
+   *  e.g. ['activity_import' => ['id' => 'activity_import', 'label' => ts('Activity Import'), 'name' => 'activity_import']]
+   *
+   * @return array
+   */
+  public static function getUserJobInfo(): array {
+    return [
+      'membership_import' => [
+        'id' => 'membership_import',
+        'name' => 'membership_import',
+        'label' => ts('Membership Import'),
+      ],
+    ];
+  }
+
+  /**
    * @param string $name
    * @param $title
    * @param int $type
