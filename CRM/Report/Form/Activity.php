@@ -565,7 +565,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
               ) {
                 if (empty($this->_params['include_case_activities_value'])) {
                   $componentId = CRM_Core_Component::getComponentID('CiviCase');
-                  $this->activityTypes = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, " AND v.component_id !={$componentId} OR v.component_id IS NULL");
+                  $componentClause = $componentId ? " AND v.component_id !={$componentId}" : "";
+                  $this->activityTypes = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, $componentClause);
                 }
                 $actTypes = array_flip($this->activityTypes);
                 $clause = "( {$this->_aliases['civicrm_activity']}.activity_type_id IN (" .
