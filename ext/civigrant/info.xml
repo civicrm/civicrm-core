@@ -31,6 +31,7 @@
   <mixins>
     <mixin>menu-xml@1.0.0</mixin>
     <mixin>mgd-php@1.1.0</mixin>
+    <mixin>afform-entity-php@1.0.0</mixin>
   </mixins>
   <civix>
     <namespace>CRM/Grant</namespace>
