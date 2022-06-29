@@ -121,10 +121,12 @@
     <add>5.50</add>
   </field>
   <field>
-    <name>type_id</name>
-    <title>User Job Type ID</title>
-    <type>int unsigned</type>
+    <name>job_type</name>
+    <title>User Job Type</title>
+    <type>varchar</type>
+    <comment>Name of the job type, which will allow finding the correct class</comment>
     <required>true</required>
+    <length>64</length>
     <html>
       <label>Job Type</label>
     </html>
