@@ -55,28 +55,24 @@
         </div>
     </div>
 
-    {if $pcpBlock}
+    {if $pcpBlock && $pcp_display_in_roll}
     <div class="crm-group pcp_display-group">
         <div class="header-dark">
            {ts}Contribution Honor Roll{/ts}
         </div>
         <div class="display-block">
-            {if $pcp_display_in_roll}
-                {ts}List my contribution{/ts}
-                {if $pcp_is_anonymous}
-                    <strong>{ts}anonymously{/ts}.</strong>
-                {else}
+          {ts}List my contribution{/ts}
+          {if $pcp_is_anonymous}
+              <strong>{ts}anonymously{/ts}.</strong>
+          {else}
             {ts}under the name{/ts}: <strong>{$pcp_roll_nickname}</strong><br/>
-                    {if $pcp_personal_note}
-                        {ts}With the personal note{/ts}: <strong>{$pcp_personal_note}</strong>
-                    {else}
-                     <strong>{ts}With no personal note{/ts}</strong>
-                     {/if}
-                {/if}
+            {if $pcp_personal_note}
+                {ts}With the personal note{/ts}: <strong>{$pcp_personal_note}</strong>
             {else}
-                {ts}Don't list my contribution in the honor roll.{/ts}
-            {/if}
-            <br />
+             <strong>{ts}With no personal note{/ts}</strong>
+             {/if}
+          {/if}
+          <br />
         </div>
     </div>
     {/if}
