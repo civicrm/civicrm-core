@@ -328,6 +328,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $js .= "</script>\n";
     $this->assign('initHideBoxes', $js);
 
+    $this->assign('saveMappingIsChecked', FALSE);
+
     $this->setDefaults($defaults);
 
     $this->addFormButtons();
@@ -357,9 +359,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
     }
     $template = CRM_Core_Smarty::singleton();
-    if (!empty($fields['saveMapping'])) {
-      $template->assign('isCheked', TRUE);
-    }
+    $template->assign('saveMappingIsChecked', !empty($fields['saveMapping']));
     return empty($errors) ? TRUE : $errors;
   }
 
