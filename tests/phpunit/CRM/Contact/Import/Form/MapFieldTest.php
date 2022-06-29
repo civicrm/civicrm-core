@@ -157,7 +157,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
         'submitted_values' => $submittedValues,
       ],
       'status_id:name' => 'draft',
-      'type_id:name' => 'contact_import',
+      'job_type' => 'contact_import',
     ])->execute()->first()['id'];
 
     $dataSource = new CRM_Import_DataSource_SQL($userJobID);

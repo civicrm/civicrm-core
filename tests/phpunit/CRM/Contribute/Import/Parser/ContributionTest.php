@@ -331,7 +331,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
         ], $submittedValues),
       ],
       'status_id:name' => 'draft',
-      'type_id:name' => 'contact_import',
+      'job_type' => 'contribution_import',
     ])->execute()->first()['id'];
     if ($submittedValues['dataSource'] ?? NULL === 'CRM_Import_DataSource') {
       $dataSource = new CRM_Import_DataSource_CSV($userJobID);

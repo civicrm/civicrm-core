@@ -1890,10 +1890,10 @@ abstract class CRM_Import_Parser {
    * @throws \CRM_Core_Exception
    */
   public static function runImport($taskContext, $userJobID, $limit) {
-    $userJob = UserJob::get()->addWhere('id', '=', $userJobID)->addSelect('type_id')->execute()->first();
+    $userJob = UserJob::get()->addWhere('id', '=', $userJobID)->addSelect('job_type')->execute()->first();
     $parserClass = NULL;
     foreach (CRM_Core_BAO_UserJob::getTypes() as $userJobType) {
-      if ($userJob['type_id'] === $userJobType['id']) {
+      if ($userJob['job_type'] === $userJobType['id']) {
         $parserClass = $userJobType['class'];
       }
     }

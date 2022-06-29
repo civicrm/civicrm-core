@@ -368,7 +368,7 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
         ], $submittedValues),
       ],
       'status_id:name' => 'draft',
-      'type_id:name' => 'activity_import',
+      'job_type' => 'activity_import',
     ])->execute()->first()['id'];
     if ($submittedValues['dataSource'] ?? NULL === 'CRM_Import_DataSource') {
       $dataSource = new CRM_Import_DataSource_CSV($userJobID);

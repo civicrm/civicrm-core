@@ -30,8 +30,8 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
    */
   public function preProcess() {
     $userJobID = CRM_Utils_Request::retrieve('user_job_id', 'String', $this, TRUE);
-    $userJob = UserJob::get(TRUE)->addWhere('id', '=', $userJobID)->addSelect('metadata', 'type_id:label')->execute()->first();
-    $this->setTitle($userJob['type_id:label']);
+    $userJob = UserJob::get(TRUE)->addWhere('id', '=', $userJobID)->addSelect('metadata', 'job_type:label')->execute()->first();
+    $this->setTitle($userJob['job_type:label']);
     $onDuplicate = $userJob['metadata']['submitted_values']['onDuplicate'];
     $this->assign('dupeError', FALSE);
 
