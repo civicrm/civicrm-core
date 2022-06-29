@@ -20,7 +20,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
     foreach ($workflows as $workflow) {
       yield [
         'name' => 'workflow/' . $workflow . '/basic_eur',
-        'title' => ts('Completed Contribution') . ' : ' . 'CAD',
+        'title' => ts('Completed Contribution') . ' : ' . 'EUR',
         'tags' => ['preview'],
         'workflow' => $workflow,
       ];
