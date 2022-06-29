@@ -43,6 +43,26 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   }
 
   /**
+   * Get information about the provided job.
+   *  - name
+   *  - id (generally the same as name)
+   *  - label
+   *
+   *  e.g. ['activity_import' => ['id' => 'activity_import', 'label' => ts('Activity Import'), 'name' => 'activity_import']]
+   *
+   * @return array
+   */
+  public static function getUserJobInfo(): array {
+    return [
+      'contribution_import' => [
+        'id' => 'contribution_import',
+        'name' => 'contribution_import',
+        'label' => ts('Contribution Import'),
+      ],
+    ];
+  }
+
+  /**
    * Contribution-specific result codes
    * @see CRM_Import_Parser result code constants
    */

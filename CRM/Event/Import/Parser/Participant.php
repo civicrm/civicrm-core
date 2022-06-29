@@ -72,6 +72,25 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
   }
 
   /**
+   * Get information about the provided job.
+   *
+   *  - name
+   *  - id (generally the same as name)
+   *  - label
+   *
+   * @return array
+   */
+  public static function getUserJobInfo(): array {
+    return [
+      'participant_import' => [
+        'id' => 'participant_import',
+        'name' => 'participant_import',
+        'label' => ts('Participant Import'),
+      ],
+    ];
+  }
+
+  /**
    * The initializer code, called before the processing.
    */
   public function init() {

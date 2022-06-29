@@ -86,6 +86,25 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
+   * Get information about the provided job.
+   *
+   *  - name
+   *  - id (generally the same as name)
+   *  - label
+   *
+   * @return array
+   */
+  public static function getUserJobInfo(): array {
+    return [
+      'contact_import' => [
+        'id' => 'contact_import',
+        'name' => 'contact_import',
+        'label' => ts('Contact Import'),
+      ],
+    ];
+  }
+
+  /**
    * Get the fields to track the import.
    *
    * @return array

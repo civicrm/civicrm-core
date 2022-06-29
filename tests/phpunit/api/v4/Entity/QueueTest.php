@@ -381,7 +381,7 @@ class QueueTest extends Api4TestBase {
     $this->assertEquals(0, $queue->numberOfItems());
 
     $userJob = \Civi\Api4\UserJob::create(FALSE)->setValues([
-      'job_type:label' => 'Contact Import',
+      'job_type:name' => 'contact_import',
       'status_id:name' => 'in_progress',
       'queue_id.name' => $queue->getName(),
     ])->execute()->single();

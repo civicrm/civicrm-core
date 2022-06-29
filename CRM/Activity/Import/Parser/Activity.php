@@ -22,6 +22,26 @@
 class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
 
   /**
+   * Get information about the provided job.
+   *  - name
+   *  - id (generally the same as name)
+   *  - label
+   *
+   *  e.g. ['activity_import' => ['id' => 'activity_import', 'label' => ts('Activity Import'), 'name' => 'activity_import']]
+   *
+   * @return array
+   */
+  public static function getUserJobInfo(): array {
+    return [
+      'activity_import' => [
+        'id' => 'activity_import',
+        'name' => 'activity_import',
+        'label' => ts('Activity Import'),
+      ],
+    ];
+  }
+
+  /**
    * The initializer code, called before the processing.
    */
   public function init() {

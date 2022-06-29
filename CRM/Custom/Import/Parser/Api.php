@@ -11,6 +11,25 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
   protected $_multipleCustomData = '';
 
   /**
+   * Get information about the provided job.
+   *
+   *  - name
+   *  - id (generally the same as name)
+   *  - label
+   *
+   * @return array
+   */
+  public static function getUserJobInfo(): array {
+    return [
+      'custom_field_import' => [
+        'id' => 'custom_field_import',
+        'name' => 'custom_field_import',
+        'label' => ts('Multiple Value Custom Field Import'),
+      ],
+    ];
+  }
+
+  /**
    * The initializer code, called before the processing
    *
    * @return void

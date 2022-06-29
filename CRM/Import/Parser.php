@@ -13,13 +13,14 @@ use Civi\Api4\Campaign;
 use Civi\Api4\CustomField;
 use Civi\Api4\Event;
 use Civi\Api4\UserJob;
+use Civi\UserJob\UserJobInterface;
 
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-abstract class CRM_Import_Parser {
+abstract class CRM_Import_Parser implements UserJobInterface {
   /**
    * Settings
    */
@@ -699,8 +700,9 @@ abstract class CRM_Import_Parser {
         $batchSize = $totalRows;
       }
       $task = new CRM_Queue_Task(
-        [get_class($this), 'runImport'],
-        ['userJobID' => $this->getUserJobID(), 'limit' => $batchSize],
+        [get_class($this), 'runJob'],
+        // Offset is unused by our import classes, but required by the interface.
+        ['userJobID' => $this->getUserJobID(), 'limit' => $batchSize, 'offset' => 0],
         ts('Processed %1 rows out of %2', [1 => $offset + $batchSize, 2 => $totalRowCount])
       );
       $queue->createItem($task);
@@ -1884,12 +1886,13 @@ abstract class CRM_Import_Parser {
    *
    * @param int $userJobID
    * @param int $limit
+   * @param int $offset
    *
    * @return bool
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public static function runImport($taskContext, $userJobID, $limit) {
+  public static function runJob(\CRM_Queue_TaskContext $taskContext, int $userJobID, int $limit, int $offset): bool {
     $userJob = UserJob::get()->addWhere('id', '=', $userJobID)->addSelect('job_type')->execute()->first();
     $parserClass = NULL;
     foreach (CRM_Core_BAO_UserJob::getTypes() as $userJobType) {
