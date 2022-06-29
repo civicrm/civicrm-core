@@ -122,6 +122,7 @@ class CRM_Core_Smarty extends Smarty {
 
     $tsLocale = CRM_Core_I18n::getLocale();
     $this->assign('tsLocale', $tsLocale);
+    $this->assign('VARS', new CRM_Core_Smarty_ReflectStub($this));
 
     // CRM-7163 hack: we don’t display langSwitch on upgrades anyway
     if (!CRM_Core_Config::isUpgradeMode()) {
