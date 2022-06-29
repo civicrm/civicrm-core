@@ -261,7 +261,7 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
     $dao = CRM_Core_DAO::executeQuery($query);
 
     while ($dao->fetch()) {
-      if ($dao->bounces >= $dao->threshold) {
+      if ($dao->threshold && $dao->bounces >= $dao->threshold) {
         $email = new CRM_Core_BAO_Email();
         $email->id = $email_id;
         $email->on_hold = TRUE;
