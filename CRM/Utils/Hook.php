@@ -1881,11 +1881,37 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called when a module-extension is installed.
-   * Each module will receive hook_civicrm_install during its own installation (but not during the
-   * installation of unrelated modules).
+   * Run early installation steps for an extension. Ex: Create new MySQL table.
+   *
+   * This dispatches directly to each new extension. You will only receive notices for your own installation.
+   *
+   * If multiple extensions are installed simultaneously, they will all run
+   * `hook_install`/`hook_enable` back-to-back (in order of dependency).
+   *
+   * This runs BEFORE refreshing major caches and services (such as
+   * `ManagedEntities` and `CRM_Logging_Schema`).
+   *
+   * @see https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_install
    */
   public static function install() {
+    // Actually invoke via CRM_Extension_Manager_Module::callHook
+    throw new \RuntimeException(sprintf("The method %s::%s is just a documentation stub and should not be invoked directly.", __CLASS__, __FUNCTION__));
+  }
+
+  /**
+   * Run later installation steps. Ex: Call a bespoke API-job for the first time.
+   *
+   * This dispatches directly to each new extension. You will only receive notices for your own installation.
+   *
+   * If multiple extensions are installed simultaneously, they will all run
+   * `hook_postInstall` back-to-back (in order of dependency).
+   *
+   * This runs AFTER refreshing major caches and services (such as
+   * `ManagedEntities` and `CRM_Logging_Schema`).
+   *
+   * @see https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_postInstall
+   */
+  public static function postInstall() {
     // Actually invoke via CRM_Extension_Manager_Module::callHook
     throw new \RuntimeException(sprintf("The method %s::%s is just a documentation stub and should not be invoked directly.", __CLASS__, __FUNCTION__));
   }
