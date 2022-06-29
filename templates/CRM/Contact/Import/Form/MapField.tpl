@@ -28,7 +28,7 @@ if ( document.getElementsByName("saveMapping")[0].checked ) {
     document.getElementsByName("saveMapping")[0].checked = false;
 }
 {/literal}
-{if $isCheked}
+{if $VARS->get('isCheked')}
     document.getElementsByName("saveMapping")[0].checked = true;
 {/if}
 </script>
