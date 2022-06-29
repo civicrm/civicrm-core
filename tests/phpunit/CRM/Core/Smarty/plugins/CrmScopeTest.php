@@ -7,6 +7,7 @@
 class CRM_Core_Smarty_plugins_CrmScopeTest extends CiviUnitTestCase {
 
   public function setUp(): void {
+    $this->useTransaction();
     parent::setUp();
     require_once 'CRM/Core/Smarty.php';
 
@@ -36,6 +37,13 @@ class CRM_Core_Smarty_plugins_CrmScopeTest extends CiviUnitTestCase {
       '{crmScope x=1 y=9}x={$x},y={$y} {crmScope y=8}x={$x},y={$y}{/crmScope} x={$x},y={$y}{/crmScope}',
     ];
     $cases[] = ['x=', 'x={$x}'];
+
+    // crmDefault and crmScope build on same mechanism and are nearly identical.
+
+    $cases[] = ['', '{crmDefault}{/crmDefault}'];
+    $cases[] = ['x=1 x=1 x=1', '{crmDefault x=1}x={$x} {crmDefault x=2}x={$x}{/crmDefault} x={$x}{/crmDefault}'];
+    $cases[] = ['x=1 x=1 x=1', '{crmScope x=1}x={$x} {crmDefault x=2}x={$x}{/crmDefault} x={$x}{/crmScope}'];
+    $cases[] = ['x=1 x=2 x=1', '{crmDefault x=1}x={$x} {crmScope x=2}x={$x}{/crmScope} x={$x}{/crmDefault}'];
     return $cases;
   }
 
