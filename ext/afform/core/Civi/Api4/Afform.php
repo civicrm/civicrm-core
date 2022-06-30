@@ -166,6 +166,10 @@ class Afform extends Generic\AbstractEntity {
           ],
         ],
         [
+          'name' => 'icon',
+          'description' => 'Icon shown in the contact summary tab',
+        ],
+        [
           'name' => 'server_route',
         ],
         [
