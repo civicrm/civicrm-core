@@ -72,21 +72,28 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
   }
 
   public function getRenderExamples(): array {
-    $metas = \Civi\Test::examples()->getMetas();
+    // Phpunit resolves data-providers at a moment where bootstrap is awkward.
+    // Dynamic data-providers should call-out to subprocess which can do full/normal boot.
+    $uf = getenv('CIVICRM_UF');
+    try {
+      putenv('CIVICRM_UF=');
+      $metas = cv('api4 ExampleData.get +s name,workflow \'{"where":[["tags","CONTAINS","phpunit"]]}\'');
+    }
+    finally {
+      putenv("CIVICRM_UF={$uf}");
+    }
+
     $results = [];
-    foreach ($metas as $name => $meta) {
-      if (!empty($meta['data']['workflow'])) {
-        continue;
-      }
-      if (empty($meta['tags']) || !in_array('phpunit', $meta['tags'])) {
+    foreach ($metas as $meta) {
+      if (!empty($meta['workflow'])) {
         continue;
       }
       if ($exampleFilter = getenv('WORKFLOW_EXAMPLES')) {
-        if (!preg_match($exampleFilter, $name)) {
+        if (!preg_match($exampleFilter, $meta['name'])) {
           continue;
         }
       }
-      $results[$name] = [$meta['name']];
+      $results[$meta['name']] = [$meta['name']];
     }
     return $results;
   }
