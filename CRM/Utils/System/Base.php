@@ -719,15 +719,15 @@ abstract class CRM_Utils_System_Base {
       // or in modules
       $cmsPath = $config->userSystem->cmsRootPath();
       $realCmsPath = realpath($cmsPath);
+      $normalizedCrmRoot = $civicrm_root;
 
       if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
         $cmsPath = strtolower(str_replace('\\', '/', $cmsPath));
         $realCmsPath = strtolower(str_replace('\\', '/', $realCmsPath));
+        $normalizedCrmRoot = strtolower(str_replace('\\', '/', $civicrm_root));
       }
 
-      $userFrameworkResourceURL = $baseURL . str_replace(["$cmsPath/", "$realCmsPath/"], '',
-          str_replace('\\', '/', $civicrm_root)
-        );
+      $userFrameworkResourceURL = $baseURL . str_replace(["$cmsPath/", "$realCmsPath/"], '', $normalizedCrmRoot);
 
       $siteName = $config->userSystem->parseDrupalSiteNameFromRoot($civicrm_root);
       if ($siteName) {
