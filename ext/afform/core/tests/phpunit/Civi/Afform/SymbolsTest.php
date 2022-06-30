@@ -25,7 +25,7 @@ class SymbolsTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfa
     $exs[] = [
       '<div/>',
       [
-        'e' => ['div' => 1, 'body' => 1],
+        'e' => ['div' => 1, 'fake' => 1],
         'a' => [],
         'c' => [],
       ],
@@ -33,7 +33,7 @@ class SymbolsTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfa
     $exs[] = [
       '<my-tabset><my-tab id="1"/><my-tab id="2">foo</my-tab><my-tab id="3">bar</my-tab></my-tabset>',
       [
-        'e' => ['my-tabset' => 1, 'my-tab' => 3, 'body' => 1],
+        'e' => ['my-tabset' => 1, 'my-tab' => 3, 'fake' => 1],
         'a' => ['id' => 3],
         'c' => [],
       ],
@@ -41,7 +41,7 @@ class SymbolsTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfa
     $exs[] = [
       '<div class="my-parent"><div class="my-child"><img class="special" src="foo.png"/></div></div>',
       [
-        'e' => ['div' => 2, 'img' => 1, 'body' => 1],
+        'e' => ['div' => 2, 'img' => 1, 'fake' => 1],
         'a' => ['class' => 3, 'src' => 1],
         'c' => [
           'my-parent' => 1,
@@ -53,7 +53,7 @@ class SymbolsTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfa
     $exs[] = [
       '<div class="my-parent foo bar">a<div class="my-child whiz bang {{ghost + stuff}} last">b</div>c</div>',
       [
-        'e' => ['div' => 2, 'body' => 1],
+        'e' => ['div' => 2, 'fake' => 1],
         'a' => ['class' => 2],
         'c' => [
           'my-parent' => 1,
@@ -70,7 +70,7 @@ class SymbolsTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfa
     $exs[] = [
       '<div class="{{make[\'cheese\']}} {{ghost + stuff}} {{a}}_{{b}}"/>',
       [
-        'e' => ['div' => 1, 'body' => 1],
+        'e' => ['div' => 1, 'fake' => 1],
         'a' => ['class' => 1],
         'c' => [
           '{{ghost + stuff}}' => 1,
