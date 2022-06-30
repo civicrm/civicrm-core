@@ -111,7 +111,9 @@ class ClassScanner {
    */
   private static function scanClasses(): array {
     $classes = static::scanCoreClasses();
-    \CRM_Utils_Hook::scanClasses($classes);
+    if (\CRM_Utils_Constant::value('CIVICRM_UF') !== 'UnitTests') {
+      \CRM_Utils_Hook::scanClasses($classes);
+    }
     return $classes;
   }
 
