@@ -35,7 +35,7 @@ class Symbols {
    */
   public static function scan($html) {
     $symbols = new static();
-    $doc = new \DOMDocumentWrapper($html, 'text/html');
+    $doc = new \DOMDocumentWrapper($html, 'text/xml');
     $symbols->scanNode($doc->root);
     return $symbols;
   }
