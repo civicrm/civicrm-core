@@ -2416,18 +2416,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    *   All of the icons to show.
    */
   public static function getICalLinks($eventId = NULL) {
-    $return = $eventId ? [] : [
-      [
-        'url' => CRM_Utils_System::url('civicrm/event/ical', 'reset=1&list=1&html=1', TRUE, NULL, TRUE),
-        'text' => ts('HTML listing of current and future public events.'),
-        'icon' => 'fa-th-list',
-      ],
-      [
-        'url' => CRM_Utils_System::url('civicrm/event/ical', 'reset=1&list=1&rss=1', TRUE, NULL, TRUE),
-        'text' => ts('Get RSS 2.0 feed for current and future public events.'),
-        'icon' => 'fa-rss',
-      ],
-    ];
+    $return = [];
     $query = [
       'reset' => 1,
     ];
@@ -2439,12 +2428,20 @@ WHERE  ce.loc_block_id = $locBlockId";
       'text' => $eventId ? ts('Download iCalendar entry for this event.') : ts('Download iCalendar entry for current and future public events.'),
       'icon' => 'fa-download',
     ];
-    $query['list'] = 1;
-    $return[] = [
-      'url' => CRM_Utils_System::url('civicrm/event/ical', $query, TRUE, NULL, TRUE),
-      'text' => $eventId ? ts('iCalendar feed for this event.') : ts('iCalendar feed for current and future public events.'),
-      'icon' => 'fa-link',
-    ];
+    if ($eventId) {
+      $return[] = [
+        'url' => CRM_Utils_System::url('civicrm/event/ical', ['gCalendar' => 1] + $query, TRUE, NULL, TRUE),
+        'text' => ts('Add event to Google Calendar'),
+        'icon' => 'fa-share',
+      ];
+    }
+    else {
+      $return[] = [
+        'url' => CRM_Utils_System::url('civicrm/event/ical', $query, TRUE, NULL, TRUE),
+        'text' => ts('iCalendar feed for current and future public events'),
+        'icon' => 'fa-link',
+      ];
+    }
     return $return;
   }
 

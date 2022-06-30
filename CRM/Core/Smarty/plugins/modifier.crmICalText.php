@@ -25,6 +25,6 @@
  * @return string
  *   formatted text
  */
-function smarty_modifier_crmICalText($str) {
-  return CRM_Utils_ICalendar::formatText($str);
+function smarty_modifier_crmICalText($str, $keep_html = FALSE, $position = 0) {
+  return CRM_Utils_ICalendar::formatText($str, $keep_html, $position);
 }
