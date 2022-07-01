@@ -2767,6 +2767,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     unset($expectedLineItem['id'], $expectedLineItem['entity_id'], $lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
     $this->assertEquals($expectedLineItem, $lineItem2['values'][0]);
+
+
+    $this->callAPISuccess('contribution', 'repeattransaction', [
+      'original_contribution_id' => $originalContribution['id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => 789,
+    ]);
+    $this->callAPISuccessGetSingle('contribution', [
+      'total_amount' => 400,
+      'trxn_id' => 789,
+    ]);
   }
 
   /**
