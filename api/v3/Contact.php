@@ -493,7 +493,7 @@ function civicrm_api3_contact_delete($params) {
  */
 function _civicrm_api3_contact_check_params(&$params) {
 
-  switch (strtolower(CRM_Utils_Array::value('contact_type', $params))) {
+  switch (strtolower($params['contact_type'] ?? '')) {
     case 'household':
       civicrm_api3_verify_mandatory($params, NULL, ['household_name']);
       break;

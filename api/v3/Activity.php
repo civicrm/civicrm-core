@@ -694,7 +694,7 @@ function _civicrm_api3_activity_check_params(&$params) {
   // needs testing
   $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate');
   $activityName = $params['activity_name'] ?? NULL;
-  $activityName = ucfirst($activityName);
+  $activityName = ucfirst($activityName ?? '');
   $activityLabel = $params['activity_label'] ?? NULL;
   if ($activityLabel) {
     $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'create');

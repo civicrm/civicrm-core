@@ -563,7 +563,7 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
     $returnProperties = NULL;
   }
 
-  if (substr($sort, 0, 2) == 'id') {
+  if (substr(($sort ?? ''), 0, 2) == 'id') {
     $sort = $lowercase_entity . "_" . $sort;
   }
 
@@ -1677,7 +1677,7 @@ function _civicrm_api3_validate_foreign_keys($entity, $action, &$params, $fields
  */
 function _civicrm_api3_validate_date(&$params, &$fieldName, &$fieldInfo) {
   [$fieldValue, $op] = _civicrm_api3_field_value_check($params, $fieldName);
-  if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
+  if (strpos(($op ?? ''), 'NULL') !== FALSE || strpos(($op ?? ''), 'EMPTY') !== FALSE) {
     return;
   }
 
@@ -2061,7 +2061,7 @@ function _civicrm_api3_validate_integer(&$params, $fieldName, &$fieldInfo, $enti
     // https://lab.civicrm.org/dev/rc/-/issues/14
     $fieldValue = 1;
   }
-  if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
+  if (strpos(($op ?? ''), 'NULL') !== FALSE || strpos(($op ?? ''), 'EMPTY') !== FALSE) {
     return;
   }
 
@@ -2230,7 +2230,7 @@ function _civicrm_api3_validate_html(&$params, &$fieldName, $fieldInfo) {
 function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $entity, $action) {
   $isGet = substr($action, 0, 3) === 'get';
   [$fieldValue, $op] = _civicrm_api3_field_value_check($params, $fieldName, 'String');
-  if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE || CRM_Utils_System::isNull($fieldValue)) {
+  if (strpos(($op ?? ''), 'NULL') !== FALSE || strpos(($op ?? ''), 'EMPTY') !== FALSE || CRM_Utils_System::isNull($fieldValue)) {
     return;
   }
 
