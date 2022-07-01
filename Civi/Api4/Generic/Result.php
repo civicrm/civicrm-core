@@ -157,7 +157,7 @@ class Result extends \ArrayObject implements \JsonSerializable {
    *
    * @return int
    */
-  public function count() {
+  public function count(): int {
     return $this->rowCount ?? parent::count();
   }
 
@@ -211,6 +211,7 @@ class Result extends \ArrayObject implements \JsonSerializable {
   /**
    * @return array
    */
+  #[\ReturnTypeWillChange]
   public function jsonSerialize() {
     return $this->getArrayCopy();
   }

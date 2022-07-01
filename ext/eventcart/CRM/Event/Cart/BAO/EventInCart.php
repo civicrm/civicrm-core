@@ -222,7 +222,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
    *
    * @return bool
    */
-  public function offsetExists($offset) {
+  public function offsetExists($offset): bool {
     return array_key_exists(array_merge($this->fields(), ['main_conference_event_id']), $offset);
   }
 
@@ -231,6 +231,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
    *
    * @return int
    */
+  #[\ReturnTypeWillChange]
   public function offsetGet($offset) {
     if ($offset == 'event') {
       return $this->event->toArray();
@@ -249,13 +250,13 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
    * @param mixed $offset
    * @param mixed $value
    */
-  public function offsetSet($offset, $value) {
+  public function offsetSet($offset, $value): void {
   }
 
   /**
    * @param mixed $offset
    */
-  public function offsetUnset($offset) {
+  public function offsetUnset($offset): void {
   }
 
   /**
