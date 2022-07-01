@@ -616,84 +616,76 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
  * @throws API_Exception
  */
 function civicrm_api3_contribution_repeattransaction($params) {
+
   civicrm_api3_verify_one_mandatory($params, NULL, ['contribution_recur_id', 'original_contribution_id']);
+
+  // We need a contribution to copy.
   if (empty($params['original_contribution_id'])) {
+    // Find one from the given recur. A template contribution is preferred, otherwise use the latest one added.
     $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($params['contribution_recur_id']);
     if (empty($templateContribution)) {
       throw new CiviCRM_API3_Exception('Contribution.repeattransaction failed to get original_contribution_id for recur with ID: ' . $params['contribution_recur_id']);
     }
-    $params['original_contribution_id'] = $templateContribution['id'];
   }
-  $contribution = new CRM_Contribute_BAO_Contribution();
-  $contribution->id = $params['original_contribution_id'];
-  if (!$contribution->find(TRUE)) {
-    throw new API_Exception(
-      'A valid original contribution ID is required', 'invalid_data');
-  }
-  // We don't support repeattransaction without a related recurring contribution.
-  if (empty($contribution->contribution_recur_id)) {
-    throw new API_Exception(
-      'Repeattransaction API can only be used in the context of contributions that have a contribution_recur_id.',
-      'invalid_data'
-    );
+  else {
+    // A template/original contribution was specified by the params. Load it.
+    $templateContribution = Contribution::get(FALSE)
+      ->addWhere('id', '=', $params['original_contribution_id'])
+      ->addWhere('is_test', 'IN', [0, 1])
+      ->addWhere('contribution_recur_id', 'IS NOT EMPTY')
+      ->execute()->first();
+    if (empty($templateContribution)) {
+      throw new CiviCRM_API3_Exception("Contribution.repeattransaction failed to load the given original_contribution_id ($params[original_contribution_id]) because it does not exist, or because it does not belong to a recurring contribution");
+    }
   }
 
-  $params['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', [
-    'return' => 'payment_processor_id',
-    'id' => $contribution->contribution_recur_id,
-  ]);
-
-  $passThroughParams = [
+  // Collect inputs for CRM_Contribute_BAO_Contribution::completeOrder in $input.
+  $paramsToCopy = [
     'trxn_id',
-    'total_amount',
     'campaign_id',
     'fee_amount',
     'financial_type_id',
     'contribution_status_id',
     'payment_processor_id',
+    'is_email_receipt',
+    'trxn_date',
+    'receive_date',
+    'card_type_id',
+    'pan_truncation',
+    'payment_instrument_id',
+    // Q. not contribution_page_id ?
   ];
-  $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
+  $input = array_intersect_key($params, array_fill_keys($paramsToCopy, NULL));
+  // Ensure certain keys exist with NULL values if they don't already (not sure if this is ACTUALLY necessary?)
+  $input += array_fill_keys(['card_type_id', 'pan_truncation'], NULL);
 
-  $ids = [];
-  if (!$contribution->loadRelatedObjects(['payment_processor_id' => $input['payment_processor_id']], $ids, TRUE)) {
-    throw new API_Exception('failed to load related objects');
-  }
-  unset($contribution->id, $contribution->receive_date, $contribution->invoice_id);
-  $contribution->receive_date = $params['receive_date'];
+  // Set amount, use templateContribution if not in params.
+  $input['total_amount'] = $params['total_amount'] ?? $templateContribution['total_amount'];
+  // Why do we need this extra 'amount' key? It's used in CRM_Contribute_BAO_Contribution::completeOrder to pass on to CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge
+  // but it could possibly be removed if that code was adjusted unless anything else uses 'amount'
+  $input['amount'] = $input['total_amount'];
 
-  // @todo Copied from _ipn_process_transaction - needs cleanup/refactor
-  $objects = $contribution->_relatedObjects;
-  $objects['contribution'] = &$contribution;
-  $input['component'] = $contribution->_component;
-  $input['is_test'] = $contribution->is_test;
-  $input['amount'] = empty($input['total_amount']) ? $contribution->total_amount : $input['total_amount'];
+  $input['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', [
+    'return' => 'payment_processor_id',
+    'id' => $templateContribution['contribution_recur_id'],
+  ]);
 
-  if (isset($params['is_email_receipt'])) {
-    $input['is_email_receipt'] = $params['is_email_receipt'];
-  }
-  if (!empty($params['trxn_date'])) {
-    $input['trxn_date'] = $params['trxn_date'];
-  }
-  if (!empty($params['receive_date'])) {
-    $input['receive_date'] = $params['receive_date'];
-  }
-  if (empty($contribution->contribution_page_id)) {
+  $input['is_test'] = $templateContribution['is_test'];
+
+  if (empty($templateContribution['contribution_page_id'])) {
+    // Q. why do we need statics here?
     static $domainFromName;
     static $domainFromEmail;
     if (empty($domainFromEmail) && (empty($params['receipt_from_name']) || empty($params['receipt_from_email']))) {
       [$domainFromName, $domainFromEmail] = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     }
-    $input['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $params, $domainFromName);
-    $input['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $params, $domainFromEmail);
+    $input['receipt_from_name'] = ($params['receipt_from_name'] ?? NULL) ?: $domainFromName;
+    $input['receipt_from_email'] = ($params['receipt_from_email'] ?? NULL) ?: $domainFromEmail;
   }
-  $input['card_type_id'] = $params['card_type_id'] ?? NULL;
-  $input['pan_truncation'] = $params['pan_truncation'] ?? NULL;
-  if (!empty($params['payment_instrument_id'])) {
-    $input['payment_instrument_id'] = $params['payment_instrument_id'];
-  }
+
   return CRM_Contribute_BAO_Contribution::completeOrder($input,
-    !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
-    $objects['contribution']->id ?? NULL,
+    $templateContribution['contribution_recur_id'],
+    NULL,
     $params['is_post_payment_create'] ?? NULL);
 }
 
