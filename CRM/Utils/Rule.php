@@ -221,7 +221,11 @@ class CRM_Utils_Rule {
       // allow relative URL's (CRM-15598)
       $url = 'http://' . $_SERVER['HTTP_HOST'] . $url;
     }
-    return (bool) filter_var(self::idnToAsci($url), FILTER_VALIDATE_URL);
+    // Convert URLs with Unicode to ASCII
+    if (strlen($url) != strlen(utf8_decode($url))) {
+      $url = self::idnToAsci($url);
+    }
+    return (bool) filter_var($url, FILTER_VALIDATE_URL);
   }
 
   /**
