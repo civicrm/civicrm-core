@@ -488,30 +488,30 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * Later we might merge in data stored against the contribution recur record rather than just return the contribution.
    *
    * @param int $id
-   * @param array $overrides
+   * @param array $inputOverrides
    *   Parameters that should be overridden. Add unit tests if using parameters other than total_amount & financial_type_id.
    *
    * @return array
    *
    * @throws \API_Exception
    */
-  public static function getTemplateContribution(int $id, $overrides = []): array {
-    $recurFields = ['is_test', 'financial_type_id', 'total_amount', 'campaign_id'];
+  public static function getTemplateContribution(int $id, array $inputOverrides = []): array {
+    $recurFields = ['is_test', 'financial_type_id', 'amount', 'campaign_id'];
     $recurringContribution = ContributionRecur::get(FALSE)
       ->addWhere('id', '=', $id)
       ->setSelect($recurFields)
       ->execute()
       ->first();
-    // If financial_type_id or total_amount are set on the
-    // recurring they are overrides, but of lower precedence
-    // than input parameters.
+
+    // Parameters passed into the function take precedences, falling back to those loaded from
+    // the recurring contribution.
     // we filter out null, '' and FALSE but not zero - I'm on the fence about zero.
-    $overrides = array_filter(array_merge(
-      // We filter recurringContribution as we only want the fields we asked for
-      // and specifically don't want 'id' added to overrides.
-      array_intersect_key($recurringContribution, array_fill_keys($recurFields, 1)),
-      $overrides
-    ), 'strlen');
+    $overrides = array_filter([
+      'is_test' => $inputOverrides['is_test'] ?? $recurringContribution['is_test'],
+      'financial_type_id' => $inputOverrides['financial_type_id'] ?? $recurringContribution['financial_type_id'],
+      'campaign_id' => $inputOverrides['campaign_id'] ?? $recurringContribution['campaign_id'],
+      'total_amount' => $inputOverrides['total_amount'] ?? $recurringContribution['amount'],
+    ], 'strlen');
 
     // First look for new-style template contribution with is_template=1
     $templateContributions = Contribution::get(FALSE)
@@ -546,8 +546,8 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       // The handling of the line items is managed in BAO_Order so this
       // is whether we should override on the contribution. Arguably the 2 should
       // be decoupled.
-      if (count($lineItems) > 1 && isset($overrides['financial_type_id'])) {
-        unset($overrides['financial_type_id']);
+      if (count($lineItems) > 1) {
+        unset($overrides['financial_type_id'], $overrides['total_amount']);
       }
       $result = array_merge($templateContribution, $overrides);
       // Line items aren't always written to a contribution, for mystery reasons.

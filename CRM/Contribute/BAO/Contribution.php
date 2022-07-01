@@ -2162,12 +2162,11 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
   protected static function repeatTransaction(array $input, array $contributionParams) {
     $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution(
       (int) $contributionParams['contribution_recur_id'],
-      array_filter([
+      [
         'total_amount' => $input['total_amount'] ?? NULL,
         'financial_type_id' => $input['financial_type_id'] ?? NULL,
         'campaign_id' => $input['campaign_id'] ?? NULL,
-        // array_filter with strlen filters out NULL, '' and FALSE but not 0.
-      ], 'strlen')
+      ]
     );
     $contributionParams['line_item'] = $templateContribution['line_item'];
     $contributionParams['status_id'] = 'Pending';
