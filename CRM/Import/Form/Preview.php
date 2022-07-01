@@ -141,7 +141,7 @@ abstract class CRM_Import_Form_Preview extends CRM_Import_Forms {
       'onEndUrl' => CRM_Utils_System::url('civicrm/import/contact/summary', [
         'user_job_id' => $this->getUserJobID(),
         'reset' => 1,
-      ]),
+      ], FALSE, NULL, FALSE),
     ]);
     $runner->runAllViaWeb();
   }
