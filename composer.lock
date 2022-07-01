@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "99c1c2664bd882eb657072896ba9fbe6",
+    "content-hash": "4b1e3de579399f19167e2270d72f9ad8",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -2147,20 +2147,21 @@
         },
         {
             "name": "pear/mail_mime",
-            "version": "1.10.9",
+            "version": "1.10.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Mail_Mime.git",
-                "reference": "1e7ae4e5258b6c0d385a8e76add567934245d38d"
+                "reference": "d4fb9ce61201593d0f8c6db629c45e29c3409c14"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Mail_Mime/zipball/1e7ae4e5258b6c0d385a8e76add567934245d38d",
-                "reference": "1e7ae4e5258b6c0d385a8e76add567934245d38d",
+                "url": "https://api.github.com/repos/pear/Mail_Mime/zipball/d4fb9ce61201593d0f8c6db629c45e29c3409c14",
+                "reference": "d4fb9ce61201593d0f8c6db629c45e29c3409c14",
                 "shasum": ""
             },
             "require": {
-                "pear/pear-core-minimal": "*"
+                "pear/pear-core-minimal": "*",
+                "php": ">=5.2.0"
             },
             "type": "library",
             "autoload": {
@@ -2173,7 +2174,7 @@
                 "./"
             ],
             "license": [
-                "BSD-3-clause"
+                "BSD-3-Clause"
             ],
             "authors": [
                 {
@@ -2193,7 +2194,7 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Mail_Mime",
                 "source": "https://github.com/pear/Mail_Mime"
             },
-            "time": "2020-06-27T08:35:27+00:00"
+            "time": "2021-09-05T08:42:45+00:00"
         },
         {
             "name": "pear/net_smtp",
