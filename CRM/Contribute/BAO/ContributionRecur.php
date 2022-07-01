@@ -496,7 +496,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @throws \API_Exception
    */
   public static function getTemplateContribution(int $id, $overrides = []): array {
-    $recurFields = ['is_test', 'financial_type_id', 'total_amount', 'campaign_id'];
+    $recurFields = ['is_test', 'financial_type_id', 'amount', 'campaign_id'];
     $recurringContribution = ContributionRecur::get(FALSE)
       ->addWhere('id', '=', $id)
       ->setSelect($recurFields)
@@ -512,6 +512,9 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       array_intersect_key($recurringContribution, array_fill_keys($recurFields, 1)),
       $overrides
     ), 'strlen');
+    if (empty($overrides['total_amount']) && !empty($overrides['amount'])) {
+      $overrides['total_amount'] = $overrides['amount'];
+    }
 
     // First look for new-style template contribution with is_template=1
     $templateContributions = Contribution::get(FALSE)
@@ -546,8 +549,8 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       // The handling of the line items is managed in BAO_Order so this
       // is whether we should override on the contribution. Arguably the 2 should
       // be decoupled.
-      if (count($lineItems) > 1 && isset($overrides['financial_type_id'])) {
-        unset($overrides['financial_type_id']);
+      if (count($lineItems) > 1) {
+        unset($overrides['financial_type_id'], $overrides['total_amount']);
       }
       $result = array_merge($templateContribution, $overrides);
       // Line items aren't always written to a contribution, for mystery reasons.

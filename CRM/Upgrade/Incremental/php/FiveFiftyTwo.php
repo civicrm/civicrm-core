@@ -29,6 +29,24 @@ class CRM_Upgrade_Incremental_php_FiveFiftyTwo extends CRM_Upgrade_Incremental_B
    */
   public function upgrade_5_52_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask(ts('Fix any Recurring Contribution total amounts that do not match template contributions', [1 => $rev]), 'synRecurTotal', $rev);
+  }
+
+  /**
+   * Update any recurring contributions to have the same amount
+   * as the recurring template contribution if it exists.
+   *
+   * Some of these got out of sync over recent changes.
+   *
+   * @return bool
+   */
+  public function synRecurTotal(): bool {
+    CRM_Core_DAO::executeQuery('
+      UPDATE civicrm_contribution.recur r
+      LEFT JOIN civicrm_contribution c ON contribution_recur_id = r.id
+      AND c.is_template = 1
+      SET amount = total_amount');
+    return TRUE;
   }
 
 }
