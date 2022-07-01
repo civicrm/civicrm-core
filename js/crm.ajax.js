@@ -273,6 +273,9 @@
         } else {
           url = url.replace(/snippet=[^&]*/, 'snippet=' + snippetType);
         }
+        if (snippetType === 'json' && CRM.angular) {
+          url += '&crmAngularModules=' + CRM.angular.modules.join();
+        }
       }
       return url;
     },
