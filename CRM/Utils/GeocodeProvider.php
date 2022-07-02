@@ -50,7 +50,7 @@ class CRM_Utils_GeocodeProvider {
    */
   public static function getUsableClassName() {
     if (self::$providerClassName === NULL) {
-      $provider = Civi::settings()->get('geoProvider');
+      $provider = Civi::settings()->get('geoProvider') ?? '';
       if (!class_exists($provider)) {
         if (class_exists('CRM_Utils_Geocode_' . $provider)) {
           $provider = 'CRM_Utils_Geocode_' . $provider;

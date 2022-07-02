@@ -120,7 +120,7 @@ class SqlTriggers {
           );
           $variables = str_replace($template_params,
             $template_values,
-            \CRM_Utils_Array::value('variables', $value)
+            $value['variables'] ?? ''
           );
 
           if (!isset($triggers[$tableName][$eventName])) {
