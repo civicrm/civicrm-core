@@ -218,7 +218,7 @@
 - github      : briennekordis
   name        : Brienne Kordis
   organization: Megaphone Technology Consulting
-  
+
 - github      : brucew2013
   name        : Bruce Wolfe
   organization: Alcohol Justice
@@ -262,6 +262,9 @@
   name        : Christian Wach
 
 - name        : Christophe Golle
+
+- github      : clarkac1
+  name        : Andy Clark
 
 - github      : clnlf
   name        : Carlos Loeza
@@ -656,6 +659,8 @@
 
 - github      : jamie-tillman
   name        : Jamie Tillman
+
+- github      : jaomalley
 
 - github      : javiya-rupal
   name        : Rupal Javiya
