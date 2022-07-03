@@ -96,6 +96,7 @@ class CRM_Event_Form_Task_BadgeTest extends CiviUnitTestCase {
       '{participant.fee_level}' => 'low',
       '{participant.fee_amount}' => '$ 0.00',
       '{participant.registered_by_id}' => NULL,
+      '{participant.created_id}' => NULL,
       '{participant.transferred_to_contact_id}' => NULL,
       '{participant.role_id:label}' => 'Attendee',
       '{participant.fee_label}' => NULL,

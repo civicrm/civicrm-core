@@ -696,6 +696,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
     //otherwise send mail Confirmation/Receipt
     $primaryContactId = $this->get('primaryContactId');
+    $primaryParticipantID = $primaryParticipant['participantID'];
 
     // for Transfer checkout.
     // The concept of contributeMode is deprecated.
@@ -707,7 +708,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     ) {
 
       //build an array of custom profile and assigning it to template
-      $customProfile = CRM_Event_BAO_Event::buildCustomProfile($registerByID, $this->_values, NULL, $isTest);
+      $customProfile = CRM_Event_BAO_Event::buildCustomProfile($primaryParticipantID, $this->_values, NULL, $isTest);
       if (count($customProfile)) {
         $this->assign('customProfile', $customProfile);
         $this->set('customProfile', $customProfile);
@@ -782,7 +783,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     else {
 
       //build an array of cId/pId of participants
-      $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($registerByID,
+      $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($primaryParticipantID,
         NULL, $primaryContactId, $isTest,
         TRUE
       );

@@ -144,6 +144,13 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form {
             'title' => ts('Registered by Participant Name'),
             'name' => 'registered_by_id',
           ),
+          'created_id' => array(
+            'title' => ts('Registered by Contact ID'),
+          ),
+          'registered_by_contact_name' => array(
+            'title' => ts('Registered by Contact Name'),
+            'name' => 'created_id',
+          ),
           'source' => array(
             'title' => ts('Source'),
           ),
@@ -635,6 +642,16 @@ ORDER BY  cv.label
           $rows[$rowNum]['civicrm_participant_registered_by_name'] = CRM_Contact_BAO_Contact::displayName($registeredByContactId);
           $rows[$rowNum]['civicrm_participant_registered_by_name_link'] = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $registeredByContactId, $this->_absoluteUrl);
           $rows[$rowNum]['civicrm_participant_registered_by_name_hover'] = ts('View Contact Summary for Contact that registered the participant.');
+        }
+      }
+
+      // Handle registered by contact name
+      if (array_key_exists('civicrm_participant_registered_by_contact_name', $row)) {
+        $registeredByContactId = $row['civicrm_participant_registered_by_contact_name'];
+        if ($registeredByContactId) {
+          $rows[$rowNum]['civicrm_participant_registered_by_contact_name'] = CRM_Contact_BAO_Contact::displayName($registeredByContactId);
+          $rows[$rowNum]['civicrm_participant_registered_by_contact_name_link'] = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $registeredByContactId, $this->_absoluteUrl);
+          $rows[$rowNum]['civicrm_participant_registered_by_contact_name_hover'] = ts('View Contact Summary for Contact that registered the participant.');
         }
       }
 

@@ -1722,6 +1722,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'participant_discount_name' => 1,
       'participant_fee_currency' => 1,
       'participant_registered_by_id' => 1,
+      'participant_created_id' => 1,
       'participant_campaign_id' => 1,
     ];
   }
@@ -1968,6 +1969,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'participant_status' => '`participant_status` varchar(255)',
       'participant_register_date' => '`participant_register_date` varchar(32)',
       'participant_registered_by_id' => '`participant_registered_by_id` varchar(64)',
+      'participant_created_id' => '`participant_created_id` varchar(64)',
       'participant_is_test' => '`participant_is_test` varchar(64)',
       'componentpaymentfield_total_amount' => '`componentpaymentfield_total_amount` varchar(32)',
       'componentpaymentfield_transaction_id' => '`componentpaymentfield_transaction_id` varchar(255)',
@@ -2139,6 +2141,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         [
           0 => 'Participant',
           'name' => 'transferred_to_contact_id',
+        ],
+      32 =>
+        [
+          0 => 'Participant',
+          'name' => 'created_id',
         ],
     ];
   }
@@ -2685,6 +2692,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'participant_discount_name' => '`participant_discount_name` varchar(64)',
       'participant_fee_currency' => '`participant_fee_currency` varchar(3)',
       'participant_registered_by_id' => '`participant_registered_by_id` varchar(64)',
+      'participant_created_id' => '`participant_created_id` varchar(255)',
       'participant_campaign_id' => '`participant_campaign_id` varchar(64)',
     ];
   }
