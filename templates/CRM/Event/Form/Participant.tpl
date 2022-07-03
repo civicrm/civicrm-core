@@ -56,6 +56,10 @@
               <td class="label">{$form.contact_id.label}</td>
               <td>{$form.contact_id.html}</td>
             </tr>
+            <tr class="crm-participant-form-created-id">
+              <td class="label">{$form.created_id.label}</td>
+              <td>{$form.created_id.html}</td>
+            </tr>
           {/if}
           {if $action EQ 2}
             {if $additionalParticipants} {* Display others registered by this participant *}
@@ -68,11 +72,11 @@
                 </td>
               </tr>
             {/if}
-            {if $registered_by_contact_id}
+            {if $created_id}
               <tr class="crm-participant-form-block-registered-by">
                 <td class="label"><label>{ts}Registered By{/ts}</label></td>
                 <td class="view-value">
-                  <a href="{crmURL p='civicrm/contact/view/participant' q="reset=1&id=$participant_registered_by_id&cid=$registered_by_contact_id&action=view"}"
+                  <a href="{crmURL p='civicrm/contact/view/participant' q="reset=1&id=$participant_registered_by_id&cid=$created_id&action=view"}"
                      title="{ts}view primary participant{/ts}">{$registered_by_display_name}</a>
                 </td>
               </tr>

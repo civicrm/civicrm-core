@@ -461,12 +461,22 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       // Get registered_by contact ID and display_name if participant was registered by someone else (CRM-4859)
       if (!empty($defaults[$this->_id]['participant_registered_by_id'])) {
-        $registered_by_contact_id = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
-          $defaults[$this->_id]['participant_registered_by_id'],
-          'contact_id', 'id'
+        // Prefer the newer, more accurate "created_id" and fallback to the participant_id stored in registered_by_id
+        $created_id = CRM_Core_DAO::getFieldValue(
+          'CRM_Event_DAO_Participant',
+          $defaults[$this->_id]['participant_id'],
+          'created_id', 'id'
         );
+        if (empty($created_id)) {
+          $created_id = CRM_Core_DAO::getFieldValue(
+            'CRM_Event_DAO_Participant',
+            $defaults[$this->_id]['participant_registered_by_id'],
+            'contact_id', 'id'
+          );
+        }
         $this->assign('participant_registered_by_id', $defaults[$this->_id]['participant_registered_by_id']);
-        $this->assign('registered_by_display_name', CRM_Contact_BAO_Contact::displayName($registered_by_contact_id));
+        $this->assign('created_id', $created_id);
+        $this->assign('registered_by_display_name', CRM_Contact_BAO_Contact::displayName($created_id));
       }
       $this->assign('registered_by_contact_id', $registered_by_contact_id ?? NULL);
     }
@@ -487,6 +497,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           $defaults[$this->_id]['financial_type_id'] = $financialTypeID;
         }
       }
+
+      $defaults[$this->_id]['created_id'] = CRM_Core_Session::getLoggedInContactID();
 
       if ($this->_mode) {
         $fields["email-{$this->_bltID}"] = 1;
@@ -631,8 +643,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     if ($this->_single) {
       $contactField = $this->addEntityRef('contact_id', ts('Participant'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
+      $registeredByContactField = $this->addEntityRef('created_id', ts('Registered By'), ['create' => FALSE], TRUE);
       if ($this->_context != 'standalone') {
         $contactField->freeze();
+        $registeredByContactField->freeze();
       }
     }
 

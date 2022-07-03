@@ -41,7 +41,7 @@
   {if $participant_registered_by_id} {* Display primary participant *}
       <tr class="crm-event-participantview-form-block-registeredBy">
           <td class="label">{ts}Registered By{/ts}</td>
-          <td><a href="{crmURL p='civicrm/contact/view/participant' q="reset=1&id=$participant_registered_by_id&cid=$registered_by_contact_id&action=view"}" title="{ts}view primary participant{/ts}">{$registered_by_display_name}</a></td>
+          <td><a href="{crmURL p='civicrm/contact/view/participant' q="reset=1&id=$participant_registered_by_id&cid=$created_id&action=view"}" title="{ts}view primary participant{/ts}">{$registered_by_display_name}</a></td>
       </tr>
   {/if}
   {if $additionalParticipants} {* Display others registered by this participant *}

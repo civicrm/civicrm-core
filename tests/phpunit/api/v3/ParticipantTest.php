@@ -53,6 +53,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID2,
       'event_id' => $this->_eventID,
       'registered_by_id' => $this->_participantID,
+      'created_id' => $this->_contactID,
     ]);
     $this->participantCreate([
       'contact_id' => $this->_contactID2,
@@ -715,6 +716,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       'event_id' => $this->_eventID,
       'status_id' => 5,
       'registered_by_id' => $participantID,
+      'created_id' => $this->_contactID,
     ]);
 
     $this->hookClass->setHook('civicrm_post', [$this, 'onPost']);

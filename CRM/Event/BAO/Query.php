@@ -549,6 +549,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         'participant_discount_name' => 1,
         'participant_fee_currency' => 1,
         'participant_registered_by_id' => 1,
+        'participant_created_id' => 1,
         'participant_campaign_id' => 1,
       ];
 

@@ -117,11 +117,11 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
 
     // Get registered_by contact ID and display_name if participant was registered by someone else (CRM-4859)
     if (!empty($values[$participantID]['participant_registered_by_id'])) {
-      $values[$participantID]['registered_by_contact_id'] = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Participant",
+      $values[$participantID]['created_id'] = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Participant",
         $values[$participantID]['participant_registered_by_id'],
         'contact_id', 'id'
       );
-      $values[$participantID]['registered_by_display_name'] = CRM_Contact_BAO_Contact::displayName($values[$participantID]['registered_by_contact_id']);
+      $values[$participantID]['registered_by_display_name'] = CRM_Contact_BAO_Contact::displayName($values[$participantID]['created_id']);
     }
 
     // Check if this is a primaryParticipant (registered for others) and retrieve additional participants if true  (CRM-4859)

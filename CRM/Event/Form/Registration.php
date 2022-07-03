@@ -741,8 +741,13 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $participant = $this->addParticipant($this, $contactID);
     $this->_participantIDS[] = $participant->id;
 
-    //setting register_by_id field and primaryContactId
-    if (!empty($this->_params['is_primary'])) {
+    // Set the registerByID and primaryContactId field if:
+    // - This is the primary participant
+    // - The participant has a contact ID
+    // - The primary contact_id field is not empty (this is the cid= param) on the form and will be set to 0/NULL if registering someone else.
+    // - The participant $contactID is equal to the contact_id used to make the registration (ie. they are registering themselves + others
+    //   and did not select the "Not X, or want to register a different person.
+    if (!empty($this->_params['is_primary']) && !empty($contactID) && !empty($this->_params['contact_id']) && ($contactID == $this->_params['contact_id'])) {
       $this->set('registerByID', $participant->id);
       $this->set('primaryContactId', $contactID);
 
