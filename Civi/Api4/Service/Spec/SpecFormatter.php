@@ -257,7 +257,7 @@ class SpecFormatter {
               if (property_exists($query, $ret)) {
                 // Note: our schema is inconsistent about whether `description` fields allow html,
                 // but it's usually assumed to be plain text, so we strip_tags() to standardize it.
-                $options[$optionIndex[$query->id]][$ret] = $ret === 'description' ? strip_tags($query->$ret) : $query->$ret;
+                $options[$optionIndex[$query->id]][$ret] = $ret === 'description' ? strip_tags($query->$ret ?? '') : $query->$ret;
               }
             }
           }

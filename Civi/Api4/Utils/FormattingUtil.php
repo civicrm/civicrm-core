@@ -89,7 +89,7 @@ class FormattingUtil {
    */
   public static function formatInputValue(&$value, ?string $fieldName, array $fieldSpec, &$operator = NULL, $index = NULL) {
     // Evaluate pseudoconstant suffix
-    $suffix = strpos($fieldName, ':');
+    $suffix = strpos(($fieldName ?? ''), ':');
     if ($suffix) {
       $options = self::getPseudoconstantList($fieldSpec, $fieldName, [], $operator ? 'get' : 'create');
       $value = self::replacePseudoconstant($options, $value, TRUE);
@@ -145,7 +145,7 @@ class FormattingUtil {
   public static function formatDateValue($format, $value, &$operator = NULL, $index = NULL) {
     // Non-relative dates (or if no search operator)
     if (!$operator || !array_key_exists($value, \CRM_Core_OptionGroup::values('relative_date_filters'))) {
-      return date($format, strtotime($value));
+      return date($format, strtotime($value ?? ''));
     }
     if (isset($index) && !strstr($operator, 'BETWEEN')) {
       throw new \API_Exception("Relative dates cannot be in an array using the $operator operator.");
@@ -196,7 +196,7 @@ class FormattingUtil {
       $contactTypePaths = [];
       foreach ($result as $key => $value) {
         $fieldExpr = SqlExpression::convert($selectAliases[$key] ?? $key);
-        $fieldName = \CRM_Utils_Array::first($fieldExpr->getFields());
+        $fieldName = \CRM_Utils_Array::first($fieldExpr->getFields() ?? '');
         $baseName = $fieldName ? \CRM_Utils_Array::first(explode(':', $fieldName)) : NULL;
         $field = $fields[$fieldName] ?? $fields[$baseName] ?? NULL;
         $dataType = $field['data_type'] ?? ($fieldName == 'id' ? 'Integer' : NULL);
@@ -209,7 +209,7 @@ class FormattingUtil {
           $dataType = NULL;
         }
         // Evaluate pseudoconstant suffixes
-        $suffix = strrpos($fieldName, ':');
+        $suffix = strrpos(($fieldName ?? ''), ':');
         $fieldOptions = NULL;
         if ($suffix) {
           $fieldOptions = self::getPseudoconstantList($field, $fieldName, $result, $action);

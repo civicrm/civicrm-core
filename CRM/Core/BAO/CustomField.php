@@ -555,7 +555,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
         $fields = [];
         while (($dao->fetch()) != NULL) {
-          $regexp = preg_replace('/[.,;:!?]/', '', NULL);
+          $regexp = preg_replace('/[.,;:!?]/', '', '');
           $fields[$dao->id]['id'] = $dao->id;
           $fields[$dao->id]['label'] = $dao->label;
           // This seems broken, but not in a new way.
@@ -2112,7 +2112,7 @@ WHERE  id IN ( %1, %2 )
         //don't insert only value separator as default value, CRM-4579
         $defaultValue = self::getOptionGroupDefault($params['option_group_id'], !empty($params['serialize']));
 
-        if (!CRM_Utils_System::isNull(explode(CRM_Core_DAO::VALUE_SEPARATOR, $defaultValue))) {
+        if ($defaultValue !== NULL && !CRM_Utils_System::isNull(explode(CRM_Core_DAO::VALUE_SEPARATOR, $defaultValue))) {
           $params['default_value'] = $defaultValue;
         }
       }

@@ -207,7 +207,7 @@ class CRM_Utils_System {
    *
    * @param array|string $query
    *
-   * @return string
+   * @return string|null
    */
   public static function makeQueryString($query) {
     if (is_array($query)) {
@@ -255,12 +255,12 @@ class CRM_Utils_System {
     $query = self::makeQueryString($query);
 
     // Legacy handling for when the system passes around html escaped strings
-    if (strstr($query, '&amp;')) {
+    if (strstr(($query ?? ''), '&amp;')) {
       $query = html_entity_decode($query);
     }
 
     // Extract fragment from path or query if munged together
-    if ($query && strstr($query, '#')) {
+    if ($query && strstr(($query ?? ''), '#')) {
       list($path, $fragment) = explode('#', $query);
     }
     if ($path && strstr($path, '#')) {
