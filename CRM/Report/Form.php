@@ -265,14 +265,16 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_aliases = [];
 
   /**
+   * SQL where clause. May be altered by hook_civicrm_alterReportVar.
    * @var string
    */
-  protected $_where;
+  public $_where;
 
   /**
+   * SQL from clause. May be altered by hook_civicrm_alterReportVar.
    * @var string
    */
-  protected $_from;
+  public $_from;
 
   /**
    * SQL Limit clause
