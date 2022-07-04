@@ -129,17 +129,12 @@ class CRM_Core_Smarty extends Smarty {
     }
 
     $this->register_function('crmURL', ['CRM_Utils_System', 'crmURL']);
-    if (CRM_Utils_Constant::value('CIVICRM_SMARTY_DEFAULT_ESCAPE')) {
-      // When default escape is enabled if the core escape is called before
-      // any custom escaping is done the modifier_escape function is not
-      // found, so require_once straight away. Note this was hit on the basic
-      // contribution dashboard from RecentlyViewed.tpl
-      require_once 'Smarty/plugins/modifier.escape.php';
-      if (!isset($this->_plugins['modifier']['escape'])) {
-        $this->register_modifier('escape', ['CRM_Core_Smarty', 'escape']);
-      }
-      $this->default_modifiers[] = 'escape:"htmlall"';
-    }
+    require_once 'Smarty/plugins/modifier.escape.php';
+    $GLOBALS['_CIVICRM_SMARTY_DEFAULT_ESCAPE'] = CRM_Utils_Constant::value('CIVICRM_SMARTY_DEFAULT_ESCAPE', FALSE);
+    $this->register_modifier('crmEscape', ['CRM_Core_Smarty', 'crmEscape']);
+    $this->register_modifier('crmAutoescape', ['CRM_Core_Smarty', 'crmAutoescape']);
+    $this->default_modifiers[] = 'crmAutoescape';
+
     $this->load_filter('pre', 'resetExtScope');
 
     $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
@@ -378,91 +373,129 @@ class CRM_Core_Smarty extends Smarty {
   }
 
   /**
+   * Every value on the form will go through crmAutoescape.
+   *
+   * If there are explicit escaping rules, they are chained afterward.
+   *
+   * @param $datum
+   * @return mixed
+   */
+  public static function crmAutoescape($datum) {
+    if (!$GLOBALS['_CIVICRM_SMARTY_DEFAULT_ESCAPE']) {
+      return $datum;
+    }
+
+    if ($datum instanceof EscapedString /*Hypothetically...*/) {
+      throw new \RuntimeException("Auto-escape should only run once per call-chain");
+    }
+
+    $datum = static::castObjectToString($datum);
+    // Ints, floats, bools - might as well pass these through. Every output format we care about will do just
+    // as well if these are raw, and some consumers may get confused if we coerce them to string.
+    $result = !is_string($datum) ? $datum : new EscapedString($datum, static::escaper('html'), TRUE);
+    return $result;
+  }
+
+  /**
    * Smarty escape modifier plugin.
    *
-   * This replaces the core smarty modifier and basically does a lot of
-   * early-returning before calling the core function.
-   *
-   * It early returns on patterns that are common 'no-escape' patterns
-   * in CiviCRM - this list can be honed over time.
-   *
-   * It also logs anything that is actually escaped. Since this only kicks
-   * in when CIVICRM_SMARTY_DEFAULT_ESCAPE is defined it is ok to be aggressive
-   * about logging as we mostly care about developers using it at this stage.
-   *
-   * Note we don't actually use 'htmlall' anywhere in our tpl layer yet so
-   * anything coming in with this be happening because of the default modifier.
-   *
-   * Also note the right way to opt a field OUT of escaping is
-   * ``{$fieldName|smarty:nodefaults}``
-   * This should be used for fields with known html AND for fields where
-   * we are doing empty or isset checks - as otherwise the value is passed for
-   * escaping first so you still get an enotice for 'empty' or a fatal for 'isset'
-   *
-   * Type:     modifier<br>
-   * Name:     escape<br>
-   * Purpose:  Escape the string according to escapement type
-   *
-   * @link http://smarty.php.net/manual/en/language.modifier.escape.php
-   *          escape (Smarty online manual)
-   * @author   Monte Ohrt <monte at ohrt dot com>
-   *
-   * @param string $string
+   * @param string $datum
    * @param string $esc_type
    * @param string $char_set
-   *
    * @return string
    */
-  public static function escape($string, $esc_type = 'html', $char_set = 'UTF-8') {
-    // CiviCRM variables are often arrays - just handle them.
-    // The early return on booleans & numbers is mostly to prevent them being
-    // logged as 'changed' when they are cast to a string.
-    if (!is_scalar($string) || empty($string) || is_bool($string) || is_numeric($string) || $esc_type === 'none') {
-      return $string;
+  public static function crmEscape($datum, $esc_type, $char_set = 'UTF-8') {
+    if ($datum instanceof EscapedString) {
+      $datum->addEscape(static::escaper($esc_type, $char_set));
+      return $datum;
     }
-    if ($esc_type === 'htmlall') {
-      // 'htmlall' is the nothing-specified default.
-      // Don't escape things we think quickform added.
-      if (strpos($string, '<input') === 0
-        || strpos($string, '<select') === 0
-        // Not handling as yet but these ones really should get some love.
-        || strpos($string, '<label') === 0
-        || strpos($string, '<button') === 0
-        || strpos($string, '<span class="crm-frozen-field">') === 0
-        || strpos($string, '<textarea') === 0
 
-        // The ones below this point are hopefully here short term.
-        || strpos($string, '<a') === 0
-        // Message templates screen
-        || strpos($string, '<span><a href') === 0
-        // Not sure how big a pattern this is - used in Pledge view tab
-        // not sure if it needs escaping
-        || strpos($string, ' action="/civicrm/') === 0
-        // eg. Tag edit page, civicrm/admin/financial/financialType/accounts?action=add&reset=1&aid=1
-        || strpos($string, ' action="" method="post"') === 0
-        // This seems to be urls...
-        || strpos($string, '/civicrm/') === 0
-        // Validation error message - eg. <span class="crm-error">Tournament Fees is a required field.</span>
-        || strpos($string, '
-    <span class="crm-error">') === 0
-        // e.g from participant tab class="action-item" href=/civicrm/contact/view/participant?reset=1&amp;action=add&amp;cid=142&amp;context=participant
-        || strpos($string, 'class="action-item" href=/civicrm/"') === 0
-      ) {
-        // Do not escape the above common patterns.
-        return $string;
+    $datum = static::castObjectToString($datum);
+    $result = !is_string($datum) ? $datum : new EscapedString($datum, static::escaper($esc_type, $char_set), FALSE);
+    return $result;
+  }
+
+  /**
+   * Ex: $f = escaper('html', 'UTF-8');
+   *     assert $f('<b>') === '&lt;b&gt;';
+   *
+   * @param string $esc_type
+   * @param string $char_set
+   * @return callable
+   */
+  protected static function escaper($esc_type, $char_set = 'UTF-8'): callable {
+    return function($v) use ($esc_type, $char_set) {
+      if ($esc_type === 'none') {
+        return $v;
+      }
+      return smarty_modifier_escape($v, $esc_type, $char_set);
+    };
+  }
+
+  protected static function castObjectToString($datum) {
+    if (is_object($datum)) {
+      if ($datum instanceof HTML_Common) {
+        throw new \RuntimeException("Oh, so we do need to handle this!");
+      }
+      elseif (is_callable([$datum, '__toString'])) {
+        $datum = (string) $datum;
+      }
+      else {
+        // This should probably be removed - just continue passing through the record. But for now, want to learn about real use-cases...
+        throw new \RuntimeException("Cannot decide auto-escaping behavior for " . get_class($datum));
       }
     }
+    return $datum;
+  }
 
-    $value = smarty_modifier_escape($string, $esc_type, $char_set);
-    if ($value !== $string) {
-      Civi::log()->debug('smarty escaping original {original}, escaped {escaped} type {type} charset {charset}', [
-        'original' => $string,
-        'escaped' => $value,
-        'type' => $esc_type,
-        'charset' => $char_set,
-      ]);
+}
+
+class EscapedString {
+  // public static function unbox($value) {
+  //   return ($value instanceof EscapedString) ? $value->escaped : $value;
+  // }
+
+  /**
+   * @var string
+   */
+  public $original;
+
+  /**
+   * @var string
+   */
+  public $escaped;
+
+  /**
+   * @var bool
+   */
+  public $isAuto;
+
+  /**
+   * @param string $original
+   * @param callable $callback
+   *   A function to use for the initial/default escaping.
+   *   ie `fn(string $original): string`
+   * @param bool $isAuto
+   */
+  public function __construct($original, $callback, $isAuto = TRUE) {
+    $this->original = $original;
+    $this->escaped = $callback($original);
+    $this->isAuto = $isAuto;
+  }
+
+  public function addEscape($callback) {
+    if ($this->isAuto) {
+      // Take precedence over the default/auto escaping.
+      $this->isAuto = FALSE;
+      $this->escaped = $callback($this->original);
     }
-    return $value;
+    else {
+      $this->escaped = $callback($this->escaped);
+    }
+  }
+
+  public function __toString() {
+    return $this->escaped;
   }
 
 }
