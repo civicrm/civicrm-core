@@ -95,6 +95,7 @@
           editor.afform.is_dashlet = false;
           editor.afform.title += ' ' + ts('(copy)');
         }
+        editor.afform.icon = editor.afform.icon || 'fa-list-alt';
         $scope.canvasTab = 'layout';
         $scope.layoutHtml = '';
         $scope.entities = {};

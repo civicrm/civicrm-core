@@ -1170,6 +1170,21 @@
       };
     })
 
+    // Adds an icon picker widget
+    // Example: `<input crm-ui-icon-picker ng-model="model.icon">`
+    .directive('crmUiIconPicker', function($timeout) {
+      return {
+        restrict: 'A',
+        controller: function($element) {
+          CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').then(function() {
+            $timeout(function() {
+              $element.crmIconPicker();
+            });
+          });
+        }
+      };
+    })
+
     .run(function($rootScope, $location) {
       /// Example: <button ng-click="goto('home')">Go home!</button>
       $rootScope.goto = function(path) {

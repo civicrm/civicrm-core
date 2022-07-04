@@ -178,25 +178,25 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
   if ($tabsetName !== 'civicrm/contact/view') {
     return;
   }
-  $scanner = \Civi::service('afform_scanner');
+  $afforms = Civi\Api4\Afform::get(FALSE)
+    ->addWhere('contact_summary', '=', 'tab')
+    ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name')
+    ->execute();
   $weight = 111;
-  foreach ($scanner->getMetas() as $afform) {
-    if (!empty($afform['contact_summary']) && $afform['contact_summary'] === 'tab') {
-      $module = _afform_angular_module_name($afform['name']);
-      $tabs[] = [
-        'id' => $afform['name'],
-        'title' => $afform['title'],
-        'weight' => $weight++,
-        'icon' => 'crm-i fa-list-alt',
-        'is_active' => TRUE,
-        'template' => 'afform/contactSummary/AfformTab.tpl',
-        'module' => $module,
-        'directive' => _afform_angular_module_name($afform['name'], 'dash'),
-      ];
-      // If this is the real contact summary page (and not a callback from ContactLayoutEditor), load module.
-      if (empty($context['caller'])) {
-        Civi::service('angularjs.loader')->addModules($module);
-      }
+  foreach ($afforms as $afform) {
+    $tabs[] = [
+      'id' => $afform['name'],
+      'title' => $afform['title'],
+      'weight' => $weight++,
+      'icon' => 'crm-i ' . ($afform['icon'] ?: 'fa-list-alt'),
+      'is_active' => TRUE,
+      'template' => 'afform/contactSummary/AfformTab.tpl',
+      'module' => $afform['module_name'],
+      'directive' => $afform['directive_name'],
+    ];
+    // If this is the real contact summary page (and not a callback from ContactLayoutEditor), load module.
+    if (empty($context['caller'])) {
+      Civi::service('angularjs.loader')->addModules($afform['module_name']);
     }
   }
 }

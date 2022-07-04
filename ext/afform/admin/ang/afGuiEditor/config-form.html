@@ -71,6 +71,9 @@
           <option value="block">{{:: ts('As Block') }}</option>
           <option value="tab">{{:: ts('As Tab') }}</option>
         </select>
+        <div class="form-group" ng-show="editor.afform.contact_summary === 'tab'">
+          <input required ng-model="editor.afform.icon" crm-ui-icon-picker class="form-control">
+        </div>
       </div>
       <p class="help-block">{{:: ts('Placement can be configured using the Contact Layout Editor.') }}</p>
     </div>
