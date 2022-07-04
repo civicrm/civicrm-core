@@ -4448,7 +4448,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution1 = $this->callAPISuccess('contribution', 'create', array_merge(
         $this->_params,
         ['contribution_recur_id' => $contributionRecur['id'], 'payment_instrument_id' => 2])
-    );
+    )['id'];
     $contribution2 = $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_status_id' => 'Completed',
       'trxn_id' => 'blah',
@@ -4549,7 +4549,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_status_id' => 'Completed',
       'trxn_id' => 7890,
-      'original_contribution_id' => $contribution,
+      'original_contribution_id' => $contribution['id'],
     ]);
     $domain = $this->callAPISuccess('domain', 'getsingle', ['id' => 1]);
     $mut->checkMailLog([
@@ -4592,7 +4592,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'repeattransaction', [
       'contribution_status_id' => 'Completed',
       'trxn_id' => 5678,
-      'original_contribution_id' => $originalContribution,
+      'original_contribution_id' => $originalContribution['id'],
     ]
     );
     $mut->checkMailLog([
@@ -4620,7 +4620,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_status_id' => 'Completed',
       'trxn_id' => 4567,
-      'original_contribution_id' => $originalContribution,
+      'original_contribution_id' => $originalContribution['id'],
     ]);
     $mut->checkMailLog([
       'From: ' . $domain['name'] . ' <' . $domain['domain_email'] . '>',
