@@ -163,10 +163,10 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
     // Note also orgs will get ellipsified, but if we do that here then
     // some existing tests on individual fail.
     // Also api v3 will enforce org naming length by failing, v4 will truncate.
-    if (mb_strlen($contact->display_name, 'UTF-8') > 128) {
+    if (mb_strlen(($contact->display_name ?? ''), 'UTF-8') > 128) {
       $contact->display_name = mb_substr($contact->display_name, 0, 128, 'UTF-8');
     }
-    if (mb_strlen($contact->sort_name, 'UTF-8') > 128) {
+    if (mb_strlen(($contact->sort_name ?? ''), 'UTF-8') > 128) {
       $contact->sort_name = mb_substr($contact->sort_name, 0, 128, 'UTF-8');
     }
 

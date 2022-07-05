@@ -878,7 +878,7 @@ class CRM_Utils_String {
     if ($fragment === '') {
       return TRUE;
     }
-    $len = strlen($fragment);
+    $len = strlen($fragment ?? '');
     return substr($string, 0, $len) === $fragment;
   }
 
@@ -895,7 +895,7 @@ class CRM_Utils_String {
     if ($fragment === '') {
       return TRUE;
     }
-    $len = strlen($fragment);
+    $len = strlen($fragment ?? '');
     return substr($string, -1 * $len) === $fragment;
   }
 

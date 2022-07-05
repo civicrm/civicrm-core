@@ -148,7 +148,7 @@ class CRM_Case_XMLRepository {
    */
   public function findXmlFile($caseType) {
     // first check custom templates directory
-    $fileName = NULL;
+    $fileName = '';
 
     if (!$fileName || !file_exists($fileName)) {
       $caseTypesViaHook = $this->getCaseTypesViaHook();
