@@ -2184,6 +2184,12 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * Gaps in the above (
    *
    * @param array $input
+   *    Keys are all optional, if not supplied the template contribution's values are used.
+   *    The template contribution is either the actual template or the latest added contribution
+   *    for the ContributionRecur specified in $contributionParams['contribution_recur_id'].
+   *    - total_amount
+   *    - financial_type_id
+   *    - campaign_id
    *
    * @param array $contributionParams
    *
