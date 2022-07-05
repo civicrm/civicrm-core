@@ -126,6 +126,3 @@ safe_delete vendor/phenx/php-font-lib/www
 safe_delete vendor/dompdf/dompdf/lib/fonts/DejaVu*
 make_font_cache > vendor/dompdf/dompdf/lib/fonts/dompdf_font_family_cache.dist.php
 make_font_readme > vendor/dompdf/dompdf/lib/fonts/README.DejaVuFonts.txt
-
-# Remove debug_print_backtrace(), which can leak system details. Put backtrace in log.
-simple_replace vendor/dompdf/dompdf/lib/html5lib/TreeBuilder.php 'debug_print_backtrace();' 'CRM_Core_Error::backtrace("backTrace", TRUE);'
