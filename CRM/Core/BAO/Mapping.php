@@ -611,7 +611,10 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
       else {
         $contactFields = CRM_Contact_BAO_Contact::exportableFields($contactType, FALSE, TRUE);
       }
-      $contactFields = array_merge($contactFields, CRM_Contact_BAO_Query_Hook::singleton()->getFields());
+      // It's unclear when we would want this but.... see
+      // https://lab.civicrm.org/dev/core/-/issues/3069 for when we don't....
+      $contactFields = array_merge($contactFields, CRM_Contact_BAO_Query_Hook::singleton()
+        ->getContactFields());
 
       // Exclude the address options disabled in the Address Settings
       $fields[$contactType] = CRM_Core_BAO_Address::validateAddressOptions($contactFields);
