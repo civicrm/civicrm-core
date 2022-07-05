@@ -517,13 +517,11 @@ function civicrm_api3_contribution_completetransaction($params) {
     $input['receive_date'] = $params['receive_date'];
   }
   if (empty($contribution->contribution_page_id)) {
-    static $domainFromName;
-    static $domainFromEmail;
-    if (empty($domainFromEmail) && (empty($params['receipt_from_name']) || empty($params['receipt_from_email']))) {
+    if (empty($params['receipt_from_name']) || empty($params['receipt_from_email'])) {
       [$domainFromName, $domainFromEmail] = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     }
-    $input['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $params, $domainFromName);
-    $input['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $params, $domainFromEmail);
+    $input['receipt_from_name'] = ($input['receipt_from_name'] ?? FALSE) ?: $domainFromName;
+    $input['receipt_from_email'] = ($input['receipt_from_email'] ?? FALSE) ?: $domainFromEmail;
   }
   $input['card_type_id'] = $params['card_type_id'] ?? NULL;
   $input['pan_truncation'] = $params['pan_truncation'] ?? NULL;
@@ -608,6 +606,11 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
  * @todo - most of this should live in the BAO layer but as we want it to be an addition
  * to 4.3 which is already stable we should add it to the api layer & re-factor into the BAO layer later
  *
+ * @todo this needs a big refactor to use the
+ * CRM_Contribute_BAO_Contribution::repeatTransaction and Payment.create where
+ * currently it uses CRM_Contribute_BAO_Contribution::completeOrder and repeats
+ * a lot of work. See comments in https://github.com/civicrm/civicrm-core/pull/23928
+ *
  * @param array $params
  *   Input parameters.
  *
@@ -653,7 +656,6 @@ function civicrm_api3_contribution_repeattransaction($params) {
     'card_type_id',
     'pan_truncation',
     'payment_instrument_id',
-    // Q. not contribution_page_id ?
   ];
   $input = array_intersect_key($params, array_fill_keys($paramsToCopy, NULL));
   // Ensure certain keys exist with NULL values if they don't already (not sure if this is ACTUALLY necessary?)
@@ -661,8 +663,11 @@ function civicrm_api3_contribution_repeattransaction($params) {
 
   // Set amount, use templateContribution if not in params.
   $input['total_amount'] = $params['total_amount'] ?? $templateContribution['total_amount'];
-  // Why do we need this extra 'amount' key? It's used in CRM_Contribute_BAO_Contribution::completeOrder to pass on to CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge
-  // but it could possibly be removed if that code was adjusted unless anything else uses 'amount'
+  // Why do we need this extra 'amount' key? It's used in
+  // CRM_Contribute_BAO_Contribution::completeOrder to pass on to
+  // CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge but it could
+  // possibly be removed if that code was adjusted, and/or when we move away
+  // from using completeOrder.
   $input['amount'] = $input['total_amount'];
 
   $input['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', [
@@ -673,9 +678,6 @@ function civicrm_api3_contribution_repeattransaction($params) {
   $input['is_test'] = $templateContribution['is_test'];
 
   if (empty($templateContribution['contribution_page_id'])) {
-    // Q. why do we need statics here?
-    static $domainFromName;
-    static $domainFromEmail;
     if (empty($domainFromEmail) && (empty($params['receipt_from_name']) || empty($params['receipt_from_email']))) {
       [$domainFromName, $domainFromEmail] = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     }
