@@ -1597,10 +1597,11 @@ WHERE  id = %1
    * @param array $options
    *   List of options, each as a record of id+name+label.
    *   Ex: [['id' => 123, 'name' => 'foo_bar', 'label' => 'Foo Bar']]
+   *   or: ['index' => ['id' => 123, 'name' => 'foo_bar', 'label' => 'Foo Bar']]
    */
   public static function formatArrayOptions($context, array &$options) {
     // Already flat; return keys/values according to context
-    if (!isset($options[0]) || !is_array($options[0])) {
+    if (!isset($options[array_key_first($options)]) || !is_array($options[array_key_first($options)])) {
       // For validate context, machine names are expected in place of labels.
       // A flat array has no names so use the ids for both key and value.
       return $context === 'validate' ?
