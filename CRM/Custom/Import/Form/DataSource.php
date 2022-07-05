@@ -81,7 +81,8 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-
+    // Perhaps never used, but permits url passing of the group.
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
     $multipleCustomData = CRM_Core_BAO_CustomGroup::getMultipleFieldGroup();
     $this->assign('fieldGroups', $multipleCustomData);
     $this->add('select', 'multipleCustomData', ts('Multi-value Custom Data'), ['' => ts('- select -')] + $multipleCustomData, TRUE);

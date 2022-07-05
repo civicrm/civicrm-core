@@ -23,13 +23,6 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    * Set variables up before form is built.
    */
   public function preProcess() {
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
-    $params = "reset=1";
-    if ($this->_id) {
-      $params .= "&id={$this->_id}";
-    }
-    CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url(static::PATH, $params));
-
     // check for post max size
     CRM_Utils_Number::formatUnitSize(ini_get('post_max_size'), TRUE);
     $this->assign('importEntity', $this->getTranslatedEntity());
