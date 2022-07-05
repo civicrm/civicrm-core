@@ -11,6 +11,8 @@
 
 use Civi\Api4\ActivityContact;
 use Civi\Api4\Contribution;
+use Civi\Api4\ContributionRecur;
+use Civi\Api4\Pledge;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
@@ -3370,7 +3372,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Note that we are creating a logged in user because email goes out from
    * that person.
    */
-  public function testCompleteTransactionUpdatePledgePayment() {
+  public function testCompleteTransactionUpdatePledgePayment(): void {
     $this->swapMessageTemplateForTestTemplate();
     $mut = new CiviMailUtils($this, TRUE);
     $mut->clearMessages();
@@ -3401,6 +3403,41 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     $mut->stop();
     $this->revertTemplateToReservedTemplate();
+  }
+
+  /**
+   * Test repeating a pledge with the repeatTransaction api..
+   *
+   * @throws \API_Exception
+   */
+  public function testRepeatTransactionWithPledgePayment(): void {
+    $contributionID = $this->createPendingPledgeContribution(2);
+    $contributionRecurID = ContributionRecur::create()->setValues([
+      'contact_id' => $this->_individualId,
+      'amount' => 250,
+      'payment_processor_id' => $this->paymentProcessorID,
+    ])->execute()->first()['id'];
+    Contribution::update()->setValues([
+      'id' => $contributionID,
+      'contribution_recur_id' => $contributionRecurID,
+    ])->execute();
+    $this->callAPISuccess('contribution', 'completetransaction', [
+      'id' => $contributionID,
+      'trxn_date' => '1 Feb 2013',
+    ]);
+    $this->assertEquals('In Progress', Pledge::get()
+      ->addWhere('id', '=', $this->_ids['pledge'])
+      ->addSelect('status_id:name')->execute()->first()['status_id:name']
+    );
+    $this->callAPISuccess('contribution', 'repeattransaction', [
+      'contribution_recur_id' => $contributionRecurID,
+      'trxn_id' => '2013',
+      'contribution_status_id' => 'Completed',
+    ]);
+    $this->assertEquals('Completed', Pledge::get()
+      ->addWhere('id', '=', $this->_ids['pledge'])
+      ->addSelect('status_id:name')->execute()->first()['status_id:name']
+    );
   }
 
   /**
@@ -3919,15 +3956,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Create a pending contribution & linked pending pledge record.
    *
-   * @throws \CRM_Core_Exception
+   * @param int $installments
+   *
+   * @return int
    */
-  public function createPendingPledgeContribution() {
-
-    $pledgeID = $this->pledgeCreate(['contact_id' => $this->_individualId, 'installments' => 1, 'amount' => 500]);
+  public function createPendingPledgeContribution(int $installments = 1): int {
+    $pledgeID = $this->pledgeCreate(['contact_id' => $this->_individualId, 'installments' => $installments, 'amount' => 500]);
     $this->_ids['pledge'] = $pledgeID;
     $contribution = $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, [
       'contribution_status_id' => 'Pending',
-      'total_amount' => 500,
+      'total_amount' => (500 / $installments),
     ]));
     $paymentID = $this->callAPISuccessGetValue('PledgePayment', [
       'options' => ['limit' => 1],
@@ -3938,10 +3976,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_id' =>
       $contribution['id'],
       'status_id' => 'Pending',
-      'scheduled_amount' => 500,
+      'scheduled_amount' => (500 / $installments),
     ]);
 
-    return $contribution['id'];
+    return (int) $contribution['id'];
   }
 
   /**

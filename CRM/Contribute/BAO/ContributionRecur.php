@@ -766,63 +766,40 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    */
   public static function updateRecurLinkedPledge($contributionID, $contributionRecurID, $contributionStatusID, $contributionAmount) {
     $returnProperties = ['id', 'pledge_id'];
-    $paymentDetails = $paymentIDs = [];
+    $paymentDetails = [];
 
-    if (CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'contribution_id', $contributionID,
-      $paymentDetails, $returnProperties
-    )
-    ) {
-      foreach ($paymentDetails as $key => $value) {
-        $paymentIDs[] = $value['id'];
-        $pledgeId = $value['pledge_id'];
-      }
-    }
-    else {
-      //payment is not already linked - if it is linked with a pledge we need to create a link.
-      // return if it is not recurring contribution
-      if (!$contributionRecurID) {
-        return;
-      }
+    $relatedContributions = new CRM_Contribute_DAO_Contribution();
+    $relatedContributions->contribution_recur_id = $contributionRecurID;
+    $relatedContributions->find();
 
-      $relatedContributions = new CRM_Contribute_DAO_Contribution();
-      $relatedContributions->contribution_recur_id = $contributionRecurID;
-      $relatedContributions->find();
-
-      while ($relatedContributions->fetch()) {
-        CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'contribution_id', $relatedContributions->id,
-          $paymentDetails, $returnProperties
-        );
-      }
-
-      if (empty($paymentDetails)) {
-        // payment is not linked with a pledge and neither are any other contributions on this
-        return;
-      }
-
-      foreach ($paymentDetails as $key => $value) {
-        $pledgeId = $value['pledge_id'];
-      }
-
-      // we have a pledge now we need to get the oldest unpaid payment
-      $paymentDetails = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeId);
-      if (empty($paymentDetails['id'])) {
-        // we can assume this pledge is now completed
-        // return now so we don't create a core error & roll back
-        return;
-      }
-      $paymentDetails['contribution_id'] = $contributionID;
-      $paymentDetails['status_id'] = $contributionStatusID;
-      $paymentDetails['actual_amount'] = $contributionAmount;
-
-      // put contribution against it
-      $payment = civicrm_api3('PledgePayment', 'create', $paymentDetails);
-      $paymentIDs[] = $payment['id'];
+    while ($relatedContributions->fetch()) {
+      CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'contribution_id', $relatedContributions->id,
+        $paymentDetails, $returnProperties
+      );
     }
 
-    // update pledge and corresponding payment statuses
-    CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeId, $paymentIDs, $contributionStatusID,
-      NULL, $contributionAmount
-    );
+    if (empty($paymentDetails)) {
+      // payment is not linked with a pledge and neither are any other contributions on this
+      return;
+    }
+
+    foreach ($paymentDetails as $value) {
+      $pledgeId = $value['pledge_id'];
+    }
+
+    // we have a pledge now we need to get the oldest unpaid payment
+    $paymentDetails = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeId);
+    if (empty($paymentDetails['id'])) {
+      // we can assume this pledge is now completed
+      // return now so we don't create a core error & roll back
+      return;
+    }
+    $paymentDetails['contribution_id'] = $contributionID;
+    $paymentDetails['status_id'] = $contributionStatusID;
+    $paymentDetails['actual_amount'] = $contributionAmount;
+
+    // put contribution against it
+    civicrm_api3('PledgePayment', 'create', $paymentDetails);
   }
 
   /**

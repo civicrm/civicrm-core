@@ -16,7 +16,6 @@ use Civi\Api4\ContributionRecur;
 use Civi\Api4\LineItem;
 use Civi\Api4\ContributionSoft;
 use Civi\Api4\PaymentProcessor;
-use Civi\Api4\PledgePayment;
 
 /**
  *
@@ -506,11 +505,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
 
     CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
 
-    if (!empty($params['id']) && !empty($params['contribution_status_id'])
-      && CRM_Core_Component::isEnabled('CiviPledge')
-    ) {
-      self::disconnectPledgePaymentsIfCancelled((int) $params['id'], CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id']));
-    }
     $transaction->commit();
 
     if (empty($contribution->contact_id)) {
@@ -1105,44 +1099,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     // This would be the case for backoffice (where is_email_receipt is not passed in) or events, where Event::sendMail will filter
     // again anyway.
     return TRUE;
-  }
-
-  /**
-   * Disconnect pledge payments from cancelled or failed contributions.
-   *
-   * If the contribution has been cancelled or has failed check to
-   * see if it is linked to a pledge and unlink it.
-   *
-   * @param int $pledgePaymentID
-   * @param string $contributionStatus
-   *
-   * @throws \API_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
-   */
-  protected static function disconnectPledgePaymentsIfCancelled(int $pledgePaymentID, $contributionStatus): void {
-    if (!in_array($contributionStatus, ['Failed', 'Cancelled'], TRUE)) {
-      return;
-    }
-    // Check first since just doing an update could be locking under load.
-    $pledgePayment = PledgePayment::get(FALSE)
-      ->addWhere('contribution_id', '=', $pledgePaymentID)
-      ->setSelect(['id', 'pledge_id', 'scheduled_date', 'scheduled_amount'])
-      ->execute()
-      ->first();
-    if (!empty($pledgePayment)) {
-      PledgePayment::update(FALSE)->setValues([
-        'contribution_id' => NULL,
-        'actual_amount' => NULL,
-        'status_id:name' => 'Pending',
-        // We need to set these fields for now because the PledgePayment::create
-        // function doesn't handled updates well at the moment. Test cover
-        // in testCancelOrderWithPledge.
-        'scheduled_date' => $pledgePayment['scheduled_date'],
-        'installment_amount' => $pledgePayment['scheduled_amount'],
-        'installments' => 1,
-        'pledge_id' => $pledgePayment['pledge_id'],
-      ])->addWhere('id', '=', $pledgePayment['id'])->execute();
-    }
   }
 
   /**
@@ -2229,6 +2185,9 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     $temporaryObject->copyCustomFields($templateContribution['id'], $createContribution['id']);
     // Add new soft credit against current $contribution.
     CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($contributionParams['contribution_recur_id'], $createContribution['id']);
+    CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($createContribution['id'], $contributionParams['contribution_recur_id'],
+      $contributionParams['status_id'], $contributionParams['total_amount']);
+
     return $createContribution;
   }
 
@@ -3827,7 +3786,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'contribution_status_id',
       'card_type_id',
       'pan_truncation',
-      'financial_type_id',
     ];
 
     $paymentProcessorId = $input['payment_processor_id'] ?? NULL;
@@ -3852,6 +3810,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     if (!$contributionID) {
       $contributionResult = self::repeatTransaction($input, $contributionParams);
       $contributionID = $contributionResult['id'];
+      if ($contributionParams['contribution_status_id'] === $completedContributionStatusID) {
+        // Ideally add deprecation notice here & only accept pending for repeattransaction.
+        return self::completeOrder($input, NULL, $contributionID);
+      }
+      return $contributionResult;
     }
 
     if ($contributionParams['contribution_status_id'] === $completedContributionStatusID) {
@@ -3888,9 +3851,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     if (!empty($contributionSoft)) {
       CRM_Contribute_BAO_ContributionSoft::pcpNotifyOwner($contributionID, $contributionSoft);
     }
-    // @todo - check if Contribution::create does this, test, remove.
-    CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($contributionID, $recurringContributionID,
-      $contributionParams['contribution_status_id'], $input['amount']);
 
     if (self::isEmailReceipt($input, $contributionID, $recurringContributionID)) {
       civicrm_api3('Contribution', 'sendconfirmation', [
