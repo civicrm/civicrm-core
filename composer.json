@@ -49,7 +49,7 @@
   "require": {
     "php": "~7.2.5 || ~7.3 || ~8",
     "cache/integration-tests": "~0.17.0",
-    "dompdf/dompdf" : "~1.2.1",
+    "dompdf/dompdf" : "~2",
     "firebase/php-jwt": ">=3 <6",
     "electrolinux/phpquery": "^0.9.6",
     "symfony/config": "~3.0 || ~4.4",
