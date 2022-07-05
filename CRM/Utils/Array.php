@@ -1077,6 +1077,9 @@ class CRM_Utils_Array {
    * @return bool
    */
   public static function pathIsset($values, $path) {
+    if ($path === []) {
+      return ($values !== NULL);
+    }
     foreach ($path as $key) {
       if (!is_array($values) || !isset($values[$key])) {
         return FALSE;
@@ -1100,6 +1103,11 @@ class CRM_Utils_Array {
    *   TRUE if anything has been removed. FALSE if no changes were required.
    */
   public static function pathUnset(&$values, $path, $cleanup = FALSE) {
+    if (count($path) === 0) {
+      $values = NULL;
+      return TRUE;
+    }
+
     if (count($path) === 1) {
       if (isset($values[$path[0]])) {
         unset($values[$path[0]]);
@@ -1131,6 +1139,10 @@ class CRM_Utils_Array {
    *   Ex: 456.
    */
   public static function pathSet(&$values, $pathParts, $value) {
+    if ($pathParts === []) {
+      $values = $value;
+      return;
+    }
     $r = &$values;
     $last = array_pop($pathParts);
     foreach ($pathParts as $part) {
