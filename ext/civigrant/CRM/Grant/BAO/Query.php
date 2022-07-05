@@ -17,16 +17,25 @@ use CRM_Grant_ExtensionUtil as E;
 class CRM_Grant_BAO_Query extends CRM_Contact_BAO_Query_Interface {
 
   /**
-   * Unused.
+   * Get available fields.
    *
-   * This function is meant to return extra contact fields, but grants are not contacts.
+   * Important for exports & relative date filters.
    *
    * @return array
    */
   public function &getFields() {
-    $fields = [];
-    return $fields;
-    // return CRM_Grant_BAO_Grant::exportableFields();
+    return CRM_Grant_BAO_Grant::exportableFields();
+  }
+
+  /**
+   * Get the fields that are available in the 'contact context'.
+   *
+   * For example exporting contacts should not include fields for grants etc.
+   *
+   * @return array
+   */
+  public function getContactFields(): array {
+    return [];
   }
 
   /**
