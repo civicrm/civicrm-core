@@ -183,38 +183,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   }
 
   /**
-   * Add the saved mapping fields to the form.
-   *
-   * @param int|null $savedMappingID
-   *
-   * @deprecated - working to remove this in favour of `addSavedMappingFields`
-   * @throws \CiviCRM_API3_Exception
-   */
-  protected function buildSavedMappingFields($savedMappingID) {
-    //to save the current mappings
-    if (!$savedMappingID) {
-      $saveDetailsName = ts('Save this field mapping');
-      $this->applyFilter('saveMappingName', 'trim');
-      $this->add('text', 'saveMappingName', ts('Name'));
-      $this->add('text', 'saveMappingDesc', ts('Description'));
-    }
-    else {
-      $savedMapping = $this->get('savedMapping');
-
-      $mappingName = (string) civicrm_api3('Mapping', 'getvalue', ['id' => $savedMappingID, 'return' => 'name']);
-      $this->set('loadedMapping', $savedMapping);
-      $this->add('hidden', 'mappingId', $savedMappingID);
-
-      $this->addElement('checkbox', 'updateMapping', ts('Update this field mapping'), NULL);
-      $saveDetailsName = ts('Save as a new field mapping');
-      $this->add('text', 'saveMappingName', ts('Name'));
-      $this->add('text', 'saveMappingDesc', ts('Description'));
-    }
-    $this->assign('savedMappingName', $mappingName ?? NULL);
-    $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL, ['onclick' => "showSaveDetails(this)"]);
-  }
-
-  /**
    * Validate that sufficient fields have been supplied to match to a contact.
    *
    * @param string $contactType
@@ -316,7 +284,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       foreach (array_keys($this->getColumnHeaders()) as $i) {
         $this->saveMappingField($savedMappingID, $i, FALSE);
       }
-      $this->set('savedMapping', $savedMappingID);
       $this->updateUserJobMetadata('mapping', ['id' => $savedMappingID]);
     }
   }
@@ -420,8 +387,34 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    * @throws \CRM_Core_Exception
    */
   protected function addSavedMappingFields(): void {
-    $savedMappingID = (int) $this->getSubmittedValue('savedMapping');
-    $this->buildSavedMappingFields($savedMappingID);
+    $savedMappingID = $this->getMappingID();
+
+    //to save the current mappings
+    if (!$savedMappingID) {
+      $saveDetailsName = ts('Save this field mapping');
+      $this->applyFilter('saveMappingName', 'trim');
+      $this->add('text', 'saveMappingName', ts('Name'));
+      $this->add('text', 'saveMappingDesc', ts('Description'));
+    }
+    else {
+      $mappingName = (string) ($this->getMapping()['name'] ?? '');
+      $this->add('hidden', 'mappingId', $savedMappingID);
+
+      $this->addElement('checkbox', 'updateMapping', ts('Update this field mapping'), NULL);
+      $saveDetailsName = ts('Save as a new field mapping');
+      $this->add('text', 'saveMappingName', ts('Name'));
+      $this->add('text', 'saveMappingDesc', ts('Description'));
+    }
+    $this->assign('savedMappingName', $mappingName ?? NULL);
+    $this->addElement('checkbox', 'saveMapping', $saveDetailsName);
+    if ($this->getSubmittedValue('saveMapping')) {
+      // Messing with submitted values is kinda bad - but it might save
+      // a lot of confusing js. If you choose to create and then refresh it's
+      // now an update, not a create.
+      $this->_submitValues['updateMapping'] = TRUE;
+      $this->_submitValues['saveMapping'] = '';
+    }
+
     $this->addFormRule(['CRM_Import_Form_MapField', 'mappingRule']);
   }
 
@@ -447,12 +440,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
           $errors['saveMappingName'] = ts('Duplicate Import Mapping Name');
         }
       }
-    }
-    // This is horrible & should be removed once gone from tpl
-    if (!empty($errors['saveMappingName'])) {
-      $_flag = 1;
-      $assignError = new CRM_Core_Page();
-      $assignError->assign('mappingDetailsError', $_flag);
     }
     return empty($errors) ? TRUE : $errors;
   }

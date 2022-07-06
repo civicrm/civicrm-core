@@ -138,4 +138,13 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     return $this->parser;
   }
 
+  /**
+   * Get the type of used for civicrm_mapping.mapping_type_id.
+   *
+   * @return string
+   */
+  public function getMappingTypeName(): string {
+    return 'Import Multi value custom data';
+  }
+
 }

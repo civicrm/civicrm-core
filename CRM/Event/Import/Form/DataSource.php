@@ -63,4 +63,13 @@ class CRM_Event_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     return $this->parser;
   }
 
+  /**
+   * Get the mapping name per the civicrm_mapping_field.type_id option group.
+   *
+   * @return string
+   */
+  public function getMappingTypeName(): string {
+    return 'Import Participant';
+  }
+
 }

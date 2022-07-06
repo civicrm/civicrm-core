@@ -114,8 +114,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   public function buildQuickForm() {
     $this->addSavedMappingFields();
 
-    $this->addFormRule(['CRM_Contact_Import_Form_MapField', 'formRule']);
-
     //-------- end of saved mapping stuff ---------
 
     $defaults = [];
@@ -271,6 +269,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $formName = 'document.forms.' . $this->_name;
     //used to warn for mismatch column count or mismatch mapping
     CRM_Core_Session::singleton()->setStatus(NULL);
+    // This processor class is in the process of being decommissioned - it
+    // doesn't do much now...
     $processor = new CRM_Import_ImportProcessor();
     $processor->setMappingID((int) $this->getSubmittedValue('savedMapping'));
     $processor->setFormName($formName);
@@ -327,33 +327,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Global validation rules for the form.
-   *
-   * @param array $fields
-   *   Posted values of the form.
-   *
-   * @return array|bool
-   *   list of errors to be posted back to the form
-   */
-  public static function formRule(array $fields) {
-    if (!empty($fields['saveMapping'])) {
-      // todo - this is non-sensical - sane js is better. PR to fix got stale but
-      // is here https://github.com/civicrm/civicrm-core/pull/23950
-      CRM_Core_Smarty::singleton()->assign('isCheked', TRUE);
-    }
-    return TRUE;
-  }
-
-  /**
-   * Process the mapped fields and map it into the uploaded file.
-   */
-  public function postProcess() {
-    $params = $this->controller->exportValues('MapField');
-    $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
-    $this->submit($params);
-  }
-
-  /**
    * Format custom field name.
    *
    * Combine group and field name to avoid conflict.
@@ -387,48 +360,12 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Main submit function.
+   * Get the mapping name per the civicrm_mapping_field.type_id option group.
    *
-   * Extracted to add testing & start refactoring.
-   *
-   * @param $params
-   * @param $mapperKeys
-   *
-   * @throws \CiviCRM_API3_Exception
-   * @throws \CRM_Core_Exception
+   * @return string
    */
-  public function submit($params) {
-    $this->set('columnNames', $this->_columnNames);
-
-    // store mapping Id to display it in the preview page
-    $this->set('loadMappingId', CRM_Utils_Array::value('mappingId', $params));
-
-    //Updating Mapping Records
-    if (!empty($params['updateMapping'])) {
-      foreach (array_keys($this->getColumnHeaders()) as $i) {
-        $this->saveMappingField($params['mappingId'], $i, TRUE);
-      }
-    }
-
-    //Saving Mapping Details and Records
-    if (!empty($params['saveMapping'])) {
-      $mappingParams = [
-        'name' => $params['saveMappingName'],
-        'description' => $params['saveMappingDesc'],
-        'mapping_type_id' => 'Import Contact',
-      ];
-
-      $saveMapping = civicrm_api3('Mapping', 'create', $mappingParams);
-
-      foreach (array_keys($this->getColumnHeaders()) as $i) {
-        $this->saveMappingField($saveMapping['id'], $i);
-      }
-      $this->set('savedMapping', $saveMapping['id']);
-    }
-
-    $parser = new CRM_Contact_Import_Parser_Contact();
-    $parser->setUserJobID($this->getUserJobID());
-    $parser->validate();
+  public function getMappingTypeName(): string {
+    return 'Import Contact';
   }
 
   /**

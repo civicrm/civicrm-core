@@ -73,14 +73,7 @@ abstract class CRM_Import_Form_Preview extends CRM_Import_Forms {
     $this->assign('mapper', $this->getMappedFieldLabels());
     $this->assign('dataValues', $this->getDataRows([], 2));
     $this->assign('columnNames', $this->getColumnHeaders());
-    //get the mapping name displayed if the mappingId is set
-    $mappingId = $this->get('loadMappingId');
-    if ($mappingId) {
-      $mapDAO = new CRM_Core_DAO_Mapping();
-      $mapDAO->id = $mappingId;
-      $mapDAO->find(TRUE);
-    }
-    $this->assign('savedMappingName', $mappingId ? $mapDAO->name : NULL);
+    $this->assign('savedMappingName', $this->getMapping()['name'] ?? NULL);
     $this->assign('skipColumnHeader', $this->getSubmittedValue('skipColumnHeader'));
     $this->assign('showColumnNames', $this->getSubmittedValue('skipColumnHeader'));
     // rowDisplayCount is deprecated - it used to be used with {section} but we have nearly gotten rid of it.
