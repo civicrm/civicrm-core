@@ -61,9 +61,9 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    */
   public function testSubmit(array $params, array $mapper, array $expecteds = []): void {
-    $form = $this->getMapFieldFormObject(['mapper' => $mapper]);
+    $form = $this->getMapFieldFormObject(array_merge($params, ['mapper' => $mapper]));
     $form->preProcess();
-    $form->submit($params);
+    $form->postProcess();
 
     CRM_Core_DAO::executeQuery('DROP TABLE civicrm_tmp_d_import_job_xxx');
     if (!empty($expecteds)) {
