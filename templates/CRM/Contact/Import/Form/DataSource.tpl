@@ -68,7 +68,7 @@
         </tr>
       {/if}
 
-      {if $savedMapping}
+      {if array_key_exists('savedMapping', $form)}
         <tr class="crm-import-datasource-form-block-savedMapping">
           <td class="label"><label for="savedMapping">{$form.savedMapping.label}</label></td>
           <td>{$form.savedMapping.html}<br />

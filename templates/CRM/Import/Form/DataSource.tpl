@@ -56,7 +56,7 @@
           <td>{$form.fieldSeparator.html}</td>
         </tr>
        <tr class="crm-import-uploadfile-form-block-date">{include file="CRM/Core/Date.tpl"}</tr>
-       {if $savedMapping}
+       {if array_key_exists('savedMapping', $form)}
          <tr class="crm-import-uploadfile-form-block-savedMapping">
            <td>{$form.savedMapping.label}</td>
            <td>{$form.savedMapping.html}<br />

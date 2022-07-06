@@ -208,6 +208,13 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       $this->add('text', 'saveMappingName', ts('Name'));
       $this->add('text', 'saveMappingDesc', ts('Description'));
     }
+    if ($this->getSubmittedValue('saveMapping')) {
+      // Messing with submitted values is kinda bad - but it might save
+      // a lot of confusing js. If you choose to create and then refresh it's
+      // now an update, not a create.
+      $this->_submitValues['updateMapping'] = TRUE;
+      $this->_submitValues['saveMapping'] = '';
+    }
     $this->assign('savedMappingName', $mappingName ?? NULL);
     $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL, ['onclick' => "showSaveDetails(this)"]);
   }

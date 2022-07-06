@@ -17,6 +17,7 @@
 
 use Civi\Api4\UserJob;
 use League\Csv\Writer;
+use Civi\Api4\Mapping;
 
 /**
  * This class helps the forms within the import flow access submitted & parsed values.
@@ -681,6 +682,40 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   protected function isSkipExisting(): bool {
     return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_SKIP;
+  }
+
+  /**
+   * Get the mapping ID.
+   *
+   * We use the one chosen in the DataSource form, unless
+   * we have progressed past that form, in which case we use the
+   * saved/updated/selected mapping.
+   *
+   * @return int|null
+   *
+   * @throws \API_Exception
+   */
+  protected function getMappingID(): ?int {
+    if (!$this->getUserJobID() || empty($this->getUserJob()['metadata']['mapping'])) {
+      return $this->getSubmittedValue('savedMapping');
+    }
+    return $this->getUserJob()['metadata']['mapping']['id'];
+  }
+
+  /**
+   * Get the mapping, if any.
+   *
+   * @return array
+   * @throws \API_Exception
+   */
+  protected function getMapping(): array {
+    //get the mapping name displayed if the mappingId is set
+    if ($this->getMappingID()) {
+      return (array) Mapping::get(FALSE)->addWhere('id', '=', $this->getMappingID())
+        ->addSelect('name', 'id', 'description')
+        ->execute()->first();
+    }
+    return [];
   }
 
 }

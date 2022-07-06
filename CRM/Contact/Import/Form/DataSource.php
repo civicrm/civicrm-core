@@ -99,8 +99,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
     $mappingArray = CRM_Core_BAO_Mapping::getMappings('Import Contact');
 
-    $this->assign('savedMapping', $mappingArray);
-    $this->addElement('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappingArray);
+    $this->buildSavedMapping();
 
     $js = ['onClick' => "buildSubTypes();buildDedupeRules();"];
     // contact types option
@@ -228,6 +227,15 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Form_DataSource {
    */
   public function getTitle(): string {
     return ts('Choose Data Source');
+  }
+
+  /**
+   * Get the mapping name per the civicrm_mapping_field.type_id option group.
+   *
+   * @return string
+   */
+  public function getMappingTypeName(): string {
+    return 'Import Contact';
   }
 
 }

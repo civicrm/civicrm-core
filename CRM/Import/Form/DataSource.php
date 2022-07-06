@@ -83,14 +83,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
 
     $this->add('text', 'fieldSeparator', ts('Import Field Separator'), ['size' => 2], TRUE);
     $this->setDefaults(['fieldSeparator' => $config->fieldSeparator]);
-    $mappingArray = CRM_Core_BAO_Mapping::getCreateMappingValues('Import ' . static::IMPORT_ENTITY);
-
-    $this->assign('savedMapping', $mappingArray);
-    $this->add('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappingArray);
-
-    if ($loadedMapping = $this->get('loadedMapping')) {
-      $this->setDefaults(['savedMapping' => $loadedMapping]);
-    }
+    $this->buildSavedMapping();
 
     //build date formats
     CRM_Core_Form_Date::buildAllowedDateFormats($this);
@@ -221,6 +214,30 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    */
   private function instantiateDataSource(): void {
     $this->getDataSourceObject()->initialize();
+  }
+
+  /**
+   * Build the saved mapping widget.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function buildSavedMapping(): void {
+    $mappings = CRM_Core_BAO_Mapping::getCreateMappingValues($this->getMappingTypeName());
+    $this->add('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappings);
+
+    if ($this->getMappingID()) {
+      $this->_submitValues['savedMapping'] = $this->getMappingID();
+    }
+  }
+
+  /**
+   * Get the mapping type name.
+   *
+   * @return string
+   */
+  protected function getMappingTypeName(): string {
+    return 'Import ' . static::IMPORT_ENTITY;
   }
 
 }
