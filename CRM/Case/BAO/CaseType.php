@@ -508,7 +508,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
    */
   public static function hasXmlDefinition($caseTypeName) {
     $fileDefinition = CRM_Case_XMLRepository::singleton()->retrieveFile($caseTypeName);
-    return (!empty($fileDefinition)) ? TRUE: FALSE;
+    return (!empty($fileDefinition)) ? TRUE : FALSE;
   }
 
   /**
