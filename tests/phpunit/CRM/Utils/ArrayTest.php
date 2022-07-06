@@ -207,6 +207,30 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
 
   }
 
+  public function testGetSet_EmptyPath() {
+    $emptyPath = [];
+
+    $x = 'hello';
+    $this->assertEquals(TRUE, CRM_Utils_Array::pathIsset($x, $emptyPath));
+    $this->assertEquals('hello', CRM_Utils_Array::pathGet($x, $emptyPath));
+    $this->assertEquals('hello', $x);
+
+    CRM_Utils_Array::pathSet($x, $emptyPath, 'bon jour');
+    $this->assertEquals(TRUE, CRM_Utils_Array::pathIsset($x, $emptyPath));
+    $this->assertEquals('bon jour', CRM_Utils_Array::pathGet($x, $emptyPath));
+    $this->assertEquals('bon jour', $x);
+
+    CRM_Utils_Array::pathUnset($x, $emptyPath);
+    $this->assertEquals(FALSE, CRM_Utils_Array::pathIsset($x, $emptyPath));
+    $this->assertEquals(NULL, CRM_Utils_Array::pathGet($x, $emptyPath));
+    $this->assertEquals(NULL, $x);
+
+    CRM_Utils_Array::pathSet($x, $emptyPath, 'buenos dias');
+    $this->assertEquals(TRUE, CRM_Utils_Array::pathIsset($x, $emptyPath));
+    $this->assertEquals('buenos dias', CRM_Utils_Array::pathGet($x, $emptyPath));
+    $this->assertEquals('buenos dias', $x);
+  }
+
   public function getSortExamples() {
     $red = ['label' => 'Red', 'id' => 1, 'weight' => '90'];
     $orange = ['label' => 'Orange', 'id' => 2, 'weight' => '70'];
