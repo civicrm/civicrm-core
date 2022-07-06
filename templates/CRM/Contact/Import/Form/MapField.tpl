@@ -41,18 +41,6 @@
    </script>
  {/literal}
 
-<script type="text/javascript" >
-{literal}
-if ( document.getElementsByName("saveMapping")[0].checked ) {
-    document.getElementsByName("updateMapping")[0].checked = true;
-    document.getElementsByName("saveMapping")[0].checked = false;
-}
-{/literal}
-{if $isCheked}
-    document.getElementsByName("saveMapping")[0].checked = true;
-{/if}
-</script>
-
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
  {$initHideBoxes|smarty:nodefaults}
 
