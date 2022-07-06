@@ -60,7 +60,9 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
     // function to format definition column
     if (isset($params['definition']) && is_array($params['definition'])) {
       $params['definition'] = self::convertDefinitionToXML($caseTypeName, $params['definition']);
-      // @see dev/core#3722 only reconcile if it's an XML-based managed entity.
+      // @see dev/core#3722 Only reconcile if it's an XML-based managed entity.
+      // @see CRM-14786 Reconcilation added to manage whenever a case-type XML definition changes,
+      // in order to add/remove associated activity and relationship types.
       if (self::hasXmlDefinition($caseTypeName)) {
         CRM_Core_ManagedEntities::scheduleReconciliation();
       }
