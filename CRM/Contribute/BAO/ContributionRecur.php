@@ -509,7 +509,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     $overrides = array_filter([
       'is_test' => $inputOverrides['is_test'] ?? $recurringContribution['is_test'],
       'financial_type_id' => $inputOverrides['financial_type_id'] ?? $recurringContribution['financial_type_id'],
-      'campaign_id' => $inputOverrides['campaign_id'] ?? $recurringContribution['campaign_id'],
+      'campaign_id' => $inputOverrides['campaign_id'] ?? ($recurringContribution['campaign_id'] ?? NULL),
       'total_amount' => $inputOverrides['total_amount'] ?? $recurringContribution['amount'],
     ], 'strlen');
 
