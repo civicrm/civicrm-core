@@ -142,14 +142,6 @@
 
 {literal}
 <script type="text/javascript">
-
-{/literal}{if $invalidGroupName}{literal}
-cj("#new-group.collapsed").crmAccordionToggle();
-{/literal}{/if}{literal}
-
-{/literal}{if $invalidTagName}{literal}
-cj("#new-tag.collapsed").crmAccordionToggle();
-{/literal}{/if}{literal}
-
+cj('span.crm-error').closest('div.crm-accordion-wrapper').crmAccordionToggle();
 </script>
 {/literal}

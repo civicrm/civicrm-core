@@ -78,8 +78,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    */
   public static function formRule($fields, $files, $self) {
     $errors = [];
-    $invalidTagName = $invalidGroupName = FALSE;
-
     if (!empty($fields['newTagName'])) {
       if (!CRM_Utils_Rule::objectExists(trim($fields['newTagName']),
         ['CRM_Core_DAO_Tag']
@@ -88,7 +86,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
         $errors['newTagName'] = ts('Tag \'%1\' already exists.',
           [1 => $fields['newTagName']]
         );
-        $invalidTagName = TRUE;
       }
     }
 
@@ -104,13 +101,9 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
         ]
       );
       if ($grpCnt) {
-        $invalidGroupName = TRUE;
         $errors['newGroupName'] = ts('Group \'%1\' already exists.', [1 => $fields['newGroupName']]);
       }
     }
-
-    $self->assign('invalidTagName', $invalidTagName);
-    $self->assign('invalidGroupName', $invalidGroupName);
 
     return empty($errors) ? TRUE : $errors;
   }
