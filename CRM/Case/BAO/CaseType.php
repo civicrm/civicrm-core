@@ -60,10 +60,10 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
     // function to format definition column
     if (isset($params['definition']) && is_array($params['definition'])) {
       $params['definition'] = self::convertDefinitionToXML($caseTypeName, $params['definition']);
-      // @see dev/core#3722 Only reconcile if it's an XML-based managed entity.
+      // @see dev/core#3722 Only reconcile if it's an API v3 entity.
       // @see CRM-14786 Reconcilation added to manage whenever a case-type XML definition changes,
       // in order to add/remove associated activity and relationship types.
-      if (self::hasXmlDefinition($caseTypeName)) {
+      if (isset($params['version']) && $params['version'] == 3) {
         CRM_Core_ManagedEntities::scheduleReconciliation();
       }
     }
@@ -496,21 +496,10 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
     $caseTypeName = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseTypeId, 'name', 'id', TRUE);
     if ($caseTypeName) {
       $dbDefinition = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseTypeId, 'definition', 'id', TRUE);
-      $fileDefinition = self::hasXmlDefinition($caseTypeName);
+      $fileDefinition = CRM_Case_XMLRepository::singleton()->retrieveFile($caseTypeName);
       return $fileDefinition && $dbDefinition;
     }
     return NULL;
-  }
-
-  /**
-   * Case Type has an xml file-based definition.
-   *
-   * @param string $caseTypeName
-   * @return bool
-   */
-  public static function hasXmlDefinition($caseTypeName) {
-    $fileDefinition = CRM_Case_XMLRepository::singleton()->retrieveFile($caseTypeName);
-    return (!empty($fileDefinition)) ? TRUE : FALSE;
   }
 
   /**
