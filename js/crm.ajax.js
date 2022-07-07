@@ -273,6 +273,7 @@
         } else {
           url = url.replace(/snippet=[^&]*/, 'snippet=' + snippetType);
         }
+        // See Civi\Angular\AngularLoader
         if (snippetType === 'json' && CRM.angular) {
           url += '&crmAngularModules=' + CRM.angular.modules.join();
         }

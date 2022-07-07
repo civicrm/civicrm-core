@@ -80,6 +80,7 @@ class AngularLoader {
     $this->region = \CRM_Utils_Request::retrieve('snippet', 'String') ? 'ajax-snippet' : 'html-header';
     $this->pageName = \CRM_Utils_System::currentPath();
     $this->modules = [];
+    // List of already-present modules may be provided by crmSnippet (see crm.ajax.js)
     if ($this->region === 'ajax-snippet' && !empty($_GET['crmAngularModules'])) {
       $this->modulesAlreadyLoaded = explode(',', $_GET['crmAngularModules']);
     }
@@ -97,13 +98,13 @@ class AngularLoader {
    */
   public function load() {
     \CRM_Core_Error::deprecatedFunctionWarning('angularjs.loader service');
-    return $this->loadAngularResources();
+    $this->loadAngularResources();
+    return $this;
   }
 
   /**
    * Load scripts, styles & settings for the active modules.
    *
-   * @return $this
    * @throws \CRM_Core_Exception
    */
   private function loadAngularResources() {
@@ -132,7 +133,7 @@ class AngularLoader {
 
     if (!$moduleNames && $this->modulesAlreadyLoaded) {
       // No modules to load
-      return $this;
+      return;
     }
     if (!$this->isAllModules($moduleNames)) {
       $assetParams = ['modules' => implode(',', $moduleNames)];
@@ -214,8 +215,6 @@ class AngularLoader {
         $res->addBundle($bundles);
       }
     }
-
-    return $this;
   }
 
   /**
