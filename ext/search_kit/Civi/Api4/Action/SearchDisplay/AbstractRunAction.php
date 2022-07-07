@@ -27,6 +27,7 @@ use Civi\Api4\Utils\FormattingUtil;
 abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
 
   use SavedSearchInspectorTrait;
+  use ArrayQueryActionTrait;
 
   /**
    * Either the name of the display or an array containing the display definition (for preview mode)
@@ -303,7 +304,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $cssClass = $clause[0] ?? '';
       if ($cssClass) {
         $condition = $this->getRuleCondition(array_slice($clause, 1));
-        if (is_null($condition[0]) || (ArrayQueryActionTrait::filterCompare($data, $condition))) {
+        if (is_null($condition[0]) || (self::filterCompare($data, $condition))) {
           $classes[] = $cssClass;
         }
       }
@@ -327,7 +328,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
       if ($iconClass) {
         $condition = $this->getRuleCondition($icon['if'] ?? []);
-        if (!is_null($condition[0]) && !(ArrayQueryActionTrait::filterCompare($data, $condition))) {
+        if (!is_null($condition[0]) && !(self::filterCompare($data, $condition))) {
           continue;
         }
         $result[] = ['class' => $iconClass, 'side' => $icon['side'] ?? 'left'];
@@ -471,7 +472,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
       return TRUE;
     }
-    return ArrayQueryActionTrait::filterCompare($data, $item['condition']);
+    return self::filterCompare($data, $item['condition']);
   }
 
   /**
