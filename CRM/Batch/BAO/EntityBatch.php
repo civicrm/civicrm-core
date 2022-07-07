@@ -66,6 +66,19 @@ class CRM_Batch_BAO_EntityBatch extends CRM_Batch_DAO_EntityBatch {
     if (!is_array($params)) {
       $params = ['id' => $params];
     }
+    // This was refactored in 99f762 to call deleteRecord but crashes if there
+    // is no id in params. This function is marked deprecated but it seemed
+    // messier to try to fix the call from
+    // CRM_Financial_Page_AJAX::assignRemove because the entity there is
+    // variable and is expecting a function called del() to exist on the
+    // entity.
+    if (!isset($params['id'])) {
+      $dao = new CRM_Batch_DAO_EntityBatch();
+      $dao->copyValues($params);
+      if ($dao->find(TRUE)) {
+        $params['id'] = $dao->id;
+      }
+    }
     return self::deleteRecord($params);
   }
 

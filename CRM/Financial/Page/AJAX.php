@@ -199,7 +199,7 @@ class CRM_Financial_Page_AJAX {
             break;
         }
 
-        if (method_exists($recordBAO, $methods[$op]) & !empty($params)) {
+        if (method_exists($recordBAO, $methods[$op]) && !empty($params)) {
           try {
             $updated = call_user_func_array(array($recordBAO, $methods[$op]), array(&$params));
           }
