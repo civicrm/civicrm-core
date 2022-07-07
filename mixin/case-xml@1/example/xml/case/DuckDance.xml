@@ -35,6 +35,9 @@
     <ActivityType>
       <name>Phone Call</name>
     </ActivityType>
+    <ActivityType>
+      <name>Quack</name>
+    </ActivityType>
 
   </ActivityTypes>
 

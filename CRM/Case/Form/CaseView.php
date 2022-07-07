@@ -294,7 +294,8 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $this->buildMergeCaseForm();
 
     //call activity form
-    self::activityForm($this, $aTypes);
+    // @todo seems a little odd to call "self" but pass $this in a form function? The only other place this is called from is one place in civihr.
+    self::activityForm($this);
 
     //get case related relationships (Case Role)
     $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($this->_contactID, $this->_caseID, NULL, FALSE);
@@ -468,10 +469,8 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
   /**
    * Build the activity selector/datatable
    * @param CRM_Core_Form $form
-   * @param array $aTypes
-   *   To include acivities related to current case id $form->_caseID.
    */
-  public static function activityForm($form, $aTypes = []) {
+  public static function activityForm($form) {
     $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($form->_contactID, $form->_caseID);
     //build reporter select
     $reporters = ["" => ts(' - any reporter - ')];
@@ -480,16 +479,22 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     }
     $form->add('select', 'reporter_id', ts('Reporter/Role'), $reporters, FALSE, ['id' => 'reporter_id_' . $form->_caseID]);
 
-    // take all case activity types for search filter, CRM-7187
+    // List all the activity types that have been used on this case
     $aTypesFilter = [];
-    $allCaseActTypes = CRM_Case_PseudoConstant::caseActivityType();
-    foreach ($allCaseActTypes as $typeDetails) {
-      if (!in_array($typeDetails['name'], ['Open Case'])) {
-        $aTypesFilter[$typeDetails['id']] = $typeDetails['label'] ?? NULL;
-      }
+    $activity_types_on_case = \Civi\Api4\CaseActivity::get()
+      ->addWhere('case_id', '=', $form->_caseID)
+      // we want to include deleted too since the filter can search for deleted
+      ->addWhere('activity_id.is_deleted', 'IN', [0, 1])
+      // technically correct, but this might end up excluding some deleted ones depending on how they got deleted
+      // ->addWhere('activity_id.is_current_revision', '=', 1)
+      ->addSelect('activity_id.activity_type_id', 'activity_id.activity_type_id:label')
+      ->addGroupBy('activity_id.activity_type_id')
+      // this creates strange SQL - if it is too slow could sort in php instead
+      ->addOrderBy('activity_id.activity_type_id:label', 'ASC')
+      ->execute();
+    foreach ($activity_types_on_case as $typeDetails) {
+      $aTypesFilter[$typeDetails['activity_id.activity_type_id']] = $typeDetails['activity_id.activity_type_id:label'];
     }
-    $aTypesFilter = $aTypesFilter + $aTypes;
-    asort($aTypesFilter);
     $form->add('select', 'activity_type_filter_id', ts('Activity Type'), ['' => ts('- select activity type -')] + $aTypesFilter, FALSE, ['id' => 'activity_type_filter_id_' . $form->_caseID]);
 
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();

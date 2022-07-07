@@ -156,7 +156,8 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements \Civi\Core\Ho
       }
       Civi::cache()->set('UserJobTypes', $types);
     }
-    return $types;
+    // Rekey to numeric to prevent https://lab.civicrm.org/dev/core/-/issues/3719
+    return array_values($types);
   }
 
 }
