@@ -1177,35 +1177,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       return TRUE;
     }
 
-    // Cache the various object fields
-    // @todo - remove this after confirming this is just a compilation of other-wise-cached fields.
-    static $fields = [];
-
-    if (isset($values['note'])) {
-      // add a note field
-      if (!isset($params['note'])) {
-        $params['note'] = [];
-      }
-      $noteBlock = count($params['note']) + 1;
-
-      $params['note'][$noteBlock] = [];
-      if (!isset($fields['Note'])) {
-        $fields['Note'] = CRM_Core_DAO_Note::fields();
-      }
-
-      // get the current logged in civicrm user
-      $session = CRM_Core_Session::singleton();
-      $userID = $session->get('userID');
-
-      if ($userID) {
-        $values['contact_id'] = $userID;
-      }
-
-      _civicrm_api3_store_values($fields['Note'], $values, $params['note'][$noteBlock]);
-
-      return TRUE;
-    }
-
     // Check for custom field values
     $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $values),
       FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE
