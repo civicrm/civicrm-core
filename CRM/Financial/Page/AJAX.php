@@ -167,6 +167,7 @@ class CRM_Financial_Page_AJAX {
     // make sure recordClass is in the CRM namespace and
     // at least 3 levels deep
     if ($recordClass[0] == 'CRM' && count($recordClass) >= 3) {
+      $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', ['labelColumn' => 'name']);
       foreach ($records as $recordID) {
         $params = [];
         switch ($op) {
@@ -186,7 +187,6 @@ class CRM_Financial_Page_AJAX {
             $params = $totals[$recordID];
           case 'reopen':
             $status = $op == 'close' ? 'Closed' : 'Reopened';
-            $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', ['labelColumn' => 'name']);
             $params['status_id'] = CRM_Utils_Array::key($status, $batchStatus);
             $session = CRM_Core_Session::singleton();
             $params['modified_date'] = date('YmdHis');
@@ -207,8 +207,8 @@ class CRM_Financial_Page_AJAX {
             $errorMessage = $e->getMessage();
           }
           if ($updated) {
-            $redirectStatus = $updated->status_id;
-            if ($batchStatus[$updated->status_id] == "Reopened") {
+            $redirectStatus = $updated->status_id ?? NULL;
+            if ($redirectStatus && $batchStatus[$redirectStatus] == "Reopened") {
               $redirectStatus = array_search("Open", $batchStatus);
             }
             $response = [

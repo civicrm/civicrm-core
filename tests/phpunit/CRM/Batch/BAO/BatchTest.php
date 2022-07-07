@@ -128,4 +128,40 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
     CRM_Batch_BAO_Batch::exportFinancialBatch([$batch['id']], 'CSV', NULL);
   }
 
+  /**
+   * Test removing from the batch via ajax
+   * (as in clicking the remove link at the far right of the row)
+   */
+  public function testRemoveFromBatch(): void {
+    $contact_id = $this->individualCreate([], 0, TRUE);
+    $batch_id = $this->callAPISuccess('Batch', 'create', [
+      'title' => 'Test Remove Batch',
+      'status_id' => 'Open',
+    ])['id'];
+    $contribution_id = $this->contributionCreate(['contact_id' => $contact_id]);
+    $_POST['op'] = 'assign';
+    $_POST['recordBAO'] = 'CRM_Batch_BAO_EntityBatch';
+    $_POST['records'] = [$contribution_id];
+    $_POST['entityID'] = $batch_id;
+    try {
+      CRM_Financial_Page_AJAX::assignRemove();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals('record-updated-success', $e->errorData['status']);
+    }
+    // now remove it
+    $_POST['op'] = 'remove';
+    try {
+      CRM_Financial_Page_AJAX::assignRemove();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals('record-updated-success', $e->errorData['status']);
+    }
+
+    unset($_POST['op']);
+    unset($_POST['recordBAO']);
+    unset($_POST['records']);
+    unset($_POST['entityID']);
+  }
+
 }
