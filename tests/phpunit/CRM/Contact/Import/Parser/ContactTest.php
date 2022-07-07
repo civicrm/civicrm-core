@@ -1089,12 +1089,16 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \League\Csv\CannotInsertRecord
    */
-  public function testImport($csv, $mapper, $expectedOutcomes = [], $submittedValues = []): void {
+  public function testImport($csv, $mapper, $expectedOutcomes = [], $submittedValues = [], $apiLookup = []): void {
     $this->importCSV($csv, $mapper, $submittedValues);
     $dataSource = new CRM_Import_DataSource_CSV(UserJob::get(FALSE)->setSelect(['id'])->execute()->first()['id']);
     foreach ($expectedOutcomes as $outcome => $count) {
       $this->assertEquals($dataSource->getRowCount([$outcome]), $count);
     }
+    if (!empty($apiLookup)) {
+      $this->callAPISuccessGetCount($apiLookup['entity'], $apiLookup['params'], $apiLookup['count']);
+    }
+
     ob_start();
     $_REQUEST['user_job_id'] = $dataSource->getUserJobID();
     $_REQUEST['status'] = array_key_first($expectedOutcomes);
@@ -1133,6 +1137,12 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    */
   public function importDataProvider(): array {
     return [
+      'individual_with_note.csv' => [
+        'csv' => 'individual_with_note.csv',
+        'mapper' => [['first_name'], ['last_name'], ['note']],
+        'expected_outcomes' => [CRM_Import_Parser::VALID => 1],
+        'check' => ['entity' => 'Note', 'params' => ['note' => 'Kinda dull'], 'count' => 1],
+      ],
       'column_names_casing.csv' => [
         'csv' => 'column_names_casing.csv',
         'mapper' => [['first_name'], ['last_name'], ['do_not_import'], ['do_not_import'], ['do_not_import'], ['do_not_import']],
