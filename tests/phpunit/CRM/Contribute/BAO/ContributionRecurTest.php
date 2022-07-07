@@ -100,8 +100,6 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
 
   /**
    * Test checking if contribution recur object can allow for changes to financial types.
-   *
-   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
    */
   public function testSupportFinancialTypeChange(): void {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
