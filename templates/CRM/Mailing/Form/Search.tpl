@@ -43,7 +43,7 @@
     </tr>
 
     {* language *}
-    {if !empty($form.language)}
+    {if array_key_exists('language', $form)}
       <tr>
         <td>{$form.language.label} {help id="id-language"}<br />
           {$form.language.html|crmAddClass:big}
