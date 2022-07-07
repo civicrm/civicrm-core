@@ -2702,8 +2702,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * CRM-16397 test appropriate action if total amount has changed for single
    * line items.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testRepeatTransactionAlteredAmount(): void {
     $paymentProcessorID = $this->paymentProcessorCreate();

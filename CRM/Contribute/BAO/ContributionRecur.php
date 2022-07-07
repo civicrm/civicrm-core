@@ -496,10 +496,9 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @throws \API_Exception
    */
   public static function getTemplateContribution(int $id, array $inputOverrides = []): array {
-    $recurFields = ['is_test', 'financial_type_id', 'amount', 'campaign_id'];
     $recurringContribution = ContributionRecur::get(FALSE)
       ->addWhere('id', '=', $id)
-      ->setSelect($recurFields)
+      ->setSelect(['is_test', 'financial_type_id', 'amount', 'campaign_id'])
       ->execute()
       ->first();
 
