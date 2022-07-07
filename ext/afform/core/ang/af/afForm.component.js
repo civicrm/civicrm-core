@@ -68,14 +68,22 @@
 
       // Called after form is submitted and files are uploaded
       function postProcess() {
-        var metaData = ctrl.getFormMeta();
+        var metaData = ctrl.getFormMeta(),
+          dialog = $element.closest('.ui-dialog-content');
 
         $element.trigger('crmFormSuccess', {
           afform: metaData,
           data: data
         });
 
-        if (metaData.redirect) {
+        status.resolve();
+        $element.unblock();
+
+        if (dialog.length) {
+          dialog.dialog('close');
+        }
+
+        else if (metaData.redirect) {
           var url = metaData.redirect;
           if (url.indexOf('civicrm/') === 0) {
             url = CRM.url(url);
@@ -84,8 +92,6 @@
           }
           $window.location.href = url;
         }
-        status.resolve();
-        $element.unblock();
       }
 
       this.submit = function() {

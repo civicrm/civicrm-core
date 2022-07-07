@@ -273,6 +273,9 @@
         } else {
           url = url.replace(/snippet=[^&]*/, 'snippet=' + snippetType);
         }
+        if (snippetType === 'json' && CRM.angular) {
+          url += '&crmAngularModules=' + CRM.angular.modules.join();
+        }
       }
       return url;
     },
@@ -299,8 +302,10 @@
       });
     },
     refresh: function() {
-      var that = this;
-      var url = this._formatUrl(this.options.url, 'json');
+      var that = this,
+        hash = this.options.url.split('#')[1];
+        url = this._formatUrl(this.options.url, 'json');
+      $(this.element).data('urlHash', hash);
       if (this.options.crmForm) $('form', this.element).ajaxFormUnbind();
       if (this.options.block) this.element.block();
       this._ajax(url).then(function(data) {
