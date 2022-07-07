@@ -59,7 +59,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       ]);
     }
 
-    $this->addFormRule(array('CRM_Contact_Import_Form_Preview', 'formRule'), $this);
+    $this->addFormRule(['CRM_Contact_Import_Form_Preview', 'formRule'], $this);
 
     parent::buildQuickForm();
   }
@@ -82,11 +82,11 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     if (!empty($fields['newTagName'])) {
       if (!CRM_Utils_Rule::objectExists(trim($fields['newTagName']),
-        array('CRM_Core_DAO_Tag')
+        ['CRM_Core_DAO_Tag']
       )
       ) {
         $errors['newTagName'] = ts('Tag \'%1\' already exists.',
-          array(1 => $fields['newTagName'])
+          [1 => $fields['newTagName']]
         );
         $invalidTagName = TRUE;
       }
@@ -95,17 +95,17 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     if (!empty($fields['newGroupName'])) {
       $title = trim($fields['newGroupName']);
       $name = CRM_Utils_String::titleToVar($title);
-      $query = 'select count(*) from civicrm_group where name like %1 OR title like %2';
+      $query = 'SELECT COUNT(*) FROM civicrm_group WHERE name LIKE %1 OR title LIKE %2';
       $grpCnt = CRM_Core_DAO::singleValueQuery(
         $query,
-        array(
-          1 => array($name, 'String'),
-          2 => array($title, 'String'),
-        )
+        [
+          1 => [$name, 'String'],
+          2 => [$title, 'String'],
+        ]
       );
       if ($grpCnt) {
         $invalidGroupName = TRUE;
-        $errors['newGroupName'] = ts('Group \'%1\' already exists.', array(1 => $fields['newGroupName']));
+        $errors['newGroupName'] = ts('Group \'%1\' already exists.', [1 => $fields['newGroupName']]);
       }
     }
 
@@ -129,7 +129,11 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       // preserving is which groups were created vs already existed.
       $summaryInfo['groups'][$groupID] = [
         'url' => CRM_Utils_System::url('civicrm/group/search', 'reset=1&force=1&context=smog&gid=' . $groupID),
-        'name' => Group::get(FALSE)->addWhere('id', '=', $groupID)->addSelect('name')->execute()->first()['name'],
+        'name' => Group::get(FALSE)
+          ->addWhere('id', '=', $groupID)
+          ->addSelect('name')
+          ->execute()
+          ->first()['name'],
         'new' => FALSE,
         'added' => 0,
         'notAdded' => 0,
@@ -159,7 +163,11 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       // preserving is which tags were created vs already existed.
       $summaryInfo['tags'][$tagID] = [
         'url' => CRM_Utils_System::url('civicrm/contact/search', 'reset=1&force=1&context=smog&id=' . $tagID),
-        'name' => Tag::get(FALSE)->addWhere('id', '=', $tagID)->addSelect('name')->execute()->first()['name'],
+        'name' => Tag::get(FALSE)
+          ->addWhere('id', '=', $tagID)
+          ->addSelect('name')
+          ->execute()
+          ->first()['name'],
         'new' => TRUE,
         'added' => 0,
         'notAdded' => 0,
@@ -181,7 +189,10 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       ];
     }
     // Store the actions to take on each row & the data to present at the end to the userJob.
-    $this->updateUserJobMetadata('post_actions', ['group' => $groupsToAddTo, 'tag' => $tagsToAdd]);
+    $this->updateUserJobMetadata('post_actions', [
+      'group' => $groupsToAddTo,
+      'tag' => $tagsToAdd,
+    ]);
     $this->updateUserJobMetadata('summary_info', $summaryInfo);
 
     // If ACL applies to the current user, update cache before running the import.
