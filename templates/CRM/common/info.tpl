@@ -12,6 +12,6 @@
   <div class="messages status {$infoType}"{if $infoOptions} data-options='{$infoOptions|smarty:nodefaults}'{/if}>
     {icon icon="fa-info-circle"}{/icon}
     <span class="msg-title">{$infoTitle}</span>
-    <span class="msg-text">{$infoMessage|smarty:nodefaults}</span>
+    <span class="msg-text">{$infoMessage|smarty:nodefaults|purify}</span>
   </div>
 {/if}

@@ -17,6 +17,6 @@
     {else}
       {assign var="infoType" value=$statItem.type}
     {/if}
-    {include file="CRM/common/info.tpl" infoTitle=$statItem.title|smarty:nodefaults infoMessage=$statItem.text|smarty:nodefaults infoOptions=$statItem.options|smarty:nodefaults|@json_encode}
+    {include file="CRM/common/info.tpl" infoTitle=$statItem.title infoMessage=$statItem.text|smarty:nodefaults|purify infoOptions=$statItem.options|smarty:nodefaults|@json_encode}
   {/foreach}
 {/if}
