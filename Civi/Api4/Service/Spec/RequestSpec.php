@@ -176,23 +176,26 @@ class RequestSpec implements \Iterator {
     return $this->action;
   }
 
+  #[\ReturnTypeWillChange]
   public function rewind() {
     return reset($this->fields);
   }
 
+  #[\ReturnTypeWillChange]
   public function current() {
     return current($this->fields);
   }
 
+  #[\ReturnTypeWillChange]
   public function key() {
     return key($this->fields);
   }
 
-  public function next() {
-    return next($this->fields);
+  public function next(): void {
+    next($this->fields);
   }
 
-  public function valid() {
+  public function valid(): bool {
     return key($this->fields) !== NULL;
   }
 

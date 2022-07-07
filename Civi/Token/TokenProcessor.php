@@ -528,6 +528,7 @@ class TokenRowIterator extends \IteratorIterator {
     $this->tokenProcessor = $tokenProcessor;
   }
 
+  #[\ReturnTypeWillChange]
   public function current() {
     return new TokenRow($this->tokenProcessor, parent::key());
   }
