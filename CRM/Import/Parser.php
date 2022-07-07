@@ -1277,6 +1277,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @throws \CRM_Core_Exception Exception thrown if field requirements are not met.
    */
   protected function validateRequiredFields(array $requiredFields, array $params, $prefixString = ''): void {
+    if (empty($requiredFields)) {
+      return;
+    }
     $missingFields = [];
     foreach ($requiredFields as $key => $required) {
       if (!is_array($required)) {
