@@ -780,14 +780,15 @@ GROUP BY  currency
 
     $returnMessages = [];
 
-    $sendReminders = CRM_Utils_Array::value('send_reminders', $params, FALSE);
+    $sendReminders = $params['send_reminders'] ?? FALSE;
 
-    $allStatus = array_flip(CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'));
-    $allPledgeStatus = CRM_Core_OptionGroup::values('pledge_status',
-      TRUE, FALSE, FALSE, NULL, 'name', TRUE
-    );
+    $allStatus = array_flip(CRM_Pledge_BAO_PledgePayment::buildOptions('status_id', 'validate'));
+    // We are left with 'Pending' & 'Overdue' - ie. payment required - should we just filter in the ones we want?
+    unset($allStatus['Completed'], $allStatus['Cancelled']);
+
+    $allPledgeStatus = array_flip(CRM_Pledge_BAO_Pledge::buildOptions('status_id', 'validate'));
+    // We are left with 'Pending' & 'Overdue', 'In Progress'
     unset($allPledgeStatus['Completed'], $allPledgeStatus['Cancelled']);
-    unset($allStatus['Completed'], $allStatus['Cancelled'], $allStatus['Failed']);
 
     $statusIds = implode(',', $allStatus);
     $pledgeStatusIds = implode(',', $allPledgeStatus);
