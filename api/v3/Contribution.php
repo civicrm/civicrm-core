@@ -813,6 +813,14 @@ function _civicrm_api3_contribution_repeattransaction_spec(&$params) {
     'name' => 'payment_processor_id',
     'type' => CRM_Utils_Type::T_INT,
   ];
+  $params['total_amount'] = [
+    'description' => ts('Optional override amount, will be ignored if more than one line item exists'),
+    'title' => ts('Total amount of the contribution'),
+    'name' => 'total_amount',
+    'type' => CRM_Utils_Type::T_MONEY,
+    // Map 'amount' to total_amount - historically both have been used at times.
+    'api.aliases' => ['amount'],
+  ];
 }
 
 /**
