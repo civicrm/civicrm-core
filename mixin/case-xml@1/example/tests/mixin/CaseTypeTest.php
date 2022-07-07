@@ -23,6 +23,16 @@ class CaseTypeTest extends \PHPUnit\Framework\Assert {
     $this->assertEquals('Duck Dance Case', $items[0]['title']);
     $this->assertEquals(TRUE, $items[0]['is_active']);
     $this->assertEquals(1, count($items));
+
+    // FIXME: This flush should be unnecessary. The fact that we need it indicates a bug during activation.
+    // However, the bug is pre-existing, and adding these assertions will ensure that it doesn't get worse.
+    $cv->api3('System', 'flush', []);
+
+    $actTypes = $cv->api4('OptionValue', 'get', [
+      'where' => [['option_group_id:name', '=', 'activity_type'], ['name', '=', 'Quack']],
+    ]);
+    $this->assertEquals('Quack', $actTypes[0]['name'], 'ActivityType "Quack" should be auto enabled. It\'s missing.');
+    $this->assertEquals(TRUE, $actTypes[0]['is_active'], 'ActivityType "Quack" should be auto enabled. It\'s inactive.');
   }
 
   public function testDisabled($cv) {
@@ -37,6 +47,11 @@ class CaseTypeTest extends \PHPUnit\Framework\Assert {
   public function testUninstalled($cv) {
     $items = $cv->api4('CaseType', 'get', ['where' => [['name', '=', 'DuckDance']]]);
     $this->assertEquals(0, count($items));
+
+    $actTypes = $cv->api4('OptionValue', 'get', [
+      'where' => [['option_group_id:name', '=', 'activity_type'], ['name', '=', 'Quack']],
+    ]);
+    $this->assertEmpty($actTypes);
   }
 
   protected static function getPath($suffix = ''): string {
