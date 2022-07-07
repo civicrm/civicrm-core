@@ -167,7 +167,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
    * @see CRM_Core_Resources_CollectionTrait::findCreateSettingSnippet()
    */
   public function &findCreateSettingSnippet($options = []): array {
-    $options = CRM_Core_Resources_CollectionAdderTrait::mergeSettingOptions($options, [
+    $options = self::mergeSettingOptions($options, [
       'region' => NULL,
     ]);
     return $this->getSettingRegion($options['region'])->findCreateSettingSnippet($options);
