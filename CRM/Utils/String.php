@@ -437,10 +437,9 @@ class CRM_Utils_String {
    *   the converted string
    */
   public static function htmlToText($html) {
-    require_once 'html2text/rcube_html2text.php';
     $token_html = preg_replace('!\{([a-z_.]+)\}!i', 'token:{$1}', $html);
-    $converter = new rcube_html2text($token_html);
-    $token_text = $converter->get_text();
+    $converter = new \Html2Text\Html2Text($token_html, ['do_links' => 'table', 'width' => 75]);
+    $token_text = $converter->getText();
     $text = preg_replace('!token\:\{([a-z_.]+)\}!i', '{$1}', $token_text);
     return $text;
   }
