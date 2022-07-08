@@ -31,6 +31,14 @@
     <required>true</required>
     <length>64</length>
     <comment>Name of Tag.</comment>
+    <pseudoconstant>
+      <table>civicrm_tag</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
     <add>1.1</add>
   </field>
   <field>
