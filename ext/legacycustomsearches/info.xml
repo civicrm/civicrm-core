@@ -15,13 +15,13 @@
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2021-07-25</releaseDate>
-  <version>5.52.beta1</version>
+  <version>5.53.alpha1</version>
   <develStage>stable</develStage>
   <tags>
     <tag>mgmt:hidden</tag>
   </tags>
   <compatibility>
-    <ver>5.52</ver>
+    <ver>5.53</ver>
   </compatibility>
   <comments>This is hidden on install to give extensions that require it time to add it to their requires and to allow us to get it out of GroupContact load</comments>
   <classloader>
