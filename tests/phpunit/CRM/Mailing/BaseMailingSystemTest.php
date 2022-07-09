@@ -164,6 +164,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
         //  body_html, filtered
         "You can go to Google \\[1\\] or opt out \\[2\\]\\.\n" .
         "\n" .
+        "\n" .
         "Links:\n" .
         "------\n" .
         "\\[1\\] http://example.net/first\\?cs=[0-9a-f_]+\n" .
@@ -216,6 +217,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
         ";" .
         //  body_html, filtered
         "You can go to Google \\[1\\] or opt out \\[2\\]\\.\n" .
+        "\n" .
         "\n" .
         "Links:\n" .
         "------\n" .
