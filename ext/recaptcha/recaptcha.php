@@ -117,4 +117,6 @@ function recaptcha_civicrm_buildForm($formName, &$form) {
           'region' => 'page-body',
         ]);
   }
+
+  CRM_Utils_ReCAPTCHA::checkAndAddCaptchaToForm($formName, $form);
 }
