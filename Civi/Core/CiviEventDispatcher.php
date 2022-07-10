@@ -147,6 +147,10 @@ class CiviEventDispatcher implements CiviEventDispatcherInterface {
       $eventName = substr($eventName, 1);
       $listener = new HookStyleListener($listener);
     }
+    if ($eventName == 'hook_civicrm_getAssetUrl') {
+      fwrite(STDERR, "memory usage: " . memory_get_usage(TRUE) . "\n");
+      fwrite(STDERR, var_export($listener, TRUE));
+    }
     $this->dispatcher->addListener($eventName, $listener, $priority);
   }
 
