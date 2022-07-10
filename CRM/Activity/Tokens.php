@@ -94,7 +94,7 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * Get tokens that are special or calculated for this enitty.
+   * Get tokens that are special or calculated for this entity.
    *
    * @return array|array[]
    */
@@ -114,7 +114,7 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * Get fields Fieldshistorically not advertised for tokens.
+   * Get fields historically not advertised for tokens.
    *
    * @return string[]
    */
