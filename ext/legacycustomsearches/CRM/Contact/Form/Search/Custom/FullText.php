@@ -372,16 +372,15 @@ WHERE      t.table_name = 'Activity' AND
     }
     $dao = CRM_Core_DAO::executeQuery($sql);
 
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
     $roleIds = CRM_Event_PseudoConstant::participantRole();
     while ($dao->fetch()) {
       $row = [];
       foreach ($this->_tableFields as $name => $dontCare) {
-        if ($name != 'activity_type_id') {
+        if ($name !== 'activity_type_id') {
           $row[$name] = $dao->$name;
         }
         else {
-          $row['activity_type'] = $activityTypes[$dao->$name] ?? NULL;
+          $row['activity_type'] = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $dao->$name);
         }
       }
       if (isset($row['participant_role'])) {
