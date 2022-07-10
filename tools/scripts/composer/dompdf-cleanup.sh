@@ -24,21 +24,21 @@ function safe_delete() {
 ## usage: make_font_cache > font-cache.php
 function make_font_cache() {
 php -r "echo json_encode(array (
-  'sans-serif' => 
+  'sans-serif' =>
   array (
     'normal' => 'Helvetica',
     'bold' => 'Helvetica-Bold',
     'italic' => 'Helvetica-Oblique',
     'bold_italic' => 'Helvetica-BoldOblique',
   ),
-  'times' => 
+  'times' =>
   array (
     'normal' => 'Times-Roman',
     'bold' => 'Times-Bold',
     'italic' => 'Times-Italic',
     'bold_italic' => 'Times-BoldItalic',
   ),
-  'times-roman' => 
+  'times-roman' =>
   array (
     'normal' => 'Times-Roman',
     'bold' => 'Times-Bold',
