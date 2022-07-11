@@ -1190,7 +1190,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
     $params = [
       'source_record_id' => $id,
       // activity type id for contribution
-      'activity_type_id' => 6,
+      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Contribution'),
     ];
 
     CRM_Activity_BAO_Activity::deleteActivity($params);
