@@ -722,7 +722,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return string
    */
   private function replaceTokens($tokenExpr, $data, $format, $index = 0) {
-    if (strpos($tokenExpr, '[') !== FALSE) {
+    if (strpos(($tokenExpr ?? ''), '[') !== FALSE) {
       foreach ($this->getTokens($tokenExpr) as $token) {
         $val = $data[$token] ?? NULL;
         if (isset($val) && $format === 'view') {
@@ -733,7 +733,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         if ($format === 'url' && (!isset($replacement) || $replacement === '')) {
           return NULL;
         }
-        $tokenExpr = str_replace('[' . $token . ']', $replacement, $tokenExpr);
+        $tokenExpr = str_replace('[' . $token . ']', ($replacement ?? ''), ($tokenExpr ?? ''));
       }
     }
     return $tokenExpr;

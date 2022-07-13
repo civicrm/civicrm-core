@@ -93,7 +93,7 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
     $formValues['table'] = $this->getFieldValue($formValues, 'table', 'String');
     $this->_table = $formValues['table'];
 
-    $formValues['text'] = trim($this->getFieldValue($formValues, 'text', 'String', ''));
+    $formValues['text'] = trim($this->getFieldValue($formValues, 'text', 'String', '') ?? '');
     $this->_text = $formValues['text'];
 
     if (!$this->_table) {
