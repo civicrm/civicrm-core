@@ -32,7 +32,7 @@ class Test {
     $conn = \Civi\Test::pdo();
 
     $oldEscaper = \CRM_Core_I18n::$SQL_ESCAPER;
-    \Civi::$statics['testPreInstall'] = (\Civi::$statics['testPreInstall'] ?? 0) + 1;
+    \Civi\Test::$statics['testPreInstall'] = (\Civi\Test::$statics['testPreInstall'] ?? 0) + 1;
     try {
       \CRM_Core_I18n::$SQL_ESCAPER = function ($text) use ($conn) {
         return substr($conn->quote($text), 1, -1);
@@ -40,9 +40,9 @@ class Test {
       return $callback();
     } finally {
       \CRM_Core_I18n::$SQL_ESCAPER = $oldEscaper;
-      \Civi::$statics['testPreInstall']--;
-      if (\Civi::$statics['testPreInstall'] <= 0) {
-        unset(\Civi::$statics['testPreInstall']);
+      \Civi\Test::$statics['testPreInstall']--;
+      if (\Civi\Test::$statics['testPreInstall'] <= 0) {
+        unset(\Civi\Test::$statics['testPreInstall']);
       }
     }
   }
