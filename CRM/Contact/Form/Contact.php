@@ -857,10 +857,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         'subName' => 'new',
       ];
     }
-    $buttons[] = [
-      'type' => 'cancel',
-      'name' => ts('Cancel'),
-    ];
 
     if (!empty($this->_values['contact_sub_type'])) {
       $this->_oldSubtypes = explode(CRM_Core_DAO::VALUE_SEPARATOR,
