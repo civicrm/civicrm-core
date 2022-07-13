@@ -63,8 +63,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
       // @see dev/core#3722 Prevent reconciliation from being called infinitely.
       // @see CRM-14786 Reconcilation added to manage whenever a case-type XML definition changes,
       // in order to add/remove associated activity and relationship types.
-      if (!isset(\Civi::$statics[__CLASS__][$caseTypeName])) {
-        \Civi::$statics[__CLASS__][$caseTypeName] = 1;
+      if (isset($params['version']) && $params['version'] == 3) {
         CRM_Core_ManagedEntities::scheduleReconciliation();
       }
     }
