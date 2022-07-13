@@ -755,7 +755,7 @@ class CRM_Core_I18n {
    *   Ex: $stringTable['enabled']['wildcardMatch']['foo'] = 'bar';
    */
   private function getWordReplacements() {
-    if (isset(Civi::$statics['testPreInstall'])) {
+    if (isset(Civi\Test::$statics['testPreInstall'])) {
       return [];
     }
 
