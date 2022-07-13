@@ -1762,6 +1762,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       'email_greeting_id' => 'email_greeting',
       'postal_greeting_id' => 'postal_greeting',
       'addressee_id' => 'addressee',
+      'source' => 'contact_source',
     ];
   }
 

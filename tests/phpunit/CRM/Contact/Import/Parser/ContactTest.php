@@ -1538,6 +1538,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'email' => $original_email,
       'gender' => $original_gender,
       'custom_' . $customField1 => $original_custom1,
+      'source' => 'original',
     ];
     $result = $this->callAPISuccess('contact', 'create', $api_params);
     $contact_id = $result['id'];
@@ -1549,6 +1550,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'custom_' . $customField1 => $import_custom1,
       'job_title' => $import_job_title,
       'custom_' . $customField2 => $import_custom2,
+      'contact_source' => 'changed',
     ];
 
     $this->runImport($import, CRM_Import_Parser::DUPLICATE_FILL, CRM_Import_Parser::VALID);
@@ -1558,6 +1560,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'custom_' . $customField1 => $original_custom1,
       'job_title' => $import_job_title,
       'custom_' . $customField2 => $import_custom2,
+      'contact_source' => 'original',
     ];
 
     $params = [
@@ -1567,9 +1570,10 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
         'custom_' . $customField1,
         'job_title',
         'custom_' . $customField2,
+        'contact_source',
       ],
     ];
-    $result = civicrm_api3('Contact', 'get', $params);
+    $result = $this->callAPISuccess('Contact', 'get', $params);
     $values = array_pop($result['values']);
     foreach ($expected as $field => $expected_value) {
       if (!isset($values[$field])) {

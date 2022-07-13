@@ -1009,10 +1009,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       else {
         $getValue = CRM_Utils_Array::retrieveValueRecursive($contact, $key);
       }
-      if ($key == 'contact_source') {
-        $params['source'] = $params[$key];
-        unset($params[$key]);
-      }
 
       if ($modeFill && isset($getValue)) {
         unset($params[$key]);
