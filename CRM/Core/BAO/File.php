@@ -338,7 +338,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
       $result['url'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$dao->cfID}&eid={$dao->entity_id}&fcs={$fileHash}");
       $result['href'] = "<a href=\"{$result['url']}\">{$result['cleanName']}</a>";
       $result['tag'] = CRM_Core_BAO_EntityTag::getTag($dao->cfID, 'civicrm_file');
-      $result['icon'] = CRM_Utils_File::getIconFromMimeType($dao->mime_type);
+      $result['icon'] = CRM_Utils_File::getIconFromMimeType($dao->mime_type ?? '');
       if ($addDeleteArgs) {
         $result['deleteURLArgs'] = self::deleteURLArgs($dao->entity_table, $dao->entity_id, $dao->cfID);
       }

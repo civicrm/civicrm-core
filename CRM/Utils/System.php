@@ -805,7 +805,7 @@ class CRM_Utils_System {
    *   The obscured credit card number.
    */
   public static function mungeCreditCard($number, $keep = 4) {
-    $number = trim($number);
+    $number = trim($number ?? '');
     if (empty($number)) {
       return NULL;
     }
@@ -1831,7 +1831,7 @@ class CRM_Utils_System {
         '{sid}' => self::getSiteID(),
         '{baseUrl}' => $config->userFrameworkBaseURL,
         '{lang}' => $tsLocale,
-        '{co}' => $config->defaultContactCountry,
+        '{co}' => $config->defaultContactCountry ?? '',
       ];
       return strtr($url, array_map('urlencode', $vars));
     }

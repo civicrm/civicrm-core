@@ -449,7 +449,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     ) {
       return TRUE;
     }
-    list($arg0, $arg1) = array_pad(explode('/', CRM_Utils_System::currentPath()), 2, '');
+    list($arg0, $arg1) = array_pad(explode('/', (CRM_Utils_System::currentPath() ?? '')), 2, '');
     return ($arg0 === 'civicrm' && in_array($arg1, ['ajax', 'angularprofiles', 'asset']));
   }
 
