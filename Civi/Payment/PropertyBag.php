@@ -156,6 +156,7 @@ class PropertyBag implements \ArrayAccess {
    * @param mixed $offset
    * @return mixed
    */
+  #[\ReturnTypeWillChange]
   public function offsetGet($offset) {
     try {
       $prop = $this->handleLegacyPropNames($offset);
@@ -198,7 +199,7 @@ class PropertyBag implements \ArrayAccess {
    * @param mixed $offset
    * @param mixed $value
    */
-  public function offsetSet($offset, $value) {
+  public function offsetSet($offset, $value): void {
     try {
       $prop = $this->handleLegacyPropNames($offset);
     }
@@ -246,7 +247,7 @@ class PropertyBag implements \ArrayAccess {
    *
    * @param mixed $offset
    */
-  public function offsetUnset ($offset) {
+  public function offsetUnset ($offset): void {
     $prop = $this->handleLegacyPropNames($offset);
     unset($this->props['default'][$prop]);
   }
@@ -1048,7 +1049,7 @@ class PropertyBag implements \ArrayAccess {
    * @param string $label e.g. 'default'
    */
   public function setRecurFrequencyUnit($recurFrequencyUnit, $label = 'default') {
-    if (!preg_match('/^day|week|month|year$/', $recurFrequencyUnit)) {
+    if (!preg_match('/^day|week|month|year$/', ($recurFrequencyUnit ?? ''))) {
       throw new \InvalidArgumentException("recurFrequencyUnit must be day|week|month|year");
     }
     return $this->set('recurFrequencyUnit', $label, $recurFrequencyUnit);
@@ -1112,7 +1113,7 @@ class PropertyBag implements \ArrayAccess {
     if ($input === '') {
       $input = NULL;
     }
-    if (strlen($input) > 255 || in_array($input, [FALSE, 0], TRUE)) {
+    if (strlen($input ?? '') > 255 || in_array($input, [FALSE, 0], TRUE)) {
       throw new \InvalidArgumentException('processorID field has max length of 255');
     }
     return $this->set('recurProcessorID', $label, $input);
