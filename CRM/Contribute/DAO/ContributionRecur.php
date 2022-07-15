@@ -783,7 +783,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'pseudoconstant' => [
             'table' => 'civicrm_payment_processor',
             'keyColumn' => 'id',
-            'labelColumn' => 'title',
+            'labelColumn' => 'name',
           ],
           'add' => '3.3',
         ],

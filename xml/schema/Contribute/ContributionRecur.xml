@@ -360,7 +360,7 @@
     <pseudoconstant>
       <table>civicrm_payment_processor</table>
       <keyColumn>id</keyColumn>
-      <labelColumn>title</labelColumn>
+      <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
       <type>Select</type>
