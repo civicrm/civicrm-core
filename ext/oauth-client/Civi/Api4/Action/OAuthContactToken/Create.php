@@ -18,7 +18,7 @@ class Create extends \Civi\Api4\Generic\DAOCreateAction {
       return;
     }
 
-    $tag = $this->values['tag'] ?? NULL;
+    $tag = $this->values['tag'] ?? '';
 
     if ('linkContact:' === substr($tag, 0, 12)) {
       $this->values['contact_id'] = substr($tag, 12);

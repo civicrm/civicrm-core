@@ -466,13 +466,13 @@ function _afform_angular_module_name($fileBaseName, $format = 'camel') {
   switch ($format) {
     case 'camel':
       $camelCase = '';
-      foreach (preg_split('/[-_ ]/', $fileBaseName, NULL, PREG_SPLIT_NO_EMPTY) as $shortNamePart) {
+      foreach (preg_split('/[-_ ]/', $fileBaseName, -1, PREG_SPLIT_NO_EMPTY) as $shortNamePart) {
         $camelCase .= ucfirst($shortNamePart);
       }
       return strtolower($camelCase[0]) . substr($camelCase, 1);
 
     case 'dash':
-      return strtolower(implode('-', preg_split('/[-_ ]|(?=[A-Z])/', $fileBaseName, NULL, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE)));
+      return strtolower(implode('-', preg_split('/[-_ ]|(?=[A-Z])/', $fileBaseName, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE)));
 
     default:
       throw new \Exception("Unrecognized format");
