@@ -567,6 +567,14 @@ if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN' && !defined('CIVICRM_EXCLUDE_DIRS
 }
 
 /**
+ * Set the mysql transaction isolation level.
+ * https://lab.civicrm.org/dev/core/-/issues/3740
+ */
+//if (!defined('CIVICRM_TRANSACTION_ISOLATION')) {
+//  define('CIVICRM_TRANSACTION_ISOLATION', 'READ COMMITTED');
+//}
+
+/**
  *
  * Do not change anything below this line. Keep as is
  *

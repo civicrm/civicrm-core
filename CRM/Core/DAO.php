@@ -212,6 +212,9 @@ class CRM_Core_DAO extends DB_DataObject {
     $factory = new CRM_Contact_DAO_Factory();
     CRM_Core_DAO::setFactory($factory);
     CRM_Core_DAO::executeQuery('SET NAMES utf8mb4');
+    if (defined('CIVICRM_TRANSACTION_ISOLATION')) {
+      CRM_Core_DAO::executeQuery('SET TRANSACTION ISOLATION LEVEL ' . CIVICRM_TRANSACTION_ISOLATION);
+    }
     CRM_Core_DAO::executeQuery('SET @uniqueID = %1', [1 => [CRM_Utils_Request::id(), 'String']]);
   }
 

@@ -411,6 +411,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->renameLabels();
     $this->ensureMySQLMode(['IGNORE_SPACE', 'ERROR_FOR_DIVISION_BY_ZERO', 'STRICT_TRANS_TABLES']);
     putenv('CIVICRM_SMARTY_DEFAULT_ESCAPE=1');
+    if (!defined('CIVICRM_TRANSACTION_ISOLATION')) {
+      define('CIVICRM_TRANSACTION_ISOLATION', 'READ COMMITTED');
+    }
   }
 
   /**
