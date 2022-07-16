@@ -505,7 +505,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
       ],
     ];
 
-    $htmlMsg = preg_split($newLineOperators['p']['pattern'], $message);
+    $htmlMsg = preg_split($newLineOperators['p']['pattern'], ($message ?? ''));
     foreach ($htmlMsg as $k => & $m) {
       $messages = preg_split($newLineOperators['br']['pattern'], $m);
       foreach ($messages as $key => & $msg) {

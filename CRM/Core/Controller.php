@@ -484,7 +484,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    */
   public function getButtonName() {
     $data = &$this->container();
-    return $data['_qf_button_name'] ?? NULL;
+    return $data['_qf_button_name'] ?? '';
   }
 
   /**

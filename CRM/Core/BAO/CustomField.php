@@ -769,7 +769,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
     // DAO stores attributes as a string, but it's hard to manipulate and
     // CRM_Core_Form::add() wants them as an array.
-    $fieldAttributes = self::attributesFromString($field->attributes);
+    $fieldAttributes = self::attributesFromString($field->attributes ?? '');
 
     // Custom field HTML should indicate group+field name
     $groupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $field->custom_group_id);

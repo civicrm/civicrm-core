@@ -1617,7 +1617,7 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields) {
 
       case CRM_Utils_Type::T_MONEY:
         [$fieldValue, $op] = _civicrm_api3_field_value_check($params, $fieldName);
-        if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
+        if (strpos(($op ?? ''), 'NULL') !== FALSE || strpos(($op ?? ''), 'EMPTY') !== FALSE) {
           break;
         }
         foreach ((array) $fieldValue as $fieldvalue) {

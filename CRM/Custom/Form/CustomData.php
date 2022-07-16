@@ -143,7 +143,7 @@ class CRM_Custom_Form_CustomData {
     $getCachedTree = $form->_getCachedTree ?? TRUE;
 
     $subType = $form->_subType;
-    if (!is_array($subType) && strstr($subType, CRM_Core_DAO::VALUE_SEPARATOR)) {
+    if (!is_array($subType) && strstr(($subType ?? ''), CRM_Core_DAO::VALUE_SEPARATOR)) {
       $subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($subType, CRM_Core_DAO::VALUE_SEPARATOR));
     }
 
