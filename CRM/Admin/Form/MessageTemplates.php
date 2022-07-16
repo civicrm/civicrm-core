@@ -128,7 +128,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
       ];
       if (!($this->_action & CRM_Core_Action::DELETE)) {
         $buttons[] = [
-          'type' => 'submit',
+          'type' => 'upload',
           'name' => ts('Save and Done'),
           'subName' => 'done',
         ];
