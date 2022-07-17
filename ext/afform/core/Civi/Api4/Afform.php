@@ -183,6 +183,11 @@ class Afform extends Generic\AbstractEntity {
           'data_type' => 'Boolean',
         ],
         [
+          'name' => 'navigation',
+          'data_type' => 'Array',
+          'description' => 'Insert into navigation menu {parent: string, label: string, weight: int}',
+        ],
+        [
           'name' => 'layout',
           'data_type' => 'Array',
           'description' => 'HTML form layout; format is controlled by layoutFormat param',
