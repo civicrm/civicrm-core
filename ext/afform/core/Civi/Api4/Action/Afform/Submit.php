@@ -78,9 +78,7 @@ class Submit extends AbstractProcessor {
 
     // Return ids and a token for uploading files
     return [
-      [
-        'token' => $this->generatePostSubmitToken(),
-      ],
+      ['token' => $this->generatePostSubmitToken()] + $this->_entityIds,
     ];
   }
 
