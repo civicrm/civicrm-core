@@ -465,6 +465,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $defaults['campaign_id'] = $this->_pledgeValues['campaign_id'];
     }
 
+    $billing_address = '';
+    if (!empty($defaults['address_id'])) {
+      $addressDetails = CRM_Core_BAO_Address::getValues(['id' => $defaults['address_id']], FALSE, 'id');
+      $addressDetails = array_values($addressDetails);
+      $billing_address = $addressDetails[0]['display'];
+    }
+    $this->assign('billing_address', $billing_address);
+
     $this->_defaults = $defaults;
     return $defaults;
   }
