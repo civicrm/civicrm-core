@@ -3549,7 +3549,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
   public static function getEntityRefCreateLinks($appendProfiles = []) {
     // You'd think that "add contacts" would be a sufficient permission to check,
     // But new contact popups are profile forms and those use their own permissions.
-    if (!CRM_Core_Permission::check([['profile create', 'profile listings and forms, 'add contacts']])) {
+    if (!CRM_Core_Permission::check([['profile create', 'profile listings and forms', 'add contacts']])) {
       return FALSE;
     }
     $profiles = [];
