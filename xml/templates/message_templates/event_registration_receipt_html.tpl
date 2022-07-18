@@ -25,7 +25,7 @@
     {/if}
 
     <p>Your order number is #{$transaction_id}. {if !empty($line_items) && empty($is_refund)} Information about the workshops will be sent separately to each participant.{/if}
-  Here's a summary of your transaction placed on {$transaction_date|date_format:"%D %I:%M %p %Z"}:</p>
+  Here's a summary of your transaction placed on {$transaction_date|crmDate:"%D %I:%M %p %Z"}:</p>
 
 {if $billing_name}
   <table class="billing-info">
@@ -90,11 +90,11 @@
   {foreach from=$line_items item=line_item}
   <tr>
     <td style="width: 220px">
-      {$line_item.event->title} ({$line_item.event->start_date|date_format:"%D"})<br />
+      {$line_item.event->title} ({$line_item.event->start_date|crmDate:"%D"})<br />
       {if $line_item.event->is_show_location}
         {$line_item.location.address.1.display|nl2br}
       {/if}{*End of isShowLocation condition*}<br /><br />
-      {$line_item.event->start_date|date_format:"%D %I:%M %p"} - {$line_item.event->end_date|date_format:"%I:%M %p"}
+      {$line_item.event->start_date|crmDate:"%D %I:%M %p"} - {$line_item.event->end_date|crmDate:"%I:%M %p"}
     </td>
     <td style="width: 180px">
     {$line_item.num_participants}
