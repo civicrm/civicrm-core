@@ -30,6 +30,7 @@
         undoHistory = [],
         undoPosition = 0,
         undoAction = null,
+        lastSaved,
         sortableOptions = {};
 
       // ngModelOptions to debounce input
@@ -100,6 +101,7 @@
         $scope.layoutHtml = '';
         $scope.entities = {};
         setEditorLayout();
+        setLastSaved();
 
         if (editor.afform.navigation) {
           loadNavigationMenu();
@@ -577,6 +579,13 @@
               snapshot.saved = index === undoPosition;
               snapshot.afform.name = data[0].name;
             });
+            if (!angular.equals(afform.navigation, lastSaved.navigation) ||
+              (afform.server_route !== lastSaved.server_route && afform.navigation)
+              (afform.icon !== lastSaved.icon && afform.navigation)
+            ) {
+              refreshMenubar();
+            }
+            setLastSaved();
           });
       };
 
@@ -589,6 +598,19 @@
           });
         }
       });
+
+      // Sets last-saved form metadata (used to determine if the menubar needs refresh)
+      function setLastSaved() {
+        lastSaved = JSON.parse(angular.toJson(editor.afform));
+        delete lastSaved.layout;
+      }
+
+      // Force-refresh the menubar to instantly display the afform menu item
+      function refreshMenubar() {
+        CRM.menubar.destroy();
+        CRM.menubar.cacheCode = Math.random();
+        CRM.menubar.initialize();
+      }
 
       // Force editor panels to a fixed height, to avoid palette scrolling offscreen
       function fixEditorHeight() {
