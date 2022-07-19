@@ -346,7 +346,7 @@ class CRM_Utils_Date {
           $day = (int) substr(($dateString ?? ''), 6, 2);
         }
 
-        if (strlen($dateString) > 10) {
+        if (strlen(($dateString ?? '')) > 10) {
           $format = $config->dateformatDatetime;
         }
         elseif ($day > 0) {
@@ -481,12 +481,12 @@ class CRM_Utils_Date {
    *   date/datetime in ISO format
    */
   public static function mysqlToIso($mysql) {
-    $year = substr($mysql, 0, 4);
-    $month = substr($mysql, 4, 2);
-    $day = substr($mysql, 6, 2);
-    $hour = substr($mysql, 8, 2);
-    $minute = substr($mysql, 10, 2);
-    $second = substr($mysql, 12, 2);
+    $year = substr(($mysql ?? ''), 0, 4);
+    $month = substr(($mysql ?? ''), 4, 2);
+    $day = substr(($mysql ?? ''), 6, 2);
+    $hour = substr(($mysql ?? ''), 8, 2);
+    $minute = substr(($mysql ?? ''), 10, 2);
+    $second = substr(($mysql ?? ''), 12, 2);
 
     $iso = '';
     if ($year) {

@@ -100,7 +100,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       $processor = new CRM_Financial_DAO_PaymentProcessor();
       $processor->id = $paymentProcessorID;
       $processor->find(TRUE);
-      $cards = json_decode($processor->accepted_credit_cards, TRUE);
+      $cards = json_decode(($processor->accepted_credit_cards ?? ''), TRUE);
       return $cards;
     }
     return [];

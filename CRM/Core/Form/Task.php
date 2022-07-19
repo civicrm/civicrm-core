@@ -103,7 +103,7 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
     }
 
     $session = CRM_Core_Session::singleton();
-    $searchFormName = strtolower($this->get('searchFormName'));
+    $searchFormName = strtolower($this->get('searchFormName') ?? '');
     if ($searchFormName === 'search') {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/' . $pathPart . '/search', $urlParams));
     }

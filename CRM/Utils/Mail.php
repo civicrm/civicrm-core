@@ -451,7 +451,7 @@ class CRM_Utils_Mail {
   public static function formatRFC822Email($name, $email, $useQuote = FALSE) {
     $result = NULL;
 
-    $name = trim($name);
+    $name = trim($name ?? '');
 
     // strip out double quotes if present at the beginning AND end
     if (substr($name, 0, 1) == '"' &&

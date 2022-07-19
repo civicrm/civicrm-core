@@ -172,7 +172,7 @@ function civicrm_api3_custom_value_get($params) {
     // Convert multi-value strings to arrays
     $sp = CRM_Core_DAO::VALUE_SEPARATOR;
     foreach ($result as $id => $value) {
-      if (strpos($value, $sp) !== FALSE) {
+      if (strpos(($value ?? ''), $sp) !== FALSE) {
         $value = explode($sp, trim($value, $sp));
       }
 
