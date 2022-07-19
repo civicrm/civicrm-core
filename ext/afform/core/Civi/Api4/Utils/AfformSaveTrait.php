@@ -67,10 +67,14 @@ trait AfformSaveTrait {
       return ($item[$field] ?? NULL) !== ($orig[$field] ?? NULL);
     };
 
-    // If the dashlet setting changed, managed entities must be reconciled
+    // If the dashlet or navigation setting changed, managed entities must be reconciled
+    // TODO: If this list of conditions gets any longer, then
+    // maybe we should unconditionally reconcile and accept the small performance drag.
     if (
       $isChanged('is_dashlet') ||
-      (!empty($meta['is_dashlet']) && $isChanged('title'))
+      $isChanged('navigation') ||
+      (!empty($meta['is_dashlet']) && $isChanged('title')) ||
+      (!empty($meta['navigation']) && ($isChanged('title') || $isChanged('permission') || $isChanged('icon') || $isChanged('server_route')))
     ) {
       \CRM_Core_ManagedEntities::singleton()->reconcile(E::LONG_NAME);
     }

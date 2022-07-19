@@ -13,7 +13,7 @@ function _afform_fields_filter($params) {
   $result = [];
   $fields = \Civi\Api4\Afform::getfields(FALSE)->setAction('create')->execute()->indexBy('name');
   foreach ($fields as $fieldName => $field) {
-    if (isset($params[$fieldName])) {
+    if (array_key_exists($fieldName, $params)) {
       $result[$fieldName] = $params[$fieldName];
 
       if ($field['data_type'] === 'Boolean' && !is_bool($params[$fieldName])) {
@@ -140,32 +140,66 @@ function afform_civicrm_managed(&$entities, $modules) {
     // This AfformScanner instance only lives during this method call, and it feeds off the regular cache.
     $scanner = new CRM_Afform_AfformScanner();
   }
+  $domains = NULL;
 
   foreach ($scanner->getMetas() as $afform) {
-    if (empty($afform['is_dashlet']) || empty($afform['name'])) {
+    if (empty($afform['name'])) {
       continue;
     }
-    $entities[] = [
-      'module' => E::LONG_NAME,
-      'name' => 'afform_dashlet_' . $afform['name'],
-      'entity' => 'Dashboard',
-      'update' => 'always',
-      // ideal cleanup policy might be to (a) deactivate if used and (b) remove if unused
-      'cleanup' => 'always',
-      'params' => [
-        'version' => 4,
-        'values' => [
-          // Q: Should we loop through all domains?
-          'domain_id' => 'current_domain',
-          'is_active' => TRUE,
-          'name' => $afform['name'],
-          'label' => $afform['title'] ?? E::ts('(Untitled)'),
-          'directive' => _afform_angular_module_name($afform['name'], 'dash'),
-          'permission' => "@afform:" . $afform['name'],
-          'url' => NULL,
+    if (!empty($afform['is_dashlet'])) {
+      $entities[] = [
+        'module' => E::LONG_NAME,
+        'name' => 'afform_dashlet_' . $afform['name'],
+        'entity' => 'Dashboard',
+        'update' => 'always',
+        // ideal cleanup policy might be to (a) deactivate if used and (b) remove if unused
+        'cleanup' => 'always',
+        'params' => [
+          'version' => 4,
+          'values' => [
+            // Q: Should we loop through all domains?
+            'domain_id' => 'current_domain',
+            'is_active' => TRUE,
+            'name' => $afform['name'],
+            'label' => $afform['title'] ?? E::ts('(Untitled)'),
+            'directive' => _afform_angular_module_name($afform['name'], 'dash'),
+            'permission' => "@afform:" . $afform['name'],
+            'url' => NULL,
+          ],
         ],
-      ],
-    ];
+      ];
+    }
+    if (!empty($afform['navigation']) && !empty($afform['server_route'])) {
+      $domains = $domains ?: \Civi\Api4\Domain::get(FALSE)->addSelect('id')->execute();
+      foreach ($domains as $domain) {
+        $params = [
+          'version' => 4,
+          'values' => [
+            'name' => $afform['name'],
+            'label' => $afform['navigation']['label'] ?: $afform['title'],
+            'permission' => (array) $afform['permission'],
+            'permission_operator' => 'OR',
+            'weight' => $afform['navigation']['weight'] ?? 0,
+            'url' => $afform['server_route'],
+            'is_active' => 1,
+            'icon' => 'crm-i ' . $afform['icon'],
+            'domain_id' => $domain['id'],
+          ],
+          'match' => ['domain_id', 'name'],
+        ];
+        if (!empty($afform['navigation']['parent'])) {
+          $params['values']['parent_id.name'] = $afform['navigation']['parent'];
+        }
+        $entities[] = [
+          'module' => E::LONG_NAME,
+          'name' => 'navigation_' . $afform['name'] . '_' . $domain['id'],
+          'cleanup' => 'always',
+          'update' => 'unmodified',
+          'entity' => 'Navigation',
+          'params' => $params,
+        ];
+      }
+    }
   }
 }
 

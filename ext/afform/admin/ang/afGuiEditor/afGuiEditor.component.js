@@ -30,6 +30,7 @@
         undoHistory = [],
         undoPosition = 0,
         undoAction = null,
+        lastSaved,
         sortableOptions = {};
 
       // ngModelOptions to debounce input
@@ -100,6 +101,11 @@
         $scope.layoutHtml = '';
         $scope.entities = {};
         setEditorLayout();
+        setLastSaved();
+
+        if (editor.afform.navigation) {
+          loadNavigationMenu();
+        }
 
         if (editor.getFormType() === 'form') {
           editor.allowEntityConfig = true;
@@ -334,6 +340,57 @@
         }
       };
 
+      this.toggleNavigation = function() {
+        if (editor.afform.navigation) {
+          editor.afform.navigation = null;
+        } else {
+          loadNavigationMenu();
+          editor.afform.navigation = {
+            parent: null,
+            label: editor.afform.title,
+            weight: 0
+          };
+        }
+      };
+
+      function loadNavigationMenu() {
+        if ('navigationMenu' in editor) {
+          return;
+        }
+        editor.navigationMenu = null;
+        var conditions = [
+          ['domain_id', '=', 'current_domain'],
+          ['name', '!=', 'Home']
+        ];
+        if (editor.afform.name) {
+          conditions.push(['name', '!=', editor.afform.name]);
+        }
+        crmApi4('Navigation', 'get', {
+          select: ['name', 'label', 'parent_id', 'icon'],
+          where: conditions,
+          orderBy: {weight: 'ASC'}
+        }).then(function(items) {
+          editor.navigationMenu = buildTree(items, null);
+        });
+      }
+
+      function buildTree(items, parentId) {
+        return _.transform(items, function(navigationMenu, item) {
+          if (parentId === item.parent_id) {
+            var children = buildTree(items, item.id),
+              menuItem = {
+                id: item.name,
+                text: item.label,
+                icon: item.icon
+              };
+            if (children.length) {
+              menuItem.children = children;
+            }
+            navigationMenu.push(menuItem);
+          }
+        }, []);
+      }
+
       // Collects all search displays currently on the form
       function getSearchDisplaysOnForm() {
         var searchFieldsets = afGui.findRecursive(editor.afform.layout, {'af-fieldset': ''});
@@ -522,6 +579,13 @@
               snapshot.saved = index === undoPosition;
               snapshot.afform.name = data[0].name;
             });
+            if (!angular.equals(afform.navigation, lastSaved.navigation) ||
+              (afform.server_route !== lastSaved.server_route && afform.navigation)
+              (afform.icon !== lastSaved.icon && afform.navigation)
+            ) {
+              refreshMenubar();
+            }
+            setLastSaved();
           });
       };
 
@@ -534,6 +598,19 @@
           });
         }
       });
+
+      // Sets last-saved form metadata (used to determine if the menubar needs refresh)
+      function setLastSaved() {
+        lastSaved = JSON.parse(angular.toJson(editor.afform));
+        delete lastSaved.layout;
+      }
+
+      // Force-refresh the menubar to instantly display the afform menu item
+      function refreshMenubar() {
+        CRM.menubar.destroy();
+        CRM.menubar.cacheCode = Math.random();
+        CRM.menubar.initialize();
+      }
 
       // Force editor panels to a fixed height, to avoid palette scrolling offscreen
       function fixEditorHeight() {
