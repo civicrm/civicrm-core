@@ -241,7 +241,7 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
  * Adds afforms as contact summary blocks.
  */
 function afform_civicrm_pageRun(&$page) {
-  if (get_class($page) !== 'CRM_Contact_Page_View_Summary') {
+  if (!in_array(get_class($page), ['CRM_Contact_Page_View_Summary', 'CRM_Contact_Page_View_Print'])) {
     return;
   }
   $scanner = \Civi::service('afform_scanner');
