@@ -93,6 +93,7 @@
     <headerPattern>/d(o )?(not )?(email)/i</headerPattern>
     <dataPattern>/^\d{1,}$/</dataPattern>
     <default>0</default>
+    <required>true</required>
     <html>
       <type>CheckBox</type>
       <label>Do Not Email</label>
@@ -103,6 +104,7 @@
     <name>do_not_phone</name>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <import>true</import>
     <headerPattern>/d(o )?(not )?(call|phone)/i</headerPattern>
     <dataPattern>/^\d{1,}$/</dataPattern>
@@ -119,6 +121,7 @@
     <headerPattern>/^(d(o\s)?n(ot\s)?mail)|(\w*)?bulk\s?(\w*)$/i</headerPattern>
     <dataPattern>/^\d{1,}$/</dataPattern>
     <default>0</default>
+    <required>true</required>
     <add>1.1</add>
     <html>
       <type>CheckBox</type>
@@ -132,6 +135,7 @@
     <headerPattern>/d(o )?(not )?(sms)/i</headerPattern>
     <dataPattern>/^\d{1,}$/</dataPattern>
     <default>0</default>
+    <required>true</required>
     <add>3.0</add>
     <html>
       <type>CheckBox</type>
@@ -145,6 +149,7 @@
     <headerPattern>/d(o )?(not )?(trade)/i</headerPattern>
     <dataPattern>/^\d{1,}$/</dataPattern>
     <default>0</default>
+    <required>true</required>
     <add>1.1</add>
     <html>
       <type>CheckBox</type>
@@ -156,6 +161,7 @@
     <type>boolean</type>
     <title>No Bulk Emails (User Opt Out)</title>
     <default>0</default>
+    <required>true</required>
     <import>true</import>
     <required>true</required>
     <comment>Has the contact opted out from receiving all bulk email from the organization or site domain?</comment>
@@ -325,7 +331,7 @@
     <type>varchar</type>
     <length>8</length>
     <default>"Both"</default>
-    <import>true</import>
+    <import>false</import>
     <headerPattern>/^p(ref\w*\s)?m(ail\s)?f(orm\w*)$/i</headerPattern>
     <comment>What is the preferred mode of sending an email.</comment>
     <add>1.1</add>

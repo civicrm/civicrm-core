@@ -10,6 +10,9 @@
  */
 namespace Civi\Api4;
 
+use Civi\Api4\Action\Queue\ClaimItems;
+use Civi\Api4\Action\Queue\RunItems;
+
 /**
  * Track a list of durable/scannable queues.
  *
@@ -31,7 +34,35 @@ class Queue extends \Civi\Api4\Generic\DAOEntity {
     return [
       'meta' => ['access CiviCRM'],
       'default' => ['administer queues'],
+      'get' => ['access CiviCRM'],
+      'runItem' => [\CRM_Core_Permission::ALWAYS_DENY_PERMISSION],
     ];
+  }
+
+  /**
+   * Claim an item from the queue. Returns zero or one items.
+   *
+   * Note: This is appropriate for persistent, auto-run queues.
+   *
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Action\Queue\ClaimItems
+   */
+  public static function claimItems($checkPermissions = TRUE) {
+    return (new ClaimItems(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * Run an item from the queue.
+   *
+   * Note: This is appropriate for persistent, auto-run queues.
+   *
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Action\Queue\RunItems
+   */
+  public static function runItems($checkPermissions = TRUE) {
+    return (new RunItems(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
 }

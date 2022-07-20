@@ -20,32 +20,18 @@
 namespace api\v4\Query;
 
 use Civi\Api4\Query\Api4SelectQuery;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class OptionValueJoinTest extends UnitTestCase {
-
-  public function setUpHeadless() {
-    $relatedTables = [
-      'civicrm_address',
-      'civicrm_email',
-      'civicrm_phone',
-      'civicrm_openid',
-      'civicrm_im',
-      'civicrm_website',
-      'civicrm_activity',
-      'civicrm_activity_contact',
-    ];
-
-    $this->cleanup(['tablesToTruncate' => $relatedTables]);
-    $this->loadDataSet('SingleContact');
-
-    return parent::setUpHeadless();
-  }
+class OptionValueJoinTest extends Api4TestBase {
 
   public function testCommunicationMethodJoin() {
+    $this->createTestRecord('Contact', [
+      'preferred_communication_method' => 1,
+    ]);
+
     $api = \Civi\API\Request::create('Contact', 'get', [
       'version' => 4,
       'checkPermissions' => FALSE,

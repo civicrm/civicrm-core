@@ -46,9 +46,12 @@
         connectWith: '[ui-sortable]',
         cancel: 'input,textarea,button,select,option,a,.dropdown-menu',
         placeholder: 'af-gui-dropzone',
-        tolerance: 'pointer',
         scrollSpeed: 8,
-        containment: '#afGuiEditor-canvas-body'
+        containment: '#afGuiEditor-canvas-body',
+        helper: function(e, $el) {
+          // Prevent draggable item from being too large for the drop zones.
+          return $el.clone().css({width: '50px', height: '20px'});
+        }
       };
 
       $scope.isSelectedFieldset = function(entityName) {
@@ -106,7 +109,9 @@
       };
 
       $scope.isRepeatable = function() {
-        return ctrl.node['af-fieldset'] || (block.directive && afGui.meta.blocks[block.directive].repeat) || ctrl.join;
+        return ctrl.join ||
+          (block.directive && afGui.meta.blocks[block.directive].repeat) ||
+          (ctrl.node['af-fieldset'] && ctrl.editor.getEntityDefn(ctrl.editor.getEntity(ctrl.node['af-fieldset'])) !== false);
       };
 
       this.toggleRepeat = function() {

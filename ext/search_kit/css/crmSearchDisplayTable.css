@@ -1,0 +1,14 @@
+/* search kit table display styling */
+
+#bootstrap-theme .crm-search-display-table > table.table > thead > tr > th.crm-search-result-select {
+  padding-left: 0;
+  padding-right: 0;
+  text-transform: none;
+  color: initial;
+  /* Don't allow button to be split on 2 lines */
+  min-width: 86px;
+}
+
+#bootstrap-theme .crm-search-display.crm-search-display-table tfoot > tr > td {
+  font-weight: bold;
+}

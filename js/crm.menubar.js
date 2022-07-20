@@ -253,8 +253,10 @@
     initializeResponsive: function() {
       var $mainMenuState = $('#crm-menubar-state');
       // hide mobile menu beforeunload
-      $(window).on('beforeunload unload', function() {
-        CRM.menubar.spin(true);
+      $(window).on('beforeunload unload', function(e) {
+        if (!e.originalEvent.returnValue) {
+          CRM.menubar.spin(true);
+        }
         if ($mainMenuState[0].checked) {
           $mainMenuState[0].click();
         }

@@ -129,9 +129,15 @@ function task_test(array $options, string $targetDir, ...$args) {
 
 function task_list(array $options, ...$mixinNames) {
   $mixinNames = resolve_mixin_names($mixinNames);
+  fprintf(STDOUT, "%-20s %-8s %-8s %s\n", "NAME", "VERSION", "SINCE", "DESCRIPTION");
+  fprintf(STDOUT, "%-20s %-8s %-8s %s\n", "----", "-------", "-----", "-----------");
   foreach ($mixinNames as $mixinName) {
     $mixin = mixlib()->get($mixinName);
-    fprintf(STDOUT, "%-20s %-10s %s\n", $mixin['mixinName'], $mixin['mixinVersion'] ?? '', $mixin['description'] ?? '');
+    fprintf(STDOUT, "%-20s %-8s %-8s %s\n",
+      $mixin['mixinName'],
+      $mixin['mixinVersion'] ?? '',
+      $mixin['since'] ?? '',
+      $mixin['description'] ?? '');
   }
 }
 

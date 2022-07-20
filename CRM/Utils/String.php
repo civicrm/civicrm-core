@@ -437,10 +437,9 @@ class CRM_Utils_String {
    *   the converted string
    */
   public static function htmlToText($html) {
-    require_once 'html2text/rcube_html2text.php';
     $token_html = preg_replace('!\{([a-z_.]+)\}!i', 'token:{$1}', $html);
-    $converter = new rcube_html2text($token_html);
-    $token_text = $converter->get_text();
+    $converter = new \Html2Text\Html2Text($token_html, ['do_links' => 'table', 'width' => 75]);
+    $token_text = $converter->getText();
     $text = preg_replace('!token\:\{([a-z_.]+)\}!i', '{$1}', $token_text);
     return $text;
   }
@@ -530,7 +529,7 @@ class CRM_Utils_String {
    */
   public static function stripAlternatives($full) {
     $matches = [];
-    preg_match('/-ALTERNATIVE ITEM 0-(.*?)-ALTERNATIVE ITEM 1-.*-ALTERNATIVE END-/s', $full, $matches);
+    preg_match('/-ALTERNATIVE ITEM 0-(.*?)-ALTERNATIVE ITEM 1-.*-ALTERNATIVE END-/s', ($full ?? ''), $matches);
 
     if (isset($matches[1]) &&
       trim(strip_tags($matches[1])) != ''
@@ -640,7 +639,7 @@ class CRM_Utils_String {
       $_filter = new HTMLPurifier($config);
     }
 
-    return $_filter->purify($string);
+    return $_filter->purify($string ?? '');
   }
 
   /**
@@ -878,8 +877,8 @@ class CRM_Utils_String {
     if ($fragment === '') {
       return TRUE;
     }
-    $len = strlen($fragment);
-    return substr($string, 0, $len) === $fragment;
+    $len = strlen($fragment ?? '');
+    return substr(($string ?? ''), 0, $len) === $fragment;
   }
 
   /**
@@ -895,8 +894,8 @@ class CRM_Utils_String {
     if ($fragment === '') {
       return TRUE;
     }
-    $len = strlen($fragment);
-    return substr($string, -1 * $len) === $fragment;
+    $len = strlen($fragment ?? '');
+    return substr(($string ?? ''), -1 * $len) === $fragment;
   }
 
   /**

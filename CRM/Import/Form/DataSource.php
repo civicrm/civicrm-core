@@ -17,21 +17,38 @@
 /**
  * Base class for upload-only import forms (all but Contact import).
  */
-abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
+abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
 
   /**
    * Set variables up before form is built.
    */
   public function preProcess() {
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
-    $params = "reset=1";
-    if ($this->_id) {
-      $params .= "&id={$this->_id}";
-    }
-    CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url(static::PATH, $params));
-
     // check for post max size
     CRM_Utils_Number::formatUnitSize(ini_get('post_max_size'), TRUE);
+    $this->assign('importEntity', $this->getTranslatedEntity());
+    $this->assign('importEntities', $this->getTranslatedEntities());
+  }
+
+  /**
+   * Get the import entity (translated).
+   *
+   * Used for template layer text.
+   *
+   * @return string
+   */
+  protected function getTranslatedEntity(): string {
+    return (string) Civi\Api4\Utils\CoreUtil::getInfoItem($this::IMPORT_ENTITY, 'title');
+  }
+
+  /**
+   * Get the import entity plural (translated).
+   *
+   * Used for template layer text.
+   *
+   * @return string
+   */
+  protected function getTranslatedEntities(): string {
+    return (string) Civi\Api4\Utils\CoreUtil::getInfoItem($this::IMPORT_ENTITY, 'title_plural');
   }
 
   /**
@@ -39,7 +56,10 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     $config = CRM_Core_Config::singleton();
-
+    // When we switch to using the DataSource.tpl used by Contact we can remove this in
+    // favour of the one used by Contact - I was trying to consolidate
+    // first & got stuck on https://github.com/civicrm/civicrm-core/pull/23458
+    $this->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_CSV');
     $uploadFileSize = CRM_Utils_Number::formatUnitSize($config->maxFileSize . 'm', TRUE);
 
     //Fetch uploadFileSize from php_ini when $config->maxFileSize is set to "no limit".
@@ -66,10 +86,9 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
     $mappingArray = CRM_Core_BAO_Mapping::getCreateMappingValues('Import ' . static::IMPORT_ENTITY);
 
     $this->assign('savedMapping', $mappingArray);
-    $this->add('select', 'savedMapping', ts('Mapping Option'), ['' => ts('- select -')] + $mappingArray);
+    $this->add('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappingArray);
 
     if ($loadedMapping = $this->get('loadedMapping')) {
-      $this->assign('loadedMapping', $loadedMapping);
       $this->setDefaults(['savedMapping' => $loadedMapping]);
     }
 
@@ -124,23 +143,25 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
   }
 
   /**
+   * Common postProcessing.
+   */
+  public function postProcess() {
+    $this->processDatasource();
+    $this->controller->resetPage('MapField');
+    parent::postProcess();
+  }
+
+  /**
    * Common form postProcess.
+   * @deprecated - just use postProcess.
    *
    * @param string $parserClassName
-   *
    * @param string|null $entity
    *   Entity to set for paraser currently only for custom import
    */
   protected function submitFileForMapping($parserClassName, $entity = NULL) {
-    $this->controller->resetPage('MapField');
-
-    $fileName = $this->controller->exportValue($this->_name, 'uploadFile');
-    $skipColumnHeader = $this->controller->exportValue($this->_name, 'skipColumnHeader');
-
-    $session = CRM_Core_Session::singleton();
-    $session->set("dateTypes", $this->get('dateFormats'));
-
-    $separator = $this->controller->exportValue($this->_name, 'fieldSeparator');
+    CRM_Core_Session::singleton()->set('dateTypes', $this->getSubmittedValue('dateFormats'));
+    $this->processDatasource();
 
     $mapper = [];
 
@@ -149,16 +170,19 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
       $parser->setEntity($this->get($entity));
     }
     $parser->setMaxLinesToProcess(100);
-    $parser->run($fileName,
-      $separator,
-      $mapper,
-      $skipColumnHeader,
+    $parser->setUserJobID($this->getUserJobID());
+    $parser->run(
+      $this->getSubmittedValue('uploadFile'),
+      $this->getSubmittedValue('fieldSeparator'),
+      [],
+      $this->getSubmittedValue('skipColumnHeader'),
       CRM_Import_Parser::MODE_MAPFIELD,
-      $this->get('contactType')
+      $this->getSubmittedValue('contactType')
     );
 
     // add all the necessary variables to the form
     $parser->set($this);
+    $this->controller->resetPage('MapField');
   }
 
   /**
@@ -168,6 +192,35 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
    */
   public function getTitle() {
     return ts('Upload Data');
+  }
+
+  /**
+   * Process the datasource submission - setting up the job and data source.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function processDatasource(): void {
+    if (!$this->getUserJobID()) {
+      $this->createUserJob();
+    }
+    else {
+      $this->flushDataSource();
+      $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
+    }
+    $this->instantiateDataSource();
+  }
+
+  /**
+   * Instantiate the datasource.
+   *
+   * This gives the datasource a chance to do any table creation etc.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  private function instantiateDataSource(): void {
+    $this->getDataSourceObject()->initialize();
   }
 
 }

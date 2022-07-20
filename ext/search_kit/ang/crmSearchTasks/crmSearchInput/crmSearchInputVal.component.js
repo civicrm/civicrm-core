@@ -9,7 +9,7 @@
     },
     require: {ngModel: 'ngModel'},
     template: '<div class="form-group" ng-include="$ctrl.getTemplate()"></div>',
-    controller: function($scope, formatForSelect2) {
+    controller: function($scope, formatForSelect2, crmApi4) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
@@ -21,7 +21,7 @@
 
         this.ngModel.$render = function() {
           ctrl.value = ctrl.ngModel.$viewValue;
-          if (!rendered && field.input_type === 'Date') {
+          if (!rendered && isDateField(field)) {
             setDateType();
           }
           rendered = true;
@@ -95,6 +95,21 @@
         }
       };
 
+      this.lookupAddress = function() {
+        ctrl.value.geo_code_1 = null;
+        ctrl.value.geo_code_2 = null;
+        if (ctrl.value.address) {
+          crmApi4('Address', 'getCoordinates', {
+            address: ctrl.value.address
+          }).then(function(coordinates) {
+            if (coordinates[0]) {
+              ctrl.value.geo_code_1 = coordinates[0].geo_code_1;
+              ctrl.value.geo_code_2 = coordinates[0].geo_code_2;
+            }
+          });
+        }
+      };
+
       this.getTemplate = function() {
         var field = ctrl.field || {};
 
@@ -102,7 +117,12 @@
           return '~/crmSearchTasks/crmSearchInput/text.html';
         }
 
-        if (field.input_type === 'Date') {
+        if (field.input_type === 'Location') {
+          ctrl.value = ctrl.value || {distance_unit: CRM.crmSearchAdmin.defaultDistanceUnit};
+          return '~/crmSearchTasks/crmSearchInput/location.html';
+        }
+
+        if (isDateField(field)) {
           return '~/crmSearchTasks/crmSearchInput/date.html';
         }
 
@@ -133,6 +153,10 @@
         var field = ctrl.field || {};
         return {results: formatForSelect2(field.options || [], ctrl.optionKey || 'id', 'label', ['description', 'color', 'icon'])};
       };
+
+      function isDateField(field) {
+        return field.data_type === 'Date' || field.data_type === 'Timestamp';
+      }
 
     }
   });

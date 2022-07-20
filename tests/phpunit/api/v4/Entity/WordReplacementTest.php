@@ -19,12 +19,13 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class WordReplacementTest extends UnitTestCase {
+class WordReplacementTest extends Api4TestBase implements TransactionalInterface {
 
   public function testDefaults() {
     $create = \Civi\Api4\WordReplacement::create(FALSE)

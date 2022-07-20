@@ -126,7 +126,6 @@ class CRM_Core_I18n {
    * @param string $locale
    */
   protected function setNativeGettextLocale($locale) {
-
     $locale .= '.utf8';
     putenv("LANG=$locale");
 
@@ -141,33 +140,29 @@ class CRM_Core_I18n {
 
     $this->_phpgettext = new CRM_Core_I18n_NativeGettext();
     $this->_extensioncache['civicrm'] = 'civicrm';
-
   }
 
   /**
    * Set getText locale.
    *
+   * Since CiviCRM 4.5, expected dir structure is civicrm/l10n/xx_XX/LC_MESSAGES/civicrm.mo
+   * because that is what native gettext expects. Fallback support for the pre-4.5 structure
+   * was removed in CiviCRM 5.51.
+   *
+   * CiviCRM 5.23 added support for the CIVICRM_L10N_BASEDIR constant (and [civicrm.l10n])
+   * so that mo files can be stored elsewhere (such as in a web-writable directory, to
+   * support extensions sur as l10nupdate.
+   *
    * @param string $locale
    */
   protected function setPhpGettextLocale($locale) {
-
-    // we support both the old file hierarchy format and the new:
-    // pre-4.5:  civicrm/l10n/xx_XX/civicrm.mo
-    // post-4.5: civicrm/l10n/xx_XX/LC_MESSAGES/civicrm.mo
     require_once 'PHPgettext/streams.php';
     require_once 'PHPgettext/gettext.php';
 
     $mo_file = CRM_Core_I18n::getResourceDir() . $locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . 'civicrm.mo';
-
-    if (!file_exists($mo_file)) {
-      // fallback to pre-4.5 mode
-      $mo_file = CRM_Core_I18n::getResourceDir() . $locale . DIRECTORY_SEPARATOR . 'civicrm.mo';
-    }
-
     $streamer = new FileReader($mo_file);
     $this->_phpgettext = new gettext_reader($streamer);
     $this->_extensioncache['civicrm'] = $this->_phpgettext;
-
   }
 
   /**
@@ -760,7 +755,7 @@ class CRM_Core_I18n {
    *   Ex: $stringTable['enabled']['wildcardMatch']['foo'] = 'bar';
    */
   private function getWordReplacements() {
-    if (isset(Civi::$statics['testPreInstall'])) {
+    if (isset(Civi\Test::$statics['testPreInstall'])) {
       return [];
     }
 
@@ -806,7 +801,7 @@ function ts($text, $params = []) {
     if ($bootstrapReady) {
       // just got ready: determine whether there is a working custom translation function
       $config = CRM_Core_Config::singleton();
-      if (isset($config->customTranslateFunction) and function_exists($config->customTranslateFunction)) {
+      if (!empty($config->customTranslateFunction) && function_exists($config->customTranslateFunction)) {
         $function = $config->customTranslateFunction;
       }
     }

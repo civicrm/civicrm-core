@@ -20,13 +20,14 @@
 namespace api\v4\Action;
 
 use Civi\Api4\Relationship;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class CurrentFilterTest extends UnitTestCase {
+class CurrentFilterTest extends Api4TestBase implements TransactionalInterface {
 
   public function testCurrentRelationship() {
     $cid1 = Contact::create()->addValue('first_name', 'Bob1')->execute()->first()['id'];

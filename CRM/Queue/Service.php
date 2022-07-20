@@ -43,7 +43,7 @@ class CRM_Queue_Service {
    * @var string[]
    * @readonly
    */
-  private static $commonFields = ['name', 'type', 'runner', 'batch_limit', 'lease_time', 'retry_limit', 'retry_interval'];
+  private static $commonFields = ['name', 'type', 'runner', 'status', 'error', 'batch_limit', 'lease_time', 'retry_limit', 'retry_interval'];
 
   /**
    * FIXME: Singleton pattern should be removed when dependency-injection
@@ -90,6 +90,10 @@ class CRM_Queue_Service {
    *   - is_persistent: bool, optional; if true, then this queue is loaded from `civicrm_queue` list
    *   - runner: string, optional; if given, then items in this queue can run
    *     automatically via `hook_civicrm_queueRun_{$runner}`
+   *   - status: string, required for runnable-queues; specify whether the runner is currently active
+   *     ex: 'active', 'draft', 'completed'
+   *   - error: string, required for runnable-queues; specify what to do with unhandled errors
+   *     ex: "drop" or "abort"
    *   - batch_limit: int, Maximum number of items in a batch.
    *   - lease_time: int, When claiming an item (or batch of items) for work, how long should the item(s) be reserved. (Seconds)
    *   - retry_limit: int, Number of permitted retries. Set to zero (0) to disable.
@@ -104,6 +108,7 @@ class CRM_Queue_Service {
     if (!empty($queueSpec['is_persistent'])) {
       $queueSpec = $this->findCreateQueueSpec($queueSpec);
     }
+    $this->validateQueueSpec($queueSpec);
     $queue = $this->instantiateQueueObject($queueSpec);
     $exists = $queue->existsQueue();
     if (!$exists) {
@@ -137,10 +142,13 @@ class CRM_Queue_Service {
       return $loaded;
     }
 
-    if (empty($queueSpec['type'])) {
-      throw new \CRM_Core_Exception(sprintf('Failed to find or create persistent queue "%s". Missing field "%s".',
-        $queueSpec['name'], 'type'));
+    if (isset($queueSpec['template'])) {
+      $base = $this->findQueueSpec(['name' => $queueSpec['template']]);
+      $reset = ['is_template' => 0];
+      $queueSpec = array_merge($base, $reset, $queueSpec);
     }
+
+    $this->validateQueueSpec($queueSpec);
 
     $dao = new CRM_Queue_DAO_Queue();
     $dao->name = $queueSpec['name'];
@@ -215,6 +223,40 @@ class CRM_Queue_Service {
     // note: you should probably never do anything else here
     $class = new ReflectionClass($this->getQueueClass($queueSpec['type']));
     return $class->newInstance($queueSpec);
+  }
+
+  /**
+   * Assert that the queueSpec is well-formed.
+   *
+   * @param array $queueSpec
+   * @throws \CRM_Core_Exception
+   */
+  public function validateQueueSpec(array $queueSpec): void {
+    $throw = function(string $message, ...$args) use ($queueSpec) {
+      $prefix = sprintf('Failed to create queue "%s". ', $queueSpec['name']);
+      throw new CRM_Core_Exception($prefix . sprintf($message, ...$args));
+    };
+
+    if (empty($queueSpec['type'])) {
+      $throw('Missing field "type".');
+    }
+
+    // The rest of the validations only apply to persistent, runnable queues.
+    if (empty($queueSpec['is_persistent']) || empty($queueSpec['runner'])) {
+      return;
+    }
+
+    $statuses = CRM_Queue_BAO_Queue::getStatuses();
+    $status = $queueSpec['status'] ?? NULL;
+    if (!isset($statuses[$status])) {
+      $throw('Invalid queue status "%s".', $status);
+    }
+
+    $errorModes = CRM_Queue_BAO_Queue::getErrorModes();
+    $errorMode = $queueSpec['error'] ?? NULL;
+    if ($queueSpec['runner'] === 'task' && !isset($errorModes[$errorMode])) {
+      $throw('Invalid error mode "%s".', $errorMode);
+    }
   }
 
 }

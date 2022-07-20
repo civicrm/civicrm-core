@@ -30,8 +30,21 @@ trait ArrayQueryActionTrait {
   protected function queryArray($values, $result) {
     $values = $this->filterArray($values);
     $values = $this->sortArray($values);
-    // Set total count before applying limit
-    $result->rowCount = count($values);
+
+    if (in_array('row_count', $this->getSelect())) {
+      $result->setCountMatched(count($values));
+    }
+    else {
+      // Set total count before applying limit
+      //
+      // This is kept here for backward compatibility, but could be confusing because
+      // the API behaviour is different with ArrayQueryActionTrait than with DAO
+      // queries. With DAO queries, the rowCount is only the same as the total
+      // matched count in specific cases, whereas with the implementation here we are
+      // setting rowCount explicitly to the matches count, before we apply limit.
+      $result->rowCount = count($values);
+    }
+
     $values = $this->limitArray($values);
     $values = $this->selectArray($values);
     $result->exchangeArray($values);

@@ -116,21 +116,84 @@ class SpecGatherer {
     if (!$customInfo) {
       return;
     }
-    // If a contact_type was passed in, exclude custom groups for other contact types
-    if ($entity === 'Contact' && $spec->getValue('contact_type')) {
-      $extends = ['Contact', $spec->getValue('contact_type')];
-    }
-    else {
-      $extends = $customInfo['extends'];
-    }
-    // FIXME: filter by entity sub-type if passed in values
-    $customFields = CustomField::get(FALSE)
-      ->addWhere('custom_group_id.extends', 'IN', $extends)
-      ->addWhere('custom_group_id.is_multiple', '=', '0')
-      ->setSelect(['custom_group_id.name', 'custom_group_id.title', '*'])
-      ->execute();
+    $values = $spec->getValues();
+    $extends = $customInfo['extends'];
+    $grouping = $customInfo['grouping'];
 
-    foreach ($customFields as $fieldArray) {
+    $query = CustomField::get(FALSE)
+      ->setSelect(['custom_group_id.name', 'custom_group_id.title', '*'])
+      ->addWhere('is_active', '=', TRUE)
+      ->addWhere('custom_group_id.is_multiple', '=', '0');
+
+    // Contact custom groups are extra complicated because contact_type can be a value for extends
+    if ($entity === 'Contact') {
+      if (array_key_exists('contact_type', $values)) {
+        $extends = ['Contact'];
+        if ($values['contact_type']) {
+          $extends[] = $values['contact_type'];
+        }
+      }
+      // Now grouping can be treated normally
+      $grouping = 'contact_sub_type';
+    }
+    if (is_string($grouping) && array_key_exists($grouping, $values)) {
+      if (empty($values[$grouping])) {
+        $query->addWhere('custom_group_id.extends_entity_column_value', 'IS EMPTY');
+      }
+      else {
+        $clause = [
+          ['custom_group_id.extends_entity_column_value', 'IS EMPTY'],
+        ];
+        foreach ((array) $values[$grouping] as $value) {
+          $clause[] = ['custom_group_id.extends_entity_column_value', 'CONTAINS', $value];
+        }
+        $query->addClause('OR', $clause);
+      }
+    }
+    // Handle multiple groupings
+    // (In core, only Participant custom fields have multiple groupings)
+    elseif (is_array($grouping)) {
+      $clauses = [];
+      foreach ($grouping as $columnId => $group) {
+        if (array_key_exists($group, $values)) {
+          if (empty($values[$group])) {
+            $clauses[] = [
+              'AND',
+              [
+                ['custom_group_id.extends_entity_column_id', '=', $columnId],
+                ['custom_group_id.extends_entity_column_value', 'IS EMPTY'],
+              ],
+            ];
+          }
+          else {
+            $clause = [];
+            foreach ((array) $values[$group] as $value) {
+              $clause[] = ['custom_group_id.extends_entity_column_value', 'CONTAINS', $value];
+            }
+            $clauses[] = [
+              'AND',
+              [
+                ['custom_group_id.extends_entity_column_id', '=', $columnId],
+                ['OR', $clause],
+              ],
+            ];
+          }
+        }
+      }
+      if ($clauses) {
+        $clauses[] = [
+          'AND',
+          [
+            ['custom_group_id.extends_entity_column_id', 'IS EMPTY'],
+            ['custom_group_id.extends_entity_column_value', 'IS EMPTY'],
+          ],
+        ];
+        $query->addClause('OR', $clauses);
+      }
+    }
+    $query->addWhere('custom_group_id.extends', 'IN', $extends);
+
+    foreach ($query->execute() as $fieldArray) {
       $field = SpecFormatter::arrayToField($fieldArray, $entity);
       $spec->addFieldSpec($field);
     }
@@ -143,6 +206,7 @@ class SpecGatherer {
   private function getCustomGroupFields($customGroup, RequestSpec $specification) {
     $customFields = CustomField::get(FALSE)
       ->addWhere('custom_group_id.name', '=', $customGroup)
+      ->addWhere('is_active', '=', TRUE)
       ->setSelect(['custom_group_id.name', 'custom_group_id.table_name', 'custom_group_id.title', '*'])
       ->execute();
 

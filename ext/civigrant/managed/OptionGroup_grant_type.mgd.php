@@ -1,9 +1,11 @@
 <?php
+use CRM_Grant_ExtensionUtil as E;
+
 return [
   [
     'name' => 'OptionGroup_grant_type',
     'entity' => 'OptionGroup',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -16,6 +18,7 @@ return [
         'is_active' => TRUE,
         'is_locked' => FALSE,
       ],
+      'match' => ['name'],
     ],
   ],
 ];

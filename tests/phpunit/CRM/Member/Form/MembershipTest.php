@@ -866,14 +866,17 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * @throws \API_Exception
    */
   public function testSubmitRecurTwoRows(): void {
-    $pfvIDs = $this->createMembershipPriceSet();
+    $this->createMembershipPriceSet();
     MembershipType::update()
       ->addWhere('id', '=', $this->ids['membership_type']['AnnualRollingOrg2'])
       ->setValues(['frequency_interval' => 1, 'frequency_unit' => 'month', 'auto_renew' => 1])->execute();
     $form = $this->getForm();
     $form->_mode = 'live';
     $priceParams = [
-      'price_' . $this->getPriceFieldID() => $pfvIDs,
+      'price_' . $this->getPriceFieldID() => [
+        $this->ids['PriceFieldValue']['AnnualRollingOrg2'] => 1,
+        $this->ids['PriceFieldValue']['AnnualRolling'] => 1,
+      ],
       'price_set_id' => $this->getPriceSetID(),
       'membership_type_id' => NULL,
       // Set financial type id to null to check it is retrieved from the price set.
@@ -1160,8 +1163,6 @@ Expires: ',
    * @throws \CiviCRM_API3_Exception
    */
   public function testTwoInheritedMembershipsViaPriceSetInBackend(): void {
-    // @todo figure out why financial validation fails with this test.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     // Create an organization and give it a "Member of" relationship to $this->_individualId.
     $orgID = $this->organizationCreate();
     $relationship = $this->callAPISuccess('Relationship', 'create', [
@@ -1172,7 +1173,7 @@ Expires: ',
     ]);
 
     // Create two memberships for the organization, via a price set in the back end.
-    $this->createTwoMembershipsViaPriceSetInBackEnd($orgID);
+    $this->createTwoMembershipsViaPriceSetInBackEnd($orgID, FALSE);
 
     // Check the primary memberships on the organization.
     $orgMembershipResult = $this->callAPISuccess('membership', 'get', [
@@ -1242,8 +1243,6 @@ Expires: ',
    * @throws \CiviCRM_API3_Exception
    */
   public function testTwoMembershipsViaPriceSetInBackendWithDiscount(): void {
-    // @todo figure out how to fix to pass valid financials.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     // Register buildAmount hook to apply discount.
     $this->hookClass->setHook('civicrm_buildAmount', [$this, 'buildAmountMembershipDiscount']);
     $this->enableTaxAndInvoicing();
@@ -1364,15 +1363,19 @@ Expires: ',
    * create two memberships for the same individual, via a price set in the back end.
    *
    * @param int $contactId Id of contact on which the memberships will be created.
+   * @param bool $isTaxEnabled
+   *   Is tax enabled for the Member Dues financial type.
+   *   Note that currently this ALSO assumes a discount has been
+   *   applied - this overloading would ideally be cleaned up.
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  protected function createTwoMembershipsViaPriceSetInBackEnd($contactId): void {
+  protected function createTwoMembershipsViaPriceSetInBackEnd(int $contactId, $isTaxEnabled = TRUE): void {
     $form = $this->getForm();
     $form->preProcess();
     $this->createLoggedInUser();
-    $pfvIDs = $this->createMembershipPriceSet();
+    $this->createMembershipPriceSet();
 
     // register for both of these memberships via backoffice membership form submission
     $params = [
@@ -1381,14 +1384,19 @@ Expires: ',
       'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
-      "price_" . $this->getPriceFieldID() => $pfvIDs,
+      'price_' . $this->getPriceFieldID() => [
+        $this->ids['PriceFieldValue']['AnnualRollingOrg2'] => 1,
+        $this->ids['PriceFieldValue']['AnnualRolling'] => 1,
+      ],
+      // $15 for discounted goat + $259 = $274 + $27.4 in tax.
+      // or without tax (and without discount) $279.
+      'total_amount' => $isTaxEnabled ? 301.4 : 279,
       'price_set_id' => $this->getPriceSetID(),
       'membership_type_id' => [1 => 0],
       'auto_renew' => '0',
       'max_related' => '',
       'num_terms' => '2',
       'source' => '',
-      'total_amount' => '30.00',
       //Member dues, see data.xml
       'financial_type_id' => '2',
       'soft_credit_type_id' => '',

@@ -124,7 +124,7 @@ class CRM_Financial_BAO_Order {
    *
    * @var bool
    */
-  protected $isPermitOverrideFinancialTypeForMultipleLines = TRUE;
+  protected $isPermitOverrideFinancialTypeForMultipleLines = FALSE;
 
   /**
    * @return bool
@@ -450,6 +450,12 @@ class CRM_Financial_BAO_Order {
     if (!$this->priceSetID) {
       foreach ($this->getPriceOptions() as $fieldID => $valueID) {
         $this->setPriceSetIDFromSelectedField($fieldID);
+      }
+      if (!$this->priceSetID && $this->getTemplateContributionID()) {
+        // Load the line items from the contribution.
+        foreach ($this->getLineItems() as $lineItem) {
+          return $lineItem['price_field_id.price_set_id'];
+        }
       }
     }
     return $this->priceSetID;
@@ -793,12 +799,14 @@ class CRM_Financial_BAO_Order {
     }
     else {
       foreach ($this->getPriceOptions() as $fieldID => $valueID) {
-        $this->setPriceSetIDFromSelectedField($fieldID);
-        $throwAwayArray = [];
-        // @todo - still using getLine for now but better to bring it to this class & do a better job.
-        $newLines = CRM_Price_BAO_PriceSet::getLine($params, $throwAwayArray, $this->getPriceSetID(), $this->getPriceFieldSpec($fieldID), $fieldID)[1];
-        foreach ($newLines as $newLine) {
-          $lineItems[$newLine['price_field_value_id']] = $newLine;
+        if ($valueID !== '') {
+          $this->setPriceSetIDFromSelectedField($fieldID);
+          $throwAwayArray = [];
+          // @todo - still using getLine for now but better to bring it to this class & do a better job.
+          $newLines = CRM_Price_BAO_PriceSet::getLine($params, $throwAwayArray, $this->getPriceSetID(), $this->getPriceFieldSpec($fieldID), $fieldID)[1];
+          foreach ($newLines as $newLine) {
+            $lineItems[$newLine['price_field_value_id']] = $newLine;
+          }
         }
       }
     }
@@ -1034,10 +1042,16 @@ class CRM_Financial_BAO_Order {
     if ($taxRate) {
       // Total is tax inclusive.
       $lineItem['tax_amount'] = ($taxRate / 100) * $this->getOverrideTotalAmount() / (1 + ($taxRate / 100));
-      $lineItem['line_total'] = $lineItem['unit_price'] = $this->getOverrideTotalAmount() - $lineItem['tax_amount'];
+      $lineItem['line_total'] = $this->getOverrideTotalAmount() - $lineItem['tax_amount'];
     }
     else {
-      $lineItem['line_total'] = $lineItem['unit_price'] = $this->getOverrideTotalAmount();
+      $lineItem['line_total'] = $this->getOverrideTotalAmount();
+    }
+    if (!empty($lineItem['qty'])) {
+      $lineItem['unit_price'] = $lineItem['line_total'] / $lineItem['qty'];
+    }
+    else {
+      $lineItem['unit_price'] = $lineItem['line_total'];
     }
   }
 
@@ -1091,6 +1105,7 @@ class CRM_Financial_BAO_Order {
         'entity_id',
         'entity_table',
         'price_field_id',
+        'price_field_id.price_set_id',
         'price_field_value_id',
         'financial_type_id',
         'label',

@@ -263,7 +263,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
     $fileName = $this->getFileName();
 
     if ($type === 'pdf') {
-      CRM_Utils_PDF_Utils::html2pdf($html, $fileName, FALSE, $formValues);
+      CRM_Utils_PDF_Utils::html2pdf($html, $fileName . '.pdf', FALSE, $formValues);
     }
     elseif (!empty($formValues['document_file_path'])) {
       $fileName = pathinfo($formValues['document_file_path'], PATHINFO_FILENAME) . '.' . $type;
@@ -283,7 +283,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
         civicrm_api3('Attachment', 'create', [
           'entity_table' => 'civicrm_activity',
           'entity_id' => $activityId,
-          'name' => $fileName,
+          'name' => $fileName . '.' . $type,
           'mime_type' => $mimeType,
           'options' => [
             'move-file' => $tee->getFileName(),

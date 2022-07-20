@@ -728,28 +728,23 @@ WHERE  id = %1";
    * @return string
    *   Text for civicrm_contribution.amount_level field.
    */
-  public static function getAmountLevelText($params) {
+  public static function getAmountLevelText($params): string {
     $priceSetID = $params['priceSetId'];
     $priceFieldSelection = self::filterPriceFieldsFromParams($priceSetID, $params);
     $priceFieldMetadata = self::getCachedPriceSetDetail($priceSetID);
-    $displayParticipantCount = NULL;
 
     $amount_level = [];
     foreach ($priceFieldMetadata['fields'] as $field) {
       if (!empty($priceFieldSelection[$field['id']])) {
-        $qtyString = '';
-        if ($field['is_enter_qty']) {
-          $qtyString = ' - ' . (float) $params['price_' . $field['id']];
-        }
         // We deliberately & specifically exclude contribution amount as it has a specific meaning.
         // ie. it represents the default price field for a contribution. Another approach would be not
         // to give it a label if we don't want it to show.
         if ($field['label'] !== ts('Contribution Amount')) {
-          $amount_level[] = $field['label'] . $qtyString;
+          $amount_level[] = $field['label'] . ($field['is_enter_qty'] ? ' - ' . (float) $params['price_' . $field['id']] : '');
         }
       }
     }
-    return CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
+    return CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . CRM_Core_DAO::VALUE_SEPARATOR;
   }
 
   /**

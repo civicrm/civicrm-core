@@ -42,6 +42,16 @@ class CRM_Queue_Task {
   public $title;
 
   /**
+   * @var array|null
+   * serializable
+   *
+   * If specified, it may include these keys:
+   *   - contactId: int|null
+   *   - domainId: int|null
+   */
+  public $runAs;
+
+  /**
    * @param mixed $callback
    *   Serializable, a callable PHP item; must accept at least one argument
    *   (CRM_Queue_TaskContext).
@@ -69,13 +79,29 @@ class CRM_Queue_Task {
     $args = $this->arguments;
     array_unshift($args, $taskCtx);
 
+    if ($this->runAs !== NULL) {
+      $equals = function($a, $b) {
+        return $a === $b || (is_numeric($a) && is_numeric($b) && $a == $b);
+      };
+      if (array_key_exists('contactId', $this->runAs) && !$equals(CRM_Core_Session::getLoggedInContactID(), $this->runAs['contactId'])) {
+        throw new Exception(sprintf('Cannot execute queue task. Unexpected contact "%s" for job "%s"', CRM_Core_Session::getLoggedInContactID(), $this->getSummary()));
+      }
+      if (array_key_exists('domainId', $this->runAs) && !$equals(CRM_Core_BAO_Domain::getDomain()->id, $this->runAs['domainId'])) {
+        throw new Exception(sprintf('Cannot execute queue task. Unexpected domain "%s" for job "%s"', CRM_Core_BAO_Domain::getDomain()->id, $this->getSummary()));
+      }
+    }
+
     if (is_callable($this->callback)) {
       $result = call_user_func_array($this->callback, $args);
       return $result;
     }
     else {
-      throw new Exception('Failed to call callback: ' . print_r($this->callback));
+      throw new Exception('Failed to call callback: ' . $this->getSummary());
     }
+  }
+
+  private function getSummary(): string {
+    return json_encode(['title' => $this->title, 'runAs' => $this->runAs, 'callback' => $this->callback], JSON_UNESCAPED_SLASHES);
   }
 
 }

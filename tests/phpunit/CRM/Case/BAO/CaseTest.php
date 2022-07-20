@@ -11,6 +11,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
     $this->tablesToTruncate = [
       'civicrm_activity',
+      'civicrm_group_contact',
       'civicrm_contact',
       'civicrm_custom_group',
       'civicrm_custom_field',
@@ -1291,6 +1292,55 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       ->addWhere('case_id', '=', $caseObj->id)
       ->execute()->first();
     $this->assertEquals($clientId, $caseContact['contact_id']);
+  }
+
+  /**
+   * Test getRelatedAndGlobalContacts()
+   */
+  public function testGetRelatedAndGlobalContacts() {
+    $loggedInUserId = $this->createLoggedInUser();
+    $clientId = $this->individualCreate(['first_name' => 'Cli', 'last_name' => 'Ent'], 0, TRUE);
+    $caseObj = $this->createCase($clientId, $loggedInUserId);
+
+    $gid = $this->callAPISuccess('Group', 'getsingle', ['name' => 'Case_Resources'])['id'];
+
+    // Create more than 25 contacts and add them to the group
+    $contacts = [];
+    for ($i = 1; $i <= 28; $i++) {
+      $contacts[$i] = [];
+      $contacts[$i]['id'] = $this->individualCreate([], 0, TRUE);
+      $contacts[$i]['sort_name'] = $this->callAPISuccess('Contact', 'getsingle', [
+        'id' => $contacts[$i]['id'],
+        'return' => ['sort_name'],
+      ])['sort_name'];
+      $this->callAPISuccess('GroupContact', 'create', [
+        'group_id' => $gid,
+        'contact_id' => $contacts[$i]['id'],
+      ]);
+    }
+    $retrievedContacts = CRM_Case_BAO_Case::getRelatedAndGlobalContacts($caseObj->id);
+    // 29 because the case manager is also in the list
+    $this->assertCount(29, $retrievedContacts);
+
+    // There's probably an easier way to do this but what I'm trying to do
+    // is for each contact we created, verify the id is in the list and the
+    // associated sort_name also matches. But the list is just sequentially
+    // keyed.
+    for ($i = 1; $i <= 28; $i++) {
+      $found = FALSE;
+      foreach ($retrievedContacts as $retrievedContact) {
+        // Note the retrieved contact_id is a string, so loose comparison
+        if ($retrievedContact['contact_id'] == $contacts[$i]['id']) {
+          if ($retrievedContact['sort_name'] !== $contacts[$i]['sort_name']) {
+            $this->fail("Contact id {$contacts[$i]['id']} found but expected sort_name {$contacts[$i]['sort_name']} != {$retrievedContact['sort_name']}");
+          }
+          $found = TRUE;
+        }
+      }
+      if (!$found) {
+        $this->fail("Contact id {$contacts[$i]['id']} not found in list");
+      }
+    }
   }
 
 }

@@ -923,4 +923,16 @@ class api_v3_EventTest extends CiviUnitTestCase {
     }
   }
 
+  public function testGetListLeadingZero() {
+    $this->callAPISuccess('Event', 'create', [
+      'title' => "0765",
+      'start_date' => "2022-04-04",
+      'event_type_id' => "Conference",
+    ]);
+    $result = $this->callAPISuccess('Event', 'getlist', [
+      'input' => "0765",
+    ]);
+    $this->assertEquals(1, $result['count']);
+  }
+
 }

@@ -2,25 +2,25 @@
 <extension key="authx" type="module">
   <file>authx</file>
   <name>AuthX</name>
-  <description>Extended authentication module</description>
+  <description>Extended authentication services</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>Tim Otten</author>
     <email>totten@civicrm.org</email>
   </maintainer>
   <urls>
-    <url desc="Main Extension Page">http://FIXME</url>
-    <url desc="Documentation">http://FIXME</url>
-    <url desc="Support">http://FIXME</url>
+    <url desc="Documentation">https://docs.civicrm.org/dev/en/latest/framework/authx/</url>
+    <url desc="Chat">https://chat.civicrm.org/civicrm/channels/dev</url>
+    <url desc="Issues">https://lab.civicrm.org/dev/core/-/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2021-02-11</releaseDate>
-  <version>5.49.alpha1</version>
-  <develStage>alpha</develStage>
+  <version>5.53.alpha1</version>
+  <develStage>stable</develStage>
   <compatibility>
-    <ver>5.0</ver>
+    <ver>5.53</ver>
   </compatibility>
-  <comments>This is a new, undeveloped module</comments>
+  <comments>AuthX enables remote applications to connect to CiviCRM. Use it to enable and disable different forms of authentication (such as username-password, API key, and/or JWT).</comments>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>

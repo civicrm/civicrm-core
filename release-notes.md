@@ -15,6 +15,172 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
 
+## CiviCRM 5.51.0
+
+Released July 6, 2022
+
+- **[Synopsis](release-notes/5.51.0.md#synopsis)**
+- **[Security advisories](release-notes/5.51.0.md#security)**
+- **[Features](release-notes/5.51.0.md#features)**
+- **[Bugs resolved](release-notes/5.51.0.md#bugs)**
+- **[Miscellany](release-notes/5.51.0.md#misc)**
+- **[Credits](release-notes/5.51.0.md#credits)**
+- **[Feedback](release-notes/5.51.0.md#feedback)**
+
+## CiviCRM 5.50.4
+
+Released June 27, 2022
+
+- **[Synopsis](release-notes/5.50.4.md#synopsis)**
+- **[Bugs resolved](release-notes/5.50.4.md#bugs)**
+- **[Credits](release-notes/5.50.4.md#credits)**
+- **[Feedback](release-notes/5.50.4.md#feedback)**
+
+## CiviCRM 5.50.3
+
+Released June 17, 2022
+
+- **[Synopsis](release-notes/5.50.3.md#synopsis)**
+- **[Bugs resolved](release-notes/5.50.3.md#bugs)**
+- **[Credits](release-notes/5.50.3.md#credits)**
+- **[Feedback](release-notes/5.50.3.md#feedback)**
+
+## CiviCRM 5.50.2
+
+Released June 14, 2022
+
+- **[Synopsis](release-notes/5.50.2.md#synopsis)**
+- **[Bugs resolved](release-notes/5.50.2.md#bugs)**
+- **[Credits](release-notes/5.50.2.md#credits)**
+- **[Feedback](release-notes/5.50.2.md#feedback)**
+
+## CiviCRM 5.50.1
+
+Released June 2, 2022
+
+- **[Synopsis](release-notes/5.50.1.md#synopsis)**
+- **[Bugs resolved](release-notes/5.50.1.md#bugs)**
+- **[Credits](release-notes/5.50.1.md#credits)**
+- **[Feedback](release-notes/5.50.1.md#feedback)**
+
+## CiviCRM 5.50.0
+
+Released June 1, 2022
+
+- **[Synopsis](release-notes/5.50.0.md#synopsis)**
+- **[Security advisories](release-notes/5.50.0.md#security)**
+- **[Features](release-notes/5.50.0.md#features)**
+- **[Bugs resolved](release-notes/5.50.0.md#bugs)**
+- **[Miscellany](release-notes/5.50.0.md#misc)**
+- **[Credits](release-notes/5.50.0.md#credits)**
+- **[Feedback](release-notes/5.50.0.md#feedback)**
+
+## CiviCRM 5.49.3
+
+Released May 25, 2022
+
+- **[Synopsis](release-notes/5.49.3.md#synopsis)**
+- **[Bugs resolved](release-notes/5.49.3.md#bugs)**
+- **[Credits](release-notes/5.49.3.md#credits)**
+- **[Feedback](release-notes/5.49.3.md#feedback)**
+
+## CiviCRM 5.49.2
+
+Released May 19, 2022
+
+- **[Synopsis](release-notes/5.49.2.md#synopsis)**
+- **[Bugs resolved](release-notes/5.49.2.md#bugs)**
+- **[Credits](release-notes/5.49.2.md#credits)**
+- **[Feedback](release-notes/5.49.2.md#feedback)**
+
+## CiviCRM 5.49.1
+
+Released May 6, 2022
+
+- **[Synopsis](release-notes/5.49.1.md#synopsis)**
+- **[Bugs resolved](release-notes/5.49.1.md#bugs)**
+- **[Credits](release-notes/5.49.1.md#credits)**
+- **[Feedback](release-notes/5.49.1.md#feedback)**
+
+## CiviCRM 5.49.0
+
+Released May 4, 2022
+
+- **[Synopsis](release-notes/5.49.0.md#synopsis)**
+- **[Features](release-notes/5.49.0.md#features)**
+- **[Bugs resolved](release-notes/5.49.0.md#bugs)**
+- **[Miscellany](release-notes/5.49.0.md#misc)**
+- **[Credits](release-notes/5.49.0.md#credits)**
+- **[Feedback](release-notes/5.49.0.md#feedback)**
+
+## CiviCRM 5.48.2
+
+Released April 20, 2022
+
+- **[Synopsis](release-notes/5.48.2.md#synopsis)**
+- **[Bugs resolved](release-notes/5.48.2.md#bugs)**
+- **[Credits](release-notes/5.48.2.md#credits)**
+- **[Feedback](release-notes/5.48.2.md#feedback)**
+
+## CiviCRM 5.48.1
+
+Released April 12, 2022
+
+- **[Synopsis](release-notes/5.48.1.md#synopsis)**
+- **[Bugs resolved](release-notes/5.48.1.md#bugs)**
+- **[Credits](release-notes/5.48.1.md#credits)**
+- **[Feedback](release-notes/5.48.1.md#feedback)**
+
+## CiviCRM 5.48.0
+
+Released April 6, 2022
+
+- **[Synopsis](release-notes/5.48.0.md#synopsis)**
+- **[Features](release-notes/5.48.0.md#features)**
+- **[Bugs resolved](release-notes/5.48.0.md#bugs)**
+- **[Miscellany](release-notes/5.48.0.md#misc)**
+- **[Credits](release-notes/5.48.0.md#credits)**
+- **[Feedback](release-notes/5.48.0.md#feedback)**
+
+## CiviCRM 5.47.4
+
+Released April 6, 2022
+
+- **[Synopsis](release-notes/5.47.4.md#synopsis)**
+- **[Security advisories](release-notes/5.47.4.md#security)**
+- **[Bugs resolved](release-notes/5.47.4.md#bugs)**
+- **[Credits](release-notes/5.47.4.md#credits)**
+- **[Feedback](release-notes/5.47.4.md#feedback)**
+
+## CiviCRM 5.47.3
+
+Released March 27, 2022
+
+- **[Synopsis](release-notes/5.47.3.md#synopsis)**
+- **[Features removed](release-notes/5.47.3.md#features)**
+- **[Bugs resolved](release-notes/5.47.3.md#bugs)**
+- **[Credits](release-notes/5.47.3.md#credits)**
+- **[Feedback](release-notes/5.47.3.md#feedback)**
+
+## CiviCRM 5.47.2
+
+Released March 16, 2022
+
+- **[Synopsis](release-notes/5.47.2.md#synopsis)**
+- **[Security advisories](release-notes/5.47.2.md#security)**
+- **[Bugs resolved](release-notes/5.47.2.md#bugs)**
+- **[Credits](release-notes/5.47.2.md#credits)**
+- **[Feedback](release-notes/5.47.2.md#feedback)**
+
+## CiviCRM 5.47.1
+
+Released March 9, 2022
+
+- **[Synopsis](release-notes/5.47.1.md#synopsis)**
+- **[Bugs resolved](release-notes/5.47.1.md#bugs)**
+- **[Credits](release-notes/5.47.1.md#credits)**
+- **[Feedback](release-notes/5.47.1.md#feedback)**
+
 ## CiviCRM 5.47.0
 
 Released March 4, 2022
@@ -26,6 +192,34 @@ Released March 4, 2022
 - **[Credits](release-notes/5.47.0.md#credits)**
 - **[Feedback](release-notes/5.47.0.md#feedback)**
 
+## CiviCRM 5.46.3
+
+Released March 16, 2022
+
+- **[Synopsis](release-notes/5.46.3.md#synopsis)**
+- **[Security advisories](release-notes/5.46.3.md#security)**
+- **[Bugs resolved](release-notes/5.46.3.md#bugs)**
+- **[Credits](release-notes/5.46.3.md#credits)**
+- **[Feedback](release-notes/5.46.3.md#feedback)**
+
+## CiviCRM 5.46.2
+
+Released February 10, 2022
+
+- **[Synopsis](release-notes/5.46.2.md#synopsis)**
+- **[Bugs resolved](release-notes/5.46.2.md#bugs)**
+- **[Credits](release-notes/5.46.2.md#credits)**
+- **[Feedback](release-notes/5.46.2.md#feedback)**
+
+## CiviCRM 5.46.1
+
+Released February 9, 2022
+
+- **[Synopsis](release-notes/5.46.1.md#synopsis)**
+- **[Bugs resolved](release-notes/5.46.1.md#bugs)**
+- **[Credits](release-notes/5.46.1.md#credits)**
+- **[Feedback](release-notes/5.46.1.md#feedback)**
+
 ## CiviCRM 5.46.0
 
 Released February 3, 2022
@@ -36,6 +230,15 @@ Released February 3, 2022
 - **[Miscellany](release-notes/5.46.0.md#misc)**
 - **[Credits](release-notes/5.46.0.md#credits)**
 - **[Feedback](release-notes/5.46.0.md#feedback)**
+
+## CiviCRM 5.45.3
+
+Released February 3, 2022
+
+- **[Synopsis](release-notes/5.45.3.md#synopsis)**
+- **[Bugs resolved](release-notes/5.45.3.md#bugs)**
+- **[Credits](release-notes/5.45.3.md#credits)**
+- **[Feedback](release-notes/5.45.3.md#feedback)**
 
 ## CiviCRM 5.45.2
 

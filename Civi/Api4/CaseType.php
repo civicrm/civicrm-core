@@ -16,10 +16,11 @@ namespace Civi\Api4;
  * This contains configuration settings for each type of CiviCase.
  *
  * @see \Civi\Api4\Case
- * @searchable none
+ * @searchable secondary
  * @since 5.37
  * @package Civi\Api4
  */
 class CaseType extends Generic\DAOEntity {
+  use Generic\Traits\ManagedEntity;
 
 }

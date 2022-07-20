@@ -31,7 +31,7 @@
       this.$onInit = function() {
         ctrl.hasDefaultValue = !!getSet('afform_default');
         ctrl.fieldDefn = angular.extend({}, ctrl.getDefn(), ctrl.node.defn);
-        ctrl.inputTypes = _.transform(_.cloneDeep(afGui.meta.inputType), function(inputTypes, type) {
+        ctrl.inputTypes = _.transform(_.cloneDeep(afGui.meta.inputTypes), function(inputTypes, type) {
           if (inputTypeCanBe(type.name)) {
             // Change labels for EntityRef fields
             if (ctrl.getDefn().input_type === 'EntityRef') {

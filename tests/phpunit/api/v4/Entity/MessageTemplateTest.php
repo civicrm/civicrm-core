@@ -18,7 +18,7 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Test\DbTestTrait;
 use Civi\Test\GenericAssertionsTrait;
 use Civi\Test\TransactionalInterface;
@@ -26,7 +26,7 @@ use Civi\Test\TransactionalInterface;
 /**
  * @group headless
  */
-class MessageTemplateTest extends UnitTestCase implements TransactionalInterface {
+class MessageTemplateTest extends Api4TestBase implements TransactionalInterface {
 
   use GenericAssertionsTrait;
   use DbTestTrait;

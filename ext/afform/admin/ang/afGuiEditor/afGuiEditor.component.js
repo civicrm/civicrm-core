@@ -27,7 +27,24 @@
       $scope.searchDisplayListFilter = {};
       this.meta = afGui.meta;
       var editor = this,
+        undoHistory = [],
+        undoPosition = 0,
+        undoAction = null,
+        lastSaved,
         sortableOptions = {};
+
+      // ngModelOptions to debounce input
+      // Used to prevent cluttering the undo history with every keystroke
+      this.debounceMode = {
+        updateOn: 'default blur',
+        debounce: {
+          default: 2000,
+          blur: 0
+        }
+      };
+
+      // Above mode for use with getterSetter
+      this.debounceWithGetterSetter = _.assign({getterSetter: true}, this.debounceMode);
 
       this.$onInit = function() {
         // Load the current form plus blocks & fields
@@ -38,13 +55,34 @@
         $timeout(fixEditorHeight);
         $timeout(editor.adjustTabWidths);
         $(window)
+          .off('.afGuiEditor')
           .on('resize.afGuiEditor', fixEditorHeight)
-          .on('resize.afGuiEditor', editor.adjustTabWidths);
+          .on('resize.afGuiEditor', editor.adjustTabWidths)
+          .on('keyup.afGuiEditor', editor.onKeyup);
+
+        // Warn of unsaved changes
+        window.onbeforeunload = function(e) {
+          if (!editor.isSaved()) {
+            e.returnValue = ts("Form has not been saved.");
+            return e.returnValue;
+          }
+        };
       };
 
       this.$onDestroy = function() {
         $(window).off('.afGuiEditor');
+        window.onbeforeunload = null;
       };
+
+      function setEditorLayout() {
+        editor.layout = {};
+        if (editor.getFormType() === 'form') {
+          editor.layout['#children'] = afGui.findRecursive(editor.afform.layout, {'#tag': 'af-form'})[0]['#children'];
+        }
+        else {
+          editor.layout['#children'] = editor.afform.layout;
+        }
+      }
 
       // Initialize the current form
       function initializeForm() {
@@ -58,14 +96,19 @@
           editor.afform.is_dashlet = false;
           editor.afform.title += ' ' + ts('(copy)');
         }
+        editor.afform.icon = editor.afform.icon || 'fa-list-alt';
         $scope.canvasTab = 'layout';
         $scope.layoutHtml = '';
-        editor.layout = {'#children': []};
         $scope.entities = {};
+        setEditorLayout();
+        setLastSaved();
+
+        if (editor.afform.navigation) {
+          loadNavigationMenu();
+        }
 
         if (editor.getFormType() === 'form') {
           editor.allowEntityConfig = true;
-          editor.layout['#children'] = afGui.findRecursive(editor.afform.layout, {'#tag': 'af-form'})[0]['#children'];
           $scope.entities = _.mapValues(afGui.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name'), backfillEntityDefaults);
 
           if (editor.mode === 'create') {
@@ -74,12 +117,9 @@
             editor.layout['#children'].push(afGui.meta.elements.submit.element);
           }
         }
-        else {
-          editor.layout['#children'] = editor.afform.layout;
-        }
 
         if (editor.getFormType() === 'block') {
-          editor.blockEntity = editor.afform.join_entity || editor.afform.entity_type;
+          editor.blockEntity = editor.afform.join_entity || editor.afform.entity_type || '*';
           $scope.entities[editor.blockEntity] = backfillEntityDefaults({
             type: editor.blockEntity,
             name: editor.blockEntity,
@@ -91,12 +131,72 @@
           editor.searchDisplays = getSearchDisplaysOnForm();
         }
 
-        // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
-        $scope.changesSaved = editor.mode === 'edit' ? 1 : false;
-        $scope.$watch('editor.afform', function () {
-          $scope.changesSaved = $scope.changesSaved === 1;
+        // Initialize undo history
+        undoAction = 'initialLoad';
+        undoHistory = [{
+          afform: _.cloneDeep(editor.afform),
+          saved: editor.mode === 'edit',
+          selectedEntityName: null
+        }];
+        $scope.$watch('editor.afform', function(newValue, oldValue) {
+          if (!undoAction && newValue && oldValue) {
+            // Clear "redo" history
+            if (undoPosition) {
+              undoHistory.splice(0, undoPosition);
+              undoPosition = 0;
+            }
+            undoHistory.unshift({
+              afform: _.cloneDeep(editor.afform),
+              saved: false,
+              selectedEntityName: $scope.selectedEntityName
+            });
+            // Trim to a total length of 20
+            if (undoHistory.length > 20) {
+              undoHistory.splice(20, undoHistory.length - 20);
+            }
+          }
+          undoAction = null;
         }, true);
       }
+
+      // Undo/redo keys (ctrl-z, ctrl-shift-z)
+      this.onKeyup = function(e) {
+        if (e.key === 'z' && e.ctrlKey && e.shiftKey) {
+          editor.redo();
+        }
+        else if (e.key === 'z' && e.ctrlKey) {
+          editor.undo();
+        }
+      };
+
+      this.canUndo = function() {
+        return !!undoHistory[undoPosition + 1];
+      };
+
+      this.canRedo = function() {
+        return !!undoHistory[undoPosition - 1];
+      };
+
+      // Revert to a previous/next revision in the undo history
+      function changeHistory(direction) {
+        if (!undoHistory[undoPosition + direction]) {
+          return;
+        }
+        undoPosition += direction;
+        undoAction = 'change';
+        editor.afform = _.cloneDeep(undoHistory[undoPosition].afform);
+        setEditorLayout();
+        $scope.canvasTab = 'layout';
+        $scope.selectedEntityName = undoHistory[undoPosition].selectedEntityName;
+      }
+
+      this.undo = _.wrap(1, changeHistory);
+
+      this.redo = _.wrap(-1, changeHistory);
+
+      this.isSaved = function() {
+        return undoHistory[undoPosition].saved;
+      };
 
       this.getFormType = function() {
         return editor.afform.type;
@@ -133,19 +233,21 @@
           var pos = 1 + _.findLastIndex(editor.layout['#children'], {'#tag': 'af-entity'});
           editor.layout['#children'].splice(pos, 0, $scope.entities[type + num]);
           // Create a new af-fieldset container for the entity
-          var fieldset = _.cloneDeep(afGui.meta.elements.fieldset.element);
-          fieldset['af-fieldset'] = type + num;
-          fieldset['af-title'] = meta.label + ' ' + num;
-          // Add boilerplate contents
-          _.each(meta.boilerplate, function (tag) {
-            fieldset['#children'].push(tag);
-          });
-          // Attempt to place the new af-fieldset after the last one on the form
-          pos = 1 + _.findLastIndex(editor.layout['#children'], 'af-fieldset');
-          if (pos) {
-            editor.layout['#children'].splice(pos, 0, fieldset);
-          } else {
-            editor.layout['#children'].push(fieldset);
+          if (meta.boilerplate !== false) {
+            var fieldset = _.cloneDeep(afGui.meta.elements.fieldset.element);
+            fieldset['af-fieldset'] = type + num;
+            fieldset['af-title'] = meta.label + ' ' + num;
+            // Add boilerplate contents
+            _.each(meta.boilerplate, function (tag) {
+              fieldset['#children'].push(tag);
+            });
+            // Attempt to place the new af-fieldset after the last one on the form
+            pos = 1 + _.findLastIndex(editor.layout['#children'], 'af-fieldset');
+            if (pos) {
+              editor.layout['#children'].splice(pos, 0, fieldset);
+            } else {
+              editor.layout['#children'].push(fieldset);
+            }
           }
           delete $scope.entities[type + num].loading;
           if (selectTab) {
@@ -237,6 +339,57 @@
           });
         }
       };
+
+      this.toggleNavigation = function() {
+        if (editor.afform.navigation) {
+          editor.afform.navigation = null;
+        } else {
+          loadNavigationMenu();
+          editor.afform.navigation = {
+            parent: null,
+            label: editor.afform.title,
+            weight: 0
+          };
+        }
+      };
+
+      function loadNavigationMenu() {
+        if ('navigationMenu' in editor) {
+          return;
+        }
+        editor.navigationMenu = null;
+        var conditions = [
+          ['domain_id', '=', 'current_domain'],
+          ['name', '!=', 'Home']
+        ];
+        if (editor.afform.name) {
+          conditions.push(['name', '!=', editor.afform.name]);
+        }
+        crmApi4('Navigation', 'get', {
+          select: ['name', 'label', 'parent_id', 'icon'],
+          where: conditions,
+          orderBy: {weight: 'ASC'}
+        }).then(function(items) {
+          editor.navigationMenu = buildTree(items, null);
+        });
+      }
+
+      function buildTree(items, parentId) {
+        return _.transform(items, function(navigationMenu, item) {
+          if (parentId === item.parent_id) {
+            var children = buildTree(items, item.id),
+              menuItem = {
+                id: item.name,
+                text: item.label,
+                icon: item.icon
+              };
+            if (children.length) {
+              menuItem.children = children;
+            }
+            navigationMenu.push(menuItem);
+          }
+        }, []);
+      }
 
       // Collects all search displays currently on the form
       function getSearchDisplaysOnForm() {
@@ -370,15 +523,17 @@
       this.getSortableOptions = function(entityName) {
         if (!sortableOptions[entityName + '']) {
           sortableOptions[entityName + ''] = {
-            helper: 'clone',
             appendTo: '#afGuiEditor-canvas-body > af-gui-container',
             containment: '#afGuiEditor-canvas-body',
             update: editor.onDrop,
             items: '> div:not(.disabled)',
             connectWith: '#afGuiEditor-canvas ' + (entityName ? '[data-entity="' + entityName + '"] > ' : '') + '[ui-sortable]',
             placeholder: 'af-gui-dropzone',
-            tolerance: 'pointer',
-            scrollSpeed: 8
+            scrollSpeed: 8,
+            helper: function(e, $el) {
+              // Prevent draggable item from being too large for the drop zones.
+              return $el.clone().css({width: '50px', height: '20px'});
+            }
           };
         }
         return sortableOptions[entityName + ''];
@@ -410,14 +565,27 @@
         var afform = JSON.parse(angular.toJson(editor.afform));
         // This might be set to undefined by validation
         afform.server_route = afform.server_route || '';
-        $scope.saving = $scope.changesSaved = true;
+        $scope.saving = true;
         crmApi4('Afform', 'save', {formatWhitespace: true, records: [afform]})
           .then(function (data) {
             $scope.saving = false;
-            editor.afform.name = data[0].name;
-            if (editor.mode !== 'edit') {
-              $location.url('/edit/' + data[0].name);
+            // When saving a new form for the first time
+            if (!editor.afform.name) {
+              undoAction = 'save';
+              editor.afform.name = data[0].name;
             }
+            // Update undo history - mark current snapshot as "saved"
+            _.each(undoHistory, function(snapshot, index) {
+              snapshot.saved = index === undoPosition;
+              snapshot.afform.name = data[0].name;
+            });
+            if (!angular.equals(afform.navigation, lastSaved.navigation) ||
+              (afform.server_route !== lastSaved.server_route && afform.navigation)
+              (afform.icon !== lastSaved.icon && afform.navigation)
+            ) {
+              refreshMenubar();
+            }
+            setLastSaved();
           });
       };
 
@@ -430,6 +598,19 @@
           });
         }
       });
+
+      // Sets last-saved form metadata (used to determine if the menubar needs refresh)
+      function setLastSaved() {
+        lastSaved = JSON.parse(angular.toJson(editor.afform));
+        delete lastSaved.layout;
+      }
+
+      // Force-refresh the menubar to instantly display the afform menu item
+      function refreshMenubar() {
+        CRM.menubar.destroy();
+        CRM.menubar.cacheCode = Math.random();
+        CRM.menubar.initialize();
+      }
 
       // Force editor panels to a fixed height, to avoid palette scrolling offscreen
       function fixEditorHeight() {

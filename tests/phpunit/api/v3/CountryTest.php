@@ -104,4 +104,48 @@ class api_v3_CountryTest extends CiviUnitTestCase {
     $this->assertEquals(1, $check);
   }
 
+  /**
+   * Test that the list of states is in the correct format when chaining
+   * and using sequential.
+   */
+  public function testCountryStateChainSequential() {
+    // first without specifying
+    $result = $this->callAPISuccess('Country', 'getsingle', [
+      'iso_code' => 'US',
+      'api.Address.getoptions' => [
+        'field' => 'state_province_id',
+        'country_id' => '$value.id',
+      ],
+    ]);
+    $this->assertSame(['key' => 1000, 'value' => 'Alabama'], $result['api.Address.getoptions']['values'][0]);
+    $this->assertSame(['key' => 1001, 'value' => 'Alaska'], $result['api.Address.getoptions']['values'][1]);
+    $this->assertSame(['key' => 1049, 'value' => 'Wyoming'], $result['api.Address.getoptions']['values'][59]);
+
+    // now specifying sequential
+    $result = $this->callAPISuccess('Country', 'getsingle', [
+      'iso_code' => 'US',
+      'api.Address.getoptions' => [
+        'field' => 'state_province_id',
+        'country_id' => '$value.id',
+        'sequential' => 1,
+      ],
+    ]);
+    $this->assertSame(['key' => 1000, 'value' => 'Alabama'], $result['api.Address.getoptions']['values'][0]);
+    $this->assertSame(['key' => 1001, 'value' => 'Alaska'], $result['api.Address.getoptions']['values'][1]);
+    $this->assertSame(['key' => 1049, 'value' => 'Wyoming'], $result['api.Address.getoptions']['values'][59]);
+
+    // now specifying keyed
+    $result = $this->callAPISuccess('Country', 'getsingle', [
+      'iso_code' => 'US',
+      'api.Address.getoptions' => [
+        'field' => 'state_province_id',
+        'country_id' => '$value.id',
+        'sequential' => 0,
+      ],
+    ]);
+    $this->assertSame('Alabama', $result['api.Address.getoptions']['values'][1000]);
+    $this->assertSame('Alaska', $result['api.Address.getoptions']['values'][1001]);
+    $this->assertSame('Wyoming', $result['api.Address.getoptions']['values'][1049]);
+  }
+
 }

@@ -80,6 +80,7 @@
     <title>Membership Block Display Minimum Fee</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Display minimum membership fee</comment>
     <add>1.5</add>
   </field>
@@ -88,6 +89,7 @@
     <title>Membership Block Is Separate Payment</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Should membership transactions be processed separately</comment>
     <add>1.5</add>
   </field>
@@ -130,6 +132,7 @@
     <title>Is Required</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is membership sign up optional</comment>
     <add>1.5</add>
   </field>
@@ -138,6 +141,7 @@
     <title>Is Active</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Is this membership_block enabled</comment>
     <add>1.5</add>
   </field>

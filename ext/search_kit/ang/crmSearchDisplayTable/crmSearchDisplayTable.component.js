@@ -7,7 +7,8 @@
       search: '<',
       display: '<',
       settings: '<',
-      filters: '<'
+      filters: '<',
+      totalCount: '<'
     },
     require: {
       afFieldset: '?^^afFieldset'
@@ -18,8 +19,26 @@
         // Mix in traits to this controller
         ctrl = angular.extend(this, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplaySortableTrait);
 
-
       this.$onInit = function() {
+        var tallyParams;
+
+        if (ctrl.settings.tally) {
+          ctrl.onPreRun.push(function (apiParams) {
+            ctrl.tally = null;
+            tallyParams = _.cloneDeep(apiParams);
+          });
+
+          ctrl.onPostRun.push(function (results, status) {
+            ctrl.tally = null;
+            if (status === 'success' && tallyParams) {
+              tallyParams.return = 'tally';
+              crmApi4('SearchDisplay', 'run', tallyParams).then(function (result) {
+                ctrl.tally = result[0];
+              });
+            }
+          });
+        }
+
         this.initializeDisplay($scope, $element);
 
         if (ctrl.settings.draggable) {

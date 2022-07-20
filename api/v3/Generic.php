@@ -167,11 +167,11 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
     }
     else {
       // not implemented MagicFunctionProvider
-      $helper = NULL;
+      $helper = '';
     }
   }
   catch (\Civi\API\Exception\NotImplementedException $e) {
-    $helper = NULL;
+    $helper = '';
   }
   if (function_exists($helper)) {
     // alter

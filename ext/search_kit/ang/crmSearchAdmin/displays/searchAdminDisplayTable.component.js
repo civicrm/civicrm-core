@@ -11,7 +11,7 @@
       parent: '^crmSearchAdminDisplay'
     },
     templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayTable.html',
-    controller: function($scope, searchMeta) {
+    controller: function($scope, searchMeta, formatForSelect2) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
@@ -44,7 +44,7 @@
 
       this.$onInit = function () {
         if (!ctrl.display.settings) {
-          ctrl.display.settings = _.extend({}, _.cloneDeep(CRM.crmSearchAdmin.defaultDisplay.settings), {columns: null});
+          ctrl.display.settings = _.extend({}, _.cloneDeep(CRM.crmSearchAdmin.defaultDisplay.settings), {columns: null, pager: {}});
           if (searchMeta.getEntity(ctrl.apiEntity).order_by) {
             ctrl.display.settings.sort.push([searchMeta.getEntity(ctrl.apiEntity).order_by, 'ASC']);
           }
@@ -54,6 +54,31 @@
         // Table can be draggable if the main entity is a SortableEntity.
         ctrl.canBeDraggable = _.includes(searchMeta.getEntity(ctrl.apiEntity).type, 'SortableEntity');
         ctrl.parent.initColumns({label: true, sortable: true});
+      };
+
+      this.toggleTally = function() {
+        if (ctrl.display.settings.tally) {
+          delete ctrl.display.settings.tally;
+          _.each(ctrl.display.settings.columns, function(col) {
+            delete col.tally;
+          });
+        } else {
+          ctrl.display.settings.tally = {label: ts('Total')};
+          _.each(ctrl.display.settings.columns, function(col) {
+            if (col.type === 'field') {
+              col.tally = {
+                fn: searchMeta.getDefaultAggregateFn(searchMeta.parseExpr(ctrl.parent.getExprFromSelect(col.key)))
+              };
+            }
+          });
+        }
+      };
+
+      this.getTallyFunctions = function() {
+        var allowedFunctions = _.filter(CRM.crmSearchAdmin.functions, function(fn) {
+          return fn.category === 'aggregate' && fn.params.length;
+        });
+        return {results: formatForSelect2(allowedFunctions, 'name', 'title', ['description'])};
       };
 
     }

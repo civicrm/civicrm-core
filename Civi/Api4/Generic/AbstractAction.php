@@ -327,13 +327,14 @@ abstract class AbstractAction implements \ArrayAccess {
   /**
    * @inheritDoc
    */
-  public function offsetExists($offset) {
+  public function offsetExists($offset): bool {
     return in_array($offset, ['entity', 'action', 'params', 'version', 'check_permissions', 'id']) || isset($this->_arrayStorage[$offset]);
   }
 
   /**
    * @inheritDoc
    */
+  #[\ReturnTypeWillChange]
   public function &offsetGet($offset) {
     $val = NULL;
     if (in_array($offset, ['entity', 'action'])) {
@@ -359,7 +360,7 @@ abstract class AbstractAction implements \ArrayAccess {
   /**
    * @inheritDoc
    */
-  public function offsetSet($offset, $value) {
+  public function offsetSet($offset, $value): void {
     if (in_array($offset, ['entity', 'action', 'entityName', 'actionName', 'params', 'version', 'id'])) {
       throw new \API_Exception('Cannot modify api4 state via array access');
     }
@@ -374,7 +375,7 @@ abstract class AbstractAction implements \ArrayAccess {
   /**
    * @inheritDoc
    */
-  public function offsetUnset($offset) {
+  public function offsetUnset($offset): void {
     if (in_array($offset, ['entity', 'action', 'entityName', 'actionName', 'params', 'check_permissions', 'version', 'id'])) {
       throw new \API_Exception('Cannot modify api4 state via array access');
     }
@@ -398,7 +399,7 @@ abstract class AbstractAction implements \ArrayAccess {
    * @return array
    */
   public function getPermissions() {
-    $permissions = call_user_func([CoreUtil::getApiClass($this->_entityName), 'permissions']);
+    $permissions = call_user_func([CoreUtil::getApiClass($this->_entityName), 'permissions'], $this->_entityName);
     $permissions += [
       // applies to getFields, getActions, etc.
       'meta' => ['access CiviCRM'],

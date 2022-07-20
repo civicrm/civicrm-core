@@ -86,11 +86,11 @@ class Kernel {
         $this->dispatcher->dispatch('civi.api.exception', new ExceptionEvent($e, NULL, $apiRequest, $this));
       }
 
-      if ($e instanceof \PEAR_Exception) {
-        $err = $this->formatPearException($e, $apiRequest);
-      }
-      elseif ($e instanceof \API_Exception) {
+      if ($e instanceof \API_Exception) {
         $err = $this->formatApiException($e, $apiRequest);
+      }
+      elseif ($e instanceof \PEAR_Exception) {
+        $err = $this->formatPearException($e, $apiRequest);
       }
       else {
         $err = $this->formatException($e, $apiRequest);

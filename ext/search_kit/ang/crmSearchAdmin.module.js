@@ -72,19 +72,20 @@
       if (!this.tab) {
         this.tab = this.tabs[0].name;
       }
+      this.searchSegmentCount = null;
     })
 
     // Controller for creating a new search
     .controller('searchCreate', function($scope, $routeParams, $location) {
       searchEntity = $routeParams.entity;
-      $scope.$ctrl = this;
+      var ctrl = $scope.$ctrl = this;
       this.savedSearch = {
         api_entity: searchEntity
       };
       // Changing entity will refresh the angular page
       $scope.$watch('$ctrl.savedSearch.api_entity', function(newEntity, oldEntity) {
         if (newEntity && oldEntity && newEntity !== oldEntity) {
-          $location.url('/create/' + newEntity);
+          $location.url('/create/' + newEntity + (ctrl.savedSearch.label ? '?label=' + ctrl.savedSearch.label : ''));
         }
       });
     })
@@ -96,7 +97,7 @@
       $scope.$ctrl = this;
     })
 
-    .factory('searchMeta', function($q, formatForSelect2) {
+    .factory('searchMeta', function($q, crmApi4, formatForSelect2) {
       function getEntity(entityName) {
         if (entityName) {
           return _.find(CRM.crmSearchAdmin.schema, {name: entityName});
@@ -179,6 +180,7 @@
         var fnName = expr.split('(')[0],
           argString = expr.substr(fnName.length + 1, expr.length - fnName.length - 2);
         info.fn = _.find(CRM.crmSearchAdmin.functions, {name: fnName || 'e'});
+        info.data_type = (info.fn && info.fn.data_type) || null;
 
         function getKeyword(whitelist) {
           var keyword;
@@ -237,6 +239,9 @@
             }
           }
         });
+        if (!info.data_type && info.args.length) {
+          info.data_type = info.args[0].data_type;
+        }
       }
       // @param {String} arg
       function parseArg(arg) {
@@ -244,11 +249,13 @@
         if (arg && !isNaN(arg)) {
           return {
             type: 'number',
+            data_type: Number.isInteger(+arg) ? 'Integer' : 'Float',
             value: +arg
           };
         } else if (_.includes(['"', "'"], arg.substr(0, 1))) {
           return {
             type: 'string',
+            data_type: 'String',
             value: arg.substr(1, arg.length - 2)
           };
         } else if (arg) {
@@ -261,6 +268,7 @@
               value: arg,
               path: split[0],
               field: fieldAndJoin.field,
+              data_type: fieldAndJoin.field.data_type,
               join: fieldAndJoin.join,
               prefix: prefixPos > 0 ? split[0].substring(0, prefixPos) : '',
               suffix: !split[1] ? '' : ':' + split[1]
@@ -273,14 +281,15 @@
           return;
         }
         var splitAs = expr.split(' AS '),
-          info = {fn: null, args: [], alias: _.last(splitAs)},
+          info = {fn: null, args: [], alias: _.last(splitAs), data_type: null},
           bracketPos = expr.indexOf('(');
-        if (bracketPos >= 0) {
+        if (bracketPos >= 0 && !_.findWhere(CRM.crmSearchAdmin.pseudoFields, {name: expr})) {
           parseFnArgs(info, splitAs[0]);
         } else {
           var arg = parseArg(splitAs[0]);
           if (arg) {
             arg.param = 0;
+            info.data_type = arg.data_type;
             info.args.push(arg);
           }
         }
@@ -329,6 +338,23 @@
         parseExpr: parseExpr,
         getDefaultLabel: getDefaultLabel,
         fieldToColumn: fieldToColumn,
+        // Supply default aggregate function appropriate to the data_type
+        getDefaultAggregateFn: function(info) {
+          var arg = info.args[0] || {};
+          if (arg.suffix) {
+            return null;
+          }
+          switch (info.data_type) {
+            case 'Integer':
+              // For the `id` field, default to COUNT, otherwise SUM
+              return (!info.fn && arg.field && arg.field.name === 'id') ? 'COUNT' : 'SUM';
+
+            case 'Float':
+            case 'Money':
+              return 'SUM';
+          }
+          return null;
+        },
         // Find all possible search columns that could serve as contact_id for a smart group
         getSmartGroupColumns: function(api_entity, api_params) {
           var joins = _.pluck((api_params.join || []), 0);
@@ -347,6 +373,32 @@
               }
             });
           });
+        },
+        // Ensure option lists are loaded for all fields with options
+        // Sets an optionsLoaded property on each entity to avoid duplicate requests
+        loadFieldOptions: function(entities) {
+          var entitiesToLoad = _.transform(entities, function(entitiesToLoad, entityName) {
+            var entity = getEntity(entityName);
+            if (!('optionsLoaded' in entity)) {
+              entity.optionsLoaded = false;
+              entitiesToLoad[entityName] = [entityName, 'getFields', {
+                loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
+                where: [['options', '!=', false]],
+                select: ['options']
+              }, {name: 'options'}];
+            }
+          }, {});
+          if (!_.isEmpty(entitiesToLoad)) {
+            crmApi4(entitiesToLoad).then(function(results) {
+              _.each(results, function(fields, entityName) {
+                var entity = getEntity(entityName);
+                _.each(fields, function(options, fieldName) {
+                  _.find(entity.fields, {name: fieldName}).options = options;
+                });
+                entity.optionsLoaded = true;
+              });
+            });
+          }
         },
         pickIcon: function() {
           var deferred = $q.defer();
@@ -400,7 +452,7 @@
   // Shoehorn in a non-angular widget for picking icons
   $(function() {
     $('#crm-container').append('<div style="display:none"><input id="crm-search-admin-icon-picker"></div>');
-    CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').done(function() {
+    CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').then(function() {
       $('#crm-search-admin-icon-picker').crmIconPicker();
     });
   });

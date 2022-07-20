@@ -3141,6 +3141,7 @@ span.crm-select-item-color {
 }
 
 .crm-container.ui-dialog {
+  background-color: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
 }
 .crm-container.ui-dialog.ui-resizable:before {
@@ -3898,30 +3899,6 @@ span.crm-status-icon {
   padding: 1px 5px;
   border-radius: 3px;
   border: 1px solid grey;
-}
-
-/* search kit grid layout styling */
-.crm-search-display-grid-container {
-  display: grid;
-  grid-gap: 1em;
-  align-items: center;
-  justify-items: center;
-}
-
-.crm-search-display-grid-layout-2 {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-.crm-search-display-grid-layout-3 {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.crm-search-display-grid-layout-4 {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-.crm-search-display-grid-layout-5 {
-  grid-template-columns: repeat(5, 1fr);
 }
 
 /* Dedupe rules */

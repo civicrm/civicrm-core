@@ -187,11 +187,6 @@
       {/if}{* end of main if field name if *}
     {/foreach}
 
-    {if $isCaptcha && ( $mode eq 8 || $mode eq 4 || $mode eq 1 ) }
-      {include file='CRM/common/ReCAPTCHA.tpl'}
-      <script type="text/javascript">cj('.recaptcha_label').attr('width', '140px');</script>
-    {/if}
-
     {if $field.groupHelpPost}
       <div class="messages help">{$field.groupHelpPost}</div>
     {/if}

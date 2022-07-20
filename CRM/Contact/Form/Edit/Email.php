@@ -71,7 +71,7 @@ class CRM_Contact_Form_Edit_Email {
       //Bulkmail checkbox
       $form->assign('multipleBulk', $multipleBulk);
       $js = ['id' => 'Email_' . $blockId . '_IsBulkmail', 'aria-label' => ts('Bulk Mailing for Email %1?', [1 => $blockId])];
-      if (!$blockEdit) {
+      if (!$blockEdit && !$multipleBulk) {
         $js['onClick'] = 'singleSelect( this.id );';
       }
       $form->addElement('advcheckbox', "email[$blockId][is_bulkmail]", NULL, '', $js);

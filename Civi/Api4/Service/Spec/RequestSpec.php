@@ -50,9 +50,23 @@ class RequestSpec implements \Iterator {
     $this->entity = $entity;
     $this->action = $action;
     $this->entityTableName = CoreUtil::getTableName($entity);
-    // Set contact_type from id if possible
-    if ($entity === 'Contact' && empty($values['contact_type']) && !empty($values['id'])) {
-      $values['contact_type'] = \CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $values['id'], 'contact_id');
+
+    // If `id` given, lookup other values needed to filter custom fields
+    $customInfo = \Civi\Api4\Utils\CoreUtil::getCustomGroupExtends($entity);
+    $idCol = $customInfo['column'] ?? NULL;
+    if ($idCol && !empty($values[$idCol])) {
+      $grouping = (array) $customInfo['grouping'];
+      $lookupNeeded = array_diff($grouping, array_keys($values));
+      if ($lookupNeeded) {
+        $record = \civicrm_api4($entity, 'get', [
+          'checkPermissions' => FALSE,
+          'where' => [[$idCol, '=', $values[$idCol]]],
+          'select' => $lookupNeeded,
+        ])->first();
+        if ($record) {
+          $values += $record;
+        }
+      }
     }
     $this->values = $values;
   }
@@ -162,23 +176,26 @@ class RequestSpec implements \Iterator {
     return $this->action;
   }
 
+  #[\ReturnTypeWillChange]
   public function rewind() {
     return reset($this->fields);
   }
 
+  #[\ReturnTypeWillChange]
   public function current() {
     return current($this->fields);
   }
 
+  #[\ReturnTypeWillChange]
   public function key() {
     return key($this->fields);
   }
 
-  public function next() {
-    return next($this->fields);
+  public function next(): void {
+    next($this->fields);
   }
 
-  public function valid() {
+  public function valid(): bool {
     return key($this->fields) !== NULL;
   }
 

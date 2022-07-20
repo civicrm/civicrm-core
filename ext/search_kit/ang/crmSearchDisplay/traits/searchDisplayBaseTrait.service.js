@@ -21,6 +21,11 @@
         this.limit = this.settings.limit;
         this.sort = this.settings.sort ? _.cloneDeep(this.settings.sort) : [];
         this.seed = Date.now();
+        this.placeholders = [];
+        var placeholderCount = 'placeholder' in this.settings ? this.settings.placeholder : 5;
+        for (var p=0; p < placeholderCount; ++p) {
+          this.placeholders.push({});
+        }
 
         this.getResults = _.debounce(function() {
           $scope.$apply(function() {
@@ -28,19 +33,28 @@
           });
         }, 800);
 
-        // If search is embedded in contact summary tab, display count in tab-header
+        // Update totalCount variable if used.
+        // Integrations can pass in `total-count="somevar" to keep track of the number of results returned
+        // FIXME: Additional hack to directly update tabHeader for contact summary tab. It would be better to
+        // decouple the contactTab code into a separate directive that checks totalCount.
         var contactTab = $element.closest('.crm-contact-page .ui-tabs-panel').attr('id');
-        if (contactTab) {
-          var unwatchCount = $scope.$watch('$ctrl.rowCount', function(rowCount) {
-            if (typeof rowCount === 'number') {
-              unwatchCount();
-              CRM.tabHeader.updateCount(contactTab.replace('contact-', '#tab_'), rowCount);
+        if (contactTab || typeof ctrl.totalCount !== 'undefined') {
+          $scope.$watch('$ctrl.rowCount', function(rowCount) {
+            // Update totalCount only if no user filters are set
+            if (typeof rowCount === 'number' && angular.equals({}, ctrl.getAfformFilters())) {
+              ctrl.totalCount = rowCount;
+              if (contactTab) {
+                CRM.tabHeader.updateCount(contactTab.replace('contact-', '#tab_'), rowCount);
+              }
             }
           });
         }
 
         // Popup forms in this display or surrounding Afform trigger a refresh
-        $element.closest('form').on('crmPopupFormSuccess', this.getResults);
+        $element.closest('form').on('crmPopupFormSuccess', function() {
+          ctrl.rowCount = null;
+          ctrl.getResults();
+        });
 
         function onChangeFilters() {
           ctrl.page = 1;
@@ -76,6 +90,16 @@
         $scope.$watch('$ctrl.filters', onChangeFilters, true);
       },
 
+      hasExtraFirstColumn: function() {
+        return this.settings.actions || this.settings.draggable || (this.settings.tally && this.settings.tally.label);
+      },
+
+      getAfformFilters: function() {
+        return _.pick(this.afFieldset ? this.afFieldset.getFieldData() : {}, function(val) {
+          return val !== null && (_.includes(['boolean', 'number'], typeof val) || val.length);
+        });
+      },
+
       // Generate params for the SearchDisplay.run api
       getApiParams: function(mode) {
         return {
@@ -85,7 +109,7 @@
           sort: this.sort,
           limit: this.limit,
           seed: this.seed,
-          filters: _.assign({}, (this.afFieldset ? this.afFieldset.getFieldData() : {}), this.filters),
+          filters: _.assign({}, this.getAfformFilters(), this.filters),
           afform: this.afFieldset ? this.afFieldset.getFormName() : null
         };
       },

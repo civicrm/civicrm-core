@@ -114,6 +114,9 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if ($user && $user->getEmail() != $email) {
       $user->setEmail($email);
 
+      // Skip requirement for password when changing the current user fields
+      $user->_skipProtectedUserFieldConstraint = TRUE;
+
       if (!count($user->validate())) {
         $user->save();
       }
@@ -313,6 +316,14 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
+    /* Before we do any loading, let's start the session and write to it.
+     * We typically call authenticate only when we need to bootstrap the CMS
+     * directly via Civi and hence bypass the normal CMS auth and bootstrap
+     * process typically done in CLI and cron scripts. See: CRM-12648
+     */
+    $session = CRM_Core_Session::singleton();
+    $session->set('civicrmInitSession', TRUE);
+
     $system = new CRM_Utils_System_Drupal8();
     $system->loadBootStrap([], FALSE);
 
@@ -419,8 +430,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $kernel->preHandle($request);
     $container = $kernel->rebuildContainer();
     // Add our request to the stack and route context.
-    $request->attributes->set(\Symfony\Cmf\Component\Routing\RouteObjectInterface::ROUTE_OBJECT, new \Symfony\Component\Routing\Route('<none>'));
-    $request->attributes->set(\Symfony\Cmf\Component\Routing\RouteObjectInterface::ROUTE_NAME, '<none>');
+    $routeInterface = class_exists('\Drupal\Core\Routing\RouteObjectInterface')
+      ? '\Drupal\Core\Routing\RouteObjectInterface'
+      : '\Symfony\Cmf\Component\Routing\RouteObjectInterface';
+    $request->attributes->set($routeInterface::ROUTE_OBJECT, new \Symfony\Component\Routing\Route('<none>'));
+    $request->attributes->set($routeInterface::ROUTE_NAME, '<none>');
     $container->get('request_stack')->push($request);
     $container->get('router.request_context')->fromRequest($request);
 

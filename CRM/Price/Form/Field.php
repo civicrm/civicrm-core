@@ -435,6 +435,12 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $errors['count'] = ts('Participant Count must be greater than zero.');
     }
 
+    // Validate start/end date inputs
+    $validateDates = \CRM_Utils_Date::validateStartEndDatepickerInputs('active_on', $fields['active_on'], 'expire_on', $fields['expire_on']);
+    if ($validateDates !== TRUE) {
+      $errors[$validateDates['key']] = $validateDates['message'];
+    }
+
     if ($form->_action & CRM_Core_Action::ADD) {
       if ($fields['html_type'] != 'Text') {
         $countemptyrows = 0;

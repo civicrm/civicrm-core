@@ -19,7 +19,7 @@
 </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 {* Table for mapping data to CRM fields *}
- {include file="CRM/Contribute/Import/Form/MapTable.tpl}
+{include file="CRM/Import/Form/MapTableCommon.tpl" mapper=$form.mapper}
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
  {$initHideBoxes|smarty:nodefaults}

@@ -39,7 +39,7 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     ];
 
     $cases[] = [
-      'html' => '<af-form><af-entity type="Foo" name="foobar"/><div af-fieldset="foobar"><af-field name="propA" /><span><p><af-field name="propB" defn="{title: \'Whiz\'}" /></p></span></div></af-form>',
+      'html' => '<af-form><af-entity type="Foo" name="foobar"/><div af-fieldset="foobar" af-repeat><af-field name="propA" /><span><p><af-field name="propB" defn="{title: \'Whiz\'}" /></p></span></div></af-form>',
       'entities' => [
         'foobar' => [
           'type' => 'Foo',
@@ -51,6 +51,8 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
           'joins' => [],
           'security' => 'RBAC',
           'actions' => ['create' => 1, 'update' => 1],
+          'min' => 0,
+          'max' => NULL,
         ],
       ],
     ];
@@ -65,6 +67,8 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
           'joins' => [],
           'security' => 'RBAC',
           'actions' => ['create' => 1, 'update' => 1],
+          'min' => 1,
+          'max' => 1,
         ],
         'whiz_bang' => [
           'type' => 'Whiz',
@@ -73,12 +77,14 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
           'joins' => [],
           'security' => 'RBAC',
           'actions' => ['create' => 1, 'update' => 1],
+          'min' => 1,
+          'max' => 1,
         ],
       ],
     ];
 
     $cases[] = [
-      'html' => '<af-form><div><af-entity type="Foo" name="foobar" security="FBAC" actions="{create: false, update: true}"/></div></af-form>',
+      'html' => '<af-form><div><af-entity type="Foo" name="foobar" security="FBAC" actions="{create: false, update: true}"/><div af-fieldset="foobar" af-repeat min="1" max="2"></div></div></af-form>',
       'entities' => [
         'foobar' => [
           'type' => 'Foo',
@@ -87,6 +93,8 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
           'joins' => [],
           'security' => 'FBAC',
           'actions' => ['create' => FALSE, 'update' => TRUE],
+          'min' => 1,
+          'max' => 2,
         ],
       ],
     ];

@@ -9,12 +9,18 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+use Civi\Api4\Pledge;
+use Civi\Api4\PledgePayment;
+use Civi\Core\HookInterface;
+use Civi\Core\Event\GenericHookEvent;
+
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Pledge_BAO_PledgePayment extends CRM_Pledge_DAO_PledgePayment {
+class CRM_Pledge_BAO_PledgePayment extends CRM_Pledge_DAO_PledgePayment implements HookInterface {
 
   /**
    * Get pledge payment details.
@@ -552,43 +558,28 @@ WHERE  civicrm_pledge.id = %2
    *
    * @return int
    *   $statusId calculated status id of pledge
+   * @throws \API_Exception
    */
-  public static function calculatePledgeStatus($pledgeId) {
-    $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $pledgeStatusTypes = CRM_Pledge_BAO_Pledge::buildOptions('status_id', 'validate');
-
-    //return if the pledge is cancelled.
-    $currentPledgeStatusId = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge', $pledgeId, 'status_id', 'id', TRUE);
-    if ($currentPledgeStatusId == array_search('Cancelled', $pledgeStatusTypes)) {
-      return $currentPledgeStatusId;
+  public static function calculatePledgeStatus(int $pledgeId): int {
+    if (count(Pledge::get(FALSE)
+      ->addWhere('id', '=', $pledgeId)
+      ->addWhere('status_id:name', '=', 'Cancelled')->execute())) {
+      // Return Canceled if the pledge is cancelled.
+      return (int) CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Cancelled');
     }
 
-    // retrieve all pledge payments for this particular pledge
-    $allPledgePayments = $allStatus = [];
-    $returnProperties = ['status_id'];
-    CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'pledge_id', $pledgeId, $allPledgePayments, $returnProperties);
-
-    // build pledge payment statuses
-    foreach ($allPledgePayments as $key => $value) {
-      $allStatus[$value['id']] = $paymentStatusTypes[$value['status_id']];
+    $pledgePaymentStatuses = (array) PledgePayment::get(FALSE)->addWhere('pledge_id', '=', $pledgeId)->setSelect(['status_id', 'status_id:name'])->execute()->indexBy('status_id:name');
+    if (!empty($pledgePaymentStatuses['Overdue'])) {
+      return (int) CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Overdue');
     }
-
-    if (array_search('Overdue', $allStatus)) {
-      $statusId = array_search('Overdue', $pledgeStatusTypes);
+    if (count($pledgePaymentStatuses) === 1 && !empty($pledgePaymentStatuses['Completed'])) {
+      return (int) CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Completed');
     }
-    elseif (array_search('Completed', $allStatus)) {
-      if (count(array_count_values($allStatus)) == 1) {
-        $statusId = array_search('Completed', $pledgeStatusTypes);
-      }
-      else {
-        $statusId = array_search('In Progress', $pledgeStatusTypes);
-      }
+    if (!empty($pledgePaymentStatuses['Completed'])) {
+      // In this case some are completed but not all (or it would have returned just above).
+      return (int) CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'In Progress');
     }
-    else {
-      $statusId = array_search('Pending', $pledgeStatusTypes);
-    }
-
-    return $statusId;
+    return (int) CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Pending');
   }
 
   /**
@@ -850,6 +841,69 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
       $result = array_diff($result, ['Failed', 'In Progress']);
     }
     return $result;
+  }
+
+  /**
+   * Update pledge payments based on contribution updates.
+   *
+   * - Disconnect pledge payments from cancelled or failed contributions.
+   * - Complete Completed payments
+   *
+   * Test cover in testCancelOrderWithPledge, testCompleteTransactionUpdatePledgePayment.
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $event
+   *
+   * @throws \API_Exception
+   */
+  public static function on_hook_civicrm_post(GenericHookEvent $event): void {
+    if (!CRM_Core_Component::isEnabled('CiviPledge')) {
+      return;
+    }
+    if ($event->entity === 'Contribution' && $event->action === 'edit' && !empty($event->object->contribution_status_id)) {
+      $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $event->object->contribution_status_id);
+
+      if (!in_array($contributionStatus, ['Failed', 'Cancelled', 'Completed'], TRUE)) {
+        return;
+      }
+      $contributionID = $event->object->id;
+      if ($contributionStatus === 'Completed' && empty($event->object->total_amount)) {
+        // This is precautionary as it is likely it is always loaded in the BAO.
+        $event->object->total_amount = Contribution::get(FALSE)->addWhere('id', '=', $contributionID)->addSelect('total_amount')->execute()->first()['total_amount'];
+      }
+
+      // Check first since just doing an update could be locking under load.
+      $pledgePayment = PledgePayment::get(FALSE)
+        ->addWhere('contribution_id', '=', $contributionID)
+        ->setSelect(['id', 'pledge_id', 'scheduled_date', 'scheduled_amount', 'status_id:name', 'pledge_id.status_id'])
+        ->execute()
+        ->first();
+      if (!empty($pledgePayment)) {
+        if ($pledgePayment['status_id:name'] === 'Completed' && $contributionStatus === 'Completed') {
+          return;
+        }
+        PledgePayment::update(FALSE)->setValues([
+          'contribution_id' => $contributionStatus === 'Completed' ? $contributionID : NULL,
+          'actual_amount' => $contributionStatus === 'Completed' ? $event->object->total_amount : NULL,
+          'status_id:name' => $contributionStatus === 'Completed' ? 'Completed' : 'Pending',
+          // We need to set these fields for now because the PledgePayment::create
+          // function doesn't handled updates well at the moment. Test cover
+          // in testCancelOrderWithPledge.
+          'scheduled_date' => $pledgePayment['scheduled_date'],
+          'installment_amount' => $pledgePayment['scheduled_amount'],
+          'installments' => 1,
+          'pledge_id' => $pledgePayment['pledge_id'],
+        ])->addWhere('id', '=', $pledgePayment['id'])->execute();
+        if ($contributionStatus === 'Completed') {
+          // Check if this completes the pledge.
+          // Ideally we would listen to PledgePayment update for this.
+          // The risk could be a code loop? For now just do for completed.
+          $pledgeExpectedStatus = self::calculatePledgeStatus($pledgePayment['pledge_id']);
+          if ($pledgeExpectedStatus !== $pledgePayment['pledge_id.status_id']) {
+            Pledge::update(FALSE)->addWhere('id', '=', $pledgePayment['pledge_id'])->setValues(['status_id', '=', $pledgeExpectedStatus])->execute();
+          }
+        }
+      }
+    }
   }
 
 }

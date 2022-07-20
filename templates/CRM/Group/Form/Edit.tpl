@@ -12,7 +12,7 @@
   <div class="help">
     {if $action eq 2}
       {capture assign=crmURL}class="no-popup" href="{crmURL p="civicrm/group/search" q="reset=1&force=1&context=smog&gid=`$group.id`"}"{/capture}
-      {ts 1=$crmURL}You can edit the Name and Description for this group here. Click <a %1>Contacts in this Group</a> to view, add or remove contacts in this group.{/ts}
+      {ts 1=$crmURL|smarty:nodefaults}You can edit the Name and Description for this group here. Click <a %1>Contacts in this Group</a> to view, add or remove contacts in this group.{/ts}
     {else}
       {ts}Enter a unique name and a description for your new group here. Then click 'Continue' to find contacts to add to your new group.{/ts}
     {/if}
@@ -95,10 +95,10 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {if $action neq 1}
     <div class="action-link">
-      <a {$crmURL}><i class="crm-i fa-users" aria-hidden="true"></i> {ts}Contacts in this Group{/ts}</a>
+      <a {$crmURL|smarty:nodefaults}><i class="crm-i fa-users" aria-hidden="true"></i> {ts}Contacts in this Group{/ts}</a>
       {if $editSmartGroupURL}
         <br />
-        <a class="no-popup" href="{$editSmartGroupURL}"><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit Smart Group Criteria{/ts}</a>
+        <a class="no-popup" href="{$editSmartGroupURL|smarty:nodefaults}"><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit Smart Group Criteria{/ts}</a>
       {/if}
     </div>
   {/if}

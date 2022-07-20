@@ -11,8 +11,6 @@
 
 namespace Civi\Api4\Query;
 
-use Civi\API\Exception\UnauthorizedException;
-
 /**
  * Sql column expression
  */
@@ -27,18 +25,13 @@ class SqlField extends SqlExpression {
     $this->fields[] = $this->expr;
   }
 
-  public function render(array $fieldList): string {
-    if (!isset($fieldList[$this->expr])) {
-      throw new \API_Exception("Invalid field '{$this->expr}'");
+  public function render(Api4SelectQuery $query): string {
+    $field = $query->getField($this->expr, TRUE);
+    if (!empty($field['sql_renderer'])) {
+      $renderer = $field['sql_renderer'];
+      return $renderer($field, $query);
     }
-    if ($fieldList[$this->expr] === FALSE) {
-      throw new UnauthorizedException("Unauthorized field '{$this->expr}'");
-    }
-    if (!empty($fieldList[$this->expr]['sql_renderer'])) {
-      $renderer = $fieldList[$this->expr]['sql_renderer'];
-      return $renderer($fieldList[$this->expr]);
-    }
-    return $fieldList[$this->expr]['sql_name'];
+    return $field['sql_name'];
   }
 
   public static function getTitle(): string {

@@ -70,7 +70,7 @@
        {if call_user_func(array('CRM_Campaign_BAO_Campaign','isCampaignEnable'))}
           <td class="crm-mailing-campaign">{$row.campaign}</td>
       {/if}
-        <td>{$row.action|replace:'xx':$row.id}</td>
+        <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
       </tr>
       {/foreach}
     </table>

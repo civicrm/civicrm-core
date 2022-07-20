@@ -51,61 +51,13 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
   /**
    * Add the financial types.
    *
+   * @deprecated
    * @param array $params
-   *   Reference array contains the values submitted by the form.
    *
    * @return CRM_Financial_DAO_FinancialAccount
    */
-  public static function add(&$params) {
-    if (empty($params['id'])) {
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-      $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, FALSE);
-      $params['is_tax'] = CRM_Utils_Array::value('is_tax', $params, FALSE);
-      $params['is_header_account'] = CRM_Utils_Array::value('is_header_account', $params, FALSE);
-      $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
-    }
-    if (!empty($params['id'])
-      && !empty($params['financial_account_type_id'])
-      && CRM_Financial_BAO_FinancialAccount::validateFinancialAccount(
-        $params['id'],
-        $params['financial_account_type_id']
-      )
-    ) {
-      throw new CRM_Core_Exception(ts('You cannot change the account type since this financial account refers to a financial item having an account type of Revenue/Liability.'));
-    }
-    if (!empty($params['is_default'])) {
-      $query = 'UPDATE civicrm_financial_account SET is_default = 0 WHERE financial_account_type_id = %1';
-      $queryParams = [1 => [$params['financial_account_type_id'], 'Integer']];
-      CRM_Core_DAO::executeQuery($query, $queryParams);
-    }
-
-    // action is taken depending upon the mode
-    $financialAccount = new CRM_Financial_DAO_FinancialAccount();
-
-    // invoke pre hook
-    $op = 'create';
-    if (!empty($params['id'])) {
-      $op = 'edit';
-    }
-    CRM_Utils_Hook::pre($op, 'FinancialAccount', CRM_Utils_Array::value('id', $params), $params);
-
-    if (!empty($params['id'])) {
-      $financialAccount->id = $params['id'];
-      $financialAccount->find(TRUE);
-    }
-
-    $financialAccount->copyValues($params);
-    $financialAccount->save();
-
-    // invoke post hook
-    $op = 'create';
-    if (!empty($params['id'])) {
-      $op = 'edit';
-    }
-    CRM_Utils_Hook::post($op, 'FinancialAccount', $financialAccount->id, $financialAccount);
-    CRM_Core_PseudoConstant::flush();
-
-    return $financialAccount;
+  public static function add($params) {
+    return self::writeRecord($params);
   }
 
   /**
@@ -113,6 +65,8 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    *
    * @deprecated
    * @param int $financialAccountId
+   *
+   * @return bool
    */
   public static function del($financialAccountId) {
     try {
@@ -148,6 +102,34 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
         }
       }
     }
+    if ($event->action === 'create' || $event->action === 'edit') {
+      $params = $event->params;
+      if (!empty($params['id'])
+        && !empty($params['financial_account_type_id'])
+        && CRM_Financial_BAO_FinancialAccount::validateFinancialAccount(
+          $params['id'],
+          $params['financial_account_type_id']
+        )
+      ) {
+        throw new CRM_Core_Exception(ts('You cannot change the account type since this financial account refers to a financial item having an account type of Revenue/Liability.'));
+      }
+      if (!empty($params['is_default'])) {
+        if (empty($params['financial_account_type_id'])) {
+          $params['financial_account_type_id'] = CRM_Core_DAO::getFieldValue(__CLASS__, $params['id'], 'financial_account_type_id');
+        }
+        $query = 'UPDATE civicrm_financial_account SET is_default = 0 WHERE financial_account_type_id = %1';
+        $queryParams = [1 => [$params['financial_account_type_id'], 'Integer']];
+        CRM_Core_DAO::executeQuery($query, $queryParams);
+      }
+    }
+  }
+
+  /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    CRM_Core_PseudoConstant::flush();
   }
 
   /**

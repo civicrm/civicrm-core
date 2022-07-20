@@ -35,9 +35,18 @@
              <td>{ts}{$contactTypeName}{/ts} {ts}(built-in){/ts}</td>
            {/if}
    </tr>
-   <tr class="crm-contact-type-form-block-image_URL">
-      <td class="label">{$form.image_URL.label} {help id="id-image_URL"}</td>
-      <td>{$form.image_URL.html|crmAddClass:'huge40'}</td>
+   {if $hasImageUrl}
+     <tr class="crm-contact-type-form-block-image_URL">
+        <td class="label">{$form.image_URL.label}</td>
+        <td>{$form.image_URL.html|crmAddClass:'huge40'}</td>
+     </tr>
+     <tr class="description status-warning">
+       <td></td><td>{ts}Support for Image URL will be dropped in the future. Please select an icon instead.{/ts}</td>
+     </tr>
+   {/if}
+   <tr class="crm-contact-type-form-block-icon">
+     <td class="label">{$form.icon.label}</td>
+     <td>{$form.icon.html}</td>
    </tr>
    <tr class="crm-contact-type-form-block-description">
      <td class="label">{$form.description.label}

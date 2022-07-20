@@ -106,7 +106,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
    * @throws \API_Exception
    */
   public function testContactTypeInfo() {
-    $blahType = ['is_active' => 0, 'name' => 'blah', 'label' => 'blah blah', 'parent_id:name' => 'Individual'];
+    $blahType = ['is_active' => 0, 'name' => 'blah', 'label' => 'blah blah', 'parent_id:name' => 'Individual', 'icon' => 'fa-random'];
     $createdType = ContactType::create()->setValues($blahType)->execute()->first();
     $activeTypes = CRM_Contact_BAO_ContactType::contactTypeInfo();
     $expected = $this->getExpectedContactTypes();
@@ -123,6 +123,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
       'parent_label' => 'Individual',
       'description' => '',
       'image_URL' => '',
+      'icon' => 'fa-random',
     ];
     $this->assertEquals($expected, $allTypes);
   }
@@ -146,6 +147,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent' => NULL,
           'parent_label' => NULL,
           'image_URL' => '',
+          'icon' => 'fa-user',
         ],
       'Household' =>
         [
@@ -159,6 +161,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent' => NULL,
           'parent_label' => NULL,
           'image_URL' => '',
+          'icon' => 'fa-home',
         ],
       'Organization' =>
         [
@@ -172,6 +175,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent' => NULL,
           'parent_label' => NULL,
           'image_URL' => '',
+          'icon' => 'fa-building',
         ],
       'Student' =>
         [
@@ -185,6 +189,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent' => 'Individual',
           'parent_label' => 'Individual',
           'image_URL' => '',
+          'icon' => 'fa-graduation-cap',
         ],
       'Parent' =>
         [
@@ -198,6 +203,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent' => 'Individual',
           'parent_label' => 'Individual',
           'image_URL' => '',
+          'icon' => 'fa-user-circle-o',
         ],
       'Staff' =>
         [
@@ -211,6 +217,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent' => 'Individual',
           'parent_label' => 'Individual',
           'image_URL' => '',
+          'icon' => 'fa-id-badge',
         ],
       'Team' =>
         [
@@ -224,6 +231,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent' => 'Organization',
           'parent_label' => 'Organization',
           'image_URL' => '',
+          'icon' => 'fa-users',
         ],
       'Sponsor' =>
         [
@@ -237,6 +245,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent' => 'Organization',
           'parent_label' => 'Organization',
           'image_URL' => '',
+          'icon' => 'fa-leaf',
         ],
       'sub1_individual' =>
         [
@@ -250,6 +259,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent' => 'Individual',
           'parent_label' => 'Individual',
           'image_URL' => '',
+          'icon' => '',
         ],
       'sub2_individual' =>
         [
@@ -263,6 +273,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent' => 'Individual',
           'parent_label' => 'Individual',
           'image_URL' => '',
+          'icon' => '',
         ],
       'sub_organization' =>
         [
@@ -276,6 +287,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent' => 'Organization',
           'parent_label' => 'Organization',
           'image_URL' => '',
+          'icon' => '',
         ],
       'sub_household' =>
         [
@@ -289,6 +301,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent' => 'Household',
           'parent_label' => 'Household',
           'image_URL' => '',
+          'icon' => '',
         ],
     ];
   }

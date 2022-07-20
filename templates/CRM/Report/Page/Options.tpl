@@ -43,7 +43,7 @@
             <td class="crm-report-optionList-label crm-editable" data-field="label">{$row.label}</td>
             <td class="crm-report-optionList-value">{$row.value}</td>
             <td class="crm-report-optionList-description">{$row.description}</td>
-            <td class="nowrap crm-report-optionList-order">{$row.weight}</td>
+            <td class="nowrap crm-report-optionList-order">{$row.weight|smarty:nodefaults}</td>
             {if !empty($showIsDefault)}
               <td class="crm-report-optionList-default_value">{$row.default_value}</td>
             {/if}

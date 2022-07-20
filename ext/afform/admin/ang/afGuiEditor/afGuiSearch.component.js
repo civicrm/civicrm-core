@@ -157,11 +157,11 @@
         $scope.elementList.length = 0;
         $scope.elementTitles.length = 0;
         _.each(afGui.meta.elements, function(element, name) {
-          if (!search || _.contains(name, search) || _.contains(element.title.toLowerCase(), search)) {
+          if (
+            (!element.afform_type || _.contains(element.afform_type, 'search')) &&
+            (!search || _.contains(name, search) || _.contains(element.title.toLowerCase(), search))
+          ) {
             var node = _.cloneDeep(element.element);
-            if (name === 'fieldset') {
-              return;
-            }
             $scope.elementList.push(node);
             $scope.elementTitles.push(element.title);
           }

@@ -373,7 +373,7 @@ class CRM_Core_Action {
    */
   public static function &replace(&$str, &$values) {
     foreach ($values as $n => $v) {
-      $str = str_replace("%%$n%%", $v, $str);
+      $str = str_replace("%%$n%%", ($v ?? ''), ($str ?? ''));
     }
     return $str;
   }

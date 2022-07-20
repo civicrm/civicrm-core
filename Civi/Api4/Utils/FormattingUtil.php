@@ -30,7 +30,7 @@ class FormattingUtil {
   /**
    * @var string[]
    */
-  public static $pseudoConstantSuffixes = ['name', 'abbr', 'label', 'color', 'description', 'icon'];
+  public static $pseudoConstantSuffixes = ['name', 'abbr', 'label', 'color', 'description', 'icon', 'grouping'];
 
   /**
    * Massage values into the format the BAO expects for a write operation
@@ -89,7 +89,7 @@ class FormattingUtil {
    */
   public static function formatInputValue(&$value, ?string $fieldName, array $fieldSpec, &$operator = NULL, $index = NULL) {
     // Evaluate pseudoconstant suffix
-    $suffix = strpos($fieldName, ':');
+    $suffix = strpos(($fieldName ?? ''), ':');
     if ($suffix) {
       $options = self::getPseudoconstantList($fieldSpec, $fieldName, [], $operator ? 'get' : 'create');
       $value = self::replacePseudoconstant($options, $value, TRUE);
@@ -145,7 +145,7 @@ class FormattingUtil {
   public static function formatDateValue($format, $value, &$operator = NULL, $index = NULL) {
     // Non-relative dates (or if no search operator)
     if (!$operator || !array_key_exists($value, \CRM_Core_OptionGroup::values('relative_date_filters'))) {
-      return date($format, strtotime($value));
+      return date($format, strtotime($value ?? ''));
     }
     if (isset($index) && !strstr($operator, 'BETWEEN')) {
       throw new \API_Exception("Relative dates cannot be in an array using the $operator operator.");
@@ -192,12 +192,11 @@ class FormattingUtil {
    * @throws \CRM_Core_Exception
    */
   public static function formatOutputValues(&$results, $fields, $action = 'get', $selectAliases = []) {
-    $fieldOptions = [];
     foreach ($results as &$result) {
       $contactTypePaths = [];
       foreach ($result as $key => $value) {
         $fieldExpr = SqlExpression::convert($selectAliases[$key] ?? $key);
-        $fieldName = \CRM_Utils_Array::first($fieldExpr->getFields());
+        $fieldName = \CRM_Utils_Array::first($fieldExpr->getFields() ?? '');
         $baseName = $fieldName ? \CRM_Utils_Array::first(explode(':', $fieldName)) : NULL;
         $field = $fields[$fieldName] ?? $fields[$baseName] ?? NULL;
         $dataType = $field['data_type'] ?? ($fieldName == 'id' ? 'Integer' : NULL);
@@ -210,17 +209,18 @@ class FormattingUtil {
           $dataType = NULL;
         }
         // Evaluate pseudoconstant suffixes
-        $suffix = strrpos($fieldName, ':');
+        $suffix = strrpos(($fieldName ?? ''), ':');
+        $fieldOptions = NULL;
         if ($suffix) {
-          $fieldOptions[$fieldName] = $fieldOptions[$fieldName] ?? self::getPseudoconstantList($field, $fieldName, $result, $action);
+          $fieldOptions = self::getPseudoconstantList($field, $fieldName, $result, $action);
           $dataType = NULL;
         }
         if ($fieldExpr->supportsExpansion) {
           if (!empty($field['serialize']) && is_string($value)) {
             $value = \CRM_Core_DAO::unSerializeField($value, $field['serialize']);
           }
-          if (isset($fieldOptions[$fieldName])) {
-            $value = self::replacePseudoconstant($fieldOptions[$fieldName], $value);
+          if (isset($fieldOptions)) {
+            $value = self::replacePseudoconstant($fieldOptions, $value);
           }
         }
         // Keep track of contact types for self::contactFieldsToRemove

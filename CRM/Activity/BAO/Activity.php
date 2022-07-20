@@ -523,7 +523,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     // if the subject contains a ‘[case #…]’ string, file that activity on the related case (CRM-5916)
     $matches = [];
-    $subjectToMatch = $params['subject'] ?? NULL;
+    $subjectToMatch = $params['subject'] ?? '';
     if (preg_match('/\[case #([0-9a-h]{7})\]/', $subjectToMatch, $matches)) {
       $key = CRM_Core_DAO::escapeString(CIVICRM_SITE_KEY);
       $hash = $matches[1];
@@ -947,7 +947,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    */
   public static function createEmailActivity($sourceContactID, $subject, $html, $text, $additionalDetails, $campaignID, $attachments, $caseID) {
     $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email');
-
+    CRM_Core_Error::deprecatedFunctionWarning('none');
     // CRM-6265: save both text and HTML parts in details (if present)
     if ($html and $text) {
       $details = "-ALTERNATIVE ITEM 0-\n{$html}{$additionalDetails}\n-ALTERNATIVE ITEM 1-\n{$text}{$additionalDetails}\n-ALTERNATIVE END-\n";
@@ -1040,11 +1040,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     $campaignId = NULL,
     $caseId = NULL
   ) {
-    // @todo add noisy deprecation.
-    // This function is no longer called from core.
-    // I just left off the noisy deprecation for now as there
-    // are already a lot of other noisy deprecation points in 5.43.
-    // get the contact details of logged in contact, which we set as from email
+    CRM_Core_Error::deprecatedFunctionWarning('none');
     if ($userID == NULL) {
       $userID = CRM_Core_Session::getLoggedInContactID();
     }
@@ -1088,13 +1084,11 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       }
 
       $tokenSubject = $subject;
-      $tokenText = in_array($values['preferred_mail_format'], ['Both', 'Text'], TRUE) ? $text : '';
-      $tokenHtml = in_array($values['preferred_mail_format'], ['Both', 'HTML'], TRUE) ? $html : '';
 
       $renderedTemplate = CRM_Core_BAO_MessageTemplate::renderTemplate([
         'messageTemplate' => [
-          'msg_text' => $tokenText,
-          'msg_html' => $tokenHtml,
+          'msg_text' => $text,
+          'msg_html' => $html,
           'msg_subject' => $tokenSubject,
         ],
         'tokenContext' => $tokenContext,
@@ -1401,6 +1395,7 @@ WHERE entity_id =%1 AND entity_table = %2";
     $cc = NULL,
     $bcc = NULL
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('none');
     [$toDisplayName, $toEmail, $toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($toID);
     if ($emailAddress) {
       $toEmail = trim($emailAddress);
@@ -1454,7 +1449,7 @@ WHERE entity_id =%1 AND entity_table = %2";
    * next week or so, before this can be called complete.
    *
    * @param bool $status
-   *
+   * @deprecated
    * @return array
    *   array of importable Fields
    */
@@ -2795,6 +2790,27 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
       ['key' => 'activity_type_id', 'value' => ts('Activity Type')],
       ['key' => 'status_id', 'value' => ts('Activity Status')],
     ];
+  }
+
+  /**
+   * Get icon for a particular activity (based on type).
+   *
+   * Example: `CRM_Activity_BAO_Activity::getIcon('Activity', 123)`
+   *
+   * @param string $entityName
+   *   Always "Activity".
+   * @param int $entityId
+   *   Id of the activity.
+   * @throws CRM_Core_Exception
+   */
+  public static function getEntityIcon(string $entityName, int $entityId) {
+    $field = Civi\Api4\Activity::getFields(FALSE)
+      ->addWhere('name', '=', 'activity_type_id')
+      ->setLoadOptions(['id', 'label', 'icon'])
+      ->execute()->single();
+    $activityTypes = array_column($field['options'], NULL, 'id');
+    $activityType = CRM_Core_DAO::getFieldValue(parent::class, $entityId, 'activity_type_id');
+    return $activityTypes[$activityType]['icon'] ?? self::$_icon;
   }
 
 }

@@ -19,12 +19,12 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class IndexTest extends UnitTestCase {
+class IndexTest extends Api4TestBase {
 
   public function testIndex() {
     // Results indexed by name

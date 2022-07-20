@@ -48,6 +48,13 @@ class AngularLoader {
   protected $region;
 
   /**
+   * @var array
+   * When adding supplimental modules via snippet,
+   * these modules are already loaded.
+   */
+  protected $modulesAlreadyLoaded = [];
+
+  /**
    * @var string
    *   Ex: 'civicrm/a'.
    */
@@ -73,6 +80,12 @@ class AngularLoader {
     $this->region = \CRM_Utils_Request::retrieve('snippet', 'String') ? 'ajax-snippet' : 'html-header';
     $this->pageName = \CRM_Utils_System::currentPath();
     $this->modules = [];
+    // List of already-present modules may be provided by crmSnippet (see crm.ajax.js)
+    if ($this->region === 'ajax-snippet' && !empty($_GET['crmAngularModules'])) {
+      $this->modulesAlreadyLoaded = explode(',', $_GET['crmAngularModules']);
+    }
+    // Ensure region exists
+    \CRM_Core_Region::instance($this->region);
   }
 
   /**
@@ -85,13 +98,13 @@ class AngularLoader {
    */
   public function load() {
     \CRM_Core_Error::deprecatedFunctionWarning('angularjs.loader service');
-    return $this->loadAngularResources();
+    $this->loadAngularResources();
+    return $this;
   }
 
   /**
    * Load scripts, styles & settings for the active modules.
    *
-   * @return $this
    * @throws \CRM_Core_Exception
    */
   private function loadAngularResources() {
@@ -115,7 +128,13 @@ class AngularLoader {
       ]);
     }
 
-    $moduleNames = $this->findActiveModules();
+    $allModules = $this->findActiveModules();
+    $moduleNames = array_values(array_diff($allModules, $this->modulesAlreadyLoaded));
+
+    if (!$moduleNames && $this->modulesAlreadyLoaded) {
+      // No modules to load
+      return;
+    }
     if (!$this->isAllModules($moduleNames)) {
       $assetParams = ['modules' => implode(',', $moduleNames)];
     }
@@ -124,7 +143,7 @@ class AngularLoader {
       $assetParams = ['nonce' => md5(implode(',', $moduleNames))];
     }
 
-    $res->addSettingsFactory(function () use (&$moduleNames, $angular, $res, $assetParams) {
+    $res->addSettingsFactory(function () use (&$moduleNames, $angular, $res, $assetParams, $allModules) {
       // Merge static settings with the results of settingsFactory functions
       $settingsByModule = $angular->getResources($moduleNames, 'settings', 'settings');
       foreach ($angular->getResources($moduleNames, 'settingsFactory', 'settingsFactory') as $moduleName => $factory) {
@@ -144,7 +163,7 @@ class AngularLoader {
       return array_merge($settingsByModule, ['permissions' => $permissions], [
         'resourceUrls' => \CRM_Extension_System::singleton()->getMapper()->getActiveModuleUrls(),
         'angular' => [
-          'modules' => $moduleNames,
+          'modules' => $allModules,
           'requires' => $angular->getResources($moduleNames, 'requires', 'requires'),
           'cacheCode' => $res->getCacheCode(),
           'bundleUrl' => \Civi::service('asset_builder')->getUrl('angular-modules.json', $assetParams),
@@ -152,13 +171,17 @@ class AngularLoader {
       ]);
     });
 
-    $res->addScriptFile('civicrm', 'bower_components/angular/angular.min.js', 100, $this->getRegion(), FALSE);
+    if (!$this->modulesAlreadyLoaded) {
+      $res->addScriptFile('civicrm', 'bower_components/angular/angular.min.js', 100, $this->getRegion(), FALSE);
+    }
 
     $headOffset = 0;
     $config = \CRM_Core_Config::singleton();
-    if ($config->debug) {
-      // FIXME: The `resetLocationProviderHashPrefix.js` has to stay in sync with `\Civi\Angular\Page\Modules::buildAngularModules()`.
-      $res->addScriptFile('civicrm', 'ang/resetLocationProviderHashPrefix.js', 101, $this->getRegion(), FALSE);
+    if ($config->debug || $this->modulesAlreadyLoaded) {
+      if (!$this->modulesAlreadyLoaded) {
+        // FIXME: The `resetLocationProviderHashPrefix.js` has to stay in sync with `\Civi\Angular\Page\Modules::buildAngularModules()`.
+        $res->addScriptFile('civicrm', 'ang/resetLocationProviderHashPrefix.js', 101, $this->getRegion(), FALSE);
+      }
       foreach ($moduleNames as $moduleName) {
         foreach ($this->angular->getResources($moduleName, 'css', 'cacheUrl') as $url) {
           $res->addStyleUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), $this->getRegion());
@@ -187,11 +210,11 @@ class AngularLoader {
       }
     }
     // Add bundles
-    foreach ($this->angular->getResources($moduleNames, 'bundles', 'bundles') as $bundles) {
-      $res->addBundle($bundles);
+    if (!$this->modulesAlreadyLoaded) {
+      foreach ($this->angular->getResources($moduleNames, 'bundles', 'bundles') as $bundles) {
+        $res->addBundle($bundles);
+      }
     }
-
-    return $this;
   }
 
   /**
@@ -366,7 +389,9 @@ class AngularLoader {
   public function onRegionRender($e) {
     if ($e->region->_name === $this->region && ($this->modules || $this->crmApp)) {
       $this->loadAngularResources();
-      $this->res->addScriptFile('civicrm', 'js/crm-angularjs-loader.js', 200, $this->getRegion(), FALSE);
+      if (!$this->modulesAlreadyLoaded) {
+        $this->res->addScriptFile('civicrm', 'js/crm-angularjs-loader.js', 200, $this->getRegion(), FALSE);
+      }
     }
   }
 

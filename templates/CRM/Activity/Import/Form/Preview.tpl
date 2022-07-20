@@ -25,17 +25,10 @@
         </p>
     {/if}
 
-    {if $conflictRowCount}
-        <p class="error">
-        {ts 1=$conflictRowCount 2=$downloadConflictRecordsUrl}CiviCRM has detected %1 records with conflicting transaction ids within this data file. If you continue, these records will be skipped. OR, you can download a file with just these problem records - <a href='%2'>Download Conflicts</a>. Then correct them in the original import file, cancel this import and begin again at step 1.{/ts}
-        </p>
-    {/if}
-
-
     <p>{ts}Click 'Import Now' if you are ready to proceed.{/ts}</p>
  </div>
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
- {include file="CRM/common/importProgress.tpl"}
+
  {* Summary Preview (record counts) *}
  <table id="preview-counts" class="report">
     <tr><td class="label crm-grid-cell">{ts}Total Rows{/ts}</td>
@@ -54,17 +47,6 @@
     </tr>
     {/if}
 
-   {if $conflictRowCount}
-    <tr class="error"><td class="label crm-grid-cell">{ts}Conflicting Rows{/ts}</td>
-        <td class="data">{$conflictRowCount}</td>
-        <td class="explanation">{ts}Rows with conflicting transaction ids within this file. These rows will be skipped (not imported).{/ts}
-            {if $conflictRowCount}
-                <p><a href="{$downloadConflictRecordsUrl}">{ts}Download Conflicts{/ts}</a></p>
-            {/if}
-        </td>
-    </tr>
-    {/if}
-
     <tr><td class="label crm-grid-cell">{ts}Valid Rows{/ts}</td>
         <td class="data">{$validRowCount}</td>
         <td class="explanation">{ts}Total rows to be imported.{/ts}</td>
@@ -73,7 +55,7 @@
  <br />
 
  {* Table for mapping preview *}
- {include file="CRM/Activity/Import/Form/MapTable.tpl}
+ {include file="CRM/Import/Form/MapTableCommon.tpl"}
  <br />
 
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

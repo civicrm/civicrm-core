@@ -106,13 +106,13 @@ abstract class SqlFunction extends SqlExpression {
   /**
    * Render the expression for insertion into the sql query
    *
-   * @param array $fieldList
+   * @param Civi\Api4\Query\Api4SelectQuery $query
    * @return string
    */
-  public function render(array $fieldList): string {
+  public function render(Api4SelectQuery $query): string {
     $output = '';
     foreach ($this->args as $arg) {
-      $rendered = $this->renderArg($arg, $fieldList);
+      $rendered = $this->renderArg($arg, $query);
       if (strlen($rendered)) {
         $output .= (strlen($output) ? ' ' : '') . $rendered;
       }
@@ -122,16 +122,16 @@ abstract class SqlFunction extends SqlExpression {
 
   /**
    * @param array $arg
-   * @param array $fieldList
+   * @param Civi\Api4\Query\Api4SelectQuery $query
    * @return string
    */
-  private function renderArg($arg, $fieldList): string {
+  private function renderArg($arg, Api4SelectQuery $query): string {
     $rendered = implode(' ', $arg['prefix']);
     foreach ($arg['expr'] ?? [] as $idx => $expr) {
       if (strlen($rendered) || $idx) {
         $rendered .= $idx ? ', ' : ' ';
       }
-      $rendered .= $expr->render($fieldList);
+      $rendered .= $expr->render($query);
     }
     if ($arg['suffix']) {
       $rendered .= (strlen($rendered) ? ' ' : '') . implode(' ', $arg['suffix']);

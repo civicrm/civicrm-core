@@ -36,7 +36,7 @@
     <name>source_record_id</name>
     <type>int unsigned</type>
     <title>Source Record</title>
-    <comment>Artificial FK to original transaction (e.g. contribution) IF it is not an Activity. Table can be figured out through activity_type_id, and further through component registry.</comment>
+    <comment>Artificial FK to original transaction (e.g. contribution) IF it is not an Activity. Entity table is discovered by filtering by the appropriate activity_type_id.</comment>
     <readonly>true</readonly>
     <add>2.0</add>
   </field>
@@ -217,7 +217,7 @@
     <name>parent_id</name>
     <title>Parent Activity ID</title>
     <type>int unsigned</type>
-    <comment>Parent meeting ID (if this is a follow-up item). This is not currently implemented</comment>
+    <comment>Parent meeting ID (if this is a follow-up item).</comment>
     <readonly>true</readonly>
     <html>
       <label>Parent Activity</label>
@@ -237,6 +237,7 @@
     <uniqueName>activity_is_test</uniqueName>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <import>true</import>
     <headerPattern>/(is.)?test(.activity)?/i</headerPattern>
     <add>2.0</add>
@@ -270,6 +271,7 @@
     <title>Auto</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <add>2.2</add>
   </field>
   <field>
@@ -294,6 +296,7 @@
     <title>Is this activity a current revision in versioning chain?</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <import>true</import>
     <headerPattern>/(is.)?(current.)?(revision|version(ing)?)/i</headerPattern>
     <add>2.2</add>
@@ -336,6 +339,7 @@
     <title>Activity is in the Trash</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <import>true</import>
     <headerPattern>/(activity.)?(trash|deleted)/i</headerPattern>
     <add>2.2</add>
@@ -400,6 +404,7 @@
     <title>Is Starred</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <import>true</import>
     <comment>Activity marked as favorite.</comment>
     <headerPattern>/(activity.)?(star|favorite)/i</headerPattern>

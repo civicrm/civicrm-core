@@ -46,6 +46,8 @@ class Admin {
       'defaultPagerSize' => \Civi::settings()->get('default_pager_size'),
       'defaultDisplay' => SearchDisplay::getDefault(FALSE)->setSavedSearch(['id' => NULL])->execute()->first(),
       'modules' => $extensions,
+      'defaultContactType' => \CRM_Contact_BAO_ContactType::basicTypeInfo()['Individual']['name'] ?? NULL,
+      'defaultDistanceUnit' => \CRM_Utils_Address::getDefaultDistanceUnit(),
       'tags' => Tag::get()
         ->addSelect('id', 'name', 'color', 'is_selectable', 'description')
         ->addWhere('used_for', 'CONTAINS', 'civicrm_saved_search')
@@ -135,7 +137,7 @@ class Admin {
           $entity['links'] = array_values($links);
         }
         $getFields = civicrm_api4($entity['name'], 'getFields', [
-          'select' => ['name', 'title', 'label', 'description', 'type', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'readonly', 'operators', 'nullable'],
+          'select' => ['name', 'title', 'label', 'description', 'type', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'readonly', 'operators', 'suffixes', 'nullable'],
           'where' => [['name', 'NOT IN', ['api_key', 'hash']]],
           'orderBy' => ['label'],
         ]);
@@ -240,7 +242,7 @@ class Admin {
         $bridge = in_array('EntityBridge', $entity['type']) ? $entity['name'] : NULL;
 
         // Non-bridge joins directly between 2 entities
-        if (!$bridge) {
+        if ($entity['searchable'] !== 'bridge') {
           foreach ($references as $reference) {
             $keyField = $fields[$reference->getReferenceKey()] ?? NULL;
             if (
@@ -288,7 +290,7 @@ class Admin {
           }
         }
         // Bridge joins go through an intermediary table
-        elseif (!empty($entity['bridge'])) {
+        if ($bridge && !empty($entity['bridge'])) {
           foreach ($entity['bridge'] as $targetKey => $bridgeInfo) {
             $baseKey = $bridgeInfo['to'];
             $reference = self::getReference($targetKey, $references);

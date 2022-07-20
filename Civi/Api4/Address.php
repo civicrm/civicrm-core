@@ -54,4 +54,13 @@ class Address extends Generic\DAOEntity {
       ->setCheckPermissions($checkPermissions);
   }
 
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Address\GetCoordinates
+   */
+  public static function getCoordinates($checkPermissions = TRUE) {
+    return (new Action\Address\GetCoordinates(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
 }

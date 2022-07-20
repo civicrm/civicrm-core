@@ -22,37 +22,45 @@
 class CRM_Upgrade_Incremental_php_FiveFortyNine extends CRM_Upgrade_Incremental_Base {
 
   /**
-   * @var string[][]
-   * Array (keyed by tableName) of boolean columns to make NOT NULL.
-   * @see self::changeBooleanColumn
+   * When executing 5.49.2 upgrade-step, it decides whether to fix limit-to. Remember that decision.
+   *
+   * Note: You cannot _generally_ use object-properties to communicate between functions in this class
+   * (because they reset in diff AJAX requests).
+   *
+   * However, you can _specifically_ communicate between `upgrade_N_N_N()` and `setPostUpgradeMessage()`.
+   * This is because they are guaranteed to run in the same call (as part of `doIncrementalUpgradeStep()`).
+   *
+   * @var bool|null
    */
-  private $booleanColumns = [
-    'civicrm_event' => [
-      'is_public' => "DEFAULT 1 COMMENT 'Public events will be included in the iCal feeds. Access to private event information may be limited using ACLs.'",
-      'is_online_registration' => "DEFAULT 0 COMMENT 'If true, include registration link on Event Info page.'",
-      'is_monetary' => "DEFAULT 0 COMMENT 'If true, one or more fee amounts must be set and a Payment Processor must be configured for Online Event Registration.'",
-      'is_map' => "DEFAULT 0 COMMENT 'Include a map block on the Event Information page when geocode info is available and a mapping provider has been specified?'",
-      'is_active' => "DEFAULT 0 COMMENT 'Is this Event enabled or disabled/cancelled?'",
-      'is_show_location' => "DEFAULT 1 COMMENT 'If true, show event location.'",
-      'is_email_confirm' => "DEFAULT 0 COMMENT 'If true, confirmation is automatically emailed to contact on successful registration.'",
-      'is_pay_later' => "DEFAULT 0 COMMENT 'if true - allows the user to send payment directly to the org later'",
-      'is_partial_payment' => "DEFAULT 0 COMMENT 'is partial payment enabled for this event'",
-      'is_multiple_registrations' => "DEFAULT 0 COMMENT 'if true - allows the user to register multiple participants for event'",
-      'allow_same_participant_emails' => "DEFAULT 0 COMMENT 'if true - allows the user to register multiple registrations from same email address.'",
-      'has_waitlist' => "DEFAULT 0 COMMENT 'Whether the event has waitlist support.'",
-      'requires_approval' => "DEFAULT 0 COMMENT 'Whether participants require approval before they can finish registering.'",
-      'allow_selfcancelxfer' => "DEFAULT 0 COMMENT 'Allow self service cancellation or transfer for event?'",
-      'is_template' => "DEFAULT 0 COMMENT 'whether the event has template'",
-      'is_share' => "DEFAULT 1 COMMENT 'Can people share the event through social media?'",
-      'is_confirm_enabled' => "DEFAULT 1 COMMENT 'If false, the event booking confirmation screen gets skipped'",
-      'is_billing_required' => "DEFAULT 0 COMMENT 'if true than billing block is required this event'",
-    ],
-    'civicrm_contribution' => [
-      'is_test' => "DEFAULT 0",
-      'is_pay_later' => "DEFAULT 0",
-      'is_template' => "DEFAULT 0 COMMENT 'Shows this is a template for recurring contributions.'",
-    ],
-  ];
+  private $executedLimitToFix;
+
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+    $willExecuteLimitToFix = (bool) version_compare(CRM_Core_BAO_Domain::version(), '5.49.beta1', '>=');
+    if ($rev == '5.49.2' && $willExecuteLimitToFix) {
+      $message = $this->createLimitToMessage();
+      if ($message) {
+        $preUpgradeMessage .= "<p>{$message}</p>";
+      }
+    }
+  }
+
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+    if ($rev == '5.49.2' && $this->executedLimitToFix === TRUE) {
+      $message = $this->createLimitToMessage();
+      if ($message) {
+        $postUpgradeMessage .= "<p><strong>" . ts('WARNING') . "</strong>: {$message}</p>";
+      }
+    }
+  }
+
+  public static function findBooleanColumns(): array {
+    $r = [];
+    $files = CRM_Utils_File::findFiles(__DIR__ . '/FiveFortyNine', '*.bool.php');
+    foreach ($files as $file) {
+      $r = array_merge($r, require $file);
+    }
+    return $r;
+  }
 
   /**
    * Upgrade step; adds tasks including 'runSql'.
@@ -61,12 +69,69 @@ class CRM_Upgrade_Incremental_php_FiveFortyNine extends CRM_Upgrade_Incremental_
    *   The version number matching this function name
    */
   public function upgrade_5_49_alpha1($rev): void {
+    $this->addTask('Add civicrm_contact_type.icon column', 'addColumn',
+      'civicrm_contact_type', 'icon', "varchar(255) DEFAULT NULL COMMENT 'crm-i icon class representing this contact type'"
+    );
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-    foreach ($this->booleanColumns as $tableName => $columns) {
+    $this->addTask('Add civicrm_option_group.option_value_fields column', 'addColumn',
+      'civicrm_option_group', 'option_value_fields', "varchar(128) DEFAULT \"name,label,description\" COMMENT 'Which optional columns from the option_value table are in use by this group.'");
+    $this->addTask('Populate civicrm_option_group.option_value_fields column', 'fillOptionValueFields');
+  }
+
+  /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_5_49_beta1($rev): void {
+    foreach (static::findBooleanColumns() as $tableName => $columns) {
       foreach ($columns as $columnName => $defn) {
         $this->addTask("Update $tableName.$columnName to be NOT NULL", 'changeBooleanColumn', $tableName, $columnName, $defn);
       }
     }
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $currentRev
+   *   DB revision (which we are currently applying)
+   * @param string $startRev
+   *   DB revision (when the upgrade started)
+   * @param string $finalRev
+   *   DB revision (that we're aiming to reach, in the end)
+   */
+  public function upgrade_5_49_2($currentRev, $startRev, $finalRev) {
+    if (empty($startRev)) {
+      throw new \RuntimeException("Error: Was somebody too clever about modifying the upgrader? We're missing a little-known but very-handy parameter!");
+    }
+    $this->executedLimitToFix = (bool) version_compare($startRev, '5.49.beta1', '>=');
+    if ($this->executedLimitToFix) {
+      $this->addTask('Update "civicrm_action_schedule.limit_to" to re-enable "NULL" values', 'changeBooleanColumnLimitTo');
+    }
+  }
+
+  public function createLimitToMessage(): ?string {
+    $suspectRecords = CRM_Core_DAO::singleValueQuery("SELECT GROUP_CONCAT(id SEPARATOR \", #\") FROM civicrm_action_schedule WHERE limit_to=0 AND (recipient_manual IS NOT NULL OR group_id IS NOT NULL)");
+    if (!empty($suspectRecords)) {
+      return ts('This site previously executed an early version of 5.49, which may have incorrectly modified some scheduled reminders. After upgrading, review these reminders (<code>%1</code>). <a %2>(Learn more...)</a>', [
+        1 => '#' . $suspectRecords,
+        2 => 'target="blank" href="https://civicrm.org/redirect/reminders-5.49"',
+      ]);
+    }
+    else {
+      return NULL;
+    }
+  }
+
+  /**
+   * Revert boolean default civicrm_action_schedule.limit_to to be NULL
+   */
+  public static function changeBooleanColumnLimitTo() {
+    CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_action_schedule` CHANGE `limit_to` `limit_to` tinyint NULL COMMENT 'Is this the recipient criteria limited to OR in addition to?'", [], TRUE, NULL, FALSE, FALSE);
+    CRM_Core_DAO::executeQuery("UPDATE `civicrm_action_schedule` SET `limit_to` = NULL WHERE `limit_to` = 0 AND `group_id` IS NULL AND recipient_manual IS NULL", [], TRUE, NULL, FALSE, FALSE);
+    return TRUE;
   }
 
   /**
@@ -79,6 +144,28 @@ class CRM_Upgrade_Incremental_php_FiveFortyNine extends CRM_Upgrade_Incremental_
   public static function changeBooleanColumn(CRM_Queue_TaskContext $ctx, $tableName, $columnName, $defn) {
     CRM_Core_DAO::executeQuery("UPDATE `$tableName` SET `$columnName` = 0 WHERE `$columnName` IS NULL", [], TRUE, NULL, FALSE, FALSE);
     CRM_Core_DAO::executeQuery("ALTER TABLE `$tableName` CHANGE `$columnName` `$columnName` tinyint NOT NULL $defn", [], TRUE, NULL, FALSE, FALSE);
+    return TRUE;
+  }
+
+  public static function fillOptionValueFields(CRM_Queue_TaskContext $ctx) {
+    // By default every option group uses 'name,description'
+    // Note: description doesn't make sense for every group, but historically Civi has been lax
+    // about restricting its use.
+    CRM_Core_DAO::executeQuery("UPDATE `civicrm_option_group` SET `option_value_fields` = 'name,label,description'", [], TRUE, NULL, FALSE, FALSE);
+
+    $groupsWithDifferentFields = [
+      'name,label,description,color' => [
+        'activity_status',
+        'case_status',
+      ],
+      'name,label,description,icon' => [
+        'activity_type',
+      ],
+    ];
+    foreach ($groupsWithDifferentFields as $fields => $names) {
+      $in = '"' . implode('","', $names) . '"';
+      CRM_Core_DAO::executeQuery("UPDATE `civicrm_option_group` SET `option_value_fields` = '$fields' WHERE `name` IN ($in)", [], TRUE, NULL, FALSE, FALSE);
+    }
     return TRUE;
   }
 

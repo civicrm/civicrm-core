@@ -1,42 +1,32 @@
 <?php
 
+use Civi\Api4\CustomField;
+
 /**
  * Class CRM_Custom_Import_Parser_Api
  */
-class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
+class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
 
-  protected $_entity = '';
   protected $_fields = [];
-  protected $_requiredFields = [];
-  protected $_dateFields = [];
   protected $_multipleCustomData = '';
 
   /**
-   * Params for the current entity being prepared for the api.
-   * @var array
-   */
-  protected $_params = [];
-
-  /**
-   * Class constructor.
+   * Get information about the provided job.
    *
-   * @param array $mapperKeys
-   * @param null $mapperLocType
-   * @param null $mapperPhoneType
+   *  - name
+   *  - id (generally the same as name)
+   *  - label
+   *
+   * @return array
    */
-  public function __construct(&$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL) {
-    parent::__construct();
-    $this->_mapperKeys = &$mapperKeys;
-  }
-
-  public function setFields() {
-    $customGroupID = $this->_multipleCustomData;
-    $importableFields = $this->getGroupFieldsForImport($customGroupID, $this);
-    $this->_fields = array_merge([
-      'do_not_import' => ['title' => ts('- do not import -')],
-      'contact_id' => ['title' => ts('Contact ID')],
-      'external_identifier' => ['title' => ts('External Identifier')],
-    ], $importableFields);
+  public static function getUserJobInfo(): array {
+    return [
+      'custom_field_import' => [
+        'id' => 'custom_field_import',
+        'name' => 'custom_field_import',
+        'label' => ts('Multiple Value Custom Field Import'),
+      ],
+    ];
   }
 
   /**
@@ -45,8 +35,10 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @return void
    */
   public function init() {
-    $this->setFields();
-    $fields = $this->_fields;
+    // Force user job to reload.
+    unset($this->userJob);
+    $this->setFieldMetadata();
+    $fields = $this->importableFieldsMetadata;
     $hasLocationType = FALSE;
 
     foreach ($fields as $name => $field) {
@@ -55,138 +47,76 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
       $field['headerPattern'] = CRM_Utils_Array::value('headerPattern', $field, '//');
       $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern'], $hasLocationType);
     }
-    $this->setActiveFields($this->_mapperKeys);
   }
 
   /**
-   * Handle the values in mapField mode.
+   * Main import function.
    *
    * @param array $values
    *   The array of values belonging to this line.
-   *
-   * @return bool
    */
-  public function mapField(&$values) {
-    return CRM_Import_Parser::VALID;
-  }
-
-  /**
-   * Handle the values in preview mode.
-   *
-   * @param array $values
-   *   The array of values belonging to this line.
-   *
-   * @return bool
-   *   the result of this processing
-   */
-  public function preview(&$values) {
-    return $this->summary($values);
-  }
-
-  /**
-   * @param array $values
-   *   The array of values belonging to this line.
-   *
-   * @return bool
-   *   the result of this processing
-   *   It is called from both the preview & the import actions
-   *
-   * @see CRM_Custom_Import_Parser_BaseClass::summary()
-   */
-  public function summary(&$values) {
-    $erroneousField = NULL;
-    $response = $this->setActiveFieldValues($values, $erroneousField);
-    $errorRequired = FALSE;
-    $missingField = '';
-    $this->_params = &$this->getActiveFieldParams();
-
-    $formatted = $this->_params;
-    $this->_updateWithId = FALSE;
-    $this->_parseStreetAddress = CRM_Utils_Array::value('street_address_parsing', CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'address_options'), FALSE);
-
-    $this->_params = $this->getActiveFieldParams();
-    foreach ($this->_requiredFields as $requiredField) {
-      if (empty($this->_params[$requiredField])) {
-        $errorRequired = TRUE;
-        $missingField .= ' ' . $requiredField;
-        CRM_Contact_Import_Parser_Contact::addToErrorMsg($this->_entity, $requiredField);
-      }
-    }
-
-    if ($errorRequired) {
-      array_unshift($values, ts('Missing required field(s) :') . $missingField);
-      return CRM_Import_Parser::ERROR;
-    }
-
-    $errorMessage = NULL;
-
-    $contactType = $this->_contactType ? $this->_contactType : 'Organization';
-    CRM_Contact_Import_Parser_Contact::isErrorInCustomData($this->_params + ['contact_type' => $contactType], $errorMessage, $this->_contactSubType, NULL);
-
-    // pseudoconstants
-    if ($errorMessage) {
-      $tempMsg = "Invalid value for field(s) : $errorMessage";
-      array_unshift($values, $tempMsg);
-      $errorMessage = NULL;
-      return CRM_Import_Parser::ERROR;
-    }
-    return CRM_Import_Parser::VALID;
-  }
-
-  /**
-   * Handle the values in import mode.
-   *
-   * @param int $onDuplicate
-   *   The code for what action to take on duplicates.
-   * @param array $values
-   *   The array of values belonging to this line.
-   *
-   * @return bool
-   *   the result of this processing
-   */
-  public function import($onDuplicate, &$values) {
-    $response = $this->summary($values);
-    if ($response != CRM_Import_Parser::VALID) {
-      return $response;
-    }
-
-    $this->_updateWithId = FALSE;
-    $this->_parseStreetAddress = CRM_Utils_Array::value('street_address_parsing', CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'address_options'), FALSE);
-
-    $contactType = $this->_contactType ? $this->_contactType : 'Organization';
-    $formatted = [
-      'contact_type' => $contactType,
-    ];
-
-    if (isset($this->_params['external_identifier']) && !isset($this->_params['contact_id'])) {
-      $checkCid = new CRM_Contact_DAO_Contact();
-      $checkCid->external_identifier = $this->_params['external_identifier'];
-      $checkCid->find(TRUE);
-      $formatted['id'] = $checkCid->id;
-    }
-    else {
-      $formatted['id'] = $this->_params['contact_id'];
-    }
-
-    $this->formatCommonData($this->_params, $formatted);
-    foreach ($formatted['custom'] as $key => $val) {
-      $this->_params['custom_' . $key] = $val[-1]['value'];
-    }
-    $this->_params['skipRecentView'] = TRUE;
-    $this->_params['check_permissions'] = TRUE;
-    $this->_params['entity_id'] = $formatted['id'];
+  public function import($values) {
+    $rowNumber = (int) $values[array_key_last($values)];
     try {
-      civicrm_api3('custom_value', 'create', $this->_params);
+      $params = $this->getMappedRow($values);
+      $formatted = [];
+      foreach ($params as $key => $value) {
+        if ($value !== '') {
+          $formatted[$key] = $value;
+        }
+      }
+
+      if (isset($params['external_identifier']) && !isset($params['contact_id'])) {
+        $checkCid = new CRM_Contact_DAO_Contact();
+        $checkCid->external_identifier = $params['external_identifier'];
+        $checkCid->find(TRUE);
+        $formatted['id'] = $checkCid->id;
+      }
+      else {
+        $formatted['id'] = $params['contact_id'];
+      }
+
+      $this->formatCommonData($params, $formatted);
+      foreach ($formatted['custom'] as $key => $val) {
+        $params['custom_' . $key] = $val[-1]['value'];
+      }
+      $params['skipRecentView'] = TRUE;
+      $params['check_permissions'] = TRUE;
+      $params['entity_id'] = $formatted['id'];
+      civicrm_api3('custom_value', 'create', $params);
+      $this->setImportStatus($rowNumber, 'IMPORTED', '', $formatted['id']);
     }
     catch (CiviCRM_API3_Exception $e) {
-      $error = $e->getMessage();
-      array_unshift($values, $error);
-      return CRM_Import_Parser::ERROR;
+      $this->setImportStatus($rowNumber, 'ERROR', '', $e->getMessage());
     }
   }
 
   /**
-   * Adapted from CRM_Contact_Import_Parser::formatCommonData
+   * Set the import metadata.
+   */
+  public function setFieldMetadata(): void {
+    if (!$this->importableFieldsMetadata) {
+      $customGroupID = $this->getSubmittedValue('multipleCustomData');
+      $importableFields = $this->getGroupFieldsForImport($customGroupID);
+      $this->importableFieldsMetadata = array_merge([
+        'do_not_import' => ['title' => ts('- do not import -')],
+        'contact_id' => ['title' => ts('Contact ID'), 'name' => 'contact_id', 'type' => CRM_Utils_Type::T_INT, 'options' => FALSE, 'headerPattern' => '/contact?|id$/i'],
+        'external_identifier' => ['title' => ts('External Identifier'), 'name' => 'external_identifier', 'type' => CRM_Utils_Type::T_INT, 'options' => FALSE, 'headerPattern' => '/external\s?id/i'],
+      ], $importableFields);
+    }
+  }
+
+  /**
+   * Get the required fields.
+   *
+   * @return array
+   */
+  public function getRequiredFields(): array {
+    return ['contact_id' => ts('Contact ID'), 'external_identifier' => ts('External Identifier')];
+  }
+
+  /**
+   * Adapted from CRM_Contact_Import_Parser_Contact::formatCommonData
    *
    * TODO: Is this function even necessary? All values get passed to the api anyway.
    *
@@ -198,29 +128,6 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   private function formatCommonData($params, &$formatted) {
 
     $customFields = CRM_Core_BAO_CustomField::getFields(NULL);
-
-    //format date first
-    $session = CRM_Core_Session::singleton();
-    $dateType = $session->get("dateTypes");
-    foreach ($params as $key => $val) {
-      $customFieldID = CRM_Core_BAO_CustomField::getKeyID($key);
-      if ($customFieldID) {
-        //we should not update Date to null, CRM-4062
-        if ($val && ($customFields[$customFieldID]['data_type'] == 'Date')) {
-          //CRM-21267
-          CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
-        }
-        elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
-          if (empty($val) && !is_numeric($val)) {
-            //retain earlier value when Import mode is `Fill`
-            unset($params[$key]);
-          }
-          else {
-            $params[$key] = CRM_Utils_String::strtoboolstr($val);
-          }
-        }
-      }
-    }
 
     //now format custom data.
     foreach ($params as $key => $field) {
@@ -280,62 +187,72 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   }
 
   /**
-   * Set import entity.
-   * @param string $entity
-   */
-  public function setEntity($entity) {
-    $this->_entity = $entity;
-    $this->_multipleCustomData = $entity;
-  }
-
-  /**
-   * The initializer code, called before the processing
-   *
-   * @return void
-   */
-  public function fini() {
-  }
-
-  /**
    * Return the field ids and names (with groups) for import purpose.
    *
-   * @param int $id
+   * @param int $customGroupID
    *   Custom group ID.
    *
    * @return array
    *
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
    */
-  public function getGroupFieldsForImport($id) {
+  private function getGroupFieldsForImport(int $customGroupID): array {
     $importableFields = [];
-    $params = ['custom_group_id' => $id];
-    $allFields = civicrm_api3('custom_field', 'get', $params);
-    $fields = $allFields['values'];
-    foreach ($fields as $id => $values) {
+    $fields = (array) CustomField::get(FALSE)
+      ->addSelect('*', 'custom_group_id.is_multiple', 'custom_group_id.name', 'custom_group_id.extends')
+      ->addWhere('custom_group_id', '=', $customGroupID)->execute();
+
+    foreach ($fields as $values) {
       $datatype = $values['data_type'] ?? NULL;
-      if ($datatype == 'File') {
+      if ($datatype === 'File') {
         continue;
       }
       /* generate the key for the fields array */
-      $key = "custom_$id";
-      $regexp = preg_replace('/[.,;:!?]/', '', CRM_Utils_Array::value(0, $values));
+      $key = 'custom_' . $values['id'];
+      $regexp = preg_replace('/[.,;:!?]/', '', $values['label']);
       $importableFields[$key] = [
         'name' => $key,
         'title' => $values['label'] ?? NULL,
-        'headerPattern' => '/' . preg_quote($regexp, '/') . '/',
+        'headerPattern' => '/' . preg_quote($regexp, '/') . '/i',
         'import' => 1,
-        'custom_field_id' => $id,
-        'options_per_line' => $values['options_per_line'] ?? NULL,
-        'data_type' => $values['data_type'] ?? NULL,
-        'html_type' => $values['html_type'] ?? NULL,
-        'is_search_range' => $values['is_search_range'] ?? NULL,
+        'custom_field_id' => $values['id'],
+        'options_per_line' => $values['options_per_line'],
+        'data_type' => $values['data_type'],
+        'html_type' => $values['html_type'],
+        'type' => CRM_Core_BAO_CustomField::dataToType()[$values['data_type']],
+        'is_search_range' => $values['is_search_range'],
+        'date_format' => $values['date_format'],
+        'time_format' => $values['time_format'],
+        'extends' => $values['custom_group_id.extends'],
+        'custom_group_id' => $customGroupID,
+        'custom_group_id.name' => $values['custom_group_id.name'],
+        'is_multiple' => $values['custom_group_id.is_multiple'],
       ];
-      if (CRM_Utils_Array::value('html_type', $values) == 'Select Date') {
-        $importableFields[$key]['date_format'] = $values['date_format'] ?? NULL;
-        $importableFields[$key]['time_format'] = $values['time_format'] ?? NULL;
-        $this->_dateFields[] = $key;
-      }
     }
     return $importableFields;
+  }
+
+  /**
+   * @deprecated stores metadata in the old format that
+   * a few functions in the parent class still use.
+   *
+   * @param string $name
+   * @param $title
+   * @param int $type
+   * @param string $headerPattern
+   * @param string $dataPattern
+   * @param bool $hasLocationType
+   */
+  private function addField(
+    $name, $title, $type = CRM_Utils_Type::T_INT,
+    $headerPattern = '//', $dataPattern = '//',
+    $hasLocationType = FALSE
+  ) {
+    $this->_fields[$name] = new CRM_Custom_Import_Field($name, $title, $type, $headerPattern, $dataPattern, $hasLocationType);
+    if (empty($name)) {
+      $this->_fields['doNotImport'] = new CRM_Custom_Import_Field($name, $title, $type, $headerPattern, $dataPattern, $hasLocationType);
+    }
   }
 
 }

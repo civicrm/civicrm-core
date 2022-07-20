@@ -25,13 +25,6 @@
         </p>
     {/if}
 
-    {if $conflictRowCount}
-        <p class="error">
-        {ts 1=$conflictRowCount 2=$downloadConflictRecordsUrl}CiviCRM has detected %1 records with conflicting participant IDs within this data file. If you continue, these records will be skipped. OR, you can download a file with just these problem records - <a href='%2'>Download Conflicts</a>. Then correct them in the original import file, cancel this import and begin again at step 1.{/ts}
-        </p>
-    {/if}
-
-
     <p>{ts}Click 'Import Now' if you are ready to proceed.{/ts}</p>
  </div>
 
@@ -46,23 +39,10 @@
     </tr>
 
     {if $invalidRowCount}
-    <tr class="error"><td class="label crm-grid-cell">{ts}Rows with Errors{/ts}</td>
+      <tr class="error"><td class="label crm-grid-cell">{ts}Rows with Errors{/ts}</td>
         <td class="data">{$invalidRowCount}</td>
         <td class="explanation">{ts}Rows with invalid data in one or more fields. These rows will be skipped (not imported).{/ts}
-            {if $invalidRowCount}
-                <p><a href="{$downloadErrorRecordsUrl}">{ts}Download Errors{/ts}</a></p>
-            {/if}
-        </td>
-    </tr>
-    {/if}
-
-    {if $conflictRowCount}
-    <tr class="error"><td class="label crm-grid-cell">{ts}Conflicting Rows{/ts}</td>
-        <td class="data">{$conflictRowCount}</td>
-        <td class="explanation">{ts}Rows with conflicting participant IDs within this file. These rows will be skipped (not imported).{/ts}
-            {if $conflictRowCount}
-                <p><a href="{$downloadConflictRecordsUrl}">{ts}Download Conflicts{/ts}</a></p>
-            {/if}
+          <p><a href="{$downloadErrorRecordsUrl}">{ts}Download Errors{/ts}</a></p>
         </td>
     </tr>
     {/if}
@@ -75,7 +55,7 @@
 
 
  {* Table for mapping preview *}
- {include file="CRM/Event/Import/Form/MapTable.tpl}
+ {include file="CRM/Import/Form/MapTableCommon.tpl"}
 
 
  <div class="crm-submit-buttons">

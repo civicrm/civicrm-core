@@ -218,12 +218,11 @@ class CRM_Core_DAO_AllCoreTables {
     // This map only applies to APIv3
     $map = [
       'acl' => 'Acl',
-      'ACL' => 'Acl',
       'im' => 'Im',
-      'IM' => 'Im',
+      'pcp' => 'Pcp',
     ];
-    if ($legacyV3 && isset($map[$name])) {
-      return $map[$name];
+    if ($legacyV3 && isset($map[strtolower($name)])) {
+      return $map[strtolower($name)];
     }
 
     $fragments = explode('_', $name);
@@ -234,9 +233,10 @@ class CRM_Core_DAO_AllCoreTables {
         $fragment = 'UF' . ucfirst(substr($fragment, 2));
       }
     }
-    // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in underscore-separated)
-    if ($fragments[0] === 'Uf') {
-      $fragments[0] = 'UF';
+    // Exceptions to CamelCase: UFGroup, UFJoin, UFMatch, UFField, ACL, IM, PCP
+    $exceptions = ['Uf', 'Acl', 'Im', 'Pcp'];
+    if (in_array($fragments[0], $exceptions)) {
+      $fragments[0] = strtoupper($fragments[0]);
     }
     return implode('', $fragments);
   }

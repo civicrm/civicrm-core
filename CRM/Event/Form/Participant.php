@@ -1659,8 +1659,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       CRM_Event_Form_Registration::initEventFee($form, $event['id'], FALSE);
       CRM_Event_Form_Registration_Register::buildAmount($form, TRUE, $form->_discountId);
       $lineItem = [];
-      $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-      $invoicing = $invoiceSettings['invoicing'] ?? NULL;
       $totalTaxAmount = 0;
       if (!CRM_Utils_System::isNull(CRM_Utils_Array::value('line_items', $form->_values))) {
         $lineItem[] = $form->_values['line_items'];
@@ -1668,9 +1666,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           $totalTaxAmount = $value['tax_amount'] + $totalTaxAmount;
         }
       }
-      if ($invoicing) {
-        $form->assign('totalTaxAmount', $totalTaxAmount);
-      }
+      $form->assign('totalTaxAmount', Civi::settings()->get('invoicing') ? ($totalTaxAmount ?? NULL) : NULL);
       $form->assign('lineItem', empty($lineItem) ? FALSE : $lineItem);
       $discounts = [];
       if (!empty($form->_values['discount'])) {
@@ -1894,15 +1890,13 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   protected function assignEventDetailsToTpl($eventID, $participantRoles, $receiptText, $isPaidEvent) {
     //use of the message template below requires variables in different format
     $events = [];
-    $returnProperties = ['event_type_id', 'fee_label', 'start_date', 'end_date', 'event_tz', 'is_show_location', 'title'];
+    $returnProperties = ['event_type_id', 'fee_label', 'start_date', 'end_date', 'is_show_location', 'title'];
 
     //get all event details.
     CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $eventID, $events, $returnProperties);
     $event = $events[$eventID];
     unset($event['start_date']);
     unset($event['end_date']);
-
-    CRM_Event_BAO_Event::setOutputTimeZone($event);
 
     $role = CRM_Event_PseudoConstant::participantRole();
 

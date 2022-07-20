@@ -18,6 +18,8 @@ class SqlFunctionAVG extends SqlFunction {
 
   protected static $category = self::CATEGORY_AGGREGATE;
 
+  protected static $dataType = 'Float';
+
   protected static function params(): array {
     return [
       [

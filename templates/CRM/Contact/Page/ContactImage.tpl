@@ -11,7 +11,7 @@
   <div class="crm-contact_image crm-contact_image-block">
     {$imageURL}
   </div>
-  {if $action eq 0 or $action eq 2}
+  {if $action eq 0 or $action neq 1 and $deleteURL}
     <div class='crm-contact_image-block crm-contact_image crm-contact_image-delete'>{$deleteURL}</div>
   {/if}
 {/crmRegion}

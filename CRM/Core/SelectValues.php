@@ -223,33 +223,17 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Various pre defined extensions for dynamic properties and groups.
+   * List of entities to present on the Custom Group form.
+   *
+   * Includes pseudo-entities for Participant, in order to present sub-types on the form.
    *
    * @return array
-   *
    */
   public static function customGroupExtends() {
-    $customGroupExtends = [
-      'Activity' => ts('Activities'),
-      'Relationship' => ts('Relationships'),
-      'Contribution' => ts('Contributions'),
-      'ContributionRecur' => ts('Recurring Contributions'),
-      'Group' => ts('Groups'),
-      'Membership' => ts('Memberships'),
-      'Event' => ts('Events'),
-      'Participant' => ts('Participants'),
-      'ParticipantRole' => ts('Participants (Role)'),
-      'ParticipantEventName' => ts('Participants (Event Name)'),
-      'ParticipantEventType' => ts('Participants (Event Type)'),
-      'Pledge' => ts('Pledges'),
-      'Grant' => ts('Grants'),
-      'Address' => ts('Addresses'),
-      'Campaign' => ts('Campaigns'),
-    ];
-    $contactTypes = ['Contact' => ts('Contacts')] + self::contactType();
-    $extendObjs = CRM_Core_OptionGroup::values('cg_extend_objects');
-    $customGroupExtends = array_merge($contactTypes, $customGroupExtends, $extendObjs);
-    return $customGroupExtends;
+    $customGroupExtends = array_column(CRM_Core_BAO_CustomGroup::getCustomGroupExtendsOptions(), 'label', 'id');
+    // ParticipantRole, ParticipantEventName, etc.
+    $pseudoSelectors = CRM_Core_OptionGroup::values('custom_data_type', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
+    return array_merge($customGroupExtends, $pseudoSelectors);
   }
 
   /**
@@ -1057,9 +1041,21 @@ class CRM_Core_SelectValues {
    */
   public static function getPermissionedRelationshipOptions() {
     return [
-      CRM_Contact_BAO_Relationship::NONE => ts('None'),
-      CRM_Contact_BAO_Relationship::VIEW => ts('View only'),
-      CRM_Contact_BAO_Relationship::EDIT => ts('View and update'),
+      [
+        'id' => CRM_Contact_BAO_Relationship::NONE,
+        'name' => 'None',
+        'label' => ts('None'),
+      ],
+      [
+        'id' => CRM_Contact_BAO_Relationship::VIEW,
+        'name' => 'View only',
+        'label' => ts('View only'),
+      ],
+      [
+        'id' => CRM_Contact_BAO_Relationship::EDIT,
+        'name' => 'View and update',
+        'label' => ts('View and update'),
+      ],
     ];
   }
 
@@ -1176,22 +1172,21 @@ class CRM_Core_SelectValues {
     ];
   }
 
-  public static function timezone() {
-    $tzlist = &Civi::$statics[__CLASS__]['tzlist'];
-
-    if (is_null($tzlist)) {
-      $tzlist = [];
-      foreach (timezone_identifiers_list() as $tz) {
-        // Actual timezone keys for PHP are mapped to human parts.
-        $tzlist[$tz] = str_replace('_', ' ', $tz);
-      }
-
-      // Add 'Etc/UTC' specially, as timezone_identifiers_list() does
-      // not include it, but it is the IANA long name for 'UTC'
-      $tzlist['Etc/UTC'] = ts('Etc/UTC');
-    }
-
-    return $tzlist;
+  /**
+   * Columns from the option_value table which may or may not be used by each option_group.
+   *
+   * Note: Value is not listed here as it is not optional.
+   *
+   * @return string[]
+   */
+  public static function optionValueFields() {
+    return [
+      'name' => 'name',
+      'label' => 'label',
+      'description' => 'description',
+      'icon' => 'icon',
+      'color' => 'color',
+    ];
   }
 
 }

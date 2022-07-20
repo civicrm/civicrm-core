@@ -355,7 +355,7 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    *
    * @return bool
    */
-  public function offsetExists($offset) {
+  public function offsetExists($offset): bool {
     return isset($this->tokenProcessor->rowContexts[$this->tokenRow][$offset])
       || isset($this->tokenProcessor->context[$offset]);
   }
@@ -367,6 +367,7 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    *
    * @return string
    */
+  #[\ReturnTypeWillChange]
   public function &offsetGet($offset) {
     if (isset($this->tokenProcessor->rowContexts[$this->tokenRow][$offset])) {
       return $this->tokenProcessor->rowContexts[$this->tokenRow][$offset];
@@ -384,7 +385,7 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    * @param string $offset
    * @param mixed $value
    */
-  public function offsetSet($offset, $value) {
+  public function offsetSet($offset, $value): void {
     $this->tokenProcessor->rowContexts[$this->tokenRow][$offset] = $value;
   }
 
@@ -393,7 +394,7 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    *
    * @param mixed $offset
    */
-  public function offsetUnset($offset) {
+  public function offsetUnset($offset): void {
     unset($this->tokenProcessor->rowContexts[$this->tokenRow][$offset]);
   }
 
@@ -402,6 +403,7 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    *
    * @return \ArrayIterator
    */
+  #[\ReturnTypeWillChange]
   public function getIterator() {
     return new \ArrayIterator($this->createMergedArray());
   }
@@ -411,7 +413,7 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    *
    * @return int
    */
-  public function count() {
+  public function count(): int {
     return count($this->createMergedArray());
   }
 

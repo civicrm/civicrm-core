@@ -312,6 +312,7 @@ trait CRM_Admin_Form_SettingTrait {
       'entity_reference' => 'EntityRef',
       'advmultiselect' => 'Element',
       'chainselect' => 'ChainSelect',
+      'yesno' => 'YesNo',
     ];
     $mapping += array_fill_keys(CRM_Core_Form::$html5Types, '');
     return $mapping[$htmlType] ?? '';

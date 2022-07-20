@@ -113,7 +113,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     // Default weight & value
     $fieldValues = ['option_group_id' => $this->_gid];
     foreach (['weight', 'value'] as $field) {
-      if (empty($defaults[$field])) {
+      if (!isset($defaults[$field]) || $defaults[$field] === '') {
         $defaults[$field] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue', $fieldValues, $field);
       }
     }
@@ -147,6 +147,10 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       return;
     }
 
+    $optionGroup = \Civi\Api4\OptionGroup::get(FALSE)
+      ->addWhere('id', '=', $this->_gid)
+      ->execute()->first();
+
     $this->applyFilter('__ALL__', 'trim');
 
     $isReserved = FALSE;
@@ -174,11 +178,12 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
         ['CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'value', $this->_domainSpecific]
       );
     }
-    else {
+
+    // Add icon & color if this option group supports it.
+    if ($optionGroup['option_value_fields'] && in_array('icon', $optionGroup['option_value_fields'])) {
       $this->add('text', 'icon', ts('Icon'), ['class' => 'crm-icon-picker', 'title' => ts('Choose Icon'), 'allowClear' => TRUE]);
     }
-
-    if (in_array($this->_gName, ['activity_status', 'case_status'])) {
+    if ($optionGroup['option_value_fields'] && in_array('color', $optionGroup['option_value_fields'])) {
       $this->add('color', 'color', ts('Color'));
     }
 

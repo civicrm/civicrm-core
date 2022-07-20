@@ -166,6 +166,10 @@ class Afform extends Generic\AbstractEntity {
           ],
         ],
         [
+          'name' => 'icon',
+          'description' => 'Icon shown in the contact summary tab',
+        ],
+        [
           'name' => 'server_route',
         ],
         [
@@ -177,6 +181,11 @@ class Afform extends Generic\AbstractEntity {
         [
           'name' => 'create_submission',
           'data_type' => 'Boolean',
+        ],
+        [
+          'name' => 'navigation',
+          'data_type' => 'Array',
+          'description' => 'Insert into navigation menu {parent: string, label: string, weight: int}',
         ],
         [
           'name' => 'layout',
@@ -236,8 +245,8 @@ class Afform extends Generic\AbstractEntity {
    */
   public static function permissions() {
     return [
-      "meta" => ["access CiviCRM"],
-      "default" => ["administer CiviCRM"],
+      'meta' => ['access CiviCRM'],
+      'default' => [['administer CiviCRM', 'administer afform']],
       // These all check form-level permissions
       'get' => [],
       'getOptions' => [],

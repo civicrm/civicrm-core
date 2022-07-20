@@ -233,8 +233,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $this->assign('allPanes', $allPanes);
     $this->assign('showAdditionalInfo', $showAdditionalInfo);
 
+    $this->assign('formType', $this->_formType);
     if ($this->_formType) {
-      $this->assign('formType', $this->_formType);
       return;
     }
 

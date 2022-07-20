@@ -338,7 +338,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
       $result['url'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$dao->cfID}&eid={$dao->entity_id}&fcs={$fileHash}");
       $result['href'] = "<a href=\"{$result['url']}\">{$result['cleanName']}</a>";
       $result['tag'] = CRM_Core_BAO_EntityTag::getTag($dao->cfID, 'civicrm_file');
-      $result['icon'] = CRM_Utils_File::getIconFromMimeType($dao->mime_type);
+      $result['icon'] = CRM_Utils_File::getIconFromMimeType($dao->mime_type ?? '');
       if ($addDeleteArgs) {
         $result['deleteURLArgs'] = self::deleteURLArgs($dao->entity_table, $dao->entity_id, $dao->cfID);
       }
@@ -428,6 +428,8 @@ AND       CEF.entity_id    = %2";
    * @param int $entityID
    * @param null $numAttachments
    * @param bool $ajaxDelete
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function buildAttachment(&$form, $entityTable, $entityID = NULL, $numAttachments = NULL, $ajaxDelete = FALSE) {
 
@@ -442,15 +444,11 @@ AND       CEF.entity_id    = %2";
     $maxFileSize = $config->maxFileSize ? $config->maxFileSize : 2;
 
     $currentAttachmentInfo = self::getEntityFile($entityTable, $entityID, TRUE);
-    $totalAttachments = 0;
+    $totalAttachments = $currentAttachmentInfo ? count($currentAttachmentInfo) : 0;
     if ($currentAttachmentInfo) {
-      $totalAttachments = count($currentAttachmentInfo);
       $form->add('checkbox', 'is_delete_attachment', ts('Delete All Attachment(s)'));
-      $form->assign('currentAttachmentInfo', $currentAttachmentInfo);
     }
-    else {
-      $form->assign('currentAttachmentInfo', NULL);
-    }
+    $form->assign('currentAttachmentInfo', $currentAttachmentInfo);
 
     if ($totalAttachments) {
       if ($totalAttachments >= $numAttachments) {
@@ -487,8 +485,9 @@ AND       CEF.entity_id    = %2";
         'placeholder' => ts('Description'),
       ]);
 
+      $tagField = "tag_$i";
       if (!empty($tags)) {
-        $form->add('select', "tag_$i", ts('Tags'), $tags, FALSE,
+        $form->add('select', $tagField, ts('Tags'), $tags, FALSE,
           [
             'id' => "tags_$i",
             'multiple' => 'multiple',
@@ -496,6 +495,9 @@ AND       CEF.entity_id    = %2";
             'placeholder' => ts('- none -'),
           ]
         );
+      }
+      else {
+        $form->addOptionalQuickFormElement($tagField);
       }
       CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_file', NULL, FALSE, TRUE, "file_taglist_$i");
     }

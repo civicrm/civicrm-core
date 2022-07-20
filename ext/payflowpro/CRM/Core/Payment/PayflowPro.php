@@ -70,14 +70,13 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
   public function doPayment(&$params, $component = 'contribute') {
     $propertyBag = \Civi\Payment\PropertyBag::cast($params);
     $this->_component = $component;
-    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
+    $result = $this->setStatusPaymentPending([]);
 
     // If we have a $0 amount, skip call to processor and set payment_status to Completed.
     // Conceivably a processor might override this - perhaps for setting up a token - but we don't
     // have an example of that at the moment.
     if ($propertyBag->getAmount() == 0) {
-      $result['payment_status_id'] = array_search('Completed', $statuses);
-      $result['payment_status'] = 'Completed';
+      $result = $this->setStatusPaymentCompleted($result);
       return $result;
     }
 
@@ -112,6 +111,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
      *Create the array of variables to be sent to the processor from the $params array
      * passed into this function
      *
+     * NB: PayFlowPro does not accept URL Encoded parameters.
+     * Particularly problematic when amount contains grouping character: e.g 1,234.56 will return [4 - Invalid Amount]
      */
 
     $payflow_query_array = [
@@ -127,7 +128,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
       'CVV2' => $params['cvv2'],
       'EXPDATE' => urlencode(sprintf('%02d', (int) $params['month']) . substr($params['year'], 2, 2)),
       'ACCTTYPE' => urlencode($params['credit_card_type']),
-      'AMT' => urlencode($this->getAmount($params)),
+      'AMT' => $this->getAmount($params),
       'CURRENCY' => urlencode($params['currency']),
       'FIRSTNAME' => $params['billing_first_name'],
       //credit card name
@@ -293,22 +294,22 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     /*
      * Payment successfully sent to gateway - process the response now
      */
-    $result = strstr($responseData, 'RESULT');
-    if (empty($result)) {
+    $responseResult = strstr($responseData, 'RESULT');
+    if (empty($responseResult)) {
       throw new PaymentProcessorException('No RESULT code from PayPal.', 9016);
     }
 
     $nvpArray = [];
-    while (strlen($result)) {
+    while (strlen($responseResult)) {
       // name
-      $keypos = strpos($result, '=');
-      $keyval = substr($result, 0, $keypos);
+      $keypos = strpos($responseResult, '=');
+      $keyval = substr($responseResult, 0, $keypos);
       // value
-      $valuepos = strpos($result, '&') ? strpos($result, '&') : strlen($result);
-      $valval = substr($result, $keypos + 1, $valuepos - $keypos - 1);
+      $valuepos = strpos($responseResult, '&') ? strpos($responseResult, '&') : strlen($responseResult);
+      $valval = substr($responseResult, $keypos + 1, $valuepos - $keypos - 1);
       // decoding the respose
       $nvpArray[$keyval] = $valval;
-      $result = substr($result, $valuepos + 1, strlen($result));
+      $responseResult = substr($responseResult, $valuepos + 1, strlen($responseResult));
     }
     // get the result code to validate.
     $result_code = $nvpArray['RESULT'];
@@ -335,7 +336,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
          * CiviCRM as part of the transact
          * but not further processing is done. Business rules would need to be defined
          *******************************************************/
-        $params['trxn_id'] = ($nvpArray['PNREF'] ?? '') . ($nvpArray['TRXPNREF'] ?? '');
+        $result['trxn_id'] = ($nvpArray['PNREF'] ?? '') . ($nvpArray['TRXPNREF'] ?? '');
         //'trxn_id' is varchar(255) field. returned value is length 12
         $params['trxn_result_code'] = $nvpArray['AUTHCODE'] . "-Cvv2:" . $nvpArray['CVV2MATCH'] . "-avs:" . $nvpArray['AVSADDR'];
 
@@ -343,9 +344,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
           $params['recur_trxn_id'] = $nvpArray['PROFILEID'];
           //'trxn_id' is varchar(255) field. returned value is length 12
         }
-        $params['payment_status_id'] = array_search('Completed', $statuses);
-        $params['payment_status'] = 'Completed';
-        return $params;
+        $result = $this->setStatusPaymentCompleted($result);
+        return $result;
 
       case 1:
         throw new PaymentProcessorException('There is a payment processor configuration problem. This is usually due to invalid account information or ip restrictions on the account.  You can verify ip restriction by logging         // into Manager.  See Service Settings >> Allowed IP Addresses.   ', 9003);

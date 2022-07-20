@@ -81,7 +81,7 @@ trait CRM_Contact_Import_MetadataTrait {
    *
    * @return array
    */
-  public function getHeaderPatterns() {
+  public function getHeaderPatterns(): array {
     return CRM_Utils_Array::collect('headerPattern', $this->getContactImportMetadata());
   }
 
@@ -90,7 +90,7 @@ trait CRM_Contact_Import_MetadataTrait {
    *
    * @return array
    */
-  public function getDataPatterns() {
+  public function getDataPatterns(): array {
     return CRM_Utils_Array::collect('dataPattern', $this->getContactImportMetadata());
   }
 
@@ -101,22 +101,6 @@ trait CRM_Contact_Import_MetadataTrait {
    */
   public function getFieldTitles() {
     return CRM_Utils_Array::collect('title', $this->getContactImportMetadata());
-  }
-
-  /**
-   * Get configured contact type.
-   */
-  protected function getContactType() {
-    return $this->_contactType ?? 'Individual';
-  }
-
-  /**
-   * Get configured contact sub type.
-   *
-   * @return string
-   */
-  protected function getContactSubType() {
-    return $this->_contactSubType ?? NULL;
   }
 
 }

@@ -168,9 +168,11 @@ class Container {
       'contactTypes' => 'contactTypes',
       'metadata' => 'metadata',
     ];
+    $verSuffixCaches = ['metadata'];
+    $verSuffix = '_' . preg_replace(';[^0-9a-z_];', '_', \CRM_Utils_System::version());
     foreach ($basicCaches as $cacheSvc => $cacheGrp) {
       $definitionParams = [
-        'name' => $cacheGrp,
+        'name' => $cacheGrp . (in_array($cacheGrp, $verSuffixCaches) ? $verSuffix : ''),
         'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
       ];
       // For Caches that we don't really care about the ttl for and/or maybe accessed
@@ -194,6 +196,18 @@ class Container {
         [
           'name' => 'CiviCRM Search PrevNextCache',
           'type' => ['SqlGroup'],
+        ],
+      ]
+    ))->setFactory('CRM_Utils_Cache::create')->setPublic(TRUE);
+
+    // Memcache is limited to 1 MB by default, and since this is not read often
+    // it does not make much sense in Redis either.
+    $container->setDefinition('cache.extension_browser', new Definition(
+      'CRM_Utils_Cache_Interface',
+      [
+        [
+          'name' => 'extension_browser',
+          'type' => ['SqlGroup', 'ArrayCache'],
         ],
       ]
     ))->setFactory('CRM_Utils_Cache::create')->setPublic(TRUE);
@@ -230,7 +244,7 @@ class Container {
     $container->setDefinition('pear_mail', new Definition('Mail'))
       ->setFactory('CRM_Utils_Mail::createMailer')->setPublic(TRUE);
 
-    $container->setDefinition('crypto.registry', new Definition('Civi\Crypto\CryptoService'))
+    $container->setDefinition('crypto.registry', new Definition('Civi\Crypto\CryptoRegistry'))
       ->setFactory('Civi\Crypto\CryptoRegistry::createDefaultRegistry')->setPublic(TRUE);
 
     $container->setDefinition('crypto.token', new Definition('Civi\Crypto\CryptoToken', []))
@@ -314,14 +328,14 @@ class Container {
             'table' => 'civicrm_case_activity',
             'when' => 'AFTER',
             'event' => ['INSERT'],
-            'sql' => "\nUPDATE civicrm_case SET modified_date = CURRENT_TIMESTAMP WHERE id = NEW.case_id;\n",
+            'sql' => "UPDATE civicrm_case SET modified_date = CURRENT_TIMESTAMP WHERE id = NEW.case_id;",
           ],
           [
             'upgrade_check' => ['table' => 'civicrm_case', 'column' => 'modified_date'],
             'table' => 'civicrm_activity',
             'when' => 'BEFORE',
             'event' => ['UPDATE', 'DELETE'],
-            'sql' => "\nUPDATE civicrm_case SET modified_date = CURRENT_TIMESTAMP WHERE id IN (SELECT ca.case_id FROM civicrm_case_activity ca WHERE ca.activity_id = OLD.id);\n",
+            'sql' => "UPDATE civicrm_case SET modified_date = CURRENT_TIMESTAMP WHERE id IN (SELECT ca.case_id FROM civicrm_case_activity ca WHERE ca.activity_id = OLD.id);",
           ],
         ],
       ]
@@ -615,6 +629,7 @@ class Container {
       \CRM_Extension_System::singleton(TRUE);
       \CRM_Extension_System::singleton()->getClassLoader()->register();
       \CRM_Extension_System::singleton()->getMixinLoader()->run();
+      \CRM_Utils_Hook::singleton()->commonBuildModuleList('civicrm_boot');
       $bootServices['dispatcher.boot']->setDispatchPolicy($mainDispatchPolicy);
 
       $runtime->includeCustomPath();

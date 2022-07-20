@@ -40,12 +40,31 @@ function civigrant_civicrm_entityTypes(&$entityTypes) {
 function civigrant_civicrm_links($context, $name, $id, &$links) {
   if ($context === 'create.new.shortcuts' && CRM_Core_Permission::check(['access CiviGrant', 'edit grants'])) {
     $links[] = [
-      'path' => 'civicrm/grant/add',
-      'query' => "reset=1&action=add&context=standalone",
       'ref' => 'new-grant',
+      'name' => 'Grant',
       'title' => ts('Grant'),
+      'url' => CRM_Utils_System::url('civicrm/grant/add', 'reset=1&action=add&context=standalone'),
     ];
   }
+}
+
+/**
+ * Implements hook_civicrm_summaryActions().
+ *
+ * Add contact summary link to create new grant.
+ */
+function civigrant_civicrm_summaryActions(&$menu, $cid) {
+  $menu['grant'] = [
+    'title' => ts('Add Grant'),
+    'weight' => 26,
+    'ref' => 'new-grant',
+    'key' => 'grant',
+    'tab' => 'afsearchGrants',
+    'href' => CRM_Utils_System::url('civicrm/contact/view/grant',
+      'reset=1&action=add&context=grant'
+    ),
+    'permissions' => ['edit grants'],
+  ];
 }
 
 /**
@@ -55,15 +74,15 @@ function civigrant_civicrm_links($context, $name, $id, &$links) {
  */
 function civigrant_civicrm_permission(&$permissions) {
   $permissions['access CiviGrant'] = [
-    E::ts('access CiviGrant'),
+    E::ts('CiviGrant:') . ' ' . E::ts('access CiviGrant'),
     E::ts('View all grants'),
   ];
   $permissions['edit grants'] = [
-    E::ts('edit grants'),
+    E::ts('CiviGrant:') . ' ' . E::ts('edit grants'),
     E::ts('Create and update grants'),
   ];
   $permissions['delete in CiviGrant'] = [
-    E::ts('delete in CiviGrant'),
+    E::ts('CiviGrant:') . ' ' . E::ts('delete in CiviGrant'),
     E::ts('Delete grants'),
   ];
 }

@@ -480,7 +480,7 @@ class TokenProcessor {
           return $value->getAmount();
 
         default:
-          throw new \CRM_Core_Exception("Invalid token filter: $filter");
+          throw new \CRM_Core_Exception("Invalid token filter: " . json_encode($filter, JSON_UNESCAPED_SLASHES));
       }
     }
 
@@ -500,9 +500,12 @@ class TokenProcessor {
           require_once 'CRM/Core/Smarty/plugins/modifier.crmDate.php';
           return \smarty_modifier_crmDate($value->format('Y-m-d H:i:s'), $filter[1] ?? NULL);
         }
+        if ($value === '') {
+          return $value;
+        }
 
       default:
-        throw new \CRM_Core_Exception("Invalid token filter: $filter");
+        throw new \CRM_Core_Exception("Invalid token filter: " . json_encode($filter, JSON_UNESCAPED_SLASHES));
     }
   }
 
@@ -525,6 +528,7 @@ class TokenRowIterator extends \IteratorIterator {
     $this->tokenProcessor = $tokenProcessor;
   }
 
+  #[\ReturnTypeWillChange]
   public function current() {
     return new TokenRow($this->tokenProcessor, parent::key());
   }

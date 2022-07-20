@@ -18,19 +18,16 @@
 
 namespace api\v4\Entity;
 
-use api\v4\Service\TestCreationParameterProvider;
 use api\v4\Traits\CheckAccessTrait;
-use api\v4\Traits\OptionCleanupTrait;
 use api\v4\Traits\TableDropperTrait;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\Entity;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Event\ValidateValuesEvent;
 use Civi\Api4\Service\Spec\CustomFieldSpec;
 use Civi\Api4\Service\Spec\FieldSpec;
-use Civi\Api4\Service\Spec\SpecGatherer;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\PostEvent;
 use Civi\Core\Event\PreEvent;
@@ -39,18 +36,10 @@ use Civi\Test\HookInterface;
 /**
  * @group headless
  */
-class ConformanceTest extends UnitTestCase implements HookInterface {
+class ConformanceTest extends Api4TestBase implements HookInterface {
 
   use CheckAccessTrait;
   use TableDropperTrait;
-  use OptionCleanupTrait {
-    setUp as setUpOptionCleanup;
-  }
-
-  /**
-   * @var \api\v4\Service\TestCreationParameterProvider
-   */
-  protected $creationParamProvider;
 
   /**
    * Set up baseline for testing
@@ -60,11 +49,6 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
   public function setUp(): void {
     // Enable all components
     \CRM_Core_BAO_ConfigSetting::enableAllComponents();
-    $this->setUpOptionCleanup();
-    $this->loadDataSet('CaseType');
-    $this->loadDataSet('ConformanceTest');
-    $gatherer = new SpecGatherer();
-    $this->creationParamProvider = new TestCreationParameterProvider($gatherer);
     parent::setUp();
     $this->resetCheckAccess();
   }
@@ -210,11 +194,12 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
       ->execute()
       ->indexBy('name');
 
-    $errMsg = sprintf('%s is missing required ID field', $entity);
-    $subset = ['data_type' => 'Integer'];
+    $idField = CoreUtil::getIdFieldName($entity);
 
-    $this->assertArrayHasKey('data_type', $fields['id'], $errMsg);
-    $this->assertEquals('Integer', $fields['id']['data_type']);
+    $errMsg = sprintf('%s getfields is missing primary key field', $entity);
+
+    $this->assertArrayHasKey($idField, $fields, $errMsg);
+    $this->assertEquals('Integer', $fields[$idField]['data_type']);
 
     // Ensure that the getFields (FieldSpec) format is generally consistent.
     foreach ($fields as $field) {
@@ -265,15 +250,17 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
     $this->setCheckAccessGrants(["{$entity}::create" => TRUE]);
     $this->assertEquals(0, $this->checkAccessCounts["{$entity}::create"]);
 
-    $requiredParams = $this->creationParamProvider->getRequired($entity);
+    $requiredParams = $this->getRequiredValuesToCreate($entity);
     $createResult = $entityClass::create()
       ->setValues($requiredParams)
       ->setCheckPermissions(!$isReadOnly)
       ->execute()
       ->first();
 
-    $this->assertArrayHasKey('id', $createResult, "create missing ID");
-    $id = $createResult['id'];
+    $idField = CoreUtil::getIdFieldName($entity);
+
+    $this->assertArrayHasKey($idField, $createResult, "create missing ID");
+    $id = $createResult[$idField];
     $this->assertGreaterThanOrEqual(1, $id, "$entity ID not positive");
     if (!$isReadOnly) {
       $this->assertEquals(1, $this->checkAccessCounts["{$entity}::create"]);
@@ -295,7 +282,7 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
     $this->setCheckAccessGrants(["{$entity}::create" => FALSE]);
     $this->assertEquals(0, $this->checkAccessCounts["{$entity}::create"]);
 
-    $requiredParams = $this->creationParamProvider->getRequired($entity);
+    $requiredParams = $this->getRequiredValuesToCreate($entity);
 
     try {
       $entityClass::create()
@@ -342,7 +329,8 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
       ->execute();
 
     $errMsg = sprintf('Failed to fetch a %s after creation', $entity);
-    $this->assertEquals($id, $getResult->first()['id'], $errMsg);
+    $idField = CoreUtil::getIdFieldName($entity);
+    $this->assertEquals($id, $getResult->first()[$idField], $errMsg);
     $this->assertEquals(1, $getResult->count(), $errMsg);
   }
 
@@ -361,7 +349,8 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
       ->execute();
 
     $errMsg = sprintf('Failed to fetch a %s after creation', $entity);
-    $this->assertEquals($id, $getResult->first()['id'], $errMsg);
+    $idField = CoreUtil::getIdFieldName($entity);
+    $this->assertEquals($id, $getResult->first()[$idField], $errMsg);
     $this->assertEquals(1, $getResult->count(), $errMsg);
     $this->resetCheckAccess();
   }
@@ -372,8 +361,9 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
    * @param string $entity
    */
   protected function checkGetCount($entityClass, $id, $entity): void {
+    $idField = CoreUtil::getIdFieldName($entity);
     $getResult = $entityClass::get(FALSE)
-      ->addWhere('id', '=', $id)
+      ->addWhere($idField, '=', $id)
       ->selectRowCount()
       ->execute();
     $errMsg = sprintf('%s getCount failed', $entity);
@@ -428,9 +418,10 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
     $this->assertEquals(0, $this->checkAccessCounts["{$entity}::delete"]);
     $isReadOnly = $this->isReadOnly($entityClass);
 
+    $idField = CoreUtil::getIdFieldName($entity);
     $deleteAction = $entityClass::delete()
       ->setCheckPermissions(!$isReadOnly)
-      ->addWhere('id', '=', $id);
+      ->addWhere($idField, '=', $id);
 
     if (property_exists($deleteAction, 'useTrash')) {
       $deleteAction->setUseTrash(FALSE);
@@ -440,15 +431,17 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
       $deleteResult = $deleteAction->execute();
     });
 
-    // We should have emitted an event.
-    $hookEntity = ($entity === 'Contact') ? 'Individual' : $entity; /* ooph */
-    $this->assertContains("pre.{$hookEntity}.delete", $log, "$entity should emit hook_civicrm_pre() for deletions");
-    $this->assertContains("post.{$hookEntity}.delete", $log, "$entity should emit hook_civicrm_post() for deletions");
+    if (in_array('DAOEntity', CoreUtil::getInfoItem($entity, 'type'))) {
+      // We should have emitted an event.
+      $hookEntity = ($entity === 'Contact') ? 'Individual' : $entity;/* ooph */
+      $this->assertContains("pre.{$hookEntity}.delete", $log, "$entity should emit hook_civicrm_pre() for deletions");
+      $this->assertContains("post.{$hookEntity}.delete", $log, "$entity should emit hook_civicrm_post() for deletions");
 
-    // should get back an array of deleted id
-    $this->assertEquals([['id' => $id]], (array) $deleteResult);
-    if (!$isReadOnly) {
-      $this->assertEquals(1, $this->checkAccessCounts["{$entity}::delete"]);
+      // should get back an array of deleted id
+      $this->assertEquals([['id' => $id]], (array) $deleteResult);
+      if (!$isReadOnly) {
+        $this->assertEquals(1, $this->checkAccessCounts["{$entity}::delete"]);
+      }
     }
     $this->resetCheckAccess();
   }

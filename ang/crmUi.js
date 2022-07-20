@@ -628,7 +628,12 @@
             }
           }
 
-          init();
+          // If using ngOptions, wait for them to load
+          if (attrs.ngOptions) {
+            $timeout(init);
+          } else {
+            init();
+          }
         }
       };
     })
@@ -759,14 +764,22 @@
         templateUrl: '~/crmUi/tabset.html',
         transclude: true,
         controllerAs: 'crmUiTabSetCtrl',
-        controller: function($scope, $parse) {
-          var tabs = $scope.tabs = []; // array<$scope>
+        controller: function($scope, $element, $timeout) {
+          var init;
+          $scope.tabs = [];
           this.add = function(tab) {
             if (!tab.id) throw "Tab is missing 'id'";
-            tabs.push(tab);
+            $scope.tabs.push(tab);
+
+            // Init jQuery.tabs() once all tabs have been added
+            if (init) {
+              $timeout.cancel(init);
+            }
+            init = $timeout(function() {
+              $element.find('.crm-tabset').tabs($scope.tabSetOptions);
+            });
           };
-        },
-        link: function (scope, element, attrs) {}
+        }
       };
     })
 
@@ -1084,21 +1097,27 @@
             $timeout(function() {
               var newPageTitle = _.trim($el.html()),
                 newDocumentTitle = scope.crmDocumentTitle || $el.text(),
-                h1Count = 0;
-              document.title = $('title').text().replace(documentTitle, newDocumentTitle);
-              // If the CMS has already added title markup to the page, use it
-              $('h1').not('.crm-container h1').each(function() {
-                if ($(this).hasClass('crm-page-title') || _.trim($(this).html()) === pageTitle) {
-                  $(this).addClass('crm-page-title').html(newPageTitle);
-                  $el.hide();
-                  ++h1Count;
+                h1Count = 0,
+                dialog = $el.closest('.ui-dialog-content');
+              if (dialog.length) {
+                dialog.dialog('option', 'title', newDocumentTitle);
+                $el.hide();
+              } else {
+                document.title = $('title').text().replace(documentTitle, newDocumentTitle);
+                // If the CMS has already added title markup to the page, use it
+                $('h1').not('.crm-container h1').each(function () {
+                  if ($(this).hasClass('crm-page-title') || _.trim($(this).html()) === pageTitle) {
+                    $(this).addClass('crm-page-title').html(newPageTitle);
+                    $el.hide();
+                    ++h1Count;
+                  }
+                });
+                if (!h1Count) {
+                  $el.show();
                 }
-              });
-              if (!h1Count) {
-                $el.show();
+                pageTitle = newPageTitle;
+                documentTitle = newDocumentTitle;
               }
-              pageTitle = newPageTitle;
-              documentTitle = newDocumentTitle;
             });
           }
 
@@ -1153,6 +1172,21 @@
           });
 
           element.attr('contenteditable', 'true');
+        }
+      };
+    })
+
+    // Adds an icon picker widget
+    // Example: `<input crm-ui-icon-picker ng-model="model.icon">`
+    .directive('crmUiIconPicker', function($timeout) {
+      return {
+        restrict: 'A',
+        controller: function($element) {
+          CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').then(function() {
+            $timeout(function() {
+              $element.crmIconPicker();
+            });
+          });
         }
       };
     })

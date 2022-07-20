@@ -517,13 +517,11 @@ function civicrm_api3_contribution_completetransaction($params) {
     $input['receive_date'] = $params['receive_date'];
   }
   if (empty($contribution->contribution_page_id)) {
-    static $domainFromName;
-    static $domainFromEmail;
-    if (empty($domainFromEmail) && (empty($params['receipt_from_name']) || empty($params['receipt_from_email']))) {
+    if (empty($params['receipt_from_name']) || empty($params['receipt_from_email'])) {
       [$domainFromName, $domainFromEmail] = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     }
-    $input['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $params, $domainFromName);
-    $input['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $params, $domainFromEmail);
+    $input['receipt_from_name'] = ($input['receipt_from_name'] ?? FALSE) ?: $domainFromName;
+    $input['receipt_from_email'] = ($input['receipt_from_email'] ?? FALSE) ?: $domainFromEmail;
   }
   $input['card_type_id'] = $params['card_type_id'] ?? NULL;
   $input['pan_truncation'] = $params['pan_truncation'] ?? NULL;
@@ -608,6 +606,11 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
  * @todo - most of this should live in the BAO layer but as we want it to be an addition
  * to 4.3 which is already stable we should add it to the api layer & re-factor into the BAO layer later
  *
+ * @todo this needs a big refactor to use the
+ * CRM_Contribute_BAO_Contribution::repeatTransaction and Payment.create where
+ * currently it uses CRM_Contribute_BAO_Contribution::completeOrder and repeats
+ * a lot of work. See comments in https://github.com/civicrm/civicrm-core/pull/23928
+ *
  * @param array $params
  *   Input parameters.
  *
@@ -616,87 +619,72 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
  * @throws API_Exception
  */
 function civicrm_api3_contribution_repeattransaction($params) {
+
   civicrm_api3_verify_one_mandatory($params, NULL, ['contribution_recur_id', 'original_contribution_id']);
+
+  // We need a contribution to copy.
   if (empty($params['original_contribution_id'])) {
-    //  CRM-19873 call with test mode.
-    $params['original_contribution_id'] = civicrm_api3('contribution', 'getvalue', [
-      'return' => 'id',
-      'contribution_status_id' => ['IN' => ['Completed']],
-      'contribution_recur_id' => $params['contribution_recur_id'],
-      'contribution_test' => CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $params['contribution_recur_id'], 'is_test'),
-      'options' => ['limit' => 1, 'sort' => 'id DESC'],
-    ]);
+    // Find one from the given recur. A template contribution is preferred, otherwise use the latest one added.
+    // @todo this duplicates work done by CRM_Contribute_BAO_Contribution::repeatTransaction & should be removed.
+    $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($params['contribution_recur_id']);
+    if (empty($templateContribution)) {
+      throw new CiviCRM_API3_Exception('Contribution.repeattransaction failed to get original_contribution_id for recur with ID: ' . $params['contribution_recur_id']);
+    }
   }
-  $contribution = new CRM_Contribute_BAO_Contribution();
-  $contribution->id = $params['original_contribution_id'];
-  if (!$contribution->find(TRUE)) {
-    throw new API_Exception(
-      'A valid original contribution ID is required', 'invalid_data');
-  }
-  // We don't support repeattransaction without a related recurring contribution.
-  if (empty($contribution->contribution_recur_id)) {
-    throw new API_Exception(
-      'Repeattransaction API can only be used in the context of contributions that have a contribution_recur_id.',
-      'invalid_data'
-    );
+  else {
+    // A template/original contribution was specified by the params. Load it.
+    // @todo this duplicates work done by CRM_Contribute_BAO_Contribution::repeatTransaction & should be removed.
+    $templateContribution = Contribution::get(FALSE)
+      ->addWhere('id', '=', $params['original_contribution_id'])
+      ->addWhere('is_test', 'IN', [0, 1])
+      ->addWhere('contribution_recur_id', 'IS NOT EMPTY')
+      ->execute()->first();
+    if (empty($templateContribution)) {
+      throw new CiviCRM_API3_Exception("Contribution.repeattransaction failed to load the given original_contribution_id ($params[original_contribution_id]) because it does not exist, or because it does not belong to a recurring contribution");
+    }
   }
 
-  $params['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', [
-    'return' => 'payment_processor_id',
-    'id' => $contribution->contribution_recur_id,
-  ]);
-
-  $passThroughParams = [
+  // Collect inputs for CRM_Contribute_BAO_Contribution::completeOrder in $input.
+  $paramsToCopy = [
     'trxn_id',
-    'total_amount',
     'campaign_id',
     'fee_amount',
     'financial_type_id',
     'contribution_status_id',
     'payment_processor_id',
+    'is_email_receipt',
+    'trxn_date',
+    'receive_date',
+    'card_type_id',
+    'pan_truncation',
+    'payment_instrument_id',
+    'total_amount',
   ];
-  $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
+  $input = array_intersect_key($params, array_fill_keys($paramsToCopy, NULL));
+  // Ensure certain keys exist with NULL values if they don't already (not sure if this is ACTUALLY necessary?)
+  $input += array_fill_keys(['card_type_id', 'pan_truncation'], NULL);
 
-  $ids = [];
-  if (!$contribution->loadRelatedObjects(['payment_processor_id' => $input['payment_processor_id']], $ids, TRUE)) {
-    throw new API_Exception('failed to load related objects');
-  }
-  unset($contribution->id, $contribution->receive_date, $contribution->invoice_id);
-  $contribution->receive_date = $params['receive_date'];
+  $input['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', [
+    'return' => 'payment_processor_id',
+    'id' => $templateContribution['contribution_recur_id'],
+  ]);
+  // @todo this duplicates work done by CRM_Contribute_BAO_Contribution::repeatTransaction & should be removed.
+  $input['is_test'] = $templateContribution['is_test'];
 
-  // @todo Copied from _ipn_process_transaction - needs cleanup/refactor
-  $objects = $contribution->_relatedObjects;
-  $objects['contribution'] = &$contribution;
-  $input['component'] = $contribution->_component;
-  $input['is_test'] = $contribution->is_test;
-  $input['amount'] = empty($input['total_amount']) ? $contribution->total_amount : $input['total_amount'];
-
-  if (isset($params['is_email_receipt'])) {
-    $input['is_email_receipt'] = $params['is_email_receipt'];
-  }
-  if (!empty($params['trxn_date'])) {
-    $input['trxn_date'] = $params['trxn_date'];
-  }
-  if (!empty($params['receive_date'])) {
-    $input['receive_date'] = $params['receive_date'];
-  }
-  if (empty($contribution->contribution_page_id)) {
-    static $domainFromName;
-    static $domainFromEmail;
+  // @todo this duplicates work done by CRM_Contribute_BAO_Contribution::repeatTransaction & should be removed.
+  if (empty($templateContribution['contribution_page_id'])) {
     if (empty($domainFromEmail) && (empty($params['receipt_from_name']) || empty($params['receipt_from_email']))) {
       [$domainFromName, $domainFromEmail] = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     }
-    $input['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $params, $domainFromName);
-    $input['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $params, $domainFromEmail);
+    $input['receipt_from_name'] = ($params['receipt_from_name'] ?? NULL) ?: $domainFromName;
+    $input['receipt_from_email'] = ($params['receipt_from_email'] ?? NULL) ?: $domainFromEmail;
   }
-  $input['card_type_id'] = $params['card_type_id'] ?? NULL;
-  $input['pan_truncation'] = $params['pan_truncation'] ?? NULL;
-  if (!empty($params['payment_instrument_id'])) {
-    $input['payment_instrument_id'] = $params['payment_instrument_id'];
-  }
+
+  // @todo this should call CRM_Contribute_BAO_Contribution::repeatTransaction - some minor cleanup needed to separate
+  // from completeOrder
   return CRM_Contribute_BAO_Contribution::completeOrder($input,
-    !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
-    $objects['contribution']->id ?? NULL,
+    $templateContribution['contribution_recur_id'],
+    NULL,
     $params['is_post_payment_create'] ?? NULL);
 }
 
@@ -824,6 +812,14 @@ function _civicrm_api3_contribution_repeattransaction_spec(&$params) {
     'title' => 'Payment processor ID',
     'name' => 'payment_processor_id',
     'type' => CRM_Utils_Type::T_INT,
+  ];
+  $params['total_amount'] = [
+    'description' => ts('Optional override amount, will be ignored if more than one line item exists'),
+    'title' => ts('Total amount of the contribution'),
+    'name' => 'total_amount',
+    'type' => CRM_Utils_Type::T_MONEY,
+    // Map 'amount' to total_amount - historically both have been used at times.
+    'api.aliases' => ['amount'],
   ];
 }
 

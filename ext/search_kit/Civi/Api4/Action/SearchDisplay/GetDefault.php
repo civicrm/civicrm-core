@@ -42,8 +42,11 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
    * @throws \API_Exception
    */
   public function _run(\Civi\Api4\Generic\Result $result) {
-    // Only administrators can use this in unsecured "preview mode"
-    if (is_array($this->savedSearch) && $this->checkPermissions && !\CRM_Core_Permission::check('administer CiviCRM data')) {
+    // Only SearchKit admins can use this in unsecured "preview mode"
+    if (
+      is_array($this->savedSearch) && $this->checkPermissions &&
+      !\CRM_Core_Permission::check([['administer CiviCRM data', 'administer search_kit']])
+    ) {
       throw new UnauthorizedException('Access denied');
     }
     $this->loadSavedSearch();
@@ -69,6 +72,7 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
           'show_count' => TRUE,
           'expose_limit' => TRUE,
         ],
+        'placeholder' => 5,
         'sort' => [],
         'columns' => [],
       ],

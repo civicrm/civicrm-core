@@ -36,28 +36,14 @@ class CRM_Extension_BrowserTest extends CiviUnitTestCase {
   }
 
   public function testDisabled() {
-    $this->browser = new CRM_Extension_Browser(FALSE, '/index.html', 'file:///itd/oesn/tmat/ter');
+    $this->browser = new CRM_Extension_Browser(FALSE, '/index.html');
     $this->assertEquals(FALSE, $this->browser->isEnabled());
     $this->assertEquals([], $this->browser->checkRequirements());
     $this->assertEquals([], $this->browser->getExtensions());
   }
 
-  public function testCheckRequirements_BadCachedir_false() {
-    $this->browser = new CRM_Extension_Browser('file://' . dirname(__FILE__) . '/dataset/good-repository', NULL, FALSE);
-    $this->assertEquals(TRUE, $this->browser->isEnabled());
-    $reqs = $this->browser->checkRequirements();
-    $this->assertEquals(1, count($reqs));
-  }
-
-  public function testCheckRequirements_BadCachedir_nonexistent() {
-    $this->browser = new CRM_Extension_Browser('file://' . dirname(__FILE__) . '/dataset/good-repository', NULL, '/tot/all/yin/v/alid');
-    $this->assertEquals(TRUE, $this->browser->isEnabled());
-    $reqs = $this->browser->checkRequirements();
-    $this->assertEquals(1, count($reqs));
-  }
-
   public function testGetExtensions_good() {
-    $this->browser = new CRM_Extension_Browser('file://' . dirname(__FILE__) . '/dataset/good-repository', NULL, $this->createTempDir('ext-cache-'));
+    $this->browser = new CRM_Extension_Browser('file://' . dirname(__FILE__) . '/dataset/good-repository', NULL);
     $this->assertEquals(TRUE, $this->browser->isEnabled());
     $this->assertEquals([], $this->browser->checkRequirements());
     $this->setupMockHandler();
@@ -72,7 +58,7 @@ class CRM_Extension_BrowserTest extends CiviUnitTestCase {
   }
 
   public function testGetExtension_good() {
-    $this->browser = new CRM_Extension_Browser('file://' . dirname(__FILE__) . '/dataset/good-repository', NULL, $this->createTempDir('ext-cache-'));
+    $this->browser = new CRM_Extension_Browser('file://' . dirname(__FILE__) . '/dataset/good-repository', NULL);
     $this->assertEquals(TRUE, $this->browser->isEnabled());
     $this->assertEquals([], $this->browser->checkRequirements());
     $this->setupMockHandler();
@@ -82,7 +68,7 @@ class CRM_Extension_BrowserTest extends CiviUnitTestCase {
   }
 
   public function testGetExtension_nonexistent() {
-    $this->browser = new CRM_Extension_Browser('file://' . dirname(__FILE__) . '/dataset/good-repository', NULL, $this->createTempDir('ext-cache-'));
+    $this->browser = new CRM_Extension_Browser('file://' . dirname(__FILE__) . '/dataset/good-repository', NULL);
     $this->assertEquals(TRUE, $this->browser->isEnabled());
     $this->assertEquals([], $this->browser->checkRequirements());
     $this->setupMockHandler();

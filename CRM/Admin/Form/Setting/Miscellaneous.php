@@ -26,6 +26,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     'contact_undelete' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'empoweredBy' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'logging' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'enableBackgroundQueue' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'maxFileSize' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'doNotAttachPDFReceipt' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'recordGeneratedLetters' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,

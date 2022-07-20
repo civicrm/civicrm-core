@@ -11,6 +11,8 @@
 
 use Civi\Api4\ActivityContact;
 use Civi\Api4\Contribution;
+use Civi\Api4\ContributionRecur;
+use Civi\Api4\Pledge;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
@@ -1390,7 +1392,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Function tests that financial records are updated when Payment Instrument is changed.
    */
-  public function testCreateUpdateContributionPaymentInstrument() {
+  public function testCreateUpdateContributionPaymentInstrument(): void {
     $instrumentId = $this->_addPaymentInstrument();
     $contribParams = [
       'contact_id' => $this->_individualId,
@@ -1406,12 +1408,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $contribution['id'],
       'payment_instrument_id' => $instrumentId,
     ]);
-    $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $newParams);
     $this->assertAPISuccess($contribution);
     $this->checkFinancialTrxnPaymentInstrumentChange($contribution['id'], 4, $instrumentId);
 
     // cleanup - delete created payment instrument
-    $this->_deletedAddedPaymentInstrument();
+    $this->deletedAddedPaymentInstrument();
   }
 
   /**
@@ -1438,7 +1440,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->checkFinancialTrxnPaymentInstrumentChange($contribution['id'], 4, $instrumentId, -100);
 
     // cleanup - delete created payment instrument
-    $this->_deletedAddedPaymentInstrument();
+    $this->deletedAddedPaymentInstrument();
   }
 
   /**
@@ -2524,6 +2526,47 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test repeat contribution accepts recur_id instead of
+   * original_contribution_id.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRepeatTransactionPreviousContributionRefunded(): void {
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', [
+      'contact_id' => $this->_individualId,
+      'installments' => '12',
+      'frequency_interval' => '1',
+      'amount' => '100',
+      'contribution_status_id' => 1,
+      'start_date' => '2012-01-01 00:00:00',
+      'currency' => 'USD',
+      'frequency_unit' => 'month',
+      'payment_processor_id' => $this->paymentProcessorID,
+    ]);
+    $this->callAPISuccess('contribution', 'create', array_merge(
+        $this->_params,
+        [
+          'contribution_recur_id' => $contributionRecur['id'],
+          'contribution_status_id' => 'Refunded',
+        ]
+      )
+    );
+
+    $this->callAPISuccess('contribution', 'repeattransaction', [
+      'contribution_recur_id' => $contributionRecur['id'],
+      'trxn_id' => 1234,
+    ]);
+    $contributions = $this->callAPISuccess('contribution', 'get', [
+      'contribution_recur_id' => $contributionRecur['id'],
+      'sequential' => 1,
+    ]);
+    // We should have contribution 0 in "Refunded" status and contribution 1 in "Pending" status
+    $this->assertEquals(2, $contributions['count']);
+    $this->assertEquals(7, $contributions['values'][0]['contribution_status_id']);
+    $this->assertEquals(2, $contributions['values'][1]['contribution_status_id']);
+  }
+
+  /**
    * CRM-19945 Tests that Contribute.repeattransaction renews a membership when contribution status=Completed
    *
    * @throws \CRM_Core_Exception
@@ -2659,8 +2702,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * CRM-16397 test appropriate action if total amount has changed for single
    * line items.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testRepeatTransactionAlteredAmount(): void {
     $paymentProcessorID = $this->paymentProcessorCreate();
@@ -2726,6 +2767,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     unset($expectedLineItem['id'], $expectedLineItem['entity_id'], $lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
     $this->assertEquals($expectedLineItem, $lineItem2['values'][0]);
+
+    $this->callAPISuccess('contribution', 'repeattransaction', [
+      'original_contribution_id' => $originalContribution['id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => 789,
+    ]);
+    $this->callAPISuccessGetSingle('contribution', [
+      'total_amount' => 400,
+      'trxn_id' => 789,
+    ]);
   }
 
   /**
@@ -3064,7 +3115,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * CRM-14151 - Test completing a transaction via the API.
    */
-  public function testCompleteTransactionWithReceiptDateSet() {
+  public function testCompleteTransactionWithReceiptDateSet(): void {
     $this->swapMessageTemplateForTestTemplate();
     $mut = new CiviMailUtils($this, TRUE);
     $this->createLoggedInUser();
@@ -3329,7 +3380,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Note that we are creating a logged in user because email goes out from
    * that person.
    */
-  public function testCompleteTransactionUpdatePledgePayment() {
+  public function testCompleteTransactionUpdatePledgePayment(): void {
     $this->swapMessageTemplateForTestTemplate();
     $mut = new CiviMailUtils($this, TRUE);
     $mut->clearMessages();
@@ -3360,6 +3411,41 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     $mut->stop();
     $this->revertTemplateToReservedTemplate();
+  }
+
+  /**
+   * Test repeating a pledge with the repeatTransaction api..
+   *
+   * @throws \API_Exception
+   */
+  public function testRepeatTransactionWithPledgePayment(): void {
+    $contributionID = $this->createPendingPledgeContribution(2);
+    $contributionRecurID = ContributionRecur::create()->setValues([
+      'contact_id' => $this->_individualId,
+      'amount' => 250,
+      'payment_processor_id' => $this->paymentProcessorID,
+    ])->execute()->first()['id'];
+    Contribution::update()->setValues([
+      'id' => $contributionID,
+      'contribution_recur_id' => $contributionRecurID,
+    ])->execute();
+    $this->callAPISuccess('contribution', 'completetransaction', [
+      'id' => $contributionID,
+      'trxn_date' => '1 Feb 2013',
+    ]);
+    $this->assertEquals('In Progress', Pledge::get()
+      ->addWhere('id', '=', $this->_ids['pledge'])
+      ->addSelect('status_id:name')->execute()->first()['status_id:name']
+    );
+    $this->callAPISuccess('contribution', 'repeattransaction', [
+      'contribution_recur_id' => $contributionRecurID,
+      'trxn_id' => '2013',
+      'contribution_status_id' => 'Completed',
+    ]);
+    $this->assertEquals('Completed', Pledge::get()
+      ->addWhere('id', '=', $this->_ids['pledge'])
+      ->addSelect('status_id:name')->execute()->first()['status_id:name']
+    );
   }
 
   /**
@@ -3878,15 +3964,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Create a pending contribution & linked pending pledge record.
    *
-   * @throws \CRM_Core_Exception
+   * @param int $installments
+   *
+   * @return int
    */
-  public function createPendingPledgeContribution() {
-
-    $pledgeID = $this->pledgeCreate(['contact_id' => $this->_individualId, 'installments' => 1, 'amount' => 500]);
+  public function createPendingPledgeContribution(int $installments = 1): int {
+    $pledgeID = $this->pledgeCreate(['contact_id' => $this->_individualId, 'installments' => $installments, 'amount' => 500]);
     $this->_ids['pledge'] = $pledgeID;
     $contribution = $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, [
       'contribution_status_id' => 'Pending',
-      'total_amount' => 500,
+      'total_amount' => (500 / $installments),
     ]));
     $paymentID = $this->callAPISuccessGetValue('PledgePayment', [
       'options' => ['limit' => 1],
@@ -3897,10 +3984,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_id' =>
       $contribution['id'],
       'status_id' => 'Pending',
-      'scheduled_amount' => 500,
+      'scheduled_amount' => (500 / $installments),
     ]);
 
-    return $contribution['id'];
+    return (int) $contribution['id'];
   }
 
   /**
@@ -4196,7 +4283,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     return $optionValue['values'][$optionValue['id']]['value'];
   }
 
-  public function _deletedAddedPaymentInstrument() {
+  public function deletedAddedPaymentInstrument() {
     $result = $this->callAPISuccess('OptionValue', 'get', [
       'option_group_id' => 'payment_instrument',
       'name' => 'Test Card',
@@ -4407,7 +4494,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution1 = $this->callAPISuccess('contribution', 'create', array_merge(
         $this->_params,
         ['contribution_recur_id' => $contributionRecur['id'], 'payment_instrument_id' => 2])
-    );
+    )['id'];
     $contribution2 = $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_status_id' => 'Completed',
       'trxn_id' => 'blah',
@@ -4508,7 +4595,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_status_id' => 'Completed',
       'trxn_id' => 7890,
-      'original_contribution_id' => $contribution,
+      'original_contribution_id' => $contribution['id'],
     ]);
     $domain = $this->callAPISuccess('domain', 'getsingle', ['id' => 1]);
     $mut->checkMailLog([
@@ -4551,7 +4638,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'repeattransaction', [
       'contribution_status_id' => 'Completed',
       'trxn_id' => 5678,
-      'original_contribution_id' => $originalContribution,
+      'original_contribution_id' => $originalContribution['id'],
     ]
     );
     $mut->checkMailLog([
@@ -4579,7 +4666,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_status_id' => 'Completed',
       'trxn_id' => 4567,
-      'original_contribution_id' => $originalContribution,
+      'original_contribution_id' => $originalContribution['id'],
     ]);
     $mut->checkMailLog([
       'From: ' . $domain['name'] . ' <' . $domain['domain_email'] . '>',

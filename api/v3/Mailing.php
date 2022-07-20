@@ -554,11 +554,11 @@ function civicrm_api3_mailing_preview($params) {
   $mailingParams = ['contact_id' => $contactID];
 
   if (!$contactID) {
-    $details = CRM_Utils_Token::getAnonymousTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
+    $details = CRM_Utils_Token::getAnonymousTokenDetails($mailingParams, $returnProperties, empty($mailing->sms_provider_id), TRUE, NULL, $mailing->getFlattenedTokens());
     $details = $details[0][0] ?? NULL;
   }
   else {
-    [$details] = CRM_Utils_Token::getTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
+    [$details] = CRM_Utils_Token::getTokenDetails($mailingParams, $returnProperties, empty($mailing->sms_provider_id), TRUE, NULL, $mailing->getFlattenedTokens());
     $details = $details[$contactID];
   }
 

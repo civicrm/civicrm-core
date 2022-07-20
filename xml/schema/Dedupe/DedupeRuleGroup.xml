@@ -87,6 +87,8 @@
     <title>Reserved?</title>
     <type>boolean</type>
     <comment>Is this a reserved rule - a rule group that has been optimized and cannot be changed by the admin</comment>
+    <default>0</default>
+    <required>true</required>
     <add>4.1</add>
     <html>
       <type>CheckBox</type>

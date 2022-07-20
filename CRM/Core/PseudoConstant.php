@@ -1598,7 +1598,7 @@ WHERE  id = %1
    *   List of options, each as a record of id+name+label.
    *   Ex: [['id' => 123, 'name' => 'foo_bar', 'label' => 'Foo Bar']]
    */
-  private static function formatArrayOptions($context, array &$options) {
+  public static function formatArrayOptions($context, array &$options) {
     // Already flat; return keys/values according to context
     if (!isset($options[0]) || !is_array($options[0])) {
       // For validate context, machine names are expected in place of labels.

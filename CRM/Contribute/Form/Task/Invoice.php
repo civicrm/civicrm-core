@@ -239,6 +239,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $contribution = new CRM_Contribute_BAO_Contribution();
       $contribution->id = $contribID;
       $contribution->fetch();
+      // @todo this is only used now to load the event title, it causes an enotice
+      // and calls deprecated code. If we decide a contribution title is a
+      // 'real thing' then we should create a token.
       $contribution->loadRelatedObjects($input, $ids, TRUE);
 
       $input['amount'] = $contribution->total_amount;
@@ -357,13 +360,21 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
       // parameters to be assign for template
       $tplParams = [
+        // @todo is a 'title' a real thing - is so, it should be token.
         'title' => $title,
+        // @todo used in the subject but analysis of ^^ would remove
         'component' => $input['component'],
+        // @todo not used in shipped template for a very long time, if ever, remove
+        // token is available.
         'id' => $contribution->id,
+        // @todo not used in shipped template from 5.52
         'source' => $source,
+        // @todo not used in shipped template from 5.52
         'invoice_number' => $contribution->invoice_number,
+        // @todo not used in shipped template from 5.52
         'invoice_id' => $contribution->invoice_id,
         'resourceBase' => $config->userFrameworkResourceURL,
+        // @todo not used in shipped template for a long time
         'defaultCurrency' => $config->defaultCurrency,
         'amount' => $contribution->total_amount,
         'amountDue' => $amountDue,
@@ -373,11 +384,17 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'notes' => $invoiceNotes,
         'lineItem' => $lineItem,
         'dataArray' => $dataArray,
+        // @todo not used in shipped template from 5.52
         'refundedStatusId' => $refundedStatusId,
+        // @todo not used in shipped template from 5.52
         'pendingStatusId' => $pendingStatusId,
+        // @todo not used in shipped template from 5.52
         'cancelledStatusId' => $cancelledStatusId,
+        // @todo not used in shipped template from 5.52
         'contribution_status_id' => $contribution->contribution_status_id,
+        // @todo not used in shipped template for a long time
         'contributionStatusName' => CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id),
+        //  @todo appears to be the same as {contribution.tax_amount}
         'subTotal' => $subTotal,
         'street_address' => $billingAddress['street_address'] ?? NULL,
         'supplemental_address_1' => $billingAddress['supplemental_address_1'] ?? NULL,
@@ -390,7 +407,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         // Kept for backwards compatibility
         'stateProvinceAbbreviation' => $billingAddress['state_province_abbreviation'] ?? NULL,
         'country' => $billingAddress['country'] ?? NULL,
+        // @todo not used in shipped template from 5.52
         'is_pay_later' => $contribution->is_pay_later,
+        // @todo not used in shipped template from 5.52 - from here down
         'organization_name' => $contribution->_relatedObjects['contact']->organization_name,
         'domain_organization' => $domain->name,
         'domain_street_address' => CRM_Utils_Array::value('street_address', CRM_Utils_Array::value('1', $locationDefaults['address'])),
@@ -411,8 +430,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
       $pdfFileName = $contribution->invoice_number . ".pdf";
       $sendTemplateParams = [
-        'groupName' => 'msg_tpl_workflow_contribution',
-        'valueName' => 'contribution_invoice_receipt',
+        'workflow' => 'contribution_invoice_receipt',
         'tplParams' => $tplParams,
         'PDFFilename' => $pdfFileName,
         'tokenContext' => ['contributionId' => $contribution->id, 'contactId' => $contribution->contact_id],
@@ -451,7 +469,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
       // condition to check for download PDF Invoice or email Invoice
       if ($invoiceElements['createPdf']) {
-        list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+        [$sent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         if (isset($params['forPage'])) {
           return $html;
         }
@@ -478,7 +496,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $sendTemplateParams['cc'] = $values['cc_receipt'] ?? NULL;
         $sendTemplateParams['bcc'] = $values['bcc_receipt'] ?? NULL;
 
-        list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+        [$sent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         // functions call for adding activity with attachment
         // make sure page layout is same for email and download invoices.
         $fileName = self::putFile($html, $pdfFileName, [
@@ -497,7 +515,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $sendTemplateParams['cc'] = $values['cc_confirm'] ?? NULL;
         $sendTemplateParams['bcc'] = $values['bcc_confirm'] ?? NULL;
 
-        list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+        [$sent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         // functions call for adding activity with attachment
         $fileName = self::putFile($html, $pdfFileName);
         self::addActivities($subject, $contribution->contact_id, $fileName, $params, $contribution->id);

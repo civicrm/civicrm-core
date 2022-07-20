@@ -15,7 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
-  const tz_fields = ['event_start_date', 'event_end_date', 'start_date', 'end_date', 'registration_start_date', 'registration_end_date'];
 
   /**
    * Retrieve DB object and copy to defaults array.
@@ -113,6 +112,19 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
         $copy = self::copy($params['template_id']);
         $params['id'] = $copy->id;
         unset($params['template_id']);
+
+        //fix for api from template creation bug
+        civicrm_api4('ActionSchedule', 'update', [
+          'checkPermissions' => FALSE,
+          'values' => [
+            'mapping_id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
+          ],
+          'where' => [
+            ['entity_value', '=', $copy->id],
+            ['mapping_id', '=', CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID],
+          ],
+        ]);
+
       }
     }
 
@@ -777,7 +789,6 @@ SELECT
   civicrm_email.email as email,
   civicrm_event.title as title,
   civicrm_event.summary as summary,
-  civicrm_event.event_tz as event_tz,
   civicrm_event.start_date as start,
   civicrm_event.end_date as end,
   civicrm_event.description as description,
@@ -849,7 +860,6 @@ WHERE civicrm_event.is_active = 1
         $info['event_id'] = $dao->event_id;
         $info['summary'] = $dao->summary;
         $info['description'] = $dao->description;
-        $info['tz'] = $dao->event_tz ?? CRM_Core_Config::singleton()->userSystem->getTimeZoneString();
         $info['start_date'] = $dao->start;
         $info['end_date'] = $dao->end;
         $info['contact_email'] = $dao->email;
@@ -2248,20 +2258,24 @@ WHERE  ce.loc_block_id = $locBlockId";
     //3. consider event seat as a sum of all seats from line items in case price field value carries count.
 
     $query = "
-    SELECT  IF ( SUM( value.count*lineItem.qty ),
-                 SUM( value.count*lineItem.qty ) +
-                 COUNT( DISTINCT participant.id ) -
-                 COUNT( DISTINCT IF ( value.count, participant.id, NULL ) ),
-                 COUNT( DISTINCT participant.id ) )
-      FROM  civicrm_participant participant
-INNER JOIN  civicrm_contact contact ON ( contact.id = participant.contact_id AND contact.is_deleted = 0 )
-INNER JOIN  civicrm_event event ON ( event.id = participant.event_id )
-LEFT  JOIN  civicrm_line_item lineItem ON ( lineItem.entity_id    = participant.id
-                                       AND  lineItem.entity_table = 'civicrm_participant' )
-LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field_value_id AND value.count )
-     WHERE  ( participant.event_id = %1 )
-            AND participant.is_test = 0
-            {$extraWhereClause}
+  SELECT
+  IF
+    -- If the line item count * the line item quantity is not 0
+    (SUM(price_field_value.`count` * lineItem.qty),
+    -- then use the count * the quantity, ensuring each
+    -- actual participant record gets a result
+    SUM(price_field_value.`count` * lineItem.qty)
+      + COUNT(DISTINCT participant.id )
+      - COUNT(DISTINCT IF (price_field_value.`count`, participant.id, NULL)),
+    -- if the line item count is NULL or 0 then count the participants
+    COUNT(DISTINCT participant.id))
+  FROM civicrm_participant participant
+    INNER JOIN  civicrm_contact contact ON (contact.id = participant.contact_id AND contact.is_deleted = 0)
+    INNER JOIN  civicrm_event event ON ( event.id = participant.event_id )
+    LEFT JOIN  civicrm_line_item lineItem ON ( lineItem.entity_id = participant.id AND  lineItem.entity_table = 'civicrm_participant' )
+    LEFT JOIN  civicrm_price_field_value price_field_value ON (price_field_value.id = lineItem.price_field_value_id AND price_field_value.`count`)
+  WHERE  (participant.event_id = %1) AND participant.is_test = 0
+    {$extraWhereClause}
   GROUP BY  participant.event_id";
 
     return (int) CRM_Core_DAO::singleValueQuery($query, [1 => [$eventId, 'Positive']]);
@@ -2402,18 +2416,7 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
    *   All of the icons to show.
    */
   public static function getICalLinks($eventId = NULL) {
-    $return = $eventId ? [] : [
-      [
-        'url' => CRM_Utils_System::url('civicrm/event/ical', 'reset=1&list=1&html=1', TRUE, NULL, TRUE),
-        'text' => ts('HTML listing of current and future public events.'),
-        'icon' => 'fa-th-list',
-      ],
-      [
-        'url' => CRM_Utils_System::url('civicrm/event/ical', 'reset=1&list=1&rss=1', TRUE, NULL, TRUE),
-        'text' => ts('Get RSS 2.0 feed for current and future public events.'),
-        'icon' => 'fa-rss',
-      ],
-    ];
+    $return = [];
     $query = [
       'reset' => 1,
     ];
@@ -2425,61 +2428,21 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
       'text' => $eventId ? ts('Download iCalendar entry for this event.') : ts('Download iCalendar entry for current and future public events.'),
       'icon' => 'fa-download',
     ];
-    $query['list'] = 1;
-    $return[] = [
-      'url' => CRM_Utils_System::url('civicrm/event/ical', $query, TRUE, NULL, TRUE),
-      'text' => $eventId ? ts('iCalendar feed for this event.') : ts('iCalendar feed for current and future public events.'),
-      'icon' => 'fa-link',
-    ];
+    if ($eventId) {
+      $return[] = [
+        'url' => CRM_Utils_System::url('civicrm/event/ical', ['gCalendar' => 1] + $query, TRUE, NULL, TRUE),
+        'text' => ts('Add event to Google Calendar'),
+        'icon' => 'fa-share',
+      ];
+    }
+    else {
+      $return[] = [
+        'url' => CRM_Utils_System::url('civicrm/event/ical', $query, TRUE, NULL, TRUE),
+        'text' => ts('iCalendar feed for current and future public events'),
+        'icon' => 'fa-link',
+      ];
+    }
     return $return;
-  }
-
-  /**
-   * Changes timezone-enabled fields to the correct zone for output and add local
-   * & UTC variants
-   *
-   * @param array $params
-   * @param $to_tz
-   *
-   * @return void
-   */
-  public static function setOutputTimeZone(array &$params, $to_tz = NULL) {
-    $to_tz = $to_tz ?? ($params['event_tz'] ?? NULL);
-
-    if (is_null($to_tz)) {
-      return;
-    }
-
-    foreach (CRM_Event_BAO_Event::tz_fields as $field) {
-      if (!empty($params[$field]) && empty($params[$field . '_local'])) {
-        $params[$field . '_utc'] = CRM_Utils_Date::convertTimeZone($params[$field], 'UTC');
-        $params[$field . '_local'] = $params[$field];
-        $params[$field] = CRM_Utils_Date::convertTimeZone($params[$field], $to_tz);
-      }
-    }
-
-  }
-
-  public static function setTimezones(CRM_Event_DAO_Event $event) {
-    // Pre-process time zoned fields into the PHP time zone, which should be the same as the database, to save as timestamp.
-    $timezone_event = ($event->event_tz ?: (!empty($event->id) ? CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $event->id, 'event_tz') : NULL));
-
-    foreach (self::tz_fields as $field) {
-      if (!empty($event->{$field})) {
-        $event->{$field} = CRM_Utils_Date::convertTimeZone($event->{$field}, NULL, $timezone_event);
-      }
-    }
-  }
-
-  public static function resetTimezones(CRM_Event_DAO_Event $event) {
-    // Process time zoned fields into their own time zone
-    $timezone_event = ($event->event_tz ?: (!empty($event->id) ? CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $event->id, 'event_tz') : NULL));
-
-    foreach (self::tz_fields as $field) {
-      if (!empty($event->{$field})) {
-        $event->{$field} = CRM_Utils_Date::convertTimeZone($event->{$field}, $timezone_event);
-      }
-    }
   }
 
 }

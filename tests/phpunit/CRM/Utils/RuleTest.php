@@ -345,7 +345,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test CVV rule
+   * Test Email rule
    *
    * @param string $email
    * @param bool $expected expected outcome of the rule validation
@@ -368,6 +368,27 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
     $cases['test@localhost'] = ['test@localhost', TRUE];
     $cases['test@ēxāmplē.co'] = ['test@exāmple', FALSE];
     return $cases;
+  }
+
+  public static function urls(): array {
+    $urls = [];
+    $urls[] = ['https://mysite.org/index.php/apps/files/?dir=/Talk/Test%20Folder1/Test%20Folder%202&fileid=597195', TRUE];
+    $urls[] = ['http://täst.de', TRUE];
+    $urls[] = ['https://الاردن.jo', TRUE];
+    $urls[] = ['I didn\'t say Simon Says', FALSE];
+    return $urls;
+  }
+
+  /**
+   * Test URL rule
+   *
+   * @param string $url
+   * @param bool $expected expected outcome of the rule validation
+   *
+   * @dataProvider urls
+   */
+  public function testUrlRule(string $url, bool $expected): void {
+    $this->assertEquals($expected, CRM_Utils_Rule::url($url));
   }
 
 }

@@ -19,12 +19,12 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class ExampleDataTest extends UnitTestCase {
+class ExampleDataTest extends Api4TestBase {
 
   /**
    * Basic canary test fetching a specific example.
@@ -33,7 +33,7 @@ class ExampleDataTest extends UnitTestCase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testGet() {
-    $file = \Civi::paths()->getPath('[civicrm.root]/Civi/WorkflowMessage/GenericWorkflowMessage/Alex.ex.php');
+    $file = \Civi::paths()->getPath('[civicrm.root]/Civi/WorkflowMessage/GenericWorkflowMessage/Alex.php');
     $name = 'workflow/generic/Alex';
 
     $this->assertTrue(file_exists($file), "Expect find canary file ($file)");

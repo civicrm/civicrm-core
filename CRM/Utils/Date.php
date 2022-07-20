@@ -337,13 +337,13 @@ class CRM_Utils_Date {
         }
       }
       else {
-        if (strpos($dateString, '-')) {
+        if (strpos(($dateString ?? ''), '-')) {
           $month = (int) substr($dateString, 5, 2);
           $day = (int) substr($dateString, 8, 2);
         }
         else {
-          $month = (int) substr($dateString, 4, 2);
-          $day = (int) substr($dateString, 6, 2);
+          $month = (int) substr(($dateString ?? ''), 4, 2);
+          $day = (int) substr(($dateString ?? ''), 6, 2);
         }
 
         if (strlen($dateString) > 10) {
@@ -369,6 +369,7 @@ class CRM_Utils_Date {
 
         $hour24 = (int) substr($dateString, 11, 2);
         $minute = (int) substr($dateString, 14, 2);
+        $second = (int) substr($dateString, 17, 2);
       }
       else {
         $year = (int) substr($dateString, 0, 4);
@@ -377,6 +378,7 @@ class CRM_Utils_Date {
 
         $hour24 = (int) substr($dateString, 8, 2);
         $minute = (int) substr($dateString, 10, 2);
+        $second = (int) substr($dateString, 12, 2);
       }
 
       if ($day % 10 == 1 and $day != 11) {
@@ -430,13 +432,13 @@ class CRM_Utils_Date {
         '%P' => $type,
         '%A' => $type,
         '%Y' => $year,
+        '%s' => str_pad($second, 2, 0, STR_PAD_LEFT),
+        '%S' => str_pad($second, 2, 0, STR_PAD_LEFT),
       ];
 
       return strtr($format, $date);
     }
-    else {
-      return '';
-    }
+    return '';
   }
 
   /**
@@ -523,7 +525,7 @@ class CRM_Utils_Date {
    */
   public static function isoToMysql($iso) {
     $dropArray = ['-' => '', ':' => '', ' ' => ''];
-    return strtr($iso, $dropArray);
+    return strtr(($iso ?? ''), $dropArray);
   }
 
   /**
@@ -541,7 +543,7 @@ class CRM_Utils_Date {
   public static function convertToDefaultDate(&$params, $dateType, $dateParam) {
     $now = getdate();
 
-    $value = NULL;
+    $value = '';
     if (!empty($params[$dateParam])) {
       // suppress hh:mm or hh:mm:ss if it exists CRM-7957
       $value = preg_replace("/(\s(([01]\d)|[2][0-3])(:([0-5]\d)){1,2})$/", "", $params[$dateParam]);
@@ -874,8 +876,8 @@ class CRM_Utils_Date {
     if ($relative) {
       list($term, $unit) = explode('.', $relative, 2);
       $dateRange = self::relativeToAbsolute($term, $unit);
-      $from = substr($dateRange['from'], 0, 8);
-      $to = substr($dateRange['to'], 0, 8);
+      $from = substr(($dateRange['from'] ?? ''), 0, 8);
+      $to = substr(($dateRange['to'] ?? ''), 0, 8);
       // @todo fix relativeToAbsolute & add tests
       // relativeToAbsolute returns 8 char date strings
       // or 14 char date + time strings.
@@ -1934,7 +1936,7 @@ class CRM_Utils_Date {
       $mysqlDate = 'null';
     }
 
-    if (trim($date)) {
+    if (trim($date ?? '')) {
       $mysqlDate = date($format, strtotime($date . ' ' . $time));
     }
 
@@ -2101,15 +2103,23 @@ class CRM_Utils_Date {
   }
 
   /**
+   * Date formatting for imports where date format is specified.
+   *
+   * Note this is used for imports (only) because the importer can
+   * specify the format.
+   *
+   * Tests are in CRM_Utils_DateTest::testFormatDate
+   *
    * @param $date
+   *   Date string as entered.
    * @param $dateType
+   *   One of the constants like CRM_Core_Form_Date::DATE_yyyy_mm_dd.
    *
    * @return null|string
    */
   public static function formatDate($date, $dateType) {
-    $formattedDate = NULL;
     if (empty($date)) {
-      return $formattedDate;
+      return NULL;
     }
 
     // 1. first convert date to default format.
@@ -2122,32 +2132,28 @@ class CRM_Utils_Date {
 
     if (CRM_Utils_Date::convertToDefaultDate($dateParams, $dateType, $dateKey)) {
       $dateVal = $dateParams[$dateKey];
-      $ruleName = 'date';
       if ($dateType == 1) {
         $matches = [];
-        if (preg_match("/(\s(([01]\d)|[2][0-3]):([0-5]\d))$/", $date, $matches)) {
-          $ruleName = 'dateTime';
+        // The seconds part of this regex is not quite right - but it does succeed
+        // in clarifying whether there is a time component or not - which is all it is meant
+        // to do.
+        if (preg_match('/(\s(([01]\d)|[2][0-3]):([0-5]\d):?[0-5]?\d?)$/', $date, $matches)) {
           if (strpos($date, '-') !== FALSE) {
             $dateVal .= array_shift($matches);
           }
+          if (!CRM_Utils_Rule::dateTime($dateVal)) {
+            return NULL;
+          }
+          $dateVal = CRM_Utils_Date::customFormat(preg_replace("/(:|\s)?/", '', $dateVal), '%Y%m%d%H%i%s');
+          return $dateVal;
         }
       }
 
       // validate date.
-      $valid = CRM_Utils_Rule::$ruleName($dateVal);
-
-      if ($valid) {
-        // format date and time to default.
-        if ($ruleName == 'dateTime') {
-          $dateVal = CRM_Utils_Date::customFormat(preg_replace("/(:|\s)?/", "", $dateVal), '%Y%m%d%H%i');
-          // hack to add seconds
-          $dateVal .= '00';
-        }
-        $formattedDate = $dateVal;
-      }
+      return CRM_Utils_Rule::date($dateVal) ? $dateVal : NULL;
     }
 
-    return $formattedDate;
+    return NULL;
   }
 
   /**
@@ -2216,71 +2222,56 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Convert a date string between time zones
+   * Check if the value returned by a date picker has a date section (ie: includes
+   * a '-' character) if it includes a time section (ie: includes a ':').
    *
-   * @param string $date - date string using $format
-   * @param string $tz_to - new time zone for date
-   * @param string $tz_from - current time zone for date
-   * @param string $format - format string specification as per DateTime::createFromFormat; defaults to 'Y-m-d H:i:s'
+   * @param string $value
+   *   A date/time string input from a datepicker value.
    *
-   * @throws \CRM_Core_Exception
-   *
-   * @return string;
+   * @return bool
+   *   TRUE if valid, FALSE if there is a time without a date.
    */
-  public static function convertTimeZone(string $date, string $tz_to = NULL, string $tz_from = NULL, $format = NULL) {
-    if (!$tz_from) {
-      $tz_from = CRM_Core_Config::singleton()->userSystem->getTimeZoneString();
+  public static function datePickerValueWithTimeHasDate($value) {
+    // If there's no : (time) or a : and a - (date) then return true
+    return (
+      strpos($value, ':') === FALSE
+      || strpos($value, ':') !== FALSE && strpos($value, '-') !== FALSE
+    );
+  }
+
+  /**
+   * Validate start and end dates entered on a form to make sure they are
+   * logical. Expects the form keys to be start_date and end_date.
+   *
+   * @param string $startFormKey
+   *   The form element key of the 'start date'
+   * @param string $startValue
+   *   The value of the 'start date'
+   * @param string $endFormKey
+   *   The form element key of the 'end date'
+   * @param string $endValue
+   * The value of the 'end date'
+   *
+   * @return array|bool
+   *   TRUE if valid, an array of the erroneous form key, and error message to
+   *   use otherwise.
+   */
+  public static function validateStartEndDatepickerInputs($startFormKey, $startValue, $endFormKey, $endValue) {
+
+    // Check date as well as time is set
+    if (!empty($startValue) && !self::datePickerValueWithTimeHasDate($startValue)) {
+      return ['key' => $startFormKey, 'message' => ts('Please enter a date as well as a time.')];
     }
-    if (!$tz_to) {
-      $tz_to = CRM_Core_Config::singleton()->userSystem->getTimeZoneString();
+    if (!empty($endValue) && !self::datePickerValueWithTimeHasDate($endValue)) {
+      return ['key' => $endFormKey, 'message' => ts('Please enter a date as well as a time.')];
     }
 
-    // Return early if both timezones are the same.
-    if ($tz_from == $tz_to) {
-      return $date;
+    // Check end date is after start date
+    if (!empty($startValue) && !empty($endValue) && $endValue < $startValue) {
+      return ['key' => $endFormKey, 'message' => ts('The end date should be after the start date.')];
     }
 
-    $tz_from = new DateTimeZone($tz_from);
-    $tz_to = new DateTimeZone($tz_to);
-
-    if (is_null($format)) {
-      // Detect "mysql" format dates and adjust format accordingly
-      $format = preg_match('/^(\d{4})(\d{2}){0,5}$/', $date, $m) ? 'YmdHis' : 'Y-m-d H:i:s';
-    }
-
-    try {
-      $date_object = DateTime::createFromFormat('!' . $format, $date, $tz_from);
-      $dt_errors = DateTime::getLastErrors();
-
-      if (!$date_object) {
-        Civi::log()->warning(ts('Attempted to convert time zone with incorrect date format %1', ['%1' => $date]));
-
-        $dt_errors = DateTime::getLastErrors();
-
-        $date_object = new DateTime($date, $tz_from);
-      }
-      elseif ($dt_errors['warning_count'] && array_intersect($dt_errors['warnings'], ['The parsed date was invalid'])) {
-        throw new Exception('The parsed date was invalid');
-      }
-
-      $date_object->setTimezone($tz_to);
-
-      return $date_object->format($format);
-    }
-    catch (Exception $e) {
-      if ($dt_errors['error_count'] || $dt_errors['warning_count']) {
-        throw new CRM_Core_Exception(ts(
-          'Failed to parse date with %1 errors and %2 warnings',
-          [
-            '%1' => $dt_errors['error_count'],
-            '%2' => $dt_errors['warning_count'],
-          ]
-        ), 0, ['format' => $format, 'date' => $date] + $dt_errors);
-      }
-      else {
-        throw $e;
-      }
-    }
+    return TRUE;
   }
 
 }

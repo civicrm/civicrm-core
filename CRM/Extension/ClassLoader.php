@@ -22,6 +22,14 @@ class CRM_Extension_ClassLoader {
   const FEATURES = ',psr0,psr4,';
 
   /**
+   * A list of recently-activated extensions. This list is retained
+   * even if some ill-advised part of the installer does a `ClassLoader::refresh()`.
+   *
+   * @var array
+   */
+  private static $newExtensions = [];
+
+  /**
    * @var CRM_Extension_Mapper
    */
   protected $mapper;
@@ -97,6 +105,9 @@ class CRM_Extension_ClassLoader {
       }
       self::loadExtension($loader, $this->mapper->keyToInfo($key), $this->mapper->keyToBasePath($key));
     }
+    foreach (static::$newExtensions as $record) {
+      static::loadExtension($loader, $record[0], $record[1]);
+    }
 
     return $loader;
   }
@@ -130,6 +141,7 @@ class CRM_Extension_ClassLoader {
     if (file_exists($file)) {
       unlink($file);
     }
+    static::$newExtensions[] = [$info, $path];
     if ($this->loader) {
       self::loadExtension($this->loader, $info, $path);
     }

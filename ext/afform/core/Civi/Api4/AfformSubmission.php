@@ -11,4 +11,14 @@ namespace Civi\Api4;
  */
 class AfformSubmission extends Generic\DAOEntity {
 
+  /**
+   * @return array
+   */
+  public static function permissions() {
+    return [
+      'meta' => ['access CiviCRM'],
+      'default' => [['administer CiviCRM', 'administer afform']],
+    ];
+  }
+
 }

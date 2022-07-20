@@ -154,8 +154,22 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
     $this->assign('context', $context);
 
     if ($this->membershipID) {
-      $params = ['id' => $this->membershipID];
-      CRM_Member_BAO_Membership::retrieve($params, $values);
+      $values = \Civi\Api4\Membership::get()
+        ->addSelect('*', 'status_id:label', 'membership_type_id:label', 'membership_type_id.financial_type_id', 'status_id.is_current_member')
+        ->addWhere('id', '=', $this->membershipID)
+        ->execute()
+        ->first();
+
+      // Ensure keys expected by MembershipView.tpl are set correctly
+      // Some of these defaults are overwritten dependant on context below
+      $values['financialTypeId'] = $values['membership_type_id.financial_type_id'];
+      $values['membership_type'] = $values['membership_type_id:label'];
+      $values['status'] = $values['status_id:label'];
+      $values['active'] = $values['status_id.is_current_member'];
+      $values['owner_contact_id'] = FALSE;
+      $values['owner_display_name'] = FALSE;
+      $values['campaign'] = FALSE;
+
       if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
         $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $values['membership_type_id'], 'financial_type_id');
         $finType = CRM_Contribute_PseudoConstant::financialType($finTypeId);

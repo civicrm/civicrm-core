@@ -384,7 +384,7 @@ class CRM_Core_DAO extends DB_DataObject {
             else {
               $options = CRM_Core_PseudoConstant::get($daoName, $fieldName);
               if (is_array($options)) {
-                $this->$dbName = $options[0];
+                $this->$dbName = $options[0] ?? NULL;
               }
               else {
                 $defaultValues = explode(',', $options);
@@ -780,7 +780,7 @@ class CRM_Core_DAO extends DB_DataObject {
         }
         else {
           $maxLength = $field['maxlength'] ?? NULL;
-          if (!is_array($value) && $maxLength && mb_strlen($value) > $maxLength && empty($field['pseudoconstant'])) {
+          if (!is_array($value) && $maxLength && mb_strlen($value ?? '') > $maxLength && empty($field['pseudoconstant'])) {
             // No ts() since this is a sysadmin-y string not seen by general users.
             Civi::log()->warning('A string for field {dbName} has been truncated. The original string was {value}.', ['dbName' => $dbName, 'value' => $value]);
             // The string is too long - what to do what to do? Well losing data is generally bad so let's truncate
@@ -2280,12 +2280,6 @@ SELECT contact_id
     // Prefer to instantiate BAO's instead of DAO's (when possible)
     // so that assignTestValue()/assignTestFK() can be overloaded.
     $baoName = str_replace('_DAO_', '_BAO_', $daoName);
-    if ($baoName === 'CRM_Financial_BAO_FinancialTrxn') {
-      // OMG OMG OMG this is so incredibly bad. The BAO is insanely named.
-      // @todo create a new class called what the BAO SHOULD be
-      // that extends BAO-crazy-name.... migrate.
-      $baoName = 'CRM_Core_BAO_FinancialTrxn';
-    }
     if (class_exists($baoName)) {
       $daoName = $baoName;
     }
@@ -3292,6 +3286,27 @@ SELECT contact_id
   }
 
   /**
+   * Overridable function to get icon for a particular entity.
+   *
+   * Example: `CRM_Contact_BAO_Contact::getIcon('Contact', 123)`
+   *
+   * @param string $entityName
+   *   Short name of the entity. This may seem redundant because the entity name can usually be inferred
+   *   from the BAO class being called, but not always. Some virtual entities share a BAO class.
+   * @param int $entityId
+   *   Id of the entity.
+   * @throws CRM_Core_Exception
+   */
+  public static function getEntityIcon(string $entityName, int $entityId) {
+    if (static::class === 'CRM_Core_DAO' || static::class !== CRM_Core_DAO_AllCoreTables::getBAOClassName(static::class)) {
+      throw new CRM_Core_Exception('CRM_Core_DAO::getIcon must be called on a BAO class e.g. CRM_Contact_BAO_Contact::getIcon("Contact", 123).');
+    }
+    // By default, just return the icon representing this entity. If there's more complex lookup to do,
+    // the BAO for this entity should override this method.
+    return static::$_icon;
+  }
+
+  /**
    * When creating a record without a supplied name,
    * create a unique, clean name derived from the label.
    *
@@ -3314,8 +3329,8 @@ SELECT contact_id
       return;
     }
     $label = $this->label ?? $this->title ?? NULL;
-    if (!$label && $label !== '0' && !$isRequired) {
-      // No label supplied and name not required, do nothing
+    if (!$label && $label !== '0') {
+      // No label supplied, do nothing
       return;
     }
     $maxLen = static::getSupportedFields()['name']['maxlength'] ?? 255;

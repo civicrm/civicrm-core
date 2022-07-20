@@ -2347,7 +2347,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $contact = $this->callAPISuccess('contact', 'create', array_merge($this->_params, $params));
 
     $result = $this->callAPISuccess('contact', 'getsingle', ['id' => $contact['id']]);
-    $this->assertEquals('Both', $result['preferred_mail_format']);
 
     $this->assertEquals('en_US', $result['preferred_language']);
     $this->assertEquals(1, $result['communication_style_id']);
@@ -2397,6 +2396,43 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(1, $result['count']);
     $this->assertEquals(date('Y-m-d', strtotime('first day of next month -5 years')), $result['values'][$contact2['id']]['birth_date']);
+  }
+
+  /**
+   * Test the greeting fields update sensibly.
+   */
+  public function testGreetingUpdates(): void {
+    $contactID = $this->individualCreate();
+    $greetingFields = ['email_greeting_id:name', 'email_greeting_display', 'email_greeting_custom'];
+    $currentGreetings = $this->callAPISuccessGetSingle('Contact', ['id' => $contactID, 'version' => 4, 'return' => $greetingFields]);
+    $this->assertEquals('Dear {contact.first_name}', $currentGreetings['email_greeting_id:name']);
+    // Change to customized greeting.
+    $this->callAPISuccess('Contact', 'create', [
+      'id' => $contactID,
+      'email_greeting_id' => 'Customized',
+      'email_greeting_custom' => 'Howdy',
+    ]);
+    $currentGreetings = $this->callAPISuccessGetSingle('Contact', ['version' => 4, 'id' => $contactID, 'return' => $greetingFields]);
+    $this->assertEquals('Customized', $currentGreetings['email_greeting_id:name']);
+    $this->assertEquals('Howdy', $currentGreetings['email_greeting_custom']);
+    $this->assertEquals('Howdy', $currentGreetings['email_greeting_display']);
+
+    // Change back to standard, check email_greeting_custom set to NULL.
+    $this->callAPISuccess('Contact', 'create', [
+      'id' => $contactID,
+      'email_greeting_id' => 'Dear {contact.first_name}',
+    ]);
+    $currentGreetings = $this->callAPISuccessGetSingle('Contact', ['id' => $contactID, 'version' => 4, 'return' => $greetingFields]);
+    $this->assertNull($currentGreetings['email_greeting_custom']);
+
+    $this->callAPISuccess('Contact', 'create', [
+      'id' => $contactID,
+      'email_greeting_custom' => 'Howdy',
+    ]);
+    $currentGreetings = $this->callAPISuccessGetSingle('Contact', ['version' => 4, 'id' => $contactID, 'return' => $greetingFields]);
+    $this->assertEquals('Customized', $currentGreetings['email_greeting_id:name']);
+    $this->assertEquals('Howdy', $currentGreetings['email_greeting_custom']);
+    $this->assertEquals('Howdy', $currentGreetings['email_greeting_display']);
   }
 
   /**

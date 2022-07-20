@@ -7,32 +7,6 @@ use CRM_Search_ExtensionUtil as E;
 class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
 
   /**
-   * Add menu item when enabled.
-   */
-  public function enable() {
-    \Civi\Api4\Navigation::create(FALSE)
-      ->addValue('parent_id:name', 'Search')
-      ->addValue('label', E::ts('Search Kit'))
-      ->addValue('name', 'search_kit')
-      ->addValue('url', 'civicrm/admin/search')
-      ->addValue('icon', 'crm-i fa-search-plus')
-      ->addValue('has_separator', 2)
-      ->addValue('weight', 99)
-      ->addValue('permission', ['administer CiviCRM data'])
-      ->execute();
-  }
-
-  /**
-   * Delete menu item when disabled.
-   */
-  public function disable() {
-    \Civi\Api4\Navigation::delete(FALSE)
-      ->addWhere('name', '=', 'search_kit')
-      ->addWhere('domain_id', '=', 'current_domain')
-      ->execute();
-  }
-
-  /**
    * Upgrade 1000 - install schema
    * @return bool
    */
@@ -42,7 +16,6 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
     if (!CRM_Core_DAO::singleValueQuery("SHOW TABLES LIKE 'civicrm_search_display'")) {
       $this->executeSqlFile('sql/auto_install.sql');
     }
-    CRM_Core_DAO::executeQuery("UPDATE civicrm_navigation SET url = 'civicrm/admin/search', name = 'search_kit' WHERE url = 'civicrm/search'");
     return TRUE;
   }
 
@@ -143,16 +116,6 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
   }
 
   /**
-   * Upgrade 1004 - fix menu permission.
-   * @return bool
-   */
-  public function upgrade_1004(): bool {
-    $this->ctx->log->info('Applying update 1004 - fix menu permission.');
-    CRM_Core_DAO::executeQuery("UPDATE civicrm_navigation SET permission = 'administer CiviCRM data' WHERE url = 'civicrm/admin/search'");
-    return TRUE;
-  }
-
-  /**
    * Upgrade 1005 - add acl_bypass column.
    * @return bool
    */
@@ -190,20 +153,25 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
   }
 
   /**
-   * Add a column to a table if it doesn't already exist
-   *
-   * FIXME: Move to a shared class, delegate to CRM_Upgrade_Incremental_Base::addColumn
-   *
-   * @param string $table
-   * @param string $column
-   * @param string $properties
-   *
+   * Add SearchSegment table
    * @return bool
    */
-  public static function addColumn($table, $column, $properties) {
-    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column, FALSE)) {
-      $query = "ALTER TABLE `$table` ADD COLUMN `$column` $properties";
-      CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
+  public function upgrade_1007(): bool {
+    $this->ctx->log->info('Applying update 1007 - add SearchSegment table.');
+    if (!CRM_Core_DAO::singleValueQuery("SHOW TABLES LIKE 'civicrm_search_segment'")) {
+      $createTable = "
+CREATE TABLE `civicrm_search_segment` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique SearchSegment ID',
+  `name` varchar(255) NOT NULL COMMENT 'Unique name',
+  `label` varchar(255) NOT NULL COMMENT 'Label for identifying search segment (will appear as name of calculated field)',
+  `description` varchar(255) COMMENT 'Description will appear when selecting SearchSegment in the fields dropdown.',
+  `entity_name` varchar(255) NOT NULL COMMENT 'Entity for which this set is used.',
+  `items` text COMMENT 'All items in set',
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `UI_name`(name)
+)
+ENGINE=InnoDB ROW_FORMAT=DYNAMIC";
+      CRM_Core_DAO::executeQuery($createTable, [], TRUE, NULL, FALSE, FALSE);
     }
     return TRUE;
   }

@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {if !$suppressForm}
-<form {$form.attributes} >
+<form {$form.attributes|smarty:nodefaults}>
   {crmRegion name='form-top'}{/crmRegion}
 {/if}
 

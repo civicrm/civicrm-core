@@ -105,6 +105,14 @@ class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
         }
       }
 
+      // Ensure keys are always set to avoid Smarty notices
+      if (!isset($contributionType[$dao->id]['accounting_code'])) {
+        $contributionType[$dao->id]['accounting_code'] = FALSE;
+      }
+      if (!isset($contributionType[$dao->id]['account_type_code'])) {
+        $contributionType[$dao->id]['account_type_code'] = FALSE;
+      }
+
       $contributionType[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
         ['id' => $dao->id],
         ts('more'),

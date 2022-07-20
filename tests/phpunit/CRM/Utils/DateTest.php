@@ -68,7 +68,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     $cases = $this->fromToData();
     foreach ($cases as $caseDescription => $case) {
       $obj = new CRM_Utils_Date();
-      list($calculatedFrom, $calculatedTo) = $obj->getFromTo($case['relative'], $case['from'], $case['to']);
+      [$calculatedFrom, $calculatedTo] = $obj->getFromTo($case['relative'], $case['from'], $case['to']);
       $this->assertEquals($case['expectedFrom'], $calculatedFrom, "Expected From failed for case $caseDescription");
       $this->assertEquals($case['expectedTo'], $calculatedTo, "Expected To failed for case $caseDescription");
     }
@@ -270,6 +270,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%p"), "pm");
     $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%P"), "PM");
     $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%Y"), "2018");
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%s"), "44");
   }
 
   /**
@@ -325,25 +326,28 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test timezone conversion function
+   * Test formatDate function.
+   *
+   * @dataProvider dateDataProvider
+   *
+   * Test the format function used in imports. Note most forms
+   * are able to format pre-submit but the import needs to parse the date.
    */
-  public function testConvertTimeZone() {
-    $tests = [
-      [['1970-01-01 00:00:00', 'Atlantic/Azores', 'UTC'], '1969-12-31 23:00:00'],
-      [['1970-01-01 00:00:00', 'Europe/Berlin'], '1970-01-01 01:00:00'],
-      [['2022-06-22 12:00:00', 'Atlantic/Azores'], '2022-06-22 12:00:00'],
-      [['2022-06-22 12:00:00', 'Europe/Berlin', 'UTC'], '2022-06-22 14:00:00'],
-      [['2022-06-22 12:00:00', 'Europe/Berlin', 'Australia/Sydney'], '2022-06-22 04:00:00'],
+  public function testFormatDate($date, $format, $expected): void {
+    $this->assertEquals($expected, CRM_Utils_Date::formatDate($date, $format));
+  }
+
+  /**
+   * Data provider for date formats.
+   *
+   * @return array[]
+   */
+  public function dateDataProvider(): array {
+    return [
+      ['date' => '2022-10-01', 'format' => CRM_Core_Form_Date::DATE_yyyy_mm_dd, 'expected' => '20221001'],
+      ['date' => '2022-10-01 15:54', 'format' => CRM_Core_Form_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155400'],
+      ['date' => '2022-10-01 15:54:56', 'format' => CRM_Core_Form_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155456'],
     ];
-
-    foreach ($tests as $i => [$params, $result]) {
-      $this->assertEquals($result, CRM_Utils_Date::convertTimeZone(...$params), "convertTimeZone $i");
-    }
-
-    //0000-00-00 00:00:00 is not an actual time, so we should expect an exception.
-    $this->expectException(CRM_Core_Exception::class);
-    $this->expectExceptionMessageMatches('{^Failed to parse date}');
-    CRM_Utils_Date::convertTimeZone('0000-00-00 00:00:00', 'Europe/Berlin');
   }
 
 }

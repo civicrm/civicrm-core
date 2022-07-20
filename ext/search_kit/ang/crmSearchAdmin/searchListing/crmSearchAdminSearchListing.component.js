@@ -17,7 +17,8 @@
       this.searchDisplayPath = CRM.url('civicrm/search');
       this.afformPath = CRM.url('civicrm/admin/afform');
       this.afformEnabled = 'org.civicrm.afform' in CRM.crmSearchAdmin.modules;
-      this.afformAdminEnabled = 'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
+      this.afformAdminEnabled = (CRM.checkPerm('administer CiviCRM') || CRM.checkPerm('administer afform')) &&
+        'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
 
       this.apiEntity = 'SavedSearch';
       this.search = {
@@ -79,7 +80,7 @@
       // Get the names of in-use filters
       function getActiveFilters() {
         return _.keys(_.pick(ctrl.filters, function(val) {
-          return val !== null && (val === true || val === false || val.length);
+          return val !== null && (_.includes(['boolean', 'number'], typeof val) || val.length);
         }));
       }
 
@@ -190,7 +191,7 @@
               searchMeta.fieldToColumn('label', {
                 label: true,
                 title: ts('Edit Label'),
-                editable: {entity: 'SavedSearch', id: 'id', name: 'label', value: 'label'}
+                editable: true
               }),
               searchMeta.fieldToColumn('api_entity:label', {
                 label: ts('For'),

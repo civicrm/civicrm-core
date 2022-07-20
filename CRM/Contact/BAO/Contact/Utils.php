@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Contact;
+use Civi\Api4\Relationship;
 
 /**
  *
@@ -19,9 +20,9 @@ use Civi\Api4\Contact;
 class CRM_Contact_BAO_Contact_Utils {
 
   /**
-   * Given a contact type, get the contact image.
+   * Given a contact type or sub_type(s), generate markup for the contact type icon.
    *
-   * @param string $contactType
+   * @param string $contactTypes
    *   Contact type.
    * @param bool $urlOnly
    *   If we need to return only image url.
@@ -35,47 +36,43 @@ class CRM_Contact_BAO_Contact_Utils {
    * @return string
    * @throws \CRM_Core_Exception
    */
-  public static function getImage($contactType, $urlOnly = FALSE, $contactId = NULL, $addProfileOverlay = TRUE, $contactUrl = NULL) {
+  public static function getImage($contactTypes, $urlOnly = FALSE, $contactId = NULL, $addProfileOverlay = TRUE, $contactUrl = NULL) {
+    // Ensure string data is unserialized
+    $contactTypes = CRM_Utils_Array::explodePadded($contactTypes);
 
-    static $imageInfo = [];
+    $allContactTypeInfo = \CRM_Contact_BAO_ContactType::getAllContactTypes();
 
-    $contactType = CRM_Utils_Array::explodePadded($contactType);
-    $contactType = $contactType[0];
+    $imageInfo = ['url' => NULL, 'image' => NULL];
 
-    if (!array_key_exists($contactType, $imageInfo)) {
-      $imageInfo[$contactType] = [];
+    foreach ($contactTypes as $contactType) {
+      $typeInfo = $allContactTypeInfo[$contactType];
+      // Prefer the first type/subtype with an icon
+      if (!empty($typeInfo['icon'])) {
+        break;
+      }
 
-      $typeInfo = [];
-      $params = ['name' => $contactType];
-      CRM_Contact_BAO_ContactType::retrieve($params, $typeInfo);
-
+      // Fall back to using image_URL if no subtypes have an icon
       if (!empty($typeInfo['image_URL'])) {
         $imageUrl = $typeInfo['image_URL'];
-        $config = CRM_Core_Config::singleton();
 
         if (!preg_match("/^(\/|(http(s)?:)).+$/i", $imageUrl)) {
-          $imageUrl = $config->resourceBase . $imageUrl;
+          $imageUrl = CRM_Core_Config::singleton()->resourceBase . $imageUrl;
         }
-        $imageInfo[$contactType]['image'] = "<div class=\"icon crm-icon {$typeInfo['name']}-icon\" style=\"background: url('{$imageUrl}')\" title=\"{$contactType}\"></div>";
-        $imageInfo[$contactType]['url'] = $imageUrl;
+        $imageInfo['image'] = "<div class=\"icon crm-icon {$typeInfo['name']}-icon\" style=\"background: url('{$imageUrl}')\" title=\"{$contactType}\"></div>";
+        $imageInfo['url'] = $imageUrl;
       }
-      else {
-        if (!empty($typeInfo['parent_id'])) {
-          $type = CRM_Contact_BAO_ContactType::getBasicType($typeInfo['name']) . '-subtype';
-        }
-        else {
-          $type = $typeInfo['name'] ?? NULL;
-        }
+    }
 
-        // do not add title since it hides contact name
-        if ($addProfileOverlay) {
-          $imageInfo[$contactType]['image'] = "<div class=\"icon crm-icon {$type}-icon\"></div>";
-        }
-        else {
-          $imageInfo[$contactType]['image'] = "<div class=\"icon crm-icon {$type}-icon\" title=\"{$contactType}\"></div>";
-        }
-        $imageInfo[$contactType]['url'] = NULL;
-      }
+    // If subtype doesn't have an image or an icon, use the parent type
+    if (empty($imageUrl) && empty($typeInfo['icon']) && !empty($typeInfo['parent'])) {
+      $typeInfo = $allContactTypeInfo[$typeInfo['parent']];
+    }
+
+    // Prefer icon over image
+    if (!empty($typeInfo['icon'])) {
+      // do not add title since it hides contact name
+      $title = $addProfileOverlay ? '' : htmlspecialchars($typeInfo['label']);
+      $imageInfo['image'] = '<i class="crm-i fa-fw ' . $typeInfo['icon'] . '" title="' . $title . '"></i>';
     }
 
     if ($addProfileOverlay) {
@@ -91,13 +88,13 @@ class CRM_Contact_BAO_Contact_Utils {
         "reset=1&gid={$summaryOverlayProfileId}&id={$contactId}&snippet=4&is_show_email_task=1"
       );
 
-      $imageInfo[$contactType]['summary-link'] = '<a href="' . $contactURL . '" data-tooltip-url="' . $profileURL . '" class="crm-summary-link">' . $imageInfo[$contactType]['image'] . '</a>';
+      $imageInfo['summary-link'] = '<a href="' . $contactURL . '" data-tooltip-url="' . $profileURL . '" class="crm-summary-link">' . $imageInfo['image'] . '</a>';
     }
     else {
-      $imageInfo[$contactType]['summary-link'] = $imageInfo[$contactType]['image'];
+      $imageInfo['summary-link'] = $imageInfo['image'];
     }
 
-    return $urlOnly ? $imageInfo[$contactType]['url'] : $imageInfo[$contactType]['summary-link'];
+    return $urlOnly ? $imageInfo['url'] : $imageInfo['summary-link'];
   }
 
   /**
@@ -253,7 +250,7 @@ WHERE  id IN ( $idString )
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function createCurrentEmployerRelationship($contactID, $employerID, $previousEmployerID = NULL, $newContact = FALSE) {
+  public static function createCurrentEmployerRelationship($contactID, $employerID, $previousEmployerID = NULL, $newContact = FALSE): void {
     if (!$employerID) {
       // This function is not called in core with no organization & should not be
       // Refs CRM-15368,CRM-15547
@@ -262,11 +259,11 @@ WHERE  id IN ( $idString )
     }
     if (!is_numeric($employerID)) {
       $dupeIDs = CRM_Contact_BAO_Contact::getDuplicateContacts(['organization_name' => $employerID], 'Organization', 'Unsupervised', [], FALSE);
-      $employerID = reset($dupeIDs) ?: Contact::create(FALSE)
+      $employerID = (int) (reset($dupeIDs) ?: Contact::create(FALSE)
         ->setValues([
           'contact_type' => 'Organization',
           'organization_name' => $employerID,
-        ])->execute()->first()['id'];
+        ])->execute()->first()['id']);
     }
 
     $relationshipTypeID = CRM_Contact_BAO_RelationshipType::getEmployeeRelationshipTypeID();
@@ -276,9 +273,49 @@ WHERE  id IN ( $idString )
       CRM_Core_Error::deprecatedWarning('attempting to create an employer with invalid contact types is deprecated');
       return;
     }
-    // create employee of relationship
-    [$duplicate, $relationshipIds]
-      = self::legacyCreateMultiple($relationshipTypeID, $employerID, $contactID);
+
+    $relationshipIds = [];
+    $ids = [];
+    $action = CRM_Core_Action::ADD;
+    $existingRelationship = Relationship::get(FALSE)
+      ->setWhere([
+        ['contact_id_a', '=', $contactID],
+        ['contact_id_b', '=', $employerID],
+        ['OR', [['start_date', '<=', 'now'], ['start_date', 'IS EMPTY']]],
+        ['OR', [['end_date', '>=', 'now'], ['end_date', 'IS EMPTY']]],
+        ['relationship_type_id', '=', $relationshipTypeID],
+        ['is_active', 'IN', [0, 1]],
+      ])
+      ->setSelect(['id', 'is_active', 'start_date', 'end_date', 'contact_id_a.employer_id'])
+      ->addOrderBy('is_active', 'DESC')
+      ->setLimit(1)
+      ->execute()->first();
+
+    if (!empty($existingRelationship)) {
+      if ($existingRelationship['is_active']) {
+        // My work here is done.
+        return;
+      }
+
+      $action = CRM_Core_Action::UPDATE;
+      // No idea why we set these ids but it's either legacy cruft or used by `relatedMemberships`
+      $ids['contact'] = $contactID;
+      $ids['contactTarget'] = $employerID;
+      $ids['relationship'] = $existingRelationship['id'];
+      CRM_Contact_BAO_Relationship::setIsActive($existingRelationship['id'], TRUE);
+    }
+    else {
+      $params = [
+        'is_active' => TRUE,
+        'contact_check' => [$employerID => TRUE],
+        'contact_id_a' => $contactID,
+        'contact_id_b' => $employerID,
+        'relationship_type_id' => $relationshipTypeID,
+      ];
+      $relationship = CRM_Contact_BAO_Relationship::add($params);
+      CRM_Contact_BAO_Relationship::addRecent($params, $relationship);
+      $relationshipIds = [$relationship->id];
+    }
 
     // In case we change employer, clean previous employer related records.
     if (!$previousEmployerID && !$newContact) {
@@ -293,25 +330,9 @@ WHERE  id IN ( $idString )
     // set current employer
     self::setCurrentEmployer([$contactID => $employerID]);
 
-    $ids = [];
-    $action = CRM_Core_Action::ADD;
-
-    //we do not know that triggered relationship record is active.
-    if ($duplicate) {
-      $relationship = new CRM_Contact_DAO_Relationship();
-      $relationship->contact_id_a = $contactID;
-      $relationship->contact_id_b = $employerID;
-      $relationship->relationship_type_id = $relationshipTypeID;
-      if ($relationship->find(TRUE)) {
-        $action = CRM_Core_Action::UPDATE;
-        $ids['contact'] = $contactID;
-        $ids['contactTarget'] = $employerID;
-        $ids['relationship'] = $relationship->id;
-        CRM_Contact_BAO_Relationship::setIsActive($relationship->id, TRUE);
-      }
-    }
-
     //need to handle related memberships. CRM-3792
+    // @todo - this probably duplicates the work done in the setIsActive
+    // for duplicates...
     if ($previousEmployerID != $employerID) {
       CRM_Contact_BAO_Relationship::relatedMemberships($contactID, [
         'relationship_ids' => $relationshipIds,
@@ -320,64 +341,6 @@ WHERE  id IN ( $idString )
         'relationship_type_id' => $relationshipTypeID . '_a_b',
       ], $ids, $action);
     }
-  }
-
-  /**
-   * Previously shared function in need of cleanup.
-   *
-   * Takes an associative array and creates a relationship object.
-   *
-   * @deprecated For single creates use the api instead (it's tested).
-   * For multiple a new variant of this function needs to be written and migrated to as this is a bit
-   * nasty
-   *
-   * @param int $relationshipTypeID
-   * @param int $organizationID
-   * @param int $contactID
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   */
-  private static function legacyCreateMultiple(int $relationshipTypeID, int $organizationID, int $contactID): array {
-    $params = [
-      'is_active' => TRUE,
-      'relationship_type_id' => $relationshipTypeID . '_a_b',
-      'contact_check' => [$organizationID => TRUE],
-    ];
-    $ids = ['contact' => $contactID];
-
-    $relationshipIds = [];
-    // check if the relationship is valid between contacts.
-    // step 1: check if the relationship is valid if not valid skip and keep the count
-    // step 2: check the if two contacts already have a relationship if yes skip and keep the count
-    // step 3: if valid relationship then add the relation and keep the count
-
-    // step 1
-    $contactFields = [
-      'contact_id_a' => $contactID,
-      'contact_id_b' => $organizationID,
-      'relationship_type_id' => $relationshipTypeID,
-    ];
-
-    if (
-      CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
-        $contactFields,
-        $contactID,
-        // step 2
-        $organizationID
-      )
-    ) {
-      return [1, []];
-    }
-
-    $singleInstanceParams = array_merge($params, $contactFields);
-    $relationship = CRM_Contact_BAO_Relationship::add($singleInstanceParams);
-    $relationshipIds[] = $relationship->id;
-
-    CRM_Contact_BAO_Relationship::addRecent($params, $relationship);
-
-    return [0, $relationshipIds];
   }
 
   /**

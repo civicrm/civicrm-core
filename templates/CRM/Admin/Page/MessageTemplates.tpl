@@ -131,7 +131,7 @@
                         <td>{$row.msg_subject}</td>
                         <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
                       {/if}
-                      <td>{$row.action|replace:'xx':$row.id}</td>
+                      <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
                     </tr>
                 {/foreach}
                 </tbody>

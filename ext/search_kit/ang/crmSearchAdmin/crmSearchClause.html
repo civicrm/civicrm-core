@@ -15,7 +15,7 @@
         </span>
       </div>
       <div ng-if="!$ctrl.conjunctions[clause[0]]" class="api4-input-group">
-        <crm-search-function ng-if="$ctrl.allowFunctions" class="form-group" expr="clause[0]" mode="clause"></crm-search-function>
+        <crm-search-function ng-if="$ctrl.areFunctionsAllowed(clause[0])" class="form-group" expr="clause[0]" mode="clause"></crm-search-function>
         <span ng-if="!$ctrl.hasFunction(clause[0])">
           <input class="form-control collapsible-optgroups" ng-model="clause[0]" crm-ui-select="{data: $ctrl.fields, allowClear: true, placeholder: 'Field'}" ng-change="$ctrl.changeClauseField(clause, index)" />
         </span>

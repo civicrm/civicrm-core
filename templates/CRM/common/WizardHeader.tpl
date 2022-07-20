@@ -34,20 +34,20 @@
                 {else}
                     {assign var="stepClass" value="current-sub-step"}
                 {/if}
-                {assign var="stepPrefix" value=$wizard.style.stepPrefixCurrent|cat:$wizard.steps[step].stepNumber|cat:". "}
+                {assign var="stepPrefix" value=$wizard.style.stepPrefixCurrent|smarty:nodefaults|cat:$wizard.steps[step].stepNumber|cat:". "}
             {else}
                 {if $wizard.steps[step].step}
                     {assign var="stepClass" value="future-step"}
                 {else}
                     {assign var="stepClass" value="future-sub-step"}
                 {/if}
-                {assign var="stepPrefix" value=$wizard.style.stepPrefixFuture|cat:$wizard.steps[step].stepNumber|cat:". "}
+                {assign var="stepPrefix" value=$wizard.style.stepPrefixFuture|smarty:nodefaults|cat:$wizard.steps[step].stepNumber|cat:". "}
             {/if}
             {if !$wizard.steps[step].valid}
                 {assign var="stepClass" value="$stepClass not-valid"}
             {/if}
             {* wizard.steps[step].link value is passed for wizards/steps which allow clickable navigation *}
-            <li class="{$stepClass}">{$stepPrefix}{if $wizard.steps[step].link}<a href="{$wizard.steps[step].link}">{/if}{$title}{if $wizard.steps[step].link}</a>{/if}</li>
+            <li class="{$stepClass}">{$stepPrefix|smarty:nodefaults}{if $wizard.steps[step].link}<a href="{$wizard.steps[step].link}">{/if}{$title}{if $wizard.steps[step].link}</a>{/if}</li>
         {/if}
     {/section}
    </ul>

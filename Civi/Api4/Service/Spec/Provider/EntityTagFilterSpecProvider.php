@@ -31,9 +31,10 @@ class EntityTagFilterSpecProvider implements Generic\SpecProviderInterface {
       ->setColumnName('id')
       ->setDescription(ts('Filter by tags (including child tags)'))
       ->setType('Filter')
+      ->setInputType('Select')
       ->setOperators(['IN', 'NOT IN'])
       ->addSqlFilter([__CLASS__, 'getTagFilterSql'])
-      ->setSuffixes(['id', 'name', 'label', 'description', 'color'])
+      ->setSuffixes(['name', 'label', 'description', 'color'])
       ->setOptionsCallback([__CLASS__, 'getTagList']);
     $spec->addFieldSpec($field);
   }

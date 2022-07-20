@@ -127,7 +127,7 @@
               {/if}
             {else}
               <div class="label">{$form.start_date.label}</div>
-              <div class="content">{$start_date_display|date_format}</div>
+              <div class="content">{$start_date_display|crmDate:'%b %e, %Y'}</div>
             {/if}
             <div class="clear"></div>
           </div>
@@ -296,9 +296,6 @@
       </div>
     {/if}
 
-    {if $isCaptcha}
-      {include file='CRM/common/ReCAPTCHA.tpl'}
-    {/if}
     <div id="crm-submit-buttons" class="crm-submit-buttons">
       {include file="CRM/common/formButtons.tpl" location="bottom"}
     </div>

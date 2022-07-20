@@ -46,9 +46,9 @@
           <td class="nowrap crmf-end_event_adjust_interval">{if !empty($row.end_event_adjust_interval)}{$row.end_event_adjust_interval}{/if}</td>
           <td class="crmf-is_current_member crm-editable" data-type="boolean">{if $row.is_current_member eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td class="crmf-is_admin crm-editable" data-type="boolean">{if $row.is_admin eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td class="nowrap crmf-weight">{$row.weight}</td>
+          <td class="nowrap crmf-weight">{$row.weight|smarty:nodefaults}</td>
           <td class="crmf-is_reserved">{if $row.is_reserved eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td>{if !empty($row.action)}{$row.action|replace:'xx':$row.id}{/if}</td>
+          <td>{if !empty($row.action)}{$row.action|smarty:nodefaults|replace:'xx':$row.id}{/if}</td>
         </tr>
         {/foreach}
         </table>

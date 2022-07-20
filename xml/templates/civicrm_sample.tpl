@@ -47,7 +47,7 @@ INSERT INTO civicrm_contribution_page
   (title,intro_text,financial_type_id,is_monetary,is_allow_other_amount,default_amount_id,min_amount,max_amount,goal_amount,thankyou_title,thankyou_text,thankyou_footer,receipt_from_name,receipt_from_email,cc_receipt,bcc_receipt,receipt_text,is_active,footer_text,amount_block_is_active,currency,is_email_receipt)
 VALUES
   ('Help Support CiviCRM!','Do you love CiviCRM? Do you use CiviCRM? Then please support CiviCRM and Contribute NOW by trying out our new online contribution features!',1,1,1,137,'10.00','10000.00','100000.00','Thanks for Your Support!','<p>Thank you for your support. Your contribution will help us build even better tools.</p><p>Please tell your friends and colleagues about CiviCRM!</p>','<p><a href=https://civicrm.org>Back to CiviCRM Home Page</a></p>','CiviCRM Fundraising Dept.','donationFake@civicrm.org','receipt@example.com','bcc@example.com','Your donation is tax deductible under IRS 501(c)(3) regulation. Our tax identification number is: 93-123-4567',1, NULL, 1, 'USD', 1),
-  ('Member Signup and Renewal', 'Members are the life-blood of our organization. If you''re not already a member - please consider signing up today. You can select the membership level the fits your budget and needs below.', 2, 1, NULL, NULL, NULL, NULL, NULL, 'Thanks for Your Support!', 'Thanks for supporting our organization with your membership. You can learn more about membership benefits from our members only page.', NULL, 'Membership Department', 'memberships@civicrm.org', NULL, NULL, 'Thanks for supporting our organization with your membership. You can learn more about membership benefits from our members only page.\r\n\r\nKeep this receipt for your records.', 1, NULL, 0, 'USD', 1),
+  ('Member Signup and Renewal', 'Members are the life-blood of our organization. If you''re not already a member - please consider signing up today. You can select the membership level the fits your budget and needs below.', 2, 1, 0, NULL, NULL, NULL, NULL, 'Thanks for Your Support!', 'Thanks for supporting our organization with your membership. You can learn more about membership benefits from our members only page.', NULL, 'Membership Department', 'memberships@civicrm.org', NULL, NULL, 'Thanks for supporting our organization with your membership. You can learn more about membership benefits from our members only page.\r\n\r\nKeep this receipt for your records.', 1, NULL, 0, 'USD', 1),
   ('Pledge for CiviCRM!','Do you love CiviCRM? Do you use CiviCRM? Then please support CiviCRM and Pledge NOW by trying out our online contribution features!',1,1,1,NULL,'10.00','10000.00','100000.00','Thanks for Your Support!','<p>Thank you for your support. Your contribution will help us build even better tools like Pledge.</p><p>Please tell your friends and colleagues about CiviPledge!</p>','<p><a href=https://civicrm.org>Back to CiviCRM Home Page</a></p>','CiviCRM Fundraising Dept.','donationFake@civicrm.org','receipt@example.com','bcc@example.com','Your donation is tax deductible under IRS 501(c)(3) regulation. Our tax identification number is: 93-123-4567',1, NULL, 1, 'USD', 1);
 
 INSERT INTO `civicrm_tell_friend`
@@ -96,13 +96,13 @@ VALUES
    (@option_group_id_act, 'Interview', (SELECT @option_value_max_val := @option_value_max_val + 1), 'Interview',  NULL, 0, NULL, @option_value_max_val, 'Conduct a phone or in person interview.', 0, 0, 1, 'fa-comment-o');
 
 INSERT INTO `civicrm_contact_type`
-  ( `name`, `label`,`image_URL`, `parent_id`, `is_active`,`is_reserved`)
+  ( `name`, `label`,`image_URL`, `parent_id`, `is_active`, `is_reserved`, `icon`)
  VALUES
-  ( 'Student'     , '{ts escape="sql"}Student{/ts}'     , NULL, 1, 1, 0),
-  ( 'Parent'      , '{ts escape="sql"}Parent{/ts}'      , NULL, 1, 1, 0),
-  ( 'Staff'       , '{ts escape="sql"}Staff{/ts}'       , NULL, 1, 1, 0),
-  ( 'Team'        , '{ts escape="sql"}Team{/ts}'        , NULL, 3, 1, 0),
-  ( 'Sponsor'     , '{ts escape="sql"}Sponsor{/ts}'     , NULL, 3, 1, 0);
+  ( 'Student'     , '{ts escape="sql"}Student{/ts}'     , NULL, 1, 1, 0, 'fa-graduation-cap'),
+  ( 'Parent'      , '{ts escape="sql"}Parent{/ts}'      , NULL, 1, 1, 0, 'fa-user-circle-o'),
+  ( 'Staff'       , '{ts escape="sql"}Staff{/ts}'       , NULL, 1, 1, 0, 'fa-id-badge'),
+  ( 'Team'        , '{ts escape="sql"}Team{/ts}'        , NULL, 3, 1, 0, 'fa-users'),
+  ( 'Sponsor'     , '{ts escape="sql"}Sponsor{/ts}'     , NULL, 3, 1, 0, 'fa-leaf');
 
     SELECT @domain_id   := min(id) FROM civicrm_domain;
     SELECT @nav_indi    := id FROM civicrm_navigation WHERE name = 'New Individual';

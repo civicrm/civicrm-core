@@ -542,6 +542,14 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
+    /* Before we do any loading, let's start the session and write to it.
+     * We typically call authenticate only when we need to bootstrap the CMS
+     * directly via Civi and hence bypass the normal CMS auth and bootstrap
+     * process typically done in CLI and cron scripts. See: CRM-12648
+     */
+    $session = CRM_Core_Session::singleton();
+    $session->set('civicrmInitSession', TRUE);
+
     $config = CRM_Core_Config::singleton();
 
     if ($loadCMSBootstrap) {
@@ -602,6 +610,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function permissionDenied() {
     status_header(403);
+    global $civicrm_wp_title;
+    $civicrm_wp_title = ts('You do not have permission to access this page.');
     throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
   }
 
@@ -871,6 +881,12 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       'role' => get_option('default_role'),
     ];
 
+    // The notify parameter was ignored on WordPress and default behaviour was to always notify.
+    // Preserve that behaviour but allow the "notify" parameter to be used.
+    if (!isset($params['notify'])) {
+      $params['notify'] = TRUE;
+    }
+
     // If there's a password add it, otherwise generate one.
     if (!empty($params['cms_pass'])) {
       $user_data['user_pass'] = $params['cms_pass'];
@@ -929,8 +945,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       wp_signon($creds, FALSE);
     }
 
-    // Fire the new user action. Sends notification email by default.
-    do_action('register_new_user', $uid);
+    if ($params['notify']) {
+      // Fire the new user action. Sends notification email by default.
+      do_action('register_new_user', $uid);
+    }
 
     // Restore the CiviCRM-WordPress listeners.
     $this->hooks_core_add();
@@ -1471,6 +1489,24 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function showPasswordFieldWhenAdminCreatesUser() {
     return !$this->isUserRegistrationPermitted();
+  }
+
+  /**
+   * Should the current execution exit after a fatal error?
+   *
+   * In WordPress, it is not usually possible to trigger theming outside of the WordPress theme process,
+   * meaning that in order to render an error inside the theme we cannot exit on error.
+   *
+   * @internal
+   * @return bool
+   */
+  public function shouldExitAfterFatal() {
+    $ret = TRUE;
+    if (!is_admin() && !wp_doing_ajax()) {
+      $ret = FALSE;
+    }
+
+    return apply_filters('civicrm_exit_after_fatal', $ret);
   }
 
 }

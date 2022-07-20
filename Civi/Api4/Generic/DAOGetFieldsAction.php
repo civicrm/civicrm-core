@@ -12,6 +12,9 @@
 
 namespace Civi\Api4\Generic;
 
+use Civi\Api4\Utils\CoreUtil;
+use Civi\Api4\Utils\FormattingUtil;
+
 /**
  * @inheritDoc
  * @method bool getIncludeCustom()
@@ -36,6 +39,7 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
       // Any fields name with a dot in it is either custom or an implicit join
       $includeCustom = strpos(implode('', $fieldsToGet), '.') !== FALSE;
     }
+    $this->formatValues();
     $spec = $gatherer->getSpec($this->getEntityName(), $this->getAction(), $includeCustom, $this->values);
     $fields = $this->specToArray($spec->getFields($fieldsToGet));
     foreach ($fieldsToGet ?? [] as $fieldName) {
@@ -88,6 +92,29 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
         'loadOptions' => $this->loadOptions,
         'action' => $this->action,
       ])->first();
+    }
+  }
+
+  /**
+   * Special handling for pseudoconstant replacements.
+   *
+   * Normally this would involve calling getFields... but this IS getFields.
+   *
+   * @throws \API_Exception
+   */
+  private function formatValues() {
+    foreach (array_keys($this->values) as $key) {
+      if (strpos($key, ':')) {
+        [$fieldName, $suffix] = explode(':', $key);
+        $context = FormattingUtil::$pseudoConstantContexts[$suffix] ?? NULL;
+        if (!$context) {
+          throw new \API_Exception('Illegal expression');
+        }
+        $baoName = CoreUtil::getBAOFromApiName($this->getEntityName());
+        $options = $baoName::buildOptions($fieldName, $context) ?: [];
+        $this->values[$fieldName] = FormattingUtil::replacePseudoconstant($options, $this->values[$key], TRUE);
+        unset($this->values[$key]);
+      }
     }
   }
 

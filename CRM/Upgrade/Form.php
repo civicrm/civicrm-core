@@ -263,15 +263,6 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   }
 
   /**
-   * @param $query
-   *
-   * @return Object
-   */
-  public function runQuery($query) {
-    return CRM_Core_DAO::executeQuery($query);
-  }
-
-  /**
    * @param $version
    *
    * @return Object
@@ -283,7 +274,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
 UPDATE civicrm_domain
 SET    version = '$version'
 ";
-    return $this->runQuery($query);
+    return CRM_Core_DAO::executeQuery($query);
   }
 
   /**
@@ -451,7 +442,7 @@ SET    version = '$version'
         [
           1 => CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER,
           2 => CRM_Utils_SQL::getDatabaseVersion(),
-          3 => '10.1',
+          3 => CRM_Upgrade_Incremental_General::MIN_INSTALL_MARIADB_VER,
           4 => $latestVer,
         ]);
     }
@@ -535,6 +526,15 @@ SET    version = '$version'
       "Cleanup old files"
     );
     $queue->createItem($task, ['weight' => 0]);
+
+    if (empty(CRM_Upgrade_Snapshot::getActivationIssues())) {
+      $task = new CRM_Queue_Task(
+        ['CRM_Upgrade_Snapshot', 'cleanupTask'],
+        ['civicrm'],
+        "Cleanup old upgrade snapshots"
+      );
+      $queue->createItem($task, ['weight' => 0]);
+    }
 
     $task = new CRM_Queue_Task(
       ['CRM_Upgrade_Form', 'disableOldExtensions'],

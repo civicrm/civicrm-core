@@ -1,56 +1,44 @@
 <?php
 
-use Civi\Api4\Event;
-
 class CRM_Event_Form_ManageEvent_RegistrationTest extends CiviUnitTestCase {
 
-  public function preventCiviExit($event) {
-    if (is_a($event->form, 'CRM_Event_Form_ManageEvent_Registration')) {
-      // EventInfo form redirects to the location form if the action is ADD
-      $event->form->setAction(CRM_Core_Action::NONE);
-    }
-  }
-
-  public function testTimeZone() {
-    $event_id = $this->eventCreate([
-      'event_tz' => 'Australia/Sydney',
-      'start_date' => '2022-06-22 12:00:00',
-      'end_date' => '2022-06-22 20:00:00',
-    ])['id'];
-
-    $formValues = [
-      'registration_start_date' => '2022-05-23 09:00:00',
-      'registration_end_date' => '2022-06-20 17:00:00',
+  /**
+   * Set up a correct array of form values.
+   * @todo More fields are required for formRule to return no errors
+   *
+   * @return array
+   */
+  private function getCorrectFormFields() {
+    return [
+      'is_online_registration' => 1,
+      'registration_start_date' => date('Y-m-d'),
+      'registration_end_date' => date('Y-m-d', time() + 86400),
+      'is_email_confirm' => 0,
+      'confirm_title' => 'Confirm your registration',
+      'thankyou_title' => 'Thank you for your registration',
     ];
-
-    Civi::dispatcher()->addListener('hook_civicrm_postProcess', [$this, 'preventCiviExit']);
-
-    $this->submitForm($formValues, $event_id);
-
-    $this->assertIsInt($event_id, 'Event creation success');
-
-    Civi::dispatcher()->removeListener('hook_civicrm_postProcess', [$this, 'preventCiviExit']);
-
-    $event = Event::get(FALSE)
-      ->addWhere('id', '=', $event_id)
-      ->addSelect('id', 'registration_start_date', 'registration_end_date', 'event_tz')
-      ->execute()[0];
-
-    $this->assertEquals('2022-05-22 23:00:00', $event['registration_start_date'], 'Registration start date resolved by timezone.');
-    $this->assertEquals('2022-06-20 07:00:00', $event['registration_end_date'], 'Registration end date resolved by timezone.');
-
   }
 
-  public function submitForm(array $formValues, int $eventID): int {
-    $form = $this->getFormObject(CRM_Event_Form_ManageEvent_Registration::class, $formValues);
-    if ($eventID) {
-      $form->set('id', $eventID);
-    }
+  /**
+   * Test end date not allowed with only 'time' part.
+   */
+  public function testEndDateWithoutDateNotAllowed() {
+    $values = $this->getCorrectFormFields();
+    $values['registration_end_date'] = '00:01';
+    $form = new CRM_Event_Form_ManageEvent_Registration();
+    $validationResult = \CRM_Event_Form_ManageEvent_Registration::formRule($values, [], $form);
+    $this->assertArrayHasKey('registration_end_date', $validationResult);
+  }
 
-    $form->preProcess();
-    $form->buildQuickForm();
-    $form->postProcess();
-    return $form->get('id');
+  /**
+   * Test end date must be after start date.
+   */
+  public function testEndDateBeforeStartDateNotAllowed() {
+    $values = $this->getCorrectFormFields();
+    $values['registration_end_date'] = '1900-01-01 00:00';
+    $form = new CRM_Event_Form_ManageEvent_Registration();
+    $validationResult = \CRM_Event_Form_ManageEvent_Registration::formRule($values, [], $form);
+    $this->assertArrayHasKey('registration_end_date', $validationResult);
   }
 
 }

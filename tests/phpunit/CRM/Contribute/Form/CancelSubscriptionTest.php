@@ -56,9 +56,12 @@ class CRM_Contribute_Form_CancelSubscriptionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test if the full fledged form is displayed on cancelling the Recurring Contribution with a payment processor which does not support cancelling a Recurring Contribution
+   * Test if the full fledged form is displayed on cancelling the Recurring
+   * Contribution with a payment processor which does not support cancelling a
+   * Recurring Contribution
    *
-   * @throws \CRM_Core_Exception|\API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testCancelSubscriptionForm(): void {
     $this->addContribution();
@@ -74,10 +77,8 @@ class CRM_Contribute_Form_CancelSubscriptionTest extends CiviUnitTestCase {
     ]);
 
     $actions = CRM_Contribute_Page_Tab::recurLinks($this->getContributionRecurID());
-    // Using "crm-enable-disable"
-    $this->assertEquals($actions[CRM_Core_Action::DISABLE]['ref'], 'crm-enable-disable');
     // Using "Cancel Recurring" form
-    // $this->assertEquals($actions[CRM_Core_Action::DISABLE]['url'], 'civicrm/contribute/unsubscribe');
+    $this->assertEquals('civicrm/contribute/unsubscribe', $actions[CRM_Core_Action::DISABLE]['url']);
   }
 
 }

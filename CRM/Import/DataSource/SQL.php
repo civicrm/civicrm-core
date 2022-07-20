@@ -17,24 +17,23 @@
 class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
 
   /**
+   * Form fields declared for this datasource.
+   *
+   * @var string[]
+   */
+  protected $submittableFields = ['sqlQuery'];
+
+  /**
    * Provides information about the data source.
    *
    * @return array
    *   collection of info about this data source
    */
-  public function getInfo() {
+  public function getInfo(): array {
     return [
       'title' => ts('SQL Query'),
       'permissions' => ['import SQL datasource'],
     ];
-  }
-
-  /**
-   * Set variables up before form is built.
-   *
-   * @param CRM_Core_Form $form
-   */
-  public function preProcess(&$form) {
   }
 
   /**
@@ -64,32 +63,52 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
     $errors = [];
 
     // Makeshift query validation (case-insensitive regex matching on word boundaries)
-    $forbidden = ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP', 'SHOW', 'UPDATE', 'information_schema'];
+    $forbidden = ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP', 'SHOW', 'UPDATE', 'REPLACE', 'information_schema'];
     foreach ($forbidden as $pattern) {
       if (preg_match("/\\b$pattern\\b/i", $fields['sqlQuery'])) {
         $errors['sqlQuery'] = ts('The query contains the forbidden %1 command.', [1 => $pattern]);
       }
     }
 
-    return $errors ? $errors : TRUE;
+    return $errors ?: TRUE;
   }
 
   /**
-   * Process the form submission.
+   * Initialize the datasource, based on the submitted values stored in the user job.
    *
-   * @param array $params
-   * @param string $db
-   * @param \CRM_Core_Form $form
-   *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public function postProcess(&$params, &$db, &$form) {
-    $importJob = new CRM_Contact_Import_ImportJob(
-      CRM_Utils_Array::value('import_table_name', $params),
-      $params['sqlQuery'], TRUE
-    );
+  public function initialize(): void {
+    $table = CRM_Utils_SQL_TempTable::build()->setDurable();
+    $tableName = $table->getName();
+    $table->createWithQuery($this->getSubmittedValue('sqlQuery'));
 
-    $form->set('importTableName', $importJob->getTableName());
+    // Get the names of the fields to be imported.
+    $columnsResult = CRM_Core_DAO::executeQuery(
+      'SHOW FIELDS FROM ' . $tableName);
+
+    $columnNames = [];
+    while ($columnsResult->fetch()) {
+      if (strpos($columnsResult->Field, ' ') !== FALSE) {
+        // Remove spaces as the Database object does this
+        // $keys = str_replace(array(".", " "), "_", array_keys($array));
+        // https://lab.civicrm.org/dev/core/-/issues/1337
+        $usableColumnName = str_replace(' ', '_', $columnsResult->Field);
+        CRM_Core_DAO::executeQuery('ALTER TABLE ' . $tableName . ' CHANGE `' . $columnsResult->Field . '` ' . $usableColumnName . ' ' . $columnsResult->Type);
+        $columnNames[] = $usableColumnName;
+      }
+      else {
+        $columnNames[] = $columnsResult->Field;
+      }
+    }
+
+    $this->addTrackingFieldsToTable($tableName);
+    $this->updateUserJobMetadata('DataSource', [
+      'table_name' => $tableName,
+      'column_headers' => $columnNames,
+      'number_of_columns' => count($columnNames),
+    ]);
   }
 
 }

@@ -13,7 +13,7 @@ Required vars: caseType
 
   <div ng-include="'~/crmCaseType/caseTypeDetails.html'"></div>
 
-  <div ng-show="isForkable()" class="crmCaseType-acttab" ui-jq="tabs" ui-options="{show: true, hide: true}">
+  <div ng-show="isForkable()" class="crmCaseType-acttab">
     <ul>
       <li><a href="#acttab-roles">{{:: ts('Case Roles') }}</a></li>
       <li><a href="#acttab-statuses">{{:: ts('Case Statuses') }}</a></li>

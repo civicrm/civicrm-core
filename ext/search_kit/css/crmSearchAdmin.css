@@ -70,7 +70,7 @@
   width: auto;
   border: 0 none;
   padding: 2px 5px;
-  text-transform: capitalize;
+  text-transform: none;
 }
 #bootstrap-theme.crm-search crm-search-clause > .btn-group {
   position: absolute;
@@ -108,10 +108,11 @@
   display: inline-block;
 }
 
-#bootstrap-theme.crm-search i.crm-search-move-icon {
+#bootstrap-theme i.crm-i.crm-search-move-icon {
   opacity: .5;
 }
-#bootstrap-theme.crm-search .crm-draggable:hover > * > i.crm-search-move-icon {
+#bootstrap-theme .crm-draggable:hover > i.crm-i.crm-search-move-icon,
+#bootstrap-theme .crm-draggable:hover > * > i.crm-i.crm-search-move-icon {
   opacity: 1;
 }
 

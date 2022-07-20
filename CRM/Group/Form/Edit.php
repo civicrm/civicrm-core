@@ -367,6 +367,10 @@ WHERE  title = %1
         'Group'
       );
 
+      if (CRM_Core_Permission::check('administer Multiple Organizations') && CRM_Core_Permission::isMultisiteEnabled()) {
+        $params['organization_id'] = empty($params['organization_id']) ? 'null' : $params['organization_id'];
+      }
+
       $group = CRM_Contact_BAO_Group::create($params);
       // Set the entity id so it is available to postProcess hook consumers
       $this->setEntityId($group->id);

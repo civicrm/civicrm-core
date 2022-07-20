@@ -87,6 +87,7 @@
     <title>Primary email</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this the primary email address</comment>
     <add>1.1</add>
     <html>
@@ -103,6 +104,7 @@
     <title>Is Billing Email?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this the billing?</comment>
     <add>2.0</add>
   </field>

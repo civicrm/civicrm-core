@@ -8,6 +8,7 @@
       var schema = {},
         data = {},
         status,
+        args,
         ctrl = this;
 
       this.$onInit = function() {
@@ -36,8 +37,8 @@
         return $scope.$parent.meta;
       };
       this.loadData = function() {
-        var toLoad = 0,
-          args = $scope.$parent.routeParams || {};
+        var toLoad = 0;
+        args = _.assign({}, $scope.$parent.routeParams || {}, $scope.$parent.options || {});
         _.each(schema, function(entity, entityName) {
           if (args[entityName] || entity.autofill) {
             toLoad++;
@@ -67,9 +68,22 @@
 
       // Called after form is submitted and files are uploaded
       function postProcess() {
-        var metaData = ctrl.getFormMeta();
+        var metaData = ctrl.getFormMeta(),
+          dialog = $element.closest('.ui-dialog-content');
 
-        if (metaData.redirect) {
+        $element.trigger('crmFormSuccess', {
+          afform: metaData,
+          data: data
+        });
+
+        status.resolve();
+        $element.unblock();
+
+        if (dialog.length) {
+          dialog.dialog('close');
+        }
+
+        else if (metaData.redirect) {
           var url = metaData.redirect;
           if (url.indexOf('civicrm/') === 0) {
             url = CRM.url(url);
@@ -78,8 +92,6 @@
           }
           $window.location.href = url;
         }
-        status.resolve();
-        $element.unblock();
       }
 
       this.submit = function() {
@@ -88,7 +100,7 @@
 
         crmApi4('Afform', 'submit', {
           name: ctrl.getFormMeta().name,
-          args: $scope.$parent.routeParams || {},
+          args: args,
           values: data}
         ).then(function(response) {
           if (ctrl.fileUploader.getNotUploadedItems().length) {

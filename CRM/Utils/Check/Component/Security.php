@@ -188,6 +188,41 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
   }
 
   /**
+   * Check that the site is configured with a signing-key.
+   *
+   * The current infrastructure for signatures was introduced circa 5.36. Specifically,
+   * most sites should now define `CIVICRM_SIGN_KEYS`. However, this could be missing for
+   * sites which either (a) upgraded from an earlier release or (b) used an unpatched installer.
+   *
+   * @return CRM_Utils_Check_Message[]
+   */
+  public function checkSigningKey(): array {
+    $messages = [];
+
+    try {
+      $found = !empty(Civi::service('crypto.registry')->findKey('SIGN'));
+      // Subtle point: We really want to know if there are any `SIGN`ing keys. The most
+      // typical way to define `SIGN`ing keys is to configure `CIVICRM_SIGN_KEYS`.
+    }
+    catch (\Civi\Crypto\Exception\CryptoException $e) {
+      $found = FALSE;
+    }
+    if (!$found) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('Some components and extensions may need to generate cryptographic signatures. Please configure <a %1>CIVICRM_SIGN_KEYS</a>. ',
+          [1 => 'href="https://docs.civicrm.org/sysadmin/en/latest/setup/secret-keys/" target="_blank"']
+        ),
+        ts('Signing Key Recommended'),
+        \Psr\Log\LogLevel::NOTICE,
+        'fa-lock'
+      );
+    }
+
+    return $messages;
+  }
+
+  /**
    * Check that some files are not present.
    *
    * These files have generally been deleted but Civi source tree but could be

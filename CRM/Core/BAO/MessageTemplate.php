@@ -330,20 +330,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
       'PDFFilename' => NULL,
     ];
 
-    // Some params have been deprecated/renamed. Synchronize old<=>new params. We periodically resync after exchanging data with other parties.
-    $sync = function () use (&$params, $modelDefaults, $viewDefaults) {
-      CRM_Utils_Array::pathSync($params, ['workflow'], ['valueName']);
-      CRM_Utils_Array::pathSync($params, ['tokenContext', 'contactId'], ['contactId']);
-      CRM_Utils_Array::pathSync($params, ['tokenContext', 'smarty'], ['disableSmarty'], function ($v, bool $isCanon) {
-        return !$v;
-      });
-
-      // Core#644 - handle Email ID passed as "From".
-      if (isset($params['from'])) {
-        $params['from'] = \CRM_Utils_Mail::formatFromAddress($params['from']);
-      }
-    };
-    $sync();
+    self::synchronizeLegacyParameters($params);
 
     // Allow WorkflowMessage to run any filters/mappings/cleanups.
     $model = $params['model'] ?? WorkflowMessage::create($params['workflow'] ?? 'UNKNOWN');
@@ -352,13 +339,13 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
     // Subsequent hooks use $params. Retaining the $params['model'] might be nice - but don't do it unless you figure out how to ensure data-consistency (eg $params['tplParams'] <=> $params['model']).
     // If you want to expose the model via hook, consider interjecting a new Hook::alterWorkflowMessage($model) between `importAll()` and `exportAll()`.
 
-    $sync();
+    self::synchronizeLegacyParameters($params);
     $params = array_merge($modelDefaults, $viewDefaults, $envelopeDefaults, $params);
 
     CRM_Utils_Hook::alterMailParams($params, 'messageTemplate');
     $mailContent = self::loadTemplate((string) $params['valueName'], $params['isTest'], $params['messageTemplateID'] ?? NULL, $params['groupName'] ?? '', $params['messageTemplate'], $params['subject'] ?? NULL);
 
-    $sync();
+    self::synchronizeLegacyParameters($params);
     $rendered = CRM_Core_TokenSmarty::render(CRM_Utils_Array::subset($mailContent, ['text', 'html', 'subject']), $params['tokenContext'], $params['tplParams']);
     if (isset($rendered['subject'])) {
       $rendered['subject'] = trim(preg_replace('/[\r\n]+/', ' ', $rendered['subject']));
@@ -366,6 +353,26 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
     $nullSet = ['subject' => NULL, 'text' => NULL, 'html' => NULL];
     $mailContent = array_merge($nullSet, $mailContent, $rendered);
     return [$mailContent, $params];
+  }
+
+  /**
+   * Some params have been deprecated/renamed. Synchronize old<=>new params.
+   *
+   * We periodically resync after exchanging data with other parties.
+   *
+   * @param array $params
+   */
+  private static function synchronizeLegacyParameters(&$params) {
+    CRM_Utils_Array::pathSync($params, ['workflow'], ['valueName']);
+    CRM_Utils_Array::pathSync($params, ['tokenContext', 'contactId'], ['contactId']);
+    CRM_Utils_Array::pathSync($params, ['tokenContext', 'smarty'], ['disableSmarty'], function ($v, bool $isCanon) {
+      return !$v;
+    });
+
+    // Core#644 - handle Email ID passed as "From".
+    if (isset($params['from'])) {
+      $params['from'] = \CRM_Utils_Mail::formatFromAddress($params['from']);
+    }
   }
 
   /**

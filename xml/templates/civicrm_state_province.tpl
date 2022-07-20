@@ -4147,4 +4147,20 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1170, "DIN", "Dinagat Islands"),
 
 -- Add missing state for Colombia
-(NULL, 1048, "HUI", "Huila");
+(NULL, 1048, "HUI", "Huila"),
+
+-- Add missing parishes for Bermuda
+ (NULL, 1023, 'DEV', 'Devonshire'),
+ (NULL, 1023, 'HAM', 'Hamilton Parish'),
+ (NULL, 1023, 'HA', 'City of Hamilton'),
+ (NULL, 1023, 'PAG', 'Paget'),
+ (NULL, 1023, 'PEM', 'Pembroke'),
+ (NULL, 1023, 'SG', 'Town of St. George'),
+ (NULL, 1023, 'SGE', 'Saint George\'s'),
+ (NULL, 1023, 'SAN', 'Sandys'),
+ (NULL, 1023, 'SMI', 'Smiths'),
+ (NULL, 1023, 'SOU', 'Southampton'),
+ (NULL, 1023, 'WAR', 'Warwick')
+ 
+ -- end of statement:
+ ;

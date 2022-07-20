@@ -28,64 +28,52 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
 
   /**
    * Initial test of submit function.
-   *
-   * @throws \Exception
    */
   public function testSubmit(): void {
     $event = $this->eventCreate();
     $mut = new CiviMailUtils($this, TRUE);
-    CRM_Event_Form_Registration_Confirm::testSubmit([
-      'id' => $event['id'],
-      'contributeMode' => 'direct',
-      'registerByID' => $this->createLoggedInUser(),
-      'params' => [
-        [
-          'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
-          'entryURL' => 'http://dmaster.local/civicrm/event/register?reset=1&amp;id=3',
-          'first_name' => 'k',
-          'last_name' => 'p',
-          'email-Primary' => 'demo@example.com',
-          'hidden_processor' => '1',
-          'credit_card_number' => '4111111111111111',
-          'cvv2' => '123',
-          'credit_card_exp_date' => [
-            'M' => '1',
-            'Y' => '2019',
-          ],
-          'credit_card_type' => 'Visa',
-          'billing_first_name' => 'p',
-          'billing_middle_name' => '',
-          'billing_last_name' => 'p',
-          'billing_street_address-5' => 'p',
-          'billing_city-5' => 'p',
-          'billing_state_province_id-5' => '1061',
-          'billing_postal_code-5' => '7',
-          'billing_country_id-5' => '1228',
-          'priceSetId' => '6',
-          'price_7' => [
-            13 => 1,
-          ],
-          'payment_processor_id' => '1',
-          'bypass_payment' => '',
-          'MAX_FILE_SIZE' => '33554432',
-          'is_primary' => 1,
-          'is_pay_later' => 0,
-          'campaign_id' => NULL,
-          'defaultRole' => 1,
-          'participant_role_id' => '1',
-          'currencyID' => 'USD',
-          'amount_level' => 'Tiny-tots (ages 5-8) - 1',
-          'amount' => '800.00',
-          'tax_amount' => NULL,
-          'year' => '2019',
-          'month' => '1',
-          'ip_address' => '127.0.0.1',
-          'invoiceID' => '57adc34957a29171948e8643ce906332',
-          'button' => '_qf_Register_upload',
-          'billing_state_province-5' => 'AP',
-          'billing_country-5' => 'US',
-        ],
+    $this->submitForm($event['id'], [
+      'first_name' => 'k',
+      'last_name' => 'p',
+      'email-Primary' => 'demo@example.com',
+      'hidden_processor' => '1',
+      'credit_card_number' => '4111111111111111',
+      'cvv2' => '123',
+      'credit_card_exp_date' => [
+        'M' => '1',
+        'Y' => '2019',
       ],
+      'credit_card_type' => 'Visa',
+      'billing_first_name' => 'p',
+      'billing_middle_name' => '',
+      'billing_last_name' => 'p',
+      'billing_street_address-5' => 'p',
+      'billing_city-5' => 'p',
+      'billing_state_province_id-5' => '1061',
+      'billing_postal_code-5' => '7',
+      'billing_country_id-5' => '1228',
+      'priceSetId' => '6',
+      'price_7' => [
+        13 => 1,
+      ],
+      'payment_processor_id' => '1',
+      'bypass_payment' => '',
+      'is_primary' => 1,
+      'is_pay_later' => 0,
+      'campaign_id' => NULL,
+      'defaultRole' => 1,
+      'participant_role_id' => '1',
+      'currencyID' => 'USD',
+      'amount_level' => 'Tiny-tots (ages 5-8) - 1',
+      'amount' => '800.00',
+      'tax_amount' => NULL,
+      'year' => '2019',
+      'month' => '1',
+      'ip_address' => '127.0.0.1',
+      'invoiceID' => '57adc34957a29171948e8643ce906332',
+      'button' => '_qf_Register_upload',
+      'billing_state_province-5' => 'AP',
+      'billing_country-5' => 'US',
     ]);
 
     $mut->checkMailLog([
@@ -122,7 +110,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'contributeMode' => 'direct',
       'registerByID' => $individualID,
       'paymentProcessorObj' => CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID),
-      'totalAmount' => $this->formatMoneyInput(8000.67),
+      'totalAmount' => 8000.67,
       'params' => [
         [
           'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
@@ -219,13 +207,167 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'amount' => '1.67',
     ], $entityFinancialTrxns[2], ['id', 'entity_id']);
     $mut->checkMailLog([
-      'Event Information and Location', 'Registration Confirmation - Annual CiviCRM meet',
+      'Event Information and Location',
+      'Registration Confirmation - Annual CiviCRM meet',
       'Expires: January ' . (date('Y') + 1),
       'Visa',
       '************1111',
       'This is a confirmation that your registration has been received and your status has been updated to <strong> Registered</strong>',
     ]);
     $mut->clearMessages();
+  }
+
+  /**
+   * Tests missing contactID when registering for paid event from waitlist
+   * https://github.com/civicrm/civicrm-core/pull/23358, https://lab.civicrm.org/extensions/stripe/-/issues/347
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testWaitlistRegistrationContactIdParam() {
+    // @todo - figure out why this doesn't pass validate financials
+    $this->isValidateFinancialsOnPostAssert = FALSE;
+    $paymentProcessorID = $this->processorCreate();
+    /* @var \CRM_Core_Payment_Dummy $processor */
+    $processor = Civi\Payment\System::singleton()->getById($paymentProcessorID);
+    $processor->setDoDirectPaymentResult(['fee_amount' => 1.67]);
+    $params = ['is_monetary' => 1, 'financial_type_id' => 1];
+    $event = $this->eventCreatePaid($params, [['name' => 'test', 'amount' => 8000.67]]);
+    $individualID = $this->individualCreate();
+    //$this->submitForm($event['id'], [
+    $form = CRM_Event_Form_Registration_Confirm::testSubmit([
+      'id' => $event['id'],
+      'contributeMode' => 'direct',
+      'registerByID' => $individualID,
+      'paymentProcessorObj' => CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID),
+      'amount' => 8000.67,
+      'amount_level' => 'Tiny-tots (ages 5-8) - 1',
+      'params' => [
+        [
+          'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
+          'entryURL' => 'http://dmaster.local/civicrm/event/register?reset=1&amp;id=3',
+          'first_name' => 'k',
+          'last_name' => 'p',
+          'email-Primary' => 'demo@example.com',
+          'hidden_processor' => '1',
+          'credit_card_number' => '4111111111111111',
+          'cvv2' => '123',
+          'credit_card_exp_date' => [
+            'M' => '1',
+            'Y' => date('Y') + 1,
+          ],
+          'credit_card_type' => 'Visa',
+          'billing_first_name' => 'p',
+          'billing_middle_name' => '',
+          'billing_last_name' => 'p',
+          'billing_street_address-5' => 'p',
+          'billing_city-5' => 'p',
+          'billing_state_province_id-5' => '1061',
+          'billing_postal_code-5' => '7',
+          'billing_country_id-5' => '1228',
+          'priceSetId' => '6',
+          'price_7' => [
+            13 => 1,
+          ],
+          'payment_processor_id' => $paymentProcessorID,
+          'bypass_payment' => '',
+          'is_primary' => 1,
+          'is_pay_later' => 0,
+          'contact_id' => $individualID,
+          'campaign_id' => NULL,
+          'defaultRole' => 1,
+          'participant_role_id' => '1',
+          'currencyID' => 'USD',
+          'amount_level' => 'Tiny-tots (ages 5-8) - 1',
+          'amount' => $this->formatMoneyInput(8000.67),
+          'tax_amount' => NULL,
+          'year' => '2019',
+          'month' => '1',
+          'ip_address' => '127.0.0.1',
+          'invoiceID' => '57adc34957a29171948e8643ce906332',
+          'button' => '_qf_Register_upload',
+          'billing_state_province-5' => 'AP',
+          'billing_country-5' => 'US',
+        ],
+      ],
+    ]);
+    $this->callAPISuccessGetCount('Participant', [], 1);
+
+    $value = $form->get('value');
+    $this->assertArrayHasKey('contact_id', $value, 'contact_id missing in $value array');
+    $this->assertEquals($value['contact_id'], $individualID, 'Invalid contact_id in $value array.');
+
+    // Add someone to the waitlist.
+    $waitlistContactId = $this->individualCreate();
+    $waitlistContact   = $this->callAPISuccess('Contact', 'getsingle', ['id' => $waitlistContactId]);
+    $waitlistParticipantId = $this->participantCreate(['event_id' => $event['id'], 'contact_id' => $waitlistContactId, 'status_id' => 'On waitlist']);
+
+    $waitlistParticipant = $this->callAPISuccess('Participant', 'getsingle', ['id' => $waitlistParticipantId, 'return' => ["participant_status"]]);
+    $this->assertEquals($waitlistParticipant['participant_status'], 'On waitlist', 'Invalid participant status. Expecting: On waitlist');
+
+    $form = CRM_Event_Form_Registration_Confirm::testSubmit([
+      'id' => $event['id'],
+      'contributeMode' => 'direct',
+      'registerByID' => $waitlistContactId,
+      'paymentProcessorObj' => CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID),
+      'amount' => 8000.67,
+      'amount_level' => 'Tiny-tots (ages 5-8) - 1',
+      'params' => [
+        [
+          'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
+          'entryURL' => 'http://dmaster.local/civicrm/event/register?reset=1&amp;id=3',
+          'first_name' => $waitlistContact['first_name'],
+          'last_name' => $waitlistContact['last_name'],
+          'email-Primary' => $waitlistContact['email'],
+          'hidden_processor' => '1',
+          'credit_card_number' => '4111111111111111',
+          'cvv2' => '123',
+          'credit_card_exp_date' => [
+            'M' => '1',
+            'Y' => date('Y') + 1,
+          ],
+          'credit_card_type' => 'Visa',
+          'billing_first_name' => $waitlistContact['first_name'],
+          'billing_middle_name' => '',
+          'billing_last_name' => $waitlistContact['last_name'],
+          'billing_street_address-5' => 'p',
+          'billing_city-5' => 'p',
+          'billing_state_province_id-5' => '1061',
+          'billing_postal_code-5' => '7',
+          'billing_country_id-5' => '1228',
+          'priceSetId' => '6',
+          'price_7' => [
+            13 => 1,
+          ],
+          'payment_processor_id' => $paymentProcessorID,
+          'bypass_payment' => '',
+          'is_primary' => 1,
+          'is_pay_later' => 0,
+          'participant_id' => $waitlistParticipantId,
+          'campaign_id' => NULL,
+          'defaultRole' => 1,
+          'participant_role_id' => '1',
+          'currencyID' => 'USD',
+          'amount_level' => 'Tiny-tots (ages 5-8) - 1',
+          'amount' => $this->formatMoneyInput(8000.67),
+          'tax_amount' => NULL,
+          'year' => '2019',
+          'month' => '1',
+          'ip_address' => '127.0.0.1',
+          'invoiceID' => '68adc34957a29171948e8643ce906332',
+          'button' => '_qf_Register_upload',
+          'billing_state_province-5' => 'AP',
+          'billing_country-5' => 'US',
+        ],
+      ],
+    ]);
+    $this->callAPISuccessGetCount('Participant', [], 2);
+
+    $waitlistParticipant = $this->callAPISuccess('Participant', 'getsingle', ['id' => $waitlistParticipantId, 'return' => ["participant_status"]]);
+    $this->assertEquals($waitlistParticipant['participant_status'], 'Registered', 'Invalid participant status. Expecting: Registered');
+
+    $value = $form->get('value');
+    $this->assertArrayHasKey('contactID', $value, 'contactID missing in waitlist registration $value array');
+    $this->assertEquals($value['contactID'], $waitlistParticipant['contact_id'], 'Invalid contactID in waitlist $value array.');
   }
 
   /**
@@ -333,7 +475,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   /**
    * Test online registration for event with no price options selected as per CRM-19964.
    */
-  public function testOnlineRegNoPrice() {
+  public function testOnlineRegNoPrice(): void {
     $this->processorCreate(['is_default' => TRUE, 'user_name' => 'Test', 'is_test' => FALSE]);
     $paymentProcessorID = $this->processorCreate(['is_default' => TRUE, 'user_name' => 'Test', 'is_test' => TRUE]);
     $params = [
@@ -360,36 +502,29 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       ]
     );
     // Create online event registration.
-    CRM_Event_Form_Registration_Confirm::testSubmit([
-      'id' => $event['id'],
-      'contributeMode' => 'direct',
-      'registerByID' => $this->createLoggedInUser(),
-      'totalAmount' => 0,
-      'params' => [
-        [
-          'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
-          'entryURL' => "http://dmaster.local/civicrm/event/register?reset=1&amp;id={$event['id']}",
-          'first_name' => 'Bruce',
-          'last_name' => 'Wayne',
-          'email-Primary' => 'bruce@gotham.com',
-          'price_' . $priceField['id'] => '',
-          'priceSetId' => $priceField['values'][$priceField['id']]['price_set_id'],
-          'payment_processor_id' => $paymentProcessorID,
-          'amount' => 0,
-          'bypass_payment' => '',
-          'MAX_FILE_SIZE' => '33554432',
-          'is_primary' => 1,
-          'is_pay_later' => 0,
-          'campaign_id' => NULL,
-          'defaultRole' => 1,
-          'participant_role_id' => '1',
-          'tax_amount' => NULL,
-          'ip_address' => '127.0.0.1',
-          'invoiceID' => '57adc34957a29171948e8643ce906332',
-          'button' => '_qf_Register_upload',
-        ],
-      ],
-    ]);
+    $this->submitForm(
+      $event['id'],
+      [
+        'first_name' => 'Bruce',
+        'last_name' => 'Wayne',
+        'email-Primary' => 'bruce@gotham.com',
+        'price_' . $priceField['id'] => '',
+        'priceSetId' => $priceField['values'][$priceField['id']]['price_set_id'],
+        'payment_processor_id' => $paymentProcessorID,
+        'amount' => 0,
+        'amount_level' => '',
+        'bypass_payment' => '',
+        'is_primary' => 1,
+        'is_pay_later' => 0,
+        'campaign_id' => NULL,
+        'defaultRole' => 1,
+        'participant_role_id' => '1',
+        'tax_amount' => NULL,
+        'ip_address' => '127.0.0.1',
+        'invoiceID' => '57adc34957a29171948e8643ce906332',
+        'button' => '_qf_Register_upload',
+      ]
+    );
     $contribution = $this->callAPISuccess('Contribution', 'get', ['invoice_id' => '57adc34957a29171948e8643ce906332']);
     $this->assertEquals($contribution['count'], '0', "Contribution should not be created for zero fee event registration when no price field selected.");
   }
@@ -404,10 +539,10 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $event = $this->eventCreate();
     $this->createJoinedProfile(['entity_table' => 'civicrm_event', 'entity_id' => $event['id']]);
 
+    $_REQUEST['id'] = $event['id'];
     /* @var \CRM_Event_Form_Registration_Confirm $form */
     $form = $this->getFormObject('CRM_Event_Form_Registration_Confirm');
     $form->set('params', [[]]);
-    $form->set('id', $event['id']);
     $form->set('values', [
       'event' => $event['values'][$event['id']],
       'location' => [],
@@ -439,60 +574,49 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       $contact_id = $this->createLoggedInUser();
     }
     $mut = new CiviMailUtils($this, TRUE);
-    CRM_Event_Form_Registration_Confirm::testSubmit([
-      'id' => $event['id'],
-      'contributeMode' => 'direct',
-      'registerByID' => $contact_id,
-      'custom_pre_id' => $event['custom_pre_id'],
-      'params' => [
-        [
-          'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
-          'entryURL' => 'http://dmaster.local/civicrm/event/register?reset=1&amp;id=3',
-          'first_name' => 'k',
-          'last_name' => 'p',
-          'email-Primary' => 'demo@example.com',
-          'hidden_processor' => '1',
-          'credit_card_number' => '4111111111111111',
-          'cvv2' => '123',
-          'credit_card_exp_date' => [
-            'M' => '1',
-            'Y' => '2019',
-          ],
-          'credit_card_type' => 'Visa',
-          'billing_first_name' => 'p',
-          'billing_middle_name' => '',
-          'billing_last_name' => 'p',
-          'billing_street_address-5' => 'p',
-          'billing_city-5' => 'p',
-          'billing_state_province_id-5' => '1061',
-          'billing_postal_code-5' => '7',
-          'billing_country_id-5' => '1228',
-          'priceSetId' => '6',
-          'price_7' => [
-            13 => 1,
-          ],
-          'payment_processor_id' => '1',
-          'bypass_payment' => '',
-          'MAX_FILE_SIZE' => '33554432',
-          'is_primary' => 1,
-          'is_pay_later' => 0,
-          'campaign_id' => NULL,
-          'defaultRole' => 1,
-          'participant_role_id' => '1',
-          'currencyID' => 'USD',
-          'amount_level' => 'Tiny-tots (ages 5-8) - 1',
-          'amount' => '800.00',
-          'tax_amount' => NULL,
-          'year' => '2019',
-          'month' => '1',
-          'ip_address' => '127.0.0.1',
-          'invoiceID' => '57adc34957a29171948e8643ce906332',
-          'button' => '_qf_Register_upload',
-          'billing_state_province-5' => 'AP',
-          'billing_country-5' => 'US',
-          'note' => $event['note'],
-        ],
+    $this->submitForm($event['id'], [
+      'first_name' => 'k',
+      'last_name' => 'p',
+      'email-Primary' => 'demo@example.com',
+      'hidden_processor' => '1',
+      'credit_card_number' => '4111111111111111',
+      'cvv2' => '123',
+      'credit_card_exp_date' => [
+        'M' => '1',
+        'Y' => '2019',
       ],
+      'credit_card_type' => 'Visa',
+      'billing_first_name' => 'p',
+      'billing_middle_name' => '',
+      'billing_last_name' => 'p',
+      'billing_street_address-5' => 'p',
+      'billing_city-5' => 'p',
+      'billing_state_province_id-5' => '1061',
+      'billing_postal_code-5' => '7',
+      'billing_country_id-5' => '1228',
+      'priceSetId' => '6',
+      'price_7' => [
+        13 => 1,
+      ],
+      'payment_processor_id' => '1',
+      'bypass_payment' => '',
+      'is_primary' => 1,
+      'is_pay_later' => 0,
+      'campaign_id' => NULL,
+      'defaultRole' => 1,
+      'participant_role_id' => '1',
+      'currencyID' => 'USD',
+      'amount_level' => 'Tiny-tots (ages 5-8) - 1',
+      'amount' => '800.00',
+      'tax_amount' => NULL,
+      'year' => '2019',
+      'month' => '1',
+      'ip_address' => '127.0.0.1',
+      'invoiceID' => '57adc34957a29171948e8643ce906332',
+      'button' => '_qf_Register_upload',
+      'billing_state_province-5' => 'AP',
+      'billing_country-5' => 'US',
+      'note' => $event['note'],
     ]);
     $participant = $this->callAPISuccessGetSingle('Participant', []);
     $mut->checkMailLog(['Comment: ' . $event['note'] . chr(0x0A)]);
@@ -515,10 +639,10 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       $this->uf_field_add($this->ids["UFGroup"]["our profile"], 'note', 'Contact', 'Comment');
     }
 
+    $_REQUEST['id'] = $event['id'];
     /* @var \CRM_Event_Form_Registration_Confirm $form */
     $form = $this->getFormObject('CRM_Event_Form_Registration_Confirm');
     $form->set('params', [[]]);
-    $form->set('id', $event['id']);
     $form->set('values', [
       'event' => $event['values'][$event['id']],
       'location' => [],
@@ -596,71 +720,78 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
-   * event#64 - ensure we send to the submitted email, not the primary email when they differ.
+   * Ensure we send to the submitted email, not the primary email, if different.
    *
-   * @throws \Exception
+   * event#64.
    */
   public function testSubmitNonPrimaryEmail(): void {
     $event = $this->eventCreate();
     $mut = new CiviMailUtils($this, TRUE);
-    $cid = $this->createLoggedInUser();
-    CRM_Event_Form_Registration_Confirm::testSubmit([
-      'id' => $event['id'],
-      'contributeMode' => 'direct',
-      'registerByID' => $cid,
-      'params' => [
-        [
-          'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
-          'entryURL' => 'http://dmaster.local/civicrm/event/register?reset=1&amp;id=3',
-          'first_name' => 'k',
-          'last_name' => 'p',
-          'email-Other' => 'nonprimaryemail@example.com',
-          'hidden_processor' => '1',
-          'credit_card_number' => '4111111111111111',
-          'cvv2' => '123',
-          'credit_card_exp_date' => [
-            'M' => '1',
-            'Y' => '2019',
-          ],
-          'credit_card_type' => 'Visa',
-          'billing_first_name' => 'p',
-          'billing_middle_name' => '',
-          'billing_last_name' => 'p',
-          'billing_street_address-5' => 'p',
-          'billing_city-5' => 'p',
-          'billing_state_province_id-5' => '1061',
-          'billing_postal_code-5' => '7',
-          'billing_country_id-5' => '1228',
-          'priceSetId' => '6',
-          'price_7' => [
-            13 => 1,
-          ],
-          'payment_processor_id' => '1',
-          'bypass_payment' => '',
-          'MAX_FILE_SIZE' => '33554432',
-          'is_primary' => 1,
-          'is_pay_later' => 0,
-          'campaign_id' => NULL,
-          'defaultRole' => 1,
-          'participant_role_id' => '1',
-          'currencyID' => 'USD',
-          'amount_level' => 'Tiny-tots (ages 5-8) - 1',
-          'amount' => '800.00',
-          'tax_amount' => NULL,
-          'year' => '2019',
-          'month' => '1',
-          'ip_address' => '127.0.0.1',
-          'invoiceID' => '57adc34957a29171948e8643ce906332',
-          'button' => '_qf_Register_upload',
-          'billing_state_province-5' => 'AP',
-          'billing_country-5' => 'US',
-        ],
+    $this->submitForm($event['id'], [
+      'first_name' => 'k',
+      'last_name' => 'p',
+      'email-Other' => 'nonprimaryemail@example.com',
+      'hidden_processor' => '1',
+      'credit_card_number' => '4111111111111111',
+      'cvv2' => '123',
+      'credit_card_exp_date' => [
+        'M' => '1',
+        'Y' => '2019',
       ],
+      'credit_card_type' => 'Visa',
+      'billing_first_name' => 'p',
+      'billing_middle_name' => '',
+      'billing_last_name' => 'p',
+      'billing_street_address-5' => 'p',
+      'billing_city-5' => 'p',
+      'billing_state_province_id-5' => '1061',
+      'billing_postal_code-5' => '7',
+      'billing_country_id-5' => '1228',
+      'priceSetId' => '6',
+      'price_7' => [
+        13 => 1,
+      ],
+      'payment_processor_id' => '1',
+      'bypass_payment' => '',
+      'MAX_FILE_SIZE' => '33554432',
+      'is_primary' => 1,
+      'is_pay_later' => 0,
+      'campaign_id' => NULL,
+      'defaultRole' => 1,
+      'participant_role_id' => '1',
+      'currencyID' => 'USD',
+      'amount_level' => 'Tiny-tots (ages 5-8) - 1',
+      'amount' => '800.00',
+      'tax_amount' => NULL,
+      'year' => '2019',
+      'month' => '1',
+      'ip_address' => '127.0.0.1',
+      'invoiceID' => '57adc34957a29171948e8643ce906332',
+      'button' => '_qf_Register_upload',
+      'billing_state_province-5' => 'AP',
+      'billing_country-5' => 'US',
     ]);
-
     $mut->checkMailLog(['nonprimaryemail@example.com']);
     $mut->stop();
     $mut->clearMessages();
+  }
+
+  /**
+   * Submit the confirm form.
+   *
+   * @param int $eventID
+   * @param array $params
+   *   Array that would be stored in the form as params at this point.
+   *   (ideally we will move to submitted rather than processed values
+   *   in time).
+   */
+  protected function submitForm(int $eventID, array $params): void {
+    $_REQUEST['id'] = $eventID;
+    $form = $this->getFormObject('CRM_Event_Form_Registration_Confirm', []);
+    $form->set('params', [$params]);
+    $form->set('registerByID', $this->createLoggedInUser());
+    $form->buildForm();
+    $form->postProcess();
   }
 
 }

@@ -706,7 +706,7 @@ class CRM_Core_CodeGen_Specification {
     $foreignKey = [
       'idColumn' => trim($foreignXML->idColumn),
       'typeColumn' => trim($foreignXML->typeColumn),
-      'key' => trim($this->value('key', $foreignXML)),
+      'key' => trim($this->value('key', $foreignXML) ?? ''),
     ];
     $dynamicForeignKeys[] = $foreignKey;
   }

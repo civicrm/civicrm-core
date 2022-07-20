@@ -23,7 +23,7 @@ class FieldSpec {
   // DataTypeSpecTrait: dataType, serialize, fkEntity
   use \Civi\Schema\Traits\DataTypeSpecTrait;
 
-  // OptionsSpecTrait: options, optionsCallback
+  // OptionsSpecTrait: options, optionsCallback, suffixes
   use \Civi\Schema\Traits\OptionsSpecTrait;
 
   // GuiSpecTrait: label, inputType, inputAttrs, helpPre, helpPost

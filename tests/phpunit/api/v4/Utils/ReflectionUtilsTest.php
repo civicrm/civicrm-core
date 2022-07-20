@@ -21,12 +21,12 @@ namespace api\v4\Utils;
 
 use Civi\Api4\Utils\ReflectionUtils;
 use api\v4\Mock\MockV4ReflectionGrandchild;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class ReflectionUtilsTest extends UnitTestCase {
+class ReflectionUtilsTest extends Api4TestBase {
 
   /**
    * Test that class annotations are returned across @inheritDoc

@@ -227,13 +227,6 @@ function civicrm_config(&$config) {
       $params['CMSdbHost'] = $config['drupal']['server'];
       $params['CMSdbName'] = addslashes($config['drupal']['database']);
     }
-    elseif (version_compare(VERSION, '6.0') >= 0) {
-      $params['cms'] = 'Drupal6';
-      $params['CMSdbUser'] = addslashes($config['drupal']['username']);
-      $params['CMSdbPass'] = addslashes($config['drupal']['password']);
-      $params['CMSdbHost'] = $config['drupal']['server'];
-      $params['CMSdbName'] = addslashes($config['drupal']['database']);
-    }
   }
   elseif ($installType == 'drupal') {
     $params['cms'] = $config['cms'];

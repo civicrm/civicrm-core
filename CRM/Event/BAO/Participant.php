@@ -578,6 +578,10 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
    * @param bool $checkPermission
    *   Is this a permissioned retrieval?
    *
+   * @deprecated only called from event search, but without most of the details
+   * returned. Event search should call stop using this & get the metadata
+   * a better way.
+   *
    * @return array
    *   array of importable Fields
    */
@@ -608,6 +612,7 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
 
       // Split status and status id into 2 fields
       // Fixme: it would be better to leave as 1 field and intelligently handle both during import
+      // note import undoes this - it is still here in case the search usage uses it.
       $participantStatus = [
         'participant_status' => [
           'title' => ts('Participant Status'),
@@ -619,6 +624,7 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
 
       // Split role and role id into 2 fields
       // Fixme: it would be better to leave as 1 field and intelligently handle both during import
+      // note import undoes this - it is still here in case the search usage uses it.
       $participantRole = [
         'participant_role' => [
           'title' => ts('Participant Role'),
@@ -1168,7 +1174,7 @@ UPDATE  civicrm_participant
     }
 
     //thumb rule is if we triggering  primary participant need to triggered additional
-    $allParticipantIds = $primaryANDAdditonalIds = [];
+    $allParticipantIds = $primaryANDAdditionalIds = [];
     foreach ($participantIds as $id) {
       $allParticipantIds[] = $id;
       if (self::isPrimaryParticipant($id)) {
@@ -1181,7 +1187,7 @@ UPDATE  civicrm_participant
         }
         if (!empty($additionalIds)) {
           $allParticipantIds = array_merge($allParticipantIds, $additionalIds);
-          $primaryANDAdditonalIds[$id] = $additionalIds;
+          $primaryANDAdditionalIds[$id] = $additionalIds;
         }
       }
     }
@@ -1291,8 +1297,8 @@ UPDATE  civicrm_participant
       }
 
       //check is it primary and has additional.
-      if (array_key_exists($participantId, $primaryANDAdditonalIds)) {
-        foreach ($primaryANDAdditonalIds[$participantId] as $additionalId) {
+      if (array_key_exists($participantId, $primaryANDAdditionalIds)) {
+        foreach ($primaryANDAdditionalIds[$participantId] as $additionalId) {
 
           if ($emailType) {
             $mail = self::sendTransitionParticipantMail($additionalId,
@@ -1391,8 +1397,6 @@ UPDATE  civicrm_participant
     ) {
       return $mailSent;
     }
-
-    CRM_Event_BAO_Event::setOutputTimeZone($eventDetails);
 
     $toEmail = $contactDetails['email'] ?? NULL;
     if ($toEmail) {
@@ -1868,10 +1872,10 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
       $details['ineligible_message'] = ts('This event registration can not be transferred or cancelled. Contact the event organizer if you have questions.');
       return $details;
     }
-    //verify participant status is still Registered
-    if ($details['status'] != 'Registered') {
+    // Verify participant status is one that can be self-cancelled
+    if (!in_array($details['status'], ['Registered', 'Pending from pay later', 'On waitlist'])) {
       $details['eligible'] = FALSE;
-      $details['ineligible_message'] = "You cannot transfer or cancel your registration for " . $eventTitle . ' as you are not currently registered for this event.';
+      $details['ineligible_message'] = ts('You cannot transfer or cancel your registration for %1 as you are not currently registered for this event.', [1 => $eventTitle]);
       return $details;
     }
     // Determine if it's too late to self-service cancel/transfer.

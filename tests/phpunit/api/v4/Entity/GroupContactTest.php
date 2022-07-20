@@ -19,22 +19,20 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
-use Civi\Api4\GroupContact;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class GroupContactTest extends UnitTestCase {
+class GroupContactTest extends Api4TestBase {
 
   public function testCreate() {
-    $contact = $this->createEntity(['type' => 'Individual']);
-    $group = $this->createEntity(['type' => 'Group']);
-    $result = GroupContact::create(FALSE)
-      ->addValue('group_id', $group['id'])
-      ->addValue('contact_id', $contact['id'])
-      ->execute()
-      ->first();
+    $contact = $this->createTestRecord('Contact');
+    $group = $this->createTestRecord('Group');
+    $result = $this->createTestRecord('GroupContact', [
+      'group_id' => $group['id'],
+      'contact_id' => $contact['id'],
+    ]);
     $this->assertEquals('Added', $result['status']);
   }
 

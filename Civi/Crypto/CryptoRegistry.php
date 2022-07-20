@@ -61,7 +61,7 @@ class CryptoRegistry {
    * @throws \CRM_Core_Exception
    * @throws \Civi\Crypto\Exception\CryptoException
    */
-  public static function createDefaultRegistry() {
+  public static function createDefaultRegistry(): CryptoRegistry {
     $registry = new static();
     $registry->addCipherSuite(new \Civi\Crypto\PhpseclibCipherSuite());
 

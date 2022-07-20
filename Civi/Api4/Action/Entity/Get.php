@@ -28,11 +28,15 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
   protected $includeCustom;
 
   /**
-   * Returns all APIv4 entities
+   * Returns all APIv4 entities from core, enabled components and enabled extensions.
    */
   protected function getRecords() {
     $provider = \Civi::service('action_object_provider');
-    return $provider->getEntities();
+    return array_filter($provider->getEntities(), function($entity) {
+      // Only include DAO entities from enabled components
+      $daoName = $entity['dao'] ?? NULL;
+      return (!$daoName || !defined("{$daoName}::COMPONENT") || \CRM_Core_Component::isEnabled($daoName::COMPONENT));
+    });
   }
 
 }

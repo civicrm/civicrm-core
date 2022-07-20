@@ -453,12 +453,21 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     }
 
     if (!empty($params['organization_id'])) {
-      // dev/core#382 Keeping the id here can cause db errors as it tries to update the wrong record in the Organization table
-      $groupOrg = [
-        'group_id' => $group->id,
-        'organization_id' => $params['organization_id'],
-      ];
-      CRM_Contact_BAO_GroupOrganization::add($groupOrg);
+      if ($params['organization_id'] == 'null') {
+        $groupOrganization = [];
+        CRM_Contact_BAO_GroupOrganization::retrieve($group->id, $groupOrganization);
+        if (!empty($groupOrganization['group_organization'])) {
+          CRM_Contact_BAO_GroupOrganization::deleteGroupOrganization($groupOrganization['group_organization']);
+        }
+      }
+      else {
+        // dev/core#382 Keeping the id here can cause db errors as it tries to update the wrong record in the Organization table
+        $groupOrg = [
+          'group_id' => $group->id,
+          'organization_id' => $params['organization_id'],
+        ];
+        CRM_Contact_BAO_GroupOrganization::add($groupOrg);
+      }
     }
 
     self::flushCaches();

@@ -15,10 +15,10 @@
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2021-01-06</releaseDate>
-  <version>5.49.alpha1</version>
+  <version>5.53.alpha1</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.38</ver>
+    <ver>5.53</ver>
   </compatibility>
   <comments>This extension is still in beta. Click on the chat link above to discuss development, report problems or ask questions.</comments>
   <classloader>
@@ -29,7 +29,7 @@
   <mixins>
     <mixin>ang-php@1.0.0</mixin>
     <mixin>menu-xml@1.0.0</mixin>
-    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>mgd-php@1.1.0</mixin>
   </mixins>
   <civix>
     <namespace>CRM/Search</namespace>

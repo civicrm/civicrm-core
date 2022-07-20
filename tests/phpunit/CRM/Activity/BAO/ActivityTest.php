@@ -1695,39 +1695,6 @@ $textValue
   }
 
   /**
-   * Test that smarty is rendered, if enabled.
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function testSmartyEnabled(): void {
-    putenv('CIVICRM_MAIL_SMARTY=1');
-    $this->createLoggedInUser();
-    $contactID = $this->individualCreate(['last_name' => 'Red']);
-    CRM_Activity_BAO_Activity::sendEmail(
-      [
-        $contactID => [
-          'preferred_mail_format' => 'Both',
-          'contact_id' => $contactID,
-          'email' => 'a@example.com',
-        ],
-      ],
-      '{contact.first_name} {$contact.first_name}',
-      '{contact.first_name} {$contact.first_name}',
-      '{contact.first_name} {$contact.first_name}',
-      NULL,
-      NULL,
-      'mail@example.com',
-      NULL,
-      NULL,
-      NULL,
-      [$contactID]
-    );
-    $activity = $this->callAPISuccessGetValue('Activity', ['return' => 'details']);
-    putenv('CIVICRM_MAIL_SMARTY=0');
-  }
-
-  /**
    * Same as testSendEmailWillReplaceTokensUniquelyForEachContact but with
    * 3 recipients and an attachment.
    *
@@ -1740,7 +1707,7 @@ $textValue
     $contactId3 = $this->individualCreate(['last_name' => 'Ochre']);
 
     // create a logged in USER since the code references it for sendEmail user.
-    $loggedInUser = $this->createLoggedInUser();
+    $this->createLoggedInUser();
     $contact = $this->callAPISuccess('Contact', 'get', ['sequential' => 1, 'id' => ['IN' => [$contactId1, $contactId2, $contactId3]]]);
 
     // Add contact tokens in subject, html , text.
@@ -1754,31 +1721,28 @@ $textValue
     $fileUri = "{$filepath}/{$fileName}";
     // Create a file.
     CRM_Utils_File::createFakeFile($filepath, 'aaaaaa', $fileName);
-    $attachments = [
-      'attachFile_1' =>
-      [
+
+    $form = $this->getFormObject('CRM_Contact_Form_Task_Email', [
+      'subject' => $subject,
+      'html_message' => $html,
+      'text_message' => $text,
+      'campaign_id' => $this->getCampaignID(),
+      'from_email_address' => 'from@example.com',
+      'to' => $contactId1 . '::' . $contact['values'][0]['email'] . ','
+      . $contactId2 . '::' . $contact['values'][1]['email'] . ','
+      . $contactId3 . '::' . $contact['values'][2]['email'],
+      'attachFile_1' => [
         'uri' => $fileUri,
         'type' => 'text/plain',
         'location' => $fileUri,
+        'name' => $fileUri,
       ],
-    ];
+      'attachDesc_1' => '',
+    ], [], []);
+    $form->set('cid', $contactId1 . ',' . $contactId2 . ',' . $contactId3);
+    $form->buildForm();
+    $form->postProcess();
 
-    CRM_Activity_BAO_Activity::sendEmail(
-      $contact['values'],
-      $subject,
-      $text,
-      $html,
-      $contact['values'][0]['email'],
-      $loggedInUser,
-      __FUNCTION__ . '@example.com',
-      $attachments,
-      NULL,
-      NULL,
-      array_column($contact['values'], 'id'),
-      NULL,
-      NULL,
-      $this->getCampaignID()
-    );
     $result = $this->callAPISuccess('Activity', 'get', ['campaign_id' => $this->getCampaignID()]);
     // An activity created for each of the two contacts
     $this->assertEquals(3, $result['count']);
@@ -1831,31 +1795,27 @@ $textValue
     $fileUri = "{$filepath}/{$fileName}";
     // Create a file.
     CRM_Utils_File::createFakeFile($filepath, 'Bananas do not bend themselves without a little help.', $fileName);
-    $attachments = [
-      'attachFile_1' =>
-        [
-          'uri' => $fileUri,
-          'type' => 'text/plain',
-          'location' => $fileUri,
-        ],
-    ];
 
-    CRM_Activity_BAO_Activity::sendEmail(
-      $contact['values'],
-      $subject,
-      $text,
-      $html,
-      $contact['values'][0]['email'],
-      $userID,
-      $from = __FUNCTION__ . '@example.com',
-      $attachments,
-      $cc = NULL,
-      $bcc = NULL,
-      $contactIds = array_column($contact['values'], 'id'),
-      $additionalDetails = NULL,
-      NULL,
-      $campaign_id
-    );
+    $form = $this->getFormObject('CRM_Contact_Form_Task_Email', [
+      'subject' => $subject,
+      'html_message' => $html,
+      'text_message' => $text,
+      'campaign_id' => $campaign_id,
+      'from_email_address' => 'from@example.com',
+      'to' => $contactId1 . '::' . $contact['values'][0]['email'] . ','
+      . $contactId2 . '::' . $contact['values'][1]['email'],
+      'attachFile_1' => [
+        'uri' => $fileUri,
+        'type' => 'text/plain',
+        'location' => $fileUri,
+        'name' => $fileUri,
+      ],
+      'attachDesc_1' => '',
+    ], [], []);
+    $form->set('cid', $contactId1 . ',' . $contactId2);
+    $form->buildForm();
+    $form->postProcess();
+
     $result = $this->callAPISuccess('activity', 'get', ['campaign_id' => $campaign_id]);
     // An activity created for each of the two contacts, i.e two activities.
     $this->assertEquals(2, $result['count']);
@@ -1868,6 +1828,8 @@ $textValue
 
     // Verify that the that both activities are linked to the same File Id.
     $this->assertEquals($result['values'][0]['file_id'], $result['values'][1]['file_id']);
+
+    unlink($fileUri);
   }
 
   /**
@@ -2629,60 +2591,6 @@ $textValue
         ],
       ],
     ];
-  }
-
-  /**
-   * Test the returned activity ids when there are multiple "To" recipients.
-   * Similar to testSendEmailWillReplaceTokensUniquelyForEachContact but we're
-   * checking the activity ids returned from sendEmail.
-   */
-  public function testSendEmailWithMultipleToRecipients(): void {
-    $contactId1 = $this->individualCreate(['first_name' => 'Aaaa', 'last_name' => 'Bbbb']);
-    $contactId2 = $this->individualCreate(['first_name' => 'Cccc', 'last_name' => 'Dddd']);
-
-    // create a logged in USER since the code references it for sendEmail user.
-    $loggedInUser = $this->createLoggedInUser();
-    $contacts = $this->callAPISuccess('Contact', 'get', [
-      'sequential' => 1,
-      'id' => ['IN' => [$contactId1, $contactId2]],
-    ]);
-
-    [$sent, $activityIds] = CRM_Activity_BAO_Activity::sendEmail(
-      $contacts['values'],
-      'a subject',
-      'here is some text',
-      '<p>here is some html</p>',
-      $contacts['values'][0]['email'],
-      $loggedInUser,
-      $from = __FUNCTION__ . '@example.com',
-      $attachments = NULL,
-      $cc = NULL,
-      $bcc = NULL,
-      array_column($contacts['values'], 'id')
-    );
-
-    // Get all activities for these contacts
-    $result = $this->callAPISuccess('activity', 'get', [
-      'sequential' => 1,
-      'return' => ['target_contact_id'],
-      'target_contact_id' => ['IN' => [$contactId1, $contactId2]],
-    ]);
-
-    // There should be one activity created for each of the two contacts
-    $this->assertEquals(2, $result['count']);
-
-    // Activity ids returned from sendEmail should match the ones returned from api call.
-    $this->assertEquals($activityIds, array_column($result['values'], 'id'));
-
-    // Is it the right contacts?
-    $this->assertEquals(
-      [0 => [0 => $contactId1], 1 => [0 => $contactId2]],
-      array_column($result['values'], 'target_contact_id')
-    );
-    $this->assertEquals(
-      [0 => [$contactId1 => 'Bbbb, Aaaa'], 1 => [$contactId2 => 'Dddd, Cccc']],
-      array_column($result['values'], 'target_contact_sort_name')
-    );
   }
 
   /**

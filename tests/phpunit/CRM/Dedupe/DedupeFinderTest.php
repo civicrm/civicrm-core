@@ -115,6 +115,186 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test our rule group with a custom group.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCustomRuleCustomFields() {
+
+    $this->setupForGroupDedupe();
+
+    //Create custom group with fields of all types to test.
+    $customGroup = $this->createCustomGroup();
+
+    $customGroupID = $this->ids['CustomGroup']['Custom Group'];
+    $ids = &$this->ids['CustomField'];
+    $ids['string'] = (int) $this->createTextCustomField(['custom_group_id' => $customGroupID])['id'];
+    $ids['date'] = (int) $this->createDateCustomField(['custom_group_id' => $customGroupID])['id'];
+    $ids['int'] = (int) $this->createIntCustomField(['custom_group_id' => $customGroupID])['id'];
+
+    $params = [];
+    foreach ($this->ids['CustomField'] as $key => $field_id) {
+      switch ($key) {
+        case 'string':
+          $params["custom_{$field_id}"] = "text";
+          break;
+
+        case 'date':
+          $params["custom_{$field_id}"] = "20220511";
+          break;
+
+        case 'int':
+          $params["custom_{$field_id}"] = 5;
+          break;
+      }
+    }
+
+    $count = 0;
+    foreach ($this->contactIDs as $contact_id) {
+      // Update the text custom fields for duplicate contact
+      foreach ($this->ids['CustomField'] as $key => $field_id) {
+        $this->callAPISuccess('Contact', 'create', array_merge([
+          'id' => $contact_id,
+        ], $params));
+      }
+      $count++;
+      if ($count == 2) {
+        break;
+      }
+    }
+
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
+      'contact_type' => 'Individual',
+      'threshold' => 4 * count($this->ids['CustomField']),
+      'used' => 'General',
+      'name' => 'TestRule',
+      'title' => 'TestRule',
+      'is_reserved' => 0,
+    ]);
+
+    foreach ($this->ids['CustomField'] as $key => $field_id) {
+      $this->callAPISuccess('Rule', 'create', [
+        'dedupe_rule_group_id' => $ruleGroup['id'],
+        'rule_table' => $this->getCustomGroupTable(),
+        'rule_weight' => 4,
+        'rule_field' => $this->getCustomFieldColumnName($key),
+      ]);
+    }
+
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
+    $this->assertCount(1, $foundDupes);
+    CRM_Dedupe_Finder::dupes($ruleGroup['id']);
+
+    $fields = [
+      'first_name' => 'robin',
+      'last_name' => 'hood',
+      'email' => 'hood@example.com',
+      'street_address' => 'Ambachtstraat 23',
+    ];
+
+    $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($fields, 'Individual', 'General', [], TRUE, $ruleGroup['id'], ['event_id' => 1]);
+    $this->assertCount(0, $ids);
+
+    $fields = array_merge($fields, $params);
+    $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($fields, 'Individual', 'General', [], TRUE, $ruleGroup['id'], ['event_id' => 1]);
+    $this->assertCount(2, $ids);
+  }
+
+  /**
+   * Test our rule group with a custom group for a SubType.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCustomRuleCustomFieldsSubtypes() {
+
+    $this->setupForGroupDedupe();
+
+    //Create custom group with fields of all types to test.
+    $contactType = $this->callAPISuccess('ContactType', 'create', ['name' => 'Big Bank', 'label' => 'biggee', 'parent_id' => 'Individual']);
+    $customGroup = $this->createCustomGroup(['extends' => 'Individual', 'extends_entity_column_value' => ['Big_Bank']]);
+
+    $customGroupID = $this->ids['CustomGroup']['Custom Group'];
+    $ids = &$this->ids['CustomField'];
+    $ids['string'] = (int) $this->createTextCustomField(['custom_group_id' => $customGroupID])['id'];
+    $ids['date'] = (int) $this->createDateCustomField(['custom_group_id' => $customGroupID])['id'];
+    $ids['int'] = (int) $this->createIntCustomField(['custom_group_id' => $customGroupID])['id'];
+
+    $params = [];
+    foreach ($this->ids['CustomField'] as $key => $field_id) {
+      switch ($key) {
+        case 'string':
+          $params["custom_{$field_id}"] = "text";
+          break;
+
+        case 'date':
+          $params["custom_{$field_id}"] = "20220511";
+          break;
+
+        case 'int':
+          $params["custom_{$field_id}"] = 5;
+          break;
+      }
+    }
+
+    foreach ($this->contactIDs as $contact_id) {
+      $this->callAPISuccess('Contact', 'create', array_merge([
+        'id' => $contact_id,
+        'contact_sub_type' => 'Big_Bank',
+      ]));
+    }
+
+    $count = 0;
+    foreach ($this->contactIDs as $contact_id) {
+      // Update the text custom fields for duplicate contact
+      foreach ($this->ids['CustomField'] as $key => $field_id) {
+        $this->callAPISuccess('Contact', 'create', array_merge([
+          'id' => $contact_id,
+        ], $params));
+      }
+      $count++;
+      if ($count == 2) {
+        break;
+      }
+    }
+
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
+      'contact_type' => 'Individual',
+      'threshold' => 4 * count($this->ids['CustomField']),
+      'used' => 'General',
+      'name' => 'TestRule',
+      'title' => 'TestRule',
+      'is_reserved' => 0,
+    ]);
+
+    foreach ($this->ids['CustomField'] as $key => $field_id) {
+      $this->callAPISuccess('Rule', 'create', [
+        'dedupe_rule_group_id' => $ruleGroup['id'],
+        'rule_table' => $this->getCustomGroupTable(),
+        'rule_weight' => 4,
+        'rule_field' => $this->getCustomFieldColumnName($key),
+      ]);
+    }
+
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
+    $this->assertCount(1, $foundDupes);
+    CRM_Dedupe_Finder::dupes($ruleGroup['id']);
+
+    $fields = [
+      'first_name' => 'robin',
+      'last_name' => 'hood',
+      'email' => 'hood@example.com',
+      'street_address' => 'Ambachtstraat 23',
+    ];
+
+    $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($fields, 'Individual', 'General', [], TRUE, $ruleGroup['id'], ['event_id' => 1]);
+    $this->assertCount(0, $ids);
+
+    $fields = array_merge($fields, $params);
+    $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($fields, 'Individual', 'General', [], TRUE, $ruleGroup['id'], ['event_id' => 1]);
+    $this->assertCount(2, $ids);
+  }
+
+  /**
    * Test that we do not get a fatal error when our rule group is a custom date field.
    *
    * @throws \CRM_Core_Exception

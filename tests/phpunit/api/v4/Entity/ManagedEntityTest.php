@@ -18,9 +18,10 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Domain;
 use Civi\Api4\Group;
+use Civi\Api4\Managed;
 use Civi\Api4\Navigation;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\OptionValue;
@@ -31,7 +32,7 @@ use Civi\Test\TransactionalInterface;
 /**
  * @group headless
  */
-class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, HookInterface {
+class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, HookInterface {
   /**
    * @var array[]
    */
@@ -82,7 +83,7 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
       ],
     ];
 
-    \CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+    Managed::reconcile(FALSE)->addModule('civicrm')->execute();
 
     $search = SavedSearch::get(FALSE)
       ->addWhere('name', '=', 'TestManagedSavedSearch')
@@ -307,11 +308,21 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
     \CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
 
     $values = OptionValue::get(FALSE)
+      ->addSelect('*', 'local_modified_date', 'has_base')
       ->addWhere('option_group_id.name', '=', 'testManagedOptionGroup')
       ->execute();
 
     $this->assertCount(1, $values);
     $this->assertEquals('Option Value 1', $values[0]['label']);
+    $this->assertNull($values[0]['local_modified_date']);
+    $this->assertTrue($values[0]['has_base']);
+
+    // Update option 1, now it should have a local_modified_date
+    // And the new label should persist after a reconcile
+    $result = OptionValue::update(FALSE)
+      ->addWhere('id', '=', $values[0]['id'])
+      ->addValue('label', '1 New Label')
+      ->execute();
 
     $optionValue2 = [
       'module' => 'civicrm',
@@ -333,8 +344,8 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
         ],
       ],
     ];
-
     $this->_managedEntities[] = $optionValue2;
+
     \CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
 
     $values = OptionValue::get(FALSE)
@@ -344,9 +355,12 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
       ->execute();
 
     $this->assertCount(2, $values);
-    $this->assertEquals('Option Value 2', $values[1]['label']);
-    $this->assertNull($values[0]['local_modified_date']);
+    $this->assertEquals('1 New Label', $values[0]['label']);
+    $this->assertNotNull($values[0]['local_modified_date']);
     $this->assertTrue($values[0]['has_base']);
+    $this->assertEquals('Option Value 2', $values[1]['label']);
+    $this->assertNull($values[1]['local_modified_date']);
+    $this->assertTrue($values[1]['has_base']);
 
     $this->_managedEntities = [];
     \CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
@@ -370,7 +384,7 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
   }
 
   public function testManagedNavigationWeights() {
-    $this->_managedEntities = [
+    $managedEntities = [
       [
         'module' => 'unit.test.fake.ext',
         'name' => 'Navigation_Test_Parent',
@@ -461,13 +475,14 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
         ],
       ],
     ];
+    $this->_managedEntities = $managedEntities;
 
     // Throw a monkey wrench by placing duplicates in another domain
     $d2 = Domain::create(FALSE)
       ->addValue('name', 'Decoy domain')
       ->addValue('version', \CRM_Utils_System::version())
       ->execute()->single();
-    foreach ($this->_managedEntities as $item) {
+    foreach ($managedEntities as $item) {
       $decoys[] = civicrm_api4('Navigation', 'create', [
         'checkPermissions' => FALSE,
         'values' => ['domain_id' => $d2['id']] + $item['params']['values'],
@@ -522,6 +537,8 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
     $allModules = [
       new \CRM_Core_Module('unit.test.fake.ext', FALSE),
     ];
+    // If module is disabled it will not run hook_civicrm_managed.
+    $this->_managedEntities = [];
     (new \CRM_Core_ManagedEntities($allModules))->reconcile();
 
     // Children's weight should have been unaffected, but they should be disabled
@@ -543,6 +560,7 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
     $allModules = [
       new \CRM_Core_Module('unit.test.fake.ext', TRUE),
     ];
+    $this->_managedEntities = $managedEntities;
     (new \CRM_Core_ManagedEntities($allModules))->reconcile();
 
     // Children's weight should have been unaffected, but they should be enabled

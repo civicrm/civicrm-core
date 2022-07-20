@@ -36,8 +36,8 @@
      {if !empty($isPrimary)}
       <p>{ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}</p>
      {/if}
-    {elseif !empty($is_pay_later)}
-     <p>{if isset($pay_later_receipt)}{$pay_later_receipt}{/if}</p> {* FIXME: this might be text rather than HTML *}
+    {elseif $is_pay_later}
+     <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
     {/if}
 
    </td>
@@ -53,7 +53,7 @@
      <tr>
       <td colspan="2" {$valueStyle}>
        {$event.event_title}<br />
-       {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if} {$event.event_tz}
+       {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
       </td>
      </tr>
 
@@ -116,7 +116,13 @@
       <tr>
        <td colspan="2" {$valueStyle}>
         {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
-        <a href="{$icalFeed}">{ts}Download iCalendar File{/ts}</a>
+        <a href="{$icalFeed}">{ts}Download iCalendar entry for this event.{/ts}</a>
+       </td>
+      </tr>
+      <tr>
+       <td colspan="2" {$valueStyle}>
+        {capture assign=gCalendar}{crmURL p='civicrm/event/ical' q="gCalendar=1&reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
+         <a href="{$gCalendar}">{ts}Add event to Google Calendar{/ts}</a>
        </td>
       </tr>
      {/if}
@@ -213,7 +219,7 @@
         {/if}
        {/foreach}
        {if !empty($dataArray)}
-        {if isset($totalAmount) and isset($totalTaxAmount)}
+        {if $totalAmount and $totalTaxAmount}
         <tr>
          <td {$labelStyle}>
           {ts}Amount Before Tax:{/ts}
@@ -246,7 +252,7 @@
         </tr>
        {/foreach}
       {/if}
-      {if isset($totalTaxAmount)}
+      {if $totalTaxAmount}
        <tr>
         <td {$labelStyle}>
          {ts}Total Tax Amount{/ts}
@@ -301,10 +307,10 @@
        </td>
      </tr>
      {/if}
-       {if !empty($is_pay_later)}
+       {if $is_pay_later}
         <tr>
          <td colspan="2" {$labelStyle}>
-          {if isset($pay_later_receipt)}{$pay_later_receipt}{/if}
+          {$pay_later_receipt}
          </td>
         </tr>
        {/if}

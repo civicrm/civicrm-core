@@ -1,5 +1,8 @@
 <?php
 
+use Civi\Api4\Mapping;
+use Civi\Api4\MappingField;
+
 /**
  * Class CRM_Import_ImportProcessor.
  *
@@ -23,6 +26,27 @@ class CRM_Import_ImportProcessor {
    * @var array
    */
   protected $metadata = [];
+
+  /**
+   * Id of the created user job.
+   *
+   * @var int
+   */
+  protected $userJobID;
+
+  /**
+   * @return int
+   */
+  public function getUserJobID(): int {
+    return $this->userJobID;
+  }
+
+  /**
+   * @param int $userJobID
+   */
+  public function setUserJobID(int $userJobID): void {
+    $this->userJobID = $userJobID;
+  }
 
   /**
    * Metadata keyed by field title.
@@ -399,24 +423,9 @@ class CRM_Import_ImportProcessor {
    * @throws \CiviCRM_API3_Exception
    */
   public function getImporterObject() {
-    $importer = new CRM_Contact_Import_Parser_Contact(
-      $this->getFieldNames(),
-      $this->getFieldLocationTypes(),
-      $this->getFieldPhoneTypes(),
-      $this->getFieldIMProviderTypes(),
-      // @todo - figure out related mappings.
-      // $mapperRelated = [], $mapperRelatedContactType = [], $mapperRelatedContactDetails = [], $mapperRelatedContactLocType = [], $mapperRelatedContactPhoneType = [], $mapperRelatedContactImProvider = [],
-      [],
-      [],
-      [],
-      [],
-      [],
-      [],
-      $this->getFieldWebsiteTypes()
-      // $mapperRelatedContactWebsiteType = []
-    );
+    $importer = new CRM_Contact_Import_Parser_Contact($this->getFieldNames());
+    $importer->setUserJobID($this->getUserJobID());
     $importer->init();
-    $importer->_contactType = $this->getContactType();
     return $importer;
   }
 
@@ -426,6 +435,63 @@ class CRM_Import_ImportProcessor {
    * @throws \CiviCRM_API3_Exception
    */
   protected function loadSavedMapping() {
+    $fields = civicrm_api3('MappingField', 'get', [
+      'mapping_id' => $this->getMappingID(),
+      'options' => ['limit' => 0],
+    ])['values'];
+    $skipped = [];
+    foreach ($fields as $index => $field) {
+      if (!$this->isValidField($field['name'])) {
+        // This scenario could occur if the name of a saved mapping field
+        // changed or became unavailable https://lab.civicrm.org/dev/core/-/issues/3511.
+        $skipped[] = $field['name'];
+        $fields[$index]['name'] = $field['name'] = 'do_not_import';
+      }
+      $fieldSpec = $this->getFieldMetadata($field['name']);
+      $fields[$index]['label'] = $fieldSpec['title'];
+      if (empty($field['location_type_id']) && !empty($fieldSpec['hasLocationType'])) {
+        $fields[$index]['location_type_id'] = 'Primary';
+      }
+    }
+    if (!empty($skipped)) {
+      CRM_Core_Session::setStatus(ts('Invalid saved mappings were skipped') . ':' . implode(', ', $skipped));
+    }
+    $this->mappingFields = $this->rekeyBySortedColumnNumbers($fields);
+  }
+
+  /**
+   * Get the metadata for the field.
+   *
+   * @param string $fieldName
+   *
+   * @return array
+   */
+  protected function getFieldMetadata(string $fieldName): array {
+    return $this->getMetadata()[$fieldName] ?? CRM_Contact_BAO_Contact::importableFields('All')[$fieldName];
+  }
+
+  /**
+   * Is the field valid for this import.
+   *
+   * If not defined in metadata is is not valid.
+   *
+   * @param string $fieldName
+   *
+   * @return bool
+   */
+  public function isValidField(string $fieldName): bool {
+    return isset($this->getMetadata()[$fieldName]) || isset(CRM_Contact_BAO_Contact::importableFields('All')[$fieldName]);
+  }
+
+  /**
+   * Load the mapping from the database into the pre-5.50 format.
+   *
+   * This is preserved as a copy the upgrade script can use - since the
+   * upgrade allows the other to be 'fixed'.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function legacyLoadSavedMapping() {
     $fields = civicrm_api3('MappingField', 'get', [
       'mapping_id' => $this->getMappingID(),
       'options' => ['limit' => 0],
@@ -504,47 +570,6 @@ class CRM_Import_ImportProcessor {
   }
 
   /**
-   * Get the relevant js for quickform.
-   *
-   * @param int $column
-   *
-   * @return string
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function getQuickFormJSForField($column) {
-    $columnNumbersToHide = [];
-    if ($this->getFieldName($column) === 'do_not_import') {
-      $columnNumbersToHide = [1, 2, 3];
-    }
-    elseif ($this->getRelationshipKey($column)) {
-      if (!$this->getWebsiteTypeID($column) && !$this->getLocationTypeID($column)) {
-        $columnNumbersToHide[] = 2;
-      }
-      if (!$this->getFieldName($column)) {
-        $columnNumbersToHide[] = 1;
-      }
-      if (!$this->getPhoneOrIMTypeID($column)) {
-        $columnNumbersToHide[] = 3;
-      }
-    }
-    else {
-      if (!$this->getLocationTypeID($column) && !$this->getWebsiteTypeID($column)) {
-        $columnNumbersToHide[] = 1;
-      }
-      if (!$this->getPhoneOrIMTypeID($column)) {
-        $columnNumbersToHide[] = 2;
-      }
-      $columnNumbersToHide[] = 3;
-    }
-
-    $jsClauses = [];
-    foreach ($columnNumbersToHide as $columnNumber) {
-      $jsClauses[] = $this->getFormName() . "['mapper[$column][" . $columnNumber . "]'].style.display = 'none';";
-    }
-    return empty($jsClauses) ? '' : implode("\n", $jsClauses) . "\n";
-  }
-
-  /**
    * Get the defaults for the column from the saved mapping.
    *
    * @param int $column
@@ -553,19 +578,62 @@ class CRM_Import_ImportProcessor {
    * @throws \CiviCRM_API3_Exception
    */
   public function getSavedQuickformDefaultsForColumn($column) {
+    $fieldMapping = [];
+
+    // $sel1 is either unmapped, a relationship or a target field.
     if ($this->getFieldName($column) === 'do_not_import') {
-      return [];
+      return $fieldMapping;
     }
+
     if ($this->getValidRelationshipKey($column)) {
-      if ($this->getWebsiteTypeID($column)) {
-        return [$this->getValidRelationshipKey($column), $this->getFieldName($column), $this->getWebsiteTypeID($column)];
-      }
-      return [$this->getValidRelationshipKey($column), $this->getFieldName($column), $this->getLocationTypeID($column), $this->getPhoneOrIMTypeID($column)];
+      $fieldMapping[] = $this->getValidRelationshipKey($column);
     }
+
+    // $sel1
+    $fieldMapping[] = $this->getFieldName($column);
+
+    // $sel2
     if ($this->getWebsiteTypeID($column)) {
-      return [$this->getFieldName($column), $this->getWebsiteTypeID($column)];
+      $fieldMapping[] = $this->getWebsiteTypeID($column);
     }
-    return [(string) $this->getFieldName($column), $this->getLocationTypeID($column), $this->getPhoneOrIMTypeID($column)];
+    elseif ($this->getLocationTypeID($column)) {
+      $fieldMapping[] = $this->getLocationTypeID($column);
+    }
+
+    // $sel3
+    if ($this->getPhoneOrIMTypeID($column)) {
+      $fieldMapping[] = $this->getPhoneOrIMTypeID($column);
+    }
+    return $fieldMapping;
+  }
+
+  /**
+   * This exists for use in the FiveFifty Upgrade
+   *
+   * @throws \API_Exception|\CiviCRM_API3_Exception
+   */
+  public static function convertSavedFields(): void {
+    $mappings = Mapping::get(FALSE)
+      ->setSelect(['id', 'contact_type'])
+      ->addWhere('mapping_type_id:name', '=', 'Import Contact')
+      ->execute();
+
+    foreach ($mappings as $mapping) {
+      $processor = new CRM_Import_ImportProcessor();
+      $processor->setMappingID($mapping['id']);
+      $processor->setMetadata(CRM_Contact_BAO_Contact::importableFields('All'));
+      $processor->legacyLoadSavedMapping();;
+      foreach ($processor->getMappingFields() as $field) {
+        // The if is mostly precautionary against running this more than once
+        // - which is common in dev if not live...
+        if ($field['name']) {
+          MappingField::update(FALSE)
+            ->setValues(['name' => $field['name']])
+            ->addWhere('id', '=', $field['id'])
+            ->execute();
+        }
+      }
+    }
   }
 
 }

@@ -136,16 +136,14 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
         'postal_code' => $event['loc_block_id.address_id.postal_code'],
 
       ]);
-      $tokens['info_url']['text/html'] = \CRM_Utils_System::url('civicrm/event/info', 'reset=1&id=' . $eventID, TRUE, NULL, FALSE);
-      $tokens['registration_url']['text/html'] = \CRM_Utils_System::url('civicrm/event/register', 'reset=1&id=' . $eventID, TRUE, NULL, FALSE);
+      $tokens['info_url']['text/html'] = \CRM_Utils_System::url('civicrm/event/info', 'reset=1&id=' . $eventID, TRUE, NULL, FALSE, TRUE);
+      $tokens['registration_url']['text/html'] = \CRM_Utils_System::url('civicrm/event/register', 'reset=1&id=' . $eventID, TRUE, NULL, FALSE, TRUE);
       $tokens['start_date']['text/html'] = !empty($event['start_date']) ? new DateTime($event['start_date']) : '';
       $tokens['end_date']['text/html'] = !empty($event['end_date']) ? new DateTime($event['end_date']) : '';
       $tokens['event_type_id:label']['text/html'] = CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Event', 'event_type_id', $event['event_type_id']);
       $tokens['event_type_id:name']['text/html'] = CRM_Core_PseudoConstant::getName('CRM_Event_BAO_Event', 'event_type_id', $event['event_type_id']);
       $tokens['contact_phone']['text/html'] = $event['loc_block_id.phone_id.phone'];
       $tokens['contact_email']['text/html'] = $event['loc_block_id.email_id.email'];
-      $tokens['event_tz:label']['text/html'] = !empty($event['event_tz']) ? CRM_Core_SelectValues::timezone()[$event['event_tz']] : '';
-      $tokens['event_tz:name']['text/html'] = $event['event_tz'] ?? '';
 
       foreach ($this->getTokenMetadata() as $fieldName => $fieldSpec) {
         if (!isset($tokens[$fieldName])) {
@@ -179,7 +177,6 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
       'event_type_id',
       'title',
       'id',
-      'event_tz',
       'pay_later_receipt',
       'start_date',
       'end_date',

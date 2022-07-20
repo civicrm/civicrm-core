@@ -702,6 +702,21 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called for declaring managed entities via API.
    *
+   * @code
+   * // Example: Optimal skeleton for backward/forward compatibility
+   * function example_civicrm_managed(&$entities, ?array $modules = NULL) {
+   *   if ($modules !== NULL && !in_array(E::LONG_NAME, $modules, TRUE)) {
+   *     return;
+   *   }
+   *   $entities[] = [
+   *     'module' => E::LONG_NAME,
+   *     'name' => 'my_option_value',
+   *     'entity' => 'OptionValue',
+   *     'params' => [...],
+   *   ];
+   * }
+   * @endCode
+   *
    * @param array $entities
    *   List of pending entities. Each entity is an array with keys:
    *   + 'module': string; for module-extensions, this is the fully-qualifed name (e.g. "com.example.mymodule"); for CMS modules, the name is prefixed by the CMS (e.g. "drupal.mymodule")
@@ -715,15 +730,26 @@ abstract class CRM_Utils_Hook {
    *     - 'always' (default): always delete orphaned records
    *     - 'never': never delete orphaned records
    *     - 'unused': only delete orphaned records if there are no other references to it in the DB. (This is determined by calling the API's "getrefcount" action.)
+   * @param array|NULL $modules
+   *   (Added circa v5.50) If given, only report entities related to $modules. NULL is a wildcard ("all modules").
    *
+   *   This parameter is _advisory_ and is not supplied on older versions.
+   *   Listeners SHOULD self-censor (only report entities which match the filter).
+   *   However, all pre-existing listeners were unaware of this option, and they WILL over-report.
+   *   Over-reported data will be discarded.
    * @return null
    *   the return value is ignored
    */
-  public static function managed(&$entities) {
-    return self::singleton()->invoke(['entities'], $entities,
-      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+  public static function managed(&$entities, ?array $modules = NULL) {
+    self::singleton()->invoke(['entities', 'modules'], $entities, $modules,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_managed'
     );
+    if ($modules) {
+      $entities = array_filter($entities, function($entity) use ($modules) {
+        return in_array($entity['module'], $modules, TRUE);
+      });
+    }
   }
 
   /**
@@ -1651,6 +1677,22 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * (EXPERIMENTAL) Scan extensions for a list of auto-registered interfaces.
+   *
+   * This hook is currently experimental. It is a means to implementing `mixin/scan-classes@1`.
+   * If there are no major difficulties circa 5.55, then it can be marked stable.
+   *
+   * @param string[] $classes
+   *   List of classes which may be of interest to the class-scanner.
+   */
+  public static function scanClasses(array &$classes) {
+    self::singleton()->invoke(['classes'], $classes, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_scanClasses'
+    );
+  }
+
+  /**
    * This hook is called when we are determining the contactID for a specific
    * email address
    *
@@ -1839,11 +1881,37 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called when a module-extension is installed.
-   * Each module will receive hook_civicrm_install during its own installation (but not during the
-   * installation of unrelated modules).
+   * Run early installation steps for an extension. Ex: Create new MySQL table.
+   *
+   * This dispatches directly to each new extension. You will only receive notices for your own installation.
+   *
+   * If multiple extensions are installed simultaneously, they will all run
+   * `hook_install`/`hook_enable` back-to-back (in order of dependency).
+   *
+   * This runs BEFORE refreshing major caches and services (such as
+   * `ManagedEntities` and `CRM_Logging_Schema`).
+   *
+   * @see https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_install
    */
   public static function install() {
+    // Actually invoke via CRM_Extension_Manager_Module::callHook
+    throw new \RuntimeException(sprintf("The method %s::%s is just a documentation stub and should not be invoked directly.", __CLASS__, __FUNCTION__));
+  }
+
+  /**
+   * Run later installation steps. Ex: Call a bespoke API-job for the first time.
+   *
+   * This dispatches directly to each new extension. You will only receive notices for your own installation.
+   *
+   * If multiple extensions are installed simultaneously, they will all run
+   * `hook_postInstall` back-to-back (in order of dependency).
+   *
+   * This runs AFTER refreshing major caches and services (such as
+   * `ManagedEntities` and `CRM_Logging_Schema`).
+   *
+   * @see https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_postInstall
+   */
+  public static function postInstall() {
     // Actually invoke via CRM_Extension_Manager_Module::callHook
     throw new \RuntimeException(sprintf("The method %s::%s is just a documentation stub and should not be invoked directly.", __CLASS__, __FUNCTION__));
   }
@@ -2404,7 +2472,7 @@ abstract class CRM_Utils_Hook {
    *        For future-proofing, use a serializable callback (e.g. string/array).
    *        See also: Civi\Core\Resolver.
    *    - requires: array, list of required Angular modules.
-   *    - basePages: array, uncondtionally load this module onto the given Angular pages. [v4.7.21+]
+   *    - basePages: array, unconditionally load this module onto the given Angular pages. [v4.7.21+]
    *      If omitted, default to "array('civicrm/a')" for backward compat.
    *      For a utility that should only be loaded on-demand, use "array()".
    *      For a utility that should be loaded in all pages use, "array('*')".
@@ -2698,6 +2766,77 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(['params', 'formName'], $params, $formName,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_alterEntityRefParams'
+    );
+  }
+
+  /**
+   * Fire `hook_civicrm_queueRun_{$runner}`.
+   *
+   * This event only fires if these conditions are met:
+   *
+   * 1. The `$queue` has been persisted in `civicrm_queue`.
+   * 2. The `$queue` has a `runner` property.
+   * 3. The `$queue` has some pending tasks.
+   * 4. The system has a queue-running agent.
+   *
+   * @param \CRM_Queue_Queue $queue
+   * @param array $items
+   *   List of claimed items which we may evaluate.
+   * @param array $outcomes
+   *   The outcomes of each task. One of 'ok', 'retry', 'fail'.
+   *   Keys should match the keys in $items.
+   */
+  public static function queueRun(CRM_Queue_Queue $queue, array $items, &$outcomes) {
+    $runner = $queue->getSpec('runner');
+    if (empty($runner) || !preg_match(';^[A-Za-z0-9_]+$;', $runner)) {
+      throw new \CRM_Core_Exception("Cannot autorun queue: " . $queue->getName());
+    }
+    return self::singleton()->invoke(['queue', 'items', 'outcomes'], $queue, $items,
+      $outcomes, $exception, self::$_nullObject, self::$_nullObject,
+      'civicrm_queueRun_' . $runner
+    );
+  }
+
+  /**
+   * Fired if the status of a queue changes.
+   *
+   * @param \CRM_Queue_Queue $queue
+   * @param string $status
+   *   New status.
+   *   Ex: 'completed', 'active', 'aborted'
+   */
+  public static function queueStatus(CRM_Queue_Queue $queue, string $status): void {
+    self::singleton()->invoke(['queue', 'status'], $queue, $status,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_queueStatus'
+    );
+  }
+
+  /**
+   * This is called if automatic execution of a queue-task fails.
+   *
+   * The `$outcome` may be modified. For example, you might inspect the $item and $exception -- and then
+   * decide whether to 'retry', 'delete', or 'abort'.
+   *
+   * @param \CRM_Queue_Queue $queue
+   * @param \CRM_Queue_DAO_QueueItem|\stdClass $item
+   *   The enqueued item $item.
+   *   In principle, this is the $item format determined by the queue, which includes `id` and `data`.
+   *   In practice, it is typically an instance of `CRM_Queue_DAO_QueueItem`.
+   * @param string $outcome
+   *   The outcome of the task. Legal values:
+   *   - 'retry': The task encountered a problem, and it should be retried.
+   *   - 'delete': The task encountered a non-recoverable problem, and it should be deleted.
+   *   - 'abort': The task encountered a non-recoverable problem, and the queue should be stopped.
+   *   - 'ok': The task finished normally. (You won't generally see this, but it could be useful in some customizations.)
+   *   The default outcome for task-errors is determined by the queue settings (`civicrm_queue.error`).
+   * @param \Throwable|null $exception
+   *   If the task failed, this is the cause of the failure.
+   */
+  public static function queueTaskError(CRM_Queue_Queue $queue, $item, &$outcome, ?Throwable $exception) {
+    return self::singleton()->invoke(['job', 'params'], $queue, $item,
+      $outcome, $exception, self::$_nullObject, self::$_nullObject,
+      'civicrm_queueTaskError'
     );
   }
 

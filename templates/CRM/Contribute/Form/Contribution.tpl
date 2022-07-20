@@ -453,7 +453,7 @@
         });
 
         function showHideCancelInfo(obj) {
-          var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids}{literal}];
+          var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids|smarty:nodefaults}{literal}];
           if (cancelInfo_show_ids.indexOf(obj.val()) > -1) {
             $('#cancelInfo', $form).show();
             $('#total_amount', $form).attr('readonly', true);

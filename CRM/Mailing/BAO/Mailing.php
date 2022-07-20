@@ -666,7 +666,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
       }
 
       // To check for an html part strip tags
-      if (trim(strip_tags($this->body_html, '<img>'))) {
+      if (trim(strip_tags(($this->body_html ?? ''), '<img>'))) {
 
         $template = [];
         if ($this->header) {
@@ -1163,11 +1163,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     $mailParams = $headers;
-    if ($text && ($test || $contact['preferred_mail_format'] == 'Text' ||
-        $contact['preferred_mail_format'] == 'Both' ||
-        ($contact['preferred_mail_format'] == 'HTML' && !array_key_exists('html', $pEmails))
-      )
-    ) {
+    if ($text) {
       $textBody = implode('', $text);
       if ($useSmarty) {
         $textBody = $smarty->fetch("string:$textBody");
@@ -1175,10 +1171,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $mailParams['text'] = $textBody;
     }
 
-    if ($html && ($test || ($contact['preferred_mail_format'] == 'HTML' ||
-          $contact['preferred_mail_format'] == 'Both'
-        ))
-    ) {
+    if ($html) {
       $htmlBody = implode('', $html);
       if ($useSmarty) {
         $htmlBody = $smarty->fetch("string:$htmlBody");
@@ -1419,22 +1412,30 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     if (!isset($this->id)) {
       return [];
     }
-    $mg = new CRM_Mailing_DAO_MailingGroup();
-    $mgtable = CRM_Mailing_DAO_MailingGroup::getTableName();
-    $group = CRM_Contact_BAO_Group::getTableName();
 
-    $mg->query("SELECT      $group.title as name FROM $mgtable
-                    INNER JOIN  $group ON $mgtable.entity_id = $group.id
-                    WHERE       $mgtable.mailing_id = {$this->id}
-                        AND     $mgtable.entity_table = '$group'
-                        AND     $mgtable.group_type = 'Include'
-                    ORDER BY    $group.name");
+    /*
+    This bypasses permissions to maintain compatibility with the SQL it replaced.  This should ideally not bypass
+    permissions in the future, but it's called by some extensions during mail processing, when cron isn't necessarily
+    called with a logged-in user.
+     */
+    $mailingGroups = \Civi\Api4\MailingGroup::get(FALSE)
+      ->addSelect('group.title', 'group.frontend_title')
+      ->addJoin('Group AS group', 'LEFT', ['entity_id', '=', 'group.id'])
+      ->addWhere('mailing_id', '=', $this->id)
+      ->addWhere('entity_table', '=', 'civicrm_group')
+      ->addWhere('group_type', '=', 'Include')
+      ->execute();
 
-    $groups = [];
-    while ($mg->fetch()) {
-      $groups[] = $mg->name;
+    $groupNames = [];
+
+    foreach ($mailingGroups as $mg) {
+      $name = $mg['group.frontend_title'] ?? $mg['group.title'];
+      if ($name) {
+        $groupNames[] = $name;
+      }
     }
-    return $groups;
+
+    return $groupNames;
   }
 
   /**
@@ -1654,12 +1655,22 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * @deprecated
    *   This is used by CiviMail but will be made redundant by FlexMailer.
-   * @param CRM_Mailing_DAO_Mailing $mailing
+   * @param CRM_Mailing_DAO_Mailing|array $mailing
    *   The mailing which may or may not be sendable.
    * @return array
    *   List of error messages.
    */
   public static function checkSendable($mailing) {
+    if (is_array($mailing)) {
+      $params = $mailing;
+      $mailing = new \CRM_Mailing_BAO_Mailing();
+      $mailing->id = $params['id'] ?? NULL;
+      if ($mailing->id) {
+        $mailing->find(TRUE);
+      }
+      $mailing->copyValues($params);
+    }
+
     $errors = [];
     foreach (['subject', 'name', 'from_name', 'from_email'] as $field) {
       if (empty($mailing->{$field})) {

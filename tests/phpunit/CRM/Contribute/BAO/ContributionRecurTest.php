@@ -9,7 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
+use Civi\Api4\LineItem;
 
 /**
  * Class CRM_Contribute_BAO_ContributionRecurTest
@@ -98,8 +100,6 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
 
   /**
    * Test checking if contribution recur object can allow for changes to financial types.
-   *
-   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
    */
   public function testSupportFinancialTypeChange(): void {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
@@ -284,7 +284,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     // Make sure a template contribution exists.
     $templateContributionId = CRM_Contribute_BAO_ContributionRecur::ensureTemplateContributionExists($contributionRecur['id']);
     $fetchedTemplate = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionRecur['id']);
-    $templateContribution = \Civi\Api4\Contribution::get(FALSE)
+    $templateContribution = Contribution::get(FALSE)
       ->addSelect('*', 'custom.*')
       ->addWhere('contribution_recur_id', '=', $contributionRecur['id'])
       ->addWhere('is_template', '=', 1)
@@ -378,7 +378,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
     $contributionRecur = reset($contributionRecur['values']);
     // Create the template
-    $templateContrib = $this->callAPISuccess('Contribution', 'create', [
+    $templateContribution = $this->callAPISuccess('Contribution', 'create', [
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
       'financial_type_id' => 1,
@@ -390,13 +390,14 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'receive_date' => 'yesterday',
       'is_template' => 1,
     ]);
+    // Now update the template amount so we can test that this route updates the recur.
     $this->callAPISuccess('Contribution', 'create', [
-      'id' => $templateContrib['id'],
+      'id' => $templateContribution['id'],
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '2.00',
       'currency' => 'USD',
     ]);
-    $updatedContributionRecur = \Civi\Api4\ContributionRecur::get(FALSE)
+    $updatedContributionRecur = ContributionRecur::get()
       ->addWhere('id', '=', $contributionRecur['id'])
       ->execute()
       ->first();
@@ -406,6 +407,20 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       strtotime($contributionRecur['modified_date']),
       strtotime($updatedContributionRecur['modified_date'])
     );
+    // Now check the reverse - update the recur & the template should update as there
+    // is a single line item.
+    ContributionRecur::update()
+      ->addWhere('id', '=', $contributionRecur['id'])
+      ->setValues(['amount' => 6])
+      ->execute();
+
+    $this->assertEquals(6, Contribution::get()
+      ->addWhere('id', '=', $templateContribution['id'])
+      ->addSelect('total_amount')->execute()->first()['total_amount']);
+    $this->assertEquals(6, LineItem::get()
+      ->addWhere('contribution_id', '=', $templateContribution['id'])
+      ->addGroupBy('contribution_id')
+      ->addSelect('SUM(line_total) AS total_amount')->execute()->first()['total_amount']);
   }
 
   /**

@@ -237,7 +237,7 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
   }
 
   /**
-   * @return array|null
+   * @return array
    */
   public function setDefaultValues() {
     if (!empty($this->_formValues)) {
@@ -246,22 +246,17 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
     $config = CRM_Core_Config::singleton();
     $countryDefault = $config->defaultContactCountry;
     $stateprovinceDefault = $config->defaultContactStateProvince;
-    $defaults = [];
+    $defaults = [
+      'prox_distance_unit' => CRM_Utils_Address::getDefaultDistanceUnit(),
+    ];
 
     if ($countryDefault) {
-      if ($countryDefault == '1228' || $countryDefault == '1226') {
-        $defaults['prox_distance_unit'] = 'miles';
-      }
-      else {
-        $defaults['prox_distance_unit'] = 'km';
-      }
       $defaults['country_id'] = $countryDefault;
       if ($stateprovinceDefault) {
         $defaults['state_province_id'] = $stateprovinceDefault;
       }
-      return $defaults;
     }
-    return NULL;
+    return $defaults;
   }
 
   /**

@@ -319,12 +319,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->buildComponentForm($this->_id, $this);
     }
 
-    if (\Civi::settings()->get('forceRecaptcha')) {
-      if (!$this->_userID) {
-        CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
-      }
-    }
-
     // Build payment processor form
     CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
 
@@ -352,19 +346,14 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->addElement('hidden', "email-{$this->_bltID}", 1);
       $this->add('text', 'total_amount', ts('Total Amount'), ['readonly' => TRUE], FALSE);
     }
-    $pps = $this->getProcessors();
+
     $this->addPaymentProcessorFieldsToForm();
-    if (!empty($pps) && count($pps) === 1) {
-      $ppKeys = array_keys($pps);
-      $currentPP = array_pop($ppKeys);
-      if ($currentPP === 0) {
-        $this->assign('is_pay_later', $this->_values['is_pay_later']);
-        $this->assign('pay_later_text', $this->getPayLaterLabel());
-      }
-    }
+    $this->assign('is_pay_later', $this->getCurrentPaymentProcessor() === 0 && $this->_values['is_pay_later']);
+    $this->assign('pay_later_text', $this->getCurrentPaymentProcessor() === 0 ? $this->getPayLaterLabel() : NULL);
 
     if ($contactID === 0) {
       $this->addCidZeroOptions();
+
     }
 
     //build pledge block.
@@ -1368,10 +1357,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem[$priceSetId], $priceSetId);
       }
 
-      if ($params['tax_amount']) {
-        $this->set('tax_amount', $params['tax_amount']);
-      }
-
       if ($proceFieldAmount) {
         $lineItem[$params['priceSetId']][$fieldOption]['unit_price'] = $proceFieldAmount;
         $lineItem[$params['priceSetId']][$fieldOption]['line_total'] = $proceFieldAmount;
@@ -1400,12 +1385,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     // Would be nice to someday understand the point of this set.
     $this->set('is_pay_later', $params['is_pay_later']);
     // assign pay later stuff
-    $this->_params['is_pay_later'] = CRM_Utils_Array::value('is_pay_later', $params, FALSE);
+    $this->_params['is_pay_later'] = $params['is_pay_later'];
     $this->assign('is_pay_later', $params['is_pay_later']);
-    if ($params['is_pay_later']) {
-      $this->assign('pay_later_text', $this->_values['pay_later_text']);
-      $this->assign('pay_later_receipt', CRM_Utils_Array::value('pay_later_receipt', $this->_values));
-    }
+    $this->assign('pay_later_text', $params['is_pay_later'] ? $this->_values['pay_later_text'] : NULL);
+    $this->assign('pay_later_receipt', ($params['is_pay_later'] && isset($this->_values['pay_later_receipt'])) ? $this->_values['pay_later_receipt'] : NULL);
 
     if ($this->_membershipBlock && $this->_membershipBlock['is_separate_payment'] && !empty($params['separate_amount'])) {
       $this->set('amount', $params['separate_amount']);
@@ -1560,6 +1543,24 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   protected function hasSeparateMembershipPaymentAmount($params) {
     return $this->_separateMembershipPayment && (int) CRM_Member_BAO_MembershipType::getMembershipType($params['selectMembership'])['minimum_fee'];
+  }
+
+  /**
+   * Get the loaded payment processor - the default for the form.
+   *
+   * If the form is using 'pay later' then the value for the manual
+   * pay later processor is 0.
+   *
+   * @return int|null
+   */
+  protected function getCurrentPaymentProcessor(): ?int {
+    $pps = $this->getProcessors();
+    if (!empty($pps) && count($pps) === 1) {
+      $ppKeys = array_keys($pps);
+      return array_pop($ppKeys);
+    }
+    // It seems like this might be un=reachable as there should always be a processor...
+    return NULL;
   }
 
 }

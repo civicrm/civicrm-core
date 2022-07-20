@@ -25,6 +25,37 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   const IMPORT_ENTITY = 'Multi value custom data';
 
   /**
+   * Get the name of the type to be stored in civicrm_user_job.type_id.
+   *
+   * @return string
+   */
+  public function getUserJobType(): string {
+    return 'custom_field_import';
+  }
+
+  /**
+   * Get the import entity (translated).
+   *
+   * Used for template layer text.
+   *
+   * @return string
+   */
+  protected function getTranslatedEntity(): string {
+    return ts('Multi-value Custom Data');
+  }
+
+  /**
+   * Get the import entity plural (translated).
+   *
+   * Used for template layer text.
+   *
+   * @return string
+   */
+  protected function getTranslatedEntities(): string {
+    return ts('multi-value custom data records');
+  }
+
+  /**
    * @return array
    */
   public function setDefaultValues() {
@@ -36,7 +67,6 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     ];
 
     $loadedMapping = $this->get('loadedMapping');
-    $this->assign('loadedMapping', $loadedMapping);
     if ($loadedMapping) {
       $defaults['savedMapping'] = $loadedMapping;
     }
@@ -51,7 +81,8 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-
+    // Perhaps never used, but permits url passing of the group.
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
     $multipleCustomData = CRM_Core_BAO_CustomGroup::getMultipleFieldGroup();
     $this->assign('fieldGroups', $multipleCustomData);
     $this->add('select', 'multipleCustomData', ts('Multi-value Custom Data'), ['' => ts('- select -')] + $multipleCustomData, TRUE);
@@ -60,19 +91,15 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   }
 
   /**
-   * Process the uploaded file.
-   *
-   * @return void
+   * @return CRM_Custom_Import_Parser_Api
    */
-  public function postProcess() {
-    $this->storeFormValues([
-      'contactType',
-      'dateFormats',
-      'savedMapping',
-      'multipleCustomData',
-    ]);
-
-    $this->submitFileForMapping('CRM_Custom_Import_Parser_Api', 'multipleCustomData');
+  protected function getParser(): CRM_Custom_Import_Parser_Api {
+    if (!$this->parser) {
+      $this->parser = new CRM_Custom_Import_Parser_Api();
+      $this->parser->setUserJobID($this->getUserJobID());
+      $this->parser->init();
+    }
+    return $this->parser;
   }
 
 }

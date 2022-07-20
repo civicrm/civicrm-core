@@ -146,33 +146,27 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
               'sequential' => 1,
               'id' => $field['cfid'],
             ]);
-            $fieldName = ts('<a href="%1" title="Edit Custom Field"> %2 </a>', [
-              1 => CRM_Utils_System::url('civicrm/admin/custom/group/field/update',
-                "action=update&reset=1&gid={$customField['custom_group_id']}&id={$field['cfid']}", TRUE
-              ),
-              2 => $customField['label'],
-            ]);
+            $url = CRM_Utils_System::url('civicrm/admin/custom/group/field/update', "action=update&reset=1&gid={$customField['custom_group_id']}&id={$field['cfid']}", TRUE);
+            $fieldName = '<a href="' . $url . '" title="' . ts('Edit Custom Field', ['escape' => 'js']) . '">' . $customField['label'] . '</a>';
           }
           catch (CiviCRM_API3_Exception $e) {
-            $fieldName = ' <span style="color:red"> - Deleted - </span> ';
+            $fieldName = '<span style="color:red">' . ts('Deleted') . ' - ' . ts('Field ID %1', [1 => $field['cfid']]) . '</span> ';
           }
         }
-        $groupEdit = '<a href="' . CRM_Utils_System::url('civicrm/contact/search/advanced', "?reset=1&ssID={$field['ssid']}", TRUE) . '" title="' . ts('Edit search criteria') . '"> <i class="crm-i fa-pencil" aria-hidden="true"></i> </a>';
-        $groupConfig = '<a href="' . CRM_Utils_System::url('civicrm/group', "?reset=1&action=update&id={$id}", TRUE) . '" title="' . ts('Group settings') . '"> <i class="crm-i fa-gear" aria-hidden="true"></i> </a>';
+        $groupEdit = '<a href="' . CRM_Utils_System::url('civicrm/contact/search/advanced', "reset=1&ssID={$field['ssid']}", TRUE) . '" title="' . ts('Edit search criteria', ['escape' => 'js']) . '"> <i class="crm-i fa-pencil" aria-hidden="true"></i> </a>';
+        $groupConfig = '<a href="' . CRM_Utils_System::url('civicrm/group', "reset=1&action=update&id={$id}", TRUE) . '" title="' . ts('Group settings', ['escape' => 'js']) . '"> <i class="crm-i fa-gear" aria-hidden="true"></i> </a>';
         $html .= "<tr><td>{$id} - {$field['title']} </td><td>{$groupEdit} {$groupConfig}</td><td class='disabled'>{$fieldName}</td>";
       }
 
-      $message = "<p>The following smart groups include custom fields which are disabled/deleted from the database. This may cause errors on group page.
-        You might need to edit their search criteria and update them to clean outdated fields from saved search OR disable them in order to fix the error.</p>
-        <p><table><thead><tr><th>Group</th><th></th><th>Custom Field</th>
-        </tr></thead><tbody>
-        $html
-        </tbody></table></p>
-       ";
+      $message = "<p>" . ts('The following smart groups include custom fields which are disabled or deleted from the database. Missing fields should automatically be ignored from the smart group criteria, but you may want to review and update their search criteria to remove the outdated fields.') . '</p>'
+        . '<p><table><thead><tr><th>' . ts('Group') . '</th><th></th><th>' . ts('Custom Field') . '</th>'
+        . '</tr></thead><tbody>'
+        . $html
+        . '</tbody></table></p>';
 
       $msg = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts($message),
+        $message,
         ts('Disabled/Deleted fields on Smart Groups'),
         \Psr\Log\LogLevel::WARNING,
         'fa-server'

@@ -54,7 +54,7 @@
     <required>true</required>
     <comment>Name for CiviCRM field which is being exposed for sharing.</comment>
     <pseudoconstant>
-      <callback>CRM_Core_BAO_UFField::getAvailableFieldTitles</callback>
+      <callback>CRM_Core_BAO_UFField::getAvailableFieldOptions</callback>
     </pseudoconstant>
     <add>1.1</add>
   </field>
@@ -63,6 +63,7 @@
     <title>Profile Field Is Active</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Is this field currently shareable? If false, hide the field for all sharing contexts.</comment>
     <add>1.1</add>
   </field>
@@ -71,6 +72,7 @@
     <title>Profile Is View Only</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>the field is view only and not editable in user forms.</comment>
     <add>1.1</add>
   </field>
@@ -79,6 +81,7 @@
     <title>Profile Field Is Required</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this field required when included in a user or registration form?</comment>
     <add>1.1</add>
   </field>
@@ -127,6 +130,7 @@
     <title>Profile Field Is a Filter</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this field included as a column in the selector table?</comment>
     <add>1.2</add>
   </field>
@@ -135,6 +139,7 @@
     <title>Profile Field Is Searchable</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this field included search form of profile?</comment>
     <add>1.4</add>
   </field>
@@ -197,6 +202,8 @@
     <name>is_reserved</name>
     <title>Profile Field Is Reserved</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
     <comment>Is this field reserved for use by some other CiviCRM functionality?</comment>
     <add>3.0</add>
   </field>
@@ -205,6 +212,7 @@
     <title>Profile Field Supports Multiple</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Include in multi-record listing?</comment>
     <add>4.3</add>
   </field>

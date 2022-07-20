@@ -185,7 +185,7 @@ class CRM_Core_Block {
    *   One of the class constants (ADD, SEARCH, etc.).
    * @param string $property
    *   The desired property.
-   * @param string $value
+   * @param mixed $value
    *   The value of the desired property.
    */
   public static function setProperty($id, $property, $value) {
@@ -394,9 +394,6 @@ class CRM_Core_Block {
     }
 
     $values = [];
-    foreach ($shortCuts as $key => $short) {
-      $values[$key] = self::setShortCutValues($short);
-    }
 
     // Deprecated hook with typo.  Please don't use this!
     CRM_Utils_Hook::links('create.new.shorcuts',
@@ -404,6 +401,13 @@ class CRM_Core_Block {
       CRM_Core_DAO::$_nullObject,
       $values
     );
+    if ($values) {
+      CRM_Core_Error::deprecatedWarning('hook_civicrm_links "create.new.shorcuts" deprecated in favor of "create.new.shortcuts"');
+    }
+
+    foreach ($shortCuts as $key => $short) {
+      $values[$key] = self::setShortCutValues($short);
+    }
 
     // Hook that enables extensions to add user-defined links
     CRM_Utils_Hook::links('create.new.shortcuts',
@@ -413,12 +417,11 @@ class CRM_Core_Block {
     );
 
     foreach ($values as $key => $val) {
-      if (!empty($val['title'])) {
-        $values[$key]['name'] = CRM_Utils_Array::value('name', $val, $val['title']);
-      }
+      $values[$key]['name'] = $val['name'] ?? $val['title'];
+      $values[$key] += ['shortCuts' => []];
     }
 
-    self::setProperty(self::CREATE_NEW, 'templateValues', array('shortCuts' => $values));
+    self::setProperty(self::CREATE_NEW, 'templateValues', ['shortCuts' => $values]);
   }
 
   /**

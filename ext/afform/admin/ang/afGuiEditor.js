@@ -235,7 +235,7 @@
   $(function() {
     // Shoehorn in a non-angular widget for picking icons
     $('#crm-container').append('<div style="display:none"><input id="af-gui-icon-picker"></div>');
-    CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').done(function() {
+    CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').then(function() {
       $('#af-gui-icon-picker').crmIconPicker();
     });
     // Add css classes while dragging

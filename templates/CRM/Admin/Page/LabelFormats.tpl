@@ -51,12 +51,12 @@
             <tr id="row_{$row.id}" class="crm-labelFormat {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}">
               <td class="crm-labelFormat-name">{$row.label}</td>
               <td class="crm-labelFormat-name">{$row.groupName}</td>
-              <td class="crm-labelFormat-order nowrap">{$row.weight}</td>
+              <td class="crm-labelFormat-order nowrap">{$row.weight|smarty:nodefaults}</td>
               <td class="crm-labelFormat-description">{$row.grouping}</td>
               <td class="crm-labelFormat-is_default">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}&nbsp;</td>
               <td class="crm-labelFormat-is_reserved">{if $row.is_reserved eq 1}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}
                 &nbsp;</td>
-              <td>{$row.action|replace:'xx':$row.id}</td>
+              <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
             </tr>
           {/foreach}
         </table>

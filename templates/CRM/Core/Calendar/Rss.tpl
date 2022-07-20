@@ -19,6 +19,8 @@
 {foreach from=$events key=uid item=event}
 <item>
 <title>{$event.title|escape:'html'}</title>
+{* pubDate must follow RFC822 format *}
+<pubDate>{$event.start_date|crmRSSPubDate}</pubDate>
 <link>{crmURL p='civicrm/event/info' q="reset=1&id=`$event.event_id`" fe=1 a=1}</link>
 <description>
 {if $event.summary}{$event.summary|escape:'html'}
@@ -27,8 +29,8 @@
 {/if}
 {if $event.start_date}{ts}When{/ts}: {$event.start_date|crmDate}{if $event.end_date} {ts}through{/ts} {strip}
         {* Only show end time if end date = start date *}
-        {if $event.end_date|date_format:"%Y%m%d" == $event.start_date|date_format:"%Y%m%d"}
-            {$event.end_date|date_format:"%I:%M %p"}
+        {if $event.end_date|crmDate:"%Y%m%d" == $event.start_date|crmDate:"%Y%m%d"}
+            {$event.end_date|crmDate:"%I:%M %p"}
         {else}
             {$event.end_date|crmDate}
         {/if}{/strip}

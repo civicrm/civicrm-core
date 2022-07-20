@@ -51,7 +51,7 @@
           {if $row.amount_level}<br/>({$row.amount_level}){/if}
           {if $row.contribution_recur_id && $row.is_template}
             <br/>{ts}(Recurring Template){/ts}
-          {elseif $row.contribution_recur_id }
+          {elseif $row.contribution_recur_id}
             <br/>{ts}(Recurring){/ts}
           {/if}
         </td>

@@ -19,13 +19,14 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\WorkflowMessage;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class WorkflowMessageTest extends UnitTestCase {
+class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface {
 
   public function testGet() {
     $result = \Civi\Api4\WorkflowMessage::get(0)
@@ -65,28 +66,65 @@ class WorkflowMessageTest extends UnitTestCase {
     $this->assertRegExp('/The role is myrole./', $result['text']);
   }
 
-  public function testRenderExamples() {
-    $examples = \Civi\Api4\ExampleData::get(0)
-      ->addWhere('tags', 'CONTAINS', 'phpunit')
-      ->addSelect('name', 'data', 'asserts')
-      ->execute();
-    $this->assertTrue($examples->rowCount >= 1);
-    foreach ($examples as $example) {
-      $this->assertTrue(!empty($example['data']['modelProps']), sprintf('Example (%s) is tagged phpunit. It should have modelProps.', $example['name']));
-      $this->assertTrue(!empty($example['asserts']['default']), sprintf('Example (%s) is tagged phpunit. It should have assertions.', $example['name']));
-      $result = \Civi\Api4\WorkflowMessage::render(0)
-        ->setWorkflow($example['data']['workflow'])
-        ->setValues($example['data']['modelProps'])
-        ->execute()
-        ->single();
-      foreach ($example['asserts']['default'] as $num => $assert) {
-        $msg = sprintf('Check assertion(%s) on example (%s)', $num, $example['name']);
-        if (isset($assert['regex'])) {
-          $this->assertRegExp($assert['regex'], $result[$assert['for']], $msg);
+  public function testRenderExamplesBaseline() {
+    $examples = $this->getRenderExamples();
+    $this->assertTrue(isset($examples['workflow/contribution_recurring_edit/AlexCancelled']));
+  }
+
+  public function getRenderExamples(): array {
+    // Phpunit resolves data-providers at a moment where bootstrap is awkward.
+    // Dynamic data-providers should call-out to subprocess which can do full/normal boot.
+    $uf = getenv('CIVICRM_UF');
+    try {
+      putenv('CIVICRM_UF=');
+      $metas = cv('api4 ExampleData.get +s name,workflow \'{"where":[["tags","CONTAINS","phpunit"]]}\'');
+    }
+    finally {
+      putenv("CIVICRM_UF={$uf}");
+    }
+
+    $results = [];
+    foreach ($metas as $meta) {
+      if (!empty($meta['workflow'])) {
+        continue;
+      }
+      if ($exampleFilter = getenv('WORKFLOW_EXAMPLES')) {
+        if (!preg_match($exampleFilter, $meta['name'])) {
+          continue;
         }
-        else {
-          $this->fail('Unrecognized assertion: ' . json_encode($assert));
-        }
+      }
+      $results[$meta['name']] = [$meta['name']];
+    }
+    return $results;
+  }
+
+  /**
+   * @param string $name
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   * @dataProvider getRenderExamples
+   */
+  public function testRenderExamples(string $name) {
+    $example = \Civi\Api4\ExampleData::get(0)
+      ->addWhere('name', '=', $name)
+      ->addSelect('name', 'file', 'data', 'asserts')
+      ->execute()
+      ->single();
+
+    $this->assertTrue(!empty($example['data']['modelProps']), sprintf('Example (%s) is tagged phpunit. It should have modelProps.', $example['name']));
+    $this->assertTrue(!empty($example['asserts']['default']), sprintf('Example (%s) is tagged phpunit. It should have assertions.', $example['name']));
+    $result = \Civi\Api4\WorkflowMessage::render(0)
+      ->setWorkflow($example['data']['workflow'])
+      ->setValues($example['data']['modelProps'])
+      ->execute()
+      ->single();
+    foreach ($example['asserts']['default'] as $num => $assert) {
+      $msg = sprintf('Check assertion(%s) on example (%s)', $num, $example['name']);
+      if (isset($assert['regex'])) {
+        $this->assertRegExp($assert['regex'], $result[$assert['for']], $msg);
+      }
+      else {
+        $this->fail('Unrecognized assertion: ' . json_encode($assert));
       }
     }
   }

@@ -19,15 +19,16 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class SqlFunctionTest extends UnitTestCase {
+class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
 
   public function testGetFunctions() {
     $functions = array_column(\CRM_Api4_Page_Api4Explorer::getSqlFunctions(), NULL, 'name');
@@ -245,24 +246,53 @@ class SqlFunctionTest extends UnitTestCase {
     }
   }
 
+  public function testCurrentDate() {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => 'now'],
+      ['first_name' => 'def', 'last_name' => $lastName, 'birth_date' => 'now - 1 year'],
+      ['first_name' => 'def', 'last_name' => $lastName, 'birth_date' => 'now - 10 year'],
+    ];
+    Contact::save(FALSE)
+      ->setRecords($sampleData)
+      ->execute();
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('birth_date', '=', 'CURDATE()', TRUE)
+      ->selectRowCount()
+      ->execute();
+    $this->assertCount(1, $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('birth_date', '<', 'DATE(NOW())', TRUE)
+      ->selectRowCount()
+      ->execute();
+    $this->assertCount(2, $result);
+  }
+
   public function testRandFunction() {
-    $cid = Contact::create(FALSE)
-      ->addValue('first_name', 'hello')
-      ->execute()->first()['id'];
+    Contact::save(FALSE)
+      ->setRecords(array_fill(0, 6, []))
+      ->execute();
 
     $result = Contact::get(FALSE)
       ->addSelect('RAND() AS rand')
       ->addOrderBy('RAND()')
       ->setDebug(TRUE)
-      ->setLimit(1)
+      ->setLimit(6)
       ->execute();
 
-    $this->assertStringContainsString('ORDER BY RAND()', $result->debug['sql'][0]);
-    $this->assertGreaterThanOrEqual(0, $result[0]['rand']);
-    $this->assertLessThan(1, $result[0]['rand']);
+    // Random numbers should have been ordered from least to greatest
+    $this->assertGreaterThanOrEqual($result[0]['rand'], $result[1]['rand']);
+    $this->assertGreaterThanOrEqual($result[1]['rand'], $result[2]['rand']);
+    $this->assertGreaterThanOrEqual($result[2]['rand'], $result[3]['rand']);
+    $this->assertGreaterThanOrEqual($result[3]['rand'], $result[4]['rand']);
+    $this->assertGreaterThanOrEqual($result[4]['rand'], $result[5]['rand']);
   }
 
-  public function testYearInWhereClause() {
+  public function testDateInWhereClause() {
     $lastName = uniqid(__FUNCTION__);
     $sampleData = [
       ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => '2009-11-11'],
@@ -288,6 +318,14 @@ class SqlFunctionTest extends UnitTestCase {
       ->selectRowCount()
       ->execute();
     $this->assertCount(2, $result);
+
+    // Try an expression in the value
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('MONTH(birth_date)', '=', 'MONTH("2030-11-12")', TRUE)
+      ->addSelect('birth_date')
+      ->execute()->single();
+    $this->assertEquals('2009-11-11', $result['birth_date']);
   }
 
 }

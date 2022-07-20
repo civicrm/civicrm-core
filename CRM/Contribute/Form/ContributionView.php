@@ -32,7 +32,13 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $id = $this->getID();
 
     // Check permission for action.
-    if (!CRM_Core_Permission::checkActionPermission('CiviContribute', $this->_action)) {
+    $actionMapping = [
+      CRM_Core_Action::VIEW => 'get',
+      CRM_Core_Action::ADD => 'create',
+      CRM_Core_Action::UPDATE => 'update',
+      CRM_Core_Action::DELETE => 'delete',
+    ];
+    if (!$this->isHasAccess($actionMapping[$this->_action])) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
     $params = ['id' => $id];
@@ -306,6 +312,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
         'title' => $invoiceButtonText,
         'url' => 'civicrm/contribute/invoice',
         'qs' => $pdfUrlParams,
+        'class' => 'no-popup',
         'icon' => 'fa-download',
       ];
       $linkButtons[] = [
@@ -355,6 +362,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($id, 'contribution', TRUE);
     $title = ts('View Payment');
     $this->assign('transaction', TRUE);
+    // Used in paymentInfoBlock.tpl
     $this->assign('payments', $paymentInfo['transaction']);
     $this->assign('paymentLinks', $paymentInfo['payment_links']);
     return $title;

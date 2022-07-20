@@ -1,14 +1,16 @@
 <?php
+use CRM_Grant_ExtensionUtil as E;
+
 return [
   [
     'name' => 'Navigation_Grants',
     'entity' => 'Navigation',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'label' => 'Grants',
+        'label' => E::ts('Grants'),
         'name' => 'Grants',
         'url' => NULL,
         'icon' => 'crm-i fa-money',
@@ -25,12 +27,12 @@ return [
   [
     'name' => 'Navigation_Grants_Navigation_Dashboard',
     'entity' => 'Navigation',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'label' => 'Dashboard',
+        'label' => E::ts('Dashboard'),
         'name' => 'Dashboard',
         'url' => 'civicrm/grant?reset=1',
         'icon' => NULL,
@@ -46,12 +48,12 @@ return [
   [
     'name' => 'Navigation_Grants_Navigation_New_Grant',
     'entity' => 'Navigation',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'label' => 'New Grant',
+        'label' => E::ts('New Grant'),
         'name' => 'New Grant',
         'url' => 'civicrm/grant/add?reset=1&action=add&context=standalone',
         'icon' => NULL,
@@ -67,12 +69,12 @@ return [
   [
     'name' => 'Navigation_Grants_Navigation_Find_Grants',
     'entity' => 'Navigation',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'label' => 'Find Grants',
+        'label' => E::ts('Find Grants'),
         'name' => 'Find Grants',
         'url' => 'civicrm/grant/search?reset=1',
         'icon' => NULL,
@@ -88,12 +90,12 @@ return [
   [
     'name' => 'Navigation_CiviGrant',
     'entity' => 'Navigation',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'label' => 'CiviGrant',
+        'label' => E::ts('CiviGrant'),
         'name' => 'CiviGrant',
         'url' => NULL,
         'icon' => NULL,
@@ -110,12 +112,12 @@ return [
   [
     'name' => 'Navigation_CiviGrant_Navigation_Grant_Types',
     'entity' => 'Navigation',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'label' => 'Grant Types',
+        'label' => E::ts('Grant Types'),
         'name' => 'Grant Types',
         'url' => 'civicrm/admin/options/grant_type?reset=1',
         'icon' => NULL,
@@ -132,12 +134,12 @@ return [
   [
     'name' => 'Navigation_CiviGrant_Navigation_Grant_Status',
     'entity' => 'Navigation',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'label' => 'Grant Status',
+        'label' => E::ts('Grant Status'),
         'name' => 'Grant Status',
         'url' => 'civicrm/admin/options/grant_status?reset=1',
         'icon' => NULL,

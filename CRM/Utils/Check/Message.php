@@ -155,13 +155,16 @@ class CRM_Utils_Check_Message {
    *   Currently supports: api3 or href
    * @param array $params
    *   Params to be passed to CRM.api3 or CRM.url depending on type
+   * @param string $icon
+   *   Fa-icon class for the button
    */
-  public function addAction($title, $confirmation, $type, $params) {
+  public function addAction($title, $confirmation, $type, $params, $icon = NULL) {
     $this->actions[] = [
       'title' => $title,
       'confirm' => $confirmation,
       'type' => $type,
       'params' => $params,
+      'icon' => $icon,
     ];
   }
 

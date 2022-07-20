@@ -21,7 +21,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * @var string[]
    */
-  public $expectedSmartyVariables = ['pager', 'skip', 'sections', 'grandStat'];
+  public $expectedSmartyVariables = ['pager', 'skip', 'sections', 'grandStat', 'chartEnabled'];
 
   /**
    * Deprecated constant, Reports should be updated to use the getRowCount function.
@@ -265,14 +265,16 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_aliases = [];
 
   /**
+   * SQL where clause. May be altered by hook_civicrm_alterReportVar.
    * @var string
    */
-  protected $_where;
+  public $_where;
 
   /**
+   * SQL from clause. May be altered by hook_civicrm_alterReportVar.
    * @var string
    */
-  protected $_from;
+  public $_from;
 
   /**
    * SQL Limit clause
@@ -2285,7 +2287,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       $sqlOP = $this->getSQLOperator($relative);
       return "( {$fieldName} {$sqlOP} )";
     }
-    if (strlen($to) === 10) {
+    if (strlen($to ?? '') === 10) {
       // If we just have the date we assume the end of that day.
       $to .= ' 23:59:59';
     }
@@ -2507,10 +2509,12 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       if (!empty($value['no_display'])) {
         unset($this->_columnHeaders[$key]);
       }
-      foreach (['colspan', 'type'] as $expectedKey) {
-        if (!isset($this->_columnHeaders[$key][$expectedKey])) {
-          // Ensure it is set to prevent smarty notices.
-          $this->_columnHeaders[$key][$expectedKey] = FALSE;
+      else {
+        foreach (['colspan', 'type'] as $expectedKey) {
+          if (!isset($this->_columnHeaders[$key][$expectedKey])) {
+            // Ensure it is set to prevent smarty notices.
+            $this->_columnHeaders[$key][$expectedKey] = FALSE;
+          }
         }
       }
     }
@@ -2582,7 +2586,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
   /**
    * @param $value
-   * @param $row
+   * @param array $row
    * @param $selectedfield
    * @param $criteriaFieldName
    *
@@ -2603,7 +2607,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
   /**
    * @param $value
-   * @param $row
+   * @param array $row
    * @param $selectedField
    * @param $criteriaFieldName
    *
@@ -2623,7 +2627,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
   /**
    * @param $value
-   * @param $row
+   * @param array $row
    * @param $selectedfield
    * @param $criteriaFieldName
    *
@@ -2643,7 +2647,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
   /**
    * @param $value
-   * @param $row
+   * @param array $row
    * @param $selectedfield
    * @param $criteriaFieldName
    *
@@ -2655,7 +2659,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
   /**
    * @param $value
-   * @param $row
+   * @param array $row
    * @param $fieldname
    *
    * @return mixed
@@ -2682,7 +2686,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
   /**
    * @param $value
-   * @param $row
+   * @param array $row
    * @param $fieldname
    *
    * @return mixed
@@ -2866,7 +2870,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    * @param string $tableName
    * @param string $tableKey
    * @param string $fieldName
-   * @param string $field
+   * @param array $field
    *
    * @return bool
    */
@@ -3012,7 +3016,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     // fields array is missing because form building etc is skipped
     // in dashboard mode for report
     //@todo - this could be done in the dashboard no we have a setter
-    if (empty($this->_params['fields']) && !$this->_noFields) {
+    if (empty($this->_params['fields']) && !$this->_noFields
+      && empty($this->_params['task'])
+    ) {
       $this->setParams($this->_formValues);
     }
 
@@ -3510,7 +3516,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                 $value = CRM_Utils_Array::value($op, $pair) . " " .
                   CRM_Utils_Array::value($val, $field['options'], $val);
               }
-              elseif ($val) {
+              elseif ($val || $val == '0') {
                 $value = CRM_Utils_Array::value($op, $pair) . " " . $val;
               }
             }
@@ -3523,10 +3529,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
           }
         }
       }
-      else {
-        // Prevents an e-notice in statistics.tpl.
-        $statistics['filters'] = [];
-      }
+    }
+    // Prevents an e-notice in statistics.tpl.
+    if (!isset($statistics['filters'])) {
+      $statistics['filters'] = [];
     }
   }
 
@@ -5147,8 +5153,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   /**
    * CRM-17793 - Alter DateTime section header to group by date from the datetime field.
    *
-   * @param $tempTable
-   * @param $columnName
+   * @param string $tempTable
+   * @param string $columnName
    */
   public function alterSectionHeaderForDateTime($tempTable, $columnName) {
     // add new column with date value for the datetime field
@@ -5955,7 +5961,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
-   * @param $options
+   * @param array $options
    *
    * @return array
    */

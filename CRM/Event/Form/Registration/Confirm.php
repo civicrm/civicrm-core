@@ -59,9 +59,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     $this->_params[0]['is_pay_later'] = $this->get('is_pay_later');
     $this->assign('is_pay_later', $this->_params[0]['is_pay_later']);
-    if ($this->_params[0]['is_pay_later']) {
-      $this->assign('pay_later_receipt', $this->_values['event']['pay_later_receipt']);
-    }
+    $this->assign('pay_later_receipt', $this->_params[0]['is_pay_later'] ? $this->_values['event']['pay_later_receipt'] : NULL);
 
     CRM_Utils_Hook::eventDiscount($this, $this->_params);
 
@@ -194,6 +192,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           continue;
         }
         $individualTaxAmount = 0;
+        $append = '';
         //display tax amount on confirmation page
         $taxAmount += $v['tax_amount'];
         if (is_array($v)) {
@@ -420,14 +419,14 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       elseif ($participantNum) {
         $participantCount[$participantNum] = 'participant';
       }
-      $totalTaxAmount += CRM_Utils_Array::value('tax_amount', $record, 0);
+      $totalTaxAmount += $record['tax_amount'] ?? 0;
       if (!empty($record['is_primary'])) {
         $taxAmount = &$params[$participantNum]['tax_amount'];
       }
       //lets get additional participant id to cancel.
       if ($this->_allowConfirmation && is_array($cancelledIds)) {
-        $additonalId = $record['participant_id'] ?? NULL;
-        if ($additonalId && $key = array_search($additonalId, $cancelledIds)) {
+        $additionalId = $record['participant_id'] ?? NULL;
+        if ($additionalId && $key = array_search($additionalId, $cancelledIds)) {
           unset($cancelledIds[$key]);
         }
       }
@@ -526,6 +525,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             $value['email'] = CRM_Utils_Array::valueByRegexKey('/^email-/', $value);
           }
 
+          // If registering from waitlist participant_id is set but contact_id is not.
+          // We need a contact ID to process the payment so set the "primary" contact ID.
+          if (empty($value['contact_id'])) {
+            $value['contact_id'] = $contactID;
+          }
+
           if (is_object($payment)) {
             // Not quite sure why we don't just user $value since it contains the data
             // from result
@@ -561,7 +566,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
 
           //passing contribution id is already registered.
-          $contribution = $this->processContribution($this, $value, $result, $contactID, $pending, $this->_paymentProcessor);
+          $contribution = $this->processContribution($value, $result, $contactID, $pending);
           $value['contributionID'] = $contribution->id;
           $value['receive_date'] = $contribution->receive_date;
           $value['trxn_id'] = $contribution->trxn_id;
@@ -876,23 +881,21 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   /**
    * Process the contribution.
    *
-   * @param CRM_Core_Form $form
    * @param array $params
    * @param array $result
    * @param int $contactID
    * @param bool $pending
-   * @param array $paymentProcessor
    *
    * @return \CRM_Contribute_BAO_Contribution
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  protected function processContribution(
-    &$form, $params, $result, $contactID,
-    $pending = FALSE,
-    $paymentProcessor = NULL
+  private function processContribution(
+    $params, $result, $contactID,
+    $pending = FALSE
   ) {
+    $form = $this;
     // Note this used to be shared with the backoffice form & no longer is, some code may no longer be required.
     $transaction = new CRM_Core_Transaction();
 
@@ -920,12 +923,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'campaign_id' => $params['campaign_id'] ?? NULL,
       'card_type_id' => $params['card_type_id'] ?? NULL,
       'pan_truncation' => $params['pan_truncation'] ?? NULL,
+      // The ternary is probably redundant - paymentProcessor should always be set.
+      // For pay-later contributions it will be the pay-later processor.
+      'payment_processor' => $this->_paymentProcessor ? $this->_paymentProcessor['id'] : NULL,
+      'payment_instrument_id' => $this->_paymentProcessor ? $this->_paymentProcessor['payment_instrument_id'] : NULL,
     ];
-
-    if ($paymentProcessor) {
-      $contribParams['payment_instrument_id'] = $paymentProcessor['payment_instrument_id'];
-      $contribParams['payment_processor'] = $paymentProcessor['id'];
-    }
 
     if (!$pending && $result) {
       $contribParams += [
@@ -1225,6 +1227,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   /**
    * Submit in test mode.
    *
+   * Do not use this - we have figured out how to emulate form in tests now.
+   *
+   * See ConfirmTest.
+   *
+   * @deprecated
+   *
    * @param $params
    */
   public static function testSubmit($params) {
@@ -1235,7 +1243,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $form->controller = new CRM_Event_Controller_Registration();
     $form->_params = $params['params'];
     // This happens in buildQuickForm so emulate here.
-    $form->_amount = $form->_totalAmount = CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value('totalAmount', $params));
+    $form->_amount = $form->_totalAmount = $params['totalAmount'] ?? 0;
     $form->set('params', $params['params']);
     $form->_values['custom_pre_id'] = $params['custom_pre_id'] ?? NULL;
     $form->_values['custom_post_id'] = $params['custom_post_id'] ?? NULL;
@@ -1248,6 +1256,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $form->_paymentProcessor = $params['paymentProcessorObj'];
     }
     $form->postProcess();
+    return $form;
   }
 
   /**

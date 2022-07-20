@@ -150,14 +150,13 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
   public function doPayment(&$params, $component = 'contribute') {
     $propertyBag = \Civi\Payment\PropertyBag::cast($params);
     $this->_component = $component;
-    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
+    $result = $this->setStatusPaymentPending([]);
 
     // If we have a $0 amount, skip call to processor and set payment_status to Completed.
     // Conceivably a processor might override this - perhaps for setting up a token - but we don't
     // have an example of that at the moment.
     if ($propertyBag->getAmount() == 0) {
-      $result['payment_status_id'] = array_search('Completed', $statuses);
-      $result['payment_status'] = 'Completed';
+      $result = $this->setStatusPaymentCompleted($result);
       return $result;
     }
 
@@ -301,9 +300,8 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
       // Success !
       //=============
       $params['trxn_result_code'] = $processorResponse['r_message'];
-      $params['trxn_id'] = $processorResponse['r_ref'];
-      $params['payment_status_id'] = array_search('Completed', $statuses);
-      $params['payment_status'] = 'Completed';
+      $result['trxn_id'] = $processorResponse['r_ref'];
+      $result = $this->setStatusPaymentCompleted($result);
       CRM_Core_Error::debug_log_message("r_authresponse " . $processorResponse['r_authresponse']);
       CRM_Core_Error::debug_log_message("r_code " . $processorResponse['r_code']);
       CRM_Core_Error::debug_log_message("r_tdate " . $processorResponse['r_tdate']);
@@ -314,7 +312,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
       CRM_Core_Error::debug_log_message("r_message " . $processorResponse['r_message']);
       CRM_Core_Error::debug_log_message("r_ref " . $processorResponse['r_ref']);
       CRM_Core_Error::debug_log_message("r_time " . $processorResponse['r_time']);
-      return $params;
+      return $result;
     }
   }
 

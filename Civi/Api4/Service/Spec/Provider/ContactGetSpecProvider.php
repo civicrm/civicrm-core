@@ -29,9 +29,10 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
       ->setColumnName('id')
       ->setDescription(ts('Groups (or sub-groups of groups) to which this contact belongs'))
       ->setType('Filter')
+      ->setInputType('Select')
       ->setOperators(['IN', 'NOT IN'])
       ->addSqlFilter([__CLASS__, 'getContactGroupSql'])
-      ->setSuffixes(['id', 'name', 'label'])
+      ->setSuffixes(['name', 'label'])
       ->setOptionsCallback([__CLASS__, 'getGroupList']);
     $spec->addFieldSpec($field);
 
@@ -41,6 +42,7 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
       $field->setLabel(ts('Age (years)'))
         ->setTitle(ts('Age (years)'))
         ->setColumnName('birth_date')
+        ->setInputType('Number')
         ->setDescription(ts('Age of individual (in years)'))
         ->setType('Extra')
         ->setReadonly(TRUE)
