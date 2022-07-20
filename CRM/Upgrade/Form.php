@@ -809,6 +809,8 @@ SET    version = '$version'
     list($ignore, $latestVer) = $upgrade->getUpgradeVersions();
     // Seems extraneous in context, but we'll preserve old behavior
     $upgrade->setVersion($latestVer);
+    // Going forward, any new tasks will run in `upgrade.finish` mode.
+    // @see \CRM_Upgrade_DispatchPolicy::pick()
 
     $config = CRM_Core_Config::singleton();
     $config->userSystem->flush();

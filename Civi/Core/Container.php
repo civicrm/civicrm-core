@@ -604,7 +604,6 @@ class Container {
       '/^hook_/' => 'not-ready',
       '/^civi\./' => 'run',
     ];
-    $mainDispatchPolicy = \CRM_Core_Config::isUpgradeMode() ? \CRM_Upgrade_DispatchPolicy::get('upgrade.main') : NULL;
     $bootServices['dispatcher.boot']->setDispatchPolicy($bootDispatchPolicy);
 
     $class = $runtime->userFrameworkClass;
@@ -630,7 +629,7 @@ class Container {
       \CRM_Extension_System::singleton()->getClassLoader()->register();
       \CRM_Extension_System::singleton()->getMixinLoader()->run();
       \CRM_Utils_Hook::singleton()->commonBuildModuleList('civicrm_boot');
-      $bootServices['dispatcher.boot']->setDispatchPolicy($mainDispatchPolicy);
+      $bootServices['dispatcher.boot']->setDispatchPolicy(\CRM_Core_Config::isUpgradeMode() ? \CRM_Upgrade_DispatchPolicy::pick() : NULL);
 
       $runtime->includeCustomPath();
 
@@ -646,7 +645,7 @@ class Container {
 
     }
     else {
-      $bootServices['dispatcher.boot']->setDispatchPolicy($mainDispatchPolicy);
+      $bootServices['dispatcher.boot']->setDispatchPolicy(\CRM_Core_Config::isUpgradeMode() ? \CRM_Upgrade_DispatchPolicy::pick() : NULL);
     }
   }
 

@@ -38,6 +38,29 @@ class CRM_Upgrade_DispatchPolicy {
   /**
    * Determine the dispatch policy
    *
+   * @return array
+   * @see \Civi\Core\CiviEventDispatcher::setDispatchPolicy()
+   */
+  public static function pick(): ?array {
+    if (!\CRM_Core_Config::isUpgradeMode()) {
+      return NULL;
+    }
+
+    // Have we run CRM_Upgrade_Form::doCoreFinish() for this version?
+    $codeVer = CRM_Utils_System::version();
+    $isCoreCurrent = CRM_Core_DAO::singleValueQuery('
+        SELECT count(*) as count
+        FROM civicrm_log
+        WHERE entity_table = "civicrm_domain"
+        AND data LIKE %1
+        ', [1 => ['upgrade:%->' . $codeVer, 'String']]);
+
+    return CRM_Upgrade_DispatchPolicy::get($isCoreCurrent < 1 ? 'upgrade.main' : 'upgrade.finish');
+  }
+
+  /**
+   * Read the dispatch policy.
+   *
    * @param string $phase
    *   Ex: 'upgrade.main' or 'upgrade.finish'.
    * @return array
