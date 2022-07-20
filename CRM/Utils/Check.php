@@ -187,7 +187,7 @@ class CRM_Utils_Check {
     $maxSeverity = 1;
     foreach ($messages as $message) {
       if ($message->isVisible()) {
-        $maxSeverity = max(1, $message->getLevel());
+        $maxSeverity = max($maxSeverity, $message->getLevel());
       }
     }
 
