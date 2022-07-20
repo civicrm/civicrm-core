@@ -334,12 +334,12 @@ class CiviEventDispatcher extends EventDispatcher {
     return $this;
   }
 
-  //  /**
-  //   * @return array|NULL
-  //   */
-  //  public function getDispatchPolicy() {
-  //    return  $this->dispatchPolicyRegex === NULL ? NULL : array_merge($this->dispatchPolicyExact, $this->dispatchPolicyRegex);
-  //  }
+  /**
+   * @return array|NULL
+   */
+  public function getDispatchPolicy() {
+    return $this->dispatchPolicyRegex === NULL ? NULL : array_merge($this->dispatchPolicyExact, $this->dispatchPolicyRegex);
+  }
 
   /**
    * Determine whether the dispatch policy applies to a given event.
