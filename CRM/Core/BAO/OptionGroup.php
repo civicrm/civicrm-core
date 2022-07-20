@@ -64,6 +64,9 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup implements \Civi
       CRM_Core_Error::deprecatedFunctionWarning('no $ids array');
       $params['id'] = $ids['optionGroup'];
     }
+    if (!empty($params['name']) && !is_string($params['name'])) {
+      throw new \Exception(print_r($params['name'], TRUE));
+    }
     if (empty($params['name']) && empty($params['id'])) {
       $params['name'] = CRM_Utils_String::titleToVar(strtolower($params['title']));
     }
