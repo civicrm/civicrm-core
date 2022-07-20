@@ -597,6 +597,7 @@ class Container {
     $bootServices['paths'] = new \Civi\Core\Paths();
 
     $bootServices['dispatcher.boot'] = new CiviEventDispatcher();
+    $bootServices['dispatcher.boot']->addListener('civi.queue.runTask.start', ['CRM_Upgrade_DispatchPolicy', 'onRunTask']);
 
     // Quality control: There should be no pre-boot hooks because they make it harder to understand/support/refactor.
     // If a pre-boot hook sneaks in, we'll raise an error.

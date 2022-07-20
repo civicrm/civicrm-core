@@ -150,4 +150,30 @@ class CRM_Upgrade_DispatchPolicy {
     return $policies[$phase];
   }
 
+  /**
+   * Assert that a specific policy is currently active.
+   *
+   * @param string $name
+   *   Ex: 'upgrade.main' or 'upgrade.finish'
+   * @throws \RuntimeException
+   */
+  public static function assertActive(string $name) {
+    $expected = static::get($name);
+    $actual = Civi::dispatcher()->getDispatchPolicy();
+    if ($expected != $actual) {
+      throw new \RuntimeException("Task can not execute correctly. The wrong dispatch policy is active. Expected to find \"$name\".");
+    }
+  }
+
+  /**
+   * Before running upgrade tasks, ensure that we apply the current dispatch-policy.
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $event
+   */
+  public static function onRunTask(\Civi\Core\Event\GenericHookEvent $event) {
+    if ($event->taskCtx->queue->getName() === \CRM_Upgrade_Form::QUEUE_NAME) {
+      Civi::dispatcher()->setDispatchPolicy(static::pick());
+    }
+  }
+
 }
