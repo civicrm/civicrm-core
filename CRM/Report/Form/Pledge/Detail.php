@@ -120,7 +120,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
           ],
           'status_id' => [
             'title' => ts('Pledge Status'),
-            'required' => TRUE,
+            'default' => TRUE,
           ],
         ],
         'filters' => [
