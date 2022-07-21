@@ -117,23 +117,6 @@ class CRM_Utils_Check {
   }
 
   /**
-   * Sort messages based upon severity
-   *
-   * @param CRM_Utils_Check_Message $a
-   * @param CRM_Utils_Check_Message $b
-   * @return int
-   */
-  public static function severitySort($a, $b) {
-    $aSeverity = $a->getLevel();
-    $bSeverity = $b->getLevel();
-    if ($aSeverity == $bSeverity) {
-      return strcmp($a->getName(), $b->getName());
-    }
-    // The Message constructor guarantees that these will always be integers.
-    return ($aSeverity <=> $bSeverity);
-  }
-
-  /**
    * Get the integer value (useful for thresholds) of the severity.
    *
    * @param int|string $severity
@@ -201,15 +184,11 @@ class CRM_Utils_Check {
   public static function checkAll($max = FALSE) {
     $messages = self::checkStatus();
 
-    uasort($messages, [__CLASS__, 'severitySort']);
-
     $maxSeverity = 1;
     foreach ($messages as $message) {
-      if (!$message->isVisible()) {
-        continue;
+      if ($message->isVisible()) {
+        $maxSeverity = max($maxSeverity, $message->getLevel());
       }
-      $maxSeverity = max(1, $message->getLevel());
-      break;
     }
 
     Civi::cache('checks')->set('systemStatusCheckResult', $maxSeverity);
