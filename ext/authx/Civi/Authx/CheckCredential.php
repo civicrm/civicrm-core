@@ -93,11 +93,11 @@ class CheckCredential implements EventSubscriberInterface {
         $claims = \Civi::service('crypto.jwt')->decode($check->credValue);
         $scopes = isset($claims['scope']) ? explode(' ', $claims['scope']) : [];
         if (!in_array('authx', $scopes)) {
-          // This is not an authx JWT.
+          // This is not an authx JWT. Proceed to check any other token sources.
           return;
         }
         if (empty($claims['sub']) || substr($claims['sub'], 0, 4) !== 'cid:') {
-          $this->reject('Malformed JWT. Must specify the contact ID.');
+          $check->reject('Malformed JWT. Must specify the contact ID.');
         }
         $contactId = substr($claims['sub'], 4);
         $check->accept(['contactId' => $contactId, 'credType' => 'jwt', 'jwt' => $claims]);
