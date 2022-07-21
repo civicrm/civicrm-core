@@ -46,6 +46,12 @@ Civi::dispatcher()->addListener('civi.invoke.auth', function($e) {
   }
 });
 
+function authx_civicrm_container(\Symfony\Component\DependencyInjection\ContainerBuilder $container) {
+  $container->register('authx_credentials', '\Civi\Authx\CheckCredential')
+    ->addTag('kernel.event_subscriber')
+    ->setPublic(TRUE);
+}
+
 /**
  * Perform a system login.
  *
