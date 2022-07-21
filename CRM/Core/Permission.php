@@ -1187,6 +1187,14 @@ class CRM_Core_Permission {
     ];
     $permissions['contribution_recur'] = $permissions['payment'];
 
+    $permissions['entity_batch']['create'] = $permissions['entity_batch']['delete'] = [
+      // This means that they can call create or delete if they have one of the
+      // below permissions. If they only have 'edit own' then the code *should* enforce
+      // that but the difference between the two seems to have
+      // been more of an intention to write code then something that
+      // was implemented....
+      ['edit own manual batches', 'edit all manual batches'],
+    ];
     // Custom field permissions
     $permissions['custom_field'] = [
       'default' => [
