@@ -1777,7 +1777,7 @@ function _civicrm_api3_validate_constraint($fieldValue, $fieldName, $fieldInfo, 
  */
 function _civicrm_api3_validate_unique_key(&$params, &$fieldName) {
   [$fieldValue, $op] = _civicrm_api3_field_value_check($params, $fieldName);
-  if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
+  if (strpos(($op ?? ''), 'NULL') !== FALSE || strpos(($op ?? ''), 'EMPTY') !== FALSE) {
     return;
   }
   $existing = civicrm_api($params['entity'], 'get', [
@@ -2217,7 +2217,7 @@ function _civicrm_api3_resolve_contactID($contactIdExpr) {
  */
 function _civicrm_api3_validate_html(&$params, &$fieldName, $fieldInfo) {
   [$fieldValue, $op] = _civicrm_api3_field_value_check($params, $fieldName);
-  if (strpos($op, 'NULL') || strpos($op, 'EMPTY')) {
+  if (strpos(($op ?? ''), 'NULL') || strpos(($op ?? ''), 'EMPTY')) {
     return;
   }
 }

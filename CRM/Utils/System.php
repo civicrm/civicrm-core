@@ -213,7 +213,7 @@ class CRM_Utils_System {
     if (is_array($query)) {
       $buf = '';
       foreach ($query as $key => $value) {
-        $buf .= ($buf ? '&' : '') . urlencode($key) . '=' . urlencode($value);
+        $buf .= ($buf ? '&' : '') . urlencode($key ?? '') . '=' . urlencode($value ?? '');
       }
       $query = $buf;
     }

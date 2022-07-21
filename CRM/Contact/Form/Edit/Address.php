@@ -355,7 +355,7 @@ class CRM_Contact_Form_Edit_Address {
    */
   public static function storeRequiredCustomDataInfo(&$form, $groupTree) {
     if (in_array(CRM_Utils_System::getClassName($form), ['CRM_Contact_Form_Contact', 'CRM_Contact_Form_Inline_Address'])) {
-      $requireOmission = NULL;
+      $requireOmission = '';
       foreach ($groupTree as $csId => $csVal) {
         // only process Address entity fields
         if ($csVal['extends'] !== 'Address') {

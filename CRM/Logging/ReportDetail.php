@@ -199,10 +199,10 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
         }
 
         // special-case for multiple values. Also works for CRM-7251: preferred_communication_method
-        if ((substr($from, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR &&
-            substr($from, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR) ||
-          (substr($to, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR &&
-            substr($to, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR)
+        if ((substr(($from ?? ''), 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR &&
+            substr(($from ?? ''), -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR) ||
+          (substr(($to ?? ''), 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR &&
+            substr(($to ?? ''), -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR)
         ) {
           $froms = $tos = [];
           foreach (explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($from, CRM_Core_DAO::VALUE_SEPARATOR)) as $val) {
