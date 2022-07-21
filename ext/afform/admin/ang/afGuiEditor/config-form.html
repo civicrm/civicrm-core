@@ -124,7 +124,10 @@
       <label for="af_config_redirect">
         {{:: ts('Post-Submit Page') }}
       </label>
-      <input ng-model="editor.afform.redirect" name="redirect" class="form-control" id="af_config_redirect" title="{{:: ts('Post-Submit Page') }}" pattern="^((http|https):\/\/|\/|civicrm\/)[-0-9a-zA-Z\/_.]\S+$" title="{{:: ts('Post-Submit Page must be either an absolute url, a relative url or a path starting with CiviCRM') }}" ng-model-options="editor.debounceMode" >
+      <div class="input-group">
+        <input ng-model="editor.afform.redirect" name="redirect" class="form-control" id="af_config_redirect" title="{{:: ts('Post-Submit Page') }}" pattern="^((http|https):\/\/|\/|civicrm\/)[-0-9a-zA-Z\/_.]\S+$" title="{{:: ts('Post-Submit Page must be either an absolute url, a relative url or a path starting with CiviCRM') }}" ng-model-options="editor.debounceMode" >
+        <af-gui-token-select class="input-group-addon" model="editor.afform" field="redirect"></af-gui-token-select>
+      </div>
       <p class="help-block">{{:: ts('Enter a URL or path that the form should redirect to following a successful submission.') }}</p>
     </div>
   </fieldset>
