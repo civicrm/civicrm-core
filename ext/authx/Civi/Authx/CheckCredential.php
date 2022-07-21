@@ -19,11 +19,35 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class CheckCredential implements EventSubscriberInterface {
 
+  /**
+   * Listener priority for handling credential format of 'Basic' with
+   * 'username:password'.
+   */
+  const PRIORITY_BASIC_USER = -200;
+
+  /**
+   * Listener priority for handling credential format of 'Bearer' with a
+   * traditional Civi API key
+   */
+  const PRIORITY_BEARER_API_KEY = -200;
+
+  /**
+   * Listener priority for handling credential format of 'Bearer' with
+   * Authx-style JSON Web Token.
+   */
+  const PRIORITY_BEARER_JWT = -300;
+
+  /**
+   * @inheritdoc
+   *
+   * Set up three subscribers to handle different credential formats ('Basic',
+   * 'Bearer') and different credential types ('pass', 'api_key', 'jwt')
+   */
   public static function getSubscribedEvents(): array {
     $events = [];
-    $events['civi.authx.checkCredential'][] = ['basicUser', -200];
-    $events['civi.authx.checkCredential'][] = ['bearerApiKey', -200];
-    $events['civi.authx.checkCredential'][] = ['bearerJwt', -300];
+    $events['civi.authx.checkCredential'][] = ['basicUser', self::PRIORITY_BASIC_USER];
+    $events['civi.authx.checkCredential'][] = ['bearerApiKey', self::PRIORITY_BEARER_API_KEY];
+    $events['civi.authx.checkCredential'][] = ['bearerJwt', self::PRIORITY_BEARER_JWT];
     return $events;
   }
 
