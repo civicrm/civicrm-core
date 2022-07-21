@@ -1334,9 +1334,28 @@ function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
   else {
     // If we have custom fields the BAO may have taken care of it or we may have to.
     // DAO::writeRecord always handles custom data.
-    // Otherwise guess based on the $extendsMap hard-coded list of BAOs that take care of custom data.
-    if (isset($params['custom']) && $fct !== 'writeRecord' && empty(CRM_Core_BAO_CustomQuery::$extendsMap[$entity])) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($entity)), $bao->id);
+    if (isset($params['custom']) && $fct !== 'writeRecord') {
+      // List of BAOs that write custom data in their create or add function.
+      $alreadyHandled = array_keys(CRM_Core_BAO_CustomQuery::$extendsMap);
+      $alreadyHandled[] = 'ActivityContact';
+      $alreadyHandled[] = 'Batch';
+      $alreadyHandled[] = 'CustomField';
+      $alreadyHandled[] = 'EntityBatch';
+      $alreadyHandled[] = 'IM';
+      $alreadyHandled[] = 'Mailing';
+      $alreadyHandled[] = 'MailingAB';
+      $alreadyHandled[] = 'OpenID';
+      $alreadyHandled[] = 'Phone';
+      $alreadyHandled[] = 'PledgePayment';
+      $alreadyHandled[] = 'PriceField';
+      $alreadyHandled[] = 'PriceFieldValue';
+      $alreadyHandled[] = 'RelationshipType';
+      $alreadyHandled[] = 'SavedSearch';
+      $alreadyHandled[] = 'Tag';
+      $alreadyHandled[] = 'Website';
+      if (!in_array($entity, $alreadyHandled)) {
+        CRM_Core_BAO_CustomValueTable::store($params['custom'], CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($entity)), $bao->id);
+      }
     }
     $values = [];
     _civicrm_api3_object_to_array($bao, $values[$bao->id]);
