@@ -61,7 +61,15 @@ class CRM_Extension_Upgrades {
       'name' => self::QUEUE_NAME,
       'reset' => TRUE,
     ]);
+    return static::fillQueue($queue);
+  }
 
+  /**
+   * @param \CRM_Queue_Queue $queue
+   *
+   * @return \CRM_Queue_Queue
+   */
+  public static function fillQueue(CRM_Queue_Queue $queue): CRM_Queue_Queue {
     foreach (self::getActiveUpgraders() as $upgrader) {
       /** @var \CRM_Extension_Upgrader_Interface $upgrader */
       $upgrader->notify('upgrade', ['enqueue', $queue]);

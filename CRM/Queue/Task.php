@@ -76,6 +76,11 @@ class CRM_Queue_Task {
    *   FALSE or exception if task fails.
    */
   public function run($taskCtx) {
+    Civi::dispatcher()->dispatch('civi.queue.runTask.start', \Civi\Core\Event\GenericHookEvent::create([
+      'task' => $this,
+      'taskCtx' => $taskCtx,
+    ]));
+
     $args = $this->arguments;
     array_unshift($args, $taskCtx);
 
@@ -91,12 +96,20 @@ class CRM_Queue_Task {
       }
     }
 
-    if (is_callable($this->callback)) {
-      $result = call_user_func_array($this->callback, $args);
-      return $result;
+    try {
+      if (is_callable($this->callback)) {
+        $result = call_user_func_array($this->callback, $args);
+        return $result;
+      }
+      else {
+        throw new Exception('Failed to call callback: ' . $this->getSummary());
+      }
     }
-    else {
-      throw new Exception('Failed to call callback: ' . $this->getSummary());
+    finally {
+      Civi::dispatcher()->dispatch('civi.queue.runTask.finally', \Civi\Core\Event\GenericHookEvent::create([
+        'task' => $this,
+        'taskCtx' => $taskCtx,
+      ]));
     }
   }
 

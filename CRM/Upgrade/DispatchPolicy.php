@@ -17,7 +17,49 @@
 class CRM_Upgrade_DispatchPolicy {
 
   /**
+   * Create an auto-clean object which temporarily applies the preferred policy.
+   *
+   * @code
+   * $cleanup = CRM_Upgrade_DispatchPolicy::useTemporarily('upgrade.finish');
+   * doStuff();
+   * unset($cleanup);
+   * @endCode
+   *
+   * @param string $name
+   * @return \CRM_Utils_AutoClean
+   */
+  public static function useTemporarily(string $name): CRM_Utils_AutoClean {
+    Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get($name));
+    return \CRM_Utils_AutoClean::with(function() {
+      Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.main'));
+    });
+  }
+
+  /**
    * Determine the dispatch policy
+   *
+   * @return array
+   * @see \Civi\Core\CiviEventDispatcher::setDispatchPolicy()
+   */
+  public static function pick(): ?array {
+    if (!\CRM_Core_Config::isUpgradeMode()) {
+      return NULL;
+    }
+
+    // Have we run CRM_Upgrade_Form::doCoreFinish() for this version?
+    $codeVer = CRM_Utils_System::version();
+    $isCoreCurrent = CRM_Core_DAO::singleValueQuery('
+        SELECT count(*) as count
+        FROM civicrm_log
+        WHERE entity_table = "civicrm_domain"
+        AND data LIKE %1
+        ', [1 => ['upgrade:%->' . $codeVer, 'String']]);
+
+    return CRM_Upgrade_DispatchPolicy::get($isCoreCurrent < 1 ? 'upgrade.main' : 'upgrade.finish');
+  }
+
+  /**
+   * Read the dispatch policy.
    *
    * @param string $phase
    *   Ex: 'upgrade.main' or 'upgrade.finish'.
@@ -106,6 +148,32 @@ class CRM_Upgrade_DispatchPolicy {
 
     // return $policies['upgrade.old'];
     return $policies[$phase];
+  }
+
+  /**
+   * Assert that a specific policy is currently active.
+   *
+   * @param string $name
+   *   Ex: 'upgrade.main' or 'upgrade.finish'
+   * @throws \RuntimeException
+   */
+  public static function assertActive(string $name) {
+    $expected = static::get($name);
+    $actual = Civi::dispatcher()->getDispatchPolicy();
+    if ($expected != $actual) {
+      throw new \RuntimeException("Task can not execute correctly. The wrong dispatch policy is active. Expected to find \"$name\".");
+    }
+  }
+
+  /**
+   * Before running upgrade tasks, ensure that we apply the current dispatch-policy.
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $event
+   */
+  public static function onRunTask(\Civi\Core\Event\GenericHookEvent $event) {
+    if ($event->taskCtx->queue->getName() === \CRM_Upgrade_Form::QUEUE_NAME) {
+      Civi::dispatcher()->setDispatchPolicy(static::pick());
+    }
   }
 
 }

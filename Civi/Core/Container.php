@@ -597,6 +597,7 @@ class Container {
     $bootServices['paths'] = new \Civi\Core\Paths();
 
     $bootServices['dispatcher.boot'] = new CiviEventDispatcher();
+    $bootServices['dispatcher.boot']->addListener('civi.queue.runTask.start', ['CRM_Upgrade_DispatchPolicy', 'onRunTask']);
 
     // Quality control: There should be no pre-boot hooks because they make it harder to understand/support/refactor.
     // If a pre-boot hook sneaks in, we'll raise an error.
@@ -604,7 +605,6 @@ class Container {
       '/^hook_/' => 'not-ready',
       '/^civi\./' => 'run',
     ];
-    $mainDispatchPolicy = \CRM_Core_Config::isUpgradeMode() ? \CRM_Upgrade_DispatchPolicy::get('upgrade.main') : NULL;
     $bootServices['dispatcher.boot']->setDispatchPolicy($bootDispatchPolicy);
 
     $class = $runtime->userFrameworkClass;
@@ -630,7 +630,7 @@ class Container {
       \CRM_Extension_System::singleton()->getClassLoader()->register();
       \CRM_Extension_System::singleton()->getMixinLoader()->run();
       \CRM_Utils_Hook::singleton()->commonBuildModuleList('civicrm_boot');
-      $bootServices['dispatcher.boot']->setDispatchPolicy($mainDispatchPolicy);
+      $bootServices['dispatcher.boot']->setDispatchPolicy(\CRM_Core_Config::isUpgradeMode() ? \CRM_Upgrade_DispatchPolicy::pick() : NULL);
 
       $runtime->includeCustomPath();
 
@@ -646,7 +646,7 @@ class Container {
 
     }
     else {
-      $bootServices['dispatcher.boot']->setDispatchPolicy($mainDispatchPolicy);
+      $bootServices['dispatcher.boot']->setDispatchPolicy(\CRM_Core_Config::isUpgradeMode() ? \CRM_Upgrade_DispatchPolicy::pick() : NULL);
     }
   }
 

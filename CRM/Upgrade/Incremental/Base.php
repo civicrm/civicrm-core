@@ -213,10 +213,7 @@ class CRM_Upgrade_Incremental_Base {
     // The `enableExtension` has a very high value of `weight`, so this runs after all
     // core DB schema updates have been resolved. We can use high-level services.
 
-    Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.finish'));
-    $restore = \CRM_Utils_AutoClean::with(function() {
-      Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.main'));
-    });
+    CRM_Upgrade_DispatchPolicy::assertActive('upgrade.finish');
 
     $manager = CRM_Extension_System::singleton()->getManager();
     $manager->enable($manager->findInstallRequirements($keys));
