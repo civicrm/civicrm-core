@@ -57,9 +57,10 @@ class CheckCredentialEvent extends \Civi\Core\Event\GenericHookEvent {
   /**
    * Emphatically reject the credential.
    *
-   * If you know that the credential is targeted at your provider, and if there is an error in it, then you
-   * may set a rejection message. This will can provide more detailed debug information. However, it will
-   * preclude other listeners from accepting the credential.
+   * If you know that the credential is targeted at your provider, and if there
+   * is an error in it, then you may set a rejection message. This will can
+   * provide more detailed debug information. However, it will preclude other
+   * listeners from accepting the credential.
    *
    * @param string $message
    */
@@ -68,10 +69,48 @@ class CheckCredentialEvent extends \Civi\Core\Event\GenericHookEvent {
   }
 
   /**
-   * FIXME
+   * Accept the sub claim, matching the credentials to a specific user by
+   * civicrm contact id ('contactId'), CRM user id ('userId') or CRM username
+   * ('user'). This will cause authx to log in that user for the purposes of the
+   * current request.
+   *
+   * The $principal must a mix of  of 'user', 'userId', 'contactId' and
+   * 'credType':
+   *
+   * - 'credType': (string) type of credential used to identify the principal.
+   *   ('pass', 'api_key', 'jwt')
+   *
+   * - 'contactId': (Authenticated) CiviCRM contact ID. If not specified, will
+   *   be obtained from 'userId'.
+   *
+   * - 'userId': (Authenticated) UF user ID. If not specified, will be obtained
+   *   from 'user' or 'contactId'.
+   *
+   * - 'user': (string). The username of the CMS user. Can be used instead of
+   *   'userId'.
+   *
+   * - 'jwt': (Authenticated, Decoded) JWT claims (if applicable)
+   *
+   * Note: Event propogation will stop after this, so subscribers with lower
+   * priorities will not be able to reject it.
+   *
+   * @param   array $principal Must include credType and (contactId or (userId
+   * xor user))
+   *
    */
-  public function accept(?array $principal): void {
-    // .. FIXME: Do more validation like `acceptSub()` ...
+  public function accept(array $principal): void {
+    if (empty($principal['credType'])) {
+      throw new AuthxException("Principal must specify credType");
+    }
+
+    if (empty($principal['contactId']) && empty($principal['userId']) && empty($principal['user'])) {
+      throw new AuthxException("Principal must specify at least one of contactId, userId or user");
+    }
+
+    if (!empty($principal['userId']) && !empty($principal['user'])) {
+      throw new AuthxException("Only userId or user can be specified in principal, not both");
+    }
+
     $this->principal = $principal;
     $this->stopPropagation();
   }
