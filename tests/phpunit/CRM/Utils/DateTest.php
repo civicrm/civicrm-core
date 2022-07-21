@@ -271,6 +271,8 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%P"), "PM");
     $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%Y"), "2018");
     $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%s"), "44");
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%A"), "Thursday");
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%a"), "Thu");
   }
 
   /**
@@ -293,6 +295,8 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%p"), "pm");
     $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%P"), "PM");
     $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%Y"), "2018");
+    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%A"), "Thursday");
+    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%a"), "Thu");
   }
 
   /**
@@ -323,6 +327,19 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       $this->assertEquals($expectNames, $actualNames, "Check temporal names in $lang");
       unset($useLocale);
     }
+  }
+
+  public function testWeekDayArrayOrder() {
+    $this->callAPISuccess('Setting', 'create', ['weekBegins' => 1]);
+    $this->assertEquals([
+      1 => 'Monday',
+      2 => 'Tuesday',
+      3 => 'Wednesday',
+      4 => 'Thursday',
+      5 => 'Friday',
+      6 => 'Saturday',
+      0 => 'Sunday',
+    ], CRM_Utils_Date::getFullWeekdayNames());
   }
 
   /**

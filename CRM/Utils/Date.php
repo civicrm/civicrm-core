@@ -161,20 +161,25 @@ class CRM_Utils_Date {
    */
   public static function getAbbrWeekdayNames() {
     $key = 'abbrDays_' . \CRM_Core_I18n::getLocale();
-    $days = &\Civi::$statics[__CLASS__][$key];
-    if (!$days) {
-      $days = [];
+    if (empty(\Civi::$statics[__CLASS__][$key])) {
+      $days = [
+        0 => ts('Sun'),
+        1 => ts('Mon'),
+        2 => ts('Tue'),
+        3 => ts('Wed'),
+        4 => ts('Thu'),
+        5 => ts('Fri'),
+        6 => ts('Sat'),
+      ];
       // First day of the week
       $firstDay = Civi::settings()->get('weekBegins');
 
-      // set LC_TIME and build the arrays from locale-provided names
-      // June 1st, 1970 was a Monday
-      CRM_Core_I18n::setLcTime();
-      for ($i = $firstDay; count($days) < 7; $i = $i > 5 ? 0 : $i + 1) {
-        $days[$i] = strftime('%a', mktime(0, 0, 0, 6, $i, 1970));
+      \Civi::$statics[__CLASS__][$key] = [];
+      for ($i = $firstDay; count(\Civi::$statics[__CLASS__][$key]) < 7; $i = $i > 5 ? 0 : $i + 1) {
+        \Civi::$statics[__CLASS__][$key][$i] = $days[$i];
       }
     }
-    return $days;
+    return \Civi::$statics[__CLASS__][$key];
   }
 
   /**
@@ -192,20 +197,25 @@ class CRM_Utils_Date {
    */
   public static function getFullWeekdayNames() {
     $key = 'fullDays_' . \CRM_Core_I18n::getLocale();
-    $days = &\Civi::$statics[__CLASS__][$key];
-    if (!$days) {
-      $days = [];
+    if (empty(\Civi::$statics[__CLASS__][$key])) {
+      $days = [
+        0 => ts('Sunday'),
+        1 => ts('Monday'),
+        2 => ts('Tuesday'),
+        3 => ts('Wednesday'),
+        4 => ts('Thursday'),
+        5 => ts('Friday'),
+        6 => ts('Saturday'),
+      ];
       // First day of the week
       $firstDay = Civi::settings()->get('weekBegins');
 
-      // set LC_TIME and build the arrays from locale-provided names
-      // June 1st, 1970 was a Monday
-      CRM_Core_I18n::setLcTime();
-      for ($i = $firstDay; count($days) < 7; $i = $i > 5 ? 0 : $i + 1) {
-        $days[$i] = strftime('%A', mktime(0, 0, 0, 6, $i, 1970));
+      \Civi::$statics[__CLASS__][$key] = [];
+      for ($i = $firstDay; count(\Civi::$statics[__CLASS__][$key]) < 7; $i = $i > 5 ? 0 : $i + 1) {
+        \Civi::$statics[__CLASS__][$key][$i] = $days[$i];
       }
     }
-    return $days;
+    return \Civi::$statics[__CLASS__][$key];
   }
 
   /**
@@ -219,19 +229,26 @@ class CRM_Utils_Date {
    */
   public static function &getAbbrMonthNames($month = FALSE) {
     $key = 'abbrMonthNames_' . \CRM_Core_I18n::getLocale();
-    $abbrMonthNames = &\Civi::$statics[__CLASS__][$key];
-    if (!isset($abbrMonthNames)) {
-
-      // set LC_TIME and build the arrays from locale-provided names
-      CRM_Core_I18n::setLcTime();
-      for ($i = 1; $i <= 12; $i++) {
-        $abbrMonthNames[$i] = strftime('%b', mktime(0, 0, 0, $i, 10, 1970));
-      }
+    if (empty(\Civi::$statics[__CLASS__][$key])) {
+      \Civi::$statics[__CLASS__][$key] = [
+        1 => ts('Jan'),
+        2 => ts('Feb'),
+        3 => ts('Mar'),
+        4 => ts('Apr'),
+        5 => ts('May'),
+        6 => ts('Jun'),
+        7 => ts('Jul'),
+        8 => ts('Aug'),
+        9 => ts('Sep'),
+        10 => ts('Oct'),
+        11 => ts('Nov'),
+        12 => ts('Dec'),
+      ];
     }
     if ($month) {
-      return $abbrMonthNames[$month];
+      return \Civi::$statics[__CLASS__][$key][$month];
     }
-    return $abbrMonthNames;
+    return \Civi::$statics[__CLASS__][$key];
   }
 
   /**
@@ -287,7 +304,8 @@ class CRM_Utils_Date {
 
   /**
    * Create a date and time string in a provided format.
-   *
+   * %A - Full day name ('Saturday'..'Sunday')
+   * %a - abbreviated day name ('Sat'..'Sun')
    * %b - abbreviated month name ('Jan'..'Dec')
    * %B - full month name ('January'..'December')
    * %d - day of the month as a decimal number, 0-padded ('01'..'31')
@@ -318,6 +336,8 @@ class CRM_Utils_Date {
     // 1-based (January) month names arrays
     $abbrMonths = self::getAbbrMonthNames();
     $fullMonths = self::getFullMonthNames();
+    $fullWeekdayNames = self::getFullWeekdayNames();
+    $abbrWeekdayNames = self::getAbbrWeekdayNames();
 
     if (!$format) {
       $config = CRM_Core_Config::singleton();
@@ -381,6 +401,8 @@ class CRM_Utils_Date {
         $second = (int) substr($dateString, 12, 2);
       }
 
+      $dayInt = date('w', strtotime($dateString));
+
       if ($day % 10 == 1 and $day != 11) {
         $suffix = 'st';
       }
@@ -414,6 +436,8 @@ class CRM_Utils_Date {
       }
 
       $date = [
+        '%A' => $fullWeekdayNames[$dayInt] ?? NULL,
+        '%a' => $abbrWeekdayNames[$dayInt] ?? NULL,
         '%b' => $abbrMonths[$month] ?? NULL,
         '%B' => $fullMonths[$month] ?? NULL,
         '%d' => $day > 9 ? $day : '0' . $day,
@@ -430,7 +454,6 @@ class CRM_Utils_Date {
         '%i' => $minute > 9 ? $minute : '0' . $minute,
         '%p' => strtolower($type),
         '%P' => $type,
-        '%A' => $type,
         '%Y' => $year,
         '%s' => str_pad($second, 2, 0, STR_PAD_LEFT),
         '%S' => str_pad($second, 2, 0, STR_PAD_LEFT),
