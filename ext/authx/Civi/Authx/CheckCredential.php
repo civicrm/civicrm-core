@@ -99,8 +99,10 @@ class CheckCredential implements EventSubscriberInterface {
         if (empty($claims['sub']) || substr($claims['sub'], 0, 4) !== 'cid:') {
           $check->reject('Malformed JWT. Must specify the contact ID.');
         }
-        $contactId = substr($claims['sub'], 4);
-        $check->accept(['contactId' => $contactId, 'credType' => 'jwt', 'jwt' => $claims]);
+        else {
+          $contactId = substr($claims['sub'], 4);
+          $check->accept(['contactId' => $contactId, 'credType' => 'jwt', 'jwt' => $claims]);
+        }
       }
       catch (CryptoException $e) {
         // Not a valid AuthX JWT. Proceed to check any other token sources.
