@@ -53,10 +53,19 @@ class CRM_Core_Permission {
   const AUTH_SRC_UNKNOWN = 0, AUTH_SRC_CHECKSUM = 1, AUTH_SRC_SITEKEY = 2, AUTH_SRC_LOGIN = 4;
 
   /**
-   * Get the current permission of this user.
+   * Get the maximum permission of the current user with respect to _any_ contact records.
    *
-   * @return string
-   *   the permission of the user (edit or view or null)
+   * Note: This appears to be hydrated via `CRM_Core_Permission*::group()`, which appears to run in
+   * many page-views, but I'm not certain that it's guaranteed.
+   *
+   * @return int|string|null
+   *   Highest permission held by the current user.
+   *   If the user has "edit" rights to at least 1 contact (via permission or ACL),
+   *     then CRM_Core_Permission::EDIT.
+   *   If the user has "view" rights to at least 1 contact (via permission or ACL),
+   *     then CRM_Core_Permission::VIEW.
+   *   Otherwise, NULL.
+   * @see \CRM_Core_Permission_Base::group()
    */
   public static function getPermission() {
     $config = CRM_Core_Config::singleton();
