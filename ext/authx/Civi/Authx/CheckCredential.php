@@ -105,6 +105,11 @@ class CheckCredential implements EventSubscriberInterface {
         }
       }
       catch (CryptoException $e) {
+        // TODO: Is responding that its expired a security risk?
+        if (strpos($e->getMessage(), 'Expired token') !== false)  {
+          $check->reject('Expired token');
+        }
+
         // Not a valid AuthX JWT. Proceed to check any other token sources.
       }
     }
