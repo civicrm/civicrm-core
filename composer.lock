@@ -2782,16 +2782,16 @@
         },
         {
             "name": "phpoffice/phpword",
-            "version": "0.18.1",
+            "version": "0.18.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPOffice/PHPWord.git",
-                "reference": "06b90e39a36872c6ee73534e1a073f4b3132fc6a"
+                "reference": "be0190cd5d8f95b4be08d5853b107aa4e352759a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPOffice/PHPWord/zipball/06b90e39a36872c6ee73534e1a073f4b3132fc6a",
-                "reference": "06b90e39a36872c6ee73534e1a073f4b3132fc6a",
+                "url": "https://api.github.com/repos/PHPOffice/PHPWord/zipball/be0190cd5d8f95b4be08d5853b107aa4e352759a",
+                "reference": "be0190cd5d8f95b4be08d5853b107aa4e352759a",
                 "shasum": ""
             },
             "require": {
@@ -2822,7 +2822,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-develop": "0.18-dev"
+                    "dev-develop": "0.19-dev"
                 }
             },
             "autoload": {
@@ -2888,9 +2888,9 @@
             ],
             "support": {
                 "issues": "https://github.com/PHPOffice/PHPWord/issues",
-                "source": "https://github.com/PHPOffice/PHPWord/tree/0.18.1"
+                "source": "https://github.com/PHPOffice/PHPWord/tree/0.18.3"
             },
-            "time": "2021-03-08T01:06:35+00:00"
+            "time": "2022-02-17T15:40:03+00:00"
         },
         {
             "name": "phpseclib/phpseclib",
@@ -5212,16 +5212,16 @@
         },
         {
             "name": "tecnickcom/tcpdf",
-            "version": "6.4.1",
+            "version": "6.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tecnickcom/TCPDF.git",
-                "reference": "5ba838befdb37ef06a16d9f716f35eb03cb1b329"
+                "reference": "42cd0f9786af7e5db4fcedaa66f717b0d0032320"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/5ba838befdb37ef06a16d9f716f35eb03cb1b329",
-                "reference": "5ba838befdb37ef06a16d9f716f35eb03cb1b329",
+                "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/42cd0f9786af7e5db4fcedaa66f717b0d0032320",
+                "reference": "42cd0f9786af7e5db4fcedaa66f717b0d0032320",
                 "shasum": ""
             },
             "require": {
@@ -5272,7 +5272,7 @@
             ],
             "support": {
                 "issues": "https://github.com/tecnickcom/TCPDF/issues",
-                "source": "https://github.com/tecnickcom/TCPDF/tree/6.4.1"
+                "source": "https://github.com/tecnickcom/TCPDF/tree/6.4.4"
             },
             "funding": [
                 {
@@ -5280,7 +5280,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2021-03-27T16:00:33+00:00"
+            "time": "2021-12-31T08:39:24+00:00"
         },
         {
             "name": "togos/gitignore",
