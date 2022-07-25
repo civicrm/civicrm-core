@@ -31,4 +31,17 @@ class CRM_Upgrade_Incremental_php_FiveFiftyThree extends CRM_Upgrade_Incremental
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
   }
 
+  /**
+   * Alter civicrm_action_schedule.limit_to column from boolean to int and update the values
+   */
+  public static function changeColumnLimitTo() {
+    CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_action_schedule` CHANGE `limit_to` `limit_to` int unsigned NOT NULL DEFAULT 1 COMMENT 'Is this the recipient criteria limited to OR in addition to?'", [], TRUE, NULL, FALSE, FALSE);
+    CRM_Core_DAO::executeQuery("UPDATE `civicrm_action_schedule` SET `limit_to` =  CASE
+      WHEN `limit_to` = 1 THEN 2
+      WHEN `limit_to` = 0 THEN 3
+      ELSE 1
+    END", [], TRUE, NULL, FALSE, FALSE);
+    return TRUE;
+  }
+
 }

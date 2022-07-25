@@ -2356,7 +2356,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->callAPISuccess('Participant', 'create', $params);
 
     $actionSchedule = $this->fixtures['sched_event_type_start_1week_before'];
-    $actionSchedule['limit_to'] = TRUE;
+    $actionSchedule['limit_to'] = 2;
     $actionSchedule['recipient'] = 'participant_role';
     $actionSchedule['recipient_listing'] = $testValue['recipient_listing'];
     $actionSchedule['entity_value'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'event_type_id');

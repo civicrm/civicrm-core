@@ -448,12 +448,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       return;
     }
     $values = $this->controller->exportValues($this->getName());
-    if (empty($this->_actionSchedule)) {
-      $bao = $this->parseActionSchedule($values)->save();
-    }
-    else {
-      $bao = $this->_actionSchedule->save();
-    }
+    $bao = CRM_Core_BAO_ActionSchedule::add((empty($this->_actionSchedule) ? $this->parseActionSchedule($values)->toArray() : $this->_actionSchedule->toArray()));
 
     // we need to set this on the form so that hooks can identify the created entity
     $this->set('id', $bao->id);
@@ -567,7 +562,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     else {
       $params['mapping_id'] = $values['entity'][0];
       if ($params['mapping_id'] == 1) {
-        $params['limit_to'] = 2;
+        $params['limit_to'] = array_search(ts('Limit or Add Recipients'), CRM_Core_SelectValues::getLimitToValues());
       }
 
       $entity_value = CRM_Utils_Array::value(1, $values['entity'], []);

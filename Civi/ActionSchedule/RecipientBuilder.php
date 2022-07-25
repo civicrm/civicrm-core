@@ -283,7 +283,7 @@ class RecipientBuilder {
     /** @var \CRM_Utils_SQL_Select $query */
     $query = $this->mapping->createQuery($this->actionSchedule, $phase, $defaultParams);
 
-    if ($this->actionSchedule->limit_to == 2) {
+    if ($this->actionSchedule->limit_to == array_search(ts('Limit or Add Recipients'), \CRM_Core_SelectValues::getLimitToValues())) {
       $query->merge($this->prepareContactFilter($query['casContactIdField']));
     }
 
@@ -468,7 +468,7 @@ WHERE      $group.id = {$groupId}
    */
   protected function prepareAddlFilter($contactIdField) {
     $contactAddlFilter = NULL;
-    if ($this->actionSchedule->limit_to === 3) {
+    if ($this->actionSchedule->limit_to === array_search(ts('Also Include'), \CRM_Core_SelectValues::getLimitToValues())) {
       $contactAddlFilter = $this->prepareContactFilter($contactIdField);
     }
     return $contactAddlFilter;

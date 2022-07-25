@@ -246,7 +246,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
         'start_action_condition' => 'before',
         'start_action_unit' => 'hour',
         'group_id' => $groupID,
-        'limit_to' => 3,
+        'limit_to' => 2,
       ]);
       $this->callAPISuccess('group_contact', 'create', [
         'contact_id' => $contactID,

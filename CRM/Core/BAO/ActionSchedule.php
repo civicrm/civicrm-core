@@ -178,6 +178,10 @@ FROM civicrm_action_schedule cas
    * @throws \CRM_Core_Exception
    */
   public static function add(array $params): CRM_Core_DAO_ActionSchedule {
+    //unset manual recipient and/or group set when limit_to is set to neither
+    if (isset($params['limit_to']) && $params['limit_to'] == array_search(ts('Neither'), CRM_Core_SelectValues::getLimitToValues())) {
+      $params['group_id'] = $params['recipient_manual_id'] = '';
+    }
     return self::writeRecord($params);
   }
 
