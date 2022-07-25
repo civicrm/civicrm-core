@@ -599,6 +599,13 @@ SET    version = '$version'
     );
     $queue->createItem($task, ['weight' => 1000]);
 
+    $task = new CRM_Queue_Task(
+      ['CRM_Upgrade_Form', 'doFinalMessages'],
+      [$currentVer, $latestVer, $postUpgradeMessageFile],
+      'Generate final messages'
+    );
+    $queue->createItem($task, ['weight' => 3000]);
+
     return $queue;
   }
 
@@ -829,6 +836,34 @@ SET    version = '$version'
     // Force a rebuild of CiviCRM asset cache in case things have changed.
     \Civi::service('asset_builder')->clear(FALSE);
 
+    return TRUE;
+  }
+
+  /**
+   * Generate any standard post-upgrade messages (which are not version-specific).
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param string $originalVer
+   *   the original revision.
+   * @param string $latestVer
+   *   the target (final) revision.
+   * @param string $postUpgradeMessageFile
+   *   path of a modifiable file which lists the post-upgrade messages.
+   *
+   * @return bool
+   */
+  public static function doFinalMessages(CRM_Queue_TaskContext $ctx, $originalVer, $latestVer, $postUpgradeMessageFile): bool {
+    // NOTE: This step should be automated circa 5.53.
+    $originalMajorMinor = array_slice(explode('.', $originalVer), 0, 2);
+    $latestMajorMinor = array_slice(explode('.', $latestVer), 0, 2);
+    if ($originalMajorMinor !== $latestMajorMinor) {
+      file_put_contents($postUpgradeMessageFile,
+        '<br/><br/>' . ts('<strong>WARNING</strong>: Core extensions may also require database updates. Please <a %1>execute extension updates</a> immediately.', [
+          1 => sprintf('href="%s" target="_blank" ', CRM_Utils_System::url('civicrm/admin/extensions/upgrade', 'reset=1', TRUE)),
+        ]),
+        FILE_APPEND
+      );
+    }
     return TRUE;
   }
 
