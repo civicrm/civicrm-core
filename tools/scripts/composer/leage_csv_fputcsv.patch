@@ -1,0 +1,78 @@
+From ed92049ea509ab20392313a9158d07433eede7f4 Mon Sep 17 00:00:00 2001
+From: Ignace Nyamagana Butera <nyamsprod@gmail.com>
+Date: Sat, 3 Apr 2021 22:27:53 +0200
+Subject: [PATCH] Adding eol support to fputcsv for PHP8.1+
+
+---
+ .github/workflows/build.yml |  2 +-
+ src/Stream.php              |  5 ++++-
+ src/Writer.php              | 16 ++++++++++++----
+ 3 files changed, 17 insertions(+), 6 deletions(-)
+
+diff --git a/src/Stream.php b/src/Stream.php
+index f6e68a31..c0262cdb 100644
+--- a/src/Stream.php
++++ b/src/Stream.php
+@@ -304,9 +304,12 @@ public function setFlags(int $flags): void
+      *
+      * @return int|false
+      */
+-    public function fputcsv(array $fields, string $delimiter = ',', string $enclosure = '"', string $escape = '\\')
++    public function fputcsv(array $fields, string $delimiter = ',', string $enclosure = '"', string $escape = '\\', string $eol = "\n")
+     {
+         $controls = $this->filterControl($delimiter, $enclosure, $escape, __METHOD__);
++        if (80100 <= PHP_VERSION_ID) {
++            $controls[] = $eol;
++        }
+ 
+         return fputcsv($this->stream, $fields, ...$controls);
+     }
+diff --git a/src/Writer.php b/src/Writer.php
+index 5bb0d3c0..0b4a07e7 100644
+--- a/src/Writer.php
++++ b/src/Writer.php
+@@ -100,9 +100,8 @@ public function getNewline(): string
+     /**
+      * Get the flush threshold.
+      *
+-     * @return int|null
+      */
+-    public function getFlushThreshold()
++    public function getFlushThreshold(): ?int
+     {
+         return $this->flush_threshold;
+     }
+@@ -159,6 +158,10 @@ public function insertOne(array $record): int
+      */
+     protected function addRecord(array $record)
+     {
++        if (80100 <= PHP_VERSION_ID) {
++            return $this->document->fputcsv($record, $this->delimiter, $this->enclosure, $this->escape, $this->newline);
++        }
++
+         return $this->document->fputcsv($record, $this->delimiter, $this->enclosure, $this->escape);
+     }
+ 
+@@ -201,7 +204,12 @@ protected function addRFC4180CompliantRecord(array $record)
+         }
+         unset($field);
+ 
+-        return $this->document->fwrite(implode($this->delimiter, $record)."\n");
++        $newline = "\n";
++        if (80100 <= PHP_VERSION_ID) {
++            $newline = $this->newline;
++        }
++
++        return $this->document->fwrite(implode($this->delimiter, $record).$newline);
+     }
+ 
+     /**
+@@ -237,7 +245,7 @@ protected function validateRecord(array $record): void
+     protected function consolidate(): int
+     {
+         $bytes = 0;
+-        if ("\n" !== $this->newline) {
++        if (80100 > PHP_VERSION_ID && "\n" !== $this->newline) {
+             $this->document->fseek(-1, SEEK_CUR);
+             /** @var int $newlineBytes */
+             $newlineBytes = $this->document->fwrite($this->newline, strlen($this->newline));
