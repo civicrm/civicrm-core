@@ -1849,7 +1849,8 @@ DESC limit 1");
     }
 
     foreach ($this->order->getMembershipLineItems() as $membershipLineItem) {
-      $memTypeNumTerms = $this->getSubmittedValue('num_terms') ?: $membershipLineItem['membership_num_terms'];
+      $memTypeNumTerms = $this->getSubmittedValue('num_terms') &&
+      !$this->getSubmittedValue('price_set_id') ? $this->getSubmittedValue('num_terms') : $membershipLineItem['membership_num_terms'];
       $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType(
         $membershipLineItem['membership_type_id'],
         $this->getSubmittedValue('join_date'),
