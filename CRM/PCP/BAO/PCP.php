@@ -716,7 +716,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
     list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'groupName' => 'msg_tpl_workflow_contribution',
-        'valueName' => $tplName,
+        'workflow' => $tplName,
         'contactId' => $pcpInfo['contact_id'],
         'tplParams' => $tplParams,
         'from' => $receiptFrom,

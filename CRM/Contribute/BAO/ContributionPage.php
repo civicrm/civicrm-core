@@ -454,7 +454,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       // send duplicate alert, if dupe match found during on-behalf-of processing.
       if (!empty($values['onbehalf_dupe_alert'])) {
         $sendTemplateParams['groupName'] = 'msg_tpl_workflow_contribution';
-        $sendTemplateParams['valueName'] = 'contribution_dupalert';
+        $sendTemplateParams['workflow'] = 'contribution_dupalert';
         $sendTemplateParams['from'] = ts('Automatically Generated') . " <{$values['receipt_from_email']}>";
         $sendTemplateParams['toName'] = $values['receipt_from_name'] ?? NULL;
         $sendTemplateParams['toEmail'] = $values['receipt_from_email'] ?? NULL;
@@ -554,7 +554,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       [$displayName, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contribution['contact_id'], FALSE);
       $templatesParams = [
         'groupName' => 'msg_tpl_workflow_contribution',
-        'valueName' => 'contribution_recurring_notify',
+        'workflow' => 'contribution_recurring_notify',
         'contactId' => $contribution['contact_id'],
         'tplParams' => [
           'recur_frequency_interval' => $recur->frequency_interval,

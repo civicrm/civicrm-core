@@ -289,7 +289,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
 
     $templateParams = [
       'groupName' => 'msg_tpl_workflow_friend',
-      'valueName' => 'friend',
+      'workflow' => 'friend',
       'contactId' => $contactID,
       'tplParams' => [
         $values['module'] => $values['module'],

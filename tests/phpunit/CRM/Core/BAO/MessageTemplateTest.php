@@ -30,7 +30,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       'suffix_id' => NULL,
     ]);
     $rendered = CRM_Core_BAO_MessageTemplate::renderTemplate([
-      'valueName' => 'case_activity',
+      'workflow' => 'case_activity',
       'tokenContext' => [
         'contactId' => $contactId,
       ],
@@ -58,7 +58,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     ]);
     [$sent, $subject, $messageText, $messageHtml] = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
-        'valueName' => 'case_activity',
+        'workflow' => 'case_activity',
         'contactId' => $contactId,
         'from' => 'admin@example.com',
         // No 'toEmail'/'toName' address => not sendable, but still returns rendered value.
@@ -99,7 +99,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
 
       [$sent, $subject, $messageText, $messageHtml] = CRM_Core_BAO_MessageTemplate::sendTemplate(
         [
-          'valueName' => 'case_activity',
+          'workflow' => 'case_activity',
           'contactId' => $contactId,
           'from' => 'admin@example.com',
           // No 'toEmail'/'toName' address => not sendable, but still returns rendered value.
@@ -137,7 +137,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
 
       [$sent, $subject, $messageText, $messageHtml] = CRM_Core_BAO_MessageTemplate::sendTemplate(
         [
-          'valueName' => 'case_activity',
+          'workflow' => 'case_activity',
           'tokenContext' => [
             'contactId' => $contactId,
             'activityId' => $activityId,
@@ -188,7 +188,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $this->assertEquals([], \Civi\Test\Invasive::get([$msg, '_extras']));
 
     [, $subject, $message] = $msg->sendTemplate([
-      'valueName' => 'case_activity',
+      'workflow' => 'case_activity',
       'from' => 'admin@example.com',
       'toName' => 'Demo',
       'toEmail' => 'admin@example.com',
@@ -217,7 +217,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $tokenString = '{domain.' . implode('} ~ {domain.', array_keys($values)) . '}';
 
     $messageContent = CRM_Core_BAO_MessageTemplate::renderTemplate([
-      'valueName' => 'dummy',
+      'workflow' => 'dummy',
       'messageTemplate' => [
         'msg_html' => $tokenString,
         // Check the space is stripped.
@@ -241,7 +241,7 @@ London, 90210
    */
   public function testRenderTemplateSmarty(): void {
     $messageContent = CRM_Core_BAO_MessageTemplate::renderTemplate([
-      'valueName' => 'dummy',
+      'workflow' => 'dummy',
       'messageTemplate' => [
         'msg_html' => '{$tokenString}',
         // Check the space is stripped.
@@ -261,7 +261,7 @@ London, 90210
    */
   public function testRenderTemplateIgnoreSmarty(): void {
     $messageContent = CRM_Core_BAO_MessageTemplate::renderTemplate([
-      'valueName' => 'dummy',
+      'workflow' => 'dummy',
       'messageTemplate' => [
         'msg_html' => '{$tokenString}',
         // Check the space is stripped.
@@ -308,7 +308,7 @@ London, 90210
       $tokenString .= "{$key}:{contact.{$key}}\n";
     }
     $messageContent = CRM_Core_BAO_MessageTemplate::renderTemplate([
-      'valueName' => 'dummy',
+      'workflow' => 'dummy',
       'messageTemplate' => [
         'msg_html' => $tokenString,
         // Check the space is stripped.

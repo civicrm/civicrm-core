@@ -287,8 +287,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
     $modelDefaults = [
       // instance of WorkflowMessageInterface, containing a list of data to provide to the message-template
       'model' => NULL,
-      // Symbolic name of the workflow step. Matches the option-value-name of the template.
-      'valueName' => NULL,
+      // Symbolic name of the workflow step. Matches the value in civicrm_msg_template.workflow_name.
+      'workflow' => NULL,
       // additional template params (other than the ones already set in the template singleton)
       'tplParams' => [],
       // additional token params (passed to the TokenProcessor)
@@ -343,7 +343,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
     $params = array_merge($modelDefaults, $viewDefaults, $envelopeDefaults, $params);
 
     CRM_Utils_Hook::alterMailParams($params, 'messageTemplate');
-    $mailContent = self::loadTemplate((string) $params['valueName'], $params['isTest'], $params['messageTemplateID'] ?? NULL, $params['groupName'] ?? '', $params['messageTemplate'], $params['subject'] ?? NULL);
+    $mailContent = self::loadTemplate((string) $params['workflow'], $params['isTest'], $params['messageTemplateID'] ?? NULL, $params['groupName'] ?? '', $params['messageTemplate'], $params['subject'] ?? NULL);
 
     self::synchronizeLegacyParameters($params);
     $rendered = CRM_Core_TokenSmarty::render(CRM_Utils_Array::subset($mailContent, ['text', 'html', 'subject']), $params['tokenContext'], $params['tplParams']);
@@ -363,6 +363,9 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    * @param array $params
    */
   private static function synchronizeLegacyParameters(&$params) {
+    // 'valueName' is deprecated, docs were updated some time back
+    // and people have been notified. Having it here means the
+    // hooks will still see it until we remove.
     CRM_Utils_Array::pathSync($params, ['workflow'], ['valueName']);
     CRM_Utils_Array::pathSync($params, ['tokenContext', 'contactId'], ['contactId']);
     CRM_Utils_Array::pathSync($params, ['tokenContext', 'smarty'], ['disableSmarty'], function ($v, bool $isCanon) {
@@ -505,7 +508,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
       // Group name & valueName are deprecated parameters. At some point it will not be passed out.
       // https://github.com/civicrm/civicrm-core/pull/17180
       'groupName' => $groupName,
-      'valueName' => $workflowName,
+      'workflow' => $workflowName,
     ];
 
     CRM_Utils_Hook::alterMailContent($mailContent);

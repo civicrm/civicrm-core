@@ -1190,7 +1190,7 @@ WHERE civicrm_event.is_active = 1
 
         $sendTemplateParams = [
           'groupName' => 'msg_tpl_workflow_event',
-          'valueName' => 'event_online_receipt',
+          'workflow' => 'event_online_receipt',
           'contactId' => $contactID,
           'isTest' => $isTest,
           'tplParams' => $tplParams,

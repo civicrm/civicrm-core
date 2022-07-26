@@ -263,7 +263,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
         $sendTemplateParams
           = [
             'groupName' => $this->_mode == 'auto_renew' ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
-            'valueName' => $this->_mode == 'auto_renew' ? 'membership_autorenew_cancelled' : 'contribution_recurring_cancelled',
+            'workflow' => $this->_mode == 'auto_renew' ? 'membership_autorenew_cancelled' : 'contribution_recurring_cancelled',
             'contactId' => $this->getSubscriptionDetails()->contact_id,
             'tplParams' => $tplParams,
             'tokenContext' => ['contribution_recurId' => $this->getContributionRecurID()],

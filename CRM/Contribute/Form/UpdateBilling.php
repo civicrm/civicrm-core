@@ -323,7 +323,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
 
       $sendTemplateParams = array(
         'groupName' => $this->getSubscriptionDetails()->membership_id ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
-        'valueName' => $this->getSubscriptionDetails()->membership_id ? 'membership_autorenew_billing' : 'contribution_recurring_billing',
+        'workflow' => $this->getSubscriptionDetails()->membership_id ? 'membership_autorenew_billing' : 'contribution_recurring_billing',
         'contactId' => $this->getSubscriptionDetails()->contact_id,
         'tplParams' => $tplParams,
         'isTest' => $this->getSubscriptionDetails()->is_test,
