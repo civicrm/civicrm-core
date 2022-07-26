@@ -34,6 +34,8 @@ CiviCRM `Contact` records are often linked to CMS `User` records -- but not alwa
 * __Optional__:  If there is a correlated CMS `User`, then load it. If there isn't, leave the CMS user as anonymous.
 * __Require__: Only allow authentication if proceed if there is a correlated user account.
 
+Handling of these credentials, or new ones can be modified by custom extensions that subscribe to the `civi.authx.checkCredential` event. See [Extending credential handling](##extending-credential-handling).
+
 ## Configuration
 
 For each authentication flow, one may toggle support for different credentials and user-links. Here is the default configuration:
@@ -127,3 +129,5 @@ $ curl 'https://demouser:demopass@example.org/civicrm/authx/id'
 
 The "AuthX: Authenticate to services with password" CiviCRM permission must
 also be granted for the role associated to the user.
+
+## Extending credential handling
