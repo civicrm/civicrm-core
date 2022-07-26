@@ -1456,7 +1456,7 @@ class CRM_Export_BAO_ExportProcessor {
         case CRM_Utils_Type::T_INT:
         case CRM_Utils_Type::T_BOOLEAN:
           if (in_array(CRM_Utils_Array::value('data_type', $fieldSpec), ['Country', 'StateProvince', 'ContactReference'])) {
-            return "`$fieldName` varchar(255)";
+            return "`$fieldName` text";
           }
           // some of those will be exported as a (localisable) string
           // @see https://lab.civicrm.org/dev/core/-/issues/2164
