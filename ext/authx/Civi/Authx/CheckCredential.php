@@ -29,13 +29,13 @@ class CheckCredential implements EventSubscriberInterface {
    * Listener priority for handling credential format of 'Bearer' with a
    * traditional Civi API key
    */
-  const PRIORITY_BEARER_API_KEY = -200;
+  const PRIORITY_BEARER_API_KEY = -300;
 
   /**
    * Listener priority for handling credential format of 'Bearer' with
    * Authx-style JSON Web Token.
    */
-  const PRIORITY_BEARER_JWT = -300;
+  const PRIORITY_BEARER_JWT = -400;
 
   /**
    * @inheritdoc
