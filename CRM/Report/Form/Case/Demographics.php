@@ -150,11 +150,11 @@ class CRM_Report_Form_Case_Demographics extends CRM_Report_Form {
           ],
           'start_date' => [
             'title' => ts('Case Start'),
-            'required' => TRUE,
+            'default' => TRUE,
           ],
           'end_date' => [
             'title' => ts('Case End'),
-            'required' => TRUE,
+            'default' => TRUE,
           ],
         ],
         'filters' => [
