@@ -219,6 +219,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $refundedStatusId = CRM_Utils_Array::key('Refunded', $contributionStatusID);
     $cancelledStatusId = CRM_Utils_Array::key('Cancelled', $contributionStatusID);
     $pendingStatusId = CRM_Utils_Array::key('Pending', $contributionStatusID);
+    $pdfFormat = CRM_Core_BAO_PdfFormat::getByName('default_invoice_pdf_format');
 
     foreach ($invoiceElements['details'] as $contribID => $detail) {
       $input = $ids = [];
@@ -499,11 +500,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         [$sent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         // functions call for adding activity with attachment
         // make sure page layout is same for email and download invoices.
-        $fileName = self::putFile($html, $pdfFileName, [
-          'margin_top' => 10,
-          'margin_left' => 65,
-          'metric' => 'px',
-        ]);
+        $fileName = self::putFile($html, $pdfFileName, $pdfFormat);
         self::addActivities($subject, $contribution->contact_id, $fileName, $params, $contribution->id);
       }
       elseif ($contribution->_component == 'event') {
@@ -528,17 +525,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         return $html;
       }
       else {
-        CRM_Utils_PDF_Utils::html2pdf($messageInvoice, $pdfFileName, FALSE, [
-          'margin_top' => 10,
-          'margin_left' => 65,
-          'metric' => 'px',
-        ]);
+        CRM_Utils_PDF_Utils::html2pdf($messageInvoice, $pdfFileName, FALSE, $pdfFormat);
         // functions call for adding activity with attachment
-        $fileName = self::putFile($html, $pdfFileName, [
-          'margin_top' => 10,
-          'margin_left' => 65,
-          'metric' => 'px',
-        ]);
+        $fileName = self::putFile($html, $pdfFileName, $pdfFormat);
         self::addActivities($subject, $contactIds, $fileName, $params);
 
         CRM_Utils_System::civiExit();
