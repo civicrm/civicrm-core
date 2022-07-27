@@ -4,11 +4,12 @@
     bindings: {
       ctrl: '@'
     },
-    controller: function($scope, $element, $timeout, crmApi4, crmStatus, $window, $location, FileUploader) {
+    controller: function($scope, $element, $timeout, crmApi4, crmStatus, $window, $location, $parse, FileUploader) {
       var schema = {},
         data = {},
         status,
         args,
+        submissionResponse,
         ctrl = this;
 
       this.$onInit = function() {
@@ -84,7 +85,7 @@
         }
 
         else if (metaData.redirect) {
-          var url = metaData.redirect;
+          var url = replaceTokens(metaData.redirect, submissionResponse[0]);
           if (url.indexOf('civicrm/') === 0) {
             url = CRM.url(url);
           } else if (url.indexOf('/') === 0) {
@@ -92,6 +93,22 @@
           }
           $window.location.href = url;
         }
+      }
+
+      function replaceTokens(str, vars) {
+        function recurse(stack, values) {
+          _.each(values, function(value, key) {
+            console.log('value:' + value, stack);
+            if (_.isArray(value) || _.isPlainObject(value)) {
+              recurse(stack.concat([key]), value);
+            } else {
+              var token = (stack.length ? stack.join('.') + '.' : '') + key;
+              str = str.replace(new RegExp(_.escapeRegExp('[' + token + ']'), 'g'), value);
+            }
+          });
+        }
+        recurse([], vars);
+        return str;
       }
 
       this.submit = function() {
@@ -103,6 +120,7 @@
           args: args,
           values: data}
         ).then(function(response) {
+          submissionResponse = response;
           if (ctrl.fileUploader.getNotUploadedItems().length) {
             _.each(ctrl.fileUploader.getNotUploadedItems(), function(file) {
               file.formData.push({

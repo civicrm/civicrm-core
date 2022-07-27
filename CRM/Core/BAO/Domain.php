@@ -149,6 +149,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @param array $params
    * @param int $id
    *
+   * @deprecated
    * @return CRM_Core_DAO_Domain
    * @throws \CRM_Core_Exception
    */
@@ -160,6 +161,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Create or update domain.
    *
+   * @deprecated
    * @param array $params
    * @return CRM_Core_DAO_Domain
    */

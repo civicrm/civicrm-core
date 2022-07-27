@@ -263,7 +263,7 @@
               disabled: alias in existingJoins
             };
           if (alias in existingJoins) {
-            opt.children = addEntityJoins(join.entity, (stack ? stack + '_' : '') + alias, baseEntity);
+            opt.children = addEntityJoins(join.entity, alias, baseEntity);
           }
           collection.push(opt);
         }

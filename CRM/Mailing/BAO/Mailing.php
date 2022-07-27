@@ -666,7 +666,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
       }
 
       // To check for an html part strip tags
-      if (trim(strip_tags($this->body_html, '<img>'))) {
+      if (trim(strip_tags(($this->body_html ?? ''), '<img>'))) {
 
         $template = [];
         if ($this->header) {
@@ -1442,52 +1442,32 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * Add the mailings.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
-   * @param array $ids
-   *   Reference array contains the id.
-   *
    *
    * @return CRM_Mailing_DAO_Mailing
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function add(&$params, $ids = []) {
-    $id = $params['id'] ?? $ids['mailing_id'] ?? NULL;
+  public static function add($params) {
+    $id = $params['id'] ?? NULL;
 
-    if (empty($params['id']) && !empty($ids)) {
-      CRM_Core_Error::deprecatedWarning('Parameter $ids is no longer used by Mailing::add. Use the api or just pass $params');
-    }
     if (!empty($params['check_permissions']) && CRM_Mailing_Info::workflowEnabled()) {
       $params = self::processWorkflowPermissions($params);
     }
-    $action = $id ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($action, 'Mailing', $id, $params);
-
-    $mailing = new static();
-    if ($id) {
-      $mailing->id = $id;
-      $mailing->find(TRUE);
+    if (!$id) {
+      $params['domain_id'] = $params['domain_id'] ?? CRM_Core_Config::domainID();
     }
-    $mailing->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
-
-    if (((!$id && empty($params['replyto_email'])) || !isset($params['replyto_email'])) &&
+    if (
+      ((!$id && empty($params['replyto_email'])) || !isset($params['replyto_email'])) &&
       isset($params['from_email'])
     ) {
       $params['replyto_email'] = $params['from_email'];
     }
-    $mailing->copyValues($params);
-
     // CRM-20892 Unset Modifed Date here so that MySQL can correctly set an updated modfied date.
-    unset($mailing->modified_date);
-    $result = $mailing->save();
+    unset($params['modified_date']);
+
+    $result = static::writeRecord($params);
 
     // CRM-20892 Re find record after saing so we can set the updated modified date in the result.
-    $mailing->find(TRUE);
-
-    if (isset($mailing->modified_date)) {
-      $result->modified_date = $mailing->modified_date;
-    }
-
-    CRM_Utils_Hook::post($action, 'Mailing', $mailing->id, $mailing);
+    $result->find(TRUE);
 
     return $result;
   }

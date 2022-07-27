@@ -112,10 +112,6 @@
   margin-bottom: 10px;
 }
 
-#afGuiEditor-palette-config .form-inline label {
-  min-width: 110px;
-}
-
 #afGuiEditor-palette-config .af-gui-entity-palette [type=search] {
   width: 120px;
   padding: 3px 3px 3px 5px;
@@ -481,6 +477,10 @@ body.af-gui-dragging {
 #afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-menu {
   width: 100%;
   right: 0;
+}
+
+#afGuiEditor .input-group-addon {
+  padding: 0;
 }
 
 #afGuiEditor .af-gui-text-h1 {

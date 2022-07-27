@@ -367,7 +367,7 @@ WHERE      a.id = %1
       // Is anything depending on this currently or is it just a result of
       // the see-sawing and some double-escaping that went back and forth
       // for a few years?
-      'value' => htmlspecialchars($this->redact($activityDAO->subject)),
+      'value' => htmlspecialchars($this->redact($activityDAO->subject) ?? ''),
       'type' => 'Memo',
     );
 

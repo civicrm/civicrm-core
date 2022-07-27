@@ -114,6 +114,23 @@ function assignRemove(recordID, op) {
   }
 }
 
+function removeFromBatch(financial_trxn_id) {
+  var entityID = "{/literal}{$entityID}{literal}";
+  if (financial_trxn_id && entityID) {
+    CRM.api4("EntityBatch", "delete", {where: [
+      ["entity_id", "=", financial_trxn_id],
+      ["entity_table", "=", "civicrm_financial_trxn"],
+      ["batch_id", "=", entityID]
+    ]}).then(function(batch) {
+      buildTransactionSelectorAssign(true);
+      buildTransactionSelectorRemove();
+      batchSummary(entityID);
+    }, function(failure) {
+      CRM.alert({/literal}'{ts escape="js"}Error removing from batch.{/ts}', '{ts escape="js"}Api Error{/ts}'{literal}, 'error');
+    });
+  }
+}
+
 function noServerResponse() {
   CRM.alert({/literal}'{ts escape="js"}No response from the server. Check your internet connection and try reloading the page.{/ts}', '{ts escape="js"}Network Error{/ts}'{literal}, 'error');
 }

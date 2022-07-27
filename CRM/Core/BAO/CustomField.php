@@ -226,7 +226,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     Civi::cache('metadata')->clear();
 
     foreach ($customFields as $index => $customField) {
-      CRM_Utils_Hook::post(empty($records[$index]['id']) ? 'create' : 'edit', 'CustomField', $customField->id, $customField);
+      $op = empty($records[$index]['id']) ? 'create' : 'edit';
+      // Theoretically a custom field could have custom fields! Trippy...
+      if (!empty($records[$index]['custom']) && is_array($records[$index]['custom'])) {
+        CRM_Core_BAO_CustomValueTable::store($records[$index]['custom'], static::$_tableName, $customField->id, $op);
+      }
+      CRM_Utils_Hook::post($op, 'CustomField', $customField->id, $customField);
     }
     return $customFields;
   }
@@ -764,7 +769,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
     // DAO stores attributes as a string, but it's hard to manipulate and
     // CRM_Core_Form::add() wants them as an array.
-    $fieldAttributes = self::attributesFromString($field->attributes);
+    $fieldAttributes = self::attributesFromString($field->attributes ?? '');
 
     // Custom field HTML should indicate group+field name
     $groupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $field->custom_group_id);
@@ -1176,7 +1181,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           // In such cases we could just get intval($value) and fetch matching
           // option again, but this would not work if key is float like 5.6.
           // So we need to truncate trailing zeros to make it work as expected.
-          if ($display === '' && strpos($value, '.') !== FALSE) {
+          if ($display === '' && strpos(($value ?? ''), '.') !== FALSE) {
             // Use round() to truncate trailing zeros, e.g:
             // 10.00 -> 10, 10.60 -> 10.6, 10.69 -> 10.69.
             $value = (string) round($value, 5);

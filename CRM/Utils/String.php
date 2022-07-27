@@ -529,7 +529,7 @@ class CRM_Utils_String {
    */
   public static function stripAlternatives($full) {
     $matches = [];
-    preg_match('/-ALTERNATIVE ITEM 0-(.*?)-ALTERNATIVE ITEM 1-.*-ALTERNATIVE END-/s', $full, $matches);
+    preg_match('/-ALTERNATIVE ITEM 0-(.*?)-ALTERNATIVE ITEM 1-.*-ALTERNATIVE END-/s', ($full ?? ''), $matches);
 
     if (isset($matches[1]) &&
       trim(strip_tags($matches[1])) != ''
@@ -639,7 +639,7 @@ class CRM_Utils_String {
       $_filter = new HTMLPurifier($config);
     }
 
-    return $_filter->purify($string);
+    return $_filter->purify($string ?? '');
   }
 
   /**
@@ -878,7 +878,7 @@ class CRM_Utils_String {
       return TRUE;
     }
     $len = strlen($fragment ?? '');
-    return substr($string, 0, $len) === $fragment;
+    return substr(($string ?? ''), 0, $len) === $fragment;
   }
 
   /**
@@ -895,7 +895,7 @@ class CRM_Utils_String {
       return TRUE;
     }
     $len = strlen($fragment ?? '');
-    return substr($string, -1 * $len) === $fragment;
+    return substr(($string ?? ''), -1 * $len) === $fragment;
   }
 
   /**

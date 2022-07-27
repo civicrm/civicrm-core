@@ -206,6 +206,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $out = [];
     switch ($column['type']) {
       case 'field':
+      case 'html':
         $rawValue = $data[$column['key']] ?? NULL;
         if (!$this->hasValue($rawValue) && isset($column['empty_value'])) {
           $out['val'] = $this->replaceTokens($column['empty_value'], $data, 'view');
@@ -230,6 +231,12 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           if ($edit) {
             $out['edit'] = $edit;
           }
+        }
+        if ($column['type'] === 'html') {
+          if (is_array($out['val'])) {
+            $out['val'] = implode(', ', $out['val']);
+          }
+          $out['val'] = \CRM_Utils_String::purifyHTML($out['val']);
         }
         break;
 
@@ -722,7 +729,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return string
    */
   private function replaceTokens($tokenExpr, $data, $format, $index = 0) {
-    if (strpos($tokenExpr, '[') !== FALSE) {
+    if (strpos(($tokenExpr ?? ''), '[') !== FALSE) {
       foreach ($this->getTokens($tokenExpr) as $token) {
         $val = $data[$token] ?? NULL;
         if (isset($val) && $format === 'view') {
@@ -733,7 +740,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         if ($format === 'url' && (!isset($replacement) || $replacement === '')) {
           return NULL;
         }
-        $tokenExpr = str_replace('[' . $token . ']', $replacement, $tokenExpr);
+        $tokenExpr = str_replace('[' . $token . ']', ($replacement ?? ''), ($tokenExpr ?? ''));
       }
     }
     return $tokenExpr;

@@ -2555,7 +2555,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
       // communication Prefferance
       $preffComm = $comm = [];
       $comm = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-        $contact->preferred_communication_method
+        ($contact->preferred_communication_method ?? '')
       );
       foreach ($comm as $value) {
         $preffComm[$value] = 1;

@@ -337,16 +337,16 @@ class CRM_Utils_Date {
         }
       }
       else {
-        if (strpos($dateString, '-')) {
+        if (strpos(($dateString ?? ''), '-')) {
           $month = (int) substr($dateString, 5, 2);
           $day = (int) substr($dateString, 8, 2);
         }
         else {
-          $month = (int) substr($dateString, 4, 2);
-          $day = (int) substr($dateString, 6, 2);
+          $month = (int) substr(($dateString ?? ''), 4, 2);
+          $day = (int) substr(($dateString ?? ''), 6, 2);
         }
 
-        if (strlen($dateString) > 10) {
+        if (strlen(($dateString ?? '')) > 10) {
           $format = $config->dateformatDatetime;
         }
         elseif ($day > 0) {
@@ -481,12 +481,12 @@ class CRM_Utils_Date {
    *   date/datetime in ISO format
    */
   public static function mysqlToIso($mysql) {
-    $year = substr($mysql, 0, 4);
-    $month = substr($mysql, 4, 2);
-    $day = substr($mysql, 6, 2);
-    $hour = substr($mysql, 8, 2);
-    $minute = substr($mysql, 10, 2);
-    $second = substr($mysql, 12, 2);
+    $year = substr(($mysql ?? ''), 0, 4);
+    $month = substr(($mysql ?? ''), 4, 2);
+    $day = substr(($mysql ?? ''), 6, 2);
+    $hour = substr(($mysql ?? ''), 8, 2);
+    $minute = substr(($mysql ?? ''), 10, 2);
+    $second = substr(($mysql ?? ''), 12, 2);
 
     $iso = '';
     if ($year) {
@@ -525,7 +525,7 @@ class CRM_Utils_Date {
    */
   public static function isoToMysql($iso) {
     $dropArray = ['-' => '', ':' => '', ' ' => ''];
-    return strtr($iso, $dropArray);
+    return strtr(($iso ?? ''), $dropArray);
   }
 
   /**
@@ -543,7 +543,7 @@ class CRM_Utils_Date {
   public static function convertToDefaultDate(&$params, $dateType, $dateParam) {
     $now = getdate();
 
-    $value = NULL;
+    $value = '';
     if (!empty($params[$dateParam])) {
       // suppress hh:mm or hh:mm:ss if it exists CRM-7957
       $value = preg_replace("/(\s(([01]\d)|[2][0-3])(:([0-5]\d)){1,2})$/", "", $params[$dateParam]);
@@ -876,8 +876,8 @@ class CRM_Utils_Date {
     if ($relative) {
       list($term, $unit) = explode('.', $relative, 2);
       $dateRange = self::relativeToAbsolute($term, $unit);
-      $from = substr($dateRange['from'], 0, 8);
-      $to = substr($dateRange['to'], 0, 8);
+      $from = substr(($dateRange['from'] ?? ''), 0, 8);
+      $to = substr(($dateRange['to'] ?? ''), 0, 8);
       // @todo fix relativeToAbsolute & add tests
       // relativeToAbsolute returns 8 char date strings
       // or 14 char date + time strings.

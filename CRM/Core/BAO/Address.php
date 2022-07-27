@@ -479,7 +479,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       // added this for CRM 1200
       'address_id' => $this->id,
       // CRM-4003
-      'address_name' => str_replace('', ' ', $this->name),
+      'address_name' => str_replace('', ' ', ($this->name ?? '')),
       'street_address' => $this->street_address,
       'supplemental_address_1' => $this->supplemental_address_1,
       'supplemental_address_2' => $this->supplemental_address_2,
@@ -774,7 +774,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
     // the DB to fatal
     $fields = CRM_Core_BAO_Address::fields();
     foreach ($fields as $fieldname => $field) {
-      if (!empty($field['maxlength']) && strlen(CRM_Utils_Array::value($fieldname, $parseFields)) > $field['maxlength']) {
+      if (!empty($field['maxlength']) && strlen(($parseFields[$fieldname] ?? '')) > $field['maxlength']) {
         return $emptyParseFields;
       }
     }

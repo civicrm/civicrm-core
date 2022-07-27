@@ -52,6 +52,7 @@ class CRM_Contact_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $form = $this->getPDFForm([
       'pdf_file_name' => $pdfFileName,
       'subject' => $activitySubject,
+      'html_message' => '<p></p>',
     ], [$this->contactId], $isLiveMode);
     $fileNameAssigned = $this->submitForm($form)['fileName'];
     $this->assertEquals($expectedFilename, $fileNameAssigned);

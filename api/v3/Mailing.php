@@ -618,7 +618,7 @@ function civicrm_api3_mailing_send_test($params) {
   $job = civicrm_api3('MailingJob', 'create', $testEmailParams);
   CRM_Mailing_BAO_Mailing::getRecipients($testEmailParams['mailing_id']);
   $testEmailParams['job_id'] = $job['id'];
-  $testEmailParams['emails'] = array_key_exists('test_email', $testEmailParams) ? explode(',', strtolower($testEmailParams['test_email'])) : NULL;
+  $testEmailParams['emails'] = array_key_exists('test_email', $testEmailParams) ? explode(',', strtolower($testEmailParams['test_email'] ?? '')) : NULL;
   if (!empty($params['test_email'])) {
     $query = CRM_Utils_SQL_Select::from('civicrm_email e')
       ->select(['e.id', 'e.contact_id', 'e.email'])

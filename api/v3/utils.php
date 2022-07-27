@@ -1334,9 +1334,28 @@ function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
   else {
     // If we have custom fields the BAO may have taken care of it or we may have to.
     // DAO::writeRecord always handles custom data.
-    // Otherwise guess based on the $extendsMap hard-coded list of BAOs that take care of custom data.
-    if (isset($params['custom']) && $fct !== 'writeRecord' && empty(CRM_Core_BAO_CustomQuery::$extendsMap[$entity])) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($entity)), $bao->id);
+    if (isset($params['custom']) && $fct !== 'writeRecord') {
+      // List of BAOs that write custom data in their create or add function.
+      $alreadyHandled = array_keys(CRM_Core_BAO_CustomQuery::$extendsMap);
+      $alreadyHandled[] = 'ActivityContact';
+      $alreadyHandled[] = 'Batch';
+      $alreadyHandled[] = 'CustomField';
+      $alreadyHandled[] = 'EntityBatch';
+      $alreadyHandled[] = 'IM';
+      $alreadyHandled[] = 'Mailing';
+      $alreadyHandled[] = 'MailingAB';
+      $alreadyHandled[] = 'OpenID';
+      $alreadyHandled[] = 'Phone';
+      $alreadyHandled[] = 'PledgePayment';
+      $alreadyHandled[] = 'PriceField';
+      $alreadyHandled[] = 'PriceFieldValue';
+      $alreadyHandled[] = 'RelationshipType';
+      $alreadyHandled[] = 'SavedSearch';
+      $alreadyHandled[] = 'Tag';
+      $alreadyHandled[] = 'Website';
+      if (!in_array($entity, $alreadyHandled)) {
+        CRM_Core_BAO_CustomValueTable::store($params['custom'], CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($entity)), $bao->id);
+      }
     }
     $values = [];
     _civicrm_api3_object_to_array($bao, $values[$bao->id]);
@@ -1449,7 +1468,17 @@ function _civicrm_api3_custom_data_get(&$returnArray, $checkPermission, $entity,
       // Shim to restore legacy behavior of ContactReference custom fields
       if (!empty($fieldInfo[$id]) && $fieldInfo[$id]['data_type'] === 'ContactReference') {
         $returnArray['custom_' . $id . '_id'] = $returnArray[$key . '_id'] = $val;
-        $returnArray['custom_' . $id] = $returnArray[$key] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $val, 'sort_name');
+
+        if (is_array($val)) {
+          $lookupValues = [];
+          foreach ($val as $contactId) {
+            $lookupValues[] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'sort_name');
+          }
+          $returnArray['custom_' . $id] = $returnArray[$key] = $lookupValues;
+        }
+        else {
+          $returnArray['custom_' . $id] = $returnArray[$key] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $val, 'sort_name');
+        }
       }
     }
   }
@@ -1607,7 +1636,7 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields) {
 
       case CRM_Utils_Type::T_MONEY:
         [$fieldValue, $op] = _civicrm_api3_field_value_check($params, $fieldName);
-        if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
+        if (strpos(($op ?? ''), 'NULL') !== FALSE || strpos(($op ?? ''), 'EMPTY') !== FALSE) {
           break;
         }
         foreach ((array) $fieldValue as $fieldvalue) {
@@ -1767,7 +1796,7 @@ function _civicrm_api3_validate_constraint($fieldValue, $fieldName, $fieldInfo, 
  */
 function _civicrm_api3_validate_unique_key(&$params, &$fieldName) {
   [$fieldValue, $op] = _civicrm_api3_field_value_check($params, $fieldName);
-  if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
+  if (strpos(($op ?? ''), 'NULL') !== FALSE || strpos(($op ?? ''), 'EMPTY') !== FALSE) {
     return;
   }
   $existing = civicrm_api($params['entity'], 'get', [
@@ -2207,7 +2236,7 @@ function _civicrm_api3_resolve_contactID($contactIdExpr) {
  */
 function _civicrm_api3_validate_html(&$params, &$fieldName, $fieldInfo) {
   [$fieldValue, $op] = _civicrm_api3_field_value_check($params, $fieldName);
-  if (strpos($op, 'NULL') || strpos($op, 'EMPTY')) {
+  if (strpos(($op ?? ''), 'NULL') || strpos(($op ?? ''), 'EMPTY')) {
     return;
   }
 }

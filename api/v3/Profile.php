@@ -193,7 +193,7 @@ function civicrm_api3_profile_submit($params) {
     $contactEntities = ['contact', 'individual', 'organization', 'household'];
     $locationEntities = ['email', 'address', 'phone', 'website', 'im'];
 
-    $entity = strtolower(CRM_Utils_Array::value('entity', $field));
+    $entity = strtolower(CRM_Utils_Array::value('entity', $field, ''));
     if ($entity && !in_array($entity, array_merge($contactEntities, $locationEntities))) {
       switch ($entity) {
         case 'note':

@@ -1529,10 +1529,10 @@ class CRM_Report_Form extends CRM_Core_Form {
     $this->sqlArray[] = $sql;
     foreach ($this->sqlArray as $sql) {
       foreach (['LEFT JOIN'] as $term) {
-        $sql = str_replace($term, '<br>  ' . $term, $sql);
+        $sql = str_replace($term, '<br>  ' . $term, ($sql ?? ''));
       }
       foreach (['FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'LIMIT', ';'] as $term) {
-        $sql = str_replace($term, '<br><br>' . $term, $sql);
+        $sql = str_replace($term, '<br><br>' . $term, ($sql ?? ''));
       }
       $this->sqlFormattedArray[] = $sql;
       $this->assign('sql', implode(';<br><br><br><br>', $this->sqlFormattedArray));
@@ -2287,7 +2287,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       $sqlOP = $this->getSQLOperator($relative);
       return "( {$fieldName} {$sqlOP} )";
     }
-    if (strlen($to) === 10) {
+    if (strlen($to ?? '') === 10) {
       // If we just have the date we assume the end of that day.
       $to .= ' 23:59:59';
     }
@@ -3443,7 +3443,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
             if (!empty($this->_params["{$fieldName}_relative"])) {
               [$from, $to] = CRM_Utils_Date::getFromTo($this->_params["{$fieldName}_relative"], NULL, NULL);
             }
-            if (strlen($to) === 10) {
+            if (strlen($to ?? '') === 10) {
               // If we just have the date we assume the end of that day.
               $to .= ' 23:59:59';
             }
@@ -3949,7 +3949,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   public function buildPermissionClause() {
     $ret = [];
     foreach ($this->selectedTables() as $tableName) {
-      $baoName = str_replace('_DAO_', '_BAO_', CRM_Core_DAO_AllCoreTables::getClassForTable($tableName));
+      $baoName = str_replace('_DAO_', '_BAO_', (CRM_Core_DAO_AllCoreTables::getClassForTable($tableName) ?? ''));
       if ($baoName && class_exists($baoName) && !empty($this->_columns[$tableName]['alias'])) {
         $tableAlias = $this->_columns[$tableName]['alias'];
         $clauses = array_filter($baoName::getSelectWhereClause($tableAlias));

@@ -32,7 +32,7 @@
 
     <div class="form-group" ng-class="{'has-error': !!config_form.server_route.$error.pattern}">
       <label for="af_config_form_server_route">
-        {{:: ts('Page') }}
+        {{:: ts('Page Route') }}
       </label>
       <input ng-model="editor.afform.server_route" name="server_route" class="form-control" id="af_config_form_server_route" pattern="^civicrm\/[-0-9a-zA-Z\/_]+$" onfocus="this.value = this.value || 'civicrm/'" onblur="if (this.value === 'civicrm/') this.value = ''" title="{{:: ts('Path must begin with &quot;civicrm/&quot;') }}" ng-model-options="editor.debounceMode">
       <p class="help-block">{{:: ts('Expose the form as a standalone webpage. (Example: "civicrm/my-form")') }}</p>
@@ -54,11 +54,32 @@
     </div>
 
     <div class="form-group">
-      <label>
-        <input type="checkbox" ng-model="editor.afform.is_dashlet">
-        {{:: ts('Add to Dashboard') }}
-      </label>
-      <p class="help-block">{{:: ts('Allow CiviCRM users to add the form to their home dashboard.') }}</p>
+      <div class="form-inline">
+        <label ng-class="{disabled: !editor.afform.server_route}">
+          <input type="checkbox" ng-checked="editor.afform.server_route && editor.afform.navigation" ng-disabled="!editor.afform.server_route" ng-click="editor.toggleNavigation()">
+          {{:: ts('Add to Navigation Menu') }}
+        </label>
+        <div class="form-group" ng-if="editor.afform.navigation">
+          <input class="form-control" ng-model="editor.afform.navigation.label" ng-model-options="editor.debounceMode" placeholder="{{:: ts('Title') }}" required>
+          <span ng-if="!editor.navigationMenu">
+            <input class="form-control loading" disabled crm-ui-select="{placeholder: ts('Loading menu items'), data: []}">
+          </span>
+          <span ng-if="editor.navigationMenu">
+            <input class="form-control" ng-model="editor.afform.navigation.parent"
+                   crm-ui-select="{allowClear: true, placeholder: ts('Top Level'), data: editor.navigationMenu || []}">
+          </span>
+          <label for="afform-admin-navigation-weight">{{:: ts('Order') }}</label>
+          <input class="form-control" id="afform-admin-navigation-weight" type="number" placeholder="{{:: ts('Order') }}" min="0" step="1" ng-model="editor.afform.navigation.weight" required>
+        </div>
+      </div>
+      <p class="help-block disabled" ng-if="!editor.afform.server_route">{{:: ts('Requires a page route') }}</p>
+    </div>
+
+    <div class="form-group" ng-show="!!editor.afform.navigation || editor.afform.contact_summary === 'tab'">
+      <div class="form-inline">
+        <label for="afform_icon">{{:: ts('Icon') }}</label>
+        <input required id="afform_icon" ng-model="editor.afform.icon" crm-ui-icon-picker class="form-control">
+      </div>
     </div>
 
     <div class="form-group">
@@ -71,12 +92,20 @@
           <option value="block">{{:: ts('As Block') }}</option>
           <option value="tab">{{:: ts('As Tab') }}</option>
         </select>
-        <div class="form-group" ng-show="editor.afform.contact_summary === 'tab'">
-          <input required ng-model="editor.afform.icon" crm-ui-icon-picker class="form-control">
-        </div>
       </div>
-      <p class="help-block">{{:: ts('Placement can be configured using the Contact Layout Editor.') }}</p>
+      <p class="help-block" ng-show="editor.afform.contact_summary">
+        {{:: ts('Placement can be configured using the Contact Layout Editor.') }}
+      </p>
     </div>
+
+    <div class="form-group">
+      <label>
+        <input type="checkbox" ng-model="editor.afform.is_dashlet">
+        {{:: ts('Add to Dashboard') }}
+      </label>
+      <p class="help-block">{{:: ts('Allow CiviCRM users to add the form to their home dashboard.') }}</p>
+    </div>
+
   </fieldset>
 
   <!--  Submit actions are only applicable to form types with a submit button (exclude blocks and search forms) -->
@@ -95,7 +124,10 @@
       <label for="af_config_redirect">
         {{:: ts('Post-Submit Page') }}
       </label>
-      <input ng-model="editor.afform.redirect" name="redirect" class="form-control" id="af_config_redirect" title="{{:: ts('Post-Submit Page') }}" pattern="^((http|https):\/\/|\/|civicrm\/)[-0-9a-zA-Z\/_.]\S+$" title="{{:: ts('Post-Submit Page must be either an absolute url, a relative url or a path starting with CiviCRM') }}" ng-model-options="editor.debounceMode" >
+      <div class="input-group">
+        <input ng-model="editor.afform.redirect" name="redirect" class="form-control" id="af_config_redirect" title="{{:: ts('Post-Submit Page') }}" pattern="^((http|https):\/\/|\/|civicrm\/)[-0-9a-zA-Z\/_.]\S+$" title="{{:: ts('Post-Submit Page must be either an absolute url, a relative url or a path starting with CiviCRM') }}" ng-model-options="editor.debounceMode" >
+        <af-gui-token-select class="input-group-addon" model="editor.afform" field="redirect"></af-gui-token-select>
+      </div>
       <p class="help-block">{{:: ts('Enter a URL or path that the form should redirect to following a successful submission.') }}</p>
     </div>
   </fieldset>

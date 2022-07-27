@@ -317,7 +317,7 @@
         var info = parseExpr(fieldExpr),
           field = (_.findWhere(info.args, {type: 'field'}) || {}).field || {},
           values = _.merge({
-            type: 'field',
+            type: field.input_type === 'RichTextEditor' ? 'html' : 'field',
             key: info.alias,
             dataType: (info.fn && info.fn.data_type) || field.data_type
           }, defaults);

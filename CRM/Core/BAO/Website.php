@@ -26,6 +26,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    *
    * @param array $params
    *
+   * @deprecated
    * @return CRM_Core_DAO_Website
    * @throws \CRM_Core_Exception
    */
@@ -36,8 +37,6 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
   /**
    * Create website.
    *
-   * If called in a legacy manner this, temporarily, fails back to calling the legacy function.
-   *
    * @param array $params
    *
    * @return CRM_Core_DAO_Website
@@ -46,7 +45,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    */
   public static function add($params) {
     CRM_Core_Error::deprecatedFunctionWarning('use apiv4');
-    return self::create($params);
+    return self::writeRecord($params);
   }
 
   /**

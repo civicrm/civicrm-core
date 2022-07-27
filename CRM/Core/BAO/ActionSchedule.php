@@ -174,6 +174,7 @@ FROM civicrm_action_schedule cas
    * @param array $params
    *   An assoc array of name/value pairs.
    *
+   * @deprecated
    * @return CRM_Core_DAO_ActionSchedule
    * @throws \CRM_Core_Exception
    */

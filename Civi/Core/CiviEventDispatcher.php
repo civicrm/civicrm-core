@@ -98,7 +98,7 @@ class CiviEventDispatcher extends EventDispatcher {
    *   Ex: 'hook_civicrm_publicEvent'
    *   Ex: '&hook_civicrm_publicEvent' (an alias for 'hook_civicrm_publicEvent' in which the listener abides hook-style ordered parameters).
    *        This notation is handy when attaching via listener-maps (e.g. `getSubscribedEvents()`).
-   * @param callable $listener
+   * @param callable|HookStyleListener $listener
    * @param int $priority
    */
   public function addListener($eventName, $listener, $priority = 0) {
@@ -334,12 +334,12 @@ class CiviEventDispatcher extends EventDispatcher {
     return $this;
   }
 
-  //  /**
-  //   * @return array|NULL
-  //   */
-  //  public function getDispatchPolicy() {
-  //    return  $this->dispatchPolicyRegex === NULL ? NULL : array_merge($this->dispatchPolicyExact, $this->dispatchPolicyRegex);
-  //  }
+  /**
+   * @return array|NULL
+   */
+  public function getDispatchPolicy() {
+    return $this->dispatchPolicyRegex === NULL ? NULL : array_merge($this->dispatchPolicyExact, $this->dispatchPolicyRegex);
+  }
 
   /**
    * Determine whether the dispatch policy applies to a given event.
