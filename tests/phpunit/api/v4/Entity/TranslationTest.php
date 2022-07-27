@@ -20,16 +20,17 @@
 namespace api\v4\Entity;
 
 use api\v4\Api4TestBase;
+use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class TranslationTest extends Api4TestBase implements TransactionalInterface {
+class TranslationTest extends Api4TestBase implements TransactionalInterface, HookInterface {
 
   protected $ids = [];
 
-  public function getCreateOKExamples() {
+  public function getCreateOKExamples(): array {
     $es = [];
 
     $es['asDraft'] = [
@@ -132,7 +133,7 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface {
     return $es;
   }
 
-  public function getUpdateBadExamples() {
+  public function getUpdateBadExamples(): array {
     $createOk = $this->getCreateOKExamples()['asDraft'][0];
     $bads = $this->getCreateBadExamples();
 
@@ -150,10 +151,15 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface {
   }
 
   /**
+   * Test valid creation.
+   *
    * @dataProvider getCreateOKExamples
+   *
    * @param array $record
+   *
+   * @throws \API_Exception
    */
-  public function testCreateOK($record) {
+  public function testCreateOK(array $record): void {
     $record = $this->fillRecord($record);
     $createResults = \civicrm_api4('Translation', 'create', [
       'checkPermissions' => FALSE,
@@ -170,11 +176,12 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface {
 
   /**
    * @dataProvider getCreateBadExamples
+   *
    * @param array $record
    * @param string $errorRegex
    *   Regular expression to compare against the error message.
    */
-  public function testCreateBad($record, $errorRegex) {
+  public function testCreateBad(array $record, string $errorRegex): void {
     $record = $this->fillRecord($record);
     try {
       \civicrm_api4('Translation', 'create', [
@@ -197,7 +204,7 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface {
    * @throws \API_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  public function testUpdateBad($createRecord, $badUpdate, $errorRegex) {
+  public function testUpdateBad($createRecord, $badUpdate, $errorRegex): void {
     $record = $this->fillRecord($createRecord);
     $createResults = \civicrm_api4('Translation', 'create', [
       'checkPermissions' => FALSE,
@@ -232,6 +239,16 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface {
       $record['entity_id'] = $this->ids['*EVENT*'] = $eventId;
     }
     return $record;
+  }
+
+  /**
+   * Mark these fields as translatable.
+   *
+   * @see CRM_Utils_Hook::translateFields
+   */
+  public static function hook_civicrm_translateFields(&$fields): void {
+    $fields['civicrm_event']['description'] = TRUE;
+    $fields['civicrm_event']['title'] = TRUE;
   }
 
 }
