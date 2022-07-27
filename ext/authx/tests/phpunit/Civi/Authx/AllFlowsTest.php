@@ -189,8 +189,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 public function testInvalidJwt($flowType): void {
   $http = $this->createGuzzle(['http_errors' => FALSE]);
 
-  $cred = $this->credJwt($this->getDemoCID()); // RED
-  // $cred = $this->credJwt('Bearer thisisnotavalidjwt');
+  $cred = $this->credJwt('Bearer thisisnotavalidjwt');
 
   $flowFunc = 'auth' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $flowType));
   /** @var \Psr\Http\Message\RequestInterface $request */
