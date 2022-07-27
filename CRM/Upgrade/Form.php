@@ -877,17 +877,7 @@ SET    version = '$version'
    * @return bool
    */
   public static function doFinalMessages(CRM_Queue_TaskContext $ctx, $originalVer, $latestVer, $postUpgradeMessageFile): bool {
-    // NOTE: This step should be automated circa 5.53.
-    $originalMajorMinor = array_slice(explode('.', $originalVer), 0, 2);
-    $latestMajorMinor = array_slice(explode('.', $latestVer), 0, 2);
-    if ($originalMajorMinor !== $latestMajorMinor) {
-      file_put_contents($postUpgradeMessageFile,
-        '<br/><br/>' . ts('<strong>WARNING</strong>: Core extensions may also require database updates. Please <a %1>execute extension updates</a> immediately.', [
-          1 => sprintf('href="%s" target="_blank" ', CRM_Utils_System::url('civicrm/admin/extensions/upgrade', 'reset=1', TRUE)),
-        ]),
-        FILE_APPEND
-      );
-    }
+    // There are currently no final messages to list. However, this stub may be useful for future messages.
     return TRUE;
   }
 
