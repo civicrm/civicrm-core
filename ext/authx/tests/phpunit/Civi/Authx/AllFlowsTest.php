@@ -95,6 +95,14 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     return $exs;
   }
 
+  public function getFlowTypes() {
+    $exs = [];
+    $exs[] = ['param'];
+    $exs[] = ['header'];
+    $exs[] = ['xheader'];
+    return $exs;
+  }
+
   public function testAnonymous(): void {
     $http = $this->createGuzzle(['http_errors' => FALSE]);
 
@@ -168,6 +176,29 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     if (!in_array('sendsExcessCookies', $this->quirks)) {
       $this->assertNoCookies($response);
     }
+  }
+
+  /**
+   * Send a request using a jwt that has expired. Assert that it fails
+   *
+   * @param string $credType
+   *   The type of credential to put in the `Authorization:` header.
+   *
+   * @dataProvider getFlowTypes
+   */
+  public function testExpiredJwt($flowType): void {
+    $http = $this->createGuzzle(['http_errors' => FALSE]);
+
+    $cred = $this->credJwt($this->getDemoCID(), TRUE);
+    $flowFunc = 'auth' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $flowType));
+    /** @var \Psr\Http\Message\RequestInterface $request */
+    $request = $this->$flowFunc($this->requestMyContact(), $cred);
+
+    \Civi::settings()->set("authx_{$flowType}_cred", ['jwt']);
+    $response = $http->send($request);
+    // Test expected to fail, confirming red
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), 'jwt', $flowType, $response);
+    // $this->assertNotAuthenticated('prohibit', $response);
   }
 
   /**
@@ -779,12 +810,12 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     return 'Bearer ' . $api_key;
   }
 
-  public function credJwt($cid) {
+  public function credJwt($cid, $expired = FALSE) {
     if (empty(\Civi::service('crypto.registry')->findKeysByTag('SIGN'))) {
       $this->markTestIncomplete('Cannot test JWT. No CIVICRM_SIGN_KEYS are defined.');
     }
     $token = \Civi::service('crypto.jwt')->encode([
-      'exp' => time() + 60 * 60,
+      'exp' => $expired ? time() - 60 * 60 : time() + 60 * 60,
       'sub' => "cid:$cid",
       'scope' => 'authx',
     ]);
