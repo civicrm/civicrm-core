@@ -196,9 +196,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
     \Civi::settings()->set("authx_{$flowType}_cred", ['jwt']);
     $response = $http->send($request);
-    // Test expected to fail, confirming red
-    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), 'jwt', $flowType, $response);
-    // $this->assertNotAuthenticated('prohibit', $response);
+    $this->assertNotAuthenticated('prohibit', $response);
   }
 
   /**
