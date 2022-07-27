@@ -28,6 +28,14 @@ class CRM_Upgrade_Incremental_php_FiveFiftyTwo extends CRM_Upgrade_Incremental_B
    *   The version number matching this function name
    */
   public function upgrade_5_52_alpha1($rev): void {
+    $this->addSnapshotTask('contribution', CRM_Utils_SQL_Select::from('civicrm_contribution')
+      ->where('(contribution_recur_id IS NOT NULL) or (is_template = 1)')
+      ->select(['id', 'contribution_recur_id', 'is_template', 'total_amount'])
+    );
+    $this->addSnapshotTask('contribution_recur', CRM_Utils_SQL_Select::from('civicrm_contribution_recur')
+      ->select(['id', 'amount', 'modified_date'])
+    );
+
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
   }
 
