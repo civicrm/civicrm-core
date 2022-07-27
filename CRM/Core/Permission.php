@@ -1510,6 +1510,7 @@ class CRM_Core_Permission {
       'get' => [
         'access CiviCRM',
       ],
+      'default' => ['administer CiviCRM data'],
     ];
     $permissions['dashboard_contact'] = [
       'default' => [
