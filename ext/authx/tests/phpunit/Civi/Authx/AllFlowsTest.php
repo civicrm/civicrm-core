@@ -178,33 +178,33 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     }
   }
 
-/**
- * Send a request using a jwt that can't be decoded at all. Assert that it fails
- *
- * @param string $credType
- *   The type of credential to put in the `Authorization:` header.
- *
- * @dataProvider getFlowTypes
- */
-public function testInvalidJwt($flowType): void {
-  $http = $this->createGuzzle(['http_errors' => FALSE]);
+  /**
+   * Send a request using a jwt that can't be decoded at all. Assert that it fails
+   *
+   * @param string $flowType
+   *   The "flow" determines how the credential is added on top of the base-request (e.g. adding a parameter or header).
+   *
+   * @dataProvider getFlowTypes
+   */
+  public function testInvalidJwt($flowType): void {
+    $http = $this->createGuzzle(['http_errors' => FALSE]);
 
-  $cred = $this->credJwt('Bearer thisisnotavalidjwt');
+    $cred = $this->credJwt('Bearer thisisnotavalidjwt');
 
-  $flowFunc = 'auth' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $flowType));
-  /** @var \Psr\Http\Message\RequestInterface $request */
-  $request = $this->$flowFunc($this->requestMyContact(), $cred);
+    $flowFunc = 'auth' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $flowType));
+    /** @var \Psr\Http\Message\RequestInterface $request */
+    $request = $this->$flowFunc($this->requestMyContact(), $cred);
 
-  \Civi::settings()->set("authx_{$flowType}_cred", ['jwt']);
-  $response = $http->send($request);
-  $this->assertNotAuthenticated('prohibit', $response);
-}
+    \Civi::settings()->set("authx_{$flowType}_cred", ['jwt']);
+    $response = $http->send($request);
+    $this->assertNotAuthenticated('prohibit', $response);
+  }
 
   /**
    * Send a request using a jwt that has expired. Assert that it fails
    *
-   * @param string $credType
-   *   The type of credential to put in the `Authorization:` header.
+   * @param string $flowType
+   *   The "flow" determines how the credential is added on top of the base-request (e.g. adding a parameter or header).
    *
    * @dataProvider getFlowTypes
    */
