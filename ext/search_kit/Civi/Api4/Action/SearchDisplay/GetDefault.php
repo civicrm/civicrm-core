@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\SearchDisplay;
 
+use Civi\Api4\Generic\Traits\SavedSearchInspectorTrait;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Search\Display;

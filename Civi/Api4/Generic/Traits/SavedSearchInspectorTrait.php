@@ -1,6 +1,6 @@
 <?php
 
-namespace Civi\Api4\Action\SearchDisplay;
+namespace Civi\Api4\Generic\Traits;
 
 use Civi\API\Request;
 use Civi\Api4\Query\SqlExpression;
@@ -174,6 +174,104 @@ trait SavedSearchInspectorTrait {
     // If the entity this column belongs to is being grouped by id, then also no
     $idField = substr($fieldPath, 0, 0 - strlen($field['name'])) . CoreUtil::getIdFieldName($field['entity']);
     return !in_array($idField, $apiParams['groupBy']);
+  }
+
+  /**
+   * @param array $fieldNames
+   *   If multiple field names are given they will be combined in an OR clause
+   * @param mixed $value
+   */
+  protected function applyFilter(array $fieldNames, $value) {
+    // Global setting determines if % wildcard should be added to both sides (default) or only the end of a search string
+    $prefixWithWildcard = \Civi::settings()->get('includeWildCardInName');
+
+    // Based on the first field, decide which clause to add this condition to
+    $fieldName = $fieldNames[0];
+    $field = $this->getField($fieldName);
+    // If field is not found it must be an aggregated column & belongs in the HAVING clause.
+    if (!$field) {
+      $this->_apiParams += ['having' => []];
+      $clause =& $this->_apiParams['having'];
+    }
+    // If field belongs to an EXCLUDE join, it should be added as a join condition
+    else {
+      $prefix = strpos($fieldName, '.') ? explode('.', $fieldName)[0] : NULL;
+      foreach ($this->_apiParams['join'] ?? [] as $idx => $join) {
+        if (($join[1] ?? 'LEFT') === 'EXCLUDE' && (explode(' AS ', $join[0])[1] ?? '') === $prefix) {
+          $clause =& $this->_apiParams['join'][$idx];
+        }
+      }
+    }
+    // Default: add filter to WHERE clause
+    if (!isset($clause)) {
+      $clause =& $this->_apiParams['where'];
+    }
+
+    $filterClauses = [];
+
+    foreach ($fieldNames as $fieldName) {
+      $field = $this->getField($fieldName);
+      $dataType = $field['data_type'] ?? NULL;
+      // Array is either associative `OP => VAL` or sequential `IN (...)`
+      if (is_array($value)) {
+        $value = array_filter($value, [$this, 'hasValue']);
+        // If array does not contain operators as keys, assume array of values
+        if (array_diff_key($value, array_flip(CoreUtil::getOperators()))) {
+          // Use IN for regular fields
+          if (empty($field['serialize'])) {
+            $filterClauses[] = [$fieldName, 'IN', $value];
+          }
+          // Use an OR group of CONTAINS for array fields
+          else {
+            $orGroup = [];
+            foreach ($value as $val) {
+              $orGroup[] = [$fieldName, 'CONTAINS', $val];
+            }
+            $filterClauses[] = ['OR', $orGroup];
+          }
+        }
+        // Operator => Value array
+        else {
+          $andGroup = [];
+          foreach ($value as $operator => $val) {
+            $andGroup[] = [$fieldName, $operator, $val];
+          }
+          $filterClauses[] = ['AND', $andGroup];
+        }
+      }
+      elseif (!empty($field['serialize'])) {
+        $filterClauses[] = [$fieldName, 'CONTAINS', $value];
+      }
+      elseif (!empty($field['options']) || in_array($dataType, ['Integer', 'Boolean', 'Date', 'Timestamp'])) {
+        $filterClauses[] = [$fieldName, '=', $value];
+      }
+      elseif ($prefixWithWildcard) {
+        $filterClauses[] = [$fieldName, 'CONTAINS', $value];
+      }
+      else {
+        $filterClauses[] = [$fieldName, 'LIKE', $value . '%'];
+      }
+    }
+    // Single field
+    if (count($filterClauses) === 1) {
+      $clause[] = $filterClauses[0];
+    }
+    else {
+      $clause[] = ['OR', $filterClauses];
+    }
+  }
+
+  /**
+   * Checks if a filter contains a non-empty value
+   *
+   * "Empty" search values are [], '', and NULL.
+   * Also recursively checks arrays to ensure they contain at least one non-empty value.
+   *
+   * @param $value
+   * @return bool
+   */
+  protected function hasValue($value) {
+    return $value !== '' && $value !== NULL && (!is_array($value) || array_filter($value, [$this, 'hasValue']));
   }
 
 }
