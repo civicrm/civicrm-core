@@ -175,7 +175,7 @@ class ActionObjectProvider implements EventSubscriberInterface, ProviderInterfac
       array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
     );
     foreach ($locations as $location) {
-      $dir = \CRM_Utils_File::addTrailingSlash(dirname($location)) . 'Civi/Api4';
+      $dir = \CRM_Utils_File::addTrailingSlash(dirname($location ?? '')) . 'Civi/Api4';
       if (is_dir($dir)) {
         foreach (glob("$dir/*.php") as $file) {
           $className = 'Civi\Api4\\' . basename($file, '.php');

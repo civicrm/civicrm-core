@@ -473,7 +473,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
           // allow for 0 value.
           if (!empty($fields['option_amount'][$index]) ||
-            strlen($fields['option_amount'][$index]) > 0
+            strlen($fields['option_amount'][$index] ?? '') > 0
           ) {
             $noAmount = 0;
           }

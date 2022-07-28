@@ -140,7 +140,7 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
     $query['casContactIdField'] = 'e.contact_id';
     $query['casEntityIdField'] = 'e.id';
     $query['casContactTableAlias'] = NULL;
-    $query['casDateField'] = str_replace('event_', 'r.', $schedule->start_action_date);
+    $query['casDateField'] = str_replace('event_', 'r.', ($schedule->start_action_date ?? ''));
     if (empty($query['casDateField']) && $schedule->absolute_date) {
       $query['casDateField'] = "'" . CRM_Utils_Type::escape($schedule->absolute_date, 'String') . "'";
     }

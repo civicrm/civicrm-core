@@ -917,7 +917,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
       $ufJoinDAO->module = $module;
       $ufJoinDAO->entity_id = $params['id'];
       $ufJoinDAO->find(TRUE);
-      $jsonData = json_decode($ufJoinDAO->module_data);
+      $jsonData = json_decode($ufJoinDAO->module_data ?? '');
       if ($jsonData) {
         $json[$module] = array_merge((array) $jsonData->$module, $json[$module]);
       }

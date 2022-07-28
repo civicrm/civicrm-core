@@ -342,8 +342,8 @@ class CRM_Utils_Date {
     $fullWeekdayNames = self::getFullWeekdayNames();
     $abbrWeekdayNames = self::getAbbrWeekdayNames();
 
-    // backwards compatability with %D being the equivilant of %m/%d/%y
-    $format = str_replace('%D', '%m/%d/%y', $format);
+    // backwards compatibility with %D being the equivalent of %m/%d/%y
+    $format = str_replace('%D', '%m/%d/%y', ($format ?? ''));
 
     if (!$format) {
       $config = CRM_Core_Config::singleton();

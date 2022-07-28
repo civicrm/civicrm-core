@@ -566,7 +566,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['state'] = $params['state_province'];
     $args['countryCode'] = $params['country'];
     $args['zip'] = $params['postal_code'];
-    $args['desc'] = substr(CRM_Utils_Array::value('description', $params), 0, 127);
+    $args['desc'] = substr(($params['description'] ?? ''), 0, 127);
     $args['custom'] = $params['accountingCode'] ?? NULL;
 
     // add CiviCRM BN code
@@ -1096,7 +1096,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     $p = [];
     foreach ($args as $n => $v) {
-      $p[] = "$n=" . urlencode($v);
+      $p[] = "$n=" . urlencode($v ?? '');
     }
 
     //NVPRequest for submitting to server

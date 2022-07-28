@@ -183,8 +183,8 @@ SELECT module,is_reserved
       }
 
       // we do this gross hack since qf also does entity replacement
-      $this->_postURL = str_replace('&amp;', '&', $this->_postURL);
-      $this->_cancelURL = str_replace('&amp;', '&', $this->_cancelURL);
+      $this->_postURL = str_replace('&amp;', '&', ($this->_postURL ?? ''));
+      $this->_cancelURL = str_replace('&amp;', '&', ($this->_cancelURL ?? ''));
 
       // also retain error URL if set
       $this->_errorURL = $_POST['errorURL'] ?? NULL;
