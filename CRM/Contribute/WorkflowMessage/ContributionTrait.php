@@ -29,6 +29,30 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
   public $isShowTax;
 
   /**
+   * Line items associated with the contribution.
+   *
+   * @var array
+   *
+   * @scope tplParams
+   */
+  public $lineItems;
+
+  /**
+   * Tax rates paid.
+   *
+   * Generally this would look like
+   *
+   * ['10.00%' => 100]
+   *
+   * To indicate that $100 was changed for 10% tax.
+   *
+   * @var array
+   *
+   * @scope tplParams
+   */
+  public $taxRateBreakdown;
+
+  /**
    * @var CRM_Financial_BAO_Order
    */
   private $order;
@@ -77,6 +101,49 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
       return FALSE;
     }
     return !$this->order->getPriceSetMetadata()['is_quick_config'];
+  }
+
+  /**
+   * Get the line items.
+   *
+   * @return array
+   */
+  public function getLineItems(): array {
+    if (isset($this->lineItems)) {
+      return $this->lineItems;
+    }
+    $order = $this->getOrder();
+    if (!$order) {
+      // This would only be the case transitionally.
+      // Since this is a trait it is used by templates which don't (yet)
+      // always have the contribution ID available as well as migrated ones.
+      return [];
+    }
+    return $order->getLineItems();
+  }
+
+  /**
+   * Get the line items.
+   *
+   * @return array
+   */
+  public function getTaxRateBreakdown(): array {
+    if (isset($this->taxRateBreakdown)) {
+      return $this->taxRateBreakdown;
+    }
+    $this->taxRateBreakdown = [];
+    foreach ($this->getLineItems() as $lineItem) {
+      $this->taxRateBreakdown[$lineItem['tax_rate']] = [
+        'amount' => $lineItem['tax_amount'] ?? 0,
+        'rate' => $lineItem['tax_rate'],
+        'percentage' => sprintf('%.2f', $lineItem['tax_rate']),
+      ];
+    }
+    if (array_keys($this->taxRateBreakdown) === [0]) {
+      // If the only tax rate charged is 0% then no tax breakdown is returned.
+      $this->taxRateBreakdown = [];
+    }
+    return $this->taxRateBreakdown;
   }
 
   /**
