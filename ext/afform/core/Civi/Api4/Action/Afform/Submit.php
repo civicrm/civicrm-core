@@ -26,6 +26,15 @@ class Submit extends AbstractProcessor {
   protected $values;
 
   protected function processForm() {
+    // Save submission record
+    if (!empty($this->_afform['create_submission'])) {
+      $submission = AfformSubmission::create(FALSE)
+        ->addValue('contact_id', \CRM_Core_Session::getLoggedInContactID())
+        ->addValue('afform_name', $this->name)
+        ->addValue('data', $this->getValues())
+        ->execute()->first();
+    }
+
     $entityValues = [];
     foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
       $entityValues[$entityName] = [];
@@ -67,19 +76,34 @@ class Submit extends AbstractProcessor {
       \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
     }
 
-    // Save submission record
+    $submissionData = $this->array_insert($this->getValues(), $this->_entityIds);
+    // Update submission record with entity IDs.
     if (!empty($this->_afform['create_submission'])) {
-      $submission = AfformSubmission::create(FALSE)
-        ->addValue('contact_id', \CRM_Core_Session::getLoggedInContactID())
-        ->addValue('afform_name', $this->name)
-        ->addValue('data', $this->_entityIds)
-        ->execute()->first();
+      AfformSubmission::update(FALSE)
+        ->addWhere('id', '=', $submission['id'])
+        ->addValue('data', $submissionData)
+        ->execute();
     }
 
     // Return ids and a token for uploading files
     return [
       ['token' => $this->generatePostSubmitToken()] + $this->_entityIds,
     ];
+  }
+
+  /**
+   * Recursively add entity IDs to the values.
+   */
+  protected function array_insert($arr, $ins) {
+    if (is_array($arr) && is_array($ins)) foreach ($ins as $k => $v) {
+      if (isset($arr[$k]) && is_array($v) && is_array($arr[$k])) {
+        $arr[$k] = $this->array_insert($arr[$k], $v);
+      }
+      else {
+        $arr[$k] = $v;
+      }
+    }
+    return($arr);
   }
 
   /**
