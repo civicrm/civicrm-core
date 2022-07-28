@@ -162,14 +162,15 @@ class CRM_Utils_Date {
   public static function getAbbrWeekdayNames() {
     $key = 'abbrDays_' . \CRM_Core_I18n::getLocale();
     if (empty(\Civi::$statics[__CLASS__][$key])) {
+      $intl_formatter = IntlDateFormatter::create(CRM_Core_I18n::getLocale(), IntlDateFormatter::MEDIUM, IntlDateFormatter::MEDIUM, NULL, IntlDateFormatter::GREGORIAN, 'E');
       $days = [
-        0 => ts('Sun'),
-        1 => ts('Mon'),
-        2 => ts('Tue'),
-        3 => ts('Wed'),
-        4 => ts('Thu'),
-        5 => ts('Fri'),
-        6 => ts('Sat'),
+        0 => $intl_formatter->format(strtotime('Sunday')),
+        1 => $intl_formatter->format(strtotime('Monday')),
+        2 => $intl_formatter->format(strtotime('Tuesday')),
+        3 => $intl_formatter->format(strtotime('Wednesday')),
+        4 => $intl_formatter->format(strtotime('Thursday')),
+        5 => $intl_formatter->format(strtotime('Friday')),
+        6 => $intl_formatter->format(strtotime('Saturday')),
       ];
       // First day of the week
       $firstDay = Civi::settings()->get('weekBegins');
@@ -198,14 +199,15 @@ class CRM_Utils_Date {
   public static function getFullWeekdayNames() {
     $key = 'fullDays_' . \CRM_Core_I18n::getLocale();
     if (empty(\Civi::$statics[__CLASS__][$key])) {
+      $intl_formatter = IntlDateFormatter::create(CRM_Core_I18n::getLocale(), IntlDateFormatter::MEDIUM, IntlDateFormatter::MEDIUM, NULL, IntlDateFormatter::GREGORIAN, 'EEEE');
       $days = [
-        0 => ts('Sunday'),
-        1 => ts('Monday'),
-        2 => ts('Tuesday'),
-        3 => ts('Wednesday'),
-        4 => ts('Thursday'),
-        5 => ts('Friday'),
-        6 => ts('Saturday'),
+        0 => $intl_formatter->format(strtotime('Sunday')),
+        1 => $intl_formatter->format(strtotime('Monday')),
+        2 => $intl_formatter->format(strtotime('Tuesday')),
+        3 => $intl_formatter->format(strtotime('Wednesday')),
+        4 => $intl_formatter->format(strtotime('Thursday')),
+        5 => $intl_formatter->format(strtotime('Friday')),
+        6 => $intl_formatter->format(strtotime('Saturday')),
       ];
       // First day of the week
       $firstDay = Civi::settings()->get('weekBegins');
@@ -230,19 +232,20 @@ class CRM_Utils_Date {
   public static function &getAbbrMonthNames($month = FALSE) {
     $key = 'abbrMonthNames_' . \CRM_Core_I18n::getLocale();
     if (empty(\Civi::$statics[__CLASS__][$key])) {
+      $intl_formatter = IntlDateFormatter::create(CRM_Core_I18n::getLocale(), IntlDateFormatter::MEDIUM, IntlDateFormatter::MEDIUM, NULL, IntlDateFormatter::GREGORIAN, 'MMM');
       \Civi::$statics[__CLASS__][$key] = [
-        1 => ts('Jan'),
-        2 => ts('Feb'),
-        3 => ts('Mar'),
-        4 => ts('Apr'),
-        5 => ts('May'),
-        6 => ts('Jun'),
-        7 => ts('Jul'),
-        8 => ts('Aug'),
-        9 => ts('Sep'),
-        10 => ts('Oct'),
-        11 => ts('Nov'),
-        12 => ts('Dec'),
+        1 => $intl_formatter->format(strtotime('January')),
+        2 => $intl_formatter->format(strtotime('February')),
+        3 => $intl_formatter->format(strtotime('March')),
+        4 => $intl_formatter->format(strtotime('April')),
+        5 => $intl_formatter->format(strtotime('May')),
+        6 => $intl_formatter->format(strtotime('June')),
+        7 => $intl_formatter->format(strtotime('July')),
+        8 => $intl_formatter->format(strtotime('August')),
+        9 => $intl_formatter->format(strtotime('September')),
+        10 => $intl_formatter->format(strtotime('October')),
+        11 => $intl_formatter->format(strtotime('November')),
+        12 => $intl_formatter->format(strtotime('December')),
       ];
     }
     if ($month) {
