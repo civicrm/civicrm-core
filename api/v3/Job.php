@@ -306,19 +306,14 @@ function _civicrm_api3_job_update_greeting_spec(&$params) {
  * @param array $params
  *
  * @return array
+ *
+ * @throws \CRM_Core_Exception
  */
-function civicrm_api3_job_process_pledge($params) {
-  // *** Uncomment the next line if you want automated reminders to be sent
-  // $params['send_reminders'] = true;
-  $result = CRM_Pledge_BAO_Pledge::updatePledgeStatus($params);
-
-  if ($result['is_error'] == 0) {
-    // experiment: detailed execution log is a result here
-    return civicrm_api3_create_success($result['messages']);
+function civicrm_api3_job_process_pledge(array $params): array {
+  if (!CRM_Core_Component::isEnabled('CiviPledge')) {
+    throw new CRM_Core_Exception(ts('%1 is not enabled'), [1 => ['CiviPledge']]);
   }
-  else {
-    return civicrm_api3_create_error($result['error_message']);
-  }
+  return civicrm_api3_create_success(implode("\n\r", CRM_Pledge_BAO_Pledge::updatePledgeStatus($params)));
 }
 
 /**

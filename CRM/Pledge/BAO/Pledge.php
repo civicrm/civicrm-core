@@ -772,11 +772,10 @@ GROUP BY  currency
    * @param array $params
    *
    * @return array
-   * @throws \API_Exception
+   *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
-  public static function updatePledgeStatus($params): array {
+  public static function updatePledgeStatus(array $params): array {
 
     $returnMessages = [];
 
@@ -875,7 +874,7 @@ SELECT  pledge.contact_id              as contact_id,
       );
       if ($newStatus != $pledgeStatus[$pledgeId]) {
         $returnMessages[] = "- status updated to: {$allPledgeStatus[$newStatus]}";
-        $updateCnt += 1;
+        ++$updateCnt;
       }
     }
 
@@ -992,8 +991,7 @@ SELECT  pledge.contact_id              as contact_id,
                 civicrm_api3('activity', 'create', $activityParams);
               }
               catch (CiviCRM_API3_Exception $e) {
-                $returnMessages[] = "Failed creating Activity for Pledge Reminder: " . $e->getMessage();
-                return ['is_error' => 1, 'message' => $returnMessages];
+                throw new CRM_Core_Exception('Failed creating Activity for Pledge Reminder: ' . $e->getMessage());
               }
               $returnMessages[] = "Payment reminder sent to: {$pledgerName} - {$toEmail}";
             }
@@ -1005,7 +1003,7 @@ SELECT  pledge.contact_id              as contact_id,
     // end if ( $sendReminders )
     $returnMessages[] = "{$updateCnt} records updated.";
 
-    return ['is_error' => 0, 'messages' => implode("\n\r", $returnMessages)];
+    return $returnMessages;
   }
 
   /**
