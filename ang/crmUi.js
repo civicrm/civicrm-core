@@ -952,12 +952,15 @@
             // handled in crmUiTab ctrl
             return;
           }
-          if (attrs.crmIcon.substring(0,3) == 'fa-') {
-            $(element).prepend('<i class="crm-i ' + attrs.crmIcon + '" aria-hidden="true"></i> ');
+          if (attrs.crmIcon) {
+            if (attrs.crmIcon.substring(0,3) == 'fa-') {
+              $(element).prepend('<i class="crm-i ' + attrs.crmIcon + '" aria-hidden="true"></i> ');
+            }
+            else {
+              $(element).prepend('<span class="icon ui-icon-' + attrs.crmIcon + '"></span> ');
+            }
           }
-          else {
-            $(element).prepend('<span class="icon ui-icon-' + attrs.crmIcon + '"></span> ');
-          }
+
           // Add crm-* class to non-bootstrap buttons
           if ($(element).is('button:not(.btn)')) {
             $(element).addClass('crm-button');
