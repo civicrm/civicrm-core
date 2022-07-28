@@ -607,6 +607,13 @@ SET    version = '$version'
     // This places the extension-upgrades after `doCoreFinish` - but before new extensions (`addExtensionTask()`)
     $queue->createItem($task, ['weight' => 1500]);
 
+    $task = new CRM_Queue_Task(
+      ['CRM_Upgrade_Form', 'doFinalMessages'],
+      [$currentVer, $latestVer, $postUpgradeMessageFile],
+      'Generate final messages'
+    );
+    $queue->createItem($task, ['weight' => 3000]);
+
     return $queue;
   }
 
@@ -853,6 +860,24 @@ SET    version = '$version'
       // (`upgrade.main` vs `upgrade.finish` or `NULL`).
       // Can we make policy transitions sticky -- eg maybe a setting or session-variable?
     }
+    return TRUE;
+  }
+
+  /**
+   * Generate any standard post-upgrade messages (which are not version-specific).
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param string $originalVer
+   *   the original revision.
+   * @param string $latestVer
+   *   the target (final) revision.
+   * @param string $postUpgradeMessageFile
+   *   path of a modifiable file which lists the post-upgrade messages.
+   *
+   * @return bool
+   */
+  public static function doFinalMessages(CRM_Queue_TaskContext $ctx, $originalVer, $latestVer, $postUpgradeMessageFile): bool {
+    // There are currently no final messages to list. However, this stub may be useful for future messages.
     return TRUE;
   }
 
