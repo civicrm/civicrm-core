@@ -67,7 +67,7 @@
     // Simple wrapper around $.crmDatepicker.
     // example with no time input: <input crm-ui-datepicker="{time: false}" ng-model="myobj.datefield"/>
     // example with custom date format: <input crm-ui-datepicker="{date: 'm/d/y'}" ng-model="myobj.datefield"/>
-    .directive('crmUiDatepicker', function () {
+    .directive('crmUiDatepicker', function ($timeout) {
       return {
         restrict: 'AE',
         require: 'ngModel',
@@ -82,14 +82,17 @@
           element
             .crmDatepicker(scope.crmUiDatepicker)
             .on('change', function() {
-              var requiredLength = 19;
-              if (scope.crmUiDatepicker && scope.crmUiDatepicker.time === false) {
-                requiredLength = 10;
-              }
-              if (scope.crmUiDatepicker && scope.crmUiDatepicker.date === false) {
-                requiredLength = 8;
-              }
-              ngModel.$setValidity('incompleteDateTime', !($(this).val().length && $(this).val().length !== requiredLength));
+              // Because change gets triggered from the $render function we could be either inside or outside the $digest cycle
+              $timeout(function() {
+                var requiredLength = 19;
+                if (scope.crmUiDatepicker && scope.crmUiDatepicker.time === false) {
+                  requiredLength = 10;
+                }
+                if (scope.crmUiDatepicker && scope.crmUiDatepicker.date === false) {
+                  requiredLength = 8;
+                }
+                ngModel.$setValidity('incompleteDateTime', !(element.val().length && element.val().length !== requiredLength));
+              });
             });
         }
       };
