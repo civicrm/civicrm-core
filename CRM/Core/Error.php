@@ -1068,22 +1068,30 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * Output a deprecated function warning to log file.  Deprecated class:function is automatically generated from calling function.
+   * Output a deprecated function warning to log file.
+   *
+   * Deprecated class:function is automatically generated from calling function.
    *
    * @param string $newMethod
    *   description of new method (eg. "buildOptions() method in the appropriate BAO object").
-   * @param string $oldMethod
+   * @param string|null $oldMethod
    *   optional description of old method (if not the calling method). eg. CRM_MyClass::myOldMethodToGetTheOptions()
    */
-  public static function deprecatedFunctionWarning($newMethod, $oldMethod = NULL) {
+  public static function deprecatedFunctionWarning(string $newMethod, ?string $oldMethod = NULL): void {
+    $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4);
     if (!$oldMethod) {
-      $dbt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-      $callerFunction = $dbt[1]['function'] ?? NULL;
-      $callerClass = $dbt[1]['class'] ?? NULL;
+      $callerFunction = $backtrace[1]['function'] ?? NULL;
+      $callerClass = $backtrace[1]['class'] ?? NULL;
       $oldMethod = "{$callerClass}::{$callerFunction}";
     }
     $message = "Deprecated function $oldMethod, use $newMethod.";
-    Civi::log()->warning($message, ['civi.tag' => 'deprecated']);
+    // Add a mini backtrace. Just the function is too little to be meaningful but people are
+    // saying they can't track down where the deprecated calls are coming from.
+    $miniBacktrace = [];
+    foreach ($backtrace as $backtraceLine) {
+      $miniBacktrace[] = ($backtraceLine['class'] ?? '') . '::' . ($backtraceLine['function'] ?? '');
+    }
+    Civi::log()->warning($message . "\n" . implode("\n", $miniBacktrace), ['civi.tag' => 'deprecated']);
     trigger_error($message, E_USER_DEPRECATED);
   }
 
