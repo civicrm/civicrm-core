@@ -17,6 +17,32 @@
  */
 trait CRM_Core_Resources_CollectionTestTrait {
 
+  use CRM_Core_Resources_CollectionAdderTrait;
+
+  /**
+   * Add an item to the collection.
+   *
+   * @param array $snippet
+   * @return array
+   *   The full/computed snippet (with defaults applied).
+   * @see CRM_Core_Resources_CollectionInterface::add()
+   * @see CRM_Core_Resources_CollectionTrait::add()
+   */
+  public function add($snippet) {
+    return $snippet;
+  }
+
+  /**
+   * Locate the 'settings' snippet.
+   *
+   * @param array $options
+   * @return array
+   * @see CRM_Core_Resources_CollectionTrait::findCreateSettingSnippet()
+   */
+  public function &findCreateSettingSnippet($options = []): array {
+    return $options;
+  }
+
   /**
    * @return \CRM_Core_Resources_CollectionInterface
    */
@@ -329,7 +355,7 @@ trait CRM_Core_Resources_CollectionTestTrait {
    */
   public function testStandardSplatParser() {
     $parse = function(...$options) {
-      return CRM_Core_Resources_CollectionAdderTrait::mergeStandardOptions($options, []);
+      return self::mergeStandardOptions($options, []);
     };
     $this->assertEquals([], $parse());
     $this->assertEquals(['weight' => '100'], $parse('100'));
@@ -346,7 +372,7 @@ trait CRM_Core_Resources_CollectionTestTrait {
    */
   public function testSettingsSplatParser() {
     $parse = function(...$options) {
-      return CRM_Core_Resources_CollectionAdderTrait::mergeSettingOptions($options, []);
+      return self::mergeSettingOptions($options, []);
     };
     $this->assertEquals([], $parse());
     $this->assertEquals(['region' => 'oakaneigh'], $parse('oakaneigh'));
