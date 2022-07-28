@@ -21,6 +21,16 @@
  */
 class CRM_Upgrade_Incremental_php_FiveFiftyThree extends CRM_Upgrade_Incremental_Base {
 
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+    if ($rev === '5.53.alpha1') {
+      $postUpgradeMessage .= '<br/>' . ts("WARNING: CiviCRM has changed our the date format variable %1 is outputted when using CRM_Core_Date::customFormat / crmDate.  Please review your <a href='%2' target='_blank'>Date Format</a> settings and your <a href='%3' target='_blank'>system message templates</a> for usage of the %1 variable", [
+        1 => '%A',
+        2 => CRM_Utils_System::url('civicrm/admin/setting/date', ['reset' => 1], TRUE),
+        3 => CRM_Utils_System::url('civicrm/admin/messageTemplates', ['reset' => 1, 'selectedChild' => 'workflow'], TRUE),
+      ]);
+    }
+  }
+
   /**
    * Upgrade step; adds tasks including 'runSql'.
    *
