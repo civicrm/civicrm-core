@@ -28,7 +28,7 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
     $priceSetId = $this->eventPriceSetCreate($feeAmt, $minAmt);
     $priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
     $form->_values['fee'] = $form->_feeBlock = $priceSet['fields'];
-    $form->_values['event'] = $event['values'][$event['id']];
+    $form->_values['event'] = $event;
     $form->_skipDupeRegistrationCheck = 1;
 
     $priceField = $this->callAPISuccess('PriceField', 'get', ['price_set_id' => $priceSetId]);

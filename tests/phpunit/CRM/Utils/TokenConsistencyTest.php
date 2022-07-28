@@ -973,7 +973,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       'description' => 'event description',
       'end_date' => 20081023,
       'registration_end_date' => 20081015,
-      $this->getCustomFieldName('text') => 'my field',
+      $this->getCustomFieldName('text', 4) => 'my field',
       'loc_block_id' => $locationBlockID,
     ])['id'];
     // Create an unrelated participant record so that the ids don't match.

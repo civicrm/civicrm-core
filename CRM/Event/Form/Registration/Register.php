@@ -310,7 +310,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $unsetSubmittedOptions[$val['id']] = $optionFullIds;
       }
       //reset values for all options those are full.
-      CRM_Event_Form_Registration::resetElementValue($unsetSubmittedOptions, $this);
+      CRM_Event_Form_Registration::resetElementValue($unsetSubmittedOptions ?? [], $this);
     }
 
     //set default participant fields, CRM-4320.

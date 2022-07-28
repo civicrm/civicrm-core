@@ -130,7 +130,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testPaymentAllocationOnMultiLineItemEvent() {
+  public function testPaymentAllocationOnMultiLineItemEvent(): void {
     // USE-CASE :
     // 1. Create a Price set with two price fields
     // 2. Register for a Event using both the price field A($55 - qty 1) and B($10 - qty 1)

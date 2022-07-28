@@ -169,10 +169,19 @@ trait CRMTraits_Custom_CustomDataTrait {
    * Generally keys map to data types.
    *
    * @param string $key
+   * @param int $version
    *
    * @return string
+   *
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
    */
-  protected function getCustomFieldName(string $key): string {
+  protected function getCustomFieldName(string $key, $version = 3): string {
+    if ($version === 4) {
+      $field = CustomField::get(FALSE)->addWhere('id', '=', $this->getCustomFieldID($key))
+        ->addSelect('name', 'custom_group_id.name')->execute()->first();
+      return $field['custom_group_id.name'] . '.' . $field['name'];
+    }
     return 'custom_' . $this->getCustomFieldID($key);
   }
 
