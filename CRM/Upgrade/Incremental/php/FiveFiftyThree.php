@@ -21,6 +21,33 @@
  */
 class CRM_Upgrade_Incremental_php_FiveFiftyThree extends CRM_Upgrade_Incremental_Base {
 
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+    if ($rev === '5.53.alpha1') {
+      $postUpgradeMessage .= '<div class="messages warning"><p>' . ts("WARNING: CiviCRM has changed the meaning of the date format specifier %1 when using CRM_Utils_Date::customFormat or {crmDate}. It was identical to %2 and the change will help compatibility with php 8.1.", [
+        1 => '%A',
+        2 => '%P',
+      ]) . '</p>';
+      $usagesInTemplates = self::getTemplatesUsingPercentA();
+      if (!empty($usagesInTemplates)) {
+        $postUpgradeMessage .= '<p>' . ts("The following <a %2>message templates</a> appear to be using the %1 specifier. You will need to manually review and update them to use %3 instead.", [
+          1 => '%A',
+          2 => 'href="' . CRM_Utils_System::url('civicrm/admin/messageTemplates', ['reset' => 1], TRUE) . '" target="_blank"',
+          3 => '%P',
+        ]) . '</p>';
+        $postUpgradeMessage .= '<ul>';
+        foreach ($usagesInTemplates as $id => $title) {
+          $link = CRM_Utils_System::url('civicrm/admin/messageTemplates/add', ['action' => 'update', 'reset' => 1, 'id' => $id], TRUE);
+          $postUpgradeMessage .= "<li><a href='{$link}' target='_blank'>" . htmlspecialchars($title) . '</a></li>';
+        }
+        $postUpgradeMessage .= '</ul></p>';
+      }
+      $postUpgradeMessage .= '<p>' . ts("Your <a %1>Date Format</a> settings have been automatically updated.", [
+        1 => 'href="' . CRM_Utils_System::url('civicrm/admin/setting/date', ['reset' => 1], TRUE) . '" target="_blank"',
+      ]) . '</p>';
+      $postUpgradeMessage .= '</div>';
+    }
+  }
+
   /**
    * Upgrade step; adds tasks including 'runSql'.
    *
@@ -29,6 +56,38 @@ class CRM_Upgrade_Incremental_php_FiveFiftyThree extends CRM_Upgrade_Incremental
    */
   public function upgrade_5_53_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Replace %A specifier in date settings.', 'replacePercentA');
+  }
+
+  public static function replacePercentA($ctx): bool {
+    foreach ([
+      'dateformatDatetime',
+      'dateformatFull',
+      'dateformatPartial',
+      'dateformatYear',
+      'dateformatTime',
+      'dateformatFinancialBatch',
+      'dateformatshortdate',
+    ] as $setting) {
+      $value = \Civi::settings()->get($setting);
+      if ($value && (strpos($value, '%A') !== FALSE)) {
+        $value = strtr($value, ['%A' => '%P']);
+        \Civi::settings()->set($setting, $value);
+      }
+    }
+    return TRUE;
+  }
+
+  public static function getTemplatesUsingPercentA(): array {
+    $usages = [];
+    // is_default has weird meaning - it means the one currently in use, not the default distributed with civi (which is is_reserved).
+    // The "NOT LIKE" part is necessary to avoid false positives because the
+    // event receipt uses it (correctly) with date_format.
+    $dao = CRM_Core_DAO::executeQuery("SELECT id, msg_title FROM civicrm_msg_template WHERE is_default = 1 AND ((msg_html LIKE BINARY '%\\%A%' AND msg_html NOT LIKE BINARY '%date_format:\"\\%A\"%') OR (msg_text LIKE BINARY '%\\%A%' AND msg_text NOT LIKE BINARY '%date_format:\"\\%A\"%') OR (msg_subject LIKE BINARY '%\\%A%' AND msg_subject NOT LIKE BINARY '%date_format:\"\\%A\"%'))");
+    while ($dao->fetch()) {
+      $usages[$dao->id] = $dao->msg_title;
+    }
+    return $usages;
   }
 
 }
