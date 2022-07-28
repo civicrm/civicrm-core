@@ -511,7 +511,7 @@ class CRM_Core_Page {
     $attribs = array_merge($standardAttribs, $attribs);
     foreach ($attribs as $attrib => $val) {
       if (strlen($val)) {
-        $val = htmlspecialchars($val);
+        $val = htmlspecialchars($val, ENT_COMPAT);
         $attribString .= " $attrib=\"$val\"";
       }
     }
