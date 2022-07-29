@@ -287,6 +287,7 @@ SELECT @option_group_id_crs    := max(id) from civicrm_option_group where name =
 SELECT @option_group_id_env    := max(id) from civicrm_option_group where name = 'environment';
 SELECT @option_group_id_default_assignee := max(id) from civicrm_option_group where name = 'activity_default_assignee';
 SELECT @option_group_id_entity_batch_extends := max(id) from civicrm_option_group where name = 'entity_batch_extends';
+SELECT @option_group_id_pdf_format := max(id) from civicrm_option_group where name = 'pdf_format';
 
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
 SELECT @eventCompId      := max(id) FROM civicrm_component where name = 'CiviEvent';
@@ -855,6 +856,9 @@ VALUES
    (@option_group_id_aco, '{ts escape="sql"}Activity Assignees{/ts}', 1, 'Activity Assignees', NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_aco, '{ts escape="sql"}Activity Source{/ts}', 2, 'Activity Source', NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_aco, '{ts escape="sql"}Activity Targets{/ts}', 3, 'Activity Targets', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
+
+-- pdf_format
+   (@option_group_id_pdf_format, '{ts escape="sql"}Invoice PDF Format{/ts}', '{literal}{"metric":"px","margin_top":10,"margin_bottom":0,"margin_left":65,"margin_right":0}{/literal}', 'default_invoice_pdf_format', NULL, 0, 0, 1, NULL, 0, 1, 1, NULL, NULL, NULL),
 
 -- financial_account_type
 -- grouping field is specific to Quickbooks for mapping to .iif format
