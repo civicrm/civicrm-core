@@ -203,7 +203,8 @@ VALUES
    ('contribution_recur_status'     , '{ts escape="sql"}Recurring Contribution Status{/ts}'      , NULL,      1, 1, 1, 'name,label,description'),
    ('environment'                   , '{ts escape="sql"}Environment{/ts}'                        , NULL,      1, 1, 0, 'name,label,description'),
    ('activity_default_assignee'     , '{ts escape="sql"}Activity default assignee{/ts}'          , NULL,      1, 1, 0, 'name,label,description'),
-   ('entity_batch_extends'          , '{ts escape="sql"}Entity Batch Extends{/ts}'               , NULL,      1, 1, 0, 'name,label,description');
+   ('entity_batch_extends'          , '{ts escape="sql"}Entity Batch Extends{/ts}'               , NULL,      1, 1, 0, 'name,label,description'),
+   ('pdf_units'                     , '{ts escape="sql"}PDF Units{/ts}'                          , NULL,      1, 1, 1, 'name,label,description');
 
 SELECT @option_group_id_pcm            := max(id) from civicrm_option_group where name = 'preferred_communication_method';
 SELECT @option_group_id_act            := max(id) from civicrm_option_group where name = 'activity_type';
@@ -288,6 +289,7 @@ SELECT @option_group_id_env    := max(id) from civicrm_option_group where name =
 SELECT @option_group_id_default_assignee := max(id) from civicrm_option_group where name = 'activity_default_assignee';
 SELECT @option_group_id_entity_batch_extends := max(id) from civicrm_option_group where name = 'entity_batch_extends';
 SELECT @option_group_id_pdf_format := max(id) from civicrm_option_group where name = 'pdf_format';
+SELECT @option_group_id_pdf_units := max(id) from civicrm_option_group where name = 'pdf_units';
 
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
 SELECT @eventCompId      := max(id) FROM civicrm_component where name = 'CiviEvent';
@@ -1056,7 +1058,15 @@ VALUES
 
 -- Entity Batch options
 --  (`option_group_id`,             `label`,                                      `value`,                   `name`,                    `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
-(@option_group_id_entity_batch_extends, '{ts escape="sql"}Financial Transactions{/ts}',  'civicrm_financial_trxn',  'civicrm_financial_trxn',   NULL,       0,         1,           1,         NULL,          0,             0,             1,           @contributeCompId,            NULL,           NULL);
+(@option_group_id_entity_batch_extends, '{ts escape="sql"}Financial Transactions{/ts}',  'civicrm_financial_trxn',  'civicrm_financial_trxn',   NULL,       0,         1,           1,         NULL,          0,             0,             1,           @contributeCompId,            NULL,           NULL),
+
+-- PDF Units
+--  (`option_group_id`,      `label`,                             `value`, `name`,       `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
+(@option_group_id_pdf_units, '{ts escape="sql"}Inches{/ts}',      'in',    'Inches',      NULL,      0,        0,            1,        NULL,          0,             0,             1,           NULL,           NULL,            NULL),
+(@option_group_id_pdf_units, '{ts escape="sql"}Centimeters{/ts}', 'cm',    'Centimeters', NULL,      0,        0,            2,        NULL,          0,             0,             1,           NULL,           NULL,            NULL),
+(@option_group_id_pdf_units, '{ts escape="sql"}Millimeters{/ts}', 'mm',    'Millimeters', NULL,      0,        0,            3,        NULL,          0,             0,             1,           NULL,           NULL,            NULL),
+(@option_group_id_pdf_units, '{ts escape="sql"}Points{/ts}',      'pt',    'Points',      NULL,      0,        0,            4,        NULL,          0,             0,             1,           NULL,           NULL,            NULL),
+(@option_group_id_pdf_units, '{ts escape="sql"}Pixels{/ts}',      'px',    'Pixels',      NULL,      0,        0,            5,        NULL,          0,             0,             1,           NULL,           NULL,            NULL);
 
 
 -- financial accounts

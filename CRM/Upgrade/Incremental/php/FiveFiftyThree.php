@@ -58,6 +58,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyThree extends CRM_Upgrade_Incremental
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Replace %A specifier in date settings.', 'replacePercentA');
     $this->addTask('Add invoice pdf format', 'addInvoicePDFFormat');
+    $this->addTask('Add option list for PDF Units', 'addPDFUnitsGroupOptionList');
   }
 
   /**
@@ -104,6 +105,31 @@ class CRM_Upgrade_Incremental_php_FiveFiftyThree extends CRM_Upgrade_Incremental
       $usages[$dao->id] = $dao->msg_title;
     }
     return $usages;
+  }
+
+  /**
+   * @param CRM_Queue_TaskContext $ctx
+   * @return bool
+   */
+  public static function addPDFUnitsGroupOptionList(CRM_Queue_TaskContext $ctx) {
+    $optionGroupId = \CRM_Core_BAO_OptionGroup::ensureOptionGroupExists([
+      'name' => 'pdf_units',
+      'title' => ts('PDF Units'),
+      'is_reserved' => 1,
+      'is_active' => 1,
+      'is_locked' => 1,
+    ]);
+    $values = [
+      ['value' => 'in', 'name' => 'Inches', 'label' => ts('Inches')],
+      ['value' => 'cm', 'name' => 'Centimeters', 'label' => ts('Centimeters')],
+      ['value' => 'mm', 'name' => 'Millimeters', 'label' => ts('Millimeters')],
+      ['value' => 'pt', 'name' => 'Points', 'label' => ts('Points')],
+      ['value' => 'px', 'name' => 'Pixels', 'label' => ts('Pixels')],
+    ];
+    foreach ($values as $value) {
+      \CRM_Core_BAO_OptionValue::ensureOptionValueExists($value + ['option_group_id' => $optionGroupId]);
+    }
+    return TRUE;
   }
 
 }
