@@ -159,8 +159,7 @@ class ExportAction extends AbstractAction {
     $daoName = CoreUtil::getInfoItem($entityType, 'dao');
     if ($daoName) {
       /** @var \CRM_Core_DAO $dao */
-      $dao = new $daoName();
-      $dao->id = $entityId;
+      $dao = $daoName::findById($entityId);
       // Collect references into arrays keyed by entity type
       $references = [];
       foreach ($dao->findReferences() as $reference) {
