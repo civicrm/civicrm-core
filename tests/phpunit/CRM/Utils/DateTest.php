@@ -254,6 +254,8 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
    * Test customFormat() function
    */
   public function testCustomFormat() {
+    $currentTimezone = date_default_timezone_get();
+    date_default_timezone_set('America/Los_Angeles');
     $dateTime = "2018-11-08 21:46:44";
     $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%b"), "Nov");
     $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%B"), "November");
@@ -273,12 +275,16 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%s"), "44");
     $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%A"), "Thursday");
     $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%a"), "Thu");
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%Z"), "PST");
+    date_default_timezone_set($currentTimezone);
   }
 
   /**
    * Test customFormat() function
    */
   public function testCustomFormatTs() {
+    $currentTimezone = date_default_timezone_get();
+    date_default_timezone_set('America/Los_Angeles');
     $ts = mktime(21, 46, 44, 11, 8, 2018);
     $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%b"), "Nov");
     $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%B"), "November");
@@ -297,6 +303,19 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%Y"), "2018");
     $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%A"), "Thursday");
     $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%a"), "Thu");
+    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%Z"), "PST");
+    date_default_timezone_set($currentTimezone);
+  }
+
+  /**
+   * Verify that the Timezone works for daylight savings based on the passed in date
+   */
+  public function testCustomFormatTimezoneDaylightSavings() {
+    $currentTimezone = date_default_timezone_get();
+    date_default_timezone_set('Australia/Sydney');
+    $dateTime = '2018-11-08 21:46:44';
+    $this->assertEquals("AEDT", CRM_Utils_Date::customFormat($dateTime, "%Z"));
+    date_default_timezone_set($currentTimezone);
   }
 
   /**

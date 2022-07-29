@@ -540,7 +540,7 @@ emo
   <!--
 {foreach from=$contributions item=contribution}
  {if $contribution.contact_id == $messageContactID}
- {assign var=\'date\' value=$contribution.receive_date|date_format:\'%d %B %Y\'}
+ {assign var=\'date\' value=$contribution.receive_date|crmDate:\'%d %B %Y\'}
  {assign var=contact_aggregate
 value=$contact_aggregate+$contribution.total_amount}
 -->

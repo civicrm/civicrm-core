@@ -33,8 +33,8 @@ isAdditionalParticipant:::{$isAdditionalParticipant}
 pay_later_receipt:::{$pay_later_receipt}
 {/if}
 event.event_title:::{$event.event_title}
-event.event_start_date:::{$event.event_start_date|date_format:"%A"}
-event.event_end_date:::{$event.event_end_date|date_format:"%Y%m%d"}
+event.event_start_date:::{$event.event_start_date|crmDate:"%A"}
+event.event_end_date:::{$event.event_end_date|crmDate:"%Y%m%d"}
 {if isset($event.is_monetary)}
 event.is_monetary:::{$event.is_monetary}
 {/if}
