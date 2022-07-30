@@ -15,7 +15,7 @@ function simple_replace() {
 }
 
 
-# add in class_exists test as per CRM-8921.
+# php 8.1 compatibility
 if ! grep -q ':int' vendor/guzzlehttp/guzzle/src/Handler/MockHandler.php; then
-  simple_replace vendor/guzzlehttp/guzzle/src/Handler/MockHandler.php '/public function count\(\)$/m' 'public function count() :int'
+  simple_replace vendor/guzzlehttp/guzzle/src/Handler/MockHandler.php '#public function count\(\)$#m' 'public function count(): int'
 fi
