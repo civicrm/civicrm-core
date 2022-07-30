@@ -2,7 +2,15 @@
 
 namespace GuzzleHttp;
 
-if (!function_exists('\GuzzleHttp\http_build_query')) {
+try {
+  \Composer\InstalledVersions::getVersion('drupal/core');
+  $drupalCoreInstalled = TRUE;
+}
+catch (\OutOfBoundsException $e) {
+  $drupalCoreInstalled = FALSE;
+}
+
+if (!$drupalCoreInstalled) {
 
   /**
    * Generates URL-encoded query string.
