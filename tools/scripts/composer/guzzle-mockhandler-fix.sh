@@ -16,6 +16,6 @@ function simple_replace() {
 
 
 # php 8.1 compatibility
-if ! grep -q ':int' vendor/guzzlehttp/guzzle/src/Handler/MockHandler.php; then
+if ! grep -q ': int' vendor/guzzlehttp/guzzle/src/Handler/MockHandler.php; then
   simple_replace vendor/guzzlehttp/guzzle/src/Handler/MockHandler.php '#public function count\(\)$#m' 'public function count(): int'
 fi
