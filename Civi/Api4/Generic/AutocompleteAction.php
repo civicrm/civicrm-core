@@ -67,7 +67,7 @@ class AutocompleteAction extends AbstractAction {
     $labelField = CoreUtil::getInfoItem($entityName, 'label_field');
     $map = [
       'id' => $idField,
-      'text' => $labelField,
+      'label' => $labelField,
     ];
     // FIXME: Use metadata
     if (isset($fields['description'])) {
