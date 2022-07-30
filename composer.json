@@ -33,7 +33,10 @@
     },
     "psr-4": {
       "Civi\\": [".", "Civi/", "setup/src/"]
-    }
+    },
+    "files": [
+      "guzzle_php81_shim.php"
+    ]
   },
   "include-path": ["vendor/tecnickcom"],
   "config": {
@@ -107,7 +110,8 @@
       "bash tools/scripts/composer/pear-exception-fix.sh",
       "bash tools/scripts/composer/net-smtp-fix.sh",
       "bash tools/scripts/composer/pear-mail-fix.sh",
-      "bash tools/scripts/composer/phpword-jquery.sh"
+      "bash tools/scripts/composer/phpword-jquery.sh",
+      "bash tools/scripts/composer/guzzle-mockhandler-fix.sh"
     ],
     "post-update-cmd": [
       "bash tools/scripts/composer/dompdf-cleanup.sh",
@@ -115,7 +119,8 @@
       "bash tools/scripts/composer/pear-exception-fix.sh",
       "bash tools/scripts/composer/net-smtp-fix.sh",
       "bash tools/scripts/composer/pear-mail-fix.sh",
-      "bash tools/scripts/composer/phpword-jquery.sh"
+      "bash tools/scripts/composer/phpword-jquery.sh",
+      "bash tools/scripts/composer/guzzle-mockhandler-fix.sh"
     ]
   },
   "repositories": {
@@ -294,6 +299,9 @@
         "Apply patch to ensure that MySQLI reporting remains the same in php8.1": "https://patch-diff.githubusercontent.com/raw/pear/DB/pull/13.patch",
         "Apply CiviCRM Customisations for the pear:db package": "https://raw.githubusercontent.com/civicrm/civicrm-core/2ad420c394/tools/scripts/composer/pear_db_civicrm_changes.patch"
       },
+      "pear/log": {
+        "Apply patch for php8.1": "https://patch-diff.githubusercontent.com/raw/pear/Log/pull/23.patch"
+      },
       "pear/mail": {
         "Apply CiviCRM Customisations for CRM-1367 and CRM-5946": "https://raw.githubusercontent.com/civicrm/civicrm-core/36319938a5bf26c1e7e2110a26a65db6a5979268/tools/scripts/composer/patches/pear-mail.patch"
       },
@@ -303,9 +311,14 @@
       "pear/net_smtp": {
         "Add in CiviCRM custom error message for CRM-8744": "https://raw.githubusercontent.com/civicrm/civicrm-core/a6a0ff13d2a155ad962529595dceaef728116f96/tools/scripts/composer/patches/net-smtp-patch.patch"
       },
+      "phpoffice/phpword": {
+        "PHP8.1 fix for passing null value into strlen": "https://patch-diff.githubusercontent.com/raw/PHPOffice/PHPWord/pull/2272.patch"
+      },
       "zetacomponents/mail": {
+        "PHP 8.1 Compatability fixes": "https://patch-diff.githubusercontent.com/raw/zetacomponents/Mail/pull/88.patch",
         "CiviCRM Custom Patches for ZetaCompoents mail": "https://raw.githubusercontent.com/civicrm/civicrm-core/9d93748a36c7c5d44422911db1c98fb2f7067b34/tools/scripts/composer/patches/civicrm-custom-patches-zetacompoents-mail.patch",
-        "Allow single quotes to be used in return path": "https://github.com/zetacomponents/Mail/pull/86.patch"
+        "Allow single quotes to be used in return path": "https://github.com/zetacomponents/Mail/pull/86.patch",
+        "CiviCRM Custom patch to fix a php8.1 issue found in CiviCRM unit tests": "https://raw.githubusercontent.com/civicrm/civicrm-core/5506f4ce5d46799857b4f4ddf34069e7541e9cc5/tools/scripts/composer/zetacomponents-php-81-civicrm-custom.patch"
       }
     },
     "compile-includes": ["ext/greenwich/composer.compile.json"],
