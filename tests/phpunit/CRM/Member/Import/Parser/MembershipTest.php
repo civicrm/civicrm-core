@@ -188,7 +188,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       $this->fail('validation error expected.');
     }
     catch (CRM_Core_Exception $e) {
-      $this->assertContains('Required parameter missing: Status', $e->getMessage());
+      $this->assertStringContainsString('Required parameter missing: Status', $e->getMessage());
       return;
     }
 
