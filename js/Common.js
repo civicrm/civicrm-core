@@ -523,6 +523,30 @@ if (!CRM.vars) CRM.vars = {};
     });
   };
 
+  // Autocomplete based on APIv4 and Select2 v4.
+  $.fn.crmAutocomplete = function(entityName, apiParams, select2Options) {
+    return $(this).each(function() {
+      $(this).select4({
+        ajax: {
+          delay: 250,
+          url: CRM.url('civicrm/ajax/api4/' + entityName + '/autocomplete'),
+          data: function (params) {
+            return {params: JSON.stringify(_.assign({
+              input: params.term,
+              page: params.page || 1
+            }, apiParams))};
+          },
+          processResults: function(data) {
+            return {
+              results: data.values,
+              pagination: {more: data.count > data.countFetched}
+            };
+          }
+        }
+      });
+    });
+  };
+
   /**
    * @see CRM_Core_Form::addEntityRef for docs
    * @param options object

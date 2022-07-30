@@ -40,7 +40,8 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       CRM_Utils_System::civiExit();
     }
     if ($_SERVER['REQUEST_METHOD'] == 'GET' &&
-      strtolower(substr($this->urlPath[4], 0, 3)) != 'get') {
+      ($this->urlPath[4] !== 'autocomplete' && strtolower(substr($this->urlPath[4], 0, 3)) !== 'get')
+    ) {
       $response = [
         'error_code' => 400,
         'error_message' => "SECURITY: All requests that modify the database must be http POST, not GET.",
