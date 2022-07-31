@@ -234,18 +234,18 @@ class CRM_Utils_Date {
     if (empty(\Civi::$statics[__CLASS__][$key])) {
       $intl_formatter = IntlDateFormatter::create(CRM_Core_I18n::getLocale(), IntlDateFormatter::MEDIUM, IntlDateFormatter::MEDIUM, NULL, IntlDateFormatter::GREGORIAN, 'MMM');
       \Civi::$statics[__CLASS__][$key] = [
-        1 => $intl_formatter->format(strtotime('January')),
-        2 => $intl_formatter->format(strtotime('February')),
-        3 => $intl_formatter->format(strtotime('March')),
-        4 => $intl_formatter->format(strtotime('April')),
-        5 => $intl_formatter->format(strtotime('May')),
-        6 => $intl_formatter->format(strtotime('June')),
-        7 => $intl_formatter->format(strtotime('July')),
-        8 => $intl_formatter->format(strtotime('August')),
-        9 => $intl_formatter->format(strtotime('September')),
-        10 => $intl_formatter->format(strtotime('October')),
-        11 => $intl_formatter->format(strtotime('November')),
-        12 => $intl_formatter->format(strtotime('December')),
+        1 => $intl_formatter->format(strtotime('1 January')),
+        2 => $intl_formatter->format(strtotime('1 February')),
+        3 => $intl_formatter->format(strtotime('1 March')),
+        4 => $intl_formatter->format(strtotime('1 April')),
+        5 => $intl_formatter->format(strtotime('1 May')),
+        6 => $intl_formatter->format(strtotime('1 June')),
+        7 => $intl_formatter->format(strtotime('1 July')),
+        8 => $intl_formatter->format(strtotime('1 August')),
+        9 => $intl_formatter->format(strtotime('1 September')),
+        10 => $intl_formatter->format(strtotime('1 October')),
+        11 => $intl_formatter->format(strtotime('1 November')),
+        12 => $intl_formatter->format(strtotime('1 December')),
       ];
     }
     if ($month) {
