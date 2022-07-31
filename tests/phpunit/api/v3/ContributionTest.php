@@ -3282,7 +3282,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testCompleteTransactionSetStatusToInProgress($dataSet) {
+  public function testCompleteTransactionSetStatusToInProgress(array $dataSet): void {
     $paymentProcessorID = $this->paymentProcessorCreate();
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge([
       'contact_id' => $this->_individualId,
@@ -3304,7 +3304,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ])
     );
     $this->callAPISuccess('Contribution', 'completetransaction', [
-      'id' => $contribution,
+      'id' => $contribution['id'],
       'receive_date' => $dataSet['receive_date'],
     ]);
     $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', [
