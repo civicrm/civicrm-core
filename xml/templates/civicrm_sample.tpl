@@ -15,7 +15,7 @@ SELECT @domainID := id FROM civicrm_domain where name = 'Default Domain Name';
 -- Sample Extended Property Group and Fields
 
 INSERT INTO `civicrm_price_set` (`name`,`title`,`is_active`,`extends`,`is_quick_config`)
-VALUES ('help_support_civicrm_amount', 'Help Support CiviCRM!', 1, 2, 1);
+VALUES ('help_support_civicrm_amount', 'Help Support CiviCRM!', 1, 2, 0);
 
 SELECT @priceSetId := max(id) FROM `civicrm_price_set` WHERE `is_quick_config` = 1 and name = 'help_support_civicrm_amount';
 
@@ -183,7 +183,7 @@ VALUES
 INSERT INTO `civicrm_price_set` (`name`,`title`,`is_active`,`extends`, `is_quick_config`)
 VALUES ('rain_forest_cup_youth_soccer_tournament', 'Rain-forest Cup Youth Soccer Tournament', 1, 1, 1),
        ('fall_fundraiser_dinner', 'Fall Fundraiser Dinner', 1, 1, 1),
-       ('summer_solstice_festival_day_concert', 'Summer Solstice Festival Day Concert',1,1,1);
+       ('summer_solstice_festival_day_concert', 'Summer Solstice Festival Day Concert',1,1,0);
 
 SELECT @priceSetId := max(id) FROM `civicrm_price_set` WHERE `is_quick_config` = 1 AND `name` = 'rain_forest_cup_youth_soccer_tournament';
 
