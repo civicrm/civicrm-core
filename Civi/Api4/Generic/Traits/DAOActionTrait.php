@@ -336,7 +336,6 @@ trait DAOActionTrait {
     if (!isset($record[$weightField]) && !empty($record[$idField])) {
       return;
     }
-    $daoFields = $daoName::getSupportedFields();
     $newWeight = $record[$weightField] ?? NULL;
     $oldWeight = empty($record[$idField]) ? NULL : \CRM_Core_DAO::getFieldValue($daoName, $record[$idField], $weightField);
 
