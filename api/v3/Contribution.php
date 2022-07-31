@@ -476,7 +476,7 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
  * @throws \CRM_Core_Exception
  * @throws \Exception
  */
-function civicrm_api3_contribution_completetransaction($params) {
+function civicrm_api3_contribution_completetransaction($params): array {
   $contribution = new CRM_Contribute_BAO_Contribution();
   $contribution->id = $params['id'];
   if (!$contribution->find(TRUE)) {
