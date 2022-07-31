@@ -808,6 +808,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{domain.postal_code}' => 'Domain (Organization) Postal Code',
       '{domain.state_province_id:label}' => 'Domain (Organization) State',
       '{domain.country_id:label}' => 'Domain (Organization) Country',
+      '{domain.empowered_by_civicrm_image_url}' => 'Empowered By CiviCRM Image',
     ];
   }
 
