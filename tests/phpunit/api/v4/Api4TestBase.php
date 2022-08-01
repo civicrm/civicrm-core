@@ -203,9 +203,9 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
         break;
 
       case 'Translation':
-        $extraValues['entity_table'] = 'civicrm_event';
-        $extraValues['entity_field'] = 'description';
-        $extraValues['entity_id'] = $this->getFkID('Event');
+        $extraValues['entity_table'] = 'civicrm_msg_template';
+        $extraValues['entity_field'] = 'msg_subject';
+        $extraValues['entity_id'] = $this->getFkID('MessageTemplate');
         break;
 
       case 'Case':
