@@ -67,6 +67,12 @@ class Submit extends AbstractProcessor {
         }
       }
     }
+
+    // validate the submitted values for required
+    if (!$this->validateForm()) {
+      throw new \Exception(ts('Please fill all required fields.'));
+    }
+
     $entityWeights = \Civi\Afform\Utils::getEntityWeights($this->_formDataModel->getEntities(), $entityValues);
     foreach ($entityWeights as $entityName) {
       $entityType = $this->_formDataModel->getEntity($entityName)['type'];
@@ -108,6 +114,78 @@ class Submit extends AbstractProcessor {
       }
     }
     return $combined;
+  }
+
+  /**
+   * Function to validate the submitted values
+   *
+   * @return boolean
+   */
+  private function validateForm() {
+    $isValid = TRUE;
+
+    // get feild flatterned defintions
+    $fieldDefinitions = $this->getAllFieldDefinitions();
+
+    // loops through each field and validates the submitted values
+    foreach ($fieldDefinitions as $entityName => $field) {
+      foreach ($this->values[$entityName] as $index => $values) {
+        foreach ($field as $fieldName => $fieldDefinition) {
+          if ($fieldName !== 'joins') {
+            if (!empty($fieldDefinition['required']) && empty($values['fields'][$fieldName])) {
+              $isValid = FALSE;
+            }
+          }
+          else {
+            // loop through each joins and validates the submitted values
+            foreach ($field['joins'] as $joinName => $joinField) {
+              foreach ($values['joins'][$joinName] as $joinIndex => $joinValues) {
+                foreach ($joinField as $joinFieldName => $joinFieldDefinition) {
+                  if (!empty($joinFieldDefinition['required']) && empty($joinValues[$joinFieldName])) {
+                    $isValid = FALSE;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return $isValid;
+  }
+
+  /**
+   * Get all field definitions for this form
+   *
+   * @return array $fieldDefinitions
+   */
+  private function getAllFieldDefinitions() {
+    $fieldDefinitions = [];
+
+    foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
+      // main entity fields
+      foreach ($entity['fields'] as $field => $attributes) {
+        if (!empty($attributes['defn'])) {
+          $fieldDefinitions[$entityName][$field] = array_merge(['name' => $field], $attributes['defn']);
+        }
+      }
+
+      // join entity fields
+      if (!empty($entity['joins'])) {
+        foreach ($entity['joins'] as $joinEntityName => $joinEntity) {
+          if (!empty($joinEntity['fields'])) {
+            foreach ($joinEntity['fields'] as $joinField => $joinAttributes) {
+              if (!empty($joinAttributes['defn'])) {
+                $fieldDefinitions[$entityName]['joins'][$joinEntityName][$joinField] = array_merge(['name' => $joinField], $joinAttributes['defn']);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return $fieldDefinitions;
   }
 
   /**

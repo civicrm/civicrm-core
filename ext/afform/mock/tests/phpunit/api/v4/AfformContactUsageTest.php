@@ -58,6 +58,20 @@ EOHTML;
   <button class="af-button btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
 </af-form>
 EOHTML;
+    self::$layouts['updateInfo'] = <<<EOHTML
+<af-form ctrl="modelListCtrl">
+  <af-entity data="{contact_type: 'Individual', source: 'Update Info'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <fieldset af-fieldset="Individual1">
+      <af-field name="first_name" defn="{required: true, input_attrs: {}}" />
+      <af-field name="last_name" defn="{required: true, input_attrs: {}}"/>
+      <div af-join="Email">
+        <div class="af-container af-layout-inline">
+          <af-field name="email" defn="{required: true, input_attrs: {}}" />
+        </div>
+      </div>
+  </fieldset>
+</af-form>
+EOHTML;
   }
 
   public function testAboutMeAllowed(): void {
@@ -408,6 +422,73 @@ EOHTML;
       ->addWhere('id', '=', $contact['id'])
       ->execute()->single();
     $this->assertEquals('New', $result['middle_name']);
+  }
+
+  public function testFormValidationEntityFields(): void {
+    $this->useValues([
+      'layout' => self::$layouts['updateInfo'],
+      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $values = [
+      'Individual1' => [
+        [
+          'fields' => [],
+          'joins' => [
+            'Email' => [
+              ['email' => 'test@example.org'],
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    $this->expectException(\Exception::class);
+
+    try {
+      Civi\Api4\Afform::submit()
+        ->setName($this->formName)
+        ->setValues($values)
+        ->execute();
+    }
+    catch (\CRM_Core_Exception $e) {
+      // Should fail required fields missing
+    }
+
+  }
+
+  public function testFormValidationEntityJoinFields(): void {
+    $this->useValues([
+      'layout' => self::$layouts['updateInfo'],
+      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $values = [
+      'Individual1' => [
+        [
+          'fields' => [
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
+          ],
+          'joins' => [
+            'Email' => [[]],
+          ],
+        ],
+      ],
+    ];
+
+    $this->expectException(\Exception::class);
+
+    try {
+      Civi\Api4\Afform::submit()
+        ->setName($this->formName)
+        ->setValues($values)
+        ->execute();
+    }
+    catch (\CRM_Core_Exception $e) {
+      // Should fail required fields missing
+    }
+
   }
 
 }
