@@ -58,7 +58,7 @@
      {if $isShowLineItems}
        <tr>
         <td colspan="2" {$valueStyle}>
-         <table> {* FIXME: style this table so that it looks like the text version (justification, etc.) *}
+         <table>
           <tr>
            <th>{ts}Item{/ts}</th>
            <th>{ts}Qty{/ts}</th>
