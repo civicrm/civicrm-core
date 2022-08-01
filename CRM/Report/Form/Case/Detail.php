@@ -194,6 +194,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         'dao' => 'CRM_Core_DAO_Address',
         'fields' => [
           'street_address' => NULL,
+          'city' => NULL,
           'state_province_id' => [
             'title' => ts('State/Province'),
           ],
