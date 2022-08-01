@@ -2327,7 +2327,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // 5) hone up the individual functions to not use rely on this having been called
     // 6) deprecate like mad
     if ($loadAll) {
-      $ids = array_merge($this->getComponentDetails($this->id), $ids);
+      $ids = array_merge(self::getComponentDetails($this->id), $ids);
       if (empty($ids['contact']) && isset($this->contact_id)) {
         $ids['contact'] = $this->contact_id;
       }
