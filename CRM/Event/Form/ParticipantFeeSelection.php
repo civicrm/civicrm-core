@@ -70,7 +70,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     }
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, TRUE);
 
-    list($this->_contributorDisplayName, $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
+    [$this->_contributorDisplayName, $this->_contributorEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
     $this->assign('displayName', $this->_contributorDisplayName);
     $this->assign('email', $this->_contributorEmail);
 
@@ -239,7 +239,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       $fetchParticipantVals = ['id' => $this->_participantId];
       CRM_Event_BAO_Participant::getValues($fetchParticipantVals, $participantDetails);
       $participantParams = array_merge($params, $participantDetails[$this->_participantId]);
-      $mailSent = $this->emailReceipt($participantParams);
+      $this->emailReceipt($participantParams);
     }
 
     // update participant
@@ -266,10 +266,8 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
   /**
    * @param array $params
-   *
-   * @return mixed
    */
-  public function emailReceipt(&$params) {
+  private function emailReceipt(array $params) {
     $updatedLineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant', FALSE, FALSE);
     $lineItem = [];
     if ($updatedLineItem) {
@@ -347,7 +345,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $template = CRM_Core_Smarty::singleton();
 
     // Retrieve the name and email of the contact - this will be the TO for receipt email
-    list($this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_contactId);
+    [$this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->_contactId);
 
     $this->_contributorDisplayName = ($this->_contributorDisplayName == ' ') ? $this->_contributorEmail : $this->_contributorDisplayName;
 
@@ -378,8 +376,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       $sendTemplateParams['bcc'] = $this->_fromEmails['bcc'] ?? NULL;
     }
 
-    list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
-    return $mailSent;
+    CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
   }
 
 }
