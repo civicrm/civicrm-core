@@ -119,8 +119,8 @@
 
        {foreach from=$taxRateBreakdown item=taxDetail key=taxRate}
          <tr>
-          <td>&nbsp;{if $taxRate == 0}{ts}No{/ts} {$taxTerm}{else}{$taxTerm} {$taxDetail.percentage}%{/if}</td>
-          <td>&nbsp;{$taxDetail.amount|crmMoney:'{contribution.currency}'}</td>
+          <td>{if $taxRate == 0}{ts}No{/ts} {$taxTerm}{else}{$taxTerm} {$taxDetail.percentage}%{/if}</td>
+          <td>{$taxDetail.amount|crmMoney:'{contribution.currency}'}</td>
         </tr>
       {/foreach}
      {/if}
