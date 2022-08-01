@@ -96,7 +96,7 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $this->assertStringContainsString('PAYMENT ADVICE', $invoiceHTML[$contribution['id']]);
 
     $this->assertStringContainsString('AMOUNT DUE:</font></b></td>
-                <td style="text-align:right;"><b><font size="1">$92.00</font></b></td>', $invoiceHTML[$contribution3['id']]);
+        <td style="text-align:right;"><b><font size="1">$92.00</font></b></td>', $invoiceHTML[$contribution3['id']]);
   }
 
   /**
@@ -178,7 +178,7 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
 
     $totalAmount = $this->formatMoneyInput($order['values'][$order['id']]['total_amount']);
     $this->assertStringContainsString("TOTAL USD</font></b></td>
-                <td style=\"text-align:right;\"><font size=\"1\">$" . $totalAmount . '</font>', $invoiceHTML);
+        <td style=\"text-align:right;\"><font size=\"1\">$" . $totalAmount . '</font>', $invoiceHTML);
 
   }
 
