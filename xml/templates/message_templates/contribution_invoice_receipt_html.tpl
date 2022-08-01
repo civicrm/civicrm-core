@@ -75,9 +75,6 @@
                 <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{ts 1=$currency}Amount %1{/ts}</font></th>
               </tr>
               {foreach from=$lineItem item=value key=priceset name=taxpricevalue}
-                {if $smarty.foreach.taxpricevalue.index eq 0}
-                {else}
-                {/if}
                 <tr>
                   <td style="text-align:left;nowrap"><font size="1">
                     {if $value.html_type eq 'Text'}
@@ -145,8 +142,6 @@
                 <td style="text-align:right;white-space: nowrap" ><b><font size="1">{ts}AMOUNT DUE:{/ts}</font></b></td>
                 <td style="text-align:right;"><b><font size="1">{$amountDue|crmMoney:$currency}</font></b></td>
               </tr>
-
-              <br/><br/><br/>
               <tr>
                 <td colspan="5"></td>
               </tr>
@@ -207,6 +202,9 @@
                   <td colspan="5" style="color:#F5F5F5;"><hr></td>
                 </tr>
               </table>
+            </td>
+          </tr>
+        </table>
       {/if}
 
       {if '{contribution.contribution_status_id:name}' === 'Refunded' || '{contribution.contribution_status_id:name}' === 'Cancelled'}
