@@ -82,7 +82,7 @@
     "pear/log": "1.13.3",
     "adrienrn/php-mimetyper": "0.2.2",
     "civicrm/composer-downloads-plugin": "^3.0",
-    "league/csv": "^9.6",
+    "league/csv": "~9.6.2",
     "league/oauth2-client": "^2.4",
     "league/oauth2-google": "^3.0",
     "tplaner/when": "~3.0.0",
