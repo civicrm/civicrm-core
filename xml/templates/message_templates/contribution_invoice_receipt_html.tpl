@@ -157,9 +157,6 @@
                 </tr>
               {/if}
             </table>
-          </td>
-        </tr>
-      </table>
 
       {if '{contribution.contribution_status_id:name}' == 'Pending' && '{contribution.is_pay_later}' == 1}
         <table style="margin-top:5px;" width="100%" border="0" cellpadding="0" cellspacing="0">
