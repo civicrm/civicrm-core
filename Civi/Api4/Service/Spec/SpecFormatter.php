@@ -49,7 +49,7 @@ class SpecFormatter {
         $field->setOptionsCallback([__CLASS__, 'getOptions']);
         $suffixes = ['label'];
         if (!empty($data['option_group_id'])) {
-          $suffixes = self::getOptionValueFields($data['option_group_id'], 'id');
+          $suffixes = CoreUtil::getOptionValueFields($data['option_group_id'], 'id');
         }
         $field->setSuffixes($suffixes);
       }
@@ -78,7 +78,7 @@ class SpecFormatter {
           }
         }
         if (!empty($data['pseudoconstant']['optionGroupName'])) {
-          $suffixes = self::getOptionValueFields($data['pseudoconstant']['optionGroupName'], 'name');
+          $suffixes = CoreUtil::getOptionValueFields($data['pseudoconstant']['optionGroupName'], 'name');
         }
         $field->setSuffixes($suffixes);
       }
@@ -97,26 +97,6 @@ class SpecFormatter {
     }
 
     return $field;
-  }
-
-  /**
-   * Get the suffixes supported by this option group
-   *
-   * @param string|int $optionGroup
-   *   OptionGroup id or name
-   * @param string $key
-   *   Is $optionGroup being passed as "id" or "name"
-   * @return array
-   */
-  private static function getOptionValueFields($optionGroup, $key) {
-    // Prevent crash during upgrade
-    if (array_key_exists('option_value_fields', \CRM_Core_DAO_OptionGroup::getSupportedFields())) {
-      $fields = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $optionGroup, 'option_value_fields', $key);
-    }
-    if (!isset($fields)) {
-      return ['name', 'label', 'description'];
-    }
-    return explode(',', $fields);
   }
 
   /**
