@@ -88,20 +88,15 @@
         <td style="text-align:right;"><font size="1">{ts}Sub Total{/ts}</font></td>
         <td style="text-align:right;"><font size="1">{$subTotal|crmMoney:$currency}</font></td>
       </tr>
-      {if !empty($dataArray)}
-        {foreach from=$dataArray item=value key=priceset}
+      {foreach from=$taxRateBreakdown item=taxDetail key=taxRate}
+        {if $taxRate != 0}
           <tr>
             <td colspan="3"></td>
-            {if $priceset}
-              <td style="text-align:right;white-space: nowrap"><font size="1">{if '{domain.tax_term}'}{ts 1='{domain.tax_term}' 2=$priceset}TOTAL %1 %2%{/ts}{/if}</font></td>
-              <td style="text-align:right"><font size="1" align="right">{$value|crmMoney:$currency}</font> </td>
-            {elseif $priceset == 0}
-              <td style="text-align:right;white-space: nowrap"><font size="1">{if '{domain.tax_term}'}{ts 1='{domain.tax_term}'}TOTAL %1{/ts}{/if}</font></td>
-              <td style="text-align:right"><font size="1" align="right">{$value|crmMoney:$currency}</font> </td>
-            {/if}
+            <td style="text-align:right;white-space: nowrap"><font size="1">{if '{domain.tax_term}'}{ts 1='{domain.tax_term}' 2=$taxRate|crmNumberFormat}TOTAL %1 %2%{/ts}{/if}</font></td>
+            <td style="text-align:right"><font size="1" align="right">{$taxDetail.amount|crmMoney:'{contribution.currency}'}</font> </td>
           </tr>
-        {/foreach}
-      {/if}
+        {/if}
+      {/foreach}
       <tr>
         <td colspan="3"></td>
         <td style="text-align:right;white-space: nowrap"><b><font size="1">{ts 1=$currency}TOTAL %1{/ts}</font></b></td>
@@ -289,20 +284,15 @@
               <td style="padding-left:28px;text-align:right;"><font size="1">{ts}Sub Total{/ts}</font></td>
               <td style="padding-left:28px;text-align:right;"><font size="1">{$subTotal|crmMoney:$currency}</font></td>
             </tr>
-            {if !empty($dataArray)}
-              {foreach from=$dataArray item=value key=priceset}
-                <tr>
-                  <td colspan="3"></td>
-                  {if $priceset}
-                    <td style="padding-left:28px;text-align:right;"><font size="1">{if '{domain.tax_term}'}{ts 1='{domain.tax_term}' 2=$priceset}TOTAL %1 %2%{/ts}{/if}</font></td>
-                    <td style="padding-left:28px;text-align:right;"><font size="1" align="right">{$value|crmMoney:$currency}</font> </td>
-                  {elseif $priceset == 0}
-                    <td style="padding-left:28px;text-align:right;"><font size="1">{if '{domain.tax_term}'}{ts 1='{domain.tax_term}'}TOTAL NO %1{/ts}{/if}</font></td>
-                    <td style="padding-left:28px;text-align:right;"><font size="1" align="right">{$value|crmMoney:$currency}</font> </td>
-                  {/if}
-                </tr>
+            {foreach from=$taxRateBreakdown item=taxDetail key=taxRate}
+                {if $taxRate != 0}
+                  <tr>
+                    <td colspan="3"></td>
+                    <td style="padding-left:28px;text-align:right;"><font size="1">{if '{domain.tax_term}'}{ts 1='{domain.tax_term}' 2=$taxRate|crmNumberFormat}TOTAL %1 %2%{/ts}{/if}</font></td>
+                    <td style="padding-left:28px;text-align:right;"><font size="1" align="right">{$taxDetail.amount|crmMoney:'{contribution.currency}'}</font> </td>
+                  </tr>
+                {/if}
               {/foreach}
-            {/if}
             <tr>
               <td colspan="3"></td>
               <td colspan="2"><hr></hr></td>
