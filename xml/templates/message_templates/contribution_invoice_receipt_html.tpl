@@ -96,10 +96,10 @@
           <tr>
             <td colspan="3"></td>
             {if $priceset}
-              <td style="text-align:right;white-space: nowrap"><font size="1">{if $taxTerm}{ts 1=$taxTerm 2=$priceset}TOTAL %1 %2%{/ts}{/if}</font></td>
+              <td style="text-align:right;white-space: nowrap"><font size="1">{if '{domain.tax_term}'}{ts 1='{domain.tax_term}' 2=$priceset}TOTAL %1 %2%{/ts}{/if}</font></td>
               <td style="text-align:right"><font size="1" align="right">{$value|crmMoney:$currency}</font> </td>
             {elseif $priceset == 0}
-              <td style="text-align:right;white-space: nowrap"><font size="1">{if $taxTerm}{ts 1=$taxTerm}TOTAL %1{/ts}{/if}</font></td>
+              <td style="text-align:right;white-space: nowrap"><font size="1">{if '{domain.tax_term}'}{ts 1='{domain.tax_term}'}TOTAL %1{/ts}{/if}</font></td>
               <td style="text-align:right"><font size="1" align="right">{$value|crmMoney:$currency}</font> </td>
             {/if}
           </tr>
@@ -292,7 +292,7 @@
                 {if $value.tax_amount != ''}
                   <td style="padding-left:28px;text-align:right;"><font size="1">{if $value.tax_rate}{$value.tax_rate}%{/if}</font></td>
                 {else}
-                  <td style="padding-left:28px;text-align:right"><font size="1">{if $taxTerm}{ts 1=$taxTerm}No %1{/ts}{/if}</font></td>
+                  <td style="padding-left:28px;text-align:right"><font size="1">{if '{domain.tax_term}'}{ts 1='{domain.tax_term}'}No %1{/ts}{/if}</font></td>
                 {/if}
                 <td style="padding-left:28px;text-align:right;"><font size="1">{$value.subTotal|crmMoney:$currency}</font></td>
               </tr>
@@ -308,10 +308,10 @@
                 <tr>
                   <td colspan="3"></td>
                   {if $priceset}
-                    <td style="padding-left:28px;text-align:right;"><font size="1">{if $taxTerm}{ts 1=$taxTerm 2=$priceset}TOTAL %1 %2%{/ts}{/if}</font></td>
+                    <td style="padding-left:28px;text-align:right;"><font size="1">{if '{domain.tax_term}'}{ts 1='{domain.tax_term}' 2=$priceset}TOTAL %1 %2%{/ts}{/if}</font></td>
                     <td style="padding-left:28px;text-align:right;"><font size="1" align="right">{$value|crmMoney:$currency}</font> </td>
                   {elseif $priceset == 0}
-                    <td style="padding-left:28px;text-align:right;"><font size="1">{if $taxTerm}{ts 1=$taxTerm}TOTAL NO %1{/ts}{/if}</font></td>
+                    <td style="padding-left:28px;text-align:right;"><font size="1">{if '{domain.tax_term}'}{ts 1='{domain.tax_term}'}TOTAL NO %1{/ts}{/if}</font></td>
                     <td style="padding-left:28px;text-align:right;"><font size="1" align="right">{$value|crmMoney:$currency}</font> </td>
                   {/if}
                 </tr>
