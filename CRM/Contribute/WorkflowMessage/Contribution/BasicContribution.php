@@ -31,8 +31,8 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
         'name' => 'workflow/' . $workflow . '/' . 'basic_cad',
         'title' => ts('Completed Contribution') . ' : ' . 'CAD',
         'tags' => ['preview'],
-        'workflow' => 'contribution_offline_receipt',
-        'currency' => 'CAD',
+        'workflow' => $workflow,
+        'contribution_params' => ['currency' => 'CAD'],
       ];
       $priceSet = $this->getNonQuickConfigPriceSet();
       if ($priceSet) {
@@ -40,8 +40,16 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
           'name' => 'workflow/' . $workflow . '/' . 'price_set_' . $priceSet['name'],
           'title' => ts('Completed Contribution') . ' : ' . $priceSet['title'],
           'tags' => ['preview'],
-          'workflow' => 'contribution_offline_receipt',
+          'workflow' => $workflow,
           'is_show_line_items' => TRUE,
+        ];
+        yield [
+          'name' => 'workflow/' . $workflow . '/' . 'refunded_price_set_' . $priceSet['name'],
+          'title' => ts('Refunded Contribution') . ' : ' . $priceSet['title'],
+          'tags' => ['preview'],
+          'workflow' => $workflow,
+          'is_show_line_items' => TRUE,
+          'contribution_params' => ['contribution_status_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded')],
         ];
       }
     }
@@ -107,11 +115,15 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
   private function addExampleData(GenericWorkflowMessage $messageTemplate, $example): void {
     $messageTemplate->setContact(\Civi\Test::example('entity/Contact/Barb'));
     $contribution = \Civi\Test::example('entity/Contribution/Euro5990/completed');
-    if (isset($example['currency'])) {
-      $contribution['currency'] = $example['currency'];
+    if (isset($example['contribution_params'])) {
+      $contribution = array_merge($contribution, $example['contribution_params']);
     }
+    $contribution['contribution_status_id:name'] = \CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution['contribution_status_id']);
+    $contribution['contribution_status_id:label'] = \CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution['contribution_status_id']);
+
     $mockOrder = new CRM_Financial_BAO_Order();
     $mockOrder->setTemplateContributionID(50);
+
     if (empty($example['is_show_line_items'])) {
       $mockOrder->setPriceSetToDefault('contribution');
       $mockOrder->setOverrideTotalAmount($contribution['total_amount']);
