@@ -65,6 +65,7 @@ class AutocompleteAction extends AbstractAction {
     $fields = CoreUtil::getApiClass($entityName)::get()->entityFields();
     $idField = CoreUtil::getIdFieldName($entityName);
     $labelField = CoreUtil::getInfoItem($entityName, 'label_field');
+    $iconFields = CoreUtil::getInfoItem($entityName, 'icon_field') ?? [];
     $map = [
       'id' => $idField,
       'label' => $labelField,
@@ -76,9 +77,7 @@ class AutocompleteAction extends AbstractAction {
     if (isset($fields['color'])) {
       $map['color'] = 'color';
     }
-    if (isset($fields['icon'])) {
-      $map['icon'] = 'icon';
-    }
+    $select = array_merge(array_values($map), $iconFields);
 
     if (!$this->savedSearch) {
       $this->savedSearch = ['api_entity' => $entityName];
@@ -101,10 +100,10 @@ class AutocompleteAction extends AbstractAction {
       }
     }
     if (empty($this->_apiParams['having'])) {
-      $this->_apiParams['select'] = array_values($map);
+      $this->_apiParams['select'] = $select;
     }
     else {
-      $this->_apiParams['select'] = array_merge($this->_apiParams['select'], array_values($map));
+      $this->_apiParams['select'] = array_merge($this->_apiParams['select'], $select);
     }
     $this->_apiParams['checkPermissions'] = $this->getCheckPermissions();
     $apiResult = civicrm_api4($entityName, 'get', $this->_apiParams);
@@ -113,6 +112,12 @@ class AutocompleteAction extends AbstractAction {
       $mapped = [];
       foreach ($map as $key => $fieldName) {
         $mapped[$key] = $row[$fieldName];
+      }
+      foreach ($iconFields as $fieldName) {
+        if (!empty($row[$fieldName])) {
+          $mapped['icon'] = $row[$fieldName];
+          break;
+        }
       }
       $result[] = $mapped;
     }

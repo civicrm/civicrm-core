@@ -24,6 +24,7 @@ namespace Civi\Api4;
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/activities/
  * @searchable primary
  * @since 5.19
+ * @iconField activity_type_id:icon
  * @package Civi\Api4
  */
 class Activity extends Generic\DAOEntity {
