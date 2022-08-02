@@ -147,7 +147,7 @@ class CRM_Utils_JS {
       }
       return $obj;
     }
-    $result = json_decode($js);
+    $result = json_decode($js ?? '');
     if ($throwException && $result === NULL && $js !== 'null') {
       throw new CRM_Core_Exception(json_last_error_msg());
     }

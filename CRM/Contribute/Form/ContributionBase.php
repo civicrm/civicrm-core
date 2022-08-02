@@ -353,7 +353,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
       $this->_paymentProcessorIDs = array_filter(explode(
         CRM_Core_DAO::VALUE_SEPARATOR,
-        CRM_Utils_Array::value('payment_processor', $this->_values)
+        ($this->_values['payment_processor'] ?? '')
       ));
 
       $this->assignPaymentProcessor($isPayLater);

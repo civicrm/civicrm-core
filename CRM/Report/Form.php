@@ -5134,13 +5134,13 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *   is that we might print a bar chart as a pdf.
    */
   protected function setOutputMode() {
-    $this->_outputMode = str_replace('report_instance.', '', CRM_Utils_Request::retrieve(
+    $this->_outputMode = str_replace('report_instance.', '', (CRM_Utils_Request::retrieve(
       'output',
       'String',
       CRM_Core_DAO::$_nullObject,
       FALSE,
       CRM_Utils_Array::value('task', $this->_params)
-    ));
+    ) ?? ''));
     // if contacts are added to group
     if (!empty($this->_params['groups']) && empty($this->_outputMode)) {
       $this->_outputMode = 'group';

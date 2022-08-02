@@ -331,7 +331,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
     $this->_duplicateButtonName = $this->getButtonName('upload', 'duplicate');
 
-    $gids = explode(',', CRM_Utils_Request::retrieve('gid', 'String', CRM_Core_DAO::$_nullObject, FALSE, 0));
+    $gids = explode(',', (CRM_Utils_Request::retrieve('gid', 'String', CRM_Core_DAO::$_nullObject, FALSE, 0) ?? ''));
 
     if ((count($gids) > 1) && !$this->_profileIds && empty($this->_profileIds)) {
       if (!empty($gids)) {

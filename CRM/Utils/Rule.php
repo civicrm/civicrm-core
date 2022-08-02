@@ -549,7 +549,7 @@ class CRM_Utils_Rule {
    */
   public static function cleanMoney($value) {
     // first remove all white space
-    $value = str_replace([' ', "\t", "\n"], '', $value);
+    $value = str_replace([' ', "\t", "\n"], '', ($value ?? ''));
 
     $config = CRM_Core_Config::singleton();
 

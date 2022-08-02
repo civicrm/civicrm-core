@@ -1030,7 +1030,7 @@ class CRM_Utils_System {
    * @return string[]
    */
   public static function explode($separator, $string, $limit) {
-    $result = explode($separator, $string, $limit);
+    $result = explode($separator, ($string ?? ''), $limit);
     for ($i = count($result); $i < $limit; $i++) {
       $result[$i] = NULL;
     }

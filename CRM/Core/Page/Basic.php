@@ -360,7 +360,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
       $key = 'name';
     }
 
-    if (trim($sort)) {
+    if (trim($sort ?? '')) {
       $object->orderBy($sort);
     }
     elseif ($key) {

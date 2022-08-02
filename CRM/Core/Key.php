@@ -140,7 +140,7 @@ class CRM_Core_Key {
   public static function valid($key) {
     // ensure that key is an alphanumeric string of at least HASH_LENGTH with
     // an optional underscore+digits at the end.
-    return preg_match('#^[0-9a-zA-Z]{' . self::HASH_LENGTH . ',}+(_\d+)?$#', $key) ? TRUE : FALSE;
+    return preg_match('#^[0-9a-zA-Z]{' . self::HASH_LENGTH . ',}+(_\d+)?$#', ($key ?? '')) ? TRUE : FALSE;
   }
 
   /**

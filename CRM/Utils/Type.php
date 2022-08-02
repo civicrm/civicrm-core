@@ -421,8 +421,8 @@ class CRM_Utils_Type {
       case 'Date':
       case 'Timestamp':
         // a null timestamp is valid
-        if (strlen(trim($data)) == 0) {
-          return trim($data);
+        if (strlen(trim($data ?? '')) == 0) {
+          return trim($data ?? '');
         }
 
         if ((preg_match('/^\d{14}$/', $data) ||

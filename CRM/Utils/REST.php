@@ -569,7 +569,7 @@ class CRM_Utils_REST {
    */
   public function loadCMSBootstrap() {
     $requestParams = CRM_Utils_Request::exportValues();
-    $q = $requestParams['q'] ?? NULL;
+    $q = $requestParams['q'] ?? '';
     $args = explode('/', $q);
 
     // Proceed with bootstrap for "?entity=X&action=Y"

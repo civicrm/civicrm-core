@@ -197,7 +197,7 @@ class CRM_Core_CommunityMessages {
       'sid' => CRM_Utils_System::getSiteID(),
       'baseUrl' => $config->userFrameworkBaseURL,
       'lang' => $config->lcMessages,
-      'co' => $config->defaultContactCountry,
+      'co' => $config->defaultContactCountry ?? '',
     ];
     $vars = [];
     foreach ($vals as $k => $v) {
