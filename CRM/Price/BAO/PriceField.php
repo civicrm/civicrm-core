@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\PriceField;
+
 /**
  * Business objects for managing price fields.
  *
@@ -164,6 +166,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     }
 
     $transaction->commit();
+    Civi::cache('metadata')->flush();
     return $priceField;
   }
 
@@ -870,6 +873,24 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
     }
 
     return 0;
+  }
+
+  /**
+   * Get a specific price field (leveraging the cache).
+   *
+   * @param int $id
+   *
+   * @return array
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  public static function getPriceField(int $id): array {
+    $cacheString = __CLASS__ . __FUNCTION__ . $id . CRM_Core_Config::domainID() . '_' . CRM_Core_I18n::getLocale();
+    if (!Civi::cache('metadata')->has($cacheString)) {
+      $field = PriceField::get(FALSE)->addWhere('id', '=', $id)->execute()->first();
+      Civi::cache('metadata')->set($cacheString, $field);
+    }
+    return Civi::cache('metadata')->get($cacheString);
   }
 
 }

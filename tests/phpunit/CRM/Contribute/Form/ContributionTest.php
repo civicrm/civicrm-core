@@ -712,7 +712,7 @@ Financial Type: Donation
 ---------------------------------------------------------
 Item                             Qty       Each    Subtotal Tax Rate Tax Amount       Total
 ----------------------------------------------------------
-Price Field 1                      1    $100.00    $100.00  10.00 %       $10.00        $110.00
+Price Field - Price Field 1        1    $100.00    $100.00  10.00 %       $10.00        $110.00
 
 
 Amount before Tax : $100.00
@@ -737,7 +737,7 @@ Financial Type: Donation
 ---------------------------------------------------------
 Item                             Qty       Each       Total
 ----------------------------------------------------------
-Price Field 1                      1    $100.00       $100.00
+Price Field - Price Field 1        1    $100.00       $100.00
 
 
 
