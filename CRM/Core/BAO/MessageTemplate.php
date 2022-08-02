@@ -527,4 +527,17 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
     return $mailContent;
   }
 
+  /**
+   * Mark these fields as translatable.
+   *
+   * @todo move this definition to the metadata.
+   *
+   * @see CRM_Utils_Hook::translateFields
+   */
+  public static function hook_civicrm_translateFields(&$fields) {
+    $fields['civicrm_msg_template']['msg_subject'] = TRUE;
+    $fields['civicrm_msg_template']['msg_text'] = TRUE;
+    $fields['civicrm_msg_template']['msg_html'] = TRUE;
+  }
+
 }

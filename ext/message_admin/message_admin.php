@@ -106,13 +106,3 @@ function message_admin_civicrm_entityTypes(&$entityTypes) {
 //  ));
 //  _message_admin_civix_navigationMenu($menu);
 //}
-
-/**
- * Mark these fields as translateable.
- * @see CRM_Utils_Hook::translateFields
- */
-function message_admin_civicrm_translateFields(&$fields) {
-  $fields['civicrm_msg_template']['msg_subject'] = TRUE;
-  $fields['civicrm_msg_template']['msg_text'] = TRUE;
-  $fields['civicrm_msg_template']['msg_html'] = TRUE;
-}
