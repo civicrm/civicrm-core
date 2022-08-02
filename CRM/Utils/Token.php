@@ -1350,7 +1350,6 @@ class CRM_Utils_Token {
       return;
     }
     // check if there are any tokens
-    $greetingTokens = self::getTokens($tokenString);
     $context = $contactId ? ['contactId' => $contactId] : [];
     if ($contactDetails) {
       $context['contact'] = isset($contactDetails[0]) ? reset($contactDetails[0]) : $contactDetails;
