@@ -648,12 +648,12 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Test case for createProfileContact.
    */
-  public function testCreateProfileContact() {
+  public function testCreateProfileContact(): void {
     //Create 3 groups.
     foreach (['group1', 'group2', 'group3'] as $key => $title) {
       $this->groups["id{$key}"] = $this->callAPISuccess('Group', 'create', [
         'title' => $title,
-        'visibility' => "Public Pages",
+        'visibility' => 'Public Pages',
       ])['id'];
     }
 

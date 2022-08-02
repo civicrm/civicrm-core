@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contact;
 use Civi\Api4\SubscriptionHistory;
 use Civi\Core\Event\PostEvent;
 use Civi\Core\HookInterface;
@@ -502,28 +503,19 @@ SELECT    *
   }
 
   /**
+   * Function that doesn't do much.
+   *
    * @param int $contactID
    * @param int $groupID
    *
+   * @deprecated
    * @return bool
    */
-  public static function isContactInGroup($contactID, $groupID) {
-    if (!CRM_Utils_Rule::positiveInteger($contactID) ||
-      !CRM_Utils_Rule::positiveInteger($groupID)
-    ) {
-      return FALSE;
-    }
-
-    $params = [
-      ['group', 'IN', [$groupID], 0, 0],
-      ['contact_id', '=', $contactID, 0, 0],
-    ];
-    [$contacts] = CRM_Contact_BAO_Query::apiQuery($params, ['contact_id']);
-
-    if (!empty($contacts)) {
-      return TRUE;
-    }
-    return FALSE;
+  public static function isContactInGroup(int $contactID, int $groupID) {
+    return (bool) Contact::get(FALSE)
+      ->addWhere('id', '=', $contactID)
+      ->addWhere('groups', 'IN', [$groupID])
+      ->selectRowCount()->execute()->count();
   }
 
   /**
