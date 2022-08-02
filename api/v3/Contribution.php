@@ -476,7 +476,7 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
  * @throws \CRM_Core_Exception
  * @throws \Exception
  */
-function civicrm_api3_contribution_completetransaction($params) {
+function civicrm_api3_contribution_completetransaction($params): array {
   $contribution = new CRM_Contribute_BAO_Contribution();
   $contribution->id = $params['id'];
   if (!$contribution->find(TRUE)) {
@@ -494,18 +494,6 @@ function civicrm_api3_contribution_completetransaction($params) {
     'trxn_id',
   ];
   $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
-
-  $ids = [];
-  if (!$contribution->loadRelatedObjects(['payment_processor_id' => $input['payment_processor_id'] ?? NULL], $ids, TRUE)) {
-    throw new API_Exception('failed to load related objects');
-  }
-
-  // @todo Copied from _ipn_process_transaction - needs cleanup/refactor
-  $objects = $contribution->_relatedObjects;
-  $objects['contribution'] = &$contribution;
-  $input['component'] = $contribution->_component;
-  $input['is_test'] = $contribution->is_test;
-  $input['amount'] = empty($input['total_amount']) ? $contribution->total_amount : $input['total_amount'];
 
   if (isset($params['is_email_receipt'])) {
     $input['is_email_receipt'] = $params['is_email_receipt'];
@@ -529,8 +517,8 @@ function civicrm_api3_contribution_completetransaction($params) {
     $input['payment_instrument_id'] = $params['payment_instrument_id'];
   }
   return CRM_Contribute_BAO_Contribution::completeOrder($input,
-    !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
-    $objects['contribution']->id ?? NULL,
+    $contribution->contribution_recur_id,
+    $params['id'],
     $params['is_post_payment_create'] ?? NULL);
 }
 
