@@ -645,6 +645,7 @@ FROM civicrm_action_schedule cas
       'actionSchedule' => $schedule,
       'actionMapping' => $mapping,
       'smarty' => TRUE,
+      'schema' => ['contactId'],
     ]);
     $tp->addMessage('body_text', $schedule->body_text, 'text/plain');
     $tp->addMessage('body_html', $schedule->body_html, 'text/html');
