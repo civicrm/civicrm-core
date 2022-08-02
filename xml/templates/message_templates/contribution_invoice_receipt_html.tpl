@@ -68,26 +68,22 @@
         <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{domain.tax_term}</font></th>
         <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{ts 1=$currency}Amount %1{/ts}</font></th>
       </tr>
-      {foreach from=$lineItem item=value key=priceset name=taxpricevalue}
+      {foreach from=$lineItems item=line}
         <tr>
           <td style="text-align:left;nowrap"><font size="1">
-            {if $value.html_type eq 'Text'}
-              {$value.label}
-            {else}
-              {$value.field_title} - {$value.label}
-            {/if}
-            {if $value.description}
-              <div>{$value.description|truncate:30:"..."}</div>
+            {$line.title}
+            {if $line.description}
+              <div>{$line.description|truncate:30:"..."}</div>
             {/if}
           </font></td>
-          <td style="text-align:right;"><font size="1">{$value.qty}</font></td>
-          <td style="text-align:right;"><font size="1">{$value.unit_price|crmMoney:$currency}</font></td>
-          {if $value.tax_amount != ''}
-            <td style="text-align:right;"><font size="1">{if $value.tax_rate}{$value.tax_rate}%{/if}</font></td>
-          {else}
-            <td style="text-align:right;"><font size="1">{if $taxTerm}{ts 1=$taxTerm}-{/ts}{/if}</font></td>
-          {/if}
-          <td style="text-align:right;"><font size="1">{$value.subTotal|crmMoney:$currency}</font></td>
+          <td style="text-align:right;"><font size="1">{$line.qty}</font></td>
+          <td style="text-align:right;"><font size="1">{$line.unit_price|crmMoney:$currency}</font></td>
+            {if $line.tax_amount != ''}
+              <td style="text-align:right;"><font size="1">{if $line.tax_rate}{$line.tax_rate|crmNumberFormat}%{/if}</font></td>
+            {else}
+              <td style="text-align:right;"><font size="1">{if '{domain.tax_term}'}{ts 1='{domain.tax_term}'}-{/ts}{/if}</font></td>
+            {/if}
+          <td style="text-align:right;"><font size="1">{$line.line_total|crmMoney:'{contribution.currency}'}</font></td>
         </tr>
       {/foreach}
       <tr>
