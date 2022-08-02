@@ -1654,7 +1654,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
         $this->validateValues($values);
         $this->setImportStatus($rowNumber, 'NEW', '');
       }
-      catch (CRM_Core_Exception $e) {
+      catch (Exception $e) {
         $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
       }
     }
