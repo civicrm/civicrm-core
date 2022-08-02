@@ -141,7 +141,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
             );
           }
           if ((CRM_Utils_Array::value($typeId, $entityColumnValue)) ||
-            CRM_Utils_System::isNull($entityColumnValue[$typeId])
+            CRM_Utils_System::isNull($entityColumnValue[$typeId] ?? NULL)
           ) {
             CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $memberId);
           }
