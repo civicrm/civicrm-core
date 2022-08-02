@@ -162,16 +162,16 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testDashboardPartialPayments() {
+  public function testDashboardPartialPayments(): void {
     $contributionId = $this->contributionCreate([
       'contact_id' => $this->contactID,
       'contribution_status_id' => 'Pending',
       'total_amount' => 25,
     ]);
-    $result = civicrm_api3('Payment', 'create', [
+    $this->callAPISuccess('Payment', 'create', [
       'contribution_id' => $contributionId,
       'total_amount' => 11,
-      'trxn_date' => "2021-05-11",
+      'trxn_date' => '2021-05-11',
     ]);
     $this->contributions[] = civicrm_api3('Contribution', 'get', [
       'contact_id' => $this->contactID,
@@ -205,7 +205,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
   /**
    * Tests the event dashboard as a minimally permissioned user.
    */
-  public function testEventDashboard() {
+  public function testEventDashboard(): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [
       'register for events',
       'access Contact Dashboard',

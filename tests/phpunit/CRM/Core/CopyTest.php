@@ -22,9 +22,9 @@ class CRM_Core_CopyTest extends CiviUnitTestCase {
   public function testEventCopy(): void {
 
     $this->createCustomGroupWithFieldOfType(['extends' => 'Event']);
-    $event = $this->eventCreate([$this->getCustomFieldName('text') => 'blah']);
+    $event = $this->eventCreate([$this->getCustomFieldName('text', 4) => 'blah']);
     $eventId = $event['id'];
-    $eventRes = $event['values'][$eventId];
+    $eventRes = $event;
     $params[$this->getCustomFieldName('text') . '_1'] = 'blah';
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
       $eventId,

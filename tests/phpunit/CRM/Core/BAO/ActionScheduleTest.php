@@ -2204,7 +2204,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $actionSchedule['start_action_offset'] = 7;
     $actionSchedule['start_action_unit'] = 'day';
     $actionSchedule['start_action_date'] = 'registration_end_date';
-    $actionSchedule['entity_value'] = $event['values'][$event['id']]['event_type_id'];
+    $actionSchedule['entity_value'] = $event['event_type_id'];
     $actionSchedule['entity_status'] = $this->callAPISuccessGetValue('ParticipantStatusType', [
       'return' => 'id',
       'name' => 'Attended',

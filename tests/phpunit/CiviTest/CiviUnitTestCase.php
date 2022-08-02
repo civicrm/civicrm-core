@@ -30,6 +30,7 @@ use Civi\Api4\Address;
 use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\Event;
 use Civi\Api4\FinancialAccount;
 use Civi\Api4\FinancialType;
 use Civi\Api4\LineItem;
@@ -921,10 +922,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
   public function dummyProcessorCreate($processorParams = []) {
     $paymentProcessorID = $this->processorCreate($processorParams);
+    $this->ids['PaymentProcessor']['dummy_test'] = $paymentProcessorID;
     // For the tests we don't need a live processor, but as core ALWAYS creates a processor in live mode and one in test mode we do need to create both
     //   Otherwise we are testing a scenario that only exists in tests (and some tests fail because the live processor has not been defined).
     $processorParams['is_test'] = FALSE;
-    $this->processorCreate($processorParams);
+    $this->ids['PaymentProcessor']['dummy_live'] = $this->processorCreate($processorParams);
     return System::singleton()->getById($paymentProcessorID);
   }
 
@@ -1101,6 +1103,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *   Name-value pair for an event.
    *
    * @return array
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
    */
   public function eventCreate(array $params = []): array {
     // if no contact was passed, make up a dummy event creator
@@ -1128,11 +1133,12 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'event_full_text' => 'Sorry! We are already full',
       'is_monetary' => 0,
       'is_active' => 1,
+      'default_role_id' => 1,
       'is_show_location' => 0,
       'is_email_confirm' => 1,
     ], $params);
 
-    $event = $this->callAPISuccess('Event', 'create', $params);
+    $event = Event::create(FALSE)->setValues($params)->execute()->first();
     $this->ids['event'][] = $event['id'];
     return $event;
   }
@@ -1151,9 +1157,17 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function eventCreatePaid($params, $options = [['name' => 'hundy', 'amount' => 100]], $key = 'event') {
-    $params['is_monetary'] = TRUE;
+  protected function eventCreatePaid(array $params, array $options = [['name' => 'hundy', 'amount' => 100]], $key = 'event'): array {
+    // @todo - uncomment these - but need to fix an e-notice first.
+    // $this->dummyProcessorCreate();
+    // $params['payment_processor'] = [$this->ids['PaymentProcessor']['dummy_live']];
+    $params = array_merge([
+      'is_monetary' => TRUE,
+      'financial_type_id:name' => 'Event Fee',
+    ], $params);
+
     $event = $this->eventCreate($params);
+
     $this->ids['Event'][$key] = (int) $event['id'];
     $this->ids['PriceSet'][$key] = $this->eventPriceSetCreate(55, 0, 'Radio', $options);
     CRM_Price_BAO_PriceSet::addTo('civicrm_event', $event['id'], $this->ids['PriceSet'][$key]);
