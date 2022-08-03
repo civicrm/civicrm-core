@@ -350,6 +350,14 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'contribution_offline_receipt', 'type' => 'html'],
         ],
       ],
+      [
+        'version' => '5.53.alpha1',
+        'upgrade_descriptor' => ts('Fix non-php compliant dates'),
+        'templates' => [
+          ['name' => 'event_online_receipt', 'type' => 'subject'],
+          ['name' => 'event_online_receipt', 'type' => 'text'],
+        ],
+      ],
     ];
   }
 
