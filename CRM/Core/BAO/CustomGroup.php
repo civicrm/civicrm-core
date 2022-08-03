@@ -654,7 +654,14 @@ ORDER BY civicrm_custom_group.weight,
     }
     $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo($entityType, TRUE);
     $subTypes = array_merge($subTypes, CRM_Event_PseudoConstant::eventType());
-    if (!array_key_exists($subType, $subTypes)) {
+    // When you create a new contact type it gets saved in mixed case in the database.
+    // Eg. "Service User" becomes "Service_User" in civicrm_contact_type.name
+    // But that field does not differentiate case (eg. you can't add Service_User and service_user because mysql will report a duplicate error)
+    // webform_civicrm and some other integrations pass in the name as lowercase to API3 Contact.duplicatecheck
+    // Since we can't actually have two strings with different cases in the database perform a case-insensitive search here:
+    $subTypes = array_change_key_case($subTypes, CASE_LOWER);
+    if (!array_key_exists(mb_strtolower($subType), $subTypes)) {
+      \Civi::log()->debug("entityType: {$entityType}; subType: {$subType}");
       throw new CRM_Core_Exception('Invalid Filter');
     }
     return $subType;
