@@ -342,6 +342,14 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'payment_or_refund_notification', 'type' => 'text'],
         ],
       ],
+      [
+        'version' => '5.53.alpha1',
+        'upgrade_descriptor' => ts('Update to new smarty variables for line items, tax'),
+        'templates' => [
+          ['name' => 'contribution_offline_receipt', 'type' => 'text'],
+          ['name' => 'contribution_offline_receipt', 'type' => 'html'],
+        ],
+      ],
     ];
   }
 
@@ -350,7 +358,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
    *
    * @return array
    */
-  public function getTemplatesToUpdate() {
+  public function getTemplatesToUpdate(): array {
     $templates = $this->getTemplateUpdates();
     $return = [];
     foreach ($templates as $templateArray) {
