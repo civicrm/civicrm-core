@@ -42,6 +42,25 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   }
 
   /**
+   * @var GuzzleHttp\Client
+   */
+  protected $guzzleClient;
+
+  /**
+   * @return \GuzzleHttp\Client
+   */
+  public function getGuzzleClient(): \GuzzleHttp\Client {
+    return $this->guzzleClient ?? new \GuzzleHttp\Client();
+  }
+
+  /**
+   * @param \GuzzleHttp\Client $guzzleClient
+   */
+  public function setGuzzleClient(\GuzzleHttp\Client $guzzleClient) {
+    $this->guzzleClient = $guzzleClient;
+  }
+
+  /**
    * Map fields to parameters.
    *
    * This function is set up and put here to make the mapping of fields
@@ -142,71 +161,29 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     // Send to the payment processor using cURL
 
     $chHost = $host . '?xmldata=' . $xml;
-
-    $ch = curl_init($chHost);
-    if (!$ch) {
-      throw new PaymentProcessorException('Could not initiate connection to payment gateway', 9004);
-    }
-
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, Civi::settings()->get('verifySSL') ? 2 : 0);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, Civi::settings()->get('verifySSL'));
-    // return the result on success, FALSE on failure
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 36000);
-    // set this for debugging -look for output in apache error log
-    //curl_setopt ($ch,CURLOPT_VERBOSE,1 );
-    // ensures any Location headers are followed
+    $curlParams = [
+      CURLOPT_RETURNTRANSFER => TRUE,
+      CURLOPT_TIMEOUT => 36000,
+      CURLOPT_SSL_VERIFYHOST => Civi::settings()->get('verifySSL') ? 2 : 0,
+      CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
+    ];
     if (ini_get('open_basedir') == '') {
-      curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+      $curlParams[CURLOPT_FOLLOWLOCATION] = 1;
     }
-
-    // Send the data out over the wire
-    $responseData = curl_exec($ch);
-
-    // See if we had a curl error - if so tell 'em and bail out
-    // NOTE: curl_error does not return a logical value (see its documentation), but
-    // a string, which is empty when there was no error.
-    if ((curl_errno($ch) > 0) || (strlen(curl_error($ch)) > 0)) {
-      curl_close($ch);
-      $errorNum = curl_errno($ch);
-      $errorDesc = curl_error($ch);
-
-      // Paranoia - in the unlikley event that 'curl' errno fails
-      if ($errorNum == 0) {
-        $errorNum = 9005;
-      }
-
-      // Paranoia - in the unlikley event that 'curl' error fails
-      if (strlen($errorDesc) == 0) {
-        $errorDesc = 'Connection to payment gateway failed';
-      }
-      throw new PaymentProcessorException('Curl error - ' . $errorDesc . ' Try this link for more information http://curl.haxx.se/docs/sslcerts.html', $errorNum);
-    }
-
-    // If null data returned - tell 'em and bail out
-    // NOTE: You will not necessarily get a string back, if the request failed for
-    // any reason, the return value will be the boolean false.
-    if (($responseData === FALSE) || (strlen($responseData) == 0)) {
-      curl_close($ch);
-      throw new PaymentProcessorException('Error: Connection to payment gateway failed - no data returned.', 9006);
-    }
+    $responseData = $this->getGuzzleClient()->post($chHost, [
+      'curl' => $curlParams,
+    ])->getBody();
 
     // If gateway returned no data - tell 'em and bail out
     if (empty($responseData)) {
-      curl_close($ch);
       throw new PaymentProcessorException('Error: No data returned from payment gateway.', 9007);
     }
 
-    // Success so far - close the curl and check the data
-    curl_close($ch);
-
     // Payment successfully sent to gateway - process the response now
-
     $processorResponse = $this->decodeXMLresponse($responseData);
     // success in test mode returns response "APPROVED"
     // test mode always returns trxn_id = 0
     // fix for CRM-2566
-
     if ($processorResponse['errorCode']) {
       throw new PaymentProcessorException("Error: [" . $processorResponse['errorCode'] . " " . $processorResponse['errorName'] . " " . $processorResponse['errorMessage'] . '] - from payment processor', 9010);
     }
