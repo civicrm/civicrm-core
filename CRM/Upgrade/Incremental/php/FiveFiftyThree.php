@@ -57,6 +57,22 @@ class CRM_Upgrade_Incremental_php_FiveFiftyThree extends CRM_Upgrade_Incremental
   public function upgrade_5_53_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Replace %A specifier in date settings.', 'replacePercentA');
+    $this->addTask('Add invoice pdf format', 'addInvoicePDFFormat');
+  }
+
+  /**
+   * @param CRM_Queue_TaskContext $ctx
+   * @return bool
+   */
+  public static function addInvoicePDFFormat(CRM_Queue_TaskContext $ctx) {
+    \CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+      'value' => '{"metric":"px","margin_top":10,"margin_bottom":0,"margin_left":65,"margin_right":0}',
+      'name' => 'default_invoice_pdf_format',
+      'label' => ts('Invoice PDF Format'),
+      'is_reserved' => TRUE,
+      'option_group_id' => 'pdf_format',
+    ]);
+    return TRUE;
   }
 
   public static function replacePercentA($ctx): bool {
