@@ -472,12 +472,11 @@ GROUP BY  currency
    * @param array $params
    *   An assoc array of name/value pairs.
    */
-  public static function sendAcknowledgment(&$form, $params) {
+  public static function sendAcknowledgment($form, $params) {
     //handle Acknowledgment.
     $allPayments = $payments = [];
 
     // get All Payments status types.
-    $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $returnProperties = [
       'status_id',
       'scheduled_amount',
@@ -508,14 +507,6 @@ GROUP BY  currency
             'status' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
           ]
         );
-
-        // get the first valid payment id.
-        if (!isset($form->paymentId) && ($paymentStatusTypes[$values['status_id']] == 'Pending' ||
-            $paymentStatusTypes[$values['status_id']] == 'Overdue'
-          )
-        ) {
-          $form->paymentId = $values['id'];
-        }
       }
     }
 
