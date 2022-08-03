@@ -52,7 +52,8 @@
       };
 
       this.getFkEntity = function() {
-        var fkEntity = ctrl.getDefn().fk_entity;
+        var defn = ctrl.getDefn(),
+          fkEntity = defn.is_id ? ctrl.container.getMainEntityType() : defn.fk_entity;
         return ctrl.editor.meta.entities[fkEntity];
       };
 
