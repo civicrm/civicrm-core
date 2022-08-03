@@ -28,6 +28,13 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
     \Civi::dispatcher()->addListener('hook_civicrm_buildAsset', array($this, 'buildSquareJs'));
   }
 
+  protected function tearDown(): void {
+    \Civi::dispatcher()->removeListener('hook_civicrm_buildAsset', array($this, 'counter'));
+    \Civi::dispatcher()->removeListener('hook_civicrm_buildAsset', array($this, 'buildSquareTxt'));
+    \Civi::dispatcher()->removeListener('hook_civicrm_buildAsset', array($this, 'buildSquareJs'));
+    parent::tearDown();
+  }
+
   /**
    * @param \Civi\Core\Event\GenericHookEvent $e
    * @see \CRM_Utils_Hook::buildAsset()

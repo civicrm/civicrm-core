@@ -401,7 +401,7 @@ class Container {
   }
 
   /**
-   * @return \Symfony\Component\EventDispatcher\EventDispatcher
+   * @return \Civi\Core\CiviEventDispatcherInterface
    */
   public function createEventDispatcher() {
     // Continue building on the original dispatcher created during bootstrap.
@@ -490,7 +490,7 @@ class Container {
   }
 
   /**
-   * @param \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher
+   * @param \Civi\Core\CiviEventDispatcherInterface $dispatcher
    * @param $magicFunctionProvider
    *
    * @return \Civi\API\Kernel

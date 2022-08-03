@@ -3,12 +3,12 @@ namespace Civi\Token;
 
 use Civi\Token\Event\TokenRegisterEvent;
 use Civi\Token\Event\TokenValueEvent;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Civi\Core\CiviEventDispatcher;
 
 class TokenProcessorTest extends \CiviUnitTestCase {
 
   /**
-   * @var \Symfony\Component\EventDispatcher\EventDispatcher
+   * @var \Civi\Core\CiviEventDispatcher
    */
   protected $dispatcher;
 
@@ -21,7 +21,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   protected function setUp(): void {
     $this->useTransaction(TRUE);
     parent::setUp();
-    $this->dispatcher = new EventDispatcher();
+    $this->dispatcher = new CiviEventDispatcher();
     $this->dispatcher->addListener('civi.token.list', [$this, 'onListTokens']);
     $this->dispatcher->addListener('civi.token.eval', [$this, 'onEvalTokens']);
     $this->counts = [
