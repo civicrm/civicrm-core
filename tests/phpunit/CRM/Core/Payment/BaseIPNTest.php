@@ -114,11 +114,11 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
     $contribution->find(TRUE);
-    $contribution->loadRelatedObjects($this->input, $this->ids, TRUE);
+    $ids = array_merge(CRM_Contribute_BAO_Contribution::getComponentDetails($this->_contributionId), $this->ids);
+    $contribution->loadRelatedObjects($this->input, $ids);
     $this->assertNotEmpty($contribution->_relatedObjects['membership']);
     $this->assertArrayHasKey($this->_membershipId . '_' . $this->_membershipTypeID, $contribution->_relatedObjects['membership']);
     $this->assertTrue(is_a($contribution->_relatedObjects['membership'][$this->_membershipId . '_' . $this->_membershipTypeID], 'CRM_Member_BAO_Membership'));
-    $this->assertTrue(is_a($contribution->_relatedObjects['financialType'], 'CRM_Financial_BAO_FinancialType'));
     $this->assertNotEmpty($contribution->_relatedObjects['contributionRecur']);
     $this->assertNotEmpty($contribution->_relatedObjects['paymentProcessor']);
   }
