@@ -55,7 +55,7 @@ class I18nSubscriber implements EventSubscriberInterface {
     else {
       $language = $params['language'] ?? NULL;
     }
-    if ($language) {
+    if ($language && \CRM_Core_I18n::isMultilingual()) {
       $this->setLocale($language, $apiRequest['id']);
     }
   }
@@ -87,12 +87,8 @@ class I18nSubscriber implements EventSubscriberInterface {
    * @throws \API_Exception
    */
   public function setLocale($lcMessages, $requestId) {
-    $domain = new \CRM_Core_DAO_Domain();
-    $domain->id = \CRM_Core_Config::domainID();
-    $domain->find(TRUE);
-
     // Check if the site is multi-lingual
-    if ($domain->locales && $lcMessages) {
+    if ($lcMessages) {
       // Validate language, otherwise a bad dbLocale could probably lead to sql-injection.
       if (!array_key_exists($lcMessages, \Civi::settings()->get('languageLimit'))) {
         throw new \API_Exception(ts('Language not enabled: %1', [1 => $lcMessages]));
