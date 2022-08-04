@@ -30,6 +30,7 @@ use Civi\Api4\UserJob;
 /**
  * @package   CiviCRM
  * @group headless
+ * @group import
  */
 class CRM_Participant_Import_Parser_ParticipantTest extends CiviUnitTestCase {
 

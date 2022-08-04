@@ -22,6 +22,7 @@ use Civi\Api4\UserJob;
  *
  * @package CiviCRM
  * @group headless
+ * @group import
  */
 class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
 

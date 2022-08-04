@@ -25,6 +25,7 @@ use Civi\Api4\UserJob;
  *
  * @package   CiviCRM
  * @group headless
+ * @group import
  */
 class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
