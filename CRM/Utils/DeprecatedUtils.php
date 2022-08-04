@@ -48,7 +48,7 @@ function _civicrm_api3_deprecated_duplicate_formatted_contact($params) {
         'is_error' => 1,
         'error_message' => [
           'code' => CRM_Core_Error::DUPLICATE_CONTACT,
-          'params' => $contact->id,
+          'params' => [$contact->id],
           'level' => 'Fatal',
           'message' => "Found matching contacts: $contact->id",
         ],
