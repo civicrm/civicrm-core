@@ -34,6 +34,12 @@ class SettingsStyleTest extends \CiviUnitTestCase {
       $assert($key, $key === $spec['name'], 'Should have matching name');
       $type = $spec['type'] ?? 'UNKNOWN';
       $assert($key, in_array($type, $validTypes), 'Should have known type. Found: ' . $type);
+      if (version_compare($spec['add'], '5.53', '>=')) {
+        $assert($key, preg_match(';^[a-z0-9]+(_[a-z0-9]+)+$;', $key), 'In 5.53+, names should use snake_case with a group/subsystem prefix.');
+      }
+      else {
+        $assert($key, preg_match(';^[a-z][a-zA-Z0-9_]+$;', $key), 'In 4.1-5.52, names should snake_case or lowerCamelCase.');
+      }
     }
     $this->assertEquals([], $errors);
   }
