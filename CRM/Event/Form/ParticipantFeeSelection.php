@@ -267,7 +267,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
   /**
    * @param array $params
    */
-  private function emailReceipt(array $params) {
+  private function emailReceipt(array $params): void {
     $updatedLineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant', FALSE, FALSE);
     $lineItem = [];
     if ($updatedLineItem) {
@@ -282,14 +282,13 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
     $this->assign('module', 'Event Registration');
     //use of the message template below requires variables in different format
-    $event = $events = [];
+    $events = [];
     $returnProperties = ['fee_label', 'start_date', 'end_date', 'is_show_location', 'title'];
 
     //get all event details.
     CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $params['event_id'], $events, $returnProperties);
     $event = $events[$params['event_id']];
-    unset($event['start_date']);
-    unset($event['end_date']);
+    unset($event['start_date'], $event['end_date']);
 
     $role = CRM_Event_PseudoConstant::participantRole();
     $participantRoles = $params['role_id'] ?? NULL;
@@ -322,7 +321,6 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       $this->assign('location', $location);
     }
 
-    $status = CRM_Event_PseudoConstant::participantStatus();
     if ($this->_isPaidEvent) {
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
       if (!$this->_mode) {
@@ -342,7 +340,6 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     }
 
     $this->assign('register_date', $params['register_date']);
-    $template = CRM_Core_Smarty::singleton();
 
     // Retrieve the name and email of the contact - this will be the TO for receipt email
     [$this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->_contactId);
@@ -350,9 +347,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $this->_contributorDisplayName = ($this->_contributorDisplayName == ' ') ? $this->_contributorEmail : $this->_contributorDisplayName;
 
     $waitStatus = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
-    if ($waitingStatus = CRM_Utils_Array::value($params['status_id'], $waitStatus)) {
-      $this->assign('isOnWaitlist', TRUE);
-    }
+    $this->assign('isOnWaitlist', (bool) ($params['status_id'][$waitStatus] ?? FALSE));
     $this->assign('contactID', $this->_contactId);
 
     $sendTemplateParams = [
