@@ -99,7 +99,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyThree extends CRM_Upgrade_Incremental
     // is_default has weird meaning - it means the one currently in use, not the default distributed with civi (which is is_reserved).
     // The "NOT LIKE" part is necessary to avoid false positives because the
     // event receipt uses it (correctly) with date_format.
-    $dao = CRM_Core_DAO::executeQuery("SELECT id, msg_title FROM civicrm_msg_template WHERE is_default = 1 AND ((msg_html LIKE BINARY '%\\%A%' AND msg_html NOT LIKE BINARY '%date_format:\"\\%A\"%') OR (msg_text LIKE BINARY '%\\%A%' AND msg_text NOT LIKE BINARY '%date_format:\"\\%A\"%') OR (msg_subject LIKE BINARY '%\\%A%' AND msg_subject NOT LIKE BINARY '%date_format:\"\\%A\"%'))");
+    $dao = CRM_Core_DAO::executeQuery("SELECT id, msg_title FROM civicrm_msg_template WHERE is_default = 1 AND workflow_name <> 'event_online_receipt' AND ((msg_html LIKE BINARY '%\\%A%' AND msg_html NOT LIKE BINARY '%date_format:\"\\%A\"%') OR (msg_text LIKE BINARY '%\\%A%' AND msg_text NOT LIKE BINARY '%date_format:\"\\%A\"%') OR (msg_subject LIKE BINARY '%\\%A%' AND msg_subject NOT LIKE BINARY '%date_format:\"\\%A\"%'))");
     while ($dao->fetch()) {
       $usages[$dao->id] = $dao->msg_title;
     }
