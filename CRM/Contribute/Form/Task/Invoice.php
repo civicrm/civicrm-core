@@ -221,7 +221,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $pendingStatusId = CRM_Utils_Array::key('Pending', $contributionStatusID);
     $pdfFormat = CRM_Core_BAO_PdfFormat::getByName('default_invoice_pdf_format');
 
-    foreach ($invoiceElements['details'] as $contribID => $detail) {
+    foreach ($invoiceElements['details'] as $contributionID => $detail) {
       $input = $ids = [];
       if (in_array($detail['contact'], $invoiceElements['excludeContactIds'])) {
         continue;
@@ -230,7 +230,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $input['component'] = $detail['component'];
 
       $ids['contact'] = $detail['contact'];
-      $ids['contribution'] = $contribID;
+      $ids['contribution'] = $contributionID;
       $ids['contributionRecur'] = NULL;
       $ids['contributionPage'] = NULL;
       $ids['membership'] = $detail['membership'] ?? NULL;
@@ -238,12 +238,13 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $ids['event'] = $detail['event'] ?? NULL;
 
       $contribution = new CRM_Contribute_BAO_Contribution();
-      $contribution->id = $contribID;
+      $contribution->id = $contributionID;
       $contribution->fetch();
       // @todo this is only used now to load the event title, it causes an enotice
       // and calls deprecated code. If we decide a contribution title is a
       // 'real thing' then we should create a token.
-      $contribution->loadRelatedObjects($input, $ids, TRUE);
+      $ids = array_merge(CRM_Contribute_BAO_Contribution::getComponentDetails($contributionID), $ids);
+      $contribution->loadRelatedObjects($input, $ids);
 
       $input['amount'] = $contribution->total_amount;
       $input['invoice_id'] = $contribution->invoice_id;
@@ -278,13 +279,13 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $dueDatePeriodSetting = Civi::settings()->get('invoice_due_date_period');
       $dueDate = date('F j, Y', strtotime($contributionReceiveDate . "+" . $dueDateSetting . "" . $dueDatePeriodSetting));
 
-      $amountPaid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribID, TRUE);
+      $amountPaid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contributionID, TRUE);
       $amountDue = ($input['amount'] - $amountPaid);
 
       // retrieving the subtotal and sum of same tax_rate
       $dataArray = [];
       $subTotal = 0;
-      $lineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribID);
+      $lineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contributionID);
       foreach ($lineItem as $taxRate) {
         if (isset($dataArray[(string) $taxRate['tax_rate']])) {
           $dataArray[(string) $taxRate['tax_rate']] = $dataArray[(string) $taxRate['tax_rate']] + CRM_Utils_Array::value('tax_amount', $taxRate);

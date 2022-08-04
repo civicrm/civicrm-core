@@ -2311,13 +2311,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *   Input as delivered from Payment Processor.
    * @param array $ids
    *   Ids as Loaded by Payment Processor.
-   * @param bool $loadAll
-   *   Load all related objects - even where id not passed in? (allows API to call this).
    *
    * @return bool
    * @throws CRM_Core_Exception
    */
-  public function loadRelatedObjects($input, &$ids, $loadAll = FALSE) {
+  public function loadRelatedObjects($input, &$ids) {
     // @todo deprecate this function - the steps should be
     // 1) add additional functions like 'getRelatedMemberships'
     // 2) switch all calls that refer to ->_relatedObjects to
@@ -2326,12 +2324,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // 4) make ->_relatedObjects protected
     // 5) hone up the individual functions to not use rely on this having been called
     // 6) deprecate like mad
-    if ($loadAll) {
-      $ids = array_merge(self::getComponentDetails($this->id), $ids);
-      if (empty($ids['contact']) && isset($this->contact_id)) {
-        $ids['contact'] = $this->contact_id;
-      }
-    }
     if (empty($this->_component)) {
       if (!empty($ids['event'])) {
         $this->_component = 'event';
@@ -2467,7 +2459,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @throws Exception
    */
   public function composeMessageArray(&$input, &$ids, &$values, $returnMessageText = TRUE) {
-    $this->loadRelatedObjects($input, $ids, TRUE);
+    $ids = array_merge(self::getComponentDetails($this->id), $ids);
+    if (empty($ids['contact']) && isset($this->contact_id)) {
+      $ids['contact'] = $this->contact_id;
+    }
+    $this->loadRelatedObjects($input, $ids);
 
     if (empty($this->_component)) {
       $this->_component = $input['component'] ?? NULL;
