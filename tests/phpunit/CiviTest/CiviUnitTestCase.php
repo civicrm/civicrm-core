@@ -3934,4 +3934,33 @@ WHERE a1.is_primary = 0
     ])->execute()->first();
   }
 
+  /**
+   * Get an array of tables with rows - useful for diagnosing cleanup issues.
+   *
+   * @return array
+   */
+  protected function getTablesWithData(): array {
+    $dataObject = new CRM_Core_DAO();
+    $data = [];
+    $sql = CRM_Core_DAO::singleValueQuery("SELECT GROUP_CONCAT(
+      'SELECT \"',
+      table_name,
+      '\" AS table_name, COUNT(*) AS row_count FROM `',
+      table_schema,
+      '`.`',
+      table_name,
+      '`' SEPARATOR ' UNION  '
+    )
+FROM INFORMATION_SCHEMA.TABLES
+WHERE table_schema = '$dataObject->_database'");
+    $result = CRM_Core_DAO::executeQuery($sql);
+    while ($result->fetch()) {
+      $count = (int) $result->row_count;
+      if ($count > 0) {
+        $data[$result->table_name] = $count;
+      }
+    }
+    return $data;
+  }
+
 }

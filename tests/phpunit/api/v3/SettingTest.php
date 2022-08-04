@@ -27,6 +27,9 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   protected $domainID2;
   protected $domainID3;
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function setUp(): void {
     parent::setUp();
     $params = [
@@ -48,27 +51,44 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->hookClass = CRM_Utils_Hook::singleton();
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function tearDown(): void {
-    CRM_Utils_Hook::singleton()->reset();
     parent::tearDown();
-    $this->callAPISuccess('system', 'flush', []);
-    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_domain WHERE name LIKE "' . __CLASS__ . '%"');
+    try {
+      CRM_Core_DAO::executeQuery('
+        DELETE d, s, n, dc, m
+        FROM civicrm_domain d
+          INNER JOIN civicrm_setting s ON s.domain_id = d.id
+          INNER JOIN civicrm_navigation n ON n.domain_id = d.id
+          INNER JOIN civicrm_menu m ON m.domain_id = d.id
+          INNER JOIN civicrm_dashboard dc ON dc.domain_id = d.id
+        WHERE d.name LIKE "' . __CLASS__ . '%"
+     ');
+    }
+    catch (CRM_Core_Exception $e) {
+      $result = $this->getTablesWithData();
+      throw new CRM_Core_Exception($e->getMessage() . 'look to one of these tables to have the data ...' . print_r($result, TRUE));
+    }
   }
 
   /**
    * Set additional settings into metadata (implements hook)
+   *
    * @param array $metaDataFolders
    */
-  public function setExtensionMetadata(&$metaDataFolders) {
+  public function setExtensionMetadata(array &$metaDataFolders): void {
     global $civicrm_root;
     $metaDataFolders[] = $civicrm_root . '/tests/phpunit/api/v3/settings';
   }
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
    */
-  public function testGetFields($version) {
+  public function testGetFields(int $version): void {
     $this->_apiversion = $version;
     $description = 'Demonstrate return from getfields - see sub-folder for variants';
     $result = $this->callAPIAndDocument('setting', 'getfields', [], __FUNCTION__, __FILE__, $description);
