@@ -28,7 +28,10 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
 
   protected $_caseDetailExtra = [];
 
-  protected $_customGroupExtends = ['Case'];
+  protected $_customGroupExtends = [
+    'Case',
+    'Contact',
+  ];
 
   protected $_caseTypeNameOrderBy = FALSE;
 
