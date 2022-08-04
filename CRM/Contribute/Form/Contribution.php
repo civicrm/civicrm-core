@@ -703,8 +703,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-    // If contribution is a template receive date is not required
-    $receiveDateRequired = !$this->_values['is_template'];
+    // If contribution is a template receive date is not required and if we are in a live credit card mode
+    $receiveDateRequired = !$this->_values['is_template'] && !$this->_mode;
     // add various dates
     $this->addField('receive_date', ['entity' => 'contribution'], $receiveDateRequired, FALSE);
     $this->addField('receipt_date', ['entity' => 'contribution'], FALSE, FALSE);
