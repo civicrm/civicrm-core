@@ -1,0 +1,41 @@
+<?php
+namespace Civi\Core;
+
+class SettingsStyleTest extends \CiviUnitTestCase {
+
+  protected function setUp(): void {
+    parent::setUp();
+    $this->useTransaction(TRUE);
+  }
+
+  /**
+   * Scan all known settings
+   */
+  public function testConformance() {
+    $errors = [];
+    $assert = function (string $setting, bool $condition, string $message) use (&$errors) {
+      if (!$condition) {
+        $errors[] = $setting . ': ' . $message;
+      }
+    };
+
+    $validTypes = array_merge(
+      // The list of 'type's are a bit of a mess. We'll prevent it from becoming more of a mess...
+      array_keys(\CRM_Utils_Type::getValidTypes()),
+      [\CRM_Utils_Type::T_STRING, \CRM_Utils_Type::T_BOOLEAN, \CRM_Utils_Type::T_INT],
+      ['Array', 'Integer']
+    );
+
+    $all = SettingsMetadata::getMetadata();
+    $this->assertTrue(count($all) > 10);
+    foreach ($all as $key => $spec) {
+      $assert($key, preg_match(';^\d+\.\d+(\.\d+)?$;', $spec['add'] ?? NULL), 'Should have well-formed \"add\" property');
+      $assert($key, $spec['is_domain'] xor $spec['is_contact'], 'Should be is_domain xor is_contact');
+      $assert($key, $key === $spec['name'], 'Should have matching name');
+      $type = $spec['type'] ?? 'UNKNOWN';
+      $assert($key, in_array($type, $validTypes), 'Should have known type. Found: ' . $type);
+    }
+    $this->assertEquals([], $errors);
+  }
+
+}
