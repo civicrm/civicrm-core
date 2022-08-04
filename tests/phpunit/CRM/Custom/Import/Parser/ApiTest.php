@@ -9,6 +9,7 @@
  *
  * @package CiviCRM
  * @group headless
+ * @group import
  */
 class CRM_Custom_Import_Parser_ApiTest extends CiviUnitTestCase {
 

@@ -11,6 +11,9 @@
 
 /**
  * Tests for the CRM_Import_Datasource_Csv class.
+ *
+ * @group headless
+ * @group import
  */
 class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
 

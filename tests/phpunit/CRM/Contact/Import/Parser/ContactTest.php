@@ -34,6 +34,7 @@ use Civi\Api4\Website;
  *
  * @package CiviCRM
  * @group headless
+ * @group import
  */
 class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;

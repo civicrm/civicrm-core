@@ -29,6 +29,7 @@ use Civi\Api4\UserJob;
 /**
  * @package   CiviCRM
  * @group headless
+ * @group import
  */
 class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
