@@ -218,7 +218,7 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
     $this->assertEquals(['foo'], $tokenRecord['scopes']);
     $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
     $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
-    $this->assertNull($tokenRecord['contact_id']);
+    $this->assertTrue(!isset($tokenRecord['contact_id']));
   }
 
   public function testContactToken_AnonymousUser_CreateContact() {
@@ -385,7 +385,7 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
     $this->assertEquals(['foo'], $tokenRecord['scopes']);
     $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
     $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
-    $this->assertNull($tokenRecord['contact_id']);
+    $this->assertTrue(!isset($tokenRecord['contact_id']));
   }
 
 }
