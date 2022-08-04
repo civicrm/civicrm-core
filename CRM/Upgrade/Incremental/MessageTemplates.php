@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\MessageTemplate;
+
 /**
  *
  * @package CRM
@@ -26,14 +28,14 @@ class CRM_Upgrade_Incremental_MessageTemplates {
   /**
    * @return string
    */
-  public function getUpgradeVersion() {
+  public function getUpgradeVersion(): string {
     return $this->upgradeVersion;
   }
 
   /**
    * @param string $upgradeVersion
    */
-  public function setUpgradeVersion($upgradeVersion) {
+  public function setUpgradeVersion($upgradeVersion): void {
     $this->upgradeVersion = $upgradeVersion;
   }
 
@@ -51,7 +53,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
    *
    * @return array
    */
-  protected function getTemplateUpdates() {
+  protected function getTemplateUpdates(): array {
     return [
       [
         'version' => '5.4.alpha1',
@@ -358,7 +360,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
    *
    * @return array
    */
-  public function getTemplatesToUpdate(): array {
+  public function getTemplatesToAskUserToUpdate(): array {
     $templates = $this->getTemplateUpdates();
     $return = [];
     foreach ($templates as $templateArray) {
@@ -465,8 +467,8 @@ class CRM_Upgrade_Incremental_MessageTemplates {
   /**
    * Get the upgrade messages.
    */
-  public function getUpgradeMessages() {
-    $updates = $this->getTemplatesToUpdate();
+  public function getUpgradeMessages(): array {
+    $updates = $this->getTemplatesToAskUserToUpdate();
     $messages = [];
     $templateLabel = '';
     foreach ($updates as $key => $value) {
@@ -489,42 +491,45 @@ class CRM_Upgrade_Incremental_MessageTemplates {
 
   /**
    * Update message templates.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
    */
-  public function updateTemplates() {
-    $templates = $this->getTemplatesToUpdate();
-    foreach ($templates as $template) {
-      $workFlowID = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) as id FROM civicrm_option_value WHERE name = %1", [
-        1 => [$template['name'], 'String'],
-      ]);
-      $content = file_get_contents(\Civi::paths()->getPath('[civicrm.root]/xml/templates/message_templates/' . $template['name'] . '_' . $template['type'] . '.tpl'));
-      $templatesToUpdate = [];
-      if (!empty($workFlowID)) {
-        // This could be empty if the template was deleted. It should not happen,
-        // but has been seen in the wild (ex: marketing/civicrm-website#163).
-        $id = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_msg_template WHERE workflow_id = $workFlowID AND is_reserved = 1");
-        if ($id) {
-          $templatesToUpdate[] = $id;
-        }
-        $defaultTemplateID = CRM_Core_DAO::singleValueQuery("
-          SELECT default_template.id FROM civicrm_msg_template reserved
-          LEFT JOIN civicrm_msg_template default_template
-            ON reserved.workflow_id = default_template.workflow_id
-          WHERE reserved.workflow_id = $workFlowID
-          AND reserved.is_reserved = 1 AND default_template.is_default = 1 AND reserved.id <> default_template.id
-          AND reserved.msg_{$template['type']} = default_template.msg_{$template['type']}
-        ");
-        if ($defaultTemplateID) {
-          $templatesToUpdate[] = $defaultTemplateID;
-        }
+  public function updateTemplates(): void {
+    // We only need to do this once as the templates are coming from the
+    // disk & won't change as we go.
+    if (empty(Civi::$statics[__CLASS__]['templates_reloaded'])) {
+      $workflowTemplates = MessageTemplate::get(FALSE)
+        ->addWhere('workflow_name', 'LIKE', '%')
+        ->addWhere('is_reserved', '=', TRUE)
+        ->addSelect('workflow_name', 'msg_subject', 'msg_text', 'msg_html', 'id')
+        ->execute();
 
-        if (!empty($templatesToUpdate)) {
-          CRM_Core_DAO::executeQuery("
-            UPDATE civicrm_msg_template SET msg_{$template['type']} = %1 WHERE id IN (" . implode(',', $templatesToUpdate) . ")", [
-              1 => [$content, 'String'],
-            ]
-          );
+      foreach ($workflowTemplates as $workflowTemplate) {
+        foreach (['html', 'text', 'subject'] as $type) {
+          $templatesToUpdate = [];
+          $content = file_get_contents(Civi::paths()
+            ->getPath('[civicrm.root]/xml/templates/message_templates/' . $workflowTemplate['workflow_name'] . '_' . $type . '.tpl'));
+          if ($content && $content !== $workflowTemplate['msg_' . $type]) {
+            $templatesToUpdate[] = $workflowTemplate['id'];
+            $defaultTemplateID = CRM_Core_DAO::singleValueQuery("
+            SELECT default_template.id FROM civicrm_msg_template reserved
+            LEFT JOIN civicrm_msg_template default_template
+              ON reserved.workflow_name = default_template.workflow_name
+            WHERE reserved.workflow_name = '{$workflowTemplate['workflow_name']}'
+            AND reserved.is_reserved = 1 AND default_template.is_default = 1 AND reserved.id <> default_template.id
+            AND reserved.msg_$type = default_template.msg_$type
+          ");
+            if ($defaultTemplateID) {
+              $templatesToUpdate[] = $defaultTemplateID;
+            }
+            if (!empty($templatesToUpdate)) {
+              CRM_Core_DAO::executeQuery("
+              UPDATE civicrm_msg_template SET msg_$type = %1 WHERE id IN (" . implode(',', $templatesToUpdate) . ')', [1 => [$content, 'String']]);
+            }
+          }
         }
       }
+      Civi::$statics[__CLASS__]['templates_reloaded'] = TRUE;
     }
   }
 

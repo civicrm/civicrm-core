@@ -182,8 +182,12 @@ class CRM_Upgrade_Incremental_General {
       1 => 'https://docs.civicrm.org/user/en/latest/email/message-templates/#modifying-system-workflow-message-templates',
       2 => '<ul>' . implode('', $messagesHtml) . '</ul>',
     ]);
-
-    $messageObj->updateTemplates();
+    if (version_compare($version, 5.26, '>')) {
+      // updateTemplates requires workflow_name which has been around
+      // for a couple of years at this point. As user hit later versions
+      // they will be get the update anyway.
+      $messageObj->updateTemplates();
+    }
   }
 
   /**
