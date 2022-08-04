@@ -694,7 +694,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     $totalRowCount = $totalRows = $dataSource->getRowCount(['new']);
     $queue = Civi::queue('user_job_' . $this->getUserJobID(), ['type' => 'Sql', 'error' => 'abort']);
     $offset = 0;
-    $batchSize = 5;
+    $batchSize = 50;
     while ($totalRows > 0) {
       if ($totalRows < $batchSize) {
         $batchSize = $totalRows;
