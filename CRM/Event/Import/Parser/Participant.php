@@ -236,7 +236,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         $error = $this->checkContactDuplicate($formatValues);
 
         if (CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
-          $matchedIDs = explode(',', $error['error_message']['params'][0]);
+          $matchedIDs = (array) $error['error_message']['params'];
           if (count($matchedIDs) >= 1) {
             foreach ($matchedIDs as $contactId) {
               $formatted['contact_id'] = $contactId;

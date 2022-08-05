@@ -417,7 +417,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $error = $this->checkContactDuplicate($paramValues);
 
         if (CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
-          $matchedIDs = explode(',', $error['error_message']['params'][0]);
+          $matchedIDs = (array) $error['error_message']['params'];
           if (count($matchedIDs) > 1) {
             throw new CRM_Core_Exception('Multiple matching contact records detected for this row. The contribution was not imported', CRM_Import_Parser::ERROR);
           }
@@ -776,7 +776,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
               $error = $this->checkContactDuplicate($params);
 
               if (isset($error['error_message']['params'][0])) {
-                $matchedIDs = explode(',', $error['error_message']['params'][0]);
+                $matchedIDs = (array) $error['error_message']['params'];
 
                 // check if only one contact is found
                 if (count($matchedIDs) > 1) {
