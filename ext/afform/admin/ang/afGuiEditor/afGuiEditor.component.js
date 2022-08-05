@@ -580,7 +580,7 @@
               snapshot.afform.name = data[0].name;
             });
             if (!angular.equals(afform.navigation, lastSaved.navigation) ||
-              (afform.server_route !== lastSaved.server_route && afform.navigation)
+              (afform.server_route !== lastSaved.server_route && afform.navigation) ||
               (afform.icon !== lastSaved.icon && afform.navigation)
             ) {
               refreshMenubar();
