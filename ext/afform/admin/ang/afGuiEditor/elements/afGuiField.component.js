@@ -224,10 +224,6 @@
         getSet('required', !getSet('required'));
       };
 
-      $scope.toggleSkipPermissions = function() {
-        getSet('skip_permissions', !getSet('skip_permissions'));
-      };
-
       $scope.toggleHelp = function(position) {
         getSet('help_' + position, $scope.propIsset('help_' + position) ? null : (ctrl.getDefn()['help_' + position] || ts('Enter text')));
       };

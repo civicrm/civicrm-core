@@ -68,9 +68,13 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   protected function loadEntities() {
     foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
       $this->_entityIds[$entityName] = [];
+      $idField = CoreUtil::getIdFieldName($entity['type']);
       if (!empty($entity['actions']['update'])) {
-        if (!empty($this->args[$entityName]) && !empty($entity['url-autofill'])) {
-          $ids = array_map('trim', explode(',', $this->args[$entityName]));
+        if (
+          !empty($this->args[$entityName]) &&
+          (!empty($entity['url-autofill']) || isset($entity['fields'][$idField]))
+        ) {
+          $ids = (array) $this->args[$entityName];
           // Limit number of records to 1 unless using af-repeat
           $ids = array_slice($ids, 0, !empty($entity['af-repeat']) ? $entity['max'] ?? NULL : 1);
           $this->loadEntity($entity, $ids);
@@ -90,10 +94,17 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    */
   private function loadEntity(array $entity, array $ids) {
     $api4 = $this->_formDataModel->getSecureApi4($entity['name']);
+    $idField = CoreUtil::getIdFieldName($entity['type']);
+    if (!empty($entity['fields'][$idField]['saved_search'])) {
+      $ids = $this->validateBySavedSearch($entity, $idField, $ids);
+    }
+    if (!$ids) {
+      return;
+    }
     $result = $api4($entity['type'], 'get', [
       'where' => [['id', 'IN', $ids]],
       'select' => array_keys($entity['fields']),
-    ])->indexBy('id');
+    ])->indexBy($idField);
     foreach ($ids as $index => $id) {
       $this->_entityIds[$entity['name']][$index] = [
         'id' => isset($result[$id]) ? $id : NULL,
@@ -131,6 +142,23 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     if ($id) {
       $this->loadEntity($entity, [$id]);
     }
+  }
+
+  private function validateBySavedSearch($entity, array $ids) {
+    $idField = CoreUtil::getIdFieldName($entity['type']);
+    $fetched = civicrm_api4($entity['type'], 'autocomplete', [
+      'ids' => $ids,
+      'formName' => 'afform:' . $this->name,
+      'fieldName' => $entity['name'] . ':' . $idField,
+    ])->indexBy($idField);
+    $validIds = [];
+    // Preserve keys
+    foreach ($ids as $index => $id) {
+      if (isset($fetched[$id])) {
+        $validIds[$index] = $id;
+      }
+    }
+    return $validIds;
   }
 
   /**

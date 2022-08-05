@@ -180,7 +180,7 @@ class AfformMetadataInjector {
       }
     }
     // Id field for selecting existing entity
-    if ($field['name'] === CoreUtil::getIdFieldName($entityName)) {
+    if ($action === 'update' && $field['name'] === CoreUtil::getIdFieldName($entityName)) {
       $entityTitle = CoreUtil::getInfoItem($entityName, 'title');
       $field['input_type'] = 'Existing';
       $field['entity'] = $entityName;

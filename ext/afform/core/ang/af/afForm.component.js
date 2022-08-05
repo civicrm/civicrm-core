@@ -37,16 +37,30 @@
       this.getFormMeta = function getFormMeta() {
         return $scope.$parent.meta;
       };
-      this.loadData = function() {
-        var toLoad = 0;
-        args = _.assign({}, $scope.$parent.routeParams || {}, $scope.$parent.options || {});
-        _.each(schema, function(entity, entityName) {
-          if (args[entityName] || entity.autofill) {
-            toLoad++;
-          }
-        });
+      // With no arguments this will prefill the entire form based on url args
+      // With selectedEntity, selectedIndex & selectedId provided this will prefill a single entity
+      this.loadData = function(selectedEntity, selectedIndex, selectedId) {
+        var toLoad = 0,
+          params = {name: ctrl.getFormMeta().name, args: {}};
+        // Load single entity
+        if (selectedEntity) {
+          toLoad = selectedId;
+          params.args[selectedEntity] = {};
+          params.args[selectedEntity][selectedIndex] = selectedId;
+        } else {
+          args = _.assign({}, $scope.$parent.routeParams || {}, $scope.$parent.options || {});
+          _.each(schema, function (entity, entityName) {
+            if (args[entityName] || entity.autofill) {
+              toLoad++;
+            }
+            if (args[entityName] && typeof args[entityName] === 'string') {
+              args[entityName] = args[entityName].split(',');
+            }
+          });
+          params.args = args;
+        }
         if (toLoad) {
-          crmApi4('Afform', 'prefill', {name: ctrl.getFormMeta().name, args: args})
+          crmApi4('Afform', 'prefill', params)
             .then(function(result) {
               _.each(result, function(item) {
                 data[item.name] = data[item.name] || {};
@@ -98,7 +112,6 @@
       function replaceTokens(str, vars) {
         function recurse(stack, values) {
           _.each(values, function(value, key) {
-            console.log('value:' + value, stack);
             if (_.isArray(value) || _.isPlainObject(value)) {
               recurse(stack.concat([key]), value);
             } else {

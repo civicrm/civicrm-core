@@ -24,6 +24,9 @@
             // If there is no Afform entity, get the name of embedded search display
             $element.find('[search-name][display-name]').attr('display-name');
         };
+        this.getEntity = function() {
+          return this.afFormCtrl.getEntity(this.modelName);
+        };
         this.getEntityType = function() {
           return this.afFormCtrl.getEntity(this.modelName).type;
         };

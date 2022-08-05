@@ -57,7 +57,7 @@ class AutocompleteSubscriber implements EventSubscriberInterface {
       if (!empty($entity['fields'][$fieldName]['defn'])) {
         $defn = \CRM_Utils_JS::decode($entity['fields'][$fieldName]['defn']);
       }
-      $apiRequest->setCheckPermissions(empty($defn['skip_permissions']));
+      $apiRequest->setCheckPermissions($entity['security'] !== 'FBAC');
       $apiRequest->setSavedSearch($defn['saved_search'] ?? NULL);
     }
   }

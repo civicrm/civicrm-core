@@ -18,12 +18,6 @@
     {{:: ts('Required') }}
   </a>
 </li>
-<li ng-if="$ctrl.fieldDefn.input_type === 'Existing'">
-  <a href ng-click="toggleSkipPermissions(); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Allows non-permissioned users to access any record returned by the saved search') }}">
-    <i class="crm-i fa-{{ getProp('skip_permissions') ? 'check-' : '' }}square-o"></i>
-    {{:: ts('Disable Permission Checks') }}
-  </a>
-</li>
 <li ng-if="$ctrl.fieldDefn.input_type !== 'Existing'">
   <a href ng-click="toggleDefaultValue(); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Pre-fill this field with a value') }}">
     <i class="crm-i fa-{{ $ctrl.hasDefaultValue ? 'check-' : '' }}square-o"></i>
