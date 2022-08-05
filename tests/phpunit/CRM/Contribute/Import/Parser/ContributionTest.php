@@ -276,6 +276,49 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals('No matching Contact found for (mum@example.com )', $row['_status_message']);
   }
 
+  public function testImportWithMatchByExternalIdentifier() :void {
+    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_contact AUTO_INCREMENT = 1000000");
+
+    $contactRubyParams = [
+      'first_name' => 'Ruby',
+      'external_identifier' => 'ruby',
+      'contact_type' => 'Individual',
+    ];
+    $contactSapphireParams = [
+      'first_name' => 'Sapphire',
+      'external_identifier' => 'sapphire',
+      'contact_type' => 'Individual',
+    ];
+    $contactRubyId = $this->individualCreate($contactRubyParams);
+    $contactSapphireId = $this->individualCreate($contactSapphireParams);
+
+    // make sure we're testing dev/core#3784
+    self::assertEquals(1, substr($contactRubyId, 0, 1));
+    self::assertEquals(1, substr($contactSapphireId, 0, 1));
+
+    $mapping = [
+      ['name' => 'external_identifier'],
+      ['name' => 'total_amount'],
+      ['name' => 'receive_date'],
+      ['name' => 'financial_type_id'],
+    ];
+    $this->importCSV('contributions_match_external_id.csv', $mapping);
+
+    $contributionsOfRuby = Contribution::get()
+      ->addWhere('contact_id', '=', $contactRubyId)->execute();
+    $contributionsOfSapphire = Contribution::get()
+      ->addWhere('contact_id', '=', $contactSapphireId)->execute();
+
+    $this->assertCount(1, $contributionsOfRuby, 'Wrong number of contributions imported');
+    $this->assertCount(1, $contributionsOfSapphire, 'Wrong number of contributions imported');
+    $this->assertEquals(22222, $contributionsOfRuby->first()['total_amount']);
+    $this->assertEquals(5, $contributionsOfSapphire->first()['total_amount']);
+
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $this->assertEquals(0, $dataSource->getRowCount([CRM_Import_Parser::ERROR]));
+    $this->assertEquals(2, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
+  }
+
   /**
    * Run the import parser.
    *
