@@ -54,6 +54,10 @@ trait SavedSearchInspectorTrait {
         ->addWhere('name', '=', $this->savedSearch)
         ->execute()->single();
     }
+    if (is_array($this->savedSearch)) {
+      $this->savedSearch += ['api_params' => []];
+      $this->savedSearch['api_params'] += ['select' => [], 'where' => []];
+    }
     $this->_apiParams = ($this->savedSearch['api_params'] ?? []) + ['select' => [], 'where' => []];
   }
 
@@ -177,14 +181,15 @@ trait SavedSearchInspectorTrait {
   }
 
   /**
-   * @param array $fieldNames
+   * @param string|array $fieldName
    *   If multiple field names are given they will be combined in an OR clause
    * @param mixed $value
    */
-  protected function applyFilter(array $fieldNames, $value) {
+  protected function applyFilter($fieldName, $value) {
     // Global setting determines if % wildcard should be added to both sides (default) or only the end of a search string
     $prefixWithWildcard = \Civi::settings()->get('includeWildCardInName');
 
+    $fieldNames = (array) $fieldName;
     // Based on the first field, decide which clause to add this condition to
     $fieldName = $fieldNames[0];
     $field = $this->getField($fieldName);

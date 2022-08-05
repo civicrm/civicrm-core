@@ -56,6 +56,22 @@ class AutocompleteAction extends AbstractAction {
   protected $fieldName;
 
   /**
+   * Filters requested by untrusted client, permissions will be checked before applying (even if this request has checkPermissions = FALSE).
+   *
+   * Format: [fieldName => value][]
+   * @var array
+   */
+  protected $clientFilters = [];
+
+  /**
+   * Filters set programmatically by `civi.api.prepare` listener. Automatically trusted.
+   *
+   * Format: [fieldName => value][]
+   * @var array
+   */
+  private $trustedFilters = [];
+
+  /**
    * Fetch results.
    *
    * @param \Civi\Api4\Generic\Result $result
@@ -102,10 +118,12 @@ class AutocompleteAction extends AbstractAction {
     if (empty($this->_apiParams['having'])) {
       $this->_apiParams['select'] = $select;
     }
+    // A HAVING clause depends on the SELECT clause so don't overwrite it.
     else {
-      $this->_apiParams['select'] = array_merge($this->_apiParams['select'], $select);
+      $this->_apiParams['select'] = array_unique(array_merge($this->_apiParams['select'], $select));
     }
     $this->_apiParams['checkPermissions'] = $this->getCheckPermissions();
+    $this->applyFilters();
     $apiResult = civicrm_api4($entityName, 'get', $this->_apiParams);
     $rawResults = array_slice((array) $apiResult, 0, $resultsPerPage);
     foreach ($rawResults as $row) {
@@ -122,6 +140,49 @@ class AutocompleteAction extends AbstractAction {
       $result[] = $mapped;
     }
     $result->setCountMatched($apiResult->countFetched());
+  }
+
+  /**
+   * Method for `civi.api.prepare` listener to add a trusted filter.
+   *
+   * @param string $fieldName
+   * @param mixed $value
+   */
+  public function addFilter(string $fieldName, $value) {
+    $this->trustedFilters[$fieldName] = $value;
+  }
+
+  /**
+   * Applies trusted filters. Checks access before applying client filters.
+   */
+  private function applyFilters() {
+    foreach ($this->trustedFilters as $field => $val) {
+      if ($this->hasValue($val)) {
+        $this->applyFilter($field, $val);
+      }
+    }
+    foreach ($this->clientFilters as $field => $val) {
+      if ($this->hasValue($val) && $this->checkFieldAccess($field)) {
+        $this->applyFilter($field, $val);
+      }
+    }
+  }
+
+  /**
+   * @param $fieldNameWithSuffix
+   * @return bool
+   */
+  private function checkFieldAccess($fieldNameWithSuffix) {
+    [$fieldName] = explode(':', $fieldNameWithSuffix);
+    if (
+      in_array($fieldName, $this->_apiParams['select'], TRUE) ||
+      in_array($fieldNameWithSuffix, $this->_apiParams['select'], TRUE) ||
+      in_array($fieldName, $this->savedSearch['api_params']['select'], TRUE) ||
+      in_array($fieldNameWithSuffix, $this->savedSearch['api_params']['select'], TRUE)
+    ) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
 }
