@@ -134,7 +134,7 @@ SELECT module,is_reserved
    * Build the form object.
    *
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     if (empty($this->_ufGroup['id'])) {
       CRM_Core_Error::statusBounce(ts('Invalid'));
     }
