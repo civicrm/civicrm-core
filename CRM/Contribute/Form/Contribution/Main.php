@@ -895,44 +895,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
 
-      $currentMemberships = NULL;
-      if ($membershipIsActive) {
-        $is_test = $self->_mode != 'live' ? 1 : 0;
-        $memContactID = $self->_membershipContactID;
-
-        // For anonymous user check using dedupe rule
-        // if user has Cancelled Membership
-        if (!$memContactID) {
-          $memContactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($fields, 'Individual', 'Unsupervised', [], FALSE);
-        }
-        $currentMemberships = CRM_Member_BAO_Membership::getContactsCancelledMembership($memContactID,
-          $is_test
-        );
-
-        foreach ($self->_values['fee'] as $fieldKey => $fieldValue) {
-          if ($fieldValue['html_type'] != 'Text' && !empty($fields['price_' . $fieldKey])) {
-            if (!is_array($fields['price_' . $fieldKey]) && isset($fieldValue['options'][$fields['price_' . $fieldKey]])) {
-              if (array_key_exists('membership_type_id', $fieldValue['options'][$fields['price_' . $fieldKey]])
-                && in_array($fieldValue['options'][$fields['price_' . $fieldKey]]['membership_type_id'], $currentMemberships)
-              ) {
-                $errors['price_' . $fieldKey] = ts('Your %1 membership was previously cancelled and can not be renewed online. Please contact the site administrator for assistance.', [1 => CRM_Member_PseudoConstant::membershipType($fieldValue['options'][$fields['price_' . $fieldKey]]['membership_type_id'])]);
-              }
-            }
-            else {
-              if (is_array($fields['price_' . $fieldKey])) {
-                foreach (array_keys($fields['price_' . $fieldKey]) as $key) {
-                  if (array_key_exists('membership_type_id', $fieldValue['options'][$key])
-                    && in_array($fieldValue['options'][$key]['membership_type_id'], $currentMemberships)
-                  ) {
-                    $errors['price_' . $fieldKey] = ts('Your %1 membership was previously cancelled and can not be renewed online. Please contact the site administrator for assistance.', [1 => CRM_Member_PseudoConstant::membershipType($fieldValue['options'][$key]['membership_type_id'])]);
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-
       // CRM-12233
       if ($membershipIsActive && empty($self->_membershipBlock['is_required'])
         && $self->isFormSupportsNonMembershipContributions()
