@@ -14,6 +14,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\OptionValue;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
@@ -340,28 +341,16 @@ class CRM_Utils_Recent {
   /**
    * Gets the list of available providers to civi's recent items stack
    *
-   * TODO: Make this an option group so extensions can extend it.
-   *
    * @return array
    */
   public static function getProviders() {
-    $providers = [
-      'Contact' => ts('Contacts'),
-      'Relationship' => ts('Relationships'),
-      'Activity' => ts('Activities'),
-      'Note' => ts('Notes'),
-      'Group' => ts('Groups'),
-      'Case' => ts('Cases'),
-      'Contribution' => ts('Contributions'),
-      'Participant' => ts('Participants'),
-      'Grant' => ts('Grants'),
-      'Membership' => ts('Memberships'),
-      'Pledge' => ts('Pledges'),
-      'Event' => ts('Events'),
-      'Campaign' => ts('Campaigns'),
-    ];
-
-    return $providers;
+    return OptionValue::get(FALSE)
+      ->addWhere('option_group_id:name', '=', 'recent_items_providers')
+      ->addWhere('is_active', '=', TRUE)
+      ->addOrderBy('weight', 'ASC')
+      ->execute()
+      ->indexBy('value')
+      ->column('label');
   }
 
 }
