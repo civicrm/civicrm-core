@@ -127,7 +127,7 @@ class AfformAdminMeta {
       // Add existing entity field
       $idField = CoreUtil::getIdFieldName($entityName);
       $fields[$idField]['readonly'] = FALSE;
-      $fields[$idField]['input_type'] = 'EntityRef';
+      $fields[$idField]['input_type'] = 'Existing';
       $fields[$idField]['is_id'] = TRUE;
       $fields[$idField]['label'] = E::ts('Existing %1', [1 => CoreUtil::getInfoItem($entityName, 'title')]);
       // Mix in alterations declared by afform entities

@@ -100,11 +100,18 @@
         return defn;
       };
 
+      // Get the api entity this field belongs to
+      this.getEntity = function() {
+        return afGui.getEntity(ctrl.container.getFieldEntityType(ctrl.node.name));
+      };
+
       $scope.getOriginalLabel = function() {
+        // Use afform entity if available (e.g. "Individual1")
         if (ctrl.container.getEntityName()) {
           return ctrl.editor.getEntity(ctrl.container.getEntityName()).label + ': ' + ctrl.getDefn().label;
         }
-        return afGui.getEntity(ctrl.container.getFieldEntityType(ctrl.node.name)).label + ': ' + ctrl.getDefn().label;
+        // Use generic entity (e.g. "Contact")
+        return ctrl.getEntity().label + ': ' + ctrl.getDefn().label;
       };
 
       $scope.hasOptions = function() {
@@ -215,6 +222,10 @@
 
       $scope.toggleRequired = function() {
         getSet('required', !getSet('required'));
+      };
+
+      $scope.toggleSkipPermissions = function() {
+        getSet('skip_permissions', !getSet('skip_permissions'));
       };
 
       $scope.toggleHelp = function(position) {

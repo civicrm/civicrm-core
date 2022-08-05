@@ -704,6 +704,32 @@
       };
     })
 
+    // Render a crmAutocomplete APIv4 widget
+    // usage: <input crm-autocomplete="'Contact'" crm-autocomplete-params={savedSearch: 'mySearch', filters: {is_deceased: false}}" ng-model="myobj.field" />
+    .directive('crmAutocomplete', function () {
+      return {
+        require: {
+          ngModel: '?ngModel'
+        },
+        bindToController: {
+          crmAutocomplete: '<',
+          crmAutocompleteParams: '<'
+        },
+        controller: function($element, $timeout) {
+          var ctrl = this;
+          $timeout(function() {
+            $element.crmAutocomplete(ctrl.crmAutocomplete, ctrl.crmAutocompleteParams);
+            // Ensure widget is updated when model changes
+            if (ctrl.ngModel) {
+              ctrl.ngModel.$render = function() {
+                $element.val(ctrl.ngModel.$viewValue || '').change();
+              };
+            }
+          });
+        }
+      };
+    })
+
     // validate multiple email text
     // usage: <input crm-multiple-email type="text" ng-model="myobj.field" />
     .directive('crmMultipleEmail', function ($parse, $timeout) {

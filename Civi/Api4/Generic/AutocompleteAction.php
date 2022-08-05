@@ -182,6 +182,21 @@ class AutocompleteAction extends AbstractAction {
     ) {
       return TRUE;
     }
+    // Proceed only if permissions are being enforced.'
+    // Anonymous users in permission-bypass mode should not be allowed to set arbitrary filters.
+    if ($this->getCheckPermissions()) {
+      $field = $this->getField($fieldName);
+      try {
+        civicrm_api4($field['entity'], 'getFields', [
+          'action' => 'get',
+          'where' => [['name', '=', $fieldName]],
+        ])->single();
+        return TRUE;
+      }
+      catch (\CRM_Core_Exception $e) {
+        return FALSE;
+      }
+    }
     return FALSE;
   }
 

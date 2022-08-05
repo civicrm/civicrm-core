@@ -38,7 +38,7 @@ class AutocompleteSubscriber implements EventSubscriberInterface {
     $apiRequest = $event->getApiRequest();
     if (is_object($apiRequest) && is_a($apiRequest, 'Civi\Api4\Generic\AutocompleteAction')) {
       $formName = $apiRequest->getFormName();
-      if (!$formName || !str_starts_with('afform:', $formName) || !strpos(':', $apiRequest->getFieldName() ?: '')) {
+      if (!str_starts_with((string) $formName, 'afform:') || !strpos((string) $apiRequest->getFieldName(), ':')) {
         return;
       }
       [$entityName, $fieldName] = explode(':', $apiRequest->getFieldName());
@@ -53,11 +53,12 @@ class AutocompleteSubscriber implements EventSubscriberInterface {
       }
       $formDataModel = new FormDataModel($afform['layout']);
       $entity = $formDataModel->getEntity($entityName);
-      $field = $entity['fields'][$fieldName] ?? NULL;
-      if ($field) {
-        $apiRequest->setCheckPermissions(empty($field['defn']['bypass_permission']));
-        $apiRequest->setSavedSearch($field['defn']['saved_search'] ?? NULL);
+      $defn = [];
+      if (!empty($entity['fields'][$fieldName]['defn'])) {
+        $defn = \CRM_Utils_JS::decode($entity['fields'][$fieldName]['defn']);
       }
+      $apiRequest->setCheckPermissions(empty($defn['skip_permissions']));
+      $apiRequest->setSavedSearch($defn['saved_search'] ?? NULL);
     }
   }
 

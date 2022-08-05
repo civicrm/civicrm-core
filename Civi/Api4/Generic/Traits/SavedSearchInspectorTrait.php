@@ -56,7 +56,7 @@ trait SavedSearchInspectorTrait {
     }
     if (is_array($this->savedSearch)) {
       $this->savedSearch += ['api_params' => []];
-      $this->savedSearch['api_params'] += ['select' => [], 'where' => []];
+      $this->savedSearch['api_params'] += ['version' => 4, 'select' => [], 'where' => []];
     }
     $this->_apiParams = ($this->savedSearch['api_params'] ?? []) + ['select' => [], 'where' => []];
   }
