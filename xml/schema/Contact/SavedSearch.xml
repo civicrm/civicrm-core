@@ -6,6 +6,7 @@
   <name>civicrm_saved_search</name>
   <comment>Users can save their complex SQL queries and use them later.</comment>
   <icon>fa-search-plus</icon>
+  <labelField>label</labelField>
   <add>1.1</add>
   <field>
     <name>id</name>
