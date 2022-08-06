@@ -265,7 +265,7 @@ class FormattingUtil {
     }
     // Fallback for option lists that exist in the api but not the BAO
     if (!isset($options) || $options === FALSE) {
-      $options = civicrm_api4($field['entity'], 'getFields', ['action' => $action, 'loadOptions' => ['id', $valueType], 'where' => [['name', '=', $field['name']]]])[0]['options'] ?? NULL;
+      $options = civicrm_api4($field['entity'], 'getFields', ['checkPermissions' => FALSE, 'action' => $action, 'loadOptions' => ['id', $valueType], 'where' => [['name', '=', $field['name']]]])[0]['options'] ?? NULL;
       $options = $options ? array_column($options, $valueType, 'id') : $options;
     }
     if (is_array($options)) {
