@@ -2,6 +2,7 @@
 
 namespace Civi\Api4;
 
+use Civi\Api4\Generic\AutocompleteAction;
 use Civi\Api4\Generic\BasicGetFieldsAction;
 
 /**
@@ -16,6 +17,8 @@ use Civi\Api4\Generic\BasicGetFieldsAction;
  *      The `prefill` and `submit` actions are used for preparing forms and processing submissions.
  *
  * @see https://lab.civicrm.org/extensions/afform
+ * @labelField title
+ * @iconField type:icon
  * @searchable none
  * @package Civi\Api4
  */
@@ -54,6 +57,15 @@ class Afform extends Generic\AbstractEntity {
    */
   public static function save($checkPermissions = TRUE) {
     return (new Action\Afform\Save('Afform', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Generic\AutocompleteAction
+   */
+  public static function autocomplete($checkPermissions = TRUE) {
+    return (new AutocompleteAction('Afform', __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 

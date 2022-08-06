@@ -37,6 +37,12 @@ class EntityTest extends Api4TestBase {
       "Entity::get missing itself");
     $this->assertArrayHasKey('Participant', $result,
       "Entity::get missing Participant");
+
+    $this->assertEquals('CRM_Contact_DAO_Contact', $result['Contact']['dao']);
+    $this->assertEquals(['DAOEntity'], $result['Contact']['type']);
+    $this->assertEquals(['id'], $result['Contact']['primary_key']);
+    // Contact icon fields
+    $this->assertEquals(['contact_sub_type:icon', 'contact_type:icon'], $result['Contact']['icon_field']);
   }
 
   public function testEntity() {

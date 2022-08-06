@@ -46,12 +46,17 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertFalse($fields['first_name']['options']);
   }
 
-  public function testTableAndColumnReturned() {
+  public function testContactGetFields() {
     $fields = Contact::getFields(FALSE)
       ->execute()
       ->indexBy('name');
+    // Ensure table & column are returned
     $this->assertEquals('civicrm_contact', $fields['display_name']['table_name']);
     $this->assertEquals('display_name', $fields['display_name']['column_name']);
+
+    // Check suffixes
+    $this->assertEquals(['name', 'label', 'icon'], $fields['contact_type']['suffixes']);
+    $this->assertEquals(['name', 'label', 'icon'], $fields['contact_sub_type']['suffixes']);
   }
 
   public function testComponentFields() {

@@ -55,6 +55,23 @@ class AfformGetTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertArrayNotHasKey('base_module', $result);
   }
 
+  public function testAfformAutocomplete(): void {
+    $title = uniqid();
+    Afform::create()
+      ->addValue('name', $this->formName)
+      ->addValue('title', $title)
+      ->addValue('type', 'form')
+      ->execute();
+
+    $result = Afform::autocomplete()
+      ->setInput(substr($title, 0, 9))
+      ->execute();
+
+    $this->assertEquals($this->formName, $result[0]['id']);
+    $this->assertEquals($title, $result[0]['label']);
+    $this->assertEquals('fa-list-alt', $result[0]['icon']);
+  }
+
   public function testGetSearchDisplays() {
     Afform::create()
       ->addValue('name', $this->formName)

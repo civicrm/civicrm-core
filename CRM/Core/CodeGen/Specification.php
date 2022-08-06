@@ -447,6 +447,9 @@ class CRM_Core_CodeGen_Specification {
         'nameColumn',
         // Column to fetch in "abbreviate" context
         'abbrColumn',
+        // Supported by APIv4 suffixes
+        'colorColumn',
+        'iconColumn',
         // Where clause snippet (will be joined to the rest of the query with AND operator)
         'condition',
         // callback function incase of static arrays

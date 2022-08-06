@@ -16,6 +16,19 @@ use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Retrieve $ENTITIES for an autocomplete form field.
+ *
+ * @method $this setInput(string $input) Set input term.
+ * @method string getInput()
+ * @method $this setIds(array $ids) Set array of ids.
+ * @method array getIds()
+ * @method $this setPage(int $page) Set current page.
+ * @method array getPage()
+ * @method $this setFormName(string $formName) Set formName.
+ * @method string getFormName()
+ * @method $this setFieldName(string $fieldName) Set fieldName.
+ * @method string getFieldName()
+ * @method $this setClientFilters(array $clientFilters) Set array of untrusted filter values.
+ * @method array getClientFilters()
  */
 class AutocompleteAction extends AbstractAction {
   use Traits\SavedSearchInspectorTrait;
@@ -110,6 +123,9 @@ class AutocompleteAction extends AbstractAction {
       // Adding one extra result allows us to see if there are any more
       $this->_apiParams['limit'] = $resultsPerPage + 1;
       $this->_apiParams['offset'] = ($this->page - 1) * $resultsPerPage;
+
+      $orderBy = CoreUtil::getInfoItem($this->getEntityName(), 'order_by') ?: $labelField;
+      $this->_apiParams['orderBy'] = [$orderBy => 'ASC'];
       if (strlen($this->input)) {
         $prefix = \Civi::settings()->get('includeWildCardInName') ? '%' : '';
         $this->_apiParams['where'][] = [$labelField, 'LIKE', $prefix . $this->input . '%'];
@@ -131,9 +147,14 @@ class AutocompleteAction extends AbstractAction {
       foreach ($map as $key => $fieldName) {
         $mapped[$key] = $row[$fieldName];
       }
+      // Get icon in order of priority
       foreach ($iconFields as $fieldName) {
         if (!empty($row[$fieldName])) {
-          $mapped['icon'] = $row[$fieldName];
+          // Icon field may be multivalued e.g. contact_sub_type
+          $icon = \CRM_Utils_Array::first(array_filter((array) $row[$fieldName]));
+          if ($icon) {
+            $mapped['icon'] = $icon;
+          }
           break;
         }
       }
