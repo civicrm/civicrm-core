@@ -46,19 +46,31 @@ class AutocompleteSubscriber implements EventSubscriberInterface {
       $afform = Afform::get()
         ->addWhere('name', '=', str_replace('afform:', '', $formName))
         ->addSelect('layout')
-        ->setLayoutFormat('shallow')
         ->execute()->first();
       if (!$afform) {
         return;
       }
       $formDataModel = new FormDataModel($afform['layout']);
       $entity = $formDataModel->getEntity($entityName);
-      $defn = [];
-      if (!empty($entity['fields'][$fieldName]['defn'])) {
-        $defn = \CRM_Utils_JS::decode($entity['fields'][$fieldName]['defn']);
+
+      // Look up the "type" fields (e.g. contact_type, activity_type_id, case_type_id, etc)
+      $typeFields = [];
+      if ($entity['type'] === 'Contact') {
+        $typeFields = ['contact_type', 'contact_sub_type'];
       }
+      else {
+        $extends = array_column(\CRM_Core_BAO_CustomGroup::getCustomGroupExtendsOptions(), 'grouping', 'id');
+        $typeFields = (array) ($extends[$entity['type']] ?? NULL);
+      }
+      // If entity has a type set in the values, auto-apply that to filters
+      foreach ($typeFields as $typeField) {
+        if (!empty($entity['data'][$typeField])) {
+          $apiRequest->addFilter($typeField, $entity['data'][$typeField]);
+        }
+      }
+
       $apiRequest->setCheckPermissions($entity['security'] !== 'FBAC');
-      $apiRequest->setSavedSearch($defn['saved_search'] ?? NULL);
+      $apiRequest->setSavedSearch($entity['fields'][$fieldName]['defn']['saved_search'] ?? NULL);
     }
   }
 
