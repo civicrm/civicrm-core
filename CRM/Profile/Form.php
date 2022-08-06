@@ -689,8 +689,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * Build the form object.
    *
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     $this->add('hidden', 'gid', $this->_gid);
+    $this->assign('deleteRecord', $this->isDeleteMode());
 
     switch ($this->_mode) {
       case self::MODE_CREATE:
@@ -713,12 +714,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
       return;
     }
 
-    if (($this->_multiRecord & CRM_Core_Action::DELETE)) {
+    if ($this->isDeleteMode()) {
       if (!$this->_recordExists) {
         CRM_Core_Session::setStatus(ts('The record %1 doesnot exists', [1 => $this->_recordId]), ts('Record doesnot exists'), 'alert');
-      }
-      else {
-        $this->assign('deleteRecord', TRUE);
       }
       return;
     }
@@ -786,7 +784,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     //lets have single status message,
     $this->assign('statusMessage', $statusMessage);
     if ($return) {
-      return FALSE;
+      return;
     }
 
     $this->assign('id', $this->_id);
@@ -846,7 +844,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         continue;
       }
 
-      list($prefixName, $index) = CRM_Utils_System::explode('-', $name, 2);
+      [$prefixName, $index] = CRM_Utils_System::explode('-', $name, 2);
 
       CRM_Core_BAO_UFGroup::buildProfile($this, $field, $this->_mode);
 
@@ -1008,7 +1006,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
 
     foreach ($fields as $key => $value) {
-      list($fieldName, $locTypeId, $phoneTypeId) = CRM_Utils_System::explode('-', $key, 3);
+      [$fieldName, $locTypeId, $phoneTypeId] = CRM_Utils_System::explode('-', $key, 3);
       if ($fieldName == 'state_province' && !empty($fields["country-{$locTypeId}"])) {
         // Validate Country - State list
         $countryId = $fields["country-{$locTypeId}"];
@@ -1368,6 +1366,13 @@ class CRM_Profile_Form extends CRM_Core_Form {
   public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
+  }
+
+  /**
+   * @return int|string
+   */
+  private function isDeleteMode() {
+    return ($this->_multiRecord & CRM_Core_Action::DELETE);
   }
 
 }
