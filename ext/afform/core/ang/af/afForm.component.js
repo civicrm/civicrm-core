@@ -45,9 +45,12 @@
         // Load single entity
         if (selectedEntity) {
           toLoad = selectedId;
+          params.fillMode = 'entity';
           params.args[selectedEntity] = {};
           params.args[selectedEntity][selectedIndex] = selectedId;
-        } else {
+        }
+        // Prefill entire form
+        else {
           args = _.assign({}, $scope.$parent.routeParams || {}, $scope.$parent.options || {});
           _.each(schema, function (entity, entityName) {
             if (args[entityName] || entity.autofill) {
@@ -67,6 +70,13 @@
                 _.extend(data[item.name], item.values, schema[item.name].data || {});
               });
             });
+        }
+        // Clear existing contact selection
+        else if (selectedEntity) {
+          data[selectedEntity][selectedIndex].fields = {};
+          if (data[selectedEntity][selectedIndex].joins) {
+            data[selectedEntity][selectedIndex].joins = {};
+          }
         }
       };
 

@@ -9,6 +9,9 @@ use Civi\Api4\Utils\CoreUtil;
 /**
  * Shared functionality for form submission pre & post processing.
  * @package Civi\Api4\Action\Afform
+ *
+ * @method $this setFillMode(string $fillMode) Set entity/form fill mode.
+ * @method string getFillMode()
  */
 abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
 
@@ -24,6 +27,13 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @var array
    */
   protected $args = [];
+
+  /**
+   * Used by prefill action to indicate if the entire form or just one entity is being filled.
+   * @var string
+   * @options form,entity
+   */
+  protected $fillMode = 'form';
 
   /**
    * @var array
@@ -79,7 +89,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           $ids = array_slice($ids, 0, !empty($entity['af-repeat']) ? $entity['max'] ?? NULL : 1);
           $this->loadEntity($entity, $ids);
         }
-        elseif (!empty($entity['autofill'])) {
+        elseif (!empty($entity['autofill']) && $this->fillMode !== 'entity') {
           $this->autofillEntity($entity, $entity['autofill']);
         }
       }

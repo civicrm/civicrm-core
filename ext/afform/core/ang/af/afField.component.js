@@ -169,6 +169,7 @@
         }
       };
 
+      // ngChange callback from Existing entity field
       ctrl.onSelectExisting = function() {
         var val = $scope.getSetSelect();
         var entity = ctrl.afFieldset.modelName;
