@@ -69,6 +69,47 @@ class CRM_Utils_AutoClean {
   }
 
   /**
+   * Temporarily override the values for system settings.
+   *
+   * Note: This was written for use with unit-tests. Give a hard think before using it at runtime.
+   *
+   * @param array $newSettings
+   *   List of new settings (key-value pairs).
+   * @return \CRM_Utils_AutoClean
+   */
+  public static function swapSettings(array $newSettings): CRM_Utils_AutoClean {
+    // Overwrite the `civicrm_setting` and (later on) rewrite the original values to `civicrm_setting`.
+    // This process could be simpler if SettingsBag::$mandatory supported multiple layers of overrides.
+    $settings = \Civi::settings();
+
+    // Backup the old settings
+    $oldExplicitSettings = [];
+    foreach ($newSettings as $name => $newSetting) {
+      if ($settings->hasExplict($name)) {
+        $oldExplicitSettings[$name] = $settings->getExplicit($name);
+      }
+      if ($settings->getMandatory($name) !== NULL) {
+        throw new \CRM_Core_Exception("Cannot override mandatory setting ($name)");
+      }
+    }
+
+    // Apply the new settings
+    $settings->add($newSettings);
+
+    // Auto-restore the original settings
+    return CRM_Utils_AutoClean::with(function() use ($newSettings, $oldExplicitSettings) {
+      $settings = \Civi::settings();
+      // Restoring may mean `revert()` or `add()` (depending on the original disposition of the setting).
+      foreach ($newSettings as $name => $newSetting) {
+        if (!array_key_exists($name, $oldExplicitSettings)) {
+          \Civi::settings()->revert($name);
+        }
+      }
+      $settings->add($oldExplicitSettings);
+    });
+  }
+
+  /**
    * Temporarily swap values using callback functions, and cleanup
    * when the current context shuts down.
    *
