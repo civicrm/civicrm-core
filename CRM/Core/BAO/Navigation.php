@@ -860,7 +860,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
     $key = Civi::service('settings_manager')
       ->getBagByContact(NULL, $cid)
       ->get('navigation');
-    if (strlen($key) !== self::CACHE_KEY_STRLEN) {
+    if (strlen($key ?? '') !== self::CACHE_KEY_STRLEN) {
       $key = self::resetNavigation($cid);
     }
     return $key;
