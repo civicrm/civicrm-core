@@ -244,23 +244,27 @@ class CRM_Utils_System {
    *   An HTML string containing a link to the given path.
    */
   public static function url(
-    $path = NULL,
-    $query = NULL,
+    $path = '',
+    $query = '',
     $absolute = FALSE,
     $fragment = NULL,
     $htmlize = TRUE,
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
+    // handle legacy null params
+    $path = $path ?? '';
+    $query = $query ?? '';
+
     $query = self::makeQueryString($query);
 
     // Legacy handling for when the system passes around html escaped strings
-    if (strstr(($query ?? ''), '&amp;')) {
+    if (strstr($query, '&amp;')) {
       $query = html_entity_decode($query);
     }
 
     // Extract fragment from path or query if munged together
-    if ($query && strstr(($query ?? ''), '#')) {
+    if ($query && strstr($query, '#')) {
       list($path, $fragment) = explode('#', $query);
     }
     if ($path && strstr($path, '#')) {
