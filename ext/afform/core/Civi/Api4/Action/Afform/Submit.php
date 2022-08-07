@@ -242,7 +242,7 @@ class Submit extends AbstractProcessor {
         $result = civicrm_api4($joinEntityName, 'replace', [
           // Disable permission checks because the main entity has already been vetted
           'checkPermissions' => FALSE,
-          'where' => self::getJoinWhereClause($event->getEntityType(), $joinEntityName, $entityId),
+          'where' => self::getJoinWhereClause($event->getFormDataModel(), $event->getEntityName(), $joinEntityName, $entityId),
           'records' => $values,
         ], ['id']);
         $indexedResult = array_combine(array_keys($values), (array) $result);
@@ -254,7 +254,7 @@ class Submit extends AbstractProcessor {
           civicrm_api4($joinEntityName, 'delete', [
             // Disable permission checks because the main entity has already been vetted
             'checkPermissions' => FALSE,
-            'where' => self::getJoinWhereClause($event->getEntityType(), $joinEntityName, $entityId),
+            'where' => self::getJoinWhereClause($event->getFormDataModel(), $event->getEntityName(), $joinEntityName, $entityId),
           ]);
         }
         catch (\API_Exception $e) {
