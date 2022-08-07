@@ -59,6 +59,7 @@
     "symfony/filesystem": "~4.4",
     "symfony/process": "~4.4",
     "symfony/var-dumper": "~3.0 || ~4.4 || ~5.1",
+    "symfony/service-contracts": "~2.2",
     "psr/log": "~1.0 || ~2.0 || ~3.0",
     "symfony/finder": "~4.4",
     "tecnickcom/tcpdf" : "6.4.*",
@@ -94,7 +95,8 @@
     "ezyang/htmlpurifier": "^4.13",
     "phpoffice/phpspreadsheet": "^1.18",
     "symfony/polyfill-php73": "^1.23",
-    "html2text/html2text": "^4.3.1"
+    "html2text/html2text": "^4.3.1",
+    "psr/container": "~1.0"
   },
   "scripts": {
     "post-install-cmd": [
