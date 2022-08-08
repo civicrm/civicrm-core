@@ -6746,9 +6746,8 @@ INSERT INTO `civicrm_payment_processor_type` (`id`, `name`, `title`, `descriptio
  (4,'AuthNet','Authorize.Net',NULL,1,0,'API Login','Payment Key','MD5 Hash',NULL,'Payment_AuthorizeNet','https://secure2.authorize.net/gateway/transact.dll',NULL,'https://api2.authorize.net/xml/v1/request.api',NULL,'https://test.authorize.net/gateway/transact.dll',NULL,'https://apitest.authorize.net/xml/v1/request.api',NULL,1,1,1,1),
  (5,'PayJunction','PayJunction',NULL,0,0,'User Name','Password',NULL,NULL,'Payment_PayJunction','https://payjunction.com/quick_link',NULL,NULL,NULL,'https://www.payjunctionlabs.com/quick_link',NULL,NULL,NULL,1,1,1,1),
  (6,'Dummy','Dummy Payment Processor',NULL,1,1,'User Name',NULL,NULL,NULL,'Payment_Dummy',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,1,1,1),
- (7,'Elavon','Elavon Payment Processor','Elavon / Nova Virtual Merchant',0,0,'SSL Merchant ID ','SSL User ID','SSL PIN',NULL,'Payment_Elavon','https://www.myvirtualmerchant.com/VirtualMerchant/processxml.do',NULL,NULL,NULL,'https://www.myvirtualmerchant.com/VirtualMerchant/processxml.do',NULL,NULL,NULL,1,0,1,1),
- (8,'Realex','Realex Payment',NULL,0,0,'Merchant ID','Password',NULL,'Account','Payment_Realex','https://epage.payandshop.com/epage.cgi',NULL,NULL,NULL,'https://epage.payandshop.com/epage-remote.cgi',NULL,NULL,NULL,1,0,1,1),
- (9,'FirstData','FirstData (aka linkpoint)','FirstData (aka linkpoint)',0,0,'Store name','certificate path',NULL,NULL,'Payment_FirstData','https://secure.linkpt.net',NULL,NULL,NULL,'https://staging.linkpt.net',NULL,NULL,NULL,1,0,1,1);
+ (7,'Realex','Realex Payment',NULL,0,0,'Merchant ID','Password',NULL,'Account','Payment_Realex','https://epage.payandshop.com/epage.cgi',NULL,NULL,NULL,'https://epage.payandshop.com/epage-remote.cgi',NULL,NULL,NULL,1,0,1,1),
+ (8,'FirstData','FirstData (aka linkpoint)','FirstData (aka linkpoint)',0,0,'Store name','certificate path',NULL,NULL,'Payment_FirstData','https://secure.linkpt.net',NULL,NULL,NULL,'https://staging.linkpt.net',NULL,NULL,NULL,1,0,1,1);
 /*!40000 ALTER TABLE `civicrm_payment_processor_type` ENABLE KEYS */;
 UNLOCK TABLES;
 

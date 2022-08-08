@@ -11,6 +11,7 @@
 !/ext/eventcart
 !/ext/ewaysingle
 !/ext/greenwich
+!/ext/elavon
 /ext/greenwich/dist
 /ext/greenwich/extern
 !/ext/message_admin
