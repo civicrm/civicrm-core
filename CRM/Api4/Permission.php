@@ -26,7 +26,9 @@ class CRM_Api4_Permission {
     $defaultPermissions = [
       ['access CiviCRM', 'access AJAX API'],
     ];
+    // Two call formats. Which one was used? Note: CRM_Api4_Permission::check() and CRM_Api4_Page_AJAX::run() should have matching conditionals.
     if (!empty($urlPath[3])) {
+      // Received single-call format
       $entity = $urlPath[3];
       $action = $urlPath[4];
       $permissions = $defaultPermissions;
@@ -34,6 +36,7 @@ class CRM_Api4_Permission {
       return CRM_Core_Permission::check($permissions);
     }
     else {
+      // Received multi-call format
       $calls = CRM_Utils_Request::retrieve('calls', 'String', CRM_Core_DAO::$_nullObject, TRUE, NULL, 'POST');
       $calls = json_decode($calls, TRUE);
       foreach ($calls as $call) {
