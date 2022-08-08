@@ -23,7 +23,7 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
   protected static function params(): array {
     return [
       [
-        'flag_before' => ['DISTINCT' => ts('Distinct')],
+        'flag_before' => ['' => NULL, 'DISTINCT' => ts('Distinct')],
         'max_expr' => 1,
         'must_be' => ['SqlField', 'SqlFunction'],
         'optional' => FALSE,

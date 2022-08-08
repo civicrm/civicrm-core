@@ -184,8 +184,8 @@
 
         function getKeyword(whitelist) {
           var keyword;
-          _.each(whitelist, function(flag) {
-            if (argString.indexOf(flag) === 0) {
+          _.each(_.filter(whitelist), function(flag) {
+            if (argString.indexOf(flag + ' ') === 0) {
               keyword = flag;
               argString = _.trim(argString.substr(flag.length));
               return false;
@@ -216,16 +216,18 @@
           var exprCount = 0,
             expr, flagBefore;
           argString = _.trim(argString);
-          if (!argString.length || (param.name && !getKeyword(param.name))) {
+          if (!argString.length || (param.name && !_.startsWith(argString, param.name + ' '))) {
             return false;
           }
           if (param.max_expr) {
             while (++exprCount <= param.max_expr && argString.length) {
               flagBefore = getKeyword(_.keys(param.flag_before || {}));
+              var name = getKeyword(param.name ? [param.name] : []);
               expr = getExpr();
               if (expr) {
                 expr.param = param.name || index;
                 expr.flag_before = flagBefore;
+                expr.name = name;
                 info.args.push(expr);
               }
               // Only continue if an expression was found and followed by a comma
@@ -237,6 +239,12 @@
             if (expr && !_.isEmpty(expr.flag_after)) {
               _.last(info.args).flag_after = getKeyword(_.keys(param.flag_after));
             }
+          } else if (param.flag_before && !param.optional) {
+            flagBefore = getKeyword(_.keys(param.flag_before));
+            info.args.push({
+              value: '',
+              flag_before: flagBefore
+            });
           }
         });
         if (!info.data_type && info.args.length) {

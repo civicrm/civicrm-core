@@ -192,7 +192,7 @@ abstract class SqlExpression {
    * @return mixed|null
    */
   protected function captureKeyword($keywords, &$arg) {
-    foreach ($keywords as $key) {
+    foreach (array_filter($keywords, 'strlen') as $key) {
       // Match keyword followed by a space or eol
       if (strpos($arg, $key . ' ') === 0 || rtrim($arg) === $key) {
         $arg = ltrim(substr($arg, strlen($key)));

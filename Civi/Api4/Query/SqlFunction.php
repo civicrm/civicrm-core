@@ -163,7 +163,7 @@ abstract class SqlFunction extends SqlExpression {
     $params = [];
     foreach (static::params() as $param) {
       // Merge in defaults to ensure each param has these properties
-      $params[] = $param + [
+      $param += [
         'name' => NULL,
         'label' => ts('Select'),
         'min_expr' => 1,
@@ -174,6 +174,10 @@ abstract class SqlFunction extends SqlExpression {
         'must_be' => ['SqlField', 'SqlFunction', 'SqlString', 'SqlNumber', 'SqlNull'],
         'api_default' => NULL,
       ];
+      if (!$param['max_expr']) {
+        $param['must_be'] = [];
+      }
+      $params[] = $param;
     }
     return $params;
   }

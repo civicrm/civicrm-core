@@ -2,20 +2,13 @@
   <input class="form-control fa-crm-formula" style="min-width: 20px" ng-model="$ctrl.fnName" crm-ui-select="{data: $ctrl.getFunctions, placeholder: ' ', width: 'off', dropdownCss: {width: '275px'}}" ng-change="$ctrl.selectFunction()">
 </span>
 <label ng-hide="$ctrl.mode !== 'select' && !$ctrl.fn">{{ $ctrl.fieldArg.field.label }}</label>
-<label ng-repeat="(val, label) in $ctrl.fn.params[0].flag_before">
-  <input type="checkbox" ng-checked="$ctrl.fieldArg.flag_before === val" ng-click="$ctrl.fieldArg.flag_before = ($ctrl.fieldArg.flag_before === val ? null : val); $ctrl.writeExpr();" >
-  {{ label }}
-</label>
-<div class="form-group" ng-repeat="arg in $ctrl.args" ng-if="arg !== $ctrl.fieldArg">
-  <select class="form-control" ng-if="$index && $ctrl.getParam($index).flag_before" ng-model="arg.flag_before" ng-change="$ctrl.writeExpr();">
-    <option ng-repeat="(val, label) in $ctrl.getParam($index).flag_before" value="{{ val }}">
-      {{ label }}
-    </option>
-  </select>
-  <span ng-switch="arg.type">
+
+<div class="form-group" ng-repeat="arg in $ctrl.args">
+  <crm-search-function-flag ng-if="$ctrl.fn" arg="arg" param="$ctrl.getParam($index)" write-expr="$ctrl.writeExpr()"></crm-search-function-flag>
+  <span ng-switch="arg.type" ng-if="arg !== $ctrl.fieldArg">
     <input ng-switch-when="number" class="form-control" type="number" ng-model="arg.value" placeholder="{{ $ctrl.getParam($index).label }}" ng-change="$ctrl.changeArg($index)" ng-model-options="{updateOn: 'blur'}">
     <input ng-switch-when="string" class="form-control" ng-model="arg.value" placeholder="{{ $ctrl.getParam($index).label }}" ng-change="$ctrl.changeArg($index)" ng-trim="false" ng-model-options="{updateOn: 'blur'}">
-    <input ng-switch-default class="form-control" ng-model="arg.value" crm-ui-select="{data: $ctrl.getFields, placeholder: $ctrl.getParam($index).label}" ng-change="$ctrl.changeArg($index)">
+    <input ng-switch-when="field" class="form-control" ng-model="arg.value" crm-ui-select="{data: $ctrl.getFields, placeholder: $ctrl.getParam($index).label}" ng-change="$ctrl.changeArg($index)">
   </span>
 </div>
 <div class="btn-group" ng-if="$ctrl.canAddArg()">
