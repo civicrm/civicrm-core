@@ -211,7 +211,7 @@ class FormattingUtil {
         // Evaluate pseudoconstant suffixes
         $suffix = strrpos(($fieldName ?? ''), ':');
         $fieldOptions = NULL;
-        if ($suffix) {
+        if (isset($value) && $suffix) {
           $fieldOptions = self::getPseudoconstantList($field, $fieldName, $result, $action);
           $dataType = NULL;
         }
