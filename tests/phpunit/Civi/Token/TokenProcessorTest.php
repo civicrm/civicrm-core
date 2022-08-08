@@ -177,6 +177,9 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     }
   }
 
+  /**
+   * @group locale
+   */
   public function testRenderLocalizedSmarty() {
     \CRM_Utils_Time::setTime('2022-04-08 16:32:04');
     $resetTime = \CRM_Utils_AutoClean::with(['CRM_Utils_Time', 'resetTime']);

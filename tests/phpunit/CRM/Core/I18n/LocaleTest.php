@@ -11,6 +11,7 @@
 /**
  * Class CRM_Core_I18n_LocaleTest
  * @group headless
+ * @group locale
  */
 class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
 
