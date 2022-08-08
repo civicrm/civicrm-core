@@ -177,10 +177,20 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     }
   }
 
+  public function getPartialNonPartial(): array {
+    return [
+      'no-partial' => [['partial_locales' => FALSE]],
+      'yes-partial' => [['partial_locales' => TRUE]],
+    ];
+  }
+
   /**
    * @group locale
+   * @dataProvider getPartialNonPartial
+   * @param array $settings
    */
-  public function testRenderLocalizedSmarty() {
+  public function testRenderLocalizedSmarty(array $settings) {
+    $cleanup = \CRM_Utils_AutoClean::swapSettings($settings);
     \CRM_Utils_Time::setTime('2022-04-08 16:32:04');
     $resetTime = \CRM_Utils_AutoClean::with(['CRM_Utils_Time', 'resetTime']);
     $this->dispatcher->addSubscriber(new \CRM_Core_DomainTokens());
