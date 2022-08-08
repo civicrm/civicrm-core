@@ -172,11 +172,18 @@ class Format {
   /**
    * Should we use the configured thousand & decimal separators.
    *
-   * The goal is to phase this into being FALSE - but for now
-   * we are looking at how to manage an 'opt in'
+   * Historically, separators were configured with system-settings, but this is problematic
+   * when you have multiple locales with divergent separator rules (eg en_GB / fr_FR).
+   * The goal is to transition to locale-based-separators instead of setting-based-separators;
+   * but for now, we only switch if there's an opt-in flag.
    */
   protected function isUseSeparatorSettings(): bool {
-    return !Civi::settings()->get('format_locale') && !CRM_Utils_Constant::value('IGNORE_SEPARATOR_CONFIG');
+    // If system enables `format_locale`, then abide the specified locale (regardless of old separator settings).
+    // If system enables IGNORE_SEPARATOR_CONFIG, then abide the active locale's spec (regardless of old separator settings).
+    // If system enables `partial_locales`, then abide active locale's spec (regardless of old separator settings).
+    return !Civi::settings()->get('format_locale')
+      && !CRM_Utils_Constant::value('IGNORE_SEPARATOR_CONFIG')
+      && !Civi::settings()->get('partial_locales');
   }
 
   /**
@@ -200,6 +207,8 @@ class Format {
     if (!$currency) {
       $currency = Civi::settings()->get('defaultCurrency');
     }
+    $locale = $locale ?: \Civi\Core\Locale::detect()->moneyFormat;
+
     $cacheKey = __CLASS__ . $currency . '_' . $locale . '_' . $style . (!empty($attributes) ? md5(json_encode($attributes)) : '');
     if (!isset(\Civi::$statics[$cacheKey])) {
       $formatter = new NumberFormatter($locale, $style);
