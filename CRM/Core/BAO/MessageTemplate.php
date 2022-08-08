@@ -344,15 +344,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
     $language = $params['language'] ?? (!empty($params['contactId']) ? Civi\Api4\Contact::get(FALSE)->addWhere('id', '=', $params['contactId'])->addSelect('preferred_language')->execute()->first()['preferred_language'] : NULL);
     CRM_Utils_Hook::alterMailParams($params, 'messageTemplate');
     [$mailContent, $translatedLanguage] = self::loadTemplate((string) $params['workflow'], $params['isTest'], $params['messageTemplateID'] ?? NULL, $params['groupName'] ?? '', $params['messageTemplate'], $params['subject'] ?? NULL, $language);
-    global $moneyFormatLocale;
-    $originalValue = $moneyFormatLocale;
-    if ($translatedLanguage) {
-      // If the template has been translated then set the moneyFormatLocale to match the translation.
-      // Note that in future if we do the same for dates we are likely to want to set it to match
-      // the preferred_language rather than the translation language - a long discussion is on the
-      // property in AbstractAction
-      $moneyFormatLocale = $translatedLanguage;
-    }
+    $params['tokenContext']['locale'] = $translatedLanguage ?? $params['language'] ?? NULL;
 
     self::synchronizeLegacyParameters($params);
     $rendered = CRM_Core_TokenSmarty::render(CRM_Utils_Array::subset($mailContent, ['text', 'html', 'subject']), $params['tokenContext'], $params['tplParams']);
@@ -361,7 +353,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
     }
     $nullSet = ['subject' => NULL, 'text' => NULL, 'html' => NULL];
     $mailContent = array_merge($nullSet, $mailContent, $rendered);
-    $moneyFormatLocale = $originalValue;
     return [$mailContent, $params];
   }
 
@@ -483,6 +474,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
 
     $apiCall = MessageTemplate::get(FALSE)
       ->setLanguage($language)
+      ->setTranslationMode('fuzzy')
       ->addSelect('msg_subject', 'msg_text', 'msg_html', 'pdf_format_id', 'id')
       ->addWhere('is_default', '=', 1);
 
@@ -540,7 +532,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
       $mailContent['subject'] = $subjectOverride;
     }
 
-    return [$mailContent, $apiCall->getTranslationLanguage()];
+    return [$mailContent, $messageTemplate['actual_language'] ?? NULL];
   }
 
   /**

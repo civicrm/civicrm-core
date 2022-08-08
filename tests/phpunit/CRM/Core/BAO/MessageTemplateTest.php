@@ -3,6 +3,7 @@
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\MessageTemplate;
+use Civi\Api4\Translation;
 use Civi\Token\TokenProcessor;
 
 /**
@@ -49,9 +50,16 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
   /**
    * Test that translated strings are rendered for templates where they exist.
    *
+   * This system has a relatively open localization policy where any translation can be used,
+   * even if the system doesn't allow it in the web UI. Ex: The sysadmin has configured 'fr_FR'
+   * strings. The user has requested 'fr_CA', and we'll fallback to 'fr_CA'.
+   *
    * @throws \API_Exception|\CRM_Core_Exception
+   * @group locale
    */
-  public function testRenderTranslatedTemplate(): void {
+  public function testRenderTranslatedTemplate_AllowPartialLocales(): void {
+    $cleanup = \CRM_Utils_AutoClean::swapSettings(['partial_locales' => TRUE, 'uiLanguages' => ['en_US']]);
+
     $this->individualCreate(['preferred_language' => 'fr_FR']);
     $contributionID = $this->contributionCreate(['contact_id' => $this->ids['Contact']['individual_0']]);
     $messageTemplateID = MessageTemplate::get()
@@ -76,6 +84,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->addWhere('workflow_name', '=', 'contribution_online_receipt')
       ->addSelect('id', 'msg_subject', 'msg_html')
       ->setLanguage('fr_FR')
+      ->setTranslationMode('fuzzy')
       ->execute()->first();
 
     $this->assertEquals('Bonjour', $messageTemplateFrench['msg_subject']);
@@ -132,6 +141,61 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     // Note that as there was a native-Canada format the money-formatting is
     // also subtly different.
     $this->assertEquals('100,00 $ US', $rendered['text']);
+  }
+
+  /**
+   * Test that translated strings are rendered for templates where they exist.
+   *
+   * This system has a relatively closed localization policy where translations will only be
+   * used if the locale is fully supported by the app. Ex: Even though there are some strings
+   * for 'fr_FR', the language in "Admin=>Localizaton", so we don't use it.
+   *
+   * @throws \API_Exception|\CRM_Core_Exception
+   * @group locale
+   */
+  public function testRenderTranslatedTemplate_OnlyFullLocales(): void {
+    $cleanup = \CRM_Utils_AutoClean::swapSettings(['partial_locales' => FALSE, 'uiLanguages' => ['en_US']]);
+
+    $this->individualCreate(['preferred_language' => 'fr_FR']);
+    $contributionID = $this->contributionCreate(['contact_id' => $this->ids['Contact']['individual_0']]);
+    $messageTemplateID = MessageTemplate::get()
+      ->addWhere('is_default', '=', 1)
+      ->addWhere('workflow_name', '=', 'contribution_online_receipt')
+      ->addSelect('id')
+      ->execute()->first()['id'];
+
+    Translation::save()->setRecords([
+      ['entity_field' => 'msg_subject', 'string' => 'Bonjour'],
+      ['entity_field' => 'msg_html', 'string' => 'Voila!'],
+      ['entity_field' => 'msg_text', 'string' => '{contribution.total_amount}'],
+    ])->setDefaults([
+      'entity_table' => 'civicrm_msg_template',
+      'entity_id' => $messageTemplateID,
+      'status_id:name' => 'active',
+      'language' => 'fr_FR',
+    ])->execute();
+
+    $messageTemplateFrench = MessageTemplate::get()
+      ->addWhere('is_default', '=', 1)
+      ->addWhere('workflow_name', '=', 'contribution_online_receipt')
+      ->addSelect('id', 'msg_subject', 'msg_html')
+      ->setLanguage('fr_FR')
+      ->setTranslationMode('fuzzy')
+      ->execute()->first();
+
+    $this->assertStringNotContainsString('Bonjour', $messageTemplateFrench['msg_subject']);
+    $this->assertStringNotContainsString('Voila!', $messageTemplateFrench['msg_html']);
+
+    $rendered = CRM_Core_BAO_MessageTemplate::renderTemplate([
+      'workflow' => 'contribution_online_receipt',
+      'tokenContext' => [
+        'contactId' => $this->ids['Contact']['individual_0'],
+        'contributionId' => $contributionID,
+      ],
+    ]);
+    $this->assertStringNotContainsString('Bonjour', $rendered['subject']);
+    $this->assertStringNotContainsString('Voila!', $rendered['html']);
+    $this->assertStringNotContainsString('100,00', $rendered['text']);
   }
 
   /**
