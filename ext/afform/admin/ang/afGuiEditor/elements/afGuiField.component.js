@@ -167,6 +167,9 @@
           case 'Number':
             return !(defn.options || defn.data_type === 'Boolean');
 
+          case 'DisplayOnly':
+            return true;
+
           default:
             return false;
         }
