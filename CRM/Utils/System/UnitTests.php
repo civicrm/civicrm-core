@@ -103,8 +103,8 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
     $separator = ($htmlize && $frontend) ? '&amp;' : '&';
 
     if (!$config->cleanURL) {
-      if (isset($path)) {
-        if (isset($query)) {
+      if ($path !== NULL && $path !== '' && $path !== FALSE) {
+        if ($query !== NULL && $query !== '' && $query !== FALSE) {
           return $base . $script . '?q=' . $path . $separator . $query . $fragment;
         }
         else {
@@ -112,7 +112,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
         }
       }
       else {
-        if (isset($query)) {
+        if ($query !== NULL && $query !== '' && $query !== FALSE) {
           return $base . $script . '?' . $query . $fragment;
         }
         else {
