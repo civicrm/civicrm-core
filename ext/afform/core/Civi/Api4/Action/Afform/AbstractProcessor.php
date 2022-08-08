@@ -103,7 +103,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
         $data = ['fields' => $result[$id]];
         foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
           $data['joins'][$joinEntity] = (array) $api4($joinEntity, 'get', [
-            'where' => self::getJoinWhereClause($entity['type'], $joinEntity, $id),
+            'where' => self::getJoinWhereClause($this->_formDataModel, $entity['name'], $joinEntity, $id),
             'limit' => !empty($join['af-repeat']) ? $join['max'] ?? 0 : 1,
             'select' => array_keys($join['fields']),
             'orderBy' => self::getEntityField($joinEntity, 'is_primary') ? ['is_primary' => 'DESC'] : [],
@@ -139,22 +139,32 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   abstract protected function processForm();
 
   /**
-   * @param $mainEntityName
-   * @param $joinEntityName
-   * @param $mainEntityId
+   * @param \Civi\Afform\FormDataModel $formDataModel
+   * @param string $mainEntityName
+   * @param string $joinEntityType
+   * @param int|string $mainEntityId
    * @return array
    * @throws \API_Exception
    */
-  protected static function getJoinWhereClause($mainEntityName, $joinEntityName, $mainEntityId) {
+  protected static function getJoinWhereClause(FormDataModel $formDataModel, string $mainEntityName, string $joinEntityType, $mainEntityId) {
+    $entity = $formDataModel->getEntity($mainEntityName);
+    $mainEntityType = $entity['type'];
     $params = [];
-    if (self::getEntityField($joinEntityName, 'entity_id')) {
+
+    // Add data as clauses e.g. `is_primary: true`
+    foreach ($entity['joins'][$joinEntityType]['data'] ?? [] as $key => $val) {
+      $params[] = [$key, '=', $val];
+    }
+
+    // Figure out the FK field between the join entity and the main entity
+    if (self::getEntityField($joinEntityType, 'entity_id')) {
       $params[] = ['entity_id', '=', $mainEntityId];
-      if (self::getEntityField($joinEntityName, 'entity_table')) {
-        $params[] = ['entity_table', '=', CoreUtil::getTableName($mainEntityName)];
+      if (self::getEntityField($joinEntityType, 'entity_table')) {
+        $params[] = ['entity_table', '=', CoreUtil::getTableName($mainEntityType)];
       }
     }
     else {
-      $mainEntityField = \CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($mainEntityName) . '_id';
+      $mainEntityField = \CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($mainEntityType) . '_id';
       $params[] = [$mainEntityField, '=', $mainEntityId];
     }
     return $params;
