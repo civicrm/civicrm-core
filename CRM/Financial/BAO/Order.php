@@ -458,12 +458,6 @@ class CRM_Financial_BAO_Order {
       foreach ($this->getPriceOptions() as $fieldID => $valueID) {
         $this->setPriceSetIDFromSelectedField($fieldID);
       }
-      if (!$this->priceSetID && $this->getTemplateContributionID()) {
-        // Load the line items from the contribution.
-        foreach ($this->getLineItems() as $lineItem) {
-          return $lineItem['price_field_id.price_set_id'];
-        }
-      }
     }
     return $this->priceSetID;
   }
@@ -580,7 +574,7 @@ class CRM_Financial_BAO_Order {
    * @return array
    */
   public function getPriceFieldSpec(int $id) :array {
-    return $this->getPriceFieldsMetadata()[$id];
+    return $this->getPriceFieldsMetadata()[$id] ?? $this->getPriceFieldMetadata($id);
   }
 
   /**
@@ -611,6 +605,28 @@ class CRM_Financial_BAO_Order {
       $this->getPriceSetMetadata();
     }
     return $this->priceFieldMetadata;
+  }
+
+  /**
+   * Get the metadata for the given price field.
+   *
+   * Note this uses a different method to getPriceFieldMetadata.
+   *
+   * There is an assumption in the code currently that all purchases
+   * are within a single price set. However, discussions have been around
+   * the idea that when form-builder supports contributions price sets will
+   * not be used as form-builder in itself is a configuration unit.
+   *
+   * Currently there are couple of unit tests that mix & match & rather than
+   * updating the tests to avoid notices when orders are loaded for receipting,
+   * the migration to this new method is starting....
+   *
+   * @param int $id
+   *
+   * @return array
+   */
+  public function getPriceFieldMetadata(int $id): array {
+    return CRM_Price_BAO_PriceField::getPriceField($id);
   }
 
   /**
@@ -819,6 +835,10 @@ class CRM_Financial_BAO_Order {
     $params['financial_type_id'] = 0;
     if ($this->getTemplateContributionID()) {
       $lineItems = $this->getLinesFromTemplateContribution();
+      // Set the price set ID from the first line item (we need to set this here
+      // to prevent a loop later when we retrieve the price field metadata to
+      // set the 'title' (as accessed from workflow message templates).
+      $this->setPriceSetID($lineItems[0]['price_field_id.price_set_id']);
     }
     else {
       foreach ($this->getPriceOptions() as $fieldID => $valueID) {
@@ -855,7 +875,7 @@ class CRM_Financial_BAO_Order {
       elseif ($taxRate) {
         $lineItem['tax_amount'] = ($taxRate / 100) * $lineItem['line_total'];
       }
-      $lineItem['title'] = $lineItem['label'];
+      $lineItem['title'] = $this->getLineItemTitle($lineItem);
     }
     return $lineItems;
   }
@@ -1001,15 +1021,7 @@ class CRM_Financial_BAO_Order {
       }
     }
     if (empty($lineItem['title'])) {
-      // Title is used in output for workflow templates.
-      $htmlType = !empty($this->priceFieldMetadata) ? $this->getPriceFieldSpec($lineItem['price_field_id'])['html_type'] : NULL;
-      $lineItem['title'] = (!$htmlType || $htmlType === 'Text') ? $lineItem['label'] : $this->getPriceFieldSpec($lineItem['price_field_id'])['label'] . ' : ' . $lineItem['label'];
-      if (!empty($lineItem['price_field_value_id'])) {
-        $description = $this->priceFieldValueMetadata[$lineItem['price_field_value_id']]['description'] ?? '';
-        if ($description) {
-          $lineItem['title'] .= ' ' . CRM_Utils_String::ellipsify($description, 30);
-        }
-      }
+      $lineItem['title'] = $this->getLineItemTitle($lineItem);
     }
     $this->lineItems[$index] = $lineItem;
   }
@@ -1209,6 +1221,29 @@ class CRM_Financial_BAO_Order {
       'label' => ts('Contribution Amount'),
     ];
     $lineItem = array_merge($defaults, $lineItem);
+  }
+
+  /**
+   * Get a 'title' for the line item.
+   *
+   * This descriptor is used in message templates. It could conceivably
+   * by used elsewhere but if so determination would likely move to the api.
+   *
+   * @param array $lineItem
+   *
+   * @return string
+   */
+  private function getLineItemTitle(array $lineItem): string {
+    // Title is used in output for workflow templates.
+    $htmlType = $this->getPriceFieldSpec($lineItem['price_field_id'])['html_type'] ?? NULL;
+    $lineItemTitle = (!$htmlType || $htmlType === 'Text') ? $lineItem['label'] : $this->getPriceFieldSpec($lineItem['price_field_id'])['label'] . ' - ' . $lineItem['label'];
+    if (!empty($lineItem['price_field_value_id'])) {
+      $description = $this->priceFieldValueMetadata[$lineItem['price_field_value_id']]['description'] ?? '';
+      if ($description) {
+        $lineItemTitle .= ' ' . CRM_Utils_String::ellipsify($description, 30);
+      }
+    }
+    return $lineItemTitle;
   }
 
 }
