@@ -163,7 +163,7 @@
       var fieldInfo = _.cloneDeep(_.findWhere(getEntity().actions, {name: action}).fields);
       fieldList.length = 0;
       if (addPseudoconstant) {
-        addPseudoconstants(fieldInfo, addPseudoconstant);
+        addPseudoconstants(fieldInfo);
       }
       if (addWriteJoins) {
         addWriteJoinFields(fieldInfo);
@@ -198,7 +198,7 @@
             });
           }
           if (addPseudoconstant) {
-            addPseudoconstants(joinFields, addPseudoconstant);
+            addPseudoconstants(joinFields);
           }
           fieldList.push({
             text: join.entity + ' AS ' + join.alias,
@@ -213,7 +213,7 @@
           var linkFields = _.cloneDeep(entityFields(field.fk_entity)),
             wildCard = addWildcard ? [{id: field.name + '.*', text: field.name + '.*', 'description': 'All core ' + field.fk_entity + ' fields'}] : [];
           if (addPseudoconstant) {
-            addPseudoconstants(linkFields, addPseudoconstant);
+            addPseudoconstants(linkFields);
           }
           fieldList.push({
             text: field.name,
@@ -225,11 +225,11 @@
     }
 
     // Note: this function transforms a raw list a-la getFields; not a select2-formatted list
-    function addPseudoconstants(fieldList, toAdd) {
+    function addPseudoconstants(fieldList) {
       var optionFields = _.filter(fieldList, 'options');
       _.each(optionFields, function(field) {
         var pos = _.findIndex(fieldList, {name: field.name}) + 1;
-        _.each(toAdd, function(suffix) {
+        _.each(field.suffixes, function(suffix) {
           var newField = _.cloneDeep(field);
           newField.name += ':' + suffix;
           fieldList.splice(pos, 0, newField);
@@ -319,7 +319,7 @@
     $scope.fieldList = function(param) {
       return function() {
         var fields = [];
-        getFieldList(fields, $scope.action === 'getFields' ? ($scope.params.action || 'get') : $scope.action, ['name'], true);
+        getFieldList(fields, $scope.action === 'getFields' ? ($scope.params.action || 'get') : $scope.action, true, true);
         // Disable fields that are already in use
         _.each($scope.params[param] || [], function(val) {
           var usedField = val[0].replace(/[:.]name/, '');
@@ -482,10 +482,10 @@
     this.buildFieldList = function() {
       var actionInfo = _.findWhere(actions, {id: $scope.action});
       getFieldList($scope.fields, $scope.action);
-      getFieldList($scope.fieldsAndJoins, $scope.action, ['name']);
+      getFieldList($scope.fieldsAndJoins, $scope.action, true);
       getFieldList($scope.fieldsAndJoinsAndFunctions, $scope.action);
-      getFieldList($scope.fieldsAndJoinsAndFunctionsWithSuffixes, $scope.action, ['name', 'label']);
-      getFieldList($scope.fieldsAndJoinsAndFunctionsAndWildcards, $scope.action, ['name', 'label']);
+      getFieldList($scope.fieldsAndJoinsAndFunctionsWithSuffixes, $scope.action, true);
+      getFieldList($scope.fieldsAndJoinsAndFunctionsAndWildcards, $scope.action, true);
       if (_.contains(['get', 'update', 'delete', 'replace'], $scope.action)) {
         addJoins($scope.fieldsAndJoins);
         // SQL functions are supported if HAVING is
@@ -506,8 +506,8 @@
           $scope.fieldsAndJoinsAndFunctionsAndWildcards.push(functions);
         }
         addJoins($scope.fieldsAndJoinsAndFunctions, true);
-        addJoins($scope.fieldsAndJoinsAndFunctionsWithSuffixes, false, ['name', 'label']);
-        addJoins($scope.fieldsAndJoinsAndFunctionsAndWildcards, true, ['name', 'label']);
+        addJoins($scope.fieldsAndJoinsAndFunctionsWithSuffixes, false, true);
+        addJoins($scope.fieldsAndJoinsAndFunctionsAndWildcards, true, true);
       }
       // Custom fields are supported if HAVING is
       if (actionInfo.params.having) {
