@@ -17,7 +17,7 @@ Other resources for identifying changes are:
 
 ## CiviCRM 5.52.1
 
-Released August 8, 2022
+Released August 9, 2022
 
 - **[Synopsis](release-notes/5.52.1.md#synopsis)**
 - **[Bugs resolved](release-notes/5.52.1.md#bugs)**
