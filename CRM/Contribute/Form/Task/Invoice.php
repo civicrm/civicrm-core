@@ -244,6 +244,16 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       // and calls deprecated code. If we decide a contribution title is a
       // 'real thing' then we should create a token.
       $ids = array_merge(CRM_Contribute_BAO_Contribution::getComponentDetails($contributionID), $ids);
+
+      if (empty($contribution->_component)) {
+        if (!empty($ids['event'])) {
+          $contribution->_component = 'event';
+        }
+        else {
+          $contribution->_component = strtolower(CRM_Utils_Array::value('component', $input, 'contribute'));
+        }
+      }
+
       $contribution->loadRelatedObjects($input, $ids);
 
       $input['amount'] = $contribution->total_amount;

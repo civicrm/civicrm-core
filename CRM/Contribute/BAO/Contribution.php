@@ -1830,6 +1830,15 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     $contribution->id = $ids['contribution'];
     $contribution->find();
 
+    if (empty($contribution->_component)) {
+      if (!empty($ids['event'])) {
+        $contribution->_component = 'event';
+      }
+      else {
+        $contribution->_component = strtolower(CRM_Utils_Array::value('component', $input, 'contribute'));
+      }
+    }
+
     $contribution->loadRelatedObjects($input, $ids);
 
     $memberships = $contribution->_relatedObjects['membership'] ?? [];
@@ -2324,20 +2333,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // 4) make ->_relatedObjects protected
     // 5) hone up the individual functions to not use rely on this having been called
     // 6) deprecate like mad
-    if (empty($this->_component)) {
-      if (!empty($ids['event'])) {
-        $this->_component = 'event';
-      }
-      else {
-        $this->_component = strtolower(CRM_Utils_Array::value('component', $input, 'contribute'));
-      }
-    }
-
-    // If the object is not fully populated then make sure it is - this is a more about legacy paths & cautious
-    // refactoring than anything else, and has unit test coverage.
-    if (empty($this->financial_type_id)) {
-      $this->find(TRUE);
-    }
 
     $paymentProcessorID = CRM_Utils_Array::value('payment_processor_id', $input, CRM_Utils_Array::value(
       'paymentProcessor',
@@ -2462,6 +2457,21 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $ids = array_merge(self::getComponentDetails($this->id), $ids);
     if (empty($ids['contact']) && isset($this->contact_id)) {
       $ids['contact'] = $this->contact_id;
+    }
+
+    if (empty($this->_component)) {
+      if (!empty($ids['event'])) {
+        $this->_component = 'event';
+      }
+      else {
+        $this->_component = strtolower(CRM_Utils_Array::value('component', $input, 'contribute'));
+      }
+    }
+
+    // If the object is not fully populated then make sure it is - this is a more about legacy paths & cautious
+    // refactoring than anything else, and has unit test coverage.
+    if (empty($this->financial_type_id)) {
+      $this->find(TRUE);
     }
     $this->loadRelatedObjects($input, $ids);
 
