@@ -52,13 +52,15 @@ trait DAOActionTrait {
    * @return array
    */
   public function baoToArray($bao, $input) {
-    $allFields = array_column($bao->fields(), 'name');
+    $entityFields = array_column($bao->fields(), 'name');
+    $inputFields = array_map(function($key) {
+      return explode(':', $key)[0];
+    }, array_keys($input));
+    $combinedFields = array_unique(array_merge($entityFields, $inputFields));
     if (!empty($this->reload)) {
-      $inputFields = $allFields;
       $bao->find(TRUE);
     }
     else {
-      $inputFields = array_keys($input);
       // Convert 'null' input to true null
       foreach ($inputFields as $key) {
         if (($bao->$key ?? NULL) === 'null') {
@@ -67,8 +69,8 @@ trait DAOActionTrait {
       }
     }
     $values = [];
-    foreach ($allFields as $field) {
-      if (isset($bao->$field) || in_array($field, $inputFields)) {
+    foreach ($combinedFields as $field) {
+      if (isset($bao->$field) || in_array($field, $inputFields) || (!empty($this->reload) && in_array($field, $entityFields))) {
         $values[$field] = $bao->$field ?? NULL;
       }
     }

@@ -29,10 +29,10 @@ use Civi\Test\TransactionalInterface;
  */
 class NullValueTest extends Api4TestBase implements TransactionalInterface {
 
-  public function setUpHeadless() {
+  public function setUp(): void {
     $format = '{contact.first_name}{ }{contact.last_name}';
     \Civi::settings()->set('display_name_format', $format);
-    return parent::setUpHeadless();
+    parent::setUp();
   }
 
   public function testStringNull() {

@@ -49,6 +49,64 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
         ->setSqlRenderer([__CLASS__, 'calculateAge']);
       $spec->addFieldSpec($field);
     }
+
+    // Address, Email, Phone, IM
+    $entities = [
+      'Address' => [
+        'primary' => [
+          'title' => ts('Primary Address ID'),
+          'label' => ts('Primary Address'),
+        ],
+        'billing' => [
+          'title' => ts('Billing Address ID'),
+          'label' => ts('Billing Address'),
+        ],
+      ],
+      'Email' => [
+        'primary' => [
+          'title' => ts('Primary Email ID'),
+          'label' => ts('Primary Email'),
+        ],
+        'billing' => [
+          'title' => ts('Billing Email ID'),
+          'label' => ts('Billing Email'),
+        ],
+      ],
+      'Phone' => [
+        'primary' => [
+          'title' => ts('Primary Phone ID'),
+          'label' => ts('Primary Phone'),
+        ],
+        'billing' => [
+          'title' => ts('Billing Phone ID'),
+          'label' => ts('Billing Phone'),
+        ],
+      ],
+      'IM' => [
+        'primary' => [
+          'title' => ts('Primary IM ID'),
+          'label' => ts('Primary IM'),
+        ],
+        'billing' => [
+          'title' => ts('Billing IM ID'),
+          'label' => ts('Billing IM'),
+        ],
+      ],
+    ];
+    foreach ($entities as $entity => $types) {
+      foreach ($types as $type => $info) {
+        $name = strtolower($entity) . '_' . $type;
+        $field = new FieldSpec($name, 'Contact', 'String');
+        $field->setLabel($info['label'])
+          ->setTitle($info['title'])
+          ->setColumnName('id')
+          ->setType('Extra')
+          ->setFkEntity($entity)
+          ->setSqlRenderer([__CLASS__, 'getLocationFieldSql']);
+        $spec->addFieldSpec($field);
+      }
+    }
+
   }
 
   /**
@@ -117,6 +175,18 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
    */
   public static function calculateAge(array $field) {
     return "TIMESTAMPDIFF(YEAR, {$field['sql_name']}, CURDATE())";
+  }
+
+  /**
+   * Generate SQL for address/email/phone/im id field
+   * @param array $field
+   * @param \Civi\Api4\Query\Api4SelectQuery $query
+   * @return string
+   */
+  public static function getLocationFieldSql(array $field, Api4SelectQuery $query) {
+    $prefix = empty($field['explicit_join']) ? '' : $field['explicit_join'] . '.';
+    $idField = $query->getField($prefix . $field['name'] . '.id');
+    return $idField['sql_name'];
   }
 
 }
