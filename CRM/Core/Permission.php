@@ -476,7 +476,6 @@ class CRM_Core_Permission {
         'CiviMember' => 'edit memberships',
         'CiviPledge' => 'edit pledges',
         'CiviContribute' => 'edit contributions',
-        'CiviGrant' => 'edit grants',
         'CiviMail' => 'access CiviMail',
         'CiviAuction' => 'add auction items',
       ];
