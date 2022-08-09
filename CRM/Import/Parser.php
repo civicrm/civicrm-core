@@ -19,6 +19,9 @@ use Civi\UserJob\UserJobInterface;
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
+ *
+ * @internal - this class is likely to change and extending it in extensions is not
+ * supported.
  */
 abstract class CRM_Import_Parser implements UserJobInterface {
   /**
