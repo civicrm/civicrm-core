@@ -1,6 +1,15 @@
 <?php
 use CRM_Grant_ExtensionUtil as E;
 
+// Prevent errors during upgrades from < 5.53 that don't yet have the option group
+$optionGroup = \Civi\Api4\OptionGroup::get(FALSE)
+  ->addWhere('name', '=', 'recent_items_providers')
+  ->selectRowCount()
+  ->execute();
+if (!$optionGroup->count()) {
+  return [];
+}
+
 return [
   [
     'name' => 'OptionGroup_recent_items_providers_OptionValue_Grant',
