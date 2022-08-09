@@ -762,7 +762,7 @@
         restrict: 'EA',
         scope: {
           crmUiTabSet: '@',
-          tabSetOptions: '@'
+          tabSetOptions: '<'
         },
         templateUrl: '~/crmUi/tabset.html',
         transclude: true,
