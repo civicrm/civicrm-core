@@ -45,7 +45,7 @@
     })
 
     // Controller for tabbed view of SavedSearches
-    .controller('searchList', function($scope, $timeout, searchMeta, formatForSelect2, dialogService) {
+    .controller('searchList', function($scope, $timeout, searchMeta, formatForSelect2) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = $scope.$ctrl = this;
       searchEntity = 'SavedSearch';
@@ -57,6 +57,10 @@
       }, []), 'text');
       this.getTags = function() {
         return {results: formatForSelect2(CRM.crmSearchAdmin.tags, 'id', 'name', ['color', 'description'])};
+      };
+
+      this.getPrimaryEntities = function() {
+        this.primaryEntities = _.filter(CRM.crmSearchAdmin.schema, {searchable: 'primary'});
       };
 
       // Tabs include a rowCount which will be updated by the search controller
