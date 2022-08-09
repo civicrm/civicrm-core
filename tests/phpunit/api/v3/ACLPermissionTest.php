@@ -210,6 +210,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
         'location_type_id' => 1,
       ],
     ];
+    // v3 GroupContact API is nonstandard
+    if ($version === 4) {
+      $testEntities['GroupContact'] = ['group_id' => $this->groupCreate()];
+    }
     foreach ($testEntities as $entity => $params) {
       $params += [
         'contact_id' => $disallowedContact,
