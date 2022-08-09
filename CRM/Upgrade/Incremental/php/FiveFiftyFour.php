@@ -38,6 +38,15 @@ class CRM_Upgrade_Incremental_php_FiveFiftyFour extends CRM_Upgrade_Incremental_
    */
   public function upgrade_5_54_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add "created_id" column to "civicrm_participant"', 'addCreatedIDColumnToParticipant');
+  }
+
+  public static function addCreatedIDColumnToParticipant($ctx): bool {
+    CRM_Upgrade_Incremental_Base::addColumn($ctx, 'civicrm_participant', 'created_id', 'int(10) UNSIGNED DEFAULT NULL COMMENT "Created by Contact ID"');
+    if (!CRM_Core_BAO_SchemaHandler::checkFKExists('civicrm_participant', 'FK_civicrm_participant_created_id')) {
+      CRM_Core_DAO::executeQuery('ALTER TABLE `civicrm_participant` ADD CONSTRAINT `FK_civicrm_participant_created_id` FOREIGN KEY (`created_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE SET NULL;');
+    }
+    return TRUE;
   }
 
 }
