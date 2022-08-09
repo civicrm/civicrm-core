@@ -26,6 +26,8 @@ require_once 'api/v3/utils.php';
 
 /**
  *
+ * @deprecated
+ *
  * @param array $params
  *
  * @return array
