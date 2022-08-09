@@ -478,7 +478,6 @@ class CRM_Core_Permission {
         'CiviContribute' => 'edit contributions',
         'CiviGrant' => 'edit grants',
         'CiviMail' => 'access CiviMail',
-        'CiviAuction' => 'add auction items',
       ];
       $permissionName = $editPermissions[$module] ?? NULL;
     }
