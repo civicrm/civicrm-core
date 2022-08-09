@@ -770,6 +770,22 @@ class CRM_Core_SelectValues {
   }
 
   /**
+   * Get measurement units recognized by the TCPDF package used to create PDF labels.
+   *
+   * @return array
+   *   array of measurement units
+   */
+  public static function getLayoutUnits(): array {
+    return [
+      'in' => ts('Inches'),
+      'cm' => ts('Centimeters'),
+      'mm' => ts('Millimeters'),
+      'pt' => ts('Points'),
+      'px' => ts('Pixels'),
+    ];
+  }
+
+  /**
    * Extension types.
    *
    * @return array
