@@ -144,7 +144,7 @@ class CRM_Core_Smarty extends Smarty {
 
     $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
 
-    if ($config->debug) {
+    if ($config->debug || (defined('CIVICRM_TEST') && CIVICRM_TEST)) {
       $this->error_reporting = E_ALL;
     }
   }
