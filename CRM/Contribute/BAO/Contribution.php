@@ -1828,7 +1828,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
 
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $ids['contribution'];
-    $contribution->find();
+    $contribution->find(TRUE);
 
     if (empty($contribution->_component)) {
       if (!empty($ids['event'])) {

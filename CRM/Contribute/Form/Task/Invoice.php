@@ -239,7 +239,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
       $contribution = new CRM_Contribute_BAO_Contribution();
       $contribution->id = $contributionID;
-      $contribution->fetch();
+      $contribution->find(TRUE);
       // @todo this is only used now to load the event title, it causes an enotice
       // and calls deprecated code. If we decide a contribution title is a
       // 'real thing' then we should create a token.
