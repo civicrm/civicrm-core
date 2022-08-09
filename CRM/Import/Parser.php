@@ -901,8 +901,46 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     }
 
     $contactFormatted['contact_type'] = $contactType;
+    $params = &$contactFormatted;
+    $id = $params['id'] ?? NULL;
+    $externalId = $params['external_identifier'] ?? NULL;
+    if ($id || $externalId) {
+      $contact = new CRM_Contact_DAO_Contact();
 
-    return _civicrm_api3_deprecated_duplicate_formatted_contact($contactFormatted);
+      $contact->id = $id;
+      $contact->external_identifier = $externalId;
+
+      if ($contact->find(TRUE)) {
+        if ($params['contact_type'] != $contact->contact_type) {
+          return ['is_error' => 1, 'error_message' => 'Mismatched contact IDs OR Mismatched contact Types'];
+        }
+        return [
+          'is_error' => 1,
+          'error_message' => [
+            'code' => CRM_Core_Error::DUPLICATE_CONTACT,
+            'params' => [$contact->id],
+            'level' => 'Fatal',
+            'message' => "Found matching contacts: $contact->id",
+          ],
+        ];
+      }
+    }
+    else {
+      $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, $params['contact_type'], 'Unsupervised');
+
+      if (!empty($ids)) {
+        return [
+          'is_error' => 1,
+          'error_message' => [
+            'code' => CRM_Core_Error::DUPLICATE_CONTACT,
+            'params' => $ids,
+            'level' => 'Fatal',
+            'message' => 'Found matching contacts: ' . implode(',', $ids),
+          ],
+        ];
+      }
+    }
+    return ['is_error' => 0];
   }
 
   /**
