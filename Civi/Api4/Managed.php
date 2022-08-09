@@ -11,9 +11,9 @@
 namespace Civi\Api4;
 
 /**
- * Managed entities API.
+ * Records "packaged" by extensions and managed by CiviCRM.
  *
- * Managed entities allow extensions to add and manage entities.
+ * Extensions can package records in a declarative fashion, typically in `.mgd.php` files.
  *
  * @searchable secondary
  * @see https://civicrm.org/blog/totten/api-and-art-installation
