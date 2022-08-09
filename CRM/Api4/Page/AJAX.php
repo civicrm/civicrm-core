@@ -58,8 +58,9 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       CRM_Utils_System::civiExit();
     }
     try {
-      // Call multiple
+      // Two call formats. Which one was used? Note: CRM_Api4_Permission::check() and CRM_Api4_Page_AJAX::run() should have matching conditionals.
       if (empty($this->urlPath[3])) {
+        // Received multi-call format
         $calls = CRM_Utils_Request::retrieve('calls', 'String', CRM_Core_DAO::$_nullObject, TRUE, NULL, 'POST');
         $calls = json_decode($calls, TRUE);
         $response = [];
@@ -67,8 +68,8 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
           $response[$index] = call_user_func_array([$this, 'execute'], $call);
         }
       }
-      // Call single
       else {
+        // Received single-call format
         $entity = $this->urlPath[3];
         $action = $this->urlPath[4];
         $params = CRM_Utils_Request::retrieve('params', 'String');
