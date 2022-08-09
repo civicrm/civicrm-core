@@ -58,6 +58,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyThree extends CRM_Upgrade_Incremental
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Replace %A specifier in date settings.', 'replacePercentA');
     $this->addTask('Add invoice pdf format', 'addInvoicePDFFormat');
+    $this->addTask('Add Recent Items Providers', 'addRecentItemsProviders');
   }
 
   /**
@@ -104,6 +105,39 @@ class CRM_Upgrade_Incremental_php_FiveFiftyThree extends CRM_Upgrade_Incremental
       $usages[$dao->id] = $dao->msg_title;
     }
     return $usages;
+  }
+
+  /**
+   * dev/core#3783 Add Recent Items Providers.
+   * @return bool
+   */
+  public static function addRecentItemsProviders() {
+    CRM_Core_BAO_OptionGroup::ensureOptionGroupExists([
+      'name' => 'recent_items_providers',
+      'title' => ts('Recent Items Providers'),
+      'is_reserved' => 0,
+    ]);
+    $values = [
+      'Contact' => ['label' => ts('Contacts')],
+      'Relationship' => ['label' => ts('Relationships')],
+      'Activity' => ['label' => ts('Activities')],
+      'Note' => ['label' => ts('Notes')],
+      'Group' => ['label' => ts('Groups')],
+      'Case' => ['label' => ts('Cases')],
+      'Contribution' => ['label' => ts('Contributions')],
+      'Participant' => ['label' => ts('Participants')],
+      'Membership' => ['label' => ts('Memberships')],
+      'Pledge' => ['label' => ts('Pledges')],
+      'Event' => ['label' => ts('Events')],
+      'Campaign' => ['label' => ts('Campaigns')],
+    ];
+    foreach ($values as $name => $value) {
+      CRM_Core_BAO_OptionValue::ensureOptionValueExists($value + [
+        'name' => $name,
+        'option_group_id' => 'recent_items_providers',
+      ]);
+    }
+    return TRUE;
   }
 
 }
