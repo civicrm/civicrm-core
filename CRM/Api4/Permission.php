@@ -22,17 +22,32 @@
 class CRM_Api4_Permission {
 
   public static function check() {
-    $config = CRM_Core_Config::singleton();
-    $urlPath = explode('/', $_GET[$config->userFrameworkURLVar]);
-    $permissions = [
+    $urlPath = explode('/', CRM_Utils_System::currentPath());
+    $defaultPermissions = [
       ['access CiviCRM', 'access AJAX API'],
     ];
+    // Two call formats. Which one was used? Note: CRM_Api4_Permission::check() and CRM_Api4_Page_AJAX::run() should have matching conditionals.
     if (!empty($urlPath[3])) {
+      // Received single-call format
       $entity = $urlPath[3];
       $action = $urlPath[4];
+      $permissions = $defaultPermissions;
       CRM_Utils_Hook::alterApiRoutePermissions($permissions, $entity, $action);
+      return CRM_Core_Permission::check($permissions);
     }
-    return CRM_Core_Permission::check($permissions);
+    else {
+      // Received multi-call format
+      $calls = CRM_Utils_Request::retrieve('calls', 'String', CRM_Core_DAO::$_nullObject, TRUE, NULL, 'POST');
+      $calls = json_decode($calls, TRUE);
+      foreach ($calls as $call) {
+        $permissions = $defaultPermissions;
+        CRM_Utils_Hook::alterApiRoutePermissions($permissions, $call[0], $call[1]);
+        if (!CRM_Core_Permission::check($permissions)) {
+          return FALSE;
+        }
+      }
+      return TRUE;
+    }
   }
 
 }
