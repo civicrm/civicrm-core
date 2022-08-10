@@ -82,14 +82,6 @@ class SchemaMapBuilder {
     if ($fkClass) {
       $tableName = AllCoreTables::getTableForClass($fkClass);
       $fkKey = $data['FKKeyColumn'] ?? 'id';
-      // Backward-compatibility for older api calls using e.g. "contact" instead of "contact_id"
-      if (strpos($field, '_id')) {
-        $alias = str_replace('_id', '', $field);
-        $joinable = new Joinable($tableName, $fkKey, $alias);
-        $joinable->setJoinType($joinable::JOIN_TYPE_MANY_TO_ONE);
-        $joinable->setDeprecated();
-        $table->addTableLink($field, $joinable);
-      }
       $joinable = new Joinable($tableName, $fkKey, $field);
       $joinable->setJoinType($joinable::JOIN_TYPE_MANY_TO_ONE);
       $table->addTableLink($field, $joinable);

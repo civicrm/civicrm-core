@@ -445,24 +445,6 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('TesterCo', $emailGet['contact_id.employer_id.display_name']);
   }
 
-  public function testDeprecatedJoins() {
-    $message = '';
-    try {
-      \Civi\Api4\Email::get(FALSE)
-        ->addWhere('contact.first_name', '=', 'Peter')
-        ->addWhere('contact.last_name', '=', '')
-        ->addWhere('contact.is_deleted', '=', 0)
-        ->addWhere('contact.is_deceased', '=', 0)
-        ->addWhere('email', '=', '')
-        ->addWhere('is_primary', '=', TRUE)
-        ->setSelect(['contact_id'])->execute();
-    }
-    catch (\Exception $e) {
-      $message = $e->getMessage();
-    }
-    $this->assertStringContainsString("Deprecated join alias 'contact' used in APIv4 get. Should be changed to 'contact_id'", $message);
-  }
-
   public function testJoinWithExpression() {
 
     $contact1 = $this->createTestRecord('Contact');
