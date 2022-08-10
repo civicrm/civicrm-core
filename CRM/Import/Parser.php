@@ -19,6 +19,9 @@ use Civi\UserJob\UserJobInterface;
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
+ *
+ * @internal - this class is likely to change and extending it in extensions is not
+ * supported.
  */
 abstract class CRM_Import_Parser implements UserJobInterface {
   /**
@@ -581,6 +584,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
+   * @deprecated
+   *
    * @return array
    */
   public function getDataPatterns():array {
@@ -597,6 +602,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @param array $values
    * @param string $enclosure
    *
+   * @deprecated
+   *
    * @return void
    */
   public static function encloseScrub(&$values, $enclosure = "'") {
@@ -611,6 +618,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
   /**
    * Setter function.
+   *
+   * @deprecated
    *
    * @param int $max
    *
@@ -762,6 +771,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   /**
    * Determines the file extension based on error code.
    *
+   * @deprecated
+   *
    * @var int $type error code constant
    * @return string
    */
@@ -797,6 +808,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   /**
    * Determines the file name based on error code.
    *
+   * @deprecated
+   *
    * @var int $type code constant
    * @return string
    */
@@ -830,6 +843,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * Check if contact is a duplicate .
    *
    * @param array $formatValues
+   *
+   * @deprecated
    *
    * @return array
    */
@@ -917,6 +932,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *   The structured parameter list.
    *
    * @return bool|CRM_Utils_Error
+   *
+   * @deprecated
    */
   private function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
     // @todo - like most functions in import ... most of this is cruft....
@@ -1197,6 +1214,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * We will try to match name first or (per https://lab.civicrm.org/dev/core/issues/1285 if we have an id.
    *
    * but if not available then see if we have a label that can be converted to a name.
+   *
+   * @deprecated
    *
    * @param string|int|null $submittedValue
    * @param array $fieldSpec
@@ -2030,6 +2049,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *   Type of date.
    * @param string $dateParam
    *   Index of params.
+   *
+   * @deprecated
    */
   public static function formatCustomDate(&$params, &$formatted, $dateType, $dateParam) {
     //fix for CRM-2687
