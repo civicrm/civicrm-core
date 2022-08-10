@@ -668,11 +668,25 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
             // get the contact id from duplicate contact rule, if more than one contact is returned
             // we should return error, since current interface allows only one-one mapping
-            $emailParams = [
+            $ids = CRM_Contact_BAO_Contact::getDuplicateContacts([
               'email' => $email,
               'contact_type' => $params['contact_type'],
-            ];
-            $checkDedupe = _civicrm_api3_deprecated_duplicate_formatted_contact($emailParams);
+            ], $params['contact_type'], 'Unsupervised');
+
+            if (!empty($ids)) {
+              $checkDedupe = [
+                'is_error' => 1,
+                'error_message' => [
+                  'code' => CRM_Core_Error::DUPLICATE_CONTACT,
+                  'params' => $ids,
+                  'level' => 'Fatal',
+                  'message' => 'Found matching contacts: ' . implode(',', $ids),
+                ],
+              ];
+            }
+            else {
+              $checkDedupe = ['is_error' => 0];
+            }
             if (!$checkDedupe['is_error']) {
               return civicrm_api3_create_error("Invalid email address(doesn't exist) $email. Row was skipped");
             }
