@@ -13,6 +13,11 @@
 
   {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
   {include file="CRM/common/WizardHeader.tpl"}
+  {if $errorMessage}
+    <div class="messages warning no-popup">
+      {$errorMessage}
+    </div>
+  {/if}
   <div class="help">
     {ts 1=$importEntity 2= $importEntities}The %1 Import Wizard allows you to easily upload %2 from other applications into CiviCRM.{/ts}
     {ts}Files to be imported must be in the 'comma-separated-values' format (CSV) and must contain data needed to match an existing contact in your CiviCRM database.{/ts} {help id='upload'}
