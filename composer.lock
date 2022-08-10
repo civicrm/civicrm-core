@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1e50023d9d896bfc1a6782c9685052c5",
+    "content-hash": "0d26ff1d3cf6aacd77e3b92a91b15be5",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -5630,23 +5630,23 @@
         },
         {
             "name": "zetacomponents/mail",
-            "version": "1.9.2",
+            "version": "1.9.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zetacomponents/Mail.git",
-                "reference": "c55267564d78724d4c25188fc653fef0da4c920a"
+                "reference": "7f7cf8135320fabf27f6530381da4977a31e1c78"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zetacomponents/Mail/zipball/c55267564d78724d4c25188fc653fef0da4c920a",
-                "reference": "c55267564d78724d4c25188fc653fef0da4c920a",
+                "url": "https://api.github.com/repos/zetacomponents/Mail/zipball/7f7cf8135320fabf27f6530381da4977a31e1c78",
+                "reference": "7f7cf8135320fabf27f6530381da4977a31e1c78",
                 "shasum": ""
             },
             "require": {
                 "zetacomponents/base": "~1.8"
             },
             "require-dev": {
-                "phpunit/phpunit": "~7.5",
+                "phpunit/phpunit": "~9.0",
                 "zetacomponents/unit-test": "*"
             },
             "type": "library",
@@ -5704,9 +5704,9 @@
             "homepage": "https://github.com/zetacomponents",
             "support": {
                 "issues": "https://github.com/zetacomponents/Mail/issues",
-                "source": "https://github.com/zetacomponents/Mail/tree/1.9.2"
+                "source": "https://github.com/zetacomponents/Mail/tree/1.9.3"
             },
-            "time": "2020-06-13T12:38:26+00:00"
+            "time": "2022-08-09T09:42:33+00:00"
         }
     ],
     "packages-dev": [],
