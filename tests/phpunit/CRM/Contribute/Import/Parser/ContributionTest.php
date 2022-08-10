@@ -226,9 +226,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'rule_weight' => 10,
       'rule_field' => 'phone_numeric',
     ]);
-    $userJobID = UserJob::create()->setValues(['job_type:name' => 'Import Contributions', 'status_id:name' => 'Draft', 'metadata' => ['contactType' => 'Individual']])->execute()->first()['id'];
     $parser = new CRM_Contribute_Import_Parser_Contribution();
-    $parser ->setUserJobID($userJobID);
+    $parser ->setUserJobID($this->getUserJobID());
     $fields = $parser->getAvailableFields();
     $this->assertArrayHasKey('phone', $fields);
     $this->callApiSuccess('RuleGroup', 'create', [

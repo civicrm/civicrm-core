@@ -94,7 +94,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
       ->setSelect(['id', 'name'])
       ->addWhere('mapping_id.mapping_type_id:name', '=', 'Import Contribution')
       ->execute();
-    $fields = CRM_Contribute_BAO_Contribution::importableFields('All', FALSE);
+    $fields = self::importableContributionFields('All', FALSE);
     $fieldMap = [];
     foreach ($fields as $fieldName => $field) {
       $fieldMap[$field['title']] = $fieldName;
@@ -270,6 +270,68 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
     );
     self::dropColumn($context, 'civicrm_user_job', 'type_id');
     return TRUE;
+  }
+
+  /**
+   * Historical copy of Contribution importable fields function.
+   *
+   * @param string $contactType
+   * @param bool $status
+   *
+   * @return array
+   *   array of importable Fields
+   */
+  private static function importableContributionFields($contactType = 'Individual', $status = TRUE) {
+    if (!$status) {
+      $fields = ['' => ['title' => ts('- do not import -')]];
+    }
+    else {
+      $fields = ['' => ['title' => ts('- Contribution Fields -')]];
+    }
+
+    $note = CRM_Core_DAO_Note::import();
+    $tmpFields = CRM_Contribute_DAO_Contribution::import();
+    unset($tmpFields['option_value']);
+    $contactFields = CRM_Contact_BAO_Contact::importableFields($contactType, NULL);
+
+    // Using new Dedupe rule.
+    $ruleParams = [
+      'contact_type' => $contactType,
+      'used' => 'Unsupervised',
+    ];
+    $fieldsArray = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
+    $tmpContactField = [];
+    if (is_array($fieldsArray)) {
+      foreach ($fieldsArray as $value) {
+        //skip if there is no dupe rule
+        if ($value === 'none') {
+          continue;
+        }
+        $customFieldId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
+          $value,
+          'id',
+          'column_name'
+        );
+        $value = $customFieldId ? 'custom_' . $customFieldId : $value;
+        $tmpContactField[trim($value)] = $contactFields[trim($value)];
+        if (!$status) {
+          $title = $tmpContactField[trim($value)]['title'] . ' ' . ts('(match to contact)');
+        }
+        else {
+          $title = $tmpContactField[trim($value)]['title'];
+        }
+        $tmpContactField[trim($value)]['title'] = $title;
+      }
+    }
+
+    $tmpContactField['external_identifier'] = $contactFields['external_identifier'];
+    $tmpContactField['external_identifier']['title'] = $contactFields['external_identifier']['title'] . ' ' . ts('(match to contact)');
+    $tmpFields['contribution_contact_id']['title'] = $tmpFields['contribution_contact_id']['html']['label'] = $tmpFields['contribution_contact_id']['title'] . ' ' . ts('(match to contact)');
+    $fields = array_merge($fields, $tmpContactField);
+    $fields = array_merge($fields, $tmpFields);
+    $fields = array_merge($fields, $note);
+    $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Contribution'));
+    return $fields;
   }
 
 }
