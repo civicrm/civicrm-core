@@ -15,8 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-require_once 'CRM/Utils/DeprecatedUtils.php';
-
 /**
  * class to parse membership csv files
  */
