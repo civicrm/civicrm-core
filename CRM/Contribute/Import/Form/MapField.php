@@ -140,7 +140,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     $mapperKeys = array_keys($this->_mapperFields);
     $hasHeaders = $this->getSubmittedValue('skipColumnHeader');
     $headerPatterns = $this->getHeaderPatterns();
-    $dataPatterns = $this->getDataPatterns();
     $mapperKeysValues = $this->getSubmittedValue('mapper');
     $columnHeaders = $this->getColumnHeaders();
     $fieldMappings = $this->getFieldMappings();
@@ -214,9 +213,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
           if ($hasHeaders) {
             $defaults["mapper[$i]"] = [$this->defaultFromHeader($columnHeader, $headerPatterns)];
           }
-          else {
-            $defaults["mapper[$i]"] = [$this->defaultFromData($dataPatterns, $i)];
-          }
         }
         //end of load mapping
       }
@@ -236,13 +232,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
               0,
             ];
           }
-        }
-        else {
-          // Otherwise guess the default from the form of the data
-          $defaults["mapper[$i]"] = [
-            $this->defaultFromData($dataPatterns, $i),
-            0,
-          ];
         }
         if (!empty($mapperKeysValues) && ($mapperKeysValues[$i][0] ?? NULL) === 'soft_credit') {
           $softCreditField = $mapperKeysValues[$i][1];

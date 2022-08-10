@@ -584,19 +584,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
-   * @deprecated
-   *
-   * @return array
-   */
-  public function getDataPatterns():array {
-    $values = [];
-    foreach ($this->_fields as $name => $field) {
-      $values[$name] = $field->_dataPattern;
-    }
-    return $values;
-  }
-
-  /**
    * Remove single-quote enclosures from a value array (row).
    *
    * @param array $values

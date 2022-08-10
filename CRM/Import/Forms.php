@@ -654,15 +654,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
    *
    * @return array
    */
-  public function getDataPatterns(): array {
-    return $this->getParser()->getDataPatterns();
-  }
-
-  /**
-   * Get the data patterns to pattern match the incoming data.
-   *
-   * @return array
-   */
   public function getHeaderPatterns(): array {
     return $this->getParser()->getHeaderPatterns();
   }

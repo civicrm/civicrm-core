@@ -348,7 +348,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     $mapperKeys = array_keys($this->_mapperFields);
     $hasHeaders = $this->getSubmittedValue('skipColumnHeader');
     $headerPatterns = $this->getHeaderPatterns();
-    $dataPatterns = $this->getDataPatterns();
     $fieldMappings = $this->getFieldMappings();
     /* Initialize all field usages to false */
 
@@ -387,9 +386,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
           if ($hasHeaders) {
             $defaults["mapper[$i]"] = [$this->defaultFromHeader($columnHeader, $headerPatterns)];
           }
-          else {
-            $defaults["mapper[$i]"] = [$this->defaultFromData($dataPatterns, $i)];
-          }
         }
         //end of load mapping
       }
@@ -401,14 +397,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
             $this->defaultFromHeader($columnHeader,
               $headerPatterns
             ),
-            //                     $defaultLocationType->id
-            0,
-          ];
-        }
-        else {
-          // Otherwise guess the default from the form of the data
-          $defaults["mapper[$i]"] = [
-            $this->defaultFromData($dataPatterns, $i),
             //                     $defaultLocationType->id
             0,
           ];

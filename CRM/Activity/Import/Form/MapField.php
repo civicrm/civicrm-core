@@ -64,9 +64,9 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
   /**
    * Build the form object.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     $savedMappingID = (int) $this->getSubmittedValue('savedMapping');
     $this->buildSavedMappingFields($savedMappingID);
     $this->addFormRule(['CRM_Activity_Import_Form_MapField', 'formRule']);
@@ -75,7 +75,6 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $defaults = [];
     $headerPatterns = $this->getHeaderPatterns();
-    $dataPatterns = $this->getDataPatterns();
     $fieldMappings = $this->getFieldMappings();
     $columnHeaders = $this->getColumnHeaders();
     $hasHeaders = $this->getSubmittedValue('skipColumnHeader');
@@ -112,9 +111,6 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
           if ($hasHeaders) {
             $defaults["mapper[$i]"] = [$this->defaultFromHeader($columnHeader, $headerPatterns)];
           }
-          else {
-            $defaults["mapper[$i]"] = [$this->defaultFromData($dataPatterns, $i)];
-          }
         }
         // End of load mapping.
       }
@@ -126,10 +122,6 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
             $this->defaultFromHeader($columnHeader, $headerPatterns),
             0,
           ];
-        }
-        else {
-          // Otherwise guess the default from the form of the data
-          $defaults["mapper[$i]"] = [$this->defaultFromData($dataPatterns, $i), 0];
         }
       }
 

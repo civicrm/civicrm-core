@@ -309,12 +309,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
             ];
           }
         }
-        else {
-          // Otherwise guess the default from the form of the data
-          $defaults["mapper[$i]"] = [
-            $this->defaultFromData($this->getDataPatterns(), $i),
-          ];
-        }
         $last_key = array_key_last($defaults["mapper[$i]"]) ?? 0;
       }
       // Call swapOptions on the deepest select element to hide the empty select lists above it.
