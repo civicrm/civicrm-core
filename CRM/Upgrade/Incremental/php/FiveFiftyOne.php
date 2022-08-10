@@ -28,6 +28,8 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
    *
    * @param string $rev
    *   The version number matching this function name
+   *
+   * @throws \CRM_Core_Exception
    */
   public function upgrade_5_51_alpha1($rev): void {
     $this->addSnapshotTask('mappings', CRM_Utils_SQL_Select::from('civicrm_mapping'));
@@ -94,7 +96,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
       ->setSelect(['id', 'name'])
       ->addWhere('mapping_id.mapping_type_id:name', '=', 'Import Contribution')
       ->execute();
-    $fields = self::importableContributionFields('All', FALSE);
+    $fields = self::importableContributionFields('All');
     $fieldMap = [];
     foreach ($fields as $fieldName => $field) {
       $fieldMap[$field['title']] = $fieldName;
@@ -276,19 +278,12 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
    * Historical copy of Contribution importable fields function.
    *
    * @param string $contactType
-   * @param bool $status
    *
    * @return array
    *   array of importable Fields
    */
-  private static function importableContributionFields($contactType = 'Individual', $status = TRUE) {
-    if (!$status) {
-      $fields = ['' => ['title' => ts('- do not import -')]];
-    }
-    else {
-      $fields = ['' => ['title' => ts('- Contribution Fields -')]];
-    }
-
+  private static function importableContributionFields($contactType = 'Individual'): array {
+    $fields = ['' => ['title' => ts('- do not import -')]];
     $note = CRM_Core_DAO_Note::import();
     $tmpFields = CRM_Contribute_DAO_Contribution::import();
     unset($tmpFields['option_value']);
@@ -312,15 +307,11 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
           'id',
           'column_name'
         );
-        $value = $customFieldId ? 'custom_' . $customFieldId : $value;
-        $tmpContactField[trim($value)] = $contactFields[trim($value)];
-        if (!$status) {
-          $title = $tmpContactField[trim($value)]['title'] . ' ' . ts('(match to contact)');
-        }
-        else {
-          $title = $tmpContactField[trim($value)]['title'];
-        }
-        $tmpContactField[trim($value)]['title'] = $title;
+        $value = trim($customFieldId ? 'custom_' . $customFieldId : $value);
+        $tmpContactField[$value] = $contactFields[$value];
+        $title = $tmpContactField[$value]['title'] . ' ' . ts('(match to contact)');
+
+        $tmpContactField[$value]['title'] = $title;
       }
     }
 

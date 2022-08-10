@@ -234,7 +234,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    */
   protected function setFieldMetadata() {
     if (empty($this->importableFieldsMetadata)) {
-      $fields = $this->importableFields($this->getContactType(), FALSE);
+      $fields = $this->importableFields($this->getContactType());
 
       $fields = array_merge($fields,
         [
@@ -277,24 +277,15 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   /**
    * Combine all the importable fields from the lower levels object.
    *
-   * The ordering is important, since currently we do not have a weight
-   * scheme. Adding weight is super important and should be done in the
-   * next week or so, before this can be called complete.
+   * This function should be decommissioned into setFieldMetadata.
    *
    * @param string $contactType
-   * @param bool $status
    *
    * @return array
    *   array of importable Fields
    */
-  private function importableFields($contactType = 'Individual', $status = TRUE) {
-
-    if (!$status) {
-      $fields = ['' => ['title' => ts('- do not import -')]];
-    }
-    else {
-      $fields = ['' => ['title' => ts('- Contribution Fields -')]];
-    }
+  private function importableFields($contactType = 'Individual') {
+    $fields = ['' => ['title' => ts('- do not import -')]];
 
     $note = CRM_Core_DAO_Note::import();
     $tmpFields = CRM_Contribute_DAO_Contribution::import();
@@ -321,12 +312,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         );
         $value = $customFieldId ? 'custom_' . $customFieldId : $value;
         $tmpContactField[trim($value)] = $contactFields[trim($value)];
-        if (!$status) {
-          $title = $tmpContactField[trim($value)]['title'] . ' ' . ts('(match to contact)');
-        }
-        else {
-          $title = $tmpContactField[trim($value)]['title'];
-        }
+        $title = $tmpContactField[trim($value)]['title'] . ' ' . ts('(match to contact)');
         $tmpContactField[trim($value)]['title'] = $title;
       }
     }
