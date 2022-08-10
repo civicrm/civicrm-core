@@ -527,6 +527,11 @@ function afform_civicrm_alterApiRoutePermissions(&$permissions, $entity, $action
       $permissions = CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION;
     }
   }
+  // This is temporarily stuck here, but probably belongs in core (until this hook is finally abolished)
+  elseif ($action === 'autocomplete') {
+    // Autocomplete widget must be accessible by anonymous users. Permissions are checked internally.
+    $permissions = CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION;
+  }
 }
 
 /**

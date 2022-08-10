@@ -32,6 +32,11 @@ use Civi\Test\TransactionalInterface;
 class AutocompleteTest extends Api4TestBase implements HookInterface, TransactionalInterface {
 
   /**
+   * @var callable
+   */
+  private $hookCallback;
+
+  /**
    * Listens for civi.api4.entityTypes event to manually add this nonstandard entity
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
@@ -40,7 +45,15 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $e->entities['MockBasicEntity'] = MockBasicEntity::getInfo();
   }
 
+  public function on_civi_api_prepare(\Civi\API\Event\PrepareEvent $event) {
+    $apiRequest = $event->getApiRequest();
+    if ($this->hookCallback && is_object($apiRequest) && is_a($apiRequest, 'Civi\Api4\Generic\AutocompleteAction')) {
+      ($this->hookCallback)($apiRequest);
+    }
+  }
+
   public function setUp(): void {
+    $this->hookCallback = NULL;
     // Ensure MockBasicEntity gets added via above listener
     \Civi::cache('metadata')->clear();
     MockBasicEntity::delete(FALSE)->addWhere('identifier', '>', 0)->execute();
@@ -119,6 +132,88 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals('fa-user', $result[1]['icon']);
     $this->assertStringStartsWith('Starry', $result[2]['label']);
     $this->assertEquals('fa-star', $result[2]['icon']);
+  }
+
+  public function testAutocompleteValidation() {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      [
+        'first_name' => 'One',
+        'api_key' => 'secret123',
+      ],
+      [
+        'first_name' => 'Two',
+        'api_key' => 'secret456',
+      ],
+      [
+        'first_name' => 'Three',
+        'api_key' => 'secret789',
+      ],
+    ];
+    $records = $this->saveTestRecords('Contact', [
+      'records' => $sampleData,
+      'defaults' => ['last_name' => $lastName],
+    ]);
+
+    $this->createLoggedInUser();
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'administer CiviCRM',
+      'view all contacts',
+    ];
+
+    // Admin can apply the api_key filter
+    $result = Contact::autocomplete()
+      ->setInput($lastName)
+      ->setClientFilters(['api_key' => 'secret789'])
+      ->execute();
+    $this->assertCount(1, $result);
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view all contacts',
+    ];
+
+    // Non-admin cannot apply filter
+    $result = Contact::autocomplete()
+      ->setInput($lastName)
+      ->setClientFilters(['api_key' => 'secret789'])
+      ->execute();
+    $this->assertCount(3, $result);
+
+    // Cannot apply filter even with permissions disabled
+    $result = Contact::autocomplete(FALSE)
+      ->setInput($lastName)
+      ->setClientFilters(['api_key' => 'secret789'])
+      ->execute();
+    $this->assertCount(3, $result);
+
+    // Assert that the end-user is not allowed to inject arbitrary savedSearch params
+    $msg = '';
+    try {
+      $result = Contact::autocomplete()
+        ->setInput($lastName)
+        ->setSavedSearch([
+          'api_entity' => 'Contact',
+          'api_params' => [],
+        ])
+        ->execute();
+    }
+    catch (\CRM_Core_Exception $e) {
+      $msg = $e->getMessage();
+    }
+    $this->assertEquals('Parameter "savedSearch" is not of the correct type. Expecting string.', $msg);
+
+    // With hook callback, permissions can be overridden by injecting a trusted filter
+    $this->hookCallback = function(\Civi\Api4\Generic\AutocompleteAction $action) {
+      $action->addFilter('api_key', 'secret456');
+      $action->setCheckPermissions(FALSE);
+    };
+
+    $result = Contact::autocomplete()
+      ->setInput($lastName)
+      ->execute();
+    $this->assertCount(1, $result);
   }
 
 }

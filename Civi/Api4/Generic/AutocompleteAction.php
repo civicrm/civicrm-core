@@ -112,6 +112,8 @@ class AutocompleteAction extends AbstractAction {
       $this->savedSearch = ['api_entity' => $entityName];
     }
     $this->loadSavedSearch();
+    // Pass-through this parameter
+    $this->_apiParams['checkPermissions'] = $this->savedSearch['api_params']['checkPermissions'] = $this->getCheckPermissions();
     // Render mode: fetch by id
     if ($this->ids) {
       $this->_apiParams['where'][] = [$idField, 'IN', $this->ids];
@@ -138,7 +140,6 @@ class AutocompleteAction extends AbstractAction {
     else {
       $this->_apiParams['select'] = array_unique(array_merge($this->_apiParams['select'], $select));
     }
-    $this->_apiParams['checkPermissions'] = $this->getCheckPermissions();
     $this->applyFilters();
     $apiResult = civicrm_api4($entityName, 'get', $this->_apiParams);
     $rawResults = array_slice((array) $apiResult, 0, $resultsPerPage);
@@ -206,19 +207,18 @@ class AutocompleteAction extends AbstractAction {
     // Proceed only if permissions are being enforced.'
     // Anonymous users in permission-bypass mode should not be allowed to set arbitrary filters.
     if ($this->getCheckPermissions()) {
-      $field = $this->getField($fieldName);
-      try {
-        civicrm_api4($field['entity'], 'getFields', [
-          'action' => 'get',
-          'where' => [['name', '=', $fieldName]],
-        ])->single();
-        return TRUE;
-      }
-      catch (\CRM_Core_Exception $e) {
-        return FALSE;
-      }
+      // This function checks field permissions
+      return (bool) $this->getField($fieldName);
     }
     return FALSE;
+  }
+
+  /**
+   * @return array
+   */
+  public function getPermissions() {
+    // Permissions for this action are checked internally
+    return [];
   }
 
 }
