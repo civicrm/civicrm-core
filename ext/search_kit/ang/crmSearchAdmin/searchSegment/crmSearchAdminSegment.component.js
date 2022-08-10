@@ -3,7 +3,7 @@
 
   angular.module('crmSearchAdmin').component('crmSearchAdminSegment', {
     bindings: {
-      segmentId: '<',
+      segment: '<',
     },
     templateUrl: '~/crmSearchAdmin/searchSegment/crmSearchAdminSegment.html',
     controller: function ($scope, searchMeta, dialogService, crmApi4, crmStatus) {
@@ -15,7 +15,6 @@
       this.entitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect();
 
       ctrl.saving = false;
-      ctrl.segment = {items: []};
 
       // Drag-n-drop settings for reordering items
       this.sortableOptions = {
@@ -33,10 +32,10 @@
       };
 
       this.$onInit = function() {
-        if (ctrl.segmentId) {
+        if (ctrl.segment.id) {
           $('.ui-dialog:visible').block();
           crmApi4('SearchSegment', 'get', {
-            where: [['id', '=', ctrl.segmentId]]
+            where: [['id', '=', ctrl.segment.id]]
           }, 0).then(function(segment) {
             ctrl.segment = segment;
             originalEntity = segment.entity_name;
@@ -44,6 +43,9 @@
             searchMeta.loadFieldOptions([segment.entity_name]);
             $('.ui-dialog:visible').unblock();
           });
+        } else {
+          ctrl.segment.items = [];
+          ctrl.onChangeEntity();
         }
       };
 

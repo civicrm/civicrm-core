@@ -5,7 +5,7 @@
 #bootstrap-theme .crm-search-nav-tabs {
   position: relative;
 }
-#bootstrap-theme .crm-search-nav-tabs > a.btn {
+#bootstrap-theme .crm-search-nav-tabs > div.btn-group {
   position: absolute;
   right: 0;
   top: 0;
