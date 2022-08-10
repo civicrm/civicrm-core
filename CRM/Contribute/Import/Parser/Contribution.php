@@ -289,7 +289,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       if (isset($params['total_amount']) && $params['total_amount'] == 0) {
         $params['total_amount'] = '0.00';
       }
-      $this->formatInput($params, $formatted);
 
       $paramValues = [];
       foreach ($params as $key => $field) {
@@ -572,32 +571,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    */
   public function &getImportedContributions() {
     return $this->_newContributions;
-  }
-
-  /**
-   * Format input params to suit api handling.
-   *
-   * Over time all the parts of  deprecatedFormatParams
-   * and all the parts of the import function on this class that relate to
-   * reformatting input should be moved here and tests should be added in
-   * CRM_Contribute_Import_Parser_ContributionTest.
-   *
-   * @param array $params
-   * @param array $formatted
-   */
-  public function formatInput(&$params, &$formatted = []) {
-    foreach ($params as $key => $val) {
-      // @todo - call formatDateFields instead.
-      if ($val) {
-        switch ($key) {
-
-          case 'pledge_payment':
-            $params[$key] = CRM_Utils_String::strtobool($val);
-            break;
-
-        }
-      }
-    }
   }
 
   /**
