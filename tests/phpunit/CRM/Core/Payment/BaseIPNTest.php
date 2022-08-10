@@ -114,6 +114,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
     $contribution->find(TRUE);
+    $contribution->_component = 'contribute';
     $ids = array_merge(CRM_Contribute_BAO_Contribution::getComponentDetails($this->_contributionId), $this->ids);
     $contribution->loadRelatedObjects($this->input, $ids);
     $this->assertNotEmpty($contribution->_relatedObjects['membership']);
