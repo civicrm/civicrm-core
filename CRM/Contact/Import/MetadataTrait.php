@@ -90,15 +90,6 @@ trait CRM_Contact_Import_MetadataTrait {
    *
    * @return array
    */
-  public function getDataPatterns(): array {
-    return CRM_Utils_Array::collect('dataPattern', $this->getContactImportMetadata());
-  }
-
-  /**
-   * Get an array of header patterns for importable keys.
-   *
-   * @return array
-   */
   public function getFieldTitles() {
     return CRM_Utils_Array::collect('title', $this->getContactImportMetadata());
   }

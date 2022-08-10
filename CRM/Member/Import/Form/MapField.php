@@ -23,9 +23,9 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
   /**
    * Build the form object.
    *
-   * @return void
+   * @throws \CRM_Core_Exception
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     $this->buildSavedMappingFields($this->getSubmittedValue('savedMapping'));
     $this->addFormRule(array('CRM_Member_Import_Form_MapField', 'formRule'), $this);
 
@@ -35,7 +35,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     $columnHeaders = $this->getColumnHeaders();
     $hasHeaders = $this->getSubmittedValue('skipColumnHeader');
     $headerPatterns = $this->getHeaderPatterns();
-    $dataPatterns = $this->getDataPatterns();
     // For most fields using the html label is a good thing
     // but for contact ID we really want to specify ID.
     $this->_mapperFields['membership_contact_id'] = ts('Contact ID');
@@ -84,9 +83,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
           if ($hasHeaders) {
             $defaults["mapper[$i]"] = array($this->defaultFromHeader($columnHeader, $headerPatterns));
           }
-          else {
-            $defaults["mapper[$i]"] = array($this->defaultFromData($dataPatterns, $i));
-          }
         }
         //end of load mapping
       }
@@ -98,14 +94,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
             $this->defaultFromHeader($columnHeader,
               $headerPatterns
             ),
-            //                     $defaultLocationType->id
-            0,
-          );
-        }
-        else {
-          // Otherwise guess the default from the form of the data
-          $defaults["mapper[$i]"] = array(
-            $this->defaultFromData($dataPatterns, $i),
             //                     $defaultLocationType->id
             0,
           );
