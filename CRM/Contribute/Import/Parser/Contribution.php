@@ -615,7 +615,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @throws \CRM_Core_Exception
    */
   private function deprecatedFormatParams($params, &$values, $create = FALSE) {
-    require_once 'CRM/Utils/DeprecatedUtils.php';
     // copy all the contribution fields as is
     require_once 'api/v3/utils.php';
 

@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CRM/Utils/DeprecatedUtils.php';
-
 /**
  * Test class for API utils
  *

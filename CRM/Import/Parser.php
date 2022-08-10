@@ -852,7 +852,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     //retrieve contact id using contact dedupe rule
     $formatValues['contact_type'] = $formatValues['contact_type'] ?? $this->getContactType();
     $formatValues['version'] = 3;
-    require_once 'CRM/Utils/DeprecatedUtils.php';
     $params = $formatValues;
     static $cIndieFields = NULL;
     static $defaultLocationId = NULL;
