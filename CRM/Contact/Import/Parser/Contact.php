@@ -1126,16 +1126,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Store parser values.
-   *
-   * @param CRM_Core_Session $store
-   *
-   * @param int $mode
-   */
-  public function set($store, $mode = self::MODE_SUMMARY) {
-  }
-
-  /**
    * Format contact parameters.
    *
    * @todo this function needs re-writing & re-merging into the main function.
