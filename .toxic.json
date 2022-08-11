@@ -34,7 +34,7 @@
     "CRM_Core_BAO_ActionScheduleTest::setUp()": "toxicAlert",
     "CRM_Core_BAO_CustomField::formatCustomField()": "toxicAlert",
     "CRM_Core_BAO_CustomGroup::getTree()": "toxicAlert",
-    "CRM_Core_BAO_Mapping::buildMappingForm()": "toxicAlert",
+    "CRM_Contact_Form_Search_Builder::buildMappingForm()": "toxicAlert",
     "CRM_Core_BAO_UFGroup::buildProfile()": "toxicAlert",
     "CRM_Core_BAO_UFGroup::getValues()": "toxicAlert",
     "CRM_Core_I18n_SchemaStructure::widgets()": "toxicAlert",
