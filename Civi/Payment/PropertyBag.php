@@ -43,6 +43,7 @@ class PropertyBag implements \ArrayAccess {
     'billing_state_province'      => 'billingStateProvince',
     'state_province'              => 'billingStateProvince',
     'billingCountry'              => TRUE,
+    'country'                     => 'billingCountry',
     'contactID'                   => TRUE,
     'contact_id'                  => 'contactID',
     'contributionID'              => TRUE,
