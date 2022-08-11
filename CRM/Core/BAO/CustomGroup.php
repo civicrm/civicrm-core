@@ -41,7 +41,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    */
   public static function create(&$params) {
     // This is the database default
-    $params += ['extends' => 'Contact'];
+    if (empty($params['id'])) {
+      $params += ['extends' => 'Contact'];
+    }
     // create custom group dao, populate fields and then save.
     $group = new CRM_Core_DAO_CustomGroup();
     if (isset($params['title'])) {
