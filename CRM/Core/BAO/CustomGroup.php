@@ -29,9 +29,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
   }
 
   /**
-   * Takes an associative array and creates a custom group object.
-   *
-   * This function is invoked from within the web form layer and also from the api layer
+   * FIXME: This function is too complex because it's trying to handle both api-style inputs and
+   * quickform inputs. Needs to be deprecated and broken up.
    *
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
@@ -40,8 +39,10 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    * @throws \Exception
    */
   public static function create(&$params) {
-    // This is the database default
-    $params += ['extends' => 'Contact'];
+    // FIXME: This is needed by the form parsing code below
+    if (empty($params['id'])) {
+      $params += ['extends' => 'Contact'];
+    }
     // create custom group dao, populate fields and then save.
     $group = new CRM_Core_DAO_CustomGroup();
     if (isset($params['title'])) {
