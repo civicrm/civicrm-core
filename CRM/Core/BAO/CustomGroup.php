@@ -2251,6 +2251,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
    * @return array
    */
   public static function getMultipleFieldGroup() {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     $multipleGroup = [];
     $dao = new CRM_Core_DAO_CustomGroup();
     $dao->is_multiple = 1;

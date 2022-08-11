@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\CustomGroup;
+
 /**
  * This class gets the name of the file to upload
  */
@@ -31,6 +33,43 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
    */
   public function getUserJobType(): string {
     return 'custom_field_import';
+  }
+
+  /**
+   * Multiple field custom groups.
+   *
+   * @var array
+   */
+  protected $customFieldGroups;
+
+  /**
+   * Get multi-field custom groups.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getCustomGroups(): array {
+    if (isset($this->customFieldGroups)) {
+      return $this->customFieldGroups;
+    }
+    $this->customFieldGroups = [];
+    // If we make the permission TRUE is it too restrictive?
+    $fields = CustomGroup::get(FALSE)->addSelect('id', 'title')
+      ->addWhere('is_multiple', '=', TRUE)
+      ->addWhere('is_active', '=', TRUE)->execute();
+    foreach ($fields as $field) {
+      $this->customFieldGroups[$field['id']] = $field['title'];
+    }
+    return $this->customFieldGroups;
+  }
+
+  /**
+   * Get an error message to assign to the template.
+   *
+   * @return string
+   */
+  protected function getErrorMessage(): string {
+    return empty($this->getCustomGroups()) ? ts('This import screen cannot be used because there are no Multi-value custom data groups.') : '';
   }
 
   /**
@@ -57,13 +96,15 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
   /**
    * @return array
+   * @throws \CRM_Core_Exception
    */
-  public function setDefaultValues() {
+  public function setDefaultValues(): array {
     $config = CRM_Core_Config::singleton();
     $defaults = [
       'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
       'fieldSeparator' => $config->fieldSeparator,
-      'multipleCustomData' => $this->_id,
+      // Perhaps never used, but permits url passing of the group.
+      'multipleCustomData' => CRM_Utils_Request::retrieve('id', 'Positive', $this),
     ];
 
     $loadedMapping = $this->get('loadedMapping');
@@ -77,16 +118,11 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   /**
    * Build the form object.
    *
-   * @return void
+   * @throws \CRM_Core_Exception
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     parent::buildQuickForm();
-    // Perhaps never used, but permits url passing of the group.
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
-    $multipleCustomData = CRM_Core_BAO_CustomGroup::getMultipleFieldGroup();
-    $this->assign('fieldGroups', $multipleCustomData);
-    $this->add('select', 'multipleCustomData', ts('Multi-value Custom Data'), ['' => ts('- select -')] + $multipleCustomData, TRUE);
-
+    $this->add('select', 'multipleCustomData', ts('Multi-value Custom Data'), ['' => ts('- select -')] + $this->getCustomGroups(), TRUE);
     $this->addContactTypeSelector();
   }
 

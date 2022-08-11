@@ -55,6 +55,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    * Common form elements.
    */
   public function buildQuickForm() {
+    $this->assign('errorMessage', $this->getErrorMessage());
     $config = CRM_Core_Config::singleton();
     // When we switch to using the DataSource.tpl used by Contact we can remove this in
     // favour of the one used by Contact - I was trying to consolidate
@@ -107,6 +108,15 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
           'name' => ts('Cancel'),
         ],
     ]);
+  }
+
+  /**
+   * Get an error message to assign to the template.
+   *
+   * @return string
+   */
+  protected function getErrorMessage(): string {
+    return '';
   }
 
   /**
