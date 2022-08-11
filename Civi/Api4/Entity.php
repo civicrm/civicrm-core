@@ -73,6 +73,11 @@ class Entity extends Generic\AbstractEntity {
       'description' => 'Field to show when displaying a record',
     ],
     [
+      'name' => 'icon_field',
+      'data_type' => 'Array',
+      'description' => 'Field(s) which contain the icon for a record, listed in order of precedence',
+    ],
+    [
       'name' => 'order_by',
       'description' => 'Default column to sort results',
     ],

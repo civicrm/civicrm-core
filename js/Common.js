@@ -523,6 +523,47 @@ if (!CRM.vars) CRM.vars = {};
     });
   };
 
+  // Autocomplete based on APIv4 and Select2.
+  $.fn.crmAutocomplete = function(entityName, apiParams, select2Options) {
+    select2Options = select2Options || {};
+    return $(this).each(function() {
+      $(this).crmSelect2({
+        ajax: {
+          quietMillis: 250,
+          url: CRM.url('civicrm/ajax/api4/' + entityName + '/autocomplete'),
+          data: function (input, pageNum) {
+            return {params: JSON.stringify(_.assign({
+              input: input,
+              page: pageNum || 1
+            }, apiParams))};
+          },
+          results: function(data) {
+            return {
+              results: data.values,
+              more: data.count > data.countFetched
+            };
+          },
+        },
+        minimumInputLength: 1,
+        formatResult: CRM.utils.formatSelect2Result,
+        formatSelection: formatEntityRefSelection,
+        escapeMarkup: _.identity,
+        initSelection: function($el, callback) {
+          var
+            multiple = !!select2Options.multiple,
+            val = $el.val();
+          if (val === '') {
+            return;
+          }
+          var params = $.extend({}, apiParams || {}, {ids: val.split(',')});
+          CRM.api4(entityName, 'autocomplete', params).then(function(result) {
+            callback(multiple ? result : result[0]);
+          });
+        }
+      });
+    });
+  };
+
   /**
    * @see CRM_Core_Form::addEntityRef for docs
    * @param options object

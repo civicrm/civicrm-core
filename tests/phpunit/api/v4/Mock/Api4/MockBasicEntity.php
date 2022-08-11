@@ -24,6 +24,7 @@ use api\v4\Mock\MockEntityDataStorage;
 /**
  * MockBasicEntity entity.
  *
+ * @labelField foo
  * @package Civi\Api4
  */
 class MockBasicEntity extends Generic\BasicEntity {

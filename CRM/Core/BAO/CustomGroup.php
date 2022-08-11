@@ -2475,7 +2475,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
       [
         'id' => 'Pledge',
         'label' => ts('Pledges'),
-        'grouping' => 'TODO',
+        'grouping' => NULL,
         'table_name' => 'civicrm_pledge',
       ],
       [

@@ -11,6 +11,7 @@
 
 namespace Civi\Afform;
 
+use Civi\Api4\Utils\CoreUtil;
 use CRM_Afform_ExtensionUtil as E;
 
 /**
@@ -41,7 +42,7 @@ class AfformMetadataInjector {
         // Each field can be nested within a fieldset, a join or a block
         foreach (pq('af-field', $doc) as $afField) {
           /** @var \DOMElement $afField */
-          $action = 'create';
+          $action = 'update';
           $joinName = pq($afField)->parents('[af-join]')->attr('af-join');
           if ($joinName) {
             self::fillFieldMetadata($joinName, $action, $afField);
@@ -177,6 +178,14 @@ class AfformMetadataInjector {
       if ($field['name'] === $fieldName) {
         break;
       }
+    }
+    // Id field for selecting existing entity
+    if ($action === 'update' && $field['name'] === CoreUtil::getIdFieldName($entityName)) {
+      $entityTitle = CoreUtil::getInfoItem($entityName, 'title');
+      $field['input_type'] = 'Existing';
+      $field['entity'] = $entityName;
+      $field['label'] = E::ts('Existing %1', [1 => $entityTitle]);
+      $field['input_attrs']['placeholder'] = E::ts('Select %1', [1 => $entityTitle]);
     }
     // If this is an implicit join, get new field from fk entity
     if ($field['name'] !== $fieldName && $field['fk_entity']) {

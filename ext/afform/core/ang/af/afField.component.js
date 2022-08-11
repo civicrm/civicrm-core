@@ -169,6 +169,14 @@
         }
       };
 
+      // ngChange callback from Existing entity field
+      ctrl.onSelectExisting = function() {
+        var val = $scope.getSetSelect();
+        var entity = ctrl.afFieldset.modelName;
+        var index = ctrl.getEntityIndex();
+        ctrl.afFieldset.afFormCtrl.loadData(entity, index, val);
+      };
+
       // Params for the Afform.submitFile API when uploading a file field
       ctrl.getFileUploadParams = function() {
         return {

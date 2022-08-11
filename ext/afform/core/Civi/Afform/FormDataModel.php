@@ -50,7 +50,7 @@ class FormDataModel {
       $this->entities[$entity]['fields'] = $this->entities[$entity]['joins'] = [];
     }
     // Pre-load full list of afforms in case this layout embeds other afform directives
-    $this->blocks = (array) Afform::get()->setCheckPermissions(FALSE)->setSelect(['name', 'directive_name'])->execute()->indexBy('directive_name');
+    $this->blocks = (array) Afform::get(FALSE)->setSelect(['name', 'directive_name'])->execute()->indexBy('directive_name');
     $this->parseFields($layout);
   }
 
@@ -171,7 +171,7 @@ class FormDataModel {
       // Recurse into embedded blocks
       if (isset($this->blocks[$node['#tag']])) {
         if (!isset($this->blocks[$node['#tag']]['layout'])) {
-          $this->blocks[$node['#tag']] = Afform::get()->setCheckPermissions(FALSE)->setSelect(['name', 'layout'])->addWhere('name', '=', $this->blocks[$node['#tag']]['name'])->execute()->first();
+          $this->blocks[$node['#tag']] = Afform::get(FALSE)->setSelect(['name', 'layout'])->addWhere('name', '=', $this->blocks[$node['#tag']]['name'])->execute()->first();
         }
         if (!empty($this->blocks[$node['#tag']]['layout'])) {
           $this->parseFields($this->blocks[$node['#tag']]['layout'], $entity, $join, $searchDisplay);

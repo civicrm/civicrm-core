@@ -83,7 +83,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
       }
     }
 
-    $getFieldsMode = 'create';
+    $getFieldsMode = 'update';
 
     // Generate list of possibly embedded afform tags to search for
     $allAfforms = \Civi::service('afform_scanner')->findFilePaths();

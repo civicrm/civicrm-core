@@ -197,7 +197,6 @@ class SpecFormatter {
     $returnFormat = array_diff($returnFormat, ['id', 'name', 'label']);
     // CRM_Core_Pseudoconstant doesn't know how to fetch extra stuff like icon, description, color, etc., so we have to invent that wheel here...
     if ($returnFormat) {
-      $optionIds = implode(',', array_column($options, 'id'));
       $optionIndex = array_flip(array_column($options, 'id'));
       if ($spec instanceof CustomFieldSpec) {
         $optionGroupId = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $spec->getCustomFieldId(), 'option_group_id');
@@ -229,15 +228,18 @@ class SpecFormatter {
           $returnFormat = array_diff($returnFormat, ['abbr']);
         }
         // Fetch anything else (color, icon, description)
-        if ($returnFormat && !empty($pseudoconstant['table']) && \CRM_Utils_Rule::commaSeparatedIntegers($optionIds)) {
-          $sql = "SELECT * FROM {$pseudoconstant['table']} WHERE id IN (%1)";
-          $query = \CRM_Core_DAO::executeQuery($sql, [1 => [$optionIds, 'CommaSeparatedIntegers']]);
+        if ($returnFormat && !empty($pseudoconstant['table'])) {
+          $idCol = $pseudoconstant['keyColumn'] ?? 'id';
+          $optionIds = \CRM_Core_DAO::escapeStrings(array_column($options, 'id'));
+          $sql = "SELECT * FROM {$pseudoconstant['table']} WHERE `$idCol` IN ($optionIds)";
+          $query = \CRM_Core_DAO::executeQuery($sql);
           while ($query->fetch()) {
             foreach ($returnFormat as $ret) {
-              if (property_exists($query, $ret)) {
+              $retCol = $pseudoconstant[$ret . 'Column'] ?? $ret;
+              if (property_exists($query, $retCol)) {
                 // Note: our schema is inconsistent about whether `description` fields allow html,
                 // but it's usually assumed to be plain text, so we strip_tags() to standardize it.
-                $options[$optionIndex[$query->id]][$ret] = $ret === 'description' ? strip_tags($query->$ret ?? '') : $query->$ret;
+                $options[$optionIndex[$query->$idCol]][$ret] = isset($query->$retCol) ? strip_tags($query->$retCol) : NULL;
               }
             }
           }

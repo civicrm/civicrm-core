@@ -1,9 +1,15 @@
-<li>
+<li ng-if="$ctrl.fieldDefn.input_type !== 'Existing'">
   <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
     <label>{{:: ts('Type:') }}</label>
     <select class="form-control" ng-model="getSet('input_type')" ng-model-options="{getterSetter: true}" title="{{:: ts('Field type') }}">
       <option ng-repeat="type in $ctrl.inputTypes" value="{{ type.name }}">{{ type.label }}</option>
     </select>
+  </div>
+</li>
+<li ng-if="$ctrl.fieldDefn.input_type === 'Existing'" title="{{:: ts('Use a saved search to filter the autocomplete results') }}">
+  <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+    <label>{{:: ts('Saved Search:') }}</label>
+    <input class="form-control" crm-entityref="{entity: 'SavedSearch', api: {id_field: 'name', params: {api_entity: $ctrl.getEntity().name}}}" ng-model="getSet('saved_search')" ng-model-options="{getterSetter: true}">
   </div>
 </li>
 <li>
@@ -12,13 +18,13 @@
     {{:: ts('Required') }}
   </a>
 </li>
-<li>
+<li ng-if="$ctrl.fieldDefn.input_type !== 'Existing'">
   <a href ng-click="toggleDefaultValue(); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Pre-fill this field with a value') }}">
     <i class="crm-i fa-{{ $ctrl.hasDefaultValue ? 'check-' : '' }}square-o"></i>
     {{:: ts('Default value') }}
   </a>
 </li>
-<li ng-if="$ctrl.hasDefaultValue">
+<li ng-if="$ctrl.fieldDefn.input_type !== 'Existing' && $ctrl.hasDefaultValue">
   <div ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline">
     <input class="form-control" af-gui-field-value="$ctrl.fieldDefn" ng-model="getSet('afform_default')" ng-model-options="{getterSetter: true}" >
   </div>

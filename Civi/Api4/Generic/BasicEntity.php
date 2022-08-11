@@ -137,6 +137,15 @@ abstract class BasicEntity extends AbstractEntity {
   }
 
   /**
+   * @param bool $checkPermissions
+   * @return AutocompleteAction
+   */
+  public static function autocomplete($checkPermissions = TRUE) {
+    return (new AutocompleteAction(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
    * @inheritDoc
    */
   public static function getInfo() {
