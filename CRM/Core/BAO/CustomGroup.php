@@ -2348,7 +2348,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
    */
   public static function getSubTypes(): array {
     $sel2 = [];
-    $activityType = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
+    $activityType = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'search');
 
     $eventType = CRM_Core_OptionGroup::values('event_type');
     $campaignTypes = CRM_Campaign_PseudoConstant::campaignType();
