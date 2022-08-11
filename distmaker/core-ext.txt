@@ -8,6 +8,7 @@ afform
 authx
 civicrm_admin_ui
 civigrant
+civiimport
 contributioncancelactions
 ckeditor4
 eventcart
