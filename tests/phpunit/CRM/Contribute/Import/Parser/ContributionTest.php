@@ -226,7 +226,9 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'rule_weight' => 10,
       'rule_field' => 'phone_numeric',
     ]);
-    $fields = CRM_Contribute_BAO_Contribution::importableFields();
+    $parser = new CRM_Contribute_Import_Parser_Contribution();
+    $parser->setUserJobID($this->getUserJobID());
+    $fields = $parser->getAvailableFields();
     $this->assertArrayHasKey('phone', $fields);
     $this->callApiSuccess('RuleGroup', 'create', [
       'id' => $unsupervisedRuleGroup['id'],
