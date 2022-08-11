@@ -597,7 +597,7 @@
           // In cases where UI initiates update, there may be an extra
           // call to refreshUI, but it doesn't create a cycle.
 
-          if (ngModel) {
+          if (ngModel && !attrs.ngOptions) {
             ngModel.$render = function () {
               $timeout(function () {
                 // ex: msg_template_id adds new item then selects it; use $timeout to ensure that
@@ -628,9 +628,16 @@
             }
           }
 
-          // If using ngOptions, wait for them to load
+          // If using ngOptions, the above methods do not work because option values get rewritten.
+          // Skip init and do something simpler.
           if (attrs.ngOptions) {
-            $timeout(init);
+            $timeout(function() {
+              element.crmSelect2(scope.crmUiSelect || {});
+              // Ensure widget is updated when model changes
+              ngModel.$render = function () {
+                element.val(ngModel.$viewValue || '').change();
+              };
+            });
           } else {
             init();
           }
