@@ -31,7 +31,7 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
     parent::preProcess();
 
     //check permission for update.
-    if (!CRM_Core_Permission::checkActionPermission('CiviGrant', CRM_Core_Action::UPDATE)) {
+    if (!CRM_Core_Permission::check('edit grants')) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
   }
