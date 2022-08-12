@@ -61,6 +61,10 @@ class CRM_Upgrade_Incremental_php_FiveFiftyThree extends CRM_Upgrade_Incremental
     $this->addTask('Add Recent Items Providers', 'addRecentItemsProviders');
   }
 
+  public function upgrade_5_53_beta1($rev): void {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+  }
+
   /**
    * @param CRM_Queue_TaskContext $ctx
    * @return bool
