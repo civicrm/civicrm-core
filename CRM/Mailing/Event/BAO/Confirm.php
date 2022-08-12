@@ -108,16 +108,21 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
       $text = CRM_Utils_String::htmlToText($component->body_html);
     }
 
-    $bao = new CRM_Mailing_BAO_Mailing();
-    $bao->body_text = $text;
-    $bao->body_html = $html;
-    $tokens = $bao->getTokens();
-
-    $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html']);
     $html = CRM_Utils_Token::replaceWelcomeTokens($html, $group->title, TRUE);
-
-    $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
     $text = CRM_Utils_Token::replaceWelcomeTokens($text, $group->title, FALSE);
+
+    $tokenProcessor = new \Civi\Token\TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+    ]);
+
+    $tokenProcessor->addMessage('body_html', $html, 'text/html');
+    $tokenProcessor->addMessage('body_text', $text, 'text/plain');
+
+    $tokenProcessor->addRow(['contactId' => $contact_id]);
+    $tokenProcessor->evaluate();
+    $html = $tokenProcessor->getRow(0)->render('body_html');
+    $text = $tokenProcessor->getRow(0)->render('body_text');
 
     $mailParams = [
       'groupName' => 'Mailing Event ' . $component->component_type,
