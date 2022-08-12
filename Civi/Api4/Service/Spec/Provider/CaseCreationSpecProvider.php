@@ -30,10 +30,10 @@ class CaseCreationSpecProvider implements Generic\SpecProviderInterface {
     $creator->setDefaultValue('user_contact_id');
     $spec->addFieldSpec($creator);
 
-    $contact = new FieldSpec('contact_id', $spec->getEntity(), 'Array');
-    $contact->setTitle(ts('Case Contact(s)'));
-    $contact->setLabel(ts('Case Client(s)'));
-    $contact->setDescription('Contact(s) who are case clients.');
+    $multiClient = \Civi::settings()->get('civicaseAllowMultipleClients');
+    $contact = new FieldSpec('contact_id', $spec->getEntity(), $multiClient ? 'Array' : 'Integer');
+    $contact->setTitle($multiClient ? ts('Case Clients') : ts('Case Client'));
+    $contact->setDescription($multiClient ? 'Contact(s) who are case clients.' : 'The case client');
     $contact->setFkEntity('Contact');
     $contact->setInputType('EntityRef');
     $contact->setRequired(TRUE);
