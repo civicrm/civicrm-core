@@ -77,6 +77,9 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 
      *   (SQL type: {$field.sqlType})
      *   Note that values will be retrieved from the database as a string.
+{if $field.deprecated}
+     * @deprecated
+{/if}
      */
     public ${$field.name};
 

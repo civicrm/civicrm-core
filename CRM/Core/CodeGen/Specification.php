@@ -362,6 +362,7 @@ class CRM_Core_CodeGen_Specification {
     $field['required'] = $this->value('required', $fieldXML);
     $field['collate'] = $this->value('collate', $fieldXML);
     $field['comment'] = $this->value('comment', $fieldXML);
+    $field['deprecated'] = $this->value('deprecated', $fieldXML, FALSE);
     $field['default'] = $this->value('default', $fieldXML);
     $field['import'] = $this->value('import', $fieldXML);
     if ($this->value('export', $fieldXML)) {
