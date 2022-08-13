@@ -293,12 +293,12 @@
   </foreignKey>
   <field>
     <name>is_current_revision</name>
-    <title>Is this activity a current revision in versioning chain?</title>
+    <title>Is current (unused)</title>
     <type>boolean</type>
     <default>1</default>
+    <comment>Unused deprecated column.</comment>
     <required>true</required>
-    <import>true</import>
-    <headerPattern>/(is.)?(current.)?(revision|version(ing)?)/i</headerPattern>
+    <deprecated>true</deprecated>
     <add>2.2</add>
   </field>
   <index>
@@ -309,8 +309,9 @@
   <field>
     <name>original_id</name>
     <type>int unsigned</type>
-    <title>Original Activity ID</title>
-    <comment>Activity ID of the first activity record in versioning chain.</comment>
+    <title>Original ID (unused)</title>
+    <comment>Unused deprecated column.</comment>
+    <deprecated>true</deprecated>
     <readonly>true</readonly>
     <html>
       <label>Original Activity</label>
