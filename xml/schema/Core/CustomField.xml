@@ -194,7 +194,6 @@
     <title>Custom Field Is Active?</title>
     <comment>Is this property active?</comment>
     <default>1</default>
-    <default>0</default>
     <add>1.1</add>
   </field>
   <field>
