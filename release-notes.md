@@ -37,6 +37,15 @@ Released September 7, 2022
 - **[Credits](release-notes/5.53.0.md#credits)**
 - **[Feedback](release-notes/5.53.0.md#feedback)**
 
+## CiviCRM 5.52.2
+
+Released August 12, 2022
+
+- **[Synopsis](release-notes/5.52.2.md#synopsis)**
+- **[Bugs resolved](release-notes/5.52.2.md#bugs)**
+- **[Credits](release-notes/5.52.2.md#credits)**
+- **[Feedback](release-notes/5.52.2.md#feedback)**
+
 ## CiviCRM 5.52.1
 
 Released August 9, 2022
