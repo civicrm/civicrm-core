@@ -39,4 +39,8 @@ class CRM_Upgrade_Incremental_php_FiveFiftyTwo extends CRM_Upgrade_Incremental_B
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
   }
 
+  public function upgrade_5_52_2($rev): void {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+  }
+
 }
