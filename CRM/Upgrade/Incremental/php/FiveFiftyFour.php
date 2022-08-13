@@ -27,7 +27,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyFour extends CRM_Upgrade_Incremental_
    * @param string $rev
    *   The version number matching this function name
    */
-  public function upgrade_5_54_alpha1($rev): void {
+  public function upgrade_5_54_alpha2($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
   }
 
