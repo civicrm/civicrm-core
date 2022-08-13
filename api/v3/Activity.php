@@ -67,15 +67,6 @@ function civicrm_api3_activity_create($params) {
   $activityBAO = CRM_Activity_BAO_Activity::create($params);
 
   if (isset($activityBAO->id)) {
-    // Fixme - Move business logic out of API
-    if (!empty($params['case_id']) && $isNew) {
-      // If this is a brand new case activity, add to case(s)
-      foreach ((array) $params['case_id'] as $singleCaseId) {
-        $caseActivityParams = ['activity_id' => $activityBAO->id, 'case_id' => $singleCaseId];
-        CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);
-      }
-    }
-
     _civicrm_api3_object_to_array($activityBAO, $activityArray[$activityBAO->id]);
     return civicrm_api3_create_success($activityArray, $params, 'Activity', 'get', $activityBAO);
   }
