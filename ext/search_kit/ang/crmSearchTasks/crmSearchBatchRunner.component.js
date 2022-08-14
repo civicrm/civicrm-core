@@ -48,7 +48,7 @@
         if (ctrl.action === 'save') {
           // For the save action, take each record from params and copy it with each supplied id
           params.records = _.transform(ctrl.ids.slice(ctrl.first, ctrl.last), function(records, id) {
-            _.each(_.cloneDeep(ctrl.params.records), function(record) {
+            _.each(_.cloneDeep(ctrl.params.records || [{}]), function(record) {
               record[ctrl.idField || 'id'] = id;
               records.push(record);
             });
