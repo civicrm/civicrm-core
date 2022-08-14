@@ -145,14 +145,11 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
   }
 
   /**
-   * Process case activity add/delete
-   * takes an associative array and
+   * Add a CaseActivity record (skip if already exists).
    *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   *
+   * @param array{activity_id: int, case_id: int} $params
    */
-  public static function processCaseActivity(&$params) {
+  public static function processCaseActivity(array $params): void {
     $caseActivityDAO = new CRM_Case_DAO_CaseActivity();
     $caseActivityDAO->activity_id = $params['activity_id'];
     $caseActivityDAO->case_id = $params['case_id'];
