@@ -17,13 +17,6 @@
 class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
 
   /**
-   * Pre-process.
-   */
-  public function preProcess() {
-    parent::preProcess();
-  }
-
-  /**
    * Run upgrade.
    *
    * @throws \Exception
