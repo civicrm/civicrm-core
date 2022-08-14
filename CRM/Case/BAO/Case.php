@@ -19,7 +19,7 @@
 /**
  * This class contains the functions for Case Management.
  */
-class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
+class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInterface {
 
   /**
    * Static field for all the case information that we can potentially export.
@@ -56,6 +56,39 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
     // Get other case values (required by XML processor), this adds to $result array
     $caseDAO->find(TRUE);
     return $result;
+  }
+
+  /**
+   * @param \Civi\Core\Event\PostEvent $e
+   */
+  public static function on_hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
+    if ($e->entity === 'Activity' && in_array($e->action, ['create', 'edit'])) {
+      // If subject contains a ‘[case #…]’ string, file activity on the related case (CRM-5916)
+      /** @var CRM_Activity_DAO_Activity $activity */
+      $activity = $e->object;
+      $matches = [];
+      $subjectToMatch = $activity->subject ?? '';
+      if (preg_match('/\[case #([0-9a-h]{7})\]/', $subjectToMatch, $matches)) {
+        $key = CRM_Core_DAO::escapeString(CIVICRM_SITE_KEY);
+        $hash = $matches[1];
+        $query = "SELECT id FROM civicrm_case WHERE SUBSTR(SHA1(CONCAT('$key', id)), 1, 7) = '" . CRM_Core_DAO::escapeString($hash) . "'";
+      }
+      elseif (preg_match('/\[case #(\d+)\]/', $subjectToMatch, $matches)) {
+        $query = "SELECT id FROM civicrm_case WHERE id = '" . CRM_Core_DAO::escapeString($matches[1]) . "'";
+      }
+      if (!empty($matches)) {
+        $caseParams = [
+          'activity_id' => $activity->id,
+          'case_id' => CRM_Core_DAO::singleValueQuery($query),
+        ];
+        if ($caseParams['case_id']) {
+          CRM_Case_BAO_Case::processCaseActivity($caseParams);
+        }
+        else {
+          CRM_Activity_BAO_Activity::logActivityAction($activity, "Case details for {$matches[1]} not found while recording an activity on case.");
+        }
+      }
+    }
   }
 
   /**

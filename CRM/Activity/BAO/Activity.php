@@ -521,37 +521,12 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
-    // if the subject contains a ‘[case #…]’ string, file that activity on the related case (CRM-5916)
-    $matches = [];
-    $subjectToMatch = $params['subject'] ?? '';
-    if (preg_match('/\[case #([0-9a-h]{7})\]/', $subjectToMatch, $matches)) {
-      $key = CRM_Core_DAO::escapeString(CIVICRM_SITE_KEY);
-      $hash = $matches[1];
-      $query = "SELECT id FROM civicrm_case WHERE SUBSTR(SHA1(CONCAT('$key', id)), 1, 7) = '" . CRM_Core_DAO::escapeString($hash) . "'";
-    }
-    elseif (preg_match('/\[case #(\d+)\]/', $subjectToMatch, $matches)) {
-      $query = "SELECT id FROM civicrm_case WHERE id = '" . CRM_Core_DAO::escapeString($matches[1]) . "'";
-    }
-    if (!empty($matches)) {
-      $caseParams = [
-        'activity_id' => $activity->id,
-        'case_id' => CRM_Core_DAO::singleValueQuery($query),
-      ];
-      if ($caseParams['case_id']) {
-        CRM_Case_BAO_Case::processCaseActivity($caseParams);
-      }
-      else {
-        self::logActivityAction($activity, "Case details for {$matches[1]} not found while recording an activity on case.");
-      }
-    }
     CRM_Utils_Hook::post($action, 'Activity', $activity->id, $activity);
     return $result;
   }
 
   /**
-   * Create an activity.
-   *
-   * @todo elaborate on what this does.
+   * Adds an entry to the log table about an activity
    *
    * @param CRM_Activity_DAO_Activity $activity
    * @param string $logMessage
