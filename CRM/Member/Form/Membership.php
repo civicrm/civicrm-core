@@ -474,7 +474,7 @@ DESC limit 1");
     // Throw status bounce when no Membership type or priceset is present
     if (empty($this->allMembershipTypeDetails) && empty($priceSets)
     ) {
-      CRM_Core_Error::statusBounce(ts('You do not have all the permissions needed for this page.'));
+      CRM_Core_Error::statusBounce(ts("You either do not have all the permissions needed for this page, or the membership types haven't been fully configured."));
     }
     // retrieve all memberships
     $allMembershipInfo = [];
