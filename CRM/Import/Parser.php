@@ -546,17 +546,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   /**
    * @return array
    */
-  public function getSelectValues(): array {
-    $values = [];
-    foreach ($this->_fields as $name => $field) {
-      $values[$name] = $field->_title;
-    }
-    return $values;
-  }
-
-  /**
-   * @return array
-   */
   public function getSelectTypes() {
     $values = [];
     // This is only called from the MapField form in isolation now,
