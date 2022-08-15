@@ -453,24 +453,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
-   * Set and validate field values.
-   *
-   * @param array $elements
-   *   array.
-   */
-  public function setActiveFieldValues($elements): void {
-    $maxCount = count($elements) < $this->_activeFieldCount ? count($elements) : $this->_activeFieldCount;
-    for ($i = 0; $i < $maxCount; $i++) {
-      $this->_activeFields[$i]->setValue($elements[$i]);
-    }
-
-    // reset all the values that we did not have an equivalent import element
-    for (; $i < $this->_activeFieldCount; $i++) {
-      $this->_activeFields[$i]->resetValue();
-    }
-  }
-
-  /**
    * Format the field values for input to the api.
    *
    * @return array
