@@ -1411,4 +1411,34 @@ WHERE {$whereClause}";
     return reset($parentArray);
   }
 
+  /**
+   * @param string $entityName
+   * @param string $action
+   * @param array $record
+   * @param $userID
+   * @return bool
+   * @see CRM_Core_DAO::checkAccess
+   */
+  public static function _checkAccess(string $entityName, string $action, array $record, $userID): bool {
+    switch ($action) {
+      case 'create':
+        $groupType = (array) ($record['group_type:name'] ?? []);
+        // If not already in :name format, transform to name
+        foreach ((array) ($record['group_type'] ?? []) as $typeId) {
+          $groupType[] = CRM_Core_PseudoConstant::getName(self::class, 'group_type', $typeId);
+        }
+        if ($groupType === ['Mailing List']) {
+          // If it's only a Mailing List, edit groups OR create mailings will work
+          return CRM_Core_Permission::check(['access CiviCRM', ['edit groups', 'access CiviMail', 'create mailings']], $userID);
+        }
+        else {
+          return CRM_Core_Permission::check(['access CiviCRM', 'edit groups'], $userID);
+        }
+
+      default:
+        // All other actions just rely on gatekeeper permissions
+        return TRUE;
+    }
+  }
+
 }
