@@ -493,9 +493,11 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
+   * Get an array of available fields that support location types (e.g phone, street_address etc).
+   *
    * @return array
    */
-  public function getSelectTypes() {
+  public function getFieldsWhichSupportLocationTypes(): array {
     $values = [];
     // This is only called from the MapField form in isolation now,
     foreach ($this->getFieldsMetadata() as $name => $field) {
