@@ -78,7 +78,7 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       '{activity.activity_type_id:label}' => 'Activity Type',
       '{activity.status_id:label}' => 'Activity Status',
       '{activity.campaign_id:label}' => 'Campaign',
-      '{activity.case_id}' => 'Activity Case ID',
+      '{activity.case_id}' => 'Case ID',
     ];
   }
 
