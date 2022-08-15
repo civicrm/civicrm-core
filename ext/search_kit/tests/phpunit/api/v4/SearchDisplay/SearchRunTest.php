@@ -365,6 +365,7 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
               'label' => 'Name',
               'type' => 'field',
               'editable' => TRUE,
+              'icons' => [['field' => 'activity_type_id:icon', 'side' => 'left']],
             ],
             [
               'key' => 'Contact_Email_contact_id_01.email',
