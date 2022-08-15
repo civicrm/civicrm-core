@@ -379,12 +379,19 @@ class Container {
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
 
     $dispatcherDefn = $container->getDefinition('dispatcher');
-    foreach (\CRM_Core_DAO_AllCoreTables::getBaoClasses() as $baoEntity => $baoClass) {
-      $listenerMap = EventScanner::findListeners($baoClass, $baoEntity);
+    $baoClasses = array_flip(\CRM_Core_DAO_AllCoreTables::getBaoClasses());
+    $hookClasses = ClassScanner::get(['interface' => HookInterface::class]);
+    $allEventClasses = array_unique(array_merge(array_keys($baoClasses), $hookClasses));
+    // In theory, $baoClasses and $hookClasses could overlap. But they also disjoin:
+    // - $baoClasses is built from hook_entityTypes, which predates ClassScanner),
+    // - $baoClasses may implement other
+    // - $baoClasses have entity-names (for handling 'self_*` methods)
+    foreach ($allEventClasses as $eventClass) {
+      $listenerMap = EventScanner::findListeners($eventClass, $baoClasses[$eventClass] ?? NULL);
       if ($listenerMap) {
-        $file = (new \ReflectionClass($baoClass))->getFileName();
+        $file = (new \ReflectionClass($eventClass))->getFileName();
         $container->addResource(new \Symfony\Component\Config\Resource\FileResource($file));
-        $dispatcherDefn->addMethodCall('addListenerMap', [$baoClass, $listenerMap]);
+        $dispatcherDefn->addMethodCall('addListenerMap', [$eventClass, $listenerMap]);
       }
     }
 

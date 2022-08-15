@@ -20,22 +20,52 @@ class ScanClassesTest extends \PHPUnit\Framework\Assert {
     // Assert that WorkflowMessageInterface's are registered.
     $items = $cv->api4('WorkflowMessage', 'get', ['where' => [['name', '=', 'shimmy_message_example']]]);
     $this->assertEquals('CRM_Shimmy_ShimmyMessage', $items[0]['class']);
+
+    // Assert that HookInterface's are registered.
+    $hookData = $this->fireHookShimmyFooBar($cv, 'world');
+    $this->assertEquals(['hello world'], $hookData);
   }
 
   public function testDisabled($cv) {
     // Assert that WorkflowMessageInterface's are removed.
     $items = $cv->api4('WorkflowMessage', 'get', ['where' => [['name', '=', 'shimmy_message_example']]]);
     $this->assertEmpty($items);
+
+    // Assert that HookInterface's are removed.
+    $hookData = $this->fireHookShimmyFooBar($cv, 'world');
+    $this->assertEquals([], $hookData);
   }
 
   public function testUninstalled($cv) {
     // Assert that WorkflowMessageInterface's are removed.
     $items = $cv->api4('WorkflowMessage', 'get', ['where' => [['name', '=', 'shimmy_message_example']]]);
     $this->assertEmpty($items);
+
+    // Assert that HookInterface's are removed.
+    $hookData = $this->fireHookShimmyFooBar($cv, 'world');
+    $this->assertEquals([], $hookData);
   }
 
   protected static function getPath($suffix = ''): string {
     return dirname(__DIR__, 2) . $suffix;
+  }
+
+  /**
+   * Fire hook_civicrm_shimmyFooBar() in the system-under-test.
+   *
+   * @param $cv
+   * @param string $name
+   * @return array
+   *   The modified $data
+   */
+  protected function fireHookShimmyFooBar($cv, string $name): array {
+    try {
+      putenv('SHIMMY_FOOBAR=' . $name);
+      return $cv->phpEval('$d=[]; Civi::dispatcher()->dispatch("hook_civicrm_shimmyFooBar", \Civi\Core\Event\GenericHookEvent::create(["data"=>&$d,"for"=>getenv("SHIMMY_FOOBAR")])); return $d;');
+    }
+    finally {
+      putenv('SHIMMY_FOOBAR');
+    }
   }
 
 }
