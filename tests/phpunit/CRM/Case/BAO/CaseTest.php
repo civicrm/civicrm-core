@@ -1276,6 +1276,48 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   }
 
   /**
+   * Same as testFileOnCaseBySubject but editing an existing non-case activity
+   */
+  public function testFileOnCaseByEditingSubject() {
+    $loggedInUserId = $this->createLoggedInUser();
+    $clientId = $this->individualCreate();
+    $caseObj = $this->createCase($clientId, $loggedInUserId);
+    $activity = $this->callAPISuccess('Activity', 'create', [
+      'source_contact_id' => $loggedInUserId,
+      'target_contact_id' => $clientId,
+      'activity_type_id' => 1,
+      'subject' => 'Starting as non-case activity',
+    ]);
+    $subject = 'Now should be a case activity [case #' . $caseObj->id . ']';
+    $form = $this->getFormObject('CRM_Activity_Form_Activity', [
+      'id' => $activity['id'],
+      'source_contact_id' => $loggedInUserId,
+      'target_contact_id' => $clientId,
+      'subject' => $subject,
+      'activity_date_time' => date('Y-m-d H:i:s'),
+      'activity_type_id' => 1,
+    ]);
+    $form->postProcess();
+
+    $activity = $this->callAPISuccess('Activity', 'getsingle', [
+      'id' => $activity['id'],
+      'return' => ['case_id'],
+    ]);
+    // Note it's an array
+    $this->assertEquals([$caseObj->id], $activity['case_id']);
+
+    // Double-check
+    $queryParams = [1 => [$activity['id'], 'Integer']];
+    $this->assertEquals(
+      $caseObj->id,
+      CRM_Core_DAO::singleValueQuery('SELECT ca.case_id
+        FROM civicrm_case_activity ca
+        INNER JOIN civicrm_activity a ON ca.activity_id = a.id
+        WHERE a.id = %1', $queryParams)
+    );
+  }
+
+  /**
    * Basic case create test with an Org client
    */
   public function testOrgClient() {
