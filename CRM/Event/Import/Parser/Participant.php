@@ -537,26 +537,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
   }
 
   /**
-   * Given a list of the importable field keys that the user has selected
-   * set the active fields array to this list
-   *
-   * @param array $fieldKeys mapped array of values
-   *
-   * @return void
-   */
-  public function setActiveFields($fieldKeys) {
-    $this->_activeFieldCount = count($fieldKeys);
-    foreach ($fieldKeys as $key) {
-      if (empty($this->_fields[$key])) {
-        $this->_activeFields[] = new CRM_Event_Import_Field('', ts('- do not import -'));
-      }
-      else {
-        $this->_activeFields[] = clone($this->_fields[$key]);
-      }
-    }
-  }
-
-  /**
    * @param string $name
    * @param $title
    * @param int $type
