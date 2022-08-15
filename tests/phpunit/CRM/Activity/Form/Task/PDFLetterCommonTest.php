@@ -25,8 +25,12 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   public function testCreateDocumentBasicTokens(): void {
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
     $this->enableCiviCampaign();
+    $case = $this->createCase($this->individualCreate());
 
-    $activity = $this->activityCreate(['campaign_id' => $this->campaignCreate()]);
+    $activity = $this->activityCreate([
+      'campaign_id' => $this->campaignCreate(),
+      'case_id' => $case->id,
+    ]);
     $data = [
       ['Subject: {activity.subject}', 'Subject: Discussion on warm beer'],
       ['Date: {activity.activity_date_time}', 'Date: ' . CRM_Utils_Date::customFormat(date('Ymd'))],
@@ -41,7 +45,7 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       ['Activity Type: {activity.activity_type_id:label}', 'Activity Type: Meeting'],
       ['(legacy) Activity ID: {activity.activity_id}', '(legacy) Activity ID: ' . $activity['id']],
       ['Activity ID: {activity.id}', 'Activity ID: ' . $activity['id']],
-      ['(just weird) Case ID: {activity.case_id}', '(just weird) Case ID: ' . ''],
+      ['(APIv4 virtual field) Case ID: {activity.case_id}', '(APIv4 virtual field) Case ID: ' . $case->id],
     ];
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['activityId']]);
 
