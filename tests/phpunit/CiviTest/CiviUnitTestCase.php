@@ -1137,7 +1137,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'is_show_location' => 0,
       'is_email_confirm' => 1,
     ], $params);
-
+    if (!empty($params['payment_processor_id'])) {
+      $params['payment_processor'] = is_array($params['payment_processor_id']) ? $params['payment_processor_id'] : [$params['payment_processor_id']];
+    }
     $event = Event::create(FALSE)->setValues($params)->execute()->first();
     $this->ids['event'][] = $event['id'];
     return $event;
