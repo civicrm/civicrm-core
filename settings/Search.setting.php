@@ -213,7 +213,7 @@ return [
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'quicksearch_options',
-    'type' => 'string',
+    'type' => 'String',
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
     'html_type' => 'checkboxes',
     'sortable' => TRUE,
