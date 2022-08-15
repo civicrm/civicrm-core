@@ -556,12 +556,13 @@ HERESQL;
       return $getCount ? 0 : $casesList;
     }
 
+    $type = CRM_Utils_Array::value('type', $params, 'upcoming');
+
     // Return cached value instead of re-running query
-    if (isset(Civi::$statics[__CLASS__]['totalCount']) && $getCount) {
-      return Civi::$statics[__CLASS__]['totalCount'];
+    if (isset(Civi::$statics[__CLASS__]['totalCount'][$type]) && $getCount) {
+      return Civi::$statics[__CLASS__]['totalCount'][$type];
     }
 
-    $type = CRM_Utils_Array::value('type', $params, 'upcoming');
     $userID = CRM_Core_Session::getLoggedInContactID();
 
     // validate access for all cases.
@@ -586,7 +587,7 @@ HERESQL;
     }
     $condition = implode(' AND ', $whereClauses);
 
-    Civi::$statics[__CLASS__]['totalCount'] = $totalCount = CRM_Core_DAO::singleValueQuery(self::getCaseActivityCountQuery($type, $userID, $condition));
+    Civi::$statics[__CLASS__]['totalCount'][$type] = $totalCount = CRM_Core_DAO::singleValueQuery(self::getCaseActivityCountQuery($type, $userID, $condition));
     if ($getCount) {
       return $totalCount;
     }
