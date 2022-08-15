@@ -71,6 +71,39 @@ class api_v3_ActivityCaseTest extends CiviCaseTestCase {
     }
   }
 
+  /**
+   * Same as testActivityCreateOnCase but editing an existing non-case activity
+   */
+  public function testActivityEditAddingCaseIdInSubject() {
+    $activity = $this->callAPISuccess('Activity', 'create', [
+      'source_contact_id' => $this->_cid,
+      'activity_type_id' => 'Meeting',
+      'subject' => 'Starting as non-case activity 1',
+    ]);
+    $hash = substr(sha1(CIVICRM_SITE_KEY . $this->_case['id']), 0, 7);
+    // edit activity and put hash in the subject
+    $activity = $this->callAPISuccess('Activity', 'create', [
+      'id' => $activity['id'],
+      'subject' => "Now should be a case activity 1 [case #{$hash}]",
+    ]);
+    $case = $this->callAPISuccessGetSingle('Activity', ['return' => ['case_id'], 'id' => $activity['id']]);
+    // It should be filed on the case now
+    $this->assertEquals($this->_case['id'], $case['case_id'][0]);
+
+    // Now same thing but just with the id not the hash
+    $activity = $this->callAPISuccess('Activity', 'create', [
+      'source_contact_id' => $this->_cid,
+      'activity_type_id' => 'Meeting',
+      'subject' => 'Starting as non-case activity 2',
+    ]);
+    $activity = $this->callAPISuccess('Activity', 'create', [
+      'id' => $activity['id'],
+      'subject' => "Now should be a case activity 2 [case #{$this->_case['id']}]",
+    ]);
+    $case = $this->callAPISuccessGetSingle('Activity', ['return' => ['case_id'], 'id' => $activity['id']]);
+    $this->assertEquals($this->_case['id'], $case['case_id'][0]);
+  }
+
   public function testGet() {
     $this->assertTrue(is_numeric($this->_case['id']));
     $this->assertTrue(is_numeric($this->_otherActivity['id']));
