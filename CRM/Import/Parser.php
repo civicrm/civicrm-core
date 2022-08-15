@@ -496,11 +496,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   public function getSelectTypes() {
     $values = [];
     // This is only called from the MapField form in isolation now,
-    // so we need to set the metadata.
-    $this->init();
-    foreach ($this->_fields as $name => $field) {
-      if (isset($field->_hasLocationType)) {
-        $values[$name] = $field->_hasLocationType;
+    foreach ($this->getFieldsMetadata() as $name => $field) {
+      if (isset($field['hasLocationType'])) {
+        $values[$name] = TRUE;
       }
     }
     return $values;
@@ -1799,6 +1797,19 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     // Force re-load of user job.
     unset($this->userJob);
     $this->setFieldMetadata();
+  }
+
+  /**
+   * Get metadata for all importable fields.
+   *
+   * @return array
+   */
+  protected function getFieldsMetadata() : array {
+    if (empty($this->importableFieldsMetadata)) {
+      unset($this->userJob);
+      $this->setFieldMetadata();
+    }
+    return $this->importableFieldsMetadata;
   }
 
   /**
