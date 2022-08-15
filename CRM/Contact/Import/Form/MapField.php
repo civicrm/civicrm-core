@@ -333,28 +333,14 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @return array|true
+   * @return array|bool
    *   list of errors to be posted back to the form
    */
-  public static function formRule($fields) {
-    $errors = [];
+  public static function formRule(array $fields) {
     if (!empty($fields['saveMapping'])) {
-      $nameField = $fields['saveMappingName'] ?? NULL;
-      if (empty($nameField)) {
-        $errors['saveMappingName'] = ts('Name is required to save Import Mapping');
-      }
-      else {
-        $mappingTypeId = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Import Contact');
-        if (CRM_Core_BAO_Mapping::checkMapping($nameField, $mappingTypeId)) {
-          $errors['saveMappingName'] = ts('Duplicate Import Mapping Name');
-        }
-      }
+      CRM_Core_Smarty::singleton()->assign('isCheked', TRUE);
     }
-    $template = CRM_Core_Smarty::singleton();
-    if (!empty($fields['saveMapping'])) {
-      $template->assign('isCheked', TRUE);
-    }
-    return empty($errors) ? TRUE : $errors;
+    return parent::mappingRule($fields);
   }
 
   /**
