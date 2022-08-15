@@ -294,6 +294,7 @@ EOHTML;
   public function testCreatingContactsWithOnlyEmail(): void {
     $this->useValues([
       'layout' => self::$layouts['employer'],
+      'create_submission' => TRUE,
       'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
@@ -331,9 +332,17 @@ EOHTML;
     $contact = \Civi\Api4\Contact::get()
       ->addWhere('display_name', '=', $individualEmail)
       ->addJoin('Contact AS org', 'LEFT', ['employer_id', '=', 'org.id'])
-      ->addSelect('display_name', 'org.display_name')
+      ->addSelect('display_name', 'org.display_name', 'org.id', 'email_primary')
       ->execute()->first();
     $this->assertEquals($orgEmail, $contact['org.display_name']);
+
+    $submission = \Civi\Api4\AfformSubmission::get(FALSE)
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1)
+      ->execute()->single();
+    $this->assertEquals($contact['id'], $submission['data']['Individual1'][0]['id']);
+    $this->assertEquals($contact['org.id'], $submission['data']['Organization1'][0]['id']);
+    $this->assertEquals($contact['email_primary'], $submission['data']['Individual1'][0]['_joins']['Email'][0]['id']);
   }
 
 }

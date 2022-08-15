@@ -154,9 +154,10 @@ class Submit extends AbstractProcessor {
         continue;
       }
       try {
+        $idField = CoreUtil::getIdFieldName($event->getEntityType());
         $saved = $api4($event->getEntityType(), 'save', ['records' => [$record['fields']]])->first();
-        $event->setEntityId($index, $saved['id']);
-        self::saveJoins($event, $index, $saved['id'], $record['joins'] ?? []);
+        $event->setEntityId($index, $saved[$idField]);
+        self::saveJoins($event, $index, $saved[$idField], $record['joins'] ?? []);
       }
       catch (\API_Exception $e) {
         // What to do here? Sometimes we should silently ignore errors, e.g. an optional entity
@@ -244,7 +245,7 @@ class Submit extends AbstractProcessor {
           'checkPermissions' => FALSE,
           'where' => self::getJoinWhereClause($event->getFormDataModel(), $event->getEntityName(), $joinEntityName, $entityId),
           'records' => $values,
-        ], ['id']);
+        ]);
         $indexedResult = array_combine(array_keys($values), (array) $result);
         $event->setJoinIds($index, $joinEntityName, $indexedResult);
       }
