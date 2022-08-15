@@ -90,7 +90,7 @@ class Container {
   public function createContainer() {
     $civicrm_base_path = dirname(dirname(__DIR__));
     $container = new ContainerBuilder();
-    $container->addCompilerPass(new RegisterListenersPass('dispatcher'));
+    $container->addCompilerPass(new RegisterListenersPass());
     $container->addObjectResource($this);
     $container->setParameter('civicrm_base_path', $civicrm_base_path);
     //$container->set(self::SELF, $this);
@@ -132,6 +132,9 @@ class Container {
       []
     ))
       ->setFactory([new Reference(self::SELF), 'createEventDispatcher'])->setPublic(TRUE);
+    // In symfony 6 it only accepts event_dispatcher as the id, but there are
+    // several places in civi and extensions that reference dispatcher.
+    $container->setAlias('event_dispatcher', 'dispatcher')->setPublic(TRUE);
 
     $container->setDefinition('magic_function_provider', new Definition(
       'Civi\API\Provider\MagicFunctionProvider',
