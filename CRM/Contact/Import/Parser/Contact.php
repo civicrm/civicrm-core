@@ -184,7 +184,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           'importID' => $currentImportID,
           'importTempTable' => $this->_tableName,
           'fieldHeaders' => $this->_mapperKeys,
-          'fields' => $this->_activeFields,
         ];
         CRM_Utils_Hook::import('Contact', 'process', $this, $hookParams);
       }
