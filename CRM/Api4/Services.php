@@ -36,17 +36,6 @@ class CRM_Api4_Services {
       'registerApiProvider',
       [new Reference('action_object_provider')]
     );
-
-    // add spec providers
-    $providers = $container->findTaggedServiceIds('spec_provider');
-    $gatherer = $container->getDefinition('spec_gatherer');
-
-    foreach (array_keys($providers) as $provider) {
-      $gatherer->addMethodCall(
-        'addSpecProvider',
-        [new Reference($provider)]
-      );
-    }
   }
 
   /**
