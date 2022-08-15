@@ -269,11 +269,13 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   protected $_warnings;
 
   /**
+   * TO BE REMOVED.
+   *
    * Array of all the fields that could potentially be part
    * of this import process
    * @var array
    */
-  protected $_fields;
+  private $_fields;
 
   /**
    * Metadata for all available fields, keyed by unique name.
