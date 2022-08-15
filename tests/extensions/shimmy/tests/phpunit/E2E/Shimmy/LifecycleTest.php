@@ -109,6 +109,11 @@ class E2E_Shimmy_LifecycleTest extends \PHPUnit\Framework\TestCase implements \C
         return (array) civicrm_api4($entity, $action, $params);
       }
 
+      public function phpEval(string $expr): array {
+        // phpcs:ignore
+        return eval($expr);
+      }
+
     };
   }
 
@@ -122,6 +127,10 @@ class E2E_Shimmy_LifecycleTest extends \PHPUnit\Framework\TestCase implements \C
       public function api4($entity, $action, $params): array {
         $params = array_merge(['checkPermissions' => FALSE], $params);
         return $this->cv('api4 --in=json ' . escapeshellarg("$entity.$action"), json_encode($params));
+      }
+
+      public function phpEval(string $expr): array {
+        return $this->cv('php:eval ' . escapeshellarg($expr));
       }
 
       /**
