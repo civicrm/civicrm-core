@@ -491,7 +491,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   private function isLocationTypeRequired($name): bool {
     if (!isset(Civi::$statics[__CLASS__]['location_fields'])) {
-      Civi::$statics[__CLASS__]['location_fields'] = (new CRM_Contact_Import_Parser_Contact())->setUserJobID($this->getUserJobID())->getSelectTypes();
+      Civi::$statics[__CLASS__]['location_fields'] = (new CRM_Contact_Import_Parser_Contact())->setUserJobID($this->getUserJobID())->getFieldsWhichSupportLocationTypes();
     }
     return (bool) (Civi::$statics[__CLASS__]['location_fields'][$name] ?? FALSE);
   }
