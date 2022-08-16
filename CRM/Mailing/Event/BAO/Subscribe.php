@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  *
  * @package CRM
@@ -220,24 +222,24 @@ SELECT     civicrm_email.id as email_id
       $text = CRM_Utils_String::htmlToText($component->body_html);
     }
 
-    $bao = new CRM_Mailing_BAO_Mailing();
-    $bao->body_text = $text;
-    $bao->body_html = $html;
-    $tokens = $bao->getTokens();
+    $html = CRM_Utils_Token::replaceSubscribeTokens($html, $group->title, $url, TRUE);
+    $text = CRM_Utils_Token::replaceSubscribeTokens($text, $group->title, $url, FALSE);
 
-    $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html']);
-    $html = CRM_Utils_Token::replaceSubscribeTokens($html,
-      $group->title,
-      $url, TRUE
-    );
-
-    $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
-    $text = CRM_Utils_Token::replaceSubscribeTokens($text,
-      $group->title,
-      $url, FALSE
-    );
     // render the &amp; entities in text mode, so that the links work
     $text = str_replace('&amp;', '&', $text);
+
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+      'schema' => ['contactId'],
+    ]);
+
+    $tokenProcessor->addMessage('body_html', $html, 'text/html');
+    $tokenProcessor->addMessage('body_text', $text, 'text/plain');
+    $tokenProcessor->addRow(['contactId' => $this->contact_id]);
+    $tokenProcessor->evaluate();
+    $html = $tokenProcessor->getRow(0)->render('body_html');
+    $text = $tokenProcessor->getRow(0)->render('body_text');
 
     CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 's',
       $this->contact_id,
