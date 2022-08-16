@@ -30,7 +30,6 @@ class CRM_Api4_Services {
     $loader->load('Civi/Api4/services.xml');
 
     self::loadServices('Civi\Api4\Service\Spec\Provider', 'spec_provider', $container);
-    self::loadServices('Civi\Api4\Event\Subscriber', 'event_subscriber', $container);
 
     $container->getDefinition('civi_api_kernel')->addMethodCall(
       'registerApiProvider',

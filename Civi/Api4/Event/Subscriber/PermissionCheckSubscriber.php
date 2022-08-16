@@ -18,8 +18,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * For any API requests that correspond to a Doctrine entity
  * ($apiRequest['doctrineClass']), check permissions specified in
  * Civi\API\Annotation\Permission.
+ *
+ * @service civi.api4.permissionCheck
  */
-class PermissionCheckSubscriber implements EventSubscriberInterface {
+class PermissionCheckSubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
 
   /**
    * @return array

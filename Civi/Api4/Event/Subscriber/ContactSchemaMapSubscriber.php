@@ -7,7 +7,10 @@ use Civi\Api4\Event\SchemaMapBuildEvent;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ContactSchemaMapSubscriber implements EventSubscriberInterface {
+/**
+ * @service civi.api4.contactSchema
+ */
+class ContactSchemaMapSubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
 
   /**
    * @return array

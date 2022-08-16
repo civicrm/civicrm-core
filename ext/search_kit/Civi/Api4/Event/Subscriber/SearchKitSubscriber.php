@@ -15,8 +15,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Event subscriber to check extra permission for SavedSearches
+ * @service civi.api4.searchKit
  */
-class SearchKitSubscriber implements EventSubscriberInterface {
+class SearchKitSubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
 
   /**
    * @return array
