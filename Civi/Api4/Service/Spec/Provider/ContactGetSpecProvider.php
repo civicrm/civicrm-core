@@ -104,7 +104,7 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
           ->setColumnName('id')
           ->setType('Extra')
           ->setFkEntity($entity)
-          ->setSqlRenderer([__CLASS__, 'getLocationFieldSql']);
+          ->setSqlRenderer(['\Civi\Api4\Service\Schema\Joiner', 'getExtraJoinSql']);
         $spec->addFieldSpec($field);
       }
     }
@@ -177,25 +177,6 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
    */
   public static function calculateAge(array $field): string {
     return "TIMESTAMPDIFF(YEAR, {$field['sql_name']}, CURDATE())";
-  }
-
-  /**
-   * Generate SQL for address/email/phone/im id field
-   *
-   * This works because the join was declared in ContactSchemaMapSubscriber
-   * and that also magically allows implicit joins through this one, by virtue
-   * of the fact that `$query->getField` will create the join not just to the `id` field
-   * but to every field on the joined entity, allowing e.g. joins to `address_primary.country_id:label`.
-   *
-   * @see \Civi\Api4\Event\Subscriber\ContactSchemaMapSubscriber::onSchemaBuild()
-   * @param array $field
-   * @param \Civi\Api4\Query\Api4SelectQuery $query
-   * @return string
-   */
-  public static function getLocationFieldSql(array $field, Api4SelectQuery $query): string {
-    $prefix = empty($field['explicit_join']) ? '' : $field['explicit_join'] . '.';
-    $idField = $query->getField($prefix . $field['name'] . '.id');
-    return $idField['sql_name'];
   }
 
 }

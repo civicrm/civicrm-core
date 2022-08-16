@@ -20,6 +20,7 @@
 namespace api\v4\Entity;
 
 use api\v4\Api4TestBase;
+use Civi\Api4\Activity;
 use Civi\Api4\Relationship;
 
 /**
@@ -65,6 +66,27 @@ class CaseTest extends Api4TestBase {
       ->first();
 
     $this->assertContains('Test Case Type', $field['options']);
+  }
+
+  public function testCaseActivity(): void {
+    $case1 = $this->createTestRecord('Case');
+    $case2 = $this->createTestRecord('Case');
+
+    $activity1 = $this->createTestRecord('Activity', [
+      'case_id' => $case1['id'],
+    ]);
+
+    $activity2 = $this->createTestRecord('Activity', [
+      'case_id' => $case2['id'],
+    ]);
+
+    $get1 = Activity::get(FALSE)
+      ->addWhere('case_id', '=', $case1['id'])
+      ->execute()
+      ->column('id');
+
+    $this->assertContains($activity1['id'], $get1);
+    $this->assertNotContains($activity2['id'], $get1);
   }
 
 }

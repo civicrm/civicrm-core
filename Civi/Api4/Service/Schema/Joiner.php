@@ -12,6 +12,8 @@
 
 namespace Civi\Api4\Service\Schema;
 
+use Civi\Api4\Query\Api4SelectQuery;
+
 class Joiner {
   /**
    * @var SchemaMap
@@ -60,6 +62,24 @@ class Joiner {
     }
 
     return $this->cache[$cacheKey];
+  }
+
+  /**
+   * SpecProvider callback for joins added via a SchemaMapSubscriber.
+   *
+   * This works for extra joins declared via SchemaMapSubscriber.
+   * It allows implicit joins through custom sql, by virtue of the fact
+   * that `$query->getField` will create the join not just to the `id` field
+   * but to every field on the joined entity, allowing e.g. joins to `address_primary.country_id:label`.
+   *
+   * @param array $field
+   * @param \Civi\Api4\Query\Api4SelectQuery $query
+   * @return string
+   */
+  public static function getExtraJoinSql(array $field, Api4SelectQuery $query): string {
+    $prefix = empty($field['explicit_join']) ? '' : $field['explicit_join'] . '.';
+    $idField = $query->getField($prefix . $field['name'] . '.id');
+    return $idField['sql_name'];
   }
 
 }
