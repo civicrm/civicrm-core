@@ -58,6 +58,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         'id' => 'contribution_import',
         'name' => 'contribution_import',
         'label' => ts('Contribution Import'),
+        'entity' => 'Contribution',
       ],
     ];
   }
