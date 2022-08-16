@@ -2,6 +2,7 @@
 
 namespace Civi\Core\Service;
 
+use Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface;
 use Civi\Api4\Utils\ReflectionUtils;
 use Civi\Core\HookInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -115,6 +116,9 @@ class AutoDefinition {
     }
     if ($class->implementsInterface(HookInterface::class) || $class->implementsInterface(EventSubscriberInterface::class)) {
       $def->addTag('event_subscriber');
+    }
+    if ($class->implementsInterface(SpecProviderInterface::class)) {
+      $def->addTag('spec_provider');
     }
 
     if (!empty($classDoc['serviceTags'])) {

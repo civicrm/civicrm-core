@@ -29,48 +29,10 @@ class CRM_Api4_Services {
     $loader = new XmlFileLoader($container, new FileLocator(dirname(dirname(__DIR__))));
     $loader->load('Civi/Api4/services.xml');
 
-    self::loadServices('Civi\Api4\Service\Spec\Provider', 'spec_provider', $container);
-
     $container->getDefinition('civi_api_kernel')->addMethodCall(
       'registerApiProvider',
       [new Reference('action_object_provider')]
     );
-  }
-
-  /**
-   * Load all services in a given directory
-   *
-   * @param string $namespace
-   * @param string $tag
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
-   */
-  public static function loadServices($namespace, $tag, $container) {
-    $namespace = \CRM_Utils_File::addTrailingSlash($namespace, '\\');
-    $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/Civi.php')],
-      array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
-    );
-    foreach ($locations as $location) {
-      $path = \CRM_Utils_File::addTrailingSlash(dirname($location)) . str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
-      if (!file_exists($path) || !is_dir($path)) {
-        $resource = new \Symfony\Component\Config\Resource\FileExistenceResource($path);
-        $container->addResource($resource);
-      }
-      else {
-        $resource = new \Symfony\Component\Config\Resource\DirectoryResource($path, ';\.php$;');
-        foreach (glob("$path*.php") as $file) {
-          $matches = [];
-          preg_match('/(\w*)\.php$/', $file, $matches);
-          $serviceName = $namespace . array_pop($matches);
-          $serviceClass = new \ReflectionClass($serviceName);
-          if ($serviceClass->isInstantiable()) {
-            $definition = $container->register(str_replace('\\', '_', $serviceName), $serviceName);
-            $definition->addTag($tag);
-            $definition->setPublic(TRUE);
-          }
-        }
-        $container->addResource($resource);
-      }
-    }
   }
 
 }
