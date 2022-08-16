@@ -14,10 +14,11 @@ namespace Civi\Core;
 /**
  * Class SqlTriggers
  * @package Civi\Core
+ * @service sql_triggers
  *
  * This class manages creation and destruction of SQL triggers.
  */
-class SqlTriggers {
+class SqlTriggers extends \Civi\Core\Service\AutoService {
 
   /**
    * The name of the output file.

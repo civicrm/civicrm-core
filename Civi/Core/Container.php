@@ -226,26 +226,6 @@ class Container {
       ]
     ))->setFactory('CRM_Utils_Cache::create')->setPublic(TRUE);
 
-    $container->setDefinition('sql_triggers', new Definition(
-      'Civi\Core\SqlTriggers',
-      []
-    ))->setPublic(TRUE);
-
-    $container->setDefinition('asset_builder', new Definition(
-      'Civi\Core\AssetBuilder',
-      []
-    ))->setPublic(TRUE);
-
-    $container->setDefinition('themes', new Definition(
-      'Civi\Core\Themes',
-      []
-    ))->setPublic(TRUE);
-
-    $container->setDefinition('format', new Definition(
-      '\Civi\Core\Format',
-      []
-    ))->setPublic(TRUE);
-
     $container->setDefinition('bundle.bootstrap3', new Definition('CRM_Core_Resources_Bundle', ['bootstrap3']))
       ->setFactory('CRM_Core_Resources_Common::createBootstrap3Bundle')->setPublic(TRUE);
 

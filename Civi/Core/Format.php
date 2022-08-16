@@ -15,10 +15,11 @@ use Brick\Money\Context\AutoContext;
 /**
  * Class Paths
  * @package Civi\Core
+ * @service format
  *
  * This class provides standardised formatting
  */
-class Format {
+class Format extends \Civi\Core\Service\AutoService {
 
   /**
    * Get formatted money
