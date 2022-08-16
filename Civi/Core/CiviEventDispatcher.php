@@ -155,7 +155,15 @@ class CiviEventDispatcher extends EventDispatcher {
       throw new \InvalidArgumentException('Expected an array("service", "method") argument');
     }
 
-    $this->addListener($eventName, new \Civi\Core\Event\ServiceListener($callback), $priority);
+    if ($eventName[0] === '&') {
+      $eventName = substr($eventName, 1);
+      $listener = new \Civi\Core\Event\HookStyleServiceListener($callback);
+    }
+    else {
+      $listener = new \Civi\Core\Event\ServiceListener($callback);
+    }
+
+    $this->addListener($eventName, $listener, $priority);
   }
 
   /**
