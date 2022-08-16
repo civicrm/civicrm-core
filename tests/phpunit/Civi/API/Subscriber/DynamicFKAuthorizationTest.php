@@ -30,7 +30,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
 
   protected function setUp(): void {
     parent::setUp();
-    \CRM_Core_DAO_AllCoreTables::init(TRUE);
+    \CRM_Core_DAO_AllCoreTables::flush();
 
     \CRM_Core_DAO_AllCoreTables::registerEntityType('FakeFile', 'CRM_Fake_DAO_FakeFile', 'fake_file');
     $fileProvider = new StaticProvider(
@@ -104,7 +104,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
 
   protected function tearDown(): void {
     parent::tearDown();
-    \CRM_Core_DAO_AllCoreTables::init(TRUE);
+    \CRM_Core_DAO_AllCoreTables::flush();
   }
 
   /**

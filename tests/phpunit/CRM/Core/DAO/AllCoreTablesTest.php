@@ -26,7 +26,7 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
     // 2. Now, let's hook into it...
     $this->hookClass->setHook('civicrm_entityTypes', [$this, '_hook_civicrm_entityTypes']);
     unset(Civi::$statics['CRM_Core_DAO_Email']);
-    CRM_Core_DAO_AllCoreTables::init(1);
+    CRM_Core_DAO_AllCoreTables::flush();
 
     // 3. And see if the data has changed...
     $fields = CRM_Core_DAO_Email::fields();
@@ -50,7 +50,7 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
 
   protected function tearDown(): void {
     CRM_Utils_Hook::singleton()->reset();
-    CRM_Core_DAO_AllCoreTables::init(1);
+    CRM_Core_DAO_AllCoreTables::flush();
     parent::tearDown();
   }
 

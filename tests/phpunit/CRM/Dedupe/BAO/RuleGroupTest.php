@@ -255,10 +255,10 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testHookDupeQueryMatch() {
+  public function testHookDupeQueryMatch(): void {
     $this->hookClass->setHook('civicrm_dupeQuery', [$this, 'hook_civicrm_dupeQuery']);
 
-    \CRM_Core_DAO_AllCoreTables::init(TRUE);
+    \CRM_Core_DAO_AllCoreTables::flush();
 
     \CRM_Core_DAO_AllCoreTables::registerEntityType('TestEntity', 'CRM_Dedupe_DAO_TestEntity', 'civicrm_dedupe_test_table');
     $this->apiKernel = \Civi::service('civi_api_kernel');
@@ -380,7 +380,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
     $this->assertCount(0, $foundDupes);
 
     CRM_Core_DAO::executeQuery('DROP TABLE civicrm_dedupe_test_table');
-    \CRM_Core_DAO_AllCoreTables::init(TRUE);
+    \CRM_Core_DAO_AllCoreTables::flush();
   }
 
   /**
