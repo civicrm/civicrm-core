@@ -42,7 +42,7 @@ class CRM_Mailing_DAO_BounceType extends CRM_Core_DAO {
    * Type of bounce
    *
    * @var string
-   *   (SQL type: varchar(256))
+   *   (SQL type: varchar(255))
    *   Note that values will be retrieved from the database as a string.
    */
   public $name;
@@ -113,7 +113,7 @@ class CRM_Mailing_DAO_BounceType extends CRM_Core_DAO {
           'title' => ts('Bounce Type Name'),
           'description' => ts('Type of bounce'),
           'required' => TRUE,
-          'maxlength' => 256,
+          'maxlength' => 255,
           'size' => CRM_Utils_Type::MEDIUM,
           'where' => 'civicrm_mailing_bounce_type.name',
           'table_name' => 'civicrm_mailing_bounce_type',
