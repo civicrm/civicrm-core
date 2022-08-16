@@ -133,10 +133,8 @@ class ClassScanner {
     $classes = [];
     static::scanFolders($classes, $civicrmRoot, 'Civi/Test/ExampleData', '\\');
     static::scanFolders($classes, $civicrmRoot, 'CRM/*/WorkflowMessage', '_');
-    static::scanFolders($classes, $civicrmRoot, 'Civi/*/WorkflowMessage', '\\');
-    static::scanFolders($classes, $civicrmRoot, 'Civi/WorkflowMessage', '\\');
     static::scanFolders($classes, $civicrmRoot, 'CRM/*/Import', '_');
-    static::scanFolders($classes, $civicrmRoot, 'Civi/Api4', '\\');
+    static::scanFolders($classes, $civicrmRoot, 'Civi', '\\', ';\\\(Security|Test)\\\;');
     if (\CRM_Utils_Constant::value('CIVICRM_UF') === 'UnitTests') {
       if (strpos(get_include_path(), $civicrmRoot . 'tests/phpunit') !== FALSE) {
         static::scanFolders($classes, $civicrmRoot . 'tests/phpunit', 'CRM/*/WorkflowMessage', '_');
@@ -182,8 +180,12 @@ class ClassScanner {
    *   Ex: "CRM" or "Civi"
    * @param string $classDelim
    *   Namespace separator, eg underscore or backslash.
+   * @param string|null $excludeRegex
+   *   A regular expression describing class-files that should be excluded.
+   *   For example, if you have two versions of a class that are loaded in mutually-incompatible environments,
+   *   then you may need to skip scanning.
    */
-  public static function scanFolders(array &$classes, string $classRoot, string $classDir, string $classDelim): void {
+  public static function scanFolders(array &$classes, string $classRoot, string $classDir, string $classDelim, ?string $excludeRegex = NULL): void {
     $classRoot = \CRM_Utils_File::addTrailingSlash($classRoot, '/');
 
     $baseDirs = (array) glob($classRoot . $classDir);
@@ -195,6 +197,9 @@ class ClassScanner {
         $absFile = str_replace(DIRECTORY_SEPARATOR, '/', $absFile);
         $relFile = \CRM_Utils_File::relativize($absFile, $classRoot);
         $class = str_replace('/', $classDelim, substr($relFile, 0, -4));
+        if ($excludeRegex !== NULL && preg_match($excludeRegex, $class)) {
+          continue;
+        }
         if (class_exists($class)) {
           $interfaces = static::getRelevantInterfaces($class);
           if ($interfaces) {
