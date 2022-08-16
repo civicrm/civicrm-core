@@ -398,7 +398,11 @@ class Container {
       }
     }
 
-    \CRM_Api4_Services::hook_container($container);
+    // FIXME: Automatically scan BasicServices for ProviderInterface.
+    $container->getDefinition('civi_api_kernel')->addMethodCall(
+      'registerApiProvider',
+      [new Reference('action_object_provider')]
+    );
 
     \CRM_Utils_Hook::container($container);
 

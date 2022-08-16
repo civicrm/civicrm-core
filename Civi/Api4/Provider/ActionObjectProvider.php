@@ -17,12 +17,15 @@ use Civi\Api4\Generic\AbstractAction;
 use Civi\API\Events;
 use Civi\Api4\Utils\ReflectionUtils;
 use Civi\Core\Event\GenericHookEvent;
+use Civi\Core\Service\AutoService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Accept $apiRequests based on \Civi\API\Action
+ *
+ * @service action_object_provider
  */
-class ActionObjectProvider implements EventSubscriberInterface, ProviderInterface {
+class ActionObjectProvider extends AutoService implements EventSubscriberInterface, ProviderInterface {
 
   /**
    * @return array
