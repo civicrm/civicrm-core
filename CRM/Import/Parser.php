@@ -1841,24 +1841,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
-   * get subtypes given the contact type
-   *
-   * @param string $contactType
-   * @return array $subTypes
-   */
-  protected function getSubtypes($contactType) {
-    $subTypes = [];
-    $types = CRM_Contact_BAO_ContactType::subTypeInfo($contactType);
-
-    if (count($types) > 0) {
-      foreach ($types as $type) {
-        $subTypes[] = $type['name'];
-      }
-    }
-    return $subTypes;
-  }
-
-  /**
    * Update the status of the import row to reflect the processing outcome.
    *
    * @param int $id
