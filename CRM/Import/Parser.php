@@ -376,21 +376,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
-   * Array of the fields that are actually part of the import process
-   * the position in the array also dictates their position in the import
-   * file
-   * @var array
-   */
-  protected $_activeFields = [];
-
-  /**
-   * Cache the count of active fields
-   *
-   * @var int
-   */
-  protected $_activeFieldCount;
-
-  /**
    * Cache of preview rows
    *
    * @var array
@@ -450,44 +435,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    */
   public function __construct() {
     $this->_maxLinesToProcess = 0;
-  }
-
-  /**
-   * Set and validate field values.
-   *
-   * @param array $elements
-   *   array.
-   */
-  public function setActiveFieldValues($elements): void {
-    $maxCount = count($elements) < $this->_activeFieldCount ? count($elements) : $this->_activeFieldCount;
-    for ($i = 0; $i < $maxCount; $i++) {
-      $this->_activeFields[$i]->setValue($elements[$i]);
-    }
-
-    // reset all the values that we did not have an equivalent import element
-    for (; $i < $this->_activeFieldCount; $i++) {
-      $this->_activeFields[$i]->resetValue();
-    }
-  }
-
-  /**
-   * Format the field values for input to the api.
-   *
-   * @return array
-   *   (reference) associative array of name/value pairs
-   */
-  public function &getActiveFieldParams() {
-    $params = [];
-    for ($i = 0; $i < $this->_activeFieldCount; $i++) {
-      if (isset($this->_activeFields[$i]->_value)
-        && !isset($params[$this->_activeFields[$i]->_name])
-        && !isset($this->_activeFields[$i]->_related)
-      ) {
-
-        $params[$this->_activeFields[$i]->_name] = $this->_activeFields[$i]->_value;
-      }
-    }
-    return $params;
   }
 
   /**
