@@ -289,6 +289,12 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param int $id
    * @param string $columnName
+   * @deprecated use standard methods like
+   *   CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionStatusID);
+   *   CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionStatusID);
+   *   CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionStatusID);
+   *   & don't specify 'CRM_Contribute_BAO_Contribution' if you mean 'CRM_Contribute_BAO_ContributionRecur' ...
+   *
    * @return array
    *   array reference of all contribution statuses
    */
