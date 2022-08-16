@@ -33,7 +33,7 @@ class CRM_Core_DAO_AllCoreTables {
     if ($fresh) {
       CRM_Core_Error::deprecatedWarning('Use CRM_Core_DAO_AllCoreTables::flush()');
     }
-    Civi::$statics[__CLASS__]['initialised'] = TRUE;
+
     Civi::$statics[__CLASS__] = [];
 
     $file = preg_replace('/\.php$/', '.data.php', __FILE__);
@@ -385,9 +385,11 @@ class CRM_Core_DAO_AllCoreTables {
 
   /**
    * Reinitialise cache.
+   *
+   * @deprecated
    */
-  public static function reinitializeCache() {
-    self::init(TRUE);
+  public static function reinitializeCache(): void {
+    self::flush();
   }
 
   /**

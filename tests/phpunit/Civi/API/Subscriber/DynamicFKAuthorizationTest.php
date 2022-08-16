@@ -178,12 +178,13 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
   }
 
   /**
-   * @param $entity
-   * @param $action
+   * @param string $entity
+   * @param string $action
    * @param array $params
+   *
    * @dataProvider okDataProvider
    */
-  public function testOk($entity, $action, $params) {
+  public function testOk(string $entity, string $action, array $params): array {
     $params['version'] = 3;
     $params['debug'] = 1;
     $params['check_permissions'] = 1;
