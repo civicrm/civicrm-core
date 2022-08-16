@@ -642,19 +642,28 @@ class Container {
       $runtime->includeCustomPath();
 
       $c = new self();
-      $container = $c->loadContainer();
-      foreach ($bootServices as $name => $obj) {
-        $container->set($name, $obj);
-      }
-      \Civi::$statics[__CLASS__]['container'] = $container;
-      // Ensure all container-based serivces have a chance to add their listeners.
-      // Without this, it's a matter of happenstance (dependent upon particular page-request/configuration/etc).
-      $container->get('dispatcher');
-
+      static::useContainer($c->loadContainer());
     }
     else {
       $bootServices['dispatcher.boot']->setDispatchPolicy(\CRM_Core_Config::isUpgradeMode() ? \CRM_Upgrade_DispatchPolicy::pick() : NULL);
     }
+  }
+
+  /**
+   * Set the active container (over-writing the current container, if defined).
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @internal Intended for bootstrap and unit-testing.
+   */
+  public static function useContainer($container): void {
+    $bootServices = \Civi::$statics[__CLASS__]['boot'];
+    foreach ($bootServices as $name => $obj) {
+      $container->set($name, $obj);
+    }
+    \Civi::$statics[__CLASS__]['container'] = $container;
+    // Ensure all container-based serivces have a chance to add their listeners.
+    // Without this, it's a matter of happenstance (dependent upon particular page-request/configuration/etc).
+    $container->get('dispatcher');
   }
 
   /**
