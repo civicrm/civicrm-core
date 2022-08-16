@@ -32,17 +32,15 @@ class ImportSpecProvider implements Generic\SpecProviderInterface {
     $userJobID = substr($spec->getEntity(), (strpos($spec->getEntity(), '_') + 1));
     $userJob = UserJob::get(FALSE)->addWhere('id', '=', $userJobID)->addSelect('metadata', 'job_type', 'created_id')->execute()->first();
 
-    $headers = $userJob['metadata']['DataSource']['column_headers'] ?? [];
     foreach ($columns as $column) {
       $isInternalField = strpos($column['name'], '_') === 0;
       $exists = $isInternalField && $spec->getFieldByName($column['name']);
       if ($exists) {
         continue;
       }
-      $header = $isInternalField ? $column['name'] : array_shift($headers);
       $field = new FieldSpec($column['name'], $spec->getEntity(), 'String');
-      $field->setTitle(ts('Import field') . ':' . $header);
-      $field->setLabel($header);
+      $field->setTitle(ts('Import field') . ':' . $column['label']);
+      $field->setLabel($column['label']);
       $field->setReadonly($isInternalField);
       $field->setDescription(ts('Data being imported into the field.'));
       $field->setColumnName($column['name']);
