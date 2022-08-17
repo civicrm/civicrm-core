@@ -30,26 +30,6 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
   }
 
   /**
-   * The initializer code, called before the processing
-   *
-   * @return void
-   */
-  public function init() {
-    // Force user job to reload.
-    unset($this->userJob);
-    $this->setFieldMetadata();
-    $fields = $this->importableFieldsMetadata;
-    $hasLocationType = FALSE;
-
-    foreach ($fields as $name => $field) {
-      $field['type'] = CRM_Utils_Array::value('type', $field, CRM_Utils_Type::T_INT);
-      $field['dataPattern'] = CRM_Utils_Array::value('dataPattern', $field, '//');
-      $field['headerPattern'] = CRM_Utils_Array::value('headerPattern', $field, '//');
-      $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern'], $hasLocationType);
-    }
-  }
-
-  /**
    * Main import function.
    *
    * @param array $values
@@ -167,7 +147,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
               if ((strtolower($v2['label']) == strtolower(trim($v1))) ||
                 (strtolower($v2['value']) == strtolower(trim($v1)))
               ) {
-                if ($htmlType == 'CheckBox') {
+                if ($htmlType === 'CheckBox') {
                   $params[$key][$v2['value']] = $formatted[$key][$v2['value']] = 1;
                 }
                 else {
@@ -231,28 +211,6 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
       ];
     }
     return $importableFields;
-  }
-
-  /**
-   * @deprecated stores metadata in the old format that
-   * a few functions in the parent class still use.
-   *
-   * @param string $name
-   * @param $title
-   * @param int $type
-   * @param string $headerPattern
-   * @param string $dataPattern
-   * @param bool $hasLocationType
-   */
-  private function addField(
-    $name, $title, $type = CRM_Utils_Type::T_INT,
-    $headerPattern = '//', $dataPattern = '//',
-    $hasLocationType = FALSE
-  ) {
-    $this->_fields[$name] = new CRM_Custom_Import_Field($name, $title, $type, $headerPattern, $dataPattern, $hasLocationType);
-    if (empty($name)) {
-      $this->_fields['doNotImport'] = new CRM_Custom_Import_Field($name, $title, $type, $headerPattern, $dataPattern, $hasLocationType);
-    }
   }
 
 }
