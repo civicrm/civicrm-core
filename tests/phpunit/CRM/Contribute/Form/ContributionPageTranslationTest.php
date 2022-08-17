@@ -13,6 +13,7 @@
  * Test ContributionPage translation features.
  *
  * @group headless
+ * @group locale
  */
 class CRM_Contribute_Form_ContributionPageTranslationTest extends CiviUnitTestCase {
 

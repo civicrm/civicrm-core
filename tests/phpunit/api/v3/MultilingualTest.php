@@ -14,6 +14,7 @@
  *
  * @package CiviCRM
  * @group headless
+ * @group locale
  */
 class api_v3_MultilingualTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
