@@ -195,11 +195,18 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
         $entities[] = $display['saved_search_id.api_entity'];
         foreach ($display['saved_search_id.api_params']['join'] ?? [] as $join) {
           $entities[] = explode(' AS ', $join[0])[0];
+          // Add bridge entities (but only if they are tagged searchable e.g. RelationshipCache)
+          if (is_string($join[2] ?? NULL) &&
+            in_array(CoreUtil::getInfoItem($join[2], 'searchable'), ['primary', 'secondary'])
+          ) {
+            $entities[] = $join[2];
+          }
         }
       }
       if (!$newForm) {
         $scanBlocks($info['definition']['layout']);
       }
+      $entities = array_unique($entities);
       $this->loadAvailableBlocks($entities, $info, [['join_entity', 'IS NULL']]);
     }
 
