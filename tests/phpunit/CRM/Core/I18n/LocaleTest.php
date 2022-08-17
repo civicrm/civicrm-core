@@ -19,17 +19,11 @@ class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
    *
    */
   public function testI18nLocaleChange() {
-    $this->enableMultilingual();
-    CRM_Core_I18n_Schema::addLocale('fr_CA', 'en_US');
+    $cleanup = $this->useMultilingual(['en_US' => 'fr_CA']);
 
     CRM_Core_I18n::singleton()->setLocale('fr_CA');
     $locale = CRM_Core_I18n::getLocale();
-
-    $this->assertEquals($locale, 'fr_CA');
-
-    CRM_Core_I18n::singleton()->setLocale('en_US');
-    CRM_Core_I18n_Schema::makeSinglelingual('en_US');
-    Civi::$statics['CRM_Core_I18n']['singleton'] = [];
+    $this->assertEquals('fr_CA', $locale);
   }
 
   public function testUiLanguages() {
@@ -58,11 +52,7 @@ class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
     $result = CRM_Core_I18n::uiLanguages();
     $this->assertTreeEquals($languages, $result);
 
-    $this->enableMultilingual();
-    // Add fr_CA in db
-    CRM_Core_I18n_Schema::addLocale('fr_CA', 'en_US');
-    // Make fr_CA 'available'
-    Civi::settings()->set('languageLimit', ['en_US' => 1, 'fr_CA' => 1]);
+    $cleanup = $this->useMultilingual(['en_US' => 'fr_CA']);
 
     // Multilingual, codes
     $result = CRM_Core_I18n::uiLanguages(TRUE);
@@ -94,10 +84,6 @@ class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
       \CRM_Core_I18n::singleton()->setLocale('fr_CA');
       $this->assertEquals('Planifié', \CRM_Core_PseudoConstant::getLabel("CRM_Activity_BAO_Activity", "status_id", 1));
     }
-
-    CRM_Core_I18n::singleton()->setLocale('en_US');
-    CRM_Core_I18n_Schema::makeSinglelingual('en_US');
-    Civi::$statics['CRM_Core_I18n']['singleton'] = [];
   }
 
   /**
