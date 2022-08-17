@@ -121,9 +121,10 @@ trait DAOActionTrait {
     }
 
     $result = [];
+    $idField = CoreUtil::getIdFieldName($this->getEntityName());
 
     foreach ($items as &$item) {
-      $entityId = $item['id'] ?? NULL;
+      $entityId = $item[$idField] ?? NULL;
       FormattingUtil::formatWriteParams($item, $this->entityFields());
       $this->formatCustomParams($item, $entityId);
 
