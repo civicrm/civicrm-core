@@ -458,4 +458,51 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($flat, $expected);
   }
 
+  public function testSingle() {
+    $okExamples = [
+      ['abc'],
+      [123],
+      [TRUE],
+      [FALSE],
+      [''],
+      [[]],
+      [[1, 2, 3]],
+      ['a' => 'b'],
+      (function () {
+        yield 'abc';
+      })(),
+    ];
+    $badExamples = [
+      [],
+      [1, 2],
+      ['a' => 'b', 'c' => 'd'],
+      [[], []],
+      (function () {
+        yield from [];
+      })(),
+      (function () {
+        yield 1;
+        yield 2;
+      })(),
+    ];
+
+    $todoCount = count($okExamples) + count($badExamples);
+    foreach ($okExamples as $i => $okExample) {
+      $this->assertTrue(CRM_Utils_Array::single($okExample) !== NULL, "Expect to get a result from example ($i)");
+      $todoCount--;
+    }
+
+    foreach ($badExamples as $i => $badExample) {
+      try {
+        CRM_Utils_Array::single($badExample);
+        $this->fail("Expected exception for bad example ($i)");
+      }
+      catch (CRM_Core_Exception $e) {
+        $todoCount--;
+      }
+    }
+
+    $this->assertEquals(0, $todoCount);
+  }
+
 }
