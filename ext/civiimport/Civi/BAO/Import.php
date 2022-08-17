@@ -70,7 +70,6 @@ class Import extends CRM_Core_DAO {
         continue;
       }
       $importEntities[$tables->id] = [
-        'user_job_id' => $tables->id,
         'table_name' => $tableName,
         'created_by' => $tables->display_name,
         'created_id' => $tables->created_id ? (int) $tables->created_id : NULL,
@@ -180,13 +179,13 @@ class Import extends CRM_Core_DAO {
    * @throws \CRM_Core_Exception
    */
   public static function writeRecord(array $record): CRM_Core_DAO {
-    $op = empty($record['id']) ? 'create' : 'edit';
-    $userJobID = $record['user_job_id'];
+    $op = empty($record['_id']) ? 'create' : 'edit';
+    $userJobID = $record['_user_job_id'];
     $entityName = 'Import_' . $userJobID;
     $userJob = UserJob::get($record['check_permissions'])->addWhere('id', '=', $userJobID)->addSelect('metadata', 'job_type', 'created_id')->execute()->first();
 
     $tableName = $userJob['metadata']['DataSource']['table_name'];
-    CRM_Utils_Hook::pre($op, $entityName, $record['id'] ?? NULL, $record);
+    CRM_Utils_Hook::pre($op, $entityName, $record['_id'] ?? NULL, $record);
     $fields = self::getAllFields($tableName);
     $instance = new self();
     $instance->__table = $tableName;

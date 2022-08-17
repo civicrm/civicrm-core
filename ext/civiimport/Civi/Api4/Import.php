@@ -10,13 +10,11 @@
  */
 namespace Civi\Api4;
 
-use Civi\Api4\Generic\BasicReplaceAction;
 use Civi\Api4\Generic\CheckAccessAction;
-use Civi\Api4\Generic\DAOCreateAction;
-use Civi\Api4\Generic\DAODeleteAction;
 use Civi\Api4\Generic\DAOGetAction;
 use Civi\Api4\Generic\DAOGetFieldsAction;
 use Civi\Api4\Action\GetActions;
+use Civi\Api4\Import\Create;
 use Civi\Api4\Import\Save;
 use Civi\Api4\Import\Update;
 
@@ -68,8 +66,8 @@ class Import {
    * @return \Civi\Api4\Generic\DAOCreateAction
    * @throws \API_Exception
    */
-  public static function create(int $userJobID, bool $checkPermissions = TRUE): DAOCreateAction {
-    return (new DAOCreateAction('Import_' . $userJobID, __FUNCTION__))
+  public static function create(int $userJobID, bool $checkPermissions = TRUE): Create {
+    return (new Create('Import_' . $userJobID, __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -81,28 +79,6 @@ class Import {
    */
   public static function update(int $userJobID, bool $checkPermissions = TRUE): Update {
     return (new Update('Import_' . $userJobID, __FUNCTION__))
-      ->setCheckPermissions($checkPermissions);
-  }
-
-  /**
-   * @param int $userJobID
-   * @param bool $checkPermissions
-   * @return \Civi\Api4\Generic\DAODeleteAction
-   * @throws \API_Exception
-   */
-  public static function delete(int $userJobID, bool $checkPermissions = TRUE): DAODeleteAction {
-    return (new DAODeleteAction('Import_' . $userJobID, __FUNCTION__))
-      ->setCheckPermissions($checkPermissions);
-  }
-
-  /**
-   * @param int $userJobID
-   * @param bool $checkPermissions
-   * @return \Civi\Api4\Generic\BasicReplaceAction
-   * @throws \API_Exception
-   */
-  public static function replace(int $userJobID, bool $checkPermissions = TRUE): BasicReplaceAction {
-    return (new BasicReplaceAction('Import_' . $userJobID, __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 

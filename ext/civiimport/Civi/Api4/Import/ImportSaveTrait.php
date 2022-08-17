@@ -12,10 +12,20 @@
 
 namespace Civi\Api4\Import;
 
-use Civi\Api4\Generic\DAOSaveAction;
+/**
+ * Code shared by Import Save/Update actions.
+ */
+trait ImportSaveTrait {
 
-class Save extends DAOSaveAction {
-
-  use ImportSaveTrait;
+  /**
+   * @inheritDoc
+   */
+  protected function write(array $items) {
+    $userJobID = str_replace('Import_', '', $this->_entityName);
+    foreach ($items as &$item) {
+      $item['_user_job_id'] = (int) $userJobID;
+    }
+    return parent::write($items);
+  }
 
 }

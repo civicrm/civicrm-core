@@ -12,9 +12,9 @@
 
 namespace Civi\Api4\Import;
 
-use Civi\Api4\Generic\DAOSaveAction;
+use Civi\Api4\Generic\DAOCreateAction;
 
-class Save extends DAOSaveAction {
+class Create extends DAOCreateAction {
 
   use ImportSaveTrait;
 
