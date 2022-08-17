@@ -82,20 +82,20 @@ class I18nSubscriber implements EventSubscriberInterface {
    * Sets the tsLocale and dbLocale for multi-lingual sites.
    * Some code duplication from CRM/Core/BAO/ConfigSetting.php retrieve()
    * to avoid regressions from refactoring.
-   * @param string $lcMessages
+   * @param string $newLocale
    * @param int $requestId
    * @throws \API_Exception
    */
-  public function setLocale($lcMessages, $requestId) {
+  public function setLocale($newLocale, $requestId) {
     $domain = new \CRM_Core_DAO_Domain();
     $domain->id = \CRM_Core_Config::domainID();
     $domain->find(TRUE);
 
     // Check if the site is multi-lingual
-    if ($domain->locales && $lcMessages) {
+    if ($domain->locales && $newLocale) {
       // Validate language, otherwise a bad dbLocale could probably lead to sql-injection.
-      if (!array_key_exists($lcMessages, \Civi::settings()->get('languageLimit'))) {
-        throw new \API_Exception(ts('Language not enabled: %1', [1 => $lcMessages]));
+      if (!array_key_exists($newLocale, \Civi::settings()->get('languageLimit'))) {
+        throw new \API_Exception(ts('Language not enabled: %1', [1 => $newLocale]));
       }
 
       global $dbLocale;
@@ -108,10 +108,10 @@ class I18nSubscriber implements EventSubscriberInterface {
       ];
 
       // Set suffix for table names - use views if more than one language
-      $dbLocale = "_{$lcMessages}";
+      $dbLocale = "_{$newLocale}";
 
       // Also set tsLocale - CRM-4041
-      $tsLocale = $lcMessages;
+      $tsLocale = $newLocale;
     }
   }
 
