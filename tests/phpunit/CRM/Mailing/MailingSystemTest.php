@@ -195,8 +195,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
     // transaction still increments the AUTO_INCREMENT counter for the table.
     // (If this behaviour ever changes we throw an exception.)
     if ($isMultiLingual) {
-      $this->enableMultilingual();
-      CRM_Core_I18n_Schema::addLocale('fr_FR', 'en_US');
+      $cleanup = $this->useMultilingual(['en_US' => 'fr_FR']);
     }
     $max_group_id = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) FROM civicrm_group");
     $max_mailing_id = 0;
