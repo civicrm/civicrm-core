@@ -1,6 +1,8 @@
 <?php
 namespace Civi\Core;
 
+use Civi\Core\Compiler\EventScannerPass;
+use Civi\Core\Compiler\SpecProviderPass;
 use Civi\Core\Event\EventScanner;
 use Civi\Core\Lock\LockManager;
 use Symfony\Component\Config\ConfigCache;
@@ -90,6 +92,8 @@ class Container {
   public function createContainer() {
     $civicrm_base_path = dirname(dirname(__DIR__));
     $container = new ContainerBuilder();
+    $container->addCompilerPass(new EventScannerPass());
+    $container->addCompilerPass(new SpecProviderPass());
     $container->addCompilerPass(new RegisterListenersPass());
     $container->addObjectResource($this);
     $container->setParameter('civicrm_base_path', $civicrm_base_path);
