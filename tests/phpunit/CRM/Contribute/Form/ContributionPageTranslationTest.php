@@ -20,14 +20,13 @@ class CRM_Contribute_Form_ContributionPageTranslationTest extends CiviUnitTestCa
   public function setUp(): void {
     parent::setUp();
     $this->_financialTypeID = 1;
-    $this->enableMultilingual();
-    CRM_Core_I18n_Schema::addLocale('fr_FR', 'en_US');
+    $this->enableMultilingual(['en_US' => 'fr_FR']);
   }
 
   public function tearDown(): void {
     global $dbLocale;
     if ($dbLocale) {
-      CRM_Core_I18n_Schema::makeSinglelingual('en_US');
+      $this->disableMultilingual();
     }
     parent::tearDown();
   }
