@@ -543,7 +543,7 @@ class CRM_Core_DAO extends DB_DataObject {
   public function sequenceKey() {
     static $sequenceKeys;
     if (!isset($sequenceKeys)) {
-      $sequenceKeys = [$this->getPrimaryKey()[0], TRUE];
+      $sequenceKeys = [CRM_Utils_Array::single($this->getPrimaryKey()), TRUE];
     }
     return $sequenceKeys;
   }
@@ -644,7 +644,7 @@ class CRM_Core_DAO extends DB_DataObject {
     // In practice the 'Import' entities are probably the only ones with a single
     // primary key that is not import. Should we check all if more than one?
     // Can do that when it comes up...
-    $primaryField = $this->getPrimaryKey()[0];
+    $primaryField = CRM_Utils_Array::single($this->getPrimaryKey());
     if (!empty($this->$primaryField)) {
       if ($hook) {
         $preEvent = new \Civi\Core\DAO\Event\PreUpdate($this);
