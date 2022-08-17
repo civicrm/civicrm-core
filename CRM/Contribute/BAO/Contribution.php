@@ -2122,7 +2122,8 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       SELECT contribution.id
       FROM civicrm_contribution contribution INNER JOIN civicrm_contribution_soft softContribution
       ON ( contribution.id = softContribution.contribution_id )
-      WHERE contribution.is_test = 0 AND contribution.is_template != '1' AND softContribution.contact_id = {$contactId} ";
+      WHERE contribution.is_test = 0 AND contribution.is_template != '1' AND softContribution.contact_id = {$contactId}
+      $additionalWhere ";
     $query = "SELECT count( x.id ) count FROM ( ";
     $query .= $contactContributionsSQL;
 
