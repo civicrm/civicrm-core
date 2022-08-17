@@ -95,11 +95,6 @@ VALUES
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
-    ( @domainID, 'civicrm/contact/search/custom/list&reset=1',              'Custom Searches', 'Custom Searches', NULL, '',                 @searchlastID, '1', NULL, 12 );
-
-INSERT INTO civicrm_navigation
-    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
-VALUES
     ( @domainID, NULL,  'Contacts', 'Contacts', NULL, '', NULL, '1', NULL, 20 );
 
 SET @contactlastID:=LAST_INSERT_ID();
@@ -287,8 +282,7 @@ VALUES
     ( @domainID, 'civicrm/admin/setting/preferences/display&reset=1',   'Display Preferences', 'Display Preferences',     'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 9 ),
     ( @domainID, 'civicrm/admin/setting/search&reset=1',    'Search Preferences',    'Search Preferences',                'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 10 ),
     ( @domainID, 'civicrm/admin/menu&reset=1',              'Navigation Menu', 'Navigation Menu',                         'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 11 ),
-    ( @domainID, 'civicrm/admin/options/wordreplacements&reset=1','Word Replacements','Word Replacements',                'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 12 ),
-    ( @domainID, 'civicrm/admin/options/custom_search&reset=1&group=custom_search', 'Manage Custom Searches', 'Manage Custom Searches', 'administer CiviCRM', '', @CustomizelastID, '1', NULL, 13 );
+    ( @domainID, 'civicrm/admin/options/wordreplacements&reset=1','Word Replacements','Word Replacements',                'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 12 );
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
