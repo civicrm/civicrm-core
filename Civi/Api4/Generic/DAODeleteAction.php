@@ -54,28 +54,29 @@ class DAODeleteAction extends AbstractBatchAction {
    * @throws \API_Exception
    */
   protected function deleteObjects($items) {
-    $ids = [];
+    $idField = CoreUtil::getIdFieldName($this->getEntityName());
+    $result = [];
     $baoName = $this->getBaoName();
 
     // Use BAO::del() method if it is not deprecated
     if (method_exists($baoName, 'del') && !ReflectionUtils::isMethodDeprecated($baoName, 'del')) {
       foreach ($items as $item) {
-        $args = [$item['id']];
+        $args = [$item[$idField]];
         $bao = call_user_func_array([$baoName, 'del'], $args);
         if ($bao !== FALSE) {
-          $ids[] = ['id' => $item['id']];
+          $result[] = [$idField => $item[$idField]];
         }
         else {
-          throw new \API_Exception("Could not delete {$this->getEntityName()} id {$item['id']}");
+          throw new \API_Exception("Could not delete {$this->getEntityName()} $idField {$item[$idField]}");
         }
       }
     }
     else {
       foreach ($baoName::deleteRecords($items) as $instance) {
-        $ids[] = ['id' => $instance->id];
+        $result[] = [$idField => $instance->$idField];
       }
     }
-    return $ids;
+    return $result;
   }
 
 }
