@@ -40,6 +40,13 @@ class CRM_Core_DAO extends DB_DataObject {
   public static $_primaryKey = ['id'];
 
   /**
+   * @return string[]
+   */
+  protected function getPrimaryKey(): array {
+    return static::$_primaryKey;
+  }
+
+  /**
    * How many times has this instance been cloned.
    *
    * @var int
@@ -536,7 +543,7 @@ class CRM_Core_DAO extends DB_DataObject {
   public function sequenceKey() {
     static $sequenceKeys;
     if (!isset($sequenceKeys)) {
-      $sequenceKeys = ['id', TRUE];
+      $sequenceKeys = [$this->getPrimaryKey()[0], TRUE];
     }
     return $sequenceKeys;
   }
@@ -634,11 +641,15 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public function save($hook = TRUE) {
     $eventID = uniqid();
-    if (!empty($this->id)) {
+    // In practice the 'Import' entities are probably the only ones with a single
+    // primary key that is not import. Should we check all if more than one?
+    // Can do that when it comes up...
+    $primaryField = $this->getPrimaryKey()[0];
+    if (!empty($this->$primaryField)) {
       if ($hook) {
         $preEvent = new \Civi\Core\DAO\Event\PreUpdate($this);
         $preEvent->eventID = $eventID;
-        \Civi::dispatcher()->dispatch("civi.dao.preUpdate", $preEvent);
+        \Civi::dispatcher()->dispatch('civi.dao.preUpdate', $preEvent);
       }
 
       $result = $this->update();
@@ -646,7 +657,7 @@ class CRM_Core_DAO extends DB_DataObject {
       if ($hook) {
         $event = new \Civi\Core\DAO\Event\PostUpdate($this, $result);
         $event->eventID = $eventID;
-        \Civi::dispatcher()->dispatch("civi.dao.postUpdate", $event);
+        \Civi::dispatcher()->dispatch('civi.dao.postUpdate', $event);
       }
       $this->clearDbColumnValueCache();
     }
