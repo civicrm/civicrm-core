@@ -586,7 +586,7 @@ GROUP BY  currency
     [$sent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'groupName' => 'msg_tpl_workflow_pledge',
-        'valueName' => 'pledge_acknowledge',
+        'workflow' => 'pledge_acknowledge',
         'contactId' => $params['contact_id'],
         'from' => $receiptFrom,
         'toName' => $pledgerDisplayName,
@@ -952,7 +952,7 @@ SELECT  pledge.contact_id              as contact_id,
             ] = CRM_Core_BAO_MessageTemplate::sendTemplate(
               [
                 'groupName' => 'msg_tpl_workflow_pledge',
-                'valueName' => 'pledge_reminder',
+                'workflow' => 'pledge_reminder',
                 'contactId' => $contactId,
                 'from' => $receiptFrom,
                 'toName' => $pledgerName,

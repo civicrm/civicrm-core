@@ -281,7 +281,7 @@ class CRM_Financial_BAO_Payment {
 
     $sendTemplateParams = [
       'groupName' => 'msg_tpl_workflow_contribution',
-      'valueName' => 'payment_or_refund_notification',
+      'workflow' => 'payment_or_refund_notification',
       'PDFFilename' => ts('notification') . '.pdf',
       'contactId' => $entities['contact']['id'],
       'toName' => $entities['contact']['display_name'],

@@ -666,7 +666,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
       $sendTemplateParams = [
         'groupName' => 'msg_tpl_workflow_contribution',
-        'valueName' => 'pcp_owner_notify',
+        'workflow' => 'pcp_owner_notify',
         'contactId' => $contributionSoft['contact_id'],
         'toEmail' => $ownerEmail,
         'toName' => $ownerName,

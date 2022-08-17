@@ -341,7 +341,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
         'is_pay_later' => $this->is_pay_later,
         'pay_later_receipt' => $this->pay_later_receipt,
       ],
-      'valueName' => 'event_registration_receipt',
+      'workflow' => 'event_registration_receipt',
       'PDFFilename' => ts('confirmation') . '.pdf',
     ];
     $template_params_to_copy = [
