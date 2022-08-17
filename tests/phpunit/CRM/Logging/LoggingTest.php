@@ -3,22 +3,17 @@
 /**
  * Class CRM_Core_DAOTest
  * @group headless
+ * @group locale
  */
 class CRM_Logging_LoggingTest extends CiviUnitTestCase {
 
   use CRMTraits_Custom_CustomDataTrait;
 
-  /**
-   * Has the db been set to multilingual.
-   *
-   * @var bool
-   */
-  protected $isDBMultilingual = FALSE;
-
   public function tearDown(): void {
     Civi::settings()->set('logging', FALSE);
-    if ($this->isDBMultilingual) {
-      CRM_Core_I18n_Schema::makeSinglelingual('en_US');
+    global $dbLocale;
+    if ($dbLocale) {
+      $this->disableMultilingual();
     }
     $logging = new CRM_Logging_Schema();
     $logging->dropAllLogTables();
@@ -64,7 +59,7 @@ class CRM_Logging_LoggingTest extends CiviUnitTestCase {
    * Test creating logging schema when database is in multilingual mode.
    */
   public function testMultilingualLogging(): void {
-    $this->makeMultilingual();
+    $this->enableMultilingual();
     Civi::settings()->set('logging', TRUE);
     $value = CRM_Core_DAO::singleValueQuery('SELECT id FROM log_civicrm_contact LIMIT 1', [], FALSE, FALSE);
     $this->assertNotNull($value, 'Logging not enabled successfully');
@@ -75,7 +70,7 @@ class CRM_Logging_LoggingTest extends CiviUnitTestCase {
    * Also test altering a multilingual table.
    */
   public function testMultilingualAlterSchemaLogging(): void {
-    $this->makeMultilingual();
+    $this->enableMultilingual();
     Civi::settings()->set('logging', TRUE);
     $logging = new CRM_Logging_Schema();
     $value = CRM_Core_DAO::singleValueQuery('SELECT id FROM log_civicrm_contact LIMIT 1', [], FALSE, FALSE);
@@ -111,14 +106,6 @@ class CRM_Logging_LoggingTest extends CiviUnitTestCase {
       || in_array("  `logging_test` int DEFAULT '0'", $create, TRUE)
       || in_array('  `logging_test` int DEFAULT 0', $create, TRUE)
     );
-  }
-
-  /**
-   * Convert the database to multilingual mode.
-   */
-  protected function makeMultilingual(): void {
-    CRM_Core_I18n_Schema::makeMultilingual('en_US');
-    $this->isDBMultilingual = TRUE;
   }
 
 }
