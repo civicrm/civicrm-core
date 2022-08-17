@@ -70,7 +70,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
   public function tearDown(): void {
     global $dbLocale;
     if ($dbLocale) {
-      CRM_Core_I18n_Schema::makeSinglelingual('en_US');
+      $this->disableMultilingual();
     }
     parent::tearDown();
     $this->assertNotEmpty($this->counts['hook_alterMailParams']);
