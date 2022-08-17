@@ -84,6 +84,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         'id' => 'participant_import',
         'name' => 'participant_import',
         'label' => ts('Participant Import'),
+        'entity' => 'Participant',
       ],
     ];
   }

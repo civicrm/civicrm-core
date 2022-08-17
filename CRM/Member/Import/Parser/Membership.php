@@ -70,6 +70,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         'id' => 'membership_import',
         'name' => 'membership_import',
         'label' => ts('Membership Import'),
+        'entity' => 'Membership',
       ],
     ];
   }
