@@ -74,6 +74,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   use \Civi\Test\DbTestTrait;
   use \Civi\Test\ContactTestTrait;
   use \Civi\Test\MailingTestTrait;
+  use \Civi\Test\LocaleTestTrait;
 
   /**
    *  Database has been initialized.
@@ -3423,23 +3424,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $contributionObj->id = $contributionID;
     $contributionObj->find(TRUE);
     return $contributionObj;
-  }
-
-  /**
-   * Enable multilingual.
-   */
-  public function enableMultilingual() {
-    $this->callAPISuccess('Setting', 'create', [
-      'lcMessages' => 'en_US',
-      'languageLimit' => [
-        'en_US' => 1,
-      ],
-    ]);
-
-    CRM_Core_I18n_Schema::makeMultilingual('en_US');
-
-    global $dbLocale;
-    $dbLocale = '_en_US';
   }
 
   /**
