@@ -584,6 +584,7 @@ participant.fee_level :steep
 participant.fee_amount :$50.00
 participant.registered_by_id :
 participant.transferred_to_contact_id :
+participant.created_id :
 participant.role_id:label :Attendee
 participant.balance :
 participant.custom_2 :99999
@@ -706,6 +707,7 @@ December 21st, 2007
       '{participant.fee_amount}' => 'Fee Amount',
       '{participant.registered_by_id}' => 'Registered By Participant ID',
       '{participant.transferred_to_contact_id}' => 'Transferred to Contact ID',
+      '{participant.created_id}' => 'Created by Contact ID',
       '{participant.role_id:label}' => 'Participant Role',
       '{participant.balance}' => 'Event Balance',
       '{participant.' . $this->getCustomFieldName('participant_int') . '}' => 'Enter integer here :: participant_Group with field int',

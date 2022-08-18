@@ -208,7 +208,7 @@
     <default>NULL</default>
     <comment>FK to Participant ID</comment>
     <html>
-      <label>Registered By</label>
+      <label>Registered By Participant</label>
     </html>
     <add>2.1</add>
     <export>true</export>
@@ -336,6 +336,24 @@
     <name>transferred_to_contact_id</name>
     <table>civicrm_contact</table>
     <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>created_id</name>
+    <type>int unsigned</type>
+    <title>Created by Contact ID</title>
+    <comment>Contact responsible for registering this participant</comment>
+    <html>
+      <type>EntityRef</type>
+      <label>Created By</label>
+    </html>
+    <add>5.54</add>
+  </field>
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>5.54</add>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
 </table>
