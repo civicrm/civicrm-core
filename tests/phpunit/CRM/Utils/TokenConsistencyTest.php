@@ -575,8 +575,8 @@ contribution_recur.payment_instrument_id:name :Check
    *
    * @return string
    */
-  protected function getExpectedParticipantTokenOutput(): string {
-    return 'participant.status_id :2
+  protected function getExpectedParticipantTokenOutput(int $participantCreatedID = NULL): string {
+    return "participant.status_id :2
 participant.role_id :1
 participant.register_date :February 19th, 2007
 participant.source :Wimbeldon
@@ -584,7 +584,7 @@ participant.fee_level :steep
 participant.fee_amount :$50.00
 participant.registered_by_id :
 participant.transferred_to_contact_id :
-participant.created_id :
+participant.created_id :{$participantCreatedID}
 participant.role_id:label :Attendee
 participant.balance :
 participant.custom_2 :99999
@@ -596,7 +596,7 @@ participant.status_id:name :Attended
 participant.role_id:name :Attendee
 participant.is_test:label :No
 participant.must_wait :
-';
+";
   }
 
   /**
@@ -664,7 +664,7 @@ December 21st, 2007
     $this->assertEquals(array_merge($tokens, $this->getEventTokens(), $this->getDomainTokens()), $tokenProcessor->listTokens());
 
     $this->callAPISuccess('job', 'send_reminder', []);
-    $expected = $this->getExpectedParticipantTokenOutput();
+    $expected = $this->getExpectedParticipantTokenOutput(3);
     $mut->checkMailLog([$expected]);
 
     $tokenProcessor->addMessage('html', $this->getTokenString(array_keys($this->getParticipantTokens())), 'text/plain');
@@ -834,7 +834,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
 
     $expectedEventString = $this->getExpectedEventTokenOutput();
     $this->callAPISuccess('job', 'send_reminder', []);
-    $expectedParticipantString = $this->getExpectedParticipantTokenOutput();
+    $expectedParticipantString = $this->getExpectedParticipantTokenOutput(5);
     $toCheck = array_merge(explode("\n", $expectedEventString), explode("\n", $expectedParticipantString));
     $toCheck[] = $expectedEventString;
     $toCheck[] = $expectedParticipantString;
