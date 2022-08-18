@@ -76,32 +76,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
   }
 
   /**
-   * @param string $name
-   * @param $title
-   * @param int $type
-   * @param string $headerPattern
-   * @param string $dataPattern
-   */
-  public function addField($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//') {
-    if (empty($name)) {
-      $this->_fields['doNotImport'] = new CRM_Member_Import_Field($name, $title, $type, $headerPattern, $dataPattern);
-    }
-    else {
-
-      //$tempField = CRM_Contact_BAO_Contact::importableFields('Individual', null );
-      $tempField = CRM_Contact_BAO_Contact::importableFields('All', NULL);
-      if (!array_key_exists($name, $tempField)) {
-        $this->_fields[$name] = new CRM_Member_Import_Field($name, $title, $type, $headerPattern, $dataPattern);
-      }
-      else {
-        $this->_fields[$name] = new CRM_Contact_Import_Field($name, $title, $type, $headerPattern, $dataPattern,
-          CRM_Utils_Array::value('hasLocationType', $tempField[$name])
-        );
-      }
-    }
-  }
-
-  /**
    * Validate the values.
    *
    * @param array $values
@@ -443,14 +417,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
   protected function setFieldMetadata(): void {
     if (empty($this->importableFieldsMetadata)) {
       $metadata = CRM_Member_BAO_Membership::importableFields($this->getContactType(), FALSE);
-
-      foreach ($metadata as $name => $field) {
-        // @todo - we don't really need to do all this.... fieldMetadata is just fine to use as is.
-        $field['type'] = CRM_Utils_Array::value('type', $field, CRM_Utils_Type::T_INT);
-        $field['dataPattern'] = CRM_Utils_Array::value('dataPattern', $field, '//');
-        $field['headerPattern'] = CRM_Utils_Array::value('headerPattern', $field, '//');
-        $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern']);
-      }
       // We are consolidating on `importableFieldsMetadata` - but both still used.
       $this->importableFieldsMetadata = $this->fieldMetadata = $metadata;
     }
