@@ -22,6 +22,7 @@
 !/ext/payflowpro
 !/ext/ckeditor4
 !/ext/legacycustomsearches
+!/ext/civiimport
 backdrop/
 bower_components
 CRM/Case/xml/configuration
