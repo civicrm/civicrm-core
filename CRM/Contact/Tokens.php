@@ -284,7 +284,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
    *
    * @param \Civi\Token\Event\TokenValueEvent $e
    *
-   * @throws TokenException
+   * @throws \Civi\Token\TokenException
    * @throws \CRM_Core_Exception
    */
   public function onEvaluate(TokenValueEvent $e) {
@@ -294,20 +294,25 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     }
 
     foreach ($e->getRows() as $row) {
-      if (empty($row->context['contactId']) && empty($row->context['contact'])) {
-        continue;
+      $contactID = $row->context['contactId'] ?? NULL;
+      $contact = $row->context['contact'] ?? NULL;
+      if (!$contactID) {
+        if (!$contact) {
+          continue;
+        }
+        $contactID = $row->context['contactId'] = $contact['id'];
+      }
+
+      if (!$contact) {
+        $contact = $row->context['contact'] = $this->getContact($contactID, $this->activeTokens);
       }
 
       unset($swapLocale);
       $swapLocale = empty($row->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($row->context['locale']);
 
-      if (empty($row->context['contact'])) {
-        $row->context['contact'] = $this->getContact($row->context['contactId'], $this->activeTokens);
-      }
-
       foreach ($this->activeTokens as $token) {
         if ($token === 'checksum') {
-          $cs = \CRM_Contact_BAO_Contact_Utils::generateChecksum($row->context['contactId'],
+          $cs = \CRM_Contact_BAO_Contact_Utils::generateChecksum($contactID,
             NULL,
             NULL,
             $row->context['hash'] ?? NULL
@@ -319,7 +324,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
           $row->format('text/html')->tokens('contact', $token, html_entity_decode($this->getFieldValue($row, $token)));
         }
         else {
-          parent::evaluateToken($row, $this->entity, $token, $row->context['contact']);
+          $this->evaluateToken($row, $this->entity, $token, [$contactID => $contact]);
         }
       }
     }
@@ -334,12 +339,17 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
    */
   protected function getFieldValue(TokenRow $row, string $field) {
     $entityName = 'contact';
+    $contactID = (int) $row->context['contactId'];
+    $contact = $this->prefetch[$contactID];
     if (isset($this->getDeprecatedTokens()[$field])) {
       // Check the non-deprecated location first, fall back to deprecated
       // this is important for the greetings because - they are weird in the query object.
       $possibilities = [$this->getDeprecatedTokens()[$field], $field];
     }
     else {
+      if (array_key_exists($field, $contact)) {
+        return $contact[$field];
+      }
       $possibilities = [$field];
       if (in_array($field, $this->getDeprecatedTokens(), TRUE)) {
         $possibilities[] = array_search($field, $this->getDeprecatedTokens(), TRUE);
@@ -347,16 +357,22 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     }
 
     foreach ($possibilities as $possibility) {
-      if (isset($row->context[$entityName][$possibility])) {
-        return $row->context[$entityName][$possibility];
+      if (array_key_exists($possibility, $contact)) {
+        return $contact[$possibility];
+      }
+      if ($this->isPseudoField($possibility)) {
+        // If we have a name or label field & already have the id loaded then we can
+        // evaluate from that rather than query again.
+        $split = explode(':', $possibility);
+        if (array_key_exists($split[0], $contact)) {
+          $this->prefetch[$contactID][$possibility] = $row->context['contact'][$possibility] = $this->getPseudoValue($split[0], $split[1], $row->context[$entityName][$split[0]]);
+          return $this->prefetch[$contactID][$possibility];
+        }
       }
     }
-    $contactID = $this->getFieldValue($row, 'id');
-    if ($contactID) {
-      $row->context['contact'] = array_merge($this->getContact($contactID, $this->activeTokens), $row->context['contact']);
-      if (isset($row->context[$entityName][$field])) {
-        return $row->context[$entityName][$field];
-      }
+    $row->context['contact'] = $this->prefetch[$contactID] = array_merge($this->getContact($contactID, $this->activeTokens), $contact);
+    if (array_key_exists($field, $this->prefetch[$contactID])) {
+      return $this->prefetch[$contactID][$field];
     }
     return '';
   }

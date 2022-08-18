@@ -1261,7 +1261,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         break;
 
       case 'Link':
-        $display = $display ? "<a href=\"$display\" target=\"_blank\">$display</a>" : $display;
+        if (empty($display)) {
+          return '';
+        }
+        // The (tested) token code might pass it in twice. A better fix might eventuate when
+        // we switch that code to use v4 token fields (ie set to a PSR7 object & resolve in
+        // the parent - but this is quick & dirty & safe for now.
+        $display = strpos($display, '<a href') !== 0 ? "<a href=\"$display\" target=\"_blank\">$display</a>" : $display;
         break;
 
       case 'TextArea':
