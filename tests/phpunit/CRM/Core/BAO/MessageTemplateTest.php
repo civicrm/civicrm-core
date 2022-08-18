@@ -47,6 +47,50 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $this->assertStringContainsString('<p>Hello testRenderTemplate Abba Baab!</p>', $rendered['html']);
   }
 
+  public function getLocaleConfigurations(): array {
+    $yesPartials = ['partial_locales' => TRUE, 'uiLanguages' => ['en_US']];
+    $noPartials = ['partial_locales' => FALSE, 'uiLanguages' => ['en_US'], 'format_locale' => 'en_US'];
+
+    $allTemplates = [];
+    $allTemplates['*'] = ['subject' => 'Hello', 'html' => 'Looky there!', 'text' => '{contribution.total_amount}'];
+    $allTemplates['fr_FR'] = ['subject' => 'Bonjour', 'html' => 'Voila!', 'text' => '{contribution.total_amount}'];
+    $allTemplates['fr_CA'] = ['subject' => 'Bonjour Canada', 'html' => 'Voila! Canada', 'text' => '{contribution.total_amount}'];
+    $allTemplates['es_PR'] = ['subject' => 'Buenos dias', 'html' => 'Listo', 'text' => '{contribution.total_amount}'];
+    $allTemplates['th_TH'] = ['subject' => 'สวัสดี', 'html' => 'ดังนั้น', 'text' => '{contribution.total_amount}'];
+
+    $onlyTemplates = function(array $locales) use ($allTemplates) {
+      return CRM_Utils_Array::subset($allTemplates, $locales);
+    };
+
+    $rendered = [];
+    // $rendered['*'] = ['subject' => 'Hello', 'html' => 'Looky there!', 'text' => '$ 100.00'];
+    $rendered['*'] = ['subject' => 'Hello', 'html' => 'Looky there!', 'text' => '$100.00'];
+    $rendered['fr_FR'] = ['subject' => 'Bonjour', 'html' => 'Voila!', 'text' => '100,00 $US'];
+    $rendered['fr_CA'] = ['subject' => 'Bonjour Canada', 'html' => 'Voila! Canada', 'text' => '100,00 $ US'];
+    $rendered['es_PR'] = ['subject' => 'Buenos dias', 'html' => 'Listo', 'text' => '100.00 $US'];
+    $rendered['th_TH'] = ['subject' => 'สวัสดี', 'html' => 'ดังนั้น', 'text' => 'US$100.00'];
+
+    $result = [/* settings, templates, preferredLanguage, expectMessage */];
+
+    $result['fr_FR matches fr_FR (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'fr_FR', $rendered['fr_FR']];
+    $result['fr_FR matches fr_FR (all-tpls; no-partials)'] = [$noPartials, $allTemplates, 'fr_FR', $rendered['fr_FR']];
+    $result['fr_FR falls back to fr_CA (ltd-tpls; yes-partials)'] = [$yesPartials, $onlyTemplates(['*', 'fr_CA']), 'fr_FR', $rendered['fr_CA']];
+    $result['fr_FR falls back to fr_CA (ltd-tpls; no-partials)'] = [$noPartials, $onlyTemplates(['*', 'fr_CA']), 'fr_FR', $rendered['fr_CA']];
+
+    $result['fr_CA matches fr_CA (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'fr_CA', $rendered['fr_CA']];
+    $result['fr_CA matches fr_CA (all-tpls; no-partials)'] = [$noPartials, $allTemplates, 'fr_CA', $rendered['fr_CA']];
+    $result['fr_CA falls back to fr_FR (ltd-tpls; yes-partials)'] = [$yesPartials, $onlyTemplates(['*', 'fr_FR']), 'fr_CA', $rendered['fr_FR']];
+    $result['fr_CA falls back to fr_FR (ltd-tpls; no-partials)'] = [$noPartials, $onlyTemplates(['*', 'fr_FR']), 'fr_CA', $rendered['fr_FR']];
+
+    $result['th_TH matches th_TH (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'th_TH', $rendered['th_TH']];
+    $result['th_TH falls back to system default (all-tpls; no-partials)'] = [$noPartials, $allTemplates, 'th_TH', $rendered['*']];
+    // ^^ The essence of the `partial_locales` setting -- whether partially-supported locales (th_TH) use mixed-mode or fallback to completely diff locale.
+    $result['th_TH falls back to system default (ltd-tpls; yes-partials)'] = [$yesPartials, $onlyTemplates(['*']), 'th_TH', $rendered['*']];
+    $result['th_TH falls back to system default (ltd-tpls; no-partials)'] = [$noPartials, $onlyTemplates(['*']), 'th_TH', $rendered['*']];
+
+    return $result;
+  }
+
   /**
    * Test that translated strings are rendered for templates where they exist.
    *
@@ -56,11 +100,15 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
    *
    * @throws \API_Exception|\CRM_Core_Exception
    * @group locale
+   * @dataProvider getLocaleConfigurations
    */
-  public function testRenderTranslatedTemplate_AllowPartialLocales(): void {
-    $cleanup = \CRM_Utils_AutoClean::swapSettings(['partial_locales' => TRUE, 'uiLanguages' => ['en_US']]);
+  public function testRenderTranslatedTemplate($settings, $templates, $preferredLanguage, $expectRendered): void {
+    if (empty($settings['partial_locales']) && count(\CRM_Core_I18n::languages(FALSE)) <= 1) {
+      $this->markTestIncomplete('Full testing of localization requires l10n data.');
+    }
+    $cleanup = \CRM_Utils_AutoClean::swapSettings($settings);
 
-    $this->individualCreate(['preferred_language' => 'fr_FR']);
+    $this->individualCreate(['preferred_language' => $preferredLanguage]);
     $contributionID = $this->contributionCreate(['contact_id' => $this->ids['Contact']['individual_0']]);
     $messageTemplateID = MessageTemplate::get()
       ->addWhere('is_default', '=', 1)
@@ -68,27 +116,43 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->addSelect('id')
       ->execute()->first()['id'];
 
-    Translation::save()->setRecords([
-      ['entity_field' => 'msg_subject', 'string' => 'Bonjour'],
-      ['entity_field' => 'msg_html', 'string' => 'Voila!'],
-      ['entity_field' => 'msg_text', 'string' => '{contribution.total_amount}'],
-    ])->setDefaults([
-      'entity_table' => 'civicrm_msg_template',
-      'entity_id' => $messageTemplateID,
-      'status_id:name' => 'active',
-      'language' => 'fr_FR',
-    ])->execute();
+    foreach ($templates as $tplLocale => $tplData) {
+      if ($tplLocale === '*') {
+        MessageTemplate::update()
+          ->addWhere('id', '=', $messageTemplateID)
+          ->setValues([
+            'msg_subject' => $tplData['subject'],
+            'msg_html' => $tplData['html'],
+            'msg_text' => $tplData['text'],
+          ])
+          ->execute();
+      }
+      else {
+        Translation::save()->setRecords([
+          ['entity_field' => 'msg_subject', 'string' => $tplData['subject']],
+          ['entity_field' => 'msg_html', 'string' => $tplData['html']],
+          ['entity_field' => 'msg_text', 'string' => $tplData['text']],
+        ])->setDefaults([
+          'entity_table' => 'civicrm_msg_template',
+          'entity_id' => $messageTemplateID,
+          'status_id:name' => 'active',
+          'language' => $tplLocale,
+        ])->execute();
+      }
+    }
 
-    $messageTemplateFrench = MessageTemplate::get()
+    $myMessageTemplate = MessageTemplate::get()
       ->addWhere('is_default', '=', 1)
       ->addWhere('workflow_name', '=', 'contribution_online_receipt')
-      ->addSelect('id', 'msg_subject', 'msg_html')
-      ->setLanguage('fr_FR')
+      ->addSelect('id', 'msg_subject', 'msg_html', 'msg_text')
+      ->setLanguage($preferredLanguage)
       ->setTranslationMode('fuzzy')
       ->execute()->first();
 
-    $this->assertEquals('Bonjour', $messageTemplateFrench['msg_subject']);
-    $this->assertEquals('Voila!', $messageTemplateFrench['msg_html']);
+    // In our examples, subject+html are constant values, but text has tokens.
+    $this->assertEquals($expectRendered['subject'], $myMessageTemplate['msg_subject']);
+    $this->assertEquals($expectRendered['html'], $myMessageTemplate['msg_html']);
+    $this->assertNotEquals($expectRendered['text'], $myMessageTemplate['msg_text']);
 
     $rendered = CRM_Core_BAO_MessageTemplate::renderTemplate([
       'workflow' => 'contribution_online_receipt',
@@ -97,105 +161,10 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
         'contributionId' => $contributionID,
       ],
     ]);
-    $this->assertEquals('Bonjour', $rendered['subject']);
-    $this->assertEquals('Voila!', $rendered['html']);
-    $this->assertEquals('100,00 $US', $rendered['text']);
-
-    // French Canadian should ALSO pick up French if there
-    //is no specific French Canadian.
-    $rendered = CRM_Core_BAO_MessageTemplate::renderTemplate([
-      'workflow' => 'contribution_online_receipt',
-      'tokenContext' => [
-        'contactId' => $this->ids['Contact']['individual_0'],
-        'contributionId' => $contributionID,
-      ],
-      'language' => 'fr_CA',
-    ]);
-    $this->assertEquals('Bonjour', $rendered['subject']);
-    $this->assertEquals('Voila!', $rendered['html']);
-    // Money is formatted per fr_FR locale as that is the found-template-locale.
-    $this->assertEquals('100,00 $US', $rendered['text']);
-
-    Translation::save()->setRecords([
-      ['entity_field' => 'msg_subject', 'string' => 'Bonjour Canada'],
-      ['entity_field' => 'msg_html', 'string' => 'Voila! Canada'],
-      ['entity_field' => 'msg_text', 'string' => '{contribution.total_amount}'],
-    ])->setDefaults([
-      'entity_table' => 'civicrm_msg_template',
-      'entity_id' => $messageTemplateID,
-      'status_id:name' => 'active',
-      'language' => 'fr_CA',
-    ])->execute();
-
-    // But, prefer French Canadian where both exist.
-    $rendered = CRM_Core_BAO_MessageTemplate::renderTemplate([
-      'workflow' => 'contribution_online_receipt',
-      'tokenContext' => [
-        'contactId' => $this->ids['Contact']['individual_0'],
-        'contributionId' => $contributionID,
-      ],
-      'language' => 'fr_CA',
-    ]);
-    $this->assertEquals('Bonjour Canada', $rendered['subject']);
-    $this->assertEquals('Voila! Canada', $rendered['html']);
-    // Note that as there was a native-Canada format the money-formatting is
-    // also subtly different.
-    $this->assertEquals('100,00 $ US', $rendered['text']);
-  }
-
-  /**
-   * Test that translated strings are rendered for templates where they exist.
-   *
-   * This system has a relatively closed localization policy where translations will only be
-   * used if the locale is fully supported by the app. Ex: Even though there are some strings
-   * for 'fr_FR', the language in "Admin=>Localizaton", so we don't use it.
-   *
-   * @throws \API_Exception|\CRM_Core_Exception
-   * @group locale
-   */
-  public function testRenderTranslatedTemplate_OnlyFullLocales(): void {
-    $cleanup = \CRM_Utils_AutoClean::swapSettings(['partial_locales' => FALSE, 'uiLanguages' => ['en_US']]);
-
-    $this->individualCreate(['preferred_language' => 'fr_FR']);
-    $contributionID = $this->contributionCreate(['contact_id' => $this->ids['Contact']['individual_0']]);
-    $messageTemplateID = MessageTemplate::get()
-      ->addWhere('is_default', '=', 1)
-      ->addWhere('workflow_name', '=', 'contribution_online_receipt')
-      ->addSelect('id')
-      ->execute()->first()['id'];
-
-    Translation::save()->setRecords([
-      ['entity_field' => 'msg_subject', 'string' => 'Bonjour'],
-      ['entity_field' => 'msg_html', 'string' => 'Voila!'],
-      ['entity_field' => 'msg_text', 'string' => '{contribution.total_amount}'],
-    ])->setDefaults([
-      'entity_table' => 'civicrm_msg_template',
-      'entity_id' => $messageTemplateID,
-      'status_id:name' => 'active',
-      'language' => 'fr_FR',
-    ])->execute();
-
-    $messageTemplateFrench = MessageTemplate::get()
-      ->addWhere('is_default', '=', 1)
-      ->addWhere('workflow_name', '=', 'contribution_online_receipt')
-      ->addSelect('id', 'msg_subject', 'msg_html')
-      ->setLanguage('fr_FR')
-      ->setTranslationMode('fuzzy')
-      ->execute()->first();
-
-    $this->assertStringNotContainsString('Bonjour', $messageTemplateFrench['msg_subject']);
-    $this->assertStringNotContainsString('Voila!', $messageTemplateFrench['msg_html']);
-
-    $rendered = CRM_Core_BAO_MessageTemplate::renderTemplate([
-      'workflow' => 'contribution_online_receipt',
-      'tokenContext' => [
-        'contactId' => $this->ids['Contact']['individual_0'],
-        'contributionId' => $contributionID,
-      ],
-    ]);
-    $this->assertStringNotContainsString('Bonjour', $rendered['subject']);
-    $this->assertStringNotContainsString('Voila!', $rendered['html']);
-    $this->assertStringNotContainsString('100,00', $rendered['text']);
+    $this->assertEquals(
+      CRM_Utils_Array::subset($expectRendered, ['subject', 'html', 'text']),
+      CRM_Utils_Array::subset($rendered, ['subject', 'html', 'text'])
+    );
   }
 
   /**
