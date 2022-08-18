@@ -9,7 +9,7 @@
     {if $config->empoweredBy}
       <table style="margin-top:5px;padding-bottom:50px;" cellpadding="5" cellspacing="0">
         <tr>
-          <td><img src="{$resourceBase}/i/civi99.png" height="34px" width="99px"></td>
+          <td><img src="{domain.empowered_by_civicrm_image_url}" height="34px" width="99px"></td>
         </tr>
       </table>
     {/if}
