@@ -476,6 +476,7 @@ WHERE  v.option_group_id = g.id
    *   the option group ID
    */
   public static function createAssoc($groupName, &$values, &$defaultID, $groupTitle = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the api');
     // @TODO: This causes a problem in multilingual
     // (https://github.com/civicrm/civicrm-core/pull/17228), but is needed in
     // order to be able to remove currencies once added.
@@ -568,8 +569,12 @@ ORDER BY v.weight
   /**
    * @param string $groupName
    * @param string $operator
+   *
+   * @deprecated
    */
   public static function deleteAssoc($groupName, $operator = "=") {
+    CRM_Core_Error::deprecatedFunctionWarning('use the api');
+
     $query = "
 DELETE g, v
   FROM civicrm_option_group g,
