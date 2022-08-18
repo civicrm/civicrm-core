@@ -473,7 +473,7 @@ class CRM_Core_PseudoConstant {
       self::$$name = NULL;
     }
     if ($name == 'cache') {
-      CRM_Core_OptionGroup::flushAll();
+      Civi::cache('metadata')->flush();
       if (isset(\Civi::$statics[__CLASS__])) {
         unset(\Civi::$statics[__CLASS__]);
       }
