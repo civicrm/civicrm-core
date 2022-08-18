@@ -186,17 +186,6 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
     }
   }
 
-  public function preProcess() {
-    $this->setTitle($this->getTitle());
-    if (!$this->verifyPreDBState($errorMessage)) {
-      if (!isset($errorMessage)) {
-        $errorMessage = 'pre-condition failed for current upgrade step';
-      }
-      throw new CRM_Core_Exception($errorMessage);
-    }
-    $this->assign('recentlyViewed', FALSE);
-  }
-
   public function buildQuickForm() {
     $this->addDefaultButtons($this->getButtonTitle(),
       'next',
