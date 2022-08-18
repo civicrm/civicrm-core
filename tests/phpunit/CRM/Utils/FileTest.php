@@ -308,6 +308,9 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    * Test isDir with open_basedir
    *
    * @link https://github.com/php/php-src/blob/5b01c4863fe9e4bc2702b2bbf66d292d23001a18/tests/security/open_basedir_is_dir.phpt
+   * @group ornery
+   *   This manipulates `open_basedir`, which is a one-way street, and it will interfere with phpunit-cli. (Test failures will lead to
+   *   lots of extra data-dumps.)
    *
    * @dataProvider isDirBasedirProvider
    *
