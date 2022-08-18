@@ -63,6 +63,9 @@ class CRM_Core_CopyTest extends CiviUnitTestCase {
 
   }
 
+  /**
+   * @group locale
+   */
   public function testI18nEventCopy() {
 
     $locales = ['en_US', 'fr_CA', 'nl_NL'];

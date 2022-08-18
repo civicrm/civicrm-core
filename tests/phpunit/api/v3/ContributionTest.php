@@ -796,6 +796,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * @return array
+   * @group locale
    */
   public function createLocalizedContributionDataProvider(): array {
     return [
