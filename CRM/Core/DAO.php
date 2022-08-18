@@ -925,29 +925,31 @@ class CRM_Core_DAO extends DB_DataObject {
    * @throws \CRM_Core_Exception
    */
   public static function writeRecord(array $record): CRM_Core_DAO {
-    $op = empty($record['id']) ? 'create' : 'edit';
+    // Todo: Support composite primary keys
+    $idField = static::$_primaryKey[0];
+    $op = empty($record[$idField]) ? 'create' : 'edit';
     $className = CRM_Core_DAO_AllCoreTables::getCanonicalClassName(static::class);
     if ($className === 'CRM_Core_DAO') {
       throw new CRM_Core_Exception('Function writeRecord must be called on a subclass of CRM_Core_DAO');
     }
     $entityName = CRM_Core_DAO_AllCoreTables::getBriefName($className);
 
-    \CRM_Utils_Hook::pre($op, $entityName, $record['id'] ?? NULL, $record);
+    \CRM_Utils_Hook::pre($op, $entityName, $record[$idField] ?? NULL, $record);
     $fields = static::getSupportedFields();
     $instance = new static();
     // Ensure fields exist before attempting to write to them
     $values = array_intersect_key($record, $fields);
     $instance->copyValues($values);
-    if (empty($values['id']) && array_key_exists('name', $fields) && empty($values['name'])) {
+    if (empty($values[$idField]) && array_key_exists('name', $fields) && empty($values['name'])) {
       $instance->makeNameFromLabel(!empty($fields['name']['required']));
     }
     $instance->save();
 
     if (!empty($record['custom']) && is_array($record['custom'])) {
-      CRM_Core_BAO_CustomValueTable::store($record['custom'], static::$_tableName, $instance->id, $op);
+      CRM_Core_BAO_CustomValueTable::store($record['custom'], static::$_tableName, $instance->$idField, $op);
     }
 
-    \CRM_Utils_Hook::post($op, $entityName, $instance->id, $instance);
+    \CRM_Utils_Hook::post($op, $entityName, $instance->$idField, $instance);
 
     return $instance;
   }
@@ -976,28 +978,30 @@ class CRM_Core_DAO extends DB_DataObject {
    * @throws CRM_Core_Exception
    */
   public static function deleteRecord(array $record) {
+    // Todo: Support composite primary keys
+    $idField = static::$_primaryKey[0];
     $className = CRM_Core_DAO_AllCoreTables::getCanonicalClassName(static::class);
     if ($className === 'CRM_Core_DAO') {
       throw new CRM_Core_Exception('Function deleteRecord must be called on a subclass of CRM_Core_DAO');
     }
     $entityName = CRM_Core_DAO_AllCoreTables::getBriefName($className);
-    if (empty($record['id'])) {
-      throw new CRM_Core_Exception("Cannot delete {$entityName} with no id.");
+    if (empty($record[$idField])) {
+      throw new CRM_Core_Exception("Cannot delete {$entityName} with no $idField.");
     }
-    CRM_Utils_Type::validate($record['id'], 'Positive');
+    CRM_Utils_Type::validate($record[$idField], 'Positive');
 
-    CRM_Utils_Hook::pre('delete', $entityName, $record['id'], $record);
+    CRM_Utils_Hook::pre('delete', $entityName, $record[$idField], $record);
     $instance = new $className();
-    $instance->id = $record['id'];
+    $instance->$idField = $record[$idField];
     // Load complete object for the sake of hook_civicrm_post, below
     $instance->find(TRUE);
     if (!$instance || !$instance->delete()) {
-      throw new CRM_Core_Exception("Could not delete {$entityName} id {$record['id']}");
+      throw new CRM_Core_Exception("Could not delete {$entityName} $idField {$record[$idField]}");
     }
     // For other operations this hook is passed an incomplete object and hook listeners can load if needed.
     // But that's not possible with delete because it's gone from the database by the time this hook is called.
     // So in this case the object has been pre-loaded so hook listeners have access to the complete record.
-    CRM_Utils_Hook::post('delete', $entityName, $record['id'], $instance);
+    CRM_Utils_Hook::post('delete', $entityName, $record[$idField], $instance);
 
     return $instance;
   }
