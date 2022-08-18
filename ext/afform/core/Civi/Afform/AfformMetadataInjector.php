@@ -42,7 +42,7 @@ class AfformMetadataInjector {
         // Each field can be nested within a fieldset, a join or a block
         foreach (pq('af-field', $doc) as $afField) {
           /** @var \DOMElement $afField */
-          $action = 'update';
+          $action = 'create';
           $joinName = pq($afField)->parents('[af-join]')->attr('af-join');
           if ($joinName) {
             self::fillFieldMetadata($joinName, $action, $afField);
@@ -180,7 +180,7 @@ class AfformMetadataInjector {
       }
     }
     // Id field for selecting existing entity
-    if ($action === 'update' && $field['name'] === CoreUtil::getIdFieldName($entityName)) {
+    if ($action === 'create' && $field['name'] === CoreUtil::getIdFieldName($entityName)) {
       $entityTitle = CoreUtil::getInfoItem($entityName, 'title');
       $field['input_type'] = 'Existing';
       $field['entity'] = $entityName;
