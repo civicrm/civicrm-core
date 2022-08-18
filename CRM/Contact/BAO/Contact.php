@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  *
  * @package CRM
@@ -2725,64 +2727,48 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
    * @param \CRM_Contact_DAO_Contact $contact
    *   Contact object after save.
    */
-  public static function processGreetings(&$contact) {
+  public static function processGreetings(CRM_Contact_DAO_Contact $contact): void {
 
-    $emailGreetingString = self::getTemplateForGreeting('email_greeting', $contact);
-    $postalGreetingString = self::getTemplateForGreeting('postal_greeting', $contact);
-    $addresseeString = self::getTemplateForGreeting('addressee', $contact);
-    //@todo this function does a lot of unnecessary loading.
-    // ensureGreetingParamsAreSet now makes sure that the contact is
-    // loaded and using updateGreetingsOnTokenFieldChange
-    // allows us the possibility of only doing an update if required.
-
-    // The contact object has not always required the
-    // fields that are required to calculate greetings
-    // so we need to retrieve it again.
+    $greetings = array_filter([
+      'email_greeting_display' => self::getTemplateForGreeting('email_greeting', $contact),
+      'postal_greeting_display' => self::getTemplateForGreeting('postal_greeting', $contact),
+      'addressee_display' => self::getTemplateForGreeting('addressee', $contact),
+    ]);
+    // A DAO fetch here is more efficient than looking up
+    // values in the token processor - this may be substantially improved by
+    // https://github.com/civicrm/civicrm-core/pull/24294 and
+    // https://github.com/civicrm/civicrm-core/pull/24156 and could be re-tested
+    // in future but tests also 'expect' it to be populated.
     if ($contact->_query !== FALSE) {
       $contact->find(TRUE);
     }
-
-    // store object values to an array
-    $contactDetails = [];
-    CRM_Core_DAO::storeValues($contact, $contactDetails);
-    $contactDetails = [[$contact->id => $contactDetails]];
-
-    $updateQueryString = [];
-
-    if ($emailGreetingString) {
-      CRM_Contact_BAO_Contact_Utils::processGreetingTemplate($emailGreetingString,
-        $contactDetails,
-        $contact->id,
-        'CRM_Contact_BAO_Contact'
-      );
-      $emailGreetingString = CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($emailGreetingString));
-      $updateQueryString[] = " email_greeting_display = '$emailGreetingString'";
+    // We can't use the DAO store method as it filters out NULL keys.
+    // Leaving NULL keys in is important as the token processor will
+    // do DB lookups to find the data if the keys are not set.
+    // We could just about skip this & just cast to an array - except create
+    // adds in `phone` and `email`
+    // in a weird & likely obsolete way....
+    $contactArray = array_intersect_key((array) $contact, $contact->fields());
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'smarty' => TRUE,
+      'class' => __CLASS__,
+      'schema' => ['contactId'],
+    ]);
+    $tokenProcessor->addRow(['contactId' => $contact->id, 'contact' => (array) $contactArray]);
+    foreach ($greetings as $greetingKey => $greetingString) {
+      $tokenProcessor->addMessage($greetingKey, $greetingString, 'text/plain');
     }
 
-    if ($postalGreetingString) {
-      CRM_Contact_BAO_Contact_Utils::processGreetingTemplate($postalGreetingString,
-        $contactDetails,
-        $contact->id,
-        'CRM_Contact_BAO_Contact'
-      );
-      $postalGreetingString = CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($postalGreetingString));
-      $updateQueryString[] = " postal_greeting_display = '$postalGreetingString'";
-    }
-
-    if ($addresseeString) {
-      CRM_Contact_BAO_Contact_Utils::processGreetingTemplate($addresseeString,
-        $contactDetails,
-        $contact->id,
-        'CRM_Contact_BAO_Contact'
-      );
-      $addresseeString = CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($addresseeString));
-      $updateQueryString[] = " addressee_display = '$addresseeString'";
+    $tokenProcessor->evaluate();
+    $row = $tokenProcessor->getRow(0);
+    foreach ($greetings as $greetingKey => $greetingString) {
+      $parsedGreeting = CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($row->render($greetingKey)));
+      $updateQueryString[] = " $greetingKey = '$parsedGreeting'";
     }
 
     if (!empty($updateQueryString)) {
       $updateQueryString = implode(',', $updateQueryString);
-      $queryString = "UPDATE civicrm_contact SET $updateQueryString WHERE id = {$contact->id}";
-      CRM_Core_DAO::executeQuery($queryString);
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_contact SET $updateQueryString WHERE id = {$contact->id}");
     }
   }
 

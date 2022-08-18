@@ -4843,7 +4843,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
-   * @throws \CRM_Core_Exception
    */
   public function testContactGreetingsCreate(int $version): void {
     $this->_apiversion = $version;
@@ -4873,8 +4872,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testContactGreetingsCreateWithCustomField(int $version): void {
     $this->_apiversion = $version;
@@ -4917,8 +4914,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * @param int $version
    *
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testGreetingParseSmarty(int $version): void {
