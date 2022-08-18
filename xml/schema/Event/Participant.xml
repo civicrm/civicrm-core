@@ -206,12 +206,13 @@
     <title>Registered By Participant ID</title>
     <import>true</import>
     <default>NULL</default>
-    <comment>FK to Participant ID</comment>
+    <comment>Deprecated in favor of created_id field</comment>
     <html>
       <label>Registered By Participant</label>
     </html>
     <add>2.1</add>
     <export>true</export>
+    <deprecated>true</deprecated>
   </field>
   <foreignKey>
     <name>registered_by_id</name>
