@@ -1212,6 +1212,35 @@ class CRM_Utils_Array {
   }
 
   /**
+   * Take one well-defined item out of a single-item list.
+   *
+   * Assert that the list genuinely contains *exactly* one item.
+   *
+   * @param iterable $items
+   * @param string $recordTypeLabel
+   * @return mixed
+   *   The first (and only) item from the $items list.
+   * @throws \CRM_Core_Exception
+   */
+  public static function single(iterable $items, string $recordTypeLabel = 'record') {
+    $result = NULL;
+    foreach ($items as $values) {
+      if ($result === NULL) {
+        $result = $values;
+      }
+      else {
+        throw new \CRM_Core_Exception("Expected to find one {$recordTypeLabel}, but there were multiple.");
+      }
+    }
+
+    if ($result === NULL) {
+      throw new \CRM_Core_Exception("Expected to find one {$recordTypeLabel}, but there were zero.");
+    }
+
+    return $result;
+  }
+
+  /**
    * Convert a simple dictionary into separate key+value records.
    *
    * @param array $array
