@@ -37,7 +37,7 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
    *
    * @throws CRM_Core_Exception
    */
-  public function onPreInstall(CRM_Extension_Info $info) {
+  public function onPreInstall(CRM_Extension_Info $info): void {
     $customReports = $this->getCustomReportsByName();
     if (array_key_exists($info->key, $customReports)) {
       throw new CRM_Core_Exception(ts('This report is already registered.'));
@@ -67,7 +67,7 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
       'is_active' => 1,
     ];
 
-    $optionValue = CRM_Core_BAO_OptionValue::add($params);
+    CRM_Core_BAO_OptionValue::add($params);
   }
 
   /**
@@ -108,14 +108,14 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
    * @return array
    */
   public function getCustomReportsByName() {
-    return CRM_Core_OptionGroup::values(self::REPORT_GROUP_NAME, TRUE, FALSE, FALSE, NULL, 'name', FALSE, TRUE);
+    return CRM_Core_OptionGroup::values(self::REPORT_GROUP_NAME, TRUE, FALSE, FALSE, NULL, 'name', FALSE);
   }
 
   /**
    * @return array
    */
   public function getCustomReportsById() {
-    return CRM_Core_OptionGroup::values(self::REPORT_GROUP_NAME, FALSE, FALSE, FALSE, NULL, 'id', FALSE, TRUE);
+    return CRM_Core_OptionGroup::values(self::REPORT_GROUP_NAME, FALSE, FALSE, FALSE, NULL, 'id', FALSE);
   }
 
 }
