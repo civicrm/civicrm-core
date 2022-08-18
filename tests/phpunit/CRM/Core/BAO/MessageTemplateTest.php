@@ -17,9 +17,10 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
    * Post test cleanup.
    */
   public function tearDown():void {
-    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_im', 'civicrm_website', 'civicrm_openid', 'civicrm_email'], TRUE);
+    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_im', 'civicrm_website', 'civicrm_openid', 'civicrm_email', 'civicrm_translation'], TRUE);
     parent::tearDown();
     Civi::cache('metadata')->clear();
+    unset($GLOBALS['tsLocale'], $GLOBALS['dbLocale'], $GLOBALS['civicrmLocale']);
   }
 
   public function testRenderTemplate(): void {
