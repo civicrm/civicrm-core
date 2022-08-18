@@ -2763,7 +2763,10 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
     $row = $tokenProcessor->getRow(0);
     foreach ($greetings as $greetingKey => $greetingString) {
       $parsedGreeting = CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($row->render($greetingKey)));
-      $updateQueryString[] = " $greetingKey = '$parsedGreeting'";
+      // Check to see if the parsed greeting already matches what is stored in the database. If it is different add in update Query
+      if ($contactArray[$greetingKey] !== $parsedGreeting) {
+        $updateQueryString[] = " $greetingKey = '$parsedGreeting'";
+      }
     }
 
     if (!empty($updateQueryString)) {
