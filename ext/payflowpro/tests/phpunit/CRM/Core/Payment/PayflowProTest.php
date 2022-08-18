@@ -61,7 +61,7 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
       $params[str_replace('-5', '', str_replace('billing_', '', $key))] = $value;
     }
     $params['state_province'] = 'NSW';
-    $params['country'] = 'AUS';
+    $params['country'] = 'AU';
     $params['contributionType_accounting_code'] = 4200;
     $params['installments'] = 1;
     $this->processor->doPayment($params);
@@ -71,7 +71,7 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
   /**
    * Test making a recurring payment
    */
-  public function testRecuringPayment(): void {
+  public function testRecurringPayment(): void {
     $this->setupMockHandler(NULL, FALSE, TRUE);
     $params = $this->getBillingParams();
     $params['amount'] = 20.00;
@@ -87,14 +87,14 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
       $params[str_replace('-5', '', str_replace('billing_', '', $key))] = $value;
     }
     $params['state_province'] = 'NSW';
-    $params['country'] = 'AUS';
+    $params['country'] = 'AU';
     $params['contributionType_accounting_code'] = 4200;
     $params['installments'] = 13;
     $params['is_recur'] = 1;
     $params['frequency_unit'] = 'month';
     $params['frequency_interval'] = 1;
     $this->processor->doPayment($params);
-    $this->assertEquals($this->getExpectedRecuringPaymentRequests(), $this->getRequestBodies());
+    $this->assertEquals($this->getExpectedRecurringPaymentRequests(), $this->getRequestBodies());
   }
 
   /**
@@ -116,7 +116,7 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
       $params[str_replace('-5', '', str_replace('billing_', '', $key))] = $value;
     }
     $params['state_province'] = 'NSW';
-    $params['country'] = 'AUS';
+    $params['country'] = 'AU';
     $params['contributionType_accounting_code'] = 4200;
     $params['installments'] = 1;
     try {
@@ -244,13 +244,13 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
    */
   public function getExpectedSinglePaymentRequests(): array {
     return [
-      'USER[4]=test&VENDOR[4]=test&PARTNER[6]=PayPal&PWD[8]=test1234&TENDER[1]=C&TRXTYPE[1]=S&ACCT[16]=4111111111111111&CVV2[3]=123&EXPDATE[4]=1022&ACCTTYPE[4]=Visa&AMT[7]=1020.00&CURRENCY[3]=AUD&FIRSTNAME[4]=John&LASTNAME[8]=O\'Connor&STREET[16]=8 Hobbitton Road&CITY[9]=The+Shire&STATE[3]=NSW&ZIP[4]=5010&COUNTRY[3]=AUS&EMAIL[24]=unittesteway@civicrm.org&CUSTIP[9]=127.0.0.1&COMMENT1[4]=4200&COMMENT2[4]=live&INVNUM[3]=xyz&ORDERDESC[17]=Test+Contribution&VERBOSITY[6]=MEDIUM&BILLTOCOUNTRY[3]=AUS',
+      'USER[4]=test&VENDOR[4]=test&PARTNER[6]=PayPal&PWD[8]=test1234&TENDER[1]=C&TRXTYPE[1]=S&ACCT[16]=4111111111111111&CVV2[3]=123&EXPDATE[4]=1022&ACCTTYPE[4]=Visa&AMT[7]=1020.00&CURRENCY[3]=AUD&FIRSTNAME[4]=John&LASTNAME[8]=O\'Connor&STREET[16]=8 Hobbitton Road&CITY[9]=The+Shire&STATE[3]=NSW&ZIP[4]=5010&COUNTRY[2]=AU&EMAIL[24]=unittesteway@civicrm.org&CUSTIP[9]=127.0.0.1&COMMENT1[4]=4200&COMMENT2[4]=live&INVNUM[3]=xyz&ORDERDESC[17]=Test+Contribution&VERBOSITY[6]=MEDIUM&BILLTOCOUNTRY[2]=AU',
     ];
   }
 
-  public function getExpectedRecuringPaymentRequests(): array {
+  public function getExpectedRecurringPaymentRequests(): array {
     return [
-      'USER[4]=test&VENDOR[4]=test&PARTNER[6]=PayPal&PWD[8]=test1234&TENDER[1]=C&TRXTYPE[1]=R&ACCT[16]=4111111111111111&CVV2[3]=123&EXPDATE[4]=1022&ACCTTYPE[4]=Visa&AMT[5]=20.00&CURRENCY[3]=AUD&FIRSTNAME[4]=John&LASTNAME[8]=O\'Connor&STREET[16]=8 Hobbitton Road&CITY[9]=The+Shire&STATE[3]=NSW&ZIP[4]=5010&COUNTRY[3]=AUS&EMAIL[24]=unittesteway@civicrm.org&CUSTIP[9]=127.0.0.1&COMMENT1[4]=4200&COMMENT2[4]=live&INVNUM[3]=xyz&ORDERDESC[17]=Test+Contribution&VERBOSITY[6]=MEDIUM&BILLTOCOUNTRY[3]=AUS&OPTIONALTRX[1]=S&OPTIONALTRXAMT[5]=20.00&ACTION[1]=A&PROFILENAME[19]=RegularContribution&TERM[2]=12&START[8]=' . date('mdY', mktime(0, 0, 0, date("m") + 1, date("d"), date("Y"))) . '&PAYPERIOD[4]=MONT',
+      'USER[4]=test&VENDOR[4]=test&PARTNER[6]=PayPal&PWD[8]=test1234&TENDER[1]=C&TRXTYPE[1]=R&ACCT[16]=4111111111111111&CVV2[3]=123&EXPDATE[4]=1022&ACCTTYPE[4]=Visa&AMT[5]=20.00&CURRENCY[3]=AUD&FIRSTNAME[4]=John&LASTNAME[8]=O\'Connor&STREET[16]=8 Hobbitton Road&CITY[9]=The+Shire&STATE[3]=NSW&ZIP[4]=5010&COUNTRY[2]=AU&EMAIL[24]=unittesteway@civicrm.org&CUSTIP[9]=127.0.0.1&COMMENT1[4]=4200&COMMENT2[4]=live&INVNUM[3]=xyz&ORDERDESC[17]=Test+Contribution&VERBOSITY[6]=MEDIUM&BILLTOCOUNTRY[2]=AU&OPTIONALTRX[1]=S&OPTIONALTRXAMT[5]=20.00&ACTION[1]=A&PROFILENAME[19]=RegularContribution&TERM[2]=12&START[8]=' . date('mdY', mktime(0, 0, 0, date("m") + 1, date("d"), date("Y"))) . '&PAYPERIOD[4]=MONT',
     ];
   }
 
