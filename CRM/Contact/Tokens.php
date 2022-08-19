@@ -284,7 +284,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
    *
    * @param \Civi\Token\Event\TokenValueEvent $e
    *
-   * @throws TokenException
+   * @throws \Civi\Token\TokenException
    * @throws \CRM_Core_Exception
    */
   public function onEvaluate(TokenValueEvent $e) {
@@ -294,20 +294,25 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     }
 
     foreach ($e->getRows() as $row) {
-      if (empty($row->context['contactId']) && empty($row->context['contact'])) {
-        continue;
+      $contactID = $row->context['contactId'] ?? NULL;
+      $contact = $row->context['contact'] ?? NULL;
+      if (!$contactID) {
+        if (!$contact) {
+          continue;
+        }
+        $contactID = $row->context['contactId'] = $contact['id'];
+      }
+
+      if (!$contact) {
+        $contact = $row->context['contact'] = $this->getContact($contactID, $this->activeTokens);
       }
 
       unset($swapLocale);
       $swapLocale = empty($row->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($row->context['locale']);
 
-      if (empty($row->context['contact'])) {
-        $row->context['contact'] = $this->getContact($row->context['contactId'], $this->activeTokens);
-      }
-
       foreach ($this->activeTokens as $token) {
         if ($token === 'checksum') {
-          $cs = \CRM_Contact_BAO_Contact_Utils::generateChecksum($row->context['contactId'],
+          $cs = \CRM_Contact_BAO_Contact_Utils::generateChecksum($contactID,
             NULL,
             NULL,
             $row->context['hash'] ?? NULL
@@ -319,7 +324,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
           $row->format('text/html')->tokens('contact', $token, html_entity_decode($this->getFieldValue($row, $token)));
         }
         else {
-          parent::evaluateToken($row, $this->entity, $token, $row->context['contact']);
+          $this->evaluateToken($row, $this->entity, $token, [$contactID => $contact]);
         }
       }
     }
