@@ -127,12 +127,22 @@ AND    {$this->_componentClause}";
     $template = CRM_Core_Smarty::singleton();
 
     $params = $this->controller->exportValues($this->_name);
-    $elements = self::getElements($this->_contributionIds, $params, $this->_contactIds);
+    $isCreatePDF = FALSE;
+    if (!empty($params['output']) &&
+      ($params['output'] === 'pdf_invoice' || $params['output'] === 'pdf_receipt')
+    ) {
+      $isCreatePDF = TRUE;
+    }
+    $elements = self::getElements($this->_contributionIds, $params, $this->_contactIds, $isCreatePDF);
+    $elementDetails = $elements['details'];
+    $excludedContactIDs = $elements['excludeContactIds'];
+    $suppressedEmails = $elements['suppressedEmails'];
 
-    foreach ($elements['details'] as $contribID => $detail) {
+    unset($elements);
+    foreach ($elementDetails as $contribID => $detail) {
       $input = $ids = [];
 
-      if (in_array($detail['contact'], $elements['excludeContactIds'])) {
+      if (in_array($detail['contact'], $excludedContactIDs)) {
         continue;
       }
       // @todo - CRM_Contribute_BAO_Contribution::sendMail re-does pretty much everything between here & when we call it.
@@ -167,7 +177,7 @@ AND    {$this->_componentClause}";
             1 => [$contribution->trxn_id, 'String'],
           ]);
 
-      if (isset($params['from_email_address']) && !$elements['createPdf']) {
+      if (isset($params['from_email_address']) && !$isCreatePDF) {
         // If a logged in user from email is used rather than a domain wide from email address
         // the from_email_address params key will be numerical and we need to convert it to be
         // in normal from email format
@@ -178,7 +188,7 @@ AND    {$this->_componentClause}";
         $input['receipt_from_name'] = str_replace('"', '', $fromDetails[0]);
       }
 
-      $mail = CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $contribID, $elements['createPdf']);
+      $mail = CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $contribID, $isCreatePDF);
 
       if (!empty($mail['html'])) {
         $message[] = $mail['html'];
@@ -191,17 +201,17 @@ AND    {$this->_componentClause}";
       $template->clearTemplateVars();
     }
 
-    if ($elements['createPdf']) {
+    if ($isCreatePDF) {
       CRM_Utils_PDF_Utils::html2pdf($message,
         'receipt.pdf',
         FALSE,
-        $elements['params']['pdf_format_id']
+        $params['pdf_format_id']
       );
       CRM_Utils_System::civiExit();
     }
     else {
-      if ($elements['suppressedEmails']) {
-        $status = ts('Email was NOT sent to %1 contacts (no email address on file, or communication preferences specify DO NOT EMAIL, or contact is deceased).', [1 => $elements['suppressedEmails']]);
+      if ($suppressedEmails) {
+        $status = ts('Email was NOT sent to %1 contacts (no email address on file, or communication preferences specify DO NOT EMAIL, or contact is deceased).', [1 => $suppressedEmails]);
         $msgTitle = ts('Email Error');
         $msgType = 'error';
       }
@@ -217,39 +227,24 @@ AND    {$this->_componentClause}";
   /**
    * Declaration of common variables for Invoice and PDF.
    *
-   *
    * @param array $contribIds
    *   Contribution Id.
    * @param array $params
    *   Parameter for pdf or email invoices.
    * @param array $contactIds
    *   Contact Id.
+   * @param bool $isCreatePDF
    *
    * @return array
    *   array of common elements
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public static function getElements($contribIds, $params, $contactIds) {
+  public static function getElements(array $contribIds, array $params, array $contactIds, bool $isCreatePDF): array {
     $pdfElements = [];
-
-    $pdfElements['contribIDs'] = implode(',', $contribIds);
-
-    $pdfElements['details'] = self::getDetails($pdfElements['contribIDs']);
-
-    $pdfElements['baseIPN'] = new CRM_Core_Payment_BaseIPN();
-
-    $pdfElements['params'] = $params;
-
-    $pdfElements['createPdf'] = FALSE;
-    if (!empty($pdfElements['params']['output']) &&
-      ($pdfElements['params']['output'] === 'pdf_invoice' || $pdfElements['params']['output'] === 'pdf_receipt')
-    ) {
-      $pdfElements['createPdf'] = TRUE;
-    }
-
+    $pdfElements['details'] = self::getDetails(implode(',', $contribIds));
     $excludeContactIds = [];
-    if (!$pdfElements['createPdf']) {
+    if (!$isCreatePDF) {
       $contactDetails = civicrm_api3('Contact', 'get', [
         'return' => ['email', 'do_not_email', 'is_deceased', 'on_hold'],
         'id' => ['IN' => $contactIds],
