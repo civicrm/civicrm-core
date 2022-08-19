@@ -4,7 +4,6 @@ namespace Civi\Core;
 
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Event\HookStyleListener;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -61,7 +60,7 @@ class CiviEventDispatcher implements CiviEventDispatcherInterface {
    * Constructor
    */
   public function __construct() {
-    $this->dispatcher = new EventDispatcher();
+    $this->dispatcher = new UnoptimizedEventDispatcher();
   }
 
   /**
