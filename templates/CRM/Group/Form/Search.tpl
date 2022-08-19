@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-group-search-form-block">
-  <div class="crm-accordion-wrapper crm-search_builder-accordion {if $rows and empty($showSearchForm)}collapsed{/if}">
+  <div class="crm-accordion-wrapper crm-search_builder-accordion">
     <div class="crm-accordion-header crm-master-accordion-header">
       {ts}Find Groups{/ts}
     </div>
