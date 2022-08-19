@@ -22,7 +22,7 @@
 
     <tr>
       <td>
-        {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
+        {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
         {if $receipt_text}
           <p>{$receipt_text|htmlize}</p>
           <p>{ts}Thank you for this contribution.{/ts}</p>
