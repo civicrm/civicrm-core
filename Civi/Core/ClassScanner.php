@@ -198,6 +198,10 @@ class ClassScanner {
             $classes[] = $class;
           }
         }
+        elseif (!interface_exists($class) && !trait_exists($class)) {
+          // ClassScanner runs during boot (before container is established). At this early stage, PHP's logger is more reliable.
+          error_log("Scanned file {$relFile} for class {$class}, but it was not found.");
+        }
       }
     }
   }
