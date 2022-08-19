@@ -62,10 +62,15 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
    * @param \Civi\Core\Event\PostEvent $e
    */
   public static function on_hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
+    // FIXME: The EventScanner ought to skip over disabled components when registering HookInterface
+    if (!CRM_Core_Component::isEnabled('CiviCase')) {
+      return;
+    }
     if ($e->entity === 'Activity' && in_array($e->action, ['create', 'edit'])) {
-      // If subject contains a ‘[case #…]’ string, file activity on the related case (CRM-5916)
       /** @var CRM_Activity_DAO_Activity $activity */
       $activity = $e->object;
+
+      // If subject contains a ‘[case #…]’ string, file activity on the related case (CRM-5916)
       $matches = [];
       $subjectToMatch = $activity->subject ?? '';
       if (preg_match('/\[case #([0-9a-h]{7})\]/', $subjectToMatch, $matches)) {
@@ -156,6 +161,26 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
 
     $caseActivityDAO->find(TRUE);
     $caseActivityDAO->save();
+  }
+
+  /**
+   * Associate an activity with 0 or more cases.
+   *
+   * @param int $activityId
+   * @param array|int $caseIds
+   */
+  public static function updateCaseActivity(int $activityId, $caseIds): void {
+    $actionName = empty($caseIds) ? 'delete' : 'replace';
+    $action = \Civi\Api4\CaseActivity::$actionName(FALSE)
+      ->addWhere('activity_id', '=', $activityId);
+
+    if (!empty($caseIds)) {
+      foreach ((array) $caseIds as $caseId) {
+        $action->addRecord(['case_id' => $caseId]);
+      }
+    }
+
+    $action->execute();
   }
 
   /**
@@ -308,22 +333,27 @@ WHERE civicrm_case.id = %1";
    * Look up a case using an activity ID.
    *
    * @param int $activityId
+   * @param bool $getSingle
    *
-   * @return int|null, case ID
+   * @return array|int|null
    */
-  public static function getCaseIdByActivityId($activityId) {
+  public static function getCaseIdByActivityId($activityId, $getSingle = TRUE) {
     $originalId = CRM_Core_DAO::singleValueQuery(
       'SELECT original_id FROM civicrm_activity WHERE id = %1',
       ['1' => [$activityId, 'Integer']]
     );
-    $caseId = CRM_Core_DAO::singleValueQuery(
+    $caseIds = [];
+    $query = CRM_Core_DAO::executeQuery(
       'SELECT case_id FROM civicrm_case_activity WHERE activity_id in (%1,%2)',
       [
         '1' => [$activityId, 'Integer'],
-        '2' => [$originalId ? $originalId : $activityId, 'Integer'],
+        '2' => [$originalId ?: $activityId, 'Integer'],
       ]
     );
-    return $caseId;
+    while ($query->fetch()) {
+      $caseIds[] = $query->case_id;
+    }
+    return $getSingle ? CRM_Utils_Array::first($caseIds) : $caseIds;
   }
 
   /**
@@ -1404,15 +1434,6 @@ HERESQL;
 
     if (!empty($recordedActivityParams)) {
       $activity = CRM_Activity_BAO_Activity::create($recordedActivityParams);
-
-      //create case_activity record if its case activity.
-      if ($caseId) {
-        $caseParams = [
-          'activity_id' => $activity->id,
-          'case_id' => $caseId,
-        ];
-        self::processCaseActivity($caseParams);
-      }
     }
 
     return $result;

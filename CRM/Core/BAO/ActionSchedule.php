@@ -464,17 +464,10 @@ FROM civicrm_action_schedule cas
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Completed'),
       'activity_type_id' => $activityTypeID,
       'source_record_id' => $entityID,
+      'case_id' => $caseID,
     ];
     // @todo use api, remove all the above wrangling
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
-
-    //file reminder on case if source activity is a case activity
-    if (!empty($caseID)) {
-      $caseActivityParams = [];
-      $caseActivityParams['case_id'] = $caseID;
-      $caseActivityParams['activity_id'] = $activity->id;
-      CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);
-    }
   }
 
   /**

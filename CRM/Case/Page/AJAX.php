@@ -65,16 +65,9 @@ class CRM_Case_Page_AJAX {
     $activityParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed');
     $activityParams['case_id'] = $caseId;
     $activityParams['is_auto'] = 0;
-    $activityParams['subject'] = 'Change Case Tags';
+    $activityParams['subject'] = ts('Change Case Tags');
 
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
-
-    $caseParams = [
-      'activity_id' => $activity->id,
-      'case_id' => $caseId,
-    ];
-
-    CRM_Case_BAO_Case::processCaseActivity($caseParams);
 
     echo 'true';
     CRM_Utils_System::civiExit();
@@ -138,16 +131,9 @@ class CRM_Case_Page_AJAX {
     $activityParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed');
     $activityParams['case_id'] = $caseId;
     $activityParams['is_auto'] = 0;
-    $activityParams['subject'] = 'Client Added To Case';
+    $activityParams['subject'] = ts('Client Added To Case');
 
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
-
-    $caseParams = [
-      'activity_id' => $activity->id,
-      'case_id' => $caseId,
-    ];
-
-    CRM_Case_BAO_Case::processCaseActivity($caseParams);
     CRM_Utils_JSON::output(TRUE);
   }
 
