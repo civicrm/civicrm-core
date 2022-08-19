@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Contact;
 use Civi\Api4\Email;
 
 /**
@@ -207,6 +208,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    *   Associated array of submitted values.
    * @param array $contactIds
    *   Contact Id.
+   *
+   * @throws \API_Exception
    */
   public static function printPDF($contribIDs, &$params, $contactIds) {
     // get all the details needed to generate a invoice
@@ -227,40 +230,17 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         continue;
       }
 
-      $input['component'] = $detail['component'];
-
-      $ids['contact'] = $detail['contact'];
-      $ids['contribution'] = $contributionID;
-      $ids['contributionRecur'] = NULL;
-      $ids['contributionPage'] = NULL;
-      $ids['membership'] = $detail['membership'] ?? NULL;
-      $ids['participant'] = $detail['participant'] ?? NULL;
-      $ids['event'] = $detail['event'] ?? NULL;
+      $component = $detail['component'];
+      $eventID = $detail['event'] ?? NULL;
 
       $contribution = new CRM_Contribute_BAO_Contribution();
       $contribution->id = $contributionID;
       $contribution->find(TRUE);
-      // @todo this is only used now to load the event title, it causes an enotice
-      // and calls deprecated code. If we decide a contribution title is a
-      // 'real thing' then we should create a token.
-      $ids = array_merge(CRM_Contribute_BAO_Contribution::getComponentDetails($contributionID), $ids);
-
-      if (empty($contribution->_component)) {
-        if (!empty($ids['event'])) {
-          $contribution->_component = 'event';
-        }
-        else {
-          $contribution->_component = strtolower(CRM_Utils_Array::value('component', $input, 'contribute'));
-        }
-      }
-
-      $contribution->loadRelatedObjects($input, $ids);
 
       $input['amount'] = $contribution->total_amount;
       $input['invoice_id'] = $contribution->invoice_id;
       $input['receive_date'] = $contribution->receive_date;
       $input['contribution_status_id'] = $contribution->contribution_status_id;
-      $input['organization_name'] = $contribution->_relatedObjects['contact']->organization_name;
 
       // Fetch the billing address. getValues should prioritize the billing
       // address, otherwise will return the primary address.
@@ -309,22 +289,22 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       // to email the invoice
       $mailDetails = [];
       $values = [];
-      if ($contribution->_component == 'event') {
+      if ($component === 'event') {
         $daoName = 'CRM_Event_DAO_Event';
-        $pageId = $contribution->_relatedObjects['event']->id;
+        $pageId = $eventID;
         $mailElements = [
           'title',
           'confirm_from_name',
           'confirm_from_email',
         ];
         CRM_Core_DAO::commonRetrieveAll($daoName, 'id', $pageId, $mailDetails, $mailElements);
-        $values['title'] = $mailDetails[$contribution->_relatedObjects['event']->id]['title'] ?? NULL;
-        $values['confirm_from_name'] = $mailDetails[$contribution->_relatedObjects['event']->id]['confirm_from_name'] ?? NULL;
-        $values['confirm_from_email'] = $mailDetails[$contribution->_relatedObjects['event']->id]['confirm_from_email'] ?? NULL;
+        $values['title'] = $mailDetails[$eventID]['title'] ?? NULL;
+        $values['confirm_from_name'] = $mailDetails[$eventID]['confirm_from_name'] ?? NULL;
+        $values['confirm_from_email'] = $mailDetails[$eventID]['confirm_from_email'] ?? NULL;
 
-        $title = $mailDetails[$contribution->_relatedObjects['event']->id]['title'] ?? NULL;
+        $title = $mailDetails[$eventID]['title'] ?? NULL;
       }
-      elseif ($contribution->_component == 'contribute') {
+      elseif ($component === 'contribute') {
         $daoName = 'CRM_Contribute_DAO_ContributionPage';
         $pageId = $contribution->contribution_page_id;
         $mailElements = [
@@ -375,7 +355,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         // @todo is a 'title' a real thing - is so, it should be token.
         'title' => $title,
         // @todo used in the subject but analysis of ^^ would remove
-        'component' => $input['component'],
+        'component' => $component,
         // @todo not used in shipped template for a very long time, if ever, remove
         // token is available.
         'id' => $contribution->id,
@@ -394,7 +374,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'invoice_date' => $invoiceDate,
         'dueDate' => $dueDate,
         'notes' => $invoiceNotes,
+        // @todo not used in shipped template from 5.53
         'lineItem' => $lineItem,
+        // @todo not used in shipped template from 5.53
         'dataArray' => $dataArray,
         // @todo not used in shipped template from 5.52
         'refundedStatusId' => $refundedStatusId,
@@ -419,10 +401,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         // Kept for backwards compatibility
         'stateProvinceAbbreviation' => $billingAddress['state_province_abbreviation'] ?? NULL,
         'country' => $billingAddress['country'] ?? NULL,
-        // @todo not used in shipped template from 5.52
-        'is_pay_later' => $contribution->is_pay_later,
         // @todo not used in shipped template from 5.52 - from here down
-        'organization_name' => $contribution->_relatedObjects['contact']->organization_name,
+        'is_pay_later' => $contribution->is_pay_later,
+        'organization_name' => Contact::get(FALSE)->addSelect('organization_name')->addWhere('id', '=', (int) $contribution->contact_id)->execute()->first()['organization_name'],
         'domain_organization' => $domain->name,
         'domain_street_address' => CRM_Utils_Array::value('street_address', CRM_Utils_Array::value('1', $locationDefaults['address'])),
         'domain_supplemental_address_1' => CRM_Utils_Array::value('supplemental_address_1', CRM_Utils_Array::value('1', $locationDefaults['address'])),
@@ -499,7 +480,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
           }
         }
       }
-      elseif ($contribution->_component == 'contribute') {
+      elseif ($component === 'contribute') {
         $email = CRM_Contact_BAO_Contact::getPrimaryEmail($contribution->contact_id);
 
         $sendTemplateParams['tplParams'] = array_merge($tplParams, ['email_comment' => $invoiceElements['params']['email_comment']]);
@@ -514,7 +495,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $fileName = self::putFile($html, $pdfFileName, $pdfFormat);
         self::addActivities($subject, $contribution->contact_id, $fileName, $params, $contribution->id);
       }
-      elseif ($contribution->_component == 'event') {
+      elseif ($component == 'event') {
         $email = CRM_Contact_BAO_Contact::getPrimaryEmail($contribution->contact_id);
 
         $sendTemplateParams['tplParams'] = array_merge($tplParams, ['email_comment' => $invoiceElements['params']['email_comment']]);
