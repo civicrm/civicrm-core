@@ -57,7 +57,13 @@ class AfformSearchMetadataInjector {
                 // Add entity names to the fieldset so that afform can populate field metadata
                 $fieldset = pq($component)->parents('[af-fieldset]');
                 if ($fieldset->length) {
-                  $entityList = array_merge([$display['saved_search_id.api_entity']], array_column($display['saved_search_id.api_params']['join'] ?? [], 0));
+                  $entityList = [$display['saved_search_id.api_entity']];
+                  foreach ($display['saved_search_id.api_params']['join'] ?? [] as $join) {
+                    $entityList[] = $join[0];
+                    if (is_string($join[2] ?? NULL)) {
+                      $entityList[] = $join[2] . ' AS ' . (explode(' AS ', $join[0])[1]);
+                    }
+                  }
                   $fieldset->attr('api-entities', htmlspecialchars(\CRM_Utils_JS::encode($entityList)));
                 }
               }
