@@ -8,7 +8,7 @@
 
 {ts}You have been added to the WAIT LIST for this event.{/ts}
 
-{if !empty($isPrimary)}
+{if '{participant.id}' === '{participant.registered_by_id}'}
 {ts}If space becomes available you will receive an email with a link to a web page where you can complete your registration.{/ts}
 
 {/if}
@@ -19,7 +19,7 @@
 
 {ts}Your registration has been submitted.{/ts}
 
-{if !empty($isPrimary)}
+{if '{participant.id}' === '{participant.registered_by_id}'}
 {ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}
 
 {/if}
@@ -93,7 +93,7 @@
 {if !empty($lineItem)}{foreach from=$lineItem item=value key=priceset}
 
 {if $value neq 'skip'}
-{if !empty($isPrimary)}
+{if '{participant.id}' === '{participant.registered_by_id}'}
 {if $lineItem|@count GT 1} {* Header for multi participant registration cases. *}
 {ts 1=$priceset+1}Participant %1{/ts}
 {/if}
@@ -143,7 +143,7 @@
 {if $totalTaxAmount}
 {ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}
 {/if}
-{if !empty($isPrimary)}
+{if '{participant.id}' === '{participant.registered_by_id}'}
 
 {if !empty($balanceAmount)}{ts}Total Paid{/ts}{else}{ts}Total Amount{/ts}{/if}: {if !empty($totalAmount)}{$totalAmount|crmMoney}{/if} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
 

@@ -1419,6 +1419,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         }
 
         $this->assign('totalAmount', $params['total_amount'] ?? $contributionParams['total_amount']);
+        // @todo - phase this assign out - removed from shipped template 5.54
         $this->assign('isPrimary', 1);
         $this->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
       }

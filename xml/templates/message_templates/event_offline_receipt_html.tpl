@@ -28,12 +28,12 @@
 
     {if !empty($isOnWaitlist)}
      <p>{ts}You have been added to the WAIT LIST for this event.{/ts}</p>
-     {if !empty($isPrimary)}
+     {if '{participant.id}' === '{participant.registered_by_id}'}
        <p>{ts}If space becomes available you will receive an email with a link to a web page where you can complete your registration.{/ts}</p>
      {/if}
     {elseif !empty($isRequireApproval)}
      <p>{ts}Your registration has been submitted.{/ts}</p>
-     {if !empty($isPrimary)}
+     {if '{participant.id}' === '{participant.registered_by_id}'}
       <p>{ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}</p>
      {/if}
     {elseif $is_pay_later}
@@ -152,7 +152,7 @@
       {if !empty($lineItem)}
        {foreach from=$lineItem item=value key=priceset}
         {if $value neq 'skip'}
-         {if !empty($isPrimary)}
+         {if '{participant.id}' === '{participant.registered_by_id}'}
           {if $lineItem|@count GT 1} {* Header for multi participant registration cases. *}
            <tr>
             <td colspan="2" {$labelStyle}>
@@ -262,7 +262,7 @@
         </td>
        </tr>
       {/if}
-      {if !empty($isPrimary)}
+      {if '{participant.id}' === '{participant.registered_by_id}'}
        <tr>
         <td {$labelStyle}>
         {if isset($balanceAmount)}

@@ -398,13 +398,13 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       ];
 
       $sendTemplateParams = [
-        'groupName' => 'msg_tpl_workflow_event',
         'workflow' => 'event_online_receipt',
         'contactId' => $participantDetails[$participant->id]['contact_id'],
         'tplParams' => $tplParams,
         'from' => $receiptFrom,
         'toName' => $participantName,
         'toEmail' => $toEmail,
+        'tokenContext' => ['contactId' => $participantDetails[$participant->id]['contact_id'], 'participantId' => $participant->id],
         'cc' => $eventDetails['cc_confirm'] ?? NULL,
         'bcc' => $eventDetails['bcc_confirm'] ?? NULL,
       ];

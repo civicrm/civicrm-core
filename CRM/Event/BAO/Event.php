@@ -1189,11 +1189,10 @@ WHERE civicrm_event.is_active = 1
         }
 
         $sendTemplateParams = [
-          'groupName' => 'msg_tpl_workflow_event',
           'workflow' => 'event_online_receipt',
-          'contactId' => $contactID,
           'isTest' => $isTest,
           'tplParams' => $tplParams,
+          'tokenContext' => ['contactId' => $contactID, 'participantId' => $participantId],
           'PDFFilename' => ts('confirmation') . '.pdf',
         ];
 
