@@ -86,7 +86,7 @@ class Locale {
    * @var string
    * @readonly
    */
-  public $nominal;
+  public $nominal = '';
 
   /**
    * Locale used for `ts()` and `l10n/**.mo` lookups.
