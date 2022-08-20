@@ -21,7 +21,7 @@
  */
 class CRM_Upgrade_Incremental_php_FiveFiftyFour extends CRM_Upgrade_Incremental_Base {
 
-  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL): void {
     parent::setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
     if ($rev === '5.54.alpha1') {
       if (\Civi::settings()->get('civicaseActivityRevisions')) {
@@ -45,6 +45,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyFour extends CRM_Upgrade_Incremental_
     $this->addTask('Add index civicrm_dedupe_rule_group.UI_name', 'addIndex', 'civicrm_dedupe_rule_group', 'name', 'UI');
     $this->addTask('Install Elavon Payment Processor Extension as needed', 'installElavonPaymentProcessorExtension');
     $this->addTask('Convert field names for contribution import saved mappings', 'updateContributionMappings');
+    $this->addTask('Make colummn_number optional in civicrm_mapping_field', 'updateMappingFieldTable');
   }
 
   public static function addCreatedIDColumnToParticipant($ctx): bool {
@@ -70,7 +71,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyFour extends CRM_Upgrade_Incremental_
    * @param CRM_Queue_TaskContext $ctx
    * @return bool
    */
-  public static function installElavonPaymentProcessorExtension(CRM_Queue_TaskContext $ctx) {
+  public static function installElavonPaymentProcessorExtension(CRM_Queue_TaskContext $ctx): bool {
     $paymentProcessors = CRM_Core_DAO::singleValueQuery("SELECT count(cpp.id) FROM civicrm_payment_processor cpp
       INNER JOIN civicrm_payment_processor_type cppt ON cppt.id = cpp.payment_processor_type_id
       WHERE cppt.name = 'Elavon'");
@@ -186,7 +187,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyFour extends CRM_Upgrade_Incremental_
       'country_id' => 'address_primary.country_id',
     ];
     $customFields = CRM_Core_DAO::executeQuery('
-      SELECT custom_field.id, custom_field.name, custom_group.name as custom_group_name
+      SELECT custom_field.id, custom_field.name, custom_group.name AS custom_group_name
       FROM civicrm_custom_field custom_field INNER JOIN civicrm_custom_group custom_group
       ON custom_field.custom_group_id = custom_group.id
       WHERE extends IN ("Contact", "Individual", "Organization", "Household")
@@ -203,6 +204,23 @@ class CRM_Upgrade_Incremental_php_FiveFiftyFour extends CRM_Upgrade_Incremental_
         ]);
       }
     }
+    return TRUE;
+  }
+
+  /**
+   * Alter civicrm_mapping_field to support defaults.
+   *
+   * This allows NULL columns that don't map to csv rows and adjusts the field
+   * description on value.
+   *
+   * @return bool
+   */
+  public static function updateMappingFieldTable(): bool {
+    CRM_Core_DAO::executeQuery("
+      ALTER TABLE civicrm_mapping_field
+        MODIFY COLUMN `column_number` int(10) unsigned DEFAULT NULL COMMENT 'Column number for mapping set',
+        MODIFY COLUMN `value` varchar(255) DEFAULT NULL COMMENT 'SQL WHERE value for search-builder mapping fields or import mapping default.'
+    ");
     return TRUE;
   }
 

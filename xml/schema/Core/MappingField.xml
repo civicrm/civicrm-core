@@ -63,7 +63,6 @@
     <name>column_number</name>
     <title>Column Number to map to</title>
     <type>int unsigned</type>
-    <required>true</required>
     <comment>Column number for mapping set</comment>
     <add>1.2</add>
   </field>
@@ -170,10 +169,10 @@
   </field>
   <field>
     <name>value</name>
-    <title>Search builder where clause</title>
+    <title>Search builder where clause or import mapping default</title>
     <type>varchar</type>
     <length>255</length>
-    <comment>SQL WHERE value for search-builder mapping fields.</comment>
+    <comment>SQL WHERE value for search-builder mapping fields or import mapping default.</comment>
     <add>1.5</add>
   </field>
 </table>
