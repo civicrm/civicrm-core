@@ -1,7 +1,7 @@
 ===========================================================
-{ts}Activity Summary{/ts} - {$activityTypeName}
+{ts}Activity Summary{/ts} - {activity.activity_type_id:label}
 ===========================================================
-{if !empty($isCaseActivity)}
+{if '{activity.case_id}'}
 {ts}Your Case Role(s){/ts} : {$contact.role|default:''}
 {if !empty($manageCaseURL)}
 {ts}Manage Case{/ts} : {$manageCaseURL}

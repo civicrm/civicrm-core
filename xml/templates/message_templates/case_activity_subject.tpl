@@ -1,1 +1,1 @@
-{if !empty($idHash)}[case #{$idHash}]{/if} {$activitySubject}
+{if !empty($idHash)}[case #{$idHash}]{/if} {activity.subject}
