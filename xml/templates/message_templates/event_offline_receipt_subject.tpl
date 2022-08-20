@@ -1,1 +1,1 @@
-{ts}Event Confirmation{/ts} - {$event.title} - {contact.display_name}
+{ts}Event Confirmation{/ts} - {event.title} - {contact.display_name}

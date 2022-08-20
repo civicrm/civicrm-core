@@ -82,7 +82,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    *
    * @dataProvider getThousandSeparators
    */
-  public function testPaidSubmit($thousandSeparator) {
+  public function testPaidSubmit(string $thousandSeparator): void {
     // @todo - figure out why this doesn't pass validate financials
     $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->setCurrencySeparators($thousandSeparator);
