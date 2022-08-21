@@ -30,8 +30,6 @@
   </div>
   <!-- crm-accordion-wrapper -->
   <div id="custom_group_{$group_id}_{$cgCount}"></div>
-  {/foreach}
+{/foreach}
 
-  {include file="CRM/common/customData.tpl"}
-
-  {include file="CRM/Form/attachmentjs.tpl"}
+{include file="CRM/Form/attachmentjs.tpl"}
