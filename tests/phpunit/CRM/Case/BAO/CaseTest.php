@@ -366,25 +366,23 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $caseObj_2 = $this->createCase($client_id_2, $loggedInUser);
     $case_id_2 = $caseObj_2->id;
 
-    // Create link case activity. We could go thru the whole form processes
-    // but we really just want to test the BAO function so just need the
-    // activity to exist.
-    $result = $this->callAPISuccess('activity', 'create', [
-      'activity_type_id' => 'Link Cases',
-      'subject' => 'Test Link Cases',
-      'status_id' => 'Completed',
+    $form = $this->getFormObject('CRM_Case_Form_Activity', [
+      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Link Cases'),
+      'link_to_case_id' => $case_id_2,
+      'caseid' => $case_id_1,
       'source_contact_id' => $loggedInUser,
       'target_contact_id' => $client_id_1,
-      'case_id' => $case_id_1,
+      'cid' => $client_id_1,
+      'activity_date_time' => date('Y-m-d H:i:s'),
+      // note the subject gets set in javascript when you select the other case
+      // so it would be a little difficult here to test the subject is correct
+      'subject' => '',
     ]);
-
-    // Put it in the format needed for endPostProcess
-    $activity = new StdClass();
-    $activity->id = $result['id'];
-    $params = [
-      'link_to_case_id' => $case_id_2,
-    ];
-    CRM_Case_Form_Activity_LinkCases::endPostProcess(NULL, $params, $activity);
+    $form->set('caseid', $case_id_1);
+    $form->set('cid', $client_id_1);
+    $form->set('atype', CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Link Cases'));
+    $form->buildForm();
+    $form->postProcess();
 
     // Get related cases for case 1
     $cases = CRM_Case_BAO_Case::getRelatedCases($case_id_1);
