@@ -103,12 +103,7 @@
           </td>
         </tr>
         <tr>
-            <td>{$form.is_opt_out.html} {$form.is_opt_out.label} {help id="id-optOut" file="CRM/Contact/Form/Contact.hlp"}</td>
-            {if !empty($form.preferred_mail_format)}
-                <td>{$form.preferred_mail_format.label} &nbsp;
-                    {$form.preferred_mail_format.html} {help id="id-emailFormat" file="CRM/Contact/Form/Contact.hlp"}
-                </td>
-            {/if}
+          <td>{$form.is_opt_out.html} {$form.is_opt_out.label} {help id="id-optOut" file="CRM/Contact/Form/Contact.hlp"}</td>
         </tr>
     </table>
  </div><!-- /.crm-accordion-body -->
