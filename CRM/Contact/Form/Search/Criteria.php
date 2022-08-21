@@ -315,7 +315,11 @@ class CRM_Contact_Form_Search_Criteria {
     foreach (self::getFilteredSearchFieldMetadata('basic') as $fieldName => $field) {
       $searchFields[$fieldName] = $field;
     }
-    $form->assign('basicSearchFields', array_merge(self::getBasicSearchFields(), $searchFields));
+    $fields = array_merge(self::getBasicSearchFields(), $searchFields);
+    foreach ($fields as $index => $field) {
+      $fields[$index] = array_merge(['class' => '', 'is_custom' => FALSE, 'template' => '', 'help' => '', 'description' => ''], $field);
+    }
+    $form->assign('basicSearchFields', $fields);
   }
 
   /**
