@@ -137,10 +137,10 @@
     <div id="customFields">
       <div class="contact_panel">
         <div class="contactCardLeft">
-          {include file="CRM/Contact/Page/View/CustomDataView.tpl" side='1'}
+          {include file="CRM/Contact/Page/View/CustomDataView.tpl" side='1' skipTitle=false}
         </div><!--contactCardLeft-->
         <div class="contactCardRight">
-          {include file="CRM/Contact/Page/View/CustomDataView.tpl" side='0'}
+          {include file="CRM/Contact/Page/View/CustomDataView.tpl" side='0' skipTitle=false}
         </div>
 
         <div class="clear"></div>
