@@ -371,6 +371,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $this->assign('customValueCount', $this->_customValueCount);
       }
     }
+    $this->addExpectedSmartyVariable('isDuplicate');
     $this->assign('paramSubType', $paramSubType ?? '');
   }
 
@@ -570,6 +571,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    *
    * @return bool
    *   email/openId
+   * @throws \CRM_Core_Exception
    */
   public static function formRule($fields, &$errors, $contactId, $contactType) {
     $config = CRM_Core_Config::singleton();
@@ -706,7 +708,12 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     // Check for duplicate contact if it wasn't already handled by ajax or disabled
     if (!Civi::settings()->get('contact_ajax_check_similar') || !empty($fields['_qf_Contact_refresh_dedupe'])) {
-      self::checkDuplicateContacts($fields, $errors, $contactId, $contactType);
+      $duplicateError = self::checkDuplicateContacts($fields, $contactId, $contactType);
+      if ($duplicateError) {
+        $errors['_qf_default'] = $duplicateError;
+        // let smarty know that there are duplicates
+        CRM_Core_Smarty::singleton()->assign('isDuplicate', TRUE);
+      }
     }
 
     return $primaryID;
@@ -1128,13 +1135,16 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    *
    * @param array $fields
    *   Fields array which are submitted.
-   * @param array $errors
    * @param int $contactID
    *   Contact id.
    * @param string $contactType
    *   Contact type.
+   *
+   * @return string|null
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function checkDuplicateContacts(&$fields, &$errors, $contactID, $contactType) {
+  private static function checkDuplicateContacts(array $fields, int $contactID, string $contactType): ?string {
     // if this is a forced save, ignore find duplicate rule
     if (empty($fields['_qf_Contact_upload_duplicate'])) {
 
@@ -1148,7 +1158,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           'count' => count($contactLinks['rows']),
           'plural' => '%count matching contacts were found.<br />',
         ]);
-        if ($contactLinks['msg'] == 'view') {
+        if ($contactLinks['msg'] === 'view') {
           $duplicateContactsLinks .= ts('You can View the existing contact', [
             'count' => count($contactLinks['rows']),
             'plural' => 'You can View the existing contacts',
@@ -1160,7 +1170,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
             'plural' => 'You can View or Edit the existing contacts',
           ]);
         }
-        if ($contactLinks['msg'] == 'merge') {
+        if ($contactLinks['msg'] === 'merge') {
           // We should also get a merge link if this is for an existing contact
           $duplicateContactsLinks .= ts(', or Merge this contact with an existing contact');
         }
@@ -1168,36 +1178,32 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $duplicateContactsLinks .= '</div>';
         $duplicateContactsLinks .= '<table class="matching-contacts-actions">';
         $row = '';
-        for ($i = 0; $i < count($contactLinks['rows']); $i++) {
+        foreach ($contactLinks['rows'] as $iValue) {
           $row .= '  <tr>   ';
           $row .= '    <td class="matching-contacts-name"> ';
-          $row .= CRM_Utils_Array::value('display_name', $contactLinks['rows'][$i]);
+          $row .= CRM_Utils_Array::value('display_name', $iValue);
           $row .= '    </td>';
           $row .= '    <td class="matching-contacts-email"> ';
-          $row .= CRM_Utils_Array::value('primary_email', $contactLinks['rows'][$i]);
+          $row .= CRM_Utils_Array::value('primary_email', $iValue);
           $row .= '    </td>';
           $row .= '    <td class="action-items"> ';
-          $row .= CRM_Utils_Array::value('view', $contactLinks['rows'][$i]);
-          $row .= CRM_Utils_Array::value('edit', $contactLinks['rows'][$i]);
-          $row .= CRM_Utils_Array::value('merge', $contactLinks['rows'][$i]);
+          $row .= CRM_Utils_Array::value('view', $iValue);
+          $row .= CRM_Utils_Array::value('edit', $iValue);
+          $row .= CRM_Utils_Array::value('merge', $iValue);
           $row .= '    </td>';
           $row .= '  </tr>   ';
         }
 
         $duplicateContactsLinks .= $row . '</table>';
         $duplicateContactsLinks .= ts("If you're sure this record is not a duplicate, click the 'Save Matching Contact' button below.");
-
-        $errors['_qf_default'] = $duplicateContactsLinks;
-
-        // let smarty know that there are duplicates
-        $template = CRM_Core_Smarty::singleton();
-        $template->assign('isDuplicate', 1);
+        return $duplicateContactsLinks;
       }
-      elseif (!empty($fields['_qf_Contact_refresh_dedupe'])) {
+      if (!empty($fields['_qf_Contact_refresh_dedupe'])) {
         // add a session message for no matching contacts
         CRM_Core_Session::setStatus(ts('No matching contact found.'), ts('None Found'), 'info');
       }
     }
+    return NULL;
   }
 
   /**
