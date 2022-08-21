@@ -336,9 +336,11 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
   /**
    * Test that ACLs are applied to group.get calls.
-   * FIXME: Api4
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGroupGetACLs() {
+  public function testGroupGetACLs($version) {
+    $this->_apiversion = $version;
     $this->createLoggedInUser();
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
     $this->callAPISuccessGetCount('Group', ['check_permissions' => 1], 0);

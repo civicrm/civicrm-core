@@ -63,9 +63,6 @@ function civicrm_api3_group_get($params) {
 
   $groups = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Group');
   foreach ($groups as $id => $group) {
-    if (!empty($params['check_permissions']) && !CRM_Contact_BAO_Group::checkPermission($group['id'])) {
-      unset($groups[$id]);
-    }
     if (!empty($options['return']) && in_array('member_count', $options['return'])) {
       $groups[$id]['member_count'] = CRM_Contact_BAO_Group::memberCount($id);
     }
