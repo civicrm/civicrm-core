@@ -445,9 +445,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
               return;
             }
 
-            // process pledge payment assoc w/ the contribution
-            $this->processPledgePayments($formatted);
-            $this->setImportStatus($rowNumber, $this->getStatus(self::PLEDGE_PAYMENT));
+            $this->setImportStatus($rowNumber, $this->processPledgePayments($formatted) ? $this->getStatus(self::PLEDGE_PAYMENT) : $this->getStatus(self::VALID), '', $newContribution['id']);
             return;
           }
           $labels = [
@@ -494,12 +492,11 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
           //return soft valid since we need to show how soft credits were added
           if (!empty($formatted['soft_credit'])) {
-            $this->setImportStatus($rowNumber, $this->getStatus(self::SOFT_CREDIT));
+            $this->setImportStatus($rowNumber, $this->getStatus(self::SOFT_CREDIT), '', $newContribution['id']);
             return;
           }
 
-          $this->processPledgePayments($formatted);
-          $this->setImportStatus($rowNumber, $this->getStatus(self::PLEDGE_PAYMENT));
+          $this->setImportStatus($rowNumber, $this->processPledgePayments($formatted) ? $this->getStatus(self::PLEDGE_PAYMENT) : $this->getStatus(self::VALID), '', $newContribution['id']);
           return;
         }
 
@@ -560,13 +557,12 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
       //return soft valid since we need to show how soft credits were added
       if (!empty($formatted['soft_credit'])) {
-        $this->setImportStatus($rowNumber, $this->getStatus(self::SOFT_CREDIT), '');
+        $this->setImportStatus($rowNumber, $this->getStatus(self::SOFT_CREDIT), '', $newContribution['id']);
         return;
       }
 
       // process pledge payment assoc w/ the contribution
-      $this->processPledgePayments($formatted);
-      $this->setImportStatus($rowNumber, $this->getStatus(self::PLEDGE_PAYMENT));
+      $this->setImportStatus($rowNumber, $this->processPledgePayments($formatted) ? $this->getStatus(self::PLEDGE_PAYMENT) : $this->getStatus(self::VALID), $newContribution['id']);
       return;
 
     }
@@ -598,8 +594,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * Process pledge payments.
    *
    * @param array $formatted
+   *
+   * @return bool
    */
-  private function processPledgePayments(array $formatted) {
+  private function processPledgePayments(array $formatted): bool {
     if (!empty($formatted['pledge_payment_id']) && !empty($formatted['pledge_id'])) {
       //get completed status
       $completeStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
@@ -615,7 +613,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         NULL,
         $formatted['total_amount']
       );
+      return TRUE;
     }
+    return FALSE;
   }
 
   /**
