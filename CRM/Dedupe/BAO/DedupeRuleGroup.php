@@ -59,7 +59,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    * @return array
    *   a table-keyed array of field-keyed arrays holding supported fields' titles
    */
-  public static function supportedFields($requestedType) {
+  public static function supportedFields($requestedType): array {
     if (!isset(Civi::$statics[__CLASS__]['supportedFields'])) {
       // this is needed, as we're piggy-backing importableFields() below
       $replacements = [

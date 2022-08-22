@@ -262,39 +262,37 @@ class CRM_Dedupe_Finder {
     }
 
     $params = [];
-    $supportedFields = CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields($ctype);
-    if (is_array($supportedFields)) {
-      foreach ($supportedFields as $table => $fields) {
-        if ($table === 'civicrm_address') {
-          // for matching on civicrm_address fields, we also need the location_type_id
-          $fields['location_type_id'] = '';
-          // FIXME: we also need to do some hacking for id and name fields, see CRM-3902’s comments
-          $fixes = [
-            'address_name' => 'name',
-            'country' => 'country_id',
-            'state_province' => 'state_province_id',
-            'county' => 'county_id',
-          ];
-          foreach ($fixes as $orig => $target) {
-            if (!empty($flat[$orig])) {
-              $params[$table][$target] = $flat[$orig];
-            }
+
+    foreach (CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields($ctype) as $table => $fields) {
+      if ($table === 'civicrm_address') {
+        // for matching on civicrm_address fields, we also need the location_type_id
+        $fields['location_type_id'] = '';
+        // FIXME: we also need to do some hacking for id and name fields, see CRM-3902’s comments
+        $fixes = [
+          'address_name' => 'name',
+          'country' => 'country_id',
+          'state_province' => 'state_province_id',
+          'county' => 'county_id',
+        ];
+        foreach ($fixes as $orig => $target) {
+          if (!empty($flat[$orig])) {
+            $params[$table][$target] = $flat[$orig];
           }
         }
-        if ($table === 'civicrm_phone') {
-          $fixes = [
-            'phone' => 'phone_numeric',
-          ];
-          foreach ($fixes as $orig => $target) {
-            if (!empty($flat[$orig])) {
-              $params[$table][$target] = $flat[$orig];
-            }
+      }
+      if ($table === 'civicrm_phone') {
+        $fixes = [
+          'phone' => 'phone_numeric',
+        ];
+        foreach ($fixes as $orig => $target) {
+          if (!empty($flat[$orig])) {
+            $params[$table][$target] = $flat[$orig];
           }
         }
-        foreach ($fields as $field => $title) {
-          if (!empty($flat[$field])) {
-            $params[$table][$field] = $flat[$field];
-          }
+      }
+      foreach ($fields as $field => $title) {
+        if (!empty($flat[$field])) {
+          $params[$table][$field] = $flat[$field];
         }
       }
     }
