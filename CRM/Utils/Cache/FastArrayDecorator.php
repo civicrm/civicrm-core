@@ -119,7 +119,17 @@ class CRM_Utils_Cache_FastArrayDecorator implements CRM_Utils_Cache_Interface {
     if (array_key_exists($key, $this->values)) {
       return TRUE;
     }
-    return $this->delegate->has($key);
+    // Doing a get here populates `$this->values`. If the calling
+    // code does a `has()` followed by a `get` we want only one
+    // look-up so do that lookup on the first request.
+    // (The only real reason to do `has` & then `get` is it is
+    // less ambiguous for false & empty values)
+    // `$this->delegate->has($key)` here then an extra
+    // lookup will be needed if we do `has` followed by `get`.
+    // Reducing `get` calls to the underlying cache has significant
+    // speed improvement (see https://github.com/civicrm/civicrm-core/pull/24156)
+    $this->get($key);
+    return array_key_exists($key, $this->values);
   }
 
 }
