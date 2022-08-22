@@ -214,8 +214,19 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   public static function printPDF($contribIDs, &$params, $contactIds) {
     // get all the details needed to generate a invoice
     $messageInvoice = [];
+    $isCreatePDF = FALSE;
+    if (!empty($params['output']) &&
+      ($params['output'] === 'pdf_invoice' || $params['output'] === 'pdf_receipt')
+    ) {
+      $isCreatePDF = TRUE;
+    }
+
     $invoiceTemplate = CRM_Core_Smarty::singleton();
-    $invoiceElements = CRM_Contribute_Form_Task_PDF::getElements($contribIDs, $params, $contactIds);
+    $invoiceElements = CRM_Contribute_Form_Task_PDF::getElements($contribIDs, $params, $contactIds, $isCreatePDF);
+    $elementDetails = $invoiceElements['details'];
+    $excludedContactIDs = $invoiceElements['excludeContactIds'];
+    $suppressedEmails = $isCreatePDF ? NULL : $invoiceElements['suppressedEmails'];
+    unset($invoiceElements);
 
     // gives the status id when contribution status is 'Refunded'
     $contributionStatusID = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -224,9 +235,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $pendingStatusId = CRM_Utils_Array::key('Pending', $contributionStatusID);
     $pdfFormat = CRM_Core_BAO_PdfFormat::getByName('default_invoice_pdf_format');
 
-    foreach ($invoiceElements['details'] as $contributionID => $detail) {
+    foreach ($elementDetails as $contributionID => $detail) {
       $input = $ids = [];
-      if (in_array($detail['contact'], $invoiceElements['excludeContactIds'])) {
+      if (in_array($detail['contact'], $excludedContactIDs)) {
         continue;
       }
 
@@ -461,7 +472,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       }
 
       // condition to check for download PDF Invoice or email Invoice
-      if ($invoiceElements['createPdf']) {
+      if ($isCreatePDF) {
         [$sent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         if (isset($params['forPage'])) {
           return $html;
@@ -483,7 +494,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       elseif ($component === 'contribute') {
         $email = CRM_Contact_BAO_Contact::getPrimaryEmail($contribution->contact_id);
 
-        $sendTemplateParams['tplParams'] = array_merge($tplParams, ['email_comment' => $invoiceElements['params']['email_comment']]);
+        $sendTemplateParams['tplParams'] = array_merge($tplParams, ['email_comment' => $params['email_comment']]);
         $sendTemplateParams['from'] = $fromEmailAddress;
         $sendTemplateParams['toEmail'] = $email;
         $sendTemplateParams['cc'] = $values['cc_receipt'] ?? NULL;
@@ -498,7 +509,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       elseif ($component == 'event') {
         $email = CRM_Contact_BAO_Contact::getPrimaryEmail($contribution->contact_id);
 
-        $sendTemplateParams['tplParams'] = array_merge($tplParams, ['email_comment' => $invoiceElements['params']['email_comment']]);
+        $sendTemplateParams['tplParams'] = array_merge($tplParams, ['email_comment' => $params['email_comment']]);
         $sendTemplateParams['from'] = $fromEmailAddress;
         $sendTemplateParams['toEmail'] = $email;
         $sendTemplateParams['cc'] = $values['cc_confirm'] ?? NULL;
@@ -512,7 +523,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $invoiceTemplate->clearTemplateVars();
     }
 
-    if ($invoiceElements['createPdf']) {
+    if ($isCreatePDF) {
       if (isset($params['forPage'])) {
         return $html;
       }
@@ -526,8 +537,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       }
     }
     else {
-      if ($invoiceElements['suppressedEmails']) {
-        $status = ts('Email was NOT sent to %1 contacts (no email address on file, or communication preferences specify DO NOT EMAIL, or contact is deceased).', [1 => $invoiceElements['suppressedEmails']]);
+      if ($suppressedEmails) {
+        $status = ts('Email was NOT sent to %1 contacts (no email address on file, or communication preferences specify DO NOT EMAIL, or contact is deceased).', [1 => $suppressedEmails]);
         $msgTitle = ts('Email Error');
         $msgType = 'error';
       }
