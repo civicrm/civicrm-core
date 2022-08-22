@@ -241,16 +241,48 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   }
 
   /**
-   * Test cancel order api
+   * Test cancel order api.
+   *
+   * @dataProvider getStatuses
    * @throws API_Exception
    */
-  public function testCancelOrderWithParticipant(): void {
+  public function testCancelOrderWithParticipant($status): void {
     $this->createContact();
     $orderID = $this->createEventOrder();
-    $this->callAPISuccess('Order', 'cancel', ['contribution_id' => $orderID]);
+    $participantID = Participant::get()->addSelect('id')->execute()->first()['id'];
+    $additionalParticipantID = Participant::create()->setValues([
+      'event_id' => $this->getEventID(),
+      'contact_id' => $this->individualCreate(),
+      'registered_by_id' => $participantID,
+      'status_id:name' => 'Pending from incomplete transaction',
+    ])->execute()->first()['id'];
+    if ($status === 'Cancelled') {
+      $this->callAPISuccess('Order', 'cancel', ['contribution_id' => $orderID]);
+    }
+    else {
+      Contribution::update()->setValues(['contribution_status_id:name' => $status])->addWhere('id', '=', $orderID)->execute();
+    }
     $this->callAPISuccess('Order', 'get', ['contribution_id' => $orderID]);
-    $this->callAPISuccessGetSingle('Contribution', ['contribution_status_id' => 'Cancelled']);
-    $this->callAPISuccessGetCount('Participant', ['status_id' => 'Cancelled'], 1);
+    $this->callAPISuccessGetSingle('Contribution', ['contribution_status_id' => $status]);
+    $this->callAPISuccessGetCount('Participant', ['status_id' => 'Cancelled'], 2);
+
+    $cancelledActivatesCount = civicrm_api3('Activity', 'get', [
+      'sequential' => 1,
+      'activity_type_id' => 'Event Registration',
+      'subject' => ['LIKE' => '%Cancelled%'],
+      'source_record_id' => ['IN' => [$participantID, $additionalParticipantID]],
+    ]);
+
+    $this->assertEquals(2, $cancelledActivatesCount['count']);
+  }
+
+  /**
+   * Get statuses that result in cancellation.
+   *
+   * @return \string[][]
+   */
+  public function getStatuses():array {
+    return [['Cancelled'], ['Failed']];
   }
 
   /**
@@ -299,6 +331,15 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
       ->execute();
     $this->assertCount(1, $activity);
     $this->assertEquals('Status changed from Pending to Cancelled', $activity->first()['subject']);
+  }
+
+  /**
+   * Get the event ID.
+   *
+   * @return int
+   */
+  protected function getEventID(): int {
+    return $this->ids['event'][0];
   }
 
   /**

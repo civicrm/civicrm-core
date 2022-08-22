@@ -257,87 +257,11 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function testThatCancellingEventPaymentWillCancelAllAdditionalPendingParticipantsAndCreateCancellationActivities(): void {
-    // Test fails - reason not yet investigated.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
-    $this->_setUpParticipantObjects('Pending from incomplete transaction');
-    $additionalParticipantId = $this->participantCreate([
-      'event_id' => $this->_eventId,
-      'registered_by_id' => $this->_participantId,
-      'status_id' => 'Pending from incomplete transaction',
-    ]);
-
-    Contribution::update(FALSE)->setValues([
-      'cancel_date' => 'now',
-      'contribution_status_id:name' => 'Cancelled',
-    ])->addWhere('id', '=', $this->_contributionId)->execute();
-
-    $cancelledParticipantsCount = $this->callAPISuccess('Participant', 'get', [
-      'sequential' => 1,
-      'id' => ['IN' => [$this->_participantId, $additionalParticipantId]],
-      'status_id' => 'Cancelled',
-    ])['count'];
-    $this->assertEquals(2, $cancelledParticipantsCount);
-
-    $cancelledActivatesCount = civicrm_api3('Activity', 'get', [
-      'sequential' => 1,
-      'activity_type_id' => 'Event Registration',
-      'subject' => ['LIKE' => '%Cancelled%'],
-      'source_record_id' => ['IN' => [$this->_participantId, $additionalParticipantId]],
-    ]);
-
-    $this->assertEquals(2, $cancelledActivatesCount['count']);
-  }
-
-  /**
-   * Test that related pending participant records are cancelled.
-   *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
-   */
-  public function testThatFailedEventPaymentWillCancelAllAdditionalPendingParticipantsAndCreateCancellationActivities(): void {
-    $this->_setUpParticipantObjects('Pending from incomplete transaction');
-    $additionalParticipantId = $this->participantCreate([
-      'event_id' => $this->_eventId,
-      'registered_by_id' => $this->_participantId,
-      'status_id' => 'Pending from incomplete transaction',
-    ]);
-
-    Contribution::update(FALSE)->setValues([
-      'cancel_date' => 'now',
-      'contribution_status_id:name' => 'Failed',
-    ])->addWhere('id', '=', $this->ids['contribution'])->execute();
-
-    $cancelledParticipantsCount = civicrm_api3('Participant', 'get', [
-      'sequential' => 1,
-      'id' => ['IN' => [$this->_participantId, $additionalParticipantId]],
-      'status_id' => 'Cancelled',
-    ])['count'];
-    $this->assertEquals(2, $cancelledParticipantsCount);
-
-    $cancelledActivatesCount = civicrm_api3('Activity', 'get', [
-      'sequential' => 1,
-      'activity_type_id' => 'Event Registration',
-      'subject' => ['LIKE' => '%Cancelled%'],
-      'source_record_id' => ['IN' => [$this->_participantId, $additionalParticipantId]],
-    ]);
-
-    $this->assertEquals(2, $cancelledActivatesCount['count']);
-  }
-
-  /**
    * Prepare for contribution Test - involving only contribution objects
    *
    * @param bool $contributionPage
    */
-  public function _setUpContributionObjects($contributionPage = FALSE) {
+  public function _setUpContributionObjects($contributionPage = FALSE): void {
 
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
