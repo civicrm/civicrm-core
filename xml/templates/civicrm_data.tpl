@@ -1788,6 +1788,7 @@ INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_act
 INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'ckeditor4', 'CKEditor4', 'CKEditor4', 'ckeditor4', 1);
 INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'legacycustomsearches', 'Custom search framework', 'Custom search framework', 'legacycustomsearches', 1);
 INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'org.civicrm.flexmailer', 'FlexMailer', 'FlexMailer', 'flexmailer', 1);
+INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'civiimport', 'CiviCRM core import code', 'CiviCRM core import code', 'civiimport', 1);
 
 -- dev/core#3783 Recent Items providers
 INSERT INTO civicrm_option_group (`name`, `title`, `is_reserved`, `is_active`) VALUES ('recent_items_providers', {localize}'{ts escape="sql"}Recent Items Providers{/ts}'{/localize}, 1, 1);
