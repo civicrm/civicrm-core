@@ -293,7 +293,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   /**
    * Check that pseudoconstant reflects new value added.
    */
-  public function testCRM11876CreateOptionPseudoConstantUpdated() {
+  public function testCRM11876CreateOptionPseudoConstantUpdated(): void {
     $optionGroupID = $this->callAPISuccess('option_group', 'getvalue', [
       'name' => 'payment_instrument',
       'return' => 'id',
@@ -304,13 +304,13 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'label' => $newOption,
     ]);
 
-    $fields = $this->callAPISuccess('contribution', 'getoptions', ['field' => 'payment_instrument_id']);
-    $this->assertTrue(in_array($newOption, $fields['values']));
+    $fields = $this->callAPISuccess('Contribution', 'getoptions', ['field' => 'payment_instrument_id']);
+    $this->assertContains($newOption, $fields['values']);
 
-    $this->callAPISuccess('option_value', 'delete', ['id' => $apiResult['id']]);
+    $this->callAPISuccess('OptionValue', 'delete', ['id' => $apiResult['id']]);
 
-    $fields = $this->callAPISuccess('contribution', 'getoptions', ['field' => 'payment_instrument_id']);
-    $this->assertFalse(in_array($newOption, $fields['values']));
+    $fields = $this->callAPISuccess('Contribution', 'getoptions', ['field' => 'payment_instrument_id']);
+    $this->assertNotContains($newOption, $fields['values']);
   }
 
   /**
