@@ -461,7 +461,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    * @return string[]
    */
   protected function getOddlyMappedMetadataFields(): array {
-    $uniqueNames = ['membership_id', 'membership_contact_id'];
+    $uniqueNames = ['membership_id', 'membership_contact_id', 'membership_start_date', 'membership_join_date', 'membership_end_date', 'membership_source', 'member_is_override', 'member_is_test', 'member_is_pay_later', 'member_campaign_id'];
     $fields = [];
     foreach ($uniqueNames as $name) {
       $fields[$this->importableFieldsMetadata[$name]['name']] = $name;
