@@ -582,6 +582,13 @@ SET    version = '$version'
     }
 
     $task = new CRM_Queue_Task(
+      ['CRM_Upgrade_Incremental_MessageTemplates', 'updateReservedAndMaybeDefaultTemplates'],
+      [],
+      "Update all reserved message templates"
+    );
+    $queue->createItem($task, ['weight' => 990]);
+
+    $task = new CRM_Queue_Task(
       ['CRM_Upgrade_Form', 'doCoreFinish'],
       [$rev, $latestVer, $latestVer, $postUpgradeMessageFile],
       "Finish core DB updates $latestVer"
