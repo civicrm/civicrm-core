@@ -847,23 +847,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       }
     }
 
-    if (array_key_exists('note', $params)) {
-      $values['note'] = $params['note'];
-    }
-
-    if ($create) {
-      // CRM_Contribute_BAO_Contribution::add() handles contribution_source
-      // So, if $values contains contribution_source, convert it to source
-      $changes = ['contribution_source' => 'source'];
-
-      foreach ($changes as $orgVal => $changeVal) {
-        if (isset($values[$orgVal])) {
-          $values[$changeVal] = $values[$orgVal];
-          unset($values[$orgVal]);
-        }
-      }
-    }
-
     return NULL;
   }
 
