@@ -285,6 +285,14 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
     $this->assertEquals('Cancelled', $contribution['contribution_status_id:name']);
     $membership = $this->callAPISuccessGetSingle('Membership', []);
     $this->assertEquals('Cancelled', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membership['status_id']));
+    $this->assertEquals(TRUE, $membership['is_override']);
+    $membershipSignupActivity = Activity::get()
+      ->addSelect('subject', 'source_record_id', 'status_id')
+      ->addWhere('activity_type_id:name', '=', 'Membership Signup')
+      ->execute();
+    $this->assertCount(1, $membershipSignupActivity);
+    $this->assertEquals($membership['id'], $membershipSignupActivity->first()['source_record_id']);
+    $this->assertEquals('General - Payment - Status: Pending', $membershipSignupActivity->first()['subject']);
     $activity = Activity::get()
       ->addSelect('subject', 'source_record_id', 'status_id')
       ->addWhere('activity_type_id:name', '=', 'Change Membership Status')
