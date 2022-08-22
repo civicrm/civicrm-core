@@ -1420,38 +1420,6 @@ Expires: ',
   }
 
   /**
-   * Test membership status overrides when contribution is cancelled.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testContributionFormStatusUpdate(): void {
-    // @todo figure out why financial validation fails with this test.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
-    $this->_contactID = $this->ids['Contact']['order'] = $this->createLoggedInUser();
-    $this->createContributionAndMembershipOrder();
-
-    $params = [
-      'total_amount' => 50,
-      'financial_type_id' => 2,
-      'contact_id' => $this->_contactID,
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
-      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'),
-    ];
-    $_REQUEST['action'] = 'update';
-    $_REQUEST['id'] = $this->ids['Contribution'][0];
-    $form = $this->getContributionForm($params);
-    $form->postProcess();
-    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_contactID]);
-
-    //Assert membership status overrides when the contribution cancelled.
-    $this->assertEquals(TRUE, $membership['is_override']);
-    $this->assertEquals($membership['status_id'], $this->callAPISuccessGetValue('MembershipStatus', [
-      'return' => 'id',
-      'name' => 'Cancelled',
-    ]));
-  }
-
-  /**
    * Get the contribution form object.
    *
    * @param array $formValues
