@@ -441,17 +441,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Did the user specify duplicates should be skipped and not imported.
-   *
-   * @return bool
-   *
-   * @throws \CRM_Core_Exception
-   */
-  private function isSkipDuplicates(): bool {
-    return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_SKIP;
-  }
-
-  /**
    * Get the fields to be highlighted in the UI.
    *
    * The highlighted fields are those used to match
