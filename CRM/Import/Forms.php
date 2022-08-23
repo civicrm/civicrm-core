@@ -674,4 +674,13 @@ class CRM_Import_Forms extends CRM_Core_Form {
     return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_SKIP;
   }
 
+  /**
+   * Did the user specify duplicates should be skipped and not imported.
+   *
+   * @return bool
+   */
+  protected function isSkipDuplicates(): bool {
+    return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_SKIP;
+  }
+
 }
