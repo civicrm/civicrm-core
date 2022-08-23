@@ -6,6 +6,7 @@
 
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionSoft;
+use Civi\Api4\Note;
 use Civi\Api4\OptionValue;
 use Civi\Api4\UserJob;
 
@@ -264,23 +265,37 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test the full form-flow import.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testImport() :void {
-    $this->importCSV('contributions.csv', [
-      ['name' => 'first_name'],
-      ['name' => 'total_amount'],
-      ['name' => 'receive_date'],
-      ['name' => 'financial_type_id'],
-      ['name' => 'email'],
-    ]);
-    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+  public function testImportNoMatch() :void {
+    $dataSource = $this->importContributionsDotCSV();
     $row = $dataSource->getRow();
     $this->assertEquals('ERROR', $row['_status']);
     $this->assertEquals('No matching Contact found for (mum@example.com )', $row['_status_message']);
   }
 
+  /**
+   * Test the full form-flow import.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportMatch() :void {
+    $this->individualCreate(['email' => 'mum@example.com']);
+    $this->importContributionsDotCSV();
+    $contribution = Contribution::get()->execute()->first();
+    $this->assertEquals('Word of mouth', $contribution['source']);
+    $note = Note::get()
+      ->addWhere('entity_id', '=', $contribution['id'])
+      ->addWhere('entity_table', '=', 'civicrm_contribution')->execute()->first();
+    $this->assertEquals('Call him back', $note['note']);
+  }
+
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function testImportWithMatchByExternalIdentifier() :void {
-    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_contact AUTO_INCREMENT = 1000000");
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_contact AUTO_INCREMENT = 1000000');
 
     $contactRubyParams = [
       'first_name' => 'Ruby',
@@ -447,6 +462,22 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     /* @var CRM_Contribute_Import_Form_Preview $form */
     $form = $this->getFormObject('CRM_Contribute_Import_Form_Preview', $submittedValues);
     return $form;
+  }
+
+  /**
+   * @return \CRM_Import_DataSource_CSV
+   */
+  private function importContributionsDotCSV(): CRM_Import_DataSource_CSV {
+    $this->importCSV('contributions.csv', [
+      ['name' => 'first_name'],
+      ['name' => 'total_amount'],
+      ['name' => 'receive_date'],
+      ['name' => 'financial_type_id'],
+      ['name' => 'email'],
+      ['name' => 'contribution_source'],
+      ['name' => 'note'],
+    ]);
+    return new CRM_Import_DataSource_CSV($this->userJobID);
   }
 
 }
