@@ -683,4 +683,15 @@ class CRM_Import_Forms extends CRM_Core_Form {
     return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_SKIP;
   }
 
+  /**
+   * Are there valid rows to import.
+   *
+   * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function hasImportableRows(): bool {
+    return (bool) $this->getRowCount(['new']);
+  }
+
 }
