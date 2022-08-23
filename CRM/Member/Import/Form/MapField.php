@@ -33,7 +33,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     foreach ($this->getColumnHeaders() as $i => $columnHeader) {
       $this->add('select2', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), $options, FALSE, ['class' => 'big', 'placeholder' => ts('- do not import -')]);
     }
-    $this->assign('initHideBoxes');
 
     $this->setDefaults($this->getDefaults());
 
