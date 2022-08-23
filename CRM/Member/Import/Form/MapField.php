@@ -44,42 +44,22 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       unset($sel1['membership_id']);
     }
 
-    $js = "<script type='text/javascript'>\n";
-    $formName = 'document.forms.' . $this->_name;
-
     $fieldMappings = $this->getFieldMappings();
 
     foreach ($columnHeaders as $i => $columnHeader) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', array(1 => $i)), NULL);
-      $jsSet = FALSE;
+      $sel->setOptions([$sel1]);
       if ($this->getSubmittedValue('savedMapping')) {
         $fieldMapping = $fieldMappings[$i] ?? NULL;
         if (isset($fieldMappings[$i])) {
           if ($fieldMapping['name'] != ts('do_not_import')) {
-            //When locationType is not set
-            $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
-
-            //When phoneType is not set
-            $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
-
-            $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
-
             $defaults["mapper[$i]"] = [$fieldMapping['name']];
-            $jsSet = TRUE;
           }
           else {
             $defaults["mapper[$i]"] = [];
           }
-          if (!$jsSet) {
-            for ($k = 1; $k < 4; $k++) {
-              $js .= "{$formName}['mapper[$i][$k]'].style.display = 'none';\n";
-            }
-          }
         }
         else {
-          // this load section to help mapping if we ran out of saved columns when doing Load Mapping
-          $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_" . $i . "_');\n";
-
           if ($hasHeaders) {
             $defaults["mapper[$i]"] = array($this->defaultFromHeader($columnHeader, $headerPatterns));
           }
@@ -87,7 +67,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
         //end of load mapping
       }
       else {
-        $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_" . $i . "_');\n";
         if ($this->getSubmittedValue('skipColumnHeader')) {
           // Infer the default from the skipped headers if we have them
           $defaults["mapper[$i]"] = array(
@@ -99,10 +78,8 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
           );
         }
       }
-      $sel->setOptions([$sel1]);
     }
-    $js .= "</script>\n";
-    $this->assign('initHideBoxes', $js);
+    $this->assign('initHideBoxes');
 
     $this->setDefaults($defaults);
 
