@@ -137,8 +137,10 @@ class ClassScanner {
     static::scanFolders($classes, $civicrmRoot, 'Civi/WorkflowMessage', '\\');
     static::scanFolders($classes, $civicrmRoot, 'CRM/*/Import', '_');
     if (\CRM_Utils_Constant::value('CIVICRM_UF') === 'UnitTests') {
-      static::scanFolders($classes, $civicrmRoot . 'tests/phpunit', 'CRM/*/WorkflowMessage', '_');
-      static::scanFolders($classes, $civicrmRoot . 'tests/phpunit', 'Civi/*/WorkflowMessage', '\\');
+      if (strpos(get_include_path(), $civicrmRoot . 'tests/phpunit') !== FALSE) {
+        static::scanFolders($classes, $civicrmRoot . 'tests/phpunit', 'CRM/*/WorkflowMessage', '_');
+        static::scanFolders($classes, $civicrmRoot . 'tests/phpunit', 'Civi/*/WorkflowMessage', '\\');
+      }
     }
 
     $cache->set($cacheKey, $classes, static::TTL);
@@ -197,6 +199,10 @@ class ClassScanner {
           if ($interfaces) {
             $classes[] = $class;
           }
+        }
+        elseif (!interface_exists($class) && !trait_exists($class)) {
+          // If you get this error, then perhaps (a) you need to fix the name of file/class/namespace or (b) you should disable class-scanning.
+          throw new \RuntimeException("Scanned file {$relFile} for class {$class}, but it was not found.");
         }
       }
     }
