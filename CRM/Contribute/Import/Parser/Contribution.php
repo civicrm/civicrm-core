@@ -206,7 +206,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   /**
    * Set field metadata.
    */
-  protected function setFieldMetadata() {
+  protected function setFieldMetadata(): void {
     if (empty($this->importableFieldsMetadata)) {
       $fields = $this->importableFields($this->getContactType());
 
@@ -311,6 +311,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
       $params = $this->getMappedRow($values);
+      if (!empty($params['contact_id'])) {
+        $this->validateContactID($params['contact_id'], $this->getContactType());
+      }
       $formatted = array_merge(['version' => 3, 'skipRecentView' => TRUE, 'skipCleanMoney' => TRUE, 'contribution_id' => $params['id'] ?? NULL], $params);
       //CRM-10994
       if (isset($params['total_amount']) && $params['total_amount'] == 0) {
@@ -340,17 +343,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $paramValues['contact_type'] = $this->getContactType();
       }
 
-      $formatError = $this->deprecatedFormatParams($paramValues, $formatted);
-
-      if ($formatError) {
-        if (CRM_Utils_Array::value('error_data', $formatError) == 'soft_credit') {
-          throw new CRM_Core_Exception('', self::SOFT_CREDIT_ERROR);
-        }
-        if (CRM_Utils_Array::value('error_data', $formatError) == 'pledge_payment') {
-          throw new CRM_Core_Exception('', self::PLEDGE_PAYMENT_ERROR);
-        }
-        throw new CRM_Core_Exception('', CRM_Import_Parser::ERROR);
-      }
+      $this->deprecatedFormatParams($paramValues, $formatted);
 
       if ($this->isUpdateExisting()) {
         //fix for CRM-2219 - Update Contribution
@@ -611,10 +604,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    *   The reformatted properties that we can use internally.
    * @param bool $create
    *
-   * @return array|CRM_Error
    * @throws \CRM_Core_Exception
    */
-  private function deprecatedFormatParams($params, &$values, $create = FALSE) {
+  private function deprecatedFormatParams($params, &$values, $create = FALSE): void {
     // copy all the contribution fields as is
     require_once 'api/v3/utils.php';
 
@@ -625,23 +617,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       }
 
       switch ($key) {
-        case 'contact_id':
-          if (!CRM_Utils_Rule::integer($value)) {
-            return civicrm_api3_create_error("contact_id not valid: $value");
-          }
-          $dao = new CRM_Core_DAO();
-          $qParams = [];
-          $svq = $dao->singleValueQuery("SELECT is_deleted FROM civicrm_contact WHERE id = $value",
-            $qParams
-          );
-          if (!isset($svq)) {
-            return civicrm_api3_create_error("Invalid Contact ID: There is no contact record with contact_id = $value.");
-          }
-          elseif ($svq == 1) {
-            return civicrm_api3_create_error("Invalid Contact ID: contact_id $value is a soft-deleted contact.");
-          }
-          $values['contact_id'] = $value;
-          break;
 
         case 'contact_type':
           // import contribution record according to select contact type
@@ -656,14 +631,11 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
             $contactType->external_identifier = $externalId;
             if ($contactType->find(TRUE)) {
               if ($params['contact_type'] != $contactType->contact_type) {
-                return civicrm_api3_create_error("Contact Type is wrong: $contactType->contact_type");
+                throw new CRM_Core_Exception("Contact Type is wrong: $contactType->contact_type", CRM_Import_Parser::ERROR);
               }
             }
           }
           elseif ($email) {
-            if (!CRM_Utils_Rule::email($email)) {
-              return civicrm_api3_create_error("Invalid email address $email provided. Row was skipped");
-            }
 
             // get the contact id from duplicate contact rule, if more than one contact is returned
             // we should return error, since current interface allows only one-one mapping
@@ -687,11 +659,11 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
               $checkDedupe = ['is_error' => 0];
             }
             if (!$checkDedupe['is_error']) {
-              return civicrm_api3_create_error("Invalid email address(doesn't exist) $email. Row was skipped");
+              throw new CRM_Core_Exception("Invalid email address(doesn't exist) $email. Row was skipped", CRM_Import_Parser::ERROR);
             }
             $matchingContactIds = explode(',', $checkDedupe['error_message']['params'][0]);
             if (count($matchingContactIds) > 1) {
-              return civicrm_api3_create_error("Invalid email address(duplicate) $email. Row was skipped");
+              throw new CRM_Core_Exception("Invalid email address(duplicate) $email. Row was skipped", CRM_Import_Parser::ERROR);
             }
             if (count($matchingContactIds) == 1) {
               $params['contribution_contact_id'] = $matchingContactIds[0];
@@ -714,14 +686,14 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
               $contactType->id = $contactId->contact_id;
               if ($contactType->find(TRUE)) {
                 if ($params['contact_type'] != $contactType->contact_type) {
-                  return civicrm_api3_create_error("Contact Type is wrong: $contactType->contact_type");
+                  throw new CRM_Core_Exception("Contact Type is wrong: $contactType->contact_type", CRM_Import_Parser::ERROR);
                 }
               }
             }
           }
           else {
             if ($this->isUpdateExisting()) {
-              return civicrm_api3_create_error("Empty Contribution and Invoice and Transaction ID. Row was skipped.");
+              throw new CRM_Core_Exception('Empty Contribution and Invoice and Transaction ID. Row was skipped.', CRM_Import_Parser::ERROR);
             }
           }
           break;
@@ -765,7 +737,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
               }
             }
             else {
-              throw new CRM_Core_Exception('No match found for specified contact in pledge payment data. Row was skipped.');
+              throw new CRM_Core_Exception('No match found for specified contact in pledge payment data. Row was skipped.', CRM_Import_Parser::ERROR);
             }
           }
           else {
@@ -781,7 +753,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
                 $contributionContactID = $params['contribution_contact_id'] = $values['contribution_contact_id'] = $contact->id;
               }
               else {
-                return civicrm_api3_create_error('No match found for specified contact in pledge payment data. Row was skipped.');
+                throw new CRM_Core_Exception('No match found for specified contact in pledge payment data. Row was skipped.');
               }
             }
             else {
@@ -793,19 +765,19 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
                 // check if only one contact is found
                 if (count($matchedIDs) > 1) {
-                  return civicrm_api3_create_error($error['error_message']['message']);
+                  throw new CRM_Core_Exception($error['error_message']['message'], CRM_Import_Parser::ERROR);
                 }
                 $contributionContactID = $params['contribution_contact_id'] = $values['contribution_contact_id'] = $matchedIDs[0];
               }
               else {
-                return civicrm_api3_create_error('No match found for specified contact in contribution data. Row was skipped.');
+                throw new CRM_Core_Exception('No match found for specified contact in contribution data. Row was skipped.', CRM_Import_Parser::ERROR);
               }
             }
           }
 
           if (!empty($params['pledge_id'])) {
             if (CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge', $params['pledge_id'], 'contact_id') != $contributionContactID) {
-              return civicrm_api3_create_error('Invalid Pledge ID provided. Contribution row was skipped.');
+              throw new CRM_Core_Exception('Invalid Pledge ID provided. Contribution row was skipped.', CRM_Import_Parser::ERROR);
             }
             $values['pledge_id'] = $params['pledge_id'];
           }
@@ -815,10 +787,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
             $pledgeDetails = CRM_Pledge_BAO_Pledge::getContactPledges($contributionContactID);
 
             if (empty($pledgeDetails)) {
-              return civicrm_api3_create_error('No open pledges found for this contact. Contribution row was skipped.');
+              throw new CRM_Core_Exception('No open pledges found for this contact. Contribution row was skipped.', CRM_Import_Parser::ERROR);
             }
             if (count($pledgeDetails) > 1) {
-              return civicrm_api3_create_error('This contact has more than one open pledge. Unable to determine which pledge to apply the contribution to. Contribution row was skipped.');
+              throw new CRM_Core_Exception('This contact has more than one open pledge. Unable to determine which pledge to apply the contribution to. Contribution row was skipped.', CRM_Import_Parser::ERROR);
             }
 
             // this mean we have only one pending / in progress pledge
@@ -833,21 +805,12 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
             $values['pledge_payment_id'] = $pledgePaymentDetails['id'];
           }
           else {
-            return civicrm_api3_create_error('Contribution and Pledge Payment amount mismatch for this record. Contribution row was skipped.');
+            throw new CRM_Core_Exception('Contribution and Pledge Payment amount mismatch for this record. Contribution row was skipped.', CRM_Import_Parser::ERROR);
           }
-          break;
-
-        case 'contribution_campaign_id':
-          if (empty(CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Campaign', $params['contribution_campaign_id']))) {
-            return civicrm_api3_create_error('Invalid Campaign ID provided. Contribution row was skipped.');
-          }
-          $values['contribution_campaign_id'] = $params['contribution_campaign_id'];
           break;
 
       }
     }
-
-    return NULL;
   }
 
   /**
@@ -862,7 +825,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @param int $columnNumber
    *
    * @return array
-   * @throws \API_Exception
    */
   public function getMappingFieldFromMapperInput(array $fieldMapping, int $mappingID, int $columnNumber): array {
     return [
@@ -937,7 +899,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    *   or as returned from getMappingFieldFromMapperInput
    *
    * @return string
-   * @throws \API_Exception
    */
   public function getMappedFieldLabel(array $mappedField): string {
     if (empty($this->importableFieldsMetadata)) {

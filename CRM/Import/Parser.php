@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Campaign;
+use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\Event;
 use Civi\Api4\UserJob;
@@ -728,6 +729,28 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     }
 
     return $fileName;
+  }
+
+  /**
+   * Validate that a passed in contact ID is for an existing, not-deleted contact.
+   *
+   * @param int $contactID
+   * @param string|null $contactType
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function validateContactID(int $contactID, ?string $contactType): void {
+    $existingContact = Contact::get(FALSE)
+      ->addWhere('id', '=', $contactID)
+      // Don't auto-filter deleted - people use import to undelete.
+      ->addWhere('is_deleted', 'IN', [0, 1])
+      ->addSelect('contact_type')->execute()->first();
+    if (empty($existingContact['id'])) {
+      throw new CRM_Core_Exception('No contact found for this contact ID:' . $contactID, CRM_Import_Parser::NO_MATCH);
+    }
+    if ($contactType && $existingContact['contact_type'] !== $contactType) {
+      throw new CRM_Core_Exception('Mismatched contact Types', CRM_Import_Parser::NO_MATCH);
+    }
   }
 
   /**

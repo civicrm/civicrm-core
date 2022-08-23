@@ -1710,17 +1710,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       throw new CRM_Core_Exception(ts('External ID already exists in Database.'), CRM_Import_Parser::DUPLICATE);
     }
     if ($contactID) {
-      $existingContact = Contact::get(FALSE)
-        ->addWhere('id', '=', $contactID)
-        // Don't auto-filter deleted - people use import to undelete.
-        ->addWhere('is_deleted', 'IN', [0, 1])
-        ->addSelect('contact_type')->execute()->first();
-      if (empty($existingContact['id'])) {
-        throw new CRM_Core_Exception('No contact found for this contact ID:' . $params['id'], CRM_Import_Parser::NO_MATCH);
-      }
-      if ($existingContact['contact_type'] !== $params['contact_type']) {
-        throw new CRM_Core_Exception('Mismatched contact Types', CRM_Import_Parser::NO_MATCH);
-      }
+      $this->validateContactID($contactID, $params['contact_type']);
       return $contactID;
     }
     // Time to see if we can find an existing contact ID to make this an update
