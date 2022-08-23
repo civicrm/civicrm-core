@@ -319,6 +319,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * Once we have cleaned up the way the mapper is handled
    * we can ditch all the existing _construct parameters in favour
    * of just the userJobID - there are current open PRs towards this end.
+   *
+   * @deprecated
    */
   public function getAvailableFields(): array {
     $this->setFieldMetadata();
@@ -1733,7 +1735,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *
    * @return array
    */
-  protected function getFieldsMetadata() : array {
+  public function getFieldsMetadata() : array {
     if (empty($this->importableFieldsMetadata)) {
       unset($this->userJob);
       $this->setFieldMetadata();
