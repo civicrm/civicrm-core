@@ -29,20 +29,9 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->buildSavedMappingFields($this->getSubmittedValue('savedMapping'));
     $this->addFormRule(array('CRM_Member_Import_Form_MapField', 'formRule'), $this);
 
-    //-------- end of saved mapping stuff ---------
-
-    // For most fields using the html label is a good thing
-    // but for contact ID we really want to specify ID.
-    $this->_mapperFields['membership_contact_id'] = ts('Contact ID');
-    $sel1 = $this->_mapperFields;
-    if (!$this->getSubmittedValue('onDuplicate')) {
-      // If not updating then do not allow membership id.
-      unset($sel1['membership_id']);
-    }
-
+    $options = $this->getFieldOptions();
     foreach ($this->getColumnHeaders() as $i => $columnHeader) {
-      $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
-      $sel->setOptions([$sel1]);
+      $this->add('select2', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), $options, FALSE, ['class' => 'big', 'placeholder' => ts('- do not import -')]);
     }
     $this->assign('initHideBoxes');
 
@@ -68,7 +57,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $importKeys = [];
     foreach ($fields['mapper'] as $mapperPart) {
-      $importKeys[] = $mapperPart[0];
+      $importKeys[] = $mapperPart;
     }
     // FIXME: should use the schema titles, not redeclare them
     $requiredFields = array(
@@ -226,11 +215,11 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       if ($this->getSubmittedValue('savedMapping')) {
         $fieldMapping = $fieldMappings[$i] ?? NULL;
         if (isset($fieldMappings[$i])) {
-          $defaults["mapper[$i]"] = ($fieldMapping['name'] !== 'do_not_import') ? [$fieldMapping['name']] : [];
+          $defaults["mapper[$i]"] = ($fieldMapping['name'] !== 'do_not_import') ? $fieldMapping['name'] : NULL;
         }
       }
       if (!isset($defaults["mapper[$i]"]) && $this->getSubmittedValue('skipColumnHeader')) {
-        $defaults["mapper[$i]"] = [$this->defaultFromHeader($columnHeader, $headerPatterns)];
+        $defaults["mapper[$i]"] = $this->defaultFromHeader($columnHeader, $headerPatterns);
       }
     }
     return $defaults;

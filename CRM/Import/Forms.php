@@ -602,6 +602,17 @@ class CRM_Import_Forms extends CRM_Core_Form {
   }
 
   /**
+   * Get the fields available for import selection.
+   *
+   * @return array
+   *   e.g ['first_name' => 'First Name', 'last_name' => 'Last Name'....
+   *
+   */
+  protected function getImportEntities(): array {
+    return $this->getParser()->getImportEntities();
+  }
+
+  /**
    * Get an instance of the parser class.
    *
    * @return \CRM_Contact_Import_Parser_Contact|\CRM_Contribute_Import_Parser_Contribution
@@ -631,7 +642,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
     $mapper = [];
     $parser = $this->getParser();
     foreach ($this->getSubmittedValue('mapper') as $columnNumber => $mappedField) {
-      $mapper[$columnNumber] = $parser->getMappedFieldLabel($parser->getMappingFieldFromMapperInput($mappedField, 0, $columnNumber));
+      $mapper[$columnNumber] = $parser->getMappedFieldLabel($parser->getMappingFieldFromMapperInput((array) $mappedField, 0, $columnNumber));
     }
     return $mapper;
   }
@@ -711,6 +722,16 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   protected function hasImportableRows(): bool {
     return (bool) $this->getRowCount(['new']);
+  }
+
+  /**
+   * Get the base entity for the import.
+   *
+   * @return string
+   */
+  protected function getBaseEntity(): string {
+    $info = $this->getParser()->getUserJobInfo();
+    return reset($info)['entity'];
   }
 
 }

@@ -456,4 +456,49 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     return empty($errors) ? TRUE : $errors;
   }
 
+  /**
+   * This transforms the lists of fields for each contact type & component
+   * into a single unified list suitable for select2.
+   *
+   * @return array
+   */
+  public function getFieldOptions(): array {
+    $fields = $this->getFields();
+    $entity = $this->getBaseEntity();
+    $categories = $this->getImportEntities();
+    $highlightedFields = $this->getHighlightedFields();
+    foreach ($fields as $fieldName => $field) {
+      if ($fieldName === '') {
+        // @todo stop setting 'do not import' in the first place.
+        continue;
+      }
+      if ($field['name'] === 'id' && $entity === $field['entity'] && !$this->isUpdateExisting()) {
+        continue;
+      }
+      $childField = [
+        'text' => $field['title'],
+        'id' => $fieldName,
+        'has_location' => !empty($field['hasLocationType']),
+      ];
+      if (in_array($fieldName, $highlightedFields, TRUE)) {
+        $childField['text'] .= '*';
+      }
+      $category = ($childField['has_location'] || $field['name'] === 'contact_id') ? 'Contact' : ($field['entity'] ?? $entity);
+      if (empty($categories[$category])) {
+        $category = $entity;
+      }
+      $categories[$category]['children'][$fieldName] = $childField;
+    }
+
+    foreach ($categories as $index => $category) {
+      if (empty($category['children'])) {
+        unset($categories[$index]);
+      }
+      else {
+        $categories[$index]['children'] = array_values($category['children']);
+      }
+    }
+    return array_values($categories);
+  }
+
 }

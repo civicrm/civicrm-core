@@ -1744,6 +1744,17 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
+   * Get a list of entities this import supports.
+   *
+   * @return array
+   */
+  public function getImportEntities() : array {
+    return [
+      'Contact' => ['text' => ts('Contact Fields'), 'is_contact' => TRUE],
+    ];
+  }
+
+  /**
    * @param array $mappedField
    *   Field detail as would be saved in field_mapping table
    *   or as returned from getMappingFieldFromMapperInput
@@ -1796,7 +1807,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     $mappedFields = [];
     $mapper = $this->getSubmittedValue('mapper');
     foreach ($mapper as $i => $mapperRow) {
-      $mappedField = $this->getMappingFieldFromMapperInput($mapperRow, 0, $i);
+      // Cast to an array as it will be a string for membership
+      // and any others we simplify away from using hierselect for a single option.
+      $mappedField = $this->getMappingFieldFromMapperInput((array) $mapperRow, 0, $i);
       // Just for clarity since 0 is a pseudo-value
       unset($mappedField['mapping_id']);
       $mappedFields[] = $mappedField;
