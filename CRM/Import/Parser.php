@@ -306,6 +306,45 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
+   * @param string $contactType
+   *
+   * @return array[]
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContactFields(string $contactType): array {
+    $contactFields = CRM_Contact_BAO_Contact::importableFields($contactType, NULL);
+
+    // Using new Dedupe rule.
+    $ruleParams = [
+      'contact_type' => $contactType,
+      'used' => 'Unsupervised',
+    ];
+    $fieldsArray = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
+    $tmpContactField = [];
+    if (is_array($fieldsArray)) {
+      foreach ($fieldsArray as $value) {
+        //skip if there is no dupe rule
+        if ($value === 'none') {
+          continue;
+        }
+        $customFieldId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
+          $value,
+          'id',
+          'column_name'
+        );
+        $value = trim($customFieldId ? 'custom_' . $customFieldId : $value);
+        $tmpContactField[$value] = $contactFields[$value];
+        $title = $tmpContactField[$value]['title'] . ' ' . ts('(match to contact)');
+        $tmpContactField[$value]['title'] = $title;
+      }
+    }
+
+    $tmpContactField['external_identifier'] = $contactFields['external_identifier'];
+    $tmpContactField['external_identifier']['title'] = $contactFields['external_identifier']['title'] . ' ' . ts('(match to contact)');
+    return $tmpContactField;
+  }
+
+  /**
    * Gets the fields available for importing in a key-name, title format.
    *
    * @return array
