@@ -26,8 +26,8 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm(): void {
-    $this->buildSavedMappingFields($this->getSubmittedValue('savedMapping'));
-    $this->addFormRule(array('CRM_Member_Import_Form_MapField', 'formRule'), $this);
+    $this->addSavedMappingFields();
+    $this->addFormRule(['CRM_Member_Import_Form_MapField', 'formRule'], $this);
 
     $options = $this->getFieldOptions();
     foreach ($this->getColumnHeaders() as $i => $columnHeader) {
@@ -108,29 +108,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
         }
       }
     }
-
-    if (!empty($fields['saveMapping'])) {
-      $nameField = $fields['saveMappingName'] ?? NULL;
-      if (empty($nameField)) {
-        $errors['saveMappingName'] = ts('Name is required to save Import Mapping');
-      }
-      else {
-        if (CRM_Core_BAO_Mapping::checkMapping($nameField, CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Import Membership'))) {
-          $errors['saveMappingName'] = ts('Duplicate Import Membership Mapping Name');
-        }
-      }
-    }
-
-    if (!empty($errors)) {
-      if (!empty($errors['saveMappingName'])) {
-        $_flag = 1;
-        $assignError = new CRM_Core_Page();
-        $assignError->assign('mappingDetailsError', $_flag);
-      }
-      return $errors;
-    }
-
-    return TRUE;
+    return $errors ?: TRUE;
   }
 
   /**
