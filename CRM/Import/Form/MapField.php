@@ -125,7 +125,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    *
    * @return string
    */
-  public function defaultFromHeader($header, &$patterns) {
+  public function defaultFromHeader($header, $patterns) {
     foreach ($patterns as $key => $re) {
       // Skip empty key/patterns
       if (!$key || !$re || strlen("$re") < 5) {
