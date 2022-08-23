@@ -127,7 +127,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
       ->setSelect(['id', 'name'])
       ->addWhere('mapping_id.mapping_type_id:name', '=', 'Import Membership')
       ->execute();
-    $fields = CRM_Member_BAO_Membership::importableFields('All', FALSE);;
+    $fields = self::getImportableMembershipFields('All');;
     $fieldMap = [];
     foreach ($fields as $fieldName => $field) {
       $fieldMap[$field['title']] = $fieldName;
@@ -243,6 +243,54 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
     }
 
     return TRUE;
+  }
+
+  /**
+   * @param string $contactType
+   *
+   * @return array|mixed
+   * @throws \CRM_Core_Exception
+   */
+  protected static function getImportableMembershipFields($contactType = 'Individual') {
+    $fields = Civi::cache('fields')->get('upgrade_membership_importable_fields' . $contactType);
+    if (!$fields) {
+      $fields = ['' => ['title' => '- ' . ts('do not import') . ' -']];
+
+      $tmpFields = CRM_Member_DAO_Membership::import();
+      $contactFields = CRM_Contact_BAO_Contact::importableFields($contactType, NULL);
+
+      // Using new Dedupe rule.
+      $ruleParams = [
+        'contact_type' => $contactType,
+        'used' => 'Unsupervised',
+      ];
+      $fieldsArray = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
+
+      $tmpContactField = [];
+      if (is_array($fieldsArray)) {
+        foreach ($fieldsArray as $value) {
+          $customFieldId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
+            $value,
+            'id',
+            'column_name'
+          );
+          $value = trim($customFieldId ? 'custom_' . $customFieldId : $value);
+          $tmpContactField[trim($value)] = $contactFields[$value] ?? NULL;
+          $title = $tmpContactField[trim($value)]['title'] . ' ' . ts('(match to contact)');
+          $tmpContactField[trim($value)]['title'] = $title;
+        }
+      }
+      $tmpContactField['external_identifier'] = $contactFields['external_identifier'];
+      $tmpContactField['external_identifier']['title'] = $contactFields['external_identifier']['title'] . ' ' . ts('(match to contact)');
+
+      $tmpFields['membership_contact_id']['title'] .= ' ' . ts('(match to contact)');
+
+      $fields = array_merge($fields, $tmpContactField);
+      $fields = array_merge($fields, $tmpFields);
+      $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Membership'));
+      Civi::cache('fields')->set('upgrade_membership_importable_fields' . $contactType, $fields);
+    }
+    return $fields;
   }
 
   /**
