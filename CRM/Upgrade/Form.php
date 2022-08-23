@@ -222,36 +222,6 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   }
 
   /**
-   * Use the form name to create the tpl file name.
-   *
-   * @return string
-   */
-
-  /**
-   * @return string
-   */
-  public function getTemplateFileName() {
-    $this->assign('title',
-      $this->getFieldsetTitle()
-    );
-    $this->assign('message',
-      $this->getTemplateMessage()
-    );
-    return 'CRM/Upgrade/Base.tpl';
-  }
-
-  public function postProcess() {
-    $this->upgrade();
-
-    if (!$this->verifyPostDBState($errorMessage)) {
-      if (!isset($errorMessage)) {
-        $errorMessage = 'post-condition failed for current upgrade step';
-      }
-      throw new CRM_Core_Exception($errorMessage);
-    }
-  }
-
-  /**
    * @param $version
    *
    * @return Object
