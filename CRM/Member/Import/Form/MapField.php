@@ -31,10 +31,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     //-------- end of saved mapping stuff ---------
 
-    $defaults = [];
-    $columnHeaders = $this->getColumnHeaders();
-    $hasHeaders = $this->getSubmittedValue('skipColumnHeader');
-    $headerPatterns = $this->getHeaderPatterns();
     // For most fields using the html label is a good thing
     // but for contact ID we really want to specify ID.
     $this->_mapperFields['membership_contact_id'] = ts('Contact ID');
@@ -44,44 +40,13 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       unset($sel1['membership_id']);
     }
 
-    $fieldMappings = $this->getFieldMappings();
-
-    foreach ($columnHeaders as $i => $columnHeader) {
-      $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', array(1 => $i)), NULL);
+    foreach ($this->getColumnHeaders() as $i => $columnHeader) {
+      $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
       $sel->setOptions([$sel1]);
-      if ($this->getSubmittedValue('savedMapping')) {
-        $fieldMapping = $fieldMappings[$i] ?? NULL;
-        if (isset($fieldMappings[$i])) {
-          if ($fieldMapping['name'] != ts('do_not_import')) {
-            $defaults["mapper[$i]"] = [$fieldMapping['name']];
-          }
-          else {
-            $defaults["mapper[$i]"] = [];
-          }
-        }
-        else {
-          if ($hasHeaders) {
-            $defaults["mapper[$i]"] = array($this->defaultFromHeader($columnHeader, $headerPatterns));
-          }
-        }
-        //end of load mapping
-      }
-      else {
-        if ($this->getSubmittedValue('skipColumnHeader')) {
-          // Infer the default from the skipped headers if we have them
-          $defaults["mapper[$i]"] = array(
-            $this->defaultFromHeader($columnHeader,
-              $headerPatterns
-            ),
-            //                     $defaultLocationType->id
-            0,
-          );
-        }
-      }
     }
     $this->assign('initHideBoxes');
 
-    $this->setDefaults($defaults);
+    $this->setDefaults($this->getDefaults());
 
     $this->addFormButtons();
   }
@@ -244,6 +209,31 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
     }
     return $highlightedFields;
+  }
+
+  /**
+   * Get default values for the mapping.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDefaults(): array {
+    $defaults = [];
+    $headerPatterns = $this->getHeaderPatterns();
+    $fieldMappings = $this->getFieldMappings();
+    foreach ($this->getColumnHeaders() as $i => $columnHeader) {
+      if ($this->getSubmittedValue('savedMapping')) {
+        $fieldMapping = $fieldMappings[$i] ?? NULL;
+        if (isset($fieldMappings[$i])) {
+          $defaults["mapper[$i]"] = ($fieldMapping['name'] !== 'do_not_import') ? [$fieldMapping['name']] : [];
+        }
+      }
+      if (!isset($defaults["mapper[$i]"]) && $this->getSubmittedValue('skipColumnHeader')) {
+        $defaults["mapper[$i]"] = [$this->defaultFromHeader($columnHeader, $headerPatterns)];
+      }
+    }
+    return $defaults;
   }
 
 }
