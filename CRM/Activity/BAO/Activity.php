@@ -310,7 +310,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       // CRM-8708, preserve case ID even though it's not part of the SQL model
       $activity->case_id = $params['case_id'];
     }
-    elseif (is_numeric($activity->id)) {
+    elseif ($action === 'edit' && CRM_Core_Component::isEnabled('CiviCase')) {
       // CRM-8708, preserve case ID even though it's not part of the SQL model
       $activity->case_id = CRM_Case_BAO_Case::getCaseIdByActivityId($activity->id);
     }
@@ -456,9 +456,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     if (empty($params['skipRecentView'])) {
       $recentOther = [];
       if (!empty($params['case_id'])) {
-        $caseContactID = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseContact', $params['case_id'], 'contact_id', 'case_id');
+        $caseId = CRM_Utils_Array::first((array) $params['case_id']);
+        $caseContactID = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseContact', $caseId, 'contact_id', 'case_id');
         $url = CRM_Utils_System::url('civicrm/case/activity/view',
-          "reset=1&aid={$activity->id}&cid={$caseContactID}&caseID={$params['case_id']}&context=home"
+          "reset=1&aid={$activity->id}&cid={$caseContactID}&caseID={$caseId}&context=home"
         );
       }
       else {
@@ -522,12 +523,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     // Add to case
-    if (!empty($params['case_id']) && $action === 'create') {
-      // If this is a brand new case activity, add to case(s)
-      foreach ((array) $params['case_id'] as $singleCaseId) {
-        $caseActivityParams = ['activity_id' => $activity->id, 'case_id' => $singleCaseId];
-        CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);
-      }
+    if (isset($params['case_id'])) {
+      CRM_Case_BAO_Case::updateCaseActivity($activity->id, $params['case_id']);
     }
 
     CRM_Utils_Hook::post($action, 'Activity', $activity->id, $activity);

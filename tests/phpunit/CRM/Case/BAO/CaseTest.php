@@ -749,19 +749,13 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $case1 = $this->createCase($clientId1, $loggedInUser);
     $case2 = $this->createCase($clientId2, $loggedInUser);
     $linkActivity = $this->callAPISuccess('Activity', 'create', [
-      'case_id' => $case1->id,
+      'case_id' => [$case1->id, $case2->id],
       'source_contact_id' => $loggedInUser,
       'target_contact' => $clientId1,
       'activity_type_id' => 'Link Cases',
       'subject' => 'Test Link Cases',
       'status_id' => 'Completed',
     ]);
-
-    // Put it in the format needed for endPostProcess
-    $activity = new StdClass();
-    $activity->id = $linkActivity['id'];
-    $params = ['link_to_case_id' => $case2->id];
-    CRM_Case_Form_Activity_LinkCases::endPostProcess(NULL, $params, $activity);
 
     // Get the option_value.value for case status Closed
     $closedStatusResult = $this->callAPISuccess('OptionValue', 'get', [

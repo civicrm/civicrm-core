@@ -21,6 +21,7 @@ namespace api\v4\Entity;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
+use Civi\Api4\CaseActivity;
 use Civi\Api4\Relationship;
 
 /**
@@ -87,6 +88,80 @@ class CaseTest extends Api4TestBase {
 
     $this->assertContains($activity1['id'], $get1);
     $this->assertNotContains($activity2['id'], $get1);
+
+    Activity::update(FALSE)
+      ->addWhere('id', '=', $activity1['id'])
+      ->addValue('case_id', $case2['id'])
+      ->execute();
+
+    // Both activities now belong to case 2
+    $get2 = CaseActivity::get(FALSE)
+      ->addWhere('case_id', '=', $case2['id'])
+      ->execute()
+      ->column('activity_id');
+    $this->assertContains($activity1['id'], $get2);
+    $this->assertContains($activity2['id'], $get2);
+
+    // Ensure it's been moved out of case 1
+    $get1 = CaseActivity::get(FALSE)
+      ->addWhere('case_id', '=', $case1['id'])
+      ->execute()
+      ->column('activity_id');
+    $this->assertNotContains($activity1['id'], $get1);
+
+    Activity::update(FALSE)
+      ->addWhere('id', '=', $activity1['id'])
+      ->addValue('case_id', NULL)
+      ->execute();
+
+    // Activity 1 has been removed
+    $get2 = CaseActivity::get(FALSE)
+      ->addWhere('case_id', '=', $case2['id'])
+      ->execute()
+      ->column('activity_id');
+    $this->assertNotContains($activity1['id'], $get2);
+    $this->assertContains($activity2['id'], $get2);
+  }
+
+  public function testMultipleCaseActivity(): void {
+    $case1 = $this->createTestRecord('Case');
+    $case2 = $this->createTestRecord('Case');
+
+    $activity = $this->createTestRecord('Activity', [
+      'case_id' => [$case1['id'], $case2['id']],
+    ]);
+
+    $get1 = CaseActivity::get(FALSE)
+      ->addWhere('activity_id', '=', $activity['id'])
+      ->execute()
+      ->column('case_id');
+    $this->assertCount(2, $get1);
+    $this->assertContains($case1['id'], $get1);
+    $this->assertContains($case2['id'], $get1);
+
+    // Ensure updating the activity doesn't change the case assoc
+    Activity::update(FALSE)
+      ->addValue('id', $activity['id'])
+      ->execute();
+
+    $get1 = CaseActivity::get(FALSE)
+      ->addWhere('activity_id', '=', $activity['id'])
+      ->execute()
+      ->column('case_id');
+    $this->assertCount(2, $get1);
+    $this->assertContains($case1['id'], $get1);
+    $this->assertContains($case2['id'], $get1);
+
+    // Delete the case assoc
+    Activity::update(FALSE)
+      ->addValue('id', $activity['id'])
+      ->addValue('case_id', [])
+      ->execute();
+
+    $get1 = CaseActivity::get(FALSE)
+      ->addWhere('activity_id', '=', $activity['id'])
+      ->execute();
+    $this->assertCount(0, $get1);
   }
 
 }

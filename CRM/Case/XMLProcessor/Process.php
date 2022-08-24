@@ -540,13 +540,6 @@ AND        a.is_deleted = 0
     if (!$activity) {
       throw new CRM_Core_Exception('Unable to create Activity');
     }
-
-    // create case activity record
-    $caseParams = [
-      'activity_id' => $activity->id,
-      'case_id' => $params['caseID'],
-    ];
-    CRM_Case_BAO_Case::processCaseActivity($caseParams);
     return TRUE;
   }
 

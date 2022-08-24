@@ -63,6 +63,11 @@ function civicrm_api3_activity_create($params) {
   // needs testing
   $params['skipRecentView'] = TRUE;
 
+  // In APIv3, only new activities can be filed on a case.
+  if (!$isNew && isset($params['case_id'])) {
+    unset($params['case_id']);
+  }
+
   // create activity
   $activityBAO = CRM_Activity_BAO_Activity::create($params);
 
