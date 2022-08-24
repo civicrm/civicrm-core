@@ -335,6 +335,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
         $tmpContactField[$value] = $contactFields[$value];
         $title = $tmpContactField[$value]['title'] . ' ' . ts('(match to contact)');
         $tmpContactField[$value]['title'] = $title;
+        // When we switch to apiv4 getfields this will already be set for
+        // all fields (including custom which it isn't yet)
+        $tmpContactField[$value]['entity'] = 'Contact';
       }
     }
 
