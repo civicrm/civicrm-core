@@ -1645,48 +1645,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Look up for an existing contact with the given external_identifier.
-   *
-   * If the identifier is found on a deleted contact then it is not a match
-   * but it must be removed from that contact to allow the new contact to
-   * have that external_identifier.
-   *
-   * @param string|null $externalIdentifier
-   * @param string $contactType
-   *
-   * @return int|null
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   */
-  protected function lookupExternalIdentifier(?string $externalIdentifier, string $contactType): ?int {
-    if (!$externalIdentifier) {
-      return NULL;
-    }
-    // Check for any match on external id, deleted or otherwise.
-    $foundContact = civicrm_api3('Contact', 'get', [
-      'external_identifier' => $externalIdentifier,
-      'showAll' => 'all',
-      'sequential' => TRUE,
-      'return' => ['id', 'contact_is_deleted', 'contact_type'],
-    ]);
-    if (empty($foundContact['id'])) {
-      return NULL;
-    }
-    if (!empty($foundContact['values'][0]['contact_is_deleted'])) {
-      // If the contact is deleted, update external identifier to be blank
-      // to avoid key error from MySQL.
-      $params = ['id' => $foundContact['id'], 'external_identifier' => ''];
-      civicrm_api3('Contact', 'create', $params);
-      return NULL;
-    }
-    if ($foundContact['values'][0]['contact_type'] !== $contactType) {
-      throw new CRM_Core_Exception('Mismatched contact Types', CRM_Import_Parser::NO_MATCH);
-    }
-    return (int) $foundContact['id'];
-  }
-
-  /**
    * Lookup the contact's contact ID.
    *
    * @param array $params
@@ -1700,12 +1658,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function lookupContactID(array $params, bool $isMainContact): ?int {
-    $extIDMatch = $this->lookupExternalIdentifier($params['external_identifier'] ?? NULL, $params['contact_type']);
     $contactID = !empty($params['id']) ? (int) $params['id'] : NULL;
-    //check if external identifier exists in database
-    if ($extIDMatch && $contactID && $extIDMatch !== $contactID) {
-      throw new CRM_Core_Exception(ts('Existing external ID does not match the imported contact ID.'), CRM_Import_Parser::ERROR);
-    }
+    $extIDMatch = $this->lookupExternalIdentifier($params['external_identifier'] ?? NULL, $params['contact_type'], $contactID);
     if ($extIDMatch && $isMainContact && ($this->isSkipDuplicates() || $this->isIgnoreDuplicates())) {
       throw new CRM_Core_Exception(ts('External ID already exists in Database.'), CRM_Import_Parser::DUPLICATE);
     }

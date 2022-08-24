@@ -150,6 +150,9 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
       $params = $this->getMappedRow($values);
+      if ($params['external_identifier']) {
+        $params['contact_id'] = $this->lookupExternalIdentifier($params['external_identifier'], $this->getContactType(), $params['contact_id'] ?? NULL);
+      }
       $session = CRM_Core_Session::singleton();
       $formatted = $params;
       // don't add to recent items, CRM-4399
@@ -271,14 +274,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         }
       }
       else {
-        if (!empty($formatValues['external_identifier'])) {
-          $checkCid = new CRM_Contact_DAO_Contact();
-          $checkCid->external_identifier = $formatValues['external_identifier'];
-          $checkCid->find(TRUE);
-          if ($checkCid->id != $formatted['contact_id']) {
-            throw new CRM_Core_Exception('Mismatch of External ID:' . $formatValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id']);
-          }
-        }
         $newParticipant = $this->deprecated_create_participant_formatted($formatted);
       }
 
