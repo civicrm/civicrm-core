@@ -264,35 +264,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     $note = CRM_Core_DAO_Note::import();
     $tmpFields = CRM_Contribute_DAO_Contribution::import();
     unset($tmpFields['option_value']);
-    $contactFields = CRM_Contact_BAO_Contact::importableFields($contactType, NULL);
-
-    // Using new Dedupe rule.
-    $ruleParams = [
-      'contact_type' => $contactType,
-      'used' => 'Unsupervised',
-    ];
-    $fieldsArray = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
-    $tmpContactField = [];
-    if (is_array($fieldsArray)) {
-      foreach ($fieldsArray as $value) {
-        //skip if there is no dupe rule
-        if ($value === 'none') {
-          continue;
-        }
-        $customFieldId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
-          $value,
-          'id',
-          'column_name'
-        );
-        $value = $customFieldId ? 'custom_' . $customFieldId : $value;
-        $tmpContactField[trim($value)] = $contactFields[trim($value)];
-        $title = $tmpContactField[trim($value)]['title'] . ' ' . ts('(match to contact)');
-        $tmpContactField[trim($value)]['title'] = $title;
-      }
-    }
-
-    $tmpContactField['external_identifier'] = $contactFields['external_identifier'];
-    $tmpContactField['external_identifier']['title'] = $contactFields['external_identifier']['title'] . ' ' . ts('(match to contact)');
+    $tmpContactField = $this->getContactFields($contactType);
     $tmpFields['contribution_contact_id']['title'] = $tmpFields['contribution_contact_id']['html']['label'] = $tmpFields['contribution_contact_id']['title'] . ' ' . ts('(match to contact)');
     $fields = array_merge($fields, $tmpContactField);
     $fields = array_merge($fields, $tmpFields);
