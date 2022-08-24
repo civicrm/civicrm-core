@@ -150,8 +150,10 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
    *
    * @return array
    *   array of mapping fields
+   * @deprecated to be removed.
    */
   public static function getMappingFields($mappingId, $addPrimary = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     //mapping is to be loaded from database
     $mapping = new CRM_Core_DAO_MappingField();
     $mapping->mapping_id = $mappingId;

@@ -174,14 +174,12 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
       $jsSet = FALSE;
       if ($this->getSubmittedValue('savedMapping')) {
-        // $mappingContactType is not really a contact type - the data has been mangled
-        // into that field - see https://lab.civicrm.org/dev/core/-/issues/654
-        [$mappingName, $mappingContactType] = CRM_Core_BAO_Mapping::getMappingFields($savedMappingID);
         $fieldMapping = $fieldMappings[$i] ?? NULL;
-        $mappingContactType = $mappingContactType[1];
-        if (isset($fieldMappings[$i])) {
+        if ($fieldMapping) {
           if ($fieldMapping['name'] !== ts('do_not_import')) {
-            $softField = $mappingContactType[$i] ?? '';
+            // $mapping contact_type is not really a contact type - the data has been mangled
+            // into that field - see https://lab.civicrm.org/dev/core/-/issues/654
+            $softField = $fieldMapping['contact_type'] ?? '';
 
             if (!$softField) {
               $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
