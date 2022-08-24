@@ -149,6 +149,8 @@
 - github      : AsylumSeekersCentre
   name        : Asylum Seekers Centre
 
+- github      : avall-llovera
+
 - github      : artfulrobot
   name        : Rich Lott
   organization: Artful Robot
@@ -854,6 +856,9 @@
   name        : Carl Andrew Lema
   organization: Kanzu Code
 
+- github      : Levi-70
+  name        : Levi.k
+
 - github      : liblogger
   name        : Helen MacDonald
   organization: Glasgow Women's Library
@@ -1273,6 +1278,9 @@
   name        : Sadashiv
   organization: Gokhalemethod
 
+- github      : savionlee
+  name        : Savion Lee
+  
 - github      : scoobird
   name        : Morgan Robinson
   organization: Palante Technology Cooperative
@@ -1572,7 +1580,7 @@
 - github      : rashedulislam
   name        : Md Rashedul Islam
   organization: Grype Digital Inc.
-  
+
 - github      : vitius1
   name        : Vít Maňásek
   organization: KAM z.s.
