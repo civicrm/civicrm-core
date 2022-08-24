@@ -306,7 +306,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $paramValues['contact_type'] = $this->getContactType();
       }
       elseif ($this->isUpdateExisting() &&
-        (!empty($paramValues['contribution_id']) || !empty($values['trxn_id']) || !empty($paramValues['invoice_id']))
+        (!empty($paramValues['id']) || !empty($values['trxn_id']) || !empty($paramValues['invoice_id']))
       ) {
         $paramValues['contact_type'] = $this->getContactType();
       }
@@ -329,9 +329,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       if ($this->isUpdateExisting()) {
         //fix for CRM-2219 - Update Contribution
         // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
-        if (!empty($paramValues['invoice_id']) || !empty($paramValues['trxn_id']) || !empty($paramValues['contribution_id'])) {
+        if (!empty($paramValues['invoice_id']) || !empty($paramValues['trxn_id']) || !empty($paramValues['id'])) {
           $dupeIds = [
-            'id' => $paramValues['contribution_id'] ?? NULL,
+            'id' => $paramValues['id'] ?? NULL,
             'trxn_id' => $paramValues['trxn_id'] ?? NULL,
             'invoice_id' => $paramValues['invoice_id'] ?? NULL,
           ];
@@ -684,12 +684,14 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
               $params['contribution_contact_id'] = $matchingContactIds[0];
             }
           }
-          elseif (!empty($params['contribution_id']) || !empty($params['trxn_id']) || !empty($params['invoice_id'])) {
+          elseif (!empty($params['id']) || !empty($params['trxn_id']) || !empty($params['invoice_id'])) {
             // when update mode check contribution id or trxn id or
             // invoice id
+            // @todo - this check is obsolete. It survives for now
+            // in order to keep the rc patch small & non-conflicty.
             $contactId = new CRM_Contribute_DAO_Contribution();
-            if (!empty($params['contribution_id'])) {
-              $contactId->id = $params['contribution_id'];
+            if (!empty($params['id'])) {
+              $contactId->id = $params['id'];
             }
             elseif (!empty($params['trxn_id'])) {
               $contactId->trxn_id = $params['trxn_id'];
