@@ -405,6 +405,44 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that existing contributions are found and updated.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportUpdateExisting(): void {
+    $this->contributionCreate([
+      'contact_id' => $this->individualCreate(),
+      'trxn_id' => 'abc',
+      'invoice_id' => '65',
+      'total_amount' => 8,
+      'financial_type_id:name' => 'Event Fee',
+    ]);
+    $mapping = [
+      ['name' => 'contribution_id'],
+      ['name' => 'invoice_id'],
+      ['name' => 'trxn_id'],
+      ['name' => ''],
+      ['name' => 'total_amount'],
+      ['name' => 'receive_date'],
+      ['name' => 'financial_type_id'],
+      ['name' => 'contribution_source'],
+      ['name' => ''],
+    ];
+    $this->importCSV('contributions_update.csv', $mapping, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
+    $rows = $this->getDataSource()->getRows();
+    foreach ($rows as $row) {
+      if ($row[8] === 'valid') {
+        // Note that as the valid value is 'IMPORTED' - but the fix to make that correct
+        // is not in 5.53 so temporary support for pledge_payment_imported
+        $this->assertContains($row[10], ['pledge_payment_imported', 'IMPORTED'], $row[11]);
+      }
+      else {
+        $this->assertEquals('ERROR', $row[10], $row[11]);
+      }
+    }
+  }
+
+  /**
    * Add a random extra option value
    *
    * @param string $optionGroup
