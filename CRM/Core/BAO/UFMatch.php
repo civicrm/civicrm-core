@@ -173,7 +173,7 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
     $ufmatch = new CRM_Core_DAO_UFMatch();
     $ufmatch->domain_id = CRM_Core_Config::domainID();
     $ufmatch->uf_id = $userKey;
-
+    $contactID = ($isLogin || empty($_POST['contact_id']) ? NULL : CRM_Utils_Type::validate($_POST['contact_id'], 'Integer'));
     if (!$ufmatch->find(TRUE)) {
       $transaction = new CRM_Core_Transaction();
 
@@ -184,8 +184,8 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
         // dev/core#1858 Ensure that if we have a contactID parameter which is set in the Create user Record contact task form
         // That this contacID value is passed through as the contact_id to the get duplicate contacts function. This is necessary because for Drupal 8 this function gets invoked
         // Before the civicrm_uf_match record is added where as in D7 it isn't called until the user tries to actually login.
-        if (!empty($params['contactID'])) {
-          $params['contact_id'] = $params['contactID'];
+        if ($contactID) {
+          $params['contact_id'] = $contactID;
         }
 
         $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, 'Individual', 'Unsupervised', [], FALSE);
@@ -215,17 +215,17 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
         // ensure there does not exists a contact_id / uf_id pair
         // in the DB. This might be due to multiple emails per contact
         // CRM-9091
-        $sql = "
+        $sql = '
 SELECT id
 FROM   civicrm_uf_match
 WHERE  contact_id = %1
 AND    domain_id = %2
-";
-        $params = [
+';
+
+        $conflict = CRM_Core_DAO::singleValueQuery($sql, [
           1 => [$dao->contact_id, 'Integer'],
           2 => [CRM_Core_Config::domainID(), 'Integer'],
-        ];
-        $conflict = CRM_Core_DAO::singleValueQuery($sql, $params);
+        ]);
 
         if (!$conflict) {
           $found = TRUE;
@@ -248,6 +248,9 @@ AND    domain_id = %2
             $primary_email = $user->email;
           }
           $params = ['email' => $primary_email];
+          if (!empty($params['contactID'])) {
+            $params['contact_id'] = $params['contactID'];
+          }
         }
 
         if ($ctype === 'Organization') {
@@ -291,14 +294,13 @@ OR     uf_name      = %2
 OR     uf_id        = %3 )
 AND    domain_id    = %4
 ";
-      $params = [
+
+      $conflict = CRM_Core_DAO::singleValueQuery($sql, [
         1 => [$ufmatch->contact_id, 'Integer'],
         2 => [$ufmatch->uf_name, 'String'],
         3 => [$ufmatch->uf_id, 'Integer'],
         4 => [$ufmatch->domain_id, 'Integer'],
-      ];
-
-      $conflict = CRM_Core_DAO::singleValueQuery($sql, $params);
+      ]);
 
       if (!$conflict) {
         $ufmatch = CRM_Core_BAO_UFMatch::create((array) $ufmatch);
