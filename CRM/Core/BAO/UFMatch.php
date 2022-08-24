@@ -247,7 +247,7 @@ AND    domain_id = %2
           else {
             $primary_email = $user->email;
           }
-          $params = ['email' => $primary_email];
+          $params['email'] = $primary_email;
         }
 
         if ($ctype === 'Organization') {
