@@ -71,6 +71,8 @@
                         <td class="html-adjust">
                           {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
                             {', '|implode:$element.contact_ref_links}
+                          {elseif $element.field_data_type EQ 'EntityReference' && $element.entity_ref_links}
+                            {', '|implode:$element.entity_ref_links}
                           {elseif $element.field_data_type == 'Memo'}
                             {$element.field_value|nl2br}
                           {else}
@@ -124,6 +126,8 @@
                   <div class="content">
                     {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
                       {', '|implode:$element.contact_ref_links}
+                    {elseif $element.field_data_type EQ 'EntityReference' && $element.entity_ref_links}
+                      {', '|implode:$element.entity_ref_links}
                     {elseif $element.field_data_type == 'Memo'}
                       {if $element.field_value}{$element.field_value|nl2br}{else}<br/>{/if}
                     {else}

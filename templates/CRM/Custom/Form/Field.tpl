@@ -67,6 +67,14 @@
         <span class="description">{ts}Filter contact search results for this field using Contact get API parameters. EXAMPLE: To list Students in group 3:{/ts} "action=get&group=3&contact_sub_type=Student" {docURL page="dev/api"}</span>
       </td>
     </tr>
+    <tr id="entity_reference_group">
+      <td class="label">{$form.entity_type.label}</td>
+      <td class="html-adjust">{$form.entity_type.html}</td>
+    </tr>
+    <tr id="entityref_advance_filter">
+      <td class="label">{$form.entityref_filter.label}</td>
+      <td class="html-adjust">{$form.entityref_filter.html}</td>
+    </tr>
     <tr class="crm-custom-field-form-block-options_per_line" id="optionsPerLine" {if $action neq 2 && ($form.data_type.value.0.0 >= 4 && $form.data_type.value.1.0 neq 'CheckBox' || $form.data_type.value.1.0 neq 'Radio' )}class="hiddenElement"{/if}>
       <td class="label">{$form.options_per_line.label}</td>
       <td class="html-adjust">{$form.options_per_line.html|crmAddClass:two}</td>
@@ -229,6 +237,7 @@
       e && e.preventDefault && e.preventDefault();
     }
     $('.toggle-contact-ref-mode', $form).click(toggleContactRefFilter);
+    $('.toggle-contact-ref-mode', $form).click(toggleContactRefFilter);
 
     function customOptionHtmlType(dataType) {
       var htmlType = $("#html_type", $form).val(),
@@ -239,9 +248,14 @@
       }
 
       if (dataType === 'ContactReference') {
+        $('#field_advance_filter, #entity_reference_group, #entityref_advance_filter', $form).hide();
         toggleContactRefFilter();
+      } else if (dataType === 'EntityReference') {
+        $('#field_advance_filter, #contact_reference_group', $form).hide();
+        $('#entity_reference_group, #entityref_advance_filter', $form).show();
       } else {
         $('#field_advance_filter, #contact_reference_group', $form).hide();
+        $('#entity_reference_group, #entityref_advance_filter', $form).hide();
       }
 
       if (_.includes(['String', 'Int', 'Float', 'Money'], dataType)) {

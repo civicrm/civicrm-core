@@ -70,6 +70,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     'File' => ['File'],
     'Link' => ['Link'],
     'ContactReference' => ['Autocomplete-Select'],
+    'EntityReference' => ['Autocomplete-Select'],
   ];
 
   /**
@@ -297,6 +298,25 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     );
 
     $this->add('hidden', 'filter_selected', 'Group', ['id' => 'filter_selected']);
+
+    // Entity Reference fields.
+    $entityTypes = \Civi\Api4\Entity::get(FALSE)
+      ->addSelect('name', 'title')
+      ->execute()
+      ->indexBy('name')
+      ->column('title');
+    $this->add('select',
+      'entity_type',
+      ts('Entity Type'),
+      $entityTypes,
+      FALSE,
+      ['class' => 'crm-select2']
+    );
+    $this->add('text',
+      'entityref_filter',
+      ts('Advanced Filter'),
+      $attributes['entityref_filter']
+    );
 
     // form fields of Custom Option rows
     $defaultOption = [];
@@ -612,6 +632,13 @@ SELECT count(*)
           }
           $self->setDefaults(['filter_selected', $fields['filter_selected']]);
           break;
+        case 'EntityReference':
+          if (!empty($fields['filter'])) {
+            if (strpos($fields['filter'], 'action=get') === FALSE) {
+              $errors['filter'] = ts("Only 'get' action is supported.");
+            }
+          }
+          break;
       }
     }
 
@@ -853,6 +880,12 @@ AND    option_group_id = %2";
       }
       elseif ($params['filter_selected'] == 'Group' && !empty($params['group_id'])) {
         $filter = 'action=lookup&group=' . implode(',', $params['group_id']);
+      }
+    }
+    if ($params['data_type'] == 'EntityReference') {
+      if (trim(CRM_Utils_Array::value('entityref_filter', $params))) {
+        $filter = 'entity=' . $params['entity_type'] . '&'
+          . trim($params['entityref_filter']);
       }
     }
     $params['filter'] = $filter;

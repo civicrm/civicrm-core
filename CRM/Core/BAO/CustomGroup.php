@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  * Business object for managing custom data groups.
  */
@@ -423,6 +425,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         'time_format',
         'option_group_id',
         'in_selector',
+        'filter',
       ],
       'custom_group' => [
         'id',
@@ -1877,6 +1880,7 @@ ORDER BY civicrm_custom_group.weight,
               'field_value' => CRM_Core_BAO_CustomField::displayValue($values['data'], $properties['id'], $entityId),
               'options_per_line' => $properties['options_per_line'] ?? NULL,
               'data' => $values['data'],
+              'filter' => $properties['filter'] ?? NULL,
             ];
             // editable = whether this set contains any non-read-only fields
             if (!isset($details[$groupID][$values['id']]['editable'])) {
@@ -1892,11 +1896,32 @@ ORDER BY civicrm_custom_group.weight,
               $details[$groupID][$values['id']]['fields'][$k]['contact_ref_links'] = [];
               $path = CRM_Contact_DAO_Contact::getEntityPaths()['view'];
               foreach (CRM_Utils_Array::explodePadded($values['data'] ?? []) as $contactId) {
-                $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'display_name');
-                if ($displayName) {
+                $entityLabel = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'display_name');
+                if ($entityLabel) {
                   $url = CRM_Utils_System::url(str_replace('[id]', $contactId, $path));
                   $details[$groupID][$values['id']]['fields'][$k]['contact_ref_links'][] = '<a href="' . $url . '" title="' . htmlspecialchars(ts('View Contact')) . '">' .
-                    $displayName . '</a>';
+                    $entityLabel . '</a>';
+                }
+              }
+            }
+            // also return entity reference entity id if user has view all or edit permissions for that entity type.
+            if ($details[$groupID][$values['id']]['fields'][$k]['field_data_type'] === 'EntityReference'
+              // TODO: Check permissions for referenced entity type.
+//              && CRM_Core_Permission::check([['view all contacts', 'edit all contacts']])
+            ) {
+              $details[$groupID][$values['id']]['fields'][$k]['entity_ref_links'] = [];
+              parse_str($details[$groupID][$values['id']]['fields'][$k]['filter'], $params);
+              $entityType = $params['entity'];
+              $daoName = CRM_Core_DAO_AllCoreTables::getFullName($entityType);
+              $path = $daoName::getEntityPaths()['view'];
+              $entityLabelField = CoreUtil::getInfoItem($entityType, 'label_field');
+              $entityTypeLabel = CoreUtil::getInfoItem($entityType, 'title');
+              foreach (CRM_Utils_Array::explodePadded($values['data'] ?? []) as $referencedEntityId) {
+                $entityLabel = CRM_Core_DAO::getFieldValue($daoName, $referencedEntityId, $entityLabelField);
+                if ($entityLabel) {
+                  $url = CRM_Utils_System::url(str_replace('[id]', $referencedEntityId, $path));
+                  $details[$groupID][$values['id']]['fields'][$k]['entity_ref_links'][] = '<a href="' . $url . '" title="' . htmlspecialchars(ts('View %1', [1 => $entityTypeLabel])) . '">' .
+                    $entityLabel . '</a>';
                 }
               }
             }
@@ -2113,8 +2138,8 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
           $fkFields = civicrm_api4($field['entity'], 'getFields', [
             'checkPermissions' => FALSE,
           ])->indexBy('name');
-          $fkIdField = \Civi\Api4\Utils\CoreUtil::getIdFieldName($field['fk_entity']);
-          $fkLabelField = \Civi\Api4\Utils\CoreUtil::getInfoItem($field['fk_entity'], 'label_field');
+          $fkIdField = CoreUtil::getIdFieldName($field['fk_entity']);
+          $fkLabelField = CoreUtil::getInfoItem($field['fk_entity'], 'label_field');
           $fkNameField = isset($fkFields['name']) ? 'name' : 'id';
           $select = [$fkIdField, $fkNameField, $fkLabelField];
           $where = [];

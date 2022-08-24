@@ -216,6 +216,7 @@ class CRM_Core_BAO_CustomQuery {
           case 'StateProvince':
           case 'Country':
           case 'ContactReference':
+          case 'EntityReference':
 
             if ($field['is_search_range'] && is_array($value)) {
               //didn't found any field under any of these three data-types as searchable by range

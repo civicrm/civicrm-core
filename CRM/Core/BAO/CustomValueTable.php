@@ -186,6 +186,7 @@ class CRM_Core_BAO_CustomValueTable {
               break;
 
             case 'ContactReference':
+            case 'EntityReference':
               if ($value == NULL || $value === '' || $value === $VS . $VS) {
                 $type = 'Timestamp';
                 $value = NULL;
@@ -315,6 +316,7 @@ class CRM_Core_BAO_CustomValueTable {
       // the below three are FK's, and have constraints added to them
 
       case 'ContactReference':
+      case 'EntityReference':
       case 'StateProvince':
       case 'Country':
       case 'File':

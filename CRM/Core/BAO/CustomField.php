@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  * Business objects for managing custom data fields.
  */
@@ -95,6 +97,11 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         'name' => 'Contact Reference',
         'label' => ts('Contact Reference'),
       ],
+      [
+        'id' => 'EntityReference',
+        'name' => 'Entity Reference',
+        'label' => ts('Entity Reference'),
+      ],
     ];
   }
 
@@ -118,6 +125,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       'File' => CRM_Utils_Type::T_STRING,
       'Link' => CRM_Utils_Type::T_STRING,
       'ContactReference' => CRM_Utils_Type::T_INT,
+      'EntityReference' => CRM_Utils_Type::T_INT,
       'Country' => CRM_Utils_Type::T_INT,
     ];
   }
@@ -983,6 +991,35 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           );
 
         }
+        elseif ($field->data_type == 'EntityReference') {
+          // break if contact does not have permission to access entityReference
+          // TODO: Does this permission make sense? If so, it needs to be created.
+          if (!CRM_Core_Permission::check('access entity reference fields')) {
+            break;
+          }
+          $fieldAttributes['class'] = ltrim(($fieldAttributes['class'] ?? '') . ' crm-form-entity-reference huge');
+          // TODO: Add "data-api-entity" attribute depending on referenced entity type.
+//          $fieldAttributes['data-api-entity'] = 'Contact';
+          if (!empty($field->serialize) || $search) {
+            $fieldAttributes['multiple'] = TRUE;
+          }
+          $element = $qf->add('text', $elementName, $label, $fieldAttributes, $useRequired && !$search);
+
+          $urlParams = "context=customfield&id={$field->id}";
+          $idOfelement = $elementName;
+          // dev/core#362 if in an onbehalf profile clean up the name to get rid of square brackets that break the select 2 js
+          // However this caused regression https://lab.civicrm.org/dev/core/issues/619 so it has been hacked back to
+          // only affecting on behalf - next time someone looks at this code it should be with a view to overhauling it
+          // rather than layering on more hacks.
+          if (substr($elementName, 0, 8) === 'onbehalf' && strpos($elementName, '[') && strpos($elementName, ']')) {
+            $idOfelement = substr(substr($elementName, (strpos($elementName, '[') + 1)), 0, -1);
+          }
+          $customUrls[$idOfelement] = CRM_Utils_System::url('civicrm/ajax/entityref',
+            $urlParams,
+            FALSE, NULL, FALSE
+          );
+
+        }
         else {
           // FIXME: This won't work with customFieldOptions hook
           $fieldAttributes += [
@@ -1148,20 +1185,30 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       case 'Autocomplete-Select':
       case 'Radio':
       case 'CheckBox':
-        if ($field['data_type'] == 'ContactReference' && (is_array($value) || is_numeric($value))) {
+        if (($field['data_type'] == 'ContactReference' || $field['data_type'] == 'EntityReference') && (is_array($value) || is_numeric($value))) {
           // Issue #2939 - guard against passing empty values to CRM_Core_DAO::getFieldValue(), which would throw an exception
           if (empty($value)) {
             $display = '';
           }
           else {
-            $displayNames = [];
-            foreach ((array) $value as $contactId) {
-              $displayNames[] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'display_name');
+            $entityLabels = [];
+            if ($field['data_type'] == 'ContactReference') {
+              $entityType = 'Contact';
             }
-            $display = implode(', ', $displayNames);
+            else {
+              parse_str($field['filter'], $params);
+              $entityType = $params['entity'];
+            }
+            $daoName = CRM_Core_DAO_AllCoreTables::getFullName($entityType);
+            $entityTypeLabel = CoreUtil::getInfoItem($entityType, 'title');
+            $entityLabelField = CoreUtil::getInfoItem($entityType, 'label_field');
+            foreach ((array) $value as $referencedEntityId) {
+              $entityLabels[] = CRM_Core_DAO::getFieldValue($daoName, $referencedEntityId, $entityLabelField) ?? $entityTypeLabel . ' ' . $referencedEntityId;
+            }
+            $display = implode(', ', $entityLabels);
           }
         }
-        elseif ($field['data_type'] == 'ContactReference') {
+        elseif ($field['data_type'] == 'ContactReference' || $field['data_type'] == 'EntityReference') {
           $display = $value;
         }
         elseif (is_array($value)) {
@@ -2798,6 +2845,7 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
       'Country' => 'civicrm_country',
       'StateProvince' => 'civicrm_state_province',
       'ContactReference' => 'civicrm_contact',
+      // TODO: EntityReference
       'File' => 'civicrm_file',
     ];
     if (isset($fkFields[$field->data_type])) {

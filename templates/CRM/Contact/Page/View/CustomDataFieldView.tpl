@@ -35,6 +35,14 @@
           {else}
             <div class="crm-content crm-custom-data">{$element.field_value}</div>
           {/if}
+          {if $element.field_data_type EQ 'EntityReference' && $element.entity_ref_links}
+            {*Entity ref id passed if user has sufficient permissions - so make a link.*}
+            <div class="crm-content crm-custom-data crm-entity-reference">
+              {', '|implode:$element.entity_ref_links}
+            </div>
+          {else}
+            <div class="crm-content crm-custom-data">{$element.field_value}</div>
+          {/if}
         {/if}
       </div>
     {/foreach}

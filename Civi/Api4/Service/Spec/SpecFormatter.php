@@ -37,6 +37,11 @@ class SpecFormatter {
         $field->setType('Field');
         $field->setTableName($data['custom_group_id.table_name']);
       }
+      if ($data['data_type'] == 'EntityReference') {
+        // Extract FK entity from the filter string.
+        parse_str($data['filter'], $params);
+        $field->setFkEntity($params['entity']);
+      }
       $field->setColumnName($data['column_name']);
       $field->setNullable(empty($data['is_required']));
       $field->setCustomFieldId($data['id'] ?? NULL);
