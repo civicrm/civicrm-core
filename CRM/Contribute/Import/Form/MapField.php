@@ -154,11 +154,10 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->setDefaults($defaults);
 
     $js = "<script type='text/javascript'>\n";
-    $formName = 'document.forms.' . $this->_name;
-    foreach ($defaults as  $index => $default) {
+    foreach ($defaults as $index => $default) {
       //  e.g swapOptions(document.forms.MapField, 'mapper[0]', 0, 3, 'hs_mapper_0_');
       // where 0 is the highest populated field number in the array and 3 is the maximum.
-      $js .= "swapOptions($formName, '$index', " . (array_key_last(array_filter($default)) ?: 0) . ", 3, 'hs_mapper_0_');\n";
+      $js .= "swapOptions(document.forms.MapField, '$index', " . (array_key_last(array_filter($default)) ?: 0) . ", 3, 'hs_mapper_0_');\n";
     }
     $js .= "</script>\n";
     $this->assign('initHideBoxes', $js);
