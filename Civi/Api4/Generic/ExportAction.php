@@ -29,6 +29,7 @@ use Civi\Api4\Utils\CoreUtil;
  * @method string getUpdate()
  */
 class ExportAction extends AbstractAction {
+  use Traits\MatchParamTrait;
 
   /**
    * Id of $ENTITY to export
@@ -145,7 +146,7 @@ class ExportAction extends AbstractAction {
         unset($record[$fieldName]);
       }
     }
-    $result[] = [
+    $export = [
       'name' => $name,
       'entity' => $entityType,
       'cleanup' => $this->cleanup,
@@ -155,6 +156,10 @@ class ExportAction extends AbstractAction {
         'values' => $record,
       ],
     ];
+    foreach (array_intersect($this->match, array_keys($allFields)) as $match) {
+      $export['params']['match'][] = $match;
+    }
+    $result[] = $export;
     // Export entities that reference this one
     $daoName = CoreUtil::getInfoItem($entityType, 'dao');
     if ($daoName) {
