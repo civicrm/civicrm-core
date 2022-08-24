@@ -134,18 +134,10 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     //-------- end of saved mapping stuff ---------
 
-    $defaults = [];
-    $mapperKeys = array_keys($this->_mapperFields);
-    $hasHeaders = $this->getSubmittedValue('skipColumnHeader');
-    $headerPatterns = $this->getHeaderPatterns();
     $mapperKeysValues = $this->getSubmittedValue('mapper');
     $columnHeaders = $this->getColumnHeaders();
     $fieldMappings = $this->getFieldMappings();
 
-    /* Initialize all field usages to false */
-    foreach ($mapperKeys as $key) {
-      $this->_fieldUsed[$key] = FALSE;
-    }
     $sel1 = $this->_mapperFields;
 
     if (!$this->isUpdateExisting()) {
@@ -185,16 +177,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
             $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
             $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
-            $defaults["mapper[$i]"] = [
-              $fieldMapping['name'],
-              $softField,
-              // Since the soft credit type id is not stored we can't load it here.
-              '',
-            ];
             $jsSet = TRUE;
-          }
-          else {
-            $defaults["mapper[$i]"] = [];
           }
           if (!$jsSet) {
             for ($k = 1; $k < 4; $k++) {
@@ -205,30 +188,11 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
         else {
           // this load section to help mapping if we ran out of saved columns when doing Load Mapping
           $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
-
-          if ($hasHeaders) {
-            $defaults["mapper[$i]"] = [$this->defaultFromHeader($columnHeader, $headerPatterns)];
-          }
         }
         //end of load mapping
       }
       else {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
-        if ($hasHeaders) {
-          // do array search first to see if has mapped key
-          $columnKey = array_search($columnHeader, $this->_mapperFields);
-          if (isset($this->_fieldUsed[$columnKey])) {
-            $defaults["mapper[$i]"] = $columnKey;
-            $this->_fieldUsed[$key] = TRUE;
-          }
-          else {
-            // Infer the default from the column names if we have them
-            $defaults["mapper[$i]"] = [
-              $this->defaultFromHeader($columnHeader, $headerPatterns),
-              0,
-            ];
-          }
-        }
         if (!empty($mapperKeysValues) && ($mapperKeysValues[$i][0] ?? NULL) === 'soft_credit') {
           $softCreditField = $mapperKeysValues[$i][1];
           $softCreditTypeID = $mapperKeysValues[$i][2];
@@ -240,7 +204,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
     $js .= "</script>\n";
     $this->assign('initHideBoxes', $js);
-    $this->setDefaults($defaults);
+    $this->setDefaults($this->getDefaults());
 
     $this->addFormButtons();
   }
@@ -343,6 +307,39 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->parser->init();
     }
     return $this->parser;
+  }
+
+  /**
+   * Get default values for the mapping.
+   *
+   * This looks up any saved mapping or derives them from the headers if possible.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDefaults(): array {
+    $defaults = [];
+    $fieldMappings = $this->getFieldMappings();
+    foreach ($this->getColumnHeaders() as $i => $columnHeader) {
+      $defaults["mapper[$i]"] = [];
+      if ($this->getSubmittedValue('savedMapping')) {
+        $fieldMapping = $fieldMappings[$i] ?? NULL;
+        if ($fieldMapping) {
+          if ($fieldMapping['name'] !== ts('do_not_import')) {
+            // $mapping contact_type is not really a contact type - the data has been mangled
+            // into that field - see https://lab.civicrm.org/dev/core/-/issues/654
+            // Since the soft credit type id is not stored we can't load it here.
+            $defaults["mapper[$i]"] = [$fieldMapping['name'], $fieldMapping['contact_type'] ?? '', ''];
+          }
+        }
+      }
+      elseif ($this->getSubmittedValue('skipColumnHeader')) {
+        $defaults["mapper[$i]"][0] = $this->guessMappingBasedOnColumns($columnHeader);
+      }
+    }
+
+    return $defaults;
   }
 
 }
