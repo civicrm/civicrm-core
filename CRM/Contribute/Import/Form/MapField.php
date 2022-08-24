@@ -125,9 +125,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
-    $savedMappingID = $this->getSubmittedValue('savedMapping');
-
-    $this->buildSavedMappingFields($savedMappingID);
+    $this->addSavedMappingFields();
 
     $this->addFormRule([
       'CRM_Contribute_Import_Form_MapField',
@@ -256,7 +254,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param $files
    * @param self $self
    *
-   * @return array
+   * @return array|true
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $files, $self) {
@@ -316,24 +314,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
     }
 
-    if (!empty($fields['saveMapping'])) {
-      $nameField = $fields['saveMappingName'] ?? NULL;
-      if (empty($nameField)) {
-        $errors['saveMappingName'] = ts('Name is required to save Import Mapping');
-      }
-      else {
-        if (CRM_Core_BAO_Mapping::checkMapping($nameField, CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Import Contribution'))) {
-          $errors['saveMappingName'] = ts('Duplicate Import Contribution Mapping Name');
-        }
-      }
-    }
-
     if (!empty($errors)) {
-      if (!empty($errors['saveMappingName'])) {
-        $_flag = 1;
-        $assignError = new CRM_Core_Page();
-        $assignError->assign('mappingDetailsError', $_flag);
-      }
       if (!empty($errors['_qf_default'])) {
         CRM_Core_Session::setStatus($errors['_qf_default'], ts("Error"), "error");
         return $errors;
