@@ -132,12 +132,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       'formRule',
     ], $this);
 
-    //-------- end of saved mapping stuff ---------
-
-    $mapperKeysValues = $this->getSubmittedValue('mapper');
-    $columnHeaders = $this->getColumnHeaders();
-    $fieldMappings = $this->getFieldMappings();
-
     $sel1 = $this->_mapperFields;
 
     if (!$this->isUpdateExisting()) {
@@ -151,60 +145,23 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $sel2['soft_credit'] = $softCreditFields;
     $sel3['soft_credit']['contact_id'] = $sel3['soft_credit']['external_identifier'] = $sel3['soft_credit']['email'] = CRM_Core_OptionGroup::values('soft_credit_type');
-    $sel4 = NULL;
 
-    // end of soft credit section
+    foreach ($this->getColumnHeaders() as $i => $columnHeader) {
+      $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
+      $sel->setOptions([$sel1, $sel2, $sel3]);
+    }
+    $defaults = $this->getDefaults();
+    $this->setDefaults($defaults);
+
     $js = "<script type='text/javascript'>\n";
     $formName = 'document.forms.' . $this->_name;
-
-    //used to warn for mismatch column count or mismatch mapping
-    $warning = 0;
-
-    foreach ($columnHeaders as $i => $columnHeader) {
-      $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
-      $jsSet = FALSE;
-      if ($this->getSubmittedValue('savedMapping')) {
-        $fieldMapping = $fieldMappings[$i] ?? NULL;
-        if ($fieldMapping) {
-          if ($fieldMapping['name'] !== ts('do_not_import')) {
-            // $mapping contact_type is not really a contact type - the data has been mangled
-            // into that field - see https://lab.civicrm.org/dev/core/-/issues/654
-            $softField = $fieldMapping['contact_type'] ?? '';
-
-            if (!$softField) {
-              $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
-            }
-
-            $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
-            $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
-            $jsSet = TRUE;
-          }
-          if (!$jsSet) {
-            for ($k = 1; $k < 4; $k++) {
-              $js .= "{$formName}['mapper[$i][$k]'].style.display = 'none';\n";
-            }
-          }
-        }
-        else {
-          // this load section to help mapping if we ran out of saved columns when doing Load Mapping
-          $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
-        }
-        //end of load mapping
-      }
-      else {
-        $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
-        if (!empty($mapperKeysValues) && ($mapperKeysValues[$i][0] ?? NULL) === 'soft_credit') {
-          $softCreditField = $mapperKeysValues[$i][1];
-          $softCreditTypeID = $mapperKeysValues[$i][2];
-          $js .= "cj('#mapper_" . $i . "_1').val($softCreditField);\n";
-          $js .= "cj('#mapper_" . $i . "_2').val($softCreditTypeID);\n";
-        }
-      }
-      $sel->setOptions([$sel1, $sel2, $sel3, $sel4]);
+    foreach ($defaults as  $index => $default) {
+      //  e.g swapOptions(document.forms.MapField, 'mapper[0]', 0, 3, 'hs_mapper_0_');
+      // where 0 is the highest populated field number in the array and 3 is the maximum.
+      $js .= "swapOptions($formName, '$index', " . (array_key_last(array_filter($default)) ?: 0) . ", 3, 'hs_mapper_0_');\n";
     }
     $js .= "</script>\n";
     $this->assign('initHideBoxes', $js);
-    $this->setDefaults($this->getDefaults());
 
     $this->addFormButtons();
   }
