@@ -58,6 +58,8 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
    * Test CRM_Core_DAO_AllCoreTables::indices() function.
    *
    * Ensure indices are listed correctly with and without localization
+   *
+   * @group locale
    */
   public function testIndices() {
     // civicrm_group UI_title is localizable

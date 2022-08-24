@@ -12,6 +12,7 @@
 /**
  * Class CRM_Core_BAO_AddressTest
  * @group headless
+ * @group locale
  */
 class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 

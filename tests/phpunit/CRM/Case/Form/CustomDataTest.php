@@ -20,6 +20,7 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
    * body for ChangeCustomData.
    *
    * @dataProvider customDataProvider
+   * @group locale
    *
    * @param array $input
    * @param array $expected
@@ -80,6 +81,7 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
    * Same as testChangeCustomDataFormattedDetails but in a different locale.
    *
    * @dataProvider customDataProvider
+   * @group locale
    *
    * @param array $input
    * @param array $expected

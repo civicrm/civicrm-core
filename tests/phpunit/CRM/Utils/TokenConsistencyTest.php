@@ -234,6 +234,8 @@ case.custom_1 :' . '
 
   /**
    * Test money format tokens can respect passed in locale.
+   *
+   * @group locale
    */
   public function testMoneyFormat(): void {
     // Our 'migration' off configured thousand separators at the moment is a define.
