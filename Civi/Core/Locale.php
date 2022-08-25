@@ -182,21 +182,26 @@ class Locale {
       \CRM_Core_OptionValue::getValues(['name' => 'languages'], $optionValues, 'weight', TRUE);
       $validNominalLocales = array_column($optionValues, 'label', 'name');
       $validTsLocales = \CRM_Core_I18n::languages(FALSE); /* Active OV _and_ available MO */
-      $validFormatLocales = $validNominalLocales; /* FIXME Where do we get this? */
     }
     else {
       $validNominalLocales = $validTsLocales = $validFormatLocales
         = \CRM_Core_I18n::languages(FALSE);
       // Or stricter? array_fill_keys(\CRM_Core_I18n::uiLanguages(TRUE), TRUE);
     }
-    $validDbLocales = \CRM_Core_I18n::isMultiLingual() ? \Civi::settings()->get('languageLimit') : NULL;
 
-    // TODO This always falls back to the system locale. Maybe use getLocalePrecedence() instead...
     $locale = new static();
-    $locale->nominal = isset($validNominalLocales[$preferred]) ? $preferred : $systemDefault;
-    $locale->ts = isset($validTsLocales[$preferred]) ? $preferred : $systemDefault;
-    $locale->moneyFormat = isset($validFormatLocales[$locale->nominal]) ? $locale->nominal : $systemDefault;
-    $locale->db = \CRM_Core_I18n::isMultiLingual() && isset($validDbLocales[$locale->nominal]) ? $locale->nominal : NULL;
+    $locale->nominal = static::pickFirstLocale(array_keys($validNominalLocales), static::getAllFallbacks($preferred)) ?: $systemDefault;
+    $fallbacks = static::getAllFallbacks($locale->nominal);
+
+    $locale->ts = static::pickFirstLocale(array_keys($validTsLocales), $fallbacks) ?: $systemDefault;
+    $locale->moneyFormat = $locale->nominal;
+    if (!\CRM_Core_I18n::isMultiLingual()) {
+      $locale->db = NULL;
+    }
+    else {
+      $validDbLocales = \Civi::settings()->get('languageLimit');
+      $locale->db = static::pickFirstLocale(array_keys($validDbLocales), $fallbacks) ?: $systemDefault;
+    }
     return $locale;
   }
 
@@ -243,13 +248,7 @@ class Locale {
    *   If no good locales could be chosen, then NULL.
    */
   public function renegotiate(array $availableLocales): ?Locale {
-    $fallbacks = array_merge(
-      // We'd like to stay in the active locale (or something closely related)
-      ($this->nominal ? static::getLocalePrecedence($this->nominal) : []),
-      // If we can't, then try the system locale (or something closely related)
-      static::getLocalePrecedence(\Civi::settings()->get('lcMessages'))
-    );
-    $picked = static::pickFirstLocale($availableLocales, $fallbacks);
+    $picked = static::pickFirstLocale($availableLocales, static::getAllFallbacks($this->nominal));
     return $picked ? static::negotiate($picked) : NULL;
   }
 
@@ -271,6 +270,21 @@ class Locale {
       }
     }
     return NULL;
+  }
+
+  /**
+   * @param string|null $preferred
+   *   ex: 'es_PR'
+   * @return array
+   *   Ex: ['es_PR', 'es_419', 'es_MX', 'es_ES', 'en_US', 'en_GB]
+   */
+  private static function getAllFallbacks(?string $preferred): array {
+    return array_merge(
+    // We'd like to stay in the active locale (or something closely related)
+      ($preferred ? static::getLocalePrecedence($preferred) : []),
+      // If we can't, then try the system locale (or something closely related)
+      static::getLocalePrecedence(\Civi::settings()->get('lcMessages'))
+    );
   }
 
   /**

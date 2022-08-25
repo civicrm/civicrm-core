@@ -86,6 +86,49 @@ class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
     }
   }
 
+  public function getPartialLocaleExamples(): array {
+    $results = [/* array $settings, string $preferredLocale, array $expectLocale, string $expectYes */];
+    $results['es_PR mixed mode'] = [['partial_locales' => TRUE], 'es_PR', ['nominal' => 'es_PR', 'ts' => 'es_MX', 'moneyFormat' => 'es_PR'], 'Sí'];
+    $results['th_TH mixed mode'] = [['partial_locales' => TRUE], 'th_TH', ['nominal' => 'th_TH', 'ts' => 'en_US', 'moneyFormat' => 'th_TH'], 'Yes'];
+    $results['es_PR switched to es_MX'] = [['partial_locales' => FALSE], 'es_PR', ['nominal' => 'es_MX', 'ts' => 'es_MX', 'moneyFormat' => 'es_MX'], 'Sí'];
+    $results['th_TH switched to en_US'] = [['partial_locales' => FALSE], 'th_TH', ['nominal' => 'en_US', 'ts' => 'en_US', 'moneyFormat' => 'en_US'], 'Yes'];
+    return $results;
+  }
+
+  /**
+   * @param array $settings
+   *   List of settings to apply during the test
+   * @param string $preferred
+   *   The locale that we should try to use.
+   *   Ex : 'es_PR'
+   * @param array $expectLocale
+   *   The locale options that we expect to use.
+   *   Ex: ['nominal' => 'es_PR', 'ts' => 'es_MX', 'moneyFormat' => 'es_PR']
+   * @param string $expectYes
+   *   The translation for "Yes" in our expected language.
+   * @dataProvider getPartialLocaleExamples
+   */
+  public function testPartialLocale(array $settings, string $preferred, array $expectLocale, string $expectYes) {
+    if (count(\CRM_Core_I18n::languages(FALSE)) <= 1) {
+      $this->markTestIncomplete('Full testing of localization requires l10n data.');
+    }
+    $cleanup = CRM_Utils_AutoClean::swapSettings($settings);
+    \Civi\Api4\OptionValue::update()
+      ->addWhere('option_group_id:name', '=', 'languages')
+      ->addWhere('name', '=', 'es_PR')
+      ->setValues(['is_active' => 1])
+      ->execute();
+
+    CRM_Core_I18n::singleton()->setLocale($preferred);
+    global $civicrmLocale;
+    $this->assertEquals($expectYes, ts('Yes'));
+    $this->assertEquals($expectLocale['ts'], $civicrmLocale->ts);
+    $this->assertEquals($expectLocale['moneyFormat'], $civicrmLocale->moneyFormat);
+    $this->assertEquals($expectLocale['nominal'], $civicrmLocale->nominal);
+    // Should getLocale() return nominal or ts?
+    // $this->assertEquals($expectLocale['nominal'], CRM_Core_I18n::getLocale());
+  }
+
   /**
    * Quirk in strtolower does not handle "I" as expected, compared to mb_strtolower.
    */
