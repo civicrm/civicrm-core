@@ -50,15 +50,15 @@ class api_v4_OAuthClientTest extends \PHPUnit\Framework\TestCase implements Head
 
     $usePerms(['manage OAuth client']);
     // If we can tighten perm model: $usePerms(['manage OAuth client', 'manage OAuth client secrets']);
-    $get = Civi\Api4\OAuthClient::get(0)->addWhere('guid', '=', "example-id-$random")->execute();
+    $get = Civi\Api4\OAuthClient::get(FALSE)->addWhere('guid', '=', "example-id-$random")->execute();
     $this->assertEquals(1, $get->count());
     $client = $get->first();
     $this->assertEquals("example-id-$random", $client['guid']);
     $this->assertEquals("example-secret-$random", $client['secret']);
 
     $usePerms(['manage OAuth client']);
-    Civi\Api4\OAuthClient::delete(0)->addWhere('guid', '=', "example-id-$random")->execute();
-    $get = Civi\Api4\OAuthClient::get(0)->addWhere('guid', '=', "example-id-$random")->execute();
+    Civi\Api4\OAuthClient::delete(FALSE)->addWhere('guid', '=', "example-id-$random")->execute();
+    $get = Civi\Api4\OAuthClient::get(FALSE)->addWhere('guid', '=', "example-id-$random")->execute();
     $this->assertEquals(0, $get->count());
   }
 

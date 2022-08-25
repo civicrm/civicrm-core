@@ -79,7 +79,7 @@ class Refresh extends BasicBatchAction {
 
   protected function getProvider($clientId) {
     if (!isset($this->providers[$clientId])) {
-      $client = \Civi\Api4\OAuthClient::get(0)->addWhere('id', '=', $clientId)->execute()->single();
+      $client = \Civi\Api4\OAuthClient::get(FALSE)->addWhere('id', '=', $clientId)->execute()->single();
       $this->providers[$clientId] = \Civi::service('oauth2.league')->createProvider($client);
     }
     return $this->providers[$clientId];
