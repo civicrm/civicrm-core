@@ -158,8 +158,8 @@ class CRM_OAuth_MailSetup {
       return;
     }
     // Not certain if 'refresh' will complain about staleness. Doesn't hurt to double-check.
-    if (empty($token['access_token']) || $token['expires'] < CRM_Utils_Time::getTimeRaw()) {
-      throw new \OAuthException("Found invalid token for mail store #" . $mailSettings['id']);
+    if (empty($token['access_token']) || $token['expires'] < CRM_Utils_Time::time()) {
+      throw new \Civi\OAuth\OAuthException("Found invalid token for mail store #" . $mailSettings['id']);
     }
 
     $mailSettings['auth'] = 'XOAuth2';

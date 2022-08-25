@@ -50,7 +50,7 @@ class Refresh extends BasicBatchAction {
   }
 
   protected function doTask($row) {
-    if ($this->threshold >= 0 && \CRM_Utils_Time::getTimeRaw() < $row['expires'] - $this->threshold) {
+    if ($this->threshold >= 0 && \CRM_Utils_Time::time() < $row['expires'] - $this->threshold) {
       return $this->filterReturn($row);
     }
 
