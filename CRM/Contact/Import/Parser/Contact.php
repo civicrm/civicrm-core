@@ -28,7 +28,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
   use CRM_Contact_Import_MetadataTrait;
 
-  protected $_mapperKeys = [];
   protected $_allExternalIdentifiers = [];
 
   /**
@@ -80,9 +79,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     // Force re-load of user job.
     unset($this->userJob);
     $this->setFieldMetadata();
-    foreach ($this->getImportableFieldsMetadata() as $name => $field) {
-      $this->addField($name, $field['title'], CRM_Utils_Array::value('type', $field), CRM_Utils_Array::value('headerPattern', $field), CRM_Utils_Array::value('dataPattern', $field), CRM_Utils_Array::value('hasLocationType', $field));
-    }
   }
 
   /**
@@ -139,14 +135,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *
    * @param array $values
    *   The array of values belonging to this line.
-   *
-   * @return bool
-   *   the result of this processing
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
-  public function import($values) {
+  public function import(array $values): void {
     $rowNumber = (int) $values[array_key_last($values)];
 
     // Put this here for now since we're gettting run by a job and need to
@@ -183,8 +173,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         $hookParams = [
           'contactID' => $contactID,
           'importID' => $currentImportID,
-          'importTempTable' => $this->_tableName,
-          'fieldHeaders' => $this->_mapperKeys,
         ];
         CRM_Utils_Hook::import('Contact', 'process', $this, $hookParams);
       }
@@ -210,13 +198,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
     catch (CRM_Core_Exception $e) {
       $this->setImportStatus($rowNumber, $this->getStatus($e->getErrorCode()), $e->getMessage());
-      return FALSE;
-    }
-    // We can probably stop catching this once https://github.com/civicrm/civicrm-core/pull/23471
-    // is merged - testImportParserWithExternalIdForRelationship will confirm....
-    catch (CiviCRM_API3_Exception $e) {
-      $this->setImportStatus($rowNumber, $this->getStatus($e->getErrorCode()), $e->getMessage());
-      return FALSE;
+      return;
     }
     $extraFields = ['related_contact_created' => 0, 'related_contact_matched' => 0];
     foreach ($relatedContacts as $outcome) {
@@ -228,7 +210,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
     }
     $this->setImportStatus($rowNumber, $this->getStatus(CRM_Import_Parser::VALID), $this->getSuccessMessage(), $contactID, $extraFields, array_merge(array_keys($relatedContacts), [$contactID]));
-    return CRM_Import_Parser::VALID;
   }
 
   /**
@@ -1104,25 +1085,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   protected function setFieldMetadata() {
     $this->setImportableFieldsMetadata($this->getContactImportMetadata());
-  }
-
-  /**
-   * @param string $name
-   * @param $title
-   * @param int $type
-   * @param string $headerPattern
-   * @param string $dataPattern
-   * @param bool $hasLocationType
-   */
-  public function addField(
-    $name, $title, $type = CRM_Utils_Type::T_INT,
-    $headerPattern = '//', $dataPattern = '//',
-    $hasLocationType = FALSE
-  ) {
-    $this->_fields[$name] = new CRM_Contact_Import_Field($name, $title, $type, $headerPattern, $dataPattern, $hasLocationType);
-    if (empty($name)) {
-      $this->_fields['doNotImport'] = new CRM_Contact_Import_Field($name, $title, $type, $headerPattern, $dataPattern, $hasLocationType);
-    }
   }
 
   /**

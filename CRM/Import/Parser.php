@@ -147,8 +147,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * Get the relevant datasource object.
    *
    * @return \CRM_Import_DataSource|null
-   *
-   * @throws \API_Exception
    */
   protected function getDataSourceObject(): ?CRM_Import_DataSource {
     $className = $this->getSubmittedValue('dataSource');
