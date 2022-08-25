@@ -169,6 +169,10 @@ class CRM_Case_Page_AJAX {
 
     $allCases = !empty($params['all']);
 
+    if ($params['type'] === 'recent' && empty($params['sortBy'])) {
+      $params['sortBy'] = 'date DESC';
+    }
+
     $cases = CRM_Case_BAO_Case::getCases($allCases, $params);
 
     $casesDT = [
