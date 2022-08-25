@@ -133,6 +133,9 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
       $params = $this->getMappedRow($values);
+      if (!empty($params['contact_id'])) {
+        $this->validateContactID($params['contact_id'], $this->getContactType());
+      }
 
       //assign join date equal to start date if join date is not provided
       if (empty($params['join_date']) && !empty($params['start_date'])) {
@@ -153,9 +156,9 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         $formatValues[$key] = $field;
       }
 
-      //format params to meet api v2 requirements.
-      //@todo find a way to test removing this formatting
-      $this->membership_format_params($formatValues, $formatted, TRUE);
+      require_once 'api/v3/utils.php';
+      // It's very likely this line does nothing.
+      _civicrm_api3_store_values(CRM_Member_DAO_Membership::fields(), $formatValues, $formatted);
 
       if (!$this->isUpdateExisting()) {
         $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($formatted,
@@ -372,55 +375,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         $formatted[$d] = CRM_Utils_Date::isoToMysql($calcDates[$d]);
       }
     }
-  }
-
-  /**
-   * @deprecated - this function formats params according to v2 standards but
-   * need to be sure about the impact of not calling it so retaining on the import class
-   * take the input parameter list as specified in the data model and
-   * convert it into the same format that we use in QF and BAO object
-   *
-   * @param array $params
-   *   Associative array of property name/value.
-   *                             pairs to insert in new contact.
-   * @param array $values
-   *   The reformatted properties that we can use internally.
-   *
-   * @param array|bool $create Is the formatted Values array going to
-   *                             be used for CRM_Member_BAO_Membership:create()
-   *
-   * @throws Exception
-   * @return array|error
-   */
-  public function membership_format_params($params, &$values, $create = FALSE) {
-    require_once 'api/v3/utils.php';
-    $fields = CRM_Member_DAO_Membership::fields();
-    _civicrm_api3_store_values($fields, $params, $values);
-
-    foreach ($params as $key => $value) {
-
-      switch ($key) {
-        case 'contact_id':
-          if (!CRM_Utils_Rule::integer($value)) {
-            throw new Exception("contact_id not valid: $value");
-          }
-          $dao = new CRM_Core_DAO();
-          $qParams = [];
-          $svq = $dao->singleValueQuery("SELECT id FROM civicrm_contact WHERE id = $value",
-            $qParams
-          );
-          if (!$svq) {
-            throw new Exception("Invalid Contact ID: There is no contact record with contact_id = $value.");
-          }
-          $values[$key] = $value;
-          break;
-
-        default:
-          break;
-      }
-    }
-
-    return NULL;
   }
 
   /**
