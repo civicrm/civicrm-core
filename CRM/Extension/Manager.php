@@ -175,7 +175,7 @@ class CRM_Extension_Manager {
           CRM_Core_Session::setStatus(ts('A copy of the extension (%1) is in a system folder (%2). The system copy will be preserved, but the new copy will be used.', [
             1 => $newInfo->key,
             2 => $oldPath,
-          ]));
+          ]), '', 'alert', ['expires' => 0]);
         }
         break;
 
