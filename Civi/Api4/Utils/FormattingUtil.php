@@ -261,7 +261,7 @@ class FormattingUtil {
     // Use BAO::buildOptions if possible
     if ($baoName) {
       $fieldName = empty($field['custom_field_id']) ? $field['name'] : 'custom_' . $field['custom_field_id'];
-      $options = $baoName::buildOptions($fieldName, $context, self::filterByPrefix($params, $fieldPath, $field['name']));
+      $options = $baoName::buildOptions($fieldName, $context, self::filterByPath($params, $fieldPath, $field['name']));
     }
     // Fallback for option lists that exist in the api but not the BAO
     if (!isset($options) || $options === FALSE) {
@@ -308,7 +308,7 @@ class FormattingUtil {
    * @param mixed $value
    */
   private static function applyFormatters(array $result, string $fieldPath, array $field, &$value) {
-    $row = self::filterByPrefix($result, $fieldPath, $field['name']);
+    $row = self::filterByPath($result, $fieldPath, $field['name']);
 
     foreach ($field['output_formatters'] as $formatter) {
       $formatter($value, $row, $field);
@@ -382,8 +382,7 @@ class FormattingUtil {
    * Given a field belonging to either the main entity or a joined entity,
    * and a values array of [path => value], this returns all values which share the same root path.
    *
-   * Works by filtering array keys to only include those with the same prefix as a given field,
-   * stripping them of that prefix.
+   * Note: Unlike CRM_Utils_Array::filterByPrefix this does not mutate the original array.
    *
    * Ex:
    * ```
@@ -409,15 +408,9 @@ class FormattingUtil {
    * @param string $fieldName
    * @return array
    */
-  public static function filterByPrefix(array $values, string $fieldPath, string $fieldName): array {
-    $filtered = [];
+  public static function filterByPath(array $values, string $fieldPath, string $fieldName): array {
     $prefix = substr($fieldPath, 0, strpos($fieldPath, $fieldName));
-    foreach ($values as $key => $val) {
-      if (!$prefix || strpos($key, $prefix) === 0) {
-        $filtered[substr($key, strlen($prefix))] = $val;
-      }
-    }
-    return $filtered;
+    return \CRM_Utils_Array::filterByPrefix($values, $prefix);
   }
 
 }
