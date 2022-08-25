@@ -213,24 +213,14 @@ UPDATE civicrm_dedupe_rule_group
       CRM_Core_DAO::executeQuery($query, $queryParams);
     }
 
-    $rgDao = new CRM_Dedupe_DAO_DedupeRuleGroup();
-    if ($this->_action & CRM_Core_Action::UPDATE) {
-      $rgDao->id = $this->_rgid;
-    }
-
-    $rgDao->title = $values['title'];
-    $rgDao->is_reserved = CRM_Utils_Array::value('is_reserved', $values, FALSE);
-    $rgDao->used = $values['used'];
-    $rgDao->contact_type = $this->_contactType;
-    $rgDao->threshold = $values['threshold'];
-    $rgDao->save();
-
-    // make sure name is set only during insert
-    if ($this->_action & CRM_Core_Action::ADD) {
-      // generate name based on title
-      $rgDao->name = CRM_Utils_String::titleToVar($values['title']) . "_{$rgDao->id}";
-      $rgDao->save();
-    }
+    $rgDao = CRM_Dedupe_BAO_DedupeRuleGroup::writeRecord([
+      'id' => $this->_rgid,
+      'contact_type' => $this->_contactType,
+      'title' => $values['title'],
+      'is_reserved' => $values['is_reserved'] ?? FALSE,
+      'used' => $values['used'],
+      'threshold' => $values['threshold'],
+    ]);
 
     // lets skip updating of fields for reserved dedupe group
     if (!empty($this->_defaults['is_reserved'])) {
