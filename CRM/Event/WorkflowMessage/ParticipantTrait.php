@@ -19,4 +19,14 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
    */
   public $eventID;
 
+  /**
+   * @param int $eventID
+   *
+   * @return CRM_Event_WorkflowMessage_ParticipantTrait
+   */
+  public function setEventID(int $eventID) {
+    $this->eventID = $eventID;
+    return $this;
+  }
+
 }
