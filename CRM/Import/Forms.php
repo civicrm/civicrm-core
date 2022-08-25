@@ -579,7 +579,37 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @throws \API_Exception
    */
   protected function getAvailableFields(): array {
-    return $this->getParser()->getAvailableFields();
+    $return = [];
+    foreach ($this->getFields() as $name => $field) {
+      if ($name === 'id' && $this->isSkipDuplicates()) {
+        // Duplicates are being skipped so id matching is not available.
+        continue;
+      }
+      $return[$name] = $field['html']['label'] ?? $field['title'];
+    }
+    return $return;
+  }
+
+  /**
+   * Get the fields available for import selection.
+   *
+   * @return array
+   *   e.g ['first_name' => 'First Name', 'last_name' => 'Last Name'....
+   *
+   */
+  protected function getFields(): array {
+    return $this->getParser()->getFieldsMetadata();
+  }
+
+  /**
+   * Get the fields available for import selection.
+   *
+   * @return array
+   *   e.g ['first_name' => 'First Name', 'last_name' => 'Last Name'....
+   *
+   */
+  protected function getImportEntities(): array {
+    return $this->getParser()->getImportEntities();
   }
 
   /**
@@ -612,7 +642,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
     $mapper = [];
     $parser = $this->getParser();
     foreach ($this->getSubmittedValue('mapper') as $columnNumber => $mappedField) {
-      $mapper[$columnNumber] = $parser->getMappedFieldLabel($parser->getMappingFieldFromMapperInput($mappedField, 0, $columnNumber));
+      $mapper[$columnNumber] = $parser->getMappedFieldLabel($parser->getMappingFieldFromMapperInput((array) $mappedField, 0, $columnNumber));
     }
     return $mapper;
   }
@@ -624,7 +654,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function assignMapFieldVariables(): void {
-    $this->addExpectedSmartyVariable('highlightedRelFields');
+    $this->addExpectedSmartyVariables(['highlightedRelFields', 'initHideBoxes']);
     $this->_columnCount = $this->getNumberOfColumns();
     $this->_columnNames = $this->getColumnHeaders();
     $this->_dataValues = array_values($this->getDataRows([], 2));
@@ -692,6 +722,16 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   protected function hasImportableRows(): bool {
     return (bool) $this->getRowCount(['new']);
+  }
+
+  /**
+   * Get the base entity for the import.
+   *
+   * @return string
+   */
+  protected function getBaseEntity(): string {
+    $info = $this->getParser()->getUserJobInfo();
+    return reset($info)['entity'];
   }
 
 }

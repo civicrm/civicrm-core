@@ -26,85 +26,15 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm(): void {
-    $this->buildSavedMappingFields($this->getSubmittedValue('savedMapping'));
-    $this->addFormRule(array('CRM_Member_Import_Form_MapField', 'formRule'), $this);
+    $this->addSavedMappingFields();
+    $this->addFormRule(['CRM_Member_Import_Form_MapField', 'formRule'], $this);
 
-    //-------- end of saved mapping stuff ---------
-
-    $defaults = [];
-    $columnHeaders = $this->getColumnHeaders();
-    $hasHeaders = $this->getSubmittedValue('skipColumnHeader');
-    $headerPatterns = $this->getHeaderPatterns();
-    // For most fields using the html label is a good thing
-    // but for contact ID we really want to specify ID.
-    $this->_mapperFields['membership_contact_id'] = ts('Contact ID');
-    $sel1 = $this->_mapperFields;
-    if (!$this->getSubmittedValue('onDuplicate')) {
-      // If not updating then do not allow membership id.
-      unset($sel1['membership_id']);
+    $options = $this->getFieldOptions();
+    foreach ($this->getColumnHeaders() as $i => $columnHeader) {
+      $this->add('select2', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), $options, FALSE, ['class' => 'big', 'placeholder' => ts('- do not import -')]);
     }
 
-    $js = "<script type='text/javascript'>\n";
-    $formName = 'document.forms.' . $this->_name;
-
-    $fieldMappings = $this->getFieldMappings();
-
-    foreach ($columnHeaders as $i => $columnHeader) {
-      $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', array(1 => $i)), NULL);
-      $jsSet = FALSE;
-      if ($this->getSubmittedValue('savedMapping')) {
-        $fieldMapping = $fieldMappings[$i] ?? NULL;
-        if (isset($fieldMappings[$i])) {
-          if ($fieldMapping['name'] != ts('do_not_import')) {
-            //When locationType is not set
-            $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
-
-            //When phoneType is not set
-            $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
-
-            $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
-
-            $defaults["mapper[$i]"] = [$fieldMapping['name']];
-            $jsSet = TRUE;
-          }
-          else {
-            $defaults["mapper[$i]"] = [];
-          }
-          if (!$jsSet) {
-            for ($k = 1; $k < 4; $k++) {
-              $js .= "{$formName}['mapper[$i][$k]'].style.display = 'none';\n";
-            }
-          }
-        }
-        else {
-          // this load section to help mapping if we ran out of saved columns when doing Load Mapping
-          $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_" . $i . "_');\n";
-
-          if ($hasHeaders) {
-            $defaults["mapper[$i]"] = array($this->defaultFromHeader($columnHeader, $headerPatterns));
-          }
-        }
-        //end of load mapping
-      }
-      else {
-        $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_" . $i . "_');\n";
-        if ($this->getSubmittedValue('skipColumnHeader')) {
-          // Infer the default from the skipped headers if we have them
-          $defaults["mapper[$i]"] = array(
-            $this->defaultFromHeader($columnHeader,
-              $headerPatterns
-            ),
-            //                     $defaultLocationType->id
-            0,
-          );
-        }
-      }
-      $sel->setOptions([$sel1]);
-    }
-    $js .= "</script>\n";
-    $this->assign('initHideBoxes', $js);
-
-    $this->setDefaults($defaults);
+    $this->setDefaults($this->getDefaults());
 
     $this->addFormButtons();
   }
@@ -126,7 +56,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $importKeys = [];
     foreach ($fields['mapper'] as $mapperPart) {
-      $importKeys[] = $mapperPart[0];
+      $importKeys[] = $mapperPart;
     }
     // FIXME: should use the schema titles, not redeclare them
     $requiredFields = array(
@@ -177,29 +107,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
         }
       }
     }
-
-    if (!empty($fields['saveMapping'])) {
-      $nameField = $fields['saveMappingName'] ?? NULL;
-      if (empty($nameField)) {
-        $errors['saveMappingName'] = ts('Name is required to save Import Mapping');
-      }
-      else {
-        if (CRM_Core_BAO_Mapping::checkMapping($nameField, CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Import Membership'))) {
-          $errors['saveMappingName'] = ts('Duplicate Import Membership Mapping Name');
-        }
-      }
-    }
-
-    if (!empty($errors)) {
-      if (!empty($errors['saveMappingName'])) {
-        $_flag = 1;
-        $assignError = new CRM_Core_Page();
-        $assignError->assign('mappingDetailsError', $_flag);
-      }
-      return $errors;
-    }
-
-    return TRUE;
+    return $errors ?: TRUE;
   }
 
   /**
@@ -267,6 +175,31 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
     }
     return $highlightedFields;
+  }
+
+  /**
+   * Get default values for the mapping.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDefaults(): array {
+    $defaults = [];
+    $headerPatterns = $this->getHeaderPatterns();
+    $fieldMappings = $this->getFieldMappings();
+    foreach ($this->getColumnHeaders() as $i => $columnHeader) {
+      if ($this->getSubmittedValue('savedMapping')) {
+        $fieldMapping = $fieldMappings[$i] ?? NULL;
+        if (isset($fieldMappings[$i])) {
+          $defaults["mapper[$i]"] = ($fieldMapping['name'] !== 'do_not_import') ? $fieldMapping['name'] : NULL;
+        }
+      }
+      if (!isset($defaults["mapper[$i]"]) && $this->getSubmittedValue('skipColumnHeader')) {
+        $defaults["mapper[$i]"] = $this->defaultFromHeader($columnHeader, $headerPatterns);
+      }
+    }
+    return $defaults;
   }
 
 }

@@ -76,6 +76,18 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
   }
 
   /**
+   * Get a list of entities this import supports.
+   *
+   * @return array
+   */
+  public function getImportEntities() : array {
+    return [
+      'Membership' => ['text' => ts('Membership Fields'), 'is_contact' => FALSE],
+      'Contact' => ['text' => ts('Contact Fields'), 'is_contact' => TRUE],
+    ];
+  }
+
+  /**
    * Validate the values.
    *
    * @param array $values

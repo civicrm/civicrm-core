@@ -359,6 +359,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * Once we have cleaned up the way the mapper is handled
    * we can ditch all the existing _construct parameters in favour
    * of just the userJobID - there are current open PRs towards this end.
+   *
+   * @deprecated
    */
   public function getAvailableFields(): array {
     $this->setFieldMetadata();
@@ -1795,12 +1797,23 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *
    * @return array
    */
-  protected function getFieldsMetadata() : array {
+  public function getFieldsMetadata() : array {
     if (empty($this->importableFieldsMetadata)) {
       unset($this->userJob);
       $this->setFieldMetadata();
     }
     return $this->importableFieldsMetadata;
+  }
+
+  /**
+   * Get a list of entities this import supports.
+   *
+   * @return array
+   */
+  public function getImportEntities() : array {
+    return [
+      'Contact' => ['text' => ts('Contact Fields'), 'is_contact' => TRUE],
+    ];
   }
 
   /**
@@ -1856,7 +1869,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     $mappedFields = [];
     $mapper = $this->getSubmittedValue('mapper');
     foreach ($mapper as $i => $mapperRow) {
-      $mappedField = $this->getMappingFieldFromMapperInput($mapperRow, 0, $i);
+      // Cast to an array as it will be a string for membership
+      // and any others we simplify away from using hierselect for a single option.
+      $mappedField = $this->getMappingFieldFromMapperInput((array) $mapperRow, 0, $i);
       // Just for clarity since 0 is a pseudo-value
       unset($mappedField['mapping_id']);
       $mappedFields[] = $mappedField;
