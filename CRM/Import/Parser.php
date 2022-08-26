@@ -1976,4 +1976,51 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     return is_numeric($importedValue) ? $importedValue : mb_strtolower(str_replace('’', "'", $importedValue));
   }
 
+  /**
+   * Look up for an existing contact with the given external_identifier.
+   *
+   * If the identifier is found on a deleted contact then it is not a match
+   * but it must be removed from that contact to allow the new contact to
+   * have that external_identifier.
+   *
+   * @param string|null $externalIdentifier
+   * @param string $contactType
+   * @param int|null $contactID
+   *
+   * @return int|null
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function lookupExternalIdentifier(?string $externalIdentifier, string $contactType, ?int $contactID): ?int {
+    if (!$externalIdentifier) {
+      return NULL;
+    }
+    // Check for any match on external id, deleted or otherwise.
+    $foundContact = civicrm_api3('Contact', 'get', [
+      'external_identifier' => $externalIdentifier,
+      'showAll' => 'all',
+      'sequential' => TRUE,
+      'return' => ['id', 'contact_is_deleted', 'contact_type'],
+    ]);
+    if (empty($foundContact['id'])) {
+      return NULL;
+    }
+    if (!empty($foundContact['values'][0]['contact_is_deleted'])) {
+      // If the contact is deleted, update external identifier to be blank
+      // to avoid key error from MySQL.
+      $params = ['id' => $foundContact['id'], 'external_identifier' => ''];
+      civicrm_api3('Contact', 'create', $params);
+      return NULL;
+    }
+    if ($contactType && $foundContact['values'][0]['contact_type'] !== $contactType) {
+      throw new CRM_Core_Exception('Mismatched contact Types', CRM_Import_Parser::NO_MATCH);
+    }
+    //check if external identifier exists in database
+    if ($contactID && $foundContact['id'] !== $contactID) {
+      throw new CRM_Core_Exception(ts('Existing external ID does not match the imported contact ID.'), CRM_Import_Parser::ERROR);
+    }
+    return (int) $foundContact['id'];
+  }
+
 }
