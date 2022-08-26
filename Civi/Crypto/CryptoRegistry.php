@@ -287,7 +287,7 @@ class CryptoRegistry {
    * @throws CryptoException
    */
   public function parseKey($keyExpr) {
-    list($suite, $keyFunc, $keyVal) = explode(':', $keyExpr);
+    [$suite, $keyFunc, $keyVal] = explode(':', $keyExpr);
     if ($suite === '') {
       $suite = self::DEFAULT_SUITE;
     }
