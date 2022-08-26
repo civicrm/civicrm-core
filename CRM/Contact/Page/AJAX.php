@@ -221,7 +221,7 @@ class CRM_Contact_Page_AJAX {
 
     $ret = ['is_error' => 0];
 
-    list($relTypeId, $b, $a) = explode('_', $relType);
+    [$relTypeId, $b, $a] = explode('_', $relType);
 
     if ($relationshipID && $originalCid) {
       CRM_Case_BAO_Case::endCaseRole($caseID, $a, $originalCid, $relTypeId);
@@ -362,7 +362,7 @@ class CRM_Contact_Page_AJAX {
       $rowCount = Civi::settings()->get('search_autocomplete_count');
 
       // add acl clause here
-      list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
+      [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
       if ($aclWhere) {
         $aclWhere = "AND {$aclWhere}";
       }
@@ -426,7 +426,7 @@ LIMIT {$rowCount}
       $rowCount = (int) CRM_Utils_Request::retrieveValue('rowcount', 'Integer', 20, FALSE, 'GET');
 
       // add acl clause here
-      list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
+      [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
       if ($aclWhere) {
         $aclWhere = " AND $aclWhere";
       }

@@ -248,7 +248,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @return array
    */
   public static function &links() {
-    list($context, $contextMenu, $key) = func_get_args();
+    [$context, $contextMenu, $key] = func_get_args();
     $extraParams = ($key) ? "&key={$key}" : NULL;
     $searchContext = ($context) ? "&context=$context" : NULL;
 
@@ -413,7 +413,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
             !in_array($name, $skipFields)
           ) {
             if (strpos($name, '-') !== FALSE) {
-              list($fieldName, $lType, $type) = CRM_Utils_System::explode('-', $name, 3);
+              [$fieldName, $lType, $type] = CRM_Utils_System::explode('-', $name, 3);
 
               if ($lType == 'Primary') {
                 $locationTypeName = 1;
@@ -477,7 +477,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
 
       foreach ($properties as $prop) {
         if (strpos($prop, '-')) {
-          list($loc, $fld, $phoneType) = CRM_Utils_System::explode('-', $prop, 3);
+          [$loc, $fld, $phoneType] = CRM_Utils_System::explode('-', $prop, 3);
           $title = $this->_query->_fields[$fld]['title'];
           if (trim($phoneType) && !is_numeric($phoneType) && strtolower($phoneType) != $fld) {
             $title .= "-{$phoneType}";
@@ -602,7 +602,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           !in_array($key, $skipFields)
         ) {
           if (strpos($key, '-') !== FALSE) {
-            list($fieldName, $id, $type) = CRM_Utils_System::explode('-', $key, 3);
+            [$fieldName, $id, $type] = CRM_Utils_System::explode('-', $key, 3);
 
             if ($id == 'Primary') {
               $locationTypeName = 1;
@@ -715,7 +715,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           $row[$property] = $websiteUrl;
         }
         elseif (strpos($property, '-email') !== FALSE) {
-          list($locType) = explode("-email", $property);
+          [$locType] = explode("-email", $property);
           $onholdProperty = "{$locType}-on_hold";
 
           $row[$property] = $result->$property ?? NULL;

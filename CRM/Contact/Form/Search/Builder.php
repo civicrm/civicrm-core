@@ -178,7 +178,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
         else {
           if (substr($v[0], 0, 7) == 'custom_') {
             // Get rid of appended location type id
-            list($fieldKey) = explode('-', $v[0]);
+            [$fieldKey] = explode('-', $v[0]);
             $type = $fields[$fieldKey]['data_type'];
 
             // hack to handle custom data of type state and country
@@ -719,7 +719,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
         $jsSet = FALSE;
 
         if (isset($mappingId)) {
-          list($mappingName, $defaults, $noneArray, $jsSet) = $this->loadSavedMapping($mappingLocation, $x, $i, $mappingName, $mapperFields, $mappingContactType, $mappingRelation, $specialFields, $mappingPhoneType, $defaults, $noneArray, $mappingImProvider, $mappingOperator, $mappingValue);
+          [$mappingName, $defaults, $noneArray, $jsSet] = $this->loadSavedMapping($mappingLocation, $x, $i, $mappingName, $mapperFields, $mappingContactType, $mappingRelation, $specialFields, $mappingPhoneType, $defaults, $noneArray, $mappingImProvider, $mappingOperator, $mappingValue);
         }
         //Fix for Search Builder
         $j = 4;
