@@ -228,7 +228,7 @@ SELECT     civicrm_email.id as email_id
     // render the &amp; entities in text mode, so that the links work
     $text = str_replace('&amp;', '&', $text);
 
-    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), [
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
       'controller' => __CLASS__,
       'smarty' => FALSE,
       'schema' => ['contactId'],
