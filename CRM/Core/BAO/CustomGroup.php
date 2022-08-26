@@ -577,7 +577,7 @@ ORDER BY civicrm_custom_group.weight,
     }
 
     if (empty($groupTree)) {
-      list($multipleFieldGroups, $groupTree) = self::buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType);
+      [$multipleFieldGroups, $groupTree] = self::buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType);
 
       $cache->set($cacheKey, $groupTree);
       $cache->set($multipleFieldGroupCacheKey, $multipleFieldGroups);
@@ -885,10 +885,10 @@ ORDER BY civicrm_custom_group.weight,
             );
             $customValue['imageURL'] = str_replace('persist/contribute', 'custom', $config->imageUploadURL) .
               $fileDAO->uri;
-            list($path) = CRM_Core_BAO_File::path($fileDAO->id, $entityId);
+            [$path] = CRM_Core_BAO_File::path($fileDAO->id, $entityId);
             if ($path && file_exists($path)) {
-              list($imageWidth, $imageHeight) = getimagesize($path);
-              list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
+              [$imageWidth, $imageHeight] = getimagesize($path);
+              [$imageThumbWidth, $imageThumbHeight] = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
               $customValue['imageThumbWidth'] = $imageThumbWidth;
               $customValue['imageThumbHeight'] = $imageThumbHeight;
             }
