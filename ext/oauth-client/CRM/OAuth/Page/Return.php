@@ -35,7 +35,7 @@ class CRM_OAuth_Page_Return extends CRM_Core_Page {
       $this->assign('error', $error ?? NULL);
     }
     elseif ($authCode = CRM_Utils_Request::retrieve('code', 'String')) {
-      $client = \Civi\Api4\OAuthClient::get(0)->addWhere('id', '=', $state['clientId'])->execute()->single();
+      $client = \Civi\Api4\OAuthClient::get(FALSE)->addWhere('id', '=', $state['clientId'])->execute()->single();
       $tokenRecord = Civi::service('oauth2.token')->init([
         'client' => $client,
         'scope' => $state['scopes'],
