@@ -1083,6 +1083,7 @@ Paid By: Check',
    * @param string $thousandSeparator
    *
    * @dataProvider getThousandSeparators
+   * @group locale
    */
   public function testSubmitSaleTax(string $thousandSeparator): void {
     $mailUtil = new CiviMailUtils($this, TRUE);
@@ -1182,7 +1183,7 @@ Paid By: Check',
    * @param string $thousandSeparator
    *
    * @dataProvider getThousandSeparators
-   *
+   * @group locale
    * @throws \Exception
    */
   public function testReSubmitSaleTax(string $thousandSeparator): void {
