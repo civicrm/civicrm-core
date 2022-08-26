@@ -73,6 +73,7 @@ trait CRM_Queue_Queue_SqlTrait {
    * @param array $options
    *   Queue-dependent options; for example, if this is a
    *   priority-queue, then $options might specify the item's priority.
+   *   Ex: ['release_time' => strtotime('+3 hours')]
    */
   public function createItem($data, $options = []) {
     $dao = new CRM_Queue_DAO_QueueItem();
@@ -80,6 +81,9 @@ trait CRM_Queue_Queue_SqlTrait {
     $dao->submit_time = CRM_Utils_Time::getTime('YmdHis');
     $dao->data = serialize($data);
     $dao->weight = CRM_Utils_Array::value('weight', $options, 0);
+    if (isset($options['release_time'])) {
+      $dao->release_time = date('Y-m-d H:i:s', $options['release_time']);
+    }
     $dao->save();
   }
 

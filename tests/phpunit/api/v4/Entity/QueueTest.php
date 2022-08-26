@@ -211,6 +211,39 @@ class QueueTest extends Api4TestBase {
     $this->assertEquals(0, $startResult->count());
   }
 
+  public function getDelayableDrivers(): array {
+    return [
+      'Sql' => [['type' => 'Sql', 'runner' => 'task', 'error' => 'delete']],
+      'SqlParallel' => [['type' => 'SqlParallel', 'runner' => 'task', 'error' => 'delete']],
+      'Memory' => [['type' => 'Memory', 'runner' => 'task', 'error' => 'delete']],
+    ];
+  }
+
+  /**
+   * @dataProvider getDelayableDrivers
+   */
+  public function testDelayedStart(array $queueSpec) {
+    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_delayed';
+    $queue = \Civi::queue($queueName, $queueSpec);
+    $this->assertEquals(0, $queue->numberOfItems());
+
+    $releaseTime = \CRM_Utils_Time::strtotime('+3 seconds');
+    \Civi::queue($queueName)->createItem(new \CRM_Queue_Task(
+      [QueueTest::class, 'doSomething'],
+      ['itwillstartanymomentnow']
+    ), ['release_time' => $releaseTime]);
+    $this->assertEquals(1, $queue->numberOfItems());
+
+    // Not available... yet...
+    $claim1 = $queue->claimItem();
+    $this->assertEquals(NULL, $claim1);
+
+    // OK, it'll come in a few seconds...
+    $claim2 = $this->waitForClaim(0.5, 6, $queueName);
+    $this->assertEquals('itwillstartanymomentnow', $claim2['data']['arguments'][0]);
+    $this->assertTrue(\CRM_Utils_Time::time() >= $releaseTime);
+  }
+
   public function getErrorModes(): array {
     return [
       'delete' => ['delete'],

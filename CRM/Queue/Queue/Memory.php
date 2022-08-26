@@ -97,12 +97,16 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
    * @param array $options
    *   Queue-dependent options; for example, if this is a
    *   priority-queue, then $options might specify the item's priority.
+   *   Ex: ['release_time' => strtotime('+3 hours')]
    */
   public function createItem($data, $options = []) {
     $id = $this->nextQueueItemId++;
     // force copy, no unintendedsharing effects from pointers
     $this->items[$id] = serialize($data);
     $this->runCounts[$id] = 0;
+    if (isset($options['release_time'])) {
+      $this->releaseTimes[$id] = $options['release_time'];
+    }
   }
 
   /**
