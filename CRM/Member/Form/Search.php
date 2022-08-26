@@ -300,7 +300,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
       $cid = CRM_Utils_Type::escape($cid, 'Integer');
       if ($cid > 0) {
         $this->_formValues['contact_id'] = $cid;
-        list($display, $image) = CRM_Contact_BAO_Contact::getDisplayAndImage($cid);
+        [$display, $image] = CRM_Contact_BAO_Contact::getDisplayAndImage($cid);
         $this->_defaults['sort_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid,
           'sort_name'
         );
@@ -311,24 +311,24 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
     $fromDate = CRM_Utils_Request::retrieve('start', 'Date');
     if ($fromDate) {
-      list($date) = CRM_Utils_Date::setDateDefaults($fromDate);
+      [$date] = CRM_Utils_Date::setDateDefaults($fromDate);
       $this->_formValues['member_start_date_low'] = $this->_defaults['member_start_date_low'] = $date;
     }
 
     $toDate = CRM_Utils_Request::retrieve('end', 'Date');
     if ($toDate) {
-      list($date) = CRM_Utils_Date::setDateDefaults($toDate);
+      [$date] = CRM_Utils_Date::setDateDefaults($toDate);
       $this->_formValues['member_start_date_high'] = $this->_defaults['member_start_date_high'] = $date;
     }
     $joinDate = CRM_Utils_Request::retrieve('join', 'Date');
     if ($joinDate) {
-      list($date) = CRM_Utils_Date::setDateDefaults($joinDate);
+      [$date] = CRM_Utils_Date::setDateDefaults($joinDate);
       $this->_formValues['member_join_date_low'] = $this->_defaults['member_join_date_low'] = $date;
     }
 
     $joinEndDate = CRM_Utils_Request::retrieve('joinEnd', 'Date');
     if ($joinEndDate) {
-      list($date) = CRM_Utils_Date::setDateDefaults($joinEndDate);
+      [$date] = CRM_Utils_Date::setDateDefaults($joinEndDate);
       $this->_formValues['member_join_date_high'] = $this->_defaults['member_join_date_high'] = $date;
     }
 

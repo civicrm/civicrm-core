@@ -1422,7 +1422,7 @@ UPDATE  civicrm_participant
         $receiptFrom = $eventDetails['confirm_from_name'] . ' <' . $eventDetails['confirm_from_email'] . '>';
       }
 
-      list($mailSent, $subject) = CRM_Core_BAO_MessageTemplate::sendTemplate(
+      [$mailSent, $subject] = CRM_Core_BAO_MessageTemplate::sendTemplate(
         [
           'workflow' => 'participant_' . strtolower($mailType),
           'contactId' => $contactId,

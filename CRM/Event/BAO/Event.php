@@ -1112,7 +1112,7 @@ WHERE civicrm_event.is_active = 1
     }
 
     if ($values['event']['is_email_confirm'] || $returnMessageText) {
-      list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
+      [$displayName, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
       $notifyEmail = CRM_Utils_Array::valueByRegexKey('/^email-/', $participantParams) ?? $email;
       //send email only when email is present
       if (isset($notifyEmail) || $returnMessageText) {
@@ -1230,7 +1230,7 @@ WHERE civicrm_event.is_active = 1
         }
 
         if ($returnMessageText) {
-          list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+          [$sent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
           return [
             'subject' => $subject,
             'body' => $message,
@@ -1600,7 +1600,7 @@ WHERE civicrm_event.is_active = 1
           $values[$index] = $campaigns[$params[$name]] ?? NULL;
         }
         elseif (strpos($name, '-') !== FALSE) {
-          list($fieldName, $id) = CRM_Utils_System::explode('-', $name, 2);
+          [$fieldName, $id] = CRM_Utils_System::explode('-', $name, 2);
           $detailName = str_replace(' ', '_', $name);
           if (in_array($fieldName, [
             'state_province',
@@ -1813,7 +1813,7 @@ WHERE  id = $cfID
             $participantParams = CRM_Utils_Array::value($pId, $values['params'], []);
           }
 
-          list($profilePre, $groupTitles) = self::buildCustomDisplay($preProfileID,
+          [$profilePre, $groupTitles] = self::buildCustomDisplay($preProfileID,
             'additionalCustomPre',
             $cId,
             $template,
@@ -1831,7 +1831,7 @@ WHERE  id = $cfID
             }
           }
 
-          list($profilePost, $groupTitles) = self::buildCustomDisplay($postProfileID,
+          [$profilePost, $groupTitles] = self::buildCustomDisplay($postProfileID,
             'additionalCustomPost',
             $cId,
             $template,
@@ -2062,7 +2062,7 @@ WHERE  ce.loc_block_id = $locBlockId";
         }
         Civi::$statics[__CLASS__]['permission']['edit'][$eventId] = FALSE;
 
-        list($allEvents, $createdEvents) = self::checkPermissionGetInfo($eventId);
+        [$allEvents, $createdEvents] = self::checkPermissionGetInfo($eventId);
         // Note: for a multisite setup, a user with edit all events, can edit all events
         // including those from other sites
         if (($permissionType == CRM_Core_Permission::EDIT) && CRM_Core_Permission::check('edit all events')) {
@@ -2081,7 +2081,7 @@ WHERE  ce.loc_block_id = $locBlockId";
         }
         Civi::$statics[__CLASS__]['permission']['view'][$eventId] = FALSE;
 
-        list($allEvents, $createdEvents) = self::checkPermissionGetInfo($eventId);
+        [$allEvents, $createdEvents] = self::checkPermissionGetInfo($eventId);
         if (CRM_Core_Permission::check('access CiviEvent')) {
           if (in_array($eventId, CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_event', $allEvents, array_keys($createdEvents)))) {
             // User created this event so has permission to view it
@@ -2158,7 +2158,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    */
   public static function getAllPermissions() {
     if (!isset(Civi::$statics[__CLASS__]['permissions'])) {
-      list($allEvents, $createdEvents) = self::checkPermissionGetInfo();
+      [$allEvents, $createdEvents] = self::checkPermissionGetInfo();
 
       // Note: for a multisite setup, a user with edit all events, can edit all events
       // including those from other sites

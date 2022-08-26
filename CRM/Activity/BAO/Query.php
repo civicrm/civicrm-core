@@ -167,7 +167,7 @@ class CRM_Activity_BAO_Query {
    * @throws \CRM_Core_Exception
    */
   public static function whereClauseSingle(&$values, &$query) {
-    list($name, $op, $value, $grouping) = $values;
+    [$name, $op, $value, $grouping] = $values;
 
     $fields = CRM_Activity_BAO_Activity::exportableFields();
     $fieldSpec = $query->getFieldSpec($name);
@@ -199,7 +199,7 @@ class CRM_Activity_BAO_Query {
 
       case 'activity_priority':
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$name.label", $op, $value, 'String');
-        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_DAO_Activity', $name, $value, $op);
+        [$op, $value] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_DAO_Activity', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', [
           1 => $fields[$name]['title'],
           2 => $op,
@@ -332,7 +332,7 @@ class CRM_Activity_BAO_Query {
       case 'source_contact_id':
         $columnName = strstr($name, '_id') ? 'id' : 'sort_name';
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("source_contact.{$columnName}", $op, $value, CRM_Utils_Type::typeToString($fields[$name]['type']));
-        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contact_DAO_Contact', $columnName, $value, $op);
+        [$op, $value] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contact_DAO_Contact', $columnName, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', [
           1 => $fields[$name]['title'],
           2 => $op,
@@ -626,7 +626,7 @@ class CRM_Activity_BAO_Query {
    * @throws \CRM_Core_Exception
    */
   public static function whereClauseSingleActivityText(&$values, &$query) {
-    list($name, $op, $value, $grouping, $wildcard) = $values;
+    [$name, $op, $value, $grouping, $wildcard] = $values;
     $activityOptionValues = $query->getWhereValues('activity_option', $grouping);
     $activityOption = CRM_Utils_Array::value(2, $activityOptionValues, 6);
 
@@ -642,7 +642,7 @@ class CRM_Activity_BAO_Query {
     }
 
     $query->_where[$grouping][] = "( " . implode(' OR ', $clauses) . " )";
-    list($qillOp, $qillVal) = $query->buildQillForFieldValue(NULL, $name, $value, $op);
+    [$qillOp, $qillVal] = $query->buildQillForFieldValue(NULL, $name, $value, $op);
     $query->_qill[$grouping][] = ts("%1 %2 '%3'", [
       1 => $label,
       2 => $qillOp,

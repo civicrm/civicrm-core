@@ -378,7 +378,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
         (version_compare(JVERSION, '3.0', 'ge') && version_compare(JVERSION, '3.2.1', 'lt'))
       ) {
         // now check password
-        list($hash, $salt) = explode(':', $dbPassword);
+        [$hash, $salt] = explode(':', $dbPassword);
         $cryptpass = md5($password . $salt);
         if ($hash != $cryptpass) {
           return FALSE;
@@ -420,7 +420,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *   Array with user specific data.
    */
   public function setUserSession($data) {
-    list($userID, $ufID) = $data;
+    [$userID, $ufID] = $data;
     $user = new JUser($ufID);
     $session = JFactory::getSession();
     $session->set('user', $user);
@@ -783,7 +783,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       return $civicrm_paths['cms.root']['path'];
     }
 
-    list($url, $siteName, $siteRoot) = $this->getDefaultSiteSettings();
+    [$url, $siteName, $siteRoot] = $this->getDefaultSiteSettings();
     if (file_exists("$siteRoot/administrator/index.php")) {
       return $siteRoot;
     }
