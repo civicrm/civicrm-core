@@ -338,7 +338,7 @@ class CRM_Core_OptionValue {
       if (is_array($nameTitle)) {
         foreach ($nameTitle as $name => $attribs) {
           self::$_fields[$key][$name] = $optionName;
-          list($tableName, $fieldName) = explode('.', $optionName['where']);
+          [$tableName, $fieldName] = explode('.', $optionName['where']);
           self::$_fields[$key][$name]['where'] = "{$name}.label";
           foreach ($attribs as $k => $val) {
             self::$_fields[$key][$name][$k] = $val;
@@ -362,7 +362,7 @@ class CRM_Core_OptionValue {
         if (!empty($values['pseudoconstant'])) {
           continue;
         }
-        list($tableName, $fieldName) = explode('.', $values['where']);
+        [$tableName, $fieldName] = explode('.', $values['where']);
         if (!empty($query->_returnProperties[$name])) {
           $query->_select["{$name}_id"] = "{$name}.value as {$name}_id";
           $query->_element["{$name}_id"] = 1;

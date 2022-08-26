@@ -41,7 +41,7 @@ class CRM_Core_Page_File extends CRM_Core_Page {
         CRM_Core_Error::statusBounce(ts('URL for file is not valid'));
       }
 
-      list($path, $mimeType) = CRM_Core_BAO_File::path($fileId, $entityId);
+      [$path, $mimeType] = CRM_Core_BAO_File::path($fileId, $entityId);
     }
     else {
       if (!CRM_Utils_File::isValidFileName($fileName)) {
