@@ -138,7 +138,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
 
       $this->assertTrue($message->body instanceof ezcMailMultipartAlternative);
 
-      list($textPart, $htmlPart) = $message->body->getParts();
+      [$textPart, $htmlPart] = $message->body->getParts();
 
       $this->assertEquals('html', $htmlPart->subType);
       $this->assertRegExp(
@@ -195,7 +195,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
 
       $this->assertTrue($message->body instanceof ezcMailMultipartAlternative);
 
-      list($textPart, $htmlPart) = $message->body->getParts();
+      [$textPart, $htmlPart] = $message->body->getParts();
 
       $this->assertEquals('html', $htmlPart->subType);
       $this->assertRegExp(
@@ -339,7 +339,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
 
       $this->assertTrue($message->body instanceof ezcMailMultipartAlternative);
 
-      list($textPart, $htmlPart) = $message->body->getParts();
+      [$textPart, $htmlPart] = $message->body->getParts();
 
       if ($htmlUrlRegex) {
         $caseName = print_r(['inputHtml' => $inputHtml, 'params' => $params, 'htmlUrlRegex' => $htmlUrlRegex, 'htmlPart' => $htmlPart->text], 1);
