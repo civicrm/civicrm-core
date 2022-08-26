@@ -677,6 +677,10 @@ class CRM_Core_I18n {
     CRM_Core_I18n::singleton()->reactivate();
   }
 
+  public static function clearLocale(): void {
+    unset($GLOBALS['tsLocale'], $GLOBALS['dbLocale'], $GLOBALS['civicrmLocale']);
+  }
+
   /**
    * Static instance provider - return the instance for the current locale.
    *
