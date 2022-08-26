@@ -96,6 +96,8 @@ class CRM_Contact_Task extends CRM_Core_Task {
         self::RECORD_CONTACTS => [
           'title' => ts('Add activity'),
           'class' => 'CRM_Activity_Form_Activity',
+          'icon' => 'fa-tasks',
+          'url' => 'civicrm/task/add-activity?action=add&context=search',
         ],
         self::SAVE_SEARCH => [
           'title' => ts('Group - create smart group'),

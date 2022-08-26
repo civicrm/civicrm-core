@@ -273,4 +273,9 @@
     <page_callback>CRM_Contact_Form_Task_Delete</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/task/add-activity</path>
+    <page_callback>CRM_Activity_Form_Activity</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>
