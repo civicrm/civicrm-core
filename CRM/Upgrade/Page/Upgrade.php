@@ -27,7 +27,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
 
     $upgrade = new CRM_Upgrade_Form();
-    list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
+    [$currentVer, $latestVer] = $upgrade->getUpgradeVersions();
 
     CRM_Utils_System::setTitle(ts('Upgrade CiviCRM to Version %1',
       [1 => $latestVer]
@@ -66,7 +66,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
   public function runIntro() {
     $upgrade = new CRM_Upgrade_Form();
     $template = CRM_Core_Smarty::singleton();
-    list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
+    [$currentVer, $latestVer] = $upgrade->getUpgradeVersions();
     CRM_Core_Smarty::singleton()->assign('sid', CRM_Utils_System::getSiteID());
     // Show success msg if db already upgraded
     if (version_compare($currentVer, $latestVer) == 0) {
@@ -121,7 +121,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
    */
   public function runBegin() {
     $upgrade = new CRM_Upgrade_Form();
-    list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
+    [$currentVer, $latestVer] = $upgrade->getUpgradeVersions();
 
     if ($error = $upgrade->checkUpgradeableVersion($currentVer, $latestVer)) {
       throw new CRM_Core_Exception($error);
@@ -175,7 +175,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     }
 
     // do a version check - after doFinish() sets the final version
-    list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
+    [$currentVer, $latestVer] = $upgrade->getUpgradeVersions();
     if ($error = $upgrade->checkCurrentVersion($currentVer, $latestVer)) {
       throw new CRM_Core_Exception($error);
     }
