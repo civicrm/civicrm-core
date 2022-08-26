@@ -39,6 +39,8 @@ class CRM_Upgrade_Incremental_php_FiveFiftyFour extends CRM_Upgrade_Incremental_
   public function upgrade_5_54_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Add "created_id" column to "civicrm_participant"', 'addCreatedIDColumnToParticipant');
+    $this->addTask('Increase field length of civicrm_dedupe_rule_group.name', 'alterDedupeRuleGroupName');
+    $this->addTask('Add index civicrm_dedupe_rule_group.UI_name', 'addIndex', 'civicrm_dedupe_rule_group', 'name', 'UI');
     $this->addTask('Install Elavon Payment Processor Extension as needed', 'installElavonPaymentProcessorExtension');
   }
 
@@ -47,6 +49,17 @@ class CRM_Upgrade_Incremental_php_FiveFiftyFour extends CRM_Upgrade_Incremental_
     if (!CRM_Core_BAO_SchemaHandler::checkFKExists('civicrm_participant', 'FK_civicrm_participant_created_id')) {
       CRM_Core_DAO::executeQuery('ALTER TABLE `civicrm_participant` ADD CONSTRAINT `FK_civicrm_participant_created_id` FOREIGN KEY (`created_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE SET NULL;');
     }
+    return TRUE;
+  }
+
+  /**
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function alterDedupeRuleGroupName(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_dedupe_rule_group` CHANGE COLUMN `name` `name` varchar(255) COMMENT 'Unique name of rule group'", [], TRUE, NULL, FALSE, FALSE);
+    CRM_Core_DAO::executeQuery("UPDATE `civicrm_dedupe_rule_group` g1, `civicrm_dedupe_rule_group` g2 SET g1.name = CONCAT(g1.name, '_', g1.id) WHERE g1.name = g2.name AND g1.id > g2.id", [], TRUE, NULL, FALSE, FALSE);
     return TRUE;
   }
 

@@ -3653,7 +3653,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'contact_type' => 'Individual',
       'threshold' => 8,
       'used' => 'General',
-      'name' => 'TestRule',
       'title' => 'TestRule',
       'is_reserved' => 0,
     ]);

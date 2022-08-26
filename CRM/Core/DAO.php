@@ -941,7 +941,7 @@ class CRM_Core_DAO extends DB_DataObject {
     $values = array_intersect_key($record, $fields);
     $instance->copyValues($values);
     if (empty($values[$idField]) && array_key_exists('name', $fields) && empty($values['name'])) {
-      $instance->makeNameFromLabel(!empty($fields['name']['required']));
+      $instance->makeNameFromLabel();
     }
     $instance->save();
 
@@ -3326,10 +3326,8 @@ SELECT contact_id
    * create a unique, clean name derived from the label.
    *
    * Note: this function does nothing unless a unique index exists for "name" column.
-   *
-   * @var bool $isRequired
    */
-  private function makeNameFromLabel(bool $isRequired): void {
+  private function makeNameFromLabel(): void {
     $indexNameWith = NULL;
     // Look for a unique index which includes the "name" field
     if (method_exists($this, 'indices')) {

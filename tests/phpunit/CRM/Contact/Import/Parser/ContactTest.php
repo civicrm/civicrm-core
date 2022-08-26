@@ -207,7 +207,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
       'threshold' => 10,
       'used' => 'General',
-      'name' => 'TestRule',
       'title' => 'TestRule',
       'is_reserved' => 0,
     ]);
