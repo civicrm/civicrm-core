@@ -194,7 +194,7 @@ class CRM_Queue_Runner {
    *
    * If the runner has an onEndUrl, then this function will not return
    *
-   * @return mixed
+   * @return array|true
    *   TRUE if all tasks complete normally; otherwise, an array describing the
    *   failed task
    */
@@ -202,26 +202,17 @@ class CRM_Queue_Runner {
     $this->disableBackgroundExecution();
     $taskResult = $this->formatTaskResult(TRUE);
     while ($taskResult['is_continue']) {
-      // setRaiseException should't be necessary here, but there's a bug
-      // somewhere which causes this setting to be lost.  Observed while
-      // upgrading 4.0=>4.2.  This preference really shouldn't be a global
-      // setting -- it should be more of a contextual/stack-based setting.
-      // This should be appropriate because queue-runners are not used with
-      // basic web pages -- they're used with CLI/REST/AJAX.
       $taskResult = $this->runNext();
-      $errorScope = NULL;
     }
 
-    if ($taskResult['numberOfItems'] == 0) {
+    if ($taskResult['numberOfItems'] === 0) {
       $result = $this->handleEnd();
       if (!empty($result['redirect_url'])) {
         CRM_Utils_System::redirect($result['redirect_url']);
       }
       return TRUE;
     }
-    else {
-      return $taskResult;
-    }
+    return $taskResult;
   }
 
   /**
@@ -375,7 +366,7 @@ class CRM_Queue_Runner {
     $result['is_error'] = $isOK ? 0 : 1;
     $result['exception'] = $exception;
     $result['last_task_title'] = $this->lastTaskTitle ?? '';
-    $result['numberOfItems'] = $this->queue->numberOfItems();
+    $result['numberOfItems'] = (int) $this->queue->numberOfItems();
     if ($result['numberOfItems'] <= 0) {
       // nothing to do
       $result['is_continue'] = 0;
