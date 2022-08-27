@@ -275,6 +275,9 @@ class CRM_Queue_Runner {
         'queue' => $this->queue,
       ]));
 
+      if ($exception) {
+        CRM_Core_Error::debug_var('queueRunnerException', CRM_Core_Error::formatTextException($exception));
+      }
       return $this->formatTaskResult($isOK, $exception);
     }
     else {
