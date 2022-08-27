@@ -501,4 +501,23 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     return array_values($categories);
   }
 
+  /**
+   * Get the 'best' mapping default from the column headers.
+   *
+   * @param string $columnHeader
+   *
+   * @return string
+   */
+  protected function guessMappingBasedOnColumns(string $columnHeader): string {
+    $headerPatterns = $this->getHeaderPatterns();
+    // do array search first to see if has mapped key
+    $columnKey = array_search($columnHeader, $this->_mapperFields, TRUE);
+    if ($columnKey && empty($this->_fieldUsed[$columnKey])) {
+      $this->_fieldUsed[$columnKey] = TRUE;
+      return $columnKey;
+    }
+    // Infer the default from the column names if we have them
+    return $this->defaultFromHeader($columnHeader, $headerPatterns);
+  }
+
 }
