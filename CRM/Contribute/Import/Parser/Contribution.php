@@ -16,6 +16,7 @@
  */
 
 use Civi\Api4\Contact;
+use Civi\Api4\Contribution;
 use Civi\Api4\Email;
 
 /**
@@ -23,24 +24,12 @@ use Civi\Api4\Email;
  */
 class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
-  protected $_mapperKeys;
-
   /**
    * Array of successfully imported contribution id's
    *
    * @var array
    */
   protected $_newContributions;
-
-  /**
-   * Class constructor.
-   *
-   * @param $mapperKeys
-   */
-  public function __construct($mapperKeys = []) {
-    parent::__construct();
-    $this->_mapperKeys = $mapperKeys;
-  }
 
   /**
    * Get information about the provided job.
@@ -188,10 +177,36 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $params['soft_credit'][$i] = ['soft_credit_type_id' => $mappedField['soft_credit_type_id'], $mappedField['soft_credit_match_field'] => $values[$i]];
       }
       else {
-        $params[$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
+        $entity = $this->getFieldMetadata($mappedField['name'])['entity'] ?? 'Contribution';
+        $params[$entity][$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
       }
     }
     return $params;
+  }
+
+  /**
+   * Override parent to cope with params being separated by entity already.
+   *
+   * @todo - make this the parent method...
+   *
+   * @param array $params
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function validateParams(array $params): void {
+
+    if (empty($params['Contribution']['id'])) {
+      $this->validateRequiredFields($this->getRequiredFields(), $params['Contribution']);
+    }
+    $errors = [];
+    foreach ($params as $entity => $values) {
+      foreach ($values as $key => $value) {
+        $errors = array_merge($this->getInvalidValues($value, $key), $errors);
+      }
+    }
+    if ($errors) {
+      throw new CRM_Core_Exception('Invalid value for field(s) : ' . implode(',', $errors));
+    }
   }
 
   /**
@@ -229,7 +244,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
             'title' => ts('Pledge ID'),
             'headerPattern' => '/Pledge ID/i',
             'name' => 'pledge_id',
-            'entity' => 'Pledge',
+            // This is handled as a contribution field & the goal is
+            // to make it pseudofield on the contribution.
+            'entity' => 'Contribution',
             'type' => CRM_Utils_Type::T_INT,
             'options' => FALSE,
           ],
@@ -240,7 +257,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       foreach ($fields as $name => $field) {
         $fields[$name] = array_merge([
           'type' => CRM_Utils_Type::T_INT,
-          'dataPattern' => '//',
           'headerPattern' => '//',
         ], $field);
       }
@@ -282,10 +298,24 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   public function import($values): void {
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
-      $params = $this->getMappedRow($values);
-      if (!empty($params['contact_id'])) {
-        $this->validateContactID($params['contact_id'], $this->getContactType());
+      $entityKeyedParams = $this->getMappedRow($values);
+      $entityKeyedParams['Contribution']['id'] = $this->lookupContributionID($entityKeyedParams['Contribution']);
+      if (empty($entityKeyedParams['Contribution']['id']) && $this->isUpdateExisting()) {
+        throw new CRM_Core_Exception('Empty Contribution and Invoice and Transaction ID. Row was skipped.', CRM_Import_Parser::ERROR);
       }
+      if (!empty($params['Contact']['contact_id'])) {
+        $this->validateContactID($params['Contact']['contact_id'], $this->getContactType());
+      }
+      // @todo - here we flatten the entities back into a single array.
+      // The entity format is better but the code below needs to be migrated.
+      $params = [];
+      foreach (['Contact', 'Contribution', 'Note'] as $entity) {
+        $params = array_merge($params, ($entityKeyedParams[$entity] ?? []));
+      }
+      if (isset($entityKeyedParams['soft_credit'])) {
+        $params['soft_credit'] = $entityKeyedParams['soft_credit'];
+      }
+
       $formatted = array_merge(['version' => 3, 'skipRecentView' => TRUE, 'skipCleanMoney' => TRUE, 'contribution_id' => $params['id'] ?? NULL], $params);
       //CRM-10994
       if (isset($params['total_amount']) && $params['total_amount'] == 0) {
@@ -307,7 +337,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $paramValues['contact_type'] = $this->getContactType();
       }
       elseif ($this->isUpdateExisting() &&
-        (!empty($paramValues['id']) || !empty($values['trxn_id']) || !empty($paramValues['invoice_id']))
+        (!empty($paramValues['id']))
       ) {
         $paramValues['contact_type'] = $this->getContactType();
       }
@@ -320,23 +350,17 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       if ($this->isUpdateExisting()) {
         //fix for CRM-2219 - Update Contribution
         // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
-        if (!empty($paramValues['invoice_id']) || !empty($paramValues['trxn_id']) || !empty($paramValues['id'])) {
-          $dupeIds = [
-            'id' => $paramValues['id'] ?? NULL,
-            'trxn_id' => $paramValues['trxn_id'] ?? NULL,
-            'invoice_id' => $paramValues['invoice_id'] ?? NULL,
-          ];
-          $ids['contribution'] = CRM_Contribute_BAO_Contribution::checkDuplicateIds($dupeIds);
-
-          if ($ids['contribution']) {
-            $formatted['id'] = $ids['contribution'];
+        if (!empty($paramValues['id'])) {
+          // todo Remove if in separate PR
+          if (TRUE) {
+            $formatted['id'] = $paramValues['id'];
             //process note
             if (!empty($paramValues['note'])) {
               $noteID = [];
-              $contactID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $ids['contribution'], 'contact_id');
+              $contactID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $paramValues['id'], 'contact_id');
               $daoNote = new CRM_Core_BAO_Note();
               $daoNote->entity_table = 'civicrm_contribution';
-              $daoNote->entity_id = $ids['contribution'];
+              $daoNote->entity_id = $paramValues['id'];
               if ($daoNote->find(TRUE)) {
                 $noteID['id'] = $daoNote->id;
               }
@@ -344,7 +368,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
               $noteParams = [
                 'entity_table' => 'civicrm_contribution',
                 'note' => $paramValues['note'],
-                'entity_id' => $ids['contribution'],
+                'entity_id' => $paramValues['id'],
                 'contact_id' => $contactID,
               ];
               CRM_Core_BAO_Note::add($noteParams, $noteID);
@@ -355,7 +379,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
             if (!empty($formatted['soft_credit'])) {
               $dupeSoftCredit = [
                 'contact_id' => $formatted['soft_credit'],
-                'contribution_id' => $ids['contribution'],
+                'contribution_id' => $paramValues['id'],
               ];
 
               //Delete all existing soft Contribution from contribution_soft table for pcp_id is_null
@@ -372,7 +396,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
               }
             }
 
-            $formatted['id'] = $ids['contribution'];
+            $formatted['id'] = $paramValues['id'];
 
             $newContribution = civicrm_api3('contribution', 'create', $formatted);
             $this->_newContributions[] = $newContribution['id'];
@@ -386,18 +410,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
             $this->setImportStatus($rowNumber, $this->processPledgePayments($formatted) ? $this->getStatus(self::PLEDGE_PAYMENT) : $this->getStatus(self::VALID), '', $newContribution['id']);
             return;
           }
-          $labels = [
-            'id' => 'Contribution ID',
-            'trxn_id' => 'Transaction ID',
-            'invoice_id' => 'Invoice ID',
-          ];
-          foreach ($dupeIds as $k => $v) {
-            if ($v) {
-              $errorMsg[] = "$labels[$k] $v";
-            }
-          }
-          $errorMsg = implode(' AND ', $errorMsg);
-          throw new CRM_Core_Exception('Matching Contribution record not found for ' . $errorMsg . '. Row was skipped.', CRM_Import_Parser::ERROR);
         }
       }
 
@@ -507,6 +519,34 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     catch (CRM_Core_Exception $e) {
       $this->setImportStatus($rowNumber, $this->getStatus($e->getErrorCode()), $e->getMessage());
     }
+  }
+
+  /**
+   * Lookup pre-existing contribution ID.
+   *
+   * @param array $params
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @return int|null
+   */
+  private function lookupContributionID(array $params): ?int {
+    $where = [];
+    $labels = [];
+    foreach (['id' => 'Contribution ID', 'trxn_id' => 'Transaction ID', 'invoice_id' => 'Invoice ID'] as $field => $label) {
+      if (!empty($params[$field])) {
+        $where[] = [$field, '=', $params[$field]];
+        $labels[] = $label . ' ' . $params[$field];
+      }
+    }
+    if (empty($where)) {
+      return NULL;
+    }
+    $contribution = Contribution::get(FALSE)->setWhere($where)->addSelect('id')->execute()->first();
+    if ($contribution['id'] ?? NULL) {
+      return $contribution['id'];
+    }
+    throw new CRM_Core_Exception('Matching Contribution record not found for ' . implode(' AND ', $labels) . '. Row was skipped.', CRM_Import_Parser::ERROR);
   }
 
   /**
@@ -641,7 +681,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
               $params['contribution_contact_id'] = $matchingContactIds[0];
             }
           }
-          elseif (!empty($params['id']) || !empty($params['trxn_id']) || !empty($params['invoice_id'])) {
+          elseif (!empty($params['id'])) {
             // when update mode check contribution id or trxn id or
             // invoice id
             // @todo - this check is obsolete. It survives for now
@@ -650,12 +690,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
             if (!empty($params['id'])) {
               $contactId->id = $params['id'];
             }
-            elseif (!empty($params['trxn_id'])) {
-              $contactId->trxn_id = $params['trxn_id'];
-            }
-            elseif (!empty($params['invoice_id'])) {
-              $contactId->invoice_id = $params['invoice_id'];
-            }
             if ($contactId->find(TRUE)) {
               $contactType->id = $contactId->contact_id;
               if ($contactType->find(TRUE)) {
@@ -663,11 +697,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
                   throw new CRM_Core_Exception("Contact Type is wrong: $contactType->contact_type", CRM_Import_Parser::ERROR);
                 }
               }
-            }
-          }
-          else {
-            if ($this->isUpdateExisting()) {
-              throw new CRM_Core_Exception('Empty Contribution and Invoice and Transaction ID. Row was skipped.', CRM_Import_Parser::ERROR);
             }
           }
           break;
@@ -690,18 +719,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           // retrieve pledge details as well as to validate pledge ID
 
           // first need to check for update mode
-          if ($this->isUpdateExisting() &&
-            ($params['id'] || $params['trxn_id'] || $params['invoice_id'])
-          ) {
+          if (!empty($params['id'])) {
             $contribution = new CRM_Contribute_DAO_Contribution();
-            if ($params['contribution_id']) {
-              $contribution->id = $params['contribution_id'];
-            }
-            elseif ($params['trxn_id']) {
-              $contribution->trxn_id = $params['trxn_id'];
-            }
-            elseif ($params['invoice_id']) {
-              $contribution->invoice_id = $params['invoice_id'];
+            if ($params['id']) {
+              $contribution->id = $params['id'];
             }
 
             if ($contribution->find(TRUE)) {
