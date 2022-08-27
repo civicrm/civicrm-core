@@ -10,6 +10,8 @@ namespace Civi\Api4\Event\Subscriber;
 use Civi;
 use Civi\API\Event\AuthorizeEvent;
 use Civi\API\Events;
+use Civi\Api4\Entity;
+use Civi\Api4\Managed;
 use Civi\Api4\UserJob;
 use Civi\Core\Event\PostEvent;
 use Civi\Core\Event\GenericHookEvent;
@@ -72,10 +74,21 @@ class ImportSubscriber implements EventSubscriberInterface {
    * Callback for hook_civicrm_post().
    */
   public function on_hook_civicrm_post(PostEvent $event): void {
-    if ($event->entity === 'UserJob' && $event->action === 'create') {
-      // Flush entities cache key so our new Import will load as an entity.
-      Civi::cache('metadata')->set('api4.entities.info', NULL);
-      CRM_Core_DAO_AllCoreTables::flush();
+    if ($event->entity === 'UserJob') {
+      try {
+        $exists = Entity::get(FALSE)->addWhere('name', '=', 'Import_' . $event->id)->selectRowCount()->execute()->count();
+        if (!$exists || $event->action === 'delete') {
+          // Flush entities cache key so our new Import will load as an entity.
+          Civi::cache('metadata')->set('api4.entities.info', NULL);
+          CRM_Core_DAO_AllCoreTables::flush();
+          Managed::reconcile(FALSE)->setModules(['civiimport'])->execute();
+        }
+      }
+      catch (\CRM_Core_Exception $e) {
+        // Log & move on.
+        \Civi::log()->warning('Failed to flush cache on UserJob clear', ['exception' => $e]);
+        return;
+      }
     }
   }
 

@@ -69,13 +69,17 @@ class Import extends CRM_Core_DAO {
       if (!CRM_Utils_Rule::alphanumeric($tableName) || !CRM_Core_DAO::singleValueQuery('SHOW TABLES LIKE %1', [1 => [$tableName, 'String']])) {
         continue;
       }
+      $createdBy = $tables->display_name ? '' : ' (' . E::ts('Created by %1', [$tables->display_name, 'String']) . ')';
       $importEntities[$tables->id] = [
         'table_name' => $tableName,
         'created_by' => $tables->display_name,
         'created_id' => $tables->created_id ? (int) $tables->created_id : NULL,
         'job_type' => $tables->job_type,
+        'user_job_id' => (int) $tables->id,
         'created_date' => $tables->created_date,
         'expires_date' => $tables->expires_date,
+        'title' => ts('Import Job') . (int) $tables->id,
+        'description' => $tables->created_date . $createdBy,
       ];
     }
     return $importEntities;
@@ -221,9 +225,17 @@ class Import extends CRM_Core_DAO {
       throw new CRM_Core_Exception('Invalid import table');
     }
     $columns = [];
+    $headers = UserJob::get(FALSE)
+      ->addWhere('metadata', 'LIKE', '%' . $tableName . '%')
+      ->addSelect('metadata')->execute()->first()['metadata']['DataSource']['column_headers'] ?? [];
     $result = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $tableName");
+    $userFieldIndex = 0;
     while ($result->fetch()) {
       $columns[$result->Field] = ['name' => $result->Field, 'table_name' => $tableName];
+      if (substr($result->Field, 1) !== '_') {
+        $columns[$result->Field]['label'] = $headers[$userFieldIndex] ?? $result->Field;
+        $userFieldIndex++;
+      }
     }
     return $columns;
   }
