@@ -68,6 +68,7 @@ trait CRMTraits_Import_ParserTrait {
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $queue = Civi::queue('user_job_' . $this->userJobID);
+      $this->assertEquals(1, CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_queue_item'));
       $runner = new CRM_Queue_Runner([
         'queue' => $queue,
         'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
