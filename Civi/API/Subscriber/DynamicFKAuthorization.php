@@ -156,7 +156,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
       }
 
       if (isset($apiRequest['params']['id'])) {
-        list($isValidId, $entityTable, $entityId) = $this->getDelegate($apiRequest['params']['id']);
+        [$isValidId, $entityTable, $entityId] = $this->getDelegate($apiRequest['params']['id']);
         if ($isValidId && $entityTable && $entityId) {
           $this->authorizeDelegate($apiRequest['action'], $entityTable, $entityId, $apiRequest);
           $this->preventReassignment($apiRequest['params']['id'], $entityTable, $entityId, $apiRequest);

@@ -123,7 +123,7 @@ class CRM_Core_CommunityMessages {
    *   parsed JSON
    */
   public function fetchDocument() {
-    list($status, $json) = $this->client->get($this->getRenderedUrl());
+    [$status, $json] = $this->client->get($this->getRenderedUrl());
     if ($status != CRM_Utils_HttpClient::STATUS_OK || empty($json)) {
       return NULL;
     }

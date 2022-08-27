@@ -175,8 +175,8 @@ class CRM_Contact_BAO_ProximityQuery {
   public static function where($latitude, $longitude, $distance, $tablePrefix = 'civicrm_address') {
     self::initialize();
 
-    list($minLongitude, $maxLongitude) = self::earthLongitudeRange($longitude, $latitude, $distance);
-    list($minLatitude, $maxLatitude) = self::earthLatitudeRange($longitude, $latitude, $distance);
+    [$minLongitude, $maxLongitude] = self::earthLongitudeRange($longitude, $latitude, $distance);
+    [$minLatitude, $maxLatitude] = self::earthLatitudeRange($longitude, $latitude, $distance);
 
     // DONT consider NAN values (which is returned by rad2deg php function)
     // for checking BETWEEN geo_code's criteria as it throws obvious 'NAN' field not found DB: Error
@@ -218,7 +218,7 @@ ACOS(
    * @throws Exception
    */
   public static function process(&$query, &$values) {
-    list($name, $op, $distance, $grouping, $wildcard) = $values;
+    [$name, $op, $distance, $grouping, $wildcard] = $values;
 
     // also get values array for all address related info
     $proximityVars = [

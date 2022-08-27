@@ -484,9 +484,9 @@ class Api4SelectQuery {
       }
       // If either the having or select field contains a pseudoconstant suffix, match and perform substitution
       else {
-        list($fieldName) = explode(':', $expr);
+        [$fieldName] = explode(':', $expr);
         foreach ($this->selectAliases as $selectAlias => $selectExpr) {
-          list($selectField) = explode(':', $selectAlias);
+          [$selectField] = explode(':', $selectAlias);
           if ($selectAlias === $selectExpr && $fieldName === $selectField && isset($this->apiFieldSpec[$fieldName])) {
             $field = $this->getField($fieldName);
             FormattingUtil::formatInputValue($value, $expr, $field, $operator);
@@ -712,7 +712,7 @@ class Api4SelectQuery {
       // First item in the array is the entity name
       $entity = array_shift($join);
       // Which might contain an alias. Split on the keyword "AS"
-      list($entity, $alias) = array_pad(explode(' AS ', $entity), 2, NULL);
+      [$entity, $alias] = array_pad(explode(' AS ', $entity), 2, NULL);
       // Ensure permissions
       if (!$this->checkEntityAccess($entity)) {
         continue;
@@ -785,7 +785,7 @@ class Api4SelectQuery {
     $stack = [NULL, NULL];
     // See if the ON clause already contains an FK reference to joinEntity
     $explicitFK = array_filter($joinTree, function($clause) use ($alias, $joinEntityFields) {
-      list($sideA, $op, $sideB) = array_pad((array) $clause, 3, NULL);
+      [$sideA, $op, $sideB] = array_pad((array) $clause, 3, NULL);
       if ($op !== '=' || !$sideB) {
         return FALSE;
       }
@@ -987,7 +987,7 @@ class Api4SelectQuery {
     $bridgeAlias = $side === 'INNER' ? $bridgeAlias : $alias;
     // Find explicit bridge join conditions and move them out of the joinTree
     $joinTree = array_filter($joinTree, function ($clause) use ($baseRef, $alias, $bridgeAlias, &$bridgeConditions) {
-      list($sideA, $op, $sideB) = array_pad((array) $clause, 3, NULL);
+      [$sideA, $op, $sideB] = array_pad((array) $clause, 3, NULL);
       // Skip AND/OR/NOT branches
       if (!$sideB) {
         return TRUE;

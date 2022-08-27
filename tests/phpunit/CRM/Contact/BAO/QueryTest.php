@@ -405,7 +405,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties);
     try {
       $this->assertLike($expectedSQL, $queryObj->getSearchSQL());
-      list($select, $from, $where, $having) = $queryObj->query();
+      [$select, $from, $where, $having] = $queryObj->query();
       $dao = CRM_Core_DAO::executeQuery("$select $from $where $having");
       $dao->fetch();
       $this->assertEquals('Anderson, Anthony', $dao->sort_name);
@@ -500,7 +500,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       TRUE, FALSE
     );
 
-    list($select) = $query->query();
+    [$select] = $query->query();
     $this->assertEquals('SELECT contact_a.id as contact_id', $select);
   }
 
@@ -1203,7 +1203,7 @@ civicrm_relationship.is_active = 1 AND
       TRUE, FALSE
     );
 
-    list($select, $from, $where, $having) = $query->query();
+    [$select, $from, $where, $having] = $query->query();
     $this->assertEquals($expectedWhere, $where);
   }
 
@@ -1395,13 +1395,13 @@ civicrm_relationship.is_active = 1 AND
       ],
     ];
     $query = new CRM_Contact_BAO_Query($params);
-    list($select, $from, $where) = $query->query();
+    [$select, $from, $where] = $query->query();
     $this->assertStringContainsString("contact_a.sort_name LIKE '%John%Doe%'", $where);
 
     //Check for NO wildcard due to comma
     $params[0][2] = 'Doe, John';
     $query = new CRM_Contact_BAO_Query($params);
-    list($select, $from, $where) = $query->query();
+    [$select, $from, $where] = $query->query();
     $this->assertStringContainsString("contact_a.sort_name LIKE '%Doe, John%'", $where);
   }
 

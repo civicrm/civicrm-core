@@ -1397,7 +1397,7 @@ HERESQL;
 
       $displayName = $info['display_name'] ?? NULL;
 
-      list($result[CRM_Utils_Array::value('contact_id', $info)], $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
+      [$result[CRM_Utils_Array::value('contact_id', $info)], $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate(
         [
           'groupName' => 'msg_tpl_workflow_case',
           'workflow' => 'case_activity',
@@ -1597,7 +1597,7 @@ HERESQL;
           $groupInfo['title'] = $results['title'];
           $params = [['group', '=', $groupInfo['id'], 0, 0]];
           $return = ['contact_id' => 1, 'sort_name' => 1, 'display_name' => 1, 'email' => 1, 'phone' => 1];
-          list($globalContacts) = CRM_Contact_BAO_Query::apiQuery($params, $return, NULL, $sort, $offset, $rowCount, TRUE, $returnOnlyCount, FALSE);
+          [$globalContacts] = CRM_Contact_BAO_Query::apiQuery($params, $return, NULL, $sort, $offset, $rowCount, TRUE, $returnOnlyCount, FALSE);
 
           if ($returnOnlyCount) {
             return $globalContacts;
@@ -3074,13 +3074,13 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
         'record_type_id' => 'Activity Source',
         'return' => 'contact_id',
       ]);
-      list($name, $address) = CRM_Contact_BAO_Contact_Location::getEmailDetails($sourceContactId);
+      [$name, $address] = CRM_Contact_BAO_Contact_Location::getEmailDetails($sourceContactId);
     }
 
     // If 'From' email address not found for Source Activity Contact then
     //   fetch the email from domain or logged in user.
     if (empty($address)) {
-      list($name, $address) = CRM_Core_BAO_Domain::getDefaultReceiptFrom();
+      [$name, $address] = CRM_Core_BAO_Domain::getDefaultReceiptFrom();
     }
 
     return "$name <$address>";

@@ -310,7 +310,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
         asort($relationshipTypes);
 
         foreach ($relationshipTypes as $key => $var) {
-          list($type) = explode('_', $key);
+          [$type] = explode('_', $key);
 
           $relationships[$key]['title'] = $var;
           $relationships[$key]['headerPattern'] = '/' . preg_quote($var, '/') . '/';
@@ -352,7 +352,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
 
         foreach ($subTypeRelationshipTypes as $key => $var) {
           if (!array_key_exists($key, $fields[$info['parent']])) {
-            list($type) = explode('_', $key);
+            [$type] = explode('_', $key);
 
             $csRelationships[$key]['title'] = $var;
             $csRelationships[$key]['headerPattern'] = '/' . preg_quote($var, '/') . '/';
@@ -488,7 +488,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
 
     // Handle mapping for 'related contact' fields
     if (count(explode('_', CRM_Utils_Array::value('1', $v))) > 2) {
-      list($id, $first, $second) = explode('_', CRM_Utils_Array::value('1', $v));
+      [$id, $first, $second] = explode('_', CRM_Utils_Array::value('1', $v));
       if (($first == 'a' && $second == 'b') || ($first == 'b' && $second == 'a')) {
 
         if (!empty($v['2'])) {

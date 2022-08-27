@@ -1057,7 +1057,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $attributes = [];
     foreach (explode(' ', $attrString) as $at) {
       if (strpos($at, '=')) {
-        list($k, $v) = explode('=', $at);
+        [$k, $v] = explode('=', $at);
         $attributes[$k] = trim($v, ' "');
       }
     }
@@ -1430,7 +1430,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
             'entity_id',
             'file_id'
           );
-          list($path) = CRM_Core_BAO_File::path($fileID, $entityId);
+          [$path] = CRM_Core_BAO_File::path($fileID, $entityId);
           $fileHash = CRM_Core_BAO_File::generateFileHash($entityId, $fileID);
           $url = CRM_Utils_System::url('civicrm/file',
             "reset=1&id=$fileID&eid=$entityId&fcs=$fileHash",
@@ -1524,7 +1524,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       return NULL;
     }
 
-    list($tableName, $columnName, $groupID) = self::getTableColumnGroup($customFieldId);
+    [$tableName, $columnName, $groupID] = self::getTableColumnGroup($customFieldId);
 
     if (!$customValueId &&
       // we always create new entites for is_multiple unless specified

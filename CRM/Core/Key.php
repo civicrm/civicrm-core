@@ -112,7 +112,7 @@ class CRM_Core_Key {
     }
 
     if ($addSequence) {
-      list($k, $t) = explode('_', $key);
+      [$k, $t] = explode('_', $key);
       if ($t < 1 || $t > 10000) {
         return NULL;
       }

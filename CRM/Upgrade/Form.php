@@ -787,7 +787,7 @@ SET    version = '$version'
     $restore = \CRM_Upgrade_DispatchPolicy::useTemporarily('upgrade.finish');
 
     $upgrade = new CRM_Upgrade_Form();
-    list($ignore, $latestVer) = $upgrade->getUpgradeVersions();
+    [$ignore, $latestVer] = $upgrade->getUpgradeVersions();
     // Seems extraneous in context, but we'll preserve old behavior
     $upgrade->setVersion($latestVer);
     // Going forward, any new tasks will run in `upgrade.finish` mode.

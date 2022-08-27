@@ -639,7 +639,7 @@ trait Api3TestTrait {
     }
 
     // Handle single api call
-    list(, $chainEntity, $chainAction) = explode('.', $key);
+    [, $chainEntity, $chainAction] = explode('.', $key);
     $lcChainEntity = \CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($chainEntity);
     $chainEntity = \CRM_Core_DAO_AllCoreTables::convertEntityNameToCamel($chainEntity);
     $lcMainEntity = \CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($mainEntity);
