@@ -49,7 +49,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    *
    * @param string $thousandSeparator
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function testImportParserWithSoftCreditsByExternalIdentifier(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);

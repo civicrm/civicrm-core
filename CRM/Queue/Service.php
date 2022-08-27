@@ -54,11 +54,11 @@ class CRM_Queue_Service {
    *
    * @return \CRM_Queue_Service
    */
-  public static function &singleton($forceNew = FALSE) {
-    if ($forceNew || !self::$_singleton) {
-      self::$_singleton = new CRM_Queue_Service();
+  public static function &singleton(bool $forceNew = FALSE) {
+    if ($forceNew || !isset(\Civi::$statics[__CLASS__]['singleton'])) {
+      \Civi::$statics[__CLASS__]['singleton'] = new CRM_Queue_Service();
     }
-    return self::$_singleton;
+    return \Civi::$statics[__CLASS__]['singleton'];
   }
 
   /**
