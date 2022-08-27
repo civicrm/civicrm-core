@@ -27,6 +27,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyFour extends CRM_Upgrade_Incremental_
       if (\Civi::settings()->get('civicaseActivityRevisions')) {
         $preUpgradeMessage .= '<p>' . ts('The setting that used to be at <em>Administer &gt; CiviCase &gt; CiviCase Settings</em> for <strong>Enable deprecated Embedded Activity Revisions</strong> is enabled, but is no longer functional.<ul><li>For more information see this <a %1>Lab Snippet</a>.</li></ul>', [1 => 'target="_blank" href="https://lab.civicrm.org/-/snippets/85"']) . '</p>';
       }
+      $preUpgradeMessage .= ($this->renderQueueMessage() ?: '');
     }
   }
 
@@ -39,6 +40,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyFour extends CRM_Upgrade_Incremental_
   public function upgrade_5_54_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Add "created_id" column to "civicrm_participant"', 'addCreatedIDColumnToParticipant');
+    $this->addTask('Convert timestamps in civicrm_queue_item', 'updateQueueTimestamps');
     $this->addTask('Increase field length of civicrm_dedupe_rule_group.name', 'alterDedupeRuleGroupName');
     $this->addTask('Add index civicrm_dedupe_rule_group.UI_name', 'addIndex', 'civicrm_dedupe_rule_group', 'name', 'UI');
     $this->addTask('Install Elavon Payment Processor Extension as needed', 'installElavonPaymentProcessorExtension');
@@ -96,6 +98,51 @@ class CRM_Upgrade_Incremental_php_FiveFiftyFour extends CRM_Upgrade_Incremental_
     else {
       CRM_Core_DAO::executeQuery("DELETE FROM civicrm_payment_processor_type WHERE name = 'Elavon'");
     }
+    return TRUE;
+  }
+
+  public function renderQueueMessage(): ?string {
+    $taskCounts = CRM_Core_DAO::executeQuery('SELECT queue_name, count(*) as count FROM civicrm_queue_item GROUP BY queue_name')
+      ->fetchMap('queue_name', 'count');
+    unset($taskCounts[CRM_Upgrade_Form::QUEUE_NAME]);
+    if (empty($taskCounts)) {
+      return NULL;
+    }
+
+    $delayedCounts = CRM_Core_DAO::executeQuery('SELECT queue_name, count(*) as count FROM civicrm_queue_item WHERE (release_time IS NOT NULL) GROUP BY queue_name')
+      ->fetchMap('queue_name', 'count');
+
+    $status = ts('<strong>Queue Timezone</strong>: The system has queued tasks, and some tasks may be scheduled for future execution. The upgrade will use your personal timezone (<code>%1</code>) to interpret these tasks. If this timezone is incorrect, the task schedule could shift. The system has %3 queue(s) with %2 pending task(s):', [
+      1 => htmlentities(CRM_Core_Config::singleton()->userSystem->getTimeZoneOffset()),
+      2 => array_sum($taskCounts),
+      3 => count($taskCounts),
+    ]);
+
+    $listItems = [];
+    // $trRows = [];
+    foreach ($taskCounts as $queueName => $itemCount) {
+      $delayedCount = $delayedCounts[$queueName] ?? 0;
+      // $trRows[] = sprintf('<tr><td>%s</td><td>%s</td><td>%s</td></tr>', htmlentities($queueName), $delayedCount, $itemCount - $delayedCount);
+
+      $listItems[] = '<li>' . ts('"<code>%1</code>" has %2 task(s), including %3 time-delayed task(s).', [
+        1 => htmlentities($queueName),
+        2 => $itemCount,
+        3 => $delayedCount,
+      ]) . '</li>';
+    }
+
+    // $header = sprintf('<tr><th>%s</th><th>%s</th><th>%s</th></tr>', ts('Queue'), ts('Time-Delayed Tasks'), ts('Other Tasks'));
+    // return sprintf('<p>%s</p><table><thead>%s</thead><tbody>%s</tbody></table>', $status, $header, implode("\n", $trRows));
+    return sprintf('<p>%s</p><ul>%s</ul>', $status, implode("\n", $listItems));
+  }
+
+  public static function updateQueueTimestamps(CRM_Queue_TaskContext $ctx): bool {
+    // We want to run timestamp conversions in the regular SQL connection, which has @time_zone configured.
+    // So this is NOT going through `*.mysql.tpl`.
+    CRM_Core_DAO::executeQuery('ALTER TABLE `civicrm_queue_item`
+      CHANGE `submit_time` `submit_time` timestamp NOT NULL COMMENT \'date on which this item was submitted to the queue\',
+      CHANGE `release_time` `release_time` timestamp NULL DEFAULT NULL COMMENT \'date on which this job becomes available; null if ASAP\'
+    ');
     return TRUE;
   }
 
