@@ -130,6 +130,7 @@ abstract class CRM_Queue_Queue {
    * @param array $options
    *   Queue-dependent options; for example, if this is a
    *   priority-queue, then $options might specify the item's priority.
+   *   Ex: ['release_time' => strtotime('+3 hours')]
    */
   abstract public function createItem($data, $options = []);
 
