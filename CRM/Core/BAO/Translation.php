@@ -11,13 +11,14 @@
 
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Translation;
+use Civi\Core\HookInterface;
 
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements \Civi\Core\HookInterface {
+class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookInterface {
 
   use CRM_Core_DynamicFKAccessTrait;
 
@@ -26,7 +27,7 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements \Civi
    *
    * @return array[]
    */
-  public static function getStatuses() {
+  public static function getStatuses(): array {
     return [
       ['id' => 1, 'name' => 'active', 'label' => ts('Active')],
       ['id' => 2, 'name' => 'draft', 'label' => ts('Draft')],
