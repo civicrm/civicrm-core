@@ -6,6 +6,7 @@
 
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionSoft;
+use Civi\Api4\Email;
 use Civi\Api4\Note;
 use Civi\Api4\OptionValue;
 use Civi\Api4\UserJob;
@@ -299,6 +300,24 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ->addWhere('entity_id', '=', $contribution['id'])
       ->addWhere('entity_table', '=', 'civicrm_contribution')->execute()->first();
     $this->assertEquals('Call him back', $note['note']);
+  }
+
+  /**
+   * Test whether importing a contribution using email match will match a non-primary.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportMatchNonPrimary(): void {
+    $anthony = $this->individualCreate();
+    Email::create()->setValues([
+      'contact_id' => $anthony,
+      'location_type_id:name' => 'Billing',
+      'is_primary' => FALSE,
+      'email' => 'mum@example.com',
+    ])->execute();
+    $this->importContributionsDotCSV();
+    $contribution = Contribution::get()->execute()->first();
+    $this->assertEquals($anthony, $contribution['contact_id']);
   }
 
   /**

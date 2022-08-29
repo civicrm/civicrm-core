@@ -69,9 +69,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test that import parser will add contact with employee of relationship.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testImportParserWithEmployeeOfRelationship(): void {
     $this->organizationCreate([
@@ -559,6 +557,72 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('Email', ['contact_id' => $id], 1);
     $this->callAPISuccessGetCount('OpenID', ['contact_id' => $id], 1);
     $this->callAPISuccessGetCount('IM', ['contact_id' => $id], 1);
+  }
+
+  /**
+   * Test whether importing a contact using email match will match a non-primary.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportMatchNonPrimary(): void {
+    $anthony = $this->individualCreate();
+    Email::create()->setValues([
+      'contact_id' => $anthony,
+      'location_type_id:name' => 'Billing',
+      'is_primary' => FALSE,
+      'email' => 'mum@example.org',
+    ])->execute();
+    $this->importCSV('individual_valid_basic.csv', [
+      ['first_name'],
+      ['email'],
+      ['source'],
+      ['do_not_import'],
+    ], ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
+    $contact = Contact::get()
+      ->addWhere('id', '=', $anthony)
+      ->execute()
+      ->first();
+    $this->assertEquals('Import', $contact['source']);
+  }
+
+  /**
+   * Test whether importing a contact using email match will match a non-primary.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportMatchSpecifiedLocationToPrimary(): void {
+    $anthony = $this->individualCreate(['email' => 'mum@example.org']);
+
+    $this->importCSV('individual_valid_basic.csv', [
+      ['first_name'],
+      ['email', CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Email', 'location_type_id', 'Other')],
+      ['source'],
+      ['do_not_import'],
+    ], ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
+    $contact = Contact::get()
+      ->addWhere('id', '=', $anthony)
+      ->execute()
+      ->first();
+    $this->assertEquals('Import', $contact['source']);
+
+    // Change the existing primary email to Bob & check that it will match the first
+    // of two emails.
+    Email::update()
+      ->addWhere('email', '=', 'mum@example.org')
+      ->addWhere('is_primary', '=', TRUE)
+      ->setValues(['email' => 'bob@example.org'])->execute();
+
+    $this->importCSV('individual_valid_basic.csv', [
+      ['first_name'],
+      ['email', CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Email', 'location_type_id', 'Other')],
+      ['middle_name'],
+      ['email', CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Email', 'location_type_id', 'Work')],
+    ], ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
+    $contact = Contact::get()
+      ->addWhere('id', '=', $anthony)
+      ->execute()
+      ->first();
+    $this->assertEquals('Import', $contact['middle_name']);
   }
 
   /**
@@ -2064,6 +2128,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
       'groups' => [],
     ], $submittedValues);
+    /* @var CRM_Contact_Import_Form_DataSource $form */
     $form = $this->getFormObject('CRM_Contact_Import_Form_DataSource', $submittedValues);
     $values = $_SESSION['_' . $form->controller->_name . '_container']['values'];
 
@@ -2209,7 +2274,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $parser->import($values);
     $dataSource = new CRM_Import_DataSource_SQL($userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals($expected, $row['_status']);
+    $this->assertEquals($expected, $row['_status'], print_r($row, TRUE));
   }
 
 }

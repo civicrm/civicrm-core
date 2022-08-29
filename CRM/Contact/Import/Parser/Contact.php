@@ -1050,7 +1050,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *
    * @param array $params
    * @param int|null $extIDMatch
-   * @param int|null $dedupeRuleID
+   * @param int|string $dedupeRuleID
    *
    * @return int|null
    *   IDs of a possible.
@@ -1058,21 +1058,19 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  protected function getPossibleContactMatch(array $params, ?int $extIDMatch, ?int $dedupeRuleID): ?int {
-    $checkParams = ['check_permissions' => FALSE, 'match' => $params, 'dedupe_rule_id' => $dedupeRuleID];
-    $possibleMatches = civicrm_api3('Contact', 'duplicatecheck', $checkParams);
+  protected function getPossibleContactMatch(array $params, ?int $extIDMatch, $dedupeRuleID): ?int {
+    $possibleMatches = $this->getPossibleMatchesByDedupeRule($params, $dedupeRuleID);
     if (!$extIDMatch) {
-      if (count($possibleMatches['values']) === 1) {
-        return array_key_last($possibleMatches['values']);
+      if (count($possibleMatches) === 1) {
+        return array_key_last($possibleMatches);
       }
-      if (count($possibleMatches['values']) > 1) {
-        throw new CRM_Core_Exception(ts('Record duplicates multiple contacts: ') . implode(',', array_keys($possibleMatches['values'])), CRM_Import_Parser::ERROR);
-
+      if (count($possibleMatches) > 1) {
+        throw new CRM_Core_Exception(ts('Record duplicates multiple contacts: ') . implode(',', array_keys($possibleMatches)), CRM_Import_Parser::ERROR);
       }
       return NULL;
     }
-    if ($possibleMatches['count']) {
-      if (array_key_exists($extIDMatch, $possibleMatches['values'])) {
+    if (count($possibleMatches) > 0) {
+      if (array_key_exists($extIDMatch, $possibleMatches)) {
         return $extIDMatch;
       }
       throw new CRM_Core_Exception(ts('Matching this contact based on the de-dupe rule would cause an external ID conflict'), CRM_Import_Parser::ERROR);
