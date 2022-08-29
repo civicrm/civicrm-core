@@ -1258,8 +1258,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $isEmailReceipt = !empty($form->_values['is_email_receipt']);
     $pledgeID = !empty($params['pledge_id']) ? $params['pledge_id'] : $form->_values['pledge_id'] ?? NULL;
-    if (!empty($form->_values['pledge_block_id']) &&
-      (!empty($params['is_pledge']) || $pledgeID)) {
+    if ((!empty($params['is_pledge']) || $pledgeID)) {
       $isPledge = TRUE;
     }
     else {
