@@ -177,8 +177,16 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $params['soft_credit'][$i] = ['soft_credit_type_id' => $mappedField['soft_credit_type_id'], $mappedField['soft_credit_match_field'] => $values[$i]];
       }
       else {
-        $entity = $this->getFieldMetadata($mappedField['name'])['entity'] ?? 'Contribution';
-        $params[$entity][$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
+        $fieldSpec = $this->getFieldMetadata($mappedField['name']);
+        $entity = $fieldSpec['entity'] ?? 'Contribution';
+        if ($fieldSpec['hasLocationType'] ?? NULL) {
+          $fieldEntity = str_replace('civicrm_', '', $fieldSpec['table_name']);
+          $fieldName = $fieldEntity . '_primary.' . $this->getFieldMetadata($mappedField['name'])['name'];
+          $params[$entity][$fieldName] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
+        }
+        else {
+          $params[$entity][$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
+        }
       }
     }
     return $params;
@@ -295,21 +303,22 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    */
-  public function import($values): void {
+  public function import(array $values): void {
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
       $entityKeyedParams = $this->getMappedRow($values);
-      $entityKeyedParams['Contribution']['id'] = $this->lookupContributionID($entityKeyedParams['Contribution']);
+      $existingContribution = $this->lookupContribution($entityKeyedParams['Contribution']);
+      $entityKeyedParams['Contribution']['id'] = $existingContribution['id'] ?? NULL;
       if (empty($entityKeyedParams['Contribution']['id']) && $this->isUpdateExisting()) {
         throw new CRM_Core_Exception('Empty Contribution and Invoice and Transaction ID. Row was skipped.', CRM_Import_Parser::ERROR);
       }
-      if (!empty($params['Contact']['contact_id'])) {
-        $this->validateContactID($params['Contact']['contact_id'], $this->getContactType());
-      }
+      $contactID = $entityKeyedParams['Contribution']['contact_id'] ?? ($existingContribution['contact_id'] ?? NULL);
+      $entityKeyedParams['Contribution']['contact_id'] = $this->getContactID($entityKeyedParams['Contact'] ?? [], $contactID);
+
       // @todo - here we flatten the entities back into a single array.
       // The entity format is better but the code below needs to be migrated.
       $params = [];
-      foreach (['Contact', 'Contribution', 'Note'] as $entity) {
+      foreach (['Contribution', 'Note'] as $entity) {
         $params = array_merge($params, ($entityKeyedParams[$entity] ?? []));
       }
       if (isset($entityKeyedParams['soft_credit'])) {
@@ -328,21 +337,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           continue;
         }
         $paramValues[$key] = $field;
-      }
-
-      //import contribution record according to select contact type
-      if ($this->isSkipDuplicates() &&
-        (!empty($paramValues['contribution_contact_id']) || !empty($paramValues['external_identifier']))
-      ) {
-        $paramValues['contact_type'] = $this->getContactType();
-      }
-      elseif ($this->isUpdateExisting() &&
-        (!empty($paramValues['id']))
-      ) {
-        $paramValues['contact_type'] = $this->getContactType();
-      }
-      elseif (!empty($paramValues['pledge_payment'])) {
-        $paramValues['contact_type'] = $this->getContactType();
       }
 
       $this->deprecatedFormatParams($paramValues, $formatted);
@@ -413,95 +407,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         }
       }
 
-      if (empty($formatted['contact_id'])) {
-
-        $error = $this->checkContactDuplicate($paramValues);
-
-        if (CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
-          $matchedIDs = (array) $error['error_message']['params'];
-          if (count($matchedIDs) > 1) {
-            throw new CRM_Core_Exception('Multiple matching contact records detected for this row. The contribution was not imported', CRM_Import_Parser::ERROR);
-          }
-          $cid = $matchedIDs[0];
-          $formatted['contact_id'] = $cid;
-
-          $newContribution = civicrm_api('contribution', 'create', $formatted);
-          if (civicrm_error($newContribution)) {
-            if (is_array($newContribution['error_message'])) {
-              if ($newContribution['error_message']['params'][0]) {
-                throw new CRM_Core_Exception($newContribution['error_message']['message'], CRM_Import_Parser::DUPLICATE);
-              }
-            }
-            else {
-              throw new CRM_Core_Exception($newContribution['error_message'], CRM_Import_Parser::ERROR);
-            }
-          }
-
-          $this->_newContributions[] = $newContribution['id'];
-          $formatted['contribution_id'] = $newContribution['id'];
-
-          //return soft valid since we need to show how soft credits were added
-          if (!empty($formatted['soft_credit'])) {
-            $this->setImportStatus($rowNumber, $this->getStatus(self::SOFT_CREDIT), '', $newContribution['id']);
-            return;
-          }
-
-          $this->setImportStatus($rowNumber, $this->processPledgePayments($formatted) ? $this->getStatus(self::PLEDGE_PAYMENT) : $this->getStatus(self::VALID), '', $newContribution['id']);
-          return;
-        }
-
-        // Using new Dedupe rule.
-        $ruleParams = [
-          'contact_type' => $this->getContactType(),
-          'used' => 'Unsupervised',
-        ];
-        $fieldsArray = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
-        $disp = NULL;
-        foreach ($fieldsArray as $value) {
-          if (array_key_exists(trim($value), $params)) {
-            $paramValue = $params[trim($value)];
-            if (is_array($paramValue)) {
-              $disp .= $params[trim($value)][0][trim($value)] . " ";
-            }
-            else {
-              $disp .= $params[trim($value)] . " ";
-            }
-          }
-        }
-
-        if (!empty($params['external_identifier'])) {
-          if ($disp) {
-            $disp .= "AND {$params['external_identifier']}";
-          }
-          else {
-            $disp = $params['external_identifier'];
-          }
-        }
-        $errorMessage = 'No matching Contact found for (' . $disp . ')';
-        throw new CRM_Core_Exception($errorMessage, CRM_Import_Parser::ERROR);
-      }
-
-      if (!empty($paramValues['external_identifier'])) {
-        $checkCid = new CRM_Contact_DAO_Contact();
-        $checkCid->external_identifier = $paramValues['external_identifier'];
-        $checkCid->find(TRUE);
-        if ($checkCid->id != $formatted['contact_id']) {
-          $errorMessage = 'Mismatch of External ID:' . $paramValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id'];
-          throw new CRM_Core_Exception($errorMessage, CRM_Import_Parser::ERROR);
-        }
-      }
-      $newContribution = civicrm_api('contribution', 'create', $formatted);
-      if (civicrm_error($newContribution)) {
-        if (is_array($newContribution['error_message'])) {
-          if ($newContribution['error_message']['params'][0]) {
-            throw new CRM_Core_Exception('', CRM_Import_Parser::DUPLICATE);
-          }
-        }
-        else {
-          throw new CRM_Core_Exception($newContribution['error_message'], CRM_Import_Parser::ERROR);
-        }
-      }
-
+      $newContribution = civicrm_api3('contribution', 'create', $formatted);
       $this->_newContributions[] = $newContribution['id'];
       $formatted['contribution_id'] = $newContribution['id'];
 
@@ -528,9 +434,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    *
    * @throws \CRM_Core_Exception
    *
-   * @return int|null
+   * @return array|null
    */
-  private function lookupContributionID(array $params): ?int {
+  private function lookupContribution(array $params): array {
     $where = [];
     $labels = [];
     foreach (['id' => 'Contribution ID', 'trxn_id' => 'Transaction ID', 'invoice_id' => 'Invoice ID'] as $field => $label) {
@@ -540,11 +446,11 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       }
     }
     if (empty($where)) {
-      return NULL;
+      return [];
     }
-    $contribution = Contribution::get(FALSE)->setWhere($where)->addSelect('id')->execute()->first();
+    $contribution = Contribution::get(FALSE)->setWhere($where)->addSelect('id', 'contact_id')->execute()->first();
     if ($contribution['id'] ?? NULL) {
-      return $contribution['id'];
+      return $contribution;
     }
     throw new CRM_Core_Exception('Matching Contribution record not found for ' . implode(' AND ', $labels) . '. Row was skipped.', CRM_Import_Parser::ERROR);
   }
@@ -630,77 +536,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
       switch ($key) {
 
-        case 'contact_type':
-          // import contribution record according to select contact type
-          require_once 'CRM/Contact/DAO/Contact.php';
-          $contactType = new CRM_Contact_DAO_Contact();
-          $contactId = $params['contribution_contact_id'] ?? NULL;
-          $externalId = $params['external_identifier'] ?? NULL;
-          $email = $params['email'] ?? NULL;
-          //when insert mode check contact id or external identifier
-          if ($contactId || $externalId) {
-            $contactType->id = $contactId;
-            $contactType->external_identifier = $externalId;
-            if ($contactType->find(TRUE)) {
-              if ($params['contact_type'] != $contactType->contact_type) {
-                throw new CRM_Core_Exception("Contact Type is wrong: $contactType->contact_type", CRM_Import_Parser::ERROR);
-              }
-            }
-          }
-          elseif ($email) {
-
-            // get the contact id from duplicate contact rule, if more than one contact is returned
-            // we should return error, since current interface allows only one-one mapping
-            $ids = CRM_Contact_BAO_Contact::getDuplicateContacts([
-              'email' => $email,
-              'contact_type' => $params['contact_type'],
-            ], $params['contact_type'], 'Unsupervised');
-
-            if (!empty($ids)) {
-              $checkDedupe = [
-                'is_error' => 1,
-                'error_message' => [
-                  'code' => CRM_Core_Error::DUPLICATE_CONTACT,
-                  'params' => $ids,
-                  'level' => 'Fatal',
-                  'message' => 'Found matching contacts: ' . implode(',', $ids),
-                ],
-              ];
-            }
-            else {
-              $checkDedupe = ['is_error' => 0];
-            }
-            if (!$checkDedupe['is_error']) {
-              throw new CRM_Core_Exception("Invalid email address(doesn't exist) $email. Row was skipped", CRM_Import_Parser::ERROR);
-            }
-            $matchingContactIds = explode(',', $checkDedupe['error_message']['params'][0]);
-            if (count($matchingContactIds) > 1) {
-              throw new CRM_Core_Exception("Invalid email address(duplicate) $email. Row was skipped", CRM_Import_Parser::ERROR);
-            }
-            if (count($matchingContactIds) == 1) {
-              $params['contribution_contact_id'] = $matchingContactIds[0];
-            }
-          }
-          elseif (!empty($params['id'])) {
-            // when update mode check contribution id or trxn id or
-            // invoice id
-            // @todo - this check is obsolete. It survives for now
-            // in order to keep the rc patch small & non-conflicty.
-            $contactId = new CRM_Contribute_DAO_Contribution();
-            if (!empty($params['id'])) {
-              $contactId->id = $params['id'];
-            }
-            if ($contactId->find(TRUE)) {
-              $contactType->id = $contactId->contact_id;
-              if ($contactType->find(TRUE)) {
-                if ($params['contact_type'] != $contactType->contact_type) {
-                  throw new CRM_Core_Exception("Contact Type is wrong: $contactType->contact_type", CRM_Import_Parser::ERROR);
-                }
-              }
-            }
-          }
-          break;
-
         case 'soft_credit':
           // import contribution record according to select contact type
           // validate contact id and external identifier.
@@ -715,6 +550,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         case 'pledge_id':
           // get total amount of from import fields
           $totalAmount = $params['total_amount'] ?? NULL;
+          $contributionContactID = $params['contact_id'];
           // we need to get contact id $contributionContactID to
           // retrieve pledge details as well as to validate pledge ID
 
@@ -726,47 +562,12 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
             }
 
             if ($contribution->find(TRUE)) {
-              $contributionContactID = $contribution->contact_id;
               if (!$totalAmount) {
                 $totalAmount = $contribution->total_amount;
               }
             }
             else {
               throw new CRM_Core_Exception('No match found for specified contact in pledge payment data. Row was skipped.', CRM_Import_Parser::ERROR);
-            }
-          }
-          else {
-            // first get the contact id for given contribution record.
-            if (!empty($params['contribution_contact_id'])) {
-              $contributionContactID = $params['contribution_contact_id'];
-            }
-            elseif (!empty($params['external_identifier'])) {
-              require_once 'CRM/Contact/DAO/Contact.php';
-              $contact = new CRM_Contact_DAO_Contact();
-              $contact->external_identifier = $params['external_identifier'];
-              if ($contact->find(TRUE)) {
-                $contributionContactID = $params['contribution_contact_id'] = $values['contribution_contact_id'] = $contact->id;
-              }
-              else {
-                throw new CRM_Core_Exception('No match found for specified contact in pledge payment data. Row was skipped.');
-              }
-            }
-            else {
-              // we need to get contribution contact using de dupe
-              $error = $this->checkContactDuplicate($params);
-
-              if (isset($error['error_message']['params'][0])) {
-                $matchedIDs = (array) $error['error_message']['params'];
-
-                // check if only one contact is found
-                if (count($matchedIDs) > 1) {
-                  throw new CRM_Core_Exception($error['error_message']['message'], CRM_Import_Parser::ERROR);
-                }
-                $contributionContactID = $params['contribution_contact_id'] = $values['contribution_contact_id'] = $matchedIDs[0];
-              }
-              else {
-                throw new CRM_Core_Exception('No match found for specified contact in contribution data. Row was skipped.', CRM_Import_Parser::ERROR);
-              }
             }
           }
 
