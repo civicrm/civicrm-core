@@ -39,7 +39,7 @@ class CRM_Utils_ReCAPTCHA {
   /**
    * Singleton function used to manage this object.
    *
-   * @return object
+   * @return CRM_Utils_ReCAPTCHA
    */
   public static function &singleton() {
     if (self::$_singleton === NULL) {

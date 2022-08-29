@@ -904,7 +904,7 @@ HERESQL;
   }
 
   /**
-   * @param $componentRows
+   * @param array $componentRows
    */
   public function alterComponentDisplay(&$componentRows) {
     // custom code to alter rows

@@ -328,8 +328,8 @@ LEFT  JOIN civicrm_contact altered_by_contact_civireport
   /**
    * Add links & hovers to the detailed report.
    *
-   * @param $baseQueryCriteria
-   * @param $row
+   * @param string $baseQueryCriteria
+   * @param array $row
    *
    * @return mixed
    */

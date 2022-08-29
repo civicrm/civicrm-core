@@ -442,7 +442,7 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    */
   public function buildChart(&$rows) {
     $graphRows = [];
