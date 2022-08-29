@@ -546,12 +546,12 @@ ORDER BY  cv.label
   }
 
   /**
-   * @param $rows
-   * @param $entryFound
-   * @param $row
-   * @param int $rowId
-   * @param $rowNum
-   * @param $types
+   * @param array $rows
+   * @param bool $entryFound
+   * @param array $row
+   * @param string $rowId
+   * @param int $rowNum
+   * @param array $types
    *
    * @return bool
    */

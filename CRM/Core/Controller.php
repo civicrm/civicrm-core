@@ -819,7 +819,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * @param null $url
+   * @param string|null $url
    * @param bool $setToReferer
    */
   public function setDestination($url = NULL, $setToReferer = FALSE) {

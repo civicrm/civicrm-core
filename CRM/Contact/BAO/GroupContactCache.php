@@ -660,7 +660,7 @@ ORDER BY   gc.contact_id, g.children
    *
    * Do not call this outside of core tested code - it WILL change.
    *
-   * @param array[int] $groupIDs
+   * @param int[] $groupIDs
    * @param string $temporaryTable
    *
    * @throws \API_Exception

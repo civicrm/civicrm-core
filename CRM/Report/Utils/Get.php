@@ -18,7 +18,8 @@ class CRM_Report_Utils_Get {
 
   /**
    * @param string $name
-   * @param $type
+   * @param int $type
+   *   Integer number identifying the data type.
    *
    * @return mixed|null
    */
@@ -36,7 +37,7 @@ class CRM_Report_Utils_Get {
   /**
    * @param string $fieldName
    * @param $field
-   * @param $defaults
+   * @param array $defaults
    *
    * @return bool
    */
@@ -83,8 +84,8 @@ class CRM_Report_Utils_Get {
 
   /**
    * @param string $fieldName
-   * @param $field
-   * @param $defaults
+   * @param array $field
+   * @param array $defaults
    */
   public static function stringParam($fieldName, &$field, &$defaults) {
     $fieldOP = CRM_Utils_Array::value("{$fieldName}_op", $_GET, 'like');
@@ -123,8 +124,8 @@ class CRM_Report_Utils_Get {
 
   /**
    * @param string $fieldName
-   * @param $field
-   * @param $defaults
+   * @param array $field
+   * @param array $defaults
    */
   public static function intParam($fieldName, &$field, &$defaults) {
     $fieldOP = CRM_Utils_Array::value("{$fieldName}_op", $_GET, 'eq');
@@ -185,7 +186,7 @@ class CRM_Report_Utils_Get {
   }
 
   /**
-   * @param $defaults
+   * @param array $defaults
    */
   public static function processChart(&$defaults) {
     $chartType = $_GET["charts"] ?? NULL;
@@ -198,8 +199,8 @@ class CRM_Report_Utils_Get {
   }
 
   /**
-   * @param $fieldGrp
-   * @param $defaults
+   * @param array $fieldGrp
+   * @param array $defaults
    */
   public static function processFilter(&$fieldGrp, &$defaults) {
     // process only filters for now
@@ -228,7 +229,7 @@ class CRM_Report_Utils_Get {
 
   /**
    * unset default filters.
-   * @param $defaults
+   * @param array $defaults
    */
   public static function unsetFilters(&$defaults) {
     static $unsetFlag = TRUE;
@@ -276,8 +277,8 @@ class CRM_Report_Utils_Get {
   }
 
   /**
-   * @param $reportFields
-   * @param $defaults
+   * @param array|null $reportFields
+   * @param array $defaults
    */
   public static function processFields(&$reportFields, &$defaults) {
     //add filters from url

@@ -350,7 +350,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    */
   public function buildChart(&$rows) {
 

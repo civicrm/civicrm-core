@@ -651,8 +651,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    *
    * @param int $memTypeID
    *   membership type ID
-   * @param int $links
-   *   (reference ) action links
+   * @param array $links
+   *   (reference) action links
    */
   public static function getPermissionedLinks($memTypeID, &$links) {
     if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {

@@ -117,7 +117,7 @@ class CRM_Extension_Mapper {
    * Given the class, provides extension path.
    *
    *
-   * @param $clazz
+   * @param string $clazz
    *
    * @return string
    *   full path the extension .php file

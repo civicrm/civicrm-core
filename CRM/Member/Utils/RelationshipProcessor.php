@@ -38,7 +38,7 @@ class CRM_Member_Utils_RelationshipProcessor {
   /**
    * CRM_Member_Utils_RelationshipProcessor constructor.
    *
-   * @param [int] $contactIDs
+   * @param int[] $contactIDs
    * @param bool $active
    *
    * @throws \CiviCRM_API3_Exception

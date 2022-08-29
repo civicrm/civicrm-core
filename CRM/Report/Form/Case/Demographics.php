@@ -422,7 +422,7 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
 
   /**
    * @param string $fname
-   * @param $val
+   * @param string $val
    *
    * @return null|string
    */
