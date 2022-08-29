@@ -114,7 +114,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
    *
    * @return int
    */
-  public function numberOfItems() {
+  public function numberOfItems(): int {
     return count($this->items);
   }
 

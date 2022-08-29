@@ -56,11 +56,11 @@ trait CRM_Queue_Queue_SqlTrait {
    * @return int
    */
   public function numberOfItems() {
-    return CRM_Core_DAO::singleValueQuery("
+    return (int) CRM_Core_DAO::singleValueQuery('
       SELECT count(*)
       FROM civicrm_queue_item
       WHERE queue_name = %1
-    ", [
+    ', [
       1 => [$this->getName(), 'String'],
     ]);
   }
