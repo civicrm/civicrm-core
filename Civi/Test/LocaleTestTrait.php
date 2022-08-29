@@ -68,12 +68,14 @@ trait LocaleTestTrait {
     $dbLocale = '_' . static::$defaultSystemLocale;
 
     if ($addLocales !== NULL) {
+      $languageLimit = \Civi::settings()->get('languageLimit');
       foreach ($addLocales as $fromLocale => $toLocales) {
         foreach ((array) $toLocales as $toLocale) {
           \CRM_Core_I18n_Schema::addLocale($toLocale, $fromLocale);
+          $languageLimit[$toLocale] = '1';
         }
-        \Civi::settings()->set('languageLimit', \Civi::settings()->get('languageLimit') + [$toLocale => '1']);
       }
+      \Civi::settings()->set('languageLimit', $languageLimit);
     }
   }
 
