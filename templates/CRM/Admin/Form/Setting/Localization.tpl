@@ -49,6 +49,12 @@
               <span class="description">{$settings_fields.contact_default_language.description}</span>
             </td>
           </tr>
+          <tr class="crm-localization-form-partial_locales">
+            <td class="label">{$form.partial_locales.label}</td>
+            <td>{$form.partial_locales.html}<br />
+              <span class="description">{$settings_fields.partial_locales.description}</span>
+            </td>
+          </tr>
           <tr class="crm-localization-form-block-defaultCurrency">
             <td class="label">{$form.defaultCurrency.label} {help id='defaultCurrency' title=$form.defaultCurrency.label}</td>
             <td>{$form.defaultCurrency.html}</td>
