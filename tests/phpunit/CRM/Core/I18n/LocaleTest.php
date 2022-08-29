@@ -88,10 +88,12 @@ class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
 
   public function getPartialLocaleExamples(): array {
     $results = [/* array $settings, string $preferredLocale, array $expectLocale, string $expectYes */];
-    $results['es_PR mixed mode'] = [['partial_locales' => TRUE], 'es_PR', ['nominal' => 'es_PR', 'ts' => 'es_MX', 'moneyFormat' => 'es_PR'], 'Sí'];
-    $results['th_TH mixed mode'] = [['partial_locales' => TRUE], 'th_TH', ['nominal' => 'th_TH', 'ts' => 'en_US', 'moneyFormat' => 'th_TH'], 'Yes'];
-    $results['es_PR switched to es_MX'] = [['partial_locales' => FALSE], 'es_PR', ['nominal' => 'es_MX', 'ts' => 'es_MX', 'moneyFormat' => 'es_MX'], 'Sí'];
-    $results['th_TH switched to en_US'] = [['partial_locales' => FALSE], 'th_TH', ['nominal' => 'en_US', 'ts' => 'en_US', 'moneyFormat' => 'en_US'], 'Yes'];
+    $results['es_MX full support (partial mode) '] = [['partial_locales' => TRUE], 'es_MX', ['nominal' => 'es_MX', 'ts' => 'es_MX', 'moneyFormat' => 'es_MX'], 'Sí', 'USD 1,234.56'];
+    $results['es_PR mixed mode'] = [['partial_locales' => TRUE], 'es_PR', ['nominal' => 'es_PR', 'ts' => 'es_MX', 'moneyFormat' => 'es_PR'], 'Sí', '$1,234.56'];
+    $results['th_TH mixed mode'] = [['partial_locales' => TRUE], 'th_TH', ['nominal' => 'th_TH', 'ts' => 'en_US', 'moneyFormat' => 'th_TH'], 'Yes', 'US$1,234.56'];
+    $results['es_MX full support (full mode) '] = [['partial_locales' => TRUE], 'es_MX', ['nominal' => 'es_MX', 'ts' => 'es_MX', 'moneyFormat' => 'es_MX'], 'Sí', 'USD 1,234.56'];
+    $results['es_PR switched to es_MX'] = [['partial_locales' => FALSE], 'es_PR', ['nominal' => 'es_MX', 'ts' => 'es_MX', 'moneyFormat' => 'es_MX'], 'Sí', 'USD 1,234.56'];
+    $results['th_TH switched to en_US'] = [['partial_locales' => FALSE], 'th_TH', ['nominal' => 'en_US', 'ts' => 'en_US', 'moneyFormat' => 'en_US'], 'Yes', '$1,234.56'];
     return $results;
   }
 
@@ -106,9 +108,11 @@ class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
    *   Ex: ['nominal' => 'es_PR', 'ts' => 'es_MX', 'moneyFormat' => 'es_PR']
    * @param string $expectYes
    *   The translation for "Yes" in our expected language.
+   * @param string $expectAmount
+   *   The expected rendering of `1234.56` (USD) in the given locale.
    * @dataProvider getPartialLocaleExamples
    */
-  public function testPartialLocale(array $settings, string $preferred, array $expectLocale, string $expectYes) {
+  public function testPartialLocale(array $settings, string $preferred, array $expectLocale, string $expectYes, string $expectAmount) {
     if (count(\CRM_Core_I18n::languages(FALSE)) <= 1) {
       $this->markTestIncomplete('Full testing of localization requires l10n data.');
     }
@@ -127,6 +131,9 @@ class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
     $this->assertEquals($expectLocale['nominal'], $civicrmLocale->nominal);
     // Should getLocale() return nominal or ts?
     // $this->assertEquals($expectLocale['nominal'], CRM_Core_I18n::getLocale());
+
+    $formattedAmount = Civi::format()->money(1234.56, 'USD');
+    $this->assertEquals($expectAmount, $formattedAmount);
   }
 
   /**
