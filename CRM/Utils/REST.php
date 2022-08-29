@@ -590,9 +590,6 @@ class CRM_Utils_REST {
     }
 
     if (!CRM_Utils_System::authenticateKey(FALSE)) {
-      // FIXME: At time of writing, this doesn't actually do anything because
-      // authenticateKey abends, but that's a bad behavior which sends a
-      // malformed response.
       CRM_Utils_System::loadBootStrap([], FALSE, FALSE);
       return self::error('Failed to authenticate key');
     }
