@@ -12,6 +12,7 @@
 use Civi\Api4\Campaign;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
+use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\Event;
 use Civi\Api4\UserJob;
 use Civi\UserJob\UserJobInterface;
@@ -948,6 +949,33 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
+   * Get the default dedupe rule name for the contact type.
+   *
+   * @param string $contactType
+   *
+   * @return string
+   */
+  protected function getDefaultRuleForContactType(string $contactType): string {
+    return $contactType . '.Unsupervised';
+  }
+
+  /**
+   * Get the dedupe rule name.
+   *
+   * @param int $id
+   *
+   * @return string
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDedupeRuleName(int $id): string {
+    return DedupeRuleGroup::get(FALSE)
+      ->addWhere('id', '=', $id)
+      ->addSelect('name')
+      ->execute()->first()['name'];
+  }
+
+  /**
    * This function adds the contact variable in $values to the
    * parameter list $params.  For most cases, $values should have length 1.  If
    * the variable being added is a child of Location, a location_type_id must
@@ -1592,7 +1620,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @throws \API_Exception
    */
   protected function getFieldEntity(string $fieldName) {
-    if ($fieldName === 'do_not_import') {
+    if ($fieldName === 'do_not_import' || $fieldName === '') {
       return '';
     }
     if (in_array($fieldName, ['email_greeting_id', 'postal_greeting_id', 'addressee_id'], TRUE)) {
@@ -2024,6 +2052,68 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       throw new CRM_Core_Exception(ts('Existing external ID does not match the imported contact ID.'), CRM_Import_Parser::ERROR);
     }
     return (int) $foundContact['id'];
+  }
+
+  /**
+   * Get contacts that match the input parameters, using a dedupe rule.
+   *
+   * @param array $params
+   * @param int|null $dedupeRuleID
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getPossibleMatchesByDedupeRule(array $params, $dedupeRuleID = NULL): array {
+    foreach (['email', 'address', 'phone', 'im'] as $locationEntity) {
+      if (array_key_exists($locationEntity, $params)) {
+        // Prefer primary
+        if (array_key_exists('Primary', $params[$locationEntity])) {
+          $locationParams = $params[$locationEntity]['Primary'];
+        }
+        else {
+          // Chose the first one - at least they can manipulate the order.
+          $locationParams = reset($params[$locationEntity]);
+        }
+        foreach ($locationParams as $key => $locationParam) {
+          // Even though we might not be using 'primary' we 'pretend' here
+          // since the apiv4 code expects that...
+          $params[$locationEntity . '_primary' . '.' . $key] = $locationParam;
+        }
+        unset($params[$locationEntity]);
+      }
+    }
+    foreach ($params as $key => $value) {
+      if (strpos($key, 'custom_') === 0) {
+        $params[$this->getApi4Name($key)] = $value;
+        unset($params[$key]);
+      }
+    }
+    $dedupeRule = $dedupeRuleID ? $this->getDedupeRuleName($dedupeRuleID) : $this->getDefaultRuleForContactType($params['contact_type']);
+    $possibleMatches = Contact::getDuplicates(FALSE)
+      ->setValues($params)
+      ->setDedupeRule($dedupeRule)
+      ->execute();
+
+    $matchIDs = [];
+    foreach ($possibleMatches as $possibleMatch) {
+      $matchIDs[(int) $possibleMatch['id']] = (int) $possibleMatch['id'];
+    }
+    return $matchIDs;
+  }
+
+  /**
+   * Get the Api4 name of a custom field.
+   *
+   * @param string $key
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getApi4Name(string $key): string {
+    return Contact::getFields(FALSE)
+      ->addWhere('custom_field_id', '=', $this->getFieldMetadata($key)['custom_field_id'])
+      ->addSelect('name')
+      ->execute()->first()['name'];
   }
 
 }

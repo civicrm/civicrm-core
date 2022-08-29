@@ -74,7 +74,7 @@ trait CRMTraits_Import_ParserTrait {
         'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
       ]);
       $result = $runner->runAll();
-      $this->assertEquals(TRUE, $result, $result === TRUE ? '' : $result['exception']->getMessage());
+      $this->assertEquals(TRUE, $result, $result === TRUE ? '' : CRM_Core_Error::formatTextException($result['exception']));
     }
   }
 

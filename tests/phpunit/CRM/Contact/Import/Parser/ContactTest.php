@@ -69,9 +69,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test that import parser will add contact with employee of relationship.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testImportParserWithEmployeeOfRelationship(): void {
     $this->organizationCreate([
@@ -560,7 +558,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('OpenID', ['contact_id' => $id], 1);
     $this->callAPISuccessGetCount('IM', ['contact_id' => $id], 1);
   }
-
 
   /**
    * Test whether importing a contact using email match will match a non-primary.
@@ -2277,7 +2274,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $parser->import($values);
     $dataSource = new CRM_Import_DataSource_SQL($userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals($expected, $row['_status']);
+    $this->assertEquals($expected, $row['_status'], print_r($row, TRUE));
   }
 
 }
