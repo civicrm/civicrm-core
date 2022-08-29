@@ -1384,12 +1384,29 @@ class CRM_Utils_Array {
    * @param string $prefix
    * @return array
    */
-  public static function prefixKeys(array $collection, string $prefix) {
+  public static function prefixKeys(array $collection, string $prefix): array {
     $result = [];
     foreach ($collection as $key => $value) {
       $result[$prefix . $key] = $value;
     }
     return $result;
+  }
+
+  /**
+   * Removes all items from an array whose keys have a given prefix, and returns them unprefixed.
+   *
+   * @param array $collection
+   * @param string $prefix
+   */
+  public static function filterByPrefix(array &$collection, string $prefix): array {
+    $filtered = [];
+    foreach (array_keys($collection) as $key) {
+      if (!$prefix || strpos($key, $prefix) === 0) {
+        $filtered[substr($key, strlen($prefix))] = $collection[$key];
+        unset($collection[$key]);
+      }
+    }
+    return $filtered;
   }
 
 }

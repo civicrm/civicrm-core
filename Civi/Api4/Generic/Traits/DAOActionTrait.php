@@ -310,11 +310,13 @@ trait DAOActionTrait {
     if (!isset($info[$fieldName])) {
       $info = [];
       $fields = CustomField::get(FALSE)
-        ->addSelect('id', 'name', 'html_type', 'data_type', 'custom_group_id.extends')
+        ->addSelect('id', 'name', 'html_type', 'data_type', 'custom_group_id.extends', 'column_name', 'custom_group_id.table_name')
         ->addWhere('custom_group_id.name', '=', $groupName)
         ->execute()->indexBy('name');
       foreach ($fields as $name => $field) {
         $field['custom_field_id'] = $field['id'];
+        $field['table_name'] = $field['custom_group_id.table_name'];
+        unset($field['custom_group_id.table_name']);
         $field['name'] = $groupName . '.' . $name;
         $field['entity'] = CustomGroupJoinable::getEntityFromExtends($field['custom_group_id.extends']);
         $info[$name] = $field;

@@ -3474,11 +3474,29 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
     $dedupeParams['rule'] = $rule;
     $dedupeParams['rule_group_id'] = $ruleGroupID;
     $dedupeParams['excluded_contact_ids'] = $excludedContactIDs;
-    $dedupeResults['ids'] = [];
-    $dedupeResults['handled'] = FALSE;
+    return self::findDuplicates($dedupeParams, $contextParams ?: []);
+  }
+
+  /**
+   * @param array $dedupeParams
+   * @param array $contextParams
+   * @return array
+   * @throws CRM_Core_Exception
+   */
+  public static function findDuplicates(array $dedupeParams, array $contextParams = []): array {
+    $dedupeResults = [
+      'ids' => [],
+      'handled' => FALSE,
+    ];
     CRM_Utils_Hook::findDuplicates($dedupeParams, $dedupeResults, $contextParams);
     if (!$dedupeResults['handled']) {
-      $dedupeResults['ids'] = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $contactType, $rule, $excludedContactIDs, $ruleGroupID);
+      $dedupeParams += [
+        'contact_type' => NULL,
+        'rule' => NULL,
+        'rule_group_id' => NULL,
+        'excluded_contact_ids' => [],
+      ];
+      $dedupeResults['ids'] = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $dedupeParams['contact_type'], $dedupeParams['rule'], $dedupeParams['excluded_contact_ids'], $dedupeParams['rule_group_id']);
     }
     return $dedupeResults['ids'] ?? [];
   }
