@@ -283,7 +283,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $dataSource = $this->importContributionsDotCSV();
     $row = $dataSource->getRow();
     $this->assertEquals('ERROR', $row['_status']);
-    $this->assertEquals('No matching Contact found for (mum@example.com )', $row['_status_message']);
+    $this->assertEquals('No matching Contact found', $row['_status_message']);
   }
 
   /**

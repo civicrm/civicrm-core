@@ -2116,4 +2116,43 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       ->execute()->first()['name'];
   }
 
+  /**
+   * Get the contact ID for the imported row.
+   *
+   * If we have a contact ID we check it is valid and, if there is also
+   * an external identifier we check it does not conflict.
+   *
+   * Failing those we try a dedupe lookup.
+   *
+   * @param array $contactParams
+   * @param int|null $contactID
+   *
+   * @return int
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContactID(array $contactParams, ?int $contactID): int {
+    $contactType = $contactParams['contact_type'] ?? $this->getContactType();
+    if ($contactID) {
+      $this->validateContactID($contactID, $contactType);
+    }
+    if (!empty($contactParams['external_identifier'])) {
+      $contactID = $this->lookupExternalIdentifier($contactParams['external_identifier'], $contactType, $contactID ?? NULL);
+    }
+    if (!$contactID) {
+      $contactParams['contact_type'] = $contactType;
+      $possibleMatches = $this->getPossibleMatchesByDedupeRule($contactParams);
+      if (count($possibleMatches) === 1) {
+        $contactID = array_key_first($possibleMatches);
+      }
+      elseif (count($possibleMatches) > 1) {
+        throw new CRM_Core_Exception(ts('Record duplicates multiple contacts: ') . implode(',', $possibleMatches));
+      }
+      else {
+        throw new CRM_Core_Exception(ts('No matching Contact found'));
+      }
+    }
+    return $contactID;
+  }
+
 }
