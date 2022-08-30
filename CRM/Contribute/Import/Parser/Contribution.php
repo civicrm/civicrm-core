@@ -342,74 +342,50 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       $this->deprecatedFormatParams($paramValues, $formatted);
 
       if ($this->isUpdateExisting()) {
-        //fix for CRM-2219 - Update Contribution
-        // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
-        if (!empty($paramValues['id'])) {
-          // todo Remove if in separate PR
-          if (TRUE) {
-            $formatted['id'] = $paramValues['id'];
-            //process note
-            if (!empty($paramValues['note'])) {
-              $noteID = [];
-              $contactID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $paramValues['id'], 'contact_id');
-              $daoNote = new CRM_Core_BAO_Note();
-              $daoNote->entity_table = 'civicrm_contribution';
-              $daoNote->entity_id = $paramValues['id'];
-              if ($daoNote->find(TRUE)) {
-                $noteID['id'] = $daoNote->id;
-              }
+        //process note
+        if (!empty($paramValues['note'])) {
+          $noteID = [];
+          $contactID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $paramValues['id'], 'contact_id');
+          $daoNote = new CRM_Core_BAO_Note();
+          $daoNote->entity_table = 'civicrm_contribution';
+          $daoNote->entity_id = $paramValues['id'];
+          if ($daoNote->find(TRUE)) {
+            $noteID['id'] = $daoNote->id;
+          }
 
-              $noteParams = [
-                'entity_table' => 'civicrm_contribution',
-                'note' => $paramValues['note'],
-                'entity_id' => $paramValues['id'],
-                'contact_id' => $contactID,
-              ];
-              CRM_Core_BAO_Note::add($noteParams, $noteID);
-              unset($formatted['note']);
-            }
+          $noteParams = [
+            'entity_table' => 'civicrm_contribution',
+            'note' => $paramValues['note'],
+            'entity_id' => $paramValues['id'],
+            'contact_id' => $contactID,
+          ];
+          CRM_Core_BAO_Note::add($noteParams, $noteID);
+          unset($formatted['note']);
+        }
 
-            //need to check existing soft credit contribution, CRM-3968
-            if (!empty($formatted['soft_credit'])) {
-              $dupeSoftCredit = [
-                'contact_id' => $formatted['soft_credit'],
-                'contribution_id' => $paramValues['id'],
-              ];
+        //need to check existing soft credit contribution, CRM-3968
+        if (!empty($formatted['soft_credit'])) {
+          $dupeSoftCredit = [
+            'contact_id' => $formatted['soft_credit'],
+            'contribution_id' => $paramValues['id'],
+          ];
 
-              //Delete all existing soft Contribution from contribution_soft table for pcp_id is_null
-              $existingSoftCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dupeSoftCredit['contribution_id']);
-              if (isset($existingSoftCredit['soft_credit']) && !empty($existingSoftCredit['soft_credit'])) {
-                foreach ($existingSoftCredit['soft_credit'] as $key => $existingSoftCreditValues) {
-                  if (!empty($existingSoftCreditValues['soft_credit_id'])) {
-                    civicrm_api3('ContributionSoft', 'delete', [
-                      'id' => $existingSoftCreditValues['soft_credit_id'],
-                      'pcp_id' => NULL,
-                    ]);
-                  }
-                }
+          //Delete all existing soft Contribution from contribution_soft table for pcp_id is_null
+          $existingSoftCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dupeSoftCredit['contribution_id']);
+          if (isset($existingSoftCredit['soft_credit']) && !empty($existingSoftCredit['soft_credit'])) {
+            foreach ($existingSoftCredit['soft_credit'] as $key => $existingSoftCreditValues) {
+              if (!empty($existingSoftCreditValues['soft_credit_id'])) {
+                civicrm_api3('ContributionSoft', 'delete', [
+                  'id' => $existingSoftCreditValues['soft_credit_id'],
+                  'pcp_id' => NULL,
+                ]);
               }
             }
-
-            $formatted['id'] = $paramValues['id'];
-
-            $newContribution = civicrm_api3('contribution', 'create', $formatted);
-            $this->_newContributions[] = $newContribution['id'];
-
-            //return soft valid since we need to show how soft credits were added
-            if (!empty($formatted['soft_credit'])) {
-              $this->setImportStatus($rowNumber, $this->getStatus(self::SOFT_CREDIT));
-              return;
-            }
-
-            $this->setImportStatus($rowNumber, $this->processPledgePayments($formatted) ? $this->getStatus(self::PLEDGE_PAYMENT) : $this->getStatus(self::VALID), '', $newContribution['id']);
-            return;
           }
         }
       }
 
       $newContribution = civicrm_api3('contribution', 'create', $formatted);
-      $this->_newContributions[] = $newContribution['id'];
-      $formatted['contribution_id'] = $newContribution['id'];
 
       //return soft valid since we need to show how soft credits were added
       if (!empty($formatted['soft_credit'])) {
@@ -418,7 +394,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       }
 
       // process pledge payment assoc w/ the contribution
-      $this->setImportStatus($rowNumber, $this->processPledgePayments($formatted) ? $this->getStatus(self::PLEDGE_PAYMENT) : $this->getStatus(self::VALID), $newContribution['id']);
+      $this->setImportStatus($rowNumber, $this->processPledgePayments($newContribution['id'], $formatted) ? $this->getStatus(self::PLEDGE_PAYMENT) : $this->getStatus(self::VALID), $newContribution['id']);
       return;
 
     }
@@ -477,18 +453,18 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   /**
    * Process pledge payments.
    *
+   * @param int $contributionID
    * @param array $formatted
    *
    * @return bool
    */
-  private function processPledgePayments(array $formatted): bool {
+  private function processPledgePayments(int $contributionID, array $formatted): bool {
     if (!empty($formatted['pledge_payment_id']) && !empty($formatted['pledge_id'])) {
-      //get completed status
-      $completeStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+      $completeStatusID = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_PledgePayment', 'status_id', 'Completed');
 
       //need to update payment record to map contribution_id
       CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment', $formatted['pledge_payment_id'],
-        'contribution_id', $formatted['contribution_id']
+        'contribution_id', $contributionID
       );
 
       CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($formatted['pledge_id'],
