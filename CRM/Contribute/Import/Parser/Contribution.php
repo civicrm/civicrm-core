@@ -18,6 +18,7 @@
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
 use Civi\Api4\Email;
+use Civi\Api4\Note;
 
 /**
  * Class to parse contribution csv files.
@@ -307,20 +308,21 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
       $entityKeyedParams = $this->getMappedRow($values);
-      $existingContribution = $this->lookupContribution($entityKeyedParams['Contribution']);
-      $entityKeyedParams['Contribution']['id'] = $existingContribution['id'] ?? NULL;
-      if (empty($entityKeyedParams['Contribution']['id']) && $this->isUpdateExisting()) {
+      $contributionParams = $entityKeyedParams['Contribution'];
+      $existingContribution = $this->lookupContribution($contributionParams);
+      if (empty($existingContribution) && $this->isUpdateExisting()) {
+        throw new CRM_Core_Exception(ts('Matching Contribution record not found. Row was skipped.'), CRM_Import_Parser::ERROR);
+      }
+      $contributionParams['id'] = $existingContribution['id'] ?? NULL;
+      if (empty($contributionParams['id']) && $this->isUpdateExisting()) {
         throw new CRM_Core_Exception('Empty Contribution and Invoice and Transaction ID. Row was skipped.', CRM_Import_Parser::ERROR);
       }
-      $contactID = $entityKeyedParams['Contribution']['contact_id'] ?? ($existingContribution['contact_id'] ?? NULL);
-      $entityKeyedParams['Contribution']['contact_id'] = $this->getContactID($entityKeyedParams['Contact'] ?? [], $contactID);
+      $contactID = $contributionParams['contact_id'] ?? ($existingContribution['contact_id'] ?? NULL);
+      $contactID = $contributionParams['contact_id'] = $this->getContactID($entityKeyedParams['Contact'] ?? [], $contactID);
 
-      // @todo - here we flatten the entities back into a single array.
+      // @todo - here we flatten some of the entities back into a single array.
       // The entity format is better but the code below needs to be migrated.
-      $params = [];
-      foreach (['Contribution', 'Note'] as $entity) {
-        $params = array_merge($params, ($entityKeyedParams[$entity] ?? []));
-      }
+      $params = $contributionParams;
       if (isset($entityKeyedParams['soft_credit'])) {
         $params['soft_credit'] = $entityKeyedParams['soft_credit'];
       }
@@ -342,27 +344,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       $this->deprecatedFormatParams($paramValues, $formatted);
 
       if ($this->isUpdateExisting()) {
-        //process note
-        if (!empty($paramValues['note'])) {
-          $noteID = [];
-          $contactID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $paramValues['id'], 'contact_id');
-          $daoNote = new CRM_Core_BAO_Note();
-          $daoNote->entity_table = 'civicrm_contribution';
-          $daoNote->entity_id = $paramValues['id'];
-          if ($daoNote->find(TRUE)) {
-            $noteID['id'] = $daoNote->id;
-          }
-
-          $noteParams = [
-            'entity_table' => 'civicrm_contribution',
-            'note' => $paramValues['note'],
-            'entity_id' => $paramValues['id'],
-            'contact_id' => $contactID,
-          ];
-          CRM_Core_BAO_Note::add($noteParams, $noteID);
-          unset($formatted['note']);
-        }
-
         //need to check existing soft credit contribution, CRM-3968
         if (!empty($formatted['soft_credit'])) {
           $dupeSoftCredit = [
@@ -385,16 +366,19 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         }
       }
 
-      $newContribution = civicrm_api3('contribution', 'create', $formatted);
+      $contributionID = civicrm_api3('contribution', 'create', $formatted)['id'];
 
+      if (!empty($entityKeyedParams['Note'])) {
+        $this->processNote($contributionID, $contactID, $entityKeyedParams['Note']);
+      }
       //return soft valid since we need to show how soft credits were added
       if (!empty($formatted['soft_credit'])) {
-        $this->setImportStatus($rowNumber, $this->getStatus(self::SOFT_CREDIT), '', $newContribution['id']);
+        $this->setImportStatus($rowNumber, $this->getStatus(self::SOFT_CREDIT), '', $contributionID);
         return;
       }
 
       // process pledge payment assoc w/ the contribution
-      $this->setImportStatus($rowNumber, $this->processPledgePayments($newContribution['id'], $formatted) ? $this->getStatus(self::PLEDGE_PAYMENT) : $this->getStatus(self::VALID), $newContribution['id']);
+      $this->setImportStatus($rowNumber, $this->processPledgePayments($contributionID, $formatted) ? $this->getStatus(self::PLEDGE_PAYMENT) : $this->getStatus(self::VALID), $contributionID);
       return;
 
     }
@@ -414,11 +398,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    */
   private function lookupContribution(array $params): array {
     $where = [];
-    $labels = [];
     foreach (['id' => 'Contribution ID', 'trxn_id' => 'Transaction ID', 'invoice_id' => 'Invoice ID'] as $field => $label) {
       if (!empty($params[$field])) {
         $where[] = [$field, '=', $params[$field]];
-        $labels[] = $label . ' ' . $params[$field];
       }
     }
     if (empty($where)) {
@@ -428,7 +410,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     if ($contribution['id'] ?? NULL) {
       return $contribution;
     }
-    throw new CRM_Core_Exception('Matching Contribution record not found for ' . implode(' AND ', $labels) . '. Row was skipped.', CRM_Import_Parser::ERROR);
+    return [];
   }
 
   /**
@@ -689,6 +671,32 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     }
     // Include the parent fields as they could be present if required for matching ...in theory.
     return array_merge($fields, parent::getOddlyMappedMetadataFields());
+  }
+
+  /**
+   * Create or update the note.
+   *
+   * @param int $contributionID
+   * @param int $contactID
+   * @param array $noteParams
+   *
+   * @throws \API_Exception
+   */
+  protected function processNote(int $contributionID, int $contactID, array $noteParams): void {
+    $noteParams = array_merge([
+      'entity_table' => 'civicrm_contribution',
+      'entity_id' => $contributionID,
+      'contact_id' => $contactID,
+    ], $noteParams);
+    if ($this->isUpdateExisting()) {
+      $note = Note::get(FALSE)
+        ->addSelect('entity_table', '=', 'civicrm_contribution')
+        ->addSelect('entity_id', '=', $contributionID)->execute()->first();
+      if (!empty($note)) {
+        $noteParams['id'] = $note['id'];
+      }
+    }
+    Note::save(FALSE)->setRecords([$noteParams])->execute();
   }
 
 }

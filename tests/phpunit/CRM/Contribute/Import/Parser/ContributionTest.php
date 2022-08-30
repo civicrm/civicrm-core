@@ -300,6 +300,18 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ->addWhere('entity_id', '=', $contribution['id'])
       ->addWhere('entity_table', '=', 'civicrm_contribution')->execute()->first();
     $this->assertEquals('Call him back', $note['note']);
+
+    // Now change the note & re-do it. The same note should be updated.
+    Note::update()
+      ->addWhere('entity_id', '=', $contribution['id'])
+      ->addValue('note', 'changed')
+      ->execute();
+    $this->importContributionsDotCSV(['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
+    $note = Note::get()
+      ->addWhere('entity_id', '=', $contribution['id'])
+      ->addWhere('entity_table', '=', 'civicrm_contribution')->execute()->first();
+    $this->assertEquals('Call him back', $note['note']);
+
   }
 
   /**
@@ -534,7 +546,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   /**
    * @return \CRM_Import_DataSource_CSV
    */
-  private function importContributionsDotCSV(): CRM_Import_DataSource_CSV {
+  private function importContributionsDotCSV($submittedValues = []): CRM_Import_DataSource_CSV {
     $this->importCSV('contributions.csv', [
       ['name' => 'first_name'],
       ['name' => 'total_amount'],
@@ -543,7 +555,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'email'],
       ['name' => 'contribution_source'],
       ['name' => 'note'],
-    ]);
+      ['name' => 'trxn_id'],
+    ], $submittedValues);
     return new CRM_Import_DataSource_CSV($this->userJobID);
   }
 
