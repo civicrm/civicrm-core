@@ -94,14 +94,14 @@
                 <ul class="panel" id="panel_participants_{$row.id}">
                   {if $findParticipants.statusCounted}
                     <li>
-                      <a class="action-item crm-hover-button" href="{crmURL p='civicrm/event/search'
+                      <a title="{ts}Counted Participants{/ts}" class="action-item crm-hover-button" href="{crmURL p='civicrm/event/search'
                       q="reset=1&force=1&status=true&event=`$row.id`"}">{$findParticipants.statusCounted}
                       </a>
                     </li>
                   {/if}
                   {if $findParticipants.statusNotCounted}
                     <li>
-                      <a class="action-item crm-hover-button"
+                      <a title="{ts}Participants Not Counted{/ts}" class="action-item crm-hover-button"
                            href="{crmURL p='civicrm/event/search'
                            q="reset=1&force=1&status=false&event=`$row.id`"}">{$findParticipants.statusNotCounted}
                       </a>
@@ -109,7 +109,7 @@
                   {/if}
                   {if $row.participant_listing_id}
                     <li>
-                      <a class="action-item crm-hover-button"
+                      <a title="{ts}Public Participant Listing{/ts}" class="action-item crm-hover-button"
                          href="{crmURL p='civicrm/event/participant' q="reset=1&id=`$row.id`"
                          fe='true'}">{ts}Public Participant Listing{/ts}
                       </a>
