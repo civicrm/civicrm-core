@@ -577,21 +577,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
             }
             $values['pledge_id'] = $params['pledge_id'];
           }
-          else {
-            // check if there are any pledge related to this contact, with payments pending or in progress
-            require_once 'CRM/Pledge/BAO/Pledge.php';
-            $pledgeDetails = CRM_Pledge_BAO_Pledge::getContactPledges($contributionContactID);
-
-            if (empty($pledgeDetails)) {
-              throw new CRM_Core_Exception('No open pledges found for this contact. Contribution row was skipped.', CRM_Import_Parser::ERROR);
-            }
-            if (count($pledgeDetails) > 1) {
-              throw new CRM_Core_Exception('This contact has more than one open pledge. Unable to determine which pledge to apply the contribution to. Contribution row was skipped.', CRM_Import_Parser::ERROR);
-            }
-
-            // this mean we have only one pending / in progress pledge
-            $values['pledge_id'] = $pledgeDetails[0];
-          }
 
           // we need to check if oldest payment amount equal to contribution amount
           require_once 'CRM/Pledge/BAO/PledgePayment.php';
