@@ -317,6 +317,22 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
+   * @inheritDoc
+   */
+  public function addSelectWhereClause() {
+    $clauses = [];
+    if (!CRM_Core_Permission::check([['edit all contacts', 'view all contacts']])) {
+      $allGroups = CRM_Core_PseudoConstant::allGroup(NULL, FALSE);
+      // FIXME: TableName 'civicrm_saved_search' seems wrong but is consistent with self::checkPermission
+      $allowedGroups = \CRM_ACL_API::group(CRM_ACL_API::VIEW, NULL, 'civicrm_saved_search', $allGroups);
+      $groupsIn = $allowedGroups ? implode(',', $allowedGroups) : '0';
+      $clauses['id'][] = "IN ($groupsIn)";
+    }
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
+  }
+
+  /**
    * Create a new group.
    *
    * @param array $params
