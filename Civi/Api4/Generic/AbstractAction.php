@@ -56,7 +56,7 @@ abstract class AbstractAction implements \ArrayAccess {
    * by `Civi\Core\Locale::negotiate($preferredLanguage)`.
    *
    * @var string
-   * @optionsCallback getPreferredLanguageOptions
+   * @optionsCallback getLanguageOptions
    */
   protected $language;
 
@@ -585,10 +585,15 @@ abstract class AbstractAction implements \ArrayAccess {
    *
    * @return array
    */
-  protected function getPreferredLanguageOptions(): array {
+  protected function getLanguageOptions(): array {
     $languages = \CRM_Contact_BAO_Contact::buildOptions('preferred_language');
     ksort($languages);
-    return array_keys($languages);
+    $result = array_keys($languages);
+    if (!\Civi::settings()->get('partial_locales')) {
+      $uiLanguages = \CRM_Core_I18n::uiLanguages(TRUE);
+      $result = array_values(array_intersect($result, $uiLanguages));
+    }
+    return $result;
   }
 
 }
