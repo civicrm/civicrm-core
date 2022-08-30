@@ -1301,7 +1301,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       }
       else {
         foreach ($required as $field => $label) {
-          if (empty($params[$field])) {
+          if (!isset($params[$field]) || $params[$field] === '') {
             $missing[$field] = $label;
           }
         }
