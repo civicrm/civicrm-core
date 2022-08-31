@@ -50,7 +50,9 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
       $spec->addFieldSpec($field);
     }
 
-    // Address, Email, Phone, IM
+    // Address, Email, Phone, IM primary/billing virtual fields
+    // This exposes the joins created by
+    // \Civi\Api4\Event\Subscriber\ContactSchemaMapSubscriber::onSchemaBuild()
     $entities = [
       'Address' => [
         'primary' => [
@@ -96,13 +98,13 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
     foreach ($entities as $entity => $types) {
       foreach ($types as $type => $info) {
         $name = strtolower($entity) . '_' . $type;
-        $field = new FieldSpec($name, 'Contact', 'String');
+        $field = new FieldSpec($name, 'Contact', 'Integer');
         $field->setLabel($info['label'])
           ->setTitle($info['title'])
           ->setColumnName('id')
           ->setType('Extra')
           ->setFkEntity($entity)
-          ->setSqlRenderer([__CLASS__, 'getLocationFieldSql']);
+          ->setSqlRenderer(['\Civi\Api4\Service\Schema\Joiner', 'getExtraJoinSql']);
         $spec->addFieldSpec($field);
       }
     }
@@ -173,20 +175,8 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
    * @param array $field
    * @return string
    */
-  public static function calculateAge(array $field) {
+  public static function calculateAge(array $field): string {
     return "TIMESTAMPDIFF(YEAR, {$field['sql_name']}, CURDATE())";
-  }
-
-  /**
-   * Generate SQL for address/email/phone/im id field
-   * @param array $field
-   * @param \Civi\Api4\Query\Api4SelectQuery $query
-   * @return string
-   */
-  public static function getLocationFieldSql(array $field, Api4SelectQuery $query) {
-    $prefix = empty($field['explicit_join']) ? '' : $field['explicit_join'] . '.';
-    $idField = $query->getField($prefix . $field['name'] . '.id');
-    return $idField['sql_name'];
   }
 
 }

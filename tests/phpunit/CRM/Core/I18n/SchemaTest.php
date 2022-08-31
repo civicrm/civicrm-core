@@ -11,6 +11,7 @@
 /**
  * Class CRM_Core_I18n_SchemaTest
  * @group headless
+ * @group locale
  */
 class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
 
@@ -31,7 +32,7 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
   }
 
   public function tearDown(): void {
-    CRM_Core_I18n_Schema::makeSinglelingual('en_US');
+    $this->disableMultilingual();
     parent::tearDown();
   }
 
@@ -43,7 +44,7 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testI18nSchemaRewrite($table, $expectedRewrite) {
-    CRM_Core_I18n_Schema::makeMultilingual('en_US');
+    $this->enableMultilingual();
     $domains = $this->callAPISuccess('Domain', 'get')['values'];
     $this->assertGreaterThan(1, count($domains));
     foreach ($domains as $domain) {
@@ -105,7 +106,7 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
   }
 
   public function testSchemaBuild() {
-    CRM_Core_I18n_Schema::makeMultilingual('en_US');
+    $this->enableMultilingual();
     $inUseCollation = CRM_Core_BAO_SchemaHandler::getInUseCollation();
     $testCreateTable = CRM_Core_DAO::executeQuery("show create table civicrm_price_set", [], TRUE, NULL, FALSE, FALSE);
     while ($testCreateTable->fetch()) {
@@ -115,8 +116,7 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
   }
 
   public function testMultilingualCustomFieldCreation() {
-    $this->enableMultilingual();
-    CRM_Core_I18n_Schema::addLocale('fr_CA', 'en_US');
+    $this->enableMultilingual(['en_US' => 'fr_CA']);
     $id = $this->customGroupCreate()['id'];
     $this->customFieldCreate(['custom_group_id' => $id]);
   }

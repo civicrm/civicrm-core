@@ -22,4 +22,19 @@ namespace Civi\Api4;
 class Group extends Generic\DAOEntity {
   use Generic\Traits\ManagedEntity;
 
+  /**
+   * Provides more-open permissions that will be further restricted by checkAccess
+   *
+   * @see \CRM_Contact_BAO_Group::_checkAccess()
+   * @return array
+   */
+  public static function permissions():array {
+    $permissions = parent::permissions();
+
+    return [
+      // Create permission depends on the group type (see CRM_Contact_BAO_Group::_checkAccess).
+      'create' => ['access CiviCRM', ['edit groups', 'access CiviMail', 'create mailings']],
+    ] + $permissions;
+  }
+
 }

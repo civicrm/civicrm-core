@@ -2122,7 +2122,8 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       SELECT contribution.id
       FROM civicrm_contribution contribution INNER JOIN civicrm_contribution_soft softContribution
       ON ( contribution.id = softContribution.contribution_id )
-      WHERE contribution.is_test = 0 AND contribution.is_template != '1' AND softContribution.contact_id = {$contactId} ";
+      WHERE contribution.is_test = 0 AND contribution.is_template != '1' AND softContribution.contact_id = {$contactId}
+      $additionalWhere ";
     $query = "SELECT count( x.id ) count FROM ( ";
     $query .= $contactContributionsSQL;
 
@@ -2433,13 +2434,14 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Create array of message information - ie. return html version, txt version, to field
+   * Create array of message information - ie. return html version, txt
+   * version, to field
    *
    * @param array $input
    *   Incoming information.
-   *   - is_recur - should this be treated as recurring (not sure why you wouldn't
-   *    just check presence of recur object but maintaining legacy approach
-   *    to be careful)
+   *   - is_recur - should this be treated as recurring (not sure why you
+   *   wouldn't just check presence of recur object but maintaining legacy
+   *   approach to be careful)
    * @param array $ids
    *   IDs of related objects.
    * @param array $values
@@ -2447,12 +2449,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *   This is augmented by values 'gathered' by gatherMessageValues
    * @param bool $returnMessageText
    *   Distinguishes between whether to send message or return.
-   *   message text. We are working towards this function ALWAYS returning message text & calling
-   *   function doing emails / pdfs with it
+   *   message text. We are working towards this function ALWAYS returning
+   *   message text & calling function doing emails / pdfs with it
    *
    * @return array
    *   messages
-   * @throws Exception
+   * @throws \CRM_Core_Exception
    */
   public function composeMessageArray(&$input, &$ids, &$values, $returnMessageText = TRUE) {
     $ids = array_merge(self::getComponentDetails($this->id), $ids);

@@ -186,7 +186,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     // @todo - this params are being set here because they were / possibly still
     // are in some places being accessed by forms later in the flow
     // ie CRM_Contact_Import_Form_MapField, CRM_Contact_Import_Form_Preview
-    // or CRM_Contact_Import_Form_Summary using `$this->get()
     // which was the old way of saving values submitted on this form such that
     // the other forms could access them. Now they should use
     // `getSubmittedValue` or simply not get them if the only

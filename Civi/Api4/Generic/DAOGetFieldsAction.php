@@ -105,14 +105,16 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
   private function formatValues() {
     foreach (array_keys($this->values) as $key) {
       if (strpos($key, ':')) {
-        [$fieldName, $suffix] = explode(':', $key);
-        $context = FormattingUtil::$pseudoConstantContexts[$suffix] ?? NULL;
-        if (!$context) {
-          throw new \API_Exception('Illegal expression');
+        if (isset($this->values[$key]) && $this->values[$key] !== '') {
+          [$fieldName, $suffix] = explode(':', $key);
+          $context = FormattingUtil::$pseudoConstantContexts[$suffix] ?? NULL;
+          // This only works for basic pseudoconstants like :name :label and :abbr. Skip others.
+          if ($context) {
+            $baoName = CoreUtil::getBAOFromApiName($this->getEntityName());
+            $options = $baoName::buildOptions($fieldName, $context) ?: [];
+            $this->values[$fieldName] = FormattingUtil::replacePseudoconstant($options, $this->values[$key], TRUE);
+          }
         }
-        $baoName = CoreUtil::getBAOFromApiName($this->getEntityName());
-        $options = $baoName::buildOptions($fieldName, $context) ?: [];
-        $this->values[$fieldName] = FormattingUtil::replacePseudoconstant($options, $this->values[$key], TRUE);
         unset($this->values[$key]);
       }
     }

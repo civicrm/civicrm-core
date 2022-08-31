@@ -105,6 +105,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
       ->setAction('create')
       ->execute()->indexBy('name');
 
+    $this->assertFalse($actFields['id']['required']);
     $this->assertTrue($actFields['activity_type_id']['required']);
     $this->assertFalse($actFields['activity_type_id']['nullable']);
     $this->assertFalse($actFields['subject']['required']);

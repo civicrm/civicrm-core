@@ -102,7 +102,17 @@ class CRM_Participant_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
     $this->assertTrue($form->validate());
-    $form->postProcess();
+    try {
+      $form->postProcess();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $queue = Civi::queue('user_job_' . $this->userJobID);
+      $runner = new CRM_Queue_Runner([
+        'queue' => $queue,
+        'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
+      ]);
+      $runner->runAll();
+    }
   }
 
   /**
@@ -160,6 +170,31 @@ class CRM_Participant_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       ['csv' => 'participant.csv', 'mapper' => $defaultMapper],
       ['csv' => 'participant_with_event_id.csv', 'mapper' => $defaultMapper],
     ];
+  }
+
+  /**
+   * Test that an external id will not match to a deleted contact..
+   */
+  public function testImportWithExternalID() :void {
+    $this->eventCreate(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
+    $this->individualCreate(['external_identifier' => 'ref-77', 'is_deleted' => TRUE]);
+    $this->importCSV('participant_with_ext_id.csv', [
+      ['name' => 'event_id'],
+      ['name' => 'do_not_import'],
+      ['name' => 'external_identifier'],
+      ['name' => 'fee_amount'],
+      ['name' => 'fee_currency'],
+      ['name' => 'fee_level'],
+      ['name' => 'is_pay_later'],
+      ['name' => 'role_id'],
+      ['name' => 'source'],
+      ['name' => 'status_id'],
+      ['name' => 'register_date'],
+      ['name' => 'do_not_import'],
+    ]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('ERROR', $row['_status']);
   }
 
   /**

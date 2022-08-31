@@ -11,6 +11,7 @@
 !/ext/eventcart
 !/ext/ewaysingle
 !/ext/greenwich
+!/ext/elavon
 /ext/greenwich/dist
 /ext/greenwich/extern
 !/ext/message_admin
@@ -22,6 +23,7 @@
 !/ext/payflowpro
 !/ext/ckeditor4
 !/ext/legacycustomsearches
+!/ext/civiimport
 backdrop/
 bower_components
 CRM/Case/xml/configuration

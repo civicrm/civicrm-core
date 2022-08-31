@@ -87,7 +87,7 @@ class GetOptions extends AbstractProcessor {
       'where' => [['name', '=', $fieldName]],
       'select' => ['options'],
       'loadOptions' => ['id', 'label'],
-      'values' => FormattingUtil::filterByPrefix($this->values, $this->fieldName, $fieldName),
+      'values' => FormattingUtil::filterByPath($this->values, $this->fieldName, $fieldName),
     ], 0)['options'] ?: [];
   }
 

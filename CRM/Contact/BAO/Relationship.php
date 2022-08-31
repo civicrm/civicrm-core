@@ -245,7 +245,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     // explode the string with _ to get the relationship type id
     // and to know which contact has to be inserted in
     // contact_id_a and which one in contact_id_b
-    list($relationshipTypeID) = explode('_', $relationshipTypes);
+    [$relationshipTypeID] = explode('_', $relationshipTypes);
 
     $relationship = new CRM_Contact_BAO_Relationship();
     if (!empty($params['id'])) {
@@ -833,7 +833,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    */
   public static function checkDuplicateRelationship($params, $id, $contactId = 0, $relationshipId = 0) {
     $relationshipTypeId = $params['relationship_type_id'] ?? NULL;
-    list($type) = explode('_', $relationshipTypeId);
+    [$type] = explode('_', $relationshipTypeId);
 
     $queryString = "
 SELECT id
@@ -1203,10 +1203,10 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       return $values;
     }
 
-    list($select1, $from1, $where1) = self::makeURLClause($contactId, $status, $numRelationship,
+    [$select1, $from1, $where1] = self::makeURLClause($contactId, $status, $numRelationship,
       $count, $relationshipId, 'a_b', $params
     );
-    list($select2, $from2, $where2) = self::makeURLClause($contactId, $status, $numRelationship,
+    [$select2, $from2, $where2] = self::makeURLClause($contactId, $status, $numRelationship,
       $count, $relationshipId, 'b_a', $params
     );
 
@@ -1551,7 +1551,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         $relTypeIds = [];
         if ($action & CRM_Core_Action::DELETE) {
           // @todo don't return relTypeId here - but it seems to be used later in a cryptic way (hint cryptic is not a complement).
-          list($relTypeId, $isDeletable) = self::isInheritedMembershipInvalidated($membershipValues, $values, $cid);
+          [$relTypeId, $isDeletable] = self::isInheritedMembershipInvalidated($membershipValues, $values, $cid);
           if ($isDeletable) {
             CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipValues['owner_membership_id'], $membershipValues['contact_id']);
           }

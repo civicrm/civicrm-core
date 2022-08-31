@@ -915,8 +915,11 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * @return array
    *   array of importable Fields
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated
    */
   public static function importableFields($contactType = 'Individual', $status = TRUE) {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     $fields = Civi::cache('fields')->get('membership_importable_fields' . $contactType . $status);
     if (!$fields) {
       if (!$status) {

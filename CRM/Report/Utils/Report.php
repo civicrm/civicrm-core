@@ -59,7 +59,7 @@ class CRM_Report_Utils_Report {
   }
 
   /**
-   * @param $optionVal
+   * @param string $optionVal
    *
    * @return mixed
    */
@@ -100,7 +100,7 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
   }
 
   /**
-   * @param $urlValue
+   * @param string $urlValue
    * @param string $query
    * @param bool $absolute
    * @param int $instanceID
@@ -137,7 +137,7 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
 
   /**
    * get instance count for a template.
-   * @param $optionVal
+   * @param string $optionVal
    *
    * @return int|null|string
    */
@@ -200,7 +200,7 @@ WHERE  inst.report_id = %1";
 
   /**
    * @param CRM_Core_Form $form
-   * @param $rows
+   * @param array $rows
    */
   public static function export2csv(&$form, &$rows) {
     //Mark as a CSV file.
@@ -524,7 +524,7 @@ WHERE  inst.report_id = %1";
   }
 
   /**
-   * @param $reportUrl
+   * @param string $reportUrl
    *
    * @return mixed
    */

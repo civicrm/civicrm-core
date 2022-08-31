@@ -102,6 +102,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'cart_id' => NULL,
       'must_wait' => NULL,
       'transferred_to_contact_id' => NULL,
+      'created_id' => NULL,
     ];
 
     foreach ($compareValues as $key => $value) {

@@ -21,7 +21,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * @var string[]
    */
-  public $expectedSmartyVariables = ['pager', 'skip', 'sections', 'grandStat', 'chartEnabled'];
+  public $expectedSmartyVariables = ['pager', 'skip', 'sections', 'grandStat', 'chartEnabled', 'uniqueId', 'rows'];
 
   /**
    * Deprecated constant, Reports should be updated to use the getRowCount function.

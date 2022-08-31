@@ -1164,6 +1164,7 @@ class CRM_Core_Permission {
     $permissions['entity_financial_account']['get'] = $permissions['contribution']['get'];
     $permissions['financial_account']['get'] = $permissions['contribution']['get'];
     $permissions['financial_trxn']['get'] = $permissions['contribution']['get'];
+    $permissions['contribution_soft'] = $permissions['contribution'];
 
     // Payment permissions
     $permissions['payment'] = [
@@ -1277,7 +1278,9 @@ class CRM_Core_Permission {
     $permissions['group_nesting'] = $permissions['group'];
     $permissions['group_organization'] = $permissions['group'];
 
-    //Group Contact permission
+    // Note: The v3 GroupContact API is nonstandard and not easy to fix, so these permissions
+    // are unnecessarily strict for v3. The v4 API overrides them.
+    // @see Civi\Api4\GroupContact::permissions
     $permissions['group_contact'] = [
       'get' => [
         'access CiviCRM',

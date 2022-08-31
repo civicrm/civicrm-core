@@ -104,6 +104,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    * @param $thousandSeparator
    * @param $currency
    * @param $expectedResult
+   * @group locale
    */
   public function testMoney($inputData, $decimalPoint, $thousandSeparator, $currency, $expectedResult): void {
     $this->setDefaultCurrency($currency);

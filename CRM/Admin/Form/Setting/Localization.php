@@ -15,6 +15,9 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\OptionGroup;
+use Civi\Api4\OptionValue;
+
 /**
  * This class generates form components for Localization.
  */
@@ -32,6 +35,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     'inheritLocale' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'lcMessages' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'legacyEncoding' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'partial_locales' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'format_locale' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'monetaryThousandSeparator' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'monetaryDecimalPoint' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
@@ -231,29 +235,45 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
    *
    * @param string[] $currencies array of currencies ['USD', 'CAD']
    * @param string $default default currency
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function updateEnabledCurrencies($currencies, $default) {
+  public static function updateEnabledCurrencies(array $currencies, string $default): void {
 
     // sort so that when we display drop down, weights have right value
     sort($currencies);
-
     // get labels for all the currencies
     $options = [];
 
     $currencySymbols = CRM_Admin_Form_Setting_Localization::getCurrencySymbols();
-    for ($i = 0; $i < count($currencies); $i++) {
+    foreach ($currencies as $i => $currency) {
       $options[] = [
-        'label' => $currencySymbols[$currencies[$i]],
-        'value' => $currencies[$i],
+        'label' => $currencySymbols[$currency],
+        'value' => $currency,
         'weight' => $i + 1,
         'is_active' => 1,
-        'is_default' => $currencies[$i] == $default,
+        'is_default' => $currency === $default,
       ];
     }
+    $optionGroupID = OptionGroup::get(FALSE)->addSelect('id')
+      ->addWhere('name', '=', 'currencies_enabled')
+      ->execute()->first()['id'];
+    // @TODO: This causes a problem in multilingual
+    // (https://github.com/civicrm/civicrm-core/pull/17228), but is needed in
+    // order to be able to remove currencies once added.
+    if (!CRM_Core_I18n::isMultiLingual()) {
+      CRM_Core_DAO::executeQuery("
+        DELETE
+        FROM civicrm_option_value
+        WHERE option_group_id = $optionGroupID
+      ");
+    }
 
-    $dontCare = NULL;
-    CRM_Core_OptionGroup::createAssoc('currencies_enabled', $options, $dontCare);
-
+    OptionValue::save(FALSE)
+      ->setRecords($options)
+      ->setDefaults(['is_active' => 1, 'option_group_id' => $optionGroupID])
+      ->setMatch(['option_group_id', 'value'])
+      ->execute();
   }
 
   /**

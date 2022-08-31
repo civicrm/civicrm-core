@@ -330,10 +330,13 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
    *
    * @param \Civi\Token\TokenRow $row
    * @param string $field
+   *
    * @return string|int
+   * @throws \CRM_Core_Exception
    */
   protected function getFieldValue(TokenRow $row, string $field) {
     $entityName = 'contact';
+    $contact = $row->context['contact'];
     if (isset($this->getDeprecatedTokens()[$field])) {
       // Check the non-deprecated location first, fall back to deprecated
       // this is important for the greetings because - they are weird in the query object.
@@ -347,13 +350,23 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     }
 
     foreach ($possibilities as $possibility) {
-      if (isset($row->context[$entityName][$possibility])) {
-        return $row->context[$entityName][$possibility];
+      if (isset($contact[$possibility])) {
+        return $contact[$possibility];
+      }
+      if ($this->isPseudoField($possibility)) {
+        // If we have a name or label field & already have the id loaded then we can
+        // evaluate from that rather than query again.
+        $split = explode(':', $possibility);
+        if (array_key_exists($split[0], $contact)) {
+          return $row->context['contact'][$possibility] = $this->getPseudoValue($split[0], $split[1], $contact[$split[0]]);
+        }
       }
     }
+
     $contactID = $this->getFieldValue($row, 'id');
     if ($contactID) {
-      $row->context['contact'] = array_merge($this->getContact($contactID, $this->activeTokens), $row->context['contact']);
+      $missingFields = array_diff_key(array_fill_keys($this->activeTokens, TRUE), $contact);
+      $row->context['contact'] = array_merge($this->getContact($contactID, array_keys($missingFields)), $contact);
       if (isset($row->context[$entityName][$field])) {
         return $row->context[$entityName][$field];
       }
@@ -484,71 +497,6 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     }
 
     return $contact;
-  }
-
-  /**
-   * Get the array of the return fields from 'get all'.
-   *
-   * This is the list from the BAO_Query object but copied
-   * here to be 'frozen in time'. The goal is to map to apiv4
-   * and stop using the legacy call to load the contact.
-   *
-   * @return array
-   */
-  protected function getAllContactReturnFields(): array {
-    return [
-      'image_URL' => 1,
-      'legal_identifier' => 1,
-      'external_identifier' => 1,
-      'contact_type' => 1,
-      'contact_sub_type' => 1,
-      'sort_name' => 1,
-      'display_name' => 1,
-      'preferred_mail_format' => 1,
-      'nick_name' => 1,
-      'first_name' => 1,
-      'middle_name' => 1,
-      'last_name' => 1,
-      'prefix_id' => 1,
-      'suffix_id' => 1,
-      'formal_title' => 1,
-      'communication_style_id' => 1,
-      'birth_date' => 1,
-      'gender_id' => 1,
-      'street_address' => 1,
-      'supplemental_address_1' => 1,
-      'supplemental_address_2' => 1,
-      'supplemental_address_3' => 1,
-      'city' => 1,
-      'postal_code' => 1,
-      'postal_code_suffix' => 1,
-      'state_province' => 1,
-      'country' => 1,
-      'world_region' => 1,
-      'geo_code_1' => 1,
-      'geo_code_2' => 1,
-      'email' => 1,
-      'on_hold' => 1,
-      'phone' => 1,
-      'im' => 1,
-      'household_name' => 1,
-      'organization_name' => 1,
-      'deceased_date' => 1,
-      'is_deceased' => 1,
-      'job_title' => 1,
-      'legal_name' => 1,
-      'sic_code' => 1,
-      'current_employer' => 1,
-      'do_not_email' => 1,
-      'do_not_mail' => 1,
-      'do_not_sms' => 1,
-      'do_not_phone' => 1,
-      'do_not_trade' => 1,
-      'is_opt_out' => 1,
-      'contact_is_deleted' => 1,
-      'preferred_communication_method' => 1,
-      'preferred_language' => 1,
-    ];
   }
 
   /**

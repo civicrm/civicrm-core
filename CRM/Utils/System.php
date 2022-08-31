@@ -126,7 +126,7 @@ class CRM_Utils_System {
       for ($i = 0, $cnt = count($qs); $i < $cnt; $i++) {
         // check first if exist a pair
         if (strstr($qs[$i], '=') !== FALSE) {
-          list($name, $value) = explode('=', $qs[$i]);
+          [$name, $value] = explode('=', $qs[$i]);
           if ($name != $urlVar) {
             $name = rawurldecode($name);
             // check for arrays in parameters: site.php?foo[]=1&foo[]=2&foo[]=3
@@ -265,15 +265,15 @@ class CRM_Utils_System {
 
     // Extract fragment from path or query if munged together
     if ($query && strstr($query, '#')) {
-      list($path, $fragment) = explode('#', $query);
+      [$path, $fragment] = explode('#', $query);
     }
     if ($path && strstr($path, '#')) {
-      list($path, $fragment) = explode('#', $path);
+      [$path, $fragment] = explode('#', $path);
     }
 
     // Extract query from path if munged together
     if ($path && strstr($path, '?')) {
-      list($path, $extraQuery) = explode('?', $path);
+      [$path, $extraQuery] = explode('?', $path);
       $query = $extraQuery . ($query ? "&$query" : '');
     }
 
@@ -723,7 +723,7 @@ class CRM_Utils_System {
     }
     elseif ($storeInSession) {
       // lets store contact id and user id in session
-      list($userID, $ufID, $randomNumber) = $result;
+      [$userID, $ufID, $randomNumber] = $result;
       if ($userID && $ufID) {
         $config = CRM_Core_Config::singleton();
         $config->userSystem->setUserSession([$userID, $ufID]);
@@ -995,7 +995,7 @@ class CRM_Utils_System {
 
     if (!array_key_exists($callback, self::$_callbacks)) {
       if (strpos($callback, '::') !== FALSE) {
-        list($className, $methodName) = explode('::', $callback);
+        [$className, $methodName] = explode('::', $callback);
         $fileName = str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
         // ignore errors if any
         @include_once $fileName;
@@ -1171,7 +1171,7 @@ class CRM_Utils_System {
    * @return string
    */
   public static function majorVersion() {
-    list($a, $b) = explode('.', self::version());
+    [$a, $b] = explode('.', self::version());
     return "$a.$b";
   }
 

@@ -171,7 +171,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     $result = [];
     foreach ($caseRolesXML as $caseRoleXML) {
       foreach ($caseRoleXML->RelationshipType as $relationshipTypeXML) {
-        list($relationshipTypeID,) = $this->locateNameOrLabel($relationshipTypeXML);
+        [$relationshipTypeID] = $this->locateNameOrLabel($relationshipTypeXML);
         if ($relationshipTypeID === FALSE) {
           continue;
         }
@@ -330,7 +330,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 
     if (!empty($caseTypeXML->CaseRoles) && $caseTypeXML->CaseRoles->RelationshipType) {
       foreach ($caseTypeXML->CaseRoles->RelationshipType as $relTypeXML) {
-        list(, $relationshipTypeMachineName) = $this->locateNameOrLabel($relTypeXML);
+        [, $relationshipTypeMachineName] = $this->locateNameOrLabel($relTypeXML);
         $result[] = $relationshipTypeMachineName;
       }
     }
@@ -511,7 +511,7 @@ AND        a.is_deleted = 0
       if (!$activityDate) {
         $activityDate = $params['activity_date_time'];
       }
-      list($activity_date, $activity_time) = CRM_Utils_Date::setDateDefaults($activityDate);
+      [$activity_date, $activity_time] = CRM_Utils_Date::setDateDefaults($activityDate);
       $activityDateTime = CRM_Utils_Date::processDate($activity_date, $activity_time);
       //add reference offset to date.
       if ((int) $activityTypeXML->reference_offset) {
@@ -540,13 +540,6 @@ AND        a.is_deleted = 0
     if (!$activity) {
       throw new CRM_Core_Exception('Unable to create Activity');
     }
-
-    // create case activity record
-    $caseParams = [
-      'activity_id' => $activity->id,
-      'case_id' => $params['caseID'],
-    ];
-    CRM_Case_BAO_Case::processCaseActivity($caseParams);
     return TRUE;
   }
 
@@ -628,7 +621,7 @@ AND        a.is_deleted = 0
     $targetContactId = is_array($activityParams['target_contact_id'])
       ? CRM_Utils_Array::first($activityParams['target_contact_id'])
       : $activityParams['target_contact_id'];
-    list($relTypeId, $a, $b) = explode('_', $activityTypeXML->default_assignee_relationship);
+    [$relTypeId, $a, $b] = explode('_', $activityTypeXML->default_assignee_relationship);
 
     $params = [
       'relationship_type_id' => $relTypeId,

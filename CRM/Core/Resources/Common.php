@@ -271,7 +271,7 @@ class CRM_Core_Resources_Common {
     // Add localized jQuery UI files
     if ($tsLocale && $tsLocale != 'en_US') {
       // Search for i18n file in order of specificity (try fr-CA, then fr)
-      list($lang) = explode('_', $tsLocale);
+      [$lang] = explode('_', $tsLocale);
       $path = "bower_components/jquery-ui/ui/i18n";
       foreach ([str_replace('_', '-', $tsLocale), $lang] as $language) {
         $localizationFile = "$path/datepicker-{$language}.js";

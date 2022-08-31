@@ -234,6 +234,8 @@ case.custom_1 :' . '
 
   /**
    * Test money format tokens can respect passed in locale.
+   *
+   * @group locale
    */
   public function testMoneyFormat(): void {
     // Our 'migration' off configured thousand separators at the moment is a define.
@@ -584,6 +586,7 @@ participant.fee_level :steep
 participant.fee_amount :$50.00
 participant.registered_by_id :
 participant.transferred_to_contact_id :
+participant.created_id :
 participant.role_id:label :Attendee
 participant.balance :
 participant.custom_2 :99999
@@ -706,6 +709,7 @@ December 21st, 2007
       '{participant.fee_amount}' => 'Fee Amount',
       '{participant.registered_by_id}' => 'Registered By Participant ID',
       '{participant.transferred_to_contact_id}' => 'Transferred to Contact ID',
+      '{participant.created_id}' => 'Created by Contact ID',
       '{participant.role_id:label}' => 'Participant Role',
       '{participant.balance}' => 'Event Balance',
       '{participant.' . $this->getCustomFieldName('participant_int') . '}' => 'Enter integer here :: participant_Group with field int',
@@ -808,6 +812,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{domain.postal_code}' => 'Domain (Organization) Postal Code',
       '{domain.state_province_id:label}' => 'Domain (Organization) State',
       '{domain.country_id:label}' => 'Domain (Organization) Country',
+      '{domain.empowered_by_civicrm_image_url}' => 'Empowered By CiviCRM Image',
     ];
   }
 

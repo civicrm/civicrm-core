@@ -19,6 +19,10 @@ class ContactSchemaMapSubscriber implements EventSubscriberInterface {
   }
 
   /**
+   * This creates a joinable which gets exposed and rendered by:
+   *
+   * @see \Civi\Api4\Service\Spec\Provider\ContactGetSpecProvider
+   *
    * @param \Civi\Api4\Event\SchemaMapBuildEvent $event
    */
   public function onSchemaBuild(SchemaMapBuildEvent $event) {

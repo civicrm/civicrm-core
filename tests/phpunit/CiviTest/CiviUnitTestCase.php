@@ -74,6 +74,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   use \Civi\Test\DbTestTrait;
   use \Civi\Test\ContactTestTrait;
   use \Civi\Test\MailingTestTrait;
+  use \Civi\Test\LocaleTestTrait;
 
   /**
    *  Database has been initialized.
@@ -356,6 +357,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *  Common setup functions for all unit tests.
    */
   protected function setUp(): void {
+    CRM_Core_I18n::clearLocale();
     parent::setUp();
     $session = CRM_Core_Session::singleton();
     $session->set('userID', NULL);
@@ -1137,7 +1139,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'is_show_location' => 0,
       'is_email_confirm' => 1,
     ], $params);
-
+    if (!empty($params['payment_processor_id'])) {
+      $params['payment_processor'] = is_array($params['payment_processor_id']) ? $params['payment_processor_id'] : [$params['payment_processor_id']];
+    }
     $event = Event::create(FALSE)->setValues($params)->execute()->first();
     $this->ids['event'][] = $event['id'];
     return $event;
@@ -3424,23 +3428,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   * Enable multilingual.
-   */
-  public function enableMultilingual() {
-    $this->callAPISuccess('Setting', 'create', [
-      'lcMessages' => 'en_US',
-      'languageLimit' => [
-        'en_US' => 1,
-      ],
-    ]);
-
-    CRM_Core_I18n_Schema::makeMultilingual('en_US');
-
-    global $dbLocale;
-    $dbLocale = '_en_US';
-  }
-
-  /**
    * Setup or clean up SMS tests
    *
    * @param bool $teardown
@@ -3667,7 +3654,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'contact_type' => 'Individual',
       'threshold' => 8,
       'used' => 'General',
-      'name' => 'TestRule',
       'title' => 'TestRule',
       'is_reserved' => 0,
     ]);
@@ -3930,6 +3916,35 @@ WHERE a1.is_primary = 0
       'city' => 'London',
       'contact_id' => $contactID,
     ])->execute()->first();
+  }
+
+  /**
+   * Get an array of tables with rows - useful for diagnosing cleanup issues.
+   *
+   * @return array
+   */
+  protected function getTablesWithData(): array {
+    $dataObject = new CRM_Core_DAO();
+    $data = [];
+    $sql = CRM_Core_DAO::singleValueQuery("SELECT GROUP_CONCAT(
+      'SELECT \"',
+      table_name,
+      '\" AS table_name, COUNT(*) AS row_count FROM `',
+      table_schema,
+      '`.`',
+      table_name,
+      '`' SEPARATOR ' UNION  '
+    )
+FROM INFORMATION_SCHEMA.TABLES
+WHERE table_schema = '$dataObject->_database'");
+    $result = CRM_Core_DAO::executeQuery($sql);
+    while ($result->fetch()) {
+      $count = (int) $result->row_count;
+      if ($count > 0) {
+        $data[$result->table_name] = $count;
+      }
+    }
+    return $data;
   }
 
 }

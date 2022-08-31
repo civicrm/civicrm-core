@@ -398,8 +398,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       ];
 
       $sendTemplateParams = [
-        'groupName' => 'msg_tpl_workflow_event',
-        'valueName' => 'event_online_receipt',
+        'workflow' => 'event_online_receipt',
         'contactId' => $participantDetails[$participant->id]['contact_id'],
         'tplParams' => $tplParams,
         'from' => $receiptFrom,
@@ -407,6 +406,10 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
         'toEmail' => $toEmail,
         'cc' => $eventDetails['cc_confirm'] ?? NULL,
         'bcc' => $eventDetails['bcc_confirm'] ?? NULL,
+        'modelProps' => [
+          'participantID' => $participant->id,
+          'eventID' => $participant->event_id,
+        ],
       ];
       CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
     }

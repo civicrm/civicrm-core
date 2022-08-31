@@ -25,7 +25,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   public function tearDown(): void {
     global $dbLocale;
     if ($dbLocale) {
-      CRM_Core_I18n_Schema::makeSinglelingual('en_US');
+      $this->disableMultilingual();
     }
     $this->financialAccountDelete('Donations');
     parent::tearDown();
@@ -112,11 +112,11 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
    * Check method del()
    *
    * @dataProvider multiLingual
+   * @group locale
    */
   public function testDel($isMultiLingual) {
     if ($isMultiLingual) {
-      $this->enableMultilingual();
-      CRM_Core_I18n_Schema::addLocale('fr_FR', 'en_US');
+      $this->enableMultilingual(['en_US' => 'fr_FR']);
     }
     $params = [
       'name' => 'Donations',

@@ -11,7 +11,7 @@ namespace Civi\Core;
  *
  * ```
  * class CRM_Foo_BAO_Bar implements \Civi\Core\HookInterface {
- *   public function hook_civicrm_post($op, $objectName, $objectId, &$objectRef) {
+ *   public static function hook_civicrm_post($op, $objectName, $objectId, &$objectRef) {
  *     echo "Running hook_civicrm_post\n";
  *   }
  * }
@@ -21,10 +21,10 @@ namespace Civi\Core;
  *
  * ```
  * class CRM_Foo_BAO_Bar implements \Civi\Core\HookInterface {
- *   public function on_civi_api_authorize(AuthorizeEvent $e): void {
+ *   public static function on_civi_api_authorize(AuthorizeEvent $e): void {
  *     echo "Running civi.api.authorize\n";
  *   }
- *   public function on_hook_civicrm_post(GenericHookEvent $e): void {
+ *   public static function on_hook_civicrm_post(PostEvent $e): void {
  *     echo "Running hook_civicrm_post\n";
  *   }
  * }

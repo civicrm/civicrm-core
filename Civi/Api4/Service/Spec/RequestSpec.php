@@ -32,6 +32,13 @@ class RequestSpec implements \Iterator {
   protected $entityTableName;
 
   /**
+   * @return string
+   */
+  public function getEntityTableName(): ?string {
+    return $this->entityTableName;
+  }
+
+  /**
    * @var FieldSpec[]
    */
   protected $fields = [];

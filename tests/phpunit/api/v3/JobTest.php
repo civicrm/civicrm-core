@@ -1019,7 +1019,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'contact_type' => $contactType,
       'threshold' => $threshold,
       'used' => $used,
-      'name' => $name,
+      'title' => $name,
       'is_reserved' => $isReserved,
     ]);
     $this->callAPISuccess('Job', 'process_batch_merge', ['rule_group_id' => $ruleGroup['id']]);

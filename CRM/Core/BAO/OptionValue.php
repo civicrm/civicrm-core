@@ -219,6 +219,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
 
     $optionValue->id = $id;
     $optionValue->save();
+    Civi::cache('metadata')->flush();
     CRM_Core_PseudoConstant::flush();
 
     CRM_Utils_Hook::post($op, 'OptionValue', $id, $optionValue);
@@ -265,6 +266,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     $hookParams = ['id' => $optionValueId];
     CRM_Utils_Hook::pre('delete', 'OptionValue', $optionValueId, $hookParams);
     if (self::updateRecords($optionValueId, CRM_Core_Action::DELETE)) {
+      Civi::cache('metadata')->flush();
       CRM_Core_PseudoConstant::flush();
       $optionValue->delete();
       CRM_Utils_Hook::post('delete', 'OptionValue', $optionValueId, $optionValue);
@@ -477,24 +479,24 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *   an array of array of values for this option group
    */
   public static function getOptionValuesArray($optionGroupID) {
+    global $tsLocale;
     // check if we can get the field values from the system cache
-    $cacheKey = "CRM_Core_BAO_OptionValue_OptionGroupID_{$optionGroupID}";
-    $cache = CRM_Utils_Cache::singleton();
-    $optionValues = $cache->get($cacheKey);
-    if (empty($optionValues)) {
-      $dao = new CRM_Core_DAO_OptionValue();
-      $dao->option_group_id = $optionGroupID;
-      $dao->orderBy('weight ASC, label ASC');
-      $dao->find();
-
-      $optionValues = [];
-      while ($dao->fetch()) {
-        $optionValues[$dao->id] = [];
-        CRM_Core_DAO::storeValues($dao, $optionValues[$dao->id]);
-      }
-
-      $cache->set($cacheKey, $optionValues);
+    $cacheKey = "CRM_Core_BAO_OptionValue_OptionGroupID_{$optionGroupID}_$tsLocale";
+    if (Civi::cache('metadata')->has($cacheKey)) {
+      return Civi::cache('metadata')->get($cacheKey);
     }
+    $dao = new CRM_Core_DAO_OptionValue();
+    $dao->option_group_id = $optionGroupID;
+    $dao->orderBy('weight ASC, label ASC');
+    $dao->find();
+
+    $optionValues = [];
+    while ($dao->fetch()) {
+      $optionValues[$dao->id] = [];
+      CRM_Core_DAO::storeValues($dao, $optionValues[$dao->id]);
+    }
+
+    Civi::cache('metadata')->set($cacheKey, $optionValues);
 
     return $optionValues;
   }

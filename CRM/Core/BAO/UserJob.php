@@ -135,10 +135,12 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements \Civi\Core\Ho
   /**
    * Get the types Import Jobs.
    *
-   * This is largely a placeholder at this stage. It will likely wind
-   * up as an option value so extensions can add different types.
-   *
-   * However, for now it just holds the one type being worked on.
+   * Each type is keyed by it's id and has
+   *   -id
+   *   -name
+   *   -label
+   *   -class
+   *   -entity
    *
    * @return array
    */
@@ -148,6 +150,7 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements \Civi\Core\Ho
       $types = [];
       $classes = ClassScanner::get(['interface' => UserJobInterface::class]);
       foreach ($classes as $class) {
+        /* @var UserJobInterface $class */
         $declaredTypes = $class::getUserJobInfo();
         foreach ($declaredTypes as $index => $declaredType) {
           $declaredTypes[$index]['class'] = $class;

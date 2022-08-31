@@ -120,7 +120,7 @@ class Kernel {
 
     try {
       $this->boot($apiRequest);
-      list($apiProvider, $apiRequest) = $this->resolve($apiRequest);
+      [$apiProvider, $apiRequest] = $this->resolve($apiRequest);
       $this->authorize($apiProvider, $apiRequest);
       return TRUE;
     }
@@ -143,9 +143,9 @@ class Kernel {
   public function runRequest($apiRequest) {
     $this->boot($apiRequest);
 
-    list($apiProvider, $apiRequest) = $this->resolve($apiRequest);
+    [$apiProvider, $apiRequest] = $this->resolve($apiRequest);
     $this->authorize($apiProvider, $apiRequest);
-    list ($apiProvider, $apiRequest) = $this->prepare($apiProvider, $apiRequest);
+    [$apiProvider, $apiRequest] = $this->prepare($apiProvider, $apiRequest);
     $result = $apiProvider->invoke($apiRequest);
 
     return $this->respond($apiProvider, $apiRequest, $result);

@@ -56,6 +56,12 @@
           <td>{$form.onDuplicate.html} {help id="id-onDuplicate"}</td>
         </tr>
       {/if}
+      {if array_key_exists('multipleCustomData', $form)}
+        <tr class="crm-import-uploadfile-form-block-multipleCustomData">
+          <td class="label">{$form.multipleCustomData.label}</td>
+          <td><span>{$form.multipleCustomData.html}</span> </td>
+        </tr>
+      {/if}
         <tr class="crm-import-datasource-form-block-fieldSeparator">
           <td class="label">{$form.fieldSeparator.label} {help id='id-fieldSeparator' file='CRM/Contact/Import/Form/DataSource'}</td>
           <td>{$form.fieldSeparator.html}</td>

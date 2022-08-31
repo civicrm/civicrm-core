@@ -457,7 +457,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     // CRM-20868 : Update invoice_numbers (in batch) with value in [invoice prefix][contribution id] format
     $contributionSettings = Civi::settings()->get('contribution_invoice_settings');
     if (!empty($contributionSettings['invoicing']) && !empty($contributionSettings['invoice_prefix'])) {
-      list($minId, $maxId) = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
+      [$minId, $maxId] = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
       FROM civicrm_contribution ")->getDatabaseResult()->fetchRow();
       for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
         $endId = $startId + self::BATCH_SIZE - 1;

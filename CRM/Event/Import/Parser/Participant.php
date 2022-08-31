@@ -84,6 +84,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         'id' => 'participant_import',
         'name' => 'participant_import',
         'label' => ts('Participant Import'),
+        'entity' => 'Participant',
       ],
     ];
   }
@@ -94,52 +95,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
   public function init() {
     unset($this->userJob);
     $this->setFieldMetadata();
-    foreach ($this->importableFieldsMetadata as $name => $field) {
-      $field['type'] = CRM_Utils_Array::value('type', $field, CRM_Utils_Type::T_INT);
-      $field['dataPattern'] = CRM_Utils_Array::value('dataPattern', $field, '//');
-      $field['headerPattern'] = CRM_Utils_Array::value('headerPattern', $field, '//');
-      $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern']);
-    }
-  }
-
-  /**
-   * Handle the values in preview mode.
-   *
-   * @param array $values
-   *   The array of values belonging to this line.
-   *
-   * @return bool
-   *   the result of this processing
-   */
-  public function preview(&$values) {
-    return $this->summary($values);
-  }
-
-  /**
-   * Handle the values in summary mode.
-   *
-   * @param array $values
-   *   The array of values belonging to this line.
-   *
-   * @return bool
-   *   the result of this processing
-   */
-  public function summary(&$values) {
-    $params = $this->getMappedRow($values);
-    $errors = [];
-    try {
-      $this->validateParams($params);
-    }
-    catch (CRM_Core_Exception $e) {
-      $errors[] = $e->getMessage();
-    }
-
-    if ($errors) {
-      $tempMsg = "Invalid value for field(s) : " . implode(',', $errors);
-      array_unshift($values, $tempMsg);
-      return CRM_Import_Parser::ERROR;
-    }
-    return CRM_Import_Parser::VALID;
   }
 
   /**
@@ -147,14 +102,14 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
    *
    * @param array $values
    *   The array of values belonging to this line.
-   *
-   * @return bool
-   *   the result of this processing
    */
-  public function import(&$values) {
+  public function import(array $values): void {
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
       $params = $this->getMappedRow($values);
+      if ($params['external_identifier']) {
+        $params['contact_id'] = $this->lookupExternalIdentifier($params['external_identifier'], $this->getContactType(), $params['contact_id'] ?? NULL);
+      }
       $session = CRM_Core_Session::singleton();
       $formatted = $params;
       // don't add to recent items, CRM-4399
@@ -224,7 +179,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
 
             $this->_newParticipant[] = $newParticipant->id;
             $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant->id);
-            return CRM_Import_Parser::VALID;
+            return;
           }
           throw new CRM_Core_Exception('Matching Participant record not found for Participant ID ' . $formatValues['participant_id'] . '. Row was skipped.');
         }
@@ -276,14 +231,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         }
       }
       else {
-        if (!empty($formatValues['external_identifier'])) {
-          $checkCid = new CRM_Contact_DAO_Contact();
-          $checkCid->external_identifier = $formatValues['external_identifier'];
-          $checkCid->find(TRUE);
-          if ($checkCid->id != $formatted['contact_id']) {
-            throw new CRM_Core_Exception('Mismatch of External ID:' . $formatValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id']);
-          }
-        }
         $newParticipant = $this->deprecated_create_participant_formatted($formatted);
       }
 
@@ -298,9 +245,8 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
           if (is_array($newParticipant['error_message']) &&
             ($participantID == $newParticipant['error_message']['params'][0])
           ) {
-            array_unshift($values, $url);
-            $this->setImportStatus($rowNumber, 'DUPLICATE', '');
-            return CRM_Import_Parser::DUPLICATE;
+            $this->setImportStatus($rowNumber, 'DUPLICATE', $url);
+            return;
           }
           if ($newParticipant['error_message']) {
             throw new CRM_Core_Exception($newParticipant['error_message']);
@@ -314,16 +260,10 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
       }
     }
     catch (CRM_Core_Exception $e) {
-      array_unshift($values, $e->getMessage());
       $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
-      return CRM_Import_Parser::ERROR;
+      return;
     }
-    catch (CiviCRM_API3_Exception $e) {
-      array_unshift($values, $e->getMessage());
-      $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
-      return CRM_Import_Parser::ERROR;
-    }
-    $this->setImportStatus($rowNumber, 'IMPORTED', '');
+    $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant['id']);
   }
 
   /**
@@ -534,52 +474,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
       }
     }
     return TRUE;
-  }
-
-  /**
-   * Given a list of the importable field keys that the user has selected
-   * set the active fields array to this list
-   *
-   * @param array $fieldKeys mapped array of values
-   *
-   * @return void
-   */
-  public function setActiveFields($fieldKeys) {
-    $this->_activeFieldCount = count($fieldKeys);
-    foreach ($fieldKeys as $key) {
-      if (empty($this->_fields[$key])) {
-        $this->_activeFields[] = new CRM_Event_Import_Field('', ts('- do not import -'));
-      }
-      else {
-        $this->_activeFields[] = clone($this->_fields[$key]);
-      }
-    }
-  }
-
-  /**
-   * @param string $name
-   * @param $title
-   * @param int $type
-   * @param string $headerPattern
-   * @param string $dataPattern
-   */
-  public function addField($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//') {
-    if (empty($name)) {
-      $this->_fields['doNotImport'] = new CRM_Event_Import_Field($name, $title, $type, $headerPattern, $dataPattern);
-    }
-    else {
-
-      //$tempField = CRM_Contact_BAO_Contact::importableFields('Individual', null );
-      $tempField = CRM_Contact_BAO_Contact::importableFields('All', NULL);
-      if (!array_key_exists($name, $tempField)) {
-        $this->_fields[$name] = new CRM_Event_Import_Field($name, $title, $type, $headerPattern, $dataPattern);
-      }
-      else {
-        $this->_fields[$name] = new CRM_Contact_Import_Field($name, $title, $type, $headerPattern, $dataPattern,
-          CRM_Utils_Array::value('hasLocationType', $tempField[$name])
-        );
-      }
-    }
   }
 
   /**

@@ -28,7 +28,7 @@ class CRM_Upgrade_Headless {
     set_time_limit(0);
 
     $upgrade = new CRM_Upgrade_Form();
-    list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
+    [$currentVer, $latestVer] = $upgrade->getUpgradeVersions();
 
     if ($error = $upgrade->checkUpgradeableVersion($currentVer, $latestVer)) {
       throw new Exception($error);

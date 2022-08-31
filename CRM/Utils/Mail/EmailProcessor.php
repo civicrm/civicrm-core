@@ -146,16 +146,16 @@ class CRM_Utils_Mail_EmailProcessor {
         if ($usedfor == 1) {
           foreach ($mail->to as $address) {
             if (preg_match($regex, ($address->email ?? ''), $matches)) {
-              list($match, $action, $job, $queue, $hash) = $matches;
+              [$match, $action, $job, $queue, $hash] = $matches;
               break;
               // FIXME: the below elseifs should be dropped when we drop legacy support
             }
             elseif (preg_match($commonRegex, ($address->email ?? ''), $matches)) {
-              list($match, $action, $_, $job, $queue, $hash) = $matches;
+              [$match, $action, $_, $job, $queue, $hash] = $matches;
               break;
             }
             elseif (preg_match($subscrRegex, ($address->email ?? ''), $matches)) {
-              list($match, $action, $_, $job) = $matches;
+              [$match, $action, $_, $job] = $matches;
               break;
             }
           }
@@ -163,13 +163,13 @@ class CRM_Utils_Mail_EmailProcessor {
           // CRM-5471: if $matches is empty, it still might be a soft bounce sent
           // to another address, so scan the body for ‘Return-Path: …bounce-pattern…’
           if (!$matches and preg_match($rpRegex, ($mail->generateBody() ?? ''), $matches)) {
-            list($match, $action, $job, $queue, $hash) = $matches;
+            [$match, $action, $job, $queue, $hash] = $matches;
           }
 
           // if $matches is still empty, look for the X-CiviMail-Bounce header
           // CRM-9855
           if (!$matches and preg_match($rpXheaderRegex, ($mail->generateBody() ?? ''), $matches)) {
-            list($match, $action, $job, $queue, $hash) = $matches;
+            [$match, $action, $job, $queue, $hash] = $matches;
           }
           // With Mandrilla, the X-CiviMail-Bounce header is produced by generateBody
           // is base64 encoded
@@ -181,7 +181,7 @@ class CRM_Utils_Mail_EmailProcessor {
                 $p_file = $v_part->__get('fileName');
                 $c_file = file_get_contents($p_file);
                 if (preg_match($rpXheaderRegex, ($c_file ?? ''), $matches)) {
-                  list($match, $action, $job, $queue, $hash) = $matches;
+                  [$match, $action, $job, $queue, $hash] = $matches;
                 }
               }
             }
@@ -189,7 +189,7 @@ class CRM_Utils_Mail_EmailProcessor {
 
           // if all else fails, check Delivered-To for possible pattern
           if (!$matches and preg_match($regex, ($mail->getHeader('Delivered-To') ?? ''), $matches)) {
-            list($match, $action, $job, $queue, $hash) = $matches;
+            [$match, $action, $job, $queue, $hash] = $matches;
           }
         }
 

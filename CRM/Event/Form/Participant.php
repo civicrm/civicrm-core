@@ -999,7 +999,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $params['total_amount'] = CRM_Utils_Rule::cleanMoney($params['total_amount']);
     }
     if ($this->_isPaidEvent) {
-      list($contributionParams, $lineItem, $additionalParticipantDetails, $params) = $this->preparePaidEventProcessing($params);
+      [$contributionParams, $lineItem, $additionalParticipantDetails, $params] = $this->preparePaidEventProcessing($params);
     }
 
     $this->_params = $params;
@@ -1020,7 +1020,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $userName = CRM_Core_Session::singleton()->getLoggedInContactDisplayName();
 
     if ($this->_contactId) {
-      list($this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_contactId);
+      [$this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->_contactId);
     }
 
     //modify params according to parameter used in create
@@ -1459,7 +1459,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       foreach ($this->_contactIds as $num => $contactID) {
         // Retrieve the name and email of the contact - this will be the TO for receipt email
-        list($this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail) = CRM_Contact_BAO_Contact::getContactDetails($contactID);
+        [$this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($contactID);
 
         $this->_contributorDisplayName = ($this->_contributorDisplayName == ' ') ? $this->_contributorEmail : $this->_contributorDisplayName;
 
@@ -1550,7 +1550,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           $sendTemplateParams['isEmailPdf'] = TRUE;
           $sendTemplateParams['contributionId'] = $contributionId;
         }
-        list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+        [$mailSent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         if ($mailSent) {
           $sent[] = $contactID;
           foreach ($participants as $ids => $values) {
@@ -1761,9 +1761,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     // Retrieve the name and email of the contact - form will be the TO for receipt email ( only if context is not standalone)
     if ($form->_context != 'standalone') {
       if ($form->_contactId) {
-        list($form->_contributorDisplayName,
-          $form->_contributorEmail
-          ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($form->_contactId);
+        [$form->_contributorDisplayName, $form->_contributorEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($form->_contactId);
         $form->assign('email', $form->_contributorEmail);
       }
       else {

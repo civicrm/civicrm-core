@@ -42,7 +42,7 @@ class AfformMetadataInjector {
         // Each field can be nested within a fieldset, a join or a block
         foreach (pq('af-field', $doc) as $afField) {
           /** @var \DOMElement $afField */
-          $action = 'update';
+          $action = 'create';
           $joinName = pq($afField)->parents('[af-join]')->attr('af-join');
           if ($joinName) {
             self::fillFieldMetadata($joinName, $action, $afField);
@@ -77,14 +77,19 @@ class AfformMetadataInjector {
   /**
    * Merge field definition metadata into an afform field's definition
    *
-   * @param string $entityName
+   * @param string|array $entityNames
    * @param string $action
    * @param \DOMElement $afField
    * @throws \API_Exception
    */
-  private static function fillFieldMetadata($entityName, $action, \DOMElement $afField) {
+  private static function fillFieldMetadata($entityNames, $action, \DOMElement $afField) {
     $fieldName = $afField->getAttribute('name');
-    $fieldInfo = self::getField($entityName, $fieldName, $action);
+    foreach ((array) $entityNames as $entityName) {
+      $fieldInfo = self::getField($entityName, $fieldName, $action);
+      if ($fieldInfo) {
+        break;
+      }
+    }
     // Merge field definition data with whatever's already in the markup.
     $deep = ['input_attrs'];
     if ($fieldInfo) {
@@ -179,8 +184,11 @@ class AfformMetadataInjector {
         break;
       }
     }
+    if (!isset($field)) {
+      return NULL;
+    }
     // Id field for selecting existing entity
-    if ($action === 'update' && $field['name'] === CoreUtil::getIdFieldName($entityName)) {
+    if ($action === 'create' && $field['name'] === CoreUtil::getIdFieldName($entityName)) {
       $entityTitle = CoreUtil::getInfoItem($entityName, 'title');
       $field['input_type'] = 'Existing';
       $field['entity'] = $entityName;
@@ -200,24 +208,28 @@ class AfformMetadataInjector {
   }
 
   /**
-   * Determines name of the api entity based on the field name prefix
+   * Determines name of the api entit(ies) based on the field name prefix
+   *
+   * Note: Normally will return a single entity name, but
+   * Will return 2 entity names in the case of Bridge joins e.g. RelationshipCache
    *
    * @param string $fieldName
    * @param string[] $entityList
-   * @return string
+   * @return string|array
    */
   private static function getFieldEntityType($fieldName, $entityList) {
     $prefix = strpos($fieldName, '.') ? explode('.', $fieldName)[0] : NULL;
+    $joinEntities = [];
     $baseEntity = array_shift($entityList);
     if ($prefix) {
       foreach ($entityList as $entityAndAlias) {
         [$entity, $alias] = explode(' AS ', $entityAndAlias);
         if ($alias === $prefix) {
-          return $entityAndAlias;
+          $joinEntities[] = $entityAndAlias;
         }
       }
     }
-    return $baseEntity;
+    return $joinEntities ?: $baseEntity;
   }
 
   private static function getFormEntities(\phpQueryObject $doc) {

@@ -139,7 +139,7 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
   /**
    * Assign line items to the template.
    *
-   * @param $tplLineItems
+   * @param array $tplLineItems
    */
   protected function assignLineItemsToTemplate($tplLineItems) {
     // @todo this should be a hook that invoicing code hooks into rather than a call to it.

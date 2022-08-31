@@ -648,7 +648,7 @@ abstract class CRM_Import_DataSource {
    */
   protected function getStatusMapping(): array {
     return [
-      CRM_Import_Parser::VALID => ['imported', 'new', 'soft_credit_imported', 'pledge_payment_imported'],
+      CRM_Import_Parser::VALID => ['imported', 'new', 'valid', 'soft_credit_imported', 'pledge_payment_imported'],
       CRM_Import_Parser::ERROR => ['error', 'invalid', 'soft_credit_error', 'pledge_payment_error'],
       CRM_Import_Parser::DUPLICATE => ['duplicate'],
       CRM_Import_Parser::NO_MATCH => ['invalid_no_match'],
@@ -657,7 +657,8 @@ abstract class CRM_Import_DataSource {
       CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT => ['soft_credit_imported'],
       CRM_Contribute_Import_Parser_Contribution::PLEDGE_PAYMENT => ['pledge_payment_imported'],
       CRM_Contribute_Import_Parser_Contribution::PLEDGE_PAYMENT_ERROR => ['pledge_payment_error'],
-      'new' => ['new'],
+      'new' => ['new', 'valid'],
+      'valid' => ['valid'],
     ];
   }
 

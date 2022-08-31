@@ -560,7 +560,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $editable['value'] = $data[$editable['value_path']];
       // Ensure field is appropriate to this entity sub-type
       $field = $this->getField($column['key']);
-      $entityValues = FormattingUtil::filterByPrefix($data, $editable['id_path'], $editable['id_key']);
+      $entityValues = FormattingUtil::filterByPath($data, $editable['id_path'], $editable['id_key']);
       if (!$this->fieldBelongsToEntity($editable['entity'], $field['name'], $entityValues)) {
         return NULL;
       }

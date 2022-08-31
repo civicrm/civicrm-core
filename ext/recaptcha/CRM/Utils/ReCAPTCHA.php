@@ -39,7 +39,7 @@ class CRM_Utils_ReCAPTCHA {
   /**
    * Singleton function used to manage this object.
    *
-   * @return object
+   * @return CRM_Utils_ReCAPTCHA
    */
   public static function &singleton() {
     if (self::$_singleton === NULL) {
@@ -202,6 +202,8 @@ class CRM_Utils_ReCAPTCHA {
    * @return mixed
    */
   public static function validate($value, $form) {
+    require_once E::path('lib/recaptcha/recaptchalib.php');
+
     $resp = recaptcha_check_answer(CRM_Core_Config::singleton()->recaptchaPrivateKey,
       $_SERVER['REMOTE_ADDR'],
       $_POST['g-recaptcha-response']

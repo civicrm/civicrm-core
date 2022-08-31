@@ -59,7 +59,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    * @return array
    *   a table-keyed array of field-keyed arrays holding supported fields' titles
    */
-  public static function supportedFields($requestedType) {
+  public static function supportedFields($requestedType): array {
     if (!isset(Civi::$statics[__CLASS__]['supportedFields'])) {
       // this is needed, as we're piggy-backing importableFields() below
       $replacements = [
@@ -94,7 +94,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
             if (isset($replacements[$where])) {
               $where = $replacements[$where];
             }
-            list($table, $field) = explode('.', $where);
+            [$table, $field] = explode('.', $where);
             if (!in_array($table, $supportedTables)) {
               continue;
             }
@@ -220,7 +220,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     CRM_Utils_Hook::dupeQuery($this, 'table', $tableQueries);
 
     while (!empty($tableQueries)) {
-      list($isInclusive, $isDie) = self::isQuerySetInclusive($tableQueries, $this->threshold, $exclWeightSum);
+      [$isInclusive, $isDie] = self::isQuerySetInclusive($tableQueries, $this->threshold, $exclWeightSum);
 
       if ($isInclusive) {
         // order queries by table count
@@ -379,7 +379,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
 
     if ($this->params && !$this->noRules) {
       if ($checkPermission) {
-        list($this->_aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('civicrm_contact');
+        [$this->_aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('civicrm_contact');
         $aclWhere = $aclWhere ? "AND {$aclWhere}" : '';
       }
       $query = "SELECT {$this->temporaryTables['dedupe']}.id1 as id
@@ -390,7 +390,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     else {
       $aclWhere = '';
       if ($checkPermission) {
-        list($this->_aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause(['c1', 'c2']);
+        [$this->_aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause(['c1', 'c2']);
         $aclWhere = $aclWhere ? "AND {$aclWhere}" : '';
       }
       $query = "SELECT IF({$this->temporaryTables['dedupe']}.id1 < {$this->temporaryTables['dedupe']}.id2, {$this->temporaryTables['dedupe']}.id1, {$this->temporaryTables['dedupe']}.id2) as id1,

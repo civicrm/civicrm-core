@@ -366,25 +366,23 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $caseObj_2 = $this->createCase($client_id_2, $loggedInUser);
     $case_id_2 = $caseObj_2->id;
 
-    // Create link case activity. We could go thru the whole form processes
-    // but we really just want to test the BAO function so just need the
-    // activity to exist.
-    $result = $this->callAPISuccess('activity', 'create', [
-      'activity_type_id' => 'Link Cases',
-      'subject' => 'Test Link Cases',
-      'status_id' => 'Completed',
+    $form = $this->getFormObject('CRM_Case_Form_Activity', [
+      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Link Cases'),
+      'link_to_case_id' => $case_id_2,
+      'caseid' => $case_id_1,
       'source_contact_id' => $loggedInUser,
       'target_contact_id' => $client_id_1,
-      'case_id' => $case_id_1,
+      'cid' => $client_id_1,
+      'activity_date_time' => date('Y-m-d H:i:s'),
+      // note the subject gets set in javascript when you select the other case
+      // so it would be a little difficult here to test the subject is correct
+      'subject' => '',
     ]);
-
-    // Put it in the format needed for endPostProcess
-    $activity = new StdClass();
-    $activity->id = $result['id'];
-    $params = [
-      'link_to_case_id' => $case_id_2,
-    ];
-    CRM_Case_Form_Activity_LinkCases::endPostProcess(NULL, $params, $activity);
+    $form->set('caseid', $case_id_1);
+    $form->set('cid', $client_id_1);
+    $form->set('atype', CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Link Cases'));
+    $form->buildForm();
+    $form->postProcess();
 
     // Get related cases for case 1
     $cases = CRM_Case_BAO_Case::getRelatedCases($case_id_1);
@@ -751,19 +749,13 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $case1 = $this->createCase($clientId1, $loggedInUser);
     $case2 = $this->createCase($clientId2, $loggedInUser);
     $linkActivity = $this->callAPISuccess('Activity', 'create', [
-      'case_id' => $case1->id,
+      'case_id' => [$case1->id, $case2->id],
       'source_contact_id' => $loggedInUser,
       'target_contact' => $clientId1,
       'activity_type_id' => 'Link Cases',
       'subject' => 'Test Link Cases',
       'status_id' => 'Completed',
     ]);
-
-    // Put it in the format needed for endPostProcess
-    $activity = new StdClass();
-    $activity->id = $linkActivity['id'];
-    $params = ['link_to_case_id' => $case2->id];
-    CRM_Case_Form_Activity_LinkCases::endPostProcess(NULL, $params, $activity);
 
     // Get the option_value.value for case status Closed
     $closedStatusResult = $this->callAPISuccess('OptionValue', 'get', [
@@ -1272,6 +1264,48 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
         INNER JOIN civicrm_activity a ON ca.activity_id = a.id
         WHERE a.subject = %1
         AND a.is_deleted = 0 AND a.is_current_revision = 1', $queryParams)
+    );
+  }
+
+  /**
+   * Same as testFileOnCaseBySubject but editing an existing non-case activity
+   */
+  public function testFileOnCaseByEditingSubject() {
+    $loggedInUserId = $this->createLoggedInUser();
+    $clientId = $this->individualCreate();
+    $caseObj = $this->createCase($clientId, $loggedInUserId);
+    $activity = $this->callAPISuccess('Activity', 'create', [
+      'source_contact_id' => $loggedInUserId,
+      'target_contact_id' => $clientId,
+      'activity_type_id' => 1,
+      'subject' => 'Starting as non-case activity',
+    ]);
+    $subject = 'Now should be a case activity [case #' . $caseObj->id . ']';
+    $form = $this->getFormObject('CRM_Activity_Form_Activity', [
+      'id' => $activity['id'],
+      'source_contact_id' => $loggedInUserId,
+      'target_contact_id' => $clientId,
+      'subject' => $subject,
+      'activity_date_time' => date('Y-m-d H:i:s'),
+      'activity_type_id' => 1,
+    ]);
+    $form->postProcess();
+
+    $activity = $this->callAPISuccess('Activity', 'getsingle', [
+      'id' => $activity['id'],
+      'return' => ['case_id'],
+    ]);
+    // Note it's an array
+    $this->assertEquals([$caseObj->id], $activity['case_id']);
+
+    // Double-check
+    $queryParams = [1 => [$activity['id'], 'Integer']];
+    $this->assertEquals(
+      $caseObj->id,
+      CRM_Core_DAO::singleValueQuery('SELECT ca.case_id
+        FROM civicrm_case_activity ca
+        INNER JOIN civicrm_activity a ON ca.activity_id = a.id
+        WHERE a.id = %1', $queryParams)
     );
   }
 

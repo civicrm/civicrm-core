@@ -764,6 +764,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider createLocalizedContributionDataProvider
+   * @group locale
    *
    * @param float|int|string $totalAmount
    * @param string $decimalPoint
@@ -2085,6 +2086,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test completing a transaction via the API with a non-USD transaction.
+   * @group locale
    */
   public function testCompleteTransactionEuro(): void {
     $mut = new CiviMailUtils($this, TRUE);

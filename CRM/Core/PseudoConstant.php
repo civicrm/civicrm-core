@@ -373,7 +373,7 @@ class CRM_Core_PseudoConstant {
         return NULL;
       }
       // We don't have good mapping so have to do a bit of guesswork from the menu
-      list(, $parent, , $child) = explode('_', $daoName);
+      [, $parent, , $child] = explode('_', $daoName);
       $sql = "SELECT path FROM civicrm_menu
         WHERE page_callback LIKE '%CRM_Admin_Page_$child%' OR page_callback LIKE '%CRM_{$parent}_Page_$child%'
         ORDER BY page_callback

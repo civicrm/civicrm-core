@@ -96,7 +96,7 @@ class ActionObjectProvider implements EventSubscriberInterface, ProviderInterfac
    * @throws \API_Exception
    */
   protected function runChain($request, $row) {
-    list($entity, $action, $params, $index) = $request;
+    [$entity, $action, $params, $index] = $request;
     // Swap out variables in $entity, $action & $params
     $this->resolveChainLinks($entity, $row);
     $this->resolveChainLinks($action, $row);

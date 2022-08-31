@@ -20,6 +20,7 @@ use Civi\Core\HookInterface;
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implements HookInterface {
+  use CRM_Contact_AccessTrait;
 
   /**
    * Deprecated add function

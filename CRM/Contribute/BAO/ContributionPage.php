@@ -259,13 +259,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     }
 
     if ($isTest && !empty($params['custom_post_id'])) {
-      $params['custom_post_id'][] = [
-        'contribution_test',
-        '=',
-        1,
-        0,
-        0,
-      ];
+      $params['custom_post_id'][] = ['contribution_test', '=', 1, 0, 0];
     }
 
     if (!$returnMessageText && !empty($gIds)) {
@@ -323,7 +317,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
             $userID = $values['related_contact'] ?? NULL;
           }
         }
-        list($values['customPost_grouptitle'], $values['customPost']) = self::getProfileNameAndFields($postID, $userID, $params['custom_post_id']);
+        [$values['customPost_grouptitle'], $values['customPost']] = self::getProfileNameAndFields($postID, $userID, $params['custom_post_id']);
       }
       // Assign honoree values for the receipt. But first, stop any leaks from
       // previously assigned values.
@@ -396,7 +390,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       // signs up. Is used for cases like - on behalf of
       // contribution / signup ..etc
       if (array_key_exists('related_contact', $values)) {
-        list($ccDisplayName, $ccEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($values['related_contact']);
+        [$ccDisplayName, $ccEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($values['related_contact']);
         $ccMailId = "{$ccDisplayName} <{$ccEmail}>";
 
         //@todo - this is the only place in this function where  $values is altered - but I can't find any evidence it is used
@@ -424,7 +418,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       ];
 
       if ($returnMessageText) {
-        list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+        [$sent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         return [
           'subject' => $subject,
           'body' => $message,
@@ -434,7 +428,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       }
 
       if (empty($values['receipt_from_name']) && empty($values['receipt_from_name'])) {
-        list($values['receipt_from_name'], $values['receipt_from_email']) = CRM_Core_BAO_Domain::getNameAndEmail();
+        [$values['receipt_from_name'], $values['receipt_from_email']] = CRM_Core_BAO_Domain::getNameAndEmail();
       }
 
       if ($values['is_email_receipt']) {
@@ -448,13 +442,13 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
           $sendTemplateParams['isEmailPdf'] = TRUE;
           $sendTemplateParams['contributionId'] = $values['contribution_id'];
         }
-        list($sent, $subject, $message) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+        [$sent, $subject, $message] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
       }
 
       // send duplicate alert, if dupe match found during on-behalf-of processing.
       if (!empty($values['onbehalf_dupe_alert'])) {
         $sendTemplateParams['groupName'] = 'msg_tpl_workflow_contribution';
-        $sendTemplateParams['valueName'] = 'contribution_dupalert';
+        $sendTemplateParams['workflow'] = 'contribution_dupalert';
         $sendTemplateParams['from'] = ts('Automatically Generated') . " <{$values['receipt_from_email']}>";
         $sendTemplateParams['toName'] = $values['receipt_from_name'] ?? NULL;
         $sendTemplateParams['toEmail'] = $values['receipt_from_email'] ?? NULL;
@@ -554,7 +548,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       [$displayName, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contribution['contact_id'], FALSE);
       $templatesParams = [
         'groupName' => 'msg_tpl_workflow_contribution',
-        'valueName' => 'contribution_recurring_notify',
+        'workflow' => 'contribution_recurring_notify',
         'contactId' => $contribution['contact_id'],
         'tplParams' => [
           'recur_frequency_interval' => $recur->frequency_interval,
@@ -591,7 +585,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $template->assign('updateSubscriptionUrl', $url);
       }
 
-      list($sent) = CRM_Core_BAO_MessageTemplate::sendTemplate($templatesParams);
+      [$sent] = CRM_Core_BAO_MessageTemplate::sendTemplate($templatesParams);
 
       if ($sent) {
         CRM_Core_Error::debug_log_message('Success: mail sent for recurring notification.');
@@ -622,7 +616,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param array|null $fieldTypes
    */
   public static function buildCustomDisplay($gid, $name, $cid, &$template, &$params, $fieldTypes = NULL) {
-    list($groupTitle, $values) = self::getProfileNameAndFields($gid, $cid, $params, $fieldTypes);
+    [$groupTitle, $values] = self::getProfileNameAndFields($gid, $cid, $params, $fieldTypes);
     if (!empty($values)) {
       $template->assign($name, $values);
     }

@@ -654,27 +654,41 @@ class CRM_Core_I18n {
   /**
    * Change the processing language without changing the current user language
    *
-   * @param string $locale
+   * @param string|\Civi\Core\Locale $locale
    *   Locale (for example 'en_US', or 'fr_CA').
    *   True if the domain was changed for an extension.
    */
   public function setLocale($locale) {
+    global $civicrmLocale;
+    if ($locale === NULL) {
+      $civicrmLocale = \Civi\Core\Locale::null();
+    }
+    elseif (is_object($locale)) {
+      $civicrmLocale = $locale;
+    }
+    else {
+      $civicrmLocale = \Civi\Core\Locale::negotiate($locale);
+    }
 
     // Change the language of the CMS as well, for URLs.
-    CRM_Utils_System::setUFLocale($locale);
+    CRM_Utils_System::setUFLocale($civicrmLocale->uf);
 
     // For sql queries, if running in DB multi-lingual mode.
     global $dbLocale;
 
     if ($dbLocale) {
-      $dbLocale = "_{$locale}";
+      $dbLocale = '_' . $civicrmLocale->db;
     }
 
     // For self::getLocale()
     global $tsLocale;
-    $tsLocale = $locale;
+    $tsLocale = $civicrmLocale->ts;
 
     CRM_Core_I18n::singleton()->reactivate();
+  }
+
+  public static function clearLocale(): void {
+    unset($GLOBALS['tsLocale'], $GLOBALS['dbLocale'], $GLOBALS['civicrmLocale']);
   }
 
   /**
@@ -807,10 +821,10 @@ function ts($text, $params = []) {
     }
   }
 
-  $activeLocale = CRM_Core_I18n::getLocale();
-  if (!$i18n or $lastLocale != $activeLocale) {
+  $civicrmLocale = CRM_Core_I18n::getLocale();
+  if (!$i18n or $lastLocale != $civicrmLocale) {
     $i18n = CRM_Core_I18n::singleton();
-    $lastLocale = $activeLocale;
+    $lastLocale = $civicrmLocale;
   }
 
   if ($function) {

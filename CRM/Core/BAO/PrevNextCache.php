@@ -35,7 +35,7 @@ class CRM_Core_BAO_PrevNextCache extends CRM_Core_DAO_PrevNextCache {
    */
   public static function getPositions($cacheKey, $id1, $id2, &$mergeId = NULL, $join = NULL, $where = NULL, $flip = FALSE) {
     if ($flip) {
-      list($id1, $id2) = [$id2, $id1];
+      [$id1, $id2] = [$id2, $id1];
     }
 
     if ($mergeId == NULL) {

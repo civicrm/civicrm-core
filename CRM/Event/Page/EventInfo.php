@@ -61,7 +61,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $values = ['event' => NULL];
     CRM_Event_BAO_Event::retrieve($params, $values['event']);
 
-    if (!$values['event']['is_active']) {
+    if (!$values['event'] || !$values['event']['is_active']) {
       CRM_Utils_System::setUFMessage(ts('The event you requested is currently unavailable (contact the site administrator for assistance).'));
       return CRM_Utils_System::permissionDenied();
     }

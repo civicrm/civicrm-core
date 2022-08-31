@@ -19,7 +19,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   public function tearDown(): void {
     global $dbLocale;
     if ($dbLocale) {
-      CRM_Core_I18n_Schema::makeSinglelingual('en_US');
+      $this->disableMultilingual();
     }
     parent::tearDown();
   }
@@ -276,6 +276,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    * @throws \API_Exception
+   * @group locale
    */
   public function testGetRecipientsEmailGroupIncludeExclude(): void {
     // Create contacts

@@ -125,7 +125,7 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
 
     // add current contact to recently viewed
     if ($ufmatch->contact_id) {
-      list($displayName, $contactImage, $contactType, $contactSubtype, $contactImageUrl)
+      [$displayName, $contactImage, $contactType, $contactSubtype, $contactImageUrl]
         = CRM_Contact_BAO_Contact::getDisplayAndImage($ufmatch->contact_id, TRUE, TRUE);
 
       $otherRecent = [
@@ -215,17 +215,17 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
         // ensure there does not exists a contact_id / uf_id pair
         // in the DB. This might be due to multiple emails per contact
         // CRM-9091
-        $sql = "
+        $sql = '
 SELECT id
 FROM   civicrm_uf_match
 WHERE  contact_id = %1
 AND    domain_id = %2
-";
-        $params = [
+';
+
+        $conflict = CRM_Core_DAO::singleValueQuery($sql, [
           1 => [$dao->contact_id, 'Integer'],
           2 => [CRM_Core_Config::domainID(), 'Integer'],
-        ];
-        $conflict = CRM_Core_DAO::singleValueQuery($sql, $params);
+        ]);
 
         if (!$conflict) {
           $found = TRUE;
@@ -247,7 +247,7 @@ AND    domain_id = %2
           else {
             $primary_email = $user->email;
           }
-          $params = ['email' => $primary_email];
+          $params['email'] = $primary_email;
         }
 
         if ($ctype === 'Organization') {
@@ -291,14 +291,13 @@ OR     uf_name      = %2
 OR     uf_id        = %3 )
 AND    domain_id    = %4
 ";
-      $params = [
+
+      $conflict = CRM_Core_DAO::singleValueQuery($sql, [
         1 => [$ufmatch->contact_id, 'Integer'],
         2 => [$ufmatch->uf_name, 'String'],
         3 => [$ufmatch->uf_id, 'Integer'],
         4 => [$ufmatch->domain_id, 'Integer'],
-      ];
-
-      $conflict = CRM_Core_DAO::singleValueQuery($sql, $params);
+      ]);
 
       if (!$conflict) {
         $ufmatch = CRM_Core_BAO_UFMatch::create((array) $ufmatch);

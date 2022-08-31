@@ -448,7 +448,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
         case 'A':
           $request = $this->requestMyContact();
           $response = $http->send($request);
-          $this->assertAnonymousContact($response);
+          $this->assertAnonymousContact($response, 'Expected Anonymous Contact in step #' . $i);
           $actualSteps .= 'A';
           break;
 
@@ -659,8 +659,9 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    * Assert the AJAX request provided empty contact information
    *
    * @param \Psr\Http\Message\ResponseInterface $response
+   * @param string $additionalMessage
    */
-  public function assertAnonymousContact(ResponseInterface $response): void {
+  public function assertAnonymousContact(ResponseInterface $response, $additionalMessage = ''): void {
     $formattedFailure = $this->formatFailure($response);
     $this->assertContentType('application/json', $response);
     $this->assertStatusCode(200, $response);
@@ -668,8 +669,8 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     if (json_last_error() !== JSON_ERROR_NONE || empty($j)) {
       $this->fail('Malformed JSON' . $formattedFailure);
     }
-    $this->assertTrue(array_key_exists('contact_id', $j) && $j['contact_id'] === NULL, 'contact_id should be null' . $formattedFailure);
-    $this->assertTrue(array_key_exists('user_id', $j) && $j['user_id'] === NULL, 'user_id should be null' . $formattedFailure);
+    $this->assertTrue(array_key_exists('contact_id', $j) && $j['contact_id'] === NULL, 'contact_id should be null' . $formattedFailure . ' ' . $additionalMessage);
+    $this->assertTrue(array_key_exists('user_id', $j) && $j['user_id'] === NULL, 'user_id should be null' . $formattedFailure . ' ' . $additionalMessage);
   }
 
   /**

@@ -184,7 +184,7 @@ class CRM_Core_BAO_CustomQuery {
       }
 
       foreach ($values as $tuple) {
-        list($name, $op, $value, $grouping, $wildcard) = $tuple;
+        [$name, $op, $value, $grouping, $wildcard] = $tuple;
 
         $field = $this->_fields[$id];
 
@@ -333,7 +333,7 @@ class CRM_Core_BAO_CustomQuery {
               && substr($name, -5, 5) !== '_high') {
               // Relative dates are handled in the buildRelativeDateQuery function.
               $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Date');
-              list($qillOp, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value, $op, [], CRM_Utils_Type::T_DATE);
+              [$qillOp, $qillVal] = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value, $op, [], CRM_Utils_Type::T_DATE);
               $this->_qill[$grouping][] = "{$field['label']} $qillOp '$qillVal'";
             }
             break;
@@ -407,7 +407,7 @@ class CRM_Core_BAO_CustomQuery {
       $joinTableAlias = $joinTable;
       // Set location-specific query
       if (isset($this->_locationSpecificCustomFields[$field['id']])) {
-        list($locationType, $locationTypeId) = $this->_locationSpecificCustomFields[$field['id']];
+        [$locationType, $locationTypeId] = $this->_locationSpecificCustomFields[$field['id']];
         $joinTableAlias = "$locationType-address";
         $joinClause = "\nLEFT JOIN $joinTable `$locationType-address` ON (`$locationType-address`.contact_id = contact_a.id AND `$locationType-address`.location_type_id = $locationTypeId)";
       }

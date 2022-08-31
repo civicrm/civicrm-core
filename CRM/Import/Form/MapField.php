@@ -125,7 +125,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    *
    * @return string
    */
-  public function defaultFromHeader($header, &$patterns) {
+  public function defaultFromHeader($header, $patterns) {
     foreach ($patterns as $key => $re) {
       // Skip empty key/patterns
       if (!$key || !$re || strlen("$re") < 5) {
@@ -186,6 +186,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    *
    * @param int|null $savedMappingID
    *
+   * @deprecated - working to remove this in favour of `addSavedMappingFields`
    * @throws \CiviCRM_API3_Exception
    */
   protected function buildSavedMappingFields($savedMappingID) {
@@ -299,8 +300,9 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     //Updating Mapping Records
     if ($this->getSubmittedValue('updateMapping')) {
       foreach (array_keys($this->getColumnHeaders()) as $i) {
-        $this->saveMappingField($this->getSubmittedValue('mappingId'), $i, TRUE);
+        $this->saveMappingField((int) $this->getSubmittedValue('mappingId'), $i, TRUE);
       }
+      $this->updateUserJobMetadata('mapping', ['id' => (int) $this->getSubmittedValue('mappingId')]);
     }
     //Saving Mapping Details and Records
     if ($this->getSubmittedValue('saveMapping')) {
@@ -314,6 +316,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
         $this->saveMappingField($savedMappingID, $i, FALSE);
       }
       $this->set('savedMapping', $savedMappingID);
+      $this->updateUserJobMetadata('mapping', ['id' => $savedMappingID]);
     }
   }
 
@@ -408,6 +411,113 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     $this->assign('initHideBoxes', $js);
     $this->setDefaults($defaults);
     return [$sel, $headerPatterns];
+  }
+
+  /**
+   * Add the saved mapping fields to the form.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function addSavedMappingFields(): void {
+    $savedMappingID = (int) $this->getSubmittedValue('savedMapping');
+    $this->buildSavedMappingFields($savedMappingID);
+    $this->addFormRule(['CRM_Import_Form_MapField', 'mappingRule']);
+  }
+
+  /**
+   * Global validation rules for the form.
+   *
+   * @param array $fields
+   *   Posted values of the form.
+   *
+   * @return array|true
+   *   list of errors to be posted back to the form
+   */
+  public static function mappingRule($fields) {
+    $errors = [];
+    if (!empty($fields['saveMapping'])) {
+      $nameField = $fields['saveMappingName'] ?? NULL;
+      if (empty($nameField)) {
+        $errors['saveMappingName'] = ts('Name is required to save Import Mapping');
+      }
+      else {
+        $mappingTypeId = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Import Contact');
+        if (CRM_Core_BAO_Mapping::checkMapping($nameField, $mappingTypeId)) {
+          $errors['saveMappingName'] = ts('Duplicate Import Mapping Name');
+        }
+      }
+    }
+    // This is horrible & should be removed once gone from tpl
+    if (!empty($errors['saveMappingName'])) {
+      $_flag = 1;
+      $assignError = new CRM_Core_Page();
+      $assignError->assign('mappingDetailsError', $_flag);
+    }
+    return empty($errors) ? TRUE : $errors;
+  }
+
+  /**
+   * This transforms the lists of fields for each contact type & component
+   * into a single unified list suitable for select2.
+   *
+   * @return array
+   */
+  public function getFieldOptions(): array {
+    $fields = $this->getFields();
+    $entity = $this->getBaseEntity();
+    $categories = $this->getImportEntities();
+    $highlightedFields = $this->getHighlightedFields();
+    foreach ($fields as $fieldName => $field) {
+      if ($fieldName === '') {
+        // @todo stop setting 'do not import' in the first place.
+        continue;
+      }
+      if ($field['name'] === 'id' && $entity === $field['entity'] && !$this->isUpdateExisting()) {
+        continue;
+      }
+      $childField = [
+        'text' => $field['title'],
+        'id' => $fieldName,
+        'has_location' => !empty($field['hasLocationType']),
+      ];
+      if (in_array($fieldName, $highlightedFields, TRUE)) {
+        $childField['text'] .= '*';
+      }
+      $category = ($childField['has_location'] || $field['name'] === 'contact_id') ? 'Contact' : ($field['entity'] ?? $entity);
+      if (empty($categories[$category])) {
+        $category = $entity;
+      }
+      $categories[$category]['children'][$fieldName] = $childField;
+    }
+
+    foreach ($categories as $index => $category) {
+      if (empty($category['children'])) {
+        unset($categories[$index]);
+      }
+      else {
+        $categories[$index]['children'] = array_values($category['children']);
+      }
+    }
+    return array_values($categories);
+  }
+
+  /**
+   * Get the 'best' mapping default from the column headers.
+   *
+   * @param string $columnHeader
+   *
+   * @return string
+   */
+  protected function guessMappingBasedOnColumns(string $columnHeader): string {
+    $headerPatterns = $this->getHeaderPatterns();
+    // do array search first to see if has mapped key
+    $columnKey = array_search($columnHeader, $this->_mapperFields, TRUE);
+    if ($columnKey && empty($this->_fieldUsed[$columnKey])) {
+      $this->_fieldUsed[$columnKey] = TRUE;
+      return $columnKey;
+    }
+    // Infer the default from the column names if we have them
+    return $this->defaultFromHeader($columnHeader, $headerPatterns);
   }
 
 }

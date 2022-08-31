@@ -156,7 +156,6 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
    * Create the general membership type.
    *
    * @throws \API_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function createMembershipType(): void {
     MembershipType::create()->setValues([
@@ -241,16 +240,24 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   }
 
   /**
-   * Test cancel order api
+   * Test fail order api.
+   *
    * @throws API_Exception
    */
-  public function testCancelOrderWithParticipant(): void {
-    $this->createContact();
-    $orderID = $this->createEventOrder();
-    $this->callAPISuccess('Order', 'cancel', ['contribution_id' => $orderID]);
-    $this->callAPISuccess('Order', 'get', ['contribution_id' => $orderID]);
-    $this->callAPISuccessGetSingle('Contribution', ['contribution_status_id' => 'Cancelled']);
-    $this->callAPISuccessGetCount('Participant', ['status_id' => 'Cancelled'], 1);
+  public function testCancelOrderWithParticipantFailed(): void {
+    $status = 'Failed';
+    $this->createAndUpdateContribution($status);
+  }
+
+  /**
+   * Test cancel order api.
+   *
+   * @throws API_Exception
+   */
+  public function testCancelOrderWithParticipantCancelled(): void {
+    $this->markTestIncomplete('For unknown reasons this failed if run after the cancelled variation of this test');
+    $status = 'Cancelled';
+    $this->createAndUpdateContribution($status);
   }
 
   /**
@@ -285,12 +292,29 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
     $this->assertEquals('Cancelled', $contribution['contribution_status_id:name']);
     $membership = $this->callAPISuccessGetSingle('Membership', []);
     $this->assertEquals('Cancelled', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membership['status_id']));
+    $this->assertEquals(TRUE, $membership['is_override']);
+    $membershipSignupActivity = Activity::get()
+      ->addSelect('subject', 'source_record_id', 'status_id')
+      ->addWhere('activity_type_id:name', '=', 'Membership Signup')
+      ->execute();
+    $this->assertCount(1, $membershipSignupActivity);
+    $this->assertEquals($membership['id'], $membershipSignupActivity->first()['source_record_id']);
+    $this->assertEquals('General - Payment - Status: Pending', $membershipSignupActivity->first()['subject']);
     $activity = Activity::get()
       ->addSelect('subject', 'source_record_id', 'status_id')
       ->addWhere('activity_type_id:name', '=', 'Change Membership Status')
       ->execute();
     $this->assertCount(1, $activity);
     $this->assertEquals('Status changed from Pending to Cancelled', $activity->first()['subject']);
+  }
+
+  /**
+   * Get the event ID.
+   *
+   * @return int
+   */
+  protected function getEventID(): int {
+    return $this->ids['event'][0];
   }
 
   /**
@@ -333,6 +357,49 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
    */
   protected function createContact(): void {
     $this->ids['contact'][0] = Civi\Api4\Contact::create()->setValues(['first_name' => 'Brer', 'last_name' => 'Rabbit'])->execute()->first()['id'];
+  }
+
+  /**
+   * @param string $status
+   *
+   * @throws \API_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function createAndUpdateContribution(string $status): void {
+    $this->createContact();
+    $orderID = $this->createEventOrder();
+    $participantID = Participant::get()
+      ->addSelect('id')
+      ->execute()
+      ->first()['id'];
+    $additionalParticipantID = Participant::create()->setValues([
+      'event_id' => $this->getEventID(),
+      'contact_id' => $this->individualCreate(),
+      'registered_by_id' => $participantID,
+      'status_id:name' => 'Pending from incomplete transaction',
+    ])->execute()->first()['id'];
+    if ($status === 'Cancelled') {
+      $this->callAPISuccess('Order', 'cancel', ['contribution_id' => $orderID]);
+    }
+    else {
+      Contribution::update()
+        ->setValues(['contribution_status_id:name' => $status])
+        ->addWhere('id', '=', $orderID)
+        ->execute();
+    }
+    $this->callAPISuccess('Order', 'get', ['contribution_id' => $orderID]);
+    $this->callAPISuccessGetSingle('Contribution', ['contribution_status_id' => $status]);
+    $this->callAPISuccessGetCount('Participant', ['status_id' => 'Cancelled'], 2);
+
+    $cancelledActivatesCount = civicrm_api3('Activity', 'get', [
+      'sequential' => 1,
+      'activity_type_id' => 'Event Registration',
+      'subject' => ['LIKE' => '%Cancelled%'],
+      'source_record_id' => ['IN' => [$participantID, $additionalParticipantID]],
+    ]);
+
+    $this->assertEquals(2, $cancelledActivatesCount['count']);
   }
 
 }

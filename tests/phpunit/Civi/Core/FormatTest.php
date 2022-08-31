@@ -20,6 +20,7 @@ use CiviUnitTestCase;
  *
  * @package Civi\Core
  * @group headless
+ * @group locale
  */
 class FormatTest extends CiviUnitTestCase {
 

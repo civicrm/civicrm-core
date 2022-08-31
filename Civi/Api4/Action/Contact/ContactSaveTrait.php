@@ -13,7 +13,6 @@
 namespace Civi\Api4\Action\Contact;
 
 use Civi\Api4\Utils\CoreUtil;
-use Civi\Api4\Utils\FormattingUtil;
 
 /**
  * Code shared by Contact create/update/save actions
@@ -58,7 +57,7 @@ trait ContactSaveTrait {
     foreach (['Address', 'Email', 'Phone', 'IM'] as $entity) {
       foreach (['primary', 'billing'] as $type) {
         $prefix = strtolower($entity) . '_' . $type . '.';
-        $item = FormattingUtil::filterByPrefix($params, $prefix . '*', '*');
+        $item = \CRM_Utils_Array::filterByPrefix($params, $prefix);
         // Not allowed to update by id or alter primary or billing flags
         unset($item['id'], $item['is_primary'], $item['is_billing']);
         if ($item) {

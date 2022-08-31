@@ -186,17 +186,6 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
     }
   }
 
-  public function preProcess() {
-    $this->setTitle($this->getTitle());
-    if (!$this->verifyPreDBState($errorMessage)) {
-      if (!isset($errorMessage)) {
-        $errorMessage = 'pre-condition failed for current upgrade step';
-      }
-      throw new CRM_Core_Exception($errorMessage);
-    }
-    $this->assign('recentlyViewed', FALSE);
-  }
-
   public function buildQuickForm() {
     $this->addDefaultButtons($this->getButtonTitle(),
       'next',
@@ -230,36 +219,6 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    */
   public function getButtonTitle() {
     return ts('Continue');
-  }
-
-  /**
-   * Use the form name to create the tpl file name.
-   *
-   * @return string
-   */
-
-  /**
-   * @return string
-   */
-  public function getTemplateFileName() {
-    $this->assign('title',
-      $this->getFieldsetTitle()
-    );
-    $this->assign('message',
-      $this->getTemplateMessage()
-    );
-    return 'CRM/Upgrade/Base.tpl';
-  }
-
-  public function postProcess() {
-    $this->upgrade();
-
-    if (!$this->verifyPostDBState($errorMessage)) {
-      if (!isset($errorMessage)) {
-        $errorMessage = 'post-condition failed for current upgrade step';
-      }
-      throw new CRM_Core_Exception($errorMessage);
-    }
   }
 
   /**
@@ -593,6 +552,13 @@ SET    version = '$version'
     }
 
     $task = new CRM_Queue_Task(
+      ['CRM_Upgrade_Incremental_MessageTemplates', 'updateReservedAndMaybeDefaultTemplates'],
+      [],
+      "Update all reserved message templates"
+    );
+    $queue->createItem($task, ['weight' => 990]);
+
+    $task = new CRM_Queue_Task(
       ['CRM_Upgrade_Form', 'doCoreFinish'],
       [$rev, $latestVer, $latestVer, $postUpgradeMessageFile],
       "Finish core DB updates $latestVer"
@@ -821,7 +787,7 @@ SET    version = '$version'
     $restore = \CRM_Upgrade_DispatchPolicy::useTemporarily('upgrade.finish');
 
     $upgrade = new CRM_Upgrade_Form();
-    list($ignore, $latestVer) = $upgrade->getUpgradeVersions();
+    [$ignore, $latestVer] = $upgrade->getUpgradeVersions();
     // Seems extraneous in context, but we'll preserve old behavior
     $upgrade->setVersion($latestVer);
     // Going forward, any new tasks will run in `upgrade.finish` mode.

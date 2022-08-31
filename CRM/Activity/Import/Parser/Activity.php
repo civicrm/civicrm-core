@@ -37,6 +37,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
         'id' => 'activity_import',
         'name' => 'activity_import',
         'label' => ts('Activity Import'),
+        'entity' => 'Activity',
       ],
     ];
   }
@@ -46,16 +47,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
    */
   public function init() {
     $this->setFieldMetadata();
-
-    foreach ($this->importableFieldsMetadata as $name => $field) {
-      $field['type'] = CRM_Utils_Array::value('type', $field, CRM_Utils_Type::T_INT);
-      $field['dataPattern'] = CRM_Utils_Array::value('dataPattern', $field, '//');
-      $field['headerPattern'] = CRM_Utils_Array::value('headerPattern', $field, '//');
-      if (!empty($field['custom_group_id'])) {
-        $field['title'] = $field["groupTitle"] . ' :: ' . $field["title"];
-      }
-      $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern']);
-    }
   }
 
   /**
@@ -189,30 +180,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
    */
   protected function getRequiredFields(): array {
     return [['activity_type_id' => ts('Activity Type'), 'activity_date_time' => ts('Activity Date')]];
-  }
-
-  /**
-   * @deprecated - these are just used in a couple of parent class functions now.
-   * @param string $name
-   * @param $title
-   * @param int $type
-   * @param string $headerPattern
-   * @param string $dataPattern
-   */
-  public function addField($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//') {
-    if (empty($name)) {
-      $this->_fields['doNotImport'] = new CRM_Activity_Import_Field($name, $title, $type, $headerPattern, $dataPattern);
-    }
-    else {
-
-      $tempField = CRM_Contact_BAO_Contact::importableFields('Individual', NULL);
-      if (!array_key_exists($name, $tempField)) {
-        $this->_fields[$name] = new CRM_Activity_Import_Field($name, $title, $type, $headerPattern, $dataPattern);
-      }
-      else {
-        $this->_fields[$name] = new CRM_Contact_Import_Field($name, $title, $type, $headerPattern, $dataPattern, CRM_Utils_Array::value('hasLocationType', $tempField[$name]));
-      }
-    }
   }
 
   /**

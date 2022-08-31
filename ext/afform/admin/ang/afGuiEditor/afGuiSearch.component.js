@@ -101,18 +101,32 @@
             label: mainEntity.label,
             fields: mainEntity.fields
           }];
-        entityCount[mainEntity.entity] = 1;
+
+        // Increment count of entityName and return a suffix string if > 1
+        function countEntity(entityName) {
+          entityCount[entityName] = (entityCount[entityName] || 0) + 1;
+          return entityCount[entityName] > 1 ? ' ' + entityCount[entityName] : '';
+        }
+        countEntity(mainEntity.entity);
 
         _.each(ctrl.display.settings['saved_search_id.api_params'].join, function(join) {
           var joinInfo = join[0].split(' AS '),
-            entity = afGui.getEntity(joinInfo[0]);
-          entityCount[entity.entity] = (entityCount[entity.entity] || 0) + 1;
+            entity = afGui.getEntity(joinInfo[0]),
+            joinEntity = afGui.getEntity(join[2]);
           entities.push({
             name: entity.entity,
             prefix: joinInfo[1] + '.',
-            label: entity.label + (entityCount[entity.entity] > 1 ? ' ' + entityCount[entity.entity] : ''),
+            label: entity.label + countEntity(entity.entity),
             fields: entity.fields,
           });
+          if (joinEntity) {
+            entities.push({
+              name: joinEntity.entity,
+              prefix: joinInfo[1] + '.',
+              label: joinEntity.label + countEntity(joinEntity.entity),
+              fields: _.omit(joinEntity.fields, _.keys(entity.fields)),
+            });
+          }
         });
 
         return entities;

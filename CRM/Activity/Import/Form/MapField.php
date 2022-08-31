@@ -46,9 +46,9 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $contactFieldsBelowWeightMessage = self::validateRequiredContactMatchFields('Individual', $importKeys);
     foreach ($requiredFields as $field => $title) {
-      if (!in_array($field, $importKeys)) {
+      if (!in_array($field, $importKeys, TRUE)) {
         if ($field === 'target_contact_id') {
-          if (!$contactFieldsBelowWeightMessage || in_array('external_identifier', $importKeys)) {
+          if (!$contactFieldsBelowWeightMessage || in_array('external_identifier', $importKeys, TRUE)) {
             continue;
           }
           $fieldMessage .= ts('Missing required contact matching fields.')
@@ -67,8 +67,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm(): void {
-    $savedMappingID = (int) $this->getSubmittedValue('savedMapping');
-    $this->buildSavedMappingFields($savedMappingID);
+    $this->addSavedMappingFields();
     $this->addFormRule(['CRM_Activity_Import_Form_MapField', 'formRule']);
 
     //-------- end of saved mapping stuff ---------
@@ -141,13 +140,11 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @return array
+   * @return array|bool
    *   list of errors to be posted back to the form
    */
-  public static function formRule($fields) {
+  public static function formRule(array $fields) {
     $errors = [];
-    // define so we avoid notices below
-    $errors['_qf_default'] = '';
 
     if (!array_key_exists('savedMapping', $fields)) {
       $importKeys = [];
@@ -159,32 +156,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
         $errors['_qf_default'] = $missingFields;
       }
     }
-
-    if (!empty($fields['saveMapping'])) {
-      $nameField = $fields['saveMappingName'] ?? NULL;
-      if (empty($nameField)) {
-        $errors['saveMappingName'] = ts('Name is required to save Import Mapping');
-      }
-      else {
-        if (CRM_Core_BAO_Mapping::checkMapping($nameField, CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Import Activity'))) {
-          $errors['saveMappingName'] = ts('Duplicate Import Mapping Name');
-        }
-      }
-    }
-
-    if (empty($errors['_qf_default'])) {
-      unset($errors['_qf_default']);
-    }
-    if (!empty($errors)) {
-      if (!empty($errors['saveMappingName'])) {
-        $_flag = 1;
-        $assignError = new CRM_Core_Page();
-        $assignError->assign('mappingDetailsError', $_flag);
-      }
-      return $errors;
-    }
-
-    return TRUE;
+    return $errors ?: TRUE;
   }
 
   /**
