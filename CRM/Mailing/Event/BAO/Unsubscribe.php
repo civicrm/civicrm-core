@@ -401,13 +401,15 @@ WHERE  email = %2
     $bao->body_text = $text;
     $bao->body_html = $html;
     $tokens = $bao->getTokens();
+    $templates = $bao->getTemplates();
+
     if ($eq->format == 'HTML' || $eq->format == 'Both') {
-      $html = CRM_Utils_Token::replaceUnsubscribeTokens($html, $domain, $groups, TRUE, $eq->contact_id, $eq->hash);
+      $html = CRM_Utils_Token::replaceUnsubscribeTokens($templates['html'], $domain, $groups, TRUE, $eq->contact_id, $eq->hash);
       $html = CRM_Utils_Token::replaceActionTokens($html, $addresses, $urls, TRUE, $tokens['html']);
       $html = CRM_Utils_Token::replaceMailingTokens($html, $dao, NULL, $tokens['html']);
     }
     if (!$html || $eq->format == 'Text' || $eq->format == 'Both') {
-      $text = CRM_Utils_Token::replaceUnsubscribeTokens($text, $domain, $groups, FALSE, $eq->contact_id, $eq->hash);
+      $text = CRM_Utils_Token::replaceUnsubscribeTokens($templates['text'], $domain, $groups, FALSE, $eq->contact_id, $eq->hash);
       $text = CRM_Utils_Token::replaceActionTokens($text, $addresses, $urls, FALSE, $tokens['text']);
       $text = CRM_Utils_Token::replaceMailingTokens($text, $dao, NULL, $tokens['text']);
     }

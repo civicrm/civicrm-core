@@ -107,8 +107,13 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
       $text = CRM_Utils_String::htmlToText($component->body_html);
     }
 
-    $html = CRM_Utils_Token::replaceWelcomeTokens($html, $group->title, TRUE);
-    $text = CRM_Utils_Token::replaceWelcomeTokens($text, $group->title, FALSE);
+    $bao = new CRM_Mailing_BAO_Mailing();
+    $bao->body_text = $text;
+    $bao->body_html = $html;
+    $templates = $bao->getTemplates();
+
+    $html = CRM_Utils_Token::replaceWelcomeTokens($templates['html'], $group->title, TRUE);
+    $text = CRM_Utils_Token::replaceWelcomeTokens($templates['text'], $group->title, FALSE);
 
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
       'controller' => __CLASS__,

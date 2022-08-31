@@ -222,8 +222,13 @@ SELECT     civicrm_email.id as email_id
       $text = CRM_Utils_String::htmlToText($component->body_html);
     }
 
-    $html = CRM_Utils_Token::replaceSubscribeTokens($html, $group->title, $url, TRUE);
-    $text = CRM_Utils_Token::replaceSubscribeTokens($text, $group->title, $url, FALSE);
+    $bao = new CRM_Mailing_BAO_Mailing();
+    $bao->body_text = $text;
+    $bao->body_html = $html;
+    $templates = $bao->getTemplates();
+
+    $html = CRM_Utils_Token::replaceSubscribeTokens($templates['html'], $group->title, $url, TRUE);
+    $text = CRM_Utils_Token::replaceSubscribeTokens($templates['text'], $group->title, $url, FALSE);
 
     // render the &amp; entities in text mode, so that the links work
     $text = str_replace('&amp;', '&', $text);
