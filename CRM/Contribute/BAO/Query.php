@@ -493,7 +493,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    * Get from clause.
    *
    * @param string $name
-   * @param string $mode
+   * @param int $mode
    * @param string $side
    *
    * @return NULL|string
