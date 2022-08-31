@@ -158,7 +158,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->_freqUnits = CRM_Core_SelectValues::getRecurringFrequencyUnits();
 
     //reminder_interval
-    $this->add('number', 'start_action_offset', ts('When'), ['class' => 'six', 'min' => 0]);
+    $this->add('number', 'start_action_offset', ts('When (trigger date)'), ['class' => 'six', 'min' => 0]);
     $this->addRule('start_action_offset', ts('Value should be a positive number'), 'positiveInteger');
 
     $isActive = ts('Scheduled Reminder Active');
