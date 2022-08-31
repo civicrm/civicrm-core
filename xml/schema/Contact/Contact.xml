@@ -335,7 +335,7 @@
     <default>"Both"</default>
     <import>false</import>
     <headerPattern>/^p(ref\w*\s)?m(ail\s)?f(orm\w*)$/i</headerPattern>
-    <comment>What is the preferred mode of sending an email.</comment>
+    <comment>Deprecated setting for text vs html mailings</comment>
     <add>1.1</add>
     <pseudoconstant>
       <callback>CRM_Core_SelectValues::pmf</callback>
@@ -344,6 +344,7 @@
       <type>Select</type>
       <label>Preferred Mail Format</label>
     </html>
+    <deprecated>true</deprecated>
   </field>
   <field>
     <name>hash</name>
