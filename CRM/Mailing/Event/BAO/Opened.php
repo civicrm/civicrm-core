@@ -108,7 +108,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    * @see https://issues.civicrm.org/jira/browse/CRM-12814
    * Get opened count for each mailing for a given set of mailing IDs
    *
-   * @param $mailingIDs
+   * @param int[] $mailingIDs
    *
    * @return array
    *   Opened count per mailing ID

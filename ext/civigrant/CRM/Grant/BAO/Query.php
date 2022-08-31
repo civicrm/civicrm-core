@@ -227,8 +227,8 @@ class CRM_Grant_BAO_Query extends CRM_Contact_BAO_Query_Interface {
 
   /**
    * @param string $name
-   * @param $mode
-   * @param $side
+   * @param int $mode
+   * @param string $side
    *
    * @return null|string
    */

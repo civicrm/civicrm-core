@@ -974,8 +974,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *   The array of contact details to send the email.
    * @param string $subject
    *   The subject of the message.
-   * @param $text
-   * @param $html
+   * @param string|null $text
+   * @param string|null $html
    * @param string $emailAddress
    *   Use this 'to' email address instead of the default Primary address.
    * @param int|null $userID
@@ -1277,7 +1277,7 @@ WHERE entity_id =%1 AND entity_table = %2";
    *
    * @param int $toID
    *   The contact id of the recipient.
-   * @param $tokenText
+   * @param string $tokenText
    * @param array $smsProviderParams
    *   The params used for sending sms.
    * @param int $activityID
@@ -1348,8 +1348,8 @@ WHERE entity_id =%1 AND entity_table = %2";
    *   The contact id of the recipient.
    * @param string $subject
    *   The subject of the message.
-   * @param $text_message
-   * @param $html_message
+   * @param string|null $text_message
+   * @param string|null $html_message
    * @param string $emailAddress
    *   Use this 'to' email address instead of the default Primary address.
    * @param int $activityID
@@ -1723,7 +1723,7 @@ WHERE      activity.id IN ($activityIds)";
   /**
    * Get all prior activities of currently viewed activity.
    *
-   * @param $activityID
+   * @param int $activityID
    *   Current activity id.
    * @param bool $onlyPriorRevisions
    *

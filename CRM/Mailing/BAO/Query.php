@@ -149,8 +149,8 @@ class CRM_Mailing_BAO_Query {
 
   /**
    * @param string $name
-   * @param $mode
-   * @param $side
+   * @param int $mode
+   * @param string $side
    *
    * @return null|string
    */

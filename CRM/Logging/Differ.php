@@ -53,7 +53,7 @@ class CRM_Logging_Differ {
   }
 
   /**
-   * @param $table
+   * @param string $table
    * @param int $contactID
    *
    * @return array
