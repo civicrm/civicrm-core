@@ -22,7 +22,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
    * @param int $param
    *   Year.
    *
-   * @return array
+   * @return array|null
    *   associated array
    */
   public static function contributionChartMonthly($param) {
@@ -61,7 +61,7 @@ INNER JOIN   civicrm_contact AS contact ON ( contact.id = contrib.contact_id )
   /**
    * Get the contribution details by year.
    *
-   * @return array
+   * @return array|null
    *   associated array
    */
   public static function contributionChartYearly() {

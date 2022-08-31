@@ -118,7 +118,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
     $chartInfoYearly = CRM_Contribute_BAO_Contribution_Utils::contributionChartYearly();
 
     //get the years.
-    $this->_years = $chartInfoYearly['By Year'];
+    $this->_years = $chartInfoYearly['By Year'] ?? [];
     $hasContributions = FALSE;
     if (is_array($chartInfoYearly)) {
       $hasContributions = TRUE;
