@@ -58,7 +58,7 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @return CRM_Utils_Check_Message[]
+   * @return array
    *   Each item is an array with keys:
    *     - name: string, an abstract name
    *     - path: string, a full file path
