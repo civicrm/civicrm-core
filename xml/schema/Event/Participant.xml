@@ -38,6 +38,7 @@
     <comment>FK to Contact ID</comment>
     <html>
       <label>Contact</label>
+      <type>EntityRef</type>
     </html>
     <add>1.7</add>
   </field>
@@ -57,6 +58,7 @@
     <comment>FK to Event ID</comment>
     <html>
       <label>Event</label>
+      <type>EntityRef</type>
     </html>
     <add>1.7</add>
   </field>
