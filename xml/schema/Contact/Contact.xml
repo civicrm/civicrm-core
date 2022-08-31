@@ -873,6 +873,7 @@
     <required>false</required>
     <export>true</export>
     <default>NULL</default>
+    <readonly>true</readonly>
     <html>
       <label>Created Date</label>
     </html>
