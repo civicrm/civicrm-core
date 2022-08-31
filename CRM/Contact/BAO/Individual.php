@@ -344,53 +344,6 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
   }
 
   /**
-   * Regenerates display_name for contacts with given prefixes/suffixes.
-   *
-   * @param array $ids
-   *   The array with the prefix/suffix id governing which contacts to regenerate.
-   * @param int $action
-   *   The action describing whether prefix/suffix was UPDATED or DELETED.
-   */
-  public static function updateDisplayNames(&$ids, $action) {
-    // get the proper field name (prefix_id or suffix_id) and its value
-    $fieldName = '';
-    foreach ($ids as $key => $value) {
-      switch ($key) {
-        case 'individualPrefix':
-          $fieldName = 'prefix_id';
-          $fieldValue = $value;
-          break 2;
-
-        case 'individualSuffix':
-          $fieldName = 'suffix_id';
-          $fieldValue = $value;
-          break 2;
-      }
-    }
-    if ($fieldName == '') {
-      return;
-    }
-
-    // query for the affected individuals
-    $fieldValue = CRM_Utils_Type::escape($fieldValue, 'Integer');
-    $contact = new CRM_Contact_BAO_Contact();
-    $contact->$fieldName = $fieldValue;
-    $contact->find();
-
-    // iterate through the affected individuals and rebuild their display_names
-    while ($contact->fetch()) {
-      $contact = new CRM_Contact_BAO_Contact();
-      $contact->id = $contact->contact_id;
-      if ($action == CRM_Core_Action::DELETE) {
-        $contact->$fieldName = 'NULL';
-        $contact->save();
-      }
-      $contact->display_name = $contact->displayName();
-      $contact->save();
-    }
-  }
-
-  /**
    * Creates display name.
    *
    * @return string
