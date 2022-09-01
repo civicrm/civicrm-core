@@ -195,7 +195,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate(['email' => 'mum@example.com']);
     $pledgeID = $this->pledgeCreate(['contact_id' => $contactID]);
     $this->importCSV('pledge.csv', [
-      ['name' => 'email'],
+      ['name' => 'email_primary.email'],
       ['name' => 'total_amount'],
       ['name' => 'pledge_id'],
       ['name' => 'receive_date'],
@@ -242,7 +242,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $parser = new CRM_Contribute_Import_Parser_Contribution();
     $parser->setUserJobID($this->getUserJobID());
     $fields = $parser->getFieldsMetadata();
-    $this->assertArrayHasKey('phone', $fields);
+    $this->assertArrayHasKey('phone_primary.phone', $fields);
     $this->callApiSuccess('RuleGroup', 'create', [
       'id' => $unsupervisedRuleGroup['id'],
       'used' => 'Unsupervised',
@@ -396,7 +396,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => ''],
       ['name' => 'receive_date'],
       ['name' => 'financial_type_id'],
-      ['name' => 'email'],
+      ['name' => 'email_primary.email'],
       ['name' => ''],
       ['name' => ''],
       ['name' => 'trxn_id'],
@@ -662,7 +662,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'total_amount'],
       ['name' => 'receive_date'],
       ['name' => 'financial_type_id'],
-      ['name' => 'email'],
+      ['name' => 'email_primary.email'],
       ['name' => 'contribution_source'],
       ['name' => 'note'],
       ['name' => 'trxn_id'],

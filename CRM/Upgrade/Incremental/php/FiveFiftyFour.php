@@ -44,6 +44,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyFour extends CRM_Upgrade_Incremental_
     $this->addTask('Increase field length of civicrm_dedupe_rule_group.name', 'alterDedupeRuleGroupName');
     $this->addTask('Add index civicrm_dedupe_rule_group.UI_name', 'addIndex', 'civicrm_dedupe_rule_group', 'name', 'UI');
     $this->addTask('Install Elavon Payment Processor Extension as needed', 'installElavonPaymentProcessorExtension');
+    $this->addTask('Convert field names for contribution import saved mappings', 'updateContributionMappings');
   }
 
   public static function addCreatedIDColumnToParticipant($ctx): bool {
@@ -143,6 +144,65 @@ class CRM_Upgrade_Incremental_php_FiveFiftyFour extends CRM_Upgrade_Incremental_
       CHANGE `submit_time` `submit_time` timestamp NOT NULL COMMENT \'date on which this item was submitted to the queue\',
       CHANGE `release_time` `release_time` timestamp NULL DEFAULT NULL COMMENT \'date on which this job becomes available; null if ASAP\'
     ');
+    return TRUE;
+  }
+
+  /**
+   * Update saved mappings for contribution imports to use apiv4 style field names.
+   *
+   * In time we will do this to the other imports.
+   *
+   * @return true
+   */
+  public static function updateContributionMappings(): bool {
+    $mappingTypeID = (int) CRM_Core_DAO::singleValueQuery("
+      SELECT option_value.value
+      FROM civicrm_option_value option_value
+        INNER JOIN civicrm_option_group option_group
+        ON option_group.id = option_value.option_group_id
+        AND option_group.name =  'mapping_type'
+      WHERE option_value.name = 'Import Contribution'");
+
+    $mappingFields = CRM_Core_DAO::executeQuery('
+      SELECT field.id, field.name FROM civicrm_mapping_field field
+        INNER JOIN civicrm_mapping mapping
+          ON field.mapping_id = mapping.id
+          AND mapping_type_id = ' . $mappingTypeID
+    );
+    // Only dedupe fields could be stored. Phone number, email, address fields & custom fields
+    // is a realistic set. The impact of missing something is pretty minor as saved field mappings
+    // are easy to update during import & people normally do a visual check - so hard coding a list
+    // feels more future-proof than doing it by code.
+    $fieldsToConvert = [
+      'email' => 'email_primary.email',
+      'phone' => 'phone_primary.phone',
+      'street_address' => 'address_primary.street_address',
+      'supplemental_address_1' => 'address_primary.supplemental_address_1',
+      'supplemental_address_2' => 'address_primary.supplemental_address_2',
+      'supplemental_address_3' => 'address_primary.supplemental_address_3',
+      'city' => 'address_primary.city',
+      'county_id' => 'address_primary.county_id',
+      'state_province_id' => 'address_primary.state_province_id',
+      'country_id' => 'address_primary.country_id',
+    ];
+    $customFields = CRM_Core_DAO::executeQuery('
+      SELECT custom_field.id, custom_field.name, custom_group.name as custom_group_name
+      FROM civicrm_custom_field custom_field INNER JOIN civicrm_custom_group custom_group
+      ON custom_field.custom_group_id = custom_group.id
+      WHERE extends IN ("Contact", "Individual", "Organization", "Household")
+    ');
+    while ($customFields->fetch()) {
+      $fieldsToConvert['custom_' . $customFields->id] = $customFields->custom_group_name . '.' . $customFields->name;
+    }
+    while ($mappingFields->fetch()) {
+      // Convert the field.
+      if (isset($fieldsToConvert[$mappingFields->name])) {
+        CRM_Core_DAO::executeQuery(' UPDATE civicrm_mapping_field SET name = %1 WHERE id = %2', [
+          1 => [$fieldsToConvert[$mappingFields->name], 'String'],
+          2 => [$mappingFields->id, 'Integer'],
+        ]);
+      }
+    }
     return TRUE;
   }
 

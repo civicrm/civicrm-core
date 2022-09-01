@@ -9,12 +9,15 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Address;
 use Civi\Api4\Campaign;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\DedupeRule;
 use Civi\Api4\DedupeRuleGroup;
+use Civi\Api4\Email;
 use Civi\Api4\Event;
+use Civi\Api4\Phone;
 use Civi\Api4\UserJob;
 use Civi\UserJob\UserJobInterface;
 
@@ -316,7 +319,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @return array[]
    */
   protected function getContactFields(string $contactType): array {
-    $contactFields = CRM_Contact_BAO_Contact::importableFields($contactType, NULL);
+    $contactFields = $this->getAllContactFields('');
     $dedupeFields = $this->getDedupeFields($contactType);
 
     $contactFieldsForContactLookup = [];
@@ -2233,34 +2236,40 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *
    * @param array $params
    * @param int|null $dedupeRuleID
+   * @param bool $isApiMetadata
+   *   Is the import using api4 style metadata (in which case no conversion needed) - eventually
+   *   only contact import will use a different style (as it supports multiple locations) and the
+   *   handling will be in that class.
    *
    * @return array
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getPossibleMatchesByDedupeRule(array $params, $dedupeRuleID = NULL): array {
-    foreach (['email', 'address', 'phone', 'im'] as $locationEntity) {
-      if (array_key_exists($locationEntity, $params)) {
-        // Prefer primary
-        if (array_key_exists('Primary', $params[$locationEntity])) {
-          $locationParams = $params[$locationEntity]['Primary'];
+  protected function getPossibleMatchesByDedupeRule(array $params, $dedupeRuleID = NULL, $isApiMetadata = TRUE): array {
+    if ($isApiMetadata === FALSE) {
+      foreach (['email', 'address', 'phone', 'im'] as $locationEntity) {
+        if (array_key_exists($locationEntity, $params)) {
+          // Prefer primary
+          if (array_key_exists('Primary', $params[$locationEntity])) {
+            $locationParams = $params[$locationEntity]['Primary'];
+          }
+          else {
+            // Chose the first one - at least they can manipulate the order.
+            $locationParams = reset($params[$locationEntity]);
+          }
+          foreach ($locationParams as $key => $locationParam) {
+            // Even though we might not be using 'primary' we 'pretend' here
+            // since the apiv4 code expects that...
+            $params[$locationEntity . '_primary' . '.' . $key] = $locationParam;
+          }
+          unset($params[$locationEntity]);
         }
-        else {
-          // Chose the first one - at least they can manipulate the order.
-          $locationParams = reset($params[$locationEntity]);
-        }
-        foreach ($locationParams as $key => $locationParam) {
-          // Even though we might not be using 'primary' we 'pretend' here
-          // since the apiv4 code expects that...
-          $params[$locationEntity . '_primary' . '.' . $key] = $locationParam;
-        }
-        unset($params[$locationEntity]);
       }
-    }
-    foreach ($params as $key => $value) {
-      if (strpos($key, 'custom_') === 0) {
-        $params[$this->getApi4Name($key)] = $value;
-        unset($params[$key]);
+      foreach ($params as $key => $value) {
+        if (strpos($key, 'custom_') === 0) {
+          $params[$this->getApi4Name($key)] = $value;
+          unset($params[$key]);
+        }
       }
     }
     $dedupeRule = $dedupeRuleID ? $this->getDedupeRuleName($dedupeRuleID) : $this->getDefaultRuleForContactType($params['contact_type']);
@@ -2344,6 +2353,110 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    */
   protected function getDedupeFields(string $contactType): array {
     return $this->getDedupeRule($contactType)['fields'];
+  }
+
+  /**
+   * Get all contact import fields metadata.
+   *
+   * @param string $prefix
+   *
+   * @return array
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  protected function getAllContactFields(string $prefix = 'Contact.'): array {
+    $allContactFields = (array) Contact::getFields()
+      ->addWhere('readonly', '=', FALSE)
+      ->addWhere('type', 'IN', ['Field', 'Custom'])
+      ->addWhere('fk_entity', 'IS EMPTY')
+      ->addOrderBy('title')
+      ->execute()->indexBy('name');
+
+    $contactTypeFields['Individual'] = (array) Contact::getFields()
+      ->addWhere('readonly', '=', FALSE)
+      ->addWhere('type', 'IN', ['Field', 'Custom'])
+      ->addWhere('fk_entity', 'IS EMPTY')
+      ->setSelect(['name'])
+      ->addValue('contact_type', 'Individual')
+      ->addOrderBy('title')
+      ->execute()->indexBy('name');
+
+    $contactTypeFields['Organization'] = (array) Contact::getFields()
+      ->addWhere('readonly', '=', FALSE)
+      ->addWhere('type', 'IN', ['Field', 'Custom'])
+      ->addWhere('fk_entity', 'IS EMPTY')
+      ->setSelect(['name'])
+      ->addValue('contact_type', 'Organization')
+      ->addOrderBy('title')
+      ->execute()->indexBy('name');
+
+    $contactTypeFields['Household'] = (array) Contact::getFields()
+      ->addWhere('readonly', '=', FALSE)
+      ->addWhere('type', 'IN', ['Field', 'Custom'])
+      ->addWhere('fk_entity', 'IS EMPTY')
+      ->setSelect(['name'])
+      ->addOrderBy('title')
+      ->execute()->indexBy('name');
+
+    $prefixedFields = [];
+    foreach ($allContactFields as $fieldName => $field) {
+      $field['contact_type'] = [];
+      foreach ($contactTypeFields as $contactTypeName => $fields) {
+        if (array_key_exists($fieldName, $fields)) {
+          $field['contact_type'][$contactTypeName] = $contactTypeName;
+        }
+      }
+      $fieldName = $prefix . $fieldName;
+      if (!empty($field['custom_field_id'])) {
+        $this->customFieldNameMap['custom_' . $field['custom_field_id']] = $fieldName;
+      }
+      $prefixedFields[$fieldName] = $field;
+    }
+
+    $addressFields = (array) Address::getFields()
+      ->addWhere('readonly', '=', FALSE)
+      ->addWhere('type', 'IN', ['Field', 'Custom'])
+      ->addOrderBy('title')
+      // Exclude these fields to keep it simpler for now - we just map to primary
+      ->addWhere('name', 'NOT IN', ['id', 'location_type_id', 'master_id'])
+      ->execute()->indexBy('name');
+    foreach ($addressFields as $fieldName => $field) {
+      // Set entity to contact as primary fields used in Contact actions
+      $field['entity'] = 'Contact';
+      $field['name'] = 'address_primary.' . $fieldName;
+      $field['contact_type'] = ['Individual', 'Organization', 'Household'];
+      $prefixedFields[$prefix . 'address_primary.' . $fieldName] = $field;
+    }
+
+    $phoneFields = (array) Phone::getFields()
+      ->addWhere('readonly', '=', FALSE)
+      ->addWhere('type', 'IN', ['Field', 'Custom'])
+      // Exclude these fields to keep it simpler for now - we just map to primary
+      ->addWhere('name', 'NOT IN', ['id', 'location_type_id', 'phone_type_id'])
+      ->addOrderBy('title')
+      ->execute()->indexBy('name');
+    foreach ($phoneFields as $fieldName => $field) {
+      $field['entity'] = 'Contact';
+      $field['name'] = 'phone_primary.' . $fieldName;
+      $field['contact_type'] = ['Individual', 'Organization', 'Household'];
+      $prefixedFields[$prefix . 'phone_primary.' . $fieldName] = $field;
+    }
+
+    $emailFields = (array) Email::getFields()
+      ->addWhere('readonly', '=', FALSE)
+      ->addWhere('type', 'IN', ['Field', 'Custom'])
+      // Exclude these fields to keep it simpler for now - we just map to primary
+      ->addWhere('name', 'NOT IN', ['id', 'location_type_id'])
+      ->addOrderBy('title')
+      ->execute()->indexBy('name');
+
+    foreach ($emailFields as $fieldName => $field) {
+      $field['entity'] = 'Contact';
+      $field['name'] = 'email_primary.' . $fieldName;
+      $field['contact_type'] = ['Individual', 'Organization', 'Household'];
+      $prefixedFields[$prefix . 'email_primary.' . $fieldName] = $field;
+    }
+    return $prefixedFields;
   }
 
 }
