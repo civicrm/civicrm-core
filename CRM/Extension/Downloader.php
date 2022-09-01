@@ -18,9 +18,43 @@
 class CRM_Extension_Downloader {
 
   /**
+   * @var CRM_Extension_Manager
+   */
+  private $manager;
+
+  /**
+   * @var string
+   */
+  private $containerDir;
+
+  /**
+   * @var string
+   * Local path to a temporary data directory
+   */
+  public $tmpDir;
+
+  /**
    * @var GuzzleHttp\Client
    */
   protected $guzzleClient;
+
+  /**
+   * @var CRM_Extension_Container_Basic
+   * The place where downloaded extensions are ultimately stored
+   */
+  public $container;
+
+  /**
+   * @param CRM_Extension_Manager $manager
+   * @param string $containerDir
+   *   The place to store downloaded & extracted extensions.
+   * @param string $tmpDir
+   */
+  public function __construct(CRM_Extension_Manager $manager, $containerDir, $tmpDir) {
+    $this->manager = $manager;
+    $this->containerDir = $containerDir;
+    $this->tmpDir = $tmpDir;
+  }
 
   /**
    * @return \GuzzleHttp\Client
@@ -34,30 +68,6 @@ class CRM_Extension_Downloader {
    */
   public function setGuzzleClient(\GuzzleHttp\Client $guzzleClient) {
     $this->guzzleClient = $guzzleClient;
-  }
-
-  /**
-   * @var CRM_Extension_Container_Basic
-   * The place where downloaded extensions are ultimately stored
-   */
-  public $container;
-
-  /**
-   * @var string
-   * Local path to a temporary data directory
-   */
-  public $tmpDir;
-
-  /**
-   * @param CRM_Extension_Manager $manager
-   * @param string $containerDir
-   *   The place to store downloaded & extracted extensions.
-   * @param string $tmpDir
-   */
-  public function __construct(CRM_Extension_Manager $manager, $containerDir, $tmpDir) {
-    $this->manager = $manager;
-    $this->containerDir = $containerDir;
-    $this->tmpDir = $tmpDir;
   }
 
   /**
@@ -121,7 +131,6 @@ class CRM_Extension_Downloader {
    */
   public function download($key, $downloadUrl) {
     $filename = $this->tmpDir . DIRECTORY_SEPARATOR . $key . '.zip';
-    $destDir = $this->containerDir . DIRECTORY_SEPARATOR . $key;
 
     if (!$downloadUrl) {
       throw new CRM_Extension_Exception(ts('Cannot install this extension - downloadUrl is not set!'));
