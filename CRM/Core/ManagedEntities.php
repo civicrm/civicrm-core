@@ -336,30 +336,36 @@ class CRM_Core_ManagedEntities {
         throw new CRM_Core_Exception('Unrecognized cleanup policy: ' . $policy);
     }
 
-    // APIv4 delete - deletion from `civicrm_managed` will be taken care of by
-    // CRM_Core_BAO_Managed::on_hook_civicrm_post()
-    if ($doDelete && CRM_Core_BAO_Managed::isApi4ManagedType($item['entity_type'])) {
-      civicrm_api4($item['entity_type'], 'delete', [
-        'checkPermissions' => FALSE,
-        'where' => [['id', '=', $item['entity_id']]],
-      ]);
-    }
-    // APIv3 delete
-    elseif ($doDelete) {
-      $params = [
-        'version' => 3,
-        'id' => $item['entity_id'],
-      ];
-      $check = civicrm_api3($item['entity_type'], 'get', $params);
-      if ($check['count']) {
-        $result = civicrm_api($item['entity_type'], 'delete', $params);
-        if ($result['is_error']) {
-          if (isset($item['name'])) {
-            $params['name'] = $item['name'];
+    // Delete the entity and the managed record
+    if ($doDelete) {
+      // APIv4 delete
+      if (CRM_Core_BAO_Managed::isApi4ManagedType($item['entity_type'])) {
+        civicrm_api4($item['entity_type'], 'delete', [
+          'checkPermissions' => FALSE,
+          'where' => [['id', '=', $item['entity_id']]],
+        ]);
+      }
+      // APIv3 delete
+      else {
+        $params = [
+          'version' => 3,
+          'id' => $item['entity_id'],
+        ];
+        $check = civicrm_api3($item['entity_type'], 'get', $params);
+        if ($check['count']) {
+          $result = civicrm_api($item['entity_type'], 'delete', $params);
+          if ($result['is_error']) {
+            if (isset($item['name'])) {
+              $params['name'] = $item['name'];
+            }
+            $this->onApiError($item['entity_type'], 'delete', $params, $result);
           }
-          $this->onApiError($item['entity_type'], 'delete', $params, $result);
         }
       }
+      // Ensure managed record is deleted.
+      // Note: in many cases CRM_Core_BAO_Managed::on_hook_civicrm_post() will take care of
+      // deleting it, but there may be edge cases, such as the source record no longer existing,
+      // so just to be sure - we need to do this as the final step.
       CRM_Core_DAO::executeQuery('DELETE FROM civicrm_managed WHERE id = %1', [
         1 => [$item['id'], 'Integer'],
       ]);
