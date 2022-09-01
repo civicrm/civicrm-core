@@ -76,6 +76,7 @@ class CRM_Core_ManagedEntities {
    *   API representation, or NULL if the entity does not exist
    */
   public function get($moduleName, $name) {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     $dao = new CRM_Core_DAO_Managed();
     $dao->module = $moduleName;
     $dao->name = $name;
