@@ -179,7 +179,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
    * @return array
    */
   protected function getRequiredFields(): array {
-    return [['activity_type_id' => ts('Activity Type'), 'activity_date_time' => ts('Activity Date')]];
+    return [['activity_type_id', 'activity_date_time']];
   }
 
   /**

@@ -125,7 +125,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate();
     $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type_id' => 'Donation', 'payment_instrument_id' => 'Check', 'contribution_status_id' => 'Pending'];
     // Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP, NULL);
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
     $this->assertEquals('Pending Label**', $contribution['contribution_status']);
 
@@ -172,13 +172,13 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate();
     $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type_id' => 'Donation', 'payment_instrument_id' => 'Check', 'contribution_status_id' => 'Pending'];
     // Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP, NULL);
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP);
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['contact_id' => $contactID]);
     $this->createCustomGroupWithFieldOfType([], 'radio');
     $values['contribution_id'] = $contribution['id'];
     $values[$this->getCustomFieldName('radio')] = 'Red Testing';
     unset(Civi::$statics['CRM_Core_BAO_OptionGroup']);
-    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE);
     $contribution = $this->callAPISuccess('Contribution', 'get', ['contact_id' => $contactID, $this->getCustomFieldName('radio') => 'Red Testing']);
     $this->assertEquals(5, $contribution['values'][$contribution['id']]['custom_' . $this->ids['CustomField']['radio']]);
     $this->callAPISuccess('CustomField', 'delete', ['id' => $this->ids['CustomField']['radio']]);
@@ -260,8 +260,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type_id' => 'Donation', $customField => 'L,V'];
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP, NULL);
     $initialContribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
-    $this->assertContains('L', $initialContribution[$customField], "Contribution Duplicate Skip Import contains L");
-    $this->assertContains('V', $initialContribution[$customField], "Contribution Duplicate Skip Import contains V");
+    $this->assertContains('L', $initialContribution[$customField], 'Contribution Duplicate Skip Import contains L');
+    $this->assertContains('V', $initialContribution[$customField], 'Contribution Duplicate Skip Import contains V');
 
     // Now update.
     $values['contribution_id'] = $initialContribution['id'];
@@ -330,6 +330,64 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->importContributionsDotCSV();
     $contribution = Contribution::get()->execute()->first();
     $this->assertEquals($anthony, $contribution['contact_id']);
+  }
+
+  /**
+   * Test that a trxn_id is enough in update mode to void the total_amount requirement.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportFieldsNotRequiredWithTrxnID(): void {
+    $this->individualCreate(['email' => 'mum@example.com']);
+    $fieldMappings = [
+      ['name' => 'first_name'],
+      ['name' => ''],
+      ['name' => 'receive_date'],
+      ['name' => 'financial_type_id'],
+      ['name' => 'email'],
+      ['name' => ''],
+      ['name' => ''],
+      ['name' => 'trxn_id'],
+    ];
+    // First we try to create without total_amount mapped.
+    // It will fail in create mode as total_amount is required for create.
+    $this->submitDataSourceForm('contributions.csv', $fieldMappings, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
+    $form = $this->getMapFieldForm([
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+      'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
+      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+    ]);
+    $form->setUserJobID($this->userJobID);
+    $form->buildForm();
+    $this->assertFalse($form->validate());
+    $this->assertEquals(['_qf_default' => 'Missing required field: Total Amount'], $form->_errors);
+
+    // Now we add in total amount - it works in create mode.
+    $fieldMappings[1]['name'] = 'total_amount';
+    $this->importCSV('contributions.csv', $fieldMappings, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
+
+    $row = $this->getDataSource()->getRows()[0];
+    $this->assertEquals('IMPORTED', $row[9]);
+    $contribution = Contribution::get()->addSelect('source', 'id')->execute()->first();
+    $this->assertEmpty($contribution['source']);
+
+    // Now we re-import as an update, only setting the 'source' field.
+    $fieldMappings = [
+      ['name' => ''],
+      ['name' => ''],
+      ['name' => ''],
+      ['name' => ''],
+      ['name' => ''],
+      ['name' => ''],
+      ['name' => 'contribution_source'],
+      ['name' => 'trxn_id'],
+    ];
+    $this->importCSV('contributions.csv', $fieldMappings, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
+
+    $row = $this->getDataSource()->getRows()[0];
+    $this->assertEquals('IMPORTED', $row[9]);
+    $contribution = Contribution::get()->addSelect('source', 'id')->execute()->first();
+    $this->assertEquals('Call him back', $contribution['source']);
   }
 
   /**
@@ -416,7 +474,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   /**
    * @param array $submittedValues
    *
-   * @return array
+   * @return int
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
