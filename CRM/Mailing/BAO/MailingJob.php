@@ -685,7 +685,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         // Handle SMS errors: CRM-15426
         $job_id = intval($this->id);
         $mailing_id = intval($mailing->id);
-        CRM_Core_Error::debug_log_message("Failed to send SMS message. Vars: mailing_id: ${mailing_id}, job_id: ${job_id}. Error message follows.");
+        CRM_Core_Error::debug_log_message("Failed to send SMS message. Vars: mailing_id: {$mailing_id}, job_id: {$job_id}. Error message follows.");
         CRM_Core_Error::debug_log_message($result->getMessage());
       }
       else {

@@ -203,7 +203,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
       SELECT SUM(fi.amount) total
       FROM civicrm_financial_item fi
         INNER JOIN civicrm_line_item li ON li.id = fi.entity_id AND fi.entity_table = 'civicrm_line_item'
-      WHERE li.entity_table = 'civicrm_participant' AND li.entity_id = ${participantId}
+      WHERE li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantId}
     ";
     $dao = CRM_Core_DAO::executeQuery($query);
 

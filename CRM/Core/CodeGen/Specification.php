@@ -591,7 +591,7 @@ class CRM_Core_CodeGen_Specification {
     // all fieldnames have to be defined and should exist in schema.
     foreach ($primaryKey['field'] as $fieldName) {
       if (!$fieldName) {
-        echo "Invalid field definition for index '$name' in table ${table['name']}\n";
+        echo "Invalid field definition for index '$name' in table {$table['name']}\n";
         return;
       }
       $parenOffset = strpos($fieldName, '(');
@@ -599,7 +599,7 @@ class CRM_Core_CodeGen_Specification {
         $fieldName = substr($fieldName, 0, $parenOffset);
       }
       if (!array_key_exists($fieldName, $fields)) {
-        echo "Missing definition of field '$fieldName' for index '$name' in table ${table['name']}\n";
+        echo "Missing definition of field '$fieldName' for index '$name' in table {$table['name']}\n";
         print_r($fields);
         exit();
       }

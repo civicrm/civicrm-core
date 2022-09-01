@@ -78,7 +78,7 @@ class CRM_Mailing_BAO_SMSJob extends CRM_Mailing_BAO_MailingJob {
         // Handle SMS errors: CRM-15426
         $job_id = (int) $this->id;
         $mailing_id = (int) $mailing->id;
-        CRM_Core_Error::debug_log_message("Failed to send SMS message. Vars: mailing_id: ${mailing_id}, job_id: ${job_id}. Error message follows.");
+        CRM_Core_Error::debug_log_message("Failed to send SMS message. Vars: mailing_id: {$mailing_id}, job_id: {$job_id}. Error message follows.");
         CRM_Core_Error::debug_log_message($e->getMessage());
       }
 

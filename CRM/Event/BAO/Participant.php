@@ -1888,7 +1888,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     $timenow = new Datetime();
     if (!$isBackOffice && isset($time_limit)) {
       $cancelHours = abs($time_limit);
-      $cancelInterval = new DateInterval("PT${cancelHours}H");
+      $cancelInterval = new DateInterval("PT{$cancelHours}H");
       $cancelInterval->invert = $time_limit < 0 ? 1 : 0;
       $cancelDeadline = (new Datetime($start_date))->sub($cancelInterval);
       if ($timenow > $cancelDeadline) {
