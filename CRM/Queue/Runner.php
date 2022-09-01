@@ -77,6 +77,11 @@ class CRM_Queue_Runner {
   public $taskCtx;
 
   /**
+   * @var string
+   */
+  public $lastTaskTitle;
+
+  /**
    * Locate a previously-created instance of the queue-runner.
    *
    * @param string $qrid
