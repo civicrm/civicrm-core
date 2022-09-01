@@ -27,8 +27,8 @@ class AbstractActionFunctionTest extends Api4TestBase {
 
   public function testUndefinedParamException(): void {
     $this->expectException('API_Exception');
-    $this->expectExceptionMessage('Unknown api parameter: getLanguage');
-    \Civi\Api4\System::flush(FALSE)->getLanguage();
+    $this->expectExceptionMessage('Unknown api parameter: getTranslationMode');
+    \Civi\Api4\System::flush(FALSE)->getTranslationMode();
   }
 
 }

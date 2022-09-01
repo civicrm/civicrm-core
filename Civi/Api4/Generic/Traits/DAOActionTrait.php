@@ -19,20 +19,13 @@ use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\ReflectionUtils;
 
 /**
- * @method string getLanguage()
- * @method $this setLanguage(string $language)
+ * Common properties and helper-methods used for DB-oriented actions.
  */
 trait DAOActionTrait {
 
   /**
-   * Specify the language to use if this is a multi-lingual environment.
-   *
-   * E.g. "en_US" or "fr_CA"
-   *
-   * @var string
+   * @var array
    */
-  protected $language;
-
   private $_maxWeights = [];
 
   /**
