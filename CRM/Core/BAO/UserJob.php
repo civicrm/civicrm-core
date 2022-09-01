@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\UserJob;
 use Civi\Core\ClassScanner;
 use Civi\UserJob\UserJobInterface;
 
@@ -48,14 +49,14 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements \Civi\Core\Ho
    *
    * @param \CRM_Queue_Queue $queue
    * @param string $status
-   * @throws \API_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \CRM_Core_Exception
+   *
    * @see \CRM_Utils_Hook::queueStatus()
    */
-  public static function hook_civicrm_queueStatus(CRM_Queue_Queue $queue, string $status) {
+  public static function hook_civicrm_queueStatus(CRM_Queue_Queue $queue, string $status): void {
     $userJobId = static::findUserJobId($queue->getName());
     if ($userJobId && $status === 'completed') {
-      \Civi\Api4\UserJob::update()
+      UserJob::update(FALSE)
         ->addWhere('id', '=', $userJobId)
         ->setValues(['status_id' => 1])
         ->execute();
