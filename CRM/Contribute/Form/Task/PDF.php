@@ -231,7 +231,7 @@ AND    {$this->_componentClause}";
    *   Contribution Id.
    * @param array $params
    *   Parameter for pdf or email invoices.
-   * @param array $contactIds
+   * @param array|int $contactIds
    *   Contact Id.
    * @param bool $isCreatePDF
    *
@@ -240,7 +240,7 @@ AND    {$this->_componentClause}";
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public static function getElements(array $contribIds, array $params, array $contactIds, bool $isCreatePDF): array {
+  public static function getElements(array $contribIds, array $params, $contactIds, bool $isCreatePDF): array {
     $pdfElements = [];
     $pdfElements['details'] = self::getDetails(implode(',', $contribIds));
     $excludeContactIds = [];
