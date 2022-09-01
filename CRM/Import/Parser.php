@@ -1351,41 +1351,59 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @throws \CRM_Core_Exception Exception thrown if field requirements are not met.
    */
   protected function validateRequiredFields(array $requiredFields, array $params, $prefixString = ''): void {
-    if (empty($requiredFields)) {
+    $missingFields = $this->getMissingFields($requiredFields, $params);
+    if (empty($missingFields)) {
       return;
     }
+    throw new CRM_Core_Exception($prefixString . ts('Missing required fields:') . ' ' . implode(' ' . ts('OR') . ' ', $missingFields));
+  }
+
+  /**
+   * Get the field requirements that are missing from the params array.
+   *
+   * @param array $requiredFields
+   * @param array $params
+   *
+   * @return array
+   */
+  protected function getMissingFields(array $requiredFields, array $params): array {
     $missingFields = [];
+    if (empty($requiredFields)) {
+      return [];
+    }
     foreach ($requiredFields as $key => $required) {
       if (!is_array($required)) {
-        $importParameter = $params[$key] ?? [];
-        if (!is_array($importParameter)) {
-          if (!empty($importParameter)) {
-            return;
+        // In this case any match means we have a match so we return on
+        // our first hit.
+        if (!empty($params[$key])) {
+          if (!is_array($params[$key])) {
+            return [];
           }
-        }
-        else {
-          foreach ($importParameter as $locationValues) {
+          // Recurse the array looking for the key - eg. look for email
+          // in a location values array
+          foreach ($params[$key] as $locationValues) {
             if (!empty($locationValues[$key])) {
-              return;
+              unset($missingFields[$key]);
             }
           }
         }
-
         $missingFields[$key] = $required;
       }
       else {
         foreach ($required as $field => $label) {
+          // We have to find all the keys.
+          // Probably this function could call itself here for
+          // more accuracy but this is what in place.
           if (empty($params[$field])) {
             $missing[$field] = $label;
           }
         }
-        if (empty($missing)) {
-          return;
+        if (!empty($missing)) {
+          $missingFields[$key] = implode(' ' . ts('and') . ' ', $missing);
         }
-        $missingFields[$key] = implode(' ' . ts('and') . ' ', $missing);
       }
     }
-    throw new CRM_Core_Exception($prefixString . ts('Missing required fields:') . ' ' . implode(' ' . ts('OR') . ' ', $missingFields));
+    return $missingFields;
   }
 
   /**
