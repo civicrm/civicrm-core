@@ -89,7 +89,6 @@
         var filteredData = model.filterData ? model.filterData(exampleData) : exampleData;
         return crmApi4('WorkflowMessage', 'render', {
           language: $ctrl.lang,
-          translationLanguage: $ctrl.lang,
           workflow: filteredData.workflow,
           values: filteredData.modelProps,
           messageTemplate: model.revisions[$ctrl.revisionId].rec
