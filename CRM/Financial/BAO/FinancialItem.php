@@ -41,8 +41,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param object $contribution
    *   Contribution object.
    * @param bool $taxTrxnID
-   *
-   * @param int $trxnId
+   * @param array|null $trxnId
    *
    * @return CRM_Financial_DAO_FinancialItem
    */
