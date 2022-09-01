@@ -522,16 +522,29 @@
         function formatFields(fields, result, prefix) {
           prefix = typeof prefix === 'undefined' ? '' : prefix;
           _.each(fields, function(field) {
-            var item = {
-              id: prefix + field.name + (field.suffixes && _.includes(field.suffixes, suffix.replace(':', '')) ? suffix : ''),
-              text: field.label,
-              description: field.description
-            };
-            if (disabledIf(item.id)) {
-              item.disabled = true;
-            }
             if (_.includes(allowedTypes, field.type)) {
+              var fieldSuffix = field.suffixes && _.includes(field.suffixes, suffix.replace(':', '')) ? suffix : '';
+              var item = {
+                id: prefix + field.name + fieldSuffix,
+                text: field.label,
+                description: field.description
+              };
+              if (disabledIf(item.id)) {
+                item.disabled = true;
+              }
               result.push(item);
+              // For fields with both an FK and a pseudoconstant, show the id as well.
+              if (fieldSuffix && field.fk_entity) {
+                var idItem = {
+                  id: prefix + field.name,
+                  text: field.title,
+                  description: field.description
+                };
+                if (disabledIf(idItem.id)) {
+                  idItem.disabled = true;
+                }
+                result.push(idItem);
+              }
             }
           });
           return result;
