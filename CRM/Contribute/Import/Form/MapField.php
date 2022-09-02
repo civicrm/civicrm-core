@@ -181,15 +181,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
         if (array_key_exists($val, $ruleFields)) {
           $weightSum += $ruleFields[$val];
         }
-        if ($val == "soft_credit") {
-          $mapperKey = CRM_Utils_Array::key('soft_credit', $importKeys);
-          if (empty($fields['mapper'][$mapperKey][1])) {
-            if (empty($errors['_qf_default'])) {
-              $errors['_qf_default'] = '';
-            }
-            $errors['_qf_default'] .= ts('Missing required fields: Soft Credit') . '<br />';
-          }
-        }
       }
       foreach ($ruleFields as $field => $weight) {
         $fieldMessage .= ' ' . $field . '(weight ' . $weight . ')';
