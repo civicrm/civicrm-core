@@ -60,7 +60,7 @@ class ExampleDataTest extends Api4TestBase {
       ->execute()
       ->single();
     $this->assertEquals($name, $get['name']);
-    $this->assertEquals(100, $get['data']['modelProps']['contact']['contact_id']);
+    $this->assertEquals(100, $get['data']['modelProps']['contact']['id']);
   }
 
 }

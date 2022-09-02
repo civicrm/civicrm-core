@@ -1,4 +1,4 @@
-{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
+{assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
 
 <p>Thank you for signing {$petition.title}.</p>
 
