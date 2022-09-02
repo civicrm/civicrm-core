@@ -1276,10 +1276,6 @@ class CRM_Contact_BAO_Query {
 
                   //build locationType join
                   $locationTypeJoin[$tName] = " ( `$tName`.location_type_id = $ltName.id )";
-
-                  if ($addWhere) {
-                    $this->_whereTables[$tName] = $this->_tables[$tName];
-                  }
                   break;
 
                 case 'civicrm_state_province':
