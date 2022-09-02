@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  *
  * @package CRM
@@ -77,9 +79,6 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
 
     $transaction->commit();
 
-    $config = CRM_Core_Config::singleton();
-
-    $domain = CRM_Core_BAO_Domain::getDomain();
     list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
 
     list($display_name, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($se->contact_id);
@@ -111,13 +110,23 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $bao = new CRM_Mailing_BAO_Mailing();
     $bao->body_text = $text;
     $bao->body_html = $html;
-    $tokens = $bao->getTokens();
+    $templates = $bao->getTemplates();
 
-    $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html']);
-    $html = CRM_Utils_Token::replaceWelcomeTokens($html, $group->title, TRUE);
+    $html = CRM_Utils_Token::replaceWelcomeTokens($templates['html'], $group->title, TRUE);
+    $text = CRM_Utils_Token::replaceWelcomeTokens($templates['text'], $group->title, FALSE);
 
-    $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
-    $text = CRM_Utils_Token::replaceWelcomeTokens($text, $group->title, FALSE);
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+      'schema' => ['contactId'],
+    ]);
+
+    $tokenProcessor->addMessage('body_html', $html, 'text/html');
+    $tokenProcessor->addMessage('body_text', $text, 'text/plain');
+    $tokenProcessor->addRow(['contactId' => $contact_id]);
+    $tokenProcessor->evaluate();
+    $html = $tokenProcessor->getRow(0)->render('body_html');
+    $text = $tokenProcessor->getRow(0)->render('body_text');
 
     $mailParams = [
       'groupName' => 'Mailing Event ' . $component->component_type,
