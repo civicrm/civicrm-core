@@ -194,23 +194,17 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
    * @param string $replyto
    *   Optional reply-to from the reply.
    */
-  private static function autoRespond(&$mailing, $queue_id, $replyto) {
-    $config = CRM_Core_Config::singleton();
+  private static function autoRespond(&$mailing, $queue_id, $replyto): void {
 
-    $contacts = CRM_Contact_DAO_Contact::getTableName();
-    $email = CRM_Core_DAO_Email::getTableName();
-    $queue = CRM_Mailing_Event_DAO_Queue::getTableName();
-
-    $eq = new CRM_Core_DAO();
-    $eq->query(
-      "SELECT     $contacts.preferred_mail_format as format,
-                  $email.email as email,
-                  $queue.job_id as job_id,
-                  $queue.hash as hash
-        FROM        $contacts
-        INNER JOIN  $queue ON $queue.contact_id = $contacts.id
-        INNER JOIN  $email ON $queue.email_id = $email.id
-        WHERE       $queue.id = " . CRM_Utils_Type::escape($queue_id, 'Integer')
+    $eq = CRM_Core_DAO::executeQuery(
+      'SELECT civicrm_email.email as email,
+               civicrm_mailing_event_queue.job_id as job_id,
+               civicrm_mailing_event_queuee.hash as hash
+               civicrm_email.contact_id
+        FROM  civicrm_contact
+        INNER JOIN  civicrm_mailing_event_queue ON civicrm_mailing_event_queue.contact_id = civicrm_contact.id
+        INNER JOIN  civicrm_email ON civicrm_mailing_event_queue.email_id = civicrm_email.id
+        WHERE       civicrm_mailing_event_queue.id = ' . CRM_Utils_Type::escape($queue_id, 'Integer')
     );
     $eq->fetch();
 
@@ -220,47 +214,32 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $component->id = $mailing->reply_id;
     $component->find(TRUE);
 
-    $domain = CRM_Core_BAO_Domain::getDomain();
-    list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
+    [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
     $params = [
-      'subject' => $component->subject,
       'toEmail' => $to,
       'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
       'replyTo' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
       'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
     ];
 
-    // TODO: do we need reply tokens?
-    $html = $component->body_html;
-    if ($component->body_text) {
-      $text = $component->body_text;
-    }
-    else {
-      $text = CRM_Utils_String::htmlToText($component->body_html);
-    }
-
-    $bao = new CRM_Mailing_BAO_Mailing();
-    $bao->body_text = $text;
-    $bao->body_html = $html;
-    $tokens = $bao->getTokens();
-
-    if ($eq->format == 'HTML' || $eq->format == 'Both') {
-      $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html']);
-      $html = CRM_Utils_Token::replaceMailingTokens($html, $mailing, NULL, $tokens['html']);
-    }
-    if (!$html || $eq->format == 'Text' || $eq->format == 'Both') {
-      $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
-      $text = CRM_Utils_Token::replaceMailingTokens($text, $mailing, NULL, $tokens['text']);
-    }
-    $params['html'] = $html;
-    $params['text'] = $text;
+    $html = CRM_Utils_Token::replaceMailingTokens($component->body_html, $mailing, NULL, $component->body_html);
+    $text = CRM_Utils_Token::replaceMailingTokens($component->body_text, $mailing, NULL, $component->body_text);
 
     CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 'a', $eq->job_id, $queue_id, $eq->hash);
     if (CRM_Core_BAO_MailSettings::includeMessageId()) {
       $params['messageId'] = $params['Message-ID'];
     }
-    CRM_Utils_Mail::send($params);
+    \CRM_Core_BAO_MessageTemplate::sendTemplate([
+      'envelope' => $params,
+      'tokenContext' => ['contactId' => $eq->contact_id],
+      // Template view options
+      'messageTemplate' => [
+        'msg_subject' => $component->subject,
+        'msg_text' => $html,
+        'msg_html' => $text,
+      ],
+    ]);
   }
 
   /**
