@@ -271,6 +271,7 @@
       crmApi4({
         examples: ['ExampleData', 'get', {
           // FIXME: workflow name
+          language: $ctrl.lang,
           where: [["tags", "CONTAINS", "preview"], ["name", "LIKE", "workflow/" + $ctrl.records.main.workflow_name + "/%"]],
           select: ['name', 'title', 'data']
         }],
@@ -279,7 +280,6 @@
           format: 'example'
         }]
       }).then(function(resp) {
-        console.log('resp',resp);
         if ((!resp.examples || resp.examples.length === 0) && resp.adhoc) {
           // In the future, if Preview dialog allows editing adhoc examples, then we can show the dialog. But for now, it won't work without explicit examples.
           crmUiAlert({

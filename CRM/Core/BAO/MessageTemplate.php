@@ -341,9 +341,10 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
 
     self::synchronizeLegacyParameters($params);
     $params = array_merge($modelDefaults, $viewDefaults, $envelopeDefaults, $params);
-
+    $language = $params['language'] ?? (!empty($params['contactId']) ? Civi\Api4\Contact::get(FALSE)->addWhere('id', '=', $params['contactId'])->addSelect('preferred_language')->execute()->first()['preferred_language'] : NULL);
     CRM_Utils_Hook::alterMailParams($params, 'messageTemplate');
-    $mailContent = self::loadTemplate((string) $params['workflow'], $params['isTest'], $params['messageTemplateID'] ?? NULL, $params['groupName'] ?? '', $params['messageTemplate'], $params['subject'] ?? NULL);
+    [$mailContent, $translatedLanguage] = self::loadTemplate((string) $params['workflow'], $params['isTest'], $params['messageTemplateID'] ?? NULL, $params['groupName'] ?? '', $params['messageTemplate'], $params['subject'] ?? NULL, $language);
+    $params['tokenContext']['locale'] = $translatedLanguage ?? $params['language'] ?? NULL;
 
     self::synchronizeLegacyParameters($params);
     $rendered = CRM_Core_TokenSmarty::render(CRM_Utils_Array::subset($mailContent, ['text', 'html', 'subject']), $params['tokenContext'], $params['tplParams']);
@@ -459,18 +460,21 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    *   If omitted, the record will be loaded from workflowName/messageTemplateID.
    * @param string|null $subjectOverride
    *   This option is the older, wonkier version of $messageTemplate['msg_subject']...
+   * @param string|null $language
    *
    * @return array
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  protected static function loadTemplate(string $workflowName, bool $isTest, int $messageTemplateID = NULL, $groupName = NULL, ?array $messageTemplateOverride = NULL, ?string $subjectOverride = NULL): array {
+  protected static function loadTemplate(string $workflowName, bool $isTest, int $messageTemplateID = NULL, $groupName = NULL, ?array $messageTemplateOverride = NULL, ?string $subjectOverride = NULL, ?string $language = NULL): array {
     $base = ['msg_subject' => NULL, 'msg_text' => NULL, 'msg_html' => NULL, 'pdf_format_id' => NULL];
     if (!$workflowName && !$messageTemplateID) {
       throw new CRM_Core_Exception(ts("Message template's option value or ID missing."));
     }
 
     $apiCall = MessageTemplate::get(FALSE)
+      ->setLanguage($language)
+      ->setTranslationMode('fuzzy')
       ->addSelect('msg_subject', 'msg_text', 'msg_html', 'pdf_format_id', 'id')
       ->addWhere('is_default', '=', 1);
 
@@ -480,7 +484,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
     else {
       $apiCall->addWhere('workflow_name', '=', $workflowName);
     }
-    $messageTemplate = array_merge($base, $apiCall->execute()->first() ?: [], $messageTemplateOverride ?: []);
+    $result = $apiCall->execute();
+    $messageTemplate = array_merge($base, $result->first() ?: [], $messageTemplateOverride ?: []);
     if (empty($messageTemplate['id']) && empty($messageTemplateOverride)) {
       if ($messageTemplateID) {
         throw new CRM_Core_Exception(ts('No such message template: id=%1.', [1 => $messageTemplateID]));
@@ -527,7 +532,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
       $mailContent['subject'] = $subjectOverride;
     }
 
-    return $mailContent;
+    return [$mailContent, $messageTemplate['actual_language'] ?? NULL];
   }
 
   /**

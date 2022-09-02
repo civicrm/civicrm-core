@@ -75,13 +75,12 @@ class Render extends \Civi\Api4\Generic\AbstractAction {
 
   public function _run(\Civi\Api4\Generic\Result $result) {
     $this->validateValues();
-
     $r = \CRM_Core_BAO_MessageTemplate::renderTemplate([
       'model' => $this->_model,
       'messageTemplate' => $this->getMessageTemplate(),
       'messageTemplateId' => $this->getMessageTemplateId(),
+      'language' => $this->getLanguage(),
     ]);
-
     $result[] = \CRM_Utils_Array::subset($r, ['subject', 'html', 'text']);
   }
 

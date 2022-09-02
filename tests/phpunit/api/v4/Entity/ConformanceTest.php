@@ -67,6 +67,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
       'civicrm_participant',
       'civicrm_batch',
       'civicrm_product',
+      'civicrm_translation',
     ];
     $this->cleanup(['tablesToTruncate' => $tablesToTruncate]);
     parent::tearDown();

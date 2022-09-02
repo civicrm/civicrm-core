@@ -24,6 +24,8 @@ use Civi\Api4\Utils\CoreUtil;
  *
  * @method $this setHaving(array $clauses)
  * @method array getHaving()
+ * @method $this setTranslationMode(string|null $mode)
+ * @method string|null getTranslationMode()
  */
 class DAOGetAction extends AbstractGetAction {
   use Traits\DAOActionTrait;
@@ -79,6 +81,15 @@ class DAOGetAction extends AbstractGetAction {
    * @var array
    */
   protected $having = [];
+
+  /**
+   * Should we automatically overload the result with translated data?
+   * How do we pick the suitable translation?
+   *
+   * @var string|null
+   * @options fuzzy,strict
+   */
+  protected $translationMode;
 
   /**
    * @throws \API_Exception
