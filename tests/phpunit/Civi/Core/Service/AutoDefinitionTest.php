@@ -34,7 +34,7 @@ class AutoDefinitionTest extends \CiviUnitTestCase {
   }
 
   /**
-   * A property with the `@inject` annotation will receive a serivce with the matching name.
+   * A property with the `@inject` annotation will receive a service with the matching name.
    */
   public function testInjectEponymousProperty() {
     $this->useExampleService(

@@ -11,28 +11,44 @@
 namespace Civi\Core\Service;
 
 /**
- * AutoService is a base-class for defining a service (in the service-container).
- * Classes which extend AutoService will have these characteristics:
+ * AutoService is a base-class for defining a service (in Civi's service-container).
+ * Child classes are scanned automatically for various annotations and interfaces.
  *
- * - The class is scanned automatically (if you enable `scan-classes@1`).
- * - The class is auto-registered as a service in Civi's container.
- * - The service is given a default name (derived from the class name).
- * - The service may subscribe to events (via `HookInterface` or `EventSubscriberInterface`).
+ * = ANNOTATIONS =
  *
- * Additionally, the class will be scanned for various annotations:
+ * Annotations are used to declare and initialize services:
  *
- * - Class annotations:
- *     - `@service <service.name>`: Customize the service name.
- *     - `@serviceTags <tag1,tag2>`: Declare additional tags for the service.
- * - Property annotations
- *     - `@inject [<service.name>]`: Inject another service automatically (by assigning this property).
- *       If the '<service.name>' is blank, then it loads an eponymous service.
- * - Method annotations
- *     - (TODO) `@inject <service.name>`: Inject another service automatically (by calling the setter-method).
+ * - Declare a service. This can be done on a `class` or static factory-method. Supported annotations:
+ *     - `@service NAME`: Set the name of the new service.
+ *     - `@serviceTags TAG-1,TAG-2`: Declare additional tags for the service.
+ *     - `@internal`: Generate a hidden/automatic name. Limit discovery of the service.
+ * - Initialize the service by calling methods. This works with factory-, constructor-, and setter-methods.
+ *     - `@inject SERVICE-1,SERVICE-2`: Call the method automatically. Pass a list of other services as parameters.
+ * - Initialize the service by assigning properties. Any property may have these annotations:
+ *     - `@inject SERVICE`: Lookup the SERVICE and set the property.
+ *       If the `SERVICE` is blank, then it loads an eponymous service.
  *
- * Note: Like other services in the container, AutoService cannot meaningfully subscribe to
- * early/boot-critical events such as `hook_entityTypes` or `hook_container`. However, you may
- * get a similar effect by customizing the `buildContainer()` method.
+ * For examples of using these annotations, consult the tests or the Developer Guide:
+ *
+ * @see \Civi\Core\Service\AutoDefinitionTest
+ * @link https://docs.civicrm.org/dev/en/latest/framework/services/
+ *
+ * = INTERFACES =
+ *
+ * Additionally, some `interface`s will be detected automatically. If an AutoService implements
+ * any of these interfaces, then it will be registered with appropriate parties:
+ *
+ * @see \Civi\Core\HookInterface
+ * @see \Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface
+ * @see \Symfony\Component\EventDispatcher\EventSubscriberInterface
+ *
+ * = REQUIREMENTS / LIMITATIONS =
+ *
+ * - To scan an extension, one must use `<mixin>scan-classes@1.0.0</mixin>` or `hook_scanClasses`.
+ * - At time of writing, `ClassScanner` may not scan all core folders.
+ * - AutoServices are part of the container. They cannot be executed until the container has
+ *   started. Consequently, the services cannot subscribe to some early/boot-time events
+ *   (eg `hook_entityTypes` or `hook_container`).
  */
 abstract class AutoService implements AutoServiceInterface {
 
