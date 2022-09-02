@@ -65,6 +65,13 @@ class AfformSearchMetadataInjector {
                     }
                   }
                   $fieldset->attr('api-entities', htmlspecialchars(\CRM_Utils_JS::encode($entityList)));
+                  // Add field metadata for aggregate fields because they are not in the schema.
+                  // Normal entity fields will be handled by AfformMetadataInjector
+                  foreach (Meta::getCalcFields($display['saved_search_id.api_entity'], $display['saved_search_id.api_params']) as $fieldInfo) {
+                    foreach (pq("af-field[name='{$fieldInfo['name']}']", $doc) as $afField) {
+                      \Civi\Afform\AfformMetadataInjector::setFieldMetadata($afField, $fieldInfo);
+                    }
+                  }
                 }
               }
             }
@@ -72,7 +79,6 @@ class AfformSearchMetadataInjector {
         }
       });
     $e->angular->add($changeSet);
-
   }
 
 }

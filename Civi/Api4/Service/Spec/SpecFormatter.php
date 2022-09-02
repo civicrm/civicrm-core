@@ -287,6 +287,10 @@ class SpecFormatter {
     if ($inputType == 'Date' && !empty($inputAttrs['formatType'])) {
       self::setLegacyDateFormat($inputAttrs);
     }
+    // Number input for integer fields
+    if ($inputType === 'Text' && $dataTypeName === 'Int') {
+      $inputType = 'Number';
+    }
     // Date/time settings from custom fields
     if ($inputType == 'Date' && !empty($data['custom_group_id'])) {
       $inputAttrs['time'] = empty($data['time_format']) ? FALSE : ($data['time_format'] == 1 ? 12 : 24);

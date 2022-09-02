@@ -424,7 +424,7 @@
               }
             });
           }
-          if (!entityType && fieldKey && afGui.getField(searchDisplay['saved_search_id.api_entity'], fieldKey)) {
+          if (!entityType) {
             entityType = searchDisplay['saved_search_id.api_entity'];
           }
         }
