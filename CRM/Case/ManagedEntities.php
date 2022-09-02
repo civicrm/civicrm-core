@@ -90,7 +90,7 @@ class CRM_Case_ManagedEntities {
       if (!in_array($actType, $validActTypes)) {
         $result[] = $managed;
       }
-      elseif ($me->get($managed['module'], $managed['name'])) {
+      elseif (self::getManagedEntity($managed['module'], $managed['name'])) {
         $result[] = $managed;
       }
     }
@@ -154,11 +154,39 @@ class CRM_Case_ManagedEntities {
       if (!in_array($relType, $validRelTypes)) {
         $result[] = $managed;
       }
-      elseif ($me->get($managed['module'], $managed['name'])) {
+      elseif (self::getManagedEntity($managed['module'], $managed['name'])) {
         $result[] = $managed;
       }
     }
 
+    return $result;
+  }
+
+  /**
+   * Read a managed entity using APIv3.
+   *
+   * @param string $moduleName
+   *   The name of the module which declared entity.
+   * @param string $managedName
+   *   The symbolic name of the entity.
+   * @return array|NULL
+   *   API representation, or NULL if the entity does not exist
+   */
+  private static function getManagedEntity($moduleName, $managedName) {
+    $dao = new CRM_Core_DAO_Managed();
+    $dao->module = $moduleName;
+    $dao->name = $managedName;
+    $result = NULL;
+    if ($dao->find(TRUE)) {
+      $params = [
+        'id' => $dao->entity_id,
+      ];
+      try {
+        $result = civicrm_api3($dao->entity_type, 'getsingle', $params);
+      }
+      catch (Exception $e) {
+      }
+    }
     return $result;
   }
 
