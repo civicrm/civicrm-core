@@ -36,7 +36,7 @@ class Extension extends Generic\AbstractEntity {
           $result[] = $info;
         }
         catch (\CRM_Extension_Exception $ex) {
-          \Civi::log()->error(sprintf('Failed to read extension (%1). Please refresh the extension list.', [1 => $key]));
+          \Civi::log()->error(sprintf('Failed to read extension (%s). Please refresh the extension list.', $key));
         }
       }
       return $result;
