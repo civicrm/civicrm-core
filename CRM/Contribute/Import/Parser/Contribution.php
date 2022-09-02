@@ -17,6 +17,7 @@
 
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
+use Civi\Api4\ContributionSoft;
 use Civi\Api4\Email;
 use Civi\Api4\Note;
 
@@ -31,6 +32,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @var array
    */
   protected $_newContributions;
+
+  protected $baseEntity = 'Contribution';
 
   /**
    * Get information about the provided job.
@@ -129,7 +132,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * Also 'im_provider_id' is mapped to the 'real' field name 'provider_id'
    *
    * @return array
-   * @throws \API_Exception
    */
   protected function getFieldMappings(): array {
     $mappedFields = [];
@@ -148,7 +150,25 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @return array
    */
   public function getRequiredFields(): array {
-    return ['id' => ts('Contribution ID'), ['financial_type_id' => ts('Financial Type'), 'total_amount' => ts('Total Amount')]];
+    return [[$this->getRequiredFieldsForMatch(), $this->getRequiredFieldsForCreate()]];
+  }
+
+  /**
+   * Get required fields to create a contribution.
+   *
+   * @return array
+   */
+  public function getRequiredFieldsForCreate(): array {
+    return ['financial_type_id', 'total_amount'];
+  }
+
+  /**
+   * Get required fields to match a contribution.
+   *
+   * @return array
+   */
+  public function getRequiredFieldsForMatch(): array {
+    return [['id'], ['invoice_id'], ['trxn_id']];
   }
 
   /**
@@ -271,6 +291,63 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       }
       $this->importableFieldsMetadata = $fields;
     }
+  }
+
+  /**
+   * Get a list of entities this import supports.
+   *
+   * @return array
+   * @throws \API_Exception
+   */
+  public function getImportEntities() : array {
+    $softCreditTypes = ContributionSoft::getFields()
+      ->setLoadOptions(TRUE)
+      ->addWhere('name', '=', 'soft_credit_type_id')
+      ->selectRowCount()
+      ->addSelect('options')->execute();
+    return [
+      'Contribution' => [
+        'text' => ts('Contribution Fields'),
+        'required_fields_update' => $this->getRequiredFieldsForMatch(),
+        'required_fields_create' => $this->getRequiredFieldsForCreate(),
+        'is_base_entity' => TRUE,
+        // For now we stick with the action selected on the DataSource page.
+        'actions' => $this->isUpdateExisting() ?
+          [['id' => 'update', 'text' => ts('Update existing'), 'description' => ts('Skip if no match found')]] :
+          [['id' => 'create', 'text' => ts('Create'), 'description' => ts('Skip if already exists')]],
+        'default_action' => $this->isUpdateExisting() ? 'update' : 'create',
+        'entity_name' => 'Contribution',
+        'entity_title' => ts('Contribution'),
+      ],
+      'Contact' => [
+        'text' => ts('Contact Fields'),
+        'unique_fields' => ['external_identifier', 'id'],
+        'is_contact' => TRUE,
+        'actions' => [
+          ['id' => 'select', 'text' => ts('Match existing')],
+          ['id' => 'update', 'text' => ts('Update existing'), ts('Skip if not found')],
+          ['id' => 'update_or_create', 'text' => ts('Update or Create')],
+        ],
+        'default_action' => 'select',
+        'entity_name' => 'Contact',
+        'entity_title' => ts('Contribution Contact'),
+      ],
+      'SoftCreditContact' => [
+        'text' => ts('Soft Credit Contact Fields'),
+        'maximum' => count($softCreditTypes),
+        'unique_fields' => ['external_identifier', 'id'],
+        'is_contact' => TRUE,
+        'actions' => [
+          ['id' => 'select', 'text' => ts('Match existing')],
+          ['id' => 'update', 'text' => ts('Update existing'), 'description' => ts('Skip if not found')],
+          ['id' => 'update_or_create', 'text' => ts('Update or Create')],
+        ],
+        'default_action' => 'select',
+        'entity_name' => 'SoftCreditContact',
+        'entity_title' => ts('Soft Credit Contact'),
+        'entity_data' => ['soft_credit_type_id' => ['required' => TRUE, 'options' => $softCreditTypes]],
+      ],
+    ];
   }
 
   /**

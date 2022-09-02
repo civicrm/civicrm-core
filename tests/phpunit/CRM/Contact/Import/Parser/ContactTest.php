@@ -1070,7 +1070,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'individual_required' => [
         'csv' => 'individual_invalid_missing_name.csv',
         'mapper' => [['last_name']],
-        'expected_error' => 'Missing required fields: First Name OR Email Address',
+        'expected_error' => 'Missing required fields: First Name OR Email',
       ],
       'individual_related_required_met' => [
         'csv' => 'individual_valid_with_related_email.csv',
@@ -1080,7 +1080,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'individual_related_required_not_met' => [
         'csv' => 'individual_invalid_with_related_phone.csv',
         'mapper' => [['first_name'], ['last_name'], ['1_a_b', 'phone', 1, 2]],
-        'expected_error' => '(Child of) Missing required fields: First Name and Last Name OR Email Address OR External Identifier',
+        'expected_error' => '(Child of) Missing required fields: First Name and Last Name OR Email OR External Identifier',
       ],
       'individual_bad_email' => [
         'csv' => 'individual_invalid_email.csv',
@@ -1096,7 +1096,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
         // External identifier is only enough in upgrade mode.
         'csv' => 'individual_invalid_external_identifier_only.csv',
         'mapper' => [['external_identifier'], ['gender_id']],
-        'expected_error' => 'Missing required fields: First Name and Last Name OR Email Address',
+        'expected_error' => 'Missing required fields: First Name and Last Name OR Email',
       ],
       'individual_invalid_external_identifier_only_update_mode' => [
         // External identifier only enough in upgrade mode, so no error here.

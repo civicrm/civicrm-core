@@ -126,6 +126,15 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
+   * An array of Custom field mappings for api formatting
+   *
+   * e.g ['custom_7' => 'IndividualData.Marriage_date']
+   *
+   * @var array
+   */
+  protected $customFieldNameMap = [];
+
+  /**
    * Get User Job.
    *
    * API call to retrieve the userJob row.
@@ -625,23 +634,42 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     if (!empty($params['id'])) {
       return;
     }
-    $requiredFields = [
-      'Individual' => [
-        'first_name_last_name' => ['first_name' => ts('First Name'), 'last_name' => ts('Last Name')],
-        'email' => ts('Email Address'),
-      ],
-      'Organization' => ['organization_name' => ts('Organization Name')],
-      'Household' => ['household_name' => ts('Household Name')],
-    ][$contactType];
+    $requiredFields = $this->getRequiredFieldsContactCreate()[$contactType];
     if ($isPermitExistingMatchFields) {
-      $requiredFields['external_identifier'] = ts('External Identifier');
       // Historically just an email has been accepted as it is 'usually good enough'
       // for a dedupe rule look up - but really this is a stand in for
       // whatever is needed to find an existing matching contact using the
       // specified dedupe rule (or the default Unsupervised if not specified).
-      $requiredFields['email'] = ts('Email Address');
+      $requiredFields = $contactType === 'Individual' ? [[$requiredFields, 'external_identifier']] : [[$requiredFields, 'email', 'external_identifier']];
     }
     $this->validateRequiredFields($requiredFields, $params, $prefixString);
+  }
+
+  /**
+   * Get the fields required for contact create.
+   *
+   * @return array
+   */
+  protected function getRequiredFieldsContactMatch(): array {
+    return [['id', 'external_identifier']];
+  }
+
+  /**
+   * Get the fields required for contact create.
+   *
+   * @return array
+   */
+  protected function getRequiredFieldsContactCreate(): array {
+    return [
+      'Individual' => [
+        [
+          ['first_name', 'last_name'],
+          'email',
+        ],
+      ],
+      'Organization' => ['organization_name'],
+      'Household' => ['household_name'],
+    ];
   }
 
   protected function doPostImportActions() {
@@ -1342,8 +1370,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *   - note this follows the and / or array nesting we see in permission checks
    *   eg.
    *   [
-   *     'email' => ts('Email'),
-   *     ['first_name' => ts('First Name'), 'last_name' => ts('Last Name')]
+   *     'email',
+   *     ['first_name', 'last_name']
    *   ]
    *   Means 'email' OR 'first_name AND 'last_name'.
    * @param string $prefixString
@@ -1351,41 +1379,149 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @throws \CRM_Core_Exception Exception thrown if field requirements are not met.
    */
   protected function validateRequiredFields(array $requiredFields, array $params, $prefixString = ''): void {
-    if (empty($requiredFields)) {
+    $missingFields = $this->getMissingFields($requiredFields, $params);
+    if (empty($missingFields)) {
       return;
     }
-    $missingFields = [];
-    foreach ($requiredFields as $key => $required) {
-      if (!is_array($required)) {
-        $importParameter = $params[$key] ?? [];
-        if (!is_array($importParameter)) {
-          if (!empty($importParameter)) {
-            return;
-          }
-        }
-        else {
-          foreach ($importParameter as $locationValues) {
-            if (!empty($locationValues[$key])) {
-              return;
-            }
-          }
-        }
-
-        $missingFields[$key] = $required;
-      }
-      else {
-        foreach ($required as $field => $label) {
-          if (empty($params[$field])) {
-            $missing[$field] = $label;
-          }
-        }
-        if (empty($missing)) {
-          return;
-        }
-        $missingFields[$key] = implode(' ' . ts('and') . ' ', $missing);
-      }
-    }
     throw new CRM_Core_Exception($prefixString . ts('Missing required fields:') . ' ' . implode(' ' . ts('OR') . ' ', $missingFields));
+  }
+
+  /**
+   * Validate that the mapping has the required fields.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function validateMapping($mapping): void {
+    $mappedFields = [];
+    foreach ($mapping as $mappingField) {
+      $mappedFields[$mappingField[0]] = $mappingField[0];
+    }
+    $entity = $this->baseEntity;
+    $missingFields = $this->getMissingFields($this->getRequiredFieldsForEntity($entity, $this->getActionForEntity($entity)), $mappedFields);
+    if (!empty($missingFields)) {
+      $error = [];
+      foreach ($missingFields as $missingField) {
+        $error[] = ts('Missing required field: %1', [1 => $missingField]);
+      }
+      throw new CRM_Core_Exception(implode('<br/>', $error));
+    }
+  }
+
+  /**
+   * Get the import action for the given entity.
+   *
+   * @param string $entity
+   *
+   * @return string
+   * @throws \API_Exception
+   */
+  private function getActionForEntity(string $entity): string {
+    return $this->getUserJob()['metadata']['entity_metadata'][$entity]['action'] ?? $this->getImportEntities()[$entity]['default_action'];
+  }
+
+  /**
+   * @param string $entity
+   * @param string $action
+   *
+   * @return array
+   */
+  private function getRequiredFieldsForEntity(string $entity, string $action): array {
+    $entityMetadata = $this->getImportEntities()[$entity];
+    if ($action === 'select') {
+      // Select uses the same lookup as update.
+      $action = 'update';
+    }
+    if (isset($entityMetadata['required_fields_' . $action])) {
+      return $entityMetadata['required_fields_' . $action];
+    }
+    return [];
+  }
+
+  /**
+   * Get the field requirements that are missing from the params array.
+   *
+   *  Eg Must have 'total_amount' and 'financial_type_id'
+   *    [
+   *      'total_amount',
+   *      'financial_type_id'
+   *    ]
+   *
+   * Eg Must have 'invoice_id' or 'trxn_id' or 'id'
+   *
+   *   [
+   *     ['invoice_id'],
+   *     ['trxn_id'],
+   *     ['id']
+   *   ],
+   *
+   * Eg Must have 'invoice_id' or 'trxn_id' or 'id' OR (total_amount AND financial_type_id)
+   *   [
+   *     [['invoice_id'], ['trxn_id'], ['id']]],
+   *     ['total_amount', 'financial_type_id]
+   *   ],
+   *
+   * Eg Must have 'invoice_id' or 'trxn_id' or 'id' AND (total_amount AND financial_type_id)
+   *   [
+   *     [['invoice_id'], ['trxn_id'], ['id']],
+   *     ['total_amount', 'financial_type_id]
+   *   ]
+   *
+   * @param array $requiredFields
+   * @param array $params
+   *
+   * @return array
+   */
+  protected function getMissingFields(array $requiredFields, array $params): array {
+    if (empty($requiredFields)) {
+      return [];
+    }
+    return $this->checkRequirement($requiredFields, $params);
+  }
+
+  /**
+   * Check an individual required fields criteria.
+   *
+   * @see getMissingFields
+   *
+   * @param string|array $requirement
+   * @param array $params
+   *
+   * @return array
+   */
+  private function checkRequirement($requirement, array $params): array {
+    $missing = [];
+    if (!is_array($requirement)) {
+      // In this case we need to match the field....
+      // if we do, then return empty, otherwise return
+      if (!empty($params[$requirement])) {
+        if (!is_array($params[$requirement])) {
+          return [];
+        }
+        // Recurse the array looking for the key - eg. look for email
+        // in a location values array
+        foreach ($params[$requirement] as $locationValues) {
+          if (!empty($locationValues[$requirement])) {
+            return [];
+          }
+        }
+      }
+      return [$requirement => $this->getFieldMetadata($requirement)['title']];
+    }
+
+    foreach ($requirement as $required) {
+      $isOrOperator = isset($requirement[0]) && is_array($requirement[0]);
+      $check = $this->checkRequirement($required, $params);
+      // A nested array is an 'OR' If we find any one then return.
+      if ($isOrOperator && empty($check)) {
+        return [];
+      }
+      $missing = array_merge($missing, $check);
+    }
+    if (!empty($missing)) {
+      $separator = ' ' . ($isOrOperator ? ts('OR') : ts('and')) . ' ';
+      return [implode($separator, $missing)];
+    }
+    return [];
   }
 
   /**
@@ -2107,13 +2243,18 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *
    * @param string $key
    *
+   * @return string
+   *
    * @throws \CRM_Core_Exception
    */
   protected function getApi4Name(string $key): string {
-    return Contact::getFields(FALSE)
-      ->addWhere('custom_field_id', '=', $this->getFieldMetadata($key)['custom_field_id'])
-      ->addSelect('name')
-      ->execute()->first()['name'];
+    if (!isset($this->customFieldNameMap[$key])) {
+      $this->customFieldNameMap[$key] = Contact::getFields(FALSE)
+        ->addWhere('custom_field_id', '=', str_replace('custom_', '', $key))
+        ->addSelect('name')
+        ->execute()->first()['name'];
+    }
+    return $this->customFieldNameMap[$key];
   }
 
   /**

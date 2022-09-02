@@ -93,7 +93,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
    * @return array
    */
   public function getRequiredFields(): array {
-    return ['contact_id' => ts('Contact ID'), 'external_identifier' => ts('External Identifier')];
+    return [['contact_id'], ['external_identifier']];
   }
 
   /**

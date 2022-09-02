@@ -31,10 +31,7 @@ trait CRMTraits_Import_ParserTrait {
    * @param array $submittedValues
    */
   protected function importCSV(string $csv, array $fieldMappings, array $submittedValues = []): void {
-    $reflector = new ReflectionClass(get_class($this));
-    $directory = dirname($reflector->getFileName());
     $submittedValues = array_merge([
-      'uploadFile' => ['name' => $directory . '/data/' . $csv],
       'skipColumnHeader' => TRUE,
       'fieldSeparator' => ',',
       'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
@@ -45,13 +42,7 @@ trait CRMTraits_Import_ParserTrait {
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
       'groups' => [],
     ], $submittedValues);
-    $form = $this->getDataSourceForm($submittedValues);
-    $values = $_SESSION['_' . $form->controller->_name . '_container']['values'];
-    $form->buildForm();
-    $form->postProcess();
-    $this->userJobID = $form->getUserJobID();
-    // This gets reset in DataSource so re-do....
-    $_SESSION['_' . $form->controller->_name . '_container']['values'] = $values;
+    $this->submitDataSourceForm($csv, $submittedValues);
 
     $form = $this->getMapFieldForm($submittedValues);
     $form->setUserJobID($this->userJobID);
@@ -101,6 +92,35 @@ trait CRMTraits_Import_ParserTrait {
    */
   protected function getDataSource(): CRM_Import_DataSource {
     return new CRM_Import_DataSource_CSV($this->userJobID);
+  }
+
+  /**
+   * Submit the data source form.
+   *
+   * @param string $csv
+   * @param array $submittedValues
+   */
+  protected function submitDataSourceForm(string $csv, $submittedValues): void {
+    $reflector = new ReflectionClass(get_class($this));
+    $directory = dirname($reflector->getFileName());
+    $submittedValues = array_merge([
+      'uploadFile' => ['name' => $directory . '/data/' . $csv],
+      'skipColumnHeader' => TRUE,
+      'fieldSeparator' => ',',
+      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'dataSource' => 'CRM_Import_DataSource_CSV',
+      'file' => ['name' => $csv],
+      'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+      'groups' => [],
+    ], $submittedValues);
+    $form = $this->getDataSourceForm($submittedValues);
+    $values = $_SESSION['_' . $form->controller->_name . '_container']['values'];
+    $form->buildForm();
+    $form->postProcess();
+    $this->userJobID = $form->getUserJobID();
+    // This gets reset in DataSource so re-do....
+    $_SESSION['_' . $form->controller->_name . '_container']['values'] = $values;
   }
 
 }

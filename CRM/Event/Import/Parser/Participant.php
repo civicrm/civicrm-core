@@ -518,7 +518,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
    * @return array
    */
   protected function getRequiredFields(): array {
-    return [['event_id' => ts('Event'), 'status_id' => ts('Status')]];
+    return [['event_id', 'status_id']];
   }
 
 }

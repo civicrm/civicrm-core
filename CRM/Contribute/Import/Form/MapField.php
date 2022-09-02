@@ -36,32 +36,16 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
   protected static function checkRequiredFields($self, string $contactORContributionId, array $importKeys, array $errors, int $weightSum, $threshold, string $fieldMessage): array {
     // FIXME: should use the schema titles, not redeclare them
     $requiredFields = [
-      $contactORContributionId == 'contribution_id' ? 'contribution_id' : 'contribution_contact_id' => $contactORContributionId == 'contribution_id' ? ts('Contribution ID') : ts('Contact ID'),
-      'total_amount' => ts('Total Amount'),
-      'financial_type_id' => ts('Financial Type'),
+      'contribution_contact_id' => ts('Contact ID'),
     ];
 
     foreach ($requiredFields as $field => $title) {
       if (!in_array($field, $importKeys)) {
-        if (empty($errors['_qf_default'])) {
-          $errors['_qf_default'] = '';
-        }
-        if ($field == $contactORContributionId) {
-          if (!($weightSum >= $threshold || in_array('external_identifier', $importKeys)) &&
-            !$self->isUpdateExisting()
+        if ($field == 'contribution_contact_id') {
+          if (!($weightSum >= $threshold || in_array('external_identifier', $importKeys))
           ) {
             $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', [1 => $threshold]) . '<br />';
           }
-          elseif ($self->isUpdateExisting() &&
-            !(in_array('invoice_id', $importKeys) || in_array('trxn_id', $importKeys) ||
-              in_array('contribution_id', $importKeys)
-            )
-          ) {
-            $errors['_qf_default'] .= ts('Invoice ID or Transaction ID or Contribution ID are required to match to the existing contribution records in Update mode.') . '<br />';
-          }
-        }
-        else {
-          $errors['_qf_default'] .= ts('Missing required field: %1', [1 => $title]) . '<br />';
         }
       }
     }
@@ -210,38 +194,18 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       foreach ($ruleFields as $field => $weight) {
         $fieldMessage .= ' ' . $field . '(weight ' . $weight . ')';
       }
-      $errors = self::checkRequiredFields($self, $contactORContributionId, $importKeys, $errors, $weightSum, $threshold, $fieldMessage);
-
-      //at least one field should be mapped during update.
-      if ($self->isUpdateExisting()) {
-        $atleastOne = FALSE;
-        foreach ($self->_mapperFields as $key => $field) {
-          if (in_array($key, $importKeys) &&
-            !in_array($key, [
-              'doNotImport',
-              'contribution_id',
-              'invoice_id',
-              'trxn_id',
-            ])
-          ) {
-            $atleastOne = TRUE;
-            break;
-          }
-        }
-        if (!$atleastOne) {
-          $errors['_qf_default'] .= ts('At least one contribution field needs to be mapped for update during update mode.') . '<br />';
-        }
+      try {
+        $parser = $self->getParser();
+        $parser->validateMapping($fields['mapper']);
+      }
+      catch (CRM_Core_Exception $e) {
+        $errors['_qf_default'] = $e->getMessage();
+      }
+      if (!$self->isUpdateExisting()) {
+        $errors = self::checkRequiredFields($self, $contactORContributionId, $importKeys, $errors, $weightSum, $threshold, $fieldMessage);
       }
     }
-
-    if (!empty($errors)) {
-      if (!empty($errors['_qf_default'])) {
-        CRM_Core_Session::setStatus($errors['_qf_default'], ts("Error"), "error");
-        return $errors;
-      }
-    }
-
-    return TRUE;
+    return !empty($errors) ? $errors : TRUE;
   }
 
   /**
