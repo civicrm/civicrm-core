@@ -7,14 +7,8 @@
         controller: 'MsgtpluiListCtrl',
         controllerAs: '$ctrl',
         templateUrl: function() {
-          // The original drafts had a mode where the "Translate" button was conditioned on some kind of language-opt-in.
-          // However, uiLanguages isn't giving that signal anymore, and that opt-in isn't strictly needed since htis
-          // is currently packaged as an opt-in extension. Maybe we should just remove `~/crmMsgadm/Workflow.html` in a few months.
-          // But for the moment, keep it around it in case we have to pivot.
-
-          // var supportsTranslation = CRM.crmMsgadm.uiLanguages && _.size(CRM.crmMsgadm.uiLanguages) > 1;
-          // return supportsTranslation ? '~/crmMsgadm/WorkflowTranslated.html' : '~/crmMsgadm/Workflow.html';
-          return '~/crmMsgadm/WorkflowTranslated.html';
+          var supportsTranslation = CRM.crmMsgadm.allLanguages && _.size(CRM.crmMsgadm.allLanguages) > 1;
+          return supportsTranslation ? '~/crmMsgadm/WorkflowTranslated.html' : '~/crmMsgadm/Workflow.html';
         },
         resolve: {
           prefetch: function(crmApi4, crmStatus) {
