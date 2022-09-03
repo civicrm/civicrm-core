@@ -174,7 +174,7 @@ class AfformMetadataInjector {
     $params = [
       'action' => $action,
       'where' => [['name', 'IN', $namesToMatch]],
-      'select' => ['name', 'label', 'input_type', 'input_attrs', 'help_pre', 'help_post', 'options', 'fk_entity'],
+      'select' => ['name', 'label', 'input_type', 'input_attrs', 'help_pre', 'help_post', 'options', 'fk_entity', 'required'],
       'loadOptions' => ['id', 'label'],
       // If the admin included this field on the form, then it's OK to get metadata about the field regardless of user permissions.
       'checkPermissions' => FALSE,
