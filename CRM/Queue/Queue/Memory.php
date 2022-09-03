@@ -110,12 +110,35 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   }
 
   /**
-   * Determine number of items remaining in the queue.
-   *
-   * @return int
+   * @param string $name
+   * @return int|float|null
+   * @see \CRM_Queue_Queue::getStatistic()
    */
-  public function numberOfItems(): int {
-    return count($this->items);
+  public function getStatistic(string $name) {
+    $ready = function(): int {
+      $now = CRM_Utils_Time::time();
+      $ready = 0;
+      foreach ($this->items as $id => $item) {
+        if (empty($this->releaseTimes[$id]) || $this->releaseTimes[$id] <= $now) {
+          $ready++;
+        }
+      }
+      return $ready;
+    };
+
+    switch ($name) {
+      case 'ready':
+        return $ready();
+
+      case 'blocked':
+        return count($this->items) - $ready();
+
+      case 'total':
+        return count($this->items);
+
+      default:
+        return NULL;
+    }
   }
 
   /**
