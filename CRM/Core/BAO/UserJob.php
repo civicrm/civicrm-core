@@ -38,7 +38,7 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements \Civi\Core\Ho
     /** @var \CRM_Queue_Queue $queue */
     $queue = $e->queue;
     $userJobId = static::findUserJobId($queue->getName());
-    if ($userJobId && $queue->numberOfItems() < 1) {
+    if ($userJobId && $queue->getStatistic('total') < 1) {
       $queue->setStatus('completed');
     }
   }
