@@ -241,13 +241,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   protected $_invalidRowCount;
 
   /**
-   * Maximum number of non-empty/comment lines to process
-   *
-   * @var int
-   */
-  protected $_maxLinesToProcess;
-
-  /**
    * Array of error lines, bounded by MAX_ERROR
    * @var array
    */
@@ -438,20 +431,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   protected $_rows;
 
   /**
-   * Filename of error data
-   *
-   * @var string
-   */
-  protected $_errorFileName;
-
-  /**
-   * Filename of duplicate data
-   *
-   * @var string
-   */
-  protected $_duplicateFileName;
-
-  /**
    * Contact type
    *
    * @var string
@@ -486,13 +465,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    $this->_maxLinesToProcess = 0;
-  }
-
-  /**
    * Add progress bar to the import process. Calculates time remaining, status etc.
    *
    * @param $statusID
@@ -506,9 +478,12 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @param $totalRowCount
    *   Total number of rows in the import file.
    *
+   * @deprecated
+   *
    * @return NULL|$currTimestamp
    */
   public function progressImport($statusID, $startImport = TRUE, $startTimestamp = NULL, $prevTimestamp = NULL, $totalRowCount = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
     $statusFile = CRM_Core_Config::singleton()->uploadDir . "status_{$statusID}.txt";
 
     if ($startImport) {
@@ -585,6 +560,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @return void
    */
   public static function encloseScrub(&$values, $enclosure = "'") {
+    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
     if (empty($values)) {
       return;
     }
@@ -604,6 +580,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @return void
    */
   public function setMaxLinesToProcess($max) {
+    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
     $this->_maxLinesToProcess = $max;
   }
 
@@ -774,6 +751,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @return string
    */
   public static function errorFileName($type) {
+    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
     $fileName = NULL;
     if (empty($type)) {
       return $fileName;
@@ -1307,6 +1285,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @return mixed
    */
   protected function parsePseudoConstantField($submittedValue, $fieldSpec) {
+    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
     // dev/core#1289 Somehow we have wound up here but the BAO has not been specified in the fieldspec so we need to check this but future us problem, for now lets just return the submittedValue
     if (!isset($fieldSpec['bao'])) {
       return $submittedValue;
