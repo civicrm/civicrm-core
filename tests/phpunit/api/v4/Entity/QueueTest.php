@@ -22,12 +22,15 @@ use api\v4\Api4TestBase;
 use Civi\Api4\Queue;
 use Civi\Api4\UserJob;
 use Civi\Core\Event\GenericHookEvent;
+use Civi\Test\QueueTestTrait;
 
 /**
  * @group headless
  * @group queue
  */
 class QueueTest extends Api4TestBase {
+
+  use QueueTestTrait;
 
   protected function setUp(): void {
     \Civi::$statics[__CLASS__] = [
@@ -56,7 +59,7 @@ class QueueTest extends Api4TestBase {
       'retry_limit' => 2,
       'retry_interval' => 4,
     ]);
-    $this->assertEquals(0, $queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $queue);
 
     \Civi::queue($queueName)->createItem(new \CRM_Queue_Task(
       [QueueTest::class, 'doSomething'],
@@ -98,13 +101,13 @@ class QueueTest extends Api4TestBase {
     $this->assertEquals(['first_ok', 'second_err', 'second_ok'], \Civi::$statics[__CLASS__]['doSomethingLog']);
 
     // All done.
-    $this->assertEquals(0, $queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $queue);
   }
 
   public function testBasicParallelPolling() {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_parallel';
     $queue = \Civi::queue($queueName, ['type' => 'SqlParallel', 'runner' => 'task', 'error' => 'delete']);
-    $this->assertEquals(0, $queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $queue);
 
     \Civi::queue($queueName)->createItem(new \CRM_Queue_Task(
       [QueueTest::class, 'doSomething'],
@@ -129,7 +132,7 @@ class QueueTest extends Api4TestBase {
     Queue::runItems(0)->setItems([$first])->execute();
     $this->assertEquals(['second_ok', 'first_ok'], \Civi::$statics[__CLASS__]['doSomethingLog']);
 
-    $this->assertEquals(0, $queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $queue);
   }
 
   /**
@@ -149,7 +152,7 @@ class QueueTest extends Api4TestBase {
       'error' => 'delete',
       'batch_limit' => 3,
     ]);
-    $this->assertEquals(0, $queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $queue);
 
     for ($i = 0; $i < 7; $i++) {
       \Civi::queue($queueName)->createItem(['thingy' => $i]);
@@ -189,7 +192,7 @@ class QueueTest extends Api4TestBase {
   public function testSelect() {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_parallel';
     $queue = \Civi::queue($queueName, ['type' => 'SqlParallel', 'runner' => 'task', 'error' => 'delete']);
-    $this->assertEquals(0, $queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $queue);
 
     \Civi::queue($queueName)->createItem(new \CRM_Queue_Task(
       [QueueTest::class, 'doSomething'],
@@ -205,7 +208,7 @@ class QueueTest extends Api4TestBase {
   public function testEmptyPoll() {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_linear';
     $queue = \Civi::queue($queueName, ['type' => 'Sql', 'runner' => 'task', 'error' => 'delete']);
-    $this->assertEquals(0, $queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $queue);
 
     $startResult = Queue::claimItems()->setQueue($queueName)->execute();
     $this->assertEquals(0, $startResult->count());
@@ -225,14 +228,14 @@ class QueueTest extends Api4TestBase {
   public function testDelayedStart(array $queueSpec) {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_delayed';
     $queue = \Civi::queue($queueName, $queueSpec);
-    $this->assertEquals(0, $queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $queue);
 
     $releaseTime = \CRM_Utils_Time::strtotime('+3 seconds');
     \Civi::queue($queueName)->createItem(new \CRM_Queue_Task(
       [QueueTest::class, 'doSomething'],
       ['itwillstartanymomentnow']
     ), ['release_time' => $releaseTime]);
-    $this->assertEquals(1, $queue->numberOfItems());
+    $this->assertQueueStats(1, 0, 1, $queue);
 
     // Not available... yet...
     $claim1 = $queue->claimItem();
@@ -268,7 +271,7 @@ class QueueTest extends Api4TestBase {
       'retry_limit' => 2,
       'retry_interval' => 1,
     ]);
-    $this->assertEquals(0, $queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $queue);
 
     \Civi::queue($queueName)->createItem(new \CRM_Queue_Task(
       [QueueTest::class, 'doSomething'],
@@ -311,28 +314,28 @@ class QueueTest extends Api4TestBase {
       'retry_interval' => 0,
       'lease_time' => 1,
     ]);
-    $this->assertEquals(0, $queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $queue);
 
     \Civi::queue($queueName)->createItem(new \CRM_Queue_Task(
       [QueueTest::class, 'doSomething'],
       ['playinghooky']
     ));
-    $this->assertEquals(1, $queue->numberOfItems());
+    $this->assertQueueStats(1, 1, 0, $queue);
 
     $claim1 = $this->waitForClaim(0.5, 5, $queueName);
     // Oops, don't do anything with claim #1!
-    $this->assertEquals(1, $queue->numberOfItems());
+    $this->assertQueueStats(1, 0, 1, $queue);
     $this->assertEquals([], \Civi::$statics[__CLASS__]['doSomethingLog']);
 
     $claim2 = $this->waitForClaim(0.5, 5, $queueName);
     // Oops, don't do anything with claim #2!
-    $this->assertEquals(1, $queue->numberOfItems());
+    $this->assertQueueStats(1, 0, 1, $queue);
     $this->assertEquals([], \Civi::$statics[__CLASS__]['doSomethingLog']);
 
     $claim3 = $this->waitForClaim(0.5, 5, $queueName);
-    $this->assertEquals(1, $queue->numberOfItems());
+    $this->assertQueueStats(1, 0, 1, $queue);
     $result = Queue::runItems(0)->setItems([$claim3])->execute()->first();
-    $this->assertEquals(0, $queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $queue);
     $this->assertEquals(['playinghooky_ok'], \Civi::$statics[__CLASS__]['doSomethingLog']);
     $this->assertEquals('ok', $result['outcome']);
   }
@@ -357,19 +360,19 @@ class QueueTest extends Api4TestBase {
       'retry_interval' => 0,
       'lease_time' => 1,
     ]);
-    $this->assertEquals(0, $queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $queue);
 
     \Civi::queue($queueName)->createItem(new \CRM_Queue_Task(
       [QueueTest::class, 'doSomething'],
       ['playinghooky']
     ));
-    $this->assertEquals(1, $queue->numberOfItems());
+    $this->assertQueueStats(1, 1, 0, $queue);
 
     $claimAndRun = function($expectOutcome, $expectEndCount) use ($queue, $queueName) {
       $claim = $this->waitForClaim(0.5, 5, $queueName);
-      $this->assertEquals(1, $queue->numberOfItems());
+      $this->assertQueueStats(1, 0, 1, $queue);
       $result = Queue::runItems(0)->setItems([$claim])->execute()->first();
-      $this->assertEquals($expectEndCount, $queue->numberOfItems());
+      $this->assertEquals($expectEndCount, $queue->getStatistic('total'));
       $this->assertEquals($expectOutcome, $result['outcome']);
     };
 
@@ -411,7 +414,7 @@ class QueueTest extends Api4TestBase {
       'runner' => 'task',
       'error' => 'delete',
     ]);
-    $this->assertEquals(0, $queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $queue);
 
     $userJob = \Civi\Api4\UserJob::create(FALSE)->setValues([
       'job_type:name' => 'contact_import',
@@ -429,20 +432,20 @@ class QueueTest extends Api4TestBase {
     ));
 
     // Verify initial status
-    $this->assertEquals(2, $queue->numberOfItems());
+    $this->assertQueueStats(2, 2, 0, $queue);
     $this->assertEquals(FALSE, isset($firedQueueStatus[$queueName]));
     $this->assertEquals(TRUE, $queue->isActive());
     $this->assertEquals(4, UserJob::get()->addWhere('id', '=', $userJob['id'])->execute()->first()['status_id']);
 
     // OK, let's run both items - and check status afterward.
     Queue::runItems(FALSE)->setQueue($queueName)->execute()->single();
-    $this->assertEquals(1, $queue->numberOfItems());
+    $this->assertQueueStats(1, 1, 0, $queue);
     $this->assertEquals(FALSE, isset($firedQueueStatus[$queueName]));
     $this->assertEquals(TRUE, $queue->isActive());
     $this->assertEquals(4, UserJob::get()->addWhere('id', '=', $userJob['id'])->execute()->first()['status_id']);
 
     Queue::runItems(FALSE)->setQueue($queueName)->execute()->single();
-    $this->assertEquals(0, $queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $queue);
     $this->assertEquals('completed', $firedQueueStatus[$queueName]);
     $this->assertEquals(FALSE, $queue->isActive());
     $this->assertEquals(1, UserJob::get()->addWhere('id', '=', $userJob['id'])->execute()->first()['status_id']);
@@ -468,7 +471,7 @@ class QueueTest extends Api4TestBase {
       'runner' => 'task',
       'error' => 'delete',
     ]);
-    $this->assertEquals(0, $queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $queue);
 
     \Civi::queue($queueName)->createItem(new \CRM_Queue_Task(
       [QueueTest::class, 'doSomething'],
@@ -480,18 +483,18 @@ class QueueTest extends Api4TestBase {
     ));
 
     // Verify initial status
-    $this->assertEquals(2, $queue->numberOfItems());
+    $this->assertQueueStats(2, 2, 0, $queue);
     $this->assertEquals(FALSE, isset($firedQueueStatus[$queueName]));
     $this->assertEquals(TRUE, $queue->isActive());
 
     // OK, let's run both items - and check status afterward.
     Queue::runItems(FALSE)->setQueue($queueName)->execute()->single();
-    $this->assertEquals(1, $queue->numberOfItems());
+    $this->assertQueueStats(1, 1, 0, $queue);
     $this->assertEquals(FALSE, isset($firedQueueStatus[$queueName]));
     $this->assertEquals(TRUE, $queue->isActive());
 
     Queue::runItems(FALSE)->setQueue($queueName)->execute()->single();
-    $this->assertEquals(0, $queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $queue);
     $this->assertEquals(FALSE, isset($firedQueueStatus[$queueName]));
     $this->assertEquals(TRUE, $queue->isActive());
   }

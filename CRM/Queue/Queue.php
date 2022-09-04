@@ -138,8 +138,28 @@ abstract class CRM_Queue_Queue {
    * Determine number of items remaining in the queue.
    *
    * @return int
+   * @deprecated
+   *   Use `getStatistic(string $name)` instead.
+   *   The definition of `numberOfItems()` has become conflicted among different subclasses.
    */
-  abstract public function numberOfItems();
+  public function numberOfItems() {
+    // This is the statistic traditionally reported by core queue implementations.
+    // However, it may not be as useful, and subclasses may have different interpretations.
+    return $this->getStatistic('total');
+  }
+
+  /**
+   * Get summary information about items in the queue.
+   *
+   * @param string $name
+   *   The desired statistic. Ex:
+   *   - 'ready': The number of items ready for execution (not currently claimed, not scheduled for future).
+   *   - 'blocked': The number of items that may be runnable in the future, but cannot be run right now.
+   *   - 'total': The total number of items known to the queue, regardless of whether their current status.
+   * @return int|float|null
+   *   The value of the statistic, or NULL if the queue backend does not unsupport this statistic.
+   */
+  abstract public function getStatistic(string $name);
 
   /**
    * Get the next item.
