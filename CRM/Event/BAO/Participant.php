@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
+class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Civi\Core\HookInterface {
 
   /**
    * Static field for all the participant information that we can potentially import.
@@ -1902,6 +1902,38 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
       }
     }
     return $details;
+  }
+
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->entity === 'Participant' && $event->action === 'create' && empty($event->params['created_id'])) {
+      // Set the "created_id" field if not already set.
+      // The created_id should always be the person that actually did the registration.
+      // That might be the first participant, but it might be someone registering someone without registering themselves.
+      // 1. Prefer logged in contact id
+      // 2. Fall back to 'registered_by_id' param.
+      // 3. Fall back to participant contact_id (for anonymous person registering themselves)
+      $event->params['created_id'] = CRM_Core_Session::getLoggedInContactID();
+      if (empty($event->params['created_id'])) {
+        if (!empty($event->params['registered_by_id'])) {
+          // No logged in contact but participant was registered by someone else.
+          // Look up the contact ID of that participant and record
+          $participant = \Civi\Api4\Participant::get(FALSE)
+            ->addSelect('contact_id')
+            ->addWhere('id', '=', $event->params['registered_by_id'])
+            ->execute()
+            ->first();
+          $event->params['created_id'] = $participant['contact_id'];
+        }
+        else {
+          $event->params['created_id'] = $event->params['contact_id'];
+        }
+      }
+    }
   }
 
 }
