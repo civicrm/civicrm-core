@@ -200,14 +200,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       else {
         $fieldSpec = $this->getFieldMetadata($mappedField['name']);
         $entity = $fieldSpec['entity'] ?? 'Contribution';
-        if ($fieldSpec['hasLocationType'] ?? NULL) {
-          $fieldEntity = str_replace('civicrm_', '', $fieldSpec['table_name']);
-          $fieldName = $fieldEntity . '_primary.' . $this->getFieldMetadata($mappedField['name'])['name'];
-          $params[$entity][$fieldName] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
-        }
-        else {
-          $params[$entity][$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
-        }
+        $params[$entity][$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
       }
     }
     return $params;

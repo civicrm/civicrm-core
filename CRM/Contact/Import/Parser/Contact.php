@@ -1059,7 +1059,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \CiviCRM_API3_Exception
    */
   protected function getPossibleContactMatch(array $params, ?int $extIDMatch, $dedupeRuleID): ?int {
-    $possibleMatches = $this->getPossibleMatchesByDedupeRule($params, $dedupeRuleID);
+    $possibleMatches = $this->getPossibleMatchesByDedupeRule($params, $dedupeRuleID, FALSE);
     if (!$extIDMatch) {
       if (count($possibleMatches) === 1) {
         return array_key_last($possibleMatches);

@@ -176,7 +176,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @noinspection PhpDocMissingThrowsInspection
    * @noinspection PhpUnhandledExceptionInspection
    */
-  protected function getCustomFieldName(string $key, $version = 3): string {
+  protected function getCustomFieldName(string $key = 'text', int $version = 3): string {
     if ($version === 4) {
       $field = CustomField::get(FALSE)->addWhere('id', '=', $this->getCustomFieldID($key))
         ->addSelect('name', 'custom_group_id.name')->execute()->first();

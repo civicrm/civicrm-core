@@ -21,38 +21,6 @@
 class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
-   * Check if required fields are present.
-   *
-   * @param CRM_Contribute_Import_Form_MapField $self
-   * @param string $contactORContributionId
-   * @param array $importKeys
-   * @param array $errors
-   * @param int $weightSum
-   * @param int $threshold
-   * @param string $fieldMessage
-   *
-   * @return array
-   */
-  protected static function checkRequiredFields($self, string $contactORContributionId, array $importKeys, array $errors, int $weightSum, $threshold, string $fieldMessage): array {
-    // FIXME: should use the schema titles, not redeclare them
-    $requiredFields = [
-      'contribution_contact_id' => ts('Contact ID'),
-    ];
-
-    foreach ($requiredFields as $field => $title) {
-      if (!in_array($field, $importKeys)) {
-        if ($field == 'contribution_contact_id') {
-          if (!($weightSum >= $threshold || in_array('external_identifier', $importKeys))
-          ) {
-            $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', [1 => $threshold]) . '<br />';
-          }
-        }
-      }
-    }
-    return $errors;
-  }
-
-  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
@@ -162,50 +130,25 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $files, $self) {
-    $errors = [];
-    $fieldMessage = NULL;
-    $contactORContributionId = $self->isUpdateExisting() ? 'contribution_id' : 'contribution_contact_id';
-    if (!array_key_exists('savedMapping', $fields)) {
-      $importKeys = [];
-      foreach ($fields['mapper'] as $mapperPart) {
-        $importKeys[] = $mapperPart[0];
-      }
-
-      $params = [
-        'used' => 'Unsupervised',
-        'contact_type' => $self->getContactType(),
-      ];
-      [$ruleFields, $threshold] = CRM_Dedupe_BAO_DedupeRuleGroup::dedupeRuleFieldsWeight($params);
-      $weightSum = 0;
-      foreach ($importKeys as $key => $val) {
-        if (array_key_exists($val, $ruleFields)) {
-          $weightSum += $ruleFields[$val];
-        }
-        if ($val == "soft_credit") {
-          $mapperKey = CRM_Utils_Array::key('soft_credit', $importKeys);
-          if (empty($fields['mapper'][$mapperKey][1])) {
-            if (empty($errors['_qf_default'])) {
-              $errors['_qf_default'] = '';
-            }
-            $errors['_qf_default'] .= ts('Missing required fields: Soft Credit') . '<br />';
-          }
-        }
-      }
-      foreach ($ruleFields as $field => $weight) {
-        $fieldMessage .= ' ' . $field . '(weight ' . $weight . ')';
-      }
-      try {
-        $parser = $self->getParser();
-        $parser->validateMapping($fields['mapper']);
-      }
-      catch (CRM_Core_Exception $e) {
-        $errors['_qf_default'] = $e->getMessage();
-      }
+    $mapperError = [];
+    try {
+      $parser = $self->getParser();
+      $rule = $parser->getDedupeRule($self->getContactType());
       if (!$self->isUpdateExisting()) {
-        $errors = self::checkRequiredFields($self, $contactORContributionId, $importKeys, $errors, $weightSum, $threshold, $fieldMessage);
+        $missingDedupeFields = $self->validateDedupeFieldsSufficientInMapping($rule, $fields['mapper']);
+        if ($missingDedupeFields) {
+          $mapperError[] = $missingDedupeFields;
+        }
       }
+      $parser->validateMapping($fields['mapper']);
     }
-    return !empty($errors) ? $errors : TRUE;
+    catch (CRM_Core_Exception $e) {
+      $mapperError[] = $e->getMessage();
+    }
+    if (!empty($mapperError)) {
+      return ['_qf_default' => implode('<br/>', $mapperError)];
+    }
+    return TRUE;
   }
 
   /**
@@ -260,6 +203,35 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     return $defaults;
+  }
+
+  /**
+   * Validate the the mapped fields contain enough to meet the dedupe rule lookup requirements.
+   *
+   * @param array $rule
+   * @param array $mapper
+   *
+   * @return string|false
+   *   Error string if insufficient.
+   */
+  protected function validateDedupeFieldsSufficientInMapping(array $rule, array $mapper): ?string {
+    $threshold = $rule['threshold'];
+    $ruleFields = $rule['fields'];
+    $weightSum = 0;
+    foreach ($mapper as $mapping) {
+      if ($mapping[0] === 'external_identifier') {
+        // It is enough to have external identifier mapped.
+        $weightSum = $threshold;
+        break;
+      }
+      if (array_key_exists($mapping[0], $ruleFields)) {
+        $weightSum += $ruleFields[$mapping[0]];
+      }
+    }
+    if ($weightSum < $threshold) {
+      return $rule['rule_message'];
+    }
+    return NULL;
   }
 
 }

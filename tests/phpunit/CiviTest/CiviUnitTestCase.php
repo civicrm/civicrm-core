@@ -3366,7 +3366,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @param string $thousandSeparator
    */
-  protected function setCurrencySeparators($thousandSeparator) {
+  protected function setCurrencySeparators(string $thousandSeparator): void {
     Civi::settings()->set('monetaryThousandSeparator', $thousandSeparator);
     Civi::settings()->set('monetaryDecimalPoint', ($thousandSeparator === ',' ? '.' : ','));
   }
