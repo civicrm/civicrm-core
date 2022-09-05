@@ -39,7 +39,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       // it might be a bit expensive to add to every single test
       // so a bit selectively.
       $this->hookClass->reset();
-      CRM_Core_DAO_AllCoreTables::flush();
+      CRM_Core_DAO_AllCoreTables::reinitializeCache(TRUE);
     }
     parent::tearDown();
   }
@@ -1467,7 +1467,7 @@ WHERE
       $this,
       'hookEntityTypes',
     ]);
-    CRM_Core_DAO_AllCoreTables::flush();
+    CRM_Core_DAO_AllCoreTables::reinitializeCache(TRUE);
     $contact1 = $this->individualCreate();
     $contact2 = $this->individualCreate(['api.Im.create' => ['name' => 'chat_handle']]);
     $this->callAPISuccess('Contact', 'merge', ['to_keep_id' => $contact1, 'to_remove_id' => $contact2]);

@@ -24,16 +24,13 @@ class CRM_Core_DAO_AllCoreTables {
   /**
    * Initialise.
    *
-   * @param bool $fresh Deprecated parameter, use flush() to flush.
+   * @param bool $fresh
    */
-  public static function init(bool $fresh = FALSE): void {
-    if (!empty(Civi::$statics[__CLASS__]['initialised']) && !$fresh) {
+  public static function init($fresh = FALSE) {
+    static $init = FALSE;
+    if ($init && !$fresh) {
       return;
     }
-    if ($fresh) {
-      CRM_Core_Error::deprecatedWarning('Use CRM_Core_DAO_AllCoreTables::flush()');
-    }
-
     Civi::$statics[__CLASS__] = [];
 
     $file = preg_replace('/\.php$/', '.data.php', __FILE__);
@@ -53,14 +50,7 @@ class CRM_Core_DAO_AllCoreTables {
       );
     }
 
-    Civi::$statics[__CLASS__]['initialised'] = TRUE;
-  }
-
-  /**
-   * Flush class cache.
-   */
-  public static function flush(): void {
-    Civi::$statics[__CLASS__]['initialised'] = FALSE;
+    $init = TRUE;
   }
 
   /**
@@ -385,11 +375,9 @@ class CRM_Core_DAO_AllCoreTables {
 
   /**
    * Reinitialise cache.
-   *
-   * @deprecated
    */
-  public static function reinitializeCache(): void {
-    self::flush();
+  public static function reinitializeCache() {
+    self::init(TRUE);
   }
 
   /**
