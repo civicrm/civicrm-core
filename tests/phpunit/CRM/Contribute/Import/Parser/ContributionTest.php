@@ -6,6 +6,8 @@
 
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionSoft;
+use Civi\Api4\DedupeRule;
+use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\Email;
 use Civi\Api4\Note;
 use Civi\Api4\OptionValue;
@@ -38,6 +40,9 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_user_job', 'civicrm_queue', 'civicrm_queue_item'], TRUE);
     OptionValue::delete()->addWhere('name', '=', 'random')->execute();
+    DedupeRule::delete()
+      ->addWhere('rule_table', '!=', 'civicrm_email')
+      ->addWhere('dedupe_rule_group_id.name', '=', 'IndividualUnsupervised')->execute();
     parent::tearDown();
   }
 
@@ -50,7 +55,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    *
    * @param string $thousandSeparator
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function testImportParserWithSoftCreditsByExternalIdentifier(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
@@ -330,6 +335,55 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->importContributionsDotCSV();
     $contribution = Contribution::get()->execute()->first();
     $this->assertEquals($anthony, $contribution['contact_id']);
+  }
+
+  /**
+   * Test import parser will consider a rule valid including a custom field.
+   *
+   * @dataProvider validateData
+   */
+  public function testValidateMappingWithCustomDedupeRule($data): void {
+    $this->addToDedupeRule();
+    // First we try to create without total_amount mapped.
+    // It will fail in create mode as total_amount is required for create.
+    $mappings = [
+      ['name' => 'financial_type_id'],
+      ['name' => 'total_amount'],
+    ];
+    foreach ($data['fields']  as $field) {
+      $mappings[] = ['name' => $field === 'custom' ? $this->getCustomFieldName() : $field];
+    }
+    $this->submitDataSourceForm('contributions.csv', ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
+    $form = $this->getMapFieldForm([
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+      'mapper' => $this->getMapperFromFieldMappings($mappings),
+      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+    ]);
+    $form->setUserJobID($this->userJobID);
+    $form->buildForm();
+    $this->assertEquals($data['valid'], $form->validate(), print_r($form->_errors, TRUE));
+  }
+
+  /**
+   * Get data to test validation on.
+   *
+   * Enough is email or any combo of first_name, last_name, custom field.
+   *
+   * @return array
+   */
+  public function validateData(): array {
+   return [
+     'email_first_name_last_name' => [['fields' => ['email', 'first_name', 'last_name'], 'valid' => TRUE]],
+     'email_last_name' => [['fields' => ['email', 'last_name'], 'valid' => TRUE]],
+     'email_first_name' => [['fields' => ['email', 'first_name',], 'valid' => TRUE]],
+     'first_name_last_name' => [['fields' => ['first_name', 'last_name'], 'valid' => TRUE]],
+     'email' => [['fields' => ['email'], 'valid' => TRUE]],
+     'first_name' => [['fields' => ['first_name'], 'valid' => FALSE]],
+     'last_name' => [['fields' => ['last_name'], 'valid' => FALSE]],
+     'last_name_custom' => [['fields' => ['last_name', 'custom'], 'valid' => TRUE]],
+     'first_name_custom' => [['fields' => ['first_name', 'custom'], 'valid' => TRUE]],
+     'custom' => [['fields' => ['first_name', 'custom'], 'valid' => FALSE]],
+   ];
   }
 
   /**
@@ -616,6 +670,38 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'trxn_id'],
     ], $submittedValues);
     return new CRM_Import_DataSource_CSV($this->userJobID);
+  }
+
+  /**
+   * Enhance field such that any combo of the custom field & first/last name is enough.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  protected function addToDedupeRule(): void {
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Contact']);
+    $dedupeRuleGroupID = DedupeRuleGroup::get()
+      ->addWhere('name', '=', 'IndividualUnsupervised')
+      ->addSelect('id')
+      ->execute()
+      ->first()['id'];
+    $this->callAPISuccess('Rule', 'create', [
+      'dedupe_rule_group_id' => $dedupeRuleGroupID,
+      'rule_weight' => 5,
+      'rule_table' => $this->getCustomGroupTable(),
+      'rule_field' => $this->getCustomFieldColumnName('text'),
+    ]);
+    $this->callAPISuccess('Rule', 'create', [
+      'dedupe_rule_group_id' => $dedupeRuleGroupID,
+      'rule_weight' => 5,
+      'rule_table' => 'civicrm_contact',
+      'rule_field' => 'first_name',
+    ]);
+    $this->callAPISuccess('Rule', 'create', [
+      'dedupe_rule_group_id' => $dedupeRuleGroupID,
+      'rule_weight' => 5,
+      'rule_table' => 'civicrm_contact',
+      'rule_field' => 'last_name',
+    ]);
   }
 
 }

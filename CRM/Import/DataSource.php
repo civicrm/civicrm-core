@@ -276,9 +276,10 @@ abstract class CRM_Import_DataSource {
    *
    * The array has all values.
    *
+   * @param array $statuses
+   *
    * @return int
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function getRowCount(array $statuses = []): int {
