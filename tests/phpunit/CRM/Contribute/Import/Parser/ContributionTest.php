@@ -186,8 +186,6 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE);
     $contribution = $this->callAPISuccess('Contribution', 'get', ['contact_id' => $contactID, $this->getCustomFieldName('radio') => 'Red Testing']);
     $this->assertEquals(5, $contribution['values'][$contribution['id']]['custom_' . $this->ids['CustomField']['radio']]);
-    $this->callAPISuccess('CustomField', 'delete', ['id' => $this->ids['CustomField']['radio']]);
-    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $this->ids['CustomGroup']['Custom Group']]);
   }
 
   /**
@@ -221,36 +219,17 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'used' => 'Unsupervised',
       'contact_type' => 'Individual',
     ]);
-    $this->callApiSuccess('RuleGroup', 'create', [
-      'id' => $unsupervisedRuleGroup['id'],
-      'used' => 'General',
-    ]);
 
-    // Create new unsupervised rule with Phone field.
-    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
-      'contact_type' => 'Individual',
-      'threshold' => 10,
-      'used' => 'Unsupervised',
-      'name' => 'MatchingPhone',
-      'title' => 'Matching Phone',
-      'is_reserved' => 0,
-    ]);
     $this->callAPISuccess('Rule', 'create', [
-      'dedupe_rule_group_id' => $ruleGroup['id'],
+      'dedupe_rule_group_id' => $unsupervisedRuleGroup['id'],
       'rule_table' => 'civicrm_phone',
       'rule_weight' => 10,
       'rule_field' => 'phone_numeric',
     ]);
     $parser = new CRM_Contribute_Import_Parser_Contribution();
     $parser->setUserJobID($this->getUserJobID());
-    $fields = $parser->getAvailableFields();
+    $fields = $parser->getFieldsMetadata();
     $this->assertArrayHasKey('phone', $fields);
-    $this->callApiSuccess('RuleGroup', 'create', [
-      'id' => $unsupervisedRuleGroup['id'],
-      'used' => 'Unsupervised',
-    ]);
-    Civi\Api4\DedupeRule::delete()->addWhere('dedupe_rule_group_id', '=', $ruleGroup['id'])->execute();
-    Civi\Api4\DedupeRuleGroup::delete()->addWhere('id', '=', $ruleGroup['id'])->execute();
   }
 
   /**
@@ -274,8 +253,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
 
     $updatedContribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $initialContribution['id']]);
-    $this->assertNotContains('L', $updatedContribution[$customField], "Contribution Duplicate Update Import does not contain L");
-    $this->assertContains('V', $updatedContribution[$customField], "Contribution Duplicate Update Import contains V");
+    $this->assertNotContains('L', $updatedContribution[$customField], 'Contribution Duplicate Update Import does not contain L');
+    $this->assertContains('V', $updatedContribution[$customField], 'Contribution Duplicate Update Import contains V');
 
   }
 
@@ -350,7 +329,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'financial_type_id'],
       ['name' => 'total_amount'],
     ];
-    foreach ($data['fields']  as $field) {
+    foreach ($data['fields'] as $field) {
       $mappings[] = ['name' => $field === 'custom' ? $this->getCustomFieldName() : $field];
     }
     $this->submitDataSourceForm('contributions.csv', ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
@@ -372,18 +351,18 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    * @return array
    */
   public function validateData(): array {
-   return [
-     'email_first_name_last_name' => [['fields' => ['email', 'first_name', 'last_name'], 'valid' => TRUE]],
-     'email_last_name' => [['fields' => ['email', 'last_name'], 'valid' => TRUE]],
-     'email_first_name' => [['fields' => ['email', 'first_name',], 'valid' => TRUE]],
-     'first_name_last_name' => [['fields' => ['first_name', 'last_name'], 'valid' => TRUE]],
-     'email' => [['fields' => ['email'], 'valid' => TRUE]],
-     'first_name' => [['fields' => ['first_name'], 'valid' => FALSE]],
-     'last_name' => [['fields' => ['last_name'], 'valid' => FALSE]],
-     'last_name_custom' => [['fields' => ['last_name', 'custom'], 'valid' => TRUE]],
-     'first_name_custom' => [['fields' => ['first_name', 'custom'], 'valid' => TRUE]],
-     'custom' => [['fields' => ['first_name', 'custom'], 'valid' => FALSE]],
-   ];
+    return [
+      'email_first_name_last_name' => [['fields' => ['email', 'first_name', 'last_name'], 'valid' => TRUE]],
+      'email_last_name' => [['fields' => ['email', 'last_name'], 'valid' => TRUE]],
+      'email_first_name' => [['fields' => ['email', 'first_name'], 'valid' => TRUE]],
+      'first_name_last_name' => [['fields' => ['first_name', 'last_name'], 'valid' => TRUE]],
+      'email' => [['fields' => ['email'], 'valid' => TRUE]],
+      'first_name' => [['fields' => ['first_name'], 'valid' => FALSE]],
+      'last_name' => [['fields' => ['last_name'], 'valid' => FALSE]],
+      'last_name_custom' => [['fields' => ['last_name', 'custom'], 'valid' => TRUE]],
+      'first_name_custom' => [['fields' => ['first_name', 'custom'], 'valid' => TRUE]],
+      'custom' => [['fields' => ['custom'], 'valid' => FALSE]],
+    ];
   }
 
   /**

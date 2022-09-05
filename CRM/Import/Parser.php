@@ -12,6 +12,7 @@
 use Civi\Api4\Campaign;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
+use Civi\Api4\DedupeRule;
 use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\Event;
 use Civi\Api4\UserJob;
@@ -279,6 +280,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    */
   private $_fields;
 
+  private $dedupeRules = [];
+
   /**
    * Metadata for all available fields, keyed by unique name.
    *
@@ -311,42 +314,24 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @param string $contactType
    *
    * @return array[]
-   * @throws \CRM_Core_Exception
    */
   protected function getContactFields(string $contactType): array {
     $contactFields = CRM_Contact_BAO_Contact::importableFields($contactType, NULL);
+    $dedupeFields = $this->getDedupeFields($contactType . 'Unsupervised');
 
-    // Using new Dedupe rule.
-    $ruleParams = [
-      'contact_type' => $contactType,
-      'used' => 'Unsupervised',
-    ];
-    $fieldsArray = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
-    $tmpContactField = [];
-    if (is_array($fieldsArray)) {
-      foreach ($fieldsArray as $value) {
-        //skip if there is no dupe rule
-        if ($value === 'none') {
-          continue;
-        }
-        $customFieldId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
-          $value,
-          'id',
-          'column_name'
-        );
-        $value = trim($customFieldId ? 'custom_' . $customFieldId : $value);
-        $tmpContactField[$value] = $contactFields[$value];
-        $title = $tmpContactField[$value]['title'] . ' ' . ts('(match to contact)');
-        $tmpContactField[$value]['title'] = $title;
-        // When we switch to apiv4 getfields this will already be set for
-        // all fields (including custom which it isn't yet)
-        $tmpContactField[$value]['entity'] = 'Contact';
+    $contactFieldsForContactLookup = [];
+    foreach ($dedupeFields as $fieldName => $dedupeField) {
+      if (!isset($contactFields[$fieldName])) {
+        continue;
       }
+      $contactFieldsForContactLookup[$fieldName] = $contactFields[$fieldName];
+      $contactFieldsForContactLookup[$fieldName]['title'] . ' ' . ts('(match to contact)');
+      $contactFieldsForContactLookup[$fieldName]['entity'] = 'Contact';
     }
 
-    $tmpContactField['external_identifier'] = $contactFields['external_identifier'];
-    $tmpContactField['external_identifier']['title'] = $contactFields['external_identifier']['title'] . ' ' . ts('(match to contact)');
-    return $tmpContactField;
+    $contactFieldsForContactLookup['external_identifier'] = $contactFields['external_identifier'];
+    $contactFieldsForContactLookup['external_identifier']['title'] = $contactFields['external_identifier']['title'] . ' ' . ts('(match to contact)');
+    return $contactFieldsForContactLookup;
   }
 
   /**
@@ -979,6 +964,68 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       ->addWhere('id', '=', $id)
       ->addSelect('name')
       ->execute()->first()['name'];
+  }
+
+  /**
+   * Get the dedupe rule, including an array of fields with weights.
+   *
+   * The fields are keyed according to the metadata.
+   *
+   * @param string $name
+   *
+   * @return array
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  public function getDedupeRule(string $name): array {
+    if (empty($this->dedupeRules[$name])) {
+      $this->dedupeRules[$name] = (array) DedupeRuleGroup::get(FALSE)
+        ->addWhere('name', '=', $name)
+        ->addSelect('threshold', 'name', 'id', 'title', 'contact_type')
+        ->execute()->first();
+      $fields = [];
+      $this->dedupeRules[$name]['rule_message'] = $fieldMessage = '';
+      // Now we add the fields in a format like ['first_name' => 6, 'custom_8' => 9]
+      // The number is the weight and we add both api three & four style fields so the
+      // array can be used for converted & unconverted.
+      $ruleFields = DedupeRule::get(FALSE)
+        ->addWhere('dedupe_rule_group_id', '=', $this->dedupeRules[$name]['id'])
+        ->addSelect('id', 'rule_table', 'rule_field', 'rule_weight')->execute();
+      foreach ($ruleFields as $ruleField) {
+        $fieldMessage .= ' ' . $ruleField['rule_field'] . '(weight ' . $ruleField['rule_weight'] . ')';
+        if ($ruleField['rule_table'] === 'civicrm_contact') {
+          $fields[$ruleField['rule_field']] = $ruleField['rule_weight'];
+        }
+        // If not a contact field we add both api variants of fields.
+        elseif ($ruleField['rule_table'] === 'civicrm_phone') {
+          // Actually the dedupe rule for phone should always be phone_numeric. so checking 'phone' is probably unncessary
+          if (in_array($ruleField['rule_field'], ['phone', 'phone_numeric'], TRUE)) {
+            $fields['phone'] = $ruleField['rule_weight'];
+            $fields['phone_primary.phone'] = $ruleField['rule_weight'];
+          }
+        }
+        elseif ($ruleField['rule_field'] === 'email') {
+          $fields['email'] = $ruleField['rule_weight'];
+          $fields['email_primary.email'] = $ruleField['rule_weight'];
+        }
+        elseif ($ruleField['rule_table'] === 'civicrm_address') {
+          $fields[$ruleField['rule_field']] = $ruleField['rule_weight'];
+          $fields['address_primary' . $ruleField['rule_field']] = $ruleField['rule_weight'];
+        }
+        else {
+          // At this point it must be a custom field.
+          $customField = CustomField::get(FALSE)->addWhere('custom_group_id.table_name', '=', $ruleField['rule_table'])
+            ->addWhere('column_name', '=', $ruleField['rule_field'])
+            ->addSelect('id', 'name', 'custom_group_id.name')->execute()->first();
+          $fields['custom_' . $customField['id']] = $ruleField['rule_weight'];
+          $fields[$customField['custom_group_id.name'] . '.' . $customField['name']] = $ruleField['rule_weight'];
+        }
+      }
+      $this->dedupeRules[$name]['rule_message'] = ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', [1 => $this->dedupeRules[$name]['threshold']]) . '<br />';
+
+      $this->dedupeRules[$name]['fields'] = $fields;
+    }
+    return $this->dedupeRules[$name];
   }
 
   /**
@@ -1695,6 +1742,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
   /**
    * Get the field metadata for fields to be be offered to match the contact.
+   * @todo this is very similar to getContactFields - this is called by participant and that
+   * by contribution import. They should be reconciled - but note that one is being fixed
+   * to support api4 style fields on contribution import - with this import to follow.
    *
    * @return array
    * @noinspection PhpDocMissingThrowsInspection
@@ -2273,6 +2323,17 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       }
     }
     return $contactID;
+  }
+
+  /**
+   * Get the fields for the dedupe rule.
+   *
+   * @param string $dedupeRuleName
+   *
+   * @return array
+   */
+  protected function getDedupeFields(string $dedupeRuleName): array {
+    return $this->getDedupeRule($dedupeRuleName)['fields'];
   }
 
 }
