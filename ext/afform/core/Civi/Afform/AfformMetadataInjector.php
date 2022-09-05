@@ -30,6 +30,11 @@ class AfformMetadataInjector {
         try {
           $module = \Civi::service('angular')->getModule(basename($path, '.aff.html'));
           $meta = \Civi\Api4\Afform::get(FALSE)->addWhere('name', '=', $module['_afform'])->setSelect(['join_entity', 'entity_type'])->execute()->first();
+
+          // Add ngForm directive to afForm controllers
+          foreach (pq('af-form[ctrl]') as $afForm) {
+            pq($afForm)->attr('ng-form', $module['_afform']);
+          }
         }
         catch (\Exception $e) {
         }
@@ -169,7 +174,7 @@ class AfformMetadataInjector {
     $params = [
       'action' => $action,
       'where' => [['name', 'IN', $namesToMatch]],
-      'select' => ['name', 'label', 'input_type', 'input_attrs', 'help_pre', 'help_post', 'options', 'fk_entity'],
+      'select' => ['name', 'label', 'input_type', 'input_attrs', 'help_pre', 'help_post', 'options', 'fk_entity', 'required'],
       'loadOptions' => ['id', 'label'],
       // If the admin included this field on the form, then it's OK to get metadata about the field regardless of user permissions.
       'checkPermissions' => FALSE,

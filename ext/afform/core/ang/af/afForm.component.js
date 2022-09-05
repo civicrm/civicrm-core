@@ -4,6 +4,9 @@
     bindings: {
       ctrl: '@'
     },
+    require: {
+      ngForm: 'form'
+    },
     controller: function($scope, $element, $timeout, crmApi4, crmStatus, $window, $location, $parse, FileUploader) {
       var schema = {},
         data = {},
@@ -135,6 +138,10 @@
       }
 
       this.submit = function() {
+        if (!ctrl.ngForm.$valid) {
+          CRM.alert(ts('Please fill all required fields.'), ts('Form Error'));
+          return;
+        }
         status = CRM.status({});
         $element.block();
 
