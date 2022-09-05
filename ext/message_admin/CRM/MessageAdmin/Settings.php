@@ -9,8 +9,15 @@ class CRM_MessageAdmin_Settings {
       ->addSelect('name', 'label')
       ->addOrderBy('label')
       ->execute();
+    $allLangsIdx = array_combine($allLangs->column('name'), $allLangs->column('label'));
+
+    $usableLangs = \Civi\Api4\MessageTemplate::getActions(0)
+      ->addWhere("name", "=", "get")
+      ->execute()
+      ->single()['params']['language']['options'];
+
     return [
-      'allLanguages' => array_combine($allLangs->column('name'), $allLangs->column('label')),
+      'allLanguages' => CRM_Utils_Array::subset($allLangsIdx, $usableLangs),
       'uiLanguages' => CRM_Core_I18n::uiLanguages(),
     ];
   }
