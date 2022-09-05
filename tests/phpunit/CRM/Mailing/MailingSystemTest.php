@@ -41,6 +41,8 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
   private $counts;
 
+  private $checkMailParamsContext = TRUE;
+
   /**
    * Set up the deprecated bao support.
    */
@@ -61,7 +63,9 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
    */
   public function hook_alterMailParams(&$params, $context = NULL): void {
     $this->counts['hook_alterMailParams'] = 1;
-    $this->assertEquals('civimail', $context);
+    if ($this->checkMailParamsContext) {
+      $this->assertEquals('civimail', $context);
+    }
   }
 
   /**
@@ -152,6 +156,70 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
       'status_id' => 'Completed',
       'subject' => $subject,
     ], 1);
+  }
+
+  public function testMailingReplyAutoRespond(): void {
+    // Because our parent class marks the _groupID as private, we can't use that :-(
+    $group_1 = $this->groupCreate([
+      'name' => 'Test Group Mailing Reply',
+      'title' => 'Test Group Mailing Reply',
+    ]);
+    $this->createContactsInGroup(1, $group_1);
+
+    // Also _mut is private to the parent, so we have to make our own:
+    $mut = new CiviMailUtils($this, TRUE);
+
+    $replyComponent = civicrm_api3('MailingComponent', 'get', ['id' => CRM_Mailing_PseudoConstant::defaultComponent('Reply', ''), 'sequential' => 1])['values'][0];
+    $replyComponent['body_html'] = $replyComponent['body_html'] . ' {domain.address} ';
+    $replyComponent['body_txt'] = $replyComponent['body_txt'] . ' {domain.address} ';
+    civicrm_api3('MailingComponent', 'create', $replyComponent);
+
+    // Create initial mailing to the group.
+    $mailingParams = [
+      'name'           => 'Mailing Reply: mailing ',
+      'subject'        => 'Mailing Reply: test',
+      'created_id'     => 1,
+      'groups'         => ['include' => [$group_1]],
+      'scheduled_date' => 'now',
+      'body_text'      => 'Please just {action.unsubscribeUrl}',
+      'auto_responder' => 1,
+      'reply_id'       => $replyComponent['id'],
+    ];
+
+    // The following code is exactly the same as runMailingSuccess() except that we store the ID of the mailing.
+    $mailing_1 = $this->callAPISuccess('mailing', 'create', $mailingParams);
+    $mut->assertRecipients(array());
+    $this->callAPISuccess('job', 'process_mailing', array('runInNonProductionEnvironment' => TRUE));
+
+    $allMessages = $mut->getAllMessages('ezc');
+    $this->assertEquals(1, count($allMessages));
+
+    // So far so good.
+    $message = end($allMessages);
+    $this->assertTrue($message->body instanceof ezcMailText);
+    $this->assertEquals('plain', $message->body->subType);
+    $this->assertEquals(1, preg_match(
+      '@mailing/unsubscribe.*jid=(\d+)&qid=(\d+)&h=([0-9a-z]+)@',
+      $message->body->text,
+      $matches
+    ));
+
+    $this->checkMailParamsContext = FALSE;
+
+    CRM_Mailing_Event_BAO_Reply::reply(
+      $matches[1],
+      $matches[2],
+      $matches[3],
+    );
+    $mut->checkMailLog([
+      'Please Send Inquiries to Our Contact Email Address',
+      CRM_Core_DomainTokens::getDomainTokenValues(NULL, FALSE)['address'],
+      'do-not-reply@chaos.org',
+      'info@EXAMPLE.ORG',
+      'mail1@nul.example.com',
+    ], ['{domain.address}']);
+    $this->callAPISuccess('Mailing', 'delete', ['id' => $mailing_1['id']]);
+    $this->callAPISuccess('Group', 'delete', ['id' => $group_1]);
   }
 
   /**
