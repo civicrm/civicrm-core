@@ -99,6 +99,8 @@ abstract class CRM_Import_Form_Preview extends CRM_Import_Forms {
 
   /**
    * Run the import.
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function runTheImport(): void {
     $parser = $this->getParser();
@@ -112,7 +114,7 @@ abstract class CRM_Import_Form_Preview extends CRM_Import_Forms {
         'reset' => 1,
       ], FALSE, NULL, FALSE),
     ]);
-    $runner->runAllViaWeb();
+    $runner->runAllInteractive();
   }
 
   /**

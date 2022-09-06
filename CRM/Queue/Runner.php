@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\UserJob;
 use Civi\Core\Event\GenericHookEvent;
 
 /**
@@ -152,10 +153,12 @@ class CRM_Queue_Runner {
    * environments which support multiprocessing (background queue-workers) can use those;
    * otherwise, they can use the traditional AJAX runner.
    *
-   * To ensure portability, requesters must satisfy the requirements of *both/all*
-   * execution mechanisms.
+   * To ensure portability, requesters must satisfy the requirements of
+   * *both/all* execution mechanisms.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function runAllInteractive() {
+  public function runAllInteractive(): void {
     $this->assertRequirementsWeb();
     $this->assertRequirementsBackground();
 
@@ -165,14 +168,13 @@ class CRM_Queue_Runner {
       'onEndUrl' => $this->onEndUrl,
       // 'onEnd' ==> No, see comments in assertRequirementsBackground()
     ];
-    \Civi\Api4\UserJob::save(FALSE)->setRecords([$userJob])->execute();
+    UserJob::save(FALSE)->setRecords([$userJob])->execute();
 
     if (Civi::settings()->get('enableBackgroundQueue')) {
-      return $this->runAllViaBackground();
+      $this->runAllViaBackground();
+      return;
     }
-    else {
-      return $this->runAllViaWeb();
-    }
+    $this->runAllViaWeb();
   }
 
   protected function runAllViaBackground() {
@@ -437,11 +439,15 @@ class CRM_Queue_Runner {
    *
    * @return array|null
    *   The record, per APIv4.
-   *   This may return NULL. UserJobs are required for `runAllInteractively()` and
-   *   `runAllViaBackground()`, but (for backward compatibility) they are not required for `runAllViaWeb()`.
+   *   This may return NULL. UserJobs are required for `runAllInteractively()`
+   *   and
+   *   `runAllViaBackground()`, but (for backward compatibility) they are not
+   *   required for `runAllViaWeb()`.
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function findUserJob(): ?array {
-    return \Civi\Api4\UserJob::get(FALSE)
+    return UserJob::get(FALSE)
       ->addWhere('queue_id.name', '=', $this->queue->getName())
       ->execute()
       ->first();

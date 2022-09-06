@@ -101,7 +101,7 @@ abstract class CRM_Queue_Queue {
   }
 
   /**
-   * Perform any registation or resource-allocation for a new queue
+   * Perform any registration or resource-allocation for a new queue
    */
   abstract public function createQueue();
 
