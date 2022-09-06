@@ -818,6 +818,7 @@
     <type>varchar</type>
     <length>255</length>
     <import>true</import>
+    <deprecated>true</deprecated>
     <headerPattern>/^Open\s?ID|u(niq\w*)?\s?ID/i</headerPattern>
     <dataPattern>/^[\w\/\:\.]+$/</dataPattern>
     <comment>the OpenID (or OpenID-style http://username.domain/) unique identifier for this contact mainly used for logging in to CiviCRM</comment>

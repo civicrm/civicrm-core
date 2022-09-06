@@ -143,6 +143,7 @@
     <name>hold_date</name>
     <type>datetime</type>
     <comment>When the address went on bounce hold</comment>
+    <readonly>true</readonly>
     <html>
       <label>Hold Date</label>
       <type>Select Date</type>
