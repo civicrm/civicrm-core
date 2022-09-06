@@ -146,7 +146,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
   public function getMapFieldFormObject(array $submittedValues = []): CRM_Contact_Import_Form_MapField {
     CRM_Core_DAO::executeQuery('CREATE TABLE IF NOT EXISTS civicrm_tmp_d_import_job_xxx (`nada` text, `first_name` text, `last_name` text, `address` text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci');
     $submittedValues = array_merge([
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactType' => 'Individual',
       'contactSubType' => '',
       'dataSource' => 'CRM_Import_DataSource_SQL',
       'sqlQuery' => 'SELECT * FROM civicrm_tmp_d_import_job_xxx',
@@ -227,7 +227,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     $this->assertEquals($this->getCustomFieldName('text'), $processor->getFieldName(4));
     $this->assertEquals('url', $processor->getFieldName(8));
 
-    $processor->setContactTypeByConstant(CRM_Import_Parser::CONTACT_HOUSEHOLD);
+    $processor->setContactTypeByConstant('Household');
     $this->assertEquals('Household', $processor->getContactType());
   }
 
@@ -346,7 +346,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     $processor->setMappingID($mappingID);
     $processor->setFormName('document.forms.MapField');
     $processor->setMetadata($this->getContactImportMetadata());
-    $processor->setContactTypeByConstant(CRM_Import_Parser::CONTACT_INDIVIDUAL);
+    $processor->setContactTypeByConstant('Individual');
 
     $defaults = [];
     $defaults["mapper[$columnNumber]"] = $processor->getSavedQuickformDefaultsForColumn($columnNumber);
@@ -362,7 +362,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    */
   private function setUpMapFieldForm(): void {
     $this->form = $this->getMapFieldFormObject();
-    $this->form->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
+    $this->form->set('contactType', 'Individual');
   }
 
   /**

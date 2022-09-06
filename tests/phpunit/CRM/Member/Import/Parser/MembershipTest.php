@@ -342,7 +342,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $userJobID = UserJob::create()->setValues([
       'metadata' => [
         'submitted_values' => array_merge([
-          'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+          'contactType' => 'Individual',
           'contactSubType' => '',
           'dataSource' => 'CRM_Import_DataSource_SQL',
           'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
@@ -468,7 +468,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'uploadFile' => ['name' => __DIR__ . '/data/' . $csv],
       'skipColumnHeader' => TRUE,
       'fieldSeparator' => ',',
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactType' => 'Individual',
       'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'file' => ['name' => $csv],

@@ -1110,14 +1110,14 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
         'csv' => 'organization_email_no_organization_name.csv',
         'mapper' => [['email'], ['phone', 1, 1]],
         'expected_error' => 'Missing required fields: Organization Name',
-        'submitted_values' => ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP, 'contactType' => CRM_Import_Parser::CONTACT_ORGANIZATION],
+        'submitted_values' => ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP, 'contactType' => 'Organization'],
       ],
       'organization_email_no_organization_name_update_mode' => [
         // Email is enough in upgrade mode (at least to pass validate).
         'csv' => 'organization_email_no_organization_name.csv',
         'mapper' => [['email'], ['phone', 1, 1]],
         'expected_error' => '',
-        'submitted_values' => ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE, 'contactType' => CRM_Import_Parser::CONTACT_ORGANIZATION],
+        'submitted_values' => ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE, 'contactType' => 'Organization'],
       ],
     ];
   }
@@ -1209,7 +1209,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
           CRM_Import_Parser::ERROR => 1,
         ],
         'submitted_values' => [
-          'contactType' => CRM_Import_Parser::CONTACT_ORGANIZATION,
+          'contactType' => 'Organization',
         ],
       ],
       //Matching this contact based on the de-dupe rule would cause an external ID conflict
@@ -1788,7 +1788,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'skipColumnHeader' => TRUE,
       'fieldSeparator' => ',',
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactType' => 'Individual',
       'mapper' => $mapper,
       'dataSource' => 'CRM_Import_DataSource_CSV',
     ], $submittedValues));
@@ -2046,7 +2046,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $userJobID = UserJob::create()->setValues([
       'metadata' => [
         'submitted_values' => array_merge([
-          'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+          'contactType' => 'Individual',
           'contactSubType' => '',
           'doGeocodeAddress' => 0,
           'disableUSPS' => 0,
@@ -2120,7 +2120,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'uploadFile' => ['name' => __DIR__ . '/../Form/data/' . $csv],
       'skipColumnHeader' => TRUE,
       'fieldSeparator' => ',',
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactType' => 'Individual',
       'mapper' => $mapper,
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'file' => ['name' => $csv],

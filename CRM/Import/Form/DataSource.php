@@ -126,18 +126,18 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
     //contact types option
     $contactTypeOptions = [];
     if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
-      $contactTypeOptions[CRM_Import_Parser::CONTACT_INDIVIDUAL] = ts('Individual');
+      $contactTypeOptions['Individual'] = ts('Individual');
     }
     if (CRM_Contact_BAO_ContactType::isActive('Household')) {
-      $contactTypeOptions[CRM_Import_Parser::CONTACT_HOUSEHOLD] = ts('Household');
+      $contactTypeOptions['Household'] = ts('Household');
     }
     if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
-      $contactTypeOptions[CRM_Import_Parser::CONTACT_ORGANIZATION] = ts('Organization');
+      $contactTypeOptions['Organization'] = ts('Organization');
     }
     $this->addRadio('contactType', ts('Contact Type'), $contactTypeOptions);
 
     $this->setDefaults([
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactType' => 'Individual',
     ]);
   }
 

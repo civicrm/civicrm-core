@@ -34,7 +34,7 @@ trait CRMTraits_Import_ParserTrait {
     $submittedValues = array_merge([
       'skipColumnHeader' => TRUE,
       'fieldSeparator' => ',',
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactType' => 'Individual',
       'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'file' => ['name' => $csv],
@@ -107,7 +107,7 @@ trait CRMTraits_Import_ParserTrait {
       'uploadFile' => ['name' => $directory . '/data/' . $csv],
       'skipColumnHeader' => TRUE,
       'fieldSeparator' => ',',
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactType' => 'Individual',
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'file' => ['name' => $csv],
       'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,

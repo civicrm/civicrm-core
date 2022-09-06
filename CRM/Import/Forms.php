@@ -343,9 +343,9 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   protected function getContactType(): string {
     $contactTypeMapping = [
-      CRM_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
-      CRM_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
-      CRM_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
+      'Individual' => 'Individual',
+      'Household' => 'Household',
+      'Organization' => 'Organization',
     ];
     return $contactTypeMapping[$this->getSubmittedValue('contactType')];
   }

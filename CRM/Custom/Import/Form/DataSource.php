@@ -101,7 +101,7 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   public function setDefaultValues(): array {
     $config = CRM_Core_Config::singleton();
     $defaults = [
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactType' => 'Individual',
       'fieldSeparator' => $config->fieldSeparator,
       // Perhaps never used, but permits url passing of the group.
       'multipleCustomData' => CRM_Utils_Request::retrieve('id', 'Positive', $this),
