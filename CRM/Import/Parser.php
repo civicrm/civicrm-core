@@ -205,15 +205,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @return string
    */
   protected function getContactType(): string {
-    if (!$this->_contactType) {
-      $contactTypeMapping = [
-        'Individual' => 'Individual',
-        'Household' => 'Household',
-        'Organization' => 'Organization',
-      ];
-      $this->_contactType = $contactTypeMapping[$this->getSubmittedValue('contactType')];
-    }
-    return $this->_contactType;
+    return $this->getSubmittedValue('contactType');
   }
 
   /**
