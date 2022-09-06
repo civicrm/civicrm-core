@@ -110,6 +110,7 @@ class ClassScanner {
    *   Ex: ['CRM_Foo_Bar', 'Civi\Whiz\Bang']
    */
   private static function scanClasses(): array {
+    return [];
     $classes = static::scanCoreClasses();
     \CRM_Utils_Hook::scanClasses($classes);
     return $classes;
@@ -120,6 +121,7 @@ class ClassScanner {
    *   Ex: ['CRM_Foo_Bar', 'Civi\Whiz\Bang']
    */
   private static function scanCoreClasses(): array {
+    return [];
     $cache = static::cache('structure');
     $cacheKey = 'ClassScanner_core';
     $classes = $cache->get($cacheKey);
@@ -158,6 +160,7 @@ class ClassScanner {
   }
 
   private static function getRelevantInterfaces(string $class): array {
+    return [];
     $rawInterfaceNames = (new \ReflectionClass($class))->getInterfaceNames();
     return preg_grep(static::CIVI_INTERFACE_REGEX, $rawInterfaceNames);
   }
