@@ -585,9 +585,26 @@ class CRM_Import_Forms extends CRM_Core_Form {
         // Duplicates are being skipped so id matching is not available.
         continue;
       }
+      if (($field['entity'] ?? '') === 'Contact' && $this->isFilterContactFields() && empty($field['match_rule'])) {
+        // Filter out metadata that is intended for create & update - this is not available in the quick-form
+        // but is now loaded in the Parser for the LexIM variant.
+        continue;
+      }
       $return[$name] = $field['html']['label'] ?? $field['title'];
     }
     return $return;
+  }
+
+  /**
+   * Should contact fields be filtered which determining fields to show.
+   *
+   * This applies to Contribution import as we put all contact fields in the metadata
+   * but only present those used for a match - but will permit create via LeXIM.
+   *
+   * @return bool
+   */
+  protected function isFilterContactFields() : bool {
+    return FALSE;
   }
 
   /**

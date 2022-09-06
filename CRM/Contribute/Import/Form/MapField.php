@@ -72,6 +72,18 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
+   * Should contact fields be filtered which determining fields to show.
+   *
+   * This applies to Contribution import as we put all contact fields in the metadata
+   * but only present those used for a match - but will permit create via LeXIM.
+   *
+   * @return bool
+   */
+  protected function isFilterContactFields() : bool {
+    return TRUE;
+  }
+
+  /**
    * Build the form object.
    *
    * @throws \CiviCRM_API3_Exception
