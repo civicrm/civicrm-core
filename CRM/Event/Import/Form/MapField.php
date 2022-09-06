@@ -54,8 +54,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @return void
    */
   public function buildQuickForm() {
-    $savedMappingID = (int) $this->getSubmittedValue('savedMapping');
-    $this->buildSavedMappingFields($savedMappingID);
+    $this->addSavedMappingFields();
     $this->addFormRule(array('CRM_Event_Import_Form_MapField', 'formRule'), $this);
     $this->addMapper();
     $this->addFormButtons();
@@ -70,7 +69,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param $files
    * @param self $self
    *
-   * @return array
+   * @return array|true
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $files, $self) {
@@ -115,39 +114,11 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
     }
 
-    if (!empty($fields['saveMapping'])) {
-      $nameField = $fields['saveMappingName'] ?? NULL;
-      if (empty($nameField)) {
-        $errors['saveMappingName'] = ts('Name is required to save Import Mapping');
-      }
-      else {
-        if (CRM_Core_BAO_Mapping::checkMapping($nameField, CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Import Participant'))) {
-          $errors['saveMappingName'] = ts('Duplicate Import Participant Mapping Name');
-        }
-      }
-    }
-
-    //display Error if loaded mapping is not selected
-    if (array_key_exists('loadMapping', $fields)) {
-      $getMapName = $fields['savedMapping'] ?? NULL;
-      if (empty($getMapName)) {
-        $errors['savedMapping'] = ts('Select saved mapping');
-      }
-    }
-
     if (empty($errors['_qf_default'])) {
       unset($errors['_qf_default']);
     }
-    if (!empty($errors)) {
-      if (!empty($errors['saveMappingName'])) {
-        $_flag = 1;
-        $assignError = new CRM_Core_Page();
-        $assignError->assign('mappingDetailsError', $_flag);
-      }
-      return $errors;
-    }
 
-    return TRUE;
+    return empty($errors) ? TRUE : $errors;
   }
 
   /**
