@@ -216,9 +216,9 @@ class CRM_Import_ImportProcessor {
    */
   public function setContactTypeByConstant($contactTypeKey) {
     $constantTypeMap = [
-      CRM_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
-      CRM_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
-      CRM_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
+      'Individual' => 'Individual',
+      'Household' => 'Household',
+      'Organization' => 'Organization',
     ];
     $this->contactType = $constantTypeMap[$contactTypeKey];
   }

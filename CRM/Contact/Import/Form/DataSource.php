@@ -106,16 +106,16 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     // contact types option
     $contactTypeOptions = $contactTypeAttributes = [];
     if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
-      $contactTypeOptions[CRM_Import_Parser::CONTACT_INDIVIDUAL] = ts('Individual');
-      $contactTypeAttributes[CRM_Import_Parser::CONTACT_INDIVIDUAL] = $js;
+      $contactTypeOptions['Individual'] = ts('Individual');
+      $contactTypeAttributes['Individual'] = $js;
     }
     if (CRM_Contact_BAO_ContactType::isActive('Household')) {
-      $contactTypeOptions[CRM_Import_Parser::CONTACT_HOUSEHOLD] = ts('Household');
-      $contactTypeAttributes[CRM_Import_Parser::CONTACT_HOUSEHOLD] = $js;
+      $contactTypeOptions['Household'] = ts('Household');
+      $contactTypeAttributes['Household'] = $js;
     }
     if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
-      $contactTypeOptions[CRM_Import_Parser::CONTACT_ORGANIZATION] = ts('Organization');
-      $contactTypeAttributes[CRM_Import_Parser::CONTACT_ORGANIZATION] = $js;
+      $contactTypeOptions['Organization'] = ts('Organization');
+      $contactTypeAttributes['Organization'] = $js;
     }
     $this->addRadio('contactType', ts('Contact Type'), $contactTypeOptions, [], NULL, FALSE, $contactTypeAttributes);
 
@@ -162,7 +162,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     $defaults = [
       'dataSource' => $this->getDefaultDataSource(),
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactType' => 'Individual',
       'fieldSeparator' => CRM_Core_Config::singleton()->fieldSeparator,
       'disableUSPS' => TRUE,
     ];

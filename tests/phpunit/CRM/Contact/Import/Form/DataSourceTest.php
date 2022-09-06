@@ -62,7 +62,7 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
     $sqlFormValues = [
       'dataSource' => 'CRM_Import_DataSource_SQL',
       'sqlQuery' => 'SELECT "bob" as first_name FROM civicrm_option_value LIMIT 5',
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactType' => 'Individual',
     ];
     $form = $this->submitDataSourceForm($sqlFormValues);
     $userJobID = $form->getUserJobID();
@@ -89,7 +89,7 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
     $csvFormValues = [
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'skipColumnHeader' => 1,
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactType' => 'Individual',
       'uploadFile' => [
         'name' => __DIR__ . '/data/yogi.csv',
         'type' => 'text/csv',

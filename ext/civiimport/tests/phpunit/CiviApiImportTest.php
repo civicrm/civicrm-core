@@ -56,7 +56,7 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
       'metadata' => [
         'DataSource' => ['table_name' => 'abc', 'column_headers' => ['External Identifier', 'Amount Given', 'Date Received', 'Financial Type', 'In honor']],
         'submitted_values' => [
-          'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+          'contactType' => 'Individual',
           'contactSubType' => '',
           'dataSource' => 'CRM_Import_DataSource_SQL',
           'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,

@@ -52,8 +52,10 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
   /**
    * Contact types
+   *
+   * @deprecated
    */
-  const CONTACT_INDIVIDUAL = 1, CONTACT_HOUSEHOLD = 2, CONTACT_ORGANIZATION = 4;
+  const CONTACT_INDIVIDUAL = 'Individual', CONTACT_HOUSEHOLD = 'Household', CONTACT_ORGANIZATION = 'Organization';
 
   /**
    * User job id.
@@ -205,9 +207,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   protected function getContactType(): string {
     if (!$this->_contactType) {
       $contactTypeMapping = [
-        CRM_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
-        CRM_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
-        CRM_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
+        'Individual' => 'Individual',
+        'Household' => 'Household',
+        'Organization' => 'Organization',
       ];
       $this->_contactType = $contactTypeMapping[$this->getSubmittedValue('contactType')];
     }
