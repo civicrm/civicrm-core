@@ -112,8 +112,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
-    $savedMappingID = (int) $this->getSubmittedValue('savedMapping');
-    $this->buildSavedMappingFields($savedMappingID);
+    $this->addSavedMappingFields();
 
     $this->addFormRule(['CRM_Contact_Import_Form_MapField', 'formRule']);
 
@@ -273,7 +272,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     //used to warn for mismatch column count or mismatch mapping
     CRM_Core_Session::singleton()->setStatus(NULL);
     $processor = new CRM_Import_ImportProcessor();
-    $processor->setMappingID($savedMappingID);
+    $processor->setMappingID((int) $this->getSubmittedValue('savedMapping'));
     $processor->setFormName($formName);
     $processor->setMetadata($this->getContactImportMetadata());
     $processor->setContactTypeByConstant($this->getSubmittedValue('contactType'));
@@ -338,9 +337,11 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public static function formRule(array $fields) {
     if (!empty($fields['saveMapping'])) {
+      // todo - this is non-sensical - sane js is better. PR to fix got stale but
+      // is here https://github.com/civicrm/civicrm-core/pull/23950
       CRM_Core_Smarty::singleton()->assign('isCheked', TRUE);
     }
-    return parent::mappingRule($fields);
+    return TRUE;
   }
 
   /**
