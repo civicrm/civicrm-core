@@ -137,6 +137,7 @@ class CRM_Core_Page_AJAX_Attachment {
   public static function angularSettings() {
     return [
       'token' => self::createToken(),
+      'maxFileSize' => Civi::settings()->get('maxFileSize'),
     ];
   }
 

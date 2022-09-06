@@ -156,11 +156,7 @@
         var model = $parse(attr.crmAttachments);
         scope.att = model(scope.$parent);
         scope.ts = CRM.ts(null);
-        CRM.api4('Setting', 'get', {
-          select: ["maxFileSize"]
-        }).then(function(settings) {
-          scope.max_size = settings[0].value;
-        });
+        scope.max_size = CRM.crmAttachment.maxFileSize;
         scope.inclUrl = '~/crmAttachment/attachments.html';
 
         // delay rendering of child tree until after model has been populated

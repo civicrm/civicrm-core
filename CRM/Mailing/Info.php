@@ -110,6 +110,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'reportIds' => $reportIds,
       'enabledLanguages' => $enabledLanguages,
       'isMultiLingual' => $isMultiLingual,
+      'autoRecipientRebuild' => Civi::settings()->get('auto_recipient_rebuild'),
     ];
     return $crmMailingSettings;
   }
