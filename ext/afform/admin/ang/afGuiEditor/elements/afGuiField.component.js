@@ -20,8 +20,6 @@
         // When search-by-range is enabled the second element gets a suffix for some properties like "placeholder2"
         rangeElements = ['', '2'],
         dateRangeElements = ['1', '2'],
-        relativeDatesWithPickRange = CRM.afGuiEditor.dateRanges,
-        relativeDatesWithoutPickRange = relativeDatesWithPickRange.slice(1),
         yesNo = [
           {id: '1', label: ts('Yes')},
           {id: '0', label: ts('No')}
@@ -30,7 +28,7 @@
 
       this.$onInit = function() {
         ctrl.hasDefaultValue = !!getSet('afform_default');
-        ctrl.fieldDefn = angular.extend({}, ctrl.getDefn(), ctrl.node.defn);
+        setFieldDefn();
         ctrl.inputTypes = _.transform(_.cloneDeep(afGui.meta.inputTypes), function(inputTypes, type) {
           if (inputTypeCanBe(type.name)) {
             // Change labels for EntityRef fields
@@ -49,6 +47,7 @@
             inputTypes.push(type);
           }
         });
+        setDateOptions();
       };
 
       this.getFkEntity = function() {
@@ -120,11 +119,8 @@
       };
 
       this.getOptions = function() {
-        if (ctrl.node.defn && ctrl.node.defn.options) {
-          return ctrl.node.defn.options;
-        }
-        if (_.includes(['Date', 'Timestamp'], $scope.getProp('data_type'))) {
-          return $scope.getProp('search_range') ? relativeDatesWithPickRange : relativeDatesWithoutPickRange;
+        if (ctrl.fieldDefn.options) {
+          return ctrl.fieldDefn.options;
         }
         if (ctrl.getDefn().input_type === 'EntityRef') {
           // Build a list of all entities in this form that can be referenced by this field.
@@ -218,6 +214,10 @@
         if (newVal && getSet('input_attrs.multiple')) {
           getSet('input_attrs.multiple', false);
         }
+        if (ctrl.hasDefaultValue) {
+          $scope.toggleDefaultValue();
+        }
+        setDateOptions();
       };
 
       $scope.toggleRequired = function() {
@@ -233,6 +233,16 @@
           ($scope.getProp('input_type') === 'CheckBox' || $scope.getProp('input_attrs.multiple')));
       }
 
+      function setFieldDefn() {
+        ctrl.fieldDefn = angular.extend({}, ctrl.getDefn(), ctrl.node.defn);
+      }
+
+      function setDateOptions() {
+        if (_.includes(['Date', 'Timestamp'], $scope.getProp('data_type'))) {
+          ctrl.node.defn.options = $scope.getProp('search_range') ? CRM.afGuiEditor.dateRanges : CRM.afGuiEditor.dateRanges.slice(1);
+          setFieldDefn();
+        }
+      }
 
       $scope.toggleDefaultValue = function() {
         if (ctrl.hasDefaultValue) {
@@ -302,7 +312,7 @@
               clearOut(ctrl.node, ['defn', 'input_attrs']);
             }
           }
-          ctrl.fieldDefn = angular.extend({}, ctrl.getDefn(), ctrl.node.defn);
+          setFieldDefn();
 
           // When changing the multiple property, force-reset the default value widget
           if (ctrl.hasDefaultValue && _.includes(['input_type', 'input_attrs.multiple'], propName)) {
