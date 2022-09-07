@@ -104,7 +104,7 @@
         {strip}
             {if $event.event_start_date && $event.event_end_date && ($event.event_end_date|crmDate:'%Y%m%d':0 == $event.event_start_date|crmDate:'%Y%m%d':0)}
               {$event.event_start_date|crmDate:'Full':0}
-              &nbsp;{ts}from{/ts}
+              &nbsp;{ts}from{/ts}&nbsp;
               {$event.event_start_date|crmDate:0:1}
             {else}
               {$event.event_start_date|crmDate}
