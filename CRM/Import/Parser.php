@@ -316,19 +316,17 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     $contactFields = $this->getAllContactFields('');
     $dedupeFields = $this->getDedupeFields($contactType);
 
-    $contactFieldsForContactLookup = [];
     foreach ($dedupeFields as $fieldName => $dedupeField) {
       if (!isset($contactFields[$fieldName])) {
         continue;
       }
-      $contactFieldsForContactLookup[$fieldName] = $contactFields[$fieldName];
-      $contactFieldsForContactLookup[$fieldName]['title'] . ' ' . ts('(match to contact)');
-      $contactFieldsForContactLookup[$fieldName]['entity'] = 'Contact';
+      $contactFields[$fieldName]['title'] . ' ' . ts('(match to contact)');
+      $contactFields[$fieldName]['match_rule'] = $this->getDefaultRuleForContactType($contactType);
     }
 
-    $contactFieldsForContactLookup['external_identifier'] = $contactFields['external_identifier'];
-    $contactFieldsForContactLookup['external_identifier']['title'] = $contactFields['external_identifier']['title'] . ' ' . ts('(match to contact)');
-    return $contactFieldsForContactLookup;
+    $contactFields['external_identifier']['title'] .= ts('(match to contact)');
+    $contactFields['external_identifier']['match_rule'] = '*';
+    return $contactFields;
   }
 
   /**
