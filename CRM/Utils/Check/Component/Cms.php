@@ -134,6 +134,15 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
   }
 
   /**
+   * For sites running in WordPress, make sure clean URLs are properly set in settings file.
+   *
+   * @return CRM_Utils_Check_Message[]
+   */
+  public static function checkCleanurls() {
+    return CRM_Core_Config::singleton()->userSystem->checkCleanurls();
+  }
+
+  /**
    * See if a page exists and is published.
    *
    * @param string $slug

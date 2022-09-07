@@ -1110,4 +1110,8 @@ abstract class CRM_Utils_System_Base {
     return TRUE;
   }
 
+  public function checkCleanurls() {
+    return [];
+  }
+
 }
