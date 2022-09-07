@@ -990,53 +990,22 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       $name = $this->getDefaultRuleForContactType($contactType);
     }
     if (empty($this->dedupeRules[$name])) {
-      $this->dedupeRules[$name] = (array) DedupeRuleGroup::get(FALSE)
-        ->addWhere('name', '=', $name)
-        ->addSelect('threshold', 'name', 'id', 'title', 'contact_type')
-        ->execute()->first();
-      $fields = [];
-      $this->dedupeRules[$name]['rule_message'] = $fieldMessage = '';
-      // Now we add the fields in a format like ['first_name' => 6, 'custom_8' => 9]
-      // The number is the weight and we add both api three & four style fields so the
-      // array can be used for converted & unconverted.
-      $ruleFields = DedupeRule::get(FALSE)
-        ->addWhere('dedupe_rule_group_id', '=', $this->dedupeRules[$name]['id'])
-        ->addSelect('id', 'rule_table', 'rule_field', 'rule_weight')->execute();
-      foreach ($ruleFields as $ruleField) {
-        $fieldMessage .= ' ' . $ruleField['rule_field'] . '(weight ' . $ruleField['rule_weight'] . ')';
-        if ($ruleField['rule_table'] === 'civicrm_contact') {
-          $fields[$ruleField['rule_field']] = $ruleField['rule_weight'];
-        }
-        // If not a contact field we add both api variants of fields.
-        elseif ($ruleField['rule_table'] === 'civicrm_phone') {
-          // Actually the dedupe rule for phone should always be phone_numeric. so checking 'phone' is probably unncessary
-          if (in_array($ruleField['rule_field'], ['phone', 'phone_numeric'], TRUE)) {
-            $fields['phone'] = $ruleField['rule_weight'];
-            $fields['phone_primary.phone'] = $ruleField['rule_weight'];
-          }
-        }
-        elseif ($ruleField['rule_field'] === 'email') {
-          $fields['email'] = $ruleField['rule_weight'];
-          $fields['email_primary.email'] = $ruleField['rule_weight'];
-        }
-        elseif ($ruleField['rule_table'] === 'civicrm_address') {
-          $fields[$ruleField['rule_field']] = $ruleField['rule_weight'];
-          $fields['address_primary' . $ruleField['rule_field']] = $ruleField['rule_weight'];
-        }
-        else {
-          // At this point it must be a custom field.
-          $customField = CustomField::get(FALSE)->addWhere('custom_group_id.table_name', '=', $ruleField['rule_table'])
-            ->addWhere('column_name', '=', $ruleField['rule_field'])
-            ->addSelect('id', 'name', 'custom_group_id.name')->execute()->first();
-          $fields['custom_' . $customField['id']] = $ruleField['rule_weight'];
-          $fields[$customField['custom_group_id.name'] . '.' . $customField['name']] = $ruleField['rule_weight'];
-        }
-      }
-      $this->dedupeRules[$name]['rule_message'] = ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', [1 => $this->dedupeRules[$name]['threshold']]) . '<br />';
-
-      $this->dedupeRules[$name]['fields'] = $fields;
+      $where = [['name', '=', $name]];
+      $this->loadRules($where);
     }
     return $this->dedupeRules[$name];
+  }
+
+  /**
+   * Get all dedupe rules.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getAllDedupeRules(): array {
+    $this->loadRules();
+    return $this->dedupeRules;
   }
 
   /**
@@ -2457,6 +2426,70 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       $prefixedFields[$prefix . 'email_primary.' . $fieldName] = $field;
     }
     return $prefixedFields;
+  }
+
+  /**
+   * @param array $where
+   * @param $name
+   *
+   * @return mixed
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function loadRules(array $where = []) {
+    $rules = DedupeRuleGroup::get(FALSE)
+      ->setWhere($where)
+      ->addSelect('threshold', 'name', 'id', 'title', 'contact_type')
+      ->execute();
+    foreach ($rules as $dedupeRule) {
+      $fields = [];
+      $name = $dedupeRule['name'];
+      $this->dedupeRules[$name] = $dedupeRule;
+      $this->dedupeRules[$name]['rule_message'] = $fieldMessage = '';
+      // Now we add the fields in a format like ['first_name' => 6, 'custom_8' => 9]
+      // The number is the weight and we add both api three & four style fields so the
+      // array can be used for converted & unconverted.
+      $ruleFields = DedupeRule::get(FALSE)
+        ->addWhere('dedupe_rule_group_id', '=', $this->dedupeRules[$name]['id'])
+        ->addSelect('id', 'rule_table', 'rule_field', 'rule_weight')
+        ->execute();
+      foreach ($ruleFields as $ruleField) {
+        $fieldMessage .= ' ' . $ruleField['rule_field'] . '(weight ' . $ruleField['rule_weight'] . ')';
+        if ($ruleField['rule_table'] === 'civicrm_contact') {
+          $fields[$ruleField['rule_field']] = $ruleField['rule_weight'];
+        }
+        // If not a contact field we add both api variants of fields.
+        elseif ($ruleField['rule_table'] === 'civicrm_phone') {
+          // Actually the dedupe rule for phone should always be phone_numeric. so checking 'phone' is probably unncessary
+          if (in_array($ruleField['rule_field'], ['phone', 'phone_numeric'], TRUE)) {
+            $fields['phone'] = $ruleField['rule_weight'];
+            $fields['phone_primary.phone'] = $ruleField['rule_weight'];
+          }
+        }
+        elseif ($ruleField['rule_field'] === 'email') {
+          $fields['email'] = $ruleField['rule_weight'];
+          $fields['email_primary.email'] = $ruleField['rule_weight'];
+        }
+        elseif ($ruleField['rule_table'] === 'civicrm_address') {
+          $fields[$ruleField['rule_field']] = $ruleField['rule_weight'];
+          $fields['address_primary' . $ruleField['rule_field']] = $ruleField['rule_weight'];
+        }
+        else {
+          // At this point it must be a custom field.
+          $customField = CustomField::get(FALSE)
+            ->addWhere('custom_group_id.table_name', '=', $ruleField['rule_table'])
+            ->addWhere('column_name', '=', $ruleField['rule_field'])
+            ->addSelect('id', 'name', 'custom_group_id.name')
+            ->execute()
+            ->first();
+          $fields['custom_' . $customField['id']] = $ruleField['rule_weight'];
+          $fields[$customField['custom_group_id.name'] . '.' . $customField['name']] = $ruleField['rule_weight'];
+        }
+      }
+      $this->dedupeRules[$name]['rule_message'] = ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', [1 => $this->dedupeRules[$name]['threshold']]) . '<br />';
+
+      $this->dedupeRules[$name]['fields'] = $fields;
+    }
   }
 
 }
