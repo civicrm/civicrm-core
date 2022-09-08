@@ -30,29 +30,16 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     //CRM-2219 removing other required fields since for updation only
     //invoice id or trxn id or contribution id is required.
     if ($this->isUpdateExisting()) {
-      $remove = [
-        'contribution_contact_id',
-        'email',
-        'first_name',
-        'last_name',
-        'external_identifier',
-      ];
-      foreach ($remove as $value) {
-        unset($this->_mapperFields[$value]);
-      }
-
       //modify field title only for update mode. CRM-3245
       foreach ([
         'contribution_id',
         'invoice_id',
         'trxn_id',
       ] as $key) {
-        $this->_mapperFields[$key] .= ' (match to contribution record)';
         $highlightedFields[] = $key;
       }
     }
     elseif ($this->isSkipExisting()) {
-      unset($this->_mapperFields['contribution_id']);
       $highlightedFieldsArray = [
         'contribution_contact_id',
         'email',
@@ -64,9 +51,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
         $highlightedFields[] = $name;
       }
     }
-
-    // modify field title for contribution status
-    $this->_mapperFields['contribution_status_id'] = ts('Contribution Status');
 
     $this->assign('highlightedFields', $highlightedFields);
   }
@@ -96,12 +80,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       'formRule',
     ], $this);
 
-    $sel1 = $this->_mapperFields;
-
-    if (!$this->isUpdateExisting()) {
-      unset($sel1['id']);
-      unset($sel1['contribution_id']);
-    }
+    $sel1 = $this->getAvailableFields();
 
     $softCreditFields['contact_id'] = ts('Contact ID');
     $softCreditFields['external_identifier'] = ts('External ID');
@@ -127,6 +106,37 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->assign('initHideBoxes', $js);
 
     $this->addFormButtons();
+  }
+
+  /**
+   * Get the fields available for import selection.
+   *
+   * @return array
+   *   e.g ['first_name' => 'First Name', 'last_name' => 'Last Name'....
+   *
+   * @throws \API_Exception
+   */
+  protected function getAvailableFields(): array {
+    $return = [];
+    foreach ($this->getFields() as $name => $field) {
+      if ($name === 'id' && $this->isSkipExisting()) {
+        // Duplicates are being skipped so id matching is not available.
+        continue;
+      }
+      if ($this->isUpdateExisting() && in_array($name, ['contribution_contact_id', 'email', 'first_name', 'last_name', 'external_identifier', 'email_primary.email'], TRUE)) {
+        continue;
+      }
+      if ($this->isUpdateExisting() && in_array($name, ['contribution_id', 'invoice_id', 'trxn_id'], TRUE)) {
+        $field['title'] .= (' ' . ts('(match to contribution record)'));
+      }
+      if (($field['entity'] ?? '') === 'Contact' && $this->isFilterContactFields() && empty($field['match_rule'])) {
+        // Filter out metadata that is intended for create & update - this is not available in the quick-form
+        // but is now loaded in the Parser for the LexIM variant.
+        continue;
+      }
+      $return[$name] = $field['html']['label'] ?? $field['title'];
+    }
+    return $return;
   }
 
   /**

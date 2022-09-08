@@ -324,7 +324,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       $contactFields[$fieldName]['match_rule'] = $this->getDefaultRuleForContactType($contactType);
     }
 
-    $contactFields['external_identifier']['title'] .= ts('(match to contact)');
+    $contactFields['external_identifier']['title'] .= (' ' . ts('(match to contact)'));
     $contactFields['external_identifier']['match_rule'] = '*';
     return $contactFields;
   }
@@ -1421,7 +1421,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @throws \API_Exception
    */
   private function getActionForEntity(string $entity): string {
-    return $this->getUserJob()['metadata']['entity_metadata'][$entity]['action'] ?? $this->getImportEntities()[$entity]['default_action'];
+    return $this->getUserJob()['metadata']['entity_metadata'][$entity]['action'] ?? ($this->getImportEntities()[$entity]['default_action'] ?? '');
   }
 
   /**
@@ -2391,7 +2391,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       // Set entity to contact as primary fields used in Contact actions
       $field['entity'] = 'Contact';
       $field['name'] = 'address_primary.' . $fieldName;
-      $field['contact_type'] = ['Individual', 'Organization', 'Household'];
+      $field['contact_type'] = ['Individual' => 'Individual', 'Organization' => 'Organization', 'Household' => 'Household'];
       $prefixedFields[$prefix . 'address_primary.' . $fieldName] = $field;
     }
 
@@ -2405,7 +2405,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     foreach ($phoneFields as $fieldName => $field) {
       $field['entity'] = 'Contact';
       $field['name'] = 'phone_primary.' . $fieldName;
-      $field['contact_type'] = ['Individual', 'Organization', 'Household'];
+      $field['contact_type'] = ['Individual' => 'Individual', 'Organization' => 'Organization', 'Household' => 'Household'];
       $prefixedFields[$prefix . 'phone_primary.' . $fieldName] = $field;
     }
 
@@ -2420,7 +2420,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     foreach ($emailFields as $fieldName => $field) {
       $field['entity'] = 'Contact';
       $field['name'] = 'email_primary.' . $fieldName;
-      $field['contact_type'] = ['Individual', 'Organization', 'Household'];
+      $field['contact_type'] = ['Individual' => 'Individual', 'Organization' => 'Organization', 'Household' => 'Household'];
       $prefixedFields[$prefix . 'email_primary.' . $fieldName] = $field;
     }
     return $prefixedFields;
