@@ -227,6 +227,7 @@ class ClassScanner {
     if (!isset(static::$caches[$name])) {
       switch ($name) {
         case 'index':
+          global $_DB_DATAOBJECT;
           if (empty($_DB_DATAOBJECT['CONFIG'])) {
             // Atypical example: You have a test with a @dataProvider that relies on ClassScanner. Runs before bot.
             return new \CRM_Utils_Cache_ArrayCache([]);
