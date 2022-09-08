@@ -245,7 +245,18 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    */
   protected function setFieldMetadata(): void {
     if (empty($this->importableFieldsMetadata)) {
-      $fields = $this->importableFields($this->getContactType());
+      $fields = ['' => ['title' => ts('- do not import -')]];
+
+      $note = CRM_Core_DAO_Note::import();
+      $tmpFields = CRM_Contribute_DAO_Contribution::import();
+      $tmpContactField = $this->getContactFields($this->getContactType());
+      $tmpFields['contribution_contact_id']['title'] = $tmpFields['contribution_contact_id']['html']['label'] = $tmpFields['contribution_contact_id']['title'] . ' ' . ts('(match to contact)');
+      $tmpFields['contribution_contact_id']['contact_type'] = ['Individual' => 'Individual', 'Household' => 'Household', 'Organization' => 'Organization'];
+      $tmpFields['contribution_contact_id']['match_rule'] = '*';
+      $fields = array_merge($fields, $tmpContactField);
+      $fields = array_merge($fields, $tmpFields);
+      $fields = array_merge($fields, $note);
+      $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Contribution'));
 
       $fields = array_merge($fields,
         [
@@ -294,10 +305,14 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    */
   public function getImportEntities() : array {
     $softCreditTypes = ContributionSoft::getFields()
-      ->setLoadOptions(TRUE)
+      ->setLoadOptions(['id', 'name', 'label', 'description'])
       ->addWhere('name', '=', 'soft_credit_type_id')
       ->selectRowCount()
-      ->addSelect('options')->execute();
+      ->addSelect('options')->execute()->first()['options'];
+    foreach ($softCreditTypes as &$softCreditType) {
+      $softCreditType['text'] = $softCreditType['label'];
+    }
+
     return [
       'Contribution' => [
         'text' => ts('Contribution Fields'),
@@ -341,31 +356,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         'entity_data' => ['soft_credit_type_id' => ['required' => TRUE, 'options' => $softCreditTypes]],
       ],
     ];
-  }
-
-  /**
-   * Combine all the importable fields from the lower levels object.
-   *
-   * This function should be decommissioned into setFieldMetadata.
-   *
-   * @param string $contactType
-   *
-   * @return array
-   *   array of importable Fields
-   */
-  private function importableFields($contactType = 'Individual') {
-    $fields = ['' => ['title' => ts('- do not import -')]];
-
-    $note = CRM_Core_DAO_Note::import();
-    $tmpFields = CRM_Contribute_DAO_Contribution::import();
-    unset($tmpFields['option_value']);
-    $tmpContactField = $this->getContactFields($contactType);
-    $tmpFields['contribution_contact_id']['title'] = $tmpFields['contribution_contact_id']['html']['label'] = $tmpFields['contribution_contact_id']['title'] . ' ' . ts('(match to contact)');
-    $fields = array_merge($fields, $tmpContactField);
-    $fields = array_merge($fields, $tmpFields);
-    $fields = array_merge($fields, $note);
-    $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Contribution'));
-    return $fields;
   }
 
   /**
