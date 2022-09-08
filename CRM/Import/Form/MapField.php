@@ -511,7 +511,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   protected function guessMappingBasedOnColumns(string $columnHeader): string {
     $headerPatterns = $this->getHeaderPatterns();
     // do array search first to see if has mapped key
-    $columnKey = array_search($columnHeader, $this->_mapperFields, TRUE);
+    $columnKey = array_search($columnHeader, $this->getAvailableFields(), TRUE);
     if ($columnKey && empty($this->_fieldUsed[$columnKey])) {
       $this->_fieldUsed[$columnKey] = TRUE;
       return $columnKey;
