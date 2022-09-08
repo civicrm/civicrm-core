@@ -2810,7 +2810,9 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
       }
     }
     if ($field->serialize) {
-      $params['type'] = 'varchar(255)';
+      // Ensure length is at least 255, but allow it to go higher.
+      $text_length = intval($field->text_length) < 255 ? 255 : $field->text_length;
+      $params['type'] = 'varchar(' . $text_length . ')';
     }
     if (isset($field->default_value)) {
       $params['default'] = "'{$field->default_value}'";
