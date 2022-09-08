@@ -517,6 +517,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
+   * The form can do it's own work now...
+   *
+   * @deprecated
    * @return array
    */
   public function getHeaderPatterns(): array {

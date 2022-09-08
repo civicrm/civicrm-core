@@ -590,6 +590,9 @@ class CRM_Import_Forms extends CRM_Core_Form {
         // but is now loaded in the Parser for the LexIM variant.
         continue;
       }
+      // Swap out dots for double underscores so as not to break the quick form js.
+      // We swap this back on postProcess.
+      $name = str_replace('.', '__', $name);
       $return[$name] = $field['html']['label'] ?? $field['title'];
     }
     return $return;
@@ -702,7 +705,17 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @return array
    */
   public function getHeaderPatterns(): array {
-    return $this->getParser()->getHeaderPatterns();
+    $headerPatterns = [];
+    foreach ($this->getFields() as $name => $field) {
+      if (empty($field['headerPattern']) || $field['headerPattern'] === '//') {
+        continue;
+      }
+      // Swap out dots for double underscores so as not to break the quick form js.
+      // The parser class undoes this when looking up the field.
+      $name = str_replace('.', '__', $name);
+      $headerPatterns[$name] = $field['headerPattern'];
+    }
+    return $headerPatterns;
   }
 
   /**

@@ -637,7 +637,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    */
   public function getMappingFieldFromMapperInput(array $fieldMapping, int $mappingID, int $columnNumber): array {
     return [
-      'name' => $fieldMapping[0],
+      // The double __ is a quickform hack - the 'real' name is dotted - eg. 'soft_credit.contact.id'
+      'name' => str_replace('__', '.', $fieldMapping[0]),
       'mapping_id' => $mappingID,
       'column_number' => $columnNumber,
       // The name of the field to match the soft credit on is (crazily)

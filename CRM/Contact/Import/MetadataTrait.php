@@ -79,6 +79,9 @@ trait CRM_Contact_Import_MetadataTrait {
   /**
    * Get an array of header patterns for importable keys.
    *
+   * We should do this work on the form layer.
+   *
+   * @deprecated
    * @return array
    */
   public function getHeaderPatterns(): array {
