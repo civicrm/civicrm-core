@@ -766,25 +766,11 @@ HTACCESS;
         }
       }
       // Find subdirs to recurse into.
-      if ($dh = opendir($subdir)) {
-        while (FALSE !== ($entry = readdir($dh))) {
-          $path = $subdir . DIRECTORY_SEPARATOR . $entry;
-          // Exclude . (self) and .. (parent) to avoid infinite loop.
-          // Exclude configured exclude dirs.
-          // Exclude dirs we can't read.
-          // Exclude anything that's not a dir.
-          if (
-            $entry !== '.'
-            && $entry !== '..'
-            && (empty($excludeDirsPattern) || !preg_match($excludeDirsPattern, $path))
-            && is_dir($path)
-            && is_readable($path)
-          ) {
-            $todos[] = $path;
-          }
-        }
-        closedir($dh);
+      $subdirs = glob("$subdir/*", GLOB_ONLYDIR);
+      if (!empty($excludeDirsPattern)) {
+        $subdirs = preg_grep($excludeDirsPattern, $subdirs, PREG_GREP_INVERT);
       }
+      $todos = array_merge($todos, $subdirs);
     }
     return $result;
   }
