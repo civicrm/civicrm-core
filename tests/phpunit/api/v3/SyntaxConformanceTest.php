@@ -148,6 +148,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       }
     }
     $this->deletableTestObjects = NULL;
+    $this->quickCleanUpFinancialEntities();
   }
 
   /**
