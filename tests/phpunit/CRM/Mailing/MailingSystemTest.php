@@ -209,7 +209,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
     CRM_Mailing_Event_BAO_Reply::reply(
       $matches[1],
       $matches[2],
-      $matches[3],
+      $matches[3]
     );
     $mut->checkMailLog([
       'Please Send Inquiries to Our Contact Email Address',
