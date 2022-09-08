@@ -79,8 +79,7 @@ trait CRMTraits_Import_ParserTrait {
     foreach ($mappings as $mapping) {
       $fieldInput = [$mapping['name']];
       if (!empty($mapping['soft_credit_type_id'])) {
-        $fieldInput[1] = $mapping['soft_credit_match_field'];
-        $fieldInput[2] = $mapping['soft_credit_type_id'];
+        $fieldInput[1] = $mapping['soft_credit_type_id'];
       }
       $mapper[] = $fieldInput;
     }

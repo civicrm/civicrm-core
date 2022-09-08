@@ -517,9 +517,10 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
-   * The form can do it's own work now...
+   * Do this work on the form layer.
    *
    * @deprecated
+   *
    * @return array
    */
   public function getHeaderPatterns(): array {
@@ -1423,8 +1424,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @return string
    * @throws \API_Exception
    */
-  private function getActionForEntity(string $entity): string {
-    return $this->getUserJob()['metadata']['entity_metadata'][$entity]['action'] ?? ($this->getImportEntities()[$entity]['default_action'] ?? '');
+  protected function getActionForEntity(string $entity): string {
+    return $this->getUserJob()['metadata']['entity_configuration'][$entity]['action'] ?? ($this->getImportEntities()[$entity]['default_action'] ?? 'select');
   }
 
   /**
@@ -1644,7 +1645,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
     $fieldMap = $this->getOddlyMappedMetadataFields();
     $fieldMapName = empty($fieldMap[$fieldName]) ? $fieldName : $fieldMap[$fieldName];
-
+    $fieldMapName = str_replace('__', '.', $fieldMapName);
     // This whole business of only loading metadata for one type when we actually need it for all is ... dubious.
     if (empty($this->getImportableFieldsMetadata()[$fieldMapName])) {
       if ($loadOptions || !$limitToContactType) {
@@ -2284,12 +2285,14 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *
    * @param array $contactParams
    * @param int|null $contactID
+   * @param string $entity
+   *   Entity, as described in getImportEntities.
    *
-   * @return int
+   * @return int|null
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getContactID(array $contactParams, ?int $contactID): int {
+  protected function getContactID(array $contactParams, ?int $contactID, string $entity): ?int {
     $contactType = $contactParams['contact_type'] ?? $this->getContactType();
     if ($contactID) {
       $this->validateContactID($contactID, $contactType);
@@ -2298,6 +2301,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       $contactID = $this->lookupExternalIdentifier($contactParams['external_identifier'], $contactType, $contactID ?? NULL);
     }
     if (!$contactID) {
+      $action = $this->getActionForEntity($entity);
       $contactParams['contact_type'] = $contactType;
       $possibleMatches = $this->getPossibleMatchesByDedupeRule($contactParams);
       if (count($possibleMatches) === 1) {
@@ -2306,8 +2310,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       elseif (count($possibleMatches) > 1) {
         throw new CRM_Core_Exception(ts('Record duplicates multiple contacts: ') . implode(',', $possibleMatches));
       }
-      else {
-        throw new CRM_Core_Exception(ts('No matching Contact found'));
+      elseif (!in_array($action, ['create', 'ignore', 'update_or_create'], TRUE)) {
+        throw new CRM_Core_Exception(ts('No matching %1 found', [$entity, 'String']));
       }
     }
     return $contactID;

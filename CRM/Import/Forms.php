@@ -711,7 +711,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
         continue;
       }
       // Swap out dots for double underscores so as not to break the quick form js.
-      // The parser class undoes this when looking up the field.
+      // We swap this back on postProcess.
       $name = str_replace('.', '__', $name);
       $headerPatterns[$name] = $field['headerPattern'];
     }
