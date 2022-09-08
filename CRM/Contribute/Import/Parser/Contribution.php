@@ -403,27 +403,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
       $this->deprecatedFormatParams($paramValues, $formatted);
 
-      if ($this->isUpdateExisting()) {
+      if (!empty($params['soft_credit']) && $this->isUpdateExisting()) {
         //need to check existing soft credit contribution, CRM-3968
-        if (!empty($formatted['soft_credit'])) {
-          $dupeSoftCredit = [
-            'contact_id' => $formatted['soft_credit'],
-            'contribution_id' => $paramValues['id'],
-          ];
-
-          //Delete all existing soft Contribution from contribution_soft table for pcp_id is_null
-          $existingSoftCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dupeSoftCredit['contribution_id']);
-          if (isset($existingSoftCredit['soft_credit']) && !empty($existingSoftCredit['soft_credit'])) {
-            foreach ($existingSoftCredit['soft_credit'] as $key => $existingSoftCreditValues) {
-              if (!empty($existingSoftCreditValues['soft_credit_id'])) {
-                civicrm_api3('ContributionSoft', 'delete', [
-                  'id' => $existingSoftCreditValues['soft_credit_id'],
-                  'pcp_id' => NULL,
-                ]);
-              }
-            }
-          }
-        }
+        $this->deleteExistingSoftCredit($contributionParams['id']);
       }
 
       $contributionID = civicrm_api3('contribution', 'create', $formatted)['id'];
@@ -432,7 +414,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $this->processNote($contributionID, $contactID, $entityKeyedParams['Note']);
       }
       //return soft valid since we need to show how soft credits were added
-      if (!empty($formatted['soft_credit'])) {
+      if (!empty($params['soft_credit'])) {
         $this->setImportStatus($rowNumber, $this->getStatus(self::SOFT_CREDIT), '', $contributionID);
         return;
       }
@@ -639,6 +621,26 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       // This field is actually not saved at all :-( It is lost each time.
       'soft_credit_type_id' => $fieldMapping[2] ?? NULL,
     ];
+  }
+
+  /**
+   * @param int $contributionID
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function deleteExistingSoftCredit(int $contributionID): void {
+    //Delete all existing soft Contribution from contribution_soft table for pcp_id is_null
+    $existingSoftCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($contributionID);
+    if (isset($existingSoftCredit['soft_credit']) && !empty($existingSoftCredit['soft_credit'])) {
+      foreach ($existingSoftCredit['soft_credit'] as $key => $existingSoftCreditValues) {
+        if (!empty($existingSoftCreditValues['soft_credit_id'])) {
+          civicrm_api3('ContributionSoft', 'delete', [
+            'id' => $existingSoftCreditValues['soft_credit_id'],
+            'pcp_id' => NULL,
+          ]);
+        }
+      }
+    }
   }
 
   /**
