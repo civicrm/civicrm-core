@@ -15,10 +15,13 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Brick\Money\Money;
-use Brick\Money\Context\DefaultContext;
-use Brick\Money\Context\CustomContext;
 use Brick\Math\RoundingMode;
+use Brick\Money\Context\CustomContext;
+use Brick\Money\Context\DefaultContext;
+use Brick\Money\Currency;
+use Brick\Money\ISOCurrencyProvider;
+use Brick\Money\Money;
+use Brick\Money\Exception\UnknownCurrencyException;
 
 /**
  * Money utilties
@@ -119,6 +122,31 @@ class CRM_Utils_Money {
   }
 
   /**
+   * Get the currency object for a given
+   *
+   * Wrapper around the Brick library to support currency codes which Brick doesn't support
+   *
+   * @internal
+   * @param string $currencyCode
+   * @return Brick\Money\Currency
+   */
+  public static function getCurrencyObject(string $currencyCode): Currency {
+    try {
+      $currency = ISOCurrencyProvider::getInstance()->getCurrency($currencyCode);
+    }
+    catch (UnknownCurrencyException $e) {
+      $currency = new Currency(
+        $currencyCode,
+        0,
+        $currencyCode,
+        2
+      );
+    }
+
+    return $currency;
+  }
+
+  /**
    * Subtract currencies using integers instead of floats, to preserve precision
    *
    * @param string|float $leftOp
@@ -130,8 +158,9 @@ class CRM_Utils_Money {
    */
   public static function subtractCurrencies($leftOp, $rightOp, $currency) {
     if (is_numeric($leftOp) && is_numeric($rightOp)) {
-      $leftMoney = Money::of($leftOp, $currency, new DefaultContext(), RoundingMode::CEILING);
-      $rightMoney = Money::of($rightOp, $currency, new DefaultContext(), RoundingMode::CEILING);
+      $currencyObject = self::getCurrencyObject($currency);
+      $leftMoney = Money::of($leftOp, $currencyObject, new DefaultContext(), RoundingMode::CEILING);
+      $rightMoney = Money::of($rightOp, $currencyObject, new DefaultContext(), RoundingMode::CEILING);
       return $leftMoney->minus($rightMoney)->getAmount()->toFloat();
     }
   }
@@ -173,7 +202,9 @@ class CRM_Utils_Money {
    * @throws \Brick\Money\Exception\UnknownCurrencyException
    */
   protected static function formatLocaleNumeric(string $amount, $locale = NULL, $currency = NULL, $numberOfPlaces = 2): string {
-    $money = Money::of($amount, $currency ?? CRM_Core_Config::singleton()->defaultCurrency, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
+    $currency = $currency ?? CRM_Core_Config::singleton()->defaultCurrency;
+    $currencyObject = self::getCurrencyObject($currency);
+    $money = Money::of($amount, $currencyObject, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
     $formatter = new \NumberFormatter($locale ?? CRM_Core_I18n::getLocale(), NumberFormatter::DECIMAL);
     $formatter->setAttribute(\NumberFormatter::MIN_FRACTION_DIGITS, $numberOfPlaces);
     return $money->formatWith($formatter);
@@ -206,7 +237,8 @@ class CRM_Utils_Money {
       }
       return self::formatNumericByFormat($amount, '%!.' . $numberOfPlaces . 'i');
     }
-    $money = Money::of($amount, CRM_Core_Config::singleton()->defaultCurrency, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
+    $currencyObject = self::getCurrencyObject(CRM_Core_Config::singleton()->defaultCurrency);
+    $money = Money::of($amount, $currencyObject, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
     // @todo - we specify en_US here because we don't want this function to do
     // currency replacement at the moment because
     // formatLocaleNumericRoundedByPrecision is doing it and if it

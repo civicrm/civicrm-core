@@ -281,6 +281,18 @@ class FormatTest extends CiviUnitTestCase {
         'money_long' => '$0.00',
       ],
     ];
+    $cases['en_US_ZMK'] = [
+      [
+        'amount' => '1234.56',
+        'locale' => 'en_US',
+        'currency' => 'ZMK',
+        'money' => 'ZMK 1,234.56',
+        'money_number' => '1,234.56',
+        'money_number_long' => '1,234.56',
+        'number' => '1,234.56',
+        'money_long' => 'ZMK 1,234.56',
+      ],
+    ];
     return $cases;
   }
 
