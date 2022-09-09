@@ -17,6 +17,9 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Extension_System {
+
+  public const DEFAULT_MAX_DEPTH = 4;
+
   private static $singleton;
 
   private $cache = NULL;
