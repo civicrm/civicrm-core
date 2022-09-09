@@ -72,7 +72,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     $this->addSavedMappingFields();
 
     $this->addFormRule([
@@ -80,18 +80,19 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       'formRule',
     ], $this);
 
-    $sel1 = $this->getAvailableFields();
+    $selectColumn1 = $this->getAvailableFields();
 
-    $softCreditFields['contact_id'] = ts('Contact ID');
-    $softCreditFields['external_identifier'] = ts('External ID');
-    $softCreditFields['email'] = ts('Email');
-
-    $sel2['soft_credit'] = $softCreditFields;
-    $sel3['soft_credit']['contact_id'] = $sel3['soft_credit']['external_identifier'] = $sel3['soft_credit']['email'] = CRM_Core_OptionGroup::values('soft_credit_type');
+    $selectColumn2 = [];
+    $softCreditTypes = CRM_Core_OptionGroup::values('soft_credit_type');
+    foreach (array_keys($selectColumn1) as $fieldName) {
+      if (strpos($fieldName, 'soft_credit__contact__') === 0) {
+        $selectColumn2[$fieldName] = $softCreditTypes;
+      }
+    }
 
     foreach ($this->getColumnHeaders() as $i => $columnHeader) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
-      $sel->setOptions([$sel1, $sel2, $sel3]);
+      $sel->setOptions([$selectColumn1, $selectColumn2]);
     }
     $defaults = $this->getDefaults();
     $this->setDefaults($defaults);
@@ -100,7 +101,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     foreach ($defaults as $index => $default) {
       //  e.g swapOptions(document.forms.MapField, 'mapper[0]', 0, 3, 'hs_mapper_0_');
       // where 0 is the highest populated field number in the array and 3 is the maximum.
-      $js .= "swapOptions(document.forms.MapField, '$index', " . (array_key_last(array_filter($default)) ?: 0) . ", 3, 'hs_mapper_0_');\n";
+      $js .= "swapOptions(document.forms.MapField, '$index', " . (array_key_last(array_filter($default)) ?: 0) . ", 2, 'hs_mapper_0_');\n";
     }
     $js .= "</script>\n";
     $this->assign('initHideBoxes', $js);
@@ -113,8 +114,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @return array
    *   e.g ['first_name' => 'First Name', 'last_name' => 'Last Name'....
-   *
-   * @throws \API_Exception
    */
   protected function getAvailableFields(): array {
     $return = [];
@@ -129,6 +128,9 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       if ($this->isUpdateExisting() && in_array($name, ['contribution_id', 'invoice_id', 'trxn_id'], TRUE)) {
         $field['title'] .= (' ' . ts('(match to contribution record)'));
       }
+      // Swap out dots for double underscores so as not to break the quick form js.
+      // We swap this back on postProcess.
+      $name = str_replace('.', '__', $name);
       if (($field['entity'] ?? '') === 'Contact' && $this->isFilterContactFields() && empty($field['match_rule'])) {
         // Filter out metadata that is intended for create & update - this is not available in the quick-form
         // but is now loaded in the Parser for the LexIM variant.
@@ -212,10 +214,14 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
         $fieldMapping = $fieldMappings[$i] ?? NULL;
         if ($fieldMapping) {
           if ($fieldMapping['name'] !== ts('do_not_import')) {
-            // $mapping contact_type is not really a contact type - the data has been mangled
+            // $mapping contact_type is not really a contact type - the 'about this entity' data has been mangled
             // into that field - see https://lab.civicrm.org/dev/core/-/issues/654
-            // Since the soft credit type id is not stored we can't load it here.
-            $defaults["mapper[$i]"] = [$fieldMapping['name'], $fieldMapping['contact_type'] ?? '', ''];
+            $softCreditTypeID = '';
+            $entityData = json_decode($fieldMapping['contact_type'] ?? '', TRUE);
+            if (!empty($entityData)) {
+              $softCreditTypeID = (int) $entityData['soft_credit']['soft_credit_type_id'];
+            }
+            $defaults["mapper[$i]"] = [$fieldMapping['name'], $softCreditTypeID];
           }
         }
       }
@@ -241,7 +247,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     $ruleFields = $rule['fields'];
     $weightSum = 0;
     foreach ($mapper as $mapping) {
-      if ($mapping[0] === 'external_identifier') {
+      if ($mapping[0] === 'external_identifier' || $mapping[0] === 'contribution_contact_id' || $mapping[0] === 'contact__id') {
         // It is enough to have external identifier mapped.
         $weightSum = $threshold;
         break;
