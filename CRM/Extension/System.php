@@ -85,6 +85,7 @@ class CRM_Extension_System {
    */
   public function __construct($parameters = []) {
     $config = CRM_Core_Config::singleton();
+    $parameters['maxDepth'] = CRM_Utils_Array::value('maxDepth', $parameters, \Civi::settings()->get('ext_max_depth'));
     $parameters['extensionsDir'] = CRM_Utils_Array::value('extensionsDir', $parameters, $config->extensionsDir);
     $parameters['extensionsURL'] = CRM_Utils_Array::value('extensionsURL', $parameters, $config->extensionsURL);
     $parameters['resourceBase'] = CRM_Utils_Array::value('resourceBase', $parameters, $config->resourceBase);
@@ -122,7 +123,8 @@ class CRM_Extension_System {
         $this->parameters['civicrm_root'],
         $this->parameters['resourceBase'],
         $this->getCache(),
-        'civiroot'
+        'civiroot',
+        $this->parameters['maxDepth']
       );
 
       // TODO: CRM_Extension_Container_Basic( /sites/all/modules )
@@ -138,7 +140,8 @@ class CRM_Extension_System {
             $vendorPath,
             CRM_Utils_File::addTrailingSlash($this->parameters['userFrameworkBaseURL'], '/') . 'vendor',
             $this->getCache(),
-            'cmsvendor'
+            'cmsvendor',
+            $this->parameters['maxDepth']
           );
         }
       }
