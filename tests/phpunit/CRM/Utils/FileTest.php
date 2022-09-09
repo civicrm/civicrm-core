@@ -538,4 +538,37 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     }
   }
 
+  public function trueOrFalse(): array {
+    return [
+      'TRUE' => [TRUE],
+      'FALSE' => [FALSE],
+    ];
+  }
+
+  /**
+   * @param bool $isRelative
+   * @dataProvider trueOrFalse
+   */
+  public function testFindFilesDepth(bool $isRelative) {
+    $CRM = Civi::paths()->getPath('[civicrm.root]/CRM');
+    $depthResults[0] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative, 0);
+    $depthResults[1] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative, 1);
+    $depthResults[2] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative, 2);
+    $depthResults[3] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative, 3);
+    $depthResults[NULL] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative);
+
+    $expectPrefix = $isRelative ? '' : $CRM . '/';
+
+    $expectFiles['Contact/BAO/Contact.php'] = [0 => FALSE, 1 => FALSE, 2 => TRUE, 3 => TRUE, NULL => TRUE];
+    $expectFiles['Contact/Import/Parser/Contact.php'] = [0 => FALSE, 1 => FALSE, 2 => FALSE, 3 => TRUE, NULL => TRUE];
+
+    foreach ($expectFiles as $expectFile => $expectMatches) {
+      $actualMatches = [];
+      foreach ($expectMatches as $depth => $expectMatch) {
+        $actualMatches[$depth] = in_array($expectPrefix . $expectFile, $depthResults[$depth]);
+      }
+      $this->assertEquals($expectMatches, $actualMatches, "The file $expectFile should be found as follows:");
+    }
+  }
+
 }
