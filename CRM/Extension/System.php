@@ -18,7 +18,7 @@
  */
 class CRM_Extension_System {
 
-  public const DEFAULT_MAX_DEPTH = 4;
+  public const DEFAULT_MAX_DEPTH = 3;
 
   private static $singleton;
 
@@ -119,13 +119,18 @@ class CRM_Extension_System {
         $containers['default'] = $this->getDefaultContainer();
       }
 
-      $containers['civiroot'] = new CRM_Extension_Container_Basic(
-        $this->parameters['civicrm_root'],
-        $this->parameters['resourceBase'],
-        $this->getCache(),
-        'civiroot',
-        $this->parameters['maxDepth']
-      );
+      $civiSubDirs = defined('CIVICRM_TEST')
+        ? ['ext', 'tools', 'tests']
+        : ['ext', 'tools'];
+      foreach ($civiSubDirs as $civiSubDir) {
+        $containers["civicrm_$civiSubDir"] = new CRM_Extension_Container_Basic(
+          CRM_Utils_File::addTrailingSlash($this->parameters['civicrm_root']) . $civiSubDir,
+          CRM_Utils_File::addTrailingSlash($this->parameters['resourceBase'], '/') . $civiSubDir,
+          $this->getCache(),
+          "civicrm_$civiSubDir",
+          $this->parameters['maxDepth']
+        );
+      }
 
       // TODO: CRM_Extension_Container_Basic( /sites/all/modules )
       // TODO: CRM_Extension_Container_Basic( /sites/$domain/modules
