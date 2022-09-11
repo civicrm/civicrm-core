@@ -48,7 +48,8 @@ class Data {
     civicrm_api('setting', 'create', ['installed' => 1, 'domain_id' => 'all', 'version' => 3]);
 
     // Rebuild triggers
-    civicrm_api('system', 'flush', ['version' => 3, 'triggers' => 1]);
+    //civicrm_api('system', 'flush', ['version' => 3, 'triggers' => 1]);
+    \Civi::service('sql_triggers')->rebuild();
 
     \CRM_Core_BAO_ConfigSetting::setEnabledComponents([
       'CiviEvent',

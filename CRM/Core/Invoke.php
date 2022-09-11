@@ -379,6 +379,9 @@ class CRM_Core_Invoke {
     $config = CRM_Core_Config::singleton();
     $config->clearModuleList();
 
+    global $dont_clear_cache_yet;
+    $dont_clear_cache_yet = TRUE;
+
     // dev/core#3660 - Activate any new classloaders/mixins/etc before re-hydrating any data-structures.
     CRM_Extension_System::singleton()->getClassLoader()->refresh();
     CRM_Extension_System::singleton()->getMixinLoader()->run(TRUE);
@@ -415,6 +418,8 @@ class CRM_Core_Invoke {
     }
 
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+    $dont_clear_cache_yet = FALSE;
+    CRM_Utils_System::flushCache();
   }
 
 }

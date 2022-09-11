@@ -1487,6 +1487,10 @@ class CRM_Utils_System {
    * Reset the various system caches and some important static variables.
    */
   public static function flushCache() {
+    global $dont_clear_cache_yet;
+    if ($dont_clear_cache_yet) {
+      return;
+    }
     // flush out all cache entries so we can reload new data
     // a bit aggressive, but livable for now
     CRM_Utils_Cache::singleton()->flush();
