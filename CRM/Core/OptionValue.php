@@ -353,7 +353,7 @@ class CRM_Core_OptionValue {
   /**
    * Build select query in case of option-values
    *
-   * @param $query
+   * @param CRM_Contact_BAO_Query $query
    */
   public static function select(&$query) {
     if (!empty($query->_params) || !empty($query->_returnProperties)) {

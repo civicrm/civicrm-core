@@ -103,7 +103,7 @@ class CRM_Core_Key {
    * @param string $name
    * @param bool $addSequence
    *
-   * @return string
+   * @return string|null
    *   if valid, else null
    */
   public static function validate($key, $name, $addSequence = FALSE) {

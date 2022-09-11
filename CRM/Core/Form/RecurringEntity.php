@@ -34,9 +34,9 @@ class CRM_Core_Form_RecurringEntity {
 
   /**
    * Schedule Reminder data
-   * @var array
+   * @var CRM_Core_DAO|null
    */
-  protected static $_scheduleReminderDetails = [];
+  protected static $_scheduleReminderDetails = NULL;
 
   /**
    *  Parent Entity ID

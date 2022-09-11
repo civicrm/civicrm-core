@@ -658,7 +658,7 @@ WHERE contact_sub_type LIKE '%{$subType}%'";
   }
 
   /**
-   * @param $contactType
+   * @param string $contactType
    * @param int $contactId
    *
    * @return bool
@@ -695,7 +695,7 @@ WHERE contact_sub_type LIKE '%{$subType}%'";
   /**
    * @todo what does this function do?
    * @param int $contactId
-   * @param $contactType
+   * @param string $contactType
    *
    * @return bool
    */

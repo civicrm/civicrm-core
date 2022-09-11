@@ -229,7 +229,7 @@ class CRM_Core_Payment_Form {
    * @param CRM_Core_Form $form
    * @param array $paymentFields
    *   Array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors.
-   * @param $paymentFields
+   * @return void
    */
   protected static function addRules(&$form, $paymentFields) {
     foreach ($paymentFields as $paymentField => $fieldSpecs) {
@@ -360,7 +360,7 @@ class CRM_Core_Payment_Form {
    * The date format for this field should typically be "M Y" (ex: Feb 2011) or "m Y" (02 2011)
    * See CRM-9017
    *
-   * @param $src
+   * @param array $src
    *
    * @return int
    */
