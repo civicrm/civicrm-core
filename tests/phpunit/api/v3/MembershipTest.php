@@ -209,7 +209,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $_REQUEST['action'] = 'update';
     $_REQUEST['id'] = $order['id'];
     // Change Payment Status to Completed
-    /* @var CRM_Contribute_Form_Contribution $form */
+    /** @var CRM_Contribute_Form_Contribution $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
       'total_amount' => 150,
       'financial_type_id' => '1',

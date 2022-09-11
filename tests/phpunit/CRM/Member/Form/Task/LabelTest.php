@@ -29,7 +29,7 @@ class CRM_Member_Form_Task_LabelTest extends CiviUnitTestCase {
     $tasks = CRM_Member_Task::permissionedTaskTitles(CRM_Core_Permission::EDIT);
     $this->assertArrayHasKey(201, $tasks);
     $membershipID = $this->contactMembershipCreate(['contact_id' => $this->individualCreate()]);
-    /* @var CRM_Member_Form_Task_Label $form */
+    /** @var CRM_Member_Form_Task_Label $form */
     $form = $this->getFormObject('CRM_Member_Form_Task_Label', [
       'task' => 201,
       'radio_ts' => 'ts_sel',

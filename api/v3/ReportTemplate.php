@@ -129,7 +129,7 @@ function _civicrm_api3_report_template_getrows($params) {
   ]
   );
 
-  /* @var \CRM_Report_Form $reportInstance */
+  /** @var \CRM_Report_Form $reportInstance */
   $reportInstance = new $class();
   if (!empty($params['instance_id'])) {
     $reportInstance->setID($params['instance_id']);

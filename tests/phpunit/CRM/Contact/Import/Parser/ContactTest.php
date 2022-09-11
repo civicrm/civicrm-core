@@ -2128,7 +2128,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
       'groups' => [],
     ], $submittedValues);
-    /* @var CRM_Contact_Import_Form_DataSource $form */
+    /** @var CRM_Contact_Import_Form_DataSource $form */
     $form = $this->getFormObject('CRM_Contact_Import_Form_DataSource', $submittedValues);
     $values = $_SESSION['_' . $form->controller->_name . '_container']['values'];
 
@@ -2139,13 +2139,13 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     // This gets reset in DataSource so re-do....
     $_SESSION['_' . $form->controller->_name . '_container']['values'] = $values;
 
-    /* @var CRM_Contact_Import_Form_MapField $form */
+    /** @var CRM_Contact_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Contact_Import_Form_MapField', $submittedValues);
 
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
     $form->postProcess();
-    /* @var CRM_Contact_Import_Form_MapField $form */
+    /** @var CRM_Contact_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Contact_Import_Form_Preview', $submittedValues);
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
@@ -2177,8 +2177,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   private function validateMultiRowCsv(string $csv, array $mapper, string $field, array $submittedValues = []): void {
-    /* @var CRM_Import_DataSource_CSV $dataSource */
-    /* @var \CRM_Contact_Import_Parser_Contact $parser */
+    /** @var CRM_Import_DataSource_CSV $dataSource */
+    /** @var \CRM_Contact_Import_Parser_Contact $parser */
     [$dataSource, $parser] = $this->getDataSourceAndParser($csv, $mapper, $submittedValues);
     while ($values = $dataSource->getRow()) {
       try {

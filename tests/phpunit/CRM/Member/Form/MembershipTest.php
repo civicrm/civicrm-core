@@ -1092,7 +1092,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    */
   public function testSubmitRecurCompleteInstant(): void {
     $mut = new CiviMailUtils($this, TRUE);
-    /* @var \CRM_Core_Payment_Dummy $processor */
+    /** @var \CRM_Core_Payment_Dummy $processor */
     $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessorID);
     $processor->setDoDirectPaymentResult([
       'payment_status_id' => 1,
@@ -1307,7 +1307,7 @@ Expires: ',
     if (isset($_REQUEST['cid'])) {
       unset($_REQUEST['cid']);
     }
-    /* @var CRM_Member_Form_Membership $form*/
+    /** @var CRM_Member_Form_Membership $form*/
     $form = $this->getFormObject('CRM_Member_Form_Membership', $formValues);
     $form->preProcess();
     return $form;
@@ -1427,7 +1427,7 @@ Expires: ',
    * @return \CRM_Contribute_Form_Contribution
    */
   protected function getContributionForm(array $formValues): CRM_Contribute_Form_Contribution {
-    /* @var CRM_Contribute_Form_Contribution $form */
+    /** @var CRM_Contribute_Form_Contribution $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Contribution', $formValues);
     $form->buildForm();
     return $form;

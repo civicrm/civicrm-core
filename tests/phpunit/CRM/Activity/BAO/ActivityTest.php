@@ -1379,7 +1379,7 @@ $text
 
     $html = __FUNCTION__ . ' html';
     $text = __FUNCTION__ . ' text';
-    /* @var CRM_Activity_Form_Task_Email $form */
+    /** @var CRM_Activity_Form_Task_Email $form */
     $form = $this->getCaseEmailTaskForm($contactId, [
       'subject' => '',
       'html_message' => $html,
@@ -1447,7 +1447,7 @@ $text
   public function testSendSmsMobilePhoneNumber(): void {
     $sent = $this->createSendSmsTest(TRUE, 2);
     $this->assertEquals(TRUE, $sent[0]);
-    /* @var CiviTestSMSProvider $provider $provider['id']*/
+    /** @var CiviTestSMSProvider $providerObj */
     $providerObj = CRM_SMS_Provider::singleton(['provider_id' => $this->ids['SmsProvider'][0]]);
     $this->assertEquals('text Anthony', $providerObj->getSentMessage());
   }
@@ -1661,7 +1661,7 @@ $text
     $html = __FUNCTION__ . ' html' . '{contact.display_name}';
     $text = __FUNCTION__ . ' text' . '{contact.display_name}';
 
-    /* @var CRM_Contact_Form_Task_Email $form */
+    /** @var CRM_Contact_Form_Task_Email $form */
     $form = $this->getFormObject('CRM_Contact_Form_Task_Email', [
       'subject' => $subject,
       'html_message' => $html,
@@ -2658,7 +2658,7 @@ $textValue
   protected function getCaseEmailTaskForm(int $contactId, array $submittedValues): CRM_Case_Form_Task_Email {
     $_REQUEST['cid'] = $contactId;
     $_REQUEST['caseid'] = $this->getCaseID();
-    /* @var CRM_Case_Form_Task_Email $form */
+    /** @var CRM_Case_Form_Task_Email $form */
     $form = $this->getFormObject('CRM_Case_Form_Task_Email', array_merge([
       'to' => $contactId . '::' . 'email@example.com',
       'from_email_address' => 'from@example.com',
@@ -2675,7 +2675,7 @@ $textValue
    */
   protected function getContactEmailTaskForm(int $contactId, array $submittedValues): CRM_Contact_Form_Task_Email {
     $_REQUEST['cid'] = $contactId;
-    /* @var CRM_Contact_Form_Task_Email $form */
+    /** @var CRM_Contact_Form_Task_Email $form */
     $form = $this->getFormObject('CRM_Contact_Form_Task_Email', array_merge([
       'to' => $contactId . '::' . 'email@example.com',
       'from_email_address' => 'from@example.com',

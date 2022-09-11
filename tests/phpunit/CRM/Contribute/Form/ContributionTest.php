@@ -2186,7 +2186,7 @@ Paid By: Check',
    * @return \CRM_Contribute_Form_Contribution
    */
   protected function getContributionForm(array $formValues): CRM_Contribute_Form_Contribution {
-    /* @var CRM_Contribute_Form_Contribution $form */
+    /** @var CRM_Contribute_Form_Contribution $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Contribution', $formValues);
     $form->buildForm();
     return $form;

@@ -101,7 +101,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
     foreach ($dependency as $name) {
       $daoString = 'CRM_' . $name[0] . '_DAO_' . $name[1];
       if (class_exists($daoString)) {
-        /* @var \CRM_Core_DAO $dao */
+        /** @var \CRM_Core_DAO $dao */
         $dao = new $daoString();
         $dao->financial_type_id = $financialTypeId;
         if ($dao->find(TRUE)) {

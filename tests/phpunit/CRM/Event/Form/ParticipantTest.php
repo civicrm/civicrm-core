@@ -836,7 +836,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribution['id']);
     $this->assertCount(2, $lineItems);
     $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $contribution['id'], 'participant_id', 'contribution_id');
-    /* @var CRM_Event_Form_SelfSvcTransfer $form */
+    /** @var CRM_Event_Form_SelfSvcTransfer $form */
     $form = $this->getFormObject('CRM_Event_Form_SelfSvcTransfer');
     $toContactId = $this->individualCreate();
     $mut = new CiviMailUtils($this);

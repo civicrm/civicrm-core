@@ -429,7 +429,7 @@ class CRM_Core_PseudoConstant {
       return $var;
     }
 
-    /* @var CRM_Core_DAO $object */
+    /** @var CRM_Core_DAO $object */
     $object = new $name();
 
     $object->selectAdd();
@@ -1492,7 +1492,7 @@ WHERE  id = %1
       return FALSE;
     }
     // Get list of fields for the option table
-    /* @var CRM_Core_DAO $dao * */
+    /** @var CRM_Core_DAO $dao * */
     $dao = new $daoName();
     $availableFields = array_keys($dao->fieldKeys());
 

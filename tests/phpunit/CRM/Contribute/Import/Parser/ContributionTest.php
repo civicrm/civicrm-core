@@ -632,7 +632,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    * @noinspection PhpUnnecessaryLocalVariableInspection
    */
   protected function getMapFieldForm(array $submittedValues): CRM_Contribute_Import_Form_MapField {
-    /* @var \CRM_Contribute_Import_Form_MapField $form */
+    /** @var \CRM_Contribute_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Contribute_Import_Form_MapField', $submittedValues);
     return $form;
   }
@@ -648,7 +648,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    * @noinspection PhpUnnecessaryLocalVariableInspection
    */
   protected function getPreviewForm(array $submittedValues): CRM_Contribute_Import_Form_Preview {
-    /* @var CRM_Contribute_Import_Form_Preview $form */
+    /** @var CRM_Contribute_Import_Form_Preview $form */
     $form = $this->getFormObject('CRM_Contribute_Import_Form_Preview', $submittedValues);
     return $form;
   }

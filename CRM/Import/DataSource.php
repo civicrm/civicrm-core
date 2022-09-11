@@ -566,7 +566,7 @@ abstract class CRM_Import_DataSource {
         break;
       }
     }
-    /* @var \CRM_Import_Parser */
+    /** @var \CRM_Import_Parser $parser */
     $parser = new $parserClass();
     $parser->setUserJobID($this->getUserJobID());
     return $parser;

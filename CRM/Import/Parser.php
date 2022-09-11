@@ -167,7 +167,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   protected function getDataSourceObject(): ?CRM_Import_DataSource {
     $className = $this->getSubmittedValue('dataSource');
     if ($className) {
-      /* @var CRM_Import_DataSource $dataSource */
       return new $className($this->getUserJobID());
     }
     return NULL;
@@ -1320,7 +1319,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     if (!isset($fieldSpec['bao'])) {
       return $submittedValue;
     }
-    /* @var \CRM_Core_DAO $bao */
+    /** @var \CRM_Core_DAO $bao */
     $bao = $fieldSpec['bao'];
     // For historical reasons use validate as context - ie disabled name matches ARE permitted.
     $nameOptions = $bao::buildOptions($fieldSpec['name'], 'validate');
@@ -2077,7 +2076,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
         $parserClass = $userJobType['class'];
       }
     }
-    /* @var \CRM_Import_Parser $parser */
+    /** @var \CRM_Import_Parser $parser */
     $parser = new $parserClass();
     $parser->setUserJobID($userJobID);
     // Not sure if we still need to init....

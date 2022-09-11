@@ -24,7 +24,7 @@ class CRM_Contribute_Form_CancelSubscriptionTest extends CiviUnitTestCase {
   public function testMail(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $this->addContribution();
-    /* @var CRM_Contribute_Form_CancelSubscription $form */
+    /** @var CRM_Contribute_Form_CancelSubscription $form */
     $form = $this->getFormObject('CRM_Contribute_Form_CancelSubscription', ['is_notify' => TRUE]);
     $form->set('crid', $this->getContributionRecurID());
     $form->buildForm();
@@ -65,7 +65,7 @@ class CRM_Contribute_Form_CancelSubscriptionTest extends CiviUnitTestCase {
    */
   public function testCancelSubscriptionForm(): void {
     $this->addContribution();
-    /* @var CRM_Contribute_Form_CancelSubscription $form */
+    /** @var CRM_Contribute_Form_CancelSubscription $form */
     $form = $this->getFormObject('CRM_Contribute_Form_CancelSubscription', ['is_notify' => TRUE]);
     $form->set('crid', $this->getContributionRecurID());
     $form->buildForm();

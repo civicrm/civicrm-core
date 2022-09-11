@@ -248,7 +248,7 @@ class Admin {
       }
       // Non-custom DAO entities
       elseif (!empty($entity['dao'])) {
-        /* @var \CRM_Core_DAO $daoClass */
+        /** @var \CRM_Core_DAO $daoClass */
         $daoClass = $entity['dao'];
         $references = $daoClass::getReferenceColumns();
         $fields = array_column($entity['fields'], NULL, 'name');

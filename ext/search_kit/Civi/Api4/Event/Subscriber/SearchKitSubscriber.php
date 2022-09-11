@@ -36,7 +36,7 @@ class SearchKitSubscriber implements EventSubscriberInterface {
    *   API authorization event.
    */
   public function onApiAuthorize(\Civi\API\Event\AuthorizeEvent $event) {
-    /* @var \Civi\Api4\Generic\AbstractAction $apiRequest */
+    /** @var \Civi\Api4\Generic\AbstractAction $apiRequest */
     $apiRequest = $event->getApiRequest();
     if ($apiRequest['version'] == 4 && $apiRequest->getEntityName() === 'SavedSearch') {
       if (\CRM_Core_Permission::check('administer search_kit')) {

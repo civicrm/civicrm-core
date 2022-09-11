@@ -80,7 +80,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       'receive_date' => '2021-02-01 2:21',
       'currency' => 'USD',
     ])['id'];
-    /* @var CRM_Contribute_Form_Task_PDFLetter $form */
+    /** @var CRM_Contribute_Form_Task_PDFLetter $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', [
       'campaign_id' => '',
       'subject' => '',
@@ -208,7 +208,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       ];
 
       $contributionId = $this->createContribution();
-      /* @var $form CRM_Contribute_Form_Task_PDFLetter */
+      /** @var $form CRM_Contribute_Form_Task_PDFLetter */
       $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
       $form->setContributionIds([$contributionId]);
       $format = Civi::settings()->get('dateformatFull');
@@ -248,7 +248,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       'html_message' => '{contact.display_name}',
       'document_type' => 'pdf',
     ];
-    /* @var $form CRM_Contribute_Form_Task_PDFLetter */
+    /** @var $form CRM_Contribute_Form_Task_PDFLetter */
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
     $form->setContributionIds([$this->createContribution()]);
     try {
@@ -282,7 +282,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       $formValues['html_message'] .= "$token : {contribution.$token}\n";
     }
     $formValues['html_message'] .= '{emoji.favourite_emoticon}';
-    /* @var $form CRM_Contribute_Form_Task_PDFLetter */
+    /** @var $form CRM_Contribute_Form_Task_PDFLetter */
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
     $form->setContributionIds([$this->createContribution(array_merge(['campaign_id' => $tokens['campaign_id:label']], $tokens))]);
     try {
@@ -429,7 +429,7 @@ emo
     ]);
     $contributionIDs[] = $contribution['id'];
 
-    /* @var \CRM_Contribute_Form_Task_PDFLetter $form */
+    /** @var \CRM_Contribute_Form_Task_PDFLetter $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
     $form->setContributionIds($contributionIDs);
 

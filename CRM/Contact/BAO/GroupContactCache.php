@@ -521,7 +521,7 @@ ORDER BY   gc.contact_id, g.children
     if (empty($apiParams['limit']) && empty($apiParams['offset'])) {
       unset($apiParams['orderBy']);
     }
-    /* @var $api \Civi\Api4\Generic\DAOGetAction */
+    /** @var \Civi\Api4\Generic\DAOGetAction $api */
     $api = Request::create($savedSearch['api_entity'], 'get', $apiParams);
     $query = new Api4SelectQuery($api);
     $query->forceSelectId = FALSE;

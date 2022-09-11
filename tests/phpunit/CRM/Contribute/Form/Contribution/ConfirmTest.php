@@ -57,7 +57,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     // create a contribution page which is later used to make online payment for pending contribution
     $contributionPageID2 = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
 
-    /* @var CRM_Contribute_Form_Contribution_Confirm $form*/
+    /** @var CRM_Contribute_Form_Contribution_Confirm $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Contribution_Confirm');
     $form->_id = $contributionPageID2;
 

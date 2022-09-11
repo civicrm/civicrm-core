@@ -88,7 +88,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->setCurrencySeparators($thousandSeparator);
     $mut = new CiviMailUtils($this);
     $paymentProcessorID = $this->processorCreate();
-    /* @var \CRM_Core_Payment_Dummy $processor */
+    /** @var \CRM_Core_Payment_Dummy $processor */
     $processor = Civi\Payment\System::singleton()->getById($paymentProcessorID);
     $processor->setDoDirectPaymentResult(['fee_amount' => 1.67]);
     $params = ['is_monetary' => 1, 'financial_type_id' => 1];
@@ -216,7 +216,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     // @todo - figure out why this doesn't pass validate financials
     $this->isValidateFinancialsOnPostAssert = FALSE;
     $paymentProcessorID = $this->processorCreate();
-    /* @var \CRM_Core_Payment_Dummy $processor */
+    /** @var \CRM_Core_Payment_Dummy $processor */
     $processor = Civi\Payment\System::singleton()->getById($paymentProcessorID);
     $processor->setDoDirectPaymentResult(['fee_amount' => 1.67]);
     $params = ['is_monetary' => 1, 'financial_type_id' => 1];
@@ -530,7 +530,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->createJoinedProfile(['entity_table' => 'civicrm_event', 'entity_id' => $event['id']]);
 
     $_REQUEST['id'] = $event['id'];
-    /* @var \CRM_Event_Form_Registration_Confirm $form */
+    /** @var \CRM_Event_Form_Registration_Confirm $form */
     $form = $this->getFormObject('CRM_Event_Form_Registration_Confirm');
     $form->set('params', [[]]);
     $form->set('values', [
@@ -631,7 +631,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     }
 
     $_REQUEST['id'] = $event['id'];
-    /* @var \CRM_Event_Form_Registration_Confirm $form */
+    /** @var \CRM_Event_Form_Registration_Confirm $form */
     $form = $this->getFormObject('CRM_Event_Form_Registration_Confirm');
     $form->set('params', [[]]);
     $form->set('values', [

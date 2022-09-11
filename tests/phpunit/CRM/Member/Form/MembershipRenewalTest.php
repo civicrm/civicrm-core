@@ -638,7 +638,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    */
   protected function getForm($formValues = [], $mode = 'test'): CRM_Member_Form_MembershipRenewal {
-    /* @var CRM_Member_Form_MembershipRenewal $form */
+    /** @var CRM_Member_Form_MembershipRenewal $form */
     $form = $this->getFormObject('CRM_Member_Form_MembershipRenewal', $formValues);
 
     $form->_bltID = 5;

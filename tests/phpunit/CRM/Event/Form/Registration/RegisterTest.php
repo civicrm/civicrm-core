@@ -99,7 +99,7 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
    * @return CRM_Event_Form_Registration_Register
    */
   protected function getEventForm(int $eventID): CRM_Event_Form_Registration_Register {
-    /* @var \CRM_Event_Form_Registration_Register $form */
+    /** @var \CRM_Event_Form_Registration_Register $form */
     $form = $this->getFormObject('CRM_Event_Form_Registration_Register');
     $_REQUEST['id'] = $eventID;
     return $form;

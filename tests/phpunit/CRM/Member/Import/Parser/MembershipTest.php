@@ -488,7 +488,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
     $form->postProcess();
-    /* @var CRM_Member_Import_Form_MapField $form */
+    /** @var CRM_Member_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Member_Import_Form_Preview', $submittedValues);
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
