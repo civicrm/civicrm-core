@@ -26,10 +26,12 @@ class CRM_Core_BAO_Managed extends CRM_Core_DAO_Managed implements Civi\Core\Hoo
    */
   public static function on_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     // When an entity is deleted, delete the corresponding Managed record
+    // Unless the cleanup policy is "never"
     if ($event->action === 'delete' && $event->id && self::isApi4ManagedType($event->entity)) {
       \Civi\Api4\Managed::delete(FALSE)
         ->addWhere('entity_type', '=', $event->entity)
         ->addWhere('entity_id', '=', $event->id)
+        ->addWhere('cleanup', '!=', 'never')
         ->execute();
     }
     // When an entity is updated, update the timestamp in corresponding Managed record
