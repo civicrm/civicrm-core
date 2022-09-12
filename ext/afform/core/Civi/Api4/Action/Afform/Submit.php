@@ -112,15 +112,17 @@ class Submit extends AbstractProcessor {
    * Recursively add entity IDs to the values.
    */
   protected function array_insert($arr, $ins) {
-    if (is_array($arr) && is_array($ins)) foreach ($ins as $k => $v) {
-      if (isset($arr[$k]) && is_array($v) && is_array($arr[$k])) {
-        $arr[$k] = $this->array_insert($arr[$k], $v);
+    if (is_array($arr) && is_array($ins)) {
+      foreach ($ins as $k => $v) {
+        if (isset($arr[$k]) && is_array($v) && is_array($arr[$k])) {
+          $arr[$k] = $this->array_insert($arr[$k], $v);
+        }
+        else {
+          $arr[$k] = $v;
+        }
       }
-      else {
-        $arr[$k] = $v;
-      }
+      return($arr);
     }
-    return($arr);
   }
 
   /**
