@@ -76,7 +76,7 @@ class Submit extends AbstractProcessor {
       \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
     }
 
-    $submissionData = $this->array_insert($this->getValues(), $this->_entityIds);
+    $submissionData = $this->combineValuesAndIds($this->getValues(), $this->_entityIds);
     // Update submission record with entity IDs.
     if (!empty($this->_afform['create_submission'])) {
       AfformSubmission::update(FALSE)
@@ -94,16 +94,20 @@ class Submit extends AbstractProcessor {
   /**
    * Recursively add entity IDs to the values.
    */
-  protected function array_insert($arr, $ins) {
-    if (is_array($arr) && is_array($ins)) foreach ($ins as $k => $v) {
-      if (isset($arr[$k]) && is_array($v) && is_array($arr[$k])) {
-        $arr[$k] = $this->array_insert($arr[$k], $v);
-      }
-      else {
-        $arr[$k] = $v;
+  protected function combineValuesAndIds($values, $ids, $isJoin = FALSE) {
+    $combined = [];
+    $values += array_fill_keys(array_keys($ids), []);
+    foreach ($values as $name => $value) {
+      foreach ($value as $idx => $val) {
+        $idData = $ids[$name][$idx] ?? [];
+        if (!$isJoin) {
+          $idData['_joins'] = $this->combineValuesAndIds($val['joins'] ?? [], $idData['_joins'] ?? [], TRUE);
+        }
+        $item = array_merge($isJoin ? $val : ($val['fields'] ?? []), $idData);
+        $combined[$name][$idx] = $item;
       }
     }
-    return($arr);
+    return $combined;
   }
 
   /**
