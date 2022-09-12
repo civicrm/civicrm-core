@@ -1778,7 +1778,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * @param $outcome
+   * @param int|null|string $outcome
    *
    * @return string
    */
