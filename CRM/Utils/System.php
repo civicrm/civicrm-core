@@ -1491,7 +1491,9 @@ class CRM_Utils_System {
     // a bit aggressive, but livable for now
     CRM_Utils_Cache::singleton()->flush();
 
-    if (Civi\Core\Container::isContainerBooted()) {
+    $localDrivers = ['CRM_Utils_Cache_ArrayCache', 'CRM_Utils_Cache_NoCache'];
+    if (Civi\Core\Container::isContainerBooted()
+      && !in_array(get_class(CRM_Utils_Cache::singleton()), $localDrivers)) {
       Civi::cache('long')->flush();
       Civi::cache('settings')->flush();
       Civi::cache('js_strings')->flush();
