@@ -778,9 +778,9 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   protected function getMappingID(): ?int {
     if (!$this->getUserJobID() || empty($this->getUserJob()['metadata']['mapping'])) {
-      return $this->getSubmittedValue('savedMapping');
+      return $this->getSubmittedValue('savedMapping') ?: NULL;
     }
-    return $this->getUserJob()['metadata']['mapping']['id'];
+    return $this->getUserJob()['metadata']['mapping']['id'] ?? NULL;
   }
 
   /**
