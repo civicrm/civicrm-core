@@ -158,7 +158,7 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    */
   protected function submitDatasourceForm(string $csvFileName): CRM_Contact_Import_Form_DataSource {
     $_GET['dataSource'] = 'CRM_Import_DataSource_CSV';
-    /* @var CRM_Contact_Import_Form_DataSource $form */
+    /** @var CRM_Contact_Import_Form_DataSource $form */
     $form = $this->getFormObject('CRM_Contact_Import_Form_DataSource', [
       'uploadFile' => [
         'name' => __DIR__ . '/' . $csvFileName,

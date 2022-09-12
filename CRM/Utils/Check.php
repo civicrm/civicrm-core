@@ -209,7 +209,7 @@ class CRM_Utils_Check {
     $checksNeeded = $statusNames;
     foreach (glob(__DIR__ . '/Check/Component/*.php') as $filePath) {
       $className = 'CRM_Utils_Check_Component_' . basename($filePath, '.php');
-      /* @var CRM_Utils_Check_Component $component */
+      /** @var CRM_Utils_Check_Component $component */
       $component = new $className();
       if ($includeDisabled || $component->isEnabled()) {
         $messages = array_merge($messages, $component->checkAll($statusNames, $includeDisabled));

@@ -288,7 +288,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
   protected function getDataSourceObject(): ?CRM_Import_DataSource {
     $className = $this->getDataSourceClassName();
     if ($className) {
-      /* @var CRM_Import_DataSource $dataSource */
       return new $className($this->getUserJobID());
     }
     return NULL;
@@ -304,7 +303,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
   protected function getDataSourceFields(): array {
     $className = $this->getDataSourceClassName();
     if ($className) {
-      /* @var CRM_Import_DataSource $dataSourceClass */
+      /** @var CRM_Import_DataSource $dataSourceClass */
       $dataSourceClass = new $className();
       return $dataSourceClass->getSubmittableFields();
     }

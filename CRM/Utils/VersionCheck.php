@@ -205,7 +205,7 @@ class CRM_Utils_VersionCheck {
     ];
     foreach ($tables as $daoName => $where) {
       if (class_exists($daoName)) {
-        /* @var \CRM_Core_DAO $dao */
+        /** @var \CRM_Core_DAO $dao */
         $dao = new $daoName();
         if ($where) {
           $dao->whereAdd($where);

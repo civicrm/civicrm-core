@@ -1774,7 +1774,7 @@ function _civicrm_api3_validate_constraint($fieldValue, $fieldName, $fieldInfo, 
   $fieldInfo = [$fieldName => $fieldInfo];
   $params = [$fieldName => $fieldValue];
   _civicrm_api3_validate_fields($entity, NULL, $params, $fieldInfo);
-  /* @var CRM_Core_DAO $dao*/
+  /** @var CRM_Core_DAO $dao */
   $dao = new $daoName();
   $dao->id = $params[$fieldName];
   $dao->selectAdd();

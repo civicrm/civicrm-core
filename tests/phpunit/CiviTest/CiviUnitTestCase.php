@@ -3230,7 +3230,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
   public function getFormObject($class, $formValues = [], $pageName = '', $searchFormValues = []) {
     $_POST = $formValues;
-    /* @var CRM_Core_Form $form */
+    /** @var CRM_Core_Form $form */
     $form = new $class();
     $_SERVER['REQUEST_METHOD'] = 'GET';
     switch ($class) {

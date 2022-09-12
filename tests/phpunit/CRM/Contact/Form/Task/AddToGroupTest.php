@@ -21,7 +21,7 @@ class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
   protected function getSearchTaskFormObject(array $formValues) {
     $_POST = $formValues;
     $_SERVER['REQUEST_METHOD'] = 'GET';
-    /* @var CRM_Core_Form $form */
+    /** @var CRM_Core_Form $form */
     $form = new CRM_Contact_Form_Task_AddToGroup();
     $form->controller = new CRM_Contact_Controller_Search();
     $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));

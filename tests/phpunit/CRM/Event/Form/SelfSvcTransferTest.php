@@ -20,7 +20,7 @@ class CRM_Event_Form_SelfSvcTransferTest extends CiviUnitTestCase {
     $this->addLocationBlockToDomain();
     $this->individualCreate(['email' => 'new@example.org']);
     $mut = new CiviMailUtils($this);
-    /* @var CRM_Event_Form_SelfSvcTransfer $form*/
+    /** @var CRM_Event_Form_SelfSvcTransfer $form*/
     $form = $this->getFormObject('CRM_Event_Form_SelfSvcTransfer', [
       'email' => 'new@example.org',
     ]);

@@ -364,7 +364,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    */
   public function alterReportVarHook($varType, &$var, &$object) {
     if ($varType === 'sql' && $object instanceof CRM_Report_Form_Contribute_Summary) {
-      /* @var CRM_Report_Form $var */
       $from = $var->getVar('_from');
       $from .= ' LEFT JOIN civicrm_financial_type as temp ON temp.id = contribution_civireport.financial_type_id';
       $var->setVar('_from', $from);

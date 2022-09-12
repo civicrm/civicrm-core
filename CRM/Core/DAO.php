@@ -2554,7 +2554,6 @@ SELECT contact_id
 
     $occurrences = [];
     foreach ($links as $refSpec) {
-      /** @var $refSpec CRM_Core_Reference_Interface */
       $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($refSpec->getReferenceTable());
       $result = $refSpec->findReferences($this);
       if ($result) {
@@ -2583,7 +2582,6 @@ SELECT contact_id
 
     $counts = [];
     foreach ($links as $refSpec) {
-      /** @var $refSpec CRM_Core_Reference_Interface */
       $count = $refSpec->getReferenceCount($this);
       if (!empty($count['count'])) {
         $counts[] = $count;
@@ -2591,7 +2589,6 @@ SELECT contact_id
     }
 
     foreach (CRM_Core_Component::getEnabledComponents() as $component) {
-      /** @var $component CRM_Core_Component_Info */
       $counts = array_merge($counts, $component->getReferenceCounts($this));
     }
     CRM_Utils_Hook::referenceCounts($this, $counts);
@@ -2621,7 +2618,7 @@ SELECT contact_id
       $links = $daoClassName::getReferenceColumns();
 
       foreach ($links as $refSpec) {
-        /** @var $refSpec CRM_Core_Reference_Interface */
+        /** @var CRM_Core_Reference_Interface $refSpec */
         if ($refSpec->matchesTargetTable($tableName)) {
           $refsFound[] = $refSpec;
         }

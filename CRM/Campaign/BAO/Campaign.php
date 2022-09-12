@@ -48,7 +48,7 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
       }
     }
 
-    /* @var \CRM_Campaign_DAO_Campaign $campaign */
+    /** @var \CRM_Campaign_DAO_Campaign $campaign */
     $campaign = self::writeRecord($params);
 
     /* Create the campaign group record */

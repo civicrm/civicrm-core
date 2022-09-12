@@ -111,7 +111,6 @@ function _civicrm_api3_payment_processor_getlist_defaults(&$request) {
  * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_payment_processor_pay($params) {
-  /* @var CRM_Core_Payment $processor */
   $processor = Civi\Payment\System::singleton()->getById($params['payment_processor_id']);
   $processor->setPaymentProcessor(civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $params['payment_processor_id']]));
   try {

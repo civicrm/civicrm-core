@@ -896,7 +896,7 @@ class Api4SelectQuery {
    */
   private function getBridgeRefs(string $bridgeEntity, string $joinEntity): array {
     $bridges = CoreUtil::getInfoItem($bridgeEntity, 'bridge') ?? [];
-    /* @var \CRM_Core_DAO $bridgeDAO */
+    /** @var \CRM_Core_DAO $bridgeDAO */
     $bridgeDAO = CoreUtil::getInfoItem($bridgeEntity, 'dao');
     $bridgeEntityFields = \Civi\API\Request::create($bridgeEntity, 'get', ['version' => 4, 'checkPermissions' => $this->getCheckPermissions()])->entityFields();
     $bridgeTable = $bridgeDAO::getTableName();

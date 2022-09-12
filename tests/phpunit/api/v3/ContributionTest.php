@@ -3557,7 +3557,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $_REQUEST['id'] = $this->getContributionID();
     $_REQUEST['action'] = 'update';
     // change pending contribution to completed
-    /* @var CRM_Contribute_Form_Contribution $form */
+    /** @var CRM_Contribute_Form_Contribution $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
       'total_amount' => 20,
       'net_amount' => 20,

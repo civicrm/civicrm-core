@@ -2716,8 +2716,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param array $locks
    */
   protected static function releaseLocks(array $locks) {
+    /** @var Civi\Core\Lock\LockInterface $lock */
     foreach ($locks as $lock) {
-      /* @var Civi\Core\Lock\LockInterface $lock */
       $lock->release();
     }
   }

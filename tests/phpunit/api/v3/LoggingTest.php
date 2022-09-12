@@ -506,7 +506,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   public function testTriggerOutput(): void {
     Civi::settings()->set('logging_no_trigger_permission', TRUE);
     Civi::settings()->set('logging', TRUE);
-    /* @var \Civi\Core\SqlTriggers $sqlTriggers */
+    /** @var \Civi\Core\SqlTriggers $sqlTriggers */
     $sqlTriggers = Civi::service('sql_triggers');
     $fileName = $sqlTriggers->getFile();
     $triggerOutPut = file_get_contents($fileName);

@@ -374,7 +374,7 @@ function civicrm_api3_generic_getrefcount($apiRequest) {
   }
   $daoClass = $entityToClassMap[$apiRequest['entity']];
 
-  /* @var $dao CRM_Core_DAO */
+  /** @var CRM_Core_DAO $dao */
   $dao = new $daoClass();
   $dao->id = $apiRequest['params']['id'];
   if ($dao->find(TRUE)) {

@@ -82,7 +82,7 @@ class CRM_Participant_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       'saveMappingName' => 'my mapping',
       'saveMappingDesc' => 'new mapping',
     ], $submittedValues);
-    /* @var \CRM_Event_Import_Form_DataSource $form */
+    /** @var \CRM_Event_Import_Form_DataSource $form */
     $form = $this->getFormObject('CRM_Event_Import_Form_DataSource', $submittedValues);
     $values = $_SESSION['_' . $form->controller->_name . '_container']['values'];
     $form->buildForm();
@@ -91,13 +91,13 @@ class CRM_Participant_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $_SESSION['_' . $form->controller->_name . '_container']['values'] = $values;
 
     $this->userJobID = $form->getUserJobID();
-    /* @var CRM_Event_Import_Form_MapField $form */
+    /** @var CRM_Event_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Event_Import_Form_MapField', $submittedValues);
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
     $this->assertTrue($form->validate());
     $form->postProcess();
-    /* @var CRM_Event_Import_Form_Preview $form */
+    /** @var CRM_Event_Import_Form_Preview $form */
     $form = $this->getFormObject('CRM_Event_Import_Form_Preview', $submittedValues);
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
