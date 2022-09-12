@@ -47,7 +47,7 @@ class FormDataModel {
     $this->entities = array_column(AHQ::getTags($root, 'af-entity'), NULL, 'name');
     foreach (array_keys($this->entities) as $entity) {
       $this->entities[$entity] = array_merge($this->defaults, $this->entities[$entity]);
-      $this->entities[$entity]['fields'] = $this->entities[$entity]['joins'] = [];
+      $this->entities[$entity]['fields'] = $this->entities[$entity]['_joins'] = [];
     }
     // Pre-load full list of afforms in case this layout embeds other afform directives
     $this->blocks = (array) Afform::get(FALSE)->setSelect(['name', 'directive_name'])->execute()->indexBy('directive_name');
@@ -155,14 +155,14 @@ class FormDataModel {
       }
       elseif ($entity && $node['#tag'] === 'af-field') {
         if ($join) {
-          $this->entities[$entity]['joins'][$join]['fields'][$node['name']] = AHQ::getProps($node);
+          $this->entities[$entity]['_joins'][$join]['fields'][$node['name']] = AHQ::getProps($node);
         }
         else {
           $this->entities[$entity]['fields'][$node['name']] = AHQ::getProps($node);
         }
       }
       elseif ($entity && !empty($node['af-join'])) {
-        $this->entities[$entity]['joins'][$node['af-join']] = AHQ::getProps($node);
+        $this->entities[$entity]['_joins'][$node['af-join']] = AHQ::getProps($node);
         $this->parseFields($node['#children'] ?? [], $entity, $node['af-join']);
       }
       elseif (!empty($node['#children'])) {

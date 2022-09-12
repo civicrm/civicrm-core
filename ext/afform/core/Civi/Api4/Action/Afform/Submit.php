@@ -26,23 +26,32 @@ class Submit extends AbstractProcessor {
   protected $values;
 
   protected function processForm() {
+    // Save submission record
+    if (!empty($this->_afform['create_submission'])) {
+      $submission = AfformSubmission::create(FALSE)
+        ->addValue('contact_id', \CRM_Core_Session::getLoggedInContactID())
+        ->addValue('afform_name', $this->name)
+        ->addValue('data', $this->getValues())
+        ->execute()->first();
+    }
+
     $entityValues = [];
     foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
       $entityValues[$entityName] = [];
-      // Gather submitted field values from $values['fields'] and sub-entities from $values['joins']
+      // Gather submitted field values from $values['fields'] and sub-entities from $values['_joins']
       foreach ($this->values[$entityName] ?? [] as $values) {
         // Only accept values from fields on the form
         $values['fields'] = array_intersect_key($values['fields'] ?? [], $entity['fields']);
         // Only accept joins set on the form
-        $values['joins'] = array_intersect_key($values['joins'] ?? [], $entity['joins']);
-        foreach ($values['joins'] as $joinEntity => &$joinValues) {
+        $values['_joins'] = array_intersect_key($values['_joins'] ?? [], $entity['_joins']);
+        foreach ($values['_joins'] as $joinEntity => &$joinValues) {
           // Enforce the limit set by join[max]
-          $joinValues = array_slice($joinValues, 0, $entity['joins'][$joinEntity]['max'] ?? NULL);
+          $joinValues = array_slice($joinValues, 0, $entity['_joins'][$joinEntity]['max'] ?? NULL);
           foreach ($joinValues as $index => $vals) {
             // Only accept values from join fields on the form
-            $joinValues[$index] = array_intersect_key($vals, $entity['joins'][$joinEntity]['fields'] ?? []);
+            $joinValues[$index] = array_intersect_key($vals, $entity['_joins'][$joinEntity]['fields'] ?? []);
             // Merge in pre-set data
-            $joinValues[$index] = array_merge($joinValues[$index], $entity['joins'][$joinEntity]['data'] ?? []);
+            $joinValues[$index] = array_merge($joinValues[$index], $entity['_joins'][$joinEntity]['data'] ?? []);
           }
         }
         $entityValues[$entityName][] = $values;
@@ -67,19 +76,51 @@ class Submit extends AbstractProcessor {
       \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
     }
 
-    // Save submission record
+    $submissionData = $this->array_insert($this->getValues(), $this->_entityIds);
+    // Update submission record with entity IDs.
     if (!empty($this->_afform['create_submission'])) {
-      $submission = AfformSubmission::create(FALSE)
-        ->addValue('contact_id', \CRM_Core_Session::getLoggedInContactID())
-        ->addValue('afform_name', $this->name)
-        ->addValue('data', $this->_entityIds)
-        ->execute()->first();
+      $submissionData = $this->array_insert($this->getValues(), $this->_entityIds);
+      $this->removeJoinsElement($submissionData);
+      AfformSubmission::update(FALSE)
+        ->addWhere('id', '=', $submission['id'])
+        ->addValue('data', $submissionData)
+        ->execute();
     }
 
     // Return ids and a token for uploading files
     return [
       ['token' => $this->generatePostSubmitToken()] + $this->_entityIds,
     ];
+  }
+
+  /**
+   * Recursively removes '_joins' from $submissionData in favor of submiting only '_joins'
+   */
+  private function removeJoinsElement(&$submissionData) {
+    foreach ($submissionData as $key => &$value) {
+      if ($key === '_joins') {
+        unset($submissionData[$key]);
+      }
+      elseif (is_array($value)) {
+        $this->removeJoinsElement($value);
+      }
+    }
+    return $submissionData;
+  }
+
+  /**
+   * Recursively add entity IDs to the values.
+   */
+  protected function array_insert($arr, $ins) {
+    if (is_array($arr) && is_array($ins)) foreach ($ins as $k => $v) {
+      if (isset($arr[$k]) && is_array($v) && is_array($arr[$k])) {
+        $arr[$k] = $this->array_insert($arr[$k], $v);
+      }
+      else {
+        $arr[$k] = $v;
+      }
+    }
+    return($arr);
   }
 
   /**
@@ -132,7 +173,7 @@ class Submit extends AbstractProcessor {
       if (empty($contact['fields']) || \CRM_Contact_BAO_Contact::hasName($contact['fields'])) {
         continue;
       }
-      foreach ($contact['joins']['Email'] ?? [] as $email) {
+      foreach ($contact['_joins']['Email'] ?? [] as $email) {
         if (!empty($email['email'])) {
           continue 2;
         }
@@ -154,9 +195,10 @@ class Submit extends AbstractProcessor {
         continue;
       }
       try {
+        $idField = CoreUtil::getIdFieldName($event->getEntityType());
         $saved = $api4($event->getEntityType(), 'save', ['records' => [$record['fields']]])->first();
-        $event->setEntityId($index, $saved['id']);
-        self::saveJoins($event, $index, $saved['id'], $record['joins'] ?? []);
+        $event->setEntityId($index, $saved[$idField]);
+        self::saveJoins($event, $index, $saved[$idField], $record['_joins'] ?? []);
       }
       catch (\API_Exception $e) {
         // What to do here? Sometimes we should silently ignore errors, e.g. an optional entity
@@ -244,7 +286,7 @@ class Submit extends AbstractProcessor {
           'checkPermissions' => FALSE,
           'where' => self::getJoinWhereClause($event->getFormDataModel(), $event->getEntityName(), $joinEntityName, $entityId),
           'records' => $values,
-        ], ['id']);
+        ]);
         $indexedResult = array_combine(array_keys($values), (array) $result);
         $event->setJoinIds($index, $joinEntityName, $indexedResult);
       }
