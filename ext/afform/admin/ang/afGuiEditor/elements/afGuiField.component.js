@@ -89,6 +89,11 @@
       // Returns the original field definition from metadata
       this.getDefn = function() {
         var defn = afGui.getField(ctrl.container.getFieldEntityType(ctrl.node.name), ctrl.node.name);
+        // Calc fields are specific to a search display, not part of the schema
+        if (!defn && ctrl.container.getSearchDisplay(ctrl.container.node)) {
+          var searchDisplay = ctrl.container.getSearchDisplay(ctrl.container.node);
+          defn = _.findWhere(searchDisplay.calc_fields, {name: ctrl.node.name});
+        }
         defn = defn || {
           label: ts('Untitled'),
           required: false

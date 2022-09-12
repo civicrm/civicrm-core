@@ -80,6 +80,88 @@ class AfformMetadataInjector {
   }
 
   /**
+   * @param $entityNames
+   * @param string $action
+   * @param string $fieldName
+   * @return array|null
+   */
+  private static function getFieldMetadata($entityNames, string $action, string $fieldName):? array {
+    foreach ((array) $entityNames as $entityName) {
+      $fieldInfo = self::getField($entityName, $fieldName, $action);
+      if ($fieldInfo) {
+        return $fieldInfo;
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * Merge a field's definition with whatever's already in the markup
+   *
+   * @param \DOMElement $afField
+   * @param array $fieldInfo
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   */
+  public static function setFieldMetadata(\DOMElement $afField, array $fieldInfo):void {
+    $deep = ['input_attrs'];
+    // Defaults for attributes not in spec
+    $fieldInfo['search_range'] = FALSE;
+
+    $existingFieldDefn = trim(pq($afField)->attr('defn') ?: '');
+    if ($existingFieldDefn && $existingFieldDefn[0] != '{') {
+      // If it's not an object, don't mess with it.
+      return;
+    }
+
+    // Get field defn from afform markup
+    $fieldDefn = $existingFieldDefn ? \CRM_Utils_JS::getRawProps($existingFieldDefn) : [];
+    // This is the input type set on the form (may be different from the default input type in the field spec)
+    $inputType = !empty($fieldDefn['input_type']) ? \CRM_Utils_JS::decode($fieldDefn['input_type']) : $fieldInfo['input_type'];
+    // On a search form, search_range will present a pair of fields (or possibly 3 fields for date select + range)
+    $isSearchRange = !empty($fieldDefn['search_range']) && \CRM_Utils_JS::decode($fieldDefn['search_range']);
+
+    // Default placeholder for select inputs
+    if ($inputType === 'Select' || $inputType === 'ChainSelect') {
+      $fieldInfo['input_attrs']['placeholder'] = E::ts('Select');
+    }
+    elseif ($inputType === 'EntityRef') {
+      $info = civicrm_api4('Entity', 'get', [
+        'where' => [['name', '=', $fieldInfo['fk_entity']]],
+        'checkPermissions' => FALSE,
+        'select' => ['title', 'title_plural'],
+      ], 0);
+      $label = empty($fieldInfo['input_attrs']['multiple']) ? $info['title'] : $info['title_plural'];
+      $fieldInfo['input_attrs']['placeholder'] = E::ts('Select %1', [1 => $label]);
+    }
+
+    if ($fieldInfo['input_type'] === 'Date') {
+      // This flag gets used by the afField controller
+      $fieldDefn['is_date'] = TRUE;
+      // For date fields that have been converted to Select
+      if ($inputType === 'Select') {
+        $dateOptions = \CRM_Utils_Array::makeNonAssociative(\CRM_Core_OptionGroup::values('relative_date_filters'), 'id', 'label');
+        if ($isSearchRange) {
+          $dateOptions = array_merge([['id' => '{}', 'label' => E::ts('Choose Date Range')]], $dateOptions);
+        }
+        $fieldInfo['options'] = $dateOptions;
+      }
+    }
+
+    foreach ($fieldInfo as $name => $prop) {
+      // Merge array props 1 level deep
+      if (in_array($name, $deep) && !empty($fieldDefn[$name])) {
+        $fieldDefn[$name] = \CRM_Utils_JS::writeObject(\CRM_Utils_JS::getRawProps($fieldDefn[$name]) + array_map(['\CRM_Utils_JS', 'encode'], $prop));
+      }
+      elseif (!isset($fieldDefn[$name])) {
+        $fieldDefn[$name] = \CRM_Utils_JS::encode($prop);
+      }
+    }
+    pq($afField)->attr('defn', htmlspecialchars(\CRM_Utils_JS::writeObject($fieldDefn)));
+  }
+
+  /**
    * Merge field definition metadata into an afform field's definition
    *
    * @param string|array $entityNames
@@ -87,70 +169,12 @@ class AfformMetadataInjector {
    * @param \DOMElement $afField
    * @throws \API_Exception
    */
-  private static function fillFieldMetadata($entityNames, $action, \DOMElement $afField) {
+  private static function fillFieldMetadata($entityNames, string $action, \DOMElement $afField):void {
     $fieldName = $afField->getAttribute('name');
-    foreach ((array) $entityNames as $entityName) {
-      $fieldInfo = self::getField($entityName, $fieldName, $action);
-      if ($fieldInfo) {
-        break;
-      }
-    }
+    $fieldInfo = self::getFieldMetadata($entityNames, $action, $fieldName);
     // Merge field definition data with whatever's already in the markup.
-    $deep = ['input_attrs'];
     if ($fieldInfo) {
-      // Defaults for attributes not in spec
-      $fieldInfo['search_range'] = FALSE;
-
-      $existingFieldDefn = trim(pq($afField)->attr('defn') ?: '');
-      if ($existingFieldDefn && $existingFieldDefn[0] != '{') {
-        // If it's not an object, don't mess with it.
-        return;
-      }
-
-      // Get field defn from afform markup
-      $fieldDefn = $existingFieldDefn ? \CRM_Utils_JS::getRawProps($existingFieldDefn) : [];
-      // This is the input type set on the form (may be different from the default input type in the field spec)
-      $inputType = !empty($fieldDefn['input_type']) ? \CRM_Utils_JS::decode($fieldDefn['input_type']) : $fieldInfo['input_type'];
-      // On a search form, search_range will present a pair of fields (or possibly 3 fields for date select + range)
-      $isSearchRange = !empty($fieldDefn['search_range']) && \CRM_Utils_JS::decode($fieldDefn['search_range']);
-
-      // Default placeholder for select inputs
-      if ($inputType === 'Select' || $inputType === 'ChainSelect') {
-        $fieldInfo['input_attrs']['placeholder'] = E::ts('Select');
-      }
-      elseif ($inputType === 'EntityRef') {
-        $info = civicrm_api4('Entity', 'get', [
-          'where' => [['name', '=', $fieldInfo['fk_entity']]],
-          'checkPermissions' => FALSE,
-          'select' => ['title', 'title_plural'],
-        ], 0);
-        $label = empty($fieldInfo['input_attrs']['multiple']) ? $info['title'] : $info['title_plural'];
-        $fieldInfo['input_attrs']['placeholder'] = E::ts('Select %1', [1 => $label]);
-      }
-
-      if ($fieldInfo['input_type'] === 'Date') {
-        // This flag gets used by the afField controller
-        $fieldDefn['is_date'] = TRUE;
-        // For date fields that have been converted to Select
-        if ($inputType === 'Select') {
-          $dateOptions = \CRM_Utils_Array::makeNonAssociative(\CRM_Core_OptionGroup::values('relative_date_filters'), 'id', 'label');
-          if ($isSearchRange) {
-            $dateOptions = array_merge([['id' => '{}', 'label' => E::ts('Choose Date Range')]], $dateOptions);
-          }
-          $fieldInfo['options'] = $dateOptions;
-        }
-      }
-
-      foreach ($fieldInfo as $name => $prop) {
-        // Merge array props 1 level deep
-        if (in_array($name, $deep) && !empty($fieldDefn[$name])) {
-          $fieldDefn[$name] = \CRM_Utils_JS::writeObject(\CRM_Utils_JS::getRawProps($fieldDefn[$name]) + array_map(['\CRM_Utils_JS', 'encode'], $prop));
-        }
-        elseif (!isset($fieldDefn[$name])) {
-          $fieldDefn[$name] = \CRM_Utils_JS::encode($prop);
-        }
-      }
-      pq($afField)->attr('defn', htmlspecialchars(\CRM_Utils_JS::writeObject($fieldDefn)));
+      self::setFieldMetadata($afField, $fieldInfo);
     }
   }
 

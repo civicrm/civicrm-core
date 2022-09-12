@@ -14,6 +14,7 @@
       $scope.controls = {};
       $scope.fieldList = [];
       $scope.calcFieldList = [];
+      $scope.calcFieldTitles = [];
       $scope.blockList = [];
       $scope.blockTitles = [];
       $scope.elementList = [];
@@ -29,7 +30,7 @@
           fieldGroups.push({
             text: ts('Calculated Fields'),
             children: _.transform(ctrl.display.settings.calc_fields, function(fields, el) {
-              fields.push({id: el.name, text: el.defn.label, disabled: ctrl.fieldInUse(el.name)});
+              fields.push({id: el.name, text: el.label, disabled: ctrl.fieldInUse(el.name)});
             }, [])
           });
         }
@@ -69,11 +70,28 @@
         return entity || ctrl.display.settings['saved_search_id.api_entity'];
       };
 
+      function fieldDefaults(field, prefix) {
+        var tag = {
+          "#tag": "af-field",
+          name: prefix + field.name
+        };
+        if (field.input_type === 'Select' || field.input_type === 'ChainSelect') {
+          tag.defn = {input_attrs: {multiple: true}};
+        } else if (field.input_type === 'Date') {
+          tag.defn = {input_type: 'Select', search_range: true};
+        } else if (field.options) {
+          tag.defn = {input_type: 'Select', input_attrs: {multiple: true}};
+        }
+        return tag;
+      }
+
       function buildCalcFieldList(search) {
         $scope.calcFieldList.length = 0;
+        $scope.calcFieldTitles.length = 0;
         _.each(_.cloneDeep(ctrl.display.settings.calc_fields), function(field) {
-          if (!search || _.contains(field.defn.label.toLowerCase(), search)) {
-            $scope.calcFieldList.push(field);
+          if (!search || _.contains(field.label.toLowerCase(), search)) {
+            $scope.calcFieldList.push(fieldDefaults(field, ''));
+            $scope.calcFieldTitles.push(field.label);
           }
         });
       }
@@ -149,21 +167,6 @@
               fieldList.push(fieldDefaults(field, prefix));
             }
           }, []);
-        }
-
-        function fieldDefaults(field, prefix) {
-          var tag = {
-            "#tag": "af-field",
-            name: prefix + field.name
-          };
-          if (field.input_type === 'Select' || field.input_type === 'ChainSelect') {
-            tag.defn = {input_attrs: {multiple: true}};
-          } else if (field.input_type === 'Date') {
-            tag.defn = {input_type: 'Select', search_range: true};
-          } else if (field.options) {
-            tag.defn = {input_type: 'Select', input_attrs: {multiple: true}};
-          }
-          return tag;
         }
       }
 
