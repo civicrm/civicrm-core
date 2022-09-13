@@ -486,11 +486,11 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   /**
    * Get the status to record.
    *
-   * @param int|null $code
+   * @param int|null|string $code
    *
    * @return string
    */
-  protected function getStatus(?int $code): string {
+  protected function getStatus($code): string {
     $errorMapping = [
       self::SOFT_CREDIT_ERROR => 'soft_credit_error',
       self::PLEDGE_PAYMENT_ERROR => 'pledge_payment_error',
