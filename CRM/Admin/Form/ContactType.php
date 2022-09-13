@@ -20,6 +20,13 @@
  */
 class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
 
+  public function preProcess(): void {
+    CRM_Utils_Request::retrieve('action', 'String', $this);
+    CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
+    $this->set('BAOName', 'CRM_Contact_BAO_ContactType');
+    parent::preProcess();
+  }
+
   /**
    * Build the form object.
    */
