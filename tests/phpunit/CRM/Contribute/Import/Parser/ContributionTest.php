@@ -59,20 +59,18 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    */
   public function testImportParserWithSoftCreditsByExternalIdentifier(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
-    $contact1Params = [
+    $mainContactID = $this->individualCreate([
       'first_name' => 'Contact',
       'last_name' => 'One',
       'external_identifier' => 'ext-1',
       'contact_type' => 'Individual',
-    ];
-    $contact2Params = [
+    ]);
+    $softCreditContactID = $this->individualCreate([
       'first_name' => 'Contact',
       'last_name' => 'Two',
       'external_identifier' => 'ext-2',
       'contact_type' => 'Individual',
-    ];
-    $contact1Id = $this->individualCreate($contact1Params);
-    $contact2Id = $this->individualCreate($contact2Params);
+    ]);
 
     $mapping = [
       ['name' => 'total_amount'],
@@ -83,19 +81,58 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     ];
     $this->importCSV('contributions_amount_validate.csv', $mapping, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
 
-    $contributionsOfMainContact = Contribution::get()->addWhere('contact_id', '=', $contact1Id)->execute();
+    $contributionsOfMainContact = Contribution::get()->addWhere('contact_id', '=', $mainContactID)->execute();
     // Although there are 2 rows in the csv, 1 should fail each time due to conflicting money formats.
     $this->assertCount(1, $contributionsOfMainContact, 'Wrong number of contributions imported');
     $this->assertEquals(1230.99, $contributionsOfMainContact->first()['total_amount']);
     $this->assertEquals(1230.99, $contributionsOfMainContact->first()['net_amount']);
     $this->assertEquals(0, $contributionsOfMainContact->first()['fee_amount']);
 
-    $contributionsOfSoftContact = ContributionSoft::get()->addWhere('contact_id', '=', $contact2Id)->execute();
+    $contributionsOfSoftContact = ContributionSoft::get()->addWhere('contact_id', '=', $softCreditContactID)->execute();
     $this->assertCount(1, $contributionsOfSoftContact, 'Contribution Soft not added for primary contact');
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::ERROR]));
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT]));
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
+  }
+
+  /**
+   * Test import parser can add to a soft credit contact of a different type.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportParserWithSoftCreditDifferentContactType(): void {
+    $mainContactID = $this->individualCreate([
+      'first_name' => 'Contact',
+      'last_name' => 'One',
+      'email' => 'harry@example.com',
+      'external_identifier' => 'ext-1',
+      'contact_type' => 'Individual',
+    ]);
+    $softCreditContactID = $this->individualCreate([
+      'organization_name' => 'The firm',
+      'external_identifier' => 'ext-2',
+      'email' => 'the-firm@example.com',
+      'contact_type' => 'Organization',
+    ]);
+
+    $mapping = [
+      ['name' => 'total_amount'],
+      ['name' => 'receive_date'],
+      ['name' => 'financial_type_id'],
+      ['name' => ''],
+      ['name' => ''],
+      ['name' => 'email_primary.email'],
+      ['name' => 'soft_credit.contact.email_primary.email', 'soft_credit_type_id' => 1],
+    ];
+    $this->importCSV('contributions_amount_validate.csv', $mapping, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
+
+    $contributionsOfMainContact = Contribution::get()->addWhere('contact_id', '=', $mainContactID)->execute();
+    // Although there are 2 rows in the csv, 1 should fail each time due to conflicting money formats.
+    $this->assertCount(1, $contributionsOfMainContact, 'Wrong number of contributions imported');
+
+    $contributionsOfSoftContact = ContributionSoft::get()->addWhere('contact_id', '=', $softCreditContactID)->execute();
+    $this->assertCount(1, $contributionsOfSoftContact, 'Contribution Soft not added for primary contact');
   }
 
   /**

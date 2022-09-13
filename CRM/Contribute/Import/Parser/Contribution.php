@@ -194,22 +194,20 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       if ($mappedField['name'] === 'do_not_import' || !$mappedField['name']) {
         continue;
       }
-      if (!empty($mappedField['soft_credit_match_field'])) {
-        $params['soft_credit'][$i] = ['soft_credit_type_id' => $mappedField['soft_credit_type_id'], $mappedField['soft_credit_match_field'] => $values[$i]];
+      $fieldSpec = $this->getFieldMetadata($mappedField['name']);
+      $entity = $fieldSpec['entity_instance'] ?? ($fieldSpec['entity'] ?? 'Contribution');
+      // If we move this to the parent we can check if the entity config 'supports_multiple'
+      if ($entity === 'SoftCreditContact') {
+        $entityKey = json_encode($mappedField['entity_data']);
+        $entityInstance = $params[$entity][$entityKey] ?? $mappedField['entity_data']['soft_credit'];
+        $entityInstance['Contact'] = array_merge($entityInstance['Contact'] ?? [], [$this->getFieldMetadata($mappedField['name'])['name'] => $this->getTransformedFieldValue($mappedField['name'], $values[$i])]);
+        $params[$entity][$entityKey] = $entityInstance;
       }
       else {
-        $fieldSpec = $this->getFieldMetadata($mappedField['name']);
-        $entity = $fieldSpec['entity_instance'] ?? ($fieldSpec['entity'] ?? 'Contribution');
-        // If we move this to the parent we can check if the entity config 'supports_multiple'
-        if ($entity === 'SoftCreditContact') {
-          $entityKey = json_encode($mappedField['entity_data']);
-          $entityInstance = $params[$entity][$entityKey] ?? $mappedField['entity_data']['soft_credit'];
-          $entityInstance['Contact'] = array_merge($entityInstance['Contact'] ?? [], [$this->getFieldMetadata($mappedField['name'])['name'] => $this->getTransformedFieldValue($mappedField['name'], $values[$i])]);
-          $params[$entity][$entityKey] = $entityInstance;
+        if ($entity === 'Contact' && !isset($params[$entity])) {
+          $params[$entity] = $this->getContactType() ? ['contact_type' => $this->getContactType()] : [];
         }
-        else {
-          $params[$entity][$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
-        }
+        $params[$entity][$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
       }
     }
     return $params;
@@ -413,6 +411,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       foreach ($params['SoftCreditContact'] ?? [] as $index => $softCreditContact) {
         $softCreditParams[$index]['soft_credit_type_id'] = $softCreditContact['soft_credit_type_id'];
         $softCreditParams[$index]['contact_id'] = $this->getContactID($softCreditContact['Contact'], $softCreditContact['id'] ?? NULL, 'SoftCreditContact');
+        if (empty($softCreditParams[$index]['contact_id'])) {
+          throw new CRM_Core_Exception(ts('Soft Credit Contact not found'));
+        }
       }
 
       $this->deprecatedFormatParams($contributionParams, $contributionParams);
