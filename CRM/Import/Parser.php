@@ -2162,7 +2162,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * have that external_identifier.
    *
    * @param string|null $externalIdentifier
-   * @param string $contactType
+   * @param string|null $contactType
+   *   If supplied the contact will be validated against this type.
    * @param int|null $contactID
    *
    * @return int|null
@@ -2170,7 +2171,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  protected function lookupExternalIdentifier(?string $externalIdentifier, string $contactType, ?int $contactID): ?int {
+  protected function lookupExternalIdentifier(?string $externalIdentifier, ?string $contactType, ?int $contactID): ?int {
     if (!$externalIdentifier) {
       return NULL;
     }
@@ -2242,16 +2243,19 @@ abstract class CRM_Import_Parser implements UserJobInterface {
         }
       }
     }
-    $dedupeRule = $dedupeRuleID ? $this->getDedupeRuleName($dedupeRuleID) : $this->getDefaultRuleForContactType($params['contact_type']);
-    $possibleMatches = Contact::getDuplicates(FALSE)
-      ->setValues($params)
-      ->setDedupeRule($dedupeRule)
-      ->execute();
-
     $matchIDs = [];
-    foreach ($possibleMatches as $possibleMatch) {
-      $matchIDs[(int) $possibleMatch['id']] = (int) $possibleMatch['id'];
+    $dedupeRules = $this->getDedupeRules((array) $dedupeRuleID, $params['contact_type'] ?? NULL);
+    foreach ($dedupeRules as $dedupeRule) {
+      $possibleMatches = Contact::getDuplicates(FALSE)
+        ->setValues($params)
+        ->setDedupeRule($dedupeRule)
+        ->execute();
+
+      foreach ($possibleMatches as $possibleMatch) {
+        $matchIDs[(int) $possibleMatch['id']] = (int) $possibleMatch['id'];
+      }
     }
+
     return $matchIDs;
   }
 
@@ -2292,7 +2296,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @throws \CRM_Core_Exception
    */
   protected function getContactID(array $contactParams, ?int $contactID, string $entity): ?int {
-    $contactType = $contactParams['contact_type'] ?? $this->getContactType();
+    $contactType = $contactParams['contact_type'] ?? NULL;
     if ($contactID) {
       $this->validateContactID($contactID, $contactType);
     }
@@ -2301,7 +2305,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     }
     if (!$contactID) {
       $action = $this->getActionForEntity($entity);
-      $contactParams['contact_type'] = $contactType;
       $possibleMatches = $this->getPossibleMatchesByDedupeRule($contactParams);
       if (count($possibleMatches) === 1) {
         $contactID = array_key_first($possibleMatches);
@@ -2494,6 +2497,30 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
       $this->dedupeRules[$name]['fields'] = $fields;
     }
+  }
+
+  /**
+   * Get the dedupe rules to use to lookup a contact.
+   *
+   * @param array $dedupeRuleIDs
+   * @param string|array|null $contact_type
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDedupeRules(array $dedupeRuleIDs, $contact_type) {
+    $dedupeRules = [];
+    if (!empty($dedupeRuleIDs)) {
+      foreach ($dedupeRuleIDs as $dedupeRuleID) {
+        $dedupeRules[] = $this->getDedupeRuleName($dedupeRuleID);
+      }
+      return $dedupeRules;
+    }
+    $contactTypes = $contact_type ? (array) $contact_type : CRM_Contact_BAO_ContactType::basicTypes();
+    foreach ($contactTypes as $contactType) {
+      $dedupeRules[] = $this->getDefaultRuleForContactType($contactType);
+    }
+    return $dedupeRules;
   }
 
 }
