@@ -2749,6 +2749,10 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
     // adds in `phone` and `email`
     // in a weird & likely obsolete way....
     $contactArray = array_intersect_key((array) $contact, $contact->fields());
+    // blech
+    $contactArray = array_map(function($v) {
+      return $v === 'null' ? NULL : $v;
+    }, $contactArray);
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
       'smarty' => TRUE,
       'class' => __CLASS__,
