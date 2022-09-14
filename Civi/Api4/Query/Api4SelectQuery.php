@@ -452,7 +452,7 @@ class Api4SelectQuery {
 
     // For WHERE clause, expr must be the name of a field.
     if ($type === 'WHERE' && !$isExpression) {
-      $expr = $this->getExpression($expr, ['SqlField', 'SqlFunction']);
+      $expr = $this->getExpression($expr, ['SqlField', 'SqlFunction', 'SqlEquation']);
       if ($expr->getType() === 'SqlField') {
         $fieldName = count($expr->getFields()) === 1 ? $expr->getFields()[0] : NULL;
         $field = $this->getField($fieldName, TRUE);
