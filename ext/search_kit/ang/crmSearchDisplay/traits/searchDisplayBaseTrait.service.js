@@ -27,6 +27,10 @@
           this.placeholders.push({});
         }
 
+        if (this.settings.addButton && this.settings.addButton.path) {
+          this.settings.addButton.url = CRM.url(this.settings.addButton.path);
+        }
+
         this.getResults = _.debounce(function() {
           $scope.$apply(function() {
             ctrl.runSearch();
