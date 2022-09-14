@@ -108,7 +108,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
     // other imports, ditto uploadFile.
     'skipColumnHeader' => 'DataSource',
     'fieldSeparator' => 'DataSource',
-    'uploadFile' => 'DataSource',
     'contactType' => 'DataSource',
     'contactSubType' => 'DataSource',
     'dateFormats' => 'DataSource',

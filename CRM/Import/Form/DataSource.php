@@ -142,17 +142,6 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
   }
 
   /**
-   * Store form values.
-   *
-   * @param array $names
-   */
-  protected function storeFormValues($names) {
-    foreach ($names as $name) {
-      $this->set($name, $this->controller->exportValue($this->_name, $name));
-    }
-  }
-
-  /**
    * Common postProcessing.
    */
   public function postProcess() {
