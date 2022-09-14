@@ -127,19 +127,36 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   /**
    * Get the field mappings for the import.
    *
-   * This is the same format as saved in civicrm_mapping_field except
-   * that location_type_id = 'Primary' rather than empty where relevant.
-   * Also 'im_provider_id' is mapped to the 'real' field name 'provider_id'
-   *
    * @return array
+   *   Array of arrays with each array representing a row in the datasource.
+   *   The arrays hold the following keys
+   *   - name - field the row maps to
+   *   - entity_data - data about the relevant entity ie ['soft_credit' => ['soft_credit_type_id => 9],
+   *   In addition the following are returned but will be phased out.
+   *   - contact_type - entity_data but json_encoded. Saved to civicrm_mapping_field in contact_type column
+   *   - column_number = this is used for saving to civicrm_field_mapping but
+   *     may be only legacy now?
+   *   - soft_credit_type_id
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function getFieldMappings(): array {
-    $mappedFields = [];
-    foreach ($this->getSubmittedValue('mapper') as $i => $mapperRow) {
-      $mappedField = $this->getMappingFieldFromMapperInput($mapperRow, 0, $i);
-      // Just for clarity since 0 is a pseudo-value
-      unset($mappedField['mapping_id']);
-      $mappedFields[] = $mappedField;
+    $mappedFields = $this->getUserJob()['metadata']['import mappings'] ?? [];
+    if (empty($mappedFields)) {
+      foreach ($this->getSubmittedValue('mapper') as $i => $mapperRow) {
+        $mappedField = $this->getMappingFieldFromMapperInput($mapperRow, 0, $i);
+        // Just for clarity since 0 is a pseudo-value
+        unset($mappedField['mapping_id']);
+        $mappedFields[] = $mappedField;
+      }
+    }
+    foreach ($mappedFields as $index => $mappedField) {
+      $mappedFields[$index]['column_number'] = 0;
+      // This is the same data as entity_data - it is stored to the database in the contact_type field
+      // slit your eyes & squint while blinking and you can almost read that as entity_type and not
+      // hate it. Otherwise go & whinge on https://lab.civicrm.org/dev/core/-/issues/1172
+      $mappedFields[$index]['contact_type'] = !empty($mappedField['entity_type']) ? json_encode($mappedField['entity_type']) : NULL;
+      $mappedFields[$index]['soft_credit_type_id'] = !empty($mappedField['entity_type']) ? $mappedField['entity_type']['soft_credit']['soft_credit_type_id'] : NULL;
     }
     return $mappedFields;
   }
@@ -195,19 +212,23 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         continue;
       }
       $fieldSpec = $this->getFieldMetadata($mappedField['name']);
+      $fieldValue = $values[$i];
+      if ($fieldValue === '' && isset($mappedField['default_value'])) {
+        $fieldValue = $mappedField['default_value'];
+      }
       $entity = $fieldSpec['entity_instance'] ?? ($fieldSpec['entity'] ?? 'Contribution');
       // If we move this to the parent we can check if the entity config 'supports_multiple'
       if ($entity === 'SoftCreditContact') {
         $entityKey = json_encode($mappedField['entity_data']);
         $entityInstance = $params[$entity][$entityKey] ?? $mappedField['entity_data']['soft_credit'];
-        $entityInstance['Contact'] = array_merge($entityInstance['Contact'] ?? [], [$this->getFieldMetadata($mappedField['name'])['name'] => $this->getTransformedFieldValue($mappedField['name'], $values[$i])]);
+        $entityInstance['Contact'] = array_merge($entityInstance['Contact'] ?? [], [$this->getFieldMetadata($mappedField['name'])['name'] => $this->getTransformedFieldValue($mappedField['name'], $fieldValue)]);
         $params[$entity][$entityKey] = $entityInstance;
       }
       else {
         if ($entity === 'Contact' && !isset($params[$entity])) {
           $params[$entity] = $this->getContactType() ? ['contact_type' => $this->getContactType()] : [];
         }
-        $params[$entity][$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
+        $params[$entity][$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $fieldValue);
       }
     }
     return $params;
@@ -631,12 +652,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       'name' => str_replace('__', '.', $fieldMapping[0]),
       'mapping_id' => $mappingID,
       'column_number' => $columnNumber,
-      'soft_credit_type_id' => $fieldMapping[1] ?? NULL,
       'entity_data' => !empty($fieldMapping[1]) ? ['soft_credit' => ['soft_credit_type_id' => $fieldMapping[1]]] : NULL,
-      // This is the same data as entity_data - it is stored to the database in the contact_type field
-      // slit your eyes & squint while blinking and you can almost read that as entity_type and not
-      // hate it. Otherwise go & whinge on https://lab.civicrm.org/dev/core/-/issues/1172
-      'contact_type' => !empty($fieldMapping[1]) ? json_encode(['soft_credit' => ['soft_credit_type_id' => $fieldMapping[1]]]) : NULL,
     ];
   }
 
@@ -728,8 +744,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     }
     $title = [];
     $title[] = $this->getFieldMetadata($mappedField['name'])['title'];
-    if ($mappedField['soft_credit_type_id']) {
-      $title[] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', $mappedField['soft_credit_type_id']);
+    if (isset($mappedField['soft_credit'])) {
+      $title[] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', $mappedField['soft_credit']['soft_credit_type_id']);
     }
 
     return implode(' - ', $title);
