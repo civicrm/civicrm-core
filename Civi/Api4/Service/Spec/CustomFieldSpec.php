@@ -37,6 +37,7 @@ class CustomFieldSpec extends FieldSpec {
         $this->setFkEntity('Contact');
         $dataType = 'Integer';
         break;
+
       case 'EntityReference':
         $dataType = 'Integer';
         break;

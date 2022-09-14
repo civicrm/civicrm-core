@@ -1907,7 +1907,7 @@ ORDER BY civicrm_custom_group.weight,
             // also return entity reference entity id if user has view all or edit permissions for that entity type.
             if ($details[$groupID][$values['id']]['fields'][$k]['field_data_type'] === 'EntityReference'
               // TODO: Check permissions for referenced entity type.
-//              && CRM_Core_Permission::check([['view all contacts', 'edit all contacts']])
+              // && CRM_Core_Permission::check([['view all contacts', 'edit all contacts']])
             ) {
               $details[$groupID][$values['id']]['fields'][$k]['entity_ref_links'] = [];
               parse_str($details[$groupID][$values['id']]['fields'][$k]['filter'], $params);

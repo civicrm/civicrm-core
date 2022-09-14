@@ -999,7 +999,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           }
           $fieldAttributes['class'] = ltrim(($fieldAttributes['class'] ?? '') . ' crm-form-entity-reference huge');
           // TODO: Add "data-api-entity" attribute depending on referenced entity type.
-//          $fieldAttributes['data-api-entity'] = 'Contact';
+          // $fieldAttributes['data-api-entity'] = 'Contact';
           if (!empty($field->serialize) || $search) {
             $fieldAttributes['multiple'] = TRUE;
           }

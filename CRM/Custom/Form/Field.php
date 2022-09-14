@@ -632,6 +632,7 @@ SELECT count(*)
           }
           $self->setDefaults(['filter_selected', $fields['filter_selected']]);
           break;
+
         case 'EntityReference':
           if (!empty($fields['filter'])) {
             if (strpos($fields['filter'], 'action=get') === FALSE) {
