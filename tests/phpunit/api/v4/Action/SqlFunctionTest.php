@@ -326,6 +326,14 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('birth_date')
       ->execute()->single();
     $this->assertEquals('2009-11-11', $result['birth_date']);
+
+    // Try in GROUP_BY
+    $result = Contact::get(FALSE)
+      ->addSelect('COUNT(id) AS counted')
+      ->addWhere('last_name', '=', $lastName)
+      ->addGroupBy('EXTRACT(YEAR FROM birth_date)')
+      ->execute();
+    $this->assertCount(2, $result);
   }
 
 }
