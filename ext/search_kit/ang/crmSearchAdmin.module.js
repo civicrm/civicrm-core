@@ -343,6 +343,9 @@
       }
       return {
         getEntity: getEntity,
+        getBaseEntity: function() {
+          return getEntity(searchEntity);
+        },
         getField: function(fieldName, entityName) {
           return getFieldAndJoin(fieldName, entityName || searchEntity).field;
         },

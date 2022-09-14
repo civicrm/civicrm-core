@@ -509,18 +509,21 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       if ($prefix) {
         $path = str_replace('[', '[' . $prefix, $path);
       }
-      // Check access for edit/update links
+      // Check access for edit/update/delete links
       // (presumably if a record is shown in SearchKit the user already has view access, and the check is expensive)
       if ($path && isset($data) && !in_array($link['action'], ['view', 'preview'], TRUE)) {
         $id = $data[$prefix . $idKey] ?? NULL;
         $id = is_array($id) ? $id[$index] ?? NULL : $id;
         if ($id) {
+          $values = [$idField => $id];
+          // If not aggregated, add other values to help checkAccess be efficient
+          if (!is_array($data[$prefix . $idKey])) {
+            $values += \CRM_Utils_Array::filterByPrefix($data, $prefix);
+          }
           $access = civicrm_api4($link['entity'], 'checkAccess', [
             // Fudge links with funny action names to check 'update'
             'action' => $link['action'] === 'delete' ? 'delete' : 'update',
-            'values' => [
-              $idField => $id,
-            ],
+            'values' => $values,
           ], 0)['access'];
           if (!$access) {
             return NULL;

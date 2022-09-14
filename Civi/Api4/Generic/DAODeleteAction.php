@@ -36,8 +36,10 @@ class DAODeleteAction extends AbstractBatchAction {
     $items = $this->getBatchRecords();
 
     if ($this->getCheckPermissions()) {
+      $idField = CoreUtil::getIdFieldName($this->getEntityName());
       foreach ($items as $key => $item) {
-        if (!CoreUtil::checkAccessRecord($this, $item, \CRM_Core_Session::getLoggedInContactID() ?: 0)) {
+        // Don't pass the entire item because only the id is a trusted value
+        if (!CoreUtil::checkAccessRecord($this, [$idField => $item[$idField]], \CRM_Core_Session::getLoggedInContactID() ?: 0)) {
           throw new UnauthorizedException("ACL check failed");
         }
         $items[$key]['check_permissions'] = TRUE;

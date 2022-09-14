@@ -126,6 +126,11 @@
      <weight>40</weight>
   </item>
   <item>
+     <path>civicrm/admin/options/subtype/edit</path>
+     <title>Edit Contact Type</title>
+     <page_callback>CRM_Admin_Form_ContactType</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/options/gender</path>
      <title>Gender Options</title>
      <desc>Options for assigning gender to individual contacts (e.g. Male, Female, Other).</desc>
