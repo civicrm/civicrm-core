@@ -114,7 +114,7 @@ class SqlExpressionTest extends Api4TestBase implements TransactionalInterface {
         // This field will be null
         '(hold_date + 5) AS null_plus_five',
       ])
-      ->addWhere('contact_id', '=', $contact['id'])
+      ->addWhere('(contact_id + 1)', '=', 1 + $contact['id'])
       ->setLimit(1)
       ->execute()
       ->first();
