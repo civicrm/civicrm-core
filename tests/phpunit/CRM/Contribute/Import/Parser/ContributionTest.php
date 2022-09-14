@@ -189,6 +189,55 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the an import can be done based on saved configuration in the UserJob.
+   *
+   * This also demonstrates some advanced import handling that the quickForm
+   * layer does not support but if you can get the config INTO the user_job
+   * table it runs... (ie via the angular form).
+   *
+   * These features are
+   *  - default_value for each field.
+   *
+   * @throws \API_Exception
+   */
+  public function testImportFromUserJobConfiguration(): void {
+    $importMappings = [
+      ['name' => 'organization_name'],
+      ['name' => 'total_amount'],
+      // Note that default_value is supported via the parser and the angular form
+      // but there is no way to enter it on the quick form.
+      ['name' => 'financial_type_id', 'default_value' => 'Donation'],
+      ['name' => 'contribution_source'],
+      ['name' => 'receive_date'],
+      ['name' => 'soft_credit.contact.email_primary.email', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 5]]],
+      ['name' => 'soft_credit.contact.first_name', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 5]]],
+      ['name' => 'soft_credit.contact.last_name', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 5]]],
+    ];
+    $submittedValues = [
+      'skipColumnHeader' => TRUE,
+      'fieldSeparator' => ',',
+      'contactType' => 'Organization',
+      'mapper' => $this->getMapperFromFieldMappings($importMappings),
+      'dataSource' => 'CRM_Import_DataSource_CSV',
+      'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+    ];
+    $this->submitDataSourceForm('soft_credit_extended.csv', $submittedValues);
+    $metadata = UserJob::get()->addWhere('id', '=', $this->userJobID)->addSelect('metadata')->execute()->first()['metadata'];
+    $metadata['import mappings'] = $importMappings;
+    UserJob::update()->addWhere('id', '=', $this->userJobID)
+      ->setValues(['metadata' => $metadata])->execute();
+    $form = $this->getMapFieldForm($submittedValues);
+    $form->setUserJobID($this->userJobID);
+    $form->buildForm();
+    $this->assertTrue($form->validate());
+    $form->postProcess();
+    $row = $this->getDataSource()->getRow();
+    // a valid status here means it has been able to incorporate the default_value.
+    $this->assertEquals('VALID', $row['_status']);
+  }
+
+  /**
    * Test dates are parsed.
    */
   public function testParsedCustomDates(): void {
