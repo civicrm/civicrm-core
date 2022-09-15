@@ -238,7 +238,7 @@ AND    {$this->_componentClause}";
    * @return array
    *   array of common elements
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getElements(array $contribIds, array $params, $contactIds, bool $isCreatePDF): array {
     $pdfElements = [];

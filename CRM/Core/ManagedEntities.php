@@ -274,7 +274,7 @@ class CRM_Core_ManagedEntities {
    *
    * @param array $item
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function disableEntity(array $item): void {
     $entity_type = $item['entity_type'];
@@ -489,7 +489,7 @@ class CRM_Core_ManagedEntities {
    * @param string $entity_type
    *
    * @return bool
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   private function isActivationSupported(string $entity_type): bool {
     if (!isset(Civi::$statics[__CLASS__][__FUNCTION__][$entity_type])) {

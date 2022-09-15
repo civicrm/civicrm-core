@@ -206,7 +206,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @return array
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setDefaultValues() {
     $this->_defaults = [];

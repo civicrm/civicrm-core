@@ -225,7 +225,6 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
    * Post process form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);

@@ -446,7 +446,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
    * @param string $old
    * @param string $new
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function replaceTokenInGreetingOptions(string $old, string $new): void {
     $oldToken = '{' . $old . '}';

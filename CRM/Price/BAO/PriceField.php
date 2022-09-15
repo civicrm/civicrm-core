@@ -47,7 +47,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @return CRM_Price_DAO_PriceField
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function create(&$params) {
     if (empty($params['id']) && empty($params['name'])) {

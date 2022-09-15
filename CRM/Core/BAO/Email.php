@@ -400,7 +400,7 @@ AND    reset_date IS NULL
    *
    * @return array
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function getEmailSignatureDefaults(int $emailID): array {

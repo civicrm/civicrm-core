@@ -243,9 +243,7 @@ SELECT module,is_reserved
   /**
    * Process the user submitted custom data values.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     parent::postProcess();

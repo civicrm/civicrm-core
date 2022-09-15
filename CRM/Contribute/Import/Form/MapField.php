@@ -70,7 +70,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
   /**
    * Build the form object.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm(): void {
     $this->addSavedMappingFields();

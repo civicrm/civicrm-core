@@ -61,7 +61,6 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
    * View details of a relationship.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function view() {
     $viewRelationship = CRM_Contact_BAO_Relationship::getRelationship($this->getContactId(), NULL, NULL, NULL, $this->getEntityId());

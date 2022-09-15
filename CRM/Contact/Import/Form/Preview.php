@@ -118,7 +118,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
   /**
    * Process the mapped fields and map it into the uploaded file.
    *
-   * @throws \API_Exception|\CRM_Core_Exception
+   * @throws \CRM_Core_Exception
    */
   public function postProcess(): void {
     $groupsToAddTo = (array) $this->getSubmittedValue('groups');

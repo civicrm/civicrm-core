@@ -354,7 +354,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * action has to be taken for the page.
    *
    * @return null
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function run() {
     $this->preProcess();

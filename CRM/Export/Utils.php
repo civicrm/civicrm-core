@@ -16,7 +16,7 @@ class CRM_Export_Utils {
    *
    * @param $exportMode
    * @return array
-   * @throws CiviCRM_API3_Exception
+   * @throws CRM_Core_Exception
    */
   public static function getExportFields($exportMode) {
     $fieldGroups = CRM_Core_BAO_Mapping::getBasicFields('Export');

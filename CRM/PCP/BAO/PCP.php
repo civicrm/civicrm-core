@@ -455,7 +455,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
    * @param CRM_Core_Form $page
    * @param array $elements
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function buildPcp($pcpId, &$page, &$elements = NULL) {
     $prms = ['id' => $pcpId];

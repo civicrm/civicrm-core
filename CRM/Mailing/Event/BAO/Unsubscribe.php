@@ -106,7 +106,6 @@ WHERE  email = %2
    *   $groups    Array of all groups from which the contact was removed, or null if the queue event could not be found.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function unsub_from_mailing($job_id, $queue_id, $hash, $return = FALSE): ?array {
     // First make sure there's a matching queue event.

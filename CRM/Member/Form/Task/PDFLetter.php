@@ -115,7 +115,6 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
    * @param $html_message
    *
    * @return array
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @internal
    *

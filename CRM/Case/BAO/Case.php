@@ -1876,7 +1876,7 @@ HERESQL;
     try {
       return civicrm_api3('Case', 'getcount', $params);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       // Lack of permissions will throw an exception
       return 0;
     }
@@ -2490,7 +2490,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
             'end_date' => ['IS NULL' => 1],
           ]);
         }
-        catch (CiviCRM_API3_Exception $e) {
+        catch (CRM_Core_Exception $e) {
           // Lack of permissions will throw an exception
           $caseCount = 0;
         }
@@ -2743,7 +2743,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     try {
       return (bool) civicrm_api3('Case', 'getcount', $params);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       // Lack of permissions will throw an exception
       return FALSE;
     }
@@ -2954,7 +2954,6 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * @param int $relTypeId
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function endCaseRole($caseId, $direction, $cid, $relTypeId) {
     // Validate inputs
@@ -2987,7 +2986,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    *   Whatever is known about this dao object.
    *
    * @return array|bool
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    *
    * @see CRM_Core_DAO::buildOptionsContext
    * @see CRM_Core_DAO::buildOptions
@@ -3058,7 +3057,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    *
    * @return mixed $emailFromContactId
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @see https://issues.civicrm.org/jira/browse/CRM-20308
    */
   public static function getReceiptFrom($activityID) {
@@ -3117,7 +3116,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     try {
       $case = civicrm_api3('Case', 'getsingle', ['id' => $caseId]);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       // Lack of permissions will throw an exception
       return 0;
     }
@@ -3125,7 +3124,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       try {
         $caseType = civicrm_api3('CaseType', 'getsingle', ['id' => $case['case_type_id'], 'return' => ['definition']]);
       }
-      catch (CiviCRM_API3_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         // Lack of permissions will throw an exception
         return 'no case type found';
       }
@@ -3136,7 +3135,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
           try {
             $relType = civicrm_api3('RelationshipType', 'getsingle', ['label_a_b' => $roleDetails['name']]);
           }
-          catch (CiviCRM_API3_Exception $e) {
+          catch (CRM_Core_Exception $e) {
           }
           if (!empty($relType['id'])) {
             $roleDetails['id'] = $relType['id'];
@@ -3146,7 +3145,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
           try {
             $relTypeBa = civicrm_api3('RelationshipType', 'getsingle', ['label_b_a' => $roleDetails['name']]);
           }
-          catch (CiviCRM_API3_Exception $e) {
+          catch (CRM_Core_Exception $e) {
           }
           if (!empty($relTypeBa['id'])) {
             if (!empty($roleDetails['direction'])) {

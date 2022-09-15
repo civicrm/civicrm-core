@@ -38,7 +38,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
   /**
    * Build the form object.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {

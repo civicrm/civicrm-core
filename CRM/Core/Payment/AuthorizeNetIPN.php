@@ -36,8 +36,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @return bool|void
    *
-   * @throws \CiviCRM_API3_Exception
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function main() {
     try {
@@ -109,7 +108,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @return bool
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function recur($input, $recur, $contribution, $first) {
 
@@ -300,9 +298,7 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
    *
    * @return int
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function getPaymentProcessorID(): int {
     // Attempt to get payment processor ID from URL

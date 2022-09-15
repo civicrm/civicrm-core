@@ -67,7 +67,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   /**
    * Set variables up before form is built.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -108,7 +107,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   /**
    * Build the form object.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
@@ -394,7 +392,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param $params
    * @param $mapperKeys
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function submit($params) {

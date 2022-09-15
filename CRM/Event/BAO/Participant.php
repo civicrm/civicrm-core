@@ -959,7 +959,7 @@ WHERE  civicrm_participant.id = {$participantId}
    * Get the ID of the default (first) participant role
    *
    * @return int
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getDefaultRoleID() {
     return (int) civicrm_api3('OptionValue', 'getvalue', [
@@ -1110,7 +1110,7 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
         }
         return TRUE;
       }
-      catch (CiviCRM_API3_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         throw new CRM_Core_Exception('Failed to update additional participant status in database');
       }
     }

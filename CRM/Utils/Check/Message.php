@@ -246,7 +246,7 @@ class CRM_Utils_Check_Message {
    *
    * @return bool
    *   TRUE means hidden, FALSE means visible.
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   private function checkStatusPreference() {
     $this->hiddenUntil = FALSE;

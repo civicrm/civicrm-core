@@ -1133,7 +1133,7 @@ SELECT is_primary,
       // create relationship
       civicrm_api3('relationship', 'create', $relParam);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       // We catch and ignore here because this has historically been a best-effort relationship create call.
       // presumably it could refuse due to duplication or similar and we would ignore that.
     }

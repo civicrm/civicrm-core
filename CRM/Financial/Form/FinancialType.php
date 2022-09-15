@@ -113,7 +113,7 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
   /**
    * Process the form submission.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

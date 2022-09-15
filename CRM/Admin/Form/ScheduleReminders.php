@@ -48,7 +48,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    * Build the form object.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm(): void {
     parent::buildQuickForm();
@@ -302,7 +301,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    * @return array|bool
    *   True if no errors, else array of errors
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function formRule(array $fields, $files, $self) {
@@ -483,7 +481,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    *   The submitted form values.
    *
    * @return CRM_Core_DAO_ActionSchedule
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function parseActionSchedule($values) {

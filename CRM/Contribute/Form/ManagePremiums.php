@@ -63,7 +63,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   /**
    * Build the form object.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     parent::buildQuickForm();

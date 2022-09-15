@@ -451,7 +451,7 @@ class CRM_Financial_BAO_Order {
    *
    * @return int
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getPriceSetID(): int {
     if (!$this->priceSetID) {
@@ -478,7 +478,7 @@ class CRM_Financial_BAO_Order {
    *
    * @param string $component [membership|contribution]
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @internal use in tested core code only.
    */
   public function setPriceSetToDefault(string $component): void {
@@ -504,7 +504,7 @@ class CRM_Financial_BAO_Order {
    *
    * @param int $eventID
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function setPriceSetIDByEventPageID(int $eventID): void {
     $this->setPriceSetIDByEntity('event', $eventID);
@@ -681,7 +681,7 @@ class CRM_Financial_BAO_Order {
    *
    * @param array $input
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function setPriceSelectionFromUnfilteredInput(array $input): void {
     foreach ($input as $fieldName => $value) {
@@ -702,7 +702,7 @@ class CRM_Financial_BAO_Order {
   /**
    * Get the id of the price field to use when just an amount is provided.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    *
    * @return int
    */
@@ -719,7 +719,7 @@ class CRM_Financial_BAO_Order {
   /**
    * Get the id of the price field to use when just an amount is provided.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    *
    * @return int
    */
@@ -738,7 +738,7 @@ class CRM_Financial_BAO_Order {
    *
    * return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getLineItems():array {
     if (empty($this->lineItems)) {
@@ -753,7 +753,7 @@ class CRM_Financial_BAO_Order {
    * This ensures the line items are indexed by
    * price field id - as required by the contribution BAO.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getPriceFieldIndexedLineItems(): array {
     $lines = [];
@@ -768,7 +768,7 @@ class CRM_Financial_BAO_Order {
    *
    * return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getMembershipLineItems():array {
     $lines = $this->getLineItems();
@@ -789,7 +789,7 @@ class CRM_Financial_BAO_Order {
    *
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getMembershipTypes(): array {
     $types = [];
@@ -804,7 +804,7 @@ class CRM_Financial_BAO_Order {
    *
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getRenewableMembershipTypes(): array {
     $types = [];
@@ -819,7 +819,7 @@ class CRM_Financial_BAO_Order {
   /**
    * @return array
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function calculateLineItems(): array {
     $lineItems = [];
@@ -885,7 +885,7 @@ class CRM_Financial_BAO_Order {
    *
    * @return float
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getTotalTaxAmount() :float {
     $amount = 0.0;
@@ -900,7 +900,7 @@ class CRM_Financial_BAO_Order {
    *
    * @return float
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getTotalAmount() :float {
     $amount = 0.0;
@@ -915,7 +915,7 @@ class CRM_Financial_BAO_Order {
    *
    * @return float
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getMembershipTotalAmount() :float {
     $amount = 0.0;
@@ -943,7 +943,7 @@ class CRM_Financial_BAO_Order {
   /**
    * @param $fieldID
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function setPriceSetIDFromSelectedField($fieldID): void {
     if (!isset($this->priceSetID)) {
@@ -966,7 +966,7 @@ class CRM_Financial_BAO_Order {
    * @param array $lineItem
    * @param int|string $index
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @internal tested core code usage only.
    * @internal use in tested core code only.
    *
@@ -1124,7 +1124,7 @@ class CRM_Financial_BAO_Order {
    *
    * @return \Civi\Api4\Generic\Result
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getLinesFromTemplateContribution(): array {
     $lines = $this->getLinesForContribution();
@@ -1143,7 +1143,7 @@ class CRM_Financial_BAO_Order {
    *
    * @internal core tested code only.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getLineItemForV3OrderApi(): array {
     $lineItems = [];
@@ -1158,7 +1158,7 @@ class CRM_Financial_BAO_Order {
 
   /**
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function getLinesForContribution(): array {
@@ -1191,7 +1191,7 @@ class CRM_Financial_BAO_Order {
    * @param string $component
    *
    * @return int
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getDefaultPriceSetForComponent(string $component): int {
     if (!isset($this->defaultPriceSets[$component])) {
@@ -1208,7 +1208,7 @@ class CRM_Financial_BAO_Order {
    *
    * @param array $lineItem
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function fillDefaultContributionLine(array &$lineItem): void {
     $defaults = [

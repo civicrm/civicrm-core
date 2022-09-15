@@ -402,7 +402,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
    *
    * @return array|bool
    *   <type>
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @deprecated - this is part of the import parser not the API & needs to be
    *   moved on out
    *

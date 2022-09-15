@@ -1094,7 +1094,7 @@ class CRM_Core_SelectValues {
    * Dropdown options for quicksearch in the menu
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function quicksearchOptions() {
     $includeEmail = civicrm_api3('setting', 'getvalue', ['name' => 'includeEmailInName', 'group' => 'Search Preferences']);

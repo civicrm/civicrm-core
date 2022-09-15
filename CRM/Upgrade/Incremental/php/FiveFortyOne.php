@@ -107,7 +107,7 @@ class CRM_Upgrade_Incremental_php_FiveFortyOne extends CRM_Upgrade_Incremental_B
    *
    * @return bool
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function installCustomSearches(CRM_Queue_TaskContext $ctx) {
     // Install via direct SQL manipulation. Note that:

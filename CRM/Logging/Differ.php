@@ -481,7 +481,7 @@ ORDER BY log_date
    * @param string $change_date
    *
    * @return bool
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function checkLogCanBeUsedWithNoLogDate($change_date) {
 

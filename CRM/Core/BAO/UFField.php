@@ -34,7 +34,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    *   Array per getfields metadata.
    *
    * @return \CRM_Core_BAO_UFField
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function create($params) {
     $id = $params['id'] ?? NULL;
@@ -52,13 +52,13 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
         $params += $defaults;
       }
       else {
-        throw new API_Exception("UFFIeld id {$params['id']} not found.");
+        throw new CRM_Core_Exception("UFFIeld id {$params['id']} not found.");
       }
     }
 
     // Validate field_name
     if (strpos($params['field_name'], 'formatting') !== 0 && !CRM_Core_BAO_UFField::isValidFieldName($params['field_name'])) {
-      throw new API_Exception('The field_name is not valid');
+      throw new CRM_Core_Exception('The field_name is not valid');
     }
 
     // Supply default label if not set
@@ -80,7 +80,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     }
 
     if (self::duplicateField($params)) {
-      throw new API_Exception("The field was not added. It already exists in this profile.");
+      throw new CRM_Core_Exception("The field was not added. It already exists in this profile.");
     }
 
     //@todo why is this even optional? Surely weight should just be 'managed' ??

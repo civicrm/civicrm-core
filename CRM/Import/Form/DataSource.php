@@ -173,7 +173,6 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
   /**
    * Process the datasource submission - setting up the job and data source.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function processDatasource(): void {
@@ -192,7 +191,6 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    *
    * This gives the datasource a chance to do any table creation etc.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   private function instantiateDataSource(): void {

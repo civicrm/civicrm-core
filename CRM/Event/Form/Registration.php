@@ -640,7 +640,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param int $contactID
    * @param \CRM_Contribute_BAO_Contribution $contribution
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function confirmPostProcess($contactID = NULL, $contribution = NULL) {
     // add/update contact information
@@ -733,7 +733,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param int $contactID
    *
    * @return \CRM_Event_BAO_Participant
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function addParticipant(&$form, $contactID) {
     if (empty($form->_params)) {
@@ -1444,7 +1444,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *   Form values.
    * @param int $contactID
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function processRegistration($params, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();
@@ -1565,7 +1565,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param $registerByID
    * @param array $participantCount
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   private function sendMails($params, $registerByID, array $participantCount) {
     $isTest = FALSE;

@@ -62,7 +62,6 @@ abstract class CRM_Import_Form_Preview extends CRM_Import_Forms {
   /**
    * Assign smarty variables for the preview screen.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function assignPreviewVariables(): void {

@@ -820,7 +820,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     try {
       civicrm_api3('Extension', 'disable', ['key' => 'com.klangsoft.flexiblejobs']);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       // just ignore if the extension isn't installed
     }
 

@@ -40,7 +40,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyFour extends CRM_Upgrade_Incremental
    *
    * @return bool
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function installCreditNotes(CRM_Queue_TaskContext $ctx) {
     // Install via direct SQL manipulation. Note that:

@@ -20,7 +20,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
    * Check defined indices exist.
    *
    * @return CRM_Utils_Check_Message[]
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function checkIndices() {
     $messages = [];
@@ -106,7 +106,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
         'options' => ['limit' => 0],
       ]);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('The smart group check was unable to run. This is likely to because a database upgrade is pending.'),
@@ -149,7 +149,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
             $url = CRM_Utils_System::url('civicrm/admin/custom/group/field/update', "action=update&reset=1&gid={$customField['custom_group_id']}&id={$field['cfid']}", TRUE);
             $fieldName = '<a href="' . $url . '" title="' . ts('Edit Custom Field', ['escape' => 'js']) . '">' . $customField['label'] . '</a>';
           }
-          catch (CiviCRM_API3_Exception $e) {
+          catch (CRM_Core_Exception $e) {
             $fieldName = '<span style="color:red">' . ts('Deleted') . ' - ' . ts('Field ID %1', [1 => $field['cfid']]) . '</span> ';
           }
         }

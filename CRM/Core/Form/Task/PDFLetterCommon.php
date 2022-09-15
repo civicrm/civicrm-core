@@ -260,7 +260,6 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    * @deprecated
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function processTemplate(&$formValues) {

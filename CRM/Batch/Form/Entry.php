@@ -521,7 +521,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * Process the form after the input has been submitted and validated.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -561,7 +560,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @return bool
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   private function processContribution(&$params) {
 
@@ -766,8 +764,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *   batch total monetary amount.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   * @throws \API_Exception
    */
   private function processMembership(array $params) {
     $batchTotal = 0;
@@ -925,7 +921,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @return bool
    *   true if mail was sent successfully
-   * @throws \CRM_Core_Exception|\API_Exception
+   * @throws \CRM_Core_Exception
    *
    */
   protected function emailReceipt($form, &$formValues): bool {
@@ -1027,7 +1023,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @return bool
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testProcessContribution($params) {
     return $this->processContribution($params);
@@ -1040,7 +1035,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @return CRM_Member_BAO_Membership
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function legacyProcessMembership($customFieldsFormatted, $formDates = []): CRM_Member_DAO_Membership {
     $updateStatusId = FALSE;
@@ -1179,7 +1173,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @return bool
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   private function currentRowIsRenew(): bool {
     return $this->currentRowIsRenewOption === 2 && $this->getCurrentMembership();
@@ -1190,7 +1183,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @return array|bool
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   protected function getCurrentMembership() {

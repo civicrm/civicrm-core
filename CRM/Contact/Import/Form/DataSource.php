@@ -178,7 +178,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Form_DataSource {
    * Call the DataSource's postProcess method.
    *
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
   public function postProcess() {
     $this->controller->resetPage('MapField');
