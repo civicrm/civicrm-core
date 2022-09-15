@@ -660,7 +660,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     if (empty($fieldValues)) {
       $field->id = $fieldID;
       if (!$field->find(TRUE)) {
-        throw new CRM_Core_Exception('Cannot find Custom Field');
+        throw new CRM_Core_Exception('Cannot find Custom Field ' . $fieldID);
       }
 
       $fieldValues = [];
