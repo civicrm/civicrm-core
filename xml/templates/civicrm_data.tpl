@@ -431,8 +431,6 @@ VALUES
   (@option_group_id_cs, '{ts escape="sql"}Pending{/ts}'    , 2, 'Pending'    , NULL, 0, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_cs, '{ts escape="sql"}Cancelled{/ts}'  , 3, 'Cancelled'  , NULL, 0, 0, 3, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_cs, '{ts escape="sql"}Failed{/ts}'     , 4, 'Failed'     , NULL, 0, 0, 4, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_cs, '{ts escape="sql"}In Progress{/ts}', 5, 'In Progress', NULL, 0, 0, 5, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_cs, '{ts escape="sql"}Overdue{/ts}'    , 6, 'Overdue'    , NULL, 0, 0, 6, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_cs, '{ts escape="sql"}Refunded{/ts}'   , 7, 'Refunded'   , NULL, 0, 0, 7, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_cs, '{ts escape="sql"}Partially paid{/ts}', 8, 'Partially paid', NULL, 0, 0, 8, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_cs, '{ts escape="sql"}Pending refund{/ts}', 9, 'Pending refund', NULL, 0, 0, 9, NULL, 0, 1, 1, NULL, NULL, NULL),
