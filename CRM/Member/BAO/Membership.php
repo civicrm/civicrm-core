@@ -10,6 +10,7 @@
  */
 
 use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\Membership;
 use Civi\Api4\MembershipType;
 
 /**
@@ -1631,7 +1632,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
       $isCancelled = FALSE;
 
       if ($isNotCancelled) {
-        $isCancelled = self::isSubscriptionCancelled($mid);
+        $isCancelled = self::isSubscriptionCancelled((int) $mid);
       }
 
       $paymentObject = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($mid, 'membership', 'obj');
@@ -1645,25 +1646,21 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
   /**
    * Check whether subscription is already cancelled.
    *
-   * @param int $mid
+   * @param int $membershipID
    *   Membership id.
    *
-   * @return string
+   * @return bool
    *   contribution status
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function isSubscriptionCancelled($mid) {
-    $sql = "
-   SELECT cr.contribution_status_id
-     FROM civicrm_contribution_recur cr
-LEFT JOIN civicrm_membership mem ON ( cr.id = mem.contribution_recur_id )
-    WHERE mem.id = %1 LIMIT 1";
-    $params = [1 => [$mid, 'Integer']];
-    $statusId = CRM_Core_DAO::singleValueQuery($sql, $params);
-    $status = CRM_Contribute_PseudoConstant::contributionStatus($statusId, 'name');
-    if ($status == 'Cancelled') {
-      return TRUE;
-    }
-    return FALSE;
+  public static function isSubscriptionCancelled(int $membershipID): bool {
+    // Check permissions set to false 'in case' - ideally would check permissions are
+    // correct & remove.
+    return (bool) Membership::get(FALSE)
+      ->addWhere('id', '=', $membershipID)
+      ->addWhere('contribution_recur_id.contribution_status_id:name', '=', 'Cancelled')
+      ->selectRowCount()->execute()->count();
   }
 
   /**
@@ -2374,7 +2371,7 @@ WHERE {$whereClause}";
       return $contactMembershipType;
     }
 
-    $membershipQuery = \Civi\Api4\Membership::get(FALSE)
+    $membershipQuery = Membership::get(FALSE)
       ->addWhere('contact_id', '=', $contactID)
       ->addWhere('status_id:name', '<>', 'Pending')
       ->addWhere('is_test', '=', $isTest)

@@ -353,7 +353,7 @@ DESC limit 1");
 
     $subscriptionCancelled = FALSE;
     if (!empty($defaults['id'])) {
-      $subscriptionCancelled = CRM_Member_BAO_Membership::isSubscriptionCancelled($this->_id);
+      $subscriptionCancelled = CRM_Member_BAO_Membership::isSubscriptionCancelled((int) $this->_id);
     }
 
     $alreadyAutoRenew = FALSE;
@@ -1562,7 +1562,7 @@ DESC limit 1");
     if ($this->_action & CRM_Core_Action::UPDATE
       && CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->getEntityId(),
         'contribution_recur_id')
-      && !CRM_Member_BAO_Membership::isSubscriptionCancelled($this->getEntityId())) {
+      && !CRM_Member_BAO_Membership::isSubscriptionCancelled((int) $this->getEntityId())) {
 
       $isRecur = TRUE;
     }

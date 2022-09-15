@@ -1583,15 +1583,12 @@ Expires: ',
   /**
    * Test Membership Payment owned by other contact, membership view should show all contribution records in listing.
    * is other contact.
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \Exception
    */
-  public function testMembershipViewContributionOwnerDifferent() {
+  public function testMembershipViewContributionOwnerDifferent(): void {
     // Membership Owner
     $contactId1 = $this->individualCreate();
 
-    // Contribution Onwer
+    // Contribution Owner
     $contactId2 = $this->individualCreate();
 
     // create new membership type
@@ -1608,7 +1605,7 @@ Expires: ',
       'financial_type_id' => 2,
     ]);
 
-    // create Membership
+    // Create Membership.
     $membershipId = $this->contactMembershipCreate([
       'contact_id' => $contactId1,
       'membership_type_id' => $membershipTypeAnnualFixed['id'],
@@ -1616,24 +1613,24 @@ Expires: ',
     ]);
 
     // 1st Payment
-    $contriParams = [
+    $contributionParams = [
       'membership_id' => $membershipId,
       'total_amount' => 25,
       'financial_type_id' => 2,
       'contact_id' => $contactId2,
       'receive_date' => '2020-08-08',
     ];
-    $contribution1 = CRM_Member_BAO_Membership::recordMembershipContribution($contriParams);
+    $contribution1 = CRM_Member_BAO_Membership::recordMembershipContribution($contributionParams);
 
     // 2nd Payment
-    $contriParams = [
+    $contributionParams = [
       'membership_id' => $membershipId,
       'total_amount' => 25,
       'financial_type_id' => 2,
       'contact_id' => $contactId2,
       'receive_date' => '2020-07-08',
     ];
-    $contribution2 = CRM_Member_BAO_Membership::recordMembershipContribution($contriParams);
+    $contribution2 = CRM_Member_BAO_Membership::recordMembershipContribution($contributionParams);
 
     // View Membership record
     $membershipViewForm = new CRM_Member_Form_MembershipView();
@@ -1643,7 +1640,7 @@ Expires: ',
     $membershipViewForm->controller->setEmbedded(TRUE);
     $membershipViewForm->preProcess();
 
-    // get contribution rows related to membership payments
+    // Get contribution rows related to membership payments.
     $templateVar = $membershipViewForm::getTemplate()->get_template_vars('rows');
 
     $this->assertEquals($templateVar[0]['contribution_id'], $contribution1->id);
@@ -1651,7 +1648,7 @@ Expires: ',
 
     $this->assertEquals($templateVar[1]['contribution_id'], $contribution2->id);
     $this->assertEquals($templateVar[1]['contact_id'], $contactId2);
-    $this->assertEquals(count($templateVar), 2);
+    $this->assertCount(2, $templateVar);
   }
 
 }
