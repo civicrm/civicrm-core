@@ -275,7 +275,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $processor->setMappingID((int) $this->getSubmittedValue('savedMapping'));
     $processor->setFormName($formName);
     $processor->setMetadata($this->getContactImportMetadata());
-    $processor->setContactTypeByConstant($this->getSubmittedValue('contactType'));
+    $processor->setContactType($this->getSubmittedValue('contactType'));
     $processor->setContactSubType($this->getSubmittedValue('contactSubType'));
     $mapper = $this->getSubmittedValue('mapper');
 
