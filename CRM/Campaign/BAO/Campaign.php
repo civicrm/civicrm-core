@@ -255,7 +255,7 @@ Order By  camp.title";
 
       //do check for component.
       if ($doCheckForComponent) {
-        $campaigns['isCampaignEnabled'] = $isValid = self::isCampaignEnable();
+        $campaigns['isCampaignEnabled'] = $isValid = self::isComponentEnabled();
       }
 
       //do check for permissions.
@@ -283,11 +283,12 @@ Order By  camp.title";
 
   /**
    * Is CiviCampaign enabled.
-   *
+   * @deprecated
    * @return bool
    */
   public static function isCampaignEnable(): bool {
-    return CRM_Core_Component::isEnabled('CiviCampaign');
+    CRM_Core_Error::deprecatedFunctionWarning('isComponentEnabled');
+    return self::isComponentEnabled();
   }
 
   /**

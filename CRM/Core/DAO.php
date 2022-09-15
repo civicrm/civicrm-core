@@ -3366,4 +3366,14 @@ SELECT contact_id
     $this->name = $name . $suffix;
   }
 
+  /**
+   * Check if component is enabled for this DAO class
+   *
+   * @return bool
+   */
+  public static function isComponentEnabled(): bool {
+    $daoName = static::class;
+    return !defined("$daoName::COMPONENT") || CRM_Core_Component::isEnabled($daoName::COMPONENT);
+  }
+
 }

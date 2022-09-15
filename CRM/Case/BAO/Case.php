@@ -30,11 +30,12 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
 
   /**
    * Is CiviCase enabled?
-   *
+   * @deprecated
    * @return bool
    */
   public static function enabled() {
-    return CRM_Core_Component::isEnabled('CiviCase');
+    CRM_Core_Error::deprecatedFunctionWarning('isComponentEnabled');
+    return self::isComponentEnabled();
   }
 
   /**
@@ -63,7 +64,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
    */
   public static function on_hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
     // FIXME: The EventScanner ought to skip over disabled components when registering HookInterface
-    if (!CRM_Core_Component::isEnabled('CiviCase')) {
+    if (!self::isComponentEnabled()) {
       return;
     }
     if ($e->entity === 'Activity' && in_array($e->action, ['create', 'edit'])) {
@@ -2467,7 +2468,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     }
 
     //do check for civicase component enabled.
-    if ($checkComponent && !self::enabled()) {
+    if ($checkComponent && !self::isComponentEnabled()) {
       return $allow;
     }
 
@@ -2709,7 +2710,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * or 'access all cases and activities'
    */
   public static function accessCiviCase() {
-    if (!self::enabled()) {
+    if (!self::isComponentEnabled()) {
       return FALSE;
     }
 
@@ -2732,7 +2733,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * @return bool
    */
   public static function accessCase($caseId, $denyClosed = TRUE) {
-    if (!$caseId || !self::enabled()) {
+    if (!$caseId || !self::isComponentEnabled()) {
       return FALSE;
     }
 
