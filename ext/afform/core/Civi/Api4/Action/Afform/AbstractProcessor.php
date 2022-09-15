@@ -52,7 +52,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * Each key in the array corresponds to the name of an entity,
    * and the value is an array of arrays
    * (because of `<af-repeat>` all entities are treated as if they may be multi)
-   * E.g. $entityIds['Individual1'] = [['id' => 1, 'joins' => ['Email' => [1,2,3]]];
+   * E.g. $entityIds['Individual1'] = [['id' => 1, '_joins' => ['Email' => [['id' => 1], ['id' => 2]]];
    *
    * @var array
    */
@@ -117,19 +117,20 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     ])->indexBy($idField);
     foreach ($ids as $index => $id) {
       $this->_entityIds[$entity['name']][$index] = [
-        'id' => isset($result[$id]) ? $id : NULL,
-        'joins' => [],
+        $idField => isset($result[$id]) ? $id : NULL,
+        '_joins' => [],
       ];
       if (isset($result[$id])) {
         $data = ['fields' => $result[$id]];
         foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
+          $joinIdField = CoreUtil::getIdFieldName($joinEntity);
           $data['joins'][$joinEntity] = (array) $api4($joinEntity, 'get', [
             'where' => self::getJoinWhereClause($this->_formDataModel, $entity['name'], $joinEntity, $id),
             'limit' => !empty($join['af-repeat']) ? $join['max'] ?? 0 : 1,
-            'select' => array_keys($join['fields']),
+            'select' => array_unique(array_merge([$joinIdField], array_keys($join['fields']))),
             'orderBy' => self::getEntityField($joinEntity, 'is_primary') ? ['is_primary' => 'DESC'] : [],
           ]);
-          $this->_entityIds[$entity['name']][$index]['joins'][$joinEntity] = array_column($data['joins'][$joinEntity], 'id');
+          $this->_entityIds[$entity['name']][$index]['_joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($data['joins'][$joinEntity], [$joinIdField]);
         }
         $this->_entityValues[$entity['name']][$index] = $data;
       }

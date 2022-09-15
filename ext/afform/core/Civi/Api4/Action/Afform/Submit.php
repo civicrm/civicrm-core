@@ -26,6 +26,15 @@ class Submit extends AbstractProcessor {
   protected $values;
 
   protected function processForm() {
+    // Save submission record
+    if (!empty($this->_afform['create_submission'])) {
+      $submission = AfformSubmission::create(FALSE)
+        ->addValue('contact_id', \CRM_Core_Session::getLoggedInContactID())
+        ->addValue('afform_name', $this->name)
+        ->addValue('data', $this->getValues())
+        ->execute()->first();
+    }
+
     $entityValues = [];
     foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
       $entityValues[$entityName] = [];
@@ -67,19 +76,38 @@ class Submit extends AbstractProcessor {
       \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
     }
 
-    // Save submission record
+    $submissionData = $this->combineValuesAndIds($this->getValues(), $this->_entityIds);
+    // Update submission record with entity IDs.
     if (!empty($this->_afform['create_submission'])) {
-      $submission = AfformSubmission::create(FALSE)
-        ->addValue('contact_id', \CRM_Core_Session::getLoggedInContactID())
-        ->addValue('afform_name', $this->name)
-        ->addValue('data', $this->_entityIds)
-        ->execute()->first();
+      AfformSubmission::update(FALSE)
+        ->addWhere('id', '=', $submission['id'])
+        ->addValue('data', $submissionData)
+        ->execute();
     }
 
     // Return ids and a token for uploading files
     return [
       ['token' => $this->generatePostSubmitToken()] + $this->_entityIds,
     ];
+  }
+
+  /**
+   * Recursively add entity IDs to the values.
+   */
+  protected function combineValuesAndIds($values, $ids, $isJoin = FALSE) {
+    $combined = [];
+    $values += array_fill_keys(array_keys($ids), []);
+    foreach ($values as $name => $value) {
+      foreach ($value as $idx => $val) {
+        $idData = $ids[$name][$idx] ?? [];
+        if (!$isJoin) {
+          $idData['_joins'] = $this->combineValuesAndIds($val['joins'] ?? [], $idData['_joins'] ?? [], TRUE);
+        }
+        $item = array_merge($isJoin ? $val : ($val['fields'] ?? []), $idData);
+        $combined[$name][$idx] = $item;
+      }
+    }
+    return $combined;
   }
 
   /**
@@ -154,9 +182,10 @@ class Submit extends AbstractProcessor {
         continue;
       }
       try {
+        $idField = CoreUtil::getIdFieldName($event->getEntityType());
         $saved = $api4($event->getEntityType(), 'save', ['records' => [$record['fields']]])->first();
-        $event->setEntityId($index, $saved['id']);
-        self::saveJoins($event, $index, $saved['id'], $record['joins'] ?? []);
+        $event->setEntityId($index, $saved[$idField]);
+        self::saveJoins($event, $index, $saved[$idField], $record['joins'] ?? []);
       }
       catch (\API_Exception $e) {
         // What to do here? Sometimes we should silently ignore errors, e.g. an optional entity
@@ -244,7 +273,7 @@ class Submit extends AbstractProcessor {
           'checkPermissions' => FALSE,
           'where' => self::getJoinWhereClause($event->getFormDataModel(), $event->getEntityName(), $joinEntityName, $entityId),
           'records' => $values,
-        ], ['id']);
+        ]);
         $indexedResult = array_combine(array_keys($values), (array) $result);
         $event->setJoinIds($index, $joinEntityName, $indexedResult);
       }
