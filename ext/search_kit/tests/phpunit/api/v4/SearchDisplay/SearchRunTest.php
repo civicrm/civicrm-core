@@ -1396,6 +1396,29 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     $this->assertEquals('JPY', $result[2]['data']['currency']);
     $this->assertEquals('¥ 500.00', $result[2]['columns'][0]['val']);
+
+    // Now do a search for the contribution line-items
+    $params['savedSearch'] = [
+      'api_entity' => 'LineItem',
+      'api_params' => [
+        'version' => 4,
+        'select' => ['line_total'],
+        'where' => [['contribution_id', 'IN', $contributions->column('id')]],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(3, $result);
+
+    // An automatic join should have been added to fetch the contribution currency
+    $this->assertEquals('GBP', $result[0]['data']['contribution_id.currency']);
+    $this->assertEquals('£ 100.00', $result[0]['columns'][0]['val']);
+
+    $this->assertEquals('USD', $result[1]['data']['contribution_id.currency']);
+    $this->assertEquals('$ 200.00', $result[1]['columns'][0]['val']);
+
+    $this->assertEquals('JPY', $result[2]['data']['contribution_id.currency']);
+    $this->assertEquals('¥ 500.00', $result[2]['columns'][0]['val']);
   }
 
 }

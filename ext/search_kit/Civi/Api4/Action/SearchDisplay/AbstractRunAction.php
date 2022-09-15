@@ -972,6 +972,19 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         }
       }
     }
+    // If the base entity has a field named 'currency', fall back on that.
+    if ($this->getField('currency')) {
+      return 'currency';
+    }
+    // Finally, if there's a FK field to civicrm_contribution, we can use an implicit join
+    // E.G. the LineItem entity has no `currency` field of its own & uses that of the contribution record
+    if ($entityDao) {
+      foreach ($entityDao::getSupportedFields() as $fieldName => $field) {
+        if (($field['FKClassName'] ?? NULL) === 'CRM_Contribute_DAO_Contribution') {
+          return $prefix . $fieldName . '.currency';
+        }
+      }
+    }
     return NULL;
   }
 
