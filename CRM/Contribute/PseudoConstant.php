@@ -299,6 +299,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *   array reference of all contribution statuses
    */
   public static function &contributionStatus($id = NULL, $columnName = 'label') {
+    CRM_Core_Error::deprecatedFunctionWarning('buildOptions, getKey etc');
     $cacheKey = $columnName;
     if (!isset(self::$contributionStatus[$cacheKey])) {
       self::$contributionStatus[$cacheKey] = CRM_Core_OptionGroup::values('contribution_status',
