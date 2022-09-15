@@ -1079,16 +1079,16 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @return array
    */
-  public static function getTableNames() {
+  public static function getTableNames(): array {
     $dao = CRM_Core_DAO::executeQuery(
       "SELECT TABLE_NAME
        FROM information_schema.TABLES
        WHERE TABLE_SCHEMA = '" . CRM_Core_DAO::getDatabaseName() . "'
          AND TABLE_NAME LIKE 'civicrm_%'
-         AND TABLE_NAME NOT LIKE 'civicrm_import_job_%'
-         AND TABLE_NAME NOT LIKE '%_temp%'
+         AND TABLE_NAME NOT LIKE '%_tmp%'
       ");
 
+    $values = [];
     while ($dao->fetch()) {
       $values[] = $dao->TABLE_NAME;
     }
@@ -1107,8 +1107,6 @@ class CRM_Core_DAO extends DB_DataObject {
        WHERE ENGINE = 'MyISAM'
          AND TABLE_SCHEMA = '" . CRM_Core_DAO::getDatabaseName() . "'
          AND TABLE_NAME LIKE 'civicrm_%'
-         AND TABLE_NAME NOT LIKE 'civicrm_import_job_%'
-         AND TABLE_NAME NOT LIKE '%_temp%'
          AND TABLE_NAME NOT LIKE 'civicrm_tmp_%'
       ");
   }
