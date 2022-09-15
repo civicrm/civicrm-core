@@ -212,9 +212,12 @@ class CRM_Import_ImportProcessor {
   /**
    * Set the contact type  according to the constant.
    *
+   * @deprecated
+   *
    * @param int $contactTypeKey
    */
   public function setContactTypeByConstant($contactTypeKey) {
+    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
     $constantTypeMap = [
       'Individual' => 'Individual',
       'Household' => 'Household',

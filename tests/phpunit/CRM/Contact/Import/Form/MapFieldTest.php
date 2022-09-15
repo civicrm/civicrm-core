@@ -226,9 +226,6 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     $this->assertEquals('street_address', $processor->getFieldName(3));
     $this->assertEquals($this->getCustomFieldName('text'), $processor->getFieldName(4));
     $this->assertEquals('url', $processor->getFieldName(8));
-
-    $processor->setContactTypeByConstant('Household');
-    $this->assertEquals('Household', $processor->getContactType());
   }
 
   /**
@@ -346,7 +343,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     $processor->setMappingID($mappingID);
     $processor->setFormName('document.forms.MapField');
     $processor->setMetadata($this->getContactImportMetadata());
-    $processor->setContactTypeByConstant('Individual');
+    $processor->setContactType('Individual');
 
     $defaults = [];
     $defaults["mapper[$columnNumber]"] = $processor->getSavedQuickformDefaultsForColumn($columnNumber);
