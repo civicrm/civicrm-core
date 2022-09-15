@@ -162,7 +162,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
    * @param int|null $id
    * @param bool $error
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function setupMockHandler($id = NULL, $error = FALSE): void {
     if ($id) {

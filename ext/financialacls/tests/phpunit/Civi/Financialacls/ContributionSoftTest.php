@@ -11,7 +11,7 @@
 namespace Civi\Financialacls;
 
 // I fought the Autoloader and the autoloader won.
-use API_Exception;
+use CRM_Core_Exception;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionSoft;
 use CRM_Contribute_BAO_ContributionSoft;
@@ -29,7 +29,6 @@ class ContributionSoftTest extends BaseTestClass {
   /**
    * Test getSoftContributionList method.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testGetSoftContributionList(): void {
@@ -151,7 +150,7 @@ class ContributionSoftTest extends BaseTestClass {
       ];
       ContributionSoft::create(FALSE)->setValues($params2)->execute();
     }
-    catch (API_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $this->fail($e->getMessage());
     }
     return [];
@@ -163,7 +162,7 @@ class ContributionSoftTest extends BaseTestClass {
    * @param array $params
    *
    * @return int
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   private function contributionCreate(array $params): int {
     return Contribution::create(FALSE)->setValues(array_merge([

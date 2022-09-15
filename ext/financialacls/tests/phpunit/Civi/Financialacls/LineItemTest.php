@@ -27,7 +27,7 @@ class LineItemTest extends BaseTestClass {
    * Test api applies permissions on line item actions (delete & get).
    *
    * @dataProvider versionThreeAndFour
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testLineItemApiPermissions($version): void {
     $contact1 = $this->individualCreate();

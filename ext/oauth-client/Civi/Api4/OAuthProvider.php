@@ -25,7 +25,7 @@ class OAuthProvider extends Generic\AbstractEntity {
 
         foreach ($providers as $name => &$provider) {
           if ($provider['name'] !== $name) {
-            throw new \API_Exception(sprintf("Mismatched OAuth provider names: \"%s\" vs \"%s\"",
+            throw new \CRM_Core_Exception(sprintf("Mismatched OAuth provider names: \"%s\" vs \"%s\"",
               $provider['name'], $name));
           }
           if (!isset($provider['class'])) {

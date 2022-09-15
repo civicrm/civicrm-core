@@ -15,7 +15,7 @@ class FinancialAccountTest extends BaseTestClass {
   /**
    * Test only accounts with permitted income types can be retrieved.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testGetFinancialAccount(): void {
     $this->setupLoggedInUserWithLimitedFinancialTypeAccess();

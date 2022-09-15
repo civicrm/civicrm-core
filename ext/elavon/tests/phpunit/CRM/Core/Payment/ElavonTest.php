@@ -137,7 +137,7 @@ class CRM_Core_Payment_ElavonTest extends \PHPUnit\Framework\TestCase implements
    *
    * @param int|null $id
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function setupMockHandler($id = NULL): void {
     if ($id) {

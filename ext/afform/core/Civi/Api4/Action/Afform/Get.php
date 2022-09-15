@@ -112,7 +112,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
    * Generates afform blocks from custom field sets.
    *
    * @param \Civi\Core\Event\GenericHookEvent $event
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getCustomGroupBlocks($event) {
     // Early return if blocks are not requested

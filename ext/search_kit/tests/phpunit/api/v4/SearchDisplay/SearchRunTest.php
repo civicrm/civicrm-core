@@ -793,7 +793,7 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
       civicrm_api4('SearchDisplay', 'run', $params);
       $this->fail();
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
     }
 
     // With a random seed, results should be shuffled in stable order

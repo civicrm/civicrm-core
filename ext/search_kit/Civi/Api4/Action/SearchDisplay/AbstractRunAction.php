@@ -87,7 +87,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   /**
    * @param \Civi\Api4\Generic\Result $result
    * @throws UnauthorizedException
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function _run(\Civi\Api4\Generic\Result $result) {
     // Only SearchKit admins can use this in unsecured "preview mode"
@@ -648,7 +648,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         'values' => $entityValues,
       ])->count();
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       return FALSE;
     }
   }
@@ -1109,7 +1109,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    *
    * @param $fieldName
    * @param $value
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
   private function addFilterLabel($fieldName, $value) {

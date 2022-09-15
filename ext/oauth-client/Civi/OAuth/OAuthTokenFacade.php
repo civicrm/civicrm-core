@@ -24,13 +24,13 @@ class OAuthTokenFacade {
    *   (via getAccessToken($tokenOptions)), eg "username", "password", "code"
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @see \League\OAuth2\Client\Provider\AbstractProvider::getAccessToken()
    */
   public function init($options): array {
     $options['storage'] = $options['storage'] ?? 'OAuthSysToken';
     if (!preg_match(self::STORAGE_TYPES, $options['storage'])) {
-      throw new \API_Exception("Invalid token storage ({$options['storage']})");
+      throw new \CRM_Core_Exception("Invalid token storage ({$options['storage']})");
     }
 
     /** @var \League\OAuth2\Client\Provider\GenericProvider $provider */
