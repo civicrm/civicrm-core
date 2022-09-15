@@ -110,7 +110,7 @@ function civicrm_api3_file_update($params) {
  * @param array $params
  *   Array per getfields metadata.
  * @return array API Result Array
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_file_delete($params) {
 
@@ -119,6 +119,6 @@ function civicrm_api3_file_delete($params) {
     return civicrm_api3_create_success();
   }
   else {
-    throw new API_Exception('Error while deleting a file.');
+    throw new CRM_Core_Exception('Error while deleting a file.');
   }
 }

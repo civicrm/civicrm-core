@@ -18,7 +18,7 @@ function saved_search_delete_example() {
   try {
     $result = civicrm_api3('SavedSearch', 'delete', $params);
   }
-  catch (CiviCRM_API3_Exception $e) {
+  catch (CRM_Core_Exception $e) {
     // Handle error here.
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();

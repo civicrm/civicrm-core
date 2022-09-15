@@ -25,7 +25,7 @@ function contribution_recur_create_example() {
   try {
     $result = civicrm_api3('ContributionRecur', 'create', $params);
   }
-  catch (CiviCRM_API3_Exception $e) {
+  catch (CRM_Core_Exception $e) {
     // Handle error here.
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();

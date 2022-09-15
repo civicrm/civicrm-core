@@ -56,7 +56,7 @@ function civicrm_api(string $entity, string $action, array $params) {
  *     e.g. `$index = ['name' => 'title']` will return an array of strings - the 'title' field keyed by the 'name' field.
  *
  * @return \Civi\Api4\Generic\Result
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  * @throws \Civi\API\Exception\NotImplementedException
  */
 function civicrm_api4(string $entity, string $action, array $params = [], $index = NULL) {
@@ -97,7 +97,7 @@ function civicrm_api4(string $entity, string $action, array $params = [], $index
   elseif (CRM_Utils_Rule::integer($index)) {
     $item = $result->itemAt($index);
     if (is_null($item)) {
-      throw new \API_Exception("Index $index not found in api results");
+      throw new \CRM_Core_Exception("Index $index not found in api results");
     }
     // Attempt to return a Result object if item is array, otherwise just return the item
     if (!is_array($item)) {
@@ -123,7 +123,7 @@ function civicrm_api4(string $entity, string $action, array $params = [], $index
  * @param array $params
  *   Array to be passed to function.
  *
- * @throws CiviCRM_API3_Exception
+ * @throws CRM_Core_Exception
  *
  * @return array|int
  *   Dependant on the $action
@@ -132,7 +132,7 @@ function civicrm_api3(string $entity, string $action, array $params = []) {
   $params['version'] = 3;
   $result = \Civi::service('civi_api_kernel')->runSafe($entity, $action, $params);
   if (is_array($result) && !empty($result['is_error'])) {
-    throw new CiviCRM_API3_Exception($result['error_message'], CRM_Utils_Array::value('error_code', $result, 'undefined'), $result);
+    throw new CRM_Core_Exception($result['error_message'], CRM_Utils_Array::value('error_code', $result, 'undefined'), $result);
   }
   return $result;
 }

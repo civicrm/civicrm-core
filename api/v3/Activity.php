@@ -21,7 +21,7 @@
  * @param array $params
  *   Array per getfields documentation.
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @return array
  *   API result array
  */
@@ -204,8 +204,7 @@ function _civicrm_api3_activity_get_spec(&$params) {
  * @return array
  *   API result array
  *
- * @throws \API_Exception
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_activity_get($params) {
@@ -289,7 +288,7 @@ function _civicrm_activity_get_handleSourceContactNameOrderBy(&$params, &$option
  *
  * @param array $params
  * @param CRM_Utils_SQL_Select $sql
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  * @throws \Exception
  */
 function _civicrm_api3_activity_get_extraFilters(&$params, &$sql) {
@@ -588,7 +587,7 @@ function _civicrm_api3_activity_fill_activity_contact_names(&$activities, $param
  * @param array $params
  *   Array holding 'id' of activity to be deleted.
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  *
  * @return array
  *   API result array
@@ -599,7 +598,7 @@ function civicrm_api3_activity_delete($params) {
     return civicrm_api3_create_success(1, $params, 'Activity', 'delete');
   }
   else {
-    throw new API_Exception('Could not delete Activity: ' . (int) $params['id']);
+    throw new CRM_Core_Exception('Could not delete Activity: ' . (int) $params['id']);
   }
 }
 
@@ -609,7 +608,7 @@ function civicrm_api3_activity_delete($params) {
  * @param array $params
  *   Associated array of fields.
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @throws Exception
  * @return array
  *   array with errors
@@ -625,7 +624,7 @@ function _civicrm_api3_activity_check_params(&$params) {
     if ($value &&
       !CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $value, 'id')
     ) {
-      throw new API_Exception('Invalid ' . ucfirst($id) . ' Id');
+      throw new CRM_Core_Exception('Invalid ' . ucfirst($id) . ' Id');
     }
   }
   // this should be handled by wrapper layer & probably the api would already manage it
@@ -649,21 +648,21 @@ function _civicrm_api3_activity_check_params(&$params) {
       throw new Exception($errorString);
     }
     elseif ($activityTypeId && ($activityTypeId != $activityTypeIdInList)) {
-      throw new API_Exception('Mismatch in Activity');
+      throw new CRM_Core_Exception('Mismatch in Activity');
     }
     $params['activity_type_id'] = $activityTypeIdInList;
   }
   elseif ($activityTypeId &&
     !array_key_exists($activityTypeId, $activityTypes)
   ) {
-    throw new API_Exception('Invalid Activity Type ID');
+    throw new CRM_Core_Exception('Invalid Activity Type ID');
   }
 
   // check for activity duration minutes
   // this should be validated @ the wrapper layer not here
   // needs testing
   if (isset($params['duration_minutes']) && !is_numeric($params['duration_minutes'])) {
-    throw new API_Exception('Invalid Activity Duration (in minutes)');
+    throw new CRM_Core_Exception('Invalid Activity Duration (in minutes)');
   }
 
   return NULL;

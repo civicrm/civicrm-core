@@ -42,7 +42,7 @@
  *   api result array
  *   {@getfields saved_search_create}
  *
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  *
  * @example SavedSearch/Create.php Std create example.
  * @access public
@@ -72,8 +72,7 @@ function _civicrm_api3_saved_search_create_spec(&$fields) {
  *   api result array
  *   {@getfields saved_search_delete}
  *
- * @throws \API_Exception
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  *
  * @example SavedSearch/Delete.php Std delete example.
  * @access public

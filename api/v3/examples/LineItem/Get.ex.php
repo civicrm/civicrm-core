@@ -18,7 +18,7 @@ function line_item_get_example() {
   try {
     $result = civicrm_api3('LineItem', 'get', $params);
   }
-  catch (CiviCRM_API3_Exception $e) {
+  catch (CRM_Core_Exception $e) {
     // Handle error here.
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();

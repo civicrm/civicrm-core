@@ -24,7 +24,7 @@ function website_get_example() {
   try {
     $result = civicrm_api3('Website', 'get', $params);
   }
-  catch (CiviCRM_API3_Exception $e) {
+  catch (CRM_Core_Exception $e) {
     // Handle error here.
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
