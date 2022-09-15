@@ -165,7 +165,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       default:
         if (!empty($data[$key])) {
           $item = $this->getSelectExpression($key);
-          if ($item['expr'] instanceof SqlField && $item['fields'][0]['fk_entity'] === 'File') {
+          if ($item['expr'] instanceof SqlField && $item['fields'][$key]['fk_entity'] === 'File') {
             return $this->generateFileUrl($data[$key]);
           }
         }
@@ -214,7 +214,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $out['val'] = $this->rewrite($column, $data);
         }
         else {
-          $out['val'] = $this->formatViewValue($column['key'], $rawValue);
+          $out['val'] = $this->formatViewValue($column['key'], $rawValue, $data);
         }
         if ($this->hasValue($column['label']) && (!empty($column['forceLabel']) || $this->hasValue($out['val']))) {
           $out['label'] = $this->replaceTokens($column['label'], $data, 'view');
@@ -735,7 +735,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       foreach ($this->getTokens($tokenExpr) as $token) {
         $val = $data[$token] ?? NULL;
         if (isset($val) && $format === 'view') {
-          $val = $this->formatViewValue($token, $val);
+          $val = $this->formatViewValue($token, $val, $data);
         }
         $replacement = is_array($val) ? $val[$index] ?? '' : $val;
         // A missing token value in a url invalidates it
@@ -752,12 +752,13 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * Format raw field value according to data type
    * @param string $key
    * @param mixed $rawValue
+   * @param array $data
    * @return array|string
    */
-  protected function formatViewValue($key, $rawValue) {
+  protected function formatViewValue($key, $rawValue, $data) {
     if (is_array($rawValue)) {
-      return array_map(function($val) use ($key) {
-        return $this->formatViewValue($key, $val);
+      return array_map(function($val) use ($key, $data) {
+        return $this->formatViewValue($key, $val, $data);
       }, $rawValue);
     }
 
@@ -773,7 +774,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         break;
 
       case 'Money':
-        $formatted = \CRM_Utils_Money::format($rawValue);
+        $currencyField = $this->getCurrencyField($key);
+        $formatted = \CRM_Utils_Money::format($rawValue, $data[$currencyField] ?? NULL);
         break;
 
       case 'Date':
@@ -877,21 +879,20 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $existing = array_map(function($item) {
       return explode(' AS ', $item)[1] ?? $item;
     }, $apiParams['select']);
-    $additions = [];
     // Add primary key field if actions are enabled
     // (only needed for non-dao entities, as Api4SelectQuery will auto-add the id)
     if (!in_array('DAOEntity', CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'type')) &&
       (!empty($this->display['settings']['actions']) || !empty($this->display['settings']['draggable']))
     ) {
-      $additions = CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'primary_key');
+      $this->addSelectExpression(CoreUtil::getIdFieldName($this->savedSearch['api_entity']));
     }
     // Add draggable column (typically "weight")
     if (!empty($this->display['settings']['draggable'])) {
-      $additions[] = $this->display['settings']['draggable'];
+      $this->addSelectExpression($this->display['settings']['draggable']);
     }
     // Add style conditions for the display
     foreach ($this->getCssRulesSelect($this->display['settings']['cssRules'] ?? []) as $addition) {
-      $additions[] = $addition;
+      $this->addSelectExpression($addition);
     }
     $possibleTokens = '';
     foreach ($this->display['settings']['columns'] as $column) {
@@ -907,31 +908,86 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $possibleTokens .= $this->getLinkPath($link) ?? '';
       }
 
-      // Select id & value for in-place editing
+      // Select id, value & grouping for in-place editing
       if (!empty($column['editable'])) {
         $editable = $this->getEditableInfo($column['key']);
         if ($editable) {
-          $additions = array_merge($additions, $editable['grouping_fields'], [$editable['value_path'], $editable['id_path']]);
+          foreach (array_merge($editable['grouping_fields'], [$editable['value_path'], $editable['id_path']]) as $addition) {
+            $this->addSelectExpression($addition);
+          }
         }
       }
       // Add style & icon conditions for the column
-      $additions = array_merge($additions,
-        $this->getCssRulesSelect($column['cssRules'] ?? []),
-        $this->getIconsSelect($column['icons'] ?? [])
-      );
-    }
-    // Add fields referenced via token
-    $tokens = $this->getTokens($possibleTokens);
-    // Only add fields not already in SELECT clause
-    $additions = array_diff(array_merge($additions, $tokens), $existing);
-    // Tokens for aggregated columns start with 'GROUP_CONCAT_'
-    foreach ($additions as $index => $alias) {
-      if (strpos($alias, 'GROUP_CONCAT_') === 0) {
-        $additions[$index] = 'GROUP_CONCAT(' . $this->getJoinFromAlias(explode('_', $alias, 3)[2]) . ') AS ' . $alias;
+      foreach ($this->getCssRulesSelect($column['cssRules'] ?? []) as $addition) {
+        $this->addSelectExpression($addition);
+      }
+      foreach ($this->getIconsSelect($column['icons'] ?? []) as $addition) {
+        $this->addSelectExpression($addition);
       }
     }
-    $this->_selectClause = NULL;
-    $apiParams['select'] = array_unique(array_merge($apiParams['select'], $additions));
+    // Add fields referenced via token
+    foreach ($this->getTokens($possibleTokens) as $addition) {
+      $this->addSelectExpression($addition);
+    }
+
+    // When selecting monetary fields, also select currency
+    foreach ($apiParams['select'] as $select) {
+      $currencyFieldName = $this->getCurrencyField($select);
+      if ($currencyFieldName) {
+        $this->addSelectExpression($currencyFieldName);
+      }
+    }
+  }
+
+  /**
+   * Given a field that contains money, find the corresponding currency field
+   *
+   * @param string $select
+   * @return string|null
+   */
+  private function getCurrencyField(string $select):?string {
+    $clause = $this->getSelectExpression($select);
+    // Only deal with fields of type money.
+    // TODO: In theory it might be possible to support aggregated columns but be careful about FULL_GROUP_BY errors
+    if (!($clause && $clause['expr']->isType('SqlField') && $clause['dataType'] === 'Money' && $clause['fields'])) {
+      return NULL;
+    }
+    $moneyFieldAlias = array_keys($clause['fields'])[0];
+    $moneyField = $clause['fields'][$moneyFieldAlias];
+    // Custom fields do their own thing wrt currency
+    if ($moneyField['type'] === 'Custom') {
+      return NULL;
+    }
+    $prefix = substr($moneyFieldAlias, 0, strrpos($moneyFieldAlias, $moneyField['name']));
+    // If the entity has a field named 'currency', just assume that's it.
+    if ($this->getField($prefix . 'currency')) {
+      return $prefix . 'currency';
+    }
+    // Some currency fields go by other names like `fee_currency`. We find them by checking the pseudoconstant.
+    $entityDao = CoreUtil::getInfoItem($moneyField['entity'], 'dao');
+    if ($entityDao) {
+      foreach ($entityDao::getSupportedFields() as $fieldName => $field) {
+        if (($field['pseudoconstant']['table'] ?? NULL) === 'civicrm_currency') {
+          return $prefix . $fieldName;
+        }
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * @param string $expr
+   */
+  protected function addSelectExpression(string $expr):void {
+    if (!$this->getSelectExpression($expr)) {
+      // Tokens for aggregated columns start with 'GROUP_CONCAT_'
+      if (strpos($expr, 'GROUP_CONCAT_') === 0) {
+        $expr = 'GROUP_CONCAT(' . $this->getJoinFromAlias(explode('_', $expr, 3)[2]) . ') AS ' . $expr;
+      }
+      $this->_apiParams['select'][] = $expr;
+      // Force-reset cache so it gets rebuilt with the new select param
+      $this->_selectClause = NULL;
+    }
   }
 
   /**
