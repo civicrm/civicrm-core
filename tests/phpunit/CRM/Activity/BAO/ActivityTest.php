@@ -18,7 +18,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Set up for test.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function setUp():void {
     parent::setUp();
@@ -30,7 +30,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Clean up after tests.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function tearDown(): void {
@@ -252,7 +252,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * deleteActivity($params) method deletes activity for given params.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testDeleteActivity() {
     $contactId = $this->individualCreate();
@@ -362,7 +361,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * for given activity id.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testDeleteActivityAssignment(): void {
     $contactId = $this->individualCreate();
@@ -1077,7 +1075,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * @param $expected
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testActivityRelativeDateFilter($params, $expected): void {
     $thisYear = date('Y');
@@ -1138,7 +1135,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * CRM-20308: Test from email address when a 'copy of Activity' event occur
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testEmailAddressOfActivityCopy() {
     // Case 1: assert the 'From' Email Address of source Actvity Contact ID
@@ -1218,9 +1214,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSendEmailBasic(): void {
     $contactId = $this->getContactID();
@@ -1312,9 +1306,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * This is different from SentEmailBasic to try to help prevent code that
    * assumes an email always has tokens in it.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testSendEmailBasicWithoutAnyTokens(): void {
@@ -1358,9 +1350,7 @@ $text
   }
 
   /**
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSendEmailWithCampaign(): void {
     // Create a contact and contactDetails array.
@@ -1415,9 +1405,7 @@ $text
   /**
    * Test that a sms does not send when a phone number is not available.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testSendSmsNoPhoneNumber(): void {
@@ -1426,9 +1414,7 @@ $text
   }
 
   /**
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testSendSmsLandLinePhoneNumber(): void {
@@ -1439,9 +1425,7 @@ $text
   /**
    * Test successful SMS send.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testSendSmsMobilePhoneNumber(): void {
@@ -1481,9 +1465,7 @@ $text
    * @param array $additionalContactParams additional contact creation params
    *
    * @return array
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function createSendSmsTest(bool $expectSuccess = TRUE, int $phoneType = 0, bool $passPhoneTypeInContactDetails = FALSE, array $additionalContactParams = []): array {
@@ -1699,7 +1681,6 @@ $textValue
    * 3 recipients and an attachment.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSendEmailWillReplaceTokensUniquelyForEachContact3(): void {
     $contactId1 = $this->individualCreate(['last_name' => 'Red']);
@@ -1933,7 +1914,7 @@ $textValue
    * @param array $do_first
    * @param array $do_second
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testTargetAssigneeVariations(array $do_first, array $do_second) {
     // Originally wanted to put this in setUp() but it broke other tests.
@@ -2002,7 +1983,6 @@ $textValue
    * @param array $do_second
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testTargetAssigneeVariationsWithScalars(array $do_first, array $do_second) {
     // Originally wanted to put this in setUp() but it broke other tests.
@@ -2596,7 +2576,7 @@ $textValue
   /**
    * @param $activityId
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function validateActivity($activityId): void {
@@ -2620,7 +2600,7 @@ $textValue
    * @param $contactDetails
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function createMobilePhone(int $contactId, bool $passPhoneTypeInContactDetails, $contactDetails): array {
     $phone = civicrm_api3('Phone', 'create', [

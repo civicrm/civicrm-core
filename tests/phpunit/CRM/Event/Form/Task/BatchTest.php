@@ -36,7 +36,6 @@ class CRM_Event_Form_Task_BatchTest extends CiviUnitTestCase {
    * Registration'.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitCancel(): void {
     $this->createEventOrder(['source' => 'Online Event Registration', 'is_pay_later' => 1]);

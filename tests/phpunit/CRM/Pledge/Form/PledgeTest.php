@@ -12,7 +12,6 @@ class CRM_Pledge_Form_PledgeTest extends CiviUnitTestCase {
   /**
    * Test the post process function.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testPostProcess(): void {

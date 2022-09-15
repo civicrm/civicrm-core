@@ -40,7 +40,6 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
    * Test the submit function of payment edit form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function testSubmitOnPaymentInstrumentChange(): void {

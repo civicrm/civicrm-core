@@ -78,7 +78,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * @param string $thousandSeparator
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    *
    * @dataProvider getThousandSeparators
    */
@@ -210,7 +209,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * Tests missing contactID when registering for paid event from waitlist
    * https://github.com/civicrm/civicrm-core/pull/23358, https://lab.civicrm.org/extensions/stripe/-/issues/347
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testWaitlistRegistrationContactIdParam() {
     // @todo - figure out why this doesn't pass validate financials
@@ -684,7 +683,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * email reflects the submitted value
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Exception
    */
   public function testNoteSubmission(): void {

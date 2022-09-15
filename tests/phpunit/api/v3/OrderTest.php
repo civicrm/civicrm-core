@@ -45,7 +45,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   /**
    * Setup function.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function setUp(): void {
     parent::setUp();
@@ -212,7 +212,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   /**
    * Test create order api for membership
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testAddOrderForMembership(): void {
     $membershipType = $this->membershipTypeCreate();
@@ -510,7 +510,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * Test create order api for participant
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testAddOrderForParticipant(): void {
     $event = $this->eventCreate();
@@ -892,9 +891,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   /**
    * Test creating an order with a mixture of taxable & non-taxable.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
   public function testOrderWithMixedTax(): void {
     $this->enableTaxAndInvoicing();

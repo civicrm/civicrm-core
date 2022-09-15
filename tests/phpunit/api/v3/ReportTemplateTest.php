@@ -140,7 +140,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * Get templates suitable for SelectWhere test.
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getReportTemplatesSupportingSelectWhere() {
     $allTemplates = self::getReportTemplates();
@@ -379,7 +379,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * Note that the function needs to
    * be static so cannot use $this->callAPISuccess
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getReportTemplates() {
     $reportTemplates = [];
@@ -560,7 +560,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *   Name of the template to test.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testContributionSummaryWithSmartGroupFilter(string $template): void {
     $groupID = $this->setUpPopulatedSmartGroup();
@@ -584,7 +583,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @param string $template
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testContributionSummaryWithNotINSmartGroupFilter($template): void {
     $groupID = $this->setUpPopulatedSmartGroup();
@@ -902,7 +900,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @return int
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setUpPopulatedSmartGroup(): int {
     $household1ID = $this->householdCreate();
@@ -1052,7 +1049,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * Test Deferred Revenue Report.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testDeferredRevenueReport(): void {
     $indv1 = $this->individualCreate();
@@ -1112,7 +1108,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @param string $template
    *   Report template unique identifier.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */

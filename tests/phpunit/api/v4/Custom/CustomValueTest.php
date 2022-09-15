@@ -273,7 +273,7 @@ class CustomValueTest extends CustomTestBase {
   /**
    * Whenever a CustomGroup toggles the `is_multiple` flag, the entity-list should be updated.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testEntityRefresh() {

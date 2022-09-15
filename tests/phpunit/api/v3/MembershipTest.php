@@ -722,7 +722,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * This add a test for https://issues.civicrm.org/jira/browse/CRM-4213 in the hope of removing
    * the buggy fix for that without a resurgence.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -1285,7 +1284,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   /**
    * CRM-18503 - Test membership join date is correctly set for fixed memberships.
    *
-   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testMembershipJoinDateFixed() {
     $memStatus = CRM_Member_PseudoConstant::membershipStatus();

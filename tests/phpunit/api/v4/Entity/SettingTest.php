@@ -45,7 +45,7 @@ class SettingTest extends Api4TestBase implements TransactionalInterface {
     try {
       Setting::set()->addValue('not_a_real_setting!', 'hello')->setCheckPermissions(FALSE)->execute();
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $message = $e->getMessage();
     }
     $this->assertStringContainsString('setting', $message);

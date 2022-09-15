@@ -14,7 +14,6 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
   /**
    * Test the right emails exist after submitting the location form twice.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -113,7 +112,6 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
   /**
    * Test updating a location block.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -242,7 +240,7 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
    * @param int $eventID
    *
    * @return \Civi\Api4\Generic\Result
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function assertCorrectEmails($eventID) {

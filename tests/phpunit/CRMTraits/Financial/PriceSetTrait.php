@@ -123,8 +123,7 @@ trait CRMTraits_Financial_PriceSetTrait {
    *
    * @param array $membershipTypeParams
    *
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function setUpMembershipBlockPriceSet(array $membershipTypeParams = []): void {
     $this->ids['PriceSet']['membership_block'] = PriceSet::create(FALSE)

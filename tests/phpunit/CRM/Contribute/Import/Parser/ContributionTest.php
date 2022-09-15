@@ -34,7 +34,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   /**
    * Cleanup function.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -198,7 +198,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    * These features are
    *  - default_value for each field.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testImportFromUserJobConfiguration(): void {
     $importMappings = [
@@ -297,7 +297,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   /**
    * Test phone is included if it is part of dedupe rule.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testPhoneMatchOnContact(): void {
     // Update existing unsupervised rule, change to general.
@@ -614,7 +614,6 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    *
    * @return int
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function getUserJobID(array $submittedValues = []): int {

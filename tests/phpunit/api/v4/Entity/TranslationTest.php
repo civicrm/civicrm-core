@@ -157,7 +157,7 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface, Ho
    *
    * @param array $record
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testCreateOK(array $record): void {
     $record = $this->fillRecord($record);
@@ -190,7 +190,7 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface, Ho
       ]);
       $this->fail('Create should have failed');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $this->assertRegExp($errorRegex, $e->getMessage());
     }
   }
@@ -201,7 +201,7 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface, Ho
    * @param $badUpdate
    * @param $errorRegex
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
   public function testUpdateBad($createRecord, $badUpdate, $errorRegex): void {
@@ -220,7 +220,7 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface, Ho
         ]);
         $this->fail('Update should fail');
       }
-      catch (\API_Exception $e) {
+      catch (\CRM_Core_Exception $e) {
         $this->assertRegExp($errorRegex, $e->getMessage());
       }
     }

@@ -440,7 +440,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
         'financial_account_id' => $nonAssetFinancialAccountId,
         'id' => $ov['id'],
       ]);
-      throw new API_Exception(ts('Should throw error.'));
+      throw new CRM_Core_Exception(ts('Should throw error.'));
     }
     catch (Exception $e) {
       try {
@@ -450,7 +450,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
           'entity_id' => $ov['id'],
           'financial_account_id' => $nonAssetFinancialAccountId,
         ]);
-        throw new API_Exception(ts('Should throw error.'));
+        throw new CRM_Core_Exception(ts('Should throw error.'));
       }
       catch (Exception $e) {
         $this->checkPaymentMethodFinancialAccountRelationship($ov['id'], $assetFinancialAccountId);

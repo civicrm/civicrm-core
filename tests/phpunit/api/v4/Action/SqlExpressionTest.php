@@ -79,7 +79,7 @@ class SqlExpressionTest extends Api4TestBase implements TransactionalInterface {
         ->addSelect('first_name AS bob')
         ->execute();
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $msg = $e->getMessage();
     }
     $this->assertStringContainsString('alias', $msg);
@@ -88,7 +88,7 @@ class SqlExpressionTest extends Api4TestBase implements TransactionalInterface {
         ->addSelect('55 AS sort_name')
         ->execute();
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $msg = $e->getMessage();
     }
     $this->assertStringContainsString('existing field name', $msg);

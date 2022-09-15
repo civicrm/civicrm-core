@@ -54,7 +54,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
   }
 
   /**
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function tearDown(): void {
@@ -82,7 +82,6 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
    *
    * @return array
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function getEntitiesHitech(): array {
@@ -136,7 +135,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
    *
    * @dataProvider getEntitiesLotech
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testConformance(string $entity): void {
     $entityClass = CoreUtil::getApiClass($entity);
@@ -187,7 +186,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
    * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
    * @param string $entity
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function checkFields($entityClass, $entity) {
     $fields = $entityClass::getFields(FALSE)
@@ -221,7 +220,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
    *
    * @return array
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function checkActions($entityClass): array {
     $actions = $entityClass::getActions(FALSE)
@@ -313,7 +312,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
         ->addValue('id', $id)
         ->execute();
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $exceptionThrown = $e->getMessage();
     }
     $this->assertStringContainsString('id', $exceptionThrown);
@@ -385,7 +384,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
         ->execute();
       $this->fail("$entityClass should require ID to delete.");
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       // OK
     }
   }
@@ -400,7 +399,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
         ->setDebug('not a bool')
         ->execute();
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $exceptionThrown = $e->getMessage();
     }
     $this->assertStringContainsString('debug', $exceptionThrown);

@@ -98,7 +98,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
    * even if the system doesn't allow it in the web UI. Ex: The sysadmin has configured 'fr_FR'
    * strings. The user has requested 'fr_CA', and we'll fallback to 'fr_CA'.
    *
-   * @throws \API_Exception|\CRM_Core_Exception
+   * @throws \CRM_Core_Exception
    * @group locale
    * @dataProvider getLocaleConfigurations
    */
@@ -168,7 +168,6 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testSendTemplate_RenderMode_OpenTemplate(): void {
@@ -279,9 +278,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
   /**
    * Test message template send.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCaseActivityCopyTemplate():void {
     $client_id = $this->individualCreate();
@@ -326,7 +323,6 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
    * Test rendering of domain tokens.
    *
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
   public function testDomainTokens(): void {
     $values = $this->getDomainTokenData();
@@ -402,9 +398,7 @@ London, 90210
   /**
    * Test rendering of contact tokens.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testContactTokens(): void {
     // Freeze the time at the start of the test, so checksums don't suffer from second rollovers.
@@ -515,7 +509,6 @@ emo
   /**
    * Test that unresolved tokens are not causing a fatal error in smarty.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testUnresolvedTokens(): void {
@@ -542,9 +535,7 @@ emo
    * function uses the token processor - at that point the test above
    * will be testing the same thing.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testContactTokensRenderedByTokenProcessor(): void {
     $this->createCustomGroupWithFieldsOfAllTypes([]);
@@ -706,9 +697,7 @@ emo
    * Note it will render additional custom fields if they exist.
    *
    * @return array
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function getOldContactTokens(): array {
     return [
@@ -848,7 +837,7 @@ emo
    * @param string $actualOutput
    *
    * @return string
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getExpectedContactOutput($id, array $tokenData, string $actualOutput): string {
     $checksum = substr($actualOutput, (strpos($actualOutput, 'cs=') + 3), 47);
@@ -949,7 +938,7 @@ contact_id:' . $tokenData['contact_id'] . '
    * @param string $actualOutput
    *
    * @return string
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getExpectedContactOutputNewStyle($id, array $tokenData, string $actualOutput): string {
     $checksum = substr($actualOutput, (strpos($actualOutput, 'cs=') + 3), 47);

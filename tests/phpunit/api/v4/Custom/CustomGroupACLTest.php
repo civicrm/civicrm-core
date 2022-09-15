@@ -183,7 +183,7 @@ class CustomGroupACLTest extends CustomTestBase {
         }
         $this->assertEquals($values, $result->column('MyField'));
       }
-      catch (\API_Exception $e) {
+      catch (\CRM_Core_Exception $e) {
         if ($groupName !== 'MySuperSecretMulti') {
           $this->fail('API get should have succeeded');
         }
@@ -211,7 +211,7 @@ class CustomGroupACLTest extends CustomTestBase {
           $this->fail('API call should have failed');
         }
       }
-      catch (\API_Exception $e) {
+      catch (\CRM_Core_Exception $e) {
         if ($groupName === 'MyReadWriteMulti') {
           $this->fail('API create should have succeeded');
         }

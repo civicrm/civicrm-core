@@ -48,9 +48,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
    * Ensure recurring contributions from Contribution Pages
    * with receipt turned off don't send a receipt.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testIPNPaymentRecurNoReceipt(): void {
     $mut = new CiviMailUtils($this, TRUE);
@@ -149,9 +147,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testIPNPaymentRecurSuccess(): void {
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
@@ -182,9 +178,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   /**
    * Test payment processor is correctly assigned for the IPN payment.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testIPNPaymentRecurSuccessMultiAuthNetProcessor(): void {
     //Create and set up recur payment using second instance of AuthNet Processor.
@@ -206,9 +200,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testIPNPaymentRecurSuccessSuppliedReceiveDate(): void {
     $this->setupRecurringPaymentProcessorTransaction();
@@ -236,9 +228,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
    * Test IPN response updates contribution_recur & contribution for first &
    * second contribution
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testIPNPaymentMembershipRecurSuccess(): void {
     $this->createRepeatMembershipOrder();
@@ -275,9 +265,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   /**
    * Test IPN response mails don't leak.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testIPNPaymentMembershipRecurSuccessNoLeakage(): void {
     $mut = new CiviMailUtils($this, TRUE);
@@ -350,9 +338,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   /**
    * Test IPN response mails don't leak.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testIPNPaymentMembershipRecurSuccessNoLeakageOnlineThenOffline(): void {
     $mut = new CiviMailUtils($this, TRUE);

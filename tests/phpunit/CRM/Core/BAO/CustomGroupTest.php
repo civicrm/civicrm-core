@@ -20,9 +20,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Clean up after test.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function tearDown(): void {
     $this->quickCleanup(['civicrm_contact'], TRUE);
@@ -446,7 +444,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test getActiveGroups() with Invalid Params()
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testGetActiveGroupsWithInvalidParams(): void {
     $contactId = $this->individualCreate();
@@ -517,7 +515,6 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
    * Test create() given a table_name
    *
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
   public function testCreateTableName(): void {
     $params = [

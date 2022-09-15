@@ -120,7 +120,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Clean up after each test.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
@@ -1161,7 +1160,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * contribution is created.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCreateContributionOnline(): void {
     CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
@@ -2127,7 +2125,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test to ensure mail is sent for pay later
    *
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
   public function testPayLater(): void {
     $mut = new CiviMailUtils($this, TRUE);
@@ -2262,7 +2259,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @param string $thousandSeparator
    *   punctuation used to refer to thousands.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @dataProvider getThousandSeparators
    */
@@ -2342,7 +2338,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * (Over time various discussions have deemed this to be the most recent one, allowing
    * users to alter custom data going forwards. This is implemented for line items already.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testRepeatTransactionWithCustomData(): void {
@@ -2688,7 +2683,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * FIXME: buildOptions seems to die in CRM_Core_Config::_construct when in test mode.
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function contributionStatusProvider() {
     $contributionStatuses = civicrm_api3('OptionValue', 'get', [
@@ -2840,7 +2835,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test Contribution with Order api.
    *
-   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testContributionOrder() {
     $this->createContributionAndMembershipOrder();
@@ -3194,7 +3189,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * If passed in it will override the default from contribution page.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testCompleteTransactionWithEmailReceiptInputTrue(): void {
@@ -3418,7 +3412,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test repeating a pledge with the repeatTransaction api..
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testRepeatTransactionWithPledgePayment(): void {
     $contributionID = $this->createPendingPledgeContribution(2);
@@ -3505,7 +3499,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test membership is renewed when transaction completed.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testCompleteTransactionMembershipPriceSet(): void {
     $this->createPriceSetWithPage('membership');
@@ -3541,7 +3535,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test if renewal activity is create after changing Pending contribution to
    * Completed via offline
    *
-   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testPendingToCompleteContribution(): void {
     $this->createPriceSetWithPage('membership');
@@ -3761,7 +3755,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * This simulates webform_civicrm using pay later contribution page
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSendConfirmationPayLater(): void {
     $mut = new CiviMailUtils($this, TRUE);
@@ -4847,7 +4840,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -4896,7 +4888,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @see dev/core#1816
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testCustomValueOptionLabelTest(): void {
@@ -5155,7 +5146,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @return int
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */

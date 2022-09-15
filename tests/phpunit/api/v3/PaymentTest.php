@@ -826,9 +826,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   /**
    * Test that a contribution can be overpaid with the payment api.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testCreatePaymentOverPay(): void {
@@ -962,7 +960,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * Test create payment api for failed contribution.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCreatePaymentOnFailedContribution(): void {
     $this->createLoggedInUser();
@@ -1086,7 +1083,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * Test create payment api for pay later contribution with partial payment.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCreatePaymentPayLaterPartialPayment(): void {
     $this->createLoggedInUser();
@@ -1147,7 +1143,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   /**
    * Test that Payment.create uses the to_account of the payment processor.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function testPaymentWithProcessorWithOddFinancialAccount(): void {
@@ -1249,7 +1244,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * @see https://lab.civicrm.org/dev/financial/-/issues/139
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testPaymentCreateTrxnIdAndDates(): void {
 

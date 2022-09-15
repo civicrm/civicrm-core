@@ -30,7 +30,7 @@ use Civi\Test\TransactionalInterface;
 class SavedSearchTest extends Api4TestBase implements TransactionalInterface {
 
   /**
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
   public function testContactSmartGroup(): void {

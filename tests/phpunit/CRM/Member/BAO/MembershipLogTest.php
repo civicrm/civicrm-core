@@ -63,7 +63,6 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    * Set up for test.
    *
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
   public function setUp(): void {
     parent::setUp();
@@ -100,7 +99,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
     $this->relationshipTypeDelete($this->relationshipTypeID);
@@ -114,7 +113,6 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    *  Test del function.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testDel() {
     list($contactID, $membershipID) = $this->setupMembership();

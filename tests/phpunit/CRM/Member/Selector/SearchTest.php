@@ -19,7 +19,7 @@ class CRM_Member_Selector_SearchTest extends CiviUnitTestCase {
   /**
    * Test results from getRows.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testSelectorGetRows(): void {
     $this->_contactID = $this->individualCreate();

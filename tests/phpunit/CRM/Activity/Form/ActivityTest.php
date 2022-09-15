@@ -305,7 +305,6 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
    * way to do it.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testInboundEmailDisplaysWithLineBreaks(): void {
     // Change label

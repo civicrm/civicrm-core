@@ -22,7 +22,6 @@ class CRM_Contribute_Form_Task_EmailTest extends CiviUnitTestCase {
    * Clean up after each test.
    *
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();

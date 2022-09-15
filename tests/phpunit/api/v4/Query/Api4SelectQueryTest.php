@@ -55,7 +55,6 @@ class Api4SelectQueryTest extends Api4TestBase {
   }
 
   /**
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
@@ -89,7 +88,7 @@ FROM civicrm_pledge a',
       $query->run();
       $this->fail('An Exception Should have been raised');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
     }
 
     $api = Request::create('Contact', 'get', [
@@ -104,7 +103,7 @@ FROM civicrm_pledge a',
       $query->run();
       $this->fail('An Exception Should have been raised');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
     }
   }
 

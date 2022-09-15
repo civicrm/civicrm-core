@@ -19,7 +19,7 @@ class CRM_Contribute_Form_UpdateSubscriptionTest extends CiviUnitTestCase {
   /**
    * Test the mail sent on update.
    *
-   * @throws \CRM_Core_Exception|\API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testMail(): void {
     $mut = new CiviMailUtils($this, TRUE);

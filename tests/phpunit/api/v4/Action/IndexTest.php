@@ -45,7 +45,7 @@ class IndexTest extends Api4TestBase {
     try {
       civicrm_api4('Activity', 'getActions', [], 99);
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $error = $e->getMessage();
     }
     $this->assertStringContainsString('not found', $error);
@@ -56,7 +56,7 @@ class IndexTest extends Api4TestBase {
     try {
       civicrm_api4('Activity', 'getActions', [], 'xyz');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $error = $e->getMessage();
     }
     $this->assertStringContainsString('not found', $error);

@@ -19,7 +19,7 @@ class CRM_Contribute_Form_CancelSubscriptionTest extends CiviUnitTestCase {
   /**
    * Test the mail sent on update.
    *
-   * @throws \CRM_Core_Exception|\API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testMail(): void {
     $mut = new CiviMailUtils($this, TRUE);
@@ -61,7 +61,6 @@ class CRM_Contribute_Form_CancelSubscriptionTest extends CiviUnitTestCase {
    * Recurring Contribution
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCancelSubscriptionForm(): void {
     $this->addContribution();

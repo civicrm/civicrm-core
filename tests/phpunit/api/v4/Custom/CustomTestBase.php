@@ -36,7 +36,7 @@ abstract class CustomTestBase extends Api4TestBase {
   /**
    * Delete all created options groups.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
     $optgroups = CustomField::get(FALSE)->addSelect('option_group_id')->addWhere('option_group_id', 'IS NOT NULL')->execute();

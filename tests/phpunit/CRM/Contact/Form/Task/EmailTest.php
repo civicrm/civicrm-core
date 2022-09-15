@@ -59,9 +59,7 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
   /**
    * Test email uses signature.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testPostProcessWithSignature(): void {

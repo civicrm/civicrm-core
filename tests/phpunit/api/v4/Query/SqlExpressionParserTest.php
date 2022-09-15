@@ -81,7 +81,7 @@ class SqlExpressionParserTest extends Api4TestBase implements TransactionalInter
         $this->fail('SqlWild should only be allowed in COUNT.');
       }
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $this->assertStringContainsString('Illegal', $e->getMessage());
     }
   }

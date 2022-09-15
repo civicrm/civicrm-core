@@ -28,7 +28,6 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
    * Test submitted the search form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSearch(): void {
 

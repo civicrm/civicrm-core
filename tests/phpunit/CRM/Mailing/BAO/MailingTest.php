@@ -273,9 +273,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    *  that has 'contact 1' identified as $contactIDs[0] and Included in the
    * mailing recipient list
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    * @group locale
    */
   public function testGetRecipientsEmailGroupIncludeExclude(): void {

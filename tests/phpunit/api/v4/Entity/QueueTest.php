@@ -47,7 +47,7 @@ class QueueTest extends Api4TestBase {
    * The first task runs normally. The second task fails at first, but it is retried, and then
    * succeeds.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testBasicLinearPolling() {
@@ -140,7 +140,7 @@ class QueueTest extends Api4TestBase {
    *
    * Batches are executed via `hook_civicrm_queueRun_{runner}`.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testBatchParallelPolling() {
@@ -397,7 +397,6 @@ class QueueTest extends Api4TestBase {
    * If a queue is created as part of a user-job, then it has a fixed scope-of-work. The status
    * should flip after completing its work.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -454,7 +453,6 @@ class QueueTest extends Api4TestBase {
   /**
    * If a queue is created as a long-term service, then its work is never complete.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
