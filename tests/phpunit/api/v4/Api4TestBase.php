@@ -23,8 +23,6 @@ use Civi\Api4\UFMatch;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Test\HeadlessInterface;
 
-require_once 'api/Exception.php';
-
 /**
  * @group headless
  */
@@ -123,7 +121,7 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
    * @param string $entityName
    * @param array $values
    * @return array|null
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
   public function createTestRecord(string $entityName, array $values = []) {
@@ -138,7 +136,7 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
    * @param string $entityName
    * @param array $saveParams
    * @return \Civi\Api4\Generic\Result
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
   public function saveTestRecords(string $entityName, array $saveParams) {
@@ -167,7 +165,7 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
    * @param array $values
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getRequiredValuesToCreate(string $entity, &$values = []) {
     $requiredFields = civicrm_api4($entity, 'getfields', [
@@ -313,7 +311,7 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
       return $randomValue;
     }
 
-    throw new \API_Exception('Could not provide default value');
+    throw new \CRM_Core_Exception('Could not provide default value');
   }
 
   /**
@@ -323,7 +321,7 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
    *
    * @return int
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   private function getFkID(string $fkEntity) {
     $params = ['checkPermissions' => FALSE];
