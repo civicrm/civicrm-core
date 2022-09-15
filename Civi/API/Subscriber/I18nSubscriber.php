@@ -45,7 +45,7 @@ class I18nSubscriber implements EventSubscriberInterface {
    * @param \Civi\API\Event\Event $event
    *   API preparation event.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function onApiPrepare(\Civi\API\Event\Event $event) {
     $apiRequest = $event->getApiRequest();
@@ -71,7 +71,7 @@ class I18nSubscriber implements EventSubscriberInterface {
    *
    * @param \Civi\API\Event\Event $event
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function onApiRespond(\Civi\API\Event\Event $event) {
     $apiRequest = $event->getApiRequest();

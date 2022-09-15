@@ -151,7 +151,7 @@ abstract class AbstractAction implements \ArrayAccess {
    *
    * @param string $entityName
    * @param string $actionName
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function __construct($entityName, $actionName) {
     // If a namespaced class name is passed in
@@ -170,17 +170,17 @@ abstract class AbstractAction implements \ArrayAccess {
    * @throws \Exception
    */
   public function __set($name, $value) {
-    throw new \API_Exception('Unknown api parameter');
+    throw new \CRM_Core_Exception('Unknown api parameter');
   }
 
   /**
    * @param int $val
    * @return $this
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function setVersion($val) {
     if ($val !== 4 && $val !== '4') {
-      throw new \API_Exception('Cannot modify api version');
+      throw new \CRM_Core_Exception('Cannot modify api version');
     }
     return $this;
   }
@@ -213,12 +213,12 @@ abstract class AbstractAction implements \ArrayAccess {
    * @param $name
    * @param $arguments
    * @return static|mixed
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function __call($name, $arguments) {
     $param = lcfirst(substr($name, 3));
     if (!$param || $param[0] == '_') {
-      throw new \API_Exception('Unknown api parameter: ' . $name);
+      throw new \CRM_Core_Exception('Unknown api parameter: ' . $name);
     }
     $mode = substr($name, 0, 3);
     if ($this->paramExists($param)) {
@@ -231,7 +231,7 @@ abstract class AbstractAction implements \ArrayAccess {
           return $this;
       }
     }
-    throw new \API_Exception('Unknown api parameter: ' . $name);
+    throw new \CRM_Core_Exception('Unknown api parameter: ' . $name);
   }
 
   /**
@@ -241,7 +241,7 @@ abstract class AbstractAction implements \ArrayAccess {
    * This is basically the outer wrapper for api v4.
    *
    * @return \Civi\Api4\Generic\Result
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function execute() {
@@ -378,7 +378,7 @@ abstract class AbstractAction implements \ArrayAccess {
    */
   public function offsetSet($offset, $value): void {
     if (in_array($offset, ['entity', 'action', 'entityName', 'actionName', 'params', 'version', 'id'])) {
-      throw new \API_Exception('Cannot modify api4 state via array access');
+      throw new \CRM_Core_Exception('Cannot modify api4 state via array access');
     }
     if ($offset == 'check_permissions') {
       $this->setCheckPermissions($value);
@@ -393,7 +393,7 @@ abstract class AbstractAction implements \ArrayAccess {
    */
   public function offsetUnset($offset): void {
     if (in_array($offset, ['entity', 'action', 'entityName', 'actionName', 'params', 'check_permissions', 'version', 'id'])) {
-      throw new \API_Exception('Cannot modify api4 state via array access');
+      throw new \CRM_Core_Exception('Cannot modify api4 state via array access');
     }
     unset($this->_arrayStorage[$offset]);
   }
@@ -441,7 +441,7 @@ abstract class AbstractAction implements \ArrayAccess {
    * This is because we DON'T want the wrapper to check permissions as this is an internal op.
    * @see \Civi\Api4\Action\Contact\GetFields
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @return array
    */
   public function entityFields() {
@@ -476,7 +476,7 @@ abstract class AbstractAction implements \ArrayAccess {
    *
    * @param $values
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function checkRequiredFields($values) {
     $unmatched = [];
@@ -499,7 +499,7 @@ abstract class AbstractAction implements \ArrayAccess {
    * Replaces pseudoconstants in input values
    *
    * @param array $record
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function formatWriteValues(&$record) {
     $optionFields = [];
@@ -548,12 +548,12 @@ abstract class AbstractAction implements \ArrayAccess {
    * @param array $vars
    *   Variable name => value
    * @return bool
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Exception
    */
   protected function evaluateCondition($expr, $vars) {
     if (strpos($expr, '}') !== FALSE || strpos($expr, '{') !== FALSE) {
-      throw new \API_Exception('Illegal character in expression');
+      throw new \CRM_Core_Exception('Illegal character in expression');
     }
     $tpl = "{if $expr}1{else}0{/if}";
     return (bool) trim(\CRM_Core_Smarty::singleton()->fetchWith('string:' . $tpl, $vars));

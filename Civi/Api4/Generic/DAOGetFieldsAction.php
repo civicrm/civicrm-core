@@ -76,7 +76,7 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
    * @param string $fieldName
    * @param array $fields
    * @return array|null
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   private function getFkFieldSpec($fieldName, $fields) {
     $fieldPath = explode('.', $fieldName);
@@ -100,7 +100,7 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
    *
    * Normally this would involve calling getFields... but this IS getFields.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   private function formatValues() {
     foreach (array_keys($this->values) as $key) {

@@ -22,7 +22,7 @@ interface ProviderInterface {
    * @return array
    *   structured response data (per civicrm_api3_create_success)
    * @see civicrm_api3_create_success
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function invoke($apiRequest);
 

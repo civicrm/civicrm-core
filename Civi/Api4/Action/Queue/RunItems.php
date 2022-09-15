@@ -58,7 +58,7 @@ class RunItems extends \Civi\Api4\Generic\AbstractAction {
       $queue = \Civi::queue($this->items[0]['queue']);
       $ids = \CRM_Utils_Array::collect('id', $this->items);
       if (count($ids) > 1 && !($queue instanceof \CRM_Queue_Queue_BatchQueueInterface)) {
-        throw new \API_Exception("runItems: Error: Running multiple items requires BatchQueueInterface");
+        throw new \CRM_Core_Exception("runItems: Error: Running multiple items requires BatchQueueInterface");
       }
       if (count($ids) > 1) {
         $items = $queue->fetchItems($ids);
@@ -77,7 +77,7 @@ class RunItems extends \Civi\Api4\Generic\AbstractAction {
         : [$queue->claimItem()];
     }
     else {
-      throw new \API_Exception("runItems: Requires either 'queue' or 'item'.");
+      throw new \CRM_Core_Exception("runItems: Requires either 'queue' or 'item'.");
     }
 
     if (empty($items)) {
@@ -87,7 +87,7 @@ class RunItems extends \Civi\Api4\Generic\AbstractAction {
     $outcomes = [];
     \CRM_Utils_Hook::queueRun($queue, $items, $outcomes);
     if (empty($outcomes)) {
-      throw new \API_Exception(sprintf('Failed to run queue items (name=%s, runner=%s, itemCount=%d, outcomeCount=%d)',
+      throw new \CRM_Core_Exception(sprintf('Failed to run queue items (name=%s, runner=%s, itemCount=%d, outcomeCount=%d)',
         $queue->getName(), $queue->getSpec('runner'), count($items), count($outcomes)));
     }
     foreach ($items as $itemPos => $item) {
@@ -102,19 +102,19 @@ class RunItems extends \Civi\Api4\Generic\AbstractAction {
   private function validateItemStubs(): void {
     $queueNames = [];
     if (!isset($this->items[0])) {
-      throw new \API_Exception("Queue items must be given as numeric array.");
+      throw new \CRM_Core_Exception("Queue items must be given as numeric array.");
     }
     foreach ($this->items as $item) {
       if (empty($item['queue'])) {
-        throw new \API_Exception("Queue item requires property 'queue'.");
+        throw new \CRM_Core_Exception("Queue item requires property 'queue'.");
       }
       if (empty($item['id'])) {
-        throw new \API_Exception("Queue item requires property 'id'.");
+        throw new \CRM_Core_Exception("Queue item requires property 'id'.");
       }
       $queueNames[$item['queue']] = 1;
     }
     if (count($queueNames) > 1) {
-      throw new \API_Exception("Queue items cannot be mixed. Found queues: " . implode(', ', array_keys($queueNames)));
+      throw new \CRM_Core_Exception("Queue items cannot be mixed. Found queues: " . implode(', ', array_keys($queueNames)));
     }
   }
 

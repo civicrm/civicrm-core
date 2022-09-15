@@ -59,7 +59,7 @@ abstract class SqlFunction extends SqlExpression {
           continue;
         }
         if (!$prefix && !$param['optional']) {
-          throw new \API_Exception("Missing param $name for SQL function " . static::getName());
+          throw new \CRM_Core_Exception("Missing param $name for SQL function " . static::getName());
         }
       }
       elseif ($param['flag_before']) {
@@ -76,7 +76,7 @@ abstract class SqlFunction extends SqlExpression {
           count($exprs) < $param['min_expr'] &&
           !(!$exprs && $param['optional'])
         ) {
-          throw new \API_Exception("Too few arguments to param $name for SQL function " . static::getName());
+          throw new \CRM_Core_Exception("Too few arguments to param $name for SQL function " . static::getName());
         }
         $this->args[$idx]['expr'] = $exprs;
 
@@ -84,7 +84,7 @@ abstract class SqlFunction extends SqlExpression {
       }
     }
     if (trim($arg)) {
-      throw new \API_Exception("Too many arguments given for SQL function " . static::getName());
+      throw new \CRM_Core_Exception("Too many arguments given for SQL function " . static::getName());
     }
   }
 

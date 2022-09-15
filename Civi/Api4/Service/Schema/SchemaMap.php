@@ -25,13 +25,13 @@ class SchemaMap {
    *
    * @return \Civi\Api4\Service\Schema\Joinable\Joinable|NULL
    *   Link to the target table
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getLink($baseTableName, $targetTableAlias): ?Joinable\Joinable {
     $table = $this->getTableByName($baseTableName);
 
     if (!$table) {
-      throw new \API_Exception("Table $baseTableName not found");
+      throw new \CRM_Core_Exception("Table $baseTableName not found");
     }
 
     foreach ($table->getTableLinks() as $link) {

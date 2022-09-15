@@ -24,7 +24,7 @@ trait WorkflowMessageTestTrait {
 
   /**
    * @return \Civi\Api4\Generic\AbstractGetAction
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function findExamples(): \Civi\Api4\Generic\AbstractGetAction {
     return \Civi\Api4\ExampleData::get(0)

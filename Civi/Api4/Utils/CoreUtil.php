@@ -161,7 +161,6 @@ class CoreUtil {
    * @param int|string $userID
    *   Contact ID of the user we are testing,. 0 for the anonymous user.
    * @return bool
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    * @throws \Civi\API\Exception\UnauthorizedException
@@ -208,7 +207,6 @@ class CoreUtil {
    *   Contact ID of the user we are testing, or 0 for the anonymous user.
    *
    * @return bool
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public static function checkAccessDelegated(string $entityName, string $actionName, array $record, int $userID) {

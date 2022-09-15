@@ -74,7 +74,7 @@ class ExportAction extends AbstractAction {
    */
   private function exportRecord(string $entityType, int $entityId, Result $result, $parentName = NULL, $excludeFields = []) {
     if (isset($this->exportedEntities[$entityType][$entityId])) {
-      throw new \API_Exception("Circular reference detected: attempted to export $entityType id $entityId multiple times.");
+      throw new \CRM_Core_Exception("Circular reference detected: attempted to export $entityType id $entityId multiple times.");
     }
     $this->exportedEntities[$entityType][$entityId] = TRUE;
     $select = $pseudofields = [];

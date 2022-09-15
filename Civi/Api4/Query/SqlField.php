@@ -20,7 +20,7 @@ class SqlField extends SqlExpression {
 
   protected function initialize() {
     if ($this->alias && $this->alias !== $this->expr) {
-      throw new \API_Exception("Aliasing field names is not allowed, only expressions can have an alias.");
+      throw new \CRM_Core_Exception("Aliasing field names is not allowed, only expressions can have an alias.");
     }
     $this->fields[] = $this->expr;
   }
