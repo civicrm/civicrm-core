@@ -220,8 +220,14 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       // If we move this to the parent we can check if the entity config 'supports_multiple'
       if ($entity === 'SoftCreditContact') {
         $entityKey = json_encode($mappedField['entity_data']);
-        $entityInstance = $params[$entity][$entityKey] ?? $mappedField['entity_data']['soft_credit'];
-        $entityInstance['Contact'] = array_merge($entityInstance['Contact'] ?? [], [$this->getFieldMetadata($mappedField['name'])['name'] => $this->getTransformedFieldValue($mappedField['name'], $fieldValue)]);
+        if (isset($params[$entity][$entityKey])) {
+          $entityInstance = $params[$entity][$entityKey];
+        }
+        else {
+          $entityInstance = $mappedField['entity_data']['soft_credit'];
+          $entityInstance['Contact']['contact_type'] = $this->getContactTypeForEntity($entity);
+        }
+        $entityInstance['Contact'] = array_merge($entityInstance['Contact'], [$this->getFieldMetadata($mappedField['name'])['name'] => $this->getTransformedFieldValue($mappedField['name'], $fieldValue)]);
         $params[$entity][$entityKey] = $entityInstance;
       }
       else {
@@ -368,7 +374,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         'unique_fields' => ['external_identifier', 'id'],
         'is_contact' => TRUE,
         'supports_multiple' => FALSE,
-        'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore', 'update']) : $this->getActions(['select', 'update', 'update_or_create']),
+        'actions' => $this->isUpdateExisting() ? $this->getActions(['ignore', 'update']) : $this->getActions(['select', 'update', 'save']),
         'selected' => [
           'action' => $this->isUpdateExisting() ? 'ignore' : 'select',
           'contact_type' => $this->getSubmittedValue('contactType'),
@@ -385,7 +391,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         'unique_fields' => ['external_identifier', 'id'],
         'is_contact' => TRUE,
         'is_required' => FALSE,
-        'actions' => array_merge([['id' => 'ignore', 'text' => ts('Do not import')]], $this->getActions(['select', 'update', 'update_or_create'])),
+        'actions' => array_merge([['id' => 'ignore', 'text' => ts('Do not import')]], $this->getActions(['select', 'update', 'save'])),
         'selected' => ['contact_type' => '', 'soft_credit_type_id' => '', 'action' => 'ignore'],
         'default_action' => 'ignore',
         'entity_name' => 'SoftCreditContact',
@@ -426,13 +432,13 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       if (empty($contributionParams['id']) && $this->isUpdateExisting()) {
         throw new CRM_Core_Exception('Empty Contribution and Invoice and Transaction ID. Row was skipped.', CRM_Import_Parser::ERROR);
       }
-      $contactID = $contributionParams['contact_id'] = $this->getContactID($params['Contact'] ?? [], $contributionParams['contact_id'] ?? ($existingContribution['contact_id'] ?? NULL), 'Contact');
+      $contributionParams['contact_id'] = $this->getContactID($params['Contact'] ?? [], $contributionParams['contact_id'] ?? ($existingContribution['contact_id'] ?? NULL), 'Contact', $this->getDedupeRulesForEntity('Contact'));
 
       $softCreditParams = [];
       foreach ($params['SoftCreditContact'] ?? [] as $index => $softCreditContact) {
         $softCreditParams[$index]['soft_credit_type_id'] = $softCreditContact['soft_credit_type_id'];
-        $softCreditParams[$index]['contact_id'] = $this->getContactID($softCreditContact['Contact'], $softCreditContact['id'] ?? NULL, 'SoftCreditContact');
-        if (empty($softCreditParams[$index]['contact_id'])) {
+        $softCreditParams[$index]['contact_id'] = $this->getContactID($softCreditContact['Contact'], $softCreditContact['id'] ?? NULL, 'SoftCreditContact', $this->getDedupeRulesForEntity('SoftCreditContact'));
+        if (empty($softCreditParams[$index]['contact_id']) && in_array($this->getActionForEntity('SoftCreditContact'), ['update', 'select'])) {
           throw new CRM_Core_Exception(ts('Soft Credit Contact not found'));
         }
       }
@@ -441,6 +447,12 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
       // From this point on we are changing stuff - the prior rows were doing lookups and exiting
       // if the lookups failed.
+
+      foreach ($params['SoftCreditContact'] ?? [] as $index => $softCreditContact) {
+        $softCreditParams[$index]['contact_id'] = $this->saveContact('SoftCreditContact', $softCreditContact['Contact']) ?: $softCreditParams[$index]['contact_id'];
+      }
+      $contributionParams['contact_id'] = $this->saveContact('Contact', $params['Contact'] ?? []) ?: $contributionParams['contact_id'];
+
       if (isset($params['SoftCreditContact']) && $this->isUpdateExisting()) {
         //need to check existing soft credit contribution, CRM-3968
         $this->deleteExistingSoftCredit($contributionParams['id']);
@@ -460,7 +472,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         }
       }
       if (!empty($params['Note'])) {
-        $this->processNote($contributionID, $contactID, $params['Note']);
+        $this->processNote($contributionID, $contributionParams['contact_id'], $params['Note']);
       }
       //return soft valid since we need to show how soft credits were added
       // because ? historically we did but this seems a bit obsolete.
@@ -677,6 +689,26 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   }
 
   /**
+   * Save the contact.
+   *
+   * @param string $entity
+   * @param array $contact
+   *
+   * @return int|null
+   *
+   * @throws \Civi\API\Exception\UnauthorizedException|\CRM_Core_Exception
+   */
+  protected function saveContact(string $entity, array $contact): ?int {
+    if (in_array($this->getActionForEntity($entity), ['update', 'save', 'create'])) {
+      return Contact::save()
+        ->setRecords([$contact])
+        ->execute()
+        ->first()['id'];
+    }
+    return NULL;
+  }
+
+  /**
    * Lookup matching contact.
    *
    * This looks up the matching contact from the contact id, external identifier
@@ -819,8 +851,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         'text' => ts('Update existing Contact.'),
         'description' => ts('Update existing Contact. Skip row if not found'),
       ],
-      'update_or_create' => [
-        'id' => 'update_or_create',
+      'save' => [
+        'id' => 'save',
         'text' => ts('Update existing Contact or Create'),
         'description' => ts('Create new contact if not found'),
       ],

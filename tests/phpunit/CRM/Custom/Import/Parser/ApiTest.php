@@ -18,6 +18,8 @@ class CRM_Custom_Import_Parser_ApiTest extends CiviUnitTestCase {
 
   /**
    * Test the full form-flow import.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testImport(): void {
     $this->individualCreate();

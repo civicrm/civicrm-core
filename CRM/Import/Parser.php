@@ -1428,6 +1428,32 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
+   * Get the dedupe rule/s to use for the given entity.
+   *
+   * If none are returned then the code will use a default 'Unsupervised' rule in `getContactID`
+   *
+   * @param string $entity
+   *
+   * @return array
+   * @throws \API_Exception
+   */
+  protected function getDedupeRulesForEntity(string $entity): array {
+    return (array) ($this->getUserJob()['metadata']['entity_configuration'][$entity]['dedupe_rule'] ?? []);
+  }
+
+  /**
+   * Get the import action for the given entity.
+   *
+   * @param string $entity
+   *
+   * @return string|null
+   * @throws \API_Exception
+   */
+  protected function getContactTypeForEntity(string $entity): ?string {
+    return $this->getUserJob()['metadata']['entity_configuration'][$entity]['contact_type'] ?? NULL;
+  }
+
+  /**
    * @param string $entity
    * @param string $action
    *
@@ -2206,7 +2232,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * Get contacts that match the input parameters, using a dedupe rule.
    *
    * @param array $params
-   * @param int|null $dedupeRuleID
+   * @param int|null|array $dedupeRuleID
    * @param bool $isApiMetadata
    *   Is the import using api4 style metadata (in which case no conversion needed) - eventually
    *   only contact import will use a different style (as it supports multiple locations) and the
@@ -2290,12 +2316,14 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @param int|null $contactID
    * @param string $entity
    *   Entity, as described in getImportEntities.
+   * @param array|null $dedupeRules
+   *   Dedupe rules to apply (will default to unsupervised rule)
    *
    * @return int|null
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getContactID(array $contactParams, ?int $contactID, string $entity): ?int {
+  protected function getContactID(array $contactParams, ?int $contactID, string $entity, ?array $dedupeRules = NULL): ?int {
     $contactType = $contactParams['contact_type'] ?? NULL;
     if ($contactID) {
       $this->validateContactID($contactID, $contactType);
@@ -2305,14 +2333,14 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     }
     if (!$contactID) {
       $action = $this->getActionForEntity($entity);
-      $possibleMatches = $this->getPossibleMatchesByDedupeRule($contactParams);
+      $possibleMatches = $this->getPossibleMatchesByDedupeRule($contactParams, $dedupeRules);
       if (count($possibleMatches) === 1) {
         $contactID = array_key_first($possibleMatches);
       }
       elseif (count($possibleMatches) > 1) {
         throw new CRM_Core_Exception(ts('Record duplicates multiple contacts: ') . implode(',', $possibleMatches));
       }
-      elseif (!in_array($action, ['create', 'ignore', 'update_or_create'], TRUE)) {
+      elseif (!in_array($action, ['create', 'ignore', 'save'], TRUE)) {
         throw new CRM_Core_Exception(ts('No matching %1 found', [$entity, 'String']));
       }
     }
@@ -2512,7 +2540,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     $dedupeRules = [];
     if (!empty($dedupeRuleIDs)) {
       foreach ($dedupeRuleIDs as $dedupeRuleID) {
-        $dedupeRules[] = $this->getDedupeRuleName($dedupeRuleID);
+        $dedupeRules[] = is_numeric($dedupeRuleID) ? $this->getDedupeRuleName($dedupeRuleID) : $dedupeRuleID;
       }
       return $dedupeRules;
     }

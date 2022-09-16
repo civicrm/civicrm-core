@@ -49,10 +49,20 @@ trait CRMTraits_Import_ParserTrait {
     $form->buildForm();
     $this->assertTrue($form->validate());
     $form->postProcess();
+    $this->submitPreviewForm($submittedValues);
+  }
+
+  /**
+   * Submit the preview form, triggering the import.
+   *
+   * @param array $submittedValues
+   */
+  protected function submitPreviewForm(array $submittedValues): void {
     $form = $this->getPreviewForm($submittedValues);
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
     $this->assertTrue($form->validate());
+
     try {
       $form->postProcess();
       $this->fail('Expected a redirect');
