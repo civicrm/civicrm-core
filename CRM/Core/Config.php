@@ -323,7 +323,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
   /**
    * Clear db cache.
    */
-  public static function clearDBCache() {
+  public static function clearDBCache(): void {
     $queries = [
       'TRUNCATE TABLE civicrm_acl_cache',
       'TRUNCATE TABLE civicrm_acl_contact_cache',
@@ -356,20 +356,15 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    *   Optional time interval for mysql date function.g '2 day'. This can be used to prevent
    *   tables created recently from being deleted.
    */
-  public static function clearTempTables($timeInterval = FALSE) {
+  public static function clearTempTables($timeInterval = FALSE): void {
 
     $dao = new CRM_Core_DAO();
     $query = "
       SELECT TABLE_NAME as tableName
       FROM   INFORMATION_SCHEMA.TABLES
       WHERE  TABLE_SCHEMA = %1
-      AND (
-        TABLE_NAME LIKE 'civicrm_import_job_%'
-        OR TABLE_NAME LIKE 'civicrm_report_temp%'
-        OR TABLE_NAME LIKE 'civicrm_tmp_d%'
-        )
+      AND TABLE_NAME LIKE 'civicrm_tmp_d%'
     ";
-    // NOTE: Cannot find use-cases where "civicrm_report_temp" would be durable. Could probably remove.
 
     if ($timeInterval) {
       $query .= " AND CREATE_TIME < DATE_SUB(NOW(), INTERVAL {$timeInterval})";
