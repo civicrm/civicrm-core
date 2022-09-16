@@ -35,7 +35,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
     return array_filter($provider->getEntities(), function($entity) {
       // Only include DAO entities from enabled components
       $daoName = $entity['dao'] ?? NULL;
-      return (!$daoName || !defined("{$daoName}::COMPONENT") || \CRM_Core_Component::isEnabled($daoName::COMPONENT));
+      return (!$daoName || $daoName::isComponentEnabled());
     });
   }
 
