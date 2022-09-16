@@ -1389,13 +1389,13 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     // Currency should have been fetched automatically and used to format the value
     $this->assertEquals('GBP', $result[0]['data']['currency']);
-    $this->assertEquals('£ 100.00', $result[0]['columns'][0]['val']);
+    $this->assertEquals('£100.00', $result[0]['columns'][0]['val']);
 
     $this->assertEquals('USD', $result[1]['data']['currency']);
-    $this->assertEquals('$ 200.00', $result[1]['columns'][0]['val']);
+    $this->assertEquals('$200.00', $result[1]['columns'][0]['val']);
 
     $this->assertEquals('JPY', $result[2]['data']['currency']);
-    $this->assertEquals('¥ 500.00', $result[2]['columns'][0]['val']);
+    $this->assertEquals('¥500', $result[2]['columns'][0]['val']);
 
     // Now do a search for the contribution line-items
     $params['savedSearch'] = [
@@ -1412,13 +1412,13 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     // An automatic join should have been added to fetch the contribution currency
     $this->assertEquals('GBP', $result[0]['data']['contribution_id.currency']);
-    $this->assertEquals('£ 100.00', $result[0]['columns'][0]['val']);
+    $this->assertEquals('£100.00', $result[0]['columns'][0]['val']);
 
     $this->assertEquals('USD', $result[1]['data']['contribution_id.currency']);
-    $this->assertEquals('$ 200.00', $result[1]['columns'][0]['val']);
+    $this->assertEquals('$200.00', $result[1]['columns'][0]['val']);
 
     $this->assertEquals('JPY', $result[2]['data']['contribution_id.currency']);
-    $this->assertEquals('¥ 500.00', $result[2]['columns'][0]['val']);
+    $this->assertEquals('¥500', $result[2]['columns'][0]['val']);
   }
 
 }
