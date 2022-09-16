@@ -172,6 +172,16 @@ abstract class SqlExpression {
   }
 
   /**
+   * Checks the name of this sql expression class.
+   *
+   * @param $type
+   * @return bool
+   */
+  public function isType($type): bool {
+    return $this->getType() === $type;
+  }
+
+  /**
    * @return string
    */
   abstract public static function getTitle(): string;
