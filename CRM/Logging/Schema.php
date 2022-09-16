@@ -142,12 +142,13 @@ AND    TABLE_NAME LIKE 'civicrm_%'
     }
 
     // do not log temp import, cache, menu and log tables
-    $this->tables = preg_grep('/^civicrm_import_job_/', $this->tables, PREG_GREP_INVERT);
     $this->tables = preg_grep('/_cache$/', $this->tables, PREG_GREP_INVERT);
     $this->tables = preg_grep('/_log/', $this->tables, PREG_GREP_INVERT);
     $this->tables = preg_grep('/^civicrm_queue_/', $this->tables, PREG_GREP_INVERT);
     //CRM-14672
     $this->tables = preg_grep('/^civicrm_menu/', $this->tables, PREG_GREP_INVERT);
+    // CiviCRM no longer creates temp tables with `_temp` - they are `tmp` - but this is being left in
+    // in case extensions do - since we don't want to suddenly start logging them.
     $this->tables = preg_grep('/_temp_/', $this->tables, PREG_GREP_INVERT);
     // CRM-18178
     $this->tables = preg_grep('/_bak$/', $this->tables, PREG_GREP_INVERT);
