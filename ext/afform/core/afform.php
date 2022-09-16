@@ -337,7 +337,7 @@ function afform_civicrm_angularModules(&$angularModules) {
  *   The module definition.
  * @return array
  *   Array(string $filename => string $html).
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function _afform_get_partials($moduleName, $module) {
   $afform = civicrm_api4('Afform', 'get', [

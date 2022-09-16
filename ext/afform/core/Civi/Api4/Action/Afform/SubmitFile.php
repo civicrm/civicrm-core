@@ -62,7 +62,7 @@ class SubmitFile extends AbstractProcessor {
 
   protected function processForm() {
     if (empty($_FILES['file'])) {
-      throw new \API_Exception('File upload required');
+      throw new \CRM_Core_Exception('File upload required');
     }
     $afformEntity = $this->_formDataModel->getEntity($this->modelName);
     $apiEntity = $this->joinEntity ?: $afformEntity['type'];
@@ -77,7 +77,7 @@ class SubmitFile extends AbstractProcessor {
     }
 
     if (!$entityId) {
-      throw new \API_Exception('Entity not found');
+      throw new \CRM_Core_Exception('Entity not found');
     }
 
     $attachmentParams = [

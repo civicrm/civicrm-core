@@ -197,7 +197,7 @@ EOHTML;
         ->indexBy('name');
       $this->fail('Expected authorization exception from Afform.prefill');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       // Should fail permission check
     }
 
@@ -211,7 +211,7 @@ EOHTML;
         ->execute();
       $this->fail('Expected authorization exception from Afform.submit');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       // Should fail permission check
     }
   }

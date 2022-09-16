@@ -21,7 +21,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
 
   /**
    * @param \Civi\Api4\Generic\Result $result
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function _run(\Civi\Api4\Generic\Result $result) {
     // Adding checkPermissions filters out actions the user is not allowed to perform

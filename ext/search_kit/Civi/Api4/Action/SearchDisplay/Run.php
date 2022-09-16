@@ -32,7 +32,7 @@ class Run extends AbstractRunAction {
 
   /**
    * @param \Civi\Api4\Result\SearchDisplayRunResult $result
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function processResult(\Civi\Api4\Result\SearchDisplayRunResult $result) {
     $entityName = $this->savedSearch['api_entity'];

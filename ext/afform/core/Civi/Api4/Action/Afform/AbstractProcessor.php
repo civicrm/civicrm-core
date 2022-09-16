@@ -62,7 +62,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
 
   /**
    * @param \Civi\Api4\Generic\Result $result
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function _run(Result $result) {
     // This will throw an exception if the form doesn't exist or user lacks permission
@@ -183,7 +183,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @param string $joinEntityType
    * @param int|string $mainEntityId
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected static function getJoinWhereClause(FormDataModel $formDataModel, string $mainEntityName, string $joinEntityType, $mainEntityId) {
     $entity = $formDataModel->getEntity($mainEntityName);
@@ -215,7 +215,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @param $entityName
    * @param $fieldName
    * @return array|null
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getEntityField($entityName, $fieldName) {
     if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__][$entityName])) {

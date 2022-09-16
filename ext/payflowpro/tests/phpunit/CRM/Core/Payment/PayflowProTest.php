@@ -200,7 +200,7 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
    * @param bool $error
    * @param bool $recurring
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function setupMockHandler($id = NULL, $error = FALSE, $recurring = FALSE): void {
     if ($id) {

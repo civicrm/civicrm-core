@@ -17,8 +17,7 @@ use Civi\Api4\Participant;
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_post
  *
- * @throws \CiviCRM_API3_Exception
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function contributioncancelactions_civicrm_post($op, $objectName, $objectId, $objectRef) {
   if ($op === 'edit' && $objectName === 'Contribution'
@@ -34,7 +33,7 @@ function contributioncancelactions_civicrm_post($op, $objectName, $objectId, $ob
  *
  * @param int $contributionID
  *
- * @throws CiviCRM_API3_Exception
+ * @throws CRM_Core_Exception
  */
 function contributioncancelactions_cancel_related_pending_participant_records(int $contributionID): void {
   $pendingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Pending'");
@@ -57,8 +56,8 @@ function contributioncancelactions_cancel_related_pending_participant_records(in
  *
  * @param int $contributionID
  *
- * @throws API_Exception
- * @throws CiviCRM_API3_Exception
+ * @throws CRM_Core_Exception
+ * @throws CRM_Core_Exception
  */
 function contributioncancelactions_cancel_related_pending_memberships(int $contributionID): void {
   $connectedMemberships = (array) LineItem::get(FALSE)->setWhere([

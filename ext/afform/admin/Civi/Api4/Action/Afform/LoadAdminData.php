@@ -246,7 +246,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
    * @param array $entities
    * @param array $info
    * @param array $where
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   private function loadAvailableBlocks($entities, &$info, $where = []) {

@@ -30,7 +30,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * @param CRM_Event_BAO_Event $event
    *
    * @return mixed
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function registerParticipant($params, &$participant, $event) {
     $participantParams = [
@@ -694,7 +694,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * @param int $event_id
    *
    * @return bool
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function apply_discount($discountCode, &$price_set_amount, &$cost, $event_id) {
     $extensions = civicrm_api3('Extension', 'get', [

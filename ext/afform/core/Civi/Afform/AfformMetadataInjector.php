@@ -100,7 +100,6 @@ class AfformMetadataInjector {
    *
    * @param \DOMElement $afField
    * @param array $fieldInfo
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
@@ -167,7 +166,7 @@ class AfformMetadataInjector {
    * @param string|array $entityNames
    * @param string $action
    * @param \DOMElement $afField
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   private static function fillFieldMetadata($entityNames, string $action, \DOMElement $afField):void {
     $fieldName = $afField->getAttribute('name');

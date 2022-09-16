@@ -145,7 +145,7 @@ class Submit extends AbstractProcessor {
    * across multiple entities (contact + n email addresses).
    *
    * @param \Civi\Afform\Event\AfformSubmitEvent $event
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @see afform_civicrm_config
    */
   public static function preprocessContact(AfformSubmitEvent $event): void {
@@ -172,7 +172,7 @@ class Submit extends AbstractProcessor {
 
   /**
    * @param \Civi\Afform\Event\AfformSubmitEvent $event
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @see afform_civicrm_config
    */
   public static function processGenericEntity(AfformSubmitEvent $event) {
@@ -187,7 +187,7 @@ class Submit extends AbstractProcessor {
         $event->setEntityId($index, $saved[$idField]);
         self::saveJoins($event, $index, $saved[$idField], $record['joins'] ?? []);
       }
-      catch (\API_Exception $e) {
+      catch (\CRM_Core_Exception $e) {
         // What to do here? Sometimes we should silently ignore errors, e.g. an optional entity
         // intentionally left blank. Other times it's a real error the user should know about.
       }
@@ -259,7 +259,7 @@ class Submit extends AbstractProcessor {
    * @param int $index
    * @param int|string $entityId
    * @param array $joins
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected static function saveJoins(AfformSubmitEvent $event, $index, $entityId, $joins) {
     foreach ($joins as $joinEntityName => $join) {
@@ -286,7 +286,7 @@ class Submit extends AbstractProcessor {
             'where' => self::getJoinWhereClause($event->getFormDataModel(), $event->getEntityName(), $joinEntityName, $entityId),
           ]);
         }
-        catch (\API_Exception $e) {
+        catch (\CRM_Core_Exception $e) {
           // No records to delete
         }
         $event->setJoinIds($index, $joinEntityName, []);

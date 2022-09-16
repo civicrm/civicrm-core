@@ -43,7 +43,7 @@ class BaseTestClass extends TestCase implements HeadlessInterface, HookInterface
   }
 
   /**
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function tearDown(): void {
@@ -86,7 +86,7 @@ class BaseTestClass extends TestCase implements HeadlessInterface, HookInterface
   /**
    * Create price set.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function createPriceSet(): void {
     $priceSet = PriceSet::create(FALSE)->setValues([
@@ -121,7 +121,7 @@ class BaseTestClass extends TestCase implements HeadlessInterface, HookInterface
   /**
    * Delete extraneous price sets.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function cleanupPriceSets(): void {
     $addedPriceSets = array_keys((array) PriceSet::get(FALSE)

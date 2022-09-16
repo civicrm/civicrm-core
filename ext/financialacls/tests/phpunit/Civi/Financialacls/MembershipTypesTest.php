@@ -36,7 +36,7 @@ class MembershipTypesTest extends BaseTestClass {
 
   /**
    * @return \Civi\Api4\Generic\Result
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function setUpMembershipTypesACLLimited(): Result {
