@@ -73,7 +73,7 @@ function _civicrm_api3_cxn_app_get_spec(&$spec) {
  *
  * @param array $params
  * @return array
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @throws CRM_Core_Exception
  * @throws \Civi\Cxn\Rpc\Exception\InvalidMessageException
  */
@@ -83,7 +83,7 @@ function civicrm_api3_cxn_app_get($params) {
 
   list ($headers, $blob, $code) = CRM_Cxn_CiviCxnHttp::singleton()->send('GET', $url, '');
   if ($code != 200) {
-    throw new API_Exception("Failed to download application list.");
+    throw new CRM_Core_Exception("Failed to download application list.");
   }
 
   $agent = new \Civi\Cxn\Rpc\Agent(NULL, NULL);

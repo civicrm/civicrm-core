@@ -21,7 +21,7 @@
  * @param array $params
  *   Array per getfields metadata.
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  *
  * @return array
  *   Newly created $ufFieldArray
@@ -65,7 +65,7 @@ function civicrm_api3_uf_field_get($params) {
  *
  * @param array $params
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  *
  * @return array
  */
@@ -74,7 +74,7 @@ function civicrm_api3_uf_field_delete($params) {
 
   $ufGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $fieldId, 'uf_group_id');
   if (!$ufGroupId) {
-    throw new API_Exception('Invalid value for field_id.');
+    throw new CRM_Core_Exception('Invalid value for field_id.');
   }
 
   $result = CRM_Core_BAO_UFField::del($fieldId);

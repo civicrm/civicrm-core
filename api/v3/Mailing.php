@@ -23,7 +23,7 @@
  *
  * @return array
  *   API Success Array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_mailing_create($params) {
@@ -34,7 +34,7 @@ function civicrm_api3_mailing_create($params) {
     unset($safeParams['modified_date']);
   }
   if (!$timestampCheck) {
-    throw new API_Exception("Mailing has not been saved, Content maybe out of date, please refresh the page and try again");
+    throw new CRM_Core_Exception("Mailing has not been saved, Content maybe out of date, please refresh the page and try again");
   }
   // If we're going to autosend, then check validity before saving.
   if (empty($params['is_completed']) && !empty($params['scheduled_date'])
@@ -48,7 +48,7 @@ function civicrm_api3_mailing_create($params) {
     $errors = call_user_func($validationFunction, $params);
     if (!empty($errors)) {
       $fields = implode(',', array_keys($errors));
-      throw new CiviCRM_API3_Exception("Mailing cannot be sent. There are missing or invalid fields ($fields).", 'cannot-send', $errors);
+      throw new CRM_Core_Exception("Mailing cannot be sent. There are missing or invalid fields ($fields).", 'cannot-send', $errors);
     }
   }
 
@@ -66,14 +66,14 @@ function civicrm_api3_mailing_create($params) {
  *   Should contain an array of entities to retrieve tokens for.
  *
  * @return array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_mailing_gettokens($params) {
   $tokens = [];
   foreach ((array) $params['entity'] as $ent) {
     $func = lcfirst($ent) . 'Tokens';
     if (!method_exists('CRM_Core_SelectValues', $func)) {
-      throw new API_Exception('Unknown token entity: ' . $ent);
+      throw new CRM_Core_Exception('Unknown token entity: ' . $ent);
     }
     $tokens = array_merge(CRM_Core_SelectValues::$func(), $tokens);
   }
@@ -161,7 +161,7 @@ function _civicrm_api3_mailing_clone_spec(&$spec) {
  * @param array $params
  *
  * @return array
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_mailing_clone($params) {
   $BLACKLIST = [
@@ -270,16 +270,16 @@ function _civicrm_api3_mailing_submit_spec(&$spec) {
  * @param array $params
  *
  * @return array
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_mailing_submit($params) {
   civicrm_api3_verify_mandatory($params, 'CRM_Mailing_DAO_Mailing', ['id']);
 
   if (!isset($params['scheduled_date']) && !isset($updateParams['approval_date'])) {
-    throw new API_Exception("Missing parameter scheduled_date and/or approval_date");
+    throw new CRM_Core_Exception("Missing parameter scheduled_date and/or approval_date");
   }
   if (!is_numeric(CRM_Core_Session::getLoggedInContactID())) {
-    throw new API_Exception("Failed to determine current user");
+    throw new CRM_Core_Exception("Failed to determine current user");
   }
 
   $updateParams = [];
@@ -312,7 +312,7 @@ function civicrm_api3_mailing_submit($params) {
  *
  * @param array $params
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @return array
  */
 function civicrm_api3_mailing_event_bounce($params) {
@@ -325,7 +325,7 @@ function civicrm_api3_mailing_event_bounce($params) {
     return civicrm_api3_create_success($params);
   }
   else {
-    throw new API_Exception(ts('Queue event could not be found'), 'no_queue_event');
+    throw new CRM_Core_Exception(ts('Queue event could not be found'), 'no_queue_event');
   }
 }
 
@@ -520,7 +520,7 @@ function civicrm_api3_mailing_event_open($params) {
  *   Array per getfields metadata.
  *
  * @return array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_mailing_preview($params) {
   $fromEmail = NULL;
@@ -593,12 +593,11 @@ function _civicrm_api3_mailing_send_test_spec(&$spec) {
  * @param array $params
  *
  * @return array
- * @throws \API_Exception
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_mailing_send_test($params) {
   if (!array_key_exists('test_group', $params) && !array_key_exists('test_email', $params)) {
-    throw new API_Exception("Mandatory key(s) missing from params array: test_group and/or test_email field are required");
+    throw new CRM_Core_Exception("Mandatory key(s) missing from params array: test_group and/or test_email field are required");
   }
   civicrm_api3_verify_mandatory($params,
     'CRM_Mailing_DAO_MailingJob',
@@ -709,7 +708,7 @@ function _civicrm_api3_mailing_stats_spec(&$params) {
  * @param array $params
  *
  * @return array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_mailing_stats($params) {
   civicrm_api3_verify_mandatory($params,

@@ -23,7 +23,7 @@ use Civi\Api4\Contribution;
  * @param array $params
  *   Input parameters.
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @return array
  *   Api result array
  */
@@ -50,7 +50,7 @@ function civicrm_api3_contribution_create($params) {
       ->addValue('id', $params['id'] ?? NULL)
       ->addValue('financial_type_id', $params['financial_type_id'] ?? NULL)
       ->execute()->first()['access']) {
-      throw new API_Exception('You do not have permission to create this contribution');
+      throw new CRM_Core_Exception('You do not have permission to create this contribution');
     }
   }
   if (!empty($params['id']) && !empty($params['contribution_status_id'])) {
@@ -60,14 +60,14 @@ function civicrm_api3_contribution_create($params) {
     // action it needs to be blocked there. If it is Ok through a form it needs to be OK through the api
     CRM_Contribute_BAO_Contribution::checkStatusValidation(NULL, $params, $error);
     if (array_key_exists('contribution_status_id', $error)) {
-      throw new API_Exception($error['contribution_status_id']);
+      throw new CRM_Core_Exception($error['contribution_status_id']);
     }
   }
   if (!empty($params['id']) && !empty($params['financial_type_id'])) {
     $error = [];
     CRM_Contribute_BAO_Contribution::checkFinancialTypeChange($params['financial_type_id'], $params['id'], $error);
     if (array_key_exists('financial_type_id', $error)) {
-      throw new API_Exception($error['financial_type_id']);
+      throw new CRM_Core_Exception($error['financial_type_id']);
     }
   }
   if (!isset($params['tax_amount']) && empty($params['line_item'])
@@ -209,18 +209,18 @@ function _civicrm_api3_contribution_create_legacy_support_45(&$params) {
  *   Input parameters.
  *
  * @return array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_contribution_delete($params) {
 
   $contributionID = !empty($params['contribution_id']) ? $params['contribution_id'] : $params['id'];
   if (!empty($params['check_permissions']) && !\Civi\Api4\Utils\CoreUtil::checkAccessDelegated('Contribution', 'delete', ['id' => $contributionID], CRM_Core_Session::getLoggedInContactID() ?: 0)) {
-    throw new API_Exception('You do not have permission to delete this contribution');
+    throw new CRM_Core_Exception('You do not have permission to delete this contribution');
   }
   if (CRM_Contribute_BAO_Contribution::deleteContribution($contributionID)) {
     return civicrm_api3_create_success([$contributionID => 1]);
   }
-  throw new API_Exception('Could not delete contribution');
+  throw new CRM_Core_Exception('Could not delete contribution');
 }
 
 /**
@@ -274,7 +274,7 @@ function civicrm_api3_contribution_get($params) {
  * @param array $params
  *
  * @return array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function _civicrm_api3_contribution_get_support_nonunique_returns($params) {
   $additionalOptions = [];
@@ -472,7 +472,6 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
  *
  * @return array
  *   API result array
- * @throws \API_Exception
  * @throws \CRM_Core_Exception
  * @throws \Exception
  */
@@ -480,10 +479,10 @@ function civicrm_api3_contribution_completetransaction($params): array {
   $contribution = new CRM_Contribute_BAO_Contribution();
   $contribution->id = $params['id'];
   if (!$contribution->find(TRUE)) {
-    throw new API_Exception('A valid contribution ID is required', 'invalid_data');
+    throw new CRM_Core_Exception('A valid contribution ID is required', 'invalid_data');
   }
   if ($contribution->contribution_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
-    throw new API_Exception(ts('Contribution already completed'), 'contribution_completed');
+    throw new CRM_Core_Exception(ts('Contribution already completed'), 'contribution_completed');
   }
 
   $params['trxn_id'] = $params['trxn_id'] ?? $contribution->trxn_id;
@@ -604,7 +603,7 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
  *
  * @return array
  *   Api result array.
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_contribution_repeattransaction($params) {
 
@@ -616,7 +615,7 @@ function civicrm_api3_contribution_repeattransaction($params) {
     // @todo this duplicates work done by CRM_Contribute_BAO_Contribution::repeatTransaction & should be removed.
     $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($params['contribution_recur_id']);
     if (empty($templateContribution)) {
-      throw new CiviCRM_API3_Exception('Contribution.repeattransaction failed to get original_contribution_id for recur with ID: ' . $params['contribution_recur_id']);
+      throw new CRM_Core_Exception('Contribution.repeattransaction failed to get original_contribution_id for recur with ID: ' . $params['contribution_recur_id']);
     }
   }
   else {
@@ -628,7 +627,7 @@ function civicrm_api3_contribution_repeattransaction($params) {
       ->addWhere('contribution_recur_id', 'IS NOT EMPTY')
       ->execute()->first();
     if (empty($templateContribution)) {
-      throw new CiviCRM_API3_Exception("Contribution.repeattransaction failed to load the given original_contribution_id ($params[original_contribution_id]) because it does not exist, or because it does not belong to a recurring contribution");
+      throw new CRM_Core_Exception("Contribution.repeattransaction failed to load the given original_contribution_id ($params[original_contribution_id]) because it does not exist, or because it does not belong to a recurring contribution");
     }
   }
 
@@ -692,7 +691,6 @@ function civicrm_api3_contribution_repeattransaction($params) {
  *
  * @return mixed
  * @throws \CRM_Core_Exception
- * @throws \CiviCRM_API3_Exception
  */
 function _ipn_process_transaction($params, $contribution, $input, $ids) {
   CRM_Core_Error::deprecatedFunctionWarning('API3 contribution.completetransaction or contribution.repeattransaction');

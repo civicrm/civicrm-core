@@ -125,8 +125,8 @@ function civicrm_api3_group_contact_create($params) {
  *
  * @param array $params
  * @return array
- * @throws API_Exception
- * @throws CiviCRM_API3_Exception
+ * @throws CRM_Core_Exception
+ * @throws CRM_Core_Exception
  * @deprecated
  */
 function civicrm_api3_group_contact_delete($params) {
@@ -146,7 +146,7 @@ function civicrm_api3_group_contact_delete($params) {
   }
   $groupContact2 = civicrm_api3('GroupContact', 'get', $checkParams);
   if ($groupContact['count'] == 0 && $groupContact2['count'] == 0) {
-    throw new API_Exception('Cannot Delete GroupContact');
+    throw new CRM_Core_Exception('Cannot Delete GroupContact');
   }
   $params['status'] = CRM_Utils_Array::value('status', $params, empty($params['skip_undelete']) ? 'Removed' : 'Deleted');
   // "Deleted" isn't a real option so skip the api wrapper to avoid pseudoconstant validation
@@ -265,7 +265,7 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
  * @param array $params
  *
  * @return bool
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_group_contact_update_status($params) {
 

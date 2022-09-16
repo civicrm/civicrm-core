@@ -27,7 +27,7 @@ function contribution_page_create_example() {
   try {
     $result = civicrm_api3('ContributionPage', 'create', $params);
   }
-  catch (CiviCRM_API3_Exception $e) {
+  catch (CRM_Core_Exception $e) {
     // Handle error here.
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();

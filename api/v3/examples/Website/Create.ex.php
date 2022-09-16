@@ -20,7 +20,7 @@ function website_create_example() {
   try {
     $result = civicrm_api3('Website', 'create', $params);
   }
-  catch (CiviCRM_API3_Exception $e) {
+  catch (CRM_Core_Exception $e) {
     // Handle error here.
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();

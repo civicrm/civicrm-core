@@ -26,7 +26,7 @@ use Civi\Api4\Membership;
  *
  * @return array
  *   Array of Order, if error an array with an error id and error message
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_order_get(array $params): array {
   $contributions = [];
@@ -70,8 +70,8 @@ function _civicrm_api3_order_get_spec(array &$params) {
  * @return array
  *   Api result array
  *
- * @throws \CiviCRM_API3_Exception
- * @throws API_Exception
+ * @throws \CRM_Core_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_order_create(array $params): array {
   civicrm_api3_verify_one_mandatory($params, NULL, ['line_items', 'total_amount']);
@@ -129,7 +129,7 @@ function civicrm_api3_order_create(array $params): array {
     if ($entityParams['entity'] === 'participant') {
       if (isset($entityParams['participant_status_id'])
         && (!CRM_Event_BAO_ParticipantStatusType::getIsValidStatusForClass($entityParams['participant_status_id'], 'Pending'))) {
-        throw new CiviCRM_API3_Exception('Creating a participant via the Order API with a non "pending" status is not supported');
+        throw new CRM_Core_Exception('Creating a participant via the Order API with a non "pending" status is not supported');
       }
       $entityParams['participant_status_id'] = $entityParams['participant_status_id'] ?? 'Pending from incomplete transaction';
       $entityParams['status_id'] = $entityParams['participant_status_id'];
@@ -190,8 +190,8 @@ function civicrm_api3_order_create(array $params): array {
  *   Input parameters.
  *
  * @return array
- * @throws API_Exception
- * @throws CiviCRM_API3_Exception
+ * @throws CRM_Core_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_order_delete(array $params): array {
   $contribution = civicrm_api3('Contribution', 'get', [
@@ -202,7 +202,7 @@ function civicrm_api3_order_delete(array $params): array {
     $result = civicrm_api3('Contribution', 'delete', $params);
   }
   else {
-    throw new API_Exception('Only test orders can be deleted.');
+    throw new CRM_Core_Exception('Only test orders can be deleted.');
   }
   return civicrm_api3_create_success($result['values'], $params, 'Order', 'delete');
 }
@@ -214,7 +214,7 @@ function civicrm_api3_order_delete(array $params): array {
  *   Input parameters.
  *
  * @return array
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_order_cancel(array $params) {
   $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -304,7 +304,7 @@ function _civicrm_api3_order_delete_spec(array &$params) {
  *
  * @param array $membershipParams
  *
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function _order_create_wrangle_membership_params(array &$membershipParams) {
   $fields = Membership::getFields(FALSE)->execute()->indexBy('name');
