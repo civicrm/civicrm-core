@@ -3182,10 +3182,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $params['trxnParams']['trxn_id'] = $params['prevContribution']->trxn_id;
         }
         $params['trxnParams']['status_id'] = $params['prevContribution']->contribution_status_id;
-
-        if (!(($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses)
-            || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatuses))
-          && $params['contribution']->contribution_status_id == array_search('Completed', $contributionStatuses))
+        $previousContributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['prevContribution']->contribution_status_id);
+        if (!(($previousContributionStatus === 'Pending' || $previousContributionStatus === 'In Progress')
+          && $contributionStatus === 'Completed')
         ) {
           $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
           $params['trxnParams']['check_number'] = $params['prevContribution']->check_number;
