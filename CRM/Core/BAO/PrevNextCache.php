@@ -388,7 +388,6 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
    *  the number of searched contacts, not the matches found.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function refillCache($rgid, $gid, $criteria, $checkPermissions, $searchLimit = 0) {
     $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions, $searchLimit);

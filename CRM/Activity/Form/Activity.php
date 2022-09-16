@@ -610,7 +610,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * Build Quick form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     if ($this->_action & (CRM_Core_Action::DELETE | CRM_Core_Action::RENEW)) {
@@ -886,7 +885,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * @param array $params
    *
    * @return array|null
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function postProcess($params = NULL) {
     if ($this->_action & CRM_Core_Action::DELETE) {

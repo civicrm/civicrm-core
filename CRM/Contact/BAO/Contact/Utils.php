@@ -246,9 +246,7 @@ WHERE  id IN ( $idString )
    * @param int|null $previousEmployerID
    * @param bool $newContact
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function createCurrentEmployerRelationship($contactID, $employerID, $previousEmployerID = NULL, $newContact = FALSE): void {
     if (!$employerID) {
@@ -357,7 +355,6 @@ WHERE  id IN ( $idString )
    *
    * @param int $previousEmployerID
    *
-   * @throws CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   private static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate = FALSE, $previousEmployerID = NULL) {
@@ -402,7 +399,6 @@ WHERE contact_a.employer_id=contact_b.id AND contact_b.id={$organizationId}; ";
    *   Contact id ( mostly organization contact id).
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function clearCurrentEmployer($contactId, $employerId = NULL) {
     $query = "UPDATE civicrm_contact
@@ -450,7 +446,7 @@ WHERE id={$contactId}; ";
    * @param string $title
    *   fieldset title.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function buildOnBehalfForm(&$form, $contactType, $countryID, $stateID, $title) {
     $form->assign('contact_type', $contactType);

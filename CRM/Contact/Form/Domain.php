@@ -114,7 +114,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   /**
    * Build the form object.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm(): void {
     $this->addField('name', ['label' => ts('Organization Name')], TRUE);

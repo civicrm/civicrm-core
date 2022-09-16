@@ -511,7 +511,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    *   Contribution page id.
    * @param object $recur
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function recurringNotify($contributionID, $type, $recur): void {
     $contribution = Contribution::get(FALSE)

@@ -341,9 +341,7 @@ WHERE  id IN ( $groupIDs )
    * @param bool $force
    *   deprecated parameter = Should we force a search through.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function load($group, $force = FALSE) {
     $groupID = (int) $group->id;
@@ -500,7 +498,7 @@ ORDER BY   gc.contact_id, g.children
    * @param int $groupID
    *
    * @return string
-   * @throws API_Exception
+   * @throws CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    * @throws CRM_Core_Exception
    */
@@ -542,7 +540,6 @@ ORDER BY   gc.contact_id, g.children
    *
    * @return string
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected static function getCustomSearchSQL(array $savedSearch, int $groupID) {
     $savedSearchID = $savedSearch['id'];
@@ -575,7 +572,6 @@ ORDER BY   gc.contact_id, g.children
    *
    * @return string
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected static function getQueryObjectSQL(array $savedSearch, int $groupID): string {
     $savedSearchID = $savedSearch['id'];
@@ -641,9 +637,7 @@ ORDER BY   gc.contact_id, g.children
    *   to make it easy to switch to multiple.
    * @param CRM_Utils_SQL_TempTable $tempTableObject
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected static function buildGroupContactTempTable(array $groupIDs, $tempTableObject): void {
     $groups = Group::get(FALSE)->addWhere('id', 'IN', $groupIDs)
@@ -663,9 +657,7 @@ ORDER BY   gc.contact_id, g.children
    * @param int[] $groupIDs
    * @param string $temporaryTable
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function populateTemporaryTableWithContactsInGroups(array $groupIDs, string $temporaryTable): void {
     $childAndParentGroupIDs = array_merge($groupIDs, CRM_Contact_BAO_GroupNesting::getDescendentGroupIds($groupIDs));
@@ -792,9 +784,7 @@ ORDER BY   gc.contact_id, g.children
    * @param string|null $children
    *
    * @return void
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected static function insertGroupContactsIntoTempTable(string $tempTableName, int $groupID, ?int $savedSearchID, ?string $children): void {
     if ($savedSearchID) {

@@ -568,7 +568,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
   /**
    * Get the metadata for fields to be included on the grant search form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getSearchFieldMetadata() {
     $fields = [
@@ -587,7 +587,6 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
    *
    * @param \CRM_Event_Form_Search $form
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public static function buildSearchForm(&$form) {

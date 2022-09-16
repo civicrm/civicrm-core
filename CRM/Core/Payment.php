@@ -677,7 +677,7 @@ abstract class CRM_Core_Payment {
    * @return array
    *   Array of payment fields appropriate to the payment processor.
    *
-   * @throws CiviCRM_API3_Exception
+   * @throws CRM_Core_Exception
    */
   public function getPaymentFormFields() {
     if ($this->_paymentProcessor['billing_mode'] == 4) {
@@ -752,7 +752,7 @@ abstract class CRM_Core_Payment {
    *
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getAllFields() {
     $paymentFields = array_intersect_key($this->getPaymentFormFieldsMetadata(), array_flip($this->getPaymentFormFields()));

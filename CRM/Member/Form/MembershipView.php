@@ -92,7 +92,6 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
    *   Primary membership info (membership_id, contact_id, membership_type ...).
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function relAction($action, $owner) {
     switch ($action) {

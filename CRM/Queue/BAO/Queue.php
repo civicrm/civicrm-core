@@ -97,7 +97,7 @@ class CRM_Queue_BAO_Queue extends CRM_Queue_DAO_Queue implements \Civi\Core\Hook
    * @param \CRM_Queue_Queue $queue
    * @param array $items
    * @param array $outcomes
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @see CRM_Utils_Hook::queueRun()
    */
   public static function hook_civicrm_queueRun_task(CRM_Queue_Queue $queue, array $items, array &$outcomes) {

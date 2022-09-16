@@ -773,7 +773,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * Process incoming notification.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function handlePaymentNotification() {
     $params = array_merge($_GET, $_REQUEST);

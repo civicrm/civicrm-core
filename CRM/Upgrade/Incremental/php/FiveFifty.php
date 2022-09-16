@@ -60,8 +60,7 @@ class CRM_Upgrade_Incremental_php_FiveFifty extends CRM_Upgrade_Incremental_Base
    * (Getting the other entities done is a stretch goal).
    *
    * @return bool
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function convertMappingFieldLabelsToNames(): bool {
     CRM_Import_ImportProcessor::convertSavedFields();

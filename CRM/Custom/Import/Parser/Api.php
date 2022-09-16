@@ -67,7 +67,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
       civicrm_api3('custom_value', 'create', $params);
       $this->setImportStatus($rowNumber, 'IMPORTED', '', $formatted['id']);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $this->setImportStatus($rowNumber, 'ERROR', '', $e->getMessage());
     }
   }

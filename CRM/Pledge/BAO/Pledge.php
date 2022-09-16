@@ -981,7 +981,7 @@ SELECT  pledge.contact_id              as contact_id,
               try {
                 civicrm_api3('activity', 'create', $activityParams);
               }
-              catch (CiviCRM_API3_Exception $e) {
+              catch (CRM_Core_Exception $e) {
                 throw new CRM_Core_Exception('Failed creating Activity for Pledge Reminder: ' . $e->getMessage());
               }
               $returnMessages[] = "Payment reminder sent to: {$pledgerName} - {$toEmail}";

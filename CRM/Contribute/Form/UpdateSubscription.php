@@ -207,7 +207,6 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
   /**
    * Called after the user submits the form.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function postProcess() {

@@ -88,7 +88,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
    * This updates them to hold the name - eg. 'total_amount'.
    *
    * @return bool
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function convertMappingFieldLabelsToNames(): bool {
     // Contribution fields....

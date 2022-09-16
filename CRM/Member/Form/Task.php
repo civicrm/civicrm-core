@@ -107,7 +107,7 @@ class CRM_Member_Form_Task extends CRM_Core_Form_Task {
   /**
    * Get the rows form the search, keyed to make the token processor happy.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getRows(): array {
     if (empty($this->rows)) {

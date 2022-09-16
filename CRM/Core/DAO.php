@@ -2636,7 +2636,7 @@ SELECT contact_id
    * Refer to CRM-17454 for information on the danger of querying the information
    * schema to derive this.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getReferencesToContactTable() {
     if (isset(\Civi::$statics[__CLASS__]) && isset(\Civi::$statics[__CLASS__]['contact_references'])) {
@@ -2707,7 +2707,7 @@ SELECT contact_id
    *
    * @param array $cidRefs
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function appendCustomContactReferenceFields(&$cidRefs) {
     $fields = civicrm_api3('CustomField', 'get', [

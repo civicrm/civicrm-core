@@ -162,7 +162,7 @@ class CRM_Import_ImportProcessor {
    *
    * @param array $metadata
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function setMetadata(array $metadata) {
     $fieldDetails = civicrm_api3('CustomField', 'get', [
@@ -231,7 +231,7 @@ class CRM_Import_ImportProcessor {
    *
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getMappingFields(): array {
     if (empty($this->mappingFields) && !empty($this->getMappingID())) {
@@ -268,7 +268,7 @@ class CRM_Import_ImportProcessor {
   /**
    * Get the names of the mapped fields.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getFieldNames() {
     return CRM_Utils_Array::collect('name', $this->getMappingFields());
@@ -280,7 +280,7 @@ class CRM_Import_ImportProcessor {
    * @param int $columnNumber
    *
    * @return string
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getFieldName($columnNumber) {
     return $this->getFieldNames()[$columnNumber];
@@ -292,7 +292,7 @@ class CRM_Import_ImportProcessor {
    * @param int $columnNumber
    *
    * @return string
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getRelationshipKey($columnNumber) {
     $field = $this->getMappingFields()[$columnNumber];
@@ -306,7 +306,7 @@ class CRM_Import_ImportProcessor {
    *
    * @return string|null
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getValidRelationshipKey($columnNumber) {
     $key = $this->getRelationshipKey($columnNumber);
@@ -320,7 +320,7 @@ class CRM_Import_ImportProcessor {
    *
    * @return int
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getIMProviderID($columnNumber) {
     return $this->getMappingFields()[$columnNumber]['im_provider_id'] ?? NULL;
@@ -333,7 +333,7 @@ class CRM_Import_ImportProcessor {
    *
    * @return int
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getPhoneTypeID($columnNumber) {
     return $this->getMappingFields()[$columnNumber]['phone_type_id'] ?? NULL;
@@ -346,7 +346,7 @@ class CRM_Import_ImportProcessor {
    *
    * @return int
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getWebsiteTypeID($columnNumber) {
     return $this->getMappingFields()[$columnNumber]['website_type_id'] ?? NULL;
@@ -361,7 +361,7 @@ class CRM_Import_ImportProcessor {
    *
    * @return int
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getLocationTypeID($columnNumber) {
     return $this->getMappingFields()[$columnNumber]['location_type_id'] ?? 0;
@@ -376,7 +376,7 @@ class CRM_Import_ImportProcessor {
    *
    * @return int
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getPhoneOrIMTypeID($columnNumber) {
     return $this->getIMProviderID($columnNumber) ?? $this->getPhoneTypeID($columnNumber);
@@ -385,7 +385,7 @@ class CRM_Import_ImportProcessor {
   /**
    * Get the location types of the mapped fields.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getFieldLocationTypes() {
     return CRM_Utils_Array::collect('location_type_id', $this->getMappingFields());
@@ -394,7 +394,7 @@ class CRM_Import_ImportProcessor {
   /**
    * Get the phone types of the mapped fields.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getFieldPhoneTypes() {
     return CRM_Utils_Array::collect('phone_type_id', $this->getMappingFields());
@@ -403,7 +403,7 @@ class CRM_Import_ImportProcessor {
   /**
    * Get the names of the im_provider fields.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getFieldIMProviderTypes() {
     return CRM_Utils_Array::collect('im_provider_id', $this->getMappingFields());
@@ -412,7 +412,7 @@ class CRM_Import_ImportProcessor {
   /**
    * Get the names of the website fields.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getFieldWebsiteTypes() {
     return CRM_Utils_Array::collect('im_provider_id', $this->getMappingFields());
@@ -423,7 +423,7 @@ class CRM_Import_ImportProcessor {
    *
    * @return CRM_Contact_Import_Parser_Contact
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getImporterObject() {
     $importer = new CRM_Contact_Import_Parser_Contact($this->getFieldNames());
@@ -435,7 +435,7 @@ class CRM_Import_ImportProcessor {
   /**
    * Load the mapping from the datbase into the format that would be received from the UI.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function loadSavedMapping() {
     $fields = civicrm_api3('MappingField', 'get', [
@@ -492,7 +492,7 @@ class CRM_Import_ImportProcessor {
    * This is preserved as a copy the upgrade script can use - since the
    * upgrade allows the other to be 'fixed'.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function legacyLoadSavedMapping() {
     $fields = civicrm_api3('MappingField', 'get', [
@@ -578,7 +578,7 @@ class CRM_Import_ImportProcessor {
    * @param int $column
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getSavedQuickformDefaultsForColumn($column) {
     $fieldMapping = [];
@@ -613,7 +613,7 @@ class CRM_Import_ImportProcessor {
   /**
    * This exists for use in the FiveFifty Upgrade
    *
-   * @throws \API_Exception|\CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function convertSavedFields(): void {
     $mappings = Mapping::get(FALSE)

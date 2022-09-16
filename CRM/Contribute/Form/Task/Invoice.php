@@ -209,7 +209,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * @param array $contactIds
    *   Contact Id.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function printPDF($contribIDs, &$params, $contactIds) {
     // get all the details needed to generate a invoice

@@ -1556,7 +1556,7 @@ ORDER BY civicrm_custom_group.weight,
    * @param string $prefix
    *   Prefix for custom grouptree assigned to template.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function buildQuickForm(&$form, &$groupTree, $inactiveNeeded = FALSE, $prefix = '') {
     $form->assign_by_ref("{$prefix}groupTree", $groupTree);
@@ -1591,7 +1591,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return array
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function extractGetParams(&$form, $type) {
     if (empty($_GET)) {

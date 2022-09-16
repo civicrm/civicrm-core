@@ -48,7 +48,6 @@ class CRM_Import_Form_DataSourceConfig extends CRM_Import_Forms {
    *
    * @return array
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
@@ -70,7 +69,7 @@ class CRM_Import_Form_DataSourceConfig extends CRM_Import_Forms {
    * @param string $fieldName
    *
    * @return mixed|null
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getSubmittedValue(string $fieldName) {
     $userJob = $this->getUserJob();

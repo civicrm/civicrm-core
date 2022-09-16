@@ -47,7 +47,7 @@ class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
   /**
    * Process the form submission.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function postProcess(): void {
     CRM_ACL_BAO_Cache::resetCache();

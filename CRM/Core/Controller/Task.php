@@ -22,7 +22,6 @@ abstract class CRM_Core_Controller_Task extends CRM_Core_Controller {
    * @param bool $modal
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
 

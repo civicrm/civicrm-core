@@ -249,7 +249,7 @@ class CRM_Contact_Page_AJAX {
         ]);
         $result = civicrm_api3('relationship', 'create', $params);
       }
-      catch (CiviCRM_API3_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         $ret['is_error'] = 1;
         $ret['error_message'] = $e->getMessage();
       }
@@ -811,7 +811,7 @@ LIMIT {$offset}, {$rowCount}
         civicrm_api3('Exception', 'create', ['contact_id1' => $cid, 'contact_id2' => $oid]);
         return TRUE;
       }
-      catch (CiviCRM_API3_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         return FALSE;
       }
     }

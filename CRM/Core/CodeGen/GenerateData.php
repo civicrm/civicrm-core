@@ -1135,7 +1135,7 @@ class CRM_Core_CodeGen_GenerateData {
   /**
    * This method populates the civicrm_group_contact table
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   private function addGroup() {
     // add the 3 groups first
@@ -1244,7 +1244,7 @@ class CRM_Core_CodeGen_GenerateData {
    *
    * It allows the members of the advisory group to edit the Summer volunteers group.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   private function addACL(): void {
     $optionValueID = OptionValue::create(FALSE)->setValues([

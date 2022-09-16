@@ -72,7 +72,7 @@ class CRM_Core_Payment_BaseIPN {
    * @deprecated use the api.
    *
    * @return bool
-   * @throws \CiviCRM_API3_Exception|\CRM_Core_Exception
+   * @throws \CRM_Core_Exception
    */
   public function failed($objects) {
     CRM_Core_Error::deprecatedFunctionWarning('use the api');
@@ -141,7 +141,7 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $objects
    *
    * @return bool
-   * @throws \CiviCRM_API3_Exception|\CRM_Core_Exception
+   * @throws \CRM_Core_Exception
    */
   public function cancelled($objects) {
     CRM_Core_Error::deprecatedFunctionWarning('Use Contribution create api to cancel the contribution');
@@ -221,7 +221,7 @@ class CRM_Core_Payment_BaseIPN {
    *
    * @param $participantID
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   private function cancelParticipant($participantID) {
     // @fixme https://lab.civicrm.org/dev/core/issues/927 Cancelling membership etc is not desirable for all use-cases and we should be able to disable it
@@ -303,7 +303,7 @@ class CRM_Core_Payment_BaseIPN {
    *        // @todo check if it is a repeat transaction & call repeattransaction instead.
    *        civicrm_api3('contribution', 'completetransaction', array('id' => $this->transaction_id));
    *      }
-   *     catch (CiviCRM_API3_Exception $e) {
+   *     catch (CRM_Core_Exception $e) {
    *     if (!stristr($e->getMessage(), 'Contribution already completed')) {
    *       $this->handleError('error', $this->transaction_id  . $e->getMessage(), 'ipn_completion', 9000, 'An error may
    *         have occurred. Please check your receipt is correct');
@@ -319,7 +319,6 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $objects
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function completeTransaction($input, $ids, $objects) {
     CRM_Core_Error::deprecatedFunctionWarning('Use Payment.create api');
@@ -359,7 +358,7 @@ class CRM_Core_Payment_BaseIPN {
    *   Related object IDs.
    * @param array $objects
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function sendMail($input, $ids, $objects) {
     CRM_Core_Error::deprecatedFunctionWarning('this should be done via completetransaction api');

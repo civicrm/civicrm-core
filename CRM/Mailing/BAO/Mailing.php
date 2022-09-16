@@ -1498,7 +1498,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *   $mailing      The new mailing object
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function create(array $params) {
 
@@ -1694,7 +1693,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @param string $entity
    *   'groups' or 'mailings'.
    * @param array $entityIds
-   * @throws CiviCRM_API3_Exception
+   * @throws CRM_Core_Exception
    */
   public static function replaceGroups($mailingId, $type, $entity, $entityIds) {
     $values = [];

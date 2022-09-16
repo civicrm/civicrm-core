@@ -74,7 +74,7 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
             ],
           ]);
         }
-        catch (CiviCRM_API3_Exception $e) {
+        catch (CRM_Core_Exception $e) {
           continue;
         }
         if (!$phone['api.Contact.getsingle']['do_not_sms'] && $phone['phone']) {

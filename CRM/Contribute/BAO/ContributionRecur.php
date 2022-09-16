@@ -448,8 +448,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *
    * @param int $id
    *
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    * @return int|NULL the ID of the newly created template contribution.
    */
@@ -529,7 +528,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *
    * @return array
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getTemplateContribution(int $id, array $inputOverrides = []): array {
     $recurringContribution = ContributionRecur::get(FALSE)
@@ -745,7 +744,6 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *
    * @return array
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function addRecurLineItems($recurId, $contribution) {
     $foundLineItems = FALSE;
@@ -764,7 +762,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
                 'is_transactional' => FALSE,
               ]);
             }
-            catch (CiviCRM_API3_Exception $e) {
+            catch (CRM_Core_Exception $e) {
               // we are catching & ignoring errors as an extra precaution since lost IPNs may be more serious that lost membership_payment data
               // this fn is unit-tested so risk of changes elsewhere breaking it are otherwise mitigated
             }
@@ -797,7 +795,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @param int $contributionStatusID
    * @param float $contributionAmount
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function updateRecurLinkedPledge($contributionID, $contributionRecurID, $contributionStatusID, $contributionAmount) {
     $returnProperties = ['id', 'pledge_id'];
@@ -894,7 +892,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   /**
    * Get the metadata for fields to be included on the search form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getContributionRecurSearchFieldMetadata() {
     $fields = [
@@ -940,7 +938,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *   - Failed
    * @param string $effectiveDate
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function updateOnNewPayment($recurringContributionID, $paymentStatus, string $effectiveDate = 'now') {
 
@@ -995,7 +993,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *
    * @param \CRM_Contribute_DAO_Contribution $contribution
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function updateOnTemplateUpdated(CRM_Contribute_DAO_Contribution $contribution) {
@@ -1053,7 +1051,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @param int $financial_type_id
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function calculateRecurLineItems($recurId, $total_amount, $financial_type_id) {
     $originalContribution = civicrm_api3('Contribution', 'getsingle', [
@@ -1119,7 +1117,6 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @internal
    *
    * @return string
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public static function getRecurFromAddress(int $id): string {

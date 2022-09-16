@@ -417,7 +417,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   /**
    * Process the form submission.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function postProcess(): void {
     if ($this->_action & CRM_Core_Action::DELETE) {

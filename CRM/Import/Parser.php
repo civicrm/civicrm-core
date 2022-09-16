@@ -147,7 +147,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *
    * @return array
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getUserJob(): array {
     if (empty($this->userJob)) {
@@ -191,7 +191,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *
    * @return bool
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function isComplete() :bool {
@@ -334,7 +333,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @return array
    *   eg. ['first_name' => 'First Name'.....]
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    *
    * @todo - we are constructing the metadata before we
    * have set the contact type so we re-do it here.
@@ -363,7 +362,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *
    * @return bool
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function isSkipDuplicates(): bool {
     return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_SKIP;
@@ -1421,7 +1420,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @param string $entity
    *
    * @return string
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getActionForEntity(string $entity): string {
     return $this->getUserJob()['metadata']['entity_configuration'][$entity]['action'] ?? ($this->getImportEntities()[$entity]['default_action'] ?? 'select');
@@ -1540,7 +1539,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *   Value as it came in from the datasource.
    *
    * @return string|array|bool|int
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getTransformedFieldValue(string $fieldName, $importedValue) {
     if (empty($importedValue)) {
@@ -1620,7 +1619,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *
    * @return false|array
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getFieldOptions(string $fieldName) {
     return $this->getFieldMetadata($fieldName, TRUE)['options'];
@@ -1764,7 +1763,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @param string $fieldName
    *
    * @return mixed|null
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getFieldEntity(string $fieldName) {
     if ($fieldName === 'do_not_import' || $fieldName === '') {
@@ -1788,7 +1787,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   /**
    * Validate the import file, updating the import table with results.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function validate(): void {
@@ -1813,7 +1811,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *
    * @param array $values
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function validateValues(array $values): void {
@@ -1998,7 +1995,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    *   or as returned from getMappingFieldFromMapperInput
    *
    * @return string
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getMappedFieldLabel(array $mappedField): string {
     // doNotImport is on it's way out - skip fields will be '' once all is done.
@@ -2016,7 +2013,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @param array $values
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getMappedRow(array $values): array {
     $params = [];
@@ -2039,7 +2036,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * Also 'im_provider_id' is mapped to the 'real' field name 'provider_id'
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getFieldMappings(): array {
     $mappedFields = [];
@@ -2065,7 +2062,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @param int $offset
    *
    * @return bool
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public static function runJob(\CRM_Queue_TaskContext $taskContext, int $userJobID, int $limit, int $offset): bool {
@@ -2169,7 +2165,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @return int|null
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function lookupExternalIdentifier(?string $externalIdentifier, ?string $contactType, ?int $contactID): ?int {
     if (!$externalIdentifier) {
@@ -2440,7 +2435,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @param $name
    *
    * @return mixed
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function loadRules(array $where = []) {

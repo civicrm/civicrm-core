@@ -137,7 +137,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    *   Payment instrument value.
    *
    * @return null|int
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getInstrumentFinancialAccount($paymentInstrumentValue) {
     if (!isset(\Civi::$statics[__CLASS__]['instrument_financial_accounts'][$paymentInstrumentValue])) {

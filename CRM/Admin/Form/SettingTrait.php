@@ -173,7 +173,6 @@ trait CRM_Admin_Form_SettingTrait {
    * Add fields in the metadata to the template.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function addFieldsDefinedInSettingsMetadata() {
     $this->addSettingsToFormFromMetadata();
@@ -323,7 +322,6 @@ trait CRM_Admin_Form_SettingTrait {
    *
    * All others are pending conversion.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   protected function setDefaultsForMetadataDefinedFields() {
@@ -351,7 +349,7 @@ trait CRM_Admin_Form_SettingTrait {
    * @param array $params
    *   Form input.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function saveMetadataDefinedSettings($params) {
     $settings = $this->getSettingsToSetByMetadata($params);
@@ -402,7 +400,7 @@ trait CRM_Admin_Form_SettingTrait {
   /**
    * Add settings to form if the metadata designates they should be on the page.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function addSettingsToFormFromMetadata() {
     $filter = $this->getSettingPageFilter();

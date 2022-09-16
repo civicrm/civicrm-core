@@ -65,7 +65,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    *
    *
    * @return object
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function add(&$params) {
@@ -263,7 +263,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    * @return array
    *   Rendered message, consistent of 'subject', 'text', 'html'
    *   Ex: ['subject' => 'Hello Bob', 'text' => 'It\'s been so long since we sent you an automated notification!']
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @see sendTemplate()
    */
@@ -279,7 +278,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    *   Mixed render parameters. See sendTemplate() for more details.
    * @return array
    *   Tuple of [$mailContent, $updatedParams].
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @see sendTemplate()
    */
@@ -388,7 +386,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    * @return array
    *   Array of four parameters: a boolean whether the email was sent, and the subject, text and HTML templates
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
   public static function sendTemplate(array $params): array {
     // Handle isEmailPdf here as the unit test on that function deems it 'non-conforming'.
@@ -463,7 +460,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    * @param string|null $language
    *
    * @return array
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected static function loadTemplate(string $workflowName, bool $isTest, int $messageTemplateID = NULL, $groupName = NULL, ?array $messageTemplateOverride = NULL, ?string $subjectOverride = NULL, ?string $language = NULL): array {

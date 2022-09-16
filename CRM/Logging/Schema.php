@@ -75,15 +75,15 @@ class CRM_Logging_Schema {
    * @param array $fieldSpec
    *
    * @return bool
-   * @throws API_Exception
+   * @throws CRM_Core_Exception
    */
   public static function checkLoggingSupport(&$value, $fieldSpec) {
     if (!(CRM_Core_DAO::checkTriggerViewPermission(FALSE)) && $value) {
-      throw new API_Exception(ts("In order to use this functionality, the installation's database user must have privileges to create triggers and views (if binary logging is enabled – this means the SUPER privilege). This install does not have the required privilege(s) enabled."));
+      throw new CRM_Core_Exception(ts("In order to use this functionality, the installation's database user must have privileges to create triggers and views (if binary logging is enabled – this means the SUPER privilege). This install does not have the required privilege(s) enabled."));
     }
     // dev/core#1812 Disable logging in a multilingual environment.
     if (CRM_Core_I18n::isMultilingual() && $value) {
-      throw new API_Exception(ts("Logging is not supported in a multilingual environment!"));
+      throw new CRM_Core_Exception(ts("Logging is not supported in a multilingual environment!"));
     }
     return TRUE;
   }
@@ -318,7 +318,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    *     'forceEngineMigration' - force engine upgrade from ARCHIVE to InnoDB?
    *
    * @return int $updateTablesCount
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function updateLogTableSchema($params) {
     $updateLogConn = FALSE;

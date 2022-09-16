@@ -1710,7 +1710,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   a controlled way. To convert the field the jcalendar code needs to be removed from the
    *   tpl as well. That file is intended to be EOL.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Exception
    * @return mixed
    *   HTML_QuickForm_Element

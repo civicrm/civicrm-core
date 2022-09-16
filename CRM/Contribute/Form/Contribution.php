@@ -219,7 +219,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Set variables up before form is built.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
     // Check permission for action.
@@ -473,9 +472,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   /**
    * Build the form object.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
   public function buildQuickForm() {
     if ($this->_id) {
@@ -1009,7 +1006,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *
    * @throws \CRM_Core_Exception
    * @throws \Civi\Payment\Exception\PaymentProcessorException
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function processCreditCard($submittedValues, $lineItem, $contactID) {
     $isTest = ($this->_mode == 'test') ? 1 : 0;
@@ -1177,9 +1174,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
             // This has now been set to 1 in the DB - declare it here also
             $contribution->contribution_status_id = 1;
           }
-          catch (CiviCRM_API3_Exception $e) {
+          catch (CRM_Core_Exception $e) {
             if ($e->getErrorCode() != 'contribution_completed') {
-              \Civi::log()->error('CRM_Contribute_Form_Contribution::processCreditCard CiviCRM_API3_Exception: ' . $e->getMessage());
+              \Civi::log()->error('CRM_Contribute_Form_Contribution::processCreditCard CRM_Core_Exception: ' . $e->getMessage());
               throw new CRM_Core_Exception('Failed to update contribution in database');
             }
           }
@@ -1241,7 +1238,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @return \CRM_Contribute_DAO_Contribution
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   private function processFormContribution(
     $params,
@@ -1455,7 +1451,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @return CRM_Contribute_BAO_Contribution
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function testSubmit($params, $action, $creditCardMode = NULL) {
@@ -1519,7 +1514,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @return \CRM_Contribute_BAO_Contribution
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   protected function submit($submittedValues, $action, $pledgePaymentID) {
@@ -2035,7 +2029,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *
    * @return string|null
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getPreviousContributionStatus(): ?string {
     if (!$this->getContributionID()) {
@@ -2060,7 +2054,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * is that it might exclude the current status of the contribution.
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getAvailableContributionStatuses(): array {
     if (!$this->getPreviousContributionStatus()) {

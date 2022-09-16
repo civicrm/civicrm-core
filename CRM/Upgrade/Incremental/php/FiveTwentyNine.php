@@ -93,7 +93,6 @@ class CRM_Upgrade_Incremental_php_FiveTwentyNine extends CRM_Upgrade_Incremental
    *
    * @return bool
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public static function installEventCart(CRM_Queue_TaskContext $ctx) {

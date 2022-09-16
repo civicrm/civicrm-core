@@ -222,7 +222,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    *
    * @return void
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     self::buildQuickEntityForm();

@@ -40,7 +40,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
    *
    * @return bool
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function isActive($contactType) {
     $contact = self::contactTypeInfo();
@@ -55,7 +55,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
    * @return array
    *   Array of basic contact types information.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function basicTypeInfo($includeInactive = FALSE) {
@@ -72,7 +72,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
    * @return array
    *   Array of basic contact types
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function basicTypes($all = FALSE) {
@@ -84,7 +84,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
    * @param string $key
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function basicTypePairs($all = FALSE, $key = 'name') {
@@ -107,7 +107,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
    * @return array
    *   Array of sub type information, subset of getAllContactTypes.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function subTypeInfo($contactType = NULL, $all = FALSE) {
     $contactTypes = self::getAllContactTypes();
@@ -134,7 +134,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
    * @return array
    *   all subtypes OR list of subtypes associated to
    *   a given basic contact type
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function subTypes($contactType = NULL, $all = FALSE, $columnName = 'name', $ignoreCache = FALSE) {
     if ($columnName === 'name') {
@@ -212,7 +212,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
    *
    * @return array|string
    *   Array of basictypes with name as 'built-in name' and 'label' as value
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function contactTypePairs($all = FALSE, $typeName = NULL, $delimiter = NULL) {
     $types = self::contactTypeInfo($all);
@@ -613,7 +613,7 @@ WHERE contact_sub_type LIKE '%{$subType}%'";
    * @param string $typeName
    *
    * @return string
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getLabel($typeName) {
     $types = self::contactTypeInfo(TRUE);
@@ -860,7 +860,7 @@ WHERE ($subtypeClause)";
    * SQL query instead of calling APIv4 to avoid an infinite loop.
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getAllContactTypes() {
     $cache = Civi::cache('contactTypes');

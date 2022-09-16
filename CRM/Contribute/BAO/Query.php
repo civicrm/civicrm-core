@@ -98,7 +98,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    * @param CRM_Contact_BAO_Query $query
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function where(&$query) {
     self::initializeAnySoftCreditClause($query);
@@ -122,7 +121,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    * @param array $values
    * @param CRM_Contact_BAO_Query $query
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public static function whereClauseSingle(&$values, &$query) {
@@ -883,7 +881,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
   /**
    * Get the metadata for fields to be included on the search form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getSearchFieldMetadata() {
     $fields = [
@@ -906,7 +904,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    * @param \CRM_Contribute_Form_Search $form
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function buildSearchForm(&$form) {
 

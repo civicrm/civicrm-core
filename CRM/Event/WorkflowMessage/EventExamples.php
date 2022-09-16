@@ -15,7 +15,7 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
   /**
    * Get the examples this class is able to deliver.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getExamples(): iterable {
     $workflows = ['event_online_receipt', 'event_offline_receipt'];
@@ -39,7 +39,7 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
    *
    * @param array $example
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function build(array &$example): void {
     $workFlow = WorkflowMessage::get(TRUE)->addWhere('name', '=', $example['workflow'])->execute()->first();
@@ -55,9 +55,7 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
    * @param \CRM_Event_WorkflowMessage_EventOnlineReceipt|\CRM_Event_WorkflowMessage_EventOfflineReceipt $messageTemplate
    * @param array $example
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   private function addExampleData(GenericWorkflowMessage $messageTemplate, $example): void {
@@ -70,7 +68,7 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
    *
    * @return array
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   private function getPriceSets(): ?array {
     // Permission check defaults to true - likely implicitly OK but may need to be false.
@@ -86,7 +84,7 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
    * @param bool $isQuickConfig
    *
    * @return array|null
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   private function getPriceSet(bool $isQuickConfig): ?array {
     $priceSetEntity = PriceSetEntity::get(FALSE)

@@ -25,7 +25,6 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Forms {
   /**
    * Set variables up before form is built.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function preProcess(): void {
@@ -57,7 +56,6 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Forms {
   /**
    * Assign the relevant smarty variables.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */

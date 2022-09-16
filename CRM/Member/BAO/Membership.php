@@ -41,7 +41,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Member_BAO_Membership
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function add(&$params) {
     $oldStatus = $oldType = NULL;
@@ -232,7 +232,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *   Deprecated parameter The array that holds all the db ids.
    *
    * @return CRM_Member_BAO_Membership|CRM_Core_Error
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    *
    * @throws CRM_Core_Exception
    */
@@ -469,7 +469,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *   array of contact_id of all related contacts.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function checkMembershipRelationship($membershipTypeID, $contactId, $action = CRM_Core_Action::ADD) {
     $contacts = [];
@@ -789,7 +788,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    *   True if only Memberships with same parent org as the $memType wanted, false otherwise.
    *
    * @return array|bool
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getContactMembership($contactID, $memType, $isTest, $membershipId = NULL, $onlySameParentOrg = FALSE) {
     //check for owner membership id, if it exists update that membership instead: CRM-15992
@@ -1338,7 +1337,6 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    *   Membership object.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function createRelatedMemberships($params, $dao) {
     unset($params['membership_id']);
@@ -1556,7 +1554,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    *
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function buildMembershipTypeValues($form, $membershipTypeID = [], $activeOnly = FALSE) {
     $membershipTypeIDS = (array) $membershipTypeID;
@@ -1582,7 +1580,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * @param bool $activeOnly
    *
    * @return int
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getContactMembershipCount(int $contactID, $activeOnly = FALSE): int {
     try {
@@ -1794,7 +1792,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @return array
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function processMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $memParams = [], $contribution = NULL, $lineItems = []) {
     CRM_Core_Error::deprecatedFunctionWarning('use the order api, BAO functions should only be called from unit tested core code.');
@@ -2049,7 +2046,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @return int
    *   Count of updated contacts.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   protected static function updateDeceasedMembersStatuses() {
@@ -2133,7 +2129,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @param array $params
    *
    * @return bool
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected static function hasExistingInheritedMembership($params) {
     foreach (civicrm_api3('Membership', 'get', ['contact_id' => $params['contact_id']])['values'] as $membership) {
@@ -2157,7 +2153,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @param int $membershipId
    * @param array $lineItem
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function processPriceSet($membershipId, $lineItem) {
     //FIXME : need to move this too
@@ -2222,7 +2218,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public static function updateAllMembershipStatus($params = []) {
@@ -2338,7 +2333,7 @@ WHERE {$whereClause}";
    * @param CRM_Core_DAO $membership
    *   The membership to be processed
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   private static function processOverriddenUntilDateMembership($membership) {
     $isOverriddenUntilDate = !empty($membership->is_override) && !empty($membership->status_override_end_date);
@@ -2407,7 +2402,6 @@ WHERE {$whereClause}";
    *
    * @return CRM_Contribute_BAO_Contribution
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function recordMembershipContribution(&$params) {
     $contributionParams = [];

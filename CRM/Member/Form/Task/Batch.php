@@ -188,7 +188,6 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
    * Process the form after the input has been submitted and validated.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -206,7 +205,6 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
    *
    * @return mixed
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function submit(array $params) {
     $dates = [

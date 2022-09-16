@@ -118,7 +118,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    *
    * @return array|array[]
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function selfServiceRecurLinks(int $recurID): array {
     $links = [];
@@ -184,7 +183,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    *
    * @return array|array[]
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function dashboardRecurLinks(int $recurID, int $contactID): array {
     $links = [];
@@ -413,7 +411,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
 
   /**
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
@@ -450,7 +447,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * loads, it decides the which action has to be taken for the page.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function run() {
     $this->preProcess();

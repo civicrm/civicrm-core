@@ -365,7 +365,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   /**
    * Process the form submission.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function postProcess() {
@@ -889,7 +888,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @return \CRM_Contribute_BAO_Contribution
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   private function processContribution(
     $params, $result, $contactID,

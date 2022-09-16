@@ -327,7 +327,7 @@ WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
    * @return array
    *   Array of event summary values
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getEventSummary() {
     $eventSummary = $eventIds = [];
@@ -1064,7 +1064,7 @@ WHERE civicrm_event.is_active = 1
    * @param bool $returnMessageText
    *
    * @return array|null
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function sendMail($contactID, $values, $participantId, $isTest = FALSE, $returnMessageText = FALSE) {
 
@@ -1470,8 +1470,6 @@ WHERE civicrm_event.is_active = 1
    * @param array $profileFields
    *
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function displayProfile(&$params, $gid, &$groupTitle, &$values, &$profileFields = []) {
     if ($gid) {
@@ -2051,7 +2049,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    *
    * @return bool|array
    *   Whether the user has permission for this event (or if eventId=NULL an array of permissions)
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function checkPermission(int $eventId, $permissionType = CRM_Core_Permission::VIEW) {
     switch ($permissionType) {
@@ -2121,7 +2119,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @param int $eventId
    *
    * @return array $allEvents, $createdEvents
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   private static function checkPermissionGetInfo($eventId = NULL) {
     $params = [
@@ -2154,7 +2152,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    *
    * @return array
    *   Array of events with permissions (array_keys=permissions)
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getAllPermissions() {
     if (!isset(Civi::$statics[__CLASS__]['permissions'])) {

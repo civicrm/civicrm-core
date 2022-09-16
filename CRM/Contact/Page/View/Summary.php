@@ -104,9 +104,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
   /**
    * View summary details of a contact.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function view() {
     // Add js for tabs, in-place editing, and jstree for tags
@@ -453,7 +451,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
    * @param string $entity
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getLocationValues(int $contact_id, string $entity): array {
     $fieldMap = [

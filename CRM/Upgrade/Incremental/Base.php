@@ -235,7 +235,7 @@ class CRM_Upgrade_Incremental_Base {
    * @param CRM_Queue_TaskContext $ctx
    * @param string $name
    * @return bool
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function removePaymentProcessorType(CRM_Queue_TaskContext $ctx, $name) {
     $processors = civicrm_api3('PaymentProcessor', 'getcount', ['payment_processor_type_id' => $name]);
