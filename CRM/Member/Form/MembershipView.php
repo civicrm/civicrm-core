@@ -399,7 +399,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
       $values['membership_type'] = CRM_Core_TestEntity::appendTestText($values['membership_type']);
     }
 
-    $subscriptionCancelled = CRM_Member_BAO_Membership::isSubscriptionCancelled($this->membershipID);
+    $subscriptionCancelled = CRM_Member_BAO_Membership::isSubscriptionCancelled((int) $this->membershipID);
     $values['auto_renew'] = ($autoRenew && !$subscriptionCancelled) ? 'Yes' : 'No';
 
     //do check for campaigns
