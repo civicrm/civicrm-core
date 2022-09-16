@@ -1150,8 +1150,8 @@ function _civicrm_api3_contact_deprecation() {
  *
  * @param array $params
  *   Allowed array keys are:
- *   -int main_id: main contact id with whom merge has to happen
- *   -int other_id: duplicate contact which would be deleted after merge operation
+ *   -int to_keep_id: main contact id with whom merge has to happen
+ *   -int to_remove_id: duplicate contact which would be deleted after merge operation
  *   -string mode: "safe" skips the merge if there are no conflicts. Does a force merge otherwise.
  *
  * @return array

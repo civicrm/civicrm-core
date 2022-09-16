@@ -25,7 +25,7 @@ use Civi\Api4\Contact;
 /**
  * @group headless
  */
-class ContactGetDuplicatesTest extends CustomTestBase {
+class ContactDuplicatesTest extends CustomTestBase {
 
   public function testGetDuplicatesUnsupervised() {
     $email = uniqid('test@');
@@ -138,6 +138,45 @@ class ContactGetDuplicatesTest extends CustomTestBase {
     $this->assertCount(2, $found);
     $this->assertContains($testContacts[2], $found);
     $this->assertContains($testContacts[4], $found);
+  }
+
+  public function testMergeDuplicates():void {
+    $email = uniqid('test@');
+
+    $testContacts = $this->saveTestRecords('Contact', [
+      'records' => [['first_name' => 'Jo'], ['first_name' => 'Not']],
+      'defaults' => ['email_primary.email' => $email],
+    ])->column('id');
+
+    // Run merge in "safe mode" which will stop because of the name conflicts
+    $result = Contact::mergeDuplicates(FALSE)
+      ->setContactId($testContacts[0])
+      ->setDuplicateId($testContacts[1])
+      ->execute();
+
+    $this->assertCount(0, $result[0]['merged']);
+    $this->assertCount(1, $result[0]['skipped']);
+    $check = Contact::get(FALSE)
+      ->addWhere('is_deleted', '=', FALSE)
+      ->addWhere('id', 'IN', $testContacts)
+      ->execute();
+    $this->assertCount(2, $check);
+
+    // Run merge in "aggressive mode" which will overwrite the name conflicts
+    $result = Contact::mergeDuplicates(FALSE)
+      ->setContactId($testContacts[0])
+      ->setDuplicateId($testContacts[1])
+      ->setMode('aggressive')
+      ->execute();
+
+    $this->assertCount(1, $result[0]['merged']);
+    $this->assertCount(0, $result[0]['skipped']);
+    $check = Contact::get(FALSE)
+      ->addWhere('is_deleted', '=', FALSE)
+      ->addWhere('id', 'IN', $testContacts)
+      ->execute();
+    $this->assertCount(1, $check);
+    $this->assertEquals('Jo', $check[0]['first_name']);
   }
 
 }

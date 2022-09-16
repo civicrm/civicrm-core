@@ -19,7 +19,7 @@ use Civi\Api4\Utils\FormattingUtil;
 
 /**
  * Get matching contacts based on a dedupe rule
- * @method setDedupeRule(string $dedupeRule)
+ * @method $this setDedupeRule(string $dedupeRule)
  * @method string getDedupeRule()
  */
 class GetDuplicates extends \Civi\Api4\Generic\DAOCreateAction {
