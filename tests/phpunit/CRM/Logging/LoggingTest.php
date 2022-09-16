@@ -25,7 +25,7 @@ class CRM_Logging_LoggingTest extends CiviUnitTestCase {
    * Check that log tables are created even for non standard custom fields
    * tables.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testLoggingNonStandardCustomTableName(): void {
     $this->createCustomGroupWithFieldOfType(['table_name' => 'abcd']);

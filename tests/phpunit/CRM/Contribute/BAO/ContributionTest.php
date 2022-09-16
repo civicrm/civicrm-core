@@ -672,7 +672,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * assignProportionalLineItems() method (add and edit modes of participant)
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testAssignProportionalLineItems(): void {
     // This test doesn't seem to manage financials properly, possibly by design
@@ -699,7 +698,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * @return CRM_Contribute_BAO_Contribution
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function addParticipantWithContribution() {
     // creating price set, price field
@@ -1024,7 +1022,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    *   punctuation used to refer to thousands.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider getThousandSeparators
    */
   public function testCreateProportionalEntryZeroAmount(string $thousandSeparator): void {
@@ -1241,7 +1238,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * This function tests whether the contribution tokens are replaced with
    * values from contribution.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testReplaceContributionTokens(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Contribution', 'title' => 'contribution stuff']);
@@ -1503,9 +1500,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * The pledge status should be updated. I believe the contribution should
    * also be unlinked but the goal at this point is no change.
    *
-   * @throws CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testCancelOrderWithPledge(): void {
     $this->ids['contact'][0] = $this->individualCreate();
@@ -1528,9 +1523,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * Test contribution update when more than one quick
    * config line item is linked to contribution.
    *
-   * @throws CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testContributionQuickConfigTwoLineItems(): void {
     $contactId1 = $this->individualCreate();
@@ -1738,7 +1731,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   /**
    * Test status updates triggering activity creation and value propagation
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testContributionStatusUpdateActivityPropagation() {

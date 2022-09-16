@@ -163,7 +163,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     try {
       Contact::get(FALSE)->addJoin('Address AS a')->execute();
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $message = $e->getMessage();
     }
     $this->assertEquals('Illegal join alias: "a"', $message);
@@ -172,7 +172,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     try {
       Contact::get(FALSE)->addJoin('Address AS add.ress')->execute();
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $message = $e->getMessage();
     }
     $this->assertEquals('Illegal join alias: "add.ress"', $message);
@@ -182,7 +182,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
       $longAlias = str_repeat('z', 257);
       Contact::get(FALSE)->addJoin("Address AS $longAlias")->execute();
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $message = $e->getMessage();
     }
     $this->assertEquals("Illegal join alias: \"$longAlias\"", $message);

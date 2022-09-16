@@ -1011,7 +1011,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    * contacts in apiv3 style.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testActivityUpdate(): void {
     $result = $this->callAPISuccess('activity', 'create', $this->_params);

@@ -338,7 +338,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
    *
    * @link https://issues.civicrm.org/jira/browse/CRM-11856
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testAlterOptionValue() {
     $this->_populateOptionAndCustomGroup('string');

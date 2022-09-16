@@ -32,7 +32,7 @@ class CRM_Contribute_Form_Task_PDFTest extends CiviUnitTestCase {
    * Test the send pdf task filters out contacts who should not receive the
    * receipt.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testSendPDF(): void {
     $variants = [[], ['do_not_email' => TRUE], ['email' => ''], ['is_deceased' => TRUE], ['on_hold' => 1]];

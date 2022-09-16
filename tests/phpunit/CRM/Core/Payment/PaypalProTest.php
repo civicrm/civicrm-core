@@ -18,7 +18,7 @@ class CRM_Core_Payment_PaypalProTest extends CiviUnitTestCase {
   use CRM_Core_Payment_PaypalProTrait;
 
   /**
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function setUp(): void {
     parent::setUp();
@@ -36,7 +36,7 @@ class CRM_Core_Payment_PaypalProTest extends CiviUnitTestCase {
    * Test doing a one-off payment.
    *
    * @throws \Civi\Payment\Exception\PaymentProcessorException
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testSinglePayment() {
     $this->setupMockHandler();

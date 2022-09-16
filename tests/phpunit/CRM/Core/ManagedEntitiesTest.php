@@ -155,7 +155,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * @param string $moduleName
    * @param string $managedName
    * @return array|null
-   * @throws CiviCRM_API3_Exception
+   * @throws CRM_Core_Exception
    */
   private function getManagedEntity(string $moduleName, string $managedName):? array {
     $dao = new CRM_Core_DAO_Managed();

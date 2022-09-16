@@ -137,7 +137,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
   /**
    * Test the content of the dashboard.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testDashboardContentContributions(): void {
     $this->contributionCreate(['contact_id' => $this->contactID]);
@@ -160,7 +160,6 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
    * Test the presence of a "Pay Now" button on partial payments
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testDashboardPartialPayments(): void {
     $contributionId = $this->contributionCreate([

@@ -100,9 +100,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * Test that import parser will not fail when same external_identifier found
    * of deleted contact.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testImportParserWithDeletedContactExternalIdentifier(): void {
     $contactId = $this->individualCreate([
@@ -124,9 +122,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * In this case the contact has no external identifier.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testImportParserWithUpdateWithoutExternalIdentifier(): void {
     [$originalValues, $result] = $this->setUpBaseContact();
@@ -142,9 +138,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * In this case the contact has no external identifier.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testImportParserWithUpdateWithCustomRule(): void {
     $this->createCustomGroupWithFieldsOfAllTypes();
@@ -194,9 +188,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * In this case the contact has no external identifier.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testImportParserWithUpdateWithCustomRuleNoExternalIDMatch(): void {
     $this->createCustomGroupWithFieldsOfAllTypes();
@@ -311,7 +303,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * The subtype is not updated, as there is conflicting contact data.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testImportParserUpdateWithExistingRelatedMatch(): void {
     $contactID = $this->individualCreate([
@@ -449,9 +441,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test that the import parser adds the address to the right location.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testImportBillingAddress(): void {
     [$contactValues] = $this->setUpBaseContact();
@@ -739,9 +729,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test greeting imports.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testGreetings(): void {
     $contactValues = [
@@ -787,9 +775,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * There is an expectation that you can import by label here.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testPrefixLabel(): void {
     $this->callAPISuccess('OptionValue', 'create', ['option_group_id' => 'individual_prefix', 'name' => 'new_one', 'label' => 'special', 'value' => 70]);
@@ -824,9 +810,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test that labels work for importing custom data.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCustomDataLabel(): void {
     $this->createCustomGroupWithFieldOfType([], 'select');
@@ -939,9 +923,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test importing 2 phones of different types.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testImportTwoPhonesDifferentTypes(): void {
     $processor = new CRM_Import_ImportProcessor();
@@ -1127,7 +1109,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @dataProvider importDataProvider
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \League\Csv\CannotInsertRecord
    */
@@ -1157,7 +1138,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testImportContactToGroup(): void {
@@ -1229,7 +1209,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * If it's not gonna import it should fail at the validation stage...
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testImportGenders(): void {
@@ -1258,7 +1237,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test importing state country & county.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testImportCountryStateCounty(): void {
@@ -1327,7 +1305,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @param string $csv
    * @param int $dateType
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testValidateDateData(string $csv, int $dateType): void {
@@ -1369,7 +1346,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testImportContactSubTypes(): void {
     ContactType::create()->setValues([
@@ -1421,7 +1398,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test location importing, including for related contacts.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testImportLocations(): void {
     $csv = 'individual_locations_with_related.csv';
@@ -1680,9 +1657,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * Ensure we can import multiple preferred_communication_methods, single
    * gender, and single preferred language using both labels and values.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testImportFieldsWithVariousOptions(): void {
     $processor = new CRM_Import_ImportProcessor();
@@ -1779,7 +1754,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @param array $submittedValues
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function getDataSourceAndParser(string $csv, array $mapper, array $submittedValues): array {
@@ -1803,7 +1778,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * @param int $contactID
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function addChild(int $contactID): void {
     $relatedContactID = $this->individualCreate();
@@ -1824,7 +1799,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
 
   /**
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   private function getRelationships(): array {
@@ -1912,7 +1887,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test mapping fields within the Parser class.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testMapFields(): void {
@@ -1979,9 +1954,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * https://github.com/civicrm/civicrm-core/blob/ca13ec46eae2042604e4e106c6cb3dc0439db3e2/CRM/Dedupe/Finder.php#L238
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testImportParserDoesNotMatchPrimaryToRelated(): void {
@@ -2039,7 +2012,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
 
   /**
    * @return mixed
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function getUserJobID($submittedValues = []) {
@@ -2073,7 +2046,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test geocode validation.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testImportGeocodes(): void {
@@ -2097,7 +2069,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @param array $submittedValues
    *   Any submitted values overrides.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function validateCSV(string $csv, array $mapper, array $submittedValues = []): void {
     [$dataSource, $parser] = $this->getDataSourceAndParser($csv, $mapper, $submittedValues);
@@ -2200,7 +2172,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * Get the contacts we imported (Susie Jones & family).
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getImportedContacts(): array {
     return (array) Contact::get()
@@ -2226,9 +2198,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @dataProvider getBooleanDataProvider
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testImportParserWithExternalIdForRelationship(bool $isOrganizationProvided): void {
     $contactImportValues = [
@@ -2263,7 +2233,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @param array $values
    * @param string $expected
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function importValues($userJobID, array $values, string $expected): void {

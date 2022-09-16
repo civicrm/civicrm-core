@@ -28,7 +28,6 @@ class CRM_Contribute_Form_Task_StatusTest extends CiviUnitTestCase {
   /**
    * Test update pending contribution with sending a confirmation mail.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    * @throws \Exception
    */

@@ -52,7 +52,7 @@ trait CRMTraits_Custom_CustomDataTrait {
         ->execute()
         ->first()['id'];
     }
-    catch (API_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $this->fail('Could not create group ' . $e->getMessage());
     }
     return $this->ids['CustomGroup'][$identifier];
@@ -192,7 +192,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @param array $values
    *
    * @return int
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function addOptionToCustomField(string $key, array $values): int {
     $optionGroupID = CustomField::get(FALSE)

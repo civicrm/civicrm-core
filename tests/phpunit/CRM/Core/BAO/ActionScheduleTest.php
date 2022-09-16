@@ -851,8 +851,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   * @throws \API_Exception
    */
   public function tearDown(): void {
     $this->deleteTestObjects();
@@ -875,7 +873,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * It should exist but this class over-deletes in not-fully-diagnosed places.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getMembershipTypeID(): int {
     $generalTypeID = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'membership_type_id', 'General');
@@ -1033,7 +1031,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *   Ex: array('subject' => '/^Hello, Alice!/').
    *   Keys: subject, body_text, body_html, from_name, from_email.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    * @dataProvider mailerExamples
@@ -1126,7 +1123,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Test calculated activity schedule.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testActivityDateTimeMatchNonRepeatableSchedule(): void {
@@ -1175,7 +1171,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Test "minute" as a valid unit.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testActivityDateTimeMinuteUnit(): void {
@@ -1327,9 +1322,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * For contacts/members which match schedule based on join/start date,
    * an email should be sent.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMembershipDateMatch(): void {
     $contactID = $this->individualCreate(array_merge($this->fixtures['contact'], ['email' => 'test-member@example.com']));
@@ -1376,7 +1369,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * CRM-21675: Support parent and smart group in 'Limit to' field
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testScheduleReminderWithParentGroup(): void {
     // Contact A with birth-date at '07-07-2005' and gender - Male, later got added in smart group
@@ -1467,9 +1459,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * For contacts/members which match schedule based on join date,
    * an email should be sent.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMembershipJoinDateNonMatch(): void {
     $this->createMembershipFromFixture('rolling_membership', '', ['email' => 'test-member@example.com']);
@@ -1490,9 +1480,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Test that the first and SECOND notifications are sent out.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMembershipEndDateRepeat(): void {
     // creates membership with end_date = 20120615
@@ -1555,9 +1543,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * between
    *  see CRM-15376
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMembershipEndDateRepeatChangedEndDate_CRM_15376(): void {
     // creates membership with end_date = 20120615
@@ -1595,9 +1581,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * For contacts/members which match schedule based on end date,
    * an email should be sent.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMembershipEndDateMatch(): void {
     // creates membership with end_date = 20120615
@@ -1698,9 +1682,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * reminder for the first contact returned in a query for renewed
    * memberships. Other contacts wouldn't get the mail.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMultipleMembershipEndDateMatch(): void {
     $contactID = $this->callAPISuccess('Contact', 'create', array_merge($this->fixtures['contact'], ['email' => 'test-member@example.com']))['id'];
@@ -1774,9 +1756,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * For contacts/members which match schedule based on end date,
    * an email should be sent.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMembershipEndDateNoMatch(): void {
     // creates membership with end_date = 20120615
@@ -1935,9 +1915,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * Check that limit_to + an empty recipients doesn't sent to multiple
    * contacts.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMembershipLimitToNone(): void {
     // creates membership with end_date = 20120615
@@ -1966,9 +1944,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Test handling of reference date for memberships.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMembershipWithReferenceDate(): void {
     $membership = $this->createMembershipFromFixture('rolling_membership', 'Current', ['email' => 'member@example.com']);
@@ -2026,9 +2002,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Test multiple membership reminder.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMembershipOnMultipleReminder(): void {
     $membership = $this->createMembershipFromFixture('rolling_membership', 'Current', ['email' => 'member@example.com']);
@@ -2155,7 +2129,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Test reminders sent on custom data anniversary.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testContactCustomDate_Anniversary(): void {
@@ -2185,7 +2158,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * Test sched reminder set via registration date.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testEventTypeRegistrationDate(): void {
     $contact = $this->individualCreate(['email' => 'test-event@example.com']);
@@ -2257,7 +2229,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * Test sched reminder set via start date.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testEventTypeStartDate(): void {
     // Create event+participant with start_date = 20120315, end_date = 20120615.
@@ -2735,9 +2706,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Test absolute date handling for membership.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testMembershipScheduleWithAbsoluteDate(): void {
@@ -2781,9 +2750,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * @param array $membershipOverrides
    *
    * @return array
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function createMembershipFromFixture(string $fixture, string $status, array $emailParams = [], array $membershipOverrides = []): array {

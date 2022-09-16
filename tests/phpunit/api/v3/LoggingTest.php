@@ -30,9 +30,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Clean up log tables.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function tearDown(): void {
     $this->quickCleanup(['civicrm_email', 'civicrm_address']);

@@ -61,7 +61,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * Set up for test.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setUp(): void {
     parent::setUp();
@@ -91,7 +90,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    *
    * @return int
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @todo resolve this with parent function.
    */
   protected function priceSetCreate($type = 'Radio') {
@@ -274,7 +272,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
 
   /**
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCRM19273() {
     // When a line item is 'resurrected' the financial_items attached to it are wrong.
@@ -304,7 +301,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * CRM-21245: Test that Contribution status doesn't changed to 'Pending Refund' from 'Partially Paid' if the partially paid amount is lower then newly selected fee amount
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCRM21245() {
     $this->registerParticipantAndPay(50);
@@ -321,7 +317,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * Test that proper financial items are recorded for cancelled line items
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCRM20611() {
     $this->registerParticipantAndPay();
@@ -374,7 +369,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * Test to ensure that correct financial records are entered on text price field fee change on event registration
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCRM21513() {
     $this->_priceSetID = $this->priceSetCreate('Text');
@@ -479,7 +473,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * CRM-17151: Test that Contribution status change to 'Completed' if balance is zero.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCRM17151() {
     // @todo figure out the financial validation issue - likely a real bug.
@@ -523,7 +516,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * Test that recording a refund when fee selection is 0 works
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testRefundWithFeeAmount0() {
     $this->registerParticipantAndPay();
@@ -576,7 +568,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * dev-financial-40: Test that partial payment entries in entity-financial-trxn table to ensure that reverse transaction is entered
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testPartialPaymentEntries() {
     $this->registerParticipantAndPay($this->_expensiveFee);
@@ -618,7 +609,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * dev-financial-40: Test that refund payment entries in entity-financial-trxn table to ensure that reverse transaction is entered on fee change to lesser amount
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testRefundPaymentEntries() {
     $this->registerParticipantAndPay($this->_expensiveFee);

@@ -32,7 +32,6 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * CRM-21200: Test that making online payment for pending contribution
    * doesn't overwrite the contribution details
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function testPayNowPayment(): void {

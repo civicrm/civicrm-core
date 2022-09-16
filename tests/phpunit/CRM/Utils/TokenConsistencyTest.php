@@ -59,7 +59,7 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
   /**
    * Test that case tokens are consistently rendered.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testCaseTokenConsistency(): void {
     $this->createLoggedInUser();
@@ -472,7 +472,7 @@ contribution_recur.payment_instrument_id:name :Check
   /**
    * Test that membership tokens are consistently rendered.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testMembershipTokenConsistency(): void {
     $this->createLoggedInUser();
@@ -647,7 +647,7 @@ December 21st, 2007
   /**
    * Test that membership tokens are consistently rendered.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testParticipantTokenConsistency(): void {
     $this->createLoggedInUser();
@@ -679,7 +679,6 @@ December 21st, 2007
   /**
    * Test that membership tokens are consistently rendered.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testParticipantCustomDateToken(): void {
@@ -749,7 +748,6 @@ United States', $tokenProcessor->getRow(0)->render('message'));
   }
 
   /**
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testDomainNow(): void {
@@ -819,7 +817,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
   /**
    * Test that event tokens are consistently rendered.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testEventTokenConsistency(): void {
     $mut = new CiviMailUtils($this);
@@ -852,7 +850,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
   /**
    * Test that event tokens work absent participant tokens.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testEventTokenConsistencyNoParticipantTokens(): void {
     $mut = new CiviMailUtils($this);
@@ -883,7 +881,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
   /**
    * Set up scheduled reminder for participants.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function setupParticipantScheduledReminder($includeParticipant = TRUE): void {
     $this->createEventAndParticipant();
@@ -946,7 +944,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
   /**
    * Create an event with a participant.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function createEventAndParticipant(): void {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Event']);

@@ -95,7 +95,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     try {
       $limit2->single();
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $msg = $e->getMessage();
     }
     $this->assertRegExp(';Expected to find one Contact record;', $msg);
@@ -111,7 +111,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
    * By default our DBs are not 🦉 compliant. This test will age
    * out when we are.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testEmoji(): void {
     $schemaNeedsAlter = \CRM_Core_BAO_SchemaHandler::databaseSupportsUTF8MB4();
@@ -315,7 +315,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
   }
 
   /**
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testOrClause(): void {
     Contact::get()

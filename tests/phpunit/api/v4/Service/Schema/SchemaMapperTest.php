@@ -34,7 +34,7 @@ class SchemaMapperTest extends Api4TestBase {
     try {
       $map->getLink('foo', 'bar');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $exception = $e;
     }
     $this->assertStringContainsString('not found', $exception->getMessage());

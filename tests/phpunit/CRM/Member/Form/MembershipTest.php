@@ -173,7 +173,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a parameter
    *  that has an empty contact_select_id value
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function testFormRuleEmptyContact(): void {
@@ -285,7 +284,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a parameter
    *  that has permanent override and no status
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function testFormRulePermanentOverrideWithNoStatus() {
@@ -480,7 +478,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * @param string $thousandSeparator
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    *
    * @dataProvider getThousandSeparators
    */
@@ -589,8 +586,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * behaviour.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   * @throws \API_Exception
    */
   public function testSubmitUnpaid(): void {
     $this->mut = new CiviMailUtils($this, TRUE);
@@ -619,7 +614,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Check if the related contribution is also updated if the minimum_fee didn't match
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testContributionUpdateOnMembershipTypeChange(): void {
     // @todo figure out why financial validation fails with this test.
@@ -724,7 +718,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *   punctuation used to refer to thousands.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider getThousandSeparators
    */
   public function testSubmitPartialPayment(string $thousandSeparator): void {
@@ -796,9 +789,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   /**
    * Test the submit function of the membership form.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitRecur(): void {
     CRM_Core_Session::singleton()->getStatus(TRUE);
@@ -862,8 +853,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * Test submit recurring with two line items.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   * @throws \API_Exception
    */
   public function testSubmitRecurTwoRows(): void {
     $this->createMembershipPriceSet();
@@ -899,7 +888,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  after related Contribution is cancelled
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testFinancialEntriesOnCancelledContribution(): void {
     // @todo figure out why financial validation fails with this test.
@@ -1046,7 +1034,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * is updated from Partially paid to Completed.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitUpdateMembershipFromPartiallyPaid(): void {
     $memStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'validate');
@@ -1087,7 +1074,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   /**
    * Test the submit function of the membership form.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function testSubmitRecurCompleteInstant(): void {
@@ -1160,7 +1146,6 @@ Expires: ',
    * Uses some data from tests/phpunit/CRM/Member/Form/dataset/data.xml .
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testTwoInheritedMembershipsViaPriceSetInBackend(): void {
     // Create an organization and give it a "Member of" relationship to $this->_individualId.
@@ -1240,7 +1225,6 @@ Expires: ',
    * checking that the line items have correct amounts.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testTwoMembershipsViaPriceSetInBackendWithDiscount(): void {
     // Register buildAmount hook to apply discount.
@@ -1301,7 +1285,6 @@ Expires: ',
    *
    * @return \CRM_Member_Form_Membership
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function getForm(array $formValues = []): CRM_Member_Form_Membership {
     if (isset($_REQUEST['cid'])) {
@@ -1369,7 +1352,6 @@ Expires: ',
    *   applied - this overloading would ideally be cleaned up.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function createTwoMembershipsViaPriceSetInBackEnd(int $contactId, $isTaxEnabled = TRUE): void {
     $form = $this->getForm();
@@ -1440,7 +1422,6 @@ Expires: ',
    * In addition (a data-integrity check) -> check that the LineItem data add up to the data at the Contribution level
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testLineItemAmountOnSalesTax(): void {
     $this->enableTaxAndInvoicing();
@@ -1524,7 +1505,6 @@ Expires: ',
   /**
    * Test that membership end_date is correct for multiple terms for pending contribution
    *
-   * @throws CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    * @throws \Exception
    */
@@ -1605,7 +1585,6 @@ Expires: ',
    * is other contact.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Exception
    */
   public function testMembershipViewContributionOwnerDifferent() {

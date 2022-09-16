@@ -221,7 +221,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
         ->execute();
       $this->fail('Api should have thrown exception');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $this->assertEquals('Missing param 2 for SQL function IF', $e->getMessage());
     }
 
@@ -231,7 +231,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
         ->execute();
       $this->fail('Api should have thrown exception');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $this->assertEquals('Too many arguments given for SQL function NULLIF', $e->getMessage());
     }
 
@@ -241,7 +241,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
         ->execute();
       $this->fail('Api should have thrown exception');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $this->assertEquals('Too few arguments to param 2 for SQL function CONCAT_WS', $e->getMessage());
     }
   }

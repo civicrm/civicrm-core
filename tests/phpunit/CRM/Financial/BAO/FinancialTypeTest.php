@@ -177,7 +177,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   /**
    * Check method test getAvailableMembershipTypes()
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testGetAvailableMembershipTypes(): void {
     // Create Membership types
@@ -223,7 +223,6 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
    * Check method testcheckPermissionedLineItems()
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCheckPermissionedLineItems() {
     $contactId = $this->individualCreate();

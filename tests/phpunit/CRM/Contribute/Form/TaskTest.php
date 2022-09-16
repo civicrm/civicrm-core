@@ -31,7 +31,6 @@ class CRM_Contribute_Form_TaskTest extends CiviUnitTestCase {
    * executes without any error after sorting the search result.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testPreProcessCommonAfterSorting(): void {
     $fields = [

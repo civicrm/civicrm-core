@@ -25,7 +25,7 @@ class CRM_Profile_Form_EditTest extends CiviUnitTestCase {
   /**
    * Test the url on the profile edit form renders tokens
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testProfileUrl(): void {
     $profileID = Civi\Api4\UFGroup::create(FALSE)->setValues([
@@ -49,7 +49,7 @@ class CRM_Profile_Form_EditTest extends CiviUnitTestCase {
   /**
    * Test that requiring tags on a profile works.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testProfileRequireTag(): void {
     $ufGroupParams = [

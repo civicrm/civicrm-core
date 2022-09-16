@@ -266,7 +266,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    *
    * (this was happening due to a check running despite no existing option_group_id)
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testUpdateCustomFieldAddOptionGroup() {
     $customGroup = $this->customGroupCreate(['extends' => 'Organization', 'title' => 'test_group']);
@@ -563,7 +563,6 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testCustomFieldCreateWithOptionGroupName(): void {

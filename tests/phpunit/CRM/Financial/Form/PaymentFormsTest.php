@@ -35,7 +35,6 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
    * Generic test on event payment forms to make sure they submit without error with payment processing.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testEventPaymentForms() {
     $this->createAuthorizeNetProcessor();

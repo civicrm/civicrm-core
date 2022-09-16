@@ -1389,7 +1389,6 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * See https://lab.civicrm.org/dev/core/issues/470
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testDisableExpiredRelationships() {
     // Step 1: Create a current employer relationship with Org A

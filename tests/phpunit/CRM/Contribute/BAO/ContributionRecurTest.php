@@ -26,7 +26,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   /**
    * Set up for test.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function setUp(): void {
     parent::setUp();
@@ -139,9 +139,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   /**
    * Check test contributions aren't picked up as template for non-test recurs
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testGetTemplateContributionMatchTest1(): void {
@@ -176,9 +174,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   /**
    * Check non-test contributions aren't picked up as template for test recurs
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testGetTemplateContributionMatchTest(): void {
@@ -224,9 +220,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    * Then we delete the template contribution and make sure a new one exists.
    * At that time the second contribution should be used a template as that is the most recent one (according to the date).
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testCreateTemplateContributionFromFirstContributionTest(): void {
@@ -324,8 +318,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   /**
    * Test that is_template contribution is used where available
    *
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testGetTemplateContributionNewTemplate(): void {
@@ -370,8 +363,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   /**
    * Test that is_template contribution is used where available
    *
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testTemplateContributionUpdatesRecur(): void {
@@ -426,7 +418,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   /**
    * Test to check if correct membership is auto renewed.
    *
-   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testAutoRenewalWhenOneMemberIsDeceased(): void {
     $contactId1 = $this->individualCreate();

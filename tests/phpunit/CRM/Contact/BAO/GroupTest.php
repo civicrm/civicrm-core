@@ -161,7 +161,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   /**
    * Test that parents as criteria don't cause loops.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testGroupWithParentInCriteria(): void {
     $parentGroupID = Group::create()->setValues([

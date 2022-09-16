@@ -29,7 +29,6 @@ class api_v3_ACLCachingTest extends CiviUnitTestCase {
    * (non-PHPdoc)
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @see CiviUnitTestCase::tearDown()
    */
   public function tearDown(): void {

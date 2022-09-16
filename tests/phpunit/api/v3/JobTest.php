@@ -185,7 +185,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Note that this test is about testing the metadata / calling of the
    * function & doesn't test the success of the called function
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testCallUpdateGreetingSuccess(): void {
     $contactID = $this->individualCreate();
@@ -227,7 +227,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * with the job wrapper being respected for legacy functions
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCallSendReminderSuccessMoreThanDefaultLimit(): void {
     $membershipTypeID = $this->membershipTypeCreate();
@@ -266,7 +265,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * & check that only the chosen one got the reminder
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCallSendReminderLimitToSMS(): void {
     [$membershipTypeID, $groupID, $theChosenOneID, $provider] = $this->setUpMembershipSMSReminders();
@@ -297,7 +295,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Test disabling expired relationships.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCallDisableExpiredRelationships(): void {
     $individualID = $this->individualCreate();
@@ -327,7 +324,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Event templates should not send reminders to additional contacts.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testTemplateRemindAdditionalContacts(): void {
     $contactId = $this->individualCreate();
@@ -362,7 +358,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Deleted events should not send reminders to additional contacts.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testDeletedEventRemindAdditionalContacts(): void {
     $contactId = $this->individualCreate();
@@ -403,7 +398,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Also check no hard fail on cron job with running a reminder that has a deleted SMS provider
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCallSendReminderLimitToSMSWithDeletedProvider(): void {
     [$membershipTypeID, $groupID, $theChosenOneID, $provider] = $this->setUpMembershipSMSReminders();
@@ -484,7 +478,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Note the group combinations & expected results:
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testBatchMergeWithAssets(): void {
     $contactID = $this->individualCreate();
@@ -523,7 +516,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Test that non-contact entity tags are untouched in merge.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testContributionEntityTag(): void {
     $this->callAPISuccess('OptionValue', 'create', ['option_group_id' => 'tag_used_for', 'value' => 'civicrm_contribution', 'label' => 'Contribution']);
@@ -558,7 +550,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * The ones with **** are the ones where I think a case could be made to change the behaviour.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testBatchMergeMergesGroups(): void {
     $contactID = $this->individualCreate();
@@ -649,7 +640,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Test that we handle cache entries without clashes.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMergeCaches(): void {
     $contactID = $this->individualCreate();
@@ -667,7 +657,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Test that we handle cache entries without clashes.
    *
-   * @throws \CiviCRM_API3_Exception|\CRM_Core_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testMergeSharedActivity(): void {
     $contactID = $this->individualCreate();
@@ -707,7 +697,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @param array $dataSet
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testBatchMergesAddresses(array $dataSet): void {
     $contactID1 = $this->individualCreate();
@@ -744,7 +733,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @param array $dataSet
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testBatchMergesAddressesHook(array $dataSet): void {
     $contactID1 = $this->individualCreate();
@@ -900,7 +888,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Test weird characters don't mess with merge & cause a fatal.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testNoErrorOnOdd(): void {
     $this->individualCreate();
@@ -920,7 +907,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * emails.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testBatchMergeEmailHandling(): void {
     for ($x = 0; $x <= 4; $x++) {
@@ -954,7 +940,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @param string|null $conflictText
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testBatchMergeEmailOnHold($onHold1, $onHold2, bool $merge, ?string $conflictText): void {
     $this->individualCreate([
@@ -1052,7 +1037,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * emails.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testBatchMergeMatchingAddress(): void {
     for ($x = 0; $x <= 2; $x++) {
@@ -1107,7 +1091,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * We have 2 sets of 5 matches & set the merge only to merge the lower set.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testBatchMergeIDRange(): void {
     for ($x = 0; $x <= 4; $x++) {
@@ -1141,7 +1124,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Test the batch merge copes with view only custom data field.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testBatchMergeCustomDataViewOnlyField(): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit my contact'];
@@ -1166,7 +1148,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * both merged & mergee fields are respected.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testBatchMergeCustomDataZeroValueField(): void {
     $customGroup = $this->customGroupCreate();
@@ -1194,7 +1175,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Test the batch merge treats 0 vs 1 as a conflict.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testBatchMergeCustomDataZeroValueFieldWithConflict(): void {
     $customGroup = $this->customGroupCreate();
@@ -2024,7 +2004,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Test processing membership for deceased contacts.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testProcessMembershipDeceased(): void {
     $this->callAPISuccess('Job', 'process_membership', []);
@@ -2041,7 +2020,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Test we get an error is deceased status is disabled.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testProcessMembershipNoDeceasedStatus(): void {
     $deceasedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Deceased');
@@ -2061,7 +2039,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * and left alone when it shouldn't.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testProcessMembershipUpdateStatus(): void {
     $this->ids['MembershipType'] = $this->membershipTypeCreate();
@@ -2194,7 +2171,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Test processing membership where is_override is set to 0 rather than NULL
    *
-   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testProcessMembershipIsOverrideNotNullNot1either(): void {
     $membershipTypeId = $this->membershipTypeCreate();
@@ -2249,7 +2226,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @return int
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function createMembershipNeedingStatusProcessing(string $startDate, string $endDate, string $status, bool $isAdminOverride = FALSE): int {
     $params = [
@@ -2278,7 +2254,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @return array
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function setUpMembershipSMSReminders(): array {
     $membershipTypeID = $this->membershipTypeCreate();
@@ -2334,7 +2309,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * format it's a little difficult to parse out, so we're just testing that
    * the email was sent and it more or less looks like an email we'd expect.
    *
-   * @throws \CRM_Core_Exception
    * @throws \CRM_Core_Exception
    */
   public function testMailReportForPrint(): void {
