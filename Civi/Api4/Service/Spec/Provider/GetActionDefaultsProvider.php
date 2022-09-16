@@ -14,7 +14,11 @@ namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
-class GetActionDefaultsProvider implements Generic\SpecProviderInterface {
+/**
+ * @service
+ * @internal
+ */
+class GetActionDefaultsProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
    * @inheritDoc

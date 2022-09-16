@@ -1,11 +1,13 @@
 <?php
 namespace Civi\Core;
 
+use Civi\Core\Compiler\AutoServiceScannerPass;
 use Civi\Core\Compiler\EventScannerPass;
 use Civi\Core\Compiler\SpecProviderPass;
 use Civi\Core\Event\EventScanner;
 use Civi\Core\Lock\LockManager;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -65,21 +67,25 @@ class Container {
       return $containerBuilder;
     }
 
-    $envId = \CRM_Core_Config_Runtime::getId();
+    $envId = md5(implode(',', array_merge(
+      [\CRM_Core_Config_Runtime::getId()],
+      array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'prefix')
+    )));
     $file = \Civi::paths()->getPath("[civicrm.compile]/CachedCiviContainer.{$envId}.php");
+    $containerCacheClass = "CachedCiviContainer_{$envId}";
     $containerConfigCache = new ConfigCache($file, $cacheMode === 'auto');
     if (!$containerConfigCache->isFresh()) {
       $containerBuilder = $this->createContainer();
       $containerBuilder->compile();
       $dumper = new PhpDumper($containerBuilder);
       $containerConfigCache->write(
-        $dumper->dump(['class' => 'CachedCiviContainer']),
+        $dumper->dump(['class' => $containerCacheClass]),
         $containerBuilder->getResources()
       );
     }
 
     require_once $file;
-    $c = new \CachedCiviContainer();
+    $c = new $containerCacheClass();
     return $c;
   }
 
@@ -92,6 +98,7 @@ class Container {
   public function createContainer() {
     $civicrm_base_path = dirname(dirname(__DIR__));
     $container = new ContainerBuilder();
+    $container->addCompilerPass(new AutoServiceScannerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 1000);
     $container->addCompilerPass(new EventScannerPass());
     $container->addCompilerPass(new SpecProviderPass());
     $container->addCompilerPass(new RegisterListenersPass());
@@ -218,26 +225,6 @@ class Container {
         ],
       ]
     ))->setFactory('CRM_Utils_Cache::create')->setPublic(TRUE);
-
-    $container->setDefinition('sql_triggers', new Definition(
-      'Civi\Core\SqlTriggers',
-      []
-    ))->setPublic(TRUE);
-
-    $container->setDefinition('asset_builder', new Definition(
-      'Civi\Core\AssetBuilder',
-      []
-    ))->setPublic(TRUE);
-
-    $container->setDefinition('themes', new Definition(
-      'Civi\Core\Themes',
-      []
-    ))->setPublic(TRUE);
-
-    $container->setDefinition('format', new Definition(
-      '\Civi\Core\Format',
-      []
-    ))->setPublic(TRUE);
 
     $container->setDefinition('bundle.bootstrap3', new Definition('CRM_Core_Resources_Bundle', ['bootstrap3']))
       ->setFactory('CRM_Core_Resources_Common::createBootstrap3Bundle')->setPublic(TRUE);
@@ -391,7 +378,11 @@ class Container {
       }
     }
 
-    \CRM_Api4_Services::hook_container($container);
+    // FIXME: Automatically scan BasicServices for ProviderInterface.
+    $container->getDefinition('civi_api_kernel')->addMethodCall(
+      'registerApiProvider',
+      [new Reference('action_object_provider')]
+    );
 
     \CRM_Utils_Hook::container($container);
 

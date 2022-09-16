@@ -15,12 +15,14 @@ namespace Civi\Api4\Service\Spec;
 use Civi\Api4\CustomField;
 use Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Core\Service\AutoService;
 
 /**
  * Class SpecGatherer
  * @package Civi\Api4\Service\Spec
+ * @service spec_gatherer
  */
-class SpecGatherer {
+class SpecGatherer extends AutoService {
 
   /**
    * @var \Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface[]

@@ -15,6 +15,8 @@ use Civi\API\Event\PrepareEvent;
 
 /**
  * Validate field inputs based on annotations in the action class
+ *
+ * @service civi.api4.validateFields
  */
 class ValidateFieldsSubscriber extends Generic\AbstractPrepareSubscriber {
 

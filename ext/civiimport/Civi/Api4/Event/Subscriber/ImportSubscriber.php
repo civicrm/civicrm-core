@@ -22,8 +22,9 @@ use Civi\API\Exception\UnauthorizedException;
 
 /**
  * Listening class that registers each Import table as an entity.
+ * @service civi.api4.importSubscriber
  */
-class ImportSubscriber implements EventSubscriberInterface {
+class ImportSubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
 
   /**
    * Get the events this class listens to.

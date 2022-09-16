@@ -18,9 +18,14 @@ use Civi\Api4\Event\SchemaMapBuildEvent;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Civi\Core\Service\AutoService;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
-class SchemaMapBuilder {
+/**
+ * @service schema_map_builder
+ */
+class SchemaMapBuilder extends AutoService {
+
   /**
    * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
    */
@@ -32,6 +37,7 @@ class SchemaMapBuilder {
 
   /**
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+   * @inject dispatcher
    */
   public function __construct(EventDispatcherInterface $dispatcher) {
     $this->dispatcher = $dispatcher;

@@ -18,7 +18,11 @@ use Civi\Api4\UserJob;
 use Civi\BAO\Import;
 use CRM_Core_BAO_UserJob;
 
-class ImportSpecProvider implements Generic\SpecProviderInterface {
+/**
+ * @service
+ * @internal
+ */
+class ImportSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
    * @inheritDoc

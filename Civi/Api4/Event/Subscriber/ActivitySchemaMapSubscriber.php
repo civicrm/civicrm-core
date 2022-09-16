@@ -8,7 +8,10 @@ use Civi\Api4\Service\Schema\Joinable\ExtraJoinable;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ActivitySchemaMapSubscriber implements EventSubscriberInterface {
+/**
+ * @service civi.api4.activitySchema
+ */
+class ActivitySchemaMapSubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
 
   /**
    * @return array
