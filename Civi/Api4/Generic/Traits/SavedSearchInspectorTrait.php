@@ -45,7 +45,7 @@ trait SavedSearchInspectorTrait {
 
   /**
    * If SavedSearch is supplied as a string, this will load it as an array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function loadSavedSearch() {

@@ -30,7 +30,7 @@ class DAODeleteAction extends AbstractBatchAction {
   public function _run(Result $result) {
     $defaults = $this->getParamDefaults();
     if ($defaults['where'] && $this->where === $defaults['where']) {
-      throw new \API_Exception('Cannot delete ' . $this->getEntityName() . ' with no "where" parameter specified');
+      throw new \CRM_Core_Exception('Cannot delete ' . $this->getEntityName() . ' with no "where" parameter specified');
     }
 
     $items = $this->getBatchRecords();
@@ -53,7 +53,7 @@ class DAODeleteAction extends AbstractBatchAction {
   /**
    * @param $items
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function deleteObjects($items) {
     $idField = CoreUtil::getIdFieldName($this->getEntityName());
@@ -69,7 +69,7 @@ class DAODeleteAction extends AbstractBatchAction {
           $result[] = [$idField => $item[$idField]];
         }
         else {
-          throw new \API_Exception("Could not delete {$this->getEntityName()} $idField {$item[$idField]}");
+          throw new \CRM_Core_Exception("Could not delete {$this->getEntityName()} $idField {$item[$idField]}");
         }
       }
     }

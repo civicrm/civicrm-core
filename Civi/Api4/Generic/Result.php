@@ -84,7 +84,7 @@ class Result extends \ArrayObject implements \JsonSerializable {
    * If there are too many or too few results, then throw an exception.
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function single() {
     return \CRM_Utils_Array::single($this, "{$this->entity} record");
@@ -109,7 +109,7 @@ class Result extends \ArrayObject implements \JsonSerializable {
    *
    * @param string $key
    * @return $this
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function indexBy($key) {
     $this->indexedBy = $key;
@@ -121,7 +121,7 @@ class Result extends \ArrayObject implements \JsonSerializable {
         }
       }
       if (!$newResults) {
-        throw new \API_Exception("Key $key not found in api results");
+        throw new \CRM_Core_Exception("Key $key not found in api results");
       }
       $this->exchangeArray($newResults);
     }
@@ -167,7 +167,7 @@ class Result extends \ArrayObject implements \JsonSerializable {
    */
   public function countMatched() :int {
     if (!isset($this->matchedCount)) {
-      throw new \API_Exception("countMatched can only be used if there was no limit set or if row_count was included in the select fields.");
+      throw new \CRM_Core_Exception("countMatched can only be used if there was no limit set or if row_count was included in the select fields.");
     }
     return $this->matchedCount;
   }

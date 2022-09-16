@@ -32,7 +32,7 @@ trait ManagedEntity {
         return $item;
       }
       else {
-        throw new \API_Exception('Cannot revert ' . $action->getEntityName() . ' with id ' . $item['id']);
+        throw new \CRM_Core_Exception('Cannot revert ' . $action->getEntityName() . ' with id ' . $item['id']);
       }
     }))->setCheckPermissions($checkPermissions);
   }

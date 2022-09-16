@@ -93,7 +93,7 @@ class ActionObjectProvider implements EventSubscriberInterface, ProviderInterfac
    * @param $request
    * @param $row
    * @return array|\Civi\Api4\Generic\Result|null
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function runChain($request, $row) {
     [$entity, $action, $params, $index] = $request;

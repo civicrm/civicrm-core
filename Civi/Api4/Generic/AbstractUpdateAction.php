@@ -79,7 +79,7 @@ abstract class AbstractUpdateAction extends AbstractBatchAction {
 
     // Require WHERE if we didn't get primary keys from values
     if (!$this->where) {
-      throw new \API_Exception('Parameter "where" is required unless primary keys are supplied in values.');
+      throw new \CRM_Core_Exception('Parameter "where" is required unless primary keys are supplied in values.');
     }
 
     // Update a single record by primary key (if this entity has a single primary key)
@@ -129,10 +129,10 @@ abstract class AbstractUpdateAction extends AbstractBatchAction {
   }
 
   /**
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function validateValues() {
-    // FIXME: There should be a protocol to report a full list of errors... Perhaps a subclass of API_Exception?
+    // FIXME: There should be a protocol to report a full list of errors... Perhaps a subclass of CRM_Core_Exception?
     $e = new ValidateValuesEvent($this, [$this->values], new \CRM_Utils_LazyArray(function () {
       $existing = $this->getBatchAction()->setSelect(['*'])->execute();
       $result = [];

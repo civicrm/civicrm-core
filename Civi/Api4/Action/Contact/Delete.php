@@ -22,12 +22,12 @@ class Delete extends \Civi\Api4\Generic\DAODeleteAction {
   /**
    * @param $items
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function deleteObjects($items) {
     foreach ($items as $item) {
       if (!\CRM_Contact_BAO_Contact::deleteContact($item['id'], FALSE, !$this->useTrash, $this->checkPermissions)) {
-        throw new \API_Exception("Could not delete {$this->getEntityName()} id {$item['id']}");
+        throw new \CRM_Core_Exception("Could not delete {$this->getEntityName()} id {$item['id']}");
       }
       $ids[] = ['id' => $item['id']];
     }

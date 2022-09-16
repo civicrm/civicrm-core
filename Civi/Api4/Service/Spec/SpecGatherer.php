@@ -108,7 +108,7 @@ class SpecGatherer {
    *
    * @param string $entity
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @see \CRM_Core_SelectValues::customGroupExtends
    */
   private function addCustomFields($entity, RequestSpec $spec) {
@@ -220,12 +220,12 @@ class SpecGatherer {
    * @param string $entityName
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   private function getDAOFields(string $entityName): array {
     $bao = CoreUtil::getBAOFromApiName($entityName);
     if (!$bao) {
-      throw new \API_Exception('Entity not loaded: ' . $entityName);
+      throw new \CRM_Core_Exception('Entity not loaded: ' . $entityName);
     }
     return $bao::getSupportedFields();
   }

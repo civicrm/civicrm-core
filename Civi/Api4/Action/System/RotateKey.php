@@ -37,12 +37,12 @@ class RotateKey extends AbstractAction {
   /**
    * @param \Civi\Api4\Generic\Result $result
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\Crypto\Exception\CryptoException
    */
   public function _run(Result $result) {
     if (empty($this->tag)) {
-      throw new \API_Exception("Missing required argument: tag");
+      throw new \CRM_Core_Exception("Missing required argument: tag");
     }
 
     // Track log of changes in memory.

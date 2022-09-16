@@ -78,11 +78,11 @@ abstract class AbstractQueryAction extends AbstractAction {
    * @param string $op
    * @param mixed $value
    * @return $this
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function addWhere(string $fieldName, string $op, $value = NULL) {
     if (!in_array($op, CoreUtil::getOperators())) {
-      throw new \API_Exception('Unsupported operator');
+      throw new \CRM_Core_Exception('Unsupported operator');
     }
     $this->where[] = [$fieldName, $op, $value];
     return $this;
@@ -96,7 +96,7 @@ abstract class AbstractQueryAction extends AbstractAction {
    *   Either a nested array of arguments, or a variable number of arguments passed to this function.
    *
    * @return $this
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function addClause(string $operator, $condition1) {
     if (!is_array($condition1[0])) {
