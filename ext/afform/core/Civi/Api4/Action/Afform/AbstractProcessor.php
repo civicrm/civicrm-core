@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\Afform;
 
+use Civi\Afform\Event\AfformPrefillEvent;
 use Civi\Afform\FormDataModel;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\Utils\CoreUtil;
@@ -93,6 +94,8 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           $this->autofillEntity($entity, $entity['autofill']);
         }
       }
+      $event = new AfformPrefillEvent($this->_afform, $this->_formDataModel, $this, $entity['type'], $entityName, $this->_entityIds);
+      \Civi::dispatcher()->dispatch('civi.afform.prefill', $event);
     }
   }
 
@@ -102,7 +105,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @param array $entity
    * @param array $ids
    */
-  private function loadEntity(array $entity, array $ids) {
+  public function loadEntity(array $entity, array $ids) {
     $api4 = $this->_formDataModel->getSecureApi4($entity['name']);
     $idField = CoreUtil::getIdFieldName($entity['type']);
     if (!empty($entity['fields'][$idField]['saved_search'])) {

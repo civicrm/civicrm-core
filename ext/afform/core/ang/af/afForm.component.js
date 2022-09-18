@@ -56,7 +56,7 @@
         else {
           args = _.assign({}, $scope.$parent.routeParams || {}, $scope.$parent.options || {});
           _.each(schema, function (entity, entityName) {
-            if (args[entityName] || entity.autofill) {
+            if (args[entityName] || entity.actions.update) {
               toLoad++;
             }
             if (args[entityName] && typeof args[entityName] === 'string') {

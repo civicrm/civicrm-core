@@ -26,8 +26,8 @@
         return afGui.meta.entities[ctrl.getEntityType()];
       };
 
-      $scope.getAdminTpl = function() {
-        return $scope.getMeta().admin_tpl || '~/afGuiEditor/entityConfig/Generic.html';
+      this.getBehaviors = function() {
+        return CRM.afGuiEditor.behaviors[ctrl.getEntityType()];
       };
 
       $scope.getField = afGui.getField;

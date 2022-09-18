@@ -3,7 +3,6 @@ namespace Civi\Afform\Event;
 
 use Civi\Afform\FormDataModel;
 use Civi\Api4\Action\Afform\Submit;
-use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Handle submission of an "<af-form>" entity (or set of entities in the case of `<af-repeat>`).
@@ -21,6 +20,7 @@ use Civi\Api4\Utils\CoreUtil;
  * @package Civi\Afform\Event
  */
 class AfformSubmitEvent extends AfformBaseEvent {
+  use AfformEventEntityTrait;
 
   /**
    * One or more records to be saved for this entity.
@@ -28,30 +28,6 @@ class AfformSubmitEvent extends AfformBaseEvent {
    * @var array
    */
   public $records;
-
-  /**
-   * @var string
-   *   entityType
-   */
-  private $entityType;
-
-  /**
-   * @var string
-   *   entityName e.g. Individual1, Activity1,
-   */
-  private $entityName;
-
-  /**
-   * Ids of each saved entity.
-   *
-   * Each key in the array corresponds to the name of an entity,
-   * and the value is an array of ids
-   * (because of `<af-repeat>` all entities are treated as if they may be multi)
-   * E.g. $entityIds['Individual1'] = [1];
-   *
-   * @var array
-   */
-  private $entityIds;
 
   /**
    * AfformSubmitEvent constructor.
@@ -73,58 +49,6 @@ class AfformSubmitEvent extends AfformBaseEvent {
   }
 
   /**
-   * Get the entity type associated with this event
-   * @return string
-   */
-  public function getEntityType(): string {
-    return $this->entityType;
-  }
-
-  /**
-   * Get the entity name associated with this event
-   * @return string
-   */
-  public function getEntityName(): string {
-    return $this->entityName;
-  }
-
-  /**
-   * @return array{type: string, fields: array, joins: array, security: string, actions: array}
-   */
-  public function getEntity() {
-    return $this->getFormDataModel()->getEntity($this->entityName);
-  }
-
-  /**
-   * @return callable
-   *   API4-style
-   */
-  public function getSecureApi4() {
-    return $this->getFormDataModel()->getSecureApi4($this->entityName);
-  }
-
-  /**
-   * @param int $index
-   * @param int|string $entityId
-   * @return $this
-   */
-  public function setEntityId($index, $entityId) {
-    $idField = CoreUtil::getIdFieldName($this->entityName);
-    $this->entityIds[$this->entityName][$index][$idField] = $entityId;
-    return $this;
-  }
-
-  /**
-   * Get the id of a saved record
-   * @param int $index
-   * @return mixed
-   */
-  public function getEntityId(int $index = 0) {
-    $idField = CoreUtil::getIdFieldName($this->entityName);
-    return $this->entityIds[$this->entityName][$index][$idField] ?? NULL;
-  }
-
-  /**
    * Get records to be saved
    * @return array
    */
@@ -138,18 +62,6 @@ class AfformSubmitEvent extends AfformBaseEvent {
    */
   public function setRecords(array $records) {
     $this->records = $records;
-    return $this;
-  }
-
-  /**
-   * @param int $index
-   * @param string $joinEntity
-   * @param array $joinIds
-   * @return $this
-   */
-  public function setJoinIds($index, $joinEntity, $joinIds) {
-    $idField = CoreUtil::getIdFieldName($joinEntity);
-    $this->entityIds[$this->entityName][$index]['_joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($joinIds, [$idField]);
     return $this;
   }
 
