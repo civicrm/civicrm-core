@@ -157,7 +157,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     $mapperError = [];
     try {
       $parser = $self->getParser();
-      $rule = $parser->getDedupeRule($self->getContactType());
+      $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'] ?? NULL);
       if (!$self->isUpdateExisting()) {
         $missingDedupeFields = $self->validateDedupeFieldsSufficientInMapping($rule, $fields['mapper']);
         if ($missingDedupeFields) {

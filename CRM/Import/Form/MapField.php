@@ -88,7 +88,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    * @noinspection PhpUnhandledExceptionInspection
    */
   public function postProcess() {
-    $this->updateUserJobMetadata('import_configuration', $this->getImportConfiguration());
+    $this->updateUserJobMetadata('import_mappings', $this->getImportConfiguration());
     $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
     $this->saveMapping();
     $parser = $this->getParser();
@@ -484,7 +484,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       if (in_array($fieldName, $highlightedFields, TRUE)) {
         $childField['text'] .= '*';
       }
-      $category = ($childField['has_location'] || $field['name'] === 'contact_id') ? 'Contact' : ($field['entity'] ?? $entity);
+      $category = ($childField['has_location'] || $field['name'] === 'contact_id') ? 'Contact' : $field['entity_instance'] ?? ($field['entity'] ?? $entity);
       if (empty($categories[$category])) {
         $category = $entity;
       }
@@ -530,9 +530,9 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    * @return array
    */
   protected function getImportConfiguration(): array {
-    $importConfiguration = [];
+    $importConfiguration = $this->getUserJob()['metadata']['import_mappings'] ?? [];
     foreach ($this->getSubmittedValue('mapper') as $mapperField) {
-      $importConfiguration[] = $mapperField;
+      $importConfiguration['name'] = $mapperField;
     }
     return $importConfiguration;
   }

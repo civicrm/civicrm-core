@@ -41,8 +41,6 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
 
   /**
    * Clean up after test.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function tearDown():void {
     $this->quickCleanup(['civicrm_contact', 'civicrm_email', 'civicrm_activity', 'civicrm_activity_contact', 'civicrm_user_job', 'civicrm_queue', 'civicrm_queue_item'], TRUE);
@@ -93,9 +91,10 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
    *
    * @param array $values
    * @param int $expectedOutcome
+   *
    * @return string The error message
    */
-  protected function importValues(array $values, $expectedOutcome = 1): string {
+  protected function importValues(array $values, int $expectedOutcome = 1): string {
     $importer = $this->createImportObject(array_keys($values));
     try {
       $importer->validateValues(array_values($values));
