@@ -158,6 +158,7 @@ class Kernel {
    * @throws \CRM_Core_Exception
    */
   public function boot($apiRequest) {
+    require_once 'api/Exception.php';
     // the create error function loads some functions from utils
     // so this require is also needed for apiv4 until such time as
     // we alter create error.
