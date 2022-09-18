@@ -355,4 +355,59 @@ EOHTML;
     $this->assertEquals($locationType, $submission['data']['Organization1'][0]['_joins']['Email'][0]['location_type_id']);
   }
 
+  public function testDedupeIndividual(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="modelListCtrl">
+  <af-entity type="Contact" data="{contact_type: 'Individual'}" name="Individual1" contact-dedupe="Individual.Supervised" />
+  <fieldset af-fieldset="Individual1">
+      <af-field name="first_name" />
+      <af-field name="middle_name" />
+      <af-field name="last_name" />
+      <div af-join="Email" min="1" af-repeat="Add">
+        <afblock-contact-email></afblock-contact-email>
+      </div>
+  </fieldset>
+</af-form>
+EOHTML;
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $lastName = uniqid(__FUNCTION__);
+    $contact = \Civi\Api4\Contact::create(FALSE)
+      ->addValue('first_name', 'Bob')
+      ->addValue('last_name', $lastName)
+      ->addValue('email_primary.email', '123@example.com')
+      ->execute()->single();
+
+    $locationType = CRM_Core_BAO_LocationType::getDefault()->id;
+    $values = [
+      'Individual1' => [
+        [
+          'fields' => [
+            'first_name' => 'Bob',
+            'middle_name' => 'New',
+            'last_name' => $lastName,
+          ],
+          'joins' => [
+            'Email' => [
+              ['email' => '123@example.com', 'location_type_id' => $locationType],
+            ],
+          ],
+        ],
+      ],
+    ];
+    Civi\Api4\Afform::submit()
+      ->setName($this->formName)
+      ->setValues($values)
+      ->execute();
+
+    // Check that the contact was updated per dedupe rule
+    $result = \Civi\Api4\Contact::get(FALSE)
+      ->addWhere('id', '=', $contact['id'])
+      ->execute()->single();
+    $this->assertEquals('New', $result['middle_name']);
+  }
+
 }
