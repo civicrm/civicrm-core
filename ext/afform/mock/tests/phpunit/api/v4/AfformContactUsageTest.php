@@ -69,6 +69,7 @@ EOHTML;
     $cid = $this->createLoggedInUser();
     CRM_Core_Config::singleton()->userPermissionTemp = new CRM_Core_Permission_Temp();
 
+    // Autofill form with current user. See `Civi\Afform\Behavior\ContactAutofill`
     $prefill = Civi\Api4\Afform::prefill()
       ->setName($this->formName)
       ->execute()
