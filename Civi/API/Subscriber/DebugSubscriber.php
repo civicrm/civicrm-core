@@ -37,7 +37,8 @@ class DebugSubscriber implements EventSubscriberInterface {
         break;
 
       case '3.':
-        $xdebugMode = explode(',', ini_get('xdebug.mode'));
+        $xdebugMode = version_compare($version, '3.1', '>=')
+          ? xdebug_info('mode') : explode(',', ini_get('xdebug.mode'));
         $this->enableStats = in_array('develop', $xdebugMode);
         break;
 
