@@ -299,7 +299,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         'entity' => 'Contact',
         'entity_instance' => 'SoftCreditContact',
         'entity_prefix' => 'soft_credit.contact.',
-        'headerPattern' => '/Soft Credit/i',
         'options' => FALSE,
         'type' => CRM_Utils_Type::T_STRING,
         'contact_type' => ['Individual' => 'Individual', 'Household' => 'Household', 'Organization' => 'Organization'],
