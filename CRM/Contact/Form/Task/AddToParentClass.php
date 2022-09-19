@@ -44,6 +44,7 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
 
     $searchRows = $this->get('searchRows');
     $searchCount = $this->get('searchCount');
+    $this->assign('searchRows', FALSE);
     if ($searchRows) {
       $checkBoxes = [];
       $chekFlag = 0;
