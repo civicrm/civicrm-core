@@ -1,4 +1,6 @@
 <?php
+use CRM_CivicrmAdminUi_ExtensionUtil as E;
+
 return [
   [
     'name' => 'SavedSearch_Administer_Contact_Types',
@@ -9,7 +11,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Administer_Contact_Types',
-        'label' => 'Administer Contact Types',
+        'label' => E::ts('Administer Contact Types'),
         'form_values' => NULL,
         'mapping_id' => NULL,
         'search_custom_id' => NULL,
@@ -41,7 +43,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Contact_Types_Table',
-        'label' => 'Contact Types Table',
+        'label' => E::ts('Contact Types Table'),
         'saved_search_id.name' => 'Administer_Contact_Types',
         'type' => 'table',
         'settings' => [
@@ -70,7 +72,7 @@ return [
               'type' => 'field',
               'key' => 'label',
               'dataType' => 'String',
-              'label' => 'Label',
+              'label' => E::ts('Label'),
               'sortable' => TRUE,
               'icons' => [
                 [
@@ -84,7 +86,7 @@ return [
               'type' => 'field',
               'key' => 'parent_id:label',
               'dataType' => 'Integer',
-              'label' => 'Parent',
+              'label' => E::ts('Parent'),
               'sortable' => TRUE,
               'icons' => [
                 [
@@ -101,7 +103,7 @@ return [
               'type' => 'field',
               'key' => 'description',
               'dataType' => 'Text',
-              'label' => 'Description',
+              'label' => E::ts('Description'),
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
@@ -114,7 +116,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-pencil',
-                  'text' => 'Edit',
+                  'text' => E::ts('Edit'),
                   'style' => 'default',
                   'path' => '',
                   'condition' => [],
@@ -125,7 +127,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-trash',
-                  'text' => 'Delete',
+                  'text' => E::ts('Delete'),
                   'style' => 'danger',
                   'path' => '',
                   'condition' => [
@@ -140,7 +142,7 @@ return [
           ],
           'addButton' => [
             'path' => 'civicrm/admin/options/subtype/edit?action=add&reset=1',
-            'text' => 'Add Contact Type',
+            'text' => E::ts('Add Contact Type'),
             'icon' => 'fa-plus',
           ],
         ],
