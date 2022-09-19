@@ -243,6 +243,9 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $controller->setEmbedded(TRUE);
     $controller->run();
 
+    $this->assign('unscheduled', FALSE);
+    $this->assign('archived', FALSE);
+
     $urlParams = 'reset=1';
     $urlString = 'civicrm/mailing/browse';
     if ($this->get('sms')) {
