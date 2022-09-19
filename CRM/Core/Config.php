@@ -19,6 +19,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\UserJob;
+
 require_once 'Log.php';
 require_once 'Mail.php';
 
@@ -266,7 +268,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
   public function cleanupCaches($sessionReset = TRUE) {
     // cleanup templates_c directory
     $this->cleanup(1, FALSE);
-
+    UserJob::delete(FALSE)->addWhere('expires_date', '<', 'now')->execute();
     // clear all caches
     self::clearDBCache();
     Civi::cache('session')->clear();
@@ -377,8 +379,14 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     }
     if (!empty($tables)) {
       $table = implode(',', $tables);
-      // drop leftover temporary tables
-      CRM_Core_DAO::executeQuery("DROP TABLE $table");
+      // If a User Job references the table do not drop it. This is a bit quick & dirty but we don't want to
+      // get into calling more sophisticated functions in a cache clear and the table names are pretty unique.
+      // A separate process will reap the UserJobs but here the goal is just not to delete them during cache clearing
+      // if they are still referenced.
+      if (!CRM_Core_DAO::executeQuery("SELECT count(*) FROM civicrm_user_job WHERE metadata LIKE '%" . $tableDAO->tableName . "%'")) {
+        // drop leftover temporary tables
+        CRM_Core_DAO::executeQuery("DROP TABLE $table");
+      }
     }
   }
 
