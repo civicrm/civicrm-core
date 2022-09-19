@@ -19,6 +19,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\UserJob;
+
 require_once 'Log.php';
 require_once 'Mail.php';
 
@@ -266,7 +268,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
   public function cleanupCaches($sessionReset = TRUE) {
     // cleanup templates_c directory
     $this->cleanup(1, FALSE);
-
+    UserJob::delete(FALSE)->addWhere('expires_date', '<', 'now')->execute();
     // clear all caches
     self::clearDBCache();
     Civi::cache('session')->clear();
