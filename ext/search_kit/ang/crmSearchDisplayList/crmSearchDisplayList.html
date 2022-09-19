@@ -1,7 +1,7 @@
 <div class="crm-search-display crm-search-display-list">
   <div class="form-inline">
     <div class="btn-group" ng-include="'~/crmSearchDisplay/SearchButton.html'" ng-if="$ctrl.settings.button"></div>
-    <div class="btn-group pull-right" ng-include="'~/crmSearchDisplay/AddButton.html'" ng-if="$ctrl.settings.addButton.url"></div>
+    <div class="btn-group pull-right" ng-include="'~/crmSearchDisplay/AddButton.html'" ng-if="$ctrl.addButton"></div>
   </div>
   <ol ng-if=":: $ctrl.settings.style === 'ol'" ng-include="'~/crmSearchDisplayList/crmSearchDisplayList' + ($ctrl.loading ? 'Loading' : 'Items') + '.html'" ng-style="{'list-style': $ctrl.settings.symbol}"></ol>
   <ul ng-if=":: $ctrl.settings.style !== 'ol'" ng-include="'~/crmSearchDisplayList/crmSearchDisplayList' + ($ctrl.loading ? 'Loading' : 'Items') + '.html'" ng-style="{'list-style': $ctrl.settings.symbol}"></ul>
