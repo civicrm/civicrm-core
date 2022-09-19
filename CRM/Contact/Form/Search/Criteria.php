@@ -326,7 +326,6 @@ class CRM_Contact_Form_Search_Criteria {
    *
    */
   public static function getBasicSearchFields() {
-    $userFramework = CRM_Core_Config::singleton()->userFramework;
     return [
       // For now an empty array is still left in place for ordering.
       'sort_name' => [],
@@ -385,7 +384,6 @@ class CRM_Contact_Form_Search_Criteria {
       ],
       'uf_user' => [
         'name' => 'uf_user',
-        'description' => ts('Does the contact have a %1 Account?', [$userFramework]),
       ],
     ];
   }
