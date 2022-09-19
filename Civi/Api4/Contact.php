@@ -90,4 +90,13 @@ class Contact extends Generic\DAOEntity {
       ->setCheckPermissions($checkPermissions);
   }
 
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Contact\MergeDuplicates
+   */
+  public static function mergeDuplicates($checkPermissions = TRUE) {
+    return (new Action\Contact\MergeDuplicates(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
 }

@@ -466,6 +466,12 @@ trait Api3TestTrait {
         }
         break;
 
+      case 'merge':
+        $v4Action = 'mergeDuplicates';
+        $v3Params['contact_id'] = $v3Params['to_keep_id'];
+        $v3Params['duplicate_id'] = $v3Params['to_remove_id'];
+        break;
+
       case 'getoptions':
         $indexBy = 0;
         $v4Action = 'getFields';
