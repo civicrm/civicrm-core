@@ -88,7 +88,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * Convert possibly underscore separated words to camel case.
+   * Convert possibly underscore, space or dash separated words to CamelCase.
    *
    * @param string $str
    * @param bool $ucFirst
@@ -96,7 +96,7 @@ class CRM_Utils_String {
    * @return string
    */
   public static function convertStringToCamel($str, $ucFirst = TRUE) {
-    $fragments = explode('_', $str);
+    $fragments = preg_split('/[-_ ]/', $str, -1, PREG_SPLIT_NO_EMPTY);
     $camel = implode('', array_map('ucfirst', $fragments));
     return $ucFirst ? $camel : lcfirst($camel);
   }
@@ -109,6 +109,16 @@ class CRM_Utils_String {
    */
   public static function convertStringToSnakeCase(string $str): string {
     return strtolower(ltrim(preg_replace('/(?=[A-Z])/', '_$0', $str), '_'));
+  }
+
+  /**
+   * Converts `CamelCase` or `snake_case` to `dash-format`
+   *
+   * @param string $str
+   * @return string
+   */
+  public static function convertStringToDash(string $str): string {
+    return strtolower(implode('-', preg_split('/[-_ ]|(?=[A-Z])/', $str, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE)));
   }
 
   /**
