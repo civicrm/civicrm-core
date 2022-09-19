@@ -1080,4 +1080,11 @@ AND    u.status = 1
     ];
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function getLabel(): string {
+    return ts('Backdrop');
+  }
+
 }

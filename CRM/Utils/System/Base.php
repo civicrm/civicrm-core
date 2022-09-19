@@ -1110,4 +1110,13 @@ abstract class CRM_Utils_System_Base {
     return TRUE;
   }
 
+  /**
+   * The human label for this CMS, as opposed to CIVICRM_UF which is an
+   * internal name.
+   * @return string
+   */
+  public function getLabel(): string {
+    return ts('CMS');
+  }
+
 }

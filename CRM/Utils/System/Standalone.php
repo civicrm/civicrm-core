@@ -625,4 +625,11 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   public function invalidateRouteCache() {
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function getLabel(): string {
+    return '';
+  }
+
 }

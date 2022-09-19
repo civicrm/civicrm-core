@@ -166,4 +166,11 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
     throw new Exception("Method not implemented: getLoginURL");
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function getLabel(): string {
+    return ts('Unit Tests');
+  }
+
 }

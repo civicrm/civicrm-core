@@ -1509,4 +1509,11 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     return apply_filters('civicrm_exit_after_fatal', $ret);
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function getLabel(): string {
+    return ts('WordPress');
+  }
+
 }

@@ -962,4 +962,11 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     ];
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function getLabel(): string {
+    return ts('Joomla!');
+  }
+
 }

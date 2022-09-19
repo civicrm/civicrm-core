@@ -721,4 +721,11 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     ];
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function getLabel(): string {
+    return ts('Drupal');
+  }
+
 }

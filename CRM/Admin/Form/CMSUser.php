@@ -29,6 +29,7 @@ class CRM_Admin_Form_CMSUser extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
+    $this->assign('ufLabel', CRM_Core_Config::singleton()->userSystem->getLabel());
 
     $this->addButtons([
       [
