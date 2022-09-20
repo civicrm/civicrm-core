@@ -141,7 +141,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @throws \CRM_Core_Exception
    */
   protected function getFieldMappings(): array {
-    $mappedFields = $this->getUserJob()['metadata']['import mappings'] ?? [];
+    $mappedFields = $this->getUserJob()['metadata']['import_mappings'] ?? [];
     if (empty($mappedFields)) {
       foreach ($this->getSubmittedValue('mapper') as $i => $mapperRow) {
         $mappedField = $this->getMappingFieldFromMapperInput($mapperRow, 0, $i);
@@ -155,8 +155,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       // This is the same data as entity_data - it is stored to the database in the contact_type field
       // slit your eyes & squint while blinking and you can almost read that as entity_type and not
       // hate it. Otherwise go & whinge on https://lab.civicrm.org/dev/core/-/issues/1172
-      $mappedFields[$index]['contact_type'] = !empty($mappedField['entity_type']) ? json_encode($mappedField['entity_type']) : NULL;
-      $mappedFields[$index]['soft_credit_type_id'] = !empty($mappedField['entity_type']) ? $mappedField['entity_type']['soft_credit']['soft_credit_type_id'] : NULL;
+      $mappedFields[$index]['contact_type'] = !empty($mappedField['entity_data']) ? json_encode($mappedField['entity_data']) : NULL;
+      $mappedFields[$index]['soft_credit_type_id'] = !empty($mappedField['entity_data']) ? $mappedField['entity_data']['soft_credit']['soft_credit_type_id'] : NULL;
     }
     return $mappedFields;
   }
@@ -224,7 +224,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           $entityInstance = $params[$entity][$entityKey];
         }
         else {
-          $entityInstance = $mappedField['entity_data']['soft_credit'];
+          $entityInstance = (array) ($mappedField['entity_data']['soft_credit']);
           $entityInstance['Contact']['contact_type'] = $this->getContactTypeForEntity($entity);
         }
         $entityInstance['Contact'] = array_merge($entityInstance['Contact'], [$this->getFieldMetadata($mappedField['name'])['name'] => $this->getTransformedFieldValue($mappedField['name'], $fieldValue)]);

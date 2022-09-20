@@ -225,7 +225,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     ];
     $this->submitDataSourceForm('soft_credit_extended.csv', $submittedValues);
     $metadata = UserJob::get()->addWhere('id', '=', $this->userJobID)->addSelect('metadata')->execute()->first()['metadata'];
-    $metadata['import mappings'] = $importMappings;
+    $metadata['import_mappings'] = $importMappings;
     $metadata['entity_configuration'] = [
       'Contribution' => ['action' => 'create'],
       'Contact' => [
