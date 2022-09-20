@@ -379,8 +379,11 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     }
     if (!empty($tables)) {
       $table = implode(',', $tables);
-      // If a User Job references the table do not drop it. This is a bit quick & dirty but we don't want to
-      // get into calling more sophisticated functions in a cache clear and the table names are pretty unique.
+      // If a User Job references the table do not drop it. This is a bit quick & dirty, but we don't want to
+      // get into calling more sophisticated functions in a cache clear, and the table names are pretty unique
+      // (ex: "civicrm_tmp_d_dflt_1234abcd5678efgh"), and the "metadata" may continue to evolve for the next
+      // couple months.
+      // TODO: Circa v5.60+, consider a more precise cleanup. Discussion: https://github.com/civicrm/civicrm-core/pull/24538
       // A separate process will reap the UserJobs but here the goal is just not to delete them during cache clearing
       // if they are still referenced.
       if (!CRM_Core_DAO::executeQuery("SELECT count(*) FROM civicrm_user_job WHERE metadata LIKE '%" . $tableDAO->tableName . "%'")) {
