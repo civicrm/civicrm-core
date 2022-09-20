@@ -1607,11 +1607,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $entityTable = 'participant';
         $entityID = $pId;
         $isRelatedId = FALSE;
-        $participantParams = [
-          'fee_amount' => $submittedValues['total_amount'],
-          'id' => $entityID,
-        ];
-        CRM_Event_BAO_Participant::add($participantParams);
+        if (CRM_Contribute_BAO_Contribution::isSingleLineItem($this->_id)) {
+          $participantParams = [
+            'fee_amount' => $submittedValues['total_amount'],
+            'id' => $entityID,
+          ];
+          CRM_Event_BAO_Participant::add($participantParams);
+        }
         if (empty($this->_lineItems)) {
           $this->_lineItems[] = CRM_Price_BAO_LineItem::getLineItems($entityID, 'participant', TRUE);
         }
