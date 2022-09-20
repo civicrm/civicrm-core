@@ -106,7 +106,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     $api4 = $this->_formDataModel->getSecureApi4($entity['name']);
     $idField = CoreUtil::getIdFieldName($entity['type']);
     if (!empty($entity['fields'][$idField]['saved_search'])) {
-      $ids = $this->validateBySavedSearch($entity, $idField, $ids);
+      $ids = $this->validateBySavedSearch($entity, $ids);
     }
     if (!$ids) {
       return;

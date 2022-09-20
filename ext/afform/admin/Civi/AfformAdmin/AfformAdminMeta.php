@@ -87,7 +87,7 @@ class AfformAdminMeta {
     $params += [
       'checkPermissions' => FALSE,
       'loadOptions' => ['id', 'label'],
-      'action' => 'update',
+      'action' => 'create',
       'select' => ['name', 'label', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize', 'data_type', 'fk_entity', 'readonly'],
       'where' => [['input_type', 'IS NOT NULL']],
     ];
@@ -123,7 +123,7 @@ class AfformAdminMeta {
     }
     // Index by name
     $fields = array_column($fields, NULL, 'name');
-    if ($params['action'] === 'update') {
+    if ($params['action'] === 'create') {
       // Add existing entity field
       $idField = CoreUtil::getIdFieldName($entityName);
       $fields[$idField]['readonly'] = FALSE;
