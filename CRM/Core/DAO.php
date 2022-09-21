@@ -18,6 +18,9 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Core\DAO\Event\PostUpdate;
+use Civi\Core\DAO\Event\PreUpdate;
+
 if (!defined('DB_DSN_MODE')) {
   define('DB_DSN_MODE', 'auto');
 }
@@ -543,7 +546,9 @@ class CRM_Core_DAO extends DB_DataObject {
   public function sequenceKey() {
     static $sequenceKeys;
     if (!isset($sequenceKeys)) {
-      $sequenceKeys = [CRM_Utils_Array::single($this->getPrimaryKey()), TRUE];
+      // See comments in 'save' function about use of 'id' for multiple key extensions.
+      $key = count($this->getPrimaryKey()) > 1 ? 'id' : $this->getPrimaryKey()[0];
+      $sequenceKeys = [$key, TRUE];
     }
     return $sequenceKeys;
   }
@@ -641,13 +646,15 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public function save($hook = TRUE) {
     $eventID = uniqid();
-    // In practice the 'Import' entities are probably the only ones with a single
-    // primary key that is not import. Should we check all if more than one?
-    // Can do that when it comes up...
-    $primaryField = CRM_Utils_Array::single($this->getPrimaryKey());
+    // Historically it was always 'id'. It is now the case that some entities (import entities)
+    // have a single key that is NOT 'id'. However, for entities that have multiple
+    // keys (which we support in codegen if not many other places) we return 'id'
+    // simply because that is what we historically did & we don't want to 'just change'
+    // it & break those extensions without doing the work to create an alternative.
+    $primaryField = count($this->getPrimaryKey()) > 1 ? 'id' : $this->getPrimaryKey()[0];
     if (!empty($this->$primaryField)) {
       if ($hook) {
-        $preEvent = new \Civi\Core\DAO\Event\PreUpdate($this);
+        $preEvent = new PreUpdate($this);
         $preEvent->eventID = $eventID;
         \Civi::dispatcher()->dispatch('civi.dao.preUpdate', $preEvent);
       }
@@ -655,7 +662,7 @@ class CRM_Core_DAO extends DB_DataObject {
       $result = $this->update();
 
       if ($hook) {
-        $event = new \Civi\Core\DAO\Event\PostUpdate($this, $result);
+        $event = new PostUpdate($this, $result);
         $event->eventID = $eventID;
         \Civi::dispatcher()->dispatch('civi.dao.postUpdate', $event);
       }
@@ -663,7 +670,7 @@ class CRM_Core_DAO extends DB_DataObject {
     }
     else {
       if ($hook) {
-        $preEvent = new \Civi\Core\DAO\Event\PreUpdate($this);
+        $preEvent = new PreUpdate($this);
         $preEvent->eventID = $eventID;
         \Civi::dispatcher()->dispatch("civi.dao.preInsert", $preEvent);
       }
@@ -671,7 +678,7 @@ class CRM_Core_DAO extends DB_DataObject {
       $result = $this->insert();
 
       if ($hook) {
-        $event = new \Civi\Core\DAO\Event\PostUpdate($this, $result);
+        $event = new PostUpdate($this, $result);
         $event->eventID = $eventID;
         \Civi::dispatcher()->dispatch("civi.dao.postInsert", $event);
       }
