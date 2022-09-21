@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/PrimaryKeys</base>
+  <class>BeepTimes</class>
+  <name>civicrm_beep_times</name>
+  <comment>FIXME</comment>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique BeepTimes ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>recording_device_id_start_time</name>
+    <fieldName>recording_device_id</fieldName>
+    <fieldName>start_time</fieldName>
+  </primaryKey>
+  <field>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <comment>FK to Contact</comment>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>recording_device_id</name>
+    <type>int unsigned</type>
+  </field>
+  <field>
+    <name>start_time</name>
+    <type>timestamp</type>
+  </field>
+  <field>
+    <name>laps</name>
+    <type>int unsigned</type>
+  </field>
+
+</table>
