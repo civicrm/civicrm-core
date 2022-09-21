@@ -1322,7 +1322,7 @@ class CRM_Core_CodeGen_GenerateData {
     $nonAssignTypes = ['Pledge Acknowledgment', 'Print PDF Letter'];
     foreach ($activityTypes as $activityType) {
       $activityTypeOptions[$activityType['activity_type_id']] = ['label' => $activityType['label'], 'name' => $activityType['label']];
-      $activityTypeOptions[$activityType['activity_type_id']]['is_add_targets'] = !in_array($nonAssignTypes, $activityType['name'], TRUE);
+      $activityTypeOptions[$activityType['activity_type_id']]['is_add_targets'] = !in_array($activityType['name'], $nonAssignTypes, TRUE);
     }
     $count = 0;
     $activityContacts = array_flip(CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate'));
