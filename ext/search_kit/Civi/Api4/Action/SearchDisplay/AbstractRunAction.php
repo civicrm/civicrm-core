@@ -730,14 +730,19 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param int $index
    * @return string
    */
-  private function replaceTokens($tokenExpr, $data, $format, $index = 0) {
+  private function replaceTokens($tokenExpr, $data, $format, $index = NULL) {
     if (strpos(($tokenExpr ?? ''), '[') !== FALSE) {
       foreach ($this->getTokens($tokenExpr) as $token) {
         $val = $data[$token] ?? NULL;
         if (isset($val) && $format === 'view') {
           $val = $this->formatViewValue($token, $val, $data);
         }
-        $replacement = is_array($val) ? $val[$index] ?? '' : $val;
+        if (!(is_null($index))) {
+          $replacement = is_array($val) ? $val[$index] ?? '' : $val;
+        }
+        else {
+          $replacement = implode(', ', (array) $val);
+        }
         // A missing token value in a url invalidates it
         if ($format === 'url' && (!isset($replacement) || $replacement === '')) {
           return NULL;
