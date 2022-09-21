@@ -147,6 +147,7 @@ class CRM_Report_Form_Case_Demographics extends CRM_Report_Form {
           'id' => [
             'title' => ts('Case ID'),
             'required' => TRUE,
+            'no_display' => TRUE,
           ],
           'start_date' => [
             'title' => ts('Case Start'),
