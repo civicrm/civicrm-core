@@ -748,6 +748,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $additionalDetails = NULL,
     $campaignId = NULL,
     $caseId = NULL
+    $template
   ) {
 
     $userID = CRM_Core_Session::getLoggedInContactID();
@@ -760,6 +761,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $contactId = $values['contact_id'];
       $emailAddress = $values['email'];
       $renderedTemplate = CRM_Core_BAO_MessageTemplate::renderTemplate([
+        'messageTemplateID' => $template,
         'messageTemplate' => [
           'msg_text' => $text,
           'msg_html' => $html,
