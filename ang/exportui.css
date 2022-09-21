@@ -1,9 +1,10 @@
 /* "fade-out" effect */
-div.crm-export-field-selector-outer {
+.crm-export-field-selector-outer {
+  display: block;
   position: relative;
   overflow-x: hidden;
 }
-div.crm-export-field-selector-outer:after {
+.crm-export-field-selector-outer:after {
   position: absolute;
   top: 0;
   right: 0;
@@ -27,7 +28,7 @@ table.crm-export-field-selector tfoot tr td > span {
 }
 .crm-export-field-selector tbody td {
   cursor: move;
-  width: 18%
+  width: 18%;
 }
 .crm-export-field-selector tbody td:first-child {
   width: 28%;
