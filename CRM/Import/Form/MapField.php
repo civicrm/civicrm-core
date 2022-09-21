@@ -88,7 +88,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    * @noinspection PhpUnhandledExceptionInspection
    */
   public function postProcess() {
-    $this->updateUserJobMetadata('import_mappings', $this->getImportConfiguration());
     $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
     $this->saveMapping();
     $parser = $this->getParser();
@@ -519,22 +518,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     }
     // Infer the default from the column names if we have them
     return $this->defaultFromHeader($columnHeader, $headerPatterns);
-  }
-
-  /**
-   * Get the import configuration per the user.
-   *
-   * When we have wrangled the user's input (e.g to deal with form layer weirdness
-   * we saved the wrangled version here - leaving the submitted value as submitted.
-   *
-   * @return array
-   */
-  protected function getImportConfiguration(): array {
-    $importConfiguration = $this->getUserJob()['metadata']['import_mappings'] ?? [];
-    foreach ($this->getSubmittedValue('mapper') as $mapperField) {
-      $importConfiguration['name'] = $mapperField;
-    }
-    return $importConfiguration;
   }
 
 }
