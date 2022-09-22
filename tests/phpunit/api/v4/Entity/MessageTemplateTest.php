@@ -116,4 +116,18 @@ class MessageTemplateTest extends Api4TestBase implements TransactionalInterface
     return [$first->single()['id'], $second->single()['id']];
   }
 
+  /**
+   * Test save with no id
+   */
+  public function testSaveNoId() {
+    $saved = civicrm_api4('MessageTemplate', 'save', ['records' => [array_merge(['is_reserved' => 0], $this->baseTpl)]]);
+  }
+
+  /**
+   * Test save with an explicit null id
+   */
+  public function testSaveNullId() {
+    $saved = civicrm_api4('MessageTemplate', 'save', ['records' => [array_merge(['id' => NULL, 'is_reserved' => 0], $this->baseTpl)]]);
+  }
+
 }
