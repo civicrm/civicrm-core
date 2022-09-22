@@ -543,10 +543,15 @@ class CRM_Upgrade_Incremental_MessageTemplates {
     // This has to come first otherwise it would be checking against is_reserved we already updated.
     $uneditedTemplates = self::getUneditedTemplates();
 
-    $dao = CRM_Core_DAO::executeQuery("SELECT id, workflow_id, workflow_name FROM civicrm_msg_template WHERE is_reserved=1");
+    $dao = CRM_Core_DAO::executeQuery('SELECT id, workflow_id, workflow_name FROM civicrm_msg_template WHERE is_reserved=1');
     while ($dao->fetch()) {
       foreach (['html', 'text', 'subject'] as $type) {
-        $content = file_get_contents(\Civi::paths()->getPath('[civicrm.root]/xml/templates/message_templates/' . $dao->workflow_name . '_' . $type . '.tpl'));
+        $filePath = \Civi::paths()->getPath('[civicrm.root]/xml/templates/message_templates/' . $dao->workflow_name . '_' . $type . '.tpl');
+        if (!file_exists($filePath)) {
+          // The query may have picked up some non-core templates that will not have files to find.
+          continue;
+        }
+        $content = file_get_contents($filePath);
         if ($content) {
           CRM_Core_DAO::executeQuery(
             "UPDATE civicrm_msg_template SET msg_{$type} = %1 WHERE id = %2", [
