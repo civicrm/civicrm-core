@@ -2639,9 +2639,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @dataProvider contributionStatusProvider
    *
+   * @param array $contributionStatus
+   *
    * @throws \CRM_Core_Exception
    */
-  public function testRepeatTransactionMembershipRenewContributionNotCompleted($contributionStatus): void {
+  public function testRepeatTransactionMembershipRenewContributionNotCompleted(array $contributionStatus): void {
     // Completed status should renew so we don't test that here
     // In Progress status was never actually intended to be available for contributions.
     // Partially paid is not valid.
