@@ -228,7 +228,7 @@ class ClassScanner {
         }
         elseif (!interface_exists($class) && !trait_exists($class)) {
           // If you get this error, then perhaps (a) you need to fix the name of file/class/namespace or (b) you should disable class-scanning.
-          throw new \RuntimeException("Scanned file {$relFile} for class {$class}, but it was not found.");
+          \Civi::log('class_scanner')->warning("Scanned file {$relFile} for class {$class}, but it was not found.");
         }
       }
     }
