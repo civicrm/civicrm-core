@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\Mapping;
+use Civi\Api4\UserJob;
 use Civi\BAO\Import;
 
 require_once 'civiimport.civix.php';
@@ -89,5 +91,56 @@ function civiimport_civicrm_entityTypes(array &$entityTypes): void {
       'class' => Import::class,
       'table' => $table['table_name'],
     ];
+  }
+}
+
+/**
+ * Alter the template for the contribution import mapping to use angular form.
+ *
+ * @param string $formName
+ * @param \CRM_Core_Form $form
+ * @param string $type
+ * @param string $templateFile
+ *
+ * @noinspection PhpUnusedParameterInspection
+ */
+function civiimport_civicrm_alterTemplateFile($formName, $form, $type, &$templateFile) {
+  if ($formName === 'CRM_Contribute_Import_Form_MapField') {
+    $templateFile = 'CRM/Import/MapField.tpl';
+  }
+}
+
+/**
+ * Load the angular app for our form.
+ *
+ * @param string $formName
+ * @param \CRM_Core_Form|CRM_Contribute_Import_Form_MapField $form
+ *
+ * @throws \CRM_Core_Exception
+ */
+function civiimport_civicrm_buildForm(string $formName, $form) {
+  if ($formName === 'CRM_Contribute_Import_Form_MapField') {
+    // Add import-ui app
+    Civi::service('angularjs.loader')->addModules('crmCiviimport');
+    $form->assignCiviimportVariables();
+    $savedMappingID = (int) $form->getSubmittedValue('savedMapping');
+    $savedMapping = [];
+    if ($savedMappingID) {
+      $savedMapping = Mapping::get()->addWhere('id', '=', $savedMappingID)->addSelect('id', 'name', 'description')->execute()->first();
+    }
+    Civi::resources()->addVars('crmImportUi', ['savedMapping' => $savedMapping]);
+  }
+
+  if ($formName === 'CRM_Contribute_Import_Form_DataSource') {
+    // If we have already configured contact type on the import screen
+    // we remove it from the DataSource screen.
+    $userJobID = $form->get('user_job_id');
+    if ($userJobID) {
+      $metadata = UserJob::get()->addWhere('id', '=', $userJobID)->addSelect('metadata')->execute()->first()['metadata'];
+      $contactType = $metadata['entity_configuration']['Contact']['contact_type'] ?? NULL;
+      if ($contactType) {
+        $form->removeElement('contactType');
+      }
+    }
   }
 }

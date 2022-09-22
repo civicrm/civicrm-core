@@ -341,12 +341,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function getContactType(): string {
-    $contactTypeMapping = [
-      'Individual' => 'Individual',
-      'Household' => 'Household',
-      'Organization' => 'Organization',
-    ];
-    return $contactTypeMapping[$this->getSubmittedValue('contactType')];
+    return $this->getSubmittedValue('contactType') ?? $this->getUserJob()['metadata']['entity_configuration']['Contact']['contact_type'];
   }
 
   /**
@@ -660,8 +655,14 @@ class CRM_Import_Forms extends CRM_Core_Form {
   protected function getMappedFieldLabels(): array {
     $mapper = [];
     $parser = $this->getParser();
-    foreach ($this->getSubmittedValue('mapper') as $columnNumber => $mappedField) {
-      $mapper[$columnNumber] = $parser->getMappedFieldLabel($parser->getMappingFieldFromMapperInput((array) $mappedField, 0, $columnNumber));
+    $importMappings = $this->getUserJob()['metadata']['import_mappings'] ?? [];
+    if (empty($importMappings)) {
+      foreach ($this->getSubmittedValue('mapper') as $columnNumber => $mapping) {
+        $importMappings[] = $parser->getMappingFieldFromMapperInput((array) $mapping, 0, $columnNumber);
+      }
+    }
+    foreach ($importMappings as $columnNumber => $importMapping) {
+      $mapper[$columnNumber] = $parser->getMappedFieldLabel($importMapping);
     }
     return $mapper;
   }
@@ -761,6 +762,30 @@ class CRM_Import_Forms extends CRM_Core_Form {
   protected function getBaseEntity(): string {
     $info = $this->getParser()->getUserJobInfo();
     return reset($info)['entity'];
+  }
+
+  /**
+   * Assign values for civiimport.
+   *
+   * I wanted to put this in the extension - but there are a lot of protected functions
+   * we would need to revisit and make public - do we want to?
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function assignCiviimportVariables(): void {
+    $contactTypes = [];
+    foreach (CRM_Contact_BAO_ContactType::basicTypeInfo() as $contactType) {
+      $contactTypes[] = ['id' => $contactType['name'], 'text' => $contactType['label']];
+    }
+    $parser = $this->getParser();
+    Civi::resources()->addVars('crmImportUi', [
+      'defaults' => $this->getDefaults(),
+      'rows' => $this->getDataRows([], 2),
+      'contactTypes' => $contactTypes,
+      'entityMetadata' => $this->getFieldOptions(),
+      'dedupeRules' => $parser->getAllDedupeRules(),
+      'userJob' => $this->getUserJob(),
+    ]);
   }
 
 }
