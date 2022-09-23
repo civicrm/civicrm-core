@@ -69,7 +69,7 @@
       <td>{$form.is_active.html}</td>
     </tr>
 
-   {if !empty($group.created_by)}
+   {if $group.created_by}
       <tr class="crm-group-form-block-created">
         <td class="label">{ts}Created By{/ts}</td>
         <td>{$group.created_by}</td>
@@ -105,10 +105,10 @@
 
   {literal}
   <script type="text/javascript">
-    {/literal}{if !empty($freezeMailingList)}{literal}
+    {/literal}{if $freezeMailingList}{literal}
     cj('input[type=checkbox][name="group_type[{/literal}{$freezeMailingList}{literal}]"]').prop('disabled',true);
     {/literal}{/if}{literal}
-    {/literal}{if !empty($hideMailingList)}{literal}
+    {/literal}{if $hideMailingList}{literal}
     cj('input[type=checkbox][name="group_type[{/literal}{$hideMailingList}{literal}]"]').hide();
     cj('label[for="group_type[{/literal}{$hideMailingList}{literal}]"]').hide();
     {/literal}{/if}{literal}
