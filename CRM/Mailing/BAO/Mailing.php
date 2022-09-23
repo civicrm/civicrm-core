@@ -1110,52 +1110,29 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       }
     }
 
-    $pTemplates = $this->getPreparedTemplates();
-    $pEmails = [];
+    $useSmarty = CRM_Utils_Constant::value('CIVICRM_MAIL_SMARTY');
 
-    foreach ($pTemplates as $type => $pTemplate) {
-      $html = $type == 'html';
-      $pEmails[$type] = [];
-      $pEmail = &$pEmails[$type];
-      $template = &$pTemplates[$type]['template'];
-      $tokens = &$pTemplates[$type]['tokens'];
-      $idx = 0;
-      if (!empty($tokens)) {
-        foreach ($tokens as $idx => $token) {
-          $token_data = $this->getTokenData($token, $html, $contact, $verp, $urls, $event_queue_id);
-          array_push($pEmail, $template[$idx]);
-          array_push($pEmail, $token_data);
-        }
-      }
-      else {
-        array_push($pEmail, $template[$idx]);
-      }
-
-      if (isset($template[($idx + 1)])) {
-        array_push($pEmail, $template[($idx + 1)]);
-      }
-    }
-
-    $html = NULL;
-    if (isset($pEmails['html']) && is_array($pEmails['html']) && count($pEmails['html'])) {
-      $html = &$pEmails['html'];
-    }
-
-    $text = NULL;
-    if (isset($pEmails['text']) && is_array($pEmails['text']) && count($pEmails['text'])) {
-      $text = &$pEmails['text'];
-    }
+    $templates = $this->getTemplates();
+    $pTemplates = CRM_Core_BAO_MessageTemplate::renderTemplate([
+      'messageTemplate' => [
+        'msg_text' => $templates['text'],
+        'msg_html' => $templates['html'],
+        'msg_subject' => $templates['subject'],
+      ],
+      'tokenContext' => ['schema' => ['contactId']],
+      'contactId' => $contactId,
+      'disableSmarty' => !$useSmarty,
+    ]);
 
     // push the tracking url on to the html email if necessary
-    if ($this->open_tracking && $html) {
-      array_push($html, "\n" . '<img src="' . CRM_Utils_System::externUrl('extern/open', "q=$event_queue_id")
-        . '" width="1" height="1" alt="" border="0">'
-      );
+    if ($this->open_tracking && isset($pTemplates['html']) && !empty($pTemplates['html'])) {
+      $pTemplates['html'] .= "\n"
+        . '<img src="' . CRM_Utils_System::externUrl('extern/open', "q=$event_queue_id")
+        . '" width="1" height="1" alt="" border="0">';
     }
 
     $message = new Mail_mime("\n");
 
-    $useSmarty = defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY;
     if ($useSmarty) {
       $smarty = CRM_Core_Smarty::singleton();
       // also add the contact tokens to the template
@@ -1163,16 +1140,16 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     $mailParams = $headers;
-    if ($text) {
-      $textBody = implode('', $text);
+    if (isset($pEmails['text']) && !empty($pTemplates['text'])) {
+      $textBody = $pTemplates['text'];
       if ($useSmarty) {
         $textBody = $smarty->fetch("string:$textBody");
       }
       $mailParams['text'] = $textBody;
     }
 
-    if ($html) {
-      $htmlBody = implode('', $html);
+    if (isset($pTemplates['html']) && !empty($pTemplates['html'])) {
+      $htmlBody = $pTemplates['html'];
       if ($useSmarty) {
         $htmlBody = $smarty->fetch("string:$htmlBody");
       }
@@ -1191,7 +1168,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $mailParams['attachments'] = $attachments;
 
-    $mailParams['Subject'] = $pEmails['subject'] ?? NULL;
+    $mailParams['Subject'] = $pTemplates['subject'] ?? NULL;
     if (is_array($mailParams['Subject'])) {
       $mailParams['Subject'] = implode('', $mailParams['Subject']);
     }
