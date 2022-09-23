@@ -82,22 +82,23 @@ class FormattingUtil {
    * @param $value
    * @param string|null $fieldName
    * @param array $fieldSpec
+   * @param array $params
    * @param string|null $operator (only for 'get' actions)
    * @param null $index (for recursive loops)
    * @throws \CRM_Core_Exception
    */
-  public static function formatInputValue(&$value, ?string $fieldName, array $fieldSpec, &$operator = NULL, $index = NULL) {
+  public static function formatInputValue(&$value, ?string $fieldName, array $fieldSpec, array $params = [], &$operator = NULL, $index = NULL) {
     // Evaluate pseudoconstant suffix
     $suffix = strpos(($fieldName ?? ''), ':');
     if ($suffix) {
-      $options = self::getPseudoconstantList($fieldSpec, $fieldName, [], $operator ? 'get' : 'create');
+      $options = self::getPseudoconstantList($fieldSpec, $fieldName, $params, $operator ? 'get' : 'create');
       $value = self::replacePseudoconstant($options, $value, TRUE);
       return;
     }
     elseif (is_array($value)) {
       $i = 0;
       foreach ($value as &$val) {
-        self::formatInputValue($val, $fieldName, $fieldSpec, $operator, $i++);
+        self::formatInputValue($val, $fieldName, $fieldSpec, $params, $operator, $i++);
       }
       return;
     }

@@ -97,6 +97,11 @@ class Api4SelectQuery {
   private $entityAccess = [];
 
   /**
+   * @var array
+   */
+  private $entityValues = [];
+
+  /**
    * @param \Civi\Api4\Generic\DAOGetAction $apiGet
    */
   public function __construct($apiGet) {
@@ -114,6 +119,8 @@ class Api4SelectQuery {
 
     $tableName = CoreUtil::getTableName($this->getEntity());
     $this->query = \CRM_Utils_SQL_Select::from($tableName . ' ' . self::MAIN_TABLE_ALIAS);
+
+    $this->fillEntityValues();
 
     $this->entityAccess[$this->getEntity()] = TRUE;
 
@@ -380,6 +387,39 @@ class Api4SelectQuery {
   }
 
   /**
+   * This takes all the where clauses that use `=` to build an array of known values which every record must have.
+   *
+   * This gets passed to `FormattingUtil::getPseudoconstantList` to evaluate conditional pseudoconstants.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function fillEntityValues() {
+    foreach ($this->getWhere() as $clause) {
+      [$fieldName, $operator, $value] = array_pad($clause, 3, NULL);
+      if (
+        // If the operator is `=`
+        $operator === '=' &&
+        // And is using a literal value
+        empty($clause[3]) &&
+        // And references a field not a function
+        !strpos($fieldName, ')')
+      ) {
+        $field = $this->getField($fieldName);
+        if ($field) {
+          // Resolve pseudoconstant suffix
+          FormattingUtil::formatInputValue($value, $fieldName, $field, $this->entityValues, $operator);
+          // If the operator is still `=` (so not a weird date range transformation)
+          if ($operator === '=') {
+            // Strip pseudoconstant suffix
+            [$fieldNameOnly] = explode(':', $fieldName);
+            $this->entityValues[$fieldNameOnly] = $value;
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Recursively validate and transform a branch or leaf clause array to SQL.
    *
    * @param array $clause
@@ -455,14 +495,14 @@ class Api4SelectQuery {
       if ($expr->getType() === 'SqlField') {
         $fieldName = count($expr->getFields()) === 1 ? $expr->getFields()[0] : NULL;
         $field = $this->getField($fieldName, TRUE);
-        FormattingUtil::formatInputValue($value, $fieldName, $field, $operator);
+        FormattingUtil::formatInputValue($value, $fieldName, $field, $this->entityValues, $operator);
       }
       elseif ($expr->getType() === 'SqlFunction') {
         $fauxField = [
           'name' => NULL,
           'data_type' => $expr::getDataType(),
         ];
-        FormattingUtil::formatInputValue($value, NULL, $fauxField, $operator);
+        FormattingUtil::formatInputValue($value, NULL, $fauxField, $this->entityValues, $operator);
       }
       $fieldAlias = $expr->render($this);
     }
@@ -474,7 +514,7 @@ class Api4SelectQuery {
         // Attempt to format if this is a real field
         if (isset($this->apiFieldSpec[$expr])) {
           $field = $this->getField($expr);
-          FormattingUtil::formatInputValue($value, $expr, $field, $operator);
+          FormattingUtil::formatInputValue($value, $expr, $field, $this->entityValues, $operator);
         }
       }
       // Expr references a non-field expression like a function; convert to alias
@@ -488,7 +528,7 @@ class Api4SelectQuery {
           [$selectField] = explode(':', $selectAlias);
           if ($selectAlias === $selectExpr && $fieldName === $selectField && isset($this->apiFieldSpec[$fieldName])) {
             $field = $this->getField($fieldName);
-            FormattingUtil::formatInputValue($value, $expr, $field, $operator);
+            FormattingUtil::formatInputValue($value, $expr, $field, $this->entityValues, $operator);
             $fieldAlias = $selectAlias;
             break;
           }
@@ -512,7 +552,7 @@ class Api4SelectQuery {
         $valExpr = $this->getExpression($value);
         if ($expr->getType() === 'SqlField' && $valExpr->getType() === 'SqlString') {
           $value = $valExpr->getExpr();
-          FormattingUtil::formatInputValue($value, $fieldName, $this->apiFieldSpec[$fieldName], $operator);
+          FormattingUtil::formatInputValue($value, $fieldName, $this->apiFieldSpec[$fieldName], $this->entityValues, $operator);
           return $this->createSQLClause($fieldAlias, $operator, $value, $this->apiFieldSpec[$fieldName], $depth);
         }
         else {
@@ -522,7 +562,7 @@ class Api4SelectQuery {
       }
       elseif ($expr->getType() === 'SqlField') {
         $field = $this->getField($fieldName);
-        FormattingUtil::formatInputValue($value, $fieldName, $field, $operator);
+        FormattingUtil::formatInputValue($value, $fieldName, $field, $this->entityValues, $operator);
       }
     }
 
