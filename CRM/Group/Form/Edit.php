@@ -190,12 +190,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       $defaults['is_active'] = 1;
     }
 
-    if (!((CRM_Core_Permission::check('access CiviMail')) ||
-      (CRM_Mailing_Info::workflowEnabled() &&
-        CRM_Core_Permission::check('create mailings')
-      )
-    )
-    ) {
+    if (!$this->isPermitMailingGroupAccess()) {
       $groupTypes = CRM_Core_OptionGroup::values('group_type', TRUE);
       if ($defaults['group_type'][$groupTypes['Mailing List']] == 1) {
         $this->assign('freezeMailingList', $groupTypes['Mailing List']);
@@ -469,6 +464,15 @@ WHERE  title = %1
       $props = array('api' => array('params' => array('contact_type' => 'Organization')));
       $form->addEntityRef('organization_id', ts('Organization'), $props);
     }
+  }
+
+  /**
+   * Does the user have permissions allowing them to create groups with option_type set to mailing?
+   *
+   * @return bool
+   */
+  protected function isPermitMailingGroupAccess(): bool {
+    return CRM_Core_Permission::check('access CiviMail') || (CRM_Mailing_Info::workflowEnabled() && CRM_Core_Permission::check('create mailings'));
   }
 
 }
