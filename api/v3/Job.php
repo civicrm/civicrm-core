@@ -619,6 +619,7 @@ function civicrm_api3_job_run_payment_cron($params) {
  *
  * @param array $params
  *   Sends in various config parameters to decide what needs to be cleaned.
+ * @return array
  */
 function civicrm_api3_job_cleanup($params) {
   $session   = CRM_Utils_Array::value('session', $params, TRUE);
@@ -655,6 +656,8 @@ function civicrm_api3_job_cleanup($params) {
   if ($wordRplc) {
     CRM_Core_BAO_WordReplacement::rebuild();
   }
+
+  return civicrm_api3_create_success();
 }
 
 /**
