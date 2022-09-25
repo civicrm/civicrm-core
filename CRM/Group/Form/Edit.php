@@ -93,7 +93,10 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    */
   public function preProcess() {
     $this->addOptionalQuickFormElement('parents');
-    $this->addExpectedSmartyVariable('parent_groups');
+    $this->addExpectedSmartyVariables([
+      'parent_groups',
+      'editSmartGroupURL',
+    ]);
     $this->_id = $this->get('id');
     if ($this->_id) {
       $breadCrumb = array(
