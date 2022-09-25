@@ -61,7 +61,6 @@ class CRM_Core_DAO extends DB_DataObject {
     return count($this->getPrimaryKey()) > 1 ? 'id' : $this->getPrimaryKey()[0];
   }
 
-
   /**
    * How many times has this instance been cloned.
    *
@@ -784,6 +783,7 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public function copyValues($params) {
     $allNull = TRUE;
+    $primaryKey = $this->getFirstPrimaryKey();
     foreach ($this->fields() as $uniqueName => $field) {
       $dbName = $field['name'];
       if (array_key_exists($dbName, $params)) {
@@ -801,7 +801,19 @@ class CRM_Core_DAO extends DB_DataObject {
       // if there is no value then make the variable NULL
       if ($exists) {
         if ($value === '') {
-          $this->$dbName = 'null';
+          if ($dbName === $primaryKey && $field['type'] === CRM_Utils_Type::T_INT) {
+            // See also \Civi\Api4\Utils\FormattingUtil::formatWriteParams().
+            // The string 'null' is used in pear::db to "unset" values, whereas
+            // it skips over fields where the param is real null. However
+            // "unsetting" a primary key doesn't make sense - you can't convert
+            // an existing record to a "new" one. And then having string 'null'
+            // in the dao object can confuse later code, in particular save()
+            // which then calls the update hook instead of the create hook.
+            $this->$dbName = NULL;
+          }
+          else {
+            $this->$dbName = 'null';
+          }
         }
         elseif (is_array($value) && !empty($field['serialize'])) {
           $this->$dbName = CRM_Core_DAO::serializeField($value, $field['serialize']);
