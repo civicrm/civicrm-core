@@ -232,7 +232,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       }
       else {
         if ($entity === 'Contact' && !isset($params[$entity])) {
-          $params[$entity] = $this->getContactType() ? ['contact_type' => $this->getContactType()] : [];
+          $params[$entity] = [];
+          $params[$entity]['contact_type'] = $this->getContactTypeForEntity($entity) ?: $this->getContactType();
         }
         $params[$entity][$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $fieldValue);
       }
@@ -366,6 +367,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         'default_action' => $this->isUpdateExisting() ? 'update' : 'create',
         'entity_name' => 'Contribution',
         'entity_title' => ts('Contribution'),
+        'entity_field_prefix' => '',
         'selected' => ['action' => $this->isUpdateExisting() ? 'update' : 'create'],
       ],
       'Contact' => [
@@ -377,8 +379,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         'selected' => [
           'action' => $this->isUpdateExisting() ? 'ignore' : 'select',
           'contact_type' => $this->getSubmittedValue('contactType'),
-          'dedupe_rule' => $this->getDedupeRule($this->getSubmittedValue('contactType'))['name'],
+          'dedupe_rule' => $this->getDedupeRule($this->getContactType())['name'],
         ],
+        'entity_field_prefix' => '',
         'default_action' => 'select',
         'entity_name' => 'Contact',
         'entity_title' => ts('Contribution Contact'),
@@ -391,9 +394,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         'is_contact' => TRUE,
         'is_required' => FALSE,
         'actions' => array_merge([['id' => 'ignore', 'text' => ts('Do not import')]], $this->getActions(['select', 'update', 'save'])),
-        'selected' => ['contact_type' => '', 'soft_credit_type_id' => '', 'action' => 'ignore'],
+        'selected' => ['contact_type' => '', 'soft_credit_type_id' => reset($softCreditTypes)['id'], 'action' => 'ignore'],
         'default_action' => 'ignore',
         'entity_name' => 'SoftCreditContact',
+        'entity_field_prefix' => 'soft_credit.contact.',
         'entity_title' => ts('Soft Credit Contact'),
         'entity_data' => [
           'soft_credit_type_id' => [
@@ -431,7 +435,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       if (empty($contributionParams['id']) && $this->isUpdateExisting()) {
         throw new CRM_Core_Exception('Empty Contribution and Invoice and Transaction ID. Row was skipped.', CRM_Import_Parser::ERROR);
       }
-      $contributionParams['contact_id'] = $this->getContactID($params['Contact'] ?? [], $contributionParams['contact_id'] ?? ($existingContribution['contact_id'] ?? NULL), 'Contact', $this->getDedupeRulesForEntity('Contact'));
+      $contributionParams['contact_id'] = $params['Contact']['id'] = $this->getContactID($params['Contact'] ?? [], $contributionParams['contact_id'] ?? ($existingContribution['contact_id'] ?? NULL), 'Contact', $this->getDedupeRulesForEntity('Contact'));
 
       $softCreditParams = [];
       foreach ($params['SoftCreditContact'] ?? [] as $index => $softCreditContact) {

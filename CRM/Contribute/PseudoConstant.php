@@ -67,13 +67,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   private static $pcPage;
 
   /**
-   * Status of personal campaign page
-   * @var array
-   * @deprecated
-   */
-  private static $pcpStatus;
-
-  /**
    * Contribution / financial batches
    * @var array
    */
@@ -342,31 +335,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
     }
 
     return $result;
-  }
-
-  /**
-   * Get all PCP Statuses.
-   *
-   * The static array pcpStatus is returned
-   *
-   * @deprecated
-   * @param string $column
-   * @return array
-   *   array reference of all PCP activity statuses
-   */
-  public static function &pcpStatus($column = 'label') {
-    CRM_Core_Error::deprecatedFunctionWarning('Function pcpStatus will be removed');
-    if (NULL === self::$pcpStatus) {
-      self::$pcpStatus = [];
-    }
-    if (!array_key_exists($column, self::$pcpStatus)) {
-      self::$pcpStatus[$column] = [];
-
-      self::$pcpStatus[$column] = CRM_Core_OptionGroup::values('pcp_status', FALSE,
-        FALSE, FALSE, NULL, $column
-      );
-    }
-    return self::$pcpStatus[$column];
   }
 
   /**
