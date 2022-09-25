@@ -50,6 +50,19 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
+   * @return string
+   */
+  protected function getFirstPrimaryKey(): string {
+    // Historically it was always 'id'. It is now the case that some entities (import entities)
+    // have a single key that is NOT 'id'. However, for entities that have multiple
+    // keys (which we support in codegen if not many other places) we return 'id'
+    // simply because that is what we historically did & we don't want to 'just change'
+    // it & break those extensions without doing the work to create an alternative.
+    return count($this->getPrimaryKey()) > 1 ? 'id' : $this->getPrimaryKey()[0];
+  }
+
+
+  /**
    * How many times has this instance been cloned.
    *
    * @var int
@@ -546,9 +559,7 @@ class CRM_Core_DAO extends DB_DataObject {
   public function sequenceKey() {
     static $sequenceKeys;
     if (!isset($sequenceKeys)) {
-      // See comments in 'save' function about use of 'id' for multiple key extensions.
-      $key = count($this->getPrimaryKey()) > 1 ? 'id' : $this->getPrimaryKey()[0];
-      $sequenceKeys = [$key, TRUE];
+      $sequenceKeys = [$this->getFirstPrimaryKey(), TRUE];
     }
     return $sequenceKeys;
   }
@@ -651,7 +662,7 @@ class CRM_Core_DAO extends DB_DataObject {
     // keys (which we support in codegen if not many other places) we return 'id'
     // simply because that is what we historically did & we don't want to 'just change'
     // it & break those extensions without doing the work to create an alternative.
-    $primaryField = count($this->getPrimaryKey()) > 1 ? 'id' : $this->getPrimaryKey()[0];
+    $primaryField = $this->getFirstPrimaryKey();
     if (!empty($this->$primaryField)) {
       if ($hook) {
         $preEvent = new PreUpdate($this);
