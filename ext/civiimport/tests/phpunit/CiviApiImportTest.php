@@ -63,6 +63,13 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
           'dedupe_rule_id' => NULL,
           'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
         ],
+        'import_mappings' => [
+          ['name' => 'external_identifier'],
+          ['name' => 'total_amount'],
+          ['name' => 'receive_date'],
+          ['name' => 'financial_type_id'],
+          [],
+        ],
       ],
       'status_id:name' => 'draft',
       'job_type' => 'contribution_import',
@@ -82,11 +89,12 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
     ])->execute();
 
     $import = Import::get($userJobID)->setSelect(['external_identifier', 'amount_given', '_status'])->execute()->first();
+    $rowID = $import['_id'];
     $this->assertEquals('80', $import['amount_given']);
 
     Import::update($userJobID)->setValues([
       'amount_given' => NULL,
-      '_id' => $import['_id'],
+      '_id' => $rowID,
       '_status' => 'IMPORTED',
     ])->execute();
 
@@ -98,23 +106,35 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
         'external_identifier' => 999,
         'amount_given' => 9,
         '_status' => 'ERROR',
+        '_id' => $rowID,
       ],
     ])->execute();
 
-    $import = Import::get($userJobID)->setSelect(['external_identifier', 'amount_given', '_status'])->addWhere('_id', '>', $import['_id'])->execute()->first();
+    $import = Import::get($userJobID)->setSelect(['external_identifier', 'amount_given', '_status'])->addWhere('_id', '=', $rowID)->execute()->first();
     $this->assertEquals(9, $import['amount_given']);
 
     Import::save($userJobID)->setRecords([
       [
         'external_identifier' => 777,
-        '_id' => $import['_id'],
+        '_id' => $rowID,
         '_status' => 'ERROR',
       ],
     ])->execute();
 
-    $import = Import::get($userJobID)->setSelect(['external_identifier', 'amount_given', '_status'])->addWhere('_id', '=', $import['_id'])->execute()->first();
+    $import = Import::get($userJobID)->setSelect(['external_identifier', 'amount_given', '_status'])->addWhere('_id', '=', $rowID)->execute()->first();
     $this->assertEquals(777, $import['external_identifier']);
 
+    $validate = Import::validate($userJobID)->addWhere('_id', '=', $rowID)->setLimit(1)->execute()->first();
+    $this->assertEquals('Missing required fields: Contribution ID OR Invoice Reference OR Transaction ID OR Financial Type ID', $validate['_status_message']);
+    $this->assertEquals('ERROR', $validate['_status']);
+
+    Import::update($userJobID)->setValues(['financial_type' => 'Donation'])->addWhere('_id', '=', $rowID)->execute();
+    $validate = Import::validate($userJobID)->addWhere('_id', '=', $rowID)->setLimit(1)->execute()->first();
+    $this->assertEquals('', $validate['_status_message']);
+    $this->assertEquals('VALID', $validate['_status']);
+    $imported = Import::import($userJobID)->addWhere('_id', '=', $rowID)->setLimit(1)->execute()->first();
+    $this->assertEquals('ERROR', $imported['_status']);
+    $this->assertEquals('No matching Contact found', $imported['_status_message']);
   }
 
   /**

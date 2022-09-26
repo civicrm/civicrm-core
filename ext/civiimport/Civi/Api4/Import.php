@@ -17,6 +17,8 @@ use Civi\Api4\Action\GetActions;
 use Civi\Api4\Import\Create;
 use Civi\Api4\Import\Save;
 use Civi\Api4\Import\Update;
+use Civi\Api4\Import\Import as ImportAction;
+use Civi\Api4\Import\Validate;
 
 /**
  * Import entity.
@@ -26,6 +28,14 @@ use Civi\Api4\Import\Update;
  * @package Civi\Api4
  */
 class Import {
+
+  /**
+   * Constructor.
+   *
+   * This is here cos otherwise phpcs complains about the `import` function
+   * having the same name as the class.
+   */
+  public function __construct() {}
 
   /**
    * @param int $userJobID
@@ -63,7 +73,8 @@ class Import {
   /**
    * @param int $userJobID
    * @param bool $checkPermissions
-   * @return \Civi\Api4\Generic\DAOCreateAction
+   *
+   * @return \Civi\Api4\Import\Create
    * @throws \API_Exception
    */
   public static function create(int $userJobID, bool $checkPermissions = TRUE): Create {
@@ -99,6 +110,30 @@ class Import {
    */
   public static function checkAccess(int $userJobID): CheckAccessAction {
     return new CheckAccessAction('Import_' . $userJobID, __FUNCTION__);
+  }
+
+  /**
+   * @param int $userJobID
+   * @param bool $checkPermissions
+   *
+   * @return \Civi\Api4\Import\Import
+   *
+   * @throws \API_Exception
+   */
+  public static function import(int $userJobID, bool $checkPermissions = TRUE): ImportAction {
+    return (new ImportAction('Import_' . $userJobID, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param int $userJobID
+   * @param bool $checkPermissions
+   *
+   * @return \Civi\Api4\Import\Validate
+   * @throws \API_Exception
+   */
+  public static function validate(int $userJobID, bool $checkPermissions = TRUE): Validate {
+    return (new Validate('Import_' . $userJobID, __FUNCTION__))->setCheckPermissions($checkPermissions);
   }
 
   /**

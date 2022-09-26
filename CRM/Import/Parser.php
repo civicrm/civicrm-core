@@ -632,7 +632,12 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     ];
   }
 
-  protected function doPostImportActions() {
+  /**
+   * Core function - do not call from outside core.
+   *
+   * @internal
+   */
+  public function doPostImportActions() {
     $userJob = $this->getUserJob();
     $summaryInfo = $userJob['metadata']['summary_info'] ?? [];
     $actions = $userJob['metadata']['post_actions'] ?? [];
@@ -1820,15 +1825,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   public function validate(): void {
     $dataSource = $this->getDataSourceObject();
     while ($row = $dataSource->getRow()) {
-      try {
-        $rowNumber = $row['_id'];
-        $values = array_values($row);
-        $this->validateValues($values);
-        $this->setImportStatus($rowNumber, 'VALID', '');
-      }
-      catch (CRM_Core_Exception $e) {
-        $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
-      }
+      $this->validateRow($row);
     }
   }
 
@@ -2549,6 +2546,21 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       $dedupeRules[] = $this->getDefaultRuleForContactType($contactType);
     }
     return $dedupeRules;
+  }
+
+  /**
+   * @param array|null $row
+   */
+  public function validateRow(?array $row): void {
+    try {
+      $rowNumber = $row['_id'];
+      $values = array_values($row);
+      $this->validateValues($values);
+      $this->setImportStatus($rowNumber, 'VALID', '');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
+    }
   }
 
 }

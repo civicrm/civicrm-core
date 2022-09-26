@@ -87,7 +87,7 @@ trait CRMTraits_Import_ParserTrait {
   protected function getMapperFromFieldMappings(array $mappings): array {
     $mapper = [];
     foreach ($mappings as $mapping) {
-      $fieldInput = [$mapping['name']];
+      $fieldInput = [$mapping['name'] ?? ''];
       if (!empty($mapping['soft_credit_type_id'])) {
         $fieldInput[1] = $mapping['soft_credit_type_id'];
       }
