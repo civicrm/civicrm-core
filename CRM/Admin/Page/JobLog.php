@@ -75,34 +75,27 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
   public function browse() {
     $jid = CRM_Utils_Request::retrieve('jid', 'Positive');
 
-    $sj = new CRM_Core_JobManager();
-
     if ($jid) {
       $jobName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Job', $jid);
       $this->assign('jobName', $jobName);
       $jobRunUrl = CRM_Utils_System::url('civicrm/admin/job', 'action=view&reset=1&context=joblog&id=' . $jid);
       $this->assign('jobRunUrl', $jobRunUrl);
     }
+    else {
+      $this->assign('jobName', FALSE);
+      $this->assign('jobRunUrl', FALSE);
+    }
 
-    $dao = new CRM_Core_DAO_JobLog();
-    $dao->orderBy('id desc');
-
-    // limit to last 1000 records
-    $dao->limit(1000);
+    $jobLogsQuery = \Civi\Api4\JobLog::get(FALSE)
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1000);
 
     if ($jid) {
-      $dao->job_id = $jid;
+      $jobLogsQuery->addWhere('job_id', '=', $jid);
     }
-    $dao->find();
 
-    $rows = [];
-    while ($dao->fetch()) {
-      unset($row);
-      CRM_Core_DAO::storeValues($dao, $row);
-      $rows[$dao->id] = $row;
-    }
+    $rows = $jobLogsQuery->execute()->getArrayCopy();
     $this->assign('rows', $rows);
-
     $this->assign('jobId', $jid);
   }
 
