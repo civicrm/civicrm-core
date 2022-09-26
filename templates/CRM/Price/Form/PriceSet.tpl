@@ -73,10 +73,10 @@
                           {$amount|crmMoney:$currency}
                         {elseif $displayOpt == 'Inclusive'}
                           {$amount|crmMoney:$currency}
-                          <span class='crm-price-amount-label'> {ts 1=$taxTerm 2=$option.tax_amount|crmMoney:$currency}(includes %1 of %2){/ts}</span>
+                          <span class='crm-price-amount-tax'> {ts 1=$taxTerm 2=$option.tax_amount|crmMoney:$currency}(includes %1 of %2){/ts}</span>
                         {else}
                           {$option.amount|crmMoney:$currency}
-                          <span class='crm-price-amount-label'> + {$option.tax_amount|crmMoney:$currency} {$taxTerm}</span>
+                          <span class='crm-price-amount-tax'> + {$option.tax_amount|crmMoney:$currency} {$taxTerm}</span>
                         {/if}
                       {else}
                         {$option.amount|crmMoney:$currency} {$fieldHandle} {$form.$fieldHandle.frozen}
