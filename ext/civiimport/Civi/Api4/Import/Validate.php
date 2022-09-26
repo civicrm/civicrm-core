@@ -12,10 +12,28 @@
 
 namespace Civi\Api4\Import;
 
-use Civi\Api4\Generic\DAOCreateAction;
+use Civi\Api4\Generic\DAOGetAction;
+use Civi\Api4\Generic\Result;
 
-class Import extends DAOCreateAction {
+class Validate extends DAOGetAction {
 
-  use ImportSaveTrait;
+  use ImportProcessTrait;
+
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function _run(Result $result): void {
+    $userJobID = (int) str_replace('Import_', '', $this->_entityName);
+
+    $this->getImportRows($result);
+    $parser = $this->getParser($userJobID);
+    foreach ($result as $row) {
+      $parser->validateRow($row);
+    }
+
+    // Re-fetch the validated result with updated messages.
+    $this->addSelect('*');
+    parent::_run($result);
+  }
 
 }

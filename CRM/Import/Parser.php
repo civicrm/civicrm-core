@@ -632,7 +632,12 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     ];
   }
 
-  protected function doPostImportActions() {
+  /**
+   * Core function - do not call from outside core.
+   *
+   * @internal
+   */
+  public function doPostImportActions() {
     $userJob = $this->getUserJob();
     $summaryInfo = $userJob['metadata']['summary_info'] ?? [];
     $actions = $userJob['metadata']['post_actions'] ?? [];
