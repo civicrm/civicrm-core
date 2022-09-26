@@ -834,7 +834,8 @@ input.crm-form-entityref {
   margin: 0;
 }
 
-.crm-price-amount-help-pre.description, .crm-price-amount-help-post.description {
+.crm-price-amount-help-pre.description,
+.crm-price-amount-help-post.description {
   font-size: 1em;
 }
 
