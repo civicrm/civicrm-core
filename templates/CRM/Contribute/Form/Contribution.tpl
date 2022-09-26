@@ -413,6 +413,14 @@
         {/foreach}
       </div>
     {/if}
+    {if $billing_address}
+      <fieldset>
+        <legend>{ts}Billing Address{/ts}</legend>
+        <div class="form-item">
+          {$billing_address|nl2br}
+        </div>
+      </fieldset>
+    {/if}
     <br />
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   </div>
