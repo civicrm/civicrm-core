@@ -50,6 +50,18 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
+   * @return string
+   */
+  protected function getFirstPrimaryKey(): string {
+    // Historically it was always 'id'. It is now the case that some entities (import entities)
+    // have a single key that is NOT 'id'. However, for entities that have multiple
+    // keys (which we support in codegen if not many other places) we return 'id'
+    // simply because that is what we historically did & we don't want to 'just change'
+    // it & break those extensions without doing the work to create an alternative.
+    return count($this->getPrimaryKey()) > 1 ? 'id' : $this->getPrimaryKey()[0];
+  }
+
+  /**
    * How many times has this instance been cloned.
    *
    * @var int
@@ -546,9 +558,7 @@ class CRM_Core_DAO extends DB_DataObject {
   public function sequenceKey() {
     static $sequenceKeys;
     if (!isset($sequenceKeys)) {
-      // See comments in 'save' function about use of 'id' for multiple key extensions.
-      $key = count($this->getPrimaryKey()) > 1 ? 'id' : $this->getPrimaryKey()[0];
-      $sequenceKeys = [$key, TRUE];
+      $sequenceKeys = [$this->getFirstPrimaryKey(), TRUE];
     }
     return $sequenceKeys;
   }
@@ -646,12 +656,7 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public function save($hook = TRUE) {
     $eventID = uniqid();
-    // Historically it was always 'id'. It is now the case that some entities (import entities)
-    // have a single key that is NOT 'id'. However, for entities that have multiple
-    // keys (which we support in codegen if not many other places) we return 'id'
-    // simply because that is what we historically did & we don't want to 'just change'
-    // it & break those extensions without doing the work to create an alternative.
-    $primaryField = count($this->getPrimaryKey()) > 1 ? 'id' : $this->getPrimaryKey()[0];
+    $primaryField = $this->getFirstPrimaryKey();
     if (!empty($this->$primaryField)) {
       if ($hook) {
         $preEvent = new PreUpdate($this);
@@ -773,6 +778,7 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public function copyValues($params) {
     $allNull = TRUE;
+    $primaryKey = $this->getFirstPrimaryKey();
     foreach ($this->fields() as $uniqueName => $field) {
       $dbName = $field['name'];
       if (array_key_exists($dbName, $params)) {
@@ -790,7 +796,19 @@ class CRM_Core_DAO extends DB_DataObject {
       // if there is no value then make the variable NULL
       if ($exists) {
         if ($value === '') {
-          $this->$dbName = 'null';
+          if ($dbName === $primaryKey && $field['type'] === CRM_Utils_Type::T_INT) {
+            // See also \Civi\Api4\Utils\FormattingUtil::formatWriteParams().
+            // The string 'null' is used in pear::db to "unset" values, whereas
+            // it skips over fields where the param is real null. However
+            // "unsetting" a primary key doesn't make sense - you can't convert
+            // an existing record to a "new" one. And then having string 'null'
+            // in the dao object can confuse later code, in particular save()
+            // which then calls the update hook instead of the create hook.
+            $this->$dbName = NULL;
+          }
+          else {
+            $this->$dbName = 'null';
+          }
         }
         elseif (is_array($value) && !empty($field['serialize'])) {
           $this->$dbName = CRM_Core_DAO::serializeField($value, $field['serialize']);
