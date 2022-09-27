@@ -8,7 +8,7 @@
          processIsolation="false"
          stopOnFailure="false"
          stderr="true"
-         beStrictAboutTestsThatDoNotTestAnything="false"
+         beStrictAboutTestsThatDoNotTestAnything="true"
          bootstrap="tests/phpunit/CiviTest/bootstrap.php"
          cacheResult="false"
 >
