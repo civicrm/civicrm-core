@@ -45,6 +45,7 @@ class ImportSpecProvider extends \Civi\Core\Service\AutoService implements Gener
       $field = new FieldSpec($column['name'], $spec->getEntity(), 'String');
       $field->setTitle(ts('Import field') . ':' . $column['label']);
       $field->setLabel($column['label']);
+      $field->setType('Field');
       $field->setReadonly($isInternalField);
       $field->setDescription(ts('Data being imported into the field.'));
       $field->setColumnName($column['name']);

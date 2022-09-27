@@ -214,6 +214,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'soft_credit.contact.email_primary.email', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 5]]],
       ['name' => 'soft_credit.contact.first_name', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 5]]],
       ['name' => 'soft_credit.contact.last_name', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 5]]],
+      [],
     ];
     $submittedValues = [
       'skipColumnHeader' => TRUE,

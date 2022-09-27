@@ -380,18 +380,6 @@ abstract class CRM_Import_DataSource {
       return NULL;
     }
     if (!$this->tableName) {
-      // If we are just loading this table we will do some validation.
-      // In the case of viewing historical jobs the table could have
-      // been deleted so we check that when we first load it.
-      if (strpos($tableName, 'civicrm_tmp_') !== 0
-        || !CRM_Utils_Rule::alphanumeric($tableName)) {
-        // The table name is generated and stored by code, not users so it
-        // should be safe - but a check seems prudent all the same.
-        throw new CRM_Core_Exception('Table cannot be deleted');
-      }
-      if (!CRM_Core_DAO::singleValueQuery('SHOW TABLES LIKE %1', [1 => [$tableName, 'String']])) {
-        throw new CRM_Import_Exception_ImportTableUnavailable('table deleted');
-      }
       $this->tableName = $tableName;
     }
     return $this->tableName;

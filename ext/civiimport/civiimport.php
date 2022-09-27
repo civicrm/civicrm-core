@@ -83,7 +83,7 @@ function civiimport_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
  */
 function civiimport_civicrm_entityTypes(array &$entityTypes): void {
-  $importEntities = Import::getImportTables();
+  $importEntities = _civiimport_civicrm_get_import_tables();
 
   foreach ($importEntities as $userJobID => $table) {
     $entityTypes['Import_' . $userJobID] = [
@@ -92,6 +92,55 @@ function civiimport_civicrm_entityTypes(array &$entityTypes): void {
       'table' => $table['table_name'],
     ];
   }
+}
+
+/**
+ * Get the available import tables.
+ *
+ * Note this lives here as `entityTypes` hook calls it - which may not fully
+ * have class loading set up by the time it runs.
+ *
+ * @return array
+ */
+function _civiimport_civicrm_get_import_tables(): array {
+  // We need to avoid the api here as it is called early & could cause loops.
+  $tables = CRM_Core_DAO::executeQuery('
+     SELECT `user_job`.`id` AS id, `metadata`, `name`, `job_type`, `user_job`.`created_id`, `created_id`.`display_name`, `user_job`.`created_date`, `user_job`.`expires_date`
+     FROM civicrm_user_job user_job
+     LEFT JOIN civicrm_contact created_id ON created_id.id = created_id
+       -- As of writing expires date is probably not being managed
+       -- it is intended to be used to actually purge the record in
+       -- a cleanup job so it might not be relevant here & perhaps this will
+       -- be removed later
+       WHERE (expires_date IS NULL OR expires_date > NOW())
+       -- this is a short-cut for looking up if they are imports
+       -- it is a new convention, at best, to require anything
+       -- specific in the job_type, but it saves any onerous lookups
+       -- in a function which needs to avoid loops
+       AND job_type LIKE "%import"
+         -- also more of a feature than a specification - but we need a table
+         -- to do this pseudo-api
+       AND metadata LIKE "%table_name%"');
+  $importEntities = [];
+  while ($tables->fetch()) {
+    $tableName = json_decode($tables->metadata, TRUE)['DataSource']['table_name'];
+    if (!CRM_Utils_Rule::alphanumeric($tableName) || !CRM_Core_DAO::singleValueQuery('SHOW TABLES LIKE %1', [1 => [$tableName, 'String']])) {
+      continue;
+    }
+    $createdBy = $tables->display_name ? '' : ' (' . E::ts('Created by %1', [$tables->display_name, 'String']) . ')';
+    $importEntities[$tables->id] = [
+      'table_name' => $tableName,
+      'created_by' => $tables->display_name,
+      'created_id' => $tables->created_id ? (int) $tables->created_id : NULL,
+      'job_type' => $tables->job_type,
+      'user_job_id' => (int) $tables->id,
+      'created_date' => $tables->created_date,
+      'expires_date' => $tables->expires_date,
+      'title' => ts('Import Job') . (int) $tables->id,
+      'description' => $tables->created_date . $createdBy,
+    ];
+  }
+  return $importEntities;
 }
 
 /**
