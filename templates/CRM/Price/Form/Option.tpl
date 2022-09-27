@@ -40,7 +40,7 @@
         <td>{$form.non_deductible_amount.html}</td>
       </tr>
       <tr class="crm-price-option-form-block-description">
-        <td class="label">{$form.description.label}</td>
+        <td class="label">{$form.description.label}<br />{help id="description" file="CRM/Price/Page/Field.hlp"}</td>
         <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_price_field_value' field='description' id=$optionId}{/if}{$form.description.html}</td>
       </tr>
       <tr class="crm-price-option-form-block-help-pre">

@@ -156,7 +156,7 @@
       <td class="label">{$form.is_display_amounts.label}</td>
       <td>{$form.is_display_amounts.html}
       {if $action neq 4}
-        <div class="description">{ts}Display amount next to each option? If no, then the amount should be in the option description.{/ts}</div>
+        <div class="description">{ts}Display amount next to each option?{/ts}</div>
       {/if}
       </td>
     </tr>
