@@ -381,24 +381,27 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         }
 
         foreach ($customOption as $opId => $opt) {
+          $preHelpText = $postHelpText = '';
+          $opt['label'] = '<span class="crm-price-amount-label">' . $opt['label'] . '</span>';
+          if (!empty($opt['help_pre'])) {
+            $preHelpText = '<span class="crm-price-amount-help-pre description">' . $opt['help_pre'] . '</span><span class="crm-price-amount-help-pre-separator">:&nbsp;</span>';
+          }
+          if (!empty($opt['help_post'])) {
+            $postHelpText = '<span class="crm-price-amount-help-post-separator">:&nbsp;</span><span class="crm-price-amount-help-post description">' . $opt['help_post'] . '</span>';
+          }
+
           $taxAmount = $opt['tax_amount'] ?? NULL;
           if ($field->is_display_amounts) {
             $opt['label'] = !empty($opt['label']) ? $opt['label'] . '<span class="crm-price-amount-label-separator">&nbsp;-&nbsp;</span>' : '';
-            $preHelpText = $postHelpText = '';
-            if (!empty($opt['help_pre'])) {
-              $preHelpText = '<span class="crm-price-amount-help-pre description">' . $opt['help_pre'] . '</span><span class="crm-price-amount-help-pre-separator">:&nbsp;</span>';
-            }
-            if (!empty($opt['help_post'])) {
-              $postHelpText = '<span class="crm-price-amount-help-post-separator">:&nbsp;</span><span class="crm-price-amount-help-post description">' . $opt['help_post'] . '</span>';
-            }
             if (isset($taxAmount) && $invoicing) {
-              $opt['label'] = '<span class="crm-price-amount-label">' . $opt['label'] . '</span>' . self::getTaxLabel($opt, $valueFieldName);
+              $opt['label'] = $opt['label'] . self::getTaxLabel($opt, $valueFieldName);
             }
             else {
-              $opt['label'] = '<span class="crm-price-amount-label">' . $opt['label'] . '</span>' . '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span>';
+              $opt['label'] = $opt['label'] . '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span>';
             }
-            $opt['label'] = $preHelpText . $opt['label'] . $postHelpText;
           }
+
+          $opt['label'] = $preHelpText . $opt['label'] . $postHelpText;
           $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
           $priceVal = implode($separator, [$opt[$valueFieldName] + $taxAmount, $count, $max_value]);
@@ -487,8 +490,17 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
 
+          $preHelpText = $postHelpText = '';
+          if (!empty($opt['help_pre'])) {
+            $preHelpText = $opt['help_pre'] . ':&nbsp;';
+          }
+          if (!empty($opt['help_post'])) {
+            $postHelpText = ':&nbsp;' . $opt['help_post'];
+          }
+
+          $taxAmount = $opt['tax_amount'] ?? NULL;
           if ($field->is_display_amounts) {
-            $opt['label'] .= '&nbsp;-&nbsp;';
+            $opt['label'] = !empty($opt['label']) ? $opt['label'] . '&nbsp;-&nbsp;' : '';
             if (isset($taxAmount) && $invoicing) {
               $opt['label'] = $opt['label'] . self::getTaxLabel($opt, $valueFieldName);
             }
@@ -496,6 +508,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
               $opt['label'] = $opt['label'] . CRM_Utils_Money::format($opt[$valueFieldName]);
             }
           }
+
+          $opt['label'] = $preHelpText . $opt['label'] . $postHelpText;
 
           $priceVal[$opt['id']] = implode($separator, [$opt[$valueFieldName] + $taxAmount, $count, $max_value]);
 
@@ -542,23 +556,28 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
 
+          $preHelpText = $postHelpText = '';
+          $opt['label'] = '<span class="crm-price-amount-label">' . $opt['label'] . '</span>';
+          if (!empty($opt['help_pre'])) {
+            $preHelpText = '<span class="crm-price-amount-help-pre description">' . $opt['help_pre'] . '</span><span class="crm-price-amount-help-pre-separator">:&nbsp;</span>';
+          }
+          if (!empty($opt['help_post'])) {
+            $postHelpText = '<span class="crm-price-amount-help-post-separator">:&nbsp;</span><span class="crm-price-amount-help-post description">' . $opt['help_post'] . '</span>';
+          }
+
+          $taxAmount = $opt['tax_amount'] ?? NULL;
           if ($field->is_display_amounts) {
-            $preHelpText = $postHelpText = '';
-            if (isset($opt['help_pre'])) {
-              $preHelpText = '<span class="crm-price-amount-help-pre description">' . $opt['help_pre'] . '</span>: ';
-            }
-            if (isset($opt['help_post'])) {
-              $postHelpText = ': <span class="crm-price-amount-help-post description">' . $opt['help_post'] . '</span>';
-            }
-            $opt['label'] = '<span class="crm-price-amount-label">' . $opt['label'] . '</span>&nbsp;-&nbsp;';
+            $opt['label'] = !empty($opt['label']) ? $opt['label'] . '<span class="crm-price-amount-label-separator">&nbsp;-&nbsp;</span>' : '';
             if (isset($taxAmount) && $invoicing) {
-              $opt['label'] .= self::getTaxLabel($opt, $valueFieldName);
+              $opt['label'] = $opt['label'] . self::getTaxLabel($opt, $valueFieldName);
             }
             else {
-              $opt['label'] .= CRM_Utils_Money::format($opt[$valueFieldName]);
+              $opt['label'] = $opt['label'] . '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span>';
             }
-            $opt['label'] = $preHelpText . $opt['label'] . $postHelpText;
           }
+
+          $opt['label'] = $preHelpText . $opt['label'] . $postHelpText;
+
           $priceVal = implode($separator, [$opt[$valueFieldName] + $taxAmount, $count, $max_value]);
           $check[$opId] = &$qf->createElement('checkbox', $opt['id'], NULL, $opt['label'],
             [
