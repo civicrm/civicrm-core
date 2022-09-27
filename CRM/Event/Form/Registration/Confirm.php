@@ -1073,13 +1073,15 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     if (!empty($form->_values[$topProfile])) {
       $profiles[] = $form->_values[$topProfile];
     }
-    $uFGroups = \Civi\Api4\UFGroup::get()
-      ->addSelect('add_to_group_id')
-      ->addWhere('id', 'IN', $profiles)
-      ->execute();
-    foreach ($uFGroups as $uFGroup) {
-      if (!empty($uFGroup['add_to_group_id'])) {
-        $addToGroups[$uFGroup['add_to_group_id']] = $uFGroup['add_to_group_id'];
+    if (!empty($profiles)) {
+      $uFGroups = \Civi\Api4\UFGroup::get()
+        ->addSelect('add_to_group_id')
+        ->addWhere('id', 'IN', $profiles)
+        ->execute();
+      foreach ($uFGroups as $uFGroup) {
+        if (!empty($uFGroup['add_to_group_id'])) {
+          $addToGroups[$uFGroup['add_to_group_id']] = $uFGroup['add_to_group_id'];
+        }
       }
     }
 
