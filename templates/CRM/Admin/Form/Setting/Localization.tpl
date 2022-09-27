@@ -37,6 +37,7 @@
                 <span class="description">{$settings_fields.inheritLocale.description}</span>
               </td>
             </tr>
+          {* This isn't a typo. languageLimit is a similar field but is for multilingual, and only gets assigned when multilingual is enabled, so the if-block is for display logic so that only one of them appears. *}
           {if !array_key_exists('languageLimit', $form)}
             <tr class="crm-localization-form-block-uiLanguages">
                 <td class="label">{$form.uiLanguages.label}</td>
