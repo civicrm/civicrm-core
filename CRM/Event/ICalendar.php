@@ -46,7 +46,7 @@ class CRM_Event_ICalendar {
 
     $info = CRM_Event_BAO_Event::getCompleteInfo($start, $type, $id, $end);
 
-    if ($gCalendar) {
+    if ($gCalendar && count($info) > 0) {
       return self::gCalRedirect($info);
     }
 
