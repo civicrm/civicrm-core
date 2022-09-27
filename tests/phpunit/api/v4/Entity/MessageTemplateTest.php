@@ -120,14 +120,18 @@ class MessageTemplateTest extends Api4TestBase implements TransactionalInterface
    * Test save with no id
    */
   public function testSaveNoId() {
-    $saved = civicrm_api4('MessageTemplate', 'save', ['records' => [array_merge(['is_reserved' => 0], $this->baseTpl)]]);
+    $saved = civicrm_api4('MessageTemplate', 'save', ['records' => [array_merge(['is_reserved' => 0], $this->baseTpl)]])->first();
+    $this->assertDBQuery('My Template', 'SELECT msg_title FROM civicrm_msg_template WHERE id = %1', [1 => [$saved['id'], 'Int']]);
+    $this->assertDBQuery('<p>My body as HTML</p>', 'SELECT msg_html FROM civicrm_msg_template WHERE id = %1', [1 => [$saved['id'], 'Int']]);
   }
 
   /**
    * Test save with an explicit null id
    */
   public function testSaveNullId() {
-    $saved = civicrm_api4('MessageTemplate', 'save', ['records' => [array_merge(['id' => NULL, 'is_reserved' => 0], $this->baseTpl)]]);
+    $saved = civicrm_api4('MessageTemplate', 'save', ['records' => [array_merge(['id' => NULL, 'is_reserved' => 0], $this->baseTpl)]])->first();
+    $this->assertDBQuery('My Template', 'SELECT msg_title FROM civicrm_msg_template WHERE id = %1', [1 => [$saved['id'], 'Int']]);
+    $this->assertDBQuery('<p>My body as HTML</p>', 'SELECT msg_html FROM civicrm_msg_template WHERE id = %1', [1 => [$saved['id'], 'Int']]);
   }
 
 }
