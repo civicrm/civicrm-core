@@ -208,7 +208,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   public function getMappedRow(array $values): array {
     $params = [];
     foreach ($this->getFieldMappings() as $i => $mappedField) {
-      if ($mappedField['name'] === 'do_not_import' || !$mappedField['name']) {
+      if (empty($mappedField['name']) || $mappedField['name'] === 'do_not_import') {
         continue;
       }
       $fieldSpec = $this->getFieldMetadata($mappedField['name']);
@@ -773,7 +773,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     if (empty($this->importableFieldsMetadata)) {
       $this->setFieldMetadata();
     }
-    if ($mappedField['name'] === '') {
+    if (empty($mappedField['name'])) {
       return '';
     }
     $title = [];
