@@ -3803,9 +3803,6 @@ span.crm-status-icon {
 #crm-container .sold-out-option,
 #crm-container .price-set-row span.sold-out-option .crm-price-amount-label,
 #crm-container .price-set-row span.sold-out-option .crm-price-amount-amount {
-  font-style: italic !important;
-  font-weight: normal !important;
-  font-size: 15px;
   color: #666 !important;
 }
 
