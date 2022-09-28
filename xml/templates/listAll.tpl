@@ -4,7 +4,7 @@
 return [
 {foreach from=$tables key=tableName item=table}
   '{$table.className}' => [
-    'name' => '{$table.entity}',
+    'name' => '{$table.objectName}',
     'class' => '{$table.className}',
     'table' => '{$tableName}',
   ],

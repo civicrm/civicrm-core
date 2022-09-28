@@ -19,16 +19,15 @@
 
 namespace api\v4\Action;
 
-use api\v4\Api4TestBase;
+use api\v4\UnitTestCase;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
-use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
+class SqlFunctionTest extends UnitTestCase {
 
   public function testGetFunctions() {
     $functions = array_column(\CRM_Api4_Page_Api4Explorer::getSqlFunctions(), NULL, 'name');
@@ -132,20 +131,6 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(100, $result[0]['MIN:total_amount']);
     $this->assertEquals(2, $result[0]['count']);
     $this->assertEquals(1, $result[1]['count']);
-
-    $result = Contribution::get(FALSE)
-      ->addGroupBy('contact_id')
-      ->addGroupBy('receive_date')
-      ->addSelect('contact_id')
-      ->addSelect('receive_date')
-      ->addSelect('SUM(total_amount)')
-      ->addOrderBy('receive_date')
-      ->addWhere('contact_id', '=', $cid)
-      ->addHaving('SUM(total_amount)', '>', 300)
-      ->execute();
-    $this->assertCount(1, $result);
-    $this->assertStringStartsWith('2020-04-04', $result[0]['receive_date']);
-    $this->assertEquals(400, $result[0]['SUM:total_amount']);
   }
 
   public function testComparisonFunctions() {
@@ -192,28 +177,6 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(FALSE, $result[$aids[2]]['duration_isnull']);
   }
 
-  public function testStringFunctions() {
-    $sampleData = [
-      ['first_name' => 'abc', 'middle_name' => 'Q', 'last_name' => 'tester1', 'source' => '123'],
-    ];
-    $cid = Contact::save(FALSE)
-      ->setRecords($sampleData)
-      ->execute()->first()['id'];
-
-    $result = Contact::get(FALSE)
-      ->addWhere('id', '=', $cid)
-      ->addSelect('CONCAT_WS("|", first_name, middle_name, last_name) AS concat_ws')
-      ->addSelect('REPLACE(first_name, "c", "cdef") AS new_first')
-      ->addSelect('UPPER(first_name)')
-      ->addSelect('LOWER(middle_name)')
-      ->execute()->first();
-
-    $this->assertEquals('abc|Q|tester1', $result['concat_ws']);
-    $this->assertEquals('abcdef', $result['new_first']);
-    $this->assertEquals('ABC', $result['UPPER:first_name']);
-    $this->assertEquals('q', $result['LOWER:middle_name']);
-  }
-
   public function testIncorrectNumberOfArguments() {
     try {
       Activity::get(FALSE)
@@ -221,8 +184,8 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
         ->execute();
       $this->fail('Api should have thrown exception');
     }
-    catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Missing param 2 for SQL function IF', $e->getMessage());
+    catch (\API_Exception $e) {
+      $this->assertEquals('Incorrect number of arguments for SQL function IF', $e->getMessage());
     }
 
     try {
@@ -231,109 +194,9 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
         ->execute();
       $this->fail('Api should have thrown exception');
     }
-    catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Too many arguments given for SQL function NULLIF', $e->getMessage());
+    catch (\API_Exception $e) {
+      $this->assertEquals('Incorrect number of arguments for SQL function NULLIF', $e->getMessage());
     }
-
-    try {
-      Activity::get(FALSE)
-        ->addSelect('CONCAT_WS(",", ) AS whoops')
-        ->execute();
-      $this->fail('Api should have thrown exception');
-    }
-    catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Too few arguments to param 2 for SQL function CONCAT_WS', $e->getMessage());
-    }
-  }
-
-  public function testCurrentDate() {
-    $lastName = uniqid(__FUNCTION__);
-    $sampleData = [
-      ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => 'now'],
-      ['first_name' => 'def', 'last_name' => $lastName, 'birth_date' => 'now - 1 year'],
-      ['first_name' => 'def', 'last_name' => $lastName, 'birth_date' => 'now - 10 year'],
-    ];
-    Contact::save(FALSE)
-      ->setRecords($sampleData)
-      ->execute();
-
-    $result = Contact::get(FALSE)
-      ->addWhere('last_name', '=', $lastName)
-      ->addWhere('birth_date', '=', 'CURDATE()', TRUE)
-      ->selectRowCount()
-      ->execute();
-    $this->assertCount(1, $result);
-
-    $result = Contact::get(FALSE)
-      ->addWhere('last_name', '=', $lastName)
-      ->addWhere('birth_date', '<', 'DATE(NOW())', TRUE)
-      ->selectRowCount()
-      ->execute();
-    $this->assertCount(2, $result);
-  }
-
-  public function testRandFunction() {
-    Contact::save(FALSE)
-      ->setRecords(array_fill(0, 6, []))
-      ->execute();
-
-    $result = Contact::get(FALSE)
-      ->addSelect('RAND() AS rand')
-      ->addOrderBy('RAND()')
-      ->setDebug(TRUE)
-      ->setLimit(6)
-      ->execute();
-
-    // Random numbers should have been ordered from least to greatest
-    $this->assertGreaterThanOrEqual($result[0]['rand'], $result[1]['rand']);
-    $this->assertGreaterThanOrEqual($result[1]['rand'], $result[2]['rand']);
-    $this->assertGreaterThanOrEqual($result[2]['rand'], $result[3]['rand']);
-    $this->assertGreaterThanOrEqual($result[3]['rand'], $result[4]['rand']);
-    $this->assertGreaterThanOrEqual($result[4]['rand'], $result[5]['rand']);
-  }
-
-  public function testDateInWhereClause() {
-    $lastName = uniqid(__FUNCTION__);
-    $sampleData = [
-      ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => '2009-11-11'],
-      ['first_name' => 'def', 'last_name' => $lastName, 'birth_date' => '2009-01-01'],
-      ['first_name' => 'def', 'last_name' => $lastName, 'birth_date' => '2010-01-01'],
-    ];
-    Contact::save(FALSE)
-      ->setRecords($sampleData)
-      ->execute();
-
-    // Should work with isExpression=FALSE
-    $result = Contact::get(FALSE)
-      ->addWhere('last_name', '=', $lastName)
-      ->addWhere('YEAR(birth_date)', '=', 2009)
-      ->selectRowCount()
-      ->execute();
-    $this->assertCount(2, $result);
-
-    // Should work with isExpression=TRUE
-    $result = Contact::get(FALSE)
-      ->addWhere('last_name', '=', $lastName)
-      ->addWhere('YEAR(birth_date)', '=', 2009, TRUE)
-      ->selectRowCount()
-      ->execute();
-    $this->assertCount(2, $result);
-
-    // Try an expression in the value
-    $result = Contact::get(FALSE)
-      ->addWhere('last_name', '=', $lastName)
-      ->addWhere('MONTH(birth_date)', '=', 'MONTH("2030-11-12")', TRUE)
-      ->addSelect('birth_date')
-      ->execute()->single();
-    $this->assertEquals('2009-11-11', $result['birth_date']);
-
-    // Try in GROUP_BY
-    $result = Contact::get(FALSE)
-      ->addSelect('COUNT(id) AS counted')
-      ->addWhere('last_name', '=', $lastName)
-      ->addGroupBy('EXTRACT(YEAR FROM birth_date)')
-      ->execute();
-    $this->assertCount(2, $result);
   }
 
 }

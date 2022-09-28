@@ -29,6 +29,12 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   public $_friendId;
 
   /**
+   */
+  public function __construct() {
+    parent::__construct();
+  }
+
+  /**
    * Takes an associative array and creates a friend object.
    *
    * the function extract all the params it needs to initialize the create a
@@ -45,20 +51,23 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
+   * Given the list of params in the params array, fetch the object
+   * and store the values in the values array
    *
    * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
+   *   Input parameters to find object.
+   * @param array $values
+   *   Output values of the object.
    *
-   * @return self|null
-   *   The DAO object, if found.
-   *
-   * @deprecated
+   * @return array
+   *   values
    */
-  public static function retrieve($params, &$defaults) {
-    return self::commonRetrieve(self::class, $params, $defaults);
+  public static function retrieve(&$params, &$values) {
+    $friend = new CRM_Friend_DAO_Friend();
+    $friend->copyValues($params);
+    $friend->find(TRUE);
+    CRM_Core_DAO::storeValues($friend, $values);
+    return $values;
   }
 
   /**
@@ -289,7 +298,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
 
     $templateParams = [
       'groupName' => 'msg_tpl_workflow_friend',
-      'workflow' => 'friend',
+      'valueName' => 'friend',
       'contactId' => $contactID,
       'tplParams' => [
         $values['module'] => $values['module'],

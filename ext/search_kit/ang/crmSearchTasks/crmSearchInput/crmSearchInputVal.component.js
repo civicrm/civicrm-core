@@ -4,24 +4,23 @@
   angular.module('crmSearchTasks').component('crmSearchInputVal', {
     bindings: {
       field: '<',
-      'op': '<',
+      'multi': '<',
       'optionKey': '<'
     },
     require: {ngModel: 'ngModel'},
     template: '<div class="form-group" ng-include="$ctrl.getTemplate()"></div>',
-    controller: function($scope, formatForSelect2, crmApi4) {
+    controller: function($scope, formatForSelect2) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
       this.$onInit = function() {
-        var rendered = false,
-          field = this.field || {};
+        var rendered = false;
         ctrl.dateRanges = CRM.crmSearchTasks.dateRanges;
-        ctrl.entity = field.fk_entity || field.entity;
+        ctrl.entity = ctrl.field.fk_entity || ctrl.field.entity;
 
         this.ngModel.$render = function() {
           ctrl.value = ctrl.ngModel.$viewValue;
-          if (!rendered && isDateField(field)) {
+          if (!rendered && ctrl.field.input_type === 'Date') {
             setDateType();
           }
           rendered = true;
@@ -44,16 +43,6 @@
             ctrl.dateType = 'fixed';
           }
         }
-      };
-
-      this.isMulti = function() {
-        // If there's a search operator, return `true` if the operator takes multiple values, else `false`
-        if (ctrl.op) {
-          return ctrl.op === 'IN' || ctrl.op === 'NOT IN';
-        }
-        // If no search operator this is an input for e.g. the bulk update action
-        // Return `true` if the field is multi-valued, else `null`
-        return ctrl.field && (ctrl.field.serialize || ctrl.field.data_type === 'Array') ? true : null;
       };
 
       this.changeDateType = function() {
@@ -95,54 +84,29 @@
         }
       };
 
-      this.lookupAddress = function() {
-        ctrl.value.geo_code_1 = null;
-        ctrl.value.geo_code_2 = null;
-        if (ctrl.value.address) {
-          crmApi4('Address', 'getCoordinates', {
-            address: ctrl.value.address
-          }).then(function(coordinates) {
-            if (coordinates[0]) {
-              ctrl.value.geo_code_1 = coordinates[0].geo_code_1;
-              ctrl.value.geo_code_2 = coordinates[0].geo_code_2;
-            }
-          });
-        }
-      };
-
       this.getTemplate = function() {
-        var field = ctrl.field || {};
 
-        if (_.includes(['LIKE', 'NOT LIKE', 'REGEXP', 'NOT REGEXP'], ctrl.op)) {
-          return '~/crmSearchTasks/crmSearchInput/text.html';
-        }
-
-        if (field.input_type === 'Location') {
-          ctrl.value = ctrl.value || {distance_unit: CRM.crmSearchAdmin.defaultDistanceUnit};
-          return '~/crmSearchTasks/crmSearchInput/location.html';
-        }
-
-        if (isDateField(field)) {
+        if (ctrl.field.input_type === 'Date') {
           return '~/crmSearchTasks/crmSearchInput/date.html';
         }
 
-        if (field.data_type === 'Boolean') {
+        if (ctrl.field.data_type === 'Boolean') {
           return '~/crmSearchTasks/crmSearchInput/boolean.html';
         }
 
-        if (field.options) {
+        if (ctrl.field.options) {
           return '~/crmSearchTasks/crmSearchInput/select.html';
         }
 
-        if ((field.fk_entity || field.name === 'id') && !_.includes(['>', '<', '>=', '<='], ctrl.op)) {
+        if (ctrl.field.fk_entity || ctrl.field.name === 'id') {
           return '~/crmSearchTasks/crmSearchInput/entityRef.html';
         }
 
-        if (field.data_type === 'Integer') {
+        if (ctrl.field.data_type === 'Integer') {
           return '~/crmSearchTasks/crmSearchInput/integer.html';
         }
 
-        if (field.data_type === 'Float') {
+        if (ctrl.field.data_type === 'Float') {
           return '~/crmSearchTasks/crmSearchInput/float.html';
         }
 
@@ -150,13 +114,8 @@
       };
 
       this.getFieldOptions = function() {
-        var field = ctrl.field || {};
-        return {results: formatForSelect2(field.options || [], ctrl.optionKey || 'id', 'label', ['description', 'color', 'icon'])};
+        return {results: formatForSelect2(ctrl.field.options, ctrl.optionKey || 'id', 'label', ['description', 'color', 'icon'])};
       };
-
-      function isDateField(field) {
-        return field.data_type === 'Date' || field.data_type === 'Timestamp';
-      }
 
     }
   });

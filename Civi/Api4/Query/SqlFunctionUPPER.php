@@ -16,8 +16,6 @@ namespace Civi\Api4\Query;
  */
 class SqlFunctionUPPER extends SqlFunction {
 
-  protected static $dataType = 'String';
-
   protected static $category = self::CATEGORY_STRING;
 
   protected static function params(): array {
@@ -34,13 +32,6 @@ class SqlFunctionUPPER extends SqlFunction {
    */
   public static function getTitle(): string {
     return ts('Uppercase');
-  }
-
-  /**
-   * @return string
-   */
-  public static function getDescription(): string {
-    return ts('Uppercase version of text.');
   }
 
 }

@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\ContributionRecur;
-
 /**
  *  Test Activity report outcome
  *
@@ -20,20 +18,22 @@ class CRM_Report_Form_Member_DetailTest extends CiviReportTestCase {
 
   public function setUp(): void {
     parent::setUp();
+
+    $this->_orgContactID = $this->organizationCreate();
     $this->_financialTypeId = 1;
     $this->_membershipStatusID = $this->membershipStatusCreate('test status');
     $this->_membershipTypeID = $this->membershipTypeCreate(['name' => 'Test Member']);
   }
 
-  /**
-   * Test the display of the auto renew memberships.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testAutoRenewDisplay(): void {
+  public function testAutoRenewDisplay() {
+
     $indContactID1 = $this->individualCreate();
     $indContactID2 = $this->individualCreate();
     $indContactID3 = $this->individualCreate();
+    $recurStatus = array_search(
+      'In Progress',
+      CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name')
+    );
     $recurParams = [
       'contact_id' => $indContactID1,
       'amount' => '5.00',
@@ -42,29 +42,29 @@ class CRM_Report_Form_Member_DetailTest extends CiviReportTestCase {
       'frequency_interval' => 30,
       'create_date' => '2019-06-22',
       'start_date' => '2019-06-22',
-      'contribution_status_id:name' => 'In Progress',
+      'contribution_status_id' => $recurStatus,
     ];
-    $recur1 = ContributionRecur::create()->setValues($recurParams)->execute()->first();
+    $recur1 = civicrm_api3('ContributionRecur', 'create', $recurParams);
     $memParams = [
       'membership_type_id' => $this->_membershipTypeID,
       'contact_id' => $indContactID1,
-      'status_id:name' => 'test status',
+      'status_id' => $this->_membershipStatusID,
       'contribution_recur_id' => $recur1['id'],
       'join_date' => '2019-06-22',
       'start_date' => '2019-06-22',
       'end_date' => '2019-07-22',
       'source' => 'Payment',
     ];
-    $this->callAPISuccess('Membership', 'create', $memParams);
+    $mem1 = civicrm_api3('Membership', 'create', $memParams);
     $recurParams['end_date'] = '2019-06-23';
     $recurParams['contact_id'] = $indContactID1;
-    $recur2 = ContributionRecur::create()->setValues($recurParams)->execute()->first();
+    $recur2 = civicrm_api3('ContributionRecur', 'create', $recurParams);
     $memParams['contact_id'] = $indContactID2;
     $memParams['contribution_recur_id'] = $recur2['id'];
-    civicrm_api3('Membership', 'create', $memParams);
+    $mem2 = civicrm_api3('Membership', 'create', $memParams);
     $memParams['contact_id'] = $indContactID3;
     unset($memParams['contribution_recur_id']);
-    civicrm_api3('Membership', 'create', $memParams);
+    $mem3 = civicrm_api3('Membership', 'create', $memParams);
 
     $input = [
       'fields' => ['autorenew_status_id'],
@@ -72,22 +72,22 @@ class CRM_Report_Form_Member_DetailTest extends CiviReportTestCase {
         'tid_op' => 'in',
         'tid_value' => $this->_membershipTypeID,
         'autorenew_status_id_op' => 'in',
-        'autorenew_status_id_value' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'In Progress'),
+        'autorenew_status_id_value' => $recurStatus,
       ],
     ];
     $obj = $this->getReportObject('CRM_Report_Form_Member_Detail', $input);
     $results = $obj->getResultSet();
     $this->assertCount(2, $results);
     foreach ($results as $result) {
-      if ($result['civicrm_contact_id'] === $indContactID1) {
+      if ($result['civicrm_contact_id'] == $indContactID1) {
         $this->assertStringNotContainsString('(ended)', $result['civicrm_contribution_recur_autorenew_status_id']);
       }
-      if ($result['civicrm_contact_id'] === $indContactID2) {
+      if ($result['civicrm_contact_id'] == $indContactID2) {
         $this->assertStringContainsString('(ended)', $result['civicrm_contribution_recur_autorenew_status_id']);
       }
     }
 
-    $input['filters']['autorenew_status_id_value'] = '0,' . CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'status_id', 'In Progress');
+    $input['filters']['autorenew_status_id_value'] = "0,$recurStatus";
     $obj = $this->getReportObject('CRM_Report_Form_Member_Detail', $input);
     $results = $obj->getResultSet();
     $this->assertCount(3, $results);

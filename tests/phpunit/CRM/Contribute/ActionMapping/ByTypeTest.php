@@ -9,9 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\Contribution;
-use Civi\Token\TokenProcessor;
-
 /**
  * Class CRM_Contribute_ActionMapping_ByTypeTest
  * @group ActionSchedule
@@ -41,50 +38,24 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
   public function createTestCases() {
     $cs = [];
 
-    $cs[] = [
-      '2015-02-01 00:00:00',
-      'addAliceDues scheduleForAny startOnTime useHelloFirstNameStatus alsoRecipientBob',
-      [
-        [
-          'time' => '2015-01-20 00:00:00',
-          'to' => ['bob@example.org'],
-          'subject' => '/Hello, Bob. @. \(via subject\)/',
-          // I'm not sure this behavior is what I would expect.
-          // - INTUITION: As someone browsing the admin UI, my guess is that "Also Include" behaves like a "CC"
-          //   (where Alice's data drives the notification, and Bob gets a copy of the message).
-          // - REALITY: The "also include" recipient, Bob, is treated as a recipient on day #1 (even
-          //   before any reminder becomes ripe for the organic recipient, Alice). The `{contact.*}`
-          //   details are filled in with Bob's information. In effect, Bob gets an early/preview
-          //   message that hints at how messages will look for Alice. However, Bob doesn't have
-          //   a contribution record, so some tokens (`{contribution.contribution_status_id:name}`)
-          //   don't work.
-          // - WHAT SHOULD IT DO: I'm not sure. The reality seems quirky and vaguely broken.
-          //   The CC behavior would be more "clearly defined" IMHO. OTOH, CC would also be more noisy.
-          //   The present behavior (early/preview message) maybe serves a different+valid business-need,
-          //   but the problems+limits seem essential.
-        ],
-        [
-          'time' => '2015-02-01 00:00:00',
-          'to' => ['alice@example.org'],
-          'subject' => '/Hello, Alice. @Completed. \(via subject\)/',
-        ],
-      ],
-    ];
-
-    $cs[] = [
-      '2015-02-01 00:00:00',
-      'scheduleForAny startOnTime useHelloFirstNameStatus alsoRecipientBob',
-      [
-        [
-          'time' => '2015-01-20 00:00:00',
-          'to' => ['bob@example.org'],
-          'subject' => '/Hello, Bob. @. \(via subject\)/',
-          // This is consistent with example+analysis above - The "Also Include" recipient gets
-          // an early/preview message without `{contribution.*}` tokens. This may be good or bad behavior.
-          // The test helps to show what the behavior is.
-        ],
-      ],
-    ];
+    // FIXME: CRM-19415: The right email content goes out, but it appears that the dates are incorrect.
+    //    $cs[] = array(
+    //      '2015-02-01 00:00:00',
+    //      'addAliceDues scheduleForAny startOnTime useHelloFirstName alsoRecipientBob',
+    //      array(
+    //        array(
+    //          'time' => '2015-02-01 00:00:00',
+    //          'to' => array('alice@example.org'),
+    //          'subject' => '/Hello, Alice.*via subject/',
+    //        ),
+    //        array(
+    //          'time' => '2015-02-01 00:00:00',
+    //          'to' => array('bob@example.org'),
+    //          'subject' => '/Hello, Bob.*via subject/',
+    //          // It might make more sense to get Alice's details... but path of least resistance...
+    //        ),
+    //      ),
+    //    );
 
     $cs[] = [
       '2015-02-01 00:00:00',
@@ -179,23 +150,17 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
   /**
    * Create a contribution record for Alice with type "Member Dues".
    */
-  public function addAliceDues(): void {
-    $this->enableCiviCampaign();
-    $campaignID = $this->campaignCreate();
+  public function addAliceDues() {
     $this->ids['Contribution']['alice'] = $this->callAPISuccess('Contribution', 'create', [
       'contact_id' => $this->contacts['alice']['id'],
       'receive_date' => date('Ymd', strtotime($this->targetDate)),
       'total_amount' => '100',
-      'currency' => 'EUR',
       'financial_type_id' => 1,
       'non_deductible_amount' => '10',
       'fee_amount' => '5',
       'net_amount' => '95',
       'source' => 'SSF',
-      // Having a cancel date is a bit artificial here but we can test it....
-      'cancel_date' => '2021-08-09',
       'contribution_status_id' => 1,
-      'campaign_id' => $campaignID,
       'soft_credit' => [
         '1' => [
           'contact_id' => $this->contacts['carol']['id'],
@@ -282,7 +247,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    * legacy processor function. Once this is true we can expose the listener on the
    * token processor for contribution and call it internally from the legacy code.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testTokenRendering(): void {
     $this->targetDate = '20150201000107';
@@ -301,70 +266,19 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       new style label = {contribution.contribution_status_id:label}
       id {contribution.id}
       contribution_id {contribution.contribution_id} - not valid for action schedule
-      cancel date {contribution.cancel_date}
-      source {contribution.source}
-      legacy source {contribution.contribution_source}
-      financial type id = {contribution.financial_type_id}
-      financial type name = {contribution.financial_type_id:name}
-      financial type label = {contribution.financial_type_id:label}
-      payment instrument id = {contribution.payment_instrument_id}
-      payment instrument name = {contribution.payment_instrument_id:name}
-      payment instrument label = {contribution.payment_instrument_id:label}
-      non_deductible_amount = {contribution.non_deductible_amount}
-      total_amount = {contribution.total_amount}
-      net_amount = {contribution.net_amount}
-      fee_amount = {contribution.fee_amount}
-      paid_amount = {contribution.paid_amount}
-      balance_amount = {contribution.balance_amount}
-      campaign_id = {contribution.campaign_id}
-      campaign name = {contribution.campaign_id:name}
-      campaign label = {contribution.campaign_id:label}';
-
+    ';
     $this->schedule->save();
     $this->callAPISuccess('job', 'send_reminder', []);
     $expected = [
       'first name = Alice',
-      'receive_date = February 1st, 2015',
+      'receive_date = February 1st, 2015 12:00 AM',
       'contribution status id = 1',
       'new style status = Completed',
       'new style label = Completed Label**',
       'id ' . $this->ids['Contribution']['alice'],
       'id  - not valid for action schedule',
-      'cancel date August 9th, 2021',
-      'source SSF',
-      'financial type id = 1',
-      'financial type name = Donation',
-      'financial type label = Donation',
-      'payment instrument id = 4',
-      'payment instrument name = Check',
-      'payment instrument label = Check',
-      'non_deductible_amount = €10.00',
-      'total_amount = €100.00',
-      'net_amount = €95.00',
-      'fee_amount = €5.00',
-      'paid_amount = €100.00',
-      'balance_amount = €0.00',
-      'campaign_id = 1',
-      'campaign name = big_campaign',
-      'campaign label = Campaign',
     ];
     $this->mut->checkMailLog($expected);
-
-    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
-      'controller' => __CLASS__,
-      'smarty' => FALSE,
-      'schema' => ['contributionId'],
-      'contributionId' => $this->ids['Contribution']['alice'],
-      'contactId' => $this->contacts['alice']['id'],
-    ]);
-    $tokenProcessor->addRow([]);
-    $tokenProcessor->addMessage('html', $this->schedule->body_text, 'text/plain');
-    $tokenProcessor->evaluate();
-    foreach ($tokenProcessor->getRows() as $row) {
-      foreach ($expected as $value) {
-        $this->assertStringContainsString($value, $row->render('html'));
-      }
-    }
 
     $messageToken = CRM_Utils_Token::getTokens($this->schedule->body_text);
 
@@ -378,89 +292,20 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       TRUE
     );
     $expected = [
-      'receive_date = February 1st, 2015',
+      'receive_date = February 1st, 2015 12:00 AM',
       'new style status = Completed',
       'contribution status id = 1',
       'id ' . $this->ids['Contribution']['alice'],
       'contribution_id ' . $this->ids['Contribution']['alice'],
-      'financial type id = 1',
-      'financial type name = Donation',
-      'financial type label = Donation',
-      'payment instrument id = 4',
-      'payment instrument name = Check',
-      'payment instrument label = Check',
-      'legacy source SSF',
-      'source SSF',
-      'non_deductible_amount = € 10.00',
-      'total_amount = € 100.00',
-      'net_amount = € 95.00',
-      'fee_amount = € 5.00',
-      'campaign_id = 1',
-      'campaign name = big_campaign',
-      'campaign label = Campaign',
     ];
     foreach ($expected as $string) {
       $this->assertStringContainsString($string, $contributionDetails[$this->contacts['alice']['id']]['html']);
     }
-    $tokens = [
-      'id',
-      'payment_instrument_id:label',
-      'financial_type_id:label',
-      'contribution_status_id:label',
-    ];
-    $legacyTokens = [];
-    $realLegacyTokens = [];
-    foreach (CRM_Core_SelectValues::contributionTokens() as $token => $label) {
-      $legacyTokens[substr($token, 14, -1)] = $label;
-      if (strpos($token, ':') === FALSE) {
-        $realLegacyTokens[substr($token, 14, -1)] = $label;
-      }
-    }
-    $fields = (array) Contribution::getFields()->addSelect('name', 'title')->execute()->indexBy('name');
-    $allFields = [];
-    foreach ($fields as $field) {
-      if (!array_key_exists($field['name'], $this->getUnadvertisedTokens())) {
-        $allFields[$field['name']] = $field['title'];
-      }
-    }
-    // contact ID is skipped.
-    unset($allFields['contact_id']);
-    $this->assertEquals($allFields, $realLegacyTokens);
-    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
-      'controller' => __CLASS__,
-      'smarty' => FALSE,
-      'schema' => ['contributionId'],
-    ]);
-    $comparison = [];
-    foreach ($tokenProcessor->listTokens() as $token => $label) {
-      if (strpos($token, '{domain.') === 0) {
-        // domain token - ignore.
-        continue;
-      }
-      $comparison[substr($token, 14, -1)] = $label;
-    }
-    $this->assertEquals($legacyTokens, $comparison);
+    $tokens = ['id', 'contribution_status_id', 'contribution_status_id:name', 'contribution_status_id:label'];
+    $processor = new CRM_Contribute_Tokens();
     foreach ($tokens as $token) {
-      $this->assertEquals(CRM_Core_SelectValues::contributionTokens()['{contribution.' . $token . '}'], $comparison[$token]);
+      $this->assertEquals(CRM_Core_SelectValues::contributionTokens()['{contribution.' . $token . '}'], $processor->tokenNames[$token]);
     }
-  }
-
-  /**
-   * Get tokens not advertised in the widget.
-   *
-   * @return string[]
-   */
-  public function getUnadvertisedTokens(): array {
-    return [
-      'financial_type_id' => 'Financial Type ID',
-      'contribution_page_id' => 'Contribution Page ID',
-      'payment_instrument_id' => 'Payment Method ID',
-      'is_test' => 'Is test',
-      'is_pay_later' => 'is pay later',
-      'is_template' => 'is_template',
-      'contribution_status_id' => 'Contribution Status ID',
-      'campaign_id' => 'Campaign ID',
-    ];
   }
 
 }

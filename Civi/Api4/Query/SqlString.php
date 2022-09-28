@@ -16,8 +16,6 @@ namespace Civi\Api4\Query;
  */
 class SqlString extends SqlExpression {
 
-  protected static $dataType = 'String';
-
   protected function initialize() {
     // Remove surrounding quotes
     $str = substr($this->expr, 1, -1);
@@ -27,12 +25,8 @@ class SqlString extends SqlExpression {
     $this->expr = str_replace(['\\\\', "\\$quot", $backslash], [$backslash, $quot, '\\\\'], $str);
   }
 
-  public function render(Api4SelectQuery $query): string {
+  public function render(array $fieldList): string {
     return '"' . \CRM_Core_DAO::escapeString($this->expr) . '"';
-  }
-
-  public static function getTitle(): string {
-    return ts('Text');
   }
 
 }

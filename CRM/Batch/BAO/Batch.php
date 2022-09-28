@@ -50,21 +50,24 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
+   * Retrieve the information about the batch.
    *
    * @param array $params
-   *   Array of criteria values.
-   * @param array|null $defaults
-   *   Array to be populated with found values.
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return self|null
-   *   The DAO object, if found.
-   *
-   * @deprecated
+   * @return array
+   *   CRM_Batch_BAO_Batch object on success, null otherwise
    */
-  public static function retrieve(array $params, ?array &$defaults = NULL) {
-    $defaults = $defaults ?? [];
-    return self::commonRetrieve(self::class, $params, $defaults);
+  public static function retrieve(&$params, &$defaults) {
+    $batch = new CRM_Batch_DAO_Batch();
+    $batch->copyValues($params);
+    if ($batch->find(TRUE)) {
+      CRM_Core_DAO::storeValues($batch, $defaults);
+      return $batch;
+    }
+    return NULL;
   }
 
   /**
@@ -326,7 +329,16 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
         $values['id']
       );
       // CRM-21205
-      $values['currency'] = CRM_Batch_BAO_EntityBatch::getBatchCurrency($values['id']);
+      $values['currency'] = CRM_Core_DAO::singleValueQuery("
+        SELECT GROUP_CONCAT(DISTINCT ft.currency)
+        FROM  civicrm_batch batch
+        JOIN civicrm_entity_batch eb
+          ON batch.id = eb.batch_id
+        JOIN civicrm_financial_trxn ft
+          ON eb.entity_id = ft.id
+        WHERE batch.id = %1
+        GROUP BY batch.id
+      ", [1 => [$values['id'], 'Positive']]);
       $results[$values['id']] = $values;
     }
 
@@ -352,7 +364,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param array $params
    *   Associated array for params.
    *
-   * @return string[]
+   * @return string
    */
   public static function whereClause($params) {
     $clauses = [];
@@ -539,7 +551,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    *   calculated total
    * @param $expected
    *   user-entered total
-   * @return string
+   * @return array
    */
   public static function displayTotals($actual, $expected) {
     $class = 'actual-value';

@@ -23,13 +23,12 @@ use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
 use Civi\Api4\Relationship;
-use api\v4\Api4TestBase;
-use Civi\Test\TransactionalInterface;
+use api\v4\UnitTestCase;
 
 /**
  * @group headless
  */
-class DateTest extends Api4TestBase implements TransactionalInterface {
+class DateTest extends UnitTestCase {
 
   public function testRelationshipDate() {
     $c1 = Contact::create()
@@ -72,7 +71,7 @@ class DateTest extends Api4TestBase implements TransactionalInterface {
 
     // Avoid problems with `strtotime(<date arithmetic expression>)` giving
     // impossible dates like April 31 which roll over and then don't match.
-    $thisMonth = (int) date('m');
+    $thisMonth = date('m');
     $lastMonth = ($thisMonth === 1 ? 12 : $thisMonth - 1);
     $nextMonth = ($thisMonth === 12 ? 1 : $thisMonth + 1);
     $lastMonthsYear = ($thisMonth === 1 ? date('Y') - 1 : date('Y'));
@@ -108,9 +107,8 @@ class DateTest extends Api4TestBase implements TransactionalInterface {
     $this->assertContains($act[5], $result);
     $this->assertContains($act[6], $result);
 
-    // Ensure it also works if the DATE() function is used
     $result = Activity::get(FALSE)->addSelect('id')
-      ->addWhere('DATE(activity_date_time)', '>=', 'this.year')
+      ->addWhere('activity_date_time', '>=', 'this.year')
       ->execute()->column('id');
     $this->assertNotContains($act[0], $result);
     $this->assertNotContains($act[1], $result);

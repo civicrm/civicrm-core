@@ -75,7 +75,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
   }
 
   /**
-   * @param string $out
+   * @param $out
    *
    * @return string
    */
@@ -144,7 +144,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
   }
 
   /**
-   * @param array $export
+   * @param $export
    */
   public function makeExport($export) {
     // Keep running list of accounts and contacts used in this batch, since we need to

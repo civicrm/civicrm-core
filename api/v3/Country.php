@@ -23,7 +23,7 @@
  *
  * @return array
  *   API result array
- * @throws \CRM_Core_Exception
+ * @throws \API_Exception
  */
 function civicrm_api3_country_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_DAO(__FUNCTION__), $params, 'Country');

@@ -25,15 +25,6 @@ class CRM_Member_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   const IMPORT_ENTITY = 'Membership';
 
   /**
-   * Get the name of the type to be stored in civicrm_user_job.type_id.
-   *
-   * @return string
-   */
-  public function getUserJobType(): string {
-    return 'membership_import';
-  }
-
-  /**
    * Build the form object.
    *
    * @return void
@@ -53,15 +44,19 @@ class CRM_Member_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   }
 
   /**
-   * @return \CRM_Member_Import_Parser_Membership
+   * Process the uploaded file.
+   *
+   * @return void
    */
-  protected function getParser(): CRM_Member_Import_Parser_Membership {
-    if (!$this->parser) {
-      $this->parser = new CRM_Member_Import_Parser_Membership();
-      $this->parser->setUserJobID($this->getUserJobID());
-      $this->parser->init();
-    }
-    return $this->parser;
+  public function postProcess() {
+    $this->storeFormValues([
+      'onDuplicate',
+      'contactType',
+      'dateFormats',
+      'savedMapping',
+    ]);
+
+    $this->submitFileForMapping('CRM_Member_Import_Parser_Membership');
   }
 
 }

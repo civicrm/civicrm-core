@@ -15,11 +15,7 @@ namespace Civi\Api4\Service\Spec\Provider;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
 
-/**
- * @service
- * @internal
- */
-class CaseCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
+class CaseCreationSpecProvider implements Generic\SpecProviderInterface {
 
   /**
    * @inheritDoc
@@ -34,10 +30,10 @@ class CaseCreationSpecProvider extends \Civi\Core\Service\AutoService implements
     $creator->setDefaultValue('user_contact_id');
     $spec->addFieldSpec($creator);
 
-    $multiClient = \Civi::settings()->get('civicaseAllowMultipleClients');
-    $contact = new FieldSpec('contact_id', $spec->getEntity(), $multiClient ? 'Array' : 'Integer');
-    $contact->setTitle($multiClient ? ts('Case Clients') : ts('Case Client'));
-    $contact->setDescription($multiClient ? 'Contact(s) who are case clients.' : 'The case client');
+    $contact = new FieldSpec('contact_id', $spec->getEntity(), 'Array');
+    $contact->setTitle(ts('Case Contact(s)'));
+    $contact->setLabel(ts('Case Client(s)'));
+    $contact->setDescription('Contact(s) who are case clients.');
     $contact->setFkEntity('Contact');
     $contact->setInputType('EntityRef');
     $contact->setRequired(TRUE);
@@ -59,9 +55,9 @@ class CaseCreationSpecProvider extends \Civi\Core\Service\AutoService implements
     $duration->setDescription('Open Case activity duration (minutes).');
     $spec->addFieldSpec($duration);
 
-    // Set defualt value for status_id so it is not required
     $defaultStatus = \CRM_Core_DAO::singleValueQuery('SELECT value FROM civicrm_option_value
       WHERE is_default
+        AND domain_id = ' . \CRM_Core_BAO_Domain::getDomain()->id . '
         AND option_group_id = (SELECT id FROM civicrm_option_group WHERE name = "case_status")
       LIMIT 1');
     if ($defaultStatus) {

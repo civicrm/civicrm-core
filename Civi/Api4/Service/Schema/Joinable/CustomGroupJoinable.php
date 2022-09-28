@@ -13,7 +13,6 @@
 namespace Civi\Api4\Service\Schema\Joinable;
 
 use Civi\Api4\CustomField;
-use Civi\Api4\Utils\CoreUtil;
 
 class CustomGroupJoinable extends Joinable {
 
@@ -53,13 +52,12 @@ class CustomGroupJoinable extends Joinable {
     $cacheKey = 'APIv4_CustomGroupJoinable-' . $this->getTargetTable();
     $entityFields = (array) \Civi::cache('metadata')->get($cacheKey);
     if (!$entityFields) {
-      $baseEntity = CoreUtil::getApiNameFromTableName($this->getBaseTable());
       $fields = CustomField::get(FALSE)
         ->setSelect(['custom_group_id.name', 'custom_group_id.extends', 'custom_group_id.table_name', 'custom_group_id.title', '*'])
         ->addWhere('custom_group_id.table_name', '=', $this->getTargetTable())
         ->execute();
       foreach ($fields as $field) {
-        $entityFields[] = \Civi\Api4\Service\Spec\SpecFormatter::arrayToField($field, $baseEntity);
+        $entityFields[] = \Civi\Api4\Service\Spec\SpecFormatter::arrayToField($field, self::getEntityFromExtends($field['custom_group_id.extends']));
       }
       \Civi::cache('metadata')->set($cacheKey, $entityFields);
     }
@@ -97,7 +95,7 @@ class CustomGroupJoinable extends Joinable {
    *
    * @param $extends
    * @return string
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function getEntityFromExtends($extends) {

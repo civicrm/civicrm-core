@@ -33,9 +33,9 @@ class CRM_Core_ShowHideBlocks {
   /**
    * Class constructor.
    *
-   * @param array|null $show
+   * @param array $show
    *   Initial value of show array.
-   * @param array|null $hide
+   * @param array $hide
    *   Initial value of hide array.
    *
    * @return \CRM_Core_ShowHideBlocks the newly created object
@@ -81,7 +81,6 @@ class CRM_Core_ShowHideBlocks {
     }
 
     $template = CRM_Core_Smarty::singleton();
-    $template->ensureVariablesAreAssigned(['elemType']);
     $template->assign_by_ref('hideBlocks', $hide);
     $template->assign_by_ref('showBlocks', $show);
   }

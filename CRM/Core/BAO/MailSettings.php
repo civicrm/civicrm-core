@@ -17,6 +17,13 @@
 class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
 
   /**
+   * Class constructor.
+   */
+  public function __construct() {
+    parent::__construct();
+  }
+
+  /**
    * Get a list of setup-actions.
    *
    * @return array
@@ -103,20 +110,28 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
-   *   Array of criteria values.
+   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   Array to be populated with found values.
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return self|null
-   *   The DAO object, if found.
-   *
-   * @deprecated
+   * @return CRM_Core_BAO_MailSettings
    */
-  public static function retrieve($params, &$defaults) {
-    return self::commonRetrieve(self::class, $params, $defaults);
+  public static function retrieve(&$params, &$defaults) {
+    $mailSettings = new CRM_Core_DAO_MailSettings();
+    $mailSettings->copyValues($params);
+
+    $result = NULL;
+    if ($mailSettings->find(TRUE)) {
+      CRM_Core_DAO::storeValues($mailSettings, $defaults);
+      $result = $mailSettings;
+    }
+
+    return $result;
   }
 
   /**
@@ -126,7 +141,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    *   Reference array contains the values submitted by the form.
    *
    *
-   * @return CRM_Core_DAO_MailSettings
+   * @return object
    */
   public static function add(&$params) {
     $result = NULL;
@@ -159,7 +174,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Core_DAO_MailSettings|CRM_Core_Error
+   * @return CRM_Core_BAO_MailSettings
    */
   public static function create(&$params) {
     $transaction = new CRM_Core_Transaction();

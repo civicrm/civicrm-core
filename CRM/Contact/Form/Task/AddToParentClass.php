@@ -30,7 +30,7 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
 
   public function buildQuickForm() {
     $contactType = $this->get('contactType');
-    $this->setTitle(ts('Add Contacts to %1', [1 => $contactType]));
+    CRM_Utils_System::setTitle(ts('Add Contacts to %1', [1 => $contactType]));
     $this->addElement('text', 'name', ts('Find Target %1', [1 => $contactType]));
 
     $this->add('select',
@@ -44,7 +44,6 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
 
     $searchRows = $this->get('searchRows');
     $searchCount = $this->get('searchCount');
-    $this->assign('searchRows', FALSE);
     if ($searchRows) {
       $checkBoxes = [];
       $chekFlag = 0;
@@ -210,6 +209,7 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
     }
 
     // get the count of contact
+    $contactBAO = new CRM_Contact_BAO_Contact();
     $query = new CRM_Contact_BAO_Query($searchValues);
     $searchCount = $query->searchQuery(0, 0, NULL, TRUE);
     $form->set('searchCount', $searchCount);

@@ -18,7 +18,7 @@
 /**
  * This class contains the functions for Case Type management.
  */
-class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\HookInterface {
+class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
   /**
    * Static field for all the case information that we can potentially export.
@@ -65,6 +65,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
 
     $caseTypeDAO->copyValues($params);
     $result = $caseTypeDAO->save();
+    CRM_Case_XMLRepository::singleton()->flush();
     return $result;
   }
 
@@ -406,9 +407,12 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
       $transaction->rollback();
       return $caseType;
     }
-    $transaction->commit();
 
     CRM_Utils_Hook::post($action, 'CaseType', $caseType->id, $case);
+
+    $transaction->commit();
+    CRM_Case_XMLRepository::singleton(TRUE);
+    CRM_Core_OptionGroup::flushAll();
 
     return $caseType;
   }
@@ -434,40 +438,20 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
   /**
    * @param int $caseTypeId
    *
-   * @deprecated
    * @throws CRM_Core_Exception
-   * @return CRM_Case_DAO_CaseType
+   * @return mixed
    */
   public static function del($caseTypeId) {
-    return static::deleteRecord(['id' => $caseTypeId]);
-  }
-
-  /**
-   * Callback for hook_civicrm_pre().
-   * @param \Civi\Core\Event\PreEvent $event
-   * @throws CRM_Core_Exception
-   */
-  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
-    // Before deleting a caseType, check references
-    if ($event->action === 'delete') {
-      $caseType = new CRM_Case_DAO_CaseType();
-      $caseType->id = $event->id;
-      $refCounts = $caseType->getReferenceCounts();
-      $total = array_sum(CRM_Utils_Array::collect('count', $refCounts));
-      if (array_sum(CRM_Utils_Array::collect('count', $refCounts))) {
-        throw new CRM_Core_Exception(ts("You can not delete this case type -- it is assigned to %1 existing case record(s). If you do not want this case type to be used going forward, consider disabling it instead.", [1 => $total]));
-      }
+    $caseType = new CRM_Case_DAO_CaseType();
+    $caseType->id = $caseTypeId;
+    $refCounts = $caseType->getReferenceCounts();
+    $total = array_sum(CRM_Utils_Array::collect('count', $refCounts));
+    if ($total) {
+      throw new CRM_Core_Exception(ts("You can not delete this case type -- it is assigned to %1 existing case record(s). If you do not want this case type to be used going forward, consider disabling it instead.", [1 => $total]));
     }
-  }
-
-  /**
-   * Callback for hook_civicrm_post().
-   * @param \Civi\Core\Event\PostEvent $event
-   */
-  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
-    // When a caseType is saved or deleted, flush xml and optionGroup cache
-    CRM_Case_XMLRepository::singleton()->flush();
-    CRM_Core_OptionGroup::flushAll();
+    $result = $caseType->delete();
+    CRM_Case_XMLRepository::singleton(TRUE);
+    return $result;
   }
 
   /**

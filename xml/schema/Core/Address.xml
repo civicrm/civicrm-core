@@ -67,7 +67,6 @@
     <title>Primary address</title>
     <type>boolean</type>
     <default>0</default>
-    <required>true</required>
     <comment>Is this the primary address.</comment>
     <add>2.0</add>
     <html>
@@ -84,7 +83,6 @@
     <title>Is Billing Address</title>
     <type>boolean</type>
     <default>0</default>
-    <required>true</required>
     <comment>Is this the billing address.</comment>
     <add>2.0</add>
     <html>
@@ -267,7 +265,6 @@
       <table>civicrm_county</table>
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
-      <abbrColumn>abbreviation</abbrColumn>
     </pseudoconstant>
     <html>
       <type>ChainSelect</type>
@@ -295,7 +292,6 @@
       <table>civicrm_state_province</table>
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
-      <abbrColumn>abbreviation</abbrColumn>
     </pseudoconstant>
     <localize_context>province</localize_context>
     <html>
@@ -352,7 +348,6 @@
     <title>USPS Code</title>
     <type>varchar</type>
     <length>32</length>
-    <deprecated>true</deprecated>
     <comment>USPS Bulk mailing code.</comment>
     <add>1.1</add>
   </field>
@@ -421,7 +416,6 @@
     <title>Is Manually Geocoded</title>
     <type>boolean</type>
     <default>0</default>
-    <required>true</required>
     <comment>Is this a manually entered geo code</comment>
     <add>4.3</add>
     <html>

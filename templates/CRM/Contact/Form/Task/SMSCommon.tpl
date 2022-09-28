@@ -9,6 +9,8 @@
 *}
 {*common template for compose sms*}
 
+{crmScript file=bower_components/sms-counter/sms_counter.min.js region=html-header}
+
 <div class="crm-accordion-wrapper crm-plaint_text_sms-accordion ">
 <div class="crm-accordion-header">
   {$form.sms_text_message.label}
@@ -45,43 +47,41 @@
 {literal}
 <script type="text/javascript">
 {/literal}{if $max_sms_length}{literal}
-CRM.loadScript(CRM.config.resourceBase + 'bower_components/sms-counter/sms_counter.min.js').done(function () {
-  maxCharInfoDisplay();
+maxCharInfoDisplay();
 
-  CRM.$('#sms_text_message').bind({
-    change: function() {
-    maxLengthMessage();
-    },
-    keyup:  function() {
-    maxCharInfoDisplay();
-    }
-  });
-
-  function maxLengthMessage()
-  {
-    var len = CRM.$('#sms_text_message').val().length;
-    var maxLength = {/literal}{$max_sms_length}{literal};
-    if (len > maxLength) {
-        CRM.$('#sms_text_message').crmError({/literal}'{ts escape="js" 1=$max_sms_length}SMS body exceeding limit of %1 characters{/ts}'{literal});
-        return false;
-    }
-  return true;
-  }
-
-  function maxCharInfoDisplay(){
-    var maxLength = {/literal}{$max_sms_length}{literal};
-    var enteredText = SmsCounter.count(CRM.$('#sms_text_message').val());
-    var count = enteredText.length;
-    var segments = enteredText.messages;
-
-    if( count < 0 ) {
-        CRM.$('#sms_text_message').val(CRM.$('#sms_text_message').val().substring(0, maxLength));
-        count = 0;
-    }
-    var message = "{/literal}{$char_count_message}{literal}"
-    CRM.$('#char-count-message').text(message.replace('%1', maxLength).replace('%2', count).replace('%3', segments));
+CRM.$('#sms_text_message').bind({
+  change: function() {
+   maxLengthMessage();
+  },
+  keyup:  function() {
+   maxCharInfoDisplay();
   }
 });
+
+function maxLengthMessage()
+{
+   var len = CRM.$('#sms_text_message').val().length;
+   var maxLength = {/literal}{$max_sms_length}{literal};
+   if (len > maxLength) {
+      CRM.$('#sms_text_message').crmError({/literal}'{ts escape="js" 1=$max_sms_length}SMS body exceeding limit of %1 characters{/ts}'{literal});
+      return false;
+   }
+return true;
+}
+
+function maxCharInfoDisplay(){
+   var maxLength = {/literal}{$max_sms_length}{literal};
+   var enteredText = SmsCounter.count(CRM.$('#sms_text_message').val());
+   var count = enteredText.length;
+   var segments = enteredText.messages;
+
+   if( count < 0 ) {
+      CRM.$('#sms_text_message').val(CRM.$('#sms_text_message').val().substring(0, maxLength));
+      count = 0;
+   }
+   var message = "{/literal}{$char_count_message}{literal}"
+   CRM.$('#char-count-message').text(message.replace('%1', maxLength).replace('%2', count).replace('%3', segments));
+}
 {/literal}{/if}{literal}
 
 </script>

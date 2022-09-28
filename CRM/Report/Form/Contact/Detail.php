@@ -440,7 +440,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   /**
    * @param $fields
    * @param $files
-   * @param self $self
+   * @param $self
    *
    * @return array
    */
@@ -785,7 +785,7 @@ HERESQL;
   }
 
   /**
-   * @param array $rows
+   * @param $rows
    *
    * @return array
    */
@@ -904,7 +904,7 @@ HERESQL;
   }
 
   /**
-   * @param array $componentRows
+   * @param $componentRows
    */
   public function alterComponentDisplay(&$componentRows) {
     // custom code to alter rows

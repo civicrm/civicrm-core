@@ -80,7 +80,7 @@ class CRM_Utils_Zip {
    * Determine the name of the folder within a zip.
    *
    * @param ZipArchive $zip
-   * @param string $expected
+   * @param $expected
    *
    * @return string|bool
    *   Return string or FALSE

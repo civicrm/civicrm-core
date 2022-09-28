@@ -33,10 +33,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
   public function check($str, $userId = NULL) {
     $config = CRM_Core_Config::singleton();
     // JFactory::getUser does strict type checking, so convert falesy values to NULL
-    if ($userId === 0 || $userId === '0') {
-      $userId = 0;
-    }
-    elseif (!$userId) {
+    if (!$userId) {
       $userId = NULL;
     }
 

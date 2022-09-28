@@ -33,14 +33,7 @@ class SqlFunctionDATE extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('Date only');
-  }
-
-  /**
-   * @return string
-   */
-  public static function getDescription(): string {
-    return ts('Only the date portion of a date/time.');
+    return ts('Date Only');
   }
 
 }

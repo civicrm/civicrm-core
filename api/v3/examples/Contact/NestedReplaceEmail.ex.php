@@ -1,9 +1,4 @@
 <?php
-
-/**
- * @file
- */
-
 /**
  * Test Generated example demonstrating the Contact.get API.
  *
@@ -46,10 +41,10 @@ function contact_get_example() {
     ],
   ];
 
-  try {
+  try{
     $result = civicrm_api3('Contact', 'get', $params);
   }
-  catch (CRM_Core_Exception $e) {
+  catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
@@ -154,7 +149,7 @@ function contact_get_expectedresult() {
           'count' => 5,
           'values' => [
             '0' => [
-              'id' => '35',
+              'id' => '19',
               'contact_id' => '19',
               'location_type_id' => '38',
               'email' => '1-1@example.com',
@@ -168,7 +163,7 @@ function contact_get_expectedresult() {
               'signature_html' => '',
             ],
             '1' => [
-              'id' => '36',
+              'id' => '20',
               'contact_id' => '19',
               'location_type_id' => '38',
               'email' => '1-2@example.com',
@@ -182,7 +177,7 @@ function contact_get_expectedresult() {
               'signature_html' => '',
             ],
             '2' => [
-              'id' => '37',
+              'id' => '21',
               'contact_id' => '19',
               'location_type_id' => '38',
               'email' => '1-3@example.com',
@@ -196,7 +191,7 @@ function contact_get_expectedresult() {
               'signature_html' => '',
             ],
             '3' => [
-              'id' => '38',
+              'id' => '22',
               'contact_id' => '19',
               'location_type_id' => '39',
               'email' => '2-1@example.com',
@@ -210,7 +205,7 @@ function contact_get_expectedresult() {
               'signature_html' => '',
             ],
             '4' => [
-              'id' => '39',
+              'id' => '23',
               'contact_id' => '19',
               'location_type_id' => '39',
               'email' => '2-2@example.com',
@@ -233,23 +228,23 @@ function contact_get_expectedresult() {
 }
 
 /*
- * This example has been generated from the API test suite.
- * The test that created it is called "testReplaceEmailsInChain"
- * and can be found at:
- * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/EmailTest.php
- *
- * You can see the outcome of the API tests at
- * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
- *
- * To Learn about the API read
- * https://docs.civicrm.org/dev/en/latest/api/
- *
- * Browse the API on your own site with the API Explorer. It is in the main
- * CiviCRM menu, under: Support > Development > API Explorer.
- *
- * Read more about testing here
- * https://docs.civicrm.org/dev/en/latest/testing/
- *
- * API Standards documentation:
- * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
- */
+* This example has been generated from the API test suite.
+* The test that created it is called "testReplaceEmailsInChain"
+* and can be found at:
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/EmailTest.php
+*
+* You can see the outcome of the API tests at
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+*
+* To Learn about the API read
+* https://docs.civicrm.org/dev/en/latest/api/
+*
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
+*
+* Read more about testing here
+* https://docs.civicrm.org/dev/en/latest/testing/
+*
+* API Standards documentation:
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+*/

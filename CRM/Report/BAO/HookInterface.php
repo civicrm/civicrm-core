@@ -32,7 +32,7 @@ class CRM_Report_BAO_HookInterface {
 
   /**
    * @param $reportObj
-   * @param string $table
+   * @param $table
    *
    * @return array
    */

@@ -52,11 +52,11 @@ abstract class AbstractGrantAction extends \Civi\Api4\Generic\AbstractBatchActio
   }
 
   /**
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   protected function validate() {
     if (!preg_match(OAuthTokenFacade::STORAGE_TYPES, $this->storage)) {
-      throw new \CRM_Core_Exception("Invalid token storage ($this->storage)");
+      throw new \API_Exception("Invalid token storage ($this->storage)");
     }
   }
 

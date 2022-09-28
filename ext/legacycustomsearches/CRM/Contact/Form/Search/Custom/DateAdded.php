@@ -72,7 +72,7 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
       $select2style
     );
 
-    $this->setTitle(ts('Search by date added to CiviCRM'));
+    $this->setTitle('Search by date added to CiviCRM');
 
     //redirect if group not available for search criteria
     if (count($groups) == 0) {
@@ -359,6 +359,18 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
    */
   public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
+  }
+
+  /**
+   * @param $title
+   */
+  public function setTitle($title) {
+    if ($title) {
+      CRM_Utils_System::setTitle($title);
+    }
+    else {
+      CRM_Utils_System::setTitle(ts('Search'));
+    }
   }
 
   /**

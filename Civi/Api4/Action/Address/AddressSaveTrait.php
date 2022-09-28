@@ -13,8 +13,7 @@
 namespace Civi\Api4\Action\Address;
 
 /**
- * Code shared by Address create/update/save actions
- *
+ * @inheritDoc
  * @method bool getStreetParsing()
  * @method $this setStreetParsing(bool $streetParsing)
  * @method bool getSkipGeocode()
@@ -48,16 +47,14 @@ trait AddressSaveTrait {
   /**
    * @inheritDoc
    */
-  protected function write(array $items) {
-    $saved = [];
-    foreach ($items as $item) {
+  protected function writeObjects(&$items) {
+    foreach ($items as &$item) {
       if ($this->streetParsing && !empty($item['street_address'])) {
         $item = array_merge($item, \CRM_Core_BAO_Address::parseStreetAddress($item['street_address']));
       }
       $item['skip_geocode'] = $this->skipGeocode;
-      $saved[] = \CRM_Core_BAO_Address::add($item, $this->fixAddress);
     }
-    return $saved;
+    return parent::writeObjects($items);
   }
 
 }

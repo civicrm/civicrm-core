@@ -65,7 +65,7 @@ class CRM_Report_BAO_Hook {
 
   /**
    * @param $reportObj
-   * @param string $table
+   * @param $table
    *
    * @return array
    */

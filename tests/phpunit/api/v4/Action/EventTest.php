@@ -16,14 +16,12 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use api\v4\Api4TestBase;
 use Civi\Api4\Event;
-use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class EventTest extends Api4TestBase implements TransactionalInterface {
+class EventTest extends \api\v4\UnitTestCase {
 
   /**
    * Test that the event api filters out templates by default.

@@ -22,7 +22,6 @@ class CRM_Contribute_BAO_ContributionTypeTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
     $this->financialAccountDelete('Donations');
-    parent::tearDown();
   }
 
   /**

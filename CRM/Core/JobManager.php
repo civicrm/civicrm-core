@@ -152,14 +152,14 @@ class CRM_Core_JobManager {
    * @return array
    *   ($id => CRM_Core_ScheduledJob)
    */
-  private function _getJobs(): array {
+  private function _getJobs() {
     $jobs = [];
     $dao = new CRM_Core_DAO_Job();
     $dao->orderBy('name');
     $dao->domain_id = CRM_Core_Config::domainID();
     $dao->find();
     while ($dao->fetch()) {
-      $temp = ['class' => NULL, 'parameters' => NULL, 'last_run' => NULL];
+      $temp = [];
       CRM_Core_DAO::storeValues($dao, $temp);
       $jobs[$dao->id] = new CRM_Core_ScheduledJob($temp);
     }
@@ -259,7 +259,7 @@ class CRM_Core_JobManager {
    * @return string
    */
   private function _apiResultToMessage($apiResult) {
-    $status = ($apiResult['is_error'] ?? FALSE) ? ts('Failure') : ts('Success');
+    $status = $apiResult['is_error'] ? ts('Failure') : ts('Success');
     $msg = CRM_Utils_Array::value('error_message', $apiResult, 'empty error_message!');
     $vals = CRM_Utils_Array::value('values', $apiResult, 'empty values!');
     if (is_array($msg)) {
@@ -268,7 +268,7 @@ class CRM_Core_JobManager {
     if (is_array($vals)) {
       $vals = serialize($vals);
     }
-    $message = ($apiResult['is_error'] ?? FALSE) ? ', Error message: ' . $msg : " (" . $vals . ")";
+    $message = $apiResult['is_error'] ? ', Error message: ' . $msg : " (" . $vals . ")";
     return $status . $message;
   }
 

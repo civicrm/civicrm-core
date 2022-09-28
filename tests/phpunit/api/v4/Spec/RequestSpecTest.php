@@ -21,12 +21,12 @@ namespace api\v4\Spec;
 
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
-use api\v4\Api4TestBase;
+use api\v4\UnitTestCase;
 
 /**
  * @group headless
  */
-class RequestSpecTest extends Api4TestBase {
+class RequestSpecTest extends UnitTestCase {
 
   public function testRequiredFieldFetching() {
     $spec = new RequestSpec('Contact', 'get');

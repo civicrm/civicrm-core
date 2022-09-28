@@ -108,7 +108,7 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
    * @dataProvider getTwoGenerators
    */
   public function testDiff_clearA($cacheA, $cacheB) {
-    [$a, $b] = $this->createTwoCaches($cacheA, $cacheB);
+    list($a, $b) = $this->createTwoCaches($cacheA, $cacheB);
     $a->set('foo', 1234);
     $b->set('foo', 5678);
     $this->assertEquals(1234, $a->get('foo'), 'Check value A after initial setup');
@@ -129,7 +129,7 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
    * @dataProvider getTwoGenerators
    */
   public function testDiff_clearB($cacheA, $cacheB) {
-    [$a, $b] = $this->createTwoCaches($cacheA, $cacheB);
+    list($a, $b) = $this->createTwoCaches($cacheA, $cacheB);
     $a->set('foo', 1234);
     $b->set('foo', 5678);
     $this->assertEquals(1234, $a->get('foo'), 'Check value A after initial setup');
@@ -150,13 +150,13 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
    * @dataProvider getTwoGenerators
    */
   public function testDiff_reload($cacheA, $cacheB) {
-    [$a, $b] = $this->createTwoCaches($cacheA, $cacheB);
+    list($a, $b) = $this->createTwoCaches($cacheA, $cacheB);
     $a->set('foo', 1234);
     $b->set('foo', 5678);
     $this->assertEquals(1234, $a->get('foo'), 'Check value A after initial setup');
     $this->assertEquals(5678, $b->get('foo'), 'Check value B after initial setup');
 
-    [$a, $b] = $this->createTwoCaches($cacheA, $cacheB);
+    list($a, $b) = $this->createTwoCaches($cacheA, $cacheB);
     $this->assertEquals(1234, $a->get('foo'), 'Check value A after initial setup');
     $this->assertEquals(5678, $b->get('foo'), 'Check value B after initial setup');
   }

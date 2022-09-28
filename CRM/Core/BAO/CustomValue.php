@@ -260,7 +260,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
     }
 
     // Do we have access to the target record?
-    if ($extends === 'Contact' || in_array($extends, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE)) {
+    if (in_array($extends, ['Contact', 'Individual', 'Organization', 'Household'])) {
       return \Civi\Api4\Utils\CoreUtil::checkAccessDelegated('Contact', 'update', ['id' => $eid], $userID);
     }
     elseif (\Civi\Api4\Utils\CoreUtil::getApiClass($extends)) {

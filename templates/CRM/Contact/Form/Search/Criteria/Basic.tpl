@@ -11,25 +11,26 @@
   {foreach from=$basicSearchFields item=fieldSpec}
     {assign var=field value=$form[$fieldSpec.name]}
     {if $field && !in_array($fieldSpec.name, array('first_name', 'last_name'))}
-      <div class="search-field {if !empty($fieldSpec.class)}{$fieldSpec.class|escape}{/if}">
-        {if !empty($fieldSpec.template)}
+      <div class="search-field {$fieldSpec.class|escape}">
+        {if $fieldSpec.template}
           {include file=$fieldSpec.template}
         {else}
           {$field.label}
-          {if !empty($fieldSpec.help)}
+          {if $fieldSpec.help}
             {assign var=help value=$fieldSpec.help}
+            {capture assign=helpFile}{if $fieldSpec.help}{$fieldSpec.help}{else}''{/if}{/capture}
             {help id=$help.id file=$help.file}
           {/if}
           <br />
           {$field.html}
-          {if !empty($fieldSpec.description)}
+          {if $fieldSpec.description}
             <div class="description font-italic">
               {$fieldSpec.description}
             </div>
           {/if}
         {/if}
       </div>
-    {elseif !empty($fieldSpec.is_custom)}
+    {elseif $fieldSpec.is_custom}
       {include file=$fieldSpec.template}
     {/if}
   {/foreach}

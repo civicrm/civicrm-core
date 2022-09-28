@@ -19,20 +19,21 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     NUM_ROWS_TO_INSERT = 100;
 
   /**
-   * Form fields declared for this datasource.
-   *
-   * @var string[]
-   */
-  protected $submittableFields = ['skipColumnHeader', 'uploadField'];
-
-  /**
    * Provides information about the data source.
    *
    * @return array
    *   collection of info about this data source
    */
-  public function getInfo(): array {
+  public function getInfo() {
     return ['title' => ts('Comma-Separated Values (CSV)')];
+  }
+
+  /**
+   * Set variables up before form is built.
+   *
+   * @param CRM_Core_Form $form
+   */
+  public function preProcess(&$form) {
   }
 
   /**
@@ -48,7 +49,9 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   public function buildQuickForm(&$form) {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_CSV');
 
-    $uploadFileSize = CRM_Utils_Number::formatUnitSize(Civi::settings()->get('maxFileSize') . 'm', TRUE);
+    $config = CRM_Core_Config::singleton();
+
+    $uploadFileSize = CRM_Utils_Number::formatUnitSize($config->maxFileSize . 'm', TRUE);
     //Fetch uploadFileSize from php_ini when $config->maxFileSize is set to "no limit".
     if (empty($uploadFileSize)) {
       $uploadFileSize = CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'), TRUE);
@@ -68,32 +71,41 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   }
 
   /**
-   * Initialize the datasource, based on the submitted values stored in the user job.
+   * Process the form submission.
+   *
+   * @param array $params
+   * @param string $db
+   * @param \CRM_Core_Form $form
    *
    * @throws \CRM_Core_Exception
    */
-  public function initialize(): void {
-    $result = $this->csvToTable(
-      $this->getSubmittedValue('uploadFile')['name'],
-      $this->getSubmittedValue('skipColumnHeader'),
-      $this->getSubmittedValue('fieldSeparator') ?? ','
+  public function postProcess(&$params, &$db, &$form) {
+    $file = $params['uploadFile']['name'];
+    $result = self::_CsvToTable($db,
+      $file,
+      CRM_Utils_Array::value('skipColumnHeader', $params, FALSE),
+      CRM_Utils_Array::value('import_table_name', $params),
+      CRM_Utils_Array::value('fieldSeparator', $params, ',')
     );
-    $this->addTrackingFieldsToTable($result['import_table_name']);
 
-    $this->updateUserJobMetadata('DataSource', [
-      'table_name' => $result['import_table_name'],
-      'column_headers' => $result['column_headers'],
-      'number_of_columns' => $result['number_of_columns'],
-    ]);
+    $form->set('originalColHeader', CRM_Utils_Array::value('original_col_header', $result));
+
+    $table = $result['import_table_name'];
+    $importJob = new CRM_Contact_Import_ImportJob($table);
+    $form->set('importTableName', $importJob->getTableName());
   }
 
   /**
    * Create a table that matches the CSV file and populate it with the file's contents
    *
+   * @param object $db
+   *   Handle to the database connection.
    * @param string $file
    *   File name to load.
    * @param bool $headers
    *   Whether the first row contains headers.
+   * @param string $tableName
+   *   Name of table from which data imported.
    * @param string $fieldSeparator
    *   Character that separates the various columns in the file.
    *
@@ -101,9 +113,11 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    *   name of the created table
    * @throws \CRM_Core_Exception
    */
-  private function csvToTable(
+  private static function _CsvToTable(
+    &$db,
     $file,
     $headers = FALSE,
+    $tableName = NULL,
     $fieldSeparator = ','
   ) {
     $result = [];
@@ -123,14 +137,14 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     }
 
     $firstrow = fgetcsv($fd, 0, $fieldSeparator);
+
     // create the column names from the CSV header or as col_0, col_1, etc.
     if ($headers) {
       //need to get original headers.
-      $result['column_headers'] = $firstrow;
+      $result['original_col_header'] = $firstrow;
 
       $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
       $columns = array_map($strtolower, $firstrow);
-      $columns = array_map('trim', $columns);
       $columns = str_replace(' ', '_', $columns);
       $columns = preg_replace('/[^a-z_]/', '', $columns);
 
@@ -168,11 +182,13 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     else {
       $columns = [];
       foreach ($firstrow as $i => $_) {
-        $columns[] = "column_$i";
+        $columns[] = "col_$i";
       }
-      $result['column_headers'] = $columns;
     }
 
+    if ($tableName) {
+      CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS $tableName");
+    }
     $table = CRM_Utils_SQL_TempTable::build()->setDurable();
     $tableName = $table->getName();
     CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS $tableName");
@@ -196,10 +212,6 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     while ($row = fgetcsv($fd, 0, $fieldSeparator)) {
       // skip rows that dont match column count, else we get a sql error
       if (count($row) != $numColumns) {
-        continue;
-      }
-      // A blank line will be array(0 => NULL)
-      if ($row === [NULL]) {
         continue;
       }
 
@@ -232,7 +244,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
 
     //get the import tmp table name.
     $result['import_table_name'] = $tableName;
-    $result['number_of_columns'] = $numColumns;
+
     return $result;
   }
 

@@ -1,11 +1,8 @@
 <?php
 namespace Civi\Token;
 
-use Brick\Money\Money;
-
 /**
  * Class TokenRow
- *
  * @package Civi\Token
  *
  * A TokenRow is a helper/stub providing simplified access to the TokenProcessor.
@@ -144,11 +141,6 @@ class TokenRow {
   /**
    * Update the value of a token.
    *
-   * If you are reading this it probably means you can't follow this function.
-   * Don't worry - I've stared at it & all I see is a bunch of letters. However,
-   * the answer to your problem is almost certainly that you are passing in null
-   * rather than an empty string for 'c'.
-   *
    * @param string|array $a
    * @param string|array $b
    * @param mixed $c
@@ -182,8 +174,8 @@ class TokenRow {
    * @return TokenRow
    */
   public function customToken($entity, $customFieldID, $entityID) {
-    $customFieldName = 'custom_' . $customFieldID;
-    $record = civicrm_api3($entity, 'getSingle', [
+    $customFieldName = "custom_" . $customFieldID;
+    $record = civicrm_api3($entity, "getSingle", [
       'return' => $customFieldName,
       'id' => $entityID,
     ]);
@@ -191,10 +183,10 @@ class TokenRow {
 
     // format the raw custom field value into proper display value
     if (isset($fieldValue)) {
-      $fieldValue = (string) \CRM_Core_BAO_CustomField::displayValue($fieldValue, $customFieldID);
+      $fieldValue = \CRM_Core_BAO_CustomField::displayValue($fieldValue, $customFieldID);
     }
 
-    return $this->format('text/html')->tokens($entity, $customFieldName, $fieldValue);
+    return $this->tokens($entity, $customFieldName, $fieldValue);
   }
 
   /**
@@ -209,7 +201,6 @@ class TokenRow {
    * @throws \CRM_Core_Exception
    */
   public function dbToken($tokenEntity, $tokenField, $baoName, $baoField, $fieldValue) {
-    \CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     if ($fieldValue === NULL || $fieldValue === '') {
       return $this->tokens($tokenEntity, $tokenField, '');
     }
@@ -280,7 +271,7 @@ class TokenRow {
                 $htmlTokens[$entity][$field] = \CRM_Utils_String::purifyHTML($value);
               }
               else {
-                $htmlTokens[$entity][$field] = is_object($value) ? $value : htmlentities($value, ENT_QUOTES);
+                $htmlTokens[$entity][$field] = htmlentities($value);
               }
             }
           }
@@ -291,18 +282,15 @@ class TokenRow {
         // HTML => Plain.
         foreach ($htmlTokens as $entity => $values) {
           foreach ($values as $field => $value) {
-            if (!$value instanceof \DateTime && !$value instanceof Money) {
-              $value = html_entity_decode(strip_tags($value));
-            }
             if (!isset($textTokens[$entity][$field])) {
-              $textTokens[$entity][$field] = $value;
+              $textTokens[$entity][$field] = html_entity_decode(strip_tags($value));
             }
           }
         }
         break;
 
       default:
-        throw new \RuntimeException('Invalid format');
+        throw new \RuntimeException("Invalid format");
     }
 
     return $this;
@@ -355,7 +343,7 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    *
    * @return bool
    */
-  public function offsetExists($offset): bool {
+  public function offsetExists($offset) {
     return isset($this->tokenProcessor->rowContexts[$this->tokenRow][$offset])
       || isset($this->tokenProcessor->context[$offset]);
   }
@@ -367,7 +355,6 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    *
    * @return string
    */
-  #[\ReturnTypeWillChange]
   public function &offsetGet($offset) {
     if (isset($this->tokenProcessor->rowContexts[$this->tokenRow][$offset])) {
       return $this->tokenProcessor->rowContexts[$this->tokenRow][$offset];
@@ -385,7 +372,7 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    * @param string $offset
    * @param mixed $value
    */
-  public function offsetSet($offset, $value): void {
+  public function offsetSet($offset, $value) {
     $this->tokenProcessor->rowContexts[$this->tokenRow][$offset] = $value;
   }
 
@@ -394,7 +381,7 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    *
    * @param mixed $offset
    */
-  public function offsetUnset($offset): void {
+  public function offsetUnset($offset) {
     unset($this->tokenProcessor->rowContexts[$this->tokenRow][$offset]);
   }
 
@@ -403,7 +390,6 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    *
    * @return \ArrayIterator
    */
-  #[\ReturnTypeWillChange]
   public function getIterator() {
     return new \ArrayIterator($this->createMergedArray());
   }
@@ -413,7 +399,7 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    *
    * @return int
    */
-  public function count(): int {
+  public function count() {
     return count($this->createMergedArray());
   }
 

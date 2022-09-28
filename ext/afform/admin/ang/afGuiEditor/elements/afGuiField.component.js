@@ -12,24 +12,25 @@
       editor: '^^afGuiEditor',
       container: '^^afGuiContainer'
     },
-    controller: function($scope, afGui, $timeout) {
+    controller: function($scope, afGui) {
       var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
-        ctrl = this,
+        ctrl = this;
+
+      $scope.editingOptions = false;
+      var yesNo = [
+        {id: '1', label: ts('Yes')},
+        {id: '0', label: ts('No')}
+      ],
         entityRefOptions = [],
         singleElement = [''],
         // When search-by-range is enabled the second element gets a suffix for some properties like "placeholder2"
         rangeElements = ['', '2'],
         dateRangeElements = ['1', '2'],
-        yesNo = [
-          {id: '1', label: ts('Yes')},
-          {id: '0', label: ts('No')}
-        ];
-      $scope.editingOptions = false;
+        relativeDatesWithPickRange = CRM.afGuiEditor.dateRanges,
+        relativeDatesWithoutPickRange = relativeDatesWithPickRange.slice(1);
 
       this.$onInit = function() {
-        ctrl.hasDefaultValue = !!getSet('afform_default');
-        setFieldDefn();
-        ctrl.inputTypes = _.transform(_.cloneDeep(afGui.meta.inputTypes), function(inputTypes, type) {
+        ctrl.inputTypes = _.transform(_.cloneDeep(afGui.meta.inputType), function(inputTypes, type) {
           if (inputTypeCanBe(type.name)) {
             // Change labels for EntityRef fields
             if (ctrl.getDefn().input_type === 'EntityRef') {
@@ -47,12 +48,10 @@
             inputTypes.push(type);
           }
         });
-        setDateOptions();
       };
 
       this.getFkEntity = function() {
-        var defn = ctrl.getDefn(),
-          fkEntity = defn.is_id ? ctrl.container.getMainEntityType() : defn.fk_entity;
+        var fkEntity = ctrl.getDefn().fk_entity;
         return ctrl.editor.meta.entities[fkEntity];
       };
 
@@ -76,7 +75,7 @@
       this.canBeMultiple = function() {
         return this.isSearch() &&
           !_.includes(['Date', 'Timestamp'], ctrl.getDefn().data_type) &&
-          _.includes(['Select', 'EntityRef', 'ChainSelect'], $scope.getProp('input_type'));
+          _.includes(['Select', 'EntityRef'], $scope.getProp('input_type'));
       };
 
       this.getRangeElements = function(type) {
@@ -89,33 +88,19 @@
       // Returns the original field definition from metadata
       this.getDefn = function() {
         var defn = afGui.getField(ctrl.container.getFieldEntityType(ctrl.node.name), ctrl.node.name);
-        // Calc fields are specific to a search display, not part of the schema
-        if (!defn && ctrl.container.getSearchDisplay(ctrl.container.node)) {
-          var searchDisplay = ctrl.container.getSearchDisplay(ctrl.container.node);
-          defn = _.findWhere(searchDisplay.calc_fields, {name: ctrl.node.name});
-        }
         defn = defn || {
           label: ts('Untitled'),
           required: false
         };
-        if (_.isEmpty(defn.input_attrs)) {
-          defn.input_attrs = {};
-        }
+        defn.input_attrs = _.isEmpty(defn.input_attrs) ? {} : defn.input_attrs;
         return defn;
       };
 
-      // Get the api entity this field belongs to
-      this.getEntity = function() {
-        return afGui.getEntity(ctrl.container.getFieldEntityType(ctrl.node.name));
-      };
-
       $scope.getOriginalLabel = function() {
-        // Use afform entity if available (e.g. "Individual1")
         if (ctrl.container.getEntityName()) {
           return ctrl.editor.getEntity(ctrl.container.getEntityName()).label + ': ' + ctrl.getDefn().label;
         }
-        // Use generic entity (e.g. "Contact")
-        return ctrl.getEntity().label + ': ' + ctrl.getDefn().label;
+        return afGui.getEntity(ctrl.container.getFieldEntityType(ctrl.node.name)).label + ': ' + ctrl.getDefn().label;
       };
 
       $scope.hasOptions = function() {
@@ -124,8 +109,11 @@
       };
 
       this.getOptions = function() {
-        if (ctrl.fieldDefn.options) {
-          return ctrl.fieldDefn.options;
+        if (ctrl.node.defn && ctrl.node.defn.options) {
+          return ctrl.node.defn.options;
+        }
+        if (_.includes(['Date', 'Timestamp'], $scope.getProp('data_type'))) {
+          return $scope.getProp('search_range') ? relativeDatesWithPickRange : relativeDatesWithoutPickRange;
         }
         if (ctrl.getDefn().input_type === 'EntityRef') {
           // Build a list of all entities in this form that can be referenced by this field.
@@ -176,9 +164,6 @@
           case 'Number':
             return !(defn.options || defn.data_type === 'Boolean');
 
-          case 'DisplayOnly':
-            return true;
-
           default:
             return false;
         }
@@ -222,72 +207,16 @@
         if (newVal && getSet('input_attrs.multiple')) {
           getSet('input_attrs.multiple', false);
         }
-        if (ctrl.hasDefaultValue) {
-          $scope.toggleDefaultValue();
-        }
-        setDateOptions();
       };
 
       $scope.toggleRequired = function() {
         getSet('required', !getSet('required'));
+        return false;
       };
 
       $scope.toggleHelp = function(position) {
         getSet('help_' + position, $scope.propIsset('help_' + position) ? null : (ctrl.getDefn()['help_' + position] || ts('Enter text')));
-      };
-
-      function defaultValueShouldBeArray() {
-        return ($scope.getProp('data_type') !== 'Boolean' &&
-          ($scope.getProp('input_type') === 'CheckBox' || $scope.getProp('input_attrs.multiple')));
-      }
-
-      function setFieldDefn() {
-        ctrl.fieldDefn = angular.extend({}, ctrl.getDefn(), ctrl.node.defn);
-      }
-
-      function setDateOptions() {
-        if (_.includes(['Date', 'Timestamp'], $scope.getProp('data_type'))) {
-          ctrl.node.defn.options = $scope.getProp('search_range') ? CRM.afGuiEditor.dateRanges : CRM.afGuiEditor.dateRanges.slice(1);
-          setFieldDefn();
-        }
-      }
-
-      $scope.toggleDefaultValue = function() {
-        if (ctrl.hasDefaultValue) {
-          getSet('afform_default', undefined);
-          ctrl.hasDefaultValue = false;
-        } else {
-          ctrl.hasDefaultValue = true;
-        }
-      };
-
-      $scope.defaultValueContains = function(val) {
-        val = '' + val;
-        var defaultVal = getSet('afform_default');
-        return defaultVal === val || (_.isArray(defaultVal) && _.includes(defaultVal, val));
-      };
-
-      $scope.toggleDefaultValueItem = function(val) {
-        val = '' + val;
-        if (defaultValueShouldBeArray()) {
-          if (!_.isArray(getSet('afform_default'))) {
-            ctrl.node.defn.afform_default = [];
-          }
-          if (_.includes(ctrl.node.defn.afform_default, val)) {
-            var newVal = _.without(ctrl.node.defn.afform_default, val);
-            getSet('afform_default', newVal.length ? newVal : undefined);
-            ctrl.hasDefaultValue = !!newVal.length;
-          } else {
-            ctrl.node.defn.afform_default.push(val);
-            ctrl.hasDefaultValue = true;
-          }
-        } else if (getSet('afform_default') === val) {
-          getSet('afform_default', undefined);
-          ctrl.hasDefaultValue = false;
-        } else {
-          getSet('afform_default', val);
-          ctrl.hasDefaultValue = true;
-        }
+        return false;
       };
 
       // Getter/setter for definition props
@@ -310,29 +239,8 @@
             clearOut(ctrl.node, ['defn'].concat(path));
           }
           // When changing input_type
-          if (propName === 'input_type') {
-            if (ctrl.node.defn && ctrl.node.defn.search_range && !ctrl.canBeRange()) {
-              delete ctrl.node.defn.search_range;
-              clearOut(ctrl.node, ['defn']);
-            }
-            if (ctrl.node.defn && ctrl.node.defn.input_attrs && 'multiple' in ctrl.node.defn.input_attrs && !ctrl.canBeMultiple()) {
-              delete ctrl.node.defn.input_attrs.multiple;
-              clearOut(ctrl.node, ['defn', 'input_attrs']);
-            }
-          }
-          setFieldDefn();
-
-          // When changing the multiple property, force-reset the default value widget
-          if (ctrl.hasDefaultValue && _.includes(['input_type', 'input_attrs.multiple'], propName)) {
-            ctrl.hasDefaultValue = false;
-            if (!defaultValueShouldBeArray() && _.isArray(getSet('afform_default'))) {
-              ctrl.node.defn.afform_default = ctrl.node.defn.afform_default[0];
-            } else if (defaultValueShouldBeArray() && _.isString(getSet('afform_default')) && ctrl.node.defn.afform_default.length) {
-              ctrl.node.defn.afform_default = ctrl.node.defn.afform_default.split(',');
-            }
-            $timeout(function() {
-              ctrl.hasDefaultValue = true;
-            });
+          if (propName === 'input_type' && ctrl.node.defn && ctrl.node.defn.search_range && !ctrl.canBeRange()) {
+            delete ctrl.node.defn.search_range;
           }
           return val;
         }

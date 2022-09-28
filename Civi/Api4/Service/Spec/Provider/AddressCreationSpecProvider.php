@@ -14,11 +14,7 @@ namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
-/**
- * @service
- * @internal
- */
-class AddressCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
+class AddressCreationSpecProvider implements Generic\SpecProviderInterface {
 
   /**
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec

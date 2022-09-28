@@ -222,6 +222,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    *
    * @return void
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     self::buildQuickEntityForm();
@@ -293,7 +294,11 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     $this->addFormRule(['CRM_Member_Form_MembershipType', 'formRule']);
 
     $this->assign('membershipTypeId', $this->_id);
-    $this->assign('deferredFinancialType', Civi::settings()->get('deferred_revenue_enabled') ? array_keys(CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType()) : NULL);
+
+    if (Civi::settings()->get('deferred_revenue_enabled')) {
+      $deferredFinancialType = CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType();
+      $this->assign('deferredFinancialType', array_keys($deferredFinancialType));
+    }
   }
 
   /**

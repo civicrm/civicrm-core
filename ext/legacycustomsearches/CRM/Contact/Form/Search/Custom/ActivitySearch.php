@@ -81,7 +81,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
     /**
      * You can define a custom title for the search form
      */
-    $this->setTitle(ts('Find Latest Activities'));
+    $this->setTitle('Find Latest Activities');
 
     /**
      * Define the search form fields here
@@ -96,7 +96,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
     );
 
     // Select box for Activity Type
-    $activityType = ['' => ts(' - select activity - ')] + CRM_Core_PseudoConstant::activityType();
+    $activityType = ['' => ' - select activity - '] + CRM_Core_PseudoConstant::activityType();
 
     $form->add('select', 'activity_type_id', ts('Activity Type'),
       $activityType,
@@ -104,7 +104,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
     );
 
     // textbox for Activity Status
-    $activityStatus = ['' => ts(' - select status - ')] + CRM_Core_PseudoConstant::activityStatus();
+    $activityStatus = ['' => ' - select status - '] + CRM_Core_PseudoConstant::activityStatus();
 
     $form->add('select', 'activity_status_id', ts('Activity Status'),
       $activityStatus,
@@ -388,6 +388,18 @@ ORDER BY contact_a.sort_name';
    */
   public function &columns() {
     return $this->_columns;
+  }
+
+  /**
+   * @param $title
+   */
+  public function setTitle($title) {
+    if ($title) {
+      CRM_Utils_System::setTitle($title);
+    }
+    else {
+      CRM_Utils_System::setTitle(ts('Search'));
+    }
   }
 
   /**

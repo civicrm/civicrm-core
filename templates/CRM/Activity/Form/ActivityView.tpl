@@ -36,7 +36,7 @@
         {/if}
 
   {if $values.engagement_level AND
-      call_user_func( array( 'CRM_Campaign_BAO_Campaign', 'isComponentEnabled' ) )}
+      call_user_func( array( 'CRM_Campaign_BAO_Campaign', 'isCampaignEnable' ) )}
       <td class="label">{ts}Engagement Level{/ts}</td><td class="view-value">{$values.engagement_level}</td>
   {/if}
 

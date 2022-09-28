@@ -18,12 +18,10 @@ class SqlFunctionAVG extends SqlFunction {
 
   protected static $category = self::CATEGORY_AGGREGATE;
 
-  protected static $dataType = 'Float';
-
   protected static function params(): array {
     return [
       [
-        'flag_before' => ['' => NULL, 'DISTINCT' => ts('Distinct')],
+        'flag_before' => ['DISTINCT' => ts('Distinct')],
         'must_be' => ['SqlField'],
       ],
     ];
@@ -34,13 +32,6 @@ class SqlFunctionAVG extends SqlFunction {
    */
   public static function getTitle(): string {
     return ts('Average');
-  }
-
-  /**
-   * @return string
-   */
-  public static function getDescription(): string {
-    return ts('The mean of all values in the grouping.');
   }
 
 }

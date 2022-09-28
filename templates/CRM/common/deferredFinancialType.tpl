@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $deferredFinancialType}
+{if isset($deferredFinancialType)}
 <div id='warningDialog' style="display:none;"></div>
 {literal}
 <script type="text/javascript">

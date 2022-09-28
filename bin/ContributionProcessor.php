@@ -183,7 +183,7 @@ class CiviContributeProcessor {
               CRM_Core_Error::debug_log_message("Skipped - {$trxnDetails['email']}, {$trxnDetails['amt']}, {$value} ..<p>", TRUE);
             }
           }
-          catch (CRM_Core_Exception $e) {
+          catch (CiviCRM_API3_Exception $e) {
             CRM_Core_Error::debug_log_message("Skipped - {$trxnDetails['email']}, {$trxnDetails['amt']}, {$value} ..<p>", TRUE);
           }
         }
@@ -545,7 +545,10 @@ CRM_Core_Error::debug_log_message('ContributionProcessor.php');
 $lock = Civi::lockManager()->acquire('worker.contribute.CiviContributeProcessor');
 
 if ($lock->isAcquired()) {
-  set_time_limit(0);
+  // try to unset any time limits
+  if (!ini_get('safe_mode')) {
+    set_time_limit(0);
+  }
 
   CiviContributeProcessor::process();
 }

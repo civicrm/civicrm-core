@@ -72,13 +72,13 @@
           <div>{$form.location_type.label} {help id="location_type" title=$form.location_type.label}</div>
           {$form.location_type.html}
         </div>
-        {if !empty($form.address_name.html)}
+        {if $form.address_name.html}
           <div class="crm-field-wrapper">
             {$form.address_name.label}<br />
             {$form.address_name.html}
           </div>
         {/if}
-        {if !empty($form.postal_code.html)}
+        {if $form.postal_code.html}
           <div class="crm-field-wrapper">
             {$form.postal_code.label}
             <input type="checkbox" id="postal-code-range-toggle" value="1"/>
@@ -109,7 +109,7 @@
             {/literal}
           </script>
         {/if}
-        {if !empty($form.prox_distance.html)}
+        {if $form.prox_distance.html}
           <div class="crm-field-wrapper">
             {$form.prox_distance.label}<br />
             {$form.prox_distance.html}&nbsp;{$form.prox_distance_unit.html}

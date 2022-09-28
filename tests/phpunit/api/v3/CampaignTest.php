@@ -26,7 +26,6 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
       'created_date' => 'first sat of July 2008',
     ];
     parent::setUp();
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
     $this->useTransaction(TRUE);
   }
 

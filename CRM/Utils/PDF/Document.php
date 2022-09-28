@@ -68,15 +68,6 @@ class CRM_Utils_PDF_Document {
       'marginBottom' => self::toTwip(CRM_Core_BAO_PdfFormat::getValue('margin_bottom', $format), $metric),
       'marginLeft' => self::toTwip(CRM_Core_BAO_PdfFormat::getValue('margin_left', $format), $metric),
     ];
-    if (CIVICRM_UF === 'UnitTests') {
-      // Streaming content will 'die' in unit tests unless ob_start()
-      // has been called.
-      throw new CRM_Core_Exception_PrematureExitException('_html2doc called', [
-        'html' => $pages,
-        'fileName' => $fileName,
-        'pageStyle' => $pageStyle,
-      ]);
-    }
 
     $ext = pathinfo($fileName, PATHINFO_EXTENSION);
 
@@ -127,9 +118,9 @@ class CRM_Utils_PDF_Document {
   }
 
   /**
-   * @param int $value
-   * @param string $metric
-   * @return float
+   * @param $value
+   * @param $metric
+   * @return int
    */
   public static function toTwip($value, $metric) {
     $point = CRM_Utils_PDF_Utils::convertMetric($value, $metric, 'pt');

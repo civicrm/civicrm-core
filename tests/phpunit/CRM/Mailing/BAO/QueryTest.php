@@ -29,7 +29,6 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
       'civicrm_contact',
     ];
     $this->quickCleanup($tablesToTruncate);
-    parent::tearDown();
   }
 
   /**

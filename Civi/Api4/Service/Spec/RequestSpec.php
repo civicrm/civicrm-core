@@ -32,55 +32,20 @@ class RequestSpec implements \Iterator {
   protected $entityTableName;
 
   /**
-   * @return string
-   */
-  public function getEntityTableName(): ?string {
-    return $this->entityTableName;
-  }
-
-  /**
    * @var FieldSpec[]
    */
   protected $fields = [];
 
   /**
-   * @var array
-   */
-  protected $values = [];
-
-  /**
    * @param string $entity
    * @param string $action
-   * @param array $values
    */
-  public function __construct($entity, $action, $values = []) {
+  public function __construct($entity, $action) {
     $this->entity = $entity;
     $this->action = $action;
     $this->entityTableName = CoreUtil::getTableName($entity);
-
-    // If `id` given, lookup other values needed to filter custom fields
-    $customInfo = \Civi\Api4\Utils\CoreUtil::getCustomGroupExtends($entity);
-    $idCol = $customInfo['column'] ?? NULL;
-    if ($idCol && !empty($values[$idCol])) {
-      $grouping = (array) $customInfo['grouping'];
-      $lookupNeeded = array_diff($grouping, array_keys($values));
-      if ($lookupNeeded) {
-        $record = \civicrm_api4($entity, 'get', [
-          'checkPermissions' => FALSE,
-          'where' => [[$idCol, '=', $values[$idCol]]],
-          'select' => $lookupNeeded,
-        ])->first();
-        if ($record) {
-          $values += $record;
-        }
-      }
-    }
-    $this->values = $values;
   }
 
-  /**
-   * @param FieldSpec $field
-   */
   public function addFieldSpec(FieldSpec $field) {
     if (!$field->getEntity()) {
       $field->setEntity($this->entity);
@@ -162,47 +127,29 @@ class RequestSpec implements \Iterator {
   }
 
   /**
-   * @return array
-   */
-  public function getValues() {
-    return $this->values;
-  }
-
-  /**
-   * @param string $key
-   * @return mixed
-   */
-  public function getValue(string $key) {
-    return $this->values[$key] ?? NULL;
-  }
-
-  /**
    * @return string
    */
   public function getAction() {
     return $this->action;
   }
 
-  #[\ReturnTypeWillChange]
   public function rewind() {
     return reset($this->fields);
   }
 
-  #[\ReturnTypeWillChange]
   public function current() {
     return current($this->fields);
   }
 
-  #[\ReturnTypeWillChange]
   public function key() {
     return key($this->fields);
   }
 
-  public function next(): void {
-    next($this->fields);
+  public function next() {
+    return next($this->fields);
   }
 
-  public function valid(): bool {
+  public function valid() {
     return key($this->fields) !== NULL;
   }
 

@@ -17,7 +17,7 @@ class CRM_Event_Controller_Registration extends CRM_Core_Controller {
   /**
    * Class constructor.
    *
-   * @param string $title
+   * @param null $title
    * @param bool|int $action
    * @param bool $modal
    */

@@ -19,15 +19,13 @@
 
 namespace api\v4\Action;
 
-use api\v4\Api4TestBase;
+use api\v4\UnitTestCase;
 use Civi\Api4\Contact;
-use Civi\Api4\Email;
-use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class SqlExpressionTest extends Api4TestBase implements TransactionalInterface {
+class SqlExpressionTest extends UnitTestCase {
 
   public function testSelectNull() {
     Contact::create()->addValue('first_name', 'bob')->setCheckPermissions(FALSE)->execute();
@@ -79,7 +77,7 @@ class SqlExpressionTest extends Api4TestBase implements TransactionalInterface {
         ->addSelect('first_name AS bob')
         ->execute();
     }
-    catch (\CRM_Core_Exception $e) {
+    catch (\API_Exception $e) {
       $msg = $e->getMessage();
     }
     $this->assertStringContainsString('alias', $msg);
@@ -88,44 +86,13 @@ class SqlExpressionTest extends Api4TestBase implements TransactionalInterface {
         ->addSelect('55 AS sort_name')
         ->execute();
     }
-    catch (\CRM_Core_Exception $e) {
+    catch (\API_Exception $e) {
       $msg = $e->getMessage();
     }
     $this->assertStringContainsString('existing field name', $msg);
     Contact::get()
       ->addSelect('55 AS ok_alias')
       ->execute();
-  }
-
-  public function testSelectEquations() {
-    $contact = Contact::create(FALSE)->addValue('first_name', 'bob')
-      ->addChain('email', Email::create()->setValues(['email' => 'hello@example.com', 'contact_id' => '$id']))
-      ->execute()->first();
-    $result = Email::get(FALSE)
-      ->setSelect([
-        'IF((contact_id.first_name = "bob"), "Yes", "No") AS is_bob',
-        'IF((contact_id.first_name != "fred"), "No", "Yes") AS is_fred',
-        '(5 * 11)',
-        '(5 > 11) AS five_greater_eleven',
-        '(5 <= 11) AS five_less_eleven',
-        '(1 BETWEEN 0 AND contact_id) AS is_between',
-        // These fields don't exist
-        '(illegal * stuff) AS illegal_stuff',
-        // This field will be null
-        '(hold_date + 5) AS null_plus_five',
-      ])
-      ->addWhere('(contact_id + 1)', '=', 1 + $contact['id'])
-      ->setLimit(1)
-      ->execute()
-      ->first();
-    $this->assertEquals('Yes', $result['is_bob']);
-    $this->assertEquals('No', $result['is_fred']);
-    $this->assertEquals('55', $result['5_11']);
-    $this->assertFalse($result['five_greater_eleven']);
-    $this->assertTrue($result['five_less_eleven']);
-    $this->assertTrue($result['is_between']);
-    $this->assertArrayNotHasKey('illegal_stuff', $result);
-    $this->assertEquals('5', $result['null_plus_five']);
   }
 
 }

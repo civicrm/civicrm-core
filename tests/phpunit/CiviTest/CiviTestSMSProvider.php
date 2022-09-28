@@ -13,7 +13,7 @@
   * Test SMS provider to allow for testing
   */
 class CiviTestSMSProvider extends CRM_SMS_Provider {
-  protected $sentMessage;
+  protected $_providerInfo = [];
   protected $_id = 0;
   static private $_singleton = [];
 
@@ -44,16 +44,6 @@ class CiviTestSMSProvider extends CRM_SMS_Provider {
   }
 
   public function send($recipients, $header, $message, $dncID = NULL) {
-    $this->sentMessage = $message;
-  }
-
-  /**
-   * Get the message that was sent.
-   *
-   * @return string
-   */
-  public function getSentMessage(): string {
-    return $this->sentMessage;
   }
 
 }

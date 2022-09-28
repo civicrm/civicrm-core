@@ -14,23 +14,33 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup implements \Civi\Core\HookInterface {
+class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
 
   /**
-   * Retrieve DB object and copy to defaults array.
+   * Class constructor.
+   */
+  public function __construct() {
+    parent::__construct();
+  }
+
+  /**
+   * Fetch object based on array of properties.
    *
    * @param array $params
-   *   Array of criteria values.
+   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   Array to be populated with found values.
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return self|null
-   *   The DAO object, if found.
-   *
-   * @deprecated
+   * @return CRM_Core_BAO_OptionGroup
    */
-  public static function retrieve($params, &$defaults) {
-    return self::commonRetrieve(self::class, $params, $defaults);
+  public static function retrieve(&$params, &$defaults) {
+    $optionGroup = new CRM_Core_DAO_OptionGroup();
+    $optionGroup->copyValues($params);
+    if ($optionGroup->find(TRUE)) {
+      CRM_Core_DAO::storeValues($optionGroup, $defaults);
+      return $optionGroup;
+    }
+    return NULL;
   }
 
   /**
@@ -56,8 +66,8 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup implements \Civi
    * @param array $ids
    *   Reference array contains the id.
    *
-   * @deprecated
-   * @return CRM_Core_DAO_OptionGroup
+   *
+   * @return object
    */
   public static function add(&$params, $ids = []) {
     if (empty($params['id']) && !empty($ids['optionGroup'])) {
@@ -82,25 +92,18 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup implements \Civi
   /**
    * Delete Option Group.
    *
-   * @deprecated
    * @param int $optionGroupId
+   *   Id of the Option Group to be deleted.
    */
   public static function del($optionGroupId) {
-    static::deleteRecord(['id' => $optionGroupId]);
-  }
+    // need to delete all option value field before deleting group
+    $optionValue = new CRM_Core_DAO_OptionValue();
+    $optionValue->option_group_id = $optionGroupId;
+    $optionValue->delete();
 
-  /**
-   * Callback for hook_civicrm_pre().
-   * @param \Civi\Core\Event\PreEvent $event
-   * @throws CRM_Core_Exception
-   */
-  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
-    if ($event->action === 'delete') {
-      // need to delete all option value field before deleting group
-      \Civi\Api4\OptionValue::delete(FALSE)
-        ->addWhere('option_group_id', '=', $event->id)
-        ->execute();
-    }
+    $optionGroup = new CRM_Core_DAO_OptionGroup();
+    $optionGroup->id = $optionGroupId;
+    $optionGroup->delete();
   }
 
   /**

@@ -3,7 +3,6 @@ namespace Civi\Afform\Event;
 
 use Civi\Afform\FormDataModel;
 use Civi\Api4\Action\Afform\Submit;
-use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Handle submission of an "<af-form>" entity (or set of entities in the case of `<af-repeat>`).
@@ -14,9 +13,9 @@ use Civi\Api4\Utils\CoreUtil;
  * If special processing for an entity type is desired, add a new listener with a higher priority
  * than 0, and do one of two things:
  *
- * 1. Fully process the save, and call `$event->stopPropagation()` to skip `processGenericEntity`.
- * 2. Manipulate the $records and allow `processGenericEntity` to perform the save.
- *    Setting $record['fields'] = NULL will prevent saving a record, e.g. if the record is not valid.
+ * 1. Fully process the save, and cancel event propagation to bypass `processGenericEntity`.
+ * 2. Manipulate the $records and allow the default listener to perform the save.
+ *    Setting $record['fields'] = NULL will cancel saving a record, e.g. if the record is not valid.
  *
  * @package Civi\Afform\Event
  */
@@ -89,13 +88,6 @@ class AfformSubmitEvent extends AfformBaseEvent {
   }
 
   /**
-   * @return array{type: string, fields: array, joins: array, security: string, actions: array}
-   */
-  public function getEntity() {
-    return $this->getFormDataModel()->getEntity($this->entityName);
-  }
-
-  /**
    * @return callable
    *   API4-style
    */
@@ -104,52 +96,12 @@ class AfformSubmitEvent extends AfformBaseEvent {
   }
 
   /**
-   * @param int $index
-   * @param int|string $entityId
+   * @param $index
+   * @param $entityId
    * @return $this
    */
   public function setEntityId($index, $entityId) {
-    $idField = CoreUtil::getIdFieldName($this->entityName);
-    $this->entityIds[$this->entityName][$index][$idField] = $entityId;
-    return $this;
-  }
-
-  /**
-   * Get the id of a saved record
-   * @param int $index
-   * @return mixed
-   */
-  public function getEntityId(int $index = 0) {
-    $idField = CoreUtil::getIdFieldName($this->entityName);
-    return $this->entityIds[$this->entityName][$index][$idField] ?? NULL;
-  }
-
-  /**
-   * Get records to be saved
-   * @return array
-   */
-  public function getRecords(): array {
-    return $this->records;
-  }
-
-  /**
-   * @param array $records
-   * @return $this
-   */
-  public function setRecords(array $records) {
-    $this->records = $records;
-    return $this;
-  }
-
-  /**
-   * @param int $index
-   * @param string $joinEntity
-   * @param array $joinIds
-   * @return $this
-   */
-  public function setJoinIds($index, $joinEntity, $joinIds) {
-    $idField = CoreUtil::getIdFieldName($joinEntity);
-    $this->entityIds[$this->entityName][$index]['_joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($joinIds, [$idField]);
+    $this->entityIds[$this->entityName][$index]['id'] = $entityId;
     return $this;
   }
 

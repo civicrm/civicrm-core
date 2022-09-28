@@ -63,7 +63,7 @@
     </td>
   </tr>
 
-  {if $form.separation}
+  {if !empty($form.separation)}
     <tr class="crm-activity-form-block-separation crm-is-multi-activity-wrapper">
       <td class="label">{$form.separation.label}</td>
       <td>{$form.separation.html} {help id="separation"}</td>
@@ -78,7 +78,7 @@
       <td>
         {$form.assignee_contact_id.html}
         {if $action neq 4}
-          {if empty($disable_swap_button)}
+          {if !$form.target_contact_id.frozen}
             <a href="#" class="crm-hover-button" id="swap_target_assignee" title="{ts}Swap Target and Assignee Contacts{/ts}" style="position:relative; bottom: 1em;">
               <i class="crm-i fa-random" aria-hidden="true"></i>
             </a>
@@ -91,8 +91,8 @@
       </td>
   </tr>
 
-  {if $activityTypeFile}
-    {include file="CRM/$crmDir/Form/Activity/$activityTypeFile.tpl"}
+  {if !empty($activityTypeFile)}
+  {include file="CRM/$crmDir/Form/Activity/$activityTypeFile.tpl"}
   {/if}
 
   <tr class="crm-activity-form-block-subject">
@@ -156,7 +156,7 @@
     <td class="label">{$form.result.label}</td><td class="view-value">{$form.result.html}</td>
   </tr>
   {/if}
-  {if $form.tag}
+  {if !empty($form.tag.html)}
   <tr class="crm-activity-form-block-tag">
     <td class="label">{$form.tag.label}</td>
     <td class="view-value">
@@ -165,7 +165,7 @@
   </tr>
   {/if}
 
-  {if $isTagset}
+  {if !empty($tagsetInfo.activity)}
     <tr class="crm-activity-form-block-tag_set">
       {include file="CRM/common/Tagset.tpl" tagsetType='activity' tableLayout=true}
     </tr>
@@ -282,4 +282,4 @@
   {/if}
   </div>{* end of form block*}
 
-{include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl" entityID=$activityId entityTable="civicrm_activity" isRepeatingEntity=false}
+{include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl" entityID=$activityId entityTable="civicrm_activity"}

@@ -6,9 +6,6 @@
 
 afform
 authx
-civicrm_admin_ui
-civigrant
-civiimport
 contributioncancelactions
 ckeditor4
 eventcart
@@ -16,11 +13,9 @@ ewaysingle
 financialacls
 flexmailer
 greenwich
-message_admin
 oauth-client
 payflowpro
 recaptcha
 search_kit
 sequentialcreditnotes
 legacycustomsearches
-elavon

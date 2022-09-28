@@ -457,7 +457,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     // CRM-20868 : Update invoice_numbers (in batch) with value in [invoice prefix][contribution id] format
     $contributionSettings = Civi::settings()->get('contribution_invoice_settings');
     if (!empty($contributionSettings['invoicing']) && !empty($contributionSettings['invoice_prefix'])) {
-      [$minId, $maxId] = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
+      list($minId, $maxId) = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
       FROM civicrm_contribution ")->getDatabaseResult()->fetchRow();
       for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
         $endId = $startId + self::BATCH_SIZE - 1;
@@ -495,6 +495,12 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask('CRM-21733: Add status_override_end_date field to civicrm_membership table', 'addColumn', 'civicrm_membership', 'status_override_end_date',
       "date DEFAULT NULL COMMENT 'The end date of membership status override if (Override until selected date) override type is selected.'");
   }
+
+  /*
+   * Important! All upgrade functions MUST add a 'runSql' task.
+   * Uncomment and use the following template for a new upgrade version
+   * (change the x in the function name):
+   */
 
   //  /**
   //   * Upgrade function.
@@ -820,7 +826,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     try {
       civicrm_api3('Extension', 'disable', ['key' => 'com.klangsoft.flexiblejobs']);
     }
-    catch (CRM_Core_Exception $e) {
+    catch (CiviCRM_API3_Exception $e) {
       // just ignore if the extension isn't installed
     }
 

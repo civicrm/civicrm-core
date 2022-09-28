@@ -26,16 +26,6 @@
 class CRM_Custom_Form_Preview extends CRM_Core_Form {
 
   /**
-   * @var int
-   */
-  protected $_groupId;
-
-  /**
-   * @var int
-   */
-  protected $_fieldId;
-
-  /**
    * The group tree data.
    *
    * @var array
@@ -50,15 +40,15 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
    * @return void
    */
   public function preProcess() {
-    // Get field id if previewing a single field
-    $this->_fieldId = CRM_Utils_Request::retrieve('fid', 'Positive', $this);
-
-    // Single field preview
+    // get the controller vars
+    $this->_groupId = $this->get('groupId');
+    $this->_fieldId = $this->get('fieldId');
     if ($this->_fieldId) {
+      // field preview
       $defaults = [];
       $params = ['id' => $this->_fieldId];
+      $fieldDAO = new CRM_Core_DAO_CustomField();
       CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $defaults);
-      $this->_groupId = $defaults['custom_group_id'];
 
       if (!empty($defaults['is_view'])) {
         CRM_Core_Error::statusBounce(ts('This field is view only so it will not display on edit form.'));
@@ -74,9 +64,7 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
       $this->_groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, $this);
       $this->assign('preview_type', 'field');
     }
-    // Group preview
     else {
-      $this->_groupId = CRM_Utils_Request::retrieve('gid', 'Positive', $this, TRUE);
       $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail($this->_groupId);
       $this->_groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, TRUE, $this);
       $this->assign('preview_type', 'group');

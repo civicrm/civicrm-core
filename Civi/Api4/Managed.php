@@ -11,9 +11,9 @@
 namespace Civi\Api4;
 
 /**
- * Records "packaged" by extensions and managed by CiviCRM.
+ * Managed (Managed entities).
  *
- * Extensions can package records in a declarative fashion, typically in `.mgd.php` files.
+ * Managed entities allow extensions to add and manage entities.
  *
  * @searchable secondary
  * @see https://civicrm.org/blog/totten/api-and-art-installation
@@ -21,14 +21,5 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class Managed extends Generic\DAOEntity {
-
-  /**
-   * @param bool $checkPermissions
-   * @return Action\Managed\Reconcile
-   */
-  public static function reconcile($checkPermissions = TRUE) {
-    return (new Action\Managed\Reconcile(__CLASS__, __FUNCTION__))
-      ->setCheckPermissions($checkPermissions);
-  }
 
 }

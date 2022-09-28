@@ -84,7 +84,7 @@ function getValues(&$contactIDs, &$values, &$allContactIDs, &$addditionalContact
  * @param $tableName
  * @param $fields
  * @param $whereField
- * @param string|null $additionalWhereCond
+ * @param null $additionalWhereCond
  * @param bool $flat
  */
 function getTableInfo(&$contactIDs, &$values, $tableName, &$fields,

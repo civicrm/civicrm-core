@@ -17,6 +17,13 @@
 class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
 
   /**
+   * Class constructor.
+   */
+  public function __construct() {
+    parent::__construct();
+  }
+
+  /**
    * Create option value.
    *
    * Note that the create function calls 'add' but has more business logic.
@@ -90,20 +97,23 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
+   * Fetch object based on array of properties.
    *
    * @param array $params
-   *   Array of criteria values.
+   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   Array to be populated with found values.
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return self|null
-   *   The DAO object, if found.
-   *
-   * @deprecated
+   * @return CRM_Core_BAO_OptionValue
    */
-  public static function retrieve($params, &$defaults) {
-    return self::commonRetrieve(self::class, $params, $defaults);
+  public static function retrieve(&$params, &$defaults) {
+    $optionValue = new CRM_Core_DAO_OptionValue();
+    $optionValue->copyValues($params);
+    if ($optionValue->find(TRUE)) {
+      CRM_Core_DAO::storeValues($optionValue, $defaults);
+      return $optionValue;
+    }
+    return NULL;
   }
 
   /**
@@ -132,6 +142,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @return \CRM_Core_DAO_OptionValue
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function add(&$params, $ids = []) {
     if (!empty($ids['optionValue']) && empty($params['id'])) {
@@ -154,23 +165,17 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $params['option_group_id'], 'name', 'id'
     );
 
-    $op = $id ? 'edit' : 'create';
-    CRM_Utils_Hook::pre($op, 'OptionValue', $id, $params);
-
     // action is taken depending upon the mode
     $optionValue = new CRM_Core_DAO_OptionValue();
     $optionValue->copyValues($params);
 
-    $isDomainOptionGroup = CRM_Core_OptionGroup::isDomainOptionGroup($groupName);
-    // When creating a new option for a group that requires a domain, set default domain
-    if ($isDomainOptionGroup && empty($params['id']) && (empty($params['domain_id']) || CRM_Utils_System::isNull($params['domain_id']))) {
+    $isDomainOptionGroup = in_array($groupName, CRM_Core_OptionGroup::$_domainIDGroups);
+    if (empty($params['domain_id']) && $isDomainOptionGroup) {
       $optionValue->domain_id = CRM_Core_Config::domainID();
     }
 
     // When setting a default option, unset other options in this group as default
-    // FIXME: The extra CRM_Utils_System::isNull is because the API will pass the string 'null'
-    // FIXME: It would help to make this column NOT NULL DEFAULT 0
-    if (!empty($params['is_default']) && !CRM_Utils_System::isNull($params['is_default'])) {
+    if (!empty($params['is_default'])) {
       $query = 'UPDATE civicrm_option_value SET is_default = 0 WHERE  option_group_id = %1';
 
       // tweak default reset, and allow multiple default within group.
@@ -185,7 +190,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $p = [1 => [$params['option_group_id'], 'Integer']];
 
       // Limit update by domain of option
-      $domain = CRM_Utils_System::isNull($optionValue->domain_id) ? NULL : $optionValue->domain_id;
+      $domain = $optionValue->domain_id ?? NULL;
       if (!$domain && $id && $isDomainOptionGroup) {
         $domain = CRM_Core_DAO::getFieldValue(__CLASS__, $id, 'domain_id');
       }
@@ -207,7 +212,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
         // CRM-21737 languages option group does not use unique values but unique names.
         $dao->name = $params['name'];
       }
-      if (CRM_Core_OptionGroup::isDomainOptionGroup($groupName)) {
+      if (in_array($groupName, CRM_Core_OptionGroup::$_domainIDGroups)) {
         $dao->domain_id = $optionValue->domain_id;
       }
       $dao->option_group_id = $params['option_group_id'];
@@ -218,10 +223,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
 
     $optionValue->id = $id;
     $optionValue->save();
-    Civi::cache('metadata')->flush();
     CRM_Core_PseudoConstant::flush();
-
-    CRM_Utils_Hook::post($op, 'OptionValue', $id, $optionValue);
 
     // Create relationship for payment instrument options
     if (!empty($params['financial_account_id'])) {
@@ -262,13 +264,9 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     if (!$optionValue->find()) {
       return FALSE;
     }
-    $hookParams = ['id' => $optionValueId];
-    CRM_Utils_Hook::pre('delete', 'OptionValue', $optionValueId, $hookParams);
     if (self::updateRecords($optionValueId, CRM_Core_Action::DELETE)) {
-      Civi::cache('metadata')->flush();
       CRM_Core_PseudoConstant::flush();
       $optionValue->delete();
-      CRM_Utils_Hook::post('delete', 'OptionValue', $optionValueId, $optionValue);
       return TRUE;
     }
     return FALSE;
@@ -478,24 +476,24 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *   an array of array of values for this option group
    */
   public static function getOptionValuesArray($optionGroupID) {
-    global $tsLocale;
     // check if we can get the field values from the system cache
-    $cacheKey = "CRM_Core_BAO_OptionValue_OptionGroupID_{$optionGroupID}_$tsLocale";
-    if (Civi::cache('metadata')->has($cacheKey)) {
-      return Civi::cache('metadata')->get($cacheKey);
-    }
-    $dao = new CRM_Core_DAO_OptionValue();
-    $dao->option_group_id = $optionGroupID;
-    $dao->orderBy('weight ASC, label ASC');
-    $dao->find();
+    $cacheKey = "CRM_Core_BAO_OptionValue_OptionGroupID_{$optionGroupID}";
+    $cache = CRM_Utils_Cache::singleton();
+    $optionValues = $cache->get($cacheKey);
+    if (empty($optionValues)) {
+      $dao = new CRM_Core_DAO_OptionValue();
+      $dao->option_group_id = $optionGroupID;
+      $dao->orderBy('weight ASC, label ASC');
+      $dao->find();
 
-    $optionValues = [];
-    while ($dao->fetch()) {
-      $optionValues[$dao->id] = [];
-      CRM_Core_DAO::storeValues($dao, $optionValues[$dao->id]);
-    }
+      $optionValues = [];
+      while ($dao->fetch()) {
+        $optionValues[$dao->id] = [];
+        CRM_Core_DAO::storeValues($dao, $optionValues[$dao->id]);
+      }
 
-    Civi::cache('metadata')->set($cacheKey, $optionValues);
+      $cache->set($cacheKey, $optionValues);
+    }
 
     return $optionValues;
   }

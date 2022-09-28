@@ -29,14 +29,14 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @return CRM_Price_DAO_PriceFieldValue
    */
   public static function add($params) {
-    $fieldValueBAO = self::writeRecord($params);
-
     if (!empty($params['is_default'])) {
       $priceFieldID = $params['price_field_id'] ?? CRM_Core_DAO::getFieldValue('CRM_Price_BAO_PriceFieldValue', $fieldValueBAO->id, 'price_field_id');
-      $query = 'UPDATE civicrm_price_field_value SET is_default = 0 WHERE price_field_id = %1 and id != %2';
-      $p = [1 => [$priceFieldID, 'Integer'], 2 => [$fieldValueBAO->id, 'Integer']];
+      $query = 'UPDATE civicrm_price_field_value SET is_default = 0 WHERE  price_field_id = %1';
+      $p = [1 => [$priceFieldID, 'Integer']];
       CRM_Core_DAO::executeQuery($query, $p);
     }
+
+    $fieldValueBAO = self::writeRecord($params);
 
     // Reset the cached values in this function.
     CRM_Price_BAO_PriceField::getOptions(CRM_Utils_Array::value('price_field_id', $params), FALSE, TRUE);
@@ -105,20 +105,19 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
-   *   Array of criteria values.
+   *   (reference ) an assoc array.
    * @param array $defaults
-   *   Array to be populated with found values.
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return self|null
-   *   The DAO object, if found.
-   *
-   * @deprecated
+   * @return CRM_Price_DAO_PriceFieldValue
    */
-  public static function retrieve($params, &$defaults) {
-    return self::commonRetrieve(self::class, $params, $defaults);
+  public static function retrieve(&$params, &$defaults) {
+    return CRM_Core_DAO::commonRetrieve('CRM_Price_DAO_PriceFieldValue', $params, $defaults);
   }
 
   /**
@@ -218,12 +217,19 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * Delete the value.
    *
    * @param int $id
+   *   Id.
    *
-   * @deprecated
    * @return bool
+   *
    */
   public static function del($id) {
-    return (bool) self::deleteRecord(['id' => $id]);
+    if (!$id) {
+      return FALSE;
+    }
+
+    $fieldValueDAO = new CRM_Price_DAO_PriceFieldValue();
+    $fieldValueDAO->id = $id;
+    return $fieldValueDAO->delete();
   }
 
   /**

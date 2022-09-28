@@ -198,7 +198,7 @@ AND    p.entity_id    = e.id
     /**
      * You can define a custom title for the search form
      */
-    $this->setTitle(ts('Price Set Export'));
+    $this->setTitle('Price Set Export');
 
     /**
      * if you are using the standard template, this array tells the template what elements
@@ -333,10 +333,12 @@ INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.i
    * @param $title
    */
   public function setTitle($title) {
-    if (empty($title)) {
-      $title = ts('Export Price Set Info for an Event');
+    if ($title) {
+      CRM_Utils_System::setTitle($title);
     }
-    parent::setTitle($title);
+    else {
+      CRM_Utils_System::setTitle(ts('Export Price Set Info for an Event'));
+    }
   }
 
   /**

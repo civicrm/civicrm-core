@@ -145,7 +145,7 @@ class CRM_Utils_PagerAToZ {
         continue;
       }
 
-      $element = ['class' => ''];
+      $element = [];
       if (in_array($link, $dynamicAlphabets)) {
         $klass = '';
         if ($link == $sortByCharacter) {
@@ -186,7 +186,7 @@ class CRM_Utils_PagerAToZ {
       ),
       ts('All')
     );
-    $aToZBar[] = ['item' => $url, 'class' => ''];
+    $aToZBar[] = ['item' => $url];
     return $aToZBar;
   }
 

@@ -16,6 +16,11 @@
  */
 class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
 
+  protected $_charts = [
+    '' => 'Tabular',
+    'barChart' => 'Bar Chart',
+    'pieChart' => 'Pie Chart',
+  ];
   protected $_customGroupExtends = ['Contribution', 'Contact', 'Individual'];
   protected $_customGroupGroupBy = TRUE;
 
@@ -137,11 +142,6 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           'non_deductible_amount' => [
             'title' => ts('Non-deductible Amount'),
           ],
-          'contribution_recur_id' => [
-            'title' => ts('Contribution Recurring'),
-            'dbAlias' => '!ISNULL(contribution_civireport.contribution_recur_id)',
-            'type' => CRM_Utils_Type::T_BOOLEAN,
-          ],
         ],
         'grouping' => 'contri-fields',
         'filters' => [
@@ -179,17 +179,6 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionPage(),
             'type' => CRM_Utils_Type::T_INT,
-          ],
-          'contribution_recur_id' => [
-            'title' => ts('Contribution Recurring'),
-            'operatorType' => CRM_Report_Form::OP_SELECT,
-            'type' => CRM_Utils_Type::T_BOOLEAN,
-            'options' => [
-              '' => ts('Any'),
-              TRUE => ts('Yes'),
-              FALSE => ts('No'),
-            ],
-            'dbAlias' => '!ISNULL(contribution_civireport.contribution_recur_id)',
           ],
           'total_amount' => [
             'title' => ts('Contribution Amount'),
@@ -235,11 +224,6 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionPage(),
             'type' => CRM_Utils_Type::T_INT,
-          ],
-          'contribution_recur_id' => [
-            'title' => ts('Contribution Recurring'),
-            'type' => CRM_Utils_Type::T_BOOLEAN,
-            'dbAlias' => '!ISNULL(contribution_civireport.contribution_recur_id)',
           ],
         ],
       ],
@@ -332,13 +316,6 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     ] + $this->addAddressFields();
 
     $this->addCampaignFields('civicrm_contribution', TRUE);
-
-    // Add charts support
-    $this->_charts = [
-      '' => ts('Tabular'),
-      'barChart' => ts('Bar Chart'),
-      'pieChart' => ts('Pie Chart'),
-    ];
 
     $this->_tagFilter = TRUE;
     $this->_groupFilter = TRUE;
@@ -1016,7 +993,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         $mode[] = CRM_Utils_Money::format($modeDAO->amount, $modeDAO->currency);
       }
       else {
-        $mode[] = ts('N/A');
+        $mode[] = 'N/A';
       }
     }
     return $mode;

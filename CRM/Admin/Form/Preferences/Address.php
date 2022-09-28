@@ -46,7 +46,7 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
   }
 
   /**
-   * @param array $fields
+   * @param $fields
    *
    * @return bool
    */

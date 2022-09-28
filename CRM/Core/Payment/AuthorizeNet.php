@@ -162,7 +162,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
     foreach ($authorizeNetFields as $field => $value) {
       // CRM-7419, since double quote is used as enclosure while doing csv parsing
-      $value = ($field === 'x_description') ? str_replace('"', "'", $value) : $value;
+      $value = ($field == 'x_description') ? str_replace('"', "'", $value) : $value;
       $postFields[] = $field . '=' . urlencode($value);
     }
 
@@ -181,13 +181,16 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
     $response_fields = $this->explode_csv($response);
 
-    $result = [];
+    // fetch available contribution statuses
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+
     // check for application errors
     // TODO:
     // AVS, CVV2, CAVV, and other verification results
     switch ($response_fields[0]) {
       case self::AUTH_REVIEW:
-        $result = $this->setStatusPaymentPending($result);
+        $params['payment_status_id'] = array_search('Pending', $contributionStatus);
+        $params['payment_status'] = 'Pending';
         break;
 
       case self::AUTH_ERROR:
@@ -200,12 +203,13 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
       default:
         // Success
-        $result['trxn_id'] = !empty($response_fields[6]) ? $response_fields[6] : $this->getTestTrxnID();
-        $result = $this->setStatusPaymentCompleted($result);
+        $params['trxn_id'] = !empty($response_fields[6]) ? $response_fields[6] : $this->getTestTrxnID();
+        $params['payment_status_id'] = array_search('Completed', $statuses);
+        $params['payment_status'] = 'Completed';
         break;
     }
 
-    return $result;
+    return $params;
   }
 
   /**
@@ -300,8 +304,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $template->assign('billingState', $this->_getParam('state_province'));
     $template->assign('billingZip', $this->_getParam('postal_code', TRUE));
     $template->assign('billingCountry', $this->_getParam('country'));
-    // Required to be set for s
-    $template->ensureVariablesAreAssigned(['subscriptionType']);
+
     $arbXML = $template->fetch('CRM/Contribute/Form/Contribution/AuthorizeNetARB.tpl');
 
     // Submit to authorize.net
@@ -360,7 +363,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $fields['x_currency_code'] = $this->_getParam('currencyID');
     $fields['x_description'] = $this->_getParam('description');
     $fields['x_cust_id'] = $this->_getParam('contactID');
-    if ($this->_getParam('paymentType') === 'AIM') {
+    if ($this->_getParam('paymentType') == 'AIM') {
       $fields['x_relay_response'] = 'FALSE';
       // request response in CSV format
       $fields['x_delim_data'] = 'TRUE';
@@ -374,7 +377,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
       $fields['x_exp_date'] = "$exp_month/$exp_year";
     }
 
-    if ($this->_mode !== 'live') {
+    if ($this->_mode != 'live') {
       $fields['x_test_request'] = 'TRUE';
     }
 
@@ -532,7 +535,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    * @return string
    */
   public function accountLoginURL() {
-    return ($this->_mode === 'test') ? 'https://test.authorize.net' : 'https://authorize.net';
+    return ($this->_mode == 'test') ? 'https://test.authorize.net' : 'https://authorize.net';
   }
 
   /**

@@ -22,22 +22,16 @@ namespace api\v4\Service\Schema;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
 use Civi\Api4\Service\Schema\SchemaMap;
 use Civi\Api4\Service\Schema\Table;
-use api\v4\Api4TestBase;
+use api\v4\UnitTestCase;
 
 /**
  * @group headless
  */
-class SchemaMapperTest extends Api4TestBase {
+class SchemaMapperTest extends UnitTestCase {
 
   public function testWillHaveNoPathWithNoTables() {
     $map = new SchemaMap();
-    try {
-      $map->getLink('foo', 'bar');
-    }
-    catch (\CRM_Core_Exception $e) {
-      $exception = $e;
-    }
-    $this->assertStringContainsString('not found', $exception->getMessage());
+    $this->assertEmpty($map->getPath('foo', 'bar'));
   }
 
   public function testWillHavePathWithSingleJump() {
@@ -49,7 +43,7 @@ class SchemaMapperTest extends Api4TestBase {
     $map = new SchemaMap();
     $map->addTables([$phoneTable, $locationTable]);
 
-    $this->assertNotEmpty($map->getLink('civicrm_phone', 'location'));
+    $this->assertNotEmpty($map->getPath('civicrm_phone', 'location'));
   }
 
   public function testCircularReferenceWillNotBreakIt() {
@@ -63,7 +57,7 @@ class SchemaMapperTest extends Api4TestBase {
     $map = new SchemaMap();
     $map->addTables([$contactTable, $carTable]);
 
-    $this->assertEmpty($map->getLink('contact', 'foo'));
+    $this->assertEmpty($map->getPath('contact', 'foo'));
   }
 
   public function testCannotGoOverJoinLimit() {
@@ -79,7 +73,7 @@ class SchemaMapperTest extends Api4TestBase {
     $map = new SchemaMap();
     $map->addTables([$first, $second, $third, $fourth]);
 
-    $this->assertEmpty($map->getLink('first', 'fifth'));
+    $this->assertEmpty($map->getPath('first', 'fifth'));
   }
 
 }

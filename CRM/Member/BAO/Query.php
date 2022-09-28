@@ -150,7 +150,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
       // $this->buildRelativeDateQuery($values);
       return;
     }
-    [$name, $op, $value, $grouping] = $values;
+    list($name, $op, $value, $grouping) = $values;
     $fields = self::getFields();
 
     $quoteValue = NULL;
@@ -273,7 +273,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
           $value,
           "Integer"
         );
-        [$op, $value] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Member_DAO_Membership', $name, $value, $op);
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Member_DAO_Membership', $name, $value, $op);
         $query->_qill[$grouping][] = $qillName . ' ' . $op . ' ' . $value;
         $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
         return;
@@ -489,7 +489,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
   /**
    * Get the metadata for fields to be included on the grant search form.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getSearchFieldMetadata() {
     $fields = [
@@ -515,7 +515,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
    *
    * @param CRM_Core_Form $form
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function buildSearchForm(&$form) {
     $form->addSearchFieldMetadata(['Membership' => self::getSearchFieldMetadata()]);

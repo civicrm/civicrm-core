@@ -39,7 +39,7 @@ function _civicrm_api3_membership_delete_spec(&$params) {
  * @param array $params
  *   Array array holding id - Id of the contact membership to be deleted.
  * @return array API result array.
- * @throws CRM_Core_Exception
+ * @throws API_Exception
  */
 function civicrm_api3_membership_delete($params) {
   if (isset($params['preserve_contribution'])) {
@@ -47,7 +47,7 @@ function civicrm_api3_membership_delete($params) {
       return civicrm_api3_create_success(TRUE, $params);
     }
     else {
-      throw new CRM_Core_Exception(ts('Could not delete membership'));
+      throw new API_Exception(ts('Could not delete membership'));
     }
   }
   else {
@@ -68,6 +68,7 @@ function civicrm_api3_membership_delete($params) {
  *   API result array.
  *
  * @throws \CRM_Core_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_membership_create($params) {
   // check params for membership id during update
@@ -89,19 +90,9 @@ function civicrm_api3_membership_create($params) {
 
   // Calculate membership dates
   // Fixme: This code belongs in the BAO
-  if (empty($params['id']) || !empty($params['num_terms'])) {
+  if (!empty($params['num_terms'])) {
     // If this is a new membership or we have a specified number of terms calculate membership dates.
-    if (empty($params['id'])) {
-      // This is a new membership, calculate the membership dates.
-      $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType(
-        $params['membership_type_id'],
-        CRM_Utils_Array::value('join_date', $params),
-        CRM_Utils_Array::value('start_date', $params),
-        CRM_Utils_Array::value('end_date', $params),
-        CRM_Utils_Array::value('num_terms', $params, 1)
-      );
-    }
-    else {
+    if (!empty($params['id'])) {
       // This is an existing membership, calculate the membership dates after renewal
       // num_terms is treated as a 'special sauce' for is_renewal but this
       // isn't really helpful for completing pendings.
@@ -111,10 +102,10 @@ function civicrm_api3_membership_create($params) {
         CRM_Utils_Array::value('membership_type_id', $params),
         $params['num_terms']
       );
-    }
-    foreach (['join_date', 'start_date', 'end_date'] as $date) {
-      if (empty($params[$date]) && isset($calcDates[$date])) {
-        $params[$date] = $calcDates[$date];
+      foreach (['join_date', 'start_date', 'end_date'] as $date) {
+        if (empty($params[$date]) && isset($calcDates[$date])) {
+          $params[$date] = $calcDates[$date];
+        }
       }
     }
   }
@@ -238,11 +229,39 @@ function civicrm_api3_membership_get($params) {
 }
 
 /**
+ * Perform api v2 custom behaviour.
+ *
+ * When we copied apiv3 from api v2 we brought across some custom behaviours - in the case of
+ * membership a complicated return array is constructed. The original
+ * behaviour made contact_id a required field. We still need to keep this for v3 when contact_id
+ * is passed in as part of the reasonable expectation developers have that we will keep the api
+ * as stable as possible
+ *
+ * @param array $params
+ *   Parameters passed into get function.
+ * @param int $membershipTypeId
+ * @param $activeOnly
+ *
+ * @return array
+ *   result for calling function
+ */
+function _civicrm_api3_membership_get_customv2behaviour(&$params, $membershipTypeId, $activeOnly) {
+  // get the membership for the given contact ID
+  $membershipParams = ['contact_id' => $params['contact_id']];
+  if ($membershipTypeId) {
+    $membershipParams['membership_type_id'] = $membershipTypeId;
+  }
+  $membershipValues = [];
+  CRM_Member_BAO_Membership::getValues($membershipParams, $membershipValues, $activeOnly);
+  return $membershipValues;
+}
+
+/**
  * Non-standard behaviour inherited from v2.
  *
  * @param array $params
  *   Parameters passed into get function.
- * @param array $membershipValues
+ * @param $membershipValues
  * @param int $contactID
  *
  * @return array

@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\ACLEntityRole;
-
 /**
  *
  * @package CRM
@@ -46,14 +44,12 @@ class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function postProcess(): void {
+  public function postProcess() {
     CRM_ACL_BAO_Cache::resetCache();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      ACLEntityRole::delete()->addWhere('id', '=', $this->_id)->execute();
+      CRM_ACL_BAO_EntityRole::del($this->_id);
       CRM_Core_Session::setStatus(ts('Selected Entity Role has been deleted.'), ts('Record Deleted'), 'success');
     }
     else {
@@ -63,7 +59,7 @@ class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
       }
 
       $params['entity_table'] = 'civicrm_group';
-      AclEntityRole::save()->setRecords([$params])->execute();
+      CRM_ACL_BAO_EntityRole::create($params);
     }
   }
 

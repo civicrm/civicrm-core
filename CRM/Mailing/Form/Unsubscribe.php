@@ -24,33 +24,18 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
    */
   public $submitOnce = TRUE;
 
-  /**
-   * @var int
-   */
-  private $_job_id;
-
-  /**
-   * @var int
-   */
-  private $_queue_id;
-
-  /**
-   * @var string
-   */
-  private $_hash;
-
-  /**
-   * @var string
-   */
-  private $_email;
-
   public function preProcess() {
+
+    $this->_type = 'unsubscribe';
+
     $this->_job_id = $job_id = CRM_Utils_Request::retrieve('jid', 'Integer', $this);
     $this->_queue_id = $queue_id = CRM_Utils_Request::retrieve('qid', 'Integer', $this);
     $this->_hash = $hash = CRM_Utils_Request::retrieve('h', 'String', $this);
-    $isConfirm = CRM_Utils_Request::retrieveValue('confirm', 'Boolean', FALSE, FALSE, 'GET');
 
-    if (!$job_id || !$queue_id || !$hash) {
+    if (!$job_id ||
+      !$queue_id ||
+      !$hash
+    ) {
       throw new CRM_Core_Exception(ts('Missing Parameters'));
     }
 
@@ -70,21 +55,27 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
     $groups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($job_id, $queue_id, $hash, TRUE);
     $this->assign('groups', $groups);
     $groupExist = NULL;
-    foreach ($groups as $value) {
+    foreach ($groups as $key => $value) {
       if ($value) {
         $groupExist = TRUE;
       }
     }
-    if (!$groupExist && !$isConfirm) {
-      $statusMsg = ts('%1 has already been unsubscribed.', [1 => $email]);
+    if (!$groupExist) {
+      $statusMsg = ts('%1 has been unsubscribed.',
+        [1 => $email]
+      );
       CRM_Core_Session::setStatus($statusMsg, '', 'error');
     }
     $this->assign('groupExist', $groupExist);
+
   }
 
   public function buildQuickForm() {
     CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
-    $this->setTitle(ts('Unsubscribe Confirmation'));
+    CRM_Utils_System::setTitle(ts('Unsubscribe Confirmation'));
+
+    $this->add('text', 'email_confirm', ts('Verify email address to unsubscribe:'));
+    $this->addRule('email_confirm', ts('Email address is required to unsubscribe.'), 'required');
 
     $buttons = [
       [
@@ -102,19 +93,42 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
   }
 
   public function postProcess() {
-    $confirmURL = CRM_Utils_System::url("civicrm/mailing/unsubscribe", "reset=1&jid={$this->_job_id}&qid={$this->_queue_id}&h={$this->_hash}&confirm=1");
+    $values = $this->exportValues();
+
+    // check if EmailTyped matches Email address
+    $result = CRM_Utils_String::compareStr($this->_email, $values['email_confirm'], TRUE);
+    $job_id = $this->_job_id;
+    $queue_id = $this->_queue_id;
+    $hash = $this->_hash;
+
+    $confirmURL = CRM_Utils_System::url("civicrm/mailing/{$this->_type}", "reset=1&jid={$job_id}&qid={$queue_id}&h={$hash}&confirm=1");
     $this->assign('confirmURL', $confirmURL);
-    CRM_Core_Session::singleton()->pushUserContext($confirmURL);
+    $session = CRM_Core_Session::singleton();
+    $session->pushUserContext($confirmURL);
 
-    // Email address verified
-    $groups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($this->_job_id, $this->_queue_id, $this->_hash);
+    if ($result == TRUE) {
+      // Email address verified
+      $groups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($job_id, $queue_id, $hash);
 
-    if (count($groups)) {
-      CRM_Mailing_Event_BAO_Unsubscribe::send_unsub_response($this->_queue_id, $groups, FALSE, $this->_job_id);
+      if (count($groups)) {
+        CRM_Mailing_Event_BAO_Unsubscribe::send_unsub_response($queue_id, $groups, FALSE, $job_id);
+      }
+
+      $statusMsg = ts('%1 is unsubscribed.',
+        [1 => $values['email_confirm']]
+      );
+
+      CRM_Core_Session::setStatus($statusMsg, '', 'success');
     }
+    elseif ($result == FALSE) {
+      // Email address not verified
+      $statusMsg = ts('%1 is not associated with this unsubscribe request.',
+        [1 => $values['email_confirm']]
+      );
 
-    $statusMsg = ts('%1 has been unsubscribed successfully.', [1 => $this->_email]);
-    CRM_Core_Session::setStatus($statusMsg, '', 'success');
+      CRM_Core_Session::setStatus($statusMsg, '', 'error');
+
+    }
   }
 
 }

@@ -19,7 +19,7 @@ class CRM_Mailing_Controller_Send extends CRM_Core_Controller {
   /**
    * Class constructor.
    *
-   * @param string $title
+   * @param null $title
    * @param bool|int $action
    * @param bool $modal
    *

@@ -21,7 +21,7 @@ class CRM_Api4_Page_Api4Explorer extends CRM_Core_Page {
 
   public function run() {
     $apiDoc = new ReflectionFunction('civicrm_api4');
-    $extensions = \CRM_Extension_System::singleton()->getMapper();
+    $groupOptions = civicrm_api4('Group', 'getFields', ['loadOptions' => TRUE, 'select' => ['options', 'name'], 'where' => [['name', 'IN', ['visibility', 'group_type']]]]);
 
     $vars = [
       'operators' => CoreUtil::getOperators(),
@@ -29,8 +29,7 @@ class CRM_Api4_Page_Api4Explorer extends CRM_Core_Page {
       'schema' => (array) \Civi\Api4\Entity::get()->setChain(['fields' => ['$name', 'getFields']])->execute(),
       'docs' => \Civi\Api4\Utils\ReflectionUtils::parseDocBlock($apiDoc->getDocComment()),
       'functions' => self::getSqlFunctions(),
-      'authxEnabled' => $extensions->isActiveModule('authx'),
-      'restUrl' => rtrim(CRM_Utils_System::url('civicrm/ajax/api4/CRMAPI4ENTITY/CRMAPI4ACTION', NULL, TRUE, NULL, FALSE, TRUE), '/'),
+      'groupOptions' => array_column((array) $groupOptions, 'options', 'name'),
     ];
     Civi::resources()
       ->addVars('api4', $vars)
@@ -60,7 +59,6 @@ class CRM_Api4_Page_Api4Explorer extends CRM_Core_Page {
           $fns[] = [
             'name' => $className::getName(),
             'title' => $className::getTitle(),
-            'description' => $className::getDescription(),
             'params' => $className::getParams(),
             'category' => $className::getCategory(),
             'dataType' => $className::getDataType(),

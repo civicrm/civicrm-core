@@ -185,6 +185,7 @@ class ManagerTest extends \CiviUnitTestCase {
       'dialogService',
       'ngRoute',
       'ngSanitize',
+      'ui.utils',
     ];
     $ignore = [
       'jsonFormatter',

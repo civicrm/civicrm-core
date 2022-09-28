@@ -171,9 +171,7 @@
             <div class="content">{$form.address.$index.geo_code_1.html}, {$form.address.$index.geo_code_2.html}
                 <br class="spacer"/>
                 <span class="description">
-                  {capture assign=docUrlText}{ts}(Refer to the Mapping and Geocoding section in the Installation and Basic Setup Chapter){/ts}{/capture}
-                  {ts}Latitude and longitude may be automatically populated by enabling a Mapping Provider.{/ts} {docURL page="user/initial-set-up/installation-and-basic-set-up/#mapping-and-geocoding" text=$docUrlText}
-                </span>
+                    {ts}Latitude and longitude may be automatically populated by enabling a Mapping Provider.{/ts} {docURL page="user/initial-set-up/installation-and-basic-set-up" text="(Refer to the Mapping and Geocoding section in the Installation and Basic Setup Chapter)"}</span>
             </div>
             <div class="clear"></div>
         </div>
@@ -184,7 +182,7 @@
 
 </fieldset>
 
-{if !empty($form.is_for_organization)}
+{if $form.is_for_organization}
     {include file="CRM/common/showHideByFieldValue.tpl"
          trigger_field_id    ="is_for_organization"
          trigger_value       ="true"

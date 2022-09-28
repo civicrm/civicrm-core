@@ -7,7 +7,7 @@ class CRM_Core_Smarty_Permissions {
 
   /**
    * non-static adapter for CRM_Core_Permission::check
-   * @param string|array $offset
+   * @param $offset
    *
    * @return bool
    */

@@ -409,10 +409,9 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   }
 
   /**
-   * Data provider for testOtherParams
-   * $prop, $legacy_names, $valid_values, $invalid_values
    *
-   * return array
+   * Data provider for testOtherParams
+   *
    */
   public function otherParamsDataProvider() {
     $valid_bools = [['0' , FALSE], ['', FALSE], [0, FALSE], [FALSE, FALSE], [TRUE, TRUE], [1, TRUE], ['1', TRUE]];
@@ -421,14 +420,13 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $valid_ints = [[123, 123], ['123', 123]];
     $invalid_ints = [-1, 0, NULL, ''];
     return [
-      ['billingStreetAddress', ['billing_street_address', 'street_address', 'billing_street_address-5'], $valid_strings_inc_null, []],
+      ['billingStreetAddress', [], $valid_strings_inc_null, []],
       ['billingSupplementalAddress1', [], $valid_strings_inc_null, []],
       ['billingSupplementalAddress2', [], $valid_strings_inc_null, []],
       ['billingSupplementalAddress3', [], $valid_strings_inc_null, []],
-      ['billingCity', ['billing_city', 'city', 'billing_city-5'], $valid_strings_inc_null, []],
-      ['billingPostalCode', ['billing_postal_code', 'postal_code', 'billing_postal_code-5'], $valid_strings_inc_null, []],
+      ['billingCity', [], $valid_strings_inc_null, []],
+      ['billingPostalCode', [], $valid_strings_inc_null, []],
       ['billingCounty', [], $valid_strings_inc_null, []],
-      ['billingStateProvince', ['billing_state_province', 'state_province', 'billing_state_province-5'], $valid_strings_inc_null, []],
       ['billingCountry', [], [['GB', 'GB'], ['NZ', 'NZ']], ['XX', '', NULL, 0]],
       ['contributionID', ['contribution_id'], $valid_ints, $invalid_ints],
       ['contributionRecurID', ['contribution_recur_id'], $valid_ints, $invalid_ints],

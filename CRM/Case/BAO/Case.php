@@ -19,7 +19,7 @@
 /**
  * This class contains the functions for Case Management.
  */
-class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInterface {
+class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
 
   /**
    * Static field for all the case information that we can potentially export.
@@ -29,13 +29,20 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
   public static $_exportableFields = NULL;
 
   /**
+   * Class constructor.
+   */
+  public function __construct() {
+    parent::__construct();
+  }
+
+  /**
    * Is CiviCase enabled?
-   * @deprecated
+   *
    * @return bool
    */
   public static function enabled() {
-    CRM_Core_Error::deprecatedFunctionWarning('isComponentEnabled');
-    return self::isComponentEnabled();
+    $config = CRM_Core_Config::singleton();
+    return in_array('CiviCase', $config->enableComponents);
   }
 
   /**
@@ -48,7 +55,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Case_DAO_Case
+   * @return CRM_Case_BAO_Case
    */
   public static function add(&$params) {
     $caseDAO = new CRM_Case_DAO_Case();
@@ -60,50 +67,12 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
   }
 
   /**
-   * @param \Civi\Core\Event\PostEvent $e
-   */
-  public static function on_hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
-    // FIXME: The EventScanner ought to skip over disabled components when registering HookInterface
-    if (!self::isComponentEnabled()) {
-      return;
-    }
-    if ($e->entity === 'Activity' && in_array($e->action, ['create', 'edit'])) {
-      /** @var CRM_Activity_DAO_Activity $activity */
-      $activity = $e->object;
-
-      // If subject contains a ‘[case #…]’ string, file activity on the related case (CRM-5916)
-      $matches = [];
-      $subjectToMatch = $activity->subject ?? '';
-      if (preg_match('/\[case #([0-9a-h]{7})\]/', $subjectToMatch, $matches)) {
-        $key = CRM_Core_DAO::escapeString(CIVICRM_SITE_KEY);
-        $hash = $matches[1];
-        $query = "SELECT id FROM civicrm_case WHERE SUBSTR(SHA1(CONCAT('$key', id)), 1, 7) = '" . CRM_Core_DAO::escapeString($hash) . "'";
-      }
-      elseif (preg_match('/\[case #(\d+)\]/', $subjectToMatch, $matches)) {
-        $query = "SELECT id FROM civicrm_case WHERE id = '" . CRM_Core_DAO::escapeString($matches[1]) . "'";
-      }
-      if (!empty($matches)) {
-        $caseParams = [
-          'activity_id' => $activity->id,
-          'case_id' => CRM_Core_DAO::singleValueQuery($query),
-        ];
-        if ($caseParams['case_id']) {
-          CRM_Case_BAO_Case::processCaseActivity($caseParams);
-        }
-        else {
-          CRM_Activity_BAO_Activity::logActivityAction($activity, "Case details for {$matches[1]} not found while recording an activity on case.");
-        }
-      }
-    }
-  }
-
-  /**
    * Takes an associative array and creates a case object.
    *
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return CRM_Case_DAO_Case
+   * @return CRM_Case_BAO_Case
    */
   public static function &create(&$params) {
     // CRM-20958 - These fields are managed by MySQL triggers. Watch out for clients resaving stale timestamps.
@@ -151,37 +120,20 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
   }
 
   /**
-   * Add a CaseActivity record (skip if already exists).
+   * Process case activity add/delete
+   * takes an associative array and
    *
-   * @param array{activity_id: int, case_id: int} $params
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   *
    */
-  public static function processCaseActivity(array $params): void {
+  public static function processCaseActivity(&$params) {
     $caseActivityDAO = new CRM_Case_DAO_CaseActivity();
     $caseActivityDAO->activity_id = $params['activity_id'];
     $caseActivityDAO->case_id = $params['case_id'];
 
     $caseActivityDAO->find(TRUE);
     $caseActivityDAO->save();
-  }
-
-  /**
-   * Associate an activity with 0 or more cases.
-   *
-   * @param int $activityId
-   * @param array|int $caseIds
-   */
-  public static function updateCaseActivity(int $activityId, $caseIds): void {
-    $actionName = empty($caseIds) ? 'delete' : 'replace';
-    $action = \Civi\Api4\CaseActivity::$actionName(FALSE)
-      ->addWhere('activity_id', '=', $activityId);
-
-    if (!empty($caseIds)) {
-      foreach ((array) $caseIds as $caseId) {
-        $action->addRecord(['case_id' => $caseId]);
-      }
-    }
-
-    $action->execute();
   }
 
   /**
@@ -265,6 +217,12 @@ WHERE civicrm_case.id = %1";
 
       CRM_Utils_Hook::post('delete', 'Case', $caseId, $case);
 
+      // remove case from recent items.
+      $caseRecent = [
+        'id' => $caseId,
+        'type' => 'Case',
+      ];
+      CRM_Utils_Recent::del($caseRecent);
       return TRUE;
     }
 
@@ -272,7 +230,7 @@ WHERE civicrm_case.id = %1";
   }
 
   /**
-   * @param int $id
+   * @param $id
    * @return bool
    */
   public static function del($id) {
@@ -334,27 +292,22 @@ WHERE civicrm_case.id = %1";
    * Look up a case using an activity ID.
    *
    * @param int $activityId
-   * @param bool $getSingle
    *
-   * @return array|int|null
+   * @return int|null, case ID
    */
-  public static function getCaseIdByActivityId($activityId, $getSingle = TRUE) {
+  public static function getCaseIdByActivityId($activityId) {
     $originalId = CRM_Core_DAO::singleValueQuery(
       'SELECT original_id FROM civicrm_activity WHERE id = %1',
       ['1' => [$activityId, 'Integer']]
     );
-    $caseIds = [];
-    $query = CRM_Core_DAO::executeQuery(
+    $caseId = CRM_Core_DAO::singleValueQuery(
       'SELECT case_id FROM civicrm_case_activity WHERE activity_id in (%1,%2)',
       [
         '1' => [$activityId, 'Integer'],
-        '2' => [$originalId ?: $activityId, 'Integer'],
+        '2' => [$originalId ? $originalId : $activityId, 'Integer'],
       ]
     );
-    while ($query->fetch()) {
-      $caseIds[] = $query->case_id;
-    }
-    return $getSingle ? CRM_Utils_Array::first($caseIds) : $caseIds;
+    return $caseId;
   }
 
   /**
@@ -477,8 +430,6 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
       "GROUP_CONCAT(DISTINCT IF(case_relationship.contact_id_b = $userID, case_relation_type.label_a_b, case_relation_type.label_b_a) SEPARATOR ', ') as case_role",
       't_act.activity_date_time as activity_date_time',
       't_act.id as activity_id',
-      'case_status.label AS case_status',
-      'civicrm_case_type.title AS case_type',
     ];
 
     $query = CRM_Contact_BAO_Query::appendAnyValueToSelect($selectClauses, 'case_id');
@@ -487,11 +438,6 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
       FROM civicrm_case
         INNER JOIN civicrm_case_contact ON civicrm_case.id = civicrm_case_contact.case_id
         INNER JOIN civicrm_contact ON civicrm_case_contact.contact_id = civicrm_contact.id
-        LEFT JOIN civicrm_case_type ON civicrm_case.case_type_id = civicrm_case_type.id
-        LEFT JOIN civicrm_option_group option_group_case_status ON ( option_group_case_status.name = 'case_status' )
-        LEFT JOIN civicrm_option_value case_status ON ( civicrm_case.status_id = case_status.value
-          AND option_group_case_status.id = case_status.option_group_id )
-
 HERESQL;
 
     // 'upcoming' and 'recent' show the next scheduled and most recent
@@ -821,9 +767,6 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
 
     $res = CRM_Core_DAO::executeQuery($query);
     while ($res->fetch()) {
-      if (!isset($rows[$res->case_type])) {
-        $rows[$res->case_type] = array_fill_keys($caseStatuses, []);
-      }
       if (!empty($rows[$res->case_type]) && !empty($rows[$res->case_type][$res->case_status])) {
         $rows[$res->case_type][$res->case_status]['count'] = $rows[$res->case_type][$res->case_status]['count'] + 1;
       }
@@ -1185,8 +1128,8 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
   /**
    * Helper function to generate a formatted contact link/name for display in the Case activities tab
    *
-   * @param int $contactId
-   * @param string $contactName
+   * @param $contactId
+   * @param $contactName
    *
    * @return string
    */
@@ -1398,10 +1341,10 @@ HERESQL;
 
       $displayName = $info['display_name'] ?? NULL;
 
-      [$result[CRM_Utils_Array::value('contact_id', $info)], $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate(
+      list($result[CRM_Utils_Array::value('contact_id', $info)], $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
         [
           'groupName' => 'msg_tpl_workflow_case',
-          'workflow' => 'case_activity',
+          'valueName' => 'case_activity',
           'contactId' => $info['contact_id'] ?? NULL,
           'tplParams' => $tplParams,
           'from' => $receiptFrom,
@@ -1435,6 +1378,15 @@ HERESQL;
 
     if (!empty($recordedActivityParams)) {
       $activity = CRM_Activity_BAO_Activity::create($recordedActivityParams);
+
+      //create case_activity record if its case activity.
+      if ($caseId) {
+        $caseParams = [
+          'activity_id' => $activity->id,
+          'case_id' => $caseId,
+        ];
+        self::processCaseActivity($caseParams);
+      }
     }
 
     return $result;
@@ -1573,16 +1525,16 @@ HERESQL;
   }
 
   /**
-   * @param array $groupInfo
+   * @param $groupInfo
    * @param null $sort
-   * @param bool $showLinks
+   * @param null $showLinks
    * @param bool $returnOnlyCount
    * @param int $offset
    * @param int $rowCount
    *
    * @return array
    */
-  public static function getGlobalContacts(&$groupInfo, $sort = NULL, $showLinks = FALSE, $returnOnlyCount = FALSE, $offset = 0, $rowCount = 25) {
+  public static function getGlobalContacts(&$groupInfo, $sort = NULL, $showLinks = NULL, $returnOnlyCount = FALSE, $offset = 0, $rowCount = 25) {
     $globalContacts = [];
 
     $settingsProcessor = new CRM_Case_XMLProcessor_Settings();
@@ -1598,7 +1550,7 @@ HERESQL;
           $groupInfo['title'] = $results['title'];
           $params = [['group', '=', $groupInfo['id'], 0, 0]];
           $return = ['contact_id' => 1, 'sort_name' => 1, 'display_name' => 1, 'email' => 1, 'phone' => 1];
-          [$globalContacts] = CRM_Contact_BAO_Query::apiQuery($params, $return, NULL, $sort, $offset, $rowCount, TRUE, $returnOnlyCount, FALSE);
+          list($globalContacts) = CRM_Contact_BAO_Query::apiQuery($params, $return, NULL, $sort, $offset, $rowCount, TRUE, $returnOnlyCount, FALSE);
 
           if ($returnOnlyCount) {
             return $globalContacts;
@@ -1626,7 +1578,7 @@ HERESQL;
     $relatedContacts = self::getRelatedContacts($caseId);
 
     $groupInfo = [];
-    $globalContacts = self::getGlobalContacts($groupInfo, NULL, FALSE, FALSE, 0, 0);
+    $globalContacts = self::getGlobalContacts($groupInfo);
 
     //unset values which are not required.
     foreach ($globalContacts as $k => & $v) {
@@ -1877,7 +1829,7 @@ HERESQL;
     try {
       return civicrm_api3('Case', 'getcount', $params);
     }
-    catch (CRM_Core_Exception $e) {
+    catch (CiviCRM_API3_Exception $e) {
       // Lack of permissions will throw an exception
       return 0;
     }
@@ -2468,7 +2420,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     }
 
     //do check for civicase component enabled.
-    if ($checkComponent && !self::isComponentEnabled()) {
+    if ($checkComponent && !self::enabled()) {
       return $allow;
     }
 
@@ -2491,7 +2443,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
             'end_date' => ['IS NULL' => 1],
           ]);
         }
-        catch (CRM_Core_Exception $e) {
+        catch (CiviCRM_API3_Exception $e) {
           // Lack of permissions will throw an exception
           $caseCount = 0;
         }
@@ -2710,7 +2662,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * or 'access all cases and activities'
    */
   public static function accessCiviCase() {
-    if (!self::isComponentEnabled()) {
+    if (!self::enabled()) {
       return FALSE;
     }
 
@@ -2733,7 +2685,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * @return bool
    */
   public static function accessCase($caseId, $denyClosed = TRUE) {
-    if (!$caseId || !self::isComponentEnabled()) {
+    if (!$caseId || !self::enabled()) {
       return FALSE;
     }
 
@@ -2744,7 +2696,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     try {
       return (bool) civicrm_api3('Case', 'getcount', $params);
     }
-    catch (CRM_Core_Exception $e) {
+    catch (CiviCRM_API3_Exception $e) {
       // Lack of permissions will throw an exception
       return FALSE;
     }
@@ -2955,6 +2907,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * @param int $relTypeId
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function endCaseRole($caseId, $direction, $cid, $relTypeId) {
     // Validate inputs
@@ -2987,7 +2940,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    *   Whatever is known about this dao object.
    *
    * @return array|bool
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    *
    * @see CRM_Core_DAO::buildOptionsContext
    * @see CRM_Core_DAO::buildOptions
@@ -3058,7 +3011,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    *
    * @return mixed $emailFromContactId
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @see https://issues.civicrm.org/jira/browse/CRM-20308
    */
   public static function getReceiptFrom($activityID) {
@@ -3074,13 +3027,13 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
         'record_type_id' => 'Activity Source',
         'return' => 'contact_id',
       ]);
-      [$name, $address] = CRM_Contact_BAO_Contact_Location::getEmailDetails($sourceContactId);
+      list($name, $address) = CRM_Contact_BAO_Contact_Location::getEmailDetails($sourceContactId);
     }
 
     // If 'From' email address not found for Source Activity Contact then
     //   fetch the email from domain or logged in user.
     if (empty($address)) {
-      [$name, $address] = CRM_Core_BAO_Domain::getDefaultReceiptFrom();
+      list($name, $address) = CRM_Core_BAO_Domain::getDefaultReceiptFrom();
     }
 
     return "$name <$address>";
@@ -3117,7 +3070,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     try {
       $case = civicrm_api3('Case', 'getsingle', ['id' => $caseId]);
     }
-    catch (CRM_Core_Exception $e) {
+    catch (CiviCRM_API3_Exception $e) {
       // Lack of permissions will throw an exception
       return 0;
     }
@@ -3125,7 +3078,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       try {
         $caseType = civicrm_api3('CaseType', 'getsingle', ['id' => $case['case_type_id'], 'return' => ['definition']]);
       }
-      catch (CRM_Core_Exception $e) {
+      catch (CiviCRM_API3_Exception $e) {
         // Lack of permissions will throw an exception
         return 'no case type found';
       }
@@ -3136,7 +3089,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
           try {
             $relType = civicrm_api3('RelationshipType', 'getsingle', ['label_a_b' => $roleDetails['name']]);
           }
-          catch (CRM_Core_Exception $e) {
+          catch (CiviCRM_API3_Exception $e) {
           }
           if (!empty($relType['id'])) {
             $roleDetails['id'] = $relType['id'];
@@ -3146,7 +3099,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
           try {
             $relTypeBa = civicrm_api3('RelationshipType', 'getsingle', ['label_b_a' => $roleDetails['name']]);
           }
-          catch (CRM_Core_Exception $e) {
+          catch (CiviCRM_API3_Exception $e) {
           }
           if (!empty($relTypeBa['id'])) {
             if (!empty($roleDetails['direction'])) {

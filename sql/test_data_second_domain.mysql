@@ -35,6 +35,12 @@ VALUES
 -- from email address.
   (@option_group_id_fma, '"FIXME" <info@EXAMPLE.ORG>', '1', '"FIXME" <info@EXAMPLE.ORG>', NULL, 0, 1, 1, 'Default domain email address and from name.', 0, 0, 1, NULL, @domainID, NULL ),
 
+-- grant types
+  (@option_group_id_grantTyp, 'Emergency'          , 1, 'Emergency'         , NULL, 0, 1,    1, NULL, 0, 0, 1, NULL, @domainID, NULL),
+  (@option_group_id_grantTyp, 'Family Support'     , 2, 'Family Support'    , NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, @domainID, NULL),
+  (@option_group_id_grantTyp, 'General Protection' , 3, 'General Protection', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, @domainID, NULL),
+  (@option_group_id_grantTyp, 'Impunity'           , 4, 'Impunity'          , NULL, 0, NULL, 4, NULL, 0, 0, 1, NULL, @domainID, NULL),
+
 -- Mail Approval Status Preferences
   (@option_group_id_mail_approval_status, 'Approved' , 1, 'Approved', NULL, 0, 1, 1, NULL, 0, 1, 1, @mailCompId, @domainID, NULL),
   (@option_group_id_mail_approval_status, 'Rejected' , 2, 'Rejected', NULL, 0, 0, 2, NULL, 0, 1, 1, @mailCompId, @domainID, NULL),
@@ -49,7 +55,7 @@ VALUES
     ( @domainID, 'Daily' ,  NULL, 'Geocode and Parse Addresses',  'Retrieves geocodes (lat and long) and / or parses street addresses (populates street number, street name, etc.)', 'job', 'geocode', 'geocoding=[1 or 0] required\nparse=[1 or 0] required\nstart=[contact ID] optional-begin with this contact ID\nend=[contact ID] optional-process contacts with IDs less than this\nthrottle=[1 or 0] optional-1 adds five second sleep', 0),
     ( @domainID, 'Daily' ,  NULL, 'Update Greetings and Addressees','Goes through contact records and updates email and postal greetings, or addressee value',   'job', 'update_greeting','ct=[Individual or Household or Organization] required\ngt=[email_greeting or postal_greeting or addressee] required\nforce=[0 or 1] optional-0 update contacts with null value, 1 update all', 0),
     ( @domainID, 'Daily' ,  NULL, 'Mail Reports', 'Generates and sends out reports via email', 'job', 'mail_report','instanceId=[ID of report instance] required\nformat=[csv or print] optional-output CSV or print-friendly HTML, else PDF', 0),
-    ( @domainID, 'Hourly' ,  NULL, 'Send Scheduled Reminders',     'Sends out scheduled reminders via email',                                                     'job', 'send_reminder',           NULL, 0),
+    ( @domainID, 'Daily' ,  NULL, 'Send Scheduled Reminders',     'Sends out scheduled reminders via email',                                                     'job', 'send_reminder',           NULL, 0),
     ( @domainID, 'Always' , NULL, 'Update Participant Statuses',  'Updates pending event participant statuses based on time',                                    'job', 'process_participant',     NULL, 0),
     ( @domainID, 'Daily' , NULL, 'Update Membership Statuses', 'Updates membership statuses. WARNING: Membership renewal reminders have been migrated to the Schedule Reminders functionality, which supports multiple renewal reminders.', 'job', 'process_membership',   NULL, 0),
     ( @domainID, 'Always' , NULL, 'Process Survey Respondents',   'Releases reserved survey respondents when they have been reserved for longer than the Release Frequency days specified for that survey.', 'job', 'process_respondent',NULL, 0),
@@ -84,6 +90,7 @@ VALUES
     ( @domainID, 'civicrm/contact/search&reset=1',                          'Find Contacts',      'Find Contacts', NULL, '',                      @searchlastID, '1', NULL, 1 ),
     ( @domainID, 'civicrm/contact/search/advanced&reset=1',                 'Advanced Search',    'Advanced Search', NULL, '', @searchlastID, '1', NULL, 2 ),
     ( @domainID, 'civicrm/contact/search/custom&csid=15&reset=1',           'Full-text Search',   'Full-text Search', NULL, '',                   @searchlastID, '1', NULL, 3 ),
+    ( @domainID, 'civicrm/contact/search/builder&reset=1',                  'Search Builder',     'Search Builder', NULL, '',                     @searchlastID, '1', '1',  4 ),
     ( @domainID, 'civicrm/case/search&reset=1',                             'Find Cases',         'Find Cases', 'access my cases and activities,access all cases and activities', 'OR',            @searchlastID, '1', NULL, 5 ),
     ( @domainID, 'civicrm/contribute/search&reset=1',                       'Find Contributions', 'Find Contributions', 'access CiviContribute', '',  @searchlastID, '1', NULL, 6 ),
     ( @domainID, 'civicrm/mailing&reset=1',                                 'Find Mailings',      'Find Mailings', 'access CiviMail', '',         @searchlastID, '1', NULL, 7 ),
@@ -91,6 +98,11 @@ VALUES
     ( @domainID, 'civicrm/event/search&reset=1',                            'Find Participants',  'Find Participants',  'access CiviEvent', '',   @searchlastID, '1', NULL, 9 ),
     ( @domainID, 'civicrm/pledge/search&reset=1',                           'Find Pledges',       'Find Pledges', 'access CiviPledge', '',        @searchlastID, '1', NULL, 10 ),
     ( @domainID, 'civicrm/activity/search&reset=1',                         'Find Activities',    'Find Activities', NULL,  '',                   @searchlastID, '1', '1',  11 );
+
+INSERT INTO civicrm_navigation
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+VALUES
+    ( @domainID, 'civicrm/contact/search/custom/list&reset=1',              'Custom Searches', 'Custom Searches', NULL, '',                 @searchlastID, '1', NULL, 12 );
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
@@ -250,6 +262,19 @@ VALUES
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
+    ( @domainID, NULL, 'Grants', 'Grants', 'access CiviGrant', '', NULL, '1', NULL, 90 );
+
+SET @grantlastID:=LAST_INSERT_ID();
+INSERT INTO civicrm_navigation
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+VALUES
+    ( @domainID, 'civicrm/grant&reset=1',           'Dashboard', 'Dashboard', 'access CiviGrant', '',       @grantlastID, '1', NULL, 1 ),
+    ( @domainID, 'civicrm/grant/add&reset=1&action=add&context=standalone', 'New Grant', 'New Grant', 'access CiviGrant,edit grants', 'AND', @grantlastID, '1', NULL, 2 ),
+    ( @domainID, 'civicrm/grant/search&reset=1',    'Find Grants', 'Find Grants', 'access CiviGrant', '',   @grantlastID, '1', 1, 3 );
+
+INSERT INTO civicrm_navigation
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+VALUES
     ( @domainID, NULL, 'Administer', 'Administer', 'administer CiviCRM', '', NULL, '1', NULL, 100 );
 
 SET @adminlastID:=LAST_INSERT_ID();
@@ -282,7 +307,8 @@ VALUES
     ( @domainID, 'civicrm/admin/setting/preferences/display&reset=1',   'Display Preferences', 'Display Preferences',     'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 9 ),
     ( @domainID, 'civicrm/admin/setting/search&reset=1',    'Search Preferences',    'Search Preferences',                'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 10 ),
     ( @domainID, 'civicrm/admin/menu&reset=1',              'Navigation Menu', 'Navigation Menu',                         'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 11 ),
-    ( @domainID, 'civicrm/admin/options/wordreplacements&reset=1','Word Replacements','Word Replacements',                'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 12 );
+    ( @domainID, 'civicrm/admin/options/wordreplacements&reset=1','Word Replacements','Word Replacements',                'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 12 ),
+    ( @domainID, 'civicrm/admin/options/custom_search&reset=1&group=custom_search', 'Manage Custom Searches', 'Manage Custom Searches', 'administer CiviCRM', '', @CustomizelastID, '1', NULL, 13 );
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
@@ -448,6 +474,17 @@ VALUES
     ( @domainID, 'civicrm/admin/options/event_badge&group=event_badge&reset=1', 'Event Badge Formats', 'Event Badge Formats', 'access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 11 ),
     ( @domainID, 'civicrm/admin/paymentProcessor&reset=1',                  'Payment Processors', 'Payment Processors',              'administer CiviCRM', '',                     @adminEventlastID, '1', NULL, 12),
     ( @domainID, 'civicrm/admin/setting/preferences/event&reset=1',         'CiviEvent Component Settings', 'CiviEvent Component Settings','access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 13 );
+
+INSERT INTO civicrm_navigation
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+VALUES
+    ( @domainID, NULL, 'CiviGrant', 'CiviGrant', 'access CiviGrant,administer CiviCRM', 'AND', @adminlastID, '1', NULL, 13 );
+
+SET @adminGrantlastID:=LAST_INSERT_ID();
+INSERT INTO civicrm_navigation
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+VALUES
+    ( @domainID, 'civicrm/admin/options/grant_type&group=grant_type&reset=1', 'Grant Types', 'Grant Types', 'access CiviGrant,administer CiviCRM', 'AND', @adminGrantlastID, '1', NULL, 1 );
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
@@ -834,6 +871,30 @@ UPDATE civicrm_report_instance SET navigation_id = LAST_INSERT_ID() WHERE id = @
 INSERT INTO `civicrm_report_instance`
     ( `domain_id`, `title`, `report_id`, `description`, `permission`, `form_values`)
 VALUES
+    ( @domainID, 'Grant Report (Detail)', 'grant/detail', 'Grant Report Detail', 'access CiviGrant', 'a:40:{s:6:"fields";a:2:{s:9:"sort_name";s:1:"1";s:25:"application_received_date";s:1:"1";}s:12:"sort_name_op";s:3:"has";s:15:"sort_name_value";s:0:"";s:12:"gender_id_op";s:2:"in";s:15:"gender_id_value";a:0:{}s:6:"id_min";s:0:"";s:6:"id_max";s:0:"";s:5:"id_op";s:3:"lte";s:8:"id_value";s:0:"";s:13:"country_id_op";s:2:"in";s:16:"country_id_value";a:0:{}s:20:"state_province_id_op";s:2:"in";s:23:"state_province_id_value";a:0:{}s:13:"grant_type_op";s:2:"in";s:16:"grant_type_value";a:0:{}s:12:"status_id_op";s:2:"in";s:15:"status_id_value";a:0:{}s:18:"amount_granted_min";s:0:"";s:18:"amount_granted_max";s:0:"";s:17:"amount_granted_op";s:3:"lte";s:20:"amount_granted_value";s:0:"";s:20:"amount_requested_min";s:0:"";s:20:"amount_requested_max";s:0:"";s:19:"amount_requested_op";s:3:"lte";s:22:"amount_requested_value";s:0:"";s:34:"application_received_date_relative";s:1:"0";s:30:"application_received_date_from";s:0:"";s:28:"application_received_date_to";s:0:"";s:28:"money_transfer_date_relative";s:1:"0";s:24:"money_transfer_date_from";s:0:"";s:22:"money_transfer_date_to";s:0:"";s:23:"grant_due_date_relative";s:1:"0";s:19:"grant_due_date_from";s:0:"";s:17:"grant_due_date_to";s:0:"";s:11:"description";s:19:"Grant Report Detail";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:10:"permission";s:16:"access CiviGrant";s:9:"domain_id";i:1;}');
+SET @instanceID:=LAST_INSERT_ID( );
+INSERT INTO civicrm_navigation
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+VALUES
+    ( @domainID, CONCAT('civicrm/report/instance/', @instanceID,'&reset=1'), 'Grant Report (Detail)', 'Grant Report Detail', 'access CiviGrant', '',@reportlastID, '1', NULL, @instanceID+2 );
+UPDATE civicrm_report_instance SET navigation_id = LAST_INSERT_ID() WHERE id = @instanceID;
+
+
+INSERT INTO `civicrm_report_instance`
+    ( `domain_id`, `title`, `report_id`, `description`, `permission`, `form_values`)
+VALUES
+    ( @domainID, 'Grant Report (Statistics)', 'grant/statistics', 'Grant Report Statistics', 'access CiviGrant', 'a:42:{s:6:"fields";a:2:{s:18:"summary_statistics";s:1:"1";s:13:"grant_type_id";s:1:"1";}s:34:"application_received_date_relative";s:1:"0";s:30:"application_received_date_from";s:0:"";s:28:"application_received_date_to";s:0:"";s:22:"decision_date_relative";s:1:"0";s:18:"decision_date_from";s:0:"";s:16:"decision_date_to";s:0:"";s:28:"money_transfer_date_relative";s:1:"0";s:24:"money_transfer_date_from";s:0:"";s:22:"money_transfer_date_to";s:0:"";s:23:"grant_due_date_relative";s:1:"0";s:19:"grant_due_date_from";s:0:"";s:17:"grant_due_date_to";s:0:"";s:13:"grant_type_op";s:2:"in";s:16:"grant_type_value";a:0:{}s:12:"status_id_op";s:2:"in";s:15:"status_id_value";a:0:{}s:20:"amount_requested_min";s:0:"";s:20:"amount_requested_max";s:0:"";s:19:"amount_requested_op";s:3:"lte";s:22:"amount_requested_value";s:0:"";s:18:"amount_granted_min";s:0:"";s:18:"amount_granted_max";s:0:"";s:17:"amount_granted_op";s:3:"lte";s:20:"amount_granted_value";s:0:"";s:24:"grant_report_received_op";s:2:"eq";s:27:"grant_report_received_value";s:0:"";s:12:"gender_id_op";s:2:"in";s:15:"gender_id_value";a:0:{}s:15:"contact_type_op";s:2:"in";s:18:"contact_type_value";a:0:{}s:12:"region_id_op";s:2:"in";s:15:"region_id_value";a:0:{}s:13:"country_id_op";s:2:"in";s:16:"country_id_value";a:0:{}s:11:"description";s:23:"Grant Report Statistics";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:10:"permission";s:1:"0";s:9:"parent_id";s:0:"";s:9:"domain_id";i:1;}');
+SET @instanceID:=LAST_INSERT_ID( );
+INSERT INTO civicrm_navigation
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+VALUES
+    ( @domainID, CONCAT('civicrm/report/instance/', @instanceID,'&reset=1'), 'Grant Report (Statistics)', 'Grant Report Statistics', 'access CiviGrant', '',@reportlastID, '1', NULL, @instanceID+2 );
+UPDATE civicrm_report_instance SET navigation_id = LAST_INSERT_ID() WHERE id = @instanceID;
+
+
+INSERT INTO `civicrm_report_instance`
+    ( `domain_id`, `title`, `report_id`, `description`, `permission`, `form_values`)
+VALUES
     ( @domainID, 'Mail Bounce Report', 'Mailing/bounce', 'Bounce Report for mailings', 'access CiviMail', 'a:33:{s:6:"fields";a:5:{s:2:"id";s:1:"1";s:10:"first_name";s:1:"1";s:9:"last_name";s:1:"1";s:11:"bounce_name";s:1:"1";s:5:"email";s:1:"1";}s:12:"sort_name_op";s:3:"has";s:15:"sort_name_value";s:0:"";s:9:"source_op";s:3:"has";s:12:"source_value";s:0:"";s:6:"id_min";s:0:"";s:6:"id_max";s:0:"";s:5:"id_op";s:3:"lte";s:8:"id_value";s:0:"";s:15:"mailing_name_op";s:2:"in";s:18:"mailing_name_value";a:0:{}s:19:"bounce_type_name_op";s:2:"eq";s:22:"bounce_type_name_value";s:0:"";s:6:"gid_op";s:2:"in";s:9:"gid_value";a:0:{}s:8:"tagid_op";s:2:"in";s:11:"tagid_value";a:0:{}s:11:"custom_1_op";s:2:"in";s:14:"custom_1_value";a:0:{}s:11:"custom_2_op";s:2:"in";s:14:"custom_2_value";a:0:{}s:17:"custom_3_relative";s:1:"0";s:13:"custom_3_from";s:0:"";s:11:"custom_3_to";s:0:"";s:9:"order_bys";a:1:{i:1;a:1:{s:6:"column";s:1:"-";}}s:11:"description";s:26:"Bounce Report for mailings";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:10:"permission";s:15:"access CiviMail";s:6:"groups";s:0:"";s:6:"charts";s:0:"";s:9:"domain_id";i:1;}');
 SET @instanceID:=LAST_INSERT_ID( );
 INSERT INTO civicrm_navigation
@@ -902,4 +963,4 @@ INSERT INTO civicrm_navigation
 VALUES
     ( @domainID, CONCAT('civicrm/report/instance/', @instanceID,'&reset=1'), 'Mailing Detail Report', 'Mailing Detail Report', 'administer CiviMail', 'OR', @reportlastID, '1', NULL, @instanceID+2 );
 UPDATE civicrm_report_instance SET navigation_id = LAST_INSERT_ID() WHERE id = @instanceID;
-UPDATE civicrm_domain SET version = '5.55.alpha1';
+UPDATE civicrm_domain SET version = '5.41.alpha1';

@@ -56,7 +56,7 @@
           {foreach from=$casesSummary.headers item=header}
             {assign var="caseStatus" value=$header.status}
             <td class="label">
-              {if is_array($row.$caseStatus)}
+              {if isset($row.$caseStatus)}
                 <a class="crm-case-summary-drilldown" href="{$row.$caseStatus.url}">{$row.$caseStatus.count}</a>
               {else}
                 0

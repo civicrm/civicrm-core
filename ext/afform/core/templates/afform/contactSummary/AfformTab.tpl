@@ -1,5 +1,5 @@
 <crm-angular-js modules="{$tabValue.module}">
-  <form id="bootstrap-theme">
+  <div id="bootstrap-theme">
     <{$tabValue.directive} options="{ldelim}contact_id: {$contactId}{rdelim}"></{$tabValue.directive}>
-  </form>
+  </div>
 </crm-angular-js>

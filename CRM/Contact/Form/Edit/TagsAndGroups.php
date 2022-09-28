@@ -61,8 +61,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
     if (!isset($form->_tagGroup)) {
       $form->_tagGroup = [];
     }
-    $form->addExpectedSmartyVariable('type');
-    $form->addOptionalQuickFormElement('group');
+
     // NYSS 5670
     if (!$contactId && !empty($form->_contactId)) {
       $contactId = $form->_contactId;
@@ -100,12 +99,12 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
           $id = $group['id'];
           // make sure that this group has public visibility
           if ($visibility &&
-            $group['visibility'] === 'User and User Admin Only'
+            $group['visibility'] == 'User and User Admin Only'
           ) {
             continue;
           }
 
-          if ($groupElementType === 'select') {
+          if ($groupElementType == 'select') {
             $groupsOptions[$key] = $group;
           }
           else {
@@ -114,29 +113,29 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
           }
         }
 
-        if ($groupElementType === 'select' && !empty($groupsOptions)) {
+        if ($groupElementType == 'select' && !empty($groupsOptions)) {
           $form->add('select2', $fName, $groupName, $groupsOptions, FALSE,
-            ['placeholder' => ts('- select -'), 'multiple' => TRUE, 'class' => 'twenty']
+            ['placeholder' => '- select -', 'multiple' => TRUE, 'class' => 'twenty']
           );
           $form->assign('groupCount', count($groupsOptions));
         }
 
-        if ($groupElementType === 'checkbox' && !empty($elements)) {
+        if ($groupElementType == 'checkbox' && !empty($elements)) {
           $form->addGroup($elements, $fName, $groupName, '&nbsp;<br />');
           $form->assign('groupCount', count($elements));
           if ($isRequired) {
             $form->addRule($fName, ts('%1 is a required field.', [1 => $groupName]), 'required');
           }
         }
+        $form->assign('groupElementType', $groupElementType);
       }
     }
-    $form->assign('groupElementType', $groupElementType ?? NULL);
 
     if ($type & self::TAG) {
       $tags = CRM_Core_BAO_Tag::getColorTags('civicrm_contact');
 
       if (!empty($tags)) {
-        $form->add('select2', 'tag', ts('Tag(s)'), $tags, $isRequired, ['class' => 'huge', 'placeholder' => ts('- select -'), 'multiple' => TRUE]);
+        $form->add('select2', 'tag', ts('Tag(s)'), $tags, FALSE, ['class' => 'huge', 'placeholder' => ts('- select -'), 'multiple' => TRUE]);
       }
 
       // build tag widget

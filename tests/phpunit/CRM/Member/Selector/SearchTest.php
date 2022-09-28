@@ -21,7 +21,7 @@ class CRM_Member_Selector_SearchTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSelectorGetRows(): void {
+  public function testSelectorGetRows() {
     $this->_contactID = $this->individualCreate();
     $this->_invoiceID = 1234;
     $this->_contributionPageID = NULL;
@@ -35,7 +35,7 @@ class CRM_Member_Selector_SearchTest extends CiviUnitTestCase {
     $this->assertEquals([
       'contact_id' => $this->_contactID,
       'membership_id' => $membershipID,
-      'contact_type' => '<a href="/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=' . $this->_contactID . '" data-tooltip-url="/index.php?q=civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=' . $this->_contactID . '&amp;snippet=4&amp;is_show_email_task=1" class="crm-summary-link"><i class="crm-i fa-fw fa-user" title=""></i></a>',
+      'contact_type' => '<a href="/index.php?q=civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=' . $this->_contactID . '&amp;snippet=4&amp;is_show_email_task=1" class="crm-summary-link"><div class="icon crm-icon Individual-icon"></div></a>',
       'sort_name' => 'Anderson, Anthony',
       'membership_type' => 'General',
       'membership_join_date' => date('Y-m-d'),
@@ -44,7 +44,7 @@ class CRM_Member_Selector_SearchTest extends CiviUnitTestCase {
       'membership_source' => 'Payment',
       'member_is_test' => '0',
       'owner_membership_id' => NULL,
-      'membership_status' => 'Pending',
+      'membership_status' => 'New',
       'member_campaign_id' => NULL,
       'campaign' => NULL,
       'campaign_id' => NULL,

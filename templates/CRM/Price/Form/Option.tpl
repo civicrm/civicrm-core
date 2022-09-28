@@ -40,7 +40,7 @@
         <td>{$form.non_deductible_amount.html}</td>
       </tr>
       <tr class="crm-price-option-form-block-description">
-        <td class="label">{$form.description.label}<br />{help id="description" file="CRM/Price/Page/Field.hlp"}</td>
+        <td class="label">{$form.description.label}</td>
         <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_price_field_value' field='description' id=$optionId}{/if}{$form.description.html}</td>
       </tr>
       <tr class="crm-price-option-form-block-help-pre">
@@ -63,14 +63,14 @@
         </td>
       </tr>
       {* fix for CRM-10241 *}
-      {if !empty($form.count.html)}
+      {if $form.count.html}
         <tr class="crm-price-option-form-block-count">
           <td class="label">{$form.count.label}</td>
           <td>{$form.count.html} {help id="id-participant-count" file="CRM/Price/Page/Field.hlp"}</td>
         </tr>
         {* 2 line fix for CRM-10241 *}
       {/if}
-      {if !empty($form.max_value.html)}
+      {if $form.max_value.html}
         <tr class="crm-price-option-form-block-max_value">
           <td class="label">{$form.max_value.label}</td>
           <td>{$form.max_value.html} {help id="id-participant-max" file="CRM/Price/Page/Field.hlp"}</td>

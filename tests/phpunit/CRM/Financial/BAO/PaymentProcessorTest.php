@@ -48,7 +48,8 @@ class CRM_Financial_BAO_PaymentProcessorTest extends CiviUnitTestCase {
   /**
    * Test the processor retrieval function.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
+   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testGetProcessors() {

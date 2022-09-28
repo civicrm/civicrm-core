@@ -31,12 +31,7 @@ class E2E_Extern_SoapTest extends CiviEndToEndTestCase {
   public $adminPass;
 
   public function setUp(): void {
-    parent::setUp();
     CRM_Core_Config::singleton(1, 1);
-
-    if (CIVICRM_UF === 'Drupal8' || CIVICRM_UF === 'Backdrop') {
-      $this->markTestSkipped('Unsupported environment');
-    }
 
     global $_CV;
     $this->adminUser = $_CV['ADMIN_USER'];

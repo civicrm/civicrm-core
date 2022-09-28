@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $langSwitch|@count > 1}
+{if isset($langSwitch) and $langSwitch|@count > 1}
   <form action="#">
     <select name="lcMessages" onchange="window.location='{crmURL q="$queryString"}'+this.value">
       {foreach from=$langSwitch item=language key=locale}

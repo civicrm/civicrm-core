@@ -161,14 +161,11 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
   }
 
   /**
-   * Check template file exists.
+   * @param string $suffix
    *
-   * @param string|null $suffix
-   *
-   * @return string|null
-   *   Template file path, else null
+   * @return null|string
    */
-  public function checkTemplateFileExists($suffix = NULL) {
+  public function checkTemplateFileExists($suffix = '') {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Page/{$this->_gid}/View.{$suffix}tpl";
       $template = CRM_Core_Page::getTemplate();

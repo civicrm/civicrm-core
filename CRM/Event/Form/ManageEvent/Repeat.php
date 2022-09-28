@@ -1,16 +1,14 @@
 <?php
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 /**
- * Class to manage the "Repeat" functionality for event
+ * Description of Repeat
+ *
+ * @author Priyanka
  */
 class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
 
@@ -26,19 +24,12 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
    */
   protected $_parentEventEndDate = NULL;
 
-  /**
-   * @return int
-   */
-  protected function getEventId() {
-    return $this->_id;
-  }
-
   public function preProcess() {
     parent::preProcess();
     $this->setSelectedChild('repeat');
-    $this->assign('currentEventId', $this->getEventId());
+    $this->assign('currentEventId', $this->_id);
 
-    $checkParentExistsForThisId = CRM_Core_BAO_RecurringEntity::getParentFor($this->getEventId(), 'civicrm_event');
+    $checkParentExistsForThisId = CRM_Core_BAO_RecurringEntity::getParentFor($this->_id, 'civicrm_event');
     //If this ID has parent, send parent id
     if ($checkParentExistsForThisId) {
       /**
@@ -61,7 +52,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
              ";
 
           $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Event_DAO_Event');
-          $permissions = CRM_Event_BAO_Event::getAllPermissions();
+          $permissions = CRM_Event_BAO_Event::checkPermission();
           while ($dao->fetch()) {
             if (in_array($dao->id, $permissions[CRM_Core_Permission::VIEW])) {
               $manageEvent[$dao->id] = [];
@@ -73,7 +64,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       }
     }
 
-    $parentEventParams = ['id' => $this->getEventId()];
+    $parentEventParams = ['id' => $this->_id];
     $parentEventValues = [];
     $parentEventReturnProperties = ['start_date', 'end_date'];
     $parentEventAttributes = CRM_Core_DAO::commonRetrieve('CRM_Event_DAO_Event', $parentEventParams, $parentEventValues, $parentEventReturnProperties);
@@ -92,7 +83,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     $defaults = [];
 
     //Always pass current event's start date by default
-    $defaults['repetition_start_date'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->getEventId(), 'start_date', 'id');
+    $defaults['repetition_start_date'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_id, 'start_date', 'id');
     $recurringEntityDefaults = CRM_Core_Form_RecurringEntity::setDefaultValues();
     return array_merge($defaults, $recurringEntityDefaults);
   }
@@ -102,7 +93,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
   }
 
   public function postProcess() {
-    if ($this->getEventId()) {
+    if ($this->_id) {
       $params = $this->controller->exportValues($this->_name);
       if ($this->_parentEventStartDate && $this->_parentEventEndDate) {
         $interval = CRM_Core_BAO_RecurringEntity::getInterval($this->_parentEventStartDate, $this->_parentEventEndDate);
@@ -111,22 +102,22 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       $params['dateColumns'] = ['start_date'];
       $params['excludeDateRangeColumns'] = ['start_date', 'end_date'];
       $params['entity_table'] = 'civicrm_event';
-      $params['entity_id'] = $this->getEventId();
+      $params['entity_id'] = $this->_id;
 
       // CRM-16568 - check if parent exist for the event.
-      $parentId = CRM_Core_BAO_RecurringEntity::getParentFor($this->getEventId(), 'civicrm_event');
+      $parentId = CRM_Core_BAO_RecurringEntity::getParentFor($this->_id, 'civicrm_event');
       $params['parent_entity_id'] = !empty($parentId) ? $parentId : $params['entity_id'];
       //Unset event id
       unset($params['id']);
 
       $url = 'civicrm/event/manage/repeat';
-      $urlParams = "action=update&reset=1&id={$this->getEventId()}&selectedChild=repeat";
+      $urlParams = "action=update&reset=1&id={$this->_id}&selectedChild=repeat";
 
       $linkedEntities = [
         [
           'table' => 'civicrm_price_set_entity',
           'findCriteria' => [
-            'entity_id' => $this->getEventId(),
+            'entity_id' => $this->_id,
             'entity_table' => 'civicrm_event',
           ],
           'linkedColumns' => ['entity_id'],
@@ -135,7 +126,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
         [
           'table' => 'civicrm_uf_join',
           'findCriteria' => [
-            'entity_id' => $this->getEventId(),
+            'entity_id' => $this->_id,
             'entity_table' => 'civicrm_event',
           ],
           'linkedColumns' => ['entity_id'],
@@ -144,7 +135,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
         [
           'table' => 'civicrm_tell_friend',
           'findCriteria' => [
-            'entity_id' => $this->getEventId(),
+            'entity_id' => $this->_id,
             'entity_table' => 'civicrm_event',
           ],
           'linkedColumns' => ['entity_id'],
@@ -153,7 +144,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
         [
           'table' => 'civicrm_pcp_block',
           'findCriteria' => [
-            'entity_id' => $this->getEventId(),
+            'entity_id' => $this->_id,
             'entity_table' => 'civicrm_event',
           ],
           'linkedColumns' => ['entity_id'],
@@ -164,7 +155,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       CRM_Utils_System::redirect(CRM_Utils_System::url($url, $urlParams));
     }
     else {
-      CRM_Core_Error::statusBounce(ts('Could not find Event ID'));
+      CRM_Core_Error::statusBounce("Could not find Event ID");
     }
     parent::endPostProcess();
   }

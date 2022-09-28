@@ -293,7 +293,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   /**
    * Check that pseudoconstant reflects new value added.
    */
-  public function testCRM11876CreateOptionPseudoConstantUpdated(): void {
+  public function testCRM11876CreateOptionPseudoConstantUpdated() {
     $optionGroupID = $this->callAPISuccess('option_group', 'getvalue', [
       'name' => 'payment_instrument',
       'return' => 'id',
@@ -304,13 +304,13 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'label' => $newOption,
     ]);
 
-    $fields = $this->callAPISuccess('Contribution', 'getoptions', ['field' => 'payment_instrument_id']);
-    $this->assertContains($newOption, $fields['values']);
+    $fields = $this->callAPISuccess('contribution', 'getoptions', ['field' => 'payment_instrument_id']);
+    $this->assertTrue(in_array($newOption, $fields['values']));
 
-    $this->callAPISuccess('OptionValue', 'delete', ['id' => $apiResult['id']]);
+    $this->callAPISuccess('option_value', 'delete', ['id' => $apiResult['id']]);
 
-    $fields = $this->callAPISuccess('Contribution', 'getoptions', ['field' => 'payment_instrument_id']);
-    $this->assertNotContains($newOption, $fields['values']);
+    $fields = $this->callAPISuccess('contribution', 'getoptions', ['field' => 'payment_instrument_id']);
+    $this->assertFalse(in_array($newOption, $fields['values']));
   }
 
   /**
@@ -440,7 +440,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
         'financial_account_id' => $nonAssetFinancialAccountId,
         'id' => $ov['id'],
       ]);
-      throw new CRM_Core_Exception(ts('Should throw error.'));
+      throw new API_Exception(ts('Should throw error.'));
     }
     catch (Exception $e) {
       try {
@@ -450,7 +450,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
           'entity_id' => $ov['id'],
           'financial_account_id' => $nonAssetFinancialAccountId,
         ]);
-        throw new CRM_Core_Exception(ts('Should throw error.'));
+        throw new API_Exception(ts('Should throw error.'));
       }
       catch (Exception $e) {
         $this->checkPaymentMethodFinancialAccountRelationship($ov['id'], $assetFinancialAccountId);

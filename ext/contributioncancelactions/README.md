@@ -21,3 +21,4 @@ The extension is licensed under [AGPL-3.0](LICENSE.txt).
 ## Installation (Web UI)
 
 This extension ships with core - you can enable or disable in the extensions UI.
+

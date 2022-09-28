@@ -76,6 +76,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * @return void
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
     // SearchFormName is deprecated & to be removed - the replacement is for the task to
@@ -128,6 +129,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * @return void
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -198,9 +200,9 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
           'id' => $this->_ssID,
           'name' => CRM_Contact_BAO_SavedSearch::getName($this->_ssID, 'title'),
         ];
+        $this->assign_by_ref('savedSearch', $savedSearchValues);
+        $this->assign('ssID', $this->_ssID);
       }
-      $this->assign('savedSearch', $savedSearchValues ?? NULL);
-      $this->assign('ssID', $this->_ssID);
 
       $this->addTaskMenu($tasks);
     }
@@ -424,7 +426,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
   /**
    * Set the metadata for the form.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function setSearchMetadata() {
     $this->addSearchFieldMetadata(['Participant' => CRM_Event_BAO_Query::getSearchFieldMetadata()]);

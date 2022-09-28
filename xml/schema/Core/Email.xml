@@ -87,7 +87,6 @@
     <title>Primary email</title>
     <type>boolean</type>
     <default>0</default>
-    <required>true</required>
     <comment>Is this the primary email address</comment>
     <add>1.1</add>
     <html>
@@ -104,7 +103,6 @@
     <title>Is Billing Email?</title>
     <type>boolean</type>
     <default>0</default>
-    <required>true</required>
     <comment>Is this the billing?</comment>
     <add>2.0</add>
   </field>
@@ -143,11 +141,8 @@
     <name>hold_date</name>
     <type>datetime</type>
     <comment>When the address went on bounce hold</comment>
-    <readonly>true</readonly>
     <html>
       <label>Hold Date</label>
-      <type>Select Date</type>
-      <formatType>activityDateTime</formatType>
     </html>
     <add>1.1</add>
   </field>
@@ -157,8 +152,6 @@
     <comment>When the address bounce status was last reset</comment>
     <html>
       <label>Reset Date</label>
-      <type>Select Date</type>
-      <formatType>activityDateTime</formatType>
     </html>
     <add>1.1</add>
   </field>

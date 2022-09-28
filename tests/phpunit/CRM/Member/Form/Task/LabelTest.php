@@ -22,14 +22,14 @@ class CRM_Member_Form_Task_LabelTest extends CiviUnitTestCase {
    * This is a 'no error' test to support refactoring. It ensures no fatal is hit & lays
    * the basis for more tests later.
    */
-  public function testMembershipTokenReplacementInPDF(): void {
+  public function testMembershipTokenReplacementInPDF() {
     // First check tasks are there is some weird static caching that could mess us up.
     $tasks = CRM_Member_Task::tasks();
     $this->assertArrayHasKey(201, $tasks, print_r($tasks, TRUE));
     $tasks = CRM_Member_Task::permissionedTaskTitles(CRM_Core_Permission::EDIT);
     $this->assertArrayHasKey(201, $tasks);
     $membershipID = $this->contactMembershipCreate(['contact_id' => $this->individualCreate()]);
-    /** @var CRM_Member_Form_Task_Label $form */
+    /* @var CRM_Member_Form_Task_Label $form */
     $form = $this->getFormObject('CRM_Member_Form_Task_Label', [
       'task' => 201,
       'radio_ts' => 'ts_sel',

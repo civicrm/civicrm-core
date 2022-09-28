@@ -1,9 +1,4 @@
 <?php
-
-/**
- * @file
- */
-
 /**
  * Test Generated example demonstrating the Domain.get API.
  *
@@ -15,10 +10,10 @@ function domain_get_example() {
     'sequential' => 1,
   ];
 
-  try {
+  try{
     $result = civicrm_api3('Domain', 'get', $params);
   }
-  catch (CRM_Core_Exception $e) {
+  catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
@@ -50,7 +45,7 @@ function domain_get_expectedresult() {
       '0' => [
         'id' => '1',
         'name' => 'Default Domain Name',
-        'version' => '5.47.alpha1',
+        'version' => '4.6.alpha1',
         'contact_id' => '3',
         'locale_custom_strings' => 'a:1:{s:5:\"en_US\";a:0:{}}',
         'domain_email' => 'my@email.com',
@@ -72,14 +67,14 @@ function domain_get_expectedresult() {
         ],
         'from_name' => 'FIXME',
         'from_email' => 'info@EXAMPLE.ORG',
-        'domain_version' => '5.47.alpha1',
+        'domain_version' => '4.6.alpha1',
       ],
       '1' => [
         'id' => '2',
         'name' => 'Second Domain',
-        'version' => '5.47.alpha1',
+        'version' => '4.6.alpha1',
         'contact_id' => '2',
-        'domain_email' => 'domainemail2@example.org',
+        'domain_email' => '\"Domain Email\" <domainemail2@example.org>',
         'domain_phone' => [
           'phone_type' => 'Phone',
           'phone' => '204 555-1001',
@@ -98,7 +93,7 @@ function domain_get_expectedresult() {
         ],
         'from_name' => 'FIXME',
         'from_email' => 'info@EXAMPLE.ORG',
-        'domain_version' => '5.47.alpha1',
+        'domain_version' => '4.6.alpha1',
       ],
     ],
   ];
@@ -107,23 +102,23 @@ function domain_get_expectedresult() {
 }
 
 /*
- * This example has been generated from the API test suite.
- * The test that created it is called "testGet"
- * and can be found at:
- * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/DomainTest.php
- *
- * You can see the outcome of the API tests at
- * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
- *
- * To Learn about the API read
- * https://docs.civicrm.org/dev/en/latest/api/
- *
- * Browse the API on your own site with the API Explorer. It is in the main
- * CiviCRM menu, under: Support > Development > API Explorer.
- *
- * Read more about testing here
- * https://docs.civicrm.org/dev/en/latest/testing/
- *
- * API Standards documentation:
- * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
- */
+* This example has been generated from the API test suite.
+* The test that created it is called "testGet"
+* and can be found at:
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/DomainTest.php
+*
+* You can see the outcome of the API tests at
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+*
+* To Learn about the API read
+* https://docs.civicrm.org/dev/en/latest/api/
+*
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
+*
+* Read more about testing here
+* https://docs.civicrm.org/dev/en/latest/testing/
+*
+* API Standards documentation:
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+*/

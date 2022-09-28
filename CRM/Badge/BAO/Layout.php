@@ -17,16 +17,33 @@
 class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @deprecated
-   * @param array $params
-   * @param array $defaults
-   *
-   * @return CRM_Core_DAO_PrintLabel|NULL
+   * Class constructor.
    */
-  public static function retrieve($params, &$defaults) {
-    return self::commonRetrieve('CRM_Core_DAO_PrintLabel', $params, $defaults);
+  public function __construct() {
+    parent::__construct();
+  }
+
+  /**
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
+   *
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
+   *
+   * @return CRM_Core_DAO_PrintLabel|null
+   *   object on success, null otherwise
+   */
+  public static function retrieve(&$params, &$defaults) {
+    $printLabel = new CRM_Core_DAO_PrintLabel();
+    $printLabel->copyValues($params);
+    if ($printLabel->find(TRUE)) {
+      CRM_Core_DAO::storeValues($printLabel, $defaults);
+      return $printLabel;
+    }
+    return NULL;
   }
 
   /**
@@ -89,10 +106,13 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * Delete name labels.
    *
    * @param int $printLabelId
-   * @deprecated
+   *   ID of the name label to be deleted.
+   *
    */
   public static function del($printLabelId) {
-    self::deleteRecord(['id' => $printLabelId]);
+    $printLabel = new CRM_Core_DAO_PrintLabel();
+    $printLabel->id = $printLabelId;
+    $printLabel->delete();
   }
 
   /**
@@ -135,7 +155,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   /**
    * Decode encoded data and return as an array.
    *
-   * @param string $jsonData
+   * @param json $jsonData
    *   Json object.
    *
    * @return array

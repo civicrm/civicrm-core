@@ -112,15 +112,15 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
         $groupTitle = CRM_Core_BAO_CustomGroup::getTitle($this->_groupID);
         switch ($mode) {
           case 'add':
-            $this->setTitle(ts('Add %1', [1 => $groupTitle]));
+            CRM_Utils_System::setTitle(ts('Add %1', [1 => $groupTitle]));
             break;
 
           case 'edit':
-            $this->setTitle(ts('Edit %1', [1 => $groupTitle]));
+            CRM_Utils_System::setTitle(ts('Edit %1', [1 => $groupTitle]));
             break;
 
           case 'copy':
-            $this->setTitle(ts('Copy %1', [1 => $groupTitle]));
+            CRM_Utils_System::setTitle(ts('Copy %1', [1 => $groupTitle]));
             break;
         }
 
@@ -138,7 +138,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     $this->assign('contact_type', $this->_contactType);
     $this->assign('contact_subtype', $this->_contactSubType);
     list($displayName, $contactImage) = CRM_Contact_BAO_Contact::getDisplayAndImage($this->_tableID);
-    $this->setTitle($displayName, $contactImage . ' ' . $displayName);
+    CRM_Utils_System::setTitle($displayName, $contactImage . ' ' . $displayName);
 
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {

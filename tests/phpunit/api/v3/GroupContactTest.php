@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\SubscriptionHistory;
-
 /**
  * Class api_v3_GroupContactTest
  * @group headless
@@ -19,6 +17,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
 
   protected $_contactId;
   protected $_contactId1;
+  protected $_apiversion = 3;
 
   /**
    * @var int
@@ -37,6 +36,8 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
    */
   public function setUp(): void {
     parent::setUp();
+    $this->useTransaction(TRUE);
+
     $this->_contactId = $this->individualCreate();
 
     $this->_groupId1 = $this->groupCreate();
@@ -70,14 +71,6 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Cleanup after test.
-   */
-  public function tearDown(): void {
-    $this->quickCleanup(['civicrm_group', 'civicrm_group_contact', 'civicrm_subscription_history']);
-    parent::tearDown();
-  }
-
-  /**
    * Test GroupContact.get by ID.
    */
   public function testGet() {
@@ -108,11 +101,33 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     }
   }
 
-  /**
-   * Test group contact create.
-   */
-  public function testCreate(): void {
-    $this->_contactId1 = $this->individualCreate([
+  public function testCreateWithEmptyParams() {
+    $params = [];
+    $groups = $this->callAPIFailure('group_contact', 'create', $params);
+    $this->assertEquals($groups['error_message'],
+      'Mandatory key(s) missing from params array: group_id, contact_id'
+    );
+  }
+
+  public function testCreateWithoutGroupIdParams() {
+    $params = [
+      'contact_id' => $this->_contactId,
+    ];
+
+    $groups = $this->callAPIFailure('group_contact', 'create', $params);
+    $this->assertEquals($groups['error_message'], 'Mandatory key(s) missing from params array: group_id');
+  }
+
+  public function testCreateWithoutContactIdParams() {
+    $params = [
+      'group_id' => $this->_groupId1,
+    ];
+    $groups = $this->callAPIFailure('group_contact', 'create', $params);
+    $this->assertEquals($groups['error_message'], 'Mandatory key(s) missing from params array: contact_id');
+  }
+
+  public function testCreate() {
+    $cont = [
       'first_name' => 'Amiteshwar',
       'middle_name' => 'L.',
       'last_name' => 'Prasad',
@@ -120,31 +135,33 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
       'suffix_id' => 3,
       'email' => 'amiteshwar.prasad@civicrm.org',
       'contact_type' => 'Individual',
-    ]);
+    ];
+
+    $this->_contactId1 = $this->individualCreate($cont);
     $params = [
       'contact_id' => $this->_contactId,
       'contact_id.2' => $this->_contactId1,
       'group_id' => $this->_groupId1,
     ];
 
-    $result = $this->callAPIAndDocument('GroupContact', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['not_added']);
-    $this->assertEquals(1, $result['added']);
-    $this->assertEquals(2, $result['total_count']);
+    $result = $this->callAPIAndDocument('group_contact', 'create', $params, __FUNCTION__, __FILE__);
+    $this->assertEquals($result['not_added'], 1);
+    $this->assertEquals($result['added'], 1);
+    $this->assertEquals($result['total_count'], 2);
   }
 
   /**
    * Test GroupContact.delete by contact+group ID.
    */
-  public function testDelete(): void {
+  public function testDelete() {
     $params = [
       'contact_id' => $this->_contactId,
       'group_id' => $this->_groupId1,
     ];
 
     $result = $this->callAPIAndDocument('group_contact', 'delete', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['removed']);
-    $this->assertEquals(1, $result['total_count']);
+    $this->assertEquals($result['removed'], 1);
+    $this->assertEquals($result['total_count'], 1);
   }
 
   public function testDeletePermanent() {
@@ -202,16 +219,9 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-19979 test that group contact delete action works when contact is in
-   * status of pending.
-   *
-   * @param int $version
-   *
-   * @dataProvider versionThreeAndFour
-   * @throws \CRM_Core_Exception
+   * CRM-19979 test that group cotnact delete action works when contact is in status of pendin.
    */
-  public function testDeleteWithPending(int $version): void {
-    $this->_apiversion = $version;
+  public function testDeleteWithPending() {
     $groupId3 = $this->groupCreate([
       'name' => 'Test Group 3',
       'domain_id' => 1,
@@ -225,24 +235,11 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
       'group_id' => $groupId3,
       'status' => 'Pending',
     ];
-    $this->callAPISuccess('GroupContact', 'create', $groupContactCreateParams);
-    $groupGetContact = $this->CallAPISuccess('GroupContact', 'get', $groupContactCreateParams);
-    $history = SubscriptionHistory::get()
-      ->addSelect('*')
-      ->addWhere('group_id', '=', $groupId3)
-      ->addWhere('status', '=', 'Pending')
-      ->addWhere('contact_id', '=', $this->_contactId)
-      ->execute();
-    $this->assertCount(1, $history);
-    if ($version === 3) {
-      $this->callAPISuccess('GroupContact', 'delete', [
-        'id' => $groupGetContact['id'],
-        'status' => 'Removed',
-      ]);
-    }
-    $this->callAPISuccess('GroupContact', 'delete', ['id' => $groupGetContact['id'], 'skip_undelete' => TRUE]);
-    $this->callAPISuccess('Group', 'delete', ['id' => $groupId3]);
-
+    $groupContact = $this->callAPISuccess('groupContact', 'create', $groupContactCreateParams);
+    $groupGetContact = $this->CallAPISuccess('groupContact', 'get', $groupContactCreateParams);
+    $this->callAPISuccess('groupContact', 'delete', ['id' => $groupGetContact['id'], 'status' => 'Removed']);
+    $this->callAPISuccess('groupContact', 'delete', ['id' => $groupGetContact['id'], 'skip_undelete' => TRUE]);
+    $this->callAPISuccess('group', 'delete', ['id' => $groupId3]);
   }
 
   /**

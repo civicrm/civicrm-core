@@ -158,7 +158,7 @@ class CRM_Utils_SQL_Insert {
   /**
    * Escape string.
    *
-   * @param string|null $value
+   * @param string|NULL $value
    *
    * @return string
    *   SQL expression, e.g. "it\'s great" (with-quotes) or NULL (without-quotes)

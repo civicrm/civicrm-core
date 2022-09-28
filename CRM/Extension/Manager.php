@@ -130,7 +130,7 @@ class CRM_Extension_Manager {
    * Class constructor.
    *
    * @param CRM_Extension_Container_Interface $fullContainer
-   * @param CRM_Extension_Container_Basic|false $defaultContainer
+   * @param CRM_Extension_Container_Basic|FALSE $defaultContainer
    * @param CRM_Extension_Mapper $mapper
    * @param array $typeManagers
    */
@@ -175,7 +175,7 @@ class CRM_Extension_Manager {
           CRM_Core_Session::setStatus(ts('A copy of the extension (%1) is in a system folder (%2). The system copy will be preserved, but the new copy will be used.', [
             1 => $newInfo->key,
             2 => $oldPath,
-          ]), '', 'alert', ['expires' => 0]);
+          ]));
         }
         break;
 
@@ -225,9 +225,6 @@ class CRM_Extension_Manager {
     }
 
     $this->refresh();
-    // It might be useful to reset the container, but (given dev/core#3686) that's not likely to do much.
-    // \Civi::reset();
-    // \CRM_Core_Config::singleton(TRUE, TRUE);
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
   }
 
@@ -314,8 +311,6 @@ class CRM_Extension_Manager {
     $this->statuses = NULL;
     $this->mapper->refresh();
     if (!CRM_Core_Config::isUpgradeMode()) {
-      \Civi::reset();
-      \CRM_Core_Config::singleton(TRUE, TRUE);
       CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
 
       $schema = new CRM_Logging_Schema();
@@ -427,8 +422,6 @@ class CRM_Extension_Manager {
 
     $this->statuses = NULL;
     $this->mapper->refresh();
-    \Civi::reset();
-    \CRM_Core_Config::singleton(TRUE, TRUE);
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
 
     $this->popProcess($keys);
@@ -487,8 +480,6 @@ class CRM_Extension_Manager {
 
     $this->statuses = NULL;
     $this->mapper->refresh();
-    // At the analogous step of `install()` or `disable()`, it would reset the container.
-    // But here, the extension goes from "disabled=>uninstall". All we really need is to reconcile mgd's.
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
     $this->popProcess($keys);
   }
@@ -575,7 +566,7 @@ class CRM_Extension_Manager {
   /**
    * Return current processes for given extension.
    *
-   * @param string $key extension key
+   * @param String $key extension key
    *
    * @return array
    */
@@ -587,7 +578,7 @@ class CRM_Extension_Manager {
    * Determine if the extension specified is currently involved in an install
    * or enable process. Just sugar code to make things more readable.
    *
-   * @param string $key extension key
+   * @param String $key extension key
    *
    * @return bool
    */
@@ -721,12 +712,9 @@ class CRM_Extension_Manager {
    * @return CRM_Extension_Info|NULL
    */
   public function createInfoFromDB($key) {
-    // System hasn't booted - and extension is missing. Need low-tech/no-hook SELECT to learn more about what's missing.
-    $select = CRM_Utils_SQL_Select::from('civicrm_extension')
-      ->where('full_name = @key', ['key' => $key])
-      ->select('full_name, type, name, label, file');
-    $dao = $select->execute();
-    if ($dao->fetch()) {
+    $dao = new CRM_Core_DAO_Extension();
+    $dao->full_name = $key;
+    if ($dao->find(TRUE)) {
       $info = new CRM_Extension_Info($dao->full_name, $dao->type, $dao->name, $dao->label, $dao->file);
       return $info;
     }

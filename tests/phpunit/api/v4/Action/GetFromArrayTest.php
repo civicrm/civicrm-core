@@ -19,13 +19,13 @@
 
 namespace api\v4\Action;
 
-use api\v4\Api4TestBase;
+use api\v4\UnitTestCase;
 use Civi\Api4\MockArrayEntity;
 
 /**
  * @group headless
  */
-class GetFromArrayTest extends Api4TestBase {
+class GetFromArrayTest extends UnitTestCase {
 
   public function testArrayGetWithLimit() {
     $result = MockArrayEntity::get()
@@ -76,7 +76,6 @@ class GetFromArrayTest extends Api4TestBase {
       ],
       [
         'field1' => 3,
-        'field3' => NULL,
       ],
       [
         'field1' => 4,
@@ -111,16 +110,6 @@ class GetFromArrayTest extends Api4TestBase {
       ->addWhere('field2', 'LIKE', '%ra%')
       ->execute();
     $this->assertEquals([1, 3], array_column((array) $result, 'field1'));
-
-    $result = MockArrayEntity::get()
-      ->addWhere('field2', 'REGEXP', '(zebra|yac[a-z]|something/else)')
-      ->execute();
-    $this->assertEquals([1, 2], array_column((array) $result, 'field1'));
-
-    $result = MockArrayEntity::get()
-      ->addWhere('field2', 'NOT REGEXP', '^[x|y|z]')
-      ->execute();
-    $this->assertEquals([4, 5], array_column((array) $result, 'field1'));
 
     $result = MockArrayEntity::get()
       ->addWhere('field3', 'IS NULL')

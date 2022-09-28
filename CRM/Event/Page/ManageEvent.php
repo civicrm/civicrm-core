@@ -53,6 +53,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
     if (!(self::$_actionLinks)) {
       // helper variable for nicer formatting
       $copyExtra = ts('Are you sure you want to make a copy of this Event?');
+      $deleteExtra = ts('Are you sure you want to delete this Event?');
 
       self::$_actionLinks = [
         CRM_Core_Action::DISABLE => [
@@ -69,6 +70,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'name' => ts('Delete'),
           'url' => CRM_Utils_System::currentPath(),
           'qs' => 'action=delete&id=%%id%%',
+          'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
           'title' => ts('Delete Event'),
         ],
         CRM_Core_Action::COPY => [
@@ -123,7 +125,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    *
    * @return array
    *   (reference) of tab links
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function &tabs() {
     // @todo Move to eventcart extension
@@ -346,14 +348,7 @@ ORDER BY start_date desc
     $eventType = CRM_Core_OptionGroup::values('event_type');
     while ($dao->fetch()) {
       if (in_array($dao->id, $permittedEventsByAction[CRM_Core_Permission::VIEW])) {
-        $manageEvent[$dao->id] = [
-          // Set defaults to prevent smarty e-notices, will be overwritten if populated.
-          'city' => '',
-          'state_province' => '',
-          'end_date' => '',
-          'loc_block_id' => '',
-          'participant_listing_id' => '',
-        ];
+        $manageEvent[$dao->id] = [];
         $repeat = CRM_Core_BAO_RecurringEntity::getPositionAndCount($dao->id, 'civicrm_event');
         $manageEvent[$dao->id]['repeat'] = '';
         if ($repeat) {

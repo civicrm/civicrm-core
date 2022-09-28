@@ -7,7 +7,6 @@ use Civi\Core\Exception\UnknownAssetException;
 /**
  * Class AssetBuilder
  * @package Civi\Core
- * @service asset_builder
  *
  * The AssetBuilder is used to manage semi-dynamic assets.
  * In normal production use, these assets are built on first
@@ -71,7 +70,7 @@ use Civi\Core\Exception\UnknownAssetException;
  * secure it (e.g. alternative digest() calculations), but the
  * current implementation is KISS.
  */
-class AssetBuilder extends \Civi\Core\Service\AutoService {
+class AssetBuilder {
 
   /**
    * @return array
@@ -242,7 +241,7 @@ class AssetBuilder extends \Civi\Core\Service\AutoService {
   /**
    * Determine the local path of a cache file.
    *
-   * @param string|null $fileName
+   * @param string|NULL $fileName
    *   Ex: 'angular.abcd1234abcd1234.json'.
    * @return string
    *   URL.
@@ -258,7 +257,7 @@ class AssetBuilder extends \Civi\Core\Service\AutoService {
   /**
    * Determine the URL of a cache file.
    *
-   * @param string|null $fileName
+   * @param string|NULL $fileName
    *   Ex: 'angular.abcd1234abcd1234.json'.
    * @return string
    *   URL.

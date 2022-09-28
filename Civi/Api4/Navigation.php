@@ -11,16 +11,12 @@
 namespace Civi\Api4;
 
 /**
- * Navigation menu items.
+ * Navigation entity.
  *
  * @searchable none
- * @orderBy weight
- * @groupWeightsBy domain_id,parent_id
  * @since 5.19
  * @package Civi\Api4
  */
 class Navigation extends Generic\DAOEntity {
-  use Generic\Traits\SortableEntity;
-  use Generic\Traits\ManagedEntity;
 
 }

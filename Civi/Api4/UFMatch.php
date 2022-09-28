@@ -13,7 +13,7 @@ namespace Civi\Api4;
 /**
  * UFMatch entity - links civicrm contacts with users created externally
  *
- * @searchable secondary
+ * @searchable none
  * @since 5.19
  * @package Civi\Api4
  */

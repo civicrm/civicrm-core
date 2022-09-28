@@ -9,7 +9,7 @@
 *}
 
 <tr>
-{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="receive_date" to='' from='' colspan="2" class='' hideRelativeLabel=0}
+{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="receive_date" colspan="2"}
 </tr>
 <tr>
   <td><label>{ts}Contribution Amounts{/ts}</label> <br />
@@ -25,7 +25,7 @@
     <label>{ts}Currency{/ts}</label> <br />
     {$form.contribution_currency_type.html|crmAddClass:twenty}
   </td>
-  {if $form.contribution_batch_id}
+  {if $form.contribution_batch_id.html }
     <td>
       {$form.contribution_batch_id.label}<br />
       {$form.contribution_batch_id.html}
@@ -58,14 +58,12 @@
 </tr>
 <tr>
   <td>
-    {if $form.contribution_or_softcredits}
-      {$form.contribution_or_softcredits.label} <br />
-      {$form.contribution_or_softcredits.html}<br />
-      <div class="float-left" id="contribution_soft_credit_type_wrapper">
-        {$form.contribution_soft_credit_type_id.label} <br />
-        {$form.contribution_soft_credit_type_id.html|crmAddClass:twenty}
-      </div>
-    {/if}
+    {$form.contribution_or_softcredits.label} <br />
+    {$form.contribution_or_softcredits.html}<br />
+    <div class="float-left" id="contribution_soft_credit_type_wrapper">
+      {$form.contribution_soft_credit_type_id.label} <br />
+      {$form.contribution_soft_credit_type_id.html|crmAddClass:twenty}
+    </div>
   </td>
   <td>
     {$form.invoice_number.label} <br />
@@ -138,10 +136,8 @@
     {$form.contribution_source.html|crmAddClass:twenty}
   </td>
   <td>
-    {if $form.contribution_product_id}
-      {$form.contribution_product_id.label} <br />
-      {$form.contribution_product_id.html|crmAddClass:twenty}
-    {/if}
+    {$form.contribution_product_id.label} <br />
+    {$form.contribution_product_id.html|crmAddClass:twenty}
   </td>
 </tr>
 <tr>
@@ -159,7 +155,7 @@
   </td>
 </tr>
 <tr>
-  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="contribution_cancel_date" to='' from='' colspan="2" class='' hideRelativeLabel=0}
+  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="contribution_cancel_date" colspan="2"}
 </tr>
 <tr>
   <td>
@@ -172,7 +168,7 @@
 </tr>
 
 {* campaign in contribution search *}
-{include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
+{include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch"
 campaignTrClass='' campaignTdClass=''}
 
 {* contribution recurring search *}
@@ -182,7 +178,7 @@ campaignTrClass='' campaignTdClass=''}
   </td>
 </tr>
 
-{if $contributionGroupTree}
+{if !empty($contributionGroupTree)}
 <tr>
   <td colspan="2">
   {include file="CRM/Custom/Form/Search.tpl" groupTree=$contributionGroupTree showHideLinks=false}</td>

@@ -54,10 +54,10 @@ class CRM_Contact_Form_Task_LabelCommon {
   /**
    * Get the rows for the labels.
    *
-   * @param array $contactIDs
+   * @param $contactIDs
    * @param int $locationTypeID
    * @param bool $respectDoNotMail
-   * @param bool $mergeSameAddress
+   * @param $mergeSameAddress
    * @param bool $mergeSameHousehold
    *   UNUSED.
    *
@@ -280,7 +280,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    *
    * @return array
    */
-  public static function mergeSameHousehold(&$rows) {
+  public function mergeSameHousehold(&$rows) {
     // group selected contacts by type
     $individuals = [];
     $households = [];

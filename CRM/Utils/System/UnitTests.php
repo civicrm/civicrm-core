@@ -34,7 +34,6 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
       $listenerMap = \Civi\Core\Event\EventScanner::findListeners($test);
       \Civi::dispatcher()->addListenerMap($test, $listenerMap);
     }
-    \Civi\Test::eventChecker()->addListeners();
   }
 
   /**
@@ -103,8 +102,8 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
     $separator = ($htmlize && $frontend) ? '&amp;' : '&';
 
     if (!$config->cleanURL) {
-      if ($path !== NULL && $path !== '' && $path !== FALSE) {
-        if ($query !== NULL && $query !== '' && $query !== FALSE) {
+      if (isset($path)) {
+        if (isset($query)) {
           return $base . $script . '?q=' . $path . $separator . $query . $fragment;
         }
         else {
@@ -112,7 +111,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
         }
       }
       else {
-        if ($query !== NULL && $query !== '' && $query !== FALSE) {
+        if (isset($query)) {
           return $base . $script . '?' . $query . $fragment;
         }
         else {

@@ -24,18 +24,18 @@ class ServiceListener {
    * @var array
    *   Ex: ['service_name', 'someMethod']
    */
-  protected $inertCb = NULL;
+  private $inertCb = NULL;
 
   /**
    * @var array|null
    *   Ex: [$svcObj, 'someMethod']
    */
-  protected $liveCb = NULL;
+  private $liveCb = NULL;
 
   /**
    * @var \Symfony\Component\DependencyInjection\ContainerInterface
    */
-  protected $container = NULL;
+  private $container = NULL;
 
   /**
    * @param array $callback
@@ -53,7 +53,7 @@ class ServiceListener {
     return call_user_func_array($this->liveCb, $args);
   }
 
-  protected function getServiceClass(): ?string {
+  public function __toString() {
     $class = NULL;
     if (\Civi\Core\Container::isContainerBooted()) {
       try {
@@ -63,11 +63,6 @@ class ServiceListener {
       catch (Throwable $t) {
       }
     }
-    return $class;
-  }
-
-  public function __toString() {
-    $class = $this->getServiceClass();
     if ($class) {
       return sprintf('$(%s)->%s($e) [%s]', $this->inertCb[0], $this->inertCb[1], $class);
     }

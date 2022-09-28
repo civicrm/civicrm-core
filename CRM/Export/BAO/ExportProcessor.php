@@ -794,7 +794,7 @@ class CRM_Export_BAO_ExportProcessor {
     //sort by state
     //CRM-15301
     $query->_sort = $order;
-    [$select, $from, $where, $having] = $query->query();
+    list($select, $from, $where, $having) = $query->query();
     $this->setQueryFields($query->_fields);
     $whereClauses = ['trash_clause' => "contact_a.is_deleted != 1"];
     if ($this->getComponentClause()) {
@@ -844,7 +844,7 @@ class CRM_Export_BAO_ExportProcessor {
         $order .= ", contact_a.id";
       }
 
-      [$field, $dir] = explode(' ', $order, 2);
+      list($field, $dir) = explode(' ', $order, 2);
       $field = trim($field);
       if (!empty($this->getReturnProperties()[$field])) {
         //CRM-15301
@@ -1088,6 +1088,7 @@ class CRM_Export_BAO_ExportProcessor {
    *
    * @return string
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function getTransformedFieldValue($field, $iterationDAO, $fieldValue, $paymentDetails) {
 
@@ -1455,7 +1456,7 @@ class CRM_Export_BAO_ExportProcessor {
         case CRM_Utils_Type::T_INT:
         case CRM_Utils_Type::T_BOOLEAN:
           if (in_array(CRM_Utils_Array::value('data_type', $fieldSpec), ['Country', 'StateProvince', 'ContactReference'])) {
-            return "`$fieldName` text";
+            return "`$fieldName` varchar(255)";
           }
           // some of those will be exported as a (localisable) string
           // @see https://lab.civicrm.org/dev/core/-/issues/2164
@@ -1468,7 +1469,7 @@ class CRM_Export_BAO_ExportProcessor {
             // @see https://lab.civicrm.org/dev/core/-/issues/2645
             switch ($fieldName) {
               case 'preferred_mail_format':
-                return "`$fieldName` text(16)";
+                return "`$fieldName` varchar(16)";
 
               default:
                 return "`$fieldName` varchar({$fieldSpec['maxlength']})";
@@ -1869,22 +1870,39 @@ class CRM_Export_BAO_ExportProcessor {
   }
 
   /**
-   * Replace contact greetings in merged contacts.
-   *
-   * @param int $contactID
+   * @param int $contactId
    *
    * @return array
-   * @throws \CRM_Core_Exception
    */
-  public function replaceMergeTokens(int $contactID): array {
-    $messageTemplate = [
-      'postal_greeting' => $this->getPostalGreetingTemplate() ?? '',
-      'addressee' => $this->getAddresseeGreetingTemplate() ?? '',
+  public function replaceMergeTokens($contactId) {
+    $greetings = [];
+    $contact = NULL;
+
+    $greetingFields = [
+      'postal_greeting' => $this->getPostalGreetingTemplate(),
+      'addressee' => $this->getAddresseeGreetingTemplate(),
     ];
-    if (array_filter($messageTemplate)) {
-      return CRM_Core_TokenSmarty::render($messageTemplate, ['contactId' => $contactID]);
+    foreach ($greetingFields as $greeting => $greetingLabel) {
+      $tokens = CRM_Utils_Token::getTokens($greetingLabel);
+      if (!empty($tokens)) {
+        if (empty($contact)) {
+          $values = [
+            'id' => $contactId,
+            'version' => 3,
+          ];
+          $contact = civicrm_api('contact', 'get', $values);
+
+          if (!empty($contact['is_error'])) {
+            return $greetings;
+          }
+          $contact = $contact['values'][$contact['id']];
+        }
+
+        $tokens = ['contact' => $greetingLabel];
+        $greetings[$greeting] = CRM_Utils_Token::replaceContactTokens($greetingLabel, $contact, NULL, $tokens);
+      }
     }
-    return $messageTemplate;
+    return $greetings;
   }
 
   /**
@@ -2038,7 +2056,7 @@ WHERE  id IN ( $deleteIDString )
    */
   public function getPreview($limit) {
     $rows = [];
-    [$outputColumns] = $this->getExportStructureArrays();
+    list($outputColumns) = $this->getExportStructureArrays();
     $query = $this->runQuery([], '');
     CRM_Core_DAO::disableFullGroupByMode();
     $result = CRM_Core_DAO::executeQuery($query[1] . ' LIMIT ' . (int) $limit);
@@ -2354,8 +2372,10 @@ LIMIT $offset, $limit
    *
    * @return string
    */
-  protected function getContactGreeting(int $contactID, string $type, string $default): string {
-    return empty($this->contactGreetingFields[$contactID][$type]) ? $default : $this->contactGreetingFields[$contactID][$type];
+  protected function getContactGreeting(int $contactID, string $type, string $default) {
+    return CRM_Utils_Array::value($type,
+      $this->contactGreetingFields[$contactID], $default
+    );
   }
 
   /**

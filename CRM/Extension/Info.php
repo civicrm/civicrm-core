@@ -23,28 +23,12 @@ class CRM_Extension_Info {
   const FILENAME = 'info.xml';
 
   /**
-   * @var string|null
+   * @var string
    */
   public $key = NULL;
-
-  /**
-   * @var string|null
-   */
   public $type = NULL;
-
-  /**
-   * @var string|null
-   */
   public $name = NULL;
-
-  /**
-   * @var string|null
-   */
   public $label = NULL;
-
-  /**
-   * @var string|null
-   */
   public $file = NULL;
 
   /**
@@ -59,13 +43,6 @@ class CRM_Extension_Info {
    *   Each item is they key-name of an extension required by this extension.
    */
   public $requires = [];
-
-  /**
-   * @var array
-   *   List of expected mixins.
-   *   Ex: ['civix@2.0.0']
-   */
-  public $mixins = [];
 
   /**
    * @var array
@@ -98,7 +75,7 @@ class CRM_Extension_Info {
   /**
    * Load extension info an XML file.
    *
-   * @param string $file
+   * @param $file
    *
    * @throws CRM_Extension_Exception_ParseException
    * @return CRM_Extension_Info
@@ -156,11 +133,11 @@ class CRM_Extension_Info {
   }
 
   /**
-   * @param string|null $key
-   * @param string|null $type
-   * @param string|null $name
-   * @param string|null $label
-   * @param string|null $file
+   * @param null $key
+   * @param null $type
+   * @param null $name
+   * @param null $label
+   * @param null $file
    */
   public function __construct($key = NULL, $type = NULL, $name = NULL, $label = NULL, $file = NULL) {
     $this->key = $key;
@@ -218,12 +195,6 @@ class CRM_Extension_Info {
         $this->tags = [];
         foreach ($val->tag as $tag) {
           $this->tags[] = (string) $tag;
-        }
-      }
-      elseif ($attr === 'mixins') {
-        $this->mixins = [];
-        foreach ($val->mixin as $mixin) {
-          $this->mixins[] = (string) $mixin;
         }
       }
       elseif ($attr === 'requires') {

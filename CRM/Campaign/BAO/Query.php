@@ -347,7 +347,7 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
     );
 
     $showInterviewer = FALSE;
-    if (CRM_Core_Permission::check('manage campaign')) {
+    if (CRM_Core_Permission::check('administer CiviCampaign')) {
       $showInterviewer = TRUE;
     }
     $form->assign('showInterviewer', $showInterviewer);

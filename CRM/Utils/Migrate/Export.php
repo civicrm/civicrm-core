@@ -383,7 +383,7 @@ class CRM_Utils_Migrate_Export {
   /**
    * @param string $groupName
    * @param string $daoName
-   * @param string $sql
+   * @param null $sql
    */
   public function fetch($groupName, $daoName, $sql = NULL) {
     $idNameFields = $this->_xml[$groupName]['idNameFields'] ?? NULL;
@@ -443,7 +443,7 @@ class CRM_Utils_Migrate_Export {
    * @param string $objectName
    *   Business-entity/xml-tag name.
    * @param CRM_Core_DAO $object
-   * @param array $mappedFields
+   * @param $mappedFields
    *
    * @return array
    */
@@ -483,7 +483,7 @@ class CRM_Utils_Migrate_Export {
             }
             $types = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($object->$name, 1, -1));
             $values = [];
-            if (in_array($object->extends, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE)) {
+            if (in_array($object->extends, ['Individual', 'Organization', 'Household'])) {
               $key = 'contact_type';
               $values = $types;
             }

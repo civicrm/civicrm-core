@@ -53,6 +53,8 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
    * Build form data. Can be modified via hook_civicrm_preProcess.
    */
   public function preProcess() {
+    $config = CRM_Core_Config::singleton();
+
     $this->components['user-dashboard'] = [
       'label' => ts("User Dashboard"),
       'select' => NULL,
@@ -71,7 +73,7 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
       ],
     ];
 
-    if (CRM_Core_Component::isEnabled('CiviContribute')) {
+    if (in_array('CiviContribute', $config->enableComponents)) {
       $this->components['contribution'] = [
         'label' => ts("Contribution Page"),
         'select' => [
@@ -90,7 +92,7 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
       ];
     }
 
-    if (CRM_Core_Component::isEnabled('CiviEvent')) {
+    if (in_array('CiviEvent', $config->enableComponents)) {
       $this->components['event'] = [
         'label' => ts("Event Page"),
         'select' => [
@@ -101,7 +103,7 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
       ];
     }
 
-    if (CRM_Core_Component::isEnabled('CiviCampaign')) {
+    if (in_array('CiviCampaign', $config->enableComponents)) {
       $this->components['petition'] = [
         'label' => ts("Petition"),
         'select' => [

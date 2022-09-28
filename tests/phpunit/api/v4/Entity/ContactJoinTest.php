@@ -19,29 +19,38 @@
 
 namespace api\v4\Entity;
 
-use Civi\Api4\Address;
 use Civi\Api4\Contact;
-use Civi\Api4\Email;
 use Civi\Api4\OptionValue;
-use api\v4\Api4TestBase;
-use Civi\Api4\Phone;
+use api\v4\UnitTestCase;
 
 /**
  * @group headless
  */
-class ContactJoinTest extends Api4TestBase {
+class ContactJoinTest extends UnitTestCase {
+
+  public function setUpHeadless() {
+    $relatedTables = [
+      'civicrm_address',
+      'civicrm_email',
+      'civicrm_phone',
+      'civicrm_openid',
+      'civicrm_im',
+      'civicrm_website',
+      'civicrm_activity',
+      'civicrm_activity_contact',
+    ];
+
+    $this->cleanup(['tablesToTruncate' => $relatedTables]);
+    $this->loadDataSet('SingleContact');
+
+    return parent::setUpHeadless();
+  }
 
   public function testContactJoin() {
-    $contact = $this->createTestRecord('Contact', [
-      'first_name' => uniqid(),
-      'last_name' => uniqid(),
-    ]);
+    $contact = $this->getReference('test_contact_1');
     $entitiesToTest = ['Address', 'OpenID', 'IM', 'Website', 'Email', 'Phone'];
 
     foreach ($entitiesToTest as $entity) {
-      $this->createTestRecord($entity, [
-        'contact_id' => $contact['id'],
-      ]);
       $results = civicrm_api4($entity, 'get', [
         'where' => [['contact_id', '=', $contact['id']]],
         'select' => ['contact_id.*_name', 'contact_id.id'],
@@ -54,12 +63,12 @@ class ContactJoinTest extends Api4TestBase {
   }
 
   public function testJoinToPCMWillReturnArray() {
-    $contact = $this->createTestRecord('Contact', [
+    $contact = Contact::create()->setValues([
       'preferred_communication_method' => [1, 2, 3],
       'contact_type' => 'Individual',
       'first_name' => 'Test',
       'last_name' => 'PCM',
-    ]);
+    ])->execute()->first();
 
     $fetchedContact = Contact::get()
       ->addWhere('id', '=', $contact['id'])
@@ -79,19 +88,19 @@ class ContactJoinTest extends Api4TestBase {
     $optionValues = array_column($options, 'value');
     $labels = array_column($options, 'label');
 
-    $contact = $this->createTestRecord('Contact', [
+    $contact = Contact::create()->setValues([
       'preferred_communication_method' => $optionValues,
       'contact_type' => 'Individual',
       'first_name' => 'Test',
       'last_name' => 'PCM',
-    ]);
+    ])->execute()->first();
 
-    $contact2 = $this->createTestRecord('Contact', [
+    $contact2 = Contact::create()->setValues([
       'preferred_communication_method' => $optionValues,
       'contact_type' => 'Individual',
       'first_name' => 'Test',
       'last_name' => 'PCM2',
-    ]);
+    ])->execute()->first();
 
     $contactIds = array_column([$contact, $contact2], 'id');
 
@@ -102,58 +111,6 @@ class ContactJoinTest extends Api4TestBase {
       ->first();
 
     $this->assertEquals($labels, $fetchedContact['preferred_communication_method:label']);
-  }
-
-  public function testCreateWithPrimaryAndBilling() {
-    $contact = $this->createTestRecord('Contact', [
-      'email_primary.email' => 'a@test.com',
-      'email_billing.email' => 'b@test.com',
-      'address_billing.city' => 'Hello',
-      'address_billing.state_province_id:abbr' => 'AK',
-      'address_billing.country_id:abbr' => 'USA',
-    ]);
-    $addr = Address::get(FALSE)
-      ->addWhere('contact_id', '=', $contact['id'])
-      ->execute();
-    $this->assertCount(1, $addr);
-    $this->assertEquals('Hello', $contact['address_billing.city']);
-    $this->assertEquals(1228, $contact['address_billing.country_id']);
-    $emails = Email::get(FALSE)
-      ->addWhere('contact_id', '=', $contact['id'])
-      ->execute();
-    $this->assertCount(2, $emails);
-    $this->assertEquals('a@test.com', $contact['email_primary.email']);
-    $this->assertEquals('b@test.com', $contact['email_billing.email']);
-  }
-
-  public function testUpdateDeletePrimaryAndBilling() {
-    $contact = $this->createTestRecord('Contact', [
-      'phone_primary.phone' => '12345',
-      'phone_billing.phone' => '54321',
-    ]);
-    Contact::update(FALSE)
-      ->addValue('id', $contact['id'])
-      // Delete primary phone, update billing phone
-      ->addValue('phone_primary.phone', NULL)
-      ->addValue('phone_billing.phone', 99999)
-      ->execute();
-    $phone = Phone::get(FALSE)
-      ->addWhere('contact_id', '=', $contact['id'])
-      ->execute()
-      ->single();
-    $this->assertEquals('99999', $phone['phone']);
-    $this->assertTrue($phone['is_billing']);
-    // Contact only has one phone now, so it should be auto-set to primary
-    $this->assertTrue($phone['is_primary']);
-
-    $get = Contact::get(FALSE)
-      ->addWhere('id', '=', $contact['id'])
-      ->addSelect('phone_primary.*')
-      ->addSelect('phone_billing.*')
-      ->execute()->single();
-    $this->assertEquals('99999', $get['phone_primary.phone']);
-    $this->assertEquals('99999', $get['phone_billing.phone']);
-    $this->assertEquals($get['phone_primary.id'], $get['phone_billing.id']);
   }
 
 }

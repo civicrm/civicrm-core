@@ -107,7 +107,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   /**
    * The query object
    *
-   * @var CRM_Contact_BAO_Query
+   * @var string
    */
   protected $_query;
 
@@ -428,7 +428,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   /**
    * Get sql query string.
    *
-   * @return CRM_Contact_BAO_Query
+   * @return string
    */
   public function &getQuery() {
     return $this->_query;

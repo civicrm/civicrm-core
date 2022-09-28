@@ -21,7 +21,7 @@
  * @param array $params
  *   Input parameters.
  *
- * @throws CRM_Core_Exception
+ * @throws API_Exception
  * @return array
  *   API result array
  */

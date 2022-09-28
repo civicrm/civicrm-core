@@ -171,7 +171,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     $result = [];
     foreach ($caseRolesXML as $caseRoleXML) {
       foreach ($caseRoleXML->RelationshipType as $relationshipTypeXML) {
-        [$relationshipTypeID] = $this->locateNameOrLabel($relationshipTypeXML);
+        list($relationshipTypeID,) = $this->locateNameOrLabel($relationshipTypeXML);
         if ($relationshipTypeID === FALSE) {
           continue;
         }
@@ -194,9 +194,10 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    * @return bool
    * @throws CRM_Core_Exception
    */
-  public function createRelationships($relationshipTypeXML, $params) {
+  public function createRelationships($relationshipTypeXML, &$params) {
+
     // get the relationship
-    [$relationshipType, $relationshipTypeName] = $this->locateNameOrLabel($relationshipTypeXML);
+    list($relationshipType, $relationshipTypeName) = $this->locateNameOrLabel($relationshipTypeXML);
     if ($relationshipType === FALSE) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/set-up");
       throw new CRM_Core_Exception(ts('Relationship type %1, found in case configuration file, is not present in the database %2',
@@ -204,39 +205,48 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
       ));
     }
 
-    $clients = (array) $params['clientID'];
-    $relationshipValues = [];
+    $client = $params['clientID'];
+    if (!is_array($client)) {
+      $client = [$client];
+    }
 
-    foreach ($clients as $clientId) {
-      // $relationshipType string ends in either `_a_b` or `_b_a`
-      $a = substr($relationshipType, -3, 1);
-      $b = substr($relationshipType, -1);
-      $relationshipValues[] = [
+    foreach ($client as $key => $clientId) {
+      $relationshipParams = [
         'relationship_type_id' => substr($relationshipType, 0, -4),
         'is_active' => 1,
         'case_id' => $params['caseID'],
         'start_date' => date("Ymd"),
         'end_date' => $params['relationship_end_date'] ?? NULL,
-        "contact_id_$a" => $clientId,
-        "contact_id_$b" => $params['creatorID'],
       ];
-    }
 
-    //\Civi\Api4\Relationship::save(FALSE)
-    //  ->setRecords($relationshipValues)
-    //  ->setMatch(['case_id', 'relationship_type_id', 'contact_id_a', 'contact_id_b'])
-    //  ->execute();
-    // FIXME: The above api code would be better, but doesn't work
-    // See discussion in https://github.com/civicrm/civicrm-core/pull/15030
-    foreach ($relationshipValues as $params) {
-      $dao = new CRM_Contact_DAO_Relationship();
-      $dao->copyValues($params);
-      // only create a relationship if it does not exist
-      if (!$dao->find(TRUE)) {
-        CRM_Contact_BAO_Relationship::add($params);
+      if (substr($relationshipType, -4) == '_b_a') {
+        $relationshipParams['contact_id_b'] = $clientId;
+        $relationshipParams['contact_id_a'] = $params['creatorID'];
+      }
+      if (substr($relationshipType, -4) == '_a_b') {
+        $relationshipParams['contact_id_a'] = $clientId;
+        $relationshipParams['contact_id_b'] = $params['creatorID'];
+      }
+
+      if (!$this->createRelationship($relationshipParams)) {
+        throw new CRM_Core_Exception('Unable to create case relationship');
       }
     }
+    return TRUE;
+  }
 
+  /**
+   * @param array $params
+   *
+   * @return bool
+   */
+  public function createRelationship(&$params) {
+    $dao = new CRM_Contact_DAO_Relationship();
+    $dao->copyValues($params);
+    // only create a relationship if it does not exist
+    if (!$dao->find(TRUE)) {
+      $dao->save();
+    }
     return TRUE;
   }
 
@@ -330,7 +340,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 
     if (!empty($caseTypeXML->CaseRoles) && $caseTypeXML->CaseRoles->RelationshipType) {
       foreach ($caseTypeXML->CaseRoles->RelationshipType as $relTypeXML) {
-        [, $relationshipTypeMachineName] = $this->locateNameOrLabel($relTypeXML);
+        list(, $relationshipTypeMachineName) = $this->locateNameOrLabel($relTypeXML);
         $result[] = $relationshipTypeMachineName;
       }
     }
@@ -511,7 +521,7 @@ AND        a.is_deleted = 0
       if (!$activityDate) {
         $activityDate = $params['activity_date_time'];
       }
-      [$activity_date, $activity_time] = CRM_Utils_Date::setDateDefaults($activityDate);
+      list($activity_date, $activity_time) = CRM_Utils_Date::setDateDefaults($activityDate);
       $activityDateTime = CRM_Utils_Date::processDate($activity_date, $activity_time);
       //add reference offset to date.
       if ((int) $activityTypeXML->reference_offset) {
@@ -540,6 +550,13 @@ AND        a.is_deleted = 0
     if (!$activity) {
       throw new CRM_Core_Exception('Unable to create Activity');
     }
+
+    // create case activity record
+    $caseParams = [
+      'activity_id' => $activity->id,
+      'case_id' => $params['caseID'],
+    ];
+    CRM_Case_BAO_Case::processCaseActivity($caseParams);
     return TRUE;
   }
 
@@ -621,7 +638,7 @@ AND        a.is_deleted = 0
     $targetContactId = is_array($activityParams['target_contact_id'])
       ? CRM_Utils_Array::first($activityParams['target_contact_id'])
       : $activityParams['target_contact_id'];
-    [$relTypeId, $a, $b] = explode('_', $activityTypeXML->default_assignee_relationship);
+    list($relTypeId, $a, $b) = explode('_', $activityTypeXML->default_assignee_relationship);
 
     $params = [
       'relationship_type_id' => $relTypeId,

@@ -156,11 +156,19 @@ class CRM_Contact_Form_Task_SMSCommon {
     }
 
     if (is_array($form->_contactIds) && !empty($form->_contactIds) && $toSetDefault) {
-      $form->_contactDetails = civicrm_api3('Contact', 'get', [
-        'id' => ['IN' => $form->_contactIds],
-        'return' => ['sort_name', 'phone', 'do_not_sms', 'is_deceased', 'display_name'],
-        'options' => ['limit' => 0],
-      ])['values'];
+      $returnProperties = [
+        'sort_name' => 1,
+        'phone' => 1,
+        'do_not_sms' => 1,
+        'is_deceased' => 1,
+        'display_name' => 1,
+      ];
+
+      list($form->_contactDetails) = CRM_Utils_Token::getTokenDetails($form->_contactIds,
+        $returnProperties,
+        FALSE,
+        FALSE
+      );
 
       // make a copy of all contact details
       $form->_allContactDetails = $form->_contactDetails;
@@ -275,7 +283,7 @@ class CRM_Contact_Form_Task_SMSCommon {
    * @param array $fields
    *   The input form values.
    * @param array $dontCare
-   * @param self $self
+   * @param array $self
    *   Additional values form 'this'.
    *
    * @return bool|array

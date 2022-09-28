@@ -1,4 +1,4 @@
-{assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
 
 {if !empty($formValues.receipt_text)}
 {$formValues.receipt_text}
@@ -9,53 +9,59 @@
 
 ===========================================================
 {ts}Contributor{/ts}: {contact.display_name}
-{if '{contribution.financial_type_id}'}
-{ts}Financial Type{/ts}: {contribution.financial_type_id:label}
+{if !empty($formValues.contributionType_name)}
+{ts}Financial Type{/ts}: {$formValues.contributionType_name}
 {/if}
-{if $isShowLineItems}
+{if $lineItem}
+{foreach from=$lineItem item=value key=priceset}
 ---------------------------------------------------------
 {capture assign=ts_item}{ts}Item{/ts}{/capture}
 {capture assign=ts_qty}{ts}Qty{/ts}{/capture}
 {capture assign=ts_each}{ts}Each{/ts}{/capture}
-{if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+{if !empty($getTaxDetails)}
 {capture assign=ts_subtotal}{ts}Subtotal{/ts}{/capture}
 {capture assign=ts_taxRate}{ts}Tax Rate{/ts}{/capture}
 {capture assign=ts_taxAmount}{ts}Tax Amount{/ts}{/capture}
 {/if}
 {capture assign=ts_total}{ts}Total{/ts}{/capture}
-{$ts_item|string_format:"%-30s"} {$ts_qty|string_format:"%5s"} {$ts_each|string_format:"%10s"} {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate} {$ts_taxAmount|string_format:"%10s"} {/if} {$ts_total|string_format:"%10s"}
+{$ts_item|string_format:"%-30s"} {$ts_qty|string_format:"%5s"} {$ts_each|string_format:"%10s"} {if !empty($getTaxDetails)} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate} {$ts_taxAmount|string_format:"%10s"} {/if} {$ts_total|string_format:"%10s"}
 ----------------------------------------------------------
-{foreach from=$lineItems item=line}
-{capture assign=ts_item}{$line.title}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.qty|string_format:"%5s"} {$line.unit_price|crmMoney:'{contribution.currency}'|string_format:"%10s"} {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}{$line.unit_price*$line.qty|crmMoney:'{contribution.currency}'|string_format:"%10s"} {if $line.tax_rate || $line.tax_amount != ""} {$line.tax_rate|string_format:"%.2f"} %   {$line.tax_amount|crmMoney:'{contribution.currency}'|string_format:"%10s"} {else}                  {/if} {/if}   {$line.line_total+$line.tax_amount|crmMoney:'{contribution.currency}'|string_format:"%10s"}
+{foreach from=$value item=line}
+{capture assign=ts_item}{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description} {$line.description}{/if}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.qty|string_format:"%5s"} {$line.unit_price|crmMoney:$currency|string_format:"%10s"} {if !empty($getTaxDetails)}{$line.unit_price*$line.qty|crmMoney:$currency|string_format:"%10s"} {if isset($line.tax_rate) and ($line.tax_rate != "" || $line.tax_amount != "")} {$line.tax_rate|string_format:"%.2f"} %   {$line.tax_amount|crmMoney:$currency|string_format:"%10s"} {else}                  {/if} {/if}   {$line.line_total+$line.tax_amount|crmMoney:$currency|string_format:"%10s"}
+{/foreach}
 {/foreach}
 {/if}
 
-
-{if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+{if !empty($getTaxDetails) && !empty($dataArray)}
 {ts}Amount before Tax{/ts} : {$formValues.total_amount-$totalTaxAmount|crmMoney:$currency}
-{/if}
-{foreach from=$taxRateBreakdown item=taxDetail key=taxRate}
-{if $taxRate == 0}{ts}No{/ts} {$taxTerm}{else}{$taxTerm} {$taxDetail.percentage}%{/if} : {$taxDetail.amount|crmMoney:'{contribution.currency}'}
-{/foreach}
 
-{if $isShowTax}
-{ts}Total Tax Amount{/ts} : {contribution.tax_amount}
+{foreach from=$dataArray item=value key=priceset}
+{if $priceset ||  $priceset == 0 || $value != ''}
+{if isset($taxTerm)}{$taxTerm}{/if} {$priceset|string_format:"%.2f"}% : {$value|crmMoney:$currency}
+{else}
+{ts}No{/ts} {if isset($taxTerm)}{$taxTerm}{/if} : {$value|crmMoney:$currency}
 {/if}
-{ts}Total Amount{/ts} : {contribution.total_amount}
-{if '{contribution.receive_date}'}
-{ts}Date Received{/ts}: {contribution.receive_date|crmDate:"shortdate"}
+{/foreach}
 {/if}
-{if '{contribution.receipt_date}'}
-{ts}Receipt Date{/ts}: {contribution.receipt_date|crmDate:"shortdate"}
+
+{if isset($totalTaxAmount) && $totalTaxAmount !== 'null'}
+{ts}Total Tax Amount{/ts} : {$totalTaxAmount|crmMoney:$currency}
 {/if}
-{if '{contribution.payment_instrument_id}' and empty($formValues.hidden_CreditCard)}
-{ts}Paid By{/ts}: {contribution.payment_instrument_id:label}
-{if '{contribution.check_number}'}
-{ts}Check Number{/ts}: {contribution.check_number}
+{ts}Total Amount{/ts} : {$formValues.total_amount|crmMoney:$currency}
+{if !empty($receive_date)}
+{ts}Date Received{/ts}: {$receive_date|truncate:10:''|crmDate}
+{/if}
+{if !empty($receipt_date)}
+{ts}Receipt Date{/ts}: {$receipt_date|truncate:10:''|crmDate}
+{/if}
+{if !empty($formValues.paidBy) and empty($formValues.hidden_CreditCard)}
+{ts}Paid By{/ts}: {$formValues.paidBy}
+{if !empty($formValues.check_number)}
+{ts}Check Number{/ts}: {$formValues.check_number}
 {/if}
 {/if}
-{if '{contribution.trxn_id}'}
-{ts}Transaction ID{/ts}: {contribution.trxn_id}
+{if !empty($formValues.trxn_id)}
+{ts}Transaction ID{/ts}: {$formValues.trxn_id}
 {/if}
 
 {if !empty($ccContribution)}

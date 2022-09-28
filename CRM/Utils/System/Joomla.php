@@ -38,17 +38,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function createUser(&$params, $mail) {
     $baseDir = JPATH_SITE;
+    require_once $baseDir . '/components/com_users/models/registration.php';
+
     $userParams = JComponentHelper::getParams('com_users');
-
-    if (version_compare(JVERSION, '4.0.0', 'ge')) {
-      $model = JFactory::getApplication()->bootComponent('com_users')->getMVCFactory()->createModel('Registration', 'Site');
-      $model->set('data', new \stdClass());
-    }
-    else {
-      require_once $baseDir . '/components/com_users/models/registration.php';
-      $model = new UsersModelRegistration();
-    }
-
+    $model = new UsersModelRegistration();
     $ufID = NULL;
 
     // get the default usertype
@@ -325,14 +318,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     require_once 'DB.php';
 
-    /* Before we do any loading, let's start the session and write to it.
-     * We typically call authenticate only when we need to bootstrap the CMS
-     * directly via Civi and hence bypass the normal CMS auth and bootstrap
-     * process typically done in CLI and cron scripts. See: CRM-12648
-     */
-    $session = CRM_Core_Session::singleton();
-    $session->set('civicrmInitSession', TRUE);
-
     $config = CRM_Core_Config::singleton();
     $user = NULL;
 
@@ -378,7 +363,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
         (version_compare(JVERSION, '3.0', 'ge') && version_compare(JVERSION, '3.2.1', 'lt'))
       ) {
         // now check password
-        [$hash, $salt] = explode(':', $dbPassword);
+        list($hash, $salt) = explode(':', $dbPassword);
         $cryptpass = md5($password . $salt);
         if ($hash != $cryptpass) {
           return FALSE;
@@ -420,7 +405,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *   Array with user specific data.
    */
   public function setUserSession($data) {
-    [$userID, $ufID] = $data;
+    list($userID, $ufID) = $data;
     $user = new JUser($ufID);
     $session = JFactory::getSession();
     $session->set('user', $user);
@@ -783,7 +768,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       return $civicrm_paths['cms.root']['path'];
     }
 
-    [$url, $siteName, $siteRoot] = $this->getDefaultSiteSettings();
+    list($url, $siteName, $siteRoot) = $this->getDefaultSiteSettings();
     if (file_exists("$siteRoot/administrator/index.php")) {
       return $siteRoot;
     }

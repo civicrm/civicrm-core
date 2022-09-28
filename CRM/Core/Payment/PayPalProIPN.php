@@ -222,7 +222,9 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @param array $input
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function recur(array $input): void {
@@ -265,18 +267,20 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     //set transaction type
     $txnType = $this->retrieve('txn_type', 'String');
     //Changes for paypal pro recurring payment
+    $contributionStatuses = array_flip(CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate'));
     switch ($txnType) {
       case 'recurring_payment_profile_created':
-        if (in_array(CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', $recur->contribution_status_id), [
-          'Pending', 'In Progress',
-        ], TRUE)
+        if (in_array($recur->contribution_status_id, [
+          $contributionStatuses['Pending'],
+          $contributionStatuses['In Progress'],
+        ])
           && !empty($recur->processor_id)
         ) {
-          echo 'already handled';
+          echo "already handled";
           return;
         }
         $recur->create_date = $now;
-        $recur->contribution_status_id = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Pending');
+        $recur->contribution_status_id = $contributionStatuses['Pending'];
         $recur->processor_id = $this->retrieve('recurring_payment_id', 'String');
         $recur->trxn_id = $recur->processor_id;
         $subscriptionPaymentStatus = CRM_Core_Payment::RECURRING_PAYMENT_START;
@@ -284,14 +288,17 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
         break;
 
       case 'recurring_payment':
-        if (!$first) {
+        if ($first) {
+          $recur->start_date = $now;
+        }
+        else {
           if ($input['paymentStatus'] !== 'Completed') {
-            throw new CRM_Core_Exception('Ignore all IPN payments that are not completed');
+            throw new CRM_Core_Exception("Ignore all IPN payments that are not completed");
           }
 
           // In future moving to create pending & then complete, but this OK for now.
           // Also consider accepting 'Failed' like other processors.
-          $input['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Completed');
+          $input['contribution_status_id'] = $contributionStatuses['Completed'];
           $input['invoice_id'] = md5(uniqid(rand(), TRUE));
           $input['original_contribution_id'] = $this->getContributionID();
           $input['contribution_recur_id'] = $this->getContributionRecurID();
@@ -301,17 +308,22 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
         }
 
         //contribution installment is completed
-        if ($this->retrieve('profile_status', 'String') === 'Expired') {
+        if ($this->retrieve('profile_status', 'String') == 'Expired') {
           if (!empty($recur->end_date)) {
-            echo 'already handled';
+            echo "already handled";
             return;
           }
-          $recur->contribution_status_id = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Completed');
+          $recur->contribution_status_id = $contributionStatuses['Completed'];
           $recur->end_date = $now;
           $sendNotification = TRUE;
           $subscriptionPaymentStatus = CRM_Core_Payment::RECURRING_PAYMENT_END;
         }
 
+        // make sure the contribution status is not done
+        // since order of ipn's is unknown
+        if ($recur->contribution_status_id != $contributionStatuses['Completed']) {
+          $recur->contribution_status_id = $contributionStatuses['In Progress'];
+        }
         break;
     }
 
@@ -337,7 +349,9 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @param array $input
    *
    * @return void
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function single(array $input): void {
 
@@ -506,7 +520,9 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * but let's assume knowledge on invoice id & schedule is enough for now esp
    * for donations only contribute is handled
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function handlePaymentExpress(): void {
     $input = ['invoice' => $this->getValue('i', FALSE)];

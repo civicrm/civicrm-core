@@ -33,7 +33,7 @@ class RequestTest extends \CiviUnitTestCase {
    * @dataProvider validEntityActionPairs
    * @param $input
    * @param $expected
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function testCreateRequest_EntityActionMunging($input, $expected) {
     list ($inEntity, $inAction, $inVersion) = $input;

@@ -23,13 +23,12 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
-    parent::tearDown();
   }
 
   /**
    * Test that correct contribution status is fetched for both live and test contributions.
    */
-  public function testLiveAndTestContributionStatus(): void {
+  public function testLiveAndTestContributionStatus() {
     $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy']);
 
     $form = $this->getThankYouFormWithContribution($paymentProcessorID, FALSE, FALSE);

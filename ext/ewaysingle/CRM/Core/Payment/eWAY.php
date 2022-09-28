@@ -140,13 +140,14 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   public function doPayment(&$params, $component = 'contribute') {
     $propertyBag = \Civi\Payment\PropertyBag::cast($params);
     $this->_component = $component;
-    $result = $this->setStatusPaymentPending([]);
+    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
 
     // If we have a $0 amount, skip call to processor and set payment_status to Completed.
     // Conceivably a processor might override this - perhaps for setting up a token - but we don't
     // have an example of that at the moment.
     if ($propertyBag->getAmount() == 0) {
-      $result = $this->setStatusPaymentCompleted($result);
+      $result['payment_status_id'] = array_search('Completed', $statuses);
+      $result['payment_status'] = 'Completed';
       return $result;
     }
 
@@ -334,9 +335,11 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
       $beaglestatus = ': ' . $beaglestatus;
     }
     $params['trxn_result_code'] = $eWAYResponse->Status() . $beaglestatus;
-    $result['trxn_id'] = $eWAYResponse->TransactionNumber();
-    $result = $this->setStatusPaymentCompleted($result);
-    return $result;
+    $params['trxn_id'] = $eWAYResponse->TransactionNumber();
+    $params['payment_status_id'] = array_search('Completed', $statuses);
+    $params['payment_status'] = 'Completed';
+
+    return $params;
   }
 
   /**

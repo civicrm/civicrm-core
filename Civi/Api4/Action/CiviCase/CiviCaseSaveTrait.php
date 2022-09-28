@@ -18,19 +18,20 @@ namespace Civi\Api4\Action\CiviCase;
 trait CiviCaseSaveTrait {
 
   /**
-   * @param array $items
+   * @param array $cases
    * @return array
    */
-  protected function write(array $items) {
-    $saved = [];
-    foreach ($items as $case) {
-      $saved[] = $result = \CRM_Case_BAO_Case::create($case);
-      // If the case doesn't have an id, it's new & needs to be opened.
+  protected function writeObjects(&$cases) {
+    $cases = array_values($cases);
+    $result = parent::writeObjects($cases);
+
+    // If the case doesn't have an id, it's new & needs to be opened.
+    foreach ($cases as $idx => $case) {
       if (empty($case['id'])) {
-        $this->openCase($case, $result->id);
+        $this->openCase($case, $result[$idx]['id']);
       }
     }
-    return $saved;
+    return $result;
   }
 
   /**

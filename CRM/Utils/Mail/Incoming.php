@@ -76,7 +76,7 @@ class CRM_Utils_Mail_Incoming {
       return NULL;
     }
 
-    return self::formatUnrecognisedPart($part);
+    return self::formatMailUnrecognisedPart($part);
   }
 
   /**
@@ -110,7 +110,7 @@ class CRM_Utils_Mail_Incoming {
       return self::formatMailDeliveryStatus($part);
     }
 
-    return self::formatUnrecognisedPart($part);
+    return self::formatMailUnrecognisedPart($part);
   }
 
   /**
@@ -237,7 +237,7 @@ class CRM_Utils_Mail_Incoming {
    *
    * @return string
    */
-  public static function formatUnrecognisedPart($part) {
+  public function formatUnrecognisedPart($part) {
     CRM_Core_Error::debug_log_message(ts('CRM_Utils_Mail_Incoming: Unable to handle message part of type "%1".', [1 => get_class($part)]));
     return ts('Unrecognised message part of type "%1".', [1 => get_class($part)]);
   }
@@ -452,13 +452,6 @@ class CRM_Utils_Mail_Incoming {
     $contactID = NULL;
     if ($dao) {
       $contactID = $dao->contact_id;
-    }
-    else {
-      $dao = CRM_Contact_BAO_Contact::matchContactOnEmail($email, 'Organization');
-
-      if ($dao) {
-        $contactID = $dao->contact_id;
-      }
     }
 
     $result = NULL;

@@ -19,27 +19,7 @@
 </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {* Table for mapping data to CRM fields *}
- {include file="CRM/Contact/Import/Form/MapTable.tpl" mapper=$form.mapper}
-
- {* // Set default location type *}
- {literal}
-   <script type="text/javascript">
-     CRM.$(function($) {
-       var defaultLocationType = "{/literal}{$defaultLocationType}{literal}";
-       if (defaultLocationType.length) {
-        $('#map-field').on('change', 'select[id^="mapper"][id$="_0"]', function() {
-          var select = $(this).next();
-          $('option', select).each(function() {
-            if ($(this).attr('value') == defaultLocationType  && $(this).text() == {/literal}{
-              $defaultLocationTypeLabel|@json_encode}{literal}) {
-              select.val(defaultLocationType);
-            }
-          });
-        });
-       }
-     });
-   </script>
- {/literal}
+ {include file="CRM/Contact/Import/Form/MapTable.tpl}
 
 <script type="text/javascript" >
 {literal}
@@ -54,6 +34,6 @@ if ( document.getElementsByName("saveMapping")[0].checked ) {
 </script>
 
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
- {$initHideBoxes|smarty:nodefaults}
+ {$initHideBoxes}
 
 </div>

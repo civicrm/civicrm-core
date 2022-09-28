@@ -21,7 +21,26 @@
 class CRM_Utils_Chart {
 
   /**
-   * Build The Bar Graph.
+   * Colours.
+   * @var array
+   */
+  private static $_colours = [
+    "#C3CC38",
+    "#C8B935",
+    "#CEA632",
+    "#D3932F",
+    "#D9802C",
+    "#FA6900",
+    "#DC9B57",
+    "#F78F01",
+    "#5AB56E",
+    "#6F8069",
+    "#C92200",
+    "#EB6C5C",
+  ];
+
+  /**
+   * Build The Bar Gharph.
    *
    * @param array $params
    *   Assoc array of name/value pairs.
@@ -126,9 +145,9 @@ class CRM_Utils_Chart {
   }
 
   /**
-   * @param array $rows
-   * @param string $chart
-   * @param string $interval
+   * @param $rows
+   * @param $chart
+   * @param $interval
    *
    * @return array
    */
@@ -210,10 +229,10 @@ class CRM_Utils_Chart {
   }
 
   /**
-   * @param array $rows
-   * @param string $chart
-   * @param array $interval
-   * @param array $chartInfo
+   * @param $rows
+   * @param $chart
+   * @param $interval
+   * @param $chartInfo
    *
    * @return array
    */
@@ -251,7 +270,7 @@ class CRM_Utils_Chart {
 
   /**
    * @param array $params
-   * @param string $chart
+   * @param $chart
    *
    * @return array
    */

@@ -153,8 +153,8 @@ class civicrm_api3 {
   /**
    * Perform action.
    *
-   * @param string $action
-   * @param array $params
+   * @param $action
+   * @param $params
    *
    * @return bool
    */
@@ -171,8 +171,8 @@ class civicrm_api3 {
   /**
    * Call via rest.
    *
-   * @param string $entity
-   * @param string $action
+   * @param $entity
+   * @param $action
    * @param array $params
    *
    * @return \stdClass
@@ -228,7 +228,7 @@ class civicrm_api3 {
   /**
    * Call api function.
    *
-   * @param string $entity
+   * @param $entity
    * @param string $action
    * @param array $params
    *
@@ -298,8 +298,8 @@ class civicrm_api3 {
   /**
    * Get attribute.
    *
-   * @param string $name
-   * @param mixed $value
+   * @param $name
+   * @param null $value
    *
    * @return $this
    */

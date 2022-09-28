@@ -26,7 +26,6 @@ class CRM_Extension_System {
   private $manager = NULL;
   private $browser = NULL;
   private $downloader = NULL;
-  private $mixinLoader = NULL;
 
   /**
    * @var CRM_Extension_ClassLoader
@@ -217,7 +216,11 @@ class CRM_Extension_System {
    */
   public function getBrowser() {
     if ($this->browser === NULL) {
-      $this->browser = new CRM_Extension_Browser($this->getRepositoryUrl(), '');
+      $cacheDir = NULL;
+      if (!empty($this->parameters['uploadDir'])) {
+        $cacheDir = CRM_Utils_File::addTrailingSlash($this->parameters['uploadDir']) . 'cache';
+      }
+      $this->browser = new CRM_Extension_Browser($this->getRepositoryUrl(), '', $cacheDir);
     }
     return $this->browser;
   }
@@ -238,16 +241,6 @@ class CRM_Extension_System {
       );
     }
     return $this->downloader;
-  }
-
-  /**
-   * @return CRM_Extension_MixinLoader;
-   */
-  public function getMixinLoader() {
-    if ($this->mixinLoader === NULL) {
-      $this->mixinLoader = new CRM_Extension_MixinLoader();
-    }
-    return $this->mixinLoader;
   }
 
   /**

@@ -31,7 +31,7 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
    * @param
    *
    */
-  public function preProcess(): void {
+  public function preProcess() {
     if ($this->get('register')) {
       $this->_mode = CRM_Profile_Form::MODE_REGISTER;
     }
@@ -53,7 +53,7 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
    * Build the form object.
    *
    */
-  public function buildQuickForm(): void {
+  public function buildQuickForm() {
     $this->addButtons([
       [
         'type' => 'upload',
@@ -91,6 +91,13 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
     }
 
     return CRM_Profile_Form::formRule($fields, $files, $form);
+  }
+
+  /**
+   * Process the user submitted custom data values.
+   */
+  public function postProcess() {
+    parent::postProcess();
   }
 
 }

@@ -7,21 +7,22 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $pager|smarty:nodefaults and $pager->_response|smarty:nodefaults}
+{if $pager and $pager->_response}
     {if $pager->_response.numPages > 1}
         <div class="crm-pager">
             <span class="element-right">
             {if $location eq 'top'}
-              {$pager->_response.titleTop|smarty:nodefaults}
+              {$pager->_response.titleTop}
             {else}
-              {$pager->_response.titleBottom|smarty:nodefaults}
+              {$pager->_response.titleBottom}
             {/if}
             </span>
+          </span>
           <span class="crm-pager-nav">
-          {$pager->_response.first|smarty:nodefaults}&nbsp;
-          {$pager->_response.back|smarty:nodefaults}&nbsp;
-          {$pager->_response.next|smarty:nodefaults}&nbsp;
-          {$pager->_response.last|smarty:nodefaults}&nbsp;
+          {$pager->_response.first}&nbsp;
+          {$pager->_response.back}&nbsp;
+          {$pager->_response.next}&nbsp;
+          {$pager->_response.last}&nbsp;
           {$pager->_response.status}
           </span>
 

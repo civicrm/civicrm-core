@@ -20,13 +20,12 @@
 namespace api\v4\Entity;
 
 use Civi\Api4\Setting;
-use api\v4\Api4TestBase;
-use Civi\Test\TransactionalInterface;
+use api\v4\UnitTestCase;
 
 /**
  * @group headless
  */
-class SettingTest extends Api4TestBase implements TransactionalInterface {
+class SettingTest extends UnitTestCase {
 
   public function testSettingASetting() {
     $setting = Setting::set()->addValue('menubar_position', 'above-crm-container')->setCheckPermissions(FALSE)->execute()->first();
@@ -45,7 +44,7 @@ class SettingTest extends Api4TestBase implements TransactionalInterface {
     try {
       Setting::set()->addValue('not_a_real_setting!', 'hello')->setCheckPermissions(FALSE)->execute();
     }
-    catch (\CRM_Core_Exception $e) {
+    catch (\API_Exception $e) {
       $message = $e->getMessage();
     }
     $this->assertStringContainsString('setting', $message);

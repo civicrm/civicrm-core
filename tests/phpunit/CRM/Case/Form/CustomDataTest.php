@@ -20,7 +20,6 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
    * body for ChangeCustomData.
    *
    * @dataProvider customDataProvider
-   * @group locale
    *
    * @param array $input
    * @param array $expected
@@ -81,7 +80,6 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
    * Same as testChangeCustomDataFormattedDetails but in a different locale.
    *
    * @dataProvider customDataProvider
-   * @group locale
    *
    * @param array $input
    * @param array $expected
@@ -336,7 +334,7 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
    * Test that when custom case data is edited but not changed that it doesn't
    * create a meaningless empty activity.
    */
-  public function testCustomDataNoChangeNoActivity(): void {
+  public function testCustomDataNoChangeNoActivity() {
     // Create a custom group and field
     $customField = $this->callAPISuccess('custom_field', 'create', [
       'custom_group_id' => $this->custom_group['id'],
@@ -364,7 +362,6 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
     // this is case type
     $form->set('subType', 1);
     $form->set('cid', $individual);
-    $form->buildForm();
     ob_start();
     $form->controller->_actions['display']->perform($form, 'display');
     ob_end_clean();

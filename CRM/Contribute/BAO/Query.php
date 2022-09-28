@@ -98,6 +98,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    * @param CRM_Contact_BAO_Query $query
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function where(&$query) {
     self::initializeAnySoftCreditClause($query);
@@ -121,10 +122,11 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    * @param array $values
    * @param CRM_Contact_BAO_Query $query
    *
+   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public static function whereClauseSingle(&$values, &$query) {
-    [$name, $op, $value, $grouping, $wildcard] = $values;
+    list($name, $op, $value, $grouping, $wildcard) = $values;
 
     $quoteValue = NULL;
     $fields = self::getFields();
@@ -241,7 +243,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         $dataType = !empty($fields[$qillName]['type']) ? CRM_Utils_Type::typeToString($fields[$qillName]['type']) : 'String';
 
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.$name", $op, $value, $dataType);
-        [$op, $value] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contribute_DAO_Contribution', $name, $value, $op, $pseudoExtraParam);
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contribute_DAO_Contribution', $name, $value, $op, $pseudoExtraParam);
         if (!($name == 'id' && $value == 0)) {
           $query->_qill[$grouping][] = ts('%1 %2 %3', [1 => $fields[$qillName]['title'], 2 => $op, 3 => $value]);
         }
@@ -263,7 +265,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution_soft.$name",
           $op, $value, CRM_Utils_Type::typeToString($fields[$qillName]['type'])
         );
-        [$op, $value] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contribute_DAO_ContributionSoft', $name, $value, $op);
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contribute_DAO_ContributionSoft', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', [1 => $fields[$qillName]['title'], 2 => $op, 3 => $value]);
         $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
         return;
@@ -380,7 +382,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
 
       case 'contribution_recur_contribution_status_id':
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution_recur.contribution_status_id", $op, $value, 'String');
-        [$op, $value] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contribute_DAO_ContributionRecur', 'contribution_status_id', $value, $op, $pseudoExtraParam);
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contribute_DAO_ContributionRecur', 'contribution_status_id', $value, $op, $pseudoExtraParam);
         $query->_qill[$grouping][] = ts("Recurring Contribution Status %1 '%2'", [1 => $op, 2 => $value]);
         $query->_tables['civicrm_contribution_recur'] = $query->_whereTables['civicrm_contribution_recur'] = 1;
         return;
@@ -419,7 +421,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         return;
 
       case 'contribution_batch_id':
-        [$qillOp, $qillValue] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Batch_BAO_EntityBatch', 'batch_id', $value, $op);
+        list($qillOp, $qillValue) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Batch_BAO_EntityBatch', 'batch_id', $value, $op);
         $query->_qill[$grouping][] = ts('Batch Name %1 %2', [1 => $qillOp, 2 => $qillValue]);
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_entity_batch.batch_id', $op, $value);
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
@@ -430,7 +432,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       case 'contribution_product_id':
         // CRM-16713 - contribution search by premiums on 'Find Contribution' form.
         $qillName = $name;
-        [$operator, $productValue] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contribute_DAO_Product', $name, $value, $op);
+        list($operator, $productValue) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contribute_DAO_Product', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', [1 => $fields[$qillName]['title'], 2 => $operator, 3 => $productValue]);
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_product.id", $op, $value);
         $query->_tables['civicrm_product'] = $query->_whereTables['civicrm_product'] = 1;
@@ -445,7 +447,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_financial_trxn.card_type_id', $op, $value);
         $query->_tables['civicrm_financial_trxn'] = $query->_whereTables['civicrm_financial_trxn'] = 1;
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
-        [$op, $value] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Financial_DAO_FinancialTrxn', 'card_type_id', $value, $op);
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Financial_DAO_FinancialTrxn', 'card_type_id', $value, $op);
         $query->_qill[$grouping][] = ts('Card Type %1 %2', [1 => $op, 2 => $value]);
         return;
 
@@ -453,7 +455,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_financial_trxn.pan_truncation', $op, $value);
         $query->_tables['civicrm_financial_trxn'] = $query->_whereTables['civicrm_financial_trxn'] = 1;
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
-        [$op, $value] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Financial_DAO_FinancialTrxn', 'pan_truncation', $value, $op);
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Financial_DAO_FinancialTrxn', 'pan_truncation', $value, $op);
         $query->_qill[$grouping][] = ts('Card Number %1 %2', [1 => $op, 2 => $value]);
         return;
 
@@ -475,7 +477,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
 
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($whereTable['where'], $op, $value, $dataType);
         $query->_qill[$grouping][] = "$whereTable[title] $op $quoteValue";
-        [$tableName] = explode('.', $whereTable['where'], 2);
+        list($tableName) = explode('.', $whereTable['where'], 2);
         $query->_tables[$tableName] = $query->_whereTables[$tableName] = 1;
         if ($tableName === 'civicrm_contribution_product') {
           $query->_tables['civicrm_product'] = $query->_whereTables['civicrm_product'] = 1;
@@ -491,7 +493,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    * Get from clause.
    *
    * @param string $name
-   * @param int $mode
+   * @param string $mode
    * @param string $side
    *
    * @return NULL|string
@@ -881,7 +883,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
   /**
    * Get the metadata for fields to be included on the search form.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getSearchFieldMetadata() {
     $fields = [
@@ -904,6 +906,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    * @param \CRM_Contribute_Form_Search $form
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function buildSearchForm(&$form) {
 
@@ -1005,9 +1008,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         ]
       );
     }
-    else {
-      $form->addOptionalQuickFormElement('contribution_product_id');
-    }
 
     self::addCustomFormFields($form, ['Contribution']);
 
@@ -1026,9 +1026,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         ] + $batches,
         FALSE, ['class' => 'crm-select2']
       );
-    }
-    else {
-      $form->addOptionalQuickFormElement('contribution_batch_id');
     }
 
     $form->assign('validCiviContribute', TRUE);
@@ -1091,7 +1088,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    *
    * Extracted into separate function to improve readability of main select function.
    *
-   * @param CRM_Contact_BAO_Query $query
+   * @param $query
    */
   private static function addSoftCreditFields(&$query) {
     $includeSoftCredits = self::isSoftCreditOptionEnabled($query->_params);

@@ -251,7 +251,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       return $messages;
     }
 
-    if (CRM_Core_Component::isEnabled('CiviMail') &&
+    $config = CRM_Core_Config::singleton();
+
+    if (in_array('CiviMail', $config->enableComponents) &&
       CRM_Core_BAO_MailSettings::defaultDomain() == "EXAMPLE.ORG"
     ) {
       $message = new CRM_Utils_Check_Message(
@@ -587,7 +589,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     try {
       $remotes = $extensionSystem->getBrowser()->getExtensions();
     }
-    catch (CRM_Extension_Exception | \GuzzleHttp\Exception\GuzzleException $e) {
+    catch (CRM_Extension_Exception $e) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         $e->getMessage(),
@@ -598,28 +600,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       return $messages;
     }
 
-    $stauses = $manager->getStatuses();
-    $keys = array_keys($stauses);
-    $enabled = array_keys(array_filter($stauses, function($status) {
-      return $status === CRM_Extension_Manager::STATUS_INSTALLED;
-    }));
+    $keys = array_keys($manager->getStatuses());
     sort($keys);
     $updates = $errors = $okextensions = [];
-
-    $extPrettyLabel = function($key) use ($mapper) {
-      // We definitely know a $key, but we may not have a $label.
-      // Which is too bad - because it would be nicer if $label could be the reliable start of the string.
-      $keyFmt = '<code>' . htmlentities($key) . '</code>';
-      try {
-        $info = $mapper->keyToInfo($key);
-        if ($info->label) {
-          return sprintf('"<em>%s</em>" (%s)', htmlentities($info->label), $keyFmt);
-        }
-      }
-      catch (CRM_Extension_Exception $ex) {
-        return "($keyFmt)";
-      }
-    };
 
     foreach ($keys as $key) {
       try {
@@ -632,20 +615,11 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       $row = CRM_Admin_Page_Extensions::createExtendedInfo($obj);
       switch ($row['status']) {
         case CRM_Extension_Manager::STATUS_INSTALLED_MISSING:
-          $errors[] = ts('%1 is installed but missing files.', [1 => $extPrettyLabel($key)]);
+          $errors[] = ts('%1 extension (%2) is installed but missing files.', [1 => $row['label'] ?? NULL, 2 => $key]);
           break;
 
         case CRM_Extension_Manager::STATUS_INSTALLED:
-          $missingRequirements = array_diff($row['requires'], $enabled);
-          if (!empty($row['requires']) && $missingRequirements) {
-            $errors[] = ts('%1 has a missing dependency on %2', [
-              1 => $extPrettyLabel($key),
-              2 => implode(', ', array_map($extPrettyLabel, $missingRequirements)),
-              'plural' => '%1 has missing dependencies: %2',
-              'count' => count($missingRequirements),
-            ]);
-          }
-          elseif (!empty($remotes[$key]) && version_compare($row['version'], $remotes[$key]->version, '<')) {
+          if (!empty($remotes[$key]) && version_compare($row['version'], $remotes[$key]->version, '<')) {
             $updates[] = $row['label'] . ': ' . $mapper->getUpgradeLink($remotes[$key], $row);
           }
           else {
@@ -678,15 +652,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     if ($errors) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__ . 'Error',
-          ts('There is one extension error:', [
-            'count' => count($errors),
-            'plural' => 'There are %count extension errors:',
-          ])
-          . '<ul><li>' . implode('</li><li>', $errors) . '</li></ul>'
-          . ts('To resolve any errors, go to <a %1>Manage Extensions</a>.', [
-            1 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1') . '"',
-          ]),
-        ts('Extension Error', ['count' => count($errors), 'plural' => 'Extension Errors']),
+        '<ul><li>' . implode('</li><li>', $errors) . '</li></ul>',
+        ts('Extension Error'),
         \Psr\Log\LogLevel::ERROR,
         'fa-plug'
       );
@@ -709,7 +676,6 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       else {
         $message = ts('All extensions are up-to-date:');
       }
-      natcasesort($okextensions);
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__ . 'Ok',
         $message . '<ul><li>' . implode('</li><li>', $okextensions) . '</li></ul>',
@@ -719,54 +685,6 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       );
     }
 
-    return $messages;
-  }
-
-  /**
-   * @return CRM_Utils_Check_Message[]
-   */
-  public function checkScheduledJobLogErrors() {
-    $jobs = civicrm_api3('Job', 'get', [
-      'sequential' => 1,
-      'return' => ["id", "name", "last_run"],
-      'is_active' => 1,
-      'options' => ['limit' => 0],
-    ]);
-    $html = '';
-    foreach ($jobs['values'] as $job) {
-      $lastExecutionMessage = civicrm_api3('JobLog', 'get', [
-        'sequential' => 1,
-        'return' => ["description"],
-        'job_id' => $job['id'],
-        'options' => ['sort' => "id desc", 'limit' => 1],
-      ])['values'][0]['description'] ?? NULL;
-      if (!empty($lastExecutionMessage) && strpos($lastExecutionMessage, 'Failure') !== FALSE) {
-        $viewLogURL = CRM_Utils_System::url('civicrm/admin/joblog', "jid={$job['id']}&reset=1");
-        $html .= '<tr>
-          <td>' . $job['name'] . ' </td>
-          <td>' . $lastExecutionMessage . '</td>
-          <td>' . $job['last_run'] . '</td>
-          <td><a href="' . $viewLogURL . '">' . ts('View Job Log') . '</a></td>
-        </tr>';
-      }
-    }
-    if (empty($html)) {
-      return [];
-    }
-
-    $message = '<p>' . ts('The following scheduled jobs failed on the last run:') . '</p>
-      <p><table><thead><tr><th>' . ts('Job') . '</th><th>' . ts('Message') . '</th><th>' . ts('Last Run') . '</th><th></th>
-      </tr></thead><tbody>' . $html . '
-      </tbody></table></p>';
-
-    $msg = new CRM_Utils_Check_Message(
-      __FUNCTION__,
-      $message,
-      ts('Scheduled Job Failures'),
-      \Psr\Log\LogLevel::WARNING,
-      'fa-server'
-    );
-    $messages[] = $msg;
     return $messages;
   }
 
@@ -1009,7 +927,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     $messages = [];
     $version = CRM_Utils_SQL::getDatabaseVersion();
     $minRecommendedVersion = CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_MYSQL_VER;
-    $mariaDbRecommendedVersion = CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_MARIADB_VER;
+    $mariaDbRecommendedVersion = '10.1';
     $upcomingCiviChangeVersion = '5.34';
     if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), $minRecommendedVersion, '<')) {
       $messages[] = new CRM_Utils_Check_Message(

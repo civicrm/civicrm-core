@@ -119,7 +119,7 @@ class TimestampTriggers {
    *
    * @param array $info
    *   See hook_civicrm_triggerInfo.
-   * @param string|null $tableFilter
+   * @param string|NULL $tableFilter
    *   See hook_civicrm_triggerInfo.
    */
   public function alterTriggerInfo(&$info, $tableFilter = NULL) {
@@ -195,13 +195,13 @@ class TimestampTriggers {
         'table' => $relatedTableNames,
         'when' => 'AFTER',
         'event' => ['INSERT', 'UPDATE'],
-        'sql' => "UPDATE {$this->getTableName()} SET {$this->getModifiedDate()} = CURRENT_TIMESTAMP WHERE id = NEW.$contactRefColumn;",
+        'sql' => "\nUPDATE {$this->getTableName()} SET {$this->getModifiedDate()} = CURRENT_TIMESTAMP WHERE id = NEW.$contactRefColumn;\n",
       ];
       $info[] = [
         'table' => $relatedTableNames,
         'when' => 'AFTER',
         'event' => ['DELETE'],
-        'sql' => "UPDATE {$this->getTableName()} SET {$this->getModifiedDate()} = CURRENT_TIMESTAMP WHERE id = OLD.$contactRefColumn;",
+        'sql' => "\nUPDATE {$this->getTableName()} SET {$this->getModifiedDate()} = CURRENT_TIMESTAMP WHERE id = OLD.$contactRefColumn;\n",
       ];
     }
   }

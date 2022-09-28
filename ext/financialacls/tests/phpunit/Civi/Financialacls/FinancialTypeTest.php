@@ -16,6 +16,8 @@ class FinancialTypeTest extends BaseTestClass {
   /**
    * Test that a message is put in session when changing the name of a
    * financial type.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testChangeFinancialTypeName(): void {
     Civi::settings()->set('acl_financial_type', TRUE);
@@ -47,7 +49,7 @@ class FinancialTypeTest extends BaseTestClass {
       foreach ($actions as $action => $action_ts) {
         $this->assertEquals(
           [
-            ts('CiviCRM: %1 contributions of type %2', [1 => $action_ts, 2 => $type]),
+            ts("CiviCRM: %1 contributions of type %2", [1 => $action_ts, 2 => $type]),
             ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
           ],
           $permissions[$action . ' contributions of type ' . $type]
@@ -58,17 +60,6 @@ class FinancialTypeTest extends BaseTestClass {
       ts('CiviCRM: administer CiviCRM Financial Types'),
       ts('Administer access to Financial Types'),
     ], $permissions['administer CiviCRM Financial Types']);
-  }
-
-  /**
-   * Test income financial types are acl filtered.
-   */
-  public function testGetIncomeFinancialType(): void {
-    $types = \CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
-    $this->assertCount(4, $types);
-    $this->setupLoggedInUserWithLimitedFinancialTypeAccess();
-    $type = \CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
-    $this->assertEquals([1 => 'Donation'], $type);
   }
 
 }

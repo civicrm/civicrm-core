@@ -17,7 +17,7 @@
 
 /**
  * This implements the profile page for all contacts. It uses a selector
- * object to do the actual display. The fields displayed are controlled by
+ * object to do the actual dispay. The fields displayd are controlled by
  * the admin.
  */
 class CRM_Profile_Page_Listings extends CRM_Core_Page {
@@ -449,14 +449,11 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
   }
 
   /**
-   * Check template file exists.
+   * @param string $suffix
    *
-   * @param string|null $suffix
-   *
-   * @return string|null
-   *   Template file path, else null
+   * @return null|string
    */
-  public function checkTemplateFileExists($suffix = NULL) {
+  public function checkTemplateFileExists($suffix = '') {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Page/{$this->_gid}/Listings.{$suffix}tpl";
       $template = CRM_Core_Page::getTemplate();

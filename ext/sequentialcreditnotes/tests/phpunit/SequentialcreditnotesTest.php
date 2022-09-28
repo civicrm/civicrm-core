@@ -43,6 +43,7 @@ class SequentialcreditnotesTest extends \PHPUnit\Framework\TestCase implements H
    * createCreditNoteId();
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testCreateCreditNoteId(): void {
     $this->_apiversion = 4;

@@ -103,7 +103,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
   /**
    * The query object.
    *
-   * @var CRM_Contact_BAO_Query
+   * @var string
    */
   protected $_query;
 
@@ -267,7 +267,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
 
       $selectSQL = "
       SELECT %1, contact_a.id, contact_a.display_name
-{$sql['from']} {$sql['where']}
+{$sql['from']}
 ";
 
       try {
@@ -348,7 +348,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
   }
 
   /**
-   * @return CRM_Contact_BAO_Query
+   * @return string
    */
   public function &getQuery() {
     return $this->_query;

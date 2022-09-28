@@ -1,7 +1,5 @@
 <?php
 
-use Civi\Api4\Participant;
-
 /**
  *  Test CRM_Event_Form_Registration functions.
  *
@@ -24,11 +22,18 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * Should financials be checked after the test but before tear down.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = TRUE;
+
+  /**
    * Initial test of submit function.
    *
    * @throws \Exception
    */
-  public function testSubmit(): void {
+  public function testSubmit() {
     $form = $this->getForm();
     $form->submit([
       'register_date' => date('Ymd'),
@@ -128,8 +133,9 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * (dev/core#310) : Test to ensure payments are correctly allocated, when a event fee is changed for a mult-line item event registration
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testPaymentAllocationOnMultiLineItemEvent(): void {
+  public function testPaymentAllocationOnMultiLineItemEvent() {
     // USE-CASE :
     // 1. Create a Price set with two price fields
     // 2. Register for a Event using both the price field A($55 - qty 1) and B($10 - qty 1)
@@ -256,9 +262,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @dataProvider getThousandSeparators
    * @throws \Exception
    */
-  public function testParticipantOfflineReceipt(string $thousandSeparator): void {
+  public function testParticipantOfflineReceipt($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
-    $this->swapMessageTemplateForTestTemplate('event_offline_receipt', 'text');
     $mut = new CiviMailUtils($this, TRUE);
     // Create an email associated with the logged in contact
     $loggedInContactID = $this->createLoggedInUser();
@@ -293,7 +298,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
     // Use the email created as the from email ensuring we are passing a numeric from to test dev/core#1069
     $this->setCurrencySeparators($thousandSeparator);
-    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1, 'pay_later_receipt' => 'pay us']);
+    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1]);
     $form->_mode = 'Live';
     $form->_quickConfig = TRUE;
     $form->_fromEmails = [
@@ -303,24 +308,13 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $submitParams = $this->getSubmitParamsForCreditCardPayment($paymentProcessorID);
     $submitParams['from_email_address'] = $email['id'];
     $form->submit($submitParams);
-    $participantID = Participant::get()->addWhere('event_id', '=', $this->getEventID())->execute()->first()['id'];
     //Check if type is correctly populated in mails.
     //Also check the string email is present not numeric from.
     $mut->checkMailLog([
-      'contactID:::' . $this->getContactID(),
-      'contact.id:::' . $this->getContactID(),
-      'eventID:::' . $this->getEventID(),
-      'event.id:::' . $this->getEventID(),
-      'participantID:::' . $participantID,
-      'participant.id:::' . $participantID,
       '<p>Test event type - 1</p>',
-      'event.title:::Annual CiviCRM meet',
-      'participant.status_id:name:::Registered',
       'testloggedinreceiptemail@civicrm.org',
-      'event.pay_later_receipt:::pay us',
       $this->formatMoneyInput(1550.55),
     ]);
-
     $this->callAPISuccess('Email', 'delete', ['id' => $email['id']]);
   }
 
@@ -379,6 +373,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * Financial Type:  'Event Fee' and 'Event Fee 2' respectively.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function createParticipantRecordsFromTwoFieldPriceSet() {
     // Create financial type - Event Fee 2
@@ -514,6 +509,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   /**
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitWithDeferredRecognition() {
     Civi::settings()->set('deferred_revenue_enabled', TRUE);
@@ -541,8 +537,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * Test submitting a partially paid event registration.
    *
    * In this case the participant status is selected as 'partially paid' and
-   * a contribution is created for the full amount with a payment equal to the
-   * entered amount.
+   * a contribution is created for the full amount with a payment equal to the entered amount.
    *
    * @dataProvider getBooleanDataProvider
    *
@@ -598,6 +593,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @param bool $isQuickConfig
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitPendingPartiallyPaidAddPayment($isQuickConfig) {
     $mut = new CiviMailUtils($this, TRUE);
@@ -732,8 +728,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'Annual CiviCRM meet',
       'Registered Email',
       $isQuickConfig ? $this->formatMoneyInput(1550.55) . ' big - 1' : 'Price Field - big',
-      $isAmountPaidOnForm ? 'Total Paid: $20.00' : ' ',
-      'Balance: $1,530.55',
+      $isAmountPaidOnForm ? 'Total Paid: $ 20.00' : ' ',
+      'Balance: $ 1,530.55',
       'Financial Type: Event Fee',
       'Paid By: Check',
       'Check Number: 879',
@@ -821,6 +817,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * Check if participant is transferred correctly.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testTransferParticipantRegistration(): void {
     //Register a contact to a sample event.
@@ -830,15 +827,10 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribution['id']);
     $this->assertCount(2, $lineItems);
     $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $contribution['id'], 'participant_id', 'contribution_id');
-    /** @var CRM_Event_Form_SelfSvcTransfer $form */
+    /* @var CRM_Event_Form_SelfSvcTransfer $form */
     $form = $this->getFormObject('CRM_Event_Form_SelfSvcTransfer');
     $toContactId = $this->individualCreate();
-    $mut = new CiviMailUtils($this);
-    $this->swapMessageTemplateForInput('event_online_receipt', '{domain.name} {contact.first_name}');
     $form->transferParticipantRegistration($toContactId, $participantId);
-    $mut->checkAllMailLog(['Default Domain Name Anthony']);
-    $mut->clearMessages();
-    $this->revertTemplateToReservedTemplate('event_online_receipt', 'html');
 
     //Assert participant is transferred to $toContactId.
     $participant = $this->callAPISuccess('Participant', 'getsingle', [

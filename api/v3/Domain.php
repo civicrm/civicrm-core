@@ -21,7 +21,7 @@
  * @param array $params
  *
  * @return array
- * @throws \CRM_Core_Exception
+ * @throws \API_Exception
  */
 function civicrm_api3_domain_get($params) {
 

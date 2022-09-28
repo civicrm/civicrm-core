@@ -39,7 +39,7 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
     $displayName = $result = $contactImage = NULL;
     if ($log->find(TRUE)) {
       if ($log->modified_id) {
-        [$displayName, $contactImage] = CRM_Contact_BAO_Contact::getDisplayAndImage($log->modified_id);
+        list($displayName, $contactImage) = CRM_Contact_BAO_Contact::getDisplayAndImage($log->modified_id);
       }
       $result = [
         'id' => $log->modified_id,
@@ -56,13 +56,13 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
    *
    * @param array $params
    *   Array of name-value pairs of log table.
-   * @return CRM_Core_DAO_Log
+   *
    */
   public static function add(&$params) {
+
     $log = new CRM_Core_DAO_Log();
     $log->copyValues($params);
     $log->save();
-    return $log;
   }
 
   /**

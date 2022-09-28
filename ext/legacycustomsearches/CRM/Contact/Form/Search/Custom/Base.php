@@ -23,12 +23,6 @@ class CRM_Contact_Form_Search_Custom_Base {
   protected $_stateID;
 
   /**
-   * The title of this form
-   * @var string
-   */
-  protected $_title = NULL;
-
-  /**
    * Class constructor.
    *
    * @param array $formValues
@@ -110,7 +104,7 @@ class CRM_Contact_Form_Search_Custom_Base {
     $sql = "SELECT $selectClause " . $this->from();
     $where = $this->where();
     if (!empty($where)) {
-      $sql .= ' WHERE ' . $where;
+      $sql .= " WHERE " . $where;
     }
 
     if ($includeContactIDs) {
@@ -234,17 +228,17 @@ class CRM_Contact_Form_Search_Custom_Base {
   }
 
   /**
-   * Setter function for title.
+   * Set the title.
    *
    * @param string $title
-   *   The title of the form.
    */
   public function setTitle($title) {
-    if (empty($title)) {
-      $title = ts('Search');
+    if ($title) {
+      CRM_Utils_System::setTitle($title);
     }
-    $this->_title = $title;
-    CRM_Utils_System::setTitle($title);
+    else {
+      CRM_Utils_System::setTitle(ts('Search'));
+    }
   }
 
   /**

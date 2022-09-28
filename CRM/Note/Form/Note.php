@@ -72,8 +72,8 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @return array
-   * @throws \CRM_Core_Exception
+   *
+   * @return void
    */
   public function setDefaultValues() {
     $defaults = [];
@@ -87,12 +87,9 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
         $defaults['parent_id'] = $defaults['entity_id'];
       }
     }
-    elseif ($this->_action & CRM_Core_Action::ADD) {
-      $defaults['note_date'] = date('Y-m-d H:i:s');
-      if ($this->_parentId) {
-        $defaults['parent_id'] = $this->_parentId;
-        $defaults['subject'] = 'Re: ' . CRM_Core_BAO_Note::getNoteSubject($this->_parentId);
-      }
+    elseif ($this->_action & CRM_Core_Action::ADD && $this->_parentId) {
+      $defaults['parent_id'] = $this->_parentId;
+      $defaults['subject'] = 'Re: ' . CRM_Core_BAO_Note::getNoteSubject($this->_parentId);
     }
     return $defaults;
   }
@@ -133,7 +130,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     }
 
     $this->addField('subject');
-    $this->addField('note_date', [], TRUE, FALSE);
+    $this->addField('note_date', [], FALSE, FALSE);
     $this->addField('note', [], TRUE);
     $this->addField('privacy');
     $this->add('hidden', 'parent_id');
@@ -166,7 +163,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $params['contact_id'] = $session->get('userID');
 
-    if (!empty($params['parent_id'])) {
+    if ($params['parent_id']) {
       $params['entity_table'] = 'civicrm_note';
       $params['entity_id'] = $params['parent_id'];
     }
@@ -176,9 +173,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     }
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Core_BAO_Note::deleteRecord(['id' => $this->_id]);
-      $status = ts('Selected Note has been deleted successfully.');
-      CRM_Core_Session::setStatus($status, ts('Deleted'), 'success');
+      CRM_Core_BAO_Note::del($this->_id);
       return;
     }
 

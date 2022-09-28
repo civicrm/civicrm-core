@@ -8,9 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* Relationship tab within View Contact - browse, and view relationships for a contact *}
-{if $action eq 4 } {* action = view *}
-  {include file="CRM/Contact/Page/View/ViewRelationship.tpl"}
-{elseif $action neq 16} {* add, update *}
+{if $action neq 16} {* add, update or view *}
   {include file="CRM/Contact/Form/Relationship.tpl"}
 {else}
   <div id="contact-summary-relationship-tab" class="view-content">
@@ -23,7 +21,7 @@
     {* display current relationships *}
     <h3>{ts}Current Relationships{/ts}</h3>
     <div id="permission-legend" class="help">
-      <span class="crm-label">{ts}Permissioned Relationships: {/ts}</span>
+      <span class="crm-label">Permissioned Relationships: </span>
       {include file="CRM/Contact/Page/View/RelationshipPerm.tpl" permType=1 afterText=true}
     </div>
     {include file="CRM/Contact/Page/View/RelationshipSelector.tpl" context="current"}

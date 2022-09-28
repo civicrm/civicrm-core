@@ -11,19 +11,8 @@
 
 /**
  * Tests for the CRM_Import_Datasource_Csv class.
- *
- * @group headless
- * @group import
  */
 class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
-
-  /**
-   * Prepare for tests.
-   */
-  public function setUp(): void {
-    $this->createLoggedInUser();
-    parent::setUp();
-  }
 
   /**
    * Test the to csv function.
@@ -31,18 +20,31 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    * @param array $fileData
    *
    * @dataProvider getCsvFiles
-   *
    * @throws \CRM_Core_Exception
    */
-  public function testToCsv(array $fileData): void {
-    $form = $this->submitDatasourceForm($fileData['filename']);
-    $csvObject = new CRM_Import_DataSource_Csv($form->getUserJobID());
-    $rows = $csvObject->getRows(0, 0, [], FALSE);
+  public function testToCsv(array $fileData) {
+    $dataSource = new CRM_Import_DataSource_CSV();
+    $params = [
+      'uploadFile' => [
+        'name' => __DIR__ . '/' . $fileData['filename'],
+      ],
+      'skipColumnHeader' => TRUE,
+    ];
+
+    // Get the PEAR::DB object
+    $dao = new CRM_Core_DAO();
+    $db = $dao->getDatabaseConnection();
+
+    $form = new CRM_Contact_Import_Form_DataSource();
+    $form->controller = new CRM_Contact_Import_Controller();
+
+    $dataSource->postProcess($params, $db, $form);
+    $tableName = $form->get('importTableName');
     foreach (['first_name', 'last_name', 'email'] as $field) {
-      $json = json_encode($rows[0][$field]);
+      $json = json_encode(CRM_Core_DAO::singleValueQuery("SELECT $field FROM $tableName"));
       $this->assertEquals($fileData["{$field}_json"], $json, "{$fileData['filename']} failed on $field");
     }
-    $csvObject->purge();
+    CRM_Core_DAO::executeQuery("DROP TABLE $tableName");
   }
 
   /**
@@ -50,7 +52,7 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getCsvFiles(): array {
+  public function getCsvFiles() {
     return [
       // import.csv is utf8-encoded, with no BOM
       [
@@ -93,20 +95,17 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test the trim function.
-   *
+   * Test the trim function
    * @dataProvider trimDataProvider
-   *
    * @param string $input
    * @param string $expected
    */
-  public function testTrim(string $input, string $expected): void {
+  public function testTrim(string $input, string $expected) {
     $this->assertSame($expected, CRM_Import_DataSource_CSV::trimNonBreakingSpaces($input));
   }
 
   /**
-   * DataProvider for testTrim.
-   *
+   * Dataprovider for testTrim
    * @return array
    */
   public function trimDataProvider(): array {
@@ -124,49 +123,6 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
       'sharing-same-byte-plus-space-both' => ["\u{a0}àfooà\u{a0}", 'àfooà'],
       'multiple-spaces' => ["\u{a0}\u{a0}foo\u{a0}\u{a0}", 'foo'],
     ];
-  }
-
-  /**
-   * Test only one column and a blank line at the end, because
-   * fgetcsv will return the blank lines as array(0 => NULL) which is an
-   * edge case. Note if it has more than one column then the blank line gets
-   * skipped because of some checking for column-count matches in the import,
-   * and so you don't hit the current fail.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testBlankLineAtEnd(): void {
-    $form = $this->submitDatasourceForm('blankLineAtEnd.csv');
-    $csvObject = new CRM_Import_DataSource_Csv($form->getUserJobID());
-
-    $json = json_encode($csvObject->getRow()['email']);
-    $this->assertEquals('"yogi@yellowstone.park"', $json);
-    $csvObject->purge();
-  }
-
-  /**
-   * Test submitting the datasource form.
-   *
-   * @param string $csvFileName
-   *
-   * @return \CRM_Contact_Import_Form_DataSource
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function submitDatasourceForm(string $csvFileName): CRM_Contact_Import_Form_DataSource {
-    $_GET['dataSource'] = 'CRM_Import_DataSource_CSV';
-    /** @var CRM_Contact_Import_Form_DataSource $form */
-    $form = $this->getFormObject('CRM_Contact_Import_Form_DataSource', [
-      'uploadFile' => [
-        'name' => __DIR__ . '/' . $csvFileName,
-      ],
-      'skipColumnHeader' => TRUE,
-      'contactType' => 'Individual',
-      'dataSource' => 'CRM_Import_DataSource_CSV',
-    ]);
-    $form->buildForm();
-    $form->postProcess();
-    return $form;
   }
 
 }

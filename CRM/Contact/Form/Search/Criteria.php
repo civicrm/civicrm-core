@@ -20,6 +20,7 @@ class CRM_Contact_Form_Search_Criteria {
    * @param CRM_Contact_Form_Search_Advanced $form
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function basic(&$form) {
     $form->addSearchFieldMetadata(['Contact' => self::getFilteredSearchFieldMetadata('basic')]);
@@ -54,10 +55,6 @@ class CRM_Contact_Form_Search_Criteria {
       }
     }
 
-    // Suppress e-notices for tag fields if not set...
-    $form->addOptionalQuickFormElement('tag_types_text');
-    $form->addOptionalQuickFormElement('tag_set');
-    $form->addOptionalQuickFormElement('all_tag_types');
     if ($form->_searchOptions['tags']) {
       // multiselect for categories
       $contactTags = CRM_Core_BAO_Tag::getTags();
@@ -85,7 +82,7 @@ class CRM_Contact_Form_Search_Criteria {
           $showAllTagTypes = TRUE;
         }
       }
-      $tagTypesText = implode(' or ', $tagsTypes);
+      $tagTypesText = implode(" or ", $tagsTypes);
       if ($showAllTagTypes) {
         $form->add('checkbox', 'all_tag_types', ts('Include tags used for %1', [1 => $tagTypesText]));
         $form->add('hidden', 'tag_types_text', $tagTypesText);
@@ -243,7 +240,7 @@ class CRM_Contact_Form_Search_Criteria {
   /**
    * Get the metadata for fields to be included on the contact search form.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getSearchFieldMetadata() {
     $fields = [
@@ -290,7 +287,7 @@ class CRM_Contact_Form_Search_Criteria {
    * @param string $filter
    *
    * @return array
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getFilteredSearchFieldMetadata($filter) {
     $fields = self::getSearchFieldMetadata();
@@ -307,18 +304,14 @@ class CRM_Contact_Form_Search_Criteria {
    *
    * @param CRM_Core_Form $form
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected static function setBasicSearchFields($form) {
     $searchFields = [];
     foreach (self::getFilteredSearchFieldMetadata('basic') as $fieldName => $field) {
       $searchFields[$fieldName] = $field;
     }
-    $fields = array_merge(self::getBasicSearchFields(), $searchFields);
-    foreach ($fields as $index => $field) {
-      $fields[$index] = array_merge(['class' => '', 'is_custom' => FALSE, 'template' => '', 'help' => '', 'description' => ''], $field);
-    }
-    $form->assign('basicSearchFields', $fields);
+    $form->assign('basicSearchFields', array_merge(self::getBasicSearchFields(), $searchFields));
   }
 
   /**
@@ -326,6 +319,7 @@ class CRM_Contact_Form_Search_Criteria {
    *
    */
   public static function getBasicSearchFields() {
+    $userFramework = CRM_Core_Config::singleton()->userFramework;
     return [
       // For now an empty array is still left in place for ordering.
       'sort_name' => [],
@@ -341,7 +335,7 @@ class CRM_Contact_Form_Search_Criteria {
       'tag_types_text' => ['name' => 'tag_types_text'],
       'tag_search' => [
         'name' => 'tag_search',
-        'help' => ['id' => 'id-all-tags', 'file' => NULL],
+        'help' => ['id' => 'id-all-tags'],
       ],
       'tag_set' => [
         'name' => 'tag_set',
@@ -351,7 +345,7 @@ class CRM_Contact_Form_Search_Criteria {
       'all_tag_types' => [
         'name' => 'all_tag_types',
         'class' => 'search-field__span-3 search-field__checkbox',
-        'help' => ['id' => 'id-all-tag-types', 'file' => NULL],
+        'help' => ['id' => 'id-all-tag-types'],
       ],
       'phone_numeric' => [
         'name' => 'phone_numeric',
@@ -384,6 +378,7 @@ class CRM_Contact_Form_Search_Criteria {
       ],
       'uf_user' => [
         'name' => 'uf_user',
+        'description' => ts('Does the contact have a %1 Account?', [$userFramework]),
       ],
     ];
   }
@@ -503,7 +498,7 @@ class CRM_Contact_Form_Search_Criteria {
   /**
    * @param CRM_Core_Form $form
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function changeLog(&$form) {
     $form->add('hidden', 'hidden_changeLog', 1);
@@ -523,7 +518,7 @@ class CRM_Contact_Form_Search_Criteria {
   /**
    * @param CRM_Core_Form_Search $form
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function relationship(&$form) {
     $form->add('hidden', 'hidden_relationship', 1);
@@ -556,7 +551,7 @@ class CRM_Contact_Form_Search_Criteria {
   /**
    * @param CRM_Core_Form_Search $form
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function demographics(&$form) {
     $form->add('hidden', 'hidden_demographics', 1);
@@ -600,12 +595,11 @@ class CRM_Contact_Form_Search_Criteria {
    *
    * @param CRM_Contact_Form_Search $form
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function custom(&$form) {
     $form->add('hidden', 'hidden_custom', 1);
-    $extends = array_merge(['Contact'],
-      CRM_Contact_BAO_ContactType::basicTypes(),
+    $extends = array_merge(['Contact', 'Individual', 'Household', 'Organization'],
       CRM_Contact_BAO_ContactType::subTypes()
     );
     $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE,

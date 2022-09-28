@@ -10,6 +10,7 @@
 {capture assign=labelStyle }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
 {capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
+<center>
   <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
 
   <!-- BEGIN HEADER -->
@@ -20,7 +21,7 @@
 
   <tr>
    <td>
-    {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
+    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
     {if !empty($formValues.receipt_text)}
      <p>{$formValues.receipt_text|htmlize}</p>
     {else}
@@ -45,52 +46,53 @@
       </td>
      </tr>
      <tr>
-      {if '{contribution.financial_type_id}'}
+      {if !empty($formValues.contributionType_name)}
         <td {$labelStyle}>
          {ts}Financial Type{/ts}
         </td>
         <td {$valueStyle}>
-         {contribution.financial_type_id:label}
+         {$formValues.contributionType_name}
         </td>
       {/if}
      </tr>
 
-     {if $isShowLineItems}
+     {if !empty($lineItem) and empty($is_quick_config)}
+      {foreach from=$lineItem item=value key=priceset}
        <tr>
         <td colspan="2" {$valueStyle}>
-         <table>
+         <table> {* FIXME: style this table so that it looks like the text version (justification, etc.) *}
           <tr>
            <th>{ts}Item{/ts}</th>
            <th>{ts}Qty{/ts}</th>
            <th>{ts}Each{/ts}</th>
-           {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+           {if !empty($getTaxDetails)}
              <th>{ts}Subtotal{/ts}</th>
              <th>{ts}Tax Rate{/ts}</th>
              <th>{ts}Tax Amount{/ts}</th>
            {/if}
            <th>{ts}Total{/ts}</th>
           </tr>
-          {foreach from=$lineItems item=line}
+          {foreach from=$value item=line}
            <tr>
             <td>
-              {$line.title}
+            {if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description}<div>{$line.description|truncate:30:"..."}</div>{/if}
             </td>
             <td>
              {$line.qty}
             </td>
             <td>
-             {$line.unit_price|crmMoney:'{contribution.currency}'}
+             {$line.unit_price|crmMoney:$currency}
             </td>
-            {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+            {if !empty($getTaxDetails)}
               <td>
-                {$line.unit_price*$line.qty|crmMoney:'{contribution.currency}'}
+                {$line.unit_price*$line.qty|crmMoney:$currency}
               </td>
-              {if $line.tax_rate || $line.tax_amount != ""}
+              {if isset($line.tax_rate) and ($line.tax_rate != "" || $line.tax_amount != "")}
                 <td>
                   {$line.tax_rate|string_format:"%.2f"}%
                 </td>
                 <td>
-                  {$line.tax_amount|crmMoney:'{contribution.currency}'}
+                  {$line.tax_amount|crmMoney:$currency}
                 </td>
               {else}
                 <td></td>
@@ -98,40 +100,45 @@
               {/if}
             {/if}
             <td>
-             {$line.line_total+$line.tax_amount|crmMoney:'{contribution.currency}'}
+             {$line.line_total+$line.tax_amount|crmMoney:$currency}
             </td>
            </tr>
           {/foreach}
          </table>
         </td>
        </tr>
-
+      {/foreach}
      {/if}
-     {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+     {if !empty($getTaxDetails) && !empty($dataArray)}
        <tr>
          <td {$labelStyle}>
            {ts} Amount before Tax : {/ts}
          </td>
          <td {$valueStyle}>
-           {$formValues.total_amount-$totalTaxAmount|crmMoney:'{contribution.currency}'}
+           {$formValues.total_amount-$totalTaxAmount|crmMoney:$currency}
          </td>
        </tr>
 
-       {foreach from=$taxRateBreakdown item=taxDetail key=taxRate}
-         <tr>
-          <td>{if $taxRate == 0}{ts}No{/ts} {$taxTerm}{else}{$taxTerm} {$taxDetail.percentage}%{/if}</td>
-          <td>{$taxDetail.amount|crmMoney:'{contribution.currency}'}</td>
+      {foreach from=$dataArray item=value key=priceset}
+        <tr>
+        {if $priceset ||  $priceset == 0 || $value != ''}
+          <td>&nbsp;{if isset($taxTerm)}{$taxTerm}{/if} {$priceset|string_format:"%.2f"}%</td>
+          <td>&nbsp;{$value|crmMoney:$currency}</td>
+        {else}
+          <td>&nbsp;{ts}No{/ts} {if isset($taxTerm)}{$taxTerm}{/if}</td>
+          <td>&nbsp;{$value|crmMoney:$currency}</td>
+        {/if}
         </tr>
       {/foreach}
      {/if}
 
-     {if $isShowTax}
+     {if isset($totalTaxAmount) && $totalTaxAmount !== 'null'}
       <tr>
         <td {$labelStyle}>
           {ts}Total Tax Amount{/ts}
         </td>
         <td {$valueStyle}>
-          {contribution.tax_amount}
+          {$totalTaxAmount|crmMoney:$currency}
         </td>
       </tr>
      {/if}
@@ -141,60 +148,60 @@
        {ts}Total Amount{/ts}
       </td>
       <td {$valueStyle}>
-        {contribution.total_amount}
+       {$formValues.total_amount|crmMoney:$currency}
       </td>
      </tr>
 
-     {if '{contribution.receive_date}'}
-       <tr>
+     {if !empty($receive_date)}
+      <tr>
        <td {$labelStyle}>
         {ts}Date Received{/ts}
        </td>
        <td {$valueStyle}>
-         {contribution.receive_date|crmDate:"shortdate"}
+        {$receive_date|truncate:10:''|crmDate}
        </td>
       </tr>
      {/if}
 
-      {if '{contribution.receipt_date}'}
+      {if !empty($receipt_date)}
       <tr>
        <td {$labelStyle}>
         {ts}Receipt Date{/ts}
        </td>
        <td {$valueStyle}>
-         {contribution.receipt_date|crmDate:"shortdate"}
+        {$receipt_date|truncate:10:''|crmDate}
        </td>
       </tr>
      {/if}
 
-     {if '{contribution.payment_instrument_id}' and empty($formValues.hidden_CreditCard)}
+     {if !empty($formValues.paidBy) and empty($formValues.hidden_CreditCard)}
       <tr>
        <td {$labelStyle}>
         {ts}Paid By{/ts}
        </td>
        <td {$valueStyle}>
-         {contribution.payment_instrument_id:label}
+        {$formValues.paidBy}
        </td>
       </tr>
-      {if '{contribution.check_number}'}
+      {if !empty($formValues.check_number)}
        <tr>
         <td {$labelStyle}>
          {ts}Check Number{/ts}
         </td>
         <td {$valueStyle}>
-          {contribution.check_number}
+         {$formValues.check_number}
         </td>
        </tr>
       {/if}
      {/if}
 
-     {if '{contribution.trxn_id}'}
+     {if !empty($formValues.trxn_id)}
       <tr>
        <td {$labelStyle}>
         {ts}Transaction ID{/ts}
        </td>
        <td {$valueStyle}>
-         {contribution.trxn_id}
+        {$formValues.trxn_id}
        </td>
       </tr>
      {/if}
@@ -313,6 +320,7 @@
   </tr>
 
  </table>
+</center>
 
 </body>
 </html>

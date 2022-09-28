@@ -127,13 +127,4 @@ WHERE  activity_id IN ( $IDs ) AND
     ]);
   }
 
-  /**
-   * Get the token processor schema required to list any tokens for this task.
-   *
-   * @return array
-   */
-  public function getTokenSchema(): array {
-    return ['activityId'];
-  }
-
 }

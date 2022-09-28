@@ -17,9 +17,8 @@ use Civi;
  *
  * @package CiviCRM_Hook
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * @service themes
  */
-class Themes extends \Civi\Core\Service\AutoService {
+class Themes {
 
   /**
    * The "default" theme adapts based on the latest recommendation from civicrm.org

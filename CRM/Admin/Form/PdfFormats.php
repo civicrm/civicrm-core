@@ -125,11 +125,11 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
     $bao = new CRM_Core_BAO_PdfFormat();
     $bao->savePdfFormat($values, $this->_id);
 
-    $status = ts('Your new PDF Page Format titled <strong>%1</strong> has been saved.', [1 => $values['name']]);
+    $status = ts('Your new PDF Page Format titled <strong>%1</strong> has been saved.', [1 => $values['name']], ts('Saved'), 'success');
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $status = ts('Your PDF Page Format titled <strong>%1</strong> has been updated.', [1 => $values['name']]);
+      $status = ts('Your PDF Page Format titled <strong>%1</strong> has been updated.', [1 => $values['name']], ts('Saved'), 'success');
     }
-    CRM_Core_Session::setStatus($status, ts('Saved'), 'success');
+    CRM_Core_Session::setStatus($status);
   }
 
 }

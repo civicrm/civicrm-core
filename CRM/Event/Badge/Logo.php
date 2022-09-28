@@ -34,7 +34,7 @@ class CRM_Event_Badge_Logo extends CRM_Event_Badge {
   }
 
   /**
-   * @param array $participant
+   * @param $participant
    */
   public function generateLabel($participant) {
     $x = $this->pdf->GetAbsX();

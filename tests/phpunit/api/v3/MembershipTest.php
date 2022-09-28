@@ -124,7 +124,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertDBRowExist('CRM_Member_DAO_Membership', $membershipID);
     $ContributionCreate = $this->callAPISuccess('Contribution', 'create', [
       'sequential' => 1,
-      'financial_type_id' => 'Member Dues',
+      'financial_type_id' => "Member Dues",
       'total_amount' => 100,
       'contact_id' => $this->_params['contact_id'],
     ]);
@@ -148,89 +148,134 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test Activity creation on cancellation of membership contribution.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testActivityForCancelledContribution(): void {
+    $contactId = $this->ids['Contact']['order'] = $this->createLoggedInUser();
+
+    $this->createContributionAndMembershipOrder();
+    $membershipID = $this->callAPISuccessGetValue('MembershipPayment', ['return' => 'id']);
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->_id = $this->ids['Contribution'][0];
+    $form->testSubmit([
+      'total_amount' => 100,
+      'financial_type_id' => 1,
+      'contact_id' => $contactId,
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'contribution_status_id' => 3,
+    ],
+    CRM_Core_Action::UPDATE);
+
+    $this->callAPISuccessGetSingle('Activity', [
+      'activity_type_id' => 'Membership Signup',
+      'source_record_id' => $membershipID,
+      'subject' => 'General - Payment - Status: Pending',
+    ]);
+    $this->callAPISuccessGetSingle('Activity', [
+      'activity_type_id' => 'Change Membership Status',
+      'source_record_id' => $membershipID,
+    ]);
+  }
+
+  /**
    * Test Multiple Membership Status for same contribution id.
    */
-  public function testMultipleMembershipsContribution(): void {
+  public function testMultipleMembershipsContribution() {
+    // Main contact
+    $memStatus = CRM_Member_PseudoConstant::membershipStatus();
+    // Pending Membership Status
+    $pendingMembershipId = array_search('Pending', $memStatus);
+    // New Membership Status
+    $newMembershipId = array_search('test status', $memStatus);
+
+    $membershipParam = [
+      'membership_type_id' => 'General',
+      'source' => 'Webform Payment',
+      'status_id' => $pendingMembershipId,
+      'is_pay_later' => 1,
+      'skipStatusCal' => 1,
+    ];
+
+    // Contact 1
     $contactId1 = $this->individualCreate();
-    $contactId2 = $this->individualCreate();
-    $contactId3 = $this->individualCreate();
-    $order = $this->callAPISuccess('Order', 'create', [
+    $membershipParam['contact_id'] = $contactId1;
+    $membershipID1 = $this->contactMembershipCreate($membershipParam);
+
+    // Pending Payment Status
+    $ContributionCreate = $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => '1',
+      'total_amount' => 100,
       'contact_id' => $contactId1,
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'contribution_status_id' => 2,
       'is_pay_later' => 1,
       'receive_date' => date('Ymd'),
-      'line_items' => [
-        [
-          'line_item' => [
-            [
-              'membership_type_id' => 'General',
-              'source' => 'Webform Payment',
-              'line_total' => 50,
-              'qty' => 1,
-            ],
-          ],
-          'params' => [
-            'contact_id' => $contactId1,
-            'membership_type_id' => 'General',
-          ],
-        ],
-        [
-          'line_item' => [
-            [
-              'membership_type_id' => 'General',
-              'source' => 'Webform Payment',
-              'line_total' => 50,
-              'qty' => 1,
-            ],
-          ],
-          'params' => [
-            'contact_id' => $contactId2,
-            'membership_type_id' => 'General',
-          ],
-        ],
-        [
-          'line_item' => [
-            [
-              'membership_type_id' => 'General',
-              'source' => 'Webform Payment',
-              'line_total' => 50,
-              'qty' => 1,
-            ],
-          ],
-          'params' => [
-            'contact_id' => $contactId3,
-            'membership_type_id' => 'General',
-          ],
-        ],
-      ],
+    ]);
+    $this->callAPISuccess('MembershipPayment', 'create', [
+      'sequential' => 1,
+      'contribution_id' => $ContributionCreate['id'],
+      'membership_id' => $membershipID1,
     ]);
 
-    $_REQUEST['action'] = 'update';
-    $_REQUEST['id'] = $order['id'];
+    // Contact 2
+    $contactId2 = $this->individualCreate();
+    $membershipParam['contact_id'] = $contactId2;
+    $membershipID2 = $this->contactMembershipCreate($membershipParam);
+    $this->callAPISuccess('MembershipPayment', 'create', [
+      'sequential' => 1,
+      'contribution_id' => $ContributionCreate['id'],
+      'membership_id' => $membershipID2,
+    ]);
+
+    // Contact 3
+    $contactId3 = $this->individualCreate();
+    $membershipParam['contact_id'] = $contactId3;
+    $membershipID3 = $this->contactMembershipCreate($membershipParam);
+    $this->callAPISuccess('MembershipPayment', 'create', [
+      'sequential' => 1,
+      'contribution_id' => $ContributionCreate['id'],
+      'membership_id' => $membershipID3,
+    ]);
+
     // Change Payment Status to Completed
-    /** @var CRM_Contribute_Form_Contribution $form */
-    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
-      'total_amount' => 150,
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->_id = $ContributionCreate['id'];
+    $params = ['id' => $ContributionCreate['id']];
+    $values = $ids = [];
+    CRM_Contribute_BAO_Contribution::getValues($params, $values, $ids);
+    $form->_values = $values;
+    $form->testSubmit([
+      'total_amount' => 100,
       'financial_type_id' => '1',
       'contact_id' => $contactId1,
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'contribution_status_id' => 1,
-    ]);
-    $form->buildForm();
-    $form->postProcess();
-    $memberships = $this->callAPISuccess('Membership', 'get', ['sort' => 'contact_id', 'sequential' => 1])['values'];
+    ],
+      CRM_Core_Action::UPDATE);
 
-    $this->assertEquals($contactId1, $memberships[0]['contact_id']);
-    $this->assertEquals('test status', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $memberships[0]['status_id']));
+    // check for Membership 1
+    $params = ['id' => $membershipID1, 'return' => ['contact_id', 'status_id']];
+    $membership1 = $this->callAPISuccess('Membership', 'get', $params);
+    $result1 = $membership1['values'][$membershipID1];
+    $this->assertEquals($result1['contact_id'], $contactId1);
+    $this->assertEquals($result1['status_id'], $newMembershipId);
 
     // check for Membership 2
-    $this->assertEquals($contactId2, $memberships[1]['contact_id']);
-    $this->assertEquals('test status', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $memberships[1]['status_id']));
+    $params = ['id' => $membershipID2];
+    $membership2 = $this->callAPISuccess('membership', 'get', $params);
+    $result2 = $membership2['values'][$membershipID2];
+    $this->assertEquals($result2['contact_id'], $contactId2);
+    $this->assertEquals($result2['status_id'], $newMembershipId);
 
     // check for Membership 3
-    $this->assertEquals($contactId3, $memberships[2]['contact_id']);
-    $this->assertEquals('test status', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $memberships[2]['status_id']));
+    $params = ['id' => $membershipID3];
+    $membership3 = $this->callAPISuccess('membership', 'get', $params);
+    $result3 = $membership3['values'][$membershipID3];
+    $this->assertEquals($result3['contact_id'], $contactId3);
+    $this->assertEquals($result3['status_id'], $newMembershipId);
   }
 
   /**
@@ -722,6 +767,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * This add a test for https://issues.civicrm.org/jira/browse/CRM-4213 in the hope of removing
    * the buggy fix for that without a resurgence.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -800,33 +846,12 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   ///////////////// civicrm_membership_create methods
 
   /**
-   * Test dates are calculated for pending membership.
+   * Test civicrm_contact_memberships_create with empty params.
+   * Error expected.
    */
-  public function testCreatePending(): void {
-    $membership = $this->callAPISuccess('Membership', 'create', [
-      'contact_id' => $this->individualCreate(),
-      'membership_type_id' => 'General',
-      'status_id' => 'Pending',
-      'sequential' => 1,
-    ])['values'][0];
-    $this->assertEquals(date('Ymd'), $membership['start_date']);
-    $this->assertEquals(date('Ymd', strtotime('+1 year -1 day')), $membership['end_date']);
-  }
-
-  /**
-   * Test dates are calculated for pending membership.
-   */
-  public function testCreatePendingWithSkipStatusCalc(): void {
-    $membership = $this->callAPISuccess('Membership', 'create', [
-      'contact_id' => $this->individualCreate(),
-      'membership_type_id' => 'General',
-      'status_id' => 'Pending',
-      'sequential' => 1,
-      'skipStatusCal' => TRUE,
-    ])['values'][0];
-    $this->assertEquals(date('Ymd'), $membership['start_date']);
-    $this->assertEquals(date('Ymd'), $membership['join_date']);
-    $this->assertEquals(date('Ymd', strtotime('+1 year -1 day')), $membership['end_date']);
+  public function testCreateWithEmptyParams() {
+    $params = [];
+    $this->callAPIFailure('membership', 'create', $params);
   }
 
   /**
@@ -890,6 +915,23 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     );
   }
 
+  public function testMembershipCreateWithInvalidStatus() {
+    $params = $this->_params;
+    $params['status_id'] = 999;
+    $this->callAPIFailure('membership', 'create', $params,
+      "'999' is not a valid option for field status_id"
+    );
+  }
+
+  public function testMembershipCreateWithInvalidType() {
+    $params = $this->_params;
+    $params['membership_type_id'] = 999;
+
+    $this->callAPIFailure('membership', 'create', $params,
+      "'999' is not a valid option for field membership_type_id"
+    );
+  }
+
   /**
    * Check with complete array + custom field
    * Note that the test is written on purpose without any
@@ -940,11 +982,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   /**
    * Test civicrm_contact_memberships_create with membership id (edit
    * membership).
-   *
-   * @dataProvider versionThreeAndFour
+   * success expected.
    */
-  public function testMembershipCreateWithId($version): void {
-    $this->_apiversion = $version;
+  public function testMembershipCreateWithId() {
     $membershipID = $this->contactMembershipCreate($this->_params);
     $params = [
       'id' => $membershipID,
@@ -1233,7 +1273,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     unset($this->_params['join_date'], $this->_params['is_override']);
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $result = $this->callAPISuccess($this->_entity, 'getsingle', ['id' => $result['id']]);
-    $this->assertEquals(date('Y-m-d'), $result['join_date']);
+    $this->assertEquals(date('Y-m-d', strtotime('now')), $result['join_date']);
     $this->assertEquals('2009-01-21', $result['start_date']);
     $this->assertEquals('2009-12-21', $result['end_date']);
   }
@@ -1284,7 +1324,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   /**
    * CRM-18503 - Test membership join date is correctly set for fixed memberships.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
    */
   public function testMembershipJoinDateFixed() {
     $memStatus = CRM_Member_PseudoConstant::membershipStatus();

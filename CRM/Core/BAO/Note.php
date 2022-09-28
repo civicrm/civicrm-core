@@ -18,7 +18,7 @@
 /**
  * BAO object for crm_note table.
  */
-class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInterface {
+class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   use CRM_Core_DynamicFKAccessTrait;
 
   /**
@@ -26,6 +26,24 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
    * @var int
    */
   const MAX_NOTES = 3;
+
+  /**
+   * Given a note id, retrieve the note text.
+   *
+   * @param int $id
+   *   Id of the note to retrieve.
+   *
+   * @return string
+   *   the note text or NULL if note not found
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @deprecated
+   */
+  public static function getNoteText($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('unused function');
+    return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Note', $id, 'note');
+  }
 
   /**
    * Given a note id, retrieve the note subject
@@ -219,7 +237,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
    *
    * @return array
    */
-  public static function &getValues($params, &$values, $numNotes = self::MAX_NOTES) {
+  public static function &getValues(&$params, &$values, $numNotes = self::MAX_NOTES) {
     if (empty($params)) {
       return NULL;
     }
@@ -253,33 +271,52 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
   }
 
   /**
-   * Event fired prior to modifying a Note.
-   * @param \Civi\Core\Event\PreEvent $event
-   */
-  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
-    if ($event->action === 'delete' && $event->id) {
-      // When deleting a note, also delete child notes
-      // This causes recursion as this hook is called again while deleting child notes,
-      // So the children of children, etc. will also be deleted.
-      foreach (self::getDescendentIds($event->id) as $child) {
-        self::deleteRecord(['id' => $child]);
-      }
-    }
-  }
-
-  /**
    * Delete the notes.
    *
    * @param int $id
+   *   Note id.
+   * @param bool $showStatus
+   *   Do we need to set status or not.
    *
-   * @deprecated
-   * @return int
+   * @return int|null
+   *   no of deleted notes on success, null otherwise
    */
-  public static function del($id) {
-    // CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    self::deleteRecord(['id' => $id]);
+  public static function del($id, $showStatus = TRUE) {
+    $return = NULL;
+    $recent = array($id);
+    $note = new CRM_Core_DAO_Note();
+    $note->id = $id;
+    $note->find();
+    $note->fetch();
+    if ($note->entity_table == 'civicrm_note') {
+      $status = ts('Selected Comment has been deleted successfully.');
+    }
+    else {
+      $status = ts('Selected Note has been deleted successfully.');
+    }
 
-    return 1;
+    // Delete all descendents of this Note
+    foreach (self::getDescendentIds($id) as $childId) {
+      $childNote = new CRM_Core_DAO_Note();
+      $childNote->id = $childId;
+      $childNote->delete();
+      $recent[] = $childId;
+    }
+
+    $return = $note->delete();
+    if ($showStatus) {
+      CRM_Core_Session::setStatus($status, ts('Deleted'), 'success');
+    }
+
+    // delete the recently created Note
+    foreach ($recent as $recentId) {
+      $noteRecent = array(
+        'id' => $recentId,
+        'type' => 'Note',
+      );
+      CRM_Utils_Recent::del($noteRecent);
+    }
+    return $return;
   }
 
   /**
@@ -472,21 +509,26 @@ ORDER BY  modified_date desc";
   }
 
   /**
-   * Get direct children of given parentId note
+   * Given a note id, get a list of the ids of all notes that are descendents of that note
    *
    * @param int $parentId
+   *   Id of the given note.
+   * @param array $ids
+   *   (reference) one-dimensional array to store found descendent ids.
    *
    * @return array
-   *   One-dimensional array containing ids of child notes
+   *   One-dimensional array containing ids of all desendent notes
    */
-  public static function getDescendentIds($parentId) {
-    $ids = [];
+  public static function getDescendentIds($parentId, &$ids = []) {
+    // get direct children of given parentId note
     $note = new CRM_Core_DAO_Note();
     $note->entity_table = 'civicrm_note';
     $note->entity_id = $parentId;
     $note->find();
     while ($note->fetch()) {
+      // foreach child, add to ids list, and recurse
       $ids[] = $note->id;
+      self::getDescendentIds($note->id, $ids);
     }
     return $ids;
   }
@@ -519,7 +561,7 @@ WHERE participant.contact_id = %1 AND  note.entity_table = 'civicrm_participant'
 
     $contactNoteId = CRM_Core_DAO::executeQuery($contactQuery, $params);
     while ($contactNoteId->fetch()) {
-      self::deleteRecord(['id' => $contactNoteId->id]);
+      self::del($contactNoteId->id, FALSE);
     }
   }
 

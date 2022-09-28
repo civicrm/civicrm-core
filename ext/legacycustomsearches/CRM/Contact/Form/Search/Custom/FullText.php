@@ -93,7 +93,7 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
     $formValues['table'] = $this->getFieldValue($formValues, 'table', 'String');
     $this->_table = $formValues['table'];
 
-    $formValues['text'] = trim($this->getFieldValue($formValues, 'text', 'String', '') ?? '');
+    $formValues['text'] = trim($this->getFieldValue($formValues, 'text', 'String', ''));
     $this->_text = $formValues['text'];
 
     if (!$this->_table) {
@@ -308,7 +308,7 @@ WHERE      t.table_name = 'Activity' AND
       }
     }
 
-    $form->add('select', 'table', ts('in...'), $tables);
+    $form->add('select', 'table', ts('Tables'), $tables);
 
     $form->assign('csID', $form->get('csid'));
 
@@ -517,6 +517,15 @@ FROM   {$this->_tableName} contact_a
    * @param $row
    */
   public function alterRow(&$row) {
+  }
+
+  /**
+   * @param $title
+   */
+  public function setTitle($title) {
+    if ($title) {
+      CRM_Utils_System::setTitle($title);
+    }
   }
 
   /**

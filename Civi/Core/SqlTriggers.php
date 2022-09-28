@@ -14,11 +14,10 @@ namespace Civi\Core;
 /**
  * Class SqlTriggers
  * @package Civi\Core
- * @service sql_triggers
  *
  * This class manages creation and destruction of SQL triggers.
  */
-class SqlTriggers extends \Civi\Core\Service\AutoService {
+class SqlTriggers {
 
   /**
    * The name of the output file.
@@ -119,10 +118,9 @@ class SqlTriggers extends \Civi\Core\Service\AutoService {
             $template_values,
             $value['sql']
           );
-          // @todo See https://github.com/civicrm/civicrm-core/pull/23926#discussion_r912298758. It's not clear 'variables' is used anywhere, and isn't documented or unit tested.
           $variables = str_replace($template_params,
             $template_values,
-            $value['variables'] ?? ''
+            \CRM_Utils_Array::value('variables', $value)
           );
 
           if (!isset($triggers[$tableName][$eventName])) {

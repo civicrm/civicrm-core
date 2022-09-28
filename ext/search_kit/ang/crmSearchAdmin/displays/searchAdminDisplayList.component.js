@@ -11,7 +11,7 @@
       parent: '^crmSearchAdminDisplay'
     },
     templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayList.html',
-    controller: function($scope, searchMeta) {
+    controller: function($scope) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
@@ -35,14 +35,10 @@
           ctrl.display.settings = {
             style: 'ul',
             limit: CRM.crmSearchAdmin.defaultPagerSize,
-            sort: [],
-            pager: {}
+            pager: true
           };
-          if (searchMeta.getEntity(ctrl.apiEntity).order_by) {
-            ctrl.display.settings.sort.push([searchMeta.getEntity(ctrl.apiEntity).order_by, 'ASC']);
-          }
         }
-        ctrl.parent.initColumns({});
+        ctrl.parent.initColumns({key: true, dataType: true, type: 'field'});
       };
 
     }

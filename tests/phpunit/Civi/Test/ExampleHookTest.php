@@ -2,7 +2,6 @@
 namespace Civi\Test;
 
 use Civi\Angular\Page\Main;
-use PHPUnit\Framework\TestCase;
 
 /**
  * This is an example of a barebones test which implements `HookInterface`. Methods are automatically scanned to
@@ -18,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @group headless
  */
-class ExampleHookTest extends TestCase implements HeadlessInterface, HookInterface {
+class ExampleHookTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface {
 
   /**
    * @var \CRM_Contact_DAO_Contact
@@ -32,7 +31,6 @@ class ExampleHookTest extends TestCase implements HeadlessInterface, HookInterfa
   }
 
   protected function setUp(): void {
-    parent::setUp();
     $this->contact = \CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact', [
       'contact_type' => 'Individual',
     ]);
@@ -43,7 +41,6 @@ class ExampleHookTest extends TestCase implements HeadlessInterface, HookInterfa
 
   protected function tearDown(): void {
     $this->contact->delete();
-    parent::tearDown();
   }
 
   /**
@@ -82,23 +79,16 @@ class ExampleHookTest extends TestCase implements HeadlessInterface, HookInterfa
     $this->tracker['civi.api.prepare'][__FUNCTION__] = TRUE;
   }
 
-  /**
-   * Basic run test.
-   */
-  public function testPageOutput(): void {
+  public function testPageOutput() {
     ob_start();
     $p = new Main();
     $p->run();
-    $content = ob_get_clean();
+    $content = ob_get_contents();
+    ob_end_clean();
     $this->assertRegExp('; hook_civicrm_alterContent on_hook_civicrm_alterContent;', $content);
   }
 
-  /**
-   * Test getfields calls hooks.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testGetFields(): void {
+  public function testGetFields() {
     $this->assertEquals([], $this->tracker['civi.api.resolve']);
     $this->assertEquals([], $this->tracker['civi.api.prepare']);
     \civicrm_api3('Contact', 'getfields', []);

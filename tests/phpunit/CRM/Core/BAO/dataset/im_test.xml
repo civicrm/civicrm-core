@@ -2,7 +2,6 @@
 <dataset>
   <civicrm_contact
     id = '69'
-    contact_type = 'Individual'
   />
   <civicrm_im
     contact_id       = '69'

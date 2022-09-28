@@ -3,7 +3,6 @@
 
   angular.module('crmSearchAdmin').component('crmSearchFunction', {
     bindings: {
-      mode: '@',
       expr: '='
     },
     require: {
@@ -22,167 +21,77 @@
         string: ts('Text')
       };
 
-      this.exprTypes = {
-        SqlField: {label: ts('Field'), type: 'field'},
-        SqlString: {label: ts('Text'), type: 'string'},
-        SqlNumber: {label: ts('Number'), type: 'number'},
-      };
-
-      this.$onInit = function() {
-        var info = searchMeta.parseExpr(ctrl.expr);
-        ctrl.fieldArg = _.findWhere(info.args, {type: 'field'});
-        ctrl.args = info.args;
-        ctrl.fn = info.fn;
-        ctrl.fnName = !info.fn ? '' : info.fn.name;
+      $scope.$watch('$ctrl.expr', function(expr) {
+        var fieldInfo = searchMeta.parseExpr(expr);
+        ctrl.path = fieldInfo.path + fieldInfo.suffix;
+        ctrl.field = [fieldInfo.field];
+        ctrl.fn = !fieldInfo.fn ? '' : fieldInfo.fn.name;
+        ctrl.modifier = fieldInfo.modifier || null;
         initFunction();
-      };
-
-      // Watch if field is switched
-      $scope.$watch('$ctrl.expr', function(newExpr, oldExpr) {
-        if (oldExpr && newExpr && newExpr.indexOf('(') < 0) {
-          ctrl.$onInit();
-        }
       });
 
-      this.addArg = function(exprType) {
-        var param = ctrl.getParam(ctrl.args.length);
-        ctrl.args.push({
-          type: ctrl.exprTypes[exprType].type,
-          flag_before: _.filter(_.keys(param.flag_before))[0],
-          name: param.name,
-          value: exprType === 'SqlNumber' ? 0 : ''
-        });
-      };
-
       function initFunction() {
-        if (!ctrl.fn) {
-          return;
+        ctrl.fnInfo = _.find(CRM.crmSearchAdmin.functions, {name: ctrl.fn});
+        if (ctrl.fnInfo && ctrl.fnInfo.params[0] && !_.isEmpty(ctrl.fnInfo.params[0].flag_before)) {
+          ctrl.modifierName = _.keys(ctrl.fnInfo.params[0].flag_before)[0];
+          ctrl.modifierLabel = ctrl.fnInfo.params[0].flag_before[ctrl.modifierName];
         }
-        // Push args to reach the minimum
-        _.each(ctrl.fn.params, function(param, index) {
-          while (
-            (ctrl.args.length - index < param.min_expr) &&
-            // TODO: Handle named params like "ORDER BY"
-            !(param.name && param.optional) &&
-            (!param.optional || param.must_be.length === 1)
-          ) {
-            ctrl.addArg(param.must_be[0]);
-          }
-        });
+        else {
+          ctrl.modifierName = null;
+          ctrl.modifier = null;
+        }
       }
-
-      this.getParam = function(index) {
-        if (ctrl.fn) {
-          return ctrl.fn.params[index] || _.last(ctrl.fn.params);
-        }
-      };
-
-      this.canAddArg = function() {
-        if (!ctrl.fn) {
-          return false;
-        }
-        var param = ctrl.getParam(ctrl.args.length),
-          index = ctrl.fn.params.indexOf(param);
-        // TODO: Handle optional named params like "ORDER BY"
-        if (param.name && param.optional) {
-          return false;
-        }
-        return ctrl.args.length - index < param.max_expr;
-      };
 
       // On-demand options for dropdown function selector
       this.getFunctions = function() {
         var allowedTypes = [], functions = [];
-        if (ctrl.expr && ctrl.fieldArg) {
-          if (ctrl.mode !== 'groupBy' && ctrl.crmSearchAdmin.canAggregate(ctrl.expr)) {
+        if (ctrl.expr && ctrl.field) {
+          if (ctrl.crmSearchAdmin.canAggregate(ctrl.expr)) {
             allowedTypes.push('aggregate');
           } else {
             allowedTypes.push('comparison', 'string');
-            if (_.includes(['Integer', 'Float', 'Date', 'Timestamp', 'Money'], ctrl.fieldArg.field.data_type)) {
+            if (_.includes(['Integer', 'Float', 'Date', 'Timestamp'], ctrl.field[0].data_type)) {
               allowedTypes.push('math');
             }
-            if (_.includes(['Date', 'Timestamp'], ctrl.fieldArg.field.data_type)) {
+            if (_.includes(['Date', 'Timestamp'], ctrl.field[0].data_type)) {
               allowedTypes.push('date');
             }
           }
           _.each(allowedTypes, function(type) {
             var allowedFunctions = _.filter(CRM.crmSearchAdmin.functions, function(fn) {
-              return fn.category === type && fn.params.length;
+              return fn.category === type &&
+                fn.params.length &&
+                // For now, only support functions that take a single field
+                fn.params[0].min_expr === 1 &&
+                fn.params[0].max_expr === 1 &&
+                !_.includes(fn.params[0].cant_be, 'SqlField') &&
+                (!fn.params[0].must_be.length || _.includes(fn.params[0].must_be, 'SqlField'));
             });
             functions.push({
               text: allTypes[type],
-              children: formatForSelect2(allowedFunctions, 'name', 'title', ['description'])
+              children: formatForSelect2(allowedFunctions, 'name', 'title')
             });
           });
         }
         return {results: functions};
       };
 
-      this.getFields = function() {
-        return {
-          results: ctrl.crmSearchAdmin.getAllFields(':label', ['Field', 'Custom', 'Extra'])
-        };
-      };
-
       this.selectFunction = function() {
-        ctrl.fn = _.find(CRM.crmSearchAdmin.functions, {name: ctrl.fnName});
-        ctrl.args = [ctrl.fieldArg];
-        if (ctrl.fn) {
-          var exprType,
-            pos = 0;
-          // Add non-field args to the beginning if needed
-          while (!_.includes(ctrl.fn.params[pos].must_be, 'SqlField')) {
-            exprType = _.first(ctrl.fn.params[pos].must_be);
-            ctrl.args.splice(pos, 0, {
-              type: exprType ? ctrl.exprTypes[exprType].type : null,
-              flag_before: _.filter(_.keys(ctrl.fn.params[pos].flag_before))[0],
-              name: ctrl.fn.params[pos].name,
-              value: exprType === 'SqlNumber' ? 0 : ''
-            });
-            ++pos;
-          }
-          // Update fieldArg
-          var fieldParam = ctrl.fn.params[pos];
-          ctrl.fieldArg.flag_before = _.keys(fieldParam.flag_before)[0];
-          ctrl.fieldArg.name = fieldParam.name;
-          initFunction();
-        }
         ctrl.writeExpr();
       };
 
-      this.changeArg = function(index) {
-        var val = ctrl.args[index].value;
-        // Delete empty value
-        if (index && !val && ctrl.args.length > ctrl.fn.params[0].min_expr) {
-          ctrl.args.splice(index, 1);
-        }
+      this.toggleModifier = function() {
+        ctrl.modifier = ctrl.modifier ? null : ctrl. modifierName;
         ctrl.writeExpr();
       };
 
       // Make a sql-friendly alias for this expression
       function makeAlias() {
-        var args = _.pluck(_.filter(_.filter(ctrl.args, 'value'), {type: 'field'}), 'value');
-        return (ctrl.fnName + '_' + args.join('_')).replace(/[.:]/g, '_');
+        return (ctrl.fn + '_' + (ctrl.modifier ? ctrl.modifier + '_' : '') + ctrl.path).replace(/[.:]/g, '_');
       }
 
       this.writeExpr = function() {
-        if (ctrl.fnName) {
-          var args = _.transform(ctrl.args, function(args, arg, index) {
-            if (arg.value || arg.flag_before) {
-              var prefix = arg.flag_before || arg.name ? (index ? ' ' : '') + (arg.flag_before || arg.name) + (arg.value ? ' ' : '') : (index ? ', ' : '');
-              args.push(prefix + (arg.type === 'string' ? JSON.stringify(arg.value) : arg.value));
-            }
-          });
-          // Replace fake function "e"
-          ctrl.expr = (ctrl.fnName === 'e' ? '' : ctrl.fnName) + '(';
-          ctrl.expr += args.join('');
-          ctrl.expr += ')';
-          if (ctrl.mode === 'select') {
-            ctrl.expr += ' AS ' + makeAlias();
-          }
-        } else {
-          ctrl.expr = ctrl.args[0].value;
-        }
+        ctrl.expr = ctrl.fn ? (ctrl.fn + '(' + (ctrl.modifier ? ctrl.modifier + ' ' : '') + ctrl.path + ') AS ' + makeAlias()) : ctrl.path;
       };
     }
   });

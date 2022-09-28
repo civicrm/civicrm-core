@@ -21,7 +21,7 @@
  * @param array $params
  *
  * @return array
- * @throws \CRM_Core_Exception
+ * @throws \API_Exception
  */
 function civicrm_api3_message_template_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'MessageTemplate');
@@ -84,7 +84,7 @@ function civicrm_api3_message_template_get($params) {
  *
  * @param array $params
  *
- * @throws CRM_Core_Exception
+ * @throws API_Exception
  * @throws \CRM_Core_Exception
  */
 function civicrm_api3_message_template_send($params) {
@@ -93,27 +93,18 @@ function civicrm_api3_message_template_send($params) {
   _civicrm_api3_message_template_send_spec($fieldSpec);
 
   foreach ($fieldSpec as $field => $spec) {
-    // There is some dark magic going on here.
-    // The point of the 'api.aliases' metadata is generally
-    // to ensure that old params can be passed in and they still work.
-    // However, in this case the api params don't match the BAO
-    // params so the names that have been determined as
-    // 'right' for the api are being transformed into
-    // the 'wrong' BAO ones. It works, it's tested &
-    // we can do better in apiv4 once we get a suitable
-    // api there.
-    if ($spec['name'] !== 'workflow' && isset($spec['api.aliases']) && array_key_exists($field, $params)) {
+    if (isset($spec['api.aliases']) && array_key_exists($field, $params)) {
       $params[CRM_Utils_Array::first($spec['api.aliases'])] = $params[$field];
       unset($params[$field]);
     }
   }
   if (empty($params['messageTemplateID'])) {
-    if (empty($params['workflow'])) {
+    if (empty($params['valueName'])) {
       // Can't use civicrm_api3_verify_mandatory for this because it would give the wrong field names
-      throw new CRM_Core_Exception(
-        'Mandatory key(s) missing from params array: requires id or workflow',
+      throw new API_Exception(
+        'Mandatory key(s) missing from params array: requires id or option_value_name',
         'mandatory_missing',
-        ['fields' => ['id', 'workflow']]
+        ['fields' => ['id', 'option_value_name']]
       );
     }
   }
@@ -135,11 +126,10 @@ function _civicrm_api3_message_template_send_spec(&$params) {
   $params['id']['api.aliases'] = ['messageTemplateID', 'message_template_id'];
   $params['id']['type'] = CRM_Utils_Type::T_INT;
 
-  $params['workflow']['description'] = 'option value name of the template (required if no id supplied)';
-  $params['workflow']['title'] = ts('Workflow');
-  $params['workflow']['api.aliases'] = ['option_value_name', 'valueName'];
-  $params['workflow']['type'] = CRM_Utils_Type::T_STRING;
-  $params['workflow']['name'] = 'workflow';
+  $params['option_value_name']['description'] = 'option value name of the template (required if no id supplied)';
+  $params['option_value_name']['title'] = 'Option Value Name';
+  $params['option_value_name']['api.aliases'] = ['valueName'];
+  $params['option_value_name']['type'] = CRM_Utils_Type::T_STRING;
 
   $params['contact_id']['description'] = 'contact id if contact tokens are to be replaced';
   $params['contact_id']['title'] = 'Contact ID';

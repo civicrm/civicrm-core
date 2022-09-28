@@ -18,23 +18,30 @@
 /**
  * Class CRM_Campaign_BAO_Survey.
  */
-class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey implements Civi\Core\HookInterface {
+class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
 
   /**
-   * Retrieve DB object and copy to defaults array.
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
-   *   Array of criteria values.
+   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   Array to be populated with found values.
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return self|null
-   *   The DAO object, if found.
-   *
-   * @deprecated
+   * @return CRM_Campaign_DAO_Survey|null
    */
-  public static function retrieve($params, &$defaults) {
-    return self::commonRetrieve(self::class, $params, $defaults);
+  public static function retrieve(&$params, &$defaults) {
+    $dao = new CRM_Campaign_DAO_Survey();
+
+    $dao->copyValues($params);
+
+    if ($dao->find(TRUE)) {
+      CRM_Core_DAO::storeValues($dao, $defaults);
+      return $dao;
+    }
+    return NULL;
   }
 
   /**
@@ -67,6 +74,9 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey implements Civi\Co
 
     $dao = self::writeRecord($params);
 
+    if (!empty($params['custom']) && is_array($params['custom'])) {
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_survey', $dao->id);
+    }
     return $dao;
   }
 
@@ -356,31 +366,24 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * Delete a survey.
+   * Delete the survey.
    *
    * @param int $id
-   * @deprecated
+   *   Survey id.
+   *
    * @return mixed|null
    */
   public static function del($id) {
     if (!$id) {
       return NULL;
     }
-    self::deleteRecord(['id' => $id]);
-    return 1;
-  }
-
-  /**
-   * Event fired prior to modifying a Survey.
-   * @param \Civi\Core\Event\PreEvent $event
-   */
-  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
-    if ($event->action === 'delete' && $event->id) {
-      $reportId = self::getReportID($event->id);
-      if ($reportId) {
-        CRM_Report_BAO_ReportInstance::deleteRecord(['id' => $reportId]);
-      }
+    $reportId = CRM_Campaign_BAO_Survey::getReportID($id);
+    if ($reportId) {
+      CRM_Report_BAO_ReportInstance::del($reportId);
     }
+    $dao = new CRM_Campaign_DAO_Survey();
+    $dao->id = $id;
+    return $dao->delete();
   }
 
   /**
@@ -542,8 +545,8 @@ INNER JOIN  civicrm_activity_contact activityAssignment
    * @param array $voterIds
    * @param bool $onlyCount
    *
-   * @return array|int
-   *   An array of survey activity, or an int if $onlyCount is set to TRUE
+   * @return array
+   *   An array of survey activity.
    */
   public static function getSurveyActivities(
     $surveyId,

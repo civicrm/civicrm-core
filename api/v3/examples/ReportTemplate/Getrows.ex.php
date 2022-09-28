@@ -1,9 +1,4 @@
 <?php
-
-/**
- * @file
- */
-
 /**
  * Test Generated example demonstrating the ReportTemplate.getrows API.
  *
@@ -23,10 +18,10 @@ function report_template_getrows_example() {
     ],
   ];
 
-  try {
+  try{
     $result = civicrm_api3('ReportTemplate', 'getrows', $params);
   }
-  catch (CRM_Core_Exception $e) {
+  catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
@@ -63,7 +58,6 @@ function report_template_getrows_expectedresult() {
         'civicrm_mailing_mailing_subject' => 'Hello again, {contact.display_name}',
         'civicrm_mailing_event_opened_id' => '17',
         'civicrm_mailing_event_opened_time_stamp' => '2011-05-26 13:23:22',
-        'class' => '',
         'civicrm_contact_sort_name_link' => '/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=102',
         'civicrm_contact_sort_name_hover' => 'View Contact details for this contact.',
       ],
@@ -75,7 +69,6 @@ function report_template_getrows_expectedresult() {
         'civicrm_mailing_mailing_subject' => 'Hello {contact.display_name}',
         'civicrm_mailing_event_opened_id' => '9',
         'civicrm_mailing_event_opened_time_stamp' => '2011-05-26 13:19:03',
-        'class' => '',
         'civicrm_contact_sort_name_link' => '/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=109',
         'civicrm_contact_sort_name_hover' => 'View Contact details for this contact.',
       ],
@@ -87,7 +80,6 @@ function report_template_getrows_expectedresult() {
         'civicrm_mailing_mailing_subject' => 'Hello {contact.display_name}',
         'civicrm_mailing_event_opened_id' => '5',
         'civicrm_mailing_event_opened_time_stamp' => '2011-05-26 13:17:54',
-        'class' => '',
         'civicrm_contact_sort_name_link' => '/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=110',
         'civicrm_contact_sort_name_hover' => 'View Contact details for this contact.',
       ],
@@ -99,7 +91,6 @@ function report_template_getrows_expectedresult() {
         'civicrm_mailing_mailing_subject' => 'Hello {contact.display_name}',
         'civicrm_mailing_event_opened_id' => '15',
         'civicrm_mailing_event_opened_time_stamp' => '2011-05-26 13:20:59',
-        'class' => '',
         'civicrm_contact_sort_name_link' => '/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=111',
         'civicrm_contact_sort_name_hover' => 'View Contact details for this contact.',
       ],
@@ -111,7 +102,6 @@ function report_template_getrows_expectedresult() {
         'civicrm_mailing_mailing_subject' => 'Hello {contact.display_name}',
         'civicrm_mailing_event_opened_id' => '11',
         'civicrm_mailing_event_opened_time_stamp' => '2011-05-26 13:19:44',
-        'class' => '',
         'civicrm_contact_sort_name_link' => '/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=112',
         'civicrm_contact_sort_name_hover' => 'View Contact details for this contact.',
       ],
@@ -131,23 +121,23 @@ function report_template_getrows_expectedresult() {
 }
 
 /*
- * This example has been generated from the API test suite.
- * The test that created it is called "testReportTemplateGetRowsMailingUniqueOpened"
- * and can be found at:
- * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ReportTemplateTest.php
- *
- * You can see the outcome of the API tests at
- * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
- *
- * To Learn about the API read
- * https://docs.civicrm.org/dev/en/latest/api/
- *
- * Browse the API on your own site with the API Explorer. It is in the main
- * CiviCRM menu, under: Support > Development > API Explorer.
- *
- * Read more about testing here
- * https://docs.civicrm.org/dev/en/latest/testing/
- *
- * API Standards documentation:
- * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
- */
+* This example has been generated from the API test suite.
+* The test that created it is called "testReportTemplateGetRowsMailingUniqueOpened"
+* and can be found at:
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ReportTemplateTest.php
+*
+* You can see the outcome of the API tests at
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+*
+* To Learn about the API read
+* https://docs.civicrm.org/dev/en/latest/api/
+*
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
+*
+* Read more about testing here
+* https://docs.civicrm.org/dev/en/latest/testing/
+*
+* API Standards documentation:
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+*/

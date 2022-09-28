@@ -36,15 +36,8 @@
       // select, checkbox, radio, date fields, text, textarea, multi-select
       // wysiwyg editor, advanced multi-select ( to do )
       if ( elementType == 'radio' ) {
-        var firstElementId    = $('.crm-copy-fields tr:first-child [name^="field["][name*="[' + fname +']"][type!=hidden]');
-        firstElementValue = firstElementId.filter(':checked').eq(0).val();
-        // if radio button is uncheck then unset all the fields.
-        if (typeof firstElementValue == 'undefined') {
-          elementId.prop("checked", false).change().siblings('a.crm-clear-link').trigger('click');
-        }
-        else {
-          elementId.filter("[value='" + firstElementValue + "']").prop("checked", true).change();
-        }
+        firstElementValue = elementId.filter(':checked').eq(0).val();
+        elementId.filter("[value='" + firstElementValue + "']").prop("checked",true).change();
       }
       else if ( elementType == 'checkbox' ) {
         // handle checkbox

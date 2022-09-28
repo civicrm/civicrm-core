@@ -6,7 +6,6 @@
       <th>{{:: ts('Open') }}</th>
       <th>{{:: ts('Text') }}</th>
       <th>{{:: ts('Link') }}</th>
-      <th>{{:: ts('Show if') }}</th>
       <th>{{:: ts('Style') }}</th>
       <th class="crm-search-admin-icon-col"></th>
     </tr>
@@ -33,21 +32,7 @@
         <crm-search-admin-token-select model="item" field="text" suffix=":label"></crm-search-admin-token-select>
       </td>
       <td class="form-inline">
-        <crm-search-admin-link-select api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" link="item" links="$ctrl.links" on-change="$ctrl.onChangeLink(item, newLink)"></crm-search-admin-link-select>
-      </td>
-      <td class="form-inline">
-        <input ng-model="item.condition[0]" crm-ui-select="{placeholder: item.action ? ts('Allowed') : ts('Always'), data: $ctrl.fields}" ng-change="$ctrl.onChangeCondition(item)">
-        <div class="form-group" ng-if="item.condition[0] === 'check user permission'">
-          <select class="form-control api4-operator" ng-model="item.condition[1]" ng-options="o.key as o.value for o in $ctrl.permissionOperators"></select>
-          <input class="form-control" crm-ui-select="{data: $ctrl.permissions}" ng-model="item.condition[2]">
-        </div>
-        <crm-search-condition class="form-group"
-          ng-if="item.condition[0] && item.condition[0] !== 'check user permission'"
-          clause="item.condition"
-          field="$ctrl.getField(item.condition[0])"
-          offset="1"
-          option-key="'name'">
-        </crm-search-condition>
+        <crm-search-admin-link-select api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" link="item" links="$ctrl.links" on-change="$ctrl.onChangeLink(item, before, after)"></crm-search-admin-link-select>
       </td>
       <td>
         <div class="btn-group">
@@ -75,10 +60,10 @@
           <option value="">
             + {{:: ts('Add...') }}
           </option>
-          <option ng-repeat="link in $ctrl.links" value="{{:: $ctrl.serialize(link) }}">
-            {{ link.text }}
+          <option ng-repeat="link in $ctrl.links" value="{{ link.path }}">
+            {{ link.title }}
           </option>
-          <option value="{{:: $ctrl.default }}">
+          <option value="civicrm/">
             {{:: ts('Other...') }}
           </option>
         </select>

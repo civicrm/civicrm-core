@@ -245,7 +245,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   public function testFindById() {
     $params = $this->sampleContact('Individual', 4);
     $existing_contact = $this->callAPISuccess('Contact', 'create', $params);
-    /** @var CRM_Contact_DAO_Contact $contact */
+    /* @var CRM_Contact_DAO_Contact $contact */
     $contact = CRM_Contact_BAO_Contact::findById($existing_contact['id']);
     $this->assertEquals($existing_contact['id'], $contact->id);
     $deleted_contact_id = $existing_contact['id'];
@@ -407,9 +407,6 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     ];
     $daoInfo = new ReflectionClass('CRM_Core_DAO');
     foreach ($daoInfo->getConstants() as $constant => $val) {
-      if ($constant === 'SERIALIZE_NONE') {
-        continue;
-      }
       if ($constant === 'SERIALIZE_JSON' || $constant === 'SERIALIZE_PHP') {
         $constants[] = [$val, array_merge($simpleData, $complexData)];
       }

@@ -15,8 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Api4\Product;
-
 /**
  * This class generates form components for Premiums.
  */
@@ -37,7 +35,8 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     if ($this->_id) {
-      $tempDefaults = Product::get()->addWhere('id', '=', $this->_id)->execute()->first();
+      $params = ['id' => $this->_id];
+      CRM_Contribute_BAO_Product::retrieve($params, $tempDefaults);
       if (isset($tempDefaults['image']) && isset($tempDefaults['thumbnail'])) {
         $defaults['imageUrl'] = $tempDefaults['image'];
         $defaults['thumbnailUrl'] = $tempDefaults['thumbnail'];
@@ -63,7 +62,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   /**
    * Build the form object.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -116,7 +115,10 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
     $this->add('textarea', 'options', ts('Options'), ['cols' => 60, 'rows' => 3]);
 
-    $this->add('select', 'period_type', ts('Period Type'), CRM_Core_SelectValues::periodType(), FALSE, ['placeholder' => TRUE]);
+    $this->add('select', 'period_type', ts('Period Type'), [
+      'rolling' => 'Rolling',
+      'fixed' => 'Fixed',
+    ], FALSE, ['placeholder' => TRUE]);
 
     $this->add('text', 'fixed_period_start_day', ts('Fixed Period Start Day'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'fixed_period_start_day'));
 
@@ -289,10 +291,10 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->_processImages($params);
 
     // Save the premium product to database
-    $premium = Product::save()->addRecord($params)->execute()->first();
+    $premium = CRM_Contribute_BAO_Product::create($params);
 
     CRM_Core_Session::setStatus(
-      ts("The Premium '%1' has been saved.", [1 => $premium['name']]),
+      ts("The Premium '%1' has been saved.", [1 => $premium->name]),
       ts('Saved'), 'success');
   }
 

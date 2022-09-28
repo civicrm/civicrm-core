@@ -14,7 +14,6 @@ namespace Civi\Api4\Generic;
 
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Utils\CoreUtil;
-use Civi\Api4\Utils\ReflectionUtils;
 
 /**
  * Delete one or more $ENTITIES.
@@ -30,16 +29,14 @@ class DAODeleteAction extends AbstractBatchAction {
   public function _run(Result $result) {
     $defaults = $this->getParamDefaults();
     if ($defaults['where'] && $this->where === $defaults['where']) {
-      throw new \CRM_Core_Exception('Cannot delete ' . $this->getEntityName() . ' with no "where" parameter specified');
+      throw new \API_Exception('Cannot delete ' . $this->getEntityName() . ' with no "where" parameter specified');
     }
 
     $items = $this->getBatchRecords();
 
     if ($this->getCheckPermissions()) {
-      $idField = CoreUtil::getIdFieldName($this->getEntityName());
       foreach ($items as $key => $item) {
-        // Don't pass the entire item because only the id is a trusted value
-        if (!CoreUtil::checkAccessRecord($this, [$idField => $item[$idField]], \CRM_Core_Session::getLoggedInContactID() ?: 0)) {
+        if (!CoreUtil::checkAccessRecord($this, $item, \CRM_Core_Session::getLoggedInContactID() ?: 0)) {
           throw new UnauthorizedException("ACL check failed");
         }
         $items[$key]['check_permissions'] = TRUE;
@@ -53,32 +50,30 @@ class DAODeleteAction extends AbstractBatchAction {
   /**
    * @param $items
    * @return array
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   protected function deleteObjects($items) {
-    $idField = CoreUtil::getIdFieldName($this->getEntityName());
-    $result = [];
+    $ids = [];
     $baoName = $this->getBaoName();
 
-    // Use BAO::del() method if it is not deprecated
-    if (method_exists($baoName, 'del') && !ReflectionUtils::isMethodDeprecated($baoName, 'del')) {
+    if ($this->getEntityName() !== 'EntityTag' && method_exists($baoName, 'del')) {
       foreach ($items as $item) {
-        $args = [$item[$idField]];
+        $args = [$item['id']];
         $bao = call_user_func_array([$baoName, 'del'], $args);
         if ($bao !== FALSE) {
-          $result[] = [$idField => $item[$idField]];
+          $ids[] = ['id' => $item['id']];
         }
         else {
-          throw new \CRM_Core_Exception("Could not delete {$this->getEntityName()} $idField {$item[$idField]}");
+          throw new \API_Exception("Could not delete {$this->getEntityName()} id {$item['id']}");
         }
       }
     }
     else {
       foreach ($baoName::deleteRecords($items) as $instance) {
-        $result[] = [$idField => $instance->$idField];
+        $ids[] = ['id' => $instance->id];
       }
     }
-    return $result;
+    return $ids;
   }
 
 }

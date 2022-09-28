@@ -20,8 +20,6 @@
  */
 class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
 
-  use CRM_Contact_Form_Task_PDFTrait;
-
   /**
    * All the existing templates in the system.
    *
@@ -41,7 +39,7 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
   public function preProcess() {
 
     $this->skipOnHold = $this->skipDeceased = FALSE;
-    $this->preProcessPDF();
+    CRM_Contact_Form_Task_PDFLetterCommon::preProcess($this);
 
     // store case id if present
     $this->_caseId = CRM_Utils_Request::retrieve('caseid', 'CommaSeparatedIntegers', $this, FALSE);
@@ -58,11 +56,10 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
       // in search context 'id' is the default profile id for search display
       // CRM-11227
       $this->_activityId = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
-      $this->_contactIds = explode(',', $cid);
-      // put contact display name in title for single contact mode
-      if (count($this->_contactIds) === 1) {
-        CRM_Utils_System::setTitle(ts('Print/Merge Document for %1', [1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name')]));
-      }
+    }
+
+    if ($cid) {
+      CRM_Contact_Form_Task_PDFLetterCommon::preProcessSingle($this, $cid);
       $this->_single = TRUE;
     }
     else {
@@ -75,24 +72,30 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
    * Set default values for the form.
    */
   public function setDefaultValues() {
-    $defaults = $this->getPDFDefaultValues();
+    $defaults = [];
     if (isset($this->_activityId)) {
       $params = ['id' => $this->_activityId];
       CRM_Activity_BAO_Activity::retrieve($params, $defaults);
       $defaults['html_message'] = $defaults['details'] ?? NULL;
     }
+    $defaults = $defaults + CRM_Contact_Form_Task_PDFLetterCommon::setDefaultValues();
     return $defaults;
   }
 
   /**
    * Build the form object.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     //enable form element
     $this->assign('suppressForm', FALSE);
-    $this->addPDFElementsToForm();
+    CRM_Contact_Form_Task_PDFLetterCommon::buildQuickForm($this);
+  }
+
+  /**
+   * Process the form after the input has been submitted and validated.
+   */
+  public function postProcess() {
+    CRM_Contact_Form_Task_PDFLetterCommon::postProcess($this);
   }
 
   /**
@@ -108,28 +111,6 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
       $tokens += CRM_Core_SelectValues::caseTokens($caseTypeId);
     }
     return $tokens;
-  }
-
-  /**
-   * Get the rows from the results to be pdf-d.
-   *
-   * @todo the case handling should be in the case pdf task.
-   * It needs fixing to support standalone & some url fixes
-   *
-   * similar to https://github.com/civicrm/civicrm-core/pull/21688
-   *
-   * @return array
-   */
-  protected function getRows(): array {
-    $rows = [];
-    foreach ($this->_contactIds as $index => $contactID) {
-      $caseID = $this->getVar('_caseId');
-      if (empty($caseID) && !empty($this->_caseIds[$index])) {
-        $caseID = $this->_caseIds[$index];
-      }
-      $rows[] = ['contact_id' => $contactID, 'schema' => ['caseId' => $caseID, 'contactId' => $contactID]];
-    }
-    return $rows;
   }
 
 }

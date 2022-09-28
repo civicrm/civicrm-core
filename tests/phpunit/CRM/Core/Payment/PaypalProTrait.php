@@ -70,7 +70,7 @@ trait CRM_Core_Payment_PaypalProTrait {
    *
    * @param int|null $id
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function setupMockHandler($id = NULL) {
     if ($id) {
@@ -87,7 +87,7 @@ trait CRM_Core_Payment_PaypalProTrait {
   /**
    * Create an AuthorizeNet processors with a configured mock handler.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function createPaypalProProcessor() {
     $processorID = $this->paymentProcessorCreate(['is_test' => 0]);

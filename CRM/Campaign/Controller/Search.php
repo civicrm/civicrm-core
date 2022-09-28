@@ -33,7 +33,7 @@ class CRM_Campaign_Controller_Search extends CRM_Core_Controller {
   /**
    * Class constructor.
    *
-   * @param string $title
+   * @param null $title
    * @param bool|int $action
    * @param bool $modal
    */

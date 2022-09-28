@@ -1,10 +1,9 @@
 /* "fade-out" effect */
-.crm-export-field-selector-outer {
-  display: block;
+div.crm-export-field-selector-outer {
   position: relative;
   overflow-x: hidden;
 }
-.crm-export-field-selector-outer:after {
+div.crm-export-field-selector-outer:after {
   position: absolute;
   top: 0;
   right: 0;
@@ -14,21 +13,21 @@
   background-image: linear-gradient(to right, transparent, #efefe5);
 }
 table.crm-export-field-selector tbody tr {
-  background-color: #fafafa;
+  background-color: #FAFAFA;
 }
 table.crm-export-field-selector tbody tr:nth-child(odd) {
-  background-color: #efefef;
+  background-color: #EFEFEF;
 }
 table.crm-export-field-selector tfoot tr {
   background-color: white;
-  border-top: 2px solid #cfcec3;
+  border-top: 2px solid #CFCEC3;
 }
 table.crm-export-field-selector tfoot tr td > span {
   margin-left: 18px;
 }
 .crm-export-field-selector tbody td {
   cursor: move;
-  width: 18%;
+  width: 18%
 }
 .crm-export-field-selector tbody td:first-child {
   width: 28%;

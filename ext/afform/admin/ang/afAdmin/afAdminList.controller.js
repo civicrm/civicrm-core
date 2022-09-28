@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('afAdmin').controller('afAdminList', function($scope, afforms, crmApi4, crmStatus, afGui) {
+  angular.module('afAdmin').controller('afAdminList', function($scope, afforms, crmApi4, crmStatus) {
     var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
       ctrl = $scope.$ctrl = this;
     this.sortField = 'title';
@@ -36,18 +36,6 @@
       afforms[afform.type].push(afform);
     }, {});
 
-    // Load aggregated submission stats for each form
-    crmApi4('AfformSubmission', 'get', {
-      select: ['afform_name', 'MAX(submission_date) AS last_submission', 'COUNT(id) AS submission_count'],
-      groupBy: ['afform_name']
-    }).then(function(submissions) {
-      _.each(submissions, function(submission) {
-        var afform = _.findWhere(afforms, {name: submission.afform_name}) || {};
-        afform.last_submission = CRM.utils.formatDate(submission.last_submission);
-        afform.submission_count = submission.submission_count;
-      });
-    });
-
     // Change sort field/direction when clicking a column header
     this.sortBy = function(col) {
       ctrl.sortDir = ctrl.sortField === col ? !ctrl.sortDir : false;
@@ -57,26 +45,20 @@
     $scope.$bindToRoute({
       expr: '$ctrl.tab',
       param: 'tab',
-      format: 'raw'
+      format: 'raw',
+      default: ctrl.tabs[0].name
     });
 
-    if (!ctrl.tab) {
-      ctrl.tab = ctrl.tabs[0].name;
-    }
-
     this.createLinks = function() {
-      // Reset search input in dropdown
-      $scope.searchCreateLinks.label = '';
-      // A value means it's alredy loaded. Null means it's loading.
-      if ($scope.types[ctrl.tab].options || $scope.types[ctrl.tab].options === null) {
+      ctrl.searchCreateLinks = '';
+      if ($scope.types[ctrl.tab].options) {
         return;
       }
-      $scope.types[ctrl.tab].options = null;
       var links = [];
 
       if (ctrl.tab === 'form') {
         _.each(CRM.afGuiEditor.entities, function(entity, name) {
-          if (entity.type === 'primary') {
+          if (entity.defaults) {
             links.push({
               url: '#create/form/' + name,
               label: entity.label,
@@ -105,8 +87,17 @@
       }
 
       if (ctrl.tab === 'search') {
-        afGui.getAllSearchDisplays().then(function(links) {
-          $scope.types.search.options = links;
+        crmApi4('SearchDisplay', 'get', {
+          select: ['name', 'label', 'type:icon', 'saved_search.name', 'saved_search.label']
+        }).then(function(searchDisplays) {
+          _.each(searchDisplays, function(searchDisplay) {
+            links.push({
+              url: '#create/search/' + searchDisplay['saved_search.name'] + '.' + searchDisplay.name,
+              label: searchDisplay['saved_search.label'] + ': ' + searchDisplay.label,
+              icon: searchDisplay['type:icon']
+            });
+          });
+          $scope.types.search.options = _.sortBy(links, 'Label');
         });
       }
     };
@@ -118,7 +109,7 @@
         if (afform.has_base) {
           apiOps.push(['Afform', 'get', {
             where: [['name', '=', afform.name]],
-            select: ['name', 'title', 'type', 'is_public', 'server_route', 'has_local', 'has_base', 'base_module', 'base_module:label']
+            select: ['name', 'title', 'type', 'is_public', 'server_route', 'has_local', 'has_base']
           }, 0]);
         }
         var apiCall = crmStatus(

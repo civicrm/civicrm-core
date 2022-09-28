@@ -104,7 +104,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    *
    * @param $restrict
    * @param bool $skipPermission
-   * @param int[]|null $profileIds
+   * @param null $profileIds
    *
    * @param bool $isShowEmailTaskLink
    *
@@ -388,14 +388,11 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   }
 
   /**
-   * Check template file exists.
+   * @param string $suffix
    *
-   * @param string|null $suffix
-   *
-   * @return string|null
-   *   Template file path, else null
+   * @return null|string
    */
-  public function checkTemplateFileExists($suffix = NULL) {
+  public function checkTemplateFileExists($suffix = '') {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Page/{$this->_gid}/Dynamic.{$suffix}tpl";
       $template = CRM_Core_Page::getTemplate();
@@ -442,14 +439,14 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * @param string $email
    *
    * @return string
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function getLinkedEmail($email): string {
     if (!$email) {
       return '';
     }
-    $emailID = Email::get()->setOrderBy(['is_primary' => 'DESC'])->setWhere([['contact_id', '=', $this->_id], ['email', '=', $email], ['on_hold', '=', FALSE], ['contact_id.is_deceased', '=', FALSE], ['contact_id.is_deleted', '=', FALSE], ['contact_id.do_not_email', '=', FALSE]])->execute()->first()['id'];
+    $emailID = Email::get()->setOrderBy(['is_primary' => 'DESC'])->setWhere([['contact_id', '=', $this->_id], ['email', '=', $email], ['on_hold', '=', FALSE], ['contact.is_deceased', '=', FALSE], ['contact.is_deleted', '=', FALSE], ['contact.do_not_email', '=', FALSE]])->execute()->first()['id'];
     if (!$emailID) {
       return $email;
     }

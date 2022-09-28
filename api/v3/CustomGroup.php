@@ -16,10 +16,16 @@
  */
 
 /**
- * Create or modify a custom field group.
+ * Use this API to create a new group.
+ *
+ * The 'extends' value accepts an array or a comma separated string.
+ * e.g array(
+ * 'Individual','Contact') or 'Individual,Contact'
+ * See the CRM Data Model for custom_group property definitions
+ * $params['class_name'] is a required field, class being extended.
  *
  * @param array $params
- *   For legacy reasons, 'extends' can be passed as an array (for setting Participant column_value)
+ *   Array per getfields metadata.
  *
  * @return array
  * @todo $params['extends'] is array format - is that std compatible

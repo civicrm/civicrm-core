@@ -20,23 +20,26 @@
           <td class="label">{$form.description.label}</td>
           <td>{$form.description.html}</td>
        </tr>
-         {if !empty($form.parent_id.html)}
+         {if $form.parent_id.html}
        <tr class="crm-tag-form-block-parent_id">
          <td class="label">{$form.parent_id.label}</td>
          <td>{$form.parent_id.html}</td>
        </tr>
    {/if}
-      {if !empty($form.used_for)}
+      {if $form.used_for}
        <tr class="crm-tag-form-block-used_for">
           <td class="label">{$form.used_for.label}</td>
           <td>{$form.used_for.html} <br />
             <span class="description">
-              {ts}What types of record(s) can this tag be used for?{/ts}
+              {* @TODO: I don't think is_parent is ever true because this form is never used for editing a tag itself, and you can't nest tagsets. And when used to add a new child tag, the used_for element doesn't exist. *}
+              {if !empty($is_parent)}{ts}You can change the types of records which this tag can be used for by editing the 'Parent' tag.{/ts}
+              {else}{ts}What types of record(s) can this tag be used for?{/ts}
+              {/if}
             </span>
           </td>
         </tr>
       {/if}
-      {if !empty($form.color.html)}
+      {if $form.color.html}
         <tr class="crm-tag-form-block-color">
           <td class="label">{$form.color.label}</td>
           <td>{$form.color.html}</td>

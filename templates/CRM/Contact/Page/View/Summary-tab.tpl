@@ -9,9 +9,9 @@
 *}
 {* Summary tab from Contact Summary screen *}
 
-{if $hookContentPlacement !== 3}
+{if (isset($hookContentPlacement) and ($hookContentPlacement neq 3)) or empty($hookContentPlacement)}
 
-  {if $hookContent && $hookContentPlacement eq 2}
+  {if !empty($hookContent) and isset($hookContentPlacement) and $hookContentPlacement eq 2}
     {include file="CRM/Contact/Page/View/SummaryHook.tpl"}
   {/if}
 
@@ -27,12 +27,12 @@
     </div>
     <div class="contactCardRight">
       {crmRegion name="contact-basic-info-right"}
-      {if $imageURL}
+      {if !empty($imageURL)}
         <div id="crm-contact-thumbnail">
           {include file="CRM/Contact/Page/ContactImage.tpl"}
         </div>
       {/if}
-        <div class="{if $imageURL} float-left{/if}">
+        <div class="{if !empty($imageURL)} float-left{/if}">
           <div class="crm-summary-basic-block crm-summary-block">
             {include file="CRM/Contact/Page/Inline/Basic.tpl"}
           </div>
@@ -137,10 +137,10 @@
     <div id="customFields">
       <div class="contact_panel">
         <div class="contactCardLeft">
-          {include file="CRM/Contact/Page/View/CustomDataView.tpl" side='1' skipTitle=false}
+          {include file="CRM/Contact/Page/View/CustomDataView.tpl" side='1'}
         </div><!--contactCardLeft-->
         <div class="contactCardRight">
-          {include file="CRM/Contact/Page/View/CustomDataView.tpl" side='0' skipTitle=false}
+          {include file="CRM/Contact/Page/View/CustomDataView.tpl" side='0'}
         </div>
 
         <div class="clear"></div>
@@ -148,7 +148,7 @@
     </div>
   {/if}
 
-  {if $hookContent && $hookContentPlacement eq 1}
+  {if !empty($hookContent) and isset($hookContentPlacement) and $hookContentPlacement eq 1}
     {include file="CRM/Contact/Page/View/SummaryHook.tpl"}
   {/if}
 {else}

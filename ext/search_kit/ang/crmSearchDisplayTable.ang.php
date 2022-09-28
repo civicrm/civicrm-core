@@ -8,11 +8,8 @@ return [
   'partials' => [
     'ang/crmSearchDisplayTable',
   ],
-  'css' => [
-    'css/crmSearchDisplayTable.css',
-  ],
   'basePages' => ['civicrm/search', 'civicrm/admin/search'],
-  'requires' => ['crmSearchDisplay', 'crmUi', 'crmSearchTasks', 'ui.bootstrap', 'ui.sortable'],
+  'requires' => ['crmSearchDisplay', 'crmUi', 'crmSearchTasks', 'ui.bootstrap'],
   'bundles' => ['bootstrap3'],
   'exports' => [
     'crm-search-display-table' => 'E',

@@ -17,7 +17,7 @@
 
 /**
  * This implements the profile page for all contacts. It uses a selector
- * object to do the actual display. The fields displayed are controlled by
+ * object to do the actual dispay. The fields displayd are controlled by
  * the admin
  */
 class CRM_Mailing_Page_Browse extends CRM_Core_Page {
@@ -243,9 +243,6 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $controller->setEmbedded(TRUE);
     $controller->run();
 
-    $this->assign('unscheduled', FALSE);
-    $this->assign('archived', FALSE);
-
     $urlParams = 'reset=1';
     $urlString = 'civicrm/mailing/browse';
     if ($this->get('sms')) {
@@ -286,7 +283,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $url = CRM_Utils_System::url($urlString, $urlParams);
     $session->pushUserContext($url);
 
-    // CRM-6862 -run form controller after
+    // CRM-6862 -run form cotroller after
     // selector, since it erase $_POST
     $this->search();
 
@@ -318,8 +315,11 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
    * @return string
    */
   public function whereClause(&$params, $sortBy = TRUE) {
+    $values = [];
+
     $clauses = [];
     $title = $this->get('mailing_name');
+    // echo " name=$title  ";
     if ($title) {
       $clauses[] = 'name LIKE %1';
       if (strpos($title, '%') !== FALSE) {
@@ -336,12 +336,12 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       $clauses[] = "name LIKE '" . strtolower(CRM_Core_DAO::escapeWildCardString($this->_sortByCharacter)) . "%'";
     }
 
-    $campaignIds = $this->get('campaign_id');
-    if (!CRM_Utils_System::isNull($campaignIds)) {
-      if (!is_array($campaignIds)) {
+    $campainIds = $this->get('campaign_id');
+    if (!CRM_Utils_System::isNull($campainIds)) {
+      if (!is_array($campainIds)) {
         $campaignIds = [$campaignIds];
       }
-      $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campaignIds)) . ' ) )';
+      $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campainIds)) . ' ) )';
     }
 
     return implode(' AND ', $clauses);

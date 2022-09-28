@@ -9,7 +9,7 @@
 *}
 <div class="crm-accordion-wrapper collapsed">
  <div class="crm-accordion-header">
-    {ts}Advanced Settings{/ts}
+    Advanced Settings
   </div><!-- /.crm-accordion-header -->
   <div class="crm-accordion-body">
   <div class="crm-block crm-form-block crm-uf-advancesetting-form-block">

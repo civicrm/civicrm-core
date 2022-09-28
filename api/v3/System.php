@@ -125,7 +125,7 @@ function _civicrm_api3_system_check_spec(&$spec) {
  *   API result descriptor; return items are alert codes/messages
  * @see civicrm_api3_create_success
  * @see civicrm_api3_create_error
- * @throws CRM_Core_Exception
+ * @throws API_Exception
  */
 function civicrm_api3_system_check($params) {
   // array(array('name'=> $, 'severity'=>$, ...))
@@ -334,7 +334,7 @@ function _civicrm_api3_system_get_redacted_mysql() {
  * Get redacted settings.
  *
  * @return array
- * @throws CRM_Core_Exception
+ * @throws CiviCRM_API3_Exception
  */
 function _civicrm_api3_system_get_redacted_settings() {
   static $whitelist = NULL;
@@ -394,7 +394,7 @@ function civicrm_api3_system_updatelogtables($params) {
  *
  * @return array
  *
- * @throws \CRM_Core_Exception
+ * @throws \API_Exception
  */
 function civicrm_api3_system_utf8conversion($params) {
   $params['patterns'] = explode(',', $params['patterns']);
@@ -407,7 +407,7 @@ function civicrm_api3_system_utf8conversion($params) {
   ) {
     return civicrm_api3_create_success(1);
   }
-  throw new CRM_Core_Exception('Conversion failed');
+  throw new API_Exception('Conversion failed');
 }
 
 /**
@@ -536,6 +536,6 @@ function civicrm_api3_system_rebuildmultilingualschema() {
     return civicrm_api3_create_success(1);
   }
   else {
-    throw new CRM_Core_Exception('Cannot call rebuild Multilingual schema on non Multilingual database');
+    throw new API_Exception('Cannot call rebuild Multilingual schema on non Multilingual database');
   }
 }

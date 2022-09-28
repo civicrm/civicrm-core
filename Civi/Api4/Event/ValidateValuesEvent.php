@@ -124,7 +124,7 @@ class ValidateValuesEvent extends GenericHookEvent {
    *   If the error is multi-field (e.g. mismatched password-confirmation), then use an array.
    *   If the error is independent of any field, then use [].
    * @param string $name
-   * @param string|null $message
+   * @param string|NULL $message
    * @return $this
    */
   public function addError($recordKey, $field, string $name, string $message = NULL): self {
@@ -140,11 +140,11 @@ class ValidateValuesEvent extends GenericHookEvent {
   /**
    * Convert the list of errors an exception.
    *
-   * @return \CRM_Core_Exception
+   * @return \API_Exception
    */
   public function toException() {
     // We should probably have a better way to report the errors in a structured/list format.
-    return new \CRM_Core_Exception(ts('Found %1 error(s) in submitted %2 record(s) of type "%3": %4', [
+    return new \API_Exception(ts('Found %1 error(s) in submitted %2 record(s) of type "%3": %4', [
       1 => count($this->errors),
       2 => count(array_unique(array_column($this->errors, 'record'))),
       3 => $this->getEntityName(),

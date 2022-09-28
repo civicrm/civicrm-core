@@ -11,24 +11,15 @@
 namespace Civi\Api4;
 
 /**
- * SavedSearch entity.
+ * SavedSearch aka Smart Groups.
  *
- * Stores search criteria for smart groups and SearchKit displays.
+ * Stores search parameters for populating smart groups with live results.
  *
- * @see https://docs.civicrm.org/user/en/latest/the-user-interface/search-kit/
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/smart-groups/
- * @searchable secondary
+ * @searchable none
  * @since 5.24
  * @package Civi\Api4
  */
 class SavedSearch extends Generic\DAOEntity {
-
-  use Generic\Traits\ManagedEntity;
-
-  public static function permissions() {
-    $permissions = parent::permissions();
-    $permissions['get'] = ['access CiviCRM'];
-    return $permissions;
-  }
 
 }

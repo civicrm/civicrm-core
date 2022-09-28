@@ -36,8 +36,8 @@
     {/if}
 {if !empty($clientName)}
     <tr class="crm-case-form-block-clientName">
-      <td class="label">{ts}Client{/ts}</td>
-      <td class="bold view-value">{$clientName}</td>
+      <td class="label font-size12pt">{ts}Client{/ts}</td>
+      <td class="font-size12pt bold view-value">{$clientName}</td>
     </tr>
 {elseif empty($clientName) and $action eq 1}
     {if $context eq 'standalone'}
@@ -53,7 +53,7 @@
     </tr>
 {/if}
 
-{if !empty($form.activity_details.html)}
+{if $form.activity_details.html}
     <tr class="crm-case-form-block-activity_details">
         <td class="label">{$form.activity_details.label}{help id="id-details" activityTypeFile=$activityTypeFile file="CRM/Case/Form/Case.hlp"}</td>
         <td class="view-value">{$form.activity_details.html|crmStripAlternatives}</td>
@@ -68,7 +68,7 @@
     </tr>
 {/if}
 
-{if !empty($form.activity_subject.html)}
+{if $form.activity_subject.html}
     <tr class="crm-case-form-block-activity_subject">
        <td class="label">{$form.activity_subject.label}{help id="id-activity_subject" activityTypeFile=$activityTypeFile file="CRM/Case/Form/Case.hlp"}</td>
        <td>{$form.activity_subject.html|crmAddClass:huge}</td>
@@ -80,7 +80,7 @@
     {include file="CRM/Case/Form/Activity/$activityTypeFile.tpl"}
 {/if}
 
-{if !empty($form.duration.html)}
+{if $form.duration.html}
     <tr class="crm-case-form-block-duration">
       <td class="label">{$form.duration.label}</td>
       <td class="view-value">

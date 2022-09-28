@@ -236,7 +236,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
    */
   public static function whereClauseSingle(&$values, &$query) {
     $checkPermission = empty($query->_skipPermission);
-    [$name, $op, $value, $grouping, $wildcard] = $values;
+    list($name, $op, $value, $grouping, $wildcard) = $values;
     $fields = array_merge(CRM_Event_BAO_Event::fields(), CRM_Event_BAO_Participant::exportableFields());
     $fieldSpec = $fields[$values[0]] ?? [];
 
@@ -323,7 +323,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
             "Boolean"
           );
 
-          $isTest = $value ? ts('a Test') : ts('not a Test');
+          $isTest = $value ? 'a Test' : 'not a Test';
           $query->_qill[$grouping][] = ts("Participant is %1", [1 => $isTest]);
           $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
         }
@@ -388,7 +388,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         }
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$tableName.$name", $op, $value, $dataType);
 
-        [$op, $value] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Participant', $name, $value, $op);
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Participant', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', [1 => $fields[$qillName]['title'], 2 => $op, 3 => $value]);
         $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
         return;
@@ -413,7 +413,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
           $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$tableName.$name", $op, $value, $dataType);
         }
 
-        [$op, $value] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Participant', $name, $value, $op);
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Participant', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', [1 => $fields[$qillName]['title'], 2 => $op, 3 => $value]);
         $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
         return;
@@ -447,7 +447,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         if (!array_key_exists($qillName, $fields)) {
           break;
         }
-        [$op, $value] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Event', $name, $value, $op, ['check_permission' => $checkPermission]);
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Event', $name, $value, $op, ['check_permission' => $checkPermission]);
         $query->_qill[$grouping][] = ts('%1 %2 %3', [1 => $fields[$qillName]['title'], 2 => $op, 3 => $value]);
         return;
 
@@ -568,7 +568,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
   /**
    * Get the metadata for fields to be included on the grant search form.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getSearchFieldMetadata() {
     $fields = [
@@ -587,6 +587,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
    *
    * @param \CRM_Event_Form_Search $form
    *
+   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public static function buildSearchForm(&$form) {

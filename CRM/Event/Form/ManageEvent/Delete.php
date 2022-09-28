@@ -30,6 +30,7 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
   /**
    * Set variables up before form is built.
    *
+   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {

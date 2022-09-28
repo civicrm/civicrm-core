@@ -70,14 +70,14 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   private static $pcPage;
 
   /**
-   * Get all events
+   * Get all the n events
    *
-   * @param int|null $id
+   *
+   * @param int $id
    * @param bool $all
-   * @param string|null $condition
-   *   Optional SQL where condition
+   * @param null $condition
    *
-   * @return array|string|null
+   * @return array
    *   array of all events if any
    */
   public static function event($id = NULL, $all = FALSE, $condition = NULL) {
@@ -106,18 +106,16 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the event participant statuses.
+   * Get all the n participant statuses.
    *
    *
-   * @param int|null $id
-   *   Return the specified participant status, or null to return all
-   * @param string|null $cond
-   *   Optional SQL where condition
+   * @param int $id
+   * @param null $cond
    * @param string $retColumn
    *   Tells populate() whether to return 'name' (default) or 'label' values.
    *
-   * @return array|string
-   *   array reference of all participant statuses if any, or single value if $id was passed
+   * @return array
+   *   array reference of all participant statuses if any
    */
   public static function &participantStatus($id = NULL, $cond = NULL, $retColumn = 'name') {
     if (self::$participantStatus === NULL) {
@@ -176,8 +174,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    *
    * @param int $id
-   * @param string|null $cond
-   *   Optional SQL where condition
+   * @param null $cond
    *
    * @return array|string
    *   array reference of all participant roles if any
@@ -273,7 +270,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
    * Flush given pseudoconstant so it can be reread from db
-   * next time it's requested.
+   * nex time it's requested.
    *
    *
    * @param bool|string $name pseudoconstant to be flushed

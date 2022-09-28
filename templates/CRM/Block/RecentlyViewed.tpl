@@ -17,7 +17,7 @@
             {if $item.image_url}
               <span class="icon crm-icon {if $item.subtype}{$item.subtype}{else}{$item.type}{/if}-icon" style="background: url('{$item.image_url}')"></span>
             {else}
-              <i class="crm-i fa-fw {$item.icon}"></i>
+              <span class="icon crm-icon {$item.type}{if $item.subtype}-subtype{/if}-icon"></span>
             {/if}
             {if $item.isDeleted}<del>{/if}{$item.title}{if $item.isDeleted}</del>{/if}
           </a>

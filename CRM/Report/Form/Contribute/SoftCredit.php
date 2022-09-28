@@ -20,6 +20,11 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
   protected $_emailFieldCredit = FALSE;
   protected $_phoneField = FALSE;
   protected $_phoneFieldCredit = FALSE;
+  protected $_charts = [
+    '' => 'Tabular',
+    'barChart' => 'Bar Chart',
+    'pieChart' => 'Pie Chart',
+  ];
 
   protected $_customGroupExtends = [
     'Contact',
@@ -294,13 +299,6 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
     // If we have a campaign, build out the relevant elements
     $this->addCampaignFields('civicrm_contribution');
 
-    // Add charts support
-    $this->_charts = [
-      '' => ts('Tabular'),
-      'barChart' => ts('Bar Chart'),
-      'pieChart' => ts('Pie Chart'),
-    ];
-
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
@@ -468,7 +466,7 @@ GROUP BY {$this->_aliases['civicrm_contribution_soft']}.contact_id, constituentn
   }
 
   /**
-   * @param array $rows
+   * @param $rows
    *
    * @return array
    */

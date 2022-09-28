@@ -22,20 +22,31 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   protected $tree;
 
   /**
-   * Retrieve DB object and copy to defaults array.
+   * Class constructor.
+   */
+  public function __construct() {
+    parent::__construct();
+  }
+
+  /**
+   * Fetch object based on array of properties.
    *
    * @param array $params
-   *   Array of criteria values.
+   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   Array to be populated with found values.
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return self|null
-   *   The DAO object, if found.
-   *
-   * @deprecated
+   * @return object
+   *   CRM_Core_DAO_Tag object on success, otherwise null
    */
-  public static function retrieve($params, &$defaults) {
-    return self::commonRetrieve(self::class, $params, $defaults);
+  public static function retrieve(&$params, &$defaults) {
+    $tag = new CRM_Core_DAO_Tag();
+    $tag->copyValues($params);
+    if ($tag->find(TRUE)) {
+      CRM_Core_DAO::storeValues($tag, $defaults);
+      return $tag;
+    }
+    return NULL;
   }
 
   /**
@@ -57,8 +68,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * Build a nested array from hierarchical tags.
    *
    * Supports infinite levels of nesting.
-   *
-   * @param string|null $usedFor
+   * @param null $usedFor
    * @param bool $excludeHidden
    */
   public function buildTree($usedFor = NULL, $excludeHidden = FALSE) {
@@ -89,7 +99,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       $thisref['name'] = $dao->name;
       $thisref['description'] = $dao->description;
       $thisref['is_selectable'] = $dao->is_selectable;
-      $thisref['children'] = [];
 
       if (!$dao->parent_id) {
         $this->tree[$dao->id] = &$thisref;
@@ -302,7 +311,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param bool $allowSelectingNonSelectable
    * @param null $exclude
    * @return array
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getColorTags($usedFor = NULL, $allowSelectingNonSelectable = FALSE, $exclude = NULL) {
     $params = [
@@ -340,11 +349,31 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * Delete the tag.
    *
    * @param int $id
-   * @deprecated
+   *   Tag id.
+   *
    * @return bool
    */
   public static function del($id) {
-    return (bool) static::deleteRecord(['id' => $id]);
+    // since this is a destructive operation, lets make sure
+    // id is a positive number
+    CRM_Utils_Type::validate($id, 'Positive');
+
+    // delete all crm_entity_tag records with the selected tag id
+    $entityTag = new CRM_Core_DAO_EntityTag();
+    $entityTag->tag_id = $id;
+    $entityTag->delete();
+
+    // delete from tag table
+    $tag = new CRM_Core_DAO_Tag();
+    $tag->id = $id;
+
+    CRM_Utils_Hook::pre('delete', 'Tag', $id, $tag);
+
+    if ($tag->delete()) {
+      CRM_Utils_Hook::post('delete', 'Tag', $id, $tag);
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**

@@ -1,9 +1,4 @@
 <?php
-
-/**
- * @file
- */
-
 /**
  * Test Generated example of using batch update API.
  *
@@ -20,10 +15,10 @@ function batch_update_example() {
     'id' => 3,
   ];
 
-  try {
+  try{
     $result = civicrm_api3('batch', 'update', $params);
   }
-  catch (CRM_Core_Exception $e) {
+  catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
@@ -82,7 +77,7 @@ function batch_update_expectedresult() {
 * The test that created it is called
 * testUpdate
 * and can be found in
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/BatchTest.php.
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/BatchTest.php
 *
 * You can see the outcome of the API tests at
 * https://test.civicrm.org/job/CiviCRM-master-git/

@@ -86,7 +86,9 @@ class ValidatorTest extends \CiviUnitTestCase {
    * @dataProvider getExamples
    */
   public function testExamples($mailingData, $expectedErrors): void {
-    $actualErrors = Validator::createAndRun($mailingData);
+    $mailing = new \CRM_Mailing_DAO_Mailing();
+    $mailing->copyValues($mailingData);
+    $actualErrors = Validator::createAndRun($mailing);
     $this->assertEquals(
       array_keys($actualErrors),
       array_keys($expectedErrors)

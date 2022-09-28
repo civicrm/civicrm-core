@@ -88,7 +88,7 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
   /**
    * Get html.
    *
-   * @param string $url
+   * @param $url
    *
    * @return array|NULL
    *   array of gettingStarted items; or NULL if not available

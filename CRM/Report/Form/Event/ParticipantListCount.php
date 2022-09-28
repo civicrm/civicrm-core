@@ -335,7 +335,8 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form {
   }
 
   /**
-   * @param array $rows
+   * Add The statistics.
+   * @param $rows
    *
    * @return array
    */
@@ -425,7 +426,7 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form {
   /**
    * @param $fields
    * @param $files
-   * @param self $self
+   * @param $self
    *
    * @return array
    */

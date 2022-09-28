@@ -53,7 +53,7 @@ class CRM_Logging_Differ {
   }
 
   /**
-   * @param string $table
+   * @param $table
    * @param int $contactID
    *
    * @return array
@@ -481,7 +481,7 @@ ORDER BY log_date
    * @param string $change_date
    *
    * @return bool
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function checkLogCanBeUsedWithNoLogDate($change_date) {
 

@@ -8,6 +8,9 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting Message Templates *}
+{if !isset($isAdmin)}
+  {assign var="isAdmin" value="0"}
+{/if}
 {if $action neq 8}
   <div class="help">
     {ts}Use this form to add or edit re-usable message templates.{/ts} {help id="id-intro" file="CRM/Admin/Page/MessageTemplates.hlp"}
@@ -115,7 +118,7 @@
         </div><!-- /.crm-accordion-body -->
       </div><!-- /.crm-accordion-wrapper -->
 
-      {if !$isWorkflow}
+      {if !$workflow_id}
         <table class="form-layout-compressed">
           <tr>
             <td class="label-left">{$form.is_active.label}</td>

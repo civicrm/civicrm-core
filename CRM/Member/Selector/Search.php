@@ -103,7 +103,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   /**
    * The query object.
    *
-   * @var CRM_Contact_BAO_Query
+   * @var string
    */
   protected $_query;
 
@@ -165,17 +165,17 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    *
    * @param string $status
    * @param bool $isPaymentProcessor
-   * @param bool $accessContribution
-   * @param string|null $qfKey
-   * @param string|null $context
+   * @param null $accessContribution
+   * @param null $qfKey
+   * @param null $context
    * @param bool $isCancelSupported
    *
    * @return array
    */
   public static function &links(
     $status = 'all',
-    $isPaymentProcessor = FALSE,
-    $accessContribution = FALSE,
+    $isPaymentProcessor = NULL,
+    $accessContribution = NULL,
     $qfKey = NULL,
     $context = NULL,
     $isCancelSupported = FALSE
@@ -308,15 +308,19 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
     $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE,
       "billing_mode IN ( 1, 3 )"
     );
-    $isPaymentProcessor = FALSE;
     if (count($processors) > 0) {
-      $isPaymentProcessor = TRUE;
+      $this->_isPaymentProcessor = TRUE;
+    }
+    else {
+      $this->_isPaymentProcessor = FALSE;
     }
 
     // Only show credit card membership signup and renewal if user has CiviContribute permission
-    $accessContribution = FALSE;
     if (CRM_Core_Permission::access('CiviContribute')) {
-      $accessContribution = TRUE;
+      $this->_accessContribution = TRUE;
+    }
+    else {
+      $this->_accessContribution = FALSE;
     }
 
     //get all campaigns.
@@ -371,8 +375,8 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
 
         $isCancelSupported = CRM_Member_BAO_Membership::isCancelSubscriptionSupported($row['membership_id']);
         $links = self::links('all',
-          $isPaymentProcessor,
-          $accessContribution,
+          $this->_isPaymentProcessor,
+          $this->_accessContribution,
           $this->_key,
           $this->_context,
           $isCancelSupported
@@ -423,7 +427,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
 
       // Display Auto-renew status on page (0=disabled, 1=enabled, 2=enabled, but error
       if (!empty($result->membership_recur_id)) {
-        if (CRM_Member_BAO_Membership::isSubscriptionCancelled((int) $row['membership_id'])) {
+        if (CRM_Member_BAO_Membership::isSubscriptionCancelled($row['membership_id'])) {
           $row['auto_renew'] = 2;
         }
         else {
@@ -520,7 +524,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   /**
    * Alphabet query.
    *
-   * @return CRM_Core_DAO
+   * @return mixed
    */
   public function alphabetQuery() {
     return $this->_query->alphabetQuery();

@@ -1,9 +1,4 @@
 <?php
-
-/**
- * @file
- */
-
 /**
  * Test Generated example demonstrating the Participant.get API.
  *
@@ -18,10 +13,10 @@ function participant_get_example() {
     'api.event.get' => 1,
   ];
 
-  try {
+  try{
     $result = civicrm_api3('Participant', 'get', $params);
   }
-  catch (CRM_Core_Exception $e) {
+  catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
@@ -52,7 +47,7 @@ function participant_get_expectedresult() {
     'id' => 1,
     'values' => [
       '1' => [
-        'contact_id' => '4',
+        'contact_id' => '2',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
         'sort_name' => 'Anderson, Anthony',
@@ -91,8 +86,8 @@ function participant_get_expectedresult() {
               'title' => 'Annual CiviCRM meet',
               'event_title' => 'Annual CiviCRM meet',
               'summary' => 'If you have any CiviCRM related issues or want to track where CiviCRM is heading, Sign up now',
-              'description' => 'This event is intended to give brief idea about progress of CiviCRM and giving solutions to common user issues',
-              'event_description' => 'This event is intended to give brief idea about progress of CiviCRM and giving solutions to common user issues',
+              'description' => 'This event is intended to give brief idea about progess of CiviCRM and giving solutions to common user issues',
+              'event_description' => 'This event is intended to give brief idea about progess of CiviCRM and giving solutions to common user issues',
               'event_type_id' => '1',
               'is_public' => '1',
               'start_date' => '2013-07-29 00:00:00',
@@ -133,23 +128,23 @@ function participant_get_expectedresult() {
 }
 
 /*
- * This example has been generated from the API test suite.
- * The test that created it is called "testGetNestedEventGet"
- * and can be found at:
- * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ParticipantTest.php
- *
- * You can see the outcome of the API tests at
- * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
- *
- * To Learn about the API read
- * https://docs.civicrm.org/dev/en/latest/api/
- *
- * Browse the API on your own site with the API Explorer. It is in the main
- * CiviCRM menu, under: Support > Development > API Explorer.
- *
- * Read more about testing here
- * https://docs.civicrm.org/dev/en/latest/testing/
- *
- * API Standards documentation:
- * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
- */
+* This example has been generated from the API test suite.
+* The test that created it is called "testGetNestedEventGet"
+* and can be found at:
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ParticipantTest.php
+*
+* You can see the outcome of the API tests at
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+*
+* To Learn about the API read
+* https://docs.civicrm.org/dev/en/latest/api/
+*
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
+*
+* Read more about testing here
+* https://docs.civicrm.org/dev/en/latest/testing/
+*
+* API Standards documentation:
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+*/

@@ -108,7 +108,7 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
     /**
      * You can define a custom title for the search form
      */
-    $this->setTitle(ts('Proximity Search'));
+    $this->setTitle('Proximity Search');
 
     /**
      * if you are using the standard template, this array tells the template what elements
@@ -237,7 +237,7 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
   }
 
   /**
-   * @return array
+   * @return array|null
    */
   public function setDefaultValues() {
     if (!empty($this->_formValues)) {
@@ -246,23 +246,40 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
     $config = CRM_Core_Config::singleton();
     $countryDefault = $config->defaultContactCountry;
     $stateprovinceDefault = $config->defaultContactStateProvince;
-    $defaults = [
-      'prox_distance_unit' => CRM_Utils_Address::getDefaultDistanceUnit(),
-    ];
+    $defaults = [];
 
     if ($countryDefault) {
+      if ($countryDefault == '1228' || $countryDefault == '1226') {
+        $defaults['prox_distance_unit'] = 'miles';
+      }
+      else {
+        $defaults['prox_distance_unit'] = 'km';
+      }
       $defaults['country_id'] = $countryDefault;
       if ($stateprovinceDefault) {
         $defaults['state_province_id'] = $stateprovinceDefault;
       }
+      return $defaults;
     }
-    return $defaults;
+    return NULL;
   }
 
   /**
    * @param $row
    */
   public function alterRow(&$row) {
+  }
+
+  /**
+   * @param $title
+   */
+  public function setTitle($title) {
+    if ($title) {
+      CRM_Utils_System::setTitle($title);
+    }
+    else {
+      CRM_Utils_System::setTitle(ts('Search'));
+    }
   }
 
   /**

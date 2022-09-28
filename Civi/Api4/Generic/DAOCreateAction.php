@@ -12,8 +12,6 @@
 
 namespace Civi\Api4\Generic;
 
-use Civi\Api4\Utils\CoreUtil;
-
 /**
  * Create a new $ENTITY from supplied values.
  *
@@ -36,12 +34,11 @@ class DAOCreateAction extends AbstractCreateAction {
   }
 
   /**
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   protected function validateValues() {
-    $idField = CoreUtil::getIdFieldName($this->getEntityName());
-    if (!empty($this->values[$idField])) {
-      throw new \CRM_Core_Exception("Cannot pass $idField to Create action. Use Update action instead.");
+    if (!empty($this->values['id'])) {
+      throw new \API_Exception('Cannot pass id to Create action. Use Update action instead.');
     }
     parent::validateValues();
   }

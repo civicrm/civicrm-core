@@ -14,13 +14,10 @@ namespace Civi\Api4;
  * MembershipType entity.
  *
  * @searchable secondary
- * @orderBy weight
- * @groupWeightsBy domain_id
  * @since 5.27
  * @package Civi\Api4
  */
 class MembershipType extends Generic\DAOEntity {
-  use Generic\Traits\ManagedEntity;
-  use Generic\Traits\SortableEntity;
+  use Generic\Traits\OptionList;
 
 }

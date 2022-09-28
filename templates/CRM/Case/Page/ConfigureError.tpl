@@ -9,8 +9,7 @@
 *}
 {* CiviCase Configuration Help - displayed when component is enabled but not yet configured. *}
 
-{capture assign=docUrlText}{ts}CiviCase Setup documentation{/ts}{/capture}
-{capture assign=docLink}{docURL page="user/case-management/set-up" text=$docUrlText}{/capture}
+{capture assign=docLink}{docURL page="user/case-management/set-up" text="CiviCase Setup documentation"}{/capture}
 
 <div class="messages status no-popup">
       {icon icon="fa-info-circle"}{/icon}

@@ -7,6 +7,9 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+{if !isset($isAdmin)}
+  {assign var="isAdmin" value="0"}
+{/if}
 {* This template is used for adding/scheduling reminders.  *}
 <div class="crm-block crm-form-block crm-scheduleReminder-form-block">
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
@@ -28,7 +31,7 @@
 
     <tr class="crm-scheduleReminder-form-block-when">
         <td class="right">{$form.start_action_offset.label}</td>
-        <td colspan="3">{$form.absolute_date.html} <strong id='OR'>{ts}OR{/ts}</strong><br /></td>
+        <td colspan="3">{$form.absolute_date.html} <strong id='OR'>OR</strong><br /></td>
     </tr>
 
     <tr id="relativeDate" class="crm-scheduleReminder-form-block-description">
@@ -56,11 +59,11 @@
     </tr>
     <tr class="crm-scheduleReminder-effective_start_date">
       <td class="right">{$form.effective_start_date.label}</td>
-      <td colspan="3">{$form.effective_start_date.html} <div class="description">{ts}Earliest trigger date to <em>include</em>.{/ts}</div></td>
+      <td colspan="3">{$form.effective_start_date.html} <div class="description"></div></td>
     </tr>
     <tr class="crm-scheduleReminder-effective_end_date">
       <td class="right">{$form.effective_end_date.label}</td>
-      <td colspan="3">{$form.effective_end_date.html} <div class="description">{ts}Earliest trigger date to <em>exclude</em>.{/ts}</div></td>
+      <td colspan="3">{$form.effective_end_date.html} <div class="description"></div></td>
     </tr>
     <tr>
       <td class="label" width="20%">{$form.from_name.label}</td>
@@ -177,6 +180,11 @@
       var $form = $('form.{/literal}{$form.formClass}{literal}'),
         recipientMapping = eval({/literal}{$recipientMapping}{literal});
 
+      updatedEffectiveDateDescription($('#entity_0 option:selected').text(), $('#start_action_date option:selected').text());
+      $('#entity_0, #start_action_date', $form).change(function() {
+       updatedEffectiveDateDescription($('#entity_0 option:selected').text(), $('#start_action_date option:selected').text());
+      });
+
       $('#absolute_date', $form).change(function() {
         $('.crm-scheduleReminder-effective_start_date, .crm-scheduleReminder-effective_end_date').toggle(($(this).val() === null));
       });
@@ -198,6 +206,11 @@
       loadMsgBox();
       $('#mode', $form).change(loadMsgBox);
 
+      function updatedEffectiveDateDescription(entityText, startActionDateText) {
+        $('.crm-scheduleReminder-effective_start_date .description').text(ts('Earliest %1 %2 to include.', {1: entityText, 2: startActionDateText}));
+        $('.crm-scheduleReminder-effective_end_date .description').text(ts('Earliest %1 %2 to exclude.', {1: entityText, 2: startActionDateText}));
+      }
+
       function populateRecipient() {
         var mappingID = $('#entity_0', $form).val() || $('[name^=mappingID]', $form).val();
         var recipient = $("#recipient", $form).val();
@@ -218,17 +231,8 @@
 
       // CRM-14070 Hide limit-to when entity is activity
       function showHideLimitTo() {
-        // '1' is the value of "Activity" in the entity select box.
         $('#limit_to', $form).toggle(!($('#entity_0', $form).val() == '1'));
         if ($('#entity_0', $form).val() != '1' || !($('#entity_0').length)) {
-          // Some Event entity is selected.
-          if (['2', '3', '5'].includes($('#entity_0', $form).val())) {
-            $('#limit_to option[value="0"]', $form).attr('disabled','disabled').removeAttr('selected');
-          }
-          else {
-            $('#limit_to option[value="0"]', $form).removeAttr('disabled');
-          }
-          // Anything but Activity is selected.
           if ($('#limit_to', $form).val() == '') {
             $('tr.recipient:visible, #recipientList, #recipient, a.recipient').hide();
             $('a.limit_to').show();
@@ -240,7 +244,6 @@
           $("label[for='recipient']").text('{/literal}{$recipientLabels.other}{literal}');
         }
         else {
-          // Activity is selected.
           $('#recipient, a.recipient').show()
           $('#recipient').css("margin-left", "-2px");
           $('a.limit_to').hide();

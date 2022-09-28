@@ -110,7 +110,9 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   /**
    * Check delete fails if a related contribution exists.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testDeleteIfHasContribution(): void {
     $financialType = FinancialType::create(FALSE)->setValues([

@@ -1,3 +1,4 @@
+<center>
  <table id="crm-event_receipt_test" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
   <tr>
    <td>
@@ -6,3 +7,4 @@
    </td>
   </tr>
  </table>
+</center>

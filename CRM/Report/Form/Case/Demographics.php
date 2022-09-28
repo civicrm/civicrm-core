@@ -150,11 +150,11 @@ class CRM_Report_Form_Case_Demographics extends CRM_Report_Form {
           ],
           'start_date' => [
             'title' => ts('Case Start'),
-            'default' => TRUE,
+            'required' => TRUE,
           ],
           'end_date' => [
             'title' => ts('Case End'),
-            'default' => TRUE,
+            'required' => TRUE,
           ],
         ],
         'filters' => [
@@ -263,7 +263,7 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
   /**
    * @param $fields
    * @param $files
-   * @param self $self
+   * @param $self
    *
    * @return array
    */
@@ -422,7 +422,7 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
 
   /**
    * @param string $fname
-   * @param string $val
+   * @param $val
    *
    * @return null|string
    */

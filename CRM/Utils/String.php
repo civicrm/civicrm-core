@@ -43,14 +43,12 @@ class CRM_Utils_String {
   public static function titleToVar($title, $maxLength = 31) {
     $variable = self::munge($title, '_', $maxLength);
 
-    // FIXME: nothing below this line makes sense. The above call to self::munge will always
-    // return a safe string of the correct length, so why are we now checking if it's a safe
-    // string of the correct length?
     if (CRM_Utils_Rule::title($variable, $maxLength)) {
       return $variable;
     }
 
-    // FIXME: When would this ever be reachable?
+    // if longer than the maxLength lets just return a substr of the
+    // md5 to prevent errors downstream
     return substr(md5($title), 0, $maxLength);
   }
 
@@ -88,7 +86,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * Convert possibly underscore, space or dash separated words to CamelCase.
+   * Convert possibly underscore separated words to camel case.
    *
    * @param string $str
    * @param bool $ucFirst
@@ -96,29 +94,9 @@ class CRM_Utils_String {
    * @return string
    */
   public static function convertStringToCamel($str, $ucFirst = TRUE) {
-    $fragments = preg_split('/[-_ ]/', $str, -1, PREG_SPLIT_NO_EMPTY);
+    $fragments = explode('_', $str);
     $camel = implode('', array_map('ucfirst', $fragments));
     return $ucFirst ? $camel : lcfirst($camel);
-  }
-
-  /**
-   * Inverse of above function, converts camelCase to snake_case
-   *
-   * @param string $str
-   * @return string
-   */
-  public static function convertStringToSnakeCase(string $str): string {
-    return strtolower(ltrim(preg_replace('/(?=[A-Z])/', '_$0', $str), '_'));
-  }
-
-  /**
-   * Converts `CamelCase` or `snake_case` to `dash-format`
-   *
-   * @param string $str
-   * @return string
-   */
-  public static function convertStringToDash(string $str): string {
-    return strtolower(implode('-', preg_split('/[-_ ]|(?=[A-Z])/', $str, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE)));
   }
 
   /**
@@ -339,8 +317,21 @@ class CRM_Utils_String {
    * @return bool
    */
   public static function isUtf8($str) {
-    $enc = mb_detect_encoding($str, ['UTF-8'], TRUE);
-    return ($enc !== FALSE);
+    if (!function_exists(mb_detect_encoding)) {
+      // eliminate all white space from the string
+      $str = preg_replace('/\s+/', '', $str);
+
+      // pattern stolen from the php.net function documentation for
+      // utf8decode();
+      // comment by JF Sebastian, 30-Mar-2005
+      return preg_match('/^([\x00-\x7f]|[\xc2-\xdf][\x80-\xbf]|\xe0[\xa0-\xbf][\x80-\xbf]|[\xe1-\xec][\x80-\xbf]{2}|\xed[\x80-\x9f][\x80-\xbf]|[\xee-\xef][\x80-\xbf]{2}|f0[\x90-\xbf][\x80-\xbf]{2}|[\xf1-\xf3][\x80-\xbf]{3}|\xf4[\x80-\x8f][\x80-\xbf]{2})*$/', $str);
+      // ||
+      // iconv('ISO-8859-1', 'UTF-8', $str);
+    }
+    else {
+      $enc = mb_detect_encoding($str, ['UTF-8'], TRUE);
+      return ($enc !== FALSE);
+    }
   }
 
   /**
@@ -419,7 +410,7 @@ class CRM_Utils_String {
    * @param string $str
    *   The string to be translated.
    *
-   * @return string|false
+   * @return bool
    */
   public static function strtoboolstr($str) {
     if (!is_scalar($str)) {
@@ -447,9 +438,10 @@ class CRM_Utils_String {
    *   the converted string
    */
   public static function htmlToText($html) {
+    require_once 'html2text/rcube_html2text.php';
     $token_html = preg_replace('!\{([a-z_.]+)\}!i', 'token:{$1}', $html);
-    $converter = new \Html2Text\Html2Text($token_html, ['do_links' => 'table', 'width' => 75]);
-    $token_text = $converter->getText();
+    $converter = new rcube_html2text($token_html);
+    $token_text = $converter->get_text();
     $text = preg_replace('!token\:\{([a-z_.]+)\}!i', '{$1}', $token_text);
     return $text;
   }
@@ -539,7 +531,7 @@ class CRM_Utils_String {
    */
   public static function stripAlternatives($full) {
     $matches = [];
-    preg_match('/-ALTERNATIVE ITEM 0-(.*?)-ALTERNATIVE ITEM 1-.*-ALTERNATIVE END-/s', ($full ?? ''), $matches);
+    preg_match('/-ALTERNATIVE ITEM 0-(.*?)-ALTERNATIVE ITEM 1-.*-ALTERNATIVE END-/s', $full, $matches);
 
     if (isset($matches[1]) &&
       trim(strip_tags($matches[1])) != ''
@@ -649,7 +641,7 @@ class CRM_Utils_String {
       $_filter = new HTMLPurifier($config);
     }
 
-    return $_filter->purify($string ?? '');
+    return $_filter->purify($string);
   }
 
   /**
@@ -688,10 +680,10 @@ class CRM_Utils_String {
    * "admin foo" => array(NULL,"admin foo")
    * "cms:admin foo" => array("cms", "admin foo")
    *
-   * @param string $delim
+   * @param $delim
    * @param string $string
    *   E.g. "view all contacts". Syntax: "[prefix:]name".
-   * @param string|null $defaultPrefix
+   * @param null $defaultPrefix
    *
    * @return array
    *   (0 => string|NULL $prefix, 1 => string $value)
@@ -887,8 +879,8 @@ class CRM_Utils_String {
     if ($fragment === '') {
       return TRUE;
     }
-    $len = strlen($fragment ?? '');
-    return substr(($string ?? ''), 0, $len) === $fragment;
+    $len = strlen($fragment);
+    return substr($string, 0, $len) === $fragment;
   }
 
   /**
@@ -904,8 +896,8 @@ class CRM_Utils_String {
     if ($fragment === '') {
       return TRUE;
     }
-    $len = strlen($fragment ?? '');
-    return substr(($string ?? ''), -1 * $len) === $fragment;
+    $len = strlen($fragment);
+    return substr($string, -1 * $len) === $fragment;
   }
 
   /**
@@ -949,7 +941,7 @@ class CRM_Utils_String {
    * safe, standard data interchange formats such as JSON rather than PHP's
    * serialization format when dealing with user input.
    *
-   * @param string|null $string
+   * @param string|NULL $string
    *
    * @return mixed
    */
@@ -1036,9 +1028,7 @@ class CRM_Utils_String {
     $cachingValue = $smarty->caching;
     $smarty->caching = 0;
     $smarty->assign('smartySingleUseString', $templateString);
-    // Do not escape the smartySingleUseString as that is our smarty template
-    // and is likely to contain html.
-    $templateString = (string) $smarty->fetch('string:{eval var=$smartySingleUseString|smarty:nodefaults}');
+    $templateString = $smarty->fetch('string:{eval var=$smartySingleUseString}');
     $smarty->caching = $cachingValue;
     $smarty->assign('smartySingleUseString', NULL);
     return $templateString;

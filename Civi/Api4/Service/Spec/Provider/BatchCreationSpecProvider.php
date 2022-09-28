@@ -14,11 +14,7 @@ namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
-/**
- * @service
- * @internal
- */
-class BatchCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
+class BatchCreationSpecProvider implements Generic\SpecProviderInterface {
 
   /**
    * @inheritDoc

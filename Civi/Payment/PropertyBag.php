@@ -27,23 +27,13 @@ class PropertyBag implements \ArrayAccess {
   protected static $propMap = [
     'amount'                      => TRUE,
     'billingStreetAddress'        => TRUE,
-    'billing_street_address'      => 'billingStreetAddress',
-    'street_address'              => 'billingStreetAddress',
     'billingSupplementalAddress1' => TRUE,
     'billingSupplementalAddress2' => TRUE,
     'billingSupplementalAddress3' => TRUE,
     'billingCity'                 => TRUE,
-    'billing_city'                => 'billingCity',
-    'city'                        => 'billingCity',
     'billingPostalCode'           => TRUE,
-    'billing_postal_code'         => 'billingPostalCode',
-    'postal_code'                 => 'billingPostalCode',
     'billingCounty'               => TRUE,
-    'billingStateProvince'        => TRUE,
-    'billing_state_province'      => 'billingStateProvince',
-    'state_province'              => 'billingStateProvince',
     'billingCountry'              => TRUE,
-    'country'                     => 'billingCountry',
     'contactID'                   => TRUE,
     'contact_id'                  => 'contactID',
     'contributionID'              => TRUE,
@@ -157,7 +147,6 @@ class PropertyBag implements \ArrayAccess {
    * @param mixed $offset
    * @return mixed
    */
-  #[\ReturnTypeWillChange]
   public function offsetGet($offset) {
     try {
       $prop = $this->handleLegacyPropNames($offset);
@@ -200,7 +189,7 @@ class PropertyBag implements \ArrayAccess {
    * @param mixed $offset
    * @param mixed $value
    */
-  public function offsetSet($offset, $value): void {
+  public function offsetSet($offset, $value) {
     try {
       $prop = $this->handleLegacyPropNames($offset);
     }
@@ -248,7 +237,7 @@ class PropertyBag implements \ArrayAccess {
    *
    * @param mixed $offset
    */
-  public function offsetUnset ($offset): void {
+  public function offsetUnset ($offset) {
     $prop = $this->handleLegacyPropNames($offset);
     unset($this->props['default'][$prop]);
   }
@@ -269,18 +258,13 @@ class PropertyBag implements \ArrayAccess {
     if ($newName === NULL && substr($prop, -2) === '-' . \CRM_Core_BAO_LocationType::getBilling()
       && isset(static::$propMap[substr($prop, 0, -2)])
     ) {
-      $billingAddressProp = substr($prop, 0, -2);
-      $newName = static::$propMap[$billingAddressProp] ?? NULL;
-      if ($newName === TRUE) {
-        // Good, modern name.
-        return $billingAddressProp;
-      }
+      $newName = substr($prop, 0, -2);
     }
 
     if ($newName === NULL) {
       if ($silent) {
         // Only for use by offsetExists
-        return NULL;
+        return;
       }
       throw new \InvalidArgumentException("Unknown property '$prop'.");
     }
@@ -605,27 +589,6 @@ class PropertyBag implements \ArrayAccess {
    */
   public function setBillingCounty($input, $label = 'default') {
     return $this->set('billingCounty', $label, (string) $input);
-  }
-
-  /**
-   * BillingStateProvince getter.
-   *
-   * @return string
-   */
-  public function getBillingStateProvince($label = 'default') {
-    return $this->get('billingStateProvince', $label);
-  }
-
-  /**
-   * BillingStateProvince setter.
-   *
-   * Nb. we can't validate this unless we have the country ID too, so we don't.
-   *
-   * @param string $input
-   * @param string $label e.g. 'default'
-   */
-  public function setBillingStateProvince($input, $label = 'default') {
-    return $this->set('billingStateProvince', $label, (string) $input);
   }
 
   /**
@@ -1050,7 +1013,7 @@ class PropertyBag implements \ArrayAccess {
    * @param string $label e.g. 'default'
    */
   public function setRecurFrequencyUnit($recurFrequencyUnit, $label = 'default') {
-    if (!preg_match('/^day|week|month|year$/', ($recurFrequencyUnit ?? ''))) {
+    if (!preg_match('/^day|week|month|year$/', $recurFrequencyUnit)) {
       throw new \InvalidArgumentException("recurFrequencyUnit must be day|week|month|year");
     }
     return $this->set('recurFrequencyUnit', $label, $recurFrequencyUnit);
@@ -1074,10 +1037,7 @@ class PropertyBag implements \ArrayAccess {
    */
   public function setRecurInstallments($recurInstallments, $label = 'default') {
     // Counts zero as positive which is ok - means no installments
-    try {
-      \CRM_Utils_Type::validate($recurInstallments, 'Positive');
-    }
-    catch (\CRM_Core_Exception $e) {
+    if (!\CRM_Utils_Type::validate($recurInstallments, 'Positive')) {
       throw new InvalidArgumentException('recurInstallments must be 0 or a positive integer');
     }
 
@@ -1114,7 +1074,7 @@ class PropertyBag implements \ArrayAccess {
     if ($input === '') {
       $input = NULL;
     }
-    if (strlen($input ?? '') > 255 || in_array($input, [FALSE, 0], TRUE)) {
+    if (strlen($input) > 255 || in_array($input, [FALSE, 0], TRUE)) {
       throw new \InvalidArgumentException('processorID field has max length of 255');
     }
     return $this->set('recurProcessorID', $label, $input);

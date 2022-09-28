@@ -109,7 +109,7 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
     }
 
     //set the title.
-    $this->setTitle(ts('Release Respondents'));
+    CRM_Utils_System::setTitle(ts('Release Respondents'));
   }
 
   /**

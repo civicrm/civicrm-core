@@ -19,7 +19,7 @@
  * @param array $apiRequest
  *
  * @return array
- * @throws CRM_Core_Exception
+ * @throws API_Exception
  */
 function civicrm_api3_generic_getActions($apiRequest) {
   civicrm_api3_verify_mandatory($apiRequest, NULL, ['entity']);

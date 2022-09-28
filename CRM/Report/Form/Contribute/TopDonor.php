@@ -37,6 +37,12 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
 
   public $_drilldownReport = ['contribute/detail' => 'Link to Detail Report'];
 
+  protected $_charts = [
+    '' => 'Tabular',
+    'barChart' => 'Bar Chart',
+    'pieChart' => 'Pie Chart',
+  ];
+
   /**
    */
   public function __construct() {
@@ -167,14 +173,6 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             'no_repeat' => TRUE,
           ],
         ],
-        'filters' => [
-          'on_hold' => [
-            'title' => ts('On Hold'),
-            'type' => CRM_Utils_Type::T_INT,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => ['' => ts('Any')] + CRM_Core_PseudoConstant::emailOnHoldOptions(),
-          ],
-        ],
         'grouping' => 'email-fields',
       ],
       'civicrm_phone' => [
@@ -190,13 +188,6 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
       ],
     ];
 
-    // Add charts support
-    $this->_charts = [
-      '' => ts('Tabular'),
-      'barChart' => ts('Bar Chart'),
-      'pieChart' => ts('Pie Chart'),
-    ];
-
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     $this->_currencyColumn = 'civicrm_contribution_currency';
@@ -206,7 +197,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
   /**
    * @param $fields
    * @param $files
-   * @param self $self
+   * @param $self
    *
    * @return array
    */

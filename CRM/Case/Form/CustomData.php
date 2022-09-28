@@ -60,7 +60,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     // Array contains only one item
     foreach ($groupTree as $groupValues) {
       $this->_customTitle = $groupValues['title'];
-      $this->setTitle(ts('Edit %1', [1 => $groupValues['title']]));
+      CRM_Utils_System::setTitle(ts('Edit %1', [1 => $groupValues['title']]));
     }
 
     $this->_defaults = [];
@@ -74,7 +74,6 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     $this->assign('groupID', $this->_groupID);
     $this->assign('subType', $this->_subTypeID);
     $this->assign('contactID', $this->_contactID);
-    $this->assign('cgCount');
   }
 
   /**
@@ -144,12 +143,12 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
    * @param array $params New custom field values from form
    *
    * @return string
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function formatCustomDataChangesForDetail($params) {
     $formattedDetails = [];
     foreach ($params as $customField => $newCustomValue) {
-      if (substr($customField, 0, 7) === 'custom_') {
+      if (substr($customField, 0, 7) == 'custom_') {
         if (($this->_defaults[$customField] ?? '') === $newCustomValue) {
           // Don't show values that did not change
           continue;

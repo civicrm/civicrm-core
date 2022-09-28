@@ -59,9 +59,7 @@ class CRM_Core_Page {
    * Are we in print mode? if so we need to modify the display
    * functionality to do a minimal display :)
    *
-   * @var int|string
-   *   Should match a CRM_Core_Smarty::PRINT_* constant,
-   *   or equal 0 if not in print mode
+   * @var bool
    */
   protected $_print = FALSE;
 
@@ -100,41 +98,6 @@ class CRM_Core_Page {
   public $useLivePageJS;
 
   /**
-   * Variables smarty expects to have set.
-   *
-   * We ensure these are assigned (value = NULL) when Smarty is instantiated in
-   * order to avoid e-notices / having to use empty or isset in the template layer.
-   *
-   * @var string[]
-   */
-  public $expectedSmartyVariables = [
-    'isForm',
-    'hookContent',
-    'hookContentPlacement',
-    // required for footer.tpl
-    'contactId',
-    // required for info.tpl
-    'infoMessage',
-    'infoTitle',
-    'infoType',
-    'infoOptions',
-    // required for Summary.tpl (contact summary) but seems
-    // likely to be used more broadly to warrant inclusion here.
-    'context',
-    // for CMSPrint.tpl
-    'urlIsPublic',
-    'breadcrumb',
-    'pageTitle',
-    'isDeleted',
-    // Required for footer.tpl,
-    // See ExampleHookTest:testPageOutput.
-    'footer_status_severity',
-    // in 'body.tpl
-    'suppressForm',
-    'beginHookFormElements',
-  ];
-
-  /**
    * Class constructor.
    *
    * @param string $title
@@ -154,11 +117,6 @@ class CRM_Core_Page {
       self::$_template = CRM_Core_Smarty::singleton();
       self::$_session = CRM_Core_Session::singleton();
     }
-    // Smarty $_template is a static var which persists between tests, so
-    // if something calls clearTemplateVars(), the static still exists but
-    // our ensured variables get blown away, so we need to set them even if
-    // it's already been initialized.
-    self::$_template->ensureVariablesAreAssigned($this->expectedSmartyVariables);
 
     // FIXME - why are we messing with 'snippet'? Why not just pass it directly into $this->_print?
     if (!empty($_REQUEST['snippet'])) {
@@ -199,8 +157,6 @@ class CRM_Core_Page {
     $pageTemplateFile = $this->getHookedTemplateFileName();
     self::$_template->assign('tplFile', $pageTemplateFile);
 
-    self::$_template->addExpectedTabHeaderKeys();
-
     // invoke the pagRun hook, CRM-3906
     CRM_Utils_Hook::pageRun($this);
 
@@ -225,10 +181,12 @@ class CRM_Core_Page {
       //its time to call the hook.
       CRM_Utils_Hook::alterContent($content, 'page', $pageTemplateFile, $this);
 
-      if ($this->_print === CRM_Core_Smarty::PRINT_PDF) {
-        CRM_Utils_PDF_Utils::html2pdf($content, "{$this->_name}.pdf", FALSE);
+      if ($this->_print == CRM_Core_Smarty::PRINT_PDF) {
+        CRM_Utils_PDF_Utils::html2pdf($content, "{$this->_name}.pdf", FALSE,
+          ['paper_size' => 'a3', 'orientation' => 'landscape']
+        );
       }
-      elseif ($this->_print === CRM_Core_Smarty::PRINT_JSON) {
+      elseif ($this->_print == CRM_Core_Smarty::PRINT_JSON) {
         $this->ajaxResponse['content'] = $content;
         CRM_Core_Page_AJAX::returnJsonResponse($this->ajaxResponse);
       }
@@ -396,11 +354,7 @@ class CRM_Core_Page {
   /**
    * Setter for print.
    *
-   * @param int|string $print
-   *   Should match a CRM_Core_Smarty::PRINT_* constant,
-   *   or equal 0 if not in print mode
-   *
-   * @return void
+   * @param bool $print
    */
   public function setPrint($print) {
     $this->_print = $print;
@@ -409,9 +363,8 @@ class CRM_Core_Page {
   /**
    * Getter for print.
    *
-   * @return int|string
-   *   Value matching a CRM_Core_Smarty::PRINT_* constant,
-   *   or 0 if not in print mode
+   * @return bool
+   *   return the print value
    */
   public function getPrint() {
     return $this->_print;
@@ -452,7 +405,7 @@ class CRM_Core_Page {
    * @param string $entity
    *   The entity being queried.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function assignFieldMetadataToTemplate($entity) {
     $fields = civicrm_api3($entity, 'getfields', ['action' => 'get']);
@@ -511,33 +464,12 @@ class CRM_Core_Page {
     $attribs = array_merge($standardAttribs, $attribs);
     foreach ($attribs as $attrib => $val) {
       if (strlen($val)) {
-        $val = htmlspecialchars($val, ENT_COMPAT);
+        $val = htmlspecialchars($val);
         $attribString .= " $attrib=\"$val\"";
       }
     }
 
     return "<i$attribString></i>$sr";
-  }
-
-  /**
-   * Add an expected smarty variable to the array.
-   *
-   * @param string $elementName
-   */
-  public function addExpectedSmartyVariable(string $elementName): void {
-    $this->expectedSmartyVariables[] = $elementName;
-  }
-
-  /**
-   * Add an expected smarty variable to the array.
-   *
-   * @param array $elementNames
-   */
-  public function addExpectedSmartyVariables(array $elementNames): void {
-    foreach ($elementNames as $elementName) {
-      // Duplicates don't actually matter....
-      $this->addExpectedSmartyVariable($elementName);
-    }
   }
 
 }

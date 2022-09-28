@@ -91,7 +91,7 @@ class CRM_Contribute_Task extends CRM_Core_Task {
           'result' => FALSE,
           'title_single_mode' => ts('Send Receipt'),
           'name' => ts('Send Receipt'),
-          'url' => 'civicrm/contribute/task?reset=1&task_item=receipt',
+          'url' => 'civicrm/contribute/task?reset=1&task=receipt',
           'key' => 'receipt',
           'icon' => 'fa-envelope-o',
           'filters' => ['contribution_status_id' => [CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')]],
@@ -101,7 +101,7 @@ class CRM_Contribute_Task extends CRM_Core_Task {
           'title' => ts('Thank-you letters - print or email'),
           'class' => 'CRM_Contribute_Form_Task_PDFLetter',
           'result' => FALSE,
-          'url' => 'civicrm/contribute/task?reset=1&task_item=letter',
+          'url' => 'civicrm/contribute/task?reset=1&task=letter',
           'key' => 'letter',
           'name' => ts('Send Letter'),
           'is_single_mode' => TRUE,
@@ -138,7 +138,7 @@ class CRM_Contribute_Task extends CRM_Core_Task {
   /**
    * Get links appropriate to the context of the row.
    *
-   * @param array $row
+   * @param $row
    *
    * @return array
    */
@@ -186,8 +186,6 @@ class CRM_Contribute_Task extends CRM_Core_Task {
       $tasks = self::taskTitles();
     }
     else {
-      // See https://lab.civicrm.org/dev/core/-/issues/3737
-      static::tasks();
       $tasks = [
         self::TASK_EXPORT => self::$_tasks[self::TASK_EXPORT]['title'],
         self::TASK_EMAIL => self::$_tasks[self::TASK_EMAIL]['title'],

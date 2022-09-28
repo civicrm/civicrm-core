@@ -69,7 +69,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'civicrm_note',
       'civicrm_entity_tag',
       'civicrm_tag',
-      'civicrm_membership',
     ];
     $this->quickCleanup($tablesToTruncate);
   }
@@ -80,8 +79,9 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
-  public function testContactGetNoResultsHook(int $version): void {
+  public function testContactGetNoResultsHook($version) {
     $this->_apiversion = $version;
     $this->hookClass->setHook('civicrm_aclWhereClause', [
       $this,
@@ -102,8 +102,9 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
-  public function testContactGetOneResultHookWithViewMyContact(int $version): void {
+  public function testContactGetOneResultHookWithViewMyContact($version) {
     $this->_apiversion = $version;
     $this->createLoggedInUser();
     $this->hookClass->setHook('civicrm_aclWhereClause', [
@@ -127,8 +128,9 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
-  public function testContactEditHookWithEditMyContact(int $version): void {
+  public function testContactEditHookWithEditMyContact($version) {
     $this->_apiversion = $version;
     $cid = $this->createLoggedInUser();
     $this->hookClass->setHook('civicrm_aclWhereClause', [
@@ -152,8 +154,9 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
-  public function testAddressWithoutContactIDAccess(int $version): void {
+  public function testAddressWithoutContactIDAccess($version) {
     $this->_apiversion = $version;
     $ownID = $this->createLoggedInUser();
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [
@@ -188,12 +191,14 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
+   * FIXME: Finish api4 part
    */
-  public function testRelatedEntityPermissions(int $version): void {
+  public function testRelatedEntityPermissions($version) {
     $this->_apiversion = $version;
     $this->createLoggedInUser();
-    $disallowedContact = $this->individualCreate([]);
+    $disallowedContact = $this->individualCreate([], 0);
     $this->allowedContactId = $this->individualCreate([], 1);
     $this->hookClass->setHook('civicrm_aclWhereClause', [
       $this,
@@ -210,10 +215,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
         'location_type_id' => 1,
       ],
     ];
-    // v3 GroupContact API is nonstandard
-    if ($version === 4) {
-      $testEntities['GroupContact'] = ['group_id' => $this->groupCreate()];
-    }
     foreach ($testEntities as $entity => $params) {
       $params += [
         'contact_id' => $disallowedContact,
@@ -278,8 +279,9 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
-  public function testContactGetAllResultsHook(int $version): void {
+  public function testContactGetAllResultsHook($version) {
     $this->_apiversion = $version;
     $this->hookClass->setHook('civicrm_aclWhereClause', [
       $this,
@@ -299,8 +301,9 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
-  public function testContactGetPermissionHookNoDeleted(int $version): void {
+  public function testContactGetPermissionHookNoDeleted($version) {
     $this->_apiversion = $version;
     $this->callAPISuccess('contact', 'create', ['id' => 2, 'is_deleted' => 1]);
     $this->hookClass->setHook('civicrm_aclWhereClause', [
@@ -320,8 +323,9 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
-  public function testContactGetHookLimitingHook(int $version): void {
+  public function testContactGetHookLimitingHook($version) {
     $this->_apiversion = $version;
     $this->hookClass->setHook('civicrm_aclWhereClause', [
       $this,
@@ -341,8 +345,9 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
-  public function testContactGetHookLimitingHookDontCheck(int $version): void {
+  public function testContactGetHookLimitingHookDontCheck($version) {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess('contact', 'get', [
       'check_permissions' => 0,
@@ -353,12 +358,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
 
   /**
    * Check that id works as a filter.
-   *
    * @param int $version
-   *
    * @dataProvider versionThreeAndFour
    */
-  public function testContactGetIDFilter(int $version): void {
+  public function testContactGetIDFilter($version) {
     $this->_apiversion = $version;
     $this->hookClass->setHook('civicrm_aclWhereClause', [
       $this,
@@ -377,7 +380,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * Check that address IS returned.
    */
-  public function testContactGetAddressReturned(): void {
+  public function testContactGetAddressReturned() {
     $this->hookClass->setHook('civicrm_aclWhereClause', [
       $this,
       'aclWhereOnlySecond',
@@ -413,12 +416,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
 
   /**
    * Check that pledge IS not returned.
-   *
    * @param int $version
-   *
    * @dataProvider versionThreeAndFour
    */
-  public function testContactGetPledgeIDNotReturned(int $version): void {
+  public function testContactGetPledgeIDNotReturned($version) {
     $this->_apiversion = $version;
     $this->hookClass->setHook('civicrm_aclWhereClause', [
       $this,
@@ -438,7 +439,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * Check that pledge IS not an allowable filter.
    */
-  public function testContactGetPledgeIDNotFiltered(): void {
+  public function testContactGetPledgeIDNotFiltered() {
     $this->hookClass->setHook('civicrm_aclWhereClause', [
       $this,
       'aclWhereHookAllResults',
@@ -460,6 +461,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testContactGetPledgeNotChainable(int $version): void {
     $this->_apiversion = $version;
@@ -479,7 +481,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     );
   }
 
-  public function setupCoreACL(): void {
+  public function setupCoreACL() {
     $this->createLoggedInUser();
     $this->_permissionedDisabledGroup = $this->groupCreate([
       'title' => 'pick-me-disabled',
@@ -499,10 +501,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * confirm that without check permissions we still get 2 contacts returned
    *
    * @param string $entity
-   * @param int $apiVersion
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testEntitiesGetHookLimitingHookNoCheck(string $entity, int $apiVersion): void {
-    $this->_apiversion = $apiVersion;
+  public function testEntitiesGetHookLimitingHookNoCheck($entity) {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
     $this->setUpEntities($entity);
     $this->hookClass->setHook('civicrm_aclWhereClause', [
@@ -513,18 +515,15 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'check_permissions' => 0,
       'return' => 'contact_id',
     ]);
-    $this->assertEquals(2, $result['count'], "failed with entity : $entity and api version $apiVersion");
+    $this->assertEquals(2, $result['count']);
   }
 
   /**
    * @dataProvider entities
    * confirm that without check permissions we still get 2 entities returned
-   *
-   * @param string $entity
-   * @param int $apiVersion
+   * @param $entity
    */
-  public function testEntitiesGetCoreACLLimitingHookNoCheck(string $entity, int $apiVersion): void {
-    $this->_apiversion = $apiVersion;
+  public function testEntitiesGetCoreACLLimitingHookNoCheck($entity) {
     $this->setupCoreACL();
     //CRM_Core_Config::singleton()->userPermissionClass->permissions = array();
     $this->setUpEntities($entity);
@@ -536,7 +535,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'check_permissions' => 0,
       'return' => 'contact_id',
     ]);
-    $this->assertEquals(2, $result['count'], "failed with entity : $entity and api version $apiVersion");
+    $this->assertEquals(2, $result['count']);
   }
 
   /**
@@ -544,17 +543,18 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * confirm that with check permissions we don't get entities
    *
    * @param $entity
-   * @param $apiVersion
+   *
+   * @throws \PHPUnit\Framework\IncompleteTestError
+   * @throws \CRM_Core_Exception
    */
-  public function testEntitiesGetCoreACLLimitingCheck($entity, $apiVersion): void {
-    $this->_apiversion = $apiVersion;
+  public function testEntitiesGetCoreACLLimitingCheck($entity) {
     $this->setupCoreACL();
     $this->setUpEntities($entity);
     $result = $this->callAPISuccess($entity, 'get', [
       'check_permissions' => 1,
       'return' => 'contact_id',
     ]);
-    $this->assertEquals(0, $result['count'], "failed with entity : $entity and api version $apiVersion");
+    $this->assertEquals(0, $result['count']);
   }
 
   /**
@@ -562,10 +562,11 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * Function tests that an empty where hook returns no results
    *
    * @param string $entity
-   * @param int $apiVersion
+   *
+   * @throws \PHPUnit\Framework\IncompleteTestError
+   * @throws \CRM_Core_Exception
    */
-  public function testEntityGetNoResultsHook(string $entity, int $apiVersion): void {
-    $this->_apiversion = $apiVersion;
+  public function testEntityGetNoResultsHook($entity) {
     $this->markTestIncomplete('hook acls only work with contacts so far');
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
     $this->setUpEntities($entity);
@@ -582,10 +583,11 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public static function entities(): array {
+  public static function entities() {
     return [
-      ['contribution', 3],
-      ['participant', 3],
+      ['contribution'],
+      ['participant'],
+    // @todo array('pledge' => 'pledge')
     ];
   }
 
@@ -594,14 +596,13 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    *
    * @param string $entity
    */
-  public function setUpEntities(string $entity): void {
+  public function setUpEntities($entity) {
     CRM_Core_DAO::createTestObject(_civicrm_api3_get_BAO($entity), [], 2, 0);
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [
       'access CiviCRM',
       'access CiviContribute',
       'access CiviEvent',
       'view event participants',
-      'access CiviMember',
     ];
   }
 
@@ -611,6 +612,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testGetActivityNoPermissions(int $version): void {
     $this->_apiversion = $version;
@@ -625,6 +627,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testGetActivityViewAllActivitiesDoesntCutItAnymore(int $version): void {
@@ -643,8 +646,9 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
-  public function testGetActivityViewAllContactsEnoughWithoutID(int $version): void {
+  public function testGetActivityViewAllContactsEnoughWithoutID($version) {
     $this->_apiversion = $version;
     $this->setPermissions(['view all contacts', 'access CiviCRM']);
     $this->callAPISuccess('Activity', 'get', ['check_permissions' => 1]);
@@ -656,9 +660,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
-  public function testGetActivityViewAllContactsEnoughWIthID(int $version): void {
+  public function testGetActivityViewAllContactsEnoughWIthID($version) {
     $this->_apiversion = $version;
     $activity = $this->activityCreate();
     $this->setPermissions(['view all contacts', 'access CiviCRM']);
@@ -674,9 +679,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
-  public function testGetActivityAccessCiviCRMEnough(int $version): void {
+  public function testGetActivityAccessCiviCRMEnough($version): void {
     $this->_apiversion = $version;
     $activity = $this->activityCreate();
     $this->setPermissions(['access CiviCRM']);
@@ -703,9 +709,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
-  public function testGetActivityCheckPermissionsByComponent(int $version): void {
+  public function testGetActivityCheckPermissionsByComponent($version): void {
     $this->_apiversion = $version;
     $activity = $this->activityCreate(['activity_type_id' => 'Contribution']);
     $activity2 = $this->activityCreate(['activity_type_id' => 'Pledge Reminder']);
@@ -730,6 +737,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testGetActivityCheckPermissionsByCaseComponent(int $version): void {
@@ -765,6 +773,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testGetActivityByACL(int $version): void {
@@ -836,9 +845,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
-  public function testGetActivityByAclCannotViewAnyContacts(int $version): void {
+  public function testGetActivityByAclCannotViewAnyContacts($version) {
     $this->_apiversion = $version;
     $activity = $this->activityCreate();
     $contacts = $this->getActivityContacts($activity);
@@ -860,9 +870,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
-  public function testGetActivityACLSourceContactDeleted($version): void {
+  public function testGetActivityACLSourceContactDeleted($version) {
     $this->_apiversion = $version;
     $this->setPermissions(['access CiviCRM', 'delete contacts']);
     $activity = $this->activityCreate();
@@ -887,9 +898,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
-  public function testActivitiesGetMultipleIdsCheckPermissions(int $version): void {
+  public function testActivitiesGetMultipleIdsCheckPermissions($version): void {
     $this->_apiversion = $version;
     $this->createLoggedInUser();
     $activity = $this->activityCreate();
@@ -916,6 +928,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testActivitiesGetMultipleIdsCheckPermissionsLimitedACL(int $version): void {
@@ -955,9 +968,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
-  public function testActivitiesGetMultipleIdsCheckPermissionsNotIN(int $version): void {
+  public function testActivitiesGetMultipleIdsCheckPermissionsNotIN($version) {
     $this->_apiversion = $version;
     $this->createLoggedInUser();
     $activity = $this->activityCreate();
@@ -982,8 +996,9 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param $activity
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
-  protected function getActivityContacts($activity): array {
+  protected function getActivityContacts($activity) {
     $contacts = [];
 
     $activityContacts = $this->callAPISuccess('ActivityContact', 'get', [
@@ -1016,7 +1031,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * Test that the 'everyone' group can be given access to a contact.
    * FIXME: Api4
    */
-  public function testGetACLEveryonePermittedEntity(): void {
+  public function testGetACLEveryonePermittedEntity() {
     $this->setupScenarioCoreACLEveryonePermittedToGroup();
     $this->callAPISuccessGetCount('Contact', [
       'id' => $this->scenarioIDs['Contact']['permitted_contact'],
@@ -1061,14 +1076,15 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
-  public function testContactGetViaJoin(int $version): void {
+  public function testContactGetViaJoin($version) {
     $this->_apiversion = $version;
     $this->createLoggedInUser();
     $main = $this->individualCreate(['first_name' => 'Main']);
     $other = $this->individualCreate(['first_name' => 'Other'], 1);
-    $tag1 = $this->tagCreate(['name' => 'tag_1', 'created_id' => $main])['id'];
-    $tag2 = $this->tagCreate(['name' => 'tag_2', 'created_id' => $other])['id'];
+    $tag1 = $this->tagCreate(['name' => uniqid('created'), 'created_id' => $main])['id'];
+    $tag2 = $this->tagCreate(['name' => uniqid('other'), 'created_id' => $other])['id'];
     $this->setPermissions(['access CiviCRM']);
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereHookAllResults']);
     $createdFirstName = 'created_id.first_name';
@@ -1092,15 +1108,12 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->assertFalse(isset($result['values'][$tag2][$createdFirstName]));
   }
 
-  /**
-   * @throws \CRM_Core_Exception
-   */
-  public function testApi4CustomEntityACL(): void {
-    $group = 'test_group';
-    $textField = 'text_field';
+  public function testApi4CustomEntityACL() {
+    $group = uniqid('mg');
+    $textField = uniqid('tx');
 
     CustomGroup::create(FALSE)
-      ->addValue('title', $group)
+      ->addValue('name', $group)
       ->addValue('extends', 'Contact')
       ->addValue('is_multiple', TRUE)
       ->addChain('field', CustomField::create()
