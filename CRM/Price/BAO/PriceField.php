@@ -461,7 +461,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             $none = ts('- none -');
           }
 
-          $choice['0'] = '<span class="crm-price-amount-label">' . $none . '</span>';
+          $choice['0'] = $none;
           $choiceAttrs['0'] = ['price' => json_encode([$elementName, '0'])];
         }
 
