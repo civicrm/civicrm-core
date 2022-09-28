@@ -65,6 +65,12 @@
             // FIXME: else: retry?
           };
 
+          if ($attr.ngDisabled) {
+            $scope.$watch($parse($attr.ngDisabled), function(disabled){
+              editor.updateOptions({readOnly: disabled});
+            });
+          }
+
           // FIXME: This makes vertical scrolling much better, but horizontal is still weird.
           var origOverflow;
           function bodyScrollSuspend() {

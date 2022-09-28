@@ -115,7 +115,9 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
     }
 
     if (is_int($ttl) && $ttl <= 0) {
-      return $this->delete($key);
+      $result = $this->delete($key);
+      $lock->release();
+      return $result;
     }
 
     $dataExists = CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM {$this->table} WHERE {$this->where($key)}");
@@ -185,7 +187,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
 
   /**
    * @param string $key
-   * @param null $default
+   * @param mixed $default
    *
    * @return mixed
    */

@@ -36,7 +36,7 @@
           {/if}
           </td>
         </tr>
-        <tr id="min_amount" class="crm-price-set-form-block-min_amount">
+        <tr class="crm-price-set-form-block-min_amount">
            <td class="label">{$form.min_amount.label}</td>
            <td>{$form.min_amount.html}</td>
         </tr>

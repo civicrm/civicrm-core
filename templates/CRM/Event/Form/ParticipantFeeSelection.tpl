@@ -81,7 +81,7 @@ CRM.$(function($) {
 
 {/literal}
 </script>
-<h3>Change Registration Selections</h3>
+<h3>{ts}Change Registration Selections{/ts}</h3>
 
 <div class="crm-block crm-form-block crm-payment-form-block">
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
@@ -92,7 +92,7 @@ CRM.$(function($) {
   {/if}
   <table class="form-layout">
     <tr>
-      <td class="font-size12pt label"><strong>{ts}Participant{/ts}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
+      <td class="label"><strong>{ts}Participant{/ts}</strong></td><td><strong>{$displayName}</strong></td>
     </tr>
     <tr>
       <td class='label'>{ts}Event{/ts}</td><td>{$eventName}</td>
@@ -143,7 +143,7 @@ CRM.$(function($) {
        </tr>
        <tr id="from-email" class="crm-event-eventfees-form-block-from_email_address">
          <td class="label">{$form.from_email_address.label}</td>
-         <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
+         <td>{$form.from_email_address.html}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
        </tr>
        <tr id='notice' class="crm-event-eventfees-form-block-receipt_text">
          <td class="label">{$form.receipt_text.label}</td>

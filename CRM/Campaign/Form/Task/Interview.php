@@ -235,7 +235,7 @@ WHERE {$clause}
     //set the title.
     $this->_surveyTypeId = $this->_surveyValues['activity_type_id'] ?? NULL;
     $surveyTypeLabel = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $this->_surveyTypeId);
-    CRM_Utils_System::setTitle(ts('Record %1 Responses', [1 => $surveyTypeLabel]));
+    $this->setTitle(ts('Record %1 Responses', [1 => $surveyTypeLabel]));
   }
 
   public function validateIds() {

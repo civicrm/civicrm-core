@@ -47,7 +47,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this);
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      CRM_Utils_System::setTitle(ts('Configure Survey') . ' - ' . $this->_surveyTitle);
+      $this->setTitle(ts('Configure Survey') . ' - ' . $this->_surveyTitle);
     }
 
     // Add custom data to form

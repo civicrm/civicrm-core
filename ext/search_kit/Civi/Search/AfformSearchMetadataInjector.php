@@ -32,10 +32,20 @@ class AfformSearchMetadataInjector {
           foreach (pq(implode(',', $displayTags), $doc) as $component) {
             $searchName = pq($component)->attr('search-name');
             $displayName = pq($component)->attr('display-name');
-            if ($searchName && $displayName) {
-              $display = \Civi\Api4\SearchDisplay::get(FALSE)
-                ->addWhere('name', '=', $displayName)
-                ->addWhere('saved_search_id.name', '=', $searchName)
+            if ($searchName) {
+              // Fetch search display if name is provided
+              if (is_string($displayName) && strlen($displayName)) {
+                $searchDisplayGet = \Civi\Api4\SearchDisplay::get(FALSE)
+                  ->addWhere('name', '=', $displayName)
+                  ->addWhere('saved_search_id.name', '=', $searchName);
+              }
+              // Fall-back to the default display
+              else {
+                $displayName = NULL;
+                $searchDisplayGet = \Civi\Api4\SearchDisplay::getDefault(FALSE)
+                  ->setSavedSearch($searchName);
+              }
+              $display = $searchDisplayGet
                 ->addSelect('settings', 'saved_search_id.api_entity', 'saved_search_id.api_params')
                 ->execute()->first();
               if ($display) {
@@ -47,8 +57,21 @@ class AfformSearchMetadataInjector {
                 // Add entity names to the fieldset so that afform can populate field metadata
                 $fieldset = pq($component)->parents('[af-fieldset]');
                 if ($fieldset->length) {
-                  $entityList = array_merge([$display['saved_search_id.api_entity']], array_column($display['saved_search_id.api_params']['join'] ?? [], 0));
+                  $entityList = [$display['saved_search_id.api_entity']];
+                  foreach ($display['saved_search_id.api_params']['join'] ?? [] as $join) {
+                    $entityList[] = $join[0];
+                    if (is_string($join[2] ?? NULL)) {
+                      $entityList[] = $join[2] . ' AS ' . (explode(' AS ', $join[0])[1]);
+                    }
+                  }
                   $fieldset->attr('api-entities', htmlspecialchars(\CRM_Utils_JS::encode($entityList)));
+                  // Add field metadata for aggregate fields because they are not in the schema.
+                  // Normal entity fields will be handled by AfformMetadataInjector
+                  foreach (Meta::getCalcFields($display['saved_search_id.api_entity'], $display['saved_search_id.api_params']) as $fieldInfo) {
+                    foreach (pq("af-field[name='{$fieldInfo['name']}']", $doc) as $afField) {
+                      \Civi\Afform\AfformMetadataInjector::setFieldMetadata($afField, $fieldInfo);
+                    }
+                  }
                 }
               }
             }
@@ -56,7 +79,6 @@ class AfformSearchMetadataInjector {
         }
       });
     $e->angular->add($changeSet);
-
   }
 
 }

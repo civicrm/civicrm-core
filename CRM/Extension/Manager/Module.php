@@ -97,6 +97,15 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
     $this->callHook($info, 'enable');
   }
 
+  public function onPostReplace(CRM_Extension_Info $oldInfo, CRM_Extension_Info $newInfo) {
+    // Like everything, ClassScanner is probably affected by pre-existing/long-standing issue dev/core#3686.
+    // This may mitigate a couple edge-cases. But really #3686 needs a different+deeper fix.
+    \Civi\Core\ClassScanner::cache('structure')->flush();
+    \Civi\Core\ClassScanner::cache('index')->flush();
+
+    parent::onPostReplace($oldInfo, $newInfo);
+  }
+
   /**
    * @param CRM_Extension_Info $info
    */

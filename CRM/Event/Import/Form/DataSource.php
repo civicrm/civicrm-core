@@ -25,6 +25,15 @@ class CRM_Event_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   const IMPORT_ENTITY = 'Participant';
 
   /**
+   * Get the name of the type to be stored in civicrm_user_job.type_id.
+   *
+   * @return string
+   */
+  public function getUserJobType(): string {
+    return 'participant_import';
+  }
+
+  /**
    * Build the form object.
    *
    * @return void
@@ -32,7 +41,6 @@ class CRM_Event_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   public function buildQuickForm() {
     parent::buildQuickForm();
 
-    $duplicateOptions = [];
     $this->addRadio('onDuplicate', ts('On Duplicate Entries'), [
       CRM_Import_Parser::DUPLICATE_SKIP => ts('Skip'),
       CRM_Import_Parser::DUPLICATE_UPDATE => ts('Update'),
@@ -44,19 +52,15 @@ class CRM_Event_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   }
 
   /**
-   * Process the uploaded file.
-   *
-   * @return void
+   * @return CRM_Event_Import_Parser_Participant
    */
-  public function postProcess() {
-    $this->storeFormValues([
-      'onDuplicate',
-      'contactType',
-      'dateFormats',
-      'savedMapping',
-    ]);
-
-    $this->submitFileForMapping('CRM_Event_Import_Parser_Participant');
+  protected function getParser(): CRM_Event_Import_Parser_Participant {
+    if (!$this->parser) {
+      $this->parser = new CRM_Event_Import_Parser_Participant();
+      $this->parser->setUserJobID($this->getUserJobID());
+      $this->parser->init();
+    }
+    return $this->parser;
   }
 
 }

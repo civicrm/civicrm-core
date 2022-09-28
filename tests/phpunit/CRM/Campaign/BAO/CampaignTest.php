@@ -15,7 +15,6 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-
 class CRM_Campaign_BAO_CampaignTest extends CiviUnitTestCase {
 
   public function testCampaignSummary() {
@@ -39,4 +38,4 @@ class CRM_Campaign_BAO_CampaignTest extends CiviUnitTestCase {
     $this->assertEquals(1, CRM_Campaign_BAO_Campaign::getCampaignSummary(['status_id' => [2, 3]], TRUE));
   }
 
-} 
+}

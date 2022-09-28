@@ -38,8 +38,6 @@ class CRM_Financial_BAO_Payment {
    * @return \CRM_Financial_DAO_FinancialTrxn
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   * @throws \API_Exception
    */
   public static function create(array $params): CRM_Financial_DAO_FinancialTrxn {
     $contribution = civicrm_api3('Contribution', 'getsingle', ['id' => $params['contribution_id']]);
@@ -191,7 +189,7 @@ class CRM_Financial_BAO_Payment {
           'is_email_receipt' => $params['is_send_contribution_notification'],
           'trxn_date' => $params['trxn_date'],
           'payment_instrument_id' => $paymentTrxnParams['payment_instrument_id'],
-          'payment_processor_id' => $paymentTrxnParams['payment_processor_id'] ?? NULL,
+          'payment_processor_id' => $paymentTrxnParams['payment_processor_id'] ?? '',
         ]);
         // Get the trxn
         $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
@@ -227,7 +225,7 @@ class CRM_Financial_BAO_Payment {
    * @param array $params
    * @param int $contributionID
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function updateRelatedContribution(array $params, int $contributionID): void {
     $contributionDAO = new CRM_Contribute_DAO_Contribution();
@@ -273,14 +271,15 @@ class CRM_Financial_BAO_Payment {
    *
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function sendConfirmation($params) {
 
     $entities = self::loadRelatedEntities($params['id']);
+
     $sendTemplateParams = [
       'groupName' => 'msg_tpl_workflow_contribution',
-      'valueName' => 'payment_or_refund_notification',
+      'workflow' => 'payment_or_refund_notification',
       'PDFFilename' => ts('notification') . '.pdf',
       'contactId' => $entities['contact']['id'],
       'toName' => $entities['contact']['display_name'],
@@ -330,7 +329,7 @@ class CRM_Financial_BAO_Payment {
    *   - event = [.... full event details......]
    *   - contribution = ['id' => x],
    *   - payment = [payment info + payment summary info]
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected static function loadRelatedEntities($id) {
     $entities = [];
@@ -373,8 +372,7 @@ class CRM_Financial_BAO_Payment {
    * @param int $contributionID
    *
    * @return int
-   * @throws \CiviCRM_API3_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getPaymentContactID($contributionID) {
     $contribution = civicrm_api3('Contribution', 'getsingle', [
@@ -496,7 +494,7 @@ class CRM_Financial_BAO_Payment {
    * @param int $contributionID
    * @param string $status
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   private static function updateContributionStatus(int $contributionID, string $status) {
     civicrm_api3('Contribution', 'create',
@@ -522,7 +520,7 @@ class CRM_Financial_BAO_Payment {
    * @param $params
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected static function getPayableLineItems($params): array {
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution_id']);
@@ -572,7 +570,7 @@ class CRM_Financial_BAO_Payment {
    *
    * @return float
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected static function getAmountOfLineItemPaid($lineItemID) {
     $paid = 0;
@@ -603,7 +601,7 @@ class CRM_Financial_BAO_Payment {
    * @param array $params
    * @param int $trxnID
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected static function reverseAllocationsFromPreviousPayment($params, $trxnID) {
     // Do a direct reversal of any entity_financial_trxn records being cancelled.
@@ -646,7 +644,7 @@ class CRM_Financial_BAO_Payment {
    *
    * @return int
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected static function getNewFinancialItemID($lineItem, $trxn_date, $contactID, $currency): int {
     $financialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(

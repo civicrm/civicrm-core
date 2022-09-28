@@ -1,0 +1,4 @@
+first_name,last_name,geocodeone,GeoCodetwo,expected
+Madame,1,1,-1,Valid
+Madame,2,a,b,Invalid
+Madame,3,1.1123,-1.1123,Valid

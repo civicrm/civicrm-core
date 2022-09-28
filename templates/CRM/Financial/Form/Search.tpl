@@ -9,9 +9,6 @@
 *}
 
 {* Financial search component. *}
-{if !isset($batchStatus)}
-  {assign var="batchStatus" value="open"}
-{/if}
 <div id="enableDisableStatusMsg" class="crm-container" style="display:none"></div>
 <div class="action-link">
   <a accesskey="N" href="{crmURL p='civicrm/financial/batch' q="reset=1&action=add&context=$batchStatus"}" id="newBatch" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}New Accounting Batch{/ts}</span></a>
@@ -233,7 +230,7 @@ CRM.$(function($) {
           CRM.alert({/literal}'{ts escape="js"}An error occurred while processing your request.{/ts}', $("#batch_update option[value=" + op + "]").text() + ' {ts escape="js"}Error{/ts}'{literal}, 'error');
         }
       },
-      'json').error(serverError);
+      'json').fail(serverError);
   }
 
   function validateOp(records, op) {

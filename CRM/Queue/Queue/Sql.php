@@ -14,6 +14,8 @@
  */
 class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
 
+  use CRM_Queue_Queue_SqlTrait;
+
   /**
    * Create a reference to queue. After constructing the queue, one should
    * usually call createQueue (if it's a new queue) or loadQueue (if it's
@@ -33,89 +35,22 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
   }
 
   /**
-   * Perform any registation or resource-allocation for a new queue
-   */
-  public function createQueue() {
-    // nothing to do -- just start CRUDing items in the appropriate table
-  }
-
-  /**
-   * Perform any loading or pre-fetch for an existing queue.
-   */
-  public function loadQueue() {
-    // nothing to do -- just start CRUDing items in the appropriate table
-  }
-
-  /**
-   * Release any resources claimed by the queue (memory, DB rows, etc)
-   */
-  public function deleteQueue() {
-    return CRM_Core_DAO::singleValueQuery("
-      DELETE FROM civicrm_queue_item
-      WHERE queue_name = %1
-    ", [
-      1 => [$this->getName(), 'String'],
-    ]);
-  }
-
-  /**
-   * Check if the queue exists.
-   *
-   * @return bool
-   */
-  public function existsQueue() {
-    return ($this->numberOfItems() > 0);
-  }
-
-  /**
-   * Add a new item to the queue.
-   *
-   * @param mixed $data
-   *   Serializable PHP object or array.
-   * @param array $options
-   *   Queue-dependent options; for example, if this is a
-   *   priority-queue, then $options might specify the item's priority.
-   */
-  public function createItem($data, $options = []) {
-    $dao = new CRM_Queue_DAO_QueueItem();
-    $dao->queue_name = $this->getName();
-    $dao->submit_time = CRM_Utils_Time::getTime('YmdHis');
-    $dao->data = serialize($data);
-    $dao->weight = CRM_Utils_Array::value('weight', $options, 0);
-    $dao->save();
-  }
-
-  /**
-   * Determine number of items remaining in the queue.
-   *
-   * @return int
-   */
-  public function numberOfItems() {
-    return CRM_Core_DAO::singleValueQuery("
-      SELECT count(*)
-      FROM civicrm_queue_item
-      WHERE queue_name = %1
-    ", [
-      1 => [$this->getName(), 'String'],
-    ]);
-  }
-
-  /**
    * Get the next item.
    *
-   * @param int $lease_time
-   *   Seconds.
-   *
+   * @param int|null $lease_time
+   *   Hold a lease on the claimed item for $X seconds.
+   *   If NULL, inherit a queue default (`$queueSpec['lease_time']`) or system default (`DEFAULT_LEASE_TIME`).
    * @return object
    *   With key 'data' that matches the inputted data.
    */
-  public function claimItem($lease_time = 3600) {
+  public function claimItem($lease_time = NULL) {
+    $lease_time = $lease_time ?: $this->getSpec('lease_time') ?: static::DEFAULT_LEASE_TIME;
 
     $result = NULL;
     $dao = CRM_Core_DAO::executeQuery('LOCK TABLES civicrm_queue_item WRITE;');
     $sql = "
         SELECT first_in_queue.* FROM (
-          SELECT id, queue_name, submit_time, release_time, data
+          SELECT id, queue_name, submit_time, release_time, run_count, data
           FROM civicrm_queue_item
           WHERE queue_name = %1
           ORDER BY weight ASC, id ASC
@@ -135,10 +70,14 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
 
     if ($dao->fetch()) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = %1 WHERE id = %2", [
+      $dao->run_count++;
+      $sql = "UPDATE civicrm_queue_item SET release_time = %1, run_count = %3 WHERE id = %2";
+      $sqlParams = [
         '1' => [date('YmdHis', $nowEpoch + $lease_time), 'String'],
         '2' => [$dao->id, 'Integer'],
-      ]);
+        '3' => [$dao->run_count, 'Integer'],
+      ];
+      CRM_Core_DAO::executeQuery($sql, $sqlParams);
       // (Comment by artfulrobot Sep 2019: Not sure what the below comment means, should be removed/clarified?)
       // work-around: inconsistent date-formatting causes unintentional breakage
       #        $dao->submit_time = date('YmdHis', strtotime($dao->submit_time));
@@ -156,15 +95,17 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
   /**
    * Get the next item, even if there's an active lease
    *
-   * @param int $lease_time
-   *   Seconds.
-   *
+   * @param int|null $lease_time
+   *   Hold a lease on the claimed item for $X seconds.
+   *   If NULL, inherit a queue default (`$queueSpec['lease_time']`) or system default (`DEFAULT_LEASE_TIME`).
    * @return object
    *   With key 'data' that matches the inputted data.
    */
-  public function stealItem($lease_time = 3600) {
+  public function stealItem($lease_time = NULL) {
+    $lease_time = $lease_time ?: $this->getSpec('lease_time') ?: static::DEFAULT_LEASE_TIME;
+
     $sql = "
-      SELECT id, queue_name, submit_time, release_time, data
+      SELECT id, queue_name, submit_time, release_time, run_count, data
       FROM civicrm_queue_item
       WHERE queue_name = %1
       ORDER BY weight ASC, id ASC
@@ -176,6 +117,7 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
     $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, 'CRM_Queue_DAO_QueueItem');
     if ($dao->fetch()) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
+      $dao->run_count++;
       CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = %1 WHERE id = %2", [
         '1' => [date('YmdHis', $nowEpoch + $lease_time), 'String'],
         '2' => [$dao->id, 'Integer'],
@@ -183,30 +125,6 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
       $dao->data = unserialize($dao->data);
       return $dao;
     }
-  }
-
-  /**
-   * Remove an item from the queue.
-   *
-   * @param CRM_Core_DAO $dao
-   *   The item returned by claimItem.
-   */
-  public function deleteItem($dao) {
-    $dao->delete();
-  }
-
-  /**
-   * Return an item that could not be processed.
-   *
-   * @param CRM_Core_DAO $dao
-   *   The item returned by claimItem.
-   */
-  public function releaseItem($dao) {
-    $sql = "UPDATE civicrm_queue_item SET release_time = NULL WHERE id = %1";
-    $params = [
-      1 => [$dao->id, 'Integer'],
-    ];
-    CRM_Core_DAO::executeQuery($sql, $params);
   }
 
 }

@@ -30,7 +30,7 @@
                 {if !empty($field.operatorType) && $field.operatorType & 4}
                   <tr class="report-contents crm-report crm-report-criteria-filter crm-report-criteria-filter-{$tableName}">
                     <td class="label report-contents">{if !empty($field.title)}{$field.title}{/if}</td>
-                      {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName=$fieldName hideRelativeLabel=1 from='_from' to='_to'}
+                      {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName=$fieldName hideRelativeLabel=1 from='_from' to='_to' class='' colspan=''}
                   </tr>
                 {elseif $form.$fieldOp.html}
                   <tr class="report-contents crm-report crm-report-criteria-filter crm-report-criteria-filter-{$tableName}" {if !empty($field.no_display)} style="display: none;"{/if}>

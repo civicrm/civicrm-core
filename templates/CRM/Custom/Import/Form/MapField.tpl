@@ -7,4 +7,4 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{include file="CRM/Contact/Import/Form/MapField.tpl"}
+{include file="CRM/Import/Form/MapField.tpl"}

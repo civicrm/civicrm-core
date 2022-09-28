@@ -14,6 +14,9 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+
+use Civi\API\Exception\UnauthorizedException;
+
 require_once 'Mail/mime.php';
 
 /**
@@ -51,13 +54,13 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
 
   /**
    * The header associated with this mailing.
-   * @var string
+   * @var CRM_Mailing_BAO_MailingComponent
    */
   private $header = NULL;
 
   /**
    * The footer associated with this mailing.
-   * @var string
+   * @var CRM_Mailing_BAO_MailingComponent
    */
   private $footer = NULL;
 
@@ -78,27 +81,6 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
    * @var int
    */
   private $_domain = NULL;
-
-  /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
-   * @deprecated
-   *
-   * @param int $mailingID
-   *
-   * @return int
-   */
-  public static function getRecipientsCount($mailingID) {
-    //rebuild the recipients
-    self::getRecipients($mailingID);
-
-    return civicrm_api3('MailingRecipients', 'getcount', ['mailing_id' => $mailingID]);
-  }
 
   /**
    * This function retrieve recipients of selected mailing groups.
@@ -147,7 +129,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
       return;
     }
 
-    list($location_filter, $order_by) = self::getLocationFilterAndOrderBy($mailingObj->email_selection_method, $mailingObj->location_type_id);
+    [$location_filter, $order_by] = self::getLocationFilterAndOrderBy($mailingObj->email_selection_method, $mailingObj->location_type_id);
 
     // get all the saved searches AND hierarchical groups
     // and load them in the cache
@@ -304,25 +286,10 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         ->execute();
     }
 
-    // Construct the filtered search queries.
-    $dao = CRM_Utils_SQL_Select::from('civicrm_mailing_group')
-      ->select('search_id, search_args, entity_id')
-      ->where('search_id IS NOT NULL AND mailing_id = #mailingID')
-      ->param('#mailingID', $mailingID)
-      ->execute();
-    while ($dao->fetch()) {
-      $customSQL = CRM_Contact_BAO_SearchCustom::civiMailSQL($dao->search_id,
-        $dao->search_args,
-        $dao->entity_id
-      );
-      $query = "REPLACE INTO {$includedTempTablename} ($entityColumn, contact_id) {$customSQL} ";
-      $mailingGroup->query($query);
-    }
-
-    list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause();
+    [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause();
 
     // clear all the mailing recipients before populating
-    CRM_Core_DAO::executeQuery(" DELETE FROM civicrm_mailing_recipients WHERE  mailing_id = %1 ", [
+    CRM_Core_DAO::executeQuery(' DELETE FROM civicrm_mailing_recipients WHERE  mailing_id = %1 ', [
       1 => [
         $mailingID,
         'Integer',
@@ -450,36 +417,70 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
   }
 
   /**
-   * @param string $type
+   * Process parameters to ensure workflow permissions are respected.
+   *
+   * 'schedule mailings' and 'approve mailings' can update certain fields,
+   * but can't create.
+   *
+   * @param array $params
+   *
+   * @return array
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected static function processWorkflowPermissions(array $params): array {
+    if (empty($params['id']) && !CRM_Core_Permission::check('access CiviMail') && !CRM_Core_Permission::check('create mailings')) {
+      throw new UnauthorizedException("Cannot create new mailing. Required permission: 'access CiviMail' or 'create mailings'");
+    }
+
+    $safeParams = [];
+    $fieldPerms = CRM_Mailing_BAO_Mailing::getWorkflowFieldPerms();
+    foreach (array_keys($params) as $field) {
+      if (CRM_Core_Permission::check($fieldPerms[$field])) {
+        $safeParams[$field] = $params[$field];
+      }
+    }
+    return $safeParams;
+  }
+
+  /**
+   * Do Submit actions.
+   *
+   * When submitting (as opposed to creating or updating) a mailing it should
+   * be scheduled.
+   *
+   * This function creates the initial job and the recipient list.
+   *
+   * @param array $params
+   * @param \CRM_Mailing_DAO_Mailing $mailing
    *
    * @return array
    */
-  private function _getMailingGroupIds($type = 'Include') {
-    $mailingGroup = new CRM_Mailing_DAO_MailingGroup();
-    $group = CRM_Contact_DAO_Group::getTableName();
-    if (!isset($this->id)) {
-      // we're just testing tokens, so return any group
-      $query = "SELECT   id AS entity_id
-                      FROM     $group
-                      ORDER BY id
-                      LIMIT 1";
-    }
-    else {
-      $mg = CRM_Mailing_DAO_MailingGroup::getTableName();
-      $query = "SELECT entity_id
-                      FROM   $mg
-                      WHERE  mailing_id = {$this->id}
-                      AND    group_type = '$type'
-                      AND    entity_table = '$group'";
-    }
-    $mailingGroup->query($query);
+  protected static function doSubmitActions(array $params, CRM_Mailing_DAO_Mailing $mailing): array {
+    // Create parent job if not yet created.
+    // Condition on the existence of a scheduled date.
+    if (!empty($params['scheduled_date']) && $params['scheduled_date'] != 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
+      $job = new CRM_Mailing_BAO_MailingJob();
+      $job->mailing_id = $mailing->id;
+      // If we are creating a new Completed mailing (e.g. import from another system) set the job to completed.
+      // Keeping former behaviour when an id is present is precautionary and may warrant reconsideration later.
+      $job->status = ((empty($params['is_completed']) || !empty($params['id'])) ? 'Scheduled' : 'Complete');
+      $job->is_test = 0;
 
-    $groupIds = [];
-    while ($mailingGroup->fetch()) {
-      $groupIds[] = $mailingGroup->entity_id;
+      if (!$job->find(TRUE)) {
+        // Don't schedule job until we populate the recipients.
+        $job->scheduled_date = NULL;
+        $job->save();
+      }
+      // Schedule the job now that it has recipients.
+      $job->scheduled_date = $params['scheduled_date'];
+      $job->save();
     }
 
-    return $groupIds;
+    // Populate the recipients.
+    if (empty($params['_skip_evil_bao_auto_recipients_'])) {
+      self::getRecipients($mailing->id);
+    }
+    return $params;
   }
 
   /**
@@ -613,7 +614,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         preg_match_all($patterns[$key], $email, $matches, PREG_PATTERN_ORDER);
         foreach ($matches[0] as $idx => $token) {
           $preg_token = '/' . preg_quote($token, '/') . '/im';
-          list($split_template[], $email) = preg_split($preg_token, $email, 2);
+          [$split_template[], $email] = preg_split($preg_token, $email, 2);
           array_push($tokens, $this->getDataFunc($token));
         }
         if ($email) {
@@ -665,7 +666,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
       }
 
       // To check for an html part strip tags
-      if (trim(strip_tags($this->body_html, '<img>'))) {
+      if (trim(strip_tags(($this->body_html ?? ''), '<img>'))) {
 
         $template = [];
         if ($this->header) {
@@ -929,7 +930,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $bao->from_name = $bao->from_email = $bao->subject = '';
 
     // use $bao's instance method to get verp and urls
-    list($verp, $urls, $_) = $bao->getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email);
+    [$verp, $urls, $_] = $bao->getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email);
     return [$verp, $urls];
   }
 
@@ -1043,7 +1044,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @param bool $isForward
    *   Is this mailing compose for forward?.
    * @param string $fromEmail
-   *   Email address of who is forwardinf it.
+   *   Email address of who is forwarding it.
    *
    * @param null $replyToEmail
    *
@@ -1062,7 +1063,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $this->_domain = CRM_Core_BAO_Domain::getDomain();
     }
 
-    list($verp, $urls, $headers) = $this->getVerpAndUrlsAndHeaders(
+    [$verp, $urls, $headers] = $this->getVerpAndUrlsAndHeaders(
       $job_id,
       $event_queue_id,
       $hash,
@@ -1090,7 +1091,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
     else {
       $params = [['contact_id', '=', $contactId, 0, 0]];
-      list($contact) = CRM_Contact_BAO_Query::apiQuery($params);
+      [$contact] = CRM_Contact_BAO_Query::apiQuery($params);
       // $contact is an array of [ contactID => contactDetails ]
 
       // also call the hook to get contact details
@@ -1162,11 +1163,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     $mailParams = $headers;
-    if ($text && ($test || $contact['preferred_mail_format'] == 'Text' ||
-        $contact['preferred_mail_format'] == 'Both' ||
-        ($contact['preferred_mail_format'] == 'HTML' && !array_key_exists('html', $pEmails))
-      )
-    ) {
+    if ($text) {
       $textBody = implode('', $text);
       if ($useSmarty) {
         $textBody = $smarty->fetch("string:$textBody");
@@ -1174,10 +1171,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $mailParams['text'] = $textBody;
     }
 
-    if ($html && ($test || ($contact['preferred_mail_format'] == 'HTML' ||
-          $contact['preferred_mail_format'] == 'Both'
-        ))
-    ) {
+    if ($html) {
       $htmlBody = implode('', $html);
       if ($useSmarty) {
         $htmlBody = $smarty->fetch("string:$htmlBody");
@@ -1418,80 +1412,62 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     if (!isset($this->id)) {
       return [];
     }
-    $mg = new CRM_Mailing_DAO_MailingGroup();
-    $mgtable = CRM_Mailing_DAO_MailingGroup::getTableName();
-    $group = CRM_Contact_BAO_Group::getTableName();
 
-    $mg->query("SELECT      $group.title as name FROM $mgtable
-                    INNER JOIN  $group ON $mgtable.entity_id = $group.id
-                    WHERE       $mgtable.mailing_id = {$this->id}
-                        AND     $mgtable.entity_table = '$group'
-                        AND     $mgtable.group_type = 'Include'
-                    ORDER BY    $group.name");
+    /*
+    This bypasses permissions to maintain compatibility with the SQL it replaced.  This should ideally not bypass
+    permissions in the future, but it's called by some extensions during mail processing, when cron isn't necessarily
+    called with a logged-in user.
+     */
+    $mailingGroups = \Civi\Api4\MailingGroup::get(FALSE)
+      ->addSelect('group.title', 'group.frontend_title')
+      ->addJoin('Group AS group', 'LEFT', ['entity_id', '=', 'group.id'])
+      ->addWhere('mailing_id', '=', $this->id)
+      ->addWhere('entity_table', '=', 'civicrm_group')
+      ->addWhere('group_type', '=', 'Include')
+      ->execute();
 
-    $groups = [];
-    while ($mg->fetch()) {
-      $groups[] = $mg->name;
+    $groupNames = [];
+
+    foreach ($mailingGroups as $mg) {
+      $name = $mg['group.frontend_title'] ?? $mg['group.title'];
+      if ($name) {
+        $groupNames[] = $name;
+      }
     }
-    return $groups;
+
+    return $groupNames;
   }
 
   /**
    * Add the mailings.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
-   * @param array $ids
-   *   Reference array contains the id.
-   *
    *
    * @return CRM_Mailing_DAO_Mailing
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function add(&$params, $ids = []) {
-    $id = $params['id'] ?? $ids['mailing_id'] ?? NULL;
+  public static function add($params) {
+    $id = $params['id'] ?? NULL;
 
-    if (empty($params['id']) && !empty($ids)) {
-      CRM_Core_Error::deprecatedWarning('Parameter $ids is no longer used by Mailing::add. Use the api or just pass $params');
+    if (!empty($params['check_permissions']) && CRM_Mailing_Info::workflowEnabled()) {
+      $params = self::processWorkflowPermissions($params);
     }
-
-    if ($id) {
-      CRM_Utils_Hook::pre('edit', 'Mailing', $id, $params);
+    if (!$id) {
+      $params['domain_id'] = $params['domain_id'] ?? CRM_Core_Config::domainID();
     }
-    else {
-      CRM_Utils_Hook::pre('create', 'Mailing', NULL, $params);
-    }
-
-    $mailing = new static();
-    if ($id) {
-      $mailing->id = $id;
-      $mailing->find(TRUE);
-    }
-    $mailing->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
-
-    if (((!$id && empty($params['replyto_email'])) || !isset($params['replyto_email'])) &&
+    if (
+      ((!$id && empty($params['replyto_email'])) || !isset($params['replyto_email'])) &&
       isset($params['from_email'])
     ) {
       $params['replyto_email'] = $params['from_email'];
     }
-    $mailing->copyValues($params);
-
     // CRM-20892 Unset Modifed Date here so that MySQL can correctly set an updated modfied date.
-    unset($mailing->modified_date);
-    $result = $mailing->save();
+    unset($params['modified_date']);
+
+    $result = static::writeRecord($params);
 
     // CRM-20892 Re find record after saing so we can set the updated modified date in the result.
-    $mailing->find(TRUE);
-
-    if (isset($mailing->modified_date)) {
-      $result->modified_date = $mailing->modified_date;
-    }
-
-    if ($id) {
-      CRM_Utils_Hook::post('edit', 'Mailing', $mailing->id, $mailing);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'Mailing', $mailing->id, $mailing);
-    }
+    $result->find(TRUE);
 
     return $result;
   }
@@ -1510,7 +1486,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    *  - _skip_evil_bao_auto_recipients_: bool
    *  - _skip_evil_bao_auto_schedule_: bool
-   *  - _evil_bao_validator_: string|callable
    *
    * </twowrongsmakesaright>
    *
@@ -1518,20 +1493,13 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *   Form values.
    *
    * @param array $params
-   * @param array $ids
    *
    * @return object
    *   $mailing      The new mailing object
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
-  public static function create(&$params, $ids = []) {
-
-    if (empty($params['id']) && (array_filter($ids) !== [])) {
-      $params['id'] = $ids['mailing_id'] ?? $ids['id'];
-      CRM_Core_Error::deprecatedWarning('Parameter $ids is no longer used by Mailing::create. Use the api or just pass $params');
-    }
+  public static function create(array $params) {
 
     // CRM-#1843
     // If it is a mass sms, set url_tracking to false
@@ -1591,7 +1559,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       if (empty($defaults['from_email'])) {
         $defaultAddress = CRM_Core_BAO_Domain::getNameAndEmail(TRUE, TRUE);
         foreach ($defaultAddress as $id => $value) {
-          if (preg_match('/"(.*)" <(.*)>/', $value, $match)) {
+          if (preg_match('/"(.*)" <(.*)>/', ($value ?? ''), $match)) {
             $defaults['from_email'] = $match[2];
             $defaults['from_name'] = $match[1];
           }
@@ -1650,42 +1618,14 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     // check and attach and files as needed
     CRM_Core_BAO_File::processAttachment($params, 'civicrm_mailing', $mailing->id);
 
-    // If we're going to autosend, then check validity before saving.
-    if (empty($params['is_completed']) && !empty($params['scheduled_date']) && $params['scheduled_date'] != 'null' && !empty($params['_evil_bao_validator_'])) {
-      $cb = Civi\Core\Resolver::singleton()
-        ->get($params['_evil_bao_validator_']);
-      $errors = call_user_func($cb, $mailing);
-      if (!empty($errors)) {
-        $fields = implode(',', array_keys($errors));
-        throw new CRM_Core_Exception("Mailing cannot be sent. There are missing or invalid fields ($fields).", 'cannot-send', $errors);
-      }
-    }
-
     $transaction->commit();
 
-    // Create parent job if not yet created.
-    // Condition on the existence of a scheduled date.
-    if (!empty($params['scheduled_date']) && $params['scheduled_date'] != 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
-      $job = new CRM_Mailing_BAO_MailingJob();
-      $job->mailing_id = $mailing->id;
-      // If we are creating a new Completed mailing (e.g. import from another system) set the job to completed.
-      // Keeping former behaviour when an id is present is precautionary and may warrant reconsideration later.
-      $job->status = ((empty($params['is_completed']) || !empty($params['id'])) ? 'Scheduled' : 'Complete');
-      $job->is_test = 0;
-
-      if (!$job->find(TRUE)) {
-        // Don't schedule job until we populate the recipients.
-        $job->scheduled_date = NULL;
-        $job->save();
-      }
-      // Schedule the job now that it has recipients.
-      $job->scheduled_date = $params['scheduled_date'];
-      $job->save();
-    }
-
-    // Populate the recipients.
-    if (empty($params['_skip_evil_bao_auto_recipients_'])) {
-      self::getRecipients($mailing->id);
+    // These actions are really 'submit' not create actions.
+    // In v4 of the api they are not available via CRUD. At some
+    // point we will create a 'submit' function which will do the crud+submit
+    // but for now only CRUD is available via v4 api.
+    if (($params['version'] ?? '') !== 4) {
+      $params = self::doSubmitActions($params, $mailing);
     }
 
     return $mailing;
@@ -1694,12 +1634,22 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * @deprecated
    *   This is used by CiviMail but will be made redundant by FlexMailer.
-   * @param CRM_Mailing_DAO_Mailing $mailing
+   * @param CRM_Mailing_DAO_Mailing|array $mailing
    *   The mailing which may or may not be sendable.
    * @return array
    *   List of error messages.
    */
   public static function checkSendable($mailing) {
+    if (is_array($mailing)) {
+      $params = $mailing;
+      $mailing = new \CRM_Mailing_BAO_Mailing();
+      $mailing->id = $params['id'] ?? NULL;
+      if ($mailing->id) {
+        $mailing->find(TRUE);
+      }
+      $mailing->copyValues($params);
+    }
+
     $errors = [];
     foreach (['subject', 'name', 'from_name', 'from_email'] as $field) {
       if (empty($mailing->{$field})) {
@@ -1743,7 +1693,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @param string $entity
    *   'groups' or 'mailings'.
    * @param array $entityIds
-   * @throws CiviCRM_API3_Exception
+   * @throws CRM_Core_Exception
    */
   public static function replaceGroups($mailingId, $type, $entity, $entityIds) {
     $values = [];
@@ -2058,16 +2008,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $report['jobs'][] = $row;
     }
 
-    $newTableSize = CRM_Mailing_BAO_Recipients::mailingSize($mailing_id);
-
-    // we need to do this for backward compatibility, since old mailings did not
-    // use the mailing_recipients table
-    if ($newTableSize > 0) {
-      $report['event_totals']['queue'] = $newTableSize;
-    }
-    else {
-      $report['event_totals']['queue'] = self::getRecipientsCount($mailing_id);
-    }
+    $report['event_totals']['queue'] = CRM_Mailing_BAO_Recipients::mailingSize($mailing_id);
 
     if (!empty($report['event_totals']['queue'])) {
       $report['event_totals']['delivered_rate'] = (100.0 * $report['event_totals']['delivered']) / $report['event_totals']['queue'];
@@ -2115,7 +2056,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         'clicks' => $mailing->clicks,
         'unique' => $mailing->unique_clicks,
         'rate' => !empty($report['event_totals']['delivered']) ? (100.0 * $mailing->unique_clicks) / $report['event_totals']['delivered'] : 0,
-        'report' => CRM_Report_Utils_Report::getNextUrl('mailing/clicks', "reset=1&mailing_id_value={$mailing_id}&url_value={$mailing->url}", FALSE, TRUE),
+        'report' => CRM_Report_Utils_Report::getNextUrl('mailing/clicks', "reset=1&mailing_id_value={$mailing_id}&url_value=" . rawurlencode($mailing->url), FALSE, TRUE),
       ];
     }
 
@@ -2343,7 +2284,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    * @param int $offset
    *   The row number to start from.
    * @param int $rowCount
-   *   The nmber of rows to return.
+   *   The number of rows to return.
    * @param string $sort
    *   The sql string that describes the sort order.
    *
@@ -2745,7 +2686,8 @@ WHERE  civicrm_mailing_job.id = %1
   }
 
   /**
-   * @param null $mode
+   * @param string|null $mode
+   *   Either 'sms' or null
    *
    * @return bool
    * @throws Exception
@@ -2908,7 +2850,7 @@ ORDER BY civicrm_mailing.name";
         CRM_Core_Action::VIEW => [
           'name' => ts('View'),
           'url' => 'civicrm/mailing/view',
-          'qs' => "reset=1&id=%%mkey%%",
+          'qs' => "reset=1&id=%%mkey%%&cid=%%cid%%&cs=%%cs%%",
           'title' => ts('View Mailing'),
           'class' => 'crm-popup',
         ],
@@ -2932,6 +2874,7 @@ ORDER BY civicrm_mailing.name";
           'mid' => $values['mailing_id'],
           'cid' => $params['contact_id'],
           'mkey' => $mailingKey,
+          'cs' => CRM_Contact_BAO_Contact_Utils::generateChecksum($params['contact_id'], NULL, 'inf'),
         ],
         ts('more'),
         FALSE,
@@ -3039,8 +2982,16 @@ ORDER BY civicrm_mailing.name";
    */
   public static function mailingGroupEntityTables() {
     return [
-      CRM_Contact_BAO_Group::getTableName() => 'Group',
-      CRM_Mailing_BAO_Mailing::getTableName() => 'Mailing',
+      [
+        'id' => CRM_Contact_BAO_Group::getTableName(),
+        'name' => 'Group',
+        'label' => ts('Group'),
+      ],
+      [
+        'id' => CRM_Mailing_BAO_Mailing::getTableName(),
+        'name' => 'Mailing',
+        'label' => ts('Mailing'),
+      ],
     ];
   }
 

@@ -12,7 +12,6 @@
 {capture assign=emptyBlockStyle }style="padding: 10px; border-bottom: 1px solid #999;background-color: #f7f7f7;"{/capture}
 {capture assign=emptyBlockValueStyle }style="padding: 10px; border-bottom: 1px solid #999;"{/capture}
 
-<center>
  <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
 
   <!-- BEGIN HEADER -->
@@ -22,7 +21,7 @@
   <!-- BEGIN CONTENT -->
   <tr>
     <td>
-      {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
+      {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
       {if $isRefund}
         <p>{ts}A refund has been issued based on changes in your registration selections.{/ts}</p>
       {else}
@@ -105,7 +104,7 @@
   <tr>
     <th {$headerStyle}>{ts}Contribution Details{/ts}</th>
   </tr>
-  {if isset($totalAmount)}
+  {if $totalAmount}
   <tr>
     <td {$labelStyle}>
       {ts}Total Fee{/ts}
@@ -115,7 +114,7 @@
     </td>
   </tr>
   {/if}
-  {if isset($totalPaid)}
+  {if $totalPaid}
   <tr>
     <td {$labelStyle}>
       {ts}Total Paid{/ts}
@@ -125,7 +124,7 @@
     </td>
   </tr>
   {/if}
-  {if isset($amountOwed)}
+  {if $amountOwed}
   <tr>
     <td {$labelStyle}>
       {ts}Balance Owed{/ts}
@@ -178,7 +177,7 @@
     <tr>
       <td colspan="2" {$valueStyle}>
          {$event.event_title}<br />
-        {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
+        {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"%Y%m%d" == $event.event_start_date|crmDate:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
       </td>
     </tr>
 
@@ -242,7 +241,6 @@
     </tr>
 
     </table>
-  </center>
 
  </body>
 </html>

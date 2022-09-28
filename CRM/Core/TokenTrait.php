@@ -46,29 +46,21 @@ trait CRM_Core_TokenTrait {
       if (array_key_exists($msgToken, $this->tokenNames)) {
         $activeTokens[] = $msgToken;
       }
-      else {
-        $altToken = preg_replace('/_\d+_/', '_N_', $msgToken);
-        if (array_key_exists($altToken, $this->tokenNames)) {
-          $activeTokens[] = $msgToken;
-        }
-      }
     }
     return array_unique($activeTokens);
   }
 
   /**
    * Find the fields that we need to get to construct the tokens requested.
-   * @param  array $activeTokens list of active tokens
+   *
    * @return array         list of fields needed to generate those tokens
    */
-  public function getReturnFields($activeTokens) {
+  public function getReturnFields(): array {
     // Make sure we always return something
     $fields = ['id'];
 
-    $tokensInUse = array_intersect(
-      $activeTokens,
-      array_merge(array_keys(self::getBasicTokens()), array_keys(self::getCustomFieldTokens()))
-    );
+    $tokensInUse =
+      array_merge(array_keys(self::getBasicTokens()), array_keys(self::getCustomFieldTokens()));
     foreach ($tokensInUse as $token) {
       if (isset(self::$fieldMapping[$token])) {
         $fields = array_merge($fields, self::$fieldMapping[$token]);
@@ -86,7 +78,10 @@ trait CRM_Core_TokenTrait {
    */
   protected function getCustomFieldTokens(): array {
     if (!isset($this->customFieldTokens)) {
-      $this->customFieldTokens = \CRM_Utils_Token::getCustomFieldTokens(ucfirst($this->getEntityName()));
+      $this->customFieldTokens = [];
+      foreach (CRM_Core_BAO_CustomField::getFields(ucfirst($this->getEntityName())) as $id => $info) {
+        $this->customFieldTokens['custom_' . $id] = $info['label'] . ' :: ' . $info['groupTitle'];
+      }
     }
     return $this->customFieldTokens;
   }

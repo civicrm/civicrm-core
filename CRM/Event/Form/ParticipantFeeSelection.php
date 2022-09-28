@@ -70,7 +70,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     }
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, TRUE);
 
-    list($this->_contributorDisplayName, $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
+    [$this->_contributorDisplayName, $this->_contributorEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
     $this->assign('displayName', $this->_contributorDisplayName);
     $this->assign('email', $this->_contributorEmail);
 
@@ -95,7 +95,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
     $title = ts("Change selections for %1", [1 => $this->_contributorDisplayName]);
     if ($title) {
-      CRM_Utils_System::setTitle($title);
+      $this->setTitle($title);
     }
   }
 
@@ -212,7 +212,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */
@@ -225,7 +225,6 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
    * Post process form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -239,7 +238,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       $fetchParticipantVals = ['id' => $this->_participantId];
       CRM_Event_BAO_Participant::getValues($fetchParticipantVals, $participantDetails);
       $participantParams = array_merge($params, $participantDetails[$this->_participantId]);
-      $mailSent = $this->emailReceipt($participantParams);
+      $this->emailReceipt($participantParams);
     }
 
     // update participant
@@ -266,10 +265,8 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
   /**
    * @param array $params
-   *
-   * @return mixed
    */
-  public function emailReceipt(&$params) {
+  private function emailReceipt(array $params): void {
     $updatedLineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant', FALSE, FALSE);
     $lineItem = [];
     if ($updatedLineItem) {
@@ -284,14 +281,13 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
     $this->assign('module', 'Event Registration');
     //use of the message template below requires variables in different format
-    $event = $events = [];
+    $events = [];
     $returnProperties = ['fee_label', 'start_date', 'end_date', 'is_show_location', 'title'];
 
     //get all event details.
     CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $params['event_id'], $events, $returnProperties);
     $event = $events[$params['event_id']];
-    unset($event['start_date']);
-    unset($event['end_date']);
+    unset($event['start_date'], $event['end_date']);
 
     $role = CRM_Event_PseudoConstant::participantRole();
     $participantRoles = $params['role_id'] ?? NULL;
@@ -324,7 +320,6 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       $this->assign('location', $location);
     }
 
-    $status = CRM_Event_PseudoConstant::participantStatus();
     if ($this->_isPaidEvent) {
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
       if (!$this->_mode) {
@@ -344,26 +339,25 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     }
 
     $this->assign('register_date', $params['register_date']);
-    $template = CRM_Core_Smarty::singleton();
 
     // Retrieve the name and email of the contact - this will be the TO for receipt email
-    list($this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_contactId);
+    [$this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->_contactId);
 
     $this->_contributorDisplayName = ($this->_contributorDisplayName == ' ') ? $this->_contributorEmail : $this->_contributorDisplayName;
 
     $waitStatus = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
-    if ($waitingStatus = CRM_Utils_Array::value($params['status_id'], $waitStatus)) {
-      $this->assign('isOnWaitlist', TRUE);
-    }
+    $this->assign('isOnWaitlist', (bool) ($params['status_id'][$waitStatus] ?? FALSE));
     $this->assign('contactID', $this->_contactId);
-    $this->assign('participantID', $this->_participantId);
 
     $sendTemplateParams = [
-      'groupName' => 'msg_tpl_workflow_event',
-      'valueName' => 'event_offline_receipt',
+      'workflow' => 'event_offline_receipt',
       'contactId' => $this->_contactId,
       'isTest' => FALSE,
       'PDFFilename' => ts('confirmation') . '.pdf',
+      'modelProps' => [
+        'participantID' => $this->_participantId,
+        'eventID' => $params['event_id'],
+      ],
     ];
 
     // try to send emails only if email id is present
@@ -376,8 +370,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       $sendTemplateParams['bcc'] = $this->_fromEmails['bcc'] ?? NULL;
     }
 
-    list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
-    return $mailSent;
+    CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
   }
 
 }

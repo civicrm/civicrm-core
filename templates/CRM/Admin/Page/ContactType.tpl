@@ -36,7 +36,7 @@
         <td class="crm-contactType-label crm-editable" data-field="label">{ts}{$row.label}{/ts}</td>
         <td class="crm-contactType-parent">{if $row.parent}{ts}{$row.parent_label}{/ts}{else}{ts}(built-in){/ts}{/if}</td>
         <td class="crm-contactType-description crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
-        <td>{$row.action|replace:'xx':$row.id}</td>
+        <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
     </tr>
     {/foreach}
     </table>

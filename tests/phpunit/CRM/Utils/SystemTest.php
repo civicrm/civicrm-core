@@ -136,7 +136,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
   public function testAlterExternUrlHook($path, $expected) {
     Civi::dispatcher()->addListener('hook_civicrm_alterExternUrl', [$this, 'hook_civicrm_alterExternUrl']);
     $externUrl = CRM_Utils_System::externUrl($path, $expected['query']);
-    $this->assertStringContainsString('path/altered/by/hook', $externUrl, 'Hook failed to alter URL path');
+    $this->assertStringContainsString('/path/altered/by/hook', $externUrl, 'Hook failed to alter URL path');
     $this->assertStringContainsString($expected['query'] . '&thisWas=alteredByHook', $externUrl, 'Hook failed to alter URL query');
   }
 
@@ -154,7 +154,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     $this->assertTrue($event->hasField('fragment'));
     $this->assertTrue($event->hasField('absolute'));
     $this->assertTrue($event->hasField('isSSL'));
-    $event->url = $event->url->withPath('path/altered/by/hook');
+    $event->url = $event->url->withPath('/path/altered/by/hook');
     $event->url = $event->url->withQuery($event->query . '&thisWas=alteredByHook');
   }
 

@@ -52,6 +52,9 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Core_SelectValues::geoProvider',
     ],
+    'on_change' => [
+      'CRM_Utils_GeocodeProvider::reset',
+    ],
     'default' => NULL,
     'title' => ts('Geocoding Provider'),
     'description' => ts('This can be the same or different from the mapping provider selected.'),

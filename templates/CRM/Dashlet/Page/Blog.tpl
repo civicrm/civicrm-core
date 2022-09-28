@@ -47,12 +47,12 @@
     {foreach from=$channel.items item=article}
       <div class="crm-accordion-wrapper collapsed">
         <div class="crm-accordion-header">
-          <span class="crm-news-feed-item-title">{$article.title}</span>
-          <span class="crm-news-feed-item-preview"> - {if function_exists('mb_substr')}{$article.description|strip_tags|mb_substr:0:150}{else}{$article.description|strip_tags}{/if}</span>
+          <span class="crm-news-feed-item-title">{$article.title|smarty:nodefaults|purify}</span>
+          <span class="crm-news-feed-item-preview"> - {if function_exists('mb_substr')}{$article.description|smarty:nodefaults|strip_tags|mb_substr:0:150}{else}{$article.description|smarty:nodefaults|strip_tags}{/if}</span>
         </div>
         <div class="crm-accordion-body">
-          <div>{$article.description}</div>
-          <p class="crm-news-feed-item-link"><a target="_blank" href="{$article.link}" title="{$article.title|escape}"><i class="crm-i fa-external-link" aria-hidden="true"></i> {ts}read more{/ts}…</a></p>
+          <div>{$article.description|smarty:nodefaults|purify}</div>
+          <p class="crm-news-feed-item-link"><a target="_blank" href="{$article.link|smarty:nodefaults|purify}" title="{$article.title|smarty:nodefaults|escape}"><i class="crm-i fa-external-link" aria-hidden="true"></i> {ts}read more{/ts}…</a></p>
         </div>
       </div>
     {/foreach}

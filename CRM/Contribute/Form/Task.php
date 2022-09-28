@@ -104,4 +104,13 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
     ]);
   }
 
+  /**
+   * Get the token processor schema required to list any tokens for this task.
+   *
+   * @return array
+   */
+  public function getTokenSchema(): array {
+    return ['contributionId', 'contactId'];
+  }
+
 }

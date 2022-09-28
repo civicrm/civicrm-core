@@ -30,8 +30,8 @@ class EntityFinancialAccount extends Generic\DAOEntity {
   public static function getInfo() {
     $info = parent::getInfo();
     $info['bridge'] = [
-      'entity_id' => [],
-      'financial_account_id' => [],
+      'entity_id' => ['to' => 'financial_account_id'],
+      'financial_account_id' => ['to' => 'entity_id'],
     ];
     return $info;
   }

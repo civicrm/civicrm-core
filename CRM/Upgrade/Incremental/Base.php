@@ -69,26 +69,26 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
-   * Verify DB state.
-   *
-   * @param $errors
-   *
-   * @return bool
-   */
-  public function verifyPreDBstate(&$errors) {
-    return TRUE;
-  }
-
-  /**
    * Compute any messages which should be displayed before upgrade.
    *
-   * Note: This function is called iteratively for each upcoming
-   * revision to the database.
+   * Downstream classes should implement this method to generate their messages.
    *
-   * @param $preUpgradeMessage
+   * This method will be invoked multiple times. Implementations MUST consult the `$rev`
+   * before deciding what messages to add. See the examples linked below.
+   *
+   * @see \CRM_Upgrade_Incremental_php_FourSeven::setPreUpgradeMessage()
+   * @see \CRM_Upgrade_Incremental_php_FiveTwenty::setPreUpgradeMessage()
+   *
+   * @param string $preUpgradeMessage
+   *   Accumulated list of messages. Alterable.
    * @param string $rev
-   *   a version number, e.g. '4.8.alpha1', '4.8.beta3', '4.8.0'.
+   *   The incremental version number. (Called repeatedly, once for each increment.)
+   *
+   *   Ex: Suppose the system upgrades from 5.7.3 to 5.10.0. The method FiveEight::setPreUpgradeMessage()
+   *   will be called for each increment of '5.8.*' ('5.8.alpha1' => '5.8.beta1' =>  '5.8.0').
    * @param null $currentVer
+   *   This is the penultimate version targeted by the upgrader.
+   *   Equivalent to CRM_Utils_System::version().
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
   }
@@ -96,10 +96,21 @@ class CRM_Upgrade_Incremental_Base {
   /**
    * Compute any messages which should be displayed after upgrade.
    *
+   * Downstream classes should implement this method to generate their messages.
+   *
+   * This method will be invoked multiple times. Implementations MUST consult the `$rev`
+   * before deciding what messages to add. See the examples linked below.
+   *
+   * @see \CRM_Upgrade_Incremental_php_FourSeven::setPostUpgradeMessage()
+   * @see \CRM_Upgrade_Incremental_php_FiveTwentyOne::setPostUpgradeMessage()
+   *
    * @param string $postUpgradeMessage
-   *   alterable.
+   *   Accumulated list of messages. Alterable.
    * @param string $rev
-   *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
+   *   The incremental version number. (Called repeatedly, once for each increment.)
+   *
+   *   Ex: Suppose the system upgrades from 5.7.3 to 5.10.0. The method FiveEight::setPreUpgradeMessage()
+   *   will be called for each increment of '5.8.*' ('5.8.alpha1' => '5.8.beta1' =>  '5.8.0').
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
   }
@@ -148,12 +159,83 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * Add a task to store a snapshot of some data (if upgrade-snapshots are supported).
+   *
+   * If there is a large amount of data, this may actually add multiple tasks.
+   *
+   * Ex :$this->addSnapshotTask('event_dates', CRM_Utils_SQL_Select::from('civicrm_event')
+   *      ->select('id, start_date, end_date'));
+   *
+   * @param string $name
+   *   Logical name for the snapshot. This will become part of the table.
+   * @param \CRM_Utils_SQL_Select $select
+   * @throws \CRM_Core_Exception
+   */
+  protected function addSnapshotTask(string $name, CRM_Utils_SQL_Select $select): void {
+    CRM_Upgrade_Snapshot::createTableName('civicrm', $this->getMajorMinor(), $name);
+    // ^^ To simplify QA -- we should always throw an exception for bad snapshot names, even if the local policy doesn't use snapshots.
+
+    if (!empty(CRM_Upgrade_Snapshot::getActivationIssues())) {
+      return;
+    }
+
+    $queue = CRM_Queue_Service::singleton()->load([
+      'type' => 'Sql',
+      'name' => CRM_Upgrade_Form::QUEUE_NAME,
+    ]);
+    foreach (CRM_Upgrade_Snapshot::createTasks('civicrm', $this->getMajorMinor(), $name, $select) as $task) {
+      $queue->createItem($task, ['weight' => -1]);
+    }
+  }
+
+  /**
+   * Add a task to activate an extension. This task will run post-upgrade (after all
+   * changes to core DB are settled).
+   *
+   * @param string $title
+   * @param string[] $keys
+   *   List of extensions to enable.
+   */
+  protected function addExtensionTask(string $title, array $keys): void {
+    Civi::queue(CRM_Upgrade_Form::QUEUE_NAME)->createItem(
+      new CRM_Queue_Task([static::CLASS, 'enableExtension'], [$keys], $title),
+      ['weight' => 2000]
+    );
+  }
+
+  /**
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param string[] $keys
+   *   List of extensions to enable.
+   * @return bool
+   */
+  public static function enableExtension(CRM_Queue_TaskContext $ctx, array $keys): bool {
+    // The `enableExtension` has a very high value of `weight`, so this runs after all
+    // core DB schema updates have been resolved. We can use high-level services.
+
+    CRM_Upgrade_DispatchPolicy::assertActive('upgrade.finish');
+
+    $manager = CRM_Extension_System::singleton()->getManager();
+    $manager->enable($manager->findInstallRequirements($keys));
+
+    // Hrm, `enable()` normally does these things... but not during upgrade...
+    // Note: A good test-scenario is to install 5.45; enable logging and CiviGrant; disable searchkit+afform; then upgrade to 5.47.
+    $schema = new CRM_Logging_Schema();
+    $schema->fixSchemaDifferences();
+
+    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
+    // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the page. We reset later in doFinish().
+
+    return TRUE;
+  }
+
+  /**
    * Remove a payment processor if not in use
    *
    * @param CRM_Queue_TaskContext $ctx
    * @param string $name
    * @return bool
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function removePaymentProcessorType(CRM_Queue_TaskContext $ctx, $name) {
     $processors = civicrm_api3('PaymentProcessor', 'getcount', ['payment_processor_type_id' => $name]);
@@ -221,6 +303,26 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * Add the specified option group, gracefully if it already exists.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param array $params
+   * @param array $options
+   *
+   * @return bool
+   */
+  public static function addOptionGroup(CRM_Queue_TaskContext $ctx, $params, $options): bool {
+    $defaults = ['is_active' => 1];
+    $optionDefaults = ['is_active' => 1];
+    $optionDefaults['option_group_id'] = \CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(array_merge($defaults, $params));
+
+    foreach ($options as $option) {
+      \CRM_Core_BAO_OptionValue::ensureOptionValueExists(array_merge($optionDefaults, $option));
+    }
+    return TRUE;
+  }
+
+  /**
    * Do any relevant message template updates.
    *
    * @param CRM_Queue_TaskContext $ctx
@@ -244,12 +346,17 @@ class CRM_Upgrade_Incremental_Base {
    */
   public static function updateMessageToken($ctx, string $workflowName, string $old, string $new, $version):bool {
     $messageObj = new CRM_Upgrade_Incremental_MessageTemplates($version);
-    $messageObj->replaceTokenInTemplate($workflowName, $old, $new);
+    if (!empty($workflowName)) {
+      $messageObj->replaceTokenInTemplate($workflowName, $old, $new);
+    }
+    else {
+      $messageObj->replaceTokenInMessageTemplates($old, $new);
+    }
     return TRUE;
   }
 
   /**
-   * Updated a message token within a template.
+   * Updated a message token within a scheduled reminder.
    *
    * @param CRM_Queue_TaskContext $ctx
    * @param string $old
@@ -261,6 +368,93 @@ class CRM_Upgrade_Incremental_Base {
   public static function updateActionScheduleToken($ctx, string $old, string $new, $version):bool {
     $messageObj = new CRM_Upgrade_Incremental_MessageTemplates($version);
     $messageObj->replaceTokenInActionSchedule($old, $new);
+    return TRUE;
+  }
+
+  /**
+   * Updated a message token within a label.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $old
+   * @param string $new
+   * @param $version
+   *
+   * @return bool
+   */
+  public static function updatePrintLabelToken($ctx, string $old, string $new, $version):bool {
+    $messageObj = new CRM_Upgrade_Incremental_MessageTemplates($version);
+    $messageObj->replaceTokenInPrintLabel($old, $new);
+    return TRUE;
+  }
+
+  /**
+   * Updated a message token within greeting options.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $old
+   * @param string $new
+   * @param $version
+   *
+   * @return bool
+   */
+  public static function updateGreetingOptions($ctx, string $old, string $new, $version):bool {
+    $messageObj = new CRM_Upgrade_Incremental_MessageTemplates($version);
+    $messageObj->replaceTokenInGreetingOptions($old, $new);
+    return TRUE;
+  }
+
+  /**
+   * Updated a currency in civicrm_currency and related configurations
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $old_name
+   * @param string $new_name
+   *
+   * @return bool
+   */
+  public static function updateCurrencyName($ctx, string $old_name, string $new_name): bool {
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_currency SET name = %1 WHERE name = %2', [
+      1 => [$new_name, 'String'],
+      2 => [$old_name, 'String'],
+    ]);
+
+    $oid = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_option_group WHERE name = 'currencies_enabled'");
+    if ($oid) {
+      CRM_Core_DAO::executeQuery('UPDATE civicrm_option_value SET value = %1 WHERE value = %2 AND option_group_id = %3', [
+        1 => [$new_name, 'String'],
+        2 => [$old_name, 'String'],
+        3 => [$oid, 'String'],
+      ]);
+    }
+
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_participant SET fee_currency = %1 WHERE fee_currency = %2', [
+      1 => [$new_name, 'String'],
+      2 => [$old_name, 'String'],
+    ]);
+
+    $tables = [
+      'civicrm_contribution',
+      'civicrm_contribution_page',
+      'civicrm_contribution_recur',
+      'civicrm_contribution_soft',
+      'civicrm_event',
+      'civicrm_financial_item',
+      'civicrm_financial_trxn',
+      'civicrm_grant',
+      'civicrm_pcp',
+      'civicrm_pledge_payment',
+      'civicrm_pledge',
+      'civicrm_product',
+    ];
+
+    foreach ($tables as $table) {
+      CRM_Core_DAO::executeQuery('UPDATE %3 SET currency = %1 WHERE currency = %2', [
+        1 => [$new_name, 'String'],
+        2 => [$old_name, 'String'],
+        3 => [$table, 'MysqlColumnNameOrAlias'],
+      ]);
+    }
+
     return TRUE;
   }
 

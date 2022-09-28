@@ -15,7 +15,7 @@
 <table class="selector row-highlight">
 <thead class="sticky">
 {if ! $single and $context eq 'Search' }
-  <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
+  <th scope="col" title="{ts}Select rows{/ts}">{$form.toggleSelect.html}</th>
 {/if}
   {foreach from=$columnHeaders item=header}
     <th scope="col">
@@ -43,7 +43,7 @@
         </td>
     {/if}
     <td class="crm-membership-type crm-membership-type_{$row.membership_type}">
-        {$row.membership_type}{if $row.is_test} ({ts}test{/ts}){/if}
+        {$row.membership_type}
         {if $row.owner_membership_id}<br />({ts}by relationship{/ts}){/if}
     </td>
     <td class="crm-membership-join_date">{$row.membership_join_date|truncate:10:''|crmDate}</td>

@@ -411,7 +411,6 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    * recalculates the 'amount' using original_installment_amount * installment.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCreatePledgePaymentForMultipleInstallments2(): void {
     $scheduled_date = date('Ymd', mktime(0, 0, 0, date("m"), date("d") + 2, date("y")));

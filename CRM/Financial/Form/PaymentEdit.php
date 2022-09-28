@@ -17,6 +17,16 @@
 class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
 
   /**
+   * Should financials be checked after the test but before tear down.
+   *
+   * Ideally all tests (or at least all that call any financial api calls ) should do this but there
+   * are some test data issues and some real bugs currently blocking.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = TRUE;
+
+  /**
    * The id of the financial trxn.
    *
    * @var int
@@ -84,7 +94,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
    * Build quickForm.
    */
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Update Payment details'));
+    $this->setTitle(ts('Update Payment details'));
 
     $paymentFields = $this->getPaymentFields();
     $this->assign('paymentFields', $paymentFields);
@@ -129,7 +139,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param $self
+   * @param self $self
    *
    * @return bool|array
    *   true if no errors, else array of errors
@@ -151,7 +161,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
   /**
    * Process the form submission.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function postProcess(): void {
     $params = [
@@ -185,7 +195,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
    *
    * @param array $submittedValues
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function submit($submittedValues) {
     // if payment instrument is changed then
@@ -219,7 +229,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
    *
    * @param array $params
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testSubmit(array $params): void {
     $this->_id = $params['id'];

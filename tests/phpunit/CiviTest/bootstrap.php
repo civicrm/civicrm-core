@@ -26,6 +26,11 @@ if (CIVICRM_UF === 'UnitTests') {
 spl_autoload_register(function($class) {
   _phpunit_mockoloader('api\\v4\\', "tests/phpunit/api/v4/", $class);
   _phpunit_mockoloader('Civi\\Api4\\', "tests/phpunit/api/v4/Mock/Api4/", $class);
+  if (substr($class, 0, 13) === 'CRM_Fake_DAO_') {
+    // phpcs:disable
+    eval('namespace { class ' . $class . ' extends \CRM_Core_DAO { public static function &fields() { $r = []; return $r; }}}');
+    // phpcs:enable
+  }
 });
 
 // ------------------------------------------------------------------------------

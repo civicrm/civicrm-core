@@ -27,7 +27,7 @@ class CRM_Event_Page_ParticipantListing_NameStatusAndDate extends CRM_Core_Page 
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Integer', $this, TRUE);
 
-    // ensure that there is a particpant type for this
+    // ensure that there is a participant type for this
     $this->_participantListingID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event',
       $this->_id,
       'participant_listing_id'

@@ -93,11 +93,11 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $this->_customField = $this->customFieldCreate(['custom_group_id' => $this->ids['string']['custom_group_id']]);
     $this->_customFieldID = $this->_customField['id'];
 
-    $customFieldDataType = CRM_Core_BAO_CustomField::dataType();
+    $customFieldDataType = array_column(CRM_Core_BAO_CustomField::dataType(), 'id');
     $dataToHtmlTypes = CRM_Custom_Form_Field::$_dataToHTML;
     $optionSupportingHTMLTypes = CRM_Custom_Form_Field::$htmlTypesWithOptions;
 
-    foreach ($customFieldDataType as $dataType => $label) {
+    foreach ($customFieldDataType as $dataType) {
       switch ($dataType) {
         // skipping File data-type & state province due to caching issues
         // case 'Country':
@@ -338,7 +338,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
    *
    * @link https://issues.civicrm.org/jira/browse/CRM-11856
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testAlterOptionValue() {
     $this->_populateOptionAndCustomGroup('string');
@@ -491,12 +491,12 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
   /**
    * Test that custom fields in greeting strings are updated.
    */
-  public function testUpdateCustomGreetings() {
+  public function testUpdateCustomGreetings(): void {
     // Create a custom group with one field.
     $customGroupResult = $this->callAPISuccess('CustomGroup', 'create', [
       'sequential' => 1,
-      'title' => "test custom group",
-      'extends' => "Individual",
+      'title' => 'test custom group',
+      'extends' => 'Individual',
     ]);
     $customFieldResult = $this->callAPISuccess('CustomField', 'create', [
       'custom_group_id' => $customGroupResult['id'],
@@ -509,21 +509,20 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     // Create a contact with an email greeting format that includes the new custom field.
     $contactResult = $this->callAPISuccess('Contact', 'create', [
       'contact_type' => 'Individual',
-      'email' => substr(sha1(rand()), 0, 7) . '@yahoo.com',
-      'email_greeting_id' => "Customized",
+      'email' => 'her@yahoo.com',
+      'email_greeting_id' => 'Customized',
       'email_greeting_custom' => "Dear {contact.custom_{$customFieldId}}",
     ]);
     $cid = $contactResult['id'];
 
     // Define testing values.
-    $uniq = uniqid();
-    $testGreetingValue = "Dear $uniq";
+    $testGreetingValue = 'Dear custom field';
 
     // Update contact's custom field with CustomValue.create
-    $customValueResult = $this->callAPISuccess('CustomValue', 'create', [
+    $this->callAPISuccess('CustomValue', 'create', [
       'entity_id' => $cid,
-      "custom_{$customFieldId}" => $uniq,
-      'entity_table' => "civicrm_contact",
+      "custom_{$customFieldId}" => 'custom field',
+      'entity_table' => 'civicrm_contact',
     ]);
 
     $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $cid, 'return' => 'email_greeting']);

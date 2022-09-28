@@ -28,8 +28,8 @@
                     <td class="label">{$form.$element_name_from.label}</td><td>
                     {$form.$element_name_from.html|crmAddClass:six}
                     &nbsp;&nbsp;{$form.$element_name_to.label}&nbsp;&nbsp;{$form.$element_name_to.html|crmAddClass:six}
-                  {elseif $element.skip_calendar NEQ true }
-                    {include file="CRM/Core/DatePickerRangeCustomField.tpl" fieldName=$element_name hideRelativeLabel=0}<td>
+                  {elseif empty($element.skip_calendar)}
+                    {include file="CRM/Core/DatePickerRangeCustomField.tpl" fieldName=$element_name to='' from='' colspan='' class='' hideRelativeLabel=0}<td>
                   {/if}
             {else}
                 <td class="label">{$form.$element_name.label}</td><td>

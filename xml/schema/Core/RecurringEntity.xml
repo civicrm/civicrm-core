@@ -51,6 +51,7 @@
       <name>mode</name>
       <type>boolean</type>
       <default>1</default>
+      <required>true</required>
       <title>Cascade Type</title>
       <required>true</required>
       <comment>1-this entity, 2-this and the following entities, 3-all the entities</comment>

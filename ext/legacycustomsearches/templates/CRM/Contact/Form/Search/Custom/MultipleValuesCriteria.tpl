@@ -29,7 +29,7 @@
           <div class="clear"></div>
         </div>
 
-        {if $form.contact_type}
+        {if !empty($form.contact_type)}
           <div class="crm-section contact_type-section">
             <div class="label">
               {$form.contact_type.label}
@@ -41,7 +41,7 @@
           </div>
         {/if}
 
-        {if $form.group}
+        {if !empty($form.group)}
         <div class="crm-section group_selection-section">
           <div class="label">
               {$form.group.label}
@@ -53,7 +53,7 @@
         </div>
         {/if}
 
-        {if $form.tag}
+        {if !empty($form.tag)}
             <div class="crm-section tag-section">
               <div class="label">
                 {$form.tag.label}

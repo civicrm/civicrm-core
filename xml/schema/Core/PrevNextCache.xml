@@ -65,6 +65,7 @@
     <title>Is Selected</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <add>4.2</add>
   </field>
   <index>

@@ -64,8 +64,8 @@ function civicrm_api3_dashboard_get($params) {
  * @param array $params
  *   Array holding 'id' of dashlet to be deleted.
  * @return array
- * @throws API_Exception
- * @throws CiviCRM_API3_Exception
+ * @throws CRM_Core_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_dashboard_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

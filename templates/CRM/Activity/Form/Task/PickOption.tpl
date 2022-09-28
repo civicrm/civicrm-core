@@ -9,7 +9,7 @@
 *}
 <div class="crm-form crm-form-block crm-pick-option-form-block">
 <div class="help">
-   Select Group of Contacts
+   {ts}Select Group of Contacts{/ts}
 </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
    <table class="form-layout-compressed">

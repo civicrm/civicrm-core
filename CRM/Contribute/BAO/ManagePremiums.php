@@ -30,9 +30,7 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_BAO_Product {
    *
    * @deprecated
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Contribute_BAO_Product
    */

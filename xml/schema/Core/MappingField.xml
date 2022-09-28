@@ -38,6 +38,7 @@
     <table>civicrm_mapping</table>
     <key>id</key>
     <add>1.2</add>
+    <onDelete>CASCADE</onDelete>
   </foreignKey>
   <field>
     <name>name</name>

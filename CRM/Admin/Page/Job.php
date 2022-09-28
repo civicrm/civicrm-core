@@ -158,13 +158,13 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
     }
 
     $sj = new CRM_Core_JobManager();
-    $rows = $temp = [];
+    $rows = [];
     foreach ($sj->jobs as $job) {
       $action = array_sum(array_keys($this->links()));
 
       // update enable/disable links.
       // CRM-9868- remove enable action for jobs that should never be run automatically via execute action or runjobs url
-      if ($job->api_action == 'process_membership_reminder_date' || $job->api_action == 'update_greeting') {
+      if ($job->api_action === 'process_membership_reminder_date' || $job->api_action === 'update_greeting') {
         $action -= CRM_Core_Action::ENABLE;
         $action -= CRM_Core_Action::DISABLE;
       }
@@ -175,8 +175,8 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
         $action -= CRM_Core_Action::DISABLE;
       }
 
-      $job->action = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $job->id),
+      $job->action = CRM_Core_Action::formLink($this->links(), $action,
+        ['id' => $job->id],
         ts('more'),
         FALSE,
         'job.manage.action',

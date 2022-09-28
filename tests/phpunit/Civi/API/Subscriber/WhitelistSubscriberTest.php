@@ -349,7 +349,7 @@ class WhitelistSubscriberTest extends \CiviUnitTestCase {
    * @dataProvider restrictionCases
    */
   public function testEach($apiRequest, $rules, $expectSuccess) {
-    \CRM_Core_DAO_AllCoreTables::init(TRUE);
+    \CRM_Core_DAO_AllCoreTables::flush();
 
     $recs = $this->getFixtures();
 

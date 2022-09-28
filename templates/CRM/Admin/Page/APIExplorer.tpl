@@ -218,7 +218,16 @@
   }
   {/literal}
 </style>
-
+<div class="messages status no-popup">
+  <p>
+    {icon icon="fa-info-circle"}{/icon}
+    <strong>{ts}Deprecation Notice{/ts}</strong>
+  </p>
+  <p>
+    {ts}APIv3 is the legacy version of CiviCRM's API. While still supported, it is not recommended for use in new projects.{/ts}
+    <a href="{crmURL p='civicrm/api4'}">{icon icon="fa-hand-o-right"}{/icon} {ts}Switch to APIv4{/ts}</a>
+  </p>
+</div>
 <div class="crm-block crm-content-block">
 <div id="mainTabContainer">
   <ul>

@@ -50,7 +50,7 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
       self::$_links = [
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
-          'url' => 'civicrm/admin/options/subtype',
+          'url' => 'civicrm/admin/options/subtype/edit',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Contact Type'),
         ],
@@ -66,7 +66,7 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/options/subtype',
+          'url' => 'civicrm/admin/options/subtype/edit',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Contact Type'),
         ],
@@ -81,7 +81,6 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
   public function run() {
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 0);
     $this->assign('action', $action);
-    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
     if (!$action) {
       $this->browse();
     }

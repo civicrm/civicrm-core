@@ -18,6 +18,7 @@ use Civi\Api4\Utils\ReflectionUtils;
 /**
  * @deprecated
  * @see \Civi\Api4\Generic\Traits\IsCurrentTrait
+ * @service civi.api4.isCurrent
  */
 class IsCurrentSubscriber extends Generic\AbstractPrepareSubscriber {
 

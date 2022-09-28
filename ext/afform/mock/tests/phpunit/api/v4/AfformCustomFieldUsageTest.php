@@ -17,7 +17,7 @@ class api_v4_AfformCustomFieldUsageTest extends api_v4_AfformUsageTestCase {
     <legend class="af-text">Individual 1</legend>
     <afblock-name-individual></afblock-name-individual>
     <div af-join="Custom_MyThings" af-repeat="Add" max="2">
-      <afjoin-custom-my-things></afjoin-custom-my-things>
+      <afblock-custom-my-things></afblock-custom-my-things>
     </div>
   </fieldset>
   <button class="af-button btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
@@ -31,7 +31,7 @@ EOHTML;
    * which can be submitted multiple times
    */
   public function testMultiRecordCustomBlock(): void {
-    $customGroup = \Civi\Api4\CustomGroup::create(FALSE)
+    \Civi\Api4\CustomGroup::create(FALSE)
       ->addValue('name', 'MyThings')
       ->addValue('title', 'My Things')
       ->addValue('style', 'Tab with table')
@@ -49,11 +49,12 @@ EOHTML;
 
     // Creating a custom group should automatically create an afform block
     $block = \Civi\Api4\Afform::get()
-      ->addWhere('name', '=', 'afjoinCustom_MyThings')
+      ->addWhere('name', '=', 'afblockCustom_MyThings')
+      ->addSelect('layout', 'directive_name')
       ->setLayoutFormat('shallow')
       ->setFormatWhitespace(TRUE)
-      ->execute()->first();
-    $this->assertEquals(2, $block['repeat']);
+      ->execute()->single();
+    $this->assertEquals('afblock-custom-my-things', $block['directive_name']);
     $this->assertEquals('my_text', $block['layout'][0]['name']);
     $this->assertEquals('my_friend', $block['layout'][1]['name']);
 

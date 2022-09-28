@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 use Civi\Api4\Activity;
+use Civi\Api4\Contribution;
 use Civi\Api4\PledgePayment;
 
 /**
@@ -31,6 +32,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
    * Clean up after tests.
    */
   public function tearDown(): void {
+    $this->disableFinancialACLs();
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }
@@ -182,9 +184,14 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * DeleteContribution() method
+   * Test contributions are deleted with assets in v3 and v4 api.@\
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
-  public function testDeleteContribution() {
+  public function testDeleteContribution(int $version): void {
+    $this->_apiversion = $version;
     $contactId = $this->individualCreate();
 
     $params = [
@@ -201,19 +208,14 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'total_amount' => 200.00,
       'fee_amount' => 5,
       'net_amount' => 195,
-      'trxn_id' => '33ereerwww322323',
-      'invoice_id' => '33ed39c9e9ee6ef6031621ce0eafe6da70',
-      'thankyou_date' => '20080522',
       'sequential' => TRUE,
     ];
 
     $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
 
-    CRM_Contribute_BAO_Contribution::deleteContribution($contribution['id']);
-
-    $this->assertDBNull('CRM_Contribute_DAO_Contribution', $contribution['trxn_id'],
-      'id', 'trxn_id', 'Database check for deleted Contribution.'
-    );
+    $this->callAPISuccess('Contribution', 'delete', ['id' => $contribution['id']]);
+    $this->callAPISuccessGetCount('Contribution', [], 0);
+    $this->callAPISuccessGetCount('LineItem', [], 0);
   }
 
   /**
@@ -307,18 +309,17 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   /**
    * Test that financial type data is not added to the annual query if acls not enabled.
    */
-  public function testAnnualQueryWithFinancialACLsEnabled() {
+  public function testAnnualQueryWithFinancialACLsEnabled(): void {
     $this->enableFinancialACLs();
     $this->createLoggedInUserWithFinancialACL();
     $permittedFinancialType = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation');
     $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([1, 2, 3]);
     $this->assertStringContainsString('SUM(total_amount) as amount,', $sql);
-    $this->assertStringContainsString('WHERE b.contact_id IN (1,2,3)', $sql);
+    $this->assertStringContainsString('b.contact_id IN (1,2,3)', $sql);
     $this->assertStringContainsString('b.financial_type_id IN (' . $permittedFinancialType . ')', $sql);
 
     // Run it to make sure it's not bad sql.
     CRM_Core_DAO::executeQuery($sql);
-    $this->disableFinancialACLs();
   }
 
   /**
@@ -342,10 +343,10 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   /**
    * Test that financial type data is not added to the annual query if acls not enabled.
    */
-  public function testAnnualQueryWithFinancialACLsDisabled() {
+  public function testAnnualQueryWithFinancialACLsDisabled(): void {
     $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([1, 2, 3]);
     $this->assertStringContainsString('SUM(total_amount) as amount,', $sql);
-    $this->assertStringContainsString('WHERE b.contact_id IN (1,2,3)', $sql);
+    $this->assertStringContainsString('b.contact_id IN (1,2,3)', $sql);
     $this->assertStringNotContainsString('b.financial_type_id', $sql);
     //$this->assertNotContains('line_item', $sql);
     // Run it to make sure it's not bad sql.
@@ -355,12 +356,12 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   /**
    * Test that financial type data is not added to the annual query if acls not enabled.
    */
-  public function testAnnualQueryWithFinancialHook() {
+  public function testAnnualQueryWithFinancialHook(): void {
     $this->hookClass->setHook('civicrm_selectWhereClause', [$this, 'aclIdNoZero']);
     $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([1, 2, 3]);
     $this->assertStringContainsString('SUM(total_amount) as amount,', $sql);
-    $this->assertStringContainsString('WHERE b.contact_id IN (1,2,3)', $sql);
-    $this->assertStringContainsString('b.id NOT IN (0)', $sql);
+    $this->assertStringContainsString('b.contact_id IN (1,2,3)', $sql);
+    $this->assertStringContainsString('WHERE b.id NOT IN (0)', $sql);
     $this->assertStringNotContainsString('b.financial_type_id', $sql);
     CRM_Core_DAO::executeQuery($sql);
   }
@@ -375,7 +376,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     if ($entity != 'Contribution') {
       return;
     }
-    $clauses['id'] = "NOT IN (0)";
+    $clauses['id'] = 'NOT IN (0)';
   }
 
   /**
@@ -671,7 +672,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * assignProportionalLineItems() method (add and edit modes of participant)
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testAssignProportionalLineItems(): void {
     // This test doesn't seem to manage financials properly, possibly by design
@@ -698,7 +698,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * @return CRM_Contribute_BAO_Contribution
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function addParticipantWithContribution() {
     // creating price set, price field
@@ -931,75 +930,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   }
 
   /**
-   * Test calculateFinancialItemAmount().
-   */
-  public function testcalculateFinancialItemAmount() {
-    $testParams = [
-      [
-        'params' => [],
-        'amountParams' => [
-          'line_total' => 100,
-          'previous_line_total' => 300,
-          'diff' => 1,
-        ],
-        'context' => 'changedAmount',
-        'expectedItemAmount' => -200,
-      ],
-      [
-        'params' => [],
-        'amountParams' => [
-          'line_total' => 100,
-          'previous_line_total' => 100,
-          'diff' => -1,
-        ],
-        // Most contexts are ignored. Removing refs to change payment instrument so placeholder.
-        'context' => 'not null',
-        'expectedItemAmount' => -100,
-      ],
-      [
-        'params' => [
-          'is_quick_config' => TRUE,
-          'total_amount' => 110,
-          'tax_amount' => 10,
-        ],
-        'amountParams' => [
-          'item_amount' => 100,
-        ],
-        'context' => 'changedAmount',
-        'expectedItemAmount' => 100,
-      ],
-      [
-        'params' => [
-          'is_quick_config' => TRUE,
-          'total_amount' => 110,
-          'tax_amount' => 10,
-        ],
-        'amountParams' => [
-          'item_amount' => NULL,
-        ],
-        'context' => 'changedAmount',
-        'expectedItemAmount' => 110,
-      ],
-      [
-        'params' => [
-          'is_quick_config' => TRUE,
-          'total_amount' => 110,
-          'tax_amount' => 10,
-        ],
-        'amountParams' => [
-          'item_amount' => NULL,
-        ],
-        'context' => NULL,
-        'expectedItemAmount' => 100,
-      ],
-    ];
-    foreach ($testParams as $params) {
-      $itemAmount = CRM_Contribute_BAO_Contribution::calculateFinancialItemAmount($params['params'], $params['amountParams'], $params['context']);
-      $this->assertEquals($itemAmount, $params['expectedItemAmount'], 'Invalid Financial Item amount.');
-    }
-  }
-
-  /**
    * Test recording of amount with comma separator.
    *
    * @throws \CRM_Core_Exception
@@ -1035,7 +965,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   /**
    * Test for function getSalesTaxFinancialAccounts().
    */
-  public function testgetSalesTaxFinancialAccounts() {
+  public function testGetSalesTaxFinancialAccounts(): void {
     $this->enableTaxAndInvoicing();
     $financialType = $this->createFinancialType();
     $financialAccount = $this->addTaxAccountToFinancialType($financialType['id']);
@@ -1044,7 +974,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $financialAccount = $this->addTaxAccountToFinancialType($financialType['id']);
     $expectedResult[$financialAccount->financial_account_id] = $financialAccount->financial_account_id;
     $salesTaxFinancialAccount = CRM_Contribute_BAO_Contribution::getSalesTaxFinancialAccounts();
-    $this->assertTrue(($salesTaxFinancialAccount == $expectedResult), 'Function returned wrong values.');
+    $this->assertEquals($salesTaxFinancialAccount, $expectedResult);
   }
 
   /**
@@ -1092,7 +1022,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    *   punctuation used to refer to thousands.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider getThousandSeparators
    */
   public function testCreateProportionalEntryZeroAmount(string $thousandSeparator): void {
@@ -1197,7 +1126,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   /**
    * Function to create contribution with tax.
    */
-  public function createContributionWithTax($params = [], $isCompleted = TRUE) {
+  public function createContributionWithTax($params = [], $isCompleted = TRUE): array {
     if (!isset($params['total_amount'])) {
       $params['total_amount'] = 100;
     }
@@ -1205,15 +1134,16 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->enableTaxAndInvoicing();
     $financialType = $this->createFinancialType();
     $financialAccount = $this->addTaxAccountToFinancialType($financialType['id']);
-    $form = new CRM_Contribute_Form_Contribution();
-
-    $form->testSubmit([
+    /** @var CRM_Contribute_Form_Contribution $form */
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
       'total_amount' => $params['total_amount'],
       'financial_type_id' => $financialType['id'],
       'contact_id' => $contactId,
       'contribution_status_id' => $isCompleted ? 1 : 2,
       'price_set_id' => 0,
-    ], CRM_Core_Action::ADD);
+    ]);
+    $form->buildForm();
+    $form->postProcess();
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [
         'contact_id' => $contactId,
@@ -1239,8 +1169,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $originalContactId = $contactID = $this->individualCreate();
     $orgId = $this->organizationCreate(['organization_name' => 'testorg1']);
     $orgCount = $this->callAPISuccessGetCount('Contact', [
-      'contact_type' => "Organization",
-      'organization_name' => "testorg1",
+      'contact_type' => 'Organization',
+      'organization_name' => 'testorg1',
     ]);
     $this->assertEquals($orgCount, 1);
 
@@ -1286,8 +1216,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
     //Check whether new organisation is created.
     $result = $this->callAPISuccess('Contact', 'get', [
-      'contact_type' => "Organization",
-      'organization_name' => "testorg1",
+      'contact_type' => 'Organization',
+      'organization_name' => 'testorg1',
     ]);
     $this->assertEquals($result['count'], 1);
 
@@ -1304,10 +1234,11 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
   /**
    * Test for replaceContributionTokens.
-   *   This function tests whether the contribution tokens are replaced with
+   *
+   * This function tests whether the contribution tokens are replaced with
    * values from contribution.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testReplaceContributionTokens(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Contribution', 'title' => 'contribution stuff']);
@@ -1341,7 +1272,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $contribution2 = $this->contributionCreate($params);
     $ids = [$contribution1, $contribution2];
 
-    $subject = "This is a test for contribution ID: {contribution.contribution_id}";
+    $subject = 'This is a test for contribution ID: {contribution.contribution_id}';
     $text = 'Contribution Amount: {contribution.total_amount}';
     $html = "<p>Contribution Source: {contribution.contribution_source}</p></br>
       <p>Contribution Invoice ID: {contribution.invoice_id}</p></br>
@@ -1363,7 +1294,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       TRUE
     );
 
-    $this->assertEquals('Contribution Amount: € 100.00', $contributionDetails[$contactId1]['text'], "The text does not match");
+    $this->assertEquals('Contribution Amount: € 100.00', $contributionDetails[$contactId1]['text'], 'The text does not match');
     $this->assertEquals('<p>Contribution Source: ABC</p></br>
       <p>Contribution Invoice ID: 12345</p></br>
       <p>Contribution Receive Date: May 11th, 2015 12:00 AM</p></br>
@@ -1386,12 +1317,12 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'invoice_id' => 67890,
       'source' => 'SSF',
       'contribution_status_id' => 'Completed',
-      'revenue_recognition_date' => date('Ymd', strtotime("+3 month")),
+      'revenue_recognition_date' => date('Ymd', strtotime('+3 month')),
     ];
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
 
     $this->callAPISuccessGetCount('EntityFinancialTrxn', [
-      'entity_table' => "civicrm_contribution",
+      'entity_table' => 'civicrm_contribution',
       'entity_id' => $contribution['id'],
     ], 2);
 
@@ -1402,17 +1333,17 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     ];
     $result = $this->callAPISuccessGetSingle('EntityFinancialTrxn', [
       'return' => [
-        "financial_trxn_id.from_financial_account_id.name",
-        "financial_trxn_id.to_financial_account_id.name",
-        "financial_trxn_id",
+        'financial_trxn_id.from_financial_account_id.name',
+        'financial_trxn_id.to_financial_account_id.name',
+        'financial_trxn_id',
       ],
-      'entity_table' => "civicrm_contribution",
+      'entity_table' => 'civicrm_contribution',
       'entity_id' => $contribution['id'],
       'financial_trxn_id.is_payment' => 0,
     ], $checkAgainst);
 
     $result = $this->callAPISuccessGetSingle('EntityFinancialTrxn', [
-      'entity_table' => "civicrm_financial_item",
+      'entity_table' => 'civicrm_financial_item',
       'financial_trxn_id' => $result['financial_trxn_id'],
       'return' => ['entity_id'],
     ]);
@@ -1423,7 +1354,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     ];
     $result = $this->callAPISuccessGetSingle('FinancialItem', [
       'id' => $result['entity_id'],
-      'return' => ["financial_account_id.name"],
+      'return' => ['financial_account_id.name'],
     ], $checkAgainst);
   }
 
@@ -1457,7 +1388,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     // Get line item
     $lineItem = $this->callAPISuccessGetSingle('LineItem', [
       'contribution_id' => $contributionId,
-      'return' => ["financial_type_id.name", "line_total"],
+      'return' => ['financial_type_id.name', 'line_total'],
     ]);
 
     $this->assertEquals(
@@ -1477,8 +1408,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'entity_id' => $lineItem['id'],
       'sequential' => 1,
       'entity_table' => 'civicrm_line_item',
-      'options' => ['sort' => "id"],
-      'return' => ["financial_account_id.name", "amount", "description"],
+      'options' => ['sort' => 'id'],
+      'return' => ['financial_account_id.name', 'amount', 'description'],
     ]);
 
     $this->assertEquals($financialItems['count'], 3, 'Count mismatch.');
@@ -1509,8 +1440,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
     // Check transactions.
     $financialTransactions = $this->callAPISuccess('EntityFinancialTrxn', 'get', [
-      'return' => ["financial_trxn_id"],
-      'entity_table' => "civicrm_contribution",
+      'return' => ['financial_trxn_id'],
+      'entity_table' => 'civicrm_contribution',
       'entity_id' => $contributionId,
       'sequential' => 1,
     ]);
@@ -1569,9 +1500,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * The pledge status should be updated. I believe the contribution should
    * also be unlinked but the goal at this point is no change.
    *
-   * @throws CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testCancelOrderWithPledge(): void {
     $this->ids['contact'][0] = $this->individualCreate();
@@ -1594,9 +1523,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * Test contribution update when more than one quick
    * config line item is linked to contribution.
    *
-   * @throws CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testContributionQuickConfigTwoLineItems(): void {
     $contactId1 = $this->individualCreate();
@@ -1799,6 +1726,56 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $activityContact = $this->callAPISuccessGetSingle('ActivityContact', $activityContactParams);
 
     $this->assertEquals($activityContact['contact_id'], $contactId_2, 'Check target contact ID matches the second contact');
+  }
+
+  /**
+   * Test status updates triggering activity creation and value propagation
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testContributionStatusUpdateActivityPropagation() {
+    $contactId = $this->individualCreate();
+    $campaignId = $this->campaignCreate();
+    $contribution = Contribution::create()
+      ->addValue('contact_id', $contactId)
+      ->addValue('campaign_id', $campaignId)
+      ->addValue('financial_type_id:name', 'Donation')
+      ->addValue('total_amount', 50)
+      ->addValue('contribution_status_id:name', 'Pending')
+      ->execute()
+      ->first();
+    $activityWhere = [
+      ['source_record_id', '=', $contribution['id']],
+      ['activity_type_id:name', '=', 'Contribution'],
+    ];
+    $activity = Activity::get()->setWhere($activityWhere)->execute()->first();
+    $this->assertNull($activity, 'Should not create contribution activity for pending contribution');
+
+    Contribution::update()
+      ->addWhere('id', '=', $contribution['id'])
+      ->addValue('contribution_status_id:name', 'Completed')
+      ->execute();
+
+    $activity = Activity::get()->setWhere($activityWhere)->execute()->first();
+    $this->assertEquals($campaignId, $activity['campaign_id'], 'Should have created contribution activity with campaign');
+
+    $newCampaignId = $this->campaignCreate();
+    Contribution::update()
+      ->addWhere('id', '=', $contribution['id'])
+      ->addValue('campaign_id', $newCampaignId)
+      ->execute();
+
+    $activity = Activity::get()->setWhere($activityWhere)->execute()->first();
+    $this->assertEquals($newCampaignId, $activity['campaign_id'], 'Should have updated contribution activity to new campaign');
+
+    Contribution::update()
+      ->addWhere('id', '=', $contribution['id'])
+      ->addValue('campaign_id', NULL)
+      ->execute();
+
+    $activity = Activity::get()->setWhere($activityWhere)->execute()->first();
+    $this->assertNull($activity['campaign_id'], 'Should have removed campaign from contribution activity');
   }
 
 }

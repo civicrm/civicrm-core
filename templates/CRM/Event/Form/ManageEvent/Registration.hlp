@@ -29,8 +29,10 @@
         <li>{ts}Return to this screen (<strong>Administer CiviCRM &raquo; CiviEvent &raquo; Manage Events &raquo; Configure &raquo; Online Registration</strong>) and select your profile.{/ts}</li>
         </ol>
 
-        {capture assign=docLinkCustom}{docURL page="user/organising-your-data/custom-fields" text="custom fields"}{/capture}
-        {capture assign=docLinkProfile}{docURL page="user/the-user-interface/profiles" text="profiles"}{/capture}
+        {capture assign=docUrlTextCustom}{ts}custom fields{/ts}{/capture}
+        {capture assign=docLinkCustom}{docURL page="user/organising-your-data/creating-custom-fields" text=$docUrlTextCustom}{/capture}
+        {capture assign=docUrlTextProfile}{ts}profiles{/ts}{/capture}
+        {capture assign=docLinkProfile}{docURL page="user/the-user-interface/profiles" text=$docUrlTextProfile}{/capture}
         {ts 1=$docLinkCustom 2=$docLinkProfile}Refer to the online documentation for more details on creating %1 and %2.{/ts}
 </p>
 {/htxt}

@@ -18,6 +18,8 @@ class SqlFunctionABS extends SqlFunction {
 
   protected static $category = self::CATEGORY_MATH;
 
+  protected static $dataType = 'Integer';
+
   protected static function params(): array {
     return [
       [
@@ -31,7 +33,14 @@ class SqlFunctionABS extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('Absolute');
+    return ts('Absolute value');
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('The positive value of a number.');
   }
 
 }

@@ -17,6 +17,9 @@ use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\AbstractCreateAction;
 use Civi\Api4\Generic\AbstractUpdateAction;
 
+/**
+ * @deprecated
+ */
 abstract class PreSaveSubscriber extends AbstractPrepareSubscriber {
 
   /**
@@ -32,6 +35,7 @@ abstract class PreSaveSubscriber extends AbstractPrepareSubscriber {
     $apiRequest = $event->getApiRequest();
 
     if ($apiRequest instanceof AbstractAction && $this->applies($apiRequest)) {
+      \CRM_Core_Error::deprecatedWarning("Use of APIv4 'PreSaveSubscriber' is deprecated. '" . get_class($this) . "' should be removed ({$apiRequest->getEntityName()}::{$apiRequest->getActionName()}).");
       if (
         ($apiRequest instanceof AbstractCreateAction && $this->supportedOperation !== 'update') ||
         ($apiRequest instanceof AbstractUpdateAction && $this->supportedOperation !== 'create')

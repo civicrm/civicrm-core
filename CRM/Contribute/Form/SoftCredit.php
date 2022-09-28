@@ -169,7 +169,7 @@ class CRM_Contribute_Form_SoftCredit {
    *   The input form values.
    *
    * @param $errors
-   * @param $self
+   * @param self $self
    *
    * @return array
    *   Array of errors

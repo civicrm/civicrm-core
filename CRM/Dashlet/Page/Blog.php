@@ -86,7 +86,7 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
   /**
    * Parse a single rss feed.
    *
-   * @param $url
+   * @param string $url
    *
    * @return array|NULL
    *   array of blog items; or NULL if not available

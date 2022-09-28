@@ -113,6 +113,8 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'api_params',
         // SearchDisplay entity
         'settings',
+        // SearchSegment items
+        'items',
       ];
       $custom = CRM_Core_DAO::executeQuery('SELECT id FROM civicrm_custom_field WHERE html_type = "RichTextEditor"');
       while ($custom->fetch()) {
@@ -143,7 +145,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
   }
 
   public function encodeValue($value) {
-    return str_replace(['<', '>'], ['&lt;', '&gt;'], $value);
+    return str_replace(['<', '>'], ['&lt;', '&gt;'], ($value ?? ''));
   }
 
   /**
@@ -190,7 +192,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
   }
 
   public function decodeValue($value) {
-    return str_replace(['&lt;', '&gt;'], ['<', '>'], $value);
+    return str_replace(['&lt;', '&gt;'], ['<', '>'], ($value ?? ''));
   }
 
   /**

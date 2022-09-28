@@ -35,13 +35,13 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
    * Build the form object.
    */
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Settings - CiviMail'));
+    $this->setTitle(ts('Settings - CiviMail'));
     $this->addFormRule(['CRM_Admin_Form_Setting_Mail', 'formRule']);
     parent::buildQuickForm();
   }
 
   /**
-   * @param $fields
+   * @param array $fields
    *
    * @return array|bool
    */

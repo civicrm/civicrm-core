@@ -86,7 +86,9 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * Are we in print mode? if so we need to modify the display
    * functionality to do a minimal display :)
    *
-   * @var bool
+   * @var int|string
+   *   Should match a CRM_Core_Smarty::PRINT_* constant,
+   *   or equal 0 if not in print mode
    */
   public $_print = 0;
 
@@ -172,6 +174,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     if (!isset(self::$_template)) {
       self::$_template = CRM_Core_Smarty::singleton();
       self::$_session = CRM_Core_Session::singleton();
+      self::$_template->ensureVariablesAreAssigned(['formTpl']);
     }
 
     // lets try to get it from the session and/or the request vars
@@ -336,7 +339,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     // note that this is split into two, because some versions of
     // php 5.x core dump on the triple assignment :)
     $this->_actionName = $this->getActionName();
-    list($pageName, $action) = $this->_actionName;
+    [$pageName, $action] = $this->_actionName;
 
     if ($this->isModal()) {
       if (!$this->isValid($pageName)) {
@@ -357,7 +360,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    */
   public function validate() {
     $this->_actionName = $this->getActionName();
-    list($pageName, $action) = $this->_actionName;
+    [$pageName, $action] = $this->_actionName;
 
     $page = &$this->_pages[$pageName];
 
@@ -481,7 +484,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    */
   public function getButtonName() {
     $data = &$this->container();
-    return $data['_qf_button_name'] ?? NULL;
+    return $data['_qf_button_name'] ?? '';
   }
 
   /**
@@ -667,9 +670,17 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * @param null $fileName
+   * Output HTTP headers for Word document
+   * (note .doc, not the newer .docx format)
+   *
+   * @deprecated
+   *
+   * @param string|null $fileName
+   * @return void
    */
   public function setWord($fileName = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+
     //Mark as a CSV file.
     CRM_Utils_System::setHttpHeader('Content-Type', 'application/vnd.ms-word');
 
@@ -681,9 +692,17 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * @param null $fileName
+   * Output HTTP headers for Excel document
+   * (note .xls, not the newer .xlsx format)
+   *
+   * @deprecated
+   *
+   * @param string|null $fileName
+   * @return void
    */
   public function setExcel($fileName = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+
     //Mark as an excel file.
     CRM_Utils_System::setHttpHeader('Content-Type', 'application/vnd.ms-excel');
 
@@ -698,13 +717,20 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * Setter for print.
    *
-   * @param bool $print
+   * Historically the $print argument has also accepted a string (xls or doc),
+   * but this usage is now deprecated.
+   *
+   * @param int|string $print
+   *   Should match a CRM_Core_Smarty::PRINT_* constant,
+   *   or equal 0 if not in print mode
+   *
+   * @return void
    */
   public function setPrint($print) {
-    if ($print == "xls") {
+    if ($print === "xls") {
       $this->setExcel();
     }
-    elseif ($print == "doc") {
+    elseif ($print === "doc") {
       $this->setWord();
     }
     $this->_print = $print;
@@ -713,8 +739,9 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * Getter for print.
    *
-   * @return bool
-   *   return the print value
+   * @return int|string
+   *   Value matching a CRM_Core_Smarty::PRINT_* constant,
+   *   or 0 if not in print mode
    */
   public function getPrint() {
     return $this->_print;
@@ -728,7 +755,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       if ($this->_print == CRM_Core_Smarty::PRINT_PAGE) {
         return 'CRM/common/print.tpl';
       }
-      elseif ($this->_print == 'xls' || $this->_print == 'doc') {
+      elseif ($this->_print === 'xls' || $this->_print === 'doc') {
         return 'CRM/Contact/Form/Task/Excel.tpl';
       }
       else {
@@ -792,7 +819,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * @param null $url
+   * @param string|null $url
    * @param bool $setToReferer
    */
   public function setDestination($url = NULL, $setToReferer = FALSE) {
@@ -815,7 +842,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    */
   public function cancelAction() {
     $actionName = $this->getActionName();
-    list($pageName, $action) = $actionName;
+    [$pageName, $action] = $actionName;
     return $this->_pages[$pageName]->cancelAction();
   }
 

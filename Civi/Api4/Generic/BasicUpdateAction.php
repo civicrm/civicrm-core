@@ -49,7 +49,7 @@ class BasicUpdateAction extends AbstractUpdateAction {
   /**
    * @param array $items
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function updateRecords(array $items): array {
     return array_map([$this, 'writeRecord'], $items);

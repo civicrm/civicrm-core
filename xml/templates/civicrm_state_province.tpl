@@ -2503,8 +2503,8 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4062, 1170, "CAT", "Catanduanes"),
 (4063, 1170, "CAV", "Cavite"),
 (4064, 1170, "CEB", "Cebu"),
-(4065, 1170, "COM", "Compostela Valley"),
-(4066, 1170, "DAV", "Davao"),
+(4065, 1170, "COM", "Davao de Oro"),
+(4066, 1170, "DAV", "Davao del Norte"),
 (4067, 1170, "DAS", "Davao del Sur"),
 (4068, 1170, "DAO", "Davao Oriental"),
 (4069, 1170, "EAS", "Eastern Samar"),
@@ -2514,7 +2514,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4073, 1170, "ILS", "Ilocos Sur"),
 (4074, 1170, "ILI", "Iloilo"),
 (4075, 1170, "ISA", "Isabela"),
-(4076, 1170, "KAL", "Kalinga-Apayso"),
+(4076, 1170, "KAL", "Kalinga"),
 (4077, 1170, "LAG", "Laguna"),
 (4078, 1170, "LAN", "Lanao del Norte"),
 (4079, 1170, "LAS", "Lanao del Sur"),
@@ -2530,7 +2530,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4089, 1170, "MOU", "Mountain Province"),
 (4090, 1170, "NEC", "Negroe Occidental"),
 (4091, 1170, "NER", "Negros Oriental"),
-(4092, 1170, "NCO", "North Cotabato"),
+(4092, 1170, "NCO", "Cotabato"),
 (4093, 1170, "NSA", "Northern Samar"),
 (4094, 1170, "NUE", "Nueva Ecija"),
 (4095, 1170, "NUV", "Nueva Vizcaya"),
@@ -4141,4 +4141,26 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1226, "WRX", "Wrexham"),
 
 -- Add missing state for South Korea
-(NULL, 1115, "50", "Sejong");
+(NULL, 1115, "50", "Sejong"),
+
+-- Add missing province for Philippines
+(NULL, 1170, "DIN", "Dinagat Islands"),
+
+-- Add missing state for Colombia
+(NULL, 1048, "HUI", "Huila"),
+
+-- Add missing parishes for Bermuda
+ (NULL, 1023, 'DEV', 'Devonshire'),
+ (NULL, 1023, 'HAM', 'Hamilton Parish'),
+ (NULL, 1023, 'HA', 'City of Hamilton'),
+ (NULL, 1023, 'PAG', 'Paget'),
+ (NULL, 1023, 'PEM', 'Pembroke'),
+ (NULL, 1023, 'SG', 'Town of St. George'),
+ (NULL, 1023, 'SGE', 'Saint George\'s'),
+ (NULL, 1023, 'SAN', 'Sandys'),
+ (NULL, 1023, 'SMI', 'Smiths'),
+ (NULL, 1023, 'SOU', 'Southampton'),
+ (NULL, 1023, 'WAR', 'Warwick')
+ 
+ -- end of statement:
+ ;

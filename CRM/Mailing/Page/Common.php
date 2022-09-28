@@ -79,7 +79,7 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
       elseif ($this->_type == 'resubscribe') {
         $groups = CRM_Mailing_Event_BAO_Resubscribe::resub_to_mailing($job_id, $queue_id, $hash);
         if (count($groups)) {
-          CRM_Mailing_Event_BAO_Resubscribe::send_resub_response($queue_id, $groups, FALSE, $job_id);
+          CRM_Mailing_Event_BAO_Resubscribe::send_resub_response($queue_id, $groups, $job_id);
         }
         else {
           // should we indicate an error, or just ignore?

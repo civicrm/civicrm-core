@@ -22,10 +22,10 @@
         <td>
           <table>
             <tr>
-              <th>ID</th>
-              <th>Case Client</th>
-              <th>Case Type</th>
-              <th>Status</th>
+              <th>{ts}ID{/ts}</th>
+              <th>{ts}Case Client{/ts}</th>
+              <th>{ts}Case Type{/ts}</th>
+              <th>{ts}Status{/ts}</th>
             </tr>
             {foreach from=$linkedCases item="linkedCase"}
               <tr>

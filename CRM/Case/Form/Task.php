@@ -34,11 +34,7 @@ class CRM_Case_Form_Task extends CRM_Core_Form_Task {
    * @inheritDoc
    */
   public function setContactIDs() {
-    // @todo Parameters shouldn't be needed and should be class member
-    // variables instead, set appropriately by each subclass.
-    $this->_contactIds = $this->getContactIDsFromComponent($this->_entityIds,
-      'civicrm_case_contact', 'case_id'
-    );
+    $this->_contactIds = $this->getContactIDs();
   }
 
   /**
@@ -69,6 +65,23 @@ class CRM_Case_Form_Task extends CRM_Core_Form_Task {
   }
 
   /**
+   * Get the rows from the results to be pdf-d.
+   *
+   * @return array
+   */
+  protected function getRows(): array {
+    $rows = [];
+    foreach ($this->_contactIds as $index => $contactID) {
+      $caseID = $this->getVar('_caseId');
+      if (empty($caseID) && !empty($this->_caseIds[$index])) {
+        $caseID = $this->_caseIds[$index];
+      }
+      $rows[] = ['contact_id' => $contactID, 'schema' => ['caseId' => $caseID, 'contactId' => $contactID]];
+    }
+    return $rows;
+  }
+
+  /**
    * Get the name of the table for the relevant entity.
    *
    * @return string
@@ -84,6 +97,30 @@ class CRM_Case_Form_Task extends CRM_Core_Form_Task {
    */
   public function getEntityAliasField() {
     return 'case_id';
+  }
+
+  protected function getContactIDs(): array {
+    if (isset($this->_contactIds)) {
+      return $this->_contactIds;
+    }
+    $contactIDSFromUrl = CRM_Utils_Request::retrieve('cid', 'CommaSeparatedIntegers', $this);
+    if (!empty($contactIDSFromUrl)) {
+      return explode(',', $contactIDSFromUrl);
+    }
+    // @todo Parameters shouldn't be needed and should be class member
+    // variables instead, set appropriately by each subclass.
+    return $this->getContactIDsFromComponent($this->_entityIds,
+      'civicrm_case_contact', 'case_id'
+    );
+  }
+
+  /**
+   * Get the token processor schema required to list any tokens for this task.
+   *
+   * @return array
+   */
+  protected function getTokenSchema(): array {
+    return ['contactId', 'caseId'];
   }
 
 }

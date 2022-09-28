@@ -86,9 +86,6 @@
                     </div>
                <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
             </div>
-  <div class="form-item">
-  {$form.status.label} {$form.status.html}
-  </div>
 
 
             </div></fieldset>

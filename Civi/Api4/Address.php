@@ -19,6 +19,8 @@ namespace Civi\Api4;
  * Creating a new address requires at minimum a contact's ID and location type ID
  * and other attributes (although optional) like street address, city, country etc.
  *
+ * @ui_join_filters is_primary
+ *
  * @searchable secondary
  * @since 5.19
  * @package Civi\Api4
@@ -49,6 +51,15 @@ class Address extends Generic\DAOEntity {
    */
   public static function update($checkPermissions = TRUE) {
     return (new Action\Address\Update(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Address\GetCoordinates
+   */
+  public static function getCoordinates($checkPermissions = TRUE) {
+    return (new Action\Address\GetCoordinates(__CLASS__, __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 

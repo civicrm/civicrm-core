@@ -32,6 +32,8 @@ use Civi\Api4\Utils\ReflectionUtils;
  * @method bool getDebug()
  * @method $this setChain(array $chain)
  * @method array getChain()
+ * @method $this setLanguage(string|null $language)
+ * @method string|null getLanguage()
  */
 abstract class AbstractAction implements \ArrayAccess {
 
@@ -43,6 +45,20 @@ abstract class AbstractAction implements \ArrayAccess {
    * @var int
    */
   protected $version = 4;
+
+  /**
+   * Preferred language (optional)
+   *
+   * This option will notify major localization subsystems (`ts()`, multilingual, etc)
+   * about which locale should be used for composing/formatting messaging.
+   *
+   * This indicates the preferred language. The effective language is determined
+   * by `Civi\Core\Locale::negotiate($preferredLanguage)`.
+   *
+   * @var string
+   * @optionsCallback getLanguageOptions
+   */
+  protected $language;
 
   /**
    * Additional api requests - will be called once per result.
@@ -135,7 +151,7 @@ abstract class AbstractAction implements \ArrayAccess {
    *
    * @param string $entityName
    * @param string $actionName
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function __construct($entityName, $actionName) {
     // If a namespaced class name is passed in
@@ -154,17 +170,17 @@ abstract class AbstractAction implements \ArrayAccess {
    * @throws \Exception
    */
   public function __set($name, $value) {
-    throw new \API_Exception('Unknown api parameter');
+    throw new \CRM_Core_Exception('Unknown api parameter');
   }
 
   /**
    * @param int $val
    * @return $this
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function setVersion($val) {
     if ($val !== 4 && $val !== '4') {
-      throw new \API_Exception('Cannot modify api version');
+      throw new \CRM_Core_Exception('Cannot modify api version');
     }
     return $this;
   }
@@ -192,13 +208,40 @@ abstract class AbstractAction implements \ArrayAccess {
   }
 
   /**
+   * Magic function to provide automatic getter/setter for params.
+   *
+   * @param $name
+   * @param $arguments
+   * @return static|mixed
+   * @throws \CRM_Core_Exception
+   */
+  public function __call($name, $arguments) {
+    $param = lcfirst(substr($name, 3));
+    if (!$param || $param[0] == '_') {
+      throw new \CRM_Core_Exception('Unknown api parameter: ' . $name);
+    }
+    $mode = substr($name, 0, 3);
+    if ($this->paramExists($param)) {
+      switch ($mode) {
+        case 'get':
+          return $this->$param;
+
+        case 'set':
+          $this->$param = $arguments[0];
+          return $this;
+      }
+    }
+    throw new \CRM_Core_Exception('Unknown api parameter: ' . $name);
+  }
+
+  /**
    * Invoke api call.
    *
    * At this point all the params have been sent in and we initiate the api call & return the result.
    * This is basically the outer wrapper for api v4.
    *
    * @return \Civi\Api4\Generic\Result
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function execute() {
@@ -254,8 +297,13 @@ abstract class AbstractAction implements \ArrayAccess {
       foreach ($this->reflect()->getProperties(\ReflectionProperty::IS_PROTECTED) as $property) {
         $name = $property->getName();
         if ($name != 'version' && $name[0] != '_') {
-          $this->_paramInfo[$name] = ReflectionUtils::getCodeDocs($property, 'Property', $vars);
-          $this->_paramInfo[$name]['default'] = $defaults[$name];
+          $docs = ReflectionUtils::getCodeDocs($property, 'Property', $vars);
+          $docs['default'] = $defaults[$name];
+          if (!empty($docs['optionsCallback'])) {
+            $docs['options'] = $this->{$docs['optionsCallback']}();
+            unset($docs['optionsCallback']);
+          }
+          $this->_paramInfo[$name] = $docs;
         }
       }
     }
@@ -295,13 +343,14 @@ abstract class AbstractAction implements \ArrayAccess {
   /**
    * @inheritDoc
    */
-  public function offsetExists($offset) {
+  public function offsetExists($offset): bool {
     return in_array($offset, ['entity', 'action', 'params', 'version', 'check_permissions', 'id']) || isset($this->_arrayStorage[$offset]);
   }
 
   /**
    * @inheritDoc
    */
+  #[\ReturnTypeWillChange]
   public function &offsetGet($offset) {
     $val = NULL;
     if (in_array($offset, ['entity', 'action'])) {
@@ -327,9 +376,9 @@ abstract class AbstractAction implements \ArrayAccess {
   /**
    * @inheritDoc
    */
-  public function offsetSet($offset, $value) {
+  public function offsetSet($offset, $value): void {
     if (in_array($offset, ['entity', 'action', 'entityName', 'actionName', 'params', 'version', 'id'])) {
-      throw new \API_Exception('Cannot modify api4 state via array access');
+      throw new \CRM_Core_Exception('Cannot modify api4 state via array access');
     }
     if ($offset == 'check_permissions') {
       $this->setCheckPermissions($value);
@@ -342,9 +391,9 @@ abstract class AbstractAction implements \ArrayAccess {
   /**
    * @inheritDoc
    */
-  public function offsetUnset($offset) {
+  public function offsetUnset($offset): void {
     if (in_array($offset, ['entity', 'action', 'entityName', 'actionName', 'params', 'check_permissions', 'version', 'id'])) {
-      throw new \API_Exception('Cannot modify api4 state via array access');
+      throw new \CRM_Core_Exception('Cannot modify api4 state via array access');
     }
     unset($this->_arrayStorage[$offset]);
   }
@@ -366,7 +415,7 @@ abstract class AbstractAction implements \ArrayAccess {
    * @return array
    */
   public function getPermissions() {
-    $permissions = call_user_func([CoreUtil::getApiClass($this->_entityName), 'permissions']);
+    $permissions = call_user_func([CoreUtil::getApiClass($this->_entityName), 'permissions'], $this->_entityName);
     $permissions += [
       // applies to getFields, getActions, etc.
       'meta' => ['access CiviCRM'],
@@ -392,15 +441,12 @@ abstract class AbstractAction implements \ArrayAccess {
    * This is because we DON'T want the wrapper to check permissions as this is an internal op.
    * @see \Civi\Api4\Action\Contact\GetFields
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @return array
    */
   public function entityFields() {
     if (!$this->_entityFields) {
       $allowedTypes = ['Field', 'Filter', 'Extra'];
-      if (method_exists($this, 'getCustomGroup')) {
-        $allowedTypes[] = 'Custom';
-      }
       $getFields = \Civi\API\Request::create($this->getEntityName(), 'getFields', [
         'version' => 4,
         'checkPermissions' => FALSE,
@@ -430,7 +476,7 @@ abstract class AbstractAction implements \ArrayAccess {
    *
    * @param $values
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function checkRequiredFields($values) {
     $unmatched = [];
@@ -453,7 +499,7 @@ abstract class AbstractAction implements \ArrayAccess {
    * Replaces pseudoconstants in input values
    *
    * @param array $record
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function formatWriteValues(&$record) {
     $optionFields = [];
@@ -484,6 +530,12 @@ abstract class AbstractAction implements \ArrayAccess {
       $options = FormattingUtil::getPseudoconstantList($info['field'], $info['expr'], $record, 'create');
       $record[$fieldName] = FormattingUtil::replacePseudoconstant($options, $info['val'], TRUE);
     }
+    // The DAO works better with ints than booleans. See https://github.com/civicrm/civicrm-core/pull/23970
+    foreach ($record as $key => $value) {
+      if (is_bool($value)) {
+        $record[$key] = (int) $value;
+      }
+    }
   }
 
   /**
@@ -496,12 +548,12 @@ abstract class AbstractAction implements \ArrayAccess {
    * @param array $vars
    *   Variable name => value
    * @return bool
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Exception
    */
   protected function evaluateCondition($expr, $vars) {
     if (strpos($expr, '}') !== FALSE || strpos($expr, '{') !== FALSE) {
-      throw new \API_Exception('Illegal character in expression');
+      throw new \CRM_Core_Exception('Illegal character in expression');
     }
     $tpl = "{if $expr}1{else}0{/if}";
     return (bool) trim(\CRM_Core_Smarty::singleton()->fetchWith('string:' . $tpl, $vars));
@@ -526,6 +578,22 @@ abstract class AbstractAction implements \ArrayAccess {
         $this->_debugOutput['callback'] = get_class($callable);
       }
     }
+  }
+
+  /**
+   * Get available preferred languages.
+   *
+   * @return array
+   */
+  protected function getLanguageOptions(): array {
+    $languages = \CRM_Contact_BAO_Contact::buildOptions('preferred_language');
+    ksort($languages);
+    $result = array_keys($languages);
+    if (!\Civi::settings()->get('partial_locales')) {
+      $uiLanguages = \CRM_Core_I18n::uiLanguages(TRUE);
+      $result = array_values(array_intersect($result, $uiLanguages));
+    }
+    return $result;
   }
 
 }

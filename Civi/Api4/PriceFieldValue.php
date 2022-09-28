@@ -14,9 +14,12 @@ namespace Civi\Api4;
  * PriceFieldValue entity.
  *
  * @searchable secondary
+ * @orderBy weight
+ * @groupWeightsBy price_field_id
  * @since 5.27
  * @package Civi\Api4
  */
 class PriceFieldValue extends Generic\DAOEntity {
+  use Generic\Traits\SortableEntity;
 
 }

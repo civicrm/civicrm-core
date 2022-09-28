@@ -140,7 +140,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
     $defaults['entity_table'] = $this->_entityTable;
 
     CRM_Friend_BAO_Friend::getValues($defaults);
-    CRM_Utils_System::setTitle(CRM_Utils_Array::value('title', $defaults));
+    $this->setTitle(CRM_Utils_Array::value('title', $defaults));
 
     $this->assign('title', CRM_Utils_Array::value('title', $defaults));
     $this->assign('intro', CRM_Utils_Array::value('intro', $defaults));
@@ -302,7 +302,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
       }
     }
 
-    CRM_Utils_System::setTitle($defaults['thankyou_title']);
+    $this->setTitle($defaults['thankyou_title']);
     $this->assign('thankYouText', $defaults['thankyou_text']);
   }
 

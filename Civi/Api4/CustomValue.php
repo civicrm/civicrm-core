@@ -30,7 +30,7 @@ class CustomValue {
    * @param string $customGroup
    * @param bool $checkPermissions
    * @return Action\CustomValue\Get
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function get($customGroup, $checkPermissions = TRUE) {
     return (new Action\CustomValue\Get($customGroup, __FUNCTION__))
@@ -41,7 +41,7 @@ class CustomValue {
    * @param string $customGroup
    * @param bool $checkPermissions
    * @return Action\CustomValue\GetFields
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getFields($customGroup = NULL, $checkPermissions = TRUE) {
     return (new Action\CustomValue\GetFields($customGroup, __FUNCTION__))
@@ -52,7 +52,7 @@ class CustomValue {
    * @param string $customGroup
    * @param bool $checkPermissions
    * @return Action\CustomValue\Save
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function save($customGroup, $checkPermissions = TRUE) {
     return (new Action\CustomValue\Save($customGroup, __FUNCTION__))
@@ -63,7 +63,7 @@ class CustomValue {
    * @param string $customGroup
    * @param bool $checkPermissions
    * @return Action\CustomValue\Create
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function create($customGroup, $checkPermissions = TRUE) {
     return (new Action\CustomValue\Create($customGroup, __FUNCTION__))
@@ -74,7 +74,7 @@ class CustomValue {
    * @param string $customGroup
    * @param bool $checkPermissions
    * @return Action\CustomValue\Update
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function update($customGroup, $checkPermissions = TRUE) {
     return (new Action\CustomValue\Update($customGroup, __FUNCTION__))
@@ -85,7 +85,7 @@ class CustomValue {
    * @param string $customGroup
    * @param bool $checkPermissions
    * @return Action\CustomValue\Delete
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function delete($customGroup, $checkPermissions = TRUE) {
     return (new Action\CustomValue\Delete($customGroup, __FUNCTION__))
@@ -96,7 +96,7 @@ class CustomValue {
    * @param string $customGroup
    * @param bool $checkPermissions
    * @return Generic\BasicReplaceAction
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function replace($customGroup, $checkPermissions = TRUE) {
     return (new Generic\BasicReplaceAction("Custom_$customGroup", __FUNCTION__))
@@ -107,7 +107,7 @@ class CustomValue {
    * @param string $customGroup
    * @param bool $checkPermissions
    * @return Action\GetActions
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getActions($customGroup = NULL, $checkPermissions = TRUE) {
     return (new Action\GetActions("Custom_$customGroup", __FUNCTION__))

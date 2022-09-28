@@ -30,7 +30,7 @@ class CRM_Admin_Form extends CRM_Core_Form {
   /**
    * The default values for form fields.
    *
-   * @var int
+   * @var array
    */
   protected $_values;
 

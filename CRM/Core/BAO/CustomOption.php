@@ -22,23 +22,16 @@
 class CRM_Core_BAO_CustomOption {
 
   /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
+   * @deprecated
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_BAO_CustomOption
+   * @return CRM_Core_DAO_OptionValue|NULL
    */
-  public static function retrieve(&$params, &$defaults) {
-    $customOption = new CRM_Core_DAO_OptionValue();
-    $customOption->copyValues($params);
-    if ($customOption->find(TRUE)) {
-      CRM_Core_DAO::storeValues($customOption, $defaults);
-      return $customOption;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_OptionValue', $params, $defaults);
   }
 
   /**
@@ -167,7 +160,7 @@ class CRM_Core_BAO_CustomOption {
   /**
    * Delete Option.
    *
-   * @param $optionId integer
+   * @param int $optionId
    *   option id
    *
    */
@@ -201,12 +194,7 @@ AND    g.id    = v.option_group_id";
       self::updateValue($optionId, $value);
 
       // also delete this option value
-      $query = "
-DELETE
-FROM   civicrm_option_value
-WHERE  id = %1";
-      $params = [1 => [$optionId, 'Integer']];
-      CRM_Core_DAO::executeQuery($query, $params);
+      CRM_Core_BAO_OptionValue::deleteRecord(['id' => $optionId]);
     }
   }
 

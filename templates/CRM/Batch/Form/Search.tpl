@@ -22,7 +22,7 @@
   </table>
 </div>
 <div class="action-link">
-  {crmButton accesskey="N" p="civicrm/batch/add" q="reset=1&action=add" id="newBatch" icon="crm-i fa-plus-circle"}{ts}New Data Entry Batch{/ts}{/crmButton}<br/>
+  {crmButton accesskey="N" p="civicrm/batch/add" q="reset=1&action=add" id="newBatch" icon="plus-circle"}{ts}New Data Entry Batch{/ts}{/crmButton}<br/>
 </div>
 <table class="crm-batch-selector">
   <thead>

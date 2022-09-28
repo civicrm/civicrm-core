@@ -67,7 +67,7 @@ function _recaptcha_qsencode ($data) {
 function _recaptcha_http_post($host, $path, $data) {
   $client = new Client();
   try {
-    $response = $client->request('POST', $host . '/' . $path, ['query' => $data]);
+    $response = $client->request('POST', $host . '/' . $path, ['query' => $data, 'timeout' => \Civi::settings()->get('http_timeout')]);
   }
   catch (Exception $e) {
     return '';

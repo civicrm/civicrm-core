@@ -22,6 +22,7 @@ class ExampleTransactionalTest extends \PHPUnit\Framework\TestCase implements He
   }
 
   protected function setUp(): void {
+    parent::setUp();
     /** @var \CRM_Contact_DAO_Contact $contact */
     $contact = \CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact', [
       'contact_type' => 'Individual',

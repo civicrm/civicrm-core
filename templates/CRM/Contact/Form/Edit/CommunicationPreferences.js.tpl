@@ -11,7 +11,7 @@
   <script type="text/javascript">
     CRM.$(function($) {
       var $form = $('form.{/literal}{$form.formClass}{literal}');
-      $('#postal_greeting_id, #addressee_id, #email_greeting_id', $form).change(function() {
+      function triggerCustomValueCommsFields() {
         var fldName = $(this).attr('id');
         if ($(this).val() == 4) {
           $("#greetings1, #greetings2", $form).show();
@@ -20,8 +20,11 @@
           $("#" + fldName + "_html, #" + fldName + "_label", $form).hide();
           $("#" + fldName.slice(0, -3) + "_custom", $form).val('');
         }
-      });
-      
+      }
+      $('#postal_greeting_id, #addressee_id, #email_greeting_id', $form)
+        .each(triggerCustomValueCommsFields)
+        .on('change', triggerCustomValueCommsFields);
+
       $('.replace-plain[data-id]', $form).click(function() {
         var element = $(this).data('id');
         $(this).hide();

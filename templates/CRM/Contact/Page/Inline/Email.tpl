@@ -26,7 +26,7 @@
   {/if}
   {foreach from=$email key="blockId" item=item}
     {if $item.email}
-    <div class="crm-summary-row {if !empty($item.is_primary)}{ts}primary{/ts}{/if}">
+    <div class="crm-summary-row {if !empty($item.is_primary)}primary{/if}">
       <div class="crm-label">
         {$item.location_type} {ts}Email{/ts}
         {privacyFlag field=do_not_email condition=$privacy.do_not_email}{privacyFlag field=on_hold condition=$item.on_hold}

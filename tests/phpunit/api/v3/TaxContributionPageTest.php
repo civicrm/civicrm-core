@@ -36,7 +36,6 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
 
   /**
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setUp(): void {
     parent::setUp();
@@ -135,7 +134,6 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    * Cleanup after function.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -188,7 +186,6 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    * @param string $thousandSeparator
    *   punctuation used to refer to thousands.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @dataProvider getThousandSeparators
    *
@@ -275,7 +272,6 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testCreateContributionPayLaterOnline(): void {
@@ -311,7 +307,6 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    * @param string $thousandSeparator
    *   punctuation used to refer to thousands.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    * @dataProvider getThousandSeparators
@@ -392,7 +387,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     ]);
 
     $this->assertEquals('300.00', $lineItems);
-    $this->assertEquals('320.00', $this->_getFinancialTrxnAmount($contribution['id']));
+    $this->assertEquals('300.00', $this->_getFinancialTrxnAmount($contribution['id']));
     $this->assertEquals('320.00', $this->_getFinancialItemAmount($contribution['id']));
   }
 
@@ -430,7 +425,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    * @param array $params
    * @param string $context
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function _checkFinancialRecords($params, $context): void {
     $contributionID = $params['id'];
@@ -525,7 +520,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    * @param $contributionID
    *
    * @return \Civi\Api4\Generic\Result
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function getFinancialTransactionsForContribution($contributionID): \Civi\Api4\Generic\Result {

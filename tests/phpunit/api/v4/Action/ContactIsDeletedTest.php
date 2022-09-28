@@ -19,12 +19,13 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class ContactIsDeletedTest extends UnitTestCase {
+class ContactIsDeletedTest extends Api4TestBase implements TransactionalInterface {
 
   public function setUpHeadless() {
     $relatedTables = [
@@ -64,7 +65,7 @@ class ContactIsDeletedTest extends UnitTestCase {
       ]);
       $this->assertEquals(count($originalQuery), count($isDeletedQuery));
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $this->fail('An Exception Should not have been raised');
     }
     try {
@@ -73,7 +74,7 @@ class ContactIsDeletedTest extends UnitTestCase {
         'where' => [['contact_id.first_name', '=', 'phoney'], ['contact_id.is_deleted', '=', 0]],
       ]);
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $this->fail('An Exception Should not have been raised');
     }
   }

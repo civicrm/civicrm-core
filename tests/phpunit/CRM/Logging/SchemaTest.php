@@ -16,9 +16,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
   /**
    * Clean up after test.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function tearDown(): void {
     $schema = new CRM_Logging_Schema();
@@ -235,7 +233,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testColumnInfo(): void {
     CRM_Core_DAO::executeQuery("CREATE TABLE `civicrm_test_column_info` (

@@ -12,7 +12,7 @@
 
   {foreach from=$fields item=fieldSpec}
     {assign var=fieldName value=$fieldSpec.name}
-    <tr class="crm-{$entityInClassFormat}-form-block-{$fieldName}">
+    <tr class="crm-{if !empty($entityInClassFormat)}{$entityInClassFormat}{/if}-form-block-{$fieldName}">
       {include file="CRM/Core/Form/Field.tpl"}
     </tr>
   {/foreach}

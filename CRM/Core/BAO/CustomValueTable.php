@@ -155,7 +155,8 @@ class CRM_Core_BAO_CustomValueTable {
 
             case 'File':
               if (!$field['file_id']) {
-                throw new CRM_Core_Exception('Missing parameter file_id');
+                $value = 'null';
+                break;
               }
 
               // need to add/update civicrm_entity_file
@@ -228,7 +229,7 @@ class CRM_Core_BAO_CustomValueTable {
             // would be 'String' for a concatenated set of integers.
             // However, the god-forsaken timestamp hack also needs to be kept
             // if value is NULL.
-            $params[$count] = [$value, ($value && $field['is_multiple']) ? 'String' : $type];
+            $params[$count] = [$value, ($value && $field['serialize']) ? 'String' : $type];
             $count++;
           }
 
@@ -360,7 +361,10 @@ class CRM_Core_BAO_CustomValueTable {
           'custom_group_id' => $customValue['custom_group_id'],
           'table_name' => $customValue['table_name'],
           'column_name' => $customValue['column_name'],
-          'is_multiple' => $customValue['is_multiple'] ?? NULL,
+          // is_multiple refers to the custom group, serialize refers to the field.
+          // @todo is_multiple can be null - does that mean anything different from 0?
+          'is_multiple' => $customValue['is_multiple'] ?? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customValue['custom_group_id'], 'is_multiple'),
+          'serialize' => $customValue['serialize'] ?? (int) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $customValue['custom_field_id'], 'serialize'),
           'file_id' => $customValue['file_id'],
         ];
 
@@ -371,6 +375,13 @@ class CRM_Core_BAO_CustomValueTable {
 
         if (!empty($customValue['id'])) {
           $cvParam['id'] = $customValue['id'];
+        }
+        elseif (empty($cvParam['is_multiple']) && !empty($entityID)) {
+          // dev/core#3000 Ensure that if we are not dealing with multiple record custom data and for some reason have got here without getting the id of the record in the custom table for this entityId let us give it one last shot
+          $rowId = CRM_Core_DAO::singleValueQuery("SELECT id FROM {$cvParam['table_name']} WHERE entity_id = %1", [1 => [$entityID, 'Integer']]);
+          if (!empty($rowId)) {
+            $cvParam['id'] = $rowId;
+          }
         }
         if (!array_key_exists($customValue['table_name'], $cvParams)) {
           $cvParams[$customValue['table_name']] = [];
@@ -395,15 +406,16 @@ class CRM_Core_BAO_CustomValueTable {
    * @param $entityTable
    * @param int $entityID
    * @param $customFieldExtends
+   * @param $parentOperation
    */
-  public static function postProcess(&$params, $entityTable, $entityID, $customFieldExtends) {
+  public static function postProcess(&$params, $entityTable, $entityID, $customFieldExtends, $parentOperation = NULL) {
     $customData = CRM_Core_BAO_CustomField::postProcess($params,
       $entityID,
       $customFieldExtends
     );
 
     if (!empty($customData)) {
-      self::store($customData, $entityTable, $entityID);
+      self::store($customData, $entityTable, $entityID, $parentOperation);
     }
   }
 
@@ -432,7 +444,7 @@ class CRM_Core_BAO_CustomValueTable {
    *                                   Empty array if no custom values found.
    * @throws CRM_Core_Exception
    */
-  public static function &getEntityValues($entityID, $entityType = NULL, $fieldIDs = NULL, $formatMultiRecordField = FALSE, $DTparams = NULL) {
+  public static function getEntityValues($entityID, $entityType = NULL, $fieldIDs = NULL, $formatMultiRecordField = FALSE, $DTparams = NULL) {
     if (!$entityID) {
       // adding this here since an empty contact id could have serious repurcussions
       // like looping forever
@@ -451,7 +463,8 @@ class CRM_Core_BAO_CustomValueTable {
       $cond[] = "cf.id IN ( $fieldIDList )";
     }
     if (empty($cond)) {
-      $cond[] = "cg.extends IN ( 'Contact', 'Individual', 'Household', 'Organization' )";
+      $contactTypes = array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes(TRUE));
+      $cond[] = "cg.extends IN ( '" . implode("', '", $contactTypes) . "' )";
     }
     $cond = implode(' AND ', $cond);
 
@@ -590,7 +603,8 @@ SELECT cg.table_name  as table_name ,
        cf.column_name as column_name,
        cf.id          as cf_id      ,
        cf.html_type   as html_type  ,
-       cf.data_type   as data_type
+       cf.data_type   as data_type  ,
+       cf.serialize   as serialize
 FROM   civicrm_custom_group cg,
        civicrm_custom_field cf
 WHERE  cf.custom_group_id = cg.id
@@ -648,6 +662,7 @@ AND    cf.id IN ( $fieldIDList )
           'table_name' => $dao->table_name,
           'column_name' => $dao->column_name,
           'is_multiple' => $dao->is_multiple,
+          'serialize' => $dao->serialize,
           'extends' => $dao->extends,
         ];
 
@@ -700,7 +715,7 @@ AND    cf.id IN ( $fieldIDList )
    * @throws Exception
    * @return array
    */
-  public static function &getValues(&$params) {
+  public static function getValues($params) {
     if (empty($params)) {
       return NULL;
     }
@@ -724,11 +739,11 @@ AND    cf.id IN ( $fieldIDList )
             [1 => $idx]
           ));
         }
-        $fieldIDs[] = (int ) $idx;
+        $fieldIDs[] = (int) $idx;
       }
     }
 
-    $default = ['Contact', 'Individual', 'Household', 'Organization'];
+    $default = array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes(TRUE));
     if (!($type = CRM_Utils_Array::value('entityType', $params)) ||
       in_array($params['entityType'], $default)
     ) {

@@ -65,8 +65,7 @@ class CRM_Contact_BAO_Contact_Location {
    *
    * @param int $id
    *   Id of the contact.
-   *
-   * @param null $type
+   * @param string|null $type
    *
    * @return array
    *   tuple of display_name and sms if found, or (null,null)

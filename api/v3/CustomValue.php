@@ -113,7 +113,7 @@ function _civicrm_api3_custom_value_create_spec(&$params) {
  *   Example: 'entity_id' => 123, 'return.custom_6' => 1, 'return.custom_33' => 1
  *   If you do not know the ID, you may use group name : field name, for example 'return.foo_stuff:my_field' => 1
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @return array
  */
 function civicrm_api3_custom_value_get($params) {
@@ -163,7 +163,7 @@ function civicrm_api3_custom_value_get($params) {
       return civicrm_api3_create_success($values, $params, 'CustomValue');
     }
     else {
-      throw new API_Exception($result['error_message']);
+      throw new CRM_Core_Exception($result['error_message']);
     }
   }
   else {
@@ -172,7 +172,7 @@ function civicrm_api3_custom_value_get($params) {
     // Convert multi-value strings to arrays
     $sp = CRM_Core_DAO::VALUE_SEPARATOR;
     foreach ($result as $id => $value) {
-      if (strpos($value, $sp) !== FALSE) {
+      if (strpos(($value ?? ''), $sp) !== FALSE) {
         $value = explode($sp, trim($value, $sp));
       }
 
@@ -230,7 +230,7 @@ function _civicrm_api3_custom_value_get_spec(&$params) {
  *
  * @param array $spec description of fields supported by this API call
  *
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function _civicrm_api3_custom_value_gettree_spec(&$spec) {
   $spec['entity_id'] = [
@@ -280,9 +280,8 @@ function _civicrm_api3_custom_value_gettree_spec(&$spec) {
  * @param array $params
  *
  * @return array API result
- * @throws \API_Exception
  * @throws \CRM_Core_Exception
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_custom_value_gettree($params) {
   $ret = [];
@@ -412,7 +411,7 @@ function _civicrm_api3_custom_value_getdisplayvalue_spec(&$spec) {
  * @param array $params
  *
  * @return array API result
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_custom_value_getdisplayvalue($params) {
   // Null or missing means use the current db value, but treat '0', 0, and '' as legitimate values to look up.

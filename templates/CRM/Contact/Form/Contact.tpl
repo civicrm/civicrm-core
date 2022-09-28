@@ -78,7 +78,7 @@
 
     {foreach from = $editOptions item = "title" key="name"}
       {if $name eq 'CustomData' }
-        <div id='customData'>{include file="CRM/Contact/Form/Edit/CustomData.tpl"}</div>
+        <div id='customData'>{include file="CRM/Contact/Form/Edit/CustomData.tpl" isSingleRecordEdit=false}</div>
       {else}
         {include file="CRM/Contact/Form/Edit/$name.tpl"}
       {/if}
@@ -185,7 +185,7 @@
         subTypeValues = null;
       }
       else if (!subTypeValues) {
-        subTypeValues = {/literal}{if isset($paramSubType)}"{$paramSubType}"{else}""{/if}{literal};
+        subTypeValues = {/literal}"{$paramSubType}"{literal};
       }
       function loadNextRecord(i, groupValue, groupCount) {
         if (i < groupCount) {

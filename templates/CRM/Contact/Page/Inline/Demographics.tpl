@@ -16,14 +16,14 @@
     {/if}
     <div class="crm-summary-row">
       <div class="crm-label">{ts}Gender{/ts}</div>
-      <div class="crm-content crm-contact-gender_display">{if !empty($gender_display)}{$gender_display}{/if}</div>
+      <div class="crm-content crm-contact-gender_display">{$gender_display}</div>
     </div>
 
     <div class="crm-summary-row">
       <div class="crm-label">{ts}Date of Birth{/ts}</div>
       <div class="crm-content crm-contact-birth_date_display">
         {assign var="date_format" value=$fields.birth_date.smarty_view_format}
-        {if !empty($birth_date)}
+        {if $birth_date}
           {$birth_date|crmDate:$date_format}
         {/if}
       </div>
@@ -35,7 +35,7 @@
             <div class="crm-content crm-contact-deceased_date_display">
               {assign var="date_format" value = $fields.birth_date.smarty_view_format}
               {$deceased_date|crmDate:$date_format}
-              {if !empty($birth_date)}({ts}Age{/ts} {if !empty($age.y)}{ts count=$age.y plural='%count years'}%count year{/ts}{elseif !empty($age.m)}{ts count=$age.m plural='%count months'}%count month{/ts}{/if}){/if}
+              {if $birth_date}({ts}Age{/ts} {if $age.y}{ts count=$age.y plural='%count years'}%count year{/ts}{elseif $age.m}{ts count=$age.m plural='%count months'}%count month{/ts}{/if}){/if}
             </div>
           </div>
         {else}
@@ -47,7 +47,7 @@
       {else}
         <div class="crm-summary-row">
           <div class="crm-label">{ts}Age{/ts}</div>
-          <div class="crm-content crm-contact-age_display">{if !empty($age.y)}{ts count=$age.y plural='%count years'}%count year{/ts}{elseif !empty($age.m)}{ts count=$age.m plural='%count months'}%count month{/ts}{/if}</div>
+          <div class="crm-content crm-contact-age_display">{if $age.y}{ts count=$age.y plural='%count years'}%count year{/ts}{elseif $age.m}{ts count=$age.m plural='%count months'}%count month{/ts}{/if}</div>
         </div>
       {/if}
     </div>

@@ -1,0 +1,6 @@
+{
+    "type": "search",
+    "title": "TestMultipleSearchForm",
+    "server_route": "",
+    "permission": "access CiviCRM"
+}

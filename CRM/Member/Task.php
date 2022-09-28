@@ -151,7 +151,7 @@ class CRM_Member_Task extends CRM_Core_Task {
    *   set of tasks that are valid for the user
    */
   public static function permissionedTaskTitles($permission, $params = []) {
-    $tasks = self::getTitlesFilteredByPermission(self::$_tasks, $permission === CRM_Core_Permission::EDIT);
+    $tasks = self::getTitlesFilteredByPermission(self::tasks(), $permission === CRM_Core_Permission::EDIT);
     return parent::corePermissionedTaskTitles($tasks, $permission, $params);
   }
 
@@ -165,8 +165,7 @@ class CRM_Member_Task extends CRM_Core_Task {
    *   the set of tasks for a group of members
    */
   public static function getTask($value) {
-    self::tasks();
-    if (!$value || empty(self::$_tasks[$value])) {
+    if (!$value || empty(self::tasks()[$value])) {
       // Make the print task the default
       $value = self::TASK_PRINT;
     }

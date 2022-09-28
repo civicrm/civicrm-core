@@ -59,10 +59,28 @@ class GroupContact extends Generic\DAOEntity {
   public static function getInfo() {
     $info = parent::getInfo();
     $info['bridge'] = [
-      'group_id' => ['description' => ts('Static (non-smart) group contacts')],
-      'contact_id' => ['description' => ts('Static (non-smart) group contacts')],
+      'group_id' => [
+        'to' => 'contact_id',
+        'description' => ts('Static (non-smart) group contacts'),
+      ],
+      'contact_id' => [
+        'to' => 'group_id',
+        'description' => ts('Static (non-smart) group contacts'),
+      ],
     ];
     return $info;
+  }
+
+  /**
+   * Returns a list of permissions needed to access the various actions in this api.
+   *
+   * @return array
+   */
+  public static function permissions() {
+    // Override CRM_Core_Permission::getEntityActionPermissions() because the v3 API is nonstandard
+    return [
+      'default' => ['access CiviCRM'],
+    ];
   }
 
 }

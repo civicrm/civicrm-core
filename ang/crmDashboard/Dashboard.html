@@ -1,17 +1,18 @@
 <div id="civicrm-dashboard">
   <fieldset class="crm-inactive-dashlet-fieldset">
     <legend>
-      <a href class="crm-hover-button" ng-click="$ctrl.showInactive = !$ctrl.showInactive">
+      <a href class="crm-hover-button" ng-click="$ctrl.toggleInactive()">
         <i class="crm-i fa-{{ $ctrl.showInactive ? 'minus' : 'plus' }}" aria-hidden="true"></i>
         {{ $ctrl.inactive.length === 1 ? ts('1 Available Dashlet') : ts('%1 Available Dashlets', {1: $ctrl.inactive.length}) }}
       </a>
+      <input ng-if="$ctrl.showInactive" class="crm-form-text" ng-model="$ctrl.filterInactive" type="search" placeholder="{{:: ts('Filter by title...') }}">
     </legend>
     <div ng-if="$ctrl.showInactive" ng-model="$ctrl.inactive" ui-sortable="$ctrl.sortableOptions" class="crm-dashboard-droppable">
       <div class="help">
-        {{ ts('Drag and drop dashlets onto the left or right columns below to add them to your dashboard. Changes are automatically saved.') }}
+        {{:: ts('Drag and drop dashlets onto the left or right columns below to add them to your dashboard. Changes are automatically saved.') }}
         <a crm-ui-help="hs({id: 'dash_configure', title: ts('Dashboard Configuration')})"></a>
       </div>
-      <div ng-repeat="dashlet in $ctrl.inactive" class="crm-inactive-dashlet">
+      <div ng-repeat="dashlet in $ctrl.inactive" class="crm-inactive-dashlet" ng-show="$ctrl.filterApplies(dashlet)">
         <crm-inactive-dashlet dashlet="dashlet" delete="$ctrl.deleteDashlet($index)"></crm-inactive-dashlet>
       </div>
     </div>

@@ -51,7 +51,7 @@
           <td class="crm-contribution-form-block-cost">{$row.cost|crmMoney}</td>
           <td class="crm-contribution-form-block-financial_type">{$row.financial_type}</td>
           <td id="row_{$row.id}_status" >{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td id={$row.id}>{$row.action|replace:'xx':$row.id}</td>
+          <td id={$row.id}>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
         </table>

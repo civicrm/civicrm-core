@@ -7,43 +7,39 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if !empty($top)}
+{if $top}
   {if !empty($printOnly)}
     <h1>{$reportTitle}</h1>
     <div id="report-date">{if !empty($reportDate)}{$reportDate}{/if}</div>
   {/if}
   {if !empty($statistics)}
     <table class="report-layout statistics-table">
-      {if !empty($statistics.groups)}
-        {foreach from=$statistics.groups item=row}
-          <tr>
-            <th class="statistics" scope="row">{$row.title}</th>
-            <td>{$row.value|escape}</td>
-          </tr>
-        {/foreach}
-      {/if}
-      {if !empty($statistics.filters)}
-        {foreach from=$statistics.filters item=row}
-          <tr>
-            <th class="statistics" scope="row">{$row.title}</th>
-            <td>{$row.value|escape}</td>
-          </tr>
-        {/foreach}
-      {/if}
+      {foreach from=$statistics.groups item=row}
+        <tr>
+          <th class="statistics" scope="row">{$row.title}</th>
+          <td>{$row.value|escape}</td>
+        </tr>
+      {/foreach}
+      {foreach from=$statistics.filters item=row}
+        <tr>
+          <th class="statistics" scope="row">{$row.title}</th>
+          <td>{$row.value|escape}</td>
+        </tr>
+      {/foreach}
     </table>
   {/if}
 {/if}
 
-{if !empty($bottom) and !empty($rows) and !empty($statistics)}
+{if $bottom and !empty($rows) and !empty($statistics)}
   <table class="report-layout">
-    {if !empty($statistics.counts)}
+    {if $statistics.counts}
       {foreach from=$statistics.counts item=row}
         <tr>
           <th class="statistics" scope="row">{$row.title}</th>
           <td>
-            {if !empty($row.type) and $row.type eq 1024}
+            {if $row.type eq 1024}
               {$row.value|crmMoney|escape}
-            {elseif !empty($row.type) and $row.type eq 2}
+            {elseif $row.type eq 2}
               {$row.value|escape}
             {else}
                {$row.value|crmNumberFormat|escape}

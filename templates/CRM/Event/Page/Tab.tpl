@@ -17,22 +17,22 @@
 
     <div class="help">
         <p>{ts 1=$displayName}This page lists all event registrations for %1 since inception.{/ts}
-        {capture assign="link"}class="action-item" href="{$newEventURL}"{/capture}
-        {if $permission EQ 'edit'}{ts 1=$link}Click <a %1>Add Event Registration</a> to register this contact for an event.{/ts}{/if}
+        {capture assign="link"}class="action-item" href="{$newEventURL|smarty:nodefaults}"{/capture}
+        {if $permission EQ 'edit'}{ts 1=$link|smarty:nodefaults}Click <a %1>Add Event Registration</a> to register this contact for an event.{/ts}{/if}
         {if $accessContribution and $newCredit}
             {capture assign=newCreditURL}{crmURL p="civicrm/contact/view/participant" q="reset=1&action=add&cid=`$contactId`&context=participant&mode=live"}{/capture}
-            {capture assign="link"}class="action-item" href="{$newCreditURL}"{/capture}
-            {ts 1=$link}Click <a %1>Submit Credit Card Event Registration</a> to process a new New Registration on behalf of the participant using their credit card.{/ts}
+            {capture assign="link"}class="action-item" href="{$newCreditURL|smarty:nodefaults}"{/capture}
+            {ts 1=$link|smarty:nodefaults}Click <a %1>Submit Credit Card Event Registration</a> to process a new New Registration on behalf of the participant using their credit card.{/ts}
         {/if}
         </p>
     </div>
     {if $action eq 16 and $permission EQ 'edit'}
        <div class="action-link">
-           <a accesskey="N" href="{$newEventURL}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Event Registration{/ts}</span></a>
+           <a accesskey="N" href="{$newEventURL|smarty:nodefaults}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Event Registration{/ts}</span></a>
             {if $accessContribution and $newCredit}
-                <a accesskey="N" href="{$newCreditURL}" class="button"><span><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}Submit Credit Card Event Registration{/ts}</a></span>
+                <a accesskey="N" href="{$newCreditURL|smarty:nodefaults}" class="button"><span><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}Submit Credit Card Event Registration{/ts}</a></span>
             {/if}
-            <br/ ><br/ >
+            <br/><br/>
        </div>
    {/if}
 

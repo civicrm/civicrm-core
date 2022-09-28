@@ -1,5 +1,5 @@
 {
-  "title": "Household Name (default)",
+  "title": "Household Name",
   "type": "block",
-  "block": "Household"
+  "entity_type": "Household"
 }

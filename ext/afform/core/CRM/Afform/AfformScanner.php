@@ -49,10 +49,9 @@ class CRM_Afform_AfformScanner {
 
     $mapper = CRM_Extension_System::singleton()->getMapper();
     foreach ($mapper->getModules() as $module) {
-      /** @var $module CRM_Core_Module */
       try {
         if ($module->is_active) {
-          $this->appendFilePaths($paths, dirname($mapper->keyToPath($module->name)) . DIRECTORY_SEPARATOR . 'ang', 20);
+          $this->appendFilePaths($paths, dirname($mapper->keyToPath($module->name)) . DIRECTORY_SEPARATOR . 'ang', $module->name);
         }
       }
       catch (CRM_Extension_Exception_MissingException $e) {
@@ -60,7 +59,7 @@ class CRM_Afform_AfformScanner {
       }
     }
 
-    $this->appendFilePaths($paths, $this->getSiteLocalPath(), 10);
+    $this->appendFilePaths($paths, $this->getSiteLocalPath(), '');
 
     $this->cache->set('afformAllPaths', $paths);
     return $paths;
@@ -157,23 +156,19 @@ class CRM_Afform_AfformScanner {
   }
 
   /**
-   * Adds has_local & has_base to an afform metadata record
+   * Adds base_module, has_local & has_base to an afform metadata record
    *
    * @param array $record
    */
   public function addComputedFields(&$record) {
     $name = $record['name'];
-    // Ex: $allPaths['viewIndividual'][0] == '/var/www/foo/afform/view-individual'].
+    // Ex: $allPaths['viewIndividual']['org.civicrm.foo'] == '/var/www/foo/afform/view-individual'].
     $allPaths = $this->findFilePaths()[$name] ?? [];
-    // $activeLayoutPath = $this->findFilePath($name, self::LAYOUT_FILE);
-    // $activeMetaPath = $this->findFilePath($name, self::METADATA_FILE);
-    $localLayoutPath = $this->createSiteLocalPath($name, self::LAYOUT_FILE);
-    $localMetaPath = $this->createSiteLocalPath($name, self::METADATA_FILE);
-
-    $record['has_local'] = file_exists($localLayoutPath) || file_exists($localMetaPath);
+    // Empty string key refers to the site local path
+    $record['has_local'] = isset($allPaths['']);
     if (!isset($record['has_base'])) {
-      $record['has_base'] = ($record['has_local'] && count($allPaths) > 1)
-        || (!$record['has_local'] && count($allPaths) > 0);
+      $record['base_module'] = \CRM_Utils_Array::first(array_filter(array_keys($allPaths)));
+      $record['has_base'] = !empty($record['base_module']);
     }
   }
 
@@ -211,16 +206,17 @@ class CRM_Afform_AfformScanner {
    *   Ex: ['foo' => [0 => '/var/www/org.example.foobar/ang']]
    * @param string $parent
    *   Ex: '/var/www/org.example.foobar/afform/'
-   * @param int $priority
-   *   Lower priority files override higher priority files.
+   * @param string $module
+   *   Name of module or '' empty string for local files.
    */
-  private function appendFilePaths(&$formPaths, $parent, $priority) {
+  private function appendFilePaths(&$formPaths, $parent, $module) {
     $files = preg_grep(self::FILE_REGEXP, (array) glob("$parent/*"));
 
     foreach ($files as $file) {
       $fileBase = preg_replace(self::FILE_REGEXP, '', $file);
       $name = basename($fileBase);
-      $formPaths[$name][$priority] = $fileBase;
+      $formPaths[$name][$module] = $fileBase;
+      // Local files get top priority
       ksort($formPaths[$name]);
     }
   }
@@ -231,7 +227,7 @@ class CRM_Afform_AfformScanner {
    * @return mixed|string
    *   Ex: '/var/www/sites/default/files/civicrm/afform'.
    */
-  private function getSiteLocalPath() {
+  public function getSiteLocalPath() {
     // TODO Allow a setting override.
     // return Civi::paths()->getPath(Civi::settings()->get('afformPath'));
     return Civi::paths()->getPath('[civicrm.files]/ang');

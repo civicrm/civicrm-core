@@ -205,6 +205,10 @@ function civicrm_config(&$config) {
     'dbPass' => addslashes($config['mysql']['password']),
     'dbHost' => $config['mysql']['server'],
     'dbName' => addslashes($config['mysql']['database']),
+    // These need to be filled manually when using the old installer if an
+    // SSL connection to MySQL is needed.
+    'dbSSL' => '',
+    'CMSdbSSL' => '',
   );
 
   $params['baseURL'] = $config['base_url'] ?? civicrm_cms_base();
@@ -218,13 +222,6 @@ function civicrm_config(&$config) {
     }
     elseif (version_compare(VERSION, '7.0-rc1') >= 0) {
       $params['cms'] = 'Drupal';
-      $params['CMSdbUser'] = addslashes($config['drupal']['username']);
-      $params['CMSdbPass'] = addslashes($config['drupal']['password']);
-      $params['CMSdbHost'] = $config['drupal']['server'];
-      $params['CMSdbName'] = addslashes($config['drupal']['database']);
-    }
-    elseif (version_compare(VERSION, '6.0') >= 0) {
-      $params['cms'] = 'Drupal6';
       $params['CMSdbUser'] = addslashes($config['drupal']['username']);
       $params['CMSdbPass'] = addslashes($config['drupal']['password']);
       $params['CMSdbHost'] = $config['drupal']['server'];

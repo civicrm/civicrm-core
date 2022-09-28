@@ -40,6 +40,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
       'civicrm_custom_field',
       'civicrm_custom_group',
     ]);
+    parent::tearDown();
   }
 
   /**

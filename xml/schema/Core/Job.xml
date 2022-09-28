@@ -130,6 +130,8 @@
     <title>Job Is Active?</title>
     <type>boolean</type>
     <comment>Is this job active?</comment>
+    <default>1</default>
+    <required>true</required>
     <add>4.1</add>
   </field>
 </table>

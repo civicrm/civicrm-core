@@ -27,6 +27,7 @@ class CRM_Member_Form_Task_BatchTest extends CiviUnitTestCase {
     $this->validateAllContributions();
     $this->validateAllPayments();
     $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
   }
 
   /**

@@ -31,7 +31,7 @@
                 <td class="crm-mapping-name">{$row.name}</td>
                 <td class="crm-mapping-description">{$row.description}</td>
                 <td class="crm-mapping-mapping_type">{$row.mapping_type}</td>
-                <td>{$row.action|replace:'xx':$row.id}</td>
+                <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
             </tr>
             {/foreach}
             </table>

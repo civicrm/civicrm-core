@@ -13,7 +13,7 @@
 
 {include file="CRM/common/TrackingFields.tpl"}
 
-<div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-thankyou-form-block">
+<div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-thankyou-form-block" data-page-id="{$contributionPageID}" data-page-template="thankyou">
   {if $thankyou_text}
     <div id="thankyou_text" class="crm-section thankyou_text-section">
       {$thankyou_text}
@@ -202,7 +202,7 @@
       </div>
       <div class="display-block">
        <div class="label-left crm-section honoree_profile-section">
-          <strong>{$honorName}</strong></br>
+          <strong>{$honorName}</strong><br/>
           {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields prefix='honor'}
         </div>
       </div>
@@ -215,26 +215,22 @@
     </fieldset>
   {/if}
 
-  {if $pcpBlock}
+  {if $pcpBlock && $pcp_display_in_roll}
     <div class="crm-group pcp_display-group">
       <div class="header-dark">
         {ts}Contribution Honor Roll{/ts}
       </div>
       <div class="display-block">
-        {if $pcp_display_in_roll}
-          {ts}List my contribution{/ts}
-          {if $pcp_is_anonymous}
-            <strong>{ts}anonymously{/ts}.</strong>
-          {else}
-            {ts}under the name{/ts}: <strong>{$pcp_roll_nickname}</strong><br/>
-            {if $pcp_personal_note}
-              {ts}With the personal note{/ts}: <strong>{$pcp_personal_note}</strong>
-            {else}
-              <strong>{ts}With no personal note{/ts}</strong>
-            {/if}
-          {/if}
+        {ts}List my contribution{/ts}
+        {if $pcp_is_anonymous}
+          <strong>{ts}anonymously{/ts}.</strong>
         {else}
-          {ts}Don't list my contribution in the honor roll.{/ts}
+          {ts}under the name{/ts}: <strong>{$pcp_roll_nickname}</strong><br/>
+          {if $pcp_personal_note}
+            {ts}With the personal note{/ts}: <strong>{$pcp_personal_note}</strong>
+          {else}
+            <strong>{ts}With no personal note{/ts}</strong>
+          {/if}
         {/if}
         <br />
       </div>

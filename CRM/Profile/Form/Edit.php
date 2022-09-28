@@ -104,23 +104,23 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
     parent::preProcess();
 
     // and also the profile is of type 'Profile'
-    $query = "
+    $query = '
 SELECT module,is_reserved
   FROM civicrm_uf_group
   LEFT JOIN civicrm_uf_join ON uf_group_id = civicrm_uf_group.id
   WHERE civicrm_uf_group.id = %1
-";
+';
 
     $params = [1 => [$this->_gid, 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
     $isProfile = FALSE;
     while ($dao->fetch()) {
-      $isProfile = ($isProfile || ($dao->module == "Profile"));
+      $isProfile = ($isProfile || ($dao->module === 'Profile'));
     }
 
     //Check that the user has the "add contacts" Permission
-    $canAdd = CRM_Core_Permission::check("add contacts");
+    $canAdd = CRM_Core_Permission::check('add contacts');
 
     //Remove need for Profile module type when using reserved profiles [CRM-14488]
     if (!$dao->N || (!$isProfile && !($dao->is_reserved && $canAdd))) {
@@ -134,23 +134,23 @@ SELECT module,is_reserved
    * Build the form object.
    *
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     if (empty($this->_ufGroup['id'])) {
       CRM_Core_Error::statusBounce(ts('Invalid'));
     }
 
     // set the title
     if ($this->_multiRecord && $this->_customGroupTitle) {
-      $groupTitle = ($this->_multiRecord & CRM_Core_Action::UPDATE) ? 'Edit ' . $this->_customGroupTitle . ' Record' : $this->_customGroupTitle;
+      $this->setTitle(($this->_multiRecord & CRM_Core_Action::UPDATE) ? 'Edit ' . $this->_customGroupTitle . ' Record' : $this->_customGroupTitle);
 
     }
     else {
-      $groupTitle = CRM_Core_BAO_UFGroup::getFrontEndTitle($this->_ufGroup['id']);
+      $this->setTitle(CRM_Core_BAO_UFGroup::getFrontEndTitle($this->_ufGroup['id']));
     }
-    CRM_Utils_System::setTitle($groupTitle);
+
     $this->assign('recentlyViewed', FALSE);
 
-    if ($this->_context != 'dialog') {
+    if ($this->_context !== 'dialog') {
       $this->_postURL = $this->_ufGroup['post_URL'];
       $this->_cancelURL = $this->_ufGroup['cancel_URL'];
 
@@ -160,7 +160,7 @@ SELECT module,is_reserved
       }
 
       if (!$this->_postURL) {
-        if ($this->_context == 'Search') {
+        if ($this->_context === 'Search') {
           $this->_postURL = CRM_Utils_System::url('civicrm/contact/search');
         }
         elseif ($this->_id && $this->_gid) {
@@ -183,8 +183,8 @@ SELECT module,is_reserved
       }
 
       // we do this gross hack since qf also does entity replacement
-      $this->_postURL = str_replace('&amp;', '&', $this->_postURL);
-      $this->_cancelURL = str_replace('&amp;', '&', $this->_cancelURL);
+      $this->_postURL = str_replace('&amp;', '&', ($this->_postURL ?? ''));
+      $this->_cancelURL = str_replace('&amp;', '&', ($this->_cancelURL ?? ''));
 
       // also retain error URL if set
       $this->_errorURL = $_POST['errorURL'] ?? NULL;
@@ -243,6 +243,7 @@ SELECT module,is_reserved
   /**
    * Process the user submitted custom data values.
    *
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     parent::postProcess();
@@ -260,7 +261,7 @@ SELECT module,is_reserved
     }
 
     // When saving (not deleting) and not in an ajax popup
-    if (empty($_POST[$this->_deleteButtonName]) && $this->_context != 'dialog') {
+    if (empty($_POST[$this->_deleteButtonName]) && $this->_context !== 'dialog') {
       CRM_Core_Session::setStatus(ts('Your information has been saved.'), ts('Thank you.'), 'success');
     }
 
@@ -287,20 +288,11 @@ SELECT module,is_reserved
       $url = CRM_Utils_System::url('civicrm/profile/view', $urlParams);
     }
     else {
-      // Replace tokens from post URL
-      $contactParams = [
-        'contact_id' => $this->_id,
-        'version' => 3,
-      ];
-
-      $contact = civicrm_api('contact', 'get', $contactParams);
-      $contact = reset($contact['values']);
-
-      $dummyMail = new CRM_Mailing_BAO_Mailing();
-      $dummyMail->body_text = $this->_postURL;
-      $tokens = $dummyMail->getTokens();
-
-      $url = CRM_Utils_Token::replaceContactTokens($this->_postURL, $contact, FALSE, CRM_Utils_Array::value('text', $tokens));
+      $url = CRM_Core_BAO_MessageTemplate::renderTemplate([
+        'messageTemplate' => ['msg_text' => $this->_postURL],
+        'contactId' => $this->_id,
+        'disableSmarty' => TRUE,
+      ])['text'];
     }
 
     $session->replaceUserContext($url);

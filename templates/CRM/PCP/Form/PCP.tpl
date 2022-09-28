@@ -19,7 +19,7 @@
 
 <div id="pcpFields">
 {crmRegion name="pcp-form-pcp-fields"}
-  {if $form.target_entity_type}
+  {if !empty($form.target_entity_type)}
   <table class="form-layout">
     <tr  class="crm-contribution-contributionpage-pcp-form-block-target_entity_type">
         <td class="label">{$form.target_entity_type.label} <span class="crm-marker"> *</span></td>

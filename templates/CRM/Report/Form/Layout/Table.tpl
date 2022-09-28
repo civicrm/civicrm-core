@@ -7,10 +7,10 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if empty($rows)}
+{if !$rows}
   <p>{ts}None found.{/ts}</p>
 {else}
-    {if !empty($pager) and $pager->_response and $pager->_response.numPages > 1}
+    {if $pager and $pager->_response and $pager->_response.numPages > 1}
         <div class="report-pager">
             {include file="CRM/common/pager.tpl" location="top"}
         </div>
@@ -24,8 +24,8 @@
                 {else}
                     {assign var=class value="class='reports-header'"}
                 {/if}
-                {if empty($skip)}
-                   {if !empty($header.colspan)}
+                {if !$skip}
+                   {if $header.colspan}
                        <th colspan={$header.colspan}>{$header.title|escape}</th>
                       {assign var=skip value=true}
                       {assign var=skipCount value=`$header.colspan`}
@@ -41,7 +41,7 @@
             {/foreach}
         {/capture}
 
-        {if empty($sections)} {* section headers and sticky headers aren't playing nice yet *}
+        {if !$sections} {* section headers and sticky headers aren't playing nice yet *}
             <thead class="sticky">
             <tr>
                 {$tableHeader}
@@ -92,14 +92,14 @@
 
         {foreach from=$rows item=row key=rowid}
            {eval var=$sectionHeaderTemplate}
-            <tr  class="{cycle values="odd-row,even-row"} {if !empty($row.class)}{$row.class}{/if} crm-report" id="crm-report_{$rowid}">
+            <tr  class="{cycle values="odd-row,even-row"} {if $row.class}{$row.class}{/if} crm-report" id="crm-report_{$rowid}">
                 {foreach from=$columnHeaders item=header key=field}
                     {assign var=fieldLink value=$field|cat:"_link"}
                     {assign var=fieldHover value=$field|cat:"_hover"}
                     {assign var=fieldClass value=$field|cat:"_class"}
                     <td class="crm-report-{$field}{if $header.type eq 1024 OR $header.type eq 1 OR $header.type eq 512} report-contents-right{elseif $row.$field eq 'Subtotal'} report-label{/if}">
                         {if !empty($row.$fieldLink)}
-                            <a title="{$row.$fieldHover|escape}" href="{$row.$fieldLink}"  {if !empty($row.$fieldClass)} class="{$row.$fieldClass}"{/if}>
+                            <a title="{$row.$fieldHover|escape}" href="{$row.$fieldLink}"  {if array_key_exists($fieldClass, $row)} class="{$row.$fieldClass}"{/if}>
                         {/if}
 
                         {if is_array($row.$field)}
@@ -136,7 +136,7 @@
             </tr>
         {/foreach}
 
-        {if !empty($grandStat)}
+        {if $grandStat}
             {* foreach from=$grandStat item=row*}
             <tr class="total-row">
                 {foreach from=$columnHeaders item=header key=field}
@@ -156,7 +156,7 @@
             {* /foreach*}
         {/if}
     </table>
-    {if !empty($pager) and $pager->_response and $pager->_response.numPages > 1}
+    {if $pager and $pager->_response and $pager->_response.numPages > 1}
         <div class="report-pager">
             {include file="CRM/common/pager.tpl" location="bottom"}
         </div>

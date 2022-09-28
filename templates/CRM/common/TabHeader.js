@@ -16,6 +16,13 @@
           CRM.alert(ts('Your changes in the <em>%1</em> tab have not been saved.', {1: ui.oldTab.text()}), ts('Unsaved Changes'), 'warning');
         }
       })
+      .on('tabsactivate', function(e, ui) {
+        var tabId = ui.newTab.attr('id');
+        if (tabId && tabId.length) {
+          tabId = tabId.slice(4); // Remove leading 'tab_'
+          history.replaceState(null, '', updateUrlParameter('selectedChild', tabId));
+        }
+      })
       .on('tabsbeforeload', function(e, ui) {
         // Use civicrm ajax wrappers rather than the default $.load
         if (!ui.panel.data("civiCrmSnippet")) {
@@ -134,7 +141,11 @@
    */
   CRM.tabHeader.resetTab = function(tab, force) {
     var $panel = CRM.tabHeader.getTabPanel(tab);
-    if ($(tab).hasClass('ui-tabs-active')) {
+    // Angular-based tabs - this event will trigger searchKit displays to refresh
+    if ($panel.children('crm-angular-js').length) {
+      $panel.find('form').first().trigger('crmPopupFormSuccess');
+    }
+    else if ($(tab).hasClass('ui-tabs-active')) {
       $panel.crmSnippet('refresh');
     }
     else if (force) {
@@ -148,4 +159,31 @@
       $panel.crmSnippet('destroy');
     }
   };
+
+  /**
+   * Updates the query parameter in the page URL,
+   * or adds the parameter if its not currently there.
+   *
+   * @param {string} param
+   * @param {string} value
+   * @return void
+   */
+   function updateUrlParameter(param, value) {
+    var newUrl,
+      newSearch,
+      href = window.location.href,
+      search = window.location.search;
+    if (search.indexOf('?' + param) !== -1 || search.indexOf('&' + param) !== -1 ) {
+      var regExp = new RegExp(param + "(.+?)(&|$)", "g");
+      newSearch = search.replace(regExp, param + "=" + value + "$2");
+      newUrl = href.replace(search, newSearch);
+    } else if (search.length) {
+      newSearch = search + '&' + param + "=" + value;
+      newUrl = href.replace(search, newSearch);
+    } else {
+      newSearch = '?' + param + "=" + value;
+      newUrl = location.protocol + '//' + location.hostname + location.pathname + newSearch + location.hash;
+    }
+    window.history.replaceState("", "", newUrl);
+  }
 })(CRM.$, CRM._);

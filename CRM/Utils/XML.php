@@ -18,7 +18,7 @@ class CRM_Utils_XML {
   /**
    * Read a well-formed XML file
    *
-   * @param $file
+   * @param string $file
    *
    * @return array
    *   (0 => SimpleXMLElement|FALSE, 1 => errorMessage|FALSE)

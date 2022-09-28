@@ -61,7 +61,7 @@
       </tr>
       <tr id="membershipOrgType" class="crm-member-membershiprenew-form-block-renew_org_name hiddenElement">
         <td class="label">{$form.membership_type_id.label}</td>
-        <td>{$form.membership_type_id.html}
+        <td>{$form.membership_type_id.html|smarty:nodefaults}
           {if $member_is_test} {ts}(test){/ts}{/if}<br/>
           <span class="description">{ts}Select Membership Organization and then Membership Type.{/ts}</span>
         </td>
@@ -118,13 +118,13 @@
         </tr>
         <tr id="fromEmail">
           <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
+          <td>{$form.from_email_address.html}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
         </tr>
-        <tr id="notice" class="crm-member-membershiprenew-form-block-receipt_text_renewal">
-          <td class="label">{$form.receipt_text_renewal.label}</td>
+        <tr id="notice" class="crm-member-membershiprenew-form-block-receipt_text">
+          <td class="label">{$form.receipt_text.label}</td>
           <td><span
               class="description">{ts}Enter a message you want included at the beginning of the emailed receipt. EXAMPLE: 'Thanks for supporting our organization with your membership.'{/ts}</span><br/>
-            {$form.receipt_text_renewal.html|crmAddClass:huge}</td>
+            {$form.receipt_text.html|crmAddClass:huge}</td>
         </tr>
       </table>
     {/if}

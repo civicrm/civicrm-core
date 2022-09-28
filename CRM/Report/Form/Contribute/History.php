@@ -16,10 +16,6 @@
  */
 class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   /**
-   * Primary Contacts count limitCONSTROW_COUNT_LIMIT = 10;
-   */
-
-  /**
    * @var array
    */
   protected $_relationshipColumns = [];
@@ -166,6 +162,14 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
           'email' => [
             'title' => ts('Email'),
             'no_repeat' => TRUE,
+          ],
+        ],
+        'filters' => [
+          'on_hold' => [
+            'title' => ts('On Hold'),
+            'type' => CRM_Utils_Type::T_INT,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => ['' => ts('Any')] + CRM_Core_PseudoConstant::emailOnHoldOptions(),
           ],
         ],
         'grouping' => 'contact-fields',
@@ -394,7 +398,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   public function where() {
     $whereClauses = $havingClauses = $relationshipWhere = [];
     $this->_relationshipWhere = '';
-    $this->_statusClause = '';
+    $this->_contributionClauses = [];
 
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -429,8 +433,11 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
               continue;
             }
 
-            if ($fieldName == 'contribution_status_id') {
-              $this->_statusClause = " AND " . $clause;
+            // Make contribution filters work.
+            // Note total_sum is already accounted for in the main buildRows
+            // and this_year and other_year skip the loop above.
+            if ($tableName == 'civicrm_contribution' && $fieldName != 'total_sum') {
+              $this->_contributionClauses[$fieldName] = $clause;
             }
 
             if (!empty($field['having'])) {
@@ -498,7 +505,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */
@@ -528,7 +535,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */
@@ -685,9 +692,14 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
       return $rows;
     }
 
+    $contributionClauses = '';
+    if (!empty($this->_contributionClauses)) {
+      $contributionClauses = ' AND ' . implode(' AND ', $this->_contributionClauses);
+    }
+
     $sqlContribution = "{$this->_select} {$this->_from} WHERE {$this->_aliases['civicrm_contact']}.id IN (" .
       implode(',', $contactIds) .
-      ") AND {$this->_aliases['civicrm_contribution']}.is_test = 0 AND {$this->_aliases['civicrm_contribution']}.is_template = 0 {$this->_statusClause} {$this->_groupBy} ";
+      ") AND {$this->_aliases['civicrm_contribution']}.is_test = 0 AND {$this->_aliases['civicrm_contribution']}.is_template = 0 {$contributionClauses} {$this->_groupBy} ";
 
     $dao = CRM_Core_DAO::executeQuery($sqlContribution);
     $contributionSum = 0;
@@ -818,11 +830,22 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
           }
 
           if ($last_primary && ($rowNum == "{$last_primary}_total")) {
-            $value = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($value);
+            // Passing non-numeric is deprecated, but this isn't a perfect fix
+            // since it will still format things like postal code 90210 as
+            // "90,210.00", but that predates the deprecation. See dev/core#2819
+            if (is_numeric($value)) {
+              $value = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($value);
+            }
           }
+          // TODO: It later tries to format this as money which then gives a warning. One option is to instead set something like $row[$key]['classes'] and then use that in the template, but I don't think the stock template supports something like that.
           $row[$key] = '<strong>' . $value . '</strong>';
         }
         $rows[$rowNum] = $row;
+      }
+
+      // The main rows don't have this set so gives a smarty warning.
+      if (!isset($row['civicrm_relationship_relationship_type_id'])) {
+        $rows[$rowNum]['civicrm_relationship_relationship_type_id'] = '';
       }
 
       // Convert Display name into link
@@ -839,12 +862,10 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
 
       if (!empty($row['civicrm_financial_trxn_card_type_id'])) {
         $rows[$rowNum]['civicrm_financial_trxn_card_type_id'] = $this->getLabels($row['civicrm_financial_trxn_card_type_id'], 'CRM_Financial_DAO_FinancialTrxn', 'card_type_id');
-        $entryFound = TRUE;
       }
 
-      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, NULL, NULL) ? TRUE : $entryFound;
-      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, NULL, NULL) ? TRUE : $entryFound;
-
+      $this->alterDisplayContactFields($row, $rows, $rowNum, NULL, NULL);
+      $this->alterDisplayAddressFields($row, $rows, $rowNum, NULL, NULL);
     }
   }
 

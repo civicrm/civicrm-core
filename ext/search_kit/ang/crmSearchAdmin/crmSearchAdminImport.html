@@ -1,0 +1,21 @@
+<div id="bootstrap-theme" crm-dialog="crmSearchAdminImport">
+  <div class="alert alert-info" ng-if="!$ctrl.checking && !$ctrl.error && !$ctrl.preview">
+    <i class="crm-i fa-info-circle"></i>
+    {{:: ts('Search configuration copied from the "Export" action can be pasted here.') }}
+  </div>
+  <div class="alert alert-info" ng-if="$ctrl.checking || $ctrl.running">
+    <i class="crm-i fa-spinner fa-pulse"></i>
+    {{ $ctrl.checking ? ts('Checking input...') : ts('Importing Saved Search...') }}
+  </div>
+  <div class="alert alert-danger" ng-if="$ctrl.error">
+    <i class="crm-i fa-exclamation-triangle"></i>
+    {{ $ctrl.error }}
+  </div>
+  <div class="alert alert-success" ng-if="$ctrl.preview && !$ctrl.error">
+    <i class="crm-i fa-check-circle-o"></i>
+    {{ $ctrl.preview }}
+  </div>
+  <textarea id="crm-search-admin-export-output-code" class="form-control" ng-model="$ctrl.values" ng-change="$ctrl.onChangeInput()" ng-disabled="$ctrl.running" rows="15"></textarea>
+  <crm-dialog-button text="ts('Import')" icons="{primary: $ctrl.running ? 'fa-spinner fa-spin' : 'fa-save'}" on-click="$ctrl.run()" disabled="$ctrl.running || $ctrl.error || !$ctrl.preview" />
+  <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="crmSearchAdminImport.cancel()" disabled="$ctrl.running" />
+</div>

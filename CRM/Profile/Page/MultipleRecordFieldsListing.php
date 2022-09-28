@@ -307,7 +307,12 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
               $customValue = &$val;
               if (!empty($dateFields) && array_key_exists($fieldId, $dateFields)) {
                 // formatted date capture value capture
-                $dateFieldsVals[$fieldId][$recId] = CRM_Core_BAO_CustomField::displayValue($customValue, $fieldId);
+                if ($this->_pageViewType == 'profileDataView') {
+                  $dateFieldsVals[$fieldId][$recId] = CRM_Utils_Date::processDate($result[$recId][$fieldId], NULL, FALSE, 'YmdHis');
+                }
+                else {
+                  $dateFieldsVals[$fieldId][$recId] = CRM_Core_BAO_CustomField::displayValue($customValue, $fieldId);
+                }
 
                 //set date and time format
                 switch ($timeFormat) {

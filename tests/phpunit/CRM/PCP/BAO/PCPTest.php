@@ -95,6 +95,13 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
   public function testGetPcpDashboardInfo() {
     $block = CRM_PCP_BAO_PCPBlock::create($this->pcpBlockParams());
     $contactID = $this->individualCreate();
+    $submitParams = [
+      'id' => 1,
+      'financial_type_id' => 1,
+      'start_date' => date('Y-m-d 00:00:00'),
+      'end_date' => date('Y-m-d 00:00:00', strtotime('+8 weeks')),
+    ];
+    $contributionUpdate = $this->callAPISuccess('ContributionPage', 'create', $submitParams);
     $contributionPage = $this->callAPISuccessGetSingle('ContributionPage', []);
     $this->callAPISuccess('Pcp', 'create', ['contact_id' => $contactID, 'title' => 'pcp', 'page_id' => $contributionPage['id'], 'pcp_block_id' => $block->id, 'is_active' => TRUE, 'status_id' => 'Approved']);
     $this->assertEquals([
@@ -103,10 +110,11 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
         [
           'pageTitle' => $contributionPage['title'],
           'action' => '<span><a href="/index.php?q=civicrm/pcp/info&amp;action=update&amp;reset=1&amp;id=' . $contributionPage['id'] . '&amp;component=contribute" class="action-item crm-hover-button" title=\'Configure\' >Edit Your Page</a><a href="/index.php?q=civicrm/friend&amp;eid=1&amp;blockId=1&amp;reset=1&amp;pcomponent=pcp&amp;component=contribute" class="action-item crm-hover-button" title=\'Tell Friends\' >Tell Friends</a></span><span class=\'btn-slide crm-hover-button\'>more<ul class=\'panel\'><li><a href="/index.php?q=civicrm/pcp/info&amp;reset=1&amp;id=1&amp;component=contribute" class="action-item crm-hover-button" title=\'URL for this Page\' >URL for this Page</a></li><li><a href="/index.php?q=civicrm/pcp/info&amp;action=browse&amp;reset=1&amp;id=1&amp;component=contribute" class="action-item crm-hover-button" title=\'Update Contact Information\' >Update Contact Information</a></li><li><a href="/index.php?q=civicrm/pcp&amp;action=disable&amp;reset=1&amp;id=1&amp;component=contribute" class="action-item crm-hover-button" title=\'Disable\' >Disable</a></li><li><a href="/index.php?q=civicrm/pcp&amp;action=delete&amp;reset=1&amp;id=1&amp;component=contribute" class="action-item crm-hover-button small-popup" title=\'Delete\' onclick = "return confirm(\'Are you sure you want to delete this Personal Campaign Page?\nThis action cannot be undone.\');">Delete</a></li></ul></span>',
-          'pcpId' => 1,
+          'pcpId' => '1',
           'pcpTitle' => 'pcp',
           'pcpStatus' => 'Approved',
           'class' => '',
+          'end_date' => date('Y-m-d 00:00:00', strtotime('+8 weeks')),
         ],
       ],
     ], CRM_PCP_BAO_PCP::getPcpDashboardInfo($contactID));

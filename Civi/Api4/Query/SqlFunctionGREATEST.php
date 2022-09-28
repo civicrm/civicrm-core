@@ -24,7 +24,9 @@ class SqlFunctionGREATEST extends SqlFunction {
     return [
       [
         'max_expr' => 99,
+        'min_expr' => 2,
         'optional' => FALSE,
+        'label' => ts('Else'),
       ],
     ];
   }
@@ -34,6 +36,13 @@ class SqlFunctionGREATEST extends SqlFunction {
    */
   public static function getTitle(): string {
     return ts('Greatest');
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('The largest of all provided values.');
   }
 
 }

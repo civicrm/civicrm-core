@@ -22,7 +22,7 @@ class HookStyleListener {
   private $callback = NULL;
 
   /**
-   * @param array $callback
+   * @param array|callable $callback
    *   Ex: ['SomeClass', 'someMethod']
    */
   public function __construct($callback) {

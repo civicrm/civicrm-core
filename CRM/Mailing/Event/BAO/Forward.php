@@ -17,21 +17,14 @@
 class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Create a new forward event, create a new contact if necessary
    *
    * @param $job_id
    * @param $queue_id
    * @param $hash
    * @param $forward_email
-   * @param null $fromEmail
-   * @param null $comment
+   * @param string|null $fromEmail
+   * @param array|null $comment
    *
    * @return bool
    */
@@ -103,8 +96,7 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
         'email' => $forward_email,
         'location_type_id' => $locationType->id,
       ];
-      require_once 'CRM/Utils/DeprecatedUtils.php';
-      _civicrm_api3_deprecated_add_formatted_param($value, $formatted);
+      self::_civicrm_api3_deprecated_add_formatted_param($value, $formatted);
       $formatted['onDuplicate'] = CRM_Import_Parser::DUPLICATE_SKIP;
       $formatted['fixAddress'] = TRUE;
       $contact = civicrm_api('contact', 'create', $formatted);
@@ -197,6 +189,183 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
     $transaction->commit();
 
     return $successfulForward;
+  }
+
+  /**
+   * This function adds the contact variable in $values to the
+   * parameter list $params.  For most cases, $values should have length 1.  If
+   * the variable being added is a child of Location, a location_type_id must
+   * also be included.  If it is a child of phone, a phone_type must be included.
+   *
+   * @param array $values
+   *   The variable(s) to be added.
+   * @param array $params
+   *   The structured parameter list.
+   *
+   * @return bool|CRM_Utils_Error
+   */
+  protected static function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
+    // @todo - most of this code is UNREACHABLE.
+    // Crawl through the possible classes:
+    // Contact
+    //      Individual
+    //      Household
+    //      Organization
+    //          Location
+    //              Address
+    //              Email
+    //              Phone
+    //              IM
+    //      Note
+    //      Custom
+
+    // Cache the various object fields
+    static $fields = NULL;
+
+    if ($fields == NULL) {
+      $fields = [];
+    }
+
+    // first add core contact values since for other Civi modules they are not added
+    require_once 'CRM/Contact/BAO/Contact.php';
+    $contactFields = CRM_Contact_DAO_Contact::fields();
+    _civicrm_api3_store_values($contactFields, $values, $params);
+
+    // get the formatted location blocks into params - w/ 3.0 format, CRM-4605
+    if (!empty($values['location_type_id'])) {
+      static $fields = NULL;
+      if ($fields == NULL) {
+        $fields = [];
+      }
+
+      foreach (['Phone', 'Email', 'IM', 'OpenID', 'Phone_Ext'] as $block) {
+        $name = strtolower($block);
+        if (!array_key_exists($name, $values)) {
+          continue;
+        }
+
+        if ($name === 'phone_ext') {
+          $block = 'Phone';
+        }
+
+        // block present in value array.
+        if (!array_key_exists($name, $params) || !is_array($params[$name])) {
+          $params[$name] = [];
+        }
+
+        if (!array_key_exists($block, $fields)) {
+          $className = "CRM_Core_DAO_$block";
+          $fields[$block] =& $className::fields();
+        }
+
+        $blockCnt = count($params[$name]);
+
+        // copy value to dao field name.
+        if ($name == 'im') {
+          $values['name'] = $values[$name];
+        }
+
+        _civicrm_api3_store_values($fields[$block], $values,
+          $params[$name][++$blockCnt]
+        );
+
+        if (empty($params['id']) && ($blockCnt == 1)) {
+          $params[$name][$blockCnt]['is_primary'] = TRUE;
+        }
+
+        // we only process single block at a time.
+        return TRUE;
+      }
+
+      // handle address fields.
+      if (!array_key_exists('address', $params) || !is_array($params['address'])) {
+        $params['address'] = [];
+      }
+
+      $addressCnt = 1;
+      foreach ($params['address'] as $cnt => $addressBlock) {
+        if (CRM_Utils_Array::value('location_type_id', $values) ==
+          CRM_Utils_Array::value('location_type_id', $addressBlock)
+        ) {
+          $addressCnt = $cnt;
+          break;
+        }
+        $addressCnt++;
+      }
+
+      if (!array_key_exists('Address', $fields)) {
+        $fields['Address'] = CRM_Core_DAO_Address::fields();
+      }
+
+      // Note: we doing multiple value formatting here for address custom fields, plus putting into right format.
+      // The actual formatting (like date, country ..etc) for address custom fields is taken care of while saving
+      // the address in CRM_Core_BAO_Address::create method
+      if (!empty($values['location_type_id'])) {
+        static $customFields = [];
+        if (empty($customFields)) {
+          $customFields = CRM_Core_BAO_CustomField::getFields('Address');
+        }
+        // make a copy of values, as we going to make changes
+        $newValues = $values;
+        foreach ($values as $key => $val) {
+          $customFieldID = CRM_Core_BAO_CustomField::getKeyID($key);
+          if ($customFieldID && array_key_exists($customFieldID, $customFields)) {
+            // mark an entry in fields array since we want the value of custom field to be copied
+            $fields['Address'][$key] = NULL;
+
+            $htmlType = $customFields[$customFieldID]['html_type'] ?? NULL;
+            if (CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID]) && $val) {
+              $mulValues = explode(',', $val);
+              $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
+              $newValues[$key] = [];
+              foreach ($mulValues as $v1) {
+                foreach ($customOption as $v2) {
+                  if ((strtolower($v2['label']) == strtolower(trim($v1))) ||
+                    (strtolower($v2['value']) == strtolower(trim($v1)))
+                  ) {
+                    if ($htmlType == 'CheckBox') {
+                      $newValues[$key][$v2['value']] = 1;
+                    }
+                    else {
+                      $newValues[$key][] = $v2['value'];
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        // consider new values
+        $values = $newValues;
+      }
+
+      _civicrm_api3_store_values($fields['Address'], $values, $params['address'][$addressCnt]);
+
+      $addressFields = [
+        'county',
+        'country',
+        'state_province',
+        'supplemental_address_1',
+        'supplemental_address_2',
+        'supplemental_address_3',
+        'StateProvince.name',
+      ];
+
+      foreach ($addressFields as $field) {
+        if (array_key_exists($field, $values)) {
+          if (!array_key_exists('address', $params)) {
+            $params['address'] = [];
+          }
+          $params['address'][$addressCnt][$field] = $values[$field];
+        }
+      }
+
+      if ($addressCnt == 1) {
+
+        $params['address'][$addressCnt]['is_primary'] = TRUE;
+      }
+      return TRUE;
+    }
   }
 
   /**

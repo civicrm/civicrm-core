@@ -881,25 +881,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => $group_name,
         ],
       ],
-      'CRM_Grant_DAO_Grant' => [
-        [
-          'fieldName' => 'status_id',
-          'sample' => 'Approved for Payment',
-        ],
-        [
-          'fieldName' => 'grant_type_id',
-          'sample' => 'Emergency',
-        ],
-        [
-          'fieldName' => 'currency',
-          'sample' => ['USD' => 'US Dollar'],
-          'max' => 200,
-        ],
-        [
-          'fieldName' => 'financial_type_id',
-          'sample' => 'Donation',
-        ],
-      ],
       'CRM_Contribute_DAO_Contribution' => [
         [
           'fieldName' => 'payment_instrument_id',

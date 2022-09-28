@@ -349,7 +349,7 @@ class CRM_Campaign_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 
-  public function processVoterData() {
+  public static function processVoterData() {
     $status = NULL;
     $operation = CRM_Utils_Type::escape($_POST['operation'], 'String');
     if ($operation == 'release') {
@@ -477,7 +477,7 @@ class CRM_Campaign_Page_AJAX {
     CRM_Utils_JSON::output(['status' => $status]);
   }
 
-  public function campaignGroups() {
+  public static function campaignGroups() {
     $surveyId = CRM_Utils_Request::retrieve('survey_id', 'Positive',
       CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST'
     );
@@ -621,7 +621,7 @@ class CRM_Campaign_Page_AJAX {
    * This function uses the deprecated v1 datatable api and needs updating. See CRM-16353.
    * @deprecated
    */
-  public function surveyList() {
+  public static function surveyList() {
     //get the search criteria params.
     $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     $searchParams = explode(',', $searchCriteria);
@@ -726,7 +726,7 @@ class CRM_Campaign_Page_AJAX {
    * This function uses the deprecated v1 datatable api and needs updating. See CRM-16353.
    * @deprecated
    */
-  public function petitionList() {
+  public static function petitionList() {
     //get the search criteria params.
     $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     $searchParams = explode(',', $searchCriteria);

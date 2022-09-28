@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-  <div class="crm-accordion-wrapper crm-block crm-form-block crm-event-searchevent-form-block collapsed">
+  <div class="crm-accordion-wrapper crm-block crm-form-block crm-event-searchevent-form-block">
     <div class="crm-accordion-header">
       {ts}Find Events{/ts}
     </div>
@@ -45,7 +45,7 @@
     </td></tr>
 
     {* campaign in event search *}
-    {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch"
+    {include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
     campaignTrClass='crm-event-searchevent-form-block-campaign_id' campaignTdClass=''}
     <td class="right">{include file="CRM/common/formButtons.tpl"}</td>
   </table>

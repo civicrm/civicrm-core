@@ -148,9 +148,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $this->_contactType = CRM_Utils_Request::retrieve('ct', 'String',
         $this, TRUE, NULL, 'REQUEST'
       );
-      if (!in_array($this->_contactType,
-        ['Individual', 'Household', 'Organization']
-      )
+      if (!in_array($this->_contactType, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE)
       ) {
         CRM_Core_Error::statusBounce(ts('Could not get a contact id and/or contact type'));
       }
@@ -180,7 +178,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       );
       $typeLabel = implode(' / ', $typeLabel);
 
-      CRM_Utils_System::setTitle(ts('New %1', [1 => $typeLabel]));
+      $this->setTitle(ts('New %1', [1 => $typeLabel]));
       $session->pushUserContext(CRM_Utils_System::url('civicrm/dashboard', 'reset=1'));
       $this->_contactId = NULL;
     }
@@ -221,7 +219,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         }
 
         // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
-        CRM_Utils_System::setTitle($displayName);
+        $this->setTitle($displayName);
         $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
         $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
 
@@ -243,15 +241,13 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           $this->_values = $values;
         }
         else {
-          $params = [
-            'id' => $this->_contactId,
-            'contact_id' => $this->_contactId,
-            'noRelationships' => TRUE,
-            'noNotes' => TRUE,
-            'noGroups' => TRUE,
-          ];
-
-          $contact = CRM_Contact_BAO_Contact::retrieve($params, $this->_values, TRUE);
+          CRM_Contact_BAO_Contact::getValues(['id' => $this->_contactId, 'contact_id' => $this->_contactId], $this->_values);
+          $this->_values['im'] = CRM_Core_BAO_IM::getValues(['contact_id' => $this->_contactId]);
+          $this->_values['email'] = CRM_Core_BAO_Email::getValues(['contact_id' => $this->_contactId]);
+          $this->_values['openid'] = CRM_Core_BAO_OpenID::getValues(['contact_id' => $this->_contactId]);
+          $this->_values['phone'] = CRM_Core_BAO_Phone::getValues(['contact_id' => $this->_contactId]);
+          $this->_values['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $this->_contactId], TRUE);
+          CRM_Core_BAO_Website::getValues(['contact_id' => $this->_contactId], $this->_values);
           $this->set('values', $this->_values);
         }
       }
@@ -333,7 +329,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         if ($groupCount > 1) {
           $this->set('groupID', $groupID);
           //loop the group
-          for ($i = 0; $i <= $groupCount; $i++) {
+          for ($i = 1; $i <= $groupCount; $i++) {
             CRM_Custom_Form_CustomData::preProcess($this, NULL, $contactSubType,
               $i, $this->_contactType, $this->_contactId
             );
@@ -357,8 +353,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       if ($this->_contactSubType || isset($paramSubType)) {
         $paramSubType = (isset($paramSubType)) ? $paramSubType :
           str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($this->_contactSubType, CRM_Core_DAO::VALUE_SEPARATOR));
-
-        $this->assign('paramSubType', $paramSubType);
       }
 
       if (CRM_Utils_Request::retrieve('type', 'String')) {
@@ -377,6 +371,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $this->assign('customValueCount', $this->_customValueCount);
       }
     }
+    $this->assign('paramSubType', $paramSubType ?? '');
   }
 
   /**
@@ -426,9 +421,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     //set address block defaults
     CRM_Contact_Form_Edit_Address::setDefaultValues($defaults, $this);
 
-    if (!empty($defaults['image_URL'])) {
-      $this->assign("imageURL", CRM_Utils_File::getImageURL($defaults['image_URL']));
-    }
+    $this->assign('imageURL', !empty($defaults['image_URL']) ? CRM_Utils_File::getImageURL($defaults['image_URL']) : '');
 
     //set location type and country to default for each block
     $this->blockSetDefaults($defaults);
@@ -730,7 +723,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
 
     if ($this->_action == CRM_Core_Action::UPDATE) {
-      $deleteExtra = json_encode(ts('Are you sure you want to delete contact image.'));
+      $deleteExtra = json_encode(ts('Are you sure you want to delete the contact image?'));
       $deleteURL = [
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete Contact Image'),
@@ -805,7 +798,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     CRM_Contact_Form_Location::buildQuickForm($this);
 
     // add attachment
-    $this->addField('image_URL', ['maxlength' => '255', 'label' => ts('Browse/Upload Image')]);
+    $this->addField('image_URL', ['maxlength' => '255', 'label' => ts('Browse/Upload Image'), 'accept' => 'image/png, image/jpeg, image/gif']);
 
     // add the dedupe button
     $this->addElement('xbutton',
@@ -951,6 +944,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     if (array_key_exists('CommunicationPreferences', $this->_editOptions)) {
       // this is a chekbox, so mark false if we dont get a POST value
       $params['is_opt_out'] = CRM_Utils_Array::value('is_opt_out', $params, FALSE);
+
+      CRM_Utils_Array::formatArrayKeys($params['preferred_communication_method']);
     }
 
     // process shared contact address.
@@ -1040,7 +1035,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     CRM_Utils_Recent::add($contact->display_name,
       CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $contact->id),
       $contact->id,
-      $this->_contactType,
+      'Contact',
       $contact->id,
       $contact->display_name,
       $recentOther
@@ -1135,7 +1130,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    *
    * @param array $fields
    *   Fields array which are submitted.
-   * @param $errors
+   * @param array $errors
    * @param int $contactID
    *   Contact id.
    * @param string $contactType
@@ -1235,7 +1230,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @return array
    *   as array of success/fails for each address block
    */
-  public function parseAddress(&$params) {
+  public static function parseAddress(&$params) {
     $parseSuccess = $parsedFields = [];
     if (!is_array($params['address']) ||
       CRM_Utils_System::isNull($params['address'])

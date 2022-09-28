@@ -37,7 +37,6 @@ source "$P/dists/common.sh"
 # Set no actions by default
 BPACK=0
 D5PACK=0
-D56PACK=0
 D7DIR=0
 J5PACK=0
 WP5PACK=0
@@ -58,7 +57,6 @@ display_usage()
   echo "  l10n           - generate internationalization data"
   echo "  Backdrop       - generate Backdrop PHP5 module"
   echo "  Drupal|d5      - generate Drupal7 PHP5 module"
-  echo "  Drupal6|d5.6   - generate Drupal6 PHP5 module"
   echo "  d7_dir         - generate Drupal7 PHP5 module, but output to a directory, no tarball"
   echo "  Joomla|j5      - generate Joomla PHP5 module"
   echo "  WordPress|wp5  - generate Wordpress PHP5 module"
@@ -125,7 +123,7 @@ check_conf()
     echo "Current directory is : $THIS_DIR";
     exit 1
   else
-    export DM_SOURCEDIR DM_GENFILESDIR DM_TMPDIR DM_TARGETDIR DM_PHP DM_RSYNC DM_ZIP DM_VERSION DM_REF_CORE DM_REF_DRUPAL DM_REF_DRUPAL6 DM_REF_DRUPAL8 DM_REF_JOOMLA DM_REF_WORDPRESS DM_REF_PACKAGES
+    export DM_SOURCEDIR DM_GENFILESDIR DM_TMPDIR DM_TARGETDIR DM_PHP DM_RSYNC DM_ZIP DM_VERSION DM_REF_CORE DM_REF_DRUPAL DM_REF_DRUPAL8 DM_REF_JOOMLA DM_REF_WORDPRESS DM_REF_PACKAGES
     if [ ! -d "$DM_SOURCEDIR" ]; then
       echo; echo "ERROR! " DM_SOURCEDIR "directory not found!"; echo "(if you get empty directory name, it might mean that one of necessary variables is not set)"; echo;
     fi
@@ -177,12 +175,6 @@ case $1 in
   SKPACK=1
   ;;
 
-  # DRUPAL6 PHP5
-  d5.6|Drupal6)
-  echo; echo "Generating Drupal6 PHP5 module"; echo;
-  D56PACK=1
-  ;;
-
   # JOOMLA PHP5
   j5|Joomla)
   echo; echo "Generating Joomla PHP5 module"; echo;
@@ -212,7 +204,6 @@ case $1 in
   echo; echo "Generating all the tarballs we've got (not the directories). "; echo;
   BPACK=1
   D5PACK=1
-  D56PACK=1
   J5PACK=1
   WP5PACK=1
   PATCHPACK=1
@@ -270,12 +261,6 @@ if [ "$BPACK" = 1 ]; then
   bash $P/dists/backdrop_php5.sh
 fi
 
-if [ "$D56PACK" = 1 ]; then
-  echo; echo "Packaging for Drupal6, PHP5 version"; echo;
-  dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL6"
-  bash $P/dists/drupal6_php5.sh
-fi
-
 if [ "$D5PACK" = 1 ]; then
   echo; echo "Packaging for Drupal7, PHP5 version"; echo;
   dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
@@ -316,7 +301,6 @@ if [ "$REPOREPORT" = 1 ]; then
   env \
     L10NPACK="$L10NPACK" \
     BPACK="$BPACK" \
-    D56PACK="$D56PACK" \
     D5PACK="$D5PACK" \
     D7DIR="$D7DIR" \
     SKPACK="$SKPACK" \

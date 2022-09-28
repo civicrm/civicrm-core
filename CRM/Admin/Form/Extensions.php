@@ -21,6 +21,16 @@
 class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
 
   /**
+   * @var string
+   */
+  private $_key;
+
+  /**
+   * @var string
+   */
+  private $label;
+
+  /**
    * Form pre-processing.
    */
   public function preProcess() {
@@ -39,6 +49,10 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
     if (!CRM_Utils_Type::validate($this->_key, 'ExtensionKey') && !empty($this->_key)) {
       throw new CRM_Core_Exception('Extension Key does not match expected standard');
     }
+
+    $name = $remoteExtensionRows[$this->_key]['label'] ?? $localExtensionRows[$this->_key]['label'] ?? NULL;
+    $this->label = $name ? sprintf('%s (<em>%s</em>)', htmlentities($name), htmlentities($this->_key))
+        : sprintf('<em>%s</em>', htmlentities($this->_key));
     $session = CRM_Core_Session::singleton();
     $url = CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1&action=browse');
     $session->pushUserContext($url);
@@ -86,35 +100,35 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
       case CRM_Core_Action::ADD:
         $buttonName = ts('Install');
         $title = ts('Install "%1"?', [
-          1 => $this->_key,
+          1 => $this->label,
         ]);
         break;
 
       case CRM_Core_Action::UPDATE:
         $buttonName = ts('Download and Install');
         $title = ts('Download and Install "%1"?', [
-          1 => $this->_key,
+          1 => $this->label,
         ]);
         break;
 
       case CRM_Core_Action::DELETE:
         $buttonName = ts('Uninstall');
         $title = ts('Uninstall "%1"?', [
-          1 => $this->_key,
+          1 => $this->label,
         ]);
         break;
 
       case CRM_Core_Action::ENABLE:
         $buttonName = ts('Enable');
         $title = ts('Enable "%1"?', [
-          1 => $this->_key,
+          1 => $this->label,
         ]);
         break;
 
       case CRM_Core_Action::DISABLE:
         $buttonName = ts('Disable');
         $title = ts('Disable "%1"?', [
-          1 => $this->_key,
+          1 => $this->label,
         ]);
         break;
     }
@@ -140,7 +154,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param array $self
+   * @param self $self
    *   This object.
    *
    * @return bool|array

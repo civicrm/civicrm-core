@@ -37,7 +37,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
     if (isset($this->_id)) {
       $defaults = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
     }
-    $defaults['member_is_active'] = $defaults['is_active'];
+    $defaults['member_is_active'] = $defaults['is_active'] ?? FALSE;
 
     // Set Display Minimum Fee default to true if we are adding a new membership block
     if (!isset($defaults['id'])) {
@@ -93,7 +93,6 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
    * Build the form object.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     $membershipTypes = CRM_Member_BAO_MembershipType::getMembershipTypes();
@@ -211,7 +210,6 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
    * @return bool|array
    *   mixed true or array of errors
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function formRule($params, $files, $contributionPageId = NULL) {
     $errors = [];

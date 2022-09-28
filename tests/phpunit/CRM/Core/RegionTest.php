@@ -23,7 +23,12 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
    * @return \CRM_Core_Resources_CollectionInterface
    */
   public function createEmptyCollection() {
-    @++Civi::$statics['CRM_Core_RegionTestId'];
+    if (empty(Civi::$statics['CRM_Core_RegionTestId'])) {
+      Civi::$statics['CRM_Core_RegionTestId'] = 1;
+    }
+    else {
+      ++Civi::$statics['CRM_Core_RegionTestId'];
+    }
     $r = new CRM_Core_Region('region_' . Civi::$statics['CRM_Core_RegionTestId']);
     $r->filter(function($snippet) {
       return $snippet['name'] !== 'default';

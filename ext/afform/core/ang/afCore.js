@@ -18,9 +18,30 @@
           $scope.crmUrl = CRM.url;
 
           // Afforms do not use routing, but some forms get input from search params
-          $scope.$watch(function() {return $location.search();}, function(params) {
-            $scope.routeParams = params;
-          });
+          var dialog = $el.closest('.ui-dialog-content');
+          if (!dialog.length) {
+            // Full-screen mode
+            $scope.$watch(function() {return $location.search();}, function(params) {
+              $scope.routeParams = params;
+            });
+          } else {
+            // Use urlHash embedded in popup dialog
+            $scope.routeParams = {};
+            if (dialog.data('urlHash')) {
+              var searchParams = new URLSearchParams(dialog.data('urlHash'));
+              searchParams.forEach(function(value, key) {
+                $scope.routeParams[key] = value;
+              });
+            }
+          }
+
+          $scope.$parent.afformTitle = meta.title;
+
+          // Prepends a string to the afform title
+          // Provides contextual titles to search Afforms in standalone mode
+          $scope.addTitle = function(addition) {
+            $scope.$parent.afformTitle = addition + ' ' + meta.title;
+          };
         }
       };
       return d;

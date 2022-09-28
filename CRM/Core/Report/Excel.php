@@ -109,8 +109,8 @@ class CRM_Core_Report_Excel {
 
   /**
    * @param string $fileName
-   * @param $header
-   * @param $rows
+   * @param string[] $header
+   * @param array[] $rows
    * @param null $titleHeader
    * @param bool $outputHeader
    */

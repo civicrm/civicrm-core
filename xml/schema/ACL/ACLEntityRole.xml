@@ -62,6 +62,8 @@
     <title>ACL Entity Role is Active</title>
     <type>boolean</type>
     <comment>Is this property active?</comment>
+    <default>1</default>
+    <required>true</required>
     <add>1.6</add>
   </field>
   <index>

@@ -84,38 +84,6 @@ abstract class CRM_SMS_Provider {
   abstract public function send($recipients, $header, $message, $dncID = NULL);
 
   /**
-   * Return message text.
-   *
-   * Child class could override this function to have better control over the message being sent.
-   *
-   * @param string $message
-   * @param int $contactID
-   * @param array $contactDetails
-   *
-   * @return string
-   */
-  public function getMessage($message, $contactID, $contactDetails) {
-    $html = $message->getHTMLBody();
-    $text = $message->getTXTBody();
-
-    return $html ? $html : $text;
-  }
-
-  /**
-   * Get recipient details.
-   *
-   * @param array $fields
-   * @param array $additionalDetails
-   *
-   * @return mixed
-   */
-  public function getRecipientDetails($fields, $additionalDetails) {
-    // we could do more altering here
-    $fields['To'] = $fields['phone'];
-    return $fields;
-  }
-
-  /**
    * @param int $apiMsgID
    * @param $message
    * @param array $headers

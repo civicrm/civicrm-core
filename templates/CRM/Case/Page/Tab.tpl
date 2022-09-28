@@ -13,7 +13,7 @@
 {elseif $redirectToCaseAdmin}
     <div class="messages status no-popup">
       {icon icon="fa-info-circle"}{/icon}
-         <strong>{ts}Oops, It looks like there are no active case types.{/ts}</strong>
+         <strong>{ts}It looks like there are no active case types yet.{/ts}</strong>
            {if call_user_func(array('CRM_Core_Permission','check'), ' administer CiviCase')}
              {capture assign=adminCaseTypeURL}{crmURL p='civicrm/a/#/caseType'}
        {/capture}
@@ -44,7 +44,7 @@
           call_user_func(array('CRM_Core_Permission','check'), 'add cases') ) AND
         $allowToAddNewCase}
         <div class="action-link">
-        <a accesskey="N" href="{$newCaseURL}" class="button no-popup"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Case{/ts}</span></a>
+        <a accesskey="N" href="{$newCaseURL|smarty:nodefaults}" class="button no-popup"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Case{/ts}</span></a>
         </div>
     {/if}
 

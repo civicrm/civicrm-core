@@ -63,7 +63,7 @@ trait DataTypeSpecTrait {
    * @param $dataType
    *
    * @return $this
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function setDataType($dataType) {
     if (array_key_exists($dataType, self::$typeAliases)) {
@@ -71,7 +71,7 @@ trait DataTypeSpecTrait {
     }
 
     if (!in_array($dataType, $this->getValidDataTypes())) {
-      throw new \Exception(sprintf('Invalid data type "%s', $dataType));
+      throw new \CRM_Core_Exception(sprintf('Invalid data type "%s', $dataType));
     }
 
     $this->dataType = $dataType;

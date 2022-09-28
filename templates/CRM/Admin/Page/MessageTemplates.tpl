@@ -28,7 +28,19 @@
       <textarea name="msg-subject" id="msg_subject" style="height: 6em; width: 45em;">{$form.msg_subject.value}</textarea>
       <div class='spacer'></div>
       <div class="section">
-        <a href='#' onclick='MessageTemplates.msg_subject.select(); return false;' class='button'><span>Select Subject</span></a>
+        <a href='#' onclick='MessageTemplates.msg_subject.select(); return false;' class='button'><span>{ts}Select Subject{/ts}</span></a>
+        <div class='spacer'></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="crm-section msg_html-section">
+    <h3 class="header-dark">{$form.msg_html.label}</h3>
+    <div class='text'>
+      <textarea class="huge" name='msg_html' id='msg_html'>{$form.msg_html.value|htmlentities}</textarea>
+      <div class='spacer'></div>
+      <div class="section">
+        <a href='#' onclick='MessageTemplates.msg_html.select(); return false;' class='button'><span>{ts}Select HTML Message{/ts}</span></a>
         <div class='spacer'></div>
       </div>
     </div>
@@ -40,19 +52,7 @@
       <textarea class="huge" name='msg_text' id='msg_text'>{$form.msg_text.value|htmlentities}</textarea>
       <div class='spacer'></div>
       <div class="section">
-        <a href='#' onclick='MessageTemplates.msg_text.select(); return false;' class='button'><span>Select Text Message</span></a>
-        <div class='spacer'></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="crm-section msg_html-section">
-  <h3 class="header-dark">{$form.msg_html.label}</h3>
-    <div class='text'>
-      <textarea class="huge" name='msg_html' id='msg_html'>{$form.msg_html.value|htmlentities}</textarea>
-      <div class='spacer'></div>
-      <div class="section">
-        <a href='#' onclick='MessageTemplates.msg_html.select(); return false;' class='button'><span>Select HTML Message</span></a>
+        <a href='#' onclick='MessageTemplates.msg_text.select(); return false;' class='button'><span>{ts}Select Text Message{/ts}</span></a>
         <div class='spacer'></div>
       </div>
     </div>
@@ -125,13 +125,13 @@
                 </thead>
                 <tbody>
                 {foreach from=$template_row item=row}
-                    <tr id="message_template-{$row.id}" class="crm-entity {if !empty($row.class)}{$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
+                    <tr id="message_template-{$row.id}" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
                       <td>{$row.msg_title}</td>
                       {if $type eq 'userTemplates'}
                         <td>{$row.msg_subject}</td>
                         <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
                       {/if}
-                      <td>{$row.action|replace:'xx':$row.id}</td>
+                      <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
                     </tr>
                 {/foreach}
                 </tbody>

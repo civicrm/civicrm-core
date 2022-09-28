@@ -230,6 +230,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       //retrieve event information
       $params = ['id' => $this->_eventId];
       CRM_Event_BAO_Event::retrieve($params, $this->_values['event']);
+
       // check for is_monetary status
       $isMonetary = $this->_values['event']['is_monetary'] ?? NULL;
       // check for ability to add contributions of type
@@ -455,7 +456,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params, $this->_bltID));
 
     // The concept of contributeMode is deprecated.
-    if ($this->_contributeMode == 'direct' && empty($params['is_pay_later'])) {
+    if ($this->_contributeMode === 'direct' && empty($params['is_pay_later'])) {
       $date = CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $params));
       $date = CRM_Utils_Date::mysqlToIso($date);
       $this->assign('credit_card_exp_date', $date);
@@ -464,18 +465,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       );
     }
 
-    // assign is_email_confirm to templates
-    if (isset($this->_values['event']['is_email_confirm'])) {
-      $this->assign('is_email_confirm', $this->_values['event']['is_email_confirm']);
-    }
-
+    $this->assign('is_email_confirm', $this->_values['event']['is_email_confirm'] ?? NULL);
     // assign pay later stuff
-    $params['is_pay_later'] = CRM_Utils_Array::value('is_pay_later', $params, FALSE);
+    $params['is_pay_later'] = $params['is_pay_later'] ?? FALSE;
     $this->assign('is_pay_later', $params['is_pay_later']);
-    if ($params['is_pay_later']) {
-      $this->assign('pay_later_text', $this->getPayLaterLabel());
-      $this->assign('pay_later_receipt', $this->_values['event']['pay_later_receipt']);
-    }
+    $this->assign('pay_later_text', $params['is_pay_later'] ? $this->getPayLaterLabel() : FALSE);
+    $this->assign('pay_later_receipt', $params['is_pay_later'] ? $this->_values['event']['pay_later_receipt'] : NULL);
 
     // also assign all participantIDs to the template
     // useful in generating confirmation numbers if needed
@@ -495,6 +490,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     $contactID = CRM_Core_Session::getLoggedInContactID();
+    $fields = [];
 
     // we don't allow conflicting fields to be
     // configured via profile
@@ -537,7 +533,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $fields = array_diff_key($fields, $fieldsToIgnore);
       CRM_Core_Session::setStatus(ts('Some of the profile fields cannot be configured for this page.'));
     }
-    $addCaptcha = FALSE;
 
     if (!empty($this->_fields)) {
       $fields = @array_diff_assoc($fields, $this->_fields);
@@ -557,19 +552,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         if ($button == 'skip') {
           $field['is_required'] = FALSE;
         }
-        // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
-        elseif ($field['add_captcha'] && !$contactID) {
-          // only add captcha for first page
-          $addCaptcha = TRUE;
-        }
         CRM_Core_BAO_UFGroup::buildProfile($this, $field, CRM_Profile_Form::MODE_CREATE, $contactID, TRUE);
 
         $this->_fields[$key] = $field;
       }
-    }
-
-    if ($addCaptcha) {
-      CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
     }
   }
 
@@ -654,7 +640,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param int $contactID
    * @param \CRM_Contribute_BAO_Contribution $contribution
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function confirmPostProcess($contactID = NULL, $contribution = NULL) {
     // add/update contact information
@@ -685,12 +671,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $this->_params['participantID'] = $participant->id;
       $this->set('primaryParticipant', $this->_params);
     }
-
-    CRM_Core_BAO_CustomValueTable::postProcess($this->_params,
-      'civicrm_participant',
-      $participant->id,
-      'Participant'
-    );
 
     $createPayment = (CRM_Utils_Array::value('amount', $this->_params, 0) != 0) ? TRUE : FALSE;
 
@@ -753,7 +733,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param int $contactID
    *
    * @return \CRM_Event_BAO_Participant
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function addParticipant(&$form, $contactID) {
     if (empty($form->_params)) {
@@ -826,6 +806,15 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     if (!$participantParams['discount_id']) {
       $participantParams['discount_id'] = "null";
+    }
+
+    $participantParams['custom'] = [];
+    foreach ($form->_params as $paramName => $paramValue) {
+      if (strpos($paramName, 'custom_') === 0) {
+        list($customFieldID, $customValueID) = CRM_Core_BAO_CustomField::getKeyID($paramName, TRUE);
+        CRM_Core_BAO_CustomField::formatCustomField($customFieldID, $participantParams['custom'], $paramValue, 'Participant', $customValueID);
+
+      }
     }
 
     $participant = CRM_Event_BAO_Participant::create($participantParams);
@@ -1052,13 +1041,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * Check if template file exists.
+   * Check template file exists.
    *
-   * @param string $suffix
+   * @param string|null $suffix
    *
-   * @return null|string
+   * @return string|null
+   *   Template file path, else null
    */
-  public function checkTemplateFileExists($suffix = '') {
+  public function checkTemplateFileExists($suffix = NULL) {
     if ($this->_eventId) {
       $templateName = $this->_name;
       if (substr($templateName, 0, 12) == 'Participant_') {
@@ -1454,7 +1444,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *   Form values.
    * @param int $contactID
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function processRegistration($params, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();
@@ -1539,8 +1529,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
         //lets get additional participant id to cancel.
         if ($this->_allowConfirmation && is_array($cancelledIds)) {
-          $additonalId = $value['participant_id'] ?? NULL;
-          if ($additonalId && $key = array_search($additonalId, $cancelledIds)) {
+          $additionalId = $value['participant_id'] ?? NULL;
+          if ($additionalId && $key = array_search($additionalId, $cancelledIds)) {
             unset($cancelledIds[$key]);
           }
         }
@@ -1575,7 +1565,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param $registerByID
    * @param array $participantCount
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   private function sendMails($params, $registerByID, array $participantCount) {
     $isTest = FALSE;

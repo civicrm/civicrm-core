@@ -46,7 +46,7 @@ function _civicrm_api3_option_value_get_spec(&$params) {
  *
  * @param array $params
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @return array
  *   API result array
  */
@@ -86,7 +86,7 @@ function _civicrm_api3_option_value_create_spec(&$params) {
  *
  * @param array $params
  * @return array API result array
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_option_value_delete($params) {
   // We will get the option group id before deleting so we can flush pseudoconstants.
@@ -97,6 +97,6 @@ function civicrm_api3_option_value_delete($params) {
     return civicrm_api3_create_success();
   }
   else {
-    throw new API_Exception('Could not delete OptionValue ' . $params['id']);
+    throw new CRM_Core_Exception('Could not delete OptionValue ' . $params['id']);
   }
 }

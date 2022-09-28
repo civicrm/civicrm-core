@@ -80,13 +80,13 @@
     <td>{$form.dedupe_rule_group_id.html} {help id="id-dedupe_rule_group_id"}</td>
   </tr>
   <tr class="crm-event-manage-registration-form-block-requires_approval">
-    {if $form.requires_approval}
+    {if !empty($form.requires_approval)}
       <td scope="row" class="label" width="20%">{$form.requires_approval.label}</td>
       <td>{$form.requires_approval.html} {help id="id-requires_approval"}</td>
     {/if}
   </tr>
   <tr id="id-approval-text" class="crm-event-manage-registration-form-block-approval_req_text">
-    {if $form.approval_req_text}
+    {if !empty($form.approval_req_text)}
       <td scope="row" class="label"
           width="20%">{$form.approval_req_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='approval_req_text' id=$eventID}{/if}</td>
       <td>{$form.approval_req_text.html}</td>
@@ -379,7 +379,7 @@ target_element_type ="block"
 field_type          ="radio"
 invert              = 0
 }
-{if $form.requires_approval}
+{if !empty($form.requires_approval)}
 {include file="CRM/common/showHideByFieldValue.tpl"
     trigger_field_id    ="requires_approval"
     trigger_value       =""

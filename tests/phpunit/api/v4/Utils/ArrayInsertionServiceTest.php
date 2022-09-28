@@ -20,12 +20,12 @@
 namespace api\v4\Utils;
 
 use Civi\Api4\Utils\ArrayInsertionUtil;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class ArrayInsertionServiceTest extends UnitTestCase {
+class ArrayInsertionServiceTest extends Api4TestBase {
 
   public function testInsertWillWork() {
     $arr = [];

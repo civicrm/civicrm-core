@@ -405,7 +405,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties);
     try {
       $this->assertLike($expectedSQL, $queryObj->getSearchSQL());
-      list($select, $from, $where, $having) = $queryObj->query();
+      [$select, $from, $where, $having] = $queryObj->query();
       $dao = CRM_Core_DAO::executeQuery("$select $from $where $having");
       $dao->fetch();
       $this->assertEquals('Anderson, Anthony', $dao->sort_name);
@@ -500,7 +500,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       TRUE, FALSE
     );
 
-    list($select) = $query->query();
+    [$select] = $query->query();
     $this->assertEquals('SELECT contact_a.id as contact_id', $select);
   }
 
@@ -1103,7 +1103,7 @@ civicrm_relationship.is_active = 1 AND
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetSummaryQueryWithFinancialACLDisabled() {
+  public function testGetSummaryQueryWithFinancialACLDisabled(): void {
     $this->createContributionsForSummaryQueryTests();
 
     // Test the function directly
@@ -1128,6 +1128,11 @@ civicrm_relationship.is_active = 1 AND
         'amount' => '$ 100.00',
         'avg' => '$ 50.00',
       ],
+      'soft_credit' => [
+        'count' => 0,
+        'avg' => 0,
+        'amount' => 0,
+      ],
     ], $summary);
   }
 
@@ -1136,7 +1141,7 @@ civicrm_relationship.is_active = 1 AND
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetSummaryQueryWithFinancialACLEnabled() {
+  public function testGetSummaryQueryWithFinancialACLEnabled(): void {
     $where = $from = NULL;
     $this->createContributionsForSummaryQueryTests();
     $this->enableFinancialACLs();
@@ -1166,6 +1171,11 @@ civicrm_relationship.is_active = 1 AND
         'amount' => '$ 50.00',
         'avg' => '$ 50.00',
       ],
+      'soft_credit' => [
+        'count' => 0,
+        'avg' => 0,
+        'amount' => 0,
+      ],
     ], $summary);
     $this->disableFinancialACLs();
   }
@@ -1193,7 +1203,7 @@ civicrm_relationship.is_active = 1 AND
       TRUE, FALSE
     );
 
-    list($select, $from, $where, $having) = $query->query();
+    [$select, $from, $where, $having] = $query->query();
     $this->assertEquals($expectedWhere, $where);
   }
 
@@ -1315,6 +1325,84 @@ civicrm_relationship.is_active = 1 AND
     $query = new CRM_Contact_BAO_Query([['world_region', '=', 3, 0]]);
     $this->assertEquals('civicrm_worldregion.id = 3', $query->_where[0][0]);
     $this->assertEquals('World Region = Middle East and North Africa', $query->_qill[0][0]);
+  }
+
+  /**
+   * Tests the advanced search query by searching on related contacts and contact type same time.
+   *
+   * Preparation:
+   *   Create an individual contact Contact A
+   *   Create an organization contact Contact B
+   *   Create an "Employer of" relationship between them.
+   *
+   * Searching:
+   *   Go to advanced search
+   *   Click on View contact as related contact
+   *   Select Employee of as relationship type
+   *   Select "Organization" as contact type
+   *
+   * Expected results
+   *   We expect to find contact A.
+   *
+   * @throws \Exception
+   */
+  public function testAdvancedSearchWithDisplayRelationshipsAndContactType(): void {
+    $employeeRelationshipTypeId = $this->callAPISuccess('RelationshipType', 'getvalue', ['return' => 'id', 'name_a_b' => 'Employee of']);
+    $indContactID = $this->individualCreate(['first_name' => 'John', 'last_name' => 'Smith']);
+    $orgContactID = $this->organizationCreate(['contact_type' => 'Organization', 'organization_name' => 'Healthy Planet Fund']);
+    $this->callAPISuccess('Relationship', 'create', ['contact_id_a' => $indContactID, 'contact_id_b' => $orgContactID, 'relationship_type_id' => $employeeRelationshipTypeId]);
+
+    // Search setup
+    $formValues = ['display_relationship_type' => $employeeRelationshipTypeId . '_a_b', 'contact_type' => 'Organization'];
+    $params = CRM_Contact_BAO_Query::convertFormValues($formValues, 0, FALSE, NULL, []);
+    $isDeleted = FALSE;
+    $selector = new CRM_Contact_Selector(
+      'CRM_Contact_Selector',
+      $formValues,
+      $params,
+      NULL,
+      CRM_Core_Action::NONE,
+      NULL,
+      FALSE,
+      'advanced'
+    );
+    $queryObject = $selector->getQueryObject();
+    $sql = $queryObject->query(FALSE, FALSE, FALSE, $isDeleted);
+    // Run the search
+    $rows = CRM_Core_DAO::executeQuery(implode(' ', $sql))->fetchAll();
+    // Check expected results.
+    $this->assertCount(1, $rows);
+    $this->assertEquals('John', $rows[0]['first_name']);
+    $this->assertEquals('Smith', $rows[0]['last_name']);
+  }
+
+  /**
+   * Tests if a space is replaced by the wildcard on sort_name when operation is 'LIKE' and there is no comma
+   *
+   * CRM-22060 fix if condition
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testReplaceSpaceByWildcardCondition() {
+    //Check for wildcard
+    $params = [
+      0 => [
+        0 => 'sort_name',
+        1 => 'LIKE',
+        2 => 'John Doe',
+        3 => 0,
+        4 => 1,
+      ],
+    ];
+    $query = new CRM_Contact_BAO_Query($params);
+    [$select, $from, $where] = $query->query();
+    $this->assertStringContainsString("contact_a.sort_name LIKE '%John%Doe%'", $where);
+
+    //Check for NO wildcard due to comma
+    $params[0][2] = 'Doe, John';
+    $query = new CRM_Contact_BAO_Query($params);
+    [$select, $from, $where] = $query->query();
+    $this->assertStringContainsString("contact_a.sort_name LIKE '%Doe, John%'", $where);
   }
 
 }

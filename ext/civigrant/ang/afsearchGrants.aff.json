@@ -1,0 +1,8 @@
+{
+    "type": "search",
+    "title": "Grants",
+    "contact_summary": "tab",
+    "icon": "fa-money",
+    "server_route": "",
+    "permission": "access CiviGrant"
+}

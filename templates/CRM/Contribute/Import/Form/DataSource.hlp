@@ -30,5 +30,5 @@
 {htxt id="id-onDuplicate"}
     <p>{ts}For each import, you can either INSERT new contribution records, or UPDATE existing records. You can not do both types of operations in a single import session.{/ts}</p>
     <p>{ts}If you are INSERTING new contributions, you will need to include a column in your data file containing the values used to link the contribution to an existing contact. You can use the 'Internal Contact ID', an 'External Identifier' (if you are using those in your contact records), OR the property defined in your Unsupervised Duplicate Matching rule (which is Email Address by default).{/ts}</p>
-    <p>{ts}If you are UPDATING existing contributions, you will need to include a unique identifer to match to the existing contribution record. This can be either the CiviCRM-assigned contribution ID, a unique Invoice ID, or a unique Transaction ID.{/ts}</p>
+    <p>{ts}If you are UPDATING existing contributions, you will need to include a unique identifier to match to the existing contribution record. This can be either the CiviCRM-assigned contribution ID, a unique Invoice ID, or a unique Transaction ID.{/ts}</p>
 {/htxt}

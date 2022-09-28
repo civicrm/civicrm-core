@@ -35,7 +35,7 @@ class CRM_Core_BAO_PrevNextCache extends CRM_Core_DAO_PrevNextCache {
    */
   public static function getPositions($cacheKey, $id1, $id2, &$mergeId = NULL, $join = NULL, $where = NULL, $flip = FALSE) {
     if ($flip) {
-      list($id1, $id2) = [$id2, $id1];
+      [$id1, $id2] = [$id2, $id1];
     }
 
     if ($mergeId == NULL) {
@@ -287,7 +287,7 @@ FROM   civicrm_prevnext_cache pn
   }
 
   /**
-   * @param $string
+   * @param mixed $string
    *
    * @return bool
    */
@@ -388,7 +388,6 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
    *  the number of searched contacts, not the matches found.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function refillCache($rgid, $gid, $criteria, $checkPermissions, $searchLimit = 0) {
     $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions, $searchLimit);

@@ -69,7 +69,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     'Event' => 'CiviEvent',
     'Case' => 'CiviCase',
     'Pledge' => 'CiviPledge',
-    'Grant' => 'CiviGrant',
     'Campaign' => 'CiviCampaign',
     'Survey' => 'CiviCampaign',
   ];
@@ -424,6 +423,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Profile',
       'Payment',
       'Order',
+      'OptionGroup',
       'MailingGroup',
       'Logging',
     ];
@@ -538,6 +538,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Logging',
       // Skip message template because workflow_id/workflow_name are sync'd.
       'MessageTemplate',
+      // Skip survey because the pseudoconstant will have no options.
+      'Survey',
     ];
     if ($sequential === TRUE) {
       return $entitiesWithout;
@@ -650,6 +652,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'CaseType' => [
         'cant_update' => [
           'definition',
+        ],
+      ],
+      'ContributionRecur' => [
+        'break_return' => [
+          'contribution_recur_modified_date',
         ],
       ],
       'Domain' => ['cant_update' => ['domain_version']],
@@ -870,16 +877,19 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
 
     $entitiesWithNamingIssues = [
-      'SmsProvider' => 'Provider',
+      'Acl' => 'ACL',
       'AclRole' => 'ACLEntityRole',
-      'MailingEventQueue' => 'Queue',
+      'Im' => 'IM',
       'Dedupe' => 'PrevNextCache',
       'Exception' => 'DedupeException',
+      'Pcp' => 'PCP',
+      'Rule' => 'DedupeRule',
       'RuleGroup' => 'DedupeRuleGroup',
+      'SmsProvider' => 'Provider',
     ];
 
-    $usableName = !empty($entitiesWithNamingIssues[$entityName]) ? $entitiesWithNamingIssues[$entityName] : $entityName;
-    $optionName = CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($usableName));
+    $usableName = $entitiesWithNamingIssues[$entityName] ?? $entityName;
+    $optionName = CRM_Core_DAO_AllCoreTables::getTableForEntityName($usableName);
 
     if (!isset(CRM_Core_BAO_CustomQuery::$extendsMap[$entityName])) {
       $createdValue = $this->callAPISuccess('OptionValue', 'create', [
@@ -1252,22 +1262,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
-   * @dataProvider entities
-   * @param $Entity
-   */
-  public function testWithoutParam_create($Entity) {
-    $this->expectException(CiviCRM_API3_Exception::class);
-    if ($Entity === 'Setting') {
-      $this->markTestSkipped('It seems OK for setting to skip here as it silently sips invalid params');
-    }
-    elseif ($Entity === 'Mailing') {
-      $this->markTestSkipped('It seems OK for "Mailing" to skip here because you can create empty drafts');
-    }
-    // should create php complaining that a param is missing
-    civicrm_api3($Entity, 'Create');
-  }
-
-  /**
    * @dataProvider entities_create
    *
    * Check that create doesn't work with an invalid
@@ -1307,24 +1301,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       $lowercase_entity = _civicrm_api_get_entity_name_from_camel($Entity);
       $this->assertEquals($lowercase_entity . $expected, $result['sort']);
     }
-  }
-
-  /**
-   * @dataProvider entities_create
-   *
-   * Check that create doesn't work with an invalid
-   * @param $Entity
-   * @throws \PHPUnit\Framework\IncompleteTestError
-   */
-  public function testInvalidID_create($Entity) {
-    // turn test off for noew
-    $this->markTestIncomplete("Entity [ $Entity ] cannot be mocked - no known DAO");
-    return;
-    if (in_array($Entity, $this->toBeImplemented['create'])) {
-      // $this->markTestIncomplete("civicrm_api3_{$Entity}_create to be implemented");
-      return;
-    }
-    $result = $this->callAPIFailure($Entity, 'Create', ['id' => 999]);
   }
 
   /**
@@ -1499,10 +1475,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         'id' => $entity['id'],
         $field => $entity[$field] ?? NULL,
       ];
-      if (isset($updateParams['financial_type_id']) && in_array($entityName, ['Grant'])) {
-        //api has special handling on these 2 fields for backward compatibility reasons
-        $entity['contribution_type_id'] = $updateParams['financial_type_id'];
-      }
       if (isset($updateParams['next_sched_contribution_date']) && in_array($entityName, ['ContributionRecur'])) {
         //api has special handling on these 2 fields for backward compatibility reasons
         $entity['next_sched_contribution'] = $updateParams['next_sched_contribution_date'];
@@ -1551,10 +1523,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         $entity = array_merge($entity, $resetFKTo);
         $updateParams = array_merge($updateParams, $resetFKTo);
         $this->callAPISuccess($entityName, 'create', $updateParams);
-        if (isset($updateParams['financial_type_id']) && in_array($entityName, ['Grant'])) {
-          //api has special handling on these 2 fields for backward compatibility reasons
-          $entity['contribution_type_id'] = $updateParams['financial_type_id'];
-        }
         if (isset($updateParams['next_sched_contribution_date']) && in_array($entityName, ['ContributionRecur'])) {
           //api has special handling on these 2 fields for backward compatibility reasons
           $entity['next_sched_contribution'] = $updateParams['next_sched_contribution_date'];
@@ -1600,52 +1568,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public function testInvalidID_delete($Entity) {
     $result = $this->callAPIFailure($Entity, 'Delete', ['id' => 999999]);
-  }
-
-  /**
-   * Create two entities and make sure delete action only deletes one!
-   *
-   * @dataProvider entities_delete
-   *
-   * limitations include the problem with avoiding loops when creating test objects -
-   * hence FKs only set by createTestObject when required. e.g parent_id on campaign is not being followed through
-   * Currency - only seems to support US
-   * @param $entityName
-   * @throws \PHPUnit\Framework\IncompleteTestError
-   */
-  public function testByID_delete($entityName) {
-    // turn test off for noew
-    $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
-    return;
-
-    if (in_array($entityName, self::toBeSkipped_automock(TRUE))) {
-      // $this->markTestIncomplete("civicrm_api3_{$Entity}_create to be implemented");
-      return;
-    }
-    $startCount = $this->callAPISuccess($entityName, 'getcount', []);
-    $createcount = 2;
-    $baos = $this->getMockableBAOObjects($entityName, $createcount);
-    [$baoObj1, $baoObj2] = $baos;
-
-    // make sure exactly 2 exist
-    $result = $this->callAPISuccess($entityName, 'getcount', [],
-      $createcount + $startCount
-    );
-
-    $this->callAPISuccess($entityName, 'delete', ['id' => $baoObj2->id]);
-    //make sure 1 less exists now
-    $result = $this->callAPISuccess($entityName, 'getcount', [],
-      ($createcount + $startCount) - 1
-    );
-
-    //make sure id #1 exists
-    $result = $this->callAPISuccess($entityName, 'getcount', ['id' => $baoObj1->id],
-      1
-    );
-    //make sure id #2 desn't exist
-    $result = $this->callAPISuccess($entityName, 'getcount', ['id' => $baoObj2->id],
-      0
-    );
   }
 
   /**
