@@ -220,21 +220,7 @@ abstract class CRM_Core_Component_Info {
    *   true if component is enabled, false if not
    */
   public function isEnabled() {
-    $config = CRM_Core_Config::singleton();
-    if (in_array($this->info['name'], $config->enableComponents)) {
-      return TRUE;
-    }
-    return FALSE;
-  }
-
-  /**
-   * Provides component's menu definition object.
-   *
-   * @return mixed
-   *   component's menu definition object
-   */
-  public function getMenuObject() {
-    return $this->_instantiate(self::COMPONENT_MENU_CLASS);
+    return CRM_Core_Component::isEnabled($this->info['name']);
   }
 
   /**
@@ -345,14 +331,13 @@ abstract class CRM_Core_Component_Info {
   /**
    * Helper for instantiating component's elements.
    *
-   * @param $cl
+   * @param string $cl
    *
    * @return mixed
    *   component's element as class instance
    */
   private function _instantiate($cl) {
     $className = $this->namespace . '_' . $cl;
-    require_once str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
     return new $className();
   }
 

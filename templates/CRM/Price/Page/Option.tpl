@@ -70,7 +70,7 @@
               {/if}
               <td class="crm-price-option-is_default">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}</td>
               <td class="nowrap crm-price-option-financial-type-id">{$row.financial_type_id}</td>
-              <td class="nowrap crm-price-option-order">{$row.weight}</td>
+              <td class="nowrap crm-price-option-order">{$row.weight|smarty:nodefaults}</td>
               {if $getTaxDetails}
                 <td>{if $row.tax_rate != '' }
                       {$taxTerm} ({$row.tax_rate}%)
@@ -79,7 +79,7 @@
                 <td>{$row.tax_amount|crmMoney}</td>
               {/if}
               <td id="row_{$row.id}_status" class="crm-price-option-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-              <td>{$row.action|replace:'xx':$row.id}</td>
+              <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
             </tr>
           {/foreach}
           </tbody>

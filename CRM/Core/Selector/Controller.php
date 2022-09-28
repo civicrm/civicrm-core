@@ -110,7 +110,9 @@ class CRM_Core_Selector_Controller {
    * Are we in print mode? if so we need to modify the display
    * functionality to do a minimal display :)
    *
-   * @var bool
+   * @var int|string
+   *   Should match a CRM_Core_Smarty::PRINT_* constant,
+   *   or equal 0 if not in print mode
    */
   protected $_print = FALSE;
 
@@ -461,7 +463,17 @@ class CRM_Core_Selector_Controller {
     }
 
     self::$_template->assign_by_ref("{$this->_prefix}sort", $this->_sort);
-    self::$_template->assign("{$this->_prefix}columnHeaders", $this->_store->get("{$this->_prefix}columnHeaders"));
+    $columnHeaders = (array) $this->_store->get("{$this->_prefix}columnHeaders");
+    foreach ($columnHeaders as $index => $columnHeader) {
+      // Fill out the keys to avoid e-notices.
+      if (!isset($columnHeader['sort'])) {
+        $columnHeaders[$index]['sort'] = NULL;
+      }
+      if (!isset($columnHeader['name'])) {
+        $columnHeaders[$index]['name'] = NULL;
+      }
+    }
+    self::$_template->assign("{$this->_prefix}columnHeaders", $columnHeaders);
     self::$_template->assign("{$this->_prefix}rows", $rows);
     self::$_template->assign("{$this->_prefix}rowsEmpty", $this->_store->get("{$this->_prefix}rowsEmpty"));
     self::$_template->assign("{$this->_prefix}qill", $this->_store->get("{$this->_prefix}qill"));
@@ -506,7 +518,9 @@ class CRM_Core_Selector_Controller {
   /**
    * Setter for print.
    *
-   * @param bool $print
+   * @param int|string $print
+   *   Should match a CRM_Core_Smarty::PRINT_* constant,
+   *   or equal 0 if not in print mode
    *
    * @return void
    */
@@ -517,8 +531,9 @@ class CRM_Core_Selector_Controller {
   /**
    * Getter for print.
    *
-   * @return bool
-   *   return the print value
+   * @return int|string
+   *   Value matching a CRM_Core_Smarty::PRINT_* constant,
+   *   or 0 if not in print mode
    */
   public function getPrint() {
     return $this->_print;

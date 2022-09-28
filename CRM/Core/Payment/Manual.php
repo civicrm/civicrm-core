@@ -111,8 +111,18 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doPayment(&$params, $component = 'contribute') {
-    $params['payment_status_id'] = $this->getResult();
-    return $params;
+    $result['payment_status_id'] = $this->getResult();
+    if ($result['payment_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')) {
+      $result = $this->setStatusPaymentPending($result);
+    }
+    elseif ($result['payment_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
+      $result = $this->setStatusPaymentCompleted($result);
+    }
+    else {
+      throw new \Civi\Payment\Exception\PaymentProcessorException('Result from doPayment MUST be one of Completed|Pending');
+    }
+
+    return $result;
   }
 
   /**

@@ -144,6 +144,14 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
             'no_repeat' => TRUE,
           ),
         ),
+        'filters' => [
+          'on_hold' => [
+            'title' => ts('On Hold'),
+            'type' => CRM_Utils_Type::T_INT,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => ['' => ts('Any')] + CRM_Core_PseudoConstant::emailOnHoldOptions(),
+          ],
+        ],
         'grouping' => 'contact-fields',
       ),
       'civicrm_phone' => array(
@@ -175,7 +183,7 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
             'name' => 'total_amount',
             'alias' => 'contribution1',
             'title' => ts('Range One Stat'),
-            'type' => CRM_Utils_Type::T_MONEY,
+            'type' => CRM_Utils_Type::T_STRING,
             'default' => TRUE,
             'required' => TRUE,
             'clause' => 'contribution_civireport1.total_amount_count as contribution1_total_amount_count, contribution_civireport1.total_amount_sum as contribution1_total_amount_sum',
@@ -184,7 +192,7 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
             'name' => 'total_amount',
             'alias' => 'contribution2',
             'title' => ts('Range Two Stat'),
-            'type' => CRM_Utils_Type::T_MONEY,
+            'type' => CRM_Utils_Type::T_STRING,
             'default' => TRUE,
             'required' => TRUE,
             'clause' => 'contribution_civireport2.total_amount_count as contribution2_total_amount_count, contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
@@ -602,7 +610,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
 
     foreach ($checkDate as $date_range => $range_data) {
       foreach ($range_data as $key => $value) {
-        if (CRM_Utils_Date::isDate($value)) {
+        if (!CRM_Utils_System::isNull($value)) {
           $errorCount[$date_range][$key]['valid'] = 'true';
           $errorCount[$date_range][$key]['is_empty'] = 'false';
         }
@@ -664,7 +672,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */
@@ -882,8 +890,8 @@ GROUP BY    currency
     $from2 = CRM_Utils_Date::customFormat($from2, NULL, array('d'));
     $to2 = CRM_Utils_Date::customFormat($to2, NULL, array('d'));
 
-    $this->_columnHeaders['contribution1_total_amount_sum']['title'] = "$from1 -<br/> $to1";
-    $this->_columnHeaders['contribution2_total_amount_sum']['title'] = "$from2 -<br/> $to2";
+    $this->_columnHeaders['contribution1_total_amount_sum']['title'] = "$from1 - $to1";
+    $this->_columnHeaders['contribution2_total_amount_sum']['title'] = "$from2 - $to2";
     unset($this->_columnHeaders['contribution1_total_amount_count'],
       $this->_columnHeaders['contribution2_total_amount_count']
     );

@@ -40,7 +40,7 @@
               </td>
               <td class="crm-badge-layout-is_default">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}&nbsp;
               </td>
-              <td>{$row.action|replace:'xx':$row.id}</td>
+              <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
             </tr>
           {/foreach}
         </table>
@@ -48,7 +48,7 @@
 
       {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          {crmButton q="action=add&reset=1" id="newbadge-layout" icon="crm-i fa-plus-circle"}{ts}New Badge Layout{/ts}{/crmButton}
+          {crmButton q="action=add&reset=1" id="newbadge-layout" icon="plus-circle"}{ts}New Badge Layout{/ts}{/crmButton}
         </div>
       {/if}
     </div>

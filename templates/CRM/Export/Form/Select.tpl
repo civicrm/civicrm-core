@@ -29,7 +29,7 @@
   </div>
 
   <div id="map" class="crm-section crm-export-mapping-section">
-      {if $form.mapping }
+      {if !empty($form.mapping)}
         <div class="label crm-label-export-mapping">
             {$form.mapping.label}
         </div>

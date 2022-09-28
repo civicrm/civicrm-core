@@ -39,7 +39,7 @@ class SequenceListener implements CaseChangeListener {
    *
    * @param \Civi\CCase\Event\CaseChangeEvent $event
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @return void
    */
   public function onCaseChange(\Civi\CCase\Event\CaseChangeEvent $event) {

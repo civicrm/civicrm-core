@@ -4,13 +4,17 @@
 /ext/*
 !/ext/afform
 !/ext/authx
+!/ext/civigrant
+!/ext/civicrm_admin_ui
 !/ext/sequentialcreditnotes
 !/ext/flexmailer
 !/ext/eventcart
 !/ext/ewaysingle
 !/ext/greenwich
+!/ext/elavon
 /ext/greenwich/dist
 /ext/greenwich/extern
+!/ext/message_admin
 !/ext/oauth-client
 !/ext/search_kit
 !/ext/financialacls
@@ -19,6 +23,7 @@
 !/ext/payflowpro
 !/ext/ckeditor4
 !/ext/legacycustomsearches
+!/ext/civiimport
 backdrop/
 bower_components
 CRM/Case/xml/configuration

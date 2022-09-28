@@ -1,5 +1,5 @@
 {
-  "title": "Individual Name (default)",
+  "title": "Individual Name",
   "type": "block",
-  "block": "Individual"
+  "entity_type": "Individual"
 }

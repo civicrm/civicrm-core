@@ -22,10 +22,7 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
    */
   public function run() {
     $config = CRM_Core_Config::singleton();
-    if (!$config->debug && (!array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
-        $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest"
-      )
-    ) {
+    if (!$config->debug && !CRM_Utils_REST::isWebServiceRequest()) {
       $response = [
         'error_code' => 401,
         'error_message' => "SECURITY ALERT: Ajax requests can only be issued by javascript clients, eg. CRM.api4().",
@@ -43,7 +40,8 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       CRM_Utils_System::civiExit();
     }
     if ($_SERVER['REQUEST_METHOD'] == 'GET' &&
-      strtolower(substr($this->urlPath[4], 0, 3)) != 'get') {
+      ($this->urlPath[4] !== 'autocomplete' && strtolower(substr($this->urlPath[4], 0, 3)) !== 'get')
+    ) {
       $response = [
         'error_code' => 400,
         'error_message' => "SECURITY: All requests that modify the database must be http POST, not GET.",
@@ -61,8 +59,9 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       CRM_Utils_System::civiExit();
     }
     try {
-      // Call multiple
+      // Two call formats. Which one was used? Note: CRM_Api4_Permission::check() and CRM_Api4_Page_AJAX::run() should have matching conditionals.
       if (empty($this->urlPath[3])) {
+        // Received multi-call format
         $calls = CRM_Utils_Request::retrieve('calls', 'String', CRM_Core_DAO::$_nullObject, TRUE, NULL, 'POST');
         $calls = json_decode($calls, TRUE);
         $response = [];
@@ -70,8 +69,8 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
           $response[$index] = call_user_func_array([$this, 'execute'], $call);
         }
       }
-      // Call single
       else {
+        // Received single-call format
         $entity = $this->urlPath[3];
         $action = $this->urlPath[4];
         $params = CRM_Utils_Request::retrieve('params', 'String');
@@ -145,6 +144,12 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
     }
     unset($vals['rowCount']);
     $vals['count'] = $result->count();
+    $vals['countFetched'] = $result->countFetched();
+    if (in_array('row_count', $params['select'] ?? [])) {
+      // We can only return countMatched (whose value is independent of LIMIT clauses) if row_count was in the select.
+      $vals['countMatched'] = $result->count();
+    }
+
     return $vals;
   }
 

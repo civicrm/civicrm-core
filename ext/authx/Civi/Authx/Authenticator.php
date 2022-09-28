@@ -28,6 +28,12 @@ class Authenticator {
   protected $authxUf;
 
   /**
+   * @var string
+   *   Ex: 'send' or 'exception
+   */
+  protected $rejectMode = 'send';
+
+  /**
    * Authenticator constructor.
    */
   public function __construct() {
@@ -40,32 +46,54 @@ class Authenticator {
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
    *   Details for the 'civi.invoke.auth' event.
-   * @param array $details
-   *   Mix of these properties:
+   * @param array{flow: string, useSession: ?bool, cred: ?string, principal: ?array} $details
+   *   Describe the authentication process with these properties:
+   *
    *   - string $flow (required);
    *     The type of authentication flow being used
    *     Ex: 'param', 'header', 'auto'
-   *   - string $cred (required)
-   *     The credential, as formatted in the 'Authorization' header.
-   *     Ex: 'Bearer 12345', 'Basic ASDFFDSA=='
    *   - bool $useSession (default FALSE)
    *     If TRUE, then the authentication should be persistent (in a session variable).
    *     If FALSE, then the authentication should be ephemeral (single page-request).
+   *
+   *   And then ONE of these properties to describe the user/principal:
+   *
+   *   - string $cred
+   *     The credential, as formatted in the 'Authorization' header.
+   *     Ex: 'Bearer 12345', 'Basic ASDFFDSA=='
+   *   - array $principal
+   *     Description of a validated principal.
+   *     Must include 'contactId', 'userId', xor 'user'
    * @return bool
    *   Returns TRUE on success.
    *   Exits with failure
    * @throws \Exception
    */
   public function auth($e, $details) {
+    if (!(isset($details['cred']) xor isset($details['principal']))) {
+      $this->reject('Authentication logic error: Must specify "cred" xor "principal".');
+    }
+    if (!isset($details['flow'])) {
+      $this->reject('Authentication logic error: Must specify "flow".');
+    }
+
     $tgt = AuthenticatorTarget::create([
       'flow' => $details['flow'],
-      'cred' => $details['cred'],
+      'cred' => $details['cred'] ?? NULL,
       'siteKey' => $details['siteKey'] ?? NULL,
       'useSession' => $details['useSession'] ?? FALSE,
     ]);
-    if ($principal = $this->checkCredential($tgt)) {
-      $tgt->setPrincipal($principal);
+
+    if (isset($tgt->cred)) {
+      if ($principal = $this->checkCredential($tgt)) {
+        $tgt->setPrincipal($principal);
+      }
     }
+    elseif (isset($details['principal'])) {
+      $details['principal']['credType'] = 'assigned';
+      $tgt->setPrincipal($details['principal']);
+    }
+
     $this->checkPolicy($tgt);
     $this->login($tgt);
     return TRUE;
@@ -132,12 +160,19 @@ class Authenticator {
       $this->reject('Invalid credential');
     }
 
-    $allowCreds = \Civi::settings()->get('authx_' . $tgt->flow . '_cred');
-    if (!in_array($tgt->credType, $allowCreds)) {
-      $this->reject(sprintf('Authentication type "%s" is not allowed for this principal.', $tgt->credType));
+    if ($tgt->contactId) {
+      $findContact = \Civi\Api4\Contact::get(0)->addWhere('id', '=', $tgt->contactId);
+      if ($findContact->execute()->count() === 0) {
+        $this->reject(sprintf('Contact ID %d is invalid', $tgt->contactId));
+      }
     }
 
-    $userMode = \Civi::settings()->get('authx_' . $tgt->flow . '_user');
+    $allowCreds = \Civi::settings()->get('authx_' . $tgt->flow . '_cred') ?: [];
+    if ($tgt->credType !== 'assigned' && !in_array($tgt->credType, $allowCreds)) {
+      $this->reject(sprintf('Authentication type "%s" with flow "%s" is not allowed for this principal.', $tgt->credType, $tgt->flow));
+    }
+
+    $userMode = \Civi::settings()->get('authx_' . $tgt->flow . '_user') ?: 'optional';
     switch ($userMode) {
       case 'ignore':
         $tgt->userId = NULL;
@@ -162,6 +197,7 @@ class Authenticator {
       $passGuard[] = in_array('perm', $useGuards) && isset($perms[$tgt->credType]) && \CRM_Core_Permission::check($perms[$tgt->credType], $tgt->contactId);
       // JWTs are signed by us. We don't need user to prove that they're allowed to use them.
       $passGuard[] = ($tgt->credType === 'jwt');
+      $passGuard[] = ($tgt->credType === 'assigned');
       if (!max($passGuard)) {
         $this->reject(sprintf('Login not permitted. Must satisfy guard (%s).', implode(', ', $useGuards)));
       }
@@ -182,7 +218,8 @@ class Authenticator {
 
     if (\CRM_Core_Session::getLoggedInContactID() || $this->authxUf->getCurrentUserId()) {
       if ($isSameValue(\CRM_Core_Session::getLoggedInContactID(), $tgt->contactId)  && $isSameValue($this->authxUf->getCurrentUserId(), $tgt->userId)) {
-        // Already logged in. Nothing to do.
+        // Already logged in. Post-condition met - but by unusual means.
+        \CRM_Core_Session::singleton()->set('authx', $tgt->createAlreadyLoggedIn());
         return;
       }
       else {
@@ -196,7 +233,7 @@ class Authenticator {
 
     if (empty($tgt->contactId)) {
       // It shouldn't be possible to get here due policy checks. But just in case.
-      throw new \LogicException("Cannot login. Failed to determine contact ID.");
+      $this->reject("Cannot login. Failed to determine contact ID.");
     }
 
     if (!($tgt->useSession)) {
@@ -223,11 +260,26 @@ class Authenticator {
   }
 
   /**
+   * Specify the rejection mode.
+   *
+   * @param string $mode
+   * @return $this
+   */
+  public function setRejectMode(string $mode) {
+    $this->rejectMode = $mode;
+    return $this;
+  }
+
+  /**
    * Reject a bad authentication attempt.
    *
    * @param string $message
    */
   protected function reject($message = 'Authentication failed') {
+    if ($this->rejectMode === 'exception') {
+      throw new AuthxException($message);
+    }
+
     \CRM_Core_Session::useFakeSession();
     $r = new Response(401, ['Content-Type' => 'text/plain'], "HTTP 401 $message");
     \CRM_Utils_System::sendResponse($r);
@@ -241,7 +293,7 @@ class AuthenticatorTarget {
    * The authentication-flow by which we received the credential.
    *
    * @var string
-   *   Ex: 'param', 'header', 'xheader', 'auto'
+   *   Ex: 'param', 'header', 'xheader', 'auto', 'script'
    */
   public $flow;
 
@@ -316,20 +368,29 @@ class AuthenticatorTarget {
    * Specify the authenticated principal for this request.
    *
    * @param array $args
-   *   Mix of: 'userId', 'contactId', 'credType'
+   *   Mix of: 'user', 'userId', 'contactId', 'credType'
    *   It is valid to give 'userId' or 'contactId' - the missing one will be
    *   filled in via UFMatch (if available).
    * @return $this
    */
   public function setPrincipal($args) {
+    if (!empty($args['user'])) {
+      $args['userId'] = $args['userId'] ?? \CRM_Core_Config::singleton()->userSystem->getUfId($args['user']);
+      if ($args['userId']) {
+        unset($args['user']);
+      }
+      else {
+        throw new AuthxException("Must specify principal with valid user, userId, or contactId");
+      }
+    }
     if (empty($args['userId']) && empty($args['contactId'])) {
-      throw new \InvalidArgumentException("Must specify principal by userId and/or contactId");
+      throw new AuthxException("Must specify principal with valid user, userId, or contactId");
     }
     if (empty($args['credType'])) {
-      throw new \InvalidArgumentException("Must specify the type of credential used to identify the principal");
+      throw new AuthxException("Must specify the type of credential used to identify the principal");
     }
     if ($this->hasPrincipal()) {
-      throw new \LogicException("Principal has already been specified");
+      throw new AuthxException("Principal has already been specified");
     }
 
     if (empty($args['contactId']) && !empty($args['userId'])) {
@@ -356,7 +417,7 @@ class AuthenticatorTarget {
    * The redacted version may be retained in the (real or fake) session and consulted by more
    * fine-grained access-controls.
    *
-   * @return array
+   * @return array{flow: string, credType: string, jwt: ?array, useSession: bool, userId: ?int, contactId: ?int}
    */
   public function createRedacted(): array {
     return [
@@ -366,6 +427,37 @@ class AuthenticatorTarget {
       'credType' => $this->credType,
       'jwt' => $this->jwt,
       'useSession' => $this->useSession,
+      'userId' => $this->userId,
+      'contactId' => $this->contactId,
+    ];
+  }
+
+  /**
+   * Describe the (OK-ish) authentication outcome wherein the same user was
+   * already authenticated.
+   *
+   * Ex: cv ev --user=demo "return authx_login(['principal' => ['user' => 'demo']], false);"
+   *
+   * In this example, `cv ev --user=demo` does an initial login, and then `authx_login()` tries
+   * to login a second time. This is sort of an error for `authx_login()` (_since it doesn't
+   * really do auth_); but it's sort of OK (because the post-conditions are met). It's sort of
+   * a code-smell (because flows with multiple login-calls are ill-advised - and may raise
+   * exceptions with different data).
+   *
+   * @return array{flow: string, credType: string, jwt: ?array, useSession: bool, userId: ?int, contactId: ?int}
+   */
+  public function createAlreadyLoggedIn(): array {
+    \Civi::log()->warning('Principal was already authenticated. Ignoring request to re-authenticate.', [
+      'userId' => $this->userId,
+      'contactId' => $this->contactId,
+      'requestedFlow' => $this->flow,
+      'requestedCredType' => $this->credType,
+    ]);
+    return [
+      'flow' => 'already-logged-in',
+      'credType' => 'already-logged-in',
+      'jwt' => NULL,
+      'useSession' => !\CRM_Utils_Constant::value('_CIVICRM_FAKE_SESSION'),
       'userId' => $this->userId,
       'contactId' => $this->contactId,
     ];

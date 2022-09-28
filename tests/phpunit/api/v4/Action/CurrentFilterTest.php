@@ -20,13 +20,14 @@
 namespace api\v4\Action;
 
 use Civi\Api4\Relationship;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class CurrentFilterTest extends UnitTestCase {
+class CurrentFilterTest extends Api4TestBase implements TransactionalInterface {
 
   public function testCurrentRelationship() {
     $cid1 = Contact::create()->addValue('first_name', 'Bob1')->execute()->first()['id'];
@@ -83,6 +84,12 @@ class CurrentFilterTest extends UnitTestCase {
     $this->assertArrayNotHasKey($expiring['id'], $notCurrent);
     $this->assertArrayHasKey($past['id'], $notCurrent);
     $this->assertArrayHasKey($inactive['id'], $notCurrent);
+
+    // Assert that "Extra" fields like is_current are not returned with select *
+    $defaultGet = Relationship::get()->setLimit(1)->execute()->single();
+    $this->assertArrayNotHasKey('is_current', $defaultGet);
+    $starGet = Relationship::get()->addSelect('*')->setLimit(1)->execute()->single();
+    $this->assertArrayNotHasKey('is_current', $starGet);
   }
 
 }

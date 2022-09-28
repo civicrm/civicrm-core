@@ -38,7 +38,7 @@ class CRM_Admin_Form_Setting_Date extends CRM_Admin_Form_Setting {
    * Build the form object.
    */
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Settings - Date'));
+    $this->setTitle(ts('Settings - Date'));
 
     parent::buildQuickForm();
   }

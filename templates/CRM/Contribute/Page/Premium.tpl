@@ -34,7 +34,7 @@
           <td class="crm-contribution-form-block-min_contribution">{$row.min_contribution|crmMoney}</td>
           <td class="crm-contribution-form-block-cost">{$row.cost|crmMoney}</td>
           <td class="crm-contribution-form-block-financial_type">{$row.financial_type}</td>
-          <td class="nowrap crm-contribution-form-block-weight">{$row.weight}</td>
+          <td class="nowrap crm-contribution-form-block-weight">{$row.weight|smarty:nodefaults}</td>
           <td class="crm-contribution-form-block-action">{$row.action}</td>
         </tr>
         {/foreach}

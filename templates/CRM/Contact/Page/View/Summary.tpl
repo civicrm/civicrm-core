@@ -26,7 +26,7 @@
         {if !empty($searchKey)}
           {assign var='urlParams' value=$urlParams|cat:"&key=$searchKey"}
         {/if}
-        {if !empty($context)}
+        {if $context}
           {assign var='urlParams' value=$urlParams|cat:"&context=$context"}
         {/if}
 
@@ -93,7 +93,7 @@
           {/if}
         {/if}
 
-        {if !empty($groupOrganizationUrl)}
+        {if $groupOrganizationUrl}
           <li class="crm-contact-associated-groups">
             {crmButton href=$groupOrganizationUrl class="associated-groups" icon="cubes"}
               {ts}Associated Multi-Org Group{/ts}
@@ -110,11 +110,11 @@
     <div id="mainTabContainer">
       <ul class="crm-contact-tabs-list">
         {foreach from=$allTabs item=tabValue}
-          <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all{if isset($tabValue.count)} crm-count-{$tabValue.count}{/if}{if isset($tabValue.class)} {$tabValue.class}{/if}">
-            <a href="{if !empty($tabValue.template)}#contact-{$tabValue.id}{else}{$tabValue.url}{/if}" title="{$tabValue.title|escape}">
-              <i class="{if $tabValue.icon}{$tabValue.icon}{else}crm-i fa-puzzle-piece{/if}" aria-hidden="true"></i>
+          <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all{if is_numeric($tabValue.count)} crm-count-{$tabValue.count}{/if}{if $tabValue.class} {$tabValue.class}{/if}">
+            <a href="{if $tabValue.template}#contact-{$tabValue.id}{else}{$tabValue.url|smarty:nodefaults}{/if}" title="{$tabValue.title|escape}">
+              <i class="{if !empty($tabValue.icon)}{$tabValue.icon}{else}crm-i fa-puzzle-piece{/if}" aria-hidden="true"></i>
               <span>{$tabValue.title}</span>
-              {if empty($tabValue.hideCount)}<em>{if isset($tabValue.count)}{$tabValue.count}{/if}</em>{/if}
+              {if empty($tabValue.hideCount)}<em>{if is_numeric($tabValue.count)}{$tabValue.count}{/if}</em>{/if}
             </a>
           </li>
         {/foreach}

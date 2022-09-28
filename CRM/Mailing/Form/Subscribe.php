@@ -43,7 +43,7 @@ SELECT   title, frontend_title, description, frontend_description
       $dao = CRM_Core_DAO::executeQuery($query);
       if ($dao->fetch()) {
         $this->assign('groupName', !empty($dao->frontend_title) ? $dao->frontend_title : $dao->title);
-        CRM_Utils_System::setTitle(ts('Subscribe to Mailing List - %1', [1 => !empty($dao->frontend_title) ? $dao->frontend_title : $dao->title]));
+        $this->setTitle(ts('Subscribe to Mailing List - %1', [1 => !empty($dao->frontend_title) ? $dao->frontend_title : $dao->title]));
       }
       else {
         CRM_Core_Error::statusBounce("The specified group is not configured for this action OR The group doesn't exist.");
@@ -53,7 +53,7 @@ SELECT   title, frontend_title, description, frontend_description
     }
     else {
       $this->assign('single', FALSE);
-      CRM_Utils_System::setTitle(ts('Mailing List Subscription'));
+      $this->setTitle(ts('Mailing List Subscription'));
     }
   }
 
@@ -105,23 +105,11 @@ ORDER BY title";
       $this->addFormRule(['CRM_Mailing_Form_Subscribe', 'formRule']);
     }
 
-    // CRM-11316 Enable ReCAPTCHA for anonymous visitors
-    $session = CRM_Core_Session::singleton();
-    $contactID = $session->get('userID');
-
-    if (!$contactID) {
-      CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
-    }
-
     $this->addButtons([
       [
         'type' => 'next',
         'name' => ts('Subscribe'),
         'isDefault' => TRUE,
-      ],
-      [
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
       ],
     ]);
   }

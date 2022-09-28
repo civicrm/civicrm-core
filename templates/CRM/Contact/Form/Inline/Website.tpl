@@ -21,7 +21,7 @@
     <tr>
       <td>{ts}Website{/ts}
         {help id="id-website" file="CRM/Contact/Form/Contact.hlp"}
-        {if $actualBlockCount lt 5 }
+        {if $actualBlockCount lt 25 }
           &nbsp;&nbsp;<span id="add-more-website" title="{ts}click to add more{/ts}"><a class="crm-hover-button action-item add-more-inline" href="#">{ts}add{/ts}</a></span>
         {/if}
       </td>

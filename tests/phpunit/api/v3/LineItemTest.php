@@ -30,7 +30,6 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
    * Prepare for test.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setUp(): void {
     parent::setUp();

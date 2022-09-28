@@ -33,12 +33,12 @@
  *
  * @return array
  * @throws \CRM_Core_Exception
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_profile_get($params) {
   $nonStandardLegacyBehaviour = is_numeric($params['profile_id']);
   if (!empty($params['check_permissions']) && !empty($params['contact_id']) && !1 === civicrm_api3('contact', 'getcount', ['contact_id' => $params['contact_id'], 'check_permissions' => 1])) {
-    throw new API_Exception('permission denied');
+    throw new CRM_Core_Exception('permission denied');
   }
   $profiles = (array) $params['profile_id'];
   $values = [];
@@ -51,7 +51,7 @@ function civicrm_api3_profile_get($params) {
       continue;
     }
     if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $profileID, 'is_active')) {
-      throw new API_Exception('Invalid value for profile_id : ' . $profileID);
+      throw new CRM_Core_Exception('Invalid value for profile_id : ' . $profileID);
     }
 
     $isContactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileType($profileID);
@@ -76,7 +76,7 @@ function civicrm_api3_profile_get($params) {
       $params['profile_id']
       );
       if (!empty($errors)) {
-        throw new API_Exception(array_pop($errors));
+        throw new CRM_Core_Exception(array_pop($errors));
       }
 
       $contactFields = $activityFields = [];
@@ -140,7 +140,7 @@ function _civicrm_api3_profile_get_spec(&$params) {
  *
  * @param array $params
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @return array
  *   API result array
  */
@@ -148,13 +148,13 @@ function civicrm_api3_profile_submit($params) {
   $profileID = _civicrm_api3_profile_getProfileID($params['profile_id']);
   if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $profileID, 'is_active')) {
     //@todo declare pseudoconstant & let api do this
-    throw new API_Exception('Invalid value for profile_id');
+    throw new CRM_Core_Exception('Invalid value for profile_id');
   }
 
   $isContactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileType($profileID);
 
   if (!empty($params['id']) && CRM_Core_BAO_UFField::checkProfileType($profileID) && !$isContactActivityProfile) {
-    throw new API_Exception('Update profiles including more than one entity not currently supported');
+    throw new CRM_Core_Exception('Update profiles including more than one entity not currently supported');
   }
 
   $contactParams = $activityParams = $missingParams = [];
@@ -169,7 +169,7 @@ function civicrm_api3_profile_submit($params) {
       $profileID
     );
     if (!empty($errors)) {
-      throw new API_Exception(array_pop($errors));
+      throw new CRM_Core_Exception(array_pop($errors));
     }
   }
 
@@ -193,7 +193,7 @@ function civicrm_api3_profile_submit($params) {
     $contactEntities = ['contact', 'individual', 'organization', 'household'];
     $locationEntities = ['email', 'address', 'phone', 'website', 'im'];
 
-    $entity = strtolower(CRM_Utils_Array::value('entity', $field));
+    $entity = strtolower(CRM_Utils_Array::value('entity', $field, ''));
     if ($entity && !in_array($entity, array_merge($contactEntities, $locationEntities))) {
       switch ($entity) {
         case 'note':
@@ -339,7 +339,7 @@ function civicrm_api3_profile_set($params) {
  *   Array of property name/value.
  *   pairs to profile field values
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @return array
  *
  * @todo add example
@@ -367,7 +367,7 @@ function civicrm_api3_profile_apply($params) {
   );
 
   if (empty($data)) {
-    throw new API_Exception('Unable to format profile parameters.');
+    throw new CRM_Core_Exception('Unable to format profile parameters.');
   }
 
   return civicrm_api3_create_success($data);
@@ -485,7 +485,7 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
  * @param int $profileID
  * @param int $optionsBehaviour
  *   0 = don't resolve, 1 = resolve non-aggressively, 2 = resolve aggressively - ie include country & state.
- * @param $is_flush
+ * @param bool $is_flush
  *
  * @return array|void
  */
@@ -604,6 +604,7 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour, 
        */
     }
   }
+  $profileFields[$profileID] = $profileFields[$profileID] ?? [];
   uasort($profileFields[$profileID], "_civicrm_api3_order_by_weight");
   return $profileFields[$profileID];
 }
@@ -622,7 +623,7 @@ function _civicrm_api3_order_by_weight($a, $b) {
  * Here we map the profile fields as stored in the uf_field table to their 'real entity'
  * we also return the profile fieldname
  *
- * @param $field
+ * @param array $field
  *
  * @return array
  */
@@ -698,7 +699,7 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
  * @param int $profileID
  *
  * @return int|string
- * @throws CiviCRM_API3_Exception
+ * @throws CRM_Core_Exception
  */
 function _civicrm_api3_profile_getProfileID($profileID) {
   if (!empty($profileID) && strtolower($profileID) != 'billing' && !is_numeric($profileID)) {
@@ -715,7 +716,7 @@ function _civicrm_api3_profile_getProfileID($profileID) {
  *
  * e.g getfields response incl 'membership_type_id' - with api.aliases = 'membership_type'
  * returned array will include both as keys (with the same values)
- * @param $entity
+ * @param string $entity
  *
  * @return array
  */

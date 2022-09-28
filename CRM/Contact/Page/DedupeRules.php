@@ -113,13 +113,16 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
    * Browse all rule groups.
    */
   public function browse() {
-    // get all rule groups
-    $ruleGroups = [];
+    $contactTypes = array_column(CRM_Contact_BAO_ContactType::basicTypeInfo(), 'label', 'name');
+    $dedupeRuleTypes = CRM_Core_SelectValues::getDedupeRuleTypes();
+    $ruleGroups = array_fill_keys(array_keys($contactTypes), []);
+
+    // Get rule groups for enabled contact types
     $dao = new CRM_Dedupe_DAO_DedupeRuleGroup();
-    $dao->orderBy('contact_type ASC, used ASC, title ASC');
+    $dao->orderBy('used ASC, title ASC');
+    $dao->whereAdd('contact_type IN ("' . implode('","', array_keys($contactTypes)) . '")');
     $dao->find();
 
-    $dedupeRuleTypes = CRM_Core_SelectValues::getDedupeRuleTypes();
     while ($dao->fetch()) {
       $ruleGroups[$dao->contact_type][$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $ruleGroups[$dao->contact_type][$dao->id]);
@@ -127,10 +130,6 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
       // form all action links
       $action = array_sum(array_keys($this->links()));
       $links = self::links();
-      /* if ($dao->is_default) {
-      unset($links[CRM_Core_Action::MAP]);
-      unset($links[CRM_Core_Action::DELETE]);
-      }*/
 
       if ($dao->is_reserved) {
         unset($links[CRM_Core_Action::DELETE]);
@@ -150,6 +149,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
       $ruleGroups[$dao->contact_type][$dao->id]['used_display'] = $dedupeRuleTypes[$ruleGroups[$dao->contact_type][$dao->id]['used']];
     }
     $this->assign('brows', $ruleGroups);
+    $this->assign('contactTypes', $contactTypes);
   }
 
   /**

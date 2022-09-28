@@ -17,16 +17,6 @@
 class CRM_Case_XMLProcessor {
 
   /**
-   * FIXME: This does *NOT* belong in a static property, but we're too late in
-   * the 4.5-cycle to do the necessary cleanup.
-   *
-   * Format is [int $id => string $relTypeCname].
-   *
-   * @var array|null
-   */
-  public static $activityTypes = NULL;
-
-  /**
    * @param $caseType
    *
    * @return FALSE|SimpleXMLElement
@@ -59,22 +49,6 @@ class CRM_Case_XMLProcessor {
     $caseType = str_replace('_', ' ', $caseType);
     $caseType = CRM_Utils_String::munge(ucwords($caseType), '', 0);
     return $caseType;
-  }
-
-  /**
-   * @deprecated
-   *
-   * @param bool $indexName
-   * @param bool $all
-   *
-   * @return array
-   */
-  public static function &allActivityTypes($indexName = TRUE, $all = FALSE) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Case_PseudoConstant::caseActivityType');
-    if (self::$activityTypes === NULL) {
-      self::$activityTypes = CRM_Case_PseudoConstant::caseActivityType($indexName, $all);
-    }
-    return self::$activityTypes;
   }
 
   /**
@@ -122,7 +96,6 @@ class CRM_Case_XMLProcessor {
    * FIXME: This should not exist
    */
   public static function flushStaticCaches() {
-    self::$activityTypes = NULL;
     unset(Civi::$statics[__CLASS__]['reltypes']);
   }
 

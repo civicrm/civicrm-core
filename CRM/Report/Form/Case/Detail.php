@@ -28,7 +28,10 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
 
   protected $_caseDetailExtra = [];
 
-  protected $_customGroupExtends = ['Case'];
+  protected $_customGroupExtends = [
+    'Case',
+    'Contact',
+  ];
 
   protected $_caseTypeNameOrderBy = FALSE;
 
@@ -56,9 +59,13 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
             'no_display' => TRUE,
             'required' => TRUE,
           ],
+          'case_id' => [
+            'title' => ts('Case ID'),
+            'type' => CRM_Utils_Type::T_INT,
+          ],
           'subject' => [
             'title' => ts('Subject'),
-            'required' => TRUE,
+            'default' => TRUE,
           ],
           'start_date' => [
             'title' => ts('Start Date'),
@@ -122,7 +129,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         'dao' => 'CRM_Case_DAO_Case',
         'order_bys' => [
           'case_type_title' => [
-            'title' => 'Case Type',
+            'title' => ts('Case Type'),
             'name' => 'title',
           ],
         ],
@@ -190,6 +197,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         'dao' => 'CRM_Core_DAO_Address',
         'fields' => [
           'street_address' => NULL,
+          'city' => NULL,
           'state_province_id' => [
             'title' => ts('State/Province'),
           ],
@@ -244,6 +252,12 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           ],
         ],
         'filters' => [
+          'last_activity_activity_type' => [
+            'name' => 'activity_type_id',
+            'title' => ts('Activity type of the last activity'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE),
+          ],
           'last_activity_date_time' => [
             'name' => 'activity_date_time',
             'title' => ts('Last Action Date'),
@@ -468,7 +482,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */

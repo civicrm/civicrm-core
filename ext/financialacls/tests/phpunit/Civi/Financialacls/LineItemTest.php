@@ -3,6 +3,8 @@
 namespace Civi\Financialacls;
 
 // I fought the Autoloader and the autoloader won.
+use Civi\Api4\LineItem;
+
 require_once 'BaseTestClass.php';
 
 /**
@@ -25,10 +27,12 @@ class LineItemTest extends BaseTestClass {
    * Test api applies permissions on line item actions (delete & get).
    *
    * @dataProvider versionThreeAndFour
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testLineItemApiPermissions($version): void {
     $contact1 = $this->individualCreate();
+    $lineItems = $this->callAPISuccess('LineItem', 'get', ['sequential' => TRUE])['values'];
+    $this->assertCount(0, $lineItems);
     $this->createPriceSet();
     $order = $this->callAPISuccess('Order', 'create', [
       'financial_type_id' => 'Donation',
@@ -72,7 +76,7 @@ class LineItemTest extends BaseTestClass {
       'price_field_id' => $this->ids['PriceField'][0],
       'qty' => 1,
       'financial_type_id' => 'Donation',
-      'check_permissions' => ($version == 3),
+      'check_permissions' => ($version === 3),
     ];
     $line = $this->callAPISuccess('LineItem', 'Create', $lineParams);
     $lineParams['financial_type_id'] = 'Event Fee';
@@ -80,7 +84,8 @@ class LineItemTest extends BaseTestClass {
     $this->callAPIFailure('LineItem', 'Create', $lineParams);
 
     $this->callAPIFailure('LineItem', 'Create', ['id' => $line['id'], 'check_permissions' => TRUE, 'financial_type_id' => 'Event Fee']);
-    $this->callAPISuccess('LineItem', 'Create', ['id' => $line['id'], 'check_permissions' => ($version == 3), 'financial_type_id' => 'Donation']);
+    $invalidLineItem = $this->callAPISuccess('LineItem', 'Create', ['id' => $line['id'], 'check_permissions' => ($version == 3), 'financial_type_id' => 'Donation']);
+    LineItem::delete(FALSE)->addWhere('id', '=', $invalidLineItem['id'])->execute();
   }
 
 }

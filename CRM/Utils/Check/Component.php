@@ -23,7 +23,7 @@ abstract class CRM_Utils_Check_Component {
    *
    * @return array
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function getChecksConfig() {
@@ -65,7 +65,7 @@ abstract class CRM_Utils_Check_Component {
    *
    * @return CRM_Utils_Check_Message[]
    *
-   * @throws API_Exception
+   * @throws CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function checkAll($requestedChecks = [], $includeDisabled = FALSE) {
@@ -105,7 +105,7 @@ abstract class CRM_Utils_Check_Component {
    *
    * @return bool
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function isDisabled($method) {

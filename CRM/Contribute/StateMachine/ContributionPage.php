@@ -34,8 +34,6 @@ class CRM_Contribute_StateMachine_ContributionPage extends CRM_Core_StateMachine
     $session = CRM_Core_Session::singleton();
     $session->set('singleForm', FALSE);
 
-    $config = CRM_Core_Config::singleton();
-
     $this->_pages = [
       'CRM_Contribute_Form_ContributionPage_Settings' => NULL,
       'CRM_Contribute_Form_ContributionPage_Amount' => NULL,
@@ -48,7 +46,7 @@ class CRM_Contribute_StateMachine_ContributionPage extends CRM_Core_StateMachine
       'CRM_Contribute_Form_ContributionPage_Widget' => NULL,
     ];
 
-    if (!in_array("CiviMember", $config->enableComponents)) {
+    if (!CRM_Core_Component::isEnabled('CiviMember')) {
       unset($this->_pages['CRM_Member_Form_MembershipBlock']);
     }
 

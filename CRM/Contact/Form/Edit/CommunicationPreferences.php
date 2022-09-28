@@ -68,8 +68,6 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
     //using for display purpose.
     $form->assign('commPreference', $commPreference);
 
-    $form->addField('preferred_mail_format', ['entity' => 'contact', 'label' => ts('Email Format')]);
-
     $form->addField('is_opt_out', ['entity' => 'contact', 'label' => ts('NO BULK EMAILS (User Opt Out)')]);
 
     $form->addField('communication_style_id', ['entity' => 'contact', 'type' => 'RadioGroup']);
@@ -82,8 +80,30 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
         'greeting_type' => $greeting,
       ];
 
-      //add addressee in Contact form
+      // Add addressee in Contact form.
       $greetingTokens = CRM_Core_PseudoConstant::greeting($filter);
+
+      // Instead of showing smarty token with/o conditional logic in Drop down
+      // list, show processed token (Only in Contact Edit mode).
+      // Get Description of each greeting.
+      $greetingTokensDescription = CRM_Core_PseudoConstant::greeting($filter, 'description');
+      if ($form->_contactId) {
+        $renderedGreetingTokens = CRM_Core_TokenSmarty::render($greetingTokens,
+          [
+            'contactId' => $form->_contactId,
+          ]
+        );
+        foreach ($greetingTokens as $key => &$emailGreetingString) {
+          if ($emailGreetingString) {
+            $emailGreetingString = $renderedGreetingTokens[$key];
+            $emailGreetingString = CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($emailGreetingString));
+            if (!empty($greetingTokensDescription[$key])) {
+              // Append description to processed greeting.
+              $emailGreetingString .= ' ( ' . $greetingTokensDescription[$key] . ' )';
+            }
+          }
+        }
+      }
       if (!empty($greetingTokens)) {
         $form->addElement('select', $fields['field'], $fields['label'],
           [
@@ -123,9 +143,6 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
       }
     }
 
-    if (array_key_exists('preferred_mail_format', $fields) && empty($fields['preferred_mail_format'])) {
-      $errors['preferred_mail_format'] = ts('Please select an email format preferred by this contact.');
-    }
     return empty($errors) ? TRUE : $errors;
   }
 

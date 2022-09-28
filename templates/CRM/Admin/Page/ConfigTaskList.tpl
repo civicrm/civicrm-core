@@ -89,7 +89,7 @@
             {else}
                 <td class="tasklist"><a href="{$config->userFrameworkBaseURL}?q=admin/user/permissions&civicrmDestination=civicrm/admin/configtask">{ts}Permissions for Anonymous Users{/ts}</a></td>
             {/if}
-            <td>{ts}You will also need to change Drupal permissions so anonymous users can make contributions, register for events and / or use profiles to enter contact information.{/ts} {docURL page="user/en/latest/initial-set-up/permissions-and-access-control" text="(learn more...)"}</td>
+            <td>{ts}You will also need to change Drupal permissions so anonymous users can make contributions, register for events and / or use profiles to enter contact information.{/ts} {docURL page="user/initial-set-up/permissions-and-access-control"}</td>
         </tr>
     {/if}
     {if $enabledComponents.CiviContribute eq 1}
@@ -102,7 +102,8 @@
 <br />
 
 <div class="description">
-    {capture assign=docLink}{docURL page="user/organising-your-data/overview" text="Organizing Your Data"}{/capture}
+    {capture assign=docUrlText}{ts}Organizing Your Data{/ts}{/capture}
+    {capture assign=docLink}{docURL page="user/organising-your-data/overview" text=$docUrlText}{/capture}
     {ts 1=$adminMenu 2=$docLink}The next set of tasks involve planning and have multiple steps. You may want to check out the %2 section in the User and Administrator Guide before you begin. You will not be returned to this page after completing these tasks, but you can always get back here from the <a href="%1">Administer CiviCRM</a> menu.{/ts}
 </div>
 

@@ -24,6 +24,8 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
+use Civi\Api4\MembershipType;
+
 /**
  *  Test CRM/Member/BAO Membership Log add , delete functions
  *
@@ -61,7 +63,6 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    * Set up for test.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setUp(): void {
     parent::setUp();
@@ -91,8 +92,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
       'visibility' => 'Public',
       'is_active' => 1,
     ];
-    $membershipType = CRM_Member_BAO_MembershipType::add($params);
-    $this->membershipTypeID = $membershipType->id;
+    $this->membershipTypeID = MembershipType::create()->setValues($params)->execute()->first()['id'];
     $this->membershipStatusID = $this->membershipStatusCreate('test status');
   }
 
@@ -113,7 +113,6 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    *  Test del function.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testDel() {
     list($contactID, $membershipID) = $this->setupMembership();
@@ -147,7 +146,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCreateMembershipWithPassedInModifiedID() {
+  public function testCreateMembershipWithPassedInModifiedID(): void {
     $modifier = $this->individualCreate();
     $membershipID = $this->setupMembership($modifier)[1];
     $this->assertEquals($modifier, $this->callAPISuccessGetValue('MembershipLog', ['membership_id' => $membershipID, 'return' => 'modified_id']));

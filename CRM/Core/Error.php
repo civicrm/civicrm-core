@@ -204,9 +204,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     CRM_Core_Error::debug_var('Fatal Error Details', $error, TRUE, TRUE, '', PEAR_LOG_ERR);
     CRM_Core_Error::backtrace('backTrace', TRUE);
 
+    $exit = TRUE;
     if ($config->initialized) {
       $content = $template->fetch('CRM/common/fatal.tpl');
       echo CRM_Utils_System::theme($content);
+      $exit = CRM_Utils_System::shouldExitAfterFatal();
     }
     else {
       echo "Sorry. A non-recoverable error has occurred. The error trace below might help to resolve the issue<p>";
@@ -217,7 +219,13 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       exit;
     }
     $runOnce = TRUE;
-    self::abend(CRM_Core_Error::FATAL_ERROR);
+
+    if ($exit) {
+      self::abend(CRM_Core_Error::FATAL_ERROR);
+    }
+    else {
+      self::inpageExceptionDisplay(CRM_Core_Error::FATAL_ERROR);
+    }
   }
 
   /**
@@ -242,9 +250,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * this function is used to return error details
+   * This function is used to return error details
    *
-   * @param $pearError
+   * @param PEAR_Error $pearError
    *
    * @return array $error
    */
@@ -442,9 +450,14 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
 
     echo CRM_Utils_System::theme($content);
+    $exit = CRM_Utils_System::shouldExitAfterFatal();
 
-    // fin
-    self::abend(CRM_Core_Error::FATAL_ERROR);
+    if ($exit) {
+      self::abend(CRM_Core_Error::FATAL_ERROR);
+    }
+    else {
+      self::inpageExceptionDisplay(CRM_Core_Error::FATAL_ERROR);
+    }
   }
 
   /**
@@ -452,7 +465,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * so we can interrupt a potential POST/redirect
    *
    * @param string $name name of debug section
-   * @param $variable mixed reference to variables that we need a trace of
+   * @param mixed $variable reference to variables that we need a trace of
    * @param bool $log should we log or return the output
    * @param bool $html whether to generate a HTML-escaped output
    * @param bool $checkPermission should we check permissions before displaying output
@@ -647,7 +660,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     // Use multiple (but stable) inputs for hash information.
     $md5inputs = [
       defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : 'NO_SITE_KEY',
-      $config->userFrameworkBaseURL,
+      CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE),
       md5($config->dsn),
       $config->dsn,
     ];
@@ -902,9 +915,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @param string $status
    *   The status message to set.
-   *
-   * @param null $redirect
-   * @param string $title
+   * @param string|null $redirect
+   * @param string|null $title
    */
   public static function statusBounce($status, $redirect = NULL, $title = NULL) {
     $session = CRM_Core_Session::singleton();
@@ -934,7 +946,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * PEAR error-handler which converts errors to exceptions
    *
-   * @param $pearError
+   * @param PEAR_Error $pearError
    * @throws PEAR_Exception
    */
   public static function exceptionHandler($pearError) {
@@ -999,13 +1011,44 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * Terminate execution abnormally.
    *
-   * @param string $code
+   * @param int $code
    */
   protected static function abend($code) {
     // do a hard rollback of any pending transactions
     // if we've come here, its because of some unexpected PEAR errors
     CRM_Core_Transaction::forceRollbackIfEnabled();
     CRM_Utils_System::civiExit($code);
+  }
+
+  /**
+   * Show in-page exception
+   * For situations where where calling abend will block the ability for a branded error screen
+   *
+   * Although the host page will run past this point, CiviCRM should not,
+   * therefore we trigger the civi.exit events
+   *
+   * @param string $code
+   */
+  protected static function inpageExceptionDisplay($code) {
+    // do a hard rollback of any pending transactions
+    // if we've come here, its because of some unexpected PEAR errors
+    CRM_Core_Transaction::forceRollbackIfEnabled();
+
+    if ($code > 0 && !headers_sent()) {
+      http_response_code(500);
+    }
+
+    // move things to CiviCRM cache as needed
+    CRM_Core_Session::storeSessionObjects();
+
+    if (Civi\Core\Container::isContainerBooted()) {
+      Civi::dispatcher()->dispatch('civi.core.exit');
+    }
+
+    $userSystem = CRM_Core_Config::singleton()->userSystem;
+    if (is_callable([$userSystem, 'onCiviExit'])) {
+      $userSystem->onCiviExit();
+    }
   }
 
   /**
@@ -1025,22 +1068,30 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * Output a deprecated function warning to log file.  Deprecated class:function is automatically generated from calling function.
+   * Output a deprecated function warning to log file.
+   *
+   * Deprecated class:function is automatically generated from calling function.
    *
    * @param string $newMethod
    *   description of new method (eg. "buildOptions() method in the appropriate BAO object").
-   * @param string $oldMethod
+   * @param string|null $oldMethod
    *   optional description of old method (if not the calling method). eg. CRM_MyClass::myOldMethodToGetTheOptions()
    */
-  public static function deprecatedFunctionWarning($newMethod, $oldMethod = NULL) {
+  public static function deprecatedFunctionWarning(string $newMethod, ?string $oldMethod = NULL): void {
+    $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4);
     if (!$oldMethod) {
-      $dbt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-      $callerFunction = $dbt[1]['function'] ?? NULL;
-      $callerClass = $dbt[1]['class'] ?? NULL;
+      $callerFunction = $backtrace[1]['function'] ?? NULL;
+      $callerClass = $backtrace[1]['class'] ?? NULL;
       $oldMethod = "{$callerClass}::{$callerFunction}";
     }
     $message = "Deprecated function $oldMethod, use $newMethod.";
-    Civi::log()->warning($message, ['civi.tag' => 'deprecated']);
+    // Add a mini backtrace. Just the function is too little to be meaningful but people are
+    // saying they can't track down where the deprecated calls are coming from.
+    $miniBacktrace = [];
+    foreach ($backtrace as $backtraceLine) {
+      $miniBacktrace[] = ($backtraceLine['class'] ?? '') . '::' . ($backtraceLine['function'] ?? '');
+    }
+    Civi::log()->warning($message . "\n" . implode("\n", $miniBacktrace), ['civi.tag' => 'deprecated']);
     trigger_error($message, E_USER_DEPRECATED);
   }
 

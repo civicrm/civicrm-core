@@ -17,16 +17,9 @@
 class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Create a new bounce event, update the email address if necessary
    *
-   * @param $params
+   * @param array $params
    *
    * @return bool|null
    */
@@ -91,15 +84,13 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
    *   ID of the mailing.
    * @param int $job_id
    *   Optional ID of a job to filter on.
-   * @param bool $is_distinct
-   *   Group by queue ID?.
    *
    * @param string|null $toDate
    *
    * @return int
    *   Number of rows in result set
    */
-  public static function getTotalCount($mailing_id, $job_id = NULL, $is_distinct = FALSE, $toDate = NULL) {
+  public static function getTotalCount($mailing_id, $job_id = NULL, $toDate = NULL) {
     $dao = new CRM_Core_DAO();
 
     $bounce = self::getTableName();
@@ -124,10 +115,6 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
 
     if (!empty($job_id)) {
       $query .= " AND $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer');
-    }
-
-    if ($is_distinct) {
-      $query .= " GROUP BY $queue.id ";
     }
 
     // query was missing

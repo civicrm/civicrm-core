@@ -25,7 +25,6 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
   /**
    * Build all the data structures needed to build the form.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
@@ -58,10 +57,10 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
         $displayName[] = CRM_Contact_BAO_Contact::displayName($val);
       }
 
-      CRM_Utils_System::setTitle(implode(',', $displayName) . ' - ' . ts('Email'));
+      $this->setTitle(implode(',', $displayName) . ' - ' . ts('Email'));
     }
     else {
-      CRM_Utils_System::setTitle(ts('New Email'));
+      $this->setTitle(ts('New Email'));
     }
     if ($this->_context === 'search') {
       $this->_single = TRUE;
@@ -81,23 +80,5 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
    * @todo move some code from preProcess into here.
    */
   public function setContactIDs() {}
-
-  /**
-   * List available tokens for this form.
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public function listTokens() {
-    $tokens = CRM_Core_SelectValues::contactTokens();
-
-    if (isset($this->_caseId) || isset($this->_caseIds)) {
-      // For a single case, list tokens relevant for only that case type
-      $caseTypeId = isset($this->_caseId) ? CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $this->_caseId, 'case_type_id') : NULL;
-      $tokens += CRM_Core_SelectValues::caseTokens($caseTypeId);
-    }
-
-    return $tokens;
-  }
 
 }

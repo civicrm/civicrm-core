@@ -47,9 +47,9 @@
           <td class="crmf-relationship_type">{$row.relationshipTypeName}</td>
           <td class="crmf-max_related" align="right">{$row.max_related}</td>
           <td class="crmf-visibility crm-editable" data-type="select">{$row.visibility}</td>
-          <td class="nowrap crmf-weight">{$row.weight}</td>
+          <td class="nowrap crmf-weight">{$row.weight|smarty:nodefaults}</td>
           <td class="crmf-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td>{$row.action|replace:'xx':$row.id}</td>
+          <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
       {/foreach}
     </table>

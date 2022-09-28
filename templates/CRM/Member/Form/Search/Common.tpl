@@ -37,7 +37,7 @@
 </tr>
 <tr>
   <td>
-    {if $form.member_auto_renew}
+    {if !empty($form.member_auto_renew)}
       <label>{$form.member_auto_renew.label}</label>
       {help id="id-member_auto_renew" file="CRM/Member/Form/Search.hlp"}
       <br/>
@@ -47,17 +47,17 @@
   <td>{$form.member_is_override.label}{help id="id-member_is_override" file="CRM/Member/Form/Search.hlp"}{$form.member_is_override.html}</td>
 </tr>
 <tr>
-  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="membership_join_date" colspan='2'}
+  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="membership_join_date" to='' from='' colspan='2' class='' hideRelativeLabel=0}
 </tr>
 <tr>
-  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="membership_start_date" colspan='2'}
+  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="membership_start_date" to='' from='' colspan='2' class='' hideRelativeLabel=0}
 </tr>
 <tr>
-  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="membership_end_date" colspan='2'}
+  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="membership_end_date" to='' from='' colspan='2' class='' hideRelativeLabel=0}
 </tr>
 
 {* campaign in membership search *}
-{include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch"
+{include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
 campaignTrClass='' campaignTdClass=''}
 
 {if !empty($membershipGroupTree)}

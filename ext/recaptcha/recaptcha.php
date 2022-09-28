@@ -15,15 +15,6 @@ function recaptcha_civicrm_config(&$config) {
 }
 
 /**
- * Implements hook_civicrm_xmlMenu().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_xmlMenu
- */
-function recaptcha_civicrm_xmlMenu(&$files) {
-  _recaptcha_civix_civicrm_xmlMenu($files);
-}
-
-/**
  * Implements hook_civicrm_install().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_install
@@ -78,41 +69,6 @@ function recaptcha_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
 }
 
 /**
- * Implements hook_civicrm_managed().
- *
- * Generate a list of entities to create/deactivate/delete when this module
- * is installed, disabled, uninstalled.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_managed
- */
-function recaptcha_civicrm_managed(&$entities) {
-  _recaptcha_civix_civicrm_managed($entities);
-}
-
-/**
- * Implements hook_civicrm_angularModules().
- *
- * Generate a list of Angular modules.
- *
- * Note: This hook only runs in CiviCRM 4.5+. It may
- * use features only available in v4.6+.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_angularModules
- */
-function recaptcha_civicrm_angularModules(&$angularModules) {
-  _recaptcha_civix_civicrm_angularModules($angularModules);
-}
-
-/**
- * Implements hook_civicrm_alterSettingsFolders().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_alterSettingsFolders
- */
-function recaptcha_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  _recaptcha_civix_civicrm_alterSettingsFolders($metaDataFolders);
-}
-
-/**
  * Implements hook_civicrm_entityTypes().
  *
  * Declare entity types provided by this module.
@@ -127,7 +83,7 @@ function recaptcha_civicrm_entityTypes(&$entityTypes) {
  * Implements hook_civicrm_navigationMenu().
  */
 function recaptcha_civicrm_navigationMenu(&$menu) {
-  _recaptcha_civix_insert_navigation_menu($menu, 'Administer/Customize Data and Screens', [
+  _recaptcha_civix_insert_navigation_menu($menu, 'Administer/System Settings', [
     'label' => E::ts('reCAPTCHA Settings'),
     'name' => 'recaptcha_settings',
     'url' => 'civicrm/admin/setting/recaptcha',
@@ -161,4 +117,6 @@ function recaptcha_civicrm_buildForm($formName, &$form) {
           'region' => 'page-body',
         ]);
   }
+
+  CRM_Utils_ReCAPTCHA::checkAndAddCaptchaToForm($formName, $form);
 }

@@ -24,13 +24,6 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
   public static $_pcpLinks = NULL;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Add or update either a Personal Campaign Page OR a PCP Block.
    *
    * @param array $params
@@ -89,8 +82,12 @@ WHERE  civicrm_pcp.contact_id = civicrm_contact.id
    */
   public static function getPcpDashboardInfo($contactId) {
     $query = '
-SELECT pcp.*, block.is_tellfriend_enabled FROM civicrm_pcp pcp
+SELECT pcp.*, block.is_tellfriend_enabled,
+COALESCE(cp.end_date, event.end_date) as end_date
+FROM civicrm_pcp pcp
 LEFT JOIN civicrm_pcp_block block ON block.id = pcp.pcp_block_id
+LEFT OUTER JOIN civicrm_contribution_page cp ON (cp.id = pcp.page_id AND pcp.page_type = "contribute")
+LEFT OUTER JOIN civicrm_event event ON (event.id = pcp.page_id AND pcp.page_type = "event")
 WHERE pcp.is_active = 1
   AND pcp.contact_id = %1
 ORDER BY page_type, page_id';
@@ -140,6 +137,7 @@ ORDER BY page_type, page_id';
         'pcpId' => $pcpInfoDao->id,
         'pcpTitle' => $pcpInfoDao->title,
         'pcpStatus' => CRM_Core_PseudoConstant::getLabel('CRM_PCP_BAO_PCP', 'status_id', $pcpInfoDao->status_id),
+        'end_date' => $pcpInfoDao->end_date,
         'action' => $action,
         'class' => $class,
       ];
@@ -158,12 +156,19 @@ AND target_entity_id NOT IN ( " . implode(',', $entityIds) . ") )";
     }
 
     $query = "
-SELECT *
+SELECT block.*,
+COALESCE(cp.end_date, event.end_date) as end_date
 FROM civicrm_pcp_block block
-LEFT JOIN civicrm_pcp pcp ON pcp.pcp_block_id = block.id
+LEFT OUTER JOIN civicrm_contribution_page cp ON (cp.id = block.target_entity_id AND block.target_entity_type = 'contribute')
+LEFT OUTER JOIN civicrm_event event ON (event.id = block.target_entity_id AND block.target_entity_type = 'event')
 WHERE block.is_active = 1
 {$clause}
-GROUP BY block.id, pcp.id
+  AND (cp.is_active = 1 OR event.is_active = 1)
+  AND (
+    (block.target_entity_type = 'contribute' AND (cp.end_date >= DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') OR cp.end_date IS NULL))
+    OR
+    (block.target_entity_type = 'event' AND (event.end_date >= DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') OR event.end_date IS NULL)))
+GROUP BY block.id, block.target_entity_id
 ORDER BY target_entity_type, target_entity_id
 ";
     $pcpBlockDao = CRM_Core_DAO::executeQuery($query);
@@ -184,7 +189,9 @@ ORDER BY target_entity_type, target_entity_id
       if ($pageTitle) {
         $pcpBlock[] = [
           'pageId' => $pcpBlockDao->target_entity_id,
+          'pageComponent' => $pcpBlockDao->target_entity_type,
           'pageTitle' => $pageTitle,
+          'end_date' => $pcpBlockDao->end_date,
           'action' => $action,
         ];
       }
@@ -448,7 +455,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
    * @param CRM_Core_Form $page
    * @param array $elements
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function buildPcp($pcpId, &$page, &$elements = NULL) {
     $prms = ['id' => $pcpId];
@@ -610,7 +617,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
     CRM_Core_Session::setStatus(ts("%1 status has been updated to %2.", [
       1 => $pcpTitle,
       2 => $pcpStatus,
-    ]), 'Status Updated', 'success');
+    ]), ts('Status Updated'), 'success');
 
     // send status change mail
     $result = self::sendStatusUpdate($id, $is_active, FALSE, $pcpPageType);
@@ -635,7 +642,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
    * @param string $component
    *
    * @throws Exception
-   * @return null
+   * @return bool
    */
   public static function sendStatusUpdate($pcpId, $newStatus, $isInitial = FALSE, $component = 'contribute') {
     $pcpStatusName = CRM_Core_OptionGroup::values("pcp_status", FALSE, FALSE, FALSE, NULL, 'name');
@@ -709,7 +716,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
     list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'groupName' => 'msg_tpl_workflow_contribution',
-        'valueName' => $tplName,
+        'workflow' => $tplName,
         'contactId' => $pcpInfo['contact_id'],
         'tplParams' => $tplParams,
         'from' => $receiptFrom,
@@ -739,7 +746,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
    * Get pcp block is active.
    *
    * @param int $pcpId
-   * @param $component
+   * @param string $component
    *
    * @return int
    */
@@ -761,7 +768,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
    * Get pcp block is enabled for component page.
    *
    * @param int $pageId
-   * @param $component
+   * @param string $component
    *
    * @return string
    */
@@ -826,7 +833,7 @@ WHERE field_name like 'email%' And is_active = 1 And uf_group_id = %1";
    * @param int $pcpId
    * @param $component
    *
-   * @return int
+   * @return string
    */
   public static function getPcpPageTitle($pcpId, $component) {
     if ($component == 'contribute') {
@@ -852,9 +859,9 @@ WHERE field_name like 'email%' And is_active = 1 And uf_group_id = %1";
    * Get pcp block & entity id given pcp id
    *
    * @param int $pcpId
-   * @param $component
+   * @param string $component
    *
-   * @return string
+   * @return int[]
    */
   public static function getPcpBlockEntityId($pcpId, $component) {
     $entity_table = self::getPcpEntityTable($component);
@@ -877,7 +884,7 @@ WHERE pcp.id = %1";
   /**
    * Get pcp entity table given a component.
    *
-   * @param $component
+   * @param string $component
    *
    * @return string
    */
@@ -924,7 +931,7 @@ INNER JOIN civicrm_uf_group ufgroup
    * Get owner notification id.
    *
    * @param int $component_id
-   * @param $component
+   * @param string $component
    *
    * @return int
    */

@@ -43,7 +43,7 @@ class SettingsStack {
    */
   public function popAll() {
     while ($frame = array_pop($this->stack)) {
-      list($setting, $value) = $frame;
+      [$setting, $value] = $frame;
       if ($value === NULL) {
         unset($GLOBALS['civicrm_setting']['domain'][$setting]);
       }

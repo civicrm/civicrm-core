@@ -56,7 +56,7 @@ function _civicrm_api3_dashboard_contact_create_spec(&$fields) {
  * @param array $params
  *
  * @return array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_dashboard_contact_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

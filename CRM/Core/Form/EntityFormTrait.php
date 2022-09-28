@@ -137,6 +137,16 @@ trait CRM_Core_Form_EntityFormTrait {
     }
     $this->applyFilter('__ALL__', 'trim');
     $this->addEntityFieldsToTemplate();
+    foreach ($this->entityFields as $index => $fields) {
+      $this->entityFields[$index] = array_merge([
+        'template' => '',
+        'help' => [],
+        'pre_html_text' => '',
+        'post_html_text' => '',
+        'description' => '',
+        'documentation_link' => '',
+      ], $fields);
+    }
     $this->assign('entityFields', $this->entityFields);
     $this->assign('entityID', $this->getEntityId());
     $this->assign('entityInClassFormat', strtolower(str_replace('_', '-', $this->getDefaultEntity())));

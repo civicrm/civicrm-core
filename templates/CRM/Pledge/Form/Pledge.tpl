@@ -81,7 +81,7 @@
           </tr>
 
         {if $email and $outBound_option != 2}
-            {if $form.is_acknowledge }
+            {if !empty($form.is_acknowledge)}
           <tr class="crm-pledge-form-block-is_acknowledge">
             <td class="label">{$form.is_acknowledge.label}</td>
             <td>{$form.is_acknowledge.html}<br />
@@ -99,7 +99,7 @@
         {/if}
           <tr id="fromEmail" style="display:none;">
             <td class="label">{$form.from_email_address.label}</td>
-            <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
+            <td>{$form.from_email_address.html}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
           </tr>
           <tr id="acknowledgeDate">
             <td class="label" class="crm-pledge-form-block-acknowledge_date">{$form.acknowledge_date.label}</td>

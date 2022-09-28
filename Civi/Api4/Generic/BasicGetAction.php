@@ -99,7 +99,6 @@ class BasicGetAction extends AbstractGetAction {
    * Evaluate :pseudoconstant suffix expressions and replace raw values with option values
    *
    * @param $records
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function formatRawValues(&$records) {
@@ -107,19 +106,19 @@ class BasicGetAction extends AbstractGetAction {
     $fields = $this->entityFields();
     foreach ($records as &$values) {
       foreach ($this->entityFields() as $field) {
+        $values += [$field['name'] => NULL];
         if (!empty($field['options'])) {
           foreach (FormattingUtil::$pseudoConstantSuffixes as $suffix) {
             $pseudofield = $field['name'] . ':' . $suffix;
             if (!isset($values[$pseudofield]) && isset($values[$field['name']]) && $this->_isFieldSelected($pseudofield)) {
               $values[$pseudofield] = $values[$field['name']];
-              $fields[$pseudofield] = $field;
             }
           }
         }
       }
     }
     // Swap raw values with pseudoconstants
-    FormattingUtil::formatOutputValues($records, $fields, $this->getEntityName(), $this->getActionName());
+    FormattingUtil::formatOutputValues($records, $fields, $this->getActionName());
   }
 
 }

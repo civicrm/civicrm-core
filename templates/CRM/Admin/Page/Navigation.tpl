@@ -20,7 +20,7 @@
 
   <div class="crm-block crm-content-block">
     <div id="new-menu-item">
-      {crmButton p="civicrm/admin/menu" q="action=add&reset=1" id="newMenuItem" icon="crm-i fa-plus-circle" style="margin-left: 6px;"}{ts}Add Menu Item{/ts}{/crmButton}
+      {crmButton p="civicrm/admin/menu" q="action=add&reset=1" id="newMenuItem" icon="plus-circle" style="margin-left: 6px;"}{ts}Add Menu Item{/ts}{/crmButton}
     </div>
     <div class="spacer"></div>
     <div style="padding-left: 48px;"><img src="{$config->resourceBase}i/logo_sm.png" /></div>

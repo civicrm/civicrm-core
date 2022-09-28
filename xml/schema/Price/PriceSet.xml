@@ -81,6 +81,7 @@
     <title>Price Set Is Active?</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Is this price set active</comment>
     <add>1.8</add>
     <html>
@@ -170,6 +171,7 @@
     <title>Is Price Set Quick Config?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is set if edited on Contribution or Event Page rather than through Manage Price Sets</comment>
     <html>
       <type>CheckBox</type>
@@ -181,6 +183,7 @@
     <title>Price Set Is Reserved</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this a predefined system price set  (i.e. it can not be deleted, edited)?</comment>
     <add>4.2</add>
     <html>

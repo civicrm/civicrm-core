@@ -159,7 +159,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $this->_event_title = CRM_Event_BAO_Event::getFieldValue('CRM_Event_DAO_Event', $this->_event_id, $daoName);
     $daoName = 'start_date';
     $this->_event_start_date = CRM_Event_BAO_Event::getFieldValue('CRM_Event_DAO_Event', $this->_event_id, $daoName);
-    list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_from_contact_id);
+    [$displayName, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_from_contact_id);
     $this->_contact_name = $displayName;
     $this->_contact_email = $email;
 
@@ -298,7 +298,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    * Process transfer - first add the new participant to the event, then cancel
    * source participant - send confirmation email to transferee
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     //For transfer, process form to allow selection of transferree
@@ -342,21 +342,16 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
   /**
    * Based on input, create participant row for transferee and send email
    *
-   * return @ void
+   * @param CRM_Event_BAO_Participant $participant
    *
    * @throws \CRM_Core_Exception
    */
-  public function participantTransfer($participant) {
-    $contactDetails = [];
-    $contactIds[] = $participant->contact_id;
-    list($currentContactDetails) = CRM_Utils_Token::getTokenDetails($contactIds, NULL,
-      FALSE, FALSE, NULL, [], 'CRM_Event_BAO_Participant');
-    foreach ($currentContactDetails as $contactId => $contactValues) {
-      $contactDetails[$contactId] = $contactValues;
-    }
+  public function participantTransfer($participant): void {
+    $contactDetails = civicrm_api3('Contact', 'getsingle', ['id' => $participant->contact_id, 'return' => ['display_name', 'email']]);
+
     $participantRoles = CRM_Event_PseudoConstant::participantRole();
     $participantDetails = [];
-    $query = "SELECT * FROM civicrm_participant WHERE id = " . $participant->id;
+    $query = 'SELECT * FROM civicrm_participant WHERE id = ' . $participant->id;
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $participantDetails[$dao->id] = [
@@ -371,26 +366,11 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
         'registered_by_id' => $dao->registered_by_id,
       ];
     }
-    $domainValues = [];
-    if (empty($domainValues)) {
-      $domain = CRM_Core_BAO_Domain::getDomain();
-      $tokens = [
-        'domain' =>
-        [
-          'name',
-          'phone',
-          'address',
-          'email',
-        ],
-        'contact' => CRM_Core_SelectValues::contactTokens(),
-      ];
-      foreach ($tokens['domain'] as $token) {
-        $domainValues[$token] = CRM_Utils_Token::getDomainTokenReplacement($token, $domain);
-      }
-    }
+
     $eventDetails = [];
     $eventParams = ['id' => $participant->event_id];
     CRM_Event_BAO_Event::retrieve($eventParams, $eventDetails);
+
     //get default participant role.
     $eventDetails['participant_role'] = $participantRoles[$eventDetails['default_role_id']] ?? NULL;
     //get the location info
@@ -399,14 +379,15 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       'entity_table' => 'civicrm_event',
     ];
     $eventDetails['location'] = CRM_Core_BAO_Location::getValues($locParams, TRUE);
-    $toEmail = $contactDetails[$participant->contact_id]['email'] ?? NULL;
+    $toEmail = $contactDetails['email'] ?? NULL;
     if ($toEmail) {
       //take a receipt from as event else domain.
-      $receiptFrom = $domainValues['name'] . ' <' . $domainValues['email'] . '>';
+      $receiptFrom = CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE);
+      $receiptFrom = reset($receiptFrom);
       if (!empty($eventDetails['confirm_from_name']) && !empty($eventDetails['confirm_from_email'])) {
         $receiptFrom = $eventDetails['confirm_from_name'] . ' <' . $eventDetails['confirm_from_email'] . '>';
       }
-      $participantName = $contactDetails[$participant->contact_id]['display_name'];
+      $participantName = $contactDetails['display_name'];
       $tplParams = [
         'event' => $eventDetails,
         'participant' => $participantDetails[$participant->id],
@@ -415,8 +396,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       ];
 
       $sendTemplateParams = [
-        'groupName' => 'msg_tpl_workflow_event',
-        'valueName' => 'event_online_receipt',
+        'workflow' => 'event_online_receipt',
         'contactId' => $participantDetails[$participant->id]['contact_id'],
         'tplParams' => $tplParams,
         'from' => $receiptFrom,
@@ -424,6 +404,10 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
         'toEmail' => $toEmail,
         'cc' => $eventDetails['cc_confirm'] ?? NULL,
         'bcc' => $eventDetails['bcc_confirm'] ?? NULL,
+        'modelProps' => [
+          'participantID' => $participant->id,
+          'eventID' => $participant->event_id,
+        ],
       ];
       CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
     }
@@ -435,22 +419,6 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    * return @ void
    */
   public function sendCancellation() {
-    $domainValues = [];
-    $domain = CRM_Core_BAO_Domain::getDomain();
-    $tokens = [
-      'domain' =>
-      [
-        'name',
-        'phone',
-        'address',
-        'email',
-      ],
-      'contact' => CRM_Core_SelectValues::contactTokens(),
-    ];
-    foreach ($tokens['domain'] as $token) {
-      $domainValues[$token] = CRM_Utils_Token::getDomainTokenReplacement($token, $domain);
-    }
-
     $participantRoles = CRM_Event_PseudoConstant::participantRole();
     $participantDetails = [];
     $query = "SELECT * FROM civicrm_participant WHERE id = {$this->_from_participant_id}";
@@ -476,23 +444,12 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     //get the location info
     $locParams = ['entity_id' => $this->_event_id, 'entity_table' => 'civicrm_event'];
     $eventDetails[$this->_event_id]['location'] = CRM_Core_BAO_Location::getValues($locParams, TRUE);
-    //get contact details
-    $contactIds[$this->_from_contact_id] = $this->_from_contact_id;
-    list($currentContactDetails) = CRM_Utils_Token::getTokenDetails($contactIds, NULL,
-      FALSE, FALSE, NULL, [],
-      'CRM_Event_BAO_Participant'
-    );
-    foreach ($currentContactDetails as $contactId => $contactValues) {
-      $contactDetails[$this->_from_contact_id] = $contactValues;
-    }
     //send a 'cancelled' email to user, and cc the event's cc_confirm email
-    $mail = CRM_Event_BAO_Participant::sendTransitionParticipantMail($this->_from_participant_id,
+    CRM_Event_BAO_Participant::sendTransitionParticipantMail($this->_from_participant_id,
       $participantDetails[$this->_from_participant_id],
       $eventDetails[$this->_event_id],
-      $contactDetails[$this->_from_contact_id],
-      $domainValues,
-      "Transferred",
-      ""
+      NULL,
+      'Transferred'
     );
     $statusMsg = ts('Event registration information for %1 has been updated.', [1 => $this->_contact_name]);
     $statusMsg .= ' ' . ts('A cancellation email has been sent to %1.', [1 => $this->_contact_email]);
@@ -506,7 +463,6 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    * @param int $fromParticipantID
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function transferParticipantRegistration($toContactID, $fromParticipantID) {
     $toParticipantValues = \Civi\Api4\Participant::get()

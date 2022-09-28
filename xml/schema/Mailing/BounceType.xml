@@ -23,7 +23,7 @@
     <name>name</name>
     <title>Bounce Type Name</title>
     <type>varchar</type>
-    <length>24</length>
+    <length>255</length>
     <required>true</required>
     <comment>Type of bounce</comment>
   </field>
@@ -31,7 +31,7 @@
     <name>description</name>
     <title>Bounce Type Description</title>
     <type>varchar</type>
-    <length>255</length>
+    <length>2048</length>
     <comment>A description of this bounce type</comment>
   </field>
   <field>

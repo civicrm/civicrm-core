@@ -27,8 +27,7 @@ Required vars: activitySet
     </td>
     <td>
       <select
-        ui-jq="select2"
-        ui-options="{dropdownAutoWidth: true}"
+        crm-ui-select="{dropdownAutoWidth: true}"
         ng-model="activity.status"
         ng-options="actStatus.name as actStatus.label for actStatus in activityStatuses|orderBy:'label'"
         >
@@ -37,8 +36,7 @@ Required vars: activitySet
     </td>
     <td>
       <select
-        ui-jq="select2"
-        ui-options="{dropdownAutoWidth: true}"
+        crm-ui-select="{dropdownAutoWidth: true}"
         ng-model="activity.reference_activity"
         ng-options="activityType.name as activityType.label for activityType in caseType.definition.timelineActivityTypes"
         >
@@ -55,8 +53,7 @@ Required vars: activitySet
     </td>
     <td>
       <select
-        ui-jq="select2"
-        ui-options="{dropdownAutoWidth: true}"
+        crm-ui-select="{dropdownAutoWidth: true}"
         ng-model="activity.reference_select"
         ng-options="key as value for (key,value) in {newest: ts('Newest'), oldest: ts('Oldest')}"
         >
@@ -64,8 +61,7 @@ Required vars: activitySet
     </td>
     <td>
       <select
-        ui-jq="select2"
-        ui-options="{dropdownAutoWidth: true}"
+        crm-ui-select="{dropdownAutoWidth: true}"
         ng-model="activity.default_assignee_type"
         ng-options="option.value as option.label for option in defaultAssigneeTypes"
         ng-change="clearActivityDefaultAssigneeValues(activity)"
@@ -73,8 +69,7 @@ Required vars: activitySet
 
       <p ng-if="activity.default_assignee_type === defaultAssigneeTypeValues.BY_RELATIONSHIP">
         <select
-          ui-jq="select2"
-          ui-options="{dropdownAutoWidth: true}"
+          crm-ui-select="{dropdownAutoWidth: true}"
           ng-model="activity.default_assignee_relationship"
           ng-options="option.id as option.text for option in relationshipTypeOptions"
           required

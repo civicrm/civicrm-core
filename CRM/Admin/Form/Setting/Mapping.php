@@ -31,7 +31,7 @@ class CRM_Admin_Form_Setting_Mapping extends CRM_Admin_Form_Setting {
    * Build the form object.
    */
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Settings - Mapping and Geocoding Providers'));
+    $this->setTitle(ts('Settings - Mapping and Geocoding Providers'));
     parent::buildQuickForm();
   }
 
@@ -52,7 +52,7 @@ class CRM_Admin_Form_Setting_Mapping extends CRM_Admin_Form_Setting {
     }
 
     if ($fields['mapProvider'] == 'OpenStreetMaps' && $fields['geoProvider'] == '') {
-      $errors['geoProvider'] = "Please select a Geocoding Provider - Open Street Maps does not provide geocoding.";
+      $errors['geoProvider'] = ts('Please select a Geocoding Provider - Open Street Maps does not provide geocoding.');
     }
 
     return $errors;

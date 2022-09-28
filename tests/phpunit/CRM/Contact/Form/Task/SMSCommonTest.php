@@ -115,9 +115,7 @@ class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
   /**
    * Test to ensure SMS Activity QuickForm displays the right phone numbers.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testQuickFormMobileNumbersDisplay() {

@@ -54,7 +54,7 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
 
     $this->_id = CRM_Utils_Request::retrieve('ppId', 'Positive', $this);
 
-    CRM_Utils_System::setTitle(ts('Edit Scheduled Pledge Payment'));
+    $this->setTitle(ts('Edit Scheduled Pledge Payment'));
   }
 
   /**

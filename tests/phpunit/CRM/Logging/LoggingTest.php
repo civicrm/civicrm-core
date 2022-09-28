@@ -3,22 +3,17 @@
 /**
  * Class CRM_Core_DAOTest
  * @group headless
+ * @group locale
  */
 class CRM_Logging_LoggingTest extends CiviUnitTestCase {
 
   use CRMTraits_Custom_CustomDataTrait;
 
-  /**
-   * Has the db been set to multilingual.
-   *
-   * @var bool
-   */
-  protected $isDBMultilingual = FALSE;
-
   public function tearDown(): void {
     Civi::settings()->set('logging', FALSE);
-    if ($this->isDBMultilingual) {
-      CRM_Core_I18n_Schema::makeSinglelingual('en_US');
+    global $dbLocale;
+    if ($dbLocale) {
+      $this->disableMultilingual();
     }
     $logging = new CRM_Logging_Schema();
     $logging->dropAllLogTables();
@@ -30,7 +25,7 @@ class CRM_Logging_LoggingTest extends CiviUnitTestCase {
    * Check that log tables are created even for non standard custom fields
    * tables.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testLoggingNonStandardCustomTableName(): void {
     $this->createCustomGroupWithFieldOfType(['table_name' => 'abcd']);
@@ -39,10 +34,32 @@ class CRM_Logging_LoggingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that hooks removing tables from logging are respected during custom field add.
+   *
+   * During custom field save logging is only handled for the affected table.
+   * We need to make sure this respects hooks to remove from the logging set.
+   */
+  public function testLoggingHookIgnore(): void {
+    $this->hookClass->setHook('civicrm_alterLogTables', [$this, 'ignoreSillyName']);
+    Civi::settings()->set('logging', TRUE);
+    $this->createCustomGroupWithFieldOfType(['table_name' => 'silly_name']);
+    $this->assertEmpty(CRM_Core_DAO::singleValueQuery("SHOW tables LIKE 'log_silly_name'"));
+  }
+
+  /**
+   * Implement hook to cause our log table to be ignored.
+   *
+   * @param array $logTableSpec
+   */
+  public function ignoreSillyName(array &$logTableSpec): void {
+    unset($logTableSpec['silly_name']);
+  }
+
+  /**
    * Test creating logging schema when database is in multilingual mode.
    */
   public function testMultilingualLogging(): void {
-    $this->makeMultilingual();
+    $this->enableMultilingual();
     Civi::settings()->set('logging', TRUE);
     $value = CRM_Core_DAO::singleValueQuery('SELECT id FROM log_civicrm_contact LIMIT 1', [], FALSE, FALSE);
     $this->assertNotNull($value, 'Logging not enabled successfully');
@@ -53,7 +70,7 @@ class CRM_Logging_LoggingTest extends CiviUnitTestCase {
    * Also test altering a multilingual table.
    */
   public function testMultilingualAlterSchemaLogging(): void {
-    $this->makeMultilingual();
+    $this->enableMultilingual();
     Civi::settings()->set('logging', TRUE);
     $logging = new CRM_Logging_Schema();
     $value = CRM_Core_DAO::singleValueQuery('SELECT id FROM log_civicrm_contact LIMIT 1', [], FALSE, FALSE);
@@ -89,14 +106,6 @@ class CRM_Logging_LoggingTest extends CiviUnitTestCase {
       || in_array("  `logging_test` int DEFAULT '0'", $create, TRUE)
       || in_array('  `logging_test` int DEFAULT 0', $create, TRUE)
     );
-  }
-
-  /**
-   * Convert the database to multilingual mode.
-   */
-  protected function makeMultilingual(): void {
-    CRM_Core_I18n_Schema::makeMultilingual('en_US');
-    $this->isDBMultilingual = TRUE;
   }
 
 }

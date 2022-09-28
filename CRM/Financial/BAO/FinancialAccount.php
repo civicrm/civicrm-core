@@ -14,33 +14,23 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAccount {
+class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAccount implements \Civi\Core\HookInterface {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Financial_BAO_FinancialAccount
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults = []) {
-    $financialAccount = new CRM_Financial_DAO_FinancialAccount();
-    $financialAccount->copyValues($params);
-    if ($financialAccount->find(TRUE)) {
-      CRM_Core_DAO::storeValues($financialAccount, $defaults);
-      return $financialAccount;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults = []) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -61,98 +51,85 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
   /**
    * Add the financial types.
    *
+   * @deprecated
    * @param array $params
-   *   Reference array contains the values submitted by the form.
    *
    * @return CRM_Financial_DAO_FinancialAccount
    */
-  public static function add(&$params) {
-    if (empty($params['id'])) {
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-      $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, FALSE);
-      $params['is_tax'] = CRM_Utils_Array::value('is_tax', $params, FALSE);
-      $params['is_header_account'] = CRM_Utils_Array::value('is_header_account', $params, FALSE);
-      $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
-    }
-    if (!empty($params['id'])
-      && !empty($params['financial_account_type_id'])
-      && CRM_Financial_BAO_FinancialAccount::validateFinancialAccount(
-        $params['id'],
-        $params['financial_account_type_id']
-      )
-    ) {
-      throw new CRM_Core_Exception(ts('You cannot change the account type since this financial account refers to a financial item having an account type of Revenue/Liability.'));
-    }
-    if (!empty($params['is_default'])) {
-      $query = 'UPDATE civicrm_financial_account SET is_default = 0 WHERE financial_account_type_id = %1';
-      $queryParams = [1 => [$params['financial_account_type_id'], 'Integer']];
-      CRM_Core_DAO::executeQuery($query, $queryParams);
-    }
-
-    // action is taken depending upon the mode
-    $financialAccount = new CRM_Financial_DAO_FinancialAccount();
-
-    // invoke pre hook
-    $op = 'create';
-    if (!empty($params['id'])) {
-      $op = 'edit';
-    }
-    CRM_Utils_Hook::pre($op, 'FinancialAccount', CRM_Utils_Array::value('id', $params), $params);
-
-    if (!empty($params['id'])) {
-      $financialAccount->id = $params['id'];
-      $financialAccount->find(TRUE);
-    }
-
-    $financialAccount->copyValues($params);
-    $financialAccount->save();
-
-    // invoke post hook
-    $op = 'create';
-    if (!empty($params['id'])) {
-      $op = 'edit';
-    }
-    CRM_Utils_Hook::post($op, 'FinancialAccount', $financialAccount->id, $financialAccount);
-    CRM_Core_PseudoConstant::flush();
-
-    return $financialAccount;
+  public static function add($params) {
+    return self::writeRecord($params);
   }
 
   /**
    * Delete financial Types.
    *
+   * @deprecated
    * @param int $financialAccountId
+   *
+   * @return bool
    */
   public static function del($financialAccountId) {
-    // checking if financial type is present
-    $check = FALSE;
-
-    //check dependencies
-    $dependency = [
-      ['Core', 'FinancialTrxn', 'to_financial_account_id'],
-      ['Financial', 'FinancialTypeAccount', 'financial_account_id'],
-      ['Financial', 'FinancialItem', 'financial_account_id'],
-    ];
-    foreach ($dependency as $name) {
-      require_once str_replace('_', DIRECTORY_SEPARATOR, "CRM_" . $name[0] . "_BAO_" . $name[1]) . ".php";
-      $className = "CRM_{$name[0]}_BAO_{$name[1]}";
-      $bao = new $className();
-      $bao->{$name[2]} = $financialAccountId;
-      if ($bao->find(TRUE)) {
-        $check = TRUE;
-      }
+    try {
+      static::deleteRecord(['id' => $financialAccountId]);
+      return TRUE;
     }
-
-    if ($check) {
-      CRM_Core_Session::setStatus(ts('This financial account cannot be deleted since it is being used as a header account. Please remove it from being a header account before trying to delete it again.'));
+    catch (CRM_Core_Exception $e) {
+      // FIXME: Setting status messages within a BAO CRUD function is bad bad bad. But this fn is deprecated so who cares.
+      CRM_Core_Session::setStatus($e->getMessage(), ts('Delete Error'), 'error');
       return FALSE;
     }
+  }
 
-    // delete from financial Type table
-    $financialAccount = new CRM_Financial_DAO_FinancialAccount();
-    $financialAccount->id = $financialAccountId;
-    $financialAccount->delete();
-    return TRUE;
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete') {
+      // Check dependencies before deleting
+      $dependency = [
+        ['Core', 'FinancialTrxn', 'to_financial_account_id'],
+        ['Financial', 'FinancialTypeAccount', 'financial_account_id'],
+        ['Financial', 'FinancialItem', 'financial_account_id'],
+      ];
+      foreach ($dependency as $name) {
+        $className = "CRM_{$name[0]}_BAO_{$name[1]}";
+        $bao = new $className();
+        $bao->{$name[2]} = $event->id;
+        if ($bao->find(TRUE)) {
+          throw new CRM_Core_Exception(ts('This financial account cannot be deleted since it is being used as a header account. Please remove it from being a header account before trying to delete it again.'));
+        }
+      }
+    }
+    if ($event->action === 'create' || $event->action === 'edit') {
+      $params = $event->params;
+      if (!empty($params['id'])
+        && !empty($params['financial_account_type_id'])
+        && CRM_Financial_BAO_FinancialAccount::validateFinancialAccount(
+          $params['id'],
+          $params['financial_account_type_id']
+        )
+      ) {
+        throw new CRM_Core_Exception(ts('You cannot change the account type since this financial account refers to a financial item having an account type of Revenue/Liability.'));
+      }
+      if (!empty($params['is_default'])) {
+        if (empty($params['financial_account_type_id'])) {
+          $params['financial_account_type_id'] = CRM_Core_DAO::getFieldValue(__CLASS__, $params['id'], 'financial_account_type_id');
+        }
+        $query = 'UPDATE civicrm_financial_account SET is_default = 0 WHERE financial_account_type_id = %1';
+        $queryParams = [1 => [$params['financial_account_type_id'], 'Integer']];
+        CRM_Core_DAO::executeQuery($query, $queryParams);
+      }
+    }
+  }
+
+  /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    CRM_Core_PseudoConstant::flush();
   }
 
   /**
@@ -276,7 +253,7 @@ WHERE cft.id = %1
   /**
    * Get Financial Account type relations.
    *
-   * @param $flip bool
+   * @param bool $flip
    *
    * @return array
    *

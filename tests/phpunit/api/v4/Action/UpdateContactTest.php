@@ -20,14 +20,15 @@
 namespace api\v4\Action;
 
 use Civi\Api4\Contact;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * Class UpdateContactTest
  * @package api\v4\Action
  * @group headless
  */
-class UpdateContactTest extends UnitTestCase {
+class UpdateContactTest extends Api4TestBase implements TransactionalInterface {
 
   public function testUpdateWithIdInWhere() {
     $contactId = Contact::create(FALSE)

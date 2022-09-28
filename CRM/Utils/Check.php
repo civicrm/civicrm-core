@@ -61,6 +61,22 @@ class CRM_Utils_Check {
   }
 
   /**
+   * @return array[]
+   */
+  public static function getSeverityOptions() {
+    return [
+      ['id' => 0, 'name' => \Psr\Log\LogLevel::DEBUG, 'label' => ts('Debug')],
+      ['id' => 1, 'name' => \Psr\Log\LogLevel::INFO, 'label' => ts('Info')],
+      ['id' => 2, 'name' => \Psr\Log\LogLevel::NOTICE, 'label' => ts('Notice')],
+      ['id' => 3, 'name' => \Psr\Log\LogLevel::WARNING, 'label' => ts('Warning')],
+      ['id' => 4, 'name' => \Psr\Log\LogLevel::ERROR, 'label' => ts('Error')],
+      ['id' => 5, 'name' => \Psr\Log\LogLevel::CRITICAL, 'label' => ts('Critical')],
+      ['id' => 6, 'name' => \Psr\Log\LogLevel::ALERT, 'label' => ts('Alert')],
+      ['id' => 7, 'name' => \Psr\Log\LogLevel::EMERGENCY, 'label' => ts('Emergency')],
+    ];
+  }
+
+  /**
    * Display daily system status alerts (admin only).
    */
   public function showPeriodicAlerts() {
@@ -101,23 +117,6 @@ class CRM_Utils_Check {
   }
 
   /**
-   * Sort messages based upon severity
-   *
-   * @param CRM_Utils_Check_Message $a
-   * @param CRM_Utils_Check_Message $b
-   * @return int
-   */
-  public static function severitySort($a, $b) {
-    $aSeverity = $a->getLevel();
-    $bSeverity = $b->getLevel();
-    if ($aSeverity == $bSeverity) {
-      return strcmp($a->getName(), $b->getName());
-    }
-    // The Message constructor guarantees that these will always be integers.
-    return ($aSeverity <=> $bSeverity);
-  }
-
-  /**
    * Get the integer value (useful for thresholds) of the severity.
    *
    * @param int|string $severity
@@ -146,7 +145,7 @@ class CRM_Utils_Check {
   /**
    * Throw an exception if any of the checks fail.
    *
-   * @param array|NULL $messages
+   * @param array|null $messages
    *   [CRM_Utils_Check_Message]
    * @param string $threshold
    *
@@ -185,15 +184,11 @@ class CRM_Utils_Check {
   public static function checkAll($max = FALSE) {
     $messages = self::checkStatus();
 
-    uasort($messages, [__CLASS__, 'severitySort']);
-
     $maxSeverity = 1;
     foreach ($messages as $message) {
-      if (!$message->isVisible()) {
-        continue;
+      if ($message->isVisible()) {
+        $maxSeverity = max($maxSeverity, $message->getLevel());
       }
-      $maxSeverity = max(1, $message->getLevel());
-      break;
     }
 
     Civi::cache('checks')->set('systemStatusCheckResult', $maxSeverity);
@@ -214,7 +209,7 @@ class CRM_Utils_Check {
     $checksNeeded = $statusNames;
     foreach (glob(__DIR__ . '/Check/Component/*.php') as $filePath) {
       $className = 'CRM_Utils_Check_Component_' . basename($filePath, '.php');
-      /* @var CRM_Utils_Check_Component $component */
+      /** @var CRM_Utils_Check_Component $component */
       $component = new $className();
       if ($includeDisabled || $component->isEnabled()) {
         $messages = array_merge($messages, $component->checkAll($statusNames, $includeDisabled));
@@ -238,28 +233,11 @@ class CRM_Utils_Check {
    * @return string
    */
   public static function toStatusLabel($level) {
-    switch ($level) {
-      case 7:
-        return ts('System Status: Emergency');
-
-      case 6:
-        return ts('System Status: Alert');
-
-      case 5:
-        return ts('System Status: Critical');
-
-      case 4:
-        return ts('System Status: Error');
-
-      case 3:
-        return ts('System Status: Warning');
-
-      case 2:
-        return ts('System Status: Notice');
-
-      default:
-        return ts('System Status: Ok');
+    if ($level > 1) {
+      $options = array_column(self::getSeverityOptions(), 'label', 'id');
+      return ts('System Status: %1', [1 => $options[$level]]);
     }
+    return ts('System Status: Ok');
   }
 
 }

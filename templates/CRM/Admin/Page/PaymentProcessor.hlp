@@ -13,8 +13,10 @@
 {htxt id='proc-type'}
 <p>{ts}Refer to the following documentation:{/ts}</p>
 <ul>
-  <li>{docURL page="user/contributions/payment-processors" text="Payment processor overview"}</li>
-  <li>{docURL page="sysadmin/setup/payment-processors" text="Processor comparison and setup guide"}</li>
+  {capture assign=docUrlText}{ts}Payment processor overview{/ts}{/capture}
+  <li>{docURL page="user/contributions/payment-processors" text=$docUrlText}</li>
+  {capture assign=docUrlText}{ts}Processor comparison and setup guide{/ts}{/capture}
+  <li>{docURL page="sysadmin/setup/payment-processors" text=$docUrlText}</li>
 </ul>
 <p>{ts}If you're not sure which processor to use - we recommend reviewing terms, limitations and coverage areas on each processor's website before proceeding.{/ts}</p>
 <p>{ts 1="https://civicrm.org/extensions?field_extension_civi_use_target_id=125"}If your desired processor is not in the list, check the <a href="%1">Extensions Directory</a> for more payment processors you can download. If you still can't find it, consider partnering with a developer and contributing a new extension.{/ts}</p>

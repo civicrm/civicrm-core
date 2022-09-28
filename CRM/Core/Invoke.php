@@ -220,6 +220,12 @@ class CRM_Core_Invoke {
     $template = CRM_Core_Smarty::singleton();
     $template->assign('activeComponent', 'CiviCRM');
     $template->assign('formTpl', 'default');
+    // Ensure template variables have 'something' assigned for e-notice
+    // prevention. These are ones that are included very often
+    // and not tied to a specific form.
+    // jsortable.tpl (datatables)
+    $template->assign('sourceUrl');
+    $template->assign('useAjax', 0);
 
     if ($item) {
 
@@ -325,13 +331,17 @@ class CRM_Core_Invoke {
   /**
    * This function contains the default action.
    *
+   * Unused function.
+   *
    * @param $action
    *
    * @param $contact_type
    * @param $contact_sub_type
    *
+   * @Deprecated
    */
   public static function form($action, $contact_type, $contact_sub_type) {
+    CRM_Core_Error::deprecatedWarning('unused');
     CRM_Utils_System::setUserContext(['civicrm/contact/search/basic', 'civicrm/contact/view']);
     $wrapper = new CRM_Utils_Wrapper();
 
@@ -369,6 +379,10 @@ class CRM_Core_Invoke {
     $config = CRM_Core_Config::singleton();
     $config->clearModuleList();
 
+    // dev/core#3660 - Activate any new classloaders/mixins/etc before re-hydrating any data-structures.
+    CRM_Extension_System::singleton()->getClassLoader()->refresh();
+    CRM_Extension_System::singleton()->getMixinLoader()->run(TRUE);
+
     // also cleanup all caches
     $config->cleanupCaches($sessionReset || CRM_Utils_Request::retrieve('sessionReset', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'));
 
@@ -399,7 +413,7 @@ class CRM_Core_Invoke {
       // For example - when uninstalling an extension. We already set "triggerRebuild" to true for these operations.
       $config->userSystem->invalidateRouteCache();
     }
-    CRM_Core_DAO_AllCoreTables::reinitializeCache(TRUE);
+
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
   }
 

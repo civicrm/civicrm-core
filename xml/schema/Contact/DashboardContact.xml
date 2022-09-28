@@ -79,6 +79,7 @@
     <title>Dashlet is Minimized?</title>
     <comment>Is Minimized?</comment>
     <default>0</default>
+    <required>true</required>
     <add>3.1</add>
     <drop>4.7</drop>
   </field>
@@ -88,6 +89,7 @@
     <title>Dashlet is FullScreen?</title>
     <comment>Is Fullscreen?</comment>
     <default>1</default>
+    <required>true</required>
     <add>3.1</add>
     <drop>4.7</drop>
   </field>

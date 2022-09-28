@@ -23,6 +23,7 @@ class CRM_Extension_Upgrader_Base implements CRM_Extension_Upgrader_Interface {
   use CRM_Extension_Upgrader_QueueTrait;
   use CRM_Extension_Upgrader_RevisionsTrait;
   use CRM_Extension_Upgrader_TasksTrait;
+  use CRM_Extension_Upgrader_SchemaTrait;
 
   /**
    * {@inheritDoc}
@@ -35,6 +36,16 @@ class CRM_Extension_Upgrader_Base implements CRM_Extension_Upgrader_Interface {
   // ******** Hook delegates ********
 
   /**
+   * Run early installation steps. Ex: Create new MySQL table.
+   *
+   * This dispatches directly to each new extension. You will only receive notices for your own installation.
+   *
+   * If multiple extensions are installed simultaneously, they will all run
+   * `hook_install`/`hook_enable` back-to-back (in order of dependency).
+   *
+   * This runs BEFORE refreshing major caches and services (such as
+   * `ManagedEntities` and `CRM_Logging_Schema`).
+   *
    * @see https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_install
    */
   public function onInstall() {
@@ -62,6 +73,16 @@ class CRM_Extension_Upgrader_Base implements CRM_Extension_Upgrader_Interface {
   }
 
   /**
+   * Run later installation steps. Ex: Call a bespoke API-job for the first time.
+   *
+   * This dispatches directly to each new extension. You will only receive notices for your own installation.
+   *
+   * If multiple extensions are installed simultaneously, they will all run
+   * `hook_postInstall` back-to-back (in order of dependency).
+   *
+   * This runs AFTER refreshing major caches and services (such as
+   * `ManagedEntities` and `CRM_Logging_Schema`).
+   *
    * @see https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_postInstall
    */
   public function onPostInstall() {

@@ -21,13 +21,6 @@
 class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHistory {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Create a new subscription history record.
    *
    * @param array $params
@@ -36,7 +29,7 @@ class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHi
    * @return object
    *   $history  The new history object
    */
-  public static function &create(&$params) {
+  public static function create($params) {
     $history = new CRM_Contact_BAO_SubscriptionHistory();
     $history->date = date('Ymd');
     $history->copyValues($params);

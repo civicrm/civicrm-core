@@ -41,7 +41,7 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
    * @access protected
    */
   public function preProcess() {
-    $this->_id = $this->get('id');
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
 
     $defaults = [];
     $params = ['id' => $this->_id];
@@ -49,7 +49,7 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
 
     $this->_title = $defaults['label'] ?? NULL;
     $this->assign('title', $this->_title);
-    CRM_Utils_System::setTitle(ts('Delete %1', [1 => $this->_title]));
+    $this->setTitle(ts('Delete %1', [1 => $this->_title]));
   }
 
   /**

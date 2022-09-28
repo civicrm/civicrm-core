@@ -7,7 +7,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{capture assign=docLink}{docURL page="CiviEvent Cart Checkout" text="CiviEvent Cart Checkout" resource="wiki"}{/capture}
+{capture assign=docUrlText}{ts}CiviEvent Cart Checkout{/ts}{/capture}
+{capture assign=docLink}{docURL page="CiviEvent Cart Checkout" text=$docUrlText resource="wiki"}{/capture}
 <div class="crm-block crm-form-block">
 <div class="help">
     {ts 1=$docLink}These settings are used to configure properties for the CiviEvent component. Please read the %1 documentation, and make sure you understand it before modifying default values.{/ts}

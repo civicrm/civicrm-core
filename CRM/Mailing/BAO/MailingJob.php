@@ -33,13 +33,6 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   public static $mailsProcessed = 0;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Create mailing job.
    *
    * @param array $params
@@ -68,12 +61,13 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    * Initiate all pending/ready jobs.
    *
    * @param array $testParams
-   * @param string $mode
+   * @param string|null $mode
+   *   Either 'sms' or null
    *
    * @return bool|null
    */
   public static function runJobs($testParams = NULL, $mode = NULL) {
-    $job = new CRM_Mailing_BAO_MailingJob();
+    $job = $mode === 'sms' ? new CRM_Mailing_BAO_SMSJob() : new CRM_Mailing_BAO_MailingJob();
 
     $jobTable = CRM_Mailing_DAO_MailingJob::getTableName();
     $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
@@ -215,7 +209,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   /**
    * Post process to determine if the parent job
    * as well as the mailing is complete after the run.
-   * @param null $mode
+   * @param string|null $mode
+   *   Either 'sms' or null
    */
   public static function runJobs_post($mode = NULL) {
 
@@ -289,7 +284,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   /**
    * before we run jobs, we need to split the jobs
    * @param int $offset
-   * @param null $mode
+   * @param string|null $mode
+   *   Either 'sms' or null
    */
   public static function runJobs_pre($offset = 200, $mode = NULL) {
     $job = new CRM_Mailing_BAO_MailingJob();
@@ -584,15 +580,6 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $mail_sync_interval = Civi::settings()->get('civimail_sync_interval');
     $retryGroup = FALSE;
 
-    // CRM-15702: Sending bulk sms to contacts without e-mail address fails.
-    // Solution is to skip checking for on hold
-    //do include a statement to check wether e-mail address is on hold
-    $skipOnHold = TRUE;
-    if ($mailing->sms_provider_id) {
-      //do not include a statement to check wether e-mail address is on hold
-      $skipOnHold = FALSE;
-    }
-
     foreach ($fields as $key => $field) {
       $params[] = $field['contact_id'];
     }
@@ -600,7 +587,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     [$details] = CRM_Utils_Token::getTokenDetails(
       $params,
       $returnProperties,
-      $skipOnHold, TRUE, NULL,
+      TRUE, TRUE, NULL,
       $mailing->getFlattenedTokens(),
       get_class($this),
       $this->id
@@ -636,12 +623,6 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
 
       $body = $message->get();
       $headers = $message->headers();
-
-      if ($mailing->sms_provider_id) {
-        $provider = CRM_SMS_Provider::singleton(['mailing_id' => $mailing->id]);
-        $body = $provider->getMessage($message, $field['contact_id'], $details[$contactID]);
-        $headers = $provider->getRecipientDetails($field, $details[$contactID]);
-      }
 
       // make $recipient actually be the *encoded* header, so as not to baffle Mail_RFC822, CRM-5743
       $recipient = $headers['To'];
@@ -704,7 +685,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         // Handle SMS errors: CRM-15426
         $job_id = intval($this->id);
         $mailing_id = intval($mailing->id);
-        CRM_Core_Error::debug_log_message("Failed to send SMS message. Vars: mailing_id: ${mailing_id}, job_id: ${job_id}. Error message follows.");
+        CRM_Core_Error::debug_log_message("Failed to send SMS message. Vars: mailing_id: {$mailing_id}, job_id: {$job_id}. Error message follows.");
         CRM_Core_Error::debug_log_message($result->getMessage());
       }
       else {
@@ -979,7 +960,7 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
           $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Bulk Email');
         }
         if (!$activityTypeID) {
-          throw new CRM_Core_Execption(ts('No relevant activity type found when recording Mailing Event delivered Activity'));
+          throw new CRM_Core_Exception(ts('No relevant activity type found when recording Mailing Event delivered Activity'));
         }
       }
 
@@ -1117,20 +1098,11 @@ AND    record_type_id = $targetRecordID
    * Delete the mailing job.
    *
    * @param int $id
-   *   Mailing Job id.
-   *
-   * @return mixed
+   * @deprecated
+   * @return bool
    */
   public static function del($id) {
-    CRM_Utils_Hook::pre('delete', 'MailingJob', $id);
-
-    $jobDAO = new CRM_Mailing_BAO_MailingJob();
-    $jobDAO->id = $id;
-    $result = $jobDAO->delete();
-
-    CRM_Utils_Hook::post('delete', 'MailingJob', $jobDAO->id, $jobDAO);
-
-    return $result;
+    return (bool) self::deleteRecord(['id' => $id]);
   }
 
 }

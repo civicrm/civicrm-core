@@ -69,10 +69,10 @@ class api_v3_CustomApiTest extends CiviUnitTestCase {
   /**
    * Install the custom api.
    */
-  public function installApi() {
+  public function installApi(): void {
     require_once __DIR__ . '/custom_api/MailingProviderData.php';
     $this->hookClass->setHook('civicrm_entityTypes', [$this, 'hookEntityTypes']);
-    CRM_Core_DAO_AllCoreTables::init(TRUE);
+    CRM_Core_DAO_AllCoreTables::flush();
     CRM_Core_DAO::executeQuery(
       "CREATE TABLE IF NOT EXISTS `civicrm_mailing_provider_data` (
     `contact_identifier` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',

@@ -34,8 +34,7 @@ Required vars: mailing, crmMailingConst
       <select
         crm-ui-id="subform.reply_id"
         name="reply_id"
-        ui-jq="select2"
-        ui-options="{dropdownAutoWidth : true}"
+        crm-ui-select="{dropdownAutoWidth : true}"
         ng-model="mailing.reply_id"
         ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'Reply'}"
         required>
@@ -46,8 +45,7 @@ Required vars: mailing, crmMailingConst
       <select
         crm-ui-id="subform.optout_id"
         name="optout_id"
-        ui-jq="select2"
-        ui-options="{dropdownAutoWidth : true}"
+        crm-ui-select="{dropdownAutoWidth : true}"
         ng-model="mailing.optout_id"
         ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'OptOut'}"
         required>
@@ -58,8 +56,7 @@ Required vars: mailing, crmMailingConst
       <select
         crm-ui-id="subform.resubscribe_id"
         name="resubscribe_id"
-        ui-jq="select2"
-        ui-options="{dropdownAutoWidth : true}"
+        crm-ui-select="{dropdownAutoWidth : true}"
         ng-model="mailing.resubscribe_id"
         ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'Resubscribe'}"
         required>
@@ -70,8 +67,7 @@ Required vars: mailing, crmMailingConst
       <select
         crm-ui-id="subform.unsubscribe_id"
         name="unsubscribe_id"
-        ui-jq="select2"
-        ui-options="{dropdownAutoWidth : true}"
+        crm-ui-select="{dropdownAutoWidth : true}"
         ng-model="mailing.unsubscribe_id"
         ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'Unsubscribe'}"
         required>

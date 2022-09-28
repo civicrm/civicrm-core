@@ -1,0 +1,15 @@
+<div af-fieldset="">
+  <div class="af-markup">
+    <div class="form-inline">
+      <a class="btn btn-primary" target="crm-popup" ng-href="{{ crmUrl('civicrm/admin/custom/group/field/add', {gid: routeParams.gid, reset: 1}) }}">
+        <i class="crm-i fa-plus-circle"></i>
+        {{:: ts('Add Field') }}
+      </a>
+      <a class="btn btn-secondary" ng-href="{{ crmUrl('civicrm/admin/custom/group') }}">
+        <i class="crm-i fa-times"></i>
+        {{:: ts('Done') }}
+      </a>
+    </div>
+  </div>
+  <crm-search-display-table search-name="Administer_Custom_Fields" display-name="Table" filters="{custom_group_id: routeParams.gid}"></crm-search-display-table>
+</div>

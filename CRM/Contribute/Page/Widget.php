@@ -21,7 +21,6 @@ class CRM_Contribute_Page_Widget extends CRM_Core_Page {
    * loads, it decides the which action has to be taken for the page.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function run() {
     $config = CRM_Core_Config::singleton();

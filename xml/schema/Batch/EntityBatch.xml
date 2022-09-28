@@ -28,6 +28,9 @@
     <length>64</length>
     <comment>physical tablename for entity being joined to file, e.g. civicrm_contact</comment>
     <add>3.3</add>
+    <pseudoconstant>
+      <optionGroupName>entity_batch_extends</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>entity_id</name>

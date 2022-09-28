@@ -1,0 +1,29 @@
+<button type="button" class="btn btn-secondary-outline dropdown-toggle" ng-click="$ctrl.openMenu()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  <i class="crm-i fa-tag"></i>
+  <span class="crm-search-admin-tags-btn-label">{{:: ts('Tags') }}</span>
+  <span class="caret"></span>
+</button>
+<ul class="dropdown-menu" ng-if="$ctrl.menuOpen">
+  <li>
+    <div class="form-inline" ng-click="$event.stopPropagation()">
+      <input type="search" placeholder="{{:: ts('Add tag...') }}" ng-model="$ctrl.search">
+    </div>
+  </li>
+  <li ng-if="$ctrl.search.length > 1">
+    <div class="form-inline">
+      <label ng-click="$ctrl.makeTag($ctrl.search)">{{:: ts('Create Tag') }}</label>
+      <input type="color" ng-model="$ctrl.color">
+      <a href ng-click="$ctrl.makeTag($ctrl.search)">{{ $ctrl.search }}</a>
+    </div>
+  </li>
+  <li ng-repeat="tag in $ctrl.allTags | filter:{name: $ctrl.search, is_selectable: true}">
+    <a href ng-click="$ctrl.toggleTag(tag)">
+      <i class="crm-i fa-check" style="visibility: {{ $ctrl.hasTag(tag) ? 'visible' : 'hidden' }}"></i>
+      <span class="crm-search-admin-tag-color" style="background-color: {{:: tag.color }}"></span>
+      {{:: tag.name }}
+    </a>
+  </li>
+</ul>
+<span class="badge" ng-repeat="id in $ctrl.tagIds" style="{{:: $ctrl.getStyle(id) }}">
+  {{:: $ctrl.getTag(id).name }}
+</span>

@@ -54,6 +54,8 @@
     <name>is_default</name>
     <title>Is Default Mail Settings?</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
     <comment>whether this is the default set of settings for this domain</comment>
     <add>2.2</add>
   </field>
@@ -130,6 +132,8 @@
     <name>is_ssl</name>
     <title>Mail Account Uses SSL</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
     <comment>whether to use SSL or not</comment>
     <add>2.2</add>
   </field>
@@ -161,6 +165,7 @@
     <title>Skip emails which do not have a Case ID or Case hash</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <html>
       <type>CheckBox</type>
     </html>
@@ -172,6 +177,7 @@
     <type>boolean</type>
     <title>Do not create new contacts when filing emails</title>
     <default>0</default>
+    <required>true</required>
     <html>
       <type>CheckBox</type>
     </html>

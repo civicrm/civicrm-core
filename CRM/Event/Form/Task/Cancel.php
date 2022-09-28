@@ -46,7 +46,7 @@ class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
    * @return void
    */
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Cancel Registration for Event Participation'));
+    $this->setTitle(ts('Cancel Registration for Event Participation'));
     $session = CRM_Core_Session::singleton();
     $this->addDefaultButtons(ts('Cancel Registrations'), 'done');
   }

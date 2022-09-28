@@ -125,14 +125,14 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     $processor->setComponentClause($componentClause);
     $processor->setIds($ids);
 
-    list($query, $queryString) = $processor->runQuery($params, $order);
+    [$query, $queryString] = $processor->runQuery($params, $order);
 
     // This perhaps only needs calling when $mergeSameHousehold == 1
     self::buildRelatedContactArray($selectAll, $ids, $processor, $componentTable);
 
     $addPaymentHeader = FALSE;
 
-    list($outputColumns) = $processor->getExportStructureArrays();
+    [$outputColumns] = $processor->getExportStructureArrays();
 
     if ($processor->isMergeSameAddress()) {
       foreach (array_keys($processor->getAdditionalFieldsForSameAddressMerge()) as $field) {
@@ -247,11 +247,11 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     if ($parserClass[0] == 'CRM' &&
       count($parserClass) >= 3
     ) {
-      require_once str_replace('_', DIRECTORY_SEPARATOR, $parserName) . ".php";
       // ensure the functions exists
       if (method_exists($parserName, 'errorFileName') &&
         method_exists($parserName, 'saveFileName')
       ) {
+        CRM_Core_Error::deprecatedWarning('unused code');
         $errorFileName = $parserName::errorFileName($type);
         $saveFileName = $parserName::saveFileName($type);
         if (!empty($errorFileName) && !empty($saveFileName)) {
@@ -424,9 +424,9 @@ VALUES $sqlValueString
       $relationQuery = new CRM_Contact_BAO_Query(NULL, $relationReturnProperties,
         NULL, FALSE, FALSE, $queryMode
       );
-      list($relationSelect, $relationFrom, $relationWhere, $relationHaving) = $relationQuery->query();
+      [$relationSelect, $relationFrom, $relationWhere, $relationHaving] = $relationQuery->query();
 
-      list($id, $direction) = explode('_', $relationshipKey, 2);
+      [$id, $direction] = explode('_', $relationshipKey, 2);
       // identify the relationship direction
       $contactA = 'contact_id_a';
       $contactB = 'contact_id_b';

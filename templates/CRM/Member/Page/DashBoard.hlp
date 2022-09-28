@@ -11,6 +11,7 @@
   {ts}Member Dashboard{/ts}
 {/htxt}
 {htxt id="id-member-intro"}
+    {capture assign=docUrlText}{ts}Refer to the online user guide for more information.{/ts}{/capture}
     {capture assign=findContactURL}{crmURL p="civicrm/contact/search/basic" q="reset=1"}{/capture}
     {capture assign=contribPagesURL}{crmURL p="civicrm/admin/contribute" q="reset=1"}{/capture}
     {capture assign=memberTypesURL}{crmURL p="civicrm/admin/member/membershipType" q="reset=1"}{/capture}
@@ -18,5 +19,5 @@
     <p>{ts 1=$contribPagesURL 2=$memberTypesURL}CiviMember allows you to create customized membership types as well as page(s) for online membership sign-up and renewal. Administrators can create or modify Membership Types <a href='%2'>here</a>, and configure Online Contribution Pages which include membership sign-up <a href='%1'>here</a>.{/ts}</p>
     {capture assign=findMembersURL}{crmURL p="civicrm/member/search/basic" q="reset=1"}{/capture}
     <p>{ts 1=$findMembersURL}This table provides a summary of <strong>Membership Signup and Renewal Activity</strong>, and includes shortcuts to view the details for these commonly used search criteria. To run your own customized searches - click <a href='%1'>Find Members</a>. You can search by Member Name, Membership Type, Status, and Signup Date Ranges.{/ts}</p>
-    <p>{ts 1=$findContactURL 2=$importURL}You can also input and track membership sign-ups offline. To record memberships manually for individual contacts, use <a href="%1">Find Contacts</a> to locate the contact. Then click <strong>View</strong> to go to their summary page and click on the <strong>New Membership</strong> link. You can also <a href="%2">import batches of membership records</a> from other sources.{/ts} {docURL page="user/membership/introduction-to-memberships" text="Refer to the online user guide for more information."}</p>
+    <p>{ts 1=$findContactURL 2=$importURL}You can also input and track membership sign-ups offline. To record memberships manually for individual contacts, use <a href="%1">Find Contacts</a> to locate the contact. Then click <strong>View</strong> to go to their summary page and click on the <strong>New Membership</strong> link. You can also <a href="%2">import batches of membership records</a> from other sources.{/ts} {docURL page="user/membership/what-is-civimember" text=$docUrlText}</p>
 {/htxt}

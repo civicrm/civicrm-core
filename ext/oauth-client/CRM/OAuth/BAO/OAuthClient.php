@@ -67,7 +67,7 @@ class CRM_OAuth_BAO_OAuthClient extends CRM_OAuth_DAO_OAuthClient {
    */
   public static function getRedirectUri() {
     return \Civi::settings()->get('oauthClientRedirectUrl') ?:
-      \CRM_Utils_System::url('civicrm/oauth-client/return', NULL, TRUE, NULL, FALSE);
+      \CRM_Utils_System::url('civicrm/oauth-client/return', NULL, TRUE, NULL, FALSE, FALSE, TRUE);
   }
 
 }

@@ -54,7 +54,7 @@ abstract class AbstractSettingAction extends \Civi\Api4\Generic\AbstractAction {
    *
    * @param int $domain
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function validateSettings($domain) {
     $meta = \Civi\Core\SettingsMetadata::getMetadata([], $domain);
@@ -63,7 +63,7 @@ abstract class AbstractSettingAction extends \Civi\Api4\Generic\AbstractAction {
     }, isset($this->values) ? array_keys($this->values) : $this->select);
     $invalid = array_diff($names, array_keys($meta));
     if ($invalid) {
-      throw new \API_Exception("Unknown settings for domain $domain: " . implode(', ', $invalid));
+      throw new \CRM_Core_Exception("Unknown settings for domain $domain: " . implode(', ', $invalid));
     }
     if (isset($this->values)) {
       foreach ($this->values as $name => $value) {
@@ -90,7 +90,7 @@ abstract class AbstractSettingAction extends \Civi\Api4\Generic\AbstractAction {
       $domains = Domain::get(FALSE)->addSelect('id')->execute()->column('id');
       $invalid = array_diff($this->domainId, $domains);
       if ($invalid) {
-        throw new \API_Exception('Invalid domain id: ' . implode(', ', $invalid));
+        throw new \CRM_Core_Exception('Invalid domain id: ' . implode(', ', $invalid));
       }
     }
     else {

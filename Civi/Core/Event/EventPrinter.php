@@ -18,7 +18,7 @@ class EventPrinter {
    */
   public static function formatName($callback): string {
     $normalizeNamespace = function($symbol) {
-      return $symbol{0} === '\\' ? substr($symbol, 1) : $symbol;
+      return $symbol[0] === '\\' ? substr($symbol, 1) : $symbol;
     };
     if (is_array($callback)) {
       [$a, $b] = $callback;

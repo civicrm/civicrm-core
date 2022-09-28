@@ -19,13 +19,15 @@
 
 namespace api\v4\Action;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
 use Civi\Api4\Relationship;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class ContactGetTest extends \api\v4\UnitTestCase {
+class ContactGetTest extends Api4TestBase implements TransactionalInterface {
 
   public function testGetDeletedContacts() {
     $last_name = uniqid('deleteContactTest');
@@ -93,7 +95,7 @@ class ContactGetTest extends \api\v4\UnitTestCase {
     try {
       $limit2->single();
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $msg = $e->getMessage();
     }
     $this->assertRegExp(';Expected to find one Contact record;', $msg);
@@ -109,7 +111,7 @@ class ContactGetTest extends \api\v4\UnitTestCase {
    * By default our DBs are not 🦉 compliant. This test will age
    * out when we are.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testEmoji(): void {
     $schemaNeedsAlter = \CRM_Core_BAO_SchemaHandler::databaseSupportsUTF8MB4();
@@ -117,9 +119,11 @@ class ContactGetTest extends \api\v4\UnitTestCase {
       \CRM_Core_DAO::executeQuery("
         ALTER TABLE civicrm_contact MODIFY COLUMN
         `first_name` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'First Name.',
-        CHARSET utf8
+        CHARSET utf8 COLLATE utf8_unicode_ci
       ");
+      \Civi::$statics['CRM_Core_BAO_SchemaHandler'] = [];
     }
+    \Civi::$statics['CRM_Core_BAO_SchemaHandler'] = [];
     Contact::get()
       ->setDebug(TRUE)
       ->addWhere('first_name', '=', '🦉Claire')
@@ -128,7 +132,7 @@ class ContactGetTest extends \api\v4\UnitTestCase {
       \CRM_Core_DAO::executeQuery("
         ALTER TABLE civicrm_contact MODIFY COLUMN
         `first_name` VARCHAR(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'First Name.',
-        CHARSET utf8mb4
+        CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci
       ");
     }
   }
@@ -195,6 +199,37 @@ class ContactGetTest extends \api\v4\UnitTestCase {
     $this->assertArrayHasKey($jan['id'], (array) $result);
   }
 
+  public function testRegexpOperators() {
+    $last_name = uniqid(__FUNCTION__);
+
+    $alice = Contact::create()
+      ->setValues(['first_name' => 'Alice', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $alex = Contact::create()
+      ->setValues(['first_name' => 'Alex', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $jane = Contact::create()
+      ->setValues(['first_name' => 'Jane', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('first_name', 'REGEXP', '^A')
+      ->execute()->indexBy('id');
+    $this->assertCount(2, $result);
+    $this->assertArrayHasKey($alice['id'], (array) $result);
+    $this->assertArrayHasKey($alex['id'], (array) $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('first_name', 'NOT REGEXP', '^A')
+      ->execute()->indexBy('id');
+    $this->assertCount(1, $result);
+    $this->assertArrayHasKey($jane['id'], (array) $result);
+  }
+
   public function testGetRelatedWithSubType() {
     $org = Contact::create(FALSE)
       ->addValue('contact_type', 'Organization')
@@ -259,14 +294,112 @@ class ContactGetTest extends \api\v4\UnitTestCase {
     $this->assertEquals(['Student'], $result['Contact_RelationshipCache_Contact_01.contact_sub_type:label']);
   }
 
+  public function testGetWithWhereExpression() {
+    $last_name = uniqid(__FUNCTION__);
+
+    $alice = Contact::create()
+      ->setValues(['first_name' => 'Alice', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('LOWER(first_name)', '=', "BINARY('ALICE')", TRUE)
+      ->execute()->indexBy('id');
+    $this->assertCount(0, $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('LOWER(first_name)', '=', "BINARY('alice')", TRUE)
+      ->execute()->indexBy('id');
+    $this->assertArrayHasKey($alice['id'], (array) $result);
+  }
+
   /**
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testOrClause(): void {
     Contact::get()
       ->addClause('OR', ['first_name', '=', '🚂'], ['last_name', '=', '🚂'])
       ->setCheckPermissions(FALSE)
       ->execute();
+  }
+
+  public function testAge(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => 'now - 1 year - 1 month'],
+      ['first_name' => 'def', 'last_name' => $lastName, 'birth_date' => 'now - 21 year - 6 month'],
+    ];
+    $this->saveTestRecords('Contact', ['records' => $sampleData]);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addSelect('first_name', 'age_years')
+      ->execute()->indexBy('first_name');
+    $this->assertEquals(1, $result['abc']['age_years']);
+    $this->assertEquals(21, $result['def']['age_years']);
+
+    Contact::get(FALSE)
+      ->addWhere('age_years', '=', 21)
+      ->addWhere('last_name', '=', $lastName)
+      ->execute()->single();
+  }
+
+  /**
+   *
+   */
+  public function testGetWithCount() {
+    $myName = uniqid('count');
+    for ($i = 1; $i <= 20; ++$i) {
+      $this->createTestRecord('Contact', [
+        'first_name' => "Contact $i",
+        'last_name' => $myName,
+      ]);
+    }
+
+    $get1 = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $myName)
+      ->selectRowCount()
+      ->addSelect('first_name')
+      ->setLimit(10)
+      ->execute();
+
+    $this->assertEquals(20, $get1->count());
+    $this->assertCount(10, (array) $get1);
+
+  }
+
+  public function testGetWithPrimaryEmailPhoneIMAddress() {
+    $lastName = uniqid(__FUNCTION__);
+    $email = uniqid() . '@example.com';
+    $phone = uniqid('phone');
+    $im = uniqid('im');
+    $c1 = $this->createTestRecord('Contact', ['last_name' => $lastName]);
+    $c2 = $this->createTestRecord('Contact', ['last_name' => $lastName]);
+    $c3 = $this->createTestRecord('Contact', ['last_name' => $lastName]);
+
+    $this->createTestRecord('Email', ['email' => $email, 'contact_id' => $c1['id']]);
+    $this->createTestRecord('Email', ['email' => 'not@primary.com', 'contact_id' => $c1['id']]);
+    $this->createTestRecord('Phone', ['phone' => $phone, 'contact_id' => $c1['id']]);
+    $this->createTestRecord('IM', ['name' => $im, 'contact_id' => $c2['id']]);
+    $this->createTestRecord('Address', ['city' => 'Somewhere', 'street_address' => '123 Street', 'contact_id' => $c2['id']]);
+
+    $results = Contact::get(FALSE)
+      ->addSelect('id', 'email_primary.email', 'phone_primary.phone', 'im_primary.name', 'address_primary.*')
+      ->addWhere('last_name', '=', $lastName)
+      ->addOrderBy('id')
+      ->execute();
+
+    $this->assertEquals($email, $results[0]['email_primary.email']);
+    $this->assertEquals($phone, $results[0]['phone_primary.phone']);
+    $this->assertEquals($im, $results[1]['im_primary.name']);
+    $this->assertEquals('Somewhere', $results[1]['address_primary.city']);
+    $this->assertEquals('123 Street', $results[1]['address_primary.street_address']);
+    $this->assertNull($results[0]['im_primary.name']);
+    $this->assertNull($results[2]['email_primary.email']);
+    $this->assertNull($results[2]['phone_primary.phone']);
+    $this->assertNull($results[2]['im_primary.name']);
+    $this->assertNull($results[2]['address_primary.city']);
   }
 
 }

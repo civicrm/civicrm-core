@@ -6,6 +6,11 @@
   <name>civicrm_contact_type</name>
   <comment>Provide type information for contacts</comment>
   <add>3.1</add>
+  <paths>
+    <add>civicrm/admin/options/subtype/edit?action=add&amp;reset=1</add>
+    <update>civicrm/admin/options/subtype/edit?action=update&amp;id=[id]&amp;reset=1</update>
+    <delete>civicrm/admin/options/subtype/edit?action=delete&amp;id=[id]&amp;reset=1</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Contact Type ID</title>
@@ -69,6 +74,15 @@
     <add>3.1</add>
   </field>
   <field>
+    <name>icon</name>
+    <title>Icon</title>
+    <type>varchar</type>
+    <length>255</length>
+    <default>NULL</default>
+    <comment>crm-i icon class representing this contact type</comment>
+    <add>5.49</add>
+  </field>
+  <field>
     <name>parent_id</name>
     <title>Parent ID</title>
     <type>int unsigned</type>
@@ -95,6 +109,7 @@
     <title>Contact Type Is Active?</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Is this entry active?</comment>
     <add>3.1</add>
   </field>
@@ -103,6 +118,7 @@
     <title>Contact Type is Reserved?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this contact type a predefined system type</comment>
     <add>3.1</add>
   </field>

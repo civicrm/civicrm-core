@@ -23,7 +23,7 @@ class SqlFunctionMIN extends SqlFunction {
   protected static function params(): array {
     return [
       [
-        'flag_before' => ['DISTINCT' => ts('Distinct')],
+        'flag_before' => ['' => NULL, 'DISTINCT' => ts('Distinct')],
         'must_be' => ['SqlField'],
       ],
     ];
@@ -34,6 +34,13 @@ class SqlFunctionMIN extends SqlFunction {
    */
   public static function getTitle(): string {
     return ts('Min');
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('The smallest value in the grouping.');
   }
 
 }

@@ -92,7 +92,6 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
    *   Primary membership info (membership_id, contact_id, membership_type ...).
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function relAction($action, $owner) {
     switch ($action) {
@@ -154,8 +153,22 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
     $this->assign('context', $context);
 
     if ($this->membershipID) {
-      $params = ['id' => $this->membershipID];
-      CRM_Member_BAO_Membership::retrieve($params, $values);
+      $values = \Civi\Api4\Membership::get()
+        ->addSelect('*', 'status_id:label', 'membership_type_id:label', 'membership_type_id.financial_type_id', 'status_id.is_current_member')
+        ->addWhere('id', '=', $this->membershipID)
+        ->execute()
+        ->first();
+
+      // Ensure keys expected by MembershipView.tpl are set correctly
+      // Some of these defaults are overwritten dependant on context below
+      $values['financialTypeId'] = $values['membership_type_id.financial_type_id'];
+      $values['membership_type'] = $values['membership_type_id:label'];
+      $values['status'] = $values['status_id:label'];
+      $values['active'] = $values['status_id.is_current_member'];
+      $values['owner_contact_id'] = FALSE;
+      $values['owner_display_name'] = FALSE;
+      $values['campaign'] = FALSE;
+
       if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
         $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $values['membership_type_id'], 'financial_type_id');
         $finType = CRM_Contribute_PseudoConstant::financialType($finTypeId);
@@ -341,7 +354,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
       }
 
       // omitting contactImage from title for now since the summary overlay css doesn't work outside crm-container
-      CRM_Utils_System::setTitle(ts('View Membership for') . ' ' . $displayName);
+      $this->setTitle(ts('View Membership for') . ' ' . $displayName);
 
       // add viewed membership to recent items list
       $recentTitle = $displayName . ' - ' . ts('Membership Type:') . ' ' . $values['membership_type'];
@@ -386,7 +399,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
       $values['membership_type'] = CRM_Core_TestEntity::appendTestText($values['membership_type']);
     }
 
-    $subscriptionCancelled = CRM_Member_BAO_Membership::isSubscriptionCancelled($this->membershipID);
+    $subscriptionCancelled = CRM_Member_BAO_Membership::isSubscriptionCancelled((int) $this->membershipID);
     $values['auto_renew'] = ($autoRenew && !$subscriptionCancelled) ? 'Yes' : 'No';
 
     //do check for campaigns

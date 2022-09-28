@@ -18,7 +18,7 @@
 /**
  *  Access Control List
  */
-class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
+class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL implements \Civi\Core\HookInterface {
 
   /**
    * Available operations for  pseudoconstant.
@@ -83,7 +83,7 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   /**
    * Get all ACLs owned by a given contact, including domain and group-level.
    *
-   * @param int|null $contact_id
+   * @param int $contact_id
    *   The contact ID.
    *
    * @return array
@@ -158,11 +158,20 @@ SELECT acl.*
   }
 
   /**
+   * Retrieve DB object and copy to defaults array.
+   *
    * @param array $params
+   *   Array of criteria values.
    * @param array $defaults
+   *   Array to be populated with found values.
+   *
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    CRM_Core_DAO::commonRetrieve('CRM_ACL_DAO_ACL', $params, $defaults);
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -185,7 +194,7 @@ SELECT acl.*
   }
 
   /**
-   * @param $str
+   * @param string $str
    * @param int $contactID
    *
    * @return bool
@@ -219,9 +228,9 @@ SELECT count( a.id )
   }
 
   /**
-   * @param $type
-   * @param $tables
-   * @param $whereTables
+   * @param int $type
+   * @param array $tables
+   * @param array $whereTables
    * @param int $contactID
    *
    * @return null|string
@@ -314,8 +323,8 @@ SELECT g.*
    * @param int $type
    * @param int $contactID
    * @param string $tableName
-   * @param null $allGroups
-   * @param null $includedGroups
+   * @param array|null $allGroups
+   * @param array|null $includedGroups
    *
    * @return array
    */
@@ -385,7 +394,7 @@ SELECT g.*
 
   /**
    * @param int $type
-   * @param $operation
+   * @param string $operation
    *
    * @return bool
    */
@@ -433,16 +442,21 @@ SELECT g.*
    * Delete ACL records.
    *
    * @param int $aclId
-   *   ID of the ACL record to be deleted.
-   *
+   * @deprecated
    */
   public static function del($aclId) {
-    // delete all entries from the acl cache
-    CRM_ACL_BAO_Cache::resetCache();
+    self::deleteRecord(['id' => $aclId]);
+  }
 
-    $acl = new CRM_ACL_DAO_ACL();
-    $acl->id = $aclId;
-    $acl->delete();
+  /**
+   * Event fired before an action is taken on an ACL record.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    // Reset cache when deleting an ACL record
+    if ($event->action === 'delete') {
+      CRM_ACL_BAO_Cache::resetCache();
+    }
   }
 
   /**
@@ -451,7 +465,7 @@ SELECT g.*
    * @param int $contactID
    * @param string $tableName
    * @param int $type
-   * @param $allGroups
+   * @param array $allGroups
    *
    * @return array
    */

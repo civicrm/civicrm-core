@@ -29,7 +29,7 @@
   'ja_JP' => 'Japanese',
   'km_KH' => 'Khmer',
   'lt_LT' => 'Lithuanian',
-  'nb_NO' => 'Norwegian BokmÃ¥l',
+  'nb_NO' => 'Norwegian Bokmål',
   'fa_IR' => 'Persian (Iran)',
   'pl_PL' => 'Polish',
   'pt_BR' => 'Portuguese (Brazil)',

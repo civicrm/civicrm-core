@@ -1,0 +1,28 @@
+<div id="bootstrap-theme">
+  <div crm-ui-debug="$ctrl"></div>
+
+  <div ng-include="'~/crmMsgadm/ListNav.html'"></div>
+
+  <div class="form-inline">
+    <label for="msgtpl-filter-text">{{:: ts('Filter') }}</label>
+    <input class="form-control" type="search" id="msgtpl-filter-text" ng-model="filters.text">
+  </div>
+
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>{{:: ts('Title') }}</th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="record in $ctrl.records | filter:filters.text | orderBy:['msg_title','_is_translation','tx_language_label']">
+      <td>{{record.msg_title}}</td>
+      <td class="text-right">
+        <a class="btn btn-xs btn-default" ng-href="{{$ctrl.editUrl(record)}}">{{:: ts('Edit') }}</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+</div>

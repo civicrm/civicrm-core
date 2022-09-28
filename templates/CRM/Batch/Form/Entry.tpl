@@ -102,7 +102,7 @@
              </div>
           {else}
             <div class="compressed crm-grid-cell">
-              {$form.field.$rowNumber.$n.html}
+              {$form.field.$rowNumber.$n.html|smarty:nodefaults}
               {if $fields.$n.html_type eq 'File' && !empty($form.field.$rowNumber.$fieldName.value.size)}
                 {ts}Attached{/ts}: {$form.field.$rowNumber.$fieldName.value.name}
               {/if}

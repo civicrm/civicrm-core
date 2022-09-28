@@ -12,6 +12,8 @@
 
 namespace Civi\Api4\Generic;
 
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  * @inheritDoc
  */
@@ -22,10 +24,12 @@ class DAOSaveAction extends AbstractSaveAction {
    * @inheritDoc
    */
   public function _run(Result $result) {
+    $idField = CoreUtil::getIdFieldName($this->getEntityName());
     foreach ($this->records as &$record) {
       $record += $this->defaults;
       $this->formatWriteValues($record);
-      if (empty($record['id'])) {
+      $this->matchExisting($record);
+      if (empty($record[$idField])) {
         $this->fillDefaults($record);
       }
     }

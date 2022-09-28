@@ -3,6 +3,7 @@
 /**
  * Class CRM_Utils_Migrate_ImportExportTest
  * @group headless
+ * @group import
  */
 class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
 
@@ -12,6 +13,7 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
       'civicrm_custom_field',
     ];
     $this->quickCleanup($tablesToTruncate, TRUE);
+    parent::tearDown();
   }
 
   /**
@@ -30,7 +32,6 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
       'html_type' => 'Text',
       'data_type' => 'String',
       'default_value' => 'abc',
-      'weight' => 4,
       'is_required' => 1,
       'is_searchable' => 0,
       'is_active' => 1,
@@ -40,7 +41,6 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
       'label' => 'Our select field',
       'html_type' => 'Select',
       'data_type' => 'String',
-      'weight' => 4,
       'is_required' => 1,
       'is_searchable' => 0,
       'is_active' => 1,

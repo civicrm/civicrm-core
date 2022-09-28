@@ -25,13 +25,13 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
   }
 
   /**
    * CRM-21200: Test that making online payment for pending contribution
    * doesn't overwrite the contribution details
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function testPayNowPayment(): void {
@@ -56,7 +56,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     // create a contribution page which is later used to make online payment for pending contribution
     $contributionPageID2 = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
 
-    /* @var CRM_Contribute_Form_Contribution_Confirm $form*/
+    /** @var CRM_Contribute_Form_Contribution_Confirm $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Contribution_Confirm');
     $form->_id = $contributionPageID2;
 
@@ -76,7 +76,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'cvv2' => 234,
       'credit_card_exp_date' => [
         'M' => 2,
-        'Y' => 2021,
+        'Y' => CRM_Utils_Time::date('Y') + 1,
       ],
       'credit_card_type' => 'Visa',
       'email-5' => 'test@test.com',
@@ -104,7 +104,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     );
 
     // Make sure that certain parameters are set on return from processConfirm
-    $this->assertEquals('Campaign Contribution', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'financial_type_id', $processConfirmResult['financial_type_id']));
+    $this->assertEquals('Campaign Contribution', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'financial_type_id', $processConfirmResult['contribution']->financial_type_id));
 
     // Based on the processed contribution, complete transaction which update the contribution status based on payment result.
     if (!empty($processConfirmResult['contribution'])) {

@@ -31,7 +31,7 @@
 {/htxt}
 {htxt id='contact-type'}
   <p>{ts}Select <strong>Individual</strong> for Contact Type if each record in your file represents an individual person - even if the file also contains related Organization data (e.g. Employer Name, Employer Address, etc.).{/ts}</p>
-  <p>{ts}Select <strong>Organization</strong> or <strong>Household</strong> if each record in your file represents a contact of that type. (NOTE: Some built-in contact types may not be enabled for your site.){/ts}</p>
+  <p>{ts}Select <strong>Organization</strong> or <strong>Household</strong> if each record in your file represents a contact of that type.{/ts}</p>
   <p>{ts}<strong>Importing Contact Subtypes</strong> - If your file contains a mix of "subtypes" belonging to a built-in type, select the built-in ("parent") type here. You will then be able to map a Contact Subtype field from your file which sets the subtype for each row. EXAMPLE: If you are importing a mixture of Individuals who are "Students" and "Parents" and "Staff" subtypes, select "Individual" here AND include a column in your import file which contains the subtype for each row.{/ts}</p>
   <p>{ts}If all records in the file belong to the same subtype, then select that subtype from the "Subtype" field. All records will be automatically assigned to that subtype. In this case you do NOT need to include a Subtype column in the file.{/ts}</p>
 {/htxt}

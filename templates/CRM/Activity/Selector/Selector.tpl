@@ -10,7 +10,7 @@
 <div class="crm-activity-selector-{$context}">
   <div class="crm-accordion-wrapper crm-search_filters-accordion">
     <div class="crm-accordion-header">
-    {ts}Filter by Activity{/ts}</a>
+    {ts}Filter by Activity{/ts}
     </div><!-- /.crm-accordion-header -->
     <div class="crm-accordion-body">
       <form><!-- form element is here to fool the datepicker widget -->

@@ -63,7 +63,7 @@
                       <td class="label">{$element.field_title}</td>
                       {if $element.field_data_type == 'Money'}
                         {if $element.field_type == 'Text'}
-                          <td class="html-adjust">{$element.field_value|crmMoney}</td>
+                          <td class="html-adjust">{$element.data|crmMoney}</td>
                         {else}
                           <td class="html-adjust">{$element.field_value}</td>
                         {/if}

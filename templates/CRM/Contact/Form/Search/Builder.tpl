@@ -52,5 +52,5 @@
 {/if}
 </div>
 {/if}
-{$initHideBoxes}
+{$initHideBoxes|smarty:nodefaults}
 {include file="CRM/Form/validate.tpl"}

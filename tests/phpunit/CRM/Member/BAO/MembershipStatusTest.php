@@ -113,7 +113,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
 
   /**
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testExpiredDisabled() {
     $this->callAPISuccess('MembershipStatus', 'get', [

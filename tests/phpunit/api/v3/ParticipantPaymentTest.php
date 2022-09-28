@@ -32,7 +32,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
-    $event = $this->eventCreate(NULL);
+    $event = $this->eventCreate();
     $this->_eventID = $event['id'];
     $this->_contactID = $this->individualCreate();
     $this->_createdParticipants = [];
@@ -61,28 +61,9 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_participant_payment_create with empty params.
-   */
-  public function testPaymentCreateEmptyParams() {
-    $params = [];
-    $this->callAPIFailure('participant_payment', 'create', $params);
-  }
-
-  /**
-   * Check without contribution_id.
-   */
-  public function testPaymentCreateMissingContributionId() {
-    //Without Payment EntityID
-    $params = [
-      'participant_id' => $this->_participantID,
-    ];
-    $this->callAPIFailure('participant_payment', 'create', $params);
-  }
-
-  /**
    * Check with valid array.
    */
-  public function testPaymentCreate() {
+  public function testPaymentCreate(): void {
     //Create Contribution & get contribution ID
     $contributionID = $this->contributionCreate(['contact_id' => $this->_contactID]);
 
@@ -92,18 +73,14 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       'contribution_id' => $contributionID,
     ];
 
-    $result = $this->callAPIAndDocument('participant_payment', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertTrue(array_key_exists('id', $result));
-
-    //delete created contribution
-    $this->contributionDelete($contributionID);
+    $this->callAPIAndDocument('participant_payment', 'create', $params, __FUNCTION__, __FILE__);
   }
 
   /**
    * Test getPaymentInfo() returns correct
    * information of the participant payment
    */
-  public function testPaymentInfoForEvent() {
+  public function testPaymentInfoForEvent(): void {
     //Create Contribution & get contribution ID
     $contributionID = $this->contributionCreate(['contact_id' => $this->_contactID]);
 
@@ -118,35 +95,6 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_participantID4, 'event');
     $this->assertEquals('Completed', $paymentInfo['contribution_status']);
     $this->assertEquals('100.00', $paymentInfo['total']);
-  }
-
-  ///////////////// civicrm_participant_payment_create methods
-
-  /**
-   * Check with empty array.
-   */
-  public function testPaymentUpdateEmpty() {
-    $this->callAPIFailure('participant_payment', 'create', []);
-  }
-
-  /**
-   * Check with missing participant_id.
-   */
-  public function testPaymentUpdateMissingParticipantId() {
-    $params = [
-      'contribution_id' => '3',
-    ];
-    $this->callAPIFailure('participant_payment', 'create', $params);
-  }
-
-  /**
-   * Check with missing contribution_id.
-   */
-  public function testPaymentUpdateMissingContributionId() {
-    $params = [
-      'participant_id' => $this->_participantID,
-    ];
-    $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
   }
 
   /**
@@ -249,15 +197,6 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       'id' => $this->_participantPaymentID,
     ];
     $this->callAPISuccess('participant_payment', 'delete', $params);
-  }
-
-  /**
-   * Check with empty array.
-   */
-  public function testPaymentDeleteWithEmptyParams() {
-    $params = [];
-    $deletePayment = $this->callAPIFailure('participant_payment', 'delete', $params);
-    $this->assertEquals('Mandatory key(s) missing from params array: id', $deletePayment['error_message']);
   }
 
   /**

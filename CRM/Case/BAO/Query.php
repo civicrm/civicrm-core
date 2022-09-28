@@ -676,7 +676,8 @@ case_relation_type.id = case_relationship.relationship_type_id )";
    *
    * @param CRM_Case_Form_Search $form
    */
-  public static function buildSearchForm(&$form) {
+  public static function buildSearchForm(&$form): void {
+    $form->addOptionalQuickFormElement('upcoming');
     //validate case configuration.
     $configured = CRM_Case_BAO_Case::isCaseConfigured();
     $form->assign('notConfigured', !$configured['configured']);

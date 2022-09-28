@@ -407,8 +407,8 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
    *   unique for each entry in the dataprovider since want to test a given
    *   relationship type against multiple xml strings. It's not a test
    *   identifier, it's an array key to use to look up something.
-   * @param $xmlString string
-   * @param $expected array
+   * @param string $xmlString
+   * @param array $expected
    * @param $dontcare array We're re-using the data provider for two tests and
    *   we don't care about those expected values.
    *
@@ -431,10 +431,10 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
    *   unique for each entry in the dataprovider since want to test a given
    *   relationship type against multiple xml strings. It's not a test
    *   identifier, it's an array key to use to look up something.
-   * @param $xmlString string
+   * @param string $xmlString
    * @param $dontcare array We're re-using the data provider for two tests and
    *   we don't care about those expected values.
-   * @param $expected array
+   * @param array $expected
    *
    * @dataProvider xmlCaseRoleDataProvider
    */

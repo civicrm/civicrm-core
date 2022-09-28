@@ -23,7 +23,7 @@
  *
  * @param array $params
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @return array
  */
 function civicrm_api3_product_create($params) {
@@ -60,7 +60,7 @@ function civicrm_api3_product_get($params) {
  *
  * @param array $params
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @return array
  *   Array of deleted values.
  */

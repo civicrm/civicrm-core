@@ -28,7 +28,6 @@ trait CRMTraits_Financial_OrderTrait {
   public function createRepeatMembershipOrder(): void {
     $this->createExtraneousContribution();
     $this->ids['contact'][0] = $this->individualCreate();
-    $this->ids['membership_type'][0] = $this->membershipTypeCreate();
 
     $contributionRecur = $this->callAPISuccess('ContributionRecur', 'create', array_merge([
       'contact_id' => $this->_contactID,
@@ -59,7 +58,7 @@ trait CRMTraits_Financial_OrderTrait {
         [
           'params' => [
             'contact_id' => $this->ids['contact'][0],
-            'membership_type_id' => $this->ids['membership_type'][0],
+            'membership_type_id:name' => 'General',
             'contribution_recur_id' => $contributionRecur['id'],
             'source' => 'Payment',
           ],

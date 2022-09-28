@@ -19,7 +19,7 @@ class CRM_Core_I18n {
   /**
    * Constants for communication preferences.
    *
-   * @var int
+   * @var string
    */
   const NONE = 'none', AUTO = 'auto';
 
@@ -126,7 +126,6 @@ class CRM_Core_I18n {
    * @param string $locale
    */
   protected function setNativeGettextLocale($locale) {
-
     $locale .= '.utf8';
     putenv("LANG=$locale");
 
@@ -141,33 +140,29 @@ class CRM_Core_I18n {
 
     $this->_phpgettext = new CRM_Core_I18n_NativeGettext();
     $this->_extensioncache['civicrm'] = 'civicrm';
-
   }
 
   /**
    * Set getText locale.
    *
+   * Since CiviCRM 4.5, expected dir structure is civicrm/l10n/xx_XX/LC_MESSAGES/civicrm.mo
+   * because that is what native gettext expects. Fallback support for the pre-4.5 structure
+   * was removed in CiviCRM 5.51.
+   *
+   * CiviCRM 5.23 added support for the CIVICRM_L10N_BASEDIR constant (and [civicrm.l10n])
+   * so that mo files can be stored elsewhere (such as in a web-writable directory, to
+   * support extensions sur as l10nupdate.
+   *
    * @param string $locale
    */
   protected function setPhpGettextLocale($locale) {
-
-    // we support both the old file hierarchy format and the new:
-    // pre-4.5:  civicrm/l10n/xx_XX/civicrm.mo
-    // post-4.5: civicrm/l10n/xx_XX/LC_MESSAGES/civicrm.mo
     require_once 'PHPgettext/streams.php';
     require_once 'PHPgettext/gettext.php';
 
     $mo_file = CRM_Core_I18n::getResourceDir() . $locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . 'civicrm.mo';
-
-    if (!file_exists($mo_file)) {
-      // fallback to pre-4.5 mode
-      $mo_file = CRM_Core_I18n::getResourceDir() . $locale . DIRECTORY_SEPARATOR . 'civicrm.mo';
-    }
-
     $streamer = new FileReader($mo_file);
     $this->_phpgettext = new gettext_reader($streamer);
     $this->_extensioncache['civicrm'] = $this->_phpgettext;
-
   }
 
   /**
@@ -184,6 +179,7 @@ class CRM_Core_I18n {
     static $enabled = NULL;
 
     if (!$all) {
+      $optionValues = [];
       // Use `getValues`, not `buildOptions` to bypass hook_civicrm_fieldOptions.  See core#1132.
       CRM_Core_OptionValue::getValues(['name' => 'languages'], $optionValues, 'weight', TRUE);
       $all = array_column($optionValues, 'label', 'name');
@@ -237,6 +233,28 @@ class CRM_Core_I18n {
     }
 
     return $justEnabled ? $enabled : $all;
+  }
+
+  /**
+   * Get the options available for format locale.
+   *
+   * Note the pseudoconstant can't be used as the key is the name not the value.
+   *
+   * @return array
+   */
+  public static function getFormatLocales(): array {
+    $values = CRM_Core_OptionValue::getValues(['name' => 'languages'], $optionValues, 'label', TRUE);
+    $return = [];
+    $return[NULL] = ts('Inherit from language');
+    foreach ($values as $value) {
+      $return[$value['name']] = $value['label'];
+    }
+    // Sorry not sorry.
+    // Hacking in for now since the is probably the most important use-case for
+    // money formatting in an English speaking non-US locale based on any reasonable
+    // metric.
+    $return['en_NZ'] = ts('English (New Zealand)');
+    return $return;
   }
 
   /**
@@ -532,7 +550,7 @@ class CRM_Core_I18n {
   /**
    * Binds a gettext domain, wrapper over bindtextdomain().
    *
-   * @param $key
+   * @param string $key
    *   Key of the extension (can be 'civicrm', or 'org.example.foo').
    *
    * @return Bool
@@ -561,7 +579,7 @@ class CRM_Core_I18n {
           // phpgettext
           $mo_file = $path . DIRECTORY_SEPARATOR . 'l10n' . DIRECTORY_SEPARATOR . $this->locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . $domain . '.mo';
           $streamer = new FileReader($mo_file);
-          $this->_extensioncache[$key] = new gettext_reader($streamer);
+          $this->_extensioncache[$key] = $streamer->length() ? new gettext_reader($streamer) : NULL;
         }
       }
       catch (CRM_Extension_Exception $e) {
@@ -610,7 +628,7 @@ class CRM_Core_I18n {
   /**
    * Is the language written "right-to-left"?
    *
-   * @param $language
+   * @param string $language
    *   Language (for example 'en_US', or 'fr_CA').
    *
    * @return bool
@@ -637,27 +655,41 @@ class CRM_Core_I18n {
   /**
    * Change the processing language without changing the current user language
    *
-   * @param $locale
+   * @param string|\Civi\Core\Locale $locale
    *   Locale (for example 'en_US', or 'fr_CA').
    *   True if the domain was changed for an extension.
    */
   public function setLocale($locale) {
+    global $civicrmLocale;
+    if ($locale === NULL) {
+      $civicrmLocale = \Civi\Core\Locale::null();
+    }
+    elseif (is_object($locale)) {
+      $civicrmLocale = $locale;
+    }
+    else {
+      $civicrmLocale = \Civi\Core\Locale::negotiate($locale);
+    }
 
     // Change the language of the CMS as well, for URLs.
-    CRM_Utils_System::setUFLocale($locale);
+    CRM_Utils_System::setUFLocale($civicrmLocale->uf);
 
     // For sql queries, if running in DB multi-lingual mode.
     global $dbLocale;
 
     if ($dbLocale) {
-      $dbLocale = "_{$locale}";
+      $dbLocale = '_' . $civicrmLocale->db;
     }
 
     // For self::getLocale()
     global $tsLocale;
-    $tsLocale = $locale;
+    $tsLocale = $civicrmLocale->ts;
 
     CRM_Core_I18n::singleton()->reactivate();
+  }
+
+  public static function clearLocale(): void {
+    unset($GLOBALS['tsLocale'], $GLOBALS['dbLocale'], $GLOBALS['civicrmLocale']);
   }
 
   /**
@@ -738,7 +770,7 @@ class CRM_Core_I18n {
    *   Ex: $stringTable['enabled']['wildcardMatch']['foo'] = 'bar';
    */
   private function getWordReplacements() {
-    if (isset(Civi::$statics['testPreInstall'])) {
+    if (isset(Civi\Test::$statics['testPreInstall'])) {
       return [];
     }
 
@@ -784,16 +816,16 @@ function ts($text, $params = []) {
     if ($bootstrapReady) {
       // just got ready: determine whether there is a working custom translation function
       $config = CRM_Core_Config::singleton();
-      if (isset($config->customTranslateFunction) and function_exists($config->customTranslateFunction)) {
+      if (!empty($config->customTranslateFunction) && function_exists($config->customTranslateFunction)) {
         $function = $config->customTranslateFunction;
       }
     }
   }
 
-  $activeLocale = CRM_Core_I18n::getLocale();
-  if (!$i18n or $lastLocale != $activeLocale) {
+  $civicrmLocale = CRM_Core_I18n::getLocale();
+  if (!$i18n or $lastLocale != $civicrmLocale) {
     $i18n = CRM_Core_I18n::singleton();
-    $lastLocale = $activeLocale;
+    $lastLocale = $civicrmLocale;
   }
 
   if ($function) {

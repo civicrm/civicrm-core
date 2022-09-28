@@ -15,6 +15,7 @@
 
 SET FOREIGN_KEY_CHECKS=0;
 
+DROP TABLE IF EXISTS `civicrm_search_segment`;
 DROP TABLE IF EXISTS `civicrm_search_display`;
 
 SET FOREIGN_KEY_CHECKS=1;

@@ -21,11 +21,11 @@ namespace Civi\Api4;
  *
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/contacts/#contact-subtypes
  * @see \Civi\Api4\Contact
- * @searchable none
+ * @searchable secondary
  * @since 5.19
  * @package Civi\Api4
  */
 class ContactType extends Generic\DAOEntity {
-  use Generic\Traits\OptionList;
+  use Generic\Traits\ManagedEntity;
 
 }

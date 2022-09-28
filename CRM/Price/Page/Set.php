@@ -109,6 +109,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
     );
 
     // assign vars to templates
+    $this->assign('usedBy', FALSE);
     $this->assign('action', $action);
     $sid = CRM_Utils_Request::retrieve('sid', 'Positive',
       $this, FALSE, 0

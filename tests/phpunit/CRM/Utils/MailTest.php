@@ -69,7 +69,7 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
     ]);
 
     $this->assertFalse(CRM_Utils_Mail::send($params));
-    $this->assertEquals('You shall not pass', CRM_Core_Session::singleton()->getStatus()[0]['text']);
+    $this->assertEquals('Unable to send email. Please report this message to the site administrator', CRM_Core_Session::singleton()->getStatus()[0]['text']);
   }
 
   /**

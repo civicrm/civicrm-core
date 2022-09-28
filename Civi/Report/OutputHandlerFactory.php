@@ -70,7 +70,7 @@ class OutputHandlerFactory {
       }
       catch (\Exception $e) {
         // no ts() since this is a sysadmin-y message
-        \Civi::log()->warn("Unable to use $candidate as an output handler. " . $e->getMessage());
+        \Civi::log()->warning("Unable to use $candidate as an output handler. " . $e->getMessage());
       }
     }
     return NULL;

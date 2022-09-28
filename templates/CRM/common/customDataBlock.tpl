@@ -7,7 +7,7 @@
   <script type="text/javascript">
     CRM.$(function($) {
       {/literal}
-      {if $customDataSubType}
+      {if !empty($customDataSubType)}
         CRM.buildCustomData('{$customDataType}', {$customDataSubType}, false, false, false, false, false, {$cid});
       {else}
         CRM.buildCustomData('{$customDataType}', false, false, false, false, false, false, {$cid});

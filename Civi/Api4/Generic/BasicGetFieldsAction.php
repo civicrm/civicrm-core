@@ -13,6 +13,7 @@
 namespace Civi\Api4\Generic;
 
 use Civi\API\Exception\NotImplementedException;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Lists information about fields for the $ENTITY entity.
@@ -88,7 +89,7 @@ class BasicGetFieldsAction extends BasicGetAction {
     catch (NotImplementedException $e) {
     }
     if (isset($actionClass) && method_exists($actionClass, 'fields')) {
-      $values = $actionClass->fields();
+      $values = $actionClass->fields($this);
     }
     else {
       $values = $this->getRecords();
@@ -135,52 +136,92 @@ class BasicGetFieldsAction extends BasicGetAction {
       if (array_key_exists('label', $fieldDefaults)) {
         $field['label'] = $field['label'] ?? $field['title'] ?? $field['name'];
       }
+      if (!empty($field['options']) && is_array($field['options']) && empty($field['suffixes']) && array_key_exists('suffixes', $field)) {
+        $this->setFieldSuffixes($field);
+      }
       if (isset($defaults['options'])) {
-        $field['options'] = $this->formatOptionList($field['options']);
+        $this->formatOptionList($field);
       }
       $field = array_diff_key($field, $internalProps);
     }
   }
 
   /**
-   * Transforms option list into the format specified in $this->loadOptions
+   * Sets `options` and `suffixes` based on pseudoconstant if given.
    *
-   * @param $options
-   * @return array|bool
+   * Transforms option list into the format specified in $this->loadOptions.
+   *
+   * @param array $field
    */
-  private function formatOptionList($options) {
-    if (!$this->loadOptions || !is_array($options)) {
-      return (bool) $options;
+  private function formatOptionList(&$field) {
+    if (empty($field['options'])) {
+      $field['options'] = !empty($field['pseudoconstant']);
     }
-    if (!$options) {
-      return $options;
+    if (!empty($field['pseudoconstant']['optionGroupName'])) {
+      $field['suffixes'] = CoreUtil::getOptionValueFields($field['pseudoconstant']['optionGroupName']);
     }
+    if (!$this->loadOptions || !$field['options']) {
+      $field['options'] = (bool) $field['options'];
+      return;
+    }
+    if (!empty($field['pseudoconstant'])) {
+      if (!empty($field['pseudoconstant']['optionGroupName'])) {
+        $field['options'] = self::pseudoconstantOptions($field['pseudoconstant']['optionGroupName']);
+      }
+      elseif (!empty($field['pseudoconstant']['callback'])) {
+        $field['options'] = call_user_func(\Civi\Core\Resolver::singleton()->get($field['pseudoconstant']['callback']));
+      }
+      else {
+        throw new \CRM_Core_Exception('Unsupported pseudoconstant type for field "' . $field['name'] . '"');
+      }
+    }
+    if (!$field['options'] || !is_array($field['options'])) {
+      return;
+    }
+
     $formatted = [];
-    $first = reset($options);
+    $first = reset($field['options']);
     // Flat array requested
     if ($this->loadOptions === TRUE) {
       // Convert non-associative to flat array
       if (is_array($first) && isset($first['id'])) {
-        foreach ($options as $option) {
+        foreach ($field['options'] as $option) {
           $formatted[$option['id']] = $option['label'] ?? $option['name'] ?? $option['id'];
         }
-        return $formatted;
+        $field['options'] = $formatted;
       }
-      return $options;
     }
     // Non-associative array of multiple properties requested
-    foreach ($options as $id => $option) {
-      // Transform a flat list
-      if (!is_array($option)) {
-        $option = [
-          'id' => $id,
-          'name' => $option,
-          'label' => $option,
-        ];
+    else {
+      foreach ($field['options'] as $id => $option) {
+        // Transform a flat list
+        if (!is_array($option)) {
+          $option = [
+            'id' => $id,
+            'name' => $id,
+            'label' => $option,
+          ];
+        }
+        $formatted[] = array_intersect_key($option, array_flip($this->loadOptions));
       }
-      $formatted[] = array_intersect_key($option, array_flip($this->loadOptions));
+      $field['options'] = $formatted;
     }
-    return $formatted;
+  }
+
+  /**
+   * Set supported field suffixes based on available option keys
+   * @param array $field
+   */
+  private function setFieldSuffixes(array &$field) {
+    // These suffixes are always supported if a field has options
+    $field['suffixes'] = ['name', 'label'];
+    $firstOption = reset($field['options']);
+    // If first option is an array, merge in those keys as available suffixes
+    if (is_array($firstOption)) {
+      // Remove 'id' because there is no practical reason to use it as a field suffix
+      $otherKeys = array_diff(array_keys($firstOption), ['id', 'name', 'label']);
+      $field['suffixes'] = array_merge($field['suffixes'], $otherKeys);
+    }
   }
 
   /**
@@ -263,8 +304,15 @@ class BasicGetFieldsAction extends BasicGetAction {
       ],
       [
         'name' => 'required',
+        'description' => 'Is this field required when creating a new entity',
         'data_type' => 'Boolean',
         'default_value' => FALSE,
+      ],
+      [
+        'name' => 'nullable',
+        'description' => 'Whether a null value is allowed in this field',
+        'data_type' => 'Boolean',
+        'default_value' => TRUE,
       ],
       [
         'name' => 'required_if',
@@ -274,6 +322,17 @@ class BasicGetFieldsAction extends BasicGetAction {
         'name' => 'options',
         'data_type' => 'Array',
         'default_value' => FALSE,
+      ],
+      [
+        'name' => 'pseudoconstant',
+        '@internal' => TRUE,
+      ],
+      [
+        'name' => 'suffixes',
+        'data_type' => 'Array',
+        'default_value' => NULL,
+        'options' => ['name', 'label', 'description', 'abbr', 'color', 'icon'],
+        'description' => 'Available option transformations, e.g. :name, :label',
       ],
       [
         'name' => 'operators',
@@ -307,6 +366,7 @@ class BasicGetFieldsAction extends BasicGetAction {
           'Radio' => ts('Radio Buttons'),
           'Select' => ts('Select'),
           'Text' => ts('Text'),
+          'Location' => ts('Address Location'),
         ],
       ],
       [

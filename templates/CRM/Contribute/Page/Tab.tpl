@@ -34,12 +34,12 @@
           <div class="help">
             {if $permission EQ 'edit'}
               {capture assign=newContribURL}{crmURL p="civicrm/contact/view/contribution" q="reset=1&action=add&cid=`$contactId`&context=contribution"}{/capture}
-              {capture assign=link}class="action-item" href="{$newContribURL}"{/capture}
-              {ts 1=$link}Click <a %1>Record Contribution</a> to record a new contribution received from this contact.{/ts}
+              {capture assign=link}class="action-item" href="{$newContribURL|smarty:nodefaults}"{/capture}
+              {ts 1=$link|smarty:nodefaults}Click <a %1>Record Contribution</a> to record a new contribution received from this contact.{/ts}
               {if $newCredit}
                 {capture assign=newCreditURL}{crmURL p="civicrm/contact/view/contribution" q="reset=1&action=add&cid=`$contactId`&context=contribution&mode=live"}{/capture}
-                {capture assign=link}class="action-item" href="{$newCreditURL}"{/capture}
-                {ts 1=$link}Click <a %1>Submit Credit Card Contribution</a> to process a new contribution on behalf of the contributor using their credit card.{/ts}
+                {capture assign=link}class="action-item" href="{$newCreditURL|smarty:nodefaults}"{/capture}
+                {ts 1=$link|smarty:nodefaults}Click <a %1>Submit Credit Card Contribution</a> to process a new contribution on behalf of the contributor using their credit card.{/ts}
               {/if}
             {else}
               {ts 1=$displayName}Contributions received from %1 since inception.{/ts}
@@ -48,9 +48,9 @@
 
           {if $action eq 16 and $permission EQ 'edit'}
             <div class="action-link">
-              <a accesskey="N" href="{$newContribURL}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Record Contribution (Check, Cash, EFT ...){/ts}</span></a>
+              <a accesskey="N" href="{$newContribURL|smarty:nodefaults}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Record Contribution (Check, Cash, EFT ...){/ts}</span></a>
               {if $newCredit}
-                <a accesskey="N" href="{$newCreditURL}" class="button"><span><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}Submit Credit Card Contribution{/ts}</span></a>
+                <a accesskey="N" href="{$newCreditURL|smarty:nodefaults}" class="button"><span><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}Submit Credit Card Contribution{/ts}</span></a>
               {/if}
               <br /><br />
             </div>

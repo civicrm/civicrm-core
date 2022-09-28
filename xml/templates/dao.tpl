@@ -72,7 +72,14 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
      * {$field.comment|regex_replace:"/\n[ ]*/":"\n* "}
      *
 {/if}
-     * @var {$field.phpType}
+     * @var {$field.phpType}{if $field.phpNullable}|null
+{/if}
+
+     *   (SQL type: {$field.sqlType})
+     *   Note that values will be retrieved from the database as a string.
+{if $field.deprecated}
+     * @deprecated
+{/if}
      */
     public ${$field.name};
 
@@ -198,7 +205,8 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
                       'permission'      => {$field.permission|@print_array},
 {/if}
 {if $field.default || $field.default === '0'}
-                         'default'   => '{if ($field.default[0]=="'" or $field.default[0]=='"')}{$field.default|substring:1:-1}{else}{$field.default}{/if}',
+  {capture assign=unquotedDefault}{if ($field.default[0]=="'" or $field.default[0]=='"')}{$field.default|substring:1:-1}{else}{$field.default}{/if}{/capture}
+                         'default'   => {if ($unquotedDefault==='NULL')}NULL{else}'{$unquotedDefault}'{/if},
 {/if} {* field.default *}
   'table_name' => '{$table.name}',
   'entity' => '{$table.entity}',

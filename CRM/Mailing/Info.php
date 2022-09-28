@@ -41,7 +41,6 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       }
     }
 
-    $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
 
@@ -50,11 +49,6 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'options' => ['limit' => 0],
       'sequential' => 1,
     ];
-    $groupNames = civicrm_api3('Group', 'get', $params + [
-      'is_active' => 1,
-      'check_permissions' => TRUE,
-      'return' => ['title', 'visibility', 'group_type', 'is_hidden'],
-    ]);
     $headerfooterList = civicrm_api3('MailingComponent', 'get', $params + [
       'is_active' => 1,
       'return' => [
@@ -68,15 +62,15 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
     $emailAdd = civicrm_api3('Email', 'get', [
       'sequential' => 1,
-      'return' => "email",
+      'return' => 'email',
       'contact_id' => $contactID,
     ]);
 
     $mesTemplate = civicrm_api3('MessageTemplate', 'get', $params + [
       'sequential' => 1,
       'is_active' => 1,
-      'return' => ["id", "msg_title"],
-      'workflow_id' => ['IS NULL' => ""],
+      'return' => ['id', 'msg_title'],
+      'workflow_name' => ['IS NULL' => ''],
     ]);
     $mailTokens = civicrm_api3('Mailing', 'gettokens', [
       'entity' => ['contact', 'mailing'],
@@ -95,10 +89,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $crmMailingSettings = [
       'templateTypes' => CRM_Mailing_BAO_Mailing::getTemplateTypes(),
       'civiMails' => [],
-      'campaignEnabled' => in_array('CiviCampaign', $config->enableComponents),
+      'campaignEnabled' => CRM_Core_Component::isEnabled('CiviCampaign'),
       'groupNames' => [],
-      // @todo this is not used in core. Remove once Mosaico no longer depends on it.
-      'testGroupNames' => $groupNames['values'],
       'headerfooterList' => $headerfooterList['values'],
       'mesTemplate' => $mesTemplate['values'],
       'emailAdd' => $emailAdd['values'],
@@ -118,6 +110,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'reportIds' => $reportIds,
       'enabledLanguages' => $enabledLanguages,
       'isMultiLingual' => $isMultiLingual,
+      'autoRecipientRebuild' => Civi::settings()->get('auto_recipient_rebuild'),
     ];
     return $crmMailingSettings;
   }

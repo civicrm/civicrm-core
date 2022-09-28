@@ -18,7 +18,8 @@ class CRM_Report_Utils_Get {
 
   /**
    * @param string $name
-   * @param $type
+   * @param int $type
+   *   Integer number identifying the data type.
    *
    * @return mixed|null
    */
@@ -36,7 +37,7 @@ class CRM_Report_Utils_Get {
   /**
    * @param string $fieldName
    * @param $field
-   * @param $defaults
+   * @param array $defaults
    *
    * @return bool
    */
@@ -83,8 +84,8 @@ class CRM_Report_Utils_Get {
 
   /**
    * @param string $fieldName
-   * @param $field
-   * @param $defaults
+   * @param array $field
+   * @param array $defaults
    */
   public static function stringParam($fieldName, &$field, &$defaults) {
     $fieldOP = CRM_Utils_Array::value("{$fieldName}_op", $_GET, 'like');
@@ -123,8 +124,8 @@ class CRM_Report_Utils_Get {
 
   /**
    * @param string $fieldName
-   * @param $field
-   * @param $defaults
+   * @param array $field
+   * @param array $defaults
    */
   public static function intParam($fieldName, &$field, &$defaults) {
     $fieldOP = CRM_Utils_Array::value("{$fieldName}_op", $_GET, 'eq');
@@ -170,10 +171,12 @@ class CRM_Report_Utils_Get {
         // send the type as string so that multiple values can also be retrieved from url.
         // for e.g url like - "memtype_in=in&memtype_value=1,2,3"
         $value = self::getTypedValue("{$fieldName}_value", CRM_Utils_Type::T_STRING);
-        if (!preg_match('/^(\d+)(,\d+){0,14}$/', $value)) {
-          // extra check. Also put a limit of 15 max values.
+
+        //change the max value to 20, ideally remove condition
+        if (!preg_match('/^(\d+)(,\d+){0,20}$/', $value)) {
           $value = NULL;
         }
+
         if ($value !== NULL) {
           $defaults["{$fieldName}_value"] = explode(",", $value);
           $defaults["{$fieldName}_op"] = $fieldOP;
@@ -183,7 +186,7 @@ class CRM_Report_Utils_Get {
   }
 
   /**
-   * @param $defaults
+   * @param array $defaults
    */
   public static function processChart(&$defaults) {
     $chartType = $_GET["charts"] ?? NULL;
@@ -196,8 +199,8 @@ class CRM_Report_Utils_Get {
   }
 
   /**
-   * @param $fieldGrp
-   * @param $defaults
+   * @param array $fieldGrp
+   * @param array $defaults
    */
   public static function processFilter(&$fieldGrp, &$defaults) {
     // process only filters for now
@@ -226,7 +229,7 @@ class CRM_Report_Utils_Get {
 
   /**
    * unset default filters.
-   * @param $defaults
+   * @param array $defaults
    */
   public static function unsetFilters(&$defaults) {
     static $unsetFlag = TRUE;
@@ -274,8 +277,8 @@ class CRM_Report_Utils_Get {
   }
 
   /**
-   * @param $reportFields
-   * @param $defaults
+   * @param array|null $reportFields
+   * @param array $defaults
    */
   public static function processFields(&$reportFields, &$defaults) {
     //add filters from url

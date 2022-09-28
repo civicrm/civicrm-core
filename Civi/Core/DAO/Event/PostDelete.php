@@ -23,13 +23,13 @@ class PostDelete extends \Symfony\Component\EventDispatcher\Event {
   public $object;
 
   /**
-   * @var mixed
+   * @var int|false
    */
   public $result;
 
   /**
-   * @param $object
-   * @param $result
+   * @param \CRM_Core_DAO $object
+   * @param int|false $result
    */
   public function __construct($object, $result) {
     $this->object = $object;

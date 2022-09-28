@@ -48,9 +48,7 @@ class CRM_Contact_Form_Task_SMS extends CRM_Contact_Form_Task {
     }
 
     $this->assign('single', $this->_single);
-    if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $this->assign('isAdmin', 1);
-    }
+    $this->assign('isAdmin', CRM_Core_Permission::check('administer CiviCRM'));
   }
 
   /**

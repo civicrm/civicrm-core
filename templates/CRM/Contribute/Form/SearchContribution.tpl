@@ -30,8 +30,8 @@
     </tr>
 
     {* campaign in contribution page search *}
-    {include file="CRM/Campaign/Form/addCampaignToComponent.tpl"
-    campaignContext="componentSearch" campaignTrClass='' campaignTdClass=''}
+    {include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
+    campaignTrClass='' campaignTdClass=''}
 
  </table>
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>

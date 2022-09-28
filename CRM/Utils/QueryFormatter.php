@@ -219,7 +219,7 @@ class CRM_Utils_QueryFormatter {
    * Format Fts.
    *
    * @param string $text
-   * @param $mode
+   * @param string $mode
    *
    * @return mixed
    */
@@ -270,7 +270,7 @@ class CRM_Utils_QueryFormatter {
    * Format FTS.
    *
    * @param string $text
-   * @param $mode
+   * @param string $mode
    *
    * @return mixed
    */
@@ -342,8 +342,8 @@ class CRM_Utils_QueryFormatter {
   /**
    * Format like.
    *
-   * @param $text
-   * @param $mode
+   * @param string $text
+   * @param string $mode
    *
    * @return mixed
    */
@@ -425,9 +425,9 @@ class CRM_Utils_QueryFormatter {
   }
 
   /**
-   * @param $text
-   * @param $wildcard
-   * @return mixed
+   * @param string|null $text
+   * @param string $wildcard
+   * @return string|null
    */
   protected function dedupeWildcards($text, $wildcard) {
     if ($text === NULL) {
@@ -471,7 +471,7 @@ class CRM_Utils_QueryFormatter {
   }
 
   /**
-   * @param $text
+   * @param string $text
    *
    * Ex: drush eval 'civicrm_initialize(); CRM_Utils_QueryFormatter::dumpExampleTable("firstword secondword");'
    */

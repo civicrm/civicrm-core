@@ -34,7 +34,7 @@ abstract class BasicEntity extends AbstractEntity {
   /**
    * Unique identifier for this entity.
    *
-   * @var string
+   * @var string|string[]
    */
   protected static $idField = 'id';
 
@@ -133,6 +133,15 @@ abstract class BasicEntity extends AbstractEntity {
    */
   public static function replace($checkPermissions = TRUE) {
     return (new BasicReplaceAction(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return AutocompleteAction
+   */
+  public static function autocomplete($checkPermissions = TRUE) {
+    return (new AutocompleteAction(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 

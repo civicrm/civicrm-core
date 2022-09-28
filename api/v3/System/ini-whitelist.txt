@@ -180,7 +180,6 @@ register_long_arrays
 report_memleaks
 report_zend_debug
 request_order
-safe_mode
 # Omit: safe_mode_allowed_env_vars
 # Omit: safe_mode_exec_dir
 safe_mode_gid

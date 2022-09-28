@@ -84,10 +84,11 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
 
   /**
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setUp(): void {
     parent::setUp();
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviMember');
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
 
     $params = [
       'contact_type_a' => 'Individual',
@@ -151,8 +152,6 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
 
     $session = CRM_Core_Session::singleton();
     $session->set('dateTypes', 1);
-    $this->_sethtmlGlobals();
-
   }
 
   /**
@@ -165,12 +164,10 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     if ($this->callAPISuccessGetCount('membership', ['id' => $this->_membershipTypeID])) {
       $this->membershipTypeDelete(['id' => $this->_membershipTypeID]);
     }
-    if ($this->callAPISuccessGetCount('MembershipStatus', ['id' => $this->_membershipStatusID])) {
-      $this->membershipStatusDelete($this->_membershipStatusID);
-    }
     $this->contactDelete($this->_contactID);
     $this->contactDelete($this->_contactID2);
     $this->contactDelete($this->_orgContactID);
+    parent::tearDown();
   }
 
   /**
@@ -178,7 +175,6 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    *
    * @param string $thousandSeparator
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    *
@@ -201,6 +197,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     //check start dates #1 should default to 1 Jan this year, #2 should be as entered
     $this->assertEquals(date('Y-m-d', strtotime('first day of January 2013')), $memberships[1]['start_date']);
     $this->assertEquals('2013-02-03', $memberships[2]['start_date']);
+    $this->assertEquals('2013-12-31', $memberships[2]['end_date']);
 
     //check start dates #1 should default to 1 Jan this year, #2 should be as entered
     $this->assertEquals(date('Y-m-d', strtotime('last day of December 2013')), $memberships[1]['end_date']);
@@ -257,7 +254,6 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
   /**
    * CRM-18000 - Test start_date, end_date after renewal
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -308,7 +304,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    * Data provider for test process membership.
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function getMembershipData(): array {
@@ -346,8 +342,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
           'financial_type' => 2,
           'total_amount' => $this->formatMoneyInput(1500),
           'receive_date' => '2013-07-17',
-          'receive_date_time' => NULL,
-          'payment_instrument' => NULL,
+          'payment_instrument' => 1,
           'trxn_id' => 'TX102',
           'check_number' => NULL,
           'contribution_status_id' => 1,
@@ -362,8 +357,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
           'financial_type' => 2,
           'total_amount' => $this->formatMoneyInput(1500),
           'receive_date' => '2013-07-17',
-          'receive_date_time' => NULL,
-          'payment_instrument' => NULL,
+          'payment_instrument' => 1,
           'trxn_id' => 'TX103',
           'check_number' => NULL,
           'contribution_status_id' => 1,
@@ -427,7 +421,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    * Create a campaign.
    *
    * @return mixed
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   private function createCampaign(): int {

@@ -1,0 +1,109 @@
+<div id="bootstrap-theme" crm-dialog="previewMsgDlg" ng-controller="MsgtpluiPreviewCtrl as $ctrl">
+
+  <div crm-ui-debug="$ctrl"></div>
+
+  <form name="previewMsgForm">
+
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <div class="navbar-brand">
+            {{::model.title}}
+          </div>
+        </div>
+        <div class="navbar-form navbar-right">
+          <div class="form-group">
+            <button crm-icon="fa-times" type="button" class="btn btn-default" ng-click="previewMsgDlg.close()">
+              {{::ts('Close')}}
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="well-sm">
+      <div class="form-horizontal">
+        <div class="form-group">
+          <label class="control-label col-sm-2">{{::ts('Revision')}}</label>
+          <div class="input-group col-sm-9">
+            <select class="form-control" ng-options="item.id as item.label for item in model.revisions" ng-model="$ctrl.revisionId"></select>
+            <div class="input-group-btn">
+              <button class="btn btn-default" ng-disabled="model.revisions.length <= 1" ng-click="$ctrl.cycle('revisionId', 'revisions', -1)" title="{{::ts('Previous revision')}}">&#xab;</button>
+              <button class="btn btn-default" ng-disabled="model.revisions.length <= 1" ng-click="$ctrl.cycle('revisionId', 'revisions', +1)" title="{{::ts('Next revision')}}">&#xbb;</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="control-label col-sm-2">{{::ts('Example')}}</label>
+          <div class="input-group col-sm-9">
+            <select class="form-control" ng-options="item.id as item.title for item in model.examples" ng-model="$ctrl.exampleId"></select>
+            <div class="input-group-btn">
+              <!-- <button class="btn btn-default" ng-click="$ctrl.toggleAdhoc()" crm-icon="fa-pencil"></button> -->
+              <button class="btn btn-default" ng-disabled="model.examples.length <= 1" ng-click="$ctrl.inspectExample()" title="{{::ts('Inspect example data')}}"><i class="crm-i fa-file-code-o"></i></button>
+              <button class="btn btn-default" ng-disabled="model.examples.length <= 1" ng-click="$ctrl.cycle('exampleId', 'examples', -1)" title="{{::ts('Previous example')}}">&#xab;</button>
+              <button class="btn btn-default" ng-disabled="model.examples.length <= 1" ng-click="$ctrl.cycle('exampleId', 'examples', +1)" title="{{::ts('Next example')}}">&#xbb;</button>
+            </div>
+          </div>
+        </div>
+
+        <!--
+        <div class="form-group" ng-if="$ctrl.isAdhocExample">
+          <label class="control-label col-sm-2"></label>
+          <div class="input-group col-sm-9">
+            <p><em>{{ts('Changes to this example are temporary.')}}</em></p>
+            <div ng-model="$ctrl.adhocExampleJson"
+                 crm-monaco="$ctrl.monacoOptions({language: 'javascript', crmHeightPct: 0.15})"
+            ></div>
+          </div>
+        </div>
+        -->
+
+        <div class="form-group">
+          <label class="control-label col-sm-2">{{::ts('Format')}}</label>
+          <div class="input-group col-sm-9">
+            <select class="form-control" ng-options="item.id as item.label for item in model.formats" ng-model="$ctrl.formatId"></select>
+            <div class="input-group-btn">
+              <button class="btn btn-default" ng-disabled="model.formats.length <= 1" ng-click="$ctrl.cycle('formatId', 'formats', -1)" title="{{::ts('Previous format')}}">&#xab;</button>
+              <button class="btn btn-default" ng-disabled="model.formats.length <= 1" ng-click="$ctrl.cycle('formatId', 'formats', +1)" title="{{::ts('Next format')}}">&#xbb;</button>
+            </div>
+          </div>
+        </div>
+
+        <hr/>
+
+        <div class="form-group text-center" ng-if="!!$ctrl.preview.loading">
+          {{::ts('Loading...')}}
+        </div>
+
+        <div class="form-group" ng-if="!$ctrl.preview.loading">
+          <label class="control-label col-sm-2">{{::ts('Subject')}}</label>
+          <p class="col-sm-9">{{$ctrl.preview.subject}}</p>
+        </div>
+
+        <div class="form-group" ng-if="!$ctrl.preview.loading && model.formats[$ctrl.formatId].name === 'msg_text'">
+          <pre class="col-sm-12">{{$ctrl.preview.text}}</pre>
+        </div>
+
+        <div class="form-group" ng-if="!$ctrl.preview.loading && model.formats[$ctrl.formatId].name === 'msg_html'">
+          <div class="jumbotron well col-sm-12">
+            <iframe crm-ui-iframe="$ctrl.preview.html"></iframe>
+          </div>
+        </div>
+
+        <div class="form-group" ng-if="!$ctrl.preview.loading && model.formats[$ctrl.formatId].name === 'msg_html_raw'">
+          <div class="jumbotron well col-sm-12">
+            <!-- <textarea ng-model="$ctrl.preview.html"></textarea> -->
+            <div ng-model="$ctrl.preview.html"
+                 ng-disabled="true"
+                 crm-monaco="$ctrl.monacoOptions({language: 'html', crmHeightPct: 0.5})"
+            ></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </form>
+
+</div>

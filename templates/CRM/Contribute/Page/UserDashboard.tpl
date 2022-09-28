@@ -49,11 +49,11 @@
                             {if call_user_func(array('CRM_Core_Permission','check'), 'view my invoices') OR call_user_func(array('CRM_Core_Permission','check'), 'access CiviContribute')}
                                 <a class="button no-popup nowrap"
                                    href="{crmURL p='civicrm/contribute/invoice' q=$urlParams}">
-                                    <i class="crm-i fa-print" aria-hidden="true"></i>
+                                    <i class="crm-i fa-download" aria-hidden="true"></i>
                                     {if empty($row.contribution_status_name) || (!empty($row.contribution_status_name) && $row.contribution_status_name != 'Refunded' && $row.contribution_status_name != 'Cancelled') }
-                                        <span>{ts}Print Invoice{/ts}</span>
+                                        <span>{ts}Download Invoice{/ts}</span>
                                     {else}
-                                        <span>{ts}Print Invoice and Credit Note{/ts}</span>
+                                        <span>{ts}Download Invoice and Credit Note{/ts}</span>
                                     {/if}
                                 </a>
                             {/if}

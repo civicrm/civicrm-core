@@ -15,6 +15,7 @@ use Civi\Token\TokenProcessor;
  * This class provides the common functionality for creating PDF letter for
  * activities.
  *
+ * @deprecated
  */
 class CRM_Activity_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetterCommon {
 
@@ -26,12 +27,13 @@ class CRM_Activity_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLette
    * @return void
    */
   public static function postProcess(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $activityIds = $form->_activityHolderIds;
     $formValues = $form->controller->exportValues($form->getName());
-    $html_message = self::processTemplate($formValues);
+    $html_message = CRM_Core_Form_Task_PDFLetterCommon::processTemplate($formValues);
 
     // Do the rest in another function to make testing easier
-    self::createDocument($activityIds, $html_message, $formValues);
+    $form->createDocument($activityIds, $html_message, $formValues);
 
     $form->postProcessHook();
 
@@ -46,9 +48,12 @@ class CRM_Activity_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLette
    * @param  string $html_message message text with tokens
    * @param  array $formValues   formValues from the form
    *
+   * @deprecated
+   *
    * @return string
    */
   public static function createDocument($activityIds, $html_message, $formValues) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $tp = self::createTokenProcessor();
     $tp->addMessage('body_html', $html_message, 'text/html');
 
@@ -63,9 +68,12 @@ class CRM_Activity_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLette
   /**
    * Create a token processor
    *
+   * @deprecated
+   *
    * @return \Civi\Token\TokenProcessor
    */
   public static function createTokenProcessor() {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     return new TokenProcessor(\Civi::dispatcher(), [
       'controller' => get_class(),
       'smarty' => FALSE,

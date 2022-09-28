@@ -111,7 +111,8 @@
         {assign var="lineItemCount" value=0}
 
         {foreach from=$pcount item=p_count}
-          {assign var="lineItemCount" value=$lineItemCount+$p_count.participant_count}
+          {assign var="intPCount" value=$p_count.participant_count|intval}
+          {assign var="lineItemCount" value=$lineItemCount+$intPCount}
         {/foreach}
         {if $lineItemCount < 1 }
           {assign var="lineItemCount" value=1}
@@ -125,7 +126,7 @@
   <div class="clear"></div>
 </div>
 
-{if $hookDiscount.message}
+{if $hookDiscount && $hookDiscount.message}
   <div class="crm-section hookDiscount-section">
     <em>({$hookDiscount.message})</em>
   </div>

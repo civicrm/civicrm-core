@@ -48,7 +48,7 @@ class CRM_Core_Module {
    * @param bool $fresh
    *   Force new results?
    *
-   * @return array
+   * @return CRM_Core_Module[]
    */
   public static function getAll($fresh = FALSE) {
     static $result;

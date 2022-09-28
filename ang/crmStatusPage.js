@@ -9,7 +9,7 @@
 
       resolve: {
         statusData: function(crmApi) {
-          return crmApi('System', 'check', {sequential: 1});
+          return crmApi('System', 'check', {sequential: 1, options: {limit: 0, sort: 'severity_id DESC'}});
         }
       }
     });

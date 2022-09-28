@@ -1,0 +1,11 @@
+<div class="crm-search-display crm-search-display-grid">
+  <div class="form-inline">
+    <div class="btn-group" ng-include="'~/crmSearchDisplay/SearchButton.html'" ng-if="$ctrl.settings.button"></div>
+    <div class="btn-group pull-right" ng-include="'~/crmSearchDisplay/AddButton.html'" ng-if="$ctrl.addButton"></div>
+  </div>
+  <div
+    class="crm-search-display-grid-container crm-search-display-grid-layout-{{$ctrl.settings.colno}}"
+    ng-include="'~/crmSearchDisplayGrid/crmSearchDisplayGrid' + ($ctrl.loading ? 'Loading' : 'Items') + '.html'"
+  ></div>
+  <div ng-include="'~/crmSearchDisplay/Pager.html'"></div>
+</div>

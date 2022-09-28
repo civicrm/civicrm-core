@@ -90,7 +90,7 @@ function _civicrm_api3_setting_getfields_spec(&$params) {
  * @param array $params
  *
  * @return array
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  * @throws \Exception
  */
 function civicrm_api3_setting_getdefaults($params) {
@@ -129,14 +129,14 @@ function _civicrm_api3_setting_getdefaults_spec(&$params) {
  * @param array $params
  *
  * @return array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_setting_getoptions($params) {
   $domainId = $params['domain_id'] ?? NULL;
   $specs = \Civi\Core\SettingsMetadata::getMetadata(['name' => $params['field']], $domainId, TRUE);
 
   if (!isset($specs[$params['field']]['options']) || !is_array($specs[$params['field']]['options'])) {
-    throw new API_Exception("The field '" . $params['field'] . "' has no associated option list.");
+    throw new CRM_Core_Exception("The field '" . $params['field'] . "' has no associated option list.");
   }
 
   return civicrm_api3_create_success($specs[$params['field']]['options'], $params, 'Setting', 'getoptions');
@@ -197,7 +197,7 @@ function _civicrm_api3_setting_revert_spec(&$params) {
  * @param array $params
  * @deprecated
  * @return array
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  * @throws \Exception
  */
 function civicrm_api3_setting_fill($params) {
@@ -258,8 +258,7 @@ function _civicrm_api3_setting_deprecation() {
  * @return array
  *   api result array
  *
- * @throws \API_Exception
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_setting_create($params) {
   $domains = _civicrm_api3_setting_getDomainArray($params);
@@ -391,7 +390,7 @@ function _civicrm_api3_setting_getvalue_spec(&$params) {
  * @param array $params
  *
  * @return array
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function _civicrm_api3_setting_getDomainArray(&$params) {
   if (empty($params['domain_id']) && isset($params['id'])) {
@@ -408,7 +407,7 @@ function _civicrm_api3_setting_getDomainArray(&$params) {
       $params['domain_id'] = array_keys($domainAPIResult['values']);
     }
     else {
-      throw new API_Exception('All domains not retrieved - problem with Domain Get api call ' . $domainAPIResult['error_message']);
+      throw new CRM_Core_Exception('All domains not retrieved - problem with Domain Get api call ' . $domainAPIResult['error_message']);
     }
   }
   if (is_array($params['domain_id'])) {

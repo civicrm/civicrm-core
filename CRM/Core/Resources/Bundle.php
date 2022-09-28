@@ -29,8 +29,8 @@ class CRM_Core_Resources_Bundle implements CRM_Core_Resources_CollectionInterfac
   public $name;
 
   /**
-   * @param string|NULL $name
-   * @param string[]|NULL $types
+   * @param string|null $name
+   * @param string[]|null $types
    *   List of resource-types to permit in this bundle. NULL for a default list.
    *   Ex: ['styleFile', 'styleUrl']
    *   The following aliases are allowed: '*all*', '*default*', '*script*', '*style*'

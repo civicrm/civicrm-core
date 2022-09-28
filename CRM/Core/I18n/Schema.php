@@ -451,8 +451,8 @@ class CRM_Core_I18n_Schema {
    *   schema structure class to use.
    * @param bool $isUpgradeMode
    *   Are we in upgrade mode therefore only build based off table not class
-   * @return array
-   *   array of CREATE INDEX queries
+   * @return string
+   *   The generated CREATE VIEW query
    */
   private static function createViewQuery($locale, $table, &$dao, $class = 'CRM_Core_I18n_SchemaStructure', $isUpgradeMode = FALSE) {
     $columns =& $class::columns();
@@ -522,19 +522,19 @@ class CRM_Core_I18n_Schema {
       $trigger = [];
 
       foreach ($hash as $column => $_) {
-        $trigger[] = "IF NEW.{$column}_{$locale} IS NOT NULL THEN";
+        $trigger[] = "IF NEW.{$column}_{$locale} IS NOT NULL AND NEW.{$column}_{$locale} != '' THEN";
         foreach ($locales as $old) {
-          $trigger[] = "IF NEW.{$column}_{$old} IS NULL THEN SET NEW.{$column}_{$old} = NEW.{$column}_{$locale}; END IF;";
+          $trigger[] = "IF NEW.{$column}_{$old} IS NULL OR NEW.{$column}_{$old} = '' THEN SET NEW.{$column}_{$old} = NEW.{$column}_{$locale}; END IF;";
         }
         foreach ($locales as $old) {
-          $trigger[] = "ELSEIF NEW.{$column}_{$old} IS NOT NULL THEN";
+          $trigger[] = "ELSEIF NEW.{$column}_{$old} IS NOT NULL AND NEW.{$column}_{$old} != '' THEN";
           foreach (array_merge($locales, [
             $locale,
           ]) as $loc) {
             if ($loc == $old) {
               continue;
             }
-            $trigger[] = "IF NEW.{$column}_{$loc} IS NULL THEN SET NEW.{$column}_{$loc} = NEW.{$column}_{$old}; END IF;";
+            $trigger[] = "IF NEW.{$column}_{$loc} IS NULL OR NEW.{$column}_{$loc} = '' THEN SET NEW.{$column}_{$loc} = NEW.{$column}_{$old}; END IF;";
           }
         }
         $trigger[] = 'END IF;';

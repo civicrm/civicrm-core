@@ -10,7 +10,8 @@
  */
 
 /**
- * Upgrade logic for FiveTwentyEight */
+ * Upgrade logic for FiveTwentyEight
+ */
 class CRM_Upgrade_Incremental_php_FiveTwentyEight extends CRM_Upgrade_Incremental_Base {
 
   /**
@@ -72,12 +73,6 @@ class CRM_Upgrade_Incremental_php_FiveTwentyEight extends CRM_Upgrade_Incrementa
       2 => '...wp-content/uploads/civicrm',
     ]) . '</p>' . $table;
   }
-
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
-   */
 
   /**
    * Upgrade function.

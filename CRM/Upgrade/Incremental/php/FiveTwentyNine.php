@@ -10,7 +10,8 @@
  */
 
 /**
- * Upgrade logic for FiveTwentyNine */
+ * Upgrade logic for FiveTwentyNine
+ */
 class CRM_Upgrade_Incremental_php_FiveTwentyNine extends CRM_Upgrade_Incremental_Base {
 
   /**
@@ -33,27 +34,6 @@ class CRM_Upgrade_Incremental_php_FiveTwentyNine extends CRM_Upgrade_Incremental
   }
 
   /**
-   * Compute any messages which should be displayed after upgrade.
-   *
-   * @param string $postUpgradeMessage
-   *   alterable.
-   * @param string $rev
-   *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
-   */
-  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
-    // Example: Generate a post-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
-    // }
-  }
-
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
-   */
-
-  /**
    * Upgrade function.
    *
    * @param string $rev
@@ -62,7 +42,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyNine extends CRM_Upgrade_Incremental
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Install eventcart extension', 'installEventCart');
 
-    list($minId, $maxId) = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
+    [$minId, $maxId] = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
       FROM civicrm_relationship ")->getDatabaseResult()->fetchRow();
     for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
       $endId = $startId + self::BATCH_SIZE - 1;
@@ -113,7 +93,6 @@ class CRM_Upgrade_Incremental_php_FiveTwentyNine extends CRM_Upgrade_Incremental
    *
    * @return bool
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public static function installEventCart(CRM_Queue_TaskContext $ctx) {

@@ -104,14 +104,14 @@ trait GuiSpecTrait {
   }
 
   /**
-   * @param string|NULL $helpPre
+   * @param string|null $helpPre
    */
   public function setHelpPre($helpPre) {
     $this->helpPre = is_string($helpPre) && strlen($helpPre) ? $helpPre : NULL;
   }
 
   /**
-   * @param string|NULL $helpPost
+   * @param string|null $helpPost
    */
   public function setHelpPost($helpPost) {
     $this->helpPost = is_string($helpPost) && strlen($helpPost) ? $helpPost : NULL;

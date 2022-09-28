@@ -19,7 +19,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   public function tearDown(): void {
     global $dbLocale;
     if ($dbLocale) {
-      CRM_Core_I18n_Schema::makeSinglelingual('en_US');
+      $this->disableMultilingual();
     }
     parent::tearDown();
   }
@@ -29,7 +29,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    * match the expected list
    *
    * @param $mailingID
-   * @param $expectedRecipients array
+   * @param array $expectedRecipients
    *   Array of contact ID that should be in the recipient list.
    */
   private function assertRecipientsCorrect($mailingID, $expectedRecipients) {
@@ -273,9 +273,8 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    *  that has 'contact 1' identified as $contactIDs[0] and Included in the
    * mailing recipient list
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
+   * @group locale
    */
   public function testGetRecipientsEmailGroupIncludeExclude(): void {
     // Create contacts

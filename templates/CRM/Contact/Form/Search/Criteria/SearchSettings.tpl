@@ -3,7 +3,7 @@
     <tr>
       <td>{$form.operator.label} {help id="id-search-operator"}<br />{$form.operator.html}</td>
       <td>
-        {if $form.deleted_contacts}{$form.deleted_contacts.html} {$form.deleted_contacts.label}{/if}
+        {if !empty($form.deleted_contacts)}{$form.deleted_contacts.html} {$form.deleted_contacts.label}{/if}
       </td>
       <td class="adv-search-top-submit" colspan="2">
         <div class="crm-submit-buttons">

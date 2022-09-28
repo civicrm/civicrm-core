@@ -1,0 +1,49 @@
+<div id="bootstrap-theme" crm-dialog="crmSearchTask">
+  <form ng-controller="crmSearchTaskTag as $ctrl">
+    <div class="form-radios">
+      <label ng-class="{disabled: !!$ctrl.run}">
+        <input type="radio" name="action" ng-model="$ctrl.action" value="save" ng-disabled="$ctrl.run">
+        {{:: ts('Add Tags') }}
+      </label>
+      <label ng-class="{disabled: !!$ctrl.run}">
+        <input type="radio" name="action" ng-model="$ctrl.action" value="delete" ng-disabled="$ctrl.run">
+        {{:: ts('Remove Tags') }}
+      </label>
+    </div>
+    <div ng-if="!$ctrl.tags">
+      <i class="crm-i fa-spinner fa-spin"></i>
+    </div>
+    <hr />
+    <fieldset ng-if="$ctrl.tags">
+      <div class="form-inline">
+        <label for="crm-search-task-tag-tag">{{:: ts('Tags') }}</label>
+        <input
+          id="crm-search-task-tag-tag"
+          ng-model="$ctrl.selectedTags"
+          class="huge"
+          ng-list
+          ng-change="$ctrl.onSelectTags()"
+          ng-disabled="$ctrl.run"
+          crm-ui-select="{multiple: true, placeholder: ts('Select tags'), data: $ctrl.tags}"
+        >
+      </div>
+      <div ng-repeat="tagset in $ctrl.tagsets" class="form-inline">
+        <label>{{:: tagset.name }}</label>
+        <input
+          ng-model="$ctrl.selectedTagsetTags[tagset.name]"
+          ng-list
+          ng-change="$ctrl.onSelectTags()"
+          ng-disabled="$ctrl.run"
+          crm-entityref="{entity: 'Tag', api: {params: {parent_id: tagset.id, is_selectable: 1}}, select: {minimumInputLength: 0, multiple: true, placeholder: ts('Select tags')}}"
+        >
+      </div>
+    </fieldset>
+    <div ng-if="$ctrl.run" class="crm-search-task-progress">
+      <h5>{{:: $ctrl.action === 'save' ? ts('Adding tags...') : ts('Removing tags...') }}</h5>
+      <crm-search-batch-runner entity="'EntityTag'" action="{{ $ctrl.action }}" id-field="entity_id" params="$ctrl.run" ids="model.ids" success="$ctrl.onSuccess()" error="$ctrl.onError()" ></crm-search-batch-runner>
+    </div>
+
+    <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.run" ></crm-dialog-button>
+    <crm-dialog-button text="$ctrl.action === 'save' ? ts('Add tags') : ts('Remove tags')" icons="{primary: $ctrl.run ? 'fa-spin fa-spinner' : 'fa-check'}" on-click="$ctrl.saveTags()" disabled="$ctrl.run || !$ctrl.selection.length" ></crm-dialog-button>
+  </form>
+</div>

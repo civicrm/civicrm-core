@@ -97,7 +97,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     }
     if ($this->processor && $this->processor->getTemporaryTable()) {
       // delete the export temp table
-      CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS " . $this->processor->getTemporaryTable());
+      CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS ' . $this->processor->getTemporaryTable());
     }
     parent::tearDown();
   }
@@ -204,6 +204,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    * @throws \League\Csv\Exception
+   * @throws \CRM_Core_Exception
    */
   public function testExportComponentsMembership(): void {
     $this->setUpMembershipExportData();
@@ -235,7 +236,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Image Url' => '',
       'Preferred Communication Method' => '',
       'Preferred Language' => 'en_US',
-      'Preferred Mail Format' => 'Both',
       'Contact Hash' => '059023a02d27d4e7f285a40ee0e30be8',
       'Contact Source' => '',
       'First Name' => 'Anthony',
@@ -305,7 +305,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Membership Start Date' => $membership['start_date'],
       'Membership Expiration Date' => $membership['end_date'],
       'Source' => 'Payment',
-      'Membership Status' => 'New',
+      'Membership Status' => 'Pending',
       'Membership ID' => '2',
       'Primary Member ID' => '',
       'Max Related' => '',
@@ -325,7 +325,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Basic test to ensure the exportComponents function can export selected fields for activity
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testExportComponentsActivity(): void {
@@ -408,7 +407,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Set up some data for us to do testing on.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setUpContributionExportData(): void {
     $this->setUpContactExportData();
@@ -420,7 +418,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Set up some data for us to do testing on.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setUpMembershipExportData(): void {
     $this->setUpContactExportData();
@@ -442,7 +439,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Set up data to test case export.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setupCaseExportData(): void {
     $contactID1 = $this->individualCreate();
@@ -463,7 +459,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Set up some data for us to do testing on.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setUpActivityExportData(): void {
     $this->setUpContactExportData();
@@ -472,9 +467,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   /**
    * Set up some data for us to do testing on.
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setUpContactExportData(): void {
     $this->contactIDs[] = $contactA = $this->individualCreate(['gender_id' => 'Female']);
@@ -519,7 +511,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @param int $isPrimaryOnly
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    * @dataProvider getBooleanDataProvider
    */
@@ -557,7 +548,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * does NOT retain the gender of the former.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testExportPseudoField(): void {
@@ -602,7 +592,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Test exporting relationships.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testExportRelationships(): void {
@@ -728,9 +717,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   /**
    * Test custom data exporting.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    * @throws \League\Csv\Exception
    */
@@ -777,7 +764,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Attempt to do a fairly full export of location data.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testExportIMData(): void {
@@ -863,9 +849,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * Less over the top complete than the im test.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    * @throws \League\Csv\Exception
    */
@@ -942,7 +926,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Export City against multiple location types.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testExportAddressData(): void {
@@ -1055,7 +1038,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Test master_address_id field when no merge is in play.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testExportMasterAddress(): void {
@@ -1077,7 +1059,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Test merging same address when specifying fields.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testMergeSameAddressSpecifyFields(): void {
@@ -1089,7 +1070,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Test the merge same address option.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testMergeSameAddress(): void {
@@ -1116,7 +1096,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Image Url' => '',
       'Preferred Communication Method' => '',
       'Preferred Language' => 'en_US',
-      'Preferred Mail Format' => 'Both',
       'Contact Hash' => 'e9bd0913cc05cc5aeae69ba04ee3be84',
       'Contact Source' => '',
       'First Name' => 'Anthony',
@@ -1194,7 +1173,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Tests the options for greeting templates when choosing to merge same address.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testMergeSameAddressGreetingOptions(): void {
@@ -1262,7 +1240,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * So C take preference over A and thus C is exported as result.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testMergeSameAddressOnExport(): void {
@@ -1389,7 +1366,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @return array
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function setUpHousehold(): array {
     $this->setUpContactExportData();
@@ -1573,7 +1549,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'image_URL' => 1,
       'preferred_communication_method' => 1,
       'preferred_language' => 1,
-      'preferred_mail_format' => 1,
       'hash' => 1,
       'contact_source' => 1,
       'first_name' => 1,
@@ -1894,7 +1869,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * https://lab.civicrm.org/dev/core/issues/819
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testExportIncompleteSubmission(): void {
@@ -2173,7 +2147,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @param string $exportMode
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setupBaseExportData($exportMode): void {
     $this->createLoggedInUser();
@@ -2264,79 +2237,78 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       15 => 'Image Url',
       16 => 'Preferred Communication Method',
       17 => 'Preferred Language',
-      18 => 'Preferred Mail Format',
-      19 => 'Contact Hash',
-      20 => 'Contact Source',
-      21 => 'First Name',
-      22 => 'Middle Name',
-      23 => 'Last Name',
-      24 => 'Individual Prefix',
-      25 => 'Individual Suffix',
-      26 => 'Formal Title',
-      27 => 'Communication Style',
-      28 => 'Email Greeting ID',
-      29 => 'Postal Greeting ID',
-      30 => 'Addressee ID',
-      31 => 'Job Title',
-      32 => 'Gender',
-      33 => 'Birth Date',
-      34 => 'Deceased',
-      35 => 'Deceased Date',
-      36 => 'Household Name',
-      37 => 'Organization Name',
-      38 => 'Sic Code',
-      39 => 'Unique ID (OpenID)',
-      40 => 'Current Employer ID',
-      41 => 'Contact is in Trash',
-      42 => 'Created Date',
-      43 => 'Modified Date',
-      44 => 'Addressee',
-      45 => 'Email Greeting',
-      46 => 'Postal Greeting',
-      47 => 'Current Employer',
-      48 => 'Location Type',
-      49 => 'Address ID',
-      50 => 'Street Address',
-      51 => 'Street Number',
-      52 => 'Street Number Suffix',
-      53 => 'Street Name',
-      54 => 'Street Unit',
-      55 => 'Supplemental Address 1',
-      56 => 'Supplemental Address 2',
-      57 => 'Supplemental Address 3',
-      58 => 'City',
-      59 => 'Postal Code Suffix',
-      60 => 'Postal Code',
-      61 => 'Latitude',
-      62 => 'Longitude',
-      63 => 'Is Manually Geocoded',
-      64 => 'Address Name',
-      65 => 'Master Address ID',
-      66 => 'County',
-      67 => 'State',
-      68 => 'Country',
-      69 => 'Phone',
-      70 => 'Phone Extension',
-      71 => 'Phone Type ID',
-      72 => 'Phone Type',
-      73 => 'Email',
-      74 => 'On Hold',
-      75 => 'Use for Bulk Mail',
-      76 => 'Signature Text',
-      77 => 'Signature Html',
-      78 => 'IM Provider',
-      79 => 'IM Screen Name',
-      80 => 'OpenID',
-      81 => 'World Region',
-      82 => 'Website',
-      83 => 'Group(s)',
-      84 => 'Tag(s)',
-      85 => 'Note(s)',
+      18 => 'Contact Hash',
+      19 => 'Contact Source',
+      20 => 'First Name',
+      21 => 'Middle Name',
+      22 => 'Last Name',
+      23 => 'Individual Prefix',
+      24 => 'Individual Suffix',
+      25 => 'Formal Title',
+      26 => 'Communication Style',
+      27 => 'Email Greeting ID',
+      28 => 'Postal Greeting ID',
+      29 => 'Addressee ID',
+      30 => 'Job Title',
+      31 => 'Gender',
+      32 => 'Birth Date',
+      33 => 'Deceased',
+      34 => 'Deceased Date',
+      35 => 'Household Name',
+      36 => 'Organization Name',
+      37 => 'Sic Code',
+      38 => 'Unique ID (OpenID)',
+      39 => 'Current Employer ID',
+      40 => 'Contact is in Trash',
+      41 => 'Created Date',
+      42 => 'Modified Date',
+      43 => 'Addressee',
+      44 => 'Email Greeting',
+      45 => 'Postal Greeting',
+      46 => 'Current Employer',
+      47 => 'Location Type',
+      48 => 'Address ID',
+      49 => 'Street Address',
+      50 => 'Street Number',
+      51 => 'Street Number Suffix',
+      52 => 'Street Name',
+      53 => 'Street Unit',
+      54 => 'Supplemental Address 1',
+      55 => 'Supplemental Address 2',
+      56 => 'Supplemental Address 3',
+      57 => 'City',
+      58 => 'Postal Code Suffix',
+      59 => 'Postal Code',
+      60 => 'Latitude',
+      61 => 'Longitude',
+      62 => 'Is Manually Geocoded',
+      63 => 'Address Name',
+      64 => 'Master Address ID',
+      65 => 'County',
+      66 => 'State',
+      67 => 'Country',
+      68 => 'Phone',
+      69 => 'Phone Extension',
+      70 => 'Phone Type ID',
+      71 => 'Phone Type',
+      72 => 'Email',
+      73 => 'On Hold',
+      74 => 'Use for Bulk Mail',
+      75 => 'Signature Text',
+      76 => 'Signature Html',
+      77 => 'IM Provider',
+      78 => 'IM Screen Name',
+      79 => 'OpenID',
+      80 => 'World Region',
+      81 => 'Website',
+      82 => 'Group(s)',
+      83 => 'Tag(s)',
+      84 => 'Note(s)',
     ];
     if (!$isContactExport) {
+      unset($headers[82]);
       unset($headers[83]);
       unset($headers[84]);
-      unset($headers[85]);
     }
     return $headers;
   }
@@ -2555,7 +2527,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'image_url' => '`image_url` longtext',
       'preferred_communication_method' => '`preferred_communication_method` varchar(255)',
       'preferred_language' => '`preferred_language` varchar(5)',
-      'preferred_mail_format' => '`preferred_mail_format` varchar(16)',
       'hash' => '`hash` varchar(32)',
       'contact_source' => '`contact_source` varchar(255)',
       'first_name' => '`first_name` varchar(64)',
@@ -2743,7 +2714,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'image_url' => '`image_url` longtext',
       'preferred_communication_method' => '`preferred_communication_method` varchar(255)',
       'preferred_language' => '`preferred_language` varchar(5)',
-      'preferred_mail_format' => '`preferred_mail_format` varchar(16)',
       'hash' => '`hash` varchar(32)',
       'contact_source' => '`contact_source` varchar(255)',
       'first_name' => '`first_name` varchar(64)',
@@ -2993,7 +2963,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Test get preview function on export processor.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testExportGetPreview(): void {
     $this->setUpContactExportData();
@@ -3033,7 +3002,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Set up contacts which will be merged with the same address option.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function setUpContactSameAddressExportData(): void {
     $this->setUpContactExportData();

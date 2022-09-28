@@ -33,13 +33,14 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
   }
 
   /**
    * Test doing a one-off payment.
    *
    * @throws \Civi\Payment\Exception\PaymentProcessorException
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testSinglePayment() {
     $this->setupMockHandler();

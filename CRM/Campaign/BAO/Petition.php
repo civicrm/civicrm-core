@@ -449,27 +449,6 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * This function returns all entities assigned to a specific tag.
-   *
-   * @param object $tag
-   *   An object of a tag.
-   *
-   * @return array
-   *   array of contact ids
-   */
-  public function getEntitiesByTag($tag) {
-    $contactIds = [];
-    $entityTagDAO = new CRM_Core_DAO_EntityTag();
-    $entityTagDAO->tag_id = $tag['id'];
-    $entityTagDAO->find();
-
-    while ($entityTagDAO->fetch()) {
-      $contactIds[] = $entityTagDAO->entity_id;
-    }
-    return $contactIds;
-  }
-
-  /**
    * Check if contact has signed this petition.
    *
    * @param int $surveyId
@@ -592,7 +571,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
           CRM_Core_BAO_MessageTemplate::sendTemplate(
             [
               'groupName' => 'msg_tpl_workflow_petition',
-              'valueName' => 'petition_sign',
+              'workflow' => 'petition_sign',
               'contactId' => $params['contactId'],
               'tplParams' => $tplParams,
               'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
@@ -649,7 +628,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
           CRM_Core_BAO_MessageTemplate::sendTemplate(
             [
               'groupName' => 'msg_tpl_workflow_petition',
-              'valueName' => 'petition_confirmation_needed',
+              'workflow' => 'petition_confirmation_needed',
               'contactId' => $params['contactId'],
               'tplParams' => $tplParams,
               'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",

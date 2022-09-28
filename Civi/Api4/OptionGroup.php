@@ -14,11 +14,11 @@ namespace Civi\Api4;
  * OptionGroup entity.
  *
  * @see \Civi\Api4\OptionValue
- * @searchable none
+ * @searchable secondary
  * @since 5.19
  * @package Civi\Api4
  */
 class OptionGroup extends Generic\DAOEntity {
-  use Generic\Traits\OptionList;
+  use Generic\Traits\ManagedEntity;
 
 }

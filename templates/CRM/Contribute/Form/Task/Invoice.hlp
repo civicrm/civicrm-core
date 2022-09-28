@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id ="id-from_email-title"}
-  {ts}From Address{/ts}
-{/htxt}
 {htxt id="content-intro-title"}
   {ts}Message Formats{/ts}
 {/htxt}

@@ -58,7 +58,7 @@ class StaticTriggers {
    *
    * @param array $info
    *   See hook_civicrm_triggerInfo.
-   * @param string|NULL $tableFilter
+   * @param string|null $tableFilter
    *   See hook_civicrm_triggerInfo.
    */
   public function alterTriggerInfo(&$info, $tableFilter = NULL) {

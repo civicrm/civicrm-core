@@ -30,7 +30,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     $parent = $this->controller->getParent();
@@ -157,7 +157,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
    * Search field metadata is normally added in buildForm but we are bypassing that in this flow
    * (I've always found the flow kinda confusing & perhaps that is the problem but this mitigates)
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function handleForcedSearch() {
     $this->setSearchMetadata();
@@ -167,7 +167,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
   /**
    * Set the metadata for the form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function setSearchMetadata() {
     $this->addSearchFieldMetadata(['Mailing' => CRM_Mailing_BAO_Query::getSearchFieldMetadata()]);

@@ -10,7 +10,7 @@
 {* CiviCampaign DashBoard (launch page) *}
 
 
-{if !empty($subPageType)}
+{if $subPageType}
   {* load campaign/survey/petition tab *}
   {include file="CRM/Campaign/Form/Search/$subPageType.tpl"}
 {else}

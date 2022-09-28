@@ -12,7 +12,7 @@
 /**
  * Class CRM_Contact_BAO_RelationshipCache.
  */
-class CRM_Contact_BAO_RelationshipCache extends CRM_Contact_DAO_RelationshipCache implements \Civi\Test\HookInterface {
+class CRM_Contact_BAO_RelationshipCache extends CRM_Contact_DAO_RelationshipCache implements \Civi\Core\HookInterface {
 
   /**
    * The "mappings" array defines the values to put into `civicrm_relationship_cache`
@@ -33,6 +33,7 @@ class CRM_Contact_BAO_RelationshipCache extends CRM_Contact_DAO_RelationshipCach
       'start_date' => 'rel.start_date',
       'end_date' => 'rel.end_date',
       'is_active' => 'rel.is_active',
+      'case_id' => 'rel.case_id',
     ],
     'b_a' => [
       'relationship_id' => 'rel.id',
@@ -45,6 +46,7 @@ class CRM_Contact_BAO_RelationshipCache extends CRM_Contact_DAO_RelationshipCach
       'start_date' => 'rel.start_date',
       'end_date' => 'rel.end_date',
       'is_active' => 'rel.is_active',
+      'case_id' => 'rel.case_id',
     ],
   ];
 
@@ -151,6 +153,20 @@ class CRM_Contact_BAO_RelationshipCache extends CRM_Contact_DAO_RelationshipCach
         ->syncInto('civicrm_relationship_cache', self::$keyFields, $mapping);
     }
     return $queries;
+  }
+
+  /**
+   * @return array
+   */
+  public function addSelectWhereClause() {
+    // Permission for this entity depends on access to the two related contacts.
+    $contactClause = CRM_Utils_SQL::mergeSubquery('Contact');
+    $clauses = [
+      'near_contact_id' => $contactClause,
+      'far_contact_id' => $contactClause,
+    ];
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
   }
 
 }

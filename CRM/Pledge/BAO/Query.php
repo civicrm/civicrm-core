@@ -497,7 +497,7 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
   /**
    * Get the metadata for fields to be included on the grant search form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getSearchFieldMetadata() {
     $fields = [
@@ -513,7 +513,7 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
   /**
    * Get the metadata for fields to be included on the grant search form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getPledgePaymentSearchFieldMetadata() {
     $fields = [
@@ -529,7 +529,6 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
    * @param CRM_Pledge_Form_Search|\CRM_Contact_Form_Search_Advanced $form
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function buildSearchForm(&$form) {
     // pledge related dates

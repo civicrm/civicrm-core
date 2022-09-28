@@ -36,4 +36,11 @@ class SqlFunctionYEAR extends SqlFunction {
     return ts('Year Only');
   }
 
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('Only the year of a date.');
+  }
+
 }

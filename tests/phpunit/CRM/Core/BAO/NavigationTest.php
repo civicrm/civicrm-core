@@ -325,6 +325,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviMail', 'delete in CiviMail'];
     CRM_Core_BAO_ConfigSetting::disableComponent('CiviMail');
     $this->assertFalse(CRM_Core_BAO_Navigation::checkPermission($menuItem));
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
   }
 
 }

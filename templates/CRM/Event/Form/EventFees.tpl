@@ -105,7 +105,7 @@
         </tr>
         <tr id="from-email" class="crm-event-eventfees-form-block-from_email_address">
           <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
+          <td>{$form.from_email_address.html}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
         </tr>
         <tr id='notice' class="crm-event-eventfees-form-block-receipt_text">
         <td class="label">{$form.receipt_text.label}</td>
@@ -132,7 +132,7 @@
       </tr>
       <tr id="from-email" class="crm-event-eventfees-form-block-from_email_address">
         <td class="label">{$form.from_email_address.label}</td>
-        <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
+        <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
       </tr>
       <tr id='notice' class="crm-event-eventfees-form-block-receipt_text">
         <td class="label">{$form.receipt_text.label}</td>
@@ -227,7 +227,7 @@
 
      function fillTotalAmount( totalAmount ) {
           if ( !totalAmount ) {
-        var amountVal = {/literal}{if $form.amount.value}{$form.amount.value}{else}0{/if}{literal};
+        var amountVal = {/literal}{if !empty($form.amount.value)}{$form.amount.value}{else}0{/if}{literal};
         if ( amountVal > 0 ) {
                var eventFeeBlockValues = {/literal}{$eventFeeBlockValues}{literal};
           totalAmount = eval('eventFeeBlockValues.amount_id_'+ amountVal);

@@ -30,10 +30,6 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
-   *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -44,7 +40,6 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
    * Check method add()
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testAdd(): void {
     $price = 100;
@@ -85,7 +80,6 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
   /**
    * Check method retrieve()
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function testRetrieve(): void {
@@ -126,8 +120,6 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
    * Check method create()
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   * @throws \API_Exception
    */
   public function testCreate(): void {
     $contactID = $this->individualCreate();
@@ -219,9 +211,6 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
 
   /**
    * Check method getPreviousFinancialItem().
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testGetPreviousFinancialItem(): void {
     $contactId = $this->individualCreate();
@@ -262,8 +251,8 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
    *   punctuation used to refer to thousands.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\Payment\Exception\PaymentProcessorException
+   *
    * @dataProvider getThousandSeparators
    */
   public function testGetPreviousFinancialItemHavingTax(string $thousandSeparator): void {
@@ -271,14 +260,15 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $contactId = $this->individualCreate();
     $this->enableTaxAndInvoicing();
     $this->addTaxAccountToFinancialType(1);
-    $form = new CRM_Contribute_Form_Contribution();
-    $form->testSubmit([
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
       'total_amount' => 100,
       'financial_type_id' => 1,
       'contact_id' => $contactId,
       'contribution_status_id' => 1,
       'price_set_id' => 0,
-    ], CRM_Core_Action::ADD);
+    ]);
+    $form->buildForm();
+    $form->postProcess();
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [
         'contact_id' => $contactId,

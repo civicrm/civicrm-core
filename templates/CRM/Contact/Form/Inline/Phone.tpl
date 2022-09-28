@@ -31,7 +31,7 @@
     {section name='i' start=1 loop=$totalBlocks}
     {assign var='blockId' value=$smarty.section.i.index}
     <tr id="Phone_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
-        <td>{$form.phone.$blockId.phone.html} {ts context="phone_ext"}ext.{/ts}&nbsp;{$form.phone.$blockId.phone_ext.html|crmAddClass:four}&nbsp;</td>
+        <td>{$form.phone.$blockId.phone.html} {$form.phone.$blockId.phone_ext.label}&nbsp;{$form.phone.$blockId.phone_ext.html|crmAddClass:four}&nbsp;</td>
         <td>{$form.phone.$blockId.location_type_id.html}</td>
         <td>{$form.phone.$blockId.phone_type_id.html}</td>
         <td align="center" class="crm-phone-is_primary">{$form.phone.$blockId.is_primary.1.html}</td>

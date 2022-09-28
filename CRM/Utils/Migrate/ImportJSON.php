@@ -189,8 +189,8 @@ class CRM_Utils_Migrate_ImportJSON {
   /**
    * @param $chunk
    * @param string $daoName
-   * @param null $lookUpMapping
-   * @param null $dateFields
+   * @param array|null $lookUpMapping
+   * @param array|null $dateFields
    */
   public function restore(&$chunk, $daoName, $lookUpMapping = NULL, $dateFields = NULL) {
     $object = new $daoName();

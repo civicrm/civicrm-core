@@ -99,6 +99,8 @@
     <name>is_domain</name>
     <title>Is Domain Setting?</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
     <comment>Is this setting a contact specific or site wide setting?</comment>
     <add>4.1</add>
   </field>

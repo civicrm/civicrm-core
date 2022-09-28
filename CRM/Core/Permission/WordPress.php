@@ -60,14 +60,14 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
 
     $user = $userId ? get_userdata($userId) : wp_get_current_user();
 
-    if ($user->has_cap('super admin') || $user->has_cap('administrator')) {
+    if ($userId !== 0 && ($user->has_cap('super admin') || $user->has_cap('administrator'))) {
       return TRUE;
     }
 
     // Make string lowercase and convert spaces into underscore
     $str = CRM_Utils_String::munge(strtolower($str));
 
-    if ($user->exists()) {
+    if ($userId !== 0 && $user->exists()) {
       // Check whether the logged in user has the capabilitity
       if ($user->has_cap($str)) {
         return TRUE;

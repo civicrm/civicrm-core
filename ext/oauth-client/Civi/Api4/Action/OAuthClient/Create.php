@@ -11,7 +11,7 @@ class Create extends \Civi\Api4\Generic\DAOCreateAction {
     if (isset($this->values['provider'])) {
       $ps = \CRM_OAuth_BAO_OAuthClient::getProviders();
       if (!isset($ps[$this->values['provider']])) {
-        throw new \API_Exception("Invalid provider name: " . $this->values['provider']);
+        throw new \CRM_Core_Exception("Invalid provider name: " . $this->values['provider']);
       }
     }
     parent::validateValues();

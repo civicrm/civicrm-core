@@ -16,7 +16,7 @@
  */
 
 /**
- * This class generates form components for the maling component preferences.
+ * This class generates form components for the mailing component preferences.
  */
 class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
 

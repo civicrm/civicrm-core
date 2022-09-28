@@ -1,6 +1,6 @@
-<span ng-repeat="item in col.links">
-  <a class="text-{{:: item.style }}" target="{{:: item.target }}" href="{{:: $ctrl.getUrl(item.path, row) }}">
-    <i ng-if=":: item.icon" class="crm-i {{:: item.icon }}"></i>
-    {{:: $ctrl.replaceTokens(item.text, row) }}
+<span ng-repeat="link in colData.links">
+  <a class="text-{{:: link.style }}" target="{{:: link.target }}" href="{{:: link.url }}">
+    <i ng-if=":: link.icon" class="crm-i {{:: link.icon }}"></i>
+    {{:: link.text }}
   </a>
 </span>

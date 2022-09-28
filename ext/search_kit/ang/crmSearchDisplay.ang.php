@@ -9,6 +9,9 @@ return [
   'partials' => [
     'ang/crmSearchDisplay',
   ],
+  'css' => [
+    'css/crmSearchDisplay.css',
+  ],
   'basePages' => [],
   'requires' => ['api4', 'ngSanitize'],
   'exports' => [

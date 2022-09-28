@@ -22,7 +22,7 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
     $this->_id = CRM_Utils_Request::retrieve('id', 'String', $this, FALSE);
 
-    CRM_Utils_System::setTitle(ts('Report Template'));
+    $this->setTitle(ts('Report Template'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
@@ -116,7 +116,7 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */

@@ -8,11 +8,11 @@
  +--------------------------------------------------------------------+
 *}
 <div class="help">
-  {ts 1=$GName}The existing option choices for %1 group are listed below. You can add, edit or delete them from this screen.{/ts}
+  {ts 1=$gLabel}The existing option choices for %1 group are listed below. You can add, edit or delete them from this screen.{/ts}
 </div>
 {if $action ne 1 and $action ne 2}
   <div class="action-link">
-    <a href="{$newReport}"  id="new"|cat:$GName class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts 1=$GName}Register New %1{/ts}</span></a>
+    <a href="{$newReport}"  id="new_{$gName}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts 1=$gLabel}Register New %1{/ts}</span></a>
   </div>
   <div class="spacer"></div>
 {/if}
@@ -43,7 +43,7 @@
             <td class="crm-report-optionList-label crm-editable" data-field="label">{$row.label}</td>
             <td class="crm-report-optionList-value">{$row.value}</td>
             <td class="crm-report-optionList-description">{$row.description}</td>
-            <td class="nowrap crm-report-optionList-order">{$row.weight}</td>
+            <td class="nowrap crm-report-optionList-order">{$row.weight|smarty:nodefaults}</td>
             {if !empty($showIsDefault)}
               <td class="crm-report-optionList-default_value">{$row.default_value}</td>
             {/if}
@@ -58,7 +58,7 @@
 
     {if $action ne 1 and $action ne 2}
       <div class="action-link">
-        <a href="{$newReport}"  id="new"|cat:$GName class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts 1=$GName}Register New %1{/ts}</span></a>
+        <a href="{$newReport}"  id="new_{$gName}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts 1=$gLabel}Register New %1{/ts}</span></a>
       </div>
     {/if}
   </div>
