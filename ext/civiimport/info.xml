@@ -20,7 +20,11 @@
   <compatibility>
     <ver>5.55</ver>
   </compatibility>
-  <comments>Core extension for us to start moving import logic into</comments>
+  <comments>Core extension for us to start moving import logic into, has more functionality</comments>
+  <requires>
+    <ext>org.civicrm.afform</ext>
+    <ext>org.civicrm.search_kit</ext>
+  </requires>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>

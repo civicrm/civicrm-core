@@ -122,23 +122,26 @@ class CRM_Upgrade_Incremental_php_FiveFiftyThree extends CRM_Upgrade_Incremental
       'is_reserved' => 0,
     ]);
     $values = [
-      'Contact' => ['label' => ts('Contacts')],
-      'Relationship' => ['label' => ts('Relationships')],
-      'Activity' => ['label' => ts('Activities')],
-      'Note' => ['label' => ts('Notes')],
-      'Group' => ['label' => ts('Groups')],
-      'Case' => ['label' => ts('Cases')],
-      'Contribution' => ['label' => ts('Contributions')],
-      'Participant' => ['label' => ts('Participants')],
-      'Membership' => ['label' => ts('Memberships')],
-      'Pledge' => ['label' => ts('Pledges')],
-      'Event' => ['label' => ts('Events')],
-      'Campaign' => ['label' => ts('Campaigns')],
+      'Contact' => ts('Contacts'),
+      'Relationship' => ts('Relationships'),
+      'Activity' => ts('Activities'),
+      'Note' => ts('Notes'),
+      'Group' => ts('Groups'),
+      'Case' => ts('Cases'),
+      'Contribution' => ts('Contributions'),
+      'Participant' => ts('Participants'),
+      'Membership' => ts('Memberships'),
+      'Pledge' => ts('Pledges'),
+      'Event' => ts('Events'),
+      'Campaign' => ts('Campaigns'),
     ];
-    foreach ($values as $name => $value) {
-      CRM_Core_BAO_OptionValue::ensureOptionValueExists($value + [
+    foreach ($values as $name => $label) {
+      CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+        'label' => $label,
         'name' => $name,
+        'value' => $name,
         'option_group_id' => 'recent_items_providers',
+        'is_reserved' => TRUE,
       ]);
     }
     return TRUE;
