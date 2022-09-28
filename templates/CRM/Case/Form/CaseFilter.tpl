@@ -21,7 +21,7 @@
           <td class="crm-contact-form-block-case_status_id crm-inline-edit-field">
             {$form.case_status_id.label}<br /> {$form.case_status_id.html}
           </td>
-          {if $accessAllCases && $form.upcoming}
+          {if $accessAllCases && isset($form.upcoming)}
             <td class="crm-case-dashboard-switch-view-buttons">
               <br/>
               {$form.upcoming.html}&nbsp;{$form.upcoming.label}

@@ -4,15 +4,9 @@
     bindings: {
       ctrl: '@'
     },
-    require: {
-      ngForm: 'form'
-    },
-    controller: function($scope, $element, $timeout, crmApi4, crmStatus, $window, $location, $parse, FileUploader) {
+    controller: function($scope, $timeout, crmApi4, crmStatus, $window, $location) {
       var schema = {},
         data = {},
-        status,
-        args,
-        submissionResponse,
         ctrl = this;
 
       this.$onInit = function() {
@@ -40,33 +34,16 @@
       this.getFormMeta = function getFormMeta() {
         return $scope.$parent.meta;
       };
-      // With no arguments this will prefill the entire form based on url args
-      // With selectedEntity, selectedIndex & selectedId provided this will prefill a single entity
-      this.loadData = function(selectedEntity, selectedIndex, selectedId) {
+      this.loadData = function() {
         var toLoad = 0,
-          params = {name: ctrl.getFormMeta().name, args: {}};
-        // Load single entity
-        if (selectedEntity) {
-          toLoad = selectedId;
-          params.fillMode = 'entity';
-          params.args[selectedEntity] = {};
-          params.args[selectedEntity][selectedIndex] = selectedId;
-        }
-        // Prefill entire form
-        else {
-          args = _.assign({}, $scope.$parent.routeParams || {}, $scope.$parent.options || {});
-          _.each(schema, function (entity, entityName) {
-            if (args[entityName] || entity.autofill) {
-              toLoad++;
-            }
-            if (args[entityName] && typeof args[entityName] === 'string') {
-              args[entityName] = args[entityName].split(',');
-            }
-          });
-          params.args = args;
-        }
+          args = $scope.$parent.routeParams || {};
+        _.each(schema, function(entity, entityName) {
+          if (args[entityName] || entity.autofill) {
+            toLoad++;
+          }
+        });
         if (toLoad) {
-          crmApi4('Afform', 'prefill', params)
+          crmApi4('Afform', 'prefill', {name: ctrl.getFormMeta().name, args: args})
             .then(function(result) {
               _.each(result, function(item) {
                 data[item.name] = data[item.name] || {};
@@ -74,97 +51,23 @@
               });
             });
         }
-        // Clear existing contact selection
-        else if (selectedEntity) {
-          data[selectedEntity][selectedIndex].fields = {};
-          if (data[selectedEntity][selectedIndex].joins) {
-            data[selectedEntity][selectedIndex].joins = {};
-          }
-        }
       };
 
-      // Used when submitting file fields
-      this.fileUploader = new FileUploader({
-        url: CRM.url('civicrm/ajax/api4/Afform/submitFile'),
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
-        onCompleteAll: postProcess,
-        onBeforeUploadItem: function(item) {
-          status.resolve();
-          status = CRM.status({start: ts('Uploading %1', {1: item.file.name})});
-        }
-      });
-
-      // Called after form is submitted and files are uploaded
-      function postProcess() {
-        var metaData = ctrl.getFormMeta(),
-          dialog = $element.closest('.ui-dialog-content');
-
-        $element.trigger('crmFormSuccess', {
-          afform: metaData,
-          data: data
-        });
-
-        status.resolve();
-        $element.unblock();
-
-        if (dialog.length) {
-          dialog.dialog('close');
-        }
-
-        else if (metaData.redirect) {
-          var url = replaceTokens(metaData.redirect, submissionResponse[0]);
-          if (url.indexOf('civicrm/') === 0) {
-            url = CRM.url(url);
-          } else if (url.indexOf('/') === 0) {
-            url = $location.protocol() + '://' + $location.host() + url;
-          }
-          $window.location.href = url;
-        }
-      }
-
-      function replaceTokens(str, vars) {
-        function recurse(stack, values) {
-          _.each(values, function(value, key) {
-            if (_.isArray(value) || _.isPlainObject(value)) {
-              recurse(stack.concat([key]), value);
-            } else {
-              var token = (stack.length ? stack.join('.') + '.' : '') + key;
-              str = str.replace(new RegExp(_.escapeRegExp('[' + token + ']'), 'g'), value);
+      this.submit = function submit() {
+        var submission = crmApi4('Afform', 'submit', {name: ctrl.getFormMeta().name, args: $scope.$parent.routeParams || {}, values: data});
+        var metaData = ctrl.getFormMeta();
+        if (metaData.redirect) {
+          submission.then(function() {
+            var url = metaData.redirect;
+            if (url.indexOf('civicrm/') === 0) {
+              url = CRM.url(url);
+            } else if (url.indexOf('/') === 0) {
+              url = $location.protocol() + '://' + $location.host() + url;
             }
+            $window.location.href = url;
           });
         }
-        recurse([], vars);
-        return str;
-      }
-
-      this.submit = function() {
-        if (!ctrl.ngForm.$valid) {
-          CRM.alert(ts('Please fill all required fields.'), ts('Form Error'));
-          return;
-        }
-        status = CRM.status({});
-        $element.block();
-
-        crmApi4('Afform', 'submit', {
-          name: ctrl.getFormMeta().name,
-          args: args,
-          values: data}
-        ).then(function(response) {
-          submissionResponse = response;
-          if (ctrl.fileUploader.getNotUploadedItems().length) {
-            _.each(ctrl.fileUploader.getNotUploadedItems(), function(file) {
-              file.formData.push({
-                params: JSON.stringify(_.extend({
-                  token: response[0].token,
-                  name: ctrl.getFormMeta().name
-                }, file.crmApiParams()))
-              });
-            });
-            ctrl.fileUploader.uploadAll();
-          } else {
-            postProcess();
-          }
-        });
+        return crmStatus({start: ts('Saving'), success: ts('Saved')}, submission);
       };
     }
   });

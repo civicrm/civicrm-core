@@ -100,7 +100,6 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
     $defaults['waitlist_text'] = CRM_Utils_Array::value('waitlist_text', $defaults, ts('This event is currently full. However you can register now and get added to a waiting list. You will be notified if spaces become available.'));
     $defaults['template_id'] = $this->_templateId;
-
     return $defaults;
   }
 
@@ -197,10 +196,8 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
   public static function formRule($values) {
     $errors = [];
 
-    // Validate start/end date inputs
-    $validateDates = \CRM_Utils_Date::validateStartEndDatepickerInputs('start_date', $values['start_date'], 'end_date', $values['end_date']);
-    if ($validateDates !== TRUE) {
-      $errors[$validateDates['key']] = $validateDates['message'];
+    if (!empty($values['end_date']) && ($values['end_date'] < $values['start_date'])) {
+      $errors['end_date'] = ts('End date should be after Start date.');
     }
 
     //CRM-4286

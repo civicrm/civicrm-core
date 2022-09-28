@@ -18,11 +18,11 @@
 /**
  * Create or updates an Pledge.
  *
- * @param array $params
+ * @param $params
  *
  * @return array
  *   Array containing 'is_error' to denote success or failure and details of the created pledge
- * @throws \CRM_Core_Exception
+ * @throws \API_Exception
  */
 function civicrm_api3_pledge_create($params) {
   _civicrm_api3_pledge_format_params($params, TRUE);

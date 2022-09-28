@@ -49,7 +49,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
     $email = new CRM_Core_BAO_Email();
     $email->contact_id = $this->_contactId;
 
-    $this->_emails = CRM_Core_BAO_Block::retrieveBlock($email);
+    $this->_emails = CRM_Core_BAO_Block::retrieveBlock($email, NULL);
 
     // Check if this contact has a first/last/organization/household name
     if ($this->_contactType == 'Individual') {

@@ -296,7 +296,7 @@ LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']}
   }
 
   /**
-   * @param array $rows
+   * @param $rows
    *
    * @return array
    */

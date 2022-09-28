@@ -31,15 +31,11 @@ function mustache_civicrm_container($container) {
 }
 
 function _mustache_compose_batch(\Civi\FlexMailer\Event\ComposeBatchEvent $event) {
-  if ($event->getMailing()->template_type !== 'mustache') {
-    return;
-  }
+  if ($event->getMailing()->template_type !== 'mustache') return;
 
   $m = new Mustache_Engine();
   foreach ($event->getTasks() as $task) {
-    if ($task->hasContent()) {
-      continue;
-    }
+    if ($task->hasContent()) continue;
     $contact = civicrm_api3('Contact', 'getsingle', array(
       'id' => $task->getContactId(),
     ));
@@ -47,7 +43,6 @@ function _mustache_compose_batch(\Civi\FlexMailer\Event\ComposeBatchEvent $event
     $task->setMailParam('html', $m->render($event->getMailing()->body_html, $contact));
   }
 }
-
 ```
 
 This implementation is naive in a few ways -- it performs separate SQL queries for each recipient; it doesn't optimize

@@ -15,11 +15,7 @@ namespace Civi\Api4\Service\Spec\Provider;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
 
-/**
- * @service
- * @internal
- */
-class CustomFieldCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
+class CustomFieldCreationSpecProvider implements Generic\SpecProviderInterface {
 
   /**
    * @inheritDoc

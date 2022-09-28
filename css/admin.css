@@ -6,12 +6,12 @@
 }
 
 #crm-container table.selector td.tasklist {
-  border-right: 1px solid #dddddd;
+  border-right: 1px solid #DDDDDD;
   width: 20%;
 }
 
 #crm-container td.tasklist a:link {
-  color: #ff0105;
+  color: #FF0105;
 }
 
 #crm-container td.tasklist a:visited {
@@ -20,22 +20,22 @@
 
 /* Class for successful upgrade */
 .crm-container .upgrade-success {
-  background-color: #00cc00;
+  background-color: #00CC00;
   color: white;
 }
 
 /* Extension management */
 
 .crm-container .extension-upgradable {
-  background-color: #ffffcc !important;
+  background-color: #FFFFCC !important;
 }
 
 .crm-container .extension-installed {
-  background-color: #ddffdd !important;
+  background-color: #DDFFDD !important;
 }
 
 .crm-container .extension-missing {
-  color: #e43d2b !important;
+  color: #E43D2B !important;
 }
 
 #crm-container .crm-extensions-upgrade {
@@ -56,7 +56,7 @@
 }
 
 .crm-container .crm-extensions-stage.fa-check-circle {
-  color: #00994d;
+  color: #00994D;
 }
 
 @media screen and (min-width: 480px) {

@@ -29,30 +29,42 @@ abstract class CRM_Contact_BAO_Query_Interface {
    *
    * @return mixed
    */
-  abstract public static function from($fieldName, $mode, $side);
+  abstract public function from($fieldName, $mode, $side);
 
   /**
    * @param $query
+   *
+   * @return null
    */
-  public static function select(&$query) {
+  public function select(&$query) {
+    return NULL;
   }
 
   /**
    * @param $query
+   *
+   * @return null
    */
-  public static function where(&$query) {
+  public function where(&$query) {
+    return NULL;
   }
 
   /**
    * @param $tables
+   *
+   * @return null
    */
   public function setTableDependency(&$tables) {
+    return NULL;
   }
 
   /**
    * @param $panes
+   *
+   * @return null
    */
   public function registerAdvancedSearchPane(&$panes) {
+    return NULL;
   }
 
   /**
@@ -91,15 +103,6 @@ abstract class CRM_Contact_BAO_Query_Interface {
    * @void
    */
   public function alterSearchBuilderOptions(&$apiEntities, &$fieldOptions) {
-  }
-
-  /**
-   * @param $mode
-   * @param $includeCustomFields
-   * @return array|null
-   */
-  public static function defaultReturnProperties($mode) {
-    return NULL;
   }
 
 }

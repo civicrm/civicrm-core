@@ -25,10 +25,13 @@ class CRM_Upgrade_Headless {
    *   - message: string, HTML-ish blob
    */
   public function run($enablePrint = TRUE) {
-    set_time_limit(0);
+    // lets get around the time limit issue if possible for upgrades
+    if (!ini_get('safe_mode')) {
+      set_time_limit(0);
+    }
 
     $upgrade = new CRM_Upgrade_Form();
-    [$currentVer, $latestVer] = $upgrade->getUpgradeVersions();
+    list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
 
     if ($error = $upgrade->checkUpgradeableVersion($currentVer, $latestVer)) {
       throw new Exception($error);

@@ -51,7 +51,7 @@ class KernelTest extends \CiviUnitTestCase {
   public function testResolveException() {
     $test = $this;
     $this->dispatcher->addListener('civi.api.resolve', function () {
-      throw new \CRM_Core_Exception('Oh My God', 'omg', ['the' => 'badzes']);
+      throw new \API_Exception('Oh My God', 'omg', ['the' => 'badzes']);
     }, Events::W_EARLY);
     $this->dispatcher->addListener('civi.api.exception', function (\Civi\API\Event\ExceptionEvent $event) use ($test) {
       $test->assertEquals('Oh My God', $event->getException()->getMessage());

@@ -35,28 +35,18 @@ class CRM_ACL_BAO_ACLEntityRole extends CRM_ACL_DAO_ACLEntityRole {
   /**
    * @param array $params
    *
-   * @deprecated
-   * @return CRM_ACL_BAO_ACLEntityRole
+   * @return CRM_ACL_DAO_EntityRole
    */
   public static function create(&$params) {
     return self::writeRecord($params);
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
    * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
-   * @deprecated
+   * @param $defaults
    */
-  public static function retrieve($params, &$defaults) {
-    return self::commonRetrieve(self::class, $params, $defaults);
+  public static function retrieve(&$params, &$defaults) {
+    CRM_Core_DAO::commonRetrieve(__CLASS__, $params, $defaults);
   }
 
   /**
@@ -79,10 +69,10 @@ class CRM_ACL_BAO_ACLEntityRole extends CRM_ACL_DAO_ACLEntityRole {
    *
    * @param int $entityRoleId
    *   ID of the EntityRole record to be deleted.
-   * @deprecated
+   *
    */
   public static function del($entityRoleId) {
-    return self::deleteRecord(['id' => $entityRoleId]);
+    return parent::deleteRecord(['id' => $entityRoleId]);
   }
 
 }

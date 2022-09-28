@@ -53,8 +53,6 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
 
     $this->_context = $this->get('context');
     $this->_id = $this->get('amtgID');
-
-    CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'Group', $this->_id);
   }
 
   /**
@@ -117,12 +115,10 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
 
     // Set dynamic page title for 'Add Members Group (confirm)'
     if ($this->_id) {
-      $this->setTitle(ts('Add Contacts: %1', [1 => $this->_title]));
+      CRM_Utils_System::setTitle(ts('Add Contacts: %1', [1 => $this->_title]));
     }
     else {
-      $this->setTitle(ts('Add Contacts to A Group'));
-      //build custom data
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
+      CRM_Utils_System::setTitle(ts('Add Contacts to A Group'));
     }
 
     $this->addDefaultButtons(ts('Add to Group'));
@@ -143,7 +139,6 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
     }
 
     $defaults['group_option'] = 0;
-    $defaults += CRM_Custom_Form_CustomData::setDefaultValues($this);
     return $defaults;
   }
 
@@ -166,10 +161,10 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
     $errors = [];
 
     if (!empty($params['group_option']) && empty($params['title'])) {
-      $errors['title'] = ts('Group Name is a required field');
+      $errors['title'] = "Group Name is a required field";
     }
     elseif (empty($params['group_option']) && empty($params['group_id'])) {
-      $errors['group_id'] = ts('Select Group is a required field.');
+      $errors['group_id'] = "Select Group is a required field.";
     }
 
     return empty($errors) ? TRUE : $errors;
@@ -186,9 +181,15 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
       $groupParams['title'] = $params['title'];
       $groupParams['description'] = $params['description'];
       $groupParams['visibility'] = "User and User Admin Only";
-      $groupParams['group_type'] = array_keys($params['group_type'] ?? []);
+      if (array_key_exists('group_type', $params) && is_array($params['group_type'])) {
+        $groupParams['group_type'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
+            array_keys($params['group_type'])
+          ) . CRM_Core_DAO::VALUE_SEPARATOR;
+      }
+      else {
+        $groupParams['group_type'] = '';
+      }
       $groupParams['is_active'] = 1;
-      $groupParams['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->_id, 'Group');
 
       $createdGroup = CRM_Contact_BAO_Group::create($groupParams);
       $groupID = $createdGroup->id;

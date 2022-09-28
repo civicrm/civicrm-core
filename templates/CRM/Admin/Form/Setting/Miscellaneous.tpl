@@ -41,12 +41,6 @@
         {/if}
         </td>
       </tr>
-      <tr class="crm-miscellaneous-form-block-enableBackgroundQueue">
-        <td class="label">{$form.enableBackgroundQueue.label}</td>
-        <td>{$form.enableBackgroundQueue.html}<br />
-          <span class="description">{$setting_descriptions.enableBackgroundQueue}</span>
-        </td>
-      </tr>
       <tr class="crm-miscellaneous-form-block-doNotAttachPDFReceipt">
         <td class="label">{$form.doNotAttachPDFReceipt.label}</td>
         <td>{$form.doNotAttachPDFReceipt.html}<br />
@@ -57,24 +51,6 @@
         <td class="label">{$form.recordGeneratedLetters.label}</td>
         <td>{$form.recordGeneratedLetters.html}<br />
           <p class="description">{ts}When generating a letter (PDF/Word) via mail-merge, how should the letter be recorded?{/ts}</p>
-        </td>
-      </tr>
-      <tr class="crm-miscellaneous-form-block-dompdf_font_dir">
-        <td class="label">{$form.dompdf_font_dir.label}</td>
-        <td>{$form.dompdf_font_dir.html}<br />
-          <p class="description">{ts}Additional folder where DOMPDF will look for fonts.{/ts}</p>
-        </td>
-      </tr>
-      <tr class="crm-miscellaneous-form-block-dompdf_chroot">
-        <td class="label">{$form.dompdf_chroot.label}</td>
-        <td>{$form.dompdf_chroot.html}<br />
-          <p class="description">{ts}Folder to restrict where DOMPDF looks when loading local images. By default it is the DOMPDF folder itself for security reasons. It will search in subfolders.{/ts}</p>
-        </td>
-      </tr>
-      <tr class="crm-miscellaneous-form-block-dompdf_enable_remote">
-        <td class="label">{$form.dompdf_enable_remote.label}</td>
-        <td>{$form.dompdf_enable_remote.html}<br />
-          <p class="description">{ts}Enable the use of remote images. By default this is enabled, but if not using remote images you may wish to turn it off for security reasons.{/ts}</p>
         </td>
       </tr>
       <tr class="crm-miscellaneous-form-block-wkhtmltopdfPath">

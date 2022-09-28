@@ -54,8 +54,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count']);
     $entityId = $result['id'];
     $this->assertIsNumeric($entityId);
-    $caseComponentId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Component', 'CiviCase', 'id', 'name');
-    $this->assertEquals($caseComponentId, $result['values'][$entityId]['component_id']);
+    $this->assertEquals(7, $result['values'][$entityId]['component_id']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
       AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "report_template") ');
@@ -140,13 +139,12 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * Get templates suitable for SelectWhere test.
    *
    * @return array
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function getReportTemplatesSupportingSelectWhere() {
     $allTemplates = self::getReportTemplates();
     // Exclude all that do not work as of test being written. I have not dug into why not.
     $currentlyExcluded = [
-      'contribute/history',
       'contribute/repeat',
       'member/summary',
       'event/summary',
@@ -364,6 +362,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    */
   public function alterReportVarHook($varType, &$var, &$object) {
     if ($varType === 'sql' && $object instanceof CRM_Report_Form_Contribute_Summary) {
+      /* @var CRM_Report_Form $var */
       $from = $var->getVar('_from');
       $from .= ' LEFT JOIN civicrm_financial_type as temp ON temp.id = contribution_civireport.financial_type_id';
       $var->setVar('_from', $from);
@@ -379,12 +378,13 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * Note that the function needs to
    * be static so cannot use $this->callAPISuccess
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getReportTemplates() {
     $reportTemplates = [];
     $reportsToSkip = [
-      'event/income' => "This report overrides buildQuery() so doesn't seem compatible with this test and you get a syntax error `WHERE civicrm_event.id IN( ) GROUP BY civicrm_event.id`",
+      'event/income' => 'I do no understand why but error is Call to undefined method CRM_Report_Form_Event_Income::from() in CRM/Report/Form.php on line 2120',
+      'contribute/history' => 'Declaration of CRM_Report_Form_Contribute_History::buildRows() should be compatible with CRM_Report_Form::buildRows($sql, &$rows)',
     ];
 
     $reports = civicrm_api3('report_template', 'get', ['return' => 'value', 'options' => ['limit' => 500]]);
@@ -560,6 +560,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *   Name of the template to test.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testContributionSummaryWithSmartGroupFilter(string $template): void {
     $groupID = $this->setUpPopulatedSmartGroup();
@@ -583,6 +584,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @param string $template
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testContributionSummaryWithNotINSmartGroupFilter($template): void {
     $groupID = $this->setUpPopulatedSmartGroup();
@@ -900,6 +902,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @return int
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function setUpPopulatedSmartGroup(): int {
     $household1ID = $this->householdCreate();
@@ -1049,6 +1052,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * Test Deferred Revenue Report.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testDeferredRevenueReport(): void {
     $indv1 = $this->individualCreate();
@@ -1108,6 +1112,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @param string $template
    *   Report template unique identifier.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -1277,7 +1282,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'civicrm_contact_contact_source_link' => '/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=' . $this->contactIDs[2],
       'civicrm_contact_contact_source_hover' => 'View Contact Summary for this Contact',
       'civicrm_activity_activity_type_id_hover' => 'View Activity Record',
-      'class' => NULL,
     ];
     $row = $rows[0];
     // This link is not relative - skip for now
@@ -1344,7 +1348,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->contactIDs[] = $this->individualCreate(['last_name' => 'Łąchowski-Roberts']);
     $this->contactIDs[] = $this->individualCreate(['last_name' => 'Łąchowski-Roberts']);
 
-    $this->activityID = $this->callAPISuccess('Activity', 'create', [
+    $this->callAPISuccess('Activity', 'create', [
       'subject' => 'Very secret meeting',
       'activity_date_time' => date('Y-m-d 23:59:58'),
       'duration' => 120,
@@ -1355,7 +1359,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'source_contact_id' => $this->contactIDs[2],
       'target_contact_id' => [$this->contactIDs[0], $this->contactIDs[1]],
       'assignee_contact_id' => $this->contactIDs[1],
-    ])['id'];
+    ]);
   }
 
   /**
@@ -1383,6 +1387,24 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'order_bys' => [['column' => 'sort_name', 'order' => 'ASC', 'section' => '1']],
       'options' => ['metadata' => ['sql']],
     ]);
+  }
+
+  /**
+   * Test contact subtype filter on grant report.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGrantReportSeparatedFilter() {
+    $contactID = $this->individualCreate(['contact_sub_type' => ['Student', 'Parent']]);
+    $contactID2 = $this->individualCreate();
+    $this->callAPISuccess('Grant', 'create', ['contact_id' => $contactID, 'status_id' => 1, 'grant_type_id' => 1, 'amount_total' => 1]);
+    $this->callAPISuccess('Grant', 'create', ['contact_id' => $contactID2, 'status_id' => 1, 'grant_type_id' => 1, 'amount_total' => 1]);
+    $rows = $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => 'grant/detail',
+      'contact_sub_type_op' => 'in',
+      'contact_sub_type_value' => ['Student'],
+    ]);
+    $this->assertEquals(1, $rows['count']);
   }
 
   /**
@@ -1598,180 +1620,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
         'street_address' => '1',
       ],
     ]);
-  }
-
-  /**
-   * Test that the contribution aggregate by relationship report filters
-   * by financial type.
-   */
-  public function testContributionAggregateByRelationship() {
-    $contact = $this->individualCreate();
-    // Two contributions with different financial types.
-    // We don't really care which types, just different.
-    $this->contributionCreate(['contact_id' => $contact, 'receive_date' => (date('Y') - 1) . '-07-01', 'financial_type_id' => 1, 'total_amount' => '10']);
-    $this->contributionCreate(['contact_id' => $contact, 'receive_date' => (date('Y') - 1) . '-08-01', 'financial_type_id' => 2, 'total_amount' => '20']);
-    $rows = $this->callAPISuccess('report_template', 'getrows', [
-      'report_id' => 'contribute/history',
-      'financial_type_id_op' => 'in',
-      'financial_type_id_value' => [1],
-      'options' => ['metadata' => ['sql']],
-      'fields' => [
-        'relationship_type_id' => 1,
-        'total_amount' => 1,
-      ],
-    ]);
-
-    // Hmm it has styling in it before being sent to the template. If that gets fixed then will need to update this.
-    $this->assertEquals('<strong>10.00</strong>', $rows['values'][$contact]['civicrm_contribution_total_amount'], 'should only include the $10 contribution');
-
-    $this->callAPISuccess('Contact', 'delete', ['id' => $contact]);
-  }
-
-  /**
-   * Basic test of the repeat contributions report.
-   */
-  public function testRepeatContributions() {
-    // our sorting options are limited in this report - default is last name so let's ensure order
-    $contact1 = $this->individualCreate(['last_name' => 'aaaaa']);
-    $contact2 = $this->individualCreate(['last_name' => 'zzzzz']);
-    $this->contributionCreate(['contact_id' => $contact1, 'receive_date' => (date('Y') - 1) . '-07-01', 'financial_type_id' => 1, 'total_amount' => '10']);
-    $this->contributionCreate(['contact_id' => $contact1, 'receive_date' => (date('Y') - 1) . '-08-01', 'financial_type_id' => 1, 'total_amount' => '20']);
-    $this->contributionCreate(['contact_id' => $contact1, 'receive_date' => date('Y') . '-01-01', 'financial_type_id' => 1, 'total_amount' => '40']);
-    $this->contributionCreate(['contact_id' => $contact2, 'receive_date' => (date('Y') - 1) . '-09-01', 'financial_type_id' => 1, 'total_amount' => '80']);
-    $rows = $this->callAPISuccess('report_template', 'getrows', [
-      'report_id' => 'contribute/repeat',
-      'receive_date1' => 'previous.year',
-      'receive_date2' => 'this.year',
-      'fields' => [
-        'sort_name' => 1,
-      ],
-    ]);
-
-    $this->assertCount(2, $rows['values']);
-
-    // Should have for both this year and last, and last year was multiple.
-    $this->assertEquals($contact1, $rows['values'][0]['contact_civireport_id'], "doesn't seem to be the right contact 1");
-    $this->assertSame('30.00', $rows['values'][0]['contribution1_total_amount_sum']);
-    $this->assertSame('2', $rows['values'][0]['contribution1_total_amount_count']);
-    $this->assertSame('40.00', $rows['values'][0]['contribution2_total_amount_sum']);
-    $this->assertSame('1', $rows['values'][0]['contribution2_total_amount_count']);
-
-    // Should only have for last year.
-    $this->assertEquals($contact2, $rows['values'][1]['contact_civireport_id'], "doesn't seem to be the right contact 2");
-    $this->assertSame('80.00', $rows['values'][1]['contribution1_total_amount_sum']);
-    $this->assertSame('1', $rows['values'][1]['contribution1_total_amount_count']);
-    $this->assertNull($rows['values'][1]['contribution2_total_amount_sum']);
-    $this->assertNull($rows['values'][1]['contribution2_total_amount_count']);
-
-    $this->callAPISuccess('Contact', 'delete', ['id' => $contact1]);
-    $this->callAPISuccess('Contact', 'delete', ['id' => $contact2]);
-  }
-
-  /**
-   * Convoluted test of the convoluted logging detail report.
-   *
-   * In principle it's just make an update and get the report and see if it
-   * matches the update.
-   * In practice, besides some setup and trigger-wrangling, the report isn't
-   * useful for activities, so we're checking activity_contact records, and
-   * because of how an activity update works that's actually a delete+insert.
-   */
-  public function testLoggingDetail() {
-    \Civi::settings()->set('logging', 1);
-    $this->createContactsWithActivities();
-    $this->doQuestionableStuffInASeparateFunctionSoNobodyNotices();
-
-    // Do something that creates an update record.
-    $this->callAPISuccess('Activity', 'create', [
-      'id' => $this->activityID,
-      'assignee_contact_id' => $this->contactIDs[0],
-      'details' => 'Edited details',
-    ]);
-
-    // In normal UI flow you would go to the summary report and drill down,
-    // but here we need to go directly to the connection id, so find out what
-    // it was.
-    $queryParams = [1 => [$this->activityID, 'Integer']];
-    $log_conn_id = CRM_Core_DAO::singleValueQuery("SELECT log_conn_id FROM log_civicrm_activity WHERE id = %1 AND log_action='UPDATE' LIMIT 1", $queryParams);
-
-    // There should be only one instance of this after enabling so we can
-    // just specify the template id as the lookup criteria.
-    $instance_id = $this->callAPISuccess('report_instance', 'getsingle', [
-      'return' => ['id'],
-      'report_id' => 'logging/contact/detail',
-    ])['id'];
-
-    $_GET = $_REQUEST = [
-      'reset' => '1',
-      'log_conn_id' => $log_conn_id,
-      'q' => "civicrm/report/instance/$instance_id",
-    ];
-    $values = $this->callAPISuccess('report_template', 'getrows', [
-      'report_id' => 'logging/contact/detail',
-    ])['values'];
-
-    // Note this is a delete+insert which is logically equivalent to update
-    $expectedValues = [
-      // here's the delete
-      0 => [
-        'field' => [
-          0 => 'Activity ID (id: 2)',
-          1 => 'Contact ID (id: 2)',
-          2 => 'Activity Contact Type (id: 2)',
-        ],
-        'from' => [
-          0 => 'Very secret meeting (id: 1)',
-          1 => 'Mr. Anthony Łąchowski-Roberts II (id: 4)',
-          2 => 'Activity Assignees',
-        ],
-        'to' => [
-          0 => '',
-          1 => '',
-          2 => '',
-        ],
-      ],
-      // this is the insert
-      1 => [
-        'field' => [
-          0 => 'Activity ID (id: 5)',
-          1 => 'Contact ID (id: 5)',
-          2 => 'Activity Contact Type (id: 5)',
-        ],
-        'from' => [
-          0 => '',
-          1 => '',
-          2 => '',
-        ],
-        'to' => [
-          0 => 'Very secret meeting (id: 1)',
-          1 => 'Mr. Anthony Brzęczysław II (id: 3)',
-          2 => 'Activity Assignees',
-        ],
-      ],
-    ];
-    $this->assertEquals($expectedValues, $values);
-
-    \Civi::settings()->set('logging', 0);
-  }
-
-  /**
-   * The issue is that in a unit test the log_conn_id is going to
-   * be the same throughout the entire test, which is not how it works normally
-   * when you have separate page requests. So use the fact that the conn_id
-   * format is controlled by a hidden variable, so we can force different
-   * conn_id's during initialization and after.
-   * If we don't do this, then the report thinks EVERY log record is part
-   * of the one change detail.
-   *
-   * On the plus side, this doesn't affect other tests since if they enable
-   * logging then that'll just recreate the variable and triggers.
-   */
-  private function doQuestionableStuffInASeparateFunctionSoNobodyNotices(): void {
-    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_setting WHERE name='logging_uniqueid_date'");
-    // Now we have to rebuild triggers because the format formula is stored in
-    // every trigger.
-    CRM_Core_Config::singleton(TRUE, TRUE);
-    \Civi::service('sql_triggers')->rebuild(NULL, TRUE);
   }
 
 }

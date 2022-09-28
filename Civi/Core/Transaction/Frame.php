@@ -168,11 +168,11 @@ class Frame {
    *
    * @param int $phase
    *   A constant; one of: self::PHASE_{PRE,POST}_{COMMIT,ROLLBACK}.
-   * @param callable $callback
+   * @param mixed $callback
    *   A PHP callback.
-   * @param mixed $params Optional values to pass to callback.
+   * @param array|NULL $params Optional values to pass to callback.
    *          See php manual call_user_func_array for details.
-   * @param string|int|null $id
+   * @param null $id
    */
   public function addCallback($phase, $callback, $params = NULL, $id = NULL) {
     if ($id) {

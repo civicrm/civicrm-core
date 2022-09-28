@@ -20,7 +20,7 @@
       {if empty($tagsetElementName) or $tagsetElementName eq $elemName}
         {assign var="parID" value=$tagset.parentID}
         {assign var="skipEntityAction" value=$tagset.skipEntityAction}
-        {if !empty($tableLayout)}
+        {if $tableLayout}
           <tr>
             <td class="label">
               {$form.$elemName.$parID.label}

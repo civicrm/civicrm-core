@@ -23,23 +23,13 @@
               <td class="label">{$element.field_title}</td>
               <td class="html-adjust">
               {* sort by fails for option per line. Added a variable to iterate through the element array*}
-                {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
-                  {', '|implode:$element.contact_ref_links}
-                {else}
-                  {foreach from=$element.field_value item=val}
-                    {$val}<br/>
-                  {/foreach}
-                {/if}
+                {foreach from=$element.field_value item=val}
+                  {$val}<br/>
+                {/foreach}
               </td>
               {else}
                 <td class="label">{$element.field_title}</td>
-                <td class="html-adjust">
-                  {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
-                    {', '|implode:$element.contact_ref_links}
-                  {else}
-                    {$element.field_value}
-                  {/if}
-                </td>
+                <td class="html-adjust">{$element.field_value}</td>
             {/if}
           </tr>
         </table>

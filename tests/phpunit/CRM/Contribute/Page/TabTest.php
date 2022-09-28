@@ -31,7 +31,8 @@ class CRM_Contribute_Page_TabTest extends CiviUnitTestCase {
   /**
    * Test links render correctly for manual processor.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testLinksManual(): void {
     [$contactID, $recurID] = $this->setupTemplate();
@@ -46,7 +47,8 @@ class CRM_Contribute_Page_TabTest extends CiviUnitTestCase {
   /**
    * Test links render correctly for manual processor.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testLinksPaypalStandard(): void {
     $this->setupTemplate([
@@ -75,7 +77,8 @@ class CRM_Contribute_Page_TabTest extends CiviUnitTestCase {
    * @param array $recurParams
    *
    * @return array
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
+   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function setupTemplate($recurParams = []): array {

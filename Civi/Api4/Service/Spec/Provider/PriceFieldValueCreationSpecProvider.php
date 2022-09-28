@@ -14,11 +14,7 @@ namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
-/**
- * @service
- * @internal
- */
-class PriceFieldValueCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
+class PriceFieldValueCreationSpecProvider implements Generic\SpecProviderInterface {
 
   /**
    * @inheritDoc

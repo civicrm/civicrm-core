@@ -8,7 +8,10 @@
  +--------------------------------------------------------------------+
 *}
 {* Custom Data form*}
-{foreach from=$groupTree item=cd_edit key=group_id name=custom_sets}
+{if !empty($formEdit)}
+  {include file="CRM/Custom/Form/Edit/CustomData.tpl" customDataEntity=''}
+{else}
+  {foreach from=$groupTree item=cd_edit key=group_id name=custom_sets}
     {if $cd_edit.is_multiple and $multiRecordDisplay eq 'single'}
       {assign var="isSingleRecordEdit" value=TRUE}
     {else}
@@ -20,8 +23,8 @@
         {include file="CRM/Custom/Form/Edit/CustomData.tpl" customDataEntity=''}
       </div>
     {else}
-     <div class="custom-group custom-group-{$cd_edit.name} crm-accordion-wrapper crm-custom-accordion {if $cd_edit.collapse_display and empty($skipTitle)}collapsed{/if}">
-      {if empty($skipTitle)}
+     <div class="custom-group custom-group-{$cd_edit.name} crm-accordion-wrapper crm-custom-accordion {if $cd_edit.collapse_display and !$skipTitle}collapsed{/if}">
+      {if !$skipTitle}
       <div class="crm-accordion-header">
         {$cd_edit.title}
        </div><!-- /.crm-accordion-header -->
@@ -31,11 +34,13 @@
       </div>
      </div>
     {/if}
-    {if $cgCount}
+    {if isset($cgCount)}
       <div id="custom_group_{$group_id}_{$cgCount}"></div>
     {else}
       <div id="custom_group_{$group_id}"></div>
     {/if}
   {/foreach}
+
+{/if}
 
 {include file="CRM/Form/attachmentjs.tpl"}

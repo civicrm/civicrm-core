@@ -18,6 +18,12 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
+  protected $_charts = [
+    '' => 'Tabular',
+    'barChart' => 'Bar Chart',
+    'pieChart' => 'Pie Chart',
+  ];
+
   protected $_add2groupSupported = FALSE;
 
   protected $_customGroupExtends = [
@@ -79,34 +85,9 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_DATE,
           ],
         ],
-        'order_bys' => [
-          'event_start_date' => [
-            'title' => ts('Event Start Date'),
-            'default' => '1',
-            'default_weight' => '0',
-            'default_order' => 'DESC',
-          ],
-          'event_end_date' => [
-            'title' => ts('Event End Date'),
-          ],
-          'max_participants' => [
-            'title' => ts('Capacity'),
-          ],
-          'title' => [
-            'title' => ts('Event Title'),
-          ],
-        ],
       ],
     ];
     $this->_currencyColumn = 'civicrm_participant_fee_currency';
-
-    // Add charts support
-    $this->_charts = [
-      '' => ts('Tabular'),
-      'barChart' => ts('Bar Chart'),
-      'pieChart' => ts('Pie Chart'),
-    ];
-
     parent::__construct();
   }
 
@@ -340,7 +321,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form {
   }
 
   /**
-   * @param array $rows
+   * @param $rows
    */
   public function buildChart(&$rows) {
     $this->_interval = 'events';

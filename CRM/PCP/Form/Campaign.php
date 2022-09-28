@@ -44,7 +44,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       $title = ts('Edit Your Personal Campaign Page');
     }
 
-    $this->setTitle($title);
+    CRM_Utils_System::setTitle($title);
     parent::preProcess();
   }
 
@@ -157,7 +157,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param self $self
+   * @param $self
    *
    *
    * @return bool|array
@@ -262,7 +262,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       $supporterUrl = CRM_Utils_System::url('civicrm/contact/view',
         "reset=1&cid={$pcp->contact_id}",
         TRUE, NULL, FALSE,
-        FALSE, TRUE
+        FALSE
       );
       $this->assign('supporterUrl', $supporterUrl);
       $supporterName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $pcp->contact_id, 'display_name');
@@ -315,7 +315,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
         [
           'groupName' => 'msg_tpl_workflow_contribution',
-          'workflow' => 'pcp_notify',
+          'valueName' => 'pcp_notify',
           'contactId' => $contactID,
           'from' => "$domainEmailName <$domainEmailAddress>",
           'toEmail' => $to,

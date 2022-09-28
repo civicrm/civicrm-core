@@ -50,7 +50,7 @@ class CRM_Price_Form_DeleteField extends CRM_Core_Form {
 
     $this->assign('title', $this->_title);
 
-    $this->setTitle(ts('Confirm Price Field Delete'));
+    CRM_Utils_System::setTitle(ts('Confirm Price Field Delete'));
   }
 
   /**

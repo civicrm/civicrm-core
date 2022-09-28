@@ -37,6 +37,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
 
   /**
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function tearDown(): void {
     $this->quickCleanup([

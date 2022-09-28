@@ -1,9 +1,4 @@
 <?php
-
-/**
- * @file
- */
-
 /**
  * Test Generated example demonstrating the Contact.get API.
  *
@@ -22,10 +17,10 @@ function contact_get_example() {
     ],
   ];
 
-  try {
+  try{
     $result = civicrm_api3('Contact', 'get', $params);
   }
-  catch (CRM_Core_Exception $e) {
+  catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
@@ -59,8 +54,8 @@ function contact_get_expectedresult() {
         'contact_id' => '3',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
-        'sort_name' => 'Group member, Test2',
-        'display_name' => 'Test2 Group member',
+        'sort_name' => 'Groupmember, Test2',
+        'display_name' => 'Test2 Groupmember',
         'do_not_email' => 0,
         'do_not_phone' => 0,
         'do_not_mail' => 0,
@@ -77,7 +72,7 @@ function contact_get_expectedresult() {
         'preferred_mail_format' => 'Both',
         'first_name' => 'Test2',
         'middle_name' => '',
-        'last_name' => 'Group member',
+        'last_name' => 'Groupmember',
         'prefix_id' => '',
         'suffix_id' => '',
         'formal_title' => '',
@@ -107,7 +102,7 @@ function contact_get_expectedresult() {
         'phone_id' => '',
         'phone_type_id' => '',
         'phone' => '',
-        'email_id' => '3',
+        'email_id' => '1',
         'email' => 'test@example.org',
         'on_hold' => 0,
         'im_id' => '',
@@ -132,23 +127,23 @@ function contact_get_expectedresult() {
 }
 
 /*
- * This example has been generated from the API test suite.
- * The test that created it is called "testContactGetWithGroupTitleMultipleGroups"
- * and can be found at:
- * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
- *
- * You can see the outcome of the API tests at
- * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
- *
- * To Learn about the API read
- * https://docs.civicrm.org/dev/en/latest/api/
- *
- * Browse the API on your own site with the API Explorer. It is in the main
- * CiviCRM menu, under: Support > Development > API Explorer.
- *
- * Read more about testing here
- * https://docs.civicrm.org/dev/en/latest/testing/
- *
- * API Standards documentation:
- * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
- */
+* This example has been generated from the API test suite.
+* The test that created it is called "testContactGetWithGroupTitleMultipleGroups"
+* and can be found at:
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
+*
+* You can see the outcome of the API tests at
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+*
+* To Learn about the API read
+* https://docs.civicrm.org/dev/en/latest/api/
+*
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
+*
+* Read more about testing here
+* https://docs.civicrm.org/dev/en/latest/testing/
+*
+* API Standards documentation:
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+*/

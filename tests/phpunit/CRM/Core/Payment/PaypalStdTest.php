@@ -21,7 +21,7 @@ class CRM_Core_Payment_PaypalStdTest extends CiviUnitTestCase {
   protected $processor;
 
   /**
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function setUp(): void {
     parent::setUp();

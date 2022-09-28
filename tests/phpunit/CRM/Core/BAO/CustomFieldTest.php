@@ -15,16 +15,18 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
   /**
    * Clean up after test.
+   *
+   * @throws \Exception
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_file', 'civicrm_entity_file'], TRUE);
+    $this->quickCleanup([], TRUE);
     parent::tearDown();
   }
 
   /**
    * Test creating a custom field.
    */
-  public function testCreateCustomField(): void {
+  public function testCreateCustomField() {
     $customGroup = $this->createCustomField();
     $customFieldID = $this->assertDBNotNull('CRM_Core_DAO_CustomField', $customGroup['id'], 'id', 'custom_group_id',
       'Database check for created CustomField.'
@@ -425,7 +427,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Test get custom field id function.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testGetCustomFieldID() {
     $this->createCustomField();
@@ -708,7 +710,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'id' => $this->getCustomFieldID('link'),
         'label' => 'test_link',
         'groupTitle' => 'Custom Group',
-        'default_value' => 'https://civicrm.org',
+        'default_value' => 'http://civicrm.org',
         'custom_group_id' => $customGroupID,
         'extends' => 'Contact',
         'extends_entity_column_value' => NULL,
@@ -982,7 +984,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Check that outputting the display value for a file field with No description doesn't generate error
    */
-  public function testFileDisplayValueNoDescription(): void {
+  public function testFileDisplayValueNoDescription() {
     $customGroup = $this->customGroupCreate([
       'extends' => 'Individual',
       'title' => 'Test Contact File Custom Group',

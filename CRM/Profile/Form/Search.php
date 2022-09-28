@@ -27,7 +27,7 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
   /**
    * Pre processing work done here.
    */
-  public function preProcess(): void {
+  public function preProcess() {
     $this->_mode = CRM_Profile_Form::MODE_SEARCH;
     parent::preProcess();
   }
@@ -78,7 +78,7 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
   /**
    * Build the form object.
    */
-  public function buildQuickForm(): void {
+  public function buildQuickForm() {
     // Is proximity search enabled for this profile?
     $proxSearch = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup',
       $this->get('gid'),
@@ -102,7 +102,7 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
   /**
    * Post process function.
    */
-  public function postProcess(): void {
+  public function postProcess() {
   }
 
 }

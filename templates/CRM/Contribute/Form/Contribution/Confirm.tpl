@@ -13,7 +13,7 @@
 
 {include file="CRM/common/TrackingFields.tpl"}
 
-<div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-confirm-form-block" data-page-id="{$contributionPageID}" data-page-template="confirm">
+<div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-confirm-form-block">
   <div class="help">
     <p>{ts}Please verify the information below carefully. Click <strong>Go Back</strong> if you need to make changes.{/ts}
       {$continueText}
@@ -123,11 +123,11 @@
                 {if $frequency_unit eq 'day'}
                   <p><strong>{ts}I want to contribute this amount every day.{/ts}</strong></p>
                 {elseif $frequency_unit eq 'week'}
-                  <p><strong>{ts}I want to contribute this amount every week.{/ts}</strong></p>
+                  <p><strong>{ts}I want to contribute this amount processed every week.{/ts}</strong></p>
                 {elseif $frequency_unit eq 'month'}
-                  <p><strong>{ts}I want to contribute this amount every month.{/ts}</strong></p>
+                  <p><strong>{ts}I want to contribute this amount processed every month.{/ts}</strong></p>
                 {elseif $frequency_unit eq 'year'}
-                  <p><strong>{ts}I want to contribute this amount every year.{/ts}</strong></p>
+                  <p><strong>{ts}I want to contribute this amount processed every year.{/ts}</strong></p>
                 {/if}
               {/if}
             {/if}
@@ -169,7 +169,7 @@
       </div>
       <div class="display-block">
         <div class="label-left crm-section honoree_profile-section">
-          <strong>{$honorName}</strong><br/>
+          <strong>{$honorName}</strong></br>
           {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor'}
         </div>
       </div>
@@ -182,25 +182,29 @@
     </fieldset>
   {/if}
 
-  {if $pcpBlock && $pcp_display_in_roll}
+  {if $pcpBlock}
     <div class="crm-group pcp_display-group">
       <div class="header-dark">
         {ts}Contribution Honor Roll{/ts}
       </div>
       <div class="display-block">
-        {ts}List my contribution{/ts}
-        {if $pcp_is_anonymous}
-          <strong>{ts}anonymously{/ts}.</strong>
-        {else}
-          {ts}under the name{/ts}:
-          <strong>{$pcp_roll_nickname}</strong>
-          <br/>
-          {if $pcp_personal_note}
-            {ts}With the personal note{/ts}:
-            <strong>{$pcp_personal_note}</strong>
+        {if $pcp_display_in_roll}
+          {ts}List my contribution{/ts}
+          {if $pcp_is_anonymous}
+            <strong>{ts}anonymously{/ts}.</strong>
           {else}
-            <strong>{ts}With no personal note{/ts}</strong>
+            {ts}under the name{/ts}:
+            <strong>{$pcp_roll_nickname}</strong>
+            <br/>
+            {if $pcp_personal_note}
+              {ts}With the personal note{/ts}:
+              <strong>{$pcp_personal_note}</strong>
+            {else}
+              <strong>{ts}With no personal note{/ts}</strong>
+            {/if}
           {/if}
+        {else}
+          {ts}Don't list my contribution in the honor roll.{/ts}
         {/if}
         <br/>
       </div>

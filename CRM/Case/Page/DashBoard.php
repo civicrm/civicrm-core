@@ -46,6 +46,8 @@ class CRM_Case_Page_DashBoard extends CRM_Core_Page {
 
     CRM_Utils_System::setTitle(ts('CiviCase Dashboard'));
 
+    $userID = $session->get('userID');
+
     //validate access for all cases.
     if ($allCases && !CRM_Core_Permission::check('access all cases and activities')) {
       $allCases = 0;

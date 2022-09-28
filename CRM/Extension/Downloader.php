@@ -16,33 +16,17 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Extension_Downloader {
-
   /**
-   * @var CRM_Extension_Manager
+   * @var CRM_Extension_Container_Basic
+   * The place where downloaded extensions are ultimately stored
    */
-  private $manager;
-
-  /**
-   * @var string
-   */
-  private $containerDir;
+  public $container;
 
   /**
    * @var string
    * Local path to a temporary data directory
    */
   public $tmpDir;
-
-  /**
-   * @var GuzzleHttp\Client
-   */
-  protected $guzzleClient;
-
-  /**
-   * @var CRM_Extension_Container_Basic
-   * The place where downloaded extensions are ultimately stored
-   */
-  public $container;
 
   /**
    * @param CRM_Extension_Manager $manager
@@ -54,20 +38,6 @@ class CRM_Extension_Downloader {
     $this->manager = $manager;
     $this->containerDir = $containerDir;
     $this->tmpDir = $tmpDir;
-  }
-
-  /**
-   * @return \GuzzleHttp\Client
-   */
-  public function getGuzzleClient(): \GuzzleHttp\Client {
-    return $this->guzzleClient ?? new \GuzzleHttp\Client();
-  }
-
-  /**
-   * @param \GuzzleHttp\Client $guzzleClient
-   */
-  public function setGuzzleClient(\GuzzleHttp\Client $guzzleClient) {
-    $this->guzzleClient = $guzzleClient;
   }
 
   /**
@@ -83,7 +53,7 @@ class CRM_Extension_Downloader {
 
     if (!$this->containerDir || !is_dir($this->containerDir) || !is_writable($this->containerDir)) {
       $civicrmDestination = urlencode(CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1'));
-      $url = CRM_Utils_System::url('civicrm/admin/setting/path', "reset=1&civicrmDestination={$civicrmDestination}");
+      $url = CRM_Utils_System::url('civicrm/admin/setting/path', "reset=1&civicrmDestination=${civicrmDestination}");
       $errors[] = array(
         'title' => ts('Directory Unwritable'),
         'message' => ts("Your extensions directory is not set or is not writable. Click <a href='%1'>here</a> to set the extensions directory.",
@@ -105,11 +75,9 @@ class CRM_Extension_Downloader {
       $requiredExtensions = CRM_Extension_System::singleton()->getManager()->findInstallRequirements([$extensionInfo->key], $extensionInfo);
       foreach ($requiredExtensions as $extension) {
         if (CRM_Extension_System::singleton()->getManager()->getStatus($extension) !== CRM_Extension_Manager::STATUS_INSTALLED && $extension !== $extensionInfo->key) {
-          $requiredExtensionInfo = CRM_Extension_System::singleton()->getBrowser()->getExtension($extension);
-          $requiredExtensionInfoName = empty($requiredExtensionInfo->name) ? $extension : $requiredExtensionInfo->name;
           $errors[] = [
             'title' => ts('Missing Requirement: %1', [1 => $extension]),
-            'message' => ts('You will not be able to install/upgrade %1 until you have installed the %2 extension.', [1 => $extensionInfo->name, 2 => $requiredExtensionInfoName]),
+            'message' => ts('You will not be able to install/upgrade %1 until you have installed the %2 extension.', [1 => $extensionInfo->key, 2 => $extension]),
           ];
         }
       }
@@ -131,6 +99,7 @@ class CRM_Extension_Downloader {
    */
   public function download($key, $downloadUrl) {
     $filename = $this->tmpDir . DIRECTORY_SEPARATOR . $key . '.zip';
+    $destDir = $this->containerDir . DIRECTORY_SEPARATOR . $key;
 
     if (!$downloadUrl) {
       throw new CRM_Extension_Exception(ts('Cannot install this extension - downloadUrl is not set!'));
@@ -165,12 +134,14 @@ class CRM_Extension_Downloader {
    *   Whether the download was successful.
    */
   public function fetch($remoteFile, $localFile) {
-    $client = $this->getGuzzleClient();
-    $response = $client->request('GET', $remoteFile, ['sink' => $localFile, 'timeout' => \Civi::settings()->get('http_timeout')]);
-    if ($response->getStatusCode() === 200) {
-      return TRUE;
+    $result = CRM_Utils_HttpClient::singleton()->fetch($remoteFile, $localFile);
+    switch ($result) {
+      case CRM_Utils_HttpClient::STATUS_OK:
+        return TRUE;
+
+      default:
+        return FALSE;
     }
-    return FALSE;
   }
 
   /**

@@ -38,19 +38,14 @@ class Refresh extends BasicBatchAction {
 
   private $syncFields = ['access_token', 'refresh_token', 'expires', 'token_type'];
   private $writeFields = ['access_token', 'refresh_token', 'expires', 'token_type', 'raw'];
-  private $selectFields = ['id', 'client_id', 'access_token', 'refresh_token', 'expires', 'token_type', 'raw'];
   private $providers = [];
 
   public function __construct($entityName, $actionName) {
-    parent::__construct($entityName, $actionName);
-  }
-
-  protected function getSelect() {
-    return $this->selectFields;
+    parent::__construct($entityName, $actionName, '*');
   }
 
   protected function doTask($row) {
-    if ($this->threshold >= 0 && \CRM_Utils_Time::time() < $row['expires'] - $this->threshold) {
+    if ($this->threshold >= 0 && \CRM_Utils_Time::getTimeRaw() < $row['expires'] - $this->threshold) {
       return $this->filterReturn($row);
     }
 
@@ -79,7 +74,7 @@ class Refresh extends BasicBatchAction {
 
   protected function getProvider($clientId) {
     if (!isset($this->providers[$clientId])) {
-      $client = \Civi\Api4\OAuthClient::get(FALSE)->addWhere('id', '=', $clientId)->execute()->single();
+      $client = \Civi\Api4\OAuthClient::get(0)->addWhere('id', '=', $clientId)->execute()->single();
       $this->providers[$clientId] = \Civi::service('oauth2.league')->createProvider($client);
     }
     return $this->providers[$clientId];

@@ -19,7 +19,7 @@
 namespace api\v4\Entity;
 
 use Civi\Api4\Contact;
-use api\v4\Api4TestBase;
+use api\v4\UnitTestCase;
 use Civi\Api4\Activity;
 use Civi\Api4\ActivityContact;
 use Civi\Test\TransactionalInterface;
@@ -32,7 +32,7 @@ use Civi\Test\TransactionalInterface;
  *
  * @group headless
  */
-class ActivityTest extends Api4TestBase implements TransactionalInterface {
+class ActivityTest extends UnitTestCase implements TransactionalInterface {
 
   public function testActivityUpdate() {
 

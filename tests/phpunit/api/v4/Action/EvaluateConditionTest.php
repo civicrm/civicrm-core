@@ -20,13 +20,12 @@
 namespace api\v4\Action;
 
 use Civi\Api4\MockBasicEntity;
-use api\v4\Api4TestBase;
-use Civi\Test\TransactionalInterface;
+use api\v4\UnitTestCase;
 
 /**
  * @group headless
  */
-class EvaluateConditionTest extends Api4TestBase implements TransactionalInterface {
+class EvaluateConditionTest extends UnitTestCase {
 
   public function testEvaluateCondition() {
     $action = MockBasicEntity::get();

@@ -30,7 +30,9 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Clean up log tables.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function tearDown(): void {
     $this->quickCleanup(['civicrm_email', 'civicrm_address']);
@@ -504,7 +506,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   public function testTriggerOutput(): void {
     Civi::settings()->set('logging_no_trigger_permission', TRUE);
     Civi::settings()->set('logging', TRUE);
-    /** @var \Civi\Core\SqlTriggers $sqlTriggers */
+    /* @var \Civi\Core\SqlTriggers $sqlTriggers */
     $sqlTriggers = Civi::service('sql_triggers');
     $fileName = $sqlTriggers->getFile();
     $triggerOutPut = file_get_contents($fileName);

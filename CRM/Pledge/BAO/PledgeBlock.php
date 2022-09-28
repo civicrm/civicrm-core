@@ -17,20 +17,32 @@
 class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
 
   /**
-   * Retrieve DB object and copy to defaults array.
+   * Class constructor.
+   */
+  public function __construct() {
+    parent::__construct();
+  }
+
+  /**
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
-   *   Array of criteria values.
+   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   Array to be populated with found values.
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return self|null
-   *   The DAO object, if found.
-   *
-   * @deprecated
+   * @return CRM_Pledge_BAO_PledgeBlock
    */
-  public static function retrieve($params, &$defaults) {
-    return self::commonRetrieve(self::class, $params, $defaults);
+  public static function retrieve(&$params, &$defaults) {
+    $pledgeBlock = new CRM_Pledge_DAO_PledgeBlock();
+    $pledgeBlock->copyValues($params);
+    if ($pledgeBlock->find(TRUE)) {
+      CRM_Core_DAO::storeValues($pledgeBlock, $defaults);
+      return $pledgeBlock;
+    }
+    return NULL;
   }
 
   /**
@@ -38,8 +50,8 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   * @deprecated
-   * @return CRM_Pledge_DAO_PledgeBlock
+   *
+   * @return CRM_Pledge_BAO_PledgeBlock
    */
   public static function &create(&$params) {
     $transaction = new CRM_Core_Transaction();
@@ -61,8 +73,8 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * Add or update pledgeBlock.
    *
    * @param array $params
-   * @deprecated
-   * @return CRM_Pledge_DAO_PledgeBlock
+   *
+   * @return object
    */
   public static function add($params) {
     // FIXME: This is assuming checkbox input like ['foo' => 1, 'bar' => 0, 'baz' => 1]. Not API friendly.

@@ -25,7 +25,7 @@ class CRM_Invoicing_Utils {
    * @param bool $newValue
    * @param array $metadata
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function onToggle($oldValue, $newValue, $metadata) {
     if ($oldValue == $newValue) {

@@ -31,10 +31,7 @@
           >
         </a>
         <div ng-if="status.actions" class="crm-status-item-actions">
-          <button type="button" ng-repeat="action in status.actions" ng-click="doAction(action)">
-            <i class="crm-i {{:: action.icon }}" ng-if="action.icon"></i>
-            {{:: action.title }}
-          </button>
+          <button ng-repeat="action in status.actions" ng-click="doAction(action)">{{ action.title }}</button>
         </div>
       </div>
     </div>

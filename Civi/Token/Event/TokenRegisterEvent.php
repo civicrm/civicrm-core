@@ -51,7 +51,7 @@ class TokenRegisterEvent extends TokenEvent {
    * Register a new token.
    *
    * @param array|string $paramsOrField
-   * @param null|string $label
+   * @param NULL|string $label
    * @return TokenRegisterEvent
    */
   public function register($paramsOrField, $label = NULL) {

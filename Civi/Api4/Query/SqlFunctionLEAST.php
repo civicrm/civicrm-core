@@ -24,9 +24,7 @@ class SqlFunctionLEAST extends SqlFunction {
     return [
       [
         'max_expr' => 99,
-        'min_expr' => 2,
         'optional' => FALSE,
-        'label' => ts('Else'),
       ],
     ];
   }
@@ -36,13 +34,6 @@ class SqlFunctionLEAST extends SqlFunction {
    */
   public static function getTitle(): string {
     return ts('Least');
-  }
-
-  /**
-   * @return string
-   */
-  public static function getDescription(): string {
-    return ts('The smallest of all provided values.');
   }
 
 }

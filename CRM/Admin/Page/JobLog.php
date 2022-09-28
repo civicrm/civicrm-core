@@ -15,8 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Api4\JobLog;
-
 /**
  * Page for displaying list of jobs.
  */
@@ -27,7 +25,7 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  public static $_links;
+  public static $_links = NULL;
 
   /**
    * Get BAO Name.
@@ -35,7 +33,7 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
    * @return string
    *   Classname of BAO.
    */
-  public function getBAOName(): string {
+  public function getBAOName() {
     return 'CRM_Core_BAO_Job';
   }
 
@@ -45,7 +43,7 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
    * @return array
    *   (reference) of action links
    */
-  public function &links(): array {
+  public function &links() {
     return self::$_links;
   }
 
@@ -56,26 +54,28 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
    * type of action and executes that action.
    * Finally it calls the parent's run method.
    */
-  public function run(): void {
+  public function run() {
+    // set title and breadcrumb
     CRM_Utils_System::setTitle(ts('Settings - Scheduled Jobs Log'));
-    CRM_Utils_System::appendBreadCrumb([
-      [
+    $breadCrumb = array(
+      array(
         'title' => ts('Administration'),
         'url' => CRM_Utils_System::url('civicrm/admin',
           'reset=1'
         ),
-      ],
-    ]);
-    parent::run();
+      ),
+    );
+    CRM_Utils_System::appendBreadCrumb($breadCrumb);
+    return parent::run();
   }
 
   /**
    * Browse all jobs.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function browse(): void {
+  public function browse() {
     $jid = CRM_Utils_Request::retrieve('jid', 'Positive');
+
+    $sj = new CRM_Core_JobManager();
 
     if ($jid) {
       $jobName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Job', $jid);
@@ -83,21 +83,26 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
       $jobRunUrl = CRM_Utils_System::url('civicrm/admin/job', 'action=view&reset=1&context=joblog&id=' . $jid);
       $this->assign('jobRunUrl', $jobRunUrl);
     }
-    else {
-      $this->assign('jobName', FALSE);
-      $this->assign('jobRunUrl', FALSE);
-    }
 
-    $jobLogsQuery = JobLog::get()
-      ->addOrderBy('id', 'DESC')
-      ->setLimit(1000);
+    $dao = new CRM_Core_DAO_JobLog();
+    $dao->orderBy('id desc');
+
+    // limit to last 1000 records
+    $dao->limit(1000);
 
     if ($jid) {
-      $jobLogsQuery->addWhere('job_id', '=', $jid);
+      $dao->job_id = $jid;
     }
+    $dao->find();
 
-    $rows = $jobLogsQuery->execute()->getArrayCopy();
+    $rows = [];
+    while ($dao->fetch()) {
+      unset($row);
+      CRM_Core_DAO::storeValues($dao, $row);
+      $rows[$dao->id] = $row;
+    }
     $this->assign('rows', $rows);
+
     $this->assign('jobId', $jid);
   }
 
@@ -107,7 +112,7 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
    * @return string
    *   Classname of edit form.
    */
-  public function editForm(): string {
+  public function editForm() {
     return 'CRM_Admin_Form_Job';
   }
 
@@ -117,7 +122,7 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
    * @return string
    *   name of this page.
    */
-  public function editName(): string {
+  public function editName() {
     return 'Scheduled Jobs';
   }
 
@@ -129,7 +134,7 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
    * @return string
    *   user context.
    */
-  public function userContext($mode = NULL): string {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/job';
   }
 

@@ -15,8 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Api4\Membership;
-
 /**
  * Class for member form task actions.
  * FIXME: This needs refactoring to properly inherit from CRM_Core_Form_Task and share more functions.
@@ -95,47 +93,6 @@ class CRM_Member_Form_Task extends CRM_Core_Form_Task {
     $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent($this->_memberIds,
       'civicrm_membership'
     );
-  }
-
-  /**
-   * @return array
-   */
-  protected function getIDS() {
-    return $this->_memberIds;
-  }
-
-  /**
-   * Get the rows form the search, keyed to make the token processor happy.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function getRows(): array {
-    if (empty($this->rows)) {
-      // checkPermissions set to false - in case form is bypassing in some way.
-      $memberships = Membership::get(FALSE)
-        ->addWhere('id', 'IN', $this->getIDs())
-        ->setSelect(['id', 'contact_id'])->execute();
-      foreach ($memberships as $membership) {
-        $this->rows[] = [
-          'contact_id' => $membership['contact_id'],
-          'membership_id' => $membership['id'],
-          'schema' => [
-            'contactId' => $membership['contact_id'],
-            'membershipId' => $membership['id'],
-          ],
-        ];
-      }
-    }
-    return $this->rows;
-  }
-
-  /**
-   * Get the token processor schema required to list any tokens for this task.
-   *
-   * @return array
-   */
-  public function getTokenSchema(): array {
-    return ['membershipId', 'contactId'];
   }
 
 }

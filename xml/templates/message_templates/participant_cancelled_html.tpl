@@ -10,6 +10,7 @@
 {capture assign=labelStyle }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
 {capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
+<center>
   <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
 
   <!-- BEGIN HEADER -->
@@ -20,7 +21,7 @@
 
   <tr>
    <td>
-    {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
+    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
     <p>{ts}Your Event Registration has been cancelled.{/ts}</p>
    </td>
   </tr>
@@ -35,7 +36,7 @@
      <tr>
       <td colspan="2" {$valueStyle}>
        {$event.event_title}<br />
-       {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"shortdate" == $event.event_start_date|crmDate:"shortdate"}{$event.event_end_date|crmDate:"Time"}{else}{$event.event_end_date|crmDate}{/if}{/if}
+       {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
       </td>
      </tr>
      <tr>
@@ -43,7 +44,7 @@
        {ts}Participant Role{/ts}:
       </td>
       <td {$valueStyle}>
-       {participant.role_id:label}
+       {$participant.role}
       </td>
      </tr>
 
@@ -87,7 +88,7 @@
       {/foreach}
      {/if}
 
-     {if '{contact.email}'}
+     {if $contact.email}
       <tr>
        <th {$headerStyle}>
         {ts}Registered Email{/ts}
@@ -95,18 +96,18 @@
       </tr>
       <tr>
        <td colspan="2" {$valueStyle}>
-        {contact.email}
+        {$contact.email}
        </td>
       </tr>
      {/if}
 
-     {if !empty('{participant.register_date}')}
+     {if !empty($register_date)}
       <tr>
        <td {$labelStyle}>
         {ts}Registration Date{/ts}
        </td>
        <td {$valueStyle}>
-        {participant.register_date}
+        {$participant.register_date|crmDate}
        </td>
       </tr>
      {/if}
@@ -117,11 +118,12 @@
 
   <tr>
    <td>
-    <p>{ts 1='{domain.phone}' 2='{domain.email}'}Please contact us at %1 or send email to %2 if you have questions.{/ts}</p>
+    <p>{ts 1=$domain.phone 2=$domain.email}Please contact us at %1 or send email to %2 if you have questions.{/ts}</p>
    </td>
   </tr>
 
  </table>
+</center>
 
 </body>
 </html>

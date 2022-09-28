@@ -14,7 +14,6 @@
  *
  * @package CiviCRM
  * @group headless
- * @group locale
  */
 class api_v3_MultilingualTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
@@ -31,7 +30,7 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
   }
 
   public function tearDown(): void {
-    $this->disableMultilingual();
+    CRM_Core_I18n_Schema::makeSinglelingual('en_US');
     parent::tearDown();
   }
 
@@ -39,8 +38,17 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
    * @dataProvider versionThreeAndFour
    */
   public function testOptionLanguage($version) {
+    $this->enableMultilingual();
     $this->_apiversion = $version;
-    $this->enableMultilingual(['en_US' => 'fr_CA']);
+
+    CRM_Core_I18n_Schema::addLocale('fr_CA', 'en_US');
+
+    $this->callAPISuccess('Setting', 'create', [
+      'languageLimit' => [
+        'en_US' => 1,
+        'fr_CA' => 1,
+      ],
+    ]);
 
     // Take a semi-random OptionGroup and test manually changing its label
     // in one language, while making sure it stays the same in English.

@@ -6,11 +6,6 @@
  */
 class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
 
-  public function tearDown(): void {
-    $this->quickCleanup(['civicrm_file', 'civicrm_entity_file'], TRUE);
-    parent::tearDown();
-  }
-
   /**
    * Test store function for country.
    */
@@ -40,6 +35,10 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
     ];
 
     CRM_Core_BAO_CustomValueTable::store($params, 'civicrm_contact', $contactID);
+
+    $this->customFieldDelete($customField['id']);
+    $this->customGroupDelete($customGroup['id']);
+    $this->contactDelete($contactID);
   }
 
   /**
@@ -71,12 +70,16 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
     ];
 
     CRM_Core_BAO_CustomValueTable::store($params, 'civicrm_contact', $contactID);
+
+    $this->customFieldDelete($customField['id']);
+    $this->customGroupDelete($customGroup['id']);
+    $this->contactDelete($contactID);
   }
 
   /**
    * Test store function for state province.
    */
-  public function testStoreStateProvince(): void {
+  public function testStoreStateProvince() {
     $contactID = $this->individualCreate();
     $customGroup = $this->customGroupCreate();
     $fields = [
@@ -101,12 +104,16 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
     ];
 
     CRM_Core_BAO_CustomValueTable::store($params, 'civicrm_contact', $contactID);
+
+    $this->customFieldDelete($customField['id']);
+    $this->customGroupDelete($customGroup['id']);
+    $this->contactDelete($contactID);
   }
 
   /**
    * Test store function for date.
    */
-  public function testStoreDate(): void {
+  public function testStoreDate() {
     $params = [];
     $contactID = $this->individualCreate();
     $customGroup = $this->customGroupCreate();
@@ -132,12 +139,16 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
     ];
 
     CRM_Core_BAO_CustomValueTable::store($params, 'civicrm_contact', $contactID);
+
+    $this->customFieldDelete($customField['id']);
+    $this->customGroupDelete($customGroup['id']);
+    $this->contactDelete($contactID);
   }
 
   /**
    * Test store function for rich text editor.
    */
-  public function testStoreRichTextEditor(): void {
+  public function testStoreRichTextEditor() {
     $params = [];
     $contactID = $this->individualCreate();
     $customGroup = $this->customGroupCreate();
@@ -162,56 +173,17 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
     ];
 
     CRM_Core_BAO_CustomValueTable::store($params, 'civicrm_contact', $contactID);
-  }
 
-  /**
-   * Test store function for multiselect int.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testStoreMultiSelectInt(): void {
-    $contactID = $this->individualCreate();
-    $customGroup = $this->customGroupCreate();
-    $fields = [
-      'custom_group_id' => $customGroup['id'],
-      'data_type' => 'Int',
-      'html_type' => 'Multi-Select',
-      'option_values' => [
-        1 => 'choice1',
-        2 => 'choice2',
-      ],
-      'default_value' => '',
-    ];
-
-    $customField = $this->customFieldCreate($fields);
-
-    $params = [
-      [
-        $customField['id'] => [
-          'value' => CRM_Core_DAO::VALUE_SEPARATOR . '1' . CRM_Core_DAO::VALUE_SEPARATOR . '2' . CRM_Core_DAO::VALUE_SEPARATOR,
-          'type' => 'Int',
-          'custom_field_id' => $customField['id'],
-          'custom_group_id' => $customGroup['id'],
-          'table_name' => $customGroup['values'][$customGroup['id']]['table_name'],
-          'column_name' => $customField['values'][$customField['id']]['column_name'],
-          'file_id' => '',
-        ],
-      ],
-    ];
-
-    CRM_Core_BAO_CustomValueTable::store($params, 'civicrm_contact', $contactID);
-
-    $customData = \Civi\Api4\Contact::get(FALSE)
-      ->addSelect('new_custom_group.Custom_Field')
-      ->addWhere('id', '=', $contactID)
-      ->execute()->first();
-    $this->assertEquals([1, 2], $customData['new_custom_group.Custom_Field']);
+    $this->customFieldDelete($customField['id']);
+    $this->customGroupDelete($customGroup['id']);
+    $this->contactDelete($contactID);
   }
 
   /**
    * Test getEntityValues function for stored value.
    */
-  public function testGetEntityValues(): void {
+  public function testGetEntityValues() {
+
     $params = [];
     $contactID = $this->individualCreate();
     $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
@@ -239,12 +211,16 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
 
     $entityValues = CRM_Core_BAO_CustomValueTable::getEntityValues($contactID, 'Individual');
 
-    $this->assertEquals('<p><strong>This is a <u>test</u></p>', $entityValues[$customField['id']],
+    $this->assertEquals($entityValues[$customField['id']], '<p><strong>This is a <u>test</u></p>',
       'Checking same for returned value.'
     );
+    $this->customFieldDelete($customField['id']);
+    $this->customGroupDelete($customGroup['id']);
+    $this->contactDelete($contactID);
   }
 
-  public function testCustomGroupMultiple(): void {
+  public function testCustomGroupMultiple() {
+    $params = [];
     $contactID = $this->individualCreate();
     $customGroup = $this->customGroupCreate();
 
@@ -270,6 +246,10 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
 
     $this->assertEquals($params['custom_' . $customField['id'] . '_-1'], $result['custom_' . $customField['id']]);
     $this->assertEquals($params['entityID'], $result['entityID']);
+
+    $this->customFieldDelete($customField['id']);
+    $this->customGroupDelete($customGroup['id']);
+    $this->contactDelete($contactID);
   }
 
 }

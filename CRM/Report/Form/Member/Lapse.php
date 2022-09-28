@@ -17,6 +17,7 @@
 class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
 
   protected $_summary = NULL;
+  protected $_charts = ['' => 'Tabular'];
   protected $_customGroupExtends = [
     'Membership',
   ];
@@ -181,7 +182,7 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
   /**
    * @param $fields
    * @param $files
-   * @param self $self
+   * @param $self
    *
    * @return array
    */

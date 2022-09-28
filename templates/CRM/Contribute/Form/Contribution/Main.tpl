@@ -57,7 +57,7 @@
   {/if}
   {include file="CRM/common/TrackingFields.tpl"}
 
-  <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-main-form-block" data-page-id="{$contributionPageID}" data-page-template="main">
+  <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-main-form-block">
 
     {crmRegion name='contribution-main-not-you-block'}
     {if $contact_id && !$ccid}
@@ -127,7 +127,7 @@
               {/if}
             {else}
               <div class="label">{$form.start_date.label}</div>
-              <div class="content">{$start_date_display|crmDate:'%b %e, %Y'}</div>
+              <div class="content">{$start_date_display|date_format}</div>
             {/if}
             <div class="clear"></div>
           </div>
@@ -135,7 +135,7 @@
       {/if}
       {/crmRegion}
 
-      {if !empty($form.is_recur)}
+      {if $form.is_recur}
         <div class="crm-public-form-item crm-section {$form.is_recur.name}-section">
           <div class="label">&nbsp;</div>
           <div class="content">
@@ -199,7 +199,7 @@
             <div class="crm-public-form-item crm-section honor_block_text-section">
               {$honor_block_text}
             </div>
-          {if !empty($form.soft_credit_type_id.html)}
+          {if $form.soft_credit_type_id.html}
             <div class="crm-public-form-item crm-section {$form.soft_credit_type_id.name}-section">
               <div class="content" >
                 {$form.soft_credit_type_id.html}
@@ -256,7 +256,7 @@
       {* end of ccid loop *}
     {/if}
 
-    {if !empty($form.payment_processor_id.label)}
+    {if $form.payment_processor_id.label}
       {* PP selection only works with JS enabled, so we hide it initially *}
       <fieldset class="crm-public-form-item crm-group payment_options-group" style="display:none;">
         <legend>{ts}Payment Options{/ts}</legend>
@@ -296,6 +296,9 @@
       </div>
     {/if}
 
+    {if $isCaptcha}
+      {include file='CRM/common/ReCAPTCHA.tpl'}
+    {/if}
     <div id="crm-submit-buttons" class="crm-submit-buttons">
       {include file="CRM/common/formButtons.tpl" location="bottom"}
     </div>
@@ -348,7 +351,7 @@
         frequencyUnit.prop('disabled', false).addClass('required');
         frequencyInerval.prop('disabled', false).addClass('required');
         installments.prop('disabled', false);
-        cj('#amount_sum_label').text('{/literal}{ts escape='js'}Regular Amount{/ts}{literal}');
+        cj('#amount_sum_label').text('{/literal}{ts escape='js'}Regular amount{/ts}{literal}');
       }
       else {
         cj('#recurHelp').hide();

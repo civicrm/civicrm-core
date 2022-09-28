@@ -25,30 +25,6 @@ class DebugSubscriber implements EventSubscriberInterface {
   private $debugLog;
 
   /**
-   * @var bool
-   */
-  private $enableStats;
-
-  public function __construct() {
-    $version = phpversion('xdebug');
-    switch ($version ? substr($version, 0, 2) : NULL) {
-      case '2.':
-        $this->enableStats = function_exists('xdebug_time_index');
-        break;
-
-      case '3.':
-        $xdebugMode = version_compare($version, '3.1', '>=')
-          ? xdebug_info('mode') : explode(',', ini_get('xdebug.mode'));
-        $this->enableStats = in_array('develop', $xdebugMode);
-        break;
-
-      default:
-        $this->enableStats = FALSE;
-        break;
-    }
-  }
-
-  /**
    * @return array
    */
   public static function getSubscribedEvents() {
@@ -94,7 +70,7 @@ class DebugSubscriber implements EventSubscriberInterface {
       if (isset($this->debugLog) && $this->debugLog->getMessages()) {
         $debug['log'] = $this->debugLog->getMessages();
       }
-      if ($this->enableStats) {
+      if (function_exists('xdebug_time_index')) {
         $debug['peakMemory'] = xdebug_peak_memory_usage();
         $debug['memory'] = xdebug_memory_usage();
         $debug['timeIndex'] = xdebug_time_index();

@@ -21,7 +21,10 @@
   </div>
   <div class="clear"></div>
     <div class='html'>
-      {$form.html_message.html}<br />
+  {if !empty($editor) and $editor EQ 'textarea'}
+      <div class="help description">{ts}NOTE: If you are composing HTML-formatted messages, you may want to enable a Rich Text (WYSIWYG) editor (Administer &raquo; Customize Data & Screens &raquo; Display Preferences).{/ts}</div>
+  {/if}
+  {$form.html_message.html}<br />
     </div>
   </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
@@ -56,7 +59,7 @@
    <div class="content">{$form.saveTemplateName.html|crmAddClass:huge}</div>
 </div>
 
-{if !$noAttach}
+{if empty($noAttach)}
     {include file="CRM/Form/attachment.tpl"}
 {/if}
 

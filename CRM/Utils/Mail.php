@@ -39,7 +39,7 @@ class CRM_Utils_Mail {
     }
     elseif ($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_SMTP) {
       if ($mailingInfo['smtpServer'] == '' || !$mailingInfo['smtpServer']) {
-        Civi::log()->error(ts('There is no valid smtp server setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the SMTP Server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
+        CRM_Core_Error::debug_log_message(ts('There is no valid smtp server setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the SMTP Server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
         throw new CRM_Core_Exception(ts('There is no valid smtp server setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the SMTP Server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
       }
 
@@ -83,7 +83,7 @@ class CRM_Utils_Mail {
       if ($mailingInfo['sendmail_path'] == '' ||
         !$mailingInfo['sendmail_path']
       ) {
-        Civi::log()->error(ts('There is no valid sendmail path setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the sendmail server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
+        CRM_Core_Error::debug_log_message(ts('There is no valid sendmail path setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the sendmail server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
         throw new CRM_Core_Exception(ts('There is no valid sendmail path setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the sendmail server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
       }
       $params['sendmail_path'] = $mailingInfo['sendmail_path'];
@@ -98,11 +98,11 @@ class CRM_Utils_Mail {
       $mailer = self::_createMailer('mock', $mailingInfo);
     }
     elseif ($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED) {
-      Civi::log()->info(ts('Outbound mail has been disabled. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the OutBound Email.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
+      CRM_Core_Error::debug_log_message(ts('Outbound mail has been disabled. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the OutBound Email.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
       CRM_Core_Error::statusBounce(ts('Outbound mail has been disabled. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the OutBound Email.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
     }
     else {
-      Civi::log()->error(ts('There is no valid SMTP server Setting Or SendMail path setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the OutBound Email.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
+      CRM_Core_Error::debug_log_message(ts('There is no valid SMTP server Setting Or SendMail path setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the OutBound Email.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
       CRM_Core_Error::debug_var('mailing_info', $mailingInfo);
       CRM_Core_Error::statusBounce(ts('There is no valid SMTP server Setting Or sendMail path setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the OutBound Email.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
     }
@@ -159,7 +159,6 @@ class CRM_Utils_Mail {
    *   fullPath : complete pathname to the file
    *   mime_type: mime type of the attachment
    *   cleanName: the user friendly name of the attachmment
-   * contactId : contact id to send the email to (optional)
    *
    * @param array $params
    *   (by reference).
@@ -184,19 +183,13 @@ class CRM_Utils_Mail {
       return FALSE;
     }
 
-    $htmlMessage = $params['html'] ?? FALSE;
-    if (trim(CRM_Utils_String::htmlToText((string) $htmlMessage)) === '') {
-      $htmlMessage = FALSE;
-    }
+    $textMessage = $params['text'] ?? NULL;
+    $htmlMessage = $params['html'] ?? NULL;
     $attachments = $params['attachments'] ?? NULL;
-    if (!empty($params['text'])) {
-      $textMessage = $params['text'];
-    }
-    else {
-      $textMessage = CRM_Utils_String::htmlToText($htmlMessage);
-      // Render the &amp; entities in text mode, so that the links work.
-      // This is copied from the Action Schedule send code.
-      $textMessage = str_replace('&amp;', '&', $textMessage);
+
+    // CRM-6224
+    if (trim(CRM_Utils_String::htmlToText($htmlMessage)) == '') {
+      $htmlMessage = FALSE;
     }
 
     $headers = [];
@@ -312,16 +305,14 @@ class CRM_Utils_Mail {
         $result = $mailer->send($to, $headers, $message);
       }
       catch (Exception $e) {
-        \Civi::log()->error('Mailing error: ' . $e->getMessage());
-        CRM_Core_Session::setStatus(ts('Unable to send email. Please report this message to the site administrator'), ts('Mailing Error'), 'error');
+        CRM_Core_Session::setStatus($e->getMessage(), ts('Mailing Error'), 'error');
         return FALSE;
       }
       if (is_a($result, 'PEAR_Error')) {
         $message = self::errorMessage($mailer, $result);
         // append error message in case multiple calls are being made to
         // this method in the course of sending a batch of messages.
-        \Civi::log()->error('Mailing error: ' . $message);
-        CRM_Core_Session::setStatus(ts('Unable to send email. Please report this message to the site administrator'), ts('Mailing Error'), 'error');
+        CRM_Core_Session::setStatus($message, ts('Mailing Error'), 'error');
         return FALSE;
       }
       // CRM-10699
@@ -443,7 +434,7 @@ class CRM_Utils_Mail {
 
   /**
    * @param string $name
-   * @param string $email
+   * @param $email
    * @param bool $useQuote
    *
    * @return null|string
@@ -451,7 +442,7 @@ class CRM_Utils_Mail {
   public static function formatRFC822Email($name, $email, $useQuote = FALSE) {
     $result = NULL;
 
-    $name = trim($name ?? '');
+    $name = trim($name);
 
     // strip out double quotes if present at the beginning AND end
     if (substr($name, 0, 1) == '"' &&
@@ -579,7 +570,7 @@ class CRM_Utils_Mail {
    * contact ID in RFC822 format.
    *
    * @param string $from
-   *   civicrm_email.id or formatted "From address", eg. 12 or "Fred Bloggs" <fred@example.org>
+   *   contact ID or formatted "From address", eg. 12 or "Fred Bloggs" <fred@example.org>
    * @return string
    *   The RFC822-formatted email header (display name + address)
    */

@@ -99,7 +99,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     }
 
     //set the title.
-    $this->setTitle(ts('Reserve Respondents'));
+    CRM_Utils_System::setTitle(ts('Reserve Respondents'));
   }
 
   public function validateSurvey() {
@@ -187,7 +187,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
    *   Posted values of the form.
    *
    * @param $files
-   * @param self $self
+   * @param $self
    *
    * @return array
    *   list of errors to be posted back to the form
@@ -285,7 +285,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
   }
 
   /**
-   * @param array $contactIds
+   * @param $contactIds
    *
    * @return array
    */

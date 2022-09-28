@@ -34,7 +34,7 @@
           {include file="CRM/common/status.tpl"}
         {/if}
 
-        {if $isForm}
+        {if !empty($isForm)}
           {include file="CRM/Form/default.tpl"}
         {else}
           {include file=$tplFile}

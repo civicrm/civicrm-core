@@ -8,8 +8,7 @@
       display: '<',
       apiParams: '<',
       settings: '<',
-      filters: '<',
-      totalCount: '='
+      filters: '<'
     },
     require: {
       afFieldset: '?^^afFieldset'
@@ -22,6 +21,11 @@
 
       this.$onInit = function() {
         this.initializeDisplay($scope, $element);
+      };
+
+      // Refresh current page
+      this.refresh = function(row) {
+        ctrl.getResults();
       };
 
     }

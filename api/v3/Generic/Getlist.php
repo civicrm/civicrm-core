@@ -19,7 +19,7 @@
  * @param array $apiRequest
  *
  * @return mixed
- * @throws \CRM_Core_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_generic_getList($apiRequest) {
   $entity = CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($apiRequest['entity']);
@@ -27,7 +27,7 @@ function civicrm_api3_generic_getList($apiRequest) {
   $meta = civicrm_api3_generic_getfields(['action' => 'get'] + $apiRequest, FALSE)['values'];
 
   // If the user types an integer into the search
-  $forceIdSearch = empty($request['id']) && !empty($request['input']) && !empty($meta['id']) && CRM_Utils_Rule::positiveInteger($request['input']) && (substr($request['input'], 0, 1) !== '0');
+  $forceIdSearch = empty($request['id']) && !empty($request['input']) && !empty($meta['id']) && CRM_Utils_Rule::positiveInteger($request['input']);
   // Add an extra page of results for the record with an exact id match
   if ($forceIdSearch) {
     $request['page_num'] = ($request['page_num'] ?? 1) - 1;
@@ -246,9 +246,9 @@ function _civicrm_api3_generic_getlist_output($result, $request, $entity, $field
 /**
  * Common postprocess for getlist output
  *
- * @param array $result
- * @param array $request
- * @param array $values
+ * @param $result
+ * @param $request
+ * @param $values
  */
 function _civicrm_api3_generic_getlist_postprocess($result, $request, &$values) {
   $chains = [];

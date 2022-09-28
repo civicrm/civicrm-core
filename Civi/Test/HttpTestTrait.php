@@ -34,20 +34,11 @@ trait HttpTestTrait {
   /**
    * Create an HTTP client suitable for simulating AJAX requests.
    *
-   * The client may include some mix of these middlewares:
-   *
-   * @see \CRM_Utils_GuzzleMiddleware::authx()
-   * @see \CRM_Utils_GuzzleMiddleware::url()
-   * @see \CRM_Utils_GuzzleMiddleware::curlLog()
-   * @see Middleware::history()
-   * @see Middleware::log()
-   *
    * @param array $options
    * @return \GuzzleHttp\Client
    */
   protected function createGuzzle($options = []) {
     $handler = HandlerStack::create();
-    $handler->unshift(\CRM_Utils_GuzzleMiddleware::authx(), 'civi_authx');
     $handler->unshift(\CRM_Utils_GuzzleMiddleware::url(), 'civi_url');
     $handler->push(Middleware::history($this->httpHistory), 'history');
 
@@ -117,7 +108,7 @@ trait HttpTestTrait {
 
   /**
    * @param $expectCode
-   * @param \Psr\Http\Message\ResponseInterface|null $response
+   * @param \Psr\Http\Message\ResponseInterface|NULL $response
    *   If NULL, then it uses the last response.
    *
    * @return $this
@@ -132,37 +123,21 @@ trait HttpTestTrait {
 
   /**
    * @param $expectType
-   * @param \Psr\Http\Message\ResponseInterface|null $response
+   * @param \Psr\Http\Message\ResponseInterface|NULL $response
    *   If NULL, then it uses the last response.
    *
    * @return $this
    */
   protected function assertContentType($expectType, $response = NULL) {
     $response = $this->resolveResponse($response);
-    [$actualType] = explode(';', $response->getHeader('Content-Type')[0]);
+    list($actualType) = explode(';', $response->getHeader('Content-Type')[0]);
     $fmt = $actualType === $expectType ? '' : $this->formatFailure($response);
     $this->assertEquals($expectType, $actualType, "Expected content-type $expectType. Received content-type $actualType.\n$fmt");
     return $this;
   }
 
   /**
-   * @param string $regexp
-   * @param \Psr\Http\Message\ResponseInterface $response
-   * @param string $message
-   */
-  protected function assertBodyRegexp($regexp, $response = NULL, $message = NULL) {
-    if ($message) {
-      $message .= "\n";
-    }
-
-    $response = $this->resolveResponse($response);
-    $this->assertRegexp($regexp, (string) $response->getBody(),
-      $message . 'Response body does not match pattern' . $this->formatFailure($response));
-    return $this;
-  }
-
-  /**
-   * @param \Psr\Http\Message\ResponseInterface|null $response
+   * @param \Psr\Http\Message\ResponseInterface|NULL $response
    * @return \Psr\Http\Message\ResponseInterface
    */
   protected function resolveResponse($response) {

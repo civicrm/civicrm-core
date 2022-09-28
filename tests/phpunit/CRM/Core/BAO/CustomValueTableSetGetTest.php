@@ -9,7 +9,7 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
   /**
    * Test setValues() and GetValues() methods with custom Date field
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSetGetValuesDate(): void {
     $contactID = $this->individualCreate();

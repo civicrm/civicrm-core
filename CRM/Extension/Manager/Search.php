@@ -105,15 +105,15 @@ class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
   /**
    * @return array
    */
-  protected function getCustomSearchesByName(): array {
-    return CRM_Core_OptionGroup::values(self::CUSTOM_SEARCH_GROUP_NAME, TRUE, FALSE, FALSE, NULL, 'name', FALSE);
+  protected function getCustomSearchesByName() {
+    return CRM_Core_OptionGroup::values(self::CUSTOM_SEARCH_GROUP_NAME, TRUE, FALSE, FALSE, NULL, 'name', FALSE, TRUE);
   }
 
   /**
    * @return array
    */
-  protected function getCustomSearchesById(): array {
-    return CRM_Core_OptionGroup::values(self::CUSTOM_SEARCH_GROUP_NAME, FALSE, FALSE, FALSE, NULL, 'id', FALSE);
+  protected function getCustomSearchesById() {
+    return CRM_Core_OptionGroup::values(self::CUSTOM_SEARCH_GROUP_NAME, FALSE, FALSE, FALSE, NULL, 'id', FALSE, TRUE);
   }
 
 }

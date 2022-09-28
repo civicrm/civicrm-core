@@ -34,9 +34,9 @@ class CRM_Core_Form_RecurringEntity {
 
   /**
    * Schedule Reminder data
-   * @var CRM_Core_DAO|null
+   * @var array
    */
-  protected static $_scheduleReminderDetails = NULL;
+  protected static $_scheduleReminderDetails = [];
 
   /**
    *  Parent Entity ID
@@ -94,7 +94,7 @@ class CRM_Core_Form_RecurringEntity {
     }
 
     // Assign variables
-    $entityType = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($entityTable);
+    $entityType = CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getClassForTable($entityTable));
     $tpl = CRM_Core_Smarty::singleton();
     $tpl->assign('recurringEntityType', ts($entityType));
     $tpl->assign('currentEntityId', self::$_entityId);
@@ -319,7 +319,7 @@ class CRM_Core_Form_RecurringEntity {
    * @param string $type
    * @param array $linkedEntities
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function postProcess($params, $type, $linkedEntities = []) {
     // Check entity_id not present in params take it from class variable

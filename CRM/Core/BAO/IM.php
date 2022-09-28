@@ -28,6 +28,7 @@ class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
    *
    * @return \CRM_Core_DAO|\CRM_Core_DAO_IM
    * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public static function create($params) {
     CRM_Core_BAO_Block::handlePrimary($params, __CLASS__);
@@ -43,6 +44,7 @@ class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
    *
    * @return \CRM_Core_DAO|\CRM_Core_DAO_IM
    * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public static function add($params) {
     CRM_Core_Error::deprecatedFunctionWarning('use the v4 api');
@@ -156,14 +158,12 @@ ORDER BY cim.is_primary DESC, im_id ASC ";
   /**
    * Call common delete function.
    *
-   * @see \CRM_Contact_BAO_Contact::on_hook_civicrm_post
-   *
    * @param int $id
-   * @deprecated
+   *
    * @return bool
    */
   public static function del($id) {
-    return (bool) self::deleteRecord(['id' => $id]);
+    return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('IM', $id);
   }
 
 }

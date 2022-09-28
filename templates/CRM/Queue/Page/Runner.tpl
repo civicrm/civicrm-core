@@ -63,7 +63,7 @@ CRM.$(function($) {
     if (!data.is_error) {
       queueRunnerData.completed++;
     }
-    if ('numberOfItems' in data && data.numberOfItems !== null) {
+    if (data.numberOfItems) {
       queueRunnerData.numberOfItems = parseInt(data.numberOfItems);
     }
 

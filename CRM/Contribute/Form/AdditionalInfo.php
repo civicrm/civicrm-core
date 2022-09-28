@@ -190,16 +190,10 @@ class CRM_Contribute_Form_AdditionalInfo {
     if (!empty($options[$selectedProductID])) {
       $dao->product_option = $options[$selectedProductID][$selectedProductOptionID];
     }
-
-    // This IF condition codeblock does the following:
-    // 1. If premium is present then get previous contribution-product mapping record (if any) based on contribtuion ID.
-    //   If found and the product chosen doesn't matches with old done, then delete or else set the ID for update
-    // 2. If no product is chosen theb delete the previous contribution-product mapping record based on contribtuion ID.
-    if ($premiumID || empty($selectedProductID)) {
+    if ($premiumID) {
       $ContributionProduct = new CRM_Contribute_DAO_ContributionProduct();
-      $ContributionProduct->contribution_id = $contributionID;
+      $ContributionProduct->id = $premiumID;
       $ContributionProduct->find(TRUE);
-      // here $selectedProductID can be 0 in case one unselect the premium product on backoffice update form
       if ($ContributionProduct->product_id == $selectedProductID) {
         $dao->id = $premiumID;
       }
@@ -209,11 +203,7 @@ class CRM_Contribute_Form_AdditionalInfo {
       }
     }
 
-    // only add/update contribution product when a product is selected
-    if (!empty($selectedProductID)) {
-      $dao->save();
-    }
-
+    $dao->save();
     //CRM-11106
     if ($premiumID == NULL || $isDeleted) {
       $premiumParams = [
@@ -241,9 +231,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    */
   public static function processNote($params, $contactID, $contributionID, $contributionNoteID = NULL) {
     if (CRM_Utils_System::isNull($params['note']) && $contributionNoteID) {
-      CRM_Core_BAO_Note::deleteRecord(['id' => $contributionNoteID]);
-      $status = ts('Selected Note has been deleted successfully.');
-      CRM_Core_Session::setStatus($status, ts('Deleted'), 'success');
+      CRM_Core_BAO_Note::del($contributionNoteID);
       return;
     }
     //process note
@@ -435,16 +423,16 @@ class CRM_Contribute_Form_AdditionalInfo {
 
     [$sendReceipt] = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
-        'workflow' => 'contribution_offline_receipt',
+        'groupName' => 'msg_tpl_workflow_contribution',
+        'valueName' => 'contribution_offline_receipt',
         'contactId' => $params['contact_id'],
         'contributionId' => $params['contribution_id'],
-        'tokenContext' => ['contributionId' => (int) $params['contribution_id'], 'contactId' => $params['contact_id']],
         'from' => $params['from_email_address'],
         'toName' => $contributorDisplayName,
         'toEmail' => $contributorEmail,
-        'isTest' => $form->_mode === 'test',
+        'isTest' => $form->_mode == 'test',
         'PDFFilename' => ts('receipt') . '.pdf',
-        'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
+        'isEmailPdf' => Civi::settings()->get('invoicing') && Civi::settings()->get('invoice_is_email_pdf'),
       ]
     );
 

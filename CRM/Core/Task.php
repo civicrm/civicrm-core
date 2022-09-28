@@ -47,7 +47,7 @@ abstract class CRM_Core_Task {
    *
    * @var array
    */
-  public static $_tasks = [];
+  public static $_tasks = NULL;
 
   /**
    * @var string

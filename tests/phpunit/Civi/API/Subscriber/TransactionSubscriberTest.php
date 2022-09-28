@@ -93,7 +93,7 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
    * @param bool $isForceRollback
    * @param bool $isNested
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function testTransactionOptions($version, $entity, $action, $params, $isTransactional, $isForceRollback, $isNested) {
     $txs = new TransactionSubscriber();

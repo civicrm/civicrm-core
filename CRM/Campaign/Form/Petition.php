@@ -57,10 +57,10 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
       $this->_surveyId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
-        $this->setTitle(ts('Edit Survey'));
+        CRM_Utils_System::setTitle(ts('Edit Survey'));
       }
       else {
-        $this->setTitle(ts('Delete Survey'));
+        CRM_Utils_System::setTitle(ts('Delete Survey'));
       }
     }
 
@@ -89,10 +89,10 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
       $this->_surveyId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
-        $this->setTitle(ts('Edit Petition'));
+        CRM_Utils_System::setTitle(ts('Edit Petition'));
       }
       else {
-        $this->setTitle(ts('Delete Petition'));
+        CRM_Utils_System::setTitle(ts('Delete Petition'));
       }
     }
 
@@ -237,9 +237,9 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
 
   /**
    * Global validation rules for the form.
-   * @param array $fields
+   * @param $fields
    * @param $files
-   * @param CRM_Core_Form $form
+   * @param $form
    * @return array|bool
    */
   public static function formRule($fields, $files, $form) {

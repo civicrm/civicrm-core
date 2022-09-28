@@ -76,7 +76,7 @@ ENDOUTPUT;
    * tests for that - we're more interested in does it echo it in print
    * format.
    */
-  public function testOutputPrint(): void {
+  public function testOutputPrint() {
     // Create many contacts, in particular so that the report would be more
     // than a one-pager.
     for ($i = 0; $i < 110; $i++) {
@@ -114,7 +114,8 @@ ENDOUTPUT;
       ]);
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $contents = ob_get_clean();
+      $contents = ob_get_contents();
+      ob_end_clean();
     }
     $this->assertStringContainsString('<title>CiviCRM Report</title>', $contents);
     $this->assertStringContainsString('test report', $contents);
@@ -125,10 +126,14 @@ ENDOUTPUT;
    * Test when you choose PDF from the actions dropdown.
    *
    * We're not too concerned about the actual report rows - there's other
-   * tests for that - we're more interested in does it hit the pdf output function.
+   * tests for that - we're more interested in does it echo it in pdf
+   * format.
+   *
+   * This isn't great but otherwise dompdf complains about headers already sent.
+   * @runInSeparateProcess
+   * @preserveGlobalState disabled
    */
-  public function testOutputPdf(): void {
-    $contents = '';
+  public function testOutputPdf() {
     // Create many contacts, in particular so that the report would be more
     // than a one-pager.
     for ($i = 0; $i < 110; $i++) {
@@ -154,8 +159,11 @@ ENDOUTPUT;
       $_SERVER['QUERY_STRING'] = 'reset=1';
     }
 
-    // In the unit text context it throws an exception for us to check.
+    // A bit weird - it will send the output to the browser, which here is the
+    // console, then throw a specific exception. So we capture the output
+    // and the exception.
     try {
+      ob_start();
       CRM_Report_Utils_Report::processReport([
         'instanceId' => $report_instance['id'],
         'format' => 'pdf',
@@ -163,16 +171,17 @@ ENDOUTPUT;
       ]);
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $contents = $e->errorData['html'];
-      $this->assertEquals('pdf', $e->errorData['output']);
+      $contents = ob_get_contents();
+      ob_end_clean();
     }
+    $this->assertStringStartsWith('%PDF', $contents);
     $this->assertStringContainsString("id_value={$last_contact['id']}", $contents);
   }
 
   /**
    * Test when you choose Csv from the actions dropdown.
    */
-  public function testOutputCsv(): void {
+  public function testOutputCsv() {
     // Create many contacts, in particular so that the report would be more
     // than a one-pager.
     for ($i = 0; $i < 110; $i++) {

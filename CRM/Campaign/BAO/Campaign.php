@@ -48,7 +48,7 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
       }
     }
 
-    /** @var \CRM_Campaign_DAO_Campaign $campaign */
+    /* @var \CRM_Campaign_DAO_Campaign $campaign */
     $campaign = self::writeRecord($params);
 
     /* Create the campaign group record */
@@ -65,6 +65,11 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
       }
     }
 
+    //store custom data
+    if (!empty($params['custom']) && is_array($params['custom'])) {
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_campaign', $campaign->id);
+    }
+
     return $campaign;
   }
 
@@ -72,35 +77,48 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    * Delete the campaign.
    *
    * @param int $id
+   *   Id of the campaign.
    *
-   * @deprecated
-   * @return bool|int
+   * @return bool|mixed
    */
   public static function del($id) {
-    try {
-      self::deleteRecord(['id' => $id]);
-    }
-    catch (CRM_Core_Exception $e) {
+    if (!$id) {
       return FALSE;
     }
-    return 1;
+
+    CRM_Utils_Hook::pre('delete', 'Campaign', $id);
+
+    $dao = new CRM_Campaign_DAO_Campaign();
+    $dao->id = $id;
+    $result = $dao->delete();
+
+    CRM_Utils_Hook::post('delete', 'Campaign', $id, $dao);
+
+    return $result;
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
-   *   Array of criteria values.
+   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   Array to be populated with found values.
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return self|null
-   *   The DAO object, if found.
-   *
-   * @deprecated
+   * @return \CRM_Campaign_DAO_Campaign|null
    */
-  public static function retrieve($params, &$defaults) {
-    return self::commonRetrieve(self::class, $params, $defaults);
+  public static function retrieve(&$params, &$defaults) {
+    $campaign = new CRM_Campaign_DAO_Campaign();
+
+    $campaign->copyValues($params);
+
+    if ($campaign->find(TRUE)) {
+      CRM_Core_DAO::storeValues($campaign, $defaults);
+      return $campaign;
+    }
+    return NULL;
   }
 
   /**
@@ -255,7 +273,7 @@ Order By  camp.title";
 
       //do check for component.
       if ($doCheckForComponent) {
-        $campaigns['isCampaignEnabled'] = $isValid = self::isComponentEnabled();
+        $campaigns['isCampaignEnabled'] = $isValid = self::isCampaignEnable();
       }
 
       //do check for permissions.
@@ -283,12 +301,20 @@ Order By  camp.title";
 
   /**
    * Is CiviCampaign enabled.
-   * @deprecated
    * @return bool
    */
-  public static function isCampaignEnable(): bool {
-    CRM_Core_Error::deprecatedFunctionWarning('isComponentEnabled');
-    return self::isComponentEnabled();
+  public static function isCampaignEnable() {
+    static $isEnable = NULL;
+
+    if (!isset($isEnable)) {
+      $isEnable = FALSE;
+      $config = CRM_Core_Config::singleton();
+      if (in_array('CiviCampaign', $config->enableComponents)) {
+        $isEnable = TRUE;
+      }
+    }
+
+    return $isEnable;
   }
 
   /**
@@ -588,8 +614,16 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
         ['id' => 'campaigns', 'multiple' => 'multiple', 'class' => 'crm-select2']
       );
     }
-
-    $form->assign('campaignElementName', $showCampaignInSearch ? $elementName : '');
+    $infoFields = [
+      'elementName',
+      'hasAccessCampaign',
+      'isCampaignEnabled',
+      'showCampaignInSearch',
+    ];
+    foreach ($infoFields as $fld) {
+      $campaignInfo[$fld] = $$fld;
+    }
+    $form->assign('campaignInfo', $campaignInfo);
   }
 
   /**

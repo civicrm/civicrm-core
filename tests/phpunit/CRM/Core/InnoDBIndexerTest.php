@@ -14,7 +14,9 @@ class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
   protected $indices = [];
 
   /**
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function tearDown(): void {
     $idx = new CRM_Core_InnoDBIndexer(FALSE, []);

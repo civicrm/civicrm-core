@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\ContributionRecur;
-
 /**
  * Class CRM_Core_Payment_PayPalProIPNTest
  * @group headless
@@ -67,7 +65,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testInvoiceSentOnIPNPaymentSuccess(): void {
+  public function testInvoiceSentOnIPNPaymentSuccess() {
     $this->enableTaxAndInvoicing();
 
     $pendingStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
@@ -115,7 +113,9 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    * The scenario is that a pending contribution exists and the first call will
    * update it to completed. The second will create a new contribution.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testIPNPaymentRecurSuccess(): void {
@@ -123,11 +123,6 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $mut = new CiviMailUtils($this, TRUE);
     $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurTransaction());
     $paypalIPN->main();
-    $recur = ContributionRecur::get()
-      ->addWhere('contact_id', '=', $this->_contactID)
-      ->addSelect('contribution_status_id:name')
-      ->execute()->first();
-    $this->assertEquals('In Progress', $recur['contribution_status_id:name']);
     $mut->checkMailLog(['https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_subscr-find'], ['civicrm/contribute/unsubscribe', 'civicrm/contribute/updatebilling']);
     $mut->stop();
     $contribution1 = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $this->_contributionID]);
@@ -161,12 +156,12 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test IPN response updates contribution_recur & contribution for first &
-   * second contribution.
+   * Test IPN response updates contribution_recur & contribution for first & second contribution.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testIPNPaymentMembershipRecurSuccess(): void {
+  public function testIPNPaymentMembershipRecurSuccess() {
     $durationUnit = 'year';
     $this->setupMembershipRecurringPaymentProcessorTransaction(['duration_unit' => $durationUnit, 'frequency_unit' => $durationUnit]);
     $this->callAPISuccessGetSingle('membership_payment', []);
@@ -194,6 +189,48 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       'entity_id' => $this->ids['membership'],
       'entity_table' => 'civicrm_membership',
     ], 2);
+    $this->callAPISuccessGetSingle('line_item', [
+      'contribution_id' => $contribution['values'][1]['id'],
+      'entity_table' => 'civicrm_membership',
+    ]);
+    $this->callAPISuccessGetSingle('membership_payment', ['contribution_id' => $contribution['values'][1]['id']]);
+  }
+
+  /**
+   * Test IPN that we can force membership when the membership payment has been deleted.
+   *
+   * https://lab.civicrm.org/dev/membership/issues/13
+   *
+   * In this scenario the membership payment record was deleted (or not created) for the first contribution but we
+   * 'recover' by using the input  membership id.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testIPNPaymentInputMembershipRecurSuccess(): void {
+    $durationUnit = 'year';
+    $this->setupMembershipRecurringPaymentProcessorTransaction(['duration_unit' => $durationUnit, 'frequency_unit' => $durationUnit]);
+    $membershipPayment = $this->callAPISuccessGetSingle('membership_payment', []);
+    $paypalIPN = new CRM_Core_Payment_PayPalIPN(array_merge($this->getPaypalRecurTransaction(), ['membershipID' => $membershipPayment['membership_id']]));
+    $paypalIPN->main();
+    $membershipEndDate = $this->callAPISuccessGetValue('membership', ['return' => 'end_date']);
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_membership_payment WHERE id = ' . $membershipPayment['id']);
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item SET entity_table = 'civicrm_contribution' WHERE entity_table = 'civicrm_membership'");
+
+    $paypalIPN = new CRM_Core_Payment_PaypalIPN(array_merge($this->getPaypalRecurSubsequentTransaction(), ['membershipID' => $membershipPayment['membership_id']]));
+    $paypalIPN->main();
+    $renewedMembershipEndDate = $this->membershipRenewalDate($durationUnit, $membershipEndDate);
+    $this->assertEquals($renewedMembershipEndDate, $this->callAPISuccessGetValue('membership', ['return' => 'end_date']));
+    $contribution = $this->callAPISuccess('contribution', 'get', [
+      'contribution_recur_id' => $this->_contributionRecurID,
+      'sequential' => 1,
+    ]);
+    $this->assertEquals(2, $contribution['count']);
+    $this->assertEquals('secondone', $contribution['values'][1]['trxn_id']);
+    $this->callAPISuccessGetCount('line_item', [
+      'entity_id' => $this->ids['membership'],
+      'entity_table' => 'civicrm_membership',
+    ], 1);
     $this->callAPISuccessGetSingle('line_item', [
       'contribution_id' => $contribution['values'][1]['id'],
       'entity_table' => 'civicrm_membership',

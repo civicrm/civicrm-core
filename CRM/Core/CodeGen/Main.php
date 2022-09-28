@@ -57,23 +57,6 @@ class CRM_Core_CodeGen_Main {
   public $sourceDigest;
 
   /**
-   * Should the specification be allowed to echo output.
-   *
-   * @var bool
-   */
-  protected $verbose = TRUE;
-
-  /**
-   * @param bool $verbose
-   *
-   * @return CRM_Core_CodeGen_Main
-   */
-  public function setVerbose(bool $verbose): CRM_Core_CodeGen_Main {
-    $this->verbose = $verbose;
-    return $this;
-  }
-
-  /**
    * @param $CoreDAOCodePath
    * @param $sqlCodePath
    * @param $phpCodePath
@@ -159,7 +142,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   public function init() {
     if (!$this->database || !$this->tables) {
       $specification = new CRM_Core_CodeGen_Specification();
-      $specification->parse($this->schemaPath, $this->buildVersion, $this->verbose);
+      $specification->parse($this->schemaPath, $this->buildVersion);
       $this->database = $specification->database;
       $this->tables = $specification->tables;
     }

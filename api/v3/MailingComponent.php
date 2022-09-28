@@ -20,7 +20,7 @@
  *
  * @param array $params
  *
- * @throws CRM_Core_Exception
+ * @throws API_Exception
  * @return array
  *   API result array.
  */
@@ -69,7 +69,7 @@ function _civicrm_api3_mailing_component_get_spec(&$params) {
  *
  * @param array $params
  *
- * @throws CRM_Core_Exception
+ * @throws API_Exception
  * @return array
  *   API result array.
  */

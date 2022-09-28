@@ -53,7 +53,7 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_F
     /**
      * You can define a custom title for the search form
      */
-    $this->setTitle(ts('Find Contributors by Aggregate Totals'));
+    $this->setTitle('Find Contributors by Aggregate Totals');
 
     /**
      * Define the search form fields here
@@ -318,6 +318,18 @@ civicrm_contact AS contact_a {$this->_aclFrom}
    */
   public function &columns() {
     return $this->_columns;
+  }
+
+  /**
+   * @param $title
+   */
+  public function setTitle($title) {
+    if ($title) {
+      CRM_Utils_System::setTitle($title);
+    }
+    else {
+      CRM_Utils_System::setTitle(ts('Search'));
+    }
   }
 
   /**

@@ -6,7 +6,6 @@
   <name>civicrm_search_display</name>
   <comment>Search Kit - saved search displays</comment>
   <log>true</log>
-  <icon>fa-clone</icon>
 
   <field>
     <name>id</name>

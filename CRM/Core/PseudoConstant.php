@@ -162,7 +162,8 @@ class CRM_Core_PseudoConstant {
    * @param string $fieldName
    * @param array $params
    * - name       string  name of the option group
-   * - flip       DEPRECATED
+   * - flip       boolean results are return in id => label format if false
+   *                            if true, the results are reversed
    * - grouping   boolean if true, return the value in 'grouping' column (currently unsupported for tables other than option_value)
    * - localize   boolean if true, localize the results before returning
    * - condition  string|array add condition(s) to the sql query - will be concatenated using 'AND'
@@ -225,7 +226,6 @@ class CRM_Core_PseudoConstant {
       // if callback is specified..
       if (!empty($pseudoconstant['callback'])) {
         $fieldOptions = call_user_func(Civi\Core\Resolver::singleton()->get($pseudoconstant['callback']), $context, $params);
-        $fieldOptions = self::formatArrayOptions($context, $fieldOptions);
         //CRM-18223: Allow additions to field options via hook.
         CRM_Utils_Hook::fieldOptions($entity, $fieldName, $fieldOptions, $params);
         return $fieldOptions;
@@ -255,10 +255,10 @@ class CRM_Core_PseudoConstant {
           $params['grouping'],
           $params['localize'],
           $params['condition'] ? ' AND ' . implode(' AND ', (array) $params['condition']) : NULL,
-          $params['labelColumn'] ?: 'label',
+          $params['labelColumn'] ? $params['labelColumn'] : 'label',
           $params['onlyActive'],
           $params['fresh'],
-          $params['keyColumn'] ?: 'value',
+          $params['keyColumn'] ? $params['keyColumn'] : 'value',
           !empty($params['orderColumn']) ? $params['orderColumn'] : 'weight'
         );
         CRM_Utils_Hook::fieldOptions($entity, $fieldName, $options, $params);
@@ -373,7 +373,7 @@ class CRM_Core_PseudoConstant {
         return NULL;
       }
       // We don't have good mapping so have to do a bit of guesswork from the menu
-      [, $parent, , $child] = explode('_', $daoName);
+      list(, $parent, , $child) = explode('_', $daoName);
       $sql = "SELECT path FROM civicrm_menu
         WHERE page_callback LIKE '%CRM_Admin_Page_$child%' OR page_callback LIKE '%CRM_{$parent}_Page_$child%'
         ORDER BY page_callback
@@ -429,7 +429,7 @@ class CRM_Core_PseudoConstant {
       return $var;
     }
 
-    /** @var CRM_Core_DAO $object */
+    /* @var CRM_Core_DAO $object */
     $object = new $name();
 
     $object->selectAdd();
@@ -1492,7 +1492,7 @@ WHERE  id = %1
       return FALSE;
     }
     // Get list of fields for the option table
-    /** @var CRM_Core_DAO $dao * */
+    /* @var CRM_Core_DAO $dao * */
     $dao = new $daoName();
     $availableFields = array_keys($dao->fieldKeys());
 
@@ -1513,8 +1513,8 @@ WHERE  id = %1
     }
 
     // Use abbrColum if context is abbreviate
-    if ($context === 'abbreviate' && !empty($pseudoconstant['abbrColumn'])) {
-      $params['labelColumn'] = $pseudoconstant['abbrColumn'];
+    if ($context === 'abbreviate' && (in_array('abbreviation', $availableFields) || !empty($pseudoconstant['abbrColumn']))) {
+      $params['labelColumn'] = $pseudoconstant['abbrColumn'] ?? 'abbreviation';
     }
 
     // Condition param can be passed as an sql clause string or an array of clauses
@@ -1584,38 +1584,6 @@ WHERE  id = %1
     }
 
     return $output;
-  }
-
-  /**
-   * Convert multidimensional option list to flat array, if necessary
-   *
-   * Detect if an array of options is simple key/value pairs or a multidimensional array.
-   * If the latter, convert to a flat array, as determined by $context.
-   *
-   * @param string|null $context
-   *   See https://docs.civicrm.org/dev/en/latest/framework/pseudoconstant/#context
-   * @param array $options
-   *   List of options, each as a record of id+name+label.
-   *   Ex: [['id' => 123, 'name' => 'foo_bar', 'label' => 'Foo Bar']]
-   */
-  public static function formatArrayOptions($context, array &$options) {
-    // Already flat; return keys/values according to context
-    if (!isset($options[0]) || !is_array($options[0])) {
-      // For validate context, machine names are expected in place of labels.
-      // A flat array has no names so use the ids for both key and value.
-      return $context === 'validate' ?
-        array_combine(array_keys($options), array_keys($options)) :
-        $options;
-    }
-    $result = [];
-    $key = ($context === 'match') ? 'name' : 'id';
-    $value = ($context === 'validate') ? 'name' : (($context === 'abbreviate') ? 'abbr' : 'label');
-    foreach ($options as $option) {
-      // Some fallbacks in case the array is missing a 'name' or 'label' or 'abbr'
-      $id = $option[$key] ?? $option['id'] ?? $option['name'];
-      $result[$id] = $option[$value] ?? $option['label'] ?? $option['name'];
-    }
-    return $result;
   }
 
 }

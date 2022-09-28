@@ -73,10 +73,10 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     ];
 
     $customField = $this->callAPIAndDocument('custom_field', 'create', $params, __FUNCTION__, __FILE__);
-    $customField['label'] = 'Name2';
-    $customFieldEdited = $this->callAPISuccess('custom_field', 'create', $customField);
+    $params['id'] = $customField['id'];
+    $customField = $this->callAPISuccess('custom_field', 'create', $params);
 
-    $this->assertNotNull($customFieldEdited['id']);
+    $this->assertNotNull($customField['id']);
   }
 
   /**
@@ -106,14 +106,14 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   public function testCustomFieldCreateAllAvailableFormInputs() {
     $gid = $this->customGroupCreate(['extends' => 'Individual', 'title' => 'testAllFormInputs']);
 
-    $dtype = $customFieldDataType = array_column(CRM_Core_BAO_CustomField::dataType(), 'id');
+    $dtype = CRM_Core_BAO_CustomField::dataType();
     $htype = CRM_Custom_Form_Field::$_dataToHTML;
 
     // Legacy html types returned by v3
     $htype['StateProvince'] = ['Select State/Province'];
     $htype['Country'] = ['Select Country'];
 
-    foreach ($dtype as $dkey) {
+    foreach ($dtype as $dkey => $dvalue) {
       foreach ($htype[$dkey] as $hvalue) {
         $this->_loopingCustomFieldCreateTest($this->_buildParams($gid['id'], $hvalue, $dkey));
       }
@@ -203,7 +203,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $optionGroup = $this->callAPISuccess('option_group', 'getsingle', [
       'id' => $optionGroupID,
     ]);
-    $this->assertEquals('select_test_group :: Country', $optionGroup['title']);
+    $this->assertEquals('Country', $optionGroup['title']);
     $optionValueCount = $this->callAPISuccess('option_value', 'getcount', [
       'option_group_id' => $optionGroupID,
     ]);
@@ -266,7 +266,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    *
    * (this was happening due to a check running despite no existing option_group_id)
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testUpdateCustomFieldAddOptionGroup() {
     $customGroup = $this->customGroupCreate(['extends' => 'Organization', 'title' => 'test_group']);
@@ -563,6 +563,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   }
 
   /**
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testCustomFieldCreateWithOptionGroupName(): void {

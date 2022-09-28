@@ -13,8 +13,7 @@ function example_civicrm_container($container) {
 }
 
 function _example_walk_batches(\Civi\FlexMailer\Event\WalkBatchesEvent $event) {
-  // Disable standard delivery
-  $event->stopPropagation();
+  $event->stopPropagation(); // Disable standard delivery
 
   while (...) {
     $tasks = array();
@@ -24,5 +23,4 @@ function _example_walk_batches(\Civi\FlexMailer\Event\WalkBatchesEvent $event) {
     $event->visit($tasks);
   }
 }
-
 ```

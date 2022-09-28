@@ -26,7 +26,6 @@ class SqlFunctionNULLIF extends SqlFunction {
         'min_expr' => 2,
         'max_expr' => 2,
         'optional' => FALSE,
-        'label' => ts('Compare with'),
       ],
     ];
   }
@@ -35,14 +34,7 @@ class SqlFunctionNULLIF extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('Unequal');
-  }
-
-  /**
-   * @return string
-   */
-  public static function getDescription(): string {
-    return ts('The first value, only if it is not equal to the second.');
+    return ts('Null if');
   }
 
 }

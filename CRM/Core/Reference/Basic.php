@@ -13,11 +13,11 @@ class CRM_Core_Reference_Basic implements CRM_Core_Reference_Interface {
   protected $targetKey;
 
   /**
-   * @param string $refTable
-   * @param string $refKey
-   * @param string $targetTable
+   * @param $refTable
+   * @param $refKey
+   * @param null $targetTable
    * @param string $targetKey
-   * @param string|null $refTypeColumn
+   * @param null $refTypeColumn
    */
   public function __construct($refTable, $refKey, $targetTable = NULL, $targetKey = 'id', $refTypeColumn = NULL) {
     $this->refTable = $refTable;
@@ -28,28 +28,28 @@ class CRM_Core_Reference_Basic implements CRM_Core_Reference_Interface {
   }
 
   /**
-   * @return string
+   * @return mixed
    */
   public function getReferenceTable() {
     return $this->refTable;
   }
 
   /**
-   * @return string
+   * @return mixed
    */
   public function getReferenceKey() {
     return $this->refKey;
   }
 
   /**
-   * @return string|null
+   * @return null
    */
   public function getTypeColumn() {
     return $this->refTypeColumn;
   }
 
   /**
-   * @return string
+   * @return null
    */
   public function getTargetTable() {
     return $this->targetTable;
@@ -112,26 +112,21 @@ EOS;
    */
   public function getReferenceCount($targetDao) {
     $targetColumn = $this->getTargetKey();
-    $count = 0;
-    if ($targetDao->{$targetColumn} !== '' && $targetDao->{$targetColumn} !== NULL) {
-
-      $params = [
-        1 => [$targetDao->{$targetColumn} ?? '', 'String'],
-      ];
-      $sql = <<<EOS
+    $params = [
+      1 => [$targetDao->$targetColumn, 'String'],
+    ];
+    $sql = <<<EOS
 SELECT count(*)
 FROM {$this->getReferenceTable()}
 WHERE {$this->getReferenceKey()} = %1
 EOS;
-      $count = CRM_Core_DAO::singleValueQuery($sql, $params);
-    }
 
     return [
       'name' => implode(':', ['sql', $this->getReferenceTable(), $this->getReferenceKey()]),
       'type' => get_class($this),
       'table' => $this->getReferenceTable(),
       'key' => $this->getReferenceKey(),
-      'count' => $count,
+      'count' => CRM_Core_DAO::singleValueQuery($sql, $params),
     ];
   }
 

@@ -38,7 +38,7 @@ trait AfformFormatTrait {
   /**
    * @param string $html
    * @return mixed
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   protected function convertHtmlToOutput($html) {
     if ($this->layoutFormat === 'html') {
@@ -51,10 +51,10 @@ trait AfformFormatTrait {
   /**
    * @param mixed $mixed
    * @return string
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   protected function convertInputToHtml($mixed) {
-    if (is_string($mixed)) {
+    if ($this->layoutFormat === 'html') {
       return $mixed;
     }
     $converter = new \CRM_Afform_ArrayHtml($this->layoutFormat !== 'shallow', $this->formatWhitespace);

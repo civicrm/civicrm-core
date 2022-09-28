@@ -576,7 +576,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
   }
 
   /**
-   * @param array $rows
+   * @param $rows
    *
    * @return array
    */
@@ -639,7 +639,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
   }
 
   /**
-   * @param array $rows
+   * @param $rows
    */
   public function alterDisplay(&$rows) {
     // custom code to alter rows

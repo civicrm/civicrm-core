@@ -221,7 +221,7 @@ class CRM_Contact_Page_AJAX {
 
     $ret = ['is_error' => 0];
 
-    [$relTypeId, $b, $a] = explode('_', $relType);
+    list($relTypeId, $b, $a) = explode('_', $relType);
 
     if ($relationshipID && $originalCid) {
       CRM_Case_BAO_Case::endCaseRole($caseID, $a, $originalCid, $relTypeId);
@@ -249,7 +249,7 @@ class CRM_Contact_Page_AJAX {
         ]);
         $result = civicrm_api3('relationship', 'create', $params);
       }
-      catch (CRM_Core_Exception $e) {
+      catch (CiviCRM_API3_Exception $e) {
         $ret['is_error'] = 1;
         $ret['error_message'] = $e->getMessage();
       }
@@ -362,7 +362,7 @@ class CRM_Contact_Page_AJAX {
       $rowCount = Civi::settings()->get('search_autocomplete_count');
 
       // add acl clause here
-      [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
+      list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
       if ($aclWhere) {
         $aclWhere = "AND {$aclWhere}";
       }
@@ -426,7 +426,7 @@ LIMIT {$rowCount}
       $rowCount = (int) CRM_Utils_Request::retrieveValue('rowcount', 'Integer', 20, FALSE, 'GET');
 
       // add acl clause here
-      [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
+      list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
       if ($aclWhere) {
         $aclWhere = " AND $aclWhere";
       }
@@ -483,7 +483,22 @@ LIMIT {$offset}, {$rowCount}
   }
 
   public static function buildDedupeRules() {
-    $contactType = CRM_Utils_Request::retrieve('parentId', 'Positive');
+    $parent = CRM_Utils_Request::retrieve('parentId', 'Positive');
+
+    switch ($parent) {
+      case 1:
+        $contactType = 'Individual';
+        break;
+
+      case 2:
+        $contactType = 'Household';
+        break;
+
+      case 4:
+        $contactType = 'Organization';
+        break;
+    }
+
     $dedupeRules = CRM_Dedupe_BAO_DedupeRuleGroup::getByType($contactType);
 
     CRM_Utils_JSON::output($dedupeRules);
@@ -563,8 +578,8 @@ LIMIT {$offset}, {$rowCount}
       'src_email' => 'ce2.email',
       'dst_postcode' => 'ca1.postal_code',
       'src_postcode' => 'ca2.postal_code',
-      'dst_street' => 'ca1.street_address',
-      'src_street' => 'ca2.street_address',
+      'dst_street' => 'ca1.street',
+      'src_street' => 'ca2.street',
     ];
 
     foreach ($mappings as $key => $dbName) {
@@ -800,18 +815,17 @@ LIMIT {$offset}, {$rowCount}
    *
    * @param int $cid
    * @param int $oid
-   * @param string $oper
-   *   'nondupe-dupe' or 'dupe-nondupe'
+   * @param "dupe-nondupe|nondupe-dupe" $oper
    *
    * @return \CRM_Core_DAO|mixed|null
    */
   public static function markNonDuplicates($cid, $oid, $oper) {
-    if ($oper === 'dupe-nondupe') {
+    if ($oper == 'dupe-nondupe') {
       try {
         civicrm_api3('Exception', 'create', ['contact_id1' => $cid, 'contact_id2' => $oid]);
         return TRUE;
       }
-      catch (CRM_Core_Exception $e) {
+      catch (CiviCRM_API3_Exception $e) {
         return FALSE;
       }
     }
@@ -827,7 +841,7 @@ LIMIT {$offset}, {$rowCount}
     $exception->find(TRUE);
     $status = NULL;
 
-    if ($oper === 'nondupe-dupe') {
+    if ($oper == 'nondupe-dupe') {
       $status = $exception->delete();
     }
     return $status;

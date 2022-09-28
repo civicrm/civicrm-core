@@ -19,32 +19,13 @@
 
 namespace api\v4\Action;
 
-use api\v4\Api4TestBase;
+use api\v4\UnitTestCase;
 use Civi\Api4\MockBasicEntity;
-use Civi\Api4\Utils\CoreUtil;
-use Civi\Core\Event\GenericHookEvent;
-use Civi\Test\HookInterface;
-use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class BasicActionsTest extends Api4TestBase implements HookInterface, TransactionalInterface {
-
-  /**
-   * Listens for civi.api4.entityTypes event to manually add this nonstandard entity
-   *
-   * @param \Civi\Core\Event\GenericHookEvent $e
-   */
-  public function on_civi_api4_entityTypes(GenericHookEvent $e): void {
-    $e->entities['MockBasicEntity'] = MockBasicEntity::getInfo();
-  }
-
-  public function setUpHeadless() {
-    // Ensure MockBasicEntity gets added via above listener
-    \Civi::cache('metadata')->clear();
-    return parent::setUpHeadless();
-  }
+class BasicActionsTest extends UnitTestCase {
 
   private function replaceRecords(&$records) {
     MockBasicEntity::delete()->addWhere('identifier', '>', 0)->execute();
@@ -57,7 +38,6 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $info = MockBasicEntity::getInfo();
     $this->assertEquals('MockBasicEntity', $info['name']);
     $this->assertEquals(['identifier'], $info['primary_key']);
-    $this->assertEquals('identifier', CoreUtil::getIdFieldName('MockBasicEntity'));
   }
 
   public function testCrud() {
@@ -178,7 +158,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
   public function testGetFields() {
     $getFields = MockBasicEntity::getFields()->execute()->indexBy('name');
 
-    $this->assertCount(8, $getFields);
+    $this->assertCount(7, $getFields);
     $this->assertEquals('Identifier', $getFields['identifier']['title']);
     // Ensure default data type is "String" when not specified
     $this->assertEquals('String', $getFields['color']['data_type']);
@@ -187,10 +167,6 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertTrue($getFields['group']['options']);
     $this->assertTrue($getFields['fruit']['options']);
     $this->assertFalse($getFields['identifier']['options']);
-
-    // Getfields should figure out what suffixes are available based on option keys
-    $this->assertEquals(['name', 'label'], $getFields['group']['suffixes']);
-    $this->assertEquals(['name', 'label', 'color'], $getFields['fruit']['suffixes']);
 
     // Load simple options
     $getFields = MockBasicEntity::getFields()
@@ -213,8 +189,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     // Simple options should be expanded to non-assoc array
     $this->assertCount(2, $getFields);
     $this->assertEquals('one', $getFields['group']['options'][0]['id']);
-    // Name is interchangeable with id
-    $this->assertEquals('one', $getFields['group']['options'][0]['name']);
+    $this->assertEquals('First', $getFields['group']['options'][0]['name']);
     $this->assertEquals('First', $getFields['group']['options'][0]['label']);
     $this->assertFalse(isset($getFields['group']['options'][0]['color']));
     // Complex options should give all requested properties
@@ -281,7 +256,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
 
     foreach (MockBasicEntity::get()->addSelect('*')->execute() as $result) {
       ksort($result);
-      $this->assertEquals(['color', 'foo', 'fruit', 'group', 'identifier', 'shape', 'size', 'weight'], array_keys($result));
+      $this->assertEquals(['color', 'group', 'identifier', 'shape', 'size', 'weight'], array_keys($result));
     }
 
     $result = MockBasicEntity::get()
@@ -377,32 +352,10 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals('two', $result->first()['group']);
   }
 
-  public function testRegexpOperators() {
-    $records = [
-      ['color' => 'red'],
-      ['color' => 'blue'],
-      ['color' => 'brown'],
-    ];
-    $this->replaceRecords($records);
-
-    $result = MockBasicEntity::get()
-      ->addWhere('color', 'REGEXP', '^b')
-      ->execute();
-    $this->assertCount(2, $result);
-    $this->assertEquals('blue', $result[0]['color']);
-    $this->assertEquals('brown', $result[1]['color']);
-
-    $result = MockBasicEntity::get()
-      ->addWhere('color', 'NOT REGEXP', '^b')
-      ->execute();
-    $this->assertCount(1, $result);
-    $this->assertEquals('red', $result[0]['color']);
-  }
-
   public function testPseudoconstantMatch() {
     $records = [
       ['group:label' => 'First', 'shape' => 'round', 'fruit:name' => 'banana'],
-      ['group:name' => 'two', 'shape' => 'square', 'fruit:label' => 'Pear'],
+      ['group:name' => 'Second', 'shape' => 'square', 'fruit:label' => 'Pear'],
     ];
     $this->replaceRecords($records);
 
@@ -414,7 +367,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals('round', $results[0]['shape']);
     $this->assertEquals('one', $results[0]['group']);
     $this->assertEquals('First', $results[0]['group:label']);
-    $this->assertEquals('one', $results[0]['group:name']);
+    $this->assertEquals('First', $results[0]['group:name']);
     $this->assertEquals(3, $results[0]['fruit']);
     $this->assertEquals('Banana', $results[0]['fruit:label']);
     $this->assertEquals('banana', $results[0]['fruit:name']);
@@ -430,7 +383,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     try {
       MockBasicEntity::create()->addValue('fruit:color', 'yellow')->execute();
     }
-    catch (\CRM_Core_Exception $createError) {
+    catch (\API_Exception $createError) {
     }
     $this->assertStringContainsString('Illegal expression', $createError->getMessage());
   }

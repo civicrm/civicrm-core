@@ -40,5 +40,8 @@
         </td>
     </tr>
 </table>
+{if $isCaptcha}
+  {include file='CRM/common/ReCAPTCHA.tpl'}
+{/if}
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 </div><!-- end crm-block -->

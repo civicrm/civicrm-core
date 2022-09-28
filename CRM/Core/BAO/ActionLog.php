@@ -25,12 +25,10 @@ class CRM_Core_BAO_ActionLog extends CRM_Core_DAO_ActionLog {
    *
    * @param array $params
    *
-   * @return CRM_Core_DAO_ActionLog
+   * @return array
    */
   public static function create($params) {
-    if (empty($params['id'])) {
-      $params['action_date_time'] = $params['action_date_time'] ?? date('YmdHis');
-    }
+    $params['action_date_time'] = $params['action_date_time'] ?? date('YmdHis');
 
     return self::writeRecord($params);
   }

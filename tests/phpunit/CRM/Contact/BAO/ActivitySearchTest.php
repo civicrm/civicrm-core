@@ -98,7 +98,6 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
     if (!empty($type['count'])) {
       $this->callAPISuccess('option_value', 'delete', ['id' => $this->test_activity_type_id]);
     }
-    parent::tearDown();
   }
 
   /**
@@ -119,7 +118,7 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
       'expected_contact' => [$this->_contactID],
     ];
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($case['form_value']));
-    [$select, $from, $where, $having] = $query->query();
+    list($select, $from, $where, $having) = $query->query();
     $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id $from $where")->fetchAll();
     foreach ($groupContacts as $key => $value) {
       $groupContacts[$key] = $value['id'];
@@ -146,7 +145,7 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
       'expected_contact' => [$this->_contactID],
     ];
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($case['form_value']));
-    [$select, $from, $where, $having] = $query->query();
+    list($select, $from, $where, $having) = $query->query();
     $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id $from $where")->fetchAll();
     foreach ($groupContacts as $key => $value) {
       $groupContacts[$key] = $value['id'];
@@ -173,7 +172,7 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
       'expected_contact' => [$this->_contactID],
     ];
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($case['form_value']));
-    [$select, $from, $where, $having] = $query->query();
+    list($select, $from, $where, $having) = $query->query();
     $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id $from $where")->fetchAll();
     foreach ($groupContacts as $key => $value) {
       $groupContacts[$key] = $value['id'];
@@ -200,7 +199,7 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
       'expected_contact' => [$this->_contactID],
     ];
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($case['form_value']));
-    [$select, $from, $where, $having] = $query->query();
+    list($select, $from, $where, $having) = $query->query();
     $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id $from $where")->fetchAll();
     foreach ($groupContacts as $key => $value) {
       $groupContacts[$key] = $value['id'];
@@ -238,7 +237,7 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
       'expected_contact' => [$this->_contactID],
     ];
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($case['form_value']));
-    [$select, $from, $where, $having] = $query->query();
+    list($select, $from, $where, $having) = $query->query();
 
     $expectedQill = [
       0 => [
@@ -292,7 +291,7 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
       'expected_contact' => [$this->_contactID],
     ];
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($case['form_value']));
-    [$select, $from, $where, $having] = $query->query();
+    list($select, $from, $where, $having) = $query->query();
 
     $expectedQill = [
       0 => [

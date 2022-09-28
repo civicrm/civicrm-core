@@ -39,12 +39,12 @@ trait GroupContactSaveTrait {
   /**
    * @inheritDoc
    */
-  protected function write(array $items) {
+  protected function writeObjects(&$items) {
     foreach ($items as &$item) {
       $item['method'] = $this->method;
       $item['tracking'] = $this->tracking;
     }
-    return \CRM_Contact_BAO_GroupContact::writeRecords($items);
+    return parent::writeObjects($items);
   }
 
 }

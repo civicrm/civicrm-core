@@ -7,5 +7,5 @@ return [
   'js' => ['ang/crmCaseType.js'],
   'css' => ['ang/crmCaseType.css'],
   'partials' => ['ang/crmCaseType'],
-  'requires' => ['ngRoute', 'crmUi', 'unsavedChanges', 'crmUtil', 'crmResource'],
+  'requires' => ['ngRoute', 'ui.utils', 'crmUi', 'unsavedChanges', 'crmUtil', 'crmResource'],
 ];

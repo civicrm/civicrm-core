@@ -1,5 +1,5 @@
 <tr>
-  <td>
+  <td class="font-size12pt">
     {$form.sort_name.label}
     <br>
     {$form.sort_name.html|crmAddClass:'twenty'}
@@ -7,7 +7,7 @@
   <td>{$form.buttons.html}</td>
 </tr>
 <tr>
-  {if !empty($form.contact_tags)}
+  {if $form.contact_tags}
     <td>
       <label>{$form.contact_tags.label}</label>
       <br>
@@ -17,7 +17,7 @@
     <td>&nbsp;</td>
   {/if}
 
-  {if !empty($form.group)}
+  {if $form.group}
     <td>
       <label>{$form.group.label}</label>
       <br>
@@ -34,7 +34,7 @@
     {$form.contact_type.html}
   </td>
   <td>
-    {if !empty($form.deleted_contacts)}
+    {if $form.deleted_contacts}
       {$form.deleted_contacts.html}&nbsp;&nbsp;{$form.deleted_contacts.label}
     {/if}
   </td>

@@ -14,11 +14,7 @@ namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
-/**
- * @service
- * @internal
- */
-class NavigationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
+class NavigationSpecProvider implements Generic\SpecProviderInterface {
 
   /**
    * This runs for both create and get actions

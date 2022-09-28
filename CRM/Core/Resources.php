@@ -167,7 +167,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
    * @see CRM_Core_Resources_CollectionTrait::findCreateSettingSnippet()
    */
   public function &findCreateSettingSnippet($options = []): array {
-    $options = self::mergeSettingOptions($options, [
+    $options = CRM_Core_Resources_CollectionAdderTrait::mergeSettingOptions($options, [
       'region' => NULL,
     ]);
     return $this->getSettingRegion($options['region'])->findCreateSettingSnippet($options);
@@ -307,7 +307,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
    *   List of matching files, relative to the extension base dir.
    * @see glob()
    */
-  public function glob($ext, $patterns, $flags = 0) {
+  public function glob($ext, $patterns, $flags = NULL) {
     $path = $this->getPath($ext);
     $patterns = (array) $patterns;
     $files = [];
@@ -336,9 +336,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
    * @return string
    */
   public function getCacheCode() {
-    // Ex: AngularJS json partials are language-specific because they ship with the strings
-    // for the current language.
-    return $this->cacheCode . CRM_Core_I18n::getLocale();
+    return $this->cacheCode;
   }
 
   /**
@@ -449,7 +447,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     ) {
       return TRUE;
     }
-    [$arg0, $arg1] = array_pad(explode('/', (CRM_Utils_System::currentPath() ?? '')), 2, '');
+    list($arg0, $arg1) = array_pad(explode('/', CRM_Utils_System::currentPath()), 2, '');
     return ($arg0 === 'civicrm' && in_array($arg1, ['ajax', 'angularprofiles', 'asset']));
   }
 
@@ -496,16 +494,27 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
    *
    * @return array
    */
-  protected static function getEntityRefMetadata() {
+  public static function getEntityRefMetadata() {
     $data = [
       'filters' => [],
       'links' => [],
     ];
+    $config = CRM_Core_Config::singleton();
+
+    $disabledComponents = [];
+    $dao = CRM_Core_DAO::executeQuery("SELECT name, namespace FROM civicrm_component");
+    while ($dao->fetch()) {
+      if (!in_array($dao->name, $config->enableComponents)) {
+        $disabledComponents[$dao->name] = $dao->namespace;
+      }
+    }
 
     foreach (CRM_Core_DAO_AllCoreTables::daoToClass() as $entity => $daoName) {
       // Skip DAOs of disabled components
-      if (!$daoName::isComponentEnabled()) {
-        continue;
+      foreach ($disabledComponents as $nameSpace) {
+        if (strpos($daoName, $nameSpace) === 0) {
+          continue 2;
+        }
       }
       $baoName = str_replace('_DAO_', '_BAO_', $daoName);
       if (class_exists($baoName)) {
@@ -554,7 +563,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     $hasQuery = strpos($url, '?') !== FALSE;
     $operator = $hasQuery ? '&' : '?';
 
-    return $url . $operator . 'r=' . $this->getCacheCode();
+    return $url . $operator . 'r=' . $this->cacheCode;
   }
 
   /**
@@ -569,7 +578,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
   }
 
   /**
-   * @param string|null $region
+   * @param string|NULL $region
    *   Optional request for a specific region. If NULL/omitted, use global default.
    * @return \CRM_Core_Region
    */

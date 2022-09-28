@@ -110,8 +110,7 @@ class CRM_Core_IDS {
         'filter_type' => 'xml',
         'filter_path' => "{$pkgs}/IDS/default_filter.xml",
         'tmp_path' => $tmpDir,
-        // Ignored, uses autoloader
-        'HTML_Purifier_Path' => TRUE,
+        'HTML_Purifier_Path' => $pkgs . '/IDS/vendors/htmlpurifier/HTMLPurifier.auto.php',
         'HTML_Purifier_Cache' => $tmpDir,
         'scan_keys' => '',
         'exceptions' => ['__utmz', '__utmc'],
@@ -226,7 +225,7 @@ class CRM_Core_IDS {
   /**
    * This function writes an entry about the intrusion to the database.
    *
-   * @param IDS_Report $result
+   * @param array $result
    * @param int $reaction
    *
    * @return bool
@@ -237,14 +236,13 @@ class CRM_Core_IDS {
 
     $data = [];
     $session = CRM_Core_Session::singleton();
-    $session_id = CRM_Core_Config::singleton()->userSystem->getSessionId() ? CRM_Core_Config::singleton()->userSystem->getSessionId() : '0';
     foreach ($result as $event) {
       $data[] = [
         'name' => $event->getName(),
         'value' => stripslashes($event->getValue()),
         'page' => $_SERVER['REQUEST_URI'],
         'userid' => $session->get('userID'),
-        'session' => $session_id,
+        'session' => session_id() ? session_id() : '0',
         'ip' => $ip,
         'reaction' => $reaction,
         'impact' => $result->getImpact(),

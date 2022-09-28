@@ -17,9 +17,9 @@
 
 {foreach from=$activity.fields item=field}
 {if $field.type eq 'Date'}
-{$field.label} : {$field.value|crmDate:$config->dateformatDatetime}
+{$field.label}{if !empty($field.category)}({$field.category}){/if} : {$field.value|crmDate:$config->dateformatDatetime}
 {else}
-{$field.label} : {$field.value}
+{$field.label}{if !empty($field.category)}({$field.category}){/if} : {$field.value}
 {/if}
 {/foreach}
 

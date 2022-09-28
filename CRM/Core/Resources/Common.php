@@ -26,7 +26,7 @@ class CRM_Core_Resources_Common {
    *
    * @param string $name
    *   Symbolic name of the bundle.
-   * @param callable|null $init
+   * @param callable|NULL $init
    *   Optional initialization function. Populate default resources.
    *   Signature: `function($bundle): void`
    *   Example: `function myinit($b) { $b->addScriptFile(...)->addStyleFile(...); }`
@@ -271,7 +271,7 @@ class CRM_Core_Resources_Common {
     // Add localized jQuery UI files
     if ($tsLocale && $tsLocale != 'en_US') {
       // Search for i18n file in order of specificity (try fr-CA, then fr)
-      [$lang] = explode('_', $tsLocale);
+      list($lang) = explode('_', $tsLocale);
       $path = "bower_components/jquery-ui/ui/i18n";
       foreach ([str_replace('_', '-', $tsLocale), $lang] as $language) {
         $localizationFile = "$path/datepicker-{$language}.js";

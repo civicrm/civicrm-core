@@ -17,6 +17,13 @@
 class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFinancialAccount {
 
   /**
+   * Class constructor.
+   */
+  public function __construct() {
+    parent::__construct();
+  }
+
+  /**
    * Fetch object based on array of properties.
    *
    * @param array $params
@@ -86,7 +93,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
 
     $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_EntityFinancialAccount', $financialTypeAccountId, 'entity_id');
     // check dependencies
-    // FIXME hardcoded list = bad
+    // FIXME more table containing financial_type_id to come
     $dependency = [
       ['Contribute', 'Contribution'],
       ['Contribute', 'ContributionPage'],
@@ -100,14 +107,12 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
 
     foreach ($dependency as $name) {
       $daoString = 'CRM_' . $name[0] . '_DAO_' . $name[1];
-      if (class_exists($daoString)) {
-        /** @var \CRM_Core_DAO $dao */
-        $dao = new $daoString();
-        $dao->financial_type_id = $financialTypeId;
-        if ($dao->find(TRUE)) {
-          $check = TRUE;
-          break;
-        }
+      /* @var \CRM_Core_DAO $dao */
+      $dao = new $daoString();
+      $dao->financial_type_id = $financialTypeId;
+      if ($dao->find(TRUE)) {
+        $check = TRUE;
+        break;
       }
     }
 
@@ -137,7 +142,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    *   Payment instrument value.
    *
    * @return null|int
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getInstrumentFinancialAccount($paymentInstrumentValue) {
     if (!isset(\Civi::$statics[__CLASS__]['instrument_financial_accounts'][$paymentInstrumentValue])) {

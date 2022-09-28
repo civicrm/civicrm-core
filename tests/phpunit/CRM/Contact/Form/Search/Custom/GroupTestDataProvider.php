@@ -323,7 +323,6 @@ class CRM_Contact_Form_Search_Custom_GroupTestDataProvider implements Iterator {
     ],
   ];
 
-  #[\ReturnTypeWillChange]
   public function rewind() {
     $this->i = 0;
   }
@@ -331,7 +330,6 @@ class CRM_Contact_Form_Search_Custom_GroupTestDataProvider implements Iterator {
   /**
    * @return array
    */
-  #[\ReturnTypeWillChange]
   public function current() {
     $count = count($this->dataset[$this->i]['id']);
     $ids = $this->dataset[$this->i]['id'];
@@ -359,19 +357,18 @@ class CRM_Contact_Form_Search_Custom_GroupTestDataProvider implements Iterator {
   /**
    * @return int
    */
-  #[\ReturnTypeWillChange]
   public function key() {
     return $this->i;
   }
 
-  public function next(): void {
+  public function next() {
     $this->i++;
   }
 
   /**
    * @return bool
    */
-  public function valid(): bool {
+  public function valid() {
     return isset($this->dataset[$this->i]);
   }
 

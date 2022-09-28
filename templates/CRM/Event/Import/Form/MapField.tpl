@@ -27,7 +27,7 @@
    </tr>
    <tr>
      <td>{* Table for mapping data to CRM fields *}
-       {include file="CRM/Import/Form/MapTableCommon.tpl" mapper=$form.mapper}
+         {include file="CRM/Event/Import/Form/MapTable.tpl}
      </td>
    </tr>
    <tr>
@@ -38,7 +38,7 @@
      </td>
    </tr>
  </table>
- {$initHideBoxes|smarty:nodefaults}
+ {$initHideBoxes}
 </div>
 {literal}
 <script type="text/javascript" >

@@ -30,7 +30,6 @@ class ExampleSubscriberTest extends \PHPUnit\Framework\TestCase implements Headl
   }
 
   protected function setUp(): void {
-    parent::setUp();
     $this->contact = \CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact', [
       'contact_type' => 'Individual',
     ]);
@@ -41,7 +40,6 @@ class ExampleSubscriberTest extends \PHPUnit\Framework\TestCase implements Headl
 
   protected function tearDown(): void {
     $this->contact->delete();
-    parent::tearDown();
   }
 
   public static function getSubscribedEvents() {

@@ -9,14 +9,10 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\Batch;
-
 /**
  * This class generates form components for batch entry.
  */
 class CRM_Batch_Form_Batch extends CRM_Admin_Form {
-
-  protected $submittableMoneyFields = ['total'];
 
   /**
    * PreProcess function.
@@ -30,8 +26,6 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
 
   /**
    * Build the form object.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -75,35 +69,35 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function postProcess(): void {
+  public function postProcess() {
+    $params = $this->controller->exportValues($this->_name);
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Core_Session::setStatus('', ts('Batch Deleted'), 'success');
+      CRM_Core_Session::setStatus("", ts("Batch Deleted"), "success");
       CRM_Batch_BAO_Batch::deleteBatch($this->_id);
       return;
     }
 
-    $batchID = Batch::save(FALSE)->setRecords([
-      [
-        // Always create with data entry status.
-        'status_id:name' => 'Data Entry',
-        'id' => $this->_id,
-        'title' => $this->getSubmittedValue('title'),
-        'description' => $this->getSubmittedValue('description'),
-        'type_id' => $this->getSubmittedValue('type_id'),
-        'total' => $this->getSubmittedValue('total'),
-        'item_count' => $this->getSubmittedValue('item_count'),
-      ],
-    ])->execute()->first()['id'];
-
-    // Redirect to batch entry page.
-    if ($this->_action & CRM_Core_Action::ADD) {
-      CRM_Core_Session::singleton()->replaceUserContext(CRM_Utils_System::url('civicrm/batch/entry', "id={$batchID}&reset=1&action=add"));
+    if ($this->_id) {
+      $params['id'] = $this->_id;
     }
     else {
-      CRM_Core_Session::singleton()->replaceUserContext(CRM_Utils_System::url('civicrm/batch/entry', "id={$batchID}&reset=1"));
+      $session = CRM_Core_Session::singleton();
+      $params['created_id'] = $session->get('userID');
+      $params['created_date'] = CRM_Utils_Date::processDate(date("Y-m-d"), date("H:i:s"));
+    }
+
+    // always create with data entry status
+    $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Data Entry');
+    $batch = CRM_Batch_BAO_Batch::create($params);
+
+    // redirect to batch entry page.
+    $session = CRM_Core_Session::singleton();
+    if ($this->_action & CRM_Core_Action::ADD) {
+      $session->replaceUserContext(CRM_Utils_System::url('civicrm/batch/entry', "id={$batch->id}&reset=1&action=add"));
+    }
+    else {
+      $session->replaceUserContext(CRM_Utils_System::url('civicrm/batch/entry', "id={$batch->id}&reset=1"));
     }
   }
 

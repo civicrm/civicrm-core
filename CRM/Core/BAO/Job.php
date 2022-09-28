@@ -13,12 +13,21 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
+ * $Id: $
+ *
  */
 
 /**
  * This class contains scheduled jobs related functions.
  */
 class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
+
+  /**
+   * Class constructor.
+   */
+  public function __construct() {
+    parent::__construct();
+  }
 
   /**
    * Add the payment-processor type in the db
@@ -35,20 +44,26 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
-   *   Array of criteria values.
+   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   Array to be populated with found values.
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return self|null
-   *   The DAO object, if found.
-   *
-   * @deprecated
+   * @return CRM_Core_DAO_Job|null
+   *   object on success, null otherwise
    */
-  public static function retrieve($params, &$defaults) {
-    return self::commonRetrieve(self::class, $params, $defaults);
+  public static function retrieve(&$params, &$defaults) {
+    $job = new CRM_Core_DAO_Job();
+    $job->copyValues($params);
+    if ($job->find(TRUE)) {
+      CRM_Core_DAO::storeValues($job, $defaults);
+      return $job;
+    }
+    return NULL;
   }
 
   /**
@@ -70,14 +85,25 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    * Function  to delete scheduled job.
    *
    * @param $jobID
+   *   ID of the job to be deleted.
    *
    * @return bool|null
-   * @deprecated
    * @throws CRM_Core_Exception
    */
   public static function del($jobID) {
-    self::deleteRecord(['id' => $jobID]);
-    return TRUE;
+    if (!$jobID) {
+      throw new CRM_Core_Exception(ts('Invalid value passed to delete function.'));
+    }
+
+    $dao = new CRM_Core_DAO_Job();
+    $dao->id = $jobID;
+    if (!$dao->find(TRUE)) {
+      return NULL;
+    }
+
+    if ($dao->delete()) {
+      return TRUE;
+    }
   }
 
   /**

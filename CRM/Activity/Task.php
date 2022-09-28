@@ -90,7 +90,8 @@ class CRM_Activity_Task extends CRM_Core_Task {
         ],
       ];
 
-      if (CRM_Core_Component::isEnabled('CiviCase')) {
+      $config = CRM_Core_Config::singleton();
+      if (in_array('CiviCase', $config->enableComponents)) {
         if (CRM_Core_Permission::check('access all cases and activities') ||
           CRM_Core_Permission::check('access my cases and activities')
         ) {
@@ -156,7 +157,7 @@ class CRM_Activity_Task extends CRM_Core_Task {
       $value = self::TASK_PRINT;
     }
     if (isset(self::$_tasks[$value])) {
-      return [(array) self::$_tasks[$value]['class'], self::$_tasks[$value]['result']];
+      return [[self::$_tasks[$value]['class']], self::$_tasks[$value]['result']];
     }
     return [[], NULL];
   }

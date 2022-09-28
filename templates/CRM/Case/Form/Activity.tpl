@@ -62,9 +62,9 @@
             <table class="form-layout-compressed">
               <tbody>
                 <tr id="with-clients" class="crm-case-activity-form-block-client_name">
-                  <td class="label">{ts}Client{/ts}</td>
+                  <td class="label font-size12pt">{ts}Client{/ts}</td>
                   <td class="view-value">
-                    <span>
+                    <span class="font-size12pt">
                       {foreach from=$client_names item=client name=clients key=id}
                         {foreach from=$client_names.$id item=client1}
                           {$client1.display_name}
@@ -131,7 +131,7 @@
                 <td class="view-value">
                   {$form.activity_date_time.html}
                   {if $action eq 2 && $activityTypeFile eq 'OpenCase'}
-                    <div class="description">{ts}Use a <a class="open-inline" href="{$changeStartURL}">Change Start Date</a> activity to change the date{/ts}</div>
+                    <div class="description">Use a <a class="open-inline" href="{$changeStartURL}">Change Start Date</a> activity to change the date</div>
                   {/if}
                 </td>
               </tr>
@@ -233,7 +233,7 @@
         </td>
       </tr>
     {/if}
-    {if !empty($form.tag.html)}
+    {if $form.tag.html}
     <tr class="crm-case-activity-form-block-tag">
       <td class="label">{$form.tag.label}</td>
       <td class="view-value">

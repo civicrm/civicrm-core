@@ -60,7 +60,7 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
     $session = CRM_Core_Session::singleton();
     $this->_userContext = $session->readUserContext();
 
-    $this->setTitle(ts('Send Email to Contacts'));
+    CRM_Utils_System::setTitle(ts('Send Email to Contacts'));
 
     $validate = FALSE;
     //validations

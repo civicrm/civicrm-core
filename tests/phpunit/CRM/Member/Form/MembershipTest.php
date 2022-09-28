@@ -80,6 +80,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *
    * Connect to the database, truncate the tables that will be used
    * and redirect stdin to a temporary file.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function setUp(): void {
     $this->_apiversion = 3;
@@ -152,6 +155,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -166,13 +171,13 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     );
     $this->callAPISuccess('Contact', 'delete', ['id' => $this->ids['contact']['organization'], 'skip_undelete' => TRUE]);
     $this->callAPISuccess('RelationshipType', 'delete', ['id' => $this->ids['relationship_type']['member']]);
-    parent::tearDown();
   }
 
   /**
    *  Test CRM_Member_Form_Membership::formRule() with a parameter
    *  that has an empty contact_select_id value
    *
+   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function testFormRuleEmptyContact(): void {
@@ -213,7 +218,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $obj = new CRM_Member_Form_Membership();
     $rc = CRM_Member_Form_Membership::formRule($params, $files, $obj);
     $this->assertisArray($rc);
-    $this->assertArrayHasKey('start_date', $rc);
+    $this->assertTrue(array_key_exists('start_date', $rc));
   }
 
   /**
@@ -284,6 +289,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a parameter
    *  that has permanent override and no status
    *
+   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function testFormRulePermanentOverrideWithNoStatus() {
@@ -478,6 +484,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * @param string $thousandSeparator
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    *
    * @dataProvider getThousandSeparators
    */
@@ -525,13 +532,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $form->_contactID = $this->_individualId;
     $form->testSubmit($params);
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
-    $membershipEndYear = date('Y') + 1;
-    if (date('m-d') == '12-31') {
-      // If you join on Dec 31, then the first term would end right away, so
-      // add a year.
-      $membershipEndYear++;
-    }
-    $this->assertEquals($membershipEndYear . '-12-31', $membership['end_date']);
+    $this->assertEquals(date('Y') + 1 . '-12-31', $membership['end_date']);
     $this->callAPISuccessGetCount('ContributionRecur', ['contact_id' => $this->_individualId], 0);
     $contribution = $this->callAPISuccess('Contribution', 'get', [
       'contact_id' => $this->_individualId,
@@ -565,13 +566,13 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       ]),
     ], 'online');
     $this->mut->checkMailLog([
-      Civi::format()->money('1234.56'),
+      CRM_Utils_Money::format('1234.56'),
       'Receipt text',
     ]);
     $this->mut->stop();
     $this->assertEquals([
       [
-        'text' => 'AnnualFixed membership for Mr. Anthony Anderson II has been added. The new membership End Date is December 31st, ' . $membershipEndYear . '. A membership confirmation and receipt has been sent to anthony_anderson@civicrm.org.',
+        'text' => 'AnnualFixed membership for Mr. Anthony Anderson II has been added. The new membership End Date is December 31st, ' . (date('Y') + 1) . '. A membership confirmation and receipt has been sent to anthony_anderson@civicrm.org.',
         'title' => 'Complete',
         'type' => 'success',
         'options' => NULL,
@@ -580,44 +581,13 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test the submit function of the membership form for unpaid membership.
-   *
-   * It turns out that no receipt is sent. This just locks in that pre-existing
-   * behaviour.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testSubmitUnpaid(): void {
-    $this->mut = new CiviMailUtils($this, TRUE);
-    $this->createLoggedInUser();
-    MembershipType::update()->addWhere('id', '=', $this->ids['membership_type']['AnnualFixed'])
-      ->setValues(['minimum_fee' => 0])->execute();
-    $form = $this->getForm([
-      'contact_id' => $this->_individualId,
-      'join_date' => date('Y-m-d'),
-      'membership_type_id' => [$this->ids['contact']['organization'], $this->ids['membership_type']['AnnualFixed']],
-      'total_amount' => 0,
-      'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
-      'send_receipt' => TRUE,
-      'receipt_text' => 'Receipt text',
-      'financial_type_id' => '',
-    ]);
-    $form->postProcess();
-    $this->mut->checkMailLog([], [
-      'Membership',
-      'Receipt text',
-    ]);
-  }
-
-  /**
    * Test the submit function of the membership form on membership type change.
-   *  Check if the related contribution is also updated if the minimum_fee didn't match
+   *  Check if the related contribuion is also updated if the minimum_fee didn't match
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testContributionUpdateOnMembershipTypeChange(): void {
-    // @todo figure out why financial validation fails with this test.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     // Step 1: Create a Membership via backoffice whose with 50.00 payment
     $form = $this->getForm();
     $this->mut = new CiviMailUtils($this, TRUE);
@@ -718,6 +688,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *   punctuation used to refer to thousands.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @dataProvider getThousandSeparators
    */
   public function testSubmitPartialPayment(string $thousandSeparator): void {
@@ -789,7 +760,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   /**
    * Test the submit function of the membership form.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitRecur(): void {
     CRM_Core_Session::singleton()->getStatus(TRUE);
@@ -853,19 +826,18 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * Test submit recurring with two line items.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
    */
   public function testSubmitRecurTwoRows(): void {
-    $this->createMembershipPriceSet();
+    $pfvIDs = $this->createMembershipPriceSet();
     MembershipType::update()
       ->addWhere('id', '=', $this->ids['membership_type']['AnnualRollingOrg2'])
       ->setValues(['frequency_interval' => 1, 'frequency_unit' => 'month', 'auto_renew' => 1])->execute();
     $form = $this->getForm();
     $form->_mode = 'live';
     $priceParams = [
-      'price_' . $this->getPriceFieldID() => [
-        $this->ids['PriceFieldValue']['AnnualRollingOrg2'] => 1,
-        $this->ids['PriceFieldValue']['AnnualRolling'] => 1,
-      ],
+      'price_' . $this->getPriceFieldID() => $pfvIDs,
       'price_set_id' => $this->getPriceSetID(),
       'membership_type_id' => NULL,
       // Set financial type id to null to check it is retrieved from the price set.
@@ -888,10 +860,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  after related Contribution is cancelled
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testFinancialEntriesOnCancelledContribution(): void {
-    // @todo figure out why financial validation fails with this test.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     // Create two memberships for individual $this->_individualId, via a price set in the back end.
     $this->createTwoMembershipsViaPriceSetInBackEnd($this->_individualId);
 
@@ -1034,8 +1005,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * is updated from Partially paid to Completed.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmitUpdateMembershipFromPartiallyPaid(): void {
+  public function testSubmitUpdateMembershipFromPartiallyPaid() {
     $memStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'validate');
 
     //Perform a pay later membership contribution.
@@ -1052,19 +1024,18 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'total_amount' => 5,
     ]);
 
+    // Complete the contribution from offline form.
+    $form = new CRM_Contribute_Form_Contribution();
     $submitParams = [
       'id' => $contribution['contribution_id'],
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'price_set_id' => 0,
     ];
     $fields = ['total_amount', 'net_amount', 'financial_type_id', 'receive_date', 'contact_id', 'payment_instrument_id'];
     foreach ($fields as $val) {
       $submitParams[$val] = $prevContribution[$val];
     }
-    $_REQUEST['action'] = 'update';
-    $_REQUEST['id'] = $contribution['contribution_id'];
-    // Complete the contribution from offline form.
-    $form = $this->getContributionForm($submitParams);
-    $form->postProcess();
+    $form->testSubmit($submitParams, CRM_Core_Action::UPDATE);
 
     //Check if Membership is updated to New.
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
@@ -1074,11 +1045,12 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   /**
    * Test the submit function of the membership form.
    *
+   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function testSubmitRecurCompleteInstant(): void {
     $mut = new CiviMailUtils($this, TRUE);
-    /** @var \CRM_Core_Payment_Dummy $processor */
+    /* @var \CRM_Core_Payment_Dummy $processor */
     $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessorID);
     $processor->setDoDirectPaymentResult([
       'payment_status_id' => 1,
@@ -1146,6 +1118,7 @@ Expires: ',
    * Uses some data from tests/phpunit/CRM/Member/Form/dataset/data.xml .
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testTwoInheritedMembershipsViaPriceSetInBackend(): void {
     // Create an organization and give it a "Member of" relationship to $this->_individualId.
@@ -1158,7 +1131,7 @@ Expires: ',
     ]);
 
     // Create two memberships for the organization, via a price set in the back end.
-    $this->createTwoMembershipsViaPriceSetInBackEnd($orgID, FALSE);
+    $this->createTwoMembershipsViaPriceSetInBackEnd($orgID);
 
     // Check the primary memberships on the organization.
     $orgMembershipResult = $this->callAPISuccess('membership', 'get', [
@@ -1225,6 +1198,7 @@ Expires: ',
    * checking that the line items have correct amounts.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testTwoMembershipsViaPriceSetInBackendWithDiscount(): void {
     // Register buildAmount hook to apply discount.
@@ -1286,11 +1260,10 @@ Expires: ',
    * @return \CRM_Member_Form_Membership
    * @throws \CRM_Core_Exception
    */
-  protected function getForm(array $formValues = []): CRM_Member_Form_Membership {
+  protected function getForm($formValues = []) {
     if (isset($_REQUEST['cid'])) {
       unset($_REQUEST['cid']);
     }
-    /** @var CRM_Member_Form_Membership $form*/
     $form = $this->getFormObject('CRM_Member_Form_Membership', $formValues);
     $form->preProcess();
     return $form;
@@ -1346,39 +1319,30 @@ Expires: ',
    * create two memberships for the same individual, via a price set in the back end.
    *
    * @param int $contactId Id of contact on which the memberships will be created.
-   * @param bool $isTaxEnabled
-   *   Is tax enabled for the Member Dues financial type.
-   *   Note that currently this ALSO assumes a discount has been
-   *   applied - this overloading would ideally be cleaned up.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  protected function createTwoMembershipsViaPriceSetInBackEnd(int $contactId, $isTaxEnabled = TRUE): void {
+  protected function createTwoMembershipsViaPriceSetInBackEnd($contactId): void {
     $form = $this->getForm();
     $form->preProcess();
     $this->createLoggedInUser();
-    $this->createMembershipPriceSet();
+    $pfvIDs = $this->createMembershipPriceSet();
 
     // register for both of these memberships via backoffice membership form submission
     $params = [
       'cid' => $contactId,
-      'contact_id' => $contactId,
       'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
-      'price_' . $this->getPriceFieldID() => [
-        $this->ids['PriceFieldValue']['AnnualRollingOrg2'] => 1,
-        $this->ids['PriceFieldValue']['AnnualRolling'] => 1,
-      ],
-      // $15 for discounted goat + $259 = $274 + $27.4 in tax.
-      // or without tax (and without discount) $279.
-      'total_amount' => $isTaxEnabled ? 301.4 : 279,
+      "price_" . $this->getPriceFieldID() => $pfvIDs,
       'price_set_id' => $this->getPriceSetID(),
       'membership_type_id' => [1 => 0],
       'auto_renew' => '0',
       'max_related' => '',
       'num_terms' => '2',
       'source' => '',
+      'total_amount' => '30.00',
       //Member dues, see data.xml
       'financial_type_id' => '2',
       'soft_credit_type_id' => '',
@@ -1391,7 +1355,7 @@ Expires: ',
       'trxn_id' => 777,
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Pending'),
       'billing_first_name' => 'Test',
-      'billing_middle_name' => 'Last',
+      'billing_middlename' => 'Last',
       'billing_street_address-5' => '10 Test St',
       'billing_city-5' => 'Test',
       'billing_state_province_id-5' => '1003',
@@ -1402,17 +1366,38 @@ Expires: ',
   }
 
   /**
-   * Get the contribution form object.
+   * Test membership status overrides when contribution is cancelled.
    *
-   * @param array $formValues
-   *
-   * @return \CRM_Contribute_Form_Contribution
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  protected function getContributionForm(array $formValues): CRM_Contribute_Form_Contribution {
-    /** @var CRM_Contribute_Form_Contribution $form */
-    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', $formValues);
-    $form->buildForm();
-    return $form;
+  public function testContributionFormStatusUpdate(): void {
+
+    $this->_contactID = $this->ids['Contact']['order'] = $this->createLoggedInUser();
+    $this->createContributionAndMembershipOrder();
+
+    $params = [
+      'total_amount' => 50,
+      'financial_type_id' => 2,
+      'contact_id' => $this->_contactID,
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'),
+    ];
+
+    //Update Contribution to Cancelled.
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->_id = $params['id'] = $this->ids['Contribution'][0];
+    $form->_mode = NULL;
+    $form->_contactID = $this->_individualId;
+    $form->testSubmit($params, CRM_Core_Action::UPDATE);
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_contactID]);
+
+    //Assert membership status overrides when the contribution cancelled.
+    $this->assertEquals(TRUE, $membership['is_override']);
+    $this->assertEquals($membership['status_id'], $this->callAPISuccessGetValue('MembershipStatus', [
+      'return' => 'id',
+      'name' => 'Cancelled',
+    ]));
   }
 
   /**
@@ -1422,8 +1407,9 @@ Expires: ',
    * In addition (a data-integrity check) -> check that the LineItem data add up to the data at the Contribution level
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testLineItemAmountOnSalesTax(): void {
+  public function testLineItemAmountOnSalesTax() {
     $this->enableTaxAndInvoicing();
     $this->addTaxAccountToFinancialType(2);
     $form = $this->getForm();
@@ -1465,17 +1451,17 @@ Expires: ',
     $this->assertEquals(50.00, $lineItem['line_total']);
     $this->assertEquals(5.00, $lineItem['tax_amount']);
 
-    $_REQUEST['id'] = $lineItem['contribution_id'];
-    $_REQUEST['context'] = 'membership';
     // Simply save the 'Edit Contribution' form
-    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->_context = 'membership';
+    $form->_values = $this->callAPISuccessGetSingle('Contribution', ['id' => $lineItem['contribution_id'], 'return' => ['total_amount', 'net_amount', 'fee_amount', 'tax_amount']]);
+    $form->testSubmit([
       'contact_id' => $this->_individualId,
+      'id' => $lineItem['contribution_id'],
       'financial_type_id' => 2,
-      'total_amount' => 55,
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
-    ]);
-    $form->buildForm();
-    $form->postProcess();
+    ],
+    CRM_Core_Action::UPDATE);
 
     // ensure that the LineItem data remain the same
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['entity_id' => $membership['id'], 'entity_table' => 'civicrm_membership']);
@@ -1505,6 +1491,7 @@ Expires: ',
   /**
    * Test that membership end_date is correct for multiple terms for pending contribution
    *
+   * @throws CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    * @throws \Exception
    */
@@ -1583,12 +1570,16 @@ Expires: ',
   /**
    * Test Membership Payment owned by other contact, membership view should show all contribution records in listing.
    * is other contact.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
    */
-  public function testMembershipViewContributionOwnerDifferent(): void {
+  public function testMembershipViewContributionOwnerDifferent() {
     // Membership Owner
     $contactId1 = $this->individualCreate();
 
-    // Contribution Owner
+    // Contribution Onwer
     $contactId2 = $this->individualCreate();
 
     // create new membership type
@@ -1605,7 +1596,7 @@ Expires: ',
       'financial_type_id' => 2,
     ]);
 
-    // Create Membership.
+    // create Membership
     $membershipId = $this->contactMembershipCreate([
       'contact_id' => $contactId1,
       'membership_type_id' => $membershipTypeAnnualFixed['id'],
@@ -1613,24 +1604,24 @@ Expires: ',
     ]);
 
     // 1st Payment
-    $contributionParams = [
+    $contriParams = [
       'membership_id' => $membershipId,
       'total_amount' => 25,
       'financial_type_id' => 2,
       'contact_id' => $contactId2,
       'receive_date' => '2020-08-08',
     ];
-    $contribution1 = CRM_Member_BAO_Membership::recordMembershipContribution($contributionParams);
+    $contribution1 = CRM_Member_BAO_Membership::recordMembershipContribution($contriParams);
 
     // 2nd Payment
-    $contributionParams = [
+    $contriParams = [
       'membership_id' => $membershipId,
       'total_amount' => 25,
       'financial_type_id' => 2,
       'contact_id' => $contactId2,
       'receive_date' => '2020-07-08',
     ];
-    $contribution2 = CRM_Member_BAO_Membership::recordMembershipContribution($contributionParams);
+    $contribution2 = CRM_Member_BAO_Membership::recordMembershipContribution($contriParams);
 
     // View Membership record
     $membershipViewForm = new CRM_Member_Form_MembershipView();
@@ -1640,7 +1631,7 @@ Expires: ',
     $membershipViewForm->controller->setEmbedded(TRUE);
     $membershipViewForm->preProcess();
 
-    // Get contribution rows related to membership payments.
+    // get contribution rows related to membership payments
     $templateVar = $membershipViewForm::getTemplate()->get_template_vars('rows');
 
     $this->assertEquals($templateVar[0]['contribution_id'], $contribution1->id);
@@ -1648,7 +1639,7 @@ Expires: ',
 
     $this->assertEquals($templateVar[1]['contribution_id'], $contribution2->id);
     $this->assertEquals($templateVar[1]['contact_id'], $contactId2);
-    $this->assertCount(2, $templateVar);
+    $this->assertEquals(count($templateVar), 2);
   }
 
 }

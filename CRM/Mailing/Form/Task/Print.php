@@ -27,7 +27,7 @@ class CRM_Mailing_Form_Task_Print extends CRM_Mailing_Form_Task {
     parent::preprocess();
 
     // set print view, so that print templates are called
-    $this->controller->setPrint(CRM_Core_Smarty::PRINT_PAGE);
+    $this->controller->setPrint(1);
 
     // get the formatted params
     $queryParams = $this->get('queryParams');

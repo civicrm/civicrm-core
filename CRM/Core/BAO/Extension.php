@@ -21,20 +21,24 @@
 class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
 
   /**
-   * Retrieve DB object and copy to defaults array.
+   * Fetch object based on array of properties.
    *
    * @param array $params
-   *   Array of criteria values.
+   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   Array to be populated with found values.
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return self|null
-   *   The DAO object, if found.
-   *
-   * @deprecated
+   * @return CRM_Core_BAO_LocationType|null
+   *   object on success, null otherwise
    */
-  public static function retrieve($params, &$defaults) {
-    return self::commonRetrieve(self::class, $params, $defaults);
+  public static function retrieve(&$params, &$defaults) {
+    $extension = new CRM_Core_DAO_Extension();
+    $extension->copyValues($params);
+    if ($extension->find(TRUE)) {
+      CRM_Core_DAO::storeValues($extension, $defaults);
+      return $extension;
+    }
+    return NULL;
   }
 
   /**

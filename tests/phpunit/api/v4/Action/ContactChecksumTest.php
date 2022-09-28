@@ -19,14 +19,12 @@
 
 namespace api\v4\Action;
 
-use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
-use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class ContactChecksumTest extends Api4TestBase implements TransactionalInterface {
+class ContactChecksumTest extends \api\v4\UnitTestCase {
 
   public function testGetChecksum() {
     $contact = Contact::create(FALSE)

@@ -17,11 +17,7 @@ namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
-/**
- * @service
- * @internal
- */
-class PaymentProcessorTypeCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
+class PaymentProcessorTypeCreationSpecProvider implements Generic\SpecProviderInterface {
 
   /**
    * This runs for both create and get actions

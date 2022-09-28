@@ -56,8 +56,8 @@ class CRM_Utils_HtmlToTextTest extends CiviUnitTestCase {
   public function testHtmlToText($html, $text) {
     $output = CRM_Utils_String::htmlToText($html);
     $this->assertEquals(
-      trim($text),
       trim($output),
+      trim($text),
       "Text Output did not match for $html"
     );
   }

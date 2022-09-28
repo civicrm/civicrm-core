@@ -92,11 +92,6 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    * Set up variables to build the form.
    */
   public function preProcess() {
-    $this->addOptionalQuickFormElement('parents');
-    $this->addExpectedSmartyVariables([
-      'parent_groups',
-      'editSmartGroupURL',
-    ]);
     $this->_id = $this->get('id');
     if ($this->_id) {
       $breadCrumb = array(
@@ -127,7 +122,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
         catch (CRM_Core_Exception $e) {
           // If the group is borked the query might fail but delete should be possible.
         }
-        $this->setTitle(ts('Confirm Group Delete'));
+        CRM_Utils_System::setTitle(ts('Confirm Group Delete'));
       }
       if ($this->_groupValues['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved groups')) {
         CRM_Core_Error::statusBounce(ts("You do not have sufficient permission to delete this reserved group."));
@@ -156,7 +151,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
 
         $this->assign_by_ref('group', $groupValues);
 
-        $this->setTitle(ts('Group Settings: %1', array(1 => $this->_title)));
+        CRM_Utils_System::setTitle(ts('Group Settings: %1', array(1 => $this->_title)));
       }
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url('civicrm/group', 'reset=1'));
@@ -193,7 +188,12 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       $defaults['is_active'] = 1;
     }
 
-    if (!$this->isPermitMailingGroupAccess()) {
+    if (!((CRM_Core_Permission::check('access CiviMail')) ||
+      (CRM_Mailing_Info::workflowEnabled() &&
+        CRM_Core_Permission::check('create mailings')
+      )
+    )
+    ) {
       $groupTypes = CRM_Core_OptionGroup::values('group_type', TRUE);
       if ($defaults['group_type'][$groupTypes['Mailing List']] == 1) {
         $this->assign('freezeMailingList', $groupTypes['Mailing List']);
@@ -365,10 +365,6 @@ WHERE  title = %1
         'Group'
       );
 
-      if (CRM_Core_Permission::check('administer Multiple Organizations') && CRM_Core_Permission::isMultisiteEnabled()) {
-        $params['organization_id'] = empty($params['organization_id']) ? 'null' : $params['organization_id'];
-      }
-
       $group = CRM_Contact_BAO_Group::create($params);
       // Set the entity id so it is available to postProcess hook consumers
       $this->setEntityId($group->id);
@@ -467,15 +463,6 @@ WHERE  title = %1
       $props = array('api' => array('params' => array('contact_type' => 'Organization')));
       $form->addEntityRef('organization_id', ts('Organization'), $props);
     }
-  }
-
-  /**
-   * Does the user have permissions allowing them to create groups with option_type set to mailing?
-   *
-   * @return bool
-   */
-  protected function isPermitMailingGroupAccess(): bool {
-    return CRM_Core_Permission::check('access CiviMail') || (CRM_Mailing_Info::workflowEnabled() && CRM_Core_Permission::check('create mailings'));
   }
 
 }

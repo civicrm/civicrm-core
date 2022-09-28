@@ -52,7 +52,6 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     CRM_Core_Session::singleton()->reset();
     CRM_Core_Smarty::singleton()->clearTemplateVars();
     $this->callAPISuccess('Contact', 'delete', ['id' => $this->contactID]);
-    parent::tearDown();
   }
 
   /**
@@ -74,7 +73,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
   /**
    * Test the content of the dashboard.
    */
-  public function testDashboardContentContributionsWithInvoicingEnabled(): void {
+  public function testDashboardContentContributionsWithInvoicingEnabled() {
     $this->contributions[] = $this->contributionCreate([
       'contact_id' => $this->contactID,
       'receive_date' => '2018-11-21',
@@ -115,7 +114,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     $expectedStrings = [
       'Your Contribution(s)',
       '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Received date</th><th>Receipt Sent</th><th>Balance</th><th>Status</th><th></th>',
-      '<td>Completed</td><td><a class="button no-popup nowrap"href="/index.php?q=civicrm/contribute/invoice&amp;reset=1&amp;id=1&amp;cid=' . $this->contactID . '"><i class="crm-i fa-download" aria-hidden="true"></i><span>Download Invoice</span></a></td></tr><tr id=\'rowid2\'',
+      '<td>Completed</td><td><a class="button no-popup nowrap"href="/index.php?q=civicrm/contribute/invoice&amp;reset=1&amp;id=1&amp;cid=' . $this->contactID . '"><i class="crm-i fa-print" aria-hidden="true"></i><span>Print Invoice</span></a></td></tr><tr id=\'rowid2\'',
       'Pay Now',
     ];
 
@@ -138,8 +137,9 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
    * Test the content of the dashboard.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testDashboardContentContributions(): void {
+  public function testDashboardContentContributions() {
     $this->contributionCreate(['contact_id' => $this->contactID]);
     $this->contributions[] = civicrm_api3('Contribution', 'get', [
       'contact_id' => $this->contactID,
@@ -150,7 +150,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     $expectedStrings = [
       'Your Contribution(s)',
       '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Received date</th><th>Receipt Sent</th><th>Balance</th><th>Status</th>',
-      '<td>$100.00 </td><td>Donation</td>',
+      '<td>$ 100.00 </td><td>Donation</td>',
       '<td>Completed</td>',
     ];
     $this->assertPageContains($expectedStrings);
@@ -160,17 +160,18 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
    * Test the presence of a "Pay Now" button on partial payments
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testDashboardPartialPayments(): void {
+  public function testDashboardPartialPayments() {
     $contributionId = $this->contributionCreate([
       'contact_id' => $this->contactID,
       'contribution_status_id' => 'Pending',
       'total_amount' => 25,
     ]);
-    $this->callAPISuccess('Payment', 'create', [
+    $result = civicrm_api3('Payment', 'create', [
       'contribution_id' => $contributionId,
       'total_amount' => 11,
-      'trxn_date' => '2021-05-11',
+      'trxn_date' => "2021-05-11",
     ]);
     $this->contributions[] = civicrm_api3('Contribution', 'get', [
       'contact_id' => $this->contactID,
@@ -181,8 +182,8 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     $expectedStrings = [
       'Your Contribution(s)',
       '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Received date</th><th>Receipt Sent</th><th>Balance</th><th>Status</th>',
-      '<td>$25.00 </td><td>Donation</td>',
-      '<td>$14.00</td><td>Partially paid</td>',
+      '<td>$ 25.00 </td><td>Donation</td>',
+      '<td>$ 14.00</td><td>Partially paid</td>',
       'Pay Now',
     ];
     $this->assertPageContains($expectedStrings);
@@ -191,12 +192,10 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
   /**
    * Run the user dashboard.
    */
-  protected function runUserDashboard(): void {
+  protected function runUserDashboard() {
     $_REQUEST = ['reset' => 1, 'id' => $this->contactID];
     $dashboard = new CRM_Contact_Page_View_UserDashBoard();
     $dashboard->_contactId = $this->contactID;
-    $dashboard->assign('formTpl', NULL);
-    $dashboard->assign('action', CRM_Core_Action::VIEW);
     $dashboard->run();
     $_REQUEST = [];
   }
@@ -204,7 +203,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
   /**
    * Tests the event dashboard as a minimally permissioned user.
    */
-  public function testEventDashboard(): void {
+  public function testEventDashboard() {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [
       'register for events',
       'access Contact Dashboard',

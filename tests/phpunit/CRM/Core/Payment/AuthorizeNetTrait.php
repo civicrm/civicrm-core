@@ -51,7 +51,7 @@ trait CRM_Core_Payment_AuthorizeNetTrait {
    *
    * @param int|null $id
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function setupMockHandler($id = NULL) {
     if ($id) {
@@ -75,7 +75,7 @@ trait CRM_Core_Payment_AuthorizeNetTrait {
   /**
    * Create an AuthorizeNet processors with a configured mock handler.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function createAuthorizeNetProcessor() {
     $processorID = $this->paymentProcessorAuthorizeNetCreate(['is_test' => FALSE]);

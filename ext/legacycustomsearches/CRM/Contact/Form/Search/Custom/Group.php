@@ -228,7 +228,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
       // we do this since this if stmt is called by the smart group part of the code
       // adding a groupBy clause and saving it as a smart group messes up the query and
       // bad things happen
-      // andie hunt seemed to have rewritten this piece when they worked on this search
+      // andrew hunt seemed to have rewritten this piece when he worked on this search
       $groupBy = NULL;
     }
 
@@ -650,6 +650,20 @@ WHERE  gcc.group_id = {$ssGroup->id}
    */
   public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
+  }
+
+  /**
+   * Set title on search.
+   *
+   * @param string $title
+   */
+  public function setTitle($title) {
+    if ($title) {
+      CRM_Utils_System::setTitle($title);
+    }
+    else {
+      CRM_Utils_System::setTitle(ts('Search'));
+    }
   }
 
   /**

@@ -5,13 +5,14 @@
 
   angular.module('crmResource').factory('crmResource', function($q, $http) {
     var deferreds = {}; // null|object; deferreds[url][idx] = Deferred;
+    var templates = null; // null|object; templates[url] = HTML;
 
     var notify = function notify() {
       var oldDfrds = deferreds;
       deferreds = null;
 
       angular.forEach(oldDfrds, function(dfrs, url) {
-        if (CRM.angular.templates[url]) {
+        if (templates[url]) {
           angular.forEach(dfrs, function(dfr) {
             dfr.resolve({
               status: 200,
@@ -19,7 +20,7 @@
                 var headers = {'Content-type': 'text/html'};
                 return name ? headers[name] : headers;
               },
-              data: CRM.angular.templates[url]
+              data: templates[url]
             });
           });
         }
@@ -34,10 +35,10 @@
     var moduleUrl = CRM.angular.bundleUrl;
     $http.get(moduleUrl)
       .then(function httpSuccess(response) {
-        CRM.angular.templates = CRM.angular.templates || {};
-        angular.forEach(response.data, function (module) {
+        templates = [];
+        angular.forEach(response.data, function(module) {
           if (module.partials) {
-            angular.extend(CRM.angular.templates, module.partials);
+            angular.extend(templates, module.partials);
           }
           if (module.strings) {
             CRM.addStrings(module.domain, module.strings);
@@ -45,14 +46,15 @@
         });
         notify();
       }, function httpError() {
+        templates = [];
         notify();
       });
 
     return {
       // @return string|Promise<string>
       getUrl: function getUrl(url) {
-        if (CRM.angular.templates && CRM.angular.templates[url]) {
-          return CRM.angular.templates[url];
+        if (templates !== null) {
+          return templates[url];
         }
         else {
           var deferred = $q.defer();

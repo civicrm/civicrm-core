@@ -29,6 +29,7 @@ class api_v3_ACLCachingTest extends CiviUnitTestCase {
    * (non-PHPdoc)
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @see CiviUnitTestCase::tearDown()
    */
   public function tearDown(): void {
@@ -48,7 +49,7 @@ class api_v3_ACLCachingTest extends CiviUnitTestCase {
     $values = $this->callAPISuccess('custom_field', 'getoptions', ['field' => 'custom_group_id']);
     $this->assertTrue($values['count'] == 0);
     $this->CustomGroupCreate(['extends' => 'Activity']);
-    $groupCount = $this->callAPISuccess('custom_group', 'getcount', ['extends' => 'Activity']);
+    $groupCount = $this->callAPISuccess('custom_group', 'getcount', ['extends' => 'activity']);
     $this->assertEquals($groupCount, 1, 'one group should now exist');
     $values = $this->callAPISuccess('custom_field', 'getoptions', ['field' => 'custom_group_id']);
     $this->assertEquals(1, $values['count'], 'check that cached value is not retained for custom_group_id');

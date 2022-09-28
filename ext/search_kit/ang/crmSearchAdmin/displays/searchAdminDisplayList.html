@@ -12,10 +12,22 @@
         {{ symbol.label }}
       </option>
     </select>
-    <div class="form-group" ng-include="'~/crmSearchAdmin/displays/common/searchButtonConfig.html'"></div>
   </div>
-  <search-admin-pager-config display="$ctrl.display"></search-admin-pager-config>
-  <search-admin-placeholder-config display="$ctrl.display"></search-admin-placeholder-config>
+  <div class="form-inline">
+    <div class="checkbox-inline form-control">
+      <label>
+        <input type="checkbox" ng-checked="$ctrl.display.settings.limit" ng-click="$ctrl.parent.toggleLimit()">
+        <span>{{:: ts('Limit Results') }}</span>
+      </label>
+      <input id="crm-search-admin-display-limit" ng-if="$ctrl.display.settings.limit" type="number" min="1" step="1" class="form-control" ng-model="$ctrl.display.settings.limit">
+    </div>
+    <div class="checkbox-inline form-control">
+      <label ng-class="{disabled: !$ctrl.display.settings.limit}">
+        <input type="checkbox" ng-model="$ctrl.display.settings.pager" ng-disabled="!$ctrl.display.settings.limit">
+        <span>{{:: ts('Use Pager') }}</span>
+      </label>
+    </div>
+  </div>
 </fieldset>
 <fieldset class="crm-search-admin-edit-columns-wrapper">
   <legend>
@@ -25,7 +37,7 @@
   <div class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
       <legend><i class="crm-i fa-arrows crm-search-move-icon"></i> {{ $ctrl.parent.getColLabel(col) }}</legend>
-      <div class="form-inline" title="{{:: ts('Should this item display on its own line or inline with other items?') }}">
+      <div class="form-inline" title="{{ ts('Should this item display on its own line or inline with other items?') }}">
         <label><input type="checkbox" ng-model="col.break"> {{:: ts('New Line') }}</label>
         <button type="button" class="btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">
           <i class="crm-i fa-ban"></i>

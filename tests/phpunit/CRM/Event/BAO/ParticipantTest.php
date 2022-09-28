@@ -102,7 +102,6 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'cart_id' => NULL,
       'must_wait' => NULL,
       'transferred_to_contact_id' => NULL,
-      'created_id' => $this->_contactId,
     ];
 
     foreach ($compareValues as $key => $value) {
@@ -455,15 +454,6 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'isBackOffice' => FALSE,
       'successExpected' => TRUE,
     ];
-    // Allow to cancel if on waitlist
-    $scenarios[] = [
-      'selfSvcEnabled' => 1,
-      'selfSvcHours' => 12,
-      'hoursToEvent' => 16,
-      'participantStatusId' => 7,
-      'isBackOffice' => FALSE,
-      'successExpected' => TRUE,
-    ];
     // Too late to self-service
     $scenarios[] = [
       'selfSvcEnabled' => 1,
@@ -473,7 +463,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'isBackOffice' => FALSE,
       'successExpected' => FALSE,
     ];
-    // Participant status cannot cancel (ex: Attended)
+    // Participant status is other than "Registered".
     $scenarios[] = [
       'selfSvcEnabled' => 1,
       'selfSvcHours' => 12,

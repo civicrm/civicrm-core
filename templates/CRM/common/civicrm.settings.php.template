@@ -41,6 +41,9 @@ global $civicrm_root, $civicrm_setting, $civicrm_paths;
  * Settings for Drupal 7.x:
  *      define( 'CIVICRM_UF'        , 'Drupal');
  *
+ * Settings for Drupal 6.x:
+ *      define( 'CIVICRM_UF'        , 'Drupal6');
+ *
  * Settings for Joomla 1.7.x - 2.5.x:
  *      define( 'CIVICRM_UF'        , 'Joomla');
  *
@@ -173,6 +176,8 @@ if (!defined('CIVICRM_LOGGING_DSN')) {
  *
  */
 
+global $civicrm_root;
+
 $civicrm_root = '%%crmRoot%%';
 if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
   define( 'CIVICRM_TEMPLATE_COMPILEDIR', '%%templateCompileDir%%');
@@ -190,19 +195,7 @@ if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
  *
  */
 //if (!defined('CIVICRM_TEMPLATE_COMPILE_CHECK')) {
-//  define('CIVICRM_TEMPLATE_COMPILE_CHECK', FALSE);
-//}
-
-/**
- * Smarty escape on output.
- *
- * This tells smarty to pass all variables through the escape function
- * unless they are piped to smarty:nodefaults (eg. {$myScript|smarty:nodefaults}
- * At this stage it should only be enabled on development sites.
- * @see https://github.com/civicrm/civicrm-core/pull/21935
- */
-//if (!defined('CIVICRM_SMARTY_DEFAULT_ESCAPE')) {
-//  define('CIVICRM_SMARTY_DEFAULT_ESCAPE', TRUE);
+//  define( 'CIVICRM_TEMPLATE_COMPILE_CHECK', FALSE);
 //}
 
 /**
@@ -597,9 +590,7 @@ if (!defined('CIVICRM_CLEANURL')) {
 }
 
 // force PHP to auto-detect Mac line endings
-if (version_compare(PHP_VERSION, '8.1') < 0) {
-  ini_set('auto_detect_line_endings', '1');
-}
+ini_set('auto_detect_line_endings', '1');
 
 // make sure the memory_limit is at least 64 MB
 $memLimitString = trim(ini_get('memory_limit'));

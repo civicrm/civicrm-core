@@ -18,7 +18,7 @@
 class CRM_Core_I18n_NativeGettext {
 
   /**
-   * @param string $string
+   * @param $string
    *
    * @return string
    */
@@ -29,8 +29,8 @@ class CRM_Core_I18n_NativeGettext {
   /**
    * Based on php-gettext, since native gettext does not support this as is.
    *
-   * @param string $context
-   * @param string $text
+   * @param $context
+   * @param $text
    *
    * @return string
    */
@@ -47,9 +47,9 @@ class CRM_Core_I18n_NativeGettext {
   }
 
   /**
-   * @param string $text
-   * @param string $plural
-   * @param int $count
+   * @param $text
+   * @param $plural
+   * @param $count
    *
    * @return string
    */

@@ -20,39 +20,10 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   const CACHE_KEY_STRLEN = 8;
 
   /**
-   * Override parent method to flush caches after a write op.
-   *
-   * Note: this only applies to APIv4 because v3 uses the singular writeRecord.
-   *
-   * @param array[] $records
-   * @return CRM_Core_DAO_Navigation[]
-   * @throws CRM_Core_Exception
+   * Class constructor.
    */
-  public static function writeRecords($records): array {
-    $results = [];
-    foreach ($records as $record) {
-      $results[] = self::writeRecord($record);
-    }
-    self::resetNavigation();
-    return $results;
-  }
-
-  /**
-   * Override parent method to flush caches after delete.
-   *
-   * Note: this only applies to APIv4 because v3 uses the singular writeRecord.
-   *
-   * @param array[] $records
-   * @return CRM_Core_DAO_Navigation[]
-   * @throws CRM_Core_Exception
-   */
-  public static function deleteRecords(array $records) {
-    $results = [];
-    foreach ($records as $record) {
-      $results[] = self::deleteRecord($record);
-    }
-    self::resetNavigation();
-    return $results;
+  public function __construct() {
+    parent::__construct();
   }
 
   /**
@@ -71,11 +42,12 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * Deprecated in favor of APIv4
+   * Add/update navigation record.
    *
-   * @deprecated
    * @param array $params Submitted values
+   *
    * @return CRM_Core_DAO_Navigation
+   *   navigation object
    */
   public static function add(&$params) {
     $navigation = new CRM_Core_DAO_Navigation();
@@ -111,21 +83,27 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
+   * Fetch object based on array of properties.
    *
    * @param array $params
-   *   Array of criteria values.
+   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   Array to be populated with found values.
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return self|null
-   *   The DAO object, if found.
-   *
-   * @deprecated
+   * @return CRM_Core_BAO_Navigation|null
+   *   object on success, NULL otherwise
    */
-  public static function retrieve($params, &$defaults) {
-    $params['domain_id'] = CRM_Core_Config::domainID();
-    return self::commonRetrieve(self::class, $params, $defaults);
+  public static function retrieve(&$params, &$defaults) {
+    $navigation = new CRM_Core_DAO_Navigation();
+    $navigation->copyValues($params);
+
+    $navigation->domain_id = CRM_Core_Config::domainID();
+
+    if ($navigation->find(TRUE)) {
+      CRM_Core_DAO::storeValues($navigation, $defaults);
+      return $navigation;
+    }
+    return NULL;
   }
 
   /**
@@ -398,7 +376,9 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
         $componentName = CRM_Core_Permission::getComponentName($key);
 
         if ($componentName) {
-          if (!CRM_Core_Component::isEnabled($componentName) || !CRM_Core_Permission::check($key)) {
+          if (!in_array($componentName, CRM_Core_Config::singleton()->enableComponents) ||
+            !CRM_Core_Permission::check($key)
+          ) {
             $showItem = FALSE;
             if ($operator == 'AND') {
               return FALSE;
@@ -722,7 +702,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
    * care about output params appended.
    *
    * @param string $url
-   * @param string $url_params
+   * @param array $url_params
    *
    * @param int|null $parent_id
    *   Optionally restrict to one parent.
@@ -860,7 +840,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
     $key = Civi::service('settings_manager')
       ->getBagByContact(NULL, $cid)
       ->get('navigation');
-    if (strlen($key ?? '') !== self::CACHE_KEY_STRLEN) {
+    if (strlen($key) !== self::CACHE_KEY_STRLEN) {
       $key = self::resetNavigation($cid);
     }
     return $key;

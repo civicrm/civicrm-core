@@ -33,7 +33,7 @@
               {literal}
               <script type="text/javascript">
                 (function($) {
-                  var ZeroRecordText = {/literal}"{ts escape='js' 1=$customGroupTitle|smarty:nodefaults}No records of type '%1' found.{/ts}"{literal};
+                  var ZeroRecordText = {/literal}'{ts 1=$customGroupTitle|escape}No records of type \'%1\' found.{/ts}'{literal};
                   var $table = $('#records-' + {/literal}'{$customGroupId}'{literal});
                   $('table.crm-multifield-selector').data({
                     "ajax": {
@@ -75,7 +75,7 @@
               {foreach from=$records key=recId item=rows}
                 <tr class="{cycle values="odd-row,even-row"}">
                   {foreach from=$headers key=hrecId item=head}
-                    <td {if !empty($dateFieldsVals.$hrecId)}data-order="{$dateFieldsVals.$hrecId.$recId|crmDate:'%Y-%m-%d'}"{/if} {crmAttributes a=$attributes.$hrecId.$recId}>{$rows.$hrecId}</td>
+                    <td {crmAttributes a=$attributes.$hrecId.$recId}>{$rows.$hrecId}</td>
                   {/foreach}
                   <td>{$rows.action}</td>
                   {foreach from=$dateFieldsVals key=fid item=rec}

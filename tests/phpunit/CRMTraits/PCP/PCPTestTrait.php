@@ -52,7 +52,7 @@ trait CRMTraits_PCP_PCPTestTrait {
    * Create the necessary initial objects for a pcp page, then return the
    * params needed to create the pcp page.
    *
-   * @throw CRM_Core_Exception
+   * @throw API_Exception
    */
   public function pcpParams() {
     $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');

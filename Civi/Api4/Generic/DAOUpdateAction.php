@@ -24,6 +24,7 @@ class DAOUpdateAction extends AbstractUpdateAction {
   /**
    * @param array $items
    * @return array
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function updateRecords(array $items): array {

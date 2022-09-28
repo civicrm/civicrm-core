@@ -88,7 +88,7 @@ class ReflectionUtils {
         elseif ($key == 'return') {
           $info['return'] = explode('|', $words[0]);
         }
-        elseif ($key == 'options') {
+        elseif ($key == 'options' || $key == 'ui_join_filters') {
           $val = str_replace(', ', ',', implode(' ', $words));
           $info[$key] = explode(',', $val);
         }
@@ -155,65 +155,6 @@ class ReflectionUtils {
       $traits = array_merge(class_uses($trait), $traits);
     }
     return $traits;
-  }
-
-  /**
-   * Get a list of standard properties which can be written+read by outside callers.
-   *
-   * @param string $class
-   */
-  public static function findStandardProperties($class): iterable {
-    try {
-      /** @var \ReflectionClass $clazz */
-      $clazz = new \ReflectionClass($class);
-
-      yield from [];
-      foreach ($clazz->getProperties(\ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PUBLIC) as $property) {
-        if (!$property->isStatic() && $property->getName()[0] !== '_') {
-          yield $property;
-        }
-      }
-    }
-    catch (\ReflectionException $e) {
-      throw new \RuntimeException(sprintf("Cannot inspect class %s.", $class));
-    }
-  }
-
-  /**
-   * Check if a class method is deprecated
-   *
-   * @param string $className
-   * @param string $methodName
-   * @return bool
-   * @throws \ReflectionException
-   */
-  public static function isMethodDeprecated(string $className, string $methodName): bool {
-    $reflection = new \ReflectionClass($className);
-    $docBlock = $reflection->getMethod($methodName)->getDocComment();
-    return strpos($docBlock, "@deprecated") !== FALSE;
-  }
-
-  /**
-   * Find any methods in this class which match the given prefix.
-   *
-   * @param string $class
-   * @param string $prefix
-   */
-  public static function findMethodHelpers($class, string $prefix): iterable {
-    try {
-      /** @var \ReflectionClass $clazz */
-      $clazz = new \ReflectionClass($class);
-
-      yield from [];
-      foreach ($clazz->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $m) {
-        if (\CRM_Utils_String::startsWith($m->getName(), $prefix)) {
-          yield $m;
-        }
-      }
-    }
-    catch (\ReflectionException $e) {
-      throw new \RuntimeException(sprintf("Cannot inspect class %s.", $class));
-    }
   }
 
 }

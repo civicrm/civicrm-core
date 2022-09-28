@@ -25,20 +25,14 @@ class Validator {
   const EVENT_CHECK_SENDABLE = 'civi.flexmailer.checkSendable';
 
   /**
-   * @param array $params
+   * @param \CRM_Mailing_DAO_Mailing $mailing
    *   The mailing which may or may not be sendable.
    * @return array
    *   List of error messages.
    */
-  public static function createAndRun(array $params): array {
-    $mailing = new \CRM_Mailing_BAO_Mailing();
-    $mailing->id = $params['id'] ?? NULL;
-    if ($mailing->id) {
-      $mailing->find(TRUE);
-    }
-    $mailing->copyValues($params);
-
-    return (new Validator())->run(array(
+  public static function createAndRun($mailing) {
+    $validator = new \Civi\FlexMailer\Validator();
+    return $validator->run(array(
       'mailing' => $mailing,
       'attachments' => \CRM_Core_BAO_File::getEntityFile('civicrm_mailing', $mailing->id),
     ));

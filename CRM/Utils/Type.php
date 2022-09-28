@@ -334,10 +334,11 @@ class CRM_Utils_Type {
 
       default:
         throw new CRM_Core_Exception(
-          $type . " is not a recognized (camel cased) data type."
+          $type . " is not a recognised (camel cased) data type."
         );
     }
 
+    // @todo Use exceptions instead of CRM_Core_Error::fatal().
     if ($abort) {
       $data = htmlentities($data);
 
@@ -421,8 +422,8 @@ class CRM_Utils_Type {
       case 'Date':
       case 'Timestamp':
         // a null timestamp is valid
-        if (strlen(trim($data ?? '')) == 0) {
-          return trim($data ?? '');
+        if (strlen(trim($data)) == 0) {
+          return trim($data);
         }
 
         if ((preg_match('/^\d{14}$/', $data) ||
@@ -606,7 +607,7 @@ class CRM_Utils_Type {
   }
 
   /**
-   * Get list of available Data Types for Option Groups
+   * Get list of avaliable Data Types for Option Groups
    *
    * @return array
    */

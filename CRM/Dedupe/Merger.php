@@ -24,7 +24,7 @@ class CRM_Dedupe_Merger {
    * be loaded dynamically on the merge form instead
    *
    * @return array
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function relTables() {
 
@@ -102,7 +102,7 @@ class CRM_Dedupe_Merger {
         'rel_table_custom_groups' => [
           'title' => ts('Custom Groups'),
           'tables' => ['civicrm_custom_group'],
-          'url' => CRM_Utils_System::url('civicrm/admin/custom/group'),
+          'url' => CRM_Utils_System::url('civicrm/admin/custom/group', 'reset=1'),
         ],
         'rel_table_uf_groups' => [
           'title' => ts('Profiles'),
@@ -178,7 +178,7 @@ class CRM_Dedupe_Merger {
    * @param int $cid
    *
    * @return array
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getActiveRelTables($cid) {
     $cid = (int) $cid;
@@ -283,7 +283,7 @@ class CRM_Dedupe_Merger {
    *   'relTables' or 'cidRefs'.
    *
    * @return array
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @see CRM-13836
    */
   public static function getMultiValueCustomSets($request) {
@@ -459,7 +459,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param int $otherID
    * @param array $tables
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function removeContactBelongings($otherID, $tables) {
     // CRM-20421: Removing Inherited memberships when memberships of parent are not migrated to new contact.
@@ -490,7 +490,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param array $tables
    * @param array $tableOperations
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
+   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function moveContactBelongings($mergeHandler, $tables, $tableOperations) {
@@ -606,7 +607,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     foreach ($sqls as $sql) {
       CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE);
     }
-    CRM_Dedupe_Merger::addMembershipToRelatedContacts($mainId);
+    CRM_Dedupe_Merger::addMembershipToRealtedContacts($mainId);
   }
 
   /**
@@ -624,7 +625,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @param array $cidRefs
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected static function filterRowBasedCustomDataFromCustomTables(array &$cidRefs) {
@@ -679,349 +680,15 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param array $params
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected static function updateContact(int $contactID, $params): void {
+  protected static function createContact($contactID, $params) {
     // This parameter causes blank fields to be be emptied out.
     // We can probably remove.
     $params['updateBlankLocInfo'] = TRUE;
-    $data = self::formatProfileContactParams($params, $contactID);
+    [$data] = CRM_Contact_BAO_Contact::formatProfileContactParams($params, [], $contactID);
     CRM_Contact_BAO_Contact::create($data);
-  }
-
-  /**
-   * Format profile contact parameters.
-   *
-   * Note this function has been duplicated from CRM_Contact_BAO_Contact
-   * in order to allow us to unravel all the work this class
-   * does to prepare to call this & create some sanity. Also start to
-   * eliminate a toxic function.
-   *
-   * @param array $params
-   * @param int $contactID
-   *
-   * @return array
-   */
-  private static function formatProfileContactParams(
-    $params,
-    int $contactID
-  ) {
-
-    $data = $contactDetails = [];
-
-    // get the contact details (hier)
-    $details = CRM_Contact_BAO_Contact::getHierContactDetails($contactID, []);
-
-    $contactDetails = $details[$contactID];
-    $data['contact_type'] = $contactDetails['contact_type'] ?? NULL;
-    $data['contact_sub_type'] = $contactDetails['contact_sub_type'] ?? NULL;
-
-    //fix contact sub type CRM-5125
-    if (array_key_exists('contact_sub_type', $params) &&
-      !empty($params['contact_sub_type'])
-    ) {
-      $data['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type']);
-    }
-    elseif (array_key_exists('contact_sub_type_hidden', $params) &&
-      !empty($params['contact_sub_type_hidden'])
-    ) {
-      // if profile was used, and had any subtype, we obtain it from there
-      //CRM-13596 - add to existing contact types, rather than overwriting
-      if (empty($data['contact_sub_type'])) {
-        // If we don't have a contact ID the $data['contact_sub_type'] will not be defined...
-        $data['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type_hidden']);
-      }
-      else {
-        $data_contact_sub_type_arr = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
-        if (!in_array($params['contact_sub_type_hidden'], $data_contact_sub_type_arr)) {
-          //CRM-20517 - make sure contact_sub_type gets the correct delimiters
-          $data['contact_sub_type'] = trim($data['contact_sub_type'], CRM_Core_DAO::VALUE_SEPARATOR);
-          $data['contact_sub_type'] = CRM_Core_DAO::VALUE_SEPARATOR . $data['contact_sub_type'] . CRM_Utils_Array::implodePadded($params['contact_sub_type_hidden']);
-        }
-      }
-    }
-
-    $locationType = [];
-    $count = 1;
-
-    //add contact id
-    $data['contact_id'] = $contactID;
-    $primaryLocationType = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID);
-
-    $billingLocationTypeId = CRM_Core_BAO_LocationType::getBilling();
-
-    $blocks = ['email', 'phone', 'im', 'openid'];
-
-    $multiplFields = ['url'];
-    // prevent overwritten of formatted array, reset all block from
-    // params if it is not in valid format (since import pass valid format)
-    foreach ($blocks as $blk) {
-      if (array_key_exists($blk, $params) &&
-        !is_array($params[$blk])
-      ) {
-        unset($params[$blk]);
-      }
-    }
-
-    $primaryPhoneLoc = NULL;
-    $session = CRM_Core_Session::singleton();
-    foreach ($params as $key => $value) {
-      [$fieldName, $locTypeId, $typeId] = CRM_Utils_System::explode('-', $key, 3);
-
-      if ($locTypeId == 'Primary') {
-        if (in_array($fieldName, $blocks)) {
-          $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, $fieldName);
-        }
-        else {
-          $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, 'address');
-        }
-        $primaryLocationType = $locTypeId;
-      }
-
-      if (is_numeric($locTypeId) &&
-        !in_array($fieldName, $multiplFields) &&
-        substr($fieldName, 0, 7) != 'custom_'
-      ) {
-        $index = $locTypeId;
-
-        if (is_numeric($typeId)) {
-          $index .= '-' . $typeId;
-        }
-        if (!in_array($index, $locationType)) {
-          $locationType[$count] = $index;
-          $count++;
-        }
-
-        $loc = CRM_Utils_Array::key($index, $locationType);
-
-        $blockName = self::getLocationEntityForKey($fieldName);
-
-        $data[$blockName][$loc]['location_type_id'] = $locTypeId;
-
-        //set is_billing true, for location type "Billing"
-        if ($locTypeId == $billingLocationTypeId) {
-          $data[$blockName][$loc]['is_billing'] = 1;
-        }
-
-        if ($contactID) {
-          //get the primary location type
-          if ($locTypeId == $primaryLocationType) {
-            $data[$blockName][$loc]['is_primary'] = 1;
-          }
-        }
-        elseif ($locTypeId == $defaultLocationId) {
-          $data[$blockName][$loc]['is_primary'] = 1;
-        }
-
-        if (in_array($fieldName, ['phone'])) {
-          if ($typeId) {
-            $data['phone'][$loc]['phone_type_id'] = $typeId;
-          }
-          else {
-            $data['phone'][$loc]['phone_type_id'] = '';
-          }
-          $data['phone'][$loc]['phone'] = $value;
-
-          //special case to handle primary phone with different phone types
-          // in this case we make first phone type as primary
-          if (isset($data['phone'][$loc]['is_primary']) && !$primaryPhoneLoc) {
-            $primaryPhoneLoc = $loc;
-          }
-
-          if ($loc != $primaryPhoneLoc) {
-            unset($data['phone'][$loc]['is_primary']);
-          }
-        }
-        elseif ($fieldName == 'email') {
-          $data['email'][$loc]['email'] = $value;
-          if (empty($contactID)) {
-            $data['email'][$loc]['is_primary'] = 1;
-          }
-        }
-        elseif ($fieldName == 'im') {
-          if (isset($params[$key . '-provider_id'])) {
-            $data['im'][$loc]['provider_id'] = $params[$key . '-provider_id'];
-          }
-          if (strpos($key, '-provider_id') !== FALSE) {
-            $data['im'][$loc]['provider_id'] = $params[$key];
-          }
-          else {
-            $data['im'][$loc]['name'] = $value;
-          }
-        }
-        elseif ($fieldName == 'openid') {
-          $data['openid'][$loc]['openid'] = $value;
-        }
-        else {
-          if ($fieldName === 'state_province') {
-            // CRM-3393
-            if (is_numeric($value) && ((int ) $value) >= 1000) {
-              $data['address'][$loc]['state_province_id'] = $value;
-            }
-            elseif (empty($value)) {
-              $data['address'][$loc]['state_province_id'] = '';
-            }
-            else {
-              $data['address'][$loc]['state_province'] = $value;
-            }
-          }
-          elseif ($fieldName === 'country') {
-            // CRM-3393
-            if (is_numeric($value) && ((int ) $value) >= 1000
-            ) {
-              $data['address'][$loc]['country_id'] = $value;
-            }
-            elseif (empty($value)) {
-              $data['address'][$loc]['country_id'] = '';
-            }
-            else {
-              $data['address'][$loc]['country'] = $value;
-            }
-          }
-          elseif ($fieldName === 'county') {
-            $data['address'][$loc]['county_id'] = $value;
-          }
-          elseif ($fieldName == 'address_name') {
-            $data['address'][$loc]['name'] = $value;
-          }
-          elseif (substr($fieldName, 0, 14) === 'address_custom') {
-            $data['address'][$loc][substr($fieldName, 8)] = $value;
-          }
-          else {
-            $data[$blockName][$loc][$fieldName] = $value;
-          }
-        }
-      }
-      else {
-        if (substr($key, 0, 4) === 'url-') {
-          $websiteField = explode('-', $key);
-          $data['website'][$websiteField[1]]['website_type_id'] = $websiteField[1];
-          $data['website'][$websiteField[1]]['url'] = $value;
-        }
-        elseif (in_array($key, CRM_Contact_BAO_Contact::$_greetingTypes, TRUE)) {
-          //save email/postal greeting and addressee values if any, CRM-4575
-          $data[$key . '_id'] = $value;
-        }
-        elseif (($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
-          // for autocomplete transfer hidden value instead of label
-          if ($params[$key] && isset($params[$key . '_id'])) {
-            $value = $params[$key . '_id'];
-          }
-
-          // we need to append time with date
-          if ($params[$key] && isset($params[$key . '_time'])) {
-            $value .= ' ' . $params[$key . '_time'];
-          }
-
-          // if auth source is not checksum / login && $value is blank, do not proceed - CRM-10128
-          if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 &&
-            ($value == '' || !isset($value))
-          ) {
-            continue;
-          }
-
-          $valueId = NULL;
-          if (!empty($params['customRecordValues'])) {
-            if (is_array($params['customRecordValues']) && !empty($params['customRecordValues'])) {
-              foreach ($params['customRecordValues'] as $recId => $customFields) {
-                if (is_array($customFields) && !empty($customFields)) {
-                  foreach ($customFields as $customFieldName) {
-                    if ($customFieldName == $key) {
-                      $valueId = $recId;
-                      break;
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-          //CRM-13596 - check for contact_sub_type_hidden first
-          if (array_key_exists('contact_sub_type_hidden', $params)) {
-            $type = $params['contact_sub_type_hidden'];
-          }
-          else {
-            $type = $data['contact_type'];
-            if (!empty($data['contact_sub_type'])) {
-              $type = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
-            }
-          }
-
-          CRM_Core_BAO_CustomField::formatCustomField($customFieldId,
-            $data['custom'],
-            $value,
-            $type,
-            $valueId,
-            $contactID,
-            FALSE,
-            FALSE
-          );
-        }
-        elseif ($key === 'edit') {
-          continue;
-        }
-        else {
-          if ($key === 'location') {
-            foreach ($value as $locationTypeId => $field) {
-              foreach ($field as $block => $val) {
-                if ($block === 'address' && array_key_exists('address_name', $val)) {
-                  $value[$locationTypeId][$block]['name'] = $value[$locationTypeId][$block]['address_name'];
-                }
-              }
-            }
-          }
-          if ($key === 'phone' && isset($params['phone_ext'])) {
-            $data[$key] = $value;
-            foreach ($value as $cnt => $phoneBlock) {
-              if ($params[$key][$cnt]['location_type_id'] == $params['phone_ext'][$cnt]['location_type_id']) {
-                $data[$key][$cnt]['phone_ext'] = CRM_Utils_Array::retrieveValueRecursive($params['phone_ext'][$cnt], 'phone_ext');
-              }
-            }
-          }
-          elseif (in_array($key, ['nick_name', 'job_title', 'middle_name', 'birth_date', 'gender_id', 'current_employer', 'prefix_id', 'suffix_id'])
-            && ($value == '' || !isset($value)) &&
-            ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 ||
-            ($key === 'current_employer' && empty($params['current_employer']))) {
-            // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value
-            // to avoid update with empty values
-            continue;
-          }
-          else {
-            $data[$key] = $value;
-          }
-        }
-      }
-    }
-
-    if (!isset($data['contact_type'])) {
-      $data['contact_type'] = 'Individual';
-    }
-
-    return $data;
-  }
-
-  /**
-   * Get the relevant location entity for the array key.
-   *
-   * This function is duplicated from CRM_Contact_BAO_Contact to allow cleanup.
-   * See self::formatProfileContactParams
-   *
-   * Based on the field name we determine which location entity
-   * we are dealing with. Apart from a few specific ones they
-   * are mostly 'address' (the default).
-   *
-   * @param string $fieldName
-   *
-   * @return string
-   */
-  protected static function getLocationEntityForKey($fieldName) {
-    if (in_array($fieldName, ['email', 'phone', 'im', 'openid'])) {
-      return $fieldName;
-    }
-    if ($fieldName === 'phone_ext') {
-      return 'phone';
-    }
-    return 'address';
   }
 
   /**
@@ -1091,7 +758,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @param bool $checkPermissions
    *   Respect logged in user permissions.
-   * @param bool|null $reloadCacheIfEmpty
+   * @param bool|NULL $reloadCacheIfEmpty
    *  If not set explicitly this is calculated but it is preferred that it be set
    *  per comments on isSelected above.
    *
@@ -1103,6 +770,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @return array|bool
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
    */
   public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $batchLimit = 1, $isSelected = 2, $criteria = [], $checkPermissions = TRUE, $reloadCacheIfEmpty = NULL, $searchLimit = 0) {
     $redirectForPerformance = $batchLimit > 1;
@@ -1165,7 +834,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param string $cacheKeyString
    * @param array $result
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function updateMergeStats($cacheKeyString, $result = []) {
     // gather latest stats
@@ -1217,7 +886,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @return array
    *   Array of how many were merged and how many were skipped.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getMergeStats($cacheKeyString) {
     $stats = civicrm_api3('Dedupe', 'get', ['cachekey' => "{$cacheKeyString}_stats", 'sequential' => 1])['values'];
@@ -1272,7 +941,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @return array|bool
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function merge($dupePairs = [], $cacheParams = [], $mode = 'safe',
                                $redirectForPerformance = FALSE, $checkPermissions = TRUE
@@ -1348,6 +1019,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @return bool
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
    */
   public static function skipMerge($mainId, $otherId, &$migrationInfo, $mode = 'safe', &$conflicts = []) {
 
@@ -1505,6 +1178,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *     though the form had been submitted with those options.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getRowsElementsAndInfo($mainId, $otherId, $checkPermissions = TRUE) {
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
@@ -1690,7 +1364,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @return bool
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function moveAllBelongings($mainId, $otherId, $migrationInfo, $checkPermissions = TRUE) {
@@ -1860,7 +1536,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       if (!isset($submitted['suffix_id']) && !empty($migrationInfo['main_details']['suffix_id'])) {
         $submitted['suffix_id'] = $migrationInfo['main_details']['suffix_id'];
       }
-      self::updateContact($mainId, $submitted);
+      self::createContact($mainId, $submitted);
     }
     $transaction->commit();
     CRM_Utils_Hook::post('merge', 'Contact', $mainId);
@@ -1904,8 +1580,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param int $contactID
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function addMembershipToRelatedContacts($contactID) {
+  public static function addMembershipToRealtedContacts($contactID) {
     $dao = new CRM_Member_DAO_Membership();
     $dao->contact_id = $contactID;
     $dao->is_test = 0;
@@ -1937,7 +1614,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param int $mainId
    * @param int $otherId
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function createMergeActivities($mainId, $otherId) {
     $params = [
@@ -1995,6 +1672,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Array of matches meeting the criteria.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getDuplicatePairs($rule_group_id, $group_id, $reloadCacheIfEmpty, $batchLimit, $isSelected, $includeConflicts = TRUE, $criteria = [], $checkPermissions = TRUE, $searchLimit = 0, $isForceNewSearch = 0) {
     $dupePairs = $isForceNewSearch ? [] : self::getCachedDuplicateMatches($rule_group_id, $group_id, $batchLimit, $isSelected, $includeConflicts, $criteria, $checkPermissions, $searchLimit);
@@ -2107,9 +1785,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param string $cacheKeyString
    *
    * @return bool|array
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CRM_Core_Exception_ResourceConflictException
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected static function dedupePair(int $mainId, int $otherId, $mode = 'safe', $checkPermissions = TRUE, $cacheKeyString = NULL) {
@@ -2335,6 +2014,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @return array
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getConflicts(array &$migrationInfo, int $mainId, int $otherId, string $mode): array {
     $conflicts = [];
@@ -2610,13 +2290,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * Build up the location block for the contact in dedupe-screen display format.
    *
-   * @param int $cid
+   * @param integer $cid
    * @param array $blockInfo
    * @param string $blockName
    *
    * @return array
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   private static function buildLocationBlockForContact($cid, $blockInfo, $blockName): array {
     $searchParams = [
@@ -2701,8 +2381,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param array $locks
    */
   protected static function releaseLocks(array $locks) {
-    /** @var Civi\Core\Lock\LockInterface $lock */
     foreach ($locks as $lock) {
+      /* @var Civi\Core\Lock\LockInterface $lock */
       $lock->release();
     }
   }
@@ -2718,7 +2398,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param array $migrationInfo
    *
    * @return array
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected static function addLocationFieldInfo($mainId, $otherId, $blockInfo, $blockName, array $locations, array $rows, array $elements, array $migrationInfo): array {
     // Collect existing fields from both 'main' and 'other' contacts first
@@ -2735,7 +2415,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
         // Add this value to the table rows
         $rows["move_location_{$blockName}_{$count}"]['other'] = $displayValue;
-        $rows["move_location_{$blockName}_{$count}"]['location_entity'] = $blockName;
 
         // CRM-17556 Only display 'main' contact value if it's the same location + type
         // Look it up from main values...
@@ -2763,6 +2442,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
               // Set this value as the default against the 'other' contact value
               $rows["move_location_{$blockName}_{$count}"]['main'] = $mainValueCheck[$blockInfo['displayField']];
               $rows["move_location_{$blockName}_{$count}"]['main_is_primary'] = $mainValueCheck['is_primary'] ?? 0;
+              $rows["move_location_{$blockName}_{$count}"]['location_entity'] = $blockName;
               $mainContactBlockId = $mainValueCheck['id'];
               break;
             }

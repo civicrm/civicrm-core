@@ -28,7 +28,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   protected $_testID;
 
   /**
-   * @var \CRM_Financial_DAO_PaymentProcessorType
+   * @var \CRM_Core_DAO_PaymentProcessor
    * Payment Processor DAO Object
    */
   protected $_paymentProcessorDAO;
@@ -269,7 +269,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   }
 
   /**
-   * @param array $fields
+   * @param $fields
    *
    * @return array|bool
    */
@@ -295,9 +295,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   }
 
   /**
-   * @param array $fields
-   * @param array $errors
-   * @param string|null $section
+   * @param $fields
+   * @param $errors
+   * @param null $section
    *
    * @return bool
    */
@@ -367,7 +367,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       $defaults['payment_processor_type_id'] = $this->_paymentProcessorType;
     }
     else {
-      CRM_Core_Session::setStatus(ts('Payment Processor Type (ID=%1) not found. Did you disable the payment processor extension?', [1 => $this->_paymentProcessorType]), ts('Missing Payment Processor'), 'alert');
+      CRM_Core_Session::setStatus('Payment Processor Type (ID=' . $this->_paymentProcessorType . ') not found. Did you disable the payment processor extension?', 'Missing Payment Processor', 'alert');
     }
 
     $cards = json_decode(CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor',
@@ -403,6 +403,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   /**
    * Process the form submission.
    *
+   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function postProcess() {
@@ -434,7 +435,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     $processor = civicrm_api3('payment_processor', 'getsingle', ['name' => $values['name'], 'is_test' => 0]);
     $errors = Civi\Payment\System::singleton()->checkProcessorConfig($processor);
     if ($errors) {
-      CRM_Core_Session::setStatus($errors, ts('Payment processor configuration invalid'), 'error');
+      CRM_Core_Session::setStatus($errors, 'Payment processor configuration invalid', 'error');
       Civi::log()->error('Payment processor configuration invalid: ' . $errors);
       CRM_Core_Session::singleton()->pushUserContext($this->refreshURL);
     }
@@ -450,7 +451,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * @param int $domainID
    * @param bool $test
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function updatePaymentProcessor(&$values, $domainID, $test) {
     if ($test) {

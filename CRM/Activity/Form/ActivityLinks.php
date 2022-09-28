@@ -25,7 +25,7 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
   }
 
   /**
-   * @param self $self
+   * @param $self
    */
   public static function commonBuildQuickForm($self) {
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $self);
@@ -74,7 +74,7 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
             ],
           ]);
         }
-        catch (CRM_Core_Exception $e) {
+        catch (CiviCRM_API3_Exception $e) {
           continue;
         }
         if (!$phone['api.Contact.getsingle']['do_not_sms'] && $phone['phone']) {

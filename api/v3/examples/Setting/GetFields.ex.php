@@ -1,13 +1,8 @@
 <?php
-
-/**
- * @file
- */
-
 /**
  * Test Generated example demonstrating the Setting.getfields API.
  *
- * Demonstrate return from getfields - see subfolder for variants.
+ * Demonstrate return from getfields - see subfolder for variants
  *
  * @return array
  *   API result array
@@ -15,10 +10,10 @@
 function setting_getfields_example() {
   $params = [];
 
-  try {
+  try{
     $result = civicrm_api3('Setting', 'getfields', $params);
   }
-  catch (CRM_Core_Exception $e) {
+  catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
@@ -45,7 +40,7 @@ function setting_getfields_expectedresult() {
   $expectedResult = [
     'is_error' => 0,
     'version' => 3,
-    'count' => 195,
+    'count' => 173,
     'values' => [
       'address_standardization_provider' => [
         'group_name' => 'Address Preferences',
@@ -61,6 +56,7 @@ function setting_getfields_expectedresult() {
         ],
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => 'CiviCRM includes an optional plugin for interfacing with the United States Postal Services (USPS) Address Standardization web service. You must register to use the USPS service at https://www.usps.com/business/web-tools-apis/address-information.htm. If you are approved, they will provide you with a User ID and the URL for the service. Plugins for other address standardization services may be available from 3rd party developers. If installed, they will be included in the drop-down below. ',
       ],
       'address_standardization_userid' => [
@@ -74,6 +70,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Provider service user ID',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
       ],
       'address_standardization_url' => [
@@ -87,6 +84,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Provider Service URL',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => 'Web Service URL',
         'validate_callback' => 'CRM_Utils_Rule::url',
       ],
@@ -199,19 +197,19 @@ function setting_getfields_expectedresult() {
         'description' => 'How to sort activity-types on the \"Manage Case\" screen? (Set \"Default\" to load setting from the legacy \"Settings.xml\" file.)',
         'help_text' => '',
       ],
-      'civicaseShowCaseActivities' => [
+      'civicaseActivityRevisions' => [
         'group_name' => 'CiviCRM Preferences',
         'group' => 'core',
-        'name' => 'civicaseShowCaseActivities',
+        'name' => 'civicaseActivityRevisions',
         'type' => 'Boolean',
         'quick_form_type' => 'YesNo',
         'default' => '',
         'html_type' => 'radio',
-        'add' => '5.24',
-        'title' => 'Include case activities in general activity views.',
+        'add' => '4.7',
+        'title' => 'Enable deprecated Embedded Activity Revisions',
         'is_domain' => 1,
         'is_contact' => 0,
-        'description' => 'e.g. the Contact form\'s Activity tab listing. Without this ticked, activities that belong to a case are hidden (default behavior). Warning: enabling this option means that all case activities relating to a contact will be listed which could result in users without \"access all cases and activities\" permission being able to see see the summarized details (date, subject, assignees, status etc.). Such users will still be prevented from managing the case and viewing/editing the activity.',
+        'description' => 'Enable tracking of activity revisions embedded within the \"civicrm_activity\" table. Alternatively, see \"Administer => System Settings => Misc => Logging\".',
         'help_text' => '',
       ],
       'cvv_backoffice_required' => [
@@ -228,21 +226,25 @@ function setting_getfields_expectedresult() {
         'is_contact' => 0,
         'description' => 'Is the CVV code required for back office credit card transactions',
         'help_text' => 'If set it back-office credit card transactions will required a cvv code. Leave as required unless you have a very strong reason to change',
-        'settings_pages' => [
-          'contribute' => [
-            'weight' => 10,
-          ],
-        ],
       ],
       'contribution_invoice_settings' => [
         'group_name' => 'Contribute Preferences',
         'group' => 'contribute',
         'name' => 'contribution_invoice_settings',
         'type' => 'Array',
+        'default' => [
+          'invoice_prefix' => 'INV_',
+          'due_date' => '10',
+          'due_date_period' => 'days',
+          'notes' => '',
+          'tax_term' => 'Sales Tax',
+          'tax_display_settings' => 'Inclusive',
+        ],
         'add' => '4.7',
-        'title' => 'Deprecated, virtualized setting',
+        'title' => 'Contribution Invoice Settings',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
       ],
       'invoicing' => [
@@ -260,97 +262,23 @@ function setting_getfields_expectedresult() {
         'on_change' => [
           '0' => 'CRM_Invoicing_Utils::onToggle',
         ],
-        'settings_pages' => [
-          'contribute' => [
-            'weight' => 90,
-          ],
-        ],
       ],
-      'invoice_prefix' => [
-        'default' => 'INV_',
-        'html_type' => 'text',
-        'name' => 'invoice_prefix',
-        'add' => '5.23',
-        'type' => 2,
-        'title' => 'Invoice Prefix',
-        'description' => 'Enter prefix to be be preprended when creating an invoice number',
-        'is_domain' => 1,
-        'is_contact' => 0,
-      ],
-      'invoice_due_date' => [
-        'default' => '10',
-        'name' => 'invoice_due_date',
-        'html_type' => 'text',
-        'title' => 'Due Date',
-        'add' => '5.23',
-        'type' => 1,
-        'is_domain' => 1,
-        'is_contact' => 0,
-      ],
-      'invoice_due_date_period' => [
-        'default' => 'days',
-        'html_type' => 'select',
-        'name' => 'invoice_due_date_period',
-        'title' => 'For transmission',
-        'weight' => 4,
-        'add' => '5.23',
-        'type' => 2,
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => 'Select the interval for due date.',
-        'options' => [
-          'select' => '- select -',
-          'days' => 'Days',
-          'months' => 'Months',
-          'years' => 'Years',
-        ],
-      ],
-      'invoice_notes' => [
-        'default' => '',
-        'name' => 'invoice_notes',
-        'html_type' => 'wysiwyg',
-        'title' => 'Notes or Standard Terms',
-        'type' => 2,
-        'add' => '5.23',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => 'Enter note or message to be displayed on PDF invoice or credit notes ',
-        'attributes' => [
-          'rows' => 2,
-          'cols' => 40,
-        ],
-      ],
-      'invoice_is_email_pdf' => [
-        'name' => 'invoice_is_email_pdf',
+      'acl_financial_type' => [
+        'group_name' => 'Contribute Preferences',
+        'group' => 'contribute',
+        'name' => 'acl_financial_type',
+        'type' => 'Boolean',
         'html_type' => 'checkbox',
-        'add' => '5.23',
-        'type' => 16,
+        'quick_form_type' => 'Element',
+        'default' => 0,
+        'add' => '4.7',
+        'title' => 'Enable Access Control by Financial Type',
         'is_domain' => 1,
         'is_contact' => 0,
-        'title' => 'Automatically email invoice when user purchases online',
-        'description' => 'Should a pdf invoice be emailed automatically?',
-      ],
-      'tax_term' => [
-        'default' => 'Sales Tax',
-        'name' => 'tax_term',
-        'html_type' => 'text',
-        'add' => '5.23',
-        'title' => 'Tax Term',
-        'type' => 2,
-        'is_domain' => 1,
-        'is_contact' => 0,
-      ],
-      'tax_display_settings' => [
-        'default' => 'Inclusive',
-        'html_type' => 'select',
-        'name' => 'tax_display_settings',
-        'type' => 2,
-        'add' => '5.23',
-        'title' => 'Tax Display Settings',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'pseudoconstant' => [
-          'callback' => 'CRM_Core_SelectValues::taxDisplayOptions',
+        'description' => '',
+        'help_text' => '',
+        'help' => [
+          'id' => 'acl_financial_type',
         ],
       ],
       'deferred_revenue_enabled' => [
@@ -365,12 +293,8 @@ function setting_getfields_expectedresult() {
         'title' => 'Enable Deferred Revenue',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
-        'settings_pages' => [
-          'contribute' => [
-            'weight' => 50,
-          ],
-        ],
       ],
       'default_invoice_page' => [
         'group_name' => 'Contribute Preferences',
@@ -380,21 +304,15 @@ function setting_getfields_expectedresult() {
         'quick_form_type' => 'Select',
         'default' => '',
         'pseudoconstant' => [
-          'table' => 'civicrm_contribution_page',
-          'keyColumn' => 'id',
-          'labelColumn' => 'title',
+          'callback' => 'CRM_Contribute_PseudoConstant::contributionPage',
         ],
         'html_type' => 'select',
         'add' => '4.7',
         'title' => 'Default invoice payment page',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
-        'settings_pages' => [
-          'contribute' => [
-            'weight' => 70,
-          ],
-        ],
       ],
       'always_post_to_accounts_receivable' => [
         'group_name' => 'Contribute Preferences',
@@ -408,12 +326,8 @@ function setting_getfields_expectedresult() {
         'title' => 'Always post to Accounts Receivable?',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
-        'settings_pages' => [
-          'contribute' => [
-            'weight' => 40,
-          ],
-        ],
       ],
       'update_contribution_on_membership_type_change' => [
         'group_name' => 'Contribute Preferences',
@@ -429,11 +343,6 @@ function setting_getfields_expectedresult() {
         'is_contact' => 0,
         'description' => 'Enabling this setting will update related contribution of membership(s) except if the membership is paid for with a recurring contribution.',
         'help_text' => '',
-        'settings_pages' => [
-          'contribute' => [
-            'weight' => 20,
-          ],
-        ],
       ],
       'contact_view_options' => [
         'group_name' => 'CiviCRM Preferences',
@@ -515,7 +424,7 @@ function setting_getfields_expectedresult() {
         'pseudoconstant' => [
           'optionGroupName' => 'address_options',
         ],
-        'default' => '12345689101112',
+        'default' => '123456891011',
         'add' => '4.1',
         'title' => 'Address Fields',
         'is_domain' => 1,
@@ -671,28 +580,6 @@ function setting_getfields_expectedresult() {
         'description' => '',
         'help_text' => '',
       ],
-      'defaultExternUrl' => [
-        'group_name' => 'CiviCRM Preferences',
-        'group' => 'core',
-        'name' => 'defaultExternUrl',
-        'type' => 'String',
-        'quick_form_type' => 'Select',
-        'html_type' => 'Select',
-        'html_attributes' => [
-          'class' => 'crm-select2',
-        ],
-        'default' => 'router',
-        'add' => '5.27',
-        'title' => 'Extern URL Style',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => 'This setting provides transitional support. It should be set to \"Prefer normal router.\" If your deployment requires \"Prefer standalone script\", then please ensure that the issue is tracked in <code>lab.civicrm.org</code>.',
-        'help_text' => '',
-        'options' => [
-          'standalone' => 'Prefer standalone scripts',
-          'router' => 'Prefer normal router',
-        ],
-      ],
       'activity_assignee_notification' => [
         'group_name' => 'CiviCRM Preferences',
         'group' => 'core',
@@ -790,25 +677,8 @@ function setting_getfields_expectedresult() {
         'pseudoconstant' => [
           'callback' => 'CRM_Contact_BAO_GroupContactCache::getModes',
         ],
-        'description' => 'Should the smart groups be flushed by cron jobs or user actions',
+        'description' => 'Should the smart groups be by cron jobs or user actions',
         'help_text' => 'In \"Opportunistic Flush\" mode, caches are flushed in response to user actions; this mode is broadly compatible but may add latency during form-submissions. In \"Cron Flush\" mode, you should schedule a cron job to flush caches; this can improve latency on form-submissions but requires more setup.',
-      ],
-      'acl_cache_refresh_mode' => [
-        'group_name' => 'CiviCRM Preferences',
-        'group' => 'core',
-        'name' => 'acl_cache_refresh_mode',
-        'type' => 'String',
-        'html_type' => 'radio',
-        'default' => 'opportunistic',
-        'add' => '5.37.0',
-        'title' => 'ACL Group Refresh Mode',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'pseudoconstant' => [
-          'callback' => 'CRM_Contact_BAO_GroupContactCache::getModes',
-        ],
-        'description' => 'Should the acl cache be flushed by cron jobs or user actions',
-        'help_text' => 'In \"Opportunistic Flush\" mode, caches are flushed in response to user actions; this mode is broadly compatible but may add latency during form-submissions. In \"Cron Flush\" mode, you should schedule a cron job to flush caches if your site uses ACLs; this can improve latency on form-submissions but requires more setup.',
       ],
       'installed' => [
         'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
@@ -842,27 +712,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Maximum Attachments',
         'is_domain' => 1,
         'is_contact' => 0,
-        'description' => 'Maximum number of files (documents, images, etc.) which can be attached to emails or activities. This setting applies to UI forms and limits the number of fields available on the form.',
-        'help_text' => '',
-      ],
-      'max_attachments_backend' => [
-        'group_name' => 'CiviCRM Preferences',
-        'group' => 'core',
-        'name' => 'max_attachments_backend',
-        'legacy_key' => 'maxAttachmentsBackend',
-        'type' => 'Integer',
-        'quick_form_type' => 'Element',
-        'html_type' => 'text',
-        'html_attributes' => [
-          'size' => 2,
-          'maxlength' => 8,
-        ],
-        'default' => 100,
-        'add' => '5.20',
-        'title' => 'Maximum Attachments For Backend Processes',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => 'Maximum number of files (documents, images, etc.) which can be processed during backend processing such as automated inbound email processing. This should be a big number higher than the other Maximum Attachments setting above. This setting here merely provides an upper limit to prevent attacks that might overload the server.',
+        'description' => 'Maximum number of files (documents, images, etc.) which can be attached to emails or activities.',
         'help_text' => '',
       ],
       'maxFileSize' => [
@@ -961,78 +811,6 @@ function setting_getfields_expectedresult() {
           'callback' => 'CRM_Contact_Form_Task_PDFLetterCommon::getLoggingOptions',
         ],
       ],
-      'dompdf_font_dir' => [
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'group_name' => 'CiviCRM Preferences',
-        'group' => 'core',
-        'name' => 'dompdf_font_dir',
-        'title' => 'DOMPDF Font Folder',
-        'description' => 'Additional folder where DOMPDF will look for fonts.',
-        'type' => 'String',
-        'quick_form_type' => 'Element',
-        'html_type' => 'text',
-        'html_attributes' => [
-          'size' => 64,
-          'maxlength' => 256,
-        ],
-        'default' => '',
-        'help_text' => '',
-        'add' => '5.43',
-      ],
-      'dompdf_chroot' => [
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'group_name' => 'CiviCRM Preferences',
-        'group' => 'core',
-        'name' => 'dompdf_chroot',
-        'title' => 'DOMPDF Local Images Folder',
-        'description' => 'Folder to restrict where DOMPDF looks when loading local images. By default it is the DOMPDF folder itself for security reasons. It will search in subfolders.',
-        'type' => 'String',
-        'quick_form_type' => 'Element',
-        'html_type' => 'text',
-        'html_attributes' => [
-          'size' => 64,
-          'maxlength' => 256,
-        ],
-        'default' => '',
-        'help_text' => '',
-        'add' => '5.43',
-      ],
-      'dompdf_enable_remote' => [
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'group_name' => 'CiviCRM Preferences',
-        'group' => 'core',
-        'name' => 'dompdf_enable_remote',
-        'title' => 'DOMPDF Enable Remote Images',
-        'description' => 'Enable the use of remote images. By default this is enabled, but if not using remote images you may wish to turn it off for security reasons.',
-        'type' => 'Boolean',
-        'quick_form_type' => 'YesNo',
-        'html_type' => '',
-        'default' => TRUE,
-        'help_text' => '',
-        'add' => '5.43',
-      ],
-      'dompdf_log_output_file' => [
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'group_name' => 'CiviCRM Preferences',
-        'group' => 'core',
-        'name' => 'dompdf_log_output_file',
-        'title' => 'DOMPDF Log File',
-        'description' => 'DOMPDF will log debugging output in this file.',
-        'type' => 'String',
-        'quick_form_type' => 'Element',
-        'html_type' => 'text',
-        'html_attributes' => [
-          'size' => 64,
-          'maxlength' => 256,
-        ],
-        'default' => '',
-        'help_text' => '',
-        'add' => '5.43',
-      ],
       'wkhtmltopdfPath' => [
         'group_name' => 'CiviCRM Preferences',
         'group' => 'core',
@@ -1047,6 +825,78 @@ function setting_getfields_expectedresult() {
         'default' => '',
         'add' => '4.3',
         'title' => 'Path to wkhtmltopdf executable',
+        'is_domain' => 1,
+        'is_contact' => 0,
+        'description' => '',
+        'help_text' => '',
+      ],
+      'recaptchaOptions' => [
+        'group_name' => 'CiviCRM Preferences',
+        'group' => 'core',
+        'name' => 'recaptchaOptions',
+        'type' => 'String',
+        'quick_form_type' => 'Element',
+        'html_attributes' => [
+          'size' => 64,
+          'maxlength' => 64,
+        ],
+        'html_type' => 'text',
+        'default' => '',
+        'add' => '4.3',
+        'title' => 'Recaptcha Options',
+        'is_domain' => 1,
+        'is_contact' => 0,
+        'description' => 'You can specify the reCAPTCHA theme options as comma separated data.(eg: theme:\'blackglass\', lang : \'fr\' ). Check the available options at <a href=\"https://developers.google.com/recaptcha/docs/display#config\">Customizing the Look and Feel of reCAPTCHA</a>.',
+        'help_text' => '',
+      ],
+      'recaptchaPublicKey' => [
+        'group_name' => 'CiviCRM Preferences',
+        'group' => 'core',
+        'name' => 'recaptchaPublicKey',
+        'type' => 'String',
+        'quick_form_type' => 'Element',
+        'html_attributes' => [
+          'size' => 64,
+          'maxlength' => 64,
+        ],
+        'html_type' => 'text',
+        'default' => '',
+        'add' => '4.3',
+        'title' => 'Recaptcha Site Key',
+        'is_domain' => 1,
+        'is_contact' => 0,
+        'description' => '',
+        'help_text' => '',
+      ],
+      'forceRecaptcha' => [
+        'add' => '4.7',
+        'help_text' => '',
+        'is_domain' => 1,
+        'is_contact' => 0,
+        'group_name' => 'CiviCRM Preferences',
+        'group' => 'core',
+        'name' => 'forceRecaptcha',
+        'type' => 'Boolean',
+        'quick_form_type' => 'YesNo',
+        'html_type' => '',
+        'default' => 0,
+        'title' => 'Force reCAPTCHA on Contribution pages',
+        'description' => 'If enabled, reCAPTCHA will show on all contribution pages.',
+      ],
+      'recaptchaPrivateKey' => [
+        'group_name' => 'CiviCRM Preferences',
+        'group' => 'core',
+        'name' => 'recaptchaPrivateKey',
+        'type' => 'String',
+        'quick_form_type' => 'Element',
+        'html_attributes' => [
+          'size' => 64,
+          'maxlength' => 64,
+        ],
+        'html_type' => 'text',
+        'default' => '',
+        'add' => '4.3',
+        'title' => 'Recaptcha Secret Key',
         'is_domain' => 1,
         'is_contact' => 0,
         'description' => '',
@@ -1628,7 +1478,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Enable Drupal Watchdog Logging',
         'is_domain' => 1,
         'is_contact' => 0,
-        'description' => 'Set this value to Yes if you want CiviCRM error/debugging messages to appear in the Drupal error logs.',
+        'description' => 'Set this value to Yes if you want CiviCRM error/debugging messages to appear in the Drupal error logs',
         'help_text' => 'Set this value to Yes if you want CiviCRM error/debugging messages the appear in your CMS\' error log. In the case of Drupal, this will cause all CiviCRM error messages to appear in the watchdog (assuming you have Drupal\'s watchdog enabled)',
       ],
       'debug_enabled' => [
@@ -1643,7 +1493,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Enable Debugging',
         'is_domain' => 1,
         'is_contact' => 0,
-        'description' => 'Set this value to Yes if you want to use one of CiviCRM\'s debugging tools. This feature should NOT be enabled for production sites.',
+        'description' => 'Set this value to Yes if you want to use one of CiviCRM\'s debugging tools. This feature should NOT be enabled for production sites',
         'help_text' => 'Do not turn this on on production sites',
       ],
       'backtrace' => [
@@ -1657,7 +1507,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Display Backtrace',
         'is_domain' => 1,
         'is_contact' => 0,
-        'description' => 'Set this value to Yes if you want to display a backtrace listing when a fatal error is encountered. This feature should NOT be enabled for production sites.',
+        'description' => 'Set this value to Yes if you want to display a backtrace listing when a fatal error is encountered. This feature should NOT be enabled for production sites',
       ],
       'environment' => [
         'group_name' => 'Developer Preferences',
@@ -1706,6 +1556,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Temporary Files Directory',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => 'File system path where temporary CiviCRM files - such as import data files - are uploaded.',
       ],
       'imageUploadDir' => [
@@ -1788,6 +1639,29 @@ function setting_getfields_expectedresult() {
         'description' => 'Path where CiviCRM extensions are stored.',
         'help_text' => '',
       ],
+      'enable_cart' => [
+        'name' => 'enable_cart',
+        'group_name' => 'Event Preferences',
+        'settings_pages' => [
+          'event' => [
+            'weight' => 10,
+          ],
+        ],
+        'group' => 'event',
+        'type' => 'Boolean',
+        'quick_form_type' => 'CheckBox',
+        'default' => 0,
+        'add' => '4.1',
+        'title' => 'Use Shopping Cart Style Event Registration',
+        'is_domain' => 1,
+        'is_contact' => 0,
+        'description' => 'This feature allows users to register for more than one event at a time. When enabled, users will add event(s) to a \"cart\" and then pay for them all at once. Enabling this setting will affect online registration for all active events. The code is an alpha state, and you will potentially need to have developer resources to debug and fix sections of the codebase while testing and deploying it',
+        'help_text' => '',
+        'documentation_link' => [
+          'page' => 'CiviEvent Cart Checkout',
+          'resource' => 'wiki',
+        ],
+      ],
       'show_events' => [
         'name' => 'show_events',
         'group_name' => 'Event Preferences',
@@ -1827,6 +1701,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Extension Repo URL',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
       ],
       'customTranslateFunction' => [
@@ -1846,6 +1721,7 @@ function setting_getfields_expectedresult() {
         ],
         'default' => '',
         'title' => 'Custom Translate Function',
+        'description' => '',
       ],
       'monetaryThousandSeparator' => [
         'group_name' => 'Localization Preferences',
@@ -1862,6 +1738,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Thousands Separator',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
       ],
       'monetaryDecimalPoint' => [
@@ -1879,6 +1756,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Decimal Delimiter',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
       ],
       'moneyformat' => [
@@ -1893,20 +1771,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Monetary Amount Display',
         'is_domain' => 1,
         'is_contact' => 0,
-        'help_text' => '',
-      ],
-      'moneyvalueformat' => [
-        'group_name' => 'Localization Preferences',
-        'group' => 'localization',
-        'name' => 'moneyvalueformat',
-        'type' => 'String',
-        'quick_form_type' => 'Element',
-        'html_type' => 'text',
-        'default' => '%!i',
-        'add' => '4.3',
-        'title' => 'Monetary Value Display',
-        'is_domain' => 1,
-        'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
       ],
       'defaultCurrency' => [
@@ -1963,9 +1828,6 @@ function setting_getfields_expectedresult() {
         'type' => 'Integer',
         'quick_form_type' => 'ChainSelect',
         'html_type' => 'ChainSelect',
-        'chain_select_settings' => [
-          'control_field' => 'defaultContactCountry',
-        ],
         'default' => '',
         'title' => 'Default State/Province',
         'description' => 'This value is selected by default when adding a new contact address.',
@@ -1987,6 +1849,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Available Countries',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
         'pseudoconstant' => [
           'callback' => 'CRM_Admin_Form_Setting_Localization::getAvailableCountries',
@@ -2009,6 +1872,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Available States and Provinces (by Country)',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
         'pseudoconstant' => [
           'callback' => 'CRM_Admin_Form_Setting_Localization::getAvailableCountries',
@@ -2025,8 +1889,8 @@ function setting_getfields_expectedresult() {
         'title' => 'Inherit CMS Language',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
-        'description' => 'If Yes, the initial session language will be set by the CMS, which can later be changed if using the CiviCRM language switcher.',
       ],
       'dateformatDatetime' => [
         'group_name' => 'Localization Preferences',
@@ -2040,6 +1904,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Date Format: Complete Date and Time',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
       ],
       'dateformatFull' => [
@@ -2054,6 +1919,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Date Format: Complete Date',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
       ],
       'dateformatPartial' => [
@@ -2068,6 +1934,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Date Format: Month and Year',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
       ],
       'dateformatTime' => [
@@ -2087,6 +1954,7 @@ function setting_getfields_expectedresult() {
         ],
         'default' => '%l:%M %P',
         'title' => 'Date Format: Time Only',
+        'description' => '',
       ],
       'dateformatYear' => [
         'add' => '4.7',
@@ -2105,6 +1973,7 @@ function setting_getfields_expectedresult() {
         ],
         'default' => '%Y',
         'title' => 'Date Format: Year Only',
+        'description' => '',
       ],
       'dateformatFinancialBatch' => [
         'add' => '4.7',
@@ -2123,6 +1992,7 @@ function setting_getfields_expectedresult() {
         ],
         'default' => '%m/%d/%Y',
         'title' => 'Date Format: Financial Batch',
+        'description' => '',
       ],
       'dateformatshortdate' => [
         'add' => '4.7',
@@ -2141,6 +2011,7 @@ function setting_getfields_expectedresult() {
         ],
         'default' => '%m/%d/%Y',
         'title' => 'Date Format: Short date Month Day Year',
+        'description' => '',
       ],
       'dateInputFormat' => [
         'add' => '4.7',
@@ -2158,6 +2029,7 @@ function setting_getfields_expectedresult() {
         ],
         'default' => 'mm/dd/yy',
         'title' => 'Date Input Format',
+        'description' => '',
       ],
       'fieldSeparator' => [
         'add' => '4.7',
@@ -2194,6 +2066,7 @@ function setting_getfields_expectedresult() {
           'd' => 1,
         ],
         'title' => 'Fiscal Year Start',
+        'description' => '',
       ],
       'languageLimit' => [
         'group_name' => 'Localization Preferences',
@@ -2211,6 +2084,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Available Languages (Multi-lingual)',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
         'pseudoconstant' => [
           'callback' => 'CRM_Core_I18n::languages',
@@ -2232,6 +2106,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Available Languages',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => 'User Interface languages available to users',
         'pseudoconstant' => [
           'callback' => 'CRM_Core_I18n::languages',
@@ -2252,6 +2127,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Default Language',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
         'pseudoconstant' => [
           'callback' => 'CRM_Admin_Form_Setting_Localization::getDefaultLocaleOptions',
@@ -2295,6 +2171,7 @@ function setting_getfields_expectedresult() {
         ],
         'default' => '1',
         'title' => 'Time Input Format',
+        'description' => '',
         'on_change' => [
           '0' => 'CRM_Core_BAO_PreferencesDate::onChangeSetting',
         ],
@@ -2314,6 +2191,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Week begins on',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
       ],
       'contact_default_language' => [
@@ -2334,31 +2212,8 @@ function setting_getfields_expectedresult() {
         'title' => 'Default Language for contacts',
         'is_domain' => 1,
         'is_contact' => 0,
-        'description' => 'Default language (if any) for contact records.',
+        'description' => 'Default language (if any) for contact records',
         'help_text' => 'If a contact is created with no language this setting will determine the language data (if any) to save.You may or may not wish to make an assumption here about whether it matches the site language',
-      ],
-      'pinnedContactCountries' => [
-        'group_name' => 'Localization Preferences',
-        'group' => 'localization',
-        'name' => 'pinnedContactCountries',
-        'type' => 'Array',
-        'quick_form_type' => 'Element',
-        'html_type' => 'advmultiselect',
-        'html_attributes' => [
-          'size' => 5,
-          'style' => 'width:150px',
-          'class' => 'advmultiselect',
-        ],
-        'default' => [],
-        'add' => '5.33',
-        'title' => 'Pinned Countries',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => 'Appear in Top section of select list',
-        'help_text' => 'Selected countries will appear in top section of country list',
-        'pseudoconstant' => [
-          'callback' => 'CRM_Admin_Form_Setting_Localization::getAvailableCountries',
-        ],
       ],
       'profile_double_optin' => [
         'group_name' => 'Mailing Preferences',
@@ -2385,7 +2240,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Track replies using VERP in Reply-To header',
         'is_domain' => 1,
         'is_contact' => 0,
-        'description' => 'If checked, mailings will default to tracking replies using VERP-ed Reply-To.',
+        'description' => 'If checked, mailings will default to tracking replies using VERP-ed Reply-To. ',
         'help_text' => '',
         'validate_callback' => 'CRM_Core_BAO_Setting::validateBoolSetting',
       ],
@@ -2414,6 +2269,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Enable global server wide lock for CiviMail',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
       ],
       'replyTo' => [
@@ -2427,7 +2283,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Enable Custom Reply-To',
         'is_domain' => 1,
         'is_contact' => 0,
-        'description' => 'Allow CiviMail users to send mailings with a custom Reply-To header.',
+        'description' => 'Allow CiviMail users to send mailings with a custom Reply-To header',
         'help_text' => '',
       ],
       'mailing_backend' => [
@@ -2443,6 +2299,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Mailing Backend',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
       ],
       'profile_add_to_group_double_optin' => [
@@ -2498,7 +2355,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Hashed Mailing URL\'s',
         'is_domain' => 1,
         'is_contact' => 0,
-        'description' => 'If enabled, a randomized hash key will be used to reference the mailing URL in the mailing.viewUrl token, instead of the mailing ID.',
+        'description' => 'If enabled, a randomized hash key will be used to reference the mailing URL in the mailing.viewUrl token, instead of the mailing ID',
         'help_text' => '',
       ],
       'civimail_multiple_bulk_emails' => [
@@ -2526,6 +2383,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Enable CiviMail to generate Message-ID header',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
       ],
       'mailerBatchLimit' => [
@@ -2582,7 +2440,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Mailer Cron Job Limit',
         'is_domain' => 1,
         'is_contact' => 0,
-        'description' => 'The maximum number of mailer delivery jobs executing simultaneously (0 = allow as many processes to execute as started by cron).',
+        'description' => 'The maximum number of mailer delivery jobs executing simultaneously (0 = allow as many processes to execute as started by cron)',
         'help_text' => '',
       ],
       'mailThrottleTime' => [
@@ -2635,6 +2493,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Enable CiviMail to create activities on delivery',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
       ],
       'simple_mail_limit' => [
@@ -2652,7 +2511,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Simple mail limit',
         'is_domain' => 1,
         'is_contact' => 0,
-        'description' => 'The number of emails sendable via simple mail. Make sure you understand the implications for your spam reputation and legal requirements for bulk emails before editing. As there is some risk both to your spam reputation and the products if this is misused it is a hidden setting.',
+        'description' => 'The number of emails sendable via simple mail. Make sure you understand the implications for your spam reputation and legal requirements for bulk emails before editing. As there is some risk both to your spam reputation and the products if this is misused it is a hidden setting',
         'help_text' => 'CiviCRM forces users sending more than this number of mails to use CiviMails. CiviMails have additional precautions: not sending to contacts who do not want bulk mail, adding domain name and opt out links. You should familiarise yourself with the law relevant to you on bulk mailings if changing this setting. For the US https://en.wikipedia.org/wiki/CAN-SPAM_Act_of_2003 is a good place to start.',
       ],
       'auto_recipient_rebuild' => [
@@ -2679,55 +2538,8 @@ function setting_getfields_expectedresult() {
         'title' => 'Allow mail from logged in contact',
         'is_domain' => 1,
         'is_contact' => 0,
-        'description' => 'Allow sending email from the logged in contact\'s email address.',
+        'description' => 'Allow sending email from the logged in contact\'s email address',
         'help_text' => 'CiviCRM allows you to send email from the domain from email addresses and the logged in contact id addresses by default. Disable this if you only want to allow the domain from addresses to be used.',
-      ],
-      'url_tracking_default' => [
-        'group_name' => 'Mailing Preferences',
-        'group' => 'mailing',
-        'name' => 'url_tracking_default',
-        'type' => 'Boolean',
-        'html_type' => 'checkbox',
-        'quick_form_type' => 'CheckBox',
-        'default' => '1',
-        'title' => 'Enable click-through tracking by default',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => 'If checked, mailings will have click-through tracking enabled by default.',
-        'help_text' => '',
-      ],
-      'open_tracking_default' => [
-        'group_name' => 'Mailing Preferences',
-        'group' => 'mailing',
-        'name' => 'open_tracking_default',
-        'type' => 'Boolean',
-        'html_type' => 'checkbox',
-        'quick_form_type' => 'CheckBox',
-        'default' => '1',
-        'title' => 'Enable open tracking by default',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => 'If checked, mailings will have open tracking enabled by default.',
-        'help_text' => '',
-      ],
-      'civimail_sync_interval' => [
-        'group_name' => 'Mailing Preferences',
-        'group' => 'mailing',
-        'name' => 'civimail_sync_interval',
-        'type' => 'Integer',
-        'quick_form_type' => 'Element',
-        'html_type' => 'text',
-        'html_attributes' => [
-          'size' => 4,
-          'maxlength' => 8,
-        ],
-        'default' => 10,
-        'title' => 'Database Update Frequency',
-        'add' => '5.28',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => 'The frequency that CiviMail updates its sent mail database.',
-        'help_text' => '',
       ],
       'geoAPIKey' => [
         'add' => '4.7',
@@ -2746,7 +2558,7 @@ function setting_getfields_expectedresult() {
         ],
         'default' => '',
         'title' => 'Geo Provider Key',
-        'description' => 'Enter the API key or Application ID associated with your geocoding provider.',
+        'description' => 'Enter the API key or Application ID associated with your geocoding provider (not required for Yahoo).',
       ],
       'geoProvider' => [
         'add' => '4.7',
@@ -2884,6 +2696,7 @@ function setting_getfields_expectedresult() {
         'add' => '4.1',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
       ],
       'uniq_email_per_site' => [
@@ -2896,6 +2709,7 @@ function setting_getfields_expectedresult() {
         'add' => '4.1',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
       ],
       'search_autocomplete_count' => [
@@ -2949,6 +2763,7 @@ function setting_getfields_expectedresult() {
         'title' => 'How to handle full-text queries',
         'is_domain' => 1,
         'is_contact' => 0,
+        'description' => '',
         'help_text' => '',
       ],
       'includeOrderByClause' => [
@@ -2962,7 +2777,7 @@ function setting_getfields_expectedresult() {
         'title' => 'Include Order By Clause',
         'is_domain' => 1,
         'is_contact' => 0,
-        'description' => 'If disabled, the search results will not be ordered. This may improve response time on search results on large datasets.',
+        'description' => 'If disabled, the search results will not be ordered. This may improve response time on search results on large datasets',
         'help_text' => '',
       ],
       'includeWildCardInName' => [
@@ -3121,25 +2936,6 @@ function setting_getfields_expectedresult() {
         'description' => 'Which fields can be searched on in the menubar quicksearch box? Don\'t see your custom field here? Make sure it is marked as Searchable.',
         'help_text' => '',
       ],
-      'default_pager_size' => [
-        'group_name' => 'Search Preferences',
-        'group' => 'Search Preferences',
-        'name' => 'default_pager_size',
-        'type' => 'Integer',
-        'quick_form_type' => 'Element',
-        'html_type' => 'text',
-        'html_attributes' => [
-          'size' => 2,
-          'maxlength' => 3,
-        ],
-        'default' => 50,
-        'add' => '5.39',
-        'title' => 'Default Search Pager size',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => 'What is the default number of records to show on a search',
-        'help_text' => '',
-      ],
       'userFrameworkResourceURL' => [
         'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
         'group' => 'url',
@@ -3208,191 +3004,6 @@ function setting_getfields_expectedresult() {
         'help_text' => '',
         'validate_callback' => 'CRM_Utils_Rule::urlish',
       ],
-      'enable_cart' => [
-        'name' => 'enable_cart',
-        'group_name' => 'Event Preferences',
-        'settings_pages' => [
-          'event' => [
-            'weight' => 10,
-          ],
-        ],
-        'group' => 'event',
-        'type' => 'Boolean',
-        'quick_form_type' => 'CheckBox',
-        'default' => 0,
-        'add' => '4.1',
-        'title' => 'Use Shopping Cart Style Event Registration',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => 'This feature allows users to register for more than one event at a time. When enabled, users will add event(s) to a \"cart\" and then pay for them all at once. Enabling this setting will affect online registration for all active events. The code is an alpha state, and you will potentially need to have developer resources to debug and fix sections of the codebase while testing and deploying it',
-        'help_text' => '',
-        'documentation_link' => [
-          'page' => 'CiviEvent Cart Checkout',
-          'resource' => 'wiki',
-        ],
-      ],
-      'acl_financial_type' => [
-        'group_name' => 'Contribute Preferences',
-        'group' => 'contribute',
-        'name' => 'acl_financial_type',
-        'type' => 'Boolean',
-        'html_type' => 'checkbox',
-        'quick_form_type' => 'Element',
-        'default' => 0,
-        'add' => '4.7',
-        'title' => 'Enable Access Control by Financial Type',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'help_text' => '',
-        'help' => [
-          'id' => 'acl_financial_type',
-        ],
-        'settings_pages' => [
-          'contribute' => [
-            'weight' => 30,
-          ],
-        ],
-        'on_change' => [
-          '0' => 'financialacls_toggle',
-        ],
-      ],
-      'flexmailer_traditional' => [
-        'group_name' => 'Flexmailer Preferences',
-        'group' => 'flexmailer',
-        'name' => 'flexmailer_traditional',
-        'type' => 'String',
-        'html_type' => 'select',
-        'html_attributes' => [
-          'class' => 'crm-select2',
-        ],
-        'pseudoconstant' => [
-          'callback' => '_flexmailer_traditional_options',
-        ],
-        'default' => 'auto',
-        'add' => '5.13',
-        'title' => 'Traditional Mailing Handler',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => 'For greater backward-compatibility, process \"<code>traditional</code>\" mailings with the CiviMail\'s hard-coded BAO.<br/>For greater forward-compatibility, process \"<code>traditional</code>\" mailings with Flexmailer\'s extensible pipeline.',
-        'help_text' => '',
-        'settings_pages' => [
-          'flexmailer' => [
-            'weight' => 5,
-          ],
-        ],
-      ],
-      'recaptchaPublicKey' => [
-        'group_name' => 'CiviCRM Preferences',
-        'group' => 'core',
-        'name' => 'recaptchaPublicKey',
-        'type' => 'String',
-        'quick_form_type' => 'Element',
-        'html_attributes' => [
-          'size' => 64,
-          'maxlength' => 64,
-        ],
-        'html_type' => 'text',
-        'default' => '',
-        'add' => '4.3',
-        'title' => 'reCAPTCHA Site Key',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => '',
-        'help_text' => '',
-        'settings_pages' => [
-          'recaptcha' => [
-            'weight' => 10,
-          ],
-        ],
-      ],
-      'recaptchaPrivateKey' => [
-        'group_name' => 'CiviCRM Preferences',
-        'group' => 'core',
-        'name' => 'recaptchaPrivateKey',
-        'type' => 'String',
-        'quick_form_type' => 'Element',
-        'html_attributes' => [
-          'size' => 64,
-          'maxlength' => 64,
-        ],
-        'html_type' => 'text',
-        'default' => '',
-        'add' => '4.3',
-        'title' => 'reCAPTCHA Secret Key',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => '',
-        'help_text' => '',
-        'settings_pages' => [
-          'recaptcha' => [
-            'weight' => 10,
-          ],
-        ],
-      ],
-      'forceRecaptcha' => [
-        'add' => '4.7',
-        'help_text' => '',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'group_name' => 'CiviCRM Preferences',
-        'group' => 'core',
-        'name' => 'forceRecaptcha',
-        'type' => 'Boolean',
-        'quick_form_type' => 'YesNo',
-        'html_type' => '',
-        'default' => 0,
-        'title' => 'Force reCAPTCHA on Contribution pages',
-        'description' => 'If enabled, reCAPTCHA will show on all contribution pages.',
-        'settings_pages' => [
-          'recaptcha' => [
-            'weight' => 10,
-          ],
-        ],
-      ],
-      'recaptchaOptions' => [
-        'group_name' => 'CiviCRM Preferences',
-        'group' => 'core',
-        'name' => 'recaptchaOptions',
-        'type' => 'String',
-        'quick_form_type' => 'Element',
-        'html_attributes' => [
-          'size' => 64,
-          'maxlength' => 64,
-        ],
-        'html_type' => 'text',
-        'default' => '',
-        'add' => '4.3',
-        'title' => 'reCAPTCHA Options',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => 'You can specify the reCAPTCHA theme options as comma separated data.(eg: theme:\'blackglass\', lang : \'fr\' ). Check the available options at <a href=\"https://developers.google.com/recaptcha/docs/display#config\">Customizing the Look and Feel of reCAPTCHA</a>.',
-        'help_text' => '',
-        'settings_pages' => [
-          'recaptcha' => [
-            'weight' => 10,
-          ],
-        ],
-      ],
-      'credit_notes_prefix' => [
-        'group_name' => 'Contribute Preferences',
-        'group' => 'contribute',
-        'name' => 'credit_notes_prefix',
-        'html_type' => 'text',
-        'quick_form_type' => 'Element',
-        'add' => '5.23',
-        'type' => 2,
-        'title' => 'Credit Notes Prefix',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => 'Prefix to be prepended to credit note ids',
-        'default' => 'CN_',
-        'help_text' => 'The credit note ID is generated when a contribution is set to Refunded, Cancelled or Chargeback. It is visible on invoices, if invoices are enabled',
-        'settings_pages' => [
-          'contribute' => [
-            'weight' => 80,
-          ],
-        ],
-      ],
     ],
   ];
 
@@ -3400,23 +3011,23 @@ function setting_getfields_expectedresult() {
 }
 
 /*
- * This example has been generated from the API test suite.
- * The test that created it is called "testGetFields"
- * and can be found at:
- * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/SettingTest.php
- *
- * You can see the outcome of the API tests at
- * https://test.civicrm.org/job/CiviCRM-Core-Matrix/
- *
- * To Learn about the API read
- * https://docs.civicrm.org/dev/en/latest/api/
- *
- * Browse the API on your own site with the API Explorer. It is in the main
- * CiviCRM menu, under: Support > Development > API Explorer.
- *
- * Read more about testing here
- * https://docs.civicrm.org/dev/en/latest/testing/
- *
- * API Standards documentation:
- * https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
- */
+* This example has been generated from the API test suite.
+* The test that created it is called "testGetFields"
+* and can be found at:
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/SettingTest.php
+*
+* You can see the outcome of the API tests at
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
+*
+* To Learn about the API read
+* https://docs.civicrm.org/dev/en/latest/api/
+*
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
+*
+* Read more about testing here
+* https://docs.civicrm.org/dev/en/latest/testing/
+*
+* API Standards documentation:
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
+*/

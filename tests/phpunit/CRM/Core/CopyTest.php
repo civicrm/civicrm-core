@@ -22,9 +22,9 @@ class CRM_Core_CopyTest extends CiviUnitTestCase {
   public function testEventCopy(): void {
 
     $this->createCustomGroupWithFieldOfType(['extends' => 'Event']);
-    $event = $this->eventCreate([$this->getCustomFieldName('text', 4) => 'blah']);
+    $event = $this->eventCreate([$this->getCustomFieldName('text') => 'blah']);
     $eventId = $event['id'];
-    $eventRes = $event;
+    $eventRes = $event['values'][$eventId];
     $params[$this->getCustomFieldName('text') . '_1'] = 'blah';
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
       $eventId,
@@ -63,14 +63,14 @@ class CRM_Core_CopyTest extends CiviUnitTestCase {
 
   }
 
-  /**
-   * @group locale
-   */
   public function testI18nEventCopy() {
 
     $locales = ['en_US', 'fr_CA', 'nl_NL'];
 
-    $cleanup = $this->useMultilingual(['en_US' => ['fr_CA', 'nl_NL']]);
+    $this->enableMultilingual();
+    CRM_Core_I18n_Schema::addLocale('fr_CA', 'en_US');
+    CRM_Core_I18n_Schema::addLocale('nl_NL', 'en_US');
+
     CRM_Core_I18n::singleton()->setLocale('en_US');
 
     $event = $this->eventCreate();
@@ -150,6 +150,11 @@ class CRM_Core_CopyTest extends CiviUnitTestCase {
       // other fields
       $this->compareLocalizedCopy($eventData, $eventCopy, $locParams, $identicalParams, $locSuffix);
     }
+
+    // reset to en_US only
+    CRM_Core_I18n::singleton()->setLocale('en_US');
+    CRM_Core_I18n_Schema::makeSinglelingual('en_US');
+
   }
 
   protected function compareLocalizedCopy($source, $dest, $locParams, $identicalParams, $locSuffix) {

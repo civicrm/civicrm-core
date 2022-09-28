@@ -54,20 +54,20 @@
   {include file="CRM/Contact/Form/Edit/Address.tpl" blockId=1}
   <table class="form-layout-compressed">
     <tr>
-      <td>{$form.email.1.email.label}</td>
+      <td><label>{ts}Email 1:{/ts}</label></td>
       <td>{$form.email.1.email.html|crmAddClass:email}</td>
     </tr>
     <tr>
-      <td>{$form.email.2.email.label}</td>
+      <td><label>{ts}Email 2:{/ts}</label></td>
       <td>{$form.email.2.email.html|crmAddClass:email}</td>
     </tr>
     <tr>
-      <td>{$form.phone.1.phone.label}</td>
-      <td>{$form.phone.1.phone.html|crmAddClass:phone} {$form.phone.1.phone_ext.label}&nbsp;{$form.phone.1.phone_ext.html|crmAddClass:four}&nbsp;{$form.phone.1.phone_type_id.html}</td>
+      <td><label>{ts}Phone 1:{/ts}</label></td>
+      <td>{$form.phone.1.phone.html|crmAddClass:phone} {ts context="phone_ext"}ext.{/ts}&nbsp;{$form.phone.1.phone_ext.html|crmAddClass:four}&nbsp;{$form.phone.1.phone_type_id.html}</td>
     </tr>
     <tr>
-      <td>{$form.phone.2.phone.label}</td>
-      <td>{$form.phone.2.phone.html|crmAddClass:phone} {$form.phone.2.phone_ext.label}&nbsp;{$form.phone.2.phone_ext.html|crmAddClass:four}&nbsp;{$form.phone.2.phone_type_id.html}</td>
+      <td><label>{ts}Phone 2:{/ts}</label></td>
+      <td>{$form.phone.2.phone.html|crmAddClass:phone} {ts context="phone_ext"}ext.{/ts}&nbsp;{$form.phone.2.phone_ext.html|crmAddClass:four}&nbsp;{$form.phone.2.phone_type_id.html}</td>
     </tr>
   </table>
 
@@ -88,7 +88,7 @@
             dataType: 'json',
             success: function(data) {
               var selectLocBlockId = $('#loc_event_id').val();
-              // Only change state when options are loaded.
+              // Only change state when options are loaded
               if (data.address_1_state_province_id) {
                 var defaultState = data.address_1_state_province_id;
                 $('#address_1_state_province_id', $form).one('crmOptionsUpdated', function() {
@@ -100,8 +100,7 @@
                 if ( i == 'count_loc_used' ) {
                   if ( ((selectLocBlockId == locBlockId) && data.count_loc_used > 1) ||
                     ((selectLocBlockId != locBlockId) && data.count_loc_used > 0) ) {
-                    // Counts retrieved via AJAX are already "other" Event counts.
-                    displayMessage(parseInt(data.count_loc_used) + 1);
+                    displayMessage(data.count_loc_used);
                   } else {
                     displayMessage(0);
                   }
@@ -118,12 +117,12 @@
           var createNew = document.getElementsByName("location_option")[0].checked;
           if (createNew) {
             $('#existingLoc', $form).hide();
-            // Clear all location fields values.
+            //clear all location fields values.
             if (clear !== false) {
               $(":input[id *= 'address_1_'], :input[id *= 'email_1_'], :input[id *= 'phone_1_']", $form).val("").change();
               {/literal}{if $config->defaultContactCountry}
               {if $config->defaultContactStateProvince}
-              // Set default state once options are loaded.
+              // Set default state once options are loaded
               var defaultState = {$config->defaultContactStateProvince}
               {literal}
                 $('#address_1_state_province_id', $form).one('crmOptionsUpdated', function() {
@@ -148,14 +147,9 @@
         showLocFields(false);
 
         function displayMessage(count) {
-          if (parseInt(count) > 1) {
-            var otherCount = parseInt(count) - 1;
-            if (otherCount > 1) {
-              var msg = {/literal}'{ts escape="js" 1="%1"}This location is used by %1 other events. Modifying location information will change values for all events.{/ts}'{literal};
-            } else {
-              var msg = {/literal}'{ts escape="js" 1="%1"}This location is used by %1 other event. Modifying location information will also change values for that event.{/ts}'{literal};
-            }
-            $('#locUsedMsg', $form).text(ts(msg, {1: otherCount})).addClass('status');
+          if (count) {
+            var msg = {/literal}'{ts escape="js" 1="%1"}This location is used by %1 other events. Modifying location information will change values for all events.{/ts}'{literal};
+            $('#locUsedMsg', $form).text(ts(msg, {1: count})).addClass('status');
           } else {
             $('#locUsedMsg', $form).text(' ').removeClass('status');
           }

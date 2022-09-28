@@ -236,8 +236,9 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Labels for advanced search against mailing summary.
    *
-   * @param string $field
-   * @return array
+   * @param $field
+   *
+   * @return unknown_type
    */
   public static function &yesNoOptions($field) {
     static $options;

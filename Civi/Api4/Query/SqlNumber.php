@@ -16,18 +16,12 @@ namespace Civi\Api4\Query;
  */
 class SqlNumber extends SqlExpression {
 
-  protected static $dataType = 'Float';
-
   protected function initialize() {
     \CRM_Utils_Type::validate($this->expr, 'Float');
   }
 
-  public function render(Api4SelectQuery $query): string {
+  public function render(array $fieldList): string {
     return $this->expr;
-  }
-
-  public static function getTitle(): string {
-    return ts('Number');
   }
 
 }

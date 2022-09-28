@@ -26,7 +26,7 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
     // 2. Now, let's hook into it...
     $this->hookClass->setHook('civicrm_entityTypes', [$this, '_hook_civicrm_entityTypes']);
     unset(Civi::$statics['CRM_Core_DAO_Email']);
-    CRM_Core_DAO_AllCoreTables::flush();
+    CRM_Core_DAO_AllCoreTables::init(1);
 
     // 3. And see if the data has changed...
     $fields = CRM_Core_DAO_Email::fields();
@@ -50,7 +50,7 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
 
   protected function tearDown(): void {
     CRM_Utils_Hook::singleton()->reset();
-    CRM_Core_DAO_AllCoreTables::flush();
+    CRM_Core_DAO_AllCoreTables::init(1);
     parent::tearDown();
   }
 
@@ -58,8 +58,6 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
    * Test CRM_Core_DAO_AllCoreTables::indices() function.
    *
    * Ensure indices are listed correctly with and without localization
-   *
-   * @group locale
    */
   public function testIndices() {
     // civicrm_group UI_title is localizable
@@ -218,18 +216,6 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
   public function testGetBriefName() {
     $this->assertEquals('Contact', CRM_Core_DAO_AllCoreTables::getBriefName('CRM_Contact_BAO_Contact'));
     $this->assertEquals('Contact', CRM_Core_DAO_AllCoreTables::getBriefName('CRM_Contact_DAO_Contact'));
-    $this->assertNull(CRM_Core_DAO_AllCoreTables::getBriefName('CRM_Core_DAO_XqZy'));
-  }
-
-  public function testGetFullName() {
-    $this->assertEquals('CRM_Contact_DAO_Contact', CRM_Core_DAO_AllCoreTables::getFullName('Contact'));
-    $this->assertNull(CRM_Core_DAO_AllCoreTables::getFullName('XqZy'));
-  }
-
-  public function testGetEntityNameForTable() {
-    $this->assertEquals('Contact', CRM_Core_DAO_AllCoreTables::getEntityNameForTable('civicrm_contact'));
-    $this->assertEquals('RelationshipCache', CRM_Core_DAO_AllCoreTables::getEntityNameForTable('civicrm_relationship_cache'));
-    $this->assertNull(CRM_Core_DAO_AllCoreTables::getEntityNameForTable('civicrm_invalid_table'));
   }
 
 }

@@ -9,7 +9,7 @@
 *}
 {* printBody.tpl: wrapper for Print views without HTML surrounds. *}
 
-{if $isForm and $formTpl}
+{if $isForm and isset($formTpl)}
     {include file="CRM/Form/$formTpl.tpl"}
 {else}
     {include file=$tplFile}

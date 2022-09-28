@@ -96,6 +96,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    * The conversion to date picker will result int these fields
    * being renamed _high & _low and needing to return correctly.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -129,6 +130,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    * The conversion to date picker will result int these fields
    * being renamed _high & _low and needing to return correctly.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -484,6 +486,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
   /**
    * Test search builder style query including custom address fields.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */

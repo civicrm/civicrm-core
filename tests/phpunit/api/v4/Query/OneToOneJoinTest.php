@@ -20,15 +20,14 @@
 namespace api\v4\Query;
 
 use Civi\Api4\Contact;
-use api\v4\Api4TestBase;
-use Civi\Test\TransactionalInterface;
+use api\v4\UnitTestCase;
 
 /**
  * Class OneToOneJoinTest
  * @package api\v4\Query
  * @group headless
  */
-class OneToOneJoinTest extends Api4TestBase implements TransactionalInterface {
+class OneToOneJoinTest extends UnitTestCase {
 
   public function testOneToOneJoin() {
     $armenianContact = Contact::create()

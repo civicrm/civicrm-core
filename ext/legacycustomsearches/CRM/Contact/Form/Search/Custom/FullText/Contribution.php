@@ -29,8 +29,9 @@ class CRM_Contact_Form_Search_Custom_FullText_Contribution extends CRM_Contact_F
    * @return bool
    */
   public function isActive() {
-    return CRM_Core_Component::isEnabled('CiviContribute') &&
-      CRM_Core_Permission::check('access CiviContribute');
+    $config = CRM_Core_Config::singleton();
+    return in_array('CiviContribute', $config->enableComponents) &&
+    CRM_Core_Permission::check('access CiviContribute');
   }
 
   /**

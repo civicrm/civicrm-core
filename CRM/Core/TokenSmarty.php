@@ -41,7 +41,6 @@ class CRM_Core_TokenSmarty {
    * @internal
    */
   public static function render(array $messages, array $tokenContext = [], array $smartyAssigns = []): array {
-    $result = [];
     $tokenContextDefaults = [
       'controller' => __CLASS__,
       'smarty' => TRUE,

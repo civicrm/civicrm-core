@@ -542,14 +542,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
-    /* Before we do any loading, let's start the session and write to it.
-     * We typically call authenticate only when we need to bootstrap the CMS
-     * directly via Civi and hence bypass the normal CMS auth and bootstrap
-     * process typically done in CLI and cron scripts. See: CRM-12648
-     */
-    $session = CRM_Core_Session::singleton();
-    $session->set('civicrmInitSession', TRUE);
-
     $config = CRM_Core_Config::singleton();
 
     if ($loadCMSBootstrap) {
@@ -610,8 +602,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function permissionDenied() {
     status_header(403);
-    global $civicrm_wp_title;
-    $civicrm_wp_title = ts('You do not have permission to access this page.');
     throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
   }
 
@@ -793,7 +783,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @param string $dir
+   * @param $dir
    *
    * @return bool
    */
@@ -881,12 +871,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       'role' => get_option('default_role'),
     ];
 
-    // The notify parameter was ignored on WordPress and default behaviour was to always notify.
-    // Preserve that behaviour but allow the "notify" parameter to be used.
-    if (!isset($params['notify'])) {
-      $params['notify'] = TRUE;
-    }
-
     // If there's a password add it, otherwise generate one.
     if (!empty($params['cms_pass'])) {
       $user_data['user_pass'] = $params['cms_pass'];
@@ -938,17 +922,12 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     if (!current_user_can('create_users')) {
       $creds = [];
       $creds['user_login'] = $params['cms_name'];
-      $creds['user_password'] = $user_data['user_pass'];
       $creds['remember'] = TRUE;
-
-      // @todo handle a wp_signon failure
       wp_signon($creds, FALSE);
     }
 
-    if ($params['notify']) {
-      // Fire the new user action. Sends notification email by default.
-      do_action('register_new_user', $uid);
-    }
+    // Fire the new user action. Sends notification email by default.
+    do_action('register_new_user', $uid);
 
     // Restore the CiviCRM-WordPress listeners.
     $this->hooks_core_add();
@@ -981,7 +960,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
   /**
    * @param array $params
-   * @param array $errors
+   * @param $errors
    * @param string $emailName
    */
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
@@ -1002,7 +981,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
     if (!empty($params['mail'])) {
       if (!is_email($params['mail'])) {
-        $errors[$emailName] = ts("Your email is invalid");
+        $errors[$emailName] = "Your email is invaid";
       }
       elseif (email_exists($params['mail'])) {
         $errors[$emailName] = ts('The email address %1 already has an account associated with it. <a href="%2">Have you forgotten your password?</a>',
@@ -1419,8 +1398,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * is only as of PHP 7.3.0 that the setcookie() method supports the "SameSite"
    * attribute in its options and will accept "None" as a valid value.
    *
-   * @param string $name The name of the cookie.
-   * @param string $value The value of the cookie.
+   * @param $name The name of the cookie.
+   * @param $value The value of the cookie.
    * @param array $options The header options for the cookie.
    */
   private function setAuthCookie($name, $value, $options) {
@@ -1489,123 +1468,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function showPasswordFieldWhenAdminCreatesUser() {
     return !$this->isUserRegistrationPermitted();
-  }
-
-  /**
-   * Should the current execution exit after a fatal error?
-   *
-   * In WordPress, it is not usually possible to trigger theming outside of the WordPress theme process,
-   * meaning that in order to render an error inside the theme we cannot exit on error.
-   *
-   * @internal
-   * @return bool
-   */
-  public function shouldExitAfterFatal() {
-    $ret = TRUE;
-    if (!is_admin() && !wp_doing_ajax()) {
-      $ret = FALSE;
-    }
-
-    return apply_filters('civicrm_exit_after_fatal', $ret);
-  }
-
-  /**
-   * Make sure clean URLs are properly set in settings file.
-   *
-   * @return CRM_Utils_Check_Message[]
-   */
-  public function checkCleanurls() {
-    $config = CRM_Core_Config::singleton();
-    $clean = 0;
-    if (defined('CIVICRM_CLEANURL')) {
-      $clean = CIVICRM_CLEANURL;
-    }
-    if ($clean == 1) {
-      //cleanURLs are enabled in CiviCRM, let's make sure the wordpress permalink settings and cache are actually correct by checking the first active contribution page
-      $contributionPages = \Civi\Api4\ContributionPage::get(FALSE)
-        ->addSelect('id')
-        ->addWhere('is_active', '=', TRUE)
-        ->setLimit(1)
-        ->execute();
-      if (count($contributionPages) > 0) {
-        $activePageId = $contributionPages[0]['id'];
-        $message = self::checkCleanPage('/contribute/transact/?reset=1&id=', $activePageId, $config);
-
-        return $message;
-      }
-      else {
-        //no active contribution pages, we can check an event page. This probably won't ever happen.
-        $eventPages = \Civi\Api4\Event::get(FALSE)
-          ->addSelect('id')
-          ->addWhere('is_active', '=', TRUE)
-          ->setLimit(1)
-          ->execute();
-        if (count($eventPages) > 0) {
-          $activePageId = $eventPages[0]['id'];
-          $message = self::checkCleanPage('/event/info/?reset=1&id=', $activePageId, $config);
-
-          return $message;
-        }
-        else {
-          //If there are no active event or contribution pages, we'll skip this check for now.
-
-          return [];
-        }
-      }
-    }
-    else {
-      //cleanURLs aren't enabled or aren't defined correctly in CiviCRM, admin should check civicrm.settings.php
-      $warning = ts('Clean URLs are not enabled correctly in CiviCRM. This can lead to "valid id" errors for users registering for events or making donations. Check civicrm.settings.php and review <a %1>the documentation</a> for more information.', [1 => 'href="' . CRM_Utils_System::docURL2('sysadmin/integration/wordpress/clean-urls/', TRUE) . '"']);
-
-      return [
-        new CRM_Utils_Check_Message(
-          __FUNCTION__,
-          $warning,
-          ts('Clean URLs Not Enabled'),
-          \Psr\Log\LogLevel::WARNING,
-          'fa-wordpress'
-        ),
-      ];
-    }
-  }
-
-  private static function checkCleanPage($slug, $id, $config) {
-    $page = $config->userFrameworkBaseURL . $config->wpBasePage . $slug . $id;
-    try {
-      $client = new \GuzzleHttp\Client();
-      $res = $client->head($page, ['http_errors' => FALSE]);
-      $httpCode = $res->getStatusCode();
-    }
-    catch (Exception $e) {
-      Civi::log()->error("Could not run " . __FUNCTION__ . " on $page. GuzzleHttp\Client returned " . $e->getMessage());
-
-      return [
-        new CRM_Utils_Check_Message(
-          __FUNCTION__,
-          ts('Could not load a clean page to check'),
-          ts('Guzzle client error'),
-          \Psr\Log\LogLevel::ERROR,
-          'fa-wordpress'
-        ),
-      ];
-    }
-
-    if ($httpCode == 404) {
-      $warning = ts('<a %1>Click here to go to Settings > Permalinks, then click "Save" to refresh the cache.</a>', [1 => 'href="' . get_admin_url(NULL, 'options-permalink.php') . '"']);
-      $message = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        $warning,
-        ts('Wordpress Permalinks cache needs to be refreshed.'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-wordpress'
-      );
-
-      return [$message];
-    }
-
-    //sanity
-    return [];
-
   }
 
 }

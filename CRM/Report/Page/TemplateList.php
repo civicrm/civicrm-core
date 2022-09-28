@@ -22,7 +22,7 @@ class CRM_Report_Page_TemplateList extends CRM_Core_Page {
 
   /**
    * @param int $compID
-   * @param string|null $grouping
+   * @param null $grouping
    *
    * @return array
    */
@@ -68,9 +68,10 @@ LEFT  JOIN civicrm_component comp
 
     $dao = CRM_Core_DAO::executeQuery($sql);
     $rows = [];
+    $config = CRM_Core_Config::singleton();
     while ($dao->fetch()) {
       if ($dao->component_name != 'Contact' && $dao->component_name != $dao->grouping &&
-        !CRM_Core_Component::isEnabled("Civi{$dao->component_name}")
+        !in_array("Civi{$dao->component_name}", $config->enableComponents)
       ) {
         continue;
       }

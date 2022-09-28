@@ -185,7 +185,7 @@ class CRM_Core_Block {
    *   One of the class constants (ADD, SEARCH, etc.).
    * @param string $property
    *   The desired property.
-   * @param mixed $value
+   * @param string $value
    *   The value of the desired property.
    */
   public static function setProperty($id, $property, $value) {
@@ -326,6 +326,8 @@ class CRM_Core_Block {
    * Create the list of options to create New objects for the application and format is as a block.
    */
   private static function setTemplateShortcutValues() {
+    $config = CRM_Core_Config::singleton();
+
     static $shortCuts = [];
 
     if (!($shortCuts)) {
@@ -347,12 +349,14 @@ class CRM_Core_Block {
 
       $components = CRM_Core_Component::getEnabledComponents();
 
-      if ($components) {
+      if (!empty($config->enableComponents)) {
         // check if we can process credit card contribs
         $newCredit = CRM_Core_Config::isEnabledBackOfficeCreditCardPayments();
 
-        foreach ($components as $obj) {
-          $obj->creatNewShortcut($shortCuts, $newCredit);
+        foreach ($components as $componentName => $obj) {
+          if (in_array($componentName, $config->enableComponents)) {
+            $obj->creatNewShortcut($shortCuts, $newCredit);
+          }
         }
       }
 
@@ -394,6 +398,9 @@ class CRM_Core_Block {
     }
 
     $values = [];
+    foreach ($shortCuts as $key => $short) {
+      $values[$key] = self::setShortCutValues($short);
+    }
 
     // Deprecated hook with typo.  Please don't use this!
     CRM_Utils_Hook::links('create.new.shorcuts',
@@ -401,13 +408,6 @@ class CRM_Core_Block {
       CRM_Core_DAO::$_nullObject,
       $values
     );
-    if ($values) {
-      CRM_Core_Error::deprecatedWarning('hook_civicrm_links "create.new.shorcuts" deprecated in favor of "create.new.shortcuts"');
-    }
-
-    foreach ($shortCuts as $key => $short) {
-      $values[$key] = self::setShortCutValues($short);
-    }
 
     // Hook that enables extensions to add user-defined links
     CRM_Utils_Hook::links('create.new.shortcuts',
@@ -417,15 +417,16 @@ class CRM_Core_Block {
     );
 
     foreach ($values as $key => $val) {
-      $values[$key]['name'] = $val['name'] ?? $val['title'];
-      $values[$key] += ['shortCuts' => []];
+      if (!empty($val['title'])) {
+        $values[$key]['name'] = CRM_Utils_Array::value('name', $val, $val['title']);
+      }
     }
 
-    self::setProperty(self::CREATE_NEW, 'templateValues', ['shortCuts' => $values]);
+    self::setProperty(self::CREATE_NEW, 'templateValues', array('shortCuts' => $values));
   }
 
   /**
-   * @param array $short
+   * @param $short
    *
    * @return array
    */
@@ -461,6 +462,10 @@ class CRM_Core_Block {
           'title' => ts('My Contact Dashboard'),
         ),
       );
+    }
+
+    if (empty($dashboardLinks)) {
+      return NULL;
     }
 
     $values = [];
@@ -547,7 +552,6 @@ class CRM_Core_Block {
     if ($config->isUpgradeMode()) {
       return NULL;
     }
-    CRM_Core_Smarty::singleton()->ensureVariablesAreAssigned(['langSwitch', 'breadcrumb', 'pageTitle']);
 
     if (!self::getProperty($id, 'active')) {
       return NULL;

@@ -22,8 +22,8 @@ class CRM_Utils_Network {
   /**
    * Try connecting to a TCP service; if it fails, retry. Repeat until serverStartupTimeOut elapses.
    *
-   * @param string $host
-   * @param string $port
+   * @param $host
+   * @param $port
    * @param int $serverStartupTimeOut
    *   Seconds.
    * @param float $interval

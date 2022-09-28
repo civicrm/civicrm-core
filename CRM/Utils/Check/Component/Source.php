@@ -35,8 +35,6 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
     $files[] = '[civicrm.vendor]/pear/net_smtp/phpdoc.sh';
     $files[] = '[civicrm.vendor]/phpoffice/phpword/samples';
     $files[] = '[civicrm.root]/templates/CRM/common/version.tpl';
-    // TODO: We need more proactive deletion for files like:
-    // $files[]  = '[civicrm.root]/CRM/Contact/Import/Parser.php';
     $files[] = '[civicrm.packages]/Log.php';
     $files[] = '[civicrm.packages]/_ORIGINAL_/Log.php';
     $files[] = '[civicrm.packages]/Log/composite.php';
@@ -60,7 +58,7 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    *   Each item is an array with keys:
    *     - name: string, an abstract name
    *     - path: string, a full file path

@@ -67,7 +67,7 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
         'remove' => [
           'name' => ts('Remove'),
           'title' => ts('Remove Transaction'),
-          'extra' => 'onclick = "removeFromBatch(%%id%%);"',
+          'extra' => 'onclick = "assignRemove( %%id%%,\'' . 'remove' . '\' );"',
         ],
       ];
     }

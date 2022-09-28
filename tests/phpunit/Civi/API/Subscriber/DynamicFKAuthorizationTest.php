@@ -30,6 +30,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
 
   protected function setUp(): void {
     parent::setUp();
+    \CRM_Core_DAO_AllCoreTables::init(TRUE);
 
     \CRM_Core_DAO_AllCoreTables::registerEntityType('FakeFile', 'CRM_Fake_DAO_FakeFile', 'fake_file');
     $fileProvider = new StaticProvider(
@@ -99,6 +100,11 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
       'select',
       ['fake_widget', 'fake_forbidden']
     ));
+  }
+
+  protected function tearDown(): void {
+    parent::tearDown();
+    \CRM_Core_DAO_AllCoreTables::init(TRUE);
   }
 
   /**
@@ -172,13 +178,12 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
   }
 
   /**
-   * @param string $entity
-   * @param string $action
+   * @param $entity
+   * @param $action
    * @param array $params
-   *
    * @dataProvider okDataProvider
    */
-  public function testOk(string $entity, string $action, array $params): void {
+  public function testOk($entity, $action, $params) {
     $params['version'] = 3;
     $params['debug'] = 1;
     $params['check_permissions'] = 1;

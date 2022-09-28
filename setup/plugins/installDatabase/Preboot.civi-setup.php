@@ -42,7 +42,7 @@ if (!defined('CIVI_SETUP')) {
       return $conn->escape_string($text);
     };
 
-    \Civi\Test::$statics['testPreInstall'] = 1;
+    \Civi::$statics['testPreInstall'] = 1;
 
     CRM_Core_Config::singleton(FALSE, TRUE);
 

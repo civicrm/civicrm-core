@@ -9,24 +9,25 @@
   receipt_text:::{$receipt_text}
   {/if}
   is_pay_later:::{$is_pay_later}
+  displayName:::{$displayName}
   financialTypeId:::{$financialTypeId}
   financialTypeName:::{$financialTypeName}
   contactID:::{$contactID}
   contributionID:::{$contributionID}
   amount:::{$amount}
-  {if !empty($amount_level)}
+  {if isset($amount_level)}
   amount_level:::{$amount_level}
   {/if}
-  {if !empty($pay_later_receipt)}
+  {if isset($pay_later_receipt)}
   pay_later_receipt:::{$pay_later_receipt}
   {/if}
-  {if !empty($headerstyle)}
+  {if isset($headerstyle)}
   headerStyle:::{$headerStyle}
   {/if}
-  {if !empty($valueStyle)}
+  {if isset($valueStyle)}
   valueStyle:::{$valueStyle}
   {/if}
-  {if !empty($labelStyle)}
+  {if isset($labelStyle)}
   labelStyle:::{$labelStyle}
   {/if}
   priceSetID:::{$priceSetID}
@@ -38,85 +39,92 @@
   getTaxDetails:::{$getTaxDetails}
   totalTaxAmount:::{$totalTaxAmount}
   {/if}
-  {if !empty($is_monetary)}
+  {if isset($is_monetary)}
   is_monetary:::{$is_monetary}
   {/if}
-  {if !empty($isShare)}
+  {if isset($isShare)}
   isShare:::{$isShare}
   {/if}
   honor_block_is_active:::{$honor_block_is_active}
   {if $honor_block_is_active}
   soft_credit_type:::{$soft_credit_type}
   {/if}
-  {if !empty($is_recur)}
+  {if isset($is_recur)}
   is_recur:::{$is_recur}
   {/if}
-  {if !empty($trxn_id)}
+  {if isset($contributeMode)}
+  contributeMode:::{$contributeMode}
+  {/if}
+  {if isset($trxn_id)}
   trxn_id:::{$trxn_id}
   {/if}
-  {if !empty($cancelSubscriptionUrl)}
+  {if isset($cancelSubscriptionUrl)}
   cancelSubscriptionUrl:::{$cancelSubscriptionUrl}
   updateSubscriptionBillingUrl:::{$updateSubscriptionBillingUrl}
   updateSubscriptionUrl:::{$updateSubscriptionUrl}
   {/if}
-  {if !empty($priceset)}
+  {if isset($priceset)}
   priceset:::{$priceset}
   {/if}
+  {if isset($taxTerm)}
   taxTerm:::{$taxTerm}
+  {/if}
   {if !empty($pcpBlock)}
   pcpBlock:::{$pcpBlock}
   pcp_display_in_roll:::{$pcp_display_in_roll}
   pcp_roll_nickname:::{$pcp_roll_nickname}
   pcp_personal_note:::{$pcp_personal_note}
   {/if}
-  {if !empty($onBehalfProfile_grouptitle)}
+  {if isset($onBehalfProfile_grouptitle)}
   onBehalfProfile_grouptitle:::{$onBehalfProfile_grouptitle}
   {/if}
   email:::{$email}
-  {if !empty($contributionPageId)}
+  {if isset($contributionPageId)}
   contributionPageId:::{$contributionPageId}
   title:::{$title}
   {/if}
-  {if !empty($isBillingAddressRequiredForPayLater)}
+  {if isset($isBillingAddressRequiredForPayLater)}
   isBillingAddressRequiredForPayLater:::{$isBillingAddressRequiredForPayLater}
   {/if}
+  {if isset($billingName)}
   billingName:::{$billingName}
   address:::{$address}
-  {if !empty($credit_card_type)}
+  {/if}
+  {if isset($credit_card_type)}
   credit_card_type:::{$credit_card_type}
   credit_card_number:::{$credit_card_number}
   credit_card_exp_date:::{$credit_card_exp_date}
   {/if}
-  {if !empty($selectPremium)}
+  {if isset($selectPremium)}
   selectPremium:::{$selectPremium}
   product_name:::{$product_name}
   option:::{$option}
   sku:::{$sku}
   {/if}
-  {if !empty($start_date)}
+  {if isset($start_date)}
   start_date:::{$start_date}
   end_date:::{$end_date}
   {/if}
-  {if !empty($is_deductible)}
+  {if isset($is_deductible)}
   is_deductible:::{$is_deductible}
   {/if}
-  {if !empty($contact_email)}
+  {if isset($contact_email)}
   contact_email:::{$contact_email}
   {/if}
-  {if !empty($contact_phone)}
+  {if isset($contact_phone)}
   contact_phone:::{$contact_phone}
   {/if}
-  {if !empty($price)}
+  {if isset($price)}
   price:::{$price}
   {/if}
-  {if !empty($customPre_grouptitle)}
+  {if isset($customPre_grouptitle)}
   customPre_grouptitle:::{$customPre_grouptitle}
   {/if}
-  {if !empty($customPost_grouptitle)}
+  {if isset($customPost_grouptitle)}
   customPost_grouptitle:::{$customPost_grouptitle}
   {/if}
   contributionStatus:::{$contributionStatus}
- {if !empty($lineItem)}
+ {if isset($lineItem)}
  {foreach from=$lineItem item=value key=priceset}
   {foreach from=$value item=line}
      line.html_type:::{$line.html_type}
@@ -125,7 +133,7 @@
      line.description:::{$line.description}
      line.qty:::{$line.qty}
      line.unit_price:::{$line.unit_price}
-     {if !empty($line.tax_rate)}
+     {if isset($line.tax_rate)}
      line.tax_rate:::{$line.tax_rate}
      line.tax_amount:::{$line.tax_amount}
      {/if}

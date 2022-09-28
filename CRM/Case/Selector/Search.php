@@ -106,7 +106,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   /**
    * The query object
    *
-   * @var CRM_Contact_BAO_Query
+   * @var string
    */
   protected $_query;
 
@@ -167,7 +167,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    * - Edit
    *
    * @param bool $isDeleted
-   * @param string|null $key
+   * @param null $key
    *
    * @return array
    */
@@ -354,7 +354,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
       $rows[$result->case_id] = $row;
     }
 
-    //retrieve the scheduled & recent Activity type and date for selector
+    //retrive the scheduled & recent Activity type and date for selector
     if (!empty($scheduledInfo)) {
       $schdeduledActivity = CRM_Case_BAO_Case::getNextScheduledActivity($scheduledInfo, 'upcoming');
       foreach ($schdeduledActivity as $key => $value) {
@@ -417,12 +417,12 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
         ],
         [
           'name' => ts('Most Recent'),
-          // @fixme: Triggers DB error field not found on "Find Cases": 'sort' => 'case_recent_activity_date',
+          'sort' => 'case_recent_activity_date',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],
         [
           'name' => ts('Next Sched.'),
-          // @fixme: Triggers DB error field not found on "Find Cases": 'sort' => 'case_scheduled_activity_date',
+          'sort' => 'case_scheduled_activity_date',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],
         ['name' => ts('Actions')],
@@ -451,7 +451,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   }
 
   /**
-   * @return CRM_Contact_BAO_Query
+   * @return string
    */
   public function &getQuery() {
     return $this->_query;

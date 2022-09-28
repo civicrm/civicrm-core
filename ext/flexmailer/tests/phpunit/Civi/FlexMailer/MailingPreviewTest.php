@@ -83,7 +83,7 @@ class MailingPreviewTest extends \CiviUnitTestCase {
     $this->assertMaxIds($maxIDs);
 
     $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
-    $this->assertEquals("Hello $displayName",
+    $this->assertEquals("[CiviMail Draft] Hello $displayName",
       $previewResult['values']['subject']);
 
     $this->assertStringContainsString("This is $displayName", $previewResult['values']['body_text']);
@@ -112,7 +112,7 @@ class MailingPreviewTest extends \CiviUnitTestCase {
     $previewResult = $this->callAPISuccess('mailing', 'preview', $params);
     $this->assertMaxIds($maxIDs);
 
-    $this->assertEquals("Hello $displayName",
+    $this->assertEquals("[CiviMail Draft] Hello $displayName",
       $previewResult['values']['subject']);
 
     $this->assertStringContainsString("This is $displayName", $previewResult['values']['body_text']);

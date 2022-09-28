@@ -9,9 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\Address;
-use Civi\Api4\Domain;
-
 /**
  *  Test APIv3 civicrm_contribute_* functions
  *
@@ -30,36 +27,24 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $this->quickCleanUpFinancialEntities();
     $this->revertTemplateToReservedTemplate('contribution_invoice_receipt');
     CRM_Utils_Hook::singleton()->reset();
-    parent::tearDown();
   }
 
   /**
    * CRM-17815 - Test due date and payment advice block in generated
    * invoice pdf for pending and completed contributions
    */
-  public function testInvoiceForDueDate(): void {
+  public function testInvoiceForDueDate() {
     $contactIds = [];
     $params = [
       'output' => 'pdf_invoice',
       'forPage' => 1,
     ];
 
-    $contactID = $this->individualCreate();
-    $this->callAPISuccess('Address', 'create', [
-      'contact_id' => $contactID,
-      'street_address' => '9 Downing Street',
-      'state_province_id' => 'Maine',
-      'supplemental_address_1' => 'Back Alley',
-      'supplemental_address_2' => 'Left corner',
-      'postal_code' => 90990,
-      'city' => 'Auckland',
-      'country_id' => 'US',
-    ]);
+    $this->_individualId = $this->individualCreate();
     $contributionParams = [
-      'contact_id' => $contactID,
+      'contact_id' => $this->_individualId,
       'total_amount' => 100,
       'financial_type_id' => 'Donation',
-      'source' => 'Donor gift',
     ];
     $result = $this->callAPISuccess('Contribution', 'create', $contributionParams);
 
@@ -86,17 +71,12 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $this->assertStringNotContainsString('Due Date', $invoiceHTML[$result['id']]);
     $this->assertStringNotContainsString('PAYMENT ADVICE', $invoiceHTML[$result['id']]);
     $this->assertStringContainsString('Mr. Anthony Anderson II', $invoiceHTML[$result['id']]);
-    $this->assertStringContainsString('Left corner ME', $invoiceHTML[$result['id']]);
-    $this->assertStringContainsString('9 Downing Street Back Alley', $invoiceHTML[$result['id']]);
-    $this->assertStringContainsString('Auckland  90990', $invoiceHTML[$result['id']]);
-    $this->assertStringContainsString('United States', $invoiceHTML[$result['id']]);
-    $this->assertStringContainsString('Donor gift', $invoiceHTML[$result['id']]);
 
     $this->assertStringContainsString('Due Date', $invoiceHTML[$contribution['id']]);
     $this->assertStringContainsString('PAYMENT ADVICE', $invoiceHTML[$contribution['id']]);
 
     $this->assertStringContainsString('AMOUNT DUE:</font></b></td>
-        <td style="text-align:right;"><b><font size="1">$92.00</font></b></td>', $invoiceHTML[$contribution3['id']]);
+                <td style="text-align:right;"><b><font size="1">$ 92.00</font></b></td>', $invoiceHTML[$contribution3['id']]);
   }
 
   /**
@@ -105,7 +85,7 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testInvoiceForLineItems(): void {
+  public function testInvoiceForLineItems() {
 
     $this->enableTaxAndInvoicing();
 
@@ -173,12 +153,12 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $lineItems = $this->callAPISuccess('LineItem', 'get', ['contribution_id' => $order['id']]);
 
     foreach ($lineItems['values'] as $lineItem) {
-      $this->assertStringContainsString("<font size=\"1\">$" . $lineItem['line_total'] . '</font>', $invoiceHTML);
+      $this->assertStringContainsString("<font size=\"1\">$ {$lineItem['line_total']}</font>", $invoiceHTML);
     }
 
     $totalAmount = $this->formatMoneyInput($order['values'][$order['id']]['total_amount']);
     $this->assertStringContainsString("TOTAL USD</font></b></td>
-        <td style=\"text-align:right;\"><font size=\"1\">$" . $totalAmount . '</font>', $invoiceHTML);
+                <td style=\"text-align:right;\"><font size=\"1\">$ $totalAmount</font>", $invoiceHTML);
 
   }
 
@@ -186,12 +166,12 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
    * Test invoices if payment is made with different currency.
    *
    * https://lab.civicrm.org/dev/core/issues/2269
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testThatInvoiceShowsTheActualContributionCurrencyInsteadOfTheDefaultOne(): void {
+  public function testThatInvoiceShowTheActuallContributionCurrencyInsteadOfTheDefaultOne() {
     $this->setDefaultCurrency('USD');
-    $contactID = Domain::get()->addSelect('contact_id')->execute()->first()['contact_id'];
-    Address::create()->setValues(['contact_id' => $contactID, 'city' => 'Beverley Hills', 'state_province_id:label' => 'California', 'country_id:label' => 'United States', 'postal_code' => 90210])->execute();
-    Civi::cache('metadata')->clear();
+
     $this->_individualId = $this->individualCreate();
 
     $contributionID = $this->setupContribution();
@@ -206,14 +186,11 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $this->assertStringNotContainsString('$', $invoiceHTML);
     $this->assertStringNotContainsString('Amount USD', $invoiceHTML);
     $this->assertStringNotContainsString('TOTAL USD', $invoiceHTML);
-    $this->assertStringContainsString('£0.00', $invoiceHTML);
-    $this->assertStringContainsString('£100.00', $invoiceHTML);
+    $this->assertStringContainsString('£ 0.00', $invoiceHTML);
+    $this->assertStringContainsString('£ 100.00', $invoiceHTML);
     $this->assertStringContainsString('Amount GBP', $invoiceHTML);
     $this->assertStringContainsString('TOTAL GBP', $invoiceHTML);
-    $this->assertStringContainsString('California', $invoiceHTML);
-    $this->assertStringContainsString('90210', $invoiceHTML);
-    $this->assertStringContainsString('United States', $invoiceHTML);
-    $this->assertStringContainsString('Default Domain Name', $invoiceHTML);
+
   }
 
   /**
@@ -239,8 +216,6 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $expected = [
       'externalIdentifier (token):::2345',
       'displayName (token):::Mr. Anthony Anderson II',
-      'currency (token):::GBP',
-      'currency (smarty):::GBP',
     ];
     foreach ($expected as $string) {
       $this->assertStringContainsString($string, $invoiceHTML);

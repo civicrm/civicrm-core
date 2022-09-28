@@ -106,7 +106,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     foreach ($entities['values'] as $value) {
       $ids[] = $value['entity_id'];
     }
-    [$batchContriID1, $batchContriID2] = $ids;
+    list($batchContriID1, $batchContriID2) = $ids;
 
     $useCases = [
       // Case 1: Search for ONLY those contributions which are created from batch
@@ -135,7 +135,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       $fv = $case['form_value'];
       CRM_Contact_BAO_Query::processSpecialFormValue($fv, ['contribution_batch_id']);
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($fv));
-      [$select, $from, $where] = $query->query();
+      list($select, $from, $where) = $query->query();
 
       // get and assert contribution count
       $contributions = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT civicrm_contribution.id %s %s AND civicrm_contribution.id IS NOT NULL', $from, $where))->fetchAll();
@@ -237,7 +237,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       $fv = $case['form_value'];
       CRM_Contact_BAO_Query::processSpecialFormValue($fv, ['financial_trxn_card_type_id']);
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($fv));
-      [$select, $from, $where] = $query->query();
+      list($select, $from, $where) = $query->query();
 
       // get and assert contribution count
       $contributions = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT civicrm_contribution.id %s %s AND civicrm_contribution.id IS NOT NULL', $from, $where))->fetchAll();
@@ -334,7 +334,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       $fv = $case['form_value'];
       CRM_Contact_BAO_Query::processSpecialFormValue($fv, ['financial_trxn_pan_truncation']);
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($fv));
-      [$select, $from, $where] = $query->query();
+      list($select, $from, $where) = $query->query();
 
       // get and assert contribution count
       $contributions = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT civicrm_contribution.id %s %s AND civicrm_contribution.id IS NOT NULL', $from, $where))->fetchAll();
@@ -359,7 +359,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $fv = ['contact_id' => $contactID];
     $queryParams = CRM_Contact_BAO_Query::convertFormValues($fv);
     $selector = new CRM_Contribute_Selector_Search($queryParams, CRM_Core_Action::ADD);
-    [$select, $from, $where] = $selector->getQuery()->query();
+    list($select, $from, $where) = $selector->getQuery()->query();
 
     // get and assert contribution count
     $contributions = CRM_Core_DAO::executeQuery("{$select} {$from} {$where}")->fetchAll();
@@ -372,7 +372,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'contact_id' => $contactID,
     ]);
     $selector = new CRM_Contribute_Selector_Search($queryParams, CRM_Core_Action::ADD);
-    [$select, $from, $where] = $selector->getQuery()->query();
+    list($select, $from, $where) = $selector->getQuery()->query();
 
     // get and assert contribution count
     $contributions = CRM_Core_DAO::executeQuery("{$select} {$from} {$where}")->fetchAll();
@@ -388,7 +388,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $this->setUpRecurringContributions();
 
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($formValues));
-    [$select, $from, $where, $having] = $query->query();
+    list($select, $from, $where, $having) = $query->query();
 
     // get and assert contribution count
     $contacts = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT contact_a.id, contact_a.display_name %s %s AND contact_a.id IS NOT NULL', $from, $where))->fetchAll();
@@ -478,7 +478,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       $fv = $case['form_value'];
       CRM_Contact_BAO_Query::processSpecialFormValue($fv, ['cancel_reason']);
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($fv));
-      [$select, $from, $where] = $query->query();
+      list($select, $from, $where) = $query->query();
 
       // get and assert contribution count
       $contributions = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT civicrm_contribution.id %s %s AND civicrm_contribution.id IS NOT NULL AND civicrm_contribution.contribution_status_id = 3', $from, $where))->fetchAll();

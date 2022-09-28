@@ -19,7 +19,7 @@ class CRM_Upgrade_Controller extends CRM_Core_Controller {
   /**
    * Class constructor.
    *
-   * @param string $title
+   * @param null $title
    * @param bool|int $action
    * @param bool $modal
    */

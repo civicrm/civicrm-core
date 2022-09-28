@@ -27,7 +27,7 @@
  *
  * @return array
  *   API success array
- * @throws \CRM_Core_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_custom_field_create(array $params): array {
 

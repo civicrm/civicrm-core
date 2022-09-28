@@ -75,10 +75,10 @@ class CRM_Core_Permission_Base {
   }
 
   /**
-   * Get the maximum permission of the current user with respect to _any_ contact records.
+   * Get the current permission of this user.
    *
-   * @return int|string|null
-   * @see \CRM_Core_Permission::getPermission()
+   * @return string
+   *   the permission of the user (edit or view or null)
    */
   public function getPermission() {
     $this->group();

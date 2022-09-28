@@ -17,10 +17,8 @@
     <div class="clear">&nbsp;</div>
     <h3 id="crm-event-dashboard-heading">{ts}Event Summary{/ts}
       {help id="id-event-intro"}
-    </h3>
-    <div class="crm-clearfix">
       {include file="CRM/Event/Page/iCalLinks.tpl"}
-    </div>
+    </h3>
     {include file="CRM/common/jsortable.tpl"}
     <table id="options" class="display">
     <thead>
@@ -98,7 +96,7 @@
                   <ul class="panel" id="panel_info_{$id}">
                     {foreach from=$eventSummary.tab key=k item=v}
                       {assign var="fld" value=$v.field}
-                      {if empty($values.$fld)}{assign var="status" value="disabled"}{else}{assign var="status" value="enabled"}{/if}
+                      {if NOT $values.$fld}{assign var="status" value="disabled"}{else}{assign var="status" value="enabled"}{/if}
                       {* Schedule Reminders requires a different query string. *}
                       {if $v.url EQ 'civicrm/event/manage/reminder'}
                         <li><a title="{$v.title|escape}" class="action-item crm-hover-button no-popup {$status}"

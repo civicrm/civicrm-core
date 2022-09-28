@@ -93,7 +93,7 @@ class CRM_Dedupe_Finder {
     if (!$params) {
       return [];
     }
-    $checkPermission = $params['check_permission'] ?? TRUE;
+    $checkPermission = CRM_Utils_Array::value('check_permission', $params, TRUE);
     // This may no longer be required - see https://github.com/civicrm/civicrm-core/pull/13176
     $params = array_filter($params);
 
@@ -220,11 +220,7 @@ class CRM_Dedupe_Finder {
     }
 
     // handle custom data
-
-    $subTypes = $fields['contact_sub_type'] ?? [];
-    // Only return custom for subType + unrestricted or return all custom
-    // fields.
-    $tree = CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1, $subTypes, NULL, TRUE, NULL, TRUE);
+    $tree = CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1);
     CRM_Core_BAO_CustomGroup::postProcess($tree, $fields, TRUE);
     foreach ($tree as $key => $cg) {
       if (!is_int($key)) {
@@ -262,37 +258,39 @@ class CRM_Dedupe_Finder {
     }
 
     $params = [];
-
-    foreach (CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields($ctype) as $table => $fields) {
-      if ($table === 'civicrm_address') {
-        // for matching on civicrm_address fields, we also need the location_type_id
-        $fields['location_type_id'] = '';
-        // FIXME: we also need to do some hacking for id and name fields, see CRM-3902’s comments
-        $fixes = [
-          'address_name' => 'name',
-          'country' => 'country_id',
-          'state_province' => 'state_province_id',
-          'county' => 'county_id',
-        ];
-        foreach ($fixes as $orig => $target) {
-          if (!empty($flat[$orig])) {
-            $params[$table][$target] = $flat[$orig];
+    $supportedFields = CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields($ctype);
+    if (is_array($supportedFields)) {
+      foreach ($supportedFields as $table => $fields) {
+        if ($table === 'civicrm_address') {
+          // for matching on civicrm_address fields, we also need the location_type_id
+          $fields['location_type_id'] = '';
+          // FIXME: we also need to do some hacking for id and name fields, see CRM-3902’s comments
+          $fixes = [
+            'address_name' => 'name',
+            'country' => 'country_id',
+            'state_province' => 'state_province_id',
+            'county' => 'county_id',
+          ];
+          foreach ($fixes as $orig => $target) {
+            if (!empty($flat[$orig])) {
+              $params[$table][$target] = $flat[$orig];
+            }
           }
         }
-      }
-      if ($table === 'civicrm_phone') {
-        $fixes = [
-          'phone' => 'phone_numeric',
-        ];
-        foreach ($fixes as $orig => $target) {
-          if (!empty($flat[$orig])) {
-            $params[$table][$target] = $flat[$orig];
+        if ($table === 'civicrm_phone') {
+          $fixes = [
+            'phone' => 'phone_numeric',
+          ];
+          foreach ($fixes as $orig => $target) {
+            if (!empty($flat[$orig])) {
+              $params[$table][$target] = $flat[$orig];
+            }
           }
         }
-      }
-      foreach ($fields as $field => $title) {
-        if (!empty($flat[$field])) {
-          $params[$table][$field] = $flat[$field];
+        foreach ($fields as $field => $title) {
+          if (!empty($flat[$field])) {
+            $params[$table][$field] = $flat[$field];
+          }
         }
       }
     }

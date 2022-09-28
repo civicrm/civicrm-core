@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Token\TokenProcessor;
-
 /**
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
@@ -75,18 +73,6 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
    */
   public static $entityShortname = NULL;
 
-
-  /**
-   * Rows to act on.
-   *
-   * e.g
-   *  [
-   *    ['contact_id' => 4, 'participant_id' => 6, 'schema' => ['contactId' => 5, 'participantId' => 6],
-   *  ]
-   * @var array
-   */
-  protected $rows = [];
-
   /**
    * Set where the browser should be directed to next.
    *
@@ -103,7 +89,7 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
     }
 
     $session = CRM_Core_Session::singleton();
-    $searchFormName = strtolower($this->get('searchFormName') ?? '');
+    $searchFormName = strtolower($this->get('searchFormName'));
     if ($searchFormName === 'search') {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/' . $pathPart . '/search', $urlParams));
     }
@@ -156,10 +142,9 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
     $searchFormValues = $form->getSearchFormValues();
 
     $form->_task = $searchFormValues['task'];
-    $isSelectedContacts = ($searchFormValues['radio_ts'] ?? NULL) === 'ts_sel';
-    $form->assign('isSelectedContacts', $isSelectedContacts);
+
     $entityIds = [];
-    if ($isSelectedContacts) {
+    if ($searchFormValues['radio_ts'] == 'ts_sel') {
       foreach ($searchFormValues as $name => $value) {
         if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
           $entityIds[] = substr($name, CRM_Core_Form::CB_PREFIX_LEN);
@@ -351,47 +336,6 @@ SELECT contact_id
   public function getEntityAliasField() {
     CRM_Core_Error::deprecatedFunctionWarning('function should be overridden');
     return $this::$entityShortname . '_id';
-  }
-
-  /**
-   * List available tokens for this form.
-   *
-   * @return array
-   */
-  public function listTokens() {
-    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => $this->getTokenSchema()]);
-    return $tokenProcessor->listTokens();
-  }
-
-  /**
-   * Get the token processor schema required to list any tokens for this task.
-   *
-   * @return array
-   */
-  protected function getTokenSchema(): array {
-    return ['contactId'];
-  }
-
-  /**
-   * Get the rows from the results.
-   *
-   * @return array
-   */
-  protected function getRows(): array {
-    $rows = [];
-    foreach ($this->getContactIDs() as $contactID) {
-      $rows[] = ['contact_id' => $contactID, 'schema' => ['contactId' => $contactID]];
-    }
-    return $rows;
-  }
-
-  /**
-   * Get the relevant contact IDs.
-   *
-   * @return array
-   */
-  protected function getContactIDs(): array {
-    return $this->_contactIds ?? [];
   }
 
 }

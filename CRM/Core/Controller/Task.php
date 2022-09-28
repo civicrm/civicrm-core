@@ -22,6 +22,7 @@ abstract class CRM_Core_Controller_Task extends CRM_Core_Controller {
    * @param bool $modal
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
 
@@ -71,10 +72,7 @@ abstract class CRM_Core_Controller_Task extends CRM_Core_Controller {
    * @throws \CRM_Core_Exception
    */
   protected function getTaskClass(): array {
-    $task = CRM_Utils_Request::retrieve('task_item', 'Alphanumeric', $this);
-    if (empty($task)) {
-      $task = CRM_Utils_Request::retrieve('task', 'Alphanumeric', $this, TRUE);
-    }
+    $task = CRM_Utils_Request::retrieve('task', 'Alphanumeric', $this, TRUE);
     foreach ($this->getAvailableTasks() as $taskAction) {
       if (($taskAction['key'] ?? '') === $task) {
         return (array) $taskAction['class'];

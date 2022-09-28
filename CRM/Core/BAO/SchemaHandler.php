@@ -157,7 +157,7 @@ class CRM_Core_BAO_SchemaHandler {
    * @param array $params
    * @param string $separator
    * @param string $prefix
-   * @param string|null $existingIndex
+   * @param string|NULL $existingIndex
    *
    * @return NULL|string
    */
@@ -171,14 +171,14 @@ class CRM_Core_BAO_SchemaHandler {
 
     // Add index if field is searchable if it does not reference a foreign key
     // (skip indexing FK fields because it would be redundant to have 2 indexes)
-    if (!empty($params['searchable']) && empty($params['fk_table_name']) && substr($existingIndex ?? '', 0, 5) !== 'INDEX') {
+    if (!empty($params['searchable']) && empty($params['fk_table_name']) && substr($existingIndex, 0, 5) !== 'INDEX') {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= $prefix;
       $sql .= "INDEX_{$params['name']} ( {$params['name']} )";
     }
     // Drop search index if field is no longer searchable
-    elseif (empty($params['searchable']) && substr($existingIndex ?? '', 0, 5) === 'INDEX') {
+    elseif (empty($params['searchable']) && substr($existingIndex, 0, 5) === 'INDEX') {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= "DROP INDEX $existingIndex";
@@ -552,7 +552,9 @@ MODIFY      {$columnName} varchar( $length )
    * @return bool TRUE if FK is found
    */
   public static function checkFKExists($table_name, $constraint_name) {
-    $dao = new CRM_Core_DAO();
+    $config = CRM_Core_Config::singleton();
+    $dsn = CRM_Utils_SQL::autoSwitchDSN($config->dsn);
+    $dbUf = DB::parseDSN($dsn);
     $query = "
       SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
       WHERE TABLE_SCHEMA = %1
@@ -561,7 +563,7 @@ MODIFY      {$columnName} varchar( $length )
       AND CONSTRAINT_TYPE = 'FOREIGN KEY'
     ";
     $params = [
-      1 => [$dao->_database, 'String'],
+      1 => [$dbUf['database'], 'String'],
       2 => [$table_name, 'String'],
       3 => [$constraint_name, 'String'],
     ];
@@ -609,7 +611,7 @@ MODIFY      {$columnName} varchar( $length )
    * @param bool $dropFalseIndices
    *  If set - this function deletes false indices present in the DB which mismatches the expected
    *  values of xml file so that civi re-creates them with correct values using createMissingIndices() function.
-   * @param array|false $tables
+   * @param array|FALSE $tables
    *   An optional array of tables - if provided the results will be restricted to these tables.
    *
    * @return array
@@ -737,7 +739,7 @@ MODIFY      {$columnName} varchar( $length )
           $existingIndex = $dao->Key_name;
         }
         $fkSql = self::buildForeignKeySQL($params, ",\n", "ADD ", $params['table_name']);
-        if (substr(($existingIndex ?? ''), 0, 2) === 'FK' && !$fkSql) {
+        if (substr($existingIndex, 0, 2) === 'FK' && !$fkSql) {
           $sql .= "$separator DROP FOREIGN KEY {$existingIndex},\nDROP INDEX {$existingIndex}";
           $separator = ",\n";
         }

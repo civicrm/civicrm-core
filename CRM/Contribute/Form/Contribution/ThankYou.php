@@ -48,7 +48,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->assign('thankyou_footer', CRM_Utils_Array::value('thankyou_footer', $this->_values));
     $this->assign('max_reminders', CRM_Utils_Array::value('max_reminders', $this->_values));
     $this->assign('initial_reminder_day', CRM_Utils_Array::value('initial_reminder_day', $this->_values));
-    $this->setTitle(CRM_Utils_Array::value('thankyou_title', $this->_values));
+    CRM_Utils_System::setTitle(CRM_Utils_Array::value('thankyou_title', $this->_values));
     // Make the contributionPageID available to the template
     $this->assign('contributionPageID', $this->_id);
     $this->assign('isShare', $this->_values['is_share']);
@@ -142,20 +142,15 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     //pcp elements
     if ($this->_pcpId) {
       $qParams .= "&amp;pcpId={$this->_pcpId}";
-      $this->assign('pcpBlock', FALSE);
-
-      // display honor roll data only if it's enabled for the PCP page
-      if (!empty($this->_pcpInfo['is_honor_roll'])) {
-        $this->assign('pcpBlock', TRUE);
-        foreach ([
-          'pcp_display_in_roll',
-          'pcp_is_anonymous',
-          'pcp_roll_nickname',
-          'pcp_personal_note',
-        ] as $val) {
-          if (!empty($this->_params[$val])) {
-            $this->assign($val, $this->_params[$val]);
-          }
+      $this->assign('pcpBlock', TRUE);
+      foreach ([
+        'pcp_display_in_roll',
+        'pcp_is_anonymous',
+        'pcp_roll_nickname',
+        'pcp_personal_note',
+      ] as $val) {
+        if (!empty($this->_params[$val])) {
+          $this->assign($val, $this->_params[$val]);
         }
       }
     }
@@ -304,6 +299,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
    * @return bool
    *   Is this a separate membership payment
    *
+   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   private function buildMembershipBlock($cid, $selectedMembershipTypeID = NULL, $isTest = NULL) {
@@ -473,7 +469,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       ]);
       return TRUE;
     }
-    catch (CRM_Core_Exception $e) {
+    catch (CiviCRM_API3_Exception $e) {
       return FALSE;
     }
   }

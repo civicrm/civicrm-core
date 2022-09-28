@@ -23,8 +23,6 @@
  */
 class CRM_Event_Form_Task_PDF extends CRM_Event_Form_Task {
 
-  use CRM_Contact_Form_Task_PDFTrait;
-
   /**
    * Are we operating in "single mode", i.e. printing letter to one
    * specific participant?
@@ -46,9 +44,46 @@ class CRM_Event_Form_Task_PDF extends CRM_Event_Form_Task {
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
-    $this->preProcessPDF();
+    CRM_Contact_Form_Task_PDFLetterCommon::preProcess($this);
     parent::preProcess();
+
+    // we have all the participant ids, so now we get the contact ids
+    parent::setContactIDs();
+
     $this->assign('single', $this->_single);
+  }
+
+  /**
+   * Build the form object.
+   */
+  public function buildQuickForm() {
+    CRM_Contact_Form_Task_PDFLetterCommon::buildQuickForm($this);
+  }
+
+  /**
+   * Process the form after the input has been submitted and validated.
+   */
+  public function postProcess() {
+    CRM_Contact_Form_Task_PDFLetterCommon::postProcess($this);
+  }
+
+  /**
+   * Set default values for the form.
+   *
+   * @return void
+   */
+  public function setDefaultValues() {
+    return CRM_Contact_Form_Task_PDFLetterCommon::setDefaultValues();
+  }
+
+  /**
+   * List available tokens for this form.
+   *
+   * @return array
+   */
+  public function listTokens() {
+    $tokens = CRM_Core_SelectValues::contactTokens();
+    return $tokens;
   }
 
 }

@@ -1,8 +1,0 @@
-{
-    "type": "search",
-    "requires": [],
-    "title": "Fields",
-    "description": "Administer custom fields list",
-    "server_route": "civicrm/admin/custom/group/fields",
-    "permission": "administer CiviCRM data"
-}

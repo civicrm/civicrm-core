@@ -65,7 +65,7 @@ class CRM_Utils_Cache {
   /**
    * Get cache relevant settings.
    *
-   * @param string $cachePlugin
+   * @param $cachePlugin
    *
    * @return array
    *   associative array of settings for the cache

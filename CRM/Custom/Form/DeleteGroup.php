@@ -41,7 +41,7 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
    * @access protected
    */
   public function preProcess() {
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+    $this->_id = $this->get('id');
 
     $defaults = [];
     $params = ['id' => $this->_id];
@@ -60,7 +60,7 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
     }
     $this->assign('title', $this->_title);
 
-    $this->setTitle(ts('Confirm Custom Group Delete'));
+    CRM_Utils_System::setTitle(ts('Confirm Custom Group Delete'));
   }
 
   /**

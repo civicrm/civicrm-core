@@ -49,10 +49,6 @@ class AngularDependencyMapper {
       $jFile = $scanner->findFilePath($formName, 'aff.json');
       $hFile = $scanner->findFilePath($formName, 'aff.html');
 
-      if (!$hFile) {
-        \Civi::log()->warning("Missing html file for Afform: '$jFile'");
-        continue;
-      }
       $jStat = stat($jFile);
       $hStat = stat($hFile);
 

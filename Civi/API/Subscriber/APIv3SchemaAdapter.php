@@ -36,7 +36,7 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
    * @param \Civi\API\Event\PrepareEvent $event
    *   API preparation event.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function onApiPrepare(\Civi\API\Event\PrepareEvent $event) {
     $apiRequest = $event->getApiRequest();

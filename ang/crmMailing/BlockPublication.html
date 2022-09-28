@@ -4,7 +4,8 @@
       <select
         crm-ui-id="subform.visibility"
         name="visibility"
-        crm-ui-select="{dropdownAutoWidth : true}"
+        ui-jq="select2"
+        ui-options="{dropdownAutoWidth : true}"
         ng-model="mailing.visibility"
         ng-options="v.key as v.value for v in crmMailingConst.visibility"
         required

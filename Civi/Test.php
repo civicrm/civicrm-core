@@ -32,7 +32,7 @@ class Test {
     $conn = \Civi\Test::pdo();
 
     $oldEscaper = \CRM_Core_I18n::$SQL_ESCAPER;
-    \Civi\Test::$statics['testPreInstall'] = (\Civi\Test::$statics['testPreInstall'] ?? 0) + 1;
+    \Civi::$statics['testPreInstall'] = (\Civi::$statics['testPreInstall'] ?? 0) + 1;
     try {
       \CRM_Core_I18n::$SQL_ESCAPER = function ($text) use ($conn) {
         return substr($conn->quote($text), 1, -1);
@@ -40,9 +40,9 @@ class Test {
       return $callback();
     } finally {
       \CRM_Core_I18n::$SQL_ESCAPER = $oldEscaper;
-      \Civi\Test::$statics['testPreInstall']--;
-      if (\Civi\Test::$statics['testPreInstall'] <= 0) {
-        unset(\Civi\Test::$statics['testPreInstall']);
+      \Civi::$statics['testPreInstall']--;
+      if (\Civi::$statics['testPreInstall'] <= 0) {
+        unset(\Civi::$statics['testPreInstall']);
       }
     }
   }
@@ -50,7 +50,7 @@ class Test {
   /**
    * Get the data source used for testing.
    *
-   * @param string|null $part
+   * @param string|NULL $part
    *   One of NULL, 'hostspec', 'port', 'username', 'password', 'database'.
    * @return string|array|NULL
    *   If $part is omitted, return full DSN array.
@@ -117,7 +117,7 @@ class Test {
           throw new \RuntimeException("\\Civi\\Test::headless() requires CIVICRM_UF=UnitTests");
         }
         $dbName = \Civi\Test::dsn('database');
-        fprintf(STDERR, "Installing {$dbName} schema\n");
+        echo "Installing {$dbName} schema\n";
         \Civi\Test::schema()->dropAll();
       }, 'headless-drop')
       ->coreSchema()
@@ -166,7 +166,6 @@ class Test {
     if (!isset(self::$singletons['codeGen'])) {
       $civiRoot = str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__));
       $codeGen = new \CRM_Core_CodeGen_Main("$civiRoot/CRM/Core/DAO", "$civiRoot/sql", $civiRoot, "$civiRoot/templates", NULL, "UnitTests", NULL, "$civiRoot/xml/schema/Schema.xml", NULL);
-      $codeGen->setVerbose(FALSE);
       $codeGen->init();
       self::$singletons['codeGen'] = $codeGen;
     }
@@ -181,46 +180,6 @@ class Test {
       self::$singletons['data'] = new \Civi\Test\Data('CiviTesterData');
     }
     return self::$singletons['data'];
-  }
-
-  /**
-   * @return \Civi\Test\ExampleDataLoader
-   */
-  public static function examples(): \Civi\Test\ExampleDataLoader {
-    if (!isset(self::$singletons['examples'])) {
-      self::$singletons['examples'] = new \Civi\Test\ExampleDataLoader();
-    }
-    return self::$singletons['examples'];
-  }
-
-  /**
-   * Lookup the content of an example data-set.
-   *
-   * This helper is for the common case of looking up the data for a specific example.
-   * If you need more detailed information (eg the list of examples or other metadata),
-   * then use `\Civi\Test::examples(): ExampleDataLoader`. It  provides more methods.
-   *
-   * @param string $name
-   *   Symbolic name of the data-set.
-   * @return array
-   *   The example data.
-   */
-  public static function example(string $name): array {
-    $result = static::examples()->getFull($name);
-    if (!isset($result['data'])) {
-      throw new \CRM_Core_Exception("Failed to load example data-set: $name");
-    }
-    return $result['data'];
-  }
-
-  /**
-   * @return \Civi\Test\EventChecker
-   */
-  public static function eventChecker() {
-    if (!isset(self::$singletons['eventChecker'])) {
-      self::$singletons['eventChecker'] = new \Civi\Test\EventChecker();
-    }
-    return self::$singletons['eventChecker'];
   }
 
   /**

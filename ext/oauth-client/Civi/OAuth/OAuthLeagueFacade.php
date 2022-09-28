@@ -25,7 +25,7 @@ class OAuthLeagueFacade {
    */
   public function createProviderOptions($clientDef) {
     $clientDef = $this->resolveSingleRef('OAuthClient', $clientDef, ['id', 'provider'], ['secret', 'guid']);
-    $providerDef = \Civi\Api4\OAuthProvider::get(FALSE)
+    $providerDef = \Civi\Api4\OAuthProvider::get(0)
       ->addWhere('name', '=', $clientDef['provider'])
       ->execute()
       ->single();

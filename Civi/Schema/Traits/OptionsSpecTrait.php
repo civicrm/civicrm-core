@@ -26,11 +26,6 @@ trait OptionsSpecTrait {
   public $options;
 
   /**
-   * @var array|null
-   */
-  public $suffixes;
-
-  /**
    * @var callable
    */
   private $optionsCallback;
@@ -61,16 +56,6 @@ trait OptionsSpecTrait {
    */
   public function setOptions($options) {
     $this->options = $options;
-    return $this;
-  }
-
-  /**
-   * @param array $suffixes
-   *
-   * @return $this
-   */
-  public function setSuffixes($suffixes) {
-    $this->suffixes = $suffixes;
     return $this;
   }
 

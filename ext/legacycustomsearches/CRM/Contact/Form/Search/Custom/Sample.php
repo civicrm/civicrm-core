@@ -50,7 +50,8 @@ class CRM_Contact_Form_Search_Custom_Sample extends CRM_Contact_Form_Search_Cust
 
     $form->add('text',
       'household_name',
-      ts('Household Name')
+      ts('Household Name'),
+      TRUE
     );
 
     $stateProvince = ['' => ts('- any state/province -')] + CRM_Core_PseudoConstant::stateProvince();
@@ -82,7 +83,7 @@ class CRM_Contact_Form_Search_Custom_Sample extends CRM_Contact_Form_Search_Cust
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param string|null $sort
+   * @param null $sort
    * @param bool $returnSQL
    *
    * @return string
@@ -94,7 +95,7 @@ class CRM_Contact_Form_Search_Custom_Sample extends CRM_Contact_Form_Search_Cust
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param string|null $sort
+   * @param null $sort
    * @param bool $includeContactIDs
    * @param bool $justIDs
    *
@@ -203,6 +204,18 @@ LEFT JOIN civicrm_state_province state_province ON state_province.id = address.s
    */
   public function alterRow(&$row) {
     $row['sort_name'] .= ' ( altered )';
+  }
+
+  /**
+   * @param $title
+   */
+  public function setTitle($title) {
+    if ($title) {
+      CRM_Utils_System::setTitle($title);
+    }
+    else {
+      CRM_Utils_System::setTitle(ts('Search'));
+    }
   }
 
   /**

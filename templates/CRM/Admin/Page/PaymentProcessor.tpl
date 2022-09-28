@@ -34,7 +34,7 @@
             <th></th>
         </tr>
         {foreach from=$rows item=row}
-        <tr id="payment_processor-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {if NOT $row.is_active} disabled{/if}">
+        <tr id="payment_processor-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
             <td class="crmf-id center">{$row.id}</td>
             <td class="crmf-test_id center">{$row.test_id}</td>
             <td class="crmf-name">{$row.name}</td>
@@ -44,7 +44,7 @@
             <td class="crmf-is_active center">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td class="crmf-is_default center">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}&nbsp;
             </td>
-            <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
+            <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
         </table>

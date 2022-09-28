@@ -44,7 +44,7 @@ class PreEvent extends GenericHookEvent {
    *
    * @param string $action
    * @param string $entity
-   * @param int|null $id
+   * @param int $id
    * @param array $params
    */
   public function __construct($action, $entity, $id, &$params) {

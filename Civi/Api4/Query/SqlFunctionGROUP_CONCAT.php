@@ -23,21 +23,20 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
   protected static function params(): array {
     return [
       [
-        'flag_before' => ['' => NULL, 'DISTINCT' => ts('Distinct')],
+        'flag_before' => ['DISTINCT' => ts('Distinct')],
         'max_expr' => 1,
         'must_be' => ['SqlField', 'SqlFunction'],
         'optional' => FALSE,
       ],
       [
-        'name' => 'ORDER BY',
-        'label' => ts('Order by'),
+        'prefix' => 'ORDER BY',
         'max_expr' => 1,
         'flag_after' => ['ASC' => ts('Ascending'), 'DESC' => ts('Descending')],
         'must_be' => ['SqlField'],
         'optional' => TRUE,
       ],
       [
-        'name' => 'SEPARATOR',
+        'prefix' => 'SEPARATOR',
         'max_expr' => 1,
         'must_be' => ['SqlString'],
         'optional' => TRUE,
@@ -79,13 +78,6 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
    */
   public static function getTitle(): string {
     return ts('List');
-  }
-
-  /**
-   * @return string
-   */
-  public static function getDescription(): string {
-    return ts('All values in the grouping.');
   }
 
 }

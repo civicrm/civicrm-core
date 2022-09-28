@@ -43,9 +43,6 @@ function _civicrm_api3_mailing_contact_getresults($params, $count) {
   }
   $options  = _civicrm_api3_get_options_from_params($params, TRUE, 'contribution', 'get');
   $fnName = '_civicrm_api3_mailing_contact_get_' . strtolower($params['type']);
-  if (!function_exists($fnName)) {
-    throw new CRM_Core_Exception('Invalid mailing type: ' . $params['type']);
-  }
   return $fnName(
       $params['contact_id'],
       $options['offset'],
@@ -84,13 +81,13 @@ function _civicrm_api3_mailing_contact_get_spec(&$params) {
  * Helper function for mailing contact queries.
  *
  * @param int $contactID
- * @param int $offset
- * @param int $limit
- * @param array|null $selectFields
- * @param string|null $fromClause
- * @param string|null $whereClause
- * @param string|null $sort
- * @param bool $getCount
+ * @param $offset
+ * @param $limit
+ * @param $selectFields
+ * @param $fromClause
+ * @param $whereClause
+ * @param $sort
+ * @param $getCount
  *
  * @return array
  */
@@ -196,10 +193,10 @@ LIMIT %2, %3
  * Get delivered mailing contacts.
  *
  * @param int $contactID
- * @param int $offset
- * @param int $limit
- * @param string|null $sort
- * @param bool $getCount
+ * @param $offset
+ * @param $limit
+ * @param $sort
+ * @param $getCount
  *
  * @return array
  */
@@ -237,10 +234,10 @@ AND        meb.id IS NULL
  * Get bounced mailing contact records.
  *
  * @param int $contactID
- * @param int $offset
- * @param int $limit
- * @param string|null $sort
- * @param bool $getCount
+ * @param $offset
+ * @param $limit
+ * @param $sort
+ * @param $getCount
  *
  * @return array
  */

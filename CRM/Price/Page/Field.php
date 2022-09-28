@@ -108,7 +108,9 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
     $priceFieldBAO->find();
 
     // display taxTerm for priceFields
+    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
     $taxTerm = Civi::settings()->get('tax_term');
+    $invoicing = $invoiceSettings['invoicing'] ?? NULL;
     $getTaxDetails = FALSE;
     $taxRate = CRM_Core_PseudoConstant::getTaxRates();
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
@@ -124,7 +126,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
         CRM_Price_BAO_PriceFieldValue::retrieve($params, $optionValues);
         $priceField[$priceFieldBAO->id]['price'] = $optionValues['amount'] ?? NULL;
         $financialTypeId = $optionValues['financial_type_id'];
-        if (Civi::settings()->get('invoicing') && isset($taxRate[$financialTypeId])) {
+        if ($invoicing && isset($taxRate[$financialTypeId])) {
           $priceField[$priceFieldBAO->id]['tax_rate'] = $taxRate[$financialTypeId];
           $getTaxDetails = TRUE;
         }
@@ -148,11 +150,11 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
         }
       }
 
-      if (!isset($priceField[$priceFieldBAO->id]['active_on']) || $priceFieldBAO->active_on == '0000-00-00 00:00:00') {
+      if ($priceFieldBAO->active_on == '0000-00-00 00:00:00') {
         $priceField[$priceFieldBAO->id]['active_on'] = '';
       }
 
-      if (!isset($priceField[$priceFieldBAO->id]['expire_on']) || $priceFieldBAO->expire_on == '0000-00-00 00:00:00') {
+      if ($priceFieldBAO->expire_on == '0000-00-00 00:00:00') {
         $priceField[$priceFieldBAO->id]['expire_on'] = '';
       }
 
@@ -230,13 +232,8 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
     );
 
     if ($this->_sid) {
-      $usedByDefaults = [
-        'civicrm_event' => FALSE,
-        'civicrm_event' => FALSE,
-        'civicrm_contribution_page' => FALSE,
-      ];
       $usedBy = CRM_Price_BAO_PriceSet::getUsedBy($this->_sid);
-      $this->assign('usedBy', array_merge($usedByDefaults, $usedBy));
+      $this->assign('usedBy', $usedBy);
       $this->_isSetReserved = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'is_reserved');
       $this->assign('isReserved', $this->_isSetReserved);
 

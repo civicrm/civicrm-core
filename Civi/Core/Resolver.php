@@ -251,8 +251,7 @@ class ResolverApi {
 
 class ResolverGlobalCallback {
   private $mode;
-  private $basePath;
-  private $subPath;
+  private $path;
 
   /**
    * Class constructor.
@@ -260,13 +259,10 @@ class ResolverGlobalCallback {
    * @param string $mode
    *   'getter' or 'setter'.
    * @param string $path
-   *   Ex: 'dbLocale' <=> $GLOBALS['dbLocale']
-   *   Ex: 'civicrm_setting/domain/debug_enabled' <=> $GLOBALS['civicrm_setting']['domain']['debug_enabled']
    */
   public function __construct($mode, $path) {
     $this->mode = $mode;
-    $this->subPath = explode('/', $path);
-    $this->basePath = array_shift($this->subPath);
+    $this->path = $path;
   }
 
   /**
@@ -277,12 +273,11 @@ class ResolverGlobalCallback {
    * @return mixed
    */
   public function __invoke($arg1 = NULL) {
-    // For PHP 8.1+ compatibility, we resolve the first path-item before doing any array operations.
     if ($this->mode === 'getter') {
-      return \CRM_Utils_Array::pathGet($GLOBALS[$this->basePath], $this->subPath);
+      return \CRM_Utils_Array::pathGet($GLOBALS, explode('/', $this->path));
     }
     elseif ($this->mode === 'setter') {
-      \CRM_Utils_Array::pathSet($GLOBALS[$this->basePath], $this->subPath, $arg1);
+      \CRM_Utils_Array::pathSet($GLOBALS, explode('/', $this->path), $arg1);
       return NULL;
     }
     else {

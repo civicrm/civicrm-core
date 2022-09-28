@@ -18,10 +18,8 @@ use Civi\Api4\Service\Spec\RequestSpec;
  * Class ContributionCreationSpecProvider
  *
  * @package Civi\Api4\Service\Spec\Provider
- * @service
- * @internal
  */
-class ContributionCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
+class ContributionCreationSpecProvider implements Generic\SpecProviderInterface {
 
   /**
    * @inheritDoc

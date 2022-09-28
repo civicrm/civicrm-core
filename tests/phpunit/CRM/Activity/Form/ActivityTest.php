@@ -303,10 +303,8 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
    * Test that inbound email is still treated properly if you change the label.
    * I'm not crazy about the strategy used in this test but I can't see another
    * way to do it.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testInboundEmailDisplaysWithLineBreaks(): void {
+  public function testInboundEmailDisplaysWithLinebreaks() {
     // Change label
     $inbound_email = $this->callAPISuccess('OptionValue', 'getsingle', [
       'option_group_id' => 'activity_type',
@@ -351,16 +349,30 @@ ENDBODY;
       'source_contact_id' => $this->source,
       'assignee_contact_id' => NULL,
     ]);
-    $_REQUEST = [
-      'context' => 'standalone',
-      'cid' => $this->source,
-      'action' => 'view',
-      'id' => $activity['id'],
-      'atype' => $activity['values'][$activity['id']]['activity_type_id'],
-    ];
+    $activity_id = $activity['id'];
 
     // Simulate viewing it from the form.
-    $output = $this->getRenderedFormContents('CRM_Activity_Form_Activity');
+
+    $form = new CRM_Activity_Form_Activity();
+    $form->controller = new CRM_Core_Controller_Simple('CRM_Activity_Form_Activity', 'Activity');
+    $form->set('context', 'standalone');
+    $form->set('cid', $this->source);
+    $form->set('action', 'view');
+    $form->set('id', $activity_id);
+    $form->set('atype', $activity['values'][$activity_id]['activity_type_id']);
+
+    $form->buildForm();
+
+    // Wish there was another way to do this
+    $form->controller->handle($form, 'display');
+
+    // This isn't a faithful representation of the output since there'll
+    // probably be a lot missing, but for now I don't see a simpler way to
+    // do this.
+    // Also this is printing the template code to the console. It doesn't hurt
+    // the test but it's clutter and I don't know where it's coming from
+    // and can't seem to prevent it.
+    $output = $form->getTemplate()->fetch($form->getTemplateFileName());
 
     // This kind of suffers from the same problem as the old webtests. It's
     // a bit brittle and tied to the UI.

@@ -19,15 +19,14 @@
 
 namespace api\v4\Entity;
 
-use api\v4\Api4TestBase;
+use api\v4\UnitTestCase;
 use Civi\Crypto\CryptoTestTrait;
-use Civi\Test\TransactionalInterface;
 use Psr\Log\LoggerInterface;
 
 /**
  * @group headless
  */
-class RotateKeyTest extends Api4TestBase implements TransactionalInterface {
+class RotateKeyTest extends UnitTestCase {
 
   use CryptoTestTrait;
 

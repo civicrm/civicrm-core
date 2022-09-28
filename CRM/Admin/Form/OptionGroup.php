@@ -40,7 +40,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
-    $this->setTitle(ts('Dropdown Options'));
+    CRM_Utils_System::setTitle(ts('Dropdown Options'));
 
     $this->applyFilter('__ALL__', 'trim');
 
@@ -94,7 +94,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
    *   The input form values.
    *
    * @param $files
-   * @param self $self
+   * @param $self
    *
    * @return bool|array
    *   true if no errors, else array of errors

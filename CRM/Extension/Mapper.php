@@ -117,7 +117,7 @@ class CRM_Extension_Mapper {
    * Given the class, provides extension path.
    *
    *
-   * @param string $clazz
+   * @param $clazz
    *
    * @return string
    *   full path the extension .php file
@@ -441,7 +441,7 @@ class CRM_Extension_Mapper {
   }
 
   /**
-   * @return CRM_Extension_Info[]
+   * @return array
    *   Ex: $result['org.civicrm.foobar'] = new CRM_Extension_Info(...).
    * @throws \CRM_Extension_Exception
    * @throws \Exception
@@ -480,7 +480,8 @@ class CRM_Extension_Mapper {
   /**
    * Get a list of all installed modules, including enabled and disabled ones
    *
-   * @return CRM_Core_Module[]
+   * @return array
+   *   CRM_Core_Module
    */
   public function getModules() {
     $result = [];
@@ -538,7 +539,6 @@ class CRM_Extension_Mapper {
     }
     // FIXME: How can code so code wrong be so right?
     CRM_Extension_System::singleton()->getClassLoader()->refresh();
-    CRM_Extension_System::singleton()->getMixinLoader()->run(TRUE);
   }
 
   /**
@@ -546,7 +546,7 @@ class CRM_Extension_Mapper {
    * @todo We should improve this to return more appropriate text. eg. when an extension is not installed
    *   it should not say "version xx is installed".
    *
-   * @param CRM_Extension_Info $remoteExtensionInfo
+   * @param array $remoteExtensionInfo
    * @param array $localExtensionInfo
    *
    * @return string

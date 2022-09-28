@@ -23,7 +23,7 @@ class SqlFunctionMAX extends SqlFunction {
   protected static function params(): array {
     return [
       [
-        'flag_before' => ['' => NULL, 'DISTINCT' => ts('Distinct')],
+        'flag_before' => ['DISTINCT' => ts('Distinct')],
         'must_be' => ['SqlField'],
       ],
     ];
@@ -34,13 +34,6 @@ class SqlFunctionMAX extends SqlFunction {
    */
   public static function getTitle(): string {
     return ts('Max');
-  }
-
-  /**
-   * @return string
-   */
-  public static function getDescription(): string {
-    return ts('The largest value in the grouping.');
   }
 
 }

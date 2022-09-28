@@ -80,7 +80,7 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
 
     $this->addDefaultButtons(ts('Save'), 'next', NULL);
 
-    $this->setTitle(ts('Languages'));
+    CRM_Utils_System::setTitle(ts('Languages'));
 
     $this->assign('locales', $this->_locales);
     $this->assign('field', $field);

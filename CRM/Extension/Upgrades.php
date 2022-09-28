@@ -61,15 +61,7 @@ class CRM_Extension_Upgrades {
       'name' => self::QUEUE_NAME,
       'reset' => TRUE,
     ]);
-    return static::fillQueue($queue);
-  }
 
-  /**
-   * @param \CRM_Queue_Queue $queue
-   *
-   * @return \CRM_Queue_Queue
-   */
-  public static function fillQueue(CRM_Queue_Queue $queue): CRM_Queue_Queue {
     foreach (self::getActiveUpgraders() as $upgrader) {
       /** @var \CRM_Extension_Upgrader_Interface $upgrader */
       $upgrader->notify('upgrade', ['enqueue', $queue]);
@@ -77,25 +69,7 @@ class CRM_Extension_Upgrades {
 
     CRM_Utils_Hook::upgrade('enqueue', $queue);
 
-    // dev/core#1618 When Extension Upgrades are run reconcile log tables
-    $task = new CRM_Queue_Task(
-      [__CLASS__, 'upgradeLogTables'],
-      [],
-      ts('Update log tables')
-    );
-    // Set weight low so that it will be run last.
-    $queue->createItem($task, -2);
-
     return $queue;
-  }
-
-  /**
-   * Update log tables following execution of extension upgrades
-   */
-  public static function upgradeLogTables() {
-    $logging = new CRM_Logging_Schema();
-    $logging->fixSchemaDifferences();
-    return TRUE;
   }
 
   /**
@@ -135,10 +109,7 @@ class CRM_Extension_Upgrades {
   }
 
   /**
-   * Sorts active extensions according to their dependencies
-   *
    * @param string[] $keys
-   *   Names of all active modules
    *
    * @return string[]
    * @throws \CRM_Extension_Exception
@@ -148,25 +119,30 @@ class CRM_Extension_Upgrades {
   protected static function sortKeys($keys) {
     $infos = CRM_Extension_System::singleton()->getMapper()->getAllInfos();
 
-    // Ensure a stable starting order.
+    // Start with our inputs in a normalized form.
     $todoKeys = array_unique($keys);
     sort($todoKeys);
 
+    // Goal: Add all active items to $sorter and flag $doneKeys['org.example.foobar']=1.
+    $doneKeys = [];
     $sorter = new \MJS\TopSort\Implementations\FixedArraySort();
 
-    foreach ($todoKeys as $key) {
-      /** @var CRM_Extension_Info $info */
-      $info = $infos[$key] ?? NULL;
-
-      // Add dependencies
-      if ($info) {
-        // Filter out missing dependencies; missing modules cannot be upgraded
-        $requires = array_intersect($info->requires ?? [], $keys);
-        $sorter->add($key, $requires);
+    while (!empty($todoKeys)) {
+      $key = array_shift($todoKeys);
+      if (isset($doneKeys[$key])) {
+        continue;
       }
-      // This shouldn't ever happen if this function is being passed a list of active extensions.
+      $doneKeys[$key] = 1;
+
+      /** @var CRM_Extension_Info $info */
+      $info = @$infos[$key];
+
+      if ($info && $info->requires) {
+        $sorter->add($key, $info->requires);
+        $todoKeys = array_merge($todoKeys, $info->requires);
+      }
       else {
-        throw new CRM_Extension_Exception('Invalid extension key: "' . $key . '"');
+        $sorter->add($key, []);
       }
     }
     return $sorter->sort();

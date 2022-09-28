@@ -115,7 +115,6 @@
     <add>5.29</add>
     <html>
       <label>Relationship to contact</label>
-      <type>Select</type>
     </html>
     <pseudoconstant>
       <callback>CRM_Core_PseudoConstant::relationshipTypeOptions</callback>
@@ -153,7 +152,6 @@
     <add>5.29</add>
     <html>
       <label>Relationship from contact</label>
-      <type>Select</type>
     </html>
     <pseudoconstant>
       <callback>CRM_Core_PseudoConstant::relationshipTypeOptions</callback>
@@ -196,7 +194,6 @@
     <type>boolean</type>
     <title>Relationship Is Active</title>
     <default>1</default>
-    <required>true</required>
     <comment>is the relationship active ?</comment>
     <add>5.29</add>
     <html>
@@ -230,25 +227,4 @@
     </html>
     <readonly>true</readonly>
   </field>
-  <field>
-    <name>case_id</name>
-    <type>int unsigned</type>
-    <component>CiviCase</component>
-    <title>Case ID</title>
-    <default>NULL</default>
-    <comment>FK to civicrm_case</comment>
-    <html>
-      <label>Case</label>
-      <type>EntityRef</type>
-    </html>
-    <add>5.44</add>
-    <readonly>true</readonly>
-  </field>
-  <foreignKey>
-    <name>case_id</name>
-    <table>civicrm_case</table>
-    <key>id</key>
-    <add>2.2</add>
-    <onDelete>CASCADE</onDelete>
-  </foreignKey>
 </table>

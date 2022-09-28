@@ -2,8 +2,6 @@
 
 namespace Civi\Api4\Utils;
 
-use CRM_Afform_ExtensionUtil as E;
-
 /**
  * Class AfformSaveTrait
  * @package Civi\Api4\Action\Afform
@@ -18,7 +16,7 @@ trait AfformSaveTrait {
 
     // If no name given, create a unique name based on the title
     if (empty($item['name'])) {
-      $prefix = 'af' . ($item['type'] ?? '');
+      $prefix = !empty($item['join']) ? "afjoin-{$item['join']}" : (!empty($item['block']) ? ('afblock-' . str_replace('*', 'all', $item['block'])) : 'afform');
       $item['name'] = _afform_angular_module_name($prefix . '-' . \CRM_Utils_String::munge($item['title'], '-'));
       $suffix = '';
       while (
@@ -31,7 +29,7 @@ trait AfformSaveTrait {
       $orig = NULL;
     }
     elseif (!preg_match('/^[a-zA-Z][-_a-zA-Z0-9]*$/', $item['name'])) {
-      throw new \CRM_Core_Exception("Afform.{$this->getActionName()}: name should begin with a letter and only contain alphanumerics underscores and dashes.");
+      throw new \API_Exception("Afform.{$this->getActionName()}: name should begin with a letter and only contain alphanumerics underscores and dashes.");
     }
     else {
       // Fetch existing metadata
@@ -67,21 +65,19 @@ trait AfformSaveTrait {
       return ($item[$field] ?? NULL) !== ($orig[$field] ?? NULL);
     };
 
-    // If the dashlet or navigation setting changed, managed entities must be reconciled
-    // TODO: If this list of conditions gets any longer, then
-    // maybe we should unconditionally reconcile and accept the small performance drag.
-    if (
-      $isChanged('is_dashlet') ||
-      $isChanged('navigation') ||
-      (!empty($meta['is_dashlet']) && $isChanged('title')) ||
-      (!empty($meta['navigation']) && ($isChanged('title') || $isChanged('permission') || $isChanged('icon') || $isChanged('server_route')))
-    ) {
-      \CRM_Core_ManagedEntities::singleton()->reconcile(E::LONG_NAME);
+    if ($isChanged('is_dashlet')) {
+      // FIXME: more targetted reconciliation
+      \CRM_Core_ManagedEntities::singleton()->reconcile();
+    }
+    elseif (array_key_exists('is_dashlet', (array) $orig) && $orig['is_dashlet'] && $isChanged('title')) {
+      // FIXME: more targetted reconciliation
+      \CRM_Core_ManagedEntities::singleton()->reconcile();
     }
 
     // Right now, permission-checks are completely on-demand.
     if ($isChanged('server_route') /* || $isChanged('permission') */) {
       \CRM_Core_Menu::store();
+      \CRM_Core_BAO_Navigation::resetNavigation();
     }
 
     $item['module_name'] = _afform_angular_module_name($item['name'], 'camel');

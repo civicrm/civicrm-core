@@ -22,13 +22,12 @@ namespace api\v4\Entity;
 use Civi\Api4\Setting;
 use Civi\Api4\StatusPreference;
 use Civi\Api4\System;
-use api\v4\Api4TestBase;
-use Civi\Test\TransactionalInterface;
+use api\v4\UnitTestCase;
 
 /**
  * @group headless
  */
-class SystemTest extends Api4TestBase implements TransactionalInterface {
+class SystemTest extends UnitTestCase {
 
   public function testSystemCheck() {
     $origEnv = \CRM_Core_Config::environment();

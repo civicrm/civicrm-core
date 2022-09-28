@@ -16,7 +16,6 @@ class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
       'civicrm_activity_contact',
     ];
     $this->quickCleanup($tablesToTruncate);
-    parent::tearDown();
   }
 
   /**
@@ -24,6 +23,7 @@ class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
    * after preProcess().
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testActivityViewPreProcess(): void {
     // create activity

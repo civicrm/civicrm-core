@@ -17,20 +17,37 @@
 class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
 
   /**
-   * Retrieve DB object and copy to defaults array.
+   * Static holder for the default LT.
+   * @var string
+   */
+  public static $_defaultPreferencesDate = NULL;
+
+  /**
+   * Class constructor.
+   */
+  public function __construct() {
+    parent::__construct();
+  }
+
+  /**
+   * Fetch object based on array of properties.
    *
    * @param array $params
-   *   Array of criteria values.
+   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   Array to be populated with found values.
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return self|null
-   *   The DAO object, if found.
-   *
-   * @deprecated
+   * @return CRM_Core_BAO_PreferencesDate|null
+   *   object on success, null otherwise
    */
-  public static function retrieve($params, &$defaults) {
-    return self::commonRetrieve(self::class, $params, $defaults);
+  public static function retrieve(&$params, &$defaults) {
+    $dao = new CRM_Core_DAO_PreferencesDate();
+    $dao->copyValues($params);
+    if ($dao->find(TRUE)) {
+      CRM_Core_DAO::storeValues($dao, $defaults);
+      return $dao;
+    }
+    return NULL;
   }
 
   /**

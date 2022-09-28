@@ -21,13 +21,13 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
       'civicrm_activity_contact',
     ];
     $this->quickCleanup($tablesToTruncate);
-    parent::tearDown();
   }
 
   /**
    * Test submitted the search form.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSearch(): void {
 
@@ -41,7 +41,7 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
     $this->assertEquals([
       [
         'contact_id' => '3',
-        'contact_type' => '<a href="/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=3" data-tooltip-url="/index.php?q=civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=3&amp;snippet=4&amp;is_show_email_task=1" class="crm-summary-link"><i class="crm-i fa-fw fa-user" title=""></i></a>',
+        'contact_type' => '<a href="/index.php?q=civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=3&amp;snippet=4&amp;is_show_email_task=1" class="crm-summary-link"><div class="icon crm-icon Individual-icon"></div></a>',
         'sort_name' => 'Anderson, Anthony',
         'display_name' => 'Mr. Anthony Anderson II',
         'activity_id' => '1',
@@ -63,10 +63,6 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
         'campaign' => NULL,
         'campaign_id' => NULL,
         'repeat' => '',
-        'contact_sub_type' => NULL,
-        'activity_campaign_id' => NULL,
-        'activity_engagement_level' => NULL,
-        'recipients' => '',
       ],
     ], $rows);
   }
@@ -121,47 +117,6 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
         ],
         'expected_qill' => [['Activity Status In Scheduled, Completed']],
       ],
-    ];
-  }
-
-  /**
-   * This just checks there's no errors. It doesn't perform any tasks.
-   * It's a little bit like choosing an action from the dropdown.
-   * @dataProvider taskControllerProvider
-   * @param int $task
-   */
-  public function testTaskController(int $task) {
-    // It gets the task from the POST var
-    $oldtask = $_POST['task'] ?? NULL;
-    $_POST['task'] = $task;
-
-    // yes it's the string 'null'
-    new CRM_Activity_Controller_Search('Find Activities', TRUE, 'null');
-
-    // clean up
-    if (is_null($oldtask)) {
-      unset($_POST['task']);
-    }
-    else {
-      $_POST['task'] = $oldtask;
-    }
-  }
-
-  /**
-   * dataprovider for testTaskController
-   * @return array
-   */
-  public function taskControllerProvider(): array {
-    return [
-      [CRM_Activity_Task::TASK_DELETE],
-      [CRM_Activity_Task::TASK_PRINT],
-      [CRM_Activity_Task::TASK_EXPORT],
-      [CRM_Activity_Task::BATCH_UPDATE],
-      [CRM_Activity_Task::TASK_EMAIL],
-      [CRM_Activity_Task::PDF_LETTER],
-      [CRM_Activity_Task::TASK_SMS],
-      [CRM_Activity_Task::TAG_ADD],
-      [CRM_Activity_Task::TAG_REMOVE],
     ];
   }
 

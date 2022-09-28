@@ -41,7 +41,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    * @param CRM_Core_Form $form
    */
   public static function buildLabelForm($form) {
-    $form->setTitle(ts('Make Mailing Labels'));
+    CRM_Utils_System::setTitle(ts('Make Mailing Labels'));
 
     //add select for label
     $label = CRM_Core_BAO_LabelFormat::getList(TRUE);
@@ -92,7 +92,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
   /**
    * Process the form after the input has been submitted and validated.
    *
-   * @param array|null $params
+   * @param array|NULL $params
    */
   public function postProcess($params = NULL) {
     $fv = $params ?: $this->controller->exportValues($this->_name);
@@ -300,6 +300,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
     if (isset($fv['merge_same_address'])) {
       CRM_Core_BAO_Address::mergeSameAddress($rows);
+      $individualFormat = TRUE;
     }
 
     // format the addresses according to CIVICRM_ADDRESS_FORMAT (CRM-1327)
@@ -314,7 +315,19 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         $row['preferred_communication_method'] = implode(', ', $temp);
       }
       $row['id'] = $id;
-      $formatted = CRM_Utils_Address::formatMailingLabel($row, 'mailing_format', FALSE, TRUE, $tokenFields);
+      $formatted = CRM_Utils_Address::format($row, 'mailing_format', FALSE, TRUE, $tokenFields);
+
+      // CRM-2211: UFPDF doesn't have bidi support; use the PECL fribidi package to fix it.
+      // On Ubuntu (possibly Debian?) be aware of http://pecl.php.net/bugs/bug.php?id=12366
+      // Due to FriBidi peculiarities, this can't be called on
+      // a multi-line string, hence the explode+implode approach.
+      if (function_exists('fribidi_log2vis')) {
+        $lines = explode("\n", $formatted);
+        foreach ($lines as $i => $line) {
+          $lines[$i] = fribidi_log2vis($line, FRIBIDI_AUTO, FRIBIDI_CHARSET_UTF8);
+        }
+        $formatted = implode("\n", $lines);
+      }
       $rows[$id] = [$formatted];
     }
 
@@ -323,7 +336,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     }
 
     //call function to create labels
-    $this->createLabel($rows, $fv['label_name']);
+    self::createLabel($rows, $fv['label_name']);
     CRM_Utils_System::civiExit();
   }
 
@@ -356,15 +369,15 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    * @param string $fileName
    *   The name of the file to save the label in.
    */
-  private function createLabel($contactRows, $format, $fileName = 'MailingLabels_CiviCRM.pdf') {
+  public function createLabel(&$contactRows, &$format, $fileName = 'MailingLabels_CiviCRM.pdf') {
     $pdf = new CRM_Utils_PDF_Label($format, 'mm');
     $pdf->Open();
     $pdf->AddPage();
 
     //build contact string that needs to be printed
     $val = NULL;
-    foreach ($contactRows as $value) {
-      foreach ($value as $v) {
+    foreach ($contactRows as $row => $value) {
+      foreach ($value as $k => $v) {
         $val .= "$v\n";
       }
 

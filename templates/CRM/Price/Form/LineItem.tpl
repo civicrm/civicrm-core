@@ -95,7 +95,7 @@
           </td>
         </tr>
         <tr>
-          <td colspan=6 class="right"><strong>{ts}Unallocated Amount{/ts}</strong></td>
+          <td colspan=6 class="right"><strong>Unallocated Amount</strong></td>
           <td><h5 class='unlocateAmount'>{$total|crmMoney} </h5></td>
         </tr>
       {/if}
@@ -124,8 +124,7 @@
           {assign var="lineItemCount" value=0}
 
           {foreach from=$pcount item=p_count}
-            {assign var="intPCount" value=$p_count.participant_count|intval}
-            {assign var="lineItemCount" value=$lineItemCount+$intPCount}
+            {assign var="lineItemCount" value=$lineItemCount+$p_count.participant_count}
           {/foreach}
           {if $lineItemCount < 1 }
             {assign var="lineItemCount" value=1}

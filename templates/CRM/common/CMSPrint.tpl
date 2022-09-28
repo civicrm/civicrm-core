@@ -11,9 +11,9 @@
 {include file="CRM/common/debug.tpl"}
 {/if}
 
-<div id="crm-container" class="crm-container{if $urlIsPublic} crm-public{/if}" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
+<div id="crm-container" class="crm-container{if !empty($urlIsPublic)} crm-public{/if}" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
 
-{if $breadcrumb}
+{if !empty($breadcrumb)}
   <div class="breadcrumb">
     {foreach from=$breadcrumb item=crumb key=key}
       {if $key != 0}
@@ -24,29 +24,23 @@
   </div>
 {/if}
 
-{if $urlIsPublic}
-    {if $pageTitle}
-      <div class="crm-title">
-        <h2 class="title">{$pageTitle}</h2>
-      </div>
-    {/if}
-{else}
-    {if $pageTitle}
-      <div class="crm-title">
-        <h1 class="title">{if $isDeleted}
-          <del>{/if}{$pageTitle}{if $isDeleted}</del>{/if}</h1>
-      </div>
-    {/if}
+{if !empty($pageTitle)}
+  <div class="crm-title">
+    <h1 class="title">{if !empty($isDeleted)}<del>{/if}{$pageTitle}{if !empty($isDeleted)}</del>{/if}</h1>
+  </div>
 {/if}
 
 {crmRegion name='page-header'}
 {/crmRegion}
 <div class="clear"></div>
 
+{if isset($localTasks) and $localTasks}
+    {include file="CRM/common/localNav.tpl"}
+{/if}
 <div id="crm-main-content-wrapper">
   {include file="CRM/common/status.tpl"}
   {crmRegion name='page-body'}
-    {if $isForm and $formTpl}
+    {if isset($isForm) and $isForm and isset($formTpl)}
       {include file="CRM/Form/$formTpl.tpl"}
     {else}
       {include file=$tplFile}
@@ -55,7 +49,7 @@
 </div>
 
 {crmRegion name='page-footer'}
-{if $urlIsPublic}
+{if !empty($urlIsPublic)}
   {include file="CRM/common/publicFooter.tpl"}
 {else}
   {include file="CRM/common/footer.tpl"}

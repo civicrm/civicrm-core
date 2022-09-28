@@ -51,7 +51,7 @@ class CRM_Contact_Form_Search_Custom_TagContributions extends CRM_Contact_Form_S
     /**
      * You can define a custom title for the search form
      */
-    $this->setTitle(ts('Find Contribution Amounts by Tag'));
+    $this->setTitle('Find Contribution Amounts by Tag');
 
     /**
      * Define the search form fields here
@@ -234,6 +234,18 @@ WHERE  $where
    */
   public function &columns() {
     return $this->_columns;
+  }
+
+  /**
+   * @param $title
+   */
+  public function setTitle($title) {
+    if ($title) {
+      CRM_Utils_System::setTitle($title);
+    }
+    else {
+      CRM_Utils_System::setTitle(ts('Search'));
+    }
   }
 
   /**

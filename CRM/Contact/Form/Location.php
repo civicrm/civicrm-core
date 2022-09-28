@@ -21,7 +21,7 @@ class CRM_Contact_Form_Location {
    *
    * @param CRM_Core_Form $form
    */
-  public static function preProcess($form) {
+  public static function preProcess(&$form) {
     $form->_addBlockName = CRM_Utils_Request::retrieve('block', 'String');
     $additionalblockCount = CRM_Utils_Request::retrieve('count', 'Positive');
 
@@ -85,33 +85,10 @@ class CRM_Contact_Form_Location {
           $generateAjaxRequest++;
           $ajaxRequestBlocks[$blockName][$instance] = TRUE;
         }
-        switch ($blockName) {
-          case 'Email':
-            // setDefaults uses this to tell which instance
-            $form->set('Email_Block_Count', $instance);
-            CRM_Contact_Form_Edit_Email::buildQuickForm($form, $instance);
-            // Only display the signature fields if this contact has a CMS account
-            // because they can only send email if they have access to the CRM
-            $ufID = $form->_contactId && CRM_Core_BAO_UFMatch::getUFId($form->_contactId);
-            $form->assign('isAddSignatureFields', (bool) $ufID);
-            if ($ufID) {
-              $form->add('textarea', "email[$instance][signature_text]", ts('Signature (Text)'),
-                ['rows' => 2, 'cols' => 40]
-              );
-              $form->add('wysiwyg', "email[$instance][signature_html]", ts('Signature (HTML)'),
-                ['rows' => 2, 'cols' => 40]
-              );
-            }
-            break;
 
-          default:
-            // @todo This pattern actually adds complexity compared to filling out a switch statement
-            // for the limited number of blocks - as we also have to receive the block count
-            $form->set($blockName . '_Block_Count', $instance);
-            $formName = 'CRM_Contact_Form_Edit_' . $blockName;
-            $formName::buildQuickForm($form);
-        }
-
+        $form->set($blockName . '_Block_Count', $instance);
+        $formName = 'CRM_Contact_Form_Edit_' . $blockName;
+        $formName::buildQuickForm($form);
       }
     }
 

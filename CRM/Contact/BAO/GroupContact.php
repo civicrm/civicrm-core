@@ -9,66 +9,66 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\Contact;
-use Civi\Api4\SubscriptionHistory;
-use Civi\Core\Event\PostEvent;
-use Civi\Core\HookInterface;
-
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implements HookInterface {
-  use CRM_Contact_AccessTrait;
+class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
 
   /**
-   * Deprecated add function
-   *
-   * @param array $params
-   *
-   * @return CRM_Contact_DAO_GroupContact
-   * @throws \CRM_Core_Exception
-   *
-   * @deprecated
+   * Class constructor.
    */
-  public static function add(array $params): CRM_Contact_DAO_GroupContact {
-    return self::writeRecord($params);
+  public function __construct() {
+    parent::__construct();
   }
 
   /**
-   * Callback for hook_civicrm_post().
+   * Takes an associative array and creates a groupContact object.
    *
-   * @param \Civi\Core\Event\PostEvent $event
+   * the function extract all the params it needs to initialize the create a
+   * group object. the params array could contain additional unused name/value
+   * pairs
    *
-   * @noinspection PhpUnused
-   * @noinspection UnknownInspectionInspection
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   *
+   * @return CRM_Contact_BAO_Group
    */
-  public static function self_hook_civicrm_post(PostEvent $event): void {
-    if (is_object($event->object) && in_array($event->action, ['create', 'edit'], TRUE)) {
-      // Lookup existing info for the sake of subscription history
-      if ($event->action === 'edit') {
-        $event->object->find(TRUE);
-      }
+  public static function add($params) {
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'GroupContact', CRM_Utils_Array::value('id', $params), $params);
 
-      try {
-        if (empty($event->object->group_id) || empty($event->object->contact_id) || empty($event->object->status)) {
-          $event->object->find(TRUE);
-        }
-        SubscriptionHistory::save(FALSE)->setRecords([
-          [
-            'group_id' => $event->object->group_id,
-            'contact_id' => $event->object->contact_id,
-            'status' => $event->object->status,
-          ],
-        ])->execute();
-      }
-      catch (CRM_Core_Exception $e) {
-        // A failure to create the history might be a deadlock or similar
-        // This record is not important enough to trigger a larger fail.
-        Civi::log()->warning('Failed to add civicrm_subscription_history record with error :error', ['error' => $e->getMessage()]);
-      }
+    if (!self::dataExists($params)) {
+      return NULL;
     }
+
+    $groupContact = new CRM_Contact_BAO_GroupContact();
+    $groupContact->copyValues($params);
+    $groupContact->save();
+
+    // Lookup existing info for the sake of subscription history
+    if (!empty($params['id'])) {
+      $groupContact->find(TRUE);
+      $params = $groupContact->toArray();
+    }
+    CRM_Contact_BAO_SubscriptionHistory::create($params);
+
+    CRM_Utils_Hook::post($hook, 'GroupContact', $groupContact->id, $groupContact);
+
+    return $groupContact;
+  }
+
+  /**
+   * Check if there is data to create the object.
+   *
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   *
+   * @return bool
+   */
+  public static function dataExists(&$params) {
+    return (!empty($params['id']) || (!empty($params['group_id']) && !empty($params['contact_id'])));
   }
 
   /**
@@ -83,7 +83,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
    * @return array
    *   (reference)   the values that could be potentially assigned to smarty
    */
-  public static function getValues($params, &$values) {
+  public static function getValues(&$params, &$values) {
     if (empty($params)) {
       return NULL;
     }
@@ -477,7 +477,7 @@ SELECT    *
    *   Id of a particular group.
    *
    *
-   * @return int groupID
+   * @return groupID
    */
   public static function getGroupId($groupContactID) {
     $dao = new CRM_Contact_DAO_GroupContact();
@@ -487,36 +487,80 @@ SELECT    *
   }
 
   /**
-   * Deprecated create function.
+   * Creates / removes contacts from the groups
    *
-   * @deprecated
+   * FIXME: Nonstandard create function; only called from CRM_Contact_BAO_Contact::createProfileContact
    *
    * @param array $params
+   *   Name/value pairs.
+   * @param int $contactId
+   *   Contact id.
    *
-   * @return CRM_Contact_DAO_GroupContact
+   * @param bool $ignorePermission
+   *   if ignorePermission is true we are coming in via profile mean $method = 'Web'
+   *
+   * @param string $method
    */
-  public static function create(array $params) {
-    // @fixme create was only called from CRM_Contact_BAO_Contact::createProfileContact
-    // As of Aug 2020 it's not called from anywhere so we can remove the below code after some time
+  public static function create($params, $contactId, $ignorePermission = FALSE, $method = 'Admin') {
+    $contactIds = [$contactId];
+    $contactGroup = [];
 
-    CRM_Core_Error::deprecatedFunctionWarning('Use the GroupContact API');
-    return self::add($params);
+    if ($contactId) {
+      $contactGroupList = CRM_Contact_BAO_GroupContact::getContactGroup($contactId, 'Added',
+        NULL, FALSE, $ignorePermission
+      );
+      if (is_array($contactGroupList)) {
+        foreach ($contactGroupList as $key) {
+          $groupId = $key['group_id'];
+          $contactGroup[$groupId] = $groupId;
+        }
+      }
+    }
+
+    // get the list of all the groups
+    $allGroup = CRM_Contact_BAO_GroupContact::getGroupList(0, $ignorePermission);
+
+    // this fix is done to prevent warning generated by array_key_exits incase of empty array is given as input
+    if (!is_array($params)) {
+      $params = [];
+    }
+
+    // check which values has to be add/remove contact from group
+    foreach ($allGroup as $key => $varValue) {
+      if (!empty($params[$key]) && !array_key_exists($key, $contactGroup)) {
+        // add contact to group
+        CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIds, $key, $method);
+      }
+      elseif (empty($params[$key]) && array_key_exists($key, $contactGroup)) {
+        // remove contact from group
+        CRM_Contact_BAO_GroupContact::removeContactsFromGroup($contactIds, $key, $method);
+      }
+    }
   }
 
   /**
-   * Function that doesn't do much.
-   *
    * @param int $contactID
    * @param int $groupID
    *
-   * @deprecated
    * @return bool
    */
-  public static function isContactInGroup(int $contactID, int $groupID) {
-    return (bool) Contact::get(FALSE)
-      ->addWhere('id', '=', $contactID)
-      ->addWhere('groups', 'IN', [$groupID])
-      ->selectRowCount()->execute()->count();
+  public static function isContactInGroup($contactID, $groupID) {
+    if (!CRM_Utils_Rule::positiveInteger($contactID) ||
+      !CRM_Utils_Rule::positiveInteger($groupID)
+    ) {
+      return FALSE;
+    }
+
+    $params = [
+      ['group', 'IN', [$groupID], 0, 0],
+      ['contact_id', '=', $contactID, 0, 0],
+    ];
+    [$contacts] = CRM_Contact_BAO_Query::apiQuery($params, ['contact_id']);
+
+    if (!empty($contacts)) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**
@@ -684,7 +728,7 @@ AND    contact_id IN ( $contactStr )
       $presentIDs = [];
       $dao = CRM_Core_DAO::executeQuery($sql, $params);
       if ($dao->fetch()) {
-        $presentIDs = explode(',', ($dao->contactStr ?? ''));
+        $presentIDs = explode(',', $dao->contactStr);
         $presentIDs = array_flip($presentIDs);
       }
 

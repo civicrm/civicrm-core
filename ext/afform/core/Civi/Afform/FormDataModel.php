@@ -13,15 +13,10 @@ use Civi\Api4\Afform;
  */
 class FormDataModel {
 
-  protected $defaults = [
-    'security' => 'RBAC',
-    'actions' => ['create' => TRUE, 'update' => TRUE],
-    'min' => 1,
-    'max' => 1,
-  ];
+  protected $defaults = ['security' => 'RBAC', 'actions' => ['create' => TRUE, 'update' => TRUE]];
 
   /**
-   * @var array[]
+   * @var array
    *   Ex: $entities['spouse']['type'] = 'Contact';
    */
   protected $entities;
@@ -30,11 +25,6 @@ class FormDataModel {
    * @var array
    */
   protected $blocks = [];
-
-  /**
-   * @var array[]
-   */
-  protected $searchDisplays = [];
 
   /**
    * @var array
@@ -50,7 +40,7 @@ class FormDataModel {
       $this->entities[$entity]['fields'] = $this->entities[$entity]['joins'] = [];
     }
     // Pre-load full list of afforms in case this layout embeds other afform directives
-    $this->blocks = (array) Afform::get(FALSE)->setSelect(['name', 'directive_name'])->execute()->indexBy('directive_name');
+    $this->blocks = (array) Afform::get()->setCheckPermissions(FALSE)->setSelect(['name', 'directive_name'])->execute()->indexBy('directive_name');
     $this->parseFields($layout);
   }
 
@@ -134,24 +124,14 @@ class FormDataModel {
    * @param array $nodes
    * @param string $entity
    * @param string $join
-   * @param string $searchDisplay
    */
-  protected function parseFields($nodes, $entity = NULL, $join = NULL, $searchDisplay = NULL) {
+  protected function parseFields($nodes, $entity = NULL, $join = NULL) {
     foreach ($nodes as $node) {
       if (!is_array($node) || !isset($node['#tag'])) {
         continue;
       }
-      elseif (isset($node['af-fieldset'])) {
-        $entity = $node['af-fieldset'] ?? NULL;
-        $searchDisplay = $entity ? NULL : $this->findSearchDisplay($node);
-        if ($entity && isset($node['af-repeat'])) {
-          $this->entities[$entity]['min'] = $node['min'] ?? 0;
-          $this->entities[$entity]['max'] = $node['max'] ?? NULL;
-        }
-        $this->parseFields($node['#children'] ?? [], $node['af-fieldset'], $join, $searchDisplay);
-      }
-      elseif ($searchDisplay && $node['#tag'] === 'af-field') {
-        $this->searchDisplays[$searchDisplay]['fields'][$node['name']] = AHQ::getProps($node);
+      elseif (!empty($node['af-fieldset']) && !empty($node['#children'])) {
+        $this->parseFields($node['#children'], $node['af-fieldset'], $join);
       }
       elseif ($entity && $node['#tag'] === 'af-field') {
         if ($join) {
@@ -166,30 +146,16 @@ class FormDataModel {
         $this->parseFields($node['#children'] ?? [], $entity, $node['af-join']);
       }
       elseif (!empty($node['#children'])) {
-        $this->parseFields($node['#children'], $entity, $join, $searchDisplay);
+        $this->parseFields($node['#children'], $entity, $join);
       }
       // Recurse into embedded blocks
       if (isset($this->blocks[$node['#tag']])) {
         if (!isset($this->blocks[$node['#tag']]['layout'])) {
-          $this->blocks[$node['#tag']] = Afform::get(FALSE)->setSelect(['name', 'layout'])->addWhere('name', '=', $this->blocks[$node['#tag']]['name'])->execute()->first();
+          $this->blocks[$node['#tag']] = Afform::get()->setCheckPermissions(FALSE)->setSelect(['name', 'layout'])->addWhere('name', '=', $this->blocks[$node['#tag']]['name'])->execute()->first();
         }
         if (!empty($this->blocks[$node['#tag']]['layout'])) {
-          $this->parseFields($this->blocks[$node['#tag']]['layout'], $entity, $join, $searchDisplay);
+          $this->parseFields($this->blocks[$node['#tag']]['layout'], $entity, $join);
         }
-      }
-    }
-  }
-
-  /**
-   * Finds a search display within a fieldset
-   *
-   * @param array $node
-   */
-  public function findSearchDisplay($node) {
-    foreach (\Civi\Search\Display::getDisplayTypes(['name']) as $displayType) {
-      foreach (AHQ::getTags($node, $displayType['name']) as $display) {
-        $this->searchDisplays[$display['display-name']]['searchName'] = $display['search-name'];
-        return $display['display-name'];
       }
     }
   }
@@ -203,17 +169,10 @@ class FormDataModel {
   }
 
   /**
-   * @return array{type: string, fields: array, joins: array, security: string, actions: array}
+   * @return array
    */
   public function getEntity($entityName) {
     return $this->entities[$entityName] ?? NULL;
-  }
-
-  /**
-   * @return array{fields: array, searchName: string}
-   */
-  public function getSearchDisplay($displayName) {
-    return $this->searchDisplays[$displayName] ?? NULL;
   }
 
 }

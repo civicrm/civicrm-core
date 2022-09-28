@@ -123,12 +123,7 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
     }
 
     if ($this->_action & CRM_Core_Action::PREVIEW) {
-      $dao = new CRM_Contribute_DAO_PremiumsProduct();
-      $dao->id = $this->_pid;
-      $dao->find(TRUE);
-      $productID = $dao->product_id;
-
-      CRM_Contribute_BAO_Premium::buildPremiumPreviewBlock($this, $productID);
+      CRM_Contribute_BAO_Premium::buildPremiumPreviewBlock($this, NULL, $this->_pid);
       $this->addButtons([
         [
           'type' => 'next',

@@ -29,6 +29,12 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     'Organization',
   ];
 
+  protected $_charts = [
+    '' => 'Tabular',
+    'barChart' => 'Bar Chart',
+    'pieChart' => 'Pie Chart',
+  ];
+
   /**
    * This report has not been optimised for group filtering.
    *
@@ -236,13 +242,6 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
       'grouping' => 'contact-fields',
     ];
 
-    // Add charts support
-    $this->_charts = [
-      '' => ts('Tabular'),
-      'barChart' => ts('Bar Chart'),
-      'pieChart' => ts('Pie Chart'),
-    ];
-
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
@@ -291,7 +290,7 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
   /**
    * @param $fields
    * @param $files
-   * @param self $self
+   * @param $self
    *
    * @return array
    */

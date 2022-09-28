@@ -173,6 +173,7 @@ trait CRM_Admin_Form_SettingTrait {
    * Add fields in the metadata to the template.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function addFieldsDefinedInSettingsMetadata() {
     $this->addSettingsToFormFromMetadata();
@@ -311,7 +312,6 @@ trait CRM_Admin_Form_SettingTrait {
       'entity_reference' => 'EntityRef',
       'advmultiselect' => 'Element',
       'chainselect' => 'ChainSelect',
-      'yesno' => 'YesNo',
     ];
     $mapping += array_fill_keys(CRM_Core_Form::$html5Types, '');
     return $mapping[$htmlType] ?? '';
@@ -322,6 +322,7 @@ trait CRM_Admin_Form_SettingTrait {
    *
    * All others are pending conversion.
    *
+   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   protected function setDefaultsForMetadataDefinedFields() {
@@ -349,7 +350,7 @@ trait CRM_Admin_Form_SettingTrait {
    * @param array $params
    *   Form input.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function saveMetadataDefinedSettings($params) {
     $settings = $this->getSettingsToSetByMetadata($params);
@@ -400,7 +401,7 @@ trait CRM_Admin_Form_SettingTrait {
   /**
    * Add settings to form if the metadata designates they should be on the page.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function addSettingsToFormFromMetadata() {
     $filter = $this->getSettingPageFilter();

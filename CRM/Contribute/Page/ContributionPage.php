@@ -299,11 +299,15 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
       return $controller->run();
     }
     elseif ($action & CRM_Core_Action::UPDATE) {
+      $config = CRM_Core_Config::singleton();
+
       // assign vars to templates
       $this->assign('id', $id);
       $this->assign('title', CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $id, 'title'));
       $this->assign('is_active', CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $id, 'is_active'));
-      $this->assign('CiviMember', CRM_Core_Component::isEnabled('CiviMember'));
+      if (in_array('CiviMember', $config->enableComponents)) {
+        $this->assign('CiviMember', TRUE);
+      }
     }
     elseif ($action & CRM_Core_Action::COPY) {
       // @todo Unused local variable can be safely removed.
@@ -452,10 +456,9 @@ ORDER BY is_active desc, title asc
     //get configure actions links.
     $configureActionLinks = self::configureActionLinks();
 
-    $contributions = [];
     while ($dao->fetch()) {
-      $contributions[$dao->id] = [];
-      CRM_Core_DAO::storeValues($dao, $contributions[$dao->id]);
+      $contribution[$dao->id] = [];
+      CRM_Core_DAO::storeValues($dao, $contribution[$dao->id]);
 
       // form all action links
       $action = array_sum(array_keys(self::actionLinks()));
@@ -483,7 +486,7 @@ ORDER BY is_active desc, title asc
 
       //build the configure links.
       $sectionsInfo = CRM_Utils_Array::value($dao->id, $contriPageSectionInfo, []);
-      $contributions[$dao->id]['configureActionLinks'] = CRM_Core_Action::formLink(self::formatConfigureLinks($sectionsInfo),
+      $contribution[$dao->id]['configureActionLinks'] = CRM_Core_Action::formLink(self::formatConfigureLinks($sectionsInfo),
         $action,
         array('id' => $dao->id),
         ts('Configure'),
@@ -494,7 +497,7 @@ ORDER BY is_active desc, title asc
       );
 
       //build the contributions links.
-      $contributions[$dao->id]['contributionLinks'] = CRM_Core_Action::formLink(self::contributionLinks(),
+      $contribution[$dao->id]['contributionLinks'] = CRM_Core_Action::formLink(self::contributionLinks(),
         $action,
         array('id' => $dao->id),
         ts('Contributions'),
@@ -505,7 +508,7 @@ ORDER BY is_active desc, title asc
       );
 
       //build the online contribution links.
-      $contributions[$dao->id]['onlineContributionLinks'] = CRM_Core_Action::formLink(self::onlineContributionLinks(),
+      $contribution[$dao->id]['onlineContributionLinks'] = CRM_Core_Action::formLink(self::onlineContributionLinks(),
         $action,
         array('id' => $dao->id),
         ts('Links'),
@@ -516,7 +519,7 @@ ORDER BY is_active desc, title asc
       );
 
       //build the normal action links.
-      $contributions[$dao->id]['action'] = CRM_Core_Action::formLink(self::actionLinks(),
+      $contribution[$dao->id]['action'] = CRM_Core_Action::formLink(self::actionLinks(),
         $action,
         array('id' => $dao->id),
         ts('more'),
@@ -527,10 +530,12 @@ ORDER BY is_active desc, title asc
       );
 
       //show campaigns on selector.
-      $contributions[$dao->id]['campaign'] = $allCampaigns[$dao->campaign_id] ?? NULL;
+      $contribution[$dao->id]['campaign'] = $allCampaigns[$dao->campaign_id] ?? NULL;
     }
 
-    $this->assign('rows', $contributions);
+    if (isset($contribution)) {
+      $this->assign('rows', $contribution);
+    }
   }
 
   public function search() {

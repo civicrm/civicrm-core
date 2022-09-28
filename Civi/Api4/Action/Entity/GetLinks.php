@@ -25,7 +25,8 @@ class GetLinks extends \Civi\Api4\Generic\BasicGetAction {
   public function getRecords() {
     \CRM_Core_Error::deprecatedWarning('APIv4 Entity::getLinks is deprecated.');
     $result = [];
-    $schema = CoreUtil::getSchemaMap();
+    /** @var \Civi\Api4\Service\Schema\SchemaMap $schema */
+    $schema = \Civi::container()->get('schema_map');
     foreach ($schema->getTables() as $table) {
       $entity = CoreUtil::getApiNameFromTableName($table->getName());
       // Since this is an api function, exclude tables that don't have an api

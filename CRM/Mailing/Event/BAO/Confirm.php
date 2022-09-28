@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Token\TokenProcessor;
-
 /**
  *
  * @package CRM
@@ -23,6 +21,13 @@ require_once 'Mail/mime.php';
  * Class CRM_Mailing_Event_BAO_Confirm
  */
 class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
+
+  /**
+   * Class constructor.
+   */
+  public function __construct() {
+    parent::__construct();
+  }
 
   /**
    * Confirm a pending subscription.
@@ -79,7 +84,10 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
 
     $transaction->commit();
 
-    list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
+    $config = CRM_Core_Config::singleton();
+
+    $domain = CRM_Core_BAO_Domain::getDomain();
+    list($domainEmailName, $_) = CRM_Core_BAO_Domain::getNameAndEmail();
 
     list($display_name, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($se->contact_id);
 
@@ -92,11 +100,7 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $component->is_active = 1;
     $component->component_type = 'Welcome';
 
-    // we should return early if welcome email temaplate is disabled
-    // this means confirmation email will not be sent
-    if (!$component->find(TRUE)) {
-      return $group->title;
-    }
+    $component->find(TRUE);
 
     $html = $component->body_html;
 
@@ -110,28 +114,18 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $bao = new CRM_Mailing_BAO_Mailing();
     $bao->body_text = $text;
     $bao->body_html = $html;
-    $templates = $bao->getTemplates();
+    $tokens = $bao->getTokens();
 
-    $html = CRM_Utils_Token::replaceWelcomeTokens($templates['html'], $group->title, TRUE);
-    $text = CRM_Utils_Token::replaceWelcomeTokens($templates['text'], $group->title, FALSE);
+    $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html']);
+    $html = CRM_Utils_Token::replaceWelcomeTokens($html, $group->title, TRUE);
 
-    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
-      'controller' => __CLASS__,
-      'smarty' => FALSE,
-      'schema' => ['contactId'],
-    ]);
-
-    $tokenProcessor->addMessage('body_html', $html, 'text/html');
-    $tokenProcessor->addMessage('body_text', $text, 'text/plain');
-    $tokenProcessor->addRow(['contactId' => $contact_id]);
-    $tokenProcessor->evaluate();
-    $html = $tokenProcessor->getRow(0)->render('body_html');
-    $text = $tokenProcessor->getRow(0)->render('body_text');
+    $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
+    $text = CRM_Utils_Token::replaceWelcomeTokens($text, $group->title, FALSE);
 
     $mailParams = [
       'groupName' => 'Mailing Event ' . $component->component_type,
       'subject' => $component->subject,
-      'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
+      'from' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
       'toEmail' => $email,
       'toName' => $display_name,
       'replyTo' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),

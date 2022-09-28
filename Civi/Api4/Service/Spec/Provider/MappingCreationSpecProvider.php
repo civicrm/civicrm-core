@@ -14,11 +14,7 @@ namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
-/**
- * @service
- * @internal
- */
-class MappingCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
+class MappingCreationSpecProvider implements Generic\SpecProviderInterface {
 
   /**
    * This function runs for both Mapping and MappingField entities

@@ -18,12 +18,12 @@
       $scope.elementList = [];
       $scope.elementTitles = [];
 
-      this.getEntityType = function() {
+      function getEntityType() {
         return (ctrl.entity.type === 'Contact' && ctrl.entity.data) ? ctrl.entity.data.contact_type || 'Contact' : ctrl.entity.type;
-      };
+      }
 
       $scope.getMeta = function() {
-        return afGui.meta.entities[ctrl.getEntityType()];
+        return afGui.meta.entities[getEntityType()];
       };
 
       $scope.getAdminTpl = function() {
@@ -54,7 +54,7 @@
         $scope.fieldList.length = 0;
         $scope.fieldList.push({
           entityName: ctrl.entity.name,
-          entityType: ctrl.getEntityType(),
+          entityType: getEntityType(),
           label: ts('%1 Fields', {1: $scope.getMeta().label}),
           fields: filterFields($scope.getMeta().fields)
         });
@@ -94,22 +94,19 @@
         $scope.blockTitles.length = 0;
         _.each(afGui.meta.blocks, function(block, directive) {
           if ((!search || _.contains(directive, search) || _.contains(block.name.toLowerCase(), search) || _.contains(block.title.toLowerCase(), search)) &&
-            (block.entity_type === '*' || block.entity_type === ctrl.entity.type || (ctrl.entity.type === 'Contact' && block.entity_type === ctrl.entity.data.contact_type)) &&
+            (block.block === '*' || block.block === ctrl.entity.type || (ctrl.entity.type === 'Contact' && block.block === ctrl.entity.data.contact_type)) &&
             block.name !== ctrl.editor.getAfform().name
           ) {
-            var item = {"#tag": block.join_entity ? "div" : directive};
-            if (block.join_entity) {
-              var joinEntity = afGui.getEntity(block.join_entity);
-              // Skip adding block if entity does not exist
-              if (!joinEntity) {
-                return;
-              }
-              item['af-join'] = block.join_entity;
+            var item = {"#tag": block.join ? "div" : directive};
+            if (block.join) {
+              item['af-join'] = block.join;
               item['#children'] = [{"#tag": directive}];
+            }
+            if (block.repeat) {
               item['af-repeat'] = ts('Add');
               item.min = '1';
-              if (typeof joinEntity.repeat_max === 'number') {
-                item.max = '' + joinEntity.repeat_max;
+              if (typeof block.repeat === 'number') {
+                item.max = '' + block.repeat;
               }
             }
             $scope.blockList.push(item);
@@ -122,9 +119,7 @@
         $scope.elementList.length = 0;
         $scope.elementTitles.length = 0;
         _.each(afGui.meta.elements, function(element, name) {
-          if (
-            (!element.afform_type || _.contains(element.afform_type, 'form')) &&
-            (!search || _.contains(name, search) || _.contains(element.title.toLowerCase(), search))) {
+          if (!search || _.contains(name, search) || _.contains(element.title.toLowerCase(), search)) {
             var node = _.cloneDeep(element.element);
             if (name === 'fieldset') {
               if (!ctrl.editor.allowEntityConfig) {
@@ -196,21 +191,22 @@
         return found.match;
       }
 
-      this.addValue = function(fieldName) {
-        if (fieldName) {
-          if (!ctrl.entity.data) {
-            ctrl.entity.data = {};
-          }
-          ctrl.entity.data[fieldName] = '';
-        }
-      };
-
       this.$onInit = function() {
         // When a new block is saved, update the list
         this.meta = afGui.meta;
         $scope.$watchCollection('$ctrl.meta.blocks', function() {
           $scope.controls.fieldSearch = '';
           ctrl.buildPaletteLists();
+        });
+
+        $scope.$watch('controls.addValue', function(fieldName) {
+          if (fieldName) {
+            if (!ctrl.entity.data) {
+              ctrl.entity.data = {};
+            }
+            ctrl.entity.data[fieldName] = '';
+            $scope.controls.addValue = '';
+          }
         });
       };
     }

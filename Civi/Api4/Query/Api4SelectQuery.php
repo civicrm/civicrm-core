@@ -13,7 +13,6 @@ namespace Civi\Api4\Query;
 
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
-use Civi\Api4\Service\Schema\Joiner;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\SelectUtil;
@@ -29,8 +28,7 @@ use Civi\Api4\Utils\SelectUtil;
  *
  * * '=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=",
  * * 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN',
- * * 'IS NOT NULL', 'IS NULL', 'CONTAINS', 'IS EMPTY', 'IS NOT EMPTY',
- * * 'REGEXP', 'NOT REGEXP'.
+ * * 'IS NOT NULL', or 'IS NULL', 'CONTAINS'.
  */
 class Api4SelectQuery {
 
@@ -47,18 +45,6 @@ class Api4SelectQuery {
    * @var array
    */
   protected $joins = [];
-
-  /**
-   * Used to keep track of implicit join table aliases
-   * @var array
-   */
-  protected $joinTree = [];
-
-  /**
-   * Used to create a unique table alias for each implicit join
-   * @var int
-   */
-  protected $autoJoinSuffix = 0;
 
   /**
    * @var array[]
@@ -97,11 +83,6 @@ class Api4SelectQuery {
   private $entityAccess = [];
 
   /**
-   * @var array
-   */
-  private $entityValues = [];
-
-  /**
    * @param \Civi\Api4\Generic\DAOGetAction $apiGet
    */
   public function __construct($apiGet) {
@@ -119,8 +100,6 @@ class Api4SelectQuery {
 
     $tableName = CoreUtil::getTableName($this->getEntity());
     $this->query = \CRM_Utils_SQL_Select::from($tableName . ' ' . self::MAIN_TABLE_ALIAS);
-
-    $this->fillEntityValues();
 
     $this->entityAccess[$this->getEntity()] = TRUE;
 
@@ -149,6 +128,7 @@ class Api4SelectQuery {
    * Builds main final sql statement after initialization.
    *
    * @return string
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function getSql() {
@@ -180,13 +160,13 @@ class Api4SelectQuery {
       }
       $results[] = $result;
     }
-    FormattingUtil::formatOutputValues($results, $this->apiFieldSpec, 'get', $this->selectAliases);
+    FormattingUtil::formatOutputValues($results, $this->apiFieldSpec, $this->getEntity(), 'get', $this->selectAliases);
     return $results;
   }
 
   /**
    * @return int
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function getCount() {
     $this->buildWhereClause();
@@ -214,7 +194,7 @@ class Api4SelectQuery {
   /**
    * @param array $select
    *   Array of select expressions; defaults to $this->getSelect
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   protected function buildSelectClause($select = NULL) {
     // Use default if select not provided, exclude row_count which is handled elsewhere
@@ -225,7 +205,7 @@ class Api4SelectQuery {
     }
     else {
       if ($this->forceSelectId) {
-        $keys = (array) CoreUtil::getInfoItem($this->getEntity(), 'primary_key');
+        $keys = CoreUtil::getInfoItem($this->getEntity(), 'primary_key');
         $select = array_merge($keys, $select);
       }
 
@@ -253,7 +233,7 @@ class Api4SelectQuery {
         // If the joined_entity.id isn't in the fieldspec already, autoJoinFK will attempt to add the entity.
         $fkField = substr($wildField, 0, strrpos($wildField, '.'));
         $fkEntity = $this->getField($fkField)['fk_entity'] ?? NULL;
-        $id = $fkEntity ? CoreUtil::getIdFieldName($fkEntity) : 'id';
+        $id = $fkEntity ? CoreUtil::getInfoItem($fkEntity, 'primary_key')[0] : 'id';
         $this->autoJoinFK($fkField . ".$id");
         $matches = $this->selectMatchingFields($wildField);
         array_splice($select, $pos, 1, $matches);
@@ -274,10 +254,10 @@ class Api4SelectQuery {
       if ($valid) {
         $alias = $expr->getAlias();
         if ($alias != $expr->getExpr() && isset($this->apiFieldSpec[$alias])) {
-          throw new \CRM_Core_Exception('Cannot use existing field name as alias');
+          throw new \API_Exception('Cannot use existing field name as alias');
         }
         $this->selectAliases[$alias] = $expr->getExpr();
-        $this->query->select($expr->render($this) . " AS `$alias`");
+        $this->query->select($expr->render($this->apiFieldSpec) . " AS `$alias`");
       }
     }
   }
@@ -328,12 +308,12 @@ class Api4SelectQuery {
   protected function buildOrderBy() {
     foreach ($this->getOrderBy() as $item => $dir) {
       if ($dir !== 'ASC' && $dir !== 'DESC') {
-        throw new \CRM_Core_Exception("Invalid sort direction. Cannot order by $item $dir");
+        throw new \API_Exception("Invalid sort direction. Cannot order by $item $dir");
       }
 
       try {
         $expr = $this->getExpression($item);
-        $column = $this->renderExpr($expr);
+        $column = $expr->render($this->apiFieldSpec);
 
         // Use FIELD() function to sort on pseudoconstant values
         $suffix = strstr($item, ':');
@@ -347,7 +327,7 @@ class Api4SelectQuery {
         }
       }
       // If the expression could not be rendered, it might be a field alias
-      catch (\CRM_Core_Exception $e) {
+      catch (\API_Exception $e) {
         // Silently ignore fields the user lacks permission to see
         if (is_a($e, 'Civi\API\Exception\UnauthorizedException')) {
           $this->debug('unauthorized_fields', $item);
@@ -357,7 +337,7 @@ class Api4SelectQuery {
           $column = '`' . $item . '`';
         }
         else {
-          throw new \CRM_Core_Exception("Invalid field '{$item}'");
+          throw new \API_Exception("Invalid field '{$item}'");
         }
       }
 
@@ -382,40 +362,7 @@ class Api4SelectQuery {
    */
   protected function buildGroupBy() {
     foreach ($this->getGroupBy() as $item) {
-      $this->query->groupBy($this->renderExpr($this->getExpression($item)));
-    }
-  }
-
-  /**
-   * This takes all the where clauses that use `=` to build an array of known values which every record must have.
-   *
-   * This gets passed to `FormattingUtil::getPseudoconstantList` to evaluate conditional pseudoconstants.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  private function fillEntityValues() {
-    foreach ($this->getWhere() as $clause) {
-      [$fieldName, $operator, $value] = array_pad($clause, 3, NULL);
-      if (
-        // If the operator is `=`
-        $operator === '=' &&
-        // And is using a literal value
-        empty($clause[3]) &&
-        // And references a field not a function
-        !strpos($fieldName, ')')
-      ) {
-        $field = $this->getField($fieldName);
-        if ($field) {
-          // Resolve pseudoconstant suffix
-          FormattingUtil::formatInputValue($value, $fieldName, $field, $this->entityValues, $operator);
-          // If the operator is still `=` (so not a weird date range transformation)
-          if ($operator === '=') {
-            // Strip pseudoconstant suffix
-            [$fieldNameOnly] = explode(':', $fieldName);
-            $this->entityValues[$fieldNameOnly] = $value;
-          }
-        }
-      }
+      $this->query->groupBy($this->getExpression($item)->render($this->apiFieldSpec));
     }
   }
 
@@ -428,7 +375,7 @@ class Api4SelectQuery {
    * @param int $depth
    * @return string SQL where clause
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    * @uses composeClause() to generate the SQL etc.
    */
   protected function treeWalkClauses($clause, $type, $depth = 0) {
@@ -472,39 +419,27 @@ class Api4SelectQuery {
 
   /**
    * Validate and transform a leaf clause array to SQL.
-   * @param array $clause [$fieldName, $operator, $criteria, $isExpression]
+   * @param array $clause [$fieldName, $operator, $criteria]
    * @param string $type
    *   WHERE|HAVING|ON
    * @param int $depth
    * @return string SQL
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    * @throws \Exception
    */
-  public function composeClause(array $clause, string $type, int $depth) {
+  protected function composeClause(array $clause, string $type, int $depth) {
     $field = NULL;
     // Pad array for unary operators
     [$expr, $operator, $value] = array_pad($clause, 3, NULL);
-    $isExpression = $clause[3] ?? FALSE;
     if (!in_array($operator, CoreUtil::getOperators(), TRUE)) {
-      throw new \CRM_Core_Exception('Illegal operator');
+      throw new \API_Exception('Illegal operator');
     }
 
     // For WHERE clause, expr must be the name of a field.
-    if ($type === 'WHERE' && !$isExpression) {
-      $expr = $this->getExpression($expr, ['SqlField', 'SqlFunction', 'SqlEquation']);
-      if ($expr->getType() === 'SqlField') {
-        $fieldName = count($expr->getFields()) === 1 ? $expr->getFields()[0] : NULL;
-        $field = $this->getField($fieldName, TRUE);
-        FormattingUtil::formatInputValue($value, $fieldName, $field, $this->entityValues, $operator);
-      }
-      elseif ($expr->getType() === 'SqlFunction') {
-        $fauxField = [
-          'name' => NULL,
-          'data_type' => $expr::getDataType(),
-        ];
-        FormattingUtil::formatInputValue($value, NULL, $fauxField, $this->entityValues, $operator);
-      }
-      $fieldAlias = $expr->render($this);
+    if ($type === 'WHERE') {
+      $field = $this->getField($expr, TRUE);
+      FormattingUtil::formatInputValue($value, $expr, $field, $operator);
+      $fieldAlias = $this->getExpression($expr)->render($this->apiFieldSpec);
     }
     // For HAVING, expr must be an item in the SELECT clause
     elseif ($type === 'HAVING') {
@@ -514,7 +449,7 @@ class Api4SelectQuery {
         // Attempt to format if this is a real field
         if (isset($this->apiFieldSpec[$expr])) {
           $field = $this->getField($expr);
-          FormattingUtil::formatInputValue($value, $expr, $field, $this->entityValues, $operator);
+          FormattingUtil::formatInputValue($value, $expr, $field, $operator);
         }
       }
       // Expr references a non-field expression like a function; convert to alias
@@ -523,12 +458,12 @@ class Api4SelectQuery {
       }
       // If either the having or select field contains a pseudoconstant suffix, match and perform substitution
       else {
-        [$fieldName] = explode(':', $expr);
+        list($fieldName) = explode(':', $expr);
         foreach ($this->selectAliases as $selectAlias => $selectExpr) {
-          [$selectField] = explode(':', $selectAlias);
+          list($selectField) = explode(':', $selectAlias);
           if ($selectAlias === $selectExpr && $fieldName === $selectField && isset($this->apiFieldSpec[$fieldName])) {
             $field = $this->getField($fieldName);
-            FormattingUtil::formatInputValue($value, $expr, $field, $this->entityValues, $operator);
+            FormattingUtil::formatInputValue($value, $expr, $field, $operator);
             $fieldAlias = $selectAlias;
             break;
           }
@@ -539,36 +474,36 @@ class Api4SelectQuery {
           throw new UnauthorizedException("Unauthorized field '$expr'");
         }
         else {
-          throw new \CRM_Core_Exception("Invalid expression in HAVING clause: '$expr'. Must use a value from SELECT clause.");
+          throw new \API_Exception("Invalid expression in HAVING clause: '$expr'. Must use a value from SELECT clause.");
         }
       }
       $fieldAlias = '`' . $fieldAlias . '`';
     }
-    elseif ($type === 'ON' || ($type === 'WHERE' && $isExpression)) {
+    elseif ($type === 'ON') {
       $expr = $this->getExpression($expr);
       $fieldName = count($expr->getFields()) === 1 ? $expr->getFields()[0] : NULL;
-      $fieldAlias = $expr->render($this);
+      $fieldAlias = $expr->render($this->apiFieldSpec);
       if (is_string($value)) {
         $valExpr = $this->getExpression($value);
-        if ($expr->getType() === 'SqlField' && $valExpr->getType() === 'SqlString') {
+        if ($fieldName && $valExpr->getType() === 'SqlString') {
           $value = $valExpr->getExpr();
-          FormattingUtil::formatInputValue($value, $fieldName, $this->apiFieldSpec[$fieldName], $this->entityValues, $operator);
+          FormattingUtil::formatInputValue($value, $fieldName, $this->apiFieldSpec[$fieldName], $operator);
           return $this->createSQLClause($fieldAlias, $operator, $value, $this->apiFieldSpec[$fieldName], $depth);
         }
         else {
-          $value = $valExpr->render($this);
+          $value = $valExpr->render($this->apiFieldSpec);
           return sprintf('%s %s %s', $fieldAlias, $operator, $value);
         }
       }
-      elseif ($expr->getType() === 'SqlField') {
+      elseif ($fieldName) {
         $field = $this->getField($fieldName);
-        FormattingUtil::formatInputValue($value, $fieldName, $field, $this->entityValues, $operator);
+        FormattingUtil::formatInputValue($value, $fieldName, $field, $operator);
       }
     }
 
     $sqlClause = $this->createSQLClause($fieldAlias, $operator, $value, $field, $depth);
     if ($sqlClause === NULL) {
-      throw new \CRM_Core_Exception("Invalid value in $type clause for '$expr'");
+      throw new \API_Exception("Invalid value in $type clause for '$expr'");
     }
     return $sqlClause;
   }
@@ -584,7 +519,7 @@ class Api4SelectQuery {
    */
   protected function createSQLClause($fieldAlias, $operator, $value, $field, int $depth) {
     if (!empty($field['operators']) && !in_array($operator, $field['operators'], TRUE)) {
-      throw new \CRM_Core_Exception('Illegal operator for ' . $field['name']);
+      throw new \API_Exception('Illegal operator for ' . $field['name']);
     }
     // Some fields use a callback to generate their sql
     if (!empty($field['sql_filters'])) {
@@ -628,11 +563,6 @@ class Api4SelectQuery {
         return "($fieldAlias $isEmptyClause $fieldAlias $operator)";
       }
     }
-
-    if ($operator == 'REGEXP' || $operator == 'NOT REGEXP') {
-      return sprintf('%s %s "%s"', $fieldAlias, $operator, \CRM_Core_DAO::escapeString($value));
-    }
-
     if (is_bool($value)) {
       $value = (int) $value;
     }
@@ -642,12 +572,11 @@ class Api4SelectQuery {
 
   /**
    * @param string $expr
-   * @param array $allowedTypes
    * @return SqlExpression
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
-  protected function getExpression(string $expr, $allowedTypes = NULL) {
-    $sqlExpr = SqlExpression::convert($expr, FALSE, $allowedTypes);
+  protected function getExpression(string $expr) {
+    $sqlExpr = SqlExpression::convert($expr);
     foreach ($sqlExpr->getFields() as $fieldName) {
       $this->getField($fieldName, TRUE);
     }
@@ -669,7 +598,7 @@ class Api4SelectQuery {
     // Prevent (most) redundant acl sub clauses if they have already been applied to the main entity.
     // FIXME: Currently this only works 1 level deep, but tracking through multiple joins would increase complexity
     // and just doing it for the first join takes care of most acl clause deduping.
-    if (count($stack) === 1 && in_array(reset($stack), $this->aclFields, TRUE)) {
+    if (count($stack) === 1 && in_array($stack[0], $this->aclFields, TRUE)) {
       return [];
     }
     $clauses = $baoName::getSelectWhereClause($tableAlias);
@@ -688,7 +617,7 @@ class Api4SelectQuery {
    *   In strict mode, this will throw an exception if the field doesn't exist
    *
    * @return array|null
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function getField($expr, $strict = FALSE) {
     // If the expression contains a pseudoconstant filter like activity_type_id:label,
@@ -704,7 +633,7 @@ class Api4SelectQuery {
       $this->debug($field === FALSE ? 'unauthorized_fields' : 'undefined_fields', $fieldName);
     }
     if ($strict && $field === NULL) {
-      throw new \CRM_Core_Exception("Invalid field '$fieldName'");
+      throw new \API_Exception("Invalid field '$fieldName'");
     }
     if ($strict && $field === FALSE) {
       throw new UnauthorizedException("Unauthorized field '$fieldName'");
@@ -726,16 +655,10 @@ class Api4SelectQuery {
       return TRUE;
     }
     if (!isset($this->entityAccess[$entity])) {
-      try {
-        $this->entityAccess[$entity] = (bool) civicrm_api4($entity, 'getActions', [
-          'where' => [['name', '=', 'get']],
-          'select' => ['name'],
-        ])->first();
-      }
-      // Anonymous users might not even be allowed to use 'getActions'
-      catch (UnauthorizedException $e) {
-        $this->entityAccess[$entity] = FALSE;
-      }
+      $this->entityAccess[$entity] = (bool) civicrm_api4($entity, 'getActions', [
+        'where' => [['name', '=', 'get']],
+        'select' => ['name'],
+      ])->first();
     }
     return $this->entityAccess[$entity];
   }
@@ -743,7 +666,7 @@ class Api4SelectQuery {
   /**
    * Join onto other entities as specified by the api call.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
   private function addExplicitJoins() {
@@ -751,16 +674,13 @@ class Api4SelectQuery {
       // First item in the array is the entity name
       $entity = array_shift($join);
       // Which might contain an alias. Split on the keyword "AS"
-      [$entity, $alias] = array_pad(explode(' AS ', $entity), 2, NULL);
+      list($entity, $alias) = array_pad(explode(' AS ', $entity), 2, NULL);
       // Ensure permissions
       if (!$this->checkEntityAccess($entity)) {
         continue;
       }
       // Ensure alias is a safe string, and supply default if not given
-      $alias = $alias ?: strtolower($entity);
-      if ($alias === self::MAIN_TABLE_ALIAS || !preg_match('/^[-\w]{1,256}$/', $alias)) {
-        throw new \CRM_Core_Exception('Illegal join alias: "' . $alias . '"');
-      }
+      $alias = $alias ? \CRM_Utils_String::munge($alias, '_', 256) : strtolower($entity);
       // First item in the array is a boolean indicating if the join is required (aka INNER or LEFT).
       // The rest are join conditions.
       $side = array_shift($join);
@@ -769,7 +689,7 @@ class Api4SelectQuery {
         $side = $side ? 'INNER' : 'LEFT';
       }
       if (!in_array($side, ['INNER', 'LEFT', 'EXCLUDE'])) {
-        throw new \CRM_Core_Exception("Illegal value for join side: '$side'.");
+        throw new \API_Exception("Illegal value for join side: '$side'.");
       }
       if ($side === 'EXCLUDE') {
         $side = 'LEFT';
@@ -780,26 +700,23 @@ class Api4SelectQuery {
       $joinEntityFields = $joinEntityGet->entityFields();
       foreach ($joinEntityFields as $field) {
         $field['sql_name'] = '`' . $alias . '`.`' . $field['column_name'] . '`';
-        $field['explicit_join'] = $alias;
         $this->addSpecField($alias . '.' . $field['name'], $field);
       }
       $tableName = CoreUtil::getTableName($entity);
       // Save join info to be retrieved by $this->getExplicitJoin()
-      $joinOn = array_filter(array_filter($join, 'is_array'));
       $this->explicitJoins[$alias] = [
         'entity' => $entity,
-        'alias' => $alias,
         'table' => $tableName,
         'bridge' => NULL,
-        'on' => $joinOn,
       ];
       // If the first condition is a string, it's the name of a bridge entity
       if (!empty($join[0]) && is_string($join[0]) && \CRM_Utils_Rule::alphanumeric($join[0])) {
+        $this->explicitJoins[$alias]['bridge'] = $join[0];
         $this->addBridgeJoin($join, $entity, $alias, $side);
       }
       else {
         $conditions = $this->getJoinConditions($join, $entity, $alias, $joinEntityFields);
-        foreach ($joinOn as $clause) {
+        foreach (array_filter($join) as $clause) {
           $conditions[] = $this->treeWalkClauses($clause, 'ON');
         }
         $this->join($side, $tableName, $alias, $conditions);
@@ -824,7 +741,7 @@ class Api4SelectQuery {
     $stack = [NULL, NULL];
     // See if the ON clause already contains an FK reference to joinEntity
     $explicitFK = array_filter($joinTree, function($clause) use ($alias, $joinEntityFields) {
-      [$sideA, $op, $sideB] = array_pad((array) $clause, 3, NULL);
+      list($sideA, $op, $sideB) = array_pad((array) $clause, 3, NULL);
       if ($op !== '=' || !$sideB) {
         return FALSE;
       }
@@ -838,10 +755,7 @@ class Api4SelectQuery {
     // If we're not explicitly referencing the ID (or some other FK field) of the joinEntity, search for a default
     if (!$explicitFK) {
       foreach ($this->apiFieldSpec as $name => $field) {
-        if (!is_array($field) || $field['type'] !== 'Field') {
-          continue;
-        }
-        if ($field['entity'] !== $joinEntity && $field['fk_entity'] === $joinEntity) {
+        if (is_array($field) && $field['entity'] !== $joinEntity && $field['fk_entity'] === $joinEntity) {
           $conditions[] = $this->treeWalkClauses([$name, '=', "$alias.id"], 'ON');
         }
         elseif (strpos($name, "$alias.") === 0 && substr_count($name, '.') === 1 && $field['fk_entity'] === $this->getEntity()) {
@@ -871,11 +785,10 @@ class Api4SelectQuery {
    * @param string $joinEntity
    * @param string $alias
    * @param string $side
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   protected function addBridgeJoin($joinTree, $joinEntity, $alias, $side) {
     $bridgeEntity = array_shift($joinTree);
-    $this->explicitJoins[$alias]['bridge'] = $bridgeEntity;
 
     // INNER joins require unique aliases, whereas left joins will be inside a subquery and short aliases are more readable
     $bridgeAlias = $side === 'INNER' ? $alias . '_via_' . strtolower($bridgeEntity) : 'b';
@@ -899,9 +812,6 @@ class Api4SelectQuery {
 
     // INNER joins are done with 2 joins
     if ($side === 'INNER') {
-      // Info needed for joining custom fields extending the bridge entity
-      $this->explicitJoins[$alias]['bridge_table_alias'] = $bridgeAlias;
-      $this->explicitJoins[$alias]['bridge_id_alias'] = 'id';
       $this->join('INNER', $bridgeTable, $bridgeAlias, $bridgeConditions);
       $this->join('INNER', $joinTable, $alias, array_merge($linkConditions, $acls, $joinConditions));
     }
@@ -913,10 +823,6 @@ class Api4SelectQuery {
           $bridgeFields[$field['column_name']] = '`' . $joinAlias . '`.`' . $field['column_name'] . '`';
         }
       }
-      // Info needed for joining custom fields extending the bridge entity
-      $this->explicitJoins[$alias]['bridge_table_alias'] = $alias;
-      $this->explicitJoins[$alias]['bridge_id_alias'] = 'bridge_entity_id_key';
-      $bridgeFields[] = "`$bridgeAlias`.`id` AS `bridge_entity_id_key`";
       $select = implode(',', $bridgeFields);
       $joinConditions = array_merge($joinConditions, $bridgeConditions);
       $innerConditions = array_merge($linkConditions, $acls);
@@ -931,31 +837,34 @@ class Api4SelectQuery {
    * @param string $bridgeEntity
    * @param string $joinEntity
    * @return array
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   private function getBridgeRefs(string $bridgeEntity, string $joinEntity): array {
-    $bridges = CoreUtil::getInfoItem($bridgeEntity, 'bridge') ?? [];
-    /** @var \CRM_Core_DAO $bridgeDAO */
+    $bridgeFields = CoreUtil::getInfoItem($bridgeEntity, 'bridge') ?? [];
+    // Sanity check - bridge entity should declare exactly 2 FK fields
+    if (count($bridgeFields) !== 2) {
+      throw new \API_Exception("Illegal bridge entity specified: $bridgeEntity. Expected 2 bridge fields, found " . count($bridgeFields));
+    }
+    /* @var \CRM_Core_DAO $bridgeDAO */
     $bridgeDAO = CoreUtil::getInfoItem($bridgeEntity, 'dao');
-    $bridgeEntityFields = \Civi\API\Request::create($bridgeEntity, 'get', ['version' => 4, 'checkPermissions' => $this->getCheckPermissions()])->entityFields();
     $bridgeTable = $bridgeDAO::getTableName();
 
     // Get the 2 bridge reference columns as CRM_Core_Reference_* objects
-    $referenceColumns = $bridgeDAO::getReferenceColumns();
-    foreach ($referenceColumns as $joinRef) {
-      $refKey = $joinRef->getReferenceKey();
-      if (array_key_exists($refKey, $bridges) && in_array($joinEntity, $joinRef->getTargetEntities())) {
-        if (!empty($bridgeEntityFields[$refKey]['fk_entity']) && $joinEntity !== $bridgeEntityFields[$refKey]['fk_entity']) {
-          continue;
+    $joinRef = $baseRef = NULL;
+    foreach ($bridgeDAO::getReferenceColumns() as $ref) {
+      if (array_key_exists($ref->getReferenceKey(), $bridgeFields)) {
+        if (!$joinRef && in_array($joinEntity, $ref->getTargetEntities())) {
+          $joinRef = $ref;
         }
-        foreach ($bridgeDAO::getReferenceColumns() as $baseRef) {
-          if ($baseRef->getReferenceKey() === $bridges[$refKey]['to']) {
-            return [$bridgeTable, $baseRef, $joinRef];
-          }
+        else {
+          $baseRef = $ref;
         }
       }
     }
-    throw new \CRM_Core_Exception("Unable to join $bridgeEntity to $joinEntity");
+    if (!$joinRef || !$baseRef) {
+      throw new \API_Exception("Unable to join $bridgeEntity to $joinEntity");
+    }
+    return [$bridgeTable, $baseRef, $joinRef];
   }
 
   /**
@@ -1000,7 +909,6 @@ class Api4SelectQuery {
       // For INNER joins, these fields get a sql alias pointing to the bridge entity,
       // but an api alias pretending they belong to the join entity.
       $field['sql_name'] = '`' . ($side === 'LEFT' ? $alias : $bridgeAlias) . '`.`' . $field['column_name'] . '`';
-      $field['explicit_join'] = $alias;
       $this->addSpecField($alias . '.' . $name, $field);
       if ($field['type'] === 'Field') {
         $fakeFields[$field['column_name']] = '`' . $bridgeAlias . '`.`' . $field['column_name'] . '`';
@@ -1019,14 +927,14 @@ class Api4SelectQuery {
    * @param string $bridgeEntity
    * @param string $side
    * @return string[]
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   private function getBridgeJoinConditions(array &$joinTree, $baseRef, string $alias, string $bridgeAlias, string $bridgeEntity, string $side): array {
     $bridgeConditions = [];
     $bridgeAlias = $side === 'INNER' ? $bridgeAlias : $alias;
     // Find explicit bridge join conditions and move them out of the joinTree
     $joinTree = array_filter($joinTree, function ($clause) use ($baseRef, $alias, $bridgeAlias, &$bridgeConditions) {
-      [$sideA, $op, $sideB] = array_pad((array) $clause, 3, NULL);
+      list($sideA, $op, $sideB) = array_pad((array) $clause, 3, NULL);
       // Skip AND/OR/NOT branches
       if (!$sideB) {
         return TRUE;
@@ -1034,13 +942,13 @@ class Api4SelectQuery {
       // If this condition makes an explicit link between the bridge and another entity
       if ($op === '=' && $sideB && ($sideA === "$alias.{$baseRef->getReferenceKey()}" || $sideB === "$alias.{$baseRef->getReferenceKey()}")) {
         $expr = $sideA === "$alias.{$baseRef->getReferenceKey()}" ? $sideB : $sideA;
-        $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getReferenceKey()}` = " . $this->getExpression($expr)->render($this);
+        $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getReferenceKey()}` = " . $this->getExpression($expr)->render($this->apiFieldSpec);
         return FALSE;
       }
       // Explicit link with dynamic "entity_table" column
       elseif ($op === '=' && $baseRef->getTypeColumn() && ($sideA === "$alias.{$baseRef->getTypeColumn()}" || $sideB === "$alias.{$baseRef->getTypeColumn()}")) {
         $expr = $sideA === "$alias.{$baseRef->getTypeColumn()}" ? $sideB : $sideA;
-        $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getTypeColumn()}` = " . $this->getExpression($expr)->render($this);
+        $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getTypeColumn()}` = " . $this->getExpression($expr)->render($this->apiFieldSpec);
         return FALSE;
       }
       return TRUE;
@@ -1048,7 +956,7 @@ class Api4SelectQuery {
     // If no bridge conditions were specified, link it to the base entity
     if (!$bridgeConditions) {
       if (!in_array($this->getEntity(), $baseRef->getTargetEntities())) {
-        throw new \CRM_Core_Exception("Unable to join $bridgeEntity to " . $this->getEntity());
+        throw new \API_Exception("Unable to join $bridgeEntity to " . $this->getEntity());
       }
       $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getReferenceKey()}` = a.`{$baseRef->getTargetKey()}`";
       if ($baseRef->getTypeColumn()) {
@@ -1062,120 +970,49 @@ class Api4SelectQuery {
    * Joins a path and adds all fields in the joined entity to apiFieldSpec
    *
    * @param $key
+   * @throws \API_Exception
+   * @throws \Exception
    */
   protected function autoJoinFK($key) {
     if (isset($this->apiFieldSpec[$key])) {
       return;
     }
-    $joiner = new Joiner(CoreUtil::getSchemaMap());
 
     $pathArray = explode('.', $key);
+
+    /** @var \Civi\Api4\Service\Schema\Joiner $joiner */
+    $joiner = \Civi::container()->get('joiner');
     // The last item in the path is the field name. We don't care about that; we'll add all fields from the joined entity.
     array_pop($pathArray);
 
-    $baseTableAlias = $this::MAIN_TABLE_ALIAS;
-
-    // If the first item is the name of an explicit join, use it as the base & shift it off the path
-    $explicitJoin = $this->getExplicitJoin($pathArray[0]);
-    if ($explicitJoin) {
-      $baseTableAlias = array_shift($pathArray);
-    }
-
-    // Ensure joinTree array contains base table
-    $this->joinTree[$baseTableAlias]['#table_alias'] = $baseTableAlias;
-    $this->joinTree[$baseTableAlias]['#path'] = $explicitJoin ? $baseTableAlias . '.' : '';
-    // During iteration this variable will refer to the current position in the tree
-    $joinTreeNode =& $this->joinTree[$baseTableAlias];
-
-    $useBridgeTable = FALSE;
     try {
-      $joinPath = $joiner->getPath($explicitJoin['table'] ?? $this->getFrom(), $pathArray);
+      $joinPath = $joiner->autoJoin($this, $pathArray);
     }
-    catch (\CRM_Core_Exception $e) {
-      if (!empty($explicitJoin['bridge'])) {
-        // Try looking up custom field in bridge entity instead
-        try {
-          $useBridgeTable = TRUE;
-          $joinPath = $joiner->getPath(CoreUtil::getTableName($explicitJoin['bridge']), $pathArray);
-        }
-        catch (\CRM_Core_Exception $e) {
-          return;
-        }
+    catch (\Exception $e) {
+      return;
+    }
+    $lastLink = array_pop($joinPath);
+    $previousLink = array_pop($joinPath);
+
+    // Custom field names are already prefixed
+    $isCustom = $lastLink instanceof CustomGroupJoinable;
+    if ($isCustom) {
+      array_pop($pathArray);
+    }
+    $prefix = $pathArray ? implode('.', $pathArray) . '.' : '';
+    // Cache field info for retrieval by $this->getField()
+    foreach ($lastLink->getEntityFields() as $fieldObject) {
+      $fieldArray = $fieldObject->toArray();
+      // Set sql name of field, using column name for real joins
+      if (!$lastLink->getSerialize()) {
+        $fieldArray['sql_name'] = '`' . $lastLink->getAlias() . '`.`' . $fieldArray['column_name'] . '`';
       }
+      // For virtual joins on serialized fields, the callback function will need the sql name of the serialized field
+      // @see self::renderSerializedJoin()
       else {
-        // Because the select clause silently ignores unknown fields, this function shouldn't throw exceptions
-        return;
+        $fieldArray['sql_name'] = '`' . $previousLink->getAlias() . '`.`' . $lastLink->getBaseColumn() . '`';
       }
-    }
-
-    foreach ($joinPath as $joinName => $link) {
-      if (!isset($joinTreeNode[$joinName])) {
-        $target = $link->getTargetTable();
-        $tableAlias = $link->getAlias() . '_' . ++$this->autoJoinSuffix;
-        $isCustom = $link instanceof CustomGroupJoinable;
-
-        $joinTreeNode[$joinName] = [
-          '#table_alias' => $tableAlias,
-          '#path' => $joinTreeNode['#path'] . $joinName . '.',
-        ];
-        $joinEntity = CoreUtil::getApiNameFromTableName($target);
-
-        if ($joinEntity && !$this->checkEntityAccess($joinEntity)) {
-          return;
-        }
-        if ($this->getCheckPermissions() && $isCustom) {
-          // Check access to custom group
-          $groupId = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $link->getTargetTable(), 'id', 'table_name');
-          if (!\CRM_Core_BAO_CustomGroup::checkGroupAccess($groupId, \CRM_Core_Permission::VIEW)) {
-            return;
-          }
-        }
-        if ($link->isDeprecated()) {
-          $deprecatedAlias = $link->getAlias();
-          \CRM_Core_Error::deprecatedWarning("Deprecated join alias '$deprecatedAlias' used in APIv4 get. Should be changed to '{$deprecatedAlias}_id'");
-        }
-        $virtualField = $link->getSerialize();
-        $baseTableAlias = $joinTreeNode['#table_alias'];
-        if ($useBridgeTable) {
-          // When joining custom fields that directly extend the bridge entity
-          $baseTableAlias = $explicitJoin['bridge_table_alias'];
-          if ($link->getBaseColumn() === 'id') {
-            $link->setBaseColumn($explicitJoin['bridge_id_alias']);
-          }
-        }
-
-        // Cache field info for retrieval by $this->getField()
-        foreach ($link->getEntityFields() as $fieldObject) {
-          $fieldArray = $fieldObject->toArray();
-          // Set sql name of field, using column name for real joins
-          if (!$virtualField) {
-            $fieldArray['sql_name'] = '`' . $tableAlias . '`.`' . $fieldArray['column_name'] . '`';
-          }
-          // For virtual joins on serialized fields, the callback function will need the sql name of the serialized field
-          // @see self::renderSerializedJoin()
-          else {
-            $fieldArray['sql_name'] = '`' . $baseTableAlias . '`.`' . $link->getBaseColumn() . '`';
-          }
-          $fieldArray['implicit_join'] = rtrim($joinTreeNode[$joinName]['#path'], '.');
-          $fieldArray['explicit_join'] = $explicitJoin ? $explicitJoin['alias'] : NULL;
-          // Custom fields will already have the group name prefixed
-          $fieldName = $isCustom ? explode('.', $fieldArray['name'])[1] : $fieldArray['name'];
-          $this->addSpecField($joinTreeNode[$joinName]['#path'] . $fieldName, $fieldArray);
-        }
-
-        // Serialized joins are rendered by this::renderSerializedJoin. Don't add their tables.
-        if (!$virtualField) {
-          $bao = $joinEntity ? CoreUtil::getBAOFromApiName($joinEntity) : NULL;
-          $conditions = $link->getConditionsForJoin($baseTableAlias, $tableAlias);
-          if ($bao) {
-            $conditions = array_merge($conditions, $this->getAclClause($tableAlias, $bao, $joinPath));
-          }
-          $this->join('LEFT', $target, $tableAlias, $conditions);
-        }
-
-      }
-      $joinTreeNode =& $joinTreeNode[$joinName];
-      $useBridgeTable = FALSE;
+      $this->addSpecField($prefix . $fieldArray['name'], $fieldArray);
     }
   }
 
@@ -1201,7 +1038,7 @@ class Api4SelectQuery {
    */
   public static function renderSerializedJoin(array $field): string {
     $sep = \CRM_Core_DAO::VALUE_SEPARATOR;
-    $id = CoreUtil::getIdFieldName($field['entity']);
+    $id = CoreUtil::getInfoItem($field['entity'], 'primary_key')[0];
     $searchFn = "FIND_IN_SET(`{$field['table_name']}`.`$id`, REPLACE({$field['sql_name']}, '$sep', ','))";
     return "(
       SELECT GROUP_CONCAT(
@@ -1300,17 +1137,10 @@ class Api4SelectQuery {
 
   /**
    * @param string $alias
-   * @return array{entity: string, alias: string, table: string, bridge: string|NULL}|NULL
+   * @return array|NULL
    */
   public function getExplicitJoin($alias) {
     return $this->explicitJoins[$alias] ?? NULL;
-  }
-
-  /**
-   * @return array{entity: string, alias: string, table: string, bridge: string|NULL}[]
-   */
-  public function getExplicitJoins() {
-    return $this->explicitJoins;
   }
 
   /**
@@ -1323,28 +1153,7 @@ class Api4SelectQuery {
       $this->apiFieldSpec[$path] = FALSE;
       return;
     }
-    $this->apiFieldSpec[$path] = $field + [
-      'implicit_join' => NULL,
-      'explicit_join' => NULL,
-    ];
-  }
-
-  /**
-   * Returns rendered expression or alias if it is already aliased in the SELECT clause.
-   *
-   * @param $expr
-   * @return mixed|string
-   */
-  protected function renderExpr($expr) {
-    $exprVal = explode(':', $expr->getExpr())[0];
-    // If this expression is already in use in the select clause, use the existing alias
-    // This allows calculated fields to be reused in SELECT, GROUP BY and ORDER BY
-    foreach ($this->selectAliases as $alias => $selectVal) {
-      if ($exprVal === explode(':', $selectVal)[0]) {
-        return "`$alias`";
-      }
-    }
-    return $expr->render($this);
+    $this->apiFieldSpec[$path] = $field;
   }
 
   /**

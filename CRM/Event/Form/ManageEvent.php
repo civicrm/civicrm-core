@@ -88,7 +88,10 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    * Set variables up before form is built.
    */
   public function preProcess() {
-    $this->assign('CiviEvent', CRM_Core_Component::isEnabled('CiviEvent'));
+    $config = CRM_Core_Config::singleton();
+    if (in_array('CiviEvent', $config->enableComponents)) {
+      $this->assign('CiviEvent', TRUE);
+    }
     CRM_Core_Form_RecurringEntity::preProcess('civicrm_event');
 
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add', 'REQUEST');
@@ -351,7 +354,8 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
         [1 => CRM_Utils_Array::value('title', CRM_Utils_Array::value($subPage, $this->get('tabHeader')), $className)]
       ), $this->getTitle(), 'success');
 
-      if (CRM_Core_Component::isEnabled('CiviCampaign')) {
+      $config = CRM_Core_Config::singleton();
+      if (in_array('CiviCampaign', $config->enableComponents)) {
         $values = $this->controller->exportValues($this->_name);
         $newCampaignID = $values['campaign_id'] ?? NULL;
         $eventID = $values['id'] ?? NULL;

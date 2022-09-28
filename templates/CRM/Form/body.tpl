@@ -7,15 +7,15 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if !empty($form.javascript)}
+{if $form.javascript}
   {$form.javascript}
 {/if}
 
-{if !empty($form.hidden)}
+{if $form.hidden}
   <div>{$form.hidden}</div>
 {/if}
 
-{if ($snippet !== 'json') and !$suppressForm and count($form.errors) gt 0}
+{if ($snippet !== 'json') and empty($suppressForm) and count($form.errors) gt 0}
    <div class="messages crm-error">
        <i class="crm-i fa-exclamation-triangle crm-i-red" aria-hidden="true"></i>
      {ts}Please correct the following errors in the form fields below:{/ts}
@@ -32,7 +32,7 @@
 {/if}
 
 {* Add all the form elements sent in by the hook - used by civiDiscount and a few other extensions *}
-{if $beginHookFormElements}
+{if !empty($beginHookFormElements)}
   <table class="form-layout-compressed">
   {foreach from=$beginHookFormElements key=dontCare item=hookFormElement}
       <tr><td class="label nowrap">{$form.$hookFormElement.label}</td><td>{$form.$hookFormElement.html}</td></tr>

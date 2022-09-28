@@ -15,8 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Token\TokenProcessor;
-
 /**
  * Class CRM_Badge_Format_Badge.
  *
@@ -42,7 +40,7 @@ class CRM_Badge_BAO_Badge {
    * @param array $layoutInfo
    *   Associated array which contains meta data about format/layout.
    */
-  public function createLabels($participants, &$layoutInfo) {
+  public function createLabels(&$participants, &$layoutInfo) {
     $this->pdf = new CRM_Utils_PDF_Label($layoutInfo['format'], 'mm');
     $this->pdf->Open();
     $this->pdf->setPrintHeader(FALSE);
@@ -60,9 +58,6 @@ class CRM_Badge_BAO_Badge {
       $this->pdf->AddPdfLabel($formattedRow);
     }
 
-    if (CIVICRM_UF === 'UnitTests') {
-      throw new CRM_Core_Exception_PrematureExitException('pdf output called', ['formattedRow' => $formattedRow]);
-    }
     $this->pdf->Output(CRM_Utils_String::munge($layoutInfo['title'], '_', 64) . '.pdf', 'D');
     CRM_Utils_System::civiExit();
   }
@@ -88,6 +83,10 @@ class CRM_Badge_BAO_Badge {
         $value = '';
         if ($element) {
           $value = $row[$element];
+          // hack to fix date field display format
+          if (strpos($element, '_date')) {
+            $value = CRM_Utils_Date::customFormat($value, "%B %E%f");
+          }
         }
 
         $formattedRow['token'][$key] = [
@@ -147,7 +146,7 @@ class CRM_Badge_BAO_Badge {
   }
 
   /**
-   * @param array $formattedRow
+   * @param $formattedRow
    */
   public function generateLabel($formattedRow) {
     switch ($formattedRow['labelFormat']) {
@@ -164,7 +163,7 @@ class CRM_Badge_BAO_Badge {
   }
 
   /**
-   * @param array $formattedRow
+   * @param $formattedRow
    * @param int $cellspacing
    */
   public function labelCreator(&$formattedRow, $cellspacing = 0) {
@@ -349,12 +348,13 @@ class CRM_Badge_BAO_Badge {
    *
    * @param string $img
    *   Image url.
-   * @param string|null $x
-   * @param string|null $y
-   * @param int|null $w
-   * @param int|null $h
+   *
+   * @param string $x
+   * @param string $y
+   * @param null $w
+   * @param null $h
    */
-  public function printImage($img, $x = NULL, $y = NULL, $w = NULL, $h = NULL) {
+  public function printImage($img, $x = '', $y = '', $w = NULL, $h = NULL) {
     if (!$x) {
       $x = $this->pdf->GetAbsX();
     }
@@ -366,7 +366,7 @@ class CRM_Badge_BAO_Badge {
     $this->imgRes = 300;
 
     if ($img) {
-      [$w, $h] = self::getImageProperties($img, $this->imgRes, $w, $h);
+      list($w, $h) = self::getImageProperties($img, $this->imgRes, $w, $h);
       $this->pdf->Image($img, $x, $y, $w, $h, '', '', '', FALSE, 72, '', FALSE,
         FALSE, $this->debug, FALSE, FALSE, FALSE);
     }
@@ -374,14 +374,12 @@ class CRM_Badge_BAO_Badge {
   }
 
   /**
-   * @param string $img
-   *   Filename
+   * @param $img
    * @param int $imgRes
-   * @param int|null $w
-   * @param int|null $h
+   * @param null $w
+   * @param null $h
    *
-   * @return int[]
-   *   [width, height]
+   * @return array
    */
   public static function getImageProperties($img, $imgRes = 300, $w = NULL, $h = NULL) {
     $imgsize = getimagesize($img);
@@ -401,33 +399,43 @@ class CRM_Badge_BAO_Badge {
   public static function buildBadges(&$params, &$form) {
     // get name badge layout info
     $layoutInfo = CRM_Badge_BAO_Layout::buildLayout($params);
-    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), ['schema' => ['participantId', 'eventId'], 'smarty' => FALSE]);
+
     // split/get actual field names from token and individual contact image URLs
-    $processorTokens = [];
+    $returnProperties = [];
     if (!empty($layoutInfo['data']['token'])) {
       foreach ($layoutInfo['data']['token'] as $index => $value) {
+        $element = '';
         if ($value) {
-          $tokenName = str_replace(['}', '{contact.', '{participant.', '{event.'], '', $value);
-          $tokenProcessor->addMessage($tokenName, $value, 'text/plain');
-          $processorTokens[] = $tokenName;
-          $layoutInfo['data']['rowElements'][$index] = $tokenName;
+          $token = CRM_Utils_Token::getTokens($value);
+          if (key($token) == 'contact') {
+            $element = $token['contact'][0];
+          }
+          elseif (key($token) == 'event') {
+            $element = $token['event'][0];
+            //FIX ME - we need to standardize event token names
+            if (substr($element, 0, 6) != 'event_') {
+              $element = 'event_' . $element;
+            }
+          }
+          elseif (key($token) == 'participant') {
+            $element = $token['participant'][0];
+          }
+
+          // build returnproperties for query
+          $returnProperties[$element] = 1;
         }
+
+        // add actual field name to row element
+        $layoutInfo['data']['rowElements'][$index] = $element;
       }
     }
 
-    $returnProperties = [
-      'participant_id' => 1,
-      'event_id' => 1,
-      'contact_id' => 1,
-    ];
-    $sortOrder = $form->get(CRM_Utils_Sort::SORT_ORDER);
-
-    if ($sortOrder) {
-      $sortField = explode(' ', $sortOrder)[0];
-      // Add to select so aliaising is handled.
-      $returnProperties[trim(str_replace('`', ' ', $sortField))] = 1;
-      $sortOrder = " ORDER BY $sortOrder";
+    // add additional required fields for query execution
+    $additionalFields = ['participant_register_date', 'participant_id', 'event_id', 'contact_id', 'image_URL'];
+    foreach ($additionalFields as $field) {
+      $returnProperties[$field] = 1;
     }
+
     if ($form->_single) {
       $queryParams = NULL;
     }
@@ -439,7 +447,7 @@ class CRM_Badge_BAO_Badge {
       CRM_Contact_BAO_Query::MODE_EVENT
     );
 
-    [$select, $from, $where, $having] = $query->query();
+    list($select, $from, $where, $having) = $query->query();
     if (empty($where)) {
       $where = "WHERE {$form->_componentClause}";
     }
@@ -447,18 +455,27 @@ class CRM_Badge_BAO_Badge {
       $where .= " AND {$form->_componentClause}";
     }
 
+    $sortOrder = NULL;
+    if ($form->get(CRM_Utils_Sort::SORT_ORDER)) {
+      $sortOrder = $form->get(CRM_Utils_Sort::SORT_ORDER);
+      if (!empty($sortOrder)) {
+        $sortOrder = " ORDER BY $sortOrder";
+      }
+    }
     $queryString = "$select $from $where $having $sortOrder";
 
     $dao = CRM_Core_DAO::executeQuery($queryString);
     $rows = [];
-
     while ($dao->fetch()) {
-      $tokenProcessor->addRow(['contactId' => $dao->contact_id, 'participantId' => $dao->participant_id, 'eventId' => $dao->event_id]);
-    }
-    $tokenProcessor->evaluate();
-    foreach ($tokenProcessor->getRows() as $row) {
-      foreach ($processorTokens as $processorToken) {
-        $rows[$row->context['participantId']][$processorToken] = $row->render($processorToken);
+      $query->convertToPseudoNames($dao);
+      $rows[$dao->participant_id] = [];
+      foreach ($returnProperties as $key => $dontCare) {
+        $value = $dao->$key ?? NULL;
+        // Format custom fields
+        if (strstr($key, 'custom_') && isset($value)) {
+          $value = CRM_Core_BAO_CustomField::displayValue($value, substr($key, 7), $dao->contact_id);
+        }
+        $rows[$dao->participant_id][$key] = $value;
       }
     }
 

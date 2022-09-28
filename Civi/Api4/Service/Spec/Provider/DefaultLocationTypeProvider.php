@@ -14,11 +14,7 @@ namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
-/**
- * @service
- * @internal
- */
-class DefaultLocationTypeProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
+class DefaultLocationTypeProvider implements Generic\SpecProviderInterface {
 
   /**
    * @inheritDoc

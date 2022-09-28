@@ -3,7 +3,6 @@
 /**
  * Class CRM_Utils_RuleTest
  * @group headless
- * @group locale
  */
 class CRM_Utils_MoneyTest extends CiviUnitTestCase {
 

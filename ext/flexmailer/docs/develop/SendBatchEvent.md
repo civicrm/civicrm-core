@@ -11,8 +11,7 @@ function example_civicrm_container($container) {
 }
 
 function _example_send_batch(\Civi\FlexMailer\Event\SendBatchEvent $event) {
-  // Disable standard delivery
-  $event->stopPropagation();
+  $event->stopPropagation(); // Disable standard delivery
 
   $context = stream_context_create(array(
     'http' => array(
@@ -21,7 +20,6 @@ function _example_send_batch(\Civi\FlexMailer\Event\SendBatchEvent $event) {
       'content' => serialize($event->getTasks()),
     ),
   ));
-  return file_get_contents('https://example.org/batch-delivery', FALSE, $context);
+  return file_get_contents('https://example.org/batch-delivery', false, $context);
 }
-
 ```

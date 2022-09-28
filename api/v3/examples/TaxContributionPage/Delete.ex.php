@@ -1,9 +1,4 @@
 <?php
-
-/**
- * @file
- */
-
 /**
  * Test Generated example of using tax_contribution_page delete API.
  *
@@ -15,10 +10,10 @@ function tax_contribution_page_delete_example() {
     'id' => 1,
   ];
 
-  try {
+  try{
     $result = civicrm_api3('tax_contribution_page', 'delete', $params);
   }
-  catch (CRM_Core_Exception $e) {
+  catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
@@ -59,7 +54,7 @@ function tax_contribution_page_delete_expectedresult() {
 * The test that created it is called
 * testDeleteContribution
 * and can be found in
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/TaxContributionPageTest.php.
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/TaxContributionPageTest.php
 *
 * You can see the outcome of the API tests at
 * https://test.civicrm.org/job/CiviCRM-master-git/

@@ -19,7 +19,7 @@
 namespace api\v4\Entity;
 
 use Civi\Api4\Contact;
-use api\v4\Api4TestBase;
+use api\v4\UnitTestCase;
 use Civi\Api4\Event\ValidateValuesEvent;
 use Civi\Test\TransactionalInterface;
 
@@ -28,16 +28,16 @@ use Civi\Test\TransactionalInterface;
  *
  * @group headless
  */
-class ValidateValuesTest extends Api4TestBase implements TransactionalInterface {
+class ValidateValuesTest extends UnitTestCase implements TransactionalInterface {
 
   private $lastValidator;
 
-  public function setUp(): void {
+  protected function setUp(): void {
     $this->lastValidator = NULL;
     parent::setUp();
   }
 
-  public function tearDown(): void {
+  protected function tearDown(): void {
     $this->setValidator(NULL);
     parent::tearDown();
   }
@@ -46,7 +46,7 @@ class ValidateValuesTest extends Api4TestBase implements TransactionalInterface 
    * Fire ValidateValuesEvent several times - and ensure it conveys the
    * expected data.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testHookData() {
@@ -160,7 +160,7 @@ class ValidateValuesTest extends Api4TestBase implements TransactionalInterface 
       ])->execute();
       $this->fail('Expected an exception due to validation error');
     }
-    catch (\CRM_Core_Exception $e) {
+    catch (\API_Exception $e) {
       $this->assertEquals(1, $hookCount);
       $this->assertRegExp(';not sufficiently namey;', $e->getMessage());
       $this->assertRegExp(';tongue twister;', $e->getMessage());

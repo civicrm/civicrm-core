@@ -34,7 +34,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    *   Array per getfields metadata.
    *
    * @return \CRM_Core_BAO_UFField
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public static function create($params) {
     $id = $params['id'] ?? NULL;
@@ -52,13 +52,13 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
         $params += $defaults;
       }
       else {
-        throw new CRM_Core_Exception("UFFIeld id {$params['id']} not found.");
+        throw new API_Exception("UFFIeld id {$params['id']} not found.");
       }
     }
 
     // Validate field_name
     if (strpos($params['field_name'], 'formatting') !== 0 && !CRM_Core_BAO_UFField::isValidFieldName($params['field_name'])) {
-      throw new CRM_Core_Exception('The field_name is not valid');
+      throw new API_Exception('The field_name is not valid');
     }
 
     // Supply default label if not set
@@ -80,7 +80,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     }
 
     if (self::duplicateField($params)) {
-      throw new CRM_Core_Exception("The field was not added. It already exists in this profile.");
+      throw new API_Exception("The field was not added. It already exists in this profile.");
     }
 
     //@todo why is this even optional? Surely weight should just be 'managed' ??
@@ -114,20 +114,17 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
+   * Fetch object based on array of properties.
    *
    * @param array $params
-   *   Array of criteria values.
+   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   Array to be populated with found values.
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return self|null
-   *   The DAO object, if found.
-   *
-   * @deprecated
+   * @return CRM_Core_BAO_UFField
    */
-  public static function retrieve($params, &$defaults) {
-    return self::commonRetrieve(self::class, $params, $defaults);
+  public static function retrieve(&$params, &$defaults) {
+    return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_UFField', $params, $defaults);
   }
 
   /**
@@ -160,11 +157,17 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    * Delete the profile Field.
    *
    * @param int $id
-   * @deprecated
+   *   Field Id.
+   *
    * @return bool
+   *
    */
   public static function del($id) {
-    return (bool) self::deleteRecord(['id' => $id]);
+    //delete  field field
+    $field = new CRM_Core_DAO_UFField();
+    $field->id = $id;
+    $field->delete();
+    return TRUE;
   }
 
   /**
@@ -417,7 +420,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
       }
     }
 
-    $contactTypes = CRM_Contact_BAO_ContactType::basicTypes(TRUE);
+    $contactTypes = ['Individual', 'Household', 'Organization'];
     $subTypes = CRM_Contact_BAO_ContactType::subTypes();
 
     $profileTypeComponent = array_intersect($components, $profileTypes);
@@ -518,8 +521,9 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     // suppress any subtypes if present
     CRM_Contact_BAO_ContactType::suppressSubTypes($profileTypes);
 
-    $contactTypes = array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes(TRUE));
+    $contactTypes = ['Contact', 'Individual', 'Household', 'Organization'];
     $components = ['Contribution', 'Participant', 'Membership', 'Activity'];
+    $fields = [];
 
     // check for mix profile condition
     if (count($profileTypes) > 1) {
@@ -585,7 +589,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    */
   public static function calculateProfileType($ufGroupType, $returnMixType = TRUE, $onlyPure = FALSE, $skipComponentType = FALSE) {
     // profile types
-    $contactTypes = array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes(TRUE));
+    $contactTypes = ['Contact', 'Individual', 'Household', 'Organization'];
     $subTypes = CRM_Contact_BAO_ContactType::subTypes();
     $components = ['Contribution', 'Participant', 'Membership', 'Activity'];
 
@@ -677,6 +681,41 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
+   * Check for mix profiles groups (eg: individual + other contact types)
+   *
+   * @param $ctype
+   *
+   * @return bool
+   *   true for mix profile group else false
+   */
+  public static function checkProfileGroupType($ctype) {
+    $ufGroup = new CRM_Core_DAO_UFGroup();
+
+    $query = "
+SELECT ufg.id as id
+  FROM civicrm_uf_group as ufg, civicrm_uf_join as ufj
+ WHERE ufg.id = ufj.uf_group_id
+   AND ufj.module = 'User Registration'
+   AND ufg.is_active = 1 ";
+
+    $ufGroup = CRM_Core_DAO::executeQuery($query);
+
+    $fields = [];
+    $validProfiles = ['Individual', 'Organization', 'Household', 'Contribution'];
+    while ($ufGroup->fetch()) {
+      $profileType = self::getProfileType($ufGroup->id);
+      if (in_array($profileType, $validProfiles)) {
+        continue;
+      }
+      elseif ($profileType) {
+        return FALSE;
+      }
+    }
+
+    return TRUE;
+  }
+
+  /**
    * Check for searchable or in selector field for given profile.
    *
    * @param int $profileID
@@ -709,7 +748,7 @@ SELECT  id
    *
    * @param int $profileID
    */
-  public static function resetInSelectorANDSearchable($profileID) {
+  public function resetInSelectorANDSearchable($profileID) {
     if (!$profileID) {
       return;
     }
@@ -739,15 +778,13 @@ SELECT  id
    * @param array $profileFilter
    *   Filter to apply to profile fields - expected usage is to only fill based on.
    *   the bottom profile per CRM-13726
-   * @param array $paymentProcessorBillingFields
-   *   Array of billing fields required by the payment processor.
    *
    * @return bool
    *   Can the address block be hidden safe in the knowledge all fields are elsewhere collected (see CRM-15118)
    */
-  public static function assignAddressField($key, &$profileAddressFields, $profileFilter, $paymentProcessorBillingFields = NULL) {
+  public static function assignAddressField($key, &$profileAddressFields, $profileFilter) {
     $billing_id = CRM_Core_BAO_LocationType::getBilling();
-    [$prefixName, $index] = CRM_Utils_System::explode('-', $key, 2);
+    list($prefixName, $index) = CRM_Utils_System::explode('-', $key, 2);
 
     $profileFields = civicrm_api3('uf_field', 'get', array_merge($profileFilter,
       [
@@ -759,22 +796,17 @@ SELECT  id
       ]
     ));
     //check for valid fields ( fields that are present in billing block )
-    if (!empty($paymentProcessorBillingFields)) {
-      $validBillingFields = $paymentProcessorBillingFields;
-    }
-    else {
-      $validBillingFields = [
-        'first_name',
-        'middle_name',
-        'last_name',
-        'street_address',
-        'supplemental_address_1',
-        'city',
-        'state_province',
-        'postal_code',
-        'country',
-      ];
-    }
+    $validBillingFields = [
+      'first_name',
+      'middle_name',
+      'last_name',
+      'street_address',
+      'supplemental_address_1',
+      'city',
+      'state_province',
+      'postal_code',
+      'country',
+    ];
     $requiredBillingFields = array_diff($validBillingFields, ['middle_name', 'supplemental_address_1']);
     $validProfileFields = [];
     $requiredProfileFields = [];
@@ -809,10 +841,8 @@ SELECT  id
     }
 
     $potentiallyMissingRequiredFields = array_diff($requiredBillingFields, $requiredProfileFields);
-    $billingProfileIsHideable = empty($potentiallyMissingRequiredFields);
     CRM_Core_Resources::singleton()
-      ->addSetting(['billing' => ['billingProfileIsHideable' => $billingProfileIsHideable]]);
-    return $billingProfileIsHideable;
+      ->addSetting(['billing' => ['billingProfileIsHideable' => empty($potentiallyMissingRequiredFields)]]);
   }
 
   /**
@@ -1038,33 +1068,6 @@ SELECT  id
     $fields = self::getAvailableFieldsFlat();
     $fields['formatting'] = ['title' => ts('Formatting')];
     return CRM_Utils_Array::collect('title', $fields);
-  }
-
-  /**
-   * Get pseudoconstant list for `field_name`
-   *
-   * Includes APIv4-style names for custom fields for portability.
-   *
-   * @return array
-   */
-  public static function getAvailableFieldOptions() {
-    $fields = self::getAvailableFieldsFlat();
-    $fields['formatting'] = ['title' => ts('Formatting')];
-    $options = [];
-    foreach ($fields as $fieldName => $field) {
-      $option = [
-        'id' => $fieldName,
-        'name' => $fieldName,
-        'label' => $field['title'],
-      ];
-      if (!empty($field['custom_group_id']) && !empty($field['id'])) {
-        $groupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $field['custom_group_id']);
-        $fieldName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $field['id']);
-        $option['name'] = "$groupName.$fieldName";
-      }
-      $options[] = $option;
-    }
-    return $options;
   }
 
   /**

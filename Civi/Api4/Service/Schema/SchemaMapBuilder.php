@@ -18,14 +18,9 @@ use Civi\Api4\Event\SchemaMapBuildEvent;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Civi\Core\Service\AutoService;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
-/**
- * @service schema_map_builder
- */
-class SchemaMapBuilder extends AutoService {
-
+class SchemaMapBuilder {
   /**
    * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
    */
@@ -37,7 +32,6 @@ class SchemaMapBuilder extends AutoService {
 
   /**
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
-   * @inject dispatcher
    */
   public function __construct(EventDispatcherInterface $dispatcher) {
     $this->dispatcher = $dispatcher;
@@ -64,9 +58,9 @@ class SchemaMapBuilder extends AutoService {
    */
   private function loadTables(SchemaMap $map) {
     /** @var \CRM_Core_DAO $daoName */
-    foreach (AllCoreTables::get() as $data) {
+    foreach (AllCoreTables::get() as $daoName => $data) {
       $table = new Table($data['table']);
-      foreach ($data['class']::fields() as $fieldData) {
+      foreach ($daoName::fields() as $fieldData) {
         $this->addJoins($table, $fieldData['name'], $fieldData);
       }
       $map->addTable($table);
@@ -88,6 +82,14 @@ class SchemaMapBuilder extends AutoService {
     if ($fkClass) {
       $tableName = AllCoreTables::getTableForClass($fkClass);
       $fkKey = $data['FKKeyColumn'] ?? 'id';
+      // Backward-compatibility for older api calls using e.g. "contact" instead of "contact_id"
+      if (strpos($field, '_id')) {
+        $alias = str_replace('_id', '', $field);
+        $joinable = new Joinable($tableName, $fkKey, $alias);
+        $joinable->setJoinType($joinable::JOIN_TYPE_MANY_TO_ONE);
+        $joinable->setDeprecated();
+        $table->addTableLink($field, $joinable);
+      }
       $joinable = new Joinable($tableName, $fkKey, $field);
       $joinable->setJoinType($joinable::JOIN_TYPE_MANY_TO_ONE);
       $table->addTableLink($field, $joinable);

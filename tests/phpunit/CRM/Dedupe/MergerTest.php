@@ -7,8 +7,6 @@
  */
 class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
-  use CRMTraits_Custom_CustomDataTrait;
-
   protected $_groupId;
 
   protected $_contactIds = [];
@@ -39,7 +37,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       // it might be a bit expensive to add to every single test
       // so a bit selectively.
       $this->hookClass->reset();
-      CRM_Core_DAO_AllCoreTables::flush();
+      CRM_Core_DAO_AllCoreTables::reinitializeCache(TRUE);
     }
     parent::tearDown();
   }
@@ -159,7 +157,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   /**
    * Test the batch merge.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testBatchMergeSelectedDuplicates(): void {
     $this->createDupeContacts();
@@ -316,6 +316,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * focus is on ensuring they match.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testGetMatches(): void {
     $this->setupMatchData();
@@ -376,6 +377,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * Test that location type is ignored when deduping by postal address.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testGetMatchesIgnoreLocationType(): void {
     $contact1 = $this->individualCreate();
@@ -407,6 +409,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * Test results are returned when criteria are passed in.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testGetMatchesCriteriaMatched(): void {
     $this->setupMatchData();
@@ -421,6 +424,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * Test results are returned when criteria are passed in & limit is  respected.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testGetMatchesCriteriaMatchedWithLimit(): void {
     $this->setupMatchData();
@@ -437,6 +441,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * respected.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testGetMatchesCriteriaMatchedWithSearchLimit(): void {
     $this->setupMatchData();
@@ -452,6 +457,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * Test getting matches where there are  no criteria.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testGetMatchesNoCriteria(): void {
     $this->setupMatchData();
@@ -465,6 +471,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * Test getting matches with a limit in play.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testGetMatchesNoCriteriaButLimit(): void {
     $this->setupMatchData();
@@ -696,8 +703,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * changes not to imply any contract on the function.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testGetRowsElementsAndInfoSpecialInfo(): void {
+  public function testGetRowsElementsAndInfoSpecialInfo() {
     $contact1 = $this->individualCreate([
       'preferred_communication_method' => [],
       'communication_style_id' => 'Familiar',
@@ -861,7 +869,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * @param $keepContactKey
    * @param $duplicateContactKey
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testCreatedDatePostMerge($keepContactKey, $duplicateContactKey) {
@@ -930,6 +940,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * no records on the custom group table.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testMigrationOfSomeCustomDataOnEmptyCustomRecord() {
     // Create Custom Fields
@@ -983,7 +994,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * Test that ContactReference fields are updated to point to the main contact
    * after a merge is performed and the duplicate contact is deleted.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testMigrationOfContactReferenceCustomField() {
@@ -1054,7 +1067,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    *   Array of fields to be merged from source into target contact, of the form
    *   ['move_<fieldName>' => <fieldValue>]
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   private function mergeContacts($originalContactID, $duplicateContactID, $params): void {
     $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($originalContactID, $duplicateContactID);
@@ -1153,7 +1168,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   /**
    * Set up some contacts for our matching.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function setupMatchData(): void {
     $fixtures = [
@@ -1287,6 +1302,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'civicrm_financial_item' => [
         0 => 'contact_id',
       ],
+      'civicrm_grant' => [
+        0 => 'contact_id',
+      ],
       'civicrm_group' => [
         0 => 'created_id',
         1 => 'modified_id',
@@ -1343,9 +1361,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       ],
       'civicrm_participant' => [
         0 => 'contact_id',
-        1 => 'created_id',
         //CRM-16761
-        2 => 'transferred_to_contact_id',
+        1 => 'transferred_to_contact_id',
       ],
       'civicrm_payment_token' => [
         0 => 'contact_id',
@@ -1396,9 +1413,6 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'civicrm_uf_match' => [
         0 => 'contact_id',
       ],
-      'civicrm_user_job' => [
-        0 => 'created_id',
-      ],
       'civicrm_value_testgetcidref_1' => [
         0 => 'entity_id',
       ],
@@ -1444,43 +1458,18 @@ WHERE
 
   /**
    * Test that declaring a custom join for search kit does not break merge.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testMergeWithDeclaredSearchJoin(): void {
     $this->hookClass->setHook('civicrm_entityTypes', [
       $this,
       'hookEntityTypes',
     ]);
-    CRM_Core_DAO_AllCoreTables::flush();
+    CRM_Core_DAO_AllCoreTables::reinitializeCache(TRUE);
     $contact1 = $this->individualCreate();
     $contact2 = $this->individualCreate(['api.Im.create' => ['name' => 'chat_handle']]);
     $this->callAPISuccess('Contact', 'merge', ['to_keep_id' => $contact1, 'to_remove_id' => $contact2]);
-  }
-
-  /**
-   * Test that a custom field attached to the relationship does not block merge.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testMergeWithRelationshipWithCustomFields(): void {
-    $contact1 = $this->individualCreate();
-    $this->createCustomGroupWithFieldsOfAllTypes(['extends' => 'Relationship']);
-    $contact2 = $this->createContactWithEmployerRelationship([
-      $this->getCustomFieldName('text') => 'blah',
-      $this->getCustomFieldName('boolean') => TRUE,
-    ]);
-    $this->callAPISuccess('Contact', 'merge', ['to_keep_id' => $contact1, 'to_remove_id' => $contact2]);
-    $this->callAPISuccessGetSingle('Relationship', [
-      'contact_id_a' => $contact1,
-    ]);
-
-    $contact2 = $this->createContactWithEmployerRelationship([
-      $this->getCustomFieldName('boolean') => TRUE,
-      $this->getCustomFieldName('text') => '',
-    ]);
-    $this->callAPISuccess('Contact', 'merge', ['to_keep_id' => $contact2, 'to_remove_id' => $contact1]);
-    $this->callAPISuccessGetSingle('Relationship', [
-      'contact_id_a' => $contact2,
-    ]);
   }
 
   /**
@@ -1507,26 +1496,6 @@ WHERE
    */
   public function hookLinkCallBack(string $className, array &$links): void {
     $links[] = new CRM_Core_Reference_Basic('civicrm_im', 'name', 'civicrm_contact', 'first_name');
-  }
-
-  /**
-   * Create an individual with a relationship of type employee.
-   *
-   * @param array $params
-   *
-   * @return int
-   * @throws \CRM_Core_Exception
-   */
-  protected function createContactWithEmployerRelationship(array $params): int {
-    $contact2 = $this->individualCreate();
-    // Test the merge can also happen if the other contact has an empty text field.
-    $this->callAPISuccess('Relationship', 'create', array_merge([
-      'contact_id_a' => $contact2,
-      'contact_id_b' => CRM_Core_BAO_Domain::getDomain()->contact_id,
-      'relationship_type_id' => 'Employee of',
-      'is_current_employer' => TRUE,
-    ], $params));
-    return $contact2;
   }
 
 }

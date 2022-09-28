@@ -105,6 +105,7 @@ abstract class SelectQuery {
    * Build & execute the query and return results array
    *
    * @return array|int
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Exception
    */
@@ -177,7 +178,7 @@ abstract class SelectQuery {
    *
    * @return array|null
    *   Returns the table and field name for adding this field to a SELECT or WHERE clause
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function addFkField($fkFieldName, $side) {
@@ -391,7 +392,7 @@ abstract class SelectQuery {
   /**
    * Orders the query by one or more fields
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function buildOrderBy() {
@@ -416,7 +417,7 @@ abstract class SelectQuery {
           }
         }
         else {
-          throw new \CRM_Core_Exception("Unknown field specified for sort. Cannot order by '$item'");
+          throw new \API_Exception("Unknown field specified for sort. Cannot order by '$item'");
         }
       }
     }

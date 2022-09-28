@@ -25,7 +25,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   /**
    * Minimum previous CiviCRM version we can directly upgrade from
    */
-  const MINIMUM_UPGRADABLE_VERSION = '4.6.12';
+  const MINIMUM_UPGRADABLE_VERSION = '4.4.7';
 
   /**
    * @var \CRM_Core_Config
@@ -186,6 +186,17 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
     }
   }
 
+  public function preProcess() {
+    CRM_Utils_System::setTitle($this->getTitle());
+    if (!$this->verifyPreDBState($errorMessage)) {
+      if (!isset($errorMessage)) {
+        $errorMessage = 'pre-condition failed for current upgrade step';
+      }
+      throw new CRM_Core_Exception($errorMessage);
+    }
+    $this->assign('recentlyViewed', FALSE);
+  }
+
   public function buildQuickForm() {
     $this->addDefaultButtons($this->getButtonTitle(),
       'next',
@@ -222,6 +233,45 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   }
 
   /**
+   * Use the form name to create the tpl file name.
+   *
+   * @return string
+   */
+
+  /**
+   * @return string
+   */
+  public function getTemplateFileName() {
+    $this->assign('title',
+      $this->getFieldsetTitle()
+    );
+    $this->assign('message',
+      $this->getTemplateMessage()
+    );
+    return 'CRM/Upgrade/Base.tpl';
+  }
+
+  public function postProcess() {
+    $this->upgrade();
+
+    if (!$this->verifyPostDBState($errorMessage)) {
+      if (!isset($errorMessage)) {
+        $errorMessage = 'post-condition failed for current upgrade step';
+      }
+      throw new CRM_Core_Exception($errorMessage);
+    }
+  }
+
+  /**
+   * @param $query
+   *
+   * @return Object
+   */
+  public function runQuery($query) {
+    return CRM_Core_DAO::executeQuery($query);
+  }
+
+  /**
    * @param $version
    *
    * @return Object
@@ -233,7 +283,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
 UPDATE civicrm_domain
 SET    version = '$version'
 ";
-    return CRM_Core_DAO::executeQuery($query);
+    return $this->runQuery($query);
   }
 
   /**
@@ -401,7 +451,7 @@ SET    version = '$version'
         [
           1 => CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER,
           2 => CRM_Utils_SQL::getDatabaseVersion(),
-          3 => CRM_Upgrade_Incremental_General::MIN_INSTALL_MARIADB_VER,
+          3 => '10.1',
           4 => $latestVer,
         ]);
     }
@@ -449,14 +499,6 @@ SET    version = '$version'
   /**
    * Fill the queue with upgrade tasks.
    *
-   * The queue is a priority-queue (sorted by tuple weight+id). Here are some common weights:
-   *
-   * - `weight=0`: Add a typical upgrade step for revising core schema.
-   * - `weight=-1`: In the middle of the upgrade, add an extra step for immediate execution.
-   * - `weight=1000`: Add some general core upgrade-logic that runs after all schema have change.d
-   * - `weight=2000`: Add some post-upgrade logic. If a task absolutely requires full system services
-   *    (eg enabling a new extension), then place it here.
-   *
    * @param string $currentVer
    *   the original revision.
    * @param string $latestVer
@@ -484,23 +526,14 @@ SET    version = '$version'
       [$postUpgradeMessageFile],
       "Cleanup old files"
     );
-    $queue->createItem($task, ['weight' => 0]);
-
-    if (empty(CRM_Upgrade_Snapshot::getActivationIssues())) {
-      $task = new CRM_Queue_Task(
-        ['CRM_Upgrade_Snapshot', 'cleanupTask'],
-        ['civicrm'],
-        "Cleanup old upgrade snapshots"
-      );
-      $queue->createItem($task, ['weight' => 0]);
-    }
+    $queue->createItem($task);
 
     $task = new CRM_Queue_Task(
       ['CRM_Upgrade_Form', 'disableOldExtensions'],
       [$postUpgradeMessageFile],
       "Checking extensions"
     );
-    $queue->createItem($task, ['weight' => 0]);
+    $queue->createItem($task);
 
     $revisions = $upgrade->getRevisionSequence();
     $maxRevision = empty($revisions) ? NULL : end($revisions);
@@ -519,7 +552,7 @@ SET    version = '$version'
           [$rev],
           "Begin Upgrade to $rev"
         );
-        $queue->createItem($beginTask, ['weight' => 0]);
+        $queue->createItem($beginTask);
 
         $task = new CRM_Queue_Task(
         // callback
@@ -528,7 +561,7 @@ SET    version = '$version'
           [$rev, $currentVer, $latestVer, $postUpgradeMessageFile],
           "Upgrade DB to $rev"
         );
-        $queue->createItem($task, ['weight' => 0]);
+        $queue->createItem($task);
 
         $task = new CRM_Queue_Task(
         // callback
@@ -537,7 +570,7 @@ SET    version = '$version'
           [$rev, $currentVer, $latestVer, $postUpgradeMessageFile],
           "Finish Upgrade DB to $rev"
         );
-        $queue->createItem($task, ['weight' => 0]);
+        $queue->createItem($task);
       }
     }
 
@@ -548,37 +581,8 @@ SET    version = '$version'
         [$rev, $latestVer, $latestVer, $postUpgradeMessageFile],
         "Finish Upgrade DB to $latestVer"
       );
-      $queue->createItem($task, ['weight' => 0]);
+      $queue->createItem($task);
     }
-
-    $task = new CRM_Queue_Task(
-      ['CRM_Upgrade_Incremental_MessageTemplates', 'updateReservedAndMaybeDefaultTemplates'],
-      [],
-      "Update all reserved message templates"
-    );
-    $queue->createItem($task, ['weight' => 990]);
-
-    $task = new CRM_Queue_Task(
-      ['CRM_Upgrade_Form', 'doCoreFinish'],
-      [$rev, $latestVer, $latestVer, $postUpgradeMessageFile],
-      "Finish core DB updates $latestVer"
-    );
-    $queue->createItem($task, ['weight' => 1000]);
-
-    $task = new CRM_Queue_Task(
-      ['CRM_Upgrade_Form', 'enqueueExtUpgrades'],
-      [$rev, $latestVer, $latestVer, $postUpgradeMessageFile],
-      "Assess extension upgrades"
-    );
-    // This places the extension-upgrades after `doCoreFinish` - but before new extensions (`addExtensionTask()`)
-    $queue->createItem($task, ['weight' => 1500]);
-
-    $task = new CRM_Queue_Task(
-      ['CRM_Upgrade_Form', 'doFinalMessages'],
-      [$currentVer, $latestVer, $postUpgradeMessageFile],
-      'Generate final messages'
-    );
-    $queue->createItem($task, ['weight' => 3000]);
 
     return $queue;
   }
@@ -729,13 +733,28 @@ SET    version = '$version'
 
     $versionObject = $upgrade->incrementalPhpObject($rev);
 
+    // pre-db check for major release.
+    if ($upgrade->checkVersionRelease($rev, 'alpha1')) {
+      if (!(is_callable([$versionObject, 'verifyPreDBstate']))) {
+        throw new CRM_Core_Exception("verifyPreDBstate method was not found for $rev");
+      }
+
+      $error = NULL;
+      if (!($versionObject->verifyPreDBstate($error))) {
+        if (!isset($error)) {
+          $error = "post-condition failed for current upgrade for $rev";
+        }
+        throw new CRM_Core_Exception($error);
+      }
+
+    }
+
     $upgrade->setSchemaStructureTables($rev);
 
     if (is_callable([$versionObject, $phpFunctionName])) {
       $versionObject->$phpFunctionName($rev, $originalVer, $latestVer);
     }
     else {
-      $ctx->log->info("Upgrade DB to $rev: SQL");
       $upgrade->processSQL($rev);
     }
 
@@ -777,28 +796,22 @@ SET    version = '$version'
     return TRUE;
   }
 
-  /**
-   * Finalize the core upgrade.
-   *
-   * @return bool
-   * @throws \CRM_Core_Exception
-   */
-  public static function doCoreFinish(): bool {
-    $restore = \CRM_Upgrade_DispatchPolicy::useTemporarily('upgrade.finish');
+  public static function doFinish() {
+    Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.finish'));
+    $restore = \CRM_Utils_AutoClean::with(function() {
+      Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.main'));
+    });
 
     $upgrade = new CRM_Upgrade_Form();
-    [$ignore, $latestVer] = $upgrade->getUpgradeVersions();
+    list($ignore, $latestVer) = $upgrade->getUpgradeVersions();
     // Seems extraneous in context, but we'll preserve old behavior
     $upgrade->setVersion($latestVer);
-    // Going forward, any new tasks will run in `upgrade.finish` mode.
-    // @see \CRM_Upgrade_DispatchPolicy::pick()
 
     $config = CRM_Core_Config::singleton();
     $config->userSystem->flush();
 
-    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
+    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, TRUE);
     // NOTE: triggerRebuild is FALSE becaues it will run again in a moment (via fixSchemaDifferences).
-    // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the Page. We reset later in doFinish().
 
     $versionCheck = new CRM_Utils_VersionCheck();
     $versionCheck->flushCache();
@@ -808,58 +821,6 @@ SET    version = '$version'
     $logging->fixSchemaDifferences();
     // Force a rebuild of CiviCRM asset cache in case things have changed.
     \Civi::service('asset_builder')->clear(FALSE);
-
-    return TRUE;
-  }
-
-  /**
-   * After core schema is up-to-date, ensure that
-   * @param \CRM_Queue_TaskContext $ctx
-   * @return bool
-   */
-  public static function enqueueExtUpgrades(CRM_Queue_TaskContext $ctx): bool {
-    CRM_Core_Config::singleton(TRUE, TRUE);
-    CRM_Upgrade_DispatchPolicy::assertActive('upgrade.finish');
-    if (CRM_Extension_Upgrades::hasPending()) {
-      CRM_Extension_Upgrades::fillQueue($ctx->queue);
-      // ISSUE: Core-upgrade tasks and ext-upgrade tasks need to run with different `DispatchPolicy`s
-      // (`upgrade.main` vs `upgrade.finish` or `NULL`).
-      // Can we make policy transitions sticky -- eg maybe a setting or session-variable?
-    }
-    return TRUE;
-  }
-
-  /**
-   * Generate any standard post-upgrade messages (which are not version-specific).
-   *
-   * @param \CRM_Queue_TaskContext $ctx
-   * @param string $originalVer
-   *   the original revision.
-   * @param string $latestVer
-   *   the target (final) revision.
-   * @param string $postUpgradeMessageFile
-   *   path of a modifiable file which lists the post-upgrade messages.
-   *
-   * @return bool
-   */
-  public static function doFinalMessages(CRM_Queue_TaskContext $ctx, $originalVer, $latestVer, $postUpgradeMessageFile): bool {
-    // There are currently no final messages to list. However, this stub may be useful for future messages.
-    return TRUE;
-  }
-
-  /**
-   * After finishing the queue, the upgrade-runner calls `doFinish()`.
-   *
-   * This is called by all upgrade-runners (inside or outside of `civicrm-core.git`).
-   * Removing it would be a breaky-annoying process; it would foreclose future use;
-   * and it would produce no tangible benefits.
-   *
-   * @return bool
-   */
-  public static function doFinish(): bool {
-    $session = CRM_Core_Session::singleton();
-    $session->reset(2);
-    return TRUE;
   }
 
   /**
@@ -873,6 +834,8 @@ SET    version = '$version'
    * @param $latestVer
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $currentVer, $latestVer) {
+    // check for changed message templates
+    CRM_Upgrade_Incremental_General::checkMessageTemplate($preUpgradeMessage, $latestVer, $currentVer);
     // set global messages
     CRM_Upgrade_Incremental_General::setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);
 

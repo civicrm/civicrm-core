@@ -23,8 +23,7 @@
       {$cd_edit.title}
     </div>
     <div id="customData{$group_id}" class="crm-accordion-body">
-      {include file="CRM/Custom/Form/Edit/CustomData.tpl" customDataEntity=''}
-      {include file="CRM/Form/attachmentjs.tpl"}
+      {include file="CRM/Custom/Form/CustomData.tpl" formEdit=true}
     </div>
     <!-- crm-accordion-body-->
   </div>

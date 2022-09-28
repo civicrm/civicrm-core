@@ -22,19 +22,13 @@
       mode = CRM.config && CRM.config.isFrontend ? 'front' : 'back';
     }
     query = query || '';
-    var url, frag, hash = '';
-    if (path.indexOf('#') > -1) {
-      hash = '#' + path.split('#')[1];
-      path = path.split('#')[0];
-    }
-    frag = path.split('?');
-    // Remove basepage as it can be changed on some CMS eg. WordPress frontend.
-    frag[0] = frag[0].replace('civicrm/', '/');
+    var url,
+      frag = path.split('?');
     // Encode url path only if slashes in placeholder were also encoded
-    if (tplURL[mode].indexOf('/crmajax-placeholder-url-path') >= 0) {
-      url = tplURL[mode].replace('/crmajax-placeholder-url-path', frag[0]);
+    if (tplURL[mode].indexOf('civicrm/placeholder-url-path') >= 0) {
+      url = tplURL[mode].replace('civicrm/placeholder-url-path', frag[0]);
     } else {
-      url = tplURL[mode].replace('%2Fcrmajax-placeholder-url-path', encodeURIComponent(frag[0]));
+      url = tplURL[mode].replace('civicrm%2Fplaceholder-url-path', encodeURIComponent(frag[0]));
     }
 
     if (_.isEmpty(query)) {
@@ -45,7 +39,7 @@
     if (frag[1]) {
       url += (url.indexOf('?') < 0 ? '?' : '&') + frag[1];
     }
-    return url + hash;
+    return url;
   };
 
   $.fn.crmURL = function () {
@@ -202,7 +196,6 @@
     options: {
       url: null,
       block: true,
-      post: null,
       crmForm: null
     },
     _originalContent: null,
@@ -273,10 +266,6 @@
         } else {
           url = url.replace(/snippet=[^&]*/, 'snippet=' + snippetType);
         }
-        // See Civi\Angular\AngularLoader
-        if (snippetType === 'json' && CRM.angular) {
-          url += '&crmAngularModules=' + CRM.angular.modules.join();
-        }
       }
       return url;
     },
@@ -292,24 +281,12 @@
         return false;
       });
     },
-    _ajax: function(url) {
-      if (!this.options.post || !this.isOriginalUrl()) {
-        return $.getJSON(url);
-      }
-      return $.post({
-        url: url,
-        dataType: 'json',
-        data: this.options.post
-      });
-    },
     refresh: function() {
-      var that = this,
-        hash = this.options.url.split('#')[1];
-        url = this._formatUrl(this.options.url, 'json');
-      $(this.element).data('urlHash', hash);
+      var that = this;
+      var url = this._formatUrl(this.options.url, 'json');
       if (this.options.crmForm) $('form', this.element).ajaxFormUnbind();
       if (this.options.block) this.element.block();
-      this._ajax(url).then(function(data) {
+      $.getJSON(url, function(data) {
         if (data.status === 'redirect') {
           that.options.url = data.userContext;
           return that.refresh();
@@ -338,7 +315,7 @@
             $('[name="'+formElement+'"]', that.element).crmError(msg);
           });
         }
-      }, function(data, msg, status) {
+      }).fail(function(data, msg, status) {
         that._onFailure(data, status);
       });
     },
@@ -530,7 +507,6 @@
           var $el = $(this),
             label = $el.is('input') ? $el.attr('value') : $el.text(),
             identifier = $el.attr('name') || $el.attr('href');
-          $el.attr('tabindex', '-1');
           if (!identifier || identifier === '#' || $.inArray(identifier, added) < 0) {
             var $icon = $el.find('.icon, .crm-i'),
               button = {'data-identifier': identifier, text: label, click: function() {
@@ -546,7 +522,7 @@
             added.push(identifier);
           }
           // display:none causes the form to not submit when pressing "enter"
-          $el.parents(buttonContainers).css({height: 0, padding: 0, margin: 0, overflow: 'hidden'}).attr('aria-hidden', 'true');
+          $el.parents(buttonContainers).css({height: 0, padding: 0, margin: 0, overflow: 'hidden'});
         });
         $el.dialog('option', 'buttons', buttons);
       }

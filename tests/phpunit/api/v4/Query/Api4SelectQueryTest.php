@@ -21,24 +21,35 @@ namespace api\v4\Query;
 
 use Civi\API\Request;
 use Civi\Api4\Query\Api4SelectQuery;
-use api\v4\Api4TestBase;
+use api\v4\UnitTestCase;
 
 /**
  * @group headless
  */
-class Api4SelectQueryTest extends Api4TestBase {
+class Api4SelectQueryTest extends UnitTestCase {
+
+  public function setUpHeadless() {
+    $relatedTables = [
+      'civicrm_address',
+      'civicrm_email',
+      'civicrm_phone',
+      'civicrm_openid',
+      'civicrm_im',
+      'civicrm_website',
+      'civicrm_activity',
+      'civicrm_activity_contact',
+    ];
+    $this->cleanup(['tablesToTruncate' => $relatedTables]);
+    $this->loadDataSet('DefaultDataSet');
+    $displayNameFormat = '{contact.first_name}{ }{contact.last_name}';
+    \Civi::settings()->set('display_name_format', $displayNameFormat);
+
+    return parent::setUpHeadless();
+  }
 
   public function testManyToOneJoin() {
-    $contact = $this->createTestRecord('Contact', [
-      'first_name' => uniqid(),
-      'last_name' => uniqid(),
-    ]);
-    $phone = $this->createTestRecord('Phone', [
-      'contact_id' => $contact['id'],
-      'phone' => uniqid(),
-    ]);
-
-    $phoneNum = $phone['phone'];
+    $phoneNum = $this->getReference('test_phone_1')['phone'];
+    $contact = $this->getReference('test_contact_1');
 
     $api = Request::create('Phone', 'get', [
       'version' => 4,
@@ -55,6 +66,7 @@ class Api4SelectQueryTest extends Api4TestBase {
   }
 
   /**
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
@@ -88,7 +100,7 @@ FROM civicrm_pledge a',
       $query->run();
       $this->fail('An Exception Should have been raised');
     }
-    catch (\CRM_Core_Exception $e) {
+    catch (\API_Exception $e) {
     }
 
     $api = Request::create('Contact', 'get', [
@@ -103,7 +115,7 @@ FROM civicrm_pledge a',
       $query->run();
       $this->fail('An Exception Should have been raised');
     }
-    catch (\CRM_Core_Exception $e) {
+    catch (\API_Exception $e) {
     }
   }
 

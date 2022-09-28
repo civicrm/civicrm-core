@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\MembershipType;
-
 /**
  * Class CRM_Financial_BAO_FinancialTypeTest
  * @group headless
@@ -25,10 +23,9 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   public function tearDown(): void {
     global $dbLocale;
     if ($dbLocale) {
-      $this->disableMultilingual();
+      CRM_Core_I18n_Schema::makeSinglelingual('en_US');
     }
     $this->financialAccountDelete('Donations');
-    parent::tearDown();
   }
 
   /**
@@ -112,11 +109,11 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
    * Check method del()
    *
    * @dataProvider multiLingual
-   * @group locale
    */
   public function testDel($isMultiLingual) {
     if ($isMultiLingual) {
-      $this->enableMultilingual(['en_US' => 'fr_FR']);
+      $this->enableMultilingual();
+      CRM_Core_I18n_Schema::addLocale('fr_FR', 'en_US');
     }
     $params = [
       'name' => 'Donations',
@@ -161,8 +158,8 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     $types = [];
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
     $expectedResult = [
-      1 => 'Donation',
-      2 => 'Member Dues',
+      1 => "Donation",
+      2 => "Member Dues",
     ];
     $this->assertEquals($expectedResult, $types, 'Verify that only certain financial types can be retrieved');
 
@@ -175,12 +172,11 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method test getAvailableMembershipTypes()
-   *
-   * @throws \CRM_Core_Exception
+   * Check method testgetAvailableMembershipTypes()
    */
-  public function testGetAvailableMembershipTypes(): void {
+  public function testgetAvailableMembershipTypes() {
     // Create Membership types
+    $ids = [];
     $params = [
       'name' => 'Type One',
       'domain_id' => 1,
@@ -193,11 +189,12 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
       'visibility' => 'Public',
       'is_active' => 1,
     ];
-    MembershipType::create()->setValues($params)->execute();
+
+    $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
     // Add another
     $params['name'] = 'Type Two';
     $params['financial_type_id'] = 2;
-    MembershipType::create()->setValues($params)->execute();
+    $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
 
     $this->setACL();
 
@@ -223,6 +220,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
    * Check method testcheckPermissionedLineItems()
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testCheckPermissionedLineItems() {
     $contactId = $this->individualCreate();
@@ -301,6 +299,28 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     ]);
     $perm = CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributions->id, 'view');
     $this->assertEquals($perm, TRUE, 'Verify that lineitems now have permission.');
+  }
+
+  /**
+   * Check method testisACLFinancialTypeStatus()
+   */
+  public function testBuildPermissionedClause() {
+    $this->setACL();
+    $this->setPermissions([
+      'view contributions of type Donation',
+      'view contributions of type Member Dues',
+    ]);
+    CRM_Financial_BAO_FinancialType::buildPermissionedClause($whereClause, 'contribution');
+    $this->assertEquals($whereClause, ' civicrm_contribution.financial_type_id IN (1,2)');
+    $this->setPermissions([
+      'view contributions of type Donation',
+      'view contributions of type Member Dues',
+      'view contributions of type Event Fee',
+    ]);
+    $whereClause = NULL;
+
+    CRM_Financial_BAO_FinancialType::buildPermissionedClause($whereClause, 'contribution');
+    $this->assertEquals($whereClause, ' civicrm_contribution.financial_type_id IN (1,4,2)');
   }
 
 }

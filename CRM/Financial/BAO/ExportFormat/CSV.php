@@ -33,6 +33,13 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
   ];
 
   /**
+   * Class constructor.
+   */
+  public function __construct() {
+    parent::__construct();
+  }
+
+  /**
    * @param array $exportParams
    */
   public function export($exportParams) {
@@ -108,7 +115,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
   }
 
   /**
-   * @param array $export
+   * @param $export
    *
    * @return string
    */
@@ -153,6 +160,9 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
    * @param array $export
    */
   public function makeExport($export) {
+    // getting data from admin page
+    $prefixValue = Civi::settings()->get('contribution_invoice_settings');
+
     foreach ($export as $batchId => $dao) {
       $financialItems = [];
       $this->_batchIds = $batchId;
@@ -172,7 +182,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
           $creditAccount = $dao->from_credit_account;
         }
 
-        $invoiceNo = Civi::settings()->get('invoice_prefix') . $dao->contribution_id;
+        $invoiceNo = CRM_Utils_Array::value('invoice_prefix', $prefixValue) . "" . $dao->contribution_id;
 
         $financialItems[] = [
           'Batch ID' => $dao->batch_id,

@@ -35,7 +35,6 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
     $this->callAPISuccess('MailSettings', 'delete', [
       'id' => $this->mailSettingsId,
     ]);
-    $this->quickCleanup(['civicrm_file', 'civicrm_entity_file']);
     parent::tearDown();
   }
 

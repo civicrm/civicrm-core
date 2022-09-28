@@ -307,7 +307,7 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
   /**
    * @param $fields
    * @param $files
-   * @param self $self
+   * @param $self
    *
    * @return array
    */

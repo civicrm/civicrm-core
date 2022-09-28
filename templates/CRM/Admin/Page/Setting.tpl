@@ -7,8 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{capture assign=docUrlText}{ts}Administration Documentation{/ts}{/capture}
-{capture assign=docLink}{docURL page="user/initial-set-up/customizing-the-user-interface" text=$docUrlText}{/capture}
+{capture assign=docLink}{docURL page="user/initial-set-up/customizing-the-user-interface" text="Administration Documentation"}{/capture}
 <div class="help">
     {ts 1=$docLink}Use the links below to configure or modify the global settings for CiviCRM for this site. Refer to the %1 for details on settings and options.{/ts}
 </div>

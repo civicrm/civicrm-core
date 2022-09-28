@@ -122,6 +122,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * Preprocess form.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
 
@@ -161,7 +162,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
 
-    $this->setTitle(ts('Renew Membership'));
+    CRM_Utils_System::setTitle(ts('Renew Membership'));
 
     parent::preProcess();
   }
@@ -358,7 +359,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       );
 
       $this->add('select', 'contribution_status_id', ts('Payment Status'),
-        CRM_Contribute_BAO_Contribution_Utils::getPendingAndCompleteStatuses()
+        CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses('membership')
       );
 
       $this->add('text', 'check_number', ts('Check Number'),
@@ -375,7 +376,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
 
-    $this->add('textarea', 'receipt_text', ts('Renewal Message'));
+    $this->add('textarea', 'receipt_text_renewal', ts('Renewal Message'));
 
     // Retrieve the name and email of the contact - this will be the TO for receipt email
     list($this->_contributorDisplayName,
@@ -407,7 +408,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * @param array $params
    *   (ref.) an assoc array of name/value pairs.
    * @param $files
-   * @param self $self
+   * @param $self
    *
    * @return bool|array
    *   mixed true or array of errors
@@ -455,6 +456,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * Process the renewal form.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess(): void {
     // get the submitted form values.
@@ -479,6 +481,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * This function is also accessed by a unit test.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function submit() {
     $this->storeContactFields($this->_params);
@@ -624,7 +627,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         'membership_id' => $membership->id,
         'contribution_recur_id' => $contributionRecurID,
       ]);
-      $this->setContributionID(CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams)->id);
+      CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams);
     }
 
     if (!empty($this->_params['send_receipt'])) {
@@ -635,7 +638,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   /**
    * Send a receipt.
    *
-   * @param CRM_Member_BAO_Membership $membership
+   * @param array $membership
    *
    * @throws \CRM_Core_Exception
    */
@@ -668,6 +671,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     CRM_Core_BAO_UFGroup::getValues($this->_contactID, $customFields, $customValues, FALSE, $members);
 
     $this->assign_by_ref('formValues', $this->_params);
+    if (!empty($this->_params['contribution_id'])) {
+      $this->assign('contributionID', $this->_params['contribution_id']);
+    }
 
     $this->assign('membership_name', CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
       $membership->membership_type_id
@@ -688,6 +694,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->assign('isAmountzero', 0);
       $this->assign('is_pay_later', 0);
       $this->assign('isPrimary', 1);
+      $this->assign('receipt_text_renewal', $this->_params['receipt_text']);
       if ($this->_mode === 'test') {
         $this->assign('action', '1024');
       }
@@ -695,19 +702,13 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     list($this->isMailSent) = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
-        'workflow' => 'membership_offline_receipt',
+        'groupName' => 'msg_tpl_workflow_membership',
+        'valueName' => 'membership_offline_receipt',
+        'contactId' => $this->_receiptContactId,
         'from' => $receiptFrom,
         'toName' => $this->_contributorDisplayName,
         'toEmail' => $this->_contributorEmail,
         'isTest' => $this->_mode === 'test',
-        'PDFFilename' => ts('receipt') . '.pdf',
-        'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
-        'modelProps' => [
-          'receiptText' => $this->getSubmittedValue('receipt_text'),
-          'contactId' => $this->_receiptContactId,
-          'contributionID' => $this->getContributionID(),
-          'membershipID' => $this->_membershipId,
-        ],
       ]
     );
   }
@@ -725,6 +726,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    *
    * @return CRM_Member_BAO_Membership
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function processMembership($memParams, $changeToday, $numRenewTerms, $pending) {
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();

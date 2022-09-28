@@ -14,11 +14,7 @@ namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
-/**
- * @service
- * @internal
- */
-class FinancialItemCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
+class FinancialItemCreationSpecProvider implements Generic\SpecProviderInterface {
 
   // I'm not sure it makes sense to have a default `entity_table`... actually, I don't even know if it makes
   // sense to expose `FinancialItem` as a public API, for what that's worth. But it's there, so clearly it does.

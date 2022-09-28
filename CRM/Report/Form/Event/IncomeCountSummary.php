@@ -18,6 +18,12 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
+  protected $_charts = [
+    '' => 'Tabular',
+    'barChart' => 'Bar Chart',
+    'pieChart' => 'Pie Chart',
+  ];
+
   protected $_add2groupSupported = FALSE;
 
   protected $_customGroupExtends = [
@@ -130,14 +136,6 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form {
         ],
       ],
     ];
-
-    // Add charts support
-    $this->_charts = [
-      '' => ts('Tabular'),
-      'barChart' => ts('Bar Chart'),
-      'pieChart' => ts('Pie Chart'),
-    ];
-
     parent::__construct();
   }
 
@@ -247,7 +245,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form {
   }
 
   /**
-   * @param array $rows
+   * @param $rows
    *
    * @return array
    */
@@ -350,7 +348,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form {
   }
 
   /**
-   * @param array $rows
+   * @param $rows
    */
   public function buildChart(&$rows) {
 

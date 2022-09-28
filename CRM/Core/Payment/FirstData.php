@@ -150,13 +150,14 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
   public function doPayment(&$params, $component = 'contribute') {
     $propertyBag = \Civi\Payment\PropertyBag::cast($params);
     $this->_component = $component;
-    $result = $this->setStatusPaymentPending([]);
+    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
 
     // If we have a $0 amount, skip call to processor and set payment_status to Completed.
     // Conceivably a processor might override this - perhaps for setting up a token - but we don't
     // have an example of that at the moment.
     if ($propertyBag->getAmount() == 0) {
-      $result = $this->setStatusPaymentCompleted($result);
+      $result['payment_status_id'] = array_search('Completed', $statuses);
+      $result['payment_status'] = 'Completed';
       return $result;
     }
 
@@ -221,7 +222,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_TIMEOUT, 36000);
     // ensures any Location headers are followed
-    if (ini_get('open_basedir') == '') {
+    if (ini_get('open_basedir') == '' && ini_get('safe_mode') == 'Off') {
       curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
     }
 
@@ -300,8 +301,9 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
       // Success !
       //=============
       $params['trxn_result_code'] = $processorResponse['r_message'];
-      $result['trxn_id'] = $processorResponse['r_ref'];
-      $result = $this->setStatusPaymentCompleted($result);
+      $params['trxn_id'] = $processorResponse['r_ref'];
+      $params['payment_status_id'] = array_search('Completed', $statuses);
+      $params['payment_status'] = 'Completed';
       CRM_Core_Error::debug_log_message("r_authresponse " . $processorResponse['r_authresponse']);
       CRM_Core_Error::debug_log_message("r_code " . $processorResponse['r_code']);
       CRM_Core_Error::debug_log_message("r_tdate " . $processorResponse['r_tdate']);
@@ -312,7 +314,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
       CRM_Core_Error::debug_log_message("r_message " . $processorResponse['r_message']);
       CRM_Core_Error::debug_log_message("r_ref " . $processorResponse['r_ref']);
       CRM_Core_Error::debug_log_message("r_time " . $processorResponse['r_time']);
-      return $result;
+      return $params;
     }
   }
 

@@ -6,7 +6,7 @@
 class CRM_Core_CodeGen_Util_File {
 
   /**
-   * @param string $dir
+   * @param $dir
    * @param int $perm
    */
   public static function createDir($dir, $perm = 0755) {
@@ -16,7 +16,7 @@ class CRM_Core_CodeGen_Util_File {
   }
 
   /**
-   * @param string $dir
+   * @param $dir
    */
   public static function cleanTempDir($dir) {
     foreach (glob("$dir/*") as $tempFile) {
@@ -31,7 +31,7 @@ class CRM_Core_CodeGen_Util_File {
   }
 
   /**
-   * @param string $prefix
+   * @param $prefix
    *
    * @return string
    */

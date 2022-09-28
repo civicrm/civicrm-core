@@ -89,11 +89,8 @@ class ChainSubscriber implements EventSubscriberInterface {
       $oldResult = $result;
       $result = ['values' => [0 => $oldResult]];
     }
-
-    // Scan the params for chain calls.
     foreach ($params as $field => $newparams) {
       if ((is_array($newparams) || $newparams === 1) && $field <> 'api.has_parent' && substr($field, 0, 3) == 'api') {
-        // This param is a chain call, e.g. api.<entity>.<action>
 
         // 'api.participant.delete' => 1 is a valid options - handle 1
         // instead of an array
@@ -108,13 +105,9 @@ class ChainSubscriber implements EventSubscriberInterface {
         $subAPI = explode($separator, $field);
 
         $subaction = empty($subAPI[2]) ? $action : $subAPI[2];
-        /** @var array of parameters that will be applied to every chained request. */
-        $enforcedSubParams = [
+        $subParams = [
           'debug' => $params['debug'] ?? NULL,
         ];
-        /** @var array of parameters that provide defaults to every chained request, but which may be overridden by parameters in the chained request. */
-        $defaultSubParams = [];
-
         $subEntity = _civicrm_api_get_entity_name_from_camel($subAPI[1]);
 
         // Hard coded list of entitys that have fields starting api_ and shouldn't be automatically
@@ -138,8 +131,8 @@ class ChainSubscriber implements EventSubscriberInterface {
             //from the parent call. in this case 'contact_id' will also be
             //set to the parent's id
             if (!($subEntity == 'line_item' && $lowercase_entity == 'contribution' && $action != 'create')) {
-              $defaultSubParams["entity_id"] = $parentAPIValues['id'];
-              $defaultSubParams['entity_table'] = 'civicrm_' . $lowercase_entity;
+              $subParams["entity_id"] = $parentAPIValues['id'];
+              $subParams['entity_table'] = 'civicrm_' . $lowercase_entity;
             }
 
             $addEntityId = TRUE;
@@ -157,39 +150,38 @@ class ChainSubscriber implements EventSubscriberInterface {
               }
             }
             if ($addEntityId) {
-              $defaultSubParams[$lowercase_entity . "_id"] = $parentAPIValues['id'];
+              $subParams[$lowercase_entity . "_id"] = $parentAPIValues['id'];
             }
           }
-          // @todo remove strtolower: $subEntity is already lower case
           if ($entity != 'Contact' && \CRM_Utils_Array::value(strtolower($subEntity . "_id"), $parentAPIValues)) {
             //e.g. if event_id is in the values returned & subentity is event
             //then pass in event_id as 'id' don't do this for contact as it
             //does some weird things like returning primary email &
             //thus limiting the ability to chain email
             //TODO - this might need the camel treatment
-            $defaultSubParams['id'] = $parentAPIValues[$subEntity . "_id"];
+            $subParams['id'] = $parentAPIValues[$subEntity . "_id"];
           }
 
           if (\CRM_Utils_Array::value('entity_table', $result['values'][$idIndex]) == $subEntity) {
-            $defaultSubParams['id'] = $result['values'][$idIndex]['entity_id'];
+            $subParams['id'] = $result['values'][$idIndex]['entity_id'];
           }
           // if we are dealing with the same entity pass 'id' through
           // (useful for get + delete for example)
           if ($lowercase_entity == $subEntity) {
-            $defaultSubParams['id'] = $result['values'][$idIndex]['id'];
+            $subParams['id'] = $result['values'][$idIndex]['id'];
           }
 
-          $enforcedSubParams['version'] = $version;
-          // Copy check_permissions from parent.
-          $enforcedSubParams['check_permissions'] = $params['check_permissions'] ?? NULL;
-          $defaultSubParams['sequential'] = 1;
-          $enforcedSubParams['api.has_parent'] = 1;
-          // Inspect $newparams, the passed in params for the chain call.
+          $subParams['version'] = $version;
+          if (!empty($params['check_permissions'])) {
+            $subParams['check_permissions'] = $params['check_permissions'];
+          }
+          $subParams['sequential'] = 1;
+          $subParams['api.has_parent'] = 1;
           if (array_key_exists(0, $newparams)) {
-            // It is a numerically indexed array - ie. multiple creates
+            $genericParams = $subParams;
+            // it is a numerically indexed array - ie. multiple creates
             foreach ($newparams as $entityparams) {
-              // Defaults, overridden by request params, overridden by enforced params.
-              $subParams = array_merge($defaultSubParams, $entityparams, $enforcedSubParams);
+              $subParams = array_merge($genericParams, $entityparams);
               _civicrm_api_replace_variables($subParams, $result['values'][$idIndex], $separator);
               $result['values'][$idIndex][$field][] = $apiKernel->runSafe($subEntity, $subaction, $subParams);
               if ($result['is_error'] === 1) {
@@ -198,8 +190,8 @@ class ChainSubscriber implements EventSubscriberInterface {
             }
           }
           else {
-            // Defaults, overridden by request params, overridden by enforced params.
-            $subParams = array_merge($defaultSubParams, $newparams, $enforcedSubParams);
+
+            $subParams = array_merge($subParams, $newparams);
             _civicrm_api_replace_variables($subParams, $result['values'][$idIndex], $separator);
             $result['values'][$idIndex][$field] = $apiKernel->runSafe($subEntity, $subaction, $subParams);
             if (!empty($result['is_error'])) {

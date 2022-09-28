@@ -33,7 +33,7 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
 
     foreach ($templates as $template) {
       $msg_text = $this->callAPISuccessGetValue('MessageTemplate', ['id' => $template['id'], 'return' => 'msg_text']);
-      $this->assertStringContainsString('{assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}', $msg_text);
+      $this->assertStringContainsString('{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}', $msg_text);
       if ($msg_text !== $originalText) {
         // Reset value for future tests.
         $this->callAPISuccess('MessageTemplate', 'create', ['msg_text' => $originalText, 'id' => $template['id']]);
@@ -44,16 +44,15 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
   /**
    * Test that a string replacement in a message template can be done.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function testMessageTemplateStringReplace(): void {
     MessageTemplate::update()->setValues(['msg_html' => '{$display_name}'])->addWhere(
       'workflow_name', '=', 'contribution_invoice_receipt'
     )->execute();
     $upgrader = new CRM_Upgrade_Incremental_MessageTemplates('5.41.0');
-    $check = new CRM_Utils_Check_Component_Tokens();
-    $message = $check->checkTokens()[0];
-    $this->assertEquals('<p>You are using tokens that have been removed or deprecated.</p><ul><li>Please review your contribution_invoice_receipt message template and remove references to the token {$display_name} as it has been replaced by {contact.display_name}</li></ul></p>', $message->getMessage());
+    $messages = $upgrader->getMessageTemplateWarning('contribution_invoice_receipt', '$display_name', 'contact.display_name');
+    $this->assertEquals('Please review your contribution_invoice_receipt message template and remove references to the token {$display_name} as it has been replaced by {contact.display_name}', $messages);
     $upgrader->replaceTokenInTemplate('contribution_invoice_receipt', '$display_name', 'contact.display_name');
     $templates = MessageTemplate::get()->addSelect('msg_html')
       ->addWhere(
@@ -62,15 +61,15 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     foreach ($templates as $template) {
       $this->assertEquals('{contact.display_name}', $template['msg_html']);
     }
-    $messages = $check->checkTokens();
-    $this->assertEmpty($messages);
+    $messages = $upgrader->getMessageTemplateWarning('contribution_invoice_receipt', '$display_name', 'contact.display_name');
+    $this->assertEquals('', $messages);
     $this->revertTemplateToReservedTemplate('contribution_invoice_receipt');
   }
 
   /**
    * Test that a $this->string replacement in a message template can be done.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function testActionScheduleStringReplace(): void {
     ActionSchedule::create(FALSE)->setValues([
@@ -116,7 +115,7 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     foreach ($templates as $template) {
       $msg_text = $this->callAPISuccessGetValue('MessageTemplate', ['id' => $template['id'], 'return' => 'msg_text']);
       if ($template['is_reserved']) {
-        $this->assertStringContainsString('{assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}', $msg_text);
+        $this->assertStringContainsString('{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}', $msg_text);
       }
       else {
         $this->assertEquals('great what a silly sausage you are', $msg_text);
@@ -736,16 +735,6 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     $contactType = $this->callAPISuccess('ContactType', 'getsingle', ['label' => 'Test Contact Type']);
     $this->assertNotEmpty($contactType['name']);
     $this->callAPISuccess('ContactType', 'delete', ['id' => $contactType['id']]);
-  }
-
-  public function testUpdateRelationshipCacheTable() {
-    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_relationship_cache DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci");
-    CRM_Upgrade_Incremental_php_FiveFortyThree::fixRelationshipCacheTableCollation();
-    $contactTableCollation = CRM_Core_BAO_SchemaHandler::getInUseCollation();
-    $dao = CRM_Core_DAO::executeQuery('SHOW TABLE STATUS LIKE \'civicrm_relationship_cache\'');
-    $dao->fetch();
-    $relationshipCacheCollation = $dao->Collation;
-    $this->assertEquals($contactTableCollation, $relationshipCacheCollation);
   }
 
 }

@@ -22,20 +22,20 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
         <tr id="extension-{$row.file|escape}" class="crm-entity crm-extension-{$row.file|escape}{if $row.status eq 'disabled'} disabled{/if}{if $row.status eq 'installed-missing' or $row.status eq 'disabled-missing'} extension-missing{/if}{if $row.status eq 'installed'} extension-installed{/if}">
           <td class="crm-extensions-label">
               <a class="collapsed" href="#"></a>&nbsp;<strong>{$row.label|escape}</strong><br/>{$row.description|escape}
-              {if $extAddNewEnabled && array_key_exists($extKey, $remoteExtensionRows) && $remoteExtensionRows[$extKey].upgradelink|smarty:nodefaults}
-                <div class="crm-extensions-upgrade">{$remoteExtensionRows[$extKey].upgradelink|smarty:nodefaults}</div>
+              {if $extAddNewEnabled && !empty($remoteExtensionRows[$extKey]) && $remoteExtensionRows[$extKey].upgradelink}
+                <div class="crm-extensions-upgrade">{$remoteExtensionRows[$extKey].upgradelink}</div>
               {/if}
           </td>
           <td class="crm-extensions-status">{$row.statusLabel} </td>
           <td class="crm-extensions-version">{$row.version|escape}
-            {if (!empty($row.develStage) and $row.develStage != 'stable') or preg_match(";(alpha|beta|dev);", $row.version)}
+            {if ($row.develStage and $row.develStage != 'stable') or preg_match(";(alpha|beta|dev);", $row.version)}
               {icon icon="fa-flask crm-extensions-stage"}{ts}This is a pre-release version. For more details, see the expanded description.{/ts}{/icon}
             {else}
               {icon icon="fa-check-circle crm-extensions-stage"}{ts}This is a stable release version.{/ts}{/icon}
             {/if}
           </td>
           <td class="crm-extensions-description">{$row.type|escape|capitalize}</td>
-          <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
+          <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
         <tr class="hiddenElement" id="crm-extensions-details-{$row.file|escape}">
             <td>

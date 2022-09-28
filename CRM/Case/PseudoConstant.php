@@ -26,7 +26,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param string $column
    * @param bool $onlyActive
-   * @param string|null $condition
+   * @param null $condition
    * @param bool $fresh
    *
    * @return array
@@ -47,7 +47,8 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the redaction rules.
    *
-   * @param int $filter
+   *
+   * @param null $filter
    *
    * @return array
    *   array reference of all redaction rules

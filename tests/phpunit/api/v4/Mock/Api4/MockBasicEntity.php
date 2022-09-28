@@ -24,7 +24,6 @@ use api\v4\Mock\MockEntityDataStorage;
 /**
  * MockBasicEntity entity.
  *
- * @labelField foo
  * @package Civi\Api4
  */
 class MockBasicEntity extends Generic\BasicEntity {
@@ -60,9 +59,6 @@ class MockBasicEntity extends Generic\BasicEntity {
         ],
         [
           'name' => 'size',
-        ],
-        [
-          'name' => 'foo',
         ],
         [
           'name' => 'weight',

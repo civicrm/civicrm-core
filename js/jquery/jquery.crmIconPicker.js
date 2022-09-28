@@ -27,9 +27,8 @@
       }
 
       var $input = $(this),
-        classes = ($input.attr('class') || '').replace('crm-icon-picker', ''),
         $button = $('<a class="crm-icon-picker-button" href="#" />').button().removeClass('ui-corner-all').attr('title', $input.attr('title')),
-        $style = $('<select class="crm-form-select"></select>').addClass(classes),
+        $style = $('<select class="crm-form-select"></select>'),
         options = [
           {key: 'fa-rotate-90', value: ts('Rotate right')},
           {key: 'fa-rotate-270', value: ts('Rotate left')},
@@ -91,8 +90,7 @@
             '<div class="icon-ctrls crm-clearfix">' +
             '<input class="crm-form-text" name="search" placeholder="&#xf002"/>' +
             '<select class="crm-form-select"></select>' +
-            // Add "No Icon" button unless field is required
-            ($input.is('[required]') ? '' : '<button type="button" class="cancel" title=""><i class="crm-i fa-ban" aria-hidden="true"></i> ' + ts('No icon') + '</button>') +
+            '<button type="button" class="cancel" title=""><i class="crm-i fa-ban" aria-hidden="true"></i> ' + ts('No icon') + '</button>' +
             '</div>' +
             '<div class="icons"></div>'
           );

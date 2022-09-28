@@ -21,7 +21,7 @@
  *
  * @param array $apiRequest
  *
- * @throws CRM_Core_Exception
+ * @throws API_Exception
  * @return array
  */
 function civicrm_api3_generic_setValue($apiRequest) {

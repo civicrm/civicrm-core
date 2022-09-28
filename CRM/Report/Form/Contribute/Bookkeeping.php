@@ -112,7 +112,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
               'title' => ts('Financial Account Owner - Debit'),
               'operatorType' => CRM_Report_Form::OP_SELECT,
               'type' => CRM_Utils_Type::T_INT,
-              'options' => ['' => ts('- Select Organization -')] + CRM_Financial_BAO_FinancialAccount::getOrganizationNames(FALSE),
+              'options' => ['' => '- Select Organization -'] + CRM_Financial_BAO_FinancialAccount::getOrganizationNames(FALSE),
               'name' => 'contact_id',
               'alias' => 'financial_account_civireport_debit',
             ],
@@ -128,7 +128,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
               'title' => ts('Financial Account Owner - Credit'),
               'operatorType' => CRM_Report_Form::OP_SELECT,
               'type' => CRM_Utils_Type::T_INT,
-              'options' => ['' => ts('- Select Organization -')] + CRM_Financial_BAO_FinancialAccount::getOrganizationNames(FALSE),
+              'options' => ['' => '- Select Organization -'] + CRM_Financial_BAO_FinancialAccount::getOrganizationNames(FALSE),
               'name' => 'contact_id',
               'alias' => 'financial_account_civireport_credit',
             ],
@@ -480,7 +480,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
   }
 
   /**
-   * @param array $rows
+   * @param $rows
    *
    * @return array
    */

@@ -31,10 +31,10 @@
             <th></th>
         </tr>
         {foreach from=$rows item=row}
-        <tr id="paymentProcessorType-{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class} crm-entity {if NOT $row.is_active} disabled{/if}">
+        <tr id="paymentProcessorType-{$row.id}" class="{cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if} crm-entity {if NOT $row.is_active} disabled{/if}">
           <td class="crm-paymentProcessorType-name">{$row.name}</td>
           <td class="crm-paymentProcessorType-title crm-editable" data-field="title">{$row.title}</td>
-            <td class="crm-paymentProcessorType-description">{$row.description}</td>
+            <td class="crm-paymentProcessorType-description">{if isset($row.description)}{$row.description}{/if}</td>
           <td id="row_{$row.id}_status" class="crm-paymentProcessorType-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td class="crm-paymentProcessorType-is_default">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}&nbsp;</td>
           <td>{$row.action}</td>

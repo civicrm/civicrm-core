@@ -12,28 +12,32 @@
 
 namespace Civi\Api4\Service\Spec;
 
-/**
- * Contains APIv4 field metadata
- */
+use Civi\Schema\Traits\ArrayFormatTrait;
+use Civi\Schema\Traits\BasicSpecTrait;
+use Civi\Schema\Traits\DataTypeSpecTrait;
+use Civi\Schema\Traits\GuiSpecTrait;
+use Civi\Schema\Traits\OptionsSpecTrait;
+use Civi\Schema\Traits\SqlSpecTrait;
+
 class FieldSpec {
 
   // BasicSpecTrait: name, title, description
-  use \Civi\Schema\Traits\BasicSpecTrait;
+  use BasicSpecTrait;
 
   // DataTypeSpecTrait: dataType, serialize, fkEntity
-  use \Civi\Schema\Traits\DataTypeSpecTrait;
+  use DataTypeSpecTrait;
 
-  // OptionsSpecTrait: options, optionsCallback, suffixes
-  use \Civi\Schema\Traits\OptionsSpecTrait;
+  // OptionsSpecTrait: options, optionsCallback
+  use OptionsSpecTrait;
 
   // GuiSpecTrait: label, inputType, inputAttrs, helpPre, helpPost
-  use \Civi\Schema\Traits\GuiSpecTrait;
+  use GuiSpecTrait;
 
   // SqlSpecTrait tableName, columnName, operators, sqlFilters
-  use \Civi\Schema\Traits\SqlSpecTrait;
+  use SqlSpecTrait;
 
   // ArrayFormatTrait: toArray():array, loadArray($array)
-  use \Civi\Schema\Traits\ArrayFormatTrait;
+  use ArrayFormatTrait;
 
   /**
    * @var mixed
@@ -62,11 +66,6 @@ class FieldSpec {
 
   /**
    * @var bool
-   */
-  public $nullable = TRUE;
-
-  /**
-   * @var string
    */
   public $requiredIf;
 
@@ -135,24 +134,6 @@ class FieldSpec {
   /**
    * @return bool
    */
-  public function getNullable() {
-    return $this->nullable;
-  }
-
-  /**
-   * @param bool $nullable
-   *
-   * @return $this
-   */
-  public function setNullable(bool $nullable) {
-    $this->nullable = $nullable;
-
-    return $this;
-  }
-
-  /**
-   * @return bool
-   */
   public function isRequired() {
     return $this->required;
   }
@@ -169,14 +150,14 @@ class FieldSpec {
   }
 
   /**
-   * @return string
+   * @return bool
    */
   public function getRequiredIf() {
     return $this->requiredIf;
   }
 
   /**
-   * @param string $requiredIf
+   * @param bool $requiredIf
    *
    * @return $this
    */

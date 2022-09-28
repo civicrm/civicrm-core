@@ -19,14 +19,13 @@
 
 namespace api\v4\Query;
 
-use api\v4\Api4TestBase;
+use api\v4\UnitTestCase;
 use Civi\Api4\Query\SqlExpression;
-use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class SqlExpressionParserTest extends Api4TestBase implements TransactionalInterface {
+class SqlExpressionParserTest extends UnitTestCase {
 
   public function aggregateFunctions() {
     return [
@@ -81,7 +80,7 @@ class SqlExpressionParserTest extends Api4TestBase implements TransactionalInter
         $this->fail('SqlWild should only be allowed in COUNT.');
       }
     }
-    catch (\CRM_Core_Exception $e) {
+    catch (\API_Exception $e) {
       $this->assertStringContainsString('Illegal', $e->getMessage());
     }
   }
